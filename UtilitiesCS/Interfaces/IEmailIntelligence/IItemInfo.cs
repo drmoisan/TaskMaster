@@ -34,7 +34,7 @@ public interface IItemInfo
     string EntryId { get; set; }
     string StoreId { get; set; }
     string FolderName { get; set; }
-    IFolderInfo FolderInfo { get; set; }
+    IFolderWrapper FolderInfo { get; set; }
     string Html { get; }
     string HTMLBody { get; }
     int InternetCodepage { get; }

@@ -55,7 +55,7 @@ namespace UtilitiesCS //QuickFiler
             _emailPrefixToStrip = new(() => Globals.Ol.EmailPrefixToStrip, true);
             _storeId = new(() => ((Folder)_item.Parent).StoreID, true);
             _folderName = new(() => ((Folder)_item.Parent).Name, true);
-            _folderInfo = new(() => new OlFolderWrapper((Folder)Item.Parent, ResolveFolderRoot(globals, ((Folder)Item.Parent).FolderPath)));
+            _folderInfo = new(() => new FolderWrapper((Folder)Item.Parent, ResolveFolderRoot(globals, ((Folder)Item.Parent).FolderPath)));
             _htmlBody = new(() => _item.HTMLBody, true);
             _html = new(() => GetHtml(HTMLBody), true);
             _isTaskFlagSet = new(() => _item.FlagStatus == OlFlagStatus.olFlagMarked);
@@ -185,7 +185,7 @@ namespace UtilitiesCS //QuickFiler
             }
             else
             {
-                return appGlobals.Ol.EmailRoot;
+                return appGlobals.Ol.Inbox;
             }
         }
         
@@ -324,8 +324,8 @@ namespace UtilitiesCS //QuickFiler
         private Lazy<string> _storeId;
         public string StoreId { get => _storeId.Value; set => _storeId = value.ToLazy(); }
 
-        private Lazy<IFolderInfo> _folderInfo;
-        public IFolderInfo FolderInfo { get => _folderInfo?.Value; set => _folderInfo = value.ToLazy(); }
+        private Lazy<IFolderWrapper> _folderInfo;
+        public IFolderWrapper FolderInfo { get => _folderInfo?.Value; set => _folderInfo = value.ToLazy(); }
 
         private Lazy<string> _folderName;
         public string FolderName { get => _folderName?.Value; set => _folderName = value.ToLazy(); }

@@ -85,7 +85,7 @@ namespace UtilitiesCS
             {
                 if (_folderOld is null && NotNull(FolderPathOld, OlRootPath, OlApp))
                 {
-                    var folderHandler = new OlFolderHelper(OlApp);
+                    var folderHandler = new FolderPredictor(OlApp);
                     _folderOld = folderHandler.GetFolder($"{OlRootPath}\\{FolderPathOld}", OlApp);
                 }
                 return _folderOld;

@@ -259,8 +259,10 @@ namespace Tags
             return searchText.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries).ToList();
         }
 
-        public string SelectionString() => string.Join(", ", _dictOptions.Where(item => item.Value).Select(item => item.Key).ToList());
-        
+        //public string SelectionAsString() => string.Join(", ", _dictOptions.Where(item => item.Value).Select(item => item.Key).ToList());
+        public string SelectionAsString() => string.Join(", ", SelectionAsList());
+        public List<string> SelectionAsList() => _dictOptions.Where(item => item.Value).Select(item => item.Key).ToList();
+
         public bool ButtonNewActive { get => _viewer.ButtonNew.Visible; set => _viewer.ButtonNew.Visible = value; }
         
         public bool ButtonAutoAssignActive {  get => _viewer.ButtonAutoAssign.Visible; set => _viewer.ButtonAutoAssign.Visible = value; }

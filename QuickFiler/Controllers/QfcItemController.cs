@@ -500,13 +500,13 @@ namespace QuickFiler.Controllers
         {
             if (varList is null)
             {
-                _folderHandler = new OlFolderHelper(
-                    _globals, ItemInfo, OlFolderHelper.InitOptions.FromField);
+                _folderHandler = new FolderPredictor(
+                    _globals, ItemInfo, FolderPredictor.InitOptions.FromField);
             }
             else
             {
-                _folderHandler = new OlFolderHelper(
-                    _globals, varList, OlFolderHelper.InitOptions.FromArrayOrString);
+                _folderHandler = new FolderPredictor(
+                    _globals, varList, FolderPredictor.InitOptions.FromArrayOrString);
             }
         }
 
@@ -517,9 +517,9 @@ namespace QuickFiler.Controllers
             {
                 try
                 {
-                    _folderHandler = await new OlFolderHelper(
-                        _globals, ItemInfo.ThrowIfNull(), OlFolderHelper.InitOptions.FromField)
-                        .InitAsync(ItemInfo, OlFolderHelper.InitOptions.FromField);
+                    _folderHandler = await new FolderPredictor(
+                        _globals, ItemInfo.ThrowIfNull(), FolderPredictor.InitOptions.FromField)
+                        .InitAsync(ItemInfo, FolderPredictor.InitOptions.FromField);
                 }
                 catch(ArgumentNullException e)
                 {
@@ -527,7 +527,7 @@ namespace QuickFiler.Controllers
                     logger.Debug("Loading empty folder handler");
                     try
                     {
-                        _folderHandler = new OlFolderHelper(_globals);
+                        _folderHandler = new FolderPredictor(_globals);
                     }
                     catch (System.Exception e2)
                     {
@@ -545,9 +545,9 @@ namespace QuickFiler.Controllers
             }
             else
             {
-                _folderHandler = await new OlFolderHelper(
-                    _globals, varList, OlFolderHelper.InitOptions.FromArrayOrString)
-                    .InitAsync(varList, OlFolderHelper.InitOptions.FromArrayOrString);
+                _folderHandler = await new FolderPredictor(
+                    _globals, varList, FolderPredictor.InitOptions.FromArrayOrString)
+                    .InitAsync(varList, FolderPredictor.InitOptions.FromArrayOrString);
             }
         }
 
@@ -623,7 +623,7 @@ namespace QuickFiler.Controllers
         private bool _suppressEvents = false;
         private CoreWebView2Environment _webViewEnvironment;
         private Dictionary<string, Theme> _themes;
-        private OlFolderHelper _folderHandler;
+        private FolderPredictor _folderHandler;
         private IApplicationGlobals _globals;
         private IList<TableLayoutPanel> _tableLayoutPanels;
         private IQfcCollectionController _parent;

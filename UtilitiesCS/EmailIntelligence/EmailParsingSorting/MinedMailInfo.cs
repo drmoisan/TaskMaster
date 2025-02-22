@@ -28,8 +28,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         private string[] _tokens;
         public string[] Tokens { get => _tokens; set => _tokens = value; }
 
-        private IFolderInfo _folderInfo;
-        public IFolderInfo FolderInfo { get => _folderInfo; set => _folderInfo = value; }
+        private IFolderWrapper _folderInfo;
+        public IFolderWrapper FolderInfo { get => _folderInfo; set => _folderInfo = value; }
 
         private IRecipientInfo[] _toRecipients;
         public IRecipientInfo[] ToRecipients { get => _toRecipients; set => _toRecipients = value; }

@@ -1,6 +1,6 @@
 ﻿using UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList;
 
-namespace ConcurrentObservableCollections.ConcurrentObservableDictionary
+namespace ConcurrentObservableCollection.ConcurrentObservableDictionary
 {
     public interface ILockingLinkedListObserver<T>
     {

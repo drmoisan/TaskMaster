@@ -271,8 +271,8 @@ namespace UtilitiesCS
             }
         }
 
-        private void Update() => updated = false;
-        protected bool updated;
+        private void Update() => Combined.RequestUpdate();//updated = false;
+        //protected bool updated;
         
         public FlagConsolidator Combined { get; protected set; }
 

@@ -95,9 +95,9 @@ namespace UtilitiesCS
             {
                 return appGlobals.Ol.ArchiveRootPath;
             }
-            else if (olBranchPath.Contains(appGlobals.Ol.EmailRootPath))
+            else if (olBranchPath.Contains(appGlobals.Ol.InboxPath))
             {
-                return appGlobals.Ol.EmailRootPath;
+                return appGlobals.Ol.InboxPath;
             }
             else
             {

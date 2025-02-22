@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Tags;
 using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 
 namespace TaskVisualization
@@ -34,12 +35,19 @@ namespace TaskVisualization
 
         public IList<string> AutoFind(object objItem)
         {
-            return AutoFile.AutoFindPeople(objItem: objItem,
-                                           ppl_dict: _globals.TD.People,
-                                           emailRootFolder: _globals.Ol.EmailRootPath,
-                                           dictRemap: _globals.TD.DictRemap,
-                                           userAddress: _globals.Ol.UserEmailAddress,
-                                           blExcludeFlagged: false);
+            if (objItem is IOutlookItem olItem && olItem.GetOlItemType() == OlItemType.olMailItem)
+            {
+                objItem = olItem.InnerObject;                
+            }
+            else if (objItem is not MailItem) { return []; }
+            
+            return AutoFile.AutoFindPeople(
+                    objItem: objItem,
+                    ppl_dict: _globals.TD.People,
+                    emailRootFolder: _globals.Ol.InboxPath,
+                    dictRemap: _globals.TD.DictRemap,
+                    userAddress: _globals.Ol.UserEmailAddress,
+                    blExcludeFlagged: false);            
 
         }
 

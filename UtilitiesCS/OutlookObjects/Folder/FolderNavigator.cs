@@ -6,7 +6,7 @@ using Microsoft.Office.Interop.Outlook;
 namespace UtilitiesCS
 {
 
-    public static class NavigateOlFolders
+    public static class FolderNavigator
     {
         
         public static Folder GetOutlookFolder(string FolderPath, Application OlApp)

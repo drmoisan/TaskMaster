@@ -22,9 +22,9 @@ namespace UtilitiesCS.EmailIntelligence.OlFolderTools.FilterOlFolders
             InitializeComponent();
         }
 
-        internal OlFolderTree FolderTree { get; set; }
+        internal FolderTree FolderTree { get; set; }
 
-        public void SetFolderTree(OlFolderTree folderTree)
+        public void SetFolderTree(FolderTree folderTree)
         {
             //var settings = new JsonSerializerSettings()
             //{
@@ -35,9 +35,9 @@ namespace UtilitiesCS.EmailIntelligence.OlFolderTools.FilterOlFolders
             //var tree = JsonConvert.SerializeObject(folderTree, settings);
             //logger.Debug($"SetFolderTree: \n{tree}");
             FolderTree = folderTree;
-            Tlv.CanExpandGetter = x => ((TreeNode<OlFolderWrapper>)x).Children.Count > 0;
-            Tlv.ChildrenGetter = x => ((TreeNode<OlFolderWrapper>)x).Children;
-            Tlv.ParentGetter = x => ((TreeNode<OlFolderWrapper>)x).Parent;
+            Tlv.CanExpandGetter = x => ((TreeNode<FolderWrapper>)x).Children.Count > 0;
+            Tlv.ChildrenGetter = x => ((TreeNode<FolderWrapper>)x).Children;
+            Tlv.ParentGetter = x => ((TreeNode<FolderWrapper>)x).Parent;
             Tlv.Roots = FolderTree.Roots;
         }
 

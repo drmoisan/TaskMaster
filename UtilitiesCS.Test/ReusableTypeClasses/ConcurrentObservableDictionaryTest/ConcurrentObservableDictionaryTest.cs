@@ -2,7 +2,7 @@
 using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ConcurrentObservableCollections.Tests
+namespace ConcurrentObservableCollection.Tests
 {
     [TestClass]
     public class ConcurrentObservableDictionaryTest

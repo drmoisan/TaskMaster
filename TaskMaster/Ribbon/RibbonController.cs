@@ -22,6 +22,7 @@ using TaskMaster.Ribbon;
 using UtilitiesCS.EmailIntelligence.OlFolderTools.FilterOlFolders;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories;
+using UtilitiesCS.OutlookObjects.Store;
 
 
 namespace TaskMaster
@@ -399,26 +400,37 @@ namespace TaskMaster
 
         #region Triage
 
-        private AsyncLazy<Triage> _triage;
-        internal AsyncLazy<Triage> Triage
+        private AsyncLazy<Triage> _triageAsync;
+        internal AsyncLazy<Triage> TriageAsync
         {
             get
             {
                 if (SynchronizationContext.Current is null)
                     SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
 
-                return _triage;
+                return _triageAsync;
             }
         }
         internal void ResetTriage()
         {
-            _triage = new(async () => await UtilitiesCS.EmailIntelligence.Triage.CreateAsync(
+            _triageAsync = new(async () => await UtilitiesCS.EmailIntelligence.Triage.CreateAsync(
                 Globals, true, Enums.NotFoundEnum.Ask));
+        }
+
+        internal Triage Triage
+        {
+            get
+            {
+                if (SynchronizationContext.Current is null)
+                    SynchronizationContext.SetSynchronizationContext(
+                        new WindowsFormsSynchronizationContext());
+                return Globals?.Engines?.InboxEngines?.TryGetValue("Triage", out var engine) ?? false ? engine as Triage : null;
+            }
         }
 
         internal async Task TriageSelectionAsync()
         {
-            var triage = await Triage;
+            var triage = await TriageAsync;
             if (triage is null) { ResetTriage(); }
             else { await triage.TestAsync(OlSelection); }
 
@@ -431,7 +443,7 @@ namespace TaskMaster
 
         internal async Task TriageSetAAsync()
         {
-            var triage = await Triage;
+            var triage = await TriageAsync;
             if (triage is null) { ResetTriage(); }
             else { await triage.TrainAsync(OlSelection, "A"); }
             //if (SynchronizationContext.Current is null)
@@ -443,14 +455,14 @@ namespace TaskMaster
 
         internal async Task TriageSetBAsync()
         {
-            var triage = await Triage;
+            var triage = await TriageAsync;
             if (triage is null) { ResetTriage(); }
             else { await triage.TrainAsync(OlSelection, "B"); }
         }
 
         internal async Task TriageSetCAsync()
         {
-            var triage = await Triage;
+            var triage = await TriageAsync;
             if (triage is null) { ResetTriage(); }
             else { await triage.TrainAsync(OlSelection, "C"); }
         }
@@ -458,7 +470,7 @@ namespace TaskMaster
 
         internal async Task TriageSetPrecision() 
         {
-            var triage = await Triage;
+            var triage = await TriageAsync;
             if (triage is null) { ResetTriage(); }
             else 
             {
@@ -515,11 +527,17 @@ namespace TaskMaster
             var currentFolder = Globals.Ol.App.ActiveExplorer().CurrentFolder;
             if (currentFolder is not null)
             {
-                var folderTree = new OlFolderTree(currentFolder);
+                var folderTree = new FolderTree(currentFolder);
                 var folderViewer = new FolderInfoViewer();
                 folderViewer.SetFolderTree(folderTree);
                 folderViewer.Show();
             }
+        }
+
+        internal void FolderStoresSettings()
+        {
+            var wrapper = new StoreWrapperController(Globals);
+            wrapper.Launch();
         }
     }
 }

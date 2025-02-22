@@ -15,32 +15,32 @@ using System.Threading;
 namespace UtilitiesCS
 {
 
-    public class OlFolderHelper
+    public class FolderPredictor
     {
         #region Constructors and Initialization
 
-        public OlFolderHelper(Outlook.Application olApp)
+        public FolderPredictor(Outlook.Application olApp)
         {
             _olApp = olApp;
         }
         
-        public OlFolderHelper(IApplicationGlobals AppGlobals)
+        public FolderPredictor(IApplicationGlobals AppGlobals)
         {
             _globals = AppGlobals;
             _olApp = AppGlobals.Ol.App;
-            Suggestions = new Suggestions();
+            Suggestions = new FolderScorer();
         }
 
-        public OlFolderHelper(IApplicationGlobals appGlobals, object objItem, InitOptions options)
+        public FolderPredictor(IApplicationGlobals appGlobals, object objItem, InitOptions options)
         {
             _globals = appGlobals;
             _olApp = appGlobals.Ol.App;
 
-            Suggestions = new Suggestions();
+            Suggestions = new FolderScorer();
 
         }
 
-        public async Task<OlFolderHelper> InitAsync(object objItem, InitOptions options)
+        public async Task<FolderPredictor> InitAsync(object objItem, InitOptions options)
         {
             switch (options)
             {
@@ -159,8 +159,8 @@ namespace UtilitiesCS
             }
         }
 
-        private Suggestions _suggestions;
-        public Suggestions Suggestions { get => _suggestions; set => _suggestions = value; }
+        private FolderScorer _suggestions;
+        public FolderScorer Suggestions { get => _suggestions; set => _suggestions = value; }
         
         private bool _blUpdateSuggestions;
         public bool BlUpdateSuggestions { get => _blUpdateSuggestions; set => _blUpdateSuggestions = value; }
@@ -245,7 +245,7 @@ namespace UtilitiesCS
 
         /// <summary>
         /// Function grabs a handle on the <seealso cref="Folder"/> based on a rooted <seealso cref="Folder"/>.FolderPath.
-        /// Uses the <seealso cref="Outlook.Application"/> stored in the <see cref="OlFolderHelper"/> instance.
+        /// Uses the <seealso cref="Outlook.Application"/> stored in the <see cref="FolderPredictor"/> instance.
         /// </summary>
         /// <param name="folderpath"> Rooted <seealso cref="MAPIFolder.FolderPath"/></param>
         /// <returns>The <seealso cref="Folder"/> represented by the <seealso cref="Folder"/>.FolderPath 
@@ -265,7 +265,7 @@ namespace UtilitiesCS
 
         /// <summary>
         /// Function grabs a handle on the <seealso cref="Folder"/> represented by the rooted <seealso cref="Folder"/>.FolderPath.
-        /// Uses the <seealso cref="Outlook.Application"/> stored in the <see cref="OlFolderHelper"/> instance. If the
+        /// Uses the <seealso cref="Outlook.Application"/> stored in the <see cref="FolderPredictor"/> instance. If the
         /// targeted folder is not found, an exception is thrown or a message is delivered to the user based on the 
         /// value of the <paramref name="throwEx"/> parameter.
         /// </summary>

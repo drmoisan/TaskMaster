@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS.EmailIntelligence.Bayesian;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.OutlookExtensions;
@@ -28,9 +29,10 @@ namespace UtilitiesCS.EmailIntelligence
             //Manager = manager;
             Globals = globals;
             Token = token;
+            OlLogic = new(this);
         }
 
-        private Triage() { }
+        private Triage() { OlLogic = new(this); }
 
         public async Task<Triage> InitAsync()
         {
@@ -62,6 +64,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         #endregion ctor
 
+        public Triage_OlLogic OlLogic { get; internal set; }
         public static readonly HashSet<string> ClassNames = ["A", "B", "C"];
         public static readonly string UnknownClassMarker = "U";
         internal static readonly string GroupName = "Triage";
@@ -207,19 +210,6 @@ namespace UtilitiesCS.EmailIntelligence
         {
             var triage = await CreateAsync(globals);
             return triage;
-            //var ce = new ConditionalItemEngine<MailItemHelper>();
-
-            //ce.AsyncCondition = (item) => Task.Run(() =>
-            //    item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" &&
-            //    mailItem.UserProperties.Find("Triage") is null);
-
-            //ce.EngineInitializer = async (globals) => ce.Engine = await Triage.CreateAsync(globals);
-            //await ce.EngineInitializer(globals);
-            //ce.AsyncAction = (item) => ce.Engine is not null ? ((Triage)ce.Engine).TestAsync(item) : null;
-            //ce.EngineName = "Triage";
-            //ce.Message = $"{ce.EngineName} is null. Skipping actions";
-
-            //return ce;
         }
 
         public Func<MailItemHelper, Task> AsyncAction => (item) => Engine is not null ? ((Triage)Engine).TestAsync(item) : null;
@@ -294,7 +284,7 @@ namespace UtilitiesCS.EmailIntelligence
         {
             var classifierName = triageId;
             //Manager["Triage"].Classifiers[classifierName].Train(await tokens.GroupAndCountAsync(), 1);
-            await Task.Run(() => ClassifierGroup.AddOrUpdateClassifier(classifierName, tokens, 1), cancel);
+            await Task.Run(() => ClassifierGroup.Train(classifierName, tokens, 1), cancel);
         }
 
         public async Task TestAsync(Selection selection, CancellationToken token = default)

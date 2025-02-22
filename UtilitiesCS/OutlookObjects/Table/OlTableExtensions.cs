@@ -384,8 +384,7 @@ namespace UtilitiesCS
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(ETL)} with a timeout of {milliseconds.ToString("#,##0")}");
             try
             {
-                (data, columnInfo) = await Task.Factory.StartNew(() => table.ETL(objectConverters, progress),
-                    token, TaskCreationOptions.LongRunning, TaskScheduler.Default).TimeoutAfter(milliseconds, attempts);
+                (data, columnInfo) = await Task.Run(() => table.ETL(objectConverters, progress),token).TimeoutAfter(milliseconds, attempts);
             }
             catch (TimeoutException)
             {
@@ -460,13 +459,12 @@ namespace UtilitiesCS
             (var objFields, var objIndices) = GetObjectFields(objectConverters, columnDictionary);
             
             //var rows = table.CastToRowArray(progress?.SpawnChild(65));
-            var rows = await Task.Factory.StartNew(() => table.CastToRowArray(progress?.SpawnChild(65)),
-                token, TaskCreationOptions.None, TaskScheduler.Default).TimeoutAfter(timeout, attempts);
+            var rows = await Task.Run(() => table.CastToRowArray(progress?.SpawnChild(65)),token).TimeoutAfter(timeout, attempts);
 
             token.ThrowIfCancellationRequested();
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
-            var jagged = await Task.Factory.StartNew(() => rows.EtlByRow(objectConverters, binIndices, objFields, objIndices, progress?.SpawnChild()),
-                token, TaskCreationOptions.None, TaskScheduler.Default).TimeoutAfter(timeout, attempts);
+            var jagged = await Task.Run(() => rows.EtlByRow(objectConverters, binIndices, objFields, objIndices, progress?.SpawnChild()),
+                token).TimeoutAfter(timeout, attempts);
             
             //var jagged = rows.EtlByRow(objectConverters, binIndices, objFields, objIndices, progress?.SpawnChild());
             var data = jagged.To2D();
@@ -774,11 +772,7 @@ namespace UtilitiesCS
             
             try
             {
-                table = await Task.Factory.StartNew(
-                    () => view.GetTable(), 
-                    token, 
-                    TaskCreationOptions.LongRunning, 
-                    TaskScheduler.Default).TimeoutAfter(2000);
+                table = await Task.Run(view.GetTable, token).TimeoutAfter(2000);
 
                 //table = await Task.Run(() => view.GetTable(), combinedTokenSource.Token);
             }

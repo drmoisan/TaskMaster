@@ -86,8 +86,10 @@ namespace UtilitiesCS
             //(PrettyPrinters.ArraytoDatatable(data, columnInfo.Keys.Cast<string>().ToArray())).DisplayDialog();
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(Email2dArrayToDf)} ...");
-            Frame<int, string> df = await Task.Factory.StartNew(() => Email2dArrayToDf(storeID, data, columnInfo),
-                token, TaskCreationOptions.LongRunning, TaskScheduler.Default).TimeoutAfter(1000, 2);
+            Frame<int, string> df = await Task.Run(() => Email2dArrayToDf(storeID, data, columnInfo),
+                token).TimeoutAfter(1000, 2);
+            //Frame<int, string> df = await Task.Factory.StartNew(() => Email2dArrayToDf(storeID, data, columnInfo),
+            //    token, TaskCreationOptions.LongRunning, TaskScheduler.Default).TimeoutAfter(1000, 2);
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(GetEmailDataInViewAsync)} complete");
             progress.Report(100);
@@ -173,10 +175,7 @@ namespace UtilitiesCS
         {
             try
             {
-                await Task.Factory.StartNew(() => AddQfcColumns(table),
-                token,
-                TaskCreationOptions.LongRunning,
-                TaskScheduler.Default).TimeoutAfter(3000);
+                await Task.Run(() => AddQfcColumns(table), token).TimeoutAfter(3000);
             }
             catch (TaskCanceledException)
             {

@@ -249,6 +249,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
         public string[] GetMatchingCategories(MailItemHelper helper)
         {
             var results = ClassifierGroup.Classify(helper.Tokens);
+            // var results2 = results.ToList();
             var filtered = results
                 .Where(x => x.Probability > ProbabilityThreshold).Select(x => x.Class)
                 .ToArray();

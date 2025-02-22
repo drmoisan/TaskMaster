@@ -10,30 +10,30 @@ using System.Diagnostics;
 
 namespace UtilitiesCS
 {
-    public class OlFolderWrapper : INotifyPropertyChanged, IFolderInfo
+    public class FolderWrapper : INotifyPropertyChanged, IFolderWrapper
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        protected OlFolderWrapper() { }
+        protected FolderWrapper() { }
 
         [JsonConstructor]
-        public OlFolderWrapper(bool selected, int itemCount, long folderSize, string name, string relativePath)
+        public FolderWrapper(bool selected, int itemCount, long folderSize, string name, string relativePath)
         {
             Selected = selected;
             ItemCount = itemCount;
             FolderSize = folderSize;
             Name = name;
             RelativePath = relativePath;
-            SubscribeToPropertyChanged(IFolderInfo.PropertyEnum.All);
+            SubscribeToPropertyChanged(IFolderWrapper.PropertyEnum.All);
         }
 
-        public OlFolderWrapper(MAPIFolder olFolder, MAPIFolder olRoot)
+        public FolderWrapper(MAPIFolder olFolder, MAPIFolder olRoot)
         {
             _olFolder = olFolder;
             _olRoot = olRoot;
             ResetLazy();
-            SubscribeToPropertyChanged(IFolderInfo.PropertyEnum.All);
+            SubscribeToPropertyChanged(IFolderWrapper.PropertyEnum.All);
         }
 
         private MAPIFolder _olRoot;
@@ -175,79 +175,79 @@ namespace UtilitiesCS
 
         
         [JsonIgnore]
-        public IFolderInfo.PropertyEnum SubscriptionStatus { get; private set; }
+        public IFolderWrapper.PropertyEnum SubscriptionStatus { get; private set; }
 
-        public void SubscribeToPropertyChanged(IFolderInfo.PropertyEnum properties)
+        public void SubscribeToPropertyChanged(IFolderWrapper.PropertyEnum properties)
         {
-            if (properties.HasFlag(IFolderInfo.PropertyEnum.OlRoot))
+            if (properties.HasFlag(IFolderWrapper.PropertyEnum.OlRoot))
             {
                 PropertyChanged -= PropertyChanged_OlRoot;
                 PropertyChanged += PropertyChanged_OlRoot;
-                SubscriptionStatus |= IFolderInfo.PropertyEnum.OlRoot;
+                SubscriptionStatus |= IFolderWrapper.PropertyEnum.OlRoot;
             }
-            if (properties.HasFlag(IFolderInfo.PropertyEnum.OlFolder))
+            if (properties.HasFlag(IFolderWrapper.PropertyEnum.OlFolder))
             {
                 PropertyChanged -= PropertyChanged_OlFolder;
                 PropertyChanged += PropertyChanged_OlFolder;
-                SubscriptionStatus |= IFolderInfo.PropertyEnum.OlFolder;
+                SubscriptionStatus |= IFolderWrapper.PropertyEnum.OlFolder;
             }
-            if (properties.HasFlag(IFolderInfo.PropertyEnum.ItemCount))
+            if (properties.HasFlag(IFolderWrapper.PropertyEnum.ItemCount))
             {
                 PropertyChanged -= PropertyChanged_ItemCount;
                 PropertyChanged += PropertyChanged_ItemCount;
-                SubscriptionStatus |= IFolderInfo.PropertyEnum.ItemCount;
+                SubscriptionStatus |= IFolderWrapper.PropertyEnum.ItemCount;
             }
-            if (properties.HasFlag(IFolderInfo.PropertyEnum.FolderSize))
+            if (properties.HasFlag(IFolderWrapper.PropertyEnum.FolderSize))
             {
                 PropertyChanged -= PropertyChanged_FolderSize;
                 PropertyChanged += PropertyChanged_FolderSize;
-                SubscriptionStatus |= IFolderInfo.PropertyEnum.FolderSize;
+                SubscriptionStatus |= IFolderWrapper.PropertyEnum.FolderSize;
             }
-            if (properties.HasFlag(IFolderInfo.PropertyEnum.Name))
+            if (properties.HasFlag(IFolderWrapper.PropertyEnum.Name))
             {
                 PropertyChanged -= PropertyChanged_Name;
                 PropertyChanged += PropertyChanged_Name;
-                SubscriptionStatus |= IFolderInfo.PropertyEnum.Name;
+                SubscriptionStatus |= IFolderWrapper.PropertyEnum.Name;
             }
-            if (properties.HasFlag(IFolderInfo.PropertyEnum.RelativePath))
+            if (properties.HasFlag(IFolderWrapper.PropertyEnum.RelativePath))
             {
                 PropertyChanged -= PropertyChanged_RelativePath;
                 PropertyChanged += PropertyChanged_RelativePath;
-                SubscriptionStatus |= IFolderInfo.PropertyEnum.RelativePath;
+                SubscriptionStatus |= IFolderWrapper.PropertyEnum.RelativePath;
             }
         }
 
-        public void UnSubscribeToPropertyChanged(IFolderInfo.PropertyEnum properties)
+        public void UnSubscribeToPropertyChanged(IFolderWrapper.PropertyEnum properties)
         {
-            if (properties.HasFlag(IFolderInfo.PropertyEnum.OlRoot))
+            if (properties.HasFlag(IFolderWrapper.PropertyEnum.OlRoot))
             {
                 PropertyChanged -= PropertyChanged_OlRoot;
-                SubscriptionStatus &= ~IFolderInfo.PropertyEnum.OlRoot;
+                SubscriptionStatus &= ~IFolderWrapper.PropertyEnum.OlRoot;
             }
-            if (properties.HasFlag(IFolderInfo.PropertyEnum.OlFolder))
+            if (properties.HasFlag(IFolderWrapper.PropertyEnum.OlFolder))
             {
                 PropertyChanged -= PropertyChanged_OlFolder;
-                SubscriptionStatus &= ~IFolderInfo.PropertyEnum.OlFolder;
+                SubscriptionStatus &= ~IFolderWrapper.PropertyEnum.OlFolder;
             }
-            if (properties.HasFlag(IFolderInfo.PropertyEnum.ItemCount))
+            if (properties.HasFlag(IFolderWrapper.PropertyEnum.ItemCount))
             {
                 PropertyChanged -= PropertyChanged_ItemCount;
-                SubscriptionStatus &= ~IFolderInfo.PropertyEnum.ItemCount;
+                SubscriptionStatus &= ~IFolderWrapper.PropertyEnum.ItemCount;
             }
-            if (properties.HasFlag(IFolderInfo.PropertyEnum.FolderSize))
+            if (properties.HasFlag(IFolderWrapper.PropertyEnum.FolderSize))
             {
                 PropertyChanged -= PropertyChanged_FolderSize;
-                SubscriptionStatus &= ~IFolderInfo.PropertyEnum.FolderSize;
+                SubscriptionStatus &= ~IFolderWrapper.PropertyEnum.FolderSize;
             }
-            if (properties.HasFlag(IFolderInfo.PropertyEnum.Name))
+            if (properties.HasFlag(IFolderWrapper.PropertyEnum.Name))
             {
                 PropertyChanged -= PropertyChanged_Name;
-                SubscriptionStatus &= ~IFolderInfo.PropertyEnum.Name;
+                SubscriptionStatus &= ~IFolderWrapper.PropertyEnum.Name;
             }
-            if (properties.HasFlag(IFolderInfo.PropertyEnum.RelativePath))
+            if (properties.HasFlag(IFolderWrapper.PropertyEnum.RelativePath))
             {
                 PropertyChanged -= PropertyChanged_RelativePath;
-                SubscriptionStatus &= ~IFolderInfo.PropertyEnum.RelativePath;
+                SubscriptionStatus &= ~IFolderWrapper.PropertyEnum.RelativePath;
             }
         }
 

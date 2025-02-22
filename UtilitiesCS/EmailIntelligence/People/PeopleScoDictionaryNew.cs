@@ -61,7 +61,7 @@ namespace ToDoModel.Data_Model.People
         public IList<string> AddMissingEntries(Outlook.MailItem olMail)
         {
             Globals.ThrowIfNull();
-            var addressList = olMail.GetEmailAddresses(Globals.Ol.EmailRootPath,
+            var addressList = olMail.GetEmailAddresses(Globals.Ol.InboxPath,
                                                        Globals.TD.DictRemap,
                                                        Globals.Ol.UserEmailAddress)
                                                        .Where(x => !this.ContainsKey(x))

@@ -138,7 +138,7 @@ namespace TaskVisualization
                 viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    selections.AsStringNoPrefix = controller.SelectionString();
+                    selections.AsStringNoPrefix = controller.SelectionAsString();
                     label.Text = selections.AsStringNoPrefix;
                 }
             }

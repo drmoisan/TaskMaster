@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UtilitiesCS;
+using UtilitiesCS.Interfaces;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
@@ -29,6 +30,8 @@ namespace UtilitiesCS
         string FnameDictRemap { get; }
         string FnameIDList { get; }
         Func<IEnumerable<string>, IPrefix, string, string, string> FindMatchingTag { get; }
+        public Func<IEnumerable<string>, List<string>> SelectFromList { get; }
+        IFlagChangeTrainingQueue FlagChangeTrainingQueue { get; }
 
     }
 }

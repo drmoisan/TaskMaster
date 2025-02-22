@@ -224,6 +224,8 @@ namespace TaskVisualization
             }
         }
 
+        internal Enums.FlagsToSet ChangedFlags { get; set; }
+
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         static extern bool PostMessage(IntPtr hWnd, int msg, int wParam, int lParam);
 
@@ -248,6 +250,7 @@ namespace TaskVisualization
         private readonly ToDoDefaults _defaults;
         private readonly IAutoAssign _autoAssign;
         private string _userEmailAddress;
+        
 
 
         private IAutoAssign _projectAssign;
@@ -294,7 +297,7 @@ namespace TaskVisualization
                 viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.People.AsStringNoPrefix = controller.SelectionString();
+                    _active.People.AsStringNoPrefix = controller.SelectionAsString();
                     _viewer.PeopleSelection.Text = _active.People.AsStringNoPrefix;
                 }
             }
@@ -327,7 +330,7 @@ namespace TaskVisualization
                 viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.Context.AsStringNoPrefix = controller.SelectionString();
+                    _active.Context.AsStringNoPrefix = controller.SelectionAsString();
                     _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
                 }
             }
@@ -358,7 +361,7 @@ namespace TaskVisualization
                 var result = viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.Projects.AsStringNoPrefix = controller.SelectionString();
+                    _active.Projects.AsStringNoPrefix = controller.SelectionAsString();
                     _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
                     _active.Program.AsStringNoPrefix = ProjectsToPrograms(_active.Projects.AsStringNoPrefix);
                 }
@@ -392,7 +395,7 @@ namespace TaskVisualization
                 var result = viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.Topics.AsStringNoPrefix = controller.SelectionString();
+                    _active.Topics.AsStringNoPrefix = controller.SelectionAsString();
                     _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
                 }
             }
@@ -753,6 +756,12 @@ namespace TaskVisualization
         /// <param name="flagType">Used to identify field names and tag Prefix</param>
         internal void MergeFlag(IList<string> value, Enums.FlagsToSet flagType)
         {
+            if (_viewer.InvokeRequired)
+            {
+                _viewer.Invoke(() => MergeFlag(value, flagType));
+                return;
+            }
+
             if (value.IsNullOrEmpty()) { return; }
             switch (flagType)
             {
@@ -832,31 +841,43 @@ namespace TaskVisualization
             {
                 ToDoEvents.Editing.AddOrUpdate(c.OlItem.EntryID, 1, (key, existing) => existing + 1);
 
-                var tokens = (c.OlItem.GetOlItemType() == OlItemType.olMailItem) ?                     
-                    await (await MailItemHelper.FromMailItemAsync(c.OlItem.InnerObject as MailItem, Globals, default, false))?.TokenizeAsync() 
-                    : null;
-
-                c.FlagAsTask = true;
+                FlagChangeGroup fcg = (c.OlItem.GetOlItemType() == OlItemType.olMailItem) ? 
+                    new(Globals, c.OlItem.InnerObject as MailItem) : null;
+                
+                c.FlagAsTask = _active.FlagAsTask; //true
 
                 c.ReadOnly = true;
-                if (_options.HasFlag(Enums.FlagsToSet.Context))
-                    c.Context.AsListNoPrefix = _active.Context.AsListNoPrefix;
-                if (_options.HasFlag(Enums.FlagsToSet.People))
-                    c.People.AsListNoPrefix = _active.People.AsListNoPrefix;
-                if (_options.HasFlag(Enums.FlagsToSet.Projects))
-                    c.Projects.AsListNoPrefix = _active.Projects.AsListNoPrefix;
-                if (_options.HasFlag(Enums.FlagsToSet.Program))
-                    c.Program.AsListNoPrefix = _active.Program.AsListNoPrefix;
-                if (_options.HasFlag(Enums.FlagsToSet.Topics))
-                    c.Topics.AsListNoPrefix = _active.Topics.AsListNoPrefix;
-                if (_options.HasFlag(Enums.FlagsToSet.Today))
+                ApplyChange(fcg, "Context", Enums.FlagsToSet.Context, c.Context, _active.Context);
+                ApplyChange(Enums.FlagsToSet.People, c.People, _active.People);
+                ApplyChange(fcg, "Project", Enums.FlagsToSet.Projects, c.Projects, _active.Projects);
+                ApplyChange(Enums.FlagsToSet.Program, c.Program, _active.Program);
+                ApplyChange(Enums.FlagsToSet.Topics, c.Topics, _active.Topics);
+                ApplyChange(Enums.FlagsToSet.Kbf, c.KB, _active.KB);
+                if (_options.HasFlag(Enums.FlagsToSet.Today) && c.Today != _active.Today)
+                {
                     c.Today = _active.Today;
-                if (_options.HasFlag(Enums.FlagsToSet.Bullpin))
+                    ChangedFlags |= Enums.FlagsToSet.Today;
+                }
+                if (_options.HasFlag(Enums.FlagsToSet.Bullpin) && c.Bullpin != _active.Bullpin)
+                {
                     c.Bullpin = _active.Bullpin;
-                if (_options.HasFlag(Enums.FlagsToSet.Kbf))
-                    c.KB.AsStringNoPrefix = _active.KB.AsStringNoPrefix;
+                    ChangedFlags |= Enums.FlagsToSet.Bullpin;
+                }
+                
+                //if (_options.HasFlag(Enums.FlagsToSet.Context))
+                //    c.Context.AsListNoPrefix = _active.Context.AsListNoPrefix;
+                //if (_options.HasFlag(Enums.FlagsToSet.People))
+                //    c.People.AsListNoPrefix = _active.People.AsListNoPrefix;
+                //if (_options.HasFlag(Enums.FlagsToSet.Projects))
+                //    c.Projects.AsListNoPrefix = _active.Projects.AsListNoPrefix;
+                //if (_options.HasFlag(Enums.FlagsToSet.Program))
+                //    c.Program.AsListNoPrefix = _active.Program.AsListNoPrefix;
+                //if (_options.HasFlag(Enums.FlagsToSet.Topics))
+                //    c.Topics.AsListNoPrefix = _active.Topics.AsListNoPrefix;
+                //if (_options.HasFlag(Enums.FlagsToSet.Kbf))
+                //    c.KB.AsStringNoPrefix = _active.KB.AsStringNoPrefix;
 
-                await c.WriteFlagsBatch();
+                await c.WriteFlagsBatchAsync(ChangedFlags);
                 c.ReadOnly = false;
 
                 if (_options.HasFlag(Enums.FlagsToSet.Priority))
@@ -872,13 +893,50 @@ namespace TaskVisualization
                 if (_options == Enums.FlagsToSet.All)
                     c.ActiveBranch = true;
 
+                if (fcg.FlagChangeItems.Count > 0)
+                {
+                    Globals.TD.FlagChangeTrainingQueue.Enqueue(fcg);
+                }
+
                 ToDoEvents.Editing.UpdateOrRemove(c.OlItem.EntryID, (key, existing) => existing == 1, (key, existing) => existing - 1, out _);
             }
         }
 
-        internal async Task ApplyChange(Enums.FlagsToSet flag)
+        internal void ApplyChange(Enums.FlagsToSet flag, FlagTranslator current, FlagTranslator revised)
         {
+            if (Options.HasFlag(flag))
+            {
+                if (!AreCollectionsEqual(current.AsListNoPrefix, revised.AsListNoPrefix))
+                {
+                    current.AsListNoPrefix = revised.AsListNoPrefix;
+                    ChangedFlags |= flag;
+                }
+            }
+        }
 
+
+        internal void ApplyChange(FlagChangeGroup fcg, string classifierName, Enums.FlagsToSet flag, FlagTranslator current, FlagTranslator revised)
+        {
+            if (Options.HasFlag(flag)) 
+            {                 
+                if (fcg?.TryEnqueue(classifierName, current.AsListNoPrefix, revised.AsListNoPrefix)??false || 
+                    !AreCollectionsEqual(current.AsListNoPrefix,revised.AsListNoPrefix))
+                {
+                    current.AsListNoPrefix = revised.AsListNoPrefix;
+                    ChangedFlags |= flag;
+                }                
+            }
+        }
+
+        private bool AreCollectionsEqual(ObservableCollection<string> collectionA, ObservableCollection<string> collectionB)
+        {
+            if (collectionA == null || collectionB == null)
+                return collectionA == collectionB;
+
+            var setA = new HashSet<string>(collectionA);
+            var setB = new HashSet<string>(collectionB);
+
+            return setA.SetEquals(setB);
         }
 
 

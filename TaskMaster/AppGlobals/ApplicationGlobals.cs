@@ -15,28 +15,39 @@ namespace TaskMaster
 
     public class ApplicationGlobals : IApplicationGlobals
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private Application _outlookApp;
 
         public ApplicationGlobals(Application olApp)
         {
             _outlookApp = olApp;
+            BasicLoaded = new Lazy<bool>(() => { LoadBasicMethod(); return true; });
         }
 
         public ApplicationGlobals(Application olApp, bool loadBasic)
         {
             _outlookApp = olApp;
-            if (loadBasic) { LoadBasic(); }
+            BasicLoaded = new Lazy<bool>(() => { LoadBasicMethod(); return true; });
+            if (loadBasic) { ForceBasicLoad(); }
         }
 
         async public Task LoadAsync(bool parallel = true)
         {
-            LoadBasic();
+            ForceBasicLoad();
             if (parallel) { await LoadParallelAsync(); }
             else { await LoadSequentialAsync(); }
         }
 
-        private void LoadBasic()
+        internal Lazy<bool> BasicLoaded;
+
+        private void ForceBasicLoad() 
+        { 
+            _ = BasicLoaded.Value;
+        }
+
+        private void LoadBasicMethod()
         {
             _fs = new AppFileSystemFolderPaths();
             _olObjects = new AppOlObjects(_outlookApp, this);
@@ -50,7 +61,7 @@ namespace TaskMaster
         async public Task LoadParallelAsync()
         {
             await LoadIntelConfigAsync();
-            await Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync());
+            await Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync(), _olObjects.LoadAsync());
             await Engines.InitAsync();
             await _events.LoadAsync();
         }
@@ -58,6 +69,7 @@ namespace TaskMaster
         async public Task LoadSequentialAsync() 
         {
             await LoadIntelConfigAsync();
+            await _olObjects.LoadAsync();
             await _toDoObjects.LoadAsync(false);
             await _autoFileObjects.LoadAsync(false);
             await Engines.InitAsync();

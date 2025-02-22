@@ -95,27 +95,27 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region ETL - EXTRACT Folders and Emails
 
-        internal struct FolderStruct(OlFolderWrapper folderInfo, long cumulativeSize, long chunkNumber, int cumulativeCount)
+        internal struct FolderStruct(FolderWrapper folderInfo, long cumulativeSize, long chunkNumber, int cumulativeCount)
         {
-            public OlFolderWrapper FolderInfo { get; set; } = folderInfo;
+            public FolderWrapper FolderInfo { get; set; } = folderInfo;
             public long CumulativeSize { get; set; } = cumulativeSize;
             public long ChunkNumber { get; set; } = chunkNumber;
             public int CumulativeCount { get; set; } = cumulativeCount;
         }
 
-        internal OlFolderTree GetOlFolderTree()
+        internal FolderTree GetOlFolderTree()
         {
-            var tree = new OlFolderTree(_globals.Ol.ArchiveRoot, _globals.TD.FilteredFolderScraping.Keys.ToList());
+            var tree = new FolderTree(_globals.Ol.ArchiveRoot, _globals.TD.FilteredFolderScraping.Keys.ToList());
             return tree;
         }
 
-        internal OlFolderTree GetOlFolderTree(ProgressTracker progress)
+        internal FolderTree GetOlFolderTree(ProgressTracker progress)
         {
-            var tree = new OlFolderTree(_globals.Ol.ArchiveRoot, _globals.TD.FilteredFolderScraping.Keys.ToList(), progress);
+            var tree = new FolderTree(_globals.Ol.ArchiveRoot, _globals.TD.FilteredFolderScraping.Keys.ToList(), progress);
             return tree;
         }
 
-        internal IEnumerable<MAPIFolder> QueryOlFolders(OlFolderTree tree)
+        internal IEnumerable<MAPIFolder> QueryOlFolders(FolderTree tree)
         {
             var folders = tree.Roots
                               .SelectMany(root => root
@@ -124,7 +124,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return folders;
         }
 
-        internal IEnumerable<OlFolderWrapper> QueryOlFolderInfo(OlFolderTree tree)
+        internal IEnumerable<FolderWrapper> QueryOlFolderInfo(FolderTree tree)
         {
             var folders = tree.Roots
                               .SelectMany(root => root
@@ -132,11 +132,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return folders;
         }
 
-        internal async Task<OlFolderWrapper[]> GetInitializedFolderInfo()
+        internal async Task<FolderWrapper[]> GetInitializedFolderInfo()
         {
             var (tokenSource, cancel, progress, sw) = await ProgressPackage.CreateAsTupleAsync();
             //screen: _globals.Ol.GetExplorerScreen());
-            OlFolderWrapper[] folders = null;
+            FolderWrapper[] folders = null;
 
             await Task.Run(
                 () =>
@@ -160,10 +160,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return folders.Where(x => x.ItemCount > 0).ToArray();
         }
 
-        internal FolderStruct[] AddRollingMeasures(long maxChunkSize, OlFolderWrapper[] folders)
+        internal FolderStruct[] AddRollingMeasures(long maxChunkSize, FolderWrapper[] folders)
         {
             var folderRecords = folders
-                .Scan(new FolderStruct(default(OlFolderWrapper), 0L, 0L, 0),
+                .Scan(new FolderStruct(default(FolderWrapper), 0L, 0L, 0),
                 (current, next) => new FolderStruct
                 {
                     FolderInfo = next,
@@ -175,7 +175,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return folderRecords;
         }
 
-        private static void LogFolderChunkMetrics(long availableRAM, OlFolderWrapper[][] folderChunks, long totalSize, int totalCount)
+        private static void LogFolderChunkMetrics(long availableRAM, FolderWrapper[][] folderChunks, long totalSize, int totalCount)
         {
             //logger.Debug($"Available RAM {availableRAM / (double)1000000:N0} MG");
             //logger.Debug($"Max Object Size in VSTO {MaxObjectSize / (double)1000000000:N1} GB");
@@ -185,14 +185,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             //logger.Debug($"Total Chunk Count: {folderChunks.Count():N0}");
         }
 
-        internal async Task<bool> TryResolveMapiHandles(OlFolderWrapper[] folders)
+        internal async Task<bool> TryResolveMapiHandles(FolderWrapper[] folders)
         {
             return await Task.Run(() =>
             {
                 if (folders is null) { return false; }
                 var handles = GetOlFolderTree().Roots.SelectMany(root => root.Flatten()).ToList();
                 int last = -1;
-                OlFolderWrapper handle = null;
+                FolderWrapper handle = null;
 
                 foreach (var folder in folders)
                 {
@@ -215,8 +215,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     var subscriptions = folder.SubscriptionStatus;
 
                     folder.UnSubscribeToPropertyChanged(
-                        IFolderInfo.PropertyEnum.OlRoot |
-                        IFolderInfo.PropertyEnum.OlFolder);
+                        IFolderWrapper.PropertyEnum.OlRoot |
+                        IFolderWrapper.PropertyEnum.OlFolder);
 
                     folder.OlRoot = handle.OlRoot;
                     folder.OlFolder = handle.OlFolder;
@@ -227,13 +227,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             });
         }
 
-        internal async Task<OlFolderWrapper[][]> ExtractOlFolderChunks(bool reload = false)
+        internal async Task<FolderWrapper[][]> ExtractOlFolderChunks(bool reload = false)
         {
             // Grab selected OlFolderInfo objects from a OlFolderTree, flatten to an array, and initialize
-            OlFolderWrapper[] folders = null;
+            FolderWrapper[] folders = null;
             if (!reload)
             {
-                folders = Deserialize<OlFolderWrapper[]>("StagingFolderRecords");
+                folders = Deserialize<FolderWrapper[]>("StagingFolderRecords");
             }
 
             if (!reload && folders is not null && await TryResolveMapiHandles(folders))
@@ -303,7 +303,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return folderChunks;
         }
 
-        internal IEnumerable<(MailItem Mail, OlFolderWrapper FolderInfo)> QueryMailTuples(IEnumerable<OlFolderWrapper> folders)
+        internal IEnumerable<(MailItem Mail, FolderWrapper FolderInfo)> QueryMailTuples(IEnumerable<FolderWrapper> folders)
         {
             var mailTuples = folders
                 .Select(folderInfo => (folderInfo.OlFolder, folderInfo))
@@ -400,14 +400,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region ETL - TRANSFORM For Data Mining
 
-        public delegate Task<T> FolderGroupTransformer<T>(OlFolderWrapper[] folders, int batch, int totalBatches, ProgressTrackerPane progress, CancellationToken token);
+        public delegate Task<T> FolderGroupTransformer<T>(FolderWrapper[] folders, int batch, int totalBatches, ProgressTrackerPane progress, CancellationToken token);
 
-        public async Task Transform(OlFolderWrapper[][] folderChunks, FolderGroupTransformer<IItemInfo[]> transformer, bool withValidation)
+        public async Task Transform(FolderWrapper[][] folderChunks, FolderGroupTransformer<IItemInfo[]> transformer, bool withValidation)
         {
             var (_, token, progress, _) = await ProgressPackage
                 .CreateAsTuplePaneAsync(progressTrackerPane: _globals.AF.ProgressTracker).ConfigureAwait(false);
             _globals.AF.ProgressPane.Visible = true;
-            var message = $"Transforming from {typeof(OlFolderWrapper[][]).Name} to {typeof(IItemInfo[])}";
+            var message = $"Transforming from {typeof(FolderWrapper[][]).Name} to {typeof(IItemInfo[])}";
             progress.Report(0, message);
 
             if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) { return; }
@@ -454,7 +454,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         public async Task<IItemInfo[]> ToIItemInfoArray(
-            OlFolderWrapper[] folders,
+            FolderWrapper[] folders,
             int batch,
             int totalBatches,
             ProgressTrackerPane progress,
@@ -492,7 +492,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         }
 
-        public async Task<IItemInfo> ToIItemInfo((MailItem Mail, OlFolderWrapper FolderInfo) mailTuple, CancellationToken cancel)
+        public async Task<IItemInfo> ToIItemInfo((MailItem Mail, FolderWrapper FolderInfo) mailTuple, CancellationToken cancel)
         {
             var mailInfo = await Task.Run(async () => await MailItemHelper.FromMailItemAsync(
                 mailTuple.Mail, _globals, cancel, true));
@@ -639,7 +639,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         public async Task ToMinedMail(
-            OlFolderWrapper[] folders,
+            FolderWrapper[] folders,
             int batch,
             int totalBatches,
             ProgressTracker progress,

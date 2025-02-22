@@ -15,7 +15,7 @@ namespace UtilitiesCS
         public FilterOlFoldersController(IApplicationGlobals appGlobals) 
         { 
             _globals = appGlobals;            
-            _olFolderTree = new OlFolderTree(_globals.Ol.ArchiveRoot,_globals.TD.FilteredFolderScraping.Keys.ToList());
+            _olFolderTree = new FolderTree(_globals.Ol.ArchiveRoot,_globals.TD.FilteredFolderScraping.Keys.ToList());
             _olFolderTree.PropertyChanged += OlFolderTree_PropertyChanged;
             _viewer = new FilterOlFoldersViewer();
             _viewer.SetController(this);
@@ -31,8 +31,8 @@ namespace UtilitiesCS
         private IApplicationGlobals _globals;       
         private FilterOlFoldersViewer _viewer;
 
-        private OlFolderTree _olFolderTree;
-        public OlFolderTree OlFolderTree { get => _olFolderTree; }
+        private FolderTree _olFolderTree;
+        public FolderTree OlFolderTree { get => _olFolderTree; }
 
         #region Event Handlers
 
@@ -71,8 +71,8 @@ namespace UtilitiesCS
 
         internal void OlFolderTree_PropertyChangedInternal(object sender, PropertyChangedEventArgs e)
         {
-            var expanded = (_viewer.TlvNotFiltered.ExpandedObjects.Cast<TreeNode<OlFolderWrapper>>()
-                .Concat(_viewer.TlvFiltered.ExpandedObjects.Cast<TreeNode<OlFolderWrapper>>()))
+            var expanded = (_viewer.TlvNotFiltered.ExpandedObjects.Cast<TreeNode<FolderWrapper>>()
+                .Concat(_viewer.TlvFiltered.ExpandedObjects.Cast<TreeNode<FolderWrapper>>()))
                 .Select(x => x.Value.RelativePath).ToArray();
 
             var notFiltered = OlFolderTree.FilterSelected(false);
@@ -93,7 +93,7 @@ namespace UtilitiesCS
 
         internal CheckStateGetterDelegate GetCheckedState = delegate (object rowObject)
         {
-            var node = (TreeNode<OlFolderWrapper>)rowObject;
+            var node = (TreeNode<FolderWrapper>)rowObject;
             if (node.Value.Selected)
                 return CheckState.Checked;
             else
@@ -129,7 +129,7 @@ namespace UtilitiesCS
 
         internal CheckState PutCheckedStateMethod(object rowObject, CheckState newValue, TreeListView tree)
         {
-            var node = (TreeNode<OlFolderWrapper>)rowObject;
+            var node = (TreeNode<FolderWrapper>)rowObject;
                         
             if (!tree.IsExpanded(node))
             {

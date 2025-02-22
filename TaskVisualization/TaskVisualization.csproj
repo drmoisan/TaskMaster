@@ -76,6 +76,9 @@
     <Compile Include="EditFilterViewer.designer.cs">
       <DependentUpon>EditFilterViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="FlagChangeGroup.cs" />
+    <Compile Include="FlagChangeItem.cs" />
+    <Compile Include="FlagChangeTrainingQueue.cs" />
     <Compile Include="FlagTasks.cs" />
     <Compile Include="ManageFilters.cs">
       <SubType>Form</SubType>

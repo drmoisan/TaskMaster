@@ -60,7 +60,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
             m.Setup(x => x.Body).Returns("Body");
             m.Setup(m => m.ConversationID).Returns("ConversationID");
             m.Setup(f => f.FolderName).Returns("FolderName");
-            var mockFolderInfo = mockRepository.Create<OlFolderWrapper>();
+            var mockFolderInfo = mockRepository.Create<FolderWrapper>();
             mockFolderInfo.Setup(x => x.OlFolder).Returns(mockFolder.Object);
             mockFolderInfo.Setup(x => x.Name).Returns("FolderName");
             m.Setup(x => x.FolderInfo).Returns(mockFolderInfo.Object);
@@ -82,10 +82,10 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
             mockEmailRoot.Setup(x => x.FolderPath).Returns("EmailRootPath");
             var mockArchiveRoot = this.mockRepository.Create<Folder>();
             mockArchiveRoot.Setup(x => x.FolderPath).Returns("ArchiveRootPath");
-            mockOl.Setup(x => x.EmailRoot).Returns(mockEmailRoot.Object);
+            mockOl.Setup(x => x.Inbox).Returns(mockEmailRoot.Object);
             mockOl.Setup(x => x.ArchiveRoot).Returns(mockArchiveRoot.Object);
             mockOl.Setup(x => x.ArchiveRootPath).Returns(mockArchiveRoot.Object.FolderPath);
-            mockOl.Setup(x => x.EmailRootPath).Returns(mockEmailRoot.Object.FolderPath);
+            mockOl.Setup(x => x.InboxPath).Returns(mockEmailRoot.Object.FolderPath);
             m.Setup(x => x.Ol).Returns(mockOl.Object);
             return m;
         }
@@ -203,7 +203,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
                 "sendername@domain.com", 
                 "SenderName &lt;<a href=\"mailto:sendername@domain.com\">sendername@domain.com</a>&gt;");
 
-            var folderInfo = new OlFolderWrapper((Folder)mockMailItem.Object.Parent, mockOl.Object.EmailRoot);
+            var folderInfo = new FolderWrapper((Folder)mockMailItem.Object.Parent, mockOl.Object.Inbox);
             var mail = mockMailItem.Object;
             var attachmentsHelper = mail.Attachments
                                         .Cast<Attachment>()

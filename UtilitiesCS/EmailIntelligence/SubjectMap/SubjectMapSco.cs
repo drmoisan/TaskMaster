@@ -159,7 +159,7 @@ namespace UtilitiesCS
 
         internal IEnumerable<(MAPIFolder Folder, string RelativePath)> QueryOlFolders(IApplicationGlobals appGlobals)
         {
-            var tree = new OlFolderTree(appGlobals.Ol.ArchiveRoot, appGlobals.TD.FilteredFolderScraping.Keys.ToList());
+            var tree = new FolderTree(appGlobals.Ol.ArchiveRoot, appGlobals.TD.FilteredFolderScraping.Keys.ToList());
             var folders = tree.Roots
                               .SelectMany(root => root
                               .FlattenIf(node => !node.Selected))

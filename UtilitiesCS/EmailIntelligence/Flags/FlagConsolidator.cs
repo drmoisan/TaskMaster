@@ -22,32 +22,39 @@ namespace UtilitiesCS.EmailIntelligence.Flags
 
         #region Consolidation Permutations
 
-        public IList<string> AsListWithPrefix { get => _asListWithPrefix.Value; set => _asListWithPrefix.ToLazy(); }
+        public IList<string> AsListWithPrefix { get => Refreshable(_asListWithPrefix); set => _asListWithPrefix.ToLazy(); }
         protected Lazy<IList<string>> _asListWithPrefix;        
         internal virtual void ResetLazyListWithPrefix()
         {
             _asListWithPrefix = new Lazy<IList<string>>(() => CombineLists(true));
         }
                         
-        public IList<string> AsListNoPrefix { get => _asListNoPrefix.Value; set => _asListNoPrefix = value.ToLazy(); }
+        public IList<string> AsListNoPrefix { get => Refreshable(_asListNoPrefix); set => _asListNoPrefix = value.ToLazy(); }
         protected Lazy<IList<string>> _asListNoPrefix;
         internal virtual void ResetLazyListNoPrefix()
         {
             _asListNoPrefix = new Lazy<IList<string>>(() => CombineLists(false));
         }
 
-        public string AsStringWithPrefix { get => _asStringWithPrefix.Value; set => _asStringWithPrefix = value.ToLazy(); }
+        public string AsStringWithPrefix { get => Refreshable(_asStringWithPrefix); set => _asStringWithPrefix = value.ToLazy(); }
         protected Lazy<string> _asStringWithPrefix;
         internal virtual void ResetStringWithPrefix()
         {
             _asStringWithPrefix = new Lazy<string>(() => string.Join(", ", AsListWithPrefix));
         }
 
-        public string AsStringNoPrefix { get => _asStringNoPrefix.Value; set => _asStringNoPrefix = value.ToLazy(); }
+        public string AsStringNoPrefix { get => Refreshable(_asStringNoPrefix); set => _asStringNoPrefix = value.ToLazy(); }
         protected Lazy<string> _asStringNoPrefix;
         internal virtual void ResetStringNoPrefix()
         {
             _asStringNoPrefix = new Lazy<string>(() => string.Join(", ", AsListNoPrefix));
+        }
+
+        private T Refreshable<T>(Lazy<T> lazy)
+        {
+            T value = lazy.Value;
+            _guard = new();
+            return value;
         }
 
         #endregion Consolidation Permutations

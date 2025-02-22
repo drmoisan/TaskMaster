@@ -18,6 +18,8 @@ using UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList;
 using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 using UtilitiesCS.Threading;
 using Tags;
+using UtilitiesCS.Interfaces;
+using TaskVisualization;
 
 namespace TaskMaster
 {
@@ -32,7 +34,6 @@ namespace TaskMaster
             else { await LoadSequentialAsync(); }
         }
 
-
         async public Task LoadParallelAsync() 
         {
             var tasks = new List<Task>
@@ -44,7 +45,9 @@ namespace TaskMaster
                 LoadProjInfoAsync(),
                 LoadCategoryFiltersAsync(),
                 LoadFilteredFolderScrapingAsync(),
-                LoadFolderRemapAsync()
+                LoadFolderRemapAsync(),
+                LoadFlagChangeTrainingQueueAsync(),
+                LoadSelectFromListAsync()
             };
             await Task.WhenAll(tasks);
         }
@@ -60,6 +63,8 @@ namespace TaskMaster
             await LoadCategoryFiltersAsync();
             await LoadFilteredFolderScrapingAsync();
             await LoadFolderRemapAsync();
+            await LoadFlagChangeTrainingQueueAsync();
+            await LoadSelectFromListAsync();
         }
 
         private readonly Properties.Settings _defaults = Properties.Settings.Default;
@@ -280,7 +285,7 @@ namespace TaskMaster
         }
         async private Task LoadFilteredFolderScrapingAsync()
         {
-            _filteredFolderScraping = await Task.Factory.StartNew(
+            _filteredFolderScraping = await Task.Run(
                                       () => LoadFilteredFolderScraping(),
                                       default(CancellationToken));
         }
@@ -303,7 +308,22 @@ namespace TaskMaster
         }
 
         public Func<IEnumerable<string>, IPrefix, string, string, string> FindMatchingTag { get; internal set; } = TagLauncher.LaunchAndFindMatch;
+        //IEnumerable<string> options, IApplicationGlobals appGlobals
+        public Func<IEnumerable<string>, List<string>> SelectFromList { get; internal set; }
+        private async Task LoadSelectFromListAsync()
+        {
+            await Task.Run(() => SelectFromList = (options) => TagLauncher.LaunchAndSelect(options, this.Parent));
+        }
 
+        public IFlagChangeTrainingQueue FlagChangeTrainingQueue { get; set; }
+        async private Task LoadFlagChangeTrainingQueueAsync()
+        {
+            await Task.Run(() => 
+            { 
+                FlagChangeTrainingQueue = new FlagChangeTrainingQueue().Init();
+            });
+        }
 
+        
     }
 }

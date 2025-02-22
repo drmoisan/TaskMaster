@@ -372,6 +372,7 @@
     <Compile Include="AppGlobals\Deprecated\ManagerClassOld.cs" />
     <Compile Include="AppGlobals\Deprecated\ManagerLazyConfig.cs" />
     <Compile Include="AppGlobals\Deprecated\SmartSerializableConfigOld.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

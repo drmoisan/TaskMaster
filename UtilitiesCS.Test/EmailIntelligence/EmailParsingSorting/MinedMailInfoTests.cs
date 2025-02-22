@@ -13,7 +13,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
     {
         private MockRepository mockRepository;
         private Mock<IItemInfo> mockIItemInfo;
-        private Mock<IFolderInfo> mockOlFolderInfo;
+        private Mock<IFolderWrapper> mockOlFolderInfo;
         private Mock<Folder> mockFolder;
         private Mock<Folder> mockFolderRoot;
         private Mock<RecipientInfo> mockSender;
@@ -76,9 +76,9 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
             return folder;
         }
         
-        private Mock<IFolderInfo> CreateMockOlFolderInfo(Folder folder, Folder folderRoot)
+        private Mock<IFolderWrapper> CreateMockOlFolderInfo(Folder folder, Folder folderRoot)
         {
-            var item = this.mockRepository.Create<IFolderInfo>();
+            var item = this.mockRepository.Create<IFolderWrapper>();
             item.SetupAllProperties();
             item.Setup(x => x.OlFolder).Returns(folder);
             item.Setup(x => x.FolderSize).Returns(1000000);
@@ -89,12 +89,12 @@ namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
             while (relativePath.StartsWith("\\")) { relativePath = relativePath.Substring(1); }
             item.Setup(x => x.RelativePath).Returns(relativePath);
             item.Setup(x => x.Selected).Returns(true);
-            item.Setup(x => x.SubscriptionStatus).Returns(IFolderInfo.PropertyEnum.All);
+            item.Setup(x => x.SubscriptionStatus).Returns(IFolderWrapper.PropertyEnum.All);
             return item;
         }
 
         private Mock<IItemInfo> CreateMockIItemInfo(
-            IFolderInfo folderInfo, RecipientInfo sender, RecipientInfo[] ccRecipients, 
+            IFolderWrapper folderInfo, RecipientInfo sender, RecipientInfo[] ccRecipients, 
             RecipientInfo[] toRecipients, string conversationId)
         {
             var itemInfo = this.mockRepository.Create<IItemInfo>();

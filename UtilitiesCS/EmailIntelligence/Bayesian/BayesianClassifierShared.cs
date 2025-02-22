@@ -232,6 +232,24 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             otherMatches.ForEach(token => UpdateProbabilitySb(token));
         }
 
+        public void UnTrainMultiTag(IDictionary<string, int> tokenFrequency, int emailCount)
+        {
+            var otherMatches = Match.TokenFrequency.Keys.Except(tokenFrequency.Keys);
+
+            _matchEmailCount.SubtractThreadSafe(1, 0, 4);
+
+            tokenFrequency.ForEach(kvp =>
+            {
+                var matchCount = Match.SubtractOrRemoveValue(kvp.Key, kvp.Value);
+                if (Parent.SharedTokenBase.TokenFrequency.TryGetValue(kvp.Key, out int tokenCount))
+                {
+                    UpdateProbabilitySb(kvp.Key, matchCount, tokenCount - matchCount);
+                }
+            });
+            //TODO: Turn this into a producer consumer pattern to avoid unnecessary repeat calculations
+            otherMatches.ForEach(token => UpdateProbabilitySb(token));
+        }
+
         public void UnTrain(IDictionary<string, int> tokenFrequency, int emailCount)
         {
             var otherMatches = Match.TokenFrequency.Keys.Except(tokenFrequency.Keys);

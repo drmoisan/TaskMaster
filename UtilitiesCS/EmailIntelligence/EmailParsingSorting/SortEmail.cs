@@ -157,7 +157,7 @@ namespace UtilitiesCS
                 mailHelper.Item.Save();
             });
 
-            var bayesianTask = Task.Run(async () => (await appGlobals.AF.Manager["Folder"]).AddOrUpdateClassifier(destinationOlStem, mailHelper.Tokens, 1));
+            var bayesianTask = Task.Run(async () => (await appGlobals.AF.Manager["Folder"]).Train(destinationOlStem, mailHelper.Tokens, 1));
             // Update Subject Map and Subject Encoder
             var subjectMapTask = Task.Run(() => appGlobals.AF.SubjectMap.Add(mailHelper.Subject, destinationOlStem));
 
@@ -244,7 +244,7 @@ namespace UtilitiesCS
                 Folder olDestination = null;
                 try
                 {
-                    var folderHandler = new OlFolderHelper(appGlobals);
+                    var folderHandler = new FolderPredictor(appGlobals);
                     olDestination = folderHandler.GetFolder(destinationOlPath, appGlobals.Ol.App);
                 }
                 catch (System.Exception e)
@@ -359,7 +359,7 @@ namespace UtilitiesCS
                 appGlobals.AF.SubjectMap.Add(mailItem.Subject, destinationOlStem);
 
                 // Move the email to the destination folder
-                var folderHandler = new OlFolderHelper(appGlobals);
+                var folderHandler = new FolderPredictor(appGlobals);
                 var olDestination = folderHandler.GetFolder(destinationOlPath, appGlobals.Ol.App);
                 var mailItemTemp = (MailItem)mailItem.Move(olDestination);
 
@@ -738,7 +738,7 @@ namespace UtilitiesCS
             // Resolve the file system deletion folder path if relevant
             deleteFsPath = null;
             var currentFolder = (Folder)mailItems[0].Parent;
-            if ((currentFolder.FolderPath != appGlobals.Ol.EmailRootPath)&&
+            if ((currentFolder.FolderPath != appGlobals.Ol.InboxPath)&&
                 (currentFolder.FolderPath.Contains(olAncestor))&&
                 (currentFolder.FolderPath != olAncestor))
             {
@@ -767,7 +767,7 @@ namespace UtilitiesCS
 
             // Resolve the file system deletion folder path if relevant
             deleteFsPath = null;
-            if ((currentFolder.FolderPath != appGlobals.Ol.EmailRootPath) &&
+            if ((currentFolder.FolderPath != appGlobals.Ol.InboxPath) &&
                 (currentFolder.FolderPath.Contains(olAncestor)) &&
                 (currentFolder.FolderPath != olAncestor))
             {
@@ -777,7 +777,7 @@ namespace UtilitiesCS
             destinationFolder = null;
             try
             {
-                destinationFolder = new OlFolderHelper(appGlobals).GetFolder(destinationOlPath, appGlobals.Ol.App);
+                destinationFolder = new FolderPredictor(appGlobals).GetFolder(destinationOlPath, appGlobals.Ol.App);
             }
             catch (System.Exception e)
             {

@@ -5,7 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 
-namespace ConcurrentObservableCollections.Tests
+namespace ConcurrentObservableCollection.Tests
 {
     [TestClass]
     public class ConcurrentObservableDictionaryTests

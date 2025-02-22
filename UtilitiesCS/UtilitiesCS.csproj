@@ -520,6 +520,7 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\OlFolder\OlFolderClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ConditionalItemEngine.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogic.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailDetailsWrapper.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFiler.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFilerConfig.cs" />
@@ -548,6 +549,9 @@
     <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FolderInfoViewer.Designer.cs">
       <DependentUpon>FolderInfoViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IToDo\IFlagChangeGroup.cs" />
+    <Compile Include="Interfaces\IToDo\IFlagChangeItem.cs" />
+    <Compile Include="Interfaces\IToDo\IFlagChangeTrainingQueue.cs" />
     <Compile Include="NewtonsoftHelpers\PeopleScoConverter.cs" />
     <Compile Include="EmailIntelligence\People\PeopleScoDictionaryNew.cs" />
     <Compile Include="NewtonsoftHelpers\PeopleScoRemainingObjectConverter.cs" />
@@ -566,7 +570,23 @@
     <Compile Include="HelperClasses\FileSystem\SysImageListHelper.cs" />
     <Compile Include="HelperClasses\ParamArray.cs" />
     <Compile Include="HelperClasses\ReflectionHelper.cs" />
-    <Compile Include="HelperClasses\TimedActions\TimedQueueOfActions.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderMinimalWrapper.cs" />
+    <Compile Include="OutlookObjects\Store\IStoreWrapperViewer.cs" />
+    <Compile Include="OutlookObjects\Store\StoresWrapper.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapper.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperController.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OutlookObjects\Store\StoreWrapperViewer.Designer.cs">
+      <DependentUpon>StoreWrapperViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Bag\BagChangedEventArgs.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Bag\ConcurrentObservableBag.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Bag\ISimpleActionBagObserver.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Bag\SimpleActionBagObserver.cs" />
+    <Compile Include="ReusableTypeClasses\TimedActions\TimedAsyncTask.cs" />
+    <Compile Include="ReusableTypeClasses\TimedActions\TimedQueueOfActions.cs" />
     <Compile Include="Interfaces\IGlobals\IAppItemEngines.cs" />
     <Compile Include="Interfaces\IGlobals\IConditionalEngine.cs" />
     <Compile Include="Interfaces\IHelperClasses\IDirectoryInfo.cs" />
@@ -604,15 +624,15 @@
     <Compile Include="NewtonsoftHelpers\KnownTypesBinder.cs" />
     <Compile Include="NewtonsoftHelpers\NConsoleTraceWriter.cs" />
     <Compile Include="NewtonsoftHelpers\NLogTraceWriter.cs" />
-    <Compile Include="Interfaces\IEmailIntelligence\IFolderInfo.cs" />
+    <Compile Include="Interfaces\IEmailIntelligence\IFolderWrapper.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IAttachment.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MovedMailInfo.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.cs" />
-    <Compile Include="EmailIntelligence\OlFolderTools\OlFolderHelper\OlFolderHelper.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderPredictor.cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\OlFolderHelper\SmithWaterman.cs" />
-    <Compile Include="EmailIntelligence\OlFolderTools\OlFolderHelper\Suggestions.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderScorer.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\ItemInfo.cs" />
-    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\OlFolderInfo .cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapper .cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersController.cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.cs">
       <SubType>Form</SubType>
@@ -620,7 +640,7 @@
     <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.Designer.cs">
       <DependentUpon>FilterOlFoldersViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\OlFolderTree.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderTree.cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\OSBrowser.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -674,9 +694,9 @@
     <Compile Include="OneDriveHelpers\AngleSharpParsedEmailBody.cs" />
     <Compile Include="OneDriveHelpers\OneDriveDownloader.cs" />
     <Compile Include="Interfaces\IReusableTypeClasses\IOutlookItem.cs" />
-    <Compile Include="OutlookExtensions\IOutlookItemFlaggable.cs" />
-    <Compile Include="OutlookExtensions\OutlookItemFlaggableTry.cs" />
-    <Compile Include="OutlookExtensions\OutlookItemTryGet.cs" />
+    <Compile Include="Interfaces\IOutlookObjects\IOutlookItemFlaggable.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemFlaggableTry.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemTryGet.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\ConcurrentObservableDictionary.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\DictionaryChangedEventArgs.cs" />
     <Compile Include="Interfaces\IReusableTypeClasses\Concurrent\Observable\Dictionary\IConcurrentObservableDictionary.cs" />
@@ -758,12 +778,12 @@
     <Compile Include="HelperClasses\FilePathHelper.cs" />
     <Compile Include="HelperClasses\SegmentStopWatch.cs" />
     <Compile Include="HelperClasses\FileSystem\ShellUtilitiesStatic.cs" />
-    <Compile Include="HelperClasses\TimedActions\TimedBatchAction.cs" />
+    <Compile Include="ReusableTypeClasses\TimedActions\TimedBatchAction.cs" />
     <Compile Include="HelperClasses\Logging\VerboseLogger.cs" />
     <Compile Include="Interfaces\IGlobals\IAppQuickFilerSettings.cs" />
     <Compile Include="Interfaces\ITimerWrapper.cs" />
-    <Compile Include="HelperClasses\TimedActions\TimedDiskWriter.cs" />
-    <Compile Include="HelperClasses\TimedActions\TimerWrapper.cs" />
+    <Compile Include="ReusableTypeClasses\TimedActions\TimedDiskWriter.cs" />
+    <Compile Include="ReusableTypeClasses\TimedActions\TimerWrapper.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IItemInfo.cs" />
     <Compile Include="EmailIntelligence\Recents\RecentsList.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\RecipientInfo.cs" />
@@ -792,7 +812,7 @@
     <Compile Include="HelperClasses\PrettyPrint.cs" />
     <Compile Include="Threading\ProgressTracker.cs" />
     <Compile Include="HelperClasses\SimpleRegex.cs" />
-    <Compile Include="Windows Forms\TableLayoutHelper.cs" />
+    <Compile Include="HelperClasses\Windows Forms\TableLayoutHelper.cs" />
     <Compile Include="HelperClasses\ThemeHelpers\Theme.cs" />
     <Compile Include="HelperClasses\ThemeHelpers\ThemeControlGroup.cs" />
     <Compile Include="HelperClasses\ToolTips\TipsController.cs" />
@@ -826,22 +846,22 @@
     <Compile Include="Interfaces\IReusableTypeClasses\IScoDictionary.cs" />
     <Compile Include="Interfaces\IReusableTypeClasses\ISerializableDictionary.cs" />
     <Compile Include="Interfaces\IReusableTypeClasses\ISerializableList.cs" />
-    <Compile Include="OutlookExtensions\Calendar.cs" />
-    <Compile Include="OutlookExtensions\ComType.cs" />
-    <Compile Include="OutlookExtensions\CreateCategory.cs" />
-    <Compile Include="OutlookExtensions\ExplorerActions.cs" />
-    <Compile Include="OutlookExtensions\FolderConverter.cs" />
-    <Compile Include="OutlookExtensions\MailItemExtensions.cs" />
-    <Compile Include="OutlookExtensions\MsgToMime\MAPIMethods.cs" />
-    <Compile Include="OutlookExtensions\NavigateOlFolders.cs" />
-    <Compile Include="OutlookExtensions\OlItemPseudoInterface.cs" />
-    <Compile Include="OutlookExtensions\OlTableExtensions.cs" />
-    <Compile Include="OutlookExtensions\OlToDoTable.cs" />
-    <Compile Include="OutlookExtensions\OutlookItem.cs" />
-    <Compile Include="OutlookExtensions\OutlookItemExtensions.cs" />
-    <Compile Include="OutlookExtensions\OutlookItemFlaggable.cs" />
-    <Compile Include="OutlookExtensions\OutlookItemTry.cs" />
-    <Compile Include="OutlookExtensions\UserDefinedFields.cs" />
+    <Compile Include="OutlookObjects\Calendar\Calendar.cs" />
+    <Compile Include="OutlookObjects\Com\ComType.cs" />
+    <Compile Include="OutlookObjects\Category\CreateCategory.cs" />
+    <Compile Include="OutlookObjects\Explorer\ExplorerActions.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderConverter.cs" />
+    <Compile Include="OutlookObjects\Item\MailItemExtensions.cs" />
+    <Compile Include="OutlookObjects\Folder\MsgToMime\MAPIMethods.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderNavigator.cs" />
+    <Compile Include="OutlookObjects\Item\OlItemPseudoInterface.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensions.cs" />
+    <Compile Include="OutlookObjects\Table\OlToDoTable.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItem.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemExtensions.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemFlaggable.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemTry.cs" />
+    <Compile Include="OutlookObjects\UserDefinedFields\UserDefinedFields.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -887,12 +907,12 @@
     <Compile Include="To Depricate\FlattenArray.cs" />
     <Compile Include="To Depricate\StackObjectVB.cs" />
     <Compile Include="To Depricate\StringManipulation.cs" />
-    <Compile Include="Windows Forms\ControlPosition.cs" />
-    <Compile Include="Windows Forms\ImageHelper.cs" />
-    <Compile Include="Windows Forms\MouseDownFilter.cs" />
-    <Compile Include="Windows Forms\OlvExtension.cs" />
-    <Compile Include="Windows Forms\ControlResizer.cs" />
-    <Compile Include="Windows Forms\ScreenHelper.cs" />
+    <Compile Include="HelperClasses\Windows Forms\ControlPosition.cs" />
+    <Compile Include="HelperClasses\Windows Forms\ImageHelper.cs" />
+    <Compile Include="HelperClasses\Windows Forms\MouseDownFilter.cs" />
+    <Compile Include="HelperClasses\Windows Forms\OlvExtension.cs" />
+    <Compile Include="HelperClasses\Windows Forms\ControlResizer.cs" />
+    <Compile Include="HelperClasses\Windows Forms\ScreenHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SVGControl\SVGControl.csproj">
@@ -963,6 +983,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ManagerResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="OutlookObjects\Store\StoreWrapperViewer.resx">
+      <DependentUpon>StoreWrapperViewer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.resx">
       <DependentUpon>ConfigViewer.cs</DependentUpon>
     </EmbeddedResource>
@@ -983,6 +1006,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Threading\SyncContextForm.resx">
+      <DependentUpon>SyncContextForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

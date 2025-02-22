@@ -13,14 +13,14 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
-    public class Suggestions
+    public class FolderScorer
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
         #region constructors and private variables
 
-        public Suggestions() { }
+        public FolderScorer() { }
 
         private ScoDictionary<string, long> _folderNameScores = new();
         private static readonly char[] _wordChars = { '&' };
@@ -30,8 +30,8 @@ namespace UtilitiesCS
 
         #region public properties
 
-        private VerboseLogger<Suggestions> _verboseLogger = new();
-        public VerboseLogger<Suggestions> Vlog => _verboseLogger;
+        private VerboseLogger<FolderScorer> _verboseLogger = new();
+        public VerboseLogger<FolderScorer> Vlog => _verboseLogger;
 
         public int Count { get => _folderNameScores.Count; }
 

@@ -173,4 +173,33 @@
   }
 }</value>
   </data>
+  <data name="StoresWrapper" xml:space="preserve">
+    <value>{
+  "$id": "1",
+  "Engine": false,
+  "Globals": "default",
+  "T": "UtilitiesCS.OutlookObjects.Store.StoresWrapper, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+  "Config": {
+    "$id": "2",
+    "Disk": {
+      "FileName": "FolderSettings.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "LocalDisk": {
+      "FileName": "FolderSettings.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "NetDisk": {
+      "FileName": "FolderSettings.json",
+      "RelativePath": "",
+      "SpecialFolderName": "Flow"
+    },
+    "ClassifierActivated": true,
+    "ActiveDisk": 1
+  },
+  "Name": "StoresWrapper"
+}</value>
+  </data>
 </root>

@@ -1,9 +1,10 @@
-﻿using System;
-using Office = Microsoft.Office.Core;
+﻿using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic;
-using System.Windows.Forms;
+using System;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using UtilitiesCS.EmailIntelligence;
+using Office = Microsoft.Office.Core;
 
 namespace TaskMaster
 {
@@ -148,6 +149,7 @@ namespace TaskMaster
         public bool SavePictures_GetPressed(Office.IRibbonControl control) => _controller.IsSavePicturesActive();
         public void SavePictures_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleSavePictures();
 
+        public void FolderSettings_Click(Office.IRibbonControl control) => _controller.FolderStoresSettings();
 
         #endregion SettingsMenu
 
@@ -194,12 +196,15 @@ namespace TaskMaster
         #region Triage
 
         public async void TriageSelection_Click(Office.IRibbonControl control) => await _controller.TriageSelectionAsync();
-        public async void TriageSetA_Click(Office.IRibbonControl control) => await _controller.TriageSetAAsync();
-        public async void TriageSetB_Click(Office.IRibbonControl control) => await _controller.TriageSetBAsync();
-        public async void TriageSetC_Click(Office.IRibbonControl control) => await _controller.TriageSetCAsync();
+        public async void TriageSetA_Click(Office.IRibbonControl control) => await _controller.Triage.OlLogic.TrainSelectionAsync("A");
+        public async void TriageSetB_Click(Office.IRibbonControl control) => await _controller.Triage.OlLogic.TrainSelectionAsync("B");
+        public async void TriageSetC_Click(Office.IRibbonControl control) => await _controller.Triage.OlLogic.TrainSelectionAsync("C");
+        //public async void TriageSetA_Click(Office.IRibbonControl control) => await _controller.TriageSetAAsync();
+        //public async void TriageSetB_Click(Office.IRibbonControl control) => await _controller.TriageSetBAsync();
+        //public async void TriageSetC_Click(Office.IRibbonControl control) => await _controller.TriageSetCAsync();
         public async void ClearTriage_Click(Office.IRibbonControl control) => await _controller.ClearTriageAync();
         public async void SetPrecision_Click(Office.IRibbonControl control) => await _controller.TriageSetPrecision();
-
+        public async void FilterViewer_Click(Office.IRibbonControl control) => await _controller.Triage.OlLogic.FilterViewAsync();
         #region Triage Config
 
         public void TriageEnabled_Click(Office.IRibbonControl control, bool pressed) => Controller.Engines.ToggleEngineAsync("Triage");

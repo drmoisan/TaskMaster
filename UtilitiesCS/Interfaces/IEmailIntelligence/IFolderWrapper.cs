@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
-    public interface IFolderInfo
+    public interface IFolderWrapper
     {
         [Flags]
         public enum PropertyEnum

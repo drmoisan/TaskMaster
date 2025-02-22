@@ -115,5 +115,32 @@ namespace UtilitiesCS {
                 return ResourceManager.GetString("RecentFolders", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;$id&quot;: &quot;1&quot;,
+        ///  &quot;Engine&quot;: false,
+        ///  &quot;Globals&quot;: &quot;default&quot;,
+        ///  &quot;T&quot;: &quot;UtilitiesCS.OutlookObjects.Store.StoresWrapper, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null&quot;,
+        ///  &quot;Config&quot;: {
+        ///    &quot;$id&quot;: &quot;2&quot;,
+        ///    &quot;Disk&quot;: {
+        ///      &quot;FileName&quot;: &quot;FolderSettings.json&quot;,
+        ///      &quot;RelativePath&quot;: &quot;&quot;,
+        ///      &quot;SpecialFolderName&quot;: &quot;AppData&quot;
+        ///    },
+        ///    &quot;LocalDisk&quot;: {
+        ///      &quot;FileName&quot;: &quot;FolderSettings.json&quot;,
+        ///      &quot;RelativePath&quot;: &quot;&quot;,
+        ///      &quot;SpecialFolderName&quot;: &quot;AppData&quot;
+        ///    },
+        ///    &quot;NetDisk&quot;: {
+        ///      &quot;F [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string StoresWrapper {
+            get {
+                return ResourceManager.GetString("StoresWrapper", resourceCulture);
+            }
+        }
     }
 }

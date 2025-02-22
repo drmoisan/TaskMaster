@@ -23,8 +23,8 @@ namespace UtilitiesCS
         {
             var filePathHelper = new FilePathHelper();
             var info = ReadToDictionary(reader);
-            var folderPath = ExtractFolderPath(info);
-            var fileName = ExtractFileName(info);
+            var folderPath = ExtractFolderPath(info) ?? "";
+            var fileName = ExtractFileName(info) ?? "";
             return new FilePathHelper(fileName, folderPath);
         }
 
@@ -128,7 +128,9 @@ namespace UtilitiesCS
 
         internal string ReadPropertyValue(JsonReader reader)
         {
-            if (reader.TokenType != JsonToken.String)
+            //if (reader.TokenType != JsonToken.String)            
+            Enum[] tokenTypes = [JsonToken.String, JsonToken.Null];
+            if (!tokenTypes.Contains(reader.TokenType))
             {
                 var message = $"{GetErrorMessage(reader)}. Reader found a token of type {reader.TokenType} " +
                     $"when it was expecting a token of type {JsonToken.String}.";
@@ -159,7 +161,7 @@ namespace UtilitiesCS
                 var max = matchingFolders.Max(x => x.Value.Length);
                 match = matchingFolders.First(x => x.Value.Length == max);
             }
-                
+               
             name = match.Key;
             relativePath = match.Value.Length > 0 ? folderPath.Replace(match.Value, ""): folderPath;
                         

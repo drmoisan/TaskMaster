@@ -1,14 +1,15 @@
 ﻿using QuickFiler.Viewers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Diagnostics;
-using UtilitiesCS.Threading;
+using System.Windows.Forms;
 using System.Windows.Threading;
+using UtilitiesCS.Threading;
 
 namespace UtilitiesCS
 {
@@ -16,28 +17,40 @@ namespace UtilitiesCS
     {
         public static void Init(bool monitorUiThread = false) 
         { 
+            _monitorUiThread = monitorUiThread;
             if (_loaded.CheckAndSetFirstCall)
             {
-                Initialize(monitorUiThread);
+                Initialize();
             }
         }
         
+        private static bool _monitorUiThread;
         private static ThreadSafeSingleShotGuard _loaded = new ThreadSafeSingleShotGuard();
-        private static void Initialize(bool monitorUiThread)
+        private static void Initialize()
         {
+            // Create a hidden form to initialize the synchronization context
             _syncContextForm = new SyncContextForm();
+            _syncContextForm.ShowInTaskbar = false;
+            _syncContextForm.WindowState = FormWindowState.Minimized;
+            _syncContextForm.Show();
+
+            // Set the synchronization context and auto-scale factor
+            _syncContextForm.CaptureUiVariables();
             UiSyncContext = _syncContextForm.UiSyncContext;
             AutoScaleFactor = _syncContextForm.FormAutoScaleFactor;
-            UiThreadId = Thread.CurrentThread.ManagedThreadId;
-            Dispatcher = Dispatcher.CurrentDispatcher;
-            
-            if (monitorUiThread)
+            UiThreadId = _syncContextForm.UiThreadId;
+            Dispatcher = _syncContextForm.UiDispatcher;
+
+            // Optionally monitor the UI thread
+            if (_monitorUiThread)
             {
                 _threadMonitor = new ThreadMonitor(Thread.CurrentThread, delayThreshold: 300);
                 _threadMonitor.Run();
             }
+
+            _syncContextForm.Hide();
         }
-        
+                
         private static SyncContextForm _syncContextForm;
 
         #region UI Thread Synchronization

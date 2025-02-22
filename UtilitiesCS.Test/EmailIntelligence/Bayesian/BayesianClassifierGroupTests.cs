@@ -29,9 +29,9 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         public void PythonIntegrationTest()
         {
             var group = new BayesianClassifierGroup();
-            group.AddOrUpdateClassifier("ham", new string[] { "a", "b", "c" }, 1);
-            group.AddOrUpdateClassifier("ham", new string[] { "a", "b" }, 1);
-            group.AddOrUpdateClassifier("spam", new string[] { "c", "d" }, 1);
+            group.Train("ham", new string[] { "a", "b", "c" }, 1);
+            group.Train("ham", new string[] { "a", "b" }, 1);
+            group.Train("spam", new string[] { "c", "d" }, 1);
 
             List<BayesianClassifierShared.WordStream> wordStreams =
             [

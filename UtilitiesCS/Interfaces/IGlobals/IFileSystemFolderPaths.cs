@@ -14,5 +14,6 @@ namespace UtilitiesCS
         //string FldrPythonStaging { get; }
         void Reload();
         IAppStagingFilenames Filenames { get; }
+        string MatchBestSpecialFolder(string path);
     }
 }

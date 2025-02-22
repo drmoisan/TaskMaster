@@ -35,6 +35,16 @@ namespace Tags
             }   
         }
 
+        public static List<string> LaunchAndSelect(IEnumerable<string> options, IApplicationGlobals appGlobals)
+        {
+            var launcher = new TagLauncher(options, appGlobals);
+            launcher.Viewer.ShowDialog();
+            if (launcher.Controller.ExitType != "Cancel")
+            {
+                return launcher.Controller.SelectionAsList();
+            }
+            else { return []; }
+        }
         public static string LaunchAndFindMatch(IEnumerable<string> options, IPrefix prefix, string userEmail, string searchString)
         {
             var launcher = new TagLauncher(options, prefix, userEmail);
@@ -47,8 +57,8 @@ namespace Tags
             _controller.SetSearchText(searchString);
             _viewer.ShowDialog();
             if (_controller.ExitType != "Cancel")
-            {
-                return _controller.SelectionString();
+            {                
+                return _controller.SelectionAsString();
             }
             return "";
         }
@@ -82,7 +92,7 @@ namespace Tags
 
             autoAssign.AutoFindDelegate = (object objItem) => AutoFile2.AutoFindPeople(objItem: objItem,
                                                                                        ppl_dict: _globals.TD.People,
-                                                                                       emailRootFolder: _globals.Ol.EmailRootPath,
+                                                                                       emailRootFolder: _globals.Ol.InboxPath,
                                                                                        dictRemap: _globals.TD.DictRemap,
                                                                                        userAddress: _globals.Ol.UserEmailAddress,
                                                                                        blExcludeFlagged: false);

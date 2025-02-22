@@ -196,15 +196,21 @@ namespace UtilitiesCS
             
             try
             {
-                await Task.Factory.StartNew(
-                    () =>
+                await Task.Run(() =>
                     {
                         Outlook.Conversation conv = mailItem.GetConversation();
                         df = conv.GetDataFrame();
                     },
-                    combinedCancellation.Token,
-                    options,
-                    scheduler);
+                    combinedCancellation.Token);
+                //await Task.Factory.StartNew(
+                //    () =>
+                //    {
+                //        Outlook.Conversation conv = mailItem.GetConversation();
+                //        df = conv.GetDataFrame();
+                //    },
+                //    combinedCancellation.Token,
+                //    options,
+                //    scheduler);
             }
             catch (OperationCanceledException e)
             {
