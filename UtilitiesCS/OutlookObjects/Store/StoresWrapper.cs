@@ -17,10 +17,11 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         #region ctor
 
-        public StoresWrapper() { }
+        public StoresWrapper(): base() { base._parent = this; }
 
         public StoresWrapper(IApplicationGlobals globals)
         {
+            base._parent = this;
             Globals = globals;
         }
 

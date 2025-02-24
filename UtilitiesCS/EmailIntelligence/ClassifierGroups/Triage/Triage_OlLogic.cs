@@ -26,9 +26,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage
         internal EmailIntelligence.Triage Parent { get; set; }
 
         
-        public Task FilterViewAsync()
+        public async Task FilterViewAsync()
         {
-            return Task.Run(FilterView);
+            await Task.Run(FilterView);
         }
 
         public void FilterView() 

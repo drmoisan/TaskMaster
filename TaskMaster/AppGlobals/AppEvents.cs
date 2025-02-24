@@ -243,8 +243,13 @@ namespace TaskMaster
                 foreach (var inbox in OlInboxes)
                 {
                     var olMailItems = inbox.Restrict("[MessageClass] = 'IPM.Note'");
-                    //var unprocessedItems = olMailItems?.Restrict(filter)?.Cast<object>();
-                    var unprocessedItems = olMailItems?.Restrict("[AutoProcessed] Is Null")?.Cast<object>();
+                    var unprocessedItems = olMailItems?.Restrict(filter)?
+                        .Cast<object>()
+                        .Where(x => x is MailItem)
+                        .Cast<MailItem>()
+                        .Where(x => x.UserProperties.Find("AutoProcessed") is null)
+                        .ToArray();
+                    //var unprocessedItems = olMailItems?.Restrict("[AutoProcessed] Is Null")?.Cast<object>();
                     if (unprocessedItems is null) { continue; }
                     unprocessedItems.ForEach(x => unprocessedQueue.Enqueue(x));
                 }

@@ -22,6 +22,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             {
                 Inbox = InnerStore.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox) as Outlook.Folder;
             }
+            UserEmailAddress = GetSmtpAddressFromStore();
             return this;
         }
 

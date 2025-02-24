@@ -11,6 +11,10 @@ namespace UtilitiesCS.OutlookObjects.Store
             ButtonOk.Click += ButtonOk_Click;
             ButtonCancel.Click += ButtonCancel_Click;
             DisplayName.SelectedValueChanged += DisplayName_SelectedValueChanged;
+            ArchiveFS.Click += ArchiveFS_Click;
+            ArchiveOutlook.Click += ArchiveOutlook_Click;
+            JunkEmail.Click += JunkEmail_Click;
+            JunkPotential.Click += JunkPotential_Click;
         }
 
         public StoreWrapperViewer(StoreWrapperController controller): this()
@@ -24,12 +28,12 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         public void ButtonOk_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            Controller?.ButtonOk_Click();
         }
 
         public void ButtonCancel_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Controller?.ButtonCancel_Click();
         }
 
         public void DisplayName_SelectedValueChanged(object sender, EventArgs e)
@@ -39,22 +43,22 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         public void ArchiveFS_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            Controller?.ArchiveFS_Click();
         }
 
         public void ArchiveOutlook_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            Controller?.ArchiveOutlook_Click();
         }
 
         public void JunkEmail_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            Controller?.JunkEmail_Click();
         }
 
         public void JunkPotential_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            Controller?.JunkPotential_Click();
         }
 
         #endregion Events

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Threading.Tasks;
+using UtilitiesCS.OutlookObjects.Store;
 
 namespace UtilitiesCS
 {
@@ -18,7 +19,8 @@ namespace UtilitiesCS
         Folder Inbox { get; }
         IEnumerable<Folder> Inboxes { get; }
         NameSpace NamespaceMAPI { get; }
-        Folder Root { get; }        
+        Folder Root { get; }
+        public StoresWrapper StoresWrapper { get; set; }
         Reminders OlReminders { get; }
         Folder ToDoFolder { get; }
         StackObjectCS<object> MovedMailsStack { get; set; }

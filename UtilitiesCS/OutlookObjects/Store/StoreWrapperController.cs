@@ -17,7 +17,6 @@ namespace UtilitiesCS.OutlookObjects.Store
         public StoreWrapperController(IApplicationGlobals globals)
         {
             Globals = globals;            
-            FsConverter = new FilePathHelperConverter(globals.FS).GetSerializablePath;
         }
 
         internal IApplicationGlobals Globals { get; set; }
@@ -38,11 +37,13 @@ namespace UtilitiesCS.OutlookObjects.Store
         #region Events
 
         public void Launch() 
-        { 
+        {
+            FsConverter = new FilePathHelperConverter(Globals.FS).GetSerializablePath;
+            Model = Globals.Ol.StoresWrapper;
             Viewer = new StoreWrapperViewer(this);
             Viewer.DisplayName.DataSource = Model.Stores.Select(store => store.DisplayName).ToList();
             
-            Viewer.Show();
+            Viewer.ShowDialog();
         }
 
         public void ButtonOk_Click()
@@ -76,7 +77,13 @@ namespace UtilitiesCS.OutlookObjects.Store
                 Viewer.Invoke(() => ArchiveFS_Click());
                 return;
             }
-            throw new NotImplementedException();
+            var folderPath = SelectFsFolder();
+            if (folderPath.IsNullOrEmpty()) { return; }
+            else 
+            {                 
+                ArchiveFS.FolderPath = folderPath;
+                Viewer.ArchiveFS.Text = GetRelativeFsPath();
+            }
         }
 
         public void ArchiveOutlook_Click()
@@ -118,34 +125,49 @@ namespace UtilitiesCS.OutlookObjects.Store
         
         internal bool AnyChanges()
         {
-            return !ArchiveOutlook.Equals(Current.ArchiveRoot) || 
-                !JunkEmail.Equals(Current.JunkCertain) || 
-                !JunkPotential.Equals(Current.JunkPotential) ||
-                !ArchiveFS.Equals(Current.ArchiveFsRoot);
+            return !PairwiseEquals(ArchiveOutlook, Current?.ArchiveRoot) ||
+                !PairwiseEquals(JunkEmail, Current?.JunkCertain) ||
+                !PairwiseEquals(JunkPotential, Current?.JunkPotential) ||
+                !PairwiseEquals(ArchiveFS, Current?.ArchiveFsRoot);
+        }
+
+        internal bool PairwiseEquals<T>(T a, T b)
+        {
+            if (a is null && b is null) { return true; }
+            if (a is null || b is null) { return false; }
+            return a.Equals(b);
         }
 
         internal void PopulateWithCurrent()
         {
             if (Viewer.InvokeRequired) { Viewer.Invoke(() => PopulateWithCurrent()); return; }
+
+            // Populate Form
+            Viewer.Inbox.Text = Current?.Inbox?.FolderPath ?? "Error Loading";
+            Viewer.RootFolder.Text = Current?.RootFolder?.FolderPath ?? "Error Loading";
+            Viewer.UserEmail.Text = Current?.UserEmailAddress ?? "Error Loading";
+            Viewer.ArchiveOutlook.Text = Current?.ArchiveRoot?.RelativePath ?? "Please select an archive";
+            Viewer.ArchiveFS.Text = GetRelativeFsPath();
+            //if (Current.ArchiveFsRoot is not null && !Current.ArchiveFsRoot.FolderPath.IsNullOrEmpty())
+            //{
+            //    var (specialFolder, relativePath) = FsConverter(Current.ArchiveFsRoot.FolderPath);
+            //    if (specialFolder.IsNullOrEmpty() & relativePath.IsNullOrEmpty())
+            //    {
+            //        Viewer.ArchiveFS.Text = "Please select an archive";
+            //    }
+            //    else
+            //    {
+            //        Viewer.ArchiveFS.Text = $"{string.Join(" -> ", [specialFolder,relativePath]).Trim()}";
+            //    }
+            //}
+            Viewer.JunkEmail.Text = JunkEmail?.RelativePath ?? "Please select a folder";
+            Viewer.JunkPotential.Text = JunkPotential?.RelativePath ?? "Please select a folder";
+
+            // Populate Controller
             ArchiveOutlook = Current.ArchiveRoot;
             ArchiveFS = Current.ArchiveFsRoot;
             JunkEmail = Current.JunkCertain;
             JunkPotential = Current.JunkPotential;
-            Viewer.ArchiveOutlook.Text = ArchiveOutlook?.RelativePath ?? "Please select an archive";
-            if (ArchiveFS is not null && !ArchiveFS.FilePath.IsNullOrEmpty())
-            {
-                var (specialFolder, relativePath) = FsConverter(ArchiveFS.FilePath);
-                if (specialFolder.IsNullOrEmpty() & relativePath.IsNullOrEmpty())
-                {
-                    Viewer.ArchiveFS.Text = "Please select an archive";
-                }
-                else
-                {
-                    Viewer.ArchiveFS.Text = $"{string.Join(" -> ", [specialFolder,relativePath])}";
-                }
-            }
-            Viewer.JunkEmail.Text = JunkEmail?.RelativePath ?? "Please select a folder";
-            Viewer.JunkPotential.Text = JunkPotential?.RelativePath ?? "Please select a folder";
         }
 
         internal void SaveChanges()
@@ -171,7 +193,41 @@ namespace UtilitiesCS.OutlookObjects.Store
                 return null;
             }                   
         }
-        
+
+        internal string SelectFsFolder()
+        {
+            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            {
+                folderBrowserDialog.Description = "Select a folder";
+                folderBrowserDialog.ShowNewFolderButton = true;
+                folderBrowserDialog.RootFolder = Environment.SpecialFolder.MyComputer;
+
+                if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+                {
+                    // Get the path of the selected folder
+                    return folderBrowserDialog.SelectedPath;
+                }
+            }
+            return null;
+        }
+
+        internal string GetRelativeFsPath()
+        {
+            if (Current.ArchiveFsRoot is not null && !Current.ArchiveFsRoot.FolderPath.IsNullOrEmpty())
+            {
+                var (specialFolder, relativePath) = FsConverter(Current.ArchiveFsRoot.FolderPath);
+                if (specialFolder.IsNullOrEmpty() & relativePath.IsNullOrEmpty())
+                {
+                    return "Please select an archive";
+                }
+                else
+                {
+                    return $"{string.Join(" -> ", [specialFolder, relativePath]).Trim()}";
+                }
+            }
+            return "Please select an archive";
+        }
+
         #endregion Methods
 
     }

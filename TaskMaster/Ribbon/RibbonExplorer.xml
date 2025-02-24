@@ -52,7 +52,7 @@
                 <button id="UndoSort" imageMso="Undo" onAction="UndoSort_Click" label="Undo Sort" size="large"/>
                 <button id="QuickFiler" imageMso="UpdateFolder" onAction="QuickFiler_Click" label="Quick Filer" size="large" />
                 <menu id="Settings" imageMso="ContentTypeSettings" label="Settings" size="large" itemSize="large">
-                  <menu id="FolderSettings" imageMso="Folder" onAction="FolderSettings_Click" label="Folder Settings" size="large" />
+                  <button id="FolderSettings" imageMso="Folder" onAction="FolderSettings_Click" label="Folder Settings" />
                   <menu id="QuickFilerSettings" imageMso="ContentTypeSettings" label="Quick Filer" itemSize="large">
                     <menu id="ItemSortSettings" imageMso="CustomizeSearchFolder" label="Item Sort Settings" itemSize ="normal">
                       <checkBox id="MoveEntireConversationDefault" label="Move Entire Conversation" getPressed="MoveEntireConversation_GetPressed" onAction="MoveEntireConversation_Clicked"/>
