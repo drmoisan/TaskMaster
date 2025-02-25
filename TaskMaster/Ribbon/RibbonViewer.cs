@@ -4,6 +4,7 @@ using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS.EmailIntelligence;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups;
 using Office = Microsoft.Office.Core;
 
 namespace TaskMaster

@@ -23,7 +23,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             lock (this)
             {
-                base.AddFirst(item);
+                base.AddFirst(item);                
             }
         }
 
@@ -34,6 +34,22 @@ namespace UtilitiesCS.ReusableTypeClasses
                 base.AddLast(item);
             }
         }
+
+        /// <summary>
+        /// Adds an item to the end of the <see cref="LockingLinkedList{T}"/> and performs an action on the item.
+        /// The intention of this method is to allow event wiring to be performed on the item while it is locked.
+        /// </summary>
+        /// <param name="item">Item to be added</param>
+        /// <param name="lockedAction">Action to be performed while locked ... i.e. event wiring</param>
+        public void AddLast(T item, Action<T> lockedAction)
+        {
+            lock (this)
+            {
+                base.AddLast(item);
+                lockedAction(item);
+            }
+        }
+
 
         public new void AddBefore(LinkedListNode<T> node, T item)
         {
@@ -71,6 +87,19 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             lock (this)
             {
+                base.Clear();
+            }
+        }
+
+        public void Clear(Action<T> unwire)
+        {
+            lock (this)
+            {
+                foreach (var item in this)
+                {
+                    unwire(item);
+                }
+
                 base.Clear();
             }
         }
@@ -206,6 +235,23 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             lock (this)
             {
+                return base.Remove(item);
+            }
+        }
+
+        /// <summary>
+        /// Removes an item from the <see cref="LockingLinkedList{T}"/>. 
+        /// Action is performed on the item before it is removed and it intended
+        /// to allow an unwiring of events in a locked state.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="unwire"></param>
+        /// <returns></returns>
+        public bool Remove(T item, Action<T> unwire)
+        {
+            lock (this)
+            {
+                unwire(item);
                 return base.Remove(item);
             }
         }

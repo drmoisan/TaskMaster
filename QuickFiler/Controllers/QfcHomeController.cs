@@ -359,7 +359,8 @@ namespace QuickFiler.Controllers
             if (!Globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var myDocuments)) { return; }
             LOC_TXT_FILE = Path.Combine(myDocuments, filename);
 
-            Duration = _stopWatchMoved.Elapsed.Seconds;
+            //Duration = _stopWatchMoved.Elapsed.Seconds;
+            Duration = StopWatch.Elapsed.Seconds;
             OlEndTime = DateTime.Now;
             OlStartTime = OlEndTime.Subtract(new TimeSpan(0, 0, 0, (int)Duration));
 

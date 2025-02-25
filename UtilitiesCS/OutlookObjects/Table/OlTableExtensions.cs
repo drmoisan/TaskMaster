@@ -14,118 +14,13 @@ using log4net.Repository.Hierarchy;
 using Microsoft.Office.Interop.Outlook;
 using static UtilitiesCS.ConvHelper;
 using Outlook = Microsoft.Office.Interop.Outlook;
+using UtilitiesCS.OutlookObjects.Fields;
 
 namespace UtilitiesCS
 {
     public static class OlTableExtensions
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        #region Property Schema Constants
-
-        const string PROPTAG_SPECIFIER = "http://schemas.microsoft.com/mapi/proptag/";
-
-        // PropTag Types
-        const string PT_BINARY = "0102";
-        const string PT_LONG = "0003";
-        const string PT_TSTRING = "001f"; /* Null-terminated 16-bit (2-byte) character string. 
-                                           * Properties with this type have the property type 
-                                           * reset to PT_UNICODE when compiling with the UNICODE 
-                                           * symbol and to PT_STRING8 when not compiling with the 
-                                           * UNICODE symbol. This property type is the same as the 
-                                           * OLE type VT_LPSTR for resulting PT_STRING8 properties 
-                                           * and VT_LPWSTR for PT_UNICODE properties */
-        const string PT_STRING8 = "001e"; /* Null-terminated 8-bit (1-byte) character string. 
-                                           * This property type is the same as the OLE type VT_LPSTR */
-
-        const string PR_RECEIVED_BY_NAME = "0x0040"; //PidTagReceivedByName
-        const string PR_STORE_ENTRYID = "0x0FFB"; //Message store PID + PT_BINARY
-        const string PR_STORE_RECORD_KEY = "0x0FFA"; //
-        const string PR_CONVERSATION_TOPIC = "0x0070"; // Normalized Conversation Subject for message group
-        
-        const string PR_PARENT_DISPLAY = "0x0e05"; //Message parent folder
-        const string PR_DEPTH = "0x3005"; /* Represents the relative level of indentation, 
-                                           * or depth, of an object in a hierarchical table
-                                           * Data type is PT_LONG */
-        const string PR_CONVERSATION_INDEX = "0x0071"; /* PT_BINARY ScCreateConversationIndex 
-                                                        * implements the index as a header block 
-                                                        * that is 22 bytes in length, followed 
-                                                        * by zero or more child blocks each 
-                                                        * 5 bytes in length */
-
-        const string PR_CONVERSATION_KEY = "0x000B"; // PT_BINARY
-        const string PR_CONVERSATION_ID = "0x3013"; // PT_BINARY
-
-        const string PR_MESSAGE_RECIPIENTS = "0x0e12";
-        const string PR_SENDER_NAME = "0x0C1A"; // PT_TSTRING
-        const string PR_SENDER_SMTP_ADDRESS = "0x5D01"; // PT_TSTRING
-        const string PR_SENDER_ADDRTYPE = "0x0C1E"; // PT_TSTRING
-
-        public static string SchemaConversationTopic = PROPTAG_SPECIFIER + PR_CONVERSATION_TOPIC + PT_TSTRING;
-        public static string SchemaFolderName = PROPTAG_SPECIFIER + PR_PARENT_DISPLAY + PT_TSTRING;
-        public static string SchemaMessageStore = PROPTAG_SPECIFIER + PR_STORE_ENTRYID + PT_BINARY;
-        public static string SchemaConversationDepth = PROPTAG_SPECIFIER + PR_DEPTH + PT_LONG;
-        public static string SchemaConversationIndex = PROPTAG_SPECIFIER + PR_CONVERSATION_INDEX + PT_BINARY;
-        public static string SchemaCustomPrefix = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/";
-        public static string SchemaTriage = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage";
-        public static string SchemaToDoID = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/ToDoID";
-        //public static string SchemaReceivedByName = PROPTAG_SPECIFIER + PR_RECEIVED_BY_NAME + PT_TSTRING;
-        //public static string SchemaConversationId = "http://schemas.microsoft.com/mapi/proptag/0x30130102";
-        public static string SchemaConversationId = PROPTAG_SPECIFIER + PR_CONVERSATION_ID + PT_BINARY;
-        public static string SchemaSenderName = PROPTAG_SPECIFIER + PR_SENDER_NAME + PT_TSTRING;
-        public static string SchemaSenderSmtpAddress = PROPTAG_SPECIFIER + PR_SENDER_SMTP_ADDRESS + PT_TSTRING;
-        public static string SchemaSenderAddrType = PROPTAG_SPECIFIER + PR_SENDER_ADDRTYPE + PT_TSTRING;
-        public static string SchemaReceivedByName = "http://schemas.microsoft.com/mapi/proptag/0x0040001E";
-        public static string SchemaMessageRecipients = "http://schemas.microsoft.com/mapi/proptag/0x0E12000D";
-        //public static string SchemaConversationKey = PROPTAG_SPECIFIER + PR_CONVERSATION_KEY + PT_BINARY; does not work
-
-        public static Dictionary<string, string> SchemaToField = new()
-        {
-            {SchemaFolderName, "Folder Name" },
-            {SchemaMessageStore, "Store"},
-            {SchemaConversationDepth, "ConvDepth" },
-            {SchemaConversationIndex, "ConversationIndex" },
-            {SchemaConversationTopic, "ConversationTopic" },
-            {SchemaConversationId, "ConversationId" },
-            {SchemaToDoID, "ToDoID" },
-            {SchemaTriage, "Triage" },
-            {SchemaSenderName, "SenderName" },
-            {SchemaSenderSmtpAddress, "SenderSmtpAddress" },
-            {SchemaSenderAddrType, "SenderAddrType" },
-            {SchemaReceivedByName, "ReceivedByName" },
-            {SchemaMessageRecipients, "MessageRecipients" }
-        };
-        public static Dictionary<string, string> FieldToSchema = new()
-        {
-            {"Folder Name", SchemaFolderName },
-            {"Store", SchemaMessageStore},
-            {"ConvDepth", SchemaConversationDepth },
-            {"ConversationIndex", SchemaConversationIndex },
-            {"ConversationTopic", SchemaConversationTopic },
-            {"ConversationId", SchemaConversationId },
-            {"ToDoID", SchemaToDoID },
-            {"Triage", SchemaTriage },
-            {"SenderName", SchemaSenderName },
-            {"SenderSmtpAddress", SchemaSenderSmtpAddress },
-            {"SenderAddrType", SchemaSenderAddrType },
-            {"ReceivedByName", SchemaReceivedByName },
-            {"MessageRecipients", SchemaMessageRecipients }
-        };
-
-        public static List<string> BinaryToStringFields = new()
-        {
-            "ConversationIndex",
-            "ConversationId",
-            "Store"//,
-            //"ReceivedByName"
-        };
-
-        public static List<string> ObjectFields = new()
-        {
-            "MessageRecipients"
-        };
-
-        #endregion
 
         /// <summary>
         /// Extension method that removes all columns in the supplied array 
@@ -140,7 +35,7 @@ namespace UtilitiesCS
                 foreach (var column in columnNames) 
                 {
                     try
-                    {
+                    {                        
                         table.Columns.Remove(column);
                     }
                     catch (COMException e)
@@ -223,7 +118,7 @@ namespace UtilitiesCS
                                  .Select(i =>
                                  {
                                      var name = table.Columns[i].Name;
-                                     if (SchemaToField.TryGetValue(name, out var adjustedName))
+                                     if (MAPIFields.SchemaToField.TryGetValue(name, out var adjustedName))
                                      { return new KeyValuePair<string, int>(adjustedName, i -1); }
                                      else { return new KeyValuePair<string, int>(name, i - 1); }
                                  });
@@ -299,7 +194,7 @@ namespace UtilitiesCS
             
             table.MoveToStart();
 
-            if (BinaryToStringFields.Any(x => columnDictionary.ContainsKey(x))||
+            if (MAPIFields.BinaryToStringFields.Any(x => columnDictionary.ContainsKey(x))||
                (objectConverters is not null && 
                objectConverters.Keys.Any(x => columnDictionary.ContainsKey(x))))
             {
@@ -334,7 +229,7 @@ namespace UtilitiesCS
             try
             {
 
-                if (BinaryToStringFields.Any(x => columnDictionary.ContainsKey(x)) ||
+                if (MAPIFields.BinaryToStringFields.Any(x => columnDictionary.ContainsKey(x)) ||
                    (objectConverters is not null &&
                    objectConverters.Keys.Any(x => columnDictionary.ContainsKey(x))))
                 {
@@ -545,7 +440,7 @@ namespace UtilitiesCS
         private static (IEnumerable<string>, IOrderedEnumerable<int>) GetBinFields(Dictionary<string, int> columnDictionary) 
         {
             // Get the column headers of the binary fields
-            var binFields = BinaryToStringFields.Where(x => columnDictionary.ContainsKey(x));
+            var binFields = MAPIFields.BinaryToStringFields.Where(x => columnDictionary.ContainsKey(x));
 
             // Get the indices of the binary fields
             var binIndices = binFields.Select(x => columnDictionary[x]).OrderBy(x => x);
@@ -978,8 +873,8 @@ namespace UtilitiesCS
             foreach (Column column in table.Columns)
             {
                 string name = column.Name;
-                if (SchemaToField.ContainsKey(name))
-                    name = SchemaToField[name];
+                if (MAPIFields.SchemaToField.ContainsKey(name))
+                    name = MAPIFields.SchemaToField[name];
                 headers[++i] = name;
             }
             return headers;

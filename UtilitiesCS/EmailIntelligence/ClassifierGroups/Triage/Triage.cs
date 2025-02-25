@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS.EmailIntelligence.Bayesian;
-using UtilitiesCS.EmailIntelligence.ClassifierGroups.Triage;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.OutlookExtensions;

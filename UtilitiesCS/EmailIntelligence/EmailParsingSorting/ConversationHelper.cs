@@ -1,20 +1,21 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Microsoft.Data.Analysis;
-using Outlook = Microsoft.Office.Interop.Outlook;
+﻿using Microsoft.Data.Analysis;
+using Microsoft.Office.Interop.Outlook;
 using System;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.Linq;
-using Reflection = System.Reflection;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using System.Drawing.Imaging;
-using System.Xml.Linq;
-using static System.Net.WebRequestMethods;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
+using UtilitiesCS.OutlookObjects.Fields;
+using static System.Net.WebRequestMethods;
+using Outlook = Microsoft.Office.Interop.Outlook;
+using Reflection = System.Reflection;
 
 namespace UtilitiesCS
 {
@@ -120,7 +121,7 @@ namespace UtilitiesCS
                 Debug.WriteLine(df.PrettyText());
                 if (SameFolder)
                 {
-                    string FolderName = ObjItem.PropertyAccessor.GetProperty(OlTableExtensions.SchemaFolderName) as string;
+                    string FolderName = ObjItem.PropertyAccessor.GetProperty(MAPIFields.Schemas.FolderName) as string;
                     df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(FolderName));
                 }
                 if (MailOnly)
@@ -276,14 +277,14 @@ namespace UtilitiesCS
                 string[] columnsToAdd = new string[]
                 {
                     "SentOn",
-                    OlTableExtensions.SchemaFolderName,
+                    MAPIFields.Schemas.FolderName,
                     //OlTableExtensions.SchemaMessageStore,
-                    OlTableExtensions.SchemaConversationDepth,
-                    OlTableExtensions.SchemaConversationIndex,
-                    OlTableExtensions.SchemaConversationTopic,
-                    OlTableExtensions.SchemaConversationId,
-                    OlTableExtensions.SchemaReceivedByName
-                    
+                    MAPIFields.Schemas.ConversationDepth,
+                    MAPIFields.Schemas.ConversationIndex,
+                    MAPIFields.Schemas.ConversationTopic,
+                    MAPIFields.Schemas.ConversationId,
+                    MAPIFields.Schemas.ReceivedByName
+
                 };
                 foreach (string columnName in columnsToAdd) { table.Columns.Add(columnName); }
             }
@@ -293,14 +294,14 @@ namespace UtilitiesCS
         internal static string[] ConversationColumnSchemas => new string[]
             {
                 "SentOn",
-                OlTableExtensions.SchemaFolderName,
-                OlTableExtensions.SchemaSenderName,
-                OlTableExtensions.SchemaSenderSmtpAddress,
-                OlTableExtensions.SchemaSenderAddrType,
+                MAPIFields.Schemas.FolderName,
+                MAPIFields.Schemas.SenderName,
+                MAPIFields.Schemas.SenderSmtpAddress,
+                MAPIFields.Schemas.SenderAddrType,
                 "EntryID",
-                OlTableExtensions.SchemaMessageStore,
-                OlTableExtensions.SchemaConversationDepth,
-                OlTableExtensions.SchemaConversationIndex
+                MAPIFields.Schemas.MessageStore,
+                MAPIFields.Schemas.ConversationDepth,
+                MAPIFields.Schemas.ConversationIndex
             };
         
         public static DataFrame GetDataFrame(this Outlook.Conversation conversation)
@@ -340,8 +341,8 @@ namespace UtilitiesCS
             {
                 Outlook.Table table = conversation.GetTable();
                 table.Columns.Add("SentOn");
-                if (WithFolder) { table.Columns.Add(OlTableExtensions.SchemaFolderName); }
-                if (WithStore) { table.Columns.Add(OlTableExtensions.SchemaMessageStore); }
+                if (WithFolder) { table.Columns.Add(MAPIFields.Schemas.FolderName); }
+                if (WithStore) { table.Columns.Add(MAPIFields.Schemas.MessageStore); }
                 return table;
             }
             else { return null; }

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Outlook;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Office.Interop.Outlook;
+using UtilitiesCS.OutlookObjects.Fields;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.OutlookExtensions
@@ -23,7 +24,7 @@ namespace UtilitiesCS.OutlookExtensions
             }
             Outlook.Table table = folder.GetTable();
             table.Columns.RemoveAll();
-            table.Columns.Add(OlTableExtensions.SchemaToDoID);
+            table.Columns.Add(MAPIFields.Schemas.ToDoID);
             table.Columns.Add("Categories");
             // table.EnumerateTable();
             return table;

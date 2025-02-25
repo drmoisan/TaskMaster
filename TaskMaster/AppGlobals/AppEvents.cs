@@ -15,6 +15,8 @@ using UtilitiesCS.Extensions;
 using System.Collections.Concurrent;
 using TaskMaster.Properties;
 using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
+using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.OutlookObjects.Fields;
 
 
 namespace TaskMaster
@@ -66,32 +68,32 @@ namespace TaskMaster
                 }
             }
         }
-        
-        private Items _olInboxItems;
-        private Items OlInboxItems
-        {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return _olInboxItems;
-            }
 
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            set
-            {
-                if (_olInboxItems != null)
-                {
-                    _olInboxItems.ItemAdd -= OlInboxItems_ItemAdd;
-                }
-                _olInboxItems = value;
-                if (_olInboxItems != null)
-                {
-                    _olInboxItems.ItemAdd += OlInboxItems_ItemAdd;
-                }
-            }
-        }
+        //private Items _olInboxItems;
+        //private Items OlInboxItems
+        //{
+        //    [MethodImpl(MethodImplOptions.Synchronized)]
+        //    get
+        //    {
+        //        return _olInboxItems;
+        //    }
 
-        internal IEnumerable<Items> OlInboxes { get; set; }
+        //    [MethodImpl(MethodImplOptions.Synchronized)]
+        //    set
+        //    {
+        //        if (_olInboxItems != null)
+        //        {
+        //            _olInboxItems.ItemAdd -= OlInboxItems_ItemAdd;
+        //        }
+        //        _olInboxItems = value;
+        //        if (_olInboxItems != null)
+        //        {
+        //            _olInboxItems.ItemAdd += OlInboxItems_ItemAdd;
+        //        }
+        //    }
+        //}
+
+        internal LockingLinkedList<Items> OlInboxes { get; set; } = new();
 
         private Reminders _olReminders;
         private Reminders OlReminders
@@ -115,20 +117,16 @@ namespace TaskMaster
         {
             {
                 OlToDoItems = Globals.Ol.ToDoFolder.Items;
-                //OlInboxItems = Globals.Ol.Inbox.Items;
                 OlReminders = Globals.Ol.OlReminders;
-                OlInboxes = Globals.Ol.Inboxes.Select(x => x.Items);
-                OlInboxes.ForEach(x => x.ItemAdd += OlInboxItems_ItemAdd);
+                Globals.Ol.Inboxes.ForEach(x => OlInboxes.AddLast(x.Items, items => items.ItemAdd += OlInboxItems_ItemAdd));
             }
         }
                 
         public void Unhook()
         {
-            OlToDoItems = null;
-            //OlInboxItems = null;
+            OlToDoItems = null;            
             OlReminders = null;
-            OlInboxes.ForEach(x => x.ItemAdd -= OlInboxItems_ItemAdd);
-            OlInboxes = null;
+            OlInboxes.Clear(items => items.ItemAdd -= OlInboxItems_ItemAdd);                  
         }
                 
         internal async Task LogAsync(string message)
@@ -154,7 +152,7 @@ namespace TaskMaster
             }
         }
 
-        private async void OlInboxItems_ItemAdd(object item)
+        internal async void OlInboxItems_ItemAdd(object item)
         {
             try
             {
@@ -189,55 +187,12 @@ namespace TaskMaster
             return false;
         }
 
-        //public async Task ProcessNewInboxItemsAsync()
-        //{
-        //    if (OlInboxItems is not null)
-        //    {
-        //        // Restrict to unprocessed items
-        //        string filter = $"@SQL=\"{OlTableExtensions.SchemaCustomPrefix}AutoProcessed\" is null";
-
-        //        var olMailItems = OlInboxItems.Restrict("[MessageClass] = 'IPM.Note'");
-        //        var unprocessedItems = olMailItems?.Restrict(filter)?.Cast<object>();
-        //        if (unprocessedItems is null) { return; }
-        //        var unprocessedQueue = new ConcurrentQueue<object>(unprocessedItems);
-        //        int errors = 0;
-        //        int success = 0;
-        //        var unprocessedCount = unprocessedQueue.Count();
-        //        logger.Debug($"Unprocessed queue has {unprocessedCount} items");
-
-
-        //        while (unprocessedQueue.Count > 0)
-        //        {
-        //            var remaining = unprocessedQueue.Count();
-        //            if (unprocessedQueue.TryDequeue(out var item) && await ProcessMailItemAsync(item))
-        //            {
-        //                success++;
-        //                logger.Debug($"Successfully processed {success} items of {unprocessedCount} in the unprocessed Queue");
-        //            }
-        //            else if (++errors >= 3)
-        //            {
-        //                logger.Warn($"Tried to process remaining {remaining} unprocessed items 3 times without success. Exiting loop.");
-        //                break;
-        //            }
-        //            else
-        //            {
-        //                if (item != default) { unprocessedQueue.Enqueue(item); }
-        //                await Task.Delay(100);
-        //            }
-        //        }
-        //        logger.Debug($"Successfully processed {success} of {unprocessedCount} items in the unprocessed Queue");
-
-        //        logger.Debug("Finished processing new inbox items");
-        //    }
-        //}
-
         public async Task ProcessNewInboxItemsAsync()
         {
             if (!OlInboxes.IsNullOrEmpty())
             {
                 // Restrict to unprocessed items
-                string filter = $"@SQL=\"{OlTableExtensions.SchemaCustomPrefix}AutoProcessed\" is null";
-                
+                string filter = $"@SQL=\"{MAPIFields.Schemas.CustomPrefix}AutoProcessed\" is null";                
                 var unprocessedQueue = new ConcurrentQueue<object>();
 
                 foreach (var inbox in OlInboxes)
@@ -253,14 +208,13 @@ namespace TaskMaster
                     if (unprocessedItems is null) { continue; }
                     unprocessedItems.ForEach(x => unprocessedQueue.Enqueue(x));
                 }
-                //var olMailItems = OlInboxItems.Restrict("[MessageClass] = 'IPM.Note'");
-                //var unprocessedItems = olMailItems?.Restrict(filter)?.Cast<object>();
-                //if (unprocessedItems is null) { return; }
+                
                 int errors = 0;
                 int success = 0;
                 var unprocessedCount = unprocessedQueue.Count();
                 logger.Debug($"Unprocessed queue has {unprocessedCount} items");
 
+                var syncContext = SynchronizationContext.Current;
 
                 while (unprocessedQueue.Count > 0)
                 {
@@ -288,6 +242,9 @@ namespace TaskMaster
                         //if (item != default) { unprocessedQueue.Enqueue(item); }
                         await Task.Delay(100);
                     }
+
+                    // Pump messages to keep the UI responsive
+                    syncContext?.Post(_ => System.Windows.Forms.Application.DoEvents(), null);
                 }
                 logger.Debug($"Successfully processed {success} of {unprocessedCount} items in the " +
                     $"unprocessed Queue with {errors} errors");
