@@ -130,15 +130,40 @@ namespace TaskVisualization
 
         public async Task<IList<string>> AutoFindAsync(object objItem)
         {
-            MailItem mailItem = null;
-            if (objItem is OutlookItem olItem) { mailItem = olItem.InnerObject as MailItem; }
-            else if (objItem is MailItem mail) { mailItem = mail; }
-            if (mailItem is null) { return null; }
+            var helper = await ToHelper(objItem);
+            if (helper is null) { return []; }
+
             var project = await CategoryClassifierGroup.CreateEngineAsync(_globals, "Project", default).ConfigureAwait(true);
             project.ProbabilityThreshold = 0.2;
-            var helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, true).ConfigureAwait(true);
-            var results = project.GetMatchingCategories(helper).ToList();
+
+            var results = (await project.GetMatchingCategoriesAsync(helper)).ToList();
             return results;
+        }
+
+        private async Task<MailItemHelper> ToHelper(object objItem)
+        {
+            MailItemHelper helper = null;
+            if (objItem is MailItemHelper mailItemHelper)
+            {
+                helper = mailItemHelper;
+            }
+            else if (objItem is OutlookItem olItem)
+            {
+                if (olItem.InnerObject is MailItem mailItem)
+                {
+                    helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false).ConfigureAwait(true);                    
+                }
+            }
+            else if (objItem is MailItem mailItem)
+            {
+                helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false).ConfigureAwait(true);                
+            }
+            if (helper is null) { return null; }
+            else
+            {
+                await Task.Run(() => _ = helper.Tokens).ConfigureAwait(true);
+                return helper;
+            }
         }
     }
 

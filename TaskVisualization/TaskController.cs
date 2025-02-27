@@ -458,9 +458,16 @@ namespace TaskVisualization
         /// </summary>
         public async Task OK_Action()
         {
+            if (_viewer.InvokeRequired)
+            {
+                _viewer.Invoke(() => OK_Action());
+                return;
+            }
             if (AnyCategorySelected)
             {
-
+                // Capture whether the task was flagged as a task
+                _active.FlagAsTask = _viewer.CbxFlagAsTask.Checked;
+                
                 // Capture the value of the task subject and if not empty write to ToDoItem
                 if (_options.HasFlag(Enums.FlagsToSet.Taskname))
                 {
@@ -569,14 +576,26 @@ namespace TaskVisualization
 
         internal async Task AutoAssignAllAsync()
         {
-            var projects = await ProjectAssign.AutoFindAsync(this._active.OlItem).ConfigureAwait(true);
-            MergeFlag(projects, Enums.FlagsToSet.Projects);
+            if (_active?.OlItem?.InnerObject is not MailItem mailItem) { return; }
+            var helper = await MailItemHelper.FromMailItemAsync(mailItem, Globals, default, false).ConfigureAwait(true);
 
-            var context = await ContextAssign.AutoFindAsync(this._active.OlItem).ConfigureAwait(true);
-            MergeFlag(context, Enums.FlagsToSet.Context);
+            var projects = await ProjectAssign.AutoFindAsync(helper).ConfigureAwait(true);
+            if (projects?.Count > 0)
+            {
+                MergeFlag(projects, Enums.FlagsToSet.Projects);
+            }
 
-            var people = await _autoAssign.AutoFindAsync(this._active.OlItem).ConfigureAwait(true);
-            MergeFlag(people, Enums.FlagsToSet.People);
+            var context = await ContextAssign.AutoFindAsync(helper).ConfigureAwait(true);
+            if (context?.Count > 0)
+            {
+                MergeFlag(context, Enums.FlagsToSet.Context);
+            }
+
+            var people = await _autoAssign.AutoFindAsync(mailItem).ConfigureAwait(true);
+            if (people?.Count > 0)
+            {
+                MergeFlag(people, Enums.FlagsToSet.People);
+            }
         }
 
         public bool KeyboardHandler_KeyDown(object sender, KeyEventArgs e)
@@ -767,29 +786,29 @@ namespace TaskVisualization
             {
                 case Enums.FlagsToSet.Context:
                     {
-                        _active.Context.AsListNoPrefix = MergeToCollection(
-                            _active.Context.AsListNoPrefix, value);
+                        _active.Context.AsListWithPrefix = MergeToCollection(
+                            _active.Context.AsListWithPrefix, value);
                         _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
                         break;
                     }
                 case Enums.FlagsToSet.People:
                     {
-                        _active.People.AsListNoPrefix = MergeToCollection(
-                            _active.People.AsListNoPrefix, value);
+                        _active.People.AsListWithPrefix = MergeToCollection(
+                            _active.People.AsListWithPrefix, value);
                         _viewer.PeopleSelection.Text = _active.People.AsStringNoPrefix;
                         break;
                     }
                 case Enums.FlagsToSet.Projects:
                     {
-                        _active.Projects.AsListNoPrefix = MergeToCollection(
-                            _active.Projects.AsListNoPrefix, value);
+                        _active.Projects.AsListWithPrefix = MergeToCollection(
+                            _active.Projects.AsListWithPrefix, value);
                         _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
                         break;
                     }
                 case Enums.FlagsToSet.Topics:
                     {
-                        _active.Topics.AsListNoPrefix = MergeToCollection(
-                            _active.Topics.AsListNoPrefix, value);
+                        _active.Topics.AsListWithPrefix = MergeToCollection(
+                            _active.Topics.AsListWithPrefix, value);
                         _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
                         break;
                     }                    // Note that _active is set after OK click
@@ -844,7 +863,10 @@ namespace TaskVisualization
                 FlagChangeGroup fcg = (c.OlItem.GetOlItemType() == OlItemType.olMailItem) ? 
                     new(Globals, c.OlItem.InnerObject as MailItem) : null;
                 
-                c.FlagAsTask = _active.FlagAsTask; //true
+                if (c.FlagAsTask != _active.FlagAsTask)
+                {
+                    c.FlagAsTask = _active.FlagAsTask; 
+                }
 
                 c.ReadOnly = true;
                 ApplyChange(fcg, "Context", Enums.FlagsToSet.Context, c.Context, _active.Context);
@@ -878,19 +900,20 @@ namespace TaskVisualization
                 //    c.KB.AsStringNoPrefix = _active.KB.AsStringNoPrefix;
 
                 await c.WriteFlagsBatchAsync(ChangedFlags);
+                ChangedFlags = Enums.FlagsToSet.None;
                 c.ReadOnly = false;
 
-                if (_options.HasFlag(Enums.FlagsToSet.Priority))
+                if (_options.HasFlag(Enums.FlagsToSet.Priority) && c.Priority != _active.Priority) 
                     c.Priority = _active.Priority;
-                if (_options.HasFlag(Enums.FlagsToSet.Taskname))
+                if (_options.HasFlag(Enums.FlagsToSet.Taskname) && c.TaskSubject != _active.TaskSubject)
                     c.TaskSubject = _active.TaskSubject;
-                if (_options.HasFlag(Enums.FlagsToSet.Worktime))
+                if (_options.HasFlag(Enums.FlagsToSet.Worktime) && c.TotalWork != _active.TotalWork)
                     c.TotalWork = _active.TotalWork;
-                if (_options.HasFlag(Enums.FlagsToSet.DueDate))
+                if (_options.HasFlag(Enums.FlagsToSet.DueDate) && c.DueDate != _active.DueDate)
                     c.DueDate = _active.DueDate;
-                if (_options.HasFlag(Enums.FlagsToSet.Reminder))
+                if (_options.HasFlag(Enums.FlagsToSet.Reminder) && c.ReminderTime != _active.ReminderTime)
                     c.ReminderTime = _active.ReminderTime;
-                if (_options == Enums.FlagsToSet.All)
+                if (_options == Enums.FlagsToSet.All && c.ActiveBranch != true)
                     c.ActiveBranch = true;
 
                 if (fcg.FlagChangeItems.Count > 0)

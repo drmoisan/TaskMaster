@@ -209,17 +209,17 @@ namespace ToDoModel
 
         private string GetUdfName(PrefixTypeEnum type) => Prefixes.Find(x => x.PrefixType == type).OlUserFieldName;
 
-        public Task WriteFlagsBatchAsync(Enums.FlagsToSet flagsToSet)
+        public async Task WriteFlagsBatchAsync(Enums.FlagsToSet flagsToSet)
         {
-            return Task.Run(() => WriteFlagsBatch(flagsToSet));
+            await Task.Run(() => WriteFlagsBatch(flagsToSet));
         }
 
         public void WriteFlagsBatch(Enums.FlagsToSet flagsToSet)
         {
             ToDoEvents.Editing.AddOrUpdate(OlItem.EntryID, 1, (key, existing) => existing + 1);
-
-            if (flagsToSet.HasFlag(Enums.FlagsToSet.Context | Enums.FlagsToSet.People | Enums.FlagsToSet.Projects 
-                | Enums.FlagsToSet.Topics | Enums.FlagsToSet.Kbf | Enums.FlagsToSet.Today | Enums.FlagsToSet.Bullpin))
+            
+            if (flagsToSet.HasAnyFlags([Enums.FlagsToSet.Context, Enums.FlagsToSet.People, Enums.FlagsToSet.Projects, 
+                Enums.FlagsToSet.Topics, Enums.FlagsToSet.Kbf, Enums.FlagsToSet.Today, Enums.FlagsToSet.Bullpin]))
             {
                 FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
             }

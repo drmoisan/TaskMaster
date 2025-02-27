@@ -207,6 +207,11 @@ namespace UtilitiesCS
         
         public ObservableCollection<string> GetPeopleList(bool IncludePrefix = false) => IncludePrefix ? _people.ListWithPrefix : _people.List;
         public void SetPeopleList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _people.List = value;
+        //{
+        //    if (IncludePrefix) { _people.ListWithPrefix = value; } 
+        //    else { _people.List = value; }
+        //}
+
 
         #endregion People
 
