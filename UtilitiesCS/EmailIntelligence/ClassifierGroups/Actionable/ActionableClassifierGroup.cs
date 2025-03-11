@@ -20,6 +20,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         public ActionableClassifierGroup(IApplicationGlobals globals): base(globals)
         {
             base.EngineName = "Actionable";
+            base.ProbabilityThreshold = 0.2;
             // Set async action
             // Set async condition
         }
@@ -84,7 +85,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         {
             var results = await ClassifierGroup.ClassifyAsync(helper.Tokens, default);
             var filtered = results
-                .Where(x => x.Probability > ProbabilityThreshold).Select(x => x.Class)
+                .Where(x => x.Probability > ProbabilityThreshold)
+                .Select(x => x.Class)
+                .Where(x => x != "None")                
                 .ToArray();
             return filtered;
         }
@@ -104,11 +107,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         public override async Task TestAsync(MailItemHelper helper)
         {
             var results = await GetMatchingCategoriesAsync(helper);
-            if (!results.IsNullOrEmpty()) 
-            {
-                var olItem = new OutlookItem(helper.Item);
-                olItem.Try().SetUdf("Actionable", results.First(), Microsoft.Office.Interop.Outlook.OlUserPropertyType.olText);
-            }
+            var value = results.IsNullOrEmpty() ? "None" : results.First();
+            var olItem = new OutlookItem(helper.Item);
+            olItem.Try().SetUdf("Actionable", value, Microsoft.Office.Interop.Outlook.OlUserPropertyType.olText);
         }
 
         
