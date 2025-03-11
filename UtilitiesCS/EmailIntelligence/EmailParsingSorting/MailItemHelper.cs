@@ -331,7 +331,13 @@ namespace UtilitiesCS //QuickFiler
         public string FolderName { get => _folderName?.Value; set => _folderName = value.ToLazy(); }
         
         private MailItem _item;
-        public virtual MailItem Item { get => _item; set => _item = value; }
+        public virtual MailItem Item 
+        {
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            get => _item;
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            set => _item = value; 
+        }
 
         private IItemInfo.PlainTextOptionsEnum _plainTextOptions = IItemInfo.PlainTextOptionsEnum.StripAll;
         public virtual IItemInfo.PlainTextOptionsEnum PlainTextOptions { get => _plainTextOptions; set => _plainTextOptions = value; }

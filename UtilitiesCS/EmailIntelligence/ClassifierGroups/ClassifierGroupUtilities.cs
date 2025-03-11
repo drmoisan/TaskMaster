@@ -23,29 +23,31 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         private IApplicationGlobals _globals = globals;
         internal IApplicationGlobals Globals => _globals;
 
-        public virtual async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(MinedMailInfo[] collection, string name)
+        public virtual async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(MinedMailInfo[] collection, string name, int minimumCountPerToken = 0)
         {
             collection.ThrowIfNull();
 
             var group = await Task.Run(() => Deserialize<BayesianClassifierGroup>($"Staging_{name}"));
             if (group is null)
             {
-                group = await CreateClassifierGroupAsync(collection);
+                group = await CreateClassifierGroupAsync(collection, minimumCountPerToken);
                 SerializeAndSave(group, "$Staging_{name}");
             }
             return group;
         }
 
         public virtual async Task<BayesianClassifierGroup> CreateClassifierGroupAsync(
-            MinedMailInfo[] collection)
+            MinedMailInfo[] collection, int minimumCountPerToken = 0)
         {
             return await Task.Run(() =>
             {
                 var group = new BayesianClassifierGroup
                 {
                     TotalEmailCount = collection.Count(),
-                    SharedTokenBase = new Corpus(
-                        collection.SelectMany(x => x.Tokens).GroupAndCount())
+                    SharedTokenBase = minimumCountPerToken == 0 ?
+                        new Corpus(collection.SelectMany(x => x.Tokens).GroupAndCount()) :
+                        new Corpus(collection.SelectMany(x => x.Tokens).GroupAndCount()
+                            .Where(kvp => kvp.Value >= minimumCountPerToken).ToDictionary())
                 };
                 return group;
             });

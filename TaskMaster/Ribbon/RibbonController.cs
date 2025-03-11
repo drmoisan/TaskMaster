@@ -23,6 +23,7 @@ using UtilitiesCS.EmailIntelligence.OlFolderTools.FilterOlFolders;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories;
 using UtilitiesCS.OutlookObjects.Store;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups;
 
 
 namespace TaskMaster
@@ -264,6 +265,15 @@ namespace TaskMaster
                     new WindowsFormsSynchronizationContext());
             var miner = new CategoryClassifierGroup(Globals);
             await miner.BuildClassifiersAsync();
+        }
+
+        internal async Task BuildActionableClassifierAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var miner = new ActionableClassifierGroup(Globals);
+            await miner.BuildClassifiersAsync(5);
         }
 
         #endregion Folder Classifier

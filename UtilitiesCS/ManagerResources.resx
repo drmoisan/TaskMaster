@@ -257,4 +257,32 @@
   }
 }</value>
   </data>
+  <data name="Actionable" xml:space="preserve">
+    <value>{
+  "$id": "1",
+  "Engine": true,
+  "Globals": "default",
+  "T": "UtilitiesCS.EmailIntelligence.ClassifierGroups.ActionableClassifierGroup, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+  "Name": "Actionable",
+  "Config": {
+    "$id": "2",
+    "Disk": {
+      "FileName": "ManagerActionable.json",
+      "RelativePath": "",
+      "SpecialFolderName": "Flow"
+    },
+    "LocalDisk": {
+      "FileName": "ManagerActionable.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "NetDisk": {
+      "FileName": "ManagerActionable.json",
+      "RelativePath": "",
+      "SpecialFolderName": "Flow"
+    },
+    "ClassifierActivated": true
+  }
+}</value>
+  </data>
 </root>

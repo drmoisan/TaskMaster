@@ -63,6 +63,31 @@ namespace UtilitiesCS {
         /// <summary>
         ///   Looks up a localized string similar to {
         ///  &quot;$id&quot;: &quot;1&quot;,
+        ///  &quot;Engine&quot;: true,
+        ///  &quot;Globals&quot;: &quot;default&quot;,
+        ///  &quot;T&quot;: &quot;UtilitiesCS.EmailIntelligence.ClassifierGroups.ActionableClassifierGroup, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null&quot;,
+        ///  &quot;Name&quot;: &quot;Actionable&quot;,
+        ///  &quot;Config&quot;: {
+        ///    &quot;$id&quot;: &quot;2&quot;,
+        ///    &quot;Disk&quot;: {
+        ///      &quot;FileName&quot;: &quot;ManagerActionable.json&quot;,
+        ///      &quot;RelativePath&quot;: &quot;&quot;,
+        ///      &quot;SpecialFolderName&quot;: &quot;Flow&quot;
+        ///    },
+        ///    &quot;LocalDisk&quot;: {
+        ///      &quot;FileName&quot;: &quot;ManagerActionable.json&quot;,
+        ///      &quot;RelativePath&quot;: &quot;&quot;,
+        ///      &quot;SpecialFolde [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Actionable {
+            get {
+                return ResourceManager.GetString("Actionable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;$id&quot;: &quot;1&quot;,
         ///  &quot;Engine&quot;: false,
         ///  &quot;Globals&quot;: &quot;default&quot;,
         ///  &quot;Name&quot;: &quot;Context&quot;,

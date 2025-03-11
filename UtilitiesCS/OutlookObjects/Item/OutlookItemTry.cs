@@ -130,6 +130,8 @@ namespace UtilitiesCS.OutlookExtensions
 
         public void Display() => TryCall(() => _olItem.Display());
 
+        public OlItemType GetOlItemType() => TryCall(() => _olItem.GetOlItemType());
+
         public void PrintOut() => TryCall(() => _olItem.PrintOut());
 
         public void Save() => TryCall(() => _olItem.Save());

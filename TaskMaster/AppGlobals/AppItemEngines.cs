@@ -12,6 +12,7 @@ using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.OutlookExtensions;
@@ -122,6 +123,12 @@ namespace TaskMaster
                         var context = await CategoryClassifierGroup.CreateEngineAsync(globals, "Context");
                         context.CategorySetter = ContextCategorySetterAsync;
                         return context;
+                    }
+                },
+                { "Actionable", async globals =>
+                    {
+                        var actionable = await ActionableClassifierGroup.CreateEngineAsync(globals, "Actionable");
+                        return actionable;
                     }
                 },
             };

@@ -304,14 +304,14 @@ namespace UtilitiesCS.EmailIntelligence
         public async Task TrainCallbackAsync(object item, bool isSpam)
         {
             MailItem mailItem = item as MailItem;
-            await Task.Run((System.Action)(() =>
+            await Task.Run(async () =>
             {
                 if (isSpam)
                 {
                     mailItem.SetUdf("Spam", 1.0, OlUserPropertyType.olPercent);
                     if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.JunkCertain.FolderPath)
                     {
-                        mailItem.Move(Globals.Ol.JunkCertain);
+                        await mailItem.TryMoveAsync(Globals.Ol.JunkCertain);
                     }
                 }
                 else
@@ -319,10 +319,10 @@ namespace UtilitiesCS.EmailIntelligence
                     mailItem.SetUdf("Spam", 0.0, OlUserPropertyType.olPercent);
                     if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.Inbox.FolderPath)
                     {
-                        mailItem.Move((MAPIFolder)Globals.Ol.Inbox);
+                        await mailItem.TryMoveAsync(Globals.Ol.Inbox);
                     }
                 }
-            }));
+            });
             
         }
 
@@ -377,6 +377,7 @@ namespace UtilitiesCS.EmailIntelligence
             {
                 if (((mailItem.Parent as Folder)?.FolderPath ?? "") != Globals.Ol.Inbox.FolderPath)
                     return Globals.Ol.Inbox;
+                //return null;
             }
             else
             {
@@ -557,12 +558,7 @@ namespace UtilitiesCS.EmailIntelligence
                 logger.Debug($"Skipping: Message class -> {GetOlItemString(olItem)}");
                 return false;
             }
-
-            //if (olItem.MessageClass != "IPM.Note") 
-            //{
-            //    logger.Debug($"Skipping: Message class {olItem.MessageClass} -> {GetOlItemString(olItem)}");
-            //    return false; 
-            //}
+                        
             var spamProp = olItem.UserProperties.Find("Spam");
             if (spamProp is not null) 
             { 

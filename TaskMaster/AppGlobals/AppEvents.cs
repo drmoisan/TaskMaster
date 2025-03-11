@@ -168,21 +168,35 @@ namespace TaskMaster
         {
             if (item is MailItem mailItem)
             {
-                var engines = await Globals.Engines.InboxEngines
+                var enginesAvailable = Globals.Engines.InboxEngines
+                    .Where(kvp => kvp.Value is not null)
+                    .ToArray();
+                var enginesApplicable = await enginesAvailable
                     .ToAsyncEnumerable()
                     .Where(kvp => kvp.Value is not null)
                     .WhereAwait(async kvp => await kvp.Value.AsyncCondition(mailItem))
                     .Where(kvp => kvp.Value.Engine is not null)
                     .ToArrayAsync();
 
-                if (engines.Length > 0)
+                if (!enginesAvailable.Any()) { logger.Debug("No engines available"); return false; }
+                else if (enginesApplicable.Length > 0)
                 {
                     var helper = await MailItemHelper.FromMailItemAsync(mailItem, Globals, default, false);
                     await Task.Run(() => _ = helper.Tokens);
-                    await engines.ToAsyncEnumerable().ForEachAwaitAsync(async e => await e.Value.AsyncAction(helper));
+                    await enginesApplicable.ToAsyncEnumerable().ForEachAwaitAsync(async e => await e.Value.AsyncAction(helper));
                     helper.Item.SetUdf("AutoProcessed", true, OlUserPropertyType.olYesNo);
                     return true;
                 }
+                else 
+                {
+                    logger.Debug($"No applicable engines for item with Subject: {mailItem.Subject}");
+                    mailItem.SetUdf("AutoProcessed", true, OlUserPropertyType.olYesNo);
+                }
+            }
+            else
+            {
+                var olItem = new OutlookItem(item);
+                logger.Debug($"Skipping item of type {olItem.Try().GetOlItemType()} with Subject: {olItem.Try().Subject}");                
             }
             return false;
         }

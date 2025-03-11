@@ -525,8 +525,10 @@
     <Compile Include="EmailIntelligence\Bayesian\Performance\MetricChartViewer.Designer.cs">
       <DependentUpon>MetricChartViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="EmailIntelligence\ClassifierGroups\Actionable\ActionableClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Categories\CategoryClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\MulticlassEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\OlFolder\OlFolderClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ConditionalItemEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogic.cs" />

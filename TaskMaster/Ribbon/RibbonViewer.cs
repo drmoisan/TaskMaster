@@ -1,6 +1,7 @@
 ﻿using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic;
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS.EmailIntelligence;
@@ -169,6 +170,7 @@ namespace TaskMaster
         public async void ScrapeAndMine_Click(Office.IRibbonControl control) => await _controller.ScrapeAndMineAsync();
         public async void BuildFolderClassifier_Click(Office.IRibbonControl control) => await _controller.BuildFolderClassifierAsync();
         public async void BuildCategoryClassifier_Click(Office.IRibbonControl control) => await _controller.BuildCategoryClassifierAsync();
+        public async void BuildActionableClassifier_Click(Office.IRibbonControl control) => await _controller.BuildActionableClassifierAsync();
 
         #endregion Folder Classifier
 
