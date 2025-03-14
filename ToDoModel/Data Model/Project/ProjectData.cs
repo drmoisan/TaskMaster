@@ -34,8 +34,16 @@ namespace ToDoModel
                                                        askUserOnError)
         { }
 
-        public void Save(string filepath) => base.Serialize(filepath);
-        public void Save() => base.Serialize();
+        public void Save(string filepath) 
+        {
+            base.Sort();
+            base.Serialize(filepath); 
+        }
+        public void Save() 
+        {
+            base.Sort();
+            base.Serialize(); 
+        }
 
         private Action<string, string> _idUpdateAction;
         public void SetIdUpdateAction(Action<string, string> action)
@@ -231,7 +239,7 @@ namespace ToDoModel
 
             df = FilterToProjectIDs(df);
             
-            var result = DfToListEntries(df);
+            var result = DfToListEntries(df).OrderBy(x => x.ProjectID).ToList();
             
             this.FromList(result);
             this.Serialize();
@@ -288,6 +296,8 @@ namespace ToDoModel
         {
             return this.Where(x => x.ProgramName.ToLower() == programName.ToLower()).ToList();
         }
+
+        
     }
 
     

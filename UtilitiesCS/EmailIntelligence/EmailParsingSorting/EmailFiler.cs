@@ -184,6 +184,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             var tasks = new List<Task>()
             {
                 Task.Run(async() =>(await Globals.AF.Manager["Folder"]).Train(Config.DestinationOlStem, mailHelper.Tokens, 1)),
+                Task.Run(async() =>(await Globals.AF.Manager["Actionable"]).Train(mailHelper.Actionable, mailHelper.Tokens, 1)),
                 Task.Run(() => Globals.AF.SubjectMap.Add(mailHelper.Subject, Config.DestinationOlStem)),
                 Task.Run(() => Globals.AF.RecentsList.AddOrMoveFirst(Config.DestinationOlStem, 5))
             };

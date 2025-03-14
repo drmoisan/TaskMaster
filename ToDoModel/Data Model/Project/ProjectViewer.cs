@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using ToDoModel.Data_Model.Project;
@@ -7,9 +8,10 @@ using UtilitiesCS;
 
 namespace ToDoModel
 {
-
     public partial class ProjectViewer
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public ProjectViewer()
         {
@@ -54,6 +56,37 @@ namespace ToDoModel
         private void OlvProjInfo_CellEditFinishing(object sender, CellEditEventArgs e)
         {
             _isEditing = false;
+        }
+
+        private void OlvProjectData_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.C)
+            {
+                CopySelectedItems();
+            }
+        }
+
+        private void CopySelectedItems()
+        {
+            if (OlvProjectData.SelectedObjects.Count > 0)
+            {
+                var selectedItems = OlvProjectData.SelectedObjects;
+                
+                try
+                {
+                    var clipboardText = string
+                        .Join("\n",selectedItems?
+                        .CastNullSafe<IProjectEntry>()
+                        .Where(x => x is not null)
+                        .Select(x => x.ToCSV()));
+                    Clipboard.SetDataObject(selectedItems, true);
+                }
+                catch (Exception e)
+                {
+                    logger.Error($"Copy to clipboard failed. {e.Message}", e);
+                }
+                
+            }
         }
     }
 }

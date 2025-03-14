@@ -88,14 +88,16 @@ namespace TaskMaster
             {
                 if (Parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
                 {
-                    return new ProjectData(filename: _defaults.FileName_ProjInfo, folderpath: appData); 
+                    var proj = new ProjectData(filename: _defaults.FileName_ProjInfo, folderpath: appData);
+                    proj.Sort();
+                    return proj;
                 }
                 else { return null; }
             });
             
             if (_projInfo?.Count == 0) 
             {
-                await Task.Run(() => _projInfo.Rebuild(Parent.Ol.App));
+                await Task.Run(() => _projInfo.Rebuild(Parent.Ol.App));                
             }
         }
         private IProjectData LoadProjInfo()

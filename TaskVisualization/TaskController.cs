@@ -916,7 +916,7 @@ namespace TaskVisualization
                 if (_options == Enums.FlagsToSet.All && c.ActiveBranch != true)
                     c.ActiveBranch = true;
 
-                if (fcg.FlagChangeItems.Count > 0)
+                if (fcg?.FlagChangeItems.Count > 0)
                 {
                     Globals.TD.FlagChangeTrainingQueue.Enqueue(fcg);
                 }

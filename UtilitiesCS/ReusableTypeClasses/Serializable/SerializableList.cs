@@ -17,7 +17,7 @@ using System.Threading;
 namespace UtilitiesCS
 {
     [Serializable()]
-    public class SerializableList<T> : IList<T>, ISerializableList<T>
+    public class SerializableList<T> : IList<T>, ISerializableList<T> where T: IComparable<T>
     {
         public SerializableList()
         {
@@ -272,6 +272,11 @@ namespace UtilitiesCS
                 }
             }
 
+        }
+
+        public void Sort() 
+        {
+            _innerList = _innerList.OrderBy(x => x).ToList();
         }
 
         

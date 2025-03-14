@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace ToDoModel
 {
     [Serializable()]
-    public class ProjectEntry : IEquatable<IProjectEntry>, IComparable, IComparable<IProjectEntry>, IProjectEntry, IEquatable<ProjectEntry>
+    public class ProjectEntry : IProjectEntry
     {
         private string _projectName;
         private string _projectID;
@@ -116,7 +116,7 @@ namespace ToDoModel
 
         public string ToCSV()
         {
-            return ProjectID + "," + ProjectName + "," + ProgramName;
+            return $"{ProgramID},{ProgramName},{ProjectID},{ProjectName}";
         }
 
         public override bool Equals(object obj)
