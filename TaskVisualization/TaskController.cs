@@ -280,7 +280,7 @@ namespace TaskVisualization
                                  where x.Key.Contains(prefix.Value)
                                  select x).ToSortedDictionary();
 
-            IList<string> selections = _active.People.AsListNoPrefix;
+            IList<string> selections = _active.People.AsListWithPrefix;
 
             selections.Remove("");
 

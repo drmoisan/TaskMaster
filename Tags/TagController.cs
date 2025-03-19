@@ -160,7 +160,7 @@ namespace Tags
             {
                 if ((sample != null) && (sample.Length > prefixLength))
                 {
-                    if (sample.Substring(0, prefixLength - 1) != prefix.Value)
+                    if (sample.Substring(0, prefixLength) != prefix.Value)
                     {
                         addPrefix = true;
                     }

@@ -155,6 +155,29 @@ namespace UtilitiesCS
             {
                 senderAddress = olMail.SenderEmailAddress;
             }
+            if (senderAddress.IsNullOrEmpty())
+            {
+                var olPA = sender.PropertyAccessor;
+                try
+                {
+                    senderAddress = olPA.GetProperty(PR_SMTP_ADDRESS) as string;
+                    if (senderAddress.IsNullOrEmpty())
+                        throw new InvalidOperationException("Sender address is null or empty");
+                }
+                catch
+                {
+                    try
+                    {
+                        senderAddress = olMail.SenderName;
+                        if (senderAddress.IsNullOrEmpty() || senderAddress.StartsWith("/o=ExchangeLabs"))
+                            throw new InvalidOperationException("Sender address and name are null or empty");
+                    }
+                    catch
+                    {
+                        senderAddress = "";
+                    }
+                }
+            }
 
             return senderAddress;
         }
@@ -305,6 +328,29 @@ namespace UtilitiesCS
             else
             {
                 smtpAddress = olRecipient.Address;
+            }
+            if (smtpAddress.IsNullOrEmpty()) 
+            {
+                var olPA = olRecipient.PropertyAccessor;
+                try
+                {
+                    smtpAddress = (string)olPA.GetProperty(PR_SMTP_ADDRESS);
+                    if (smtpAddress.IsNullOrEmpty())
+                        throw new InvalidOperationException("SMTP address is null or empty");
+                }
+                catch
+                {
+                    try
+                    {
+                        smtpAddress = olRecipient.Name;
+                        if (smtpAddress.IsNullOrEmpty() || smtpAddress.StartsWith("/o=ExchangeLabs"))
+                            throw new InvalidOperationException("SMTP address and name are null, empty, or malformed");
+                    }
+                    catch (System.Exception)
+                    {
+                        smtpAddress = "";                        
+                    }
+                }
             }
             return smtpAddress;
             //var OlPA = OlRecipient.PropertyAccessor;
