@@ -3,6 +3,10 @@ using UtilitiesCS;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Threading;
+using Microsoft.Office.Core;
 
 namespace ToDoModel
 {
@@ -19,9 +23,11 @@ namespace ToDoModel
         public string ProjectID 
         { 
             get => _projectID;
-            set 
-            { 
-                if ((value is not null)&&(value.Length != 4))
+            //private set => _projectID = value;
+            //[MethodImpl(MethodImplOptions.Synchronized)]
+            set
+            {
+                if ((value is not null) && (value.Length != 4))
                 {
                     MessageBox.Show($"{nameof(ProjectID)} cannot be set with malformed value {value}." +
                         "Value should be 4 digits or characters");
@@ -34,21 +40,21 @@ namespace ToDoModel
                 {
                     var response = MessageBox.Show($"Are you sure you want to change {nameof(ProjectID)} from" +
                         $"{_projectID} to {value}", "Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                    if (response == DialogResult.Yes) 
-                    { 
+                    if (response == DialogResult.Yes)
+                    {
                         if (_idUpdate is not null)
                         {
                             var response2 = MessageBox.Show("Would you like to change underlying outlook objects, " +
                             "child objects, and update ID List?", "Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                            if (response2 == DialogResult.Yes) 
+                            if (response2 == DialogResult.Yes)
                             {
-                                _idUpdate.Invoke(_projectID,value);
+                                _idUpdate.Invoke(_projectID, value);
                             }
                         }
                         _projectID = value;
                     }
                 }
-                
+
             }
         }
         private string _programID;
@@ -56,7 +62,7 @@ namespace ToDoModel
 
         public ProjectEntry(string ProjName, string ProjID, string ProgName)
         {
-            ProjectName = ProjName;
+            ProjectName = ProjName;                        
             ProjectID = ProjID;
             ProgramName = ProgName;
         }
@@ -64,10 +70,68 @@ namespace ToDoModel
         [JsonConstructor]
         public ProjectEntry(string ProjName, string ProjID, string ProgName, string programID)
         {
-            ProjectName = ProjName;
+            ProjectName = ProjName;            
             ProjectID = ProjID;
             ProgramName = ProgName;
             ProgramID = programID;
+        }
+
+        public bool SetProjectId(string newID) 
+        {
+            if (ProjectID.IsNullOrEmpty() && !newID.IsNullOrEmpty())
+            {
+                ProjectID = newID;
+                return true;
+            }
+
+            switch (newID)
+            {
+                case null:
+                    ProjectID = newID;
+                    return true;
+
+                case string s when s.Length != 4:
+                    MyBox.ShowDialog($"{nameof(ProjectID)} cannot be set with malformed value {newID}." +
+                        "Value should be 4 digits or characters", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+
+                case string s when s == ProjectID:
+                    break;
+                    
+                case string s when s != ProjectID:
+                    return ChangeId(newID);
+
+                default:
+                    throw new ArgumentException($"Unsupported value for {nameof(newID)} of {newID}");                   
+            }
+            
+            return false;
+        }
+
+        internal bool ChangeId(string newID) 
+        {
+            var response = MyBox.ShowDialog($"Are you sure you want to change {nameof(ProjectID)} from" +
+                    $"{ProjectID} to {newID}", "Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (response == DialogResult.Yes)
+            {
+                if (_idUpdate is not null)
+                {
+                    var response2 = MyBox.ShowDialog("Would you like to change underlying outlook objects, " +
+                    "child objects, and update ID List?", "Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (response2 == DialogResult.Yes)
+                    {
+                        _idUpdate.Invoke(ProjectID, newID);
+                    }
+                }
+                ProjectID = newID;
+                return true;
+            }
+            return false;
+        }
+        
+        public async Task<bool> SetProjectIdAsync(string newID, CancellationToken cancel)
+        {
+            return await Task.Run(() => SetProjectId(newID), cancel);
         }
 
         public void SetIdUpdateAction(Action<string, string> action) 
@@ -150,6 +214,6 @@ namespace ToDoModel
         }
     
         public bool IsAnyNull() 
-        { return (_projectName is null)||(_projectID is null)||(_programName is null); }
+        { return (ProjectName is null)||(ProjectID is null)||(ProgramName is null); }
     }
 }

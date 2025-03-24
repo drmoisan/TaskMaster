@@ -170,7 +170,7 @@ namespace TaskMaster
         internal async Task ShowHeadersNoChildrenAsync()
         {
             var dataTree = new TreeOfToDoItems([]);
-            await Task.Run(() => dataTree.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadAll, Globals));
+            await Task.Run(() => dataTree.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadNotComplete, Globals));
             await Task.Run(dataTree.ShowEmptyHeadersInView);
         }
 

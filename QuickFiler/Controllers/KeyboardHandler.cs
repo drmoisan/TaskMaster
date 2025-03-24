@@ -116,7 +116,14 @@ namespace QuickFiler.Controllers
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(_parent.UiSyncContext);
-            await KeyDownTaskAsync(sender, e);
+            try
+            {
+                await KeyDownTaskAsync(sender, e);
+            }
+            catch (System.Exception ex)
+            {
+                logger.Error($"Error in {nameof(KeyboardHandler_KeyDownAsync)} for key {e.KeyValue}. {ex.Message}", ex);                
+            }
         }
 
         public async Task KeyDownTaskAsync(object sender, KeyEventArgs e)

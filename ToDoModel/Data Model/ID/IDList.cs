@@ -223,9 +223,17 @@ namespace ToDoModel
         {
             var _dataModel = new TreeOfToDoItems();
             _dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadAll, appGlobals);
+            var flat = _dataModel.TryFlatten()?.Select(x => x.ToDoID).ToList();
+            if (flat is not null)
+            {
+                this.FromList(flat);
+            }
+            
             _dataModel.ReNumberIDs(this);
+            this.Sort();
+            this.Serialize();
         }
-
+               
         public void SetOlApp(Outlook.Application olApp) { _olApp = olApp; }
     }
 }

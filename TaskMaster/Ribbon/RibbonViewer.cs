@@ -86,7 +86,7 @@ namespace TaskMaster
         
         public async void BtnShowHeadersNoChildren_Click(Office.IRibbonControl control)
         {
-            await _controller.HideHeadersNoChildrenAsync();
+            await _controller.ShowHeadersNoChildrenAsync();
         }
 
         public void BtnRefreshIDList_Click(Office.IRibbonControl control)

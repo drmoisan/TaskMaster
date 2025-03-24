@@ -113,7 +113,6 @@
     <Compile Include="Data Model\Project\ProjectViewer.Designer.cs">
       <DependentUpon>ProjectViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Data Model\Project\ProjectList.cs" />
     <Compile Include="Data Model\Project\ProjectEntry.cs" />
     <Compile Include="Data Model\Project\ToDoProjectInfoLegacy.cs" />
     <Compile Include="Data Model\Project\ToDoProjectInfoUtilities.cs" />

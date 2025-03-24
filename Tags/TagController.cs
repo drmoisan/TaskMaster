@@ -414,6 +414,7 @@ namespace Tags
                     if (_autoAssigner is not null) 
                     { 
                         var newCategory = _autoAssigner.AddColorCategory(_prefix, categoryName);
+                        if (newCategory is null) { return; }
                         categoryName = newCategory.Name;
                     }                    
                     AddOption(categoryName, blClickTrue: true);

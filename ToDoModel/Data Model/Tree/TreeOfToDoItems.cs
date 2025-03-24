@@ -27,13 +27,27 @@ namespace ToDoModel
 
         #region Initialize and Access Encapsulated Tree
 
+        public List<ToDoItem> TryFlatten() 
+        {
+            try
+            {
+                return Roots.Select(root => root.Flatten()).SelectMany(x => x).ToList();
+            }
+            catch (System.Exception)
+            {
+
+                return null;
+            }
+        }
+
         private List<TreeNode<ToDoItem>> _roots = new List<TreeNode<ToDoItem>>();        
         public List<TreeNode<ToDoItem>> Roots { get => _roots; private set => _roots = value; }
         
         public enum LoadOptions
         {
             vbLoadAll = 0,
-            vbLoadInView = 1
+            vbLoadInView = 1,
+            vbLoadNotComplete = 2
         }
 
         public void LoadTree(LoadOptions LoadType, IApplicationGlobals appGlobals)
@@ -148,8 +162,23 @@ namespace ToDoModel
                 try
                 {
                     var folder = (Folder)store.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
-                    var olObjects = (strFilter == "@SQL=" | LoadType == LoadOptions.vbLoadAll) ? folder.Items : folder.Items.Restrict(strFilter);
-                    return olObjects.Cast<object>().Select(x => new OutlookItem(x)).ToList();
+                    Items olObjects = default;
+                    if (strFilter == "@SQL=" | LoadType == LoadOptions.vbLoadAll)
+                    {
+                        olObjects = folder.Items;
+                    }
+                    else if (LoadType == LoadOptions.vbLoadNotComplete)
+                    {
+                        strFilter = "[Complete] = false";
+                        olObjects = folder.Items.Restrict(strFilter);
+                        //"http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/810f0040" IS NULL
+                    }
+                    else 
+                    {
+                        olObjects = folder.Items.Restrict(strFilter); 
+                    }
+                        //var olObjects = (strFilter == "@SQL=" | LoadType == LoadOptions.vbLoadAll) ? folder.Items : folder.Items.Restrict(strFilter);
+                    return olObjects?.Cast<object>().Select(x => new OutlookItem(x)).ToList();
                 }
                 catch (System.Exception)
                 {
@@ -274,6 +303,7 @@ namespace ToDoModel
                     if (Children[i].Children.Count > 0)
                         ReNumberChildrenIDs(Children[i].Children, idList);
                 }
+                
                 idList.Serialize();
             }
         }
@@ -348,15 +378,16 @@ namespace ToDoModel
         }
 
         public void ShowEmptyHeadersInView()
-        {
-            //Action<TreeNode<ToDoItem>> action = node => { if (node.ChildCount == 0) { if (IsHeader(node.Value.Context.AsStringNoPrefix)) { node.Value.ActiveBranch = false; } } };
+        {            
             Action<TreeNode<ToDoItem>> action = node =>
             {
-                if (node.ChildCount == 0)
+                if (node.Parent is null || node.Parent.Value.ActiveBranch)
                 {
-                    if (IsHeader(node.Value.Context.AsStringNoPrefix))
-                    { node.Value.ActiveBranch = true; }
-                }
+                    if (IsHeader(node.Value.Context.AsStringNoPrefix) && !node.Value.ActiveBranch)
+                    { 
+                        node.Value.ActiveBranch = true; 
+                    }
+                }                
             };
 
             foreach (TreeNode<ToDoItem> node in Roots)
