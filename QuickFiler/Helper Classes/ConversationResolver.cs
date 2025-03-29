@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using ToDoModel;
 using UtilitiesCS;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 namespace QuickFiler.Helper_Classes
 {

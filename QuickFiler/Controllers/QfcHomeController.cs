@@ -180,7 +180,7 @@ namespace QuickFiler.Controllers
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(QfcHomeController)}.{nameof(RunAsync)} is complete");
 
             //_ = IterateQueueAsync();
-            await IterateQueueAsync();
+            await Task.Run(IterateQueueAsync);
         }
 
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

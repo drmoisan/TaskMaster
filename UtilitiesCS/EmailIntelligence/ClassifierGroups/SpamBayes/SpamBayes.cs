@@ -375,9 +375,9 @@ namespace UtilitiesCS.EmailIntelligence
             }
             else if (isSpam == false)
             {
-                if (((mailItem.Parent as Folder)?.FolderPath ?? "") != Globals.Ol.Inbox.FolderPath)
-                    return Globals.Ol.Inbox;
-                //return null;
+                //if (((mailItem.Parent as Folder)?.FolderPath ?? "") != Globals.Ol.Inbox.FolderPath)
+                //    return Globals.Ol.Inbox;
+                return null;
             }
             else
             {

@@ -36,15 +36,15 @@ namespace ToDoModel
             this.components = new System.ComponentModel.Container();
             this.SplitContainer1 = new System.Windows.Forms.SplitContainer();
             this.OlvProjectData = new BrightIdeasSoftware.ObjectListView();
+            this.OlvProgramID = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvProgramName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.OlvProjectID = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.OlvProjectName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.OlvProgramName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.OlvProgramID = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.button1 = new System.Windows.Forms.Button();
-            this.ButtonCancel = new System.Windows.Forms.Button();
-            this.ButtonOk = new System.Windows.Forms.Button();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
+            this.ButtonOk = new System.Windows.Forms.Button();
+            this.ButtonCancel = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.ProjectInfoBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
             this.SplitContainer1.Panel1.SuspendLayout();
@@ -60,6 +60,7 @@ namespace ToDoModel
             // 
             this.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SplitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.SplitContainer1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.SplitContainer1.Name = "SplitContainer1";
             this.SplitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
@@ -70,8 +71,9 @@ namespace ToDoModel
             // SplitContainer1.Panel2
             // 
             this.SplitContainer1.Panel2.Controls.Add(this.tableLayoutPanel1);
-            this.SplitContainer1.Size = new System.Drawing.Size(774, 450);
-            this.SplitContainer1.SplitterDistance = 398;
+            this.SplitContainer1.Size = new System.Drawing.Size(1548, 865);
+            this.SplitContainer1.SplitterDistance = 765;
+            this.SplitContainer1.SplitterWidth = 8;
             this.SplitContainer1.TabIndex = 0;
             // 
             // OlvProjectData
@@ -95,16 +97,32 @@ namespace ToDoModel
             this.OlvProjectData.HasCollapsibleGroups = false;
             this.OlvProjectData.HideSelection = false;
             this.OlvProjectData.Location = new System.Drawing.Point(0, 0);
+            this.OlvProjectData.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.OlvProjectData.Name = "OlvProjectData";
             this.OlvProjectData.ShowGroups = false;
-            this.OlvProjectData.Size = new System.Drawing.Size(774, 398);
+            this.OlvProjectData.Size = new System.Drawing.Size(1548, 765);
             this.OlvProjectData.TabIndex = 0;
             this.OlvProjectData.UseCompatibleStateImageBehavior = false;
             this.OlvProjectData.View = System.Windows.Forms.View.Details;
-            this.OlvProjectData.CellEditFinishing += new BrightIdeasSoftware.CellEditEventHandler(this.OlvProjInfo_CellEditFinishing);
             this.OlvProjectData.CellEditStarting += new BrightIdeasSoftware.CellEditEventHandler(this.OlvProjInfo_CellEditStarting);
+            this.OlvProjectData.CellEditFinishing += new BrightIdeasSoftware.CellEditEventHandler(this.OlvProjInfo_CellEditFinishing);            
             this.OlvProjectData.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OlvProjectData_KeyDown);
             this.OlvProjectData.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OlvProjInfo_KeyUp);
+            // 
+            // OlvProgramID
+            // 
+            this.OlvProgramID.AspectName = "ProgramID";
+            this.OlvProgramID.MinimumWidth = 76;
+            this.OlvProgramID.Text = "Program ID";
+            this.OlvProgramID.Width = 76;
+            // 
+            // OlvProgramName
+            // 
+            this.OlvProgramName.AspectName = "ProgramName";
+            this.OlvProgramName.Groupable = false;
+            this.OlvProgramName.MinimumWidth = 224;
+            this.OlvProgramName.Text = "Program Name";
+            this.OlvProgramName.Width = 224;
             // 
             // OlvProjectID
             // 
@@ -123,68 +141,22 @@ namespace ToDoModel
             this.OlvProjectName.Text = "Project Name";
             this.OlvProjectName.Width = 350;
             // 
-            // OlvProgramName
-            // 
-            this.OlvProgramName.AspectName = "ProgramName";
-            this.OlvProgramName.Groupable = false;
-            this.OlvProgramName.MinimumWidth = 224;
-            this.OlvProgramName.Text = "Program Name";
-            this.OlvProgramName.Width = 224;
-            // 
-            // OlvProgramID
-            // 
-            this.OlvProgramID.AspectName = "ProgramID";
-            this.OlvProgramID.MinimumWidth = 76;
-            this.OlvProgramID.Text = "Program ID";
-            this.OlvProgramID.Width = 76;
-            // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 310F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 620F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel2, 1, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 67F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(774, 48);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1548, 92);
             this.tableLayoutPanel1.TabIndex = 4;
-            // 
-            // button1
-            // 
-            this.button1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button1.Location = new System.Drawing.Point(203, 3);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(94, 23);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "NEW";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // ButtonCancel
-            // 
-            this.ButtonCancel.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.ButtonCancel.Location = new System.Drawing.Point(103, 3);
-            this.ButtonCancel.Name = "ButtonCancel";
-            this.ButtonCancel.Size = new System.Drawing.Size(94, 23);
-            this.ButtonCancel.TabIndex = 1;
-            this.ButtonCancel.Text = "CANCEL";
-            this.ButtonCancel.UseVisualStyleBackColor = true;
-            this.ButtonCancel.Click += new System.EventHandler(this.ButtonCancel_Click);
-            // 
-            // ButtonOk
-            // 
-            this.ButtonOk.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.ButtonOk.Location = new System.Drawing.Point(3, 3);
-            this.ButtonOk.Name = "ButtonOk";
-            this.ButtonOk.Size = new System.Drawing.Size(94, 23);
-            this.ButtonOk.TabIndex = 0;
-            this.ButtonOk.Text = "OK";
-            this.ButtonOk.UseVisualStyleBackColor = true;
-            this.ButtonOk.Click += new System.EventHandler(this.ButtonOk_Click);
             // 
             // flowLayoutPanel2
             // 
@@ -192,10 +164,46 @@ namespace ToDoModel
             this.flowLayoutPanel2.Controls.Add(this.ButtonCancel);
             this.flowLayoutPanel2.Controls.Add(this.button1);
             this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel2.Location = new System.Drawing.Point(235, 3);
+            this.flowLayoutPanel2.Location = new System.Drawing.Point(470, 6);
+            this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(304, 29);
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(608, 55);
             this.flowLayoutPanel2.TabIndex = 0;
+            // 
+            // ButtonOk
+            // 
+            this.ButtonOk.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.ButtonOk.Location = new System.Drawing.Point(6, 6);
+            this.ButtonOk.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.ButtonOk.Name = "ButtonOk";
+            this.ButtonOk.Size = new System.Drawing.Size(188, 44);
+            this.ButtonOk.TabIndex = 0;
+            this.ButtonOk.Text = "OK";
+            this.ButtonOk.UseVisualStyleBackColor = true;
+            this.ButtonOk.Click += new System.EventHandler(this.ButtonOk_Click);
+            // 
+            // ButtonCancel
+            // 
+            this.ButtonCancel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.ButtonCancel.Location = new System.Drawing.Point(206, 6);
+            this.ButtonCancel.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.ButtonCancel.Name = "ButtonCancel";
+            this.ButtonCancel.Size = new System.Drawing.Size(188, 44);
+            this.ButtonCancel.TabIndex = 1;
+            this.ButtonCancel.Text = "CANCEL";
+            this.ButtonCancel.UseVisualStyleBackColor = true;
+            this.ButtonCancel.Click += new System.EventHandler(this.ButtonCancel_Click);
+            // 
+            // button1
+            // 
+            this.button1.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.button1.Location = new System.Drawing.Point(406, 6);
+            this.button1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(188, 44);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "NEW";
+            this.button1.UseVisualStyleBackColor = true;
             // 
             // ProjectInfoBindingSource
             // 
@@ -203,10 +211,11 @@ namespace ToDoModel
             // 
             // ProjectViewer
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(774, 450);
+            this.ClientSize = new System.Drawing.Size(1548, 865);
             this.Controls.Add(this.SplitContainer1);
+            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.Name = "ProjectViewer";
             this.Text = "ProjectInfoWindow";
             this.Resize += new System.EventHandler(this.ProjectInfoWindow_Resize);

@@ -220,8 +220,7 @@ namespace QuickFiler.Controllers
         public void Cleanup()
         {
             _globals.Ol.PropertyChanged -= DarkMode_CheckedChanged;
-            UnregisterFormEventHandlers();
-            _undoConsumerTask?.Dispose();
+            UnregisterFormEventHandlers();            
             _undoQueue?.Dispose();
             _globals = null;
             _formViewer?.Dispose();

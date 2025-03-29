@@ -113,30 +113,41 @@ namespace QuickFiler.Controllers
         public void SetupWorker(System.ComponentModel.BackgroundWorker worker) 
         {
             worker.WorkerSupportsCancellation = true;
+            
             _token.Register(() => worker.CancelAsync());
             worker.DoWork += new System.ComponentModel.DoWorkEventHandler(Worker_DoWork);
             //worker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(Worker_RunWorkerCompleted);
         }
 
-        private void Worker_DoWork(object sender, DoWorkEventArgs e)
+        private async void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            // Do not access the form's BackgroundWorker reference directly.
-            // Instead, use the reference provided by the sender parameter.
-            BackgroundWorker bw = sender as BackgroundWorker;
-
-            // Extract the argument.
-            //zxxint arg = (int)e.Argument;
-
-            // Start the time-consuming operation.
-            //e.Result = await LoadRemainingEmailsToQueueAsync(bw, _token);
-            e.Result = LoadRemainingEmailsToQueue(bw, _token);
-
-            // If the operation was canceled by the user,
-            // set the DoWorkEventArgs.Cancel property to true.
-            if (bw.CancellationPending)
+            try
             {
-                e.Cancel = true;
+
+                // Do not access the form's BackgroundWorker reference directly.
+                // Instead, use the reference provided by the sender parameter.            
+                BackgroundWorker bw = sender as BackgroundWorker;
+
+                // Extract the argument.
+                //zxxint arg = (int)e.Argument;
+
+                // Start the time-consuming operation.
+                //e.Result = await LoadRemainingEmailsToQueueAsync(bw, _token);
+                //e.Result = LoadRemainingEmailsToQueue(bw, _token);
+                e.Result = await LoadRemainingEmailsToQueueAsync(_token);
+
+                // If the operation was canceled by the user,
+                // set the DoWorkEventArgs.Cancel property to true.
+                if (bw.CancellationPending)
+                {
+                    e.Cancel = true;
+                }
             }
+            catch (System.Exception ex)
+            {
+                logger.Error($"Error in Worker_DoWork {ex.Message}", ex);
+            }
+
         }
 
         // This event handler demonstrates how to interpret
@@ -204,8 +215,50 @@ namespace QuickFiler.Controllers
 
             var emailList = await Task.Run(() => InitEmailQueue(batchSize, worker), token);
 
+
             return emailList;
         }
+
+        private async Task<bool> LoadRemainingEmailsToQueueAsync(CancellationToken cancel)
+        {
+            if ((_frame is null) || (_frame.RowCount == 0))
+            {
+                MessageBox.Show("Email Frame is empty");
+                return false;
+            }
+
+            // Cast Frame to array of IEmailInfo
+            var rows = await Task.Run(() => _frame.GetRowsAs<IEmailSortInfo>().Values.ToArray());
+                        
+            foreach (var row in rows)
+            {
+                try
+                {
+                    cancel.ThrowIfCancellationRequested();
+                    //var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
+                    var item = await Task.Run(() => _olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId), cancel);
+                    if (item is not null && item is MailItem mailItem)
+                    {
+                        _masterQueue.AddLast(mailItem);
+                        _moveMonitor.HookItem(mailItem, (x) => _masterQueue.Remove(x));
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    //logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
+                    return false;
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error($"{nameof(LoadRemainingEmailsToQueue)} Error. \n {e.Message}\n{e.StackTrace}");
+                    throw e;
+                }
+                await Task.Yield();
+            }
+            return true;
+
+        }
+
 
         private bool LoadRemainingEmailsToQueue(BackgroundWorker bw, CancellationToken token)
         {

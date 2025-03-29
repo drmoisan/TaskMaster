@@ -5,14 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UtilitiesCS;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace ToDoModel.Data_Model.Project
 {
     public class ProjectController
     {
-        public ProjectController(IProjectData projectData)
+        public ProjectController(IProjectData projectData, ScDictionary<string, string> programData)
         {
             DataModel = projectData;
+            ProgramData = programData;
             Viewer = new() { Controller = this };
         }
 
@@ -36,6 +38,7 @@ namespace ToDoModel.Data_Model.Project
 
         protected IProjectData _dataModel;
         internal IProjectData DataModel { get => _dataModel; set => _dataModel = value; }
+        internal ScDictionary<string, string> ProgramData { get; set; }
 
         protected ProjectViewer _viewer;
         internal ProjectViewer Viewer { get => _viewer; set => _viewer = value; }

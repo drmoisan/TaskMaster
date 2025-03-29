@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,7 +18,26 @@ namespace UtilitiesCS
 
         private static bool IsLegalFolderName(string folderName)
         {
-            return !folderName.Any(c => IllegalFolderCharacters.Contains(c));
+            if (folderName.IsNullOrEmpty()) { return false; }
+            else { return !folderName.Any(c => IllegalFolderCharacters.Contains(c)); }
+        }
+
+        private static (bool legal, string revisedFolder) IsLegalFolderName(string folderName, bool askUser)
+        {
+            string revisedFolder = folderName;
+            var legal = IsLegalFolderName(revisedFolder);
+            if (!legal && askUser)
+            {
+
+            }
+            return (legal, revisedFolder);
+        }
+
+        private static (bool legal, string revisedFolder) AskUserForAlternatives(string illegalFolderName)
+        {
+            var illegal = GetIllegalFolderChars(illegalFolderName).SentenceJoin();
+            var dict = new Dictionary<string, System.Action>();
+            MyBox.ShowDialog($"Folder cannot contain characters {illegal}. How should we proceed?", "Folder Error", BoxIcon.Question, dict);
         }
 
         private static char[] GetIllegalFolderChars(string folderName)
@@ -32,7 +52,7 @@ namespace UtilitiesCS
             return regex.Replace(filename, "_");
         }
 
-        public static string ToFsFolderpath(this string olBranchPath, string olAncestorPath, string fsAncestorEquivalent) 
+        public static string ToFsFolderpath(this string olBranchPath, string olAncestorPath, string fsAncestorEquivalent, bool ask = true) 
         {
             if (string.IsNullOrEmpty(olBranchPath)) 
                 throw new ArgumentNullException(nameof(olBranchPath));
@@ -46,9 +66,11 @@ namespace UtilitiesCS
             var fsPathExDividers = fsPath.Substring(3).Replace($"{Path.DirectorySeparatorChar}", "");
                         
             if (!IsLegalFolderName(fsPathExDividers))
+            {
                 throw new ArgumentException(
                     $"{nameof(fsPathExDividers)} has a value of {fsPathExDividers} which contains illegal characters {GetIllegalFolderChars(fsPathExDividers).SentenceJoin()}", 
                     nameof(fsPath));
+            }
 
             return fsPath;
 

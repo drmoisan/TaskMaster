@@ -117,7 +117,7 @@ namespace TaskMaster
 
         internal void ReviseProjectData()
         {
-            var controller = new ToDoModel.Data_Model.Project.ProjectController(Globals.TD.ProjInfo);
+            var controller = new ToDoModel.Data_Model.Project.ProjectController(Globals.TD.ProjInfo, Globals.TD.ProgramInfo);
             controller.Run();
         }
 
