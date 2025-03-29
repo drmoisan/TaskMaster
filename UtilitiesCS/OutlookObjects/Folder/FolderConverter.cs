@@ -28,7 +28,7 @@ namespace UtilitiesCS
             var legal = IsLegalFolderName(revisedFolder);
             if (!legal && askUser)
             {
-
+                (legal, revisedFolder) = AskUserForAlternatives(revisedFolder);
             }
             return (legal, revisedFolder);
         }
@@ -36,8 +36,25 @@ namespace UtilitiesCS
         private static (bool legal, string revisedFolder) AskUserForAlternatives(string illegalFolderName)
         {
             var illegal = GetIllegalFolderChars(illegalFolderName).SentenceJoin();
-            var dict = new Dictionary<string, System.Action>();
-            MyBox.ShowDialog($"Folder cannot contain characters {illegal}. How should we proceed?", "Folder Error", BoxIcon.Question, dict);
+            var dict = BuildAlternativesDictionary(illegalFolderName);
+            var result = MyBox.ShowDialog($"Folder cannot contain characters {illegal}. How should we proceed?", "Folder Error", BoxIcon.Question, dict);
+            if (result.IsNullOrEmpty()) { return (false, illegalFolderName); }
+            else 
+            {
+                var (legal, revisedFolder) = IsLegalFolderName(result, true);
+                if (legal) { return (true, revisedFolder); }
+                else { return AskUserForAlternatives(revisedFolder); }
+            }            
+        }
+
+        private static Dictionary<string, Func<Task<string>>> BuildAlternativesDictionary(string illegalFolderName)
+        {
+            var dict = new Dictionary<string, Func<Task<string>>>();
+            dict.Add("Skip", async () => await Task.FromResult(""));            
+            dict.Add("Replace with underscore", async () => await Task.Run(() => SanitizeFilename(illegalFolderName)));
+            dict.Add("Remove illegal characters", async () => await Task.Run(() => illegalFolderName.Replace(illegalFolderName, "")));
+            dict.Add("Enter new folder name", async () => await Task.Run(() => InputBox.ShowDialog("Enter new folder name", "Folder Error", SanitizeFilename(illegalFolderName))));
+            return dict;
         }
 
         private static char[] GetIllegalFolderChars(string folderName)

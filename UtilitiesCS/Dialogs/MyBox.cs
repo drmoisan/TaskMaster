@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
+using UtilitiesCS.Dialogs;
 
 namespace UtilitiesCS
 {
@@ -59,6 +60,19 @@ namespace UtilitiesCS
             return result;
         }
 
+        public static T ShowDialog<T>(MyBoxViewer viewer, string Message, string Title, BoxIcon icon, FunctionButtonGroup<T> group)
+        {
+            viewer.Show();
+            ReplaceButtons(viewer, group.FunctionButtons);
+            viewer.Text = Title;
+            viewer.TextMessage.Text = Message;
+            viewer.SetDialogIcon(icon);
+            viewer.Hide();
+            viewer.TopMost = true;
+            DialogResult result = viewer.ShowDialog();
+            return group.Result;
+        }
+
         public static DialogResult ShowDialog(MyBoxViewer viewer, string Message, string Title, MessageBoxIcon icon, IList<ActionButton> actionButtons)
         {
             viewer.Show();
@@ -85,7 +99,14 @@ namespace UtilitiesCS
             var actionButtons = actions.ToActionButtons(viewer);
             return ShowDialog(viewer, message, title, icon, actionButtons);
         }
-        
+
+        public static T ShowDialog<T>(string message, string title, BoxIcon icon, Dictionary<string, Func<Task<T>>> functions)
+        {
+            using MyBoxViewer viewer = new();            
+            var group = functions.ToFunctionButtonsAsync(viewer);
+            return ShowDialog(viewer, message, title, icon, group);
+        }
+
         internal static void ReplaceButtons(MyBoxViewer viewer, IList<ActionButton> actionButtons)
         {
             int columnWidth = viewer.L2Bottom.GetColumnWidths()[1];
@@ -96,6 +117,21 @@ namespace UtilitiesCS
             foreach (var actionButton in actionButtons)
             {
                 AppendButtonInColumn(viewer.L2Bottom, actionButton, columnWidth);
+                minSize.Width += columnWidth;
+            }
+            viewer.MinimumSize = minSize;
+        }
+
+        internal static void ReplaceButtons<T>(MyBoxViewer viewer, IList<FunctionButton<T>> functionButtons)
+        {
+            int columnWidth = viewer.L2Bottom.GetColumnWidths()[1];
+            viewer.RemoveStandardButtons();
+
+            Size minSize = viewer.MinimumSize;
+
+            foreach (var functionButton in functionButtons)
+            {
+                AppendButtonInColumn(viewer.L2Bottom, functionButton, columnWidth);
                 minSize.Width += columnWidth;
             }
             viewer.MinimumSize = minSize;
@@ -126,6 +162,35 @@ namespace UtilitiesCS
             return actionButtons;
         }
 
+        public class FunctionButtonGroup<T>
+        {
+            public List<FunctionButton<T>> FunctionButtons { get; set; } = [];
+            public T Result { get; set; }
+        }
+
+        internal static FunctionButtonGroup<T> ToFunctionButtonsAsync<T>(this Dictionary<string, Func<Task<T>>> functions, MyBoxViewer _viewer)
+        {
+            IList<FunctionButton<T>> functionButtons = new List<FunctionButton<T>>();
+            int i = 0;
+            var group = new FunctionButtonGroup<T>();
+            foreach (var functionPair in functions)
+            {                
+                Func<Task<T>> function = async () =>
+                {
+                    var result = await functionPair.Value();
+                    group.Result = result;
+                    return result;
+                };
+
+                var functionButton = new FunctionButton<T>(
+                    $"button{i}", functionPair.Key, DialogResult.OK, function);
+
+                group.FunctionButtons.Add(functionButton);
+                i++;
+            }
+            return group;
+        }
+
         internal static void AppendButtonInColumn(TableLayoutPanel tlp, DelegateButton dlb, Single width)
         {
             tlp.ColumnCount++;
@@ -144,6 +209,16 @@ namespace UtilitiesCS
                                         System.Windows.Forms.SizeType.Absolute,
                                         width));
             tlp.Controls.Add(actionButton.Button, tlp.ColumnCount - 2, 0);
+        }
+
+        internal static void AppendButtonInColumn<T>(TableLayoutPanel tlp, FunctionButton<T> functionButton, Single width)
+        {
+            tlp.ColumnCount++;
+            tlp.ColumnStyles.Insert(tlp.ColumnCount - 2,
+                                    new System.Windows.Forms.ColumnStyle(
+                                        System.Windows.Forms.SizeType.Absolute,
+                                        width));
+            tlp.Controls.Add(functionButton.Button, tlp.ColumnCount - 2, 0);
         }
 
         private static void SetDialogIcon(this MyBoxViewer viewer, MessageBoxIcon icon)

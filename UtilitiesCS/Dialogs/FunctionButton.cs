@@ -25,6 +25,7 @@ namespace UtilitiesCS.Dialogs
             _button.DialogResult = dialogResult;
             _button.Click += new System.EventHandler(Button_Click);
             _function = function;
+            _buttonClicked = function;
         }
 
         public FunctionButton(
@@ -33,8 +34,9 @@ namespace UtilitiesCS.Dialogs
             Func<T> function)
         {
             _name = name;
-            _function = function;
+            _function = function;            
             Button = MakeButton(buttonText);
+            ButtonClicked = function;
         }
 
         public FunctionButton(
@@ -46,6 +48,7 @@ namespace UtilitiesCS.Dialogs
             _template = template.Clone();
             _name = name;
             _function = function;
+            ButtonClicked = function;
             Button = MakeButton(buttonText);
         }
 
@@ -58,6 +61,7 @@ namespace UtilitiesCS.Dialogs
             _name = name;
             _function = function;
             Button = MakeButton(buttonText, dialogResult);
+            ButtonClicked = function;
         }
 
         public FunctionButton(
@@ -71,6 +75,7 @@ namespace UtilitiesCS.Dialogs
             _name = name;
             _function = function;
             Button = MakeButton(buttonText, dialogResult);
+            ButtonClicked = function;
         }
 
         public FunctionButton(
@@ -83,6 +88,7 @@ namespace UtilitiesCS.Dialogs
             _name = name;
             _function = function;
             Button = MakeButton(buttonText, buttonImage, dialogResult);
+            ButtonClicked = function;
         }
 
         public FunctionButton(
@@ -97,6 +103,95 @@ namespace UtilitiesCS.Dialogs
             _name = name;
             _function = function;
             Button = MakeButton(buttonText, buttonImage, dialogResult);
+            ButtonClicked = function;
+        }
+
+        public FunctionButton(
+            Button button,
+            DialogResult dialogResult,
+            Func<Task<T>> function)
+        {
+            _button = button;
+            _button.DialogResult = dialogResult;
+            _button.Click += new System.EventHandler(Button_Click);
+            //_function = function;
+            ButtonClickedAsync = function;
+        }
+
+        public FunctionButton(
+            string name,
+            string buttonText,
+            Func<Task<T>> function)
+        {
+            _name = name;
+            //_function = function;
+            Button = MakeButton(buttonText);
+            ButtonClickedAsync = function;
+        }
+
+        public FunctionButton(
+            string name,
+            string buttonText,
+            Func<Task<T>> function,
+            Button template)
+        {
+            _template = template.Clone();
+            _name = name;
+            //_function = function;
+            ButtonClickedAsync = function;
+            Button = MakeButton(buttonText);
+        }
+
+        public FunctionButton(
+            string name,
+            string buttonText,
+            DialogResult dialogResult,
+            Func<Task<T>> function)
+        {
+            _name = name;
+            //_function = function;
+            Button = MakeButton(buttonText, dialogResult);
+            ButtonClickedAsync = function;
+        }
+
+        public FunctionButton(
+            string name,
+            string buttonText,
+            DialogResult dialogResult,
+            Func<Task<T>> function,
+            Button template)
+        {
+            _template = template.Clone();
+            _name = name;
+            //_function = function;
+            Button = MakeButton(buttonText, dialogResult);
+            ButtonClickedAsync = function;
+        }
+
+        public FunctionButton(
+            string name,
+            Image buttonImage,
+            string buttonText,
+            DialogResult dialogResult,
+            Func<Task<T>> function)
+        {
+            _name = name;
+            Button = MakeButton(buttonText, buttonImage, dialogResult);
+            ButtonClickedAsync = function;
+        }
+
+        public FunctionButton(
+            string name,
+            Image buttonImage,
+            string buttonText,
+            DialogResult dialogResult,
+            Func<Task<T>> function,
+            Button template)
+        {
+            _template = template.Clone();
+            _name = name;            
+            Button = MakeButton(buttonText, buttonImage, dialogResult);
+            ButtonClickedAsync = function;
         }
 
         private string _name;
