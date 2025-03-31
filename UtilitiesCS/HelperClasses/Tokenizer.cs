@@ -58,7 +58,7 @@ namespace UtilitiesCS
         /// <returns>array of word tokens</returns>
         public static string[] Tokenize(this string doc, Regex regex)
         {
-            if (doc.IsNullOrEmpty() || regex == null) { return []; }
+            
             return regex.Matches(doc)
                         .Cast<Match>()
                         .Select(x => x.Value
