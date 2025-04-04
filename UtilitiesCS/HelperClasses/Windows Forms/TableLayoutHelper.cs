@@ -11,6 +11,13 @@ namespace UtilitiesCS
     {
         public static void InsertSpecificRow(this TableLayoutPanel panel, int rowIndex, RowStyle templateStyle, int insertCount = 1) 
         {
+            // If not on the UI thread, invoke the method on the UI thread
+            if (panel.InvokeRequired)
+            {
+                panel.Invoke(() => InsertSpecificRow(panel, rowIndex, templateStyle, insertCount));
+                return;
+            }
+
             if ((rowIndex < 0)||(rowIndex>panel.RowCount))
             {
                 throw new ArgumentOutOfRangeException(nameof(rowIndex));
@@ -42,6 +49,13 @@ namespace UtilitiesCS
 
         public static void RemoveSpecificRow(this TableLayoutPanel panel, int rowIndex, int removeCount = 1)
         {
+            // If not on the UI thread, invoke the method on the UI thread
+            if (panel.InvokeRequired) 
+            {
+                panel.Invoke(() => RemoveSpecificRow(panel, rowIndex, removeCount));
+                return;
+            }
+            
             if (rowIndex >= panel.RowCount)
             {
                 return;
@@ -83,6 +97,13 @@ namespace UtilitiesCS
 
         public static void RemoveSpecificColumn(this TableLayoutPanel panel, int colIndex, int removeCount = 1)
         {
+            // If not on the UI thread, invoke the method on the UI thread
+            if (panel.InvokeRequired)
+            {
+                panel.Invoke(() => RemoveSpecificColumn(panel, colIndex, removeCount));
+                return;
+            }
+            
             if (colIndex >= panel.ColumnCount)
             {
                 return;
