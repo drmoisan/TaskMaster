@@ -38,15 +38,31 @@ namespace UtilitiesCS
 
         private void SetParentProperties(Type parentType)
         {
+            if(LabelControl.InvokeRequired)
+            {
+                LabelControl.Invoke(() => SetParentProperties(parentType));
+                return;
+            }
+
             if (parentType == typeof(TableLayoutPanel))
             {
                 _tlp = (TableLayoutPanel)_labelControl.Parent;
                 _columnNumber = _tlp.GetColumn(_labelControl);
                 _columnWidth = _tlp.ColumnStyles[_columnNumber].Width;
             }
-            else
+            else if(parentType == typeof(System.Windows.Forms.Panel))
+            {
+                _tlp = null;
+                _columnNumber = 0;
+                _columnWidth = 0;
+            }
+            else if (parentType == typeof(System.Windows.Forms.Panel) && _labelControl.Parent != null)
             {
                 _panel = (System.Windows.Forms.Panel)_labelControl.Parent;
+            }
+            else
+            {
+                throw new ArgumentException($"Type {parentType} is not a supported type for the parent of {nameof(LabelControl)}. It must be of type {typeof(TableLayoutPanel)} or {typeof(System.Windows.Forms.Panel)} but it is of type {parentType}");
             }
         }
 
@@ -60,6 +76,11 @@ namespace UtilitiesCS
 
         public Type ResolveParentType()
         {
+            if (_labelControl.InvokeRequired)
+            {
+                return (Type)_labelControl.Invoke(() => ResolveParentType());
+            }
+
             if (_labelControl.Parent == null)
             {
                 throw new ArgumentException($"The parent of {nameof(LabelControl)} is null. " +
