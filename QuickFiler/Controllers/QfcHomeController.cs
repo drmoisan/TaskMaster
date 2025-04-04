@@ -162,7 +162,9 @@ namespace QuickFiler.Controllers
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(QfcDatamodel.InitEmailQueueAsync)} ...");
             progress.Report(0, "Initializing Email Queue");
 
-            IList<MailItem> listEmail = await _datamodel.InitEmailQueueAsync(_formController.ItemsPerIteration, _formViewer.Worker, Token, TokenSource);
+            IList<MailItem> listEmail = await Task.Run(
+                async () => await _datamodel.InitEmailQueueAsync(
+                    _formController.ItemsPerIteration, _formViewer.Worker, Token, TokenSource));
 
             progress.Report(30, "Initializing Qfc Items");
 
