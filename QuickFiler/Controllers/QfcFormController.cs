@@ -613,7 +613,7 @@ namespace QuickFiler.Controllers
                                                   _states);
             _groups.LoadControlsAndHandlers_01(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
-
+        
         public async Task LoadItemsAsync(IList<MailItem> listObjects)
         {
             Token.ThrowIfCancellationRequested();

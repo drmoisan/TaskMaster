@@ -163,15 +163,18 @@ namespace QuickFiler.Controllers
                     _tlpLayout = value;
                     if (_tlpLayout)
                     {
-                        _itemTlp.ResumeLayout(true);
+                        if (_itemTlp.InvokeRequired) { _itemTlp.Invoke(() => _itemTlp.ResumeLayout(true)); }
+                        else { _itemTlp.ResumeLayout(true); }                        
                     }
                     else
                     {
-                        _itemTlp.SuspendLayout();
+                        if (_itemTlp.InvokeRequired) { _itemTlp.Invoke(() => _itemTlp.SuspendLayout()); }
+                        else { _itemTlp.SuspendLayout(); }
                     }
                 }
             }
-        }    
+        }
+        
         public bool SafeSetTlpLayout(bool state)
         {
             var originalState = TlpLayout;
@@ -229,10 +232,12 @@ namespace QuickFiler.Controllers
 
         public async Task LoadControlsAndHandlers_01Async(IList<MailItem> listMailItems, RowStyle template, RowStyle templateExpanded)
         {
+            
             Token.ThrowIfCancellationRequested();
 
             // Freeze the form while loading controls
-            _formViewer.SuspendLayout();
+            if (_formViewer.InvokeRequired) { _formViewer.Invoke(() => _formViewer.SuspendLayout()); }
+            else { _formViewer.SuspendLayout(); }
             var tlpLayoutState = SafeSetTlpLayout(false);
 
             // Save the QfcItem template styles
@@ -240,8 +245,14 @@ namespace QuickFiler.Controllers
             _templateExpanded = templateExpanded;
 
             // Hook the move monitor to the mail items
-            listMailItems.ForEach(mailItem => _moveMonitor.HookItem(mailItem, (x) => RemoveSpecificControlGroup(x.EntryID)));
+            await Task.Run(
+                () => listMailItems.ForEach(
+                    mailItem => _moveMonitor.HookItem(mailItem, (x) => RemoveSpecificControlGroup(x.EntryID))))
+                .ConfigureAwait(true);
 
+            // Create empty keyboard handler actions
+            await Task.Run(CreateEmptyKbdHandlerCharActions, Token).ConfigureAwait(true);
+            
             // Load the Item Viewers, Item Controllers, and Initialize
             await LoadGroups_02bAsync(listMailItems, template, _tlpStates);
             WireUpAsyncKeyboardHandler();
@@ -253,13 +264,26 @@ namespace QuickFiler.Controllers
 
         }
 
-        public async Task LoadGroups_02bAsync(IList<MailItem> items, RowStyle template, TlpCellStates tlpStates) 
+        public void CreateEmptyKbdHandlerCharActions()
+        {
+            _kbdHandler.CharActions = new KbdActions<char, KaChar, Action<char>>();
+            _kbdHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
+        }
+
+        public async Task LoadGroups_02cAsync(IList<MailItem> items, RowStyle template, TlpCellStates tlpStates)
         {
             Token.ThrowIfCancellationRequested();
 
-            _kbdHandler.CharActions = new KbdActions<char, KaChar, Action<char>>();
-            _kbdHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
+            var digits = items.Count >= 10 ? 2 : 1;
+            var grpTasks = items.Select((mailItem, i) => LoadGroup_03bAsync(template, mailItem, i, digits, tlpStates)).ToList();
+            _itemGroups = [.. (await Task.WhenAll(grpTasks))];
+        }
 
+
+        public async Task LoadGroups_02bAsync(IList<MailItem> items, RowStyle template, TlpCellStates tlpStates) 
+        {
+            Token.ThrowIfCancellationRequested();
+                        
             var digits = items.Count >= 10 ? 2 : 1;
 
             var grpTasks = items.Select((mailItem, i) => LoadGroup_03bAsync(template, mailItem, i, digits, tlpStates)).ToList();

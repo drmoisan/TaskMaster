@@ -73,15 +73,18 @@ namespace QuickFiler.Helper_Classes
 
             if (loadAll)
             {
-                await resolver.LoadDfAsync(token, loadAll);
-                await resolver.LoadConversationInfoAsync(token, loadAll);
-                await resolver.LoadConversationItemsAsync(token, loadAll);
+                await Task.Run(async () =>
+                {
+                    await resolver.LoadDfAsync(token, loadAll);
+                    await resolver.LoadConversationInfoAsync(token, loadAll);
+                    await resolver.LoadConversationItemsAsync(token, loadAll);
+                });
                 resolver.PropertyChanged += resolver.Handler_PropertyChanged;
             }
             else
             {
                 resolver.PropertyChanged += resolver.Handler_PropertyChanged;
-                await resolver.LoadDfAsync(token, loadAll);
+                await Task.Run(async () => await resolver.LoadDfAsync(token, loadAll));
             }
 
             return resolver;

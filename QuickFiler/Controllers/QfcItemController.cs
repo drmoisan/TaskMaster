@@ -793,6 +793,13 @@ namespace QuickFiler.Controllers
 
         public void SetTopicThread(List<MailItemHelper> conversationInfo)
         {
+            // Run on the UI Thread if necessary
+            if (_itemViewer.InvokeRequired)
+            {
+                _itemViewer.Invoke(() => SetTopicThread(conversationInfo));
+                return;
+            }
+
             // Set the TopicThread to the ConversationInfo list
             _itemViewer.TopicThread.SetObjects(conversationInfo);
             _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
