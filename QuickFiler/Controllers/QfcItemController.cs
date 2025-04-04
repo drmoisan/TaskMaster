@@ -274,7 +274,7 @@ namespace QuickFiler.Controllers
 
             // Create the environment manually
             var task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
-
+            
             await task.ContinueWith(t =>
             {
                 _webViewEnvironment = task.Result;
@@ -284,6 +284,12 @@ namespace QuickFiler.Controllers
 
         internal void ResolveControlGroups(ItemViewer itemViewer)
         {
+            if (itemViewer.InvokeRequired)
+            {
+                itemViewer.Invoke(() => ResolveControlGroups(itemViewer));
+                return;
+            }
+
             var controls = itemViewer.GetAllChildren();
 
             _listTipsDetails = _itemViewer.TipsLabels
@@ -354,9 +360,9 @@ namespace QuickFiler.Controllers
 
         public void PopulateControls(MailItem mailItem, int viewerPosition)
         {
-            ItemInfo = new MailItemHelper(mailItem, _globals);
+            ItemHelper = new MailItemHelper(mailItem, _globals);
             //_itemInfo.LoadPriority(_globals, _token);
-            AssignControls(ItemInfo, viewerPosition);
+            AssignControls(ItemHelper, viewerPosition);
 
         }
 
@@ -366,9 +372,10 @@ namespace QuickFiler.Controllers
 
             _token.ThrowIfCancellationRequested();
 
-            ItemInfo = await MailItemHelper.FromMailItemAsync(mailItem, _globals, _token, loadAll);
+            ItemHelper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, _token, loadAll);
 
-            await AssignControlsAsync(ItemInfo, viewerPosition);
+            AssignControls(ItemHelper, viewerPosition);
+            //await AssignControlsAsync(ItemHelper, viewerPosition);
 
         }
 
@@ -389,6 +396,11 @@ namespace QuickFiler.Controllers
         internal void AssignControls(MailItemHelper itemInfo, int viewerPosition)
         {
             //TraceUtility.LogMethodCall(itemInfo, viewerPosition);
+            if (_itemViewer.InvokeRequired)
+            {
+                _itemViewer.Invoke(() => AssignControls(itemInfo, viewerPosition));
+                return;
+            }
 
             _itemViewer.LblSender.Text = itemInfo.SenderName;
             _itemViewer.LblSubject.Text = itemInfo.Subject;
@@ -501,7 +513,7 @@ namespace QuickFiler.Controllers
             if (varList is null)
             {
                 _folderHandler = new FolderPredictor(
-                    _globals, ItemInfo, FolderPredictor.InitOptions.FromField);
+                    _globals, ItemHelper, FolderPredictor.InitOptions.FromField);
             }
             else
             {
@@ -518,8 +530,8 @@ namespace QuickFiler.Controllers
                 try
                 {
                     _folderHandler = await new FolderPredictor(
-                        _globals, ItemInfo.ThrowIfNull(), FolderPredictor.InitOptions.FromField)
-                        .InitAsync(ItemInfo, FolderPredictor.InitOptions.FromField);
+                        _globals, ItemHelper.ThrowIfNull(), FolderPredictor.InitOptions.FromField)
+                        .InitAsync(ItemHelper, FolderPredictor.InitOptions.FromField);
                 }
                 catch(ArgumentNullException e)
                 {
@@ -607,12 +619,12 @@ namespace QuickFiler.Controllers
             _homeController = null;
             _kbdHandler = null;
             _itemPositionTips = null;
-            ItemInfo = null;
+            ItemHelper = null;
             _itemViewer = null;
             _emailIsReadTimer = null;
         }
 
-        internal string GetItemSummary() => $"Subject: {ItemInfo.Subject} sent on {ItemInfo.SentDate.ToString("MM/dd/yyyy")} at {ItemInfo.SentDate.ToString("HH:mm")} by {ItemInfo.SenderName}";
+        internal string GetItemSummary() => $"Subject: {ItemHelper.Subject} sent on {ItemHelper.SentDate.ToString("MM/dd/yyyy")} at {ItemHelper.SentDate.ToString("HH:mm")} by {ItemHelper.SenderName}";
 
         #endregion ItemViewer Setup and Disposal
 
@@ -664,7 +676,7 @@ namespace QuickFiler.Controllers
 
         public int Height { get => _itemViewer.Height; }
 
-        public MailItemHelper ItemInfo { get => _itemInfo; set => _itemInfo = value; }
+        public MailItemHelper ItemHelper { get => _itemInfo; set => _itemInfo = value; }
         private MailItemHelper _itemInfo;
 
         public bool IsExpanded { get => _expanded; }
@@ -861,27 +873,27 @@ namespace QuickFiler.Controllers
                 throw (e.InitializationException);
             }
             _isWebViewerInitialized = true;
-            _itemViewer.L0v2h2_WebView2.NavigateToString(ItemInfo.Html);
+            _itemViewer.L0v2h2_WebView2.NavigateToString(ItemHelper.Html);
             //_itemViewer.L0v2h2_Panel.Visible = false;
         }
 
         internal void RegisterFocusActions()
         {
             _kbdHandler.KeyActions.Add(
-                ItemInfo.EntryId, Keys.Right, (x) => this.ToggleConversationCheckbox(Enums.ToggleState.Off));
+                ItemHelper.EntryId, Keys.Right, (x) => this.ToggleConversationCheckbox(Enums.ToggleState.Off));
             _kbdHandler.KeyActions.Add(
-                ItemInfo.EntryId, Keys.Left, (x) => this.ToggleConversationCheckbox(Enums.ToggleState.On));
-            _kbdHandler.CharActions.Add(ItemInfo.EntryId, 'O', (x) => _ = _explorerController.OpenQFItem(Mail));
-            _kbdHandler.CharActions.Add(ItemInfo.EntryId, 'C', (x) => this.ToggleConversationCheckbox());
-            _kbdHandler.CharActions.Add(ItemInfo.EntryId, 'A', (x) => this.ToggleSaveAttachments());
-            _kbdHandler.CharActions.Add(ItemInfo.EntryId, 'M', (x) => this.ToggleSaveCopyOfMail());
-            _kbdHandler.CharActions.Add(ItemInfo.EntryId, 'E', (x) => this.ToggleExpansion());
-            _kbdHandler.CharActions.Add(ItemInfo.EntryId, 'S', (x) => this.JumpToSearchTextbox());
-            _kbdHandler.CharActions.Add(ItemInfo.EntryId, 'T', (x) => this.FlagAsTask());
-            _kbdHandler.CharActions.Add(ItemInfo.EntryId, 'P', (x) => this._parent.PopOutControlGroup(ItemNumber));
-            _kbdHandler.CharActions.Add(ItemInfo.EntryId, 'R', (x) => this._parent.RemoveSpecificControlGroup(ItemNumber));
-            _kbdHandler.CharActions.Add(ItemInfo.EntryId, 'X', (x) => this.MarkItemForDeletion());
-            _kbdHandler.CharActions.Add(ItemInfo.EntryId, 'F', (x) => this.JumpToFolderDropDown());
+                ItemHelper.EntryId, Keys.Left, (x) => this.ToggleConversationCheckbox(Enums.ToggleState.On));
+            _kbdHandler.CharActions.Add(ItemHelper.EntryId, 'O', (x) => _ = _explorerController.OpenQFItem(Mail));
+            _kbdHandler.CharActions.Add(ItemHelper.EntryId, 'C', (x) => this.ToggleConversationCheckbox());
+            _kbdHandler.CharActions.Add(ItemHelper.EntryId, 'A', (x) => this.ToggleSaveAttachments());
+            _kbdHandler.CharActions.Add(ItemHelper.EntryId, 'M', (x) => this.ToggleSaveCopyOfMail());
+            _kbdHandler.CharActions.Add(ItemHelper.EntryId, 'E', (x) => this.ToggleExpansion());
+            _kbdHandler.CharActions.Add(ItemHelper.EntryId, 'S', (x) => this.JumpToSearchTextbox());
+            _kbdHandler.CharActions.Add(ItemHelper.EntryId, 'T', (x) => this.FlagAsTask());
+            _kbdHandler.CharActions.Add(ItemHelper.EntryId, 'P', (x) => this._parent.PopOutControlGroup(ItemNumber));
+            _kbdHandler.CharActions.Add(ItemHelper.EntryId, 'R', (x) => this._parent.RemoveSpecificControlGroup(ItemNumber));
+            _kbdHandler.CharActions.Add(ItemHelper.EntryId, 'X', (x) => this.MarkItemForDeletion());
+            _kbdHandler.CharActions.Add(ItemHelper.EntryId, 'F', (x) => this.JumpToFolderDropDown());
             if (_expanded) { RegisterExpandedActions(); }
         }
 
@@ -891,19 +903,19 @@ namespace QuickFiler.Controllers
             //_kbdHandler.KeyActionsAsync.Add(_itemInfo.EntryId, Keys.Right, (x) => ToggleCheckboxAsync(_itemViewer.CbxConversation, Enums.ToggleState.Off));
             //_kbdHandler.KeyActionsAsync.Add(_itemInfo.EntryId, Keys.Left, (x) => ToggleCheckboxAsync(_itemViewer.CbxConversation, Enums.ToggleState.On));
             //_kbdHandler.CharActionsAsync.Add(_itemInfo.EntryId, 'A', (x) => this.ToggleCheckboxAsync(_itemViewer.CbxAttachments));
-            _kbdHandler.CharActionsAsync.Add(ItemInfo.EntryId, 'C', (x) => this.ToggleCbMenuItemAsync(_itemViewer.ConversationMenuItem));
-            _kbdHandler.CharActionsAsync.Add(ItemInfo.EntryId, 'O', (x) => _ = _explorerController.OpenQFItem(Mail));
-            _kbdHandler.CharActionsAsync.Add(ItemInfo.EntryId, 'M', (x) => this.KbdExecuteAsync(MenuDropDown, true));
-            _kbdHandler.CharActionsAsync.Add(ItemInfo.EntryId, 'R', (x) => this.KbdExecuteAsync(Reply, true));
-            _kbdHandler.CharActionsAsync.Add(ItemInfo.EntryId, 'L', (x) => this.KbdExecuteAsync(ReplyAll, true));
-            _kbdHandler.CharActionsAsync.Add(ItemInfo.EntryId, 'W', (x) => this.KbdExecuteAsync(Forward, true));
-            _kbdHandler.CharActionsAsync.Add(ItemInfo.EntryId, 'E', (x) => this.ToggleExpansionAsync());
-            _kbdHandler.CharActionsAsync.Add(ItemInfo.EntryId, 'S', (x) => this.JumpToAsync(_itemViewer.TxtboxSearch));
-            _kbdHandler.CharActionsAsync.Add(ItemInfo.EntryId, 'T', (x) => this.KbdExecuteAsync(FlagAsTaskAsync, true));
-            _kbdHandler.CharActionsAsync.Add(ItemInfo.EntryId, 'P', (x) => this.KbdExecuteAsync(_parent.PopOutControlGroupAsync, ItemNumber, false));
-            _kbdHandler.CharActionsAsync.Add(ItemInfo.EntryId, 'Z', (x) => this.KbdExecuteAsync(_parent.RemoveSpecificControlGroupAsync, ItemNumber, false));
-            _kbdHandler.CharActionsAsync.Add(ItemInfo.EntryId, 'X', (x) => this.KbdExecuteAsync(this.MarkItemForDeletionAsync, false));
-            _kbdHandler.CharActionsAsync.Add(ItemInfo.EntryId, 'F', (x) => this.JumpToFolderDropDownAsync());
+            _kbdHandler.CharActionsAsync.Add(ItemHelper.EntryId, 'C', (x) => this.ToggleCbMenuItemAsync(_itemViewer.ConversationMenuItem));
+            _kbdHandler.CharActionsAsync.Add(ItemHelper.EntryId, 'O', (x) => _ = _explorerController.OpenQFItem(Mail));
+            _kbdHandler.CharActionsAsync.Add(ItemHelper.EntryId, 'M', (x) => this.KbdExecuteAsync(MenuDropDown, true));
+            _kbdHandler.CharActionsAsync.Add(ItemHelper.EntryId, 'R', (x) => this.KbdExecuteAsync(Reply, true));
+            _kbdHandler.CharActionsAsync.Add(ItemHelper.EntryId, 'L', (x) => this.KbdExecuteAsync(ReplyAll, true));
+            _kbdHandler.CharActionsAsync.Add(ItemHelper.EntryId, 'W', (x) => this.KbdExecuteAsync(Forward, true));
+            _kbdHandler.CharActionsAsync.Add(ItemHelper.EntryId, 'E', (x) => this.ToggleExpansionAsync());
+            _kbdHandler.CharActionsAsync.Add(ItemHelper.EntryId, 'S', (x) => this.JumpToAsync(_itemViewer.TxtboxSearch));
+            _kbdHandler.CharActionsAsync.Add(ItemHelper.EntryId, 'T', (x) => this.KbdExecuteAsync(FlagAsTaskAsync, true));
+            _kbdHandler.CharActionsAsync.Add(ItemHelper.EntryId, 'P', (x) => this.KbdExecuteAsync(_parent.PopOutControlGroupAsync, ItemNumber, false));
+            _kbdHandler.CharActionsAsync.Add(ItemHelper.EntryId, 'Z', (x) => this.KbdExecuteAsync(_parent.RemoveSpecificControlGroupAsync, ItemNumber, false));
+            _kbdHandler.CharActionsAsync.Add(ItemHelper.EntryId, 'X', (x) => this.KbdExecuteAsync(this.MarkItemForDeletionAsync, false));
+            _kbdHandler.CharActionsAsync.Add(ItemHelper.EntryId, 'F', (x) => this.JumpToFolderDropDownAsync());
             if (_expanded) { RegisterExpandedAsyncActions(); }
 
 
@@ -911,31 +923,31 @@ namespace QuickFiler.Controllers
 
         internal void RegisterExpandedActions()
         {
-            _kbdHandler.CharActions.Add(ItemInfo.EntryId, 'B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2));
-            _kbdHandler.CharActions.Add(ItemInfo.EntryId, 'D', async (x) => await JumpToAsync(_itemViewer.TopicThread));
+            _kbdHandler.CharActions.Add(ItemHelper.EntryId, 'B', async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2));
+            _kbdHandler.CharActions.Add(ItemHelper.EntryId, 'D', async (x) => await JumpToAsync(_itemViewer.TopicThread));
         }
 
         internal void RegisterExpandedAsyncActions()
         {
-            _kbdHandler.CharActionsAsync.Add(ItemInfo.EntryId, 'B', (x) => JumpToAsync(_itemViewer.L0v2h2_WebView2));
-            _kbdHandler.CharActionsAsync.Add(ItemInfo.EntryId, 'D', (x) => JumpToAsync(_itemViewer.TopicThread));
+            _kbdHandler.CharActionsAsync.Add(ItemHelper.EntryId, 'B', (x) => JumpToAsync(_itemViewer.L0v2h2_WebView2));
+            _kbdHandler.CharActionsAsync.Add(ItemHelper.EntryId, 'D', (x) => JumpToAsync(_itemViewer.TopicThread));
         }
 
         internal void UnregisterFocusActions()
         {
-            _kbdHandler.KeyActions.Remove(ItemInfo.EntryId, Keys.Right);
-            _kbdHandler.KeyActions.Remove(ItemInfo.EntryId, Keys.Left);
-            _kbdHandler.CharActions.Remove(ItemInfo.EntryId, 'O');
-            _kbdHandler.CharActions.Remove(ItemInfo.EntryId, 'C');
-            _kbdHandler.CharActions.Remove(ItemInfo.EntryId, 'A');
-            _kbdHandler.CharActions.Remove(ItemInfo.EntryId, 'M');
-            _kbdHandler.CharActions.Remove(ItemInfo.EntryId, 'E');
-            _kbdHandler.CharActions.Remove(ItemInfo.EntryId, 'S');
-            _kbdHandler.CharActions.Remove(ItemInfo.EntryId, 'T');
-            _kbdHandler.CharActions.Remove(ItemInfo.EntryId, 'P');
-            _kbdHandler.CharActions.Remove(ItemInfo.EntryId, 'R');
-            _kbdHandler.CharActions.Remove(ItemInfo.EntryId, 'X');
-            _kbdHandler.CharActions.Remove(ItemInfo.EntryId, 'F');
+            _kbdHandler.KeyActions.Remove(ItemHelper.EntryId, Keys.Right);
+            _kbdHandler.KeyActions.Remove(ItemHelper.EntryId, Keys.Left);
+            _kbdHandler.CharActions.Remove(ItemHelper.EntryId, 'O');
+            _kbdHandler.CharActions.Remove(ItemHelper.EntryId, 'C');
+            _kbdHandler.CharActions.Remove(ItemHelper.EntryId, 'A');
+            _kbdHandler.CharActions.Remove(ItemHelper.EntryId, 'M');
+            _kbdHandler.CharActions.Remove(ItemHelper.EntryId, 'E');
+            _kbdHandler.CharActions.Remove(ItemHelper.EntryId, 'S');
+            _kbdHandler.CharActions.Remove(ItemHelper.EntryId, 'T');
+            _kbdHandler.CharActions.Remove(ItemHelper.EntryId, 'P');
+            _kbdHandler.CharActions.Remove(ItemHelper.EntryId, 'R');
+            _kbdHandler.CharActions.Remove(ItemHelper.EntryId, 'X');
+            _kbdHandler.CharActions.Remove(ItemHelper.EntryId, 'F');
             if (_expanded) { UnregisterExpandedActions(); }
         }
 
@@ -944,32 +956,32 @@ namespace QuickFiler.Controllers
             //_kbdHandler.KeyActionsAsync.Remove(_itemInfo.EntryId, Keys.Right);
             //_kbdHandler.KeyActionsAsync.Remove(_itemInfo.EntryId, Keys.Left);
             //_kbdHandler.CharActionsAsync.Remove(_itemInfo.EntryId, 'A');
-            _kbdHandler.CharActionsAsync.Remove(ItemInfo.EntryId, 'C');
-            _kbdHandler.CharActionsAsync.Remove(ItemInfo.EntryId, 'O');
-            _kbdHandler.CharActionsAsync.Remove(ItemInfo.EntryId, 'M');
-            _kbdHandler.CharActionsAsync.Remove(ItemInfo.EntryId, 'R');
-            _kbdHandler.CharActionsAsync.Remove(ItemInfo.EntryId, 'L');
-            _kbdHandler.CharActionsAsync.Remove(ItemInfo.EntryId, 'W');
-            _kbdHandler.CharActionsAsync.Remove(ItemInfo.EntryId, 'E');
-            _kbdHandler.CharActionsAsync.Remove(ItemInfo.EntryId, 'S');
-            _kbdHandler.CharActionsAsync.Remove(ItemInfo.EntryId, 'T');
-            _kbdHandler.CharActionsAsync.Remove(ItemInfo.EntryId, 'P');
-            _kbdHandler.CharActionsAsync.Remove(ItemInfo.EntryId, 'Z');
-            _kbdHandler.CharActionsAsync.Remove(ItemInfo.EntryId, 'X');
-            _kbdHandler.CharActionsAsync.Remove(ItemInfo.EntryId, 'F');
+            _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'C');
+            _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'O');
+            _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'M');
+            _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'R');
+            _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'L');
+            _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'W');
+            _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'E');
+            _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'S');
+            _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'T');
+            _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'P');
+            _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'Z');
+            _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'X');
+            _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'F');
             if (_expanded) { UnregisterExpandedAsyncActions(); }
         }
 
         internal void UnregisterExpandedActions()
         {
-            _kbdHandler.CharActions.Remove(ItemInfo.EntryId, 'B');
-            _kbdHandler.CharActions.Remove(ItemInfo.EntryId, 'D');
+            _kbdHandler.CharActions.Remove(ItemHelper.EntryId, 'B');
+            _kbdHandler.CharActions.Remove(ItemHelper.EntryId, 'D');
         }
 
         internal void UnregisterExpandedAsyncActions()
         {
-            _kbdHandler.CharActionsAsync.Remove(ItemInfo.EntryId, 'B');
-            _kbdHandler.CharActionsAsync.Remove(ItemInfo.EntryId, 'D');
+            _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'B');
+            _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'D');
         }
 
         #endregion Wire Events
@@ -1326,7 +1338,7 @@ namespace QuickFiler.Controllers
         {
             _tlpStates["Expanded"].ApplyState(_itemViewer);
             _expanded = true;
-            if ((ItemInfo is not null) && ItemInfo.UnRead == true)
+            if ((ItemHelper is not null) && ItemHelper.UnRead == true)
             {
                 _emailIsReadTimer = new System.Threading.Timer(ApplyReadEmailFormat);
                 _emailIsReadTimer.Change(4000, System.Threading.Timeout.Infinite);
@@ -1540,7 +1552,7 @@ namespace QuickFiler.Controllers
         {
             if (_isWebViewerInitialized)
             {
-                _itemViewer.L0v2h2_WebView2.NavigateToString(ItemInfo.ToggleDark(desiredState));
+                _itemViewer.L0v2h2_WebView2.NavigateToString(ItemHelper.ToggleDark(desiredState));
                 if (ConversationResolver.Count.Expanded > 0)
                 {
                     ConversationResolver.ConversationInfo.Expanded.ForEach(item => item.ToggleDark(desiredState));
@@ -1565,7 +1577,7 @@ namespace QuickFiler.Controllers
 
         public void ApplyReadEmailFormat(object state)
         {
-            ItemInfo.UnRead = false;
+            ItemHelper.UnRead = false;
             _themes[_activeTheme].SetMailRead(async: true);
             Mail.UnRead = false;
             Mail.Save();
@@ -1621,7 +1633,7 @@ namespace QuickFiler.Controllers
         {
             //TraceUtility.LogMethodCall();
 
-            if (ItemInfo is not null)
+            if (ItemHelper is not null)
             {
                 IList<MailItemHelper> helpers = PackageItems();
                 bool attachments = SelectedFolder != "Trash to Delete" && _optionAttachments;
@@ -1651,7 +1663,7 @@ namespace QuickFiler.Controllers
                 {
                     //logger.Debug($"Error moving mail {Subject} from {Sender} on {SentDate}. Skipping");
                     logger.Error($"{e}");
-                    MessageBox.Show($"Error moving mail {ItemInfo.Subject} from {ItemInfo.Sender} on {ItemInfo.SentDate}. Skipping");
+                    MessageBox.Show($"Error moving mail {ItemHelper.Subject} from {ItemHelper.Sender} on {ItemHelper.SentDate}. Skipping");
                 }
 
                 //SortEmail.Cleanup_Files();
@@ -1691,7 +1703,7 @@ namespace QuickFiler.Controllers
 
         internal IList<MailItemHelper> PackageItems()
         {
-            return _optionConversationChecked ? ConversationResolver.ConversationInfo.SameFolder : new List<MailItemHelper> { ItemInfo };
+            return _optionConversationChecked ? ConversationResolver.ConversationInfo.SameFolder : new List<MailItemHelper> { ItemHelper };
         }
                
         public void FlagAsTask()

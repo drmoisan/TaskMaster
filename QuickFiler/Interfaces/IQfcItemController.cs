@@ -30,7 +30,7 @@ namespace QuickFiler.Interfaces
         bool IsActiveUI { get; set; }
         string ConvOriginID { get; set; }
         int Height { get; }
-        MailItemHelper ItemInfo { get; set; }
+        MailItemHelper ItemHelper { get; set; }
         MailItem Mail { get; set; }
         void ToggleExpansion(); 
         string SelectedFolder { get; }
