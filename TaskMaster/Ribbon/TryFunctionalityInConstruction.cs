@@ -22,7 +22,7 @@ namespace TaskMaster.Ribbon
 {
     public class TryFunctionalityInConstruction(IApplicationGlobals globals)
     {
-        public IApplicationGlobals Globals { get; internal protected set; } = globals;
+        public IApplicationGlobals AppGlobals { get; internal protected set; } = globals;
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -31,7 +31,7 @@ namespace TaskMaster.Ribbon
 
         internal void TryGetConversationDataframe()
         {
-            var Mail = Globals.Ol.App.ActiveExplorer().Selection[1];
+            var Mail = AppGlobals.Ol.App.ActiveExplorer().Selection[1];
             Outlook.Conversation conv = (Outlook.Conversation)Mail.GetConversation();
             Microsoft.Data.Analysis.DataFrame df = conv.GetDataFrame();
             //logger.Debug(df.PrettyText());
@@ -39,54 +39,85 @@ namespace TaskMaster.Ribbon
         }
         internal void TryGetConversationOutlookTable()
         {
-            var Mail = Globals.Ol.App.ActiveExplorer().Selection[1];
+            var Mail = AppGlobals.Ol.App.ActiveExplorer().Selection[1];
             Outlook.Conversation conv = (Outlook.Conversation)Mail.GetConversation();
             var table = conv.GetTable(WithFolder: true, WithStore: true);
             table.EnumerateTable();
         }
         internal void TryGetMailItemInfo()
         {
-            var mailItem = Globals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
-            var helper = new MailItemHelper(mailItem, Globals);
+            var mailItem = AppGlobals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
+            var helper = new MailItemHelper(mailItem, AppGlobals);
             //logger.Debug(helper.Item.HTMLBody);
         }
 
         internal void TryGetMailItemInfoViaConversation()
         {
-            var Mail = Globals.Ol.App.ActiveExplorer().Selection[1];
+            var Mail = AppGlobals.Ol.App.ActiveExplorer().Selection[1];
             var conversation = (Outlook.Conversation)Mail.GetConversation();
             var df = conversation.GetDataFrame();
             df.PrettyPrint();
             //var mInfo = new MailItemHelper(df, 0, Globals.Ol.EmailPrefixToStrip);
-            var info = MailItemHelper.FromDf(df, 0, Globals);
+            var info = MailItemHelper.FromDf(df, 0, AppGlobals);
         }
         internal void TryGetQfcDataModel()
         {
             var cts = new CancellationTokenSource();
             var token = cts.Token;
-            var dc = new QuickFiler.Controllers.QfcDatamodel(Globals, token);
+            var dc = new QuickFiler.Controllers.QfcDatamodel(AppGlobals, token);
         }
         internal void TryGetTableInView()
         {
-            Outlook.Table table = Globals.Ol.App.ActiveExplorer().GetTableInView();
+            Outlook.Table table = AppGlobals.Ol.App.ActiveExplorer().GetTableInView();
         }
         internal void TryRebuildProjInfo()
         {
-            Globals.TD.ProjInfo.Rebuild(Globals.Ol.App);
+            AppGlobals.TD.ProjInfo.Rebuild(AppGlobals.Ol.App);
         }
         internal void TryRecipientGetInfo()
         {
-            var Mail = (Outlook.MailItem)Globals.Ol.App.ActiveExplorer().Selection[1];
-            var recipients = Mail.Recipients.Cast<Recipient>();
-            var info = recipients.GetInfo();
+            var Mail = (Outlook.MailItem)AppGlobals.Ol.App.ActiveExplorer().Selection[1];
+
+            //var addressLists = Globals.Ol.NamespaceMAPI.AddressLists;
+            //foreach (var addressList in addressLists)
+            //{
+
+            //}
+            //var stores = AppGlobals.Ol.NamespaceMAPI.Stores.Cast<Store>();
+            //var globalAddresses = stores
+            //    .Select(store => store.GetGlobalAddressList(AppGlobals.Ol.App))                
+            //    .ToArray();
+            //var globalEntries = globalAddresses
+            //    .Select(ga => ga.AddressEntries.Cast<AddressEntry>().ToArray())
+            //    .ToArray();
+            //Mail.Recipients.ResolveAll();
+            var recipients = Mail.Recipients.Cast<Recipient>()
+                .Select(recipient => recipient.ToResolvedRecipient(AppGlobals.Ol.NamespaceMAPI))
+                .ToArray();
+            //ExchangeUser exchangeUser = null;
+            //foreach (var recipient in recipients)
+            //{
+            //    foreach (var entries in globalEntries)
+            //    {
+            //        var entry = entries.FirstOrDefault(x => x.Name == recipient.Name);
+            //        if (entry != default) 
+            //        {
+            //            exchangeUser = entry.GetExchangeUser();
+            //            break; 
+            //        }
+            //    }
+            //}
+
+            var info = recipients.GetInfo().ToArray();
         }
+
         internal void TrySubstituteIdRoot()
         {
-            Globals.TD.IDList.SubstituteIdRoot("9710", "2501");
+            AppGlobals.TD.IDList.SubstituteIdRoot("9710", "2501");
         }
         internal void TryGetImage()
         {
-            var ae = Globals.Ol.App.ActiveExplorer();
+            var ae = AppGlobals.Ol.App.ActiveExplorer();
             //var image = ae.CommandBars.GetImageMso("ReplyAll", 38, 38);
             var image3 = ae.CommandBars.GetImageMso("Forward", 38, 38);
             //var image5 = ae.CommandBars.GetImageMso("Reply", 100, 100);
@@ -109,14 +140,14 @@ namespace TaskMaster.Ribbon
 
         internal void TryLoadFolderFilter()
         {
-            var filter = new FilterOlFoldersController(Globals);
+            var filter = new FilterOlFoldersController(AppGlobals);
             //var filter = new FilterOlFoldersViewer();
             //filter.ShowDialog();
         }
 
         internal void TryLoadFolderRemap()
         {
-            var remap = new FolderRemapController(Globals);
+            var remap = new FolderRemapController(AppGlobals);
         }
 
         internal async Task RebuildSubjectMapAsync()
@@ -124,12 +155,12 @@ namespace TaskMaster.Ribbon
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            await Globals.AF.SubjectMap.RebuildAsync(Globals);
+            await AppGlobals.AF.SubjectMap.RebuildAsync(AppGlobals);
         }
 
         internal void ShowSubjectMapMetrics()
         {
-            Globals.AF.SubjectMap.ShowSummaryMetrics();
+            AppGlobals.AF.SubjectMap.ShowSummaryMetrics();
         }
 
         internal async Task TryTokenizeEmail()
@@ -141,9 +172,9 @@ namespace TaskMaster.Ribbon
             CancellationTokenSource cts = new CancellationTokenSource();
             var token = cts.Token;
 
-            var ae = Globals.Ol.App.ActiveExplorer();
+            var ae = AppGlobals.Ol.App.ActiveExplorer();
             var mail = (Outlook.MailItem)ae.Selection[1];
-            var mailInfo = await MailItemHelper.FromMailItemAsync(mail, Globals, token, true);
+            var mailInfo = await MailItemHelper.FromMailItemAsync(mail, AppGlobals, token, true);
             var tokenizer = new EmailTokenizer();
             //tokenizer.setup();
             var tokens = tokenizer.Tokenize(mailInfo).ToArray();
@@ -156,7 +187,7 @@ namespace TaskMaster.Ribbon
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var miner = new UtilitiesCS.EmailIntelligence.Bayesian.EmailDataMiner(Globals);
+            var miner = new UtilitiesCS.EmailIntelligence.Bayesian.EmailDataMiner(AppGlobals);
             await miner.MineEmails();
         }
 
@@ -165,7 +196,7 @@ namespace TaskMaster.Ribbon
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var miner = new OlFolderClassifierGroup(Globals);
+            var miner = new OlFolderClassifierGroup(AppGlobals);
             await miner.BuildClassifiersAsync();
         }
 
@@ -176,7 +207,7 @@ namespace TaskMaster.Ribbon
 
         internal void TrySerializeMailInfo()
         {
-            new EmailDataMiner(Globals).SerializeActiveItem();
+            new EmailDataMiner(AppGlobals).SerializeActiveItem();
             //var ae = Globals.Ol.App.ActiveExplorer();
             //var mail = (Outlook.MailItem)ae.Selection[1];
             //new EmailDataMiner(Globals).SerializeMailInfo(mail);
@@ -188,7 +219,7 @@ namespace TaskMaster.Ribbon
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var tuner = new BayesianPerformanceMeasurement(Globals);
+            var tuner = new BayesianPerformanceMeasurement(AppGlobals);
             await tuner.TestFolderClassifierAsync();
         }
 
@@ -197,13 +228,13 @@ namespace TaskMaster.Ribbon
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            var tuner = new BayesianPerformanceMeasurement(Globals);
+            var tuner = new BayesianPerformanceMeasurement(AppGlobals);
             await tuner.TestFolderClassifierAsync(verbose: true);
         }
 
         internal void TryNewTaskHeader()
         {
-            var projectCreator = new AutoCreateProject(Globals);
+            var projectCreator = new AutoCreateProject(AppGlobals);
             var prefix = new PrefixItem(
                 prefixType: PrefixTypeEnum.Project,
                 key: "Project", value: Properties.Settings.Default.Prefix_Project,
@@ -214,7 +245,7 @@ namespace TaskMaster.Ribbon
 
         internal void TryGetInboxes()
         {
-            var stores = Globals.Ol.NamespaceMAPI.Stores;
+            var stores = AppGlobals.Ol.NamespaceMAPI.Stores;
             var inboxes = stores
                 .Cast<Store>()
                 .Select(store => 

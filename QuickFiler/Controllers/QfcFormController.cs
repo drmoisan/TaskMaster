@@ -1,13 +1,15 @@
 ﻿using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using UtilitiesCS;
-using System.Windows.Forms;
-using System.Diagnostics;
-using System.Threading;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.Interfaces.IWinForm;
 
@@ -81,6 +83,7 @@ namespace QuickFiler.Controllers
         private Dictionary<string, Theme> _themes;
         private BlockingCollection<IMovedMailInfo> _undoQueue = [];
         private Task _undoConsumerTask;
+        private List<Task<MailItemHelper>> _helperTasks = [];
 
         #endregion
 
@@ -603,6 +606,7 @@ namespace QuickFiler.Controllers
 
         public void LoadItems(IList<MailItem> listObjects)
         {
+            _helperTasks = listObjects.Select(x => MailItemHelper.FromMailItemAsync(x, _globals, Token, false)).ToList();
             _groups = new QfcCollectionController(AppGlobals: _globals,
                                                   viewerInstance: _formViewer,
                                                   InitType: QfEnums.InitTypeEnum.Sort,
@@ -613,8 +617,13 @@ namespace QuickFiler.Controllers
                                                   _states);
             _groups.LoadControlsAndHandlers_01(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
-        
+
         public async Task LoadItemsAsync(IList<MailItem> listObjects)
+        {
+            await LoadItemsAsync(listObjects, null);
+        }
+
+        public async Task LoadItemsAsync(IList<MailItem> listObjects, ProgressTracker progress)
         {
             Token.ThrowIfCancellationRequested();
 
@@ -627,6 +636,13 @@ namespace QuickFiler.Controllers
                                                   token: Token,
                                                   _states);
             await _groups.LoadControlsAndHandlers_01Async(listObjects, _rowStyleTemplate, _rowStyleExpanded);
+            progress?.Report(100);
+
+            _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            _formViewer.Show();
+            _formViewer.Refresh();
+            
+            await _groups.LoadSecondaryAsync();
         }
 
         /// <summary>

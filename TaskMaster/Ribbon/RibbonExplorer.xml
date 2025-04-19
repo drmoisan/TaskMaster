@@ -81,9 +81,9 @@
                     <button id="GetMailItemInfo" imageMso="TraceDependentCells" onAction="GetMailItemInfo_Click" label="GetMailItemInfo" />
                     <!--<button id="GetQfcDataModel" imageMso="TraceDependentCells" onAction="GetQfcDataModel_Click" label="GetQfcDataModel" />
                     <button id="GetTableInView" imageMso="TraceDependentCells" onAction="GetTableInView_Click" label="GetTableInView" />
-                    <button id="RebuildProjInfo" imageMso="TraceDependentCells" onAction="RebuildProjInfo_Click" label="RebuildProjInfo" />
+                    <button id="RebuildProjInfo" imageMso="TraceDependentCells" onAction="RebuildProjInfo_Click" label="RebuildProjInfo" />-->
                     <button id="RecipientGetInfo" imageMso="TraceDependentCells" onAction="RecipientGetInfo_Click" label="RecipientGetInfo" />
-                    <button id="SubstituteIdRoot" imageMso="TraceDependentCells" onAction="SubstituteIdRoot_Click" label="SubstituteIdRoot" />-->
+                    <!--<button id="SubstituteIdRoot" imageMso="TraceDependentCells" onAction="SubstituteIdRoot_Click" label="SubstituteIdRoot" />-->
                     <button id="GetImage" imageMso="TraceDependentCells" onAction="GetImage_Click" label="GetImage"/>
                     <button id="LoadFolderFilter" imageMso="Filter" onAction="LoadFolderFilter_Click" label="Load Folder Filter" />
                     <button id="LoadFolderRemap" imageMso="Filter" onAction="LoadFolderRemap_Click" label="Load Folder Remap" />

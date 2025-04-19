@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using UtilitiesCS;
 using UtilitiesCS.Interfaces.IWinForm;
 
 
@@ -29,6 +30,7 @@ namespace QuickFiler.Controllers
         void LoadItems(IList<MailItem> listObjects);
         void LoadItems(TableLayoutPanel tlp, List<QfcItemGroup> itemGroups);
         Task LoadItemsAsync(IList<MailItem> listObjects);
+        Task LoadItemsAsync(IList<MailItem> listObjects, ProgressTracker progress);
         int LoadItemsPerIteration();        
         void RegisterFormEventHandlers();
         void RemoveTemplatesAndSetupTlp();

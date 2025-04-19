@@ -185,6 +185,7 @@ namespace UtilitiesCS
                 PushToUndoStack(mailItemOriginal, mailItemNew, appGlobals);
                 // Capture the move details in the log
                 await Task.Run(() => CaptureMoveDetails(mailItemOriginal, mailItemNew, appGlobals)).ConfigureAwait(false);
+                //await Task.Run(() => CaptureMoveDetails(mailHelper, appGlobals)).ConfigureAwait(false);
             }
         }
 

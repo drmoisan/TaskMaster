@@ -57,11 +57,13 @@ namespace UtilitiesCS.Threading
                     try
                     {
                         if (entry.useUiThread)
-                            await UiThread.Dispatcher.InvokeAsync(async () =>
+                        {
+                            await await UiThread.Dispatcher.InvokeAsync(async () =>
                             {
                                 await entry.actionAsync();
                                 await Task.Yield(); // Yield control back to the message loop
                             });
+                        }
                         else
                         {
                             await entry.actionAsync();

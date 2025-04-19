@@ -35,19 +35,34 @@ namespace TaskVisualization
 
         public IList<string> AutoFind(object objItem)
         {
-            if (objItem is IOutlookItem olItem && olItem.GetOlItemType() == OlItemType.olMailItem)
+            MailItemHelper helper = null;
+            if (objItem is null) { return []; }
+            else if (objItem is MailItemHelper)
             {
-                objItem = olItem.InnerObject;                
+                helper = objItem as MailItemHelper;
             }
-            else if (objItem is not MailItem) { return []; }
+            else if (objItem is IOutlookItem olItem && olItem.GetOlItemType() == OlItemType.olMailItem)
+            {
+                helper = new MailItemHelper(olItem.InnerObject as MailItem, _globals);                
+            }
+            else if (objItem is MailItem olMail)
+            {
+                helper = new MailItemHelper(olMail, _globals);
+            }            
+            else
+            {
+                return [];
+            }
+
+            return AutoFile.AutoFindPeople(helper, _globals.TD.People, true, false);
             
-            return AutoFile.AutoFindPeople(
-                    objItem: objItem,
-                    ppl_dict: _globals.TD.People,
-                    emailRootFolder: _globals.Ol.InboxPath,
-                    dictRemap: _globals.TD.DictRemap,
-                    userAddress: _globals.Ol.UserEmailAddress,
-                    blExcludeFlagged: false);            
+            //return AutoFile.AutoFindPeople(
+            //        objItem: objItem,
+            //        ppl_dict: _globals.TD.People,
+            //        emailRootFolder: _globals.Ol.InboxPath,
+            //        dictRemap: _globals.TD.DictRemap,
+            //        userAddress: _globals.Ol.UserEmailAddress,
+            //        blExcludeFlagged: false);            
 
         }
 

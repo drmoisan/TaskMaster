@@ -16,6 +16,7 @@ namespace QuickFiler.Interfaces
         List<QfcItemGroup> ItemGroups { get; set; }
 
         // UI Add and Remove QfcItems
+        Task LoadSecondaryAsync();
         void LoadControlsAndHandlers_01(IList<MailItem> listObjects, RowStyle template, RowStyle templateExpanded);
         void LoadControlsAndHandlers_01(TableLayoutPanel tlp, List<QfcItemGroup> itemGroups);
         Task LoadControlsAndHandlers_01Async(IList<MailItem> listObjects, RowStyle template, RowStyle templateExpanded);

@@ -1,5 +1,10 @@
-﻿using System.Runtime.InteropServices;
+﻿using Deedle.Internal;
+using Microsoft.Graph.Models.TermStore;
+using Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 using UtilitiesCS.OutlookObjects.Folder;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
@@ -49,6 +54,15 @@ namespace UtilitiesCS.OutlookObjects.Store
             JunkCertain?.RestoreFromRelativePath(RootFolder);
         }
 
+        public void RestoreGlobalAddresses(Application olApp)
+        {
+            GlobalAddressBook = InnerStore?
+                .GetGlobalAddressList(olApp)?
+                .AddressEntries?
+                .Cast<AddressEntry>()?
+                .ToList();
+        }
+
         #endregion ctor
 
         #region Store Properties
@@ -66,6 +80,9 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         [JsonIgnore]
         public string UserEmailAddress { get; internal set; }
+
+        [JsonIgnore]
+        public List<AddressEntry> GlobalAddressBook { get; internal set; }
 
         internal string GetSmtpAddressFromStore()
         {

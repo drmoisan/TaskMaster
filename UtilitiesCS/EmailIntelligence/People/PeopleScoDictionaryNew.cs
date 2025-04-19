@@ -61,12 +61,19 @@ namespace ToDoModel.Data_Model.People
         public IList<string> AddMissingEntries(Outlook.MailItem olMail)
         {
             Globals.ThrowIfNull();
-            var addressList = olMail.GetEmailAddresses(Globals.Ol.InboxPath,
-                                                       Globals.TD.DictRemap,
-                                                       Globals.Ol.UserEmailAddress)
-                                                       .Where(x => !this.ContainsKey(x))
-                                                       .Select(x => x)
-                                                       .ToList();
+            var helper = new MailItemHelper(olMail, Globals);
+            var recipients = helper.ToRecipients.ToList();
+            recipients.AddRange(helper.CcRecipients);
+            recipients.Add(helper.Sender);
+
+            var addressList = recipients.Select(x => x.Address).ToList();
+
+            //var addressList = olMail.GetEmailAddresses(Globals.Ol.InboxPath,
+            //                                           Globals.TD.DictRemap,
+            //                                           Globals.Ol.UserEmailAddress)
+            //                                           .Where(x => !this.ContainsKey(x))
+            //                                           .Select(x => x)
+            //                                           .ToList();
             IList<string> newPeople = [];
 
             foreach (var address in addressList)

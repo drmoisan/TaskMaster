@@ -122,7 +122,6 @@
     <Compile Include="Data Model\ToDo\ToDoLoader.cs" />
     <Compile Include="Data Model\ToDo\ToDoSynchronizer.cs" />
     <Compile Include="Data Model\Tree\TreeOfToDoItems.cs" />
-    <Compile Include="Email Utilities\AutoFile.cs" />
     <Compile Include="Email Utilities\CaptureEmailAddressesModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

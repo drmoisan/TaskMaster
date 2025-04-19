@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
+using UtilitiesCS.OutlookExtensions;
 
 namespace Tags
 {
@@ -90,14 +91,44 @@ namespace Tags
             autoAssign.AddColorCategoryDelegate = (IPrefix prefix, string categoryName) => 
                 CreateCategoryModule.CreateCategory(olNS: _globals.Ol.NamespaceMAPI, prefix: prefix, newCatName: categoryName);
 
-            autoAssign.AutoFindDelegate = (object objItem) => AutoFile2.AutoFindPeople(objItem: objItem,
-                                                                                       ppl_dict: _globals.TD.People,
-                                                                                       emailRootFolder: _globals.Ol.InboxPath,
-                                                                                       dictRemap: _globals.TD.DictRemap,
-                                                                                       userAddress: _globals.Ol.UserEmailAddress,
-                                                                                       blExcludeFlagged: false);
+            autoAssign.AutoFindDelegate = (object objItem) =>
+            {
+                var helper = GetHelper(objItem);
+                if (helper is null) { return []; }
+                return AutoFile.AutoFindPeople(helper, _globals.TD.People, true, false);
+                //return AutoFile2.AutoFindPeople(
+                //    objItem: objItem,
+                //    ppl_dict: _globals.TD.People,
+                //    emailRootFolder: _globals.Ol.InboxPath,
+                //    dictRemap: _globals.TD.DictRemap,
+                //    userAddress: _globals.Ol.UserEmailAddress,
+                //    blExcludeFlagged: false);
+            };
+            
             return autoAssign;
         }
+
+        private MailItemHelper GetHelper(object objItem)
+        {
+            if (objItem is MailItem mailItem)
+            {
+                return new MailItemHelper(mailItem, _globals);
+            }
+            else if (objItem is IOutlookItem olItem && olItem.GetOlItemType() == OlItemType.olMailItem)
+            {
+                return new MailItemHelper(olItem.InnerObject as MailItem, _globals); 
+            }
+            else if (objItem is MailItemHelper)
+            {
+                return objItem as MailItemHelper;
+            }
+            else
+            {
+                return default;
+            }
+        }
+
+        
 
         internal class LauncherAutoAssign : IAutoAssign
         {

@@ -1,15 +1,20 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Outlook;
+using System;
 using System.Collections.Generic;
-using Microsoft.Office.Interop.Outlook;
-using UtilitiesCS;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS;
 
-namespace ToDoModel
+
+namespace UtilitiesCS
 {
-
-    public static class CaptureEmailAddressesModule
+    public static class CaptureEmailAddressesModule2
     {
-        //public static List<string> GetEmailAddresses(this MailItem olMail, string emailRootFolder, IScoDictionary<string, string> dictRemap, string currentUserEmail)
+        
+
+        //public static List<string> GetEmailAddresses(this MailItem OlMail, string emailRootFolder, IScoDictionary<string, string> dictRemap, string currentUserEmail)
         //{
         //    int i;
         //    int j;
@@ -18,7 +23,7 @@ namespace ToDoModel
         //    var emailAddressList = new List<string>();
 
         //    //string[] strEmail = CaptureEmailDetailsModule.CaptureEmailDetails(OlMail, emailRootFolder, dictRemap);
-        //    string[] strEmail = olMail.Details(emailRootFolder, dictRemap);
+        //    string[] strEmail = OlMail.Details(emailRootFolder, dictRemap);
 
         //    if (strEmail is Array == true)
         //    {
@@ -54,6 +59,7 @@ namespace ToDoModel
         //    }
         //    return emailAddressList;
         //}
+
 
     }
 }

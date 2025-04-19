@@ -172,9 +172,10 @@ namespace QuickFiler.Controllers
             if (items is null) { throw new ArgumentNullException(nameof(items)); }
             if (items.Count == 0) { throw new ArgumentException("items is empty"); }
 
-            items.ForEach(item => _moveMonitor.HookItem(item, async (x) => await RemoveItem(x)));
-
             _qfcCollectionController = qfcCollectionController;
+            
+            await Task.Run(() => items.ForEach(item => _moveMonitor.HookItem(item, async (x) => await RemoveItem(x))));
+
 
             Interlocked.Increment(ref _jobsRunning);
             //logger.Debug($"{nameof(EnqueueAsync)} called and jobsRunning increased to {_jobsRunning}");
@@ -185,8 +186,9 @@ namespace QuickFiler.Controllers
 
             try
             {
-                var itemGroups = await LoadControllersViewersAsync(items, _globals,
-                    _homeController, qfcCollectionController, tlp, 0);
+                var itemGroups = await UiIdleAsyncCallAsync(async () => 
+                    await LoadControllersViewersAsync(items, _globals,
+                    _homeController, qfcCollectionController, tlp, 0));
                 _queue.Add((tlp, itemGroups));
             }
             catch (OperationCanceledException)
@@ -466,6 +468,18 @@ namespace QuickFiler.Controllers
         internal async Task<T> UiIdleCallAsync<T>(Func<T> func)
         {
             return await UiThread.Dispatcher.InvokeAsync(func, System.Windows.Threading.DispatcherPriority.ContextIdle);
+        }
+
+        internal async Task<T> UiIdleAsyncCallAsync<T>(Func<Task<T>> func)
+        {
+            T result = await await UiThread.Dispatcher.InvokeAsync(async() => 
+            {
+                T result = await func();
+                await Task.Yield();
+                return result;
+            }, System.Windows.Threading.DispatcherPriority.ContextIdle);
+            return result;
+            //return await UiThread.Dispatcher.InvokeAsync(func, System.Windows.Threading.DispatcherPriority.ContextIdle);
         }
 
 

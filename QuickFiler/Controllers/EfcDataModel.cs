@@ -130,7 +130,7 @@ namespace QuickFiler.Controllers
             set => _mail = value;
         }
                 
-        public MailItemHelper MailInfo => ConversationResolver?.MailInfo;
+        public MailItemHelper MailInfo => ConversationResolver?.MailHelper;
 
         private MailItem TryGetFirstInSelection() 
         {

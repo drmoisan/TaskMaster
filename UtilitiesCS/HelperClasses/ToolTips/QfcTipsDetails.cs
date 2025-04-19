@@ -38,11 +38,11 @@ namespace UtilitiesCS
 
         private void SetParentProperties(Type parentType)
         {
-            if(LabelControl.InvokeRequired)
-            {
-                LabelControl.Invoke(() => SetParentProperties(parentType));
-                return;
-            }
+            //if(LabelControl.InvokeRequired)
+            //{
+            //    LabelControl.Invoke(() => SetParentProperties(parentType));
+            //    return;
+            //}
 
             if (parentType == typeof(TableLayoutPanel))
             {
@@ -76,10 +76,10 @@ namespace UtilitiesCS
 
         public Type ResolveParentType()
         {
-            if (_labelControl.InvokeRequired)
-            {
-                return (Type)_labelControl.Invoke(() => ResolveParentType());
-            }
+            //if (_labelControl.InvokeRequired)
+            //{
+            //    return (Type)_labelControl.Invoke(() => ResolveParentType());
+            //}
 
             if (_labelControl.Parent == null)
             {

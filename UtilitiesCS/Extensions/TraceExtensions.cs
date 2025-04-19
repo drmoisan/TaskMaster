@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UtilitiesCS.Extensions
 {
@@ -68,7 +65,6 @@ namespace UtilitiesCS.Extensions
                 return "";
             }
         }
-
 
         public static string GetParameterName(this MethodBase method, int index)
         {

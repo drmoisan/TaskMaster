@@ -165,20 +165,20 @@ namespace QuickFiler.Controllers
             IList<MailItem> listEmail = await Task.Run(
                 async () => await _datamodel.InitEmailQueueAsync(
                     _formController.ItemsPerIteration, _formViewer.Worker, Token, TokenSource));
-
+            
             progress.Report(30, "Initializing Qfc Items");
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(QfcFormController.LoadItemsAsync)} ...");
             await _formController.LoadItemsAsync(listEmail);
 
-            progress.Report(100);
+            progress?.Report(100);
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Showing and Refreshing {nameof(QfcFormViewer)} ...");
             _stopWatch = new Stopwatch();
             _stopWatch.Start();
-            _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            _formViewer.Show();
-            _formViewer.Refresh();
+            //_formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            //_formViewer.Show();
+            //_formViewer.Refresh();
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(QfcHomeController)}.{nameof(RunAsync)} is complete");
 
             //_ = IterateQueueAsync();
@@ -222,6 +222,7 @@ namespace QuickFiler.Controllers
                 var listObjects = await _datamodel.DequeueNextItemGroupAsync(_formController.ItemsPerIteration, 2000);
                 if (listObjects.Count > 0)
                 {
+                    //await UiThread.Dispatcher.InvokeAsync(async () => await QfcQueue.EnqueueAsync(listObjects, _formController.Groups));
                     await QfcQueue.EnqueueAsync(listObjects, _formController.Groups).ConfigureAwait(false);
                 }
                 else
@@ -276,61 +277,59 @@ namespace QuickFiler.Controllers
         public void QuickFileMetrics_WRITE(string filename)
         {
 
-            string LOC_TXT_FILE;
-            string curDateText, curTimeText, durationText, durationMinutesText;
-            double Duration;
+            
+            string durationText, durationMinutesText;
+            
             string dataLineBeg;
-            DateTime OlEndTime;
-            DateTime OlStartTime;
-            AppointmentItem OlAppointment;
-            Folder OlEmailCalendar;
+            
+            
 
             // Create a line of comma seperated valued to store data
-            curDateText = DateTime.Now.ToString("MM/dd/yyyy");
-
-            curTimeText = DateTime.Now.ToString("hh:mm");
-
-            dataLineBeg = curDateText + "," + curTimeText + ",";
+            var now = DateTime.Now;
+            //var curDateText = DateTime.Now.ToString("MM/dd/yyyy");
+            //var curTimeText = DateTime.Now.ToString("hh:mm");
+            //dataLineBeg = curDateText + "," + curTimeText + ",";
+            dataLineBeg = $"{now:MM/dd/yyyy},{now:hh:mm},";
 
             if (!Globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var folderRoot))
             {
                 logger.Debug($"{nameof(QuickFileMetrics_WRITE)} aborted due to lack of MyDocuments location");
                 return;
             }
-            LOC_TXT_FILE = Path.Combine(folderRoot, filename);
+            var filepath = Path.Combine(folderRoot, filename);
 
-            Duration = _stopWatchMoved.Elapsed.Seconds;
-            OlEndTime = DateTime.Now;
-            OlStartTime = OlEndTime.Subtract(new TimeSpan(0, 0, 0, (int)Duration));
+            double duration = _stopWatchMoved.Elapsed.Seconds;
+            var endTime = now;
+            var startTime = endTime.Subtract(_stopWatchMoved.Elapsed);
 
             var emailsLoaded = _formController.Groups.EmailsToMove;
 
             if (emailsLoaded > 0)
             {
-                Duration /= emailsLoaded;
+                duration /= emailsLoaded;
             }
 
-            durationText = Duration.ToString("##0");
+            durationText = duration.ToString("##0");
             // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable durationText = " & durationText
 
-            durationMinutesText = (Duration / 60d).ToString("##0.00");
+            durationMinutesText = (duration / 60d).ToString("##0.00");
 
-            OlEmailCalendar = UtilitiesCS.Calendar.GetCalendar("Email Time", Globals.Ol.App.Session);
-            OlAppointment = (AppointmentItem)OlEmailCalendar.Items.Add();
+            var olEmailCalendar = UtilitiesCS.Calendar.GetCalendar("Email Time", Globals.Ol.App.Session);
+            var olAppointment = (AppointmentItem)olEmailCalendar.Items.Add();
             {
-                OlAppointment.Subject = $"Quick Filed {emailsLoaded} emails";
-                OlAppointment.Start = OlStartTime;
-                OlAppointment.End = OlEndTime;
-                OlAppointment.Categories = "@ Email";
-                OlAppointment.ReminderSet = false;
-                OlAppointment.Sensitivity = OlSensitivity.olPrivate;
-                OlAppointment.Save();
+                olAppointment.Subject = $"Quick Filed {emailsLoaded} emails";
+                olAppointment.Start = startTime;
+                olAppointment.End = endTime;
+                olAppointment.Categories = "@ Email";
+                olAppointment.ReminderSet = false;
+                olAppointment.Sensitivity = OlSensitivity.olPrivate;
+                olAppointment.Save();
             }
 
 
             string[] strOutput = _formController.Groups
-                .GetMoveDiagnostics(durationText, durationMinutesText, Duration,
-                dataLineBeg, OlEndTime, ref OlAppointment);
+                .GetMoveDiagnostics(durationText, durationMinutesText, duration,
+                dataLineBeg, endTime, ref olAppointment);
 
             if (Globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var myDocuments))
             {

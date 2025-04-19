@@ -41,25 +41,40 @@ namespace UtilitiesCS.OutlookObjects.Store
         }
 
         [OnDeserialized]
-        public void RewireOlObjects(System.Runtime.Serialization.StreamingContext context)
+        public async void RewireOlObjects(System.Runtime.Serialization.StreamingContext context)
+        {
+            try
+            {
+                await RewireOlObjectsAsync(context);
+            }
+            catch (System.Exception e)
+            {
+                logger.Error($"Error in {nameof(RewireOlObjects)}: {e.Message}");                
+            }
+        }
+
+        internal async Task RewireOlObjectsAsync(StreamingContext context)
         {
             this.Stores ??= [];
             var stores = Globals.Ol.NamespaceMAPI.Stores
-                .Cast<Outlook.Store>()
+                .Cast<Outlook.Store>()                
                 .Where(store => store.ExchangeStoreType != OlExchangeStoreType.olExchangePublicFolder);
-            
+
             foreach (var store in stores)
             {
+                
                 var storeWrapper = Stores.Find(x => x.DisplayName == store.DisplayName);
                 if (storeWrapper is null)
                 {
-                    storeWrapper = new StoreWrapper(store).Init();
+                    storeWrapper = await Task.Run(() => new StoreWrapper(store).Init());
                     Stores.Add(storeWrapper);
                 }
                 else
                 {
-                    storeWrapper.Restore(store);
-                }
+                    await Task.Run(() => storeWrapper.Restore(store));
+                    //await Task.Run(() => storeWrapper.RestoreGlobalAddresses(Globals.Ol.App));
+                    
+                }                                
             }
         }
 

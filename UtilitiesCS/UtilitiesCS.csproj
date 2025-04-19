@@ -530,22 +530,22 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\OlFolder\OlFolderClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ConditionalItemEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogic.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\EmailDetailsWrapper.cs" />
+    <Compile Include="OutlookObjects\MailItem\EmailDetailsWrapper.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFiler.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFilerConfig.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\IEmailDetailsWrapper.cs" />
+    <Compile Include="Interfaces\IOutlookObjects\IEmailDetailsWrapper.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\IEmailTokenizer.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\IRecipientInfo.cs" />
+    <Compile Include="Interfaces\IOutlookObjects\IRecipientInfo.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MinedMailInfo.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Prediction.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierShared.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\AttachmentHelper.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\AutoFile2.cs" />
+    <Compile Include="OutlookObjects\Attachment\AttachmentHelper.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\AutoFile.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Obsolete\CorpusExample.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailTokenizer.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\CaptureEmailAddressesModule2.cs" />
+    <Compile Include="OutlookObjects\MailItem\CaptureEmailAddressesModule2.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\ImageStripper.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\AttachmentSerializable.cs" />
+    <Compile Include="OutlookObjects\Attachment\AttachmentSerializable.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\SpamBayes\SpamBayes.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\TristateEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage.cs" />
@@ -558,7 +558,7 @@
     <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FolderInfoViewer.Designer.cs">
       <DependentUpon>FolderInfoViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="HelperClasses\DASLFilterParser.cs" />
+    <Compile Include="OutlookObjects\Filter DASL\DASLFilterParser.cs" />
     <Compile Include="Interfaces\IToDo\IFlagChangeGroup.cs" />
     <Compile Include="Interfaces\IToDo\IFlagChangeItem.cs" />
     <Compile Include="Interfaces\IToDo\IFlagChangeTrainingQueue.cs" />
@@ -582,6 +582,7 @@
     <Compile Include="HelperClasses\ReflectionHelper.cs" />
     <Compile Include="OutlookObjects\Fields\MAPIFields.cs" />
     <Compile Include="OutlookObjects\Folder\FolderMinimalWrapper.cs" />
+    <Compile Include="OutlookObjects\Recipient\RecipientStatic.cs" />
     <Compile Include="OutlookObjects\Store\IStoreWrapperViewer.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapper.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapper.cs" />
@@ -642,7 +643,7 @@
     <Compile Include="OutlookObjects\Folder\FolderPredictor.cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\OlFolderHelper\SmithWaterman.cs" />
     <Compile Include="OutlookObjects\Folder\FolderScorer.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\ItemInfo.cs" />
+    <Compile Include="Interfaces\IOutlookObjects\ItemInfo.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapper .cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersController.cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.cs">
@@ -678,14 +679,14 @@
     <Compile Include="EmailIntelligence\Ctf\CtfIncidenceList.cs" />
     <Compile Include="EmailIntelligence\Ctf\CtfMap.cs" />
     <Compile Include="EmailIntelligence\Ctf\CtfMapEntry.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\EmailDetails.cs" />
+    <Compile Include="OutlookObjects\MailItem\EmailDetails.cs" />
     <Compile Include="EmailIntelligence\FilterEntry.cs" />
     <Compile Include="EmailIntelligence\Flags\FlagClassNoItem.cs" />
     <Compile Include="EmailIntelligence\Flags\FlagDetails.cs" />
     <Compile Include="EmailIntelligence\Flags\FlagParser.cs" />
     <Compile Include="EmailIntelligence\Flags\FlagTranslator.cs" />
     <Compile Include="EmailIntelligence\IntelligenceFilters.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\MailItemHelper.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemHelper.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -786,7 +787,7 @@
       <DependentUpon>ProgressViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="HelperClasses\ToolTips\QfcTipsDetails.cs" />
-    <Compile Include="HelperClasses\FilePathHelper.cs" />
+    <Compile Include="HelperClasses\FileSystem\FilePathHelper.cs" />
     <Compile Include="HelperClasses\SegmentStopWatch.cs" />
     <Compile Include="HelperClasses\FileSystem\ShellUtilitiesStatic.cs" />
     <Compile Include="ReusableTypeClasses\TimedActions\TimedBatchAction.cs" />
@@ -797,7 +798,7 @@
     <Compile Include="ReusableTypeClasses\TimedActions\TimerWrapper.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IItemInfo.cs" />
     <Compile Include="EmailIntelligence\Recents\RecentsList.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\RecipientInfo.cs" />
+    <Compile Include="OutlookObjects\Recipient\RecipientInfo.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEncoder.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEntry.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapSco.cs" />
@@ -814,12 +815,12 @@
     <Compile Include="Extensions\QueueExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\WinFormsExtensions.cs" />
-    <Compile Include="EmailIntelligence\EmailParsingSorting\ConversationHelper.cs" />
+    <Compile Include="OutlookObjects\Conversation\ConversationHelper.cs" />
     <Compile Include="HelperClasses\BinaryFlags\GenericBitwise.cs" />
     <Compile Include="HelperClasses\Initializer.cs" />
-    <Compile Include="HelperClasses\MailResolution.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailResolution.cs" />
     <Compile Include="HelperClasses\MergeSortImplementations.cs" />
-    <Compile Include="HelperClasses\OlItemSummary.cs" />
+    <Compile Include="OutlookObjects\Item\OlItemSummary.cs" />
     <Compile Include="HelperClasses\PrettyPrint.cs" />
     <Compile Include="Threading\ProgressTracker.cs" />
     <Compile Include="HelperClasses\SimpleRegex.cs" />
@@ -862,7 +863,7 @@
     <Compile Include="OutlookObjects\Category\CreateCategory.cs" />
     <Compile Include="OutlookObjects\Explorer\ExplorerActions.cs" />
     <Compile Include="OutlookObjects\Folder\FolderConverter.cs" />
-    <Compile Include="OutlookObjects\Item\MailItemExtensions.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemExtensions.cs" />
     <Compile Include="OutlookObjects\Folder\MsgToMime\MAPIMethods.cs" />
     <Compile Include="OutlookObjects\Folder\FolderNavigator.cs" />
     <Compile Include="OutlookObjects\Item\OlItemPseudoInterface.cs" />

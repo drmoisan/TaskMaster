@@ -89,6 +89,7 @@
     <Compile Include="OneDriveHelpers\AngleSharpParsedEmailBodyTests.cs" />
     <Compile Include="OneDriveHelpers\OneDriveDownloaderTests.cs" />
     <Compile Include="OutlookExtensions\FolderConverter_Tests.cs" />
+    <Compile Include="OutlookObjects\Recipient\RecipientStaticTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
