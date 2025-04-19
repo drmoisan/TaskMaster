@@ -193,18 +193,39 @@ namespace TaskMaster
         }
 
         private Folder _junkCertain;
-        public Folder JunkCertain
+        //public Folder JunkCertain
+        //{
+        //    get
+        //    {
+        //        if (_junkCertain is null)
+        //        {
+        //            _junkCertain = (Folder)App.Session.DefaultStore.GetDefaultFolder(OlDefaultFolders.olFolderJunk);
+        //        }
+        //        return _junkCertain;
+        //    }
+        //}
+        public Folder JunkCertain => Initializer.GetOrLoad(ref _junkPotential, LoadJunkCertain);
+        internal Folder LoadJunkCertain()
         {
-            get
+            var root = new FolderTree(Root).Roots.FirstOrDefault();
+            var folderPath = Properties.Settings.Default.OlJunkCertain;
+            if (folderPath.IsNullOrEmpty()) { return null; }
+            var sequence = new Queue<string>(folderPath.Split('\\'));
+
+            var node = root.FindSequentialNode((current, other) => current.Name == other, sequence);
+            var folder = node?.Value?.OlFolder as Folder;
+            if (folder is null)
             {
-                if (_junkCertain is null)
-                {
-                    _junkCertain = (Folder)App.Session.DefaultStore.GetDefaultFolder(OlDefaultFolders.olFolderJunk);
-                }
-                return _junkCertain;
+                MyBox.ShowDialog("Junk Potential Folder not found. Please select it manually.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                folder = NamespaceMAPI.PickFolder() as Folder;
+                if (folder is null) { return null; }
+                var wrapper = new FolderWrapper(folder, Root);
+                Properties.Settings.Default.OlJunkCertain = wrapper.RelativePath;
+                Properties.Settings.Default.Save();
             }
+            return folder;
         }
-        
+
         private string _archiveRootPath;
         public string ArchiveRootPath
         {

@@ -12,7 +12,7 @@ namespace TaskMaster.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.11.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.14.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -625,13 +625,25 @@ namespace TaskMaster.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Junk - Potential")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Junk Suspects SB")]
         public string OlJunkPotential {
             get {
                 return ((string)(this["OlJunkPotential"]));
             }
             set {
                 this["OlJunkPotential"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Junk E-Mail SB")]
+        public string OlJunkCertain {
+            get {
+                return ((string)(this["OlJunkCertain"]));
+            }
+            set {
+                this["OlJunkCertain"] = value;
             }
         }
     }
