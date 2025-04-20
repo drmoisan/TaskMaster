@@ -635,6 +635,7 @@ namespace Tags
                 
             if (!_dictOptions.Equals(_filteredOptions))
             {
+                _filteredOptions ??= [];
                 if (!_filteredOptions.ContainsKey(option))
                 {
                     _filteredOptions.Add(option, blClickTrue);
