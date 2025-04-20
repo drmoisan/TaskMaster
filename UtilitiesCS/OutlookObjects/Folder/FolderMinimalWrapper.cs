@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Graph.Drives.Item.Items.Item.SearchWithQ;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -75,14 +76,45 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 return;
             }
 
+            var pathParts = RelativePath.Split(['\\'], StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            try
+            {
+                if (RelativePath.StartsWith("\\\\"))
+                {
+                    var rp = RelativePath;                
+                    while (rp.StartsWith("\\\\"))
+                    {
+                        if (olRoot.Parent is Outlook.Folder)
+                        {
+                            olRoot = olRoot.Parent as Outlook.Folder;
+                        }
+                        else if (olRoot.Parent is Outlook.NameSpace ns) 
+                        {
+                            olRoot = ns.Stores.Cast<Outlook.Store>()
+                                .FirstOrDefault(store => store.GetRootFolder().FolderPath == $"\\\\{pathParts[0]}")
+                                .GetRootFolder() as Outlook.Folder;
+                            pathParts.RemoveAt(0);
+
+                        }                    
+                        rp = rp.Substring(2);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error($"Error loading the relative path '{RelativePath}'. {e.Message}", e);
+            }
+
             try
             {
                 OlRoot = olRoot;
-                var pathParts = RelativePath.Split(['\\'], StringSplitOptions.RemoveEmptyEntries);
+                
                 Outlook.Folder currentFolder = olRoot;
 
                 foreach (var part in pathParts)
                 {
+                    //currentFolder.Folders.Cast<Outlook.Folder>().ForEach(f => logger.Debug($"Folder: {f.Name}"));
                     currentFolder = currentFolder.Folders.Cast<Outlook.Folder>().FirstOrDefault(f => f.Name.Equals(part, StringComparison.OrdinalIgnoreCase));
                     if (currentFolder == null)
                     {

@@ -182,17 +182,17 @@
   "Config": {
     "$id": "2",
     "Disk": {
-      "FileName": "FolderSettings.json",
+      "FileName": "StoresWrapper.json",
       "RelativePath": "",
       "SpecialFolderName": "AppData"
     },
     "LocalDisk": {
-      "FileName": "FolderSettings.json",
+      "FileName": "StoresWrapper.json",
       "RelativePath": "",
       "SpecialFolderName": "AppData"
     },
     "NetDisk": {
-      "FileName": "FolderSettings.json",
+      "FileName": "StoresWrapper.json",
       "RelativePath": "",
       "SpecialFolderName": "Flow"
     },
