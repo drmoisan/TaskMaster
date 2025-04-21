@@ -161,5 +161,8 @@
     <Setting Name="OlJunkCertain" Type="System.String" Scope="User">
       <Value Profile="(Default)">Junk E-Mail SB</Value>
     </Setting>
+    <Setting Name="JunkPotential" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Junk Suspects SB</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

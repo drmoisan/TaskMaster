@@ -174,7 +174,7 @@ namespace TaskMaster
         internal Folder LoadJunkPotential()
         {
             var root = new FolderTree(Root).Roots.FirstOrDefault();
-            var folderPath = Properties.Settings.Default.OlJunkPotential;
+            var folderPath = Properties.Settings.Default.JunkPotential;
             if (folderPath.IsNullOrEmpty()) { return null; }
             var sequence = new Queue<string>(folderPath.Split('\\'));
             
@@ -204,7 +204,7 @@ namespace TaskMaster
         //        return _junkCertain;
         //    }
         //}
-        public Folder JunkCertain => Initializer.GetOrLoad(ref _junkPotential, LoadJunkCertain);
+        public Folder JunkCertain => Initializer.GetOrLoad(ref _junkCertain, LoadJunkCertain);
         internal Folder LoadJunkCertain()
         {
             var root = new FolderTree(Root).Roots.FirstOrDefault();

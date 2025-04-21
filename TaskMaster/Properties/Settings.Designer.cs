@@ -646,5 +646,17 @@ namespace TaskMaster.Properties {
                 this["OlJunkCertain"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Junk Suspects SB")]
+        public string JunkPotential {
+            get {
+                return ((string)(this["JunkPotential"]));
+            }
+            set {
+                this["JunkPotential"] = value;
+            }
+        }
     }
 }
