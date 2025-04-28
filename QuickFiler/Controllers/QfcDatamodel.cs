@@ -1,21 +1,22 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Outlook = Microsoft.Office.Interop.Outlook;
+﻿using Deedle;
+using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Xml.Linq;
 using ToDoModel;
 using UtilitiesCS;
-using Deedle;
-using System.ComponentModel;
-using System.Windows.Forms;
-using System.Threading;
-using QuickFiler.Helper_Classes;
 using UtilitiesCS.ReusableTypeClasses;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 
 
@@ -473,6 +474,39 @@ namespace QuickFiler.Controllers
             throw new NotImplementedException();
         }
 
+        internal void TryUnhookOrReplace(ref List<MailItem> nodes, int i) 
+        {
+            if (nodes is null || nodes.Count == 0 || nodes.Count < i + 1) 
+            { 
+                logger.Error($"Error unhooking item from move monitor. No items in array or index out of range. nodes.Length = {nodes?.Count ?? 0} but index i = {i}");
+                return; 
+            }
+            var node = nodes[i];
+            bool processing = true;
+            while (processing)
+            {
+                try
+                {
+                    _moveMonitor.UnhookItem(node);                    
+                    processing = false;
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error($"Error unhooking item from move monitor. Getting next item from Queue {e.Message}");
+                    nodes.Remove(node);
+                    node = _masterQueue.TryTakeFirst();
+                    if (node is null)
+                    {
+                        processing = false;
+                    }
+                    else
+                    {
+                        nodes.Insert(i, node);
+                    }
+                }
+            }
+        }
+        
         public async Task<IList<MailItem>> DequeueNextItemGroupAsync(int quantity, int timeOut)
         {
             _token.ThrowIfCancellationRequested();
@@ -481,18 +515,45 @@ namespace QuickFiler.Controllers
                 await WaitForQueue(quantity, _token);
 
             var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
+            if (nodes is null) { return null; }
+
             try
-            {
-                if (nodes is not null)
+            {                                
+                await Task.Run(() => 
                 {
-                    await Task.Run(async () => 
+                    var max = nodes.Count;
+                    for (int i = 0; i < max; i++)
                     {
-                        foreach (var node in nodes)
-                        {
-                            await _moveMonitor.UnhookItemAsync(node, _token);
-                        }
-                    }, _token);                    
-                }
+                        TryUnhookOrReplace(ref nodes, i);
+                        //var node = nodes[i];
+                        //_token.ThrowIfCancellationRequested();
+                        //bool processing = true;
+                        //while (processing) 
+                        //{
+                        //    try
+                        //    {
+                        //        await _moveMonitor.UnhookItemAsync(node, _token);
+                        //        processing = false;
+                        //    }
+                        //    catch (System.Exception e)
+                        //    {
+                        //        logger.Error($"Error unhooking item from move monitor. Getting next item from Queue {e.Message}");                                    
+                        //        nodes.Remove(node);
+                        //        node = _masterQueue.TryTakeFirst();
+                        //        if (node is null) 
+                        //        {
+                        //            processing = false;
+                        //        }
+                        //        else
+                        //        {
+                        //            nodes.Insert(i, node);
+                        //        }
+                        //    }
+                        //}
+                            
+                    }                    
+                }, _token);                    
+               
                 
             }
             catch (System.Exception e)
@@ -512,14 +573,11 @@ namespace QuickFiler.Controllers
             var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
             try
             {
-                if (nodes is not null)
-                {                    
-                    foreach (var node in nodes)
-                    {
-                        _moveMonitor.UnhookItem(node);
-                    }                    
-                }
-
+                var max = nodes.Count;
+                for (int i = 0; i < max; i++)
+                {
+                    TryUnhookOrReplace(ref nodes, i);
+                }                   
             }
             catch (System.Exception e)
             {

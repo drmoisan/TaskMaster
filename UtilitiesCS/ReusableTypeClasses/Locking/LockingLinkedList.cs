@@ -313,6 +313,27 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
+        public T TryTakeFirst()
+        {
+            lock (this)
+            {
+                if (base.Count == 0) { return default; }
+                else
+                {
+                    try
+                    {
+                        var node = base.First;
+                        base.RemoveFirst();
+                        return node.Value;
+                    }
+                    catch (Exception)
+                    {
+                        return default;                        
+                    }
+                }
+            }
+        }
+
         public T[] TakeFirst(int n)
         {
             lock (this)
