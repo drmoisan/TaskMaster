@@ -1,29 +1,31 @@
-﻿using Office = Microsoft.Office.Core;
-using Outlook = Microsoft.Office.Interop.Outlook;
+﻿using Microsoft.Office.Interop.Outlook;
+using QuickFiler;
+using QuickFiler.Controllers;
+using QuickFiler.Interfaces;
+using System;
+using System.Collections;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using TaskMaster.Ribbon;
 using TaskTree;
 using TaskVisualization;
 using ToDoModel;
 using UtilitiesCS;
-using QuickFiler.Interfaces;
-using System.Windows.Forms;
-using QuickFiler;
-using Microsoft.Office.Interop.Outlook;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Threading;
-using System;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
-using QuickFiler.Controllers;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
+using UtilitiesCS.EmailIntelligence.OlFolderTools.FilterOlFolders;
+using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.OutlookExtensions;
-using UtilitiesCS.Extensions.Lazy;
-using TaskMaster.Ribbon;
-using UtilitiesCS.EmailIntelligence.OlFolderTools.FilterOlFolders;
-using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
-using UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories;
+using UtilitiesCS.OutlookObjects.Folder;
 using UtilitiesCS.OutlookObjects.Store;
-using UtilitiesCS.EmailIntelligence.ClassifierGroups;
+using Office = Microsoft.Office.Core;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 
 namespace TaskMaster
@@ -548,6 +550,51 @@ namespace TaskMaster
         {
             var wrapper = new StoreWrapperController(Globals);
             wrapper.Launch();
+        }
+
+        internal void CompareFolders()
+        {
+            var folder1 = PromptUserToSelectFolder();
+            if (folder1 is null) return;
+            var folderTree1 = new FolderTree(folder1);
+            //var folders1 = folderTree1.FlattenArrayTree
+            var folder2 = PromptUserToSelectFolder();
+            if (folder2 is null) return;
+            var folderTree2 = new FolderTree(folder2);
+            var (identicalNodes, identicalContents, onlyCurrentNodes, onlyOtherNodes) = folderTree1.Compare(folderTree2);
+            logger.Info($"Folder Comparison Output for {folder1.Name} and {folder2.Name}" +
+                $"\nIdentical Nodes: {identicalNodes.Count}\nIdentical Contents: {identicalContents.Count}\n" +
+                $"Only In Folder 1: {onlyCurrentNodes.Count}, Only In Folder 2: {onlyOtherNodes.Count}");
+        }
+
+
+
+        internal Outlook.Folder PromptUserToSelectFolder()
+        {
+            // Ensure this runs on the UI thread
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+
+            var outlookApp = Globals?.Ol?.App;
+            if (outlookApp == null)
+            {
+                MessageBox.Show("Outlook application is not available.");
+                return null;
+            }
+
+            Outlook.Folder selectedFolder = null;
+            try
+            {
+                var ns = outlookApp.GetNamespace("MAPI");
+                var folder = ns.PickFolder();
+                selectedFolder = folder as Outlook.Folder;
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"Error selecting folder: {ex.Message}");
+            }
+
+            return selectedFolder;
         }
     }
 }

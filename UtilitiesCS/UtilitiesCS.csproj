@@ -530,6 +530,10 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\OlFolder\OlFolderClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ConditionalItemEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogic.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperNameCountSizeComparer.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperNameAndParentNameComparer.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperNodeComparer.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperNodeContentsComparer.cs" />
     <Compile Include="OutlookObjects\MailItem\EmailDetailsWrapper.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFiler.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFilerConfig.cs" />

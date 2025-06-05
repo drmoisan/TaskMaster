@@ -207,6 +207,11 @@ namespace UtilitiesCS
             return new[] { Value }.Concat(Children.SelectMany(x => x.Flatten()));
         }
 
+        public IEnumerable<TreeNode<T>> FlattenNodes()
+        {
+            return new[] { this }.Concat(Children.SelectMany(x => x.FlattenNodes()));
+        }
+
         public IEnumerable<T> FlattenIf(Func<T, bool> comparator)
         {
             return Flatten().Where(comparator);

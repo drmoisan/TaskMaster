@@ -220,6 +220,8 @@ namespace TaskMaster
 
         #endregion Triage
 
+        public void CompareFolders_Click(Office.IRibbonControl control) => _controller.CompareFolders();
+
         #region TryMethods  
         public void NewTaskHeader_Click(Office.IRibbonControl control) => _controller.Try.TryNewTaskHeader();
         public void DeepCompareEmails_Click(Office.IRibbonControl control) => _controller.TryDeepCompareEmails();

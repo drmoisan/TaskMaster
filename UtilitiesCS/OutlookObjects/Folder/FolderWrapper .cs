@@ -91,30 +91,48 @@ namespace UtilitiesCS
         public long FolderSize { get => _lazyFolderSize.Value; set => _lazyFolderSize = value.ToLazyValue(); }
         private long LoadFolderSize()
         {
-            return OlFolder.Items.Cast<dynamic>().Aggregate(0L, (acc, item) =>
+            var items = OlFolder.Items;
+            long totalSize = 0L;
+            foreach (var objItem in items) 
             {
-                try { return acc + (item?.Size ?? 0); }
-                catch (OverflowException e)
-                {
-                    string message = $"OverflowException encountered while aggregating " +
-                    $"item sizes in {OlFolder.FolderPath}.\n{e.Message}\n";
-
-                    message += $"Accumulator prior to overflow: {acc:N0}\n";
-
-                    try
-                    {
-                        message += $"Current Value to add: {item.Size}";
-                    }
-                    catch (System.Exception ie)
-                    {
-                        message += $"Unable to get size of item to add (see inner exception): \n{ie.Message}\n";
-                    }
-
-                    logger.Error(message, e);
-                    return acc;
+                try
+                {                    
+                    var olItem = new OutlookItem(objItem);
+                    totalSize += olItem.Size;
                 }
-            });
+                catch (System.Exception e)
+                {
+                    logger.Error(e.Message, e);
+                }
+            }
+            return totalSize;
         }
+        //private long LoadFolderSize()
+        //{
+        //    return OlFolder.Items.Cast<dynamic>().Aggregate(0L, (acc, item) =>
+        //    {
+        //        try { return acc + (item?.Size ?? 0); }
+        //        catch (OverflowException e)
+        //        {
+        //            string message = $"OverflowException encountered while aggregating " +
+        //            $"item sizes in {OlFolder.FolderPath}.\n{e.Message}\n";
+
+        //            message += $"Accumulator prior to overflow: {acc:N0}\n";
+
+        //            try
+        //            {
+        //                message += $"Current Value to add: {item.Size}";
+        //            }
+        //            catch (System.Exception ie)
+        //            {
+        //                message += $"Unable to get size of item to add (see inner exception): \n{ie.Message}\n";
+        //            }
+
+        //            logger.Error(message, e);
+        //            return acc;
+        //        }
+        //    });
+        //}
 
         private Lazy<string> _lazyName;
         public string Name { get => _lazyName.Value; private set => _lazyName = value.ToLazy(); }

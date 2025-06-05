@@ -7,6 +7,8 @@ using UtilitiesCS.HelperClasses;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections;
+using UtilitiesCS.OutlookObjects.Folder;
 
 namespace UtilitiesCS
 {
@@ -199,6 +201,60 @@ namespace UtilitiesCS
         }
 
         #endregion Initialization
+
+        #region Transformations and Comparisons
+
+        public List<FolderWrapper> Flatten()
+        {            
+            return [.. _roots.SelectMany(root => root.Flatten())];
+        }
+
+        public List<TreeNode<FolderWrapper>> FlattenNodes()
+        {
+            return [.. _roots.SelectMany(root => root.FlattenNodes())];
+        }
+
+        public (List<TreeNode<FolderWrapper>> nodes, List<TreeNode<FolderWrapper>> contents, List<TreeNode<FolderWrapper>> currentOnly, List<TreeNode<FolderWrapper>> otherOnly) Compare(FolderTree other) 
+        {
+            var compareNodes = new FolderWrapperNodeComparer();
+            var (nodes, onlyCurrentNodes, onlyOtherNodes) = CompareMembers(other, compareNodes);            
+            var compareContents = new FolderWrapperNodeContentsComparer();
+            var (contents, onlyCurrentContents, onlyOtherContents) = CompareMembers(other, compareContents);
+            return (nodes, contents, onlyCurrentNodes, onlyOtherNodes);
+        }
+
+        public (List<TreeNode<FolderWrapper>> same, List<TreeNode<FolderWrapper>> onlyCurrent, List<TreeNode<FolderWrapper>> onlyOther) CompareMembers(List<TreeNode<FolderWrapper>> current, List<TreeNode<FolderWrapper>> other, IEqualityComparer<TreeNode<FolderWrapper>> comparer)
+        {
+            var same = current.Intersect(other, comparer).ToList();
+            var onlyCurrent = current.Except(other, comparer).ToList();
+            var onlyOther = other.Except(current, comparer).ToList();
+            return (same, onlyCurrent, onlyOther);
+        }
+
+
+        public (List<TreeNode<FolderWrapper>> same, List<TreeNode<FolderWrapper>> onlyCurrent, List<TreeNode<FolderWrapper>> onlyOther) CompareMembers(FolderTree other, IEqualityComparer<TreeNode<FolderWrapper>> comparer)
+        {
+            var currentFlat = this.FlattenNodes();
+            var otherFlat = other.FlattenNodes();
+            return CompareMembers(currentFlat, otherFlat, comparer);
+        }
+
+        public (List<FolderWrapper> same, List<FolderWrapper> onlyCurrent, List<FolderWrapper> onlyOther) CompareMembers(FolderTree other, IEqualityComparer<FolderWrapper> comparer)
+        {
+            var thisFlat = this.Flatten();
+            var otherFlat = other.Flatten();            
+            return CompareMembers(thisFlat, otherFlat, comparer);
+        }
+
+        public (List<FolderWrapper> same, List<FolderWrapper> onlyCurrent, List<FolderWrapper> onlyOther) CompareMembers(List<FolderWrapper> current, List<FolderWrapper> other, IEqualityComparer<FolderWrapper> comparer)
+        {
+            var same = current.Intersect(other, comparer).ToList();
+            var onlyCurrent = current.Except(other, comparer).ToList();
+            var onlyOther = other.Except(current, comparer).ToList();
+            return (same, onlyCurrent, onlyOther);
+        }
+
+        #endregion Transformations and Comparisons
 
         #region Tree Filtering and Selection
 

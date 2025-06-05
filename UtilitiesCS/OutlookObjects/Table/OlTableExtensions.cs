@@ -99,10 +99,16 @@ namespace UtilitiesCS
         /// <param name="columnNames">Array of column names or schemas</param>
         public static void AddColumns(this Outlook.Table table, string[] columnNames)
         {
-            if (table is not null)
+            if (table is null) { return; }
+            try
             {
                 foreach (var column in columnNames) { table.Columns.Add(column); }
             }
+            catch (System.Exception e)
+            {
+                logger.Error(e.Message, e);
+            }
+            
         }
 
         /// <summary>
@@ -189,6 +195,12 @@ namespace UtilitiesCS
                                                                                ProgressTracker progress = null)
         {
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(GetColumnDictionary)} ...");
+            if (table is null)
+            {
+                logger.Error($"Parameter {nameof(table)} is null");
+                return (null, null);
+            }
+
             var columnDictionary = table.GetColumnDictionary();
             object[,] data = null;
             
@@ -201,7 +213,11 @@ namespace UtilitiesCS
                 //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(EtlByRow)} ...");
                 data = EtlByRow(table, objectConverters, columnDictionary, progress);
             }
-            else { data = table?.GetArray(table.GetRowCount()) as object[,]; }
+            else 
+            { 
+                var rowCount = table.GetRowCount();
+                data = table?.GetArray(rowCount) as object[,]; 
+            }
             return (data, columnDictionary);
         }
 

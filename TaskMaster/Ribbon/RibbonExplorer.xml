@@ -117,6 +117,9 @@
                   <checkBox id="TriageEnabledToggle" getPressed="TriageEnabled_GetPressed" onAction="TriageEnabled_Click" label="Triage Enabled"/>
                 </menu>
               </group>
+              <group id ="UtilitiesGroup" imageMso="ContentTypeSettings" label="Utilities">
+                <button id="CompareFolders" imageMso="FindDialog" onAction="CompareFolders_Click" label="Compare Folders" size="large"/>
+              </group>                     
             </tab>
         </tabs>
     </ribbon>
