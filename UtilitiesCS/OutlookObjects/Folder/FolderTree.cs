@@ -219,8 +219,9 @@ namespace UtilitiesCS
             var compareNodes = new FolderWrapperNodeComparer();
             var (nodes, onlyCurrentNodes, onlyOtherNodes) = CompareMembers(other, compareNodes);            
             var compareContents = new FolderWrapperNodeContentsComparer();
-            var (contents, onlyCurrentContents, onlyOtherContents) = CompareMembers(other, compareContents);
-            return (nodes, contents, onlyCurrentNodes, onlyOtherNodes);
+            //var (contents, onlyCurrentContents, onlyOtherContents) = CompareMembers(other, compareContents);
+            var (contents, onlyCurrentContents, onlyOtherContents) = CompareMembers(onlyCurrentNodes, onlyOtherNodes, compareContents);
+            return (nodes, contents, onlyCurrentContents, onlyOtherContents);
         }
 
         public (List<TreeNode<FolderWrapper>> same, List<TreeNode<FolderWrapper>> onlyCurrent, List<TreeNode<FolderWrapper>> onlyOther) CompareMembers(List<TreeNode<FolderWrapper>> current, List<TreeNode<FolderWrapper>> other, IEqualityComparer<TreeNode<FolderWrapper>> comparer)

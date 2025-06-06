@@ -182,7 +182,7 @@ namespace UtilitiesCS
 
         public Outlook.NameSpace Session => this.GetPropertyValue<Outlook.NameSpace>(olSession);
 
-        public long Size => this.GetPropertyValue<long>(olSize);
+        public int Size => this.GetPropertyValue<int>(olSize);
 
         public string Subject { get => this.GetPropertyValue<string>(olSubject); set => SetPropertyValue(olSubject, value); }
 
@@ -245,40 +245,79 @@ namespace UtilitiesCS
             }
         }
 
+        //public virtual T GetPropertyValue<T>(string propertyName)
+        //{
+        //    try
+        //    {
+        //        return (T)ItemType.InvokeMember(
+        //            propertyName,
+        //            BindingFlags.Public | BindingFlags.GetField | BindingFlags.GetProperty,
+        //            null,
+        //            InnerObject,
+        //            Args);
+
+        //    }
+        //    catch (Exception)
+        //    {
+        //        var propertyInfo = TryGetPropertyInfo(propertyName);
+        //        if (propertyInfo is null) 
+        //        { 
+        //            throw new MissingMemberException(ItemType.Name, propertyName); 
+        //        }
+
+        //        try
+        //        {
+        //            var value = propertyInfo.GetValue(_item);
+        //            if (value is null) { return default(T); }
+        //            else
+        //            {
+        //                var typedValue = (T)value;
+        //                return typedValue;
+        //            }
+        //        }
+
+        //        catch (SystemException e)
+        //        {
+        //            // An invalid property name exception is propagated to client
+        //            logger.Error($"{nameof(OutlookItem)}.{nameof(GetPropertyValue)}<{nameof(T)}> threw an " +
+        //                $"exception for property [{propertyName}]. {e.Message}", e);
+        //            throw;
+        //        }
+
+        //    }
+
+        //}
+
         public virtual T GetPropertyValue<T>(string propertyName)
         {
             try
             {
-                return (T)ItemType.InvokeMember(
+                // For COM objects, use InvokeMember for late binding
+                var value = ItemType.InvokeMember(
                     propertyName,
                     BindingFlags.Public | BindingFlags.GetField | BindingFlags.GetProperty,
                     null,
                     InnerObject,
                     Args);
-                
+                return (T)value;
             }
-            catch (Exception)
+            catch (MissingMemberException)
             {
-                var propertyInfo = TryGetPropertyInfo(propertyName) ?? throw new MissingMemberException(ItemType.Name, propertyName);
-                try
-                {
-                    var value = propertyInfo.GetValue(_item);
-                    if (value is null) { return default(T); }
-                    else
-                    {
-                        var typedValue = (T)value;
-                        return typedValue;
-                    }
-                }
-                catch (SystemException e)
-                {
-                    // An invalid property name exception is propagated to client
-                    logger.Error($"{nameof(OutlookItem)}.{nameof(GetPropertyValue)}<{nameof(T)}> threw an " +
-                        $"exception for property [{propertyName}]. {e.Message}", e);
-                    throw;
-                }
+                // Property does not exist
+                throw new MissingMemberException(ItemType.Name, propertyName);
             }
-            
+            catch (TargetInvocationException ex)
+            {
+                // Property exists but failed to invoke
+                logger.Error($"{nameof(OutlookItem)}.{nameof(GetPropertyValue)}<{typeof(T).Name}> threw an exception for property [{propertyName}]. {ex.Message}", ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Unexpected error
+                logger.Error($"{nameof(OutlookItem)}.{nameof(GetPropertyValue)}<{typeof(T).Name}> threw an unexpected exception for property [{propertyName}]. {ex.Message}", ex);
+                throw;
+            }
         }
 
         internal virtual void SetPropertyValue<T>(string propertyName, T propertyValue)

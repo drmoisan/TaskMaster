@@ -1,12 +1,14 @@
 ﻿using Microsoft.Office.Interop.Outlook;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Linq;
-using System;
 using Newtonsoft.Json;
-using UtilitiesCS.Extensions.Lazy;
+using System;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using UtilitiesCS.Extensions.Lazy;
+using UtilitiesCS.OutlookExtensions;
 
 namespace UtilitiesCS
 {
@@ -98,14 +100,28 @@ namespace UtilitiesCS
                 try
                 {                    
                     var olItem = new OutlookItem(objItem);
-                    totalSize += olItem.Size;
+                    if (olItem.IsValid()) { totalSize += olItem.Size; }
+                    else if (HasProperty(objItem, "Size")) // Fallback for items that don't implement IOutlookItem
+                    {
+                        totalSize += (long)objItem.GetType().GetProperty("Size").GetValue(objItem, null);
+                    }
                 }
                 catch (System.Exception e)
                 {
                     logger.Error(e.Message, e);
                 }
+                finally
+                {                    
+                    Marshal.ReleaseComObject(objItem);
+                }
             }
             return totalSize;
+        }
+
+        private bool HasProperty(object obj, string propertyName)
+        {
+            if (obj == null) return false;
+            return obj.GetType().GetProperty(propertyName) != null;
         }
         //private long LoadFolderSize()
         //{

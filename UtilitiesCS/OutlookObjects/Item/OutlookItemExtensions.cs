@@ -23,6 +23,22 @@ namespace UtilitiesCS.OutlookExtensions
 
         public static OutlookItemTryGet TryGet(this OutlookItem item) => new(item);
 
+        public static bool IsValid(this OutlookItem item)
+        {
+            if (item is null) { return false; }
+            else if (item.InnerObject is null) { return false; }
+            else if (item.InnerObject is AppointmentItem) { return true; }
+            else if (item.InnerObject is ContactItem) { return true; }
+            else if (item.InnerObject is DistListItem) { return true; }
+            else if (item.InnerObject is JournalItem) { return true; }
+            else if (item.InnerObject is MailItem) { return true; }
+            else if (item.InnerObject is MobileItem) { return true; }
+            else if (item.InnerObject is NoteItem) { return true; }
+            else if (item.InnerObject is PostItem) { return true; }
+            else if (item.InnerObject is TaskItem) { return true; }
+            else { return false; }
+        }
+
         public static OlItemType GetOlItemType(this IOutlookItem item)
         {
             if (item.InnerObject is AppointmentItem) { return OlItemType.olAppointmentItem; }
@@ -34,7 +50,13 @@ namespace UtilitiesCS.OutlookExtensions
             else if (item.InnerObject is NoteItem) { return OlItemType.olNoteItem; }
             else if (item.InnerObject is PostItem) { return OlItemType.olPostItem; }
             else if (item.InnerObject is TaskItem) { return OlItemType.olTaskItem; }
-            else { throw new ArgumentException($"{item.InnerObject.GetType().Name} is not a supported type for {nameof(OlItemType)} class."); }
+            // Technically the item type is incorrect for a meeting response, but it will serve the purpose of identifying
+            // the item as a meeting-related item and should contain the same properties.
+            else if (item.InnerObject is MeetingItem) { return OlItemType.olAppointmentItem; }            
+            else
+            {
+                throw new ArgumentException($"{item.InnerObject.GetType().Name} is not a supported type for {nameof(OlItemType)} class.");
+            }
         }
 
 

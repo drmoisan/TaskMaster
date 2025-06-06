@@ -26,6 +26,7 @@ using UtilitiesCS.OutlookObjects.Folder;
 using UtilitiesCS.OutlookObjects.Store;
 using Office = Microsoft.Office.Core;
 using Outlook = Microsoft.Office.Interop.Outlook;
+using System.Collections.Generic;
 
 
 namespace TaskMaster
@@ -562,12 +563,39 @@ namespace TaskMaster
             if (folder2 is null) return;
             var folderTree2 = new FolderTree(folder2);
             var (identicalNodes, identicalContents, onlyCurrentNodes, onlyOtherNodes) = folderTree1.Compare(folderTree2);
-            logger.Info($"Folder Comparison Output for {folder1.Name} and {folder2.Name}" +
-                $"\nIdentical Nodes: {identicalNodes.Count}\nIdentical Contents: {identicalContents.Count}\n" +
-                $"Only In Folder 1: {onlyCurrentNodes.Count}, Only In Folder 2: {onlyOtherNodes.Count}");
+            var identicalNodesStats = GetStats(identicalNodes);
+            var identicalContentsStats = GetStats(identicalContents);
+            var onlyCurrentStats = GetStats(onlyCurrentNodes);
+            var onlyOtherStats = GetStats(onlyOtherNodes);
+
+            logger.Info($"\nFolder Comparison Output for {folder1.Name} and {folder2.Name}" +
+                $"\nIdentical Nodes: {identicalNodes.Count:N0} Folder Size: {identicalNodesStats.size}  Item Count: {identicalNodesStats.count:N0}" +
+                $"\nIdentical Contents: {identicalContents.Count:N0}  Folder Size: {identicalContentsStats.size}  Item Count: {identicalContentsStats.count:N0}" +
+                $"\nOnly In Folder 1: {onlyCurrentNodes.Count:N0} Folder Size: {onlyCurrentStats.size}  Item Count: {onlyCurrentStats.count:N0}" +
+                $"\nOnly In Folder 2: {onlyOtherNodes.Count:N0} Folder Size: {onlyOtherStats.size}  Item Count: {onlyOtherStats.count:N0}");
         }
 
+        internal (string size, int count) GetStats(List<TreeNode<FolderWrapper>> nodes)
+        {
+            if (nodes is null || nodes.Count == 0) return ("0", 0);
+            var sizeL = nodes.Sum(x => x.Value.FolderSize);
+            var size = FormatFileSize(sizeL);
+            var count = nodes.Sum(x => x.Value.ItemCount);
+            return (size, count);
+        }
 
+        public static string FormatFileSize(long sizeInBytes)
+        {
+            string[] sizes = { "bytes", "KB", "MB", "GB", "TB" };
+            double len = sizeInBytes;
+            int order = 0;
+            while (len >= 1024 && order < sizes.Length - 1)
+            {
+                order++;
+                len /= 1024;
+            }
+            return $"{len:0.0} {sizes[order]} ({sizeInBytes:N0})";
+        }
 
         internal Outlook.Folder PromptUserToSelectFolder()
         {

@@ -97,7 +97,7 @@ namespace UtilitiesCS.OutlookExtensions
 
         public Outlook.NameSpace Session => TryGet(() => _olItem.Session);
 
-        public long Size => TryGet(() => _olItem.Size);
+        public int Size => TryGet(() => _olItem.Size);
 
         public string Subject { get => TryGet(() => _olItem.Subject); set => TrySet((x) => _olItem.Subject = x, value); }
 
