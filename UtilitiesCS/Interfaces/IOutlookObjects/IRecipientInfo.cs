@@ -1,6 +1,8 @@
-﻿namespace UtilitiesCS
+﻿using System;
+
+namespace UtilitiesCS
 {
-    public interface IRecipientInfo
+    public interface IRecipientInfo: IEquatable<IRecipientInfo>
     {
         string Address { get; set; }
         string Html { get; set; }

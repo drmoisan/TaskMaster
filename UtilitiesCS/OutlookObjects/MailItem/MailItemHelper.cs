@@ -68,6 +68,7 @@ namespace UtilitiesCS //QuickFiler
             _ccRecipientsHtml = new(() => string.Join("; ", CcRecipients?.Select(t => t.Html) ?? [""]), true);
             _sentDate = new(() => _item.SentOn, true);
             _sentOn = new(() => this.SentDate.ToString("g"), true);
+            _size = new(() => _item.Size, true);
             _subject = new(() => _item.Subject, true);
             _tokens = new(() => Tokenizer.Tokenize(this).ToArray(), true);
             _triage = new(() => _item.GetTriage(), true);
@@ -356,6 +357,9 @@ namespace UtilitiesCS //QuickFiler
 
         private Lazy<IRecipientInfo> _sender;
         public virtual IRecipientInfo Sender { get => _sender.Value; set => _sender = value.ToLazy(); }
+
+        private Lazy<int> _size;
+        public virtual int Size { get => _size.Value; set => _size = value.ToLazyValue(); }
 
         private LazyTry<Recipient[]> _olRecipients;
         internal virtual Recipient[] OlRecipients { get => _olRecipients.Value; set => _olRecipients = value.ToLazyTry(); }
@@ -685,5 +689,37 @@ img {
         }
 
         #endregion Serialization Conversion Methods
+
+        #region IEquatable<ItemInfo> Implementation
+
+        public bool Equals(ItemInfo other)
+        {
+            if (other is null) { return false; }
+            else if (ReferenceEquals(this, other)) { return true; }
+            else
+            {
+                if (Size != other.Size) return false;
+                if (SentDate != other.SentDate) return false;
+                if (Subject != other.Subject) return false;
+                if (Body != other.Body) return false;
+                if (Sender != other.Sender) return false;
+                if (!RecipientsEquivalent(CcRecipients, other.CcRecipients)) return false;
+                if (!RecipientsEquivalent(ToRecipients, other.ToRecipients)) return false;
+                return true;
+            }
+        }
+
+        internal bool RecipientsEquivalent(IRecipientInfo[] source, IRecipientInfo[] other)
+        {
+            if (source == null && other == null) return true;
+            if (source == null || other == null) return false;
+            if (source.Length != other.Length) return false;
+            if (source.Intersect(other).Count() != other.Length) return false;
+            return true;
+        }
+
+        #endregion IEquatable<ItemInfo> Implementation
+
+        
     }
 }

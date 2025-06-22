@@ -9,7 +9,7 @@ using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS;
 
-public interface IItemInfo
+public interface IItemInfo: IEquatable<ItemInfo>
 {
     [Flags]
     public enum PlainTextOptionsEnum
@@ -40,11 +40,13 @@ public interface IItemInfo
     int InternetCodepage { get; }
     bool IsTaskFlagSet { get; set; }
     PlainTextOptionsEnum PlainTextOptions { get; set; }
+    int Size { get; set; }
     IRecipientInfo Sender { get; set; }
     IRecipientInfo[] CcRecipients { get; }
     IRecipientInfo[] ToRecipients { get; }
     DateTime SentDate { get; set; }
     string SentOn { get; set; }
+
     string Subject { get; set; }
     string[] Tokens { get; }
     string Triage { get; set; }

@@ -25,5 +25,15 @@ namespace UtilitiesCS
         public virtual string Name { get => _name; set => _name = value; }
         public virtual string Address { get => _address; set => _address = value; }
         public virtual string Html { get => _html; set => _html = value; }
+
+        public bool Equals(IRecipientInfo other)
+        {
+            if (other == null) { return false; }
+            else if (ReferenceEquals(this, other)) { return true; }
+            else if (other.Name.IsNullOrEmpty() & other.Address.IsNullOrEmpty()) { return false; }
+            else if (Name.IsNullOrEmpty() & Address.IsNullOrEmpty()) { return false; }
+            else if ((Name ?? "") == (other.Name ?? "") && (Address ?? "") == (other.Address ?? "")) { return true; }
+            else { return false; }
+        }
     }
 }

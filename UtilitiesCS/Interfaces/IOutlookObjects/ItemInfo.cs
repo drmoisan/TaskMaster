@@ -1,5 +1,7 @@
 ﻿using Microsoft.Office.Interop.Outlook;
 using System;
+using System.Drawing;
+using System.Linq;
 using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS.EmailIntelligence
@@ -9,7 +11,7 @@ namespace UtilitiesCS.EmailIntelligence
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        
+
         public ItemInfo() { }
 
         public ItemInfo(IItemInfo itemInfo)
@@ -29,6 +31,7 @@ namespace UtilitiesCS.EmailIntelligence
             InternetCodepage = itemInfo.InternetCodepage;
             IsTaskFlagSet = itemInfo.IsTaskFlagSet;
             PlainTextOptions = itemInfo.PlainTextOptions;
+            Size = itemInfo.Size;
             Sender = itemInfo.Sender;
             CcRecipients = itemInfo.CcRecipients;
             ToRecipients = itemInfo.ToRecipients;
@@ -48,14 +51,15 @@ namespace UtilitiesCS.EmailIntelligence
         public string EmailPrefixToStrip { get; set; }
         public string EntryId { get; set; }
         public string StoreId { get; set; }
+        public int Size { get; set; }
         public string FolderName { get; set; }
         public IFolderWrapper FolderInfo { get; set; }
         public string Html { get; set; }
         public string HTMLBody { get; set; }
         public int InternetCodepage { get; set; }
         public bool IsTaskFlagSet { get; set; }
-        public SegmentStopWatch Sw { get; set;}
-        
+        public SegmentStopWatch Sw { get; set; }
+
         public IItemInfo.PlainTextOptionsEnum PlainTextOptions { get; set; }
         public IRecipientInfo Sender { get; set; }
         public IRecipientInfo[] CcRecipients { get; set; }
@@ -67,5 +71,31 @@ namespace UtilitiesCS.EmailIntelligence
         public string[] Tokens { get; set; }
         public string Triage { get; set; }
         public bool UnRead { get; set; }
+
+        public bool Equals(ItemInfo other)
+        {
+            if (other is null) { return false; }
+            else if (ReferenceEquals(this, other)) { return true; }
+            else
+            {
+                if (Size != other.Size) return false;
+                if (SentDate != other.SentDate) return false;
+                if (Subject != other.Subject) return false;
+                if (Body != other.Body) return false;
+                if (Sender != other.Sender) return false;
+                if (!RecipientsEquivalent(CcRecipients, other.CcRecipients)) return false;
+                if (!RecipientsEquivalent(ToRecipients, other.ToRecipients)) return false;                
+                return true;
+            }
+        }
+
+        internal bool RecipientsEquivalent(IRecipientInfo[] source, IRecipientInfo[] other)
+        {
+            if (source == null && other == null) return true;
+            if (source == null || other == null) return false;
+            if (source.Length != other.Length) return false;
+            if (source.Intersect(other).Count() != other.Length) return false;
+            return true;
+        }
     }
 }

@@ -571,10 +571,34 @@ namespace TaskMaster
             logger.Info($"\nFolder Comparison Output for {folder1.Name} and {folder2.Name}" +
                 $"\nIdentical Nodes: {identicalNodes.Count:N0} Folder Size: {identicalNodesStats.size}  Item Count: {identicalNodesStats.count:N0}" +
                 $"\nIdentical Contents: {identicalContents.Count:N0}  Folder Size: {identicalContentsStats.size}  Item Count: {identicalContentsStats.count:N0}" +
-                $"\nOnly In Folder 1: {onlyCurrentNodes.Count:N0} Folder Size: {onlyCurrentStats.size}  Item Count: {onlyCurrentStats.count:N0}" +
-                $"\nOnly In Folder 2: {onlyOtherNodes.Count:N0} Folder Size: {onlyOtherStats.size}  Item Count: {onlyOtherStats.count:N0}");
+                $"\nOnly In Folder 1 ({folder1.Name}): {onlyCurrentNodes.Count:N0} Folder Size: {onlyCurrentStats.size}  Item Count: {onlyCurrentStats.count:N0}" +
+                $"\nOnly In Folder 2 ({folder2.Name}): {onlyOtherNodes.Count:N0} Folder Size: {onlyOtherStats.size}  Item Count: {onlyOtherStats.count:N0}");
+
+            if (onlyCurrentStats.count > 0)
+            {
+                logger.Info($"Folders only in Folder 1 ({folder1.Name}): \n{string.Join("\n", onlyCurrentNodes.Select(x => x.Value.RelativePath))}");                
+            }
+            if (onlyOtherStats.count > 0)
+            {
+                logger.Info($"Folders only in Folder 2 ({folder2.Name}): \n{string.Join("\n", onlyOtherNodes.Select(x => x.Value.RelativePath))}");
+            }
+
+            if (onlyCurrentStats.count > 0 && onlyOtherStats.count > 0)
+            {
+                var response = MessageBox.Show($"Compare items in unique folders?", "Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == DialogResult.Yes)
+                {
+                    
+                }
+            }
+            
         }
 
+        internal void CompareItems() 
+        { 
+
+        }
+        
         internal (string size, int count) GetStats(List<TreeNode<FolderWrapper>> nodes)
         {
             if (nodes is null || nodes.Count == 0) return ("0", 0);
