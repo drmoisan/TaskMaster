@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections;
 using UtilitiesCS.OutlookObjects.Folder;
+using UtilitiesCS;
 
 namespace UtilitiesCS
 {
@@ -214,15 +215,32 @@ namespace UtilitiesCS
             return [.. _roots.SelectMany(root => root.FlattenNodes())];
         }
 
-        public (List<TreeNode<FolderWrapper>> nodes, List<TreeNode<FolderWrapper>> contents, List<TreeNode<FolderWrapper>> currentOnly, List<TreeNode<FolderWrapper>> otherOnly) Compare(FolderTree other) 
+        public (List<TreeNode<FolderWrapper>> nodes, List<TreeNode<FolderWrapper>> contents, List<TreeNode<FolderWrapper>> sameName, List<TreeNode<FolderWrapper>> currentOnly, List<TreeNode<FolderWrapper>> otherOnly) Compare(FolderTree other) 
         {
             var compareNodes = new FolderWrapperNodeComparer();
             var (nodes, onlyCurrentNodes, onlyOtherNodes) = CompareMembers(other, compareNodes);            
             var compareContents = new FolderWrapperNodeContentsComparer();
             //var (contents, onlyCurrentContents, onlyOtherContents) = CompareMembers(other, compareContents);
             var (contents, onlyCurrentContents, onlyOtherContents) = CompareMembers(onlyCurrentNodes, onlyOtherNodes, compareContents);
-            return (nodes, contents, onlyCurrentContents, onlyOtherContents);
+            var compareNames = new FolderWrapperNameAndParentNameComparer();
+            var currentContentsSplit = onlyCurrentContents.Split(compareNames);
+            var otherContentsSplit = onlyOtherContents.Split(compareNames);
+            var uniqueNameMatch = new List<TreeNode<FolderWrapper>>();
+            if (currentContentsSplit.Unique.Count > 0 && otherContentsSplit.Unique.Count > 0)
+            {
+                uniqueNameMatch = currentContentsSplit.Unique.Intersect(otherContentsSplit.Unique, compareNames).ToList();
+                if (uniqueNameMatch.Count > 0)
+                {
+                    onlyCurrentContents = onlyCurrentContents.Except(uniqueNameMatch, compareNames).ToList();
+                    onlyOtherContents = onlyOtherContents.Except(uniqueNameMatch, compareNames).ToList();
+                }
+            }
+
+            //var currentNameCount = onlyCurrentContents
+            return (nodes, contents, uniqueNameMatch, onlyCurrentContents, onlyOtherContents);
         }
+
+        
 
         public (List<TreeNode<FolderWrapper>> same, List<TreeNode<FolderWrapper>> onlyCurrent, List<TreeNode<FolderWrapper>> onlyOther) CompareMembers(List<TreeNode<FolderWrapper>> current, List<TreeNode<FolderWrapper>> other, IEqualityComparer<TreeNode<FolderWrapper>> comparer)
         {

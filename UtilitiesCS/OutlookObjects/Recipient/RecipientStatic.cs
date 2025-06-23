@@ -78,6 +78,16 @@ namespace UtilitiesCS
 
         }
 
+        public static string GetSenderName(this MeetingItem olMeeting)
+        {
+            return olMeeting.SenderName;            
+        }
+
+        public static string GetSenderAddress(this MeetingItem olMeeting)
+        {
+            return olMeeting.SenderEmailAddress;
+        }
+
         public static string GetSenderAddress(this MailItem olMail)
         {
             AddressEntry sender = olMail.Sender;
@@ -124,6 +134,22 @@ namespace UtilitiesCS
             }
 
             return senderAddress;
+        }
+
+        public static IRecipientInfo GetSenderInfo(this MeetingItem olMeeting)
+        {
+            olMeeting.ThrowIfNull();
+            if (olMeeting.SenderName.IsNullOrEmpty())
+            {
+                return new RecipientInfo("", "", "");
+            }
+            else
+            {
+                var name = olMeeting.GetSenderName();
+                var address = olMeeting.GetSenderAddress();
+                var html = ConvertRecipientToHtml(name, address);
+                return new RecipientInfo(name, address, html);
+            }
         }
 
         public static IRecipientInfo GetSenderInfo(this MailItem olMail)
@@ -188,7 +214,30 @@ namespace UtilitiesCS
             return (string.Join("; ", recipientsTo), string.Join("; ", recipientsCC));
         }
 
+        public static (string recipientsTo, string recipientsCC) GetRecipients(this MeetingItem olMeeting, Outlook.NameSpace ns)
+        {
+            var olRecipients = olMeeting.Recipients;
+            if (olRecipients is null) { return ("", ""); }
 
+            List<string> recipientsTo = [];
+            List<string> recipientsCC = [];
+
+            foreach (Recipient olRecipient in olRecipients)
+            {
+                var resolved = olRecipient.ToResolvedRecipient(ns);
+                var smtpAddress = GetRecipientAddress(resolved);
+                if (resolved.Type == (int)OlMailRecipientType.olTo)
+                {
+                    recipientsTo.Add(smtpAddress);
+                }
+                else if (resolved.Type == (int)OlMailRecipientType.olCC)
+                {
+                    recipientsCC.Add(smtpAddress);
+                }
+            }
+
+            return (string.Join("; ", recipientsTo), string.Join("; ", recipientsCC));
+        }
 
         public static (string recipientsTo, string recipientsCC) GetRecipients(this MailItem olMail)
         {
@@ -201,6 +250,31 @@ namespace UtilitiesCS
             foreach (Recipient olRecipient in olRecipients)
             {
                 
+                var smtpAddress = GetRecipientAddress(olRecipient);
+                if (olRecipient.Type == (int)OlMailRecipientType.olTo)
+                {
+                    recipientsTo.Add(smtpAddress);
+                }
+                else if (olRecipient.Type == (int)OlMailRecipientType.olCC)
+                {
+                    recipientsCC.Add(smtpAddress);
+                }
+            }
+
+            return (string.Join("; ", recipientsTo), string.Join("; ", recipientsCC));
+        }
+        
+        public static (string recipientsTo, string recipientsCC) GetRecipients(this MeetingItem olMeeting)
+        {
+            var olRecipients = olMeeting.Recipients;
+            if (olRecipients is null) { return ("", ""); }
+
+            List<string> recipientsTo = [];
+            List<string> recipientsCC = [];
+
+            foreach (Recipient olRecipient in olRecipients)
+            {
+
                 var smtpAddress = GetRecipientAddress(olRecipient);
                 if (olRecipient.Type == (int)OlMailRecipientType.olTo)
                 {
@@ -279,9 +353,19 @@ namespace UtilitiesCS
             return olMail.Recipients.Cast<Recipient>().Where(r => r.Type == (int)OlMailRecipientType.olTo);
         }
 
+        public static IEnumerable<Recipient> GetToRecipients(this MeetingItem olMeeting)
+        {
+            return olMeeting.Recipients.Cast<Recipient>().Where(r => r.Type == (int)OlMailRecipientType.olTo);
+        }
+
         public static IEnumerable<Recipient> GetCcRecipients(this MailItem olMail)
         {
             return olMail.Recipients.Cast<Recipient>().Where(r => r.Type == (int)OlMailRecipientType.olCC);
+        }
+
+        public static IEnumerable<Recipient> GetCcRecipients(this MeetingItem olMeeting)
+        {
+            return olMeeting.Recipients.Cast<Recipient>().Where(r => r.Type == (int)OlMailRecipientType.olCC);
         }
 
         private static string GetRecipientAddress(Recipient olRecipient)

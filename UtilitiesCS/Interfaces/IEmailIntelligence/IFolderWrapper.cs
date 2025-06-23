@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using UtilitiesCS.Interfaces.IReusableTypeClasses;
 
 namespace UtilitiesCS
 {

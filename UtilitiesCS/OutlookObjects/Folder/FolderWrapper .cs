@@ -1,12 +1,15 @@
 ﻿using Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
+using UtilitiesCS.Extensions;
 using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.OutlookExtensions;
 
@@ -123,33 +126,7 @@ namespace UtilitiesCS
             if (obj == null) return false;
             return obj.GetType().GetProperty(propertyName) != null;
         }
-        //private long LoadFolderSize()
-        //{
-        //    return OlFolder.Items.Cast<dynamic>().Aggregate(0L, (acc, item) =>
-        //    {
-        //        try { return acc + (item?.Size ?? 0); }
-        //        catch (OverflowException e)
-        //        {
-        //            string message = $"OverflowException encountered while aggregating " +
-        //            $"item sizes in {OlFolder.FolderPath}.\n{e.Message}\n";
-
-        //            message += $"Accumulator prior to overflow: {acc:N0}\n";
-
-        //            try
-        //            {
-        //                message += $"Current Value to add: {item.Size}";
-        //            }
-        //            catch (System.Exception ie)
-        //            {
-        //                message += $"Unable to get size of item to add (see inner exception): \n{ie.Message}\n";
-        //            }
-
-        //            logger.Error(message, e);
-        //            return acc;
-        //        }
-        //    });
-        //}
-
+        
         private Lazy<string> _lazyName;
         public string Name { get => _lazyName.Value; private set => _lazyName = value.ToLazy(); }
         internal virtual string LoadName() => OlFolder?.Name;
@@ -201,6 +178,7 @@ namespace UtilitiesCS
             _lazyName = new Lazy<string>(LoadName);
             _lazyRelativePath = new Lazy<string>(LoadRelativePath);
             _lazyItemCountSubFolders = new Lazy<int>(LoadItemCountSubFolders);
+            ItemHelpers = new AsyncLazy<IItemInfo[]>(async () => await Task.Run(() => LoadItemHelpers()));
         }
 
         #endregion Lazy Properties
@@ -329,6 +307,97 @@ namespace UtilitiesCS
         }
 
         #endregion INotifyPropertyChanged
+
+        #region Folder Comparison
+
+        //private Lazy<IItemInfo[]> _lazyItemHelpers;
+        //public IItemInfo[] ItemHelpers { get => _lazyItemHelpers.Value; set => _lazyItemHelpers = value?.ToLazy(); }
+        public AsyncLazy<IItemInfo[]> ItemHelpers { get; set; } 
+        public IApplicationGlobals Globals { get; set; }
+
+
+        internal IItemInfo[] LoadItemHelpers()
+        {
+            if (Globals is null) { throw new ArgumentNullException("Globals"); }
+            List<IItemInfo> helpers = [];
+            var items = OlFolder.Items;            
+            foreach (var objItem in items)
+            {
+                try
+                {
+                    if (objItem is MailItem mailItem)
+                    {
+                        helpers.Add(new MailItemHelper(mailItem, Globals).ToMatchableObject());
+                    }
+                    else if (objItem is MeetingItem meetingItem)
+                    {
+                        helpers.Add(new MeetingItemHelper(meetingItem, Globals).ToMatchableObject());
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error(e.Message, e);
+                }
+                finally
+                {
+                    Marshal.ReleaseComObject(objItem);
+                }
+            }
+            Marshal.ReleaseComObject(items);
+            return helpers.ToArray();
+        }
+
+        public async Task<double> CalculateItemMatchPercentageAsync(FolderWrapper other, IApplicationGlobals globals, CancellationToken cancel)
+        {
+            Globals = globals;
+            return await CalculateItemMatchPercentageAsync(other, cancel).ConfigureAwait(false);
+        }
+
+        public async Task<double> CalculateItemMatchPercentageAsync(FolderWrapper other, CancellationToken cancel)
+        {
+            if (Globals is null) { throw new ArgumentNullException("Globals"); }
+            if (other.Globals is null) { other.Globals = Globals; }
+            if (ItemCount == 0 || other.ItemCount == 0) { return 0; }
+            
+            var (matching, currentOnly, otherOnly) = await CompareItemsAsync(other, cancel).ConfigureAwait(false);
+            return CalculateItemMatchPercentage(matching, currentOnly, otherOnly);
+        }
+
+        public double CalculateItemMatchPercentage(IItemInfo[] matching, IItemInfo[] currentOnly, IItemInfo[] otherOnly)
+        {
+            if (matching.IsNullOrEmpty() || currentOnly.IsNullOrEmpty() || otherOnly.IsNullOrEmpty()) { return 0; }
+            double matchPercentage = (matching.Length * 2) / (double)(matching.Length * 2 + currentOnly.Length + otherOnly.Length);
+            return matchPercentage;
+        }
+
+        public async Task<(IItemInfo[] matching, IItemInfo[] currentOnly, IItemInfo[] otherOnly)> CompareItemsAsync(FolderWrapper other, IApplicationGlobals globals, CancellationToken cancel)
+        {
+            Globals = globals;
+            return await CompareItemsAsync(other, cancel).ConfigureAwait(false);
+        }
+
+        public async Task<(IItemInfo[] matching, IItemInfo[] currentOnly, IItemInfo[] otherOnly)> CompareItemsAsync(FolderWrapper other, CancellationToken cancel)
+        {
+            if (Globals is null) { throw new ArgumentNullException("Globals"); }
+            if (other.Globals is null) { other.Globals = Globals; }
+            var currentHelpers = await ItemHelpers;
+            var otherHelpers = await other.ItemHelpers;
+            if (currentHelpers.IsNullOrEmpty() || otherHelpers.IsNullOrEmpty()) 
+            { 
+                return ([], currentHelpers, otherHelpers); 
+            }
+            else
+            {
+                var matching = currentHelpers.Intersect(otherHelpers).ToArray();
+                var currentOnly = currentHelpers.Except(otherHelpers).ToArray();
+                var otherOnly = otherHelpers.Except(currentHelpers).ToArray();
+                return (matching, currentOnly, otherOnly); 
+            }
+        }
+
+
+
+        #endregion Folder Comparison
 
     }
 }

@@ -247,6 +247,13 @@ namespace UtilitiesCS
             return olProperty is null ? "" : (string)olProperty.Value;
         }
 
+        public static string GetTriage(this MeetingItem olMeeting)
+        {
+            olMeeting.ThrowIfNull();
+            var olProperty = olMeeting.UserProperties.Find("Triage", true);
+            return olProperty is null ? "" : (string)olProperty.Value;
+        }
+
         #endregion
 
         #region Private Helper Methods

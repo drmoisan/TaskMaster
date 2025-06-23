@@ -214,5 +214,18 @@ namespace UtilitiesCS
         }
 
         public static bool IsNullOrEmpty(this IList<string> list) => list is null || list.Count == 0;
+
+        public static (IList<T> Unique, IList<T> Duplicates) Split<T>(this IList<T> list, IEqualityComparer<T> comparer)
+        {
+            if (list == null)
+                return (new List<T>(), new List<T>());
+            if (comparer == null)
+                comparer = EqualityComparer<T>.Default;
+
+            var groups = list.GroupBy(x => x, comparer);
+            var unique = groups.Where(g => g.Count() == 1).SelectMany(g => g).ToList();
+            var duplicates = groups.Where(g => g.Count() > 1).SelectMany(g => g).ToList();
+            return (unique, duplicates);
+        }
     }
 }

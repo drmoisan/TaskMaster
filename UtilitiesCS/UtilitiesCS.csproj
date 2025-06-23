@@ -530,10 +530,14 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\OlFolder\OlFolderClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ConditionalItemEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogic.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\IPercentageMatchable.cs" />
+    <Compile Include="OutlookObjects\AppointmentItem\MeetingItemHelper.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperNameComparer.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperNameCountSizeComparer.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperNameAndParentNameComparer.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperNodeComparer.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperNodeContentsComparer.cs" />
+    <Compile Include="OutlookObjects\Item\ItemComparer.cs" />
     <Compile Include="OutlookObjects\MailItem\EmailDetailsWrapper.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFiler.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFilerConfig.cs" />
@@ -647,7 +651,7 @@
     <Compile Include="OutlookObjects\Folder\FolderPredictor.cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\OlFolderHelper\SmithWaterman.cs" />
     <Compile Include="OutlookObjects\Folder\FolderScorer.cs" />
-    <Compile Include="Interfaces\IOutlookObjects\ItemInfo.cs" />
+    <Compile Include="OutlookObjects\MailItem\ItemInfo.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapper .cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersController.cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.cs">

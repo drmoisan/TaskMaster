@@ -72,7 +72,7 @@ namespace UtilitiesCS.EmailIntelligence
         public string Triage { get; set; }
         public bool UnRead { get; set; }
 
-        public bool Equals(ItemInfo other)
+        public bool Equals(IItemInfo other)
         {
             if (other is null) { return false; }
             else if (ReferenceEquals(this, other)) { return true; }

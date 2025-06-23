@@ -4,9 +4,11 @@ using QuickFiler.Controllers;
 using QuickFiler.Interfaces;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using System.Windows.Forms;
 using TaskMaster.Ribbon;
 using TaskTree;
@@ -26,7 +28,6 @@ using UtilitiesCS.OutlookObjects.Folder;
 using UtilitiesCS.OutlookObjects.Store;
 using Office = Microsoft.Office.Core;
 using Outlook = Microsoft.Office.Interop.Outlook;
-using System.Collections.Generic;
 
 
 namespace TaskMaster
@@ -562,15 +563,17 @@ namespace TaskMaster
             var folder2 = PromptUserToSelectFolder();
             if (folder2 is null) return;
             var folderTree2 = new FolderTree(folder2);
-            var (identicalNodes, identicalContents, onlyCurrentNodes, onlyOtherNodes) = folderTree1.Compare(folderTree2);
+            var (identicalNodes, identicalContents, sameUniqueName, onlyCurrentNodes, onlyOtherNodes) = folderTree1.Compare(folderTree2);
             var identicalNodesStats = GetStats(identicalNodes);
             var identicalContentsStats = GetStats(identicalContents);
+            var sameUniqueNameStats = GetStats(sameUniqueName);
             var onlyCurrentStats = GetStats(onlyCurrentNodes);
             var onlyOtherStats = GetStats(onlyOtherNodes);
 
             logger.Info($"\nFolder Comparison Output for {folder1.Name} and {folder2.Name}" +
                 $"\nIdentical Nodes: {identicalNodes.Count:N0} Folder Size: {identicalNodesStats.size}  Item Count: {identicalNodesStats.count:N0}" +
                 $"\nIdentical Contents: {identicalContents.Count:N0}  Folder Size: {identicalContentsStats.size}  Item Count: {identicalContentsStats.count:N0}" +
+                $"\nSame Unique Name: {sameUniqueName.Count:N0}  Folder Size: {sameUniqueNameStats.size}  Item Count: {sameUniqueNameStats.count:N0}" +
                 $"\nOnly In Folder 1 ({folder1.Name}): {onlyCurrentNodes.Count:N0} Folder Size: {onlyCurrentStats.size}  Item Count: {onlyCurrentStats.count:N0}" +
                 $"\nOnly In Folder 2 ({folder2.Name}): {onlyOtherNodes.Count:N0} Folder Size: {onlyOtherStats.size}  Item Count: {onlyOtherStats.count:N0}");
 
@@ -593,6 +596,103 @@ namespace TaskMaster
             }
             
         }
+
+        internal async Task CompareFoldersAsync()
+        {
+            var folder1 = PromptUserToSelectFolder();
+            if (folder1 is null) return;
+            var folderTree1 = await Task.Run(() => new FolderTree(folder1));
+            //var folders1 = folderTree1.FlattenArrayTree
+            var folder2 = PromptUserToSelectFolder();
+            if (folder2 is null) return;
+
+            var folderTree2 = await Task.Run(() => new FolderTree(folder2));
+            var (identicalNodes, identicalContents, sameUniqueName, onlyCurrentNodes, onlyOtherNodes) = 
+                await Task.Run(() => folderTree1.Compare(folderTree2));
+            var identicalNodesStats = GetStats(identicalNodes);
+            var identicalContentsStats = GetStats(identicalContents);
+            var sameUniqueNameStats = GetStats(sameUniqueName);
+            var onlyCurrentStats = GetStats(onlyCurrentNodes);
+            var onlyOtherStats = GetStats(onlyOtherNodes);
+
+            logger.Info($"\nFolder Comparison Output for {folder1.Name} and {folder2.Name}" +
+                $"\nIdentical Nodes: {identicalNodes.Count:N0} Folder Size: {identicalNodesStats.size}  Item Count: {identicalNodesStats.count:N0}" +
+                $"\nIdentical Contents: {identicalContents.Count:N0}  Folder Size: {identicalContentsStats.size}  Item Count: {identicalContentsStats.count:N0}" +
+                $"\nSame Unique Name: {sameUniqueName.Count:N0}  Folder Size: {sameUniqueNameStats.size}  Item Count: {sameUniqueNameStats.count:N0}" +
+                $"\nOnly In Folder 1 ({folder1.Name}): {onlyCurrentNodes.Count:N0} Folder Size: {onlyCurrentStats.size}  Item Count: {onlyCurrentStats.count:N0}" +
+                $"\nOnly In Folder 2 ({folder2.Name}): {onlyOtherNodes.Count:N0} Folder Size: {onlyOtherStats.size}  Item Count: {onlyOtherStats.count:N0}");
+
+            if (onlyCurrentStats.count > 0)
+            {
+                logger.Info($"Folders only in Folder 1 ({folder1.Name}): \n{string.Join("\n", onlyCurrentNodes.Select(x => x.Value.RelativePath))}");
+            }
+            if (onlyOtherStats.count > 0)
+            {
+                logger.Info($"Folders only in Folder 2 ({folder2.Name}): \n{string.Join("\n", onlyOtherNodes.Select(x => x.Value.RelativePath))}");
+            }
+            
+            if (onlyCurrentStats.count > 0 && onlyOtherStats.count > 0)
+            {
+                var response = MessageBox.Show($"Find partially matching folders?", "Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == DialogResult.Yes)
+                {
+                    logger.Info("Comparing items to find partial matches ...");
+                    var m = await onlyCurrentNodes.ToAsyncEnumerable().SelectAwait(async node =>
+                    {
+                        var otherM = await onlyOtherNodes.ToAsyncEnumerable().SelectAwait(async o => 
+                        { 
+                            var percentage = await node.Value.CalculateItemMatchPercentageAsync(o.Value, Globals, default);
+                            return (node:o, percentage:percentage);
+                        }).ToArrayAsync();
+                        
+                        var max = otherM.FindMax((n1, n2) => n2.percentage > n1.percentage ? n2: n1);
+                        
+                        return (folder1:node, folder2:max.node, percentage:max.percentage);
+                    }).ToArrayAsync();
+
+                    var folder1Unmatched = m.Where(x => x.percentage == 0).Select(x => x.folder1).ToList();
+                    var folder2matches = m.Where(x => x.percentage > 0).Select(x => x.folder2).ToList();
+                    var folder2Unmatched = onlyOtherNodes.Where(x => !folder2matches.Contains(x)).ToList();
+
+
+                    foreach (var match in m)
+                    {
+                        if (match.percentage > 0)
+                        {
+                            logger.Info($"Folder {match.folder1.Value.RelativePath} has a partial match with {match.folder2.Value.RelativePath} ({match.percentage:P2})");
+                            var copyResponse = MessageBox.Show($"Copy missing items from {match.folder2.Value.RelativePath} to {match.folder1.Value.RelativePath}?", "Copy Items", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                            if (copyResponse == DialogResult.Yes)
+                            {
+                                var (matching, currentOnly, otherOnly) = await match.folder1.Value.CompareItemsAsync(match.folder2.Value, Globals, default).ConfigureAwait(false);
+                                foreach (var iitem in otherOnly)
+                                {
+                                    var item = Globals.Ol.NamespaceMAPI.GetItemFromID(iitem.EntryId, iitem.StoreId);
+                                    var olItem = new OutlookItem(item);
+                                    var destination = match.folder1.Value.OlFolder as Outlook.Folder;
+                                    if (olItem is not null && destination is not null)
+                                    {
+                                        olItem.Move(destination);
+                                        logger.Info($"Moved item {olItem.Subject} to {match.folder1.Value.RelativePath}");
+                                    }
+                                    else
+                                    {
+                                        logger.Warn($"Failed to move item {olItem?.Subject ?? "Unknown Subject"} to {match.folder1.Value.RelativePath}");
+                                    }                                    
+                                }
+                                
+                            }
+                        } 
+                        
+                    }
+
+                    logger.Info($"Folders with no matches in {folder1.Name}: \n{string.Join("\n",folder1Unmatched.Select(x => x.Value.RelativePath))}");
+                    logger.Info($"Folders with no matches in {folder2.Name}: \n{string.Join("\n",folder2Unmatched.Select(x => x.Value.RelativePath))}");
+
+                }
+            }
+
+        }
+
 
         internal void CompareItems() 
         { 

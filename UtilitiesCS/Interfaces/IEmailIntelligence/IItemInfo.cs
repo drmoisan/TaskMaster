@@ -9,7 +9,7 @@ using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS;
 
-public interface IItemInfo: IEquatable<ItemInfo>
+public interface IItemInfo: IEquatable<IItemInfo>
 {
     [Flags]
     public enum PlainTextOptionsEnum
