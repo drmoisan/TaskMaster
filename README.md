@@ -175,7 +175,23 @@ Coding guidelines (high-level):
 
 ## License
 
-This repository appears to be private/internal. If you intend to open-source or redistribute, add a `LICENSE` file and update this section accordingly.
+TaskMaster — Outlook add-in and supporting libraries for email triage, tagging, and task visualization.
+
+SPDX-License-Identifier: GPL-3.0-or-later
+Copyright (C) 2025 Dan Moisan
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program in a file named “COPYING”.  If not, see <https://www.gnu.org/licenses/>.
 
 ---
 
