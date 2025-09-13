@@ -1,0 +1,21 @@
+{
+  "$id": "1",
+  "Activated": false,
+  "Globals": "default",
+  "Name": "Spam",
+  "Disk": {
+    "FileName": "SpamClassifier.json",
+    "RelativePath": "",
+    "SpecialFolderName": "AppData"
+  },
+  "LocalDisk": {
+    "FileName": "SpamClassifier.json",
+    "RelativePath": "",
+    "SpecialFolderName": "AppData"
+  },
+  "NetDisk": {
+    "FileName": "SpamClassifier.json",
+    "RelativePath": "",
+    "SpecialFolderName": "PythonStaging"
+  }
+}

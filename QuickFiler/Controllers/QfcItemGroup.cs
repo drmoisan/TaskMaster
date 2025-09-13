@@ -18,14 +18,18 @@ namespace QuickFiler.Controllers
         public QfcItemGroup() { }
         public QfcItemGroup(MailItem mailItem) { _mailItem = mailItem; }
 
-        private IQfcItemController _itemController;
         private MailItem _mailItem;
+        internal MailItem MailItem 
+        { 
+            get => _mailItem;
+            set => _mailItem = value; 
+        }
 
-        private ItemViewer _itemViewer;
         internal ItemViewer ItemViewer { get => _itemViewer; set => _itemViewer = value; }
+        private ItemViewer _itemViewer;
 
         internal IQfcItemController ItemController { get => _itemController; set => _itemController = value; }
-        internal MailItem MailItem { get => _mailItem; set => _mailItem = value; }
+        private IQfcItemController _itemController;
     }
 
 }

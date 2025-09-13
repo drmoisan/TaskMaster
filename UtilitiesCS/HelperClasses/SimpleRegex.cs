@@ -49,7 +49,22 @@ namespace UtilitiesCS
             return (rg, searchPattern);
         }
 
-        
+        public static string[] GetRegexGroups(this Regex regex, string input)
+        {
+            Match match = regex.Match(input);
+            if (match.Success)
+            {
+                // Extract groups from the match
+                string[] groups = new string[match.Groups.Count - 1];
+                for (int i = 1; i < match.Groups.Count; i++)
+                {
+                    groups[i - 1] = match.Groups[i].Value;
+                }
+                return groups;
+            }
+
+            return [];
+        }
 
     }
 }

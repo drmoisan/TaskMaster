@@ -5,18 +5,12 @@ using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms.Design;
 using System.Windows.Forms;
 using System.Drawing;
-using System.Windows.Forms.VisualStyles;
-using System.Drawing.Printing;
 using System.Diagnostics;
 using Svg;
-using Fizzler;
-using System.Globalization;
-using System.Diagnostics.Eventing.Reader;
 using System.Runtime.CompilerServices;
+
 
 namespace SVGControl
 {
@@ -30,15 +24,19 @@ namespace SVGControl
     [TypeConverter(typeof(SvgOptionsConverter))]
     public class SvgImageSelector : INotifyPropertyChanged
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public SvgImageSelector(Size outer, Padding margin, AutoSize autoSize)
         {
+            ResourceNames = new List<ISvgResource>();
             _renderer = new SvgRenderer(outer, margin, autoSize);
             _renderer.PropertyChanged += Renderer_PropertyChanged;
-            Debug.WriteLine("SvgImageSelector Initialized");
+            //logger.Debug("SvgImageSelector Initialized");
         }
 
         public SvgImageSelector(Size outer, Padding margin, AutoSize autoSize, bool useDefaultImage)
         {
+            ResourceNames = new List<ISvgResource>();
             _useDefaultImage = useDefaultImage;
             if (useDefaultImage)
             {
@@ -49,7 +47,7 @@ namespace SVGControl
             }
             else { _renderer = new SvgRenderer(outer, margin, autoSize); }
             _renderer.PropertyChanged += Renderer_PropertyChanged;
-            Debug.WriteLine("SvgImageSelector Initialized");
+            //logger.Debug("SvgImageSelector Initialized");
         }
 
         //private SvgDocument _doc;
@@ -58,6 +56,7 @@ namespace SVGControl
         private bool _saveRendering = false;
         private bool _useDefaultImage = false;
         private SvgRenderer _renderer;
+
         internal String AboluteImagePath
         {
             get { return _absoluteImagePath; }
@@ -83,26 +82,65 @@ namespace SVGControl
             }
             set
             {
-                if (_relativeImagePath != value)
+                //if (_relativeImagePath != value)
+                //{
+                //    if ((value == "")|(value == "(none)"))
+                //    {
+                //        _relativeImagePath = value;
+                //        if (_useDefaultImage) { SetDefaultImage(); }
+                //        else { _renderer.Document = null; }
+                //    }
+                //    else
+                //    {
+                //        string valueAbs = value.AbsoluteFromURI(GetAnchorPath());
+                //        _renderer.Document = SvgDocument.Open(valueAbs);
+                //        _absoluteImagePath = valueAbs;
+                //        _relativeImagePath = valueAbs.GetRelativeURI(GetAnchorPath());
+                //    }
+                //    NotifyPropertyChanged("ImagePath");
+                //}
+            }
+        }
+
+        private ISvgResource _svgResource = null;
+
+        [Editor(typeof(DropDownEditor), typeof(UITypeEditor))]
+        public ISvgResource ResourceName
+        {
+            get => _svgResource ;
+            
+            set
+            {
+                if (_svgResource != value)
                 {
-                    if ((value == "")|(value == "(none)"))
+                    if (value is null || value.Name == "")
                     {
-                        _relativeImagePath = value;
+                        _svgResource = value;
                         if (_useDefaultImage) { SetDefaultImage(); }
                         else { _renderer.Document = null; }
                     }
                     else
                     {
-                        string valueAbs = value.AbsoluteFromURI(GetAnchorPath());
-                        _renderer.Document = SvgDocument.Open(valueAbs);
-                        _absoluteImagePath = valueAbs;
-                        _relativeImagePath = valueAbs.GetRelativeURI(GetAnchorPath());
+                        _svgResource = value;
+                        _renderer.Document = SvgRenderer.GetSvgDocument(value.Data);
                     }
-                    NotifyPropertyChanged("ImagePath");
+                    NotifyPropertyChanged("ResourceName");
                 }
+                //_svgResource = value;
             }
         }
-        
+
+        //private List<string> _resourceNames;
+
+        [Browsable(false)]
+        public List<ISvgResource> ResourceNames { get; private set; }
+
+        public void AddResource(ISvgResource resource)
+        {
+            if (!ResourceNames.Contains(resource))
+            ResourceNames.Add(resource);
+        }
+
         [DefaultValue(AutoSize.MaintainAspectRatio)]
         public AutoSize AutoSize { get => _renderer.AutoSize; set => _renderer.AutoSize = value; }
         
@@ -200,7 +238,12 @@ namespace SVGControl
         {
             //string workingDirectory = System.AppDomain.CurrentDomain.BaseDirectory;
             //Debug.WriteLine("System.AppDomain.CurrentDomain.BaseDirectory is " + workingDirectory);
-            //var resrcs = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            //var assmbly = System.Reflection.Assembly.GetExecutingAssembly();
+            //var location = assmbly.Location;
+            
+            //var resrcs = assmbly.GetManifestResourceNames();
+            
+            
             string workingDirectory = Environment.CurrentDirectory;
             List<string> directories = new List<string>(workingDirectory.Split(Path.DirectorySeparatorChar));
             if ((directories.Count > 2) && (directories[directories.Count - 2] == "bin"))

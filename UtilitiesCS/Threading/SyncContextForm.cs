@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Threading;
 
 namespace QuickFiler.Viewers
 {
@@ -16,10 +17,31 @@ namespace QuickFiler.Viewers
         public SyncContextForm()
         {
             InitializeComponent();
-            _context = SynchronizationContext.Current;
+            //this.Shown += SyncContextForm_Shown;
         }
 
-        private SynchronizationContext _context;
-        public SynchronizationContext UiSyncContext { get => _context; }
+        public System.Drawing.SizeF FormAutoScaleFactor { get; private set; }
+                
+        public SynchronizationContext UiSyncContext { get; private set; }
+
+        public Dispatcher UiDispatcher { get; private set; }
+
+        public int UiThreadId { get; private set; }
+
+        public void CaptureUiVariables() 
+        {
+            UiSyncContext = SynchronizationContext.Current;
+            FormAutoScaleFactor = this.AutoScaleFactor;
+            UiDispatcher = Dispatcher.CurrentDispatcher;
+            UiThreadId = Thread.CurrentThread.ManagedThreadId;
+        }
+
+        //private void SyncContextForm_Shown(object sender, EventArgs e)
+        //{
+        //    UiSyncContext = SynchronizationContext.Current;
+        //    FormAutoScaleFactor = this.AutoScaleFactor;
+        //    UiDispatcher = Dispatcher.CurrentDispatcher;
+        //    UiThreadId = Thread.CurrentThread.ManagedThreadId;
+        //}
     }
 }

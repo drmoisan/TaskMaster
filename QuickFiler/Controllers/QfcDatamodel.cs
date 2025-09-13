@@ -1,24 +1,22 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Outlook = Microsoft.Office.Interop.Outlook;
+﻿using Deedle;
+using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Xml.Linq;
 using ToDoModel;
 using UtilitiesCS;
-using Deedle;
 using UtilitiesCS.ReusableTypeClasses;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.ComponentModel;
-using System.Windows.Forms;
-using System.Threading;
-using static Deedle.FrameBuilder;
-using log4net.Repository.Hierarchy;
-//using static UtilitiesCS.OlItemSummary;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 
 
@@ -29,11 +27,14 @@ namespace QuickFiler.Controllers
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        #region Constructors and Initializers
+
         private QfcDatamodel(IApplicationGlobals appGlobals) 
         { 
             _globals = appGlobals;
             _olApp = _globals.Ol.App;
             _activeExplorer = _olApp.ActiveExplorer();
+            _globals.Ol.App.NewMailEx += Application_NewMailEx;
         }
 
         public QfcDatamodel(IApplicationGlobals appGlobals, CancellationToken token) 
@@ -43,29 +44,57 @@ namespace QuickFiler.Controllers
             _olApp = _globals.Ol.App;
             _activeExplorer = _olApp.ActiveExplorer();
             _frame = InitDf(_activeExplorer);
+            _globals.Ol.App.NewMailEx += Application_NewMailEx;
         }
 
         public static async Task<QfcDatamodel> LoadAsync(IApplicationGlobals appGlobals, CancellationToken token, CancellationTokenSource tokenSource, ProgressTracker progress) 
         {
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Creating new {nameof(QfcDatamodel)} ... ");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Creating new {nameof(QfcDatamodel)} ... ");
             progress.Report(0, "Initializing Data Model");
 
             var model = new QfcDatamodel(appGlobals);
             model.Token = token;
             model.TokenSource = tokenSource;
 
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(InitDfAsync)} ... ");
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(InitDfAsync)} ... ");
             await model.InitDfAsync(appGlobals.Ol.App.ActiveExplorer(), progress.Increment(2)).ConfigureAwait(false);
             return model;
         }
 
+        public void Cleanup() 
+        {
+            _tokenSource?.Cancel();
+            _worker?.CancelAsync();
+            _globals.Ol.App.NewMailEx -= Application_NewMailEx;
+            _moveMonitor.UnhookAll();
+            _moveMonitor = null;
+            _activeExplorer = null;
+            _olApp = null;
+            _globals = null;
+            _frame = null;
+            _masterQueue = null;
+            //_blockingQueue = null;
+            //_priorityQueue = null;
+            //_queues = null;
+            _worker = null;
+        }
+
+        #endregion Constructors and Initializers
+
+        #region Private Variables
+
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private IApplicationGlobals _globals;
         private Explorer _activeExplorer;
-        private ConcurrentQueue<MailItem> _masterQueue;
+        private LockingLinkedList<MailItem> _masterQueue = [];
+        private EmailMoveMonitor _moveMonitor = new();
         private Outlook.Application _olApp;
         private Frame<int, string> _frame;
         private BackgroundWorker _worker;
+
+        #endregion Private Variables
+
+        #region Public Properties
 
         private bool _complete = false;
         public bool Complete { get => _complete; set => _complete = value; }
@@ -78,11 +107,84 @@ namespace QuickFiler.Controllers
         private CancellationTokenSource _tokenSource;
         public CancellationTokenSource TokenSource { get => _tokenSource; set => _tokenSource = value; }
 
+        #endregion Public Properties
+
+        #region BackgroundWorker
+
+        public void SetupWorker(System.ComponentModel.BackgroundWorker worker) 
+        {
+            worker.WorkerSupportsCancellation = true;
+            
+            _token.Register(() => worker.CancelAsync());
+            worker.DoWork += new System.ComponentModel.DoWorkEventHandler(Worker_DoWork);
+            //worker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(Worker_RunWorkerCompleted);
+        }
+
+        private async void Worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+
+                // Do not access the form's BackgroundWorker reference directly.
+                // Instead, use the reference provided by the sender parameter.            
+                BackgroundWorker bw = sender as BackgroundWorker;
+
+                // Extract the argument.
+                //zxxint arg = (int)e.Argument;
+
+                // Start the time-consuming operation.
+                //e.Result = await LoadRemainingEmailsToQueueAsync(bw, _token);
+                //e.Result = LoadRemainingEmailsToQueue(bw, _token);
+                e.Result = await LoadRemainingEmailsToQueueAsync(_token);
+
+                // If the operation was canceled by the user,
+                // set the DoWorkEventArgs.Cancel property to true.
+                if (bw.CancellationPending)
+                {
+                    e.Cancel = true;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                logger.Error($"Error in Worker_DoWork {ex.Message}", ex);
+            }
+
+        }
+
+        // This event handler demonstrates how to interpret
+        // the outcome of the asynchronous operation implemented
+        // in the DoWork event handler.
+        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+            {
+                // The user canceled the operation.
+                MessageBox.Show("Operation was canceled");
+            }
+            else if (e.Error != null)
+            {
+                // There was an error during the operation.
+                string msg = String.Format("An error occurred: {0}", e.Error.Message);
+                MessageBox.Show(msg);
+            }
+            else
+            {
+                // The operation completed normally.
+                //string msg = String.Format("Result = {0}", e.Result);
+                //MessageBox.Show(msg);
+            }
+        }
+
+        #endregion BackgroundWorker
+
+        #region Email Queue Initial Setup
+
         public IList<MailItem> InitEmailQueue(int batchSize, BackgroundWorker worker)
         {
             _worker = worker;
             
             // Extract first batch
+            batchSize = batchSize < _frame.RowCount ? batchSize : _frame.RowCount;
             var firstIteration = _frame.GetRowsAt(Enumerable.Range(0, batchSize).ToArray());
 
             // Drop extracted range from source table
@@ -112,134 +214,124 @@ namespace QuickFiler.Controllers
             _tokenSource = tokenSource;
             _worker = worker;
 
-            var emailList = await Task.Factory.StartNew(() => InitEmailQueue(batchSize, worker), 
-                                                        token,
-                                                        TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            var emailList = await Task.Run(() => InitEmailQueue(batchSize, worker), token);
+
 
             return emailList;
         }
 
-        public void SetupWorker(System.ComponentModel.BackgroundWorker worker) 
+        private async Task<bool> LoadRemainingEmailsToQueueAsync(CancellationToken cancel)
         {
-            worker.WorkerSupportsCancellation = true;
-            _token.Register(() => worker.CancelAsync());
-            worker.DoWork += new System.ComponentModel.DoWorkEventHandler(Worker_DoWork);
-            //worker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(Worker_RunWorkerCompleted);
-        }
-
-        private void Worker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            // Do not access the form's BackgroundWorker reference directly.
-            // Instead, use the reference provided by the sender parameter.
-            BackgroundWorker bw = sender as BackgroundWorker;
-
-            // Extract the argument.
-            //zxxint arg = (int)e.Argument;
-
-            // Start the time-consuming operation.
-            e.Result = LoadRemainingEmailsToQueue(bw);
-
-            // If the operation was canceled by the user,
-            // set the DoWorkEventArgs.Cancel property to true.
-            if (bw.CancellationPending)
-            {
-                e.Cancel = true;
-            }
-        }
-
-        // This event handler demonstrates how to interpret
-        // the outcome of the asynchronous operation implemented
-        // in the DoWork event handler.
-        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Cancelled)
-            {
-                // The user canceled the operation.
-                MessageBox.Show("Operation was canceled");
-            }
-            else if (e.Error != null)
-            {
-                // There was an error during the operation.
-                string msg = String.Format("An error occurred: {0}", e.Error.Message);
-                MessageBox.Show(msg);
-            }
-            else
-            {
-                // The operation completed normally.
-                //string msg = String.Format("Result = {0}", e.Result);
-                //MessageBox.Show(msg);
-            }
-        }
-
-        private bool LoadRemainingEmailsToQueue(BackgroundWorker bw)
-        {
-            if((_frame is null) || (_frame.RowCount == 0))
+            if ((_frame is null) || (_frame.RowCount == 0))
             {
                 MessageBox.Show("Email Frame is empty");
-                _masterQueue = new ConcurrentQueue<MailItem>();
+                return false;
+            }
+
+            // Cast Frame to array of IEmailInfo
+            var rows = await Task.Run(() => _frame.GetRowsAs<IEmailSortInfo>().Values.ToArray());
+                        
+            foreach (var row in rows)
+            {
+                try
+                {
+                    cancel.ThrowIfCancellationRequested();
+                    //var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
+                    var item = await Task.Run(() => _olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId), cancel);
+                    if (item is not null && item is MailItem mailItem)
+                    {
+                        _masterQueue.AddLast(mailItem);
+                        _moveMonitor.HookItem(mailItem, (x) => _masterQueue.Remove(x));
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    //logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
+                    return false;
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error($"{nameof(LoadRemainingEmailsToQueue)} Error. \n {e.Message}\n{e.StackTrace}");
+                    throw e;
+                }
+                await Task.Yield();
+            }
+            return true;
+
+        }
+
+
+        private bool LoadRemainingEmailsToQueue(BackgroundWorker bw, CancellationToken token)
+        {
+            if ((_frame is null) || (_frame.RowCount == 0))
+            {
+                MessageBox.Show("Email Frame is empty");
                 return false;
             }
             
             // Cast Frame to array of IEmailInfo
             var rows = _frame.GetRowsAs<IEmailSortInfo>().Values.ToArray();
 
-            // Batch Process
-            // Convert array of IEmailInfo to List<MailItem>
-            var emailList = rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ToList();
-
-            //// Cast list to concurrent queue
-            _masterQueue = new ConcurrentQueue<MailItem>(emailList);
-
-            //_masterQueue = new ConcurrentQueue<MailItem>();
-
-            rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ForEach(item => _masterQueue.Enqueue(item));
-
+            foreach (var row in rows)
+            {
+                try
+                {
+                    token.ThrowIfCancellationRequested();
+                    //var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
+                    var item = _olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
+                    if (item is not null && item is MailItem mailItem)
+                    {
+                        _masterQueue.AddLast(mailItem);
+                        _moveMonitor.HookItem(mailItem, (x) => _masterQueue.Remove(x));
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    //logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
+                    return false;
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error($"{nameof(LoadRemainingEmailsToQueue)} Error. \n {e.Message}\n{e.StackTrace}");
+                    throw e;
+                }
+            }
             return true;
             
         }
-                                
-        public async Task<IList<MailItem>> DequeueNextItemGroupAsync(int quantity, int timeOut)
+
+        private async Task<bool> LoadRemainingEmailsToQueueAsync(BackgroundWorker bw, CancellationToken token)
         {
-            int i;
-            CancellationTokenSource toSrc = new CancellationTokenSource();
-            toSrc.CancelAfter(timeOut);
-            CancellationToken toToken = toSrc.Token;
+            if ((_frame is null) || (_frame.RowCount == 0))
+            {
+                MessageBox.Show("Email Frame is empty");
+                return false;
+            }
 
-            IList<MailItem> listObjects = new List<MailItem>();
-
-            // Wait for the queue to be sufficiently populated or terminate populating
-            await WaitForQueue(quantity, toToken);
-
-            toToken.ThrowIfCancellationRequested();
-            _token.ThrowIfCancellationRequested();
-
-            // Adjust quantity to the lesser of the queue size or the requested quantity
-            int adjustedQuantity = quantity < _masterQueue.Count ? quantity : _masterQueue.Count;
-
-            if (adjustedQuantity == 0) { Complete = true;}
+            try
+            {
+                await _frame.GetRowsAs<IEmailSortInfo>().Values.ToAsyncEnumerable().ForEachAwaitWithCancellationAsync(
+                    async (row, token) => await Task.Run(() =>
+                    {
+                        token.ThrowIfCancellationRequested();    
+                        var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
+                        _masterQueue.AddLast(item);
+                        _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
+                    }, token),
+                    token);
+                return true;
+            }
+            catch (TaskCanceledException)
+            {
+                //logger.Debug($"{nameof(LoadRemainingEmailsToQueueAsync)} Task cancelled");
+                return false;
+            }
             
-            for (i = 1; i <= adjustedQuantity; i++)
-            {
-                if (_masterQueue.TryDequeue(out MailItem item))
-                    listObjects.Add(item);
-            }
 
-            return listObjects;
-        }
+            
 
-        internal async Task WaitForQueue(int quantity, CancellationToken toToken)
-        {
-            while (_worker.IsBusy && (_masterQueue is null || _masterQueue.Count < quantity))
-            {
-                toToken.ThrowIfCancellationRequested();
-                await Task.Delay(200);
-            }
-        }
+            
 
-        //TODO: Implement UndoMove()
-        public void UndoMove()
-        {
-            throw new NotImplementedException();
         }
 
         public Frame<int, string> InitDf(Explorer activeExplorer)
@@ -277,47 +369,58 @@ namespace QuickFiler.Controllers
 
         public async Task InitDfAsync(Explorer activeExplorer, ProgressTracker progress)
         {
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Toggle offline mode");
-
-            var offline = await ToggleOfflineMode(_globals.Ol.NamespaceMAPI.Offline);
             
-            Frame<int, string> df = null;
-                        
-            logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(DfDeedle.GetEmailDataInViewAsync)} ... ");
-            try
-            {
-                df = await DfDeedle.GetEmailDataInViewAsync(
-                    activeExplorer, Token, TokenSource, progress.Increment(3).SpawnChild(78))
-                    .ConfigureAwait(false);
-            }
-            catch (TaskCanceledException)
-            {
-                await ToggleOfflineMode(offline);
-            }
-            catch (System.Exception e)
-            {
-                await ToggleOfflineMode(offline);
-                throw e;
-            }
+            var df = await GetEmailsInViewDfAsync(activeExplorer, progress).ConfigureAwait(false);
 
             if (df is not null)
             {
-                // Restore online mode if it was previously so
-                await ToggleOfflineMode(offline);
-
-                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Filtering df ... ");
+                //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Filtering df ... ");
                 // Filter out non-email items
                 df = df.FilterRowsBy("MessageClass", "IPM.Note");
 
                 // Filter to the latest email in each conversation
                 var dfFiltered = MostRecentByConversation(df);
 
-                logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Sorting df ... ");
+                //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Sorting df ... ");
                 // Sort by triage classification and then date
                 _frame = SortTriageDate(dfFiltered);
 
                 progress.Report(100);
-            }    
+            }
+        }
+
+        private async Task<Frame<int, string>> GetEmailsInViewDfAsync(Explorer activeExplorer, ProgressTracker progress)
+        {
+            Frame<int, string> df = null;
+
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Toggle offline mode");
+            var offline = await ToggleOfflineMode(_globals.Ol.NamespaceMAPI.Offline);
+            
+            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(DfDeedle.GetEmailDataInViewAsync)} ... ");
+            try
+            {
+                df = await DfDeedle.GetEmailDataInViewAsync(
+                    activeExplorer, Token, TokenSource, progress.Increment(3).SpawnChild(78))
+                    .ConfigureAwait(false);
+                await ToggleOfflineMode(offline);
+                
+                //df.DisplayDialog();
+                
+                return df;
+            }
+            catch (TaskCanceledException)
+            {
+                //logger.Debug($"{nameof(DfDeedle.GetEmailDataInViewAsync)} Task cancelled");
+                await ToggleOfflineMode(offline);
+                return null;
+            }
+            catch (System.Exception e)
+            {
+                await ToggleOfflineMode(offline);
+                logger.Error($"{nameof(DfDeedle.GetEmailDataInViewAsync)} Error. \n {e.Message}\n{e.StackTrace}");
+                throw e;
+            }
+
         }
 
         public Frame<int, string> SortTriageDate(Frame<int, string> df)
@@ -360,11 +463,173 @@ namespace QuickFiler.Controllers
             var dfFiltered = Frame.FromRows(rows);
             return dfFiltered;
         }
+
+        #endregion Email Queue Initial Setup
+
+        #region Email Queue Processing
+
+        //TODO: Implement UndoMove()
+        public void UndoMove()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void TryUnhookOrReplace(ref List<MailItem> nodes, int i) 
+        {
+            if (nodes is null || nodes.Count == 0 || nodes.Count < i + 1) 
+            { 
+                logger.Error($"Error unhooking item from move monitor. No items in array or index out of range. nodes.Length = {nodes?.Count ?? 0} but index i = {i}");
+                return; 
+            }
+            var node = nodes[i];
+            bool processing = true;
+            while (processing)
+            {
+                try
+                {
+                    _moveMonitor.UnhookItem(node);                    
+                    processing = false;
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error($"Error unhooking item from move monitor. Getting next item from Queue {e.Message}");
+                    nodes.Remove(node);
+                    node = _masterQueue.TryTakeFirst();
+                    if (node is null)
+                    {
+                        processing = false;
+                    }
+                    else
+                    {
+                        nodes.Insert(i, node);
+                    }
+                }
+            }
+        }
+        
+        public async Task<IList<MailItem>> DequeueNextItemGroupAsync(int quantity, int timeOut)
+        {
+            _token.ThrowIfCancellationRequested();
+
+            if (_masterQueue.Count < quantity)
+                await WaitForQueue(quantity, _token);
+
+            var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
+            if (nodes is null) { return null; }
+
+            try
+            {                                
+                await Task.Run(() => 
+                {
+                    var max = nodes.Count;
+                    for (int i = 0; i < max; i++)
+                    {
+                        TryUnhookOrReplace(ref nodes, i);
+                        //var node = nodes[i];
+                        //_token.ThrowIfCancellationRequested();
+                        //bool processing = true;
+                        //while (processing) 
+                        //{
+                        //    try
+                        //    {
+                        //        await _moveMonitor.UnhookItemAsync(node, _token);
+                        //        processing = false;
+                        //    }
+                        //    catch (System.Exception e)
+                        //    {
+                        //        logger.Error($"Error unhooking item from move monitor. Getting next item from Queue {e.Message}");                                    
+                        //        nodes.Remove(node);
+                        //        node = _masterQueue.TryTakeFirst();
+                        //        if (node is null) 
+                        //        {
+                        //            processing = false;
+                        //        }
+                        //        else
+                        //        {
+                        //            nodes.Insert(i, node);
+                        //        }
+                        //    }
+                        //}
+                            
+                    }                    
+                }, _token);                    
+               
                 
+            }
+            catch (System.Exception e)
+            {
+                logger.Error("Error unhooking items from move monitor", e);
+                throw;
+            }
+            
+            
+            return nodes;
+        }
+
+        public IList<MailItem> DequeueNextItemGroup(int quantity)
+        {
+            _token.ThrowIfCancellationRequested();
+
+            var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
+            try
+            {
+                var max = nodes.Count;
+                for (int i = 0; i < max; i++)
+                {
+                    TryUnhookOrReplace(ref nodes, i);
+                }                   
+            }
+            catch (System.Exception e)
+            {
+                logger.Error("Error unhooking items from move monitor", e);
+                throw;
+            }
+            return nodes;
+        }
+
+        internal async Task WaitForQueue(int quantity, CancellationToken token)
+        {
+            while (_worker.IsBusy && (_masterQueue?.Count < quantity))
+            {
+                token.ThrowIfCancellationRequested();
+                await Task.Delay(200);
+            }
+        }
+
+        #endregion Email Queue Processing
+
+        #region Linked List Locking
+
+
+
+        #endregion Linked List Locking
+
+        #region Event Handlers
+
+        void Application_NewMailEx(string entryID)
+        {
+            //var item = _globals.Ol.App.Session.GetItemFromID(entryID, System.Reflection.Missing.Value);
+            try
+            {
+                var item = _globals.Ol.App.Session.GetItemFromID(entryID) as MailItem;
+                if (item is not null) { _masterQueue.AddFirst(item); }
+            }
+            catch (System.Exception e)
+            {
+                logger.Error(e.Message, e);
+            }
+            
+            
+        }
+
+        #endregion Event Handlers
     }
 
     internal class EmailSorter
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public EmailSorter() { }
         public EmailSorter(SortOptionsEnum options) { _options = options; }
 
@@ -389,9 +654,22 @@ namespace QuickFiler.Controllers
 
         public long GetSortKey(string triage, DateTime dateTime)
         {
-            if (_options.HasFlag(SortOptionsEnum.TriageImportantFirst) && _options.HasFlag(SortOptionsEnum.DateRecentFirst))
+            if (_options.HasFlag(SortOptionsEnum.TriageImportantFirst) && 
+                _options.HasFlag(SortOptionsEnum.DateRecentFirst))
             {
-                return (long)(100000000000000 * _triageImportantLast[triage]) + GetDateKey(dateTime); 
+                try
+                {
+                    var triageKey = (long)(100000000000000 * _triageImportantLast[triage]) 
+                        + GetDateKey(dateTime);
+                    return triageKey;
+                }
+                catch (KeyNotFoundException e)
+                {
+                    logger.Error($"Triage value {triage} not found in " +
+                        $"dictionary from date {GetDateKey(dateTime)} " +
+                        $"\n {e.Message} \n {e.StackTrace}");
+                    throw;
+                }
             }
             return -1;
         }

@@ -1,68 +1,79 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
-using Outlook = Microsoft.Office.Interop.Outlook;
-using Office = Microsoft.Office.Core;
 using Microsoft.Office.Interop.Outlook;
-using System.Runtime.CompilerServices;
-using System.Diagnostics;
-using ToDoModel;
 using Microsoft.Office.Core;
-using QuickFiler;
 using UtilitiesCS;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using UtilitiesCS.Threading;
 
-
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
-
+[assembly: InternalsVisibleTo("TaskMaster.Test")]
 namespace TaskMaster
 {
     public partial class ThisAddIn
     {
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
-            logger.Debug($"Application Starting");
+            logger.Debug("ThisAddIn_Startup() fired");
+
             // Ensure that forms are ready for high resolution
             InitializeDPI();
 
-            // Create the global variables
-            _globals = new ApplicationGlobals(Application);
-
             // Grab the sync context for the UI thread
-            UIThreadExtensions.InitUiContext(monitorUiThread: false);
+            UiThread.Init(monitorUiThread: false);
 
-            // Initialize the global variables on a low priority thread
-            _ = _globals.LoadAsync();
+            Application.Startup += Application_Startup;
+        }
 
-            // Initialize long loading elements on a low priority thread
-            EfcViewerQueue.BuildQueue(2);
-            //ItemViewerQueue.BuildQueueWhenIdle(10);
-            ItemViewerQueue.BuildQueueBackground(30);
-            
-            // Initialize IdleAction Queue so that breakpoint is hit after UI
-            IdleActionQueue.AddEntry(()=>Debug.WriteLine("App Idle"));
+        private void Application_Startup()
+        {
+            logger.Debug("Application_Startup() fired");
+            //IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => 
+            //{ 
+            SetUpBrightIdeasSettings();
+            SetUpDeedle();
+            //}));
 
-            // Redirect the console output to the debug window for Deedle df.Print() calls
-            DebugTextWriter tw = new DebugTextWriter();
-            Console.SetOut(tw);
-            
-            // Send a reference to the ribbon controller and external utilities for future use
+            _globals = new ApplicationGlobals(Application, true);
             _ribbonController.SetGlobals(_globals);
             _externalUtilities.SetGlobals(_globals, _ribbonController);
 
-            // Hook the Inbox and ToDo events
-            //_globals.Events.Hook();
-            logger.Debug("ThisAddIn_Startup() complete");
+            IdleAsyncQueue.AddEntry(true, async () =>
+            {                
+                await _globals.LoadAsync(false);
+                logger.Debug("Finished loading globals");
+            });
+            
+            //IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => _ribbonController.SetGlobals(_globals)));
+            //IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => _externalUtilities.SetGlobals(_globals, _ribbonController)));
+            IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => logger.Debug("IdleAsyncQueue Complete")));
+            logger.Debug("Application_Startup() complete");
+        }
 
+        private void SetUpDeedle()
+        {
+            // Redirect the console output to the debug window for Deedle df.Print() calls
+            DebugTextWriter tw = new();
+            Console.SetOut(tw);
+        }
+
+        /// <summary>
+        /// Set the indent for TreeListView Renderer which does not autoscale.
+        /// Default pixels per level was 16 + 1 but designed for 100% scaling.
+        /// This add-in is designed for 200% scaling.
+        /// </summary>
+        private void SetUpBrightIdeasSettings()
+        {            
+            var tlvIndent = 34;
+            tlvIndent = (int)(tlvIndent * UiThread.AutoScaleFactor.Width);
+            BrightIdeasSoftware.TreeListView.TreeRenderer.PIXELS_PER_LEVEL = tlvIndent;
         }
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private ApplicationGlobals _globals;
         private AddInUtilities _externalUtilities;
         private RibbonController _ribbonController;
-
+        
         /// <summary>
         /// Overrides the default behavior of the COM add-in to create an XML ribbon
         /// <seealso cref="RibbonViewer"/> which is controlled by 
@@ -92,11 +103,17 @@ namespace TaskMaster
         /// <returns>Instance of the <seealso cref="AddInUtilities"/> class</returns>
         protected override object RequestComAddInAutomationService()
         {
-            if (_externalUtilities is null)
-                _externalUtilities = new AddInUtilities();
+            _externalUtilities ??= new AddInUtilities();
 
             return _externalUtilities;
         }
+
+        //private async Task FinishLoadingGlobalsAsync()
+        //{
+        //    await loadGlobals;
+        //    logger.Debug("Finished loading globals");
+
+        //}
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
         {

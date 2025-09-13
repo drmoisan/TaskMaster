@@ -79,5 +79,31 @@ namespace UtilitiesCS.Test.Properties {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;html xmlns:v=&quot;urn:schemas-microsoft-com:vml&quot; xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot; xmlns:w=&quot;urn:schemas-microsoft-com:office:word&quot; xmlns:m=&quot;http://schemas.microsoft.com/office/2004/12/omml&quot; xmlns=&quot;http://www.w3.org/TR/REC-html40&quot;&gt;
+        ///	&lt;head&gt;
+        ///		&lt;meta name=Generator content=&quot;Microsoft Word 15 (filtered medium)&quot;&gt;
+        ///		&lt;!--[if !mso]&gt;&lt;style&gt;v\:* {behavior:url(#default#VML);}
+        ///		o\:* {behavior:url(#default#VML);}
+        ///		w\:* {behavior:url(#default#VML);}
+        ///		.shape {behavior:url(#default#VML);}
+        ///		&lt;/style&gt;&lt;! [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string HtmlBodyLinks {
+            get {
+                return ResourceManager.GetString("HtmlBodyLinks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] pplkey {
+            get {
+                object obj = ResourceManager.GetObject("pplkey", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

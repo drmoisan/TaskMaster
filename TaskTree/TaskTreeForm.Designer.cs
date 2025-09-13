@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace TaskTree
 {
-    public partial class TaskTreeForm 
+    public partial class TaskTreeForm
     {
         /// <summary>
         /// Required designer variable.
@@ -31,248 +31,259 @@ namespace TaskTree
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            ImageList1 = new System.Windows.Forms.ImageList(components);
-            ContextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(components);
-            ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            FlowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            But_ReloadTree = new System.Windows.Forms.Button();
-            But_ReloadTree.Click += new EventHandler(But_ReloadTree_Click);
-            But_ExpandCollapse = new System.Windows.Forms.Button();
-            But_ExpandCollapse.Click += new EventHandler(But_ExpandCollapse_Click);
-            But_ShowHideComplete = new System.Windows.Forms.Button();
-            But_ShowHideComplete.Click += new EventHandler(But_ShowHideComplete_Click);
-            SplitContainer1 = new System.Windows.Forms.SplitContainer();
-            TLV = new BrightIdeasSoftware.TreeListView();
-            TLV.ModelCanDrop += new EventHandler<BrightIdeasSoftware.ModelDropEventArgs>(HandleModelCanDrop);
-            TLV.ModelDropped += new EventHandler<BrightIdeasSoftware.ModelDropEventArgs>(HandleModelDropped);
-            TLV.ItemActivate += new EventHandler(TLV_ItemActivate);
-            TLV.FormatRow += new EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(FormatRow);
-            OlvTaskSubject = new BrightIdeasSoftware.OLVColumn();
-            OlvToDoID = new BrightIdeasSoftware.OLVColumn();
-            OlvColumn1 = new BrightIdeasSoftware.OLVColumn();
-            OlvColumn2 = new BrightIdeasSoftware.OLVColumn();
-            OlvColumn3 = new BrightIdeasSoftware.OLVColumn();
-            OlvColumn6 = new BrightIdeasSoftware.OLVColumn();
-            OlvColumn4 = new BrightIdeasSoftware.OLVColumn();
-            OlvColumn5 = new BrightIdeasSoftware.OLVColumn();
-            OlvColumn7 = new BrightIdeasSoftware.OLVColumn();
-            OlvColumn8 = new BrightIdeasSoftware.OLVColumn();
-            OlvColumn9 = new BrightIdeasSoftware.OLVColumn();
-            ContextMenuStrip1.SuspendLayout();
-            FlowLayoutPanel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)SplitContainer1).BeginInit();
-            SplitContainer1.Panel1.SuspendLayout();
-            SplitContainer1.Panel2.SuspendLayout();
-            SplitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)TLV).BeginInit();
-            SuspendLayout();
+            this.components = new System.ComponentModel.Container();
+            this.ImageList1 = new System.Windows.Forms.ImageList(this.components);
+            this.ContextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.FlowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.But_ReloadTree = new System.Windows.Forms.Button();
+            this.But_ExpandCollapse = new System.Windows.Forms.Button();
+            this.But_ShowHideComplete = new System.Windows.Forms.Button();
+            this.SplitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.TreeLv = new BrightIdeasSoftware.TreeListView();
+            this.OlvTaskSubject = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvToDoID = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvColumn1 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvColumn3 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvColumn2 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvColumn9 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvColumn6 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvColumn4 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvColumn5 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvColumn7 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.OlvColumn8 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.ContextMenuStrip1.SuspendLayout();
+            this.FlowLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).BeginInit();
+            this.SplitContainer1.Panel1.SuspendLayout();
+            this.SplitContainer1.Panel2.SuspendLayout();
+            this.SplitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TreeLv)).BeginInit();
+            this.SuspendLayout();
             // 
             // ImageList1
             // 
-            ImageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            ImageList1.ImageSize = new System.Drawing.Size(16, 16);
-            ImageList1.TransparentColor = System.Drawing.Color.Transparent;
+            this.ImageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.ImageList1.ImageSize = new System.Drawing.Size(16, 16);
+            this.ImageList1.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // ContextMenuStrip1
             // 
-            ContextMenuStrip1.ImageScalingSize = new System.Drawing.Size(36, 36);
-            ContextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuItem1 });
-            ContextMenuStrip1.Name = "ContextMenuStrip1";
-            ContextMenuStrip1.Size = new System.Drawing.Size(104, 26);
+            this.ContextMenuStrip1.ImageScalingSize = new System.Drawing.Size(36, 36);
+            this.ContextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ToolStripMenuItem1});
+            this.ContextMenuStrip1.Name = "ContextMenuStrip1";
+            this.ContextMenuStrip1.Size = new System.Drawing.Size(104, 26);
             // 
             // ToolStripMenuItem1
             // 
-            ToolStripMenuItem1.Name = "ToolStripMenuItem1";
-            ToolStripMenuItem1.Size = new System.Drawing.Size(103, 22);
-            ToolStripMenuItem1.Text = "Open";
+            this.ToolStripMenuItem1.Name = "ToolStripMenuItem1";
+            this.ToolStripMenuItem1.Size = new System.Drawing.Size(103, 22);
+            this.ToolStripMenuItem1.Text = "Open";
             // 
             // FlowLayoutPanel1
             // 
-            FlowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            FlowLayoutPanel1.Controls.Add(But_ReloadTree);
-            FlowLayoutPanel1.Controls.Add(But_ExpandCollapse);
-            FlowLayoutPanel1.Controls.Add(But_ShowHideComplete);
-            FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            FlowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            FlowLayoutPanel1.Name = "FlowLayoutPanel1";
-            FlowLayoutPanel1.Size = new System.Drawing.Size(1369, 50);
-            FlowLayoutPanel1.TabIndex = 1;
+            this.FlowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.FlowLayoutPanel1.Controls.Add(this.But_ReloadTree);
+            this.FlowLayoutPanel1.Controls.Add(this.But_ExpandCollapse);
+            this.FlowLayoutPanel1.Controls.Add(this.But_ShowHideComplete);
+            this.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.FlowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.FlowLayoutPanel1.Name = "FlowLayoutPanel1";
+            this.FlowLayoutPanel1.Size = new System.Drawing.Size(1369, 50);
+            this.FlowLayoutPanel1.TabIndex = 1;
             // 
             // But_ReloadTree
             // 
-            But_ReloadTree.Location = new System.Drawing.Point(3, 3);
-            But_ReloadTree.Name = "But_ReloadTree";
-            But_ReloadTree.Size = new System.Drawing.Size(117, 23);
-            But_ReloadTree.TabIndex = 0;
-            But_ReloadTree.Text = "Reload Tree";
-            But_ReloadTree.UseVisualStyleBackColor = true;
+            this.But_ReloadTree.Location = new System.Drawing.Point(3, 3);
+            this.But_ReloadTree.Name = "But_ReloadTree";
+            this.But_ReloadTree.Size = new System.Drawing.Size(117, 23);
+            this.But_ReloadTree.TabIndex = 0;
+            this.But_ReloadTree.Text = "Reload Tree";
+            this.But_ReloadTree.UseVisualStyleBackColor = true;
+            this.But_ReloadTree.Click += new System.EventHandler(this.But_ReloadTree_Click);
             // 
             // But_ExpandCollapse
             // 
-            But_ExpandCollapse.Location = new System.Drawing.Point(126, 3);
-            But_ExpandCollapse.Name = "But_ExpandCollapse";
-            But_ExpandCollapse.Size = new System.Drawing.Size(117, 23);
-            But_ExpandCollapse.TabIndex = 1;
-            But_ExpandCollapse.Text = "Expand / Collapse All";
-            But_ExpandCollapse.UseVisualStyleBackColor = true;
+            this.But_ExpandCollapse.Location = new System.Drawing.Point(126, 3);
+            this.But_ExpandCollapse.Name = "But_ExpandCollapse";
+            this.But_ExpandCollapse.Size = new System.Drawing.Size(117, 23);
+            this.But_ExpandCollapse.TabIndex = 1;
+            this.But_ExpandCollapse.Text = "Expand / Collapse All";
+            this.But_ExpandCollapse.UseVisualStyleBackColor = true;
+            this.But_ExpandCollapse.Click += new System.EventHandler(this.But_ExpandCollapse_Click);
             // 
             // But_ShowHideComplete
             // 
-            But_ShowHideComplete.Location = new System.Drawing.Point(249, 3);
-            But_ShowHideComplete.Name = "But_ShowHideComplete";
-            But_ShowHideComplete.Size = new System.Drawing.Size(117, 23);
-            But_ShowHideComplete.TabIndex = 3;
-            But_ShowHideComplete.Text = "Show/Hide Complete";
-            But_ShowHideComplete.UseVisualStyleBackColor = true;
+            this.But_ShowHideComplete.Location = new System.Drawing.Point(249, 3);
+            this.But_ShowHideComplete.Name = "But_ShowHideComplete";
+            this.But_ShowHideComplete.Size = new System.Drawing.Size(117, 23);
+            this.But_ShowHideComplete.TabIndex = 3;
+            this.But_ShowHideComplete.Text = "Show/Hide Complete";
+            this.But_ShowHideComplete.UseVisualStyleBackColor = true;
+            this.But_ShowHideComplete.Click += new System.EventHandler(this.But_ShowHideComplete_Click);
             // 
             // SplitContainer1
             // 
-            SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            SplitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            SplitContainer1.IsSplitterFixed = true;
-            SplitContainer1.Location = new System.Drawing.Point(0, 0);
-            SplitContainer1.Name = "SplitContainer1";
-            SplitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SplitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.SplitContainer1.IsSplitterFixed = true;
+            this.SplitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.SplitContainer1.Name = "SplitContainer1";
+            this.SplitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
             // SplitContainer1.Panel1
             // 
-            SplitContainer1.Panel1.AccessibleName = "SplitContainer1Panel1";
-            SplitContainer1.Panel1.Controls.Add(FlowLayoutPanel1);
-            SplitContainer1.Panel1MinSize = 35;
+            this.SplitContainer1.Panel1.AccessibleName = "SplitContainer1Panel1";
+            this.SplitContainer1.Panel1.Controls.Add(this.FlowLayoutPanel1);
+            this.SplitContainer1.Panel1MinSize = 35;
             // 
             // SplitContainer1.Panel2
             // 
-            SplitContainer1.Panel2.AccessibleName = "SplitContainer1Panel2";
-            SplitContainer1.Panel2.Controls.Add(TLV);
-            SplitContainer1.Size = new System.Drawing.Size(1369, 476);
-            SplitContainer1.TabIndex = 2;
+            this.SplitContainer1.Panel2.AccessibleName = "SplitContainer1Panel2";
+            this.SplitContainer1.Panel2.Controls.Add(this.TreeLv);
+            this.SplitContainer1.Size = new System.Drawing.Size(1369, 476);
+            this.SplitContainer1.TabIndex = 2;
             // 
-            // TLV
+            // TreeLv
             // 
-            TLV.AllColumns.Add(OlvTaskSubject);
-            TLV.AllColumns.Add(OlvToDoID);
-            TLV.AllColumns.Add(OlvColumn1);
-            TLV.AllColumns.Add(OlvColumn3);
-            TLV.AllColumns.Add(OlvColumn2);
-            TLV.AllColumns.Add(OlvColumn9);
-            TLV.AllColumns.Add(OlvColumn6);
-            TLV.AllColumns.Add(OlvColumn4);
-            TLV.AllColumns.Add(OlvColumn5);
-            TLV.AllColumns.Add(OlvColumn7);
-            TLV.AllColumns.Add(OlvColumn8);
-            TLV.AllowColumnReorder = true;
-            TLV.AllowDrop = true;
-            TLV.CellEditActivation = BrightIdeasSoftware.ObjectListView.CellEditActivateMode.SingleClick;
-            TLV.CellEditUseWholeCell = false;
-            TLV.CheckBoxes = true;
-            TLV.CheckedAspectName = "Value.Complete";
-            TLV.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { OlvTaskSubject, OlvToDoID, OlvColumn3, OlvColumn2, OlvColumn9, OlvColumn6, OlvColumn4, OlvColumn7, OlvColumn8 });
-            TLV.Cursor = System.Windows.Forms.Cursors.Default;
-            TLV.Dock = System.Windows.Forms.DockStyle.Fill;
-            TLV.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.0f, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            TLV.HideSelection = false;
-            TLV.IsSimpleDragSource = true;
-            TLV.IsSimpleDropSink = true;
-            TLV.Location = new System.Drawing.Point(0, 0);
-            TLV.Name = "TLV";
-            TLV.ShowGroups = false;
-            TLV.ShowImagesOnSubItems = true;
-            TLV.Size = new System.Drawing.Size(1369, 422);
-            TLV.SmallImageList = ImageList1;
-            TLV.TabIndex = 0;
-            TLV.UseCompatibleStateImageBehavior = false;
-            TLV.UseFiltering = true;
-            TLV.View = System.Windows.Forms.View.Details;
-            TLV.VirtualMode = true;
+            this.TreeLv.AllColumns.Add(this.OlvTaskSubject);
+            this.TreeLv.AllColumns.Add(this.OlvToDoID);
+            this.TreeLv.AllColumns.Add(this.OlvColumn1);
+            this.TreeLv.AllColumns.Add(this.OlvColumn3);
+            this.TreeLv.AllColumns.Add(this.OlvColumn2);
+            this.TreeLv.AllColumns.Add(this.OlvColumn9);
+            this.TreeLv.AllColumns.Add(this.OlvColumn6);
+            this.TreeLv.AllColumns.Add(this.OlvColumn4);
+            this.TreeLv.AllColumns.Add(this.OlvColumn5);
+            this.TreeLv.AllColumns.Add(this.OlvColumn7);
+            this.TreeLv.AllColumns.Add(this.OlvColumn8);
+            this.TreeLv.AllowColumnReorder = true;
+            this.TreeLv.AllowDrop = true;
+            this.TreeLv.CellEditActivation = BrightIdeasSoftware.ObjectListView.CellEditActivateMode.SingleClick;
+            this.TreeLv.CellEditUseWholeCell = false;
+            this.TreeLv.CheckBoxes = true;
+            this.TreeLv.CheckedAspectName = "Value.Complete";
+            this.TreeLv.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.OlvTaskSubject,
+            this.OlvToDoID,
+            this.OlvColumn3,
+            this.OlvColumn2,
+            this.OlvColumn9,
+            this.OlvColumn6,
+            this.OlvColumn4,
+            this.OlvColumn7,
+            this.OlvColumn8});
+            this.TreeLv.Cursor = System.Windows.Forms.Cursors.Default;
+            this.TreeLv.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TreeLv.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TreeLv.HideSelection = false;
+            this.TreeLv.IsSimpleDragSource = true;
+            this.TreeLv.IsSimpleDropSink = true;
+            this.TreeLv.Location = new System.Drawing.Point(0, 0);
+            this.TreeLv.Name = "TreeLv";
+            this.TreeLv.ShowGroups = false;
+            this.TreeLv.ShowImagesOnSubItems = true;
+            this.TreeLv.Size = new System.Drawing.Size(1369, 422);
+            this.TreeLv.SmallImageList = this.ImageList1;
+            this.TreeLv.TabIndex = 0;
+            this.TreeLv.UseCompatibleStateImageBehavior = false;
+            this.TreeLv.UseFiltering = true;
+            this.TreeLv.View = System.Windows.Forms.View.Details;
+            this.TreeLv.VirtualMode = true;
+            this.TreeLv.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.FormatRow);
+            this.TreeLv.ModelCanDrop += new System.EventHandler<BrightIdeasSoftware.ModelDropEventArgs>(this.HandleModelCanDrop);
+            this.TreeLv.ModelDropped += new System.EventHandler<BrightIdeasSoftware.ModelDropEventArgs>(this.HandleModelDropped);
+            this.TreeLv.ItemActivate += new System.EventHandler(this.TLV_ItemActivate);
             // 
             // OlvTaskSubject
             // 
-            OlvTaskSubject.AspectName = "Value.TaskSubject";
-            OlvTaskSubject.Text = "Task Subject";
-            OlvTaskSubject.Width = 246;
+            this.OlvTaskSubject.AspectName = "Value.TaskSubject";
+            this.OlvTaskSubject.Text = "Task Subject";
+            this.OlvTaskSubject.Width = 246;
             // 
             // OlvToDoID
             // 
-            OlvToDoID.AspectName = "Value.ToDoID";
-            OlvToDoID.Text = "To Do ID";
-            OlvToDoID.Width = 117;
+            this.OlvToDoID.AspectName = "Value.ToDoID";
+            this.OlvToDoID.Text = "To Do ID";
+            this.OlvToDoID.Width = 241;
             // 
             // OlvColumn1
             // 
-            OlvColumn1.AspectName = "Value.Project";
-            OlvColumn1.DisplayIndex = 1;
-            OlvColumn1.IsVisible = false;
-            OlvColumn1.Text = "Project";
-            OlvColumn1.Width = 114;
-            // 
-            // OlvColumn2
-            // 
-            OlvColumn2.AspectName = "Value.Topic";
-            OlvColumn2.Text = "Topic";
-            OlvColumn2.Width = 94;
+            this.OlvColumn1.AspectName = "Value.Projects.AsStringNoPrefix";
+            this.OlvColumn1.DisplayIndex = 1;
+            this.OlvColumn1.IsVisible = false;
+            this.OlvColumn1.Text = "Project";
+            this.OlvColumn1.Width = 114;
             // 
             // OlvColumn3
             // 
-            OlvColumn3.AspectName = "Value.People";
-            OlvColumn3.Text = "People";
-            OlvColumn3.Width = 122;
+            this.OlvColumn3.AspectName = "Value.People.AsStringNoPrefix";
+            this.OlvColumn3.Text = "People";
+            this.OlvColumn3.Width = 187;
             // 
-            // OlvColumn6
+            // OlvColumn2
             // 
-            OlvColumn6.AspectName = "Value.MetaTaskLvl";
-            OlvColumn6.Text = "Lvl";
-            // 
-            // OlvColumn4
-            // 
-            OlvColumn4.AspectName = "Value.MetaTaskSubject";
-            OlvColumn4.Text = "Meta Task";
-            OlvColumn4.Width = 187;
-            // 
-            // OlvColumn5
-            // 
-            OlvColumn5.AspectName = "Value.TaskCreateDate";
-            OlvColumn5.DisplayIndex = 6;
-            OlvColumn5.IsVisible = false;
-            OlvColumn5.Text = "Created";
-            OlvColumn5.Width = 146;
-            // 
-            // OlvColumn7
-            // 
-            OlvColumn7.AspectName = "Value.StartDate";
-            OlvColumn7.Text = "Started";
-            OlvColumn7.Width = 100;
-            // 
-            // OlvColumn8
-            // 
-            OlvColumn8.AspectName = "Value.InFolder";
-            OlvColumn8.Text = "In Folder";
-            OlvColumn8.Width = 103;
+            this.OlvColumn2.AspectName = "Value.Topics.AsStringNoPrefix";
+            this.OlvColumn2.Text = "Topics";
+            this.OlvColumn2.Width = 160;
             // 
             // OlvColumn9
             // 
-            OlvColumn9.AspectName = "Value.Context";
-            OlvColumn9.Text = "Context";
-            OlvColumn9.Width = 112;
+            this.OlvColumn9.AspectName = "Value.Context.AsStringNoPrefix";
+            this.OlvColumn9.Text = "Context";
+            this.OlvColumn9.Width = 269;
+            // 
+            // OlvColumn6
+            // 
+            this.OlvColumn6.AspectName = "Value.MetaTaskLvl";
+            this.OlvColumn6.Text = "Lvl";
+            // 
+            // OlvColumn4
+            // 
+            this.OlvColumn4.AspectName = "Value.MetaTaskSubject";
+            this.OlvColumn4.Text = "Meta Task";
+            this.OlvColumn4.Width = 187;
+            // 
+            // OlvColumn5
+            // 
+            this.OlvColumn5.AspectName = "Value.TaskCreateDate";
+            this.OlvColumn5.DisplayIndex = 6;
+            this.OlvColumn5.IsVisible = false;
+            this.OlvColumn5.Text = "Created";
+            this.OlvColumn5.Width = 146;
+            // 
+            // OlvColumn7
+            // 
+            this.OlvColumn7.AspectName = "Value.StartDate";
+            this.OlvColumn7.Text = "Started";
+            this.OlvColumn7.Width = 216;
+            // 
+            // OlvColumn8
+            // 
+            this.OlvColumn8.AspectName = "Value.InFolder";
+            this.OlvColumn8.Text = "In Folder";
+            this.OlvColumn8.Width = 198;
             // 
             // TaskTreeForm
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(6.0f, 13.0f);
-            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(1369, 476);
-            Controls.Add(SplitContainer1);
-            Name = "TaskTreeForm";
-            Text = "TaskTreeForm";
-            ContextMenuStrip1.ResumeLayout(false);
-            FlowLayoutPanel1.ResumeLayout(false);
-            SplitContainer1.Panel1.ResumeLayout(false);
-            SplitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)SplitContainer1).EndInit();
-            SplitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)TLV).EndInit();
-            Load += new EventHandler(TaskTreeForm_Load);
-            Resize += new EventHandler(TaskTreeForm_Resize);
-            ResumeLayout(false);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(1369, 476);
+            this.Controls.Add(this.SplitContainer1);
+            this.Name = "TaskTreeForm";
+            this.Text = "TaskTreeForm";
+            this.Load += new System.EventHandler(this.TaskTreeForm_Load);
+            this.Resize += new System.EventHandler(this.TaskTreeForm_Resize);
+            this.ContextMenuStrip1.ResumeLayout(false);
+            this.FlowLayoutPanel1.ResumeLayout(false);
+            this.SplitContainer1.Panel1.ResumeLayout(false);
+            this.SplitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.SplitContainer1)).EndInit();
+            this.SplitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.TreeLv)).EndInit();
+            this.ResumeLayout(false);
+
         }
 
         #endregion
@@ -295,7 +306,7 @@ namespace TaskTree
         internal System.Windows.Forms.SplitContainer SplitContainer1;
         internal BrightIdeasSoftware.OLVColumn OlvColumn7;
         internal BrightIdeasSoftware.OLVColumn OlvColumn8;
-        internal BrightIdeasSoftware.TreeListView TLV;
+        internal BrightIdeasSoftware.TreeListView TreeLv;
         internal BrightIdeasSoftware.OLVColumn OlvColumn9;
     }
 }

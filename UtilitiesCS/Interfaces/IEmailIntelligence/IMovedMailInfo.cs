@@ -19,12 +19,14 @@ namespace UtilitiesCS
         
         [JsonIgnore]
         Application OlApp { get; set; }
+        [JsonIgnore]
+        IApplicationGlobals Globals { get; set; }
 
         [JsonIgnore]
         string OlRootPath { get; set; }
         string StoreId { get; set; }
 
-        bool UndoMove();
+        MailItem UndoMove();
         string UndoMoveMessage(Outlook.Application olApp);
     }
 }

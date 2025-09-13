@@ -20,6 +20,7 @@ namespace UtilitiesCS
         {
             _button = button;
             _button.DialogResult = dialogResult;
+            _button.Click += new System.EventHandler(Button_Click);
             _action = action;
         }
 

@@ -127,9 +127,14 @@ namespace UtilitiesCS
 
     public static class EnumExtensions
     {
-        public static bool HasFlags<TEnum>(this TEnum optionsSelected, params TEnum[] flagsToCheck) where TEnum : Enum
+        public static bool HasAnyFlags<TEnum>(this TEnum optionsSelected, params TEnum[] flagsToCheck) where TEnum : Enum
         {
-            if(flagsToCheck is null || flagsToCheck.Length == 0) { return false; }
+            return flagsToCheck.Any(flag => optionsSelected.HasFlag(flag));            
+        }
+
+        public static bool HasAllFlags<TEnum>(this TEnum optionsSelected, params TEnum[] flagsToCheck) where TEnum : Enum
+        {
+            if (flagsToCheck is null || flagsToCheck.Length == 0) { return false; }
             return optionsSelected.HasFlag(GenericBitwiseStatic<TEnum>.Or(flagsToCheck));
         }
 

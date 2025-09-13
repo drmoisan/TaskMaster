@@ -1,0 +1,30 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="UtilitiesCS.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Prefix_People" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag PPL </Value>
+    </Setting>
+    <Setting Name="Prefix_Context" Type="System.String" Scope="User">
+      <Value Profile="(Default)">_@</Value>
+    </Setting>
+    <Setting Name="Prefix_Topic" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag TOPIC </Value>
+    </Setting>
+    <Setting Name="Prefix_Project" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag PROJECT </Value>
+    </Setting>
+    <Setting Name="Prefix_Today" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag A Top Priority Today</Value>
+    </Setting>
+    <Setting Name="Prefix_Bullpin" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag Bullpin Priorities</Value>
+    </Setting>
+    <Setting Name="Prefix_KB" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tag KB </Value>
+    </Setting>
+    <Setting Name="Prefix_Program" Type="System.String" Scope="User">
+      <Value Profile="(Default)">TagProgram</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

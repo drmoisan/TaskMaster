@@ -1,19 +1,39 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Outlook;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
-using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using UtilitiesCS;
+using UtilitiesCS.OutlookObjects.Store;
+using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.Windows_Forms;
 
 namespace TaskMaster
 {
     public class AppOlObjects : IOlObjects
     {
-        public AppOlObjects(Application olApplication)
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        public AppOlObjects(Application olApplication, IApplicationGlobals appGlobals)
         {
+            _globals = appGlobals;
             _olApplication = olApplication;
+            ResetLazyInboxes();
         }
+
+        public async Task LoadAsync()
+        {
+            await LoadStoresAsync();
+        }
+
+        private IApplicationGlobals _globals;
+        internal ISmartSerializableNonTyped SmartSerializable { get; set; } = new SmartSerializableNonTyped();
 
         private Application _olApplication;
         public Application App { get => _olApplication; }
@@ -64,16 +84,44 @@ namespace TaskMaster
             }
         }
 
-        private Folder _inbox;
-        public Folder Inbox
+        private Lazy<IEnumerable<Folder>> _inboxes;
+        public IEnumerable<Folder> Inboxes => _inboxes.Value;
+        internal IEnumerable<Folder> LoadInboxes()
         {
-            get
+            // TODO: Test with gmail to see if I need to add a filter for non-exchange
+            var stores = NamespaceMAPI.Stores.Cast<Store>().Where(
+                store => store.ExchangeStoreType != OlExchangeStoreType.olExchangePublicFolder);
+            
+            var inboxes = new List<Folder>();
+            foreach (var store in stores) 
             {
-                if (_inbox is null)
-                    _inbox = (Folder)NamespaceMAPI.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
-                return _inbox;
+                MAPIFolder inbox = null;
+                try
+                {                    
+                    inbox = store.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+                }
+                catch (COMException e) 
+                { 
+                    logger.Error($"Error loading inbox from store. {e.Message}", e);
+                }
+                if (inbox is not null)
+                {
+                    inboxes.Add((Folder)inbox);
+                }
             }
+            return inboxes;
         }
+        internal void ResetLazyInboxes() => _inboxes = new Lazy<IEnumerable<Folder>>(LoadInboxes);
+
+        public StoresWrapper StoresWrapper { get; set; }
+        async internal Task LoadStoresAsync() => await Task.Run(async () =>
+        {
+            if (_globals.IntelRes.Config.TryGetValue("StoresWrapper", out var config))
+            {
+                StoresWrapper = await SmartSerializable.DeserializeAsync(config, true, () => new StoresWrapper(_globals).Init());                
+            }
+            else { logger.Error("StoresWrapper config not found."); }
+        }, _globals.AF.CancelToken);
 
         private Reminders _olReminders;
         public Reminders OlReminders
@@ -97,28 +145,85 @@ namespace TaskMaster
             }
         }
 
-        private Folder _emailRoot;
-        public Folder EmailRoot
+        private Folder _inbox;
+        public Folder Inbox
         {
             get
             {
-                if (_emailRoot is null)
-                    _emailRoot = (Folder)App.Session.DefaultStore.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
-                return _emailRoot;
+                if (_inbox is null)
+                    _inbox = (Folder)App.Session.DefaultStore.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+                return _inbox;
             }
         }
         
-        private string _emailRootPath;
-        public string EmailRootPath
+        private string _inboxRootPath;
+        public string InboxPath
         {
             get
             {
-                if (_emailRootPath is null)
+                if (_inboxRootPath is null)
                 {
-                    _emailRootPath = EmailRoot.FolderPath;
+                    _inboxRootPath = Inbox.FolderPath;
                 }
-                return _emailRootPath;
+                return _inboxRootPath;
             }
+        }
+                
+        private Folder _junkPotential;
+        public Folder JunkPotential => Initializer.GetOrLoad(ref _junkPotential, LoadJunkPotential);
+        internal Folder LoadJunkPotential()
+        {
+            var root = new FolderTree(Root).Roots.FirstOrDefault();
+            var folderPath = Properties.Settings.Default.JunkPotential;
+            if (folderPath.IsNullOrEmpty()) { return null; }
+            var sequence = new Queue<string>(folderPath.Split('\\'));
+            
+            var node = root.FindSequentialNode((current, other) => current.Name == other, sequence);
+            var folder = node?.Value?.OlFolder as Folder;
+            if (folder is null) 
+            { 
+                MyBox.ShowDialog("Junk Potential Folder not found. Please select it manually.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                folder = NamespaceMAPI.PickFolder() as Folder;
+                if (folder is null) { return null; }
+                var wrapper = new FolderWrapper(folder, Root);
+                Properties.Settings.Default.OlJunkPotential = wrapper.RelativePath;
+                Properties.Settings.Default.Save();
+            }
+            return folder;
+        }
+
+        private Folder _junkCertain;
+        //public Folder JunkCertain
+        //{
+        //    get
+        //    {
+        //        if (_junkCertain is null)
+        //        {
+        //            _junkCertain = (Folder)App.Session.DefaultStore.GetDefaultFolder(OlDefaultFolders.olFolderJunk);
+        //        }
+        //        return _junkCertain;
+        //    }
+        //}
+        public Folder JunkCertain => Initializer.GetOrLoad(ref _junkCertain, LoadJunkCertain);
+        internal Folder LoadJunkCertain()
+        {
+            var root = new FolderTree(Root).Roots.FirstOrDefault();
+            var folderPath = Properties.Settings.Default.OlJunkCertain;
+            if (folderPath.IsNullOrEmpty()) { return null; }
+            var sequence = new Queue<string>(folderPath.Split('\\'));
+
+            var node = root.FindSequentialNode((current, other) => current.Name == other, sequence);
+            var folder = node?.Value?.OlFolder as Folder;
+            if (folder is null)
+            {
+                MyBox.ShowDialog("Junk Potential Folder not found. Please select it manually.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                folder = NamespaceMAPI.PickFolder() as Folder;
+                if (folder is null) { return null; }
+                var wrapper = new FolderWrapper(folder, Root);
+                Properties.Settings.Default.OlJunkCertain = wrapper.RelativePath;
+                Properties.Settings.Default.Save();
+            }
+            return folder;
         }
 
         private string _archiveRootPath;
@@ -134,17 +239,43 @@ namespace TaskMaster
             }
         }
 
-        private StackObjectCS<object> _movedMails_Stack;
-        public StackObjectCS<object> MovedMails_Stack
+        private Folder _archiveRoot;
+        public Folder ArchiveRoot => Initializer.GetOrLoad(ref _archiveRoot, LoadArchiveRoot);
+        internal Folder LoadArchiveRoot() 
+        {
+            var folderHandler = new FolderPredictor(_globals);
+            return folderHandler.GetFolder(Root.Folders, "Archive");
+        }
+
+        public string EmailPrefixToStrip => Properties.Resources.Email_Prefix_To_Strip;
+        
+        private StackObjectCS<object> _movedMailsStack;
+        public StackObjectCS<object> MovedMailsStack
         {
             get
             {
-                return _movedMails_Stack;
+                return _movedMailsStack;
             }
             set
             {
-                _movedMails_Stack = value;
+                _movedMailsStack = value;
             }
+        }
+
+        private TimedDiskWriter<string> _emailMoveWriter;
+        public TimedDiskWriter<string> EmailMoveWriter => Initializer.GetOrLoad(ref _emailMoveWriter, LoadEmailMoveWriter);
+        public TimedDiskWriter<string> LoadEmailMoveWriter()
+        {
+            var writer = new TimedDiskWriter<string>();
+            writer.Config.WriteInterval = TimeSpan.FromSeconds(5);
+            writer.Config.TryAddTimeout = 20;
+            if (_globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var myDocuments))
+            {
+                SortEmail.WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, myDocuments);
+                writer.DiskWriter = async (items) => await FileIO2.WriteTextFileAsync(_globals.FS.Filenames.MovedMails, items.ToArray(), myDocuments, default);
+                return writer;
+            }
+            else { return null; }
         }
 
         private string _userEmailAddress;
@@ -177,6 +308,31 @@ namespace TaskMaster
             }
         }
 
+        public int GetExplorerScreenNumber()
+        {
+            System.Windows.Forms.Screen screen = GetExplorerScreen();
+            return System.Windows.Forms.Screen.AllScreens.ToList().IndexOf(screen);
+        }
+
+        public Size GetExplorerScreenSize() 
+        {
+            var explorer = App.ActiveExplorer();
+            Rectangle bounds = new(explorer.Left, explorer.Top, explorer.Width, explorer.Height);
+            return bounds.Size;
+        }
+        
+        public System.Windows.Forms.Screen GetExplorerScreen()
+        {
+            var explorer = App.ActiveExplorer();
+            Rectangle bounds = new(explorer.Left, explorer.Top, explorer.Width, explorer.Height);
+            return System.Windows.Forms.Screen.AllScreens.FindMax((s1, s2) =>
+            {
+                var a1 = Rectangle.Intersect(s1.Bounds, bounds).Area();
+                var a2 = Rectangle.Intersect(s2.Bounds, bounds).Area();
+                return a2 > a1 ? s2 : s1;
+            });
+        }
+        
         private void NotifyPropertyChanged([CallerMemberName] string propertyName="")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

@@ -18,7 +18,7 @@ namespace QuickFiler
         {
             for (int i = 0; i < count; i++)
             {
-                _ = UIThreadExtensions.UiDispatcher.InvokeAsync(
+                _ = UiThread.Dispatcher.InvokeAsync(
                     () =>
                     {
                         _queue.Enqueue(new EfcViewer());
@@ -40,9 +40,9 @@ namespace QuickFiler
             if (_queue.Count > 0)
             {
                 viewer = _queue.Dequeue();
-                logger.Debug($"Dequeued 1, {_queue.Count} remaining");
+                //logger.Debug($"Dequeued 1, {_queue.Count} remaining");
                 BuildQueue(1);
-                //Debug.WriteLine($"Exiting dequeue, {_queue.Count} remaining");
+                
             }
             else
             {

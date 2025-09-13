@@ -1,7 +1,12 @@
-﻿using System;
-using Office = Microsoft.Office.Core;
+﻿using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic;
+using System;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using UtilitiesCS.EmailIntelligence;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups;
+using Office = Microsoft.Office.Core;
 
 namespace TaskMaster
 {
@@ -32,6 +37,7 @@ namespace TaskMaster
         
         private Office.IRibbonUI _ribbon;
         private RibbonController _controller;
+        internal RibbonController Controller => _controller;
 
         public void SetController(RibbonController Controller)
         {
@@ -73,9 +79,14 @@ namespace TaskMaster
             _controller.FlagAsTask();
         }
 
-        public void BtnHideHeadersNoChildren_Click(Office.IRibbonControl control)
+        public async void BtnHideHeadersNoChildren_Click(Office.IRibbonControl control)
         {
-            _controller.HideHeadersNoChildren();
+            await _controller.HideHeadersNoChildrenAsync();
+        }
+        
+        public async void BtnShowHeadersNoChildren_Click(Office.IRibbonControl control)
+        {
+            await _controller.ShowHeadersNoChildrenAsync();
         }
 
         public void BtnRefreshIDList_Click(Office.IRibbonControl control)
@@ -83,14 +94,14 @@ namespace TaskMaster
             _controller.RefreshIDList();
         }
 
-        public void BtnSplitToDoID_Click(Office.IRibbonControl control)
+        public async void BtnSplitToDoID_Click(Office.IRibbonControl control)
         {
-            _controller.SplitToDoID();
+            await _controller.SplitToDoIdAsync();
         }
 
         public void BtnReviseProjectInfo_Click(Office.IRibbonControl control)
         {
-            _controller.ReviseProjectInfo();
+            _controller.ReviseProjectData();
         }
 
         public void BtnCompressIDs_Click(Office.IRibbonControl control)
@@ -108,59 +119,137 @@ namespace TaskMaster
             return _controller.GetHookButtonText(control);
         }
 
-        public void BtnMigrateIDs_Click(Office.IRibbonControl control)
-        {
-            _controller.BtnMigrateIDs_Click();
-            // MessageBox.Show("Not Implemented");
-        }
-
-        //public void QuickFilerOld_Click(Office.IRibbonControl control)
-        //{
-        //    _controller.LoadQuickFilerOld();
-        //}
-
-        //public void QuickFiler_Click(Office.IRibbonControl control)
-        //{
-        //    _controller.LoadQuickFiler();
-        //}
-
+        public void BtnPopulateUdf_Click(Office.IRibbonControl control) => _controller.PopulateUdf();
+        
         public async void QuickFiler_Click(Office.IRibbonControl control)
         {
             await _controller.LoadQuickFilerAsync();
         }
 
-        public void Runtest(Office.IRibbonControl control)
-        {
-            _controller.RunTry();
-        }
+        public async void SortEmail_Click(Office.IRibbonControl control) => await _controller.SortEmailAsync();
 
-        public void SortEmail_Click(Office.IRibbonControl control)
-        {
-            _controller.SortEmail();
-        }
+        public async void UndoSort_Click(Office.IRibbonControl control) => await _controller.UndoSortAsync();
 
-        public void UndoSort_Click(Office.IRibbonControl control)
-        {
-            _controller.UndoSort();
-        }
+        public async void FindFolder_Click(Office.IRibbonControl control) => await _controller.FindFolderAsync();
 
         public bool ToggleDarkMode_GetPressed(Office.IRibbonControl control) => _controller.IsDarkModeActive();
         public void ToggleDarkMode_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleDarkMode();
-        
+
         #endregion
+
+        #region SettingsMenu
+
+        public bool MoveEntireConversation_GetPressed(Office.IRibbonControl control) => _controller.IsMoveEntireConversationActive();
+        public void MoveEntireConversation_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleMoveEntireConversation();
+        
+        public bool SaveAttachments_GetPressed(Office.IRibbonControl control) => _controller.IsSaveAttachmentsActive();
+        public void SaveAttachments_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleSaveAttachments();
+        
+        public bool SaveEmailCopy_GetPressed(Office.IRibbonControl control) => _controller.IsSaveEmailCopyActive();
+        public void SaveEmailCopy_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleSaveEmailCopy();
+        
+        public bool SavePictures_GetPressed(Office.IRibbonControl control) => _controller.IsSavePicturesActive();
+        public void SavePictures_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleSavePictures();
+
+        public void FolderSettings_Click(Office.IRibbonControl control) => _controller.FolderStoresSettings();
+
+        #endregion SettingsMenu
+
+        #region BayesianPerformance
+
+        public async void TestClassifier_Click(Office.IRibbonControl control) => await _controller.Try.TryTestClassifierAsync();
+        public async void TestClassifierVerbose_Click(Office.IRibbonControl control) => await _controller.Try.TryTestClassifierVerboseAsync();
+        public async void GetConfusionDrivers_Click(Office.IRibbonControl control) => await _controller.GetConfusionDriversAsync();
+        public async void ChartMetrics_Click(Office.IRibbonControl control) => await _controller.TryChartMetricsAsync();
+        public async void InvestigateErrors_Click(Office.IRibbonControl control) => await _controller.InvestigateErrorsAsync();
+
+        #endregion BayesianPerformance
+
+        #region Folder Classifier
+
+        public async void ScrapeAndMine_Click(Office.IRibbonControl control) => await _controller.ScrapeAndMineAsync();
+        public async void BuildFolderClassifier_Click(Office.IRibbonControl control) => await _controller.BuildFolderClassifierAsync();
+        public async void BuildCategoryClassifier_Click(Office.IRibbonControl control) => await _controller.BuildCategoryClassifierAsync();
+        public async void BuildActionableClassifier_Click(Office.IRibbonControl control) => await _controller.BuildActionableClassifierAsync();
+
+        #endregion Folder Classifier
+
+        #region Spam Manager
+
+        public async void ClearSpam_Click(Office.IRibbonControl control) => await Controller.ClearSpamManagerAsync();
+        public async void TrainSpam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, true);         
+        public async void TrainHam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, false); 
+        public async void TestSpam_Click(Office.IRibbonControl control) => await ((SpamBayes)Controller.Engines.InboxEngines[SpamBayes.GroupName].Engine).TestAsync(Controller.OlSelection);
+        public void TestSpamVerbose_Click(Office.IRibbonControl control) => Controller.TestSpamVerbose();
+        public void SpamMetrics_Click(Office.IRibbonControl control) => Controller.SpamMetrics();
+        public void SpamInvestigateErrors_Click(Office.IRibbonControl control) => Controller.SpamInvestigateErrors();
+
+        #region Spam Config
+
+        public void SpamBayesEnabled_Click(Office.IRibbonControl control, bool pressed) => Controller.Engines.ToggleEngineAsync(SpamBayes.GroupName);
+        public async Task<bool> SpamBayesEnabled_GetPressed(Office.IRibbonControl control) => await Controller.Engines.EngineActiveAsync(SpamBayes.GroupName);
+        public async void SpamSaveNetwork_Click(Office.IRibbonControl control) => await Controller.Engines.ShowDiskDialog(SpamBayes.GroupName, false);
+        public async void SpamSaveLocal_Click(Office.IRibbonControl control) => await Controller.Engines.ShowDiskDialog(SpamBayes.GroupName, true);
+        public void GetSaveLocation_Click(Office.IRibbonControl control) => Controller.Engines.ShowSaveInfo(SpamBayes.GroupName);
+
+        #endregion Spam Config
+
+        #endregion Spam Manager
+
+        #region Triage
+
+        public async void TriageSelection_Click(Office.IRibbonControl control) => await _controller.TriageSelectionAsync();
+        public async void TriageSetA_Click(Office.IRibbonControl control) => await _controller.Triage.OlLogic.TrainSelectionAsync("A");
+        public async void TriageSetB_Click(Office.IRibbonControl control) => await _controller.Triage.OlLogic.TrainSelectionAsync("B");
+        public async void TriageSetC_Click(Office.IRibbonControl control) => await _controller.Triage.OlLogic.TrainSelectionAsync("C");
+        //public async void TriageSetA_Click(Office.IRibbonControl control) => await _controller.TriageSetAAsync();
+        //public async void TriageSetB_Click(Office.IRibbonControl control) => await _controller.TriageSetBAsync();
+        //public async void TriageSetC_Click(Office.IRibbonControl control) => await _controller.TriageSetCAsync();
+        public async void ClearTriage_Click(Office.IRibbonControl control) => await _controller.ClearTriageAync();
+        public async void SetPrecision_Click(Office.IRibbonControl control) => await _controller.TriageSetPrecision();
+        public async void FilterViewer_Click(Office.IRibbonControl control) => await _controller.Triage.OlLogic.FilterViewAsync();
+        #region Triage Config
+
+        public void TriageEnabled_Click(Office.IRibbonControl control, bool pressed) => Controller.Engines.ToggleEngineAsync("Triage");
+        public async Task<bool> TriageEnabled_GetPressed(Office.IRibbonControl control) => await Controller.Engines.EngineActiveAsync("Triage");
+        public async void TriageSaveNetwork_Click(Office.IRibbonControl control) => await Controller.Engines.ShowDiskDialog("Triage", false);
+        public async void TriageSaveLocal_Click(Office.IRibbonControl control) => await Controller.Engines.ShowDiskDialog("Triage", true);
+        public void TriageGetSaveLocation_Click(Office.IRibbonControl control) => Controller.Engines.ShowSaveInfo("Triage");
+
+        #endregion Triage Config
+
+        #endregion Triage
+
+        public async void CompareFolders_Click(Office.IRibbonControl control) => await _controller.CompareFoldersAsync();
 
         #region TryMethods  
-        public void GetConversationDataframe_Click(Office.IRibbonControl control) => _controller.TryGetConversationDataframe();
-        public void GetConversationOutlookTable_Click(Office.IRibbonControl control) => _controller.TryGetConversationOutlookTable();
-        public void GetMailItemInfo_Click(Office.IRibbonControl control) => _controller.TryGetMailItemInfo();
-        public void GetQfcDataModel_Click(Office.IRibbonControl control) => _controller.TryGetQfcDataModel();
-        public void GetTableInView_Click(Office.IRibbonControl control) => _controller.TryGetTableInView();
-        public void LegacySortMailToExistingRun2_Click(Office.IRibbonControl control) => _controller.TryLegacySortMailToExistingRun2();
-        public void RebuildProjInfo_Click(Office.IRibbonControl control) => _controller.TryRebuildProjInfo();
-        public void RecipientGetInfo_Click(Office.IRibbonControl control) => _controller.TryRecipientGetInfo();
-        public void SubstituteIdRoot_Click(Office.IRibbonControl control) => _controller.TrySubstituteIdRoot();
-
+        public void NewTaskHeader_Click(Office.IRibbonControl control) => _controller.Try.TryNewTaskHeader();
+        public void DeepCompareEmails_Click(Office.IRibbonControl control) => _controller.TryDeepCompareEmails();
+        public void GetConversationDataframe_Click(Office.IRibbonControl control) => _controller.Try.TryGetConversationDataframe();
+        public void GetConversationOutlookTable_Click(Office.IRibbonControl control) => _controller.Try.TryGetConversationOutlookTable();
+        public void GetMailItemInfo_Click(Office.IRibbonControl control) => _controller.Try.TryGetMailItemInfo();
+        public void GetQfcDataModel_Click(Office.IRibbonControl control) => _controller.Try.TryGetQfcDataModel();
+        public void GetTableInView_Click(Office.IRibbonControl control) => _controller.Try.TryGetTableInView();
+        public void RebuildProjInfo_Click(Office.IRibbonControl control) => _controller.Try.TryRebuildProjInfo();
+        public void RecipientGetInfo_Click(Office.IRibbonControl control) => _controller.Try.TryRecipientGetInfo();
+        public void SubstituteIdRoot_Click(Office.IRibbonControl control) => _controller.Try.TrySubstituteIdRoot();
+        public void GetImage_Click(Office.IRibbonControl control) => _controller.Try.TryGetImage();
+        public void LoadFolderFilter_Click(Office.IRibbonControl control) => _controller.Try.TryLoadFolderFilter();
+        public void LoadFolderRemap_Click(Office.IRibbonControl control) => _controller.Try.TryLoadFolderRemap();
+        public async void RebuildSubjectMap_Click(Office.IRibbonControl control) => await _controller.Try.RebuildSubjectMapAsync();
+        public void ShowSubjectMapMetrics_Click(Office.IRibbonControl control) => _controller.Try.ShowSubjectMapMetrics();
+        public async void TokenizeEmail_Click(Office.IRibbonControl control) => await _controller.Try.TryTokenizeEmail();
+        public async void MineEmails_Click(Office.IRibbonControl control) => await _controller.Try.TryMineEmails();
+        public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.Try.TryBuildClassifier();                
+        public void PrintManagerState_Click(Office.IRibbonControl control) => _controller.Try.TryPrintManagerState();
+        public void SerializeMailInfo_Click(Office.IRibbonControl control) => _controller.Try.TrySerializeMailInfo();
+        public void TryGetInboxes_Click(Office.IRibbonControl control) => _controller.Try.TryGetInboxes();
         #endregion
+
+        public void DeleteTriageSpamFields_Click(Office.IRibbonControl control) => _controller.TryDeleteTriageSpamFields();
+        public async void Intelligence_Click(Office.IRibbonControl control) => await _controller.IntelligenceAsync();
+
+        public void GetFolderInfo_Click(Office.IRibbonControl control) => _controller.GetFolderInfo();
 
         #region Helpers
 

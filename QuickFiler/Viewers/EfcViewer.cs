@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TaskVisualization;
 using UtilitiesCS;
 
 namespace QuickFiler
@@ -22,6 +23,7 @@ namespace QuickFiler
             InitializeComponent();
             _context = SynchronizationContext.Current;
             _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            //InitMenuItems();
             InitTipsLabelsList();
         }
 
@@ -40,6 +42,7 @@ namespace QuickFiler
         }
 
         private IQfcKeyboardHandler _keyboardHandler;
+        internal IQfcKeyboardHandler KeyboardHandler { get => _keyboardHandler; }
         public void SetKeyboardHandler(IQfcKeyboardHandler keyboardHandler)
         {
             _keyboardHandler = keyboardHandler;
@@ -55,10 +58,8 @@ namespace QuickFiler
                 LblAcSearch,
                 LblAcFolderList,
                 LblAcTrash,
-                LblAcAttachments,
                 LblAcEmail,
-                LblAcPictures,
-                LblAcConversation,
+                LblAcFilters,
                 LblAcOk,
                 LblAcCancel,
                 LblAcRefresh,
@@ -73,11 +74,66 @@ namespace QuickFiler
             {
                 object sender = FromHandle(msg.HWnd);
                 var e = new KeyEventArgs(keyData);
-                _keyboardHandler.ToggleKeyboardDialog(sender, e);
+                _keyboardHandler.ToggleKeyboardDialogAsync(sender, e);
                 return true;
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        //private void InitMenuItems()
+        //{
+        //    MenuItem_CheckedChanged(ConversationMenuItem);
+        //    MenuItem_CheckedChanged(SaveAttachmentsMenuItem);
+        //    MenuItem_CheckedChanged(SaveEmailMenuItem);
+        //    MenuItem_CheckedChanged(SavePicturesMenuItem);
+        //}
+
+        //private void MenuItem_CheckedChanged(object sender, EventArgs e)
+        //{
+        //    var menuItem = (ToolStripMenuItem)sender;
+        //    MenuItem_CheckedChanged(menuItem);
+        //}
+
+        //private void MenuItem_CheckedChanged(ToolStripMenuItem menuItem)
+        //{
+        //    if (menuItem.Checked)
+        //    {
+        //        menuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
+        //    }
+        //    else
+        //    {
+        //        menuItem.Image = null;
+        //    }
+        //}
+
+        //private void MenuItem_Click(object sender, EventArgs e)
+        //{
+        //    var menuItem = (ToolStripMenuItem)sender;
+        //    menuItem.Checked = !menuItem.Checked;
+        //}
+
+        //private void MenuItem_CheckedChanged(ToolStripMenuItem menuItem)
+        //{
+        //    if (menuItem.Checked)
+        //    {
+        //        menuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
+        //    }
+        //    else
+        //    {
+        //        menuItem.Image = null;
+        //    }
+        //}
+
+        //private void MenuItem_Click(object sender, EventArgs e)
+        //{
+        //    var menuItem = (ToolStripMenuItem)sender;
+        //    menuItem.Checked = !menuItem.Checked;
+        //}
+
+        private void EditFiltersMenuItem_Click(object sender, EventArgs e)
+        {
+            _formController.EditFiltersMenuItem_Click(sender, e);
         }
     }
 }

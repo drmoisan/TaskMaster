@@ -263,7 +263,15 @@ namespace UtilitiesCS
 
         public static T[] TryFlattenArrayTree<T>(this object node)
         {
-            return FlattenArrayTree<T>(node, false).ToArray();
+            try
+            {
+                return FlattenArrayTree<T>(node, false).ToArray();
+            }
+            catch (Exception)
+            {
+                return default;                
+            }
+            
         }
 
         internal static List<T> FlattenArrayTree<T>(this object node, bool strict) 

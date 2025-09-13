@@ -8,6 +8,7 @@ using System.Collections;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS;
 using System.Windows.Forms.VisualStyles;
+using Deedle.Internal;
 
 namespace ToDoModel
 {
@@ -15,119 +16,133 @@ namespace ToDoModel
     {
         #region constructors 
 
-        public TreeOfToDoItems()
-        {
-            ListOfToDoTree = new List<TreeNode<ToDoItem>>();
-        }
+        public TreeOfToDoItems() { }
 
         public TreeOfToDoItems(List<TreeNode<ToDoItem>> todoTree)
         {
-            _todoTree = todoTree;
+            Roots = todoTree;
         }
 
         #endregion
 
         #region Initialize and Access Encapsulated Tree
 
-        private List<TreeNode<ToDoItem>> _todoTree = new List<TreeNode<ToDoItem>>();
-        
-        public List<TreeNode<ToDoItem>> ListOfToDoTree { get => _todoTree; private set => _todoTree = value; }
+        public List<ToDoItem> TryFlatten() 
+        {
+            try
+            {
+                return Roots.Select(root => root.Flatten()).SelectMany(x => x).ToList();
+            }
+            catch (System.Exception)
+            {
+
+                return null;
+            }
+        }
+
+        private List<TreeNode<ToDoItem>> _roots = new List<TreeNode<ToDoItem>>();        
+        public List<TreeNode<ToDoItem>> Roots { get => _roots; private set => _roots = value; }
         
         public enum LoadOptions
         {
             vbLoadAll = 0,
-            vbLoadInView = 1
+            vbLoadInView = 1,
+            vbLoadNotComplete = 2
         }
 
-        public void LoadTree(LoadOptions LoadType, Application Application)
+        public void LoadTree(LoadOptions LoadType, IApplicationGlobals appGlobals)
         {
-            
-            IList colItems;
-            
+            // Get the list of ToDo items from Outlook
+            var items = GetToDoList(LoadType, appGlobals.Ol.App);
 
-            try
+            // Create a flat tree of ToDo items and assign IDs to those that don't have them
+            var tree = ToListTreeNode(items, appGlobals);
+
+            // Sort the flat tree by ToDoID
+            tree.MergeSort(this.CompareItemsByToDoID, inplace: true);
+            
+            tree = MakeTreeHierarchical(tree);
+
+            Roots = tree;
+            
+            //WriteTreeToCSVDebug(@"C:\temp\TreeOfToDoItems.csv");
+        }
+
+        private List<TreeNode<ToDoItem>> MakeTreeHierarchical(List<TreeNode<ToDoItem>> tree)
+        {
+            int max = tree.Count - 1;
+            int i;
+
+            // Loop through the tree from the end to the beginning
+            for (i = max; i >= 0; i -= 1)
             {
-                // ***STEP 1: LOAD RAW [ITEMS] TO A LIST AND SORT THEM***
-                var itemsForTree = GetToDoList(LoadType, Application);
-                itemsForTree.MergeSort(this.CompareItemsByToDoID, inplace: true);
+                var toDoNode = tree[i];
 
-                colItems = new List<OutlookItem>();
-                var colNoID = new List<OutlookItem>();
-                ToDoItem tmpToDo = null;
-                TreeNode<ToDoItem> ToDoNode;
-                TreeNode<ToDoItem> NodeParent;
-
-
-                // ***STEP 2: ADD ITEMS TO A FLAT TREE & ASSIGN IDs TO THOSE THAT DON'T HAVE THEM***
-                // Iterate through ToDo items in List
-                foreach (var objItem in itemsForTree)
+                // If the ID is bigger than 2 digits, it is a child of someone. 
+                // So in that case link it to the proper _parent
+                // First try cutting off the last two digits, but in the case of
+                // Filtered Items, it is possible that the _parent is not visible.
+                // If the _parent is not visible, work iteratively to find the next 
+                // closest visible _parent until you get to the root
+                if (toDoNode.Value.ToDoID.Length > 2)
                 {
-                    // Cast objItem to temporary ToDoItem
-                    if (objItem is MailItem)
+                    string strID = toDoNode.Value.ToDoID;
+                    string strParentID = strID.Substring(0, strID.Length - 2);
+                    bool blContinue = true;
+
+                    while (blContinue)
                     {
-                        tmpToDo = new ToDoItem((MailItem)objItem);
-                    }
-                    else if (objItem is TaskItem)
-                    {
-                        tmpToDo = new ToDoItem((TaskItem)objItem);
-                    }
-
-                    // Add the temporary ToDoItem to the tree, assigning an ID if missing
-                    // If tmpToDo.ToDoID = "nothing" Then
-                    // ToDoTree.AddChild(tmpToDo)
-                    ListOfToDoTree.Add(new TreeNode<ToDoItem>(tmpToDo));
-                    // Else
-                    // ToDoTree.AddChild(tmpToDo, tmpToDo.ToDoID)
-                    // ToDoTree.Add(New TreeNode(Of ToDoItem)(tmpToDo, tmpToDo.ToDoID))
-                    // End If
-                }
-
-                // ***STEP 3: MAKE TREE HIERARCHICAL
-                int max = ListOfToDoTree.Count - 1;
-                int i;
-
-                // Loop through the tree from the end to the beginning
-                for (i = max; i >= 0; i -= 1)
-                {
-                    ToDoNode = ListOfToDoTree[i];
-
-                    // If the ID is bigger than 2 digits, it is a child of someone. 
-                    // So in that case link it to the proper _parent
-                    // First try cutting off the last two digits, but in the case of
-                    // Filtered Items, it is possible that the _parent is not visible.
-                    // If the _parent is not visible, work recursively to find the next 
-                    // closest visible _parent until you get to the root
-                    if (ToDoNode.Value.ToDoID.Length > 2)
-                    {
-                        string strID = ToDoNode.Value.ToDoID;
-                        string strParentID = strID.Substring(1, strID.Length - 2);
-                        bool blContinue = true;
-
-                        while (blContinue)
+                        var nodeParent = FindChildByID(strParentID, tree);
+                        if (nodeParent is not null)
                         {
-                            NodeParent = FindChildByID(strParentID, ListOfToDoTree);
-                            // NodeParent = F
-                            if (NodeParent is not null)
-                            {
-                                var unused2 = NodeParent.InsertChild(ToDoNode);
-                                bool unused1 = ListOfToDoTree.Remove(ToDoNode);
-                                blContinue = false;
-                            }
-                            if (strParentID.Length > 2)
-                            {
-                                strParentID = strParentID.Substring(1, strParentID.Length - 2);
-                            }
-                            else
-                            {
-                                blContinue = false;
-                            }
+                            nodeParent.InsertChild(toDoNode);
+                            tree.Remove(toDoNode);
+                            blContinue = false;
+                        }
+                        if (strParentID.Length > 2)
+                        {
+                            strParentID = strParentID.Substring(0, strParentID.Length - 2);
+                        }
+                        else
+                        {
+                            blContinue = false;
                         }
                     }
                 }
             }
-            catch (System.Exception ex)
+            
+            return tree;
+        }
+
+        private List<TreeNode<ToDoItem>> ToListTreeNode(List<OutlookItem> items, IApplicationGlobals appGlobals)
+        {
+            // Convert items to TreeNode<ToDoItem> and fill IDs for those that don't have them
+            var tree = items.Select(x =>
             {
-                Debug.WriteLine(ex.Message);
+                var td = new ToDoItem(x);
+                AssignId(appGlobals, td);
+                return new TreeNode<ToDoItem>(new ToDoItem(x));
+            }).ToList();
+            return tree;
+        }
+
+        public static void AssignId(IApplicationGlobals appGlobals, ToDoItem td)
+        {
+            if (td.ToDoID.IsNullOrEmpty())
+            {
+                if (td.Projects.AsListNoPrefix.Count == 1)
+                {
+                    var projectName = td.Projects.AsListNoPrefix[0];
+                    var projectInfos = appGlobals.TD.ProjInfo.Find_ByProjectName(projectName);
+                    if (projectInfos.Count == 1)
+                    {
+                        td.ToDoID = appGlobals.TD.IDList.GetNextToDoID(projectInfos[0].ProjectID + "00");
+                    }
+                }
+                if (td.ToDoID.IsNullOrEmpty())
+                {
+                    td.ToDoID = appGlobals.TD.IDList.GetNextToDoID();
+                }
             }
         }
 
@@ -142,14 +157,54 @@ namespace ToDoModel
             strFilter = "@SQL=" + objView.Filter;
 
             var stores = Application.Session.Stores.Cast<Store>();
-            var result = stores.Select(store =>
+            var result = stores.Where(store => store.ExchangeStoreType != OlExchangeStoreType.olExchangePublicFolder).Select(store =>
             {
-                var folder = (Folder)store.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
-                var olObjects = (strFilter == "@SQL=" | LoadType == LoadOptions.vbLoadAll) ? folder.Items : folder.Items.Restrict(strFilter);
-                return olObjects.Cast<object>().Select(x => new OutlookItem(x)).ToList();
+                try
+                {
+                    var folder = (Folder)store.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
+                    Items olObjects = default;
+                    if (strFilter == "@SQL=" | LoadType == LoadOptions.vbLoadAll)
+                    {
+                        olObjects = folder.Items;
+                    }
+                    else if (LoadType == LoadOptions.vbLoadNotComplete)
+                    {
+                        strFilter = "[Complete] = false";
+                        olObjects = folder.Items.Restrict(strFilter);
+                        //"http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/810f0040" IS NULL
+                    }
+                    else 
+                    {
+                        olObjects = folder.Items.Restrict(strFilter); 
+                    }
+                        //var olObjects = (strFilter == "@SQL=" | LoadType == LoadOptions.vbLoadAll) ? folder.Items : folder.Items.Restrict(strFilter);
+                    return olObjects?.Cast<object>().Select(x => new OutlookItem(x)).ToList();
+                }
+                catch (System.Exception)
+                {
+                    return new List<OutlookItem>();
+                }
+                
             }).SelectMany(x=>x).ToList();
             
             return result;
+        }
+
+        public IAsyncEnumerable<object> GetToDoListAsync(LoadOptions loadType, Application olApp)
+        {
+            var olView = (View)olApp.ActiveExplorer().CurrentView;
+            var strFilter = "@SQL=" + olView.Filter;
+            var items = olApp.Session.Stores
+                ?.Cast<Store>()
+                ?.ToAsyncEnumerable()
+                ?.Select(store => store.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
+                ?.SelectMany(folder =>
+                    (strFilter == "@SQL=" | loadType == LoadOptions.vbLoadAll) ?
+                    folder?.Items?.Cast<object>()?.ToAsyncEnumerable() :
+                    folder?.Items?.Restrict(strFilter)?.Cast<object>()?.ToAsyncEnumerable())
+                ?.Select(x => new OutlookItem(x));
+            items ??= new List<OutlookItem>().ToAsyncEnumerable();
+            return items;
         }
 
         #endregion
@@ -161,18 +216,23 @@ namespace ToDoModel
             return (item.ToDoID ?? "") == (strToDoID ?? "");
         }
 
+        internal int CompareItemsByToDoID(TreeNode<ToDoItem> left, TreeNode<ToDoItem> right)
+        {
+            return CompareItemsByToDoID(left.Value, right.Value);
+        }
+
         internal int CompareItemsByToDoID(ToDoItem left, ToDoItem right)
         {
-            string todoIDLeft = left.ToDoID;
-            string todoIDRight = right.ToDoID;
+            string todoIDLeft = left.ToDoID.ToUpper();
+            string todoIDRight = right.ToDoID.ToUpper();
 
             return CompareItemsByToDoID(todoIDLeft, todoIDRight);
         }
 
         internal int CompareItemsByToDoID(OutlookItem objItemLeft, OutlookItem objItemRight)
         {
-            string todoIDLeft = objItemLeft.GetUdfString("ToDoID");
-            string todoIDRight = objItemRight.GetUdfString("ToDoID");
+            string todoIDLeft = objItemLeft.GetUdfString("ToDoID").ToUpper();
+            string todoIDRight = objItemRight.GetUdfString("ToDoID").ToUpper();
 
             return CompareItemsByToDoID(todoIDLeft, todoIDRight);
         }
@@ -190,7 +250,17 @@ namespace ToDoModel
             else
             {
                 var idx = todoIDLeft.FirstDiffIndex(todoIDRight);
+                
+                // Identical IDs
                 if (idx == -1) { return 0; }
+                
+                // Left ID is prefix of Right ID
+                if (idx == todoIDLeft.Length) { return -1; }
+
+                // Right ID is prefix of Left ID
+                if (idx == todoIDRight.Length) { return 1; }
+
+                // Compare the two characters that differ
                 var left = todoIDLeft[idx].ToBase10(36);
                 var right = todoIDRight[idx].ToBase10(36);
                 if (left < right) { return -1; }
@@ -200,7 +270,7 @@ namespace ToDoModel
 
         public void ReNumberIDs(IDList idList)
         {
-            foreach (var RootNode in ListOfToDoTree)
+            foreach (var RootNode in Roots)
             {
                 foreach (var Child in RootNode.Children)
                 {
@@ -212,19 +282,18 @@ namespace ToDoModel
         
         public void ReNumberChildrenIDs(List<TreeNode<ToDoItem>> Children, IIDList idList)
         {
-            var i = default(int);
             int max = Children.Count - 1;
             if (max >= 0)
             {
-                string strParentID = Children[i].Parent.Value.ToDoID;
+                string strParentID = Children[0].Parent.Value.ToDoID;
                 var loopTo = max;
-                for (i = 0; i <= loopTo; i++)
+                for (int i = 0; i <= loopTo; i++)
                 {
                     if (idList.Contains(Children[i].Value.ToDoID))
                         idList.Remove(Children[i].Value.ToDoID);
                 }
                 var loopTo1 = max;
-                for (i = 0; i <= loopTo1; i++)
+                for (int i = 0; i <= loopTo1; i++)
                 {
                     string NextID = idList.GetNextToDoID(strParentID + "00");
                     // Dim LevelChange As Boolean = (Children(i).Value.ToDoID.Length = NextID.Length)
@@ -234,23 +303,23 @@ namespace ToDoModel
                     if (Children[i].Children.Count > 0)
                         ReNumberChildrenIDs(Children[i].Children, idList);
                 }
+                
                 idList.Serialize();
             }
         }
 
-        public TreeNode<ToDoItem> FindChildByID(string ID, List<TreeNode<ToDoItem>> nodes)
+        public TreeNode<ToDoItem> FindChildByID(string Id, List<TreeNode<ToDoItem>> nodes)
         {
-            TreeNode<ToDoItem> rnode;
-
+            if (Id.IsNullOrEmpty()) { return null; }
             foreach (var node in nodes)
             {
-                if ((node.Value.ToDoID ?? "") == (ID ?? ""))
+                if ((node.Value.ToDoID ?? "") == Id)
                 {
                     return node;
                 }
                 else
                 {
-                    rnode = FindChildByID(ID, node.Children);
+                    var rnode = FindChildByID(Id, node.Children);
                     if (rnode is not null)
                     {
                         return rnode;
@@ -262,7 +331,7 @@ namespace ToDoModel
 
         }
 
-        #endregion region
+        #endregion ToDoId
 
         public void AddChild(TreeNode<ToDoItem> Child, TreeNode<ToDoItem> Parent, IIDList idList)
         {
@@ -283,7 +352,7 @@ namespace ToDoModel
 
         internal bool IsHeader(string TagContext)
         {
-            if (TagContext.Contains("@PROJECTS") || TagContext.Contains("HEADER") || TagContext.Contains("DELIVERABLE") || TagContext.Contains("@PROGRAMS"))
+            if (TagContext.Contains("PROJECTS") || TagContext.Contains("HEADER") || TagContext.Contains("DELIVERABLE") || TagContext.Contains("@PROGRAMS"))
             {
                 return true;
             }
@@ -292,9 +361,36 @@ namespace ToDoModel
 
         public void HideEmptyHeadersInView()
         {
-            Action<TreeNode<ToDoItem>> action = node => { if (node.ChildCount == 0) { if (IsHeader(node.Value.Context.AsStringNoPrefix)) { node.Value.ActiveBranch = false; } } };
+            //Action<TreeNode<ToDoItem>> action = node => { if (node.ChildCount == 0) { if (IsHeader(node.Value.Context.AsStringNoPrefix)) { node.Value.ActiveBranch = false; } } };
+            Action<TreeNode<ToDoItem>> action = node => 
+            { 
+                if (node.ChildCount == 0 || !node.Children.Any(x => x.Value.ActiveBranch)) 
+                { 
+                    if (IsHeader(node.Value.Context.AsStringNoPrefix)) 
+                    { node.Value.ActiveBranch = false; } 
+                } 
+            };
 
-            foreach (TreeNode<ToDoItem> node in ListOfToDoTree)
+
+            var leaves = Roots.SelectMany(x => x.Leaves());
+            foreach (TreeNode<ToDoItem> node in leaves)
+                node.TraverseAncestors(action);
+        }
+
+        public void ShowEmptyHeadersInView()
+        {            
+            Action<TreeNode<ToDoItem>> action = node =>
+            {
+                if (node.Parent is null || node.Parent.Value.ActiveBranch)
+                {
+                    if (IsHeader(node.Value.Context.AsStringNoPrefix) && !node.Value.ActiveBranch)
+                    { 
+                        node.Value.ActiveBranch = true; 
+                    }
+                }                
+            };
+
+            foreach (TreeNode<ToDoItem> node in Roots)
                 node.Traverse(action);
         }
 
@@ -308,7 +404,7 @@ namespace ToDoModel
                 sw.WriteLine("File Dump");
             }
 
-            LoopTreeToWrite(ListOfToDoTree, FilePath, "");
+            LoopTreeToWrite(Roots, FilePath, "");
         }
         
         internal void LoopTreeToWrite(List<TreeNode<ToDoItem>> nodes, string filename, string lineprefix)
@@ -322,7 +418,9 @@ namespace ToDoModel
                 }
             }
         }
-        
+
+            
+
         internal void AppendLineToCSV(string filename, string line)
         {
             using (var sw = File.AppendText(filename))
@@ -331,7 +429,9 @@ namespace ToDoModel
             }
         }
 
-        #endregion
+        
+
+        #endregion Debugging Helper Functions
 
     }
 }

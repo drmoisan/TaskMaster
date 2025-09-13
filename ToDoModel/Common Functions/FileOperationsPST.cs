@@ -141,7 +141,8 @@ namespace ToDoModel
                 {
 
                     __itemsPST_ItemChange_blIsRunning = true;
-                    var todo = new ToDoItem(olItem, OnDemand: true);
+                    //var todo = new ToDoItem(olItem, OnDemand: true);
+                    var todo = new ToDoItem(olItem, onDemand: true);
                     UserProperty objProperty_ToDoID = olItem.GetUdf("ToDoID");
                     UserProperty objProperty_Project = olItem.GetUdf("TagProject");
 
@@ -183,7 +184,7 @@ namespace ToDoModel
                                                 {
                                                     // Change the Item's todoid to be a node of the project
                                                     strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
-                                                    todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
+                                                    todo.Program.AsStringNoPrefix = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
                                                     todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
                                                     // strToDoID = IDList.GetNextToDoID(strProjectToDo & "00")
                                                     // SetUdf("ToDoID", Value:=strToDoID, SpecificItem:=Item)
@@ -205,7 +206,7 @@ namespace ToDoModel
                                             // ProjDict.ProjectDictionary.Add(strProject, strToDoID)
                                             // SaveDict()
                                             string strProgram = InputBox.ShowDialog($"What is the program name for {strProject}?", DefaultResponse: "");
-                                            _globals.TD.ProjInfo.Add(new ToDoProjectInfoEntry(strProject, strToDoID, strProgram));
+                                            _globals.TD.ProjInfo.Add(new ProjectEntry(strProject, strToDoID, strProgram));
                                             _globals.TD.ProjInfo.Save();
                                         }
                                     }
@@ -223,7 +224,7 @@ namespace ToDoModel
                                 if (_globals.TD.ProjInfo.Contains_ProjectName(strProject))
                                 {
                                     strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
-                                    todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
+                                    todo.Program.AsStringNoPrefix = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
                                     // If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
                                     // strProjectToDo = ProjDict.ProjectDictionary(strProject)
                                     todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
@@ -250,7 +251,7 @@ namespace ToDoModel
                                     strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
                                     // Add the next ToDoID available in that branch
                                     todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
-                                    todo.TagProgram = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
+                                    todo.Program.AsStringNoPrefix = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
                                     _globals.TD.IDList.Serialize(_globals.TD.FnameIDList);
                                     
                                     todo.SplitID();
@@ -286,10 +287,10 @@ namespace ToDoModel
                                 strCats += "Tag KB Completed";
                             }
                             olItem.SetCategories(strCats);
-                            todo.KB = "Completed";
+                            todo.KB.AsStringNoPrefix = "Completed";
                         }
                     }
-                    else if (todo.KB == "Completed")
+                    else if (todo.KB.AsStringNoPrefix == "Completed")
                     {
                         string strCats = olItem.GetCategories();
 
@@ -325,7 +326,7 @@ namespace ToDoModel
                             strCats = strReplace;
                         }
                         olItem.SetCategories(strCats);
-                        todo.KB = strKB;
+                        todo.KB.AsStringNoPrefix = strKB;
 
                     }
                     __itemsPST_ItemChange_blIsRunning = false;

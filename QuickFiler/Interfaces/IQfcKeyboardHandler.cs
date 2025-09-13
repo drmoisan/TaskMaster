@@ -12,6 +12,7 @@ namespace QuickFiler.Interfaces
         void ToggleKeyboardDialog();
         void ToggleKeyboardDialog(object sender, KeyEventArgs e); 
         Task ToggleKeyboardDialogAsync();
+        void ToggleKeyboardDialogAsync(object sender, KeyEventArgs e);
         void KeyboardHandler_PreviewKeyDownAsync(object sender, PreviewKeyDownEventArgs e);
         void KeyboardHandler_KeyDown(object sender, KeyEventArgs e);
         void KeyboardHandler_KeyDownAsync(object sender, KeyEventArgs e);
@@ -20,6 +21,8 @@ namespace QuickFiler.Interfaces
         KbdActions<char, KaCharAsync, Func<char, Task>> CharActionsAsync { get; set; }
         KbdActions<Keys, KaKey, Action<Keys>> KeyActions { get; set; }
         KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> KeyActionsAsync { get; set; }
+        KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> AlwaysOnKeyActionsAsync { get; set; }
+        KbdActions<string, KaStringAsync, Func<string, Task>> StringActionsAsync { get; set; }
 
         void CboFolders_KeyDown(object sender, KeyEventArgs e);
         void CboFolders_KeyDownAsync(object sender, KeyEventArgs e);

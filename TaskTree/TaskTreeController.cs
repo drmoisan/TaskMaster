@@ -11,12 +11,19 @@ using BrightIdeasSoftware;
 using Outlook = Microsoft.Office.Interop.Outlook;
 using ToDoModel;
 using UtilitiesCS;
+using Microsoft.Office.Interop.Outlook;
+using System.Threading.Tasks;
 
 namespace TaskTree
 {
     public class TaskTreeController
     {
-        public TaskTreeController(IApplicationGlobals AppGlobals, TaskTreeForm Viewer, TreeOfToDoItems DataModel)
+        #region Constructors and Initializers
+        
+        public TaskTreeController(
+            IApplicationGlobals AppGlobals,
+            TaskTreeForm Viewer,
+            TreeOfToDoItems DataModel)
         {
             _globals = AppGlobals;
             _viewer = Viewer;
@@ -24,37 +31,46 @@ namespace TaskTree
             _viewer.SetController(this);
         }
 
-        
-        public List<TreeNode<ToDoItem>> ToDoTree = new List<TreeNode<ToDoItem>>();
-        private readonly Resizer rs = new Resizer();
-        private readonly Resizer rscol = new Resizer();
-        private bool expanded = false;
-        private bool filtercompleted = true;
-        private TaskTreeForm _viewer;
-        private IApplicationGlobals _globals;
-        public TreeOfToDoItems _dataModel = new TreeOfToDoItems(new List<TreeNode<ToDoItem>>());
-
         public void InitializeTreeListView()
         {
-
             {
-                _viewer.TLV.CanExpandGetter = (x => ((TreeNode<ToDoItem>)x).ChildCount > 0);
-                _viewer.TLV.ChildrenGetter = (x => ((TreeNode<ToDoItem>)x).Children);
-                _viewer.TLV.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
-                _viewer.TLV.Roots = _dataModel.ListOfToDoTree;
-                _viewer.TLV.Sort(_viewer.OlvToDoID, SortOrder.Ascending);
+                _viewer.TreeLv.CanExpandGetter = x => ((TreeNode<ToDoItem>)x).ChildCount > 0;
+                _viewer.TreeLv.ChildrenGetter = x => ((TreeNode<ToDoItem>)x).Children;
+                _viewer.TreeLv.ParentGetter = x => ((TreeNode<ToDoItem>)x).Parent;
+                _viewer.TreeLv.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
+                _viewer.TreeLv.Roots = _dataModel.Roots;
+                _viewer.TreeLv.Sort(_viewer.OlvToDoID, SortOrder.Ascending);
+
             }
 
-            SimpleDropSink sink1 = (SimpleDropSink)_viewer.TLV.DropSink;
+            SimpleDropSink sink1 = (SimpleDropSink)_viewer.TreeLv.DropSink;
             sink1.AcceptExternal = true;
             sink1.CanDropBetween = true;
             sink1.CanDropOnBackground = true;
 
-            rs.FindAllControls(_viewer);
-            rs.SetResizeDimensions(_viewer.SplitContainer1, Resizer.ResizeDimensions.None, true);
-            rs.SetResizeDimensions(_viewer.SplitContainer1.Panel2, Resizer.ResizeDimensions.Position | Resizer.ResizeDimensions.Size, true);
-            rs.PrintDict();
+            _rs.FindAllControls(_viewer);
+            _rs.SetResizeDimensions(_viewer.SplitContainer1, ControlResizer.ResizeDimensions.None, true);
+            _rs.SetResizeDimensions(_viewer.SplitContainer1.Panel2, ControlResizer.ResizeDimensions.Position | ControlResizer.ResizeDimensions.Size, true);
+            _rs.ResizeAllControls(_viewer);
+            //_rs.PrintDict();
         }
+
+        #endregion Constructors and Initializers
+
+        #region Private Fields
+
+        public List<TreeNode<ToDoItem>> ToDoTree = new List<TreeNode<ToDoItem>>();
+        private readonly ControlResizer _rs = new ControlResizer();
+        private readonly ControlResizer _rscol = new ControlResizer();
+        private bool _expanded = false;
+        private bool _filterCompleted = true;
+        private TaskTreeForm _viewer;
+        private IApplicationGlobals _globals;
+        public TreeOfToDoItems _dataModel = new TreeOfToDoItems(new List<TreeNode<ToDoItem>>());
+
+        #endregion Private Fields
+
+        #region Event Handlers
 
         internal void HandleModelCanDrop(object sender, ModelDropEventArgs e)
         {
@@ -136,11 +152,54 @@ namespace TaskTree
                     }
             }
             e.RefreshObjects();
-            if (filtercompleted)
-                _viewer.TLV.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
-            _viewer.TLV.Sort();
+            if (_filterCompleted)
+                _viewer.TreeLv.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
+            _viewer.TreeLv.Sort();
             // this.lastSortColumn = Column;
             // this.lastSortOrder = order;
+        }
+
+        #endregion Event Handlers
+
+        #region UI Helper Functions
+
+        internal void ActivateOlItem(dynamic item)
+        {
+            if (item is not null)
+            {
+                var activeExplorer = _globals.Ol.App.ActiveExplorer();
+                if (activeExplorer.IsItemSelectableInView(item))
+                {
+                    activeExplorer.ClearSelection();
+                    activeExplorer.AddToSelection(item);
+                }
+                else { item.Display(); }
+            }
+        }
+
+        internal async Task ActivateOlItemAsync(dynamic item)
+        {
+            if (item is not null)
+            {
+                var activeExplorer = _globals.Ol.App.ActiveExplorer();
+                await Task.Run(() => 
+                { 
+                    if (activeExplorer.IsItemSelectableInView(item))
+                    {
+                        activeExplorer.ClearSelection();
+                        activeExplorer.AddToSelection(item);
+                    }
+                    else { item.Display(); }
+                });
+                await Task.Run(activeExplorer.Activate);
+            }
+        }
+
+        internal void FormatRow(object sender, FormatRowEventArgs e)
+        {
+            var node = (TreeNode<ToDoItem>)e.Model;
+            var todo = node.Value;
+            e.Item.Font = todo.Complete ? new Font(e.Item.Font, e.Item.Font.Style | FontStyle.Strikeout) : new Font(e.Item.Font, e.Item.Font.Style & ~FontStyle.Strikeout);
         }
 
         internal void MoveObjectsToRoots(TreeListView targetTree, TreeListView sourceTree, IList toMove)
@@ -186,9 +245,9 @@ namespace TaskTree
             {
                 if (x.Parent is null)
                 {
-                    if (_dataModel.ListOfToDoTree.Contains(x))
+                    if (_dataModel.Roots.Contains(x))
                     {
-                        _dataModel.ListOfToDoTree.Remove(x);         // Data Model: Remove node from roots
+                        _dataModel.Roots.Remove(x);         // Data Model: Remove node from roots
                     }
                     else
                     {
@@ -209,14 +268,14 @@ namespace TaskTree
                 // targetRootsChanged = True                   'TreeListview:
                 // targetRoots.InsertRange(targetRoots.IndexOf(target) + siblingOffset, toMove) 'TreeListview: Inserted into new tree
                 // DataModel: Nothing here. Is this dealt with?
-                _dataModel.ListOfToDoTree.AddRange((IEnumerable<TreeNode<ToDoItem>>)toMove);
-                string strSeed = _dataModel.ListOfToDoTree.Count > toMove.Count ? _dataModel.ListOfToDoTree[_dataModel.ListOfToDoTree.Count - toMove.Count - 2].Value.ToDoID : "00";
+                _dataModel.Roots.AddRange((IEnumerable<TreeNode<ToDoItem>>)toMove);
+                string strSeed = _dataModel.Roots.Count > toMove.Count ? _dataModel.Roots[_dataModel.Roots.Count - toMove.Count - 2].Value.ToDoID : "00";
 
-                var loopTo = _dataModel.ListOfToDoTree.Count - 1;
-                for (int i = _dataModel.ListOfToDoTree.Count - toMove.Count - 1; i <= loopTo; i++)
+                var loopTo = _dataModel.Roots.Count - 1;
+                for (int i = _dataModel.Roots.Count - toMove.Count - 1; i <= loopTo; i++)
                 {
                     strSeed = _globals.TD.IDList.GetNextToDoID(strSeed);
-                    _dataModel.ListOfToDoTree[i].Value.ToDoID = strSeed;
+                    _dataModel.Roots[i].Value.ToDoID = strSeed;
                 }
             }
             else
@@ -239,9 +298,9 @@ namespace TaskTree
                 if (x.Parent is null)
                 {
                     sourceTree.RemoveObject(x);              
-                    if (_dataModel.ListOfToDoTree.Contains(x))
+                    if (_dataModel.Roots.Contains(x))
                     {
-                        _dataModel.ListOfToDoTree.Remove(x);         
+                        _dataModel.Roots.Remove(x);         
                     }
                     else
                     {
@@ -257,6 +316,75 @@ namespace TaskTree
                 _dataModel.AddChild(x, target, _globals.TD.IDList);    
             }
         }
+
+        internal void ToggleExpandCollapseAll()
+        {
+            if (_expanded)
+            {
+                _viewer.TreeLv.CollapseAll();
+            }
+            else
+            {
+                _viewer.TreeLv.ExpandAll();
+            }
+            _expanded = !_expanded;
+
+        }
+
+        internal void ResizeForm()
+        {
+            _rs.ResizeAllControls(_viewer);
+            _viewer.TreeLv.AutoScaleColumnsToContainer();
+        }
+
+        internal void RebuildTreeVisual()
+        {
+            _viewer.TreeLv.Roots = _dataModel.Roots;
+            _viewer.TreeLv.RebuildAll(preserveState: false);
+        }
+
+        internal void ToggleHideComplete()
+        {
+            if (_filterCompleted)
+            {
+                _viewer.TreeLv.ModelFilter = null;
+                _filterCompleted = false;
+            }
+            else
+            {
+                _viewer.TreeLv.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
+                _filterCompleted = true;
+            }
+        }
+
+        internal void TreeLvActivateItem()
+        {
+            var node = GetSelectedTreeNode();
+            if (node is not null) 
+            {
+                var objItem = node.Value.OlItem.InnerObject;
+                if (IsValidType(objItem)) { ActivateOlItem(objItem); }
+                else { MessageBox.Show($"Unsupported type. Selection is of type {objItem.GetType()}"); }
+            }
+        }
+
+        internal async Task TreeLvActivateItemAsync()
+        {
+            var node = GetSelectedTreeNode();
+            if (node is not null)
+            {
+                var objItem = node.Value.OlItem.InnerObject;
+                if (IsValidType(objItem)) 
+                { 
+                    await ActivateOlItemAsync(objItem); 
+                }
+                else { MessageBox.Show($"Unsupported type. Selection is of type {objItem.GetType()}"); }
+            }
+        }
+
+        #endregion UI Helper Functions
+
+        #region Data Model Helper Functions
 
         private TreeNode<ToDoItem> FindChildByID(string ID, List<TreeNode<ToDoItem>> nodes)
         {
@@ -285,85 +413,24 @@ namespace TaskTree
         
         internal TreeNode<ToDoItem> GetSelectedTreeNode()
         {
-            var item = _viewer.TLV.GetItem(_viewer.TLV.SelectedIndex).RowObject;
-            return item as TreeNode<ToDoItem>;
+            try
+            {
+                return _viewer.TreeLv.GetItem(_viewer.TreeLv.SelectedIndex).RowObject as TreeNode<ToDoItem>;
+            }
+            catch (System.Exception)
+            {
+                return null;                
+            }
+            
+            
         }
-                
+
         internal bool IsValidType(object item)
         {
             return ((item is Outlook.MailItem) || (item is Outlook.TaskItem));
         }
         
-        internal void ActivateOlItem(dynamic item)
-        {
-            if (item is not null)
-            {
-                var activeExplorer = _globals.Ol.App.ActiveExplorer();
-                if (activeExplorer.IsItemSelectableInView(item))
-                {
-                    activeExplorer.ClearSelection();
-                    activeExplorer.AddToSelection(item);
-                }
-                else { item.Display(); }
-            }
-        }
-
-        internal void TlvActivateItem()
-        {
-            var node = GetSelectedTreeNode();
-            if (node is not null) 
-            {
-                var objItem = node.Value.GetItem();
-                if (IsValidType(objItem)) { ActivateOlItem(objItem); }
-                else { MessageBox.Show($"Unsupported type. Selection is of type {objItem.GetType()}"); }
-            }
-        }
-
-        internal void FormatRow(object sender, FormatRowEventArgs e)
-        {
-            ToDoItem objToDo = (ToDoItem)e.Model;
-            e.Item.Font = objToDo.Complete ? new Font(e.Item.Font, e.Item.Font.Style | FontStyle.Strikeout) : new Font(e.Item.Font, e.Item.Font.Style & ~FontStyle.Strikeout);
-        }
-
-        internal void ToggleExpandCollapseAll()
-        {
-            if (expanded)
-            {
-                _viewer.TLV.CollapseAll();
-            }
-            else
-            {
-                _viewer.TLV.ExpandAll();
-            }
-            expanded = !expanded;
-
-        }
-
-        internal void ResizeForm()
-        {
-            rs.ResizeAllControls(_viewer);
-            _viewer.TLV.AutoScaleColumnsToContainer();
-        }
-
-        internal void ToggleHideComplete()
-        {
-            if (filtercompleted)
-            {
-                _viewer.TLV.ModelFilter = null;
-                filtercompleted = false;
-            }
-            else
-            {
-                _viewer.TLV.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
-                filtercompleted = true;
-            }
-        }
-
-        internal void RebuildTreeVisual()
-        {
-            _viewer.TLV.Roots = _dataModel.ListOfToDoTree;
-            _viewer.TLV.RebuildAll(preserveState: false);
-        }
+        #endregion Data Model Helper Functions
 
         #region debugging helper functions
 

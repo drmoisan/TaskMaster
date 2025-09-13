@@ -1,144 +1,174 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using Newtonsoft.Json;
 using ToDoModel;
+using ToDoModel.Data_Model.People;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList;
+using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 using UtilitiesCS.Threading;
+using Tags;
+using UtilitiesCS.Interfaces;
+using TaskVisualization;
 
 namespace TaskMaster
 {
 
-    public class AppToDoObjects : IToDoObjects
+    public class AppToDoObjects(IApplicationGlobals parentInstance) : IToDoObjects
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public AppToDoObjects(ApplicationGlobals ParentInstance)
+        async public Task LoadAsync(bool parallel = true)
         {
-            _parent = ParentInstance;
+            if (parallel) { await LoadParallelAsync(); }
+            else { await LoadSequentialAsync(); }
         }
 
-        async public Task LoadAsync()
+        async public Task LoadParallelAsync() 
         {
-            var tasks = new List<Task> 
+            var tasks = new List<Task>
             {
-                LoadDictPPLAsync(),
+                LoadPrefixListAsync(),                
                 LoadDictRemapAsync(),
-                LoadProjInfoAsync(),
                 LoadIdListAsync(),
+                LoadProgramInfoAsync(),
+                LoadProjInfoAsync(),
                 LoadCategoryFiltersAsync(),
-                LoadPrefixListAsync()
+                LoadFilteredFolderScrapingAsync(),
+                LoadFolderRemapAsync(),
+                LoadFlagChangeTrainingQueueAsync(),
+                LoadSelectFromListAsync()
             };
             await Task.WhenAll(tasks);
-            //logger.Debug($"{nameof(AppToDoObjects)}.{nameof(LoadAsync)} is complete.");
+        }
+        
+        async public Task LoadSequentialAsync() 
+        {
+            await LoadPrefixListAsync();
+            await LoadPeopleAsync();
+            await LoadDictRemapAsync();
+            await LoadIdListAsync();
+            await LoadProgramInfoAsync();
+            await LoadProjInfoAsync();
+            await LoadCategoryFiltersAsync();
+            await LoadFilteredFolderScrapingAsync();
+            await LoadFolderRemapAsync();
+            await LoadFlagChangeTrainingQueueAsync();
+            await LoadSelectFromListAsync();
         }
 
-        private Properties.Settings _defaults = Properties.Settings.Default;
+        private readonly Properties.Settings _defaults = Properties.Settings.Default;
         
         private T Initialized<T>(T obj, Func<T> initializer)
         {
-            if (obj is null)
-            {
-                obj = initializer.Invoke();
-            }
+            obj ??= initializer.Invoke();
             return obj;
         }
 
-        private readonly ApplicationGlobals _parent;
-        public IApplicationGlobals Parent
-        {
-            get
-            {
-                return _parent;
-            }
-        }
+        public IApplicationGlobals Parent { get; protected set; } = parentInstance;
+        internal ISmartSerializableNonTyped SmartSerializable { get; set; } = new SmartSerializableNonTyped();
 
         private string _projInfo_Filename;
         public string ProjInfo_Filename => Initialized(_projInfo_Filename, () => _projInfo_Filename = _defaults.FileName_ProjInfo);
-        private ProjectInfo _projInfo;
-        public IProjectInfo ProjInfo => Initialized(_projInfo, () => LoadProjInfo());
+        private ProjectData _projInfo;
+        public IProjectData ProjInfo => Initialized(_projInfo, () => LoadProjInfo());
         async private Task LoadProjInfoAsync()
         {
-            _projInfo = await Task.Run(() => new ProjectInfo(filename: _defaults.FileName_ProjInfo, folderpath: Parent.FS.FldrAppData));
-            //_projInfo = await Task.Factory.StartNew(
-            //                  () => new ProjectInfo(filename: _defaults.FileName_ProjInfo,
-            //                                        folderpath: Parent.FS.FldrAppData), 
-            //                  default,
-            //                  TaskCreationOptions.None,
-            //                  PriorityScheduler.BelowNormal);
-            if (_projInfo.Count == 0) 
+            _projInfo = await Task.Run(() => 
             {
-                await Task.Run(() => _projInfo.Rebuild(Parent.Ol.App));
-                //await Task.Factory.StartNew(
-                //      () => _projInfo.Rebuild(Parent.Ol.App),
-                //      default,
-                //      TaskCreationOptions.None,
-                //      PriorityScheduler.BelowNormal);
+                if (Parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
+                {
+                    var proj = new ProjectData(filename: _defaults.FileName_ProjInfo, folderpath: appData);
+                    proj.Sort();
+                    return proj;
+                }
+                else { return null; }
+            });
+            
+            if (_projInfo?.Count == 0) 
+            {
+                await Task.Run(() => _projInfo.Rebuild(Parent.Ol.App));                
             }
         }
-        private IProjectInfo LoadProjInfo()
+        private IProjectData LoadProjInfo()
         {
-            var projectInfo = new ProjectInfo(filename: _defaults.FileName_ProjInfo,
-                                              folderpath: Parent.FS.FldrAppData);
-            if (projectInfo.Count == 0) { projectInfo.Rebuild(Parent.Ol.App); }
-            return projectInfo;
+
+            if (Parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
+            {
+                var projectInfo = new ProjectData(filename: _defaults.FileName_ProjInfo,
+                                                  folderpath: appData);
+                if (projectInfo.Count == 0) { projectInfo.Rebuild(Parent.Ol.App); }
+                return projectInfo;
+            }
+            else { return null; }
         }
 
-        //private string _dictPPL_Filename;
-        //public string DictPPL_Filename { get => Initialized(_dictPPL_Filename, () => _defaults.FilenameDictPpl);}
-        ////{
-        ////    get
-        ////    {
-        ////        if (_dictPPL_Filename is null)
-        ////            _dictPPL_Filename = _defaults.FilenameDictPpl;
-        ////        return _dictPPL_Filename;
-        ////    }
-        ////}
-        
+        private ScDictionary<string, string> _programInfo;
+        public ScDictionary<string, string> ProgramInfo => Initialized(_programInfo, LoadProgramInfo);
+        private ScDictionary<string, string> LoadProgramInfo() 
+        {
+            if (Parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
+            {
+                return ScDictionary<string, string>.Static.Deserialize(_defaults.FileName_ProgramDictionary, appData); 
+            }
+            else { return null; }
+        }
 
-        ////TODO: Convert DictPPL to SCODictionary
-        //private Dictionary<string, string> _dictPPL;
-        //public Dictionary<string, string> DictPPL => Initialized(_dictPPL, () => LoadDictJSON(Parent.FS.FldrStaging, DictPPL_Filename));
-        ////{
-        ////    get
-        ////    {
-        ////        if (_dictPPL is null)
-        ////            _dictPPL = LoadDictJSON(Parent.FS.FldrStaging, DictPPL_Filename);
-        ////        return _dictPPL;
-        ////    }
-        ////}
-        //async private Task LoadDictPPLAsync() 
-        //{ _dictPPL = await LoadDictJSONAsync(Parent.FS.FldrStaging, DictPPL_Filename); }
-        //public void DictPPL_Save()
+        async private Task LoadProgramInfoAsync() => _programInfo = await Task.Run(LoadProgramInfo);
+
+        //public ProgramData
+
+        async internal Task LoadPeopleAsync() => await Task.Run(async () =>
+        {
+            if (Parent.IntelRes.Config.TryGetValue("People", out var config))
+            {                
+                People = await SmartSerializable.DeserializeAsync(config, true, () => new PeopleScoDictionaryNew(Parent));
+                People.Prefix = PrefixList.Find(x => x.PrefixType == PrefixTypeEnum.People);
+                People.CollectionChanged += People_CollectionChanged;
+            }
+            else { logger.Error("People config not found."); }
+        }, Parent.AF.CancelToken);
+
+        public IPeopleScoDictionaryNew People {  get; private set; }
+        public void People_CollectionChanged(object Sender, DictionaryChangedEventArgs<string, string> args)
+        {
+            People.Serialize();
+            //var dict = (PeopleScoDictionaryNew)Sender;
+            //dict.Serialize();
+        }
+
+
+        //private PeopleScoDictionary _dictPPL;
+        //public IPeopleScoDictionary DictPPL => Initialized(_dictPPL, () => LoadDictPPL());
+        //private PeopleScoDictionary LoadDictPPL()
         //{
-        //    File.WriteAllText(Path.Combine(Parent.FS.FldrStaging, DictPPL_Filename), 
-        //                      JsonConvert.SerializeObject(_dictPPL, Formatting.Indented));
-        //}
+        //    if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+        //    {
+        //        var dictPPL = new PeopleScoDictionary(filename: _defaults.FilenameDictPpl,
+        //                                          folderpath: pythonStaging,
+        //                                          appGlobals: Parent,
+        //                                          prefix: PrefixList.Find(x => x.PrefixType == PrefixTypeEnum.People));
 
-        private PeopleScoDictionary _dictPPL;
-        public IPeopleScoDictionary DictPPL => Initialized(_dictPPL, () => LoadDictPPL());
-        private PeopleScoDictionary LoadDictPPL()
-        {
-            var dictPPL = new PeopleScoDictionary(filename: _defaults.FilenameDictPpl,
-                                                  folderpath: Parent.FS.FldrPythonStaging,
-                                                  appGlobals: Parent,
-                                                  prefix: PrefixList.Find(x => x.PrefixType == PrefixTypeEnum.People));
-            
-            return dictPPL;
-        }
-        async private Task LoadDictPPLAsync() => _dictPPL = await Task.Factory.StartNew(
-            () => LoadDictPPL(), default, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-        async private Task LoadPrefixAndDictPeopleAsync()
-        {
-            await LoadPrefixListAsync();
-            await LoadDictPPLAsync();
-        }
+        //        return dictPPL;
+        //    }
+        //    else { return null; }
+        //}
+        //async private Task LoadDictPPLAsync() => _dictPPL = await Task.Run(LoadDictPPL);
+        //async private Task LoadPrefixAndDictPeopleAsync()
+        //{
+        //    await LoadPrefixListAsync();
+        //    await LoadDictPPLAsync();
+        //}
 
         public string FnameIDList => _defaults.FileName_IDList;
         
@@ -149,11 +179,16 @@ namespace TaskMaster
         
         private IIDList LoadIDList()
         {
-            var idList = new IDList(FnameIDList,
-                                    Parent.FS.FldrAppData,
+            if (Parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
+            {
+                var idList = new IDList(FnameIDList,
+                                    appData,
                                     Parent.Ol.App);
-            if (idList.Count == 0) { idList.RefreshIDList(); }
-            return idList;
+                if (idList.Count == 0) { idList.RefreshIDList(); }
+                return idList;
+
+            }
+            else { return null;}
         }
 
         private string _fnameDictRemap;
@@ -163,193 +198,134 @@ namespace TaskMaster
         public IScoDictionary<string, string> DictRemap => Initialized(_dictRemap, () => LoadDictRemap());
         private ScoDictionary<string, string> LoadDictRemap()
         {
-            var dictRemap = new ScoDictionary<string, string>(filename: FnameDictRemap,
-                                                              folderpath: Parent.FS.FldrPythonStaging);
-            return dictRemap;
-        }
-        async private Task LoadDictRemapAsync() => _dictRemap = await Task.Factory.StartNew(
-            () => LoadDictRemap(), default, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+            {
+                var dictRemap = new ScoDictionary<string, string>(filename: FnameDictRemap,
+                                                              folderpath: pythonStaging);
+                return dictRemap;
 
-        //private Dictionary<string, string> _dictRemap;
-        //public Dictionary<string, string> DictRemap => Initialized(_dictRemap, () => LoadDictJSON(Parent.FS.FldrStaging, FnameDictRemap));
-        //async private Task LoadDictRemapAsync() => _dictRemap = await LoadDictJSONAsync(Parent.FS.FldrStaging, FnameDictRemap);
+            }
+            else { return null;}
+        }
+        async private Task LoadDictRemapAsync() => _dictRemap = await Task.Run(LoadDictRemap, default);
 
         //TODO: Convert CategoryFilters to ScoCollection
         private ISerializableList<string> _catFilters;
         public ISerializableList<string> CategoryFilters
         {
-            get => Initialized(_catFilters, () => new SerializableList<string>(filename: _defaults.FileName_CategoryFilters,
-                                                                               folderpath: _parent.FS.FldrPythonStaging));
+            get => Initialized(_catFilters, () =>
+            {
+                if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+                {
+                    return new SerializableList<string>(filename: _defaults.FileName_CategoryFilters,
+                                                        folderpath: pythonStaging);
+                }
+                else { return null;}
+            });
             set
             {
                 _catFilters = value;
-                if (_catFilters.Folderpath == "")
+                
+                if (_catFilters.Folderpath == "" && Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
                 {
-                    _catFilters.Folderpath = _parent.FS.FldrPythonStaging;
+                    _catFilters.Folderpath = pythonStaging;
                     _catFilters.Filename = _defaults.FileName_CategoryFilters;
                 }
-                _catFilters.Serialize();
+                if (_catFilters.Folderpath != "") { _catFilters.Serialize(); }
             }
         }
         async private Task LoadCategoryFiltersAsync()
         {
-            _catFilters = await Task.Factory.StartNew(
-                () => new SerializableList<string>(filename: _defaults.FileName_CategoryFilters,
-                                                   folderpath: _parent.FS.FldrPythonStaging),
-                default(CancellationToken));
-                //default,
-                //TaskCreationOptions.None,
-                //PriorityScheduler.BelowNormal);
+            
+            _catFilters = await Task.Run(() =>
+            {
+                if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+                {
+                    return new SerializableList<string>(filename: _defaults.FileName_CategoryFilters,
+                                                       folderpath: pythonStaging);
+                }
+                else { return null; }
+            }, default);
         }
 
         // Prefix List
         private ScoCollection<IPrefix> _prefixList;
         public ScoCollection<IPrefix> PrefixList => Initialized(_prefixList, () => LoadPrefixList());
-        private ScoCollection<IPrefix> LoadPrefixList()
+        public ScoCollection<IPrefix> LoadPrefixList()
         {
-            var prefixList = new ScoCollection<IPrefix>(filename: _defaults.FileName_PrefixList,
-                                                        folderpath: Parent.FS.FldrPythonStaging);
-            if (prefixList.Count == 0) 
-            { 
-                var tdDefaults = new ToDoDefaults();
-                foreach (var prefix in tdDefaults.PrefixList) { prefixList.Add(prefix); }
-                prefixList.Serialize();
+            if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+            {
+                var prefixList = new ScoCollection<IPrefix>(fileName: _defaults.FileName_PrefixList,
+                                                            folderPath: pythonStaging);
+
+                if (prefixList.Count == 0) 
+                { 
+                    var tdDefaults = new ToDoDefaults();
+                    foreach (var prefix in tdDefaults.PrefixList) { prefixList.Add(prefix); }
+                    prefixList.Serialize();
+                }
+                return prefixList;
             }
-            return prefixList;
+            else { return null;}
         }
         async private Task LoadPrefixListAsync()
         {
-            _prefixList = await Task.Factory.StartNew(
-                              () => LoadPrefixList(),
-                              default(CancellationToken));
-                              //default,
-                              //TaskCreationOptions.None,
-                              //PriorityScheduler.BelowNormal);
+            _prefixList = await Task.Run(LoadPrefixList);
         }
 
+        private ScoDictionary<string, int> _filteredFolderScraping;
+        public ScoDictionary<string, int> FilteredFolderScraping => Initialized(_filteredFolderScraping, () => LoadFilteredFolderScraping());
+        public ScoDictionary<string, int> LoadFilteredFolderScraping()
+        {
+            if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+            {
+                var filteredFolderScraping = new ScoDictionary<string, int>(_defaults.FileName_FilteredFolderScraping,
+                                                                            pythonStaging);
+                return filteredFolderScraping;
+            }
+            else { return null; }
+        }
+        async private Task LoadFilteredFolderScrapingAsync()
+        {
+            _filteredFolderScraping = await Task.Run(
+                                      () => LoadFilteredFolderScraping(),
+                                      default(CancellationToken));
+        }
 
-        //private Dictionary<string, string> LoadDictCSV(string fpath, string filename)
-        //{
-        //    var dict = CSVDictUtilities.LoadDictCSV(fpath, filename.Split('.')[0] + ".csv");
-        //    if (dict is not null)
-        //        WriteDictJSON(dict, Path.Combine(fpath, filename));
-        //    return dict;
-        //}
+        private ScoDictionary<string, string> _folderRemap;
+        public ScoDictionary<string, string> FolderRemap => Initializer.GetOrLoad(ref _folderRemap, () => LoadFolderRemap());
+        public ScoDictionary<string, string> LoadFolderRemap()
+        {
+            if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+            {
+                var folderRemap = new ScoDictionary<string, string>(_defaults.FileName_FolderRemap,
+                                                                    pythonStaging);
+                return folderRemap;
+            }
+            else { return null; }
+        }
+        async private Task LoadFolderRemapAsync()
+        {
+            _folderRemap = await Task.Run(LoadFolderRemap);
+        }
 
-        //async private Task<Dictionary<string, string>> LoadDictCSVAsync(string fpath, string filename)
-        //{
-        //    var dict = await Task<Dictionary<string,string>>.Factory.StartNew(
-        //                     () => CSVDictUtilities.LoadDictCSV(fpath, filename.Split('.')[0] + ".csv"),
-        //                     default,
-        //                     TaskCreationOptions.None,
-        //                     PriorityScheduler.BelowNormal);
+        public Func<IEnumerable<string>, IPrefix, string, string, string> FindMatchingTag { get; internal set; } = TagLauncher.LaunchAndFindMatch;
+        //IEnumerable<string> options, IApplicationGlobals appGlobals
+        public Func<IEnumerable<string>, List<string>> SelectFromList { get; internal set; }
+        private async Task LoadSelectFromListAsync()
+        {
+            await Task.Run(() => SelectFromList = (options) => TagLauncher.LaunchAndSelect(options, this.Parent));
+        }
 
-        //    if (dict is not null)
-        //        _ = Task.Factory.StartNew(
-        //            () => WriteDictJSON(dict, Path.Combine(fpath, filename)),
-        //            default,
-        //            TaskCreationOptions.None,
-        //            PriorityScheduler.BelowNormal);
-        //    return dict;
-        //}
+        public IFlagChangeTrainingQueue FlagChangeTrainingQueue { get; set; }
+        async private Task LoadFlagChangeTrainingQueueAsync()
+        {
+            await Task.Run(() => 
+            { 
+                FlagChangeTrainingQueue = new FlagChangeTrainingQueue().Init();
+            });
+        }
 
-        ////TODO: Deprecate LoadDictJSON
-        //private Dictionary<string, string> LoadDictJSON(string fpath, string filename)
-        //{
-
-        //    string filepath = Path.Combine(fpath, filename);
-        //    Dictionary<string, string> dict = null;
-        //    var response = DialogResult.Ignore;
-
-        //    try
-        //    {                
-        //        dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(Path.Combine(Parent.FS.FldrStaging, DictPPL_Filename)));
-        //    }
-        //    catch (FileNotFoundException ex)
-        //    {
-        //        response = MessageBox.Show("Error", filepath + "not found. Load from CSV?", MessageBoxButtons.YesNo,MessageBoxIcon.Error);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        response = MessageBox.Show("Error", filepath + "encountered a problem. " + ex.Message + "Load from CSV?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-        //    }
-        //    finally
-        //    {
-        //        if (response == DialogResult.Yes)
-        //        {
-        //            dict = LoadDictCSV(fpath, filename);
-        //        }
-        //        else if (response == DialogResult.No)
-        //        {
-        //            response = MessageBox.Show("Error", "Start a new blank dictionary?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-        //            if (response == DialogResult.Yes)
-        //            {
-        //                dict = new Dictionary<string, string>();
-        //            }
-        //            else
-        //            {
-        //                throw new ArgumentNullException("Cannot proceed without dictionary: " + filename);
-        //            }
-        //        }
-        //    }
-        //    return dict;
-        //}
-
-        //async private Task<Dictionary<string, string>> LoadDictJSONAsync(string fpath, string filename)
-        //{
-
-        //    string filepath = Path.Combine(fpath, filename);
-        //    Dictionary<string, string> dict = null;
-        //    var response = DialogResult.Ignore;
-
-        //    try
-        //    {
-        //        dict = await Task<Dictionary<string, string>>.Factory.StartNew(
-        //                     () => JsonConvert.DeserializeObject<Dictionary<string, string>>(
-        //                         File.ReadAllText(
-        //                            Path.Combine(
-        //                                Parent.FS.FldrStaging, 
-        //                                DictPPL_Filename))),
-        //                     default,
-        //                     TaskCreationOptions.None,
-        //                     PriorityScheduler.BelowNormal);
-        //    }
-        //    catch (FileNotFoundException)
-        //    {
-                
-        //        response = MessageBox.Show("Error", filepath + "not found. Load from CSV?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        response = MessageBox.Show("Error", filepath + "encountered a problem. " + ex.Message + "Load from CSV?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-        //    }
-        //    finally
-        //    {
-        //        if (response == DialogResult.Yes)
-        //        {
-        //            dict = await LoadDictCSVAsync(fpath, filename);
-        //        }
-        //        else if (response == DialogResult.No)
-        //        {
-        //            response = MessageBox.Show("Error", "Start a new blank dictionary?", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-        //            if (response == DialogResult.Yes)
-        //            {
-        //                dict = new Dictionary<string, string>();
-        //            }
-        //            else
-        //            {
-        //                throw new ArgumentNullException("Cannot proceed without dictionary: " + filename);
-        //            }
-        //        }
-        //    }
-        //    return dict;
-        //}
-
-        ////TODO: Deprecate WriteDictJSON
-        //public void WriteDictJSON(Dictionary<string, string> dict, string filepath)
-        //{
-        //    File.WriteAllText(filepath, JsonConvert.SerializeObject(dict, Formatting.Indented));
-        //}
-
+        
     }
 }

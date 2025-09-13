@@ -2,13 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using static Deedle.Vectors.VectorConstruction;
 
 
 namespace UtilitiesCS
 {
-
     public static class FileIO2
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public static void DELETE_TextFile(string filename, string stagingPath)
         {
             string filepath = Path.Combine(stagingPath, filename);
@@ -30,12 +35,50 @@ namespace UtilitiesCS
 
         public static void WriteTextFile(string filename, string[] strOutput, string folderpath)
         {
+            //TraceUtility.LogMethodCall(filename, strOutput, folderpath);
+
             string filepath = Path.Combine(folderpath, filename);
             var listOutput = new List<string>(strOutput);
             foreach (var output in listOutput)
                 WriteUTF8(filepath, output, (WriteOptions.AppendNewLine | WriteOptions.OpenAsAppend));
-            
-            
+
+
+        }
+
+        public static async Task WriteTextFileAsync(string filename, string[] strOutput, string folderpath, CancellationToken token)
+        {
+            //TraceUtility.LogMethodCall(filename, strOutput, folderpath, token);
+
+            string filepath = Path.Combine(folderpath, filename);
+            bool success = false;
+            int attempts = 0;
+
+            while (!success) 
+            { 
+                try
+                {
+                    token.ThrowIfCancellationRequested();
+                    using (var sw = new StreamWriter(filepath, true, System.Text.Encoding.UTF8))
+                    {
+                        success = true;
+                        foreach (var output in strOutput)
+                            await sw.WriteLineAsync(output);
+                    }
+                }
+                catch (IOException)
+                {
+                    Interlocked.Increment(ref attempts);
+                    if (attempts < 100)
+                    {
+                        await Task.Delay(100);
+                    }
+                    else 
+                    { 
+                        logger.Error($"Failed to write to {filepath} after {attempts} attempts.");
+                        success = true; 
+                    }
+                }            
+            }
         }
 
         private static void WriteUTF8(string filepath, string textString, WriteOptions options)

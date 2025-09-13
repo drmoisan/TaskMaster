@@ -5,14 +5,13 @@ using System;
 using System.Collections.Generic;
 using UtilitiesCS;
 
-namespace UtilitiesCS.Test.EmailIntelligence
+namespace Z.Obsolete.UtilitiesCS.Test.EmailIntelligence
 {
     [TestClass]
+    [Obsolete]
     public class CtfIncidenceListTests
     {
         private MockRepository mockRepository;
-
-
 
         [TestInitialize]
         public void TestInitialize()
@@ -22,136 +21,136 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
         }
 
-        private CtfIncidenceList CreateCtfIncidenceList()
-        {
-            return new CtfIncidenceList();
-        }
+        //private CtfIncidenceList CreateCtfIncidenceList()
+        //{
+        //    return new CtfIncidenceList();
+        //}
 
-        [TestMethod]
-        public void CTF_Inc_Position_ADD_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var ctfIncidenceList = this.CreateCtfIncidenceList();
-            int Inc_Num = 0;
-            CtfMapEntry CTF_Map = null;
+        //[TestMethod]
+        //public void Unfinished_CTF_Inc_Position_ADD_StateUnderTest_ExpectedBehavior()
+        //{
+        //    // Arrange
+        //    var ctfIncidenceList = this.CreateCtfIncidenceList();
+        //    int Inc_Num = 0;
+        //    CtfMapEntry CTF_Map = null;
 
-            // Act
-            ctfIncidenceList.CtfIncidencePositionAdd(
-                Inc_Num,
-                CTF_Map);
+        //    // Act
+        //    ctfIncidenceList.CtfIncidencePositionAdd(
+        //        Inc_Num,
+        //        CTF_Map);
 
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
+        //    // Assert
+        //    Assert.Fail();
+        //    this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void CTF_Incidence_FIND_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var ctfIncidenceList = this.CreateCtfIncidenceList();
-            string ConvID = null;
+        //[TestMethod]
+        //public void Unfinished_CTF_Incidence_FIND_StateUnderTest_ExpectedBehavior()
+        //{
+        //    // Arrange
+        //    var ctfIncidenceList = this.CreateCtfIncidenceList();
+        //    string ConvID = null;
 
-            // Act
-            var result = ctfIncidenceList.FindID(
-                ConvID);
+        //    // Act
+        //    var result = ctfIncidenceList.FindID(
+        //        ConvID);
 
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
+        //    // Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void CTF_Incidence_INIT_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var ctfIncidenceList = this.CreateCtfIncidenceList();
-            int Inc_Num = 0;
+        //[TestMethod]
+        //public void Unfinished_CTF_Incidence_INIT_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var ctfIncidenceList = this.CreateCtfIncidenceList();
+        //    //int Inc_Num = 0;
 
-            // Act
-            ctfIncidenceList.CTF_Incidence_INIT(
-                Inc_Num);
+        //    //// Act
+        //    //ctfIncidenceList.CTF_Incidence_INIT(
+        //    //    Inc_Num);
 
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void CTF_Incidence_SET_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var ctfIncidenceList = this.CreateCtfIncidenceList();
-            int Inc_Num = 0;
-            int Inc_Position = 0;
-            int Folder_Count = 0;
-            CtfMapEntry Map = null;
+        //[TestMethod]
+        //public void Unfinished_CTF_Incidence_SET_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var ctfIncidenceList = this.CreateCtfIncidenceList();
+        //    //int Inc_Num = 0;
+        //    //int Inc_Position = 0;
+        //    //int Folder_Count = 0;
+        //    //CtfMapEntry Map = null;
 
-            // Act
-            ctfIncidenceList.CTF_Incidence_SET(
-                Inc_Num,
-                Inc_Position,
-                Folder_Count,
-                Map);
+        //    //// Act
+        //    //ctfIncidenceList.CTF_Incidence_SET(
+        //    //    Inc_Num,
+        //    //    Inc_Position,
+        //    //    Folder_Count,
+        //    //    Map);
 
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void CTF_Incidence_Text_File_WRITE_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var ctfIncidenceList = this.CreateCtfIncidenceList();
-            string folderpath = null;
-            string filename = null;
+        //[TestMethod]
+        //public void Unfinished_CTF_Incidence_Text_File_WRITE_StateUnderTest_ExpectedBehavior()
+        //{
+        //    //// Arrange
+        //    //var ctfIncidenceList = this.CreateCtfIncidenceList();
+        //    //string folderpath = null;
+        //    //string filename = null;
 
-            // Act
-            ctfIncidenceList.CTF_Incidence_Text_File_WRITE(
-                folderpath,
-                filename);
+        //    //// Act
+        //    //ctfIncidenceList.CTF_Incidence_Text_File_WRITE(
+        //    //    folderpath,
+        //    //    filename);
 
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
+        //    //// Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
-        [TestMethod]
-        public void ReadTextFile_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var ctfIncidenceList = this.CreateCtfIncidenceList();
+        //[TestMethod]
+        //public void Unfinished_ReadTextFile_StateUnderTest_ExpectedBehavior()
+        //{
+        //    // Arrange
+        //    var ctfIncidenceList = this.CreateCtfIncidenceList();
 
-            // Act
-            //var result = ctfIncidenceList.ReadTextFile(
-            //    filepath);
+        //    // Act
+        //    //var result = ctfIncidenceList.ReadTextFile(
+        //    //    filepath);
 
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
+        //    // Assert
+        //    //Assert.Fail();
+        //    //this.mockRepository.VerifyAll();
+        //}
 
         [TestMethod]
         public void ProcessQueue_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            Queue<string> lines = new(new List<string> 
+            Queue<string> lines = new(new List<string>
             {
                 "68109D5D0ED86B4B8384B64247D96451", "1",
                 "Reference\\Computer Information", "1",
                 "D5A990D48B6B2B40ADC28F23CE8D6FAC", "2",
                 "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT", "4",
-                "Reference\\Computer Information", "3" 
+                "Reference\\Computer Information", "3"
             });
 
             var expected = new CtfIncidenceList();
             expected.Add(
                 new CtfIncidence(emailConversationID: "68109D5D0ED86B4B8384B64247D96451",
                                  folderCount: 1,
-                                 emailFolder: new List<string> 
-                                 { 
-                                     "Reference\\Computer Information" 
+                                 emailFolder: new List<string>
+                                 {
+                                     "Reference\\Computer Information"
                                  },
                                  emailConversationCount: new List<int> { 1 }
                 ));
@@ -239,7 +238,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void TryDequeueIncidence_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            Queue<string> lines = new( new List<string> { "D5A990D48B6B2B40ADC28F23CE8D6FAC", "2",
+            Queue<string> lines = new(new List<string> { "D5A990D48B6B2B40ADC28F23CE8D6FAC", "2",
                 "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT", "4",
                 "Reference\\Computer Information", "3" });
             var expected = new CtfIncidence(
@@ -248,7 +247,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 emailFolder: new List<string> { "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT", "Reference\\Computer Information" },
                 emailConversationCount: new List<int> { 4, 3 }
                 );
-            
+
             // Act
             var actual = CtfIncidenceList.TryDequeueIncidence(ref lines);
 

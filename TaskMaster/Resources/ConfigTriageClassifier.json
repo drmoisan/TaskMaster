@@ -1,0 +1,21 @@
+{
+  "$id": "1",
+  "Activated": false,
+  "Globals": "default",
+  "Name": "Triage",
+  "Disk": {
+    "FileName": "TriageClassifier.json",
+    "RelativePath": "",
+    "SpecialFolderName": "AppData"
+  },
+  "LocalDisk": {
+    "FileName": "TriageClassifier.json",
+    "RelativePath": "",
+    "SpecialFolderName": "AppData"
+  },
+  "NetDisk": {
+    "FileName": "TriageClassifier.json",
+    "RelativePath": "",
+    "SpecialFolderName": "PythonStaging"
+  }
+}

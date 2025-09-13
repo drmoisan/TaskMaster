@@ -27,9 +27,9 @@ namespace ToDoModel.Test
             this.mockApplicationGlobals.SetupGet(x => x.Ol).Returns(this.mockOlObjects.Object);
         }
 
-        private FolderHandler CreateFolderHandler()
+        private FolderPredictor CreateFolderHandler()
         {
-            return new FolderHandler(
+            return new FolderPredictor(
                 this.mockApplicationGlobals.Object);
         }
                 
@@ -61,7 +61,7 @@ namespace ToDoModel.Test
             string path = "\\\\email@company.com\\Folder 1\\Folder 2\\Folder 3";
             string root = "\\\\email@company.com";
             bool includeChildren = true;
-            string expected = "\\Folder 1\\Folder 2\\Folder 3";
+            string expected = "Folder 1\\Folder 2\\Folder 3";
 
             // Act
             var actual = folderHandler.GetOlSubpath(

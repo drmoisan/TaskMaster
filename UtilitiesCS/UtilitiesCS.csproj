@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.props" Condition="Exists('..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.props')" />
-  <Import Project="..\packages\Microsoft.ML.CpuMath.2.0.1\build\netstandard2.0\Microsoft.ML.CpuMath.props" Condition="Exists('..\packages\Microsoft.ML.CpuMath.2.0.1\build\netstandard2.0\Microsoft.ML.CpuMath.props')" />
+  <Import Project="..\packages\Microsoft.ML.4.0.2\build\netstandard2.0\Microsoft.ML.props" Condition="Exists('..\packages\Microsoft.ML.4.0.2\build\netstandard2.0\Microsoft.ML.props')" />
+  <Import Project="..\packages\Microsoft.ML.CpuMath.4.0.2\build\netstandard2.0\Microsoft.ML.CpuMath.props" Condition="Exists('..\packages\Microsoft.ML.CpuMath.4.0.2\build\netstandard2.0\Microsoft.ML.CpuMath.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>12.0</LangVersion>
     <ProjectGuid>{46628EC9-8A89-491E-84A2-6CF3069BA011}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -26,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,73 +37,220 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Apache.Arrow, Version=13.0.0.0, Culture=neutral, PublicKeyToken=204f54e5a45c07df, processorArchitecture=MSIL">
-      <HintPath>..\packages\Apache.Arrow.13.0.0\lib\netstandard2.0\Apache.Arrow.dll</HintPath>
+    <Reference Include="AngleSharp, Version=1.3.0.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
+      <HintPath>..\packages\AngleSharp.1.3.0\lib\net472\AngleSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Apache.Arrow, Version=20.0.0.0, Culture=neutral, PublicKeyToken=204f54e5a45c07df, processorArchitecture=MSIL">
+      <HintPath>..\packages\Apache.Arrow.20.0.0\lib\net462\Apache.Arrow.dll</HintPath>
+    </Reference>
+    <Reference Include="Azure.Core, Version=1.46.2.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Azure.Core.1.46.2\lib\net472\Azure.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="C.math, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\C.math.NET.1.1\lib\net20\C.math.dll</HintPath>
+    </Reference>
+    <Reference Include="CustomMarshalers" />
     <Reference Include="Deedle, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Deedle.3.0.0\lib\netstandard2.0\Deedle.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Core, Version=7.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\FSharp.Core.7.0.400\lib\netstandard2.0\FSharp.Core.dll</HintPath>
+    <Reference Include="ExCSS, Version=4.3.0.0, Culture=neutral, PublicKeyToken=bdbe16be9b936b9a, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExCSS.4.3.0\lib\net48\ExCSS.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=2.0.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
+    <Reference Include="Fizzler, Version=1.3.1.0, Culture=neutral, PublicKeyToken=4ebff4844e382110, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fizzler.1.3.1\lib\netstandard2.0\Fizzler.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.7.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    <Reference Include="FluentAssertions, Version=8.3.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentAssertions.8.3.0\lib\net47\FluentAssertions.dll</HintPath>
     </Reference>
+    <Reference Include="FSharp.Core, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FSharp.Core.9.0.300\lib\netstandard2.0\FSharp.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Generic.Math, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Generic.Math.1.0.2\lib\net46\Generic.Math.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=3.1.0.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.3.1.0\lib\net462\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net.Ext.Json, Version=3.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.Ext.Json.3.0.3\lib\net462\log4net.Ext.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.9.0.6\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.HashCode, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.HashCode.6.0.0\lib\net462\Microsoft.Bcl.HashCode.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.Memory, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.Memory.9.0.6\lib\net462\Microsoft.Bcl.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.Numerics, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.Numerics.9.0.6\lib\net462\Microsoft.Bcl.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.TimeProvider, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.TimeProvider.9.0.6\lib\net462\Microsoft.Bcl.TimeProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Build" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="Microsoft.Data.Analysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Data.Analysis.0.20.1\lib\netstandard2.0\Microsoft.Data.Analysis.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Data.Analysis.0.22.2\lib\netstandard2.0\Microsoft.Data.Analysis.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.ML, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ML.2.0.1\lib\netstandard2.0\Microsoft.ML.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=9.0.0.6, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.9.0.6\lib\net462\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=9.0.0.6, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.9.0.6\lib\net462\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Graph, Version=5.82.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Graph.5.82.0\lib\netstandard2.0\Microsoft.Graph.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Graph.Core, Version=3.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Graph.Core.3.2.4\lib\net462\Microsoft.Graph.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Identity.Client, Version=4.73.0.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Identity.Client.4.73.0\lib\net472\Microsoft.Identity.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Abstractions, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Abstractions.8.12.1\lib\net472\Microsoft.IdentityModel.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.8.12.1\lib\net472\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Logging, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Logging.8.12.1\lib\net472\Microsoft.IdentityModel.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Protocols, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Protocols.8.12.1\lib\net472\Microsoft.IdentityModel.Protocols.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Protocols.OpenIdConnect.8.12.1\lib\net472\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Tokens, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.8.12.1\lib\net472\Microsoft.IdentityModel.Tokens.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Validators, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Validators.8.12.1\lib\net472\Microsoft.IdentityModel.Validators.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib\netstandard2.0\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Kiota.Abstractions, Version=1.19.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Abstractions.1.19.0\lib\netstandard2.0\Microsoft.Kiota.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Kiota.Authentication.Azure, Version=1.19.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Authentication.Azure.1.19.0\lib\netstandard2.0\Microsoft.Kiota.Authentication.Azure.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Kiota.Http.HttpClientLibrary, Version=1.19.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Http.HttpClientLibrary.1.19.0\lib\net462\Microsoft.Kiota.Http.HttpClientLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Kiota.Serialization.Form, Version=1.19.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Form.1.19.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Form.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Kiota.Serialization.Json, Version=1.19.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Json.1.19.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Kiota.Serialization.Multipart, Version=1.19.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Multipart.1.19.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Multipart.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Kiota.Serialization.Text, Version=1.19.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Text.1.19.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Text.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ML.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ML.2.0.1\lib\netstandard2.0\Microsoft.ML.Core.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ML.4.0.2\lib\netstandard2.0\Microsoft.ML.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ML.CpuMath, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ML.CpuMath.2.0.1\lib\netstandard2.0\Microsoft.ML.CpuMath.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ML.CpuMath.4.0.2\lib\netstandard2.0\Microsoft.ML.CpuMath.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ML.Data, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ML.2.0.1\lib\netstandard2.0\Microsoft.ML.Data.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ML.4.0.2\lib\netstandard2.0\Microsoft.ML.Data.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ML.DataView, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ML.DataView.2.0.1\lib\netstandard2.0\Microsoft.ML.DataView.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ML.DataView.4.0.2\lib\netstandard2.0\Microsoft.ML.DataView.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ML.KMeansClustering, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ML.2.0.1\lib\netstandard2.0\Microsoft.ML.KMeansClustering.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ML.4.0.2\lib\netstandard2.0\Microsoft.ML.KMeansClustering.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ML.PCA, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ML.2.0.1\lib\netstandard2.0\Microsoft.ML.PCA.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ML.4.0.2\lib\netstandard2.0\Microsoft.ML.PCA.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ML.StandardTrainers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ML.2.0.1\lib\netstandard2.0\Microsoft.ML.StandardTrainers.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ML.4.0.2\lib\netstandard2.0\Microsoft.ML.StandardTrainers.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ML.Transforms, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ML.2.0.1\lib\netstandard2.0\Microsoft.ML.Transforms.dll</HintPath>
+      <HintPath>..\packages\Microsoft.ML.4.0.2\lib\netstandard2.0\Microsoft.ML.Transforms.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.2088.41, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2088.41\lib\net45\Microsoft.Web.WebView2.Core.dll</HintPath>
+    <Reference Include="Microsoft.Office.Tools, Version=0.0.22544.530, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\2022\Preview\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.Web.WebView2.WinForms, Version=1.0.2088.41, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2088.41\lib\net45\Microsoft.Web.WebView2.WinForms.dll</HintPath>
+    <Reference Include="Microsoft.Office.Tools.Common, Version=0.0.22544.530, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\2022\Preview\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.Common.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.Web.WebView2.Wpf, Version=1.0.2088.41, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2088.41\lib\net45\Microsoft.Web.WebView2.Wpf.dll</HintPath>
+    <Reference Include="Microsoft.Office.Tools.Common.v4.0.Utilities, Version=0.0.22544.530, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\2022\Preview\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.Common.v4.0.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Outlook, Version=0.0.22544.530, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\2022\Preview\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.Outlook.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Outlook.v4.0.Utilities, Version=0.0.22544.530, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\2022\Preview\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.Outlook.v4.0.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.3296.44, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.3296.44\lib\net462\Microsoft.Web.WebView2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.WebView2.WinForms, Version=1.0.3296.44, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.3296.44\lib\net462\Microsoft.Web.WebView2.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.WebView2.Wpf, Version=1.0.3296.44, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.3296.44\lib\net462\Microsoft.Web.WebView2.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Win32.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Win32.Primitives.4.3.0\lib\net46\Microsoft.Win32.Primitives.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Mono.Cecil, Version=0.11.6.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.11.6\lib\net40\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb, Version=0.11.6.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.11.6\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb, Version=0.11.6.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.11.6\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks, Version=0.11.6.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Cecil.0.11.6\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Reflection, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Reflection.2.0.0\lib\net40\Mono.Reflection.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json.Bson, Version=1.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.Bson.1.0.3\lib\net45\Newtonsoft.Json.Bson.dll</HintPath>
+    </Reference>
     <Reference Include="ObjectListView, Version=2.9.1.1072, Culture=neutral, PublicKeyToken=b1c5bf581481bcd4, processorArchitecture=MSIL">
       <HintPath>..\packages\ObjectListView.Official.2.9.1\lib\net20\ObjectListView.dll</HintPath>
+    </Reference>
+    <Reference Include="Office, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Std.UriTemplate, Version=2.0.5.0, Culture=neutral, PublicKeyToken=c118b0afb4598f9a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Std.UriTemplate.2.0.5\lib\netstandard2.0\Std.UriTemplate.dll</HintPath>
+    </Reference>
+    <Reference Include="Svg, Version=3.4.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
+      <HintPath>..\packages\Svg.3.4.7\lib\net481\Svg.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.AppContext, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -110,14 +258,17 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    <Reference Include="System.Buffers, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.6.1\lib\net462\System.Buffers.dll</HintPath>
     </Reference>
-    <Reference Include="System.CodeDom, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.CodeDom.7.0.0\lib\net462\System.CodeDom.dll</HintPath>
+    <Reference Include="System.ClientModel, Version=1.4.2.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ClientModel.1.4.2\lib\netstandard2.0\System.ClientModel.dll</HintPath>
     </Reference>
-    <Reference Include="System.Collections.Immutable, Version=7.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Collections.Immutable.7.0.0\lib\net462\System.Collections.Immutable.dll</HintPath>
+    <Reference Include="System.CodeDom, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.CodeDom.9.0.6\lib\net462\System.CodeDom.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Immutable, Version=9.0.0.6, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.9.0.6\lib\net462\System.Collections.Immutable.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
@@ -127,8 +278,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="System.Diagnostics.DiagnosticSource, Version=7.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.7.0.2\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.9.0.6\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
     <Reference Include="System.Diagnostics.Tracing, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Diagnostics.Tracing.4.3.0\lib\net462\System.Diagnostics.Tracing.dll</HintPath>
@@ -136,11 +287,24 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.9.0.6\lib\net462\System.Drawing.Common.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing.Design" />
     <Reference Include="System.Globalization.Calendars, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Globalization.Calendars.4.3.0\lib\net46\System.Globalization.Calendars.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.8.12.1\lib\net472\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Interactive, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Interactive.6.0.3\lib\net48\System.Interactive.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Interactive.Async, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Interactive.Async.6.0.3\lib\net48\System.Interactive.Async.dll</HintPath>
     </Reference>
     <Reference Include="System.IO, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IO.4.3.0\lib\net462\System.IO.dll</HintPath>
@@ -168,26 +332,35 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.IO.Pipelines, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Pipelines.9.0.6\lib\net462\System.IO.Pipelines.dll</HintPath>
+    </Reference>
     <Reference Include="System.Linq, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Linq.4.3.0\lib\net463\System.Linq.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Linq.Async, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Linq.Async.6.0.1\lib\net48\System.Linq.Async.dll</HintPath>
+      <HintPath>..\packages\System.Linq.Async.6.0.3\lib\net48\System.Linq.Async.dll</HintPath>
     </Reference>
     <Reference Include="System.Linq.Expressions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Linq.Expressions.4.3.0\lib\net463\System.Linq.Expressions.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    <Reference Include="System.Memory, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory.Data, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.Data.9.0.6\lib\net462\System.Memory.Data.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http, Version=4.1.1.3, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Net.Http.4.3.4\lib\net46\System.Net.Http.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.WinHttpHandler, Version=9.0.0.6, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.Http.WinHttpHandler.9.0.6\lib\net462\System.Net.Http.WinHttpHandler.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Sockets, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Net.Sockets.4.3.0\lib\net46\System.Net.Sockets.dll</HintPath>
@@ -195,8 +368,17 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    <Reference Include="System.Numerics.Tensors, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Tensors.9.0.6\lib\net462\System.Numerics.Tensors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics.Vectors, Version=4.1.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.6.1\lib\net462\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.6.0.1\lib\net472\System.Reactive.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Async, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Async.6.0.0-alpha.18\lib\netstandard2.0\System.Reactive.Async.dll</HintPath>
     </Reference>
     <Reference Include="System.Reflection, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reflection.4.3.0\lib\net462\System.Reflection.dll</HintPath>
@@ -208,8 +390,8 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Extensions, Version=4.1.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.Extensions.4.3.1\lib\net462\System.Runtime.Extensions.dll</HintPath>
@@ -246,22 +428,34 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Text.Encoding.CodePages, Version=9.0.0.6, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encoding.CodePages.9.0.6\lib\net462\System.Text.Encoding.CodePages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.9.0.6\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.9.0.6\lib\net462\System.Text.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System.Text.RegularExpressions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Text.RegularExpressions.4.3.1\lib\net463\System.Text.RegularExpressions.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Threading.Channels, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Channels.7.0.0\lib\net462\System.Threading.Channels.dll</HintPath>
+    <Reference Include="System.Threading.Channels, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Channels.9.0.6\lib\net462\System.Threading.Channels.dll</HintPath>
     </Reference>
-    <Reference Include="System.Threading.Tasks.Dataflow, Version=7.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Dataflow.7.0.0\lib\net462\System.Threading.Tasks.Dataflow.dll</HintPath>
+    <Reference Include="System.Threading.Tasks.Dataflow, Version=9.0.0.6, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Dataflow.9.0.6\lib\net462\System.Threading.Tasks.Dataflow.dll</HintPath>
     </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.6.3\lib\net462\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -271,6 +465,9 @@
       <HintPath>..\packages\System.Xml.ReaderWriter.4.3.1\lib\net46\System.Xml.ReaderWriter.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Tesseract, Version=5.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Tesseract.5.2.0\lib\net48\Tesseract.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -289,6 +486,7 @@
     <Compile Include="Dialogs\FolderNotFoundViewer.Designer.cs">
       <DependentUpon>FolderNotFoundViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\FunctionButton.cs" />
     <Compile Include="Dialogs\InputBox.cs" />
     <Compile Include="Dialogs\InputBoxViewer.cs">
       <SubType>Form</SubType>
@@ -303,25 +501,325 @@
     </Compile>
     <Compile Include="Dialogs\NotImplementedDialog.cs" />
     <Compile Include="Dialogs\YesNoToAll.cs" />
-    <Compile Include="EmailIntelligence\AutoFile2.cs" />
-    <Compile Include="EmailIntelligence\CaptureEmailAddressesModule2.cs" />
-    <Compile Include="EmailIntelligence\CommonWords.cs" />
-    <Compile Include="EmailIntelligence\CtfIncidence.cs" />
-    <Compile Include="EmailIntelligence\CtfIncidenceList.cs" />
-    <Compile Include="EmailIntelligence\CtfMap.cs" />
-    <Compile Include="EmailIntelligence\CtfMapEntry.cs" />
-    <Compile Include="EmailIntelligence\EmailDetails.cs" />
-    <Compile Include="EmailIntelligence\RecentsList.cs" />
-    <Compile Include="EmailIntelligence\RecipientInfo.cs" />
-    <Compile Include="EmailIntelligence\SubjectMapEncoder.cs" />
-    <Compile Include="EmailIntelligence\SubjectMapEntry.cs" />
-    <Compile Include="EmailIntelligence\SubjectMapSL.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Obsolete\BayesianClassifier.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierExtensions.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Performance\BayesianPerformanceMeasurement.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Obsolete\BayesianFilter.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Obsolete\CorpusVectorized_badidea.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Obsolete\DedicatedToken.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\DoNotSerializeContractResolver.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Obsolete\ClassifierGroup.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Corpus.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\CorpusInherit.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Performance\BayesianSerializationHelper.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Performance\BayesianMetricTypes.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Performance\ConfusionViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmailIntelligence\Bayesian\Performance\ConfusionViewer.Designer.cs">
+      <DependentUpon>ConfusionViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EmailIntelligence\Bayesian\Performance\MetricChartViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmailIntelligence\Bayesian\Performance\MetricChartViewer.Designer.cs">
+      <DependentUpon>MetricChartViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EmailIntelligence\ClassifierGroups\Actionable\ActionableClassifierGroup.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\Categories\CategoryClassifierGroup.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\MulticlassEngine.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\OlFolder\OlFolderClassifierGroup.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\ConditionalItemEngine.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogic.cs" />
+    <Compile Include="EmailIntelligence\Flags\IFlagTranslator.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\IPercentageMatchable.cs" />
+    <Compile Include="OutlookObjects\AppointmentItem\MeetingItemHelper.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperNameComparer.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperNameCountSizeComparer.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperNameAndParentNameComparer.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperNodeComparer.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperNodeContentsComparer.cs" />
+    <Compile Include="OutlookObjects\Item\ItemComparer.cs" />
+    <Compile Include="OutlookObjects\MailItem\EmailDetailsWrapper.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFiler.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFilerConfig.cs" />
+    <Compile Include="Interfaces\IOutlookObjects\IEmailDetailsWrapper.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\IEmailTokenizer.cs" />
+    <Compile Include="Interfaces\IOutlookObjects\IRecipientInfo.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\MinedMailInfo.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Prediction.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierShared.cs" />
+    <Compile Include="OutlookObjects\Attachment\AttachmentHelper.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\AutoFile.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Obsolete\CorpusExample.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\EmailTokenizer.cs" />
+    <Compile Include="OutlookObjects\MailItem\CaptureEmailAddressesModule2.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\ImageStripper.cs" />
+    <Compile Include="OutlookObjects\Attachment\AttachmentSerializable.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\SpamBayes\SpamBayes.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\TristateEngine.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs" />
+    <Compile Include="EmailIntelligence\Flags\FlagConsolidator.cs" />
+    <Compile Include="EmailIntelligence\IntelligenceConfig.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FolderInfoViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FolderInfoViewer.Designer.cs">
+      <DependentUpon>FolderInfoViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OutlookObjects\Filter DASL\DASLFilterParser.cs" />
+    <Compile Include="Interfaces\IToDo\IFlagChangeGroup.cs" />
+    <Compile Include="Interfaces\IToDo\IFlagChangeItem.cs" />
+    <Compile Include="Interfaces\IToDo\IFlagChangeTrainingQueue.cs" />
+    <Compile Include="NewtonsoftHelpers\PeopleScoConverter.cs" />
+    <Compile Include="EmailIntelligence\People\PeopleScoDictionaryNew.cs" />
+    <Compile Include="NewtonsoftHelpers\PeopleScoRemainingObjectConverter.cs" />
+    <Compile Include="NewtonsoftHelpers\WrapperPeopleScoDictionaryNew.cs" />
+    <Compile Include="Extensions\AsyncSerialization.cs" />
+    <Compile Include="Extensions\CompilerServicesExtensions.cs" />
+    <Compile Include="Extensions\IControlExtensions.cs" />
+    <Compile Include="Extensions\JsonSerializerExtensions.cs" />
+    <Compile Include="Extensions\StreamExtensions.cs" />
+    <Compile Include="HelperClasses\CloningFunctions\DeepCompare.cs" />
+    <Compile Include="HelperClasses\CloningFunctions\DispatchUtility.cs" />
+    <Compile Include="HelperClasses\FileSystem\DirectoryInfoWrapper.cs" />
+    <Compile Include="HelperClasses\FileSystem\FileInfoWrapper.cs" />
+    <Compile Include="HelperClasses\FileSystem\FileSystemInfoWrapper.cs" />
+    <Compile Include="HelperClasses\FileSystem\ShellUtilities.cs" />
+    <Compile Include="HelperClasses\FileSystem\SysImageListHelper.cs" />
+    <Compile Include="HelperClasses\ParamArray.cs" />
+    <Compile Include="HelperClasses\ReflectionHelper.cs" />
+    <Compile Include="OutlookObjects\Fields\MAPIFields.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderMinimalWrapper.cs" />
+    <Compile Include="OutlookObjects\Recipient\RecipientStatic.cs" />
+    <Compile Include="OutlookObjects\Store\IStoreWrapperViewer.cs" />
+    <Compile Include="OutlookObjects\Store\StoresWrapper.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapper.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperController.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OutlookObjects\Store\StoreWrapperViewer.Designer.cs">
+      <DependentUpon>StoreWrapperViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Bag\BagChangedEventArgs.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Bag\ConcurrentObservableBag.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Bag\ISimpleActionBagObserver.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Bag\SimpleActionBagObserver.cs" />
+    <Compile Include="ReusableTypeClasses\TimedActions\TimedAsyncTask.cs" />
+    <Compile Include="ReusableTypeClasses\TimedActions\TimedQueueOfActions.cs" />
+    <Compile Include="Interfaces\IGlobals\IAppItemEngines.cs" />
+    <Compile Include="Interfaces\IGlobals\IConditionalEngine.cs" />
+    <Compile Include="Interfaces\IHelperClasses\IDirectoryInfo.cs" />
+    <Compile Include="Interfaces\IHelperClasses\IFileInfo.cs" />
+    <Compile Include="Interfaces\IHelperClasses\IFileSystemInfo.cs" />
+    <Compile Include="Interfaces\IToDo\IPeopleScoDictionaryNew.cs" />
+    <Compile Include="Interfaces\IToDo\IToDoItem.cs" />
+    <Compile Include="IntelligenceResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IntelligenceResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Interfaces\IReusableTypeClasses\Concurrent\IConcurrentDictionary.cs" />
+    <Compile Include="Interfaces\IWinForm\IContainerControl.cs" />
+    <Compile Include="Interfaces\IWinForm\IControl.cs" />
+    <Compile Include="Interfaces\IWinForm\IControlCollection.cs" />
+    <Compile Include="Interfaces\IWinForm\IForm.cs" />
+    <Compile Include="Interfaces\IWinForm\IScrollableControl.cs" />
+    <Compile Include="Interfaces\IWinForm\IUserControl.cs" />
+    <Compile Include="Interfaces\IWinForm\PropertyStore.cs" />
+    <Compile Include="ManagerResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ManagerResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="NewtonsoftHelpers\AllInclusiveBinder.cs" />
+    <Compile Include="NewtonsoftHelpers\MonoExtension\MonoExtension.cs" />
+    <Compile Include="NewtonsoftHelpers\NonRecursiveConverter.cs" />
+    <Compile Include="NewtonsoftHelpers\ScoDictionaryConverter.cs" />
+    <Compile Include="NewtonsoftHelpers\SDIL Reader\ILGlobals.cs" />
+    <Compile Include="NewtonsoftHelpers\SDIL Reader\ILInstruction.cs" />
+    <Compile Include="NewtonsoftHelpers\SDIL Reader\MethodBodyReader.cs" />
+    <Compile Include="NewtonsoftHelpers\WrapperScDictionary.cs" />
+    <Compile Include="NewtonsoftHelpers\DerivedCompositionConverter_ConcurrentDictionary.cs" />
+    <Compile Include="NewtonsoftHelpers\KnownTypesBinder.cs" />
+    <Compile Include="NewtonsoftHelpers\NConsoleTraceWriter.cs" />
+    <Compile Include="NewtonsoftHelpers\NLogTraceWriter.cs" />
+    <Compile Include="Interfaces\IEmailIntelligence\IFolderWrapper.cs" />
+    <Compile Include="Interfaces\IEmailIntelligence\IAttachment.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\MovedMailInfo.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderPredictor.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\OlFolderHelper\SmithWaterman.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderScorer.cs" />
+    <Compile Include="OutlookObjects\MailItem\ItemInfo.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapper .cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersController.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.Designer.cs">
+      <DependentUpon>FilterOlFoldersViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OutlookObjects\Folder\FolderTree.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\OSBrowser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\OSBrowser.Designer.cs">
+      <DependentUpon>OSBrowser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapController.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapTree.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapViewer.Designer.cs">
+      <DependentUpon>FolderRemapViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderSelector.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderSelector.Designer.cs">
+      <DependentUpon>FolderSelector.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EmailIntelligence\EmailParsingSorting\EmailDataMiner.cs" />
+    <Compile Include="EmailIntelligence\SubjectMap\CommonWords.cs" />
+    <Compile Include="EmailIntelligence\Ctf\CtfIncidence.cs" />
+    <Compile Include="EmailIntelligence\Ctf\CtfIncidenceList.cs" />
+    <Compile Include="EmailIntelligence\Ctf\CtfMap.cs" />
+    <Compile Include="EmailIntelligence\Ctf\CtfMapEntry.cs" />
+    <Compile Include="OutlookObjects\MailItem\EmailDetails.cs" />
+    <Compile Include="EmailIntelligence\FilterEntry.cs" />
+    <Compile Include="EmailIntelligence\Flags\FlagClassNoItem.cs" />
+    <Compile Include="EmailIntelligence\Flags\FlagDetails.cs" />
+    <Compile Include="EmailIntelligence\Flags\FlagParser.cs" />
+    <Compile Include="EmailIntelligence\Flags\FlagTranslator.cs" />
+    <Compile Include="EmailIntelligence\IntelligenceFilters.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemHelper.cs" />
+    <Compile Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.Designer.cs">
+      <DependentUpon>SubjectMapMetrics.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Extensions\IAsyncEnumerableExtensions.cs" />
+    <Compile Include="Extensions\LazyExtension.cs" />
+    <Compile Include="Extensions\NullExtensions.cs" />
+    <Compile Include="Extensions\TraceExtensions.cs" />
+    <Compile Include="HelperClasses\WipUnfinished\ComStreamWrapper.cs" />
+    <Compile Include="HelperClasses\ObjectSize.cs" />
+    <Compile Include="HelperClasses\CloningFunctions\ObjectCopier.cs" />
+    <Compile Include="NewtonsoftHelpers\FilePathHelperConverter.cs" />
+    <Compile Include="NewtonsoftHelpers\ScDictionaryConverter.cs" />
+    <Compile Include="NewtonsoftHelpers\WrapperScoDictionary.cs" />
+    <Compile Include="OneDriveHelpers\AngleSharpParsedEmailBody.cs" />
+    <Compile Include="OneDriveHelpers\OneDriveDownloader.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\IOutlookItem.cs" />
+    <Compile Include="Interfaces\IOutlookObjects\IOutlookItemFlaggable.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemFlaggableTry.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemTryGet.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\ConcurrentObservableDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\DictionaryChangedEventArgs.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\Concurrent\Observable\Dictionary\IConcurrentObservableDictionary.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\Concurrent\Observable\Dictionary\IDictionaryObserver.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\SimpleActionDictionaryObserver.cs" />
+    <Compile Include="ReusableTypeClasses\LazyTry\LazyTry.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\ILockingLinkedList.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\LockingLinkedList.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\LockingLinkedListNode.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\Observable\LinkedList\ILockingLinkedListObserver.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\Observable\LinkedList\LockingObservableLinkedListChangedEventArgs.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\Observable\LinkedList\LockingObservableLinkedList.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\Observable\LinkedList\LockingObservableLinkedListNode.cs" />
+    <Compile Include="ReusableTypeClasses\Locking\Observable\LinkedList\SimpleActionLockingLinkedListObserver.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigController.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigGroupBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.Designer.cs">
+      <DependentUpon>ConfigViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Interfaces\IReusableTypeClasses\ISmartSerializable.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\ISmartSerializableConfig.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\ISmartSerializableNonTyped.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializable.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\Config\NewSmartSerializableConfig.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializableBase.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializableLoader.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializableNonTyped.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\SmartSerializableStatic.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\SerializableNew\Concurrent\Observable\IScoDictionaryNew.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryNew.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryStatic.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\SloLinkedList.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\ScDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\ScBag.cs" />
+    <Compile Include="Threading\AsyncMultiTasker.cs" />
+    <Compile Include="Threading\IdleAsyncQueue.cs" />
+    <Compile Include="Threading\IProgressViewer.cs" />
+    <Compile Include="Threading\ProgressPackage.cs" />
+    <Compile Include="Threading\ProgressPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Threading\ProgressPane.Designer.cs">
+      <DependentUpon>ProgressPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Extensions\ImageExtensions.cs" />
+    <Compile Include="Extensions\JsonExtensions.cs" />
+    <Compile Include="ReusableTypeClasses\AsyncLazy\AsyncLazy.cs" />
+    <Compile Include="HelperClasses\Logging\DebugTextLogger.cs" />
+    <Compile Include="HelperClasses\Logging\DebugTextWriter.cs" />
+    <Compile Include="HelperClasses\DvgForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HelperClasses\DvgForm.Designer.cs">
+      <DependentUpon>DvgForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HelperClasses\FileSystem\MyFileSystemInfo.cs" />
+    <Compile Include="ReusableTypeClasses\Other\AbstractCloneable.cs" />
+    <Compile Include="Threading\ProgressMultiStepViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Threading\ProgressMultiStepViewer.Designer.cs">
+      <DependentUpon>ProgressMultiStepViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NewtonsoftHelpers\AppGlobalsConverter.cs" />
+    <Compile Include="Threading\ProgressTrackerAsync.cs" />
+    <Compile Include="Threading\ProgressTrackerPane.cs" />
+    <Compile Include="Threading\ProgressViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Threading\ProgressViewer.Designer.cs">
+      <DependentUpon>ProgressViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HelperClasses\ToolTips\QfcTipsDetails.cs" />
+    <Compile Include="HelperClasses\FileSystem\FilePathHelper.cs" />
+    <Compile Include="HelperClasses\SegmentStopWatch.cs" />
+    <Compile Include="HelperClasses\FileSystem\ShellUtilitiesStatic.cs" />
+    <Compile Include="ReusableTypeClasses\TimedActions\TimedBatchAction.cs" />
+    <Compile Include="HelperClasses\Logging\VerboseLogger.cs" />
+    <Compile Include="Interfaces\IGlobals\IAppQuickFilerSettings.cs" />
+    <Compile Include="Interfaces\ITimerWrapper.cs" />
+    <Compile Include="ReusableTypeClasses\TimedActions\TimedDiskWriter.cs" />
+    <Compile Include="ReusableTypeClasses\TimedActions\TimerWrapper.cs" />
+    <Compile Include="Interfaces\IEmailIntelligence\IItemInfo.cs" />
+    <Compile Include="EmailIntelligence\Recents\RecentsList.cs" />
+    <Compile Include="OutlookObjects\Recipient\RecipientInfo.cs" />
+    <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEncoder.cs" />
+    <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEntry.cs" />
+    <Compile Include="EmailIntelligence\SubjectMap\SubjectMapSco.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\DfDeedle.cs" />
     <Compile Include="Extensions\DfMLNet.cs" />
     <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\DrawingExtensions.cs" />
-    <Compile Include="Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="Extensions\ExceptionExtensions.cs" />
     <Compile Include="Extensions\ExtToChar.cs" />
@@ -329,37 +827,30 @@
     <Compile Include="Extensions\QueueExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\WinFormsExtensions.cs" />
-    <Compile Include="HelperClasses\ConversationHelper.cs" />
-    <Compile Include="HelperClasses\DgvForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="HelperClasses\DgvForm.Designer.cs" />
-    <Compile Include="HelperClasses\GenericBitwise.cs" />
+    <Compile Include="OutlookObjects\Conversation\ConversationHelper.cs" />
+    <Compile Include="HelperClasses\BinaryFlags\GenericBitwise.cs" />
     <Compile Include="HelperClasses\Initializer.cs" />
-    <Compile Include="HelperClasses\MailResolution.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailResolution.cs" />
     <Compile Include="HelperClasses\MergeSortImplementations.cs" />
-    <Compile Include="HelperClasses\OlItemSummary.cs" />
+    <Compile Include="OutlookObjects\Item\OlItemSummary.cs" />
     <Compile Include="HelperClasses\PrettyPrint.cs" />
-    <Compile Include="HelperClasses\ProgressTracker.cs" />
-    <Compile Include="HelperClasses\ProgressViewer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="HelperClasses\ProgressViewer.Designer.cs" />
+    <Compile Include="Threading\ProgressTracker.cs" />
     <Compile Include="HelperClasses\SimpleRegex.cs" />
-    <Compile Include="HelperClasses\TableLayoutHelper.cs" />
-    <Compile Include="HelperClasses\Theme.cs" />
-    <Compile Include="HelperClasses\ThemeControlGroup.cs" />
-    <Compile Include="HelperClasses\TipsController.cs" />
+    <Compile Include="HelperClasses\Windows Forms\TableLayoutHelper.cs" />
+    <Compile Include="HelperClasses\ThemeHelpers\Theme.cs" />
+    <Compile Include="HelperClasses\ThemeHelpers\ThemeControlGroup.cs" />
+    <Compile Include="HelperClasses\ToolTips\TipsController.cs" />
     <Compile Include="HelperClasses\Tokenizer.cs" />
+    <Compile Include="HelperClasses\Logging\TraceUtility.cs" />
     <Compile Include="Interfaces\Enums.cs" />
-    <Compile Include="Interfaces\IAppEvents.cs" />
+    <Compile Include="Interfaces\IGlobals\IAppEvents.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IMovedMailInfo.cs" />
+    <Compile Include="Interfaces\IGenericTimer.cs" />
     <Compile Include="Interfaces\IGlobals\IAppAutoFileObjects.cs" />
     <Compile Include="Interfaces\IGlobals\IApplicationGlobals.cs" />
     <Compile Include="Interfaces\IGlobals\IAppStagingFilenames.cs" />
     <Compile Include="Interfaces\IGlobals\IFileSystemFolderPaths.cs" />
     <Compile Include="Interfaces\IGlobals\IOlObjects.cs" />
-    <Compile Include="Interfaces\IGlobals\IRecentsList.cs" />
     <Compile Include="Interfaces\IGlobals\IToDoObj.cs" />
     <Compile Include="Interfaces\IGlobals\IToDoObjects.cs" />
     <Compile Include="Interfaces\IQuickFiler\IQfcTipsDetails.cs" />
@@ -367,84 +858,112 @@
     <Compile Include="Interfaces\IToDo\IIDList.cs" />
     <Compile Include="Interfaces\IToDo\IPeopleScoDictionary.cs" />
     <Compile Include="Interfaces\IToDo\IPrefix.cs" />
-    <Compile Include="Interfaces\IToDo\IProjectInfo.cs" />
+    <Compile Include="Interfaces\IToDo\IProjectData.cs" />
     <Compile Include="Interfaces\IToDo\IProjectInfoLegacy.cs" />
     <Compile Include="Interfaces\IToDo\ISubjectMapEncoder.cs" />
     <Compile Include="Interfaces\IToDo\ISubjectMapEntry.cs" />
-    <Compile Include="Interfaces\IToDo\ISubjectMapSL.cs" />
-    <Compile Include="Interfaces\IToDo\IToDoProjectInfoEntry.cs" />
-    <Compile Include="Interfaces\ITypes\IObservableDictionary.cs" />
-    <Compile Include="Interfaces\ITypes\IScoCollection.cs" />
-    <Compile Include="Interfaces\ITypes\ISCODictionary.cs" />
-    <Compile Include="Interfaces\ITypes\ISerializableDictionary.cs" />
-    <Compile Include="Interfaces\ITypes\ISerializableList.cs" />
-    <Compile Include="OutlookExtensions\Calendar.cs" />
-    <Compile Include="OutlookExtensions\CategoryExtensions.cs" />
-    <Compile Include="OutlookExtensions\ComType.cs" />
-    <Compile Include="OutlookExtensions\CreateCategory.cs" />
-    <Compile Include="OutlookExtensions\ExplorerActions.cs" />
-    <Compile Include="OutlookExtensions\FolderConverter.cs" />
-    <Compile Include="OutlookExtensions\IOutlookItem.cs" />
-    <Compile Include="OutlookExtensions\NavigateOlFolders.cs" />
-    <Compile Include="OutlookExtensions\OlItemPseudoInterface.cs" />
-    <Compile Include="OutlookExtensions\OlTableExtensions.cs" />
-    <Compile Include="OutlookExtensions\OlToDoTable.cs" />
-    <Compile Include="OutlookExtensions\OutlookItem.cs" />
-    <Compile Include="OutlookExtensions\OutlookItemExtensions.cs" />
-    <Compile Include="OutlookExtensions\OutlookItemFlaggable.cs" />
-    <Compile Include="OutlookExtensions\OutlookItemTry.cs" />
-    <Compile Include="OutlookExtensions\UserDefinedFields.cs" />
+    <Compile Include="Interfaces\IToDo\ISubjectMapSco.cs" />
+    <Compile Include="Interfaces\IToDo\IProjectEntry.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\Observable\IObservableDictionary.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\IScoCollection.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\IScoCollection2.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\IScoDictionary.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\ISerializableDictionary.cs" />
+    <Compile Include="Interfaces\IReusableTypeClasses\ISerializableList.cs" />
+    <Compile Include="OutlookObjects\Calendar\Calendar.cs" />
+    <Compile Include="OutlookObjects\Com\ComType.cs" />
+    <Compile Include="OutlookObjects\Category\CreateCategory.cs" />
+    <Compile Include="OutlookObjects\Explorer\ExplorerActions.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderConverter.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemExtensions.cs" />
+    <Compile Include="OutlookObjects\Folder\MsgToMime\MAPIMethods.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderNavigator.cs" />
+    <Compile Include="OutlookObjects\Item\OlItemPseudoInterface.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensions.cs" />
+    <Compile Include="OutlookObjects\Table\OlToDoTable.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItem.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemExtensions.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemFlaggable.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemTry.cs" />
+    <Compile Include="OutlookObjects\Fields\UserDefinedFields.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ReusableTypeClasses\AsyncQueue.cs" />
-    <Compile Include="ReusableTypeClasses\ObservableCollectionBatchUpdate.cs" />
-    <Compile Include="ReusableTypeClasses\ObservableDictionary.cs" />
-    <Compile Include="ReusableTypeClasses\ScoCollection.cs" />
-    <Compile Include="ReusableTypeClasses\SCODictionary.cs" />
-    <Compile Include="ReusableTypeClasses\ScoStack.cs" />
-    <Compile Include="ReusableTypeClasses\SerializableDictionary.cs" />
-    <Compile Include="ReusableTypeClasses\SerializableList.cs" />
-    <Compile Include="ReusableTypeClasses\StackGeek.cs" />
-    <Compile Include="ReusableTypeClasses\StackObjectCS.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="ReusableTypeClasses\Other\AsyncQueue.cs" />
+    <Compile Include="ReusableTypeClasses\Matrices\DenMatrix.cs" />
+    <Compile Include="ReusableTypeClasses\Matrices\JaggedMatrix.cs" />
+    <Compile Include="ReusableTypeClasses\Matrices\Matrix.cs" />
+    <Compile Include="ReusableTypeClasses\Matrices\DataConverter2d.cs" />
+    <Compile Include="ReusableTypeClasses\Observable\ObservableCollectionBatchUpdate.cs" />
+    <Compile Include="ReusableTypeClasses\Observable\ObservableDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\Observable\ObserverHelper.cs" />
+    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\ScoCollection.cs" />
+    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\SCODictionary.cs" />
+    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\ScoSortedDictionary.cs" />
+    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\ScoStack.cs" />
+    <Compile Include="ReusableTypeClasses\Serializable\SerializableList.cs" />
+    <Compile Include="ReusableTypeClasses\Other\StackGeek.cs" />
+    <Compile Include="ReusableTypeClasses\Other\StackObjectCS.cs" />
+    <Compile Include="ReusableTypeClasses\Other\TreeNodeOfT.cs" />
     <Compile Include="Threading\ApplicationIdleTimer.cs" />
-    <Compile Include="Threading\AsyncIdleQueue.cs" />
+    <Compile Include="Threading\AsyncIdleQueue1.cs" />
     <Compile Include="Threading\IdleActionQueue.cs" />
-    <Compile Include="Threading\PriorityScheduler.cs" />
     <Compile Include="Threading\SyncContextForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Threading\SyncContextForm.Designer.cs" />
     <Compile Include="Threading\TaskPriority.cs" />
     <Compile Include="Threading\ThreadMonitor.cs" />
+    <Compile Include="Threading\ThreadSafeFunctions.cs" />
+    <Compile Include="Threading\ThreadSafeSingleShotGuard.cs" />
     <Compile Include="Threading\TimeOutTask.cs" />
-    <Compile Include="Threading\UIThreadExtensions.cs" />
+    <Compile Include="Threading\UiThread.cs" />
     <Compile Include="To Depricate\CSVDictUtilities.cs" />
     <Compile Include="To Depricate\FileIO2.cs" />
     <Compile Include="To Depricate\FlattenArray.cs" />
     <Compile Include="To Depricate\StackObjectVB.cs" />
     <Compile Include="To Depricate\StringManipulation.cs" />
-    <Compile Include="Windows Forms\ControlPosition.cs" />
-    <Compile Include="Windows Forms\MouseDownFilter.cs" />
-    <Compile Include="Windows Forms\OlvExtension.cs" />
-    <Compile Include="Windows Forms\Resizer.cs" />
+    <Compile Include="HelperClasses\Windows Forms\ControlPosition.cs" />
+    <Compile Include="HelperClasses\Windows Forms\ImageHelper.cs" />
+    <Compile Include="HelperClasses\Windows Forms\MouseDownFilter.cs" />
+    <Compile Include="HelperClasses\Windows Forms\OlvExtension.cs" />
+    <Compile Include="HelperClasses\Windows Forms\ControlResizer.cs" />
+    <Compile Include="HelperClasses\Windows Forms\ScreenHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SVGControl\SVGControl.csproj">
-      <Project>{481e1cb9-3bd9-470f-92df-f8f1fe957b06}</Project>
+      <Project>{d0fee0d9-901a-4fb8-97d1-96a8f634b83c}</Project>
       <Name>SVGControl</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj">
       <Project>{f2e1680e-1b15-4cf2-bab0-54b8c8f6abdf}</Project>
       <Name>UtilitiesSwordfish.NET.General</Name>
     </ProjectReference>
+    <ProjectReference Include="..\VBFunctions\VBFunctions.csproj">
+      <Project>{c10dbd94-a7f6-43bc-8630-43002722d130}</Project>
+      <Name>VBFunctions</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Developer\collect-commit-context.ps1" />
+    <None Include="Developer\collect-pull-request-context.ps1" />
+    <None Include="Developer\make_chat_gpt_bundle.ps1" />
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\UtilitiesCS.EmailIntelligence.Bayesian.BayesianHypertuning+ThresholdMetric.datasource" />
+    <None Include="Properties\DataSources\UtilitiesCS.EmailIntelligence.Bayesian.BayesianHypertuning+ThresholdMetrics.datasource" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Dialogs\DelegateButtonTemplate.resx">
@@ -457,11 +976,66 @@
     <EmbeddedResource Include="Dialogs\MyBoxViewer.resx">
       <DependentUpon>MyBoxViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="HelperClasses\DgvForm.resx" />
-    <EmbeddedResource Include="HelperClasses\ProgressViewer.resx" />
+    <EmbeddedResource Include="EmailIntelligence\Bayesian\Performance\ConfusionViewer.resx">
+      <DependentUpon>ConfusionViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailIntelligence\Bayesian\Performance\MetricChartViewer.resx">
+      <DependentUpon>MetricChartViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.resx">
+      <DependentUpon>FilterOlFoldersViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FolderInfoViewer.resx">
+      <DependentUpon>FolderInfoViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailIntelligence\OlFolderTools\FilterOlFolders\OSBrowser.resx">
+      <DependentUpon>OSBrowser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapViewer.resx">
+      <DependentUpon>FolderRemapViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailIntelligence\OlFolderTools\FolderRemap\FolderSelector.resx">
+      <DependentUpon>FolderSelector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.resx">
+      <DependentUpon>SubjectMapMetrics.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IntelligenceResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>IntelligenceResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ManagerResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ManagerResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OutlookObjects\Store\StoreWrapperViewer.resx">
+      <DependentUpon>StoreWrapperViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.resx">
+      <DependentUpon>ConfigViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Threading\ProgressPane.resx">
+      <DependentUpon>ProgressPane.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HelperClasses\DvgForm.resx">
+      <DependentUpon>DvgForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Threading\ProgressMultiStepViewer.resx">
+      <DependentUpon>ProgressMultiStepViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Threading\ProgressViewer.resx">
+      <DependentUpon>ProgressViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Threading\SyncContextForm.resx">
+      <DependentUpon>SyncContextForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -472,6 +1046,8 @@
     <Content Include="Resources\CalculationWarning.svg" />
     <Content Include="Resources\Cancel.png" />
     <Content Include="Resources\Cancel.svg" />
+    <None Include="Resources\charset_lookup.json" />
+    <None Include="Resources\CancelBlue.svg" />
     <Content Include="Resources\Cloud.svg" />
     <Content Include="Resources\CSEventReceiver.svg" />
     <Content Include="Resources\CSWorkflowAssociationForm.svg" />
@@ -480,6 +1056,7 @@
     <Content Include="Resources\EventTracepointOn.svg" />
     <Content Include="Resources\ExceptionPublic.png" />
     <Content Include="Resources\ExclamationPoint.svg" />
+    <None Include="Resources\Folder Open.svg" />
     <Content Include="Resources\FolderError.svg" />
     <Content Include="Resources\History.svg" />
     <Content Include="Resources\LibraryWarning.svg" />
@@ -504,6 +1081,8 @@
     <Content Include="Resources\RepeatUntilFailure.svg" />
     <Content Include="Resources\Run.png" />
     <Content Include="Resources\Run.svg" />
+    <None Include="Resources\Save.svg" />
+    <None Include="Resources\SaveAs.svg" />
     <Content Include="Resources\ScatterLineChart.svg" />
     <Content Include="Resources\SearchFolderClosed.svg" />
     <Content Include="Resources\ShowAssignedConfigurations.svg" />
@@ -511,6 +1090,8 @@
     <Content Include="Resources\SortByType.svg" />
     <Content Include="Resources\StatusExcluded.10.10.svg" />
     <Content Include="Resources\StatusHelp.13.13.svg" />
+    <None Include="Resources\eng.traineddata" />
+    <None Include="Resources\StatusInProgress.svg" />
     <Content Include="Resources\StatusWarning.12.12.svg" />
     <Content Include="Resources\TeamProjectRepositoryFolder.svg" />
     <Content Include="Resources\TestCoveredPassing.svg" />
@@ -518,18 +1099,29 @@
     <Content Include="Resources\VBWorkflow.svg" />
     <Content Include="Resources\wb.svg" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="EmailIntelligence\TaskPane\" />
+    <Folder Include="ReusableTypeClasses\SerializableNew\Locking\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.ML.CpuMath.2.0.1\build\netstandard2.0\Microsoft.ML.CpuMath.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ML.CpuMath.2.0.1\build\netstandard2.0\Microsoft.ML.CpuMath.props'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.props'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.2088.41\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.2088.41\build\Microsoft.Web.WebView2.targets'))" />
     <Error Condition="!Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets'))" />
+    <Error Condition="!Exists('..\packages\Tesseract.5.2.0\build\Tesseract.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Tesseract.5.2.0\build\Tesseract.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.ML.CpuMath.4.0.2\build\netstandard2.0\Microsoft.ML.CpuMath.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ML.CpuMath.4.0.2\build\netstandard2.0\Microsoft.ML.CpuMath.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.ML.4.0.2\build\netstandard2.0\Microsoft.ML.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ML.4.0.2\build\netstandard2.0\Microsoft.ML.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.ML.4.0.2\build\netstandard2.0\Microsoft.ML.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ML.4.0.2\build\netstandard2.0\Microsoft.ML.targets'))" />
+    <Error Condition="!Exists('..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.3296.44\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.3296.44\build\Microsoft.Web.WebView2.targets'))" />
   </Target>
-  <Import Project="..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.targets" Condition="Exists('..\packages\Microsoft.ML.2.0.1\build\netstandard2.0\Microsoft.ML.targets')" />
-  <Import Project="..\packages\Microsoft.Web.WebView2.1.0.2088.41\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.2088.41\build\Microsoft.Web.WebView2.targets')" />
   <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
+  <Import Project="..\packages\Tesseract.5.2.0\build\Tesseract.targets" Condition="Exists('..\packages\Tesseract.5.2.0\build\Tesseract.targets')" />
+  <Import Project="..\packages\Microsoft.ML.4.0.2\build\netstandard2.0\Microsoft.ML.targets" Condition="Exists('..\packages\Microsoft.ML.4.0.2\build\netstandard2.0\Microsoft.ML.targets')" />
+  <Import Project="..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" />
+  <Import Project="..\packages\Microsoft.Web.WebView2.1.0.3296.44\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.3296.44\build\Microsoft.Web.WebView2.targets')" />
 </Project>

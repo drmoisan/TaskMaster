@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Drawing.Design;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.Remoting.Messaging;
+using System.Resources;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
+
 
 namespace SVGControl
 {
@@ -22,7 +16,9 @@ namespace SVGControl
 
         public ButtonSVG()
         {
+            //var caller = System.Reflection.Assembly.GetCallingAssembly();
             InitializeComponent();
+            //var caller = this.Parent.GetType().Assembly;
             _imageSVG = new SvgImageSelector(base.Size,
                                              new Padding(3),
                                              SVGControl.AutoSize.MaintainAspectRatio);
@@ -31,7 +27,7 @@ namespace SVGControl
         }
 
         private void ButtonSVG_Resize(object sender, EventArgs e)
-        {
+        {            
             _imageSVG.Outer = this.Size;
         }
 
@@ -62,6 +58,21 @@ namespace SVGControl
                 return ms.ToArray();
             }
         }
-                
+
+        private void ButtonSVG_ParentChanged(object sender, EventArgs e)
+        {
+            //var caller = this.Parent.GetType().Assembly;
+            //var assemblyName = caller.GetName().Name;
+            //var rm = new ResourceManager($"{assemblyName}.Properties.Resources", caller);
+            //var rset = rm.GetResourceSet(CultureInfo.CurrentUICulture, true, true);
+            //var names = rset.Cast<System.Collections.DictionaryEntry>().Select(x => GetStringForValue(x.Value)).ToList();
+            //ImageSVG.ResourceNames = names;
+        }
+
+        private static string GetStringForValue(object value)
+        {
+            if (value == null) return "null";
+            return value.ToString();
+        }
     }
 }

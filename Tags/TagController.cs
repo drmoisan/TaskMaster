@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
@@ -53,6 +54,32 @@ namespace Tags
 
         }
 
+        public TagController(TagViewer viewerInstance,
+                             SortedDictionary<string, bool> dictOptions,
+                             IList<string> selections = null,
+                             IPrefix prefix = null)
+        {
+            viewerInstance.SetController(this);
+            _viewer = viewerInstance;
+            _dictOriginal = dictOptions;
+            _dictOptions = dictOptions;
+            _selections = selections;
+            _isMail = false;
+
+            _gridTemplate = CaptureAndRemoveTemplate();
+            SetAutoAssignState(null);
+
+            _prefix = prefix ?? GetDefaultPrefix();
+
+            LoadSelections(selections);
+
+            LoadControls(_dictOptions, _prefix.Value);
+
+            WireEvents();
+
+            _viewer.SearchText.Focus();
+        }
+
         public MailItem ResolveMailItem(object objItem) //internal
         {
             if ((objItem is not null) && (objItem is MailItem))
@@ -62,12 +89,14 @@ namespace Tags
             else return null;
         } 
 
+        internal IPrefix GetDefaultPrefix() => new PrefixItem(PrefixTypeEnum.Other, "", "", OlCategoryColor.olCategoryColorNone);
+
         public void ResolvePrefix(IList<IPrefix> prefixes, string prefixKey) //internal
         {
             // Set default prefix if none exists
-            if (string.IsNullOrEmpty(prefixKey))
+            if (prefixes is null || string.IsNullOrEmpty(prefixKey))
             {
-                _prefix = new PrefixItem(PrefixTypeEnum.Other, "", "", OlCategoryColor.olCategoryColorNone);
+                _prefix = GetDefaultPrefix();
             }
             // Else if it exists, set the Iprefix based on the prefixKey
             else if (prefixes.Exists(x => x.Key == prefixKey))
@@ -131,7 +160,7 @@ namespace Tags
             {
                 if ((sample != null) && (sample.Length > prefixLength))
                 {
-                    if (sample.Substring(0, prefixLength - 1) != prefix.Value)
+                    if (sample.Substring(0, prefixLength) != prefix.Value)
                     {
                         addPrefix = true;
                     }
@@ -174,7 +203,7 @@ namespace Tags
         private readonly IAutoAssign _autoAssigner;
         private ControlPosition _gridTemplate;
 
-        #endregion
+        #endregion Contructors and Initializers
 
 
         #region Public Functions and Properties
@@ -230,8 +259,10 @@ namespace Tags
             return searchText.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries).ToList();
         }
 
-        public string SelectionString() => string.Join(", ", _dictOptions.Where(item => item.Value).Select(item => item.Key).ToList());
-        
+        //public string SelectionAsString() => string.Join(", ", _dictOptions.Where(item => item.Value).Select(item => item.Key).ToList());
+        public string SelectionAsString() => string.Join(", ", SelectionAsList());
+        public List<string> SelectionAsList() => _dictOptions.Where(item => item.Value).Select(item => item.Key).ToList();
+
         public bool ButtonNewActive { get => _viewer.ButtonNew.Visible; set => _viewer.ButtonNew.Visible = value; }
         
         public bool ButtonAutoAssignActive {  get => _viewer.ButtonAutoAssign.Visible; set => _viewer.ButtonAutoAssign.Visible = value; }
@@ -274,22 +305,31 @@ namespace Tags
 
         private void ButtonNew_Click(object sender, EventArgs e) => AddColorCategory();
 
-        private void ButtonAutoAssign_Click(object sender, EventArgs e)
+        private async void ButtonAutoAssign_Click(object sender, EventArgs e)
         {
-            var col_choices = _autoAssigner.AutoFind(_objItem);
-            foreach (string str_choice in col_choices)
+            try
             {
-                if (_dictOptions.ContainsKey(str_choice))
+                var col_choices = await _autoAssigner.AutoFindAsync(_objItem).ConfigureAwait(true);
+                foreach (string str_choice in col_choices)
                 {
-                    ToggleOn(str_choice);
+                    if (_dictOptions.ContainsKey(str_choice))
+                    {
+                        ToggleOn(str_choice);
+                    }
+                    else
+                    {
+                        AddOption(str_choice, blClickTrue: true);
+                    }
                 }
-                else
-                {
-                    AddOption(str_choice, blClickTrue: true);
-                }
+                if (col_choices.Count > 0)
+                    FilterToSelected();
             }
-            if (col_choices.Count > 0)
-                FilterToSelected();
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+            
         }
 
         private void ButtonCancel_Click(object sender, EventArgs e)
@@ -334,10 +374,10 @@ namespace Tags
 
         }
 
-        public void AddColorCategory(string categoryName = "") //internal
+        internal bool TryGetAutoAssignment(out IList<string> assignments) 
         {
             bool autoAdded = false;
-            IList<string> colCatName = new List<string>();
+            assignments = [];
 
             // Check to see if can be automatically created
             if (_autoAssigner is not null & _isMail)
@@ -347,47 +387,65 @@ namespace Tags
 
                 if (vbR == DialogResult.Yes)
                 {
-                    colCatName = _autoAssigner.AddChoicesToDict(_olMail, _prefixes, _prefix.Key, _userEmailAddress);
-                    // Dim colChoices As Collection = AutoFile.dictPPL_AddMissingEntries(_olMail)
-                    foreach (string newCatName in colCatName)
+                    assignments = _autoAssigner.AddChoicesToDict(_olMail, _prefixes, _prefix.Key, _userEmailAddress);
+
+                    foreach (string newCatName in assignments)
                     {
                         AddOption(newCatName, blClickTrue: true);
                         autoAdded = true;
                     }
                 }
             }
-
-            if (!autoAdded)
+            return autoAdded; 
+        }
+        
+        public void AddColorCategory(string categoryName = "") //internal
+        {
+            // Only create category if we can't auto-assign to an existing
+            if (!TryGetAutoAssignment(out var assignments))
             {
+                // Get the category name from the user
+                categoryName = GetUserInputCategory(categoryName);
+
+                // If the user entered a category name, add it to the options
                 if (!string.IsNullOrEmpty(categoryName))
                 {
-                    categoryName = InputBox.ShowDialog("The following category name will be added:","Add Category Dialog", DefaultResponse: categoryName);
-                }
-                else
-                {
-                    bool advance = false;
-                    string msg = "Enter new category name:";
-                    while (!advance)
-                    {
-                        categoryName = InputBox.ShowDialog(msg, "Add Category Dialog", DefaultResponse: " ");
-                        if (categoryName != " ")
-                            advance = true;
-                        msg = "Please enter a name or hit cancel:";
-                    }
-                }
-                if (!string.IsNullOrEmpty(categoryName)&&_autoAssigner is not null)
-                {
-                    var newCategory = _autoAssigner.AddColorCategory(_prefix, categoryName);
-                    if (newCategory is not null)
-                    {
-                        AddOption(newCategory.Name, blClickTrue: true);
-                        colCatName.Add(newCategory.Name);
-                    }
+                    // If the _autoAssigner is not null, use its delegate to add the category
+                    if (_autoAssigner is not null) 
+                    { 
+                        var newCategory = _autoAssigner.AddColorCategory(_prefix, categoryName);
+                        if (newCategory is null) { return; }
+                        categoryName = newCategory.Name;
+                    }                    
+                    AddOption(categoryName, blClickTrue: true);
+                    assignments.Add(categoryName);                    
                 }
             }
 
-            if (colCatName.Count > 0)
+            if (assignments.Count > 0)
                 FilterToSelected();
+        }
+
+        internal static string GetUserInputCategory(string categoryName)
+        {
+            if (!string.IsNullOrEmpty(categoryName))
+            {
+                categoryName = InputBox.ShowDialog("The following category name will be added:", "Add Category Dialog", DefaultResponse: categoryName);
+            }
+            else
+            {
+                bool advance = false;
+                string msg = "Enter new category name:";
+                while (!advance)
+                {
+                    categoryName = InputBox.ShowDialog(msg, "Add Category Dialog", DefaultResponse: " ");
+                    if (categoryName != " ")
+                        advance = true;
+                    msg = "Please enter a name or hit cancel:";
+                }
+            }
+
+            return categoryName;
         }
 
         public void FocusCheckbox(CheckBox cbx) //internal
@@ -495,7 +553,7 @@ namespace Tags
             CheckBoxController clsCheckBox;
 
             _filteredOptions = dictOptions;
-            intFocus = 0;
+            intFocus = -1;
             _colCbxCtrl = new();
             _colCbxEvent = new();
 
@@ -577,6 +635,7 @@ namespace Tags
                 
             if (!_dictOptions.Equals(_filteredOptions))
             {
+                _filteredOptions ??= [];
                 if (!_filteredOptions.ContainsKey(option))
                 {
                     _filteredOptions.Add(option, blClickTrue);
@@ -613,10 +672,10 @@ namespace Tags
         public void Select_Ctrl_By_Offset(int increment) //internal
         {
             int newpos = intFocus + increment;
-            if (newpos == -1)
+            if (newpos <= -1)
             {
                 _viewer.SearchText.Select();
-                intFocus = newpos;
+                intFocus = -1;
             }
             else if (newpos <= _colCbxCtrl.Count - 1)
             {

@@ -24,10 +24,12 @@ namespace QuickFiler.Interfaces
     public interface IQfcDatamodel
     {
         Task<IList<MailItem>> DequeueNextItemGroupAsync(int quantity, int timeOut);
+        IList<MailItem> DequeueNextItemGroup(int quantity);
         void UndoMove();
         ScoStack<IMovedMailInfo> MovedItems { get; }
         IList<MailItem> InitEmailQueue(int batchSize, BackgroundWorker worker);
         Task<IList<MailItem>> InitEmailQueueAsync(int batchSize, BackgroundWorker worker, CancellationToken token, CancellationTokenSource tokenSource);
         bool Complete { get; set; }
+        void Cleanup();
     }
 }

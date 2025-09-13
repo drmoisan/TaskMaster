@@ -116,6 +116,9 @@ namespace TaskMaster
             }
         }
 
+        private string _emailInfoStagingFile;
+        public string EmailInfoStagingFile { get => _emailInfoStagingFile ?? InitProp(ref _emailInfoStagingFile, Settings.Default.FileName_EmailInfoStaging); set => _emailInfoStagingFile = value;}
+
         internal string InitProp(ref string prop, string value)
         {
             prop = value;

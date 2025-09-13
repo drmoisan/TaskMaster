@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SVGControl
 {
-    public class SvgOptionsConverter : ExpandableObjectConverter
+    public class SvgOptionsConverter1 : ExpandableObjectConverter
     {
         public override object ConvertTo(
             ITypeDescriptorContext context,

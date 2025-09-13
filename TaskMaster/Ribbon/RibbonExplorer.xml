@@ -2,12 +2,18 @@
 <customUI onLoad="Ribbon_Load" xmlns="http://schemas.microsoft.com/office/2006/01/customui">
     <ribbon>
         <tabs>
+          <tab idMso="TabFolder">
+            <group id="FolderInfoGroup" label="Folder Info">
+              <button id="GetFolderInfo" imageMso="FileProperties" onAction="GetFolderInfo_Click" label="Get Folder Info" />
+            </group>
+          </tab>
             <tab idMso="TabTasks">
                 <group id="Group1" label="Task Master">
                     <button id="BtnLoadTree" imageMso="OutlineShowDetail" onAction="BtnLoadTree_Click" label="Load Tree" size="large" />
                     <button id="BtnFlagTask" imageMso="FlagMessage" onAction="FlagAsTask_Click" label="Flag Task" size="large" />
                     <menu id="ViewMenu" imageMso="FindDialog" label="View" size="large" itemSize="large">
                         <button id="BtnHideHeadersNoChildren" imageMso="ReviewShowOrHideComment" onAction="BtnHideHeadersNoChildren_Click" label="Hide Empty Headers" />
+                        <button id="BtnShowHeadersNoChildren" imageMso="ReviewShowOrHideComment" onAction="BtnShowHeadersNoChildren_Click" label="Show Empty Headers" />
                     </menu>
                     <menu id="UtilitiesMenu" imageMso="CurrentViewSettings" label="Utilities" size="large" itemSize="large">
                         <button id="BtnRefreshIDList" imageMso="AccessRefreshAllLists" onAction="BtnRefreshIDList_Click" label="Refresh IDList" />
@@ -16,28 +22,104 @@
                         <button id="BtnCompressIDs" imageMso="ReviewCombineRevisions" onAction="BtnCompressIDs_Click" label="Compress IDs" />
                         <button id="BtnHookToggle" imageMso="PositionAbsoluteMarks" onAction="BtnHookToggle_Click" getLabel="GetHookButtonText" />
                         <button id="BtnMigrateIDs" onAction="BtnMigrateIDs_Click" label="MigrateToDoIDs" />
+                        <button id ="BtnPopulateUdf" onAction="BtnPopulateUdf_Click" label ="Populate User Defined Fields"/>
+                        <button id="NewTaskHeader" imageMso ="NewTask" onAction="NewTaskHeader_Click" label="New Task Header"/>
                     </menu>
                 </group>
             </tab>
             <tab idMso="TabMail">
+              <group id="SpamBayesGroup" imageMso="RecycleBin" label="Spam Bayes">
+                <button id="TrainSpam" imageMso="CancelAll" onAction="TrainSpam_Click" label="Train Spam" />
+                <button id="TrainHam" imageMso="ClickToRunEnableUpdates" onAction="TrainHam_Click" label="Train Ham" />                
+                <menu id="OtherSpamActions" imageMso="AdministrationHome" label="Other" size="normal">
+                  <menu id = "SpamSaveOptions" imageMso="FileSave" label="Save Options" >
+                    <button id="SpamSaveNetwork" imageMso="ServerConnection" onAction="SpamSaveNetwork_Click" label="Network"/>
+                    <button id="SpamSaveLocal" imageMso="FillDown" onAction="SpamSaveLocal_Click" label="Local"/>
+                    <button id ="GetSaveState" imageMso="Help" onAction="GetSaveLocation_Click" label="Current Location"/>
+                  </menu>
+                  <checkBox id="SpamBayesEnabledToggle" getPressed="SpamBayesEnabled_GetPressed" onAction="SpamBayesEnabled_Click" label="Spam Bayes Enabled"/>                  
+                  <button id="NewSpam" imageMso="NewComment" onAction="ClearSpam_Click" label="Clear Spam Manager" />
+                  <button id="TestSpam" imageMso="CalculateNow" onAction="TestSpam_Click" label="Test Spam" />
+                  <button id="TestSpamVerbose" imageMso="CalculateSheet" onAction="TestSpamVerbose_Click" label="Test Spam Verbose" />
+                  <button id="SpamMetrics" imageMso="Chart3DColumnChart" onAction="SpamMetrics_Click" label="Spam Metrics" />
+                  <button id="SpamInvestigateErrors" imageMso="AutoSummarize" onAction="SpamInvestigateErrors_Click" label="Spam Investigate Errors" />                 
+                </menu>             
+              </group>
               <group id="Group2" label="Task Master">
                 <button id="FlagAsTask" imageMso="FlagMessage" onAction="FlagAsTask_Click" label="Flag Task" size="large" />
                 <button id="SortEmail" imageMso="MoveToFolder" onAction="SortEmail_Click" label="Sort Email" size="large"/>
+                <button id="FindEmailFolder" imageMso="FindDialog" onAction="FindFolder_Click" label="Find Folder" size="large"/>
                 <button id="UndoSort" imageMso="Undo" onAction="UndoSort_Click" label="Undo Sort" size="large"/>
                 <button id="QuickFiler" imageMso="UpdateFolder" onAction="QuickFiler_Click" label="Quick Filer" size="large" />
-                <menu id="TryMenu" imageMso="TechnicalSupport" label="Try Methods" size="large" itemSize="large">
-                  <toggleButton id="DarkMode" imageMso="BlackAndWhiteInverseGrayscale" getPressed="ToggleDarkMode_GetPressed" onAction="ToggleDarkMode_Click" label="Dark Mode"/>
-                  <button id="GetConversationDataframe" imageMso="TraceDependentCells" onAction="GetConversationDataframe_Click" label="GetConversationDataframe" />
-                  <button id="GetConversationOutlookTable" imageMso="TraceDependentCells" onAction="GetConversationOutlookTable_Click" label="GetConversationOutlookTable" />
-                  <button id="GetMailItemInfo" imageMso="TraceDependentCells" onAction="GetMailItemInfo_Click" label="GetMailItemInfo" />
-                  <button id="GetQfcDataModel" imageMso="TraceDependentCells" onAction="GetQfcDataModel_Click" label="GetQfcDataModel" />
-                  <button id="GetTableInView" imageMso="TraceDependentCells" onAction="GetTableInView_Click" label="GetTableInView" />
-                  <button id="LegacySortMailToExistingRun2" imageMso="TraceDependentCells" onAction="LegacySortMailToExistingRun2_Click" label="LegacySortMailToExistingRun2" />
-                  <button id="RebuildProjInfo" imageMso="TraceDependentCells" onAction="RebuildProjInfo_Click" label="RebuildProjInfo" />
-                  <button id="RecipientGetInfo" imageMso="TraceDependentCells" onAction="RecipientGetInfo_Click" label="RecipientGetInfo" />
-                  <button id="SubstituteIdRoot" imageMso="TraceDependentCells" onAction="SubstituteIdRoot_Click" label="SubstituteIdRoot" />
+                <menu id="Settings" imageMso="ContentTypeSettings" label="Settings" size="large" itemSize="large">
+                  <button id="FolderSettings" imageMso="Folder" onAction="FolderSettings_Click" label="Folder Settings" />
+                  <menu id="QuickFilerSettings" imageMso="ContentTypeSettings" label="Quick Filer" itemSize="large">
+                    <menu id="ItemSortSettings" imageMso="CustomizeSearchFolder" label="Item Sort Settings" itemSize ="normal">
+                      <checkBox id="MoveEntireConversationDefault" label="Move Entire Conversation" getPressed="MoveEntireConversation_GetPressed" onAction="MoveEntireConversation_Clicked"/>
+                      <checkBox id="SaveAttachmentsDefault" label="Save Attachments" getPressed="SaveAttachments_GetPressed" onAction="SaveAttachments_Clicked"/>
+                      <checkBox id="SaveEmailCopyDefault" label="Save Email Copy" getPressed="SaveEmailCopy_GetPressed" onAction="SaveEmailCopy_Clicked"/>
+                      <checkBox id="SavePicturesDefault" label="Save Pictures" getPressed="SavePictures_GetPressed" onAction="SavePictures_Clicked"/>
+                    </menu>
+                  </menu>
+                  <menu id="FolderClassifier" imageMso="Move" label ="Folder Classifier" itemSize="large">
+                    <button id="ScrapeAndMine" imageMso="ProtectedActualsSynchronize" onAction="ScrapeAndMine_Click" label="Scrape/Mine" />
+                    <button id="BuildCategoryClassifier" imageMso="ProtectedActualsSynchronize" onAction="BuildCategoryClassifier_Click" label="Build Category Classifier" />
+                    <button id="BuildActionableClassifier" imageMso="ActionInsert" onAction="BuildActionableClassifier_Click" label="Build Actionable Classifier"/>
+                  </menu>
+                  <menu id="BayesianPerformance" imageMso="TaskEarnedValueForm" label="Bayesian Performance" itemSize="large">
+                    <button id="TestClassifier" imageMso="AutoSummarize" onAction="TestClassifier_Click" label="Test Classifier" />
+                    <button id="TestClassifierVerbose" imageMso="AutoSummarize" onAction="TestClassifierVerbose_Click" label="Test Classifier Verbose" />
+                    <button id ="GetConfusionDetails" imageMso="CalendarMonthDetailsSplitButton" onAction="GetConfusionDrivers_Click" label="Get Confusion Drivers"/>
+                    <button id ="ChartMetrics" imageMso="ChartChangeType" onAction="ChartMetrics_Click" label="Chart Metrics"/>
+                    <button id ="InvestigateErrors" imageMso="ChartQuickExplore" onAction="InvestigateErrors_Click" label="Investigate Errors"/>
+                  </menu>                 
+                  <menu id="TryMenu" imageMso="TechnicalSupport" label="Try Methods" itemSize="large">
+                    <toggleButton id="DarkMode" imageMso="BlackAndWhiteInverseGrayscale" getPressed="ToggleDarkMode_GetPressed" onAction="ToggleDarkMode_Click" label="Dark Mode"/>
+                    <button id="DeepEmailCompare" imageMso ="TraceDependentCells" onAction="DeepCompareEmails_Click" label="Deep Compare Emails"/>
+                    <!--<button id="GetConversationDataframe" imageMso="TraceDependentCells" onAction="GetConversationDataframe_Click" label="GetConversationDataframe" />
+                    <button id="GetConversationOutlookTable" imageMso="TraceDependentCells" onAction="GetConversationOutlookTable_Click" label="GetConversationOutlookTable" />-->
+                    <button id="GetMailItemInfo" imageMso="TraceDependentCells" onAction="GetMailItemInfo_Click" label="GetMailItemInfo" />
+                    <!--<button id="GetQfcDataModel" imageMso="TraceDependentCells" onAction="GetQfcDataModel_Click" label="GetQfcDataModel" />
+                    <button id="GetTableInView" imageMso="TraceDependentCells" onAction="GetTableInView_Click" label="GetTableInView" />
+                    <button id="RebuildProjInfo" imageMso="TraceDependentCells" onAction="RebuildProjInfo_Click" label="RebuildProjInfo" />-->
+                    <button id="RecipientGetInfo" imageMso="TraceDependentCells" onAction="RecipientGetInfo_Click" label="RecipientGetInfo" />
+                    <!--<button id="SubstituteIdRoot" imageMso="TraceDependentCells" onAction="SubstituteIdRoot_Click" label="SubstituteIdRoot" />-->
+                    <button id="GetImage" imageMso="TraceDependentCells" onAction="GetImage_Click" label="GetImage"/>
+                    <button id="LoadFolderFilter" imageMso="Filter" onAction="LoadFolderFilter_Click" label="Load Folder Filter" />
+                    <button id="LoadFolderRemap" imageMso="Filter" onAction="LoadFolderRemap_Click" label="Load Folder Remap" />
+                    <!--<button id="RebuildSubjectMap" imageMso="Filter" onAction="RebuildSubjectMap_Click" label="Rebuild Subject Map" />
+                    <button id="ShowSubjectMapMetrics" imageMso="Filter" onAction="ShowSubjectMapMetrics_Click" label="Show Subject Map Metrics" />-->
+                    <button id="TokenizeEmail" imageMso="Filter" onAction="TokenizeEmail_Click" label="Tokenize Email" />
+                    <button id="MineEmails" imageMso="Filter" onAction="MineEmails_Click" label="Mine Emails" />
+                    <button id="BuildClassifier" imageMso="Filter" onAction="BuildClassifier_Click" label="Build Classifier" />
+                    <button id="PrintManagerState" imageMso="PrintAttach" onAction="PrintManagerState_Click" label="Print Manager State" />
+                    <button id="SerializeMailInfo" imageMso="SaveAll" onAction="SerializeMailInfo_Click" label="Serialize Mail Info"/>
+                    <button id="DeleteTriageSpamFields" imageMso="Delete" onAction ="DeleteTriageSpamFields_Click" label ="Delete Triage Spam"/>
+                    <button id="TryGetInboxes" imageMso="AccessListIssues" onAction ="TryGetInboxes_Click" label ="TryGetInboxes"/>
+                  </menu>
+                  <button id="RunIntelligence" imageMso="ARMPreviewButton" onAction="Intelligence_Click" label="Intelligence"/>
+                </menu>  
+              </group>
+              <group id="TriageGroup" imageMso="Filter" label="Triage">
+                <button id="TriageSetA" onAction="TriageSetA_Click" label="Set A"/>
+                <button id="TriageSetB" onAction="TriageSetB_Click" label="Set B"/>
+                <button id="TriageSetC" onAction="TriageSetC_Click" label="Set C"/>
+                <menu id="OtherTriageActions" label="Other" size="normal">
+                  <button id="FilterTriageGroup" imageMso="Filter" onAction="FilterViewer_Click" label="Filter"/>
+                  <button id="ClearTriage" imageMso="Clear" onAction="ClearTriage_Click" label="Clear Triage"/>
+                  <button id="TriageSelection" imageMso="FilterBySelection" onAction="TriageSelection_Click" label="Triage Selection"/>
+                  <button id="SetPrecision" imageMso="EditCitation" onAction="SetPrecision_Click" label="Set Precision"/>
+                  <menu id = "TriageSaveOptions" imageMso="FileSave" label="Save Options" >
+                    <button id="TriageSaveNetwork" imageMso="ServerConnection" onAction="TriageSaveNetwork_Click" label="Network"/>
+                    <button id="TriageSaveLocal" imageMso="FillDown" onAction="TriageSaveLocal_Click" label="Local"/>
+                    <button id ="TriageGetSaveState" imageMso="Help" onAction="TriageGetSaveLocation_Click" label="Current Location"/>
+                  </menu>
+                  <checkBox id="TriageEnabledToggle" getPressed="TriageEnabled_GetPressed" onAction="TriageEnabled_Click" label="Triage Enabled"/>
                 </menu>
               </group>
+              <group id ="UtilitiesGroup" imageMso="ContentTypeSettings" label="Utilities">
+                <button id="CompareFolders" imageMso="FindDialog" onAction="CompareFolders_Click" label="Compare Folders" size="large"/>
+              </group>                     
             </tab>
         </tabs>
     </ribbon>

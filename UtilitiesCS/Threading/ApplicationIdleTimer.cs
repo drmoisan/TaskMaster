@@ -1,7 +1,10 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace UtilitiesCS.Threading
@@ -17,11 +20,14 @@ namespace UtilitiesCS.Threading
 	/// </summary>
 	public class ApplicationIdleTimer
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Static Members and Events
 
         // private singleton
         private static ApplicationIdleTimer instance = null;
+        private SynchronizationContext syncContext;
 
         // Notes:
         // Could have utilized the System.Timers.ElapsedEventArgs, but that 
@@ -102,6 +108,8 @@ namespace UtilitiesCS.Threading
         private long guiThreshold = TimeSpan.TicksPerMillisecond * 50L;
         // Maximum CPU use (percentage) that is considered "idle"
         private double cpuThreshold = 0.10;
+        
+        private long subscriptionCount = 0;
         #endregion
 
         #region Constructors
@@ -109,6 +117,12 @@ namespace UtilitiesCS.Threading
         /// Private constructor.  One instance is plenty.
         /// </summary> 
         private ApplicationIdleTimer()
+        {
+            syncContext = SynchronizationContext.Current;
+            StartTimer();
+        }
+
+        private void StartTimer()
         {
             // Initialize counters
             isIdle = false;
@@ -122,9 +136,33 @@ namespace UtilitiesCS.Threading
             _timer.Start();
 
             // Hook into the events
-            _timer.Elapsed += new System.Timers.ElapsedEventHandler(Heartbeat);
-            System.Windows.Forms.Application.Idle += new EventHandler(Application_Idle);
+            _timer.Elapsed += Heartbeat;
+            logger.Debug($"{nameof(ApplicationIdle)} is subscribing to {nameof(System.Windows.Forms.Application.Idle)} event. \n{TraceUtility.GetMethodCallLogString()}");
+            
+            System.Windows.Forms.Application.Idle += Application_Idle;
+            Interlocked.Increment(ref subscriptionCount);
         }
+
+        private void StopTimer()
+        {            
+            _timer.Stop();
+            _timer.Enabled = false;            
+
+            // Hook into the events
+            _timer.Elapsed -= Heartbeat;
+            if (syncContext != null)
+            {
+                syncContext.Post(_ => System.Windows.Forms.Application.Idle -= Application_Idle, null);
+            }
+            else
+            {
+                System.Windows.Forms.Application.Idle -= Application_Idle;
+            }
+            //System.Windows.Forms.Application.Idle -= Application_Idle;
+            logger.Debug($"{nameof(ApplicationIdle)} unsubscribed from {nameof(System.Windows.Forms.Application.Idle)} event. \n{TraceUtility.GetMethodCallLogString()}");
+            Interlocked.Decrement(ref subscriptionCount);
+        }
+
         /// <summary>
         /// Static initialization.  Called once per AppDomain.
         /// </summary>
@@ -134,6 +172,7 @@ namespace UtilitiesCS.Threading
             if (instance == null)
             {
                 instance = new ApplicationIdleTimer();
+                _ = Guard.CheckAndSetFirstCall;
             }
         }
         #endregion
@@ -191,7 +230,36 @@ namespace UtilitiesCS.Threading
         private void Application_Idle(object sender, EventArgs e)
         {
             // Increment idle counter.
-            idlesSinceCheckpoint++;
+            Interlocked.Increment(ref idlesSinceCheckpoint);
+            if (subscriptionCount == 0)
+            {
+                //throw new InvalidOperationException($"{nameof(ApplicationIdleTimer)}.{nameof(Application_Idle)} should not be firing with a subscription count of 0");
+            }
+        }
+
+        private Delegate FindTriggeringEventHandler(object sender, EventArgs e)
+        {
+            EventInfo idleEventInfo = typeof(System.Windows.Forms.Application)
+                .GetEvent("Idle", BindingFlags.Static | BindingFlags.Public);
+            if (idleEventInfo == null) return null;
+
+            FieldInfo eventField = typeof(System.Windows.Forms.Application)
+                .GetField("Idle", BindingFlags.Static | BindingFlags.NonPublic);
+            if (eventField == null) return null;
+
+            object eventFieldValue = eventField.GetValue(null);
+            if (eventFieldValue is MulticastDelegate eventDelegate)
+            {
+                foreach (Delegate handler in eventDelegate.GetInvocationList())
+                {
+                    if (handler.Target == this && handler.Method.Name == nameof(Application_Idle))
+                    {
+                        return handler;
+                    }
+                }
+            }
+
+            return null;
         }
 
         internal double ComputeCPUUsage(bool resetCounters)
@@ -335,7 +403,43 @@ namespace UtilitiesCS.Threading
                 instance.cpuThreshold = value;
             }
         }
+        
+        internal static ThreadSafeSingleShotGuard Guard { get; private set; } = new ThreadSafeSingleShotGuard();
+
         #endregion
+
+        #region Static Public Methods
+
+        internal static void Stop()
+        {
+            instance.StopTimer();
+            Guard = new ThreadSafeSingleShotGuard();
+        }
+
+        internal static void Start()
+        {
+            if (Guard.CheckAndSetFirstCall)
+            {
+                instance.StartTimer();
+            }
+        }
+
+        public static void Subscribe(ApplicationIdleEventHandler handler)
+        {
+            ApplicationIdle += handler;
+            Start();
+        }
+
+        public static void Unsubscribe(ApplicationIdleEventHandler handler) 
+        {
+            ApplicationIdle -= handler;
+            if (ApplicationIdle is null || ApplicationIdle.GetInvocationList().Length == 0)
+            {
+                Stop();
+            }
+        }
+
+        #endregion Static Public Methods
     }
 
 }

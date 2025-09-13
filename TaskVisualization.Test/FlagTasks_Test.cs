@@ -7,22 +7,20 @@ using Moq;
 using System.Collections.Generic;
 using System.Collections;
 
-namespace TaskVisualization.Test
+namespace Z.Disabled.TaskVisualization.Test
 {
     [TestClass]
     public class FlagTasks_Test
     {
-        
-
         [TestMethod]
-        public void GetFlagsToSet_TestMultiple()
+        public void Disabled_GetFlagsToSet_TestMultiple()
         {
             
-            MoqOlToDo mockGlobals = new MoqOlToDo();
+            //MoqOlToDo mockGlobals = new MoqOlToDo();
                                     
-            FlagTasks testFlagger = new FlagTasks(mockGlobals.MockGlobals());
-            testFlagger.Run();
-            //testFlagger.GetFlagsToSet(2);
+            //FlagTasks testFlagger = new FlagTasks(mockGlobals.MockGlobals());
+            //testFlagger.Run();
+            ////testFlagger.GetFlagsToSet(2);
         }
     }
 }

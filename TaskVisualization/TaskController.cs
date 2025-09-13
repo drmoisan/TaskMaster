@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using Tags;
 using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.OutlookExtensions;
 
 
 namespace TaskVisualization
 {
-
 
     public class TaskController
     {
@@ -30,7 +32,7 @@ namespace TaskVisualization
         /// <param name="autoAssign">Class implementing <seealso cref="IAutoAssign"/> interface</param>
         /// <param name="userEmailAddress">Email address of user to avoid auto-tagging everything with user tag</param>
         /// <param name="flagOptions">Enumeration of fields to activate</param>
-        public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, ToDoDefaults defaults, IAutoAssign autoAssign, string userEmailAddress, FlagsToSet flagOptions = FlagsToSet.all)
+        public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, ToDoDefaults defaults, IAutoAssign autoAssign, string userEmailAddress, Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All)
         {
             //TODO: Add description of olCategories and defaults in documentation
             // Save parameters to internal variables
@@ -48,8 +50,10 @@ namespace TaskVisualization
 
 
             // First ToDoItem in list is cloned to _active and set to readonly
-            _active = (ToDoItem)_todo_list[0].Clone();
-            _active.IsReadOnly = true;
+            _active = _todo_list[0].DeepCopy();
+            _active.ReadOnly = true;
+            _active.Identifier = "ReadOnly Clone From Task Controller";
+            _todo_list[0].Identifier = "Original ToDoItem passed into Task Controller";
 
             // All color categories in Outlook.Namespace are loaded to a sorted dictionary
             _dict_categories = new SortedDictionary<string, bool>();
@@ -66,6 +70,51 @@ namespace TaskVisualization
                                     controlCaption => controlCaption.Key,
                                     controlCaption => controlCaption.Value[0]);
 
+        }
+
+        public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, 
+            ToDoDefaults defaults, IAutoAssign autoAssign, IAutoAssign projectAssign, IAutoAssign contextAssign,
+            Func<string, string> projectsToPrograms, string userEmailAddress, IApplicationGlobals globals,
+            Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All)
+        {
+            _viewer = formInstance;
+            _todo_list = toDoSelection;
+            _options = flagOptions;
+            _defaults = defaults;
+            _autoAssign = autoAssign;
+            _userEmailAddress = userEmailAddress;
+            Globals = globals;
+
+            // Activate this controller within the viewer
+            formInstance.SetController(this);
+            formInstance.AcceptButton = formInstance.OKButton;
+            formInstance.CancelButton = formInstance.Cancel_Button;
+
+
+            // First ToDoItem in list is cloned to _active and set to readonly
+            _active = _todo_list[0].DeepCopy();
+            _active.ReadOnly = true;
+            _active.Identifier = "ReadOnly Clone From Task Controller";
+            _todo_list[0].Identifier = "Original ToDoItem passed into Task Controller";
+
+            // All color categories in Outlook.Namespace are loaded to a sorted dictionary
+            _dict_categories = new SortedDictionary<string, bool>();
+            foreach (Category cat in olCategories)
+                _dict_categories.Add(cat.Name, false);
+
+            _xlCtrlLookup = GetControlLookup();
+            _xlCtrlOptions = GetOptionsLookup();
+            _xlCtrlCaptions = GetCaptionLookup();
+            _xlCtrlsNav = (from controlCaption in GetCaptionLookup(0)
+                           where GetOptionsLookup(0)[controlCaption.Key]
+                           select controlCaption)
+                                .ToDictionary(
+                                    controlCaption => controlCaption.Key,
+                                    controlCaption => controlCaption.Value[0]);
+
+            ProjectAssign = projectAssign;
+            ProjectsToPrograms = projectsToPrograms;
+            ContextAssign = contextAssign;
         }
 
         /// <summary>
@@ -102,7 +151,7 @@ namespace TaskVisualization
                     }
             }
 
-            _viewer.KbSelector.SelectedItem = _active.KB.IsNullOrEmpty() ? "Backlog" : _active.KB;
+            _viewer.KbSelector.SelectedItem = _active.KB.AsStringNoPrefix.IsNullOrEmpty() ? "Backlog" : _active.KB.AsStringNoPrefix;
 
             if (_active.TotalWork == 0)
                 _active.TotalWork = _defaults.DefaultTaskLength;
@@ -126,7 +175,7 @@ namespace TaskVisualization
                 Enums.ToggleState.Off);
 
             // Deactivate controls that are not set in _options
-            if (_options != FlagsToSet.all)
+            if (_options != Enums.FlagsToSet.All)
                 ActivateOptions();
 
             // Wire keypress event handler
@@ -158,12 +207,14 @@ namespace TaskVisualization
 
         #region Public Properties
 
-        private FlagsToSet _options;
+        internal IApplicationGlobals Globals { get; set; }
+
+        private Enums.FlagsToSet _options;
         /// <summary>
-        /// Sets options for which controls / fields to activate using FlagsToSet enumeration
+        /// Sets options for which controls / fields to activate using Enums.FlagsToSet enumeration
         /// </summary>
         /// <returns></returns>
-        public FlagsToSet Options
+        public Enums.FlagsToSet Options
         {
             get => _options;
             set
@@ -172,6 +223,8 @@ namespace TaskVisualization
                 ActivateOptions();
             }
         }
+
+        internal Enums.FlagsToSet ChangedFlags { get; set; }
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         static extern bool PostMessage(IntPtr hWnd, int msg, int wParam, int lParam);
@@ -197,26 +250,20 @@ namespace TaskVisualization
         private readonly ToDoDefaults _defaults;
         private readonly IAutoAssign _autoAssign;
         private string _userEmailAddress;
+        
 
 
-        [Flags]
-        public enum FlagsToSet
+        private IAutoAssign _projectAssign;
+        public IAutoAssign ProjectAssign
         {
-            none = 0,
-            context = 1,
-            people = 2,
-            projects = 4,
-            topics = 8,
-            priority = 16,
-            taskname = 32,
-            worktime = 64,
-            today = 128,
-            bullpin = 256,
-            kbf = 512,
-            duedate = 1024,
-            reminder = 2048,
-            all = 4095
+            get => _projectAssign;
+            set => _projectAssign = value;
         }
+
+        public IAutoAssign ContextAssign { get; set; }
+
+        private Func<string, string> _projectsToPrograms;
+        internal Func<string, string> ProjectsToPrograms { get => _projectsToPrograms; private protected set => _projectsToPrograms = value; }
 
         #endregion
 
@@ -233,7 +280,7 @@ namespace TaskVisualization
                                  where x.Key.Contains(prefix.Value)
                                  select x).ToSortedDictionary();
 
-            IList<string> selections = _active.People.AsListNoPrefix;
+            IList<string> selections = _active.People.AsListWithPrefix;
 
             selections.Remove("");
 
@@ -250,7 +297,7 @@ namespace TaskVisualization
                 viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.People.AsStringNoPrefix = controller.SelectionString();
+                    _active.People.AsStringNoPrefix = controller.SelectionAsString();
                     _viewer.PeopleSelection.Text = _active.People.AsStringNoPrefix;
                 }
             }
@@ -283,7 +330,7 @@ namespace TaskVisualization
                 viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.Context.AsStringNoPrefix = controller.SelectionString();
+                    _active.Context.AsStringNoPrefix = controller.SelectionAsString();
                     _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
                 }
             }
@@ -305,7 +352,7 @@ namespace TaskVisualization
             {
                 var controller = new TagController(viewerInstance: viewer,
                                                    dictOptions: filtered_cats,
-                                                   autoAssigner: _autoAssign,
+                                                   autoAssigner: ProjectAssign,
                                                    prefixes: _defaults.PrefixList,
                                                    selections: selections,
                                                    prefixKey: prefix.Key,
@@ -314,8 +361,9 @@ namespace TaskVisualization
                 var result = viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.Projects.AsStringNoPrefix = controller.SelectionString();
+                    _active.Projects.AsStringNoPrefix = controller.SelectionAsString();
                     _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
+                    _active.Program.AsStringNoPrefix = ProjectsToPrograms(_active.Projects.AsStringNoPrefix);
                 }
             }
         }
@@ -347,7 +395,7 @@ namespace TaskVisualization
                 var result = viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.Topics.AsStringNoPrefix = controller.SelectionString();
+                    _active.Topics.AsStringNoPrefix = controller.SelectionAsString();
                     _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
                 }
             }
@@ -356,7 +404,7 @@ namespace TaskVisualization
         /// <summary> Ensures ToDoItem model is in sync with changes in the viewer </summary>
         public void Assign_KB()
         {
-            _active.KB = _viewer.KbSelector.SelectedItem.ToString();
+            _active.KB.AsStringNoPrefix = _viewer.KbSelector.SelectedItem.ToString();
         }
 
         /// <summary> Ensures ToDoItem model is in sync with changes in the viewer </summary>
@@ -408,13 +456,20 @@ namespace TaskVisualization
         /// Method determines if any category has been selected and copies the flags from the 
         /// sample _active item to all members of _todo_list based on flags set in _options
         /// </summary>
-        public void OK_Action()
+        public async Task OK_Action()
         {
+            if (_viewer.InvokeRequired)
+            {
+                _viewer.Invoke(() => OK_Action());
+                return;
+            }
             if (AnyCategorySelected)
             {
-
+                // Capture whether the task was flagged as a task
+                _active.FlagAsTask = _viewer.CbxFlagAsTask.Checked;
+                
                 // Capture the value of the task subject and if not empty write to ToDoItem
-                if (_options.HasFlag(FlagsToSet.taskname))
+                if (_options.HasFlag(Enums.FlagsToSet.Taskname))
                 {
                     if (!string.IsNullOrEmpty(_viewer.TaskName.Text))
                         _active.TaskSubject = _viewer.TaskName.Text;
@@ -426,7 +481,7 @@ namespace TaskVisualization
                 _viewer.Hide();
 
                 // Apply values captured in _active to each member of _todo_list for flags in _options
-                ApplyChanges();
+                await Task.Run(ApplyChanges);
 
                 _viewer.DialogResult = DialogResult.OK;
 
@@ -466,59 +521,83 @@ namespace TaskVisualization
         /// <summary> Sets values to specific fields based on shortcut button </summary>
         public void Shortcut_Meeting()
         {
-            SetFlag("Meeting", FlagsToSet.context);
+            SetFlag("Meeting", Enums.FlagsToSet.Context);
         }
 
         /// <summary> Sets values to specific fields based on shortcut button </summary>
         public void Shortcut_Email()
         {
-            SetFlag("Email", FlagsToSet.context);
+            SetFlag("Email", Enums.FlagsToSet.Context);
         }
 
         /// <summary> Sets values to specific fields based on shortcut button </summary>
         public void Shortcut_Calls()
         {
-            SetFlag("Calls", FlagsToSet.context);
+            SetFlag("Calls", Enums.FlagsToSet.Context);
         }
 
         /// <summary> Sets values to specific fields based on shortcut button </summary>
         public void Shortcut_PreRead()
         {
-            SetFlag("PreRead", FlagsToSet.context);
+            SetFlag("PreRead", Enums.FlagsToSet.Context);
         }
 
         /// <summary> Sets values to specific fields based on shortcut button </summary>
         public void Shortcut_WaitingFor()
         {
-            SetFlag("Waiting For", FlagsToSet.context);
+            SetFlag("Waiting For", Enums.FlagsToSet.Context);
         }
 
         /// <summary> Sets values to specific fields based on shortcut button </summary>
         public void Shortcut_Unprocessed()
         {
-            SetFlag("Reading - .Unprocessed > 2 Minutes", FlagsToSet.context);
+            SetFlag("Reading - .Unprocessed > 2 Minutes", Enums.FlagsToSet.Context);
         }
 
         /// <summary> Sets values to specific fields based on shortcut button </summary>
         public void Shortcut_ReadingBusiness()
         {
-            SetFlag("Reading - Business", FlagsToSet.context);
+            SetFlag("Reading - Business", Enums.FlagsToSet.Context);
         }
 
         /// <summary> Sets values to specific fields based on shortcut button </summary>
         public void Shortcut_ReadingNews()
         {
-            SetFlag("Reading - News | Articles | Other", FlagsToSet.context);
-            SetFlag("Routine - Reading", FlagsToSet.projects);
-            SetFlag("READ: " + _viewer.TaskName.Text, FlagsToSet.taskname);
-            SetFlag("15", FlagsToSet.worktime);
+            SetFlag("Reading - News | Articles | Other", Enums.FlagsToSet.Context);
+            SetFlag("Routine - Reading", Enums.FlagsToSet.Projects);
+            SetFlag("READ: " + _viewer.TaskName.Text, Enums.FlagsToSet.Taskname);
+            SetFlag("15", Enums.FlagsToSet.Worktime);
             bool unused = _viewer.Duration.Focus();
         }
 
         #endregion
 
         #region Public Keyboard Events and Properties
-        
+
+        internal async Task AutoAssignAllAsync()
+        {
+            if (_active?.OlItem?.InnerObject is not MailItem mailItem) { return; }
+            var helper = await MailItemHelper.FromMailItemAsync(mailItem, Globals, default, false).ConfigureAwait(true);
+
+            var projects = await ProjectAssign.AutoFindAsync(helper).ConfigureAwait(true);
+            if (projects?.Count > 0)
+            {
+                MergeFlag(projects, Enums.FlagsToSet.Projects);
+            }
+
+            var context = await ContextAssign.AutoFindAsync(helper).ConfigureAwait(true);
+            if (context?.Count > 0)
+            {
+                MergeFlag(context, Enums.FlagsToSet.Context);
+            }
+
+            var people = await _autoAssign.AutoFindAsync(mailItem).ConfigureAwait(true);
+            if (people?.Count > 0)
+            {
+                MergeFlag(people, Enums.FlagsToSet.People);
+            }
+        }
+
         public bool KeyboardHandler_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Alt)
@@ -531,12 +610,18 @@ namespace TaskVisualization
                         (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, '\0', _altLevel);
                     }
                     _altActive = false;
-                    _activeNavGroup = -1;
+                    //_activeNavGroup = -1;
                     return true;               
                 }
                 else
                 {
                     ToggleXlGroupNav(Enums.ToggleState.On);
+                    if (_activeNavGroup != -1) 
+                    { 
+                        var groupNumber = _activeNavGroup;
+                        _activeNavGroup = -1;
+                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(groupNumber.ToString()[0]);
+                    }
                     _altActive = true;
                     return true;
                 }
@@ -546,7 +631,8 @@ namespace TaskVisualization
                 if (e.KeyCode >= Keys.A & e.KeyCode <= Keys.Z)
                 {
                     e.SuppressKeyPress = true;
-                    (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, e.KeyCode.ToString().ToUpper()[0], _altLevel);
+                    if (_xlCtrlsActive is not null)
+                        (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, e.KeyCode.ToString().ToUpper()[0], _altLevel);
                     return true;
                 }
                 else if (e.KeyCode == Keys.Down)
@@ -630,41 +716,41 @@ namespace TaskVisualization
         /// </summary>
         /// <param name="value">Comma separated list of tags</param>
         /// <param name="flagType">Used to identify field names and tag Prefix</param>
-        private void SetFlag(string value, FlagsToSet flagType)
+        internal void SetFlag(string value, Enums.FlagsToSet flagType)
         {
             switch (flagType)
             {
-                case FlagsToSet.context:
+                case Enums.FlagsToSet.Context:
                     {
                         _active.Context.AsStringNoPrefix = value;
                         _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
                         break;
                     }
-                case FlagsToSet.people:
+                case Enums.FlagsToSet.People:
                     {
                         _active.People.AsStringNoPrefix = value;
                         _viewer.PeopleSelection.Text = _active.People.AsStringNoPrefix;
                         break;
                     }
-                case FlagsToSet.projects:
+                case Enums.FlagsToSet.Projects:
                     {
                         _active.Projects.AsStringNoPrefix = value;
                         _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
                         break;
                     }
-                case FlagsToSet.topics:
+                case Enums.FlagsToSet.Topics:
                     {
                         _active.Topics.AsStringNoPrefix = value;
                         _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
                         break;
                     }
-                case FlagsToSet.taskname:
+                case Enums.FlagsToSet.Taskname:
                     {
                         _active.TaskSubject = value;
                         _viewer.TaskName.Text = value;
                         break;
                     }
-                case FlagsToSet.worktime:
+                case Enums.FlagsToSet.Worktime:
                     {
                         _viewer.Duration.Text = value;
                         break;
@@ -673,6 +759,63 @@ namespace TaskVisualization
             }
 
         }
+
+
+        internal ObservableCollection<string> MergeToCollection(ObservableCollection<string> original, IList<string> toMerge)
+        {
+            var hash = new HashSet<string>(toMerge);
+            original.ForEach(x =>  hash.Add(x));
+            return new ObservableCollection<string>(hash);
+        }
+
+        /// <summary>
+        /// Sets value based on the flag type and value
+        /// </summary>
+        /// <param name="value">Comma separated list of tags</param>
+        /// <param name="flagType">Used to identify field names and tag Prefix</param>
+        internal void MergeFlag(IList<string> value, Enums.FlagsToSet flagType)
+        {
+            if (_viewer.InvokeRequired)
+            {
+                _viewer.Invoke(() => MergeFlag(value, flagType));
+                return;
+            }
+
+            if (value.IsNullOrEmpty()) { return; }
+            switch (flagType)
+            {
+                case Enums.FlagsToSet.Context:
+                    {
+                        _active.Context.AsListWithPrefix = MergeToCollection(
+                            _active.Context.AsListWithPrefix, value);
+                        _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
+                        break;
+                    }
+                case Enums.FlagsToSet.People:
+                    {
+                        _active.People.AsListWithPrefix = MergeToCollection(
+                            _active.People.AsListWithPrefix, value);
+                        _viewer.PeopleSelection.Text = _active.People.AsStringNoPrefix;
+                        break;
+                    }
+                case Enums.FlagsToSet.Projects:
+                    {
+                        _active.Projects.AsListWithPrefix = MergeToCollection(
+                            _active.Projects.AsListWithPrefix, value);
+                        _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
+                        break;
+                    }
+                case Enums.FlagsToSet.Topics:
+                    {
+                        _active.Topics.AsListWithPrefix = MergeToCollection(
+                            _active.Topics.AsListWithPrefix, value);
+                        _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
+                        break;
+                    }                    // Note that _active is set after OK click
+            }
+
+        }
+
 
         /// <summary>
         /// Method grabs the work Duration out of a text box, converts to an integer, 
@@ -711,43 +854,115 @@ namespace TaskVisualization
         /// <summary>
         /// Iterates through _todo_list and applies the values in _active for the fields in _options
         /// </summary>
-        private void ApplyChanges()
-        {
+        internal async Task ApplyChanges()
+        {            
             foreach (ToDoItem c in _todo_list)
             {
-                c.FlagAsTask = true;
-                c.IsReadOnly = true;
+                ToDoEvents.Editing.AddOrUpdate(c.OlItem.EntryID, 1, (key, existing) => existing + 1);
 
-                if (_options.HasFlag(FlagsToSet.context))
-                    c.Context = _active.Context;
-                if (_options.HasFlag(FlagsToSet.people))
-                    c.People = _active.People;
-                if (_options.HasFlag(FlagsToSet.projects))
-                    c.Projects = _active.Projects;
-                if (_options.HasFlag(FlagsToSet.topics))
-                    c.Topics = _active.Topics;
-                if (_options.HasFlag(FlagsToSet.today))
+                FlagChangeGroup fcg = (c.OlItem.GetOlItemType() == OlItemType.olMailItem) ? 
+                    new(Globals, c.OlItem.InnerObject as MailItem) : null;
+                
+                if (c.FlagAsTask != _active.FlagAsTask)
+                {
+                    c.FlagAsTask = _active.FlagAsTask; 
+                }
+
+                c.ReadOnly = true;
+                ApplyChange(fcg, "Context", Enums.FlagsToSet.Context, c.Context, _active.Context);
+                ApplyChange(Enums.FlagsToSet.People, c.People, _active.People);
+                ApplyChange(fcg, "Project", Enums.FlagsToSet.Projects, c.Projects, _active.Projects);
+                ApplyChange(Enums.FlagsToSet.Program, c.Program, _active.Program);
+                ApplyChange(Enums.FlagsToSet.Topics, c.Topics, _active.Topics);
+                ApplyChange(Enums.FlagsToSet.Kbf, c.KB, _active.KB);
+                if (_options.HasFlag(Enums.FlagsToSet.Today) && c.Today != _active.Today)
+                {
                     c.Today = _active.Today;
-                if (_options.HasFlag(FlagsToSet.bullpin))
+                    ChangedFlags |= Enums.FlagsToSet.Today;
+                }
+                if (_options.HasFlag(Enums.FlagsToSet.Bullpin) && c.Bullpin != _active.Bullpin)
+                {
                     c.Bullpin = _active.Bullpin;
-                if (_options.HasFlag(FlagsToSet.kbf))
-                    c.KB = _active.KB;
+                    ChangedFlags |= Enums.FlagsToSet.Bullpin;
+                }
+                
+                //if (_options.HasFlag(Enums.FlagsToSet.Context))
+                //    c.Context.AsListNoPrefix = _active.Context.AsListNoPrefix;
+                //if (_options.HasFlag(Enums.FlagsToSet.People))
+                //    c.People.AsListNoPrefix = _active.People.AsListNoPrefix;
+                //if (_options.HasFlag(Enums.FlagsToSet.Projects))
+                //    c.Projects.AsListNoPrefix = _active.Projects.AsListNoPrefix;
+                //if (_options.HasFlag(Enums.FlagsToSet.Program))
+                //    c.Program.AsListNoPrefix = _active.Program.AsListNoPrefix;
+                //if (_options.HasFlag(Enums.FlagsToSet.Topics))
+                //    c.Topics.AsListNoPrefix = _active.Topics.AsListNoPrefix;
+                //if (_options.HasFlag(Enums.FlagsToSet.Kbf))
+                //    c.KB.AsStringNoPrefix = _active.KB.AsStringNoPrefix;
 
-                c.WriteFlagsBatch();
-                c.IsReadOnly = false;
+                await c.WriteFlagsBatchAsync(ChangedFlags);
+                ChangedFlags = Enums.FlagsToSet.None;
+                c.ReadOnly = false;
 
-                if (_options.HasFlag(FlagsToSet.priority))
+                if (_options.HasFlag(Enums.FlagsToSet.Priority) && c.Priority != _active.Priority) 
                     c.Priority = _active.Priority;
-                if (_options.HasFlag(FlagsToSet.taskname))
+                if (_options.HasFlag(Enums.FlagsToSet.Taskname) && c.TaskSubject != _active.TaskSubject)
                     c.TaskSubject = _active.TaskSubject;
-                if (_options.HasFlag(FlagsToSet.worktime))
+                if (_options.HasFlag(Enums.FlagsToSet.Worktime) && c.TotalWork != _active.TotalWork)
                     c.TotalWork = _active.TotalWork;
-                if (_options.HasFlag(FlagsToSet.duedate))
+                if (_options.HasFlag(Enums.FlagsToSet.DueDate) && c.DueDate != _active.DueDate)
                     c.DueDate = _active.DueDate;
-                if (_options.HasFlag(FlagsToSet.reminder))
+                if (_options.HasFlag(Enums.FlagsToSet.Reminder) && c.ReminderTime != _active.ReminderTime)
                     c.ReminderTime = _active.ReminderTime;
+                if (_options == Enums.FlagsToSet.All && c.ActiveBranch != true)
+                    c.ActiveBranch = true;
+
+                if (fcg?.FlagChangeItems.Count > 0)
+                {
+                    Globals.TD.FlagChangeTrainingQueue.Enqueue(fcg);
+                }
+
+                ToDoEvents.Editing.UpdateOrRemove(c.OlItem.EntryID, (key, existing) => existing == 1, (key, existing) => existing - 1, out _);
             }
         }
+
+        internal void ApplyChange(Enums.FlagsToSet flag, FlagTranslator current, FlagTranslator revised)
+        {
+            if (Options.HasFlag(flag))
+            {
+                if (!AreCollectionsEqual(current.AsListNoPrefix, revised.AsListNoPrefix))
+                {
+                    current.AsListNoPrefix = revised.AsListNoPrefix;
+                    ChangedFlags |= flag;
+                }
+            }
+        }
+
+
+        internal void ApplyChange(FlagChangeGroup fcg, string classifierName, Enums.FlagsToSet flag, FlagTranslator current, FlagTranslator revised)
+        {
+            if (Options.HasFlag(flag)) 
+            {                 
+                if (fcg?.TryEnqueue(classifierName, current.AsListNoPrefix, revised.AsListNoPrefix)??false || 
+                    !AreCollectionsEqual(current.AsListNoPrefix,revised.AsListNoPrefix))
+                {
+                    current.AsListNoPrefix = revised.AsListNoPrefix;
+                    ChangedFlags |= flag;
+                }                
+            }
+        }
+
+        private bool AreCollectionsEqual(ObservableCollection<string> collectionA, ObservableCollection<string> collectionB)
+        {
+            if (collectionA == null || collectionB == null)
+                return collectionA == collectionB;
+
+            var setA = new HashSet<string>(collectionA);
+            var setB = new HashSet<string>(collectionB);
+
+            return setA.SetEquals(setB);
+        }
+
+
 
         #endregion
 
@@ -828,13 +1043,13 @@ namespace TaskVisualization
             else if (ctrl is Label)
             {
 
-                if (lbl.Equals(_viewer.XlPeople))
-                {
-                    AssignPeople();
-                }
-                else if (lbl.Equals(_viewer.XlProject))
+                if (lbl.Equals(_viewer.XlProject))
                 {
                     AssignProject();
+                }
+                else if (lbl.Equals(_viewer.XlPeople))
+                {
+                    AssignPeople();
                 }
                 else if (lbl.Equals(_viewer.XlTopic))
                 {
@@ -869,7 +1084,7 @@ namespace TaskVisualization
                 var tips = NavTips.Where(x => x.GroupNumber == _activeNavGroup);
                 tips.ForEach(x => x.ToggleColumnOnly(Enums.ToggleState.Off));
                 tips.ElementAt(0).TLP.BackColor = SystemColors.Control;
-                _activeNavGroup = -1;
+                //_activeNavGroup = -1;
             }
             return (null, true, 0);
         }
@@ -902,7 +1117,7 @@ namespace TaskVisualization
                     return (dictActivate, true, 1);
                 }
             }
-            else { return (null, true, 0); }
+            else { return (_xlCtrlsActive, _altActive, _altLevel); }
         }
 
         internal (Dictionary<Label, char> dictActive, bool altActive, int level) ActivateXlGroup(char selectedChar)
@@ -1026,30 +1241,30 @@ namespace TaskVisualization
         //{
         //    var xlCtrlOptions = new Dictionary<Label, bool>();
         //    {
-        //        xlCtrlOptions.Add(_viewer.XlTopic, _options.HasFlag(FlagsToSet.topics));
-        //        xlCtrlOptions.Add(_viewer.XlProject, _options.HasFlag(FlagsToSet.projects));
-        //        xlCtrlOptions.Add(_viewer.XlPeople, _options.HasFlag(FlagsToSet.people));
-        //        xlCtrlOptions.Add(_viewer.XlContext, _options.HasFlag(FlagsToSet.context));
-        //        xlCtrlOptions.Add(_viewer.XlTaskname, _options.HasFlag(FlagsToSet.taskname));
-        //        xlCtrlOptions.Add(_viewer.XlImportance, _options.HasFlag(FlagsToSet.priority));
-        //        xlCtrlOptions.Add(_viewer.XlKanban, _options.HasFlag(FlagsToSet.kbf));
-        //        xlCtrlOptions.Add(_viewer.XlWorktime, _options.HasFlag(FlagsToSet.worktime));
+        //        xlCtrlOptions.Add(_viewer.XlTopic, _options.HasFlag(Enums.FlagsToSet.topics));
+        //        xlCtrlOptions.Add(_viewer.XlProject, _options.HasFlag(Enums.FlagsToSet.projects));
+        //        xlCtrlOptions.Add(_viewer.XlPeople, _options.HasFlag(Enums.FlagsToSet.people));
+        //        xlCtrlOptions.Add(_viewer.XlContext, _options.HasFlag(Enums.FlagsToSet.context));
+        //        xlCtrlOptions.Add(_viewer.XlTaskname, _options.HasFlag(Enums.FlagsToSet.taskname));
+        //        xlCtrlOptions.Add(_viewer.XlImportance, _options.HasFlag(Enums.FlagsToSet.priority));
+        //        xlCtrlOptions.Add(_viewer.XlKanban, _options.HasFlag(Enums.FlagsToSet.kbf));
+        //        xlCtrlOptions.Add(_viewer.XlWorktime, _options.HasFlag(Enums.FlagsToSet.worktime));
         //        xlCtrlOptions.Add(_viewer.XlOk, true);
         //        xlCtrlOptions.Add(_viewer.XlCancel, true);
-        //        xlCtrlOptions.Add(_viewer.XlReminder, _options.HasFlag(FlagsToSet.reminder));
-        //        xlCtrlOptions.Add(_viewer.XlDuedate, _options.HasFlag(FlagsToSet.duedate));
-        //        xlCtrlOptions.Add(_viewer.XlScWaiting, _options.HasFlag(FlagsToSet.all));
-        //        xlCtrlOptions.Add(_viewer.XlScUnprocessed, _options.HasFlag(FlagsToSet.all));
-        //        xlCtrlOptions.Add(_viewer.XlScNews, _options.HasFlag(FlagsToSet.all));
-        //        xlCtrlOptions.Add(_viewer.XlScEmail, _options.HasFlag(FlagsToSet.all));
-        //        xlCtrlOptions.Add(_viewer.XlScReadingbusiness, _options.HasFlag(FlagsToSet.all));
-        //        xlCtrlOptions.Add(_viewer.XlScCalls, _options.HasFlag(FlagsToSet.all));
-        //        xlCtrlOptions.Add(_viewer.XlScInternet, _options.HasFlag(FlagsToSet.all));
-        //        xlCtrlOptions.Add(_viewer.XlScPreread, _options.HasFlag(FlagsToSet.all));
-        //        xlCtrlOptions.Add(_viewer.XlScMeeting, _options.HasFlag(FlagsToSet.all));
-        //        xlCtrlOptions.Add(_viewer.XlScPersonal, _options.HasFlag(FlagsToSet.all));
-        //        xlCtrlOptions.Add(_viewer.XlScBullpin, _options.HasFlag(FlagsToSet.all));
-        //        xlCtrlOptions.Add(_viewer.XlScToday, _options.HasFlag(FlagsToSet.all));
+        //        xlCtrlOptions.Add(_viewer.XlReminder, _options.HasFlag(Enums.FlagsToSet.reminder));
+        //        xlCtrlOptions.Add(_viewer.XlDuedate, _options.HasFlag(Enums.FlagsToSet.duedate));
+        //        xlCtrlOptions.Add(_viewer.XlScWaiting, _options.HasFlag(Enums.FlagsToSet.all));
+        //        xlCtrlOptions.Add(_viewer.XlScUnprocessed, _options.HasFlag(Enums.FlagsToSet.all));
+        //        xlCtrlOptions.Add(_viewer.XlScNews, _options.HasFlag(Enums.FlagsToSet.all));
+        //        xlCtrlOptions.Add(_viewer.XlScEmail, _options.HasFlag(Enums.FlagsToSet.all));
+        //        xlCtrlOptions.Add(_viewer.XlScReadingbusiness, _options.HasFlag(Enums.FlagsToSet.all));
+        //        xlCtrlOptions.Add(_viewer.XlScCalls, _options.HasFlag(Enums.FlagsToSet.all));
+        //        xlCtrlOptions.Add(_viewer.XlScInternet, _options.HasFlag(Enums.FlagsToSet.all));
+        //        xlCtrlOptions.Add(_viewer.XlScPreread, _options.HasFlag(Enums.FlagsToSet.all));
+        //        xlCtrlOptions.Add(_viewer.XlScMeeting, _options.HasFlag(Enums.FlagsToSet.all));
+        //        xlCtrlOptions.Add(_viewer.XlScPersonal, _options.HasFlag(Enums.FlagsToSet.all));
+        //        xlCtrlOptions.Add(_viewer.XlScBullpin, _options.HasFlag(Enums.FlagsToSet.all));
+        //        xlCtrlOptions.Add(_viewer.XlScToday, _options.HasFlag(Enums.FlagsToSet.all));
         //    }
         //    return xlCtrlOptions;
         //}
@@ -1165,35 +1380,38 @@ namespace TaskVisualization
             {
                 new ControlRelationship(0, _viewer.XlSector1,  true,  _viewer.XlSector1.Text,  _viewer.XlSector1),
                 new ControlRelationship(0, _viewer.XlSector2,  true,  _viewer.XlSector2.Text,  _viewer.XlSector2),
-                new ControlRelationship(0, _viewer.XlSector3,  _options.HasFlag(FlagsToSet.all),  _viewer.XlSector3.Text,  _viewer.XlSector3),
+                new ControlRelationship(0, _viewer.XlSector3,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.XlSector3.Text,  _viewer.XlSector3),
                 new ControlRelationship(0, _viewer.XlSector4,  true,  _viewer.XlSector4.Text,  _viewer.XlSector4),
-                new ControlRelationship(2, _viewer.XlTopic,  _options.HasFlag(FlagsToSet.topics),  _viewer.LblTopic.Text,  _viewer.LblTopic),
-                new ControlRelationship(2, _viewer.XlProject,  _options.HasFlag(FlagsToSet.projects),  _viewer.LblProject.Text,  _viewer.LblProject),
-                new ControlRelationship(2, _viewer.XlPeople,  _options.HasFlag(FlagsToSet.people),  _viewer.LblPeople.Text,  _viewer.LblPeople),
-                new ControlRelationship(2, _viewer.XlContext,  _options.HasFlag(FlagsToSet.context),  _viewer.LblContext.Text,  _viewer.LblContext),
-                new ControlRelationship(1, _viewer.XlTaskname,  _options.HasFlag(FlagsToSet.taskname),  _viewer.LblTaskname.Text,  _viewer.TaskName),
-                new ControlRelationship(1, _viewer.XlImportance,  _options.HasFlag(FlagsToSet.priority),  _viewer.LblPriority.Text,  _viewer.PriorityBox),
-                new ControlRelationship(1, _viewer.XlKanban,  _options.HasFlag(FlagsToSet.kbf),  _viewer.LblKbf.Text,  _viewer.KbSelector),
-                new ControlRelationship(1, _viewer.XlWorktime,  _options.HasFlag(FlagsToSet.worktime),  _viewer.LblDuration.Text,  _viewer.Duration),
+                new ControlRelationship(2, _viewer.XlTopic,  _options.HasFlag(Enums.FlagsToSet.Topics),  _viewer.LblTopic.Text,  _viewer.LblTopic),
+                new ControlRelationship(2, _viewer.XlProject,  _options.HasFlag(Enums.FlagsToSet.Projects),  _viewer.LblProject.Text,  _viewer.LblProject),
+                new ControlRelationship(2, _viewer.XlPeople,  _options.HasFlag(Enums.FlagsToSet.People),  _viewer.LblPeople.Text,  _viewer.LblPeople),
+                new ControlRelationship(2, _viewer.XlContext,  _options.HasFlag(Enums.FlagsToSet.Context),  _viewer.LblContext.Text,  _viewer.LblContext),
+                new ControlRelationship(1, _viewer.XlTaskname,  _options.HasFlag(Enums.FlagsToSet.Taskname),  _viewer.LblTaskname.Text,  _viewer.TaskName),
+                new ControlRelationship(1, _viewer.XlImportance,  _options.HasFlag(Enums.FlagsToSet.Priority),  _viewer.LblPriority.Text,  _viewer.PriorityBox),
+                new ControlRelationship(1, _viewer.XlKanban,  _options.HasFlag(Enums.FlagsToSet.Kbf),  _viewer.LblKbf.Text,  _viewer.KbSelector),
+                new ControlRelationship(1, _viewer.XlWorktime,  _options.HasFlag(Enums.FlagsToSet.Worktime),  _viewer.LblDuration.Text,  _viewer.Duration),
                 new ControlRelationship(4, _viewer.XlOk,  true,  _viewer.OKButton.Text,  _viewer.OKButton),
                 new ControlRelationship(4, _viewer.XlCancel,  true,  _viewer.Cancel_Button.Text,  _viewer.Cancel_Button),
-                new ControlRelationship(1, _viewer.XlReminder,  _options.HasFlag(FlagsToSet.reminder),  _viewer.LblReminder.Text,  _viewer.DtReminder),
-                new ControlRelationship(1, _viewer.XlDuedate,  _options.HasFlag(FlagsToSet.duedate),  _viewer.LblDuedate.Text,  _viewer.DtDuedate),
-                new ControlRelationship(3, _viewer.XlScWaiting,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutWaitingFor.Text,  _viewer.ShortcutWaitingFor),
-                new ControlRelationship(3, _viewer.XlScUnprocessed,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutUnprocessed.Text,  _viewer.ShortcutUnprocessed),
-                new ControlRelationship(3, _viewer.XlScNews,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutNews.Text,  _viewer.ShortcutNews),
-                new ControlRelationship(3, _viewer.XlScEmail,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutEmail.Text,  _viewer.ShortcutEmail),
-                new ControlRelationship(3, _viewer.XlScReadingbusiness,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutReadingBusiness.Text,  _viewer.ShortcutReadingBusiness),
-                new ControlRelationship(3, _viewer.XlScCalls,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutCalls.Text,  _viewer.ShortcutCalls),
-                new ControlRelationship(3, _viewer.XlScInternet,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutInternet.Text,  _viewer.ShortcutInternet),
-                new ControlRelationship(3, _viewer.XlScPreread,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutPreRead.Text,  _viewer.ShortcutPreRead),
-                new ControlRelationship(3, _viewer.XlScMeeting,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutMeeting.Text,  _viewer.ShortcutMeeting),
-                new ControlRelationship(3, _viewer.XlScPersonal,  _options.HasFlag(FlagsToSet.all),  _viewer.ShortcutPersonal.Text,  _viewer.ShortcutPersonal),
-                new ControlRelationship(3, _viewer.XlScBullpin,  _options.HasFlag(FlagsToSet.all),  _viewer.CbxBullpin.Text,  _viewer.CbxBullpin),
-                new ControlRelationship(3, _viewer.XlScToday,  _options.HasFlag(FlagsToSet.all),  _viewer.CbxToday.Text,  _viewer.CbxToday)
+                new ControlRelationship(4, _viewer.XlAutotag,  true,  _viewer.AutoTagButton.Text,  _viewer.AutoTagButton),
+                new ControlRelationship(1, _viewer.XlReminder,  _options.HasFlag(Enums.FlagsToSet.Reminder),  _viewer.LblReminder.Text,  _viewer.DtReminder),
+                new ControlRelationship(1, _viewer.XlDuedate,  _options.HasFlag(Enums.FlagsToSet.DueDate),  _viewer.LblDuedate.Text,  _viewer.DtDuedate),
+                new ControlRelationship(3, _viewer.XlScWaiting,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutWaitingFor.Text,  _viewer.ShortcutWaitingFor),
+                new ControlRelationship(3, _viewer.XlScUnprocessed,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutUnprocessed.Text,  _viewer.ShortcutUnprocessed),
+                new ControlRelationship(3, _viewer.XlScNews,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutNews.Text,  _viewer.ShortcutNews),
+                new ControlRelationship(3, _viewer.XlScEmail,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutEmail.Text,  _viewer.ShortcutEmail),
+                new ControlRelationship(3, _viewer.XlScReadingbusiness,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutReadingBusiness.Text,  _viewer.ShortcutReadingBusiness),
+                new ControlRelationship(3, _viewer.XlScCalls,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutCalls.Text,  _viewer.ShortcutCalls),
+                new ControlRelationship(3, _viewer.XlScInternet,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutInternet.Text,  _viewer.ShortcutInternet),
+                new ControlRelationship(3, _viewer.XlScPreread,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutPreRead.Text,  _viewer.ShortcutPreRead),
+                new ControlRelationship(3, _viewer.XlScMeeting,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutMeeting.Text,  _viewer.ShortcutMeeting),
+                new ControlRelationship(3, _viewer.XlScPersonal,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutPersonal.Text,  _viewer.ShortcutPersonal),
+                new ControlRelationship(3, _viewer.XlScBullpin,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.CbxBullpin.Text,  _viewer.CbxBullpin),
+                new ControlRelationship(3, _viewer.XlScToday,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.CbxToday.Text,  _viewer.CbxToday)
             };
             return list;
         }
+
+
 
         private struct ControlRelationship
         {
@@ -1216,8 +1434,8 @@ namespace TaskVisualization
 
         }
 
-        private Dictionary<FlagsToSet, List<Control>> _optionsGroups;
-        internal Dictionary<FlagsToSet, List<Control>> OptionsGroups
+        private Dictionary<Enums.FlagsToSet, List<Control>> _optionsGroups;
+        internal Dictionary<Enums.FlagsToSet, List<Control>> OptionsGroups
         {
             get
             {
@@ -1225,17 +1443,17 @@ namespace TaskVisualization
                 {
                     _optionsGroups = new()
                     {
-                        { FlagsToSet.context, new List<Control> { _viewer.CategorySelection, _viewer.LblContext } },
-                        { FlagsToSet.topics, new List<Control>{ _viewer.TopicSelection, _viewer.LblTopic } },
-                        { FlagsToSet.projects, new List<Control>{ _viewer.ProjectSelection, _viewer.LblProject } },
-                        { FlagsToSet.people, new List<Control>{ _viewer.PeopleSelection, _viewer.LblPeople } },
-                        { FlagsToSet.taskname, new List<Control>{ _viewer.TaskName, _viewer.LblTaskname } },
-                        { FlagsToSet.priority, new List<Control>{ _viewer.PriorityBox, _viewer.LblPriority } },
-                        { FlagsToSet.kbf, new List<Control>{ _viewer.KbSelector, _viewer.LblKbf } },
-                        { FlagsToSet.worktime, new List<Control>{ _viewer.Duration, _viewer.LblDuration } },
-                        { FlagsToSet.reminder, new List<Control>{ _viewer.DtReminder, _viewer.LblReminder } },
-                        { FlagsToSet.duedate, new List<Control>{ _viewer.DtDuedate, _viewer.LblDuedate } },
-                        { FlagsToSet.all, new List<Control> 
+                        { Enums.FlagsToSet.Context, new List<Control> { _viewer.CategorySelection, _viewer.LblContext } },
+                        { Enums.FlagsToSet.Topics, new List<Control>{ _viewer.TopicSelection, _viewer.LblTopic } },
+                        { Enums.FlagsToSet.Projects, new List<Control>{ _viewer.ProjectSelection, _viewer.LblProject } },
+                        { Enums.FlagsToSet.People, new List<Control>{ _viewer.PeopleSelection, _viewer.LblPeople } },
+                        { Enums.FlagsToSet.Taskname, new List<Control>{ _viewer.TaskName, _viewer.LblTaskname } },
+                        { Enums.FlagsToSet.Priority, new List<Control>{ _viewer.PriorityBox, _viewer.LblPriority } },
+                        { Enums.FlagsToSet.Kbf, new List<Control>{ _viewer.KbSelector, _viewer.LblKbf } },
+                        { Enums.FlagsToSet.Worktime, new List<Control>{ _viewer.Duration, _viewer.LblDuration } },
+                        { Enums.FlagsToSet.Reminder, new List<Control>{ _viewer.DtReminder, _viewer.LblReminder } },
+                        { Enums.FlagsToSet.DueDate, new List<Control>{ _viewer.DtDuedate, _viewer.LblDuedate } },
+                        { Enums.FlagsToSet.All, new List<Control> 
                         { 
                             _viewer.ShortcutMeeting,_viewer.ShortcutCalls,_viewer.ShortcutPersonal,
                             _viewer.ShortcutEmail,_viewer.ShortcutInternet,_viewer.ShortcutReadingBusiness,

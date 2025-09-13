@@ -130,7 +130,7 @@ namespace QuickFiler.Controllers
         //PRIORITY: Implement OpenQFItem
         async public Task OpenQFItem(MailItem mailItem)
         {
-            _parent.FormCtrlr.MinimizeFormViewer();
+            _parent.FormController.MinimizeFormViewer();
             NavigateToOutlookFolder(mailItem);
             if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort) & AutoFile.AreConversationsGrouped(_activeExplorer))
                 await Task.Run(() => ExplConvView_ToggleOff());
@@ -232,7 +232,7 @@ namespace QuickFiler.Controllers
             }
         }
 
-        private static void UpdateForMove(MailItem mailItem, string fldr, CtfMap ctfMap, ISubjectMapSL subMap)
+        private static void UpdateForMove(MailItem mailItem, string fldr, CtfMap ctfMap, ISubjectMapSco subMap)
         {
             ctfMap.Add(mailItem.ConversationID, fldr, 1);
             subMap.Add(mailItem.Subject, fldr);

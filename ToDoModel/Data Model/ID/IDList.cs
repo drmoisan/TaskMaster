@@ -1,14 +1,16 @@
-﻿using Outlook = Microsoft.Office.Interop.Outlook;
+﻿using Deedle;
+using Microsoft.Office.Interop.Outlook;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UtilitiesCS;
-using Microsoft.Office.Interop.Outlook;
-using Deedle;
+using System.Web.UI.WebControls;
 using System.Windows.Forms;
+using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
+using UtilitiesCS.OutlookObjects.Fields;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace ToDoModel
 {
@@ -116,9 +118,9 @@ namespace ToDoModel
                                                 removeColumns: null, 
                                                 addColumns: new string[]
                                                 {
-                                                    OlTableExtensions.SchemaToDoID,
+                                                    MAPIFields.Schemas.ToDoID,
                                                     "Categories",
-                                                    OlTableExtensions.SchemaMessageStore
+                                                    MAPIFields.Schemas.MessageStore
                                                 });
 
             df = df.FillMissing("ERROR");
@@ -127,6 +129,50 @@ namespace ToDoModel
             this.FromList(idList);
             _maxIDLength = this.Select(x => x.Length).Max();
             this.Serialize();
+        }
+
+        public async Task<string> SubstituteIdRootAsync(string oldId, string newRoot, string oldRoot) 
+        {
+            return await Task.Run(() => 
+            { 
+                var newId = oldId.Replace(oldRoot, newRoot);
+                this.Remove(oldId);
+                this.Add(newId);
+                this.Serialize();
+                return newId;
+            });
+                
+            
+        }
+
+        public IAsyncEnumerable<IToDoItem> GetItemsWithRootIdAsync(string rootId) 
+        {
+            var strFilter = $"@SQL={MAPIFields.Schemas.ToDoID} like '{rootId}%'";
+            var items = _olApp.Session.Stores
+                ?.Cast<Store>()
+                ?.ToAsyncEnumerable()
+                ?.Select(TryGetDefaultToDoFolder)
+                ?.Where(store => store is not null)
+                ?.SelectMany(folder => 
+                    folder?
+                    .Items?
+                    .Restrict(strFilter)?
+                    .Cast<object>()?
+                    .ToAsyncEnumerable()?
+                    .Select(x => new ToDoItem(new OutlookItem(x))));
+            return items;
+        }
+
+        internal MAPIFolder TryGetDefaultToDoFolder(Store store)
+        {
+            try
+            {
+                return store.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
+            }
+            catch (System.Exception)
+            {
+                return null;
+            }
         }
 
         public void SubstituteIdRoot(string oldPrefix, string newPrefix)
@@ -141,12 +187,12 @@ namespace ToDoModel
                 var df = DfDeedle.FromDefaultFolder(stores: _olApp.Session.Stores,
                                                     folderEnum: OlDefaultFolders.olFolderToDo,
                                                     removeColumns: null, 
-                                                    addColumns: new string[]
-                                                    {
-                                                        OlTableExtensions.SchemaToDoID,
+                                                    addColumns:
+                                                    [
+                                                        MAPIFields.Schemas.ToDoID,
                                                         "Categories",
-                                                        OlTableExtensions.SchemaMessageStore
-                                                    });
+                                                        MAPIFields.Schemas.MessageStore
+                                                    ]);
 
                 df = df.FillMissing("");
                 var df2 = df.Where(x => ((string)x.Value["ToDoID"]).Contains(oldPrefix));
@@ -158,7 +204,7 @@ namespace ToDoModel
                     string todoOld = row["ToDoID"].ToString();
                     string todoNew = todoOld.Replace(oldPrefix, newPrefix);
                     var item = new OutlookItem(_olApp.Session.GetItemFromID(entryID, storeID));
-                    item.SetUdf("ToDoID", todoNew);
+                    item.TrySetUdf("ToDoID", todoNew);
                     this.Remove(todoOld);
                     this.Add(todoNew);
                 }
@@ -172,14 +218,22 @@ namespace ToDoModel
         /// recursively calls DataModel_ToDoTree.ReNumberChildrenIDs() and then invokes the
         /// ListOfIDsLegacy.Save() Method
         /// </summary>
-        /// <param name="OlApp">Pointer to Outlook Application</param>
-        public void CompressToDoIDs(Outlook.Application OlApp)
+        /// <param name="appGlobals">Pointer to Outlook Application</param>
+        public void CompressToDoIDs(IApplicationGlobals appGlobals)
         {
             var _dataModel = new TreeOfToDoItems();
-            _dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadAll, OlApp);
+            _dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadAll, appGlobals);
+            var flat = _dataModel.TryFlatten()?.Select(x => x.ToDoID).ToList();
+            if (flat is not null)
+            {
+                this.FromList(flat);
+            }
+            
             _dataModel.ReNumberIDs(this);
+            this.Sort();
+            this.Serialize();
         }
-
+               
         public void SetOlApp(Outlook.Application olApp) { _olApp = olApp; }
     }
 }

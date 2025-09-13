@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
@@ -58,7 +59,7 @@ namespace TaskVisualization
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-       {
+        {
             if (keyData.HasFlag(Keys.Alt))
             {
                 // If keyData = Keys.Up OrElse keyData = Keys.Down OrElse keyData = Keys.Left OrElse keyData = Keys.Right OrElse keyData = Keys.Alt Then
@@ -72,10 +73,10 @@ namespace TaskVisualization
         }
 
         private List<Label> _navColumns;
-        internal List<Label> NavColumns 
+        internal List<Label> NavColumns
         {
-            get 
-            { 
+            get
+            {
                 if (_navColumns is null)
                     _navColumns = new() { C1S1, C2S2, C2S4, C3S1, C3S2, C3S4, C4S1, C4S2 };
                 return _navColumns;
@@ -159,9 +160,11 @@ namespace TaskVisualization
             _controller.Shortcut_WaitingFor();
         }
 
-        private void OKButton_Click(object sender, EventArgs e)
+        private async void OKButton_Click(object sender, EventArgs e)
         {
-            _controller.OK_Action();
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+            await _controller.OK_Action();
         }
 
         private void CbxToday_CheckedChanged(object sender, EventArgs e)
@@ -236,5 +239,26 @@ namespace TaskVisualization
 
         #endregion
 
+        private void TaskViewer_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.Down || e.KeyCode == Keys.Up)
+            {
+                e.IsInputKey = true;
+            }
+        }
+
+        private async void AutoTagButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                await _controller.AutoAssignAllAsync().ConfigureAwait(true);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
+        }
     }
 }
