@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ConcurrentObservableCollections.ConcurrentObservableDictionary
+namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
 {
     internal class SimpleActionDictionaryObserver<TKey, TValue> : IDictionaryObserver<TKey, TValue>
     {

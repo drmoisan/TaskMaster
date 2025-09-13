@@ -94,14 +94,24 @@ namespace QuickFiler.Helper_Classes
                 }
                 catch (System.Exception e)
                 {
+                    string entryId = "";
+                    try
+                    {
+                        entryId = mail.EntryID;
+                    }
+                    catch (System.Exception ex)
+                    {
+                        entryId = "[Error getting EntryID]";
+                    }
+
                     if (remaining > 0)
                     {
-                        logger.Error($"Error getting parent folder for mail item {mail.EntryID}. {remaining} remaining attempts.");
+                        logger.Error($"Error getting parent folder for mail item {entryId}. {remaining} remaining attempts.");
                         return await GetParentFolderAsync(mail, remaining - 1);
                     }
                     else
                     {
-                        logger.Error($"Error getting parent folder for mail item {mail.EntryID}. No remaining attempts. Returning null", e);
+                        logger.Error($"Error getting parent folder for mail item {entryId}. No remaining attempts. Returning null", e);
                         return null;
                     }
                 }

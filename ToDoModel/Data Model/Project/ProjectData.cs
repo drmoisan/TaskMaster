@@ -1,14 +1,16 @@
-﻿using System;
+﻿using Deedle;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
 using System.Windows.Forms;
 using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
-using Deedle;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace ToDoModel
@@ -34,8 +36,16 @@ namespace ToDoModel
                                                        askUserOnError)
         { }
 
-        public void Save(string filepath) => base.Serialize(filepath);
-        public void Save() => base.Serialize();
+        public void Save(string filepath) 
+        {
+            base.Sort();
+            base.Serialize(filepath); 
+        }
+        public void Save() 
+        {
+            base.Sort();
+            base.Serialize(); 
+        }
 
         private Action<string, string> _idUpdateAction;
         public void SetIdUpdateAction(Action<string, string> action)
@@ -108,7 +118,6 @@ namespace ToDoModel
             return dfToDo;
         }
 
-
         private static Frame<int,string> DropDuplicates(Frame<int, string> df, IEnumerable<Frame<int, string>> duplicateRows)
         {
             var dfTemp = df.Clone();
@@ -118,8 +127,6 @@ namespace ToDoModel
             }
             return dfTemp;
         }
-
-        
 
         private static void LogDuplicates(IEnumerable<Frame<int, string>> duplicateRows)
         {
@@ -231,7 +238,7 @@ namespace ToDoModel
 
             df = FilterToProjectIDs(df);
             
-            var result = DfToListEntries(df);
+            var result = DfToListEntries(df).OrderBy(x => x.ProjectID).ToList();
             
             this.FromList(result);
             this.Serialize();
@@ -288,7 +295,21 @@ namespace ToDoModel
         {
             return this.Where(x => x.ProgramName.ToLower() == programName.ToLower()).ToList();
         }
+
+        [JsonProperty]
+        internal IApplicationGlobals Globals { get; set; }
+
+        #region Update Callbacks
+
+        internal bool UpdateProjectID(string newID)
+        {
+            if (Contains_ProjectID(newID)) { return false; }
+            return true;
+        }
+
+        #endregion Update Callbacks
+
     }
 
-    
+
 }

@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using Newtonsoft.Json;
 using ToDoModel;
 using ToDoModel.Data_Model.People;
@@ -17,6 +17,9 @@ using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList;
 using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 using UtilitiesCS.Threading;
+using Tags;
+using UtilitiesCS.Interfaces;
+using TaskVisualization;
 
 namespace TaskMaster
 {
@@ -31,7 +34,6 @@ namespace TaskMaster
             else { await LoadSequentialAsync(); }
         }
 
-
         async public Task LoadParallelAsync() 
         {
             var tasks = new List<Task>
@@ -43,7 +45,9 @@ namespace TaskMaster
                 LoadProjInfoAsync(),
                 LoadCategoryFiltersAsync(),
                 LoadFilteredFolderScrapingAsync(),
-                LoadFolderRemapAsync()
+                LoadFolderRemapAsync(),
+                LoadFlagChangeTrainingQueueAsync(),
+                LoadSelectFromListAsync()
             };
             await Task.WhenAll(tasks);
         }
@@ -59,6 +63,8 @@ namespace TaskMaster
             await LoadCategoryFiltersAsync();
             await LoadFilteredFolderScrapingAsync();
             await LoadFolderRemapAsync();
+            await LoadFlagChangeTrainingQueueAsync();
+            await LoadSelectFromListAsync();
         }
 
         private readonly Properties.Settings _defaults = Properties.Settings.Default;
@@ -82,14 +88,16 @@ namespace TaskMaster
             {
                 if (Parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
                 {
-                    return new ProjectData(filename: _defaults.FileName_ProjInfo, folderpath: appData); 
+                    var proj = new ProjectData(filename: _defaults.FileName_ProjInfo, folderpath: appData);
+                    proj.Sort();
+                    return proj;
                 }
                 else { return null; }
             });
             
             if (_projInfo?.Count == 0) 
             {
-                await Task.Run(() => _projInfo.Rebuild(Parent.Ol.App));
+                await Task.Run(() => _projInfo.Rebuild(Parent.Ol.App));                
             }
         }
         private IProjectData LoadProjInfo()
@@ -125,6 +133,7 @@ namespace TaskMaster
             if (Parent.IntelRes.Config.TryGetValue("People", out var config))
             {                
                 People = await SmartSerializable.DeserializeAsync(config, true, () => new PeopleScoDictionaryNew(Parent));
+                People.Prefix = PrefixList.Find(x => x.PrefixType == PrefixTypeEnum.People);
                 People.CollectionChanged += People_CollectionChanged;
             }
             else { logger.Error("People config not found."); }
@@ -133,8 +142,9 @@ namespace TaskMaster
         public IPeopleScoDictionaryNew People {  get; private set; }
         public void People_CollectionChanged(object Sender, DictionaryChangedEventArgs<string, string> args)
         {
-            var dict = (PeopleScoDictionaryNew)Sender;
-            dict.Serialize();
+            People.Serialize();
+            //var dict = (PeopleScoDictionaryNew)Sender;
+            //dict.Serialize();
         }
 
 
@@ -277,7 +287,7 @@ namespace TaskMaster
         }
         async private Task LoadFilteredFolderScrapingAsync()
         {
-            _filteredFolderScraping = await Task.Factory.StartNew(
+            _filteredFolderScraping = await Task.Run(
                                       () => LoadFilteredFolderScraping(),
                                       default(CancellationToken));
         }
@@ -299,8 +309,23 @@ namespace TaskMaster
             _folderRemap = await Task.Run(LoadFolderRemap);
         }
 
+        public Func<IEnumerable<string>, IPrefix, string, string, string> FindMatchingTag { get; internal set; } = TagLauncher.LaunchAndFindMatch;
+        //IEnumerable<string> options, IApplicationGlobals appGlobals
+        public Func<IEnumerable<string>, List<string>> SelectFromList { get; internal set; }
+        private async Task LoadSelectFromListAsync()
+        {
+            await Task.Run(() => SelectFromList = (options) => TagLauncher.LaunchAndSelect(options, this.Parent));
+        }
 
+        public IFlagChangeTrainingQueue FlagChangeTrainingQueue { get; set; }
+        async private Task LoadFlagChangeTrainingQueueAsync()
+        {
+            await Task.Run(() => 
+            { 
+                FlagChangeTrainingQueue = new FlagChangeTrainingQueue().Init();
+            });
+        }
 
-
+        
     }
 }

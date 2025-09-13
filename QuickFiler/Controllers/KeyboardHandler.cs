@@ -25,7 +25,7 @@ namespace QuickFiler.Controllers
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public KeyboardHandler(QfcFormViewer viewer, IFilerHomeController parent)
+        public KeyboardHandler(IQfcFormViewer viewer, IFilerHomeController parent)
         {
             viewer.SetKeyboardHandler(this);
             _parent = parent;
@@ -116,7 +116,14 @@ namespace QuickFiler.Controllers
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(_parent.UiSyncContext);
-            await KeyDownTaskAsync(sender, e);
+            try
+            {
+                await KeyDownTaskAsync(sender, e);
+            }
+            catch (System.Exception ex)
+            {
+                logger.Error($"Error in {nameof(KeyboardHandler_KeyDownAsync)} for key {e.KeyValue}. {ex.Message}", ex);                
+            }
         }
 
         public async Task KeyDownTaskAsync(object sender, KeyEventArgs e)

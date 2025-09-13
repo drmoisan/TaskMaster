@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
-using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using log4net.Repository.Hierarchy;
 using Microsoft.Graph.Security.AttackSimulation.Trainings.Item.LanguageDetails;
 using Newtonsoft.Json;

@@ -15,8 +15,6 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void TestInitialize()
         {
             this.mockRepository = new MockRepository(MockBehavior.Strict);
-
-
         }
 
         public class MyDerivedClass : ScoDictionaryNew<string, string>

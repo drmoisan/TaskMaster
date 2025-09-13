@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
-    public class FlagTranslator
+    public class FlagTranslator : IFlagTranslator
     {
         public FlagTranslator() { }
 
         public FlagTranslator(Func<bool, string> getStrFunc,
                               Action<bool, string> setStrFunc,
                               Func<bool, ObservableCollection<string>> getListFunc,
-                              Action<bool, ObservableCollection<string>> setListFunc) 
+                              Action<bool, ObservableCollection<string>> setListFunc)
         {
             _getStrFunc = getStrFunc ?? throw new ArgumentNullException(nameof(getStrFunc));
             _setStrFunc = setStrFunc ?? throw new ArgumentNullException(nameof(setStrFunc));
@@ -30,13 +30,13 @@ namespace UtilitiesCS
 
         private Func<bool, string> _getStrFunc;
         public Func<bool, string> GetStrFunc { get => _getStrFunc; set => _getStrFunc = value; }
-        
+
         private Action<bool, string> _setStrFunc;
         public Action<bool, string> SetStrFunc { get => _setStrFunc; set => _setStrFunc = value; }
-        
+
         private Func<bool, ObservableCollection<string>> _getListFunc;
         public Func<bool, ObservableCollection<string>> GetListFunc { get => _getListFunc; set => _getListFunc = value; }
-        
+
         private Action<bool, ObservableCollection<string>> _setListFunc;
         public Action<bool, ObservableCollection<string>> SetListFunc { get => _setListFunc; set => _setListFunc = value; }
 

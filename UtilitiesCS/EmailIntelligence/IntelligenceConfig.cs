@@ -11,12 +11,16 @@ using UtilitiesCS;
 using System.IO;
 using System.Resources;
 using UtilitiesCS.Extensions;
+using ToDoModel.Data_Model.People;
+
 
 
 namespace UtilitiesCS.EmailIntelligence
 {
     public class IntelligenceConfig(IApplicationGlobals globals) 
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public static async Task<IntelligenceConfig> LoadAsync(IApplicationGlobals globals)
         {
             return await new IntelligenceConfig(globals).InitAsync();
@@ -43,16 +47,26 @@ namespace UtilitiesCS.EmailIntelligence
                 .SelectAwait(async kvp =>
                 {
                     var loader = await SmartSerializableLoader.DeserializeAsync(Globals, kvp.Value);
-
-                    if (loader.T is not null && IsDerivedFromScoDictionaryNew(loader.T))
-                    {
-                        loader.Config.JsonSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.None;
-                        loader.Config.JsonSettings.Converters.Add(new NewtonsoftHelpers.Sco.ScoDictionaryConverter());
-                        //add a converter for sco dictionary
+                    if (loader is null) 
+                    { 
+                        logger.Error($"Error in {nameof(ReadConfigurationAsync)}. Loader for {kvp.Key} is null");
+                        return new KeyValuePair<string, SmartSerializableLoader>(kvp.Key, null); 
                     }
+                    if (loader.T is not null)
+                    {
+                        if (loader.T == typeof(PeopleScoDictionaryNew))
+                        {
+                            loader.Config.JsonSettings.Converters.Add(new PeopleScoConverter());
+                        }
+                        else if (IsDerivedFromScoDictionaryNew(loader.T))
+                        {
+                            loader.Config.JsonSettings.Converters.Add(new NewtonsoftHelpers.Sco.ScoDictionaryConverter());
+                        }
+                    }
+                                        
                     loader.PropertyChanged += Loader_PropertyChanged;
                     return new KeyValuePair<string, SmartSerializableLoader>(kvp.Key, loader);
-                }).ToConcurrentDictionaryAsync();
+                }).Where(kvp => kvp.Value is not null).ToConcurrentDictionaryAsync();
 
             return resourceDictionary;
         }

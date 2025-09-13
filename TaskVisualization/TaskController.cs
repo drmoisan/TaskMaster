@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -11,6 +12,7 @@ using Microsoft.Office.Interop.Outlook;
 using Tags;
 using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.OutlookExtensions;
 
 
 namespace TaskVisualization
@@ -70,7 +72,10 @@ namespace TaskVisualization
 
         }
 
-        public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, ToDoDefaults defaults, IAutoAssign autoAssign, IAutoAssign projectAssign, Func<string, string> projectsToPrograms, string userEmailAddress, Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All)
+        public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, 
+            ToDoDefaults defaults, IAutoAssign autoAssign, IAutoAssign projectAssign, IAutoAssign contextAssign,
+            Func<string, string> projectsToPrograms, string userEmailAddress, IApplicationGlobals globals,
+            Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All)
         {
             _viewer = formInstance;
             _todo_list = toDoSelection;
@@ -78,6 +83,7 @@ namespace TaskVisualization
             _defaults = defaults;
             _autoAssign = autoAssign;
             _userEmailAddress = userEmailAddress;
+            Globals = globals;
 
             // Activate this controller within the viewer
             formInstance.SetController(this);
@@ -108,6 +114,7 @@ namespace TaskVisualization
 
             ProjectAssign = projectAssign;
             ProjectsToPrograms = projectsToPrograms;
+            ContextAssign = contextAssign;
         }
 
         /// <summary>
@@ -200,6 +207,8 @@ namespace TaskVisualization
 
         #region Public Properties
 
+        internal IApplicationGlobals Globals { get; set; }
+
         private Enums.FlagsToSet _options;
         /// <summary>
         /// Sets options for which controls / fields to activate using Enums.FlagsToSet enumeration
@@ -214,6 +223,8 @@ namespace TaskVisualization
                 ActivateOptions();
             }
         }
+
+        internal Enums.FlagsToSet ChangedFlags { get; set; }
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         static extern bool PostMessage(IntPtr hWnd, int msg, int wParam, int lParam);
@@ -239,6 +250,7 @@ namespace TaskVisualization
         private readonly ToDoDefaults _defaults;
         private readonly IAutoAssign _autoAssign;
         private string _userEmailAddress;
+        
 
 
         private IAutoAssign _projectAssign;
@@ -247,6 +259,8 @@ namespace TaskVisualization
             get => _projectAssign;
             set => _projectAssign = value;
         }
+
+        public IAutoAssign ContextAssign { get; set; }
 
         private Func<string, string> _projectsToPrograms;
         internal Func<string, string> ProjectsToPrograms { get => _projectsToPrograms; private protected set => _projectsToPrograms = value; }
@@ -266,7 +280,7 @@ namespace TaskVisualization
                                  where x.Key.Contains(prefix.Value)
                                  select x).ToSortedDictionary();
 
-            IList<string> selections = _active.People.AsListNoPrefix;
+            IList<string> selections = _active.People.AsListWithPrefix;
 
             selections.Remove("");
 
@@ -283,7 +297,7 @@ namespace TaskVisualization
                 viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.People.AsStringNoPrefix = controller.SelectionString();
+                    _active.People.AsStringNoPrefix = controller.SelectionAsString();
                     _viewer.PeopleSelection.Text = _active.People.AsStringNoPrefix;
                 }
             }
@@ -316,7 +330,7 @@ namespace TaskVisualization
                 viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.Context.AsStringNoPrefix = controller.SelectionString();
+                    _active.Context.AsStringNoPrefix = controller.SelectionAsString();
                     _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
                 }
             }
@@ -347,7 +361,7 @@ namespace TaskVisualization
                 var result = viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.Projects.AsStringNoPrefix = controller.SelectionString();
+                    _active.Projects.AsStringNoPrefix = controller.SelectionAsString();
                     _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
                     _active.Program.AsStringNoPrefix = ProjectsToPrograms(_active.Projects.AsStringNoPrefix);
                 }
@@ -381,7 +395,7 @@ namespace TaskVisualization
                 var result = viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
-                    _active.Topics.AsStringNoPrefix = controller.SelectionString();
+                    _active.Topics.AsStringNoPrefix = controller.SelectionAsString();
                     _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
                 }
             }
@@ -444,9 +458,16 @@ namespace TaskVisualization
         /// </summary>
         public async Task OK_Action()
         {
+            if (_viewer.InvokeRequired)
+            {
+                _viewer.Invoke(() => OK_Action());
+                return;
+            }
             if (AnyCategorySelected)
             {
-
+                // Capture whether the task was flagged as a task
+                _active.FlagAsTask = _viewer.CbxFlagAsTask.Checked;
+                
                 // Capture the value of the task subject and if not empty write to ToDoItem
                 if (_options.HasFlag(Enums.FlagsToSet.Taskname))
                 {
@@ -552,7 +573,31 @@ namespace TaskVisualization
         #endregion
 
         #region Public Keyboard Events and Properties
-        
+
+        internal async Task AutoAssignAllAsync()
+        {
+            if (_active?.OlItem?.InnerObject is not MailItem mailItem) { return; }
+            var helper = await MailItemHelper.FromMailItemAsync(mailItem, Globals, default, false).ConfigureAwait(true);
+
+            var projects = await ProjectAssign.AutoFindAsync(helper).ConfigureAwait(true);
+            if (projects?.Count > 0)
+            {
+                MergeFlag(projects, Enums.FlagsToSet.Projects);
+            }
+
+            var context = await ContextAssign.AutoFindAsync(helper).ConfigureAwait(true);
+            if (context?.Count > 0)
+            {
+                MergeFlag(context, Enums.FlagsToSet.Context);
+            }
+
+            var people = await _autoAssign.AutoFindAsync(mailItem).ConfigureAwait(true);
+            if (people?.Count > 0)
+            {
+                MergeFlag(people, Enums.FlagsToSet.People);
+            }
+        }
+
         public bool KeyboardHandler_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Alt)
@@ -671,7 +716,7 @@ namespace TaskVisualization
         /// </summary>
         /// <param name="value">Comma separated list of tags</param>
         /// <param name="flagType">Used to identify field names and tag Prefix</param>
-        private void SetFlag(string value, Enums.FlagsToSet flagType)
+        internal void SetFlag(string value, Enums.FlagsToSet flagType)
         {
             switch (flagType)
             {
@@ -715,6 +760,63 @@ namespace TaskVisualization
 
         }
 
+
+        internal ObservableCollection<string> MergeToCollection(ObservableCollection<string> original, IList<string> toMerge)
+        {
+            var hash = new HashSet<string>(toMerge);
+            original.ForEach(x =>  hash.Add(x));
+            return new ObservableCollection<string>(hash);
+        }
+
+        /// <summary>
+        /// Sets value based on the flag type and value
+        /// </summary>
+        /// <param name="value">Comma separated list of tags</param>
+        /// <param name="flagType">Used to identify field names and tag Prefix</param>
+        internal void MergeFlag(IList<string> value, Enums.FlagsToSet flagType)
+        {
+            if (_viewer.InvokeRequired)
+            {
+                _viewer.Invoke(() => MergeFlag(value, flagType));
+                return;
+            }
+
+            if (value.IsNullOrEmpty()) { return; }
+            switch (flagType)
+            {
+                case Enums.FlagsToSet.Context:
+                    {
+                        _active.Context.AsListWithPrefix = MergeToCollection(
+                            _active.Context.AsListWithPrefix, value);
+                        _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
+                        break;
+                    }
+                case Enums.FlagsToSet.People:
+                    {
+                        _active.People.AsListWithPrefix = MergeToCollection(
+                            _active.People.AsListWithPrefix, value);
+                        _viewer.PeopleSelection.Text = _active.People.AsStringNoPrefix;
+                        break;
+                    }
+                case Enums.FlagsToSet.Projects:
+                    {
+                        _active.Projects.AsListWithPrefix = MergeToCollection(
+                            _active.Projects.AsListWithPrefix, value);
+                        _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
+                        break;
+                    }
+                case Enums.FlagsToSet.Topics:
+                    {
+                        _active.Topics.AsListWithPrefix = MergeToCollection(
+                            _active.Topics.AsListWithPrefix, value);
+                        _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
+                        break;
+                    }                    // Note that _active is set after OK click
+            }
+
+        }
+
+
         /// <summary>
         /// Method grabs the work Duration out of a text box, converts to an integer, 
         /// and sets totalwork on the ToDoItem. 
@@ -752,51 +854,115 @@ namespace TaskVisualization
         /// <summary>
         /// Iterates through _todo_list and applies the values in _active for the fields in _options
         /// </summary>
-        private async Task ApplyChanges()
+        internal async Task ApplyChanges()
         {            
             foreach (ToDoItem c in _todo_list)
             {
                 ToDoEvents.Editing.AddOrUpdate(c.OlItem.EntryID, 1, (key, existing) => existing + 1);
 
-                c.FlagAsTask = true;
+                FlagChangeGroup fcg = (c.OlItem.GetOlItemType() == OlItemType.olMailItem) ? 
+                    new(Globals, c.OlItem.InnerObject as MailItem) : null;
+                
+                if (c.FlagAsTask != _active.FlagAsTask)
+                {
+                    c.FlagAsTask = _active.FlagAsTask; 
+                }
 
                 c.ReadOnly = true;
-                if (_options.HasFlag(Enums.FlagsToSet.Context))
-                    c.Context.AsListNoPrefix = _active.Context.AsListNoPrefix;
-                if (_options.HasFlag(Enums.FlagsToSet.People))
-                    c.People.AsListNoPrefix = _active.People.AsListNoPrefix;
-                if (_options.HasFlag(Enums.FlagsToSet.Projects))
-                    c.Projects.AsListNoPrefix = _active.Projects.AsListNoPrefix;
-                if (_options.HasFlag(Enums.FlagsToSet.Program))
-                    c.Program.AsListNoPrefix = _active.Program.AsListNoPrefix;
-                if (_options.HasFlag(Enums.FlagsToSet.Topics))
-                    c.Topics.AsListNoPrefix = _active.Topics.AsListNoPrefix;
-                if (_options.HasFlag(Enums.FlagsToSet.Today))
+                ApplyChange(fcg, "Context", Enums.FlagsToSet.Context, c.Context, _active.Context);
+                ApplyChange(Enums.FlagsToSet.People, c.People, _active.People);
+                ApplyChange(fcg, "Project", Enums.FlagsToSet.Projects, c.Projects, _active.Projects);
+                ApplyChange(Enums.FlagsToSet.Program, c.Program, _active.Program);
+                ApplyChange(Enums.FlagsToSet.Topics, c.Topics, _active.Topics);
+                ApplyChange(Enums.FlagsToSet.Kbf, c.KB, _active.KB);
+                if (_options.HasFlag(Enums.FlagsToSet.Today) && c.Today != _active.Today)
+                {
                     c.Today = _active.Today;
-                if (_options.HasFlag(Enums.FlagsToSet.Bullpin))
+                    ChangedFlags |= Enums.FlagsToSet.Today;
+                }
+                if (_options.HasFlag(Enums.FlagsToSet.Bullpin) && c.Bullpin != _active.Bullpin)
+                {
                     c.Bullpin = _active.Bullpin;
-                if (_options.HasFlag(Enums.FlagsToSet.Kbf))
-                    c.KB.AsStringNoPrefix = _active.KB.AsStringNoPrefix;
+                    ChangedFlags |= Enums.FlagsToSet.Bullpin;
+                }
+                
+                //if (_options.HasFlag(Enums.FlagsToSet.Context))
+                //    c.Context.AsListNoPrefix = _active.Context.AsListNoPrefix;
+                //if (_options.HasFlag(Enums.FlagsToSet.People))
+                //    c.People.AsListNoPrefix = _active.People.AsListNoPrefix;
+                //if (_options.HasFlag(Enums.FlagsToSet.Projects))
+                //    c.Projects.AsListNoPrefix = _active.Projects.AsListNoPrefix;
+                //if (_options.HasFlag(Enums.FlagsToSet.Program))
+                //    c.Program.AsListNoPrefix = _active.Program.AsListNoPrefix;
+                //if (_options.HasFlag(Enums.FlagsToSet.Topics))
+                //    c.Topics.AsListNoPrefix = _active.Topics.AsListNoPrefix;
+                //if (_options.HasFlag(Enums.FlagsToSet.Kbf))
+                //    c.KB.AsStringNoPrefix = _active.KB.AsStringNoPrefix;
 
-                await c.WriteFlagsBatch();
+                await c.WriteFlagsBatchAsync(ChangedFlags);
+                ChangedFlags = Enums.FlagsToSet.None;
                 c.ReadOnly = false;
 
-                if (_options.HasFlag(Enums.FlagsToSet.Priority))
+                if (_options.HasFlag(Enums.FlagsToSet.Priority) && c.Priority != _active.Priority) 
                     c.Priority = _active.Priority;
-                if (_options.HasFlag(Enums.FlagsToSet.Taskname))
+                if (_options.HasFlag(Enums.FlagsToSet.Taskname) && c.TaskSubject != _active.TaskSubject)
                     c.TaskSubject = _active.TaskSubject;
-                if (_options.HasFlag(Enums.FlagsToSet.Worktime))
+                if (_options.HasFlag(Enums.FlagsToSet.Worktime) && c.TotalWork != _active.TotalWork)
                     c.TotalWork = _active.TotalWork;
-                if (_options.HasFlag(Enums.FlagsToSet.DueDate))
+                if (_options.HasFlag(Enums.FlagsToSet.DueDate) && c.DueDate != _active.DueDate)
                     c.DueDate = _active.DueDate;
-                if (_options.HasFlag(Enums.FlagsToSet.Reminder))
+                if (_options.HasFlag(Enums.FlagsToSet.Reminder) && c.ReminderTime != _active.ReminderTime)
                     c.ReminderTime = _active.ReminderTime;
-                if (_options == Enums.FlagsToSet.All)
+                if (_options == Enums.FlagsToSet.All && c.ActiveBranch != true)
                     c.ActiveBranch = true;
+
+                if (fcg?.FlagChangeItems.Count > 0)
+                {
+                    Globals.TD.FlagChangeTrainingQueue.Enqueue(fcg);
+                }
 
                 ToDoEvents.Editing.UpdateOrRemove(c.OlItem.EntryID, (key, existing) => existing == 1, (key, existing) => existing - 1, out _);
             }
         }
+
+        internal void ApplyChange(Enums.FlagsToSet flag, FlagTranslator current, FlagTranslator revised)
+        {
+            if (Options.HasFlag(flag))
+            {
+                if (!AreCollectionsEqual(current.AsListNoPrefix, revised.AsListNoPrefix))
+                {
+                    current.AsListNoPrefix = revised.AsListNoPrefix;
+                    ChangedFlags |= flag;
+                }
+            }
+        }
+
+
+        internal void ApplyChange(FlagChangeGroup fcg, string classifierName, Enums.FlagsToSet flag, FlagTranslator current, FlagTranslator revised)
+        {
+            if (Options.HasFlag(flag)) 
+            {                 
+                if (fcg?.TryEnqueue(classifierName, current.AsListNoPrefix, revised.AsListNoPrefix)??false || 
+                    !AreCollectionsEqual(current.AsListNoPrefix,revised.AsListNoPrefix))
+                {
+                    current.AsListNoPrefix = revised.AsListNoPrefix;
+                    ChangedFlags |= flag;
+                }                
+            }
+        }
+
+        private bool AreCollectionsEqual(ObservableCollection<string> collectionA, ObservableCollection<string> collectionB)
+        {
+            if (collectionA == null || collectionB == null)
+                return collectionA == collectionB;
+
+            var setA = new HashSet<string>(collectionA);
+            var setB = new HashSet<string>(collectionB);
+
+            return setA.SetEquals(setB);
+        }
+
+
 
         #endregion
 
@@ -1226,6 +1392,7 @@ namespace TaskVisualization
                 new ControlRelationship(1, _viewer.XlWorktime,  _options.HasFlag(Enums.FlagsToSet.Worktime),  _viewer.LblDuration.Text,  _viewer.Duration),
                 new ControlRelationship(4, _viewer.XlOk,  true,  _viewer.OKButton.Text,  _viewer.OKButton),
                 new ControlRelationship(4, _viewer.XlCancel,  true,  _viewer.Cancel_Button.Text,  _viewer.Cancel_Button),
+                new ControlRelationship(4, _viewer.XlAutotag,  true,  _viewer.AutoTagButton.Text,  _viewer.AutoTagButton),
                 new ControlRelationship(1, _viewer.XlReminder,  _options.HasFlag(Enums.FlagsToSet.Reminder),  _viewer.LblReminder.Text,  _viewer.DtReminder),
                 new ControlRelationship(1, _viewer.XlDuedate,  _options.HasFlag(Enums.FlagsToSet.DueDate),  _viewer.LblDuedate.Text,  _viewer.DtDuedate),
                 new ControlRelationship(3, _viewer.XlScWaiting,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutWaitingFor.Text,  _viewer.ShortcutWaitingFor),
@@ -1243,6 +1410,8 @@ namespace TaskVisualization
             };
             return list;
         }
+
+
 
         private struct ControlRelationship
         {

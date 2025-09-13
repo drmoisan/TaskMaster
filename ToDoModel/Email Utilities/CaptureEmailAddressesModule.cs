@@ -9,51 +9,51 @@ namespace ToDoModel
 
     public static class CaptureEmailAddressesModule
     {
-        public static List<string> GetEmailAddresses(this MailItem OlMail, string emailRootFolder, IScoDictionary<string, string> dictRemap, string currentUserEmail)
-        {
-            int i;
-            int j;
-            string[] strAddresses;
-            bool blContains;
-            var emailAddressList = new List<string>();
+        //public static List<string> GetEmailAddresses(this MailItem olMail, string emailRootFolder, IScoDictionary<string, string> dictRemap, string currentUserEmail)
+        //{
+        //    int i;
+        //    int j;
+        //    string[] strAddresses;
+        //    bool blContains;
+        //    var emailAddressList = new List<string>();
 
-            //string[] strEmail = CaptureEmailDetailsModule.CaptureEmailDetails(OlMail, emailRootFolder, dictRemap);
-            string[] strEmail = OlMail.Details(emailRootFolder, dictRemap);
+        //    //string[] strEmail = CaptureEmailDetailsModule.CaptureEmailDetails(OlMail, emailRootFolder, dictRemap);
+        //    string[] strEmail = olMail.Details(emailRootFolder, dictRemap);
 
-            if (strEmail is Array == true)
-            {
-                for (i = 4; i <= 6; i++)
-                {
-                    if (!string.IsNullOrEmpty(strEmail[i]))
-                    {
-                        strAddresses = strEmail[i].Split(';', trim: true);
-                        var loopTo = strAddresses.Length;
-                        for (j = 0; j < loopTo; j++)
-                        {
-                            blContains = false;
+        //    if (strEmail is Array == true)
+        //    {
+        //        for (i = 4; i <= 6; i++)
+        //        {
+        //            if (!string.IsNullOrEmpty(strEmail[i]))
+        //            {
+        //                strAddresses = strEmail[i].Split(';', trim: true);
+        //                var loopTo = strAddresses.Length;
+        //                for (j = 0; j < loopTo; j++)
+        //                {
+        //                    blContains = false;
 
-                            foreach (var strTmp in emailAddressList)
-                            {
+        //                    foreach (var strTmp in emailAddressList)
+        //                    {
 
-                                if ((strTmp.Trim().ToLower() ?? "") == (strAddresses[j].Trim().ToLower() ?? ""))
-                                {
-                                    blContains = true;
-                                }
-                            }
+        //                        if ((strTmp.Trim().ToLower() ?? "") == (strAddresses[j].Trim().ToLower() ?? ""))
+        //                        {
+        //                            blContains = true;
+        //                        }
+        //                    }
 
-                            if (blContains == false)
-                            {
-                                if (strAddresses[j].ToLower() != currentUserEmail.ToLower())
-                                {
-                                    emailAddressList.Add(strAddresses[j].Trim().ToLower());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return emailAddressList;
-        }
+        //                    if (blContains == false)
+        //                    {
+        //                        if (strAddresses[j].ToLower() != currentUserEmail.ToLower())
+        //                        {
+        //                            emailAddressList.Add(strAddresses[j].Trim().ToLower());
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return emailAddressList;
+        //}
 
     }
 }

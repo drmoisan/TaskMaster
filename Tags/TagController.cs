@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
@@ -159,7 +160,7 @@ namespace Tags
             {
                 if ((sample != null) && (sample.Length > prefixLength))
                 {
-                    if (sample.Substring(0, prefixLength - 1) != prefix.Value)
+                    if (sample.Substring(0, prefixLength) != prefix.Value)
                     {
                         addPrefix = true;
                     }
@@ -258,8 +259,10 @@ namespace Tags
             return searchText.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries).ToList();
         }
 
-        public string SelectionString() => string.Join(", ", _dictOptions.Where(item => item.Value).Select(item => item.Key).ToList());
-        
+        //public string SelectionAsString() => string.Join(", ", _dictOptions.Where(item => item.Value).Select(item => item.Key).ToList());
+        public string SelectionAsString() => string.Join(", ", SelectionAsList());
+        public List<string> SelectionAsList() => _dictOptions.Where(item => item.Value).Select(item => item.Key).ToList();
+
         public bool ButtonNewActive { get => _viewer.ButtonNew.Visible; set => _viewer.ButtonNew.Visible = value; }
         
         public bool ButtonAutoAssignActive {  get => _viewer.ButtonAutoAssign.Visible; set => _viewer.ButtonAutoAssign.Visible = value; }
@@ -302,22 +305,31 @@ namespace Tags
 
         private void ButtonNew_Click(object sender, EventArgs e) => AddColorCategory();
 
-        private void ButtonAutoAssign_Click(object sender, EventArgs e)
+        private async void ButtonAutoAssign_Click(object sender, EventArgs e)
         {
-            var col_choices = _autoAssigner.AutoFind(_objItem);
-            foreach (string str_choice in col_choices)
+            try
             {
-                if (_dictOptions.ContainsKey(str_choice))
+                var col_choices = await _autoAssigner.AutoFindAsync(_objItem).ConfigureAwait(true);
+                foreach (string str_choice in col_choices)
                 {
-                    ToggleOn(str_choice);
+                    if (_dictOptions.ContainsKey(str_choice))
+                    {
+                        ToggleOn(str_choice);
+                    }
+                    else
+                    {
+                        AddOption(str_choice, blClickTrue: true);
+                    }
                 }
-                else
-                {
-                    AddOption(str_choice, blClickTrue: true);
-                }
+                if (col_choices.Count > 0)
+                    FilterToSelected();
             }
-            if (col_choices.Count > 0)
-                FilterToSelected();
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+            
         }
 
         private void ButtonCancel_Click(object sender, EventArgs e)
@@ -402,6 +414,7 @@ namespace Tags
                     if (_autoAssigner is not null) 
                     { 
                         var newCategory = _autoAssigner.AddColorCategory(_prefix, categoryName);
+                        if (newCategory is null) { return; }
                         categoryName = newCategory.Name;
                     }                    
                     AddOption(categoryName, blClickTrue: true);
@@ -622,6 +635,7 @@ namespace Tags
                 
             if (!_dictOptions.Equals(_filteredOptions))
             {
+                _filteredOptions ??= [];
                 if (!_filteredOptions.ContainsKey(option))
                 {
                     _filteredOptions.Add(option, blClickTrue);

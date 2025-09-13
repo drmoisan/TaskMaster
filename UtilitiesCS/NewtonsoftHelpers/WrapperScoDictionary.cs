@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.NewtonsoftHelpers.MonoExtension;
-using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using Newtonsoft.Json;
 
 namespace UtilitiesCS.NewtonsoftHelpers
@@ -49,20 +49,39 @@ namespace UtilitiesCS.NewtonsoftHelpers
                 derivedInstance.TryAdd(kvp.Key, kvp.Value);
             }
 
+            // Set up the config field            
+            var configField = RemainingObject.GetType().GetField("<Config>k__BackingField", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var configValue = configField?.GetValue(RemainingObject) as NewSmartSerializableConfig;
+            derivedInstance.Config = configValue;
             // Set additional fields
             var derivedType = typeof(TDerived);
 
             var additionalFields = RemainingObject.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).ToArray();
-
+            var drvdFields = derivedType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).ToArray();
             foreach (var field in additionalFields)
             {
                 var fieldInfo = derivedType.GetField(field.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
                 if (fieldInfo != null)
                 {
-                    fieldInfo.SetValue(derivedInstance, field.GetValue(RemainingObject));
+                    var fieldValue = field.GetValue(RemainingObject);
+                    fieldInfo.SetValue(derivedInstance, fieldValue);
                 }
             }
+
+            // new 2/16/2025
+            //var baseType = typeof(ConcurrentObservableDictionary<TKey, TValue>);
+
+            //var derivedProperties = derivedType
+            //    .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            //    .Where(property => (property.DeclaringType != baseType) && (property.Name != "Config"))
+            //    .ToArray();
+
+            //foreach (var property in derivedProperties)
+            //{
+            //    var obj = property.GetValue(RemainingObject);
+            //    property.SetValue(derivedInstance, obj);
+            //}
 
             return derivedInstance;
         }

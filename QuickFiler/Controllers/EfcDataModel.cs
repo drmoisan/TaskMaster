@@ -83,8 +83,8 @@ namespace QuickFiler.Controllers
         private CancellationTokenSource _tokenSource;
         public CancellationTokenSource TokenSource { get => _tokenSource; protected set => _tokenSource = value; }
 
-        private OlFolderHelper _folderHelper;
-        public OlFolderHelper FolderHelper 
+        private FolderPredictor _folderHelper;
+        public FolderPredictor FolderHelper 
         {
             get 
             { 
@@ -99,20 +99,20 @@ namespace QuickFiler.Controllers
             {
                 if (MailInfo is null) 
                 {
-                    FolderHelper = await Task.Run(() => new OlFolderHelper(Globals), Token);
+                    FolderHelper = await Task.Run(() => new FolderPredictor(Globals), Token);
                 }
                 else
                 {
-                    FolderHelper = await Task.Run(async () => await new OlFolderHelper(
-                        Globals, MailInfo, OlFolderHelper.InitOptions.FromField)
-                        .InitAsync(MailInfo, OlFolderHelper.InitOptions.FromField), Token);
+                    FolderHelper = await Task.Run(async () => await new FolderPredictor(
+                        Globals, MailInfo, FolderPredictor.InitOptions.FromField)
+                        .InitAsync(MailInfo, FolderPredictor.InitOptions.FromField), Token);
                 }
             }
             else
             {
-                FolderHelper = await Task.Run(async () => await new OlFolderHelper(
-                    Globals, folderList, OlFolderHelper.InitOptions.FromArrayOrString)
-                    .InitAsync(folderList, OlFolderHelper.InitOptions.FromArrayOrString), Token);
+                FolderHelper = await Task.Run(async () => await new FolderPredictor(
+                    Globals, folderList, FolderPredictor.InitOptions.FromArrayOrString)
+                    .InitAsync(folderList, FolderPredictor.InitOptions.FromArrayOrString), Token);
             }
         }
 
@@ -130,7 +130,7 @@ namespace QuickFiler.Controllers
             set => _mail = value;
         }
                 
-        public MailItemHelper MailInfo => ConversationResolver?.MailInfo;
+        public MailItemHelper MailInfo => ConversationResolver?.MailHelper;
 
         private MailItem TryGetFirstInSelection() 
         {

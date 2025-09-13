@@ -2,6 +2,11 @@
 <customUI onLoad="Ribbon_Load" xmlns="http://schemas.microsoft.com/office/2006/01/customui">
     <ribbon>
         <tabs>
+          <tab idMso="TabFolder">
+            <group id="FolderInfoGroup" label="Folder Info">
+              <button id="GetFolderInfo" imageMso="FileProperties" onAction="GetFolderInfo_Click" label="Get Folder Info" />
+            </group>
+          </tab>
             <tab idMso="TabTasks">
                 <group id="Group1" label="Task Master">
                     <button id="BtnLoadTree" imageMso="OutlineShowDetail" onAction="BtnLoadTree_Click" label="Load Tree" size="large" />
@@ -47,6 +52,7 @@
                 <button id="UndoSort" imageMso="Undo" onAction="UndoSort_Click" label="Undo Sort" size="large"/>
                 <button id="QuickFiler" imageMso="UpdateFolder" onAction="QuickFiler_Click" label="Quick Filer" size="large" />
                 <menu id="Settings" imageMso="ContentTypeSettings" label="Settings" size="large" itemSize="large">
+                  <button id="FolderSettings" imageMso="Folder" onAction="FolderSettings_Click" label="Folder Settings" />
                   <menu id="QuickFilerSettings" imageMso="ContentTypeSettings" label="Quick Filer" itemSize="large">
                     <menu id="ItemSortSettings" imageMso="CustomizeSearchFolder" label="Item Sort Settings" itemSize ="normal">
                       <checkBox id="MoveEntireConversationDefault" label="Move Entire Conversation" getPressed="MoveEntireConversation_GetPressed" onAction="MoveEntireConversation_Clicked"/>
@@ -57,6 +63,8 @@
                   </menu>
                   <menu id="FolderClassifier" imageMso="Move" label ="Folder Classifier" itemSize="large">
                     <button id="ScrapeAndMine" imageMso="ProtectedActualsSynchronize" onAction="ScrapeAndMine_Click" label="Scrape/Mine" />
+                    <button id="BuildCategoryClassifier" imageMso="ProtectedActualsSynchronize" onAction="BuildCategoryClassifier_Click" label="Build Category Classifier" />
+                    <button id="BuildActionableClassifier" imageMso="ActionInsert" onAction="BuildActionableClassifier_Click" label="Build Actionable Classifier"/>
                   </menu>
                   <menu id="BayesianPerformance" imageMso="TaskEarnedValueForm" label="Bayesian Performance" itemSize="large">
                     <button id="TestClassifier" imageMso="AutoSummarize" onAction="TestClassifier_Click" label="Test Classifier" />
@@ -73,9 +81,9 @@
                     <button id="GetMailItemInfo" imageMso="TraceDependentCells" onAction="GetMailItemInfo_Click" label="GetMailItemInfo" />
                     <!--<button id="GetQfcDataModel" imageMso="TraceDependentCells" onAction="GetQfcDataModel_Click" label="GetQfcDataModel" />
                     <button id="GetTableInView" imageMso="TraceDependentCells" onAction="GetTableInView_Click" label="GetTableInView" />
-                    <button id="RebuildProjInfo" imageMso="TraceDependentCells" onAction="RebuildProjInfo_Click" label="RebuildProjInfo" />
+                    <button id="RebuildProjInfo" imageMso="TraceDependentCells" onAction="RebuildProjInfo_Click" label="RebuildProjInfo" />-->
                     <button id="RecipientGetInfo" imageMso="TraceDependentCells" onAction="RecipientGetInfo_Click" label="RecipientGetInfo" />
-                    <button id="SubstituteIdRoot" imageMso="TraceDependentCells" onAction="SubstituteIdRoot_Click" label="SubstituteIdRoot" />-->
+                    <!--<button id="SubstituteIdRoot" imageMso="TraceDependentCells" onAction="SubstituteIdRoot_Click" label="SubstituteIdRoot" />-->
                     <button id="GetImage" imageMso="TraceDependentCells" onAction="GetImage_Click" label="GetImage"/>
                     <button id="LoadFolderFilter" imageMso="Filter" onAction="LoadFolderFilter_Click" label="Load Folder Filter" />
                     <button id="LoadFolderRemap" imageMso="Filter" onAction="LoadFolderRemap_Click" label="Load Folder Remap" />
@@ -97,6 +105,7 @@
                 <button id="TriageSetB" onAction="TriageSetB_Click" label="Set B"/>
                 <button id="TriageSetC" onAction="TriageSetC_Click" label="Set C"/>
                 <menu id="OtherTriageActions" label="Other" size="normal">
+                  <button id="FilterTriageGroup" imageMso="Filter" onAction="FilterViewer_Click" label="Filter"/>
                   <button id="ClearTriage" imageMso="Clear" onAction="ClearTriage_Click" label="Clear Triage"/>
                   <button id="TriageSelection" imageMso="FilterBySelection" onAction="TriageSelection_Click" label="Triage Selection"/>
                   <button id="SetPrecision" imageMso="EditCitation" onAction="SetPrecision_Click" label="Set Precision"/>
@@ -108,6 +117,9 @@
                   <checkBox id="TriageEnabledToggle" getPressed="TriageEnabled_GetPressed" onAction="TriageEnabled_Click" label="Triage Enabled"/>
                 </menu>
               </group>
+              <group id ="UtilitiesGroup" imageMso="ContentTypeSettings" label="Utilities">
+                <button id="CompareFolders" imageMso="FindDialog" onAction="CompareFolders_Click" label="Compare Folders" size="large"/>
+              </group>                     
             </tab>
         </tabs>
     </ribbon>

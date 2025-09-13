@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace UtilitiesCS
 {
     [Obsolete("Use CtfMapEntry Instead")]
-    public class CtfIncidence 
+    public class CtfIncidence: IComparable<CtfIncidence> 
     {
         public CtfIncidence()
         {
@@ -46,6 +46,10 @@ namespace UtilitiesCS
         public List<string> EmailFolders { get => _emailFolders; set => _emailFolders = value;}
         
         public List<int> EmailCounts { get => _emailCounts; set => _emailCounts = value; }
-        
+
+        public int CompareTo(CtfIncidence other)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

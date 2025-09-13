@@ -1,4 +1,4 @@
-﻿using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+﻿using ConcurrentObservableCollection.ConcurrentObservableDictionary;
 using System;
 using System.Collections.Generic;
 using System.Linq;

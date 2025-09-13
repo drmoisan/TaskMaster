@@ -36,21 +36,24 @@
       <HintPath>..\packages\Deedle.3.0.0\lib\netstandard2.0\Deedle.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Core, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\FSharp.Core.9.0.100\lib\netstandard2.0\FSharp.Core.dll</HintPath>
+      <HintPath>..\packages\FSharp.Core.9.0.300\lib\netstandard2.0\FSharp.Core.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=3.0.3.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.3.0.3\lib\net462\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=3.1.0.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.3.1.0\lib\net462\log4net.dll</HintPath>
     </Reference>
     <Reference Include="log4net.Ext.Json, Version=3.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.Ext.Json.3.0.3\lib\net462\log4net.Ext.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.9.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.9.0.6\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Mono.Reflection, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Reflection.2.0.0\lib\net40\Mono.Reflection.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -65,20 +68,20 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Interactive, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Interactive.6.0.1\lib\net48\System.Interactive.dll</HintPath>
+      <HintPath>..\packages\System.Interactive.6.0.3\lib\net48\System.Interactive.dll</HintPath>
     </Reference>
     <Reference Include="System.Linq.Async, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Linq.Async.6.0.1\lib\net48\System.Linq.Async.dll</HintPath>
+      <HintPath>..\packages\System.Linq.Async.6.0.3\lib\net48\System.Linq.Async.dll</HintPath>
     </Reference>
     <Reference Include="System.Numerics" />
     <Reference Include="System.Reactive, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reactive.6.0.1\lib\net472\System.Reactive.dll</HintPath>
     </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.1.0\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.6.0\lib\net462\System.Threading.Tasks.Extensions.dll</HintPath>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.6.3\lib\net462\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
@@ -96,8 +99,11 @@
     <Compile Include="Common Functions\FileOperationsPST.cs" />
     <Compile Include="Data Model\ID\BaseChanger.cs" />
     <Compile Include="Data Model\ID\IDList.cs" />
+    <Compile Include="Data Model\People\PeopleScoConverter.cs" />
     <Compile Include="Data Model\People\PeopleScoDictionary.cs" />
     <Compile Include="Data Model\People\PeopleScoDictionaryNew.cs" />
+    <Compile Include="Data Model\People\PeopleScoRemainingObjectConverter.cs" />
+    <Compile Include="Data Model\People\WrapperPeopleScoDictionaryNew.cs" />
     <Compile Include="Data Model\Project\ProgramData.cs" />
     <Compile Include="Data Model\Project\ProjectData.cs" />
     <Compile Include="Data Model\Project\ProjectController.cs" />
@@ -107,7 +113,6 @@
     <Compile Include="Data Model\Project\ProjectViewer.Designer.cs">
       <DependentUpon>ProjectViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Data Model\Project\ProjectList.cs" />
     <Compile Include="Data Model\Project\ProjectEntry.cs" />
     <Compile Include="Data Model\Project\ToDoProjectInfoLegacy.cs" />
     <Compile Include="Data Model\Project\ToDoProjectInfoUtilities.cs" />
@@ -117,7 +122,6 @@
     <Compile Include="Data Model\ToDo\ToDoLoader.cs" />
     <Compile Include="Data Model\ToDo\ToDoSynchronizer.cs" />
     <Compile Include="Data Model\Tree\TreeOfToDoItems.cs" />
-    <Compile Include="Email Utilities\AutoFile.cs" />
     <Compile Include="Email Utilities\CaptureEmailAddressesModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

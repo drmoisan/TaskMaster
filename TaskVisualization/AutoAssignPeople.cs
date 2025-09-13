@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Tags;
 using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.OutlookExtensions;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 
 namespace TaskVisualization
 {
@@ -19,14 +21,48 @@ namespace TaskVisualization
             get => [.. _globals.TD.CategoryFilters];
         }
 
+        public async Task<IList<string>> AutoFindAsync(object objItem)
+        {
+            try
+            {
+                return await Task.Run(() => AutoFind(objItem)).ConfigureAwait(true);
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+        }
+
         public IList<string> AutoFind(object objItem)
         {
-            return AutoFile.AutoFindPeople(objItem: objItem,
-                                           ppl_dict: _globals.TD.People,
-                                           emailRootFolder: _globals.Ol.EmailRootPath,
-                                           dictRemap: _globals.TD.DictRemap,
-                                           userAddress: _globals.Ol.UserEmailAddress,
-                                           blExcludeFlagged: false);
+            MailItemHelper helper = null;
+            if (objItem is null) { return []; }
+            else if (objItem is MailItemHelper)
+            {
+                helper = objItem as MailItemHelper;
+            }
+            else if (objItem is IOutlookItem olItem && olItem.GetOlItemType() == OlItemType.olMailItem)
+            {
+                helper = new MailItemHelper(olItem.InnerObject as MailItem, _globals);                
+            }
+            else if (objItem is MailItem olMail)
+            {
+                helper = new MailItemHelper(olMail, _globals);
+            }            
+            else
+            {
+                return [];
+            }
+
+            return AutoFile.AutoFindPeople(helper, _globals.TD.People, true, false);
+            
+            //return AutoFile.AutoFindPeople(
+            //        objItem: objItem,
+            //        ppl_dict: _globals.TD.People,
+            //        emailRootFolder: _globals.Ol.InboxPath,
+            //        dictRemap: _globals.TD.DictRemap,
+            //        userAddress: _globals.Ol.UserEmailAddress,
+            //        blExcludeFlagged: false);            
 
         }
 

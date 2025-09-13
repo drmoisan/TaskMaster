@@ -28,19 +28,25 @@ namespace TaskMaster
         private void Application_Startup()
         {
             logger.Debug("Application_Startup() fired");
+            //IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => 
+            //{ 
             SetUpBrightIdeasSettings();
             SetUpDeedle();
+            //}));
+
+            _globals = new ApplicationGlobals(Application, true);
+            _ribbonController.SetGlobals(_globals);
+            _externalUtilities.SetGlobals(_globals, _ribbonController);
 
             IdleAsyncQueue.AddEntry(true, async () =>
-            {
-                _globals = new ApplicationGlobals(Application);
+            {                
                 await _globals.LoadAsync(false);
                 logger.Debug("Finished loading globals");
             });
             
-            IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => _ribbonController.SetGlobals(_globals)));
-            IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => _externalUtilities.SetGlobals(_globals, _ribbonController)));
-
+            //IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => _ribbonController.SetGlobals(_globals)));
+            //IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => _externalUtilities.SetGlobals(_globals, _ribbonController)));
+            IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => logger.Debug("IdleAsyncQueue Complete")));
             logger.Debug("Application_Startup() complete");
         }
 

@@ -73,7 +73,7 @@ namespace ToDoModel.Test.Data_Model.ToDo
 
         public NameSpace Session => throw new NotImplementedException();
 
-        public long Size => throw new NotImplementedException();
+        public int Size => throw new NotImplementedException();
 
         public string Subject { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 

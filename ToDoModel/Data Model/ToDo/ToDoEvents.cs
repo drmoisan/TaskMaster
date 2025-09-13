@@ -13,6 +13,7 @@ using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using UtilitiesCS.Extensions;
 //using Microsoft.VisualBasic;
 
 namespace ToDoModel
@@ -247,7 +248,7 @@ namespace ToDoModel
                 todo.ProjectsToPrograms = projInfo.Programs_ByProjectNames;
 
                 await Task.Run(() => SynchronizeEC(olToDoItems, todo));
-                //await Task.Run(() => AutoCodeId(ProjInfo, idList, todo));                
+                await Task.Run(() => AutoCodeId(projInfo, idList, todo));                
                 await Task.Run(() => SynchronizeKanban(item, todo));
                 await Task.Delay(500);
 
@@ -382,104 +383,78 @@ namespace ToDoModel
             }
         }
 
-        private static void AutoCodeId(IProjectData ProjInfo, IIDList idList, ToDoItem todo)
+        private static bool ParamsAreValid(IProjectData ProjInfo, IIDList idList, ToDoItem todo)
         {
-            // AUTOCODE ToDoID based on Project
-            // Check to see if the project exists before attempting to autocode the id
-            // Get Project Name
-            string strProject = todo.Projects.AsStringNoPrefix;
-            if (!strProject.IsNullOrEmpty())
+            try
             {
-                // Code the Program name
-                if (ProjInfo.Contains_ProjectName(strProject))
-                {
-                    string strProgram = ProjInfo.Programs_ByProjectNames(strProject);
-                    if (todo.Program.AsStringNoPrefix != strProgram)
-                    {
-                        todo.Program.AsStringNoPrefix = strProgram;
-                    }
-                }
-
-                string strProjectToDo;
-                // Check to see whether there is an existing ID
-
-                string strToDoID = todo.ToDoID;
-                if (!strToDoID.IsNullOrEmpty())
-                {
-                    // Don't autocode branches that existed in another project previously
-                    if (strToDoID.Length != 0 & strToDoID.Length <= 4)
-                    {
-                        if (strProject.Length != 0)
-                        {
-                            // Check to ensure it is in the dictionary before autocoding
-                            if (ProjInfo.Contains_ProjectName(strProject))
-                            {
-                                if (strToDoID.Length == 2)
-                                {
-                                    // Change the item's todoid to be a node of the project
-                                    if (todo.Context.AsStringNoPrefix != "@PROJECTS")
-                                    {
-                                        strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
-                                        todo.ToDoID = idList.GetNextToDoID(strProjectToDo + "00");
-                                        idList.Serialize();
-                                        todo.SplitID();
-                                        todo.EC2 = true;
-                                    }
-                                }
-                            }
-
-
-                            else if (strToDoID.Length == 4) // If it is not in the dictionary, see if this is a project we should add
-                            {
-                                var response = MessageBox.Show("Add Project " + strProject + " to the Master List?", "Dialog", MessageBoxButtons.YesNo);
-                                if (response == DialogResult.Yes)
-                                {
-                                    string strProgram = InputBox.ShowDialog("What is the program name for " + strProject + "?", DefaultResponse: "");
-                                    ProjInfo.Add(new ProjectEntry(strProject, strToDoID, strProgram));
-                                    ProjInfo.Save();
-                                }
-                            }
-                        }
-                    }
-
-                    else if (strToDoID.Length == 0)
-                    {
-                        strProject = todo.Projects.AsStringNoPrefix;
-                        if (ProjInfo.Contains_ProjectName(strProject))
-                        {
-                            strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
-                            todo.Program.AsStringNoPrefix = ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
-                            todo.ToDoID = idList.GetNextToDoID(strProjectToDo + "00");
-                            idList.Serialize();
-                            todo.SplitID();
-                        }
-
-                    }
-                }
-                else // In this case, the project name exists but the todo id does not
-                {
-                    // Get Project Name
-                    strProject = todo.Projects.AsStringNoPrefix;
-
-                    // If the project name is in our dictionary, autoadd the ToDoID to this item
-                    if (strProject.Length != 0)
-                    {
-                        // If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
-                        if (ProjInfo.Contains_ProjectName(strProject))
-                        {
-                            strProjectToDo = ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
-                            // Add the next ToDoID available in that branch
-                            todo.ToDoID = idList.GetNextToDoID(strProjectToDo + "00");
-                            todo.Program.AsStringNoPrefix = ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
-                            idList.Serialize();
-                            todo.SplitID();
-                            todo.EC2 = true;
-                        }
-                    }
-                }
-
-
+                ProjInfo.ThrowIfNull();
+                idList.ThrowIfNull();
+                todo.ThrowIfNull();
             }
+            catch (ArgumentNullException e)
+            {
+                logger.Warn($"Cannot autocode ToDoId because {e.ParamName} in {nameof(ToDoEvents)}.{nameof(AutoCodeId)} was null");
+                return false;
+            }
+            if (todo.Projects?.AsListNoPrefix?.IsNullOrEmpty() ?? true)
+            {
+                logger.Warn($"Cannot autocode ToDoId because {nameof(todo.Projects.AsListNoPrefix)} in {nameof(ToDoEvents)}.{nameof(AutoCodeId)} is null or empty");
+                return false;
+            }
+            return true;
+        }
+
+        private static void AutoCodeId(IProjectData ProjInfo, IIDList idList, ToDoItem todo)
+        {            
+            if (!ParamsAreValid(ProjInfo, idList, todo)) { return; }
+            
+            // Get Project Name
+            string project = todo.Projects.AsStringNoPrefix;
+            var toDoId = todo.ToDoID;
+
+            if (ProjInfo.Contains_ProjectName(project))
+            {
+                // Since project is found, get the project ID
+                var projectId = ProjInfo.Find_ByProjectName(project).First().ProjectID;
+
+                // Auto code based on the state of the existing ToDoID
+                if (toDoId.IsNullOrEmpty())
+                {
+                    // If the todo id is not set, set it to the next available id in the project branch
+                    MakeChildOfProject(projectId, idList, todo);
+                }                
+                else if (projectId == toDoId) { return; } // Exit if the item is the Project header
+                else if (toDoId.Length == 2) { return; } // Exit if the item is a Program header
+                else if (toDoId.Length > 4) { return;  } // Exit if the item is a child of another branch
+                else if (toDoId.Length == 4) // If the item has a placeholder ID but should be a child of the project
+                {
+                    MakeChildOfProject(projectId, idList, todo);
+                }
+            }
+            else if (toDoId.Length == 4) // If it is not in the dictionary, see if this is a project we should add
+            {
+                var response = MessageBox.Show("Add Project " + project + " to the Master List?", "Dialog", MessageBoxButtons.YesNo);
+                if (response == DialogResult.Yes)
+                {
+                    string program = InputBox.ShowDialog("What is the program name for " + project + "?", DefaultResponse: "");
+                    ProjInfo.Add(new ProjectEntry(project, toDoId, program));
+                    ProjInfo.Save();
+                }
+            }                       
+        }
+
+        private static string MakeChildOfProject(string projectId, IIDList idList, ToDoItem todo)
+        {                        
+            // Get the next available first-branch ID within the project and assign it
+            todo.ToDoID = idList.GetNextToDoID($"{projectId}00");
+            // Save the ID list
+            idList.Serialize();
+            // Split the ID
+            todo.SplitID();
+            // Mark the item as an active branch
+            todo.EC2 = true;
+
+            return projectId;
         }
 
         private static bool OlToDoItem_IsMarkedComplete(object Item)

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UtilitiesCS.Interfaces.ReusableTypeClasses;
 
-namespace ConcurrentObservableCollections.ConcurrentObservableDictionary
+namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
 {
     public interface IConcurrentObservableDictionary<TKey, TValue>:IConcurrentDictionary<TKey, TValue>
     {

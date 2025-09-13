@@ -8,11 +8,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using UtilitiesCS.EmailIntelligence.Bayesian;
-using static UtilitiesCS.Test.EmailIntelligence.Bayesian.BayesianClassifierSharedTests;
 using System.Security.Policy;
 using C;
+using UtilitiesCS.Test.EmailIntelligence.Bayesian;
 
-namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
+namespace UtilitiesCS.Test.EmailIntelligence
 {
     [TestClass]
     public class BayesianClassifierSharedTests

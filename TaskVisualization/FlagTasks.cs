@@ -46,15 +46,18 @@ namespace TaskVisualization
             // _defaultsToDo = New ToDoDefaults()
             _autoAssignPeople = new AutoAssignPeople(globals);
             _autoCreateProject = new AutoCreateProject(globals);
+            var autoAssignContext = new AutoAssignContext(globals);
             _controller = new TaskController(formInstance: _viewer,
                                              olCategories: globals.Ol.NamespaceMAPI.Categories,
                                              toDoSelection: _todoSelection,
                                              defaults: _defaultsToDo,
                                              autoAssign: _autoAssignPeople,
                                              projectAssign: _autoCreateProject,
+                                             contextAssign: autoAssignContext,
                                              projectsToPrograms: globals.TD.ProjInfo.Programs_ByProjectNames,
                                              flagOptions: _flagsToSet,
-                                             userEmailAddress: globals.Ol.UserEmailAddress);
+                                             userEmailAddress: globals.Ol.UserEmailAddress,
+                                             globals: _globals);
             _userEmailAddress = globals.Ol.UserEmailAddress;
         }
 

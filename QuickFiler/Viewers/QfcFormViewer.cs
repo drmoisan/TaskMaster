@@ -13,7 +13,7 @@ using UtilitiesCS;
 
 namespace QuickFiler
 {
-    public partial class QfcFormViewer : Form
+    public partial class QfcFormViewer : Form, IQfcFormViewer
     {
         public QfcFormViewer()
         {
@@ -33,12 +33,12 @@ namespace QuickFiler
         private TaskScheduler _uiScheduler;
         public TaskScheduler UiScheduler { get => _uiScheduler; }
 
-        public void SetController(IFilerFormController controller)
+        public virtual void SetController(IFilerFormController controller)
         {
             _formController = controller;
         }
 
-        public void SetKeyboardHandler(IQfcKeyboardHandler keyboardHandler)
+        public virtual void SetKeyboardHandler(IQfcKeyboardHandler keyboardHandler)
         {
             _keyboardHandler = keyboardHandler;
         }
@@ -60,33 +60,50 @@ namespace QuickFiler
         }
 
         private List<Control> _panels;
-        public List<Control> Panels => Initializer.GetOrLoad(ref _panels, LoadPanels); 
+        public virtual List<Control> Panels => Initializer.GetOrLoad(ref _panels, LoadPanels);
         private List<Control> LoadPanels()
         {
-            var panels = new List<Control> 
-            { 
-                this.L1v_TableLayout,
+            var panels = new List<Control>
+            {
+                this._l1v_TableLayout,
                 this.L1v1L2h_TableLayout,
-                this.L1v0L2L3v_TableLayout,
-                this.L1v0L2_PanelMain,
+                this._l1v0L2L3v_TableLayout,
+                this._l1v0L2_PanelMain,
             };
             return panels;
         }
 
         private List<Control> _buttons;
-        public List<Control> Buttons => Initializer.GetOrLoad(ref _buttons, LoadButtons);
+        public virtual List<Control> Buttons => Initializer.GetOrLoad(ref _buttons, LoadButtons);
+
+
         private List<Control> LoadButtons()
         {
             var buttons = new List<Control>
             {
-                this.L1v1L2h2_ButtonOK,
-                this.L1v1L2h3_ButtonCancel,
-                this.L1v1L2h4_ButtonUndo,
+                this._l1v1L2h2_ButtonOK,
+                this._l1v1L2h3_ButtonCancel,
+                this._l1v1L2h4_ButtonUndo,
                 this.ButtonFilters,
-                this.L1v1L2h5_BtnSkip,
+                this._l1v1L2h5_BtnSkip,
             };
             return buttons;
         }
+
+        #region IQfcFormViewer
+        
+        public BackgroundWorker Worker => WorkerInternal;
+        public TableLayoutPanel L1v0L2L3v_TableLayout { get => _l1v0L2L3v_TableLayout; set => _l1v0L2L3v_TableLayout = value; }
+        public ItemViewer QfcItemViewerTemplate => _QfcItemViewerTemplate;
+        public ItemViewerExpanded QfcItemViewerExpandedTemplate => _qfcItemViewerExpandedTemplate;
+        public TableLayoutPanel L1v_TableLayout => _l1v_TableLayout;
+        public System.Windows.Forms.NumericUpDown L1v1L2h5_SpnEmailPerLoad => _l1v1L2h5_SpnEmailPerLoad;
+        public System.Windows.Forms.Button L1v1L2h2_ButtonOK => _l1v1L2h2_ButtonOK;
+        public System.Windows.Forms.Button L1v1L2h3_ButtonCancel => _l1v1L2h3_ButtonCancel;
+        public System.Windows.Forms.Button L1v1L2h4_ButtonUndo => _l1v1L2h4_ButtonUndo;
+        public System.Windows.Forms.Button L1v1L2h5_BtnSkip => _l1v1L2h5_BtnSkip;
+        public Panel L1v0L2_PanelMain => _l1v0L2_PanelMain;
+        #endregion IQfcFormViewer
 
     }
 }

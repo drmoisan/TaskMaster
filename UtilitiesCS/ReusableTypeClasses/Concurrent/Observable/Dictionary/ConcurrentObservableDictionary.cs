@@ -5,7 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ConcurrentObservableCollections.ConcurrentObservableDictionary
+namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
 {
     /// <summary>
     /// https://github.com/artrey/ConcurrentObservableCollections/tree/master

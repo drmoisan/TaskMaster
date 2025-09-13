@@ -38,553 +38,553 @@ namespace QuickFiler
             SVGControl.SvgResource svgResource10 = new SVGControl.SvgResource();
             SVGControl.SvgResource svgResource11 = new SVGControl.SvgResource();
             SVGControl.SvgResource svgResource12 = new SVGControl.SvgResource();
-            this.L0vh_Tlp = new System.Windows.Forms.TableLayoutPanel();
-            this.MoveOptionsStrip = new System.Windows.Forms.MenuStrip();
-            this.MoveOptionsMenu = new System.Windows.Forms.ToolStripMenuItem();
-            this.LblAcSearch = new System.Windows.Forms.Label();
-            this.CboFolders = new System.Windows.Forms.ComboBox();
-            this.LblSearch = new System.Windows.Forms.Label();
-            this.TxtboxSearch = new System.Windows.Forms.TextBox();
-            this.L0v2h2_WebView2 = new Microsoft.Web.WebView2.WinForms.WebView2();
-            this.LblConvCt = new System.Windows.Forms.Label();
-            this.LblItemNumber = new System.Windows.Forms.Label();
-            this.LblSender = new System.Windows.Forms.Label();
-            this.LblTriage = new System.Windows.Forms.Label();
-            this.lblCaptionTriage = new System.Windows.Forms.Label();
-            this.LblCaptionPredicted = new System.Windows.Forms.Label();
-            this.LblActionable = new System.Windows.Forms.Label();
-            this.LblSentOn = new System.Windows.Forms.Label();
-            this.LblSubject = new System.Windows.Forms.Label();
-            this.LblAcOpen = new System.Windows.Forms.Label();
-            this.L1h0L2hv3h_TlpBodyToggle = new System.Windows.Forms.TableLayoutPanel();
-            this.TopicThread = new BrightIdeasSoftware.FastObjectListView();
-            this.sender = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.SentDate = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.infolder = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.TxtboxBody = new System.Windows.Forms.TextBox();
-            this.LblAcBody = new System.Windows.Forms.Label();
-            this.LblAcFolder = new System.Windows.Forms.Label();
-            this.LblFolder = new System.Windows.Forms.Label();
-            this.L1h1L2v1h3Panel = new System.Windows.Forms.Panel();
-            this.LblAcReply = new System.Windows.Forms.Label();
-            this.LblAcReplyAll = new System.Windows.Forms.Label();
-            this.LblAcFwd = new System.Windows.Forms.Label();
-            this.BtnReply = new SVGControl.ButtonSVG();
-            this.BtnReplyAll = new SVGControl.ButtonSVG();
-            this.BtnForward = new SVGControl.ButtonSVG();
-            this.LblAcDelete = new System.Windows.Forms.Label();
-            this.BtnDelItem = new SVGControl.ButtonSVG();
-            this.LblAcPopOut = new System.Windows.Forms.Label();
-            this.BtnPopOut = new SVGControl.ButtonSVG();
-            this.LblAcTask = new System.Windows.Forms.Label();
-            this.BtnFlagTask = new SVGControl.ButtonSVG();
-            this.LblAcMoveOptions = new System.Windows.Forms.Label();
-            this.ConversationMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
-            this.SaveAttachmentsMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
-            this.SaveEmailMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
-            this.SavePicturesMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
-            this.L0vh_Tlp.SuspendLayout();
-            this.MoveOptionsStrip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_WebView2)).BeginInit();
-            this.L1h0L2hv3h_TlpBodyToggle.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.TopicThread)).BeginInit();
-            this.L1h1L2v1h3Panel.SuspendLayout();
+            this._l0vh_Tlp = new System.Windows.Forms.TableLayoutPanel();
+            this._moveOptionsStrip = new System.Windows.Forms.MenuStrip();
+            this._moveOptionsMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this._lblAcSearch = new System.Windows.Forms.Label();
+            this._cboFolders = new System.Windows.Forms.ComboBox();
+            this._lblSearch = new System.Windows.Forms.Label();
+            this._txtboxSearch = new System.Windows.Forms.TextBox();
+            this._l0v2h2_WebView2 = new Microsoft.Web.WebView2.WinForms.WebView2();
+            this._lblConvCt = new System.Windows.Forms.Label();
+            this._lblItemNumber = new System.Windows.Forms.Label();
+            this._lblSender = new System.Windows.Forms.Label();
+            this._lblTriage = new System.Windows.Forms.Label();
+            this._lblCaptionTriage = new System.Windows.Forms.Label();
+            this._lblCaptionPredicted = new System.Windows.Forms.Label();
+            this._lblActionable = new System.Windows.Forms.Label();
+            this._lblSentOn = new System.Windows.Forms.Label();
+            this._lblSubject = new System.Windows.Forms.Label();
+            this._lblAcOpen = new System.Windows.Forms.Label();
+            this._l1h0L2hv3h_TlpBodyToggle = new System.Windows.Forms.TableLayoutPanel();
+            this._topicThread = new BrightIdeasSoftware.FastObjectListView();
+            this._sender = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this._sentDate = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this._infolder = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this._txtboxBody = new System.Windows.Forms.TextBox();
+            this._lblAcBody = new System.Windows.Forms.Label();
+            this._lblAcFolder = new System.Windows.Forms.Label();
+            this._lblFolder = new System.Windows.Forms.Label();
+            this._l1h1L2v1h3Panel = new System.Windows.Forms.Panel();
+            this._lblAcReply = new System.Windows.Forms.Label();
+            this._lblAcReplyAll = new System.Windows.Forms.Label();
+            this._lblAcFwd = new System.Windows.Forms.Label();
+            this._btnReply = new SVGControl.ButtonSVG();
+            this._btnReplyAll = new SVGControl.ButtonSVG();
+            this._btnForward = new SVGControl.ButtonSVG();
+            this._lblAcDelete = new System.Windows.Forms.Label();
+            this._btnDelItem = new SVGControl.ButtonSVG();
+            this._lblAcPopOut = new System.Windows.Forms.Label();
+            this._btnPopOut = new SVGControl.ButtonSVG();
+            this._lblAcTask = new System.Windows.Forms.Label();
+            this._btnFlagTask = new SVGControl.ButtonSVG();
+            this._lblAcMoveOptions = new System.Windows.Forms.Label();
+            this._conversationMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
+            this._saveAttachmentsMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
+            this._saveEmailMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
+            this._savePicturesMenuItem = new QuickFiler.Viewers.ToolStripMenuItemCb();
+            this._l0vh_Tlp.SuspendLayout();
+            this._moveOptionsStrip.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._l0v2h2_WebView2)).BeginInit();
+            this._l1h0L2hv3h_TlpBodyToggle.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._topicThread)).BeginInit();
+            this._l1h1L2v1h3Panel.SuspendLayout();
             this.SuspendLayout();
             // 
             // L0vh_Tlp
             // 
-            this.L0vh_Tlp.ColumnCount = 15;
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 272F));
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 42F));
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27F));
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 5F));
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 61F));
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 47F));
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 84F));
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 55F));
-            this.L0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 325F));
-            this.L0vh_Tlp.Controls.Add(this.MoveOptionsStrip, 12, 0);
-            this.L0vh_Tlp.Controls.Add(this.LblAcSearch, 11, 2);
-            this.L0vh_Tlp.Controls.Add(this.CboFolders, 13, 4);
-            this.L0vh_Tlp.Controls.Add(this.LblSearch, 12, 2);
-            this.L0vh_Tlp.Controls.Add(this.TxtboxSearch, 13, 2);
-            this.L0vh_Tlp.Controls.Add(this.L0v2h2_WebView2, 1, 5);
-            this.L0vh_Tlp.Controls.Add(this.LblConvCt, 10, 1);
-            this.L0vh_Tlp.Controls.Add(this.LblItemNumber, 0, 0);
-            this.L0vh_Tlp.Controls.Add(this.LblSender, 1, 0);
-            this.L0vh_Tlp.Controls.Add(this.LblTriage, 4, 0);
-            this.L0vh_Tlp.Controls.Add(this.lblCaptionTriage, 3, 0);
-            this.L0vh_Tlp.Controls.Add(this.LblCaptionPredicted, 6, 0);
-            this.L0vh_Tlp.Controls.Add(this.LblActionable, 7, 0);
-            this.L0vh_Tlp.Controls.Add(this.LblSentOn, 9, 0);
-            this.L0vh_Tlp.Controls.Add(this.LblSubject, 1, 1);
-            this.L0vh_Tlp.Controls.Add(this.LblAcOpen, 0, 3);
-            this.L0vh_Tlp.Controls.Add(this.L1h0L2hv3h_TlpBodyToggle, 1, 3);
-            this.L0vh_Tlp.Controls.Add(this.LblAcBody, 0, 5);
-            this.L0vh_Tlp.Controls.Add(this.LblAcFolder, 11, 4);
-            this.L0vh_Tlp.Controls.Add(this.LblFolder, 12, 4);
-            this.L0vh_Tlp.Controls.Add(this.L1h1L2v1h3Panel, 14, 0);
-            this.L0vh_Tlp.Controls.Add(this.LblAcMoveOptions, 11, 0);
-            this.L0vh_Tlp.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L0vh_Tlp.Location = new System.Drawing.Point(0, 0);
-            this.L0vh_Tlp.Margin = new System.Windows.Forms.Padding(2);
-            this.L0vh_Tlp.Name = "L0vh_Tlp";
-            this.L0vh_Tlp.RowCount = 6;
-            this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 18F));
-            this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 12F));
-            this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 18F));
-            this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 12F));
-            this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-            this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 10F));
-            this.L0vh_Tlp.Size = new System.Drawing.Size(1198, 472);
-            this.L0vh_Tlp.TabIndex = 0;
+            this._l0vh_Tlp.ColumnCount = 15;
+            this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 272F));
+            this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 42F));
+            this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27F));
+            this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 5F));
+            this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 61F));
+            this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 47F));
+            this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 84F));
+            this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+            this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 55F));
+            this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 325F));
+            this._l0vh_Tlp.Controls.Add(this._moveOptionsStrip, 12, 0);
+            this._l0vh_Tlp.Controls.Add(this._lblAcSearch, 11, 2);
+            this._l0vh_Tlp.Controls.Add(this._cboFolders, 13, 4);
+            this._l0vh_Tlp.Controls.Add(this._lblSearch, 12, 2);
+            this._l0vh_Tlp.Controls.Add(this._txtboxSearch, 13, 2);
+            this._l0vh_Tlp.Controls.Add(this._l0v2h2_WebView2, 1, 5);
+            this._l0vh_Tlp.Controls.Add(this._lblConvCt, 10, 1);
+            this._l0vh_Tlp.Controls.Add(this._lblItemNumber, 0, 0);
+            this._l0vh_Tlp.Controls.Add(this._lblSender, 1, 0);
+            this._l0vh_Tlp.Controls.Add(this._lblTriage, 4, 0);
+            this._l0vh_Tlp.Controls.Add(this._lblCaptionTriage, 3, 0);
+            this._l0vh_Tlp.Controls.Add(this._lblCaptionPredicted, 6, 0);
+            this._l0vh_Tlp.Controls.Add(this._lblActionable, 7, 0);
+            this._l0vh_Tlp.Controls.Add(this._lblSentOn, 9, 0);
+            this._l0vh_Tlp.Controls.Add(this._lblSubject, 1, 1);
+            this._l0vh_Tlp.Controls.Add(this._lblAcOpen, 0, 3);
+            this._l0vh_Tlp.Controls.Add(this._l1h0L2hv3h_TlpBodyToggle, 1, 3);
+            this._l0vh_Tlp.Controls.Add(this._lblAcBody, 0, 5);
+            this._l0vh_Tlp.Controls.Add(this._lblAcFolder, 11, 4);
+            this._l0vh_Tlp.Controls.Add(this._lblFolder, 12, 4);
+            this._l0vh_Tlp.Controls.Add(this._l1h1L2v1h3Panel, 14, 0);
+            this._l0vh_Tlp.Controls.Add(this._lblAcMoveOptions, 11, 0);
+            this._l0vh_Tlp.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._l0vh_Tlp.Location = new System.Drawing.Point(0, 0);
+            this._l0vh_Tlp.Margin = new System.Windows.Forms.Padding(2);
+            this._l0vh_Tlp.Name = "L0vh_Tlp";
+            this._l0vh_Tlp.RowCount = 6;
+            this._l0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 18F));
+            this._l0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 12F));
+            this._l0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 18F));
+            this._l0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 12F));
+            this._l0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this._l0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this._l0vh_Tlp.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 10F));
+            this._l0vh_Tlp.Size = new System.Drawing.Size(1198, 472);
+            this._l0vh_Tlp.TabIndex = 0;
             // 
             // MoveOptionsStrip
             // 
-            this.MoveOptionsStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this.MoveOptionsStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.MoveOptionsMenu});
-            this.MoveOptionsStrip.Location = new System.Drawing.Point(707, 0);
-            this.MoveOptionsStrip.Name = "MoveOptionsStrip";
-            this.MoveOptionsStrip.Padding = new System.Windows.Forms.Padding(3, 1, 0, 1);
-            this.L0vh_Tlp.SetRowSpan(this.MoveOptionsStrip, 2);
-            this.MoveOptionsStrip.Size = new System.Drawing.Size(100, 24);
-            this.MoveOptionsStrip.TabIndex = 43;
-            this.MoveOptionsStrip.Text = "menuStrip1";
+            this._moveOptionsStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this._moveOptionsStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._moveOptionsMenu});
+            this._moveOptionsStrip.Location = new System.Drawing.Point(707, 0);
+            this._moveOptionsStrip.Name = "MoveOptionsStrip";
+            this._moveOptionsStrip.Padding = new System.Windows.Forms.Padding(3, 1, 0, 1);
+            this._l0vh_Tlp.SetRowSpan(this._moveOptionsStrip, 2);
+            this._moveOptionsStrip.Size = new System.Drawing.Size(100, 24);
+            this._moveOptionsStrip.TabIndex = 43;
+            this._moveOptionsStrip.Text = "menuStrip1";
             // 
             // MoveOptionsMenu
             // 
-            this.MoveOptionsMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ConversationMenuItem,
-            this.SaveAttachmentsMenuItem,
-            this.SaveEmailMenuItem,
-            this.SavePicturesMenuItem});
-            this.MoveOptionsMenu.Name = "MoveOptionsMenu";
-            this.MoveOptionsMenu.Size = new System.Drawing.Size(94, 22);
-            this.MoveOptionsMenu.Text = "&Move Options";
+            this._moveOptionsMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._conversationMenuItem,
+            this._saveAttachmentsMenuItem,
+            this._saveEmailMenuItem,
+            this._savePicturesMenuItem});
+            this._moveOptionsMenu.Name = "MoveOptionsMenu";
+            this._moveOptionsMenu.Size = new System.Drawing.Size(94, 22);
+            this._moveOptionsMenu.Text = "&Move Options";
             // 
             // LblAcSearch
             // 
-            this.LblAcSearch.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.LblAcSearch.AutoSize = true;
-            this.LblAcSearch.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcSearch.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
-            this.LblAcSearch.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcSearch.Location = new System.Drawing.Point(687, 35);
-            this.LblAcSearch.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcSearch.Name = "LblAcSearch";
-            this.L0vh_Tlp.SetRowSpan(this.LblAcSearch, 2);
-            this.LblAcSearch.Size = new System.Drawing.Size(20, 19);
-            this.LblAcSearch.TabIndex = 10;
-            this.LblAcSearch.Text = "S";
+            this._lblAcSearch.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this._lblAcSearch.AutoSize = true;
+            this._lblAcSearch.BackColor = System.Drawing.SystemColors.ControlText;
+            this._lblAcSearch.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this._lblAcSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
+            this._lblAcSearch.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this._lblAcSearch.Location = new System.Drawing.Point(687, 35);
+            this._lblAcSearch.Margin = new System.Windows.Forms.Padding(0);
+            this._lblAcSearch.Name = "LblAcSearch";
+            this._l0vh_Tlp.SetRowSpan(this._lblAcSearch, 2);
+            this._lblAcSearch.Size = new System.Drawing.Size(20, 19);
+            this._lblAcSearch.TabIndex = 10;
+            this._lblAcSearch.Text = "S";
             // 
             // CboFolders
             // 
-            this.L0vh_Tlp.SetColumnSpan(this.CboFolders, 2);
-            this.CboFolders.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.CboFolders.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.CboFolders.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.CboFolders.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CboFolders.FormattingEnabled = true;
-            this.CboFolders.Location = new System.Drawing.Point(807, 64);
-            this.CboFolders.Margin = new System.Windows.Forms.Padding(0, 4, 0, 0);
-            this.CboFolders.Name = "CboFolders";
-            this.CboFolders.Size = new System.Drawing.Size(391, 25);
-            this.CboFolders.TabIndex = 42;
+            this._l0vh_Tlp.SetColumnSpan(this._cboFolders, 2);
+            this._cboFolders.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._cboFolders.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._cboFolders.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this._cboFolders.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._cboFolders.FormattingEnabled = true;
+            this._cboFolders.Location = new System.Drawing.Point(807, 64);
+            this._cboFolders.Margin = new System.Windows.Forms.Padding(0, 4, 0, 0);
+            this._cboFolders.Name = "CboFolders";
+            this._cboFolders.Size = new System.Drawing.Size(391, 25);
+            this._cboFolders.TabIndex = 42;
             // 
             // LblSearch
             // 
-            this.LblSearch.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.LblSearch.AutoSize = true;
-            this.LblSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblSearch.Location = new System.Drawing.Point(710, 38);
-            this.LblSearch.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
-            this.LblSearch.Name = "LblSearch";
-            this.L0vh_Tlp.SetRowSpan(this.LblSearch, 2);
-            this.LblSearch.Size = new System.Drawing.Size(51, 13);
-            this.LblSearch.TabIndex = 6;
-            this.LblSearch.Text = "Search:";
+            this._lblSearch.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this._lblSearch.AutoSize = true;
+            this._lblSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._lblSearch.Location = new System.Drawing.Point(710, 38);
+            this._lblSearch.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
+            this._lblSearch.Name = "LblSearch";
+            this._l0vh_Tlp.SetRowSpan(this._lblSearch, 2);
+            this._lblSearch.Size = new System.Drawing.Size(51, 13);
+            this._lblSearch.TabIndex = 6;
+            this._lblSearch.Text = "Search:";
             // 
             // TxtboxSearch
             // 
-            this.TxtboxSearch.BackColor = System.Drawing.SystemColors.Menu;
-            this.L0vh_Tlp.SetColumnSpan(this.TxtboxSearch, 2);
-            this.TxtboxSearch.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TxtboxSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtboxSearch.Location = new System.Drawing.Point(809, 34);
-            this.TxtboxSearch.Margin = new System.Windows.Forms.Padding(2, 4, 2, 0);
-            this.TxtboxSearch.Name = "TxtboxSearch";
-            this.TxtboxSearch.Size = new System.Drawing.Size(387, 24);
-            this.TxtboxSearch.TabIndex = 41;
+            this._txtboxSearch.BackColor = System.Drawing.SystemColors.Menu;
+            this._l0vh_Tlp.SetColumnSpan(this._txtboxSearch, 2);
+            this._txtboxSearch.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._txtboxSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._txtboxSearch.Location = new System.Drawing.Point(809, 34);
+            this._txtboxSearch.Margin = new System.Windows.Forms.Padding(2, 4, 2, 0);
+            this._txtboxSearch.Name = "TxtboxSearch";
+            this._txtboxSearch.Size = new System.Drawing.Size(387, 24);
+            this._txtboxSearch.TabIndex = 41;
             // 
             // L0v2h2_WebView2
             // 
-            this.L0v2h2_WebView2.AllowExternalDrop = true;
-            this.L0v2h2_WebView2.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
-            this.L0vh_Tlp.SetColumnSpan(this.L0v2h2_WebView2, 14);
+            this._l0v2h2_WebView2.AllowExternalDrop = true;
+            this._l0v2h2_WebView2.BackgroundImage = global::QuickFiler.Properties.Resources.AppStartPageBackground;
+            this._l0vh_Tlp.SetColumnSpan(this._l0v2h2_WebView2, 14);
             coreWebView2CreationProperties2.AdditionalBrowserArguments = null;
             coreWebView2CreationProperties2.BrowserExecutableFolder = null;
             coreWebView2CreationProperties2.IsInPrivateModeEnabled = null;
             coreWebView2CreationProperties2.Language = null;
             coreWebView2CreationProperties2.ProfileName = null;
             coreWebView2CreationProperties2.UserDataFolder = null;
-            this.L0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties2;
-            this.L0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
-            this.L0v2h2_WebView2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L0v2h2_WebView2.Location = new System.Drawing.Point(52, 112);
-            this.L0v2h2_WebView2.Margin = new System.Windows.Forms.Padding(2);
-            this.L0v2h2_WebView2.Name = "L0v2h2_WebView2";
-            this.L0v2h2_WebView2.Size = new System.Drawing.Size(1144, 358);
-            this.L0v2h2_WebView2.TabIndex = 40;
-            this.L0v2h2_WebView2.ZoomFactor = 1D;
-            this.L0v2h2_WebView2.ParentChanged += new System.EventHandler(this.L0v2h2_WebView2_ParentChanged);
+            this._l0v2h2_WebView2.CreationProperties = coreWebView2CreationProperties2;
+            this._l0v2h2_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
+            this._l0v2h2_WebView2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._l0v2h2_WebView2.Location = new System.Drawing.Point(52, 112);
+            this._l0v2h2_WebView2.Margin = new System.Windows.Forms.Padding(2);
+            this._l0v2h2_WebView2.Name = "L0v2h2_WebView2";
+            this._l0v2h2_WebView2.Size = new System.Drawing.Size(1144, 358);
+            this._l0v2h2_WebView2.TabIndex = 40;
+            this._l0v2h2_WebView2.ZoomFactor = 1D;
+            this._l0v2h2_WebView2.ParentChanged += new System.EventHandler(this.L0v2h2_WebView2_ParentChanged);
             // 
             // LblConvCt
             // 
-            this.LblConvCt.AutoSize = true;
-            this.LblConvCt.Dock = System.Windows.Forms.DockStyle.Right;
-            this.LblConvCt.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblConvCt.Location = new System.Drawing.Point(643, 18);
-            this.LblConvCt.Margin = new System.Windows.Forms.Padding(0);
-            this.LblConvCt.Name = "LblConvCt";
-            this.LblConvCt.Padding = new System.Windows.Forms.Padding(3);
-            this.L0vh_Tlp.SetRowSpan(this.LblConvCt, 2);
-            this.LblConvCt.Size = new System.Drawing.Size(44, 30);
-            this.LblConvCt.TabIndex = 14;
-            this.LblConvCt.Text = "99";
+            this._lblConvCt.AutoSize = true;
+            this._lblConvCt.Dock = System.Windows.Forms.DockStyle.Right;
+            this._lblConvCt.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._lblConvCt.Location = new System.Drawing.Point(643, 18);
+            this._lblConvCt.Margin = new System.Windows.Forms.Padding(0);
+            this._lblConvCt.Name = "LblConvCt";
+            this._lblConvCt.Padding = new System.Windows.Forms.Padding(3);
+            this._l0vh_Tlp.SetRowSpan(this._lblConvCt, 2);
+            this._lblConvCt.Size = new System.Drawing.Size(44, 30);
+            this._lblConvCt.TabIndex = 14;
+            this._lblConvCt.Text = "99";
             // 
             // LblItemNumber
             // 
-            this.LblItemNumber.BackColor = System.Drawing.SystemColors.HotTrack;
-            this.LblItemNumber.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LblItemNumber.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblItemNumber.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.LblItemNumber.Location = new System.Drawing.Point(2, 2);
-            this.LblItemNumber.Margin = new System.Windows.Forms.Padding(2, 2, 2, 10);
-            this.LblItemNumber.Name = "LblItemNumber";
-            this.LblItemNumber.Padding = new System.Windows.Forms.Padding(0, 0, 0, 4);
-            this.L0vh_Tlp.SetRowSpan(this.LblItemNumber, 3);
-            this.LblItemNumber.Size = new System.Drawing.Size(46, 36);
-            this.LblItemNumber.TabIndex = 6;
-            this.LblItemNumber.Text = "[#]";
-            this.LblItemNumber.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this._lblItemNumber.BackColor = System.Drawing.SystemColors.HotTrack;
+            this._lblItemNumber.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._lblItemNumber.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._lblItemNumber.ForeColor = System.Drawing.SystemColors.HighlightText;
+            this._lblItemNumber.Location = new System.Drawing.Point(2, 2);
+            this._lblItemNumber.Margin = new System.Windows.Forms.Padding(2, 2, 2, 10);
+            this._lblItemNumber.Name = "LblItemNumber";
+            this._lblItemNumber.Padding = new System.Windows.Forms.Padding(0, 0, 0, 4);
+            this._l0vh_Tlp.SetRowSpan(this._lblItemNumber, 3);
+            this._lblItemNumber.Size = new System.Drawing.Size(46, 36);
+            this._lblItemNumber.TabIndex = 6;
+            this._lblItemNumber.Text = "[#]";
+            this._lblItemNumber.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // LblSender
             // 
-            this.LblSender.AutoSize = true;
-            this.LblSender.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblSender.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.LblSender.Location = new System.Drawing.Point(53, 0);
-            this.LblSender.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
-            this.LblSender.MinimumSize = new System.Drawing.Size(270, 0);
-            this.LblSender.Name = "LblSender";
-            this.LblSender.Size = new System.Drawing.Size(270, 18);
-            this.LblSender.TabIndex = 7;
-            this.LblSender.Text = "[SENDER NAME]";
+            this._lblSender.AutoSize = true;
+            this._lblSender.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._lblSender.ForeColor = System.Drawing.SystemColors.ControlText;
+            this._lblSender.Location = new System.Drawing.Point(53, 0);
+            this._lblSender.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
+            this._lblSender.MinimumSize = new System.Drawing.Size(270, 0);
+            this._lblSender.Name = "LblSender";
+            this._lblSender.Size = new System.Drawing.Size(270, 18);
+            this._lblSender.TabIndex = 7;
+            this._lblSender.Text = "[SENDER NAME]";
             // 
             // LblTriage
             // 
-            this.LblTriage.AutoSize = true;
-            this.LblTriage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.LblTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblTriage.Location = new System.Drawing.Point(388, 0);
-            this.LblTriage.Margin = new System.Windows.Forms.Padding(0);
-            this.LblTriage.Name = "LblTriage";
-            this.LblTriage.Size = new System.Drawing.Size(17, 17);
-            this.LblTriage.TabIndex = 9;
-            this.LblTriage.Text = "A";
+            this._lblTriage.AutoSize = true;
+            this._lblTriage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this._lblTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._lblTriage.Location = new System.Drawing.Point(388, 0);
+            this._lblTriage.Margin = new System.Windows.Forms.Padding(0);
+            this._lblTriage.Name = "LblTriage";
+            this._lblTriage.Size = new System.Drawing.Size(17, 17);
+            this._lblTriage.TabIndex = 9;
+            this._lblTriage.Text = "A";
             // 
             // lblCaptionTriage
             // 
-            this.lblCaptionTriage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblCaptionTriage.AutoSize = true;
-            this.lblCaptionTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCaptionTriage.Location = new System.Drawing.Point(346, 0);
-            this.lblCaptionTriage.Margin = new System.Windows.Forms.Padding(0);
-            this.lblCaptionTriage.Name = "lblCaptionTriage";
-            this.lblCaptionTriage.Size = new System.Drawing.Size(42, 15);
-            this.lblCaptionTriage.TabIndex = 8;
-            this.lblCaptionTriage.Text = "Triage";
+            this._lblCaptionTriage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._lblCaptionTriage.AutoSize = true;
+            this._lblCaptionTriage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._lblCaptionTriage.Location = new System.Drawing.Point(346, 0);
+            this._lblCaptionTriage.Margin = new System.Windows.Forms.Padding(0);
+            this._lblCaptionTriage.Name = "lblCaptionTriage";
+            this._lblCaptionTriage.Size = new System.Drawing.Size(42, 15);
+            this._lblCaptionTriage.TabIndex = 8;
+            this._lblCaptionTriage.Text = "Triage";
             // 
             // LblCaptionPredicted
             // 
-            this.LblCaptionPredicted.AutoSize = true;
-            this.LblCaptionPredicted.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblCaptionPredicted.Location = new System.Drawing.Point(421, 0);
-            this.LblCaptionPredicted.Margin = new System.Windows.Forms.Padding(0);
-            this.LblCaptionPredicted.Name = "LblCaptionPredicted";
-            this.LblCaptionPredicted.Size = new System.Drawing.Size(59, 18);
-            this.LblCaptionPredicted.TabIndex = 10;
-            this.LblCaptionPredicted.Text = "Predicted:";
+            this._lblCaptionPredicted.AutoSize = true;
+            this._lblCaptionPredicted.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._lblCaptionPredicted.Location = new System.Drawing.Point(421, 0);
+            this._lblCaptionPredicted.Margin = new System.Windows.Forms.Padding(0);
+            this._lblCaptionPredicted.Name = "LblCaptionPredicted";
+            this._lblCaptionPredicted.Size = new System.Drawing.Size(59, 18);
+            this._lblCaptionPredicted.TabIndex = 10;
+            this._lblCaptionPredicted.Text = "Predicted:";
             // 
             // LblActionable
             // 
-            this.LblActionable.AutoSize = true;
-            this.LblActionable.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.LblActionable.Location = new System.Drawing.Point(482, 0);
-            this.LblActionable.Margin = new System.Windows.Forms.Padding(0);
-            this.LblActionable.Name = "LblActionable";
-            this.LblActionable.Size = new System.Drawing.Size(41, 18);
-            this.LblActionable.TabIndex = 11;
-            this.LblActionable.Text = "Deleted";
+            this._lblActionable.AutoSize = true;
+            this._lblActionable.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+            this._lblActionable.Location = new System.Drawing.Point(482, 0);
+            this._lblActionable.Margin = new System.Windows.Forms.Padding(0);
+            this._lblActionable.Name = "LblActionable";
+            this._lblActionable.Size = new System.Drawing.Size(41, 18);
+            this._lblActionable.TabIndex = 11;
+            this._lblActionable.Text = "Deleted";
             // 
             // LblSentOn
             // 
-            this.LblSentOn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblSentOn.AutoSize = true;
-            this.L0vh_Tlp.SetColumnSpan(this.LblSentOn, 2);
-            this.LblSentOn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
-            this.LblSentOn.Location = new System.Drawing.Point(559, 0);
-            this.LblSentOn.Margin = new System.Windows.Forms.Padding(0);
-            this.LblSentOn.MinimumSize = new System.Drawing.Size(128, 0);
-            this.LblSentOn.Name = "LblSentOn";
-            this.LblSentOn.Size = new System.Drawing.Size(128, 18);
-            this.LblSentOn.TabIndex = 12;
-            this.LblSentOn.Text = "12/31/2999 12:59 PM";
+            this._lblSentOn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._lblSentOn.AutoSize = true;
+            this._l0vh_Tlp.SetColumnSpan(this._lblSentOn, 2);
+            this._lblSentOn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+            this._lblSentOn.Location = new System.Drawing.Point(559, 0);
+            this._lblSentOn.Margin = new System.Windows.Forms.Padding(0);
+            this._lblSentOn.MinimumSize = new System.Drawing.Size(128, 0);
+            this._lblSentOn.Name = "LblSentOn";
+            this._lblSentOn.Size = new System.Drawing.Size(128, 18);
+            this._lblSentOn.TabIndex = 12;
+            this._lblSentOn.Text = "12/31/2999 12:59 PM";
             // 
             // LblSubject
             // 
-            this.LblSubject.AutoSize = true;
-            this.L0vh_Tlp.SetColumnSpan(this.LblSubject, 9);
-            this.LblSubject.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LblSubject.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblSubject.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.LblSubject.Location = new System.Drawing.Point(50, 18);
-            this.LblSubject.Margin = new System.Windows.Forms.Padding(0);
-            this.LblSubject.Name = "LblSubject";
-            this.L0vh_Tlp.SetRowSpan(this.LblSubject, 2);
-            this.LblSubject.Size = new System.Drawing.Size(587, 30);
-            this.LblSubject.TabIndex = 13;
-            this.LblSubject.Text = "[SUBJECT]";
+            this._lblSubject.AutoSize = true;
+            this._l0vh_Tlp.SetColumnSpan(this._lblSubject, 9);
+            this._lblSubject.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._lblSubject.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._lblSubject.ForeColor = System.Drawing.SystemColors.ControlText;
+            this._lblSubject.Location = new System.Drawing.Point(50, 18);
+            this._lblSubject.Margin = new System.Windows.Forms.Padding(0);
+            this._lblSubject.Name = "LblSubject";
+            this._l0vh_Tlp.SetRowSpan(this._lblSubject, 2);
+            this._lblSubject.Size = new System.Drawing.Size(587, 30);
+            this._lblSubject.TabIndex = 13;
+            this._lblSubject.Text = "[SUBJECT]";
             // 
             // LblAcOpen
             // 
-            this.LblAcOpen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblAcOpen.AutoSize = true;
-            this.LblAcOpen.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcOpen.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcOpen.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblAcOpen.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcOpen.Location = new System.Drawing.Point(28, 48);
-            this.LblAcOpen.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcOpen.Name = "LblAcOpen";
-            this.L0vh_Tlp.SetRowSpan(this.LblAcOpen, 2);
-            this.LblAcOpen.Size = new System.Drawing.Size(22, 19);
-            this.LblAcOpen.TabIndex = 22;
-            this.LblAcOpen.Text = "O";
+            this._lblAcOpen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._lblAcOpen.AutoSize = true;
+            this._lblAcOpen.BackColor = System.Drawing.SystemColors.ControlText;
+            this._lblAcOpen.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this._lblAcOpen.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._lblAcOpen.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this._lblAcOpen.Location = new System.Drawing.Point(28, 48);
+            this._lblAcOpen.Margin = new System.Windows.Forms.Padding(0);
+            this._lblAcOpen.Name = "LblAcOpen";
+            this._l0vh_Tlp.SetRowSpan(this._lblAcOpen, 2);
+            this._lblAcOpen.Size = new System.Drawing.Size(22, 19);
+            this._lblAcOpen.TabIndex = 22;
+            this._lblAcOpen.Text = "O";
             // 
             // L1h0L2hv3h_TlpBodyToggle
             // 
-            this.L1h0L2hv3h_TlpBodyToggle.ColumnCount = 2;
-            this.L0vh_Tlp.SetColumnSpan(this.L1h0L2hv3h_TlpBodyToggle, 10);
-            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 0F));
-            this.L1h0L2hv3h_TlpBodyToggle.Controls.Add(this.TopicThread, 1, 0);
-            this.L1h0L2hv3h_TlpBodyToggle.Controls.Add(this.TxtboxBody, 0, 0);
-            this.L1h0L2hv3h_TlpBodyToggle.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L1h0L2hv3h_TlpBodyToggle.Location = new System.Drawing.Point(52, 50);
-            this.L1h0L2hv3h_TlpBodyToggle.Margin = new System.Windows.Forms.Padding(2);
-            this.L1h0L2hv3h_TlpBodyToggle.Name = "L1h0L2hv3h_TlpBodyToggle";
-            this.L1h0L2hv3h_TlpBodyToggle.RowCount = 1;
-            this.L0vh_Tlp.SetRowSpan(this.L1h0L2hv3h_TlpBodyToggle, 2);
-            this.L1h0L2hv3h_TlpBodyToggle.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.L1h0L2hv3h_TlpBodyToggle.Size = new System.Drawing.Size(633, 58);
-            this.L1h0L2hv3h_TlpBodyToggle.TabIndex = 38;
+            this._l1h0L2hv3h_TlpBodyToggle.ColumnCount = 2;
+            this._l0vh_Tlp.SetColumnSpan(this._l1h0L2hv3h_TlpBodyToggle, 10);
+            this._l1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this._l1h0L2hv3h_TlpBodyToggle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 0F));
+            this._l1h0L2hv3h_TlpBodyToggle.Controls.Add(this._topicThread, 1, 0);
+            this._l1h0L2hv3h_TlpBodyToggle.Controls.Add(this._txtboxBody, 0, 0);
+            this._l1h0L2hv3h_TlpBodyToggle.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._l1h0L2hv3h_TlpBodyToggle.Location = new System.Drawing.Point(52, 50);
+            this._l1h0L2hv3h_TlpBodyToggle.Margin = new System.Windows.Forms.Padding(2);
+            this._l1h0L2hv3h_TlpBodyToggle.Name = "L1h0L2hv3h_TlpBodyToggle";
+            this._l1h0L2hv3h_TlpBodyToggle.RowCount = 1;
+            this._l0vh_Tlp.SetRowSpan(this._l1h0L2hv3h_TlpBodyToggle, 2);
+            this._l1h0L2hv3h_TlpBodyToggle.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this._l1h0L2hv3h_TlpBodyToggle.Size = new System.Drawing.Size(633, 58);
+            this._l1h0L2hv3h_TlpBodyToggle.TabIndex = 38;
             // 
             // TopicThread
             // 
-            this.TopicThread.AllColumns.Add(this.sender);
-            this.TopicThread.AllColumns.Add(this.SentDate);
-            this.TopicThread.AllColumns.Add(this.infolder);
-            this.TopicThread.AllowDrop = true;
-            this.TopicThread.BackColor = System.Drawing.SystemColors.Control;
-            this.TopicThread.CellEditEnterChangesRows = true;
-            this.TopicThread.CellEditUseWholeCell = false;
-            this.TopicThread.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.sender,
-            this.SentDate,
-            this.infolder});
-            this.TopicThread.Cursor = System.Windows.Forms.Cursors.Default;
-            this.TopicThread.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TopicThread.EmptyListMsg = "The fast list is empty";
-            this.TopicThread.FullRowSelect = true;
-            this.TopicThread.HideSelection = false;
-            this.TopicThread.Location = new System.Drawing.Point(635, 2);
-            this.TopicThread.Margin = new System.Windows.Forms.Padding(2);
-            this.TopicThread.MultiSelect = false;
-            this.TopicThread.Name = "TopicThread";
-            this.TopicThread.ShowGroups = false;
-            this.TopicThread.Size = new System.Drawing.Size(1, 54);
-            this.TopicThread.Sorting = System.Windows.Forms.SortOrder.Descending;
-            this.TopicThread.TabIndex = 9;
-            this.TopicThread.UseCompatibleStateImageBehavior = false;
-            this.TopicThread.View = System.Windows.Forms.View.Details;
-            this.TopicThread.VirtualMode = true;
-            this.TopicThread.Visible = false;
+            this._topicThread.AllColumns.Add(this._sender);
+            this._topicThread.AllColumns.Add(this._sentDate);
+            this._topicThread.AllColumns.Add(this._infolder);
+            this._topicThread.AllowDrop = true;
+            this._topicThread.BackColor = System.Drawing.SystemColors.Control;
+            this._topicThread.CellEditEnterChangesRows = true;
+            this._topicThread.CellEditUseWholeCell = false;
+            this._topicThread.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this._sender,
+            this._sentDate,
+            this._infolder});
+            this._topicThread.Cursor = System.Windows.Forms.Cursors.Default;
+            this._topicThread.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._topicThread.EmptyListMsg = "The fast list is empty";
+            this._topicThread.FullRowSelect = true;
+            this._topicThread.HideSelection = false;
+            this._topicThread.Location = new System.Drawing.Point(635, 2);
+            this._topicThread.Margin = new System.Windows.Forms.Padding(2);
+            this._topicThread.MultiSelect = false;
+            this._topicThread.Name = "TopicThread";
+            this._topicThread.ShowGroups = false;
+            this._topicThread.Size = new System.Drawing.Size(1, 54);
+            this._topicThread.Sorting = System.Windows.Forms.SortOrder.Descending;
+            this._topicThread.TabIndex = 9;
+            this._topicThread.UseCompatibleStateImageBehavior = false;
+            this._topicThread.View = System.Windows.Forms.View.Details;
+            this._topicThread.VirtualMode = true;
+            this._topicThread.Visible = false;
             // 
             // sender
             // 
-            this.sender.AspectName = "SenderName";
-            this.sender.FillsFreeSpace = true;
-            this.sender.HeaderForeColor = System.Drawing.SystemColors.ControlText;
-            this.sender.MinimumWidth = 200;
-            this.sender.Text = "From";
-            this.sender.Width = 200;
+            this._sender.AspectName = "SenderName";
+            this._sender.FillsFreeSpace = true;
+            this._sender.HeaderForeColor = System.Drawing.SystemColors.ControlText;
+            this._sender.MinimumWidth = 200;
+            this._sender.Text = "From";
+            this._sender.Width = 200;
             // 
             // SentDate
             // 
-            this.SentDate.AspectName = "SentDate";
-            this.SentDate.FillsFreeSpace = true;
-            this.SentDate.MinimumWidth = 250;
-            this.SentDate.Text = "Received";
-            this.SentDate.Width = 250;
+            this._sentDate.AspectName = "SentDate";
+            this._sentDate.FillsFreeSpace = true;
+            this._sentDate.MinimumWidth = 250;
+            this._sentDate.Text = "Received";
+            this._sentDate.Width = 250;
             // 
             // infolder
             // 
-            this.infolder.AspectName = "FolderName";
-            this.infolder.FillsFreeSpace = true;
-            this.infolder.MinimumWidth = 200;
-            this.infolder.Text = "In Folder";
-            this.infolder.Width = 200;
+            this._infolder.AspectName = "FolderName";
+            this._infolder.FillsFreeSpace = true;
+            this._infolder.MinimumWidth = 200;
+            this._infolder.Text = "In Folder";
+            this._infolder.Width = 200;
             // 
             // TxtboxBody
             // 
-            this.TxtboxBody.BackColor = System.Drawing.SystemColors.Control;
-            this.TxtboxBody.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.TxtboxBody.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TxtboxBody.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtboxBody.Location = new System.Drawing.Point(6, 0);
-            this.TxtboxBody.Margin = new System.Windows.Forms.Padding(6, 0, 0, 0);
-            this.TxtboxBody.Multiline = true;
-            this.TxtboxBody.Name = "TxtboxBody";
-            this.TxtboxBody.ReadOnly = true;
-            this.TxtboxBody.Size = new System.Drawing.Size(627, 58);
-            this.TxtboxBody.TabIndex = 6;
-            this.TxtboxBody.TabStop = false;
-            this.TxtboxBody.Text = "[BODY]";
+            this._txtboxBody.BackColor = System.Drawing.SystemColors.Control;
+            this._txtboxBody.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this._txtboxBody.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._txtboxBody.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._txtboxBody.Location = new System.Drawing.Point(6, 0);
+            this._txtboxBody.Margin = new System.Windows.Forms.Padding(6, 0, 0, 0);
+            this._txtboxBody.Multiline = true;
+            this._txtboxBody.Name = "TxtboxBody";
+            this._txtboxBody.ReadOnly = true;
+            this._txtboxBody.Size = new System.Drawing.Size(627, 58);
+            this._txtboxBody.TabIndex = 6;
+            this._txtboxBody.TabStop = false;
+            this._txtboxBody.Text = "[BODY]";
             // 
             // LblAcBody
             // 
-            this.LblAcBody.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblAcBody.AutoSize = true;
-            this.LblAcBody.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcBody.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcBody.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblAcBody.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcBody.Location = new System.Drawing.Point(30, 110);
-            this.LblAcBody.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcBody.Name = "LblAcBody";
-            this.LblAcBody.Size = new System.Drawing.Size(20, 19);
-            this.LblAcBody.TabIndex = 39;
-            this.LblAcBody.Text = "B";
+            this._lblAcBody.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._lblAcBody.AutoSize = true;
+            this._lblAcBody.BackColor = System.Drawing.SystemColors.ControlText;
+            this._lblAcBody.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this._lblAcBody.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._lblAcBody.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this._lblAcBody.Location = new System.Drawing.Point(30, 110);
+            this._lblAcBody.Margin = new System.Windows.Forms.Padding(0);
+            this._lblAcBody.Name = "LblAcBody";
+            this._lblAcBody.Size = new System.Drawing.Size(20, 19);
+            this._lblAcBody.TabIndex = 39;
+            this._lblAcBody.Text = "B";
             // 
             // LblAcFolder
             // 
-            this.LblAcFolder.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.LblAcFolder.AutoSize = true;
-            this.LblAcFolder.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcFolder.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
-            this.LblAcFolder.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcFolder.Location = new System.Drawing.Point(687, 65);
-            this.LblAcFolder.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
-            this.LblAcFolder.Name = "LblAcFolder";
-            this.LblAcFolder.Size = new System.Drawing.Size(19, 19);
-            this.LblAcFolder.TabIndex = 37;
-            this.LblAcFolder.Text = "F";
+            this._lblAcFolder.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this._lblAcFolder.AutoSize = true;
+            this._lblAcFolder.BackColor = System.Drawing.SystemColors.ControlText;
+            this._lblAcFolder.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this._lblAcFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
+            this._lblAcFolder.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this._lblAcFolder.Location = new System.Drawing.Point(687, 65);
+            this._lblAcFolder.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
+            this._lblAcFolder.Name = "LblAcFolder";
+            this._lblAcFolder.Size = new System.Drawing.Size(19, 19);
+            this._lblAcFolder.TabIndex = 37;
+            this._lblAcFolder.Text = "F";
             // 
             // LblFolder
             // 
-            this.LblFolder.AutoSize = true;
-            this.LblFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblFolder.Location = new System.Drawing.Point(710, 67);
-            this.LblFolder.Margin = new System.Windows.Forms.Padding(3, 7, 0, 0);
-            this.LblFolder.Name = "LblFolder";
-            this.LblFolder.Size = new System.Drawing.Size(46, 13);
-            this.LblFolder.TabIndex = 27;
-            this.LblFolder.Text = "Folder:";
+            this._lblFolder.AutoSize = true;
+            this._lblFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._lblFolder.Location = new System.Drawing.Point(710, 67);
+            this._lblFolder.Margin = new System.Windows.Forms.Padding(3, 7, 0, 0);
+            this._lblFolder.Name = "LblFolder";
+            this._lblFolder.Size = new System.Drawing.Size(46, 13);
+            this._lblFolder.TabIndex = 27;
+            this._lblFolder.Text = "Folder:";
             // 
             // L1h1L2v1h3Panel
             // 
-            this.L1h1L2v1h3Panel.Controls.Add(this.LblAcReply);
-            this.L1h1L2v1h3Panel.Controls.Add(this.LblAcReplyAll);
-            this.L1h1L2v1h3Panel.Controls.Add(this.LblAcFwd);
-            this.L1h1L2v1h3Panel.Controls.Add(this.BtnReply);
-            this.L1h1L2v1h3Panel.Controls.Add(this.BtnReplyAll);
-            this.L1h1L2v1h3Panel.Controls.Add(this.BtnForward);
-            this.L1h1L2v1h3Panel.Controls.Add(this.LblAcDelete);
-            this.L1h1L2v1h3Panel.Controls.Add(this.BtnDelItem);
-            this.L1h1L2v1h3Panel.Controls.Add(this.LblAcPopOut);
-            this.L1h1L2v1h3Panel.Controls.Add(this.BtnPopOut);
-            this.L1h1L2v1h3Panel.Controls.Add(this.LblAcTask);
-            this.L1h1L2v1h3Panel.Controls.Add(this.BtnFlagTask);
-            this.L1h1L2v1h3Panel.Location = new System.Drawing.Point(873, 0);
-            this.L1h1L2v1h3Panel.Margin = new System.Windows.Forms.Padding(0);
-            this.L1h1L2v1h3Panel.Name = "L1h1L2v1h3Panel";
-            this.L0vh_Tlp.SetRowSpan(this.L1h1L2v1h3Panel, 2);
-            this.L1h1L2v1h3Panel.Size = new System.Drawing.Size(305, 30);
-            this.L1h1L2v1h3Panel.TabIndex = 9;
+            this._l1h1L2v1h3Panel.Controls.Add(this._lblAcReply);
+            this._l1h1L2v1h3Panel.Controls.Add(this._lblAcReplyAll);
+            this._l1h1L2v1h3Panel.Controls.Add(this._lblAcFwd);
+            this._l1h1L2v1h3Panel.Controls.Add(this._btnReply);
+            this._l1h1L2v1h3Panel.Controls.Add(this._btnReplyAll);
+            this._l1h1L2v1h3Panel.Controls.Add(this._btnForward);
+            this._l1h1L2v1h3Panel.Controls.Add(this._lblAcDelete);
+            this._l1h1L2v1h3Panel.Controls.Add(this._btnDelItem);
+            this._l1h1L2v1h3Panel.Controls.Add(this._lblAcPopOut);
+            this._l1h1L2v1h3Panel.Controls.Add(this._btnPopOut);
+            this._l1h1L2v1h3Panel.Controls.Add(this._lblAcTask);
+            this._l1h1L2v1h3Panel.Controls.Add(this._btnFlagTask);
+            this._l1h1L2v1h3Panel.Location = new System.Drawing.Point(873, 0);
+            this._l1h1L2v1h3Panel.Margin = new System.Windows.Forms.Padding(0);
+            this._l1h1L2v1h3Panel.Name = "L1h1L2v1h3Panel";
+            this._l0vh_Tlp.SetRowSpan(this._l1h1L2v1h3Panel, 2);
+            this._l1h1L2v1h3Panel.Size = new System.Drawing.Size(305, 30);
+            this._l1h1L2v1h3Panel.TabIndex = 9;
             // 
             // LblAcReply
             // 
-            this.LblAcReply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblAcReply.AutoSize = true;
-            this.LblAcReply.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcReply.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcReply.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblAcReply.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcReply.Location = new System.Drawing.Point(5, 0);
-            this.LblAcReply.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcReply.Name = "LblAcReply";
-            this.LblAcReply.Size = new System.Drawing.Size(18, 15);
-            this.LblAcReply.TabIndex = 14;
-            this.LblAcReply.Text = "R";
+            this._lblAcReply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._lblAcReply.AutoSize = true;
+            this._lblAcReply.BackColor = System.Drawing.SystemColors.ControlText;
+            this._lblAcReply.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this._lblAcReply.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._lblAcReply.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this._lblAcReply.Location = new System.Drawing.Point(5, 0);
+            this._lblAcReply.Margin = new System.Windows.Forms.Padding(0);
+            this._lblAcReply.Name = "LblAcReply";
+            this._lblAcReply.Size = new System.Drawing.Size(18, 15);
+            this._lblAcReply.TabIndex = 14;
+            this._lblAcReply.Text = "R";
             // 
             // LblAcReplyAll
             // 
-            this.LblAcReplyAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblAcReplyAll.AutoSize = true;
-            this.LblAcReplyAll.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcReplyAll.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcReplyAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblAcReplyAll.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcReplyAll.Location = new System.Drawing.Point(54, 0);
-            this.LblAcReplyAll.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcReplyAll.Name = "LblAcReplyAll";
-            this.LblAcReplyAll.Size = new System.Drawing.Size(16, 15);
-            this.LblAcReplyAll.TabIndex = 13;
-            this.LblAcReplyAll.Text = "L";
+            this._lblAcReplyAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._lblAcReplyAll.AutoSize = true;
+            this._lblAcReplyAll.BackColor = System.Drawing.SystemColors.ControlText;
+            this._lblAcReplyAll.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this._lblAcReplyAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._lblAcReplyAll.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this._lblAcReplyAll.Location = new System.Drawing.Point(54, 0);
+            this._lblAcReplyAll.Margin = new System.Windows.Forms.Padding(0);
+            this._lblAcReplyAll.Name = "LblAcReplyAll";
+            this._lblAcReplyAll.Size = new System.Drawing.Size(16, 15);
+            this._lblAcReplyAll.TabIndex = 13;
+            this._lblAcReplyAll.Text = "L";
             // 
             // LblAcFwd
             // 
-            this.LblAcFwd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblAcFwd.AutoSize = true;
-            this.LblAcFwd.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcFwd.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcFwd.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblAcFwd.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcFwd.Location = new System.Drawing.Point(104, 0);
-            this.LblAcFwd.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcFwd.Name = "LblAcFwd";
-            this.LblAcFwd.Size = new System.Drawing.Size(21, 15);
-            this.LblAcFwd.TabIndex = 12;
-            this.LblAcFwd.Text = "W";
+            this._lblAcFwd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._lblAcFwd.AutoSize = true;
+            this._lblAcFwd.BackColor = System.Drawing.SystemColors.ControlText;
+            this._lblAcFwd.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this._lblAcFwd.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._lblAcFwd.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this._lblAcFwd.Location = new System.Drawing.Point(104, 0);
+            this._lblAcFwd.Margin = new System.Windows.Forms.Padding(0);
+            this._lblAcFwd.Name = "LblAcFwd";
+            this._lblAcFwd.Size = new System.Drawing.Size(21, 15);
+            this._lblAcFwd.TabIndex = 12;
+            this._lblAcFwd.Text = "W";
             // 
             // BtnReply
             // 
-            this.BtnReply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnReply.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BtnReply.Image = ((System.Drawing.Image)(resources.GetObject("BtnReply.Image")));
-            this.BtnReply.ImageSVG.ImagePath = "(none)";
-            this.BtnReply.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
+            this._btnReply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._btnReply.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._btnReply.Image = ((System.Drawing.Image)(resources.GetObject("BtnReply.Image")));
+            this._btnReply.ImageSVG.ImagePath = "(none)";
+            this._btnReply.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
             svgResource7.Data = new byte[] {
         ((byte)(60)),
         ((byte)(63)),
@@ -1613,25 +1613,25 @@ namespace QuickFiler
         ((byte)(62)),
         ((byte)(10))};
             svgResource7.Name = "Reply";
-            this.BtnReply.ImageSVG.ResourceName = svgResource7;
-            this.BtnReply.ImageSVG.SaveRendering = false;
-            this.BtnReply.ImageSVG.Size = new System.Drawing.Size(44, 24);
-            this.BtnReply.ImageSVG.UseDefaultImage = false;
-            this.BtnReply.Location = new System.Drawing.Point(4, 0);
-            this.BtnReply.Margin = new System.Windows.Forms.Padding(0);
-            this.BtnReply.Name = "BtnReply";
-            this.BtnReply.Size = new System.Drawing.Size(50, 30);
-            this.BtnReply.TabIndex = 11;
-            this.BtnReply.TabStop = false;
-            this.BtnReply.UseVisualStyleBackColor = true;
+            this._btnReply.ImageSVG.ResourceName = svgResource7;
+            this._btnReply.ImageSVG.SaveRendering = false;
+            this._btnReply.ImageSVG.Size = new System.Drawing.Size(44, 24);
+            this._btnReply.ImageSVG.UseDefaultImage = false;
+            this._btnReply.Location = new System.Drawing.Point(4, 0);
+            this._btnReply.Margin = new System.Windows.Forms.Padding(0);
+            this._btnReply.Name = "BtnReply";
+            this._btnReply.Size = new System.Drawing.Size(50, 30);
+            this._btnReply.TabIndex = 11;
+            this._btnReply.TabStop = false;
+            this._btnReply.UseVisualStyleBackColor = true;
             // 
             // BtnReplyAll
             // 
-            this.BtnReplyAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnReplyAll.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BtnReplyAll.Image = ((System.Drawing.Image)(resources.GetObject("BtnReplyAll.Image")));
-            this.BtnReplyAll.ImageSVG.ImagePath = "(none)";
-            this.BtnReplyAll.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
+            this._btnReplyAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._btnReplyAll.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._btnReplyAll.Image = ((System.Drawing.Image)(resources.GetObject("BtnReplyAll.Image")));
+            this._btnReplyAll.ImageSVG.ImagePath = "(none)";
+            this._btnReplyAll.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
             svgResource8.Data = new byte[] {
         ((byte)(60)),
         ((byte)(63)),
@@ -3099,25 +3099,25 @@ namespace QuickFiler
         ((byte)(62)),
         ((byte)(10))};
             svgResource8.Name = "ReplyAll";
-            this.BtnReplyAll.ImageSVG.ResourceName = svgResource8;
-            this.BtnReplyAll.ImageSVG.SaveRendering = false;
-            this.BtnReplyAll.ImageSVG.Size = new System.Drawing.Size(44, 24);
-            this.BtnReplyAll.ImageSVG.UseDefaultImage = false;
-            this.BtnReplyAll.Location = new System.Drawing.Point(54, 0);
-            this.BtnReplyAll.Margin = new System.Windows.Forms.Padding(0);
-            this.BtnReplyAll.Name = "BtnReplyAll";
-            this.BtnReplyAll.Size = new System.Drawing.Size(50, 30);
-            this.BtnReplyAll.TabIndex = 10;
-            this.BtnReplyAll.TabStop = false;
-            this.BtnReplyAll.UseVisualStyleBackColor = true;
+            this._btnReplyAll.ImageSVG.ResourceName = svgResource8;
+            this._btnReplyAll.ImageSVG.SaveRendering = false;
+            this._btnReplyAll.ImageSVG.Size = new System.Drawing.Size(44, 24);
+            this._btnReplyAll.ImageSVG.UseDefaultImage = false;
+            this._btnReplyAll.Location = new System.Drawing.Point(54, 0);
+            this._btnReplyAll.Margin = new System.Windows.Forms.Padding(0);
+            this._btnReplyAll.Name = "BtnReplyAll";
+            this._btnReplyAll.Size = new System.Drawing.Size(50, 30);
+            this._btnReplyAll.TabIndex = 10;
+            this._btnReplyAll.TabStop = false;
+            this._btnReplyAll.UseVisualStyleBackColor = true;
             // 
             // BtnForward
             // 
-            this.BtnForward.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnForward.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BtnForward.Image = ((System.Drawing.Image)(resources.GetObject("BtnForward.Image")));
-            this.BtnForward.ImageSVG.ImagePath = "(none)";
-            this.BtnForward.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
+            this._btnForward.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._btnForward.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._btnForward.Image = ((System.Drawing.Image)(resources.GetObject("BtnForward.Image")));
+            this._btnForward.ImageSVG.ImagePath = "(none)";
+            this._btnForward.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
             svgResource9.Data = new byte[] {
         ((byte)(60)),
         ((byte)(63)),
@@ -3924,45 +3924,45 @@ namespace QuickFiler
         ((byte)(62)),
         ((byte)(10))};
             svgResource9.Name = "Forward";
-            this.BtnForward.ImageSVG.ResourceName = svgResource9;
-            this.BtnForward.ImageSVG.SaveRendering = false;
-            this.BtnForward.ImageSVG.Size = new System.Drawing.Size(44, 24);
-            this.BtnForward.ImageSVG.UseDefaultImage = false;
-            this.BtnForward.Location = new System.Drawing.Point(104, 0);
-            this.BtnForward.Margin = new System.Windows.Forms.Padding(0);
-            this.BtnForward.Name = "BtnForward";
-            this.BtnForward.Size = new System.Drawing.Size(50, 30);
-            this.BtnForward.TabIndex = 9;
-            this.BtnForward.TabStop = false;
-            this.BtnForward.UseVisualStyleBackColor = true;
+            this._btnForward.ImageSVG.ResourceName = svgResource9;
+            this._btnForward.ImageSVG.SaveRendering = false;
+            this._btnForward.ImageSVG.Size = new System.Drawing.Size(44, 24);
+            this._btnForward.ImageSVG.UseDefaultImage = false;
+            this._btnForward.Location = new System.Drawing.Point(104, 0);
+            this._btnForward.Margin = new System.Windows.Forms.Padding(0);
+            this._btnForward.Name = "BtnForward";
+            this._btnForward.Size = new System.Drawing.Size(50, 30);
+            this._btnForward.TabIndex = 9;
+            this._btnForward.TabStop = false;
+            this._btnForward.UseVisualStyleBackColor = true;
             // 
             // LblAcDelete
             // 
-            this.LblAcDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblAcDelete.AutoSize = true;
-            this.LblAcDelete.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcDelete.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcDelete.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold);
-            this.LblAcDelete.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcDelete.Location = new System.Drawing.Point(254, 0);
-            this.LblAcDelete.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcDelete.Name = "LblAcDelete";
-            this.LblAcDelete.Size = new System.Drawing.Size(17, 15);
-            this.LblAcDelete.TabIndex = 8;
-            this.LblAcDelete.Text = "X";
+            this._lblAcDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._lblAcDelete.AutoSize = true;
+            this._lblAcDelete.BackColor = System.Drawing.SystemColors.ControlText;
+            this._lblAcDelete.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this._lblAcDelete.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold);
+            this._lblAcDelete.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this._lblAcDelete.Location = new System.Drawing.Point(254, 0);
+            this._lblAcDelete.Margin = new System.Windows.Forms.Padding(0);
+            this._lblAcDelete.Name = "LblAcDelete";
+            this._lblAcDelete.Size = new System.Drawing.Size(17, 15);
+            this._lblAcDelete.TabIndex = 8;
+            this._lblAcDelete.Text = "X";
             // 
             // BtnDelItem
             // 
-            this.BtnDelItem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnDelItem.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BtnDelItem.BackColor = System.Drawing.SystemColors.Control;
-            this.BtnDelItem.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.BtnDelItem.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Red;
-            this.BtnDelItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BtnDelItem.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.BtnDelItem.Image = ((System.Drawing.Image)(resources.GetObject("BtnDelItem.Image")));
-            this.BtnDelItem.ImageSVG.ImagePath = "(none)";
-            this.BtnDelItem.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
+            this._btnDelItem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._btnDelItem.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._btnDelItem.BackColor = System.Drawing.SystemColors.Control;
+            this._btnDelItem.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
+            this._btnDelItem.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Red;
+            this._btnDelItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._btnDelItem.ForeColor = System.Drawing.SystemColors.ControlText;
+            this._btnDelItem.Image = ((System.Drawing.Image)(resources.GetObject("BtnDelItem.Image")));
+            this._btnDelItem.ImageSVG.ImagePath = "(none)";
+            this._btnDelItem.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
             svgResource10.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
@@ -4578,40 +4578,40 @@ namespace QuickFiler
         ((byte)(13)),
         ((byte)(10))};
             svgResource10.Name = "Delete1";
-            this.BtnDelItem.ImageSVG.ResourceName = svgResource10;
-            this.BtnDelItem.ImageSVG.SaveRendering = false;
-            this.BtnDelItem.ImageSVG.Size = new System.Drawing.Size(44, 24);
-            this.BtnDelItem.ImageSVG.UseDefaultImage = false;
-            this.BtnDelItem.Location = new System.Drawing.Point(254, 0);
-            this.BtnDelItem.Margin = new System.Windows.Forms.Padding(0);
-            this.BtnDelItem.Name = "BtnDelItem";
-            this.BtnDelItem.Size = new System.Drawing.Size(50, 30);
-            this.BtnDelItem.TabIndex = 7;
-            this.BtnDelItem.TabStop = false;
-            this.BtnDelItem.UseVisualStyleBackColor = true;
+            this._btnDelItem.ImageSVG.ResourceName = svgResource10;
+            this._btnDelItem.ImageSVG.SaveRendering = false;
+            this._btnDelItem.ImageSVG.Size = new System.Drawing.Size(44, 24);
+            this._btnDelItem.ImageSVG.UseDefaultImage = false;
+            this._btnDelItem.Location = new System.Drawing.Point(254, 0);
+            this._btnDelItem.Margin = new System.Windows.Forms.Padding(0);
+            this._btnDelItem.Name = "BtnDelItem";
+            this._btnDelItem.Size = new System.Drawing.Size(50, 30);
+            this._btnDelItem.TabIndex = 7;
+            this._btnDelItem.TabStop = false;
+            this._btnDelItem.UseVisualStyleBackColor = true;
             // 
             // LblAcPopOut
             // 
-            this.LblAcPopOut.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblAcPopOut.AutoSize = true;
-            this.LblAcPopOut.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcPopOut.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcPopOut.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold);
-            this.LblAcPopOut.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcPopOut.Location = new System.Drawing.Point(204, 0);
-            this.LblAcPopOut.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcPopOut.Name = "LblAcPopOut";
-            this.LblAcPopOut.Size = new System.Drawing.Size(17, 15);
-            this.LblAcPopOut.TabIndex = 6;
-            this.LblAcPopOut.Text = "P";
+            this._lblAcPopOut.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._lblAcPopOut.AutoSize = true;
+            this._lblAcPopOut.BackColor = System.Drawing.SystemColors.ControlText;
+            this._lblAcPopOut.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this._lblAcPopOut.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold);
+            this._lblAcPopOut.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this._lblAcPopOut.Location = new System.Drawing.Point(204, 0);
+            this._lblAcPopOut.Margin = new System.Windows.Forms.Padding(0);
+            this._lblAcPopOut.Name = "LblAcPopOut";
+            this._lblAcPopOut.Size = new System.Drawing.Size(17, 15);
+            this._lblAcPopOut.TabIndex = 6;
+            this._lblAcPopOut.Text = "P";
             // 
             // BtnPopOut
             // 
-            this.BtnPopOut.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnPopOut.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BtnPopOut.Image = ((System.Drawing.Image)(resources.GetObject("BtnPopOut.Image")));
-            this.BtnPopOut.ImageSVG.ImagePath = "(none)";
-            this.BtnPopOut.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
+            this._btnPopOut.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._btnPopOut.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._btnPopOut.Image = ((System.Drawing.Image)(resources.GetObject("BtnPopOut.Image")));
+            this._btnPopOut.ImageSVG.ImagePath = "(none)";
+            this._btnPopOut.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
             svgResource11.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
@@ -5338,40 +5338,40 @@ namespace QuickFiler
         ((byte)(13)),
         ((byte)(10))};
             svgResource11.Name = "ApplicationFlyout1";
-            this.BtnPopOut.ImageSVG.ResourceName = svgResource11;
-            this.BtnPopOut.ImageSVG.SaveRendering = false;
-            this.BtnPopOut.ImageSVG.Size = new System.Drawing.Size(44, 24);
-            this.BtnPopOut.ImageSVG.UseDefaultImage = false;
-            this.BtnPopOut.Location = new System.Drawing.Point(204, 0);
-            this.BtnPopOut.Margin = new System.Windows.Forms.Padding(0);
-            this.BtnPopOut.Name = "BtnPopOut";
-            this.BtnPopOut.Size = new System.Drawing.Size(50, 30);
-            this.BtnPopOut.TabIndex = 5;
-            this.BtnPopOut.TabStop = false;
-            this.BtnPopOut.UseVisualStyleBackColor = true;
+            this._btnPopOut.ImageSVG.ResourceName = svgResource11;
+            this._btnPopOut.ImageSVG.SaveRendering = false;
+            this._btnPopOut.ImageSVG.Size = new System.Drawing.Size(44, 24);
+            this._btnPopOut.ImageSVG.UseDefaultImage = false;
+            this._btnPopOut.Location = new System.Drawing.Point(204, 0);
+            this._btnPopOut.Margin = new System.Windows.Forms.Padding(0);
+            this._btnPopOut.Name = "BtnPopOut";
+            this._btnPopOut.Size = new System.Drawing.Size(50, 30);
+            this._btnPopOut.TabIndex = 5;
+            this._btnPopOut.TabStop = false;
+            this._btnPopOut.UseVisualStyleBackColor = true;
             // 
             // LblAcTask
             // 
-            this.LblAcTask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.LblAcTask.AutoSize = true;
-            this.LblAcTask.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcTask.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcTask.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblAcTask.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcTask.Location = new System.Drawing.Point(154, 0);
-            this.LblAcTask.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcTask.Name = "LblAcTask";
-            this.LblAcTask.Size = new System.Drawing.Size(17, 15);
-            this.LblAcTask.TabIndex = 4;
-            this.LblAcTask.Text = "T";
+            this._lblAcTask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._lblAcTask.AutoSize = true;
+            this._lblAcTask.BackColor = System.Drawing.SystemColors.ControlText;
+            this._lblAcTask.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this._lblAcTask.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._lblAcTask.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this._lblAcTask.Location = new System.Drawing.Point(154, 0);
+            this._lblAcTask.Margin = new System.Windows.Forms.Padding(0);
+            this._lblAcTask.Name = "LblAcTask";
+            this._lblAcTask.Size = new System.Drawing.Size(17, 15);
+            this._lblAcTask.TabIndex = 4;
+            this._lblAcTask.Text = "T";
             // 
             // BtnFlagTask
             // 
-            this.BtnFlagTask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnFlagTask.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.BtnFlagTask.Image = ((System.Drawing.Image)(resources.GetObject("BtnFlagTask.Image")));
-            this.BtnFlagTask.ImageSVG.ImagePath = "(none)";
-            this.BtnFlagTask.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
+            this._btnFlagTask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._btnFlagTask.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._btnFlagTask.Image = ((System.Drawing.Image)(resources.GetObject("BtnFlagTask.Image")));
+            this._btnFlagTask.ImageSVG.ImagePath = "(none)";
+            this._btnFlagTask.ImageSVG.Margin = new System.Windows.Forms.Padding(3);
             svgResource12.Data = new byte[] {
         ((byte)(60)),
         ((byte)(115)),
@@ -6080,66 +6080,66 @@ namespace QuickFiler
         ((byte)(13)),
         ((byte)(10))};
             svgResource12.Name = "FlagDarkRed1";
-            this.BtnFlagTask.ImageSVG.ResourceName = svgResource12;
-            this.BtnFlagTask.ImageSVG.SaveRendering = false;
-            this.BtnFlagTask.ImageSVG.Size = new System.Drawing.Size(44, 24);
-            this.BtnFlagTask.ImageSVG.UseDefaultImage = false;
-            this.BtnFlagTask.Location = new System.Drawing.Point(154, 0);
-            this.BtnFlagTask.Margin = new System.Windows.Forms.Padding(0);
-            this.BtnFlagTask.Name = "BtnFlagTask";
-            this.BtnFlagTask.Size = new System.Drawing.Size(50, 30);
-            this.BtnFlagTask.TabIndex = 3;
-            this.BtnFlagTask.TabStop = false;
-            this.BtnFlagTask.UseVisualStyleBackColor = true;
+            this._btnFlagTask.ImageSVG.ResourceName = svgResource12;
+            this._btnFlagTask.ImageSVG.SaveRendering = false;
+            this._btnFlagTask.ImageSVG.Size = new System.Drawing.Size(44, 24);
+            this._btnFlagTask.ImageSVG.UseDefaultImage = false;
+            this._btnFlagTask.Location = new System.Drawing.Point(154, 0);
+            this._btnFlagTask.Margin = new System.Windows.Forms.Padding(0);
+            this._btnFlagTask.Name = "BtnFlagTask";
+            this._btnFlagTask.Size = new System.Drawing.Size(50, 30);
+            this._btnFlagTask.TabIndex = 3;
+            this._btnFlagTask.TabStop = false;
+            this._btnFlagTask.UseVisualStyleBackColor = true;
             // 
             // LblAcMoveOptions
             // 
-            this.LblAcMoveOptions.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.LblAcMoveOptions.AutoSize = true;
-            this.LblAcMoveOptions.BackColor = System.Drawing.SystemColors.ControlText;
-            this.LblAcMoveOptions.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.LblAcMoveOptions.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
-            this.LblAcMoveOptions.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.LblAcMoveOptions.Location = new System.Drawing.Point(687, 5);
-            this.LblAcMoveOptions.Margin = new System.Windows.Forms.Padding(0);
-            this.LblAcMoveOptions.Name = "LblAcMoveOptions";
-            this.L0vh_Tlp.SetRowSpan(this.LblAcMoveOptions, 2);
-            this.LblAcMoveOptions.Size = new System.Drawing.Size(20, 19);
-            this.LblAcMoveOptions.TabIndex = 10;
-            this.LblAcMoveOptions.Text = "M";
+            this._lblAcMoveOptions.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this._lblAcMoveOptions.AutoSize = true;
+            this._lblAcMoveOptions.BackColor = System.Drawing.SystemColors.ControlText;
+            this._lblAcMoveOptions.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this._lblAcMoveOptions.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Bold);
+            this._lblAcMoveOptions.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this._lblAcMoveOptions.Location = new System.Drawing.Point(687, 5);
+            this._lblAcMoveOptions.Margin = new System.Windows.Forms.Padding(0);
+            this._lblAcMoveOptions.Name = "LblAcMoveOptions";
+            this._l0vh_Tlp.SetRowSpan(this._lblAcMoveOptions, 2);
+            this._lblAcMoveOptions.Size = new System.Drawing.Size(20, 19);
+            this._lblAcMoveOptions.TabIndex = 10;
+            this._lblAcMoveOptions.Text = "M";
             // 
             // ConversationMenuItem
             // 
-            this.ConversationMenuItem.CheckOnClick = true;
-            this.ConversationMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("ConversationMenuItem.Image")));
-            this.ConversationMenuItem.Name = "ConversationMenuItem";
-            this.ConversationMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded;
-            this.ConversationMenuItem.Size = new System.Drawing.Size(177, 22);
-            this.ConversationMenuItem.Text = "Move &Conversation";
+            this._conversationMenuItem.CheckOnClick = true;
+            this._conversationMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("ConversationMenuItem.Image")));
+            this._conversationMenuItem.Name = "ConversationMenuItem";
+            this._conversationMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded;
+            this._conversationMenuItem.Size = new System.Drawing.Size(177, 22);
+            this._conversationMenuItem.Text = "Move &Conversation";
             // 
             // SaveAttachmentsMenuItem
             // 
-            this.SaveAttachmentsMenuItem.CheckOnClick = true;
-            this.SaveAttachmentsMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("SaveAttachmentsMenuItem.Image")));
-            this.SaveAttachmentsMenuItem.Name = "SaveAttachmentsMenuItem";
-            this.SaveAttachmentsMenuItem.Size = new System.Drawing.Size(177, 22);
-            this.SaveAttachmentsMenuItem.Text = "Save &Attachments";
+            this._saveAttachmentsMenuItem.CheckOnClick = true;
+            this._saveAttachmentsMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("SaveAttachmentsMenuItem.Image")));
+            this._saveAttachmentsMenuItem.Name = "SaveAttachmentsMenuItem";
+            this._saveAttachmentsMenuItem.Size = new System.Drawing.Size(177, 22);
+            this._saveAttachmentsMenuItem.Text = "Save &Attachments";
             // 
             // SaveEmailMenuItem
             // 
-            this.SaveEmailMenuItem.CheckOnClick = true;
-            this.SaveEmailMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
-            this.SaveEmailMenuItem.Name = "SaveEmailMenuItem";
-            this.SaveEmailMenuItem.Size = new System.Drawing.Size(177, 22);
-            this.SaveEmailMenuItem.Text = "Save E&mail Copy";
+            this._saveEmailMenuItem.CheckOnClick = true;
+            this._saveEmailMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
+            this._saveEmailMenuItem.Name = "SaveEmailMenuItem";
+            this._saveEmailMenuItem.Size = new System.Drawing.Size(177, 22);
+            this._saveEmailMenuItem.Text = "Save E&mail Copy";
             // 
             // SavePicturesMenuItem
             // 
-            this.SavePicturesMenuItem.CheckOnClick = true;
-            this.SavePicturesMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
-            this.SavePicturesMenuItem.Name = "SavePicturesMenuItem";
-            this.SavePicturesMenuItem.Size = new System.Drawing.Size(177, 22);
-            this.SavePicturesMenuItem.Text = "Save &Pictures";
+            this._savePicturesMenuItem.CheckOnClick = true;
+            this._savePicturesMenuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
+            this._savePicturesMenuItem.Name = "SavePicturesMenuItem";
+            this._savePicturesMenuItem.Size = new System.Drawing.Size(177, 22);
+            this._savePicturesMenuItem.Text = "Save &Pictures";
             // 
             // ItemViewer
             // 
@@ -6147,69 +6147,69 @@ namespace QuickFiler
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.Controls.Add(this.L0vh_Tlp);
+            this.Controls.Add(this._l0vh_Tlp);
             this.MinimumSize = new System.Drawing.Size(759, 103);
             this.Name = "ItemViewer";
             this.Size = new System.Drawing.Size(1198, 472);
-            this.L0vh_Tlp.ResumeLayout(false);
-            this.L0vh_Tlp.PerformLayout();
-            this.MoveOptionsStrip.ResumeLayout(false);
-            this.MoveOptionsStrip.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.L0v2h2_WebView2)).EndInit();
-            this.L1h0L2hv3h_TlpBodyToggle.ResumeLayout(false);
-            this.L1h0L2hv3h_TlpBodyToggle.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.TopicThread)).EndInit();
-            this.L1h1L2v1h3Panel.ResumeLayout(false);
-            this.L1h1L2v1h3Panel.PerformLayout();
+            this._l0vh_Tlp.ResumeLayout(false);
+            this._l0vh_Tlp.PerformLayout();
+            this._moveOptionsStrip.ResumeLayout(false);
+            this._moveOptionsStrip.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._l0v2h2_WebView2)).EndInit();
+            this._l1h0L2hv3h_TlpBodyToggle.ResumeLayout(false);
+            this._l1h0L2hv3h_TlpBodyToggle.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._topicThread)).EndInit();
+            this._l1h1L2v1h3Panel.ResumeLayout(false);
+            this._l1h1L2v1h3Panel.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
-        internal System.Windows.Forms.Label LblItemNumber;
-        internal System.Windows.Forms.Label LblSender;
-        internal System.Windows.Forms.Label lblCaptionTriage;
-        internal System.Windows.Forms.Label LblTriage;
-        internal System.Windows.Forms.Label LblCaptionPredicted;
-        internal System.Windows.Forms.Label LblActionable;
-        internal System.Windows.Forms.Label LblSentOn;
-        internal System.Windows.Forms.Label LblSubject;
-        internal System.Windows.Forms.Label LblConvCt;
-        internal System.Windows.Forms.Label LblAcOpen;
-        internal System.Windows.Forms.Label LblFolder;
-        internal System.Windows.Forms.Label LblAcSearch;
-        internal System.Windows.Forms.Label LblSearch;
-        internal System.Windows.Forms.Label LblAcFolder;
-        internal System.Windows.Forms.TextBox TxtboxBody;
-        public BrightIdeasSoftware.FastObjectListView TopicThread;
-        private BrightIdeasSoftware.OLVColumn sender;
-        internal BrightIdeasSoftware.OLVColumn SentDate;
-        private BrightIdeasSoftware.OLVColumn infolder;
-        internal System.Windows.Forms.Label LblAcBody;
-        internal Microsoft.Web.WebView2.WinForms.WebView2 L0v2h2_WebView2;
-        public System.Windows.Forms.TableLayoutPanel L0vh_Tlp;
-        internal System.Windows.Forms.TableLayoutPanel L1h0L2hv3h_TlpBodyToggle;
-        internal System.Windows.Forms.Panel L1h1L2v1h3Panel;
-        internal System.Windows.Forms.Label LblAcDelete;
-        internal ButtonSVG BtnDelItem;
-        internal System.Windows.Forms.Label LblAcPopOut;
-        internal ButtonSVG BtnPopOut;
-        internal System.Windows.Forms.Label LblAcTask;
-        internal ButtonSVG BtnFlagTask;
-        internal ButtonSVG BtnForward;
-        internal System.Windows.Forms.Label LblAcReply;
-        internal System.Windows.Forms.Label LblAcReplyAll;
-        internal System.Windows.Forms.Label LblAcFwd;
-        internal ButtonSVG BtnReply;
-        internal ButtonSVG BtnReplyAll;
-        internal System.Windows.Forms.ComboBox CboFolders;
-        internal System.Windows.Forms.TextBox TxtboxSearch;
-        internal System.Windows.Forms.MenuStrip MoveOptionsStrip;
-        internal System.Windows.Forms.ToolStripMenuItem MoveOptionsMenu;
-        public Viewers.ToolStripMenuItemCb ConversationMenuItem;
-        public Viewers.ToolStripMenuItemCb SaveAttachmentsMenuItem;
-        public Viewers.ToolStripMenuItemCb SaveEmailMenuItem;
-        public Viewers.ToolStripMenuItemCb SavePicturesMenuItem;
-        internal System.Windows.Forms.Label LblAcMoveOptions;
+        internal System.Windows.Forms.Label _lblItemNumber;
+        internal System.Windows.Forms.Label _lblSender;
+        internal System.Windows.Forms.Label _lblCaptionTriage;
+        internal System.Windows.Forms.Label _lblTriage;
+        internal System.Windows.Forms.Label _lblCaptionPredicted;
+        internal System.Windows.Forms.Label _lblActionable;
+        internal System.Windows.Forms.Label _lblSentOn;
+        internal System.Windows.Forms.Label _lblSubject;
+        internal System.Windows.Forms.Label _lblConvCt;
+        internal System.Windows.Forms.Label _lblAcOpen;
+        internal System.Windows.Forms.Label _lblFolder;
+        internal System.Windows.Forms.Label _lblAcSearch;
+        internal System.Windows.Forms.Label _lblSearch;
+        internal System.Windows.Forms.Label _lblAcFolder;
+        internal System.Windows.Forms.TextBox _txtboxBody;
+        public BrightIdeasSoftware.FastObjectListView _topicThread;
+        private BrightIdeasSoftware.OLVColumn _sender;
+        internal BrightIdeasSoftware.OLVColumn _sentDate;
+        private BrightIdeasSoftware.OLVColumn _infolder;
+        internal System.Windows.Forms.Label _lblAcBody;
+        internal Microsoft.Web.WebView2.WinForms.WebView2 _l0v2h2_WebView2;
+        public System.Windows.Forms.TableLayoutPanel _l0vh_Tlp;
+        internal System.Windows.Forms.TableLayoutPanel _l1h0L2hv3h_TlpBodyToggle;
+        internal System.Windows.Forms.Panel _l1h1L2v1h3Panel;
+        internal System.Windows.Forms.Label _lblAcDelete;
+        internal ButtonSVG _btnDelItem;
+        internal System.Windows.Forms.Label _lblAcPopOut;
+        internal ButtonSVG _btnPopOut;
+        internal System.Windows.Forms.Label _lblAcTask;
+        internal ButtonSVG _btnFlagTask;
+        internal ButtonSVG _btnForward;
+        internal System.Windows.Forms.Label _lblAcReply;
+        internal System.Windows.Forms.Label _lblAcReplyAll;
+        internal System.Windows.Forms.Label _lblAcFwd;
+        internal ButtonSVG _btnReply;
+        internal ButtonSVG _btnReplyAll;
+        internal System.Windows.Forms.ComboBox _cboFolders;
+        internal System.Windows.Forms.TextBox _txtboxSearch;
+        internal System.Windows.Forms.MenuStrip _moveOptionsStrip;
+        internal System.Windows.Forms.ToolStripMenuItem _moveOptionsMenu;
+        public Viewers.ToolStripMenuItemCb _conversationMenuItem;
+        public Viewers.ToolStripMenuItemCb _saveAttachmentsMenuItem;
+        public Viewers.ToolStripMenuItemCb _saveEmailMenuItem;
+        public Viewers.ToolStripMenuItemCb _savePicturesMenuItem;
+        internal System.Windows.Forms.Label _lblAcMoveOptions;
     }
 }

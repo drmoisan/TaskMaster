@@ -1,24 +1,33 @@
-﻿using Office = Microsoft.Office.Core;
-using Outlook = Microsoft.Office.Interop.Outlook;
+﻿using Microsoft.Office.Interop.Outlook;
+using QuickFiler;
+using QuickFiler.Controllers;
+using QuickFiler.Interfaces;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Web.UI.WebControls;
+using System.Windows.Forms;
+using TaskMaster.Ribbon;
 using TaskTree;
 using TaskVisualization;
 using ToDoModel;
 using UtilitiesCS;
-using QuickFiler.Interfaces;
-using System.Windows.Forms;
-using QuickFiler;
-using Microsoft.Office.Interop.Outlook;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Threading;
-using System;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
-using QuickFiler.Controllers;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
+using UtilitiesCS.EmailIntelligence.OlFolderTools.FilterOlFolders;
+using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.OutlookExtensions;
-using UtilitiesCS.Extensions.Lazy;
-using TaskMaster.Ribbon;
+using UtilitiesCS.OutlookObjects.Folder;
+using UtilitiesCS.OutlookObjects.Store;
+using Office = Microsoft.Office.Core;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 
 namespace TaskMaster
@@ -87,7 +96,7 @@ namespace TaskMaster
                 loaded = _quickFiler.Loaded;
             if (loaded == false)
             {
-                _quickFiler = new QuickFiler.Controllers.QfcHomeController(Globals, ReleaseQuickFiler);
+                _quickFiler = new QuickFiler.Controllers.QfcHomeController(Globals, ReleaseQuickFiler).Init();
                 _quickFiler.Run();
             }
         }
@@ -112,7 +121,7 @@ namespace TaskMaster
 
         internal void ReviseProjectData()
         {
-            var controller = new ToDoModel.Data_Model.Project.ProjectController(Globals.TD.ProjInfo);
+            var controller = new ToDoModel.Data_Model.Project.ProjectController(Globals.TD.ProjInfo, Globals.TD.ProgramInfo);
             controller.Run();
         }
 
@@ -165,7 +174,7 @@ namespace TaskMaster
         internal async Task ShowHeadersNoChildrenAsync()
         {
             var dataTree = new TreeOfToDoItems([]);
-            await Task.Run(() => dataTree.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadAll, Globals));
+            await Task.Run(() => dataTree.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadNotComplete, Globals));
             await Task.Run(dataTree.ShowEmptyHeadersInView);
         }
 
@@ -235,11 +244,47 @@ namespace TaskMaster
             await miner.MineEmails();
         }
 
+        internal async Task ContinueMiningAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var miner = new UtilitiesCS.EmailIntelligence.Bayesian.EmailDataMiner(Globals);
+            await miner.MineEmails();
+        }
+        
+        internal async Task BuildFolderClassifierAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var miner = new OlFolderClassifierGroup(Globals);
+            await miner.BuildClassifiersAsync();
+        }
+
+        internal async Task BuildCategoryClassifierAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var miner = new CategoryClassifierGroup(Globals);
+            await miner.BuildClassifiersAsync();
+        }
+
+        internal async Task BuildActionableClassifierAsync()
+        {
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext());
+            var miner = new ActionableClassifierGroup(Globals);
+            await miner.BuildClassifiersAsync(5);
+        }
+
         #endregion Folder Classifier
 
         #region BayesianPerformance
 
-        
+
         internal async Task GetConfusionDriversAsync()
         {
             if (SynchronizationContext.Current is null)
@@ -369,26 +414,37 @@ namespace TaskMaster
 
         #region Triage
 
-        private AsyncLazy<Triage> _triage;
-        internal AsyncLazy<Triage> Triage
+        private AsyncLazy<Triage> _triageAsync;
+        internal AsyncLazy<Triage> TriageAsync
         {
             get
             {
                 if (SynchronizationContext.Current is null)
                     SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
 
-                return _triage;
+                return _triageAsync;
             }
         }
         internal void ResetTriage()
         {
-            _triage = new(async () => await UtilitiesCS.EmailIntelligence.Triage.CreateAsync(
+            _triageAsync = new(async () => await UtilitiesCS.EmailIntelligence.Triage.CreateAsync(
                 Globals, true, Enums.NotFoundEnum.Ask));
+        }
+
+        internal Triage Triage
+        {
+            get
+            {
+                if (SynchronizationContext.Current is null)
+                    SynchronizationContext.SetSynchronizationContext(
+                        new WindowsFormsSynchronizationContext());
+                return Globals?.Engines?.InboxEngines?.TryGetValue("Triage", out var engine) ?? false ? engine as Triage : null;
+            }
         }
 
         internal async Task TriageSelectionAsync()
         {
-            var triage = await Triage;
+            var triage = await TriageAsync;
             if (triage is null) { ResetTriage(); }
             else { await triage.TestAsync(OlSelection); }
 
@@ -401,7 +457,7 @@ namespace TaskMaster
 
         internal async Task TriageSetAAsync()
         {
-            var triage = await Triage;
+            var triage = await TriageAsync;
             if (triage is null) { ResetTriage(); }
             else { await triage.TrainAsync(OlSelection, "A"); }
             //if (SynchronizationContext.Current is null)
@@ -413,14 +469,14 @@ namespace TaskMaster
 
         internal async Task TriageSetBAsync()
         {
-            var triage = await Triage;
+            var triage = await TriageAsync;
             if (triage is null) { ResetTriage(); }
             else { await triage.TrainAsync(OlSelection, "B"); }
         }
 
         internal async Task TriageSetCAsync()
         {
-            var triage = await Triage;
+            var triage = await TriageAsync;
             if (triage is null) { ResetTriage(); }
             else { await triage.TrainAsync(OlSelection, "C"); }
         }
@@ -428,7 +484,7 @@ namespace TaskMaster
 
         internal async Task TriageSetPrecision() 
         {
-            var triage = await Triage;
+            var triage = await TriageAsync;
             if (triage is null) { ResetTriage(); }
             else 
             {
@@ -480,5 +536,220 @@ namespace TaskMaster
             }
         }
 
+        internal void GetFolderInfo()
+        {
+            var currentFolder = Globals.Ol.App.ActiveExplorer().CurrentFolder;
+            if (currentFolder is not null)
+            {
+                var folderTree = new FolderTree(currentFolder);
+                var folderViewer = new FolderInfoViewer();
+                folderViewer.SetFolderTree(folderTree);
+                folderViewer.Show();
+            }
+        }
+
+        internal void FolderStoresSettings()
+        {
+            var wrapper = new StoreWrapperController(Globals);
+            wrapper.Launch();
+        }
+
+        internal void CompareFolders()
+        {
+            var folder1 = PromptUserToSelectFolder();
+            if (folder1 is null) return;
+            var folderTree1 = new FolderTree(folder1);
+            //var folders1 = folderTree1.FlattenArrayTree
+            var folder2 = PromptUserToSelectFolder();
+            if (folder2 is null) return;
+            var folderTree2 = new FolderTree(folder2);
+            var (identicalNodes, identicalContents, sameUniqueName, onlyCurrentNodes, onlyOtherNodes) = folderTree1.Compare(folderTree2);
+            var identicalNodesStats = GetStats(identicalNodes);
+            var identicalContentsStats = GetStats(identicalContents);
+            var sameUniqueNameStats = GetStats(sameUniqueName);
+            var onlyCurrentStats = GetStats(onlyCurrentNodes);
+            var onlyOtherStats = GetStats(onlyOtherNodes);
+
+            logger.Info($"\nFolder Comparison Output for {folder1.Name} and {folder2.Name}" +
+                $"\nIdentical Nodes: {identicalNodes.Count:N0} Folder Size: {identicalNodesStats.size}  Item Count: {identicalNodesStats.count:N0}" +
+                $"\nIdentical Contents: {identicalContents.Count:N0}  Folder Size: {identicalContentsStats.size}  Item Count: {identicalContentsStats.count:N0}" +
+                $"\nSame Unique Name: {sameUniqueName.Count:N0}  Folder Size: {sameUniqueNameStats.size}  Item Count: {sameUniqueNameStats.count:N0}" +
+                $"\nOnly In Folder 1 ({folder1.Name}): {onlyCurrentNodes.Count:N0} Folder Size: {onlyCurrentStats.size}  Item Count: {onlyCurrentStats.count:N0}" +
+                $"\nOnly In Folder 2 ({folder2.Name}): {onlyOtherNodes.Count:N0} Folder Size: {onlyOtherStats.size}  Item Count: {onlyOtherStats.count:N0}");
+
+            if (onlyCurrentStats.count > 0)
+            {
+                logger.Info($"Folders only in Folder 1 ({folder1.Name}): \n{string.Join("\n", onlyCurrentNodes.Select(x => x.Value.RelativePath))}");                
+            }
+            if (onlyOtherStats.count > 0)
+            {
+                logger.Info($"Folders only in Folder 2 ({folder2.Name}): \n{string.Join("\n", onlyOtherNodes.Select(x => x.Value.RelativePath))}");
+            }
+
+            if (onlyCurrentStats.count > 0 && onlyOtherStats.count > 0)
+            {
+                var response = MessageBox.Show($"Compare items in unique folders?", "Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == DialogResult.Yes)
+                {
+                    
+                }
+            }
+            
+        }
+
+        internal async Task CompareFoldersAsync()
+        {
+            var folder1 = PromptUserToSelectFolder();
+            if (folder1 is null) return;
+            var folderTree1 = await Task.Run(() => new FolderTree(folder1));
+            //var folders1 = folderTree1.FlattenArrayTree
+            var folder2 = PromptUserToSelectFolder();
+            if (folder2 is null) return;
+
+            var folderTree2 = await Task.Run(() => new FolderTree(folder2));
+            var (identicalNodes, identicalContents, sameUniqueName, onlyCurrentNodes, onlyOtherNodes) = 
+                await Task.Run(() => folderTree1.Compare(folderTree2));
+            var identicalNodesStats = GetStats(identicalNodes);
+            var identicalContentsStats = GetStats(identicalContents);
+            var sameUniqueNameStats = GetStats(sameUniqueName);
+            var onlyCurrentStats = GetStats(onlyCurrentNodes);
+            var onlyOtherStats = GetStats(onlyOtherNodes);
+
+            logger.Info($"\nFolder Comparison Output for {folder1.Name} and {folder2.Name}" +
+                $"\nIdentical Nodes: {identicalNodes.Count:N0} Folder Size: {identicalNodesStats.size}  Item Count: {identicalNodesStats.count:N0}" +
+                $"\nIdentical Contents: {identicalContents.Count:N0}  Folder Size: {identicalContentsStats.size}  Item Count: {identicalContentsStats.count:N0}" +
+                $"\nSame Unique Name: {sameUniqueName.Count:N0}  Folder Size: {sameUniqueNameStats.size}  Item Count: {sameUniqueNameStats.count:N0}" +
+                $"\nOnly In Folder 1 ({folder1.Name}): {onlyCurrentNodes.Count:N0} Folder Size: {onlyCurrentStats.size}  Item Count: {onlyCurrentStats.count:N0}" +
+                $"\nOnly In Folder 2 ({folder2.Name}): {onlyOtherNodes.Count:N0} Folder Size: {onlyOtherStats.size}  Item Count: {onlyOtherStats.count:N0}");
+
+            if (onlyCurrentStats.count > 0)
+            {
+                logger.Info($"Folders only in Folder 1 ({folder1.Name}): \n{string.Join("\n", onlyCurrentNodes.Select(x => x.Value.RelativePath))}");
+            }
+            if (onlyOtherStats.count > 0)
+            {
+                logger.Info($"Folders only in Folder 2 ({folder2.Name}): \n{string.Join("\n", onlyOtherNodes.Select(x => x.Value.RelativePath))}");
+            }
+            
+            if (onlyCurrentStats.count > 0 && onlyOtherStats.count > 0)
+            {
+                var response = MessageBox.Show($"Find partially matching folders?", "Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (response == DialogResult.Yes)
+                {
+                    logger.Info("Comparing items to find partial matches ...");
+                    var m = await onlyCurrentNodes.ToAsyncEnumerable().SelectAwait(async node =>
+                    {
+                        var otherM = await onlyOtherNodes.ToAsyncEnumerable().SelectAwait(async o => 
+                        { 
+                            var percentage = await node.Value.CalculateItemMatchPercentageAsync(o.Value, Globals, default);
+                            return (node:o, percentage:percentage);
+                        }).ToArrayAsync();
+                        
+                        var max = otherM.FindMax((n1, n2) => n2.percentage > n1.percentage ? n2: n1);
+                        
+                        return (folder1:node, folder2:max.node, percentage:max.percentage);
+                    }).ToArrayAsync();
+
+                    
+                    
+                    var folder1Unmatched = m.Where(x => x.percentage == 0).Select(x => x.folder1).ToList();
+                    var folder2matches = m.Where(x => x.percentage > 0).Select(x => x.folder2).ToList();
+                    var folder2Unmatched = onlyOtherNodes.Where(x => !folder2matches.Contains(x)).ToList();
+
+
+                    foreach (var match in m)
+                    {
+                        logger.Debug($"Comparing {match.folder1.Value.RelativePath} with {match.folder2.Value.RelativePath} - Match Percentage: {match.percentage:P2}");
+                        if (match.percentage > 0)
+                        {
+                            logger.Info($"Folder {match.folder1.Value.RelativePath} has a partial match with {match.folder2.Value.RelativePath} ({match.percentage:P2})");
+                            var copyResponse = MessageBox.Show($"Copy missing items from {match.folder2.Value.RelativePath} to {match.folder1.Value.RelativePath}?", "Copy Items", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                            if (copyResponse == DialogResult.Yes)
+                            {
+                                var (matching, currentOnly, otherOnly) = await match.folder1.Value.CompareItemsAsync(match.folder2.Value, Globals, default).ConfigureAwait(false);
+                                foreach (var iitem in otherOnly)
+                                {
+                                    var item = Globals.Ol.NamespaceMAPI.GetItemFromID(iitem.EntryId, iitem.StoreId);
+                                    var olItem = new OutlookItem(item);
+                                    var destination = match.folder1.Value.OlFolder as Outlook.Folder;
+                                    if (olItem is not null && destination is not null)
+                                    {
+                                        olItem.Move(destination);
+                                        logger.Info($"Moved item {olItem.Subject} to {match.folder1.Value.RelativePath}");
+                                    }
+                                    else
+                                    {
+                                        logger.Warn($"Failed to move item {olItem?.Subject ?? "Unknown Subject"} to {match.folder1.Value.RelativePath}");
+                                    }                                    
+                                }
+                                
+                            }
+                        } 
+                        
+                    }
+
+                    logger.Info($"Folders with no matches in {folder1.Name}: \n{string.Join("\n",folder1Unmatched.Select(x => x.Value.RelativePath))}");
+                    logger.Info($"Folders with no matches in {folder2.Name}: \n{string.Join("\n",folder2Unmatched.Select(x => x.Value.RelativePath))}");
+
+                }
+            }
+
+        }
+
+
+        internal void CompareItems() 
+        { 
+
+        }
+        
+        internal (string size, int count) GetStats(List<TreeNode<FolderWrapper>> nodes)
+        {
+            if (nodes is null || nodes.Count == 0) return ("0", 0);
+            var sizeL = nodes.Sum(x => x.Value.FolderSize);
+            var size = FormatFileSize(sizeL);
+            var count = nodes.Sum(x => x.Value.ItemCount);
+            return (size, count);
+        }
+
+        public static string FormatFileSize(long sizeInBytes)
+        {
+            string[] sizes = { "bytes", "KB", "MB", "GB", "TB" };
+            double len = sizeInBytes;
+            int order = 0;
+            while (len >= 1024 && order < sizes.Length - 1)
+            {
+                order++;
+                len /= 1024;
+            }
+            return $"{len:0.0} {sizes[order]} ({sizeInBytes:N0})";
+        }
+
+        internal Outlook.Folder PromptUserToSelectFolder()
+        {
+            // Ensure this runs on the UI thread
+            if (SynchronizationContext.Current is null)
+                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+
+            var outlookApp = Globals?.Ol?.App;
+            if (outlookApp == null)
+            {
+                MessageBox.Show("Outlook application is not available.");
+                return null;
+            }
+
+            Outlook.Folder selectedFolder = null;
+            try
+            {
+                var ns = outlookApp.GetNamespace("MAPI");
+                var folder = ns.PickFolder();
+                selectedFolder = folder as Outlook.Folder;
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"Error selecting folder: {ex.Message}");
+            }
+
+            return selectedFolder;
+        }
     }
 }

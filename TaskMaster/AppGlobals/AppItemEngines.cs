@@ -8,10 +8,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories;
 using UtilitiesCS.Extensions;
+using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config;
 using UtilitiesCS.Threading;
@@ -106,10 +110,53 @@ namespace TaskMaster
                         var triage = await Triage.CreateEngineAsync(globals);
                         return triage;
                     } 
-                }
+                },
+                { "Project", async globals =>
+                    {
+                        var project = await CategoryClassifierGroup.CreateEngineAsync(globals, "Project");
+                        project.CategorySetter = ProjectCategorySetterAsync;
+                        return project;
+                    } 
+                },
+                { "Context", async globals =>
+                    {
+                        var context = await CategoryClassifierGroup.CreateEngineAsync(globals, "Context");
+                        context.CategorySetter = ContextCategorySetterAsync;
+                        return context;
+                    }
+                },
+                { "Actionable", async globals =>
+                    {
+                        var actionable = await ActionableClassifierGroup.CreateEngineAsync(globals, "Actionable");
+                        return actionable;
+                    }
+                },
             };
             return ei;
         }
+
+        #region CategoryClassifierActions
+
+        internal async Task ProjectCategorySetterAsync(IEnumerable<string> categories, MailItemHelper helper) 
+        {
+            await Task.Run(() =>
+            {
+                var todo = new ToDoItem(new OutlookItemFlaggable(helper.Item));
+                todo.Projects.AsListNoPrefix = [.. categories];
+                todo.FlagAsTask = true;
+            });
+        }
+
+        internal async Task ContextCategorySetterAsync(IEnumerable<string> categories, MailItemHelper helper)
+        {
+            await Task.Run(() =>
+            {
+                var todo = new ToDoItem(new OutlookItemFlaggable(helper.Item));
+                todo.Context.AsListNoPrefix = [.. categories];
+            });
+        }
+
+        #endregion CategoryClassifierActions
 
         #region Activation and Configuration
 
@@ -141,7 +188,7 @@ namespace TaskMaster
         //            if (configs.TryGetValue(engine.EngineName, out var loader))
         //            {
         //                Globals.AF.Manager.ResetLoadClassifierAsyncLazy(engine.EngineName, loader);
-        //            }
+        //            } 
         //        }
         //    }
         //}

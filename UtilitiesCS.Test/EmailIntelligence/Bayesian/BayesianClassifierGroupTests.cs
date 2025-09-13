@@ -11,7 +11,7 @@ using System.Linq;
 using FluentAssertions;
 
 
-namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
+namespace UtilitiesCS.Test.EmailIntelligence
 {
     [TestClass]
     public class BayesianClassifierGroupTests
@@ -29,9 +29,9 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         public void PythonIntegrationTest()
         {
             var group = new BayesianClassifierGroup();
-            group.AddOrUpdateClassifier("ham", new string[] { "a", "b", "c" }, 1);
-            group.AddOrUpdateClassifier("ham", new string[] { "a", "b" }, 1);
-            group.AddOrUpdateClassifier("spam", new string[] { "c", "d" }, 1);
+            group.Train("ham", new string[] { "a", "b", "c" }, 1);
+            group.Train("ham", new string[] { "a", "b" }, 1);
+            group.Train("spam", new string[] { "c", "d" }, 1);
 
             List<BayesianClassifierShared.WordStream> wordStreams =
             [
@@ -62,10 +62,10 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 
         }
 
-        private SubClassifierGroup CreateBayesianClassifierGroup()
-        {
-            return new SubClassifierGroup();
-        }
+        //private SubClassifierGroup CreateBayesianClassifierGroup()
+        //{
+        //    return new SubClassifierGroup();
+        //}
 
         //[TestMethod]
         //public void AddOrUpdateClassifier_StateUnderTest_ExpectedBehavior()

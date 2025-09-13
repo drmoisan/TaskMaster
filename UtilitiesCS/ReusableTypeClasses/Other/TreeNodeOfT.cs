@@ -166,11 +166,24 @@ namespace UtilitiesCS
             }
             
         }
-        
+
+        public TreeNode<T>[] GetLeavesAtMaxDepth() 
+        {
+            var leaves = Leaves();
+            var maxDepth = leaves.Max(x => x.Depth);
+            return leaves.Where(x => x.Depth == maxDepth).ToArray();
+        }
+
         public TreeNode<T>[] GetNextLevel(TreeNode<T>[] nodes) 
         { 
             if (nodes is null) { return null; }
             return nodes.Where(x => !x.Children.IsNullOrEmpty()).SelectMany(x => x.Children).ToArray();
+        }
+
+        public TreeNode<T>[] GetPreviousLevel(TreeNode<T>[] nodes)
+        {
+            if (nodes is null) { return null; }
+            return nodes.Where(x => x.Parent is not null).Select(x => x.Parent).Distinct().ToArray();
         }
 
         public IEnumerable<TreeNode<T>> FindAll(Func<T, bool> comparator)
@@ -192,6 +205,11 @@ namespace UtilitiesCS
         public IEnumerable<T> Flatten()
         {
             return new[] { Value }.Concat(Children.SelectMany(x => x.Flatten()));
+        }
+
+        public IEnumerable<TreeNode<T>> FlattenNodes()
+        {
+            return new[] { this }.Concat(Children.SelectMany(x => x.FlattenNodes()));
         }
 
         public IEnumerable<T> FlattenIf(Func<T, bool> comparator)
@@ -241,6 +259,32 @@ namespace UtilitiesCS
             action(Value);
             if (Parent is not null)
                 Parent.TraverseAncestors(action);
+        }
+
+        public void TraverseByLevel(bool down, Action<TreeNode<T>> action) 
+        {
+            if (down) 
+            { 
+                TreeNode<T>[] nodes = [this];
+                do
+                {
+                    nodes.ForEach(node => action(node));
+                    nodes = GetNextLevel(nodes);
+                } while (nodes.Length > 0);
+            }
+            else 
+            { 
+                var initialDepth = Depth;
+                var nodes = GetLeavesAtMaxDepth();
+                var depth = nodes.FirstOrDefault()?.Depth ?? -1;
+                
+                while (depth >= initialDepth)
+                {
+                    nodes.ForEach(node => action(node));
+                    nodes = GetPreviousLevel(nodes);
+                    depth = nodes.FirstOrDefault()?.Depth ?? -1;
+                }                
+            }
         }
 
         public void TraverseAncestors(Action<TreeNode<T>> action)

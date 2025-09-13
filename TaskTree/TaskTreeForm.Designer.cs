@@ -73,12 +73,12 @@ namespace TaskTree
             this.ContextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ToolStripMenuItem1});
             this.ContextMenuStrip1.Name = "ContextMenuStrip1";
-            this.ContextMenuStrip1.Size = new System.Drawing.Size(148, 42);
+            this.ContextMenuStrip1.Size = new System.Drawing.Size(104, 26);
             // 
             // ToolStripMenuItem1
             // 
             this.ToolStripMenuItem1.Name = "ToolStripMenuItem1";
-            this.ToolStripMenuItem1.Size = new System.Drawing.Size(147, 38);
+            this.ToolStripMenuItem1.Size = new System.Drawing.Size(103, 22);
             this.ToolStripMenuItem1.Text = "Open";
             // 
             // FlowLayoutPanel1
@@ -89,17 +89,15 @@ namespace TaskTree
             this.FlowLayoutPanel1.Controls.Add(this.But_ShowHideComplete);
             this.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.FlowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.FlowLayoutPanel1.Margin = new System.Windows.Forms.Padding(6);
             this.FlowLayoutPanel1.Name = "FlowLayoutPanel1";
-            this.FlowLayoutPanel1.Size = new System.Drawing.Size(2738, 50);
+            this.FlowLayoutPanel1.Size = new System.Drawing.Size(1369, 50);
             this.FlowLayoutPanel1.TabIndex = 1;
             // 
             // But_ReloadTree
             // 
-            this.But_ReloadTree.Location = new System.Drawing.Point(6, 6);
-            this.But_ReloadTree.Margin = new System.Windows.Forms.Padding(6);
+            this.But_ReloadTree.Location = new System.Drawing.Point(3, 3);
             this.But_ReloadTree.Name = "But_ReloadTree";
-            this.But_ReloadTree.Size = new System.Drawing.Size(234, 44);
+            this.But_ReloadTree.Size = new System.Drawing.Size(117, 23);
             this.But_ReloadTree.TabIndex = 0;
             this.But_ReloadTree.Text = "Reload Tree";
             this.But_ReloadTree.UseVisualStyleBackColor = true;
@@ -107,10 +105,9 @@ namespace TaskTree
             // 
             // But_ExpandCollapse
             // 
-            this.But_ExpandCollapse.Location = new System.Drawing.Point(252, 6);
-            this.But_ExpandCollapse.Margin = new System.Windows.Forms.Padding(6);
+            this.But_ExpandCollapse.Location = new System.Drawing.Point(126, 3);
             this.But_ExpandCollapse.Name = "But_ExpandCollapse";
-            this.But_ExpandCollapse.Size = new System.Drawing.Size(234, 44);
+            this.But_ExpandCollapse.Size = new System.Drawing.Size(117, 23);
             this.But_ExpandCollapse.TabIndex = 1;
             this.But_ExpandCollapse.Text = "Expand / Collapse All";
             this.But_ExpandCollapse.UseVisualStyleBackColor = true;
@@ -118,10 +115,9 @@ namespace TaskTree
             // 
             // But_ShowHideComplete
             // 
-            this.But_ShowHideComplete.Location = new System.Drawing.Point(498, 6);
-            this.But_ShowHideComplete.Margin = new System.Windows.Forms.Padding(6);
+            this.But_ShowHideComplete.Location = new System.Drawing.Point(249, 3);
             this.But_ShowHideComplete.Name = "But_ShowHideComplete";
-            this.But_ShowHideComplete.Size = new System.Drawing.Size(234, 44);
+            this.But_ShowHideComplete.Size = new System.Drawing.Size(117, 23);
             this.But_ShowHideComplete.TabIndex = 3;
             this.But_ShowHideComplete.Text = "Show/Hide Complete";
             this.But_ShowHideComplete.UseVisualStyleBackColor = true;
@@ -133,7 +129,6 @@ namespace TaskTree
             this.SplitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.SplitContainer1.IsSplitterFixed = true;
             this.SplitContainer1.Location = new System.Drawing.Point(0, 0);
-            this.SplitContainer1.Margin = new System.Windows.Forms.Padding(6);
             this.SplitContainer1.Name = "SplitContainer1";
             this.SplitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
@@ -147,8 +142,7 @@ namespace TaskTree
             // 
             this.SplitContainer1.Panel2.AccessibleName = "SplitContainer1Panel2";
             this.SplitContainer1.Panel2.Controls.Add(this.TreeLv);
-            this.SplitContainer1.Size = new System.Drawing.Size(2738, 915);
-            this.SplitContainer1.SplitterWidth = 8;
+            this.SplitContainer1.Size = new System.Drawing.Size(1369, 476);
             this.SplitContainer1.TabIndex = 2;
             // 
             // TreeLv
@@ -187,11 +181,10 @@ namespace TaskTree
             this.TreeLv.IsSimpleDragSource = true;
             this.TreeLv.IsSimpleDropSink = true;
             this.TreeLv.Location = new System.Drawing.Point(0, 0);
-            this.TreeLv.Margin = new System.Windows.Forms.Padding(6);
             this.TreeLv.Name = "TreeLv";
             this.TreeLv.ShowGroups = false;
             this.TreeLv.ShowImagesOnSubItems = true;
-            this.TreeLv.Size = new System.Drawing.Size(2738, 857);
+            this.TreeLv.Size = new System.Drawing.Size(1369, 422);
             this.TreeLv.SmallImageList = this.ImageList1;
             this.TreeLv.TabIndex = 0;
             this.TreeLv.UseCompatibleStateImageBehavior = false;
@@ -217,7 +210,7 @@ namespace TaskTree
             // 
             // OlvColumn1
             // 
-            this.OlvColumn1.AspectName = "Value.Project.AsStringNoPrefix";
+            this.OlvColumn1.AspectName = "Value.Projects.AsStringNoPrefix";
             this.OlvColumn1.DisplayIndex = 1;
             this.OlvColumn1.IsVisible = false;
             this.OlvColumn1.Text = "Project";
@@ -274,11 +267,10 @@ namespace TaskTree
             // 
             // TaskTreeForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2738, 915);
+            this.ClientSize = new System.Drawing.Size(1369, 476);
             this.Controls.Add(this.SplitContainer1);
-            this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "TaskTreeForm";
             this.Text = "TaskTreeForm";
             this.Load += new System.EventHandler(this.TaskTreeForm_Load);

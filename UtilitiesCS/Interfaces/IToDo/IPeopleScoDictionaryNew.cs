@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
-using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using ConcurrentObservableCollection.ConcurrentObservableDictionary;
 
 namespace UtilitiesCS
 {

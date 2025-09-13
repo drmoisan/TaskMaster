@@ -4,7 +4,7 @@ using System;
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
     [Serializable]
-    public class MinedMailInfo
+    public class MinedMailInfo : ICloneable
     {
         public MinedMailInfo() { }
         public MinedMailInfo(IItemInfo info)
@@ -19,6 +19,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             EntryId = info.EntryId;
             StoreId = info.StoreId;
             Subject = info.Subject;
+            Actionable = info.Actionable;
         }
 
         private string _categories;
@@ -27,8 +28,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         private string[] _tokens;
         public string[] Tokens { get => _tokens; set => _tokens = value; }
 
-        private IFolderInfo _folderInfo;
-        public IFolderInfo FolderInfo { get => _folderInfo; set => _folderInfo = value; }
+        private IFolderWrapper _folderInfo;
+        public IFolderWrapper FolderInfo { get => _folderInfo; set => _folderInfo = value; }
 
         private IRecipientInfo[] _toRecipients;
         public IRecipientInfo[] ToRecipients { get => _toRecipients; set => _toRecipients = value; }
@@ -50,6 +51,39 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         private string _subject;
         public string Subject { get => _subject; set => _subject = value; }
-    }
 
+        public string Actionable { get; set; }
+
+        internal string GroupingKey { get; set; }
+
+        #region IClonable
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
+
+        public MinedMailInfo DeepCopy()
+        {
+            var deepCopy = new MinedMailInfo
+            {
+                Categories = this.Categories,
+                Tokens = (string[])this.Tokens?.Clone(),
+                FolderInfo = this.FolderInfo, // Assuming IFolderInfo is immutable or has its own deep copy method
+                ToRecipients = (IRecipientInfo[])this.ToRecipients?.Clone(),
+                CcRecipients = (IRecipientInfo[])this.CcRecipients?.Clone(),
+                Sender = this.Sender, // Assuming IRecipientInfo is immutable or has its own deep copy method
+                ConversationId = this.ConversationId,
+                EntryId = this.EntryId,
+                StoreId = this.StoreId,
+                Subject = this.Subject,
+                Actionable = this.Actionable,
+                GroupingKey = this.GroupingKey
+            };
+
+            return deepCopy;
+
+            #endregion IClonable
+        }
+    }
 }

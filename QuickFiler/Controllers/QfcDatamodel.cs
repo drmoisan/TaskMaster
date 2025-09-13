@@ -1,21 +1,22 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Outlook = Microsoft.Office.Interop.Outlook;
+﻿using Deedle;
+using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Xml.Linq;
 using ToDoModel;
 using UtilitiesCS;
-using Deedle;
-using System.ComponentModel;
-using System.Windows.Forms;
-using System.Threading;
-using QuickFiler.Helper_Classes;
 using UtilitiesCS.ReusableTypeClasses;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 
 
@@ -113,30 +114,41 @@ namespace QuickFiler.Controllers
         public void SetupWorker(System.ComponentModel.BackgroundWorker worker) 
         {
             worker.WorkerSupportsCancellation = true;
+            
             _token.Register(() => worker.CancelAsync());
             worker.DoWork += new System.ComponentModel.DoWorkEventHandler(Worker_DoWork);
             //worker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(Worker_RunWorkerCompleted);
         }
 
-        private void Worker_DoWork(object sender, DoWorkEventArgs e)
+        private async void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            // Do not access the form's BackgroundWorker reference directly.
-            // Instead, use the reference provided by the sender parameter.
-            BackgroundWorker bw = sender as BackgroundWorker;
-
-            // Extract the argument.
-            //zxxint arg = (int)e.Argument;
-
-            // Start the time-consuming operation.
-            //e.Result = await LoadRemainingEmailsToQueueAsync(bw, _token);
-            e.Result = LoadRemainingEmailsToQueue(bw, _token);
-
-            // If the operation was canceled by the user,
-            // set the DoWorkEventArgs.Cancel property to true.
-            if (bw.CancellationPending)
+            try
             {
-                e.Cancel = true;
+
+                // Do not access the form's BackgroundWorker reference directly.
+                // Instead, use the reference provided by the sender parameter.            
+                BackgroundWorker bw = sender as BackgroundWorker;
+
+                // Extract the argument.
+                //zxxint arg = (int)e.Argument;
+
+                // Start the time-consuming operation.
+                //e.Result = await LoadRemainingEmailsToQueueAsync(bw, _token);
+                //e.Result = LoadRemainingEmailsToQueue(bw, _token);
+                e.Result = await LoadRemainingEmailsToQueueAsync(_token);
+
+                // If the operation was canceled by the user,
+                // set the DoWorkEventArgs.Cancel property to true.
+                if (bw.CancellationPending)
+                {
+                    e.Cancel = true;
+                }
             }
+            catch (System.Exception ex)
+            {
+                logger.Error($"Error in Worker_DoWork {ex.Message}", ex);
+            }
+
         }
 
         // This event handler demonstrates how to interpret
@@ -204,8 +216,50 @@ namespace QuickFiler.Controllers
 
             var emailList = await Task.Run(() => InitEmailQueue(batchSize, worker), token);
 
+
             return emailList;
         }
+
+        private async Task<bool> LoadRemainingEmailsToQueueAsync(CancellationToken cancel)
+        {
+            if ((_frame is null) || (_frame.RowCount == 0))
+            {
+                MessageBox.Show("Email Frame is empty");
+                return false;
+            }
+
+            // Cast Frame to array of IEmailInfo
+            var rows = await Task.Run(() => _frame.GetRowsAs<IEmailSortInfo>().Values.ToArray());
+                        
+            foreach (var row in rows)
+            {
+                try
+                {
+                    cancel.ThrowIfCancellationRequested();
+                    //var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
+                    var item = await Task.Run(() => _olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId), cancel);
+                    if (item is not null && item is MailItem mailItem)
+                    {
+                        _masterQueue.AddLast(mailItem);
+                        _moveMonitor.HookItem(mailItem, (x) => _masterQueue.Remove(x));
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    //logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
+                    return false;
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error($"{nameof(LoadRemainingEmailsToQueue)} Error. \n {e.Message}\n{e.StackTrace}");
+                    throw e;
+                }
+                await Task.Yield();
+            }
+            return true;
+
+        }
+
 
         private bool LoadRemainingEmailsToQueue(BackgroundWorker bw, CancellationToken token)
         {
@@ -420,6 +474,39 @@ namespace QuickFiler.Controllers
             throw new NotImplementedException();
         }
 
+        internal void TryUnhookOrReplace(ref List<MailItem> nodes, int i) 
+        {
+            if (nodes is null || nodes.Count == 0 || nodes.Count < i + 1) 
+            { 
+                logger.Error($"Error unhooking item from move monitor. No items in array or index out of range. nodes.Length = {nodes?.Count ?? 0} but index i = {i}");
+                return; 
+            }
+            var node = nodes[i];
+            bool processing = true;
+            while (processing)
+            {
+                try
+                {
+                    _moveMonitor.UnhookItem(node);                    
+                    processing = false;
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error($"Error unhooking item from move monitor. Getting next item from Queue {e.Message}");
+                    nodes.Remove(node);
+                    node = _masterQueue.TryTakeFirst();
+                    if (node is null)
+                    {
+                        processing = false;
+                    }
+                    else
+                    {
+                        nodes.Insert(i, node);
+                    }
+                }
+            }
+        }
+        
         public async Task<IList<MailItem>> DequeueNextItemGroupAsync(int quantity, int timeOut)
         {
             _token.ThrowIfCancellationRequested();
@@ -428,18 +515,45 @@ namespace QuickFiler.Controllers
                 await WaitForQueue(quantity, _token);
 
             var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
+            if (nodes is null) { return null; }
+
             try
-            {
-                if (nodes is not null)
+            {                                
+                await Task.Run(() => 
                 {
-                    await Task.Run(async () => 
+                    var max = nodes.Count;
+                    for (int i = 0; i < max; i++)
                     {
-                        foreach (var node in nodes)
-                        {
-                            await _moveMonitor.UnhookItemAsync(node, _token);
-                        }
-                    }, _token);                    
-                }
+                        TryUnhookOrReplace(ref nodes, i);
+                        //var node = nodes[i];
+                        //_token.ThrowIfCancellationRequested();
+                        //bool processing = true;
+                        //while (processing) 
+                        //{
+                        //    try
+                        //    {
+                        //        await _moveMonitor.UnhookItemAsync(node, _token);
+                        //        processing = false;
+                        //    }
+                        //    catch (System.Exception e)
+                        //    {
+                        //        logger.Error($"Error unhooking item from move monitor. Getting next item from Queue {e.Message}");                                    
+                        //        nodes.Remove(node);
+                        //        node = _masterQueue.TryTakeFirst();
+                        //        if (node is null) 
+                        //        {
+                        //            processing = false;
+                        //        }
+                        //        else
+                        //        {
+                        //            nodes.Insert(i, node);
+                        //        }
+                        //    }
+                        //}
+                            
+                    }                    
+                }, _token);                    
+               
                 
             }
             catch (System.Exception e)
@@ -449,6 +563,27 @@ namespace QuickFiler.Controllers
             }
             
             
+            return nodes;
+        }
+
+        public IList<MailItem> DequeueNextItemGroup(int quantity)
+        {
+            _token.ThrowIfCancellationRequested();
+
+            var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
+            try
+            {
+                var max = nodes.Count;
+                for (int i = 0; i < max; i++)
+                {
+                    TryUnhookOrReplace(ref nodes, i);
+                }                   
+            }
+            catch (System.Exception e)
+            {
+                logger.Error("Error unhooking items from move monitor", e);
+                throw;
+            }
             return nodes;
         }
 

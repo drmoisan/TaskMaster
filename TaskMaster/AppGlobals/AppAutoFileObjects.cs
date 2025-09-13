@@ -358,10 +358,8 @@ namespace TaskMaster
             return filters;
         }
         async private Task LoadFiltersAsync()
-        {
-            await Task.Factory.StartNew(
-                () => _filters = LoadFilters(),
-                CancelToken);
+        {            
+            await Task.Run(() => _filters = LoadFilters(), CancelToken);
         }
         private void ScoFilterEntry_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {

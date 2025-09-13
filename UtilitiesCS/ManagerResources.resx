@@ -117,6 +117,34 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Project" xml:space="preserve">
+    <value>{
+  "$id": "1",
+  "Engine": false,
+  "Globals": "default",
+  "Name": "Project",
+  "T": null,
+  "Config": {
+    "$id": "2",
+    "Disk": {
+      "FileName": "ManagerProject.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "LocalDisk": {
+      "FileName": "ManagerProject.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "NetDisk": {
+      "FileName": "ManagerProject.json",
+      "RelativePath": "",
+      "SpecialFolderName": "Flow"
+    },
+    "ClassifierActivated": true
+  }
+}</value>
+  </data>
   <data name="Folder" xml:space="preserve">
     <value>{
   "$id": "1",
@@ -194,6 +222,62 @@
     },
     "NetDisk": {
       "FileName": "ManagerTriage.json",
+      "RelativePath": "",
+      "SpecialFolderName": "Flow"
+    },
+    "ClassifierActivated": true
+  }
+}</value>
+  </data>
+  <data name="Context" xml:space="preserve">
+    <value>{
+  "$id": "1",
+  "Engine": false,
+  "Globals": "default",
+  "Name": "Context",
+  "T": null,
+  "Config": {
+    "$id": "2",
+    "Disk": {
+      "FileName": "ManagerContext.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "LocalDisk": {
+      "FileName": "ManagerContext.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "NetDisk": {
+      "FileName": "ManagerContext.json",
+      "RelativePath": "",
+      "SpecialFolderName": "Flow"
+    },
+    "ClassifierActivated": true
+  }
+}</value>
+  </data>
+  <data name="Actionable" xml:space="preserve">
+    <value>{
+  "$id": "1",
+  "Engine": true,
+  "Globals": "default",
+  "T": "UtilitiesCS.EmailIntelligence.ClassifierGroups.ActionableClassifierGroup, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+  "Name": "Actionable",
+  "Config": {
+    "$id": "2",
+    "Disk": {
+      "FileName": "ManagerActionable.json",
+      "RelativePath": "",
+      "SpecialFolderName": "Flow"
+    },
+    "LocalDisk": {
+      "FileName": "ManagerActionable.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "NetDisk": {
+      "FileName": "ManagerActionable.json",
       "RelativePath": "",
       "SpecialFolderName": "Flow"
     },

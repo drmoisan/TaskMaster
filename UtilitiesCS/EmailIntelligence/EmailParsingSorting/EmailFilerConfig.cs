@@ -97,7 +97,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         {
             currentFolder.ThrowIfNull();
 
-            if ((currentFolder.FolderPath != Globals.Ol.EmailRootPath) &&
+            if ((currentFolder.FolderPath != Globals.Ol.InboxPath) &&
                 (currentFolder.FolderPath.Contains(OlAncestor)) &&
                 (currentFolder.FolderPath != OlAncestor))
             {
@@ -137,7 +137,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         {
             try
             {
-                var destinationOlFolder = new OlFolderHelper(Globals).GetFolder(DestinationOlPath, Globals.Ol.App);
+                var destinationOlFolder = new FolderPredictor(Globals).GetFolder(DestinationOlPath, Globals.Ol.App);
                 return destinationOlFolder;
             }
             catch (System.Exception e)

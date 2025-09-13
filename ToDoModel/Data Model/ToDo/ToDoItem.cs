@@ -7,8 +7,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using log4net.Repository.Hierarchy;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic.ApplicationServices;
 using ToDoModel.Data_Model.ToDo;
@@ -44,13 +42,13 @@ namespace ToDoModel
         {
             FlaggableItem = flaggableItem;
             Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
-            InitializeOutlookItem(_flaggableItem);
+            InitializeOutlookItem(FlaggableItem);
             string argstrCats_All = FlaggableItem.Categories;
             Flags = new FlagParser(ref argstrCats_All);
-            var combined = Flags.Combine();
-            if (argstrCats_All != combined)
+            
+            if (!Flags.AreEquivalentTo(FlaggableItem.Categories))
             {
-                FlaggableItem.Categories = combined;
+                FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
                 FlaggableItem.Save();
             }
             InitializeCustomFields(FlaggableItem);
@@ -62,10 +60,14 @@ namespace ToDoModel
             Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
             if (!onDemand)
             {
-                InitializeOutlookItem(_flaggableItem);
+                InitializeOutlookItem(FlaggableItem);
                 string argstrCats_All = outlookItem.Categories;
                 Flags = new FlagParser(ref argstrCats_All);
-                outlookItem.Categories = argstrCats_All;
+                if (!Flags.AreEquivalentTo(FlaggableItem.Categories))
+                {
+                    FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
+                    FlaggableItem.Save();
+                }
                 InitializeCustomFields(FlaggableItem);
             }
         }
@@ -184,7 +186,7 @@ namespace ToDoModel
             var ro = ReadOnly;
             ReadOnly = false;
 
-            FlaggableItem.Categories = Flags.Combine();
+            FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
 
             FlaggableItem.TrySetUdf(GetUdfName(PrefixTypeEnum.Context), Context.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
             FlaggableItem.TrySetUdf(GetUdfName(PrefixTypeEnum.People), People.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
@@ -205,11 +207,20 @@ namespace ToDoModel
 
         private string GetUdfName(PrefixTypeEnum type) => Prefixes.Find(x => x.PrefixType == type).OlUserFieldName;
 
+        public async Task WriteFlagsBatchAsync(Enums.FlagsToSet flagsToSet)
+        {
+            await Task.Run(() => WriteFlagsBatch(flagsToSet));
+        }
+
         public void WriteFlagsBatch(Enums.FlagsToSet flagsToSet)
         {
             ToDoEvents.Editing.AddOrUpdate(OlItem.EntryID, 1, (key, existing) => existing + 1);
-
-            FlaggableItem.Categories = Flags.Combine();
+            
+            if (flagsToSet.HasAnyFlags([Enums.FlagsToSet.Context, Enums.FlagsToSet.People, Enums.FlagsToSet.Projects, 
+                Enums.FlagsToSet.Topics, Enums.FlagsToSet.Kbf, Enums.FlagsToSet.Today, Enums.FlagsToSet.Bullpin]))
+            {
+                FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
+            }
 
             if (flagsToSet.HasFlag(Enums.FlagsToSet.Context))
             {
@@ -306,95 +317,28 @@ namespace ToDoModel
 
         #region Public Properties
 
-        private List<IPrefix> _prefixes = new ToDoDefaults().PrefixList;
-        internal List<IPrefix> Prefixes => _prefixes;
+        internal List<IPrefix> Prefixes { get; } = new ToDoDefaults().PrefixList;
 
-        private Func<string, string> _projectsToPrograms;
-        public Func<string, string> ProjectsToPrograms { get => _projectsToPrograms; set => _projectsToPrograms = value; }
+        public Func<string, string> ProjectsToPrograms { get; set; }
+        
+        public IProjectData ProjectData { get; set; }
 
-        private IProjectData _projectData;
-        public IProjectData ProjectData { get => _projectData; set => _projectData = value; }
+        internal ToDoLoader Loader { get; private set; }
 
-        private ToDoLoader _loader;
-        internal ToDoLoader Loader { get => _loader; private set => _loader = value; }
+        public bool IdAutoCoding { get; set; }
 
-        public bool IdAutoCoding { get => _idAutoCoding; set => _idAutoCoding = value; }
-        private bool _idAutoCoding = true;
+        public IOutlookItem OlItem => FlaggableItem;
+        internal IOutlookItemFlaggable FlaggableItem { get; set; }
 
-        public IOutlookItem OlItem => _flaggableItem;
-        private IOutlookItemFlaggable _flaggableItem;
-        internal IOutlookItemFlaggable FlaggableItem { get => _flaggableItem; set => _flaggableItem = value; }
-
-        private IIDList _idList;
-        public IIDList IdList { get => _idList; set => _idList = value; }
+        public IIDList IdList { get; set; }
 
         /// <summary>
         /// Gets and Sets a flag that when true, prevents saving changes to the underlying [object]
         /// </summary>
         /// <returns>Boolean</returns>
-        public bool ReadOnly
-        {
-            get => _readonly;
-            set => _readonly = value;
-        }
-        private bool _readonly = false;
-        internal bool IsReadOnly() { return _readonly; }
-
-
-        public FlagParser Flags
-        {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get => Loader.GetOrLoad(ref _flags, () => _flags = FlagsLoader());
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            internal set
-            {
-                if (_flags is not null) { UnWireFlagParser(); }
-                _flags = value;
-                WireFlagParser();
-            }
-        }
-        internal FlagParser _flags;
-        private FlagParser FlagsLoader()
-        {
-            if (FlaggableItem is null)
-            {
-                var callerName = new StackTrace().GetFrame(1).GetMethod().Name;
-                throw new ArgumentNullException("Cannot get property " + callerName + " if both _flags AND olObject are Null");
-            }
-            var categories = FlaggableItem.Categories;
-            var flags = new FlagParser(ref categories);
-
-            if (FlaggableItem.Categories != categories)
-            {
-                //Question: Is this next line correct? Shouldn't it be FlaggableItem.Categories = flags.Combine???
-                FlaggableItem.Categories = categories;
-                FlaggableItem.Save();
-            };
-            return flags;
-        }
-        private void WireFlagParser()
-        {
-            _flags.CollectionChanged += FlagDetails_Changed;
-            _flags.ProjectsChanged += Projects_Changed;
-            _flags.ProgramChanged += Program_Changed;
-            _flags.PeopleChanged += People_Changed;
-            _flags.ContextChanged += Context_Changed;
-            _flags.TopicsChanged += Topics_Changed;
-            _flags.KbChanged += KB_Changed;
-        }
-
-        private void UnWireFlagParser()
-        {
-            _flags.CollectionChanged -= FlagDetails_Changed;
-            _flags.ProjectsChanged -= Projects_Changed;
-            _flags.ProgramChanged -= Program_Changed;
-            _flags.PeopleChanged -= People_Changed;
-            _flags.ContextChanged -= Context_Changed;
-            _flags.TopicsChanged -= Topics_Changed;
-            _flags.KbChanged -= KB_Changed;
-        }
-
-
+        public bool ReadOnly { get; set; } = false;       
+        internal bool IsReadOnly() { return ReadOnly; }
+                
         public bool FlagAsTask
         {
             get => (bool)Loader.GetOrLoad(ref _flagAsTask, () => FlaggableItem.Try().FlagAsTask, FlaggableItem);
@@ -419,13 +363,10 @@ namespace ToDoModel
             set
             {
                 Flags.Bullpin = value;
-                if (!ReadOnly)
+                if (!ReadOnly && FlaggableItem is not null)
                 {
-                    if (FlaggableItem is not null)
-                    {
-                        FlaggableItem.Categories = Flags.Combine();
-                        FlaggableItem.Save();
-                    }
+                    FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
+                    FlaggableItem.Save();                    
                 }
             }
         }
@@ -440,14 +381,10 @@ namespace ToDoModel
             set
             {
                 Flags.Today = value;
-                if (!ReadOnly)
+                if (!ReadOnly && FlaggableItem is not null)
                 {
-                    if (FlaggableItem is not null)
-                    {
-
-                        FlaggableItem.Categories = Flags.Combine();
-                        FlaggableItem.Save();
-                    }
+                    FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
+                    FlaggableItem.Save();                    
                 }
             }
         }
@@ -500,6 +437,62 @@ namespace ToDoModel
             set => Loader.SetAndSave(value, (x) => FlaggableItem.Categories = x);
         }
 
+        #region Flag Parser
+        public FlagParser Flags
+        {
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            get => Loader.GetOrLoad(ref _flags, () => _flags = FlagsLoader());
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            internal set
+            {
+                if (_flags is not null) { UnWireFlagParser(); }
+                _flags = value;
+                WireFlagParser();
+            }
+        }
+        internal FlagParser _flags;
+        private FlagParser FlagsLoader()
+        {
+            if (FlaggableItem is null)
+            {
+                var callerName = new StackTrace().GetFrame(1).GetMethod().Name;
+                throw new ArgumentNullException("Cannot get property " + callerName + " if both _flags AND olObject are Null");
+            }
+            var categories = FlaggableItem.Categories;
+            var flags = new FlagParser(ref categories);
+
+            if (FlaggableItem.Categories != categories)
+            {
+                //Question: Is this next line correct? Shouldn't it be FlaggableItem.Categories = flags.Combine???
+                FlaggableItem.Categories = categories;
+                FlaggableItem.Save();
+            }
+            ;
+            return flags;
+        }
+        private void WireFlagParser()
+        {
+            _flags.CollectionChanged += FlagDetails_Changed;
+            _flags.ProjectsChanged += Projects_Changed;
+            _flags.ProgramChanged += Program_Changed;
+            _flags.PeopleChanged += People_Changed;
+            _flags.ContextChanged += Context_Changed;
+            _flags.TopicsChanged += Topics_Changed;
+            _flags.KbChanged += KB_Changed;
+        }
+        private void UnWireFlagParser()
+        {
+            _flags.CollectionChanged -= FlagDetails_Changed;
+            _flags.ProjectsChanged -= Projects_Changed;
+            _flags.ProgramChanged -= Program_Changed;
+            _flags.PeopleChanged -= People_Changed;
+            _flags.ContextChanged -= Context_Changed;
+            _flags.TopicsChanged -= Topics_Changed;
+            _flags.KbChanged -= KB_Changed;
+        }
+        #endregion Flag Parser
+
+        #region Flag Translators
         internal FlagTranslator[] GetFlagTranslators()
         {
             return [People, Projects, Program, Context, Topics, KB];
@@ -524,6 +517,7 @@ namespace ToDoModel
             _topic = LoadTopic();
             _kb = LoadKb();
         }
+        #endregion Flag Translators
 
         #region People
 
@@ -625,7 +619,7 @@ namespace ToDoModel
             get => Loader.GetOrLoad(ref _toDoID, () => FlaggableItem.Try().GetUdfString("ToDoID"), FlaggableItem);
             set => Loader.SetAndSave(ref _toDoID, value, (x) =>
             {
-                if (!ReadOnly)
+                if (!ReadOnly && FlaggableItem is not null)
                 {
                     FlaggableItem.TrySetUdf("ToDoID", x);
                     if (!x.IsNullOrEmpty() && x.Length > 0) { SplitID(); }

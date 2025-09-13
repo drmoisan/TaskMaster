@@ -95,5 +95,15 @@ namespace UtilitiesCS.Test.Properties {
                 return ResourceManager.GetString("HtmlBodyLinks", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] pplkey {
+            get {
+                object obj = ResourceManager.GetObject("pplkey", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

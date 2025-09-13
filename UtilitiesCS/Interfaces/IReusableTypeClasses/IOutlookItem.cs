@@ -40,7 +40,7 @@ namespace UtilitiesCS
         bool Saved { get; }
         OlSensitivity Sensitivity { get; set; }
         NameSpace Session { get; }
-        long Size { get; }
+        int Size { get; }
         string Subject { get; set; }
         DateTime TaskStartDate { get; }
         bool UnRead { get; set; }

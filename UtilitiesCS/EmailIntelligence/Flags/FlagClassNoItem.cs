@@ -30,7 +30,7 @@ namespace UtilitiesCS
         public FlagClassNoItem(IList<string> categoryList)
         {
             Flags = new FlagParser(categoryList);
-            CategoryNames = Flags.Combine();
+            CategoryNames = Flags.Combined.AsStringWithPrefix;
             PropertyChanged += Handler_PropertyChanged;
         }
 
@@ -39,7 +39,7 @@ namespace UtilitiesCS
             _olCategories = categories.Cast<Category>().ToList();
             var categoryList = _olCategories.Select(c => c.Name).ToList();
             Flags = new FlagParser(categoryList);
-            CategoryNames = Flags.Combine();
+            CategoryNames = Flags.Combined.AsStringWithPrefix;
             PropertyChanged += Handler_PropertyChanged;
         }
 
@@ -48,7 +48,7 @@ namespace UtilitiesCS
             _olCategories = categories;
             var categoryList = categories.Select(c => c.Name).ToList();
             Flags = new FlagParser(categoryList);
-            CategoryNames = Flags.Combine();
+            CategoryNames = Flags.Combined.AsStringWithPrefix;
             PropertyChanged += Handler_PropertyChanged;
         }
 

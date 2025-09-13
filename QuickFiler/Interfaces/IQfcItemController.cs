@@ -15,11 +15,14 @@ namespace QuickFiler.Interfaces
 {
     public interface IQfcItemController
     {
+        void AssignFolderComboBox();
         /// <summary>
         /// Toggles special formatting for one group to highlight the group of controls that is active
-        /// </summary>
+        /// </summary>        
         Task InitializeAsync();
+        Task InitializeSequentialAsync();
         void Initialize(bool async);
+        Task LoadConversationResolverAsync(CancellationTokenSource tokenSource, CancellationToken token, bool loadAll);
         void ToggleFocus(); // Turn on or off the formatting to highlight this QfcItem
         void ToggleFocus(Enums.ToggleState desiredState);
         Task ToggleFocusAsync();
@@ -30,7 +33,7 @@ namespace QuickFiler.Interfaces
         bool IsActiveUI { get; set; }
         string ConvOriginID { get; set; }
         int Height { get; }
-        MailItemHelper ItemInfo { get; set; }
+        MailItemHelper ItemHelper { get; set; }
         MailItem Mail { get; set; }
         void ToggleExpansion(); 
         string SelectedFolder { get; }
@@ -55,6 +58,10 @@ namespace QuickFiler.Interfaces
         void PopulateConversation(int countOnly);
         void PopulateConversation(ConversationResolver resolver);
         Task PopulateFolderComboBoxAsync(CancellationToken token, object varList = null);
+        Task LoadFolderHandlerAsync(CancellationToken cancel, object varList = null);
+        void PopulateControls(MailItemHelper helper, int viewerPosition);
+        void RenderConversationCount(int count);
+        void RenderConversationCount();
         void SetThemeDark(bool async);
         void SetThemeLight(bool async);
         void Cleanup();
@@ -74,7 +81,9 @@ namespace QuickFiler.Interfaces
         void ToggleTips(bool async, Enums.ToggleState desiredState);
         Task ToggleExpansionAsync();
         Task ToggleFocusAsync(Enums.ToggleState off);
+        public CancellationToken Token { get; set; }
 
         public Dictionary<string, System.Action> RightKeyActions { get; }
+        Task InitializeGraphicsAsync();
     }
 }

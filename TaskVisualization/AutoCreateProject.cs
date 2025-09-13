@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Tags;
 using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories;
 using UtilitiesCS.Extensions;
 
 namespace TaskVisualization
@@ -124,6 +125,45 @@ namespace TaskVisualization
         {
             // TODO: Link this to the Bayesian project prediction model
             throw new NotImplementedException();
+            
+        }
+
+        public async Task<IList<string>> AutoFindAsync(object objItem)
+        {
+            var helper = await ToHelper(objItem);
+            if (helper is null) { return []; }
+
+            var project = await CategoryClassifierGroup.CreateEngineAsync(_globals, "Project", default).ConfigureAwait(true);
+            project.ProbabilityThreshold = 0.2;
+
+            var results = (await project.GetMatchingCategoriesAsync(helper)).ToList();
+            return results;
+        }
+
+        private async Task<MailItemHelper> ToHelper(object objItem)
+        {
+            MailItemHelper helper = null;
+            if (objItem is MailItemHelper mailItemHelper)
+            {
+                helper = mailItemHelper;
+            }
+            else if (objItem is OutlookItem olItem)
+            {
+                if (olItem.InnerObject is MailItem mailItem)
+                {
+                    helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false).ConfigureAwait(true);                    
+                }
+            }
+            else if (objItem is MailItem mailItem)
+            {
+                helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false).ConfigureAwait(true);                
+            }
+            if (helper is null) { return null; }
+            else
+            {
+                await Task.Run(() => _ = helper.Tokens).ConfigureAwait(true);
+                return helper;
+            }
         }
     }
 

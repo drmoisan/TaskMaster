@@ -246,5 +246,19 @@ namespace TaskVisualization
                 e.IsInputKey = true;
             }
         }
+
+        private async void AutoTagButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                await _controller.AutoAssignAllAsync().ConfigureAwait(true);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
+        }
     }
 }

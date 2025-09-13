@@ -122,7 +122,7 @@
   "$id": "1",
   "Engine": false,
   "Globals": "default",
-  "T": "ToDoModel.Data_Model.People.PeopleScoDictionaryNew, ToDoModel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+  "T": "ToDoModel.Data_Model.People.PeopleScoDictionaryNew, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
   "Config": {
     "$id": "2",
     "Disk": {
@@ -171,6 +171,35 @@
     },
     "ClassifierActivated": true
   }
+}</value>
+  </data>
+  <data name="StoresWrapper" xml:space="preserve">
+    <value>{
+  "$id": "1",
+  "Engine": false,
+  "Globals": "default",
+  "T": "UtilitiesCS.OutlookObjects.Store.StoresWrapper, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+  "Config": {
+    "$id": "2",
+    "Disk": {
+      "FileName": "StoresWrapper.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "LocalDisk": {
+      "FileName": "StoresWrapper.json",
+      "RelativePath": "",
+      "SpecialFolderName": "AppData"
+    },
+    "NetDisk": {
+      "FileName": "StoresWrapper.json",
+      "RelativePath": "",
+      "SpecialFolderName": "Flow"
+    },
+    "ClassifierActivated": true,
+    "ActiveDisk": 1
+  },
+  "Name": "StoresWrapper"
 }</value>
   </data>
 </root>

@@ -1,4 +1,4 @@
-﻿namespace ConcurrentObservableCollections.ConcurrentObservableDictionary
+﻿namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
 {
     public interface IDictionaryObserver<TKey, TValue>
     {

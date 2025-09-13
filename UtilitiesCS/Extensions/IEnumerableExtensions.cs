@@ -52,6 +52,24 @@ namespace UtilitiesCS
             }
         }
 
+        public static (int DifferenceCount, IEnumerable<T> OnlyThis, IEnumerable<T> OnlyOther) CompareTo<T>(this IEnumerable<T> enumerable, IEnumerable<T> other)
+        {
+            if (enumerable is null)
+            {
+                if (other is null) { throw new ArgumentException($"Cannot compare differences because both {nameof(IEnumerable<T>)} parameters were null"); }
+                else { return (other.Count(), [], [.. other]); }
+            }
+            else if (other is null) { return (enumerable.Count(), [.. enumerable], []); }
+            else
+            {
+                var onlyThis = enumerable.Except(other);
+                var onlyOther = other.Except(enumerable);
+                var differenceCount = onlyThis.Count() + onlyOther.Count();
+                return (differenceCount, onlyThis, onlyOther);
+            }
+        }
+
+
         //public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
         //{
         //    foreach (T item in enumerable)

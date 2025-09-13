@@ -1,15 +1,16 @@
-﻿using Outlook = Microsoft.Office.Interop.Outlook;
+﻿using Deedle;
+using Microsoft.Office.Interop.Outlook;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UtilitiesCS;
-using Microsoft.Office.Interop.Outlook;
-using Deedle;
-using System.Windows.Forms;
-using UtilitiesCS.OutlookExtensions;
 using System.Web.UI.WebControls;
+using System.Windows.Forms;
+using UtilitiesCS;
+using UtilitiesCS.OutlookExtensions;
+using UtilitiesCS.OutlookObjects.Fields;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace ToDoModel
 {
@@ -117,9 +118,9 @@ namespace ToDoModel
                                                 removeColumns: null, 
                                                 addColumns: new string[]
                                                 {
-                                                    OlTableExtensions.SchemaToDoID,
+                                                    MAPIFields.Schemas.ToDoID,
                                                     "Categories",
-                                                    OlTableExtensions.SchemaMessageStore
+                                                    MAPIFields.Schemas.MessageStore
                                                 });
 
             df = df.FillMissing("ERROR");
@@ -146,7 +147,7 @@ namespace ToDoModel
 
         public IAsyncEnumerable<IToDoItem> GetItemsWithRootIdAsync(string rootId) 
         {
-            var strFilter = $"@SQL={OlTableExtensions.SchemaToDoID} like '{rootId}%'";
+            var strFilter = $"@SQL={MAPIFields.Schemas.ToDoID} like '{rootId}%'";
             var items = _olApp.Session.Stores
                 ?.Cast<Store>()
                 ?.ToAsyncEnumerable()
@@ -188,9 +189,9 @@ namespace ToDoModel
                                                     removeColumns: null, 
                                                     addColumns:
                                                     [
-                                                        OlTableExtensions.SchemaToDoID,
+                                                        MAPIFields.Schemas.ToDoID,
                                                         "Categories",
-                                                        OlTableExtensions.SchemaMessageStore
+                                                        MAPIFields.Schemas.MessageStore
                                                     ]);
 
                 df = df.FillMissing("");
@@ -222,9 +223,17 @@ namespace ToDoModel
         {
             var _dataModel = new TreeOfToDoItems();
             _dataModel.LoadTree(TreeOfToDoItems.LoadOptions.vbLoadAll, appGlobals);
+            var flat = _dataModel.TryFlatten()?.Select(x => x.ToDoID).ToList();
+            if (flat is not null)
+            {
+                this.FromList(flat);
+            }
+            
             _dataModel.ReNumberIDs(this);
+            this.Sort();
+            this.Serialize();
         }
-
+               
         public void SetOlApp(Outlook.Application olApp) { _olApp = olApp; }
     }
 }

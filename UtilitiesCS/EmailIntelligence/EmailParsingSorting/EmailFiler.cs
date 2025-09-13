@@ -136,7 +136,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
                 await LabelAutoSortedAsync(mailItemTemp);
                 PushToUndoStack(mailItemOriginal, mailItemTemp);
                 await Task.WhenAll(trainingTasks).ConfigureAwait(false);
-                await Task.Run(() => CaptureMoveDetails(mailItemOriginal, mailItemTemp)).ConfigureAwait(false);
+                await Task.Run(() => CaptureMoveDetails(mailHelper)).ConfigureAwait(false);
             }
             
         }
@@ -147,15 +147,25 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             Globals.AF.MovedMails.Push(info);
         }
 
-        private void CaptureMoveDetails(MailItem mailItem, MailItem oMailTmp)
+        private void CaptureMoveDetails(MailItemHelper helper)
         {
             //TraceUtility.LogMethodCall(mailItem, oMailTmp, _globals);
 
-            string[] strAry = oMailTmp.Details(Globals.Ol.ArchiveRootPath).Skip(1).ToArray();
+            string[] strAry = helper.Details().Skip(1).ToArray();
             var output = SanitizeArrayLineTSV(ref strAry);
 
             Globals.Ol.EmailMoveWriter.Enqueue(output);
         }
+
+        //private void CaptureMoveDetails(MailItem mailItem, MailItem oMailTmp)
+        //{
+        //    //TraceUtility.LogMethodCall(mailItem, oMailTmp, _globals);
+
+        //    string[] strAry = oMailTmp.Details(Globals.Ol.ArchiveRootPath).Skip(1).ToArray();
+        //    var output = SanitizeArrayLineTSV(ref strAry);
+
+        //    Globals.Ol.EmailMoveWriter.Enqueue(output);
+        //}
 
         private string SanitizeArrayLineTSV(ref string[] strOutput)
         {
@@ -183,7 +193,8 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         {
             var tasks = new List<Task>()
             {
-                Task.Run(async() =>(await Globals.AF.Manager["Folder"]).AddOrUpdateClassifier(Config.DestinationOlStem, mailHelper.Tokens, 1)),
+                Task.Run(async() =>(await Globals.AF.Manager["Folder"]).Train(Config.DestinationOlStem, mailHelper.Tokens, 1)),
+                Task.Run(async() =>(await Globals.AF.Manager["Actionable"]).Train(mailHelper.Actionable, mailHelper.Tokens, 1)),
                 Task.Run(() => Globals.AF.SubjectMap.Add(mailHelper.Subject, Config.DestinationOlStem)),
                 Task.Run(() => Globals.AF.RecentsList.AddOrMoveFirst(Config.DestinationOlStem, 5))
             };

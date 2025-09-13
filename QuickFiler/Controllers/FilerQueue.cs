@@ -15,7 +15,7 @@ namespace QuickFiler.Controllers
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        internal BlockingCollection<FilerQueueItem> Queue { get; private set; } = new BlockingCollection<FilerQueueItem>();
+        internal BlockingCollection<FilerQueueItem> Queue { get; private set; } = [];
 
         public void Enqueue(FilerQueueItem item)
         {

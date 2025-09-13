@@ -1,9 +1,12 @@
-﻿using System;
-using Office = Microsoft.Office.Core;
+﻿using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic;
-using System.Windows.Forms;
+using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using UtilitiesCS.EmailIntelligence;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups;
+using Office = Microsoft.Office.Core;
 
 namespace TaskMaster
 {
@@ -83,7 +86,7 @@ namespace TaskMaster
         
         public async void BtnShowHeadersNoChildren_Click(Office.IRibbonControl control)
         {
-            await _controller.HideHeadersNoChildrenAsync();
+            await _controller.ShowHeadersNoChildrenAsync();
         }
 
         public void BtnRefreshIDList_Click(Office.IRibbonControl control)
@@ -148,6 +151,7 @@ namespace TaskMaster
         public bool SavePictures_GetPressed(Office.IRibbonControl control) => _controller.IsSavePicturesActive();
         public void SavePictures_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleSavePictures();
 
+        public void FolderSettings_Click(Office.IRibbonControl control) => _controller.FolderStoresSettings();
 
         #endregion SettingsMenu
 
@@ -164,11 +168,14 @@ namespace TaskMaster
         #region Folder Classifier
 
         public async void ScrapeAndMine_Click(Office.IRibbonControl control) => await _controller.ScrapeAndMineAsync();
+        public async void BuildFolderClassifier_Click(Office.IRibbonControl control) => await _controller.BuildFolderClassifierAsync();
+        public async void BuildCategoryClassifier_Click(Office.IRibbonControl control) => await _controller.BuildCategoryClassifierAsync();
+        public async void BuildActionableClassifier_Click(Office.IRibbonControl control) => await _controller.BuildActionableClassifierAsync();
 
         #endregion Folder Classifier
 
         #region Spam Manager
-        
+
         public async void ClearSpam_Click(Office.IRibbonControl control) => await Controller.ClearSpamManagerAsync();
         public async void TrainSpam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, true);         
         public async void TrainHam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, false); 
@@ -192,12 +199,15 @@ namespace TaskMaster
         #region Triage
 
         public async void TriageSelection_Click(Office.IRibbonControl control) => await _controller.TriageSelectionAsync();
-        public async void TriageSetA_Click(Office.IRibbonControl control) => await _controller.TriageSetAAsync();
-        public async void TriageSetB_Click(Office.IRibbonControl control) => await _controller.TriageSetBAsync();
-        public async void TriageSetC_Click(Office.IRibbonControl control) => await _controller.TriageSetCAsync();
+        public async void TriageSetA_Click(Office.IRibbonControl control) => await _controller.Triage.OlLogic.TrainSelectionAsync("A");
+        public async void TriageSetB_Click(Office.IRibbonControl control) => await _controller.Triage.OlLogic.TrainSelectionAsync("B");
+        public async void TriageSetC_Click(Office.IRibbonControl control) => await _controller.Triage.OlLogic.TrainSelectionAsync("C");
+        //public async void TriageSetA_Click(Office.IRibbonControl control) => await _controller.TriageSetAAsync();
+        //public async void TriageSetB_Click(Office.IRibbonControl control) => await _controller.TriageSetBAsync();
+        //public async void TriageSetC_Click(Office.IRibbonControl control) => await _controller.TriageSetCAsync();
         public async void ClearTriage_Click(Office.IRibbonControl control) => await _controller.ClearTriageAync();
         public async void SetPrecision_Click(Office.IRibbonControl control) => await _controller.TriageSetPrecision();
-
+        public async void FilterViewer_Click(Office.IRibbonControl control) => await _controller.Triage.OlLogic.FilterViewAsync();
         #region Triage Config
 
         public void TriageEnabled_Click(Office.IRibbonControl control, bool pressed) => Controller.Engines.ToggleEngineAsync("Triage");
@@ -209,6 +219,8 @@ namespace TaskMaster
         #endregion Triage Config
 
         #endregion Triage
+
+        public async void CompareFolders_Click(Office.IRibbonControl control) => await _controller.CompareFoldersAsync();
 
         #region TryMethods  
         public void NewTaskHeader_Click(Office.IRibbonControl control) => _controller.Try.TryNewTaskHeader();
@@ -228,7 +240,7 @@ namespace TaskMaster
         public void ShowSubjectMapMetrics_Click(Office.IRibbonControl control) => _controller.Try.ShowSubjectMapMetrics();
         public async void TokenizeEmail_Click(Office.IRibbonControl control) => await _controller.Try.TryTokenizeEmail();
         public async void MineEmails_Click(Office.IRibbonControl control) => await _controller.Try.TryMineEmails();
-        public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.Try.TryBuildClassifier();        
+        public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.Try.TryBuildClassifier();                
         public void PrintManagerState_Click(Office.IRibbonControl control) => _controller.Try.TryPrintManagerState();
         public void SerializeMailInfo_Click(Office.IRibbonControl control) => _controller.Try.TrySerializeMailInfo();
         public void TryGetInboxes_Click(Office.IRibbonControl control) => _controller.Try.TryGetInboxes();
@@ -236,6 +248,8 @@ namespace TaskMaster
 
         public void DeleteTriageSpamFields_Click(Office.IRibbonControl control) => _controller.TryDeleteTriageSpamFields();
         public async void Intelligence_Click(Office.IRibbonControl control) => await _controller.IntelligenceAsync();
+
+        public void GetFolderInfo_Click(Office.IRibbonControl control) => _controller.GetFolderInfo();
 
         #region Helpers
 

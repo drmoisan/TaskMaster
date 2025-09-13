@@ -1,20 +1,21 @@
 ﻿using Deedle;
 using Microsoft.Office.Interop.Outlook;
-using Outlook = Microsoft.Office.Interop.Outlook;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UtilitiesCS.ReusableTypeClasses;
-using UtilitiesCS.OutlookExtensions;
 using System.Data;
-using System.Threading;
-using System.Windows;
-using UtilitiesCS;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Newtonsoft.Json.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using UtilitiesCS;
+using UtilitiesCS.OutlookExtensions;
+using UtilitiesCS.OutlookObjects.Fields;
+using UtilitiesCS.ReusableTypeClasses;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
@@ -86,8 +87,10 @@ namespace UtilitiesCS
             //(PrettyPrinters.ArraytoDatatable(data, columnInfo.Keys.Cast<string>().ToArray())).DisplayDialog();
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(Email2dArrayToDf)} ...");
-            Frame<int, string> df = await Task.Factory.StartNew(() => Email2dArrayToDf(storeID, data, columnInfo),
-                token, TaskCreationOptions.LongRunning, TaskScheduler.Default).TimeoutAfter(1000, 2);
+            Frame<int, string> df = await Task.Run(() => Email2dArrayToDf(storeID, data, columnInfo),
+                token).TimeoutAfter(1000, 2);
+            //Frame<int, string> df = await Task.Factory.StartNew(() => Email2dArrayToDf(storeID, data, columnInfo),
+            //    token, TaskCreationOptions.LongRunning, TaskScheduler.Default).TimeoutAfter(1000, 2);
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(GetEmailDataInViewAsync)} complete");
             progress.Report(100);
@@ -162,8 +165,8 @@ namespace UtilitiesCS
         private static void AddQfcColumns(Table table)
         {
             table.Columns.Add("SentOn");
-            table.Columns.Add(OlTableExtensions.SchemaConversationId);
-            table.Columns.Add(OlTableExtensions.SchemaTriage);
+            table.Columns.Add(MAPIFields.Schemas.ConversationId);
+            table.Columns.Add(MAPIFields.Schemas.Triage);
             table.Columns.Remove("Subject");
             table.Columns.Remove("CreationTime");
             table.Columns.Remove("LastModificationTime");
@@ -173,10 +176,7 @@ namespace UtilitiesCS
         {
             try
             {
-                await Task.Factory.StartNew(() => AddQfcColumns(table),
-                token,
-                TaskCreationOptions.LongRunning,
-                TaskScheduler.Default).TimeoutAfter(3000);
+                await Task.Run(() => AddQfcColumns(table), token).TimeoutAfter(3000);
             }
             catch (TaskCanceledException)
             {

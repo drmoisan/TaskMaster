@@ -1,6 +1,6 @@
-﻿using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+﻿using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 
-namespace ConcurrentObservableCollections.Tests
+namespace ConcurrentObservableCollection.Tests
 {
     public class SimpleObserver : IDictionaryObserver<string, double>
     {

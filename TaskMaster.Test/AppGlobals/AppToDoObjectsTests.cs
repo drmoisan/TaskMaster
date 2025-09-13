@@ -13,7 +13,7 @@ using System.Threading;
 using System.Collections.Specialized;
 using FluentAssertions;
 using System.Linq;
-using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using System.Reflection;
 
 namespace TaskMaster.Test.AppGlobals
@@ -34,8 +34,6 @@ namespace TaskMaster.Test.AppGlobals
 
         private MockRepository mockRepository;
         private Mock<IApplicationGlobals> mockApplicationGlobals;
-        //private Mock<AppAutoFileObjects> mockAutoFileObjects;
-        //private AppFileSystemFolderPaths appFP;
         private Mock<IntelligenceConfig> mockIntelligenceConfig;
         private Mock<ISmartSerializableNonTyped> mockSmartSerializable;
 

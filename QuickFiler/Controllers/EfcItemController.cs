@@ -692,19 +692,21 @@ namespace QuickFiler.Controllers
             
             if (desiredState == Enums.ToggleState.On)
             {
-                await Task.Factory.StartNew(
-                    () => ToggleExpansionOn(), 
-                    default, 
-                    TaskCreationOptions.None, 
-                    _itemViewer.UiScheduler);
+                await _itemViewer.UiDispatcher.InvokeAsync(ToggleExpansionOn);
+                //await Task.Factory.StartNew(
+                //    () => ToggleExpansionOn(),
+                //    default,
+                //    TaskCreationOptions.None,
+                //    _itemViewer.UiScheduler);
             }
             else
             {
-                await Task.Factory.StartNew(
-                    () => ToggleExpansionOff(), 
-                    default, 
-                    TaskCreationOptions.None, 
-                    _itemViewer.UiScheduler);
+                await _itemViewer.UiDispatcher.InvokeAsync(ToggleExpansionOff);
+                //await Task.Factory.StartNew(
+                //    () => ToggleExpansionOff(), 
+                //    default, 
+                //    TaskCreationOptions.None, 
+                //    _itemViewer.UiScheduler);
             }
         }
 

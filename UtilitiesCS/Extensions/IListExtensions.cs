@@ -84,6 +84,23 @@ namespace UtilitiesCS
             }
         }
 
+        public static (int DifferenceCount, IList<T> OnlyThis, IList<T> OnlyOther) CompareTo<T>(this IList<T> list, IList<T> other)
+        {
+            if (list is null)
+            {
+                if (other is null) { throw new ArgumentException($"Cannot compare differences because both lists were null"); }
+                else { return (other.Count, [], [.. other]); }
+            }
+            else if (other is null) { return (list.Count, [.. list], []); }
+            else
+            {
+                var onlyThis = list.Except(other).ToList();
+                var onlyOther = other.Except(list).ToList();
+                var differenceCount = onlyThis.Count + onlyOther.Count;
+                return (differenceCount, onlyThis, onlyOther);
+            }
+        }
+
         public static int[] FindIndices<T>(this IList<T> list, Predicate<T> match)
         {
             return list.FindIndices(0, list.Count, match);
@@ -197,5 +214,18 @@ namespace UtilitiesCS
         }
 
         public static bool IsNullOrEmpty(this IList<string> list) => list is null || list.Count == 0;
+
+        public static (IList<T> Unique, IList<T> Duplicates) Split<T>(this IList<T> list, IEqualityComparer<T> comparer)
+        {
+            if (list == null)
+                return (new List<T>(), new List<T>());
+            if (comparer == null)
+                comparer = EqualityComparer<T>.Default;
+
+            var groups = list.GroupBy(x => x, comparer);
+            var unique = groups.Where(g => g.Count() == 1).SelectMany(g => g).ToList();
+            var duplicates = groups.Where(g => g.Count() > 1).SelectMany(g => g).ToList();
+            return (unique, duplicates);
+        }
     }
 }

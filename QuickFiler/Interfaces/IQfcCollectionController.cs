@@ -13,9 +13,10 @@ namespace QuickFiler.Interfaces
     public interface IQfcCollectionController
     {
         // Public Properties
-        
+        List<QfcItemGroup> ItemGroups { get; set; }
 
         // UI Add and Remove QfcItems
+        Task LoadSecondaryAsync();
         void LoadControlsAndHandlers_01(IList<MailItem> listObjects, RowStyle template, RowStyle templateExpanded);
         void LoadControlsAndHandlers_01(TableLayoutPanel tlp, List<QfcItemGroup> itemGroups);
         Task LoadControlsAndHandlers_01Async(IList<MailItem> listObjects, RowStyle template, RowStyle templateExpanded);
@@ -55,6 +56,14 @@ namespace QuickFiler.Interfaces
         int EmailsToMove { get; }
         bool ReadyForMove { get; }
         void ResetPanelHeight();
+
+        // Navigation
+        void UnregisterNavigation();
+        void RegisterNavigation();
+        Task ToggleOffNavigationAsync();
+        Task ToggleOnNavigationAsync();
+        void CacheMoveObjects();
+        void CleanupBackground();
 
         void Cleanup();
 

@@ -32,8 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net, Version=3.0.3.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.3.0.3\lib\net462\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=3.1.0.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.3.1.0\lib\net462\log4net.dll</HintPath>
     </Reference>
     <Reference Include="log4net.Ext.Json, Version=3.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.Ext.Json.3.0.3\lib\net462\log4net.Ext.Json.dll</HintPath>
@@ -52,7 +52,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Interactive, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Interactive.6.0.1\lib\net48\System.Interactive.dll</HintPath>
+      <HintPath>..\packages\System.Interactive.6.0.3\lib\net48\System.Interactive.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
@@ -67,6 +67,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoAssignContext.cs" />
     <Compile Include="AutoAssignPeople.cs" />
     <Compile Include="EditFilterController.cs" />
     <Compile Include="EditFilterViewer.cs">
@@ -75,6 +76,9 @@
     <Compile Include="EditFilterViewer.designer.cs">
       <DependentUpon>EditFilterViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="FlagChangeGroup.cs" />
+    <Compile Include="FlagChangeItem.cs" />
+    <Compile Include="FlagChangeTrainingQueue.cs" />
     <Compile Include="FlagTasks.cs" />
     <Compile Include="ManageFilters.cs">
       <SubType>Form</SubType>

@@ -254,7 +254,7 @@ namespace UtilitiesCS.EmailIntelligence
             }
         }
 
-        public async Task TestAsync(MailItemHelper helper)
+        public async Task TestAsync(IItemInfo helper)
         {
             var probability = await CalculateProbabilityAsync(helper.Tokens);
             await TestActionAsync(helper, probability);
@@ -293,7 +293,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         public string[] TokenizeEmail(object email)
         {
-            return email as MailItem is null ? [] : new MailItemHelper(email as MailItem, Globals).LoadAll(Globals, Globals.Ol.EmailRoot, true).Tokens;
+            return email as MailItem is null ? [] : new MailItemHelper(email as MailItem, Globals).LoadAll(Globals, Globals.Ol.Inbox, true).Tokens;
         }
         
         public async Task<string[]> TokenizeEmailAsync(object email) 
@@ -304,14 +304,14 @@ namespace UtilitiesCS.EmailIntelligence
         public async Task TrainCallbackAsync(object item, bool isSpam)
         {
             MailItem mailItem = item as MailItem;
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 if (isSpam)
                 {
                     mailItem.SetUdf("Spam", 1.0, OlUserPropertyType.olPercent);
                     if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.JunkCertain.FolderPath)
                     {
-                        mailItem.Move(Globals.Ol.JunkCertain);
+                        await mailItem.TryMoveAsync(Globals.Ol.JunkCertain);
                     }
                 }
                 else
@@ -319,7 +319,7 @@ namespace UtilitiesCS.EmailIntelligence
                     mailItem.SetUdf("Spam", 0.0, OlUserPropertyType.olPercent);
                     if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.Inbox.FolderPath)
                     {
-                        mailItem.Move(Globals.Ol.Inbox);
+                        await mailItem.TryMoveAsync(Globals.Ol.Inbox);
                     }
                 }
             });
@@ -375,8 +375,9 @@ namespace UtilitiesCS.EmailIntelligence
             }
             else if (isSpam == false)
             {
-                if (((mailItem.Parent as Folder)?.FolderPath ?? "") != Globals.Ol.Inbox.FolderPath)
-                    return Globals.Ol.Inbox;
+                //if (((mailItem.Parent as Folder)?.FolderPath ?? "") != Globals.Ol.Inbox.FolderPath)
+                //    return Globals.Ol.Inbox;
+                return null;
             }
             else
             {
@@ -529,7 +530,17 @@ namespace UtilitiesCS.EmailIntelligence
         {
             if (item is not MailItem mailItem) { return false; }
             if (mailItem.MessageClass != "IPM.Note") { return false; }
-            if (mailItem.UserProperties.Find("Spam") is not null) { return false; }
+            if (mailItem.UserProperties.Find("Spam") is not null) 
+            {
+                var autoCodeProp = mailItem.UserProperties.Find("AutoProcessed");
+                if (autoCodeProp is not null)
+                {
+                    autoCodeProp.Value = true;
+                    mailItem.Save();
+                }
+                return false; 
+            }
+
             return true;
         }
 
@@ -547,16 +558,23 @@ namespace UtilitiesCS.EmailIntelligence
                 logger.Debug($"Skipping: Message class -> {GetOlItemString(olItem)}");
                 return false;
             }
-
-            //if (olItem.MessageClass != "IPM.Note") 
-            //{
-            //    logger.Debug($"Skipping: Message class {olItem.MessageClass} -> {GetOlItemString(olItem)}");
-            //    return false; 
-            //}
+                        
             var spamProp = olItem.UserProperties.Find("Spam");
             if (spamProp is not null) 
             { 
-                logger.Debug($"Skipping: Has Spam property {spamProp.Value} -> {GetOlItemString(olItem)}");
+                var autoCodeProp = olItem.UserProperties.Find("AutoProcessed");
+                if (autoCodeProp is not null) 
+                { 
+                    autoCodeProp.Value = true;
+                    olItem.Save();
+                }
+                else 
+                { 
+                    autoCodeProp = olItem.UserProperties.Add("AutoProcessed", OlUserPropertyType.olYesNo, true);
+                    autoCodeProp.Value = true;
+                    olItem.Save();
+                }
+                logger.Debug($"Skipping: Has Spam property with value of {spamProp.Value} -> {GetOlItemString(olItem)}");
                 return false;
             }
             

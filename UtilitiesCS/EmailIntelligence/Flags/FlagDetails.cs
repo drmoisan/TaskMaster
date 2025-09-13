@@ -51,16 +51,20 @@ namespace UtilitiesCS
                 if (value is null) { _list.Clear(); }
                 else
                 {
-                    IEnumerable<string> temp;
+                    //IEnumerable<string> temp;
                     if (value.Count > 0 && value[0].Length >= Prefix.Length && value[0].Substring(0, Prefix.Length) == Prefix)
                     {
-                        temp = value.Select(x => x.Replace(Prefix, ""));
+                        //temp = value.Select(x => x.Replace(Prefix, ""));
+                        for (int i = 0; i < value.Count; i++)
+                        {
+                            value[i] = value[i].Replace(Prefix, "");
+                        }
                     }
-                    else
-                    {
-                        temp = value;
-                    }
-                    if (!_list.SequenceEqual(temp))
+                    //else
+                    //{
+                    //    temp = value;
+                    //}
+                    if (!_list.SequenceEqual(value))
                     {
                         Unsubscribe();
                         var oldValue = _list;
@@ -73,7 +77,12 @@ namespace UtilitiesCS
         }
 
         private ObservableCollection<string> _listWithPrefix = new();
-        public ObservableCollection<string> ListWithPrefix { get => _listWithPrefix; }
+        public ObservableCollection<string> ListWithPrefix 
+        {
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            get => _listWithPrefix;         
+        }
+
                                 
         private string _withPrefix = "";
         public string WithPrefix { get => _withPrefix; }

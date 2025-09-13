@@ -1,5 +1,5 @@
 ﻿using AngleSharp.Common;
-using ConcurrentObservableCollections.ConcurrentObservableDictionary;
+using ConcurrentObservableCollection.ConcurrentObservableDictionary;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

@@ -48,7 +48,8 @@ namespace UtilitiesCS.ReusableTypeClasses
                 if (_config is not null)
                     _config.PropertyChanged -= Config_PropertyChanged;
                 _config = value;
-                _config.PropertyChanged += Config_PropertyChanged;
+                if (_config is not null)
+                    _config.PropertyChanged += Config_PropertyChanged;
             }
         }
         
