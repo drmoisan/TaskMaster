@@ -6,7 +6,7 @@ using Moq;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace UtilitiesCS.Test.HelperClasses.ObjListViewDemo
+namespace UtilitiesCS.Test.HelperClasses
 {
     [TestClass]
     public class SysImageListHelperTests

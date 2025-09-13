@@ -11,7 +11,7 @@ using System.Linq;
 using FluentAssertions;
 
 
-namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
+namespace UtilitiesCS.Test.EmailIntelligence
 {
     [TestClass]
     public class BayesianClassifierGroupTests
@@ -62,10 +62,10 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 
         }
 
-        private SubClassifierGroup CreateBayesianClassifierGroup()
-        {
-            return new SubClassifierGroup();
-        }
+        //private SubClassifierGroup CreateBayesianClassifierGroup()
+        //{
+        //    return new SubClassifierGroup();
+        //}
 
         //[TestMethod]
         //public void AddOrUpdateClassifier_StateUnderTest_ExpectedBehavior()

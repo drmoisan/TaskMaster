@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace UtilitiesCS.Tests
+namespace UtilitiesCS.Test
 {
     [TestClass]
     public class FlagParserTests

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups;
 
-namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
+namespace UtilitiesCS.Test.EmailIntelligence
 {
     [TestClass]
     public class Triage_OlLogicTests

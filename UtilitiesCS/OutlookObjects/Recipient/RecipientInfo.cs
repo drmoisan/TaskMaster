@@ -35,5 +35,11 @@ namespace UtilitiesCS
             else if ((Name ?? "") == (other.Name ?? "") && (Address ?? "") == (other.Address ?? "")) { return true; }
             else { return false; }
         }
+
+        public override int GetHashCode()
+        {
+            // Use a simple hash code based on Name and Address
+            return (Name ?? "").GetHashCode() * 31 + (Address ?? "").GetHashCode();
+        }
     }
 }

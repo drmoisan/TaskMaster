@@ -6,7 +6,7 @@ using FluentAssertions;
 using Newtonsoft.Json;
 using System;
 
-namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
+namespace UtilitiesCS.Test.EmailIntelligence
 {
     [TestClass]
     public class MinedMailInfoTests

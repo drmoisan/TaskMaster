@@ -10,7 +10,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using FluentAssertions;
 
-namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
+namespace UtilitiesCS.Test.EmailIntelligence
 {
     [Obsolete("This class is obsolete. Use BayesianClassifierSharedTests instead")]
     [TestClass]

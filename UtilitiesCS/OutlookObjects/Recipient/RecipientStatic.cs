@@ -55,26 +55,28 @@ namespace UtilitiesCS
 
         public static string GetSenderName(this MailItem olMail)
         {
-            AddressEntry sender = olMail.Sender;
-            string senderName = "";
+            var name = olMail.SenderName;
+            return name;
+            //AddressEntry sender = olMail.Sender;
+            //string senderName = "";
 
-            if (sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
-            {
-                ExchangeUser exchUser = sender.GetExchangeUser();
-                if (exchUser != null)
-                {
-                    senderName = $"{exchUser.FirstName} {exchUser.LastName}";
-                }
-                else
-                {
-                    senderName = sender.Name;
-                }
-            }
-            else
-            {
-                senderName = olMail.SenderName;
-            }
-            return senderName;
+            //if (sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
+            //{
+            //    ExchangeUser exchUser = sender.GetExchangeUser();
+            //    if (exchUser != null)
+            //    {
+            //        senderName = $"{exchUser.FirstName} {exchUser.LastName}";
+            //    }
+            //    else
+            //    {
+            //        senderName = sender.Name;
+            //    }
+            //}
+            //else
+            //{
+            //    senderName = olMail.SenderName;
+            //}
+            //return senderName;
 
         }
 
@@ -90,50 +92,51 @@ namespace UtilitiesCS
 
         public static string GetSenderAddress(this MailItem olMail)
         {
-            AddressEntry sender = olMail.Sender;
-            string senderAddress = "";
+            return olMail.SenderEmailAddress;
+            //AddressEntry sender = olMail.Sender;
+            //string senderAddress = "";
 
-            if (sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
-            {
-                ExchangeUser exchUser = sender.GetExchangeUser();
-                if (exchUser != null)
-                {
-                    senderAddress = exchUser.PrimarySmtpAddress;
-                }
-                else
-                {
-                    senderAddress = sender.Address;
-                }
-            }
-            else
-            {
-                senderAddress = olMail.SenderEmailAddress;
-            }
-            if (senderAddress.IsNullOrEmpty())
-            {
-                var olPA = sender.PropertyAccessor;
-                try
-                {
-                    senderAddress = olPA.GetProperty(PR_SMTP_ADDRESS) as string;
-                    if (senderAddress.IsNullOrEmpty())
-                        throw new InvalidOperationException("Sender address is null or empty");
-                }
-                catch
-                {
-                    try
-                    {
-                        senderAddress = olMail.SenderName;
-                        if (senderAddress.IsNullOrEmpty() || senderAddress.StartsWith("/o=ExchangeLabs"))
-                            throw new InvalidOperationException("Sender address and name are null or empty");
-                    }
-                    catch
-                    {
-                        senderAddress = "";
-                    }
-                }
-            }
+            //if (sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
+            //{
+            //    ExchangeUser exchUser = sender.GetExchangeUser();
+            //    if (exchUser != null)
+            //    {
+            //        senderAddress = exchUser.PrimarySmtpAddress;
+            //    }
+            //    else
+            //    {
+            //        senderAddress = sender.Address;
+            //    }
+            //}
+            //else
+            //{
+            //    senderAddress = olMail.SenderEmailAddress;
+            //}
+            //if (senderAddress.IsNullOrEmpty())
+            //{
+            //    var olPA = sender.PropertyAccessor;
+            //    try
+            //    {
+            //        senderAddress = olPA.GetProperty(PR_SMTP_ADDRESS) as string;
+            //        if (senderAddress.IsNullOrEmpty())
+            //            throw new InvalidOperationException("Sender address is null or empty");
+            //    }
+            //    catch
+            //    {
+            //        try
+            //        {
+            //            senderAddress = olMail.SenderName;
+            //            if (senderAddress.IsNullOrEmpty() || senderAddress.StartsWith("/o=ExchangeLabs"))
+            //                throw new InvalidOperationException("Sender address and name are null or empty");
+            //        }
+            //        catch
+            //        {
+            //            senderAddress = "";
+            //        }
+            //    }
+            //}
 
-            return senderAddress;
+            //return senderAddress;
         }
 
         public static IRecipientInfo GetSenderInfo(this MeetingItem olMeeting)
@@ -163,6 +166,7 @@ namespace UtilitiesCS
             {
                 var name = olMail.GetSenderName();
                 var address = olMail.GetSenderAddress();
+                var pa = olMail.Sender.PropertyAccessor;                
                 var html = ConvertRecipientToHtml(name, address);
                 return new RecipientInfo(name, address, html);
             }
@@ -466,27 +470,38 @@ namespace UtilitiesCS
         internal static (string Name, string Address) GetRecipientInfo(Recipient recipient)
         {
             string name, address;
-            if (recipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || recipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
-            {
-                ExchangeUser exchUser = recipient.AddressEntry.GetExchangeUser();
-                if (exchUser != null)
-                {
-                    var firstNameExch = exchUser.FirstName;
-                    address = exchUser.PrimarySmtpAddress;
-                    var rx = new Regex(@"^(.+)@([^@]+)$");
-                    name = $"{exchUser.FirstName} {exchUser.LastName}";
-                }
-                else
-                {
-                    name = recipient.Name;
-                    address = recipient.Address;
-                }
-            }
-            else
-            {
-                name = recipient.Name;
-                address = recipient.Address;
-            }
+            name = recipient.Name;
+            address = recipient.Address;
+            //try
+            //{
+            //    if (recipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || recipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
+            //    {
+            //        ExchangeUser exchUser = recipient.AddressEntry.GetExchangeUser();
+            //        if (exchUser != null)
+            //        {
+            //            var firstNameExch = exchUser.FirstName;
+            //            address = exchUser.PrimarySmtpAddress;
+            //            var rx = new Regex(@"^(.+)@([^@]+)$");
+            //            name = $"{exchUser.FirstName} {exchUser.LastName}";
+            //        }
+            //        else
+            //        {
+            //            name = recipient.Name;
+            //            address = recipient.Address;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        name = recipient.Name;
+            //        address = recipient.Address;
+            //    }
+            //}
+            //catch (System.Exception)
+            //{
+            //    name = recipient.Name;
+            //    address = recipient.Address;                
+            //}
+            
 
             return (name, address);
         }

@@ -11,7 +11,7 @@ using Newtonsoft;
 using Newtonsoft.Json;
 using UtilitiesCS.EmailIntelligence;
 
-namespace UtilitiesCS.Test.EmailIntelligence.EmailParsingSorting
+namespace UtilitiesCS.Test.EmailIntelligence
 {
     
 

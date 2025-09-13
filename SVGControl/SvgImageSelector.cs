@@ -56,7 +56,7 @@ namespace SVGControl
         private bool _saveRendering = false;
         private bool _useDefaultImage = false;
         private SvgRenderer _renderer;
-        
+
         internal String AboluteImagePath
         {
             get { return _absoluteImagePath; }

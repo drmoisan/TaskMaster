@@ -365,7 +365,7 @@ namespace UtilitiesCS
 
         public double CalculateItemMatchPercentage(IItemInfo[] matching, IItemInfo[] currentOnly, IItemInfo[] otherOnly)
         {
-            if (matching.IsNullOrEmpty() || currentOnly.IsNullOrEmpty() || otherOnly.IsNullOrEmpty()) { return 0; }
+            if (matching.IsNullOrEmpty()) { return 0; }
             double matchPercentage = (matching.Length * 2) / (double)(matching.Length * 2 + currentOnly.Length + otherOnly.Length);
             return matchPercentage;
         }
@@ -388,6 +388,22 @@ namespace UtilitiesCS
             }
             else
             {
+                int i = 0;
+                int j = 0;
+                var matching2 = new List<IItemInfo>();
+
+                for (i = 0; i < currentHelpers.Length; i++)
+                {
+                    for (j = 0; j < otherHelpers.Length; j++)
+                    {
+                        if(currentHelpers[i].Equals(otherHelpers[j]))
+                        {
+                            matching2.Add(currentHelpers[i]);
+                            break; // Found a match, no need to check further for this item
+                        }
+                    }
+                }
+
                 var matching = currentHelpers.Intersect(otherHelpers).ToArray();
                 var currentOnly = currentHelpers.Except(otherHelpers).ToArray();
                 var otherOnly = otherHelpers.Except(currentHelpers).ToArray();

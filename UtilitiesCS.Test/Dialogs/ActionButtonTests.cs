@@ -3,7 +3,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace UtilitiesCS.Tests
+namespace UtilitiesCS.Test
 {
     [TestClass]
     public class ActionButtonTests

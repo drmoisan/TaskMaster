@@ -78,15 +78,26 @@ namespace UtilitiesCS.EmailIntelligence
             else if (ReferenceEquals(this, other)) { return true; }
             else
             {
-                if (Size != other.Size) return false;
+                //if (Size != other.Size) return false;
                 if (SentDate != other.SentDate) return false;
                 if (Subject != other.Subject) return false;
                 if (Body != other.Body) return false;
-                if (Sender != other.Sender) return false;
+                if (!Sender.Equals(other.Sender)) return false;
                 if (!RecipientsEquivalent(CcRecipients, other.CcRecipients)) return false;
-                if (!RecipientsEquivalent(ToRecipients, other.ToRecipients)) return false;                
+                if (!RecipientsEquivalent(ToRecipients, other.ToRecipients)) return false;
                 return true;
             }
+        }
+
+        public override int GetHashCode()
+        {
+            // Use a simple hash code based on EntryId, StoreId, and Subject            
+            //return Size.GetHashCode() + SentDate.GetHashCode() * 31 +
+            return    (Subject ?? "").GetHashCode() * 31 * 31 +
+                (Body ?? "").GetHashCode() * 31 * 31 * 31 +
+                Sender.GetHashCode() * 31 * 31 * 31 * 31 +
+                GetRecipientsHashCode(CcRecipients) * 31 *31*31*31*31 +
+                GetRecipientsHashCode(ToRecipients) * 31 * 31 * 31 * 31 * 31 * 31;
         }
 
         internal bool RecipientsEquivalent(IRecipientInfo[] source, IRecipientInfo[] other)
@@ -96,6 +107,18 @@ namespace UtilitiesCS.EmailIntelligence
             if (source.Length != other.Length) return false;
             if (source.Intersect(other).Count() != other.Length) return false;
             return true;
+        }
+
+        internal int GetRecipientsHashCode(IRecipientInfo[] recipients)
+        {
+            if (recipients == null || recipients.Length == 0) return 0;
+            int hash = 0;
+            int i = 0;
+            foreach (var recipient in recipients)
+            {
+                hash += (int)Math.Pow(recipient.GetHashCode(), i++);
+            }
+            return hash;
         }
     }
 }

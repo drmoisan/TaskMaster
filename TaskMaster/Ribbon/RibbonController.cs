@@ -650,6 +650,8 @@ namespace TaskMaster
                         return (folder1:node, folder2:max.node, percentage:max.percentage);
                     }).ToArrayAsync();
 
+                    
+                    
                     var folder1Unmatched = m.Where(x => x.percentage == 0).Select(x => x.folder1).ToList();
                     var folder2matches = m.Where(x => x.percentage > 0).Select(x => x.folder2).ToList();
                     var folder2Unmatched = onlyOtherNodes.Where(x => !folder2matches.Contains(x)).ToList();
@@ -657,6 +659,7 @@ namespace TaskMaster
 
                     foreach (var match in m)
                     {
+                        logger.Debug($"Comparing {match.folder1.Value.RelativePath} with {match.folder2.Value.RelativePath} - Match Percentage: {match.percentage:P2}");
                         if (match.percentage > 0)
                         {
                             logger.Info($"Folder {match.folder1.Value.RelativePath} has a partial match with {match.folder2.Value.RelativePath} ({match.percentage:P2})");
