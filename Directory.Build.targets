@@ -1,0 +1,9 @@
+<Project>
+  <Target Name="SetTaskMasterManifestCert" BeforeTargets="ResolveKeySource" Condition="'$(MSBuildProjectName)' == 'TaskMaster'">
+    <PropertyGroup>
+      <SignManifests>true</SignManifests>
+      <ManifestKeyFile></ManifestKeyFile>
+      <ManifestCertificateThumbprint>88E95FCC6F066C07776218A398BF7046A447D802</ManifestCertificateThumbprint>
+    </PropertyGroup>
+  </Target>
+</Project>

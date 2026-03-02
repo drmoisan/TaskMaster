@@ -97,22 +97,34 @@ namespace UtilitiesCS
 
         public static T[,] To2D<T>(this T[][] source)
         {
-            try
+            if (source is null)
             {
-                int FirstDim = source.Length;
-                int SecondDim = source.GroupBy(row => row.Length).Single().Key; // throws InvalidOperationException if source is not rectangular
-
-                var result = new T[FirstDim, SecondDim];
-                for (int i = 0; i < FirstDim; ++i)
-                    for (int j = 0; j < SecondDim; ++j)
-                        result[i, j] = source[i][j];
-
-                return result;
+                throw new ArgumentNullException(nameof(source));
             }
-            catch (InvalidOperationException)
+
+            int FirstDim = source.Length;
+            if (FirstDim == 0)
+            {
+                return new T[0, 0];
+            }
+
+            if (source.Any(row => row is null))
+            {
+                throw new InvalidOperationException("The given jagged array contains null rows.");
+            }
+
+            int SecondDim = source[0].Length;
+            if (source.Any(row => row.Length != SecondDim))
             {
                 throw new InvalidOperationException("The given jagged array is not rectangular.");
             }
+
+            var result = new T[FirstDim, SecondDim];
+            for (int i = 0; i < FirstDim; ++i)
+                for (int j = 0; j < SecondDim; ++j)
+                    result[i, j] = source[i][j];
+
+            return result;
         }
 
         #endregion

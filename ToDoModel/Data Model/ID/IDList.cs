@@ -123,11 +123,30 @@ namespace ToDoModel
                                                     MAPIFields.Schemas.MessageStore
                                                 });
 
+            var toDoColumn = ResolveColumnKey(df, "ToDoID", MAPIFields.Schemas.ToDoID);
+            if (string.IsNullOrEmpty(toDoColumn))
+            {
+                this.Clear();
+                _maxIDLength = 0;
+                this.Serialize();
+                return;
+            }
+
             df = df.FillMissing("ERROR");
-            df = df.Where(x => ((string)x.Value["ToDoID"]) != "ERROR");
-            var idList = df.GetColumn<string>("ToDoID").Values.ToList();
+            df = df.Where(x =>
+            {
+                try
+                {
+                    return ((string)x.Value[toDoColumn]) != "ERROR";
+                }
+                catch (KeyNotFoundException)
+                {
+                    return false;
+                }
+            });
+            var idList = df.GetColumn<string>(toDoColumn).Values.ToList();
             this.FromList(idList);
-            _maxIDLength = this.Select(x => x.Length).Max();
+            _maxIDLength = this.Count == 0 ? 0 : this.Select(x => x.Length).Max();
             this.Serialize();
         }
 
@@ -194,14 +213,31 @@ namespace ToDoModel
                                                         MAPIFields.Schemas.MessageStore
                                                     ]);
 
+                var toDoColumn = ResolveColumnKey(df, "ToDoID", MAPIFields.Schemas.ToDoID);
+                var storeColumn = ResolveColumnKey(df, "Store", MAPIFields.Schemas.MessageStore);
+                if (string.IsNullOrEmpty(toDoColumn) || string.IsNullOrEmpty(storeColumn))
+                {
+                    return;
+                }
+
                 df = df.FillMissing("");
-                var df2 = df.Where(x => ((string)x.Value["ToDoID"]).Contains(oldPrefix));
+                var df2 = df.Where(x =>
+                {
+                    try
+                    {
+                        return ((string)x.Value[toDoColumn]).Contains(oldPrefix);
+                    }
+                    catch (KeyNotFoundException)
+                    {
+                        return false;
+                    }
+                });
 
                 foreach (var row in df2.Rows.Values)
                 {
                     string entryID = row["EntryID"].ToString();
-                    string storeID = row["Store"].ToString();
-                    string todoOld = row["ToDoID"].ToString();
+                    string storeID = row[storeColumn].ToString();
+                    string todoOld = row[toDoColumn].ToString();
                     string todoNew = todoOld.Replace(oldPrefix, newPrefix);
                     var item = new OutlookItem(_olApp.Session.GetItemFromID(entryID, storeID));
                     item.TrySetUdf("ToDoID", todoNew);
@@ -211,6 +247,21 @@ namespace ToDoModel
 
                 this.Serialize();
             }
+        }
+
+        private static string ResolveColumnKey(Frame<int, string> df, params string[] candidates)
+        {
+            if (df is null) { return null; }
+
+            foreach (var candidate in candidates)
+            {
+                if (!string.IsNullOrEmpty(candidate) && df.ColumnKeys.Contains(candidate))
+                {
+                    return candidate;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>

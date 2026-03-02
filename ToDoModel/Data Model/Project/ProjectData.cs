@@ -77,10 +77,11 @@ namespace ToDoModel
             (var data, var columnInfo) = table.ETL();
             
             var df = DfDeedle.FromArray2D(data: data, columnInfo);
+            if (df is null || !df.ColumnKeys.Contains("ToDoID")) { return null; }
                         
             df = df.FillMissing("");
-
-            df = Frame.FromRows(df.Rows.Where(x => (string)x.Value["ToDoID"] != ""));
+            df = df.Where(x => (string)x.Value["ToDoID"] != "");
+            if (df.RowCount == 0) { return null; }
 
 
             Frame<string, string> dfToDo = null;
@@ -92,7 +93,7 @@ namespace ToDoModel
             {                
                 var duplicateIDs = df.GetDuplicateEntriesByColumn<int,string,string>("ToDoID");
 
-                if (duplicateIDs.Count() > 0)
+                if (duplicateIDs.Length > 0)
                 {
                     var duplicateRowsGroups = duplicateIDs.Select(x => df.FilterRowsBy("ToDoID", x));
                     LogDuplicates(duplicateRowsGroups);

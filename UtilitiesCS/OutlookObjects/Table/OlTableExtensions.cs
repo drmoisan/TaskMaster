@@ -205,6 +205,13 @@ namespace UtilitiesCS
             object[,] data = null;
             
             table.MoveToStart();
+            var rowCount = table.GetRowCount();
+
+            if (rowCount == 0)
+            {
+                data = new object[0, columnDictionary.Count];
+                return (data, columnDictionary);
+            }
 
             if (MAPIFields.BinaryToStringFields.Any(x => columnDictionary.ContainsKey(x))||
                (objectConverters is not null && 
@@ -214,9 +221,8 @@ namespace UtilitiesCS
                 data = EtlByRow(table, objectConverters, columnDictionary, progress);
             }
             else 
-            { 
-                var rowCount = table.GetRowCount();
-                data = table?.GetArray(rowCount) as object[,]; 
+            {
+                data = table?.GetArray(rowCount) as object[,];
             }
             return (data, columnDictionary);
         }

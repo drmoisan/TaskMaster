@@ -324,8 +324,30 @@ namespace UtilitiesCS
             {
                 if (response == DialogResult.Yes && !backupFilepath.IsNullOrEmpty())
                 {
-                    collection = LoadFromBackup(backupLoader, backupFilepath, disk);
-                    writeCollection = true;
+                    try
+                    {
+                        if (File.Exists(backupFilepath))
+                        {
+                            collection = LoadFromBackup(backupLoader, backupFilepath, disk);
+                            writeCollection = true;
+                        }
+                        else
+                        {
+                            logger.Error($"Backup file not found: {backupFilepath}");
+                            var response2 = AskUser(askUserOnError,
+                                $"Backup file not found: {backupFilepath}\nNeed a list to continue. Create a new list or abort execution?");
+                            collection = CreateEmpty(response2, disk);
+                            writeCollection = true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error($"Error loading backup file {backupFilepath}.", ex);
+                        var response2 = AskUser(askUserOnError,
+                            $"Backup file {backupFilepath} encountered a problem.\nNeed a list to continue. Create a new list or abort execution?");
+                        collection = CreateEmpty(response2, disk);
+                        writeCollection = true;
+                    }
                 }
                 else if (response != DialogResult.Ignore)
                 {
