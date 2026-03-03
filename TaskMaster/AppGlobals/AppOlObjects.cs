@@ -30,6 +30,7 @@ namespace TaskMaster
         public async Task LoadAsync()
         {
             await LoadStoresAsync();
+            await Task.CompletedTask;
         }
 
         private IApplicationGlobals _globals;
@@ -89,8 +90,9 @@ namespace TaskMaster
         internal IEnumerable<Folder> LoadInboxes()
         {
             // TODO: Test with gmail to see if I need to add a filter for non-exchange
+            var storesWrapper = StoresWrapper ?? new StoresWrapper() { };
             var stores = NamespaceMAPI.Stores.Cast<Store>().Where(
-                store => store.ExchangeStoreType != OlExchangeStoreType.olExchangePublicFolder);
+                storesWrapper.ShouldIncludeStore);
             
             var inboxes = new List<Folder>();
             foreach (var store in stores) 
