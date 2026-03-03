@@ -77,7 +77,19 @@ namespace ToDoModel
             (var data, var columnInfo) = table.ETL();
             
             var df = DfDeedle.FromArray2D(data: data, columnInfo);
-            if (df is null || !df.ColumnKeys.Contains("ToDoID")) { return null; }
+            if (df is null)
+            {
+                logger.Error("GetDfToDo: Data frame creation from Outlook ToDo table returned null.");
+                return null;
+            }
+
+            if (!df.ColumnKeys.Contains("ToDoID"))
+            {
+                logger.Error(
+                    $"GetDfToDo: Expected 'ToDoID' column not found in Outlook ToDo table. " +
+                    $"Available columns: {string.Join(\", \", df.ColumnKeys)}");
+                return null;
+            }
                         
             df = df.FillMissing("");
             df = df.Where(x => (string)x.Value["ToDoID"] != "");

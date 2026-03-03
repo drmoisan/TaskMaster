@@ -146,7 +146,7 @@ namespace ToDoModel
             });
             var idList = df.GetColumn<string>(toDoColumn).Values.ToList();
             this.FromList(idList);
-            _maxIDLength = this.Count == 0 ? 0 : this.Select(x => x.Length).Max();
+            _maxIDLength = this.Count == 0 ? 0 : this.Max(x => x.Length);
             this.Serialize();
         }
 

@@ -74,7 +74,8 @@ namespace UtilitiesCS.OutlookExtensions
             try
             {
                 items = folder.Items;
-                for (int i = 1; i <= items.Count; i++)
+                int itemCount = items.Count;
+                for (int i = 1; i <= itemCount; i++)
                 {
                     object itemObj = null;
                     try

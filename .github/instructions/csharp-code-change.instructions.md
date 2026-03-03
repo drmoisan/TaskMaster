@@ -33,14 +33,18 @@ These are the required tools for C# code in this repo:
    - C# code must pass Roslyn/.NET analyzer diagnostics configured by `.editorconfig`, `.globalconfig`, and project properties.
    - Enforce analyzer diagnostics in build using `EnableNETAnalyzers` and `EnforceCodeStyleInBuild`.
    - Prefer fixing diagnostics over suppressing them.
-   - Approved command: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+   - Approved commands (Windows; choose the variant for your shell):
+     - **CMD / Developer Command Prompt:** `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+     - **PowerShell:** `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
 
 3. **Type Checking — C# compiler + nullable analysis**
 
    - Treat C# compiler diagnostics and nullable-flow warnings as first-class type-safety checks.
    - Enable nullable reference types and fail builds on warnings for touched code paths.
    - Avoid introducing nullable warnings; fix the root null-state issue instead.
-   - Approved command: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+   - Approved commands (Windows; choose the variant for your shell):
+     - **CMD / Developer Command Prompt:** `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+     - **PowerShell:** `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:Nullable=enable /p:TreatWarningsAsErrors=true`
 
 > **Testing tools and behavior are defined in the unit test policies.** Do not define test behavior here; instead, obey `general-unit-test.instructions.md` and `csharp-unit-test.instructions.md`.
 
