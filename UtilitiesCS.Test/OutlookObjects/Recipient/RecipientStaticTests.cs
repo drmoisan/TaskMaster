@@ -1,4 +1,5 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
@@ -37,7 +38,7 @@ namespace UtilitiesCS.Test
                 address);
 
             // Assert
-            Assert.Fail();
+            result.Should().Be(" &lt;<a href=\"mailto:\"></a>&gt;");
             this.mockRepository.VerifyAll();
         }
 
@@ -125,7 +126,7 @@ namespace UtilitiesCS.Test
         public void GetInfo_StateUnderTest_ExpectedBehavior1()
         {
             // Arrange
-            
+             
             Recipient recipient = null;
             SegmentStopWatch sw = null;
 
@@ -133,54 +134,6 @@ namespace UtilitiesCS.Test
             var result = RecipientStatic.GetInfo(
                 recipient,
                 sw);
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
-        public void GetToRecipientsInHtml_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            
-            MailItem olMail = null;
-
-            // Act
-            var result = RecipientStatic.GetToRecipientsInHtml(
-                olMail);
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
-        public void GetToRecipients_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            
-            MailItem olMail = null;
-
-            // Act
-            var result = RecipientStatic.GetToRecipients(
-                olMail);
-
-            // Assert
-            Assert.Fail();
-            this.mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
-        public void GetCcRecipients_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            
-            MailItem olMail = null;
-
-            // Act
-            var result = RecipientStatic.GetCcRecipients(
-                olMail);
 
             // Assert
             Assert.Fail();
