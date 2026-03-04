@@ -87,7 +87,7 @@ namespace ToDoModel
             {
                 logger.Error(
                     $"GetDfToDo: Expected 'ToDoID' column not found in Outlook ToDo table. " +
-                    $"Available columns: {string.Join(\", \", df.ColumnKeys)}");
+                    $"Available columns: {string.Join(", ", df.ColumnKeys)}");
                 return null;
             }
                         
