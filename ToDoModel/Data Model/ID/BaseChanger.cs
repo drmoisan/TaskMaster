@@ -103,43 +103,4 @@ namespace ToDoModel
         }
 
     }
-
-    public class Program
-    {
-        private Globals _globals = new Globals();
-
-        public void Run()
-        {
-            var seedID = _globals.TD.ProgramInfo.Values
-                .Where(x => !x.IsNullOrEmpty())
-                .OrderByDescending(x => x)
-                .FirstOrDefault() ?? "00";
-            var newProgramID = _globals.TD.IDList.GetNextToDoID(seedID);
-        }
-    }
-
-    public class Globals
-    {
-        public TD TD { get; set; } = new TD();
-    }
-
-    public class TD
-    {
-        public ProgramInfoData ProgramInfo { get; set; } = new ProgramInfoData();
-        public IDList IDList { get; set; } = new IDList();
-    }
-
-    public class ProgramInfoData
-    {
-        public System.Collections.Generic.List<string> Values { get; set; } = new System.Collections.Generic.List<string>();
-    }
-
-    public class IDList
-    {
-        public string GetNextToDoID(string seedID)
-        {
-            // Implementation for generating new ToDo ID
-            return seedID + "01"; // Example implementation
-        }
-    }
 }
