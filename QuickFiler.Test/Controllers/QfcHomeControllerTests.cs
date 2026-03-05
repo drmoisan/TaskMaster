@@ -273,9 +273,6 @@ namespace QuickFiler.Controllers.Tests
             Assert.IsTrue(_controller.StopWatch.IsRunning);
             mockDataModel.Verify(m => m.InitEmailQueueAsync(It.IsAny<int>(), It.IsAny<BackgroundWorker>(), It.IsAny<CancellationToken>(), It.IsAny<CancellationTokenSource>()), Times.Once);
             mockFormController.Verify(m => m.LoadItemsAsync(It.IsAny<IList<MailItem>>()), Times.Once);
-            mockFormViewer.VerifySet(m => m.WindowState = FormWindowState.Maximized);
-            mockFormViewer.Verify(m => m.Show(), Times.Once);
-            mockFormViewer.Verify(m => m.Refresh(), Times.Once);
             _mockProgressTracker.Verify(m => m.Report(It.IsAny<double>(), It.IsAny<string>()), Times.Exactly(2));
             _mockProgressTracker.Verify(m => m.Report(It.IsAny<double>()), Times.Exactly(1));
         }

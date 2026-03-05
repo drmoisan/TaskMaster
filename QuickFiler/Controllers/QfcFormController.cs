@@ -294,21 +294,40 @@ namespace QuickFiler.Controllers
         private string _activeTheme;
         public string ActiveTheme
         {
-            get => Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
-            set => Initializer.SetAndSave<string>(ref _activeTheme, value, (x) => _themes[x].SetTheme(async: true));
+            get => _themes is null
+                ? _activeTheme
+                : Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
+            set => Initializer.SetAndSave<string>(ref _activeTheme, value, (x) =>
+            {
+                if (_themes is not null && _themes.TryGetValue(x, out var theme))
+                {
+                    theme.SetTheme(async: true);
+                }
+            });
         }
         internal string LoadTheme()
         {
-            var activeTheme = DarkMode ? "DarkNormal" : "LightNormal";
-            _themes[activeTheme].SetTheme();
+            var activeTheme = (_globals?.Ol?.DarkMode ?? _darkMode) ? "DarkNormal" : "LightNormal";
+            if (_themes is not null && _themes.TryGetValue(activeTheme, out var theme))
+            {
+                theme.SetTheme();
+            }
             return activeTheme;
         }
 
         private bool _darkMode;
         public bool DarkMode
         {
-            get => Initializer.GetOrLoad(ref _darkMode, () => _globals.Ol.DarkMode, false, _globals, _globals.Ol);
-            set => Initializer.SetAndSave(ref _darkMode, value, (x) => _globals.Ol.DarkMode = x);
+            get => _globals?.Ol is null
+                ? _darkMode
+                : Initializer.GetOrLoad(ref _darkMode, () => _globals.Ol.DarkMode, false, _globals, _globals.Ol);
+            set => Initializer.SetAndSave(ref _darkMode, value, (x) =>
+            {
+                if (_globals?.Ol is not null)
+                {
+                    _globals.Ol.DarkMode = x;
+                }
+            });
         }
 
         private IQfcCollectionController _groups;
@@ -336,8 +355,12 @@ namespace QuickFiler.Controllers
 
         internal void DarkMode_CheckedChanged(object sender, EventArgs e)
         {
-            SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
-            _darkMode = _globals.Ol.DarkMode;
+            if (_formViewer?.UiSyncContext is not null)
+            {
+                SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
+            }
+
+            _darkMode = _globals?.Ol?.DarkMode ?? _darkMode;
             if (DarkMode) { ActiveTheme = "DarkNormal"; }
             else { ActiveTheme = "LightNormal"; }
         }
@@ -388,10 +411,13 @@ namespace QuickFiler.Controllers
 
         async public Task ActionCancelAsync()
         {
-            _parent.TokenSource.Cancel();
-            await _formViewer.UiSyncContext;
-            _formViewer.Hide();
-            _groups.Cleanup();
+            _parent?.TokenSource?.Cancel();
+            if (_formViewer?.UiSyncContext is not null)
+            {
+                await _formViewer.UiSyncContext;
+            }
+            _formViewer?.Hide();
+            _groups?.Cleanup();
             Cleanup();
         }
 
@@ -420,7 +446,7 @@ namespace QuickFiler.Controllers
                     $"implemented for {nameof(_initType)} {_initType}");
             }
 
-            else if (_groups.ReadyForMove)
+            else if (_groups?.ReadyForMove == true)
             {
                 //_blRunningModalCode = true;
 
@@ -446,6 +472,11 @@ namespace QuickFiler.Controllers
         {
             //TraceUtility.LogMethodCall();
 
+            if (_qfcQueue is null || _groups is null || _parent is null || _formViewer is null)
+            {
+                return;
+            }
+
             if ((_qfcQueue.Count + _qfcQueue.JobsRunning) > 0)
             {
                 _groups.CacheMoveObjects();
@@ -470,7 +501,7 @@ namespace QuickFiler.Controllers
                 await moveTask;
                 //await iterate;
             }
-            else if (_formViewer.Worker.IsBusy)
+            else if (_formViewer.Worker?.IsBusy == true)
             {
                 MessageBox.Show("Still loading emails. Please try again in a few seconds.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -502,6 +533,11 @@ namespace QuickFiler.Controllers
         internal async Task BackGroundMoveAsync()
         {
             //TraceUtility.LogMethodCall();
+
+            if (_groups is null || _globals?.FS?.Filenames is null || WriteMetrics is null)
+            {
+                return;
+            }
 
             // Move emails
             await _groups.MoveEmailsAsync(_movedItems);
@@ -575,10 +611,16 @@ namespace QuickFiler.Controllers
 
         internal void AdjustTlp(TableLayoutPanel tlp, int newCount)
         {
+            if (tlp is null || _rowStyleTemplate is null)
+            {
+                return;
+            }
+
             var oldCount = tlp.RowCount - 1;
             if (oldCount != newCount)
             {
-                var diff = newCount - Math.Max(0, oldCount);
+                oldCount = Math.Max(0, oldCount);
+                var diff = newCount - oldCount;
                 if (diff > 0)
                 {
                     tlp.InsertSpecificRow(oldCount, _rowStyleTemplate, diff);
@@ -589,11 +631,12 @@ namespace QuickFiler.Controllers
                 }
                 else
                 {
-                    tlp.RemoveSpecificRow(newCount, diff);
+                    var removeCount = Math.Abs(diff);
+                    tlp.RemoveSpecificRow(newCount, removeCount);
                     tlp.MinimumSize = new System.Drawing.Size(
                         tlp.MinimumSize.Width,
                         tlp.MinimumSize.Height -
-                        (int)Math.Round(_rowStyleTemplate.Height * diff, 0));
+                        (int)Math.Round(_rowStyleTemplate.Height * removeCount, 0));
                 }
             }
         }
@@ -674,6 +717,11 @@ namespace QuickFiler.Controllers
 
         public void LoadItems(IList<MailItem> listObjects)
         {
+            if (listObjects is null || _globals is null || _formViewer is null || _parent is null || _tokenSource is null || _states is null)
+            {
+                return;
+            }
+
             _helperTasks = listObjects.Select(x => MailItemHelper.FromMailItemAsync(x, _globals, Token, false)).ToList();
             _groups = new QfcCollectionController(AppGlobals: _globals,
                                                   viewerInstance: _formViewer,
@@ -693,6 +741,11 @@ namespace QuickFiler.Controllers
 
         public async Task LoadItemsAsync(IList<MailItem> listObjects, ProgressTracker progress)
         {
+            if (listObjects is null || _globals is null || _formViewer is null || _parent is null || _tokenSource is null || _states is null)
+            {
+                return;
+            }
+
             Token.ThrowIfCancellationRequested();
 
             _groups = new QfcCollectionController(AppGlobals: _globals,

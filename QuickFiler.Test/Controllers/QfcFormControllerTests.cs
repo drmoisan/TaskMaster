@@ -48,6 +48,15 @@ namespace QuickFiler.Controllers.Tests
             return $"The variable {variable} was not set properly";
         }
 
+        private Dictionary<string, Theme> CreateThemeMap()
+        {
+            return new Dictionary<string, Theme>
+            {
+                { "DarkNormal", new Theme("DarkNormal", new Dictionary<string, ThemeControlGroup>()) },
+                { "LightNormal", new Theme("LightNormal", new Dictionary<string, ThemeControlGroup>()) }
+            };
+        }
+
         private QfcFormController CreateQfcFormController()
         {
             return new QfcFormController(
@@ -240,6 +249,7 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange
             _controller = CreateQfcFormController();
+            SetPrivateField(_controller, "_themes", CreateThemeMap());
             _controller.ActiveTheme = "DarkNormal";
 
             // Act
@@ -334,6 +344,7 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange
             _controller = CreateQfcFormController();
+            SetPrivateField(_controller, "_themes", CreateThemeMap());
             _mockGlobals.Setup(g => g.Ol.DarkMode).Returns(true);
 
             // Act
@@ -565,7 +576,7 @@ namespace QuickFiler.Controllers.Tests
             // Arrange
             _controller = CreateQfcFormController();
             FormWindowState windowState = FormWindowState.Normal;
-            _mockFormViewer.Setup(fv => fv.Invoke(It.IsAny<System.Action>())).Callback<System.Action>(action => action());
+            _mockFormViewer.Setup(fv => fv.Invoke(It.IsAny<Delegate>())).Callback<Delegate>(action => action.DynamicInvoke());
             _mockFormViewer.SetupSet(fv => fv.WindowState = It.IsAny<FormWindowState>()).Callback<FormWindowState>(state => windowState = state);
 
             // Act
@@ -581,7 +592,7 @@ namespace QuickFiler.Controllers.Tests
             // Arrange
             _controller = CreateQfcFormController();
             FormWindowState windowState = FormWindowState.Normal;
-            _mockFormViewer.Setup(fv => fv.Invoke(It.IsAny<System.Action>())).Callback<System.Action>(action => action());
+            _mockFormViewer.Setup(fv => fv.Invoke(It.IsAny<Delegate>())).Callback<Delegate>(action => action.DynamicInvoke());
             _mockFormViewer.SetupSet(fv => fv.WindowState = It.IsAny<FormWindowState>()).Callback<FormWindowState>(state => windowState = state);
 
             // Act
