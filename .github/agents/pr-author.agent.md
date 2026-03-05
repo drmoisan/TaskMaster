@@ -1,7 +1,7 @@
 ---
 name: pr-author
 description: Writes robust GitHub pull requests from a provided repository context file (commit log + diff summary + changed files), using a feature-first narrative grounded ONLY in the context plus its enumerated additional files, explicit verification steps, and strictly correct GitHub auto-close syntax without hallucinated issue numbers.
-model: GPT-5.2 (copilot)
+model: GPT-5.3-Codex (copilot)
 ---
 
 # PR Author — Operating Instructions
