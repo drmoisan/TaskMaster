@@ -115,7 +115,10 @@ namespace UtilitiesCS
                 }
                 finally
                 {
-                    Marshal.ReleaseComObject(objItem);
+                    if (objItem is not null && Marshal.IsComObject(objItem))
+                    {
+                        Marshal.ReleaseComObject(objItem);
+                    }
                 }
             }
             return totalSize;

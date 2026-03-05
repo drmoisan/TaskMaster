@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Html.Dom;
@@ -14,8 +15,15 @@ namespace UtilitiesCS.OneDriveHelpers
 {
     public class AngleSharpParsedEmailBody
     {
+        private static readonly Lazy<bool> _codePagesProviderRegistered = new(() =>
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            return true;
+        });
+
         public AngleSharpParsedEmailBody(string html)
         {
+            _ = _codePagesProviderRegistered.Value;
             Parser = new HtmlParser();
             _document = new Lazy<IHtmlDocument>(() => Parser.ParseDocument(html));
         }

@@ -295,7 +295,7 @@ namespace UtilitiesCS
                 // For COM objects, use InvokeMember for late binding
                 var value = ItemType.InvokeMember(
                     propertyName,
-                    BindingFlags.Public | BindingFlags.GetField | BindingFlags.GetProperty,
+                    BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetField | BindingFlags.GetProperty,
                     null,
                     InnerObject,
                     Args);
@@ -326,7 +326,7 @@ namespace UtilitiesCS
             {
                 ItemType.InvokeMember(
                     propertyName,
-                    BindingFlags.Public | BindingFlags.SetField | BindingFlags.SetProperty,
+                    BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetField | BindingFlags.SetProperty,
                     null,
                     InnerObject,
                     [propertyValue]);

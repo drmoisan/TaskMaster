@@ -50,9 +50,20 @@ namespace UtilitiesCS.NewtonsoftHelpers
             }
 
             // Set up the config field            
-            var configField = RemainingObject.GetType().GetField("<Config>k__BackingField", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var remainingObjectType = RemainingObject.GetType();
+            var configField = remainingObjectType.GetField("<Config>k__BackingField", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                ?? remainingObjectType.GetField("_Config", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             var configValue = configField?.GetValue(RemainingObject) as NewSmartSerializableConfig;
-            derivedInstance.Config = configValue;
+            if (configValue is null)
+            {
+                var configProperty = remainingObjectType.GetProperty("Config", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                configValue = configProperty?.GetValue(RemainingObject) as NewSmartSerializableConfig;
+            }
+
+            if (configValue is not null)
+            {
+                derivedInstance.Config = configValue;
+            }
             // Set additional fields
             var derivedType = typeof(TDerived);
 
@@ -67,6 +78,26 @@ namespace UtilitiesCS.NewtonsoftHelpers
                     var fieldValue = field.GetValue(RemainingObject);
                     fieldInfo.SetValue(derivedInstance, fieldValue);
                 }
+            }
+
+            var additionalProperties = remainingObjectType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(p => p.Name != nameof(ScoDictionaryNew<TKey, TValue>.Config));
+
+            foreach (var property in additionalProperties)
+            {
+                if (!property.CanRead || property.GetIndexParameters().Length > 0)
+                {
+                    continue;
+                }
+
+                var targetProperty = derivedType.GetProperty(property.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                if (targetProperty is null || !targetProperty.CanWrite)
+                {
+                    continue;
+                }
+
+                var propertyValue = property.GetValue(RemainingObject);
+                targetProperty.SetValue(derivedInstance, propertyValue);
             }
 
             // new 2/16/2025

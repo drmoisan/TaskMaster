@@ -168,10 +168,12 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
 
         public string ParseAndStripFilter(string strFilter)
         {
-            var pattern = @"((" + Regex.Escape($"\"{MAPIFields.Schemas.Triage}\" LIKE '%[ABC]%'") + @"( OR )?){1,3}";
-            //string strRegFilter = $"((\"{RegExSchemaSite}/Triage\" LIKE '%[ABC]%')( OR )?){1,3}";
-            Regex objRegex = new(pattern);
-            return objRegex.Replace(strFilter, "");
+            var triageField = Regex.Escape($"\"{MAPIFields.Schemas.Triage}\"");
+            var pattern = $@"(?:\s*(?:\(\s*)?{triageField}\s*(?:LIKE\s*'%[ABC]%'|=\s*'[ABC]')\s*(?:\)\s*)?(?:OR\s*)?)+";
+            var strippedFilter = Regex.Replace(strFilter, pattern, "");
+            strippedFilter = Regex.Replace(strippedFilter, @"\(\s*\)", "");
+            strippedFilter = Regex.Replace(strippedFilter, @"\s{2,}", " ").Trim();
+            return strippedFilter;
         }
 
         public async Task TrainSelectionAsync(string triageId, CancellationToken token = default)
