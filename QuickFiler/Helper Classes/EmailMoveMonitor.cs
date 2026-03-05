@@ -99,7 +99,7 @@ namespace QuickFiler.Helper_Classes
                     {
                         entryId = mail.EntryID;
                     }
-                    catch (System.Exception ex)
+                    catch (System.Exception)
                     {
                         entryId = "[Error getting EntryID]";
                     }

@@ -506,12 +506,17 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange
             _controller = CreateQfcFormController();
+            _mockQfcQueue.SetupGet(q => q.Count).Returns(1);
+            _mockQfcQueue.SetupGet(q => q.JobsRunning).Returns(0);
+            _mockQfcQueue
+                .Setup(q => q.TryDequeueAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()))
+                .ReturnsAsync((new TableLayoutPanel(), new List<QfcItemGroup>()));
 
             // Act
             await _controller.ButtonSkipHandler(this, EventArgs.Empty);
 
             // Assert
-            // Add assertions based on the expected behavior of the method
+            _mockQfcQueue.Verify(q => q.TryDequeueAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()), Times.Once);
         }
 
         [TestMethod]
@@ -519,12 +524,17 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange
             _controller = CreateQfcFormController();
+            _mockQfcQueue.SetupGet(q => q.Count).Returns(1);
+            _mockQfcQueue.SetupGet(q => q.JobsRunning).Returns(0);
+            _mockQfcQueue
+                .Setup(q => q.TryDequeueAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()))
+                .ReturnsAsync((new TableLayoutPanel(), new List<QfcItemGroup>()));
 
             // Act
             await _controller.SkipGroupAsync();
 
             // Assert
-            // Add assertions based on the expected behavior of the method
+            _mockQfcQueue.Verify(q => q.TryDequeueAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()), Times.Once);
         }
 
         [TestMethod]

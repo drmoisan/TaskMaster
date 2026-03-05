@@ -697,7 +697,7 @@ namespace QuickFiler.Controllers
             }
             else
             {
-                MessageBox.Show("Cannot skip. This is the last group.", "Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                logger.Info("Skip requested but queue is exhausted; no additional groups are available.");
             }
         }
 
