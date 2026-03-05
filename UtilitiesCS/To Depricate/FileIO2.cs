@@ -53,8 +53,8 @@ namespace UtilitiesCS
             bool success = false;
             int attempts = 0;
 
-            while (!success) 
-            { 
+            while (!success)
+            {
                 try
                 {
                     token.ThrowIfCancellationRequested();
@@ -72,12 +72,12 @@ namespace UtilitiesCS
                     {
                         await Task.Delay(100);
                     }
-                    else 
-                    { 
+                    else
+                    {
                         logger.Error($"Failed to write to {filepath} after {attempts} attempts.");
-                        success = true; 
+                        success = true;
                     }
-                }            
+                }
             }
         }
 
@@ -203,7 +203,7 @@ namespace UtilitiesCS
         public static string[][] CsvReadToJagged(string filename, string folderpath, bool skipHeaders = false, string delimiter = ",")
         {
             string[] array1D = CsvRead(filename, folderpath, skipHeaders);
-            var jagged = array1D.Select(x => x.Split(delimiter, trim:true)).ToArray();
+            var jagged = array1D.Select(x => x.Split(delimiter, trim: true)).ToArray();
             return jagged;
         }
     }

@@ -20,7 +20,7 @@ namespace TaskVisualization
         }
 
         private IApplicationGlobals _globals;
-        
+
         public void LoadFilters(IApplicationGlobals globals)
         {
             _globals = globals;
@@ -39,7 +39,7 @@ namespace TaskVisualization
             FiltersOlv.SetObjects(_globals.AF.Filters);
             FiltersOlv.BuildList();
         }
-        
+
         private void EditFilterCallback(EditFilterController controller, FilterEntry filterEntry)
         {
             _globals.AF.Filters.Add(filterEntry);

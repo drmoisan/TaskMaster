@@ -23,7 +23,7 @@ namespace UtilitiesCS.OutlookExtensions
         public static void DeleteUdf(this MailItem item, string fieldName)
         {
             UserProperty property = item.UserProperties.Find(fieldName);
-            
+
             var idx = item.UserProperties.Cast<UserProperty>().ToList().FindIndex(x => x.Name == fieldName);
 
             if (idx > -1)
@@ -35,7 +35,7 @@ namespace UtilitiesCS.OutlookExtensions
 
         //public static UserProperty GetUdf(this IOutlookItem item, string fieldName) => item.UserProperties.Find(fieldName);
         public static UserProperty GetUdf(this IOutlookItem item, string fieldName)
-        { 
+        {
             var ups = item.UserProperties;
             var up = ups.Find(fieldName, true);
             return up;
@@ -45,8 +45,8 @@ namespace UtilitiesCS.OutlookExtensions
         public static string GetUdfString(this MailItem item, string fieldName) => item.GetUdf(fieldName).GetUdfString();
         public static string GetUdfString(this IOutlookItem item, string fieldName) => item.GetUdf(fieldName).GetUdfString();
 
-        public static string GetUdfString(this UserProperty property) 
-        { 
+        public static string GetUdfString(this UserProperty property)
+        {
             object value = property.GetUdfValue(OlUserPropertyType.olText, true);
             if (value.IsArray<string>())
             {
@@ -195,10 +195,10 @@ namespace UtilitiesCS.OutlookExtensions
                 objProperty = item.UserProperties.Find(fieldName);
                 return true;
             }
-            catch (System.Exception) 
+            catch (System.Exception)
             {
                 return false;
-            }            
+            }
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace UtilitiesCS.OutlookExtensions
                     item.UserProperties.Remove(index + 1);
                     property = item.UserProperties.Add(udfName, olUdfType);
                 }
-                
+
                 property.Value = value;
                 item.Save();
                 return true;
@@ -239,7 +239,7 @@ namespace UtilitiesCS.OutlookExtensions
                 return false;
             }
         }
-                        
+
         /// <summary>
         /// Extension function to set a user defined property on an Outlook item of unknown type. 
         /// </summary>
@@ -254,7 +254,7 @@ namespace UtilitiesCS.OutlookExtensions
                                   object value,
                                   OlUserPropertyType olUdfType = OlUserPropertyType.olText)
         {
-            if (!ValidPropertyArgs(value, olUdfType)) 
+            if (!ValidPropertyArgs(value, olUdfType))
             {
                 throw new ArgumentException($"Argument {nameof(value)}={value} " +
                     $"is of type {value.GetType()} which is not assignable to type {olUdfType}.");
@@ -284,7 +284,7 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        private static Dictionary<OlUserPropertyType, Type> udfTypeLookup = new Dictionary<OlUserPropertyType, Type> 
+        private static Dictionary<OlUserPropertyType, Type> udfTypeLookup = new Dictionary<OlUserPropertyType, Type>
         {
             {OlUserPropertyType.olText, typeof(string)},
             {OlUserPropertyType.olNumber, typeof(double) },
@@ -329,8 +329,8 @@ namespace UtilitiesCS.OutlookExtensions
             Type destinationType = udfTypeLookup[olUdfType];
             Type valueType = value.GetType();
             if (destinationType.IsAssignableFrom(valueType)) { return true; }
-            else 
-            {                
+            else
+            {
                 string msg = $"Argument {nameof(value)}={value} is of type {valueType} " +
                         $"which is not assignable to {olUdfType} which is of type {destinationType}." +
                         $"Stack Trace: {TraceUtility.GetMyTraceString(new StackTrace())}";
@@ -526,7 +526,7 @@ namespace UtilitiesCS.OutlookExtensions
             {
                 logger.Error($"Error in set user property: {ex.Message}");
                 logger.Error($"Callstack {TraceUtility.GetMethodTraceString(item, udfName, value, olUdfType)}");
-                
+
                 return false;
             }
         }

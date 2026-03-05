@@ -87,7 +87,7 @@ namespace UtilitiesCS
         {
             return ItemCount + SumItemCountRecursively(OlFolder);
         }
-        internal int SumItemCountRecursively(MAPIFolder folder) 
+        internal int SumItemCountRecursively(MAPIFolder folder)
         {
             return folder.Folders?.Cast<MAPIFolder>().Sum(f => f.Items.Count + SumItemCountRecursively(f)) ?? 0;
         }
@@ -98,10 +98,10 @@ namespace UtilitiesCS
         {
             var items = OlFolder.Items;
             long totalSize = 0L;
-            foreach (var objItem in items) 
+            foreach (var objItem in items)
             {
                 try
-                {                    
+                {
                     var olItem = new OutlookItem(objItem);
                     if (olItem.IsValid()) { totalSize += olItem.Size; }
                     else if (HasProperty(objItem, "Size")) // Fallback for items that don't implement IOutlookItem
@@ -114,7 +114,7 @@ namespace UtilitiesCS
                     logger.Error(e.Message, e);
                 }
                 finally
-                {                    
+                {
                     Marshal.ReleaseComObject(objItem);
                 }
             }
@@ -126,7 +126,7 @@ namespace UtilitiesCS
             if (obj == null) return false;
             return obj.GetType().GetProperty(propertyName) != null;
         }
-        
+
         private Lazy<string> _lazyName;
         public string Name { get => _lazyName.Value; private set => _lazyName = value.ToLazy(); }
         internal virtual string LoadName() => OlFolder?.Name;
@@ -185,7 +185,7 @@ namespace UtilitiesCS
 
         #region INotifyPropertyChanged
 
-        
+
         [JsonIgnore]
         public IFolderWrapper.PropertyEnum SubscriptionStatus { get; private set; }
 
@@ -312,7 +312,7 @@ namespace UtilitiesCS
 
         //private Lazy<IItemInfo[]> _lazyItemHelpers;
         //public IItemInfo[] ItemHelpers { get => _lazyItemHelpers.Value; set => _lazyItemHelpers = value?.ToLazy(); }
-        public AsyncLazy<IItemInfo[]> ItemHelpers { get; set; } 
+        public AsyncLazy<IItemInfo[]> ItemHelpers { get; set; }
         public IApplicationGlobals Globals { get; set; }
 
 
@@ -320,7 +320,7 @@ namespace UtilitiesCS
         {
             if (Globals is null) { throw new ArgumentNullException("Globals"); }
             List<IItemInfo> helpers = [];
-            var items = OlFolder.Items;            
+            var items = OlFolder.Items;
             foreach (var objItem in items)
             {
                 try
@@ -358,7 +358,7 @@ namespace UtilitiesCS
             if (Globals is null) { throw new ArgumentNullException("Globals"); }
             if (other.Globals is null) { other.Globals = Globals; }
             if (ItemCount == 0 || other.ItemCount == 0) { return 0; }
-            
+
             var (matching, currentOnly, otherOnly) = await CompareItemsAsync(other, cancel).ConfigureAwait(false);
             return CalculateItemMatchPercentage(matching, currentOnly, otherOnly);
         }
@@ -382,9 +382,9 @@ namespace UtilitiesCS
             if (other.Globals is null) { other.Globals = Globals; }
             var currentHelpers = await ItemHelpers;
             var otherHelpers = await other.ItemHelpers;
-            if (currentHelpers.IsNullOrEmpty() || otherHelpers.IsNullOrEmpty()) 
-            { 
-                return ([], currentHelpers, otherHelpers); 
+            if (currentHelpers.IsNullOrEmpty() || otherHelpers.IsNullOrEmpty())
+            {
+                return ([], currentHelpers, otherHelpers);
             }
             else
             {
@@ -396,7 +396,7 @@ namespace UtilitiesCS
                 {
                     for (j = 0; j < otherHelpers.Length; j++)
                     {
-                        if(currentHelpers[i].Equals(otherHelpers[j]))
+                        if (currentHelpers[i].Equals(otherHelpers[j]))
                         {
                             matching2.Add(currentHelpers[i]);
                             break; // Found a match, no need to check further for this item
@@ -407,7 +407,7 @@ namespace UtilitiesCS
                 var matching = currentHelpers.Intersect(otherHelpers).ToArray();
                 var currentOnly = currentHelpers.Except(otherHelpers).ToArray();
                 var otherOnly = otherHelpers.Except(currentHelpers).ToArray();
-                return (matching, currentOnly, otherOnly); 
+                return (matching, currentOnly, otherOnly);
             }
         }
 

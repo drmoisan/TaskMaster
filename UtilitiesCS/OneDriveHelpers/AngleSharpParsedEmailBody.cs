@@ -12,7 +12,7 @@ using UtilitiesCS.Extensions.Lazy;
 
 namespace UtilitiesCS.OneDriveHelpers
 {
-    public class AngleSharpParsedEmailBody 
+    public class AngleSharpParsedEmailBody
     {
         public AngleSharpParsedEmailBody(string html)
         {
@@ -52,9 +52,9 @@ namespace UtilitiesCS.OneDriveHelpers
             return this;
         }
 
-        
 
-        
+
+
 
     }
 }

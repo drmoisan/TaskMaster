@@ -19,12 +19,12 @@ namespace UtilitiesCS.ReusableTypeClasses
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
     [Serializable()]
-    public class ScoDictionary<TKey, TValue>: ConcurrentObservableDictionary<TKey, TValue>, IScoDictionary<TKey, TValue>
+    public class ScoDictionary<TKey, TValue> : ConcurrentObservableDictionary<TKey, TValue>, IScoDictionary<TKey, TValue>
     {
         #region constructors
         public ScoDictionary() : base() { }
         public ScoDictionary(IDictionary<TKey, TValue> source) : base(source) { }
-        public ScoDictionary(IEqualityComparer<TKey> equalityComparer) : base(equalityComparer) { }    
+        public ScoDictionary(IEqualityComparer<TKey> equalityComparer) : base(equalityComparer) { }
         public ScoDictionary(int capactity) : base(capactity) { }
         public ScoDictionary(IDictionary<TKey, TValue> source, IEqualityComparer<TKey> equalityComparer) : base(source, equalityComparer) { }
         public ScoDictionary(int capacity, IEqualityComparer<TKey> equalityComparer) : base(capacity, equalityComparer) { }
@@ -66,7 +66,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         #endregion
 
         #region Serialization
-        
+
 
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private string _filepath = "";
@@ -156,7 +156,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public void SerializeThreadSafe(string filepath)
         {
-            
+
             // Set Status to Locked
             if (_readWriteLock.TryEnterWriteLock(-1))
             {
@@ -184,7 +184,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                     _readWriteLock.ExitWriteLock();
                 }
             }
-            
+
         }
 
         private async Task WriteTextAsync(string filePath, string text)
@@ -196,7 +196,8 @@ namespace UtilitiesCS.ReusableTypeClasses
                 bufferSize: 4096, useAsync: true))
             {
                 await sourceStream.WriteAsync(encodedText, 0, encodedText.Length);
-            };
+            }
+            ;
         }
 
         public void Deserialize()

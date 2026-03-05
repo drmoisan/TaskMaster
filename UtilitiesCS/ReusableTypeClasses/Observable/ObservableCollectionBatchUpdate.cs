@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public class ObservableCollectionBatchUpdate<T>: ObservableCollection<T>
+    public class ObservableCollectionBatchUpdate<T> : ObservableCollection<T>
     {
         private bool _suppressNotification = false;
 
@@ -29,5 +29,5 @@ namespace UtilitiesCS.ReusableTypeClasses
         }
     }
 
-    
+
 }

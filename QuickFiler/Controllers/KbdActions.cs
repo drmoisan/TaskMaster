@@ -46,7 +46,7 @@ namespace QuickFiler.Controllers
         public bool ContainsKey(TKey key) => _list.Any(x => x.KeyEquals(key));
 
         public UClass[] FilterKeys(TKey key) => _list.Where(x => x.KeyEquals(key)).ToArray();
-        
+
         public UClass Find(TKey key)
         {
             var matches = _list.Where(x => x.KeyEquals(key));
@@ -99,11 +99,11 @@ namespace QuickFiler.Controllers
 
         public void Add(UClass instance)
         {
-            
+
             if (_list.Any(x => x.SourceId == instance.SourceId && x.KeyEquals(instance.Key)))
             {
                 string message = $"Cannot add key because it already exists. Key {instance.Key} SourceId {instance.SourceId}";
-                
+
                 logger.Error(message);
                 throw new ArgumentException(message, nameof(instance));
             }

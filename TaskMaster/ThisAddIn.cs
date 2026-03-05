@@ -39,11 +39,11 @@ namespace TaskMaster
             _externalUtilities.SetGlobals(_globals, _ribbonController);
 
             IdleAsyncQueue.AddEntry(true, async () =>
-            {                
+            {
                 await _globals.LoadAsync(false);
                 logger.Debug("Finished loading globals");
             });
-            
+
             //IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => _ribbonController.SetGlobals(_globals)));
             //IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => _externalUtilities.SetGlobals(_globals, _ribbonController)));
             IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => logger.Debug("IdleAsyncQueue Complete")));
@@ -63,7 +63,7 @@ namespace TaskMaster
         /// This add-in is designed for 200% scaling.
         /// </summary>
         private void SetUpBrightIdeasSettings()
-        {            
+        {
             var tlvIndent = 34;
             tlvIndent = (int)(tlvIndent * UiThread.AutoScaleFactor.Width);
             BrightIdeasSoftware.TreeListView.TreeRenderer.PIXELS_PER_LEVEL = tlvIndent;
@@ -73,7 +73,7 @@ namespace TaskMaster
         private ApplicationGlobals _globals;
         private AddInUtilities _externalUtilities;
         private RibbonController _ribbonController;
-        
+
         /// <summary>
         /// Overrides the default behavior of the COM add-in to create an XML ribbon
         /// <seealso cref="RibbonViewer"/> which is controlled by 
@@ -132,7 +132,7 @@ namespace TaskMaster
             this.Startup += new System.EventHandler(ThisAddIn_Startup);
             this.Shutdown += new System.EventHandler(ThisAddIn_Shutdown);
         }
-        
+
         #endregion
     }
 }

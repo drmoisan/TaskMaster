@@ -53,7 +53,7 @@ namespace UtilitiesCS
             string[] flatcsv;
             string[] words_X = Str_X.GetWords(SWOptions);
             string[] words_Y = Str_Y.GetWords(SWOptions);
-                        
+
             LenX = words_X.Length;
             LenY = words_Y.Length;
             Matrix = new object[LenX + 3 + 1, LenY + 3 + 1];
@@ -121,7 +121,7 @@ namespace UtilitiesCS
 
             // StopWatch_SW.Pause
             return result;
-            
+
         }
 
         public static int CalculateScore(int[] wordsX,
@@ -135,7 +135,7 @@ namespace UtilitiesCS
                                          string yString,
                                          int logThreshhold)
         {
-            
+
             var tup = CalculateMatrixTuple(wordsX, wordLengthX, wordsY, wordLengthY, matchScore, mismatchScore, gapPenalty);
             if (logThreshhold > -1 && tup.Score > logThreshhold)
                 LogMatrixState(tup.Matrix, xString, yString);
@@ -166,16 +166,16 @@ namespace UtilitiesCS
         {
             ValidateInputs(wordsX, wordLengthX, wordsY, wordLengthY);
             DeclareMatrix(wordsX, wordsY, out int lengthX, out int lengthY, out int maxValue, out int[,] matrix);
-            
+
             //LogMatrixState(matrix);
 
-                        
+
             for (int x = 3; x < lengthX + 3; x++)
                 matrix[x, 1] = wordsX[x - 3];
-            
+
             for (int y = 3; y < lengthY + 3; y++)
                 matrix[1, y] = wordsY[y - 3];
-            
+
 
             //LogMatrixState(matrix);
 
@@ -221,7 +221,7 @@ namespace UtilitiesCS
 
             result = maxValue;
 
-            
+
             return (matrix, result);
 
         }
@@ -287,7 +287,7 @@ namespace UtilitiesCS
             var val = lengths.First();
             for (int i = 0; i < lengths.Count(); i++)
             {
-                if(lengths[i] != val)
+                if (lengths[i] != val)
                 {
                     var stackTrace = new StackTrace();
                     var frame = stackTrace.GetFrame(1);
@@ -300,12 +300,12 @@ namespace UtilitiesCS
                     throw new ArgumentOutOfRangeException(message);
                 }
             }
-            
+
         }
 
         public static int max(params int[] values)
         {
-            int max = values[0]; 
+            int max = values[0];
             for (int i = 1; i < values.Length; i++)
             {
                 max = Math.Max(max, values[i]);

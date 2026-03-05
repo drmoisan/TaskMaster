@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace UtilitiesCS
 {
-    public interface IProjectData: ISerializableList<IProjectEntry>
+    public interface IProjectData : ISerializableList<IProjectEntry>
     {
         bool Contains_ProgramName(string programName);
         bool Contains_ProjectID(string projectID);

@@ -13,7 +13,7 @@ namespace UtilitiesCS
     public class DelegateButton
     {
         public DelegateButton() { }
-        
+
         public DelegateButton(Button button,
                               DialogResult dialogResult,
                               Delegate @delegate)
@@ -58,17 +58,17 @@ namespace UtilitiesCS
                               DialogResult dialogResult,
                               Delegate @delegate,
                               Button template)
-        { 
+        {
             _template = template.Clone();
             _name = name;
             _delegate = @delegate;
             Button = MakeButton(buttonText, dialogResult);
         }
 
-        public DelegateButton(string name, 
-                              Image buttonImage, 
-                              string buttonText, 
-                              DialogResult dialogResult, 
+        public DelegateButton(string name,
+                              Image buttonImage,
+                              string buttonText,
+                              DialogResult dialogResult,
                               Delegate @delegate)
         {
             _name = name;
@@ -94,19 +94,19 @@ namespace UtilitiesCS
         private Button _template = new DelegateButtonTemplate().Button1.Clone();
         private Delegate _delegate;
 
-        
+
         public static DelegateButton FromButton(Button button,
                                                 DialogResult dialogResult,
-                                                Delegate @delegate) 
-        { 
+                                                Delegate @delegate)
+        {
             var db = new DelegateButton();
             db.Button = button;
             db.Button.DialogResult = dialogResult;
             db.Delegate = @delegate;
 
-            return db; 
+            return db;
         }
-        
+
         public string Name { get => _name; set => _name = value; }
 
         public Button Button
@@ -120,7 +120,7 @@ namespace UtilitiesCS
                 _button.Click += new System.EventHandler(Button_Click);
             }
         }
-        
+
         public Delegate Delegate { get => _delegate; set => _delegate = value; }
 
         public Button ButtonTemplate { get => _template; set => _template = value.Clone(); }
@@ -167,6 +167,6 @@ namespace UtilitiesCS
         {
             _delegate.DynamicInvoke();
         }
-        
+
     }
 }

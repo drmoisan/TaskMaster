@@ -34,7 +34,7 @@ namespace UtilitiesCS.Dialogs
             Func<T> function)
         {
             _name = name;
-            _function = function;            
+            _function = function;
             Button = MakeButton(buttonText);
             ButtonClicked = function;
         }
@@ -189,7 +189,7 @@ namespace UtilitiesCS.Dialogs
             Button template)
         {
             _template = template.Clone();
-            _name = name;            
+            _name = name;
             Button = MakeButton(buttonText, buttonImage, dialogResult);
             ButtonClickedAsync = function;
         }
@@ -225,13 +225,13 @@ namespace UtilitiesCS.Dialogs
                 {
                     if (ButtonClicked is not null) { _button.Click -= Button_Click; }
                     if (ButtonClickedAsync is not null) { _button.Click -= Button_ClickAsync; }
-                }                    
+                }
                 _button = value;
                 {
                     if (ButtonClicked is not null) { _button.Click += Button_Click; }
                     if (ButtonClickedAsync is not null) { _button.Click += Button_ClickAsync; }
                 }
-                
+
             }
         }
 
@@ -278,21 +278,21 @@ namespace UtilitiesCS.Dialogs
         }
 
         private Func<T> _buttonClicked;
-        public Func<T> ButtonClicked 
-        { 
+        public Func<T> ButtonClicked
+        {
             get => _buttonClicked;
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
                 if (_buttonClicked is not null && _button is not null) { _button.Click -= Button_Click; }
                 _buttonClicked = value;
-                if (_buttonClicked is not null && _button is not null) { _button.Click += Button_Click; }                    
+                if (_buttonClicked is not null && _button is not null) { _button.Click += Button_Click; }
             }
         }
 
         private Func<Task<T>> _buttonClickedAsync;
-        public Func<Task<T>> ButtonClickedAsync 
-        { 
+        public Func<Task<T>> ButtonClickedAsync
+        {
             get => _buttonClickedAsync;
             set
             {
@@ -301,7 +301,7 @@ namespace UtilitiesCS.Dialogs
                 if (_buttonClickedAsync is not null && _button is not null) { _button.Click += Button_ClickAsync; }
             }
         }
-        
+
         public T Value { get; internal set; }
 
         internal void Button_Click(object sender, EventArgs e)
@@ -315,7 +315,7 @@ namespace UtilitiesCS.Dialogs
                 logger.Error($"Error in Button_Click: {ex.Message}", ex);
                 throw;
             }
-            
+
         }
         internal async void Button_ClickAsync(object sender, EventArgs e)
         {
@@ -328,8 +328,8 @@ namespace UtilitiesCS.Dialogs
                 logger.Error($"Error in Button_ClickAsync: {ex.Message}", ex);
                 throw;
             }
-            
+
         }
-    
+
     }
 }

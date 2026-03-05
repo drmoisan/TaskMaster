@@ -128,7 +128,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         //    var actual = TypeBuilderNamespace.MyTypeBuilder.CreateReplica(expected);
         //    actual.Should().BeEquivalentTo(expected);
         //}
-        
+
         //[TestMethod]
         //public void MyTypeBuilderTest3()
         //{

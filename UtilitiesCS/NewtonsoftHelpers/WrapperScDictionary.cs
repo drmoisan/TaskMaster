@@ -19,7 +19,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
         public ConcurrentDictionary<TKey, TValue> ConcurrentDictionary { get; set; }
         public object RemainingObject { get; set; }
 
-        public WrapperScDictionary() 
+        public WrapperScDictionary()
         {
             ConcurrentDictionary = new ConcurrentDictionary<TKey, TValue>();
         }
@@ -32,7 +32,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
         }
 
         public TDerived ToDerived()
-        {            
+        {
             ConcurrentDictionary.ThrowIfNull();
             RemainingObject.ThrowIfNull();
 
@@ -49,11 +49,11 @@ namespace UtilitiesCS.NewtonsoftHelpers
             var derivedType = typeof(TDerived);
 
             var additionalFields = RemainingObject.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).ToArray();
-            
+
             foreach (var field in additionalFields)
             {
                 var fieldInfo = derivedType.GetField(field.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                
+
                 if (fieldInfo != null)
                 {
                     fieldInfo.SetValue(derivedInstance, field.GetValue(RemainingObject));
@@ -82,12 +82,12 @@ namespace UtilitiesCS.NewtonsoftHelpers
 
             var derivedProperties = derivedType
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(property => (property.DeclaringType != baseType)&&(property.Name != "Config"))
+                .Where(property => (property.DeclaringType != baseType) && (property.Name != "Config"))
                 .ToArray();
 
             var derivedFields = derivedType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                                           .Where(field => (field.DeclaringType != baseType)&&(field.Name != "ism"));
-            
+                                           .Where(field => (field.DeclaringType != baseType) && (field.Name != "ism"));
+
             TypeBuilder tb = GetTypeBuilder();
             ConstructorBuilder constructor = tb.DefineDefaultConstructor(
                 MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName);
@@ -101,7 +101,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
             }
 
             var fieldsToCreate = derivedFields.Where(field => !capturedFields.ContainsKey(field.Name)).ToArray();
-            
+
             foreach (var field in fieldsToCreate)
             {
                 tb.DefineField(field.Name, field.FieldType, field.Attributes);
@@ -138,9 +138,9 @@ namespace UtilitiesCS.NewtonsoftHelpers
             var assemblyName = new AssemblyName(typeSignature);
             AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(
                 assemblyName, AssemblyBuilderAccess.Run);
-            
+
             ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule("MainModule");
-            
+
             TypeBuilder tb = moduleBuilder.DefineType(typeSignature,
                     TypeAttributes.Public |
                     TypeAttributes.Class |
@@ -152,11 +152,11 @@ namespace UtilitiesCS.NewtonsoftHelpers
             return tb;
         }
 
-        public  void CreateConfigProperty(TypeBuilder tb)
+        public void CreateConfigProperty(TypeBuilder tb)
         {
             var propertyBuilder = tb.DefineProperty("Config", PropertyAttributes.None, typeof(NewSmartSerializableConfig), null);
             var fieldBuilder = tb.DefineField("_Config", typeof(NewSmartSerializableConfig), FieldAttributes.Private);
-            
+
             var getMethod = tb.DefineMethod("get_Config", MethodAttributes.Public, typeof(NewSmartSerializableConfig), Type.EmptyTypes);
             var getIl = getMethod.GetILGenerator();
             getIl.Emit(OpCodes.Ldarg_0);
@@ -182,11 +182,11 @@ namespace UtilitiesCS.NewtonsoftHelpers
             PropertyBuilder propertyBuilder = tb.DefineProperty(property.Name, property.Attributes, property.PropertyType, property.DeclaringType.GetGenericArguments());
             var getMethod = ModifyGetMethod(tb, property, ref capturedFields);
             propertyBuilder.SetGetMethod(getMethod);
-            
+
             var setMethod = ModifySetMethod(tb, property, ref capturedFields);
             propertyBuilder.SetSetMethod(setMethod);
         }
-        
+
         public void ReplicateProperty(TypeBuilder tb, PropertyInfo property, FieldInfo existingField)
         {
             //FieldBuilder fieldBuilder = tb.DefineField("_" + propertyName, propertyType, FieldAttributes.Private);
@@ -284,7 +284,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
             Type[] type_arguments = null;
             var oldGetMethod = property.GetGetMethod();
             if (oldGetMethod == null) { throw new InvalidOperationException("Property does not have a getter."); }
-            
+
             //if (!(oldGetMethod is ConstructorInfo))
             //    method_arguments = oldGetMethod.GetGenericArguments();
 
@@ -297,7 +297,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
             MethodBuilder getPropMthdBldr = tb.DefineMethod("get_" + property.Name, oldGetMethod.Attributes, property.PropertyType, type_arguments);
             ILGenerator getIl = getPropMthdBldr.GetILGenerator();
 
-            foreach (var instruction in oldInstructions) 
+            foreach (var instruction in oldInstructions)
             {
                 if (instruction.OpCode == OpCodes.Ldfld || instruction.OpCode == OpCodes.Stfld)
                 {
@@ -308,10 +308,10 @@ namespace UtilitiesCS.NewtonsoftHelpers
                         fieldBuilder = tb.DefineField(bf.Name, bf.FieldType, bf.Attributes);
                         backingFields[bf.Name] = fieldBuilder;
                     }
-                                        
+
                     getIl.Emit(OpCodes.Ldfld, fieldBuilder);
                 }
-                else if (instruction.OpCode == OpCodes.Callvirt) 
+                else if (instruction.OpCode == OpCodes.Callvirt)
                 {
                     var method = (MethodInfo)instruction.Operand;
                     getIl.Emit(instruction.OpCode, method);

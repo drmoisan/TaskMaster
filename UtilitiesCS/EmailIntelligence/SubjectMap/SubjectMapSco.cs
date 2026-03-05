@@ -55,7 +55,7 @@ namespace UtilitiesCS
             ScoCollection<SubjectMapEntry>.AltListLoader backupLoader,
             string backupFilepath,
             bool askUserOnError,
-            ISerializableList<string> commonWords) : 
+            ISerializableList<string> commonWords) :
             base(filename,
                  folderpath,
                  backupLoader,
@@ -64,7 +64,7 @@ namespace UtilitiesCS
         { _commonWords = commonWords; }
 
         private ISerializableList<string> _commonWords;
-        
+
         private Regex _tokenizerRegex = Tokenizer.GetRegex();
         public void SetTokenizerRegex(Regex tokenizerRegex) => _tokenizerRegex = tokenizerRegex;
 
@@ -103,11 +103,11 @@ namespace UtilitiesCS
                 {
                     logger.Error($"Error adding {nameof(SubjectMapEntry)}. Skipping entry. {e.Message}");
                 }
-                catch (InvalidOperationException e) 
+                catch (InvalidOperationException e)
                 {
                     logger.Error($"Error adding {nameof(SubjectMapEntry)}. Skipping entry. {e.Message}");
                 }
-                
+
             }
             else
             {
@@ -146,11 +146,11 @@ namespace UtilitiesCS
                     return base.ToList().Where(entry => entry.Folderpath == key).ToList();
             }
         }
-    
+
         public bool TryRepair(SubjectMapEntry entry)
         {
             var idx = this.FindIndex(x => x == entry);
-            if (idx == -1) { return false;  }
+            if (idx == -1) { return false; }
             var result = this[idx].TryRepair(true);
             if (!result) { return false; }
             this.Serialize();
@@ -163,14 +163,14 @@ namespace UtilitiesCS
             var folders = tree.Roots
                               .SelectMany(root => root
                               .FlattenIf(node => !node.Selected))
-                              .Select(x => (x.OlFolder,x.RelativePath));
+                              .Select(x => (x.OlFolder, x.RelativePath));
             return folders;
         }
 
         internal IEnumerable<(MailItem Item, string RelativePath)> QueryMailTuples(IEnumerable<(MAPIFolder Folder, string RelativePath)> folders)
         {
             var mailItems = folders
-                .SelectMany<(MAPIFolder Folder, string RelativePath), 
+                .SelectMany<(MAPIFolder Folder, string RelativePath),
                             (MailItem Item, string RelativePath)>(tup => tup
                             .Folder.Items.Cast<object>()
                             .Where(obj => obj is MailItem)
@@ -178,7 +178,7 @@ namespace UtilitiesCS
                             .Select(item => (item, tup.RelativePath)));
             return mailItems;
         }
-                
+
         internal List<T> Consume<T>(IEnumerable<T> enumerable, int count, ProgressTracker progress)
         {
             int completed = 0;
@@ -199,20 +199,20 @@ namespace UtilitiesCS
         {
             summaryMetrics = this
                 .GroupBy(x => x.Folderpath)
-                .Select(grp => new SummaryMetric 
-                { 
+                .Select(grp => new SummaryMetric
+                {
                     FolderName = grp.First().Foldername,
                     FolderPath = grp.First().Folderpath,
                     SubjectCount = grp.Count(),
-                    EmailCount = grp.Sum(x=>x.EmailSubjectCount)
+                    EmailCount = grp.Sum(x => x.EmailSubjectCount)
                 })
                 .ToList();
             var smm = new SubjectMapMetrics(summaryMetrics);
             smm.Show();
         }
-        
+
         internal void RepopulateSubjectMapEntries(
-            IApplicationGlobals appGlobals, 
+            IApplicationGlobals appGlobals,
             ProgressTracker progress,
             IEnumerable<(MAPIFolder Folder, string RelativePath)> folderTuples,
             IEnumerable<(MailItem Item, string RelativePath)> mailIEnumerable)
@@ -230,7 +230,7 @@ namespace UtilitiesCS
 
             var count = mailTuples.Count();
             var timeCounting = stopwatch.ElapsedMilliseconds - timeConsuming;
-            
+
             RebuildEntries(appGlobals, mailTuples, count, progress.SpawnChild(70));
             var timeRebuilding = stopwatch.ElapsedMilliseconds - timeCounting;
 
@@ -256,7 +256,7 @@ namespace UtilitiesCS
                 var folderPath = tuple.RelativePath;
                 var remappedPath = appGlobals.TD.FolderRemap.ContainsKey(folderPath) ? appGlobals.TD.FolderRemap[folderPath] : folderPath;
                 this.Add(subject, remappedPath);
-                progress.Report((int)(((double)++i / count) * 100),$"Creating Subject Map Entry {i:N0} of {count:N0}");
+                progress.Report((int)(((double)++i / count) * 100), $"Creating Subject Map Entry {i:N0} of {count:N0}");
             }
         }
 
@@ -274,7 +274,7 @@ namespace UtilitiesCS
             {
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
-                
+
                 // Query List of Outlook Folders if they are not on the skip list
                 progress.Report(0, "Building Outlook Folder Tree");
                 var folders = QueryOlFolders(appGlobals);
@@ -294,7 +294,7 @@ namespace UtilitiesCS
 
             progress.Report(100);
 
-                              
+
         }
 
         internal List<SummaryMetric> summaryMetrics;

@@ -20,14 +20,14 @@ namespace TaskVisualization
         public IList<string> FilterList => [.. _globals.TD.CategoryFilters];
 
         public IList<string> AddChoicesToDict(MailItem olMail, IList<IPrefix> prefixes, string prefixKey, string currentUserEmail)
-        {            
+        {
             throw new NotImplementedException();
         }
 
         public Category AddColorCategory(IPrefix prefix, string projectName)
         {
             projectName = StripPrefix(prefix?.Value, projectName);
-            
+
             if (!_globals.TD.ProjInfo.Contains_ProjectName(projectName))
             {
                 if (!TryAutoExtractProgram(projectName, out var programName))
@@ -46,15 +46,15 @@ namespace TaskVisualization
             return null;
         }
 
-        public string GetNextProjectID(string programID) 
+        public string GetNextProjectID(string programID)
         {
             programID.ThrowIfNullOrEmpty();
             var projects = _globals.TD.ProjInfo.Where(entry => entry.ProgramID == programID).OrderByDescending(entry => entry.ProjectID).FirstOrDefault();
             var seedId = projects?.ProjectID ?? $"{programID}00";
             return _globals.TD.IDList.GetNextToDoID(seedId);
         }
-        
-        internal string ChooseOrCreateProgramName() 
+
+        internal string ChooseOrCreateProgramName()
         {
             var chooser = new TagLauncher(_globals.TD.ProgramInfo.Keys, _globals);
             chooser.Viewer.ShowDialog();
@@ -72,10 +72,10 @@ namespace TaskVisualization
                 _globals.TD.ProgramInfo.Serialize();
                 return selection;
             }
-            
+
         }
 
-        internal bool TryAutoExtractProgram(string projectName, out string programName) 
+        internal bool TryAutoExtractProgram(string projectName, out string programName)
         {
             programName = null;
             //var programs = _globals.TD.ProjInfo.Select(entry => entry.ProgramName).OrderByDescending(x => x.Length).ToList();
@@ -91,7 +91,7 @@ namespace TaskVisualization
             return false;
         }
 
-        public void CreateProjectTaskItem(string projectName, string projectID) 
+        public void CreateProjectTaskItem(string projectName, string projectID)
         {
             var taskItems = GetTaskItems();
             var taskItem = (TaskItem)taskItems.Add(OlItemType.olTaskItem);
@@ -100,7 +100,7 @@ namespace TaskVisualization
             todo.ToDoID = projectID;
             todo.TaskSubject = projectName;
             todo.Projects.AsStringNoPrefix = projectName;
-            todo.Context.AsStringNoPrefix = "PROJECTS";            
+            todo.Context.AsStringNoPrefix = "PROJECTS";
         }
 
         internal Items GetTaskItems()
@@ -125,7 +125,7 @@ namespace TaskVisualization
         {
             // TODO: Link this to the Bayesian project prediction model
             throw new NotImplementedException();
-            
+
         }
 
         public async Task<IList<string>> AutoFindAsync(object objItem)
@@ -151,12 +151,12 @@ namespace TaskVisualization
             {
                 if (olItem.InnerObject is MailItem mailItem)
                 {
-                    helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false).ConfigureAwait(true);                    
+                    helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false).ConfigureAwait(true);
                 }
             }
             else if (objItem is MailItem mailItem)
             {
-                helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false).ConfigureAwait(true);                
+                helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false).ConfigureAwait(true);
             }
             if (helper is null) { return null; }
             else

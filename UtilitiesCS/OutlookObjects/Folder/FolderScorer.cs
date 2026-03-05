@@ -17,7 +17,7 @@ namespace UtilitiesCS
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        
+
         #region constructors and private variables
 
         public FolderScorer() { }
@@ -70,10 +70,10 @@ namespace UtilitiesCS
         public bool AddOlFolderKeys(MailItem olMail,
                                     IApplicationGlobals appGlobals,
                                     int topN = -1)
-        {            
+        {
             var objProperty = olMail.UserProperties.Find("FolderKey");
             if (objProperty is null) { return false; }
-            
+
             var foldersObject = objProperty.Value;
             if (foldersObject is null) { return false; }
             else if (foldersObject is Array) { return AddArray(foldersObject, topN); }
@@ -97,7 +97,7 @@ namespace UtilitiesCS
             AddWordSequenceSuggestions(olMail, appGlobals, parallel);
 
             Vlog.LogObject(_folderNameScores, nameof(_folderNameScores));
-            
+
         }
 
         public async Task RefreshSuggestions(MailItemHelper mailInfo,
@@ -125,7 +125,7 @@ namespace UtilitiesCS
         private async Task AddBayesianSuggestionsAsync(MailItemHelper mailInfo, IApplicationGlobals globals, int topNfolderKeys)
         {
             EmailIntelligence.Bayesian.Prediction<string>[] predictions = null;
-            
+
             if (topNfolderKeys > 0)
             {
                 predictions = (await globals.AF.Manager["Folder"]).Classify(mailInfo.Tokens).Take(topNfolderKeys).ToArray();
@@ -134,7 +134,7 @@ namespace UtilitiesCS
             {
                 predictions = (await globals.AF.Manager["Folder"]).Classify(mailInfo.Tokens).ToArray();
             }
-            
+
             foreach (var prediction in predictions)
             {
                 long score = (long)Math.Round(prediction.Probability * 1000, 0);
@@ -178,13 +178,13 @@ namespace UtilitiesCS
 
         public void FromArray(string[] folderPaths)
         {
-            _folderNameScores.Clear(); 
+            _folderNameScores.Clear();
             AddArray(folderPaths, -1);
         }
 
         public string[] ToArray() => _folderNameScores.OrderByDescending(x => x.Value).Select(x => x.Key).ToArray();
 
-        public string[] ToArray(int topN) => _folderNameScores.OrderByDescending(x=>x.Value).Take(topN).Select(x=>x.Key).ToArray();
+        public string[] ToArray(int topN) => _folderNameScores.OrderByDescending(x => x.Value).Take(topN).Select(x => x.Key).ToArray();
 
         internal void AddConversationBasedSuggestions(MailItem OlMail, IApplicationGlobals _globals, int topN = 5)
         {
@@ -262,18 +262,18 @@ namespace UtilitiesCS
 
         internal ParallelQuery<FolderScoring> QuerySubject(ParallelQuery<ISubjectMapEntry> map,
                                                            SubjectMapEntry target,
-                                                           int matchScore, 
-                                                           int mismatchScore, 
+                                                           int matchScore,
+                                                           int mismatchScore,
                                                            int gapPenalty,
                                                            int convCtPwr)
         {
             return map.AsParallel()
-                      .Where(entry => 
+                      .Where(entry =>
                       {
-                          if (!entry.Validate())                          
-                              return false;                          
-                          return entry.SubjectEncoded is not null;                          
-                       })
+                          if (!entry.Validate())
+                              return false;
+                          return entry.SubjectEncoded is not null;
+                      })
                       .Select(entry =>
                       {
                           int subjScore = SmithWaterman.CalculateScore(
@@ -375,32 +375,32 @@ namespace UtilitiesCS
                        })
                       .Select(entry =>
                       {
-                            //var thresh = entry.Folderpath == "Reference\\HR - Personal - Offers LOIs Expats" ? (int)Math.Round(Math.Pow(threshhold / entry.EmailSubjectCount, 1/convCtPwr),0): -1;
-                            var thresh = -1;
-                            int subjScore = SmithWaterman.CalculateScore(
-                                entry.SubjectEncoded,
-                                entry.SubjectWordLengths,
-                                target.SubjectEncoded,
-                                target.SubjectWordLengths,
-                                matchScore,
-                                mismatchScore,
-                                gapPenalty, 
-                                entry.EmailSubject, target.EmailSubject, thresh);
-                            int subjScoreWt = (int)Math.Round(
-                                       Math.Pow(subjScore, convCtPwr) * entry.EmailSubjectCount);
+                          //var thresh = entry.Folderpath == "Reference\\HR - Personal - Offers LOIs Expats" ? (int)Math.Round(Math.Pow(threshhold / entry.EmailSubjectCount, 1/convCtPwr),0): -1;
+                          var thresh = -1;
+                          int subjScore = SmithWaterman.CalculateScore(
+                              entry.SubjectEncoded,
+                              entry.SubjectWordLengths,
+                              target.SubjectEncoded,
+                              target.SubjectWordLengths,
+                              matchScore,
+                              mismatchScore,
+                              gapPenalty,
+                              entry.EmailSubject, target.EmailSubject, thresh);
+                          int subjScoreWt = (int)Math.Round(
+                                     Math.Pow(subjScore, convCtPwr) * entry.EmailSubjectCount);
 
-                            entry.Score = subjScoreWt;
-                            return entry;
+                          entry.Score = subjScoreWt;
+                          return entry;
                       })
                       .GroupBy(entry => entry.Folderpath,
                                entry => entry,
                                (folderpath, grouping) => new FolderScoring
                                {
-                                    FolderPath = folderpath,
-                                    FolderName = grouping.Select(x => x.Foldername).First(),
-                                    FolderEncoding = grouping.Select(x => x.FolderEncoded).First(),
-                                    FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First(),
-                                    Score = grouping.Select(x => x.Score).Sum()
+                                   FolderPath = folderpath,
+                                   FolderName = grouping.Select(x => x.Foldername).First(),
+                                   FolderEncoding = grouping.Select(x => x.FolderEncoded).First(),
+                                   FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First(),
+                                   Score = grouping.Select(x => x.Score).Sum()
                                });
         }
 
@@ -409,7 +409,7 @@ namespace UtilitiesCS
                                                         SubjectMapEntry target,
                                                         int matchScore,
                                                         int mismatchScore,
-                                                        int gapPenalty)                                                                  
+                                                        int gapPenalty)
         {
             //int threshhold = 1000;
             return map.Where(entry =>
@@ -422,11 +422,11 @@ namespace UtilitiesCS
                                entry => entry,
                                (folderpath, grouping) => new FolderScoring
                                {
-                                    FolderPath = folderpath,
-                                    FolderName = grouping.Select(x => x.Foldername).First(),
-                                    FolderEncoding = grouping.Select(x => x.FolderEncoded).First(),
-                                    FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First(),
-                                    Score = 0
+                                   FolderPath = folderpath,
+                                   FolderName = grouping.Select(x => x.Foldername).First(),
+                                   FolderEncoding = grouping.Select(x => x.FolderEncoded).First(),
+                                   FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First(),
+                                   Score = 0
                                })
                       .Select(entry =>
                       {
@@ -440,8 +440,8 @@ namespace UtilitiesCS
                                                                      mismatchScore,
                                                                      gapPenalty,
                                                                      entry.FolderName, target.EmailSubject, thresh);
-                            entry.Score = (int)(fldrScore * fldrScore);
-                            return entry;
+                          entry.Score = (int)(fldrScore * fldrScore);
+                          return entry;
                       });
         }
 

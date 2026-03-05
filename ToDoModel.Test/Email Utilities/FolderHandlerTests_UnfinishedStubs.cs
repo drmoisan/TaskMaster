@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Z.Unfinished.ToDoModel.Test
 {
-	[TestClass]
+    [TestClass]
     public class FolderHandlerTests_UnfinishedStubs
     {
         private MockRepository mockRepository;

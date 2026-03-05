@@ -17,13 +17,13 @@ namespace UtilitiesCS
 
         #region Constructors
 
-        public StackObjectCS() 
-        { 
+        public StackObjectCS()
+        {
             _list = new List<T>();
         }
 
-        public StackObjectCS(IEnumerable<T> items) 
-        { 
+        public StackObjectCS(IEnumerable<T> items)
+        {
             _list = new List<T>(items);
         }
 
@@ -35,7 +35,7 @@ namespace UtilitiesCS
         {
             if (_list.Count == 0)
                 throw new InvalidOperationException("Stack is empty. No element to peek at");
-            return _list[0]; 
+            return _list[0];
         }
 
         public T Peek(int index)
@@ -45,7 +45,7 @@ namespace UtilitiesCS
             return _list[index];
         }
 
-        public T Pop() 
+        public T Pop()
         {
             if (_list.Count == 0)
                 throw new InvalidOperationException("Stack is empty. Cannot pop an element");
@@ -56,14 +56,14 @@ namespace UtilitiesCS
 
         public T Pop(int index)
         {
-            if (_list.Count -1 < index)
+            if (_list.Count - 1 < index)
                 throw new IndexOutOfRangeException($"Index {index} out of range. Stack only has {_list.Count} elements.");
             T result = _list[index];
             _list.RemoveAt(index);
             return result;
         }
 
-        public void Push(T item) => _list.Insert(0,item);
+        public void Push(T item) => _list.Insert(0, item);
 
         public T[] ToArray() => _list.ToArray();
 
@@ -74,14 +74,14 @@ namespace UtilitiesCS
         }
 
         public List<T> ToList() => _list;
-        
+
         public List<T> ToList(bool reverse)
         {
             if (reverse) { return new List<T>(Enumerable.Reverse(_list)); }
             else { return _list; }
         }
 
-        public bool TryPeek(out T result) 
+        public bool TryPeek(out T result)
         {
             try
             {
@@ -138,7 +138,7 @@ namespace UtilitiesCS
                 return false;
             }
         }
-        
+
         #endregion
 
         #region ICollection<T>
@@ -147,14 +147,14 @@ namespace UtilitiesCS
 
         public bool IsReadOnly => false;
 
-        public void Add(T item) => _list.Insert(0,item);
-        
+        public void Add(T item) => _list.Insert(0, item);
+
         public void Clear() => _list = new List<T>();
 
         public bool Contains(T item) => _list.Contains(item);
 
         public void CopyTo(T[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
-        
+
         #endregion
 
         //#region ICollection
@@ -164,18 +164,18 @@ namespace UtilitiesCS
         //public bool IsSynchronized => throw new NotImplementedException();
 
         //public void CopyTo(Array array, int index) => _list.CopyTo(array, index);
-        
-        
+
+
         //#endregion
 
         #region IEnumberable<T>
-        
+
         public IEnumerator<T> GetEnumerator() => _list.GetEnumerator();
 
         public bool Remove(T item) => _list.Remove(item);
-        
+
         IEnumerator IEnumerable.GetEnumerator() => _list.GetEnumerator();
-        
+
         #endregion
     }
 }

@@ -68,7 +68,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         public JsonSerializerSettings LocalJsonSettings { get => _localJsonSettings.Value; set { _localJsonSettings = value.ToLazy(); Notify(); } }
         protected Lazy<JsonSerializerSettings> _localJsonSettings;
 
-        public ISmartSerializableConfig.ActiveDiskEnum ActiveDisk { get => _activeDisk; protected set { _activeDisk = value; Notify(); } } 
+        public ISmartSerializableConfig.ActiveDiskEnum ActiveDisk { get => _activeDisk; protected set { _activeDisk = value; Notify(); } }
         protected ISmartSerializableConfig.ActiveDiskEnum _activeDisk;
 
         public static JsonSerializerSettings GetDefaultSettings()
@@ -115,7 +115,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             return this.MemberwiseClone();
         }
 
-        public ISmartSerializableConfig DeepCopy() 
+        public ISmartSerializableConfig DeepCopy()
         {
             //var clone = (NewSmartSerializableConfig)Clone();
             var clone = new NewSmartSerializableConfig
@@ -148,11 +148,11 @@ namespace UtilitiesCS.ReusableTypeClasses
             Notify("CopyFrom");
         }
 
-        public void CopyChanged(ISmartSerializableConfig other, bool deep, bool notify) 
+        public void CopyChanged(ISmartSerializableConfig other, bool deep, bool notify)
         {
             var changed = CopyChanged(other, deep);
-            if (notify) 
-            { 
+            if (notify)
+            {
                 Notify(string.Join(",", changed));
             }
         }
@@ -160,7 +160,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         public IList<string> CopyChanged(ISmartSerializableConfig other, bool deep)
         {
             List<string> changed = [];
-            
+
             if (_activeDisk != other.ActiveDisk)
             {
                 _activeDisk = other.ActiveDisk;

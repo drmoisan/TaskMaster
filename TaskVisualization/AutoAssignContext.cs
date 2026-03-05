@@ -10,7 +10,7 @@ using UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories;
 
 namespace TaskVisualization
 {
-    public class AutoAssignContext: IAutoAssign
+    public class AutoAssignContext : IAutoAssign
     {
         private readonly IApplicationGlobals _globals;
         public AutoAssignContext(IApplicationGlobals globals)
@@ -36,7 +36,7 @@ namespace TaskVisualization
             if (helper is null) { return []; }
 
             var project = await CategoryClassifierGroup.CreateEngineAsync(_globals, "Context", default).ConfigureAwait(true);
-            project.ProbabilityThreshold = 0.2;            
+            project.ProbabilityThreshold = 0.2;
             var results = project.GetMatchingCategories(helper).ToList();
             return results;
         }
@@ -52,12 +52,12 @@ namespace TaskVisualization
             {
                 if (olItem.InnerObject is MailItem mailItem)
                 {
-                    helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false).ConfigureAwait(true);                    
+                    helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false).ConfigureAwait(true);
                 }
             }
             else if (objItem is MailItem mailItem)
             {
-                helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false).ConfigureAwait(true);                
+                helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false).ConfigureAwait(true);
             }
 
             if (helper is null) { return null; }
@@ -68,5 +68,5 @@ namespace TaskVisualization
             }
         }
     }
-    
+
 }

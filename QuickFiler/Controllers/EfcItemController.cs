@@ -43,7 +43,7 @@ namespace QuickFiler.Controllers
                                  ItemViewer itemViewer,
                                  EfcDataModel dataModel,
                                  bool async,
-                                 CancellationToken token): 
+                                 CancellationToken token) :
             this(globals, homeController, parent, itemViewer, token)
         {
             _dataModel = dataModel;
@@ -72,7 +72,7 @@ namespace QuickFiler.Controllers
 
             ResolveControlGroups(_itemViewer);
 
-            
+
             // Toggle off Tips and Navigation directly since we are definitely on the UI thread
             _listTipsDetails.ForEach(x => x.Toggle(Enums.ToggleState.Off));
             _itemPositionTips.Toggle(Enums.ToggleState.Off, shareColumn: true);
@@ -144,13 +144,13 @@ namespace QuickFiler.Controllers
             PopulateControls(_dataModel);
 
             PopulateConversation();
-            
+
             // Toggle off Tips and Navigation directly since we are definitely on the UI thread
             _listTipsDetails.ForEach(x => x.Toggle(Enums.ToggleState.Off));
             _itemPositionTips.Toggle(Enums.ToggleState.Off, shareColumn: true);
-            
+
             WireEvents();
-            Task.Run(()=>InitializeWebViewAsync());
+            Task.Run(() => InitializeWebViewAsync());
         }
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -166,19 +166,19 @@ namespace QuickFiler.Controllers
 
             // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
             CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("–incognito ");
-                        
+
             // Create the environment manually
             Task<CoreWebView2Environment> task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
 
             // Do this so the task is continued on the UI Thread
             TaskScheduler ui = TaskScheduler.FromCurrentSynchronizationContext();
-            
+
             task.ContinueWith(t =>
             {
                 _webViewEnvironment = task.Result;
                 _itemViewer.L0v2h2_WebView2.EnsureCoreWebView2Async(_webViewEnvironment);
             }, ui);
-            
+
         }
 
         internal async Task InitializeWebViewAsync()
@@ -211,13 +211,13 @@ namespace QuickFiler.Controllers
             //_itemViewer.L1h1L2v.ForAllControl(c => { c.Enabled = false; c.Visible = false; });
             //_itemViewer.L1h.Panel2Collapsed = true;
             _itemViewer.RemoveControlsColsRightOf(_itemViewer.LblConvCt);
-            
+
             // Adjust the navigation formatting to account for the fact that there is no item position label
             var widthAdjustment = _itemViewer.LblItemNumber.Width - _itemViewer.LblAcOpen.Width;
             var columnNumber = _itemViewer.L0vh_Tlp.GetColumn(_itemViewer.LblAcOpen);
             _itemViewer.L0vh_Tlp.ColumnStyles[columnNumber].Width -= widthAdjustment;
         }
-        
+
         public void Cleanup()
         {
             Buttons.ForEach(x =>
@@ -273,7 +273,7 @@ namespace QuickFiler.Controllers
             // Could be redundant to event handler in ConversationResolver
             // _ = Task.Run(() => _dataModel.ConversationResolver.LoadConversationItemsAsync(_homeController.Token, backgroundLoad: true));
         }
-                
+
         internal void ResolveControlGroups(ItemViewer itemViewer)
         {
             var ctrls = itemViewer.GetAllChildren();
@@ -293,7 +293,7 @@ namespace QuickFiler.Controllers
                             .ToList();
 
             _navCtrls = new List<Control> { _itemViewer.LblItemNumber };
-            _tipsCtrls = _itemViewer.LeftTipsLabels.Select(x=>(Control)x).ToList();
+            _tipsCtrls = _itemViewer.LeftTipsLabels.Select(x => (Control)x).ToList();
             _dflt2Ctrls = new List<Control> { _itemViewer.L0vh_Tlp, _itemViewer.TxtboxBody, _itemViewer.TopicThread };
             _mailCtrls = new List<Control> { _itemViewer.LblSender, _itemViewer.LblSubject, };
         }
@@ -331,8 +331,8 @@ namespace QuickFiler.Controllers
         #endregion
 
         #region Exposed properties
-        
-        
+
+
         private MailItemHelper _itemInfo;
         internal MailItemHelper ItemInfo => _itemInfo;
 
@@ -340,7 +340,7 @@ namespace QuickFiler.Controllers
         public string ActiveTheme
         {
             get => Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
-            set => Initializer.SetAndSave<string>(ref _activeTheme, value, (x) => _themes[x].SetTheme(async: true)); 
+            set => Initializer.SetAndSave<string>(ref _activeTheme, value, (x) => _themes[x].SetTheme(async: true));
         }
         internal string LoadTheme()
         {
@@ -360,12 +360,12 @@ namespace QuickFiler.Controllers
 
         private int _intComboRightCtr = 0;
         public int CounterComboRight { get => _intComboRightCtr; set => _intComboRightCtr = value; }
-        
+
         private bool _darkMode;
-        public bool DarkMode 
+        public bool DarkMode
         {
             get => Initializer.GetOrLoad(ref _darkMode, () => _globals.Ol.DarkMode, false, _globals, _globals.Ol);
-            set => Initializer.SetAndSave(ref _darkMode, value, (x) => _globals.Ol.DarkMode = x); 
+            set => Initializer.SetAndSave(ref _darkMode, value, (x) => _globals.Ol.DarkMode = x);
         }
 
         //private List<MailItemInfo> _conversationInfo;
@@ -513,7 +513,7 @@ namespace QuickFiler.Controllers
                 x.KeyDown += new System.Windows.Forms.KeyEventHandler(_keyboardHandler.KeyboardHandler_KeyDownAsync);
             },
             new List<Control> { _itemViewer.CboFolders, _itemViewer.TxtboxSearch, _itemViewer.TopicThread });
-                        
+
             _itemViewer.L0v2h2_WebView2.CoreWebView2InitializationCompleted += WebView2Control_CoreWebView2InitializationCompleted;
             if (_dataModel.ConversationResolver is not null)
                 _dataModel.ConversationResolver.PropertyChanged += new PropertyChangedEventHandler(ConversationResolverPropertyChanged);
@@ -526,15 +526,15 @@ namespace QuickFiler.Controllers
             });
         }
 
-        internal void RegisterActions(Dictionary<char, Action<char>> actions, bool overwriteDuplicates) 
+        internal void RegisterActions(Dictionary<char, Action<char>> actions, bool overwriteDuplicates)
         {
-            if (!overwriteDuplicates) 
+            if (!overwriteDuplicates)
             {
-                actions = actions.Where(action => !_keyboardHandler.CharActions.ContainsKey(action.Key)).ToDictionary();       
+                actions = actions.Where(action => !_keyboardHandler.CharActions.ContainsKey(action.Key)).ToDictionary();
             }
             actions.ForEach(action => _keyboardHandler.CharActions[action.Key] = action.Value);
         }
-        
+
         internal void RegisterAsyncFocusActions()
         {
             _keyboardHandler.CharActionsAsync.Add("Item", 'O', (x) => _ = _explorerController.OpenQFItem(_itemInfo.Item));
@@ -561,7 +561,7 @@ namespace QuickFiler.Controllers
         {
             keys.ForEach(key => _keyboardHandler.CharActions.Remove("Item", key));
         }
-        
+
         #endregion
 
         #region Event Handlers
@@ -576,7 +576,7 @@ namespace QuickFiler.Controllers
                 _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
             }
         }
-                
+
         private void TopicThread_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
             var objects = _itemViewer.TopicThread.SelectedObjects;
@@ -587,7 +587,7 @@ namespace QuickFiler.Controllers
             }
 
         }
-        
+
         internal void WebView2Control_CoreWebView2InitializationCompleted(object sender, CoreWebView2InitializationCompletedEventArgs e)
         {
             if (!e.IsSuccess)
@@ -608,7 +608,7 @@ namespace QuickFiler.Controllers
             //_itemViewer.L0v2h2_WebView2.NavigateToString(_itemInfo.Html);
             _itemViewer.L0v2h2_WebView2.Visible = false;
         }
-        
+
         internal void DarkMode_Changed(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(_globals.Ol.DarkMode))
@@ -689,7 +689,7 @@ namespace QuickFiler.Controllers
         public async Task ToggleExpansionAsync(Enums.ToggleState desiredState)
         {
             _parent.ToggleExpansionStyle(desiredState);
-            
+
             if (desiredState == Enums.ToggleState.On)
             {
                 await _itemViewer.UiDispatcher.InvokeAsync(ToggleExpansionOn);
@@ -765,7 +765,7 @@ namespace QuickFiler.Controllers
                 _activeUI = false;
                 UnregisterAsyncFocusActions();
             }
-            else if(desiredState == Enums.ToggleState.On && !_activeUI)
+            else if (desiredState == Enums.ToggleState.On && !_activeUI)
             {
                 _activeUI = true;
                 RegisterAsyncFocusActions();
@@ -830,7 +830,7 @@ namespace QuickFiler.Controllers
         }
 
         public void ToggleSaveCopyOfMail()
-        {   
+        {
             UiThread.Dispatcher.Invoke(() =>
                 _itemViewer.SaveEmailMenuItem.Checked =
                 !_itemViewer.SaveEmailMenuItem.Checked);
@@ -881,7 +881,7 @@ namespace QuickFiler.Controllers
         }
 
         public void ApplyReadEmailFormat(object state)
-        {   
+        {
             _itemInfo.UnRead = false;
             _themes[_activeTheme].ControlGroups["MailRelated"].ApplyTheme(async: true);
         }
@@ -911,7 +911,7 @@ namespace QuickFiler.Controllers
             await _itemViewer.UiSyncContext;
             control.Focus();
         }
-                
+
         public Dictionary<string, System.Action> RightKeyActions
         {
             get => new()

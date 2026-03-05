@@ -15,7 +15,7 @@ namespace UtilitiesCS
 
         public DoNotSerializeContractResolver(params string[] propertyNames)
         {
-            _propertyNames = propertyNames;   
+            _propertyNames = propertyNames;
         }
 
         protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)

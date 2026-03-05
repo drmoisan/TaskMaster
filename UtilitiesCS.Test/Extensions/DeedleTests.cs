@@ -23,7 +23,7 @@ namespace UtilitiesCS.Test
             // Create data frame with properties as column names
             var dfObjects = Frame.FromRecords(objects);
 
-            
+
         }
 
 

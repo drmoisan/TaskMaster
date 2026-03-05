@@ -27,7 +27,7 @@ namespace Z.Unfinished.UtilitiesCS.Test.EmailIntelligence.EmailParsing
         //{
         //    Task<AttachmentInfo> CreateAsync(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath);
         //}
-        
+
         //public class FactoryWrapper(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath) : IFactory
         //{
         //    Attachment _attachment = attachment;

@@ -14,21 +14,21 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
 
         #region ctor
 
-        public ConfigController(IApplicationGlobals globals, ISmartSerializableConfig config) 
-        { 
+        public ConfigController(IApplicationGlobals globals, ISmartSerializableConfig config)
+        {
             Config = config;
             ConfigCopy = config.DeepCopy();
-            Globals = globals;           
+            Globals = globals;
         }
 
-        public ConfigController Init() 
+        public ConfigController Init()
         {
             FilePathConverter = new FilePathHelperConverter(Globals.FS);
             SpecialFolderList = [.. Globals.FS.SpecialFolders.Keys];
             SpecialFolderList.Insert(0, "None");
 
-            Viewer = new ConfigViewer();            
-            
+            Viewer = new ConfigViewer();
+
             Viewer.ComboSpecialFolderLocal.DataSource = Globals.FS.SpecialFolders.Keys;
             var (specialFolderLocal, relativePathLocal) = FilePathConverter.GetSerializablePath(ConfigCopy.LocalDisk.FolderPath);
             var specialFolderSelectionLocal = specialFolderLocal == "Not Found" ? "None" : specialFolderLocal;
@@ -50,8 +50,8 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
         }
 
         public static ConfigController Show(IApplicationGlobals globals, ISmartSerializableConfig config)
-        {            
-            var controller = new ConfigController(globals, config).Init();            
+        {
+            var controller = new ConfigController(globals, config).Init();
             controller.Viewer.Show();
             return controller;
         }
@@ -78,7 +78,7 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
         {
             var folderPath = FilePathConverter.ExtractFolderPath(specialFolderName, relativePath);
             if (ConfigCopy.ActiveDisk == diskType) { ConfigCopy.Disk.FolderPath = folderPath; }
-            
+
             switch (diskType)
             {
                 case ISmartSerializableConfig.ActiveDiskEnum.Local:
@@ -89,7 +89,7 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
                     break;
                 default:
                     break;
-            }            
+            }
         }
 
         internal void ActivateDiskGroup(ISmartSerializableConfig.ActiveDiskEnum diskType)
@@ -128,6 +128,6 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
 
         #endregion Events
 
-        
+
     }
 }

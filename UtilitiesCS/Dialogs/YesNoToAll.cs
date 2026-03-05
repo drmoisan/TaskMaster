@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace UtilitiesCS
 {
-        
+
     public enum YesNoToAllResponse
     {
         Empty = 0,
@@ -36,7 +36,7 @@ namespace UtilitiesCS
             _response = YesNoToAllResponse.Empty;
 
             List<DelegateButton> delegateButtons = new List<DelegateButton>()
-            { 
+            {
                 new DelegateButton("Yes",Properties.Resources.Run1,"Yes",
                     DialogResult.OK, new YesNoToAllDelegate(YesNoToAll.RespondYes)),
                 new DelegateButton("YesToAll",Properties.Resources.RepeatLastRun1,"YesToAll",
@@ -48,7 +48,7 @@ namespace UtilitiesCS
                 new DelegateButton("Cancel","NoToAll",
                     DialogResult.Cancel, new YesNoToAllDelegate(YesNoToAll.RespondCancel))
             };
-            MyBox.ShowDialog(message, "Dialog",BoxIcon.Question, delegateButtons);
+            MyBox.ShowDialog(message, "Dialog", BoxIcon.Question, delegateButtons);
 
             return Response;
         }

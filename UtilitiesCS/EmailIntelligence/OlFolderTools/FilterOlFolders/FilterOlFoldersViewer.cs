@@ -28,7 +28,7 @@ namespace UtilitiesCS
             SetupRenderer(this.TlvNotFiltered.TreeColumnRenderer);
             SetupRenderer(this.TlvFiltered.TreeColumnRenderer);
         }
-        
+
         private void SetupDragAndDrop()
         {
 
@@ -39,7 +39,8 @@ namespace UtilitiesCS
             TlvNotFiltered.IsSimpleDragSource = true;
             TlvNotFiltered.IsSimpleDropSink = true;
 
-            TlvNotFiltered.ModelCanDrop += delegate (object sender, ModelDropEventArgs e) {
+            TlvNotFiltered.ModelCanDrop += delegate (object sender, ModelDropEventArgs e)
+            {
                 e.Effect = DragDropEffects.None;
                 if (e.TargetModel == null)
                     return;
@@ -50,7 +51,8 @@ namespace UtilitiesCS
                     e.InfoMessage = "Can only drop on directories";
             };
 
-            TlvNotFiltered.ModelDropped += delegate (object sender, ModelDropEventArgs e) {
+            TlvNotFiltered.ModelDropped += delegate (object sender, ModelDropEventArgs e)
+            {
                 String msg = String.Format("{2} items were dropped on '{1}' as a {0} operation.",
                     e.Effect, ((DirectoryInfo)e.TargetModel).Name, e.SourceModels.Count);
                 MessageBox.Show(msg, "Object List View Demo", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -65,10 +67,10 @@ namespace UtilitiesCS
             renderer.UseTriangles = true;
             renderer.IsShowGlyphs = true;
         }
-        
+
         private void SetupTree()
         {
-            this.TlvNotFiltered.CanExpandGetter = x => ((TreeNode<FolderWrapper>)x).ChildCount>0;
+            this.TlvNotFiltered.CanExpandGetter = x => ((TreeNode<FolderWrapper>)x).ChildCount > 0;
             this.TlvNotFiltered.ChildrenGetter = x => ((TreeNode<FolderWrapper>)x).Children;
             this.TlvNotFiltered.ParentGetter = x => ((TreeNode<FolderWrapper>)x).Parent;
             this.OlvNameNotFiltered.ImageGetter = x => 0;
@@ -86,7 +88,7 @@ namespace UtilitiesCS
             //this.TlvFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == true);
         }
 
-        
+
 
         /// <summary>
         /// Format a file size into a more intelligible value

@@ -47,7 +47,7 @@ namespace UtilitiesCS
             }
             else { await SortAsync(mailItems, savePictures, destinationFolderpath, saveMsg, saveAttachments, removeFlowFile, appGlobals); }
         }
-        
+
         async public static Task SortAsync(IList<MailItem> mailItems,
                                bool savePictures,
                                string destinationFolderpath,
@@ -138,10 +138,10 @@ namespace UtilitiesCS
             {
 
                 var attachments = mailHelper.AttachmentsHelper.ToAsyncEnumerable();
-                await attachments.ForEachAsync(async x => 
-                { 
-                    
-                    await x.SaveAttachmentAsync(saveFsPath); 
+                await attachments.ForEachAsync(async x =>
+                {
+
+                    await x.SaveAttachmentAsync(saveFsPath);
                 });
 
                 // Delete the original attachments if removePreviousFsFiles is true
@@ -178,7 +178,7 @@ namespace UtilitiesCS
 
             await bayesianTask;
             await subjectMapTask;
-            
+
             // Add the email to the Undo Stack
             if (mailItemNew is not null)
             {
@@ -202,7 +202,7 @@ namespace UtilitiesCS
             //TraceUtility.LogMethodCall(mailItems, savePictures, destinationOlStem, saveMsg, 
             //    saveAttachments, removePreviousFsFiles, appGlobals, olAncestor, fsAncestorEquivalent);
 
-            if (mailItems is null || mailItems.Count == 0) 
+            if (mailItems is null || mailItems.Count == 0)
             { throw new ArgumentNullException($"{mailItems} is null or empty"); }
 
             var conversationID = mailItems.FirstOrDefault().ConversationID;
@@ -259,20 +259,20 @@ namespace UtilitiesCS
                 {
                     //logger.Debug($"Folder with path {destinationOlPath} could not be resolved");
                 }
-                
+
                 MailItem mailItemTemp = null;
-                
+
                 try
                 {
                     if (olDestination is not null)
                     {
                         mailItemTemp = await Task.Run(() => (MailItem)mailItem.Move(olDestination));
                     }
-                    else 
-                    { 
+                    else
+                    {
                         //logger.Debug($"Folder with path {destinationOlPath} could not be resolved so the mail cannot be moved");
                     }
-                    
+
                 }
                 catch (System.Exception e)
                 {
@@ -280,14 +280,14 @@ namespace UtilitiesCS
                     var stop = true;
                     if (stop) { throw e; }
                 }
-                
+
 
                 // Add the email to the Undo Stack
                 PushToUndoStack(mailItem, mailItemTemp, appGlobals);
 
                 // Capture the move details in the log
-                await Task.Run(()=>CaptureMoveDetails(mailItem, mailItemTemp, appGlobals)).ConfigureAwait(false);
-                
+                await Task.Run(() => CaptureMoveDetails(mailItem, mailItemTemp, appGlobals)).ConfigureAwait(false);
+
             }
 
             // Update the Recents list and save
@@ -298,18 +298,18 @@ namespace UtilitiesCS
             appGlobals.AF.CtfMap.Add(destinationOlStem, conversationID, mailItems.Count);
 
             // Serialize the data
-            var tasks = new List<Task> 
+            var tasks = new List<Task>
             { 
                 //appGlobals.AF.RecentsList.SerializeAsync(),
                 appGlobals.AF.CtfMap.SerializeAsync(),
                 appGlobals.AF.SubjectMap.SerializeAsync(),
-                appGlobals.AF.MovedMails.SerializeAsync() 
+                appGlobals.AF.MovedMails.SerializeAsync()
             };
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
-            
+
             await appGlobals.AF.Encoder.Encoder.SerializeAsync();
-                        
+
         }
 
         public static void Sort(IList<MailItem> mailItems,
@@ -326,8 +326,8 @@ namespace UtilitiesCS
 
             var conversationID = mailItems[0].ConversationID;
 
-            ResolvePaths(mailItems,destinationOlStem,appGlobals,olAncestor,fsAncestorEquivalent, 
-                out string destinationOlPath,out string saveFsPath, out string deleteFsPath);
+            ResolvePaths(mailItems, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent,
+                out string destinationOlPath, out string saveFsPath, out string deleteFsPath);
 
             foreach (var mailItem in mailItems)
             {
@@ -385,7 +385,7 @@ namespace UtilitiesCS
             appGlobals.AF.CtfMap.Serialize();
             appGlobals.AF.SubjectMap.Serialize();
             appGlobals.AF.MovedMails.Serialize();
-            
+
             appGlobals.AF.Encoder.Encoder.Serialize();
 
         }
@@ -400,7 +400,7 @@ namespace UtilitiesCS
         }
 
         // Duplicative with QuickFiler but it is still mapped to main menu so I need to take it out
-        public static async Task UndoAsync(ScoStack<IMovedMailInfo> movedStack, IApplicationGlobals globals) 
+        public static async Task UndoAsync(ScoStack<IMovedMailInfo> movedStack, IApplicationGlobals globals)
         {
             DialogResult repeatResponse = DialogResult.Yes;
             var i = 0;
@@ -419,11 +419,11 @@ namespace UtilitiesCS
                         movedStack[i].UndoMove();
                         movedStack.Pop(i);
                     }
-                    else { i++;}
-                    repeatResponse = MessageBox.Show("Continue Undoing Moves?", "Undo Dialog", MessageBoxButtons.YesNo);   
-                } 
+                    else { i++; }
+                    repeatResponse = MessageBox.Show("Continue Undoing Moves?", "Undo Dialog", MessageBoxButtons.YesNo);
+                }
             }
-            
+
             if (repeatResponse == DialogResult.Yes) { MessageBox.Show("Nothing to undo"); }
             movedStack.Serialize();
         }
@@ -460,13 +460,13 @@ namespace UtilitiesCS
             {
                 attachments = attachments.Where(x => x.AttachmentInfo.IsImage);
             }
-            
+
             if (!savePictures)
             {
                 attachments = attachments.Where(x => !x.AttachmentInfo.IsImage);
             }
             return attachments;
-                           
+
         }
 
         internal static IAsyncEnumerable<AttachmentHelper> GetAttachmentsInfoAsync(
@@ -519,7 +519,7 @@ namespace UtilitiesCS
                         _attachmentsOverwrite = YesNoToAll.ShowDialog($"The file {attachmentHelper.FilePathSave} already exists. Overwrite?");
                     }
                     SaveCase(_attachmentsOverwrite, attachmentHelper.Attachment, attachmentHelper.FilePathSave, attachmentHelper.FilePathSaveAlt);
-                    
+
                     // Reset response about overwriting attachments when it is not "ToAll"
                     if (_attachmentsOverwrite == YesNoToAllResponse.Yes || _attachmentsOverwrite == YesNoToAllResponse.No)
                     {
@@ -560,7 +560,7 @@ namespace UtilitiesCS
                     {
                         _attachmentsOverwrite = YesNoToAll.ShowDialog($"The file {attachmentHelper.FilePathSave} already exists. Overwrite?");
                     }
-                    
+
                     await SaveCaseAsync(_attachmentsOverwrite, attachmentHelper.Attachment, attachmentHelper.FilePathSave, attachmentHelper.FilePathSaveAlt);
                     if (_attachmentsOverwrite == YesNoToAllResponse.Yes || _attachmentsOverwrite == YesNoToAllResponse.No)
                     {
@@ -568,8 +568,8 @@ namespace UtilitiesCS
                     }
                 }
             }
-            else 
-            { 
+            else
+            {
                 //await Task.Run(() => attachmentInfo.Attachment.SaveAsFile(attachmentInfo.FolderPathSave));
                 await attachmentHelper.Attachment.TrySaveAttachmentAsync(attachmentHelper.FilePathSave);
             }
@@ -600,12 +600,12 @@ namespace UtilitiesCS
                         _attachmentsAltName = YesNoToAll.ShowDialog($"The file {filePathSave} already exists. Save with an alternate name?");
                         //await UIThreadExtensions.UiDispatcher.InvokeAsync(()=>_attachmentsAltName = YesNoToAll.ShowDialog($"The file {filePathSave} already exists. Save with an alternate name?"));
                     }
-                    
+
                     if (_attachmentsAltName == YesNoToAllResponse.Yes || _attachmentsAltName == YesNoToAllResponse.YesToAll)
                     {
                         await attachment.TrySaveAttachmentAsync(filePathSaveAlt);
                     }
-                    
+
                     // Reset the Alt name response if it is not set "ToAll"
                     if (_attachmentsAltName == YesNoToAllResponse.Yes || _attachmentsAltName == YesNoToAllResponse.No)
                     {
@@ -630,7 +630,7 @@ namespace UtilitiesCS
             try
             {
                 System.IO.Directory.CreateDirectory(Path.GetDirectoryName(filePathSave));
-                await Task.Run(()=>attachment.SaveAsFile(filePathSave));
+                await Task.Run(() => attachment.SaveAsFile(filePathSave));
                 return true;
             }
             catch (System.UnauthorizedAccessException e)
@@ -681,13 +681,13 @@ namespace UtilitiesCS
                     throw;
                 }
             }
-            
+
             catch (System.Exception)
             {
                 throw;
             }
         }
-        
+
         internal static void SaveCase(
             YesNoToAllResponse response,
             Attachment attachment,
@@ -726,7 +726,7 @@ namespace UtilitiesCS
             string olAncestor,
             string fsAncestorEquivalent,
             out string destinationOlPath,
-            out string saveFsPath, 
+            out string saveFsPath,
             out string deleteFsPath)
         {
             //TraceUtility.LogMethodCall(mailItems, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent);
@@ -739,8 +739,8 @@ namespace UtilitiesCS
             // Resolve the file system deletion folder path if relevant
             deleteFsPath = null;
             var currentFolder = (Folder)mailItems[0].Parent;
-            if ((currentFolder.FolderPath != appGlobals.Ol.InboxPath)&&
-                (currentFolder.FolderPath.Contains(olAncestor))&&
+            if ((currentFolder.FolderPath != appGlobals.Ol.InboxPath) &&
+                (currentFolder.FolderPath.Contains(olAncestor)) &&
                 (currentFolder.FolderPath != olAncestor))
             {
                 deleteFsPath = ((Folder)mailItems[0].Parent).ToFsFolderpath(olAncestor, fsAncestorEquivalent);
@@ -762,7 +762,7 @@ namespace UtilitiesCS
             //TraceUtility.LogMethodCall(currentFolder, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent);
 
             destinationOlPath = $"{olAncestor}\\{destinationOlStem}";
-            
+
             // Resolve the file system destination folder path 
             saveFsPath = destinationOlPath.ToFsFolderpath(olAncestor, fsAncestorEquivalent);
 
@@ -785,7 +785,7 @@ namespace UtilitiesCS
                 //logger.Debug($"Cannot grab handle on Folder {destinationOlPath}. Emails will not be moved");
                 logger.Error(e);
             }
-            
+
         }
 
         async internal static Task SaveMessageAsMsgAsync(
@@ -795,9 +795,9 @@ namespace UtilitiesCS
             //TraceUtility.LogMethodCall(mailItem, fsLocation);
 
             var filenameSeed = FolderConverter.SanitizeFilename(mailItem.Subject);
-            
+
             var strPath = AttachmentHelper.AdjustForMaxPath(fsLocation, filenameSeed, "msg", "");
-            await Task.Run(()=>mailItem.SaveAs(strPath, OlSaveAsType.olMSG));
+            await Task.Run(() => mailItem.SaveAs(strPath, OlSaveAsType.olMSG));
         }
 
         internal static void SaveMessageAsMSG(
@@ -840,7 +840,7 @@ namespace UtilitiesCS
                     atmtct = atmtct + 1;
 
                     AlreadyExists = false;
-                    
+
                     // Get the full name of the current attachment.
                     if (attachment.Type != OlAttachmentType.olOLE)
                     {
@@ -933,7 +933,7 @@ namespace UtilitiesCS
                             if (Verify_Action == true)
                             {
 
-                                    
+
 
                                 if ((int)_attachmentsOverwrite + (int)_responseSaveFile == 0)
                                 {
@@ -995,17 +995,17 @@ namespace UtilitiesCS
                                 attachment.SaveAsFile(strAtmtPath);
                         }
                     }
-                    
-                    
+
+
                 }
             }
 
-        }   
+        }
 
         #endregion
 
-       
-        
+
+
 
         private static void PushToUndoStack(
             MailItem beforeMove,
@@ -1016,7 +1016,7 @@ namespace UtilitiesCS
             var info = new MovedMailInfo(beforeMove, afterMove, _globals.Ol.Root.FolderPath);
             _globals.AF.MovedMails.Push(info);
         }
-        
+
         private static void CaptureMoveDetails(
             MailItem mailItem,
             MailItem oMailTmp,
@@ -1034,7 +1034,7 @@ namespace UtilitiesCS
         {
             //if (strOutput.IsInitialized())
             //{
-            var line = string.Join("\t",strOutput
+            var line = string.Join("\t", strOutput
                          //.Where(s => !string.IsNullOrEmpty(s))
                          .Select(s => s ?? "")
                          .Select(s => StripTabsCrLf(s))
@@ -1088,7 +1088,7 @@ namespace UtilitiesCS
 
         private static void SanitizeArray(string[,] strAryOutput, ref string[] strOutput)
         {
-            if (strAryOutput == null) 
+            if (strAryOutput == null)
             {
                 Debug.WriteLine($"The array {nameof(strAryOutput)} is empty.");
             }
@@ -1104,8 +1104,8 @@ namespace UtilitiesCS
                 }
             }
         }
-        
-        
+
+
     }
 
 }

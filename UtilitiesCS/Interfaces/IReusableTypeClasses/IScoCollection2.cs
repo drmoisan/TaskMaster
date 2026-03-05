@@ -7,7 +7,7 @@ using Swordfish.NET.General.Collections;
 
 namespace UtilitiesCS
 {
-    internal interface IScoCollection2<T>: IConcurrentObservableCollection<T>
+    internal interface IScoCollection2<T> : IConcurrentObservableCollection<T>
     {
         #region Serialization
 

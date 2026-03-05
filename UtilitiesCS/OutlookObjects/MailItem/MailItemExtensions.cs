@@ -36,11 +36,11 @@ namespace UtilitiesCS.OutlookExtensions
                     logger.Warn($"Retrying move operation. Retries remaining: {retries}");
                     return await mailItem.TryMoveAsync(folder, retries - 1);
                 }
-                else 
-                { 
-                    return null; 
+                else
+                {
+                    return null;
                 }
-            }            
+            }
         }
 
         #region commented code

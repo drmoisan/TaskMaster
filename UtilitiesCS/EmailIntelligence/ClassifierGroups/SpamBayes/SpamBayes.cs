@@ -44,23 +44,23 @@ namespace UtilitiesCS.EmailIntelligence
         {
             var sb = new SpamBayes();
             sb.Globals = globals;
-            
+
             if (!sb.ValidatePathsSet()) { return null; }
 
             if (!await sb.ValidateSpamClassifierAsync(
-                sb.HasValidSpamClassifierAsync, 
+                sb.HasValidSpamClassifierAsync,
                 sb.SpamBayesMissingHandlerAsync,
-                treatment, 
-                token)) 
-            { 
-                return null; 
+                treatment,
+                token))
+            {
+                return null;
             }
 
             return await Task.Run(sb.InitAsync, token);
 
         }
 
-        public async Task<SpamBayes> InitAsync() 
+        public async Task<SpamBayes> InitAsync()
         {
             Globals.ThrowIfNull();
 
@@ -74,14 +74,14 @@ namespace UtilitiesCS.EmailIntelligence
                 CalculateProbabilityAsync = ClassifierGroup.Classifiers["Spam"].Chi2SpamProbAsync;
                 CallbackAsync = TrainCallbackAsync;
                 Threshhold = new TristateThreshhold(0.8, 0.2);
-                return this; 
+                return this;
             }
             else
             {
                 return null;
             }
         }
-                
+
         public static BayesianClassifierGroup CreateNewClassifier()
         {
             var group = new BayesianClassifierGroup
@@ -99,14 +99,14 @@ namespace UtilitiesCS.EmailIntelligence
 
         public static async Task<BayesianClassifierGroup> CreateSpamClassifiersAsync(CancellationToken token = default)
         {
-            return await Task.Run(CreateNewClassifier, token);            
+            return await Task.Run(CreateNewClassifier, token);
         }
 
         #endregion Constructors and Static Methods
 
         #region Classifier Validation
 
-        internal bool ValidatePathsSet() 
+        internal bool ValidatePathsSet()
         {
             try
             {
@@ -120,9 +120,9 @@ namespace UtilitiesCS.EmailIntelligence
                 return false;
             }
             return true;
-            
+
         }
-        
+
         internal async Task<bool> ValidateSpamClassifierAsync(
             Func<CancellationToken, Task<(bool, string)>> asyncValidator,
             Func<Enums.NotFoundEnum, string, CancellationToken, Task<bool>> asyncAction,
@@ -150,7 +150,7 @@ namespace UtilitiesCS.EmailIntelligence
             }
             else
             {
-                
+
                 var classifierGroup = await classifierGroupTask;
                 if (classifierGroup is null) { return (false, $"No classifier group named {GroupName} was found in manager."); }
                 else
@@ -227,15 +227,15 @@ namespace UtilitiesCS.EmailIntelligence
 
         protected internal IApplicationGlobals Globals { get => _globals; protected set => _globals = value; }
         private IApplicationGlobals _globals;
-        
+
         public BayesianClassifierGroup ClassifierGroup { get => _classifierGroup; set => _classifierGroup = value; }
         private BayesianClassifierGroup _classifierGroup;
 
         public static readonly HashSet<string> ClassNames = ["Spam", "Ham"];
         public static readonly string GroupName = "Spam";
-        
+
         public bool IsActivated => ClassifierGroup is not null;
-                
+
         #endregion Public Properties
 
         #region Public Classifier Methods
@@ -248,7 +248,7 @@ namespace UtilitiesCS.EmailIntelligence
                 if (item is MailItem mailItem)
                 {
                     var tokens = await TokenizeAsync(mailItem);
-                    var probability = await CalculateProbabilityAsync(tokens);                    
+                    var probability = await CalculateProbabilityAsync(tokens);
                     await TestActionAsync(mailItem, probability);
                 }
             }
@@ -268,7 +268,7 @@ namespace UtilitiesCS.EmailIntelligence
                 var probability = await CalculateProbabilityAsync(tokens);
                 await TestActionAsync(mailItem, probability);
             }
-            else { logger.Warn("Skipping SpamBayes for unknown item type");  }
+            else { logger.Warn("Skipping SpamBayes for unknown item type"); }
         }
 
         public async Task TrainAsync(Selection selection, bool isSpam)
@@ -281,7 +281,7 @@ namespace UtilitiesCS.EmailIntelligence
                     await TrainAsync(mailItem, isSpam);
                 }
             }
-            
+
             ClassifierGroup.Serialize();
         }
 
@@ -295,10 +295,10 @@ namespace UtilitiesCS.EmailIntelligence
         {
             return email as MailItem is null ? [] : new MailItemHelper(email as MailItem, Globals).LoadAll(Globals, Globals.Ol.Inbox, true).Tokens;
         }
-        
-        public async Task<string[]> TokenizeEmailAsync(object email) 
-        { 
-            return email as MailItem is null ? [] : (await MailItemHelper.FromMailItemAsync(email as MailItem, Globals, default, true)).Tokens; 
+
+        public async Task<string[]> TokenizeEmailAsync(object email)
+        {
+            return email as MailItem is null ? [] : (await MailItemHelper.FromMailItemAsync(email as MailItem, Globals, default, true)).Tokens;
         }
 
         public async Task TrainCallbackAsync(object item, bool isSpam)
@@ -323,13 +323,13 @@ namespace UtilitiesCS.EmailIntelligence
                     }
                 }
             });
-            
+
         }
 
         internal void MoveSpamOrHam(object item, double probability)
         {
             var isSpam = GetTristate(probability);
-            if ( item is MailItemHelper helper && helper.Item is not null)
+            if (item is MailItemHelper helper && helper.Item is not null)
             {
                 helper.Item.SetUdf("Spam", probability, OlUserPropertyType.olPercent);
                 MoveSpamOrHam(helper, isSpam);
@@ -341,7 +341,7 @@ namespace UtilitiesCS.EmailIntelligence
                 MoveSpamOrHam(mailItem, isSpam);
             }
         }
-        
+
         internal void MoveSpamOrHam(MailItemHelper helper, bool? isSpam)
         {
             lock (helper.Item)
@@ -355,7 +355,7 @@ namespace UtilitiesCS.EmailIntelligence
                         helper.Item = moved;
                     }
                 }
-            }               
+            }
         }
 
         internal void MoveSpamOrHam(MailItem mailItem, bool? isSpam)
@@ -371,7 +371,7 @@ namespace UtilitiesCS.EmailIntelligence
             if (isSpam == true)
             {
                 if (((mailItem.Parent as Folder)?.FolderPath ?? "") != Globals.Ol.JunkCertain.FolderPath) { }
-                    return Globals.Ol.JunkCertain;
+                return Globals.Ol.JunkCertain;
             }
             else if (isSpam == false)
             {
@@ -420,9 +420,9 @@ namespace UtilitiesCS.EmailIntelligence
         //                //mailItem.Move(Globals.Ol.JunkPossible);
         //            }
         //        }
-                
+
         //    });
-            
+
         //}
 
         #endregion Public Classifier Methods
@@ -530,7 +530,7 @@ namespace UtilitiesCS.EmailIntelligence
         {
             if (item is not MailItem mailItem) { return false; }
             if (mailItem.MessageClass != "IPM.Note") { return false; }
-            if (mailItem.UserProperties.Find("Spam") is not null) 
+            if (mailItem.UserProperties.Find("Spam") is not null)
             {
                 var autoCodeProp = mailItem.UserProperties.Find("AutoProcessed");
                 if (autoCodeProp is not null)
@@ -538,7 +538,7 @@ namespace UtilitiesCS.EmailIntelligence
                     autoCodeProp.Value = true;
                     mailItem.Save();
                 }
-                return false; 
+                return false;
             }
 
             return true;
@@ -547,29 +547,29 @@ namespace UtilitiesCS.EmailIntelligence
         private bool ConditionLog(object item)
         {
             var olItem = new OutlookItem(item);
-            if (olItem.TryGet().OlItemType(out var result) && result != OlItemType.olMailItem) 
-            { 
+            if (olItem.TryGet().OlItemType(out var result) && result != OlItemType.olMailItem)
+            {
                 logger.Debug($"Skipping: Not MailItem -> {GetOlItemString(olItem)}");
-                return false; 
+                return false;
             }
-            
+
             if (olItem.Try().MessageClass != "IPM.Note")
             {
                 logger.Debug($"Skipping: Message class -> {GetOlItemString(olItem)}");
                 return false;
             }
-                        
+
             var spamProp = olItem.UserProperties.Find("Spam");
-            if (spamProp is not null) 
-            { 
+            if (spamProp is not null)
+            {
                 var autoCodeProp = olItem.UserProperties.Find("AutoProcessed");
-                if (autoCodeProp is not null) 
-                { 
+                if (autoCodeProp is not null)
+                {
                     autoCodeProp.Value = true;
                     olItem.Save();
                 }
-                else 
-                { 
+                else
+                {
                     autoCodeProp = olItem.UserProperties.Add("AutoProcessed", OlUserPropertyType.olYesNo, true);
                     autoCodeProp.Value = true;
                     olItem.Save();
@@ -577,15 +577,15 @@ namespace UtilitiesCS.EmailIntelligence
                 logger.Debug($"Skipping: Has Spam property with value of {spamProp.Value} -> {GetOlItemString(olItem)}");
                 return false;
             }
-            
+
             return true;
         }
 
         private string GetOlItemString(OutlookItem olItem)
         {
-            var type = olItem.TryGet().OlItemType(out var typeVal)? $"{typeVal}": $"{olItem.InnerObject.GetType()}";
+            var type = olItem.TryGet().OlItemType(out var typeVal) ? $"{typeVal}" : $"{olItem.InnerObject.GetType()}";
             var created = olItem.TryGet().CreationTime(out var result) ? $" created on {result:g}" : "";
-            var subject = olItem.Try().Subject;            
+            var subject = olItem.Try().Subject;
             subject = subject.IsNullOrEmpty() ? "" : $" with subject {subject}";
             var sender = olItem.Try().SenderName;
             sender = sender.IsNullOrEmpty() ? "" : $" from {sender}";

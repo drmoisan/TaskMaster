@@ -19,11 +19,11 @@ namespace UtilitiesCS
 
         public string FolderAction { get; set; }
 
-        public string FolderName 
+        public string FolderName
         {
-            get 
+            get
             {
-                return FolderNameTxtBox.Text; 
+                return FolderNameTxtBox.Text;
             }
             set
             {

@@ -8,7 +8,7 @@ using System.Runtime;
 
 namespace ToDoModel.Data_Model.People
 {
-    public class PeopleScoConverter : JsonConverter<PeopleScoDictionaryNew> 
+    public class PeopleScoConverter : JsonConverter<PeopleScoDictionaryNew>
     {
         public PeopleScoConverter() { }
 

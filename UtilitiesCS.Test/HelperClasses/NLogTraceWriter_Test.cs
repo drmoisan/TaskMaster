@@ -30,9 +30,9 @@ namespace UtilitiesCS.Test.HelperClasses
         {
             var l = this.mockRepository.Create<ILog>();
             l.Setup(x => x.Error(It.IsAny<object>(), It.IsAny<Exception>())).Callback<object, Exception>((message, ex) => PrintLogCall("Error", message, ex));
-            l.Setup(x => x.Warn(It.IsAny<object>(), It.IsAny<Exception>())).Callback<object, Exception>((message, ex) => PrintLogCall("Warn", message, ex)); 
-            l.Setup(x => x.Info(It.IsAny<object>(), It.IsAny<Exception>())).Callback<object, Exception>((message, ex) => PrintLogCall("Info", message, ex)); 
-            l.Setup(x => x.Debug(It.IsAny<object>(), It.IsAny<Exception>())).Callback<object, Exception>((message, ex) => PrintLogCall("Debug", message, ex)); 
+            l.Setup(x => x.Warn(It.IsAny<object>(), It.IsAny<Exception>())).Callback<object, Exception>((message, ex) => PrintLogCall("Warn", message, ex));
+            l.Setup(x => x.Info(It.IsAny<object>(), It.IsAny<Exception>())).Callback<object, Exception>((message, ex) => PrintLogCall("Info", message, ex));
+            l.Setup(x => x.Debug(It.IsAny<object>(), It.IsAny<Exception>())).Callback<object, Exception>((message, ex) => PrintLogCall("Debug", message, ex));
 
             return l;
         }

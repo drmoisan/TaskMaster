@@ -93,10 +93,10 @@ namespace UtilitiesCS.EmailIntelligence
         {
             // Use a simple hash code based on EntryId, StoreId, and Subject            
             //return Size.GetHashCode() + SentDate.GetHashCode() * 31 +
-            return    (Subject ?? "").GetHashCode() * 31 * 31 +
+            return (Subject ?? "").GetHashCode() * 31 * 31 +
                 (Body ?? "").GetHashCode() * 31 * 31 * 31 +
                 Sender.GetHashCode() * 31 * 31 * 31 * 31 +
-                GetRecipientsHashCode(CcRecipients) * 31 *31*31*31*31 +
+                GetRecipientsHashCode(CcRecipients) * 31 * 31 * 31 * 31 * 31 +
                 GetRecipientsHashCode(ToRecipients) * 31 * 31 * 31 * 31 * 31 * 31;
         }
 

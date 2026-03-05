@@ -26,7 +26,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         {
             var root = RootFromFolder(olRoot);
 
-            foreach (var mapping in mappings) 
+            foreach (var mapping in mappings)
             {
                 var fromNode = root.FindAll(x => x.Value.RelativePath == mapping.Key).FirstOrDefault();
                 var toNode = root.FindAll(x => x.Value.RelativePath == mapping.Value).FirstOrDefault();
@@ -67,8 +67,8 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
                          .Select(node => node.Value)
                          .ToList();
         }
-        
-        public List<TreeNode<OlFolderRemap>> GetInvertedMapTree() 
+
+        public List<TreeNode<OlFolderRemap>> GetInvertedMapTree()
         {
             var remapList = GetRemapList();
             var remapTree = new List<TreeNode<OlFolderRemap>>();
@@ -148,7 +148,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         {
             _olFolder = olFolder;
             _olRoot = olRoot;
-            _relativePath = olFolder.FolderPath.Replace(olRoot.FolderPath+"\\", "");
+            _relativePath = olFolder.FolderPath.Replace(olRoot.FolderPath + "\\", "");
             _name = olFolder.Name;
         }
 

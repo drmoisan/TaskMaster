@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace Swordfish.NET.Collections
 {
-    public interface IImmutableCollectionBase<T>: ICollection<T>, IEnumerable<T>, ICollection, IEnumerable
+    public interface IImmutableCollectionBase<T> : ICollection<T>, IEnumerable<T>, ICollection, IEnumerable
     {
     }
 }

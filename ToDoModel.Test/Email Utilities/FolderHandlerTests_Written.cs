@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace ToDoModel.Test
 {
-	[TestClass]
+    [TestClass]
     public class FolderHandlerTests_Written
     {
         private MockRepository mockRepository;
@@ -32,7 +32,7 @@ namespace ToDoModel.Test
             return new FolderPredictor(
                 this.mockApplicationGlobals.Object);
         }
-                
+
         [TestMethod]
         public void GetRelevantOlPathPortion_StateUnderTest_ExpectedBehavior1()
         {

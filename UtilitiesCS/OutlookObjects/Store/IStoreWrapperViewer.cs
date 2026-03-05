@@ -4,7 +4,7 @@ using UtilitiesCS.Interfaces.IWinForm;
 
 namespace UtilitiesCS.OutlookObjects.Store
 {
-    public interface IStoreWrapperViewer: IForm
+    public interface IStoreWrapperViewer : IForm
     {
         Label ArchiveFS { get; set; }
         Label ArchiveOutlook { get; set; }

@@ -11,7 +11,7 @@ namespace UtilitiesCS
         public static Category CreateCategory(this NameSpace olNS, IPrefix prefix, string newCatName)
         {
             Category objCategory = null;
-            
+
             string strTemp;
 
             if (!string.IsNullOrEmpty(newCatName))

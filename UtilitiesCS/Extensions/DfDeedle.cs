@@ -32,14 +32,14 @@ namespace UtilitiesCS
             AddQfcColumns(table, currentFolder);
 
             (object[,] data, Dictionary<string, int> columnInfo) = table.ETL();
-            
+
             var records = Enumerable.Range(0, data.GetLength(0)).Select(i =>
             {
                 DateTime sentOn = DateTime.MaxValue;
                 var dateField = data[i, columnInfo["SentOn"]];
                 if (dateField is not null) { DateTime.TryParse(dateField.ToString(), out sentOn); }
                 if (dateField is null) { sentOn = DateTime.MaxValue; }
-                
+
                 return new
                 {
                     EntryId = data[i, columnInfo["EntryID"]],
@@ -65,14 +65,14 @@ namespace UtilitiesCS
             //logger.Debug(strAry.ToFormattedText());
 
             var df = Frame.FromRecords(records);
-            
+
             return df;
         }
 
         public static async Task<Frame<int, string>> GetEmailDataInViewAsync(Explorer activeExplorer, CancellationToken token, CancellationTokenSource tokenSource, ProgressTracker progress)
         {
             token.ThrowIfCancellationRequested();
-            
+
             //logger.Debug($"{nameof(GetEmailDataInViewAsync)}: {activeExplorer.CurrentFolder.Name}");
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(OlTableExtensions.GetTableInViewAsync)} ...");
@@ -122,8 +122,8 @@ namespace UtilitiesCS
                 );
                 return record;
             });
-            
-            
+
+
             return records;
         }
 
@@ -153,7 +153,7 @@ namespace UtilitiesCS
             if (!acceptableTriage.Contains(triage)) { return "Z"; }
             return triage;
         }
-        
+
         private static DateTime DateFrom2dPosition(object[,] data, int column, int row)
         {
             DateTime date = DateTime.MaxValue;
@@ -333,7 +333,7 @@ namespace UtilitiesCS
                 IEnumerable<string> objFields,
                 IEnumerable<int> objIndices) = await table.EtlPrepAsync(cancel);
             var jagged = await rows.EtlByRowAsync(objectConverters, binIndices, objFields, objIndices).ToArrayAsync();
-            
+
             var data = jagged.To2D();
             Frame<int, string> df = FromArray2D(data: data, columnDictionary);
 
@@ -355,7 +355,7 @@ namespace UtilitiesCS
 
             Frame<int, string> df = FromArray2D(data: data, columnInfo);
 
-            return df;   
+            return df;
         }
 
         public static Frame<int, string> FromDefaultFolder(Stores stores,
@@ -377,7 +377,7 @@ namespace UtilitiesCS
                 {
                     continue;
                 }
-                
+
                 // Set the index to the EntryID to avoid duplicate integer index
                 var dfEid = dfTemp.IndexRowsWith<int, string, string>(dfTemp.GetColumn<string>("EntryID").Values);
                 if (df is null) { df = dfEid; }
@@ -405,7 +405,7 @@ namespace UtilitiesCS
 
         public static void DisplayDialog(this Frame<int, string> df)
         {
-            var rowNames = new List<string> { "Rows"};
+            var rowNames = new List<string> { "Rows" };
             DataTable table = df.ToDataTable(rowNames);
             table.DisplayDialog();
         }
@@ -424,16 +424,16 @@ namespace UtilitiesCS
         //    log4net.ILog logger = log4net.LogManager.GetLogger(declaringType);
         //    logger.Debug(frame.Format(15, 15, 15, 15, printTypes: false, showInfo: true));
         //}
-        
+
         public static void PrintToLog<TRowKey, TColumnKey>(this Frame<TRowKey, TColumnKey> frame, log4net.ILog logger, [CallerArgumentExpression(nameof(frame))] string frameName = "")
         {
             var frameText = frame.Format(15, 15, 15, 15, printTypes: false, showInfo: true);
-            
+
             // Find the width of the frame in characters. If multi-line, find the position of the newline character.
             // Else use the length of the entire string
             var loc = frameText.IndexOf("\n");
             if (loc == -1) { loc = frameText.Length; }
-            var separator = new string('_',loc);
+            var separator = new string('_', loc);
             logger.Debug($"\n{frameName}\n{separator}\n{frame.Format(15, 15, 15, 15, printTypes: false, showInfo: true)}\n");
         }
 
@@ -447,11 +447,11 @@ namespace UtilitiesCS
         {
             var idx = other.RowIndex.Keys.ToArray();
             if (idx.Length == 0) { return df; }
-            df = df.Where(row => !idx.Contains(row.Key));            
+            df = df.Where(row => !idx.Contains(row.Key));
             return df;
         }
 
-        
+
 
         public static TColumnData[] GetDuplicateEntriesByColumn<TRow, TColumn, TColumnData>(this Frame<TRow, TColumn> df, TColumn columnId)
         {

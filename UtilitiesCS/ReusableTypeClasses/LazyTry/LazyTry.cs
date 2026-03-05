@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
-    public class LazyTry<T>: Lazy<T>
+    public class LazyTry<T> : Lazy<T>
     {
         public LazyTry() : base() { }
         public LazyTry(Func<T> valueFactory) : base(
@@ -21,8 +21,9 @@ namespace UtilitiesCS
                 {
                     return default(T);
                 }
-            }) { }
-        public LazyTry(LazyThreadSafetyMode mode): base(mode) { }
+            })
+        { }
+        public LazyTry(LazyThreadSafetyMode mode) : base(mode) { }
         public LazyTry(Func<T> valueFactory, bool isThreadSafe) : base(
             () =>
             {
@@ -35,8 +36,9 @@ namespace UtilitiesCS
                 {
                     return default(T);
                 }
-            }, 
-            isThreadSafe) { }
+            },
+            isThreadSafe)
+        { }
         public LazyTry(Func<T> valueFactory, LazyThreadSafetyMode mode) : base(
             () =>
             {
@@ -49,8 +51,9 @@ namespace UtilitiesCS
                 {
                     return default(T);
                 }
-            }, 
-            mode) { }
+            },
+            mode)
+        { }
 
     }
 }

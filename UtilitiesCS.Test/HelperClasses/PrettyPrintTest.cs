@@ -18,7 +18,7 @@ namespace UtilitiesCS.Test.HelperClasses
             // Arrange
             string input = "   Test of the ToJustifiedText method.   ";
             string expected = "T e s t     o f     t h e     T o J u s t i f i e d T e x t     m e t h o d .   ";
-            
+
             // Act
             string actual = input.ToJustifiedText(80);
 

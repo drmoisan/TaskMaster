@@ -12,7 +12,7 @@ using UtilitiesCS.Interfaces.IWinForm;
 
 namespace QuickFiler
 {
-    public interface IItemViewer: IUserControl
+    public interface IItemViewer : IUserControl
     {
         ButtonSVG BtnDelItem { get; set; }
         ButtonSVG BtnFlagTask { get; set; }

@@ -34,11 +34,11 @@ namespace TaskMaster
             else { await LoadSequentialAsync(); }
         }
 
-        async public Task LoadParallelAsync() 
+        async public Task LoadParallelAsync()
         {
             var tasks = new List<Task>
             {
-                LoadPrefixListAsync(),                
+                LoadPrefixListAsync(),
                 LoadDictRemapAsync(),
                 LoadIdListAsync(),
                 LoadProgramInfoAsync(),
@@ -51,8 +51,8 @@ namespace TaskMaster
             };
             await Task.WhenAll(tasks);
         }
-        
-        async public Task LoadSequentialAsync() 
+
+        async public Task LoadSequentialAsync()
         {
             await LoadPrefixListAsync();
             await LoadPeopleAsync();
@@ -68,7 +68,7 @@ namespace TaskMaster
         }
 
         private readonly Properties.Settings _defaults = Properties.Settings.Default;
-        
+
         private T Initialized<T>(T obj, Func<T> initializer)
         {
             obj ??= initializer.Invoke();
@@ -84,7 +84,7 @@ namespace TaskMaster
         public IProjectData ProjInfo => Initialized(_projInfo, () => LoadProjInfo());
         async private Task LoadProjInfoAsync()
         {
-            _projInfo = await Task.Run(() => 
+            _projInfo = await Task.Run(() =>
             {
                 if (Parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
                 {
@@ -94,10 +94,10 @@ namespace TaskMaster
                 }
                 else { return null; }
             });
-            
-            if (_projInfo?.Count == 0) 
+
+            if (_projInfo?.Count == 0)
             {
-                await Task.Run(() => _projInfo.Rebuild(Parent.Ol.App));                
+                await Task.Run(() => _projInfo.Rebuild(Parent.Ol.App));
             }
         }
         private IProjectData LoadProjInfo()
@@ -115,11 +115,11 @@ namespace TaskMaster
 
         private ScDictionary<string, string> _programInfo;
         public ScDictionary<string, string> ProgramInfo => Initialized(_programInfo, LoadProgramInfo);
-        private ScDictionary<string, string> LoadProgramInfo() 
+        private ScDictionary<string, string> LoadProgramInfo()
         {
             if (Parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
             {
-                return ScDictionary<string, string>.Static.Deserialize(_defaults.FileName_ProgramDictionary, appData); 
+                return ScDictionary<string, string>.Static.Deserialize(_defaults.FileName_ProgramDictionary, appData);
             }
             else { return null; }
         }
@@ -131,7 +131,7 @@ namespace TaskMaster
         async internal Task LoadPeopleAsync() => await Task.Run(async () =>
         {
             if (Parent.IntelRes.Config.TryGetValue("People", out var config))
-            {                
+            {
                 People = await SmartSerializable.DeserializeAsync(config, true, () => new PeopleScoDictionaryNew(Parent));
                 People.Prefix = PrefixList.Find(x => x.PrefixType == PrefixTypeEnum.People);
                 People.CollectionChanged += People_CollectionChanged;
@@ -139,7 +139,7 @@ namespace TaskMaster
             else { logger.Error("People config not found."); }
         }, Parent.AF.CancelToken);
 
-        public IPeopleScoDictionaryNew People {  get; private set; }
+        public IPeopleScoDictionaryNew People { get; private set; }
         public void People_CollectionChanged(object Sender, DictionaryChangedEventArgs<string, string> args)
         {
             People.Serialize();
@@ -171,12 +171,12 @@ namespace TaskMaster
         //}
 
         public string FnameIDList => _defaults.FileName_IDList;
-        
+
         private IIDList _idList;
         //TODO: Convert IDList to ScoCollection
         public IIDList IDList => Initialized(_idList, () => LoadIDList());
         async private Task LoadIdListAsync() => _idList = await Task.Run(() => LoadIDList());
-        
+
         private IIDList LoadIDList()
         {
             if (Parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
@@ -188,7 +188,7 @@ namespace TaskMaster
                 return idList;
 
             }
-            else { return null;}
+            else { return null; }
         }
 
         private string _fnameDictRemap;
@@ -205,7 +205,7 @@ namespace TaskMaster
                 return dictRemap;
 
             }
-            else { return null;}
+            else { return null; }
         }
         async private Task LoadDictRemapAsync() => _dictRemap = await Task.Run(LoadDictRemap, default);
 
@@ -220,12 +220,12 @@ namespace TaskMaster
                     return new SerializableList<string>(filename: _defaults.FileName_CategoryFilters,
                                                         folderpath: pythonStaging);
                 }
-                else { return null;}
+                else { return null; }
             });
             set
             {
                 _catFilters = value;
-                
+
                 if (_catFilters.Folderpath == "" && Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
                 {
                     _catFilters.Folderpath = pythonStaging;
@@ -236,7 +236,7 @@ namespace TaskMaster
         }
         async private Task LoadCategoryFiltersAsync()
         {
-            
+
             _catFilters = await Task.Run(() =>
             {
                 if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
@@ -258,15 +258,15 @@ namespace TaskMaster
                 var prefixList = new ScoCollection<IPrefix>(fileName: _defaults.FileName_PrefixList,
                                                             folderPath: pythonStaging);
 
-                if (prefixList.Count == 0) 
-                { 
+                if (prefixList.Count == 0)
+                {
                     var tdDefaults = new ToDoDefaults();
                     foreach (var prefix in tdDefaults.PrefixList) { prefixList.Add(prefix); }
                     prefixList.Serialize();
                 }
                 return prefixList;
             }
-            else { return null;}
+            else { return null; }
         }
         async private Task LoadPrefixListAsync()
         {
@@ -320,12 +320,12 @@ namespace TaskMaster
         public IFlagChangeTrainingQueue FlagChangeTrainingQueue { get; set; }
         async private Task LoadFlagChangeTrainingQueueAsync()
         {
-            await Task.Run(() => 
-            { 
+            await Task.Run(() =>
+            {
                 FlagChangeTrainingQueue = new FlagChangeTrainingQueue().Init();
             });
         }
 
-        
+
     }
 }

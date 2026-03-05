@@ -13,87 +13,100 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 
-namespace Swordfish.NET.Collections {
-  /// <summary>
-  /// This holds a collection of values that belong to a concurrent dictionary
-  /// </summary>
-  public class ConcurrentValueCollection<TKey, TValue> : ImmutableCollectionBase<TValue> {
-
-    // ************************************************************************
-    // Private Fields
-    // ************************************************************************
-    #region Private Fields
-
+namespace Swordfish.NET.Collections
+{
     /// <summary>
-    /// The immutable list of key value pairs from the dictionary
+    /// This holds a collection of values that belong to a concurrent dictionary
     /// </summary>
-    private ICollection<KeyValuePair<TKey, TValue>> _pairs;
+    public class ConcurrentValueCollection<TKey, TValue> : ImmutableCollectionBase<TValue>
+    {
 
-    #endregion Private Fields
+        // ************************************************************************
+        // Private Fields
+        // ************************************************************************
+        #region Private Fields
 
-    // ************************************************************************
-    // Constructors
-    // ************************************************************************
-    #region Constructors
+        /// <summary>
+        /// The immutable list of key value pairs from the dictionary
+        /// </summary>
+        private ICollection<KeyValuePair<TKey, TValue>> _pairs;
 
-    /// <summary>
-    /// Constructor that takes a dictionary
-    /// </summary>
-    public ConcurrentValueCollection(ConcurrentObservableDictionary<TKey, TValue> dictionary) {
-      _pairs = dictionary.Snapshot;
-    }
+        #endregion Private Fields
 
-    #endregion Constructors
+        // ************************************************************************
+        // Constructors
+        // ************************************************************************
+        #region Constructors
 
-    // ************************************************************************
-    // ImmutableCollectionBase implementation
-    // ************************************************************************
-    #region ImmutableCollectionBase implementation
-
-    /// </summary>
-    /// <param name="item">The object to locate</param>
-    /// <returns>true if item is found otherwise false</returns>
-    public override bool Contains(TValue item) {
-      foreach(var pair in _pairs){
-      if (item.Equals(pair.Value)) {
-          return true;
+        /// <summary>
+        /// Constructor that takes a dictionary
+        /// </summary>
+        public ConcurrentValueCollection(ConcurrentObservableDictionary<TKey, TValue> dictionary)
+        {
+            _pairs = dictionary.Snapshot;
         }
-      }
-      return false;
-    }
 
-    /// <summary>
-    //  Copies the elements of the collection to an array, starting
-    /// at a particular index.
-    /// </summary>
-    public override void CopyTo(TValue[] array, int arrayIndex) {
-      if (array == null) {
-        throw (new System.ArgumentNullException());
-      }
-      foreach(var pair in _pairs){
-        array[arrayIndex] = pair.Value;
-        ++arrayIndex;
-      }
-    }
+        #endregion Constructors
 
-    /// <summary>
-    /// Gets the enumerator for the collection
-    /// </summary>
-    public override IEnumerator<TValue> GetEnumerator() {
-      foreach (var pair in _pairs) {
-        yield return pair.Value;
-      }
-    }
+        // ************************************************************************
+        // ImmutableCollectionBase implementation
+        // ************************************************************************
+        #region ImmutableCollectionBase implementation
 
-    /// <summary>
-    /// Gets the number of elements contained in the collection<T>.
-    /// </summary>
-    public override int Count {
-      get {
-        return _pairs.Count;
-      }
-    }
+        /// </summary>
+        /// <param name="item">The object to locate</param>
+        /// <returns>true if item is found otherwise false</returns>
+        public override bool Contains(TValue item)
+        {
+            foreach (var pair in _pairs)
+            {
+                if (item.Equals(pair.Value))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
-    #endregion ImmutableCollectionBase implementation
-  }
+        /// <summary>
+        //  Copies the elements of the collection to an array, starting
+        /// at a particular index.
+        /// </summary>
+        public override void CopyTo(TValue[] array, int arrayIndex)
+        {
+            if (array == null)
+            {
+                throw (new System.ArgumentNullException());
+            }
+            foreach (var pair in _pairs)
+            {
+                array[arrayIndex] = pair.Value;
+                ++arrayIndex;
+            }
+        }
+
+        /// <summary>
+        /// Gets the enumerator for the collection
+        /// </summary>
+        public override IEnumerator<TValue> GetEnumerator()
+        {
+            foreach (var pair in _pairs)
+            {
+                yield return pair.Value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the number of elements contained in the collection<T>.
+        /// </summary>
+        public override int Count
+        {
+            get
+            {
+                return _pairs.Count;
+            }
+        }
+
+        #endregion ImmutableCollectionBase implementation
+    }
 }

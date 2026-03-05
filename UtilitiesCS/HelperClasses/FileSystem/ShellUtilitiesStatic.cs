@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace ObjectListViewDemo
 {
-    
+
     /// <summary>
     /// ShellUtilities contains routines to interact with the Windows Shell.
     /// </summary>

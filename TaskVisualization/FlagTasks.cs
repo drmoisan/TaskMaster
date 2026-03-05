@@ -22,7 +22,7 @@ namespace TaskVisualization
         private readonly List<ToDoItem> _todoSelection;
         private readonly Explorer _olExplorer;
         private TaskViewer _viewer;
-        
+
         private readonly TaskController _controller;
         private readonly ToDoDefaults _defaultsToDo = new ToDoDefaults();
         private readonly AutoAssignPeople _autoAssignPeople;
@@ -70,7 +70,7 @@ namespace TaskVisualization
                     return _viewer.ShowDialog();
                 else
                     _viewer.Show();
-                    return DialogResult.None;
+                return DialogResult.None;
             }
             else
             {
@@ -91,7 +91,7 @@ namespace TaskVisualization
                     olItems.Add(new OutlookItem(taskItems.Add(OlItemType.olTaskItem)));
                 }
             }
-                
+
 
             var todoList = Enumerable.Range(0, olItems.Count())
                 .Select(i =>
@@ -108,13 +108,13 @@ namespace TaskVisualization
             return todoList;
         }
 
-        public static void PopulateUdf(IList itemList, IApplicationGlobals globals) 
-        { 
+        public static void PopulateUdf(IList itemList, IApplicationGlobals globals)
+        {
             var toDoSelection = InitializeToDoList(itemList, globals);
             var flagsToSet = GetFlagsToSet(toDoSelection.Count);
             toDoSelection.ForEach(x => x.WriteFlagsBatch(flagsToSet));
         }
-                
+
         /// <summary>
         /// Adds the Selection from the ActiveExplorer to a new List of object
         /// </summary>

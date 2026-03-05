@@ -108,7 +108,7 @@ namespace UtilitiesCS.Threading
         private long guiThreshold = TimeSpan.TicksPerMillisecond * 50L;
         // Maximum CPU use (percentage) that is considered "idle"
         private double cpuThreshold = 0.10;
-        
+
         private long subscriptionCount = 0;
         #endregion
 
@@ -138,15 +138,15 @@ namespace UtilitiesCS.Threading
             // Hook into the events
             _timer.Elapsed += Heartbeat;
             logger.Debug($"{nameof(ApplicationIdle)} is subscribing to {nameof(System.Windows.Forms.Application.Idle)} event. \n{TraceUtility.GetMethodCallLogString()}");
-            
+
             System.Windows.Forms.Application.Idle += Application_Idle;
             Interlocked.Increment(ref subscriptionCount);
         }
 
         private void StopTimer()
-        {            
+        {
             _timer.Stop();
-            _timer.Enabled = false;            
+            _timer.Enabled = false;
 
             // Hook into the events
             _timer.Elapsed -= Heartbeat;
@@ -403,7 +403,7 @@ namespace UtilitiesCS.Threading
                 instance.cpuThreshold = value;
             }
         }
-        
+
         internal static ThreadSafeSingleShotGuard Guard { get; private set; } = new ThreadSafeSingleShotGuard();
 
         #endregion
@@ -430,7 +430,7 @@ namespace UtilitiesCS.Threading
             Start();
         }
 
-        public static void Unsubscribe(ApplicationIdleEventHandler handler) 
+        public static void Unsubscribe(ApplicationIdleEventHandler handler)
         {
             ApplicationIdle -= handler;
             if (ApplicationIdle is null || ApplicationIdle.GetInvocationList().Length == 0)

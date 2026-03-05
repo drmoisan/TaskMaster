@@ -15,11 +15,11 @@ namespace UtilitiesCS
 
         public static string[] Split(this string str, char separator, bool trim)
         {
-            if (trim) { return str.Split(separator).Select(s => s.Trim()).ToArray(); } 
+            if (trim) { return str.Split(separator).Select(s => s.Trim()).ToArray(); }
             else { return str.Split(separator); }
         }
 
-        public static string[] Split(this string str,  string delimiter) 
+        public static string[] Split(this string str, string delimiter)
         { return str.Split(new string[] { delimiter }, StringSplitOptions.None); }
 
         public static string[] Split(this string str, string delimiter, bool trim)
@@ -70,7 +70,7 @@ namespace UtilitiesCS
 
             return (index == min && s1.Length == s2.Length) ? -1 : index;
         }
-        
+
         public static string PadToCenter(this string str, int totalWidth, char paddingChar = ' ')
         {
             if (str.Length >= totalWidth) { return str; }

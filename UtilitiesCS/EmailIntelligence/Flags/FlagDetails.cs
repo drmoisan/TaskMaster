@@ -19,15 +19,15 @@ namespace UtilitiesCS
     {
         #region Constructors and Initializers
 
-        public FlagDetails() 
-        { 
+        public FlagDetails()
+        {
             Subscribe();
             SubscribeWithPrefix();
         }
 
-        public FlagDetails(string prefix) 
-        { 
-            this.Prefix = prefix; 
+        public FlagDetails(string prefix)
+        {
+            this.Prefix = prefix;
             Subscribe();
             SubscribeWithPrefix();
         }
@@ -70,26 +70,26 @@ namespace UtilitiesCS
                         var oldValue = _list;
                         _list = value;
                         Subscribe();
-                        List_CollectionChanged(_list, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace,oldValue, value));
+                        List_CollectionChanged(_list, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, oldValue, value));
                     }
                 }
             }
         }
 
         private ObservableCollection<string> _listWithPrefix = new();
-        public ObservableCollection<string> ListWithPrefix 
+        public ObservableCollection<string> ListWithPrefix
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
-            get => _listWithPrefix;         
+            get => _listWithPrefix;
         }
 
-                                
+
         private string _withPrefix = "";
         public string WithPrefix { get => _withPrefix; }
-        
+
         private string _noPrefix = "";
         public string NoPrefix { get => _noPrefix; }
-        
+
         private string _prefix = "";
         public string Prefix { get => _prefix; set => _prefix = value; }
 
@@ -165,10 +165,10 @@ namespace UtilitiesCS
             lock (this)
             {
                 return DeepCopyInternal();
-            }            
+            }
         }
 
-        private FlagDetails DeepCopyInternal() 
+        private FlagDetails DeepCopyInternal()
         {
             Unsubscribe();
             UnsubscribeWithPrefix();

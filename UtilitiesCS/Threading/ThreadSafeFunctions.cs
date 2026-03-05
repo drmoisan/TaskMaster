@@ -21,7 +21,7 @@ namespace UtilitiesCS.Threading
             while (startingValue != exchangeValue)
             {
                 if (++attempts > maxAttempts)
-                    throw new InvalidOperationException($"Attempted to add {attempts-1} times without success");
+                    throw new InvalidOperationException($"Attempted to add {attempts - 1} times without success");
                 startingValue = source;
                 var temp = startingValue + amount;
                 exchangeValue = Interlocked.CompareExchange(ref source, temp, startingValue);
@@ -105,7 +105,7 @@ namespace UtilitiesCS.Threading
 
         public static void DecrementThreadSafe(this ref double source, double minValue)
         {
-            source.SubtractThreadSafe(1,minValue,100);
+            source.SubtractThreadSafe(1, minValue, 100);
         }
 
         public static void DecrementThreadSafe(this ref double source, double minValue, int maxAttempts)
@@ -118,22 +118,22 @@ namespace UtilitiesCS.Threading
             source.AdjustThreadSafe(adjustmentFactory, limitFactory, 100);
         }
 
-        public static void AdjustThreadSafe(this ref double source, Func<double,double> adjustmentFactory, Func<double,double> limitFactory, int maxAttempts) 
+        public static void AdjustThreadSafe(this ref double source, Func<double, double> adjustmentFactory, Func<double, double> limitFactory, int maxAttempts)
         {
             if (maxAttempts < 1)
                 throw new ArgumentException("maxAttempts must be greater than 0");
-            
+
             int attempts = 0;
             double exchangeValue = 0;
             double startingValue = -1;
-            
+
             while (startingValue != exchangeValue)
             {
                 if (++attempts > maxAttempts)
                     throw new InvalidOperationException($"Attempted to add {attempts - 1} times without success");
                 startingValue = source;
-                var temp = limitFactory(adjustmentFactory(startingValue));                
-                exchangeValue = Interlocked.CompareExchange(ref source, temp, startingValue); 
+                var temp = limitFactory(adjustmentFactory(startingValue));
+                exchangeValue = Interlocked.CompareExchange(ref source, temp, startingValue);
             }
         }
 

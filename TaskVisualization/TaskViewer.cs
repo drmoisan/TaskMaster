@@ -258,7 +258,7 @@ namespace TaskVisualization
 
                 throw;
             }
-            
+
         }
     }
 }

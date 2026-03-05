@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
-    public class Prediction<T>: IComparable<Prediction<T>>
+    public class Prediction<T> : IComparable<Prediction<T>>
     {
         public Prediction() { }
 
@@ -26,6 +26,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             if (other is null) { return 1; }
             else { return _probability.CompareTo(other._probability); }
-        }        
+        }
     }
 }

@@ -29,10 +29,10 @@ namespace UtilitiesCS
         private SubjectMapSco _subjectMap;
         private Regex _tokenizerRegex = Tokenizer.GetRegex(new char[] { '&' }.AsTokenPattern());
 
-        public IScoDictionary<int, string> Decoder 
-        { 
-            get 
-            { 
+        public IScoDictionary<int, string> Decoder
+        {
+            get
+            {
                 if (_decoder is null)
                 {
                     if (_encoder is null)
@@ -49,19 +49,19 @@ namespace UtilitiesCS
                     {
                         if (iEnumerableOfKVPs.GroupBy(kvp => kvp.Key).Where(g => g.Count() > 1).Any())
                         {
-                            var response = MessageBox.Show("Encoder is corrupt. "+
-                                "Duplicate keys found in decoder. "+
-                                "Would you like to rebuild the encoder / decoder?", 
+                            var response = MessageBox.Show("Encoder is corrupt. " +
+                                "Duplicate keys found in decoder. " +
+                                "Would you like to rebuild the encoder / decoder?",
                                 "Duplicate Keys", MessageBoxButtons.YesNo);
-                            
+
                             if (response == DialogResult.Yes) { RebuildEncoding(); }
                             else { throw; }
                         }
                         else { throw; }
                     }
                 }
-                return _decoder; 
-            } 
+                return _decoder;
+            }
         }
         public IScoDictionary<string, int> Encoder
         {
@@ -76,8 +76,11 @@ namespace UtilitiesCS
 
         public void RebuildEncoding()
         {
-            if(_subjectMap is null) { throw new NullReferenceException(
-                $"{nameof(_subjectMap)} is null within class {nameof(SubjectMapEncoder)}"); }
+            if (_subjectMap is null)
+            {
+                throw new NullReferenceException(
+                $"{nameof(_subjectMap)} is null within class {nameof(SubjectMapEncoder)}");
+            }
             RebuildEncoding(_subjectMap);
         }
 
@@ -113,7 +116,7 @@ namespace UtilitiesCS
         public void AugmentTokenDict(string[] tokens)
         {
             bool changed = false;
-            if (tokens is null) { throw new ArgumentNullException(nameof(tokens));}
+            if (tokens is null) { throw new ArgumentNullException(nameof(tokens)); }
             foreach (var token in tokens)
             {
                 lock (Encoder)
@@ -131,11 +134,11 @@ namespace UtilitiesCS
                         changed = true;
                     }
                 }
-                
+
             }
             if (changed) { _encoder.Serialize(); }
         }
-        
+
         public void AugmentTokenDict(string text)
         {
             AugmentTokenDict(text.Tokenize().Distinct().ToArray());

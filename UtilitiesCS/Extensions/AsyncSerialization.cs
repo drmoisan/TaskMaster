@@ -22,7 +22,7 @@ namespace UtilitiesCS
             return $"{mb:N1} MB";
         }
 
-        
+
         public static async Task<string> ReadTextAsync(string filePath, IProgress<(double current, double total)> progress)
         {
             using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
@@ -47,7 +47,7 @@ namespace UtilitiesCS
         public static async Task<string> ReadTextWithProgressAsync(this FilePathHelper disk, ProgressTrackerPane progress, string messagePrefix = "")
         {
             var sw = await Task.Run(Stopwatch.StartNew).ConfigureAwait(false);
-            
+
             using var stream = new FileStream(disk.FilePath, FileMode.Open, FileAccess.Read);
             using var reader = new StreamReader(stream, Encoding.UTF8);
 
@@ -99,7 +99,7 @@ namespace UtilitiesCS
         public static async Task WriteTextWithProgressAsync(this FilePathHelper disk, string texts, ProgressTrackerPane progress, string messagePrefix = "")
         {
             var length = Encoding.UTF8.GetByteCount(texts);
-            
+
             using var stream = new FileStream(disk.FilePath, FileMode.Open, FileAccess.Write);
             using var writer = new StreamWriter(stream, Encoding.UTF8);
 
@@ -131,8 +131,8 @@ namespace UtilitiesCS
             using var file = File.Open(disk.FilePath, FileMode.Create);
 
             // RecyclableMemoryStream will be returned, it inherits MemoryStream, however prevents data allocation into the LOH
-            using var memoryStream = streamManager.GetStream(); 
-            
+            using var memoryStream = streamManager.GetStream();
+
             using var writer = new StreamWriter(memoryStream);
             serializer.Serialize(writer, obj);
 
@@ -143,7 +143,7 @@ namespace UtilitiesCS
 
             //await memoryStream.CopyToAsync(file).ConfigureAwait(false);
             //await file.FlushAsync().ConfigureAwait(false);
-            
+
             var copyTask = memoryStream.CopyToAsync(file, 81920, cancel);
             var writeTask = copyTask.ContinueWith(t => file.FlushAsync(), cancel);
 
@@ -169,7 +169,7 @@ namespace UtilitiesCS
             long sourceLength,
             Stream destination,
             int bufferSize,
-            ProgressTrackerPane progress, 
+            ProgressTrackerPane progress,
             string messagePrefix,
             CancellationToken cancellationToken)
         {
@@ -183,10 +183,10 @@ namespace UtilitiesCS
             if (0 > sourceLength && source.CanSeek)
                 sourceLength = source.Length - source.Position;
             var totalBytesCopied = 0L;
-            
+
             var (percent, message) = GetProgressParams(totalBytesCopied, sourceLength, sw, messagePrefix);
             progress?.Report(percent, message);
-            
+
             var bytesRead = -1;
 
             while (0 != bytesRead && !cancellationToken.IsCancellationRequested)
@@ -204,7 +204,7 @@ namespace UtilitiesCS
             {
                 progress.Report(100);
             }
-                
+
             cancellationToken.ThrowIfCancellationRequested();
         }
 

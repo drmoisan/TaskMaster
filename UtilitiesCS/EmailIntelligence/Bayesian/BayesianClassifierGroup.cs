@@ -12,7 +12,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
-    public class BayesianClassifierGroup: SmartSerializable<BayesianClassifierGroup>
+    public class BayesianClassifierGroup : SmartSerializable<BayesianClassifierGroup>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -59,9 +59,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public void UnTrain(string tag, IEnumerable<string> matchTokens, int emailCount)
         {
-            if(_classifiers.TryGetValue(tag, out var classifier))
+            if (_classifiers.TryGetValue(tag, out var classifier))
             {
-                if (classifier is not null) 
+                if (classifier is not null)
                 {
                     var matchFrequency = matchTokens.GroupAndCount();
                     classifier.UnTrain(matchFrequency, emailCount);
@@ -71,7 +71,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     }
                 }
             }
-            
+
         }
 
         public async Task UnTrainMultiTagAsync(IEnumerable<string> tags, IEnumerable<string> matchTokens, int emailCount, CancellationToken cancel)
@@ -94,11 +94,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             foreach (var tag in tags)
             {
-                if (_classifiers.TryGetValue(tag, out var classifier)) 
-                { 
+                if (_classifiers.TryGetValue(tag, out var classifier))
+                {
                     classifier.UnTrainMultiTag(matchFrequency, emailCount);
                 }
-                
+
             }
         }
 
@@ -117,15 +117,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public void TrainMultiTag(IEnumerable<string> tags, IEnumerable<string> matchTokens, int emailCount)
         {
             var matchFrequency = matchTokens.GroupAndCount();
-            
+
             AddToEmailCount(emailCount);
-            
+
             matchFrequency.ForEach(
                 kvp => SharedTokenBase.TokenFrequency.AddOrUpdate(
-                    kvp.Key, 
+                    kvp.Key,
                     kvp.Value,
                     (sharedKey, existingValue) => existingValue + kvp.Value));
-            
+
             foreach (var tag in tags)
             {
                 var classifier = _classifiers.GetOrAdd(tag, CreateNewClassifier(tag, this));
@@ -197,8 +197,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             IDictionary<string, int> tokenIncidence, CancellationToken cancel)
         {
             var results = Classifiers.ToAsyncEnumerable()
-                .SelectAwait(async(classifier) => new Prediction<string>(
-                    classifier.Key, 
+                .SelectAwait(async (classifier) => new Prediction<string>(
+                    classifier.Key,
                     await classifier.Value.Chi2SpamProbAsync(tokenIncidence.Keys.ToArray())))
                 //await classifier.Value.GetMatchProbabilityAsync(tokenIncidence, cancel)))
                 .Where(x => x.Probability >= MinimumProbability)

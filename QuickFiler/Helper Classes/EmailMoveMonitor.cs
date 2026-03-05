@@ -58,16 +58,16 @@ namespace QuickFiler.Helper_Classes
         {
             cancel.ThrowIfCancellationRequested();
 
-            if (mail is null) 
-            { 
+            if (mail is null)
+            {
                 //logger.Debug("Mail item is null. Returning.");
-                return; 
+                return;
             }
             var parent = await GetParentFolderAsync(mail);
-            if (parent is null) 
-            { 
+            if (parent is null)
+            {
                 //logger.Debug("Parent folder is null. Returning.");
-                return; 
+                return;
             }
             lock (_hookedItems)
             {
@@ -85,8 +85,8 @@ namespace QuickFiler.Helper_Classes
         private async Task<Folder> GetParentFolderAsync(MailItem mail, int remaining = 2)
         {
             if (mail is null) { return null; }
-                        
-            var parentFolder = await Task.Run(async () => 
+
+            var parentFolder = await Task.Run(async () =>
             {
                 try
                 {
@@ -115,7 +115,7 @@ namespace QuickFiler.Helper_Classes
                         return null;
                     }
                 }
-                
+
             });
 
             return parentFolder;

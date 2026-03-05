@@ -34,7 +34,7 @@ namespace QuickFiler.Controllers
             Globals = globals;
             ParentCleanup = parentCleanup;
         }
-        
+
         public static async Task<QfcHomeController> LaunchAsync(IApplicationGlobals appGlobals,
                                                                 System.Action parentCleanup)
         {
@@ -165,7 +165,7 @@ namespace QuickFiler.Controllers
             IList<MailItem> listEmail = await Task.Run(
                 async () => await _datamodel.InitEmailQueueAsync(
                     _formController.ItemsPerIteration, _formViewer.Worker, Token, TokenSource));
-            
+
             progress.Report(30, "Initializing Qfc Items");
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(QfcFormController.LoadItemsAsync)} ...");
@@ -277,12 +277,12 @@ namespace QuickFiler.Controllers
         public void QuickFileMetrics_WRITE(string filename)
         {
 
-            
+
             string durationText, durationMinutesText;
-            
+
             string dataLineBeg;
-            
-            
+
+
 
             // Create a line of comma seperated valued to store data
             var now = DateTime.Now;

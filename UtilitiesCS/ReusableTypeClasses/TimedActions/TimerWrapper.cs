@@ -55,7 +55,7 @@ namespace UtilitiesCS.HelperClasses
 
         public void ResetTimer()
         {
-            this.timer.Stop(); 
+            this.timer.Stop();
             this.timer.Start();
         }
 

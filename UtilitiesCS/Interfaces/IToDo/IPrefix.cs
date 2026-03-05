@@ -27,7 +27,7 @@ namespace UtilitiesCS
         KB,
         Other
     }
-    
+
     public interface IPrefix
     {
         PrefixTypeEnum PrefixType { get; set; }

@@ -18,8 +18,8 @@ namespace UtilitiesCS.EmailIntelligence.SubjectMap
             InitializeComponent();
         }
 
-        public SubjectMapMetrics(IEnumerable<SubjectMapSco.SummaryMetric> metrics) 
-        { 
+        public SubjectMapMetrics(IEnumerable<SubjectMapSco.SummaryMetric> metrics)
+        {
             InitializeComponent();
             this.DlvMetrics.SetObjects(metrics);
             foreach (OLVColumn col in this.DlvMetrics.Columns)

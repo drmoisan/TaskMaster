@@ -4,7 +4,7 @@ using System.ComponentModel;
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
     [Obsolete("This class is not used in the current implementation of the Bayesian Classifier.")]
-    public class DedicatedToken: IEquatable<DedicatedToken>, INotifyPropertyChanged
+    public class DedicatedToken : IEquatable<DedicatedToken>, INotifyPropertyChanged
     {
         public DedicatedToken() { }
 
@@ -17,7 +17,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         private string _token;
         public string Token { get => _token; set => _token = value; }
-        
+
         private string _folderPath;
         public string FolderPath { get => _folderPath; set => _folderPath = value; }
 
@@ -41,9 +41,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 #nullable enable
 
         public event PropertyChangedEventHandler? PropertyChanged { add { } remove { } }
-        
+
         #endregion INotifyPropertyChanged
 
-        
+
     }
 }

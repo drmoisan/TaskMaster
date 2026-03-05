@@ -10,7 +10,7 @@ using Microsoft.VisualBasic;
 
 namespace UtilitiesCS
 {
-    public class FilePathHelper: INotifyPropertyChanged, ICloneable
+    public class FilePathHelper : INotifyPropertyChanged, ICloneable
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -40,7 +40,7 @@ namespace UtilitiesCS
         public static FilePathHelper FromSeed(string fileNameSeed, string fileExtension, string fileNameSuffix, string folderPath)
         {
             var fph = new FilePathHelper(fileNameSeed, fileExtension, fileNameSuffix, folderPath);
-            
+
             return fph;
         }
 
@@ -50,12 +50,12 @@ namespace UtilitiesCS
 
         private string _filePath = "";
         public string FilePath { get => _filePath; set { _filePath = value; NotifyPropertyChanged(); } }
-        
+
         private string _folderPath = "";
-        public string FolderPath { get=> _folderPath; set { _folderPath = value; NotifyPropertyChanged(); } }
+        public string FolderPath { get => _folderPath; set { _folderPath = value; NotifyPropertyChanged(); } }
 
         private string _fileName = "";
-        public string FileName { get => _fileName; set { _fileName = value; NotifyPropertyChanged(); }}
+        public string FileName { get => _fileName; set { _fileName = value; NotifyPropertyChanged(); } }
 
         private string _fileStemSeed = null;
         public string FileStemSeed { get => _fileStemSeed; set { _fileStemSeed = value; NotifyPropertyChanged(); } }
@@ -77,7 +77,7 @@ namespace UtilitiesCS
 
         public virtual bool Exists()
         {
-            if(FilePath.IsNullOrEmpty())
+            if (FilePath.IsNullOrEmpty())
                 return false;
             try
             {
@@ -100,7 +100,7 @@ namespace UtilitiesCS
                 catch (Exception e)
                 {
                     logger.Error($"{e.StackTrace}\n{e.Message}\nError getting last write time for FilePath {FilePath}");
-                    return default;                    
+                    return default;
                 }
             else
                 return default;
@@ -120,7 +120,7 @@ namespace UtilitiesCS
         {
             if (!StemInitialized())
                 return MAX_PATH;
-            
+
             return MAX_PATH - FolderPath.Length - FileExtension.Length - FileStemSuffix.Length;
         }
 
@@ -128,7 +128,7 @@ namespace UtilitiesCS
         {
             var fileExtension = Path.GetExtension(fileName);
             var fileStem = Path.GetFileNameWithoutExtension(fileName);
-            
+
             if (fileStem.IsNullOrEmpty())
             {
                 fileStem = fileExtension ?? "";
@@ -137,7 +137,7 @@ namespace UtilitiesCS
 
             return (fileStem, fileExtension ?? "");
         }
-        
+
         public bool TryParseFileStem(string fileStem, out string fileStemSeed, out string fileStemSuffix)
         {
             fileStemSeed = FileStemSeed ?? "";
@@ -177,7 +177,7 @@ namespace UtilitiesCS
             {
                 fileStemSuffix = remainingChars;
             }
-            else 
+            else
             {
                 fileStemSeed += remainingChars;
             }
@@ -189,9 +189,9 @@ namespace UtilitiesCS
         {
             if (fileName.IsNullOrEmpty())
                 return false;
-            
+
             var (fileStem, fileExtension) = ExtractStemAndExtension(fileName);
-                        
+
             if (TryParseFileStem(fileStem, out string fileStemSeed, out string fileStemSuffix))
             {
                 _fileStemSeed = fileStemSeed;
@@ -205,14 +205,14 @@ namespace UtilitiesCS
                 return false;
             }
         }
-                
+
         public bool AdjustForMaxPath()
         {
             if (!StemInitialized())
                 return false;
 
             var maxSeedLength = MAX_PATH - FolderPath.Length - FileExtension.Length - FileStemSuffix.Length;
-            
+
             var fileName = $"{FileStemSeed}{FileStemSuffix}{FileExtension}";
             var filePath = Path.Combine(FolderPath, fileName);
             if (filePath.Length > MAX_PATH)
@@ -264,29 +264,29 @@ namespace UtilitiesCS
                     else
                         _filePath = null;
                     break;
-                
+
                 case "FilePath":
                     if (_filePath.IsNullOrEmpty())
                     {
                         _folderPath = "";
                         _fileName = "";
                         return;
-                    }                    
-                    
+                    }
+
                     try
                     {
-                        _folderPath = Path.GetDirectoryName(_filePath);    
+                        _folderPath = Path.GetDirectoryName(_filePath);
                     }
                     catch (System.Exception ex)
                     {
-                        var st = string.Join("\n",TraceUtility.GetMyMethodNames(new StackTrace()));
+                        var st = string.Join("\n", TraceUtility.GetMyMethodNames(new StackTrace()));
                         string msg = $"FilePath: {_filePath} is invalid.\n{st}";
                         logger.Error(msg, ex);
                         throw;
                     }
-                    
+
                     _fileName = Path.GetFileName(_filePath);
-                    if (_fileName == "") 
+                    if (_fileName == "")
                         throw new ArgumentException($"FilePath {_filePath} must include a FileName");
                     break;
                 case "FileStemSeed":
@@ -366,7 +366,7 @@ namespace UtilitiesCS
                 _fileName = other._fileName;
                 changed.Add(nameof(FileName));
             }
-            
+
             if (_filePath != other._filePath)
             {
                 _filePath = other._filePath;

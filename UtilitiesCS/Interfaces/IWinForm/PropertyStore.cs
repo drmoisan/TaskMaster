@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 
 namespace QuickFiler.Interfaces
-{         
+{
     ///  
     ///     This is a small class that can efficiently store property values.
     ///     It tries to optimize for size first, "get" access second, and 

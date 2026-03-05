@@ -21,7 +21,7 @@ namespace ObjectListViewDemo.Tests
             _mockDirectoryInfo.Setup(d => d.FullName).Returns("TestDirectory");
             _mockDirectoryInfo.Setup(d => d.Name).Returns("TestDirectory");
             _mockDirectoryInfo.Setup(d => d.Attributes).Returns(System.IO.FileAttributes.Directory);
-            
+
             _mockFileInfo.Setup(f => f.FullName).Returns("TestFile.txt");
             _mockFileInfo.Setup(f => f.Name).Returns("TestFile.txt");
             _mockFileInfo.Setup(f => f.Extension).Returns(".txt");

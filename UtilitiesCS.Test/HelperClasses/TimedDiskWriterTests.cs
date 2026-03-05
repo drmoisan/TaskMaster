@@ -90,8 +90,8 @@ namespace UtilitiesCS.Test.HelperClasses
         {
             // Arrange
             var timedDiskWriter = this.CreateTimedDiskWriter();
-            
-            timedDiskWriter.DiskWriter = (x) => {  };
+
+            timedDiskWriter.DiskWriter = (x) => { };
             timedDiskWriter.Config.WriteInterval = TimeSpan.FromHours(1);
 
             string item1 = "Queued String 1";
@@ -102,7 +102,7 @@ namespace UtilitiesCS.Test.HelperClasses
                 item1,
                 item2
             };
-            
+
             CancellationToken token = default;
 
             // Act
@@ -114,7 +114,7 @@ namespace UtilitiesCS.Test.HelperClasses
 
             // Assert
             actual.Should().BeEquivalentTo(expected);
-            
+
         }
 
         [TestMethod]
@@ -185,16 +185,16 @@ namespace UtilitiesCS.Test.HelperClasses
             // Assert
             Assert.AreEqual(expected, actual);
         }
-       
+
         [TestMethod]
         public void Configuration_PropertyChanged_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            var timedDiskWriter = this.mockTimedDiskWriter.Object; 
-            
+            var timedDiskWriter = this.mockTimedDiskWriter.Object;
+
             object sender = null;
             var e = new PropertyChangedEventArgs("WriteInterval");
-            
+
             // Act
             timedDiskWriter.Configuration_PropertyChanged(sender, e);
 
@@ -209,12 +209,12 @@ namespace UtilitiesCS.Test.HelperClasses
         {
             // Arrange
             var timedDiskWriter = this.CreateTimedDiskWriter();
-            
+
             string item1 = "Queued String 1";
             string item2 = "Queued String 2";
-            timedDiskWriter.Queue = 
+            timedDiskWriter.Queue =
                 new BlockingCollection<string>(
-                    new ConcurrentQueue<string>()){ item1, item2 };
+                    new ConcurrentQueue<string>()) { item1, item2 };
 
             var expected = new List<string> { item1, item2 };
             var actual = new List<string>();
@@ -267,7 +267,8 @@ namespace UtilitiesCS.Test.HelperClasses
 
             timedDiskWriter.Queue =
                 new BlockingCollection<string>(
-                    new ConcurrentQueue<string>()) { };
+                    new ConcurrentQueue<string>())
+                { };
 
             timedDiskWriter.DiskWriter = (items) => { };
 

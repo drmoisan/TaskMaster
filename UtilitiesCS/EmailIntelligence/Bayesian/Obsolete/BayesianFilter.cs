@@ -169,17 +169,17 @@ namespace Expat.Bayesian
     //    private void CalculateTokenProbability(string token)
     //    {
     //        /*
-			 //* This is a direct implementation of Paul Graham's algorithm from
-			 //* http://www.paulgraham.com/spam.html
-			 //* 
-			 //*	(let ((g (* 2 (or (gethash word good) 0)))
-			 //*		  (b (or (gethash word bad) 0)))
-			 //*	   (unless (< (+ g b) 5)
-			 //*		 (max .01
-			 //*			  (min .99 (float (/ (min 1 (/ b nbad))
-			 //*								 (+ (min 1 (/ g ngood))   
-			 //*									(min 1 (/ b nbad)))))))))
-			 //*/
+    //* This is a direct implementation of Paul Graham's algorithm from
+    //* http://www.paulgraham.com/spam.html
+    //* 
+    //*	(let ((g (* 2 (or (gethash word good) 0)))
+    //*		  (b (or (gethash word bad) 0)))
+    //*	   (unless (< (+ g b) 5)
+    //*		 (max .01
+    //*			  (min .99 (float (/ (min 1 (/ b nbad))
+    //*								 (+ (min 1 (/ g ngood))   
+    //*									(min 1 (/ b nbad)))))))))
+    //*/
 
     //        int g = _good.Tokens.ContainsKey(token) ? _good.Tokens[token] * Knobs.GoodTokenWeight : 0;
     //        int b = _bad.Tokens.ContainsKey(token) ? _bad.Tokens[token] : 0;
@@ -302,14 +302,14 @@ namespace Expat.Bayesian
     //        }
 
     //        /* Combine the 15 most interesting probabilities together into one.  
-			 //* The algorithm to do this is shown below and described here:
-			 //* http://www.paulgraham.com/naivebayes.html
-			 //* 
-			 //*				abc           
-			 //*	---------------------------
-			 //*	abc + (1 - a)(1 - b)(1 - c)
-			 //*
-			 //*/
+    //* The algorithm to do this is shown below and described here:
+    //* http://www.paulgraham.com/naivebayes.html
+    //* 
+    //*				abc           
+    //*	---------------------------
+    //*	abc + (1 - a)(1 - b)(1 - c)
+    //*
+    //*/
 
     //        double mult = 1;  // for holding abc..n
     //        double comb = 1;  // for holding (1 - a)(1 - b)(1 - c)..(1-n)

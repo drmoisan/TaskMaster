@@ -8,11 +8,11 @@ using UtilitiesCS;
 
 namespace QuickFiler
 {
-    public class TlpCellStates: Dictionary<string, TlpCellSnapShotList>
+    public class TlpCellStates : Dictionary<string, TlpCellSnapShotList>
     {
-        public TlpCellStates(): base() {}
+        public TlpCellStates() : base() { }
 
-        public TlpCellStates(IEnumerable<KeyValuePair<string, TlpCellSnapShotList>> collection) : base() 
+        public TlpCellStates(IEnumerable<KeyValuePair<string, TlpCellSnapShotList>> collection) : base()
         {
             foreach (var kvp in collection)
                 this.Add(kvp.Key, kvp.Value);
@@ -48,11 +48,11 @@ namespace QuickFiler
 
     }
 
-    public class TlpCellSnapShotList: List<TlpCellSnapShot>
+    public class TlpCellSnapShotList : List<TlpCellSnapShot>
     {
         public TlpCellSnapShotList() : base() { }
         public TlpCellSnapShotList(IEnumerable<TlpCellSnapShot> collection) : base(collection) { }
-        
+
         public void ApplyState(Control root)
         {
             this.ForEach(s => s.ApplyState(root));
@@ -63,8 +63,8 @@ namespace QuickFiler
     {
         public TlpCellSnapShot() { }
 
-        public TlpCellSnapShot(TableLayoutPanel tlp, Control control) 
-        { 
+        public TlpCellSnapShot(TableLayoutPanel tlp, Control control)
+        {
             SnapCell(tlp, control);
         }
 
@@ -73,13 +73,13 @@ namespace QuickFiler
             TlpName = tlp.Name;
             ControlName = control.Name;
             Cell = tlp.GetCellPosition(control);
-            
+
             RowSpan = tlp.GetRowSpan(control);
-            
+
             RowStyles = new List<RowStyle>();
             for (int i = Cell.Row; i < Cell.Row + RowSpan; i++)
                 RowStyles.Add(tlp.RowStyles[i]);
-            
+
             ColumnSpan = tlp.GetColumnSpan(control);
             ColumnStyles = new List<ColumnStyle>();
             for (int i = Cell.Column; i < Cell.Column + ColumnSpan; i++)
@@ -106,7 +106,7 @@ namespace QuickFiler
         public TableLayoutPanelCellPosition Cell { get => _cell; set => _cell = value; }
         public int Row { get => _cell.Row; set => _cell.Row = value; }
         public int Column { get => _cell.Column; set => _cell.Column = value; }
-        
+
         private List<RowStyle> _rowStyles;
         public List<RowStyle> RowStyles { get => _rowStyles; set => _rowStyles = value; }
 
@@ -124,7 +124,7 @@ namespace QuickFiler
 
         private bool _visible;
         public bool Visible { get => _visible; set => _visible = value; }
-        
+
         public void ApplyState(Control root)
         {
             var tlp = root.Controls.Find(TlpName, true).FirstOrDefault() as TableLayoutPanel;

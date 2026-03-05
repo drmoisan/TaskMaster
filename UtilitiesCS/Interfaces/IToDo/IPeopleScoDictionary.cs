@@ -4,7 +4,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
-    public interface IPeopleScoDictionary: IScoDictionary<string, string>
+    public interface IPeopleScoDictionary : IScoDictionary<string, string>
     {
         IPrefix Prefix { get; set; }
         IList<string> AddMissingEntries(MailItem olMail);

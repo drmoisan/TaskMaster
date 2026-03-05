@@ -39,9 +39,9 @@ namespace QuickFiler.Controllers
 
         public Task Consumer { get; private set; } = Task.CompletedTask;
 
-        public async Task ConsumeAsync() 
+        public async Task ConsumeAsync()
         {
-            await Task.Run(async () => 
+            await Task.Run(async () =>
             {
                 while (Queue.TryTake(out var item))
                 {
@@ -52,9 +52,9 @@ namespace QuickFiler.Controllers
                     catch (Exception e)
                     {
                         var first = item.Helpers.First();
-                        logger.Error($"Error sorting mail items Subject: {first.Subject} Sent On: {first.SentOn} from {first.SenderName} {e.Message}",e);
+                        logger.Error($"Error sorting mail items Subject: {first.Subject} Sent On: {first.SentOn} from {first.SenderName} {e.Message}", e);
                     }
-                    
+
                 }
                 guard = new ThreadSafeSingleShotGuard();
             });

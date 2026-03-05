@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.OutlookObjects.Folder
 {
-    public class FolderWrapperNameAndParentNameComparer:IEqualityComparer<TreeNode<FolderWrapper>>
+    public class FolderWrapperNameAndParentNameComparer : IEqualityComparer<TreeNode<FolderWrapper>>
     {
         public bool Equals(TreeNode<FolderWrapper> x, TreeNode<FolderWrapper> y)
         {
             if (ReferenceEquals(x, y)) return true;
-            if (x is null || y is null) return false;            
+            if (x is null || y is null) return false;
             var nameComparison = string.Equals(x.Value.Name, y.Value.Name, StringComparison.OrdinalIgnoreCase);
             if (!nameComparison) return false;
             // Compare parent names if both nodes have parents
@@ -29,8 +29,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         public int GetHashCode(TreeNode<FolderWrapper> obj)
         {
-            if (obj is null) return 0;            
-            int hashName = obj.Value?.Name?.ToLowerInvariant().GetHashCode() ?? 0; 
+            if (obj is null) return 0;
+            int hashName = obj.Value?.Name?.ToLowerInvariant().GetHashCode() ?? 0;
             int hashParentName = obj.Parent?.Value?.Name?.ToLowerInvariant().GetHashCode() ?? 0;
             return hashName * 31 + hashParentName;
         }

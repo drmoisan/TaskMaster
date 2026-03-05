@@ -11,7 +11,7 @@ using System.Windows.Forms;
 namespace SVGControl
 {
     public partial class ButtonSVG : Button
-    { 
+    {
         private SvgImageSelector _imageSVG;
 
         public ButtonSVG()
@@ -27,7 +27,7 @@ namespace SVGControl
         }
 
         private void ButtonSVG_Resize(object sender, EventArgs e)
-        {            
+        {
             _imageSVG.Outer = this.Size;
         }
 
@@ -47,13 +47,13 @@ namespace SVGControl
             this.InvokePaint(this, new PaintEventArgs(this.CreateGraphics(), this.DisplayRectangle));
             //this.Image = ImageSVG.Render();
         }
-        
+
         public static byte[] ObjectToByteArray(Object obj)
         {
             BinaryFormatter bf = new BinaryFormatter();
             using (var ms = new MemoryStream())
             {
-                if (obj!=null)
+                if (obj != null)
                     bf.Serialize(ms, obj);
                 return ms.ToArray();
             }

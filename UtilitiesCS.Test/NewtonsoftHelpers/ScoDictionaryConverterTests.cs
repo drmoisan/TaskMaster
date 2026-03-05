@@ -47,7 +47,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
                 this.TryAdd("key1", 1);
                 this.TryAdd("key2", 2);
 
-                var settings = GetSettings(globals);                
+                var settings = GetSettings(globals);
                 this.Config.JsonSettings = settings;
                 Globals = globals;
                 return this;
@@ -68,7 +68,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
                 };
                 settings.Converters.Add(new AppGlobalsConverter(globals));
                 settings.Converters.Add(new FilePathHelperConverter(globals.FS));
-                
+
                 return settings;
             }
 
@@ -121,9 +121,9 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         internal class DerivedSimple : ScoDictionaryNew<string, int>
         {
             public string AdditionalField1 { get; set; }
-            
+
             public DerivedSimple() { AdditionalField1 = "Test"; }
-            
+
             public static JsonSerializerSettings GetJsonSettings(IApplicationGlobals globals) { return new DerivedSimple().GetSettings(globals); }
             private JsonSerializerSettings GetSettings(IApplicationGlobals globals)
             {
@@ -172,7 +172,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             // Arrange
             var expected = new TestDerived().Init(globals);
             expected.Config.JsonSettings.Converters.Add(new ScoDictionaryConverter<TestDerived, string, int>());
-            
+
             // Act
             var json = expected.SerializeToString();
             Console.WriteLine(json);
@@ -183,7 +183,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
             // Direct action with custom converter
             //var actual = JsonConvert.DeserializeObject<TestDerived>(json, settings);
-            
+
             // Static class deserialization with custom converter
             var settings = TestDerived.GetJsonSettings(globals);
             settings.Converters.Add(new ScoDictionaryConverter<TestDerived, string, int>());
@@ -191,7 +191,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             var actual = smartSerializable.DeserializeObject<TestDerived>(json, settings);
 
             // Assert
-            
+
             actual.Should().BeEquivalentTo(expected);
             actual.Config.Should().BeEquivalentTo(expected.Config);
             actual.AdditionalField3.Should().Be(expected.AdditionalField3);

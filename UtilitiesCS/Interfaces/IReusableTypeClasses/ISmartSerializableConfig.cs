@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public interface ISmartSerializableConfig: ICloneable, INotifyPropertyChanged
+    public interface ISmartSerializableConfig : ICloneable, INotifyPropertyChanged
     {
         bool ClassifierActivated { get; set; }
         FilePathHelper Disk { get; set; }

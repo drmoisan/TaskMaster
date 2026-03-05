@@ -1,5 +1,5 @@
 ﻿using Outlook = Microsoft.Office.Interop.Outlook;
-using Microsoft.Office.Interop.Outlook; 
+using Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,14 +11,14 @@ using System;
 
 namespace UtilitiesCS.OutlookObjects.Store
 {
-    public class StoresWrapper: SmartSerializable<StoresWrapper>
+    public class StoresWrapper : SmartSerializable<StoresWrapper>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region ctor
 
-        public StoresWrapper(): base() { base._parent = this; }
+        public StoresWrapper() : base() { base._parent = this; }
 
         public StoresWrapper(IApplicationGlobals globals)
         {
@@ -30,7 +30,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         {
             Stores = GetFilteredStores()
                 .Select(store => new StoreWrapper(store).Init())
-                .ToList();            
+                .ToList();
             return this;
         }
 
@@ -48,7 +48,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             }
             catch (System.Exception e)
             {
-                logger.Error($"Error in {nameof(RewireOlObjects)}: {e.Message}");                
+                logger.Error($"Error in {nameof(RewireOlObjects)}: {e.Message}");
             }
         }
 
@@ -59,7 +59,7 @@ namespace UtilitiesCS.OutlookObjects.Store
 
             foreach (var store in stores)
             {
-                
+
                 var storeWrapper = Stores.Find(x => x.DisplayName == store.DisplayName);
                 if (storeWrapper is null)
                 {
@@ -70,8 +70,8 @@ namespace UtilitiesCS.OutlookObjects.Store
                 {
                     await Task.Run(() => storeWrapper.Restore(store));
                     //await Task.Run(() => storeWrapper.RestoreGlobalAddresses(Globals.Ol.App));
-                    
-                }                                
+
+                }
             }
         }
 
@@ -84,11 +84,11 @@ namespace UtilitiesCS.OutlookObjects.Store
 
 
         public static bool StoreIsIncluded(
-            Outlook.Store store, 
+            Outlook.Store store,
             IList<string> excludedStoreNameContains,
             IList<string> excludedStoreFilePathContains,
-            IList<string> gwsoFilePathContains, 
-            bool excludePublicFolderStores, 
+            IList<string> gwsoFilePathContains,
+            bool excludePublicFolderStores,
             bool excludeGwsoStores)
         {
             if (excludePublicFolderStores && store.ExchangeStoreType == OlExchangeStoreType.olExchangePublicFolder)
@@ -178,7 +178,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         internal IApplicationGlobals Globals { get; set; }
 
         [JsonProperty]
-        public List<StoreWrapper> Stores { get; set; } 
+        public List<StoreWrapper> Stores { get; set; }
 
         [JsonProperty]
         public bool ExcludePublicFolderStores { get; set; } = true;

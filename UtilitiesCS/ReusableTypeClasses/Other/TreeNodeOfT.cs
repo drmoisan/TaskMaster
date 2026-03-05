@@ -56,7 +56,7 @@ namespace UtilitiesCS
             Children.Add(node);
             return node;
         }
-        
+
         public TreeNode<T> AddChild(T value, string strID)
         {
             var node = new TreeNode<T>(value) { Parent = this };
@@ -72,7 +72,7 @@ namespace UtilitiesCS
             Children.Add(node);
             return node;
         }
-        
+
         public TreeNode<T>[] AddChildren(params T[] values)
         {
             return values.Select(new Func<T, TreeNode<T>>(AddChild)).ToArray();
@@ -96,7 +96,7 @@ namespace UtilitiesCS
 
         public IEnumerable<TreeNode<T>> Descendents(bool includeSelf = false)
         {
-            TreeNode<T>[] nodes = includeSelf ?[this]: [];
+            TreeNode<T>[] nodes = includeSelf ? [this] : [];
             return nodes.Concat(Children.SelectMany(x => x.Descendents(true)));
         }
 
@@ -147,11 +147,11 @@ namespace UtilitiesCS
             return node;
         }
 
-        public TreeNode<T> FindNode(Func<T, bool> comparator, bool descendByLevel = false) 
-        { 
-            if (!descendByLevel) 
-            { 
-                return FindAll(comparator).FirstOrDefault(); 
+        public TreeNode<T> FindNode(Func<T, bool> comparator, bool descendByLevel = false)
+        {
+            if (!descendByLevel)
+            {
+                return FindAll(comparator).FirstOrDefault();
             }
             else
             {
@@ -164,18 +164,18 @@ namespace UtilitiesCS
                 }
                 return default;
             }
-            
+
         }
 
-        public TreeNode<T>[] GetLeavesAtMaxDepth() 
+        public TreeNode<T>[] GetLeavesAtMaxDepth()
         {
             var leaves = Leaves();
             var maxDepth = leaves.Max(x => x.Depth);
             return leaves.Where(x => x.Depth == maxDepth).ToArray();
         }
 
-        public TreeNode<T>[] GetNextLevel(TreeNode<T>[] nodes) 
-        { 
+        public TreeNode<T>[] GetNextLevel(TreeNode<T>[] nodes)
+        {
             if (nodes is null) { return null; }
             return nodes.Where(x => !x.Children.IsNullOrEmpty()).SelectMany(x => x.Children).ToArray();
         }
@@ -194,14 +194,14 @@ namespace UtilitiesCS
                 return new TreeNode<T>[] { }.Concat(Children.SelectMany(x => x.FindAll(comparator)));
         }
 
-        public IEnumerable<TreeNode<T>> FindAll(Func<TreeNode<T>, bool> comparator) 
+        public IEnumerable<TreeNode<T>> FindAll(Func<TreeNode<T>, bool> comparator)
         {
             if (comparator(this))
                 return new TreeNode<T>[] { this }.Concat(Children.SelectMany(x => x.FindAll(comparator)));
             else
                 return new TreeNode<T>[] { }.Concat(Children.SelectMany(x => x.FindAll(comparator)));
         }
-        
+
         public IEnumerable<T> Flatten()
         {
             return new[] { Value }.Concat(Children.SelectMany(x => x.Flatten()));
@@ -216,7 +216,7 @@ namespace UtilitiesCS
         {
             return Flatten().Where(comparator);
         }
-        
+
         public bool IsAncestor(TreeNode<T> model)
         {
             if (ReferenceEquals(this, model))
@@ -225,11 +225,11 @@ namespace UtilitiesCS
                 return false;
             return Parent.IsAncestor(model);
         }
-        
+
         public virtual IEnumerable<TreeNode<T>> Leaves()
         {
             TreeNode<T>[] nodes = [];
-            return nodes.Concat(Children.SelectMany(x => 
+            return nodes.Concat(Children.SelectMany(x =>
             {
                 if (x.Children.Count == 0)
                     return new[] { x };
@@ -237,7 +237,7 @@ namespace UtilitiesCS
                     return x.Leaves();
             }));
         }
-                
+
         public void Traverse(Action<T> action)
         {
             action(Value);
@@ -261,10 +261,10 @@ namespace UtilitiesCS
                 Parent.TraverseAncestors(action);
         }
 
-        public void TraverseByLevel(bool down, Action<TreeNode<T>> action) 
+        public void TraverseByLevel(bool down, Action<TreeNode<T>> action)
         {
-            if (down) 
-            { 
+            if (down)
+            {
                 TreeNode<T>[] nodes = [this];
                 do
                 {
@@ -272,18 +272,18 @@ namespace UtilitiesCS
                     nodes = GetNextLevel(nodes);
                 } while (nodes.Length > 0);
             }
-            else 
-            { 
+            else
+            {
                 var initialDepth = Depth;
                 var nodes = GetLeavesAtMaxDepth();
                 var depth = nodes.FirstOrDefault()?.Depth ?? -1;
-                
+
                 while (depth >= initialDepth)
                 {
                     nodes.ForEach(node => action(node));
                     nodes = GetPreviousLevel(nodes);
                     depth = nodes.FirstOrDefault()?.Depth ?? -1;
-                }                
+                }
             }
         }
 

@@ -41,11 +41,11 @@ namespace UtilitiesCS
             Completed = 4
         }
 
-        public enum LoadState 
-        { 
-            NotLoaded = 0, 
-            Loading = 1, 
-            Loaded = 2 
+        public enum LoadState
+        {
+            NotLoaded = 0,
+            Loading = 1,
+            Loaded = 2
         }
 
         public enum SerializationOptions
@@ -64,7 +64,7 @@ namespace UtilitiesCS
 
         [Flags]
         public enum DictionaryResult
-        { 
+        {
             KeyExists = 1,          // 001
             KeysChanged = 2,        // 010
             ValueChanged = 4,       // 100

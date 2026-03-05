@@ -118,7 +118,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return classifier;
         }
 
-        private static void CalcProbability(BayesianClassifierGroup parent, IDictionary<string, int> matches, 
+        private static void CalcProbability(BayesianClassifierGroup parent, IDictionary<string, int> matches,
             bool addToParent, BayesianClassifierShared classifier)
         {
             matches.ForEach(kvp =>
@@ -131,7 +131,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             });
         }
 
-        private static void ValidateParameters(BayesianClassifierGroup parent, string tag, 
+        private static void ValidateParameters(BayesianClassifierGroup parent, string tag,
             IDictionary<string, int> matches, int matchEmailCount)
         {
             var nullPositions = NullCheckParams(parent, tag, matches);
@@ -178,14 +178,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         [JsonProperty]
         public int MatchEmailCount { get => _matchEmailCount; set => _matchEmailCount = value; }
         private int _matchEmailCount;
-                
+
         /// <summary>
         /// A list of probabilities that the given word might appear in a Spam text
         /// </summary>
         [JsonProperty]
         public ConcurrentDictionary<string, double> Prob { get => _prob; private set => _prob = value; }
         protected ConcurrentDictionary<string, double> _prob = new();
-        
+
         [JsonProperty]
         public BayesianClassifierGroup Parent { get => _parent; internal set => _parent = value; }
         protected BayesianClassifierGroup _parent;
@@ -200,11 +200,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public void Train(IDictionary<string, int> tokenFrequency, int emailCount)
         {
             var otherMatches = Match.TokenFrequency.Keys.Except(tokenFrequency.Keys);
-            
+
             Interlocked.Add(ref _matchEmailCount, emailCount);
             Parent.AddToEmailCount(emailCount);
-            tokenFrequency.ForEach(kvp => 
-            { 
+            tokenFrequency.ForEach(kvp =>
+            {
                 var matchCount = Match.AddOrSumTokenValue(kvp.Key, kvp.Value);
                 var tokenCount = Parent.SharedTokenBase.TokenFrequency.AddOrUpdate(kvp.Key, kvp.Value,
                     (sharedKey, existingValue) => existingValue + kvp.Value);
@@ -219,7 +219,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var otherMatches = Match.TokenFrequency.Keys.Except(tokenFrequency.Keys);
 
             Interlocked.Add(ref _matchEmailCount, emailCount);
-            
+
             tokenFrequency.ForEach(kvp =>
             {
                 var matchCount = Match.AddOrSumTokenValue(kvp.Key, kvp.Value);
@@ -261,13 +261,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             tokenFrequency.ForEach(kvp =>
             {
                 var matchCount = Match.SubtractOrRemoveValue(kvp.Key, kvp.Value);
-                
+
                 Parent.SharedTokenBase.TokenFrequency.UpdateOrRemove(
                     kvp.Key,
                     (key, oldValue) => oldValue - kvp.Value <= 0,
                     (key, oldValue) => oldValue - kvp.Value,
                     out int tokenCount);
-                                                    
+
                 UpdateProbabilitySb(kvp.Key, matchCount, tokenCount - matchCount);
             });
 
@@ -325,7 +325,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         internal protected virtual void UpdateProbabilitySb(string token, int matchCount, int notMatchCount)
         {
-            
+
             int m = matchCount;
             int nm = notMatchCount;
 
@@ -356,7 +356,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         }
 
-        internal protected virtual double UpdateProbabilitySb(WordInfo record) 
+        internal protected virtual double UpdateProbabilitySb(WordInfo record)
         {
             int m = record.MatchCount;
             int nm = record.NotMatchCount;
@@ -430,7 +430,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             Prob[token] = prob;
 
-            
+
         }
 
         internal protected virtual void UpdateProbability(string token)
@@ -465,9 +465,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     double matchFactor = Math.Min(1, (double)m / (double)MatchEmailCount);
 
                     double notMatchfactor = Math.Min(1, (double)nm * Knobs.NotMatchTokenWeight / (double)(Parent.TotalEmailCount - MatchEmailCount));
-                
-                    prob = Math.Max(Knobs.MinScore, 
-                        Math.Min(Knobs.MaxScore, 
+
+                    prob = Math.Max(Knobs.MinScore,
+                        Math.Min(Knobs.MaxScore,
                         matchFactor / (notMatchfactor + matchFactor)));
                 }
                 Prob[token] = prob;
@@ -517,7 +517,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return combined;
 
         }
-        
+
         public SortedList<string, double> GetInterestingList(IDictionary<string, int> tokenIncidence)
         {
             SortedList<string, double> interestingList = [];
@@ -530,13 +530,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             // Inner Merge of match probabilities and token incidence
             var matchIncidence = MergeProb(tokenIncidence);
-            
+
             var matchTokens = matchIncidence
                 .Select(x =>
                 {
                     // Convert token and probability to a key that can be sorted by "interestingness"
                     var interestingKey = (0.5 - Math.Abs(0.5 - x.Prob)).ToString(".00000") + x.Token;
-                
+
                     // Add the key to the list the number of times it appears in the body
                     Enumerable.Range(0, x.Incidence)
                         .ForEach(i => interestingList.Add(interestingKey + i, x.Prob));
@@ -545,9 +545,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     return x.Token;
                 })
                 .ToArray();
-                        
+
             var notMatchIncidence = GetNotMatchIncidence(tokenIncidence, matchTokens);
-                        
+
             notMatchIncidence.ForEach(x =>
             {
                 var interestingKey = (0.5 - Math.Abs(0.5 - Knobs.MinScore)).ToString(".00000") + x.Key;
@@ -556,7 +556,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             });
 
             var newWordProbs = tokenIncidence.Where(
-                kvp => !matchTokens.Contains(kvp.Key) && 
+                kvp => !matchTokens.Contains(kvp.Key) &&
                 !Parent.SharedTokenBase.TokenFrequency.ContainsKey(kvp.Key))
                 //!notMatchIncidence.ContainsKey(kvp.Key))
                 .ToDictionary();
@@ -568,7 +568,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 Enumerable.Range(0, x.Value)
                     .ForEach(i => interestingList.Add(interestingKey + i, Knobs.UnknownWordProb));
             });
-            
+
 
             return interestingList;
         }
@@ -588,9 +588,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var probabilities = GetInterestingList(tokenIncidence);
 
             var combined = CombineProbabilities(probabilities);
-            
-            var drivers = probabilities.Select(x => 
-                { 
+
+            var drivers = probabilities.Select(x =>
+                {
                     var key = x.Key.Substring(6);
                     key = key.Substring(0, key.Length - 1);
                     var value = x.Value;
@@ -599,7 +599,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 .OrderByDescending(x => x.value)
                 .Take(Knobs.InterestingWordCount)
                 .ToArray();
-            
+
             return (combined, drivers);
         }
 
@@ -630,7 +630,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             return combined;
         }
-        
+
         private Dictionary<string, int> GetNotMatchIncidence(IDictionary<string, int> tokenIncidence, string[] matchKeys)
         {
             return tokenIncidence
@@ -657,17 +657,17 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             public int MatchCount = matchCount;
             public int NotMatchCount = notMatchCount;
         }
-        
+
         public struct WordStream(string name, string[] words)
         {
             public string Name = name;
             public string[] Words = words;
         }
 
-        
+
         public (double, List<(string word, double prob)>) Chi2SpamProb(WordStream wordStream, bool evidence) => Chi2SpamProb(wordStream.Words, evidence);
         public double Chi2SpamProb(WordStream wordStream) => Chi2SpamProb(wordStream, false).Item1;
-        public (double, List<(string word, double prob)>) Chi2SpamProb(IDictionary<string, int> tokenFrequency, bool evidence) => Chi2SpamProb([..tokenFrequency.Keys], evidence);
+        public (double, List<(string word, double prob)>) Chi2SpamProb(IDictionary<string, int> tokenFrequency, bool evidence) => Chi2SpamProb([.. tokenFrequency.Keys], evidence);
         public double Chi2SpamProb(IDictionary<string, int> tokenFrequency) => Chi2SpamProb(tokenFrequency, false).Item1;
 
         /// <summary>
@@ -761,7 +761,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public double chi2Q(double x2, int v)
         {
-            
+
             var m = x2 / 2.0;
             var sum = Math.Exp(-m);
             var term = sum;
@@ -772,12 +772,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
 
             return Math.Min(sum, 1.0);
-        
+
         }
 
-        
-        
-        
+
+
+
 
         //public List<(double prob, string word, WordInfo record)> GetClues(WordStream wordStream) => GetClues([.. wordStream.Words]);
         //public List<(double prob, string word, WordInfo record)> GetClues(IDictionary<string, int> tokenFrequency) => GetClues([.. tokenFrequency.Keys]);
@@ -800,7 +800,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return selectedClues;
         }
 
-        
+
         public (double distance, double prob, string word, WordInfo record) GetWordDistance(string word)
         {
             WordInfo record = GetWordInfo(word);

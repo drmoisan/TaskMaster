@@ -55,7 +55,7 @@ namespace UtilitiesCS.Test.Threading
             };
             settings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
             settings.Converters.Add(new AppGlobalsConverter(this.mockApplicationGlobals.Object));
-            
+
             return settings;
         }
 
@@ -72,28 +72,28 @@ namespace UtilitiesCS.Test.Threading
             public IApplicationGlobals AppGlobals { get; set; }
         }
 
-        
+
 
         #endregion Helper Methods and Classes
 
         [TestMethod]
-        public void SimpleConversionTest() 
-        { 
+        public void SimpleConversionTest()
+        {
             // Arrange
             var settings = this.CreateJsonSerializerSettings();
             var appGlobals = this.mockApplicationGlobals.Object;
             var expected = new SampleClass() { Name = "Test", Age = 47, AppGlobals = appGlobals };
-            
+
             // Act
             var json = JsonConvert.SerializeObject(expected, settings);
             Console.WriteLine("JSON Object");
             Console.WriteLine(json);
             var actual = JsonConvert.DeserializeObject<SampleClass>(json, settings);
-            
+
             // Assert
             actual.Should().BeEquivalentTo(expected);
         }
-        
+
         [TestMethod]
         public void ReadJson_StateUnderTest_ExpectedBehavior()
         {
@@ -117,6 +117,6 @@ namespace UtilitiesCS.Test.Threading
             result.Should().BeEquivalentTo(this.mockApplicationGlobals.Object);
         }
 
-        
+
     }
 }

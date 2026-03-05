@@ -46,7 +46,7 @@ namespace UtilitiesCS.Test
         public void GetSenderName_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            
+
             MailItem olMail = null;
 
             // Act
@@ -62,7 +62,7 @@ namespace UtilitiesCS.Test
         public void GetSenderAddress_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            
+
             MailItem olMail = null;
 
             // Act
@@ -78,7 +78,7 @@ namespace UtilitiesCS.Test
         public void GetSenderInfo_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            
+
             MailItem olMail = null;
 
             // Act
@@ -94,7 +94,7 @@ namespace UtilitiesCS.Test
         public void GetRecipients_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            
+
             MailItem olMail = null;
 
             // Act
@@ -110,7 +110,7 @@ namespace UtilitiesCS.Test
         public void GetInfo_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-           
+
             IEnumerable<Recipient> recipients = null;
 
             // Act
@@ -126,7 +126,7 @@ namespace UtilitiesCS.Test
         public void GetInfo_StateUnderTest_ExpectedBehavior1()
         {
             // Arrange
-             
+
             Recipient recipient = null;
             SegmentStopWatch sw = null;
 

@@ -83,17 +83,17 @@ namespace SVGControl
         /// <returns>Returns a resized or the original document depending on the document.</returns>
         private SvgDocument AdjustSize(SvgDocument document)
         {
-            if ((TargetSize.Height > 0) && (TargetSize.Width > 0) && ((document.Height != TargetSize.Height)||(document.Width != TargetSize.Width))) 
-            { 
-                int widthAspect = (int)(TargetSize.Height * document.Width/(double)document.Height);
-                if (widthAspect < TargetSize.Width) 
+            if ((TargetSize.Height > 0) && (TargetSize.Width > 0) && ((document.Height != TargetSize.Height) || (document.Width != TargetSize.Width)))
+            {
+                int widthAspect = (int)(TargetSize.Height * document.Width / (double)document.Height);
+                if (widthAspect < TargetSize.Width)
                 {
                     document.Height = TargetSize.Height;
                     document.Width = widthAspect;
                 }
                 else
                 {
-                    document.Height = (int)(TargetSize.Width * document.Height/(double)document.Width);
+                    document.Height = (int)(TargetSize.Width * document.Height / (double)document.Width);
                     document.Width = TargetSize.Width;
                 }
             }

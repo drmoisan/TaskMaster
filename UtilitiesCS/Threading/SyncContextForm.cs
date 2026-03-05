@@ -21,14 +21,14 @@ namespace QuickFiler.Viewers
         }
 
         public System.Drawing.SizeF FormAutoScaleFactor { get; private set; }
-                
+
         public SynchronizationContext UiSyncContext { get; private set; }
 
         public Dispatcher UiDispatcher { get; private set; }
 
         public int UiThreadId { get; private set; }
 
-        public void CaptureUiVariables() 
+        public void CaptureUiVariables()
         {
             UiSyncContext = SynchronizationContext.Current;
             FormAutoScaleFactor = this.AutoScaleFactor;

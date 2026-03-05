@@ -10,7 +10,7 @@ namespace QuickFiler.Interfaces
     {
         bool KbdActive { get; set; }
         void ToggleKeyboardDialog();
-        void ToggleKeyboardDialog(object sender, KeyEventArgs e); 
+        void ToggleKeyboardDialog(object sender, KeyEventArgs e);
         Task ToggleKeyboardDialogAsync();
         void ToggleKeyboardDialogAsync(object sender, KeyEventArgs e);
         void KeyboardHandler_PreviewKeyDownAsync(object sender, PreviewKeyDownEventArgs e);

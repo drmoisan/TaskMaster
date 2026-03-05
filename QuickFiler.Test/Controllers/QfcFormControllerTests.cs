@@ -47,7 +47,7 @@ namespace QuickFiler.Controllers.Tests
             return $"The variable {variable} was not set properly";
         }
 
-        private QfcFormController CreateQfcFormController() 
+        private QfcFormController CreateQfcFormController()
         {
             return new QfcFormController(
                 _mockGlobals.Object,
@@ -68,7 +68,7 @@ namespace QuickFiler.Controllers.Tests
             _mockAF = new Mock<IAppAutoFileObjects>();
             _mockAF.SetupSet(af => af.MaximizeQuickFileWindow = It.IsAny<System.Action>())
                 .Callback<System.Action>(action => _maxQfWindow = action)
-                .Verifiable();            
+                .Verifiable();
 
             _mockAF.SetupGet(_mockAF => _mockAF.MaximizeQuickFileWindow).Returns(_maxQfWindow);
 
@@ -101,25 +101,25 @@ namespace QuickFiler.Controllers.Tests
                 _tokenSource,
                 _token);
 
-            
+
             // Assert
             Assert.IsNotNull(controller);
             Assert.AreEqual(_mockGlobals.Object, GetPrivateField<IApplicationGlobals>(controller, "_globals"), ErrMsg("_globals"));
             Assert.AreEqual(_mockQfcQueue.Object, GetPrivateField<IQfcQueue>(controller, "_qfcQueue"), ErrMsg("_qfcQueue"));
-            Assert.AreEqual(QfEnums.InitTypeEnum.Sort, GetPrivateField<QfEnums.InitTypeEnum>(controller, "_initType"), ErrMsg("_initType"));            
+            Assert.AreEqual(QfEnums.InitTypeEnum.Sort, GetPrivateField<QfEnums.InitTypeEnum>(controller, "_initType"), ErrMsg("_initType"));
             Assert.AreEqual(_mockParent.Object, GetPrivateField<IQfcHomeController>(controller, "_parent"), ErrMsg("_parent"));
             Assert.AreEqual(_maxQfWindow.Method, controller.GetType().GetMethod("MaximizeFormViewer"));
             Assert.AreEqual(_mockFormViewer.Object, controller.FormViewer);
             Assert.AreEqual((IFilerFormController)controller, _filerFormController);
             Assert.AreEqual(_tokenSource, controller.TokenSource);
             Assert.AreEqual(_token, controller.Token);
-            
+
         }
 
         #endregion ctor Tests
 
         #region Setup and Disposal
-                
+
         [TestMethod]
         public void CaptureItemSettings_ShouldCaptureSettings()
         {
@@ -445,10 +445,10 @@ namespace QuickFiler.Controllers.Tests
             var spn = new NumericUpDown();
             spn.Value = 9;
             _mockFormViewer.SetupGet(x => x.L1v1L2h5_SpnEmailPerLoad).Returns(spn);
-            
+
             _mockQfcQueue.Setup(q => q.ChangeIterationSize(
                 It.IsAny<ValueTuple<TableLayoutPanel, List<QfcItemGroup>>>(),
-                It.IsAny<int>(), 
+                It.IsAny<int>(),
                 It.IsAny<RowStyle>()))
                 .Returns(Task.CompletedTask)
                 .Verifiable();

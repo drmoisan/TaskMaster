@@ -4,10 +4,10 @@ using System.Security.AccessControl;
 
 namespace UtilitiesCS
 {
-    public interface IFileInfo:IFileSystemInfo
+    public interface IFileInfo : IFileSystemInfo
     {
         IDirectoryInfo Directory { get; }
-        string DirectoryName { get; }        
+        string DirectoryName { get; }
         bool IsReadOnly { get; set; }
         long Length { get; }
 
@@ -16,7 +16,7 @@ namespace UtilitiesCS
         IFileInfo CopyTo(string destFileName, bool overwrite);
         FileStream Create();
         StreamWriter CreateText();
-        void Decrypt();        
+        void Decrypt();
         void Encrypt();
         FileSecurity GetAccessControl();
         FileSecurity GetAccessControl(AccessControlSections includeSections);

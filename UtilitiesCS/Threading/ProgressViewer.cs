@@ -50,7 +50,7 @@ namespace UtilitiesCS
         }
 
         #region IProgressViewer
-        
+
         //void IProgressViewer.SetCancellationTokenSource(CancellationTokenSource tokenSource)
         //{
         //    this.SetCancellationTokenSource(tokenSource);
@@ -59,7 +59,7 @@ namespace UtilitiesCS
         //Label IProgressViewer.JobName => this.JobName;
         //Button IProgressViewer.ButtonCancel => this.ButtonCancel;
         //Dispatcher IProgressViewer.UiDispatcher { get => this.UiDispatcher; set => this.UiDispatcher = value; }
-        
+
         #endregion IProgressViewer
     }
 }

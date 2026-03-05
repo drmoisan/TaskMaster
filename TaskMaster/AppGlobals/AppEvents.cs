@@ -30,7 +30,7 @@ namespace TaskMaster
         {
             Globals = globals;
         }
-                
+
         //public ConcurrentBag<IConditionalEngine<MailItemHelper>> InboxEngines {get; protected set; } = [];
 
         internal async Task<AppEvents> LoadAsync()
@@ -40,7 +40,7 @@ namespace TaskMaster
             return this;
         }
 
-        internal IApplicationGlobals Globals {get; set; }
+        internal IApplicationGlobals Globals { get; set; }
 
         private Items _olToDoItems;
         public Items OlToDoItems
@@ -121,19 +121,19 @@ namespace TaskMaster
                 Globals.Ol.Inboxes.ForEach(x => OlInboxes.AddLast(x.Items, items => items.ItemAdd += OlInboxItems_ItemAdd));
             }
         }
-                
+
         public void Unhook()
         {
-            OlToDoItems = null;            
+            OlToDoItems = null;
             OlReminders = null;
-            OlInboxes.Clear(items => items.ItemAdd -= OlInboxItems_ItemAdd);                  
+            OlInboxes.Clear(items => items.ItemAdd -= OlInboxItems_ItemAdd);
         }
-                
+
         internal async Task LogAsync(string message)
         {
             await Task.Run(() => logger.Debug(message));
         }
-                
+
         private void OlToDoItems_ItemAdd(object item)
         {
             ToDoEvents.OlToDoItems_ItemAdd(item, Globals);
@@ -156,7 +156,7 @@ namespace TaskMaster
         {
             try
             {
-                await ProcessMailItemAsync(item);               
+                await ProcessMailItemAsync(item);
             }
             catch (System.Exception)
             {
@@ -187,7 +187,7 @@ namespace TaskMaster
                     helper.Item.SetUdf("AutoProcessed", true, OlUserPropertyType.olYesNo);
                     return true;
                 }
-                else 
+                else
                 {
                     logger.Debug($"No applicable engines for item with Subject: {mailItem.Subject}");
                     mailItem.SetUdf("AutoProcessed", true, OlUserPropertyType.olYesNo);
@@ -196,7 +196,7 @@ namespace TaskMaster
             else
             {
                 var olItem = new OutlookItem(item);
-                logger.Debug($"Skipping item of type {olItem.Try().GetOlItemType()} with Subject: {olItem.Try().Subject}");                
+                logger.Debug($"Skipping item of type {olItem.Try().GetOlItemType()} with Subject: {olItem.Try().Subject}");
             }
             return false;
         }
@@ -206,7 +206,7 @@ namespace TaskMaster
             if (!OlInboxes.IsNullOrEmpty())
             {
                 // Restrict to unprocessed items
-                string filter = $"@SQL=\"{MAPIFields.Schemas.CustomPrefix}AutoProcessed\" is null";                
+                string filter = $"@SQL=\"{MAPIFields.Schemas.CustomPrefix}AutoProcessed\" is null";
                 var unprocessedQueue = new ConcurrentQueue<object>();
 
                 foreach (var inbox in OlInboxes)
@@ -222,7 +222,7 @@ namespace TaskMaster
                     if (unprocessedItems is null) { continue; }
                     unprocessedItems.ForEach(x => unprocessedQueue.Enqueue(x));
                 }
-                
+
                 int errors = 0;
                 int success = 0;
                 var unprocessedCount = unprocessedQueue.Count();
@@ -235,20 +235,20 @@ namespace TaskMaster
                     var remaining = unprocessedQueue.Count();
                     if (unprocessedQueue.TryDequeue(out var item) && await ProcessMailItemAsync(item))
                     {
-                        success++;                        
+                        success++;
                         logger.Debug($"Successfully processed item {success + errors} of {unprocessedCount} in the unprocessed Queue");
                     }
-                    else if (++errors == 3) 
+                    else if (++errors == 3)
                     {
                         var response = MyBox.ShowDialog($"Tried to process remaining {remaining} unprocessed " +
-                            $"items 3 times without success. Continue trying?","Error",
-                            MessageBoxButtons.YesNo,MessageBoxIcon.Hand);
+                            $"items 3 times without success. Continue trying?", "Error",
+                            MessageBoxButtons.YesNo, MessageBoxIcon.Hand);
 
-                        if (response == DialogResult.No) 
-                        { 
+                        if (response == DialogResult.No)
+                        {
                             logger.Warn($"Tried to process remaining {remaining} unprocessed items 3 times without success. Exiting loop.");
-                            break; 
-                        }                        
+                            break;
+                        }
                     }
                     else
                     {

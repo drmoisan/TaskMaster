@@ -43,19 +43,19 @@ namespace TaskVisualization
             }
             else if (objItem is IOutlookItem olItem && olItem.GetOlItemType() == OlItemType.olMailItem)
             {
-                helper = new MailItemHelper(olItem.InnerObject as MailItem, _globals);                
+                helper = new MailItemHelper(olItem.InnerObject as MailItem, _globals);
             }
             else if (objItem is MailItem olMail)
             {
                 helper = new MailItemHelper(olMail, _globals);
-            }            
+            }
             else
             {
                 return [];
             }
 
             return AutoFile.AutoFindPeople(helper, _globals.TD.People, true, false);
-            
+
             //return AutoFile.AutoFindPeople(
             //        objItem: objItem,
             //        ppl_dict: _globals.TD.People,

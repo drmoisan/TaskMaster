@@ -39,7 +39,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             {
                 if (type.IsGenericType && type.GetGenericTypeDefinition() == baseType)
                 {
-                    return type.GetGenericArguments(); 
+                    return type.GetGenericArguments();
                 }
                 type = type.BaseType;
             }

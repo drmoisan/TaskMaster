@@ -4,12 +4,12 @@ using System.Windows.Forms;
 
 namespace UtilitiesCS.Interfaces.IWinForm
 {
-    public interface IContainerControlLocal: IScrollableControl
+    public interface IContainerControlLocal : IScrollableControl
     {
         Control ActiveControl { get; set; }
         SizeF AutoScaleDimensions { get; set; }
         AutoScaleMode AutoScaleMode { get; set; }
-        AutoValidate AutoValidate { get; set; }        
+        AutoValidate AutoValidate { get; set; }
         SizeF CurrentAutoScaleDimensions { get; }
         Form ParentForm { get; }
 

@@ -18,7 +18,7 @@ namespace TaskTree
             _context = SynchronizationContext.Current;
             _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
         }
-        
+
         #endregion Constructors 
 
         #region Public Methods and Properties
@@ -56,7 +56,7 @@ namespace TaskTree
             if (_controller is not null)
                 _controller.HandleModelDropped(sender, e);
         }
-                
+
         private async void TLV_ItemActivate(object sender, EventArgs e)
         {
             if (SynchronizationContext.Current is null)

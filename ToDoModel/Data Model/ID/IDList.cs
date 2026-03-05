@@ -115,7 +115,7 @@ namespace ToDoModel
         {
             var df = DfDeedle.FromDefaultFolder(stores: _olApp.Session.Stores,
                                                 folderEnum: OlDefaultFolders.olFolderToDo,
-                                                removeColumns: null, 
+                                                removeColumns: null,
                                                 addColumns: new string[]
                                                 {
                                                     MAPIFields.Schemas.ToDoID,
@@ -150,21 +150,21 @@ namespace ToDoModel
             this.Serialize();
         }
 
-        public async Task<string> SubstituteIdRootAsync(string oldId, string newRoot, string oldRoot) 
+        public async Task<string> SubstituteIdRootAsync(string oldId, string newRoot, string oldRoot)
         {
-            return await Task.Run(() => 
-            { 
+            return await Task.Run(() =>
+            {
                 var newId = oldId.Replace(oldRoot, newRoot);
                 this.Remove(oldId);
                 this.Add(newId);
                 this.Serialize();
                 return newId;
             });
-                
-            
+
+
         }
 
-        public IAsyncEnumerable<IToDoItem> GetItemsWithRootIdAsync(string rootId) 
+        public IAsyncEnumerable<IToDoItem> GetItemsWithRootIdAsync(string rootId)
         {
             var strFilter = $"@SQL={MAPIFields.Schemas.ToDoID} like '{rootId}%'";
             var items = _olApp.Session.Stores
@@ -172,7 +172,7 @@ namespace ToDoModel
                 ?.ToAsyncEnumerable()
                 ?.Select(TryGetDefaultToDoFolder)
                 ?.Where(store => store is not null)
-                ?.SelectMany(folder => 
+                ?.SelectMany(folder =>
                     folder?
                     .Items?
                     .Restrict(strFilter)?
@@ -205,7 +205,7 @@ namespace ToDoModel
             {
                 var df = DfDeedle.FromDefaultFolder(stores: _olApp.Session.Stores,
                                                     folderEnum: OlDefaultFolders.olFolderToDo,
-                                                    removeColumns: null, 
+                                                    removeColumns: null,
                                                     addColumns:
                                                     [
                                                         MAPIFields.Schemas.ToDoID,
@@ -279,12 +279,12 @@ namespace ToDoModel
             {
                 this.FromList(flat);
             }
-            
+
             _dataModel.ReNumberIDs(this);
             this.Sort();
             this.Serialize();
         }
-               
+
         public void SetOlApp(Outlook.Application olApp) { _olApp = olApp; }
     }
 }

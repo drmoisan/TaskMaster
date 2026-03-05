@@ -11,16 +11,16 @@ namespace ToDoModel
         public ToDoDefaults()
         {
             var defaults = Properties.Settings.Default;
-            PrefixList = new List<IPrefix>() 
-            { 
-                new PrefixItem(prefixType: PrefixTypeEnum.People, key: "People", value: defaults.Prefix_People, color: OlCategoryColor.olCategoryColorDarkGray, defaults.UDF_People), 
+            PrefixList = new List<IPrefix>()
+            {
+                new PrefixItem(prefixType: PrefixTypeEnum.People, key: "People", value: defaults.Prefix_People, color: OlCategoryColor.olCategoryColorDarkGray, defaults.UDF_People),
                 new PrefixItem(prefixType : PrefixTypeEnum.Project, key: "Project", value: Properties.Settings.Default.Prefix_Project, color: OlCategoryColor.olCategoryColorTeal, defaults.UDF_Project),
                 new PrefixItem(prefixType : PrefixTypeEnum.Program, key: "Program", value: Properties.Settings.Default.Prefix_Program, color: OlCategoryColor.olCategoryColorTeal, defaults.UDF_Program),
-                new PrefixItem(prefixType : PrefixTypeEnum.Topic, key: "Topic", value: Properties.Settings.Default.Prefix_Topic, color: OlCategoryColor.olCategoryColorDarkTeal, defaults.UDF_Topic), 
-                new PrefixItem(prefixType : PrefixTypeEnum.Context, key: "Context", value: Properties.Settings.Default.Prefix_Context, color: OlCategoryColor.olCategoryColorNone, defaults.UDF_Context), 
-                new PrefixItem(prefixType : PrefixTypeEnum.Today, key: "Today", value: Properties.Settings.Default.Prefix_Today, color: OlCategoryColor.olCategoryColorDarkRed, ""), 
-                new PrefixItem(prefixType : PrefixTypeEnum.Bullpin, key: "Bullpin", value: Properties.Settings.Default.Prefix_Bullpin, color: OlCategoryColor.olCategoryColorOrange, ""), 
-                new PrefixItem(prefixType : PrefixTypeEnum.KB, key: "KB", value: Properties.Settings.Default.Prefix_KB, color: OlCategoryColor.olCategoryColorRed, "") 
+                new PrefixItem(prefixType : PrefixTypeEnum.Topic, key: "Topic", value: Properties.Settings.Default.Prefix_Topic, color: OlCategoryColor.olCategoryColorDarkTeal, defaults.UDF_Topic),
+                new PrefixItem(prefixType : PrefixTypeEnum.Context, key: "Context", value: Properties.Settings.Default.Prefix_Context, color: OlCategoryColor.olCategoryColorNone, defaults.UDF_Context),
+                new PrefixItem(prefixType : PrefixTypeEnum.Today, key: "Today", value: Properties.Settings.Default.Prefix_Today, color: OlCategoryColor.olCategoryColorDarkRed, ""),
+                new PrefixItem(prefixType : PrefixTypeEnum.Bullpin, key: "Bullpin", value: Properties.Settings.Default.Prefix_Bullpin, color: OlCategoryColor.olCategoryColorOrange, ""),
+                new PrefixItem(prefixType : PrefixTypeEnum.KB, key: "KB", value: Properties.Settings.Default.Prefix_KB, color: OlCategoryColor.olCategoryColorRed, "")
             };
             DefaultTaskLength = Properties.Settings.Default.Default_Task_Length;
         }

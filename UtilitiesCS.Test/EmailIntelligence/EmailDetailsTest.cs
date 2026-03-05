@@ -34,7 +34,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         //    // Assert
 
         //    actual.Should().BeEquivalentTo(expected);
-            
+
         //}
     }
 }

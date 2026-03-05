@@ -11,7 +11,7 @@ using UtilitiesCS.EmailIntelligence.Bayesian;
 
 namespace UtilitiesCS
 {
-    public class AppGlobalsConverter: JsonConverter<IApplicationGlobals>
+    public class AppGlobalsConverter : JsonConverter<IApplicationGlobals>
     {
         private IApplicationGlobals _globals;
 

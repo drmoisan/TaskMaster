@@ -13,7 +13,7 @@ using Microsoft.Office.Core;
 
 namespace Z.Unfinished.QuickFiler.Test
 {
-	[TestClass]
+    [TestClass]
     public class MailItemInfoTests
     {
         private MockRepository mockRepository;
@@ -54,7 +54,7 @@ namespace Z.Unfinished.QuickFiler.Test
             this.mockRecipient.Setup(x => x.AddressEntry).Returns(this.mockRecipientAddress.Object);
             this.mockRecipient.Setup(x => x.PropertyAccessor).Returns(this.mockRecipientPropertyAccessor.Object);
             List<Recipient> recipientList = new List<Recipient> { this.mockRecipient.Object };
-            
+
             // Setup mock recipients and add to mail item
             this.mockRecipients = this.mockRepository.Create<Recipients>();
             this.mockRecipients.Setup(x => x.Count).Returns(recipientList.Count);
@@ -66,7 +66,7 @@ namespace Z.Unfinished.QuickFiler.Test
             this.mockFolder = this.mockRepository.Create<Folder>();
             this.mockFolder.Setup(x => x.Name).Returns("Folder Name");
             this.mockMailItem.Setup(x => x.Parent).Returns(this.mockFolder.Object);
-            
+
             // Setup sender property assessor
             this.mockPropertyAccessor = this.mockRepository.Create<PropertyAccessor>();
             this.mockPropertyAccessor.Setup(x => x.GetProperty(PR_SMTP_ADDRESS)).Returns("sender.address@domain.com");
@@ -76,7 +76,7 @@ namespace Z.Unfinished.QuickFiler.Test
             this.mockSender.Setup(x => x.Type).Returns("To");
             this.mockSender.Setup(x => x.Name).Returns("SenderName");
             this.mockSender.Setup(x => x.PropertyAccessor).Returns(this.mockPropertyAccessor.Object);
-            
+
             // Add Sender to mail item
             this.mockMailItem.Setup(x => x.Sender).Returns(this.mockSender.Object);
             this.mockMailItem.Setup(x => x.Subject).Returns("Subject");
@@ -92,7 +92,7 @@ namespace Z.Unfinished.QuickFiler.Test
             this.mockUserProperties.Setup(x => x.Find(It.IsAny<string>(), It.IsAny<object>()))
                                    .Returns<string, object>((a, b) =>
             {
-                if(a == "Triage") { return this.mockTriage.Object; }
+                if (a == "Triage") { return this.mockTriage.Object; }
                 return null;
             });
 
@@ -103,7 +103,7 @@ namespace Z.Unfinished.QuickFiler.Test
             this.mockMailItem.Setup(x => x.Sent).Returns(true);
             this.mockMailItem.Setup(x => x.IsMarkedAsTask).Returns(true);
             this.mockMailItem.Setup(x => x.HTMLBody).Returns("HTML Body");
-            
+
         }
 
         private MailItemHelper CreateMailItemInfo()
@@ -155,6 +155,6 @@ namespace Z.Unfinished.QuickFiler.Test
             //// Assert
             //actual.Should().BeEquivalentTo(expected);
         }
-                
+
     }
 }

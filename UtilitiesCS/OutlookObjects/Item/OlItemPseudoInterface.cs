@@ -42,10 +42,10 @@ namespace UtilitiesCS
                 else if (obj is AppointmentItem) { return ((AppointmentItem)obj).Conflicts.Count == 0; }
                 else { throw new ArgumentException($"Unsupported type {obj.GetType().Name}"); }
             }
-            catch 
+            catch
             {
                 Debug.WriteLine(++counter);
-                return false; 
+                return false;
             }
         }
 
@@ -58,11 +58,11 @@ namespace UtilitiesCS
         {
             return selection.Cast<object>().Where(x => x.IsSupported()).ToList();
         }
-        
+
         private static bool IsSupported(this object item)
         {
             if (((item is MailItem) || (item is MeetingItem) || (item is AppointmentItem) || (item is TaskItem))) { return true; }
-            else { return false;}
+            else { return false; }
         }
 
         private static void EnsureSupported(this object item)

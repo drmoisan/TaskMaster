@@ -52,23 +52,23 @@ namespace UtilitiesCS
 
         internal static object GetFirstNonNull(object[] columnData)
         {
-            if ((columnData is null)||(columnData.Length == 0)) { return null; }
+            if ((columnData is null) || (columnData.Length == 0)) { return null; }
 
             var filteredData = columnData.Where(x => x is not null).ToArray();
             if ((filteredData is null) || (filteredData.Length == 0)) { return null; }
 
             return filteredData.First();
         }
-    
+
         public static string[] GetNames(this DataFrameColumnCollection columns) => columns.Select(x => x.Name).ToArray();
 
         public static Type[] GetTypes(this DataFrameColumnCollection columns) => columns.Select(x => x.DataType).ToArray();
 
-        public static DataTable ToDataTable(this DataFrame df) 
+        public static DataTable ToDataTable(this DataFrame df)
         {
             // Create new DataTable.
             DataTable table = new DataTable();
-            
+
             // Create DataColumns from the definition in the Dataframe
             foreach (var dfColumn in df.Columns)
             {
@@ -90,7 +90,7 @@ namespace UtilitiesCS
                 //columnNames.Select(x => tableRow[x] = dfRow[Array.IndexOf(columnNames, x)]);
                 table.Rows.Add(tableRow);
             }
-            return table; 
+            return table;
         }
 
         public static void Display(this DataFrame df)

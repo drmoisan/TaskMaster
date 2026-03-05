@@ -88,7 +88,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public static async Task<SmartSerializableLoader> DeserializeAsync(
             IApplicationGlobals globals, byte[] binary, CancellationToken cancel = default)
-        {                
+        {
             try
             {
                 if (globals is null) { throw new ArgumentNullException(nameof(globals)); }
@@ -110,9 +110,9 @@ namespace UtilitiesCS.ReusableTypeClasses
             {
                 logger.Error($"Error in {nameof(DeserializeAsync)}.\n{e.Message}", e);
                 throw;
-            }                
+            }
         }
-        
+
         internal SmartSerializableLoader DeserializeConfig(byte[] binary)
         {
             var jsonObject = TryConvertBinaryToJson(binary);
@@ -140,7 +140,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 logger.Error($"Error in {nameof(DeserializeConfig)}.\n{e.Message}", e);
                 return null;
             }
-                
+
             instance.Globals = Globals;
             instance.ResetLazy();
             instance.Config.ActivateMostRecent();
@@ -156,12 +156,12 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
             catch (Exception e)
             {
-                logger.Error($"Error in {nameof(TryConvertBinaryToJson)}.\n{e.Message}",e);
+                logger.Error($"Error in {nameof(TryConvertBinaryToJson)}.\n{e.Message}", e);
                 return null;
             }
         }
 
-        
+
     }
 }
 

@@ -13,7 +13,8 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 
-namespace Swordfish.NET.Collections {
+namespace Swordfish.NET.Collections
+{
 
     /// <summary>
     /// This class provides the base restrictions for an immutable collection

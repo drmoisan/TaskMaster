@@ -27,5 +27,5 @@ namespace UtilitiesCS.NewtonsoftHelpers
             }
         }
 
-    }   
+    }
 }

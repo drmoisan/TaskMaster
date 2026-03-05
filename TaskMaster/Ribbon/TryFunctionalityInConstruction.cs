@@ -248,7 +248,7 @@ namespace TaskMaster.Ribbon
             var stores = AppGlobals.Ol.NamespaceMAPI.Stores;
             var inboxes = stores
                 .Cast<Store>()
-                .Select(store => 
+                .Select(store =>
                 {
                     try
                     {
@@ -258,7 +258,7 @@ namespace TaskMaster.Ribbon
                     {
                         return null;
                     }
-                     
+
                 })
                 .Where(store => store is not null).ToArray();
             var mailboxes = inboxes.Select(x => x.FolderPath.Split("\\").Where(x => !x.IsNullOrEmpty()).FirstOrDefault()).ToArray();

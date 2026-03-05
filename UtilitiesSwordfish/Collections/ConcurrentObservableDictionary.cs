@@ -16,7 +16,8 @@ using System.Collections;
 using System.ComponentModel;
 using System.Collections.Specialized;
 
-namespace Swordfish.NET.Collections {
+namespace Swordfish.NET.Collections
+{
 
     /// <summary>
     /// This class provides a dictionary that can be bound to a WPF control,

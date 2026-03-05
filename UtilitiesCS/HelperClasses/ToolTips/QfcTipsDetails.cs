@@ -15,8 +15,8 @@ namespace UtilitiesCS
 {
     public class QfcTipsDetails : IQfcTipsDetails
     {
-        private QfcTipsDetails(System.Windows.Forms.Label labelControl, SynchronizationContext uiContext) 
-        { 
+        private QfcTipsDetails(System.Windows.Forms.Label labelControl, SynchronizationContext uiContext)
+        {
             _labelControl = labelControl;
             _uiContext = uiContext;
         }
@@ -50,7 +50,7 @@ namespace UtilitiesCS
                 _columnNumber = _tlp.GetColumn(_labelControl);
                 _columnWidth = _tlp.ColumnStyles[_columnNumber].Width;
             }
-            else if(parentType == typeof(System.Windows.Forms.Panel))
+            else if (parentType == typeof(System.Windows.Forms.Panel))
             {
                 _tlp = null;
                 _columnNumber = 0;
@@ -123,10 +123,10 @@ namespace UtilitiesCS
 
         private System.Windows.Forms.Label _labelControl;
         public System.Windows.Forms.Label LabelControl { get => _labelControl; internal set => _labelControl = value; }
-        
+
         private TableLayoutPanel _tlp;
         public TableLayoutPanel TLP { get => _tlp; }
-        
+
         private int _columnNumber;
         public int ColumnNumber { get => _columnNumber; }
 
@@ -134,7 +134,7 @@ namespace UtilitiesCS
         public bool IsNavColumn { get => _isNavColumn; set => _isNavColumn = value; }
 
         private System.Single _columnWidth;
-        public float ColumnWidth { get => _columnWidth; }        
+        public float ColumnWidth { get => _columnWidth; }
 
         public void Toggle()
         {
@@ -224,7 +224,7 @@ namespace UtilitiesCS
         public async Task ToggleAsync(Enums.ToggleState desiredState, bool sharedColumn)
         {
             _token.ThrowIfCancellationRequested();
-            await UiThread.Dispatcher.InvokeAsync(()=>Toggle(desiredState, sharedColumn));
+            await UiThread.Dispatcher.InvokeAsync(() => Toggle(desiredState, sharedColumn));
         }
     }
 }

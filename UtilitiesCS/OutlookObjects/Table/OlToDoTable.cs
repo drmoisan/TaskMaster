@@ -6,8 +6,8 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 namespace UtilitiesCS.OutlookExtensions
 {
     public static class OlToDoTable
-    {  
-        public static Outlook.Table GetToDoTable(this Outlook.Store store) 
+    {
+        public static Outlook.Table GetToDoTable(this Outlook.Store store)
         {
             MAPIFolder folder = null;
             try
@@ -123,6 +123,6 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        
+
     }
 }

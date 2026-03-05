@@ -36,7 +36,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             this.conversationId = "1A2B3C4DMockConversationId5E6F7G";
             this.mockSender = this.CreateMockRecipientInfo("sender", "sender@domain.com");
             (this.ccRecipients, this.toRecipients) = this.CreateMockRecipients();
-            this.mockIItemInfo = CreateMockIItemInfo(this.mockOlFolderInfo.Object, this.mockSender.Object, 
+            this.mockIItemInfo = CreateMockIItemInfo(this.mockOlFolderInfo.Object, this.mockSender.Object,
                 this.ccRecipients, this.toRecipients, this.conversationId);
         }
 
@@ -55,7 +55,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             };
             return (ccRecipients, toRecipients);
         }
-        
+
         private Mock<RecipientInfo> CreateMockRecipientInfo(string name, string address)
         {
             var recipientInfo = this.mockRepository.Create<RecipientInfo>();
@@ -65,7 +65,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             recipientInfo.Setup(x => x.Html).Returns($"<a href=\"mailto:{address}\">{name}</a>");
             return recipientInfo;
         }
-        
+
         private Mock<Folder> CreateMockFolder(string folderPath)
         {
             var folder = this.mockRepository.Create<Folder>();
@@ -75,7 +75,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             folder.Setup(x => x.Name).Returns(folderName);
             return folder;
         }
-        
+
         private Mock<IFolderWrapper> CreateMockOlFolderInfo(Folder folder, Folder folderRoot)
         {
             var item = this.mockRepository.Create<IFolderWrapper>();
@@ -83,8 +83,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             item.Setup(x => x.OlFolder).Returns(folder);
             item.Setup(x => x.FolderSize).Returns(1000000);
             item.Setup(x => x.ItemCount).Returns(100);
-            item.Setup(x => x.Name).Returns(folder.Name);            
-            item.Setup(x => x.OlRoot).Returns(folderRoot);            
+            item.Setup(x => x.Name).Returns(folder.Name);
+            item.Setup(x => x.OlRoot).Returns(folderRoot);
             var relativePath = folder.FolderPath.Replace(folderRoot.FolderPath, "");
             while (relativePath.StartsWith("\\")) { relativePath = relativePath.Substring(1); }
             item.Setup(x => x.RelativePath).Returns(relativePath);
@@ -94,13 +94,13 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         private Mock<IItemInfo> CreateMockIItemInfo(
-            IFolderWrapper folderInfo, RecipientInfo sender, RecipientInfo[] ccRecipients, 
+            IFolderWrapper folderInfo, RecipientInfo sender, RecipientInfo[] ccRecipients,
             RecipientInfo[] toRecipients, string conversationId)
         {
             var itemInfo = this.mockRepository.Create<IItemInfo>();
             itemInfo.SetupAllProperties();
             itemInfo.Setup(x => x.Categories).Returns("Category1, Category2, Category3");
-            itemInfo.Setup(x => x.Tokens).Returns(["Token1", "Token2", "Token3" ]);
+            itemInfo.Setup(x => x.Tokens).Returns(["Token1", "Token2", "Token3"]);
             itemInfo.Setup(x => x.FolderInfo).Returns(folderInfo);
             itemInfo.Setup(x => x.Body).Returns("Body Text");
             itemInfo.Setup(x => x.CcRecipients).Returns(ccRecipients);
@@ -121,7 +121,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             expected.Tokens = this.tokens;
             expected.FolderInfo = this.mockOlFolderInfo.Object;
             expected.ConversationId = this.conversationId;
-            expected.Sender = this.mockSender.Object; 
+            expected.Sender = this.mockSender.Object;
 
             // Act
             var actual = new MinedMailInfo(this.mockIItemInfo.Object);

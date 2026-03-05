@@ -207,7 +207,8 @@ namespace UtilitiesCS.NewtonsoftHelpers
             if (getMethod is not null) { propertyBuilder.SetGetMethod(getMethod); }
 
             var setMethod = ModifySetMethod(tb, property, ref capturedFields);
-            if (setMethod is not null) { propertyBuilder.SetSetMethod(setMethod); };
+            if (setMethod is not null) { propertyBuilder.SetSetMethod(setMethod); }
+            ;
         }
 
         public void ReplicateProperty(TypeBuilder tb, PropertyInfo property, FieldInfo existingField)

@@ -24,7 +24,7 @@ namespace UtilitiesCS.Interfaces
             this.SignalTime = signalTime;
         }
     }
-    
+
     /// <summary>
     /// This interface is a wrapper for the System.Timers.Timer class.
     /// https://stackoverflow.com/questions/8940982/how-can-i-run-the-event-handler-assigned-to-a-mock

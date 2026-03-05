@@ -37,7 +37,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             var filterViewCalled = false;
             _triageOlLogic = new Triage_OlLogic(_mockTriage.Object);
-            
+
             await _triageOlLogic.FilterViewAsync();
 
             Assert.IsTrue(filterViewCalled);

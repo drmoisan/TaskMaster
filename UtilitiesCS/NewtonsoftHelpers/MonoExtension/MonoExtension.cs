@@ -21,14 +21,14 @@ namespace UtilitiesCS.NewtonsoftHelpers.MonoExtension
                     break;
                 case OperandType.InlineSwitch:
                     throw new NotImplementedException();
-                    //int length = il.ReadInt32();
-                    //int base_offset = il.position + (4 * length);
-                    //int[] branches = new int[length];
-                    //for (int i = 0; i < length; i++)
-                    //    branches[i] = il.ReadInt32() + base_offset;
+                //int length = il.ReadInt32();
+                //int base_offset = il.position + (4 * length);
+                //int[] branches = new int[length];
+                //for (int i = 0; i < length; i++)
+                //    branches[i] = il.ReadInt32() + base_offset;
 
-                    //instruction.Operand = branches;
-                    //break;
+                //instruction.Operand = branches;
+                //break;
                 case OperandType.ShortInlineBrTarget:
                     //throw new NotImplementedException();
                     gen.Emit(instruction.OpCode, (int)instruction.Offset);
@@ -36,8 +36,8 @@ namespace UtilitiesCS.NewtonsoftHelpers.MonoExtension
                     break;
                 case OperandType.InlineBrTarget:
                     throw new NotImplementedException();
-                    //instruction.Operand = il.ReadInt32() + il.position;
-                    //break;
+                //instruction.Operand = il.ReadInt32() + il.position;
+                //break;
                 case OperandType.ShortInlineI:
                     if (instruction.OpCode == OpCodes.Ldc_I4_S)
                         gen.Emit(instruction.OpCode, (sbyte)instruction.Operand);
@@ -111,7 +111,7 @@ namespace UtilitiesCS.NewtonsoftHelpers.MonoExtension
                     gen.Emit(instruction.OpCode, (FieldInfo)instruction.Operand);
                     break;
                 case OperandType.ShortInlineVar:
-                    //instruction.Operand = GetVariable(instruction, il.ReadByte());                    
+                //instruction.Operand = GetVariable(instruction, il.ReadByte());                    
                 case OperandType.InlineVar:
                     if (instruction.OpCode.Name.Contains("loc"))
                     {

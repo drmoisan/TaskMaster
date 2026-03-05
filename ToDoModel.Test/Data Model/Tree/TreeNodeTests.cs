@@ -21,7 +21,7 @@ namespace ToDoModel.Test
         //    tw = new DebugTextWriter();
         //    Console.SetOut(tw);
         //}
-        
+
         [TestInitialize]
         public void TestInitialize()
         {
@@ -44,7 +44,7 @@ namespace ToDoModel.Test
         private char currentChar = 'z';
 
         private TreeNode<string> CreateTreeNode()
-        { 
+        {
             return new TreeNode<string>("");
         }
 
@@ -58,13 +58,13 @@ namespace ToDoModel.Test
             return CreateChildren(null, levels).First();
         }
 
-        private List<TreeNode<string>> CreateChildren (TreeNode<string> parent, int levels)
+        private List<TreeNode<string>> CreateChildren(TreeNode<string> parent, int levels)
         {
             if (levels-- == 0) return null;
 
             var r = new Random();
             var childCount = r.Next(1, 5);
-            
+
             List<TreeNode<string>> children = new List<TreeNode<string>>();
             if (parent != null)
             {
@@ -108,7 +108,7 @@ namespace ToDoModel.Test
         {
             // Arrange
             //var treeNode2 = this.CreateTreeNode(3);
-            
+
             var treeNode = CreateTreeNode("a");
             var childB = CreateTreeNode("b");
             var childC = CreateTreeNode("c");
@@ -130,15 +130,15 @@ namespace ToDoModel.Test
             //  | \-f
             //  \-c
             //    \-g
-            
+
             var expected = new List<TreeNode<string>> { childB, childD, childE, childF, childC, childG };
 
             // Act
             Console.WriteLine("Original Tree");
             PrintPretty(treeNode, "", true);
-            
+
             Console.WriteLine("\nExpected Results");
-            Console.WriteLine(string.Join(",",expected.Select(x => x.Value)));
+            Console.WriteLine(string.Join(",", expected.Select(x => x.Value)));
             //treeNode.Traverse(x => Console.WriteLine(x.Value));
 
             //var expected = new List<TreeNode<string>> { };

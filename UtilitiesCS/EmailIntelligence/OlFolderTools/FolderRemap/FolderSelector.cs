@@ -38,7 +38,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             this.TlvOriginal.CheckStatePutter = delegate (object rowObject, CheckState newValue)
             {
                 _selection = ((TreeNode<OlFolderRemap>)rowObject).Value;
-                this.Hide(); 
+                this.Hide();
                 return CheckState.Checked;
             };
 

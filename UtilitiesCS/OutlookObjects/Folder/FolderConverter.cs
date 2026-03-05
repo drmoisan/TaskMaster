@@ -39,18 +39,18 @@ namespace UtilitiesCS
             var dict = BuildAlternativesDictionary(illegalFolderName);
             var result = MyBox.ShowDialog($"Folder cannot contain characters {illegal}. How should we proceed?", "Folder Error", BoxIcon.Question, dict);
             if (result.IsNullOrEmpty()) { return (false, illegalFolderName); }
-            else 
+            else
             {
                 var (legal, revisedFolder) = IsLegalFolderName(result, true);
                 if (legal) { return (true, revisedFolder); }
                 else { return AskUserForAlternatives(revisedFolder); }
-            }            
+            }
         }
 
         private static Dictionary<string, Func<Task<string>>> BuildAlternativesDictionary(string illegalFolderName)
         {
             var dict = new Dictionary<string, Func<Task<string>>>();
-            dict.Add("Skip", async () => await Task.FromResult(""));            
+            dict.Add("Skip", async () => await Task.FromResult(""));
             dict.Add("Replace with underscore", async () => await Task.Run(() => SanitizeFilename(illegalFolderName)));
             dict.Add("Remove illegal characters", async () => await Task.Run(() => illegalFolderName.Replace(illegalFolderName, "")));
             dict.Add("Enter new folder name", async () => await Task.Run(() => InputBox.ShowDialog("Enter new folder name", "Folder Error", SanitizeFilename(illegalFolderName))));
@@ -69,23 +69,23 @@ namespace UtilitiesCS
             return regex.Replace(filename, "_");
         }
 
-        public static string ToFsFolderpath(this string olBranchPath, string olAncestorPath, string fsAncestorEquivalent, bool ask = true) 
+        public static string ToFsFolderpath(this string olBranchPath, string olAncestorPath, string fsAncestorEquivalent, bool ask = true)
         {
-            if (string.IsNullOrEmpty(olBranchPath)) 
+            if (string.IsNullOrEmpty(olBranchPath))
                 throw new ArgumentNullException(nameof(olBranchPath));
-            if (string.IsNullOrEmpty(olAncestorPath)) 
+            if (string.IsNullOrEmpty(olAncestorPath))
                 throw new ArgumentNullException(nameof(olAncestorPath));
-            if (string.IsNullOrEmpty(fsAncestorEquivalent)) 
+            if (string.IsNullOrEmpty(fsAncestorEquivalent))
                 throw new ArgumentNullException(nameof(fsAncestorEquivalent));
 
             var fsPath = olBranchPath.Replace(olAncestorPath, fsAncestorEquivalent);
 
             var fsPathExDividers = fsPath.Substring(3).Replace($"{Path.DirectorySeparatorChar}", "");
-                        
+
             if (!IsLegalFolderName(fsPathExDividers))
             {
                 throw new ArgumentException(
-                    $"{nameof(fsPathExDividers)} has a value of {fsPathExDividers} which contains illegal characters {GetIllegalFolderChars(fsPathExDividers).SentenceJoin()}", 
+                    $"{nameof(fsPathExDividers)} has a value of {fsPathExDividers} which contains illegal characters {GetIllegalFolderChars(fsPathExDividers).SentenceJoin()}",
                     nameof(fsPath));
             }
 
@@ -125,7 +125,7 @@ namespace UtilitiesCS
                 return olFolderBranch.FolderPath.ToFsFolderpath(olAncestor, folderRoot);
             }
             else { return null; }
-            
+
         }
 
         public static string ResolveOlRoot(string olBranchPath, IApplicationGlobals appGlobals)

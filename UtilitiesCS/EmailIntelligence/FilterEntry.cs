@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
-    public class FilterEntry: ICloneable
+    public class FilterEntry : ICloneable
     {
-        public FilterEntry() 
+        public FilterEntry()
         {
             _name = "";
             _description = "";
@@ -34,10 +34,10 @@ namespace UtilitiesCS
 
         private string _description;
         public string Description { get => _description; set => _description = value; }
-        
+
         private List<string> _folders;
         public List<string> Folders { get => _folders; set => _folders = value; }
-        
+
         private FlagClassNoItem _flags;
         public FlagClassNoItem Flags { get => _flags; set => _flags = value; }
 

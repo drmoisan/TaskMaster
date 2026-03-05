@@ -27,7 +27,7 @@ namespace TaskMaster
             _globals = globals;
             _ribbonController = ribbonController;
         }
-        
+
         private IApplicationGlobals _globals;
         private RibbonController _ribbonController;
 

@@ -62,6 +62,6 @@ namespace QuickFiler.Controllers
         public Action<string> Update { get => _update; set => _update = value; }
     }
 
-    
+
 
 }

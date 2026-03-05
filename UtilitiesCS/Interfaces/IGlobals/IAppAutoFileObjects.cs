@@ -18,14 +18,14 @@ namespace UtilitiesCS
         int LngConvCtPwr { get; set; }
         int MaxRecents { get; set; }
         //RecentsList<string> RecentsList { get; set; }
-        SloLinkedList<string> RecentsList { get;}
+        SloLinkedList<string> RecentsList { get; }
         CtfMap CtfMap { get; set; }
         ISerializableList<string> CommonWords { get; set; }
         bool SuggestionFilesLoaded { get; set; }
         int SmithWatterman_MatchScore { get; set; }
         int SmithWatterman_MismatchScore { get; set; }
         int SmithWatterman_GapPenalty { get; set; }
-        public SubjectMapSco SubjectMap { get;  }
+        public SubjectMapSco SubjectMap { get; }
         ISubjectMapEncoder Encoder { get; }
         System.Action MaximizeQuickFileWindow { get; set; }
         ScoStack<IMovedMailInfo> MovedMails { get; }

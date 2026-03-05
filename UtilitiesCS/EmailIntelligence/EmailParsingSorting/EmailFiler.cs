@@ -24,7 +24,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Constructors and Initializers
-        
+
         public EmailFiler() { }
 
         public EmailFiler(EmailFilerConfig options)
@@ -36,7 +36,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
         #region Private Fields
 
-        
+
         #endregion Private Fields
 
         #region Public Properties
@@ -78,7 +78,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         {
             //TraceUtility.LogMethodCall();
             Config.ResolvePaths();
-            await Task.Run(() => OpenFileSystemFolder(Config.SaveFsPath)); 
+            await Task.Run(() => OpenFileSystemFolder(Config.SaveFsPath));
         }
 
         internal void OpenFileSystemFolder(string folderPath)
@@ -138,10 +138,10 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
                 await Task.WhenAll(trainingTasks).ConfigureAwait(false);
                 await Task.Run(() => CaptureMoveDetails(mailHelper)).ConfigureAwait(false);
             }
-            
+
         }
 
-        private void PushToUndoStack(MailItem beforeMove,MailItem afterMove)
+        private void PushToUndoStack(MailItem beforeMove, MailItem afterMove)
         {
             var info = new MovedMailInfo(beforeMove, afterMove, Globals.Ol.Root.FolderPath);
             Globals.AF.MovedMails.Push(info);
@@ -198,7 +198,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
                 Task.Run(() => Globals.AF.SubjectMap.Add(mailHelper.Subject, Config.DestinationOlStem)),
                 Task.Run(() => Globals.AF.RecentsList.AddOrMoveFirst(Config.DestinationOlStem, 5))
             };
-            
+
             return tasks;
         }
 
@@ -230,7 +230,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
                 await foreach (var attachment in toDelete) { await Task.Run(() => File.Delete(attachment.FilePathDelete)); }
             }
         }
-        
+
         async public Task SaveMessageAsMsgAsync(
             MailItem mailItem,
             string fsLocation)
@@ -275,7 +275,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
                     {
                         logger.Error($"Error moving email {mailHelper.Subject} to {Config.DestinationOlFolder.FolderPath}\n{e.Message}", e);
                         return (original, null);
-                    }                    
+                    }
                 }
             });
         }

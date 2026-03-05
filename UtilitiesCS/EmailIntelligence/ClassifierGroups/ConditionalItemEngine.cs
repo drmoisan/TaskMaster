@@ -33,8 +33,8 @@ namespace UtilitiesCS
         public T TypedItem { get; set; }
         public ISmartSerializableConfig Config { get; set; }
         public System.Action SerializationEngine { get; set; }
-        public void Serialize() 
-        { 
+        public void Serialize()
+        {
             if (SerializationEngine is not null)
             {
                 SerializationEngine();

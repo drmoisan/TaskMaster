@@ -223,7 +223,7 @@ namespace QuickFiler.Controllers
         public void Cleanup()
         {
             _globals.Ol.PropertyChanged -= DarkMode_CheckedChanged;
-            UnregisterFormEventHandlers();            
+            UnregisterFormEventHandlers();
             _undoQueue?.Dispose();
             _globals = null;
             _formViewer?.Dispose();
@@ -334,7 +334,7 @@ namespace QuickFiler.Controllers
             {
                 logger.Error(ex.Message, ex);
                 throw;
-            }            
+            }
         }
 
         async public Task ActionCancelAsync()
@@ -343,7 +343,7 @@ namespace QuickFiler.Controllers
             await _formViewer.UiSyncContext;
             _formViewer.Hide();
             _groups.Cleanup();
-            Cleanup();            
+            Cleanup();
         }
 
         async public void ButtonOK_Click(object sender, EventArgs e)
@@ -357,7 +357,7 @@ namespace QuickFiler.Controllers
             {
                 logger.Error(ex.Message, ex);
                 throw;
-            }            
+            }
         }
 
         async public Task ActionOkAsync()
@@ -477,7 +477,7 @@ namespace QuickFiler.Controllers
             //SortEmail.Undo(_movedItems, _globals.Ol.App);
         }
 
-        public async Task SpnEmailPerLoadHandler(object sender, EventArgs e) 
+        public async Task SpnEmailPerLoadHandler(object sender, EventArgs e)
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
@@ -511,7 +511,7 @@ namespace QuickFiler.Controllers
                     break;
             }
         }
-        
+
         public async void SpnEmailPerLoad_ValueChanged(object sender, EventArgs e)
         {
             try
@@ -557,7 +557,7 @@ namespace QuickFiler.Controllers
             _formViewer.L1v1L2h5_BtnSkip.Text = "Skip Group";
             _formViewer.L1v1L2h5_BtnSkip.Enabled = true;
         }
-        
+
         async public void ButtonSkip_Click(object sender, EventArgs e)
         {
             if (SynchronizationContext.Current is null)
@@ -641,7 +641,7 @@ namespace QuickFiler.Controllers
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             _formViewer.Show();
             _formViewer.Refresh();
-            
+
             await _groups.LoadSecondaryAsync();
         }
 

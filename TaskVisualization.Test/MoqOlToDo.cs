@@ -13,7 +13,7 @@ using System.Security.Cryptography;
 
 namespace TaskVisualization.Test
 {
-    
+
     public class MoqOlToDo
     {
         public PropertyAccessor MockPA()
@@ -86,7 +86,7 @@ namespace TaskVisualization.Test
 
             mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "TagProgram"), It.IsAny<object[]>()))
                 .Returns(MockProperty<string>("TestProgram", "TagProgram", OlUserPropertyType.olText));
-            
+
             mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "AB"), It.IsAny<object[]>()))
                 .Returns(MockProperty<bool>(true, "AB", OlUserPropertyType.olYesNo));
 
@@ -107,7 +107,7 @@ namespace TaskVisualization.Test
                                              DateTime creationTime,
                                              DateTime taskStartDate,
                                              OlFlagStatus olFlagStatus,
-                                             string categoryNames) 
+                                             string categoryNames)
         {
             var email = new Mock<MailItem>();
             email.Setup(x => x.TaskSubject).Returns(TaskSubject);
@@ -115,7 +115,7 @@ namespace TaskVisualization.Test
             email.Setup(x => x.Importance).Returns(olImportance);
             email.Setup(x => x.CreationTime).Returns(creationTime);
             email.Setup(x => x.TaskStartDate).Returns(taskStartDate);
-            email.Setup(x => x.ReminderTime).Returns(new DateTime(4501,01,01));
+            email.Setup(x => x.ReminderTime).Returns(new DateTime(4501, 01, 01));
             email.Setup(x => x.TaskDueDate).Returns(new DateTime(4501, 01, 01));
             email.Setup(x => x.FlagStatus).Returns(olFlagStatus);
             email.Setup(x => x.Categories).Returns(categoryNames);
@@ -125,7 +125,7 @@ namespace TaskVisualization.Test
 
             return email;
         }
-        
+
         internal IEnumerator CategoryCollection()
         {
             var category1 = MockCategory("Tag PROJECT TestProject1");
@@ -144,7 +144,7 @@ namespace TaskVisualization.Test
             cat.SetupGet(x => x.Name).Returns(categoryName);
             return cat.Object;
         }
-        
+
         internal Categories MockCategories(string categoryString)
         {
             var categories = new Mock<Categories>();
@@ -152,10 +152,10 @@ namespace TaskVisualization.Test
             categories.As<IEnumerable>().Setup(x => x.GetEnumerator()).Returns(CategoryCollection());
             return categories.Object;
         }
-        
+
         internal IEnumerator EmailCollection()
         {
-            var email1 = MailItemMock("Task1",OlImportance.olImportanceHigh,DateTime.Now, DateTime.Now, OlFlagStatus.olFlagMarked, "");
+            var email1 = MailItemMock("Task1", OlImportance.olImportanceHigh, DateTime.Now, DateTime.Now, OlFlagStatus.olFlagMarked, "");
             var email2 = MailItemMock("Task2", OlImportance.olImportanceLow, DateTime.Now, DateTime.Now, OlFlagStatus.olFlagMarked, "");
 
             yield return email1.Object;
@@ -181,12 +181,12 @@ namespace TaskVisualization.Test
             var mockOlObjects = new Mock<IOlObjects>();
             mockOlObjects.Setup(x => x.App).Returns(mockOlApp.Object);
             mockOlObjects.Setup(x => x.NamespaceMAPI).Returns(mockNamespaceMAPI.Object);
-                                    
+
             var mockGlobals = new Mock<IApplicationGlobals>();
             mockGlobals.Setup(x => x.Ol).Returns(mockOlObjects.Object);
 
             return mockGlobals.Object;
         }
-        
+
     }
 }

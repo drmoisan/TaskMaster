@@ -108,7 +108,7 @@ namespace QuickFiler.Controllers
                     e.Handled = true;
                     CharActions[(char)e.KeyValue].DynamicInvoke((char)e.KeyValue);
                 }
-             
+
             }
         }
 
@@ -122,7 +122,7 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                logger.Error($"Error in {nameof(KeyboardHandler_KeyDownAsync)} for key {e.KeyValue}. {ex.Message}", ex);                
+                logger.Error($"Error in {nameof(KeyboardHandler_KeyDownAsync)} for key {e.KeyValue}. {ex.Message}", ex);
             }
         }
 
@@ -131,8 +131,8 @@ namespace QuickFiler.Controllers
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(_parent.UiSyncContext);
 
-            if ((AlwaysOnKeyActionsAsync != null) && AlwaysOnKeyActionsAsync.ContainsKey(e.KeyCode)) 
-            { 
+            if ((AlwaysOnKeyActionsAsync != null) && AlwaysOnKeyActionsAsync.ContainsKey(e.KeyCode))
+            {
                 e.SuppressKeyPress = true;
                 e.Handled = true;
                 await AlwaysOnKeyActionsAsync[e.KeyCode](e.KeyCode);
@@ -160,7 +160,7 @@ namespace QuickFiler.Controllers
                         e.SuppressKeyPress = true;
                         e.Handled = true;
 
-                        if (_filterBuilder.Length ==1)
+                        if (_filterBuilder.Length == 1)
                             StringActionsAsync.ForEach(x => x.Activated = true);
                         var actions = StringActionsAsync.FilterKeys(_filterBuilder.ToString());
                         if (actions.Length == 0)
@@ -176,7 +176,7 @@ namespace QuickFiler.Controllers
                     {
                         _filterBuilder.Length--;
                     }
-                } 
+                }
             }
         }
 
@@ -465,7 +465,7 @@ namespace QuickFiler.Controllers
                         break;
                     }
                 case Keys k when (k == Keys.Left || k == Keys.Return || k == Keys.Escape):
-                    { 
+                    {
                         // Close the drop down box
                         UiThread.Dispatcher.Invoke(() => cbo.DroppedDown = false);
                         e.SuppressKeyPress = true;
@@ -510,5 +510,5 @@ namespace QuickFiler.Controllers
             }
         }
 
-    }    
+    }
 }

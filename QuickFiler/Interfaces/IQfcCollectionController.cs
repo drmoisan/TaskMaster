@@ -20,7 +20,7 @@ namespace QuickFiler.Interfaces
         void LoadControlsAndHandlers_01(IList<MailItem> listObjects, RowStyle template, RowStyle templateExpanded);
         void LoadControlsAndHandlers_01(TableLayoutPanel tlp, List<QfcItemGroup> itemGroups);
         Task LoadControlsAndHandlers_01Async(IList<MailItem> listObjects, RowStyle template, RowStyle templateExpanded);
-        ItemViewer LoadItemViewer_03(int intItemNumber, RowStyle template, bool blGroupConversation = true, int columnNumber = 0); 
+        ItemViewer LoadItemViewer_03(int intItemNumber, RowStyle template, bool blGroupConversation = true, int columnNumber = 0);
         void PopOutControlGroup(int intPosition);
         Task PopOutControlGroupAsync(int selection);
         void RemoveControls();
@@ -45,7 +45,7 @@ namespace QuickFiler.Interfaces
         void ToggleGroupConv(int childCount, int indexOriginal);
         void ToggleGroupConv(string originalId);
         void ToggleUnGroupConv(ConversationResolver resolver, string entryID, int conversationCount, object folderList);
-        void MakeSpaceForItems(int insertionIndex, int insertCount);                        
+        void MakeSpaceForItems(int insertionIndex, int insertCount);
 
         // UI Light Dark
         void SetDarkMode(bool async);
@@ -68,6 +68,6 @@ namespace QuickFiler.Interfaces
         void Cleanup();
 
         string[] GetMoveDiagnostics(string durationText, string durationMinutesText, double Duration, string dataLineBeg, DateTime OlEndTime, ref AppointmentItem OlAppointment);
-        
+
     }
 }

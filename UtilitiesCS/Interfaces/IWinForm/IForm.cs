@@ -5,16 +5,16 @@ using System.Windows.Forms;
 
 namespace UtilitiesCS.Interfaces.IWinForm
 {
-    public interface IForm: IContainerControl, IScrollableControl
+    public interface IForm : IContainerControl, IScrollableControl
     {
         IButtonControl AcceptButton { get; set; }
         Form ActiveMdiChild { get; }
         bool AllowTransparency { get; set; }
         bool AutoScale { get; set; }
-        Size AutoScaleBaseSize { get; set; }                
+        Size AutoScaleBaseSize { get; set; }
         AutoSizeMode AutoSizeMode { get; set; }
-        AutoValidate AutoValidate { get; set; }        
-        IButtonControl CancelButton { get; set; }        
+        AutoValidate AutoValidate { get; set; }
+        IButtonControl CancelButton { get; set; }
         bool ControlBox { get; set; }
         Rectangle DesktopBounds { get; set; }
         Point DesktopLocation { get; set; }
@@ -25,14 +25,14 @@ namespace UtilitiesCS.Interfaces.IWinForm
         bool IsMdiChild { get; }
         bool IsMdiContainer { get; set; }
         bool IsRestrictedWindow { get; }
-        bool KeyPreview { get; set; }        
-        MenuStrip MainMenuStrip { get; set; }        
-        bool MaximizeBox { get; set; }        
+        bool KeyPreview { get; set; }
+        MenuStrip MainMenuStrip { get; set; }
+        bool MaximizeBox { get; set; }
         Form[] MdiChildren { get; }
         Form MdiParent { get; set; }
         MainMenu Menu { get; set; }
         MainMenu MergedMenu { get; }
-        bool MinimizeBox { get; set; }        
+        bool MinimizeBox { get; set; }
         bool Modal { get; }
         double Opacity { get; set; }
         Form[] OwnedForms { get; }
@@ -40,15 +40,15 @@ namespace UtilitiesCS.Interfaces.IWinForm
         Rectangle RestoreBounds { get; }
         bool RightToLeftLayout { get; set; }
         bool ShowIcon { get; set; }
-        bool ShowInTaskbar { get; set; }        
+        bool ShowInTaskbar { get; set; }
         SizeGripStyle SizeGripStyle { get; set; }
-        FormStartPosition StartPosition { get; set; }                        
+        FormStartPosition StartPosition { get; set; }
         bool TopLevel { get; set; }
         bool TopMost { get; set; }
         Color TransparencyKey { get; set; }
         FormWindowState WindowState { get; set; }
 
-        event EventHandler Activated;        
+        event EventHandler Activated;
         event EventHandler AutoValidateChanged;
         event EventHandler Closed;
         event CancelEventHandler Closing;
@@ -59,7 +59,7 @@ namespace UtilitiesCS.Interfaces.IWinForm
         event CancelEventHandler HelpButtonClicked;
         event InputLanguageChangedEventHandler InputLanguageChanged;
         event InputLanguageChangingEventHandler InputLanguageChanging;
-        event EventHandler Load;        
+        event EventHandler Load;
         event EventHandler MaximizedBoundsChanged;
         event EventHandler MaximumSizeChanged;
         event EventHandler MdiChildActivate;
@@ -69,7 +69,7 @@ namespace UtilitiesCS.Interfaces.IWinForm
         event EventHandler ResizeBegin;
         event EventHandler ResizeEnd;
         event EventHandler RightToLeftLayoutChanged;
-        event EventHandler Shown;                
+        event EventHandler Shown;
 
         void Activate();
         void AddOwnedForm(Form ownedForm);

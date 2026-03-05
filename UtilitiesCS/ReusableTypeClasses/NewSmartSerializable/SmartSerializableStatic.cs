@@ -8,7 +8,7 @@ using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    
+
     public static class SmartSerializableStatic
     {
         public static bool IsSmartSerializable(this Type type)

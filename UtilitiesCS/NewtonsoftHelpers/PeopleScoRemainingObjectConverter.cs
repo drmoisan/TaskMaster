@@ -5,7 +5,7 @@ using System;
 namespace ToDoModel.Data_Model.People
 {
     public class PeopleScoRemainingObjectConverter : JsonConverter
-    {        
+    {
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(object);

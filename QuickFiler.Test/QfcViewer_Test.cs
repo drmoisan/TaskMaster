@@ -19,9 +19,10 @@ namespace Z.Disabled.QuickFiler.Test
         //private ItemViewer iv;
         //private Mock<IFilerFormController> formController;
 
-        
 
-        [TestInitialize] public void Disabled_Init() 
+
+        [TestInitialize]
+        public void Disabled_Init()
         {
             // Disabled to avoid showing the form
             //qf = new QfcFormViewer();
@@ -30,7 +31,7 @@ namespace Z.Disabled.QuickFiler.Test
             //iv = new ItemViewer();
             //formController = new Mock<IFilerFormController>();
         }
-        
+
         [TestMethod]
         public void Disabled_TestMethod1()
         {
@@ -43,14 +44,14 @@ namespace Z.Disabled.QuickFiler.Test
             //qf.SetController(formController.Object);
             //qf.Show();
             //qf.Refresh();
-            
+
             //RowStyle rowStyle = new RowStyle(SizeType.Absolute, itemHeight);
             //TableLayoutHelper.InsertSpecificRow(panel: qf.L1v0L2L3v_TableLayout, rowIndex: 0, templateStyle: rowStyle);
             //qf.L1v0L2L3v_TableLayout.Height += itemHeight;
 
             //qf.Refresh();
 
-            
+
             //qf.L1v0L2L3v_TableLayout.Controls.Add(iv, 0, 0);
             //iv.AutoSize = true;
             //iv.AutoSizeMode = AutoSizeMode.GrowAndShrink;
@@ -64,7 +65,7 @@ namespace Z.Disabled.QuickFiler.Test
         }
 
         [TestMethod]
-        public void Disabled_TestToggleTips() 
+        public void Disabled_TestToggleTips()
         {
             ////qf.Show();
             //qf.Refresh();
