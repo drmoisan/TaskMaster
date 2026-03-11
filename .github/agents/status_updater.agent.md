@@ -5,7 +5,19 @@ argument-hint: "Provide EpicRootFolder (absolute or workspace-relative path, e.g
 target: vscode
 tools:
   ['execute/testFailure', 'execute/getTerminalOutput', 'execute/runTask', 'execute/runInTerminal', 'execute/runTests', 'read/problems', 'read/readFile', 'read/terminalSelection', 'read/terminalLastCommand', 'read/getTaskOutput', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'todo']
-handoffs: [{ label: "Create status remediation plan (atomic_planner)", agent: atomic_planner, prompt: "You are atomic_planner. Create an atomic remediation plan ONLY (no implementation) to address the gaps and conflicts described in `<EPIC_FOLDER>/status-sync.<timestamp>.md` (see the \"Blockers / Gaps\" section) and WRITE the plan to the explicit file path provided in the prompt as `<EPIC_FOLDER>/status-remediation-plan.<timestamp>.md`.\n\nRequirements:\n- Preserve atomic planner conventions (phases, [P#-T#] task IDs, checkboxes, verifiable acceptance criteria).\n- Separate discovery/research from implementation tasks.\n- Include Phase 0 tasks for: reading applicable repo policies, confirming epic scope/docs, defining sync success criteria.\n- Include a final QA phase: doc structure checks -> link checks (if available) -> repo QA tasks/tests (if applicable).\n- Use ONLY the explicit output path supplied (no path confirmation questions).", send: false }]
+handoffs:
+  - label: Create status remediation plan (atomic_planner)
+    agent: atomic_planner
+    prompt: |
+      You are atomic_planner. Create an atomic remediation plan ONLY (no implementation) to address the gaps and conflicts described in `<EPIC_FOLDER>/status-sync.<timestamp>.md` (see the "Blockers / Gaps" section) and WRITE the plan to the explicit file path provided in the prompt as `<EPIC_FOLDER>/status-remediation-plan.<timestamp>.md`.
+
+      Requirements:
+      - Preserve atomic planner conventions (phases, [P#-T#] task IDs, checkboxes, verifiable acceptance criteria).
+      - Separate discovery/research from implementation tasks.
+      - Include Phase 0 tasks for: reading applicable repo policies, confirming epic scope/docs, defining sync success criteria.
+      - Include a final QA phase: doc structure checks -> link checks (if available) -> repo QA tasks/tests (if applicable).
+      - Use ONLY the explicit output path supplied (no path confirmation questions).
+    send: false
 ---
 
 # Role and objective

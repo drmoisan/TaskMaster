@@ -1,6 +1,6 @@
 ---
 name: csharp-orchestrator
-model: GPT-5.3-Codex (copilot)
+model: GPT-5.4 (copilot)
 description: Orchestrate end-to-end C# feature/bug delivery by estimating change budget and routing through atomic planning/execution and feature review until complete.
 argument-hint: "Provide objective, affected files (if known), and whether this is likely bug or feature. The orchestrator will estimate change budget, choose workflow path, delegate to specialist agents, and persist until completion."
 target: vscode
@@ -119,9 +119,9 @@ Follow this exact sequence.
 
 1.3 Create potential entry using exact command by type:
 - If `${promotion-type}` is `feature`:
-  - `${workspaceFolder}/scripts/dev-tools/new-potential-entry.ps1 -ShortName ${short-name}`
+  - `VS Code command: `drm-copilot: New Potential Entry (PowerShell Placeholder)` (command ID: `drmCopilotExtension.newPotentialEntryPsPlaceholder`) -ShortName ${short-name}`
 - If `${promotion-type}` is `bug`:
-  - `${workspaceFolder}/scripts/dev_tools/new_potential_bug_entry.py --short-name ${short-name}`
+  - `VS Code command: `drm-copilot: New Potential Bug Entry (Python Placeholder)` (command ID: `drmCopilotExtension.newPotentialBugEntryPyPlaceholder`) --short-name ${short-name}`
 
 1.4 Detect created potential markdown file path and save as `${relativeFile}`.
 
@@ -132,7 +132,7 @@ Follow this exact sequence.
 ### Step 2 — Promote potential item
 
 2.1 Promote to issue with exact command:
-- `poetry run python -m scripts.dev_tools.potential_to_issue --potential-path ${relativeFile} --promotion-type ${promotion-type}`
+- `VS Code command: `drm-copilot: Potential To Issue (Placeholder)` (command ID: `drmCopilotExtension.potentialToIssuePlaceholder`) --potential-path ${relativeFile} --promotion-type ${promotion-type}`
 
 2.2 Set `${long-name}` from `${relativeFile}` filename without `.md`.
 
@@ -142,7 +142,7 @@ Follow this exact sequence.
 - `${promotion-type}/${short-name}-${issue-num}`
 
 2.5 Create active feature folder with exact command:
-- `poetry run python -m scripts.dev_tools.new_active_feature_folder --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num}`
+- `VS Code command: `drm-copilot: New Active Feature Folder (Placeholder)` (command ID: `drmCopilotExtension.newActiveFeatureFolderPlaceholder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num}`
 
 2.6 Capture created folder path as `${feature-folder}`.
 

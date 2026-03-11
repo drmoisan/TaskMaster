@@ -70,6 +70,8 @@ You MUST NOT:
 
 ## 2. Plan Ingestion Protocol (Mandatory)
 
+Use `atomic-plan-contract` as the system-of-record for mode gate behavior, including mode source precedence, fail-closed routing, and minor-audit evidence-task requirements.
+
 ### 2.0.1 Mode-aware preflight gate (Mandatory)
 
 During preflight (before [P0-T1]), resolve work mode from feature `issue.md` marker first:

@@ -11,6 +11,7 @@ Canonical variable model and command sequence for promoting potential feature/bu
 
 Use this skill when:
 - A large-scope change requires feature/bug promotion workflow.
+- A short-path workflow still requires promotion/folder initialization before delegated implementation.
 - An orchestrator must create potential docs, promote to issue, branch, and active feature folder.
 - Downstream research/spec agents depend on deterministic paths and identifiers.
 
@@ -23,21 +24,49 @@ Use this skill when:
 - `${issue-num}`: promoted GitHub issue number
 - `${feature-folder}`: active feature folder path
 - `${work-mode}`: `full` or `minor-audit`
+- `${short-path-flag}`: `--work-mode minor-audit` (mandatory for short-path promotion/folder creation)
 
 ## Canonical Command Sequence
 
 1) Create potential entry by type:
-- feature: `${workspaceFolder}/scripts/dev-tools/new-potential-entry.ps1 -ShortName ${short-name}`
-- bug: `${workspaceFolder}/scripts/dev_tools/new_potential_bug_entry.py --short-name ${short-name}`
+- feature: `VS Code command: `drm-copilot: New Potential Entry (PowerShell Placeholder)` (command ID: `drmCopilotExtension.newPotentialEntryPsPlaceholder`) -ShortName ${short-name}`
+- bug: `VS Code command: `drm-copilot: New Potential Bug Entry (Python Placeholder)` (command ID: `drmCopilotExtension.newPotentialBugEntryPyPlaceholder`) --short-name ${short-name}`
 
 2) Promote potential doc:
-- `poetry run python -m scripts.dev_tools.potential_to_issue --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode ${work-mode}`
+- `VS Code command: `drm-copilot: Potential To Issue (Placeholder)` (command ID: `drmCopilotExtension.potentialToIssuePlaceholder`) --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode ${work-mode}`
 
 3) Create branch:
 - `${promotion-type}/${short-name}-${issue-num}`
 
 4) Create active feature folder:
-- `poetry run python -m scripts.dev_tools.new_active_feature_folder --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode ${work-mode}`
+- `VS Code command: `drm-copilot: New Active Feature Folder (Placeholder)` (command ID: `drmCopilotExtension.newActiveFeatureFolderPlaceholder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode ${work-mode}`
+
+## Canonical Short-Path Sequence (Minor Audit Mode)
+
+When orchestrator routing selects short path, promotion/folder initialization still occurs and MUST use `minor-audit` mode.
+
+1) Promote potential doc with short-path flag:
+- `VS Code command: `drm-copilot: Potential To Issue (Placeholder)` (command ID: `drmCopilotExtension.potentialToIssuePlaceholder`) --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode minor-audit`
+
+2) Create branch:
+- `${promotion-type}/${short-name}-${issue-num}`
+
+3) Create active feature folder with short-path flag:
+- `VS Code command: `drm-copilot: New Active Feature Folder (Placeholder)` (command ID: `drmCopilotExtension.newActiveFeatureFolderPlaceholder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode minor-audit`
+
+4) Delegate minimal-audit plan creation to `atomic_planner` with directive:
+- `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`
+
+5) Require preflight validation via `atomic_executor` until:
+- `PREFLIGHT: ALL CLEAR`
+
+6) Execute plan Phase 0 only via executor and checkpoint evidence.
+
+7) Branch:
+- manual bootstrap: save state and stop,
+- non-bootstrap: continue with constrained small-path development.
+
+8) Validate delivery via executor against `issue.md`, then run reduced audit/remediation loop until ready-to-merge.
 
 ## Required Outputs for Downstream Handoffs
 

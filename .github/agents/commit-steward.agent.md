@@ -1,8 +1,7 @@
 ---
 name: commit_steward
-model: GPT-5.2 (copilot)
 description: Write commit messages for the current repo based on staged changes
-target: vscode
+model: GPT-5.4 (copilot)
 ---
 
 # Commit Message Steward

@@ -1,6 +1,6 @@
 ---
 name: comment_remediator
-model: GPT-5.1-Codex-Max (copilot)
+model: GPT-5.4 (copilot)
 description: Autonomous agent that remediates code to comply with intent-first docstring and comment policies across specified Python scopes (file, folder, or full repo) while enforcing repo coding standards.
 tools:
   - search/listDirectory
