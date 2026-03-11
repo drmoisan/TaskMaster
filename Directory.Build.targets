@@ -1,10 +1,20 @@
 <Project>
   <!--
-    Developer builds only: override the VSTO manifest certificate thumbprint so the
-    local developer certificate is used. This target must NOT run in CI because CI
-    passes ManifestCertificateThumbprint on the MSBuild command line with a freshly
-    created ephemeral certificate; a target-scoped PropertyGroup would override that
-    command-line value and break the build.
+    CI builds: disable VSTO manifest and assembly signing so that
+    ResolveKeySource (Microsoft.Common.targets) does not attempt to
+    locate a certificate that only exists on the developer machine.
+    These top-level PropertyGroups are evaluated after the .csproj
+    static PropertyGroups, effectively overriding SignManifests and
+    SignAssembly for CI.
+  -->
+  <PropertyGroup Condition="'$(CI)' == 'true' and '$(MSBuildProjectName)' == 'TaskMaster'">
+    <SignManifests>false</SignManifests>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+
+  <!--
+    Developer builds only: override the VSTO manifest certificate
+    thumbprint so the local developer certificate is used.
   -->
   <Target Name="SetTaskMasterManifestCert" BeforeTargets="ResolveKeySource"
           Condition="'$(MSBuildProjectName)' == 'TaskMaster' and '$(CI)' != 'true'">

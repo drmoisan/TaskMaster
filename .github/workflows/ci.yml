@@ -75,32 +75,17 @@ jobs:
       - name: Build with analyzers and code style enforcement
         shell: pwsh
         run: |
-          # VSTO add-in projects require SignManifests=true with a certificate present
-          # in CurrentUser\My. Create an ephemeral self-signed certificate and pass its
-          # thumbprint directly on the MSBuild command line (same process, no env-var
-          # transfer) so ResolveKeySource can locate it.
-          $cert = New-SelfSignedCertificate `
-            -CertStoreLocation 'Cert:\CurrentUser\My' `
-            -Subject 'CN=TaskMaster CI Build' `
-            -KeyUsage DigitalSignature `
-            -Type CodeSigningCert
           & msbuild $env:SOLUTION_PATH /t:Build /p:Configuration=Debug `
               "/p:Platform=Any CPU" `
-              /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true `
-              "/p:ManifestCertificateThumbprint=$($cert.Thumbprint)"
+              /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Build with nullable warnings treated as errors
         shell: pwsh
         run: |
-          # Reuse the ephemeral certificate installed by the previous build step.
-          $cert = Get-ChildItem 'Cert:\CurrentUser\My' |
-            Where-Object { $_.Subject -eq 'CN=TaskMaster CI Build' } |
-            Select-Object -First 1
           & msbuild $env:SOLUTION_PATH /t:Build /p:Configuration=Debug `
               "/p:Platform=Any CPU" `
-              /p:Nullable=enable /p:TreatWarningsAsErrors=true `
-              "/p:ManifestCertificateThumbprint=$($cert.Thumbprint)"
+              /p:Nullable=enable /p:TreatWarningsAsErrors=true
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Run MSTest suite with coverage
