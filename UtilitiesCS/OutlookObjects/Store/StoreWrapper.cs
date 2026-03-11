@@ -18,7 +18,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         #region ctor
 
         public StoreWrapper(Outlook.Store store) { InnerStore = store; }
-        
+
         public StoreWrapper Init()
         {
             DisplayName = InnerStore.DisplayName;
@@ -41,11 +41,11 @@ namespace UtilitiesCS.OutlookObjects.Store
             catch (System.Exception e)
             {
                 logger.Error($"Error restoring {nameof(StoreWrapper)} named {DisplayName} {e.Message}");
-                return false;                
+                return false;
             }
         }
-        
-        public void Restore(Outlook.Store store) 
+
+        public void Restore(Outlook.Store store)
         {
             InnerStore = store;
             Init();

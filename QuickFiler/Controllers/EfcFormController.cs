@@ -150,7 +150,7 @@ namespace QuickFiler.Controllers
             _formViewer.MinimumSize = new Size((int)(explorerSize.Width * 0.75), (int)(explorerSize.Height * 0.75));
             _formViewer.Size = _formViewer.MinimumSize;
         }
-        
+
         public void Cleanup()
         {
             _globals.Ol.PropertyChanged -= DarkMode_Changed;
@@ -160,8 +160,8 @@ namespace QuickFiler.Controllers
             _parentCleanup.Invoke();
         }
 
-        public void ConfigureFind() 
-        { 
+        public void ConfigureFind()
+        {
             if (_initType.HasFlag(QfEnums.InitTypeEnum.Find))
             {
                 _formViewer.Text = "Quick Filer - Find Folder";
@@ -170,7 +170,7 @@ namespace QuickFiler.Controllers
 
             }
         }
-        
+
         internal void ResolveControlGroups()
         {
             _listTipsDetails = _formViewer.TipsLabels
@@ -180,16 +180,16 @@ namespace QuickFiler.Controllers
 
             var starter = _formViewer.GetAllChildren(except: new List<Control> { _itemViewer, });
 
-            _listButtons  = starter.Where(x => x is Button).Cast<Button>().ToList();
+            _listButtons = starter.Where(x => x is Button).Cast<Button>().ToList();
 
             _listCheckBox = starter.Where(x => (x is CheckBox)).ToList();
 
             _listHighlighted = new List<Control> { _formViewer.SearchText, _formViewer.FolderListBox, };
 
-            _listDefault = starter.Where(x => !_formViewer.TipsLabels.Contains(x) && 
-                                              !_listButtons.Contains(x) && 
+            _listDefault = starter.Where(x => !_formViewer.TipsLabels.Contains(x) &&
+                                              !_listButtons.Contains(x) &&
                                               !_listHighlighted.Contains(x) &&
-                                              !_listCheckBox.Contains(x)) 
+                                              !_listCheckBox.Contains(x))
                                   .ToList();
         }
 
@@ -202,7 +202,7 @@ namespace QuickFiler.Controllers
                 _listButtons.Cast<Control>().ToList(),
                 _listCheckBox);
 
-            _activeTheme = LoadTheme(); 
+            _activeTheme = LoadTheme();
         }
 
         #endregion Setup and Cleanup Methods
@@ -232,7 +232,7 @@ namespace QuickFiler.Controllers
         public IntPtr FormHandle => _formViewer.Handle;
 
         public string SelectedFolder { get => _formViewer.FolderListBox.SelectedItem as string; }
-        
+
         private bool _saveAttachments;
         public bool SaveAttachments
         {
@@ -296,12 +296,12 @@ namespace QuickFiler.Controllers
                     new KaKeyAsync("Collection", Keys.Return, (k) => ActionOkAsync())
                 });
         }
-        
+
         public void WireEventHandlers()
         {
             //_homeController.KeyboardHandler.CharActions = new KbdActions<char, KaChar, Action<char>>();
             //_homeController.KeyboardHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
-            
+
             _formViewer.ForAllControls(x =>
             {
                 x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(
@@ -309,7 +309,7 @@ namespace QuickFiler.Controllers
                 x.KeyDown += new System.Windows.Forms.KeyEventHandler(
                     _homeController.KeyboardHandler.KeyboardHandler_KeyDownAsync);
             },
-            new List<Control> {  });
+            new List<Control> { });
             _formViewer.SaveAttachmentsMenuItem.CheckedChanged += SaveAttachments_CheckedChanged;
             _formViewer.SaveEmailMenuItem.CheckedChanged += SaveEmail_CheckedChanged;
             _formViewer.SavePicturesMenuItem.CheckedChanged += SavePictures_CheckedChanged;
@@ -326,7 +326,7 @@ namespace QuickFiler.Controllers
             _formViewer.EditFiltersMenuItem.Click += EditFiltersMenuItem_Click;
             _globals.Ol.PropertyChanged += DarkMode_Changed;
         }
-               
+
         public void SearchText_DownArrow(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Down) { _formViewer.FolderListBox.Select(); }
@@ -338,7 +338,7 @@ namespace QuickFiler.Controllers
             else if (e.KeyCode == Keys.Left) { }
             else if (e.KeyCode == Keys.Right) { }
         }
-        
+
         async public void ButtonCancel_Click(object sender, EventArgs e)
         {
             try
@@ -352,7 +352,7 @@ namespace QuickFiler.Controllers
             {
                 logger.Error(ex.Message, ex);
                 throw;
-            }            
+            }
         }
 
         async public void ButtonOK_Click(object sender, EventArgs e)
@@ -368,7 +368,7 @@ namespace QuickFiler.Controllers
             {
                 logger.Error(ex.Message, ex);
                 throw;
-            }            
+            }
         }
 
         async public void ButtonRefresh_Click(object sender, EventArgs e)
@@ -383,7 +383,7 @@ namespace QuickFiler.Controllers
             catch (System.Exception ex)
             {
                 logger.Error(ex.Message, ex);
-                throw;                
+                throw;
             }
         }
 
@@ -438,8 +438,8 @@ namespace QuickFiler.Controllers
                 logger.Error(ex.Message, ex);
                 throw;
             }
-            
-            
+
+
         }
 
         async public void ButtonDelete_Click(object sender, EventArgs e)
@@ -452,9 +452,9 @@ namespace QuickFiler.Controllers
             {
                 logger.Error(ex.Message, ex);
                 throw;
-            }            
+            }
         }
-                
+
         private void SaveAttachments_CheckedChanged(object sender, EventArgs e)
         {
             SaveAttachments = _formViewer.SaveAttachmentsMenuItem.Checked;
@@ -573,8 +573,8 @@ namespace QuickFiler.Controllers
             else
             {
                 _formViewer.Hide();
-                if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort)) 
-                { 
+                if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
+                {
                     await _homeController.ExecuteMovesAsync();
                 }
                 else if (_initType.HasFlag(QfEnums.InitTypeEnum.Find))
@@ -600,7 +600,7 @@ namespace QuickFiler.Controllers
         }
 
         async public Task ActionDeleteAsync()
-        {             
+        {
             await _formViewer.UiSyncContext;
             var items = (string[])_formViewer.FolderListBox.DataSource;
             var itemList = items.ToList();
@@ -609,12 +609,12 @@ namespace QuickFiler.Controllers
         }
 
         async public Task CreateFolderAsync()
-        {            
+        {
             if (!IsValidSelection)
             {
                 MessageBox.Show("Please select a valid folder");
             }
-            else if (_initType.HasFlag(QfEnums.InitTypeEnum.Find)) 
+            else if (_initType.HasFlag(QfEnums.InitTypeEnum.Find))
             {
                 await _homeController.OpenFsFolderAsync(SelectedFolder);
             }
@@ -622,7 +622,7 @@ namespace QuickFiler.Controllers
             {
                 await _formViewer.UiSyncContext;
                 _formViewer.Hide();
-                if (!_globals.FS.SpecialFolders.TryGetValue("OneDrive", out var oneDrive)) { return;  }
+                if (!_globals.FS.SpecialFolders.TryGetValue("OneDrive", out var oneDrive)) { return; }
                 var folder = await Task.FromResult(_dataModel
                                                    .FolderHelper
                                                    .CreateFolder(SelectedFolder,
@@ -647,8 +647,8 @@ namespace QuickFiler.Controllers
         {
             await Task.Run(() => _dataModel.RefreshSuggestions(), Token);
             var matches = await Task.Run(() => _dataModel.FindMatches(_formViewer.SearchText.Text), Token);
-            
-            
+
+
             _formViewer.FolderListBox.DataSource = matches;
             if (_formViewer.FolderListBox.Items.Count > 0) { _formViewer.FolderListBox.SelectedIndex = 1; }
         }
@@ -656,7 +656,7 @@ namespace QuickFiler.Controllers
         #endregion
 
         #region Helper Methods
-        
+
         async public Task KbdExecuteAsync(Func<Task> action)
         {
             await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
@@ -675,7 +675,7 @@ namespace QuickFiler.Controllers
             //await _formViewer.UiSyncContext;
             control.Focus();
         }
-        
+
         public void MaximizeFormViewer()
         {
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -811,7 +811,7 @@ namespace QuickFiler.Controllers
                 _formViewer.MinimumSize = new Size(_formViewer.MinimumSize.Width, _formViewer.MinimumSize.Height - _tlpHeightDiff);
                 _formViewer.Size = new Size(_formViewer.Size.Width, _formViewer.Size.Height - _tlpHeightDiff);
             }
-        
+
         }
 
     }

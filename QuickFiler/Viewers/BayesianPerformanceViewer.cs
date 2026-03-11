@@ -36,8 +36,8 @@ namespace QuickFiler.Viewers
             }
             catch (System.Exception)
             {
-                return "unknown";                
-            }            
+                return "unknown";
+            }
         }
 
         private void OlvVerboseDetails_SelectionChanged(object sender, System.EventArgs e)
@@ -50,7 +50,7 @@ namespace QuickFiler.Viewers
             Controller?.OlvDrivers_SelectionChanged();
         }
 
-      
+
         private void ClassSelector_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             Controller?.ClassSelector_SelectedIndexChanged();

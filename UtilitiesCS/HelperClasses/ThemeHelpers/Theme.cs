@@ -124,26 +124,26 @@ namespace UtilitiesCS
         public Theme(string name,
                      Dictionary<string, ThemeControlGroup> controlGroups)
         {
-            if (controlGroups is null) { throw new ArgumentNullException(nameof(controlGroups));}
+            if (controlGroups is null) { throw new ArgumentNullException(nameof(controlGroups)); }
             _name = name;
             _controlGroups = controlGroups;
         }
 
-        
+
         #endregion
-        
+
 
         #region Public Properties
 
         private Color _navBackColor;
         public Color NavBackColor { get => _navBackColor; set => _navBackColor = value; }
-        
+
         private Color _navForeColor;
         public Color NavForeColor { get => _navForeColor; set => _navForeColor = value; }
-                        
+
         private Action<Enums.ToggleState> _htmlConverter;
         public Action<Enums.ToggleState> HtmlConverter { get => _htmlConverter; set => _htmlConverter = value; }
-        
+
         private Color _buttonBackColor;
         public Color ButtonBackColor { get => _buttonBackColor; set => _buttonBackColor = value; }
 
@@ -155,61 +155,61 @@ namespace UtilitiesCS
 
         private Color _cboFoldersBackColor;
         public Color CboFoldersBackColor { get => _cboFoldersBackColor; set => _cboFoldersBackColor = value; }
-        
+
         private Color _cboFoldersForeColor;
         public Color CboFoldersForeColor { get => _cboFoldersForeColor; set => _cboFoldersForeColor = value; }
-        
+
         private Color _defaultBackColor;
         public Color DefaultBackColor { get => _defaultBackColor; set => _defaultBackColor = value; }
-        
+
         private Color _defaultForeColor;
-        public Color DefaultForeColor { get => _defaultForeColor; set => _defaultForeColor = value; }        
-        
+        public Color DefaultForeColor { get => _defaultForeColor; set => _defaultForeColor = value; }
+
         private Color _mailReadBackColor;
         public Color MailReadBackColor { get => _mailReadBackColor; set => _mailReadBackColor = value; }
-        
+
         private Color _mailReadForeColor;
         public Color MailReadForeColor { get => _mailReadForeColor; set => _mailReadForeColor = value; }
-        
+
         private Color _mailUnreadBackColor;
         public Color MailUnreadBackColor { get => _mailUnreadBackColor; set => _mailUnreadBackColor = value; }
-        
+
         private Color _mailUnreadForeColor;
         public Color MailUnreadForeColor { get => _mailUnreadForeColor; set => _mailUnreadForeColor = value; }
-        
+
         private Color _tipsBackColor;
         public Color TipsBackColor { get => _tipsBackColor; set => _tipsBackColor = value; }
-        
+
         private Color _tipsDetailsBackColor;
         public Color TipsDetailsBackColor { get => _tipsDetailsBackColor; set => _tipsDetailsBackColor = value; }
-        
+
         private Color _tipsDetailsForeColor;
         public Color TipsDetailsForeColor { get => _tipsDetailsForeColor; set => _tipsDetailsForeColor = value; }
-        
+
         private Color _tipsForeColor;
         public Color TipsForeColor { get => _tipsForeColor; set => _tipsForeColor = value; }
-        
+
         private Color _tlpBackColor;
         public Color TlpBackColor { get => _tlpBackColor; set => _tlpBackColor = value; }
-        
+
         private Color _txtboxBodyBackColor;
         public Color TxtboxBodyBackColor { get => _txtboxBodyBackColor; set => _txtboxBodyBackColor = value; }
-        
+
         private Color _txtboxBodyForeColor;
         public Color TxtboxBodyForeColor { get => _txtboxBodyForeColor; set => _txtboxBodyForeColor = value; }
-        
+
         private Color _txtboxSearchBackColor;
         public Color TxtboxSearchBackColor { get => _txtboxSearchBackColor; set => _txtboxSearchBackColor = value; }
-        
+
         private Color _txtboxSearchForeColor;
         public Color TxtboxSearchForeColor { get => _txtboxSearchForeColor; set => _txtboxSearchForeColor = value; }
-        
+
         private Enums.ToggleState _htmlDark;
         public Enums.ToggleState HtmlDark { get => _htmlDark; set => _htmlDark = value; }
-        
+
         private Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme _web2ViewScheme;
         public Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme Web2ViewScheme { get => _web2ViewScheme; set => _web2ViewScheme = value; }
-       
+
         private string _name;
         public string Name { get => _name; set => _name = value; }
 
@@ -222,8 +222,11 @@ namespace UtilitiesCS
 
         public void SetMailRead(bool async)
         {
-            if (_lblSender is null) {  throw new System.InvalidOperationException(
-                $"Variable {nameof(_lblSender)} is null");}
+            if (_lblSender is null)
+            {
+                throw new System.InvalidOperationException(
+                $"Variable {nameof(_lblSender)} is null");
+            }
             if (async) { _lblSender.BeginInvoke(new System.Action(() => SetMailRead())); }
             else { _lblSender.Invoke(new System.Action(() => SetMailRead())); }
         }
@@ -256,7 +259,7 @@ namespace UtilitiesCS
             if (async) { _lblSender.BeginInvoke(new System.Action(() => SetMailUnread())); }
             else { _lblSender.Invoke(new System.Action(() => SetMailUnread())); }
         }
-        
+
         private void SetMailUnread()
         {
             if (_lblSender is null)
@@ -278,20 +281,20 @@ namespace UtilitiesCS
         public void SetQfcTheme(bool async)
         {
             if (async) { UiThread.Dispatcher.InvokeAsync(() => SetQfcTheme()); }
-            else if (_lblItemNumber.InvokeRequired) 
-            { 
+            else if (_lblItemNumber.InvokeRequired)
+            {
                 _lblItemNumber.Invoke(() => SetQfcTheme());
             }
             else { SetQfcTheme(); }
             //UiThread.Dispatcher.Invoke(() => SetQfcTheme()); 
-            
+
             //if (async) { _lblSender.BeginInvoke(new System.Action(() => SetQfcTheme())); }
             //else { _lblSender.Invoke(new System.Action(() => SetQfcTheme())); }
         }
-        
+
         public async Task SetQfcThemeAsync()
         {
-            await UiThread.Dispatcher.InvokeAsync(()=> SetQfcTheme());
+            await UiThread.Dispatcher.InvokeAsync(() => SetQfcTheme());
         }
 
         private void SetQfcTheme()
@@ -341,7 +344,7 @@ namespace UtilitiesCS
             }
 
             _menuStrip.BackColor = DefaultBackColor;
-            
+
             _menuStrip.ForeColor = DefaultForeColor;
             // Colors for the folder search
             // TODO: Override the draw function because these colors do not work as expected

@@ -42,8 +42,8 @@ namespace TaskMaster
 
         internal Lazy<bool> BasicLoaded;
 
-        private void ForceBasicLoad() 
-        { 
+        private void ForceBasicLoad()
+        {
             _ = BasicLoaded.Value;
         }
 
@@ -66,7 +66,7 @@ namespace TaskMaster
             await _events.LoadAsync();
         }
 
-        async public Task LoadSequentialAsync() 
+        async public Task LoadSequentialAsync()
         {
             await LoadIntelConfigAsync();
             await _olObjects.LoadAsync();
@@ -85,16 +85,16 @@ namespace TaskMaster
 
         private AppFileSystemFolderPaths _fs;
         public IFileSystemFolderPaths FS => _fs;
-        
+
         private AppOlObjects _olObjects;
         public IOlObjects Ol => _olObjects;
-        
+
         private AppToDoObjects _toDoObjects;
         public IToDoObjects TD => _toDoObjects;
-        
+
         private AppAutoFileObjects _autoFileObjects;
         public IAppAutoFileObjects AF => _autoFileObjects;
-        
+
         private AppEvents _events;
         public IAppEvents Events => _events;
 
@@ -106,13 +106,13 @@ namespace TaskMaster
         async private Task LoadIntelConfigAsync() => await Task.Run(async () => IntelRes = await IntelligenceConfig.LoadAsync(this), default);
 
 
-        public IAppItemEngines Engines { get; private set; } 
+        public IAppItemEngines Engines { get; private set; }
 
         public List<Type> GetClasses()
-            {
-                return ReflectionHelper.GetAllClassesInSolution();
-            }
-        
+        {
+            return ReflectionHelper.GetAllClassesInSolution();
+        }
+
         public string[] GetProjectNames()
         {
             //ProjectCollection.GlobalProjectCollection.LoadedProjects

@@ -31,9 +31,9 @@ namespace UtilitiesCS
         /// <param name="doc">text to be tokenized</param>
         /// <param name="min">minimum token size in characters</param>
         /// <returns>array of word tokens</returns>
-        public static string[] Tokenize(this string doc, int min) 
-        { 
-            return doc.Tokenize(GetRegex(new char[] { }.AsTokenPattern(min))); 
+        public static string[] Tokenize(this string doc, int min)
+        {
+            return doc.Tokenize(GetRegex(new char[] { }.AsTokenPattern(min)));
         }
 
         /// <summary>
@@ -44,9 +44,9 @@ namespace UtilitiesCS
         /// <param name="chars">array of whitespace characters to 
         /// be interpreted as string literals</param>
         /// <returns>array of word tokens</returns>
-        public static string[] Tokenize(this string doc, char[] chars) 
-        { 
-            return doc.Tokenize(GetRegex(chars.AsTokenPattern())); 
+        public static string[] Tokenize(this string doc, char[] chars)
+        {
+            return doc.Tokenize(GetRegex(chars.AsTokenPattern()));
         }
 
         /// <summary>
@@ -58,14 +58,14 @@ namespace UtilitiesCS
         /// <returns>array of word tokens</returns>
         public static string[] Tokenize(this string doc, Regex regex)
         {
-            
+
             return regex.Matches(doc)
                         .Cast<Match>()
                         .Select(x => x.Value
                         .ToLower())
                         .ToArray();
         }
-        
+
         /// <summary>
         /// Create a regex for tokenization with expanded definition of a word
         /// </summary>
@@ -75,7 +75,7 @@ namespace UtilitiesCS
         public static string AsTokenPattern(this char[] chars, int minCharsPerWord = 2)
         {
             string wordPattern = chars.AsRegexWord();
-            return GetTokenPattern(wordPattern, minCharsPerWord);  
+            return GetTokenPattern(wordPattern, minCharsPerWord);
         }
 
         public static Regex GetRegex(string tokenPattern) => new Regex(tokenPattern);
@@ -107,7 +107,7 @@ namespace UtilitiesCS
         /// <returns>Expanded Regex pattern for word</returns>
         public static string AsRegexWord(this char[] chars)
         {
-            if ((chars is null)||(chars.Length == 0)) { return @"\w"; }
+            if ((chars is null) || (chars.Length == 0)) { return @"\w"; }
             else { return @"[\w" + new string(chars) + @"]"; }
         }
     }

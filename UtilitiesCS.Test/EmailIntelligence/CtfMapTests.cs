@@ -229,8 +229,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             });
 
             var expected = new CtfMapEntry(
-                "Reference\\Computer Information", 
-                "68109D5D0ED86B4B8384B64247D96451", 
+                "Reference\\Computer Information",
+                "68109D5D0ED86B4B8384B64247D96451",
                 1);
 
             // Act
@@ -323,7 +323,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void DequeueToNextRecord_StateUnderTest_Remove2()
         {
             // Arrange
-            Queue<string> lines = new( new List<string>
+            Queue<string> lines = new(new List<string>
             {
                 "68109D5D0ED86B4B8384B64247D96451",
                 "1",

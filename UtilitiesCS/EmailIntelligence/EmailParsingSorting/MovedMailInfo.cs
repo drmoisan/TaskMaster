@@ -95,7 +95,7 @@ namespace UtilitiesCS
 
         internal bool NotNull(params object[] parameters) => !parameters.Any(x => x is null);
 
-        public bool IsReadyToUndoMove { get => NotNull(MailItem, FolderOld);}
+        public bool IsReadyToUndoMove { get => NotNull(MailItem, FolderOld); }
 
         public MailItem UndoMove()
         {
@@ -118,10 +118,10 @@ namespace UtilitiesCS
                     ready = false;
                 }
             }
-            if (ready) 
+            if (ready)
             {
                 return $"Undo Move of email?{Environment.NewLine}SentOn: {MailItem.SentOn.ToString("MM/dd/yyyy")}" +
-                       $"{System.Environment.NewLine}{MailItem.Subject}{System.Environment.NewLine}"+
+                       $"{System.Environment.NewLine}{MailItem.Subject}{System.Environment.NewLine}" +
                        $"From: {FolderPathNew}{System.Environment.NewLine}To: {FolderPathOld}";
             }
             else

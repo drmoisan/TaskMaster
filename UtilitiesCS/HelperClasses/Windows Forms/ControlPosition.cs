@@ -22,7 +22,7 @@ namespace UtilitiesCS
         }
 
         public static ControlPosition CreateTemplate(Control control)
-        {            
+        {
             var cp = new ControlPosition(control.Left,
                                          control.Top,
                                          control.Width,
@@ -47,7 +47,7 @@ namespace UtilitiesCS
             var cp = FromTemplate(this, cellVertical, cellHorizontal);
             Set(control, cp);
         }
-        
+
         public static void Set(Control control, ControlPosition template, int cellVertical, int cellHorizontal)
         {
             var cp = FromTemplate(template, cellVertical, cellHorizontal);
@@ -63,7 +63,7 @@ namespace UtilitiesCS
             control.Margin = cp.Margin;
             control.Padding = cp.Padding;
         }
-        
+
         public static ControlPosition FromTemplate(ControlPosition template, int cellVertical, int cellHorizontal)
         {
             var top = template.FixedTop + (template.Height + template.Margin.Vertical) * cellVertical;
@@ -78,7 +78,7 @@ namespace UtilitiesCS
 
             cp.FixedLeft = cp.Left - cp.Margin.Left;
             cp.FixedTop = cp.Top - cp.Margin.Top;
-            
+
             return cp;
         }
 
@@ -111,6 +111,6 @@ namespace UtilitiesCS
 
         private int _fixedTop;
         public int FixedTop { get => _fixedTop; set => _fixedTop = value; }
-        
+
     }
 }

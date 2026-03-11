@@ -1,0 +1,5 @@
+{
+  "dotnet.defaultSolution": "TaskMaster.sln",
+  "dotnet.testWindow.useTestingPlatformProtocol": true,
+  "omnisharp.projectLoadTimeout": 120
+}

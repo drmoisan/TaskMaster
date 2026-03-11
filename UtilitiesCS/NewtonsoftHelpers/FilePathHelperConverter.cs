@@ -32,19 +32,19 @@ namespace UtilitiesCS
         {
             if (!info.TryGetValue("SpecialFolderName", out string folderName)) { return null; }
             if (FileSystemFolders.SpecialFolders.TryGetValue(folderName, out string folderPath))
-            { 
+            {
                 if (info.TryGetValue("RelativePath", out string relativePath))
                 {
                     return Path.Combine(folderPath, relativePath);
                 }
                 else
                 {
-                    return folderPath; 
+                    return folderPath;
                 }
             }
             else
-            { 
-                return null; 
+            {
+                return null;
             }
         }
 
@@ -82,7 +82,7 @@ namespace UtilitiesCS
             var info = new Dictionary<string, string>();
             reader.Read();
             while (reader.TokenType != JsonToken.EndObject)
-            {                
+            {
                 string key = ReadPropertyName(reader);
                 reader.Read();
                 string value = ReadPropertyValue(reader);
@@ -98,7 +98,7 @@ namespace UtilitiesCS
             if (reader.TokenType != JsonToken.PropertyName)
             {
                 string message = $"{GetErrorMessage(reader)}. Reader found a token of type " +
-                    $"{reader.TokenType} when it was expecting a token of type {JsonToken.PropertyName}."; 
+                    $"{reader.TokenType} when it was expecting a token of type {JsonToken.PropertyName}.";
                 throw new JsonReaderException(message);
             }
 
@@ -112,7 +112,7 @@ namespace UtilitiesCS
                     $"name that was null or empty.";
                 throw new JsonReaderException(message, e);
             }
-            
+
         }
 
         private static string GetErrorMessage(JsonReader reader)
@@ -148,11 +148,11 @@ namespace UtilitiesCS
             var matchingFolders = FileSystemFolders.SpecialFolders
                 .Where(x => folderPath.Contains(x.Value));
 
-            if (matchingFolders.Count() == 0) 
-            { 
-                match = new KeyValuePair<string,string>("Not Found", ""); 
+            if (matchingFolders.Count() == 0)
+            {
+                match = new KeyValuePair<string, string>("Not Found", "");
             }
-            else if (matchingFolders.Count() == 1) 
+            else if (matchingFolders.Count() == 1)
             {
                 match = matchingFolders.First();
             }
@@ -161,10 +161,10 @@ namespace UtilitiesCS
                 var max = matchingFolders.Max(x => x.Value.Length);
                 match = matchingFolders.First(x => x.Value.Length == max);
             }
-               
+
             name = match.Key;
-            relativePath = match.Value.Length > 0 ? folderPath.Replace(match.Value, ""): folderPath;
-                        
+            relativePath = match.Value.Length > 0 ? folderPath.Replace(match.Value, "") : folderPath;
+
             return (name, relativePath);
         }
 

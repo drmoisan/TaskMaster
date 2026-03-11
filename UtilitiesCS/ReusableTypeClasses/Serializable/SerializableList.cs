@@ -17,7 +17,7 @@ using System.Threading;
 namespace UtilitiesCS
 {
     [Serializable()]
-    public class SerializableList<T> : IList<T>, ISerializableList<T> where T: IComparable<T>
+    public class SerializableList<T> : IList<T>, ISerializableList<T> where T : IComparable<T>
     {
         public SerializableList()
         {
@@ -229,7 +229,7 @@ namespace UtilitiesCS
             {
                 await SerializeAsync(Filepath);
             }
-            else { await Task.CompletedTask;}
+            else { await Task.CompletedTask; }
 
         }
 
@@ -274,12 +274,12 @@ namespace UtilitiesCS
 
         }
 
-        public void Sort() 
+        public void Sort()
         {
             _innerList = _innerList.OrderBy(x => x).ToList();
         }
 
-        
+
         //public void Serialize(string filepath)
         //{
         //    this.Filepath = filepath;
@@ -401,7 +401,7 @@ namespace UtilitiesCS
                 var settings = new JsonSerializerSettings();
                 settings.TypeNameHandling = TypeNameHandling.Auto;
                 settings.Formatting = Formatting.Indented;
-                _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath),settings);
+                _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath), settings);
                 if (_innerList is null)
                 { throw new FileFormatException("File could not be deserialized correctly"); }
                 //_innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));

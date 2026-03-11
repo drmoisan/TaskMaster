@@ -12,7 +12,7 @@ namespace UtilitiesCS
         /// Serializable concurrent observable dictionary containing word tokens and integer values
         /// </summary>
         IScoDictionary<string, int> Encoder { get; }
-        
+
         /// <summary>
         /// Matches array of tokens against existing values. Integers are 
         /// assigned to each new token on a FIFO basis in increments of 1
@@ -27,7 +27,7 @@ namespace UtilitiesCS
         /// </summary>
         /// <param name="text">string of text to be tokenized and encoded</param>
         void AugmentTokenDict(string text);
-        
+
         /// <summary>
         /// Decodes an array of integers to an array of textual tokens
         /// </summary>

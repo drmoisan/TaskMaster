@@ -31,8 +31,8 @@ namespace UtilitiesCS
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public ManagerAsyncLazy(IApplicationGlobals globals) : base() 
-        { 
+        public ManagerAsyncLazy(IApplicationGlobals globals) : base()
+        {
             Globals = globals;
             ResetConfigAsyncLazy();
         }
@@ -68,7 +68,7 @@ namespace UtilitiesCS
 
         public void ResetConfigAsyncLazy() => Configuration = new(ReadConfiguration);
 
-        internal async Task WriteConfigurationAsync() 
+        internal async Task WriteConfigurationAsync()
         {
             string assemblyDirectory = Path.GetDirectoryName(typeof(ManagerResources).Assembly.Location);
             string resxFilePath = Path.Combine(assemblyDirectory, "ManagerResources.resx");
@@ -93,11 +93,11 @@ namespace UtilitiesCS
             {
                 var loader = (SmartSerializableLoader)sender;
                 if (loader.Config.ClassifierActivated && !this.TryGetValue(nameof(loader.Name), out var classifier))
-                {                    
+                {
                     var classifierGroup = GetAsyncLazyClassifierLoader(loader);
-                    if (classifierGroup != null) 
-                    { 
-                        this[loader.Name] = classifierGroup; 
+                    if (classifierGroup != null)
+                    {
+                        this[loader.Name] = classifierGroup;
                         await Globals.Engines.RestartEngineAsync(loader.Name);
                     }
                 }
@@ -108,7 +108,7 @@ namespace UtilitiesCS
                 }
                 await WriteConfigurationAsync();
             }
-            else if (e.PropertyName.Contains(nameof(SmartSerializableLoader.T))) 
+            else if (e.PropertyName.Contains(nameof(SmartSerializableLoader.T)))
             { await WriteConfigurationAsync(); }
         }
 
@@ -187,7 +187,7 @@ namespace UtilitiesCS
 
         internal AsyncLazy<BayesianClassifierGroup> GetAsyncLazyClassifierLoader(SmartSerializableLoader loader)
         {
-            return new AsyncLazy<BayesianClassifierGroup>(async () => 
+            return new AsyncLazy<BayesianClassifierGroup>(async () =>
             {
                 //Type outerClassType = loader.T;
                 //Type staticClassType = loader.T.GetNestedType("Static", BindingFlags.Static | BindingFlags.Public);
@@ -223,23 +223,23 @@ namespace UtilitiesCS
                 //    logger.Error($"{loader.T.Name}.Static nested static class was not found.");
                 //    return null;
                 //}
-                
+
                 var classifier = await BayesianClassifierGroup.Static.DeserializeAsync(loader, true, GetAltLoader(loader));
                 classifier.PropertyChanged += Config_PropertyChanged;
                 return classifier;
             });
         }
 
-        private Func<BayesianClassifierGroup> GetAltLoader(SmartSerializableLoader loader) 
+        private Func<BayesianClassifierGroup> GetAltLoader(SmartSerializableLoader loader)
         {
             // Get the MethodInfo of the static method
             MethodInfo staticMethod = null;
-            if(loader.T is not null)
+            if (loader.T is not null)
             {
                 staticMethod = loader.T.GetMethod("CreateNewClassifier", BindingFlags.Static | BindingFlags.Public);
             }
-            
-            Func<BayesianClassifierGroup> altLoader = staticMethod is null ? null : () => staticMethod.Invoke(null,null) as BayesianClassifierGroup;
+
+            Func<BayesianClassifierGroup> altLoader = staticMethod is null ? null : () => staticMethod.Invoke(null, null) as BayesianClassifierGroup;
 
             return altLoader;
         }
@@ -253,7 +253,7 @@ namespace UtilitiesCS
             }
         }
 
-        public void ResetLoadClassifierAsyncLazy(string name, SmartSerializableLoader loader) 
+        public void ResetLoadClassifierAsyncLazy(string name, SmartSerializableLoader loader)
         {
             if (loader.Config.ClassifierActivated)
             {

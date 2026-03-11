@@ -7,7 +7,7 @@ namespace UtilitiesCS.HelperClasses.FileSystem
     public class FileSystemInfoWrapper : IFileSystemInfo
     {
         private readonly FileSystemInfo _fileSystemInfo;
-        
+
         public FileSystemInfoWrapper(FileSystemInfo fileSystemInfo)
         {
             _fileSystemInfo = fileSystemInfo ?? throw new ArgumentNullException(nameof(fileSystemInfo));

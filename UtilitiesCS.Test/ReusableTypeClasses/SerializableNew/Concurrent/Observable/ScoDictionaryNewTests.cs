@@ -215,7 +215,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         //    Assert.Fail();
         //    this.mockRepository.VerifyAll();
         //}
-        
+
         #endregion Commented out tests
 
         [TestMethod]

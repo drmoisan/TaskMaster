@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.Interfaces.IReusableTypeClasses
 {
-    public interface IPercentageMatchable<T> 
+    public interface IPercentageMatchable<T>
     {
         /// <summary>
         /// Calculates the percentage match between two collections.

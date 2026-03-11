@@ -20,7 +20,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void TestInitialize()
         {
             Console.SetOut(new DebugTextWriter());
-            this.mockRepository = new MockRepository(MockBehavior.Loose) { CallBase = true};
+            this.mockRepository = new MockRepository(MockBehavior.Loose) { CallBase = true };
             this.dedicated = CreateDedicatedTokens();
             this.dedicated2 = CreateDedicatedTokens2();
 
@@ -61,36 +61,36 @@ namespace UtilitiesCS.Test.EmailIntelligence
         //private Mock<BayesianClassifier> mockBayesianClassifier;
 
         [Obsolete]
-        private class BayesianClassifierSub: BayesianClassifier
+        private class BayesianClassifierSub : BayesianClassifier
         {
             public BayesianClassifierSub() { }
-            public BayesianClassifierSub(ConcurrentDictionary<string, double> prob) 
-            { 
+            public BayesianClassifierSub(ConcurrentDictionary<string, double> prob)
+            {
                 base._prob = prob;
             }
 
             public new ConcurrentDictionary<string, double> Prob { get => base._prob; set => base._prob = value; }
 
-            public new ClassifierGroupSub Parent 
-            { 
+            public new ClassifierGroupSub Parent
+            {
                 get => base._parent as ClassifierGroupSub;
-                set => base._parent = value; 
+                set => base._parent = value;
             }
-            
+
             public new Corpus Match { get => base._match; set => base._match = value; }
             public new Corpus NotMatch { get => base._notMatch; set => base._notMatch = value; }
 
         }
 
         [Obsolete]
-        public class ClassifierGroupSub: ClassifierGroup
+        public class ClassifierGroupSub : ClassifierGroup
         {
             public ClassifierGroupSub() { }
 
             public ClassifierGroupSub(
                 ConcurrentDictionary<string, DedicatedToken> dedicated,
-                Corpus sharedTokenBase) 
-            { 
+                Corpus sharedTokenBase)
+            {
                 base._dedicatedTokens = dedicated;
                 base._sharedTokenBase = sharedTokenBase;
                 base._totalTokenCount = sharedTokenBase.TokenCount + dedicated.Sum(x => x.Value.Count);
@@ -101,10 +101,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
             public new virtual Corpus SharedTokenBase { get => base._sharedTokenBase; set => base._sharedTokenBase = value; }
         }
 
-        public class CorpusSub: Corpus
+        public class CorpusSub : Corpus
         {
             public CorpusSub() { }
-            public CorpusSub(ConcurrentDictionary<string, int> tb) 
+            public CorpusSub(ConcurrentDictionary<string, int> tb)
             {
                 this.TokenFrequency = tb;
                 this.TokenCount = tb.Sum(x => x.Value);
@@ -120,7 +120,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
         private void AddKvp(ConcurrentDictionary<string, DedicatedToken> cd, string token, int count, string folderPath)
         {
-            cd.TryAdd(token, new DedicatedToken() 
+            cd.TryAdd(token, new DedicatedToken()
             { Token = token, Count = count, FolderPath = folderPath });
         }
 
@@ -196,7 +196,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var classifier = CreateBayesianClassifier();
             classifier.Tag = "folderC";
             classifier.Parent = classifierGroup;
-            classifier.Prob = new ConcurrentDictionary<string, double> 
+            classifier.Prob = new ConcurrentDictionary<string, double>
             {
                 ["shared1"] = 0.714285714285714,
                 ["shared2"] = 0.142857142857143,
@@ -216,7 +216,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             var classifier = CreateBayesianClassifier();
             classifier.Tag = "folderC";
-            classifier.Parent = new ClassifierGroupSub(CreateDedicatedTokens2(), new CorpusSub(CreateSharedTokens2())) ;
+            classifier.Parent = new ClassifierGroupSub(CreateDedicatedTokens2(), new CorpusSub(CreateSharedTokens2()));
             classifier.Prob = new ConcurrentDictionary<string, double>(
                 Enumerable.Range(0, 26)
                 .Select(i => new KeyValuePair<string, double>(
@@ -239,14 +239,14 @@ namespace UtilitiesCS.Test.EmailIntelligence
             Console.WriteLine(text);
         }
 
-        private void LogDedicatedTokens() 
+        private void LogDedicatedTokens()
         {
-            Console.WriteLine($"\nDEDICATED TOKENS:\n[{string.Join(",",this.dedicated.Select(x => x.Value.Token))}]");
+            Console.WriteLine($"\nDEDICATED TOKENS:\n[{string.Join(",", this.dedicated.Select(x => x.Value.Token))}]");
         }
 
-        private void LogTokens(IDictionary<string, double> probabilities, string title) 
+        private void LogTokens(IDictionary<string, double> probabilities, string title)
         {
-            Console.WriteLine($"\n{title.ToUpper()}:\n[{string.Join(",", probabilities.Select(x=>x.Key))}]");
+            Console.WriteLine($"\n{title.ToUpper()}:\n[{string.Join(",", probabilities.Select(x => x.Key))}]");
         }
 
         private void LogTokens(IDictionary<string, int> probabilities, string title)
@@ -281,7 +281,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Set up classifier
             var classifier = SetupClassifierScenario1A();
             LogProbabilities(classifier.Prob.OrderBy(x => x.Key).ToDictionary(), "Source probabilities");
-            
+
             // Set up tokens in the Prob list
             List<string> input = ["shared1", "shared1", "dedicated8", "shared4", "shared4", "shared2", "shared7"];
 
@@ -293,7 +293,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Assert
             Console.WriteLine($"Expected: {expected:N5}");
             Console.WriteLine($"Actual:   {actual:N5}");
-            Assert.AreEqual(Math.Round(expected,5), Math.Round(actual,5));
+            Assert.AreEqual(Math.Round(expected, 5), Math.Round(actual, 5));
 
         }
 
@@ -320,10 +320,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Set up tokens in the Prob list
             var input = Enumerable.Range(8, 4).Select(i => alphabet[i].ToString()).ToList();
-            
+
             // Add two duplicate tokens in the Prob list
             input.AddRange(Enumerable.Range(9, 2).Select(i => alphabet[i].ToString()));
-            
+
             // Add Shared and Dedicated tokens that are NOT in the Prob list
             input.AddRange(["dedicated2", "dedicated3", "shared1", "shared2", "shared3", "new1"]);
             Console.WriteLine($"\nInput Tokens: \n[{string.Join(", ", input)}]\n");
@@ -382,7 +382,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Set up the expected output
             var expected = new SortedList<string, double>();
             LogProbabilities(expected, "Expected Output");
-            
+
             // ===============
             // Act
             // ===============
@@ -441,7 +441,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var classifier = SetupClassifierScenario1();
 
             // Set up null token parameter
-            string[] input = ["new1","new2","new3"];
+            string[] input = ["new1", "new2", "new3"];
 
             // Set up the expected output
             var expected = new SortedList<string, double>();
@@ -463,7 +463,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void CombineProbabilities_01ExcludeEntriesAfterInterestingWordCount_ExpectedBehavior()
         {
             Console.WriteLine("Tests whether the cutoff for Knobs.InterestingWordCount is working\n");
-            
+
             // Arrange
             var classifier = this.CreateBayesianClassifier();
             var cutoff = classifier.Knobs.InterestingWordCount;
@@ -492,7 +492,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var classifier = this.CreateBayesianClassifier();
             var cutoff = classifier.Knobs.InterestingWordCount;
             SortedList<string, double> input = [];
-            Enumerable.Range(0, Math.Max(1,cutoff-2)).ForEach(i => input.Add($".00001highprobtoken{i}", 1));
+            Enumerable.Range(0, Math.Max(1, cutoff - 2)).ForEach(i => input.Add($".00001highprobtoken{i}", 1));
             Console.WriteLine($"Interesting Word Count: {cutoff}\n");
             LogProbabilities(input, "Source List of Probabilities");
             double expected = 1;
@@ -515,7 +515,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var classifier = this.CreateBayesianClassifier();
             var cutoff = classifier.Knobs.InterestingWordCount;
             SortedList<string, double> input = [];
-            
+
             LogProbabilities(input, "Source List of Probabilities");
             double expected = 0;
             Console.WriteLine($"Expected: {expected:N2}");
@@ -558,14 +558,14 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 kvp.Key, Math.Round(kvp.Value, 5)))
                 .OrderBy(x => x.Key)
                 .ToDictionary();
-            
+
             // Act
             var result = await BayesianClassifier.FromTokenBaseAsync(
                 parent,
                 tag,
                 matchTokens,
                 token);
-            
+
             var actual = result.Prob.Select(kvp => new KeyValuePair<string, double>(
                 kvp.Key, Math.Round(kvp.Value, 5)))
                 .OrderBy(x => x.Key)
@@ -574,7 +574,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             //LogTokenFrequency(result.Match.TokenFrequency.OrderBy(x => x.Key).ToDictionary(), "Match token frequency");
             LogProbabilities(expected, "Expected probability tokens");
             LogProbabilities(actual, "Resulting probability tokens");
-            
+
             // Assert
             actual.Should().BeEquivalentTo(expected);
         }
@@ -584,7 +584,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             // Arrange
             var bayesianClassifier = new BayesianClassifierSub();
-            
+
 
             List<string> matchTokens = [];
             List<string> notMatchTokens = [];
@@ -599,10 +599,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 notMatchTokens.AddRange(Enumerable.Range(5, 2).Select(i => $"token{i:00}"));
                 notMatchTokens.AddRange(Enumerable.Range(5, 2).Select(i => $"token{i:00}"));
             }
-            
+
             Console.WriteLine($"Match tokens: [{string.Join(",", matchTokens)}]");
             Console.WriteLine($"Not Match tokens: [{string.Join(",", notMatchTokens)}]");
-                        
+
             var expectedMatchFrequency = new Dictionary<string, int>()
             {
                 ["token00"] = 4,
@@ -624,7 +624,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var expectedMatchCount = 28;
 
             var expectedNotMatchCount = 36;
-            
+
             Dictionary<string, double> expectedProb = new()
             {
                 ["token02"] = 0.99990,
@@ -634,7 +634,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 ["token06"] = 0.01100,
                 ["token07"] = 0.01100
             };
-            
+
             // Act
             bayesianClassifier.AddTokens(
                 matchTokens,
@@ -644,10 +644,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var actualMatchCount = bayesianClassifier.MatchCount;
             var actualNotMatchFrequency = bayesianClassifier.NotMatch.TokenFrequency.OrderBy(x => x.Key).ToDictionary();
             var actualNotMatchCount = bayesianClassifier.NotMatchCount;
-            var actualProb = bayesianClassifier.Prob.Select(kvp => 
-                new KeyValuePair<string,double>(kvp.Key, Math.Round(kvp.Value,5)))
+            var actualProb = bayesianClassifier.Prob.Select(kvp =>
+                new KeyValuePair<string, double>(kvp.Key, Math.Round(kvp.Value, 5)))
                 .OrderBy(kvp => kvp.Key).ToDictionary();
-                        
+
             LogTokenFrequency(expectedMatchFrequency, "Expected Match token frequency");
             Console.WriteLine($"Expected Match token count: {expectedMatchCount}");
             Console.WriteLine("");

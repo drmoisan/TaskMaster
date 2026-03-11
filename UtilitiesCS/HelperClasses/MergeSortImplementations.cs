@@ -39,8 +39,8 @@ namespace UtilitiesCS
 
                 return null;
             }
-            
-            return result; 
+
+            return result;
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace UtilitiesCS
             right = new Queue<T>(MergeSort(right.ToList(), comparison));
             var result = left.Merge(right, comparison);
 
-            for (int i = 0; i< count; i++)
+            for (int i = 0; i < count; i++)
             {
                 list[i] = result[i];
             }

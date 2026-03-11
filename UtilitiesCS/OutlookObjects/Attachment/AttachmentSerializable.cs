@@ -18,9 +18,9 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
         #region Constructors
 
         public AttachmentSerializable() { }
-        
-        public AttachmentSerializable(Attachment a, bool imageBytesOnly = true) 
-        {             
+
+        public AttachmentSerializable(Attachment a, bool imageBytesOnly = true)
+        {
             // Serialized Properties
             Type = a.Type;
             BlockLevel = a.BlockLevel;
@@ -35,7 +35,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
                 logger.Error($"Error assigning PathName for type {(OlAttachmentType)Type}. {e.Message}", e);
                 FileName = "";
             }
-            
+
             Index = a.Index;
             if (Type != OlAttachmentType.olEmbeddeditem)
             {
@@ -45,10 +45,10 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
                 }
                 catch (System.Exception e)
                 {
-                    logger.Error($"Error assigning PathName for type {(OlAttachmentType)Type}. {e.Message}", e);                
+                    logger.Error($"Error assigning PathName for type {(OlAttachmentType)Type}. {e.Message}", e);
                 }
             }
-                        
+
             Position = a.Position;
             Size = a.Size;
 
@@ -74,11 +74,11 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
         public string FilenameSeed { get; set; }
 
         private Lazy<bool> _isImage;
-        public bool IsImage 
+        public bool IsImage
         {
-            get 
-            { 
-                if (_isImage is null) 
+            get
+            {
+                if (_isImage is null)
                 {
                     _isImage = new Lazy<bool>(IsAnImage);
                     var caller = new System.Diagnostics.StackTrace().GetMyMethodNames().FirstOrDefault();
@@ -86,8 +86,8 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
                         $"before underlying {_isImage.GetType()} was set");
                 }
                 return _isImage.Value;
-            } 
-            set => _isImage = value.ToLazyValue(); 
+            }
+            set => _isImage = value.ToLazyValue();
         }
 
         private Lazy<byte[]> _data;
@@ -114,8 +114,8 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
         internal byte[] GetBytes(Attachment attachment)
         {
             byte[] bytes = null;
-            
-            if (!IsImage & ImageBytesOnly) { return bytes;}
+
+            if (!IsImage & ImageBytesOnly) { return bytes; }
 
             if (Type != OlAttachmentType.olByValue)
             {
@@ -132,7 +132,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
             {
                 TryFromSaveAsLoad(attachment, out bytes);
             }
-            
+
             return bytes;
         }
 
@@ -140,7 +140,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
         {
             bytes = null;
             var tempFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var fileName = $"temp_{DateTime.Now:yyyyMMddHHmmssf}"; 
+            var fileName = $"temp_{DateTime.Now:yyyyMMddHHmmssf}";
             var tempFilePath = Path.Combine(tempFolderPath, fileName);
             try
             {
@@ -154,7 +154,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
             }
             return bytes is not null;
         }
-        
+
         internal bool TryFromAccessor(Attachment attachment, out byte[] bytes)
         {
             const string PR_ATTACH_DATA_BIN = "http://schemas.microsoft.com/mapi/proptag/0x37010102";
@@ -163,8 +163,8 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
             {
                 bytes = attachment.PropertyAccessor.GetProperty(PR_ATTACH_DATA_BIN);
             }
-            catch (System.Exception) 
-            { 
+            catch (System.Exception)
+            {
                 return false;
             }
 

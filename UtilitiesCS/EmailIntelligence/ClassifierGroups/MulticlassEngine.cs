@@ -30,7 +30,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         /// <summary>
         /// Initializes a new instance of the <see cref="MulticlassEngine"/> class.
         /// </summary>
-        protected MulticlassEngine() {  }
+        protected MulticlassEngine() { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MulticlassEngine"/> class with the specified globals.
@@ -48,7 +48,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         /// <typeparam name="T">The type of the multiclass engine.</typeparam>
         /// <param name="groupName">The name of the group.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the initialized engine.</returns>        
-        public async Task<T> InitAsync(string groupName) 
+        public async Task<T> InitAsync(string groupName)
         {
             Globals.ThrowIfNull();
 
@@ -111,14 +111,14 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             Globals.ThrowIfNull();
 
             var miner = new EmailDataMiner(Globals);
-            
+
             // Set up Progress Tracking            
             var (ppkg, sw) = await SetupProgressTracking();
 
             // Load the staging data            
             MinedMailInfo[] collection = await LoadStagingData(ppkg, sw);
             var allocation = (100 - ppkg.ProgressTrackerPane.Progress);
-            
+
             // Remove the existing Category Classifier
             Globals.AF.Manager.TryRemove(EngineName, out _);
 
@@ -331,7 +331,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         /// Delegate from the <seealso cref="IConditionalEngine{}"/> interface representing the 
         /// asynchronous action that initializes the engine
         /// </summary>
-        public Func<IApplicationGlobals, Task> EngineInitializer { get; internal set; } = async(globals) => await Task.CompletedTask;
+        public Func<IApplicationGlobals, Task> EngineInitializer { get; internal set; } = async (globals) => await Task.CompletedTask;
 
         /// <summary>
         /// Property from the <seealso cref="IConditionalEngine{}"/> interface that represents the name of the engine

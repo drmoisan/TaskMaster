@@ -43,7 +43,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
             public int GetAdditionalField2() => AdditionalField2;
         }
-                
+
         private class RemainingObjectClass
         {
             public string AdditionalField1 { get; set; }
@@ -61,17 +61,17 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         }
 
         private class RemainingObjectClass1
-        {            
+        {
             public NewSmartSerializableConfig Config { get; set; }
         }
 
-        private class DerivedTest2: ScDictionary<string, string>
+        private class DerivedTest2 : ScDictionary<string, string>
         {
             public string AdditionalField1 { get; set; }
             private int AdditionalField2;
             private string _additionalField3;
             public string AdditionalField3 { get => _additionalField3; set => _additionalField3 = value; }
-            
+
             public DerivedTest2()
             {
                 AdditionalField1 = "Test";
@@ -108,7 +108,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         }
 
         private WrapperScDictionary<DerivedTest2, string, string> GetWrapperComposedTest2()
-        {            
+        {
             var wrapper = new WrapperScDictionary<DerivedTest2, string, string>();
             wrapper.ConcurrentDictionary.TryAdd("key1", "value1");
             wrapper.ConcurrentDictionary.TryAdd("key2", "value2");
@@ -118,14 +118,14 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             return wrapper;
         }
 
-        public static class ConfigInitializer 
+        public static class ConfigInitializer
         {
             public static NewSmartSerializableConfig InitConfig(NewSmartSerializableConfig config, IApplicationGlobals globals)
             {
                 config.Disk.FileName = "testdict.json";
-                if (globals.FS.SpecialFolders.TryGetValue("AppData", out var appData)) 
-                { 
-                    config.Disk.FolderPath = appData; 
+                if (globals.FS.SpecialFolders.TryGetValue("AppData", out var appData))
+                {
+                    config.Disk.FolderPath = appData;
                     config.NetDisk.FileName = "testdict.json";
                     config.NetDisk.FolderPath = appData;
                     config.LocalDisk = config.Disk;
@@ -137,13 +137,13 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
                     return config;
                 }
                 return null;
-                
+
             }
         }
 
         [TestMethod]
-        public void ToComposition_ShouldExtractScDictionaryAndFields() 
-        { 
+        public void ToComposition_ShouldExtractScDictionaryAndFields()
+        {
             // Arrange
             var derived = GetDerivedTest2();
             var expected = GetWrapperComposedTest2();

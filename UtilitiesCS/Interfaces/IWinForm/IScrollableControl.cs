@@ -2,13 +2,13 @@
 using System.Windows.Forms;
 
 namespace UtilitiesCS.Interfaces.IWinForm
-{ 
-    public interface IScrollableControl: IControl
+{
+    public interface IScrollableControl : IControl
     {
         bool AutoScroll { get; set; }
         Size AutoScrollMargin { get; set; }
         Size AutoScrollMinSize { get; set; }
-        Point AutoScrollPosition { get; set; }        
+        Point AutoScrollPosition { get; set; }
         ScrollableControl.DockPaddingEdges DockPadding { get; }
         HScrollProperties HorizontalScroll { get; }
         VScrollProperties VerticalScroll { get; }

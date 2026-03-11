@@ -15,15 +15,15 @@ namespace UtilitiesCS
 {
     public static class UiThread
     {
-        public static void Init(bool monitorUiThread = false) 
-        { 
+        public static void Init(bool monitorUiThread = false)
+        {
             _monitorUiThread = monitorUiThread;
             if (_loaded.CheckAndSetFirstCall)
             {
                 Initialize();
             }
         }
-        
+
         private static bool _monitorUiThread;
         private static ThreadSafeSingleShotGuard _loaded = new ThreadSafeSingleShotGuard();
         private static void Initialize()
@@ -50,7 +50,7 @@ namespace UtilitiesCS
 
             _syncContextForm.Hide();
         }
-                
+
         private static SyncContextForm _syncContextForm;
 
         #region UI Thread Synchronization
@@ -62,7 +62,7 @@ namespace UtilitiesCS
             private readonly SynchronizationContext _context;
             public SynchronizationContextAwaiter(SynchronizationContext context)
             {
-                if(context is null) { throw new ArgumentNullException(nameof(context)); }
+                if (context is null) { throw new ArgumentNullException(nameof(context)); }
                 _context = context;
             }
 
@@ -77,7 +77,7 @@ namespace UtilitiesCS
         {
             return new SynchronizationContextAwaiter(context);
         }
-    
+
         public static SynchronizationContext UiSyncContext
         {
             get
@@ -88,10 +88,10 @@ namespace UtilitiesCS
             private set => _uiSyncContext = value;
         }
         private static SynchronizationContext _uiSyncContext;
-        
+
         public static int UiThreadId { get => _uiThreadId; private set => _uiThreadId = value; }
         private static int _uiThreadId = -1;
-        
+
         public static Dispatcher Dispatcher { get => _dispatcher; private set => _dispatcher = value; }
         private static Dispatcher _dispatcher;
 
@@ -101,12 +101,12 @@ namespace UtilitiesCS
 
         private static ThreadMonitor _threadMonitor;
 
-        public static System.Drawing.SizeF AutoScaleFactor 
+        public static System.Drawing.SizeF AutoScaleFactor
         {
-            get 
-            { 
-                if (_autoScaleFactor is null) { Init();  }
-                return (System.Drawing.SizeF)_autoScaleFactor; 
+            get
+            {
+                if (_autoScaleFactor is null) { Init(); }
+                return (System.Drawing.SizeF)_autoScaleFactor;
             }
             private set => _autoScaleFactor = value;
         }

@@ -19,7 +19,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             bool addToSharedTokens,
             CancellationToken token)
         {
-            return await BayesianClassifierShared.FromTokenBaseAsync(parent, tag, 
+            return await BayesianClassifierShared.FromTokenBaseAsync(parent, tag,
                 matchTokens.GroupAndCount(), emailCount, addToSharedTokens, token);
         }
 
@@ -42,11 +42,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         public static async Task<Dictionary<string, int>> GroupAndCountAsync(
-            this IEnumerable<string> items) 
-        { 
+            this IEnumerable<string> items)
+        {
             return await Task.Run(() => items.GroupBy(item => item)
                                              .ToDictionary(
-                                                 group => group.Key, 
+                                                 group => group.Key,
                                                  group => group.Count()));
         }
 

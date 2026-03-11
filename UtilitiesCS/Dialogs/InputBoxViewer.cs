@@ -29,12 +29,12 @@ namespace UtilitiesCS
 
         private void Ok_Click(object sender, EventArgs e)
         {
-            if (Input.Text == "") 
+            if (Input.Text == "")
             {
                 MessageBox.Show("Please enter a value or cancel.");
             }
-            else 
-            {  
+            else
+            {
                 DialogResult = DialogResult.OK;
                 this.Hide();
             }

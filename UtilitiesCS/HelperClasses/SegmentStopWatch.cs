@@ -9,38 +9,38 @@ using System.Threading;
 
 namespace UtilitiesCS.HelperClasses
 {
-    public class SegmentStopWatch: Stopwatch
+    public class SegmentStopWatch : Stopwatch
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public SegmentStopWatch(): base() 
-        { 
+        public SegmentStopWatch() : base()
+        {
             if (UiThread.UiThreadId == Thread.CurrentThread.ManagedThreadId)
             {
-                
+
                 logger.Warn($"SegmentStopWatch created on UI thread {Thread.CurrentThread.ManagedThreadId}" +
-                    $"\nStackTrace: {string.Join(" => ",TraceUtility.GetMyMethodNames(new StackTrace()))}");
+                    $"\nStackTrace: {string.Join(" => ", TraceUtility.GetMyMethodNames(new StackTrace()))}");
             }
         }
 
         private TimeSpan _latestElapsed = default;
-        
+
         private Stack<(string ActionName, TimeSpan Duration)> _durations = new();
         public Stack<(string ActionName, TimeSpan Duration)> Durations => _durations;
 
-        public new SegmentStopWatch Start() 
-        { 
+        public new SegmentStopWatch Start()
+        {
             base.Start();
             return this;
         }
-        
+
         public new SegmentStopWatch Stop()
         {
             base.Stop();
             return this;
         }
-                
+
         public void LogDuration(string actionName)
         {
             TimeSpan duration = this.Elapsed - _latestElapsed;
@@ -59,13 +59,13 @@ namespace UtilitiesCS.HelperClasses
             }
         }
 
-        public Stack<(string ActionName, TimeSpan Duration)> GroupByActionName(bool inplace = false) 
+        public Stack<(string ActionName, TimeSpan Duration)> GroupByActionName(bool inplace = false)
         {
             var grouped = _durations
                 .Reverse()
                 .GroupBy(x => x.ActionName)
-                .Select(group => 
-                { 
+                .Select(group =>
+                {
                     var actionName = group.Key;
                     var duration = TimeSpan.FromTicks(group.Sum(x => x.Duration.Ticks));
                     return (ActionName: actionName, Duration: duration);
@@ -102,7 +102,7 @@ namespace UtilitiesCS.HelperClasses
         public void WriteToLog([CallerMemberName] string methodName = "", bool clear = true)
         {
             var text = GetDurations(methodName);
-            if (clear) 
+            if (clear)
             { _durations.Clear(); }
             logger.Info($"\n{text}");
         }
@@ -121,7 +121,7 @@ namespace UtilitiesCS.HelperClasses
                 })
                 .ToStack();
         }
-        
+
         public static Stack<(string ActionName, TimeSpan Duration)> GroupDurations(
                        Stack<(string ActionName, TimeSpan Duration)> d1,
                        Stack<(string ActionName, TimeSpan Duration)> d2)
@@ -135,7 +135,7 @@ namespace UtilitiesCS.HelperClasses
                     var duration = TimeSpan.FromTicks(group.Sum(x => x.Duration.Ticks));
                     return (ActionName: actionName, Duration: duration);
                 })
-                .ToStack(); 
+                .ToStack();
         }
     }
 }

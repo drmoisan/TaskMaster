@@ -13,7 +13,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        
+
         private IApplicationGlobals _globals = globals;
         internal IApplicationGlobals Globals => _globals;
 
@@ -87,7 +87,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             if (File.Exists(disk.FilePath))
             {
                 var fileText = await disk.ReadTextWithProgressAsync(progress, $"Reading {disk.FileName} Async: ");
-                                
+
                 try
                 {
                     item = JsonConvert.DeserializeObject<T>(fileText, jsonSettings);
@@ -96,7 +96,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
                 {
                     logger.Error($"Error deserializing {disk.FileName}\n{e.Message}\nStack Trace:\n{e.StackTrace}", e);
                 }
-                
+
             }
             return item;
         }
@@ -175,7 +175,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             var serializer = JsonSerializer.Create(jsonSettings);
             var disk = GetDisk(fileNameSeed, fileNameSuffix, fileExtension);
 
-            await serializer.SerializeWithProgressAsync(obj, disk, progress, cancel, progressPrefix);            
+            await serializer.SerializeWithProgressAsync(obj, disk, progress, cancel, progressPrefix);
         }
 
         public virtual async Task WriteTextsAsync(string filePath, IEnumerable<string> texts)
@@ -190,7 +190,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
                     byte[] encodedText = Encoding.Unicode.GetBytes(text + Environment.NewLine);
                     await sourceStream.WriteAsync(encodedText, 0, encodedText.Length);
                 });
-            };
+            }
+            ;
         }
 
         internal virtual void SerializeAndSave<T>(T obj, JsonSerializer serializer, FilePathHelper disk)

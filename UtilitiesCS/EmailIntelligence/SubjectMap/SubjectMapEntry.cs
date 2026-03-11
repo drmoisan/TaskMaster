@@ -78,11 +78,11 @@ namespace UtilitiesCS
         {
             _subjectTokens = emailSubject.Tokenize(_tokenizerRegex);
             _subjectTokens = _subjectTokens.StripCommonWords(_commonWords);
-            if (_subjectTokens.Count() == 0) 
-            { 
-                throw new System.InvalidOperationException($"{nameof(emailSubject)} {emailSubject} has no valid tokens"); 
+            if (_subjectTokens.Count() == 0)
+            {
+                throw new System.InvalidOperationException($"{nameof(emailSubject)} {emailSubject} has no valid tokens");
             }
-            _subjectText = string.Join(" ",_subjectTokens);
+            _subjectText = string.Join(" ", _subjectTokens);
             _subjectWordLengths = _subjectTokens.Select(x => x.Length).ToArray();
             _subjectEmailCount = emailSubjectCount;
             if (ReadyToEncode(_subjectTokens, false))
@@ -99,37 +99,37 @@ namespace UtilitiesCS
                 {
                     throw e;
                 }
-                
+
 
             }
         }
         internal void Init(string emailFolder, string emailSubject, int emailSubjectCount, IList<string> commonWords)
         {
             _commonWords = commonWords;
-            
-            Init(emailFolder: emailFolder, 
-                 emailSubject: emailSubject, 
+
+            Init(emailFolder: emailFolder,
+                 emailSubject: emailSubject,
                  emailSubjectCount: emailSubjectCount);
         }
         internal void Init(string emailFolder, string emailSubject, int emailSubjectCount)
         {
             _folderPath = emailFolder;
-            if (_folderPath is null) { throw new System.ArgumentNullException(emailFolder, $"{nameof(emailFolder)} is null");}
-            
+            if (_folderPath is null) { throw new System.ArgumentNullException(emailFolder, $"{nameof(emailFolder)} is null"); }
+
             _folderName = emailFolder.Split("\\").Last();
             _folderTokens = _folderName.Tokenize(_tokenizerRegex);
             _folderWordLengths = _folderTokens.Select(x => x.Length).ToArray();
 
             if (_folderTokens.Count() == 0)
             {
-                throw new System.InvalidOperationException($"{nameof(emailFolder)} {emailFolder} has no valid tokens"); 
+                throw new System.InvalidOperationException($"{nameof(emailFolder)} {emailFolder} has no valid tokens");
             }
 
             _subjectText = emailSubject;
             _subjectTokens = _subjectText.Tokenize(_tokenizerRegex);
-            if ((_commonWords is not null)&(_subjectTokens.Length > 0)) 
-            { 
-                _subjectTokens.StripCommonWords(_commonWords); 
+            if ((_commonWords is not null) & (_subjectTokens.Length > 0))
+            {
+                _subjectTokens.StripCommonWords(_commonWords);
             }
             if (_subjectTokens.Count() == 0)
             {
@@ -140,19 +140,19 @@ namespace UtilitiesCS
         }
 
         #endregion Constructors and Initializers
-                
+
         #region Public Properties
 
         [JsonIgnore]
         public IList<string> CommonWords { get => _commonWords; set => _commonWords = value; }
         private IList<string> _commonWords;
 
-        public string Folderpath 
-        { 
-            get => _folderPath; 
-            set 
-            { 
-                _folderPath = value; 
+        public string Folderpath
+        {
+            get => _folderPath;
+            set
+            {
+                _folderPath = value;
                 _folderName = _folderPath.Split("\\").Last();
                 _folderTokens = _folderName.Tokenize(_tokenizerRegex);
                 _folderWordLengths = _folderTokens.Select(x => x.Length).ToArray();
@@ -174,14 +174,14 @@ namespace UtilitiesCS
             }
         }
         private string _folderPath;
-        
+
         public string Foldername { get => _folderName; }
         private string _folderName;
-        
-        public string EmailSubject 
-        { 
+
+        public string EmailSubject
+        {
             get => _subjectText;
-            set 
+            set
             {
                 if (value is null)
                 {
@@ -210,30 +210,30 @@ namespace UtilitiesCS
                         throw e;
                     }
                 }
-            } 
+            }
         }
         private string _subjectText;
-        
+
         public int EmailSubjectCount { get => _subjectEmailCount; set => _subjectEmailCount = value; }
         private int _subjectEmailCount;
 
         [JsonIgnore]
-        public ISubjectMapEncoder Encoder 
-        { 
+        public ISubjectMapEncoder Encoder
+        {
             get => _encoder;
-            set 
-            { 
+            set
+            {
                 _encoder = value;
                 if (ReadyToEncode(throwEx: false))
                     this.Encode();
             }
         }
         private ISubjectMapEncoder _encoder;
-        
+
         public int[] FolderWordLengths { get => _folderWordLengths; set => _folderWordLengths = value; }
         private int[] _folderWordLengths;
 
-        public int[] FolderEncoded 
+        public int[] FolderEncoded
         {
             get
             {
@@ -272,10 +272,10 @@ namespace UtilitiesCS
         public int Score { get => _score; set => _score = value; }
         private int _score = 0;
 
-        public int[] SubjectEncoded 
+        public int[] SubjectEncoded
         {
-            get 
-            { 
+            get
+            {
                 // Encode subject only if it is null, we have an active encoder, and we are ready to encode
                 if (_subjectEncoded is null && _encoder is not null && ReadyToEncode(_subjectTokens, false))
                 {
@@ -292,22 +292,22 @@ namespace UtilitiesCS
                         throw e;
                     }
                 }
-                return _subjectEncoded; 
+                return _subjectEncoded;
             }
-            set 
-            { 
-                if (value is null) 
-                { 
+            set
+            {
+                if (value is null)
+                {
                     Debug.WriteLine("SubjectEncoded set to null");
                 }
-                _subjectEncoded = value; 
-            } 
+                _subjectEncoded = value;
+            }
         }
         private int[] _subjectEncoded;
-        
+
         public int[] SubjectWordLengths { get => _subjectWordLengths; set => _subjectWordLengths = value; }
-        private int[] _subjectWordLengths;  
-                        
+        private int[] _subjectWordLengths;
+
         public Regex TokenizerRegex { get => _tokenizerRegex; set => _tokenizerRegex = value; }
         private Regex _tokenizerRegex;
 
@@ -351,7 +351,7 @@ namespace UtilitiesCS
             Init(emailFolder: _folderPath, emailSubject: _subjectText, emailSubjectCount: _subjectEmailCount);
             if (ReadyToEncode(encoder)) { Encode(); }
         }
-        
+
         public void Encode(ISubjectMapEncoder encoder)
         {
             if (ReadyToEncode(encoder)) { Encode(); }
@@ -364,12 +364,12 @@ namespace UtilitiesCS
             {
                 return _encoder.Encode(tokens);
             }
-            else 
-            { 
-                return null; 
+            else
+            {
+                return null;
             }
         }
-    
+
         internal int[] Encode(ISubjectMapEncoder encoder, string text)
         {
             if (text is null) { return null; }
@@ -390,12 +390,12 @@ namespace UtilitiesCS
 
         public bool Equals(ISubjectMapEntry other)
         {
-            return this.EmailSubject == other.EmailSubject && 
+            return this.EmailSubject == other.EmailSubject &&
                 this.Folderpath == other.Folderpath;
         }
 
         public void LogObjectState() => logger.Debug(JsonConvert.SerializeObject(this));
-        
+
         public bool ReadyToEncode(ISubjectMapEncoder encoder)
         {
             _encoder = encoder;
@@ -405,13 +405,13 @@ namespace UtilitiesCS
         public bool ReadyToEncode(bool throwEx)
         {
             if (IsNull(_encoder, nameof(_encoder), throwEx)) return false;
-            
+
             string[] tokens = TokensToEncode(throwEx);
 
             if (IsNull(tokens, nameof(tokens), throwEx) || tokens.Length == 0) return false;
-            
-            _encoder.AugmentTokenDict(tokens); 
-            
+
+            _encoder.AugmentTokenDict(tokens);
+
             return true;
         }
 
@@ -439,16 +439,16 @@ namespace UtilitiesCS
 
         internal string[] TokensToEncode(bool throwEx)
         {
-            if ((_folderTokens is null) || (_folderTokens.Length == 0)) 
+            if ((_folderTokens is null) || (_folderTokens.Length == 0))
             {
                 if (throwEx)
                 {
                     throw new System.ArgumentNullException(
                         nameof(_folderTokens), $"{nameof(_folderTokens)} is null or empty");
                 }
-                else 
-                { 
-                    return null; 
+                else
+                {
+                    return null;
                 }
             }
             else if ((_subjectTokens is null) || (_subjectTokens.Length == 0)) { return _folderTokens; }

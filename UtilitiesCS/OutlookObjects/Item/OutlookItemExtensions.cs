@@ -52,7 +52,7 @@ namespace UtilitiesCS.OutlookExtensions
             else if (item.InnerObject is TaskItem) { return OlItemType.olTaskItem; }
             // Technically the item type is incorrect for a meeting response, but it will serve the purpose of identifying
             // the item as a meeting-related item and should contain the same properties.
-            else if (item.InnerObject is MeetingItem) { return OlItemType.olAppointmentItem; }            
+            else if (item.InnerObject is MeetingItem) { return OlItemType.olAppointmentItem; }
             else
             {
                 throw new ArgumentException($"{item.InnerObject.GetType().Name} is not a supported type for {nameof(OlItemType)} class.");
@@ -108,21 +108,21 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        internal static object TryGetPropertyValue<T>(this OutlookItem item, string propertyName, string propertyNameAlt, Func<object, T> converter, Func<object, T> converterAlt) 
+        internal static object TryGetPropertyValue<T>(this OutlookItem item, string propertyName, string propertyNameAlt, Func<object, T> converter, Func<object, T> converterAlt)
         {
             var value = TryGetPropertyValue(item, propertyName);
-            if (value is not null) 
+            if (value is not null)
             {
                 if (converter is null) { return value; }
                 else { return converter(value); }
-            } 
+            }
             value = TryGetPropertyValue(item, propertyNameAlt);
-            if (value is not null) 
+            if (value is not null)
             {
                 if (converterAlt is null) { return value; }
                 else { return converterAlt(value); }
             }
-            else { return null; }            
+            else { return null; }
         }
 
         internal static PropertyInfo TryGetPropertyInfo(this OutlookItem item, string propertyName)
@@ -143,7 +143,7 @@ namespace UtilitiesCS.OutlookExtensions
 
         internal static object TryGetPropertyValue(this OutlookItem item, string propertyName)
         {
-            
+
             try
             {
                 return item.ItemType.InvokeMember(
@@ -164,7 +164,7 @@ namespace UtilitiesCS.OutlookExtensions
                 {
                     logger.Debug($"{nameof(OutlookItemExtensions)}.{nameof(TryGetPropertyValue)} threw an " +
                         $"exception for property [{propertyName}]. {e.Message}", e);
-                    return null;                    
+                    return null;
                 }
             }
 
@@ -190,7 +190,7 @@ namespace UtilitiesCS.OutlookExtensions
 
         internal static bool TrySetPropertyValue(this OutlookItem item, string propertyName, object propertyValue)
         {
-            
+
             try
             {
                 item.ItemType.InvokeMember(
@@ -219,7 +219,7 @@ namespace UtilitiesCS.OutlookExtensions
             }
 
 
-            
+
         }
 
         internal static object TryCallMethod(this OutlookItem item, string methodName)

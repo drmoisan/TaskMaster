@@ -7,7 +7,7 @@ using System.Numerics;
 
 namespace ToDoModel.Test
 {
-	[TestClass]
+    [TestClass]
     public class BaseChangerTests
     {
         private MockRepository mockRepository;
@@ -72,7 +72,7 @@ namespace ToDoModel.Test
             // Assert
             Assert.AreEqual(expected, actual);
         }
-        
+
         [TestMethod]
         public void ToBase10_StateUnderTest_ExpectedBehavior_1Z()
         {

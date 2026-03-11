@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace QuickFiler.Controllers
 {
-    public interface IQfcQueue: INotifyCollectionChanged, INotifyPropertyChanged
+    public interface IQfcQueue : INotifyCollectionChanged, INotifyPropertyChanged
     {
         int Count { get; }
         int JobsRunning { get; }

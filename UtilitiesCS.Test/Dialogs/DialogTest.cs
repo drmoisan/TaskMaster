@@ -10,11 +10,11 @@ namespace Z.Disabled.UtilitiesCS.Test
     public class DialogTest
     {
         private delegate DialogResult TestDelegate();
-                
+
         [TestMethod]
         public void Form_TestMethod1()
         {
-            
+
             //string title, string message, Dictionary< string,Delegate > map
             string title = "TestDialog";
             string message = "This is a test to see if this is working properly";
@@ -23,7 +23,7 @@ namespace Z.Disabled.UtilitiesCS.Test
             map.Add("CANCEL", new TestDelegate(buttonCancel));
 
             MyBoxViewer _box = new MyBoxViewer(title, message, map);
-            
+
             //Disabled
             //DialogResult result = _box.ShowDialog();
             //Assert.IsTrue(result == DialogResult.OK);
@@ -45,10 +45,10 @@ namespace Z.Disabled.UtilitiesCS.Test
             return DialogResult.Cancel;
         }
 
-        
+
     }
 
-    
+
     //public static class MyDelegates
     //{
     //    public static DialogResult buttonOK()

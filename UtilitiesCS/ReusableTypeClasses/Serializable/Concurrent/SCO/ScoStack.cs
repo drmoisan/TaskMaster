@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
-    public class ScoStack<T>: ScoCollection<T>
+    public class ScoStack<T> : ScoCollection<T>
     {
         public ScoStack() : base() { }
         public ScoStack(List<T> listOfT) : base(listOfT) { }

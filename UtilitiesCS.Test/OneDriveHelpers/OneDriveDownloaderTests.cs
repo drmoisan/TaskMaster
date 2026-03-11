@@ -20,7 +20,7 @@ namespace UtilitiesCS.Test.OneDriveHelpers
         //private Mock<OneDriveDownloader> downloaderMock;
         //private Mock<HttpClient> clientMock;
         //private HttpResponseMessage httpResponseMessage;
-        
+
 
 
 
@@ -28,8 +28,8 @@ namespace UtilitiesCS.Test.OneDriveHelpers
         public void TestInitialize()
         {
             this.mockRepository = new MockRepository(MockBehavior.Loose);
-            
-            
+
+
         }
 
         public class Downloader : OneDriveDownloader
@@ -49,13 +49,14 @@ namespace UtilitiesCS.Test.OneDriveHelpers
             return Encoding.UTF8.GetBytes(input);
         }
 
-        public byte[] StreamToByteArray(Stream input) 
+        public byte[] StreamToByteArray(Stream input)
         {
             using (var memoryStream = new MemoryStream())
             {
                 input.CopyTo(memoryStream);
                 return memoryStream.ToArray();
-            };
+            }
+            ;
         }
 
         //[TestMethod]
@@ -78,9 +79,9 @@ namespace UtilitiesCS.Test.OneDriveHelpers
         //        url,
         //        timeoutMs,
         //        cancel);
-            
+
         //    actual = StreamToByteArray(result);
-            
+
         //    // Assert
         //    expected.Should().BeEquivalentTo(actual);
         //}
@@ -104,7 +105,7 @@ namespace UtilitiesCS.Test.OneDriveHelpers
         //        cancel);
 
         //    // Assert
-            
+
         //}
 
         //[TestMethod]
@@ -125,7 +126,7 @@ namespace UtilitiesCS.Test.OneDriveHelpers
         //        timeoutMs,
         //        cancel);
         //    var actual = StreamToByteArray(result);
-            
+
 
         //    // Assert
         //    actual.Should().BeEquivalentTo(expected);

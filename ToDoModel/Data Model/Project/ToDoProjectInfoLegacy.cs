@@ -47,7 +47,7 @@ namespace ToDoModel.Legacy
 
         public bool Contains_ProjectName(string projectName)
         {
-            return base.FindIndex(x => x.ProjectName.ToLower() == projectName.ToLower()) !=-1;
+            return base.FindIndex(x => x.ProjectName.ToLower() == projectName.ToLower()) != -1;
         }
 
         public string Programs_ByProjectNames(string projectNames)
@@ -59,7 +59,7 @@ namespace ToDoModel.Legacy
                             select projectInfo.ProgramName;
 
                 string strTemp = query.First().ToString();
-                
+
                 return strTemp;
             }
             catch (Exception ex)

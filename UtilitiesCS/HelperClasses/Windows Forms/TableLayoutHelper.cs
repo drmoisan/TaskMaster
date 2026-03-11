@@ -9,7 +9,7 @@ namespace UtilitiesCS
 {
     public static class TableLayoutHelper
     {
-        public static void InsertSpecificRow(this TableLayoutPanel panel, int rowIndex, RowStyle templateStyle, int insertCount = 1) 
+        public static void InsertSpecificRow(this TableLayoutPanel panel, int rowIndex, RowStyle templateStyle, int insertCount = 1)
         {
             // If not on the UI thread, invoke the method on the UI thread
             if (panel.InvokeRequired)
@@ -18,7 +18,7 @@ namespace UtilitiesCS
                 return;
             }
 
-            if ((rowIndex < 0)||(rowIndex>panel.RowCount))
+            if ((rowIndex < 0) || (rowIndex > panel.RowCount))
             {
                 throw new ArgumentOutOfRangeException(nameof(rowIndex));
             }
@@ -50,12 +50,12 @@ namespace UtilitiesCS
         public static void RemoveSpecificRow(this TableLayoutPanel panel, int rowIndex, int removeCount = 1)
         {
             // If not on the UI thread, invoke the method on the UI thread
-            if (panel.InvokeRequired) 
+            if (panel.InvokeRequired)
             {
                 panel.Invoke(() => RemoveSpecificRow(panel, rowIndex, removeCount));
                 return;
             }
-            
+
             if (rowIndex >= panel.RowCount)
             {
                 return;
@@ -70,7 +70,7 @@ namespace UtilitiesCS
                     panel.Controls.Remove(control);
                 }
             }
-            
+
 
             // move up row controls that comes after row we want to remove
             for (int i = rowIndex + removeCount; i < panel.RowCount; i++)
@@ -87,7 +87,7 @@ namespace UtilitiesCS
 
             // remove specific styles
             //for (int i = rowIndex; i < rowIndex + removeCount; i++)
-            for (int i = rowIndex + removeCount -1; i >= rowIndex; i--)
+            for (int i = rowIndex + removeCount - 1; i >= rowIndex; i--)
             {
                 panel.RowStyles.RemoveAt(i);
             }
@@ -103,7 +103,7 @@ namespace UtilitiesCS
                 panel.Invoke(() => RemoveSpecificColumn(panel, colIndex, removeCount));
                 return;
             }
-            
+
             if (colIndex >= panel.ColumnCount)
             {
                 return;
@@ -114,7 +114,7 @@ namespace UtilitiesCS
                 // delete all controls of column or set of columns that we want to delete
                 for (int j = 0; j < panel.RowCount; j++)
                 {
-                    var control = panel.GetControlFromPosition(i,j);
+                    var control = panel.GetControlFromPosition(i, j);
                     if (control is not null)
                         panel.Controls.Remove(control);
                 }
@@ -138,8 +138,8 @@ namespace UtilitiesCS
             {
                 panel.ColumnStyles.RemoveAt(i);
             }
-            
-            
+
+
 
             panel.ColumnCount -= removeCount;
         }

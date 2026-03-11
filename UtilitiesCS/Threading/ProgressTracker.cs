@@ -12,9 +12,9 @@ using UtilitiesCS.Windows_Forms;
 
 namespace UtilitiesCS
 {
-    public class ProgressTracker: IProgress<(int Value, string JobName)>
+    public class ProgressTracker : IProgress<(int Value, string JobName)>
     {
-        public ProgressTracker(CancellationTokenSource tokenSource) 
+        public ProgressTracker(CancellationTokenSource tokenSource)
         {
             _cancelSource = tokenSource;
         }
@@ -25,7 +25,7 @@ namespace UtilitiesCS
             _screen = screen;
         }
 
-        public virtual ProgressTracker Initialize() 
+        public virtual ProgressTracker Initialize()
         {
             UiDispatcher = UiThread.Dispatcher;
 
@@ -54,8 +54,8 @@ namespace UtilitiesCS
             return this;
         }
 
-        public ProgressTracker(ProgressTracker parent, int allocation, int startingAt) 
-        { 
+        public ProgressTracker(ProgressTracker parent, int allocation, int startingAt)
+        {
             _parent = new ParentProgress<(int Value, string JobName)>(parent, allocation, startingAt);
             _jobName = parent._jobName;
             _progressViewer = parent.ProgressViewer;
@@ -75,7 +75,7 @@ namespace UtilitiesCS
 
         internal Dispatcher UiDispatcher { get => _uiDispatcher; set => _uiDispatcher = value; }
         private Dispatcher _uiDispatcher;
-        
+
         private ProgressViewer _progressViewer;
         public ProgressViewer ProgressViewer { get => _progressViewer; protected set => _progressViewer = value; }
 
@@ -90,7 +90,7 @@ namespace UtilitiesCS
 
         public virtual ProgressTracker Increment(double value)
         {
-            var newProgress = Math.Max(Math.Min(_progress + value,100),0);
+            var newProgress = Math.Max(Math.Min(_progress + value, 100), 0);
             Report(newProgress);
             return this;
         }
@@ -112,8 +112,8 @@ namespace UtilitiesCS
             {
                 Report(100);
             }
-            else 
-            { 
+            else
+            {
                 _jobName = jobName;
                 Report(value);
             }
@@ -134,28 +134,28 @@ namespace UtilitiesCS
             {
                 _progress = value;
                 var parentProgress = (int)Math.Round(_parent.Allocation * value / 100, 0) + _parent.StartingAt;
-                
+
                 // Updates UI
                 _parent.Progress.Report((parentProgress, _jobName));
-                
+
                 if (_isRoot && parentProgress == 100)
                 {
                     if (_pvIsDisposed.CheckAndSetFirstCall)
                     {
                         if (_progressViewer.InvokeRequired)
-                            _progressViewer.Invoke(() => 
+                            _progressViewer.Invoke(() =>
                             {
                                 if (!_progressViewer.IsDisposed)
-                                    _progressViewer.Close();    
+                                    _progressViewer.Close();
                             });
                         else
-                            _progressViewer.Close();                                       
+                            _progressViewer.Close();
                     }
                 }
             }
         }
 
-        public async virtual Task ReportAsync(double value) 
+        public async virtual Task ReportAsync(double value)
         {
             if (value < 0)
             {
@@ -188,7 +188,7 @@ namespace UtilitiesCS
 
         public virtual ProgressTracker SpawnChild(double allocation)
         {
-            return this.SpawnChild((int)Math.Round(allocation, 0));            
+            return this.SpawnChild((int)Math.Round(allocation, 0));
         }
 
         public virtual ProgressTracker SpawnChild()

@@ -28,8 +28,8 @@ namespace UtilitiesCS
             }
             else
             {
-            viewer.Dispose();
-            return null;
+                viewer.Dispose();
+                return null;
             }
         }
     }

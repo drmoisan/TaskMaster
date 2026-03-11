@@ -8,14 +8,14 @@ using QuickFiler.Controllers;
 
 namespace QuickFiler.Interfaces
 {
-	public interface IFilerHomeController
-	{
+    public interface IFilerHomeController
+    {
         #region Constructors, Initializers, and Destructors
-        
+
         void Run();
         Task RunAsync(ProgressTracker progress);
         void Cleanup();
-        
+
         #endregion
 
         #region Public Properties
@@ -24,11 +24,11 @@ namespace QuickFiler.Interfaces
         CancellationTokenSource TokenSource { get; }
         CancellationToken Token { get; }
         bool Loaded { get; }
-		Stopwatch StopWatch { get; }
+        Stopwatch StopWatch { get; }
         //IQfcDatamodel DataModel { get; }
         IQfcExplorerController ExplorerController { get; set; }
-		IFilerFormController FormController { get; }
-		IQfcKeyboardHandler KeyboardHandler { get; set; }
+        IFilerFormController FormController { get; }
+        IQfcKeyboardHandler KeyboardHandler { get; set; }
         FilerQueue FilerQueue { get; }
         //QfcFormViewer FormViewer { get; }
 

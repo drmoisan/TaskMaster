@@ -10,7 +10,7 @@ using Deedle;
 namespace UtilitiesCS.Extensions
 {
 #nullable enable
-    
+
     public static class NullExtensions
     {
         public static T ThrowIfNull<T>(
@@ -23,7 +23,7 @@ namespace UtilitiesCS.Extensions
             if (argument is null)
             {
                 var traceString = new StackTrace().TryGetMyTraceString("[unable to get trace info]");
-                
+
                 var paramName = argumentExpression;
                 if (string.IsNullOrEmpty(message))
                 {
@@ -56,7 +56,7 @@ namespace UtilitiesCS.Extensions
             string? message = default,
             [CallerMemberName] string callerName = "",
             [CallerArgumentExpression(nameof(argument))] string argumentExpression = ""
-        ) 
+        )
         {
             if (argument is null || argument.Count() == 0)
             {

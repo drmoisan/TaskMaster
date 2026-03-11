@@ -52,7 +52,7 @@ namespace QuickFiler.Controllers
                                  MailItem mailItem,
                                  TlpCellStates tlpStates,
                                  bool async)
-        {            
+        {
             SaveParameters(AppGlobals, homeController, parent, itemViewer, viewerPosition, itemNumberDigits, mailItem, tlpStates);
         }
 
@@ -107,7 +107,7 @@ namespace QuickFiler.Controllers
             else { SetThemeLight(async: true); }
 
             await PopulateControlsAsync(Mail, ItemNumber, false);
-            await ToggleTipsAsync(desiredState: Enums.ToggleState.Off | Enums.ToggleState.Force);            
+            await ToggleTipsAsync(desiredState: Enums.ToggleState.Off | Enums.ToggleState.Force);
             await ToggleNavigationAsync(desiredState: Enums.ToggleState.Off);
 
             //WireEvents();
@@ -133,7 +133,7 @@ namespace QuickFiler.Controllers
             await PopulateConversationAsync(_tokenSource, Token, false);
             await PopulateFolderComboBoxAsync(default, null);
             //};
-            
+
             //await Task.WhenAll(tasks);
             await Task.Run(() => WireEvents());
 
@@ -155,7 +155,7 @@ namespace QuickFiler.Controllers
             WireEvents();
             _ = InitializeWebViewAsync();
         }
-        
+
         public async Task InitializeSequentialAsync()
         {
             Token.ThrowIfCancellationRequested();
@@ -264,7 +264,7 @@ namespace QuickFiler.Controllers
             token.ThrowIfCancellationRequested();
 
             var controller = new QfcItemController();
-            controller.SaveParameters(AppGlobals, homeController, parent, itemViewer, viewerPosition, itemNumberDigits, mailItem, tlpStates);            
+            controller.SaveParameters(AppGlobals, homeController, parent, itemViewer, viewerPosition, itemNumberDigits, mailItem, tlpStates);
             await controller.InitializeSequentialAsync();
             return controller;
         }
@@ -272,7 +272,7 @@ namespace QuickFiler.Controllers
         #endregion ctor
 
         #region ItemViewer Setup and Disposal
-        
+
         internal async Task InitializeWebViewAsync()
         {
             //TraceUtility.LogMethodCall();
@@ -420,7 +420,7 @@ namespace QuickFiler.Controllers
             //}
             await _itemViewer.UiDispatcher.InvokeAsync(() => AssignControls(itemInfo, viewerPosition));
         }
-        
+
         internal void AssignControls(MailItemHelper itemInfo, int viewerPosition)
         {
             //TraceUtility.LogMethodCall(itemInfo, viewerPosition);
@@ -589,18 +589,18 @@ namespace QuickFiler.Controllers
             {
                 try
                 {
-                    _folderHandler = await Task.Run(async () => 
+                    _folderHandler = await Task.Run(async () =>
                     {
                         var fp = new FolderPredictor(
-                            _globals, 
+                            _globals,
                             ItemHelper.ThrowIfNull(),
                             FolderPredictor.InitOptions.FromField);
-                        
+
                         return await fp.InitAsync(
                             ItemHelper, FolderPredictor.InitOptions.FromField);
-                    }, cancel).ConfigureAwait(false);                    
+                    }, cancel).ConfigureAwait(false);
                 }
-                catch(ArgumentNullException e)
+                catch (ArgumentNullException e)
                 {
                     logger.Error(e.Message);
                     logger.Debug("Loading empty folder handler");
@@ -613,14 +613,14 @@ namespace QuickFiler.Controllers
                         logger.Error(e2.Message, e);
                         throw;
                     }
-                    
-                }                
+
+                }
                 catch (System.Exception e)
                 {
                     logger.Error(e.Message, e);
                     throw;
                 }
-                
+
             }
             else
             {
@@ -639,8 +639,8 @@ namespace QuickFiler.Controllers
 
             LoadFolderHandler(varList);
 
-            if (_itemViewer.InvokeRequired) 
-            { 
+            if (_itemViewer.InvokeRequired)
+            {
                 _itemViewer.Invoke(() => AssignFolderComboBox());
             }
             else
@@ -657,7 +657,7 @@ namespace QuickFiler.Controllers
 
             await Task.Run(() => LoadFolderHandlerAsync(token, varList), token);
             await _itemViewer.UiDispatcher.InvokeAsync(AssignFolderComboBox);
-            
+
         }
 
         public void AssignFolderComboBox()
@@ -727,7 +727,7 @@ namespace QuickFiler.Controllers
         private bool _optionEmailCopy;
         private bool _optionAttachments;
         private bool _optionsPictures;
-        
+
         private CancellationTokenSource _tokenSource;
         private TlpCellStates _tlpStates;
 
@@ -790,8 +790,8 @@ namespace QuickFiler.Controllers
                 _itemNumber = value;
                 if (ItemNumberDigits == 1)
                 {
-                    if (_itemViewer is not null) 
-                    { 
+                    if (_itemViewer is not null)
+                    {
                         _itemViewer.LblItemNumber.Text = _itemNumber.ToString();
                     }
                 }
@@ -958,13 +958,13 @@ namespace QuickFiler.Controllers
                 double totalDelay = 0;
                 double maxDelay = 10000;
                 while (ItemHelper is null)
-                {                    
+                {
                     var newDelay = 100 * ++delayCount;
 
                     if (totalDelay > maxDelay)
                     {
                         throw new TimeoutException($"ItemHelper is null in {nameof(WebView2Control_CoreWebView2InitializationCompleted)}" +
-                            $"and has exceeded the maximum wait time of {Math.Round(maxDelay/1000,1)} seconds");                        
+                            $"and has exceeded the maximum wait time of {Math.Round(maxDelay / 1000, 1)} seconds");
                     }
                     await Task.Delay(newDelay);
                     totalDelay += newDelay;
@@ -977,14 +977,14 @@ namespace QuickFiler.Controllers
                 else
                 {
                     _itemViewer.L0v2h2_WebView2.NavigateToString(ItemHelper.Html);
-                }                
+                }
             }
-            
+
             catch (System.Exception ex)
             {
                 logger.Error($"Error in WebView2Control Initialization Completed Event: {ex.Message}", ex);
             }
-            
+
         }
 
         internal void RegisterFocusActions()
@@ -1137,28 +1137,28 @@ namespace QuickFiler.Controllers
             MarkItemForDeletion();
         }
 
-        internal async void BtnReply_Click(object sender, EventArgs e) 
+        internal async void BtnReply_Click(object sender, EventArgs e)
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            await Reply(); 
+            await Reply();
         }
 
-        internal async void BtnReplyAll_Click(object sender, EventArgs e) 
+        internal async void BtnReplyAll_Click(object sender, EventArgs e)
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            await ReplyAll(); 
+            await ReplyAll();
         }
 
-        internal async void BtnForward_Click(object sender, EventArgs e) 
+        internal async void BtnForward_Click(object sender, EventArgs e)
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext());
-            await Forward(); 
+            await Forward();
         }
 
         internal async void TxtboxBody_DoubleClick(object sender, EventArgs e)
@@ -1171,11 +1171,11 @@ namespace QuickFiler.Controllers
 
         private void Button_MouseEnter(object sender, EventArgs e)
         {
-            ((Button)sender).BackColor = _themes[_activeTheme].ButtonMouseOverColor; 
+            ((Button)sender).BackColor = _themes[_activeTheme].ButtonMouseOverColor;
         }
 
         private void MenuItem_MouseEnter(object sender, EventArgs e)
-        {            
+        {
             ((ToolStripMenuItem)sender).BackColor = _themes[_activeTheme].ButtonMouseOverColor;
         }
 
@@ -1194,14 +1194,14 @@ namespace QuickFiler.Controllers
         private void MenuItem_MouseLeave(object sender, EventArgs e)
         {
             ((ToolStripMenuItem)sender).BackColor = _themes[_activeTheme].ButtonBackColor;
-            
+
         }
 
         internal void TextBoxSearch_TextChanged(object sender, EventArgs e)
         {
             _itemViewer.CboFolders.Items.Clear();
             _itemViewer.CboFolders.Items.AddRange(
-                _folderHandler.FindFolder(searchString: "*" + 
+                _folderHandler.FindFolder(searchString: "*" +
                 _itemViewer.TxtboxSearch.Text + "*",
                 reloadCTFStagingFiles: false,
                 recalcSuggestions: false,
@@ -1226,12 +1226,12 @@ namespace QuickFiler.Controllers
         private void TopicThread_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
             var objects = _itemViewer.TopicThread.SelectedObjects;
-            if ((objects is not null)&&(objects.Count !=0))
+            if ((objects is not null) && (objects.Count != 0))
             {
                 var info = objects[0] as MailItemHelper;
                 _itemViewer.L0v2h2_WebView2.NavigateToString(info.Html);
             }
-           
+
         }
 
         private void CbxEmailCopy_CheckedChanged(object sender, EventArgs e)
@@ -1302,13 +1302,13 @@ namespace QuickFiler.Controllers
         async public Task MenuDropDown()
         {
             await UiThread.Dispatcher.InvokeAsync(
-                ()=>_itemViewer.MoveOptionsMenu.ShowDropDown());
+                () => _itemViewer.MoveOptionsMenu.ShowDropDown());
         }
 
         async public Task Reply()
         {
             var reply = await UiThread.Dispatcher.InvokeAsync(
-                ()=> this.Mail.Reply());
+                () => this.Mail.Reply());
             reply.Display();
         }
 
@@ -1349,7 +1349,7 @@ namespace QuickFiler.Controllers
         async public Task ToggleCheckboxAsync(CheckBox checkBox, Enums.ToggleState desiredState)
         {
             var booleanState = desiredState.HasFlag(Enums.ToggleState.On);
-            
+
             await UiThread.Dispatcher.InvokeAsync(() =>
             {
                 if (checkBox.Checked != booleanState) { checkBox.Checked = booleanState; }
@@ -1362,8 +1362,8 @@ namespace QuickFiler.Controllers
         /// </summary>
         public void ToggleConversationCheckbox()
         {
-            UiThread.Dispatcher.Invoke(() => 
-                _itemViewer.ConversationMenuItem.Checked = 
+            UiThread.Dispatcher.Invoke(() =>
+                _itemViewer.ConversationMenuItem.Checked =
                 !_itemViewer.ConversationMenuItem.Checked);
         }
 
@@ -1387,7 +1387,7 @@ namespace QuickFiler.Controllers
                             _itemViewer.ConversationMenuItem.Checked = false;
                         break;
                     default:
-                        _itemViewer.ConversationMenuItem.Checked = 
+                        _itemViewer.ConversationMenuItem.Checked =
                         !_itemViewer.ConversationMenuItem.Checked;
                         break;
                 }
@@ -1436,7 +1436,7 @@ namespace QuickFiler.Controllers
                 UnregisterExpandedAsyncActions();
             }
         }
-        
+
         private void ToggleExpansionOff()
         {
             _tlpStates["Compressed"].ApplyState(_itemViewer);
@@ -1483,7 +1483,7 @@ namespace QuickFiler.Controllers
             }));
         }
 
-        public async Task ToggleFocusAsync(Enums.ToggleState desiredState) 
+        public async Task ToggleFocusAsync(Enums.ToggleState desiredState)
         {
             var boolDesiredState = desiredState.HasFlag(Enums.ToggleState.On);
             if (_activeUI && !boolDesiredState) { await ToggleFocusOffAsync(); }
@@ -1523,7 +1523,7 @@ namespace QuickFiler.Controllers
         {
             if (_activeUI) { await ToggleFocusOffAsync(); }
             else { await ToggleFocusOnAsync(); }
-            await _themes[_activeTheme].SetQfcThemeAsync(); 
+            await _themes[_activeTheme].SetQfcThemeAsync();
         }
 
         private async Task ToggleFocusOnAsync()
@@ -1567,7 +1567,7 @@ namespace QuickFiler.Controllers
             {
                 _itemViewer.Invoke(new System.Action(() => _itemPositionTips.Toggle(desiredState, false)));
             }
-            
+
         }
 
         public async Task ToggleNavigationAsync(Enums.ToggleState desiredState)
@@ -1577,13 +1577,13 @@ namespace QuickFiler.Controllers
 
         public void ToggleTips(bool async, Enums.ToggleState desiredState)
         {
-            InvokeBeginInvoke(async, new System.Action(() => 
-            { 
+            InvokeBeginInvoke(async, new System.Action(() =>
+            {
                 _tableLayoutPanels.ForEach(x => x.SuspendLayout());
                 ListTipsDetails.ForEach(x => x.Toggle(desiredState, shareColumn: false));
                 if (_expanded || desiredState.HasFlag(Enums.ToggleState.Force))
-                { 
-                    ListTipsExpanded.ForEach(x => x.Toggle(desiredState, shareColumn: false)); 
+                {
+                    ListTipsExpanded.ForEach(x => x.Toggle(desiredState, shareColumn: false));
                 }
                 _tableLayoutPanels.ForEach(x => x.ResumeLayout());
             }));
@@ -1597,7 +1597,7 @@ namespace QuickFiler.Controllers
 
             //List<Task> tasks = new List<Task>();
             //tasks.Add(ListTipsDetails.ToAsyncEnumerable().ForEachAsync(async x => await x.ToggleAsync(desiredState, shareColumn: true)));
-            
+
             foreach (var tip in ListTipsDetails)
             {
                 await tip.ToggleAsync(desiredState, shareColumn: false);
@@ -1605,7 +1605,7 @@ namespace QuickFiler.Controllers
             //await ListTipsExpanded.ToAsyncEnumerable().ForEachAsync(async x => await x.ToggleAsync(desiredState, shareColumn: true));
             //var tasks = ListTipsExpanded.Select(x => x.ToggleAsync(desiredState, shareColumn: true));
             //ListTipsExpanded.ForEach(async x => await x.ToggleAsync(desiredState, shareColumn: true));
-            
+
             if (_expanded || desiredState.HasFlag(Enums.ToggleState.Force))
             {
                 foreach (var tip in ListTipsExpanded)
@@ -1616,7 +1616,7 @@ namespace QuickFiler.Controllers
                 //tasks = tasks.Concat(ListTipsExpanded.Select(x => x.ToggleAsync(desiredState, shareColumn: true)));
                 //ListTipsExpanded.ForEach(async x => await x.ToggleAsync(desiredState, shareColumn: true));
             }
-            
+
         }
 
         public void InvokeBeginInvoke(bool async, System.Action action)
@@ -1636,8 +1636,8 @@ namespace QuickFiler.Controllers
         public void ToggleSaveCopyOfMail()
         {
             UiThread.Dispatcher.Invoke(() =>
-                _itemViewer.SaveEmailMenuItem.Checked = 
-                !_itemViewer.SaveEmailMenuItem.Checked);            
+                _itemViewer.SaveEmailMenuItem.Checked =
+                !_itemViewer.SaveEmailMenuItem.Checked);
         }
 
         #endregion UI Navigation Methods
@@ -1702,11 +1702,11 @@ namespace QuickFiler.Controllers
             //TraceUtility.LogMethodCall();
 
             var folderList = _itemViewer.CboFolders.Items.Cast<object>().Select(item => item.ToString()).ToArray();
-            var entryID = _convOriginID != "" ? _convOriginID :  Mail.EntryID;
+            var entryID = _convOriginID != "" ? _convOriginID : Mail.EntryID;
             _parent.ToggleGroupConv(entryID);
         }
 
-        internal void EnumerateConversation() 
+        internal void EnumerateConversation()
         {
             //TraceUtility.LogMethodCall();
 
@@ -1722,12 +1722,15 @@ namespace QuickFiler.Controllers
             await UiThread.Dispatcher.InvokeAsync(EnumerateConversation);
         }
 
-        public Dictionary<string, System.Action> RightKeyActions { get => new() 
+        public Dictionary<string, System.Action> RightKeyActions
+        {
+            get => new()
         {
             { "&Pop Out", ()=>this._parent.PopOutControlGroup(ItemNumber)},
             { "&Expand", ()=>{_itemViewer.LblSubject.Focus(); this.EnumerateConversation(); } },
             { "&Cancel", ()=>{ } }
-        }; }
+        };
+        }
 
         public Dictionary<string, Func<Task>> RightKeyActionsAsync
         {
@@ -1815,7 +1818,7 @@ namespace QuickFiler.Controllers
         {
             return _optionConversationChecked ? ConversationResolver.ConversationInfo.SameFolder : new List<MailItemHelper> { ItemHelper };
         }
-               
+
         public void FlagAsTask()
         {
             List<MailItem> itemList = [Mail];
@@ -1833,7 +1836,7 @@ namespace QuickFiler.Controllers
         public async Task FlagAsTaskAsync()
         {
             List<MailItem> itemList = [Mail];
-            await UiThread.Dispatcher.InvokeAsync(() => 
+            await UiThread.Dispatcher.InvokeAsync(() =>
             {
                 var flagTask = new FlagTasks(globals: _globals,
                                          itemList: itemList,

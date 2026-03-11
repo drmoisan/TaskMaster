@@ -68,7 +68,7 @@ namespace TaskMaster.AppGlobals
     //    {
     //        var manager = new ManagerClass();
 
-            
+
 
     //        //var network = new FilePathHelper(fileName, networkPath);
     //        //var networkDt = File.Exists(network.FilePath) ? File.GetLastWriteTimeUtc(network.FilePath) : default;
@@ -161,10 +161,10 @@ namespace TaskMaster.AppGlobals
 
     //        public static ManagerClass Deserialize(string fileName, string folderPath) =>
     //        GetInstance().Deserialize(fileName, folderPath);
-            
+
     //        public static ManagerClass Deserialize(string fileName, string folderPath, bool askUserOnError) =>
     //            GetInstance().Deserialize(fileName, folderPath, askUserOnError);
-            
+
     //        public static ManagerClass Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) =>
     //        GetInstance().Deserialize(fileName, folderPath, askUserOnError, settings);
 

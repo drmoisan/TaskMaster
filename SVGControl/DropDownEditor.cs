@@ -49,7 +49,7 @@ namespace SVGControl
 
             var entries2 = rset.Cast<System.Collections.DictionaryEntry>()
                               .OrderBy(x => x.Key)
-                              .Select(x => new KeyValuePair<string,object>((string)x.Key, x.Value))
+                              .Select(x => new KeyValuePair<string, object>((string)x.Key, x.Value))
                               .ToList();
 
             var entries = rset.Cast<System.Collections.DictionaryEntry>()
@@ -66,7 +66,7 @@ namespace SVGControl
             //{
             //    imageSelector.AddResource(entry);
             //}
-            
+
             //var names = rset.Cast<System.Collections.DictionaryEntry>()
             //                .Where(x => x.Value is byte[])
             //                .Select(x => GetStringForValue(x.Key))

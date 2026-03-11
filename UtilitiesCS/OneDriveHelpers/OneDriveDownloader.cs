@@ -16,7 +16,7 @@ namespace UtilitiesCS.OneDriveHelpers
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public OneDriveDownloader() 
+        public OneDriveDownloader()
         {
             Client = new();
             ClientGetAsync = Client.GetAsync;
@@ -31,32 +31,32 @@ namespace UtilitiesCS.OneDriveHelpers
         public async Task<Stream> TryGetUrlStreamAsync(string url, int timeoutMs, CancellationToken cancel)
         {
             var response = await ClientGetAsync.RunWithTimeout(url, cancel, timeoutMs, 3, false);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadAsStreamAsync();
             }
-            else 
-            { 
+            else
+            {
                 //logger.Debug($"Failed to get stream from {url}");
-                return null;  
+                return null;
             }
         }
 
-        public async Task DownloadFileAsync(string url, string destinationPath, int timeoutMs, CancellationToken cancel) 
-        { 
+        public async Task DownloadFileAsync(string url, string destinationPath, int timeoutMs, CancellationToken cancel)
+        {
             var contentStream = await TryGetUrlStreamAsync(url, timeoutMs, cancel);
             if (contentStream is null) { return; }
             var fileStream = await TryGetFileStreamWriter(destinationPath, timeoutMs, cancel);
             if (fileStream is null) { return; }
-            
+
             await contentStream.TryCopyToAsyncWithTimeout(fileStream, cancel, timeoutMs, 3, false);
             fileStream?.Dispose();
             contentStream?.Dispose();
         }
-                
-        
-        
+
+
+
         public virtual async Task<Stream> TryGetFileStreamWriter(string destinationPath, int timeoutMs, CancellationToken cancel)
         {
             try

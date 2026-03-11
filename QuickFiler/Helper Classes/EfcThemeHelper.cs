@@ -13,7 +13,7 @@ namespace QuickFiler.Helper_Classes
 {
     internal static class EfcThemeHelper
     {
-        public static Dictionary<string, Theme> SetupThemes(IList<Control> nav, 
+        public static Dictionary<string, Theme> SetupThemes(IList<Control> nav,
                                                             IList<Control> tips,
                                                             IList<Control> dflt2,
                                                             IList<Control> selectors,
@@ -26,7 +26,7 @@ namespace QuickFiler.Helper_Classes
         {
             //dflt2 should have tlps, multiline textboxes
             //selectors should have combo, search
-            var lightNormal = new Dictionary<string, ThemeControlGroup> 
+            var lightNormal = new Dictionary<string, ThemeControlGroup>
             {
                 //{ "Nav", new ThemeControlGroup(controls: nav, back: SystemColors.HotTrack, fore: SystemColors.Control) },
                 { "Tips", new ThemeControlGroup(controls: tips, back: Color.Black, fore: Color.White) },

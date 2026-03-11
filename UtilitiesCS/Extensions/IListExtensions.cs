@@ -26,7 +26,7 @@ namespace UtilitiesCS
                 }
             }
         }
-        
+
         public static bool TryAddRange<T>(this IList<T> list, IEnumerable<T> items)
         {
             if (list is null || items is null)
@@ -42,7 +42,7 @@ namespace UtilitiesCS
                 catch (System.Exception)
                 {
                     return false;
-                } 
+                }
             }
             else
             {
@@ -56,7 +56,7 @@ namespace UtilitiesCS
                 catch (System.Exception)
                 {
                     return false;
-                }                
+                }
             }
             return true;
         }
@@ -65,7 +65,7 @@ namespace UtilitiesCS
         {
             return list.FindIndex(value, comparison) != -1;
         }
-    
+
         public static bool Exists<T>(this IList<T> list, Predicate<T> match)
         {
             return list.FindIndex(match) != -1;
@@ -209,7 +209,7 @@ namespace UtilitiesCS
             {
                 return false;
             }
-            
+
             return true;
         }
 

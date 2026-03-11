@@ -24,7 +24,7 @@ namespace UtilitiesCS
         }
 
         [Obsolete]
-        public static string Extract(object Item, Details Flags) 
+        public static string Extract(object Item, Details Flags)
         {
             if (Item is AppointmentItem) { return ExtractSummary((AppointmentItem)Item).ToString(Flags); }
             else if (Item is MailItem) { return ExtractSummary((MailItem)Item).ToString(Flags); }
@@ -36,7 +36,7 @@ namespace UtilitiesCS
 
         public static string ToString(this Dictionary<Details, string> Dict, Details Flags)
         {
-            return String.Join(", ",Dict.Where(x => Flags.HasFlag(x.Key)).Select(x => $"{x.Key}: {x.Value}"));
+            return String.Join(", ", Dict.Where(x => Flags.HasFlag(x.Key)).Select(x => $"{x.Key}: {x.Value}"));
         }
 
         [Obsolete]
@@ -48,7 +48,7 @@ namespace UtilitiesCS
                 return new Dictionary<Details, string>()
                 {
                     { Details.Type, typeof(MailItem).ToString() },
-                    { Details.Subject, item.MessageClass.ToString() } 
+                    { Details.Subject, item.MessageClass.ToString() }
                 };
             }
 
@@ -103,7 +103,7 @@ namespace UtilitiesCS
         [Obsolete]
         public static Dictionary<Details, string> ExtractSummary(TaskRequestItem item)
         {
-            
+
             return new Dictionary<Details, string>()
             {
                 { Details.Type, typeof(TaskRequestItem).ToString() },

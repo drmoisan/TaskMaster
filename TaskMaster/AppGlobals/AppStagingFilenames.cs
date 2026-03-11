@@ -58,7 +58,7 @@ namespace TaskMaster
         public string CtfMap
         {
             get => _ctfMap ?? InitProp(ref _ctfMap, Settings.Default.File_CTF_Map);
-            
+
             set
             {
                 _ctfMap = value;
@@ -71,7 +71,7 @@ namespace TaskMaster
         public string EmailSessionTemp
         {
             get => _emailSessionTemp ?? InitProp(ref _emailSessionTemp, Settings.Default.FileName_EmailSessionTmp);
-            
+
             set
             {
                 _emailSessionTemp = value;
@@ -117,7 +117,7 @@ namespace TaskMaster
         }
 
         private string _emailInfoStagingFile;
-        public string EmailInfoStagingFile { get => _emailInfoStagingFile ?? InitProp(ref _emailInfoStagingFile, Settings.Default.FileName_EmailInfoStaging); set => _emailInfoStagingFile = value;}
+        public string EmailInfoStagingFile { get => _emailInfoStagingFile ?? InitProp(ref _emailInfoStagingFile, Settings.Default.FileName_EmailInfoStaging); set => _emailInfoStagingFile = value; }
 
         internal string InitProp(ref string prop, string value)
         {

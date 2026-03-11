@@ -423,7 +423,7 @@
 //    {
 //        [JsonProperty]
 //        internal IApplicationGlobals Globals { get; set; }
-                
+
 //        [JsonProperty]
 //        public NewSmartSerializableConfig Config { get; set; }
 

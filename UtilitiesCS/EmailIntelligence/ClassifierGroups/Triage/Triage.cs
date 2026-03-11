@@ -15,7 +15,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.EmailIntelligence
 {
-    public class Triage: IConditionalEngine<MailItemHelper>
+    public class Triage : IConditionalEngine<MailItemHelper>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -38,7 +38,7 @@ namespace UtilitiesCS.EmailIntelligence
         {
             TokenizeAsync = new EmailTokenizer().TokenizeAsync;
             CallbackAsync = (item, value) => Task.Run(() => ((MailItem)item).SetUdf("Triage", value));
-            
+
             ClassifierGroup = await Globals.AF.Manager[GroupName];
             return this;
         }
@@ -78,7 +78,7 @@ namespace UtilitiesCS.EmailIntelligence
             var (isValid, message) = await asyncValidator(cancel);
             return isValid ? true : await asyncAction(treatment, message, cancel);
         }
-               
+
         public async Task<(bool, string)> HasValidTriageManagerAsync(CancellationToken token)
         {
             try
@@ -159,7 +159,7 @@ namespace UtilitiesCS.EmailIntelligence
                     throw new ArgumentOutOfRangeException(nameof(treatment), "Unknown treatment");
             }
         }
-                
+
         public static BayesianClassifierGroup CreateClassifier()
         {
             var group = new BayesianClassifierGroup
@@ -187,7 +187,7 @@ namespace UtilitiesCS.EmailIntelligence
         public BayesianClassifierGroup ClassifierGroup { get => _classifierGroup; set => _classifierGroup = value; }
         private BayesianClassifierGroup _classifierGroup;
 
-        public ISmartSerializableConfig Config => ClassifierGroup.Config; 
+        public ISmartSerializableConfig Config => ClassifierGroup.Config;
 
         //internal ScDictionary<string, BayesianClassifierGroup> Manager { get; }
         internal CancellationToken Token { get; }
@@ -227,7 +227,7 @@ namespace UtilitiesCS.EmailIntelligence
         public string Message => $"{EngineName} is null. Skipping actions";
 
         public MailItemHelper TypedItem { get; set; }
-        
+
         public void Serialize() => ClassifierGroup.Serialize();
 
         #endregion IConditionalEngine
@@ -237,13 +237,13 @@ namespace UtilitiesCS.EmailIntelligence
             await Task.Run(async () =>
             {
                 ClassifierGroup = new BayesianClassifierGroup();
-                if ((await Globals.AF.Manager.Configuration).TryGetValue($"Config{GroupName}", out var loader)) 
-                { 
+                if ((await Globals.AF.Manager.Configuration).TryGetValue($"Config{GroupName}", out var loader))
+                {
                     ClassifierGroup.Config = loader.Config;
                     ClassifierGroup.Serialize();
                 }
                 Globals.AF.Manager[GroupName] = ClassifierGroup.ToAsyncLazy();
-                
+
             }, token);
         }
 
@@ -290,7 +290,7 @@ namespace UtilitiesCS.EmailIntelligence
         public async Task TestAsync(Selection selection, CancellationToken token = default)
         {
             if (selection is null) { return; }
-            
+
             await selection
                 .Cast<object>()
                 .ToAsyncEnumerable()

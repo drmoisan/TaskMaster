@@ -76,7 +76,7 @@ namespace UtilitiesCS
         }
     }
 
-    internal class AsyncLazyPropertyCachedValues 
+    internal class AsyncLazyPropertyCachedValues
     {
         // In this case, you only want the asynchronous operation executed once: the first time it’s requested.
         // After the operation completes, the result of the operation should be cached and returned immediately.
@@ -91,7 +91,7 @@ namespace UtilitiesCS
 
         public AsyncLazy<int> MyProperty { get; private set; }
     }
-    
+
     internal class AsyncLazyUsage
     {
         // The idea is to have a lazy-initialized task, which represents the initialization of the resource.
@@ -115,11 +115,11 @@ namespace UtilitiesCS
             MyResource resource = await myResource;
             //...
         }
-        
+
         public class MyResource { }
     }
 
-    internal class DataBoundValues : INotifyPropertyChanged 
+    internal class DataBoundValues : INotifyPropertyChanged
     {
         // Data binding requires immediate (synchronous) results, and it can only deal with a limited set of types.
         // Data binding will not give awaitable types any special treatment, so the type of an “asynchronous property”

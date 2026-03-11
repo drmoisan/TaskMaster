@@ -1,0 +1,64 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "restore: TaskMaster.sln",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "restore",
+        "TaskMaster.sln"
+      ],
+      "group": "build"
+    },
+    {
+      "label": "build: TaskMaster.sln (VS MSBuild)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/vscode/Invoke-VSBuild.ps1",
+        "-SolutionPath",
+        "TaskMaster.sln",
+        "-Configuration",
+        "Debug",
+        "-Platform",
+        "Any CPU"
+      ],
+      "dependsOn": [
+        "restore: TaskMaster.sln"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
+      "label": "test: MSTest (vstest.console)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/vscode/Invoke-MSTest.ps1",
+        "-SearchRoot",
+        ".",
+        "-Configuration",
+        "Debug",
+      ],
+      "dependsOn": [
+        "build: TaskMaster.sln (VS MSBuild)"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

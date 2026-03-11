@@ -19,7 +19,7 @@ namespace TaskTree
     public class TaskTreeController
     {
         #region Constructors and Initializers
-        
+
         public TaskTreeController(
             IApplicationGlobals AppGlobals,
             TaskTreeForm Viewer,
@@ -182,8 +182,8 @@ namespace TaskTree
             if (item is not null)
             {
                 var activeExplorer = _globals.Ol.App.ActiveExplorer();
-                await Task.Run(() => 
-                { 
+                await Task.Run(() =>
+                {
                     if (activeExplorer.IsItemSelectableInView(item))
                     {
                         activeExplorer.ClearSelection();
@@ -257,8 +257,8 @@ namespace TaskTree
                 else
                 {
                     x.Parent.RemoveChild(x);
-                }                 
-                x.Parent = target.Parent;                    
+                }
+                x.Parent = target.Parent;
             }
 
             // Now add to the moved objects to children of their parent (or to the roots collection
@@ -286,7 +286,7 @@ namespace TaskTree
                 target.Parent.Children.InsertRange(idx, toMove.Cast<TreeNode<ToDoItem>>()); // DataModel: Inserted into new data model tree. 
                 _dataModel.ReNumberChildrenIDs(target.Parent.Children, (IDList)_globals.TD.IDList);
 
-            }         
+            }
 
 
         }
@@ -297,10 +297,10 @@ namespace TaskTree
             {
                 if (x.Parent is null)
                 {
-                    sourceTree.RemoveObject(x);              
+                    sourceTree.RemoveObject(x);
                     if (_dataModel.Roots.Contains(x))
                     {
-                        _dataModel.Roots.Remove(x);         
+                        _dataModel.Roots.Remove(x);
                     }
                     else
                     {
@@ -310,10 +310,10 @@ namespace TaskTree
                 else
                 {
                     x.Parent.Children.Remove(x);
-                }             
+                }
 
-                x.Parent = target;                                   
-                _dataModel.AddChild(x, target, _globals.TD.IDList);    
+                x.Parent = target;
+                _dataModel.AddChild(x, target, _globals.TD.IDList);
             }
         }
 
@@ -360,7 +360,7 @@ namespace TaskTree
         internal void TreeLvActivateItem()
         {
             var node = GetSelectedTreeNode();
-            if (node is not null) 
+            if (node is not null)
             {
                 var objItem = node.Value.OlItem.InnerObject;
                 if (IsValidType(objItem)) { ActivateOlItem(objItem); }
@@ -374,9 +374,9 @@ namespace TaskTree
             if (node is not null)
             {
                 var objItem = node.Value.OlItem.InnerObject;
-                if (IsValidType(objItem)) 
-                { 
-                    await ActivateOlItemAsync(objItem); 
+                if (IsValidType(objItem))
+                {
+                    await ActivateOlItemAsync(objItem);
                 }
                 else { MessageBox.Show($"Unsupported type. Selection is of type {objItem.GetType()}"); }
             }
@@ -410,7 +410,7 @@ namespace TaskTree
             return null;
 
         }
-        
+
         internal TreeNode<ToDoItem> GetSelectedTreeNode()
         {
             try
@@ -419,17 +419,17 @@ namespace TaskTree
             }
             catch (System.Exception)
             {
-                return null;                
+                return null;
             }
-            
-            
+
+
         }
 
         internal bool IsValidType(object item)
         {
             return ((item is Outlook.MailItem) || (item is Outlook.TaskItem));
         }
-        
+
         #endregion Data Model Helper Functions
 
         #region debugging helper functions

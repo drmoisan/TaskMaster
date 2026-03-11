@@ -13,7 +13,7 @@ namespace UtilitiesCS.Test
         {
             // Arrange
             string categoryString = "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
-            
+
             // Act
             var parser = new FlagParser(ref categoryString);
 

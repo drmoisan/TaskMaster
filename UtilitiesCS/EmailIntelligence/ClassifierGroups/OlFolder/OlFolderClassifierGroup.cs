@@ -125,7 +125,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             ppkg.ProgressTrackerPane.Report(0, "Building Folder Classifier -> Load Mined Mail Info");
 
             if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) { return; }
-            
+
             var folderPath = Path.Combine(folderRoot, "Bayesian");
             var collection = await EmailDataMiner.Load<MinedMailInfo[]>(folderPath);
             collection.ThrowIfNullOrEmpty();
@@ -155,7 +155,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
                     classifierGroup.Config = loader.Config.DeepCopy() as NewSmartSerializableConfig;
                     classifierGroup.Serialize();
 
-                    Globals.AF.Manager["Folder"] = classifierGroup.ToAsyncLazy();                
+                    Globals.AF.Manager["Folder"] = classifierGroup.ToAsyncLazy();
                     //Globals.AF.Manager.Serialize();
                     MyBox.ShowDialog("Folder Classifier Built Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -172,7 +172,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
                     SharedTokenBase = new Corpus()
                 };
                 return group;
-            });            
+            });
             Globals.AF.Manager["Spam"] = temp.ToAsyncLazy();
             var configurations = await Globals.AF.Manager.Configuration;
             if (configurations.TryGetValue("Spam", out var loader))
@@ -182,7 +182,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             temp.Serialize();
             //Globals.AF.Manager.Serialize();
         }
-                        
+
         #endregion Build Classifiers
 
     }

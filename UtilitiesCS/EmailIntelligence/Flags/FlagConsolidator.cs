@@ -15,7 +15,7 @@ namespace UtilitiesCS.EmailIntelligence.Flags
     public class FlagConsolidator
     {
         public FlagConsolidator(FlagParser parser)
-        {            
+        {
             Parser = parser.ThrowIfNull();
             ResetAll();
         }
@@ -23,12 +23,12 @@ namespace UtilitiesCS.EmailIntelligence.Flags
         #region Consolidation Permutations
 
         public IList<string> AsListWithPrefix { get => Refreshable(_asListWithPrefix); set => _asListWithPrefix.ToLazy(); }
-        protected Lazy<IList<string>> _asListWithPrefix;        
+        protected Lazy<IList<string>> _asListWithPrefix;
         internal virtual void ResetLazyListWithPrefix()
         {
             _asListWithPrefix = new Lazy<IList<string>>(() => CombineLists(true));
         }
-                        
+
         public IList<string> AsListNoPrefix { get => Refreshable(_asListNoPrefix); set => _asListNoPrefix = value.ToLazy(); }
         protected Lazy<IList<string>> _asListNoPrefix;
         internal virtual void ResetLazyListNoPrefix()
@@ -72,7 +72,7 @@ namespace UtilitiesCS.EmailIntelligence.Flags
         internal FlagParser Parser { get; set; }
         internal virtual List<string> CombineLists(bool wtag = true)
         {
-            List<IList<string>> list = [Parser.People.ListWithPrefix, Parser.Projects.ListWithPrefix, 
+            List<IList<string>> list = [Parser.People.ListWithPrefix, Parser.Projects.ListWithPrefix,
                 Parser.Topics.ListWithPrefix, Parser.Context.ListWithPrefix, Parser.Kb.ListWithPrefix];
 
             if (!Parser.Other.IsNullOrEmpty()) { list.Add([.. Parser.Other.Split(separator: ',', trim: true)]); }

@@ -27,8 +27,8 @@ namespace ToDoModel
 
         private ToDoItem() { }
 
-        public ToDoItem(IOutlookItem outlookItem): this(new OutlookItemFlaggable(outlookItem)) 
-        {            
+        public ToDoItem(IOutlookItem outlookItem) : this(new OutlookItemFlaggable(outlookItem))
+        {
             //FlaggableItem = new OutlookItemFlaggable(outlookItem);
             //Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
             //InitializeOutlookItem(_flaggableItem);
@@ -45,7 +45,7 @@ namespace ToDoModel
             InitializeOutlookItem(FlaggableItem);
             string argstrCats_All = FlaggableItem.Categories;
             Flags = new FlagParser(ref argstrCats_All);
-            
+
             if (!Flags.AreEquivalentTo(FlaggableItem.Categories))
             {
                 FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
@@ -77,7 +77,7 @@ namespace ToDoModel
             _toDoID = strID;
             Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
         }
-                
+
         #endregion Constructors
 
         #region Private Variables
@@ -88,7 +88,7 @@ namespace ToDoModel
         //private string _tagProgram = "";
         private bool? _activeBranch = null;
         private string _expandChildren = "";
-        
+
         #endregion Private Variables
 
         #region Initializers
@@ -215,8 +215,8 @@ namespace ToDoModel
         public void WriteFlagsBatch(Enums.FlagsToSet flagsToSet)
         {
             ToDoEvents.Editing.AddOrUpdate(OlItem.EntryID, 1, (key, existing) => existing + 1);
-            
-            if (flagsToSet.HasAnyFlags([Enums.FlagsToSet.Context, Enums.FlagsToSet.People, Enums.FlagsToSet.Projects, 
+
+            if (flagsToSet.HasAnyFlags([Enums.FlagsToSet.Context, Enums.FlagsToSet.People, Enums.FlagsToSet.Projects,
                 Enums.FlagsToSet.Topics, Enums.FlagsToSet.Kbf, Enums.FlagsToSet.Today, Enums.FlagsToSet.Bullpin]))
             {
                 FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
@@ -320,7 +320,7 @@ namespace ToDoModel
         internal List<IPrefix> Prefixes { get; } = new ToDoDefaults().PrefixList;
 
         public Func<string, string> ProjectsToPrograms { get; set; }
-        
+
         public IProjectData ProjectData { get; set; }
 
         internal ToDoLoader Loader { get; private set; }
@@ -336,9 +336,9 @@ namespace ToDoModel
         /// Gets and Sets a flag that when true, prevents saving changes to the underlying [object]
         /// </summary>
         /// <returns>Boolean</returns>
-        public bool ReadOnly { get; set; } = false;       
+        public bool ReadOnly { get; set; } = false;
         internal bool IsReadOnly() { return ReadOnly; }
-                
+
         public bool FlagAsTask
         {
             get => (bool)Loader.GetOrLoad(ref _flagAsTask, () => FlaggableItem.Try().FlagAsTask, FlaggableItem);
@@ -366,7 +366,7 @@ namespace ToDoModel
                 if (!ReadOnly && FlaggableItem is not null)
                 {
                     FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
-                    FlaggableItem.Save();                    
+                    FlaggableItem.Save();
                 }
             }
         }
@@ -384,7 +384,7 @@ namespace ToDoModel
                 if (!ReadOnly && FlaggableItem is not null)
                 {
                     FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
-                    FlaggableItem.Save();                    
+                    FlaggableItem.Save();
                 }
             }
         }
@@ -982,11 +982,11 @@ namespace ToDoModel
 
         internal async Task AutoCodeChildren(string newProject, string newRoot, string oldRoot)
         {
-            
+
             // Use the newId and the oldId as the roots for changes in the children
             var items = await IdList.GetItemsWithRootIdAsync(oldRoot).ToArrayAsync();
-            
-            foreach (var todo in items) 
+
+            foreach (var todo in items)
             {
                 ToDoEvents.Editing.AddOrUpdate(todo.OlItem.EntryID, 1, (key, existing) => existing + 1);
                 todo.IdAutoCoding = false;

@@ -49,7 +49,7 @@ namespace ToDoModel
                     OlFolder = (Folder)OlFolder.Folders[FoldersArray[i]];
                 return OlFolder;
             }
-            catch (System.Exception ex) 
+            catch (System.Exception ex)
             {
                 Debug.WriteLine(ex.Message);
                 Debug.WriteLine("Folder Does Not Exist");
@@ -193,7 +193,7 @@ namespace ToDoModel
                                                     todo.SplitID();
                                                 }
                                             }
-                                            
+
                                         }
                                     }
 
@@ -253,7 +253,7 @@ namespace ToDoModel
                                     todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
                                     todo.Program.AsStringNoPrefix = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
                                     _globals.TD.IDList.Serialize(_globals.TD.FnameIDList);
-                                    
+
                                     todo.SplitID();
                                     // ***NEED CODE HERE***
                                     // ***NEED CODE HERE***
@@ -275,7 +275,7 @@ namespace ToDoModel
                             string strCats = olItem.GetCategories().Replace("Tag KB Backlog", "").Replace(",,", ",");
                             strCats = strCats.Replace("Tag KB InProgress", "").Replace(",,", ",");
                             strCats = strCats.Replace("Tag KB Planned", "").Replace(",,", ",");
-                            
+
                             while (strCats.Substring(0, 1) == ",")
                                 strCats = strCats.Substring(1);
                             if (strCats.Length > 0)
@@ -351,7 +351,7 @@ namespace ToDoModel
                 }
                 return null;
             }
-            catch (System.Exception ex) 
+            catch (System.Exception ex)
             {
                 Debug.WriteLine(ex.Message);
                 return null;

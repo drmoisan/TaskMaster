@@ -19,10 +19,10 @@ namespace QuickFiler.Controllers
         public QfcItemGroup(MailItem mailItem) { _mailItem = mailItem; }
 
         private MailItem _mailItem;
-        internal MailItem MailItem 
-        { 
+        internal MailItem MailItem
+        {
             get => _mailItem;
-            set => _mailItem = value; 
+            set => _mailItem = value;
         }
 
         internal ItemViewer ItemViewer { get => _itemViewer; set => _itemViewer = value; }

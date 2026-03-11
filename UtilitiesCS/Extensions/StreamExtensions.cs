@@ -23,6 +23,6 @@ namespace UtilitiesCS.Extensions
                 return false;
             }
         }
-            
+
     }
 }

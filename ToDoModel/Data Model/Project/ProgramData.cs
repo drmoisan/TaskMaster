@@ -9,7 +9,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace ToDoModel
 {
-    public class ProgramData: ScDictionary<string, int>
+    public class ProgramData : ScDictionary<string, int>
     {
         #region Constructors
 
@@ -27,7 +27,7 @@ namespace ToDoModel
         #region Deserialization
 
         public new static class Static
-        {         
+        {
             public static ProgramData Deserialize(string fileName, string folderPath) =>
                 new ProgramData(ScDictionary<string, int>.Static.Deserialize(fileName, folderPath));
 

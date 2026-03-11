@@ -31,7 +31,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         public int TN { get; set; }
     }
 
-    public class VerboseClassCounts() 
+    public class VerboseClassCounts()
     {
         public string Class { get; set; }
         public int TP { get; set; }
@@ -49,7 +49,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             get => VerboseOutcomes?.ToArray() ?? [];
             set => VerboseOutcomes = value?.ToDictionary();
         }
-    
+
     }
 
     //public record VerboseClassCounts()
@@ -138,9 +138,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 
         [JsonConstructor]
         public ClassificationErrors(
-            string @class, 
-            IEnumerable<KeyValuePair<VerboseTestOutcome, string>> verboseOutcomes, 
-            int falsePositives, 
+            string @class,
+            IEnumerable<KeyValuePair<VerboseTestOutcome, string>> verboseOutcomes,
+            int falsePositives,
             int falseNegatives,
             double precision,
             double recall,
@@ -156,7 +156,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         }
 
         public string Class { get; set; }
-        
+
         [JsonIgnore]
         public Dictionary<VerboseTestOutcome, string> VerboseOutcomes { get; set; }
 
@@ -177,8 +177,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         public double F1 { get; set; }
     }
 
-    public class VerboseOutcomeClass 
-    { 
+    public class VerboseOutcomeClass
+    {
 
     }
 
@@ -199,5 +199,5 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         public Series Recall { get; set; }
         public Series F1 { get; set; }
     }
-    
+
 }

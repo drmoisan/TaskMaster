@@ -97,7 +97,7 @@ namespace ToDoModel
             }
 
         }
-        
+
         public static List<object> GetListOfToDoItemsInView(Outlook.Application olApp)
         {
             Items OlItems;
@@ -122,20 +122,20 @@ namespace ToDoModel
             // GetToDoItemsInView = OlItems
             return ListObjects;
         }
-                
-        public static IAsyncEnumerable<object> GetAsyncEnumerableOfToDoItemsInView(Outlook.Application olApp) 
-        { 
+
+        public static IAsyncEnumerable<object> GetAsyncEnumerableOfToDoItemsInView(Outlook.Application olApp)
+        {
             var olView = (Outlook.View)olApp.ActiveExplorer().CurrentView;
             var strFilter = "@SQL=" + olView.Filter;
             var items = olApp.Session.Stores
                 ?.Cast<Store>()
                 ?.ToAsyncEnumerable()
                 ?.Select(store => store.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
-                ?.SelectMany(folder => 
-                    strFilter == "@SQL=" ? 
-                    folder?.Items?.Cast<object>()?.ToAsyncEnumerable() : 
+                ?.SelectMany(folder =>
+                    strFilter == "@SQL=" ?
+                    folder?.Items?.Cast<object>()?.ToAsyncEnumerable() :
                     folder?.Items?.Restrict(strFilter)?.Cast<object>()?.ToAsyncEnumerable());
-            return items;   
+            return items;
         }
 
         public static Items GetToDoItemsInView(Outlook.Application OlApp)
@@ -205,10 +205,10 @@ namespace ToDoModel
         {
             var itemsAsyncEnum = GetAsyncEnumerableOfToDoItemsInView(olApp);
             await itemsAsyncEnum.ForEachAwaitAsync(
-                async item => await Task.Run(()=>TrySplitToDoID(item)));
+                async item => await Task.Run(() => TrySplitToDoID(item)));
         }
 
-        private static void TrySplitToDoID(object item) 
+        private static void TrySplitToDoID(object item)
         {
             try
             {
@@ -218,7 +218,7 @@ namespace ToDoModel
             {
                 logger.Error(e.Message, e);
             }
-            
+
         }
 
         public static async Task OlToDoItems_ItemChange(object item, Items olToDoItems, IApplicationGlobals globals)
@@ -229,11 +229,11 @@ namespace ToDoModel
             {
                 entryId = ((dynamic)item).EntryID;
             }
-            catch (System.Exception e) 
-            {  
+            catch (System.Exception e)
+            {
                 logger.Error($"Error in {nameof(ToDoEvents)}.{nameof(OlToDoItems_ItemChange)} getting EntryID from item\n{e.Message}");
             }
-            
+
             if (entryId is not null && Editing.TryAdd(entryId, 1))
             {
                 var projInfo = globals.TD.ProjInfo;
@@ -241,14 +241,14 @@ namespace ToDoModel
 
                 var olItem = new OutlookItem(item);
                 var todo = new ToDoItem(olItem);
-                
+
                 todo.Identifier = $"ItemChangeEvent: {todo.ToDoID}";
                 todo.ProjectData = projInfo;
                 todo.IdList = idList;
                 todo.ProjectsToPrograms = projInfo.Programs_ByProjectNames;
 
                 await Task.Run(() => SynchronizeEC(olToDoItems, todo));
-                await Task.Run(() => AutoCodeId(projInfo, idList, todo));                
+                await Task.Run(() => AutoCodeId(projInfo, idList, todo));
                 await Task.Run(() => SynchronizeKanban(item, todo));
                 await Task.Delay(500);
 
@@ -405,9 +405,9 @@ namespace ToDoModel
         }
 
         private static void AutoCodeId(IProjectData ProjInfo, IIDList idList, ToDoItem todo)
-        {            
+        {
             if (!ParamsAreValid(ProjInfo, idList, todo)) { return; }
-            
+
             // Get Project Name
             string project = todo.Projects.AsStringNoPrefix;
             var toDoId = todo.ToDoID;
@@ -422,10 +422,10 @@ namespace ToDoModel
                 {
                     // If the todo id is not set, set it to the next available id in the project branch
                     MakeChildOfProject(projectId, idList, todo);
-                }                
+                }
                 else if (projectId == toDoId) { return; } // Exit if the item is the Project header
                 else if (toDoId.Length == 2) { return; } // Exit if the item is a Program header
-                else if (toDoId.Length > 4) { return;  } // Exit if the item is a child of another branch
+                else if (toDoId.Length > 4) { return; } // Exit if the item is a child of another branch
                 else if (toDoId.Length == 4) // If the item has a placeholder ID but should be a child of the project
                 {
                     MakeChildOfProject(projectId, idList, todo);
@@ -440,11 +440,11 @@ namespace ToDoModel
                     ProjInfo.Add(new ProjectEntry(project, toDoId, program));
                     ProjInfo.Save();
                 }
-            }                       
+            }
         }
 
         private static string MakeChildOfProject(string projectId, IIDList idList, ToDoItem todo)
-        {                        
+        {
             // Get the next available first-branch ID within the project and assign it
             todo.ToDoID = idList.GetNextToDoID($"{projectId}00");
             // Save the ID list
@@ -480,7 +480,7 @@ namespace ToDoModel
         public static void OlToDoItems_ItemAdd(object item, IApplicationGlobals AppGlobals)
         {
             var olItem = new OutlookItem(item);
-            if (Editing.TryAdd(olItem.EntryID, 1)) 
+            if (Editing.TryAdd(olItem.EntryID, 1))
             {
                 var todo = new ToDoItem(olItem);
                 var ProjInfo = AppGlobals.TD.ProjInfo;
@@ -510,7 +510,7 @@ namespace ToDoModel
                 todo.VisibleTreeState = 63;
 
                 Editing.TryRemove(olItem.EntryID, out _);
-            }            
+            }
         }
 
         private static string SubstituteCharsInID(string strToDoID)

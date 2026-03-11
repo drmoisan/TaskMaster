@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Z.Disabled.ToDoModel.Test.Email_Utilities
 {
-	[TestClass]
+    [TestClass]
     public class SortItemsToExistingFolderTests
     {
         private MockRepository mockRepository;
@@ -34,7 +34,7 @@ namespace Z.Disabled.ToDoModel.Test.Email_Utilities
             //string expectedExtension = ".atm";
             //string actualFilename = "";
             //string actualExtension = "";
-            
+
             //// Act
             //(filenameActual, extensionActual) = SortEmail.GetAttachmentFilename(attachment);
 

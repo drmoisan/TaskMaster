@@ -72,10 +72,10 @@ namespace QuickFiler
             var mailItems = LoadToList(globals, mail);
 
             await home.InitAsync(globals, mailItems, QfEnums.InitTypeEnum.Find);
-            
+
             return home;
         }
-        
+
         protected async Task InitAsync(IApplicationGlobals globals, List<MailItem> mailItems, QfEnums.InitTypeEnum initType)
         {
             // Start initializing data model
@@ -133,7 +133,7 @@ namespace QuickFiler
 
         private EfcViewer _formViewer;
         internal EfcViewer FormViewer { get => _formViewer; private set => _formViewer = value; }
-        
+
         private IApplicationGlobals _globals;
         internal IApplicationGlobals Globals { get => _globals; private set => _globals = value; }
 
@@ -144,8 +144,8 @@ namespace QuickFiler
         internal System.Action ParentCleanup { get => _parentCleanup; private set => _parentCleanup = value; }
 
         //[STAThread]
-        public void Run() 
-        { 
+        public void Run()
+        {
             if (_dataModel?.Mail is not null || InitType.HasFlag(QfEnums.InitTypeEnum.Find))
             {
                 _formViewer.Show();
@@ -187,7 +187,7 @@ namespace QuickFiler
 
         private EfcDataModel _dataModel;
         internal EfcDataModel DataModel { get => _dataModel; set => _dataModel = value; }
-                
+
         private System.Diagnostics.Stopwatch _stopWatch;
         public System.Diagnostics.Stopwatch StopWatch { get => _stopWatch; }
 
@@ -228,7 +228,7 @@ namespace QuickFiler
                                           _formController.SaveEmail,
                                           _formController.SavePictures,
                                           moveConversation);
-            
+
             QuickFileMetrics_WRITE(_globals.FS.Filenames.EmailSession, selectedFolder, convInfo);
         }
 
@@ -244,9 +244,9 @@ namespace QuickFiler
 
         public void QuickFileMetrics_WRITE(string filename, string selectedFolder, List<MailItemHelper> moved)
         {
-            if (moved is not null && moved.Count == 0) 
-            { 
-            
+            if (moved is not null && moved.Count == 0)
+            {
+
                 var curDateText = DateTime.Now.ToString("MM/dd/yyyy");
                 var curTimeText = DateTime.Now.ToString("hh:mm");
                 var dataLineBeg = curDateText + "," + curTimeText + ",";
@@ -254,7 +254,7 @@ namespace QuickFiler
                 var Duration = _stopWatch.Elapsed.Seconds;
                 var OlEndTime = DateTime.Now;
                 var OlStartTime = OlEndTime.Subtract(new TimeSpan(0, 0, 0, (int)Duration));
-           
+
                 Duration /= moved.Count;
                 var durationText = Duration.ToString("##0");
                 var durationMinutesText = (Duration / 60d).ToString("##0.00");
@@ -266,7 +266,7 @@ namespace QuickFiler
 
                 if (Globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var folderRoot))
                 {
-                    FileIO2.WriteTextFile(filename, dataLines, folderRoot);                    
+                    FileIO2.WriteTextFile(filename, dataLines, folderRoot);
                 }
             }
         }
@@ -275,7 +275,7 @@ namespace QuickFiler
         {
             throw new NotImplementedException();
         }
-                
+
 
         #endregion
 

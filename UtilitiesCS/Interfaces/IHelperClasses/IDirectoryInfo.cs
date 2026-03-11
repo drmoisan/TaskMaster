@@ -6,7 +6,7 @@ using System.Security.AccessControl;
 namespace UtilitiesCS
 {
     public interface IDirectoryInfo : IFileSystemInfo
-    {        
+    {
         IDirectoryInfo Parent { get; }
         IDirectoryInfo Root { get; }
 

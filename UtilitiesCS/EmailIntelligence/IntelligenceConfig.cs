@@ -17,7 +17,7 @@ using ToDoModel.Data_Model.People;
 
 namespace UtilitiesCS.EmailIntelligence
 {
-    public class IntelligenceConfig(IApplicationGlobals globals) 
+    public class IntelligenceConfig(IApplicationGlobals globals)
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -47,10 +47,10 @@ namespace UtilitiesCS.EmailIntelligence
                 .SelectAwait(async kvp =>
                 {
                     var loader = await SmartSerializableLoader.DeserializeAsync(Globals, kvp.Value);
-                    if (loader is null) 
-                    { 
+                    if (loader is null)
+                    {
                         logger.Error($"Error in {nameof(ReadConfigurationAsync)}. Loader for {kvp.Key} is null");
-                        return new KeyValuePair<string, SmartSerializableLoader>(kvp.Key, null); 
+                        return new KeyValuePair<string, SmartSerializableLoader>(kvp.Key, null);
                     }
                     if (loader.T is not null)
                     {
@@ -63,7 +63,7 @@ namespace UtilitiesCS.EmailIntelligence
                             loader.Config.JsonSettings.Converters.Add(new NewtonsoftHelpers.Sco.ScoDictionaryConverter());
                         }
                     }
-                                        
+
                     loader.PropertyChanged += Loader_PropertyChanged;
                     return new KeyValuePair<string, SmartSerializableLoader>(kvp.Key, loader);
                 }).Where(kvp => kvp.Value is not null).ToConcurrentDictionaryAsync();

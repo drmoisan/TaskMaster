@@ -34,7 +34,7 @@ namespace TaskMaster
         {
             _controller = Controller;
         }
-        
+
         private Office.IRibbonUI _ribbon;
         private RibbonController _controller;
         internal RibbonController Controller => _controller;
@@ -62,7 +62,7 @@ namespace TaskMaster
 
         #region Ribbon Callbacks
         // Create callback methods here. For more information about adding callback methods, visit https://go.microsoft.com/fwlink/?LinkID=271226
-        
+
         public void Ribbon_Load(Office.IRibbonUI ribbonUI)
         {
             _ribbon = ribbonUI;
@@ -83,7 +83,7 @@ namespace TaskMaster
         {
             await _controller.HideHeadersNoChildrenAsync();
         }
-        
+
         public async void BtnShowHeadersNoChildren_Click(Office.IRibbonControl control)
         {
             await _controller.ShowHeadersNoChildrenAsync();
@@ -120,7 +120,7 @@ namespace TaskMaster
         }
 
         public void BtnPopulateUdf_Click(Office.IRibbonControl control) => _controller.PopulateUdf();
-        
+
         public async void QuickFiler_Click(Office.IRibbonControl control)
         {
             await _controller.LoadQuickFilerAsync();
@@ -141,13 +141,13 @@ namespace TaskMaster
 
         public bool MoveEntireConversation_GetPressed(Office.IRibbonControl control) => _controller.IsMoveEntireConversationActive();
         public void MoveEntireConversation_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleMoveEntireConversation();
-        
+
         public bool SaveAttachments_GetPressed(Office.IRibbonControl control) => _controller.IsSaveAttachmentsActive();
         public void SaveAttachments_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleSaveAttachments();
-        
+
         public bool SaveEmailCopy_GetPressed(Office.IRibbonControl control) => _controller.IsSaveEmailCopyActive();
         public void SaveEmailCopy_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleSaveEmailCopy();
-        
+
         public bool SavePictures_GetPressed(Office.IRibbonControl control) => _controller.IsSavePicturesActive();
         public void SavePictures_Click(Office.IRibbonControl control, bool pressed) => _controller.ToggleSavePictures();
 
@@ -177,8 +177,8 @@ namespace TaskMaster
         #region Spam Manager
 
         public async void ClearSpam_Click(Office.IRibbonControl control) => await Controller.ClearSpamManagerAsync();
-        public async void TrainSpam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, true);         
-        public async void TrainHam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, false); 
+        public async void TrainSpam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, true);
+        public async void TrainHam_Click(Office.IRibbonControl control) => await Controller.SB.TrainAsync(Controller.OlSelection, false);
         public async void TestSpam_Click(Office.IRibbonControl control) => await ((SpamBayes)Controller.Engines.InboxEngines[SpamBayes.GroupName].Engine).TestAsync(Controller.OlSelection);
         public void TestSpamVerbose_Click(Office.IRibbonControl control) => Controller.TestSpamVerbose();
         public void SpamMetrics_Click(Office.IRibbonControl control) => Controller.SpamMetrics();
@@ -240,7 +240,7 @@ namespace TaskMaster
         public void ShowSubjectMapMetrics_Click(Office.IRibbonControl control) => _controller.Try.ShowSubjectMapMetrics();
         public async void TokenizeEmail_Click(Office.IRibbonControl control) => await _controller.Try.TryTokenizeEmail();
         public async void MineEmails_Click(Office.IRibbonControl control) => await _controller.Try.TryMineEmails();
-        public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.Try.TryBuildClassifier();                
+        public async void BuildClassifier_Click(Office.IRibbonControl control) => await _controller.Try.TryBuildClassifier();
         public void PrintManagerState_Click(Office.IRibbonControl control) => _controller.Try.TryPrintManagerState();
         public void SerializeMailInfo_Click(Office.IRibbonControl control) => _controller.Try.TrySerializeMailInfo();
         public void TryGetInboxes_Click(Office.IRibbonControl control) => _controller.Try.TryGetInboxes();

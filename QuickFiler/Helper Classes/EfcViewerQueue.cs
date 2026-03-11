@@ -13,7 +13,7 @@ namespace QuickFiler
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static Queue<EfcViewer> _queue = new Queue<EfcViewer>();
-                
+
         public static void BuildQueue(int count)
         {
             for (int i = 0; i < count; i++)
@@ -23,7 +23,7 @@ namespace QuickFiler
                     {
                         _queue.Enqueue(new EfcViewer());
                         //logger.Debug($"Enqueued {_queue.Count}");
-                    }, 
+                    },
                     System.Windows.Threading.DispatcherPriority.Background);
 
                 //IdleActionQueue.AddEntry(()=> 
@@ -33,7 +33,7 @@ namespace QuickFiler
                 //});
             }
         }
-                        
+
         public static EfcViewer Dequeue()
         {
             EfcViewer viewer = null;
@@ -42,7 +42,7 @@ namespace QuickFiler
                 viewer = _queue.Dequeue();
                 //logger.Debug($"Dequeued 1, {_queue.Count} remaining");
                 BuildQueue(1);
-                
+
             }
             else
             {

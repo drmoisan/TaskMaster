@@ -33,7 +33,7 @@ namespace Tags
             {
                 var prefixList = new List<IPrefix> { prefix };
                 _controller = new TagController(_viewer, dictOptions, null, prefixList, userEmail, prefixKey: prefix.Key);
-            }   
+            }
         }
 
         public static List<string> LaunchAndSelect(IEnumerable<string> options, IApplicationGlobals appGlobals)
@@ -52,13 +52,13 @@ namespace Tags
             launcher.Viewer.Controls.Remove(launcher.Viewer.ButtonNew);
             return launcher.FindMatch(searchString);
         }
-        
+
         public string FindMatch(string searchString)
         {
             _controller.SetSearchText(searchString);
             _viewer.ShowDialog();
             if (_controller.ExitType != "Cancel")
-            {                
+            {
                 return _controller.SelectionAsString();
             }
             return "";
@@ -77,18 +77,18 @@ namespace Tags
             Func<IPrefix, string, Category> addColorCategoryDelegate,
             Func<object, IList<string>> autoFindDelegate)
         {
-           return new LauncherAutoAssign(filterList,
-                                         addChoicesToDictDelegate,
-                                         addColorCategoryDelegate,
-                                         autoFindDelegate);
+            return new LauncherAutoAssign(filterList,
+                                          addChoicesToDictDelegate,
+                                          addColorCategoryDelegate,
+                                          autoFindDelegate);
         }
-        
-        public IAutoAssign GetAutoAssign() 
-        { 
+
+        public IAutoAssign GetAutoAssign()
+        {
             var autoAssign = new LauncherAutoAssign();
             autoAssign.FilterList = new List<string>();
             autoAssign.AddChoicesToDictDelegate = _globals.TD.People.AddMissingEntries;
-            autoAssign.AddColorCategoryDelegate = (IPrefix prefix, string categoryName) => 
+            autoAssign.AddColorCategoryDelegate = (IPrefix prefix, string categoryName) =>
                 CreateCategoryModule.CreateCategory(olNS: _globals.Ol.NamespaceMAPI, prefix: prefix, newCatName: categoryName);
 
             autoAssign.AutoFindDelegate = (object objItem) =>
@@ -104,7 +104,7 @@ namespace Tags
                 //    userAddress: _globals.Ol.UserEmailAddress,
                 //    blExcludeFlagged: false);
             };
-            
+
             return autoAssign;
         }
 
@@ -116,7 +116,7 @@ namespace Tags
             }
             else if (objItem is IOutlookItem olItem && olItem.GetOlItemType() == OlItemType.olMailItem)
             {
-                return new MailItemHelper(olItem.InnerObject as MailItem, _globals); 
+                return new MailItemHelper(olItem.InnerObject as MailItem, _globals);
             }
             else if (objItem is MailItemHelper)
             {
@@ -128,7 +128,7 @@ namespace Tags
             }
         }
 
-        
+
 
         internal class LauncherAutoAssign : IAutoAssign
         {
@@ -138,7 +138,7 @@ namespace Tags
                                       Func<MailItem, IList<string>> addChoicesToDictDelegate,
                                       Func<IPrefix, string, Category> addColorCategoryDelegate,
                                       Func<object, IList<string>> autoFindDelegate)
-            {                 
+            {
                 _filterList = filterList;
                 _addChoicesToDictDelegate = addChoicesToDictDelegate;
                 _addColorCategoryDelegate = addColorCategoryDelegate;

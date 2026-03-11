@@ -84,12 +84,12 @@ namespace UtilitiesCS
             return !source.Except(other).Any();
         }
 
-        public static IEnumerable<TValue> SelectGroup<TKey, TValue>(this IEnumerable<IGrouping<TKey, TValue>> groups, TKey key) 
+        public static IEnumerable<TValue> SelectGroup<TKey, TValue>(this IEnumerable<IGrouping<TKey, TValue>> groups, TKey key)
         {
             return groups.Where(x => x.Key.Equals(key)).SelectMany(x => x);
         }
 
-        public static string StringJoin(this IEnumerable<string> strings, string seperator=",") => string.Join(seperator, strings);
+        public static string StringJoin(this IEnumerable<string> strings, string seperator = ",") => string.Join(seperator, strings);
 
         public static string StringJoin(this IEnumerable<char> chars, string seperator = "") => string.Join(seperator, chars);
 
@@ -112,7 +112,7 @@ namespace UtilitiesCS
         public static Stack<T> ToStack<T>(this IEnumerable<T> enumerable)
         {
             return new Stack<T>(enumerable);
-        } 
+        }
 
         public static IEnumerable<T> WithProgressReporting<T>(this IEnumerable<T> enumerable, long count, Action<int> progress)
         {
@@ -122,7 +122,7 @@ namespace UtilitiesCS
             foreach (var item in enumerable)
             {
                 yield return item;
-                
+
                 Interlocked.Increment(ref completed);
                 progress((int)(((double)completed / count) * 100));
             }
@@ -143,7 +143,7 @@ namespace UtilitiesCS
         }
 
         public static IEnumerable<T> WithProgressReporting<T>(this IEnumerable<T> enumerable, int count, ProgressTrackerPane progress, Stopwatch sw)
-        {            
+        {
             enumerable.ThrowIfNullOrEmpty();
             progress.ThrowIfNull();
             sw ??= Stopwatch.StartNew();
@@ -157,7 +157,7 @@ namespace UtilitiesCS
 
                 progress.Report(
                     (double)completed / count * 100,
-                    $"Testing Classifiers -> { GetProgressMessage(completed, count, sw) }");
+                    $"Testing Classifiers -> {GetProgressMessage(completed, count, sw)}");
             }
         }
 
@@ -229,7 +229,7 @@ namespace UtilitiesCS
 
             return new Tuple<IEnumerable<T>, IEnumerable<U>, IEnumerable<V>>(first, second, third);
         }
-                        
+
         public static IEnumerable<IEnumerable<T>> Transpose<T>(
             this IEnumerable<IEnumerable<T>> source)
         {
@@ -388,7 +388,7 @@ namespace UtilitiesCS
             var count = array.Count();
 
             var rnd = new Random();
-            
+
             // Must consume IEnumerable to avoid generating a different random numbers on each iteration
             var assignments = Enumerable.Range(0, count).Select(x => rnd.NextDouble() > trainPercent ? "Test" : "Train").ToArray();
             var zipped = array.Zip(assignments, (tElement, grouping) => (grouping, tElement)).ToArray();

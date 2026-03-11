@@ -36,8 +36,8 @@ namespace UtilitiesCS.Threading
                     Thread.Sleep(pollingFrequency);
                     var dispatcher = Dispatcher.FromThread(thread);
                     if (dispatcher is null)
-                        UiThread.UiSyncContext.Send((x) => dispatcher = Dispatcher.CurrentDispatcher, null);        
-                
+                        UiThread.UiSyncContext.Send((x) => dispatcher = Dispatcher.CurrentDispatcher, null);
+
                     var task = dispatcher.InvokeAsync(() => { });
 
                     for (var i = 0; i < stackTraceIterations; i++)

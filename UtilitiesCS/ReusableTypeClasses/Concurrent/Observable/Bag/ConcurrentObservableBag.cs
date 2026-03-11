@@ -7,7 +7,7 @@
 
 //namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Bag
 //{
-    
+
 //    public class ConcurrentObservableBag<T> : ConcurrentBag<T>
 //    {
 //        public event EventHandler<BagChangedEventArgs<T>> CollectionChanged;
@@ -54,7 +54,7 @@
 //        public ConcurrentObservableBag(IEnumerable<T> collection)
 //            : base(collection) { }
 
-        
+
 //        #endregion
 
 //        public new void Clear()

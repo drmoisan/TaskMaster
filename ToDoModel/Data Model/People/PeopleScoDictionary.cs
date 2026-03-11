@@ -116,7 +116,7 @@
 //                                                       .Select(x => x)
 //                                                       .ToList();
 //            IList<string> newPeople = new List<string>();
-            
+
 //            foreach (var address in addressList)
 //            {
 //                var response = MessageBox.Show($"Add mapping for {address}?", "Dialog", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
@@ -157,7 +157,7 @@
 //            if (seed.StartsWith(prefix)) { return seed; }
 //            else { return $"{prefix}{seed}"; }
 //        }
-        
+
 //        public string RefineValidateCategory(string newPerson, IPrefix prefix) 
 //        {
 //            bool continueAsking = true;

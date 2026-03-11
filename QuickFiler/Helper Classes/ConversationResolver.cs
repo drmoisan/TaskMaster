@@ -262,8 +262,8 @@ namespace QuickFiler.Helper_Classes
 
             var convInfoExpanded = (await Task.WhenAll(tasksConvInfoExp)).OrderBy(x => x.ConversationID).ToList();
 
-            if (convInfoExpanded?.Count > 0) 
-            { 
+            if (convInfoExpanded?.Count > 0)
+            {
                 var idx = convInfoExpanded.FindIndex(x => x.EntryId == MailHelper.EntryId);
                 if (idx > -1) { convInfoExpanded[idx] = MailHelper; }
             }
@@ -379,15 +379,15 @@ namespace QuickFiler.Helper_Classes
 
             var dfExpanded = dfRaw.FilterConversation(folderName, false, true);
             dfExpanded = dfExpanded.Filter(dfExpanded["SentOn"].ElementwiseNotEquals<string>(""));
-            var dfSameFolder = folderName.IsNullOrEmpty() ? 
+            var dfSameFolder = folderName.IsNullOrEmpty() ?
                 dfExpanded : dfExpanded.FilterConversation(((Folder)_mailItem.Parent).Name, true, true);
 
             Df = new Pair<DataFrame>(sameFolder: dfSameFolder, expanded: dfExpanded);
         }
 
         private Pair<int> _count;
-        public Pair<int> Count 
-        { 
+        public Pair<int> Count
+        {
             get => Initializer.GetOrLoad(ref _count, LoadCount);
             internal set => _count = value;
         }

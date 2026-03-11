@@ -122,14 +122,14 @@ namespace UtilitiesCS
         }
     }
 
-    
+
 
 
     public static class EnumExtensions
     {
         public static bool HasAnyFlags<TEnum>(this TEnum optionsSelected, params TEnum[] flagsToCheck) where TEnum : Enum
         {
-            return flagsToCheck.Any(flag => optionsSelected.HasFlag(flag));            
+            return flagsToCheck.Any(flag => optionsSelected.HasFlag(flag));
         }
 
         public static bool HasAllFlags<TEnum>(this TEnum optionsSelected, params TEnum[] flagsToCheck) where TEnum : Enum
@@ -142,7 +142,7 @@ namespace UtilitiesCS
         {
             return GenericBitwiseStatic<TEnum>.Or(flags);
         }
-        
+
         public static T ToCombined<T>(this IEnumerable<T> list)
             where T : Enum
         {
@@ -176,5 +176,5 @@ namespace UtilitiesCS
             return listT.ToArray();
         }
     }
-    
+
 }

@@ -13,7 +13,7 @@ using UtilitiesCS;
 
 namespace UtilitiesCS
 {
-    public class FolderTree: INotifyPropertyChanged
+    public class FolderTree : INotifyPropertyChanged
     {
         #region ctor
 
@@ -25,7 +25,7 @@ namespace UtilitiesCS
         public FolderTree(IEnumerable<MAPIFolder> olRoots)
         {
             _roots = olRoots.Select(RootFromFolder).ToList();
-            DetangleRoots();            
+            DetangleRoots();
             WireNotifications();
         }
 
@@ -50,13 +50,13 @@ namespace UtilitiesCS
             var root = RootFromFolder(olRoot, progress.SpawnChild(95), ref folderCount);
 
             if (folderCount > 0)
-            { 
+            {
                 var traverseProgress = progress.SpawnChild(5);
                 double increment = 100 / (double)folderCount;
                 double rt = 0;
 
-                root.Traverse(node => 
-                { 
+                root.Traverse(node =>
+                {
                     node.Selected = selections.Contains(node.RelativePath);
                     rt += increment;
                     traverseProgress.Report(rt);
@@ -76,7 +76,7 @@ namespace UtilitiesCS
                 tree._roots = new List<TreeNode<FolderWrapper>>() { tree.RootFromFolder(olRoot) };
                 tree.WireNotifications();
             });
-            
+
             return tree;
         }
 
@@ -124,13 +124,13 @@ namespace UtilitiesCS
 
         public void LoadItemCounts()
         {
-            Roots.ForEach(root => root.TraverseByLevel(false, node => 
-            { 
+            Roots.ForEach(root => root.TraverseByLevel(false, node =>
+            {
                 var descendantItemCount = node.ChildCount == 0 ? 0 : node.Children.Sum(child => child.Value.ItemCountSubFolders);
                 node.Value.ItemCountSubFolders = node.Value.ItemCount + descendantItemCount;
             }));
         }
-        
+
         private TreeNode<FolderWrapper> RootFromFolder(MAPIFolder olRoot)
         {
             var info = new FolderWrapper(olRoot, olRoot);
@@ -174,16 +174,16 @@ namespace UtilitiesCS
         {
             var children = node.Value.OlFolder.Folders.Cast<MAPIFolder>().ToArray();
             var count = children.Count();
-            
+
             if (count > 0)
             {
                 double increment = 100 / (double)count;
                 double rt = 0;
-                foreach (var child in children) 
+                foreach (var child in children)
                 {
                     var childNode = node.AddChild(new FolderWrapper(child, olRoot));
                     Interlocked.Increment(ref runningTotal);
-                    
+
                     rt += increment;
                     if (child.Folders.Count > 0)
                     {
@@ -196,9 +196,9 @@ namespace UtilitiesCS
                         //progress.Increment(increment);
                     }
                 }
-                
+
                 progress.Report(100);
-            }                
+            }
         }
 
         #endregion Initialization
@@ -206,7 +206,7 @@ namespace UtilitiesCS
         #region Transformations and Comparisons
 
         public List<FolderWrapper> Flatten()
-        {            
+        {
             return [.. _roots.SelectMany(root => root.Flatten())];
         }
 
@@ -215,10 +215,10 @@ namespace UtilitiesCS
             return [.. _roots.SelectMany(root => root.FlattenNodes())];
         }
 
-        public (List<TreeNode<FolderWrapper>> nodes, List<TreeNode<FolderWrapper>> contents, List<TreeNode<FolderWrapper>> sameName, List<TreeNode<FolderWrapper>> currentOnly, List<TreeNode<FolderWrapper>> otherOnly) Compare(FolderTree other) 
+        public (List<TreeNode<FolderWrapper>> nodes, List<TreeNode<FolderWrapper>> contents, List<TreeNode<FolderWrapper>> sameName, List<TreeNode<FolderWrapper>> currentOnly, List<TreeNode<FolderWrapper>> otherOnly) Compare(FolderTree other)
         {
             var compareNodes = new FolderWrapperNodeComparer();
-            var (nodes, onlyCurrentNodes, onlyOtherNodes) = CompareMembers(other, compareNodes);            
+            var (nodes, onlyCurrentNodes, onlyOtherNodes) = CompareMembers(other, compareNodes);
             var compareContents = new FolderWrapperNodeContentsComparer();
             //var (contents, onlyCurrentContents, onlyOtherContents) = CompareMembers(other, compareContents);
             var (contents, onlyCurrentContents, onlyOtherContents) = CompareMembers(onlyCurrentNodes, onlyOtherNodes, compareContents);
@@ -240,7 +240,7 @@ namespace UtilitiesCS
             return (nodes, contents, uniqueNameMatch, onlyCurrentContents, onlyOtherContents);
         }
 
-        
+
 
         public (List<TreeNode<FolderWrapper>> same, List<TreeNode<FolderWrapper>> onlyCurrent, List<TreeNode<FolderWrapper>> onlyOther) CompareMembers(List<TreeNode<FolderWrapper>> current, List<TreeNode<FolderWrapper>> other, IEqualityComparer<TreeNode<FolderWrapper>> comparer)
         {
@@ -261,7 +261,7 @@ namespace UtilitiesCS
         public (List<FolderWrapper> same, List<FolderWrapper> onlyCurrent, List<FolderWrapper> onlyOther) CompareMembers(FolderTree other, IEqualityComparer<FolderWrapper> comparer)
         {
             var thisFlat = this.Flatten();
-            var otherFlat = other.Flatten();            
+            var otherFlat = other.Flatten();
             return CompareMembers(thisFlat, otherFlat, comparer);
         }
 
@@ -283,7 +283,7 @@ namespace UtilitiesCS
             {
                 node.Traverse(node => node.Selected = true);
             }
-            
+
         }
 
         public List<TreeNode<FolderWrapper>> FilterSelected(bool include)
@@ -292,7 +292,7 @@ namespace UtilitiesCS
             var dummyRootIn = new TreeNode<FolderWrapper>(_roots[0].Value);
             dummyRootIn.Children = _roots;
 
-            FilterChildren(dummyRootIn, dummyRootOut, include); 
+            FilterChildren(dummyRootIn, dummyRootOut, include);
             var selected = dummyRootOut.Children;
             return selected;
         }
@@ -321,12 +321,12 @@ namespace UtilitiesCS
         {
             _roots.ForEach(root => root.Traverse(node => node.Value.PropertyChanged += Child_PropertyChanged));
         }
-        
+
         private TimedBatchAction _batchNotifier = new(TimeSpan.FromMilliseconds(50));
 
         private void Child_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            _batchNotifier.RequestAction(() => PropertyChanged?.Invoke(sender, e));   
+            _batchNotifier.RequestAction(() => PropertyChanged?.Invoke(sender, e));
         }
 
         public void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -340,5 +340,5 @@ namespace UtilitiesCS
     }
 
 
-    
+
 }

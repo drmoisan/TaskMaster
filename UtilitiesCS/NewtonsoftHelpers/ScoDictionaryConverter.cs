@@ -15,9 +15,9 @@ namespace UtilitiesCS.NewtonsoftHelpers.Sco
         public override TDerived ReadJson(JsonReader reader, Type typeToConvert, TDerived existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var wrapper = serializer.Deserialize(reader, typeof(WrapperScoDictionary<TDerived, TKey, TValue>)) as WrapperScoDictionary<TDerived, TKey, TValue>;
-            return wrapper?.ToDerived();            
+            return wrapper?.ToDerived();
         }
-                
+
         public override void WriteJson(JsonWriter writer, TDerived value, JsonSerializer serializer)
         {
             var wrapper = new WrapperScoDictionary<TDerived, TKey, TValue>().ToComposition(value);
@@ -45,7 +45,7 @@ namespace UtilitiesCS.NewtonsoftHelpers.Sco
             Type wrapperType = typeof(WrapperScoDictionary<,,>).MakeGenericType(objectType, genericArguments[0], genericArguments[1]);
             var wrapper = serializer.Deserialize(reader, wrapperType);
             return wrapperType.GetMethod("ToDerived", [])?.Invoke(wrapper, null);
-            
+
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -60,7 +60,7 @@ namespace UtilitiesCS.NewtonsoftHelpers.Sco
             serializer.Serialize(writer, wrapper, wrapperType);
 
             //var wrapper2 = new WrapperScoDictionary<ScoDictionaryNew<string,string>,string,string> ();
-                        
+
         }
     }
 }

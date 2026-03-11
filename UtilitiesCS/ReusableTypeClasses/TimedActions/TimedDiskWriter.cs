@@ -28,7 +28,7 @@ namespace UtilitiesCS
         /// <summary>
         /// Constructor for <see cref="TimedDiskWriter{T}"/>
         /// </summary>
-        public TimedDiskWriter() 
+        public TimedDiskWriter()
         {
             Config = new Configuration(20, TimeSpan.FromMilliseconds(500));
             Config.PropertyChanged += Configuration_PropertyChanged;
@@ -55,7 +55,7 @@ namespace UtilitiesCS
         }
 
         #region Public Properties
-                
+
         /// <inheritdoc cref="Configuration"/>
         public virtual Configuration Config { get => _config; private set => _config = value; }
         private Configuration _config;
@@ -154,13 +154,13 @@ namespace UtilitiesCS
             {
                 items.Add(item);
             }
-            
+
             if (items.Any())
             {
                 DiskWriter(items);
             }
-            else 
-            { 
+            else
+            {
                 Interlocked.Increment(ref _emptyQueueChecks);
                 if (_emptyQueueChecks > 4)
                 {
@@ -169,14 +169,14 @@ namespace UtilitiesCS
                 }
             }
         }
-        
+
         /// <summary>
         /// Starts the timer to invoke the <see cref="DiskWriter"/>
         /// </summary>
         public virtual void StartTimer()
         {
-            if (DiskWriter is null) 
-            { 
+            if (DiskWriter is null)
+            {
                 throw new InvalidOperationException($"{nameof(TimedDiskWriter<T>)} is " +
                     $"attempting to start the timer with no action assigned to " +
                     $"the callback {nameof(DiskWriter)} ");
@@ -281,14 +281,14 @@ namespace UtilitiesCS
             /// <summary>
             /// Frequency with which to write to disk
             /// </summary>
-            public TimeSpan WriteInterval 
-            { 
+            public TimeSpan WriteInterval
+            {
                 get => _writeInterval;
-                set 
-                { 
+                set
+                {
                     _writeInterval = value;
                     NotifyPropertyChanged();
-                } 
+                }
             }
             private TimeSpan _writeInterval = TimeSpan.FromMinutes(5);
 

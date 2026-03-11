@@ -4,9 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace UtilitiesCS
 {
-    
 
-    public interface ISubjectMapSco: IScoCollection<SubjectMapEntry>
+
+    public interface ISubjectMapSco : IScoCollection<SubjectMapEntry>
     {
         void Add(string subject, string folderName);
         IList<SubjectMapEntry> Find(string key, Enums.FindBy findBy);

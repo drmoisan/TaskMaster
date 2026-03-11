@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace UtilitiesCS.Interfaces.IWinForm
 {
-    public interface IUserControl: IContainerControl
+    public interface IUserControl : IContainerControl
     {
         bool AutoSize { get; set; }
         AutoSizeMode AutoSizeMode { get; set; }

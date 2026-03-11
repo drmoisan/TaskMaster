@@ -20,7 +20,7 @@
 //                _task = task;
 //                _callback = callback;
 //            }
-            
+
 //            public async Task ExecuteAsync()
 //            {
 //                await _task;
@@ -75,64 +75,64 @@
 //        }
 //        private static ConcurrentQueue<QueuedTask> _entries;
 //    }
-    // Original Function
-    //public class AsyncIdleQueue
-    //{
-    //    private AsyncIdleQueue()
-    //    {
-    //    }
-    //    private class QueuedDetails
-    //    {
-    //        public QueuedDetails(IAsyncResult result, AsyncCallback callback)
-    //        {
-    //            _result = result;
-    //            _callback = callback;
-    //        }
-    //        public bool InvokeIfComplete()
-    //        {
-    //            bool done = _result.IsCompleted;
+// Original Function
+//public class AsyncIdleQueue
+//{
+//    private AsyncIdleQueue()
+//    {
+//    }
+//    private class QueuedDetails
+//    {
+//        public QueuedDetails(IAsyncResult result, AsyncCallback callback)
+//        {
+//            _result = result;
+//            _callback = callback;
+//        }
+//        public bool InvokeIfComplete()
+//        {
+//            bool done = _result.IsCompleted;
 
-    //            if (done)
-    //            {
-    //                _callback(_result);
-    //            }
-    //            return (done);
-    //        }
-    //        private IAsyncResult _result;
-    //        private AsyncCallback _callback;
-    //    }
-    //    static AsyncIdleQueue()
-    //    {
-    //        System.Windows.Forms.Application.Idle += new EventHandler(OnApplicationIdle);
-    //    }
-    //    public static void AddEntry(IAsyncResult result, AsyncCallback callback)
-    //    {
-    //        Entries.Add(new QueuedDetails(result, callback));
-    //    }
-    //    private static ArrayList Entries
-    //    {
-    //        get
-    //        {
-    //            if (_entries == null)
-    //            {
-    //                _entries = new ArrayList();
-    //            }
-    //            return (_entries);
-    //        }
-    //    }
-    //    private static void OnApplicationIdle(object sender, EventArgs e)
-    //    {
-    //        for (int i = 0; i < Entries.Count; ++i)
-    //        {
-    //            QueuedDetails d = (QueuedDetails)Entries[i];
+//            if (done)
+//            {
+//                _callback(_result);
+//            }
+//            return (done);
+//        }
+//        private IAsyncResult _result;
+//        private AsyncCallback _callback;
+//    }
+//    static AsyncIdleQueue()
+//    {
+//        System.Windows.Forms.Application.Idle += new EventHandler(OnApplicationIdle);
+//    }
+//    public static void AddEntry(IAsyncResult result, AsyncCallback callback)
+//    {
+//        Entries.Add(new QueuedDetails(result, callback));
+//    }
+//    private static ArrayList Entries
+//    {
+//        get
+//        {
+//            if (_entries == null)
+//            {
+//                _entries = new ArrayList();
+//            }
+//            return (_entries);
+//        }
+//    }
+//    private static void OnApplicationIdle(object sender, EventArgs e)
+//    {
+//        for (int i = 0; i < Entries.Count; ++i)
+//        {
+//            QueuedDetails d = (QueuedDetails)Entries[i];
 
-    //            if (d.InvokeIfComplete())
-    //            {
-    //                Entries.Remove(d);
-    //                --i;
-    //            }
-    //        }
-    //    }
-    //    private static ArrayList _entries;
-    //}
+//            if (d.InvokeIfComplete())
+//            {
+//                Entries.Remove(d);
+//                --i;
+//            }
+//        }
+//    }
+//    private static ArrayList _entries;
+//}
 //}

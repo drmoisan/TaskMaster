@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace UtilitiesCS.Interfaces.IWinForm
 {
-    public interface IControl: IComponent, IDropTarget, ISynchronizeInvoke, IWin32Window, IDisposable, IBindableComponent //,IArrangedElement
+    public interface IControl : IComponent, IDropTarget, ISynchronizeInvoke, IWin32Window, IDisposable, IBindableComponent //,IArrangedElement
     {
         AccessibleObject AccessibilityObject { get; }
         string AccessibleDefaultActionDescription { get; set; }
@@ -19,8 +19,8 @@ namespace UtilitiesCS.Interfaces.IWinForm
         bool AutoSize { get; set; }
         Color BackColor { get; set; }
         Image BackgroundImage { get; set; }
-        ImageLayout BackgroundImageLayout { get; set; }        
-        int Bottom { get; }        
+        ImageLayout BackgroundImageLayout { get; set; }
+        int Bottom { get; }
         bool CanFocus { get; }
         bool CanSelect { get; }
         bool Capture { get; set; }
@@ -33,17 +33,17 @@ namespace UtilitiesCS.Interfaces.IWinForm
         ContextMenuStrip ContextMenuStrip { get; set; }
         Control.ControlCollection Controls { get; }
         bool Created { get; }
-        Cursor Cursor { get; set; }        
-        int DeviceDpi { get; }        
+        Cursor Cursor { get; set; }
+        int DeviceDpi { get; }
         bool Disposing { get; }
         DockStyle Dock { get; set; }
         bool Enabled { get; set; }
         bool Focused { get; }
         Font Font { get; set; }
-        Color ForeColor { get; set; }        
+        Color ForeColor { get; set; }
         bool HasChildren { get; }
         int Height { get; set; }
-        ImeMode ImeMode { get; set; }        
+        ImeMode ImeMode { get; set; }
         bool IsAccessible { get; set; }
         bool IsDisposed { get; }
         bool IsHandleCreated { get; }
@@ -63,7 +63,7 @@ namespace UtilitiesCS.Interfaces.IWinForm
         bool RecreatingHandle { get; }
         Region Region { get; set; }
         int Right { get; }
-        RightToLeft RightToLeft { get; set; }        
+        RightToLeft RightToLeft { get; set; }
         Size Size { get; set; }
         int TabIndex { get; set; }
         bool TabStop { get; set; }
@@ -147,19 +147,19 @@ namespace UtilitiesCS.Interfaces.IWinForm
         event CancelEventHandler Validating;
         event EventHandler VisibleChanged;
 
-        IAsyncResult BeginInvoke(Delegate method);        
+        IAsyncResult BeginInvoke(Delegate method);
         void BringToFront();
         bool Contains(Control ctl);
         void CreateControl();
         Graphics CreateGraphics();
         DragDropEffects DoDragDrop(object data, DragDropEffects allowedEffects);
-        void DrawToBitmap(Bitmap bitmap, Rectangle targetBounds);        
+        void DrawToBitmap(Bitmap bitmap, Rectangle targetBounds);
         Form FindForm();
         bool Focus();
         Control GetChildAtPoint(Point pt);
         Control GetChildAtPoint(Point pt, GetChildAtPointSkip skipValue);
         IContainerControl GetContainerControl();
-        Control GetNextControl(Control ctl, bool forward);        
+        Control GetNextControl(Control ctl, bool forward);
         void Hide();
         void Invalidate();
         void Invalidate(bool invalidateChildren);
@@ -167,7 +167,7 @@ namespace UtilitiesCS.Interfaces.IWinForm
         void Invalidate(Rectangle rc, bool invalidateChildren);
         void Invalidate(Region region);
         void Invalidate(Region region, bool invalidateChildren);
-        object Invoke(Delegate method);        
+        object Invoke(Delegate method);
         int LogicalToDeviceUnits(int value);
         Size LogicalToDeviceUnits(Size value);
         void PerformLayout();

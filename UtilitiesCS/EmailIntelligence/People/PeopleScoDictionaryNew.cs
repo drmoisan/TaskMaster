@@ -157,7 +157,7 @@ namespace ToDoModel.Data_Model.People
             var regex = new Regex(@"([a-zA-Z\d]+)[\._]([a-zA-Z]+)[\._]*([a-zA-z]*)\d*@([a-zA-z\d]+)(\.(com|ca|au|mx))+", RegexOptions.Multiline);
             var groups = regex.GetRegexGroups(address);
             StringBuilder sb = new StringBuilder();
-            if (groups.IsNullOrEmpty() || groups[1].IsNullOrEmpty()) 
+            if (groups.IsNullOrEmpty() || groups[1].IsNullOrEmpty())
             {
                 regex = new Regex(@"([a-zA-Z\d])([a-zA-Z\d]+)\d*(@)([a-zA-z\d]+)(\.(com|ca|au|mx))+", RegexOptions.Multiline);
                 groups = regex.GetRegexGroups(address);
@@ -167,7 +167,7 @@ namespace ToDoModel.Data_Model.People
             {
                 groups[1] += $" {groups[2]}";
             }
-            
+
             if (!groups[0].IsNullOrEmpty())
             {
                 sb.Append(groups[0]);
@@ -201,6 +201,6 @@ namespace ToDoModel.Data_Model.People
             //return launcher.FindMatch(searchString);
         }
 
-        
+
     }
 }

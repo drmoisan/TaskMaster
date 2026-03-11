@@ -16,11 +16,11 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         public StoreWrapperController(IApplicationGlobals globals)
         {
-            Globals = globals;            
+            Globals = globals;
         }
 
         internal IApplicationGlobals Globals { get; set; }
-        
+
         public IStoreWrapperViewer Viewer { get; internal set; }
 
         public StoresWrapper Model { get; internal set; }
@@ -30,19 +30,19 @@ namespace UtilitiesCS.OutlookObjects.Store
         internal FolderMinimalWrapper ArchiveOutlook { get; set; }
         internal FilePathHelper ArchiveFS { get; set; }
         internal FolderMinimalWrapper JunkEmail { get; set; }
-        internal FolderMinimalWrapper JunkPotential { get; set; }       
+        internal FolderMinimalWrapper JunkPotential { get; set; }
         internal Func<string, (string, string)> FsConverter { get; set; }
-        
+
 
         #region Events
 
-        public void Launch() 
+        public void Launch()
         {
             FsConverter = new FilePathHelperConverter(Globals.FS).GetSerializablePath;
             Model = Globals.Ol.StoresWrapper;
             Viewer = new StoreWrapperViewer(this);
             Viewer.DisplayName.DataSource = Model.Stores.Select(store => store.DisplayName).ToList();
-            
+
             Viewer.ShowDialog();
         }
 
@@ -61,7 +61,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         {
             if (AnyChanges())
             {
-                var response = MyBox.ShowDialog("Save changes?", "Save Changes", 
+                var response = MyBox.ShowDialog("Save changes?", "Save Changes",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (response == DialogResult.Yes) { SaveChanges(); }
             }
@@ -79,8 +79,8 @@ namespace UtilitiesCS.OutlookObjects.Store
             }
             var folderPath = SelectFsFolder();
             if (folderPath.IsNullOrEmpty()) { return; }
-            else 
-            {                 
+            else
+            {
                 ArchiveFS.FolderPath = folderPath;
                 Viewer.ArchiveFS.Text = GetRelativeFsPath();
             }
@@ -122,7 +122,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         #endregion Events
 
         #region Methods
-        
+
         internal bool AnyChanges()
         {
             return !PairwiseEquals(ArchiveOutlook, Current?.ArchiveRoot) ||
@@ -171,7 +171,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         }
 
         internal void SaveChanges()
-        {            
+        {
             Current.ArchiveRoot = ArchiveOutlook;
             Current.JunkCertain = JunkEmail;
             Current.JunkPotential = JunkPotential;
@@ -191,7 +191,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             {
                 logger.Error($"Error selecting folder. {e.Message}", e);
                 return null;
-            }                   
+            }
         }
 
         internal string SelectFsFolder()

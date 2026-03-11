@@ -17,7 +17,7 @@ namespace UtilitiesCS
     /// <summary>
     /// Class converts color categories to flags relevant to People, Projects, Topics, Context, etc
     /// </summary>
-    public class FlagParser: INotifyCollectionChanged, ICloneable, INotifyPropertyChanged
+    public class FlagParser : INotifyCollectionChanged, ICloneable, INotifyPropertyChanged
     {
         #region ctor
 
@@ -34,7 +34,7 @@ namespace UtilitiesCS
                 categoryString = "";
 
             var categories = categoryString.Split(separator: ',', trim: true).ToList();
-            Initialize(categories);            
+            Initialize(categories);
         }
 
         public FlagParser(IList<string> categories)
@@ -61,18 +61,18 @@ namespace UtilitiesCS
 
             Today = categories.Remove(Properties.Settings.Default.Prefix_Today);
             Bullpin = categories.Remove(Properties.Settings.Default.Prefix_Bullpin);
-            Other = categories.Count > 0 ? string.Join(", ", categories) : "";    
+            Other = categories.Count > 0 ? string.Join(", ", categories) : "";
             Combined = new(this);
             WireEvents();
         }
-        
+
         private string identifier = "not set";
-        public string Identifier 
-        { 
+        public string Identifier
+        {
             get => identifier;
-            set 
-            { 
-                identifier = value; 
+            set
+            {
+                identifier = value;
                 Wiring.ForEach(x => x.Key.Identifier = value);
             }
         }
@@ -202,9 +202,9 @@ namespace UtilitiesCS
         /// <param name="IncludePrefix">Determines whether GET includes the category Prefix</param>
         /// <returns>A string containing a comma separated Topic names</returns>
         public string GetPeople(bool IncludePrefix = false) => IncludePrefix ? _people.WithPrefix : _people.NoPrefix;
-        
+
         public void SetPeople(bool IncludePrefix = false, string value = default) => _people.List = SplitToList(value, ",", _people.Prefix);
-        
+
         public ObservableCollection<string> GetPeopleList(bool IncludePrefix = false) => IncludePrefix ? _people.ListWithPrefix : _people.List;
         public void SetPeopleList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _people.List = value;
         //{
@@ -277,8 +277,8 @@ namespace UtilitiesCS
         }
 
         private void Update() => Combined.RequestUpdate();//updated = false;
-        //protected bool updated;
-        
+                                                          //protected bool updated;
+
         public FlagConsolidator Combined { get; protected set; }
 
         #region commented out
@@ -352,7 +352,7 @@ namespace UtilitiesCS
                 { Kb , Kb_CollectionChanged }
             };
         }
-        
+
         public void WireEvents()
         {
             _people.CollectionChanged += People_CollectionChanged;
@@ -363,9 +363,9 @@ namespace UtilitiesCS
             _kb.CollectionChanged += Kb_CollectionChanged;
         }
 
-        public void UnWireEvents() => Wiring.ForEach(x => UnWireFlagParserEvent(x.Key, x.Value));        
+        public void UnWireEvents() => Wiring.ForEach(x => UnWireFlagParserEvent(x.Key, x.Value));
 
-        public void UnWireFlagParserEvent(FlagDetails flagDetails,NotifyCollectionChangedEventHandler handler)
+        public void UnWireFlagParserEvent(FlagDetails flagDetails, NotifyCollectionChangedEventHandler handler)
         {
             if (flagDetails is not null)
             {
@@ -474,17 +474,17 @@ namespace UtilitiesCS
         #endregion Helper Methods
 
         #region Comparison
-        
-        public bool AreEquivalentTo(string other) 
+
+        public bool AreEquivalentTo(string other)
         {
             if (Combined.AsStringWithPrefix.IsNullOrEmpty())
             {
                 if (other.IsNullOrEmpty()) { return true; }
                 else { return false; }
             }
-            else if (other.IsNullOrEmpty()) { return false; }                
-            else if (Combined.AsStringWithPrefix == other) { return true; }            
-            else 
+            else if (other.IsNullOrEmpty()) { return false; }
+            else if (Combined.AsStringWithPrefix == other) { return true; }
+            else
             {
                 var otherList = other.Split(separator: ',', trim: true).OrderBy(x => x).ToList();
                 return Combined.AsListWithPrefix.SequenceEqual(otherList);

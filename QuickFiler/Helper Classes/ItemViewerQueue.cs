@@ -38,7 +38,7 @@ namespace QuickFiler
                     {
                         _queue.Enqueue(new ItemViewer());
                         //logger.Debug($"Enqueued {_queue.Count}");
-                    }, 
+                    },
                     System.Windows.Threading.DispatcherPriority.Background);
             }
         }
@@ -60,7 +60,7 @@ namespace QuickFiler
                 viewer = _queue.Dequeue();
                 //logger.Debug($"Dequeued 1, {_queue.Count} remaining");
                 BuildQueueWhenIdle(1);
-                
+
             }
             else
             {

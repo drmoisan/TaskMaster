@@ -15,9 +15,9 @@ namespace Z.Disabled.TaskVisualization.Test
         [TestMethod]
         public void Disabled_GetFlagsToSet_TestMultiple()
         {
-            
+
             //MoqOlToDo mockGlobals = new MoqOlToDo();
-                                    
+
             //FlagTasks testFlagger = new FlagTasks(mockGlobals.MockGlobals());
             //testFlagger.Run();
             ////testFlagger.GetFlagsToSet(2);

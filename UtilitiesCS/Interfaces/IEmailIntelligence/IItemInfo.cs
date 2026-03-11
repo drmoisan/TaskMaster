@@ -9,7 +9,7 @@ using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS;
 
-public interface IItemInfo: IEquatable<IItemInfo>
+public interface IItemInfo : IEquatable<IItemInfo>
 {
     [Flags]
     public enum PlainTextOptionsEnum
@@ -51,7 +51,7 @@ public interface IItemInfo: IEquatable<IItemInfo>
     string[] Tokens { get; }
     string Triage { get; set; }
     bool UnRead { get; set; }
-    
+
     [JsonIgnore]
     SegmentStopWatch Sw { get; set; }
 }

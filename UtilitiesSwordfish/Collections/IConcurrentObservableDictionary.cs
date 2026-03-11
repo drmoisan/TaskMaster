@@ -20,6 +20,6 @@ namespace Swordfish.NET.Collections
         TValue RetrieveOrAdd(TKey key, Func<TValue> getValue);
         bool TryAdd(TKey key, TValue value);
         bool TryGetIndexOf(TKey key, out int index);
-        
+
     }
 }

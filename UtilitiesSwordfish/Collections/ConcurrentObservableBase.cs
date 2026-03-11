@@ -19,7 +19,8 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Security.Cryptography;
 
-namespace Swordfish.NET.Collections {
+namespace Swordfish.NET.Collections
+{
 
     /// <summary>
     /// This class provides the base for concurrent collections that 

@@ -22,10 +22,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
             OlRoot = (Outlook.Folder)olRoot;
             ResetLazy();
         }
-        
+
         public FolderMinimalWrapper(string name, string relativePath)
         {
-            Name = name; 
+            Name = name;
             RelativePath = relativePath;
         }
 
@@ -38,7 +38,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         [JsonProperty]
         public string Name { get => _lazyName?.Value; private set => _lazyName = value?.ToLazy(); }
         private Lazy<string> _lazyName;
-        
+
         [JsonProperty]
         public string RelativePath { get => _lazyRelativePath?.Value; set => _lazyRelativePath = value?.ToLazy(); }
         private Lazy<string> _lazyRelativePath;
@@ -82,21 +82,21 @@ namespace UtilitiesCS.OutlookObjects.Folder
             {
                 if (RelativePath.StartsWith("\\\\"))
                 {
-                    var rp = RelativePath;                
+                    var rp = RelativePath;
                     while (rp.StartsWith("\\\\"))
                     {
                         if (olRoot.Parent is Outlook.Folder)
                         {
                             olRoot = olRoot.Parent as Outlook.Folder;
                         }
-                        else if (olRoot.Parent is Outlook.NameSpace ns) 
+                        else if (olRoot.Parent is Outlook.NameSpace ns)
                         {
                             olRoot = ns.Stores.Cast<Outlook.Store>()
                                 .FirstOrDefault(store => store.GetRootFolder().FolderPath == $"\\\\{pathParts[0]}")
                                 .GetRootFolder() as Outlook.Folder;
                             pathParts.RemoveAt(0);
 
-                        }                    
+                        }
                         rp = rp.Substring(2);
                     }
                 }
@@ -109,7 +109,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             try
             {
                 OlRoot = olRoot;
-                
+
                 Outlook.Folder currentFolder = olRoot;
 
                 foreach (var part in pathParts)
@@ -132,11 +132,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
         }
 
         public void ResetLazy()
-        {            
+        {
             _lazyRelativePath = new Lazy<string>(ToRelativePath);
             _lazyName = new Lazy<string>(() => OlFolder?.Name);
         }
 
-        
+
     }
 }

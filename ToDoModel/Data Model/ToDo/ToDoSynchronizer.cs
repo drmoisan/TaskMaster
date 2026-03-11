@@ -12,7 +12,7 @@ namespace ToDoModel
 {
     public class ToDoSynchronizer
     {
-        public ToDoSynchronizer(IApplicationGlobals globals) 
+        public ToDoSynchronizer(IApplicationGlobals globals)
         {
             Globals = globals;
             ProjInfo = Globals.TD.ProjInfo;
@@ -44,7 +44,7 @@ namespace ToDoModel
             {
                 var todo = ToDoFromId(entryId);
 
-                await Task.Run(() => SynchronizeEC(Globals.Events.OlToDoItems, todo));               
+                await Task.Run(() => SynchronizeEC(Globals.Events.OlToDoItems, todo));
                 await Task.Run(() => SynchronizeKanban(todo.OlItem.InnerObject, todo));
                 await Task.Delay(500);
 
@@ -52,8 +52,8 @@ namespace ToDoModel
             }
         }
 
-        
-        
+
+
         private ToDoItem ToDoFromId(string entryId)
         {
             var item = Ns.GetItemFromID(entryId);

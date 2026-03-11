@@ -91,7 +91,7 @@ namespace UtilitiesCS
         }
 
         public static bool TryAddValues<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dictionary, TKey key, TValue value)
-        {            
+        {
             while (dictionary.TryGetValue(key, out var existingValue))
             {
                 TValue newValue = GenericMath<TValue>.Add(existingValue, value);
@@ -127,7 +127,7 @@ namespace UtilitiesCS
         {
             var linkedTS = CancellationTokenSource.CreateLinkedTokenSource(token);
             linkedTS.CancelAfter(500);
-            
+
             return await Task.Run(() => dictionary.TryAddValues(key, value), linkedTS.Token);
         }
 
@@ -144,7 +144,7 @@ namespace UtilitiesCS
                 {
                     // removes if KVP is exact match. If another thread has
                     // updated the value, it will fail and try the loop again
-                    if (((ICollection<KeyValuePair<TKey,TValue>>)dictionary)
+                    if (((ICollection<KeyValuePair<TKey, TValue>>)dictionary)
                         .Remove(new KeyValuePair<TKey, TValue>(key, value)))
                     {
                         value = default;

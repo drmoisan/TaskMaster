@@ -63,12 +63,12 @@ namespace UtilitiesCS
         }
 
         public static void ForAllControls(this IEnumerable<Control> controls, Action<Control> action, IList<Control> except)
-        {           
+        {
             foreach (Control c in controls)
             {
                 if (!except.Contains(c))
                     ForAllControls(c, action, except);
-            }                       
+            }
         }
 
         public static void ForAllControls(this Control.ControlCollection controls, Action<Control> action, IList<Control> except)
@@ -102,7 +102,7 @@ namespace UtilitiesCS
                     ForAllControls(c, seedValue, function, except);
                 }
             }
-            
+
         }
 
         public static void ForAllControls<T>(this Control parent, T value, Func<Control, T, T> function)
@@ -144,7 +144,7 @@ namespace UtilitiesCS
             }
         }
 
-        public static T GetAncestor<T>(this Control control) where T: class
+        public static T GetAncestor<T>(this Control control) where T : class
         {
             var parent = control.Parent;
             if (parent is T) { return parent as T; }
@@ -181,9 +181,9 @@ namespace UtilitiesCS
             }
         }
 
-        public static bool IsRegistered(this EventHandler handler, 
-                                        Delegate prospectiveHandler) => 
-            handler != null && 
+        public static bool IsRegistered(this EventHandler handler,
+                                        Delegate prospectiveHandler) =>
+            handler != null &&
             handler.GetInvocationList()
                    .Any(existingHandler => existingHandler == prospectiveHandler);
 
@@ -212,7 +212,7 @@ namespace UtilitiesCS
 
         // 3 Public Overloads of Clone<T>
 
-        public static T Clone<T>(this T controlToClone, string name, bool deep=false)
+        public static T Clone<T>(this T controlToClone, string name, bool deep = false)
             where T : Control
         {
             T instance = controlToClone.Clone<T>(deep);
@@ -220,7 +220,7 @@ namespace UtilitiesCS
             return instance;
         }
 
-        public static T Clone<T>(this T controlToClone, bool deep=false)
+        public static T Clone<T>(this T controlToClone, bool deep = false)
             where T : Control
         {
             PropertyInfo[] controlProperties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -236,7 +236,7 @@ namespace UtilitiesCS
         }
 
         public static T Clone<T>(this T sourceClass, bool deep, int remainingDepth) where T : class
-            
+
         {
             var type = sourceClass.GetType();
             var properties = type.GetProperties();
@@ -279,28 +279,28 @@ namespace UtilitiesCS
                     if (deep) { property.DeepCopyProperty(sourceClass, remainingDepth, ref destinationClass); }
                     else { property.ShallowCopyProperty(sourceClass, ref destinationClass); }
                 }
-                
+
             }
         }
-        
+
         // 4 Types of Node Copying
-        
-        private static void ShallowCopyProperty<T>(this PropertyInfo propInfo, T classToClone, ref T clonedInstance)  
+
+        private static void ShallowCopyProperty<T>(this PropertyInfo propInfo, T classToClone, ref T clonedInstance)
         {
-            propInfo.SetValue(clonedInstance, propInfo.GetValue(classToClone, null), null);   
+            propInfo.SetValue(clonedInstance, propInfo.GetValue(classToClone, null), null);
         }
 
-        private static void DeepCopyProperty<T>(this PropertyInfo property, T classToClone, int remainingDepth, ref T clonedInstance) 
+        private static void DeepCopyProperty<T>(this PropertyInfo property, T classToClone, int remainingDepth, ref T clonedInstance)
         {
             object value = property.GetValue(classToClone);
-            if ((value != null) && (value.GetType().IsClass) && (!value.GetType().IsPrimitiveLike()) && (value.GetType().FullName.StartsWith("System.") ? (remainingDepth-- > 0) : true)) 
-            { 
+            if ((value != null) && (value.GetType().IsClass) && (!value.GetType().IsPrimitiveLike()) && (value.GetType().FullName.StartsWith("System.") ? (remainingDepth-- > 0) : true))
+            {
                 property.SetValue(clonedInstance, value.Clone(true, remainingDepth));
             }
             else
             {
                 property.SetValue(classToClone, value);
-            }    
+            }
         }
 
         private static void CopyBySubProperties<T>(this PropertyInfo property, ref T destinationClass, T sourceClass, bool deep, int remainingDepth) where T : class
@@ -313,21 +313,23 @@ namespace UtilitiesCS
             subProperties.CopyToDestination(ref destinationClass2, sourceClass2, deep, remainingDepth);
         }
 
-        private static void CopyTableLayoutSettings<T>(this PropertyInfo property, ref T destinationClass, T sourceClass) 
+        private static void CopyTableLayoutSettings<T>(this PropertyInfo property, ref T destinationClass, T sourceClass)
         {
-            var source = (TableLayoutSettings)property.GetValue(sourceClass); 
+            var source = (TableLayoutSettings)property.GetValue(sourceClass);
             var destination = (TableLayoutSettings)property.GetValue(destinationClass);
-                        
+
             destination.ColumnCount = source.ColumnCount;
             foreach (ColumnStyle style in source.ColumnStyles)
             {
                 destination.ColumnStyles.Add(style.Clone());
-            };
+            }
+            ;
             destination.RowCount = source.RowCount;
             foreach (RowStyle style in source.RowStyles)
             {
                 destination.RowStyles.Add(style.Clone());
-            };
+            }
+            ;
             destination.GrowStyle = source.GrowStyle;
         }
 
@@ -349,16 +351,16 @@ namespace UtilitiesCS
             return clonedInstance;
         }
 
-        internal static List<Type> TypesSetByProperties = new List<Type>() 
-        { 
-             
+        internal static List<Type> TypesSetByProperties = new List<Type>()
+        {
+
         };
 
         internal static bool IsPrimitiveLike(this Type type)
         {
-            return type.IsPrimitive || 
-                   type.IsEnum || 
-                   type == typeof(string) || 
+            return type.IsPrimitive ||
+                   type.IsEnum ||
+                   type == typeof(string) ||
                    type == typeof(decimal) ||
                    type == typeof(DateTime);
         }

@@ -173,7 +173,7 @@ namespace QuickFiler.Controllers
             if (items.Count == 0) { throw new ArgumentException("items is empty"); }
 
             _qfcCollectionController = qfcCollectionController;
-            
+
             await Task.Run(() => items.ForEach(item => _moveMonitor.HookItem(item, async (x) => await RemoveItem(x))));
 
 
@@ -186,7 +186,7 @@ namespace QuickFiler.Controllers
 
             try
             {
-                var itemGroups = await UiIdleAsyncCallAsync(async () => 
+                var itemGroups = await UiIdleAsyncCallAsync(async () =>
                     await LoadControllersViewersAsync(items, _globals,
                     _homeController, qfcCollectionController, tlp, 0));
                 _queue.Add((tlp, itemGroups));
@@ -472,7 +472,7 @@ namespace QuickFiler.Controllers
 
         internal async Task<T> UiIdleAsyncCallAsync<T>(Func<Task<T>> func)
         {
-            T result = await await UiThread.Dispatcher.InvokeAsync(async() => 
+            T result = await await UiThread.Dispatcher.InvokeAsync(async () =>
             {
                 T result = await func();
                 await Task.Yield();

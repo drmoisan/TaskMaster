@@ -13,11 +13,11 @@ using UtilitiesCS.EmailIntelligence.EmailParsing;
 
 namespace UtilitiesCS.EmailIntelligence
 {
-    public class AttachmentHelper 
+    public class AttachmentHelper
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        
+
         #region Constructors and Initializers
 
         public AttachmentHelper() { }
@@ -44,7 +44,7 @@ namespace UtilitiesCS.EmailIntelligence
             await att.InitAsync(attachment, sentOn, saveFolderPath, deleteFolderPath);
             return att;
         }
-                
+
         public void Init(Attachment attachment, DateTime sentOn, string saveFolderPath, string deleteFolderPath)
         {
             _attachment = attachment;
@@ -66,12 +66,12 @@ namespace UtilitiesCS.EmailIntelligence
                 {
                     AttachmentInfo.FilenameSeed = FolderConverter.SanitizeFilename(attachment.DisplayName);
                 }
-                else 
+                else
                 {
                     AttachmentInfo.FilenameSeed = "unknown";
                 }
 
-                AttachmentInfo.FilenameSeed = PrependDatePrefix(AttachmentInfo.FilenameSeed, sentOn);                    
+                AttachmentInfo.FilenameSeed = PrependDatePrefix(AttachmentInfo.FilenameSeed, sentOn);
                 FilePathSave = AdjustForMaxPath(saveFolderPath, AttachmentInfo.FilenameSeed, AttachmentInfo.FileExtension);
                 FilePathSaveAlt = AdjustForMaxPath(saveFolderPath, AttachmentInfo.FilenameSeed, AttachmentInfo.FileExtension, GetNameSuffix());
 
@@ -198,10 +198,10 @@ namespace UtilitiesCS.EmailIntelligence
             }
             catch (System.Exception e)
             {
-                logger.Error($"Error getting filename for item. Attachment type {attachment.Type}\n{e.Message}",e);
+                logger.Error($"Error getting filename for item. Attachment type {attachment.Type}\n{e.Message}", e);
             }
-            
-            
+
+
             return (filename, extension);
         }
 

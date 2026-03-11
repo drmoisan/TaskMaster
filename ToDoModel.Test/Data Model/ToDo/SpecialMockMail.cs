@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ToDoModel.Test.Data_Model.ToDo
 {
-    internal class SpecialMockMail:MailItem
+    internal class SpecialMockMail : MailItem
     {
         public void Close(OlInspectorClose SaveMode)
         {
@@ -39,7 +39,7 @@ namespace ToDoModel.Test.Data_Model.ToDo
         {
             throw new NotImplementedException();
         }
-                
+
         public ConcurrentDictionary<string, int> CallDictionary { get; set; } = new ConcurrentDictionary<string, int>();
 
         public void Save()
@@ -243,7 +243,7 @@ namespace ToDoModel.Test.Data_Model.ToDo
         public PropertyAccessor PropertyAccessor { get; set; }
 
         public Account SendUsingAccount { get; set; }
-        public string TaskSubject { get; set ; }
+        public string TaskSubject { get; set; }
         public DateTime TaskDueDate { get; set; }
         public DateTime TaskStartDate { get; set; }
         public DateTime TaskCompletedDate { get; set; }

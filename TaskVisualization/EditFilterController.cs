@@ -37,7 +37,7 @@ namespace TaskVisualization
         }
 
         public EditFilterController(
-            IApplicationGlobals appGlobals, 
+            IApplicationGlobals appGlobals,
             FilterEntry filterEntry)
         {
             _filterEntryCopy = (FilterEntry)filterEntry.Clone();
@@ -73,14 +73,14 @@ namespace TaskVisualization
         private ToDoDefaults _defaults;
         private List<QfcTipsDetails> _tips;
 
-        internal void Initialize() 
+        internal void Initialize()
         {
             _viewer = new EditFilterViewer();
 
             _defaults = new ToDoDefaults();
 
             _olFlags = new FlagClassNoItem(_globals.Ol.NamespaceMAPI.Categories);
-            
+
             if (!_filterEntry.Flags.Context.AsStringNoPrefix.IsNullOrEmpty())
                 _viewer.ContextSelection.Text = _filterEntry.Flags.Context.AsStringNoPrefix;
             if (!_filterEntry.Flags.People.AsStringNoPrefix.IsNullOrEmpty())
@@ -123,9 +123,9 @@ namespace TaskVisualization
         #region Major Actions
 
         public void SelectItems(
-            FlagTranslator options, 
-            FlagTranslator selections, 
-            IPrefix prefix, 
+            FlagTranslator options,
+            FlagTranslator selections,
+            IPrefix prefix,
             System.Windows.Forms.Label label)
         {
             var dictOptions = options.AsListWithPrefix
@@ -144,8 +144,8 @@ namespace TaskVisualization
             }
         }
 
-        internal void SetUpDeleteDialog() 
-        { 
+        internal void SetUpDeleteDialog()
+        {
 
         }
 
@@ -195,7 +195,7 @@ namespace TaskVisualization
 
         private void BtnCancel_Click(object sender, EventArgs e)
         {
-            if(_callback is null) 
+            if (_callback is null)
             {
                 _viewer.Close();
                 _filterEntry.RevertToCopy(_filterEntryCopy);

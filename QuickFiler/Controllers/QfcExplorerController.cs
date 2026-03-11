@@ -27,7 +27,7 @@ namespace QuickFiler.Controllers
             _activeExplorer = _globals.Ol.App.ActiveExplorer();
             _parent = parent;
         }
-        
+
         private QfEnums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
         private IFilerHomeController _parent;
@@ -49,7 +49,7 @@ namespace QuickFiler.Controllers
             throw new NotImplementedException();
         }
 
-        
+
         public void ExplConvView_ReturnState()
         {
             if (BlShowInConversations)
@@ -134,7 +134,7 @@ namespace QuickFiler.Controllers
             NavigateToOutlookFolder(mailItem);
             if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort) & AutoFile.AreConversationsGrouped(_activeExplorer))
                 await Task.Run(() => ExplConvView_ToggleOff());
-            
+
             if (_activeExplorer.IsItemSelectableInView(mailItem))
             {
                 await Task.Run(() => _activeExplorer.ClearSelection());

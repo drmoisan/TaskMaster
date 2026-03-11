@@ -20,7 +20,7 @@ namespace UtilitiesCS.Windows_Forms
         {
             return rectangle.Width * rectangle.Height;
         }
-        
+
         public static void ToggleScreens(this ContainerControl container, bool withScaling)
         {
             if (Screen.AllScreens.Count() < 2) { throw new ArgumentOutOfRangeException(nameof(container), $"There is only one screen"); }
@@ -45,7 +45,7 @@ namespace UtilitiesCS.Windows_Forms
             // Get the next screen in the sequence
             if (++screenNumber == Screen.AllScreens.Count()) { screenNumber = 0; }
             var targetScreen = Screen.AllScreens[screenNumber];
-            
+
             return container.TrySwitchScreens(sourceScreen, targetScreen, withScaling);
         }
 
@@ -53,15 +53,15 @@ namespace UtilitiesCS.Windows_Forms
         {
             screen = default;
             screenNumber = -1;
-            
+
             screenNumber = Screen.AllScreens.FindIndex(screen => screen.Bounds.Contains(point));
             if (screenNumber == -1) { return false; }
 
             screen = Screen.AllScreens[screenNumber];
-            
+
             return true;
         }
-        
+
         internal static (Screen Screen, int ScreenNumber) GetScreen(this Point point)
         {
             var screenNumber = Screen.AllScreens.FindIndex(screen => screen.Bounds.Contains(point));
@@ -90,7 +90,7 @@ namespace UtilitiesCS.Windows_Forms
             double scalingFactorX = 1;
             double scalingFactorY = 1;
 
-            if (withScaling) 
+            if (withScaling)
             {
                 scalingFactorX = currentScreen.Bounds.Width <= 0 ? 1 : targetScreen.Bounds.Width / (double)currentScreen.Bounds.Width;
                 scalingFactorY = currentScreen.Bounds.Height <= 0 ? 1 : targetScreen.Bounds.Height / (double)currentScreen.Bounds.Height;
@@ -107,7 +107,7 @@ namespace UtilitiesCS.Windows_Forms
         public static bool TrySwitchTo(this Point point, Screen targetScreen, bool withScaling, out Point newPoint)
         {
             newPoint = default;
-            Screen sourceScreen; 
+            Screen sourceScreen;
             int screenNumber;
             if (point == default || targetScreen is null || TryGetScreen(point, out sourceScreen, out screenNumber)) { return false; }
             return TrySwitchScreens(point, sourceScreen, targetScreen, withScaling, out newPoint);
@@ -117,7 +117,7 @@ namespace UtilitiesCS.Windows_Forms
         {
             var point = container.Location;
             var newPoint = point.SwitchScreens(sourceScreen, targetScreen, withScaling);
-            
+
             if (container.InvokeRequired)
             {
                 container.Invoke(() => container.Location = newPoint);
@@ -138,7 +138,7 @@ namespace UtilitiesCS.Windows_Forms
         /// <returns>A System.Drawing.<seealso cref="Point"/> in the same relative location on the new screen</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public static Point SwitchScreens(this Point point, Screen sourceScreen,Screen targetScreen, bool withScaling)
+        public static Point SwitchScreens(this Point point, Screen sourceScreen, Screen targetScreen, bool withScaling)
         {
             if (sourceScreen is null) { throw new ArgumentNullException(nameof(sourceScreen)); }
             if (targetScreen is null) { throw new ArgumentNullException(nameof(targetScreen)); }
@@ -162,7 +162,7 @@ namespace UtilitiesCS.Windows_Forms
 
         public static bool TrySwitchScreens(this ContainerControl container, Screen targetScreen, bool withScaling)
         {
-            if (container is null || container.IsDisposed ) { return false; }
+            if (container is null || container.IsDisposed) { return false; }
             if (!container.Location.TryGetScreen(out Screen sourceScreen, out _)) { return false; }
             return container.TrySwitchScreens(sourceScreen, targetScreen, withScaling);
         }
@@ -201,7 +201,7 @@ namespace UtilitiesCS.Windows_Forms
         {
             newPoint = default;
             if (sourceScreen is null || targetScreen is null) { return false; }
-            
+
             double scalingFactorX = 1;
             double scalingFactorY = 1;
 

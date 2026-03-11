@@ -4,7 +4,7 @@ using UtilitiesCS.Interfaces.ReusableTypeClasses;
 
 namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
 {
-    public interface IConcurrentObservableDictionary<TKey, TValue>:IConcurrentDictionary<TKey, TValue>
+    public interface IConcurrentObservableDictionary<TKey, TValue> : IConcurrentDictionary<TKey, TValue>
     {
         event EventHandler<DictionaryChangedEventArgs<TKey, TValue>> CollectionChanged;
 

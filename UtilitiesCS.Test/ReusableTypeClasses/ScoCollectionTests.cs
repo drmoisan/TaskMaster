@@ -70,6 +70,6 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             _receivedEvents.Should().BeEquivalentTo(expected);
 
         }
-    
-    }    
+
+    }
 }

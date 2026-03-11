@@ -10,7 +10,7 @@ namespace ToDoModel.Data_Model.ToDo
 {
     internal class ToDoLoader
     {
-        public ToDoLoader(System.Action olSaver, Func<bool>isReadOnly)
+        public ToDoLoader(System.Action olSaver, Func<bool> isReadOnly)
         {
             //() => FlaggableItem.Save() is olSaver
             OlSaver = olSaver;
@@ -80,8 +80,8 @@ namespace ToDoModel.Data_Model.ToDo
 
         internal T GetOrLoad<T>(ref T value, Func<T> loader, params object[] dependencies)
         {
-            if (value is null || value.Equals(default)) 
-            { 
+            if (value is null || value.Equals(default))
+            {
                 if (dependencies is null) { throw new ArgumentNullException($"Method {nameof(GetOrLoad)} failed the dependency check because {nameof(dependencies)} was passed as a null array"); }
                 if (dependencies.Any(x => x is null))
                 {

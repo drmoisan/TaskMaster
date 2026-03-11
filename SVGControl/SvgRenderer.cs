@@ -44,7 +44,7 @@ namespace SVGControl
             Size = CalcInnerSize(size, _margin);
             _autoSize = autoSize;
         }
-        
+
         public SvgRenderer(SvgDocument doc, Size size, Padding margin, AutoSize autoSize)
         {
             _doc = doc;
@@ -64,12 +64,12 @@ namespace SVGControl
         }
 
         private Size _outer;
-        private Size _original; 
+        private Size _original;
         private Padding _margin;
         private SvgDocument _doc;
         private AutoSize _autoSize;
         private Size _size;
-                
+
         [NotifyParentProperty(true)]
         internal Size Outer
         {
@@ -102,17 +102,17 @@ namespace SVGControl
         public AutoSize AutoSize { get => _autoSize; set => _autoSize = value; }
 
         [NotifyParentProperty(true)]
-        public SvgDocument Document 
-        { 
+        public SvgDocument Document
+        {
             get => _doc;
-            set 
-            { 
+            set
+            {
                 _doc = value;
                 if (value != null) { _original = _doc.Draw().Size; }
                 NotifyPropertyChanged();
             }
         }
-        
+
         private Size CalcInnerSize(Size outer, Padding margin)
         {
             var innerWidth = outer.Width - margin.Left - margin.Right;
@@ -196,14 +196,14 @@ namespace SVGControl
         }
 
         #region EventHandlers
-        
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        
+
         #endregion
     }
 }

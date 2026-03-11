@@ -27,7 +27,7 @@ namespace ToDoModel
 
         #region Initialize and Access Encapsulated Tree
 
-        public List<ToDoItem> TryFlatten() 
+        public List<ToDoItem> TryFlatten()
         {
             try
             {
@@ -40,9 +40,9 @@ namespace ToDoModel
             }
         }
 
-        private List<TreeNode<ToDoItem>> _roots = new List<TreeNode<ToDoItem>>();        
+        private List<TreeNode<ToDoItem>> _roots = new List<TreeNode<ToDoItem>>();
         public List<TreeNode<ToDoItem>> Roots { get => _roots; private set => _roots = value; }
-        
+
         public enum LoadOptions
         {
             vbLoadAll = 0,
@@ -60,11 +60,11 @@ namespace ToDoModel
 
             // Sort the flat tree by ToDoID
             tree.MergeSort(this.CompareItemsByToDoID, inplace: true);
-            
+
             tree = MakeTreeHierarchical(tree);
 
             Roots = tree;
-            
+
             //WriteTreeToCSVDebug(@"C:\temp\TreeOfToDoItems.csv");
         }
 
@@ -110,7 +110,7 @@ namespace ToDoModel
                     }
                 }
             }
-            
+
             return tree;
         }
 
@@ -148,9 +148,9 @@ namespace ToDoModel
 
         public List<OutlookItem> GetToDoList(LoadOptions LoadType, Application Application)
         {
-            
+
             View objView;
-            
+
             string strFilter;
 
             objView = (View)Application.ActiveExplorer().CurrentView;
@@ -173,20 +173,20 @@ namespace ToDoModel
                         olObjects = folder.Items.Restrict(strFilter);
                         //"http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/810f0040" IS NULL
                     }
-                    else 
+                    else
                     {
-                        olObjects = folder.Items.Restrict(strFilter); 
+                        olObjects = folder.Items.Restrict(strFilter);
                     }
-                        //var olObjects = (strFilter == "@SQL=" | LoadType == LoadOptions.vbLoadAll) ? folder.Items : folder.Items.Restrict(strFilter);
+                    //var olObjects = (strFilter == "@SQL=" | LoadType == LoadOptions.vbLoadAll) ? folder.Items : folder.Items.Restrict(strFilter);
                     return olObjects?.Cast<object>().Select(x => new OutlookItem(x)).ToList();
                 }
                 catch (System.Exception)
                 {
                     return new List<OutlookItem>();
                 }
-                
-            }).SelectMany(x=>x).ToList();
-            
+
+            }).SelectMany(x => x).ToList();
+
             return result;
         }
 
@@ -250,10 +250,10 @@ namespace ToDoModel
             else
             {
                 var idx = todoIDLeft.FirstDiffIndex(todoIDRight);
-                
+
                 // Identical IDs
                 if (idx == -1) { return 0; }
-                
+
                 // Left ID is prefix of Right ID
                 if (idx == todoIDLeft.Length) { return -1; }
 
@@ -279,7 +279,7 @@ namespace ToDoModel
                 }
             }
         }
-        
+
         public void ReNumberChildrenIDs(List<TreeNode<ToDoItem>> Children, IIDList idList)
         {
             int max = Children.Count - 1;
@@ -303,7 +303,7 @@ namespace ToDoModel
                     if (Children[i].Children.Count > 0)
                         ReNumberChildrenIDs(Children[i].Children, idList);
                 }
-                
+
                 idList.Serialize();
             }
         }
@@ -362,13 +362,13 @@ namespace ToDoModel
         public void HideEmptyHeadersInView()
         {
             //Action<TreeNode<ToDoItem>> action = node => { if (node.ChildCount == 0) { if (IsHeader(node.Value.Context.AsStringNoPrefix)) { node.Value.ActiveBranch = false; } } };
-            Action<TreeNode<ToDoItem>> action = node => 
-            { 
-                if (node.ChildCount == 0 || !node.Children.Any(x => x.Value.ActiveBranch)) 
-                { 
-                    if (IsHeader(node.Value.Context.AsStringNoPrefix)) 
-                    { node.Value.ActiveBranch = false; } 
-                } 
+            Action<TreeNode<ToDoItem>> action = node =>
+            {
+                if (node.ChildCount == 0 || !node.Children.Any(x => x.Value.ActiveBranch))
+                {
+                    if (IsHeader(node.Value.Context.AsStringNoPrefix))
+                    { node.Value.ActiveBranch = false; }
+                }
             };
 
 
@@ -378,16 +378,16 @@ namespace ToDoModel
         }
 
         public void ShowEmptyHeadersInView()
-        {            
+        {
             Action<TreeNode<ToDoItem>> action = node =>
             {
                 if (node.Parent is null || node.Parent.Value.ActiveBranch)
                 {
                     if (IsHeader(node.Value.Context.AsStringNoPrefix) && !node.Value.ActiveBranch)
-                    { 
-                        node.Value.ActiveBranch = true; 
+                    {
+                        node.Value.ActiveBranch = true;
                     }
-                }                
+                }
             };
 
             foreach (TreeNode<ToDoItem> node in Roots)
@@ -406,7 +406,7 @@ namespace ToDoModel
 
             LoopTreeToWrite(Roots, FilePath, "");
         }
-        
+
         internal void LoopTreeToWrite(List<TreeNode<ToDoItem>> nodes, string filename, string lineprefix)
         {
             if (nodes is not null)
@@ -419,7 +419,7 @@ namespace ToDoModel
             }
         }
 
-            
+
 
         internal void AppendLineToCSV(string filename, string line)
         {
@@ -429,7 +429,7 @@ namespace ToDoModel
             }
         }
 
-        
+
 
         #endregion Debugging Helper Functions
 

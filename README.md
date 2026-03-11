@@ -118,6 +118,22 @@ The solution uses **MSTest v3** with **Microsoft.Testing.Platform**.
 * In Visual Studio, open **Test Explorer** → **Run All**.
 * Or run at the command line via `vstest.console.exe` (installed with VS) if needed.
 
+### VS Code workflow (preserves solution/projects)
+
+This repository includes workspace settings under `.vscode/` so you can stay on the existing Visual Studio solution/project model (`TaskMaster.sln` + `*.csproj`) while building and running tests from VS Code.
+
+* Install recommended extensions when prompted:
+  * `ms-dotnettools.csdevkit`
+  * `ms-dotnettools.csharp`
+* Use **Terminal → Run Build Task** to run `build: TaskMaster.sln (VS MSBuild)`.
+* Use **Terminal → Run Task** to run `test: MSTest (vstest.console)`.
+* You can also use the VS Code **Testing** view to discover and run MSTest tests once the C# extensions finish loading the solution.
+
+Notes:
+
+* The VS Code tasks discover `MSBuild.exe` and `vstest.console.exe` using `vswhere`, so they work from a regular VS Code terminal (no Developer Command Prompt required).
+* For these tasks, install Visual Studio 2022 (or Build Tools) with MSBuild + Test Platform components.
+
 Test projects include:
 `*.Test` projects for TaskMaster, QuickFiler, TaskVisualization, TaskTree, ToDoModel, UtilitiesCS, UtilitiesSwordfish, SVGControl, VBFunctions.
 

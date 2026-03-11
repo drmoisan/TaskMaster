@@ -41,10 +41,10 @@ namespace TaskVisualization
 
         public T ResolveParent<T>(Control control) where T : Control
         {
-            
+
             return (T)_labelControl.Parent;
         }
-        
+
         public Type ResolveParentType()
         {
             if (_labelControl.Parent == null)
@@ -52,7 +52,7 @@ namespace TaskVisualization
                 throw new ArgumentException($"The parent of {nameof(LabelControl)} is null. " +
                 $"Must be of type {typeof(TableLayoutPanel)}");
             }
-            else if (!new List<Type>{typeof(TableLayoutPanel), typeof(Panel)}
+            else if (!new List<Type> { typeof(TableLayoutPanel), typeof(Panel) }
                                     .Contains(_labelControl.Parent.GetType()))
             {
                 throw new ArgumentException($"The parent of {nameof(LabelControl)} must " +
@@ -67,7 +67,7 @@ namespace TaskVisualization
 
         private Label _labelControl;
         public Label LabelControl { get => _labelControl; }
-        
+
         private TableLayoutPanel _tlp;
         public TableLayoutPanel TLP { get => _tlp; }
 
@@ -75,7 +75,7 @@ namespace TaskVisualization
 
         private int _columnNumber;
         public int ColumnNumber { get => _columnNumber; }
-        
+
         private float _columnWidth;
         public float ColumnWidth { get => _columnWidth; }
 
@@ -148,7 +148,7 @@ namespace TaskVisualization
         {
             if (desiredState == Enums.ToggleState.Off)
             {
-                if (_parentType == typeof(TableLayoutPanel)) 
+                if (_parentType == typeof(TableLayoutPanel))
                     _tlp.ColumnStyles[_columnNumber].Width = 0;
             }
             else

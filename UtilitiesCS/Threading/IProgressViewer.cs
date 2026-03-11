@@ -9,13 +9,13 @@ using System.Windows.Forms;
 
 namespace UtilitiesCS
 {
-    public interface IProgressViewer: IContainerControl, IComponent, IDisposable
+    public interface IProgressViewer : IContainerControl, IComponent, IDisposable
     {
         public ProgressBar Bar { get; }
         public Label JobName { get; }
         public Button ButtonCancel { get; }
         public void SetCancellationTokenSource(System.Threading.CancellationTokenSource tokenSource);
         public System.Windows.Threading.Dispatcher UiDispatcher { get; set; }
-        
+
     }
 }

@@ -31,7 +31,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public SmartSerializable(T parent)
         {
-            _parent = parent;            
+            _parent = parent;
             Config = new NewSmartSerializableConfig();
         }
 
@@ -40,11 +40,11 @@ namespace UtilitiesCS.ReusableTypeClasses
         #region SerializationConfig
 
         [JsonProperty]
-        public NewSmartSerializableConfig Config 
-        { 
+        public NewSmartSerializableConfig Config
+        {
             get => _config;
-            set 
-            { 
+            set
+            {
                 if (_config is not null)
                     _config.PropertyChanged -= Config_PropertyChanged;
                 _config = value;
@@ -52,7 +52,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                     _config.PropertyChanged += Config_PropertyChanged;
             }
         }
-        
+
         private NewSmartSerializableConfig _config = new NewSmartSerializableConfig();
 
         #endregion SerializationConfig
@@ -60,7 +60,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         public string Name { get; set; }
 
         #region INotifyPropertyChanged
-        
+
         private void Config_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             //var properties = string.Join(",",e.PropertyName.Split(',').Select(name => $"{typeof(T).Name}.{name}"));
@@ -99,7 +99,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             if (response == DialogResult.Yes)
             {
-                var instance = altLoader is null ? new T(): altLoader();
+                var instance = altLoader is null ? new T() : altLoader();
                 instance.Config.JsonSettings = settings;
                 instance.Serialize(disk.FilePath);
                 return instance;
@@ -214,7 +214,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             try
             {
                 instance = DeserializeJson(loader.Config.Disk, loader.Config.JsonSettings);
-                if (instance is null) 
+                if (instance is null)
                 {
                     throw new InvalidOperationException($"{disk.FilePath} deserialized to null.");
                 }
@@ -308,7 +308,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         protected T DeserializeJson(FilePathHelper disk, JsonSerializerSettings settings)
         {
             T instance = null;
-            if (!disk.Exists()){ return instance; }
+            if (!disk.Exists()) { return instance; }
             try
             {
                 instance = JsonConvert.DeserializeObject<T>(
@@ -333,9 +333,9 @@ namespace UtilitiesCS.ReusableTypeClasses
             {
                 logger.Error(e.Message, e);
             }
-            if (instance is not null) 
-            { 
-                instance.Config.JsonSettings = settings.DeepCopy(); 
+            if (instance is not null)
+            {
+                instance.Config.JsonSettings = settings.DeepCopy();
             }
             return instance;
         }
@@ -349,7 +349,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         #endregion Deserialization
 
         #region Serialization
-                
+
         public void Serialize()
         {
             if (Config.Disk.FilePath != "")
@@ -378,7 +378,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         private Func<string, StreamWriter> _createStreamWriter = File.CreateText;
         protected Func<string, StreamWriter> CreateStreamWriter { get => _createStreamWriter; set => _createStreamWriter = value; }
 
-        
+
         public void SerializeThreadSafe(string filePath)
         {
             _parent.ThrowIfNull($"{nameof(SmartSerializable<T>)}.{nameof(_parent)} is null. It must be linked to the instance it is serializing.");
@@ -391,7 +391,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                     {
                         SerializeToStream(sw);
                         sw.Close();
-                    }                    
+                    }
                 }
                 catch (System.Exception e)
                 {
@@ -458,7 +458,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         #endregion Serialization
 
         #region Static
-        
+
         public static class Static
         {
             private static SmartSerializable<T> GetInstance() => new();
@@ -490,7 +490,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             internal static JsonSerializerSettings GetDefaultSettings() =>
                 SmartSerializable<T>.GetDefaultSettings();
         }
-        
+
         #endregion Static
     }
 
