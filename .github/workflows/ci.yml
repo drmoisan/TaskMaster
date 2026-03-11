@@ -72,30 +72,36 @@ jobs:
         shell: pwsh
         run: dotnet format $env:SOLUTION_PATH --verify-no-changes --no-restore
 
-      - name: Generate ephemeral VSTO signing certificate
+      - name: Build with analyzers and code style enforcement
         shell: pwsh
         run: |
-          # VSTO add-in projects (TaskMaster.csproj) require SignManifests=true;
-          # create a short-lived self-signed cert so CI can satisfy that requirement
-          # without needing the developer certificate stored in the local cert store.
+          # VSTO add-in projects require SignManifests=true with a certificate present
+          # in CurrentUser\My. Create an ephemeral self-signed certificate and pass its
+          # thumbprint directly on the MSBuild command line (same process, no env-var
+          # transfer) so ResolveKeySource can locate it.
           $cert = New-SelfSignedCertificate `
             -CertStoreLocation 'Cert:\CurrentUser\My' `
             -Subject 'CN=TaskMaster CI Build' `
             -KeyUsage DigitalSignature `
             -Type CodeSigningCert
-          "CI_CERT_THUMBPRINT=$($cert.Thumbprint)" | Out-File -FilePath $env:GITHUB_ENV -Append
-
-      - name: Build with analyzers and code style enforcement
-        shell: pwsh
-        run: >-
-          msbuild $env:SOLUTION_PATH /t:Build /p:Configuration=Debug /p:Platform='Any CPU'
-          /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true
+          & msbuild $env:SOLUTION_PATH /t:Build /p:Configuration=Debug `
+              "/p:Platform=Any CPU" `
+              /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true `
+              "/p:ManifestCertificateThumbprint=$($cert.Thumbprint)"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Build with nullable warnings treated as errors
         shell: pwsh
-        run: >-
-          msbuild $env:SOLUTION_PATH /t:Build /p:Configuration=Debug /p:Platform='Any CPU'
-          /p:Nullable=enable /p:TreatWarningsAsErrors=true
+        run: |
+          # Reuse the ephemeral certificate installed by the previous build step.
+          $cert = Get-ChildItem 'Cert:\CurrentUser\My' |
+            Where-Object { $_.Subject -eq 'CN=TaskMaster CI Build' } |
+            Select-Object -First 1
+          & msbuild $env:SOLUTION_PATH /t:Build /p:Configuration=Debug `
+              "/p:Platform=Any CPU" `
+              /p:Nullable=enable /p:TreatWarningsAsErrors=true `
+              "/p:ManifestCertificateThumbprint=$($cert.Thumbprint)"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Run MSTest suite with coverage
         shell: pwsh

@@ -1,21 +1,17 @@
 <Project>
-  <Target Name="SetTaskMasterManifestCert" BeforeTargets="ResolveKeySource" Condition="'$(MSBuildProjectName)' == 'TaskMaster'">
-    <!-- Developer builds: use the developer certificate by thumbprint. -->
-    <PropertyGroup Condition="'$(CI)' != 'true'">
+  <!--
+    Developer builds only: override the VSTO manifest certificate thumbprint so the
+    local developer certificate is used. This target must NOT run in CI because CI
+    passes ManifestCertificateThumbprint on the MSBuild command line with a freshly
+    created ephemeral certificate; a target-scoped PropertyGroup would override that
+    command-line value and break the build.
+  -->
+  <Target Name="SetTaskMasterManifestCert" BeforeTargets="ResolveKeySource"
+          Condition="'$(MSBuildProjectName)' == 'TaskMaster' and '$(CI)' != 'true'">
+    <PropertyGroup>
       <SignManifests>true</SignManifests>
       <ManifestKeyFile></ManifestKeyFile>
       <ManifestCertificateThumbprint>88E95FCC6F066C07776218A398BF7046A447D802</ManifestCertificateThumbprint>
-    </PropertyGroup>
-    <!--
-      CI builds: VSTO requires SignManifests=true; use the ephemeral self-signed
-      certificate created by the workflow's 'Generate ephemeral VSTO signing certificate'
-      step. The thumbprint is written to GITHUB_ENV and forwarded here via the
-      CI_CERT_THUMBPRINT environment variable, which MSBuild exposes as a property.
-    -->
-    <PropertyGroup Condition="'$(CI)' == 'true'">
-      <SignManifests>true</SignManifests>
-      <ManifestKeyFile></ManifestKeyFile>
-      <ManifestCertificateThumbprint>$(CI_CERT_THUMBPRINT)</ManifestCertificateThumbprint>
     </PropertyGroup>
   </Target>
 </Project>
