@@ -59,9 +59,14 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+        with:
+          nuget-version: latest
+
       - name: Restore solution
         shell: pwsh
-        run: dotnet restore $env:SOLUTION_PATH
+        run: nuget restore $env:SOLUTION_PATH
 
       - name: Verify formatting
         shell: pwsh
