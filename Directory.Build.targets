@@ -1,14 +1,21 @@
 <Project>
   <Target Name="SetTaskMasterManifestCert" BeforeTargets="ResolveKeySource" Condition="'$(MSBuildProjectName)' == 'TaskMaster'">
-    <!-- Enable manifest signing with the developer certificate when not running in CI. -->
+    <!-- Developer builds: use the developer certificate by thumbprint. -->
     <PropertyGroup Condition="'$(CI)' != 'true'">
       <SignManifests>true</SignManifests>
       <ManifestKeyFile></ManifestKeyFile>
       <ManifestCertificateThumbprint>88E95FCC6F066C07776218A398BF7046A447D802</ManifestCertificateThumbprint>
     </PropertyGroup>
-    <!-- Disable manifest signing in CI: no developer certificate is available. -->
+    <!--
+      CI builds: VSTO requires SignManifests=true; use the ephemeral self-signed
+      certificate created by the workflow's 'Generate ephemeral VSTO signing certificate'
+      step. The thumbprint is written to GITHUB_ENV and forwarded here via the
+      CI_CERT_THUMBPRINT environment variable, which MSBuild exposes as a property.
+    -->
     <PropertyGroup Condition="'$(CI)' == 'true'">
-      <SignManifests>false</SignManifests>
+      <SignManifests>true</SignManifests>
+      <ManifestKeyFile></ManifestKeyFile>
+      <ManifestCertificateThumbprint>$(CI_CERT_THUMBPRINT)</ManifestCertificateThumbprint>
     </PropertyGroup>
   </Target>
 </Project>

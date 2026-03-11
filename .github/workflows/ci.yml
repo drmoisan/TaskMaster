@@ -72,6 +72,19 @@ jobs:
         shell: pwsh
         run: dotnet format $env:SOLUTION_PATH --verify-no-changes --no-restore
 
+      - name: Generate ephemeral VSTO signing certificate
+        shell: pwsh
+        run: |
+          # VSTO add-in projects (TaskMaster.csproj) require SignManifests=true;
+          # create a short-lived self-signed cert so CI can satisfy that requirement
+          # without needing the developer certificate stored in the local cert store.
+          $cert = New-SelfSignedCertificate `
+            -CertStoreLocation 'Cert:\CurrentUser\My' `
+            -Subject 'CN=TaskMaster CI Build' `
+            -KeyUsage DigitalSignature `
+            -Type CodeSigningCert
+          "CI_CERT_THUMBPRINT=$($cert.Thumbprint)" | Out-File -FilePath $env:GITHUB_ENV -Append
+
       - name: Build with analyzers and code style enforcement
         shell: pwsh
         run: >-
