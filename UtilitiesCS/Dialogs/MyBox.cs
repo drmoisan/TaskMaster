@@ -29,7 +29,7 @@ namespace UtilitiesCS
                 _viewer.RemoveStandardButtons();
                 _viewer.Text = Title;
                 _viewer.TextMessage.Text = Message;
-                
+
 
                 Size tmp = _viewer.MinimumSize;
 
@@ -86,7 +86,7 @@ namespace UtilitiesCS
             return result;
         }
 
-        public static DialogResult ShowDialog(string message, string title, MessageBoxButtons buttons, MessageBoxIcon icon) 
+        public static DialogResult ShowDialog(string message, string title, MessageBoxButtons buttons, MessageBoxIcon icon)
         {
             var actionButtons = GetStandardButtons(buttons);
             using MyBoxViewer viewer = new();
@@ -102,7 +102,7 @@ namespace UtilitiesCS
 
         public static T ShowDialog<T>(string message, string title, BoxIcon icon, Dictionary<string, Func<Task<T>>> functions)
         {
-            using MyBoxViewer viewer = new();            
+            using MyBoxViewer viewer = new();
             var group = functions.ToFunctionButtonsAsync(viewer);
             return ShowDialog(viewer, message, title, icon, group);
         }
@@ -174,7 +174,7 @@ namespace UtilitiesCS
             int i = 0;
             var group = new FunctionButtonGroup<T>();
             foreach (var functionPair in functions)
-            {                
+            {
                 Func<Task<T>> function = async () =>
                 {
                     var result = await functionPair.Value();
@@ -194,11 +194,11 @@ namespace UtilitiesCS
         internal static void AppendButtonInColumn(TableLayoutPanel tlp, DelegateButton dlb, Single width)
         {
             tlp.ColumnCount++;
-            tlp.ColumnStyles.Insert(tlp.ColumnCount-2, 
+            tlp.ColumnStyles.Insert(tlp.ColumnCount - 2,
                                     new System.Windows.Forms.ColumnStyle(
                                         System.Windows.Forms.SizeType.Absolute,
                                         width));
-            tlp.Controls.Add(dlb.Button, tlp.ColumnCount -2,0);
+            tlp.Controls.Add(dlb.Button, tlp.ColumnCount - 2, 0);
         }
 
         internal static void AppendButtonInColumn(TableLayoutPanel tlp, ActionButton actionButton, Single width)
@@ -271,13 +271,13 @@ namespace UtilitiesCS
         internal static IList<ActionButton> GetStandardButtons(MessageBoxButtons buttons)
         {
             List<ActionButton> actionButtons = [];
-            switch (buttons) 
-            { 
+            switch (buttons)
+            {
                 case MessageBoxButtons.OK:
                     actionButtons = [new ActionButton("ButtonOk", "Ok", DialogResult.OK, () => { })];
                     break;
                 case MessageBoxButtons.OKCancel:
-                    actionButtons = 
+                    actionButtons =
                         [
                             new ActionButton("ButtonOk", "Ok", DialogResult.OK, () => { }),
                             new ActionButton("ButtonCancel", "Cancel", DialogResult.Cancel, () => { })

@@ -7,8 +7,8 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
     public class LockingObservableLinkedListChangedEventArgs<T>(NotifyCollectionChangedAction action)
     {
         public LockingObservableLinkedListChangedEventArgs(
-            NotifyCollectionChangedAction action, 
-            LockingObservableLinkedListNode<T> newNode, 
+            NotifyCollectionChangedAction action,
+            LockingObservableLinkedListNode<T> newNode,
             LockingObservableLinkedListNode<T> oldNode)
             : this(action)
         {

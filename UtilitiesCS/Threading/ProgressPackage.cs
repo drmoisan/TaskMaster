@@ -50,7 +50,7 @@ namespace UtilitiesCS.Threading
             ProgressTracker progressTracker = null,
             SegmentStopWatch stopWatch = null,
             Screen screen = null)
-        { 
+        {
             var package = new ProgressPackage();
             await package.InitializeAsync(cancelSource, cancel, progressTracker, stopWatch, screen);
             return package.ToTuple();
@@ -86,7 +86,7 @@ namespace UtilitiesCS.Threading
         // Note: Should be run on a background thread to avoid locking the UI thread
         public SegmentStopWatch StopWatch { get => _stopWatch; set => _stopWatch = value; }
         private SegmentStopWatch _stopWatch;
-        
+
         public ProgressPackage SpawnChild(int allocation)
         {
             return new ProgressPackage
@@ -98,14 +98,14 @@ namespace UtilitiesCS.Threading
                 ProgressTrackerPane = this.ProgressTrackerPane?.SpawnChild(allocation)
             };
         }
-        
-        public (CancellationTokenSource CancelSource, CancellationToken Cancel, ProgressTracker ProgressTracker, SegmentStopWatch StopWatch) 
+
+        public (CancellationTokenSource CancelSource, CancellationToken Cancel, ProgressTracker ProgressTracker, SegmentStopWatch StopWatch)
             ToTuple()
         {
             return (CancelSource, Cancel, ProgressTracker, StopWatch);
         }
 
-        public (CancellationTokenSource CancelSource, CancellationToken Cancel, ProgressTrackerPane ProgressTrackerPane, SegmentStopWatch StopWatch) 
+        public (CancellationTokenSource CancelSource, CancellationToken Cancel, ProgressTrackerPane ProgressTrackerPane, SegmentStopWatch StopWatch)
             ToTuplePane()
         {
             return (CancelSource, Cancel, ProgressTrackerPane, StopWatch);

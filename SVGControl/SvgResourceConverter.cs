@@ -10,7 +10,7 @@ using System.IO;
 
 namespace SVGControl
 {
-    public class SvgResourceConverter: TypeConverter
+    public class SvgResourceConverter : TypeConverter
     {
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {

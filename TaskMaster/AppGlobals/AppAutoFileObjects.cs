@@ -84,7 +84,7 @@ namespace TaskMaster
             await LoadSubjectMapAndEncoderAsync();
             await LoadMovedMailsAsync();
             await LoadFiltersAsync();
-            await Manager.InitAsync();            
+            await Manager.InitAsync();
         }
 
         private bool _sugFilesLoaded = false;
@@ -133,8 +133,8 @@ namespace TaskMaster
         public ScoStack<IMovedMailInfo> MovedMails { get => Initialized(_movedMails, LoadMovedMails); }
         private ScoStack<IMovedMailInfo> LoadMovedMails()
         {
-            if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging)) 
-            { 
+            if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
+            {
                 var movedMails = new ScoStack<IMovedMailInfo>(filename: _defaults.FileName_MovedEmails,
                                                               folderpath: pythonStaging,
                                                               askUserOnError: false);
@@ -166,7 +166,7 @@ namespace TaskMaster
             var list = (SloLinkedList<T>)Sender;
             list.Serialize();
         }
-        
+
         //public IntelligenceConfig IntelRes { get; private set; }
         //async private Task LoadIntelConfigAsync() => await Task.Run(async () => IntelRes = await IntelligenceConfig.LoadAsync(_parent), CancelToken);
 
@@ -218,7 +218,7 @@ namespace TaskMaster
                 {
                     if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
                     {
-                        _ctfMap = new CtfMap(filename: _defaults.File_CTF_Inc, folderpath: pythonStaging, 
+                        _ctfMap = new CtfMap(filename: _defaults.File_CTF_Inc, folderpath: pythonStaging,
                             backupFilepath: Path.Combine(pythonStaging, _defaults.BackupFile_CTF_Inc),
                             askUserOnError: true);
                     }
@@ -302,9 +302,9 @@ namespace TaskMaster
                                                                                                _defaults.BackupFile_CommonWords),
                                                                   askUserOnError: false);
                 }
-            }, default(CancellationToken)); 
-            
-            
+            }, default(CancellationToken));
+
+
         }
         private IList<string> CommonWordsBackupLoader(string filepath)
         {
@@ -313,10 +313,10 @@ namespace TaskMaster
                 string[] cw = FileIO2.CsvRead(filename: Path.GetFileName(filepath), folderpath: Path.GetDirectoryName(filepath), skipHeaders: false);
                 return cw.ToList();
             }
-            else 
+            else
             {
                 logger.Error($"File not found {filepath}");
-                return []; 
+                return [];
             }
         }
 
@@ -354,11 +354,11 @@ namespace TaskMaster
             }
             _filterObserver = new ObserverHelper<NotifyCollectionChangedEventArgs>("FilterObserver", (x) => Filters.Serialize());
             filters.Subscribe(_filterObserver);
-            
+
             return filters;
         }
         async private Task LoadFiltersAsync()
-        {            
+        {
             await Task.Run(() => _filters = LoadFilters(), CancelToken);
         }
         private void ScoFilterEntry_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -465,8 +465,8 @@ namespace TaskMaster
             }
         }
 
-        public ManagerAsyncLazy Manager { get; internal set; } 
-        
+        public ManagerAsyncLazy Manager { get; internal set; }
+
         private ProgressTrackerPane _progressTracker;
         public ProgressTrackerPane ProgressTracker => _progressTracker;
         private Microsoft.Office.Tools.CustomTaskPane _progressPane;
@@ -486,7 +486,7 @@ namespace TaskMaster
         public CancellationToken CancelToken => Initializer.GetOrLoad(ref _token, LoadToken);
         private CancellationToken _token;
         private CancellationToken LoadToken() => CancelSource.Token;
-        
+
         #region Unused Commented Code
 
         //using (Stream stream = new MemoryStream(Properties.Resources.manager_config))

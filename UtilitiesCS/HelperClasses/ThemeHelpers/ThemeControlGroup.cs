@@ -21,11 +21,11 @@ namespace UtilitiesCS
         public ThemeControlGroup(IList<Control> controls, Color back)
         {
             if (controls is null) { throw new ArgumentNullException(nameof(controls)); }
-            if (controls.Count == 0) 
-            { 
-                throw new ArgumentOutOfRangeException(nameof(controls), $"To create a " + 
-                    $"{nameof(ThemeControlGroup)}, the parameter "+
-                    $"{nameof(controls)} must contain at least one {nameof(Control)}"); 
+            if (controls.Count == 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(controls), $"To create a " +
+                    $"{nameof(ThemeControlGroup)}, the parameter " +
+                    $"{nameof(controls)} must contain at least one {nameof(Control)}");
             }
             _controls = controls;
             _backColor = back;
@@ -86,7 +86,7 @@ namespace UtilitiesCS
                                  Color fore,
                                  Color back,
                                  Action<IList<object>, Color, Color> objectSetter)
-        { 
+        {
             _objects = objects;
             _foreColor = fore;
             _backColor = back;
@@ -111,8 +111,8 @@ namespace UtilitiesCS
 
         #region Private Variables
 
-        private enum GroupTypeEnum 
-        { 
+        private enum GroupTypeEnum
+        {
             Unsupported,
             OneField,
             TwoField,
@@ -142,7 +142,7 @@ namespace UtilitiesCS
 
         #endregion Private Variables
 
-        
+
 
         private string _groupName;
         public string GroupName { get => _groupName; set => _groupName = value; }
@@ -172,14 +172,14 @@ namespace UtilitiesCS
                     ApplyThemeWebView2();
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(_groupType),$"Unsupported group type");
+                    throw new ArgumentOutOfRangeException(nameof(_groupType), $"Unsupported group type");
             }
         }
 
         public void ApplyTheme(bool async)
         {
-            if (_controls is not null) 
-            { 
+            if (_controls is not null)
+            {
                 if (async) { UiThread.Dispatcher.InvokeAsync(new Action(() => ApplyTheme())); }
                 else { UiThread.Dispatcher.Invoke(new Action(() => ApplyTheme())); }
             }
@@ -190,13 +190,13 @@ namespace UtilitiesCS
         {
             _controls.ForEach(c => c.BackColor = _backColor);
         }
-        
+
         private void ApplyThemeTwoField()
         {
-            _controls.ForEach(c => 
-            { 
+            _controls.ForEach(c =>
+            {
                 c.ForeColor = _foreColor;
-                c.BackColor = _backColor; 
+                c.BackColor = _backColor;
             });
         }
 
@@ -243,7 +243,7 @@ namespace UtilitiesCS
 
         private void ApplyThemeTwoFieldWithSetter() => ObjectSetter(_objects, _foreColor, _backColor);
 
-        private void ApplyThemeWebView2() 
+        private void ApplyThemeWebView2()
         {
             if (_webView2.CoreWebView2 is not null)
             {
@@ -260,7 +260,7 @@ namespace UtilitiesCS
 
         private void Control_MouseLeave(object sender, EventArgs e)
         {
-            if (IsAltHover(sender)) { ((Control)sender).BackColor = _backColorAlt; } 
+            if (IsAltHover(sender)) { ((Control)sender).BackColor = _backColorAlt; }
             else { ((Control)sender).BackColor = _backColorMain; }
         }
 
@@ -276,15 +276,15 @@ namespace UtilitiesCS
             }
         }
 
-        private void DeactivateEventsTwoFieldAltHover() 
-        {             
+        private void DeactivateEventsTwoFieldAltHover()
+        {
             _controls.ForEach(control =>
             {
                 control.RemoveEventHandlers("MouseEnter");
                 control.RemoveEventHandlers("MouseLeave");
             });
         }
-        
+
         #endregion Event Wiring and Handlers
 
 

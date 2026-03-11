@@ -78,7 +78,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             var results = Classifiers.Select(
                 classifier => new Prediction<string>(
-                    classifier.Key, classifier.Value.GetMatchProbability(tokens))).OrderBy(x=>x);
+                    classifier.Key, classifier.Value.GetMatchProbability(tokens))).OrderBy(x => x);
             return results;
         }
 
@@ -86,7 +86,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Debug Methods
 
-        public void LogMetrics() 
+        public void LogMetrics()
         {
             var metrics = Classifiers.Select(x => new
             {
@@ -94,8 +94,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 Match = x.Value?.Match?.TokenFrequency?.Keys?.Count() ?? 0,
                 NotMatch = x.Value?.NotMatch?.TokenFrequency?.Keys?.Count() ?? 0,
                 Probability = x.Value?.Prob?.Keys?.Count() ?? 0,
-                Total = x.Value?.Match?.TokenFrequency?.Keys?.Count() ?? 0 + 
-                        x.Value?.NotMatch?.TokenFrequency?.Keys?.Count() ?? 0 + 
+                Total = x.Value?.Match?.TokenFrequency?.Keys?.Count() ?? 0 +
+                        x.Value?.NotMatch?.TokenFrequency?.Keys?.Count() ?? 0 +
                         x.Value?.Prob?.Keys?.Count() ?? 0
             }).ToList();
             metrics.Insert(0, new
@@ -117,7 +117,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             metrics.Add(new
             {
                 Descriptor = "Total",
-                Match = metrics.Select(x=>x.Match).Sum(),
+                Match = metrics.Select(x => x.Match).Sum(),
                 NotMatch = metrics.Select(x => x.NotMatch).Sum(),
                 Probability = metrics.Select(x => x.Probability).Sum(),
                 Total = metrics.Select(x => x.Total).Sum()
@@ -128,16 +128,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             logger.Info($"\n{jagged.ToFormattedText(
                     ["Descriptor", "Matches", "Not Match", "Probability", "Total Lines"],
-                    [Enums.Justification.Left, Enums.Justification.Right, 
-                        Enums.Justification.Right, Enums.Justification.Right, 
+                    [Enums.Justification.Left, Enums.Justification.Right,
+                        Enums.Justification.Right, Enums.Justification.Right,
                         Enums.Justification.Right],
                     "Classifier Manager Metrics".ToUpper())}");
         }
 
-        public void LogState() 
+        public void LogState()
         {
-            logger.Info($"\n{
-                Classifiers
+            logger.Info($"\n{Classifiers
                 .Select(x => new[]
                     {
                         x.Value.Tag,
@@ -150,13 +149,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 .ToFormattedText(
                     ["Classifier", "Parent", "TokenBase", "Positive", "Negative"],
                     [Enums.Justification.Center, Enums.Justification.Center,
-                        Enums.Justification.Center, Enums.Justification.Center, 
+                        Enums.Justification.Center, Enums.Justification.Center,
                         Enums.Justification.Center],
                     "Classifier Manager State".ToUpper())}");
         }
 
         #endregion Debug Methods
-        
+
         #region Serialization
 
         [OnDeserialized]
@@ -166,10 +165,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             LogMetrics();
         }
 
-        public async Task AfterDeserialize(CancellationToken token) 
+        public async Task AfterDeserialize(CancellationToken token)
         {
             var sw = new SegmentStopWatch().Start();
-            
+
             AppGlobals.AF.ProgressPane.Visible = true;
             //logger.Debug("Starting Classifier Probability Calculation");
             AppGlobals.AF.ProgressTracker.Report(0, "Starting Classifier Probability Calculation");
@@ -181,7 +180,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             //await AfterDeserialized_HeavyParallelizationAsync(token, sw);
             await OptimizeUpdate(sw);
-                                    
+
             sw.Stop().GroupByActionName(inplace: true);
             sw.WriteToLog();
 
@@ -223,11 +222,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                         });
 
             }
-                
+
         }
-        
+
         // Parallelization made this slower because memory usage was too high
-        internal async Task InferNegative(CancellationToken token) 
+        internal async Task InferNegative(CancellationToken token)
         {
             AppGlobals.AF.ProgressTracker.Report(
                 0, "Starting Negative Token Inference");
@@ -241,9 +240,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var sw = new SegmentStopWatch();
             // Start the chunked tasks to multiprocess async
             var tasks = chunks.Select(
-                chunk => Task.Run(async () => await 
+                chunk => Task.Run(async () => await
                 chunk.ToAsyncEnumerable()
-                .ForEachAsync(async (classifier) => 
+                .ForEachAsync(async (classifier) =>
                 {
                     await classifier.InferNegativeTokensAsync(token);
                     Interlocked.Increment(ref completed);
@@ -253,7 +252,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 })));
 
             sw.Start();
-            
+
             try
             {
                 await Task.WhenAll(tasks);
@@ -285,11 +284,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 //logger.Debug("Loading Canceled by User");
             }
         }
-        
-        internal string GetReportMessage(int completed, int count, SegmentStopWatch sw, string header = "Completed") 
+
+        internal string GetReportMessage(int completed, int count, SegmentStopWatch sw, string header = "Completed")
         {
             string message;
-            if (completed > 0) 
+            if (completed > 0)
             {
                 var speed = sw.Elapsed.TotalSeconds / (double)completed;
                 var remaining = TimeSpan.FromSeconds((count - completed) * speed);
@@ -299,7 +298,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 message = $"{header} {completed} of {count}";
             }
-            
+
             return message;
         }
 

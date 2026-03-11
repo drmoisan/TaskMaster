@@ -68,11 +68,11 @@ namespace UtilitiesCS.EmailIntelligence
             var tokens = Tokenize(item);
             Train(tokens, state);
             if (Callback is not null) { Callback(item); }
-            
+
         }
 
         public abstract Task TrainAsync(string[] tokens, bool state);
-        
+
         public async Task TrainAsync(object item, bool state)
         {
             TokenizeAsync.ThrowIfNull($"{nameof(Tokenize)} delegate function cannot be null to Train classifier");

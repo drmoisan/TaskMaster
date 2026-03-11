@@ -35,13 +35,13 @@ namespace Tags
             _userEmailAddress = userEmailAddress;
             _selections = selections;
             _objCaller = objCallerObj;
-            
+
             _olMail = ResolveMailItem(_objItem);
-            
+
             if (_olMail is not null) { _isMail = true; }
 
             _gridTemplate = CaptureAndRemoveTemplate();
-            
+
             ResolvePrefix(_prefixes, prefixKey);
 
             SetAutoAssignState(_autoAssigner);
@@ -87,7 +87,7 @@ namespace Tags
                 return (MailItem)_objItem;
             }
             else return null;
-        } 
+        }
 
         internal IPrefix GetDefaultPrefix() => new PrefixItem(PrefixTypeEnum.Other, "", "", OlCategoryColor.olCategoryColorNone);
 
@@ -101,14 +101,14 @@ namespace Tags
             // Else if it exists, set the Iprefix based on the prefixKey
             else if (prefixes.Exists(x => x.Key == prefixKey))
             {
-                _prefix = prefixes.Find(x => (x.Key) == prefixKey );
+                _prefix = prefixes.Find(x => (x.Key) == prefixKey);
             }
             // Else throw an error
             else
             {
                 throw new ArgumentException(nameof(prefixes) + " must contain " + nameof(prefixKey) + " value " + prefixKey);
             }
-        } 
+        }
 
         public void SetAutoAssignState(IAutoAssign autoAssigner) //internal
         {
@@ -123,7 +123,7 @@ namespace Tags
                 _viewer.ButtonAutoAssign.Visible = false;
                 _viewer.ButtonAutoAssign.Enabled = false;
             }
-        } 
+        }
 
         public void LoadSelections(IList<string> selections) //internal
         {
@@ -150,7 +150,7 @@ namespace Tags
                     }
                 }
             }
-        } 
+        }
 
         public bool IsPrefixMissing(IPrefix prefix, string sample) //internal
         {
@@ -172,7 +172,7 @@ namespace Tags
             }
 
             return addPrefix;
-        } 
+        }
 
         public ControlPosition CaptureAndRemoveTemplate() //internal
         {
@@ -209,9 +209,9 @@ namespace Tags
         #region Public Functions and Properties
 
         public void ToggleChoice(string str_choice) => _dictOptions[str_choice] = !_dictOptions[str_choice];
-        
+
         public void ToggleOn(string str_choice) => _dictOptions[str_choice] = true; //internal
-            
+
         public void ToggleOff(string str_choice) => _dictOptions[str_choice] = false; //internal
 
         public void UpdateSelections()
@@ -224,15 +224,15 @@ namespace Tags
         {
             // Get search strings 
             var searchStrings = ParseSearchStrings(_viewer.SearchText.Text);
-            
+
             // Filter the dictionary based on the search strings
             var filtered = Search(_dictOptions, searchStrings);
-            
+
             // If the filtered dictionary is different from the current filtered dictionary, then reload the controls
             if (!_filteredOptions.SequenceEqual(filtered))
             {
                 RemoveControls();
-                LoadControls(filtered, _prefix.Value); 
+                LoadControls(filtered, _prefix.Value);
             }
         }
 
@@ -248,7 +248,7 @@ namespace Tags
                                             .SelectMany(x => x)
                                             .Distinct()
                                             .ToSortedDictionary();
-            
+
         }
 
         public List<string> ParseSearchStrings(string searchText)
@@ -264,9 +264,9 @@ namespace Tags
         public List<string> SelectionAsList() => _dictOptions.Where(item => item.Value).Select(item => item.Key).ToList();
 
         public bool ButtonNewActive { get => _viewer.ButtonNew.Visible; set => _viewer.ButtonNew.Visible = value; }
-        
-        public bool ButtonAutoAssignActive {  get => _viewer.ButtonAutoAssign.Visible; set => _viewer.ButtonAutoAssign.Visible = value; }
-        
+
+        public bool ButtonAutoAssignActive { get => _viewer.ButtonAutoAssign.Visible; set => _viewer.ButtonAutoAssign.Visible = value; }
+
         public void SetSearchText(string searchText) => _viewer.SearchText.Text = searchText;
 
         public string ExitType { get => _exitType; }
@@ -275,7 +275,7 @@ namespace Tags
 
         #region Public Events
 
-        public void WireEvents() 
+        public void WireEvents()
         {
             _viewer.L1v2L2_OptionsPanel.KeyDown += new System.Windows.Forms.KeyEventHandler(L1v2L2_OptionsPanel_KeyDown);
             _viewer.L1v2L2_OptionsPanel.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(OptionsPanel_PreviewKeyDown);
@@ -292,11 +292,11 @@ namespace Tags
 
         private void L1v2L2_OptionsPanel_KeyDown(object sender, KeyEventArgs e)
         {
-            
+
         }
 
         private void ButtonOk_Click(object sender, EventArgs e) => ButtonOk_Action();
-        
+
         public void ButtonOk_Action() //internal
         {
             _viewer.Close();
@@ -329,7 +329,7 @@ namespace Tags
 
                 throw;
             }
-            
+
         }
 
         private void ButtonCancel_Click(object sender, EventArgs e)
@@ -374,7 +374,7 @@ namespace Tags
 
         }
 
-        internal bool TryGetAutoAssignment(out IList<string> assignments) 
+        internal bool TryGetAutoAssignment(out IList<string> assignments)
         {
             bool autoAdded = false;
             assignments = [];
@@ -396,9 +396,9 @@ namespace Tags
                     }
                 }
             }
-            return autoAdded; 
+            return autoAdded;
         }
-        
+
         public void AddColorCategory(string categoryName = "") //internal
         {
             // Only create category if we can't auto-assign to an existing
@@ -411,14 +411,14 @@ namespace Tags
                 if (!string.IsNullOrEmpty(categoryName))
                 {
                     // If the _autoAssigner is not null, use its delegate to add the category
-                    if (_autoAssigner is not null) 
-                    { 
+                    if (_autoAssigner is not null)
+                    {
                         var newCategory = _autoAssigner.AddColorCategory(_prefix, categoryName);
                         if (newCategory is null) { return; }
                         categoryName = newCategory.Name;
-                    }                    
+                    }
                     AddOption(categoryName, blClickTrue: true);
-                    assignments.Add(categoryName);                    
+                    assignments.Add(categoryName);
                 }
             }
 
@@ -457,7 +457,7 @@ namespace Tags
         #endregion
 
         #region Keyboard Events
-        
+
         public void OptionsPanel_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e) //internal
         {
             switch (e.KeyCode)
@@ -541,7 +541,7 @@ namespace Tags
                     }
             }
         }
-        
+
         #endregion
 
         #region Major Actions
@@ -570,7 +570,7 @@ namespace Tags
                     MessageBox.Show($"Error adding {nameof(CheckBox)} in {nameof(Tags)}.{nameof(LoadControls)}");
                     return false;
                 }
-                
+
                 ctrlCB.Text = _filteredOptions.Keys.ElementAt(i).Substring(prefix.Length);
                 ctrlCB.Checked = _filteredOptions.Values.ElementAt(i);
 
@@ -588,7 +588,7 @@ namespace Tags
 
                 // ctrlCB.AutoSize = True
                 ControlPosition.Set(ctrlCB, _gridTemplate, i, 0);
-                
+
                 // _viewer.OptionsPanel.ScrollHeight = ctrlCB.Top + cHt_var
                 try
                 {
@@ -632,7 +632,7 @@ namespace Tags
             {
                 _dictOptions[option] = blClickTrue;
             }
-                
+
             if (!_dictOptions.Equals(_filteredOptions))
             {
                 _filteredOptions ??= [];

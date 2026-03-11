@@ -15,14 +15,14 @@ using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public class ScBag<T>: ConcurrentBag<T>
+    public class ScBag<T> : ConcurrentBag<T>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Constructors
 
-        public ScBag() :base() { }
+        public ScBag() : base() { }
         public ScBag(IEnumerable<T> collection) : base(collection) { }
 
         #endregion Constructors

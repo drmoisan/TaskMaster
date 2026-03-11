@@ -119,14 +119,14 @@ namespace UtilitiesCS
                 _progress = value;
                 var parentProgress = (int)Math.Round(_parent.Allocation * value / 100, 0) + _parent.StartingAt;
                 _parent.Progress.Report((parentProgress, _jobName));
-                if (_isRoot) 
-                { 
-                    if (parentProgress == 100 || _root100) 
+                if (_isRoot)
+                {
+                    if (parentProgress == 100 || _root100)
                     {
                         ChangeBarColor(_root100 ? System.Drawing.Color.Blue : System.Drawing.Color.Green);
                         _root100 = !_root100;
                     }
-                } 
+                }
             }
         }
 

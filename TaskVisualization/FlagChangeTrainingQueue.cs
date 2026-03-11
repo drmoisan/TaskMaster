@@ -24,7 +24,7 @@ namespace TaskVisualization
             return this;
         }
 
-        
+
         public IFlagChangeTrainingQueue.QueueOptions Options { get; set; } = IFlagChangeTrainingQueue.QueueOptions.Timed;
         internal CancellationToken Cancel { get; private set; } = default;
         internal BlockingCollection<IFlagChangeGroup> Queue { get; private set; } = [];

@@ -9,14 +9,14 @@ namespace UtilitiesCS
     /// the emails within the folder. Each entry contains a unique combination of a folder 
     /// name and an email subject. Class is to be used in conjunction with 
     /// </summary>
-    public interface ISubjectMapEntry: IEquatable<ISubjectMapEntry>
+    public interface ISubjectMapEntry : IEquatable<ISubjectMapEntry>
     {
         /// <summary>
         /// List of common words to strip from tokens to make token 
         /// list as distinct as possible
         /// </summary>
         IList<string> CommonWords { get; set; }
-        
+
         /// <summary>
         /// String with the path of an email folder relative to the inbox
         /// </summary>
@@ -57,7 +57,7 @@ namespace UtilitiesCS
         /// <summary>
         /// Array of integers representing the lengths of each word in the subject
         /// </summary>
-        int[] SubjectWordLengths { get; set ; }
+        int[] SubjectWordLengths { get; set; }
 
         /// <summary>
         /// Smith Waterman score
@@ -67,7 +67,7 @@ namespace UtilitiesCS
         /// <summary>
         /// Reference to encoder to be used to encode the folder name and subject
         /// </summary>
-        public ISubjectMapEncoder Encoder { get;  set; }
+        public ISubjectMapEncoder Encoder { get; set; }
 
         /// <summary>
         /// Tokenize Foldername and Subject and Encode using the supplied 

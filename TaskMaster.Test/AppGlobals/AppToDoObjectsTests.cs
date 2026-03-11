@@ -27,7 +27,7 @@ namespace TaskMaster.Test.AppGlobals
             Console.SetOut(new DebugTextWriter());
             this.mockRepository = new MockRepository(MockBehavior.Strict);
             this.mockApplicationGlobals = this.mockRepository.Create<IApplicationGlobals>();
-            this.mockApplicationGlobals.SetupGet(x => x.AF.CancelToken).Returns(CancellationToken.None);            
+            this.mockApplicationGlobals.SetupGet(x => x.AF.CancelToken).Returns(CancellationToken.None);
         }
 
         #region Helper Classes and Variables
@@ -109,7 +109,7 @@ namespace TaskMaster.Test.AppGlobals
         {
             // Arrange
             this.mockIntelligenceConfig = SetUpMockIntelRes(mockApplicationGlobals);
-            var appToDoObjects = new AppToDoObjects(mockApplicationGlobals.Object);            
+            var appToDoObjects = new AppToDoObjects(mockApplicationGlobals.Object);
             this.mockSmartSerializable = GetMockSS();
             appToDoObjects.SmartSerializable = mockSmartSerializable.Object;
             var expectedHandler = typeof(AppToDoObjects).GetMethod("People_CollectionChanged", [typeof(object), typeof(DictionaryChangedEventArgs<string, string>)]);
@@ -118,11 +118,11 @@ namespace TaskMaster.Test.AppGlobals
             await appToDoObjects.LoadPeopleAsync();
 
             // Assert
-            
+
             // that SmartSerializable.DeserializeAsync was called once,
             // the return value was properly assigned to the People property,
             // and the CollectionChanged event was properly assigned
-           
+
             mockSmartSerializable.Verify(m => m.DeserializeAsync(It.IsAny<SmartSerializableLoader>(), true, It.IsAny<Func<PeopleScoDictionaryNew>>()), Times.Once);
             Assert.IsNotNull(appToDoObjects.People);
             var assignedHandlers = EventHelper.GetEventInvocationList(appToDoObjects.People, "CollectionChanged");
@@ -141,7 +141,7 @@ namespace TaskMaster.Test.AppGlobals
 
         //    // Act
         //    await appToDoObjects.LoadPeopleAsync();            
-            
+
         //    // Assert
 
         //    // the return value was properly assigned to the People property,

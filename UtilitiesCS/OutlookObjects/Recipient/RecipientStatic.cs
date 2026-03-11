@@ -82,7 +82,7 @@ namespace UtilitiesCS
 
         public static string GetSenderName(this MeetingItem olMeeting)
         {
-            return olMeeting.SenderName;            
+            return olMeeting.SenderName;
         }
 
         public static string GetSenderAddress(this MeetingItem olMeeting)
@@ -166,7 +166,7 @@ namespace UtilitiesCS
             {
                 var name = olMail.GetSenderName();
                 var address = olMail.GetSenderAddress();
-                var pa = olMail.Sender.PropertyAccessor;                
+                var pa = olMail.Sender.PropertyAccessor;
                 var html = ConvertRecipientToHtml(name, address);
                 return new RecipientInfo(name, address, html);
             }
@@ -180,7 +180,7 @@ namespace UtilitiesCS
                 return new RecipientInfo("", "", "");
             }
             else
-            {                
+            {
                 var recipient = olMail.Sender.ToResolvedRecipient(ns)?.GetInfo();
                 if (recipient is not null) { return recipient; }
                 else
@@ -253,7 +253,7 @@ namespace UtilitiesCS
 
             foreach (Recipient olRecipient in olRecipients)
             {
-                
+
                 var smtpAddress = GetRecipientAddress(olRecipient);
                 if (olRecipient.Type == (int)OlMailRecipientType.olTo)
                 {
@@ -267,7 +267,7 @@ namespace UtilitiesCS
 
             return (string.Join("; ", recipientsTo), string.Join("; ", recipientsCC));
         }
-        
+
         public static (string recipientsTo, string recipientsCC) GetRecipients(this MeetingItem olMeeting)
         {
             var olRecipients = olMeeting.Recipients;
@@ -332,7 +332,7 @@ namespace UtilitiesCS
         }
 
         public static IEnumerable<RecipientInfo> GetInfo(this IEnumerable<Recipient> recipients)
-        {            
+        {
             return recipients.Select(x => x.GetInfo());
         }
 
@@ -501,7 +501,7 @@ namespace UtilitiesCS
             //    name = recipient.Name;
             //    address = recipient.Address;                
             //}
-            
+
 
             return (name, address);
         }

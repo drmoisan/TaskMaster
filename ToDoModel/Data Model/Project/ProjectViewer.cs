@@ -21,7 +21,7 @@ namespace ToDoModel
             InitializeComponent();
         }
 
-        private bool _isEditing = false;        
+        private bool _isEditing = false;
 
         private ProjectController _controller;
         public ProjectController Controller { get => _controller; set => _controller = value; }
@@ -32,9 +32,9 @@ namespace ToDoModel
         internal ControlResizer Resizer { get => _resizer; }
 
         private void ButtonOk_Click(object sender, EventArgs e) => Controller.SaveAndClose();
-        
+
         private void ButtonCancel_Click(object sender, EventArgs e) => Controller.Cancel();
-        
+
         private void ProjectInfoWindow_Resize(object sender, EventArgs e)
         {
             _resizer.ResizeAllControls(this);
@@ -73,22 +73,22 @@ namespace ToDoModel
         {
             _isEditing = true;
             if (e.Column == this.OlvProgramID && !ProgramData.IsNullOrEmpty())
-            { 
+            {
                 // Grab handle on the row and cast to IProjectData
                 IProjectEntry projectEntry = (IProjectEntry)e.RowObject;
-                
-                var cb = GetCombo(sender, e, ProgramData.Values.OrderBy(x=>x).ToArray());
-                
+
+                var cb = GetCombo(sender, e, ProgramData.Values.OrderBy(x => x).ToArray());
+
                 cb.SelectedIndexChanged += (sender, args) =>
                 {
                     var id = cb.SelectedItem as string;
-                    
+
                     var kvp = id.IsNullOrEmpty() ? default : ProgramData.FirstOrDefault(x => x.Value == id);
                     if (!kvp.Key.IsNullOrEmpty() && !kvp.Value.IsNullOrEmpty())
                     {
                         projectEntry.ProgramID = kvp.Value;
                         projectEntry.ProgramName = kvp.Key;
-                    }                    
+                    }
                     e.Cancel = true;
                 };
                 e.Control = cb;
@@ -98,13 +98,13 @@ namespace ToDoModel
                 // Grab handle on the row and cast to IProjectData
                 IProjectEntry projectEntry = (IProjectEntry)e.RowObject;
 
-                var cb = GetCombo(sender, e, ProgramData.Keys.OrderBy(x=>x).ToArray());
+                var cb = GetCombo(sender, e, ProgramData.Keys.OrderBy(x => x).ToArray());
 
                 cb.SelectedIndexChanged += (sender, args) =>
                 {
                     var name = cb.SelectedItem as string;
 
-                    if (!name.IsNullOrEmpty() && ProgramData.TryGetValue(name, out var id))                     
+                    if (!name.IsNullOrEmpty() && ProgramData.TryGetValue(name, out var id))
                     {
                         projectEntry.ProgramID = id;
                         projectEntry.ProgramName = name;
@@ -131,15 +131,15 @@ namespace ToDoModel
         private void OlvProjInfo_CellEditFinishing(object sender, CellEditEventArgs e)
         {
             _isEditing = false;
-            if ((e.Column == this.OlvProgramID || e.Column == this.OlvProgramName) && !ProgramData.IsNullOrEmpty()) 
-            { 
+            if ((e.Column == this.OlvProgramID || e.Column == this.OlvProgramName) && !ProgramData.IsNullOrEmpty())
+            {
                 // Any updating will have been down in the SelectedIndexChanged event handler
                 // Here we simply make the list redraw the involved ListViewItem
                 ((ObjectListView)sender).RefreshItem(e.ListViewItem);
 
                 // We have updated the model object, so we cancel the auto update
                 e.Cancel = true;
-            }            
+            }
         }
 
         private void OlvProjectData_KeyDown(object sender, KeyEventArgs e)
@@ -155,11 +155,11 @@ namespace ToDoModel
             if (OlvProjectData.SelectedObjects.Count > 0)
             {
                 var selectedItems = OlvProjectData.SelectedObjects;
-                
+
                 try
                 {
                     var clipboardText = string
-                        .Join("\n",selectedItems?
+                        .Join("\n", selectedItems?
                         .CastNullSafe<IProjectEntry>()
                         .Where(x => x is not null)
                         .Select(x => x.ToCSV()));
@@ -169,10 +169,10 @@ namespace ToDoModel
                 {
                     logger.Error($"Copy to clipboard failed. {e.Message}", e);
                 }
-                
+
             }
         }
 
-        
+
     }
 }

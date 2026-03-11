@@ -21,9 +21,9 @@ namespace SVGControl
         public PictureBoxSVG()
         {
             InitializeComponent();
-            _imageSvg = new SvgImageSelector(base.Size, 
-                                             new Padding(0), 
-                                             SVGControl.AutoSize.MaintainAspectRatio, 
+            _imageSvg = new SvgImageSelector(base.Size,
+                                             new Padding(0),
+                                             SVGControl.AutoSize.MaintainAspectRatio,
                                              useDefaultImage: true);
             this.Image = _imageSvg.Render();
             _imageSvg.PropertyChanged += ImageSVG_PropertyChanged;
@@ -37,10 +37,10 @@ namespace SVGControl
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         [Browsable(true)]
         [EditorBrowsable(EditorBrowsableState.Always)]
-        public SvgImageSelector ImageSvg 
-        { 
-            get => _imageSvg; 
-            set => _imageSvg = value; 
+        public SvgImageSelector ImageSvg
+        {
+            get => _imageSvg;
+            set => _imageSvg = value;
         }
 
         private void Control_SizeChanged(object sender, EventArgs e)

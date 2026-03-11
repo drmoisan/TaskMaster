@@ -20,7 +20,7 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
             InitializeComponent();
             SetupConfigGroupBoxReferences();
         }
-        
+
         private void SetupConfigGroupBoxReferences()
         {
             groupBoxLocal.SpecialFolderComboBox = ComboSpecialFolderLocal;
@@ -50,8 +50,8 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
 
         #region Properties
 
-        internal List<ConfigGroupBox> Boxes { get; private set; } 
-        
+        internal List<ConfigGroupBox> Boxes { get; private set; }
+
         internal ConfigController Controller { get; set; }
 
         #endregion Properties
@@ -96,7 +96,7 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
 
         private void SpecialFolder_SelectedValueChanged(object sender, EventArgs e)
         {
-            var box = (ConfigGroupBox)((ComboBox)sender).Parent;            
+            var box = (ConfigGroupBox)((ComboBox)sender).Parent;
             Controller?.ChangeSpecialFolder(box.SpecialFolderName, box.RelativePath, box.DiskType);
         }
 
@@ -119,7 +119,7 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
             }
         }
 
-        internal void ActivateUiBox(ConfigGroupBox box) 
+        internal void ActivateUiBox(ConfigGroupBox box)
         {
             box.IsActive = true;
             box.BackColor = System.Drawing.SystemColors.Highlight;
@@ -127,7 +127,7 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
             box.LabelActive.Visible = true;
         }
 
-        internal void DeactivateUiBox(ConfigGroupBox box) 
+        internal void DeactivateUiBox(ConfigGroupBox box)
         {
             box.IsActive = false;
             box.BackColor = System.Drawing.SystemColors.Control;

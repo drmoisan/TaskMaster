@@ -14,6 +14,6 @@ namespace UtilitiesCS
             {
                 yield return queue.Dequeue();
             }
-        }   
+        }
     }
 }

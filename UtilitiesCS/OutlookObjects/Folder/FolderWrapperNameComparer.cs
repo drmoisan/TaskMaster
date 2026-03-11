@@ -12,7 +12,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         {
             if (ReferenceEquals(x, y)) return true;
             if (x?.Value is null || y?.Value is null) return false;
-            if (x.Value.Name.IsNullOrEmpty() || y.Value.Name.IsNullOrEmpty()) return false;            
+            if (x.Value.Name.IsNullOrEmpty() || y.Value.Name.IsNullOrEmpty()) return false;
             return x.Value.Name == y.Value.Name;
         }
 

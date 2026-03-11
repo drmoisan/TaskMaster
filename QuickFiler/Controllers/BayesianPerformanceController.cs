@@ -18,8 +18,8 @@ namespace QuickFiler.Controllers
         public BayesianPerformanceController(IApplicationGlobals globals) { _globals = globals; }
 
         private IApplicationGlobals _globals;
-        internal IApplicationGlobals Globals {get => _globals; set => _globals = value; }
-                
+        internal IApplicationGlobals Globals { get => _globals; set => _globals = value; }
+
         internal BayesianSerializationHelper Serialization { get; set; }
 
         public ClassificationErrors[] Errors { get => _errors; set => _errors = value; }
@@ -36,7 +36,7 @@ namespace QuickFiler.Controllers
         {
             Serialization ??= new BayesianSerializationHelper(Globals);
             Errors ??= await Serialization.DeserializeAsync<ClassificationErrors[]>("ClassificationErrors[]");
-            var ppkg = (new ProgressPackage()).InitializeAsync(cancelSource: _globals.AF.CancelSource, cancel: _globals.AF.CancelToken , progressTrackerPane: _globals.AF.ProgressTracker);
+            var ppkg = (new ProgressPackage()).InitializeAsync(cancelSource: _globals.AF.CancelSource, cancel: _globals.AF.CancelToken, progressTrackerPane: _globals.AF.ProgressTracker);
             Viewer = new BayesianPerformanceViewer(this).Init();
             var classes = Errors.Select(x => x.Class).ToArray();
             Viewer.ClassSelector.Items.AddRange(classes);
@@ -60,7 +60,7 @@ namespace QuickFiler.Controllers
 
         internal void OlvVerboseDetails_SelectionChanged()
         {
-            var objects = Viewer.OlvVerboseDetails.SelectedObjects;  
+            var objects = Viewer.OlvVerboseDetails.SelectedObjects;
             if ((objects is not null) && (objects.Count != 0))
             {
                 var outcomePair = (KeyValuePair<VerboseTestOutcome, string>)objects[0];
@@ -96,16 +96,16 @@ namespace QuickFiler.Controllers
         {
             var selectedClass = Viewer.ClassSelector.SelectedItem.ToString();
             ActiveError = Errors.FirstOrDefault(x => x.Class == selectedClass);
-            if (ActiveError is not null) 
-            { 
-                AssignFormValues(ActiveError); 
+            if (ActiveError is not null)
+            {
+                AssignFormValues(ActiveError);
             }
         }
 
-        internal void ReSortItem() 
+        internal void ReSortItem()
         {
             var item = (MailItem)Globals.Ol.NamespaceMAPI.GetItemFromID(ActiveOutcome.Source.EntryId, ActiveOutcome.Source.StoreId);
-            if (item is not null) 
+            if (item is not null)
             {
                 var sorter = new EfcHomeController(_globals, () => { }, item);
                 sorter.Run();
@@ -114,6 +114,6 @@ namespace QuickFiler.Controllers
 
         protected BayesianPerformanceViewer _viewer;
         internal virtual BayesianPerformanceViewer Viewer { get => _viewer; private set => _viewer = value; }
-        
+
     }
 }

@@ -41,7 +41,8 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
             treeListView.IsSimpleDragSource = true;
             treeListView.IsSimpleDropSink = true;
 
-            treeListView.ModelCanDrop += delegate (object sender, ModelDropEventArgs e) {
+            treeListView.ModelCanDrop += delegate (object sender, ModelDropEventArgs e)
+            {
                 e.Effect = DragDropEffects.None;
                 if (e.TargetModel == null)
                     return;
@@ -52,7 +53,8 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
                     e.InfoMessage = "Can only drop on directories";
             };
 
-            treeListView.ModelDropped += delegate (object sender, ModelDropEventArgs e) {
+            treeListView.ModelDropped += delegate (object sender, ModelDropEventArgs e)
+            {
                 String msg = String.Format("{2} items were dropped on '{1}' as a {0} operation.",
                     e.Effect, ((DirectoryInfo)e.TargetModel).Name, e.SourceModels.Count);
                 MessageBox.Show(msg, "Object List View Demo", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -68,7 +70,8 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
 
             // CanExpandGetter is called very often! It must be very fast.
 
-            this.treeListView.CanExpandGetter = delegate (object x) {
+            this.treeListView.CanExpandGetter = delegate (object x)
+            {
                 return ((MyFileSystemInfo)x).IsDirectory;
             };
 
@@ -81,14 +84,16 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
             // earliest opportunity. We get around the second problem by collapsing the branch again, so it's children
             // will not be fetched when the tree is refreshed. The user could still explicitly unroll it again --
             // that's their problem :)
-            this.treeListView.ChildrenGetter = delegate (object x) {
+            this.treeListView.ChildrenGetter = delegate (object x)
+            {
                 try
                 {
                     return ((MyFileSystemInfo)x).GetFileSystemInfos();
                 }
                 catch (UnauthorizedAccessException ex)
                 {
-                    this.BeginInvoke((MethodInvoker)delegate () {
+                    this.BeginInvoke((MethodInvoker)delegate ()
+                    {
                         this.treeListView.Collapse(x);
                         MessageBox.Show(this, ex.Message, "ObjectListViewDemo", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     });
@@ -107,7 +112,7 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
 
                     // Update the code to use DirectoryInfoWrapper
                     roots.Add(new MyFileSystemInfo(new DirectoryInfoWrapper(new DirectoryInfo(di.Name))));
-                    //roots.Add(new MyFileSystemInfo(new DirectoryInfo(di.Name)));
+                //roots.Add(new MyFileSystemInfo(new DirectoryInfo(di.Name)));
             }
             this.treeListView.Roots = roots;
         }
@@ -121,13 +126,15 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
             // since TreeListViews can't show groups.
 
             SysImageListHelper helper = new SysImageListHelper(this.treeListView);
-            this.olvColumnName.ImageGetter = delegate (object x) {
+            this.olvColumnName.ImageGetter = delegate (object x)
+            {
                 return helper.GetImageIndex(((MyFileSystemInfo)x).FullName);
             };
 
             // Get the size of the file system entity. 
             // Folders and errors are represented as negative numbers
-            this.olvColumnSize.AspectGetter = delegate (object x) {
+            this.olvColumnSize.AspectGetter = delegate (object x)
+            {
                 MyFileSystemInfo myFileSystemInfo = (MyFileSystemInfo)x;
 
                 if (myFileSystemInfo.IsDirectory)
@@ -148,7 +155,8 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
             // size in the AspectGetter, and doing the conversion in the 
             // AspectToStringConverter, sorting on this column will work off the
             // actual sizes, rather than the formatted string.
-            this.olvColumnSize.AspectToStringConverter = delegate (object x) {
+            this.olvColumnSize.AspectToStringConverter = delegate (object x)
+            {
                 long sizeInBytes = (long)x;
                 if (sizeInBytes < 0) // folder or error
                     return "";
@@ -156,14 +164,16 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
             };
 
             // Show the system description for this object
-            this.olvColumnFileType.AspectGetter = delegate (object x) {
+            this.olvColumnFileType.AspectGetter = delegate (object x)
+            {
                 return ShellUtilitiesStatic.GetFileType(((MyFileSystemInfo)x).FullName);
             };
 
             // Show the file attributes for this object
             // A FlagRenderer masks off various values and draws zero or images based 
             // on the presence of individual bits.
-            this.olvColumnAttributes.AspectGetter = delegate (object x) {
+            this.olvColumnAttributes.AspectGetter = delegate (object x)
+            {
                 return ((MyFileSystemInfo)x).Attributes;
             };
             FlagRenderer attributesRenderer = new FlagRenderer();
@@ -198,10 +208,10 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
             return String.Format("{0} bytes", size);
         }
     }
-    
-    
 
-    
+
+
+
 }
 
-    
+

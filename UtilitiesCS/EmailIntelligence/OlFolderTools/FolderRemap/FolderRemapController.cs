@@ -13,7 +13,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
 {
     public class FolderRemapController
     {
-        public FolderRemapController(IApplicationGlobals appGlobals) 
+        public FolderRemapController(IApplicationGlobals appGlobals)
         {
             _globals = appGlobals;
             _folderRemapTree = new FolderRemapTree(_globals.Ol.ArchiveRoot, _globals.TD.FolderRemap);
@@ -39,7 +39,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
 
         private List<OlFolderRemap> _mappings2;
         public List<OlFolderRemap> Mappings2 { get => _mappings2; private set => _mappings2 = value; }
-        
+
         private bool _update;
 
         #region Internal Helper Methods
@@ -71,7 +71,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             _globals.TD.FolderRemap.Serialize();
         }
 
-        internal void ExpandTo(int level, bool addChecked=false) 
+        internal void ExpandTo(int level, bool addChecked = false)
         {
             RemapTree.Roots
                      .SelectMany(root => root
@@ -133,9 +133,9 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             switch (e.DropTargetLocation)
             {
                 case DropTargetLocation.Background:
-                    
+
                     break;
-                case DropTargetLocation.Item: 
+                case DropTargetLocation.Item:
                     _update = true;
                     MoveObjectsToChildren(
                         e.ListView as TreeListView,
@@ -180,11 +180,11 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             {
                 return CheckState.Checked;
             }
-            else 
+            else
             {
                 node.MappedTo = null;
                 return CheckState.Unchecked;
-            }            
+            }
         };
 
 
@@ -219,10 +219,10 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
 
                     if (destination.MappedTo is not null) { destination = destination.MappedTo; }
                     node.Value.MappedTo = destination;
-                    
+
                     return CheckState.Checked;
                 }
-                
+
                 else
                 {
                     node.Value.MappedTo = null;
@@ -230,7 +230,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
                 }
             };
             return putter;
-        } 
+        }
 
         #endregion Event Handlers
 

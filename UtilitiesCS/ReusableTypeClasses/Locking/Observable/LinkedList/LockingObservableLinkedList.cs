@@ -71,7 +71,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             OnCollectionChanged(NotifyCollectionChangedAction.Add, this.First);
         }
 
-        public void AddOrMoveFirst(T item) 
+        public void AddOrMoveFirst(T item)
         {
             var node = Find(item);
             if (node is null)
@@ -82,7 +82,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             {
                 return;
             }
-            
+
             else
             {
                 base.Remove(node.innerNode);
@@ -102,7 +102,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
                     RemoveLast();
                 }
             }
-            else if(node == First)
+            else if (node == First)
             {
                 return;
             }
@@ -382,7 +382,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
         private readonly ConcurrentDictionary<LockingObservableLinkedListNode<T>, ICollection<ILockingLinkedListObserver<T>>> _observers
             = new ConcurrentDictionary<LockingObservableLinkedListNode<T>, ICollection<ILockingLinkedListObserver<T>>>();
 
-        
+
         private LockingObservableLinkedListNode<T> ToLocking(LockingLinkedListNode<T> node)
         {
             if (node is null) { return null; }

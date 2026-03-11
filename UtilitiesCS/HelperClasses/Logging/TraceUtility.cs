@@ -14,9 +14,9 @@ namespace UtilitiesCS
         {
             var sf = new StackTrace();
             //var assembliesAndMethods = Enumerable.Range(0, sf.FrameCount).Select(i => (sf.GetFrame(i).GetMethod().DeclaringType.Assembly.GetName().Name, sf.GetFrame(i).GetMethod().Name)).ToArray();
-            
+
             int frameLevel = 0;
-            MethodBase method; 
+            MethodBase method;
             try
             {
                 method = GetFirstMethodOfMine(sf, ref frameLevel);
@@ -34,7 +34,7 @@ namespace UtilitiesCS
 
             var methodParameters = method?.GetParameters();
             string methodName = "";
-            if (method is not null) 
+            if (method is not null)
             {
                 methodName = $"{GetClassName(method)}.{method.Name}";
             }
@@ -54,7 +54,7 @@ namespace UtilitiesCS
                 frameLevel = 2;
                 methodCalledBy = null;
             }
-            
+
             var methodCaller = $"{GetClassName(methodCalledBy)}.{methodCalledBy.Name}()" ?? "";
 
             // Exclude out parameters
@@ -109,7 +109,7 @@ namespace UtilitiesCS
             var st = new StackTrace(1);
             var methods = st.GetMyMethods();
             var lastMethod = methods.Pop();
-            var paramString = lastMethod is null? "method not resolved": lastMethod.GetParameterString(callingMethodParamValues);
+            var paramString = lastMethod is null ? "method not resolved" : lastMethod.GetParameterString(callingMethodParamValues);
             var lastName = $"{GetClassName(lastMethod)}.{lastMethod.Name}({paramString})";
             var methodNames = methods.Select(m => $"{GetClassName(m)}.{m.Name}({GetParameterNames(m)})").ToList();
             methodNames.Add(lastName);
@@ -144,7 +144,7 @@ namespace UtilitiesCS
         private static string GetParameterString(this MethodBase method, params object[] callingMethodParamValues)
         {
             var methodParameters = method?.GetParameters();
-            
+
             // Exclude out parameters
             var methodParamsExcludingOut = methodParameters?.Where(p => !p.IsOut).ToArray();
             if (methodParamsExcludingOut.Length == callingMethodParamValues.Length)
@@ -193,7 +193,7 @@ namespace UtilitiesCS
             }
             return methodCalledBy;
         }
-        
+
         public static string[] GetMyMethodNames(this StackTrace trace)
         {
             return trace.GetMyMethods().Select(m => $"{GetClassName(m)}.{m.Name}").ToArray();
@@ -235,8 +235,8 @@ namespace UtilitiesCS
             if (m.IsStatic) { return m.Module.Assembly; }
             else { return m.DeclaringType.Assembly; }
         }
-        
-        public static List<(StackFrame Frame, MethodBase Method)> GetMyFrames(this StackTrace trace) 
+
+        public static List<(StackFrame Frame, MethodBase Method)> GetMyFrames(this StackTrace trace)
         {
             List<(StackFrame Frame, MethodBase Method)> result = [];
 
@@ -244,17 +244,17 @@ namespace UtilitiesCS
             {
                 var frame = trace.GetFrame(i);
                 var method = frame.GetMethod();
-                
-                if (method is not null && 
-                    method.Name != "MoveNext" && 
+
+                if (method is not null &&
+                    method.Name != "MoveNext" &&
                     method.GetAssembly().IsMine())
-                {                    
+                {
                     result.Add((frame, method));
                 }
             }
             return result;
         }
-        
+
         internal static bool IsMine(this Assembly assembly)
         {
             return ProjectNames.Contains(assembly.GetName().Name);
@@ -273,7 +273,7 @@ namespace UtilitiesCS
             {
                 try
                 {
-                    if(++i >= trace.FrameCount) 
+                    if (++i >= trace.FrameCount)
                     {
                         methodCalledBy = null;
                         repeat = false;
@@ -282,10 +282,10 @@ namespace UtilitiesCS
                     {
                         var m = trace.GetFrame(i).GetMethod();
                         string assemblyName;
-                        
+
                         if (m.IsStatic) { assemblyName = m.Module.Assembly.GetName().Name; }
                         else { assemblyName = m.DeclaringType.Assembly.GetName().Name; }
-                        
+
                         if (ProjectNames.Contains(assemblyName))
                         {
                             methodCalledBy = trace.GetFrame(i).GetMethod();
@@ -293,7 +293,7 @@ namespace UtilitiesCS
                             else { repeat = false; }
                         }
                     }
-                    
+
                 }
                 catch (Exception)
                 {
@@ -313,20 +313,20 @@ namespace UtilitiesCS
             {
                 if (_projectNames is null)
                 {
-                    _projectNames = new List<string> 
-                    { 
-                        "Tags", "ToDoModel", "ToDoModel.Test", "TaskVisualization", 
-                        "TaskMaster.Test", "UtilitiesCS", "UtilitiesCS.Test", "QuickFiler", 
-                        "QuickFiler.Test", "TaskVisualization.Test", "SVGControl", 
-                        "SVGControl.Test", "TaskTree", "TaskMaster", "UtilitiesSwordfish.NET.General", 
-                        "UtilitiesSwordfish.NET.Test", "Tags.Test" 
+                    _projectNames = new List<string>
+                    {
+                        "Tags", "ToDoModel", "ToDoModel.Test", "TaskVisualization",
+                        "TaskMaster.Test", "UtilitiesCS", "UtilitiesCS.Test", "QuickFiler",
+                        "QuickFiler.Test", "TaskVisualization.Test", "SVGControl",
+                        "SVGControl.Test", "TaskTree", "TaskMaster", "UtilitiesSwordfish.NET.General",
+                        "UtilitiesSwordfish.NET.Test", "Tags.Test"
                     };
                 }
                 return _projectNames;
             }
         }
-        
-        
+
+
     }
-    
+
 }

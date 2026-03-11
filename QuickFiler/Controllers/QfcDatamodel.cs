@@ -29,16 +29,16 @@ namespace QuickFiler.Controllers
 
         #region Constructors and Initializers
 
-        private QfcDatamodel(IApplicationGlobals appGlobals) 
-        { 
+        private QfcDatamodel(IApplicationGlobals appGlobals)
+        {
             _globals = appGlobals;
             _olApp = _globals.Ol.App;
             _activeExplorer = _olApp.ActiveExplorer();
             _globals.Ol.App.NewMailEx += Application_NewMailEx;
         }
 
-        public QfcDatamodel(IApplicationGlobals appGlobals, CancellationToken token) 
-        { 
+        public QfcDatamodel(IApplicationGlobals appGlobals, CancellationToken token)
+        {
             _globals = appGlobals;
             _token = token;
             _olApp = _globals.Ol.App;
@@ -47,7 +47,7 @@ namespace QuickFiler.Controllers
             _globals.Ol.App.NewMailEx += Application_NewMailEx;
         }
 
-        public static async Task<QfcDatamodel> LoadAsync(IApplicationGlobals appGlobals, CancellationToken token, CancellationTokenSource tokenSource, ProgressTracker progress) 
+        public static async Task<QfcDatamodel> LoadAsync(IApplicationGlobals appGlobals, CancellationToken token, CancellationTokenSource tokenSource, ProgressTracker progress)
         {
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Creating new {nameof(QfcDatamodel)} ... ");
             progress.Report(0, "Initializing Data Model");
@@ -61,7 +61,7 @@ namespace QuickFiler.Controllers
             return model;
         }
 
-        public void Cleanup() 
+        public void Cleanup()
         {
             _tokenSource?.Cancel();
             _worker?.CancelAsync();
@@ -98,12 +98,12 @@ namespace QuickFiler.Controllers
 
         private bool _complete = false;
         public bool Complete { get => _complete; set => _complete = value; }
-        
+
         public ScoStack<IMovedMailInfo> MovedItems { get => _globals.AF.MovedMails; }
-        
+
         private CancellationToken _token;
         public CancellationToken Token { get => _token; set => _token = value; }
-        
+
         private CancellationTokenSource _tokenSource;
         public CancellationTokenSource TokenSource { get => _tokenSource; set => _tokenSource = value; }
 
@@ -111,10 +111,10 @@ namespace QuickFiler.Controllers
 
         #region BackgroundWorker
 
-        public void SetupWorker(System.ComponentModel.BackgroundWorker worker) 
+        public void SetupWorker(System.ComponentModel.BackgroundWorker worker)
         {
             worker.WorkerSupportsCancellation = true;
-            
+
             _token.Register(() => worker.CancelAsync());
             worker.DoWork += new System.ComponentModel.DoWorkEventHandler(Worker_DoWork);
             //worker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(Worker_RunWorkerCompleted);
@@ -182,14 +182,14 @@ namespace QuickFiler.Controllers
         public IList<MailItem> InitEmailQueue(int batchSize, BackgroundWorker worker)
         {
             _worker = worker;
-            
+
             // Extract first batch
             batchSize = batchSize < _frame.RowCount ? batchSize : _frame.RowCount;
             var firstIteration = _frame.GetRowsAt(Enumerable.Range(0, batchSize).ToArray());
 
             // Drop extracted range from source table
-            _frame = _frame.GetRowsAt(Enumerable.Range(batchSize,_frame.RowCount-batchSize).ToArray());
-            
+            _frame = _frame.GetRowsAt(Enumerable.Range(batchSize, _frame.RowCount - batchSize).ToArray());
+
             // Cast Frame to array of IEmailInfo
             var rows = firstIteration.GetRowsAs<IEmailSortInfo>().Values.ToArray();
 
@@ -230,7 +230,7 @@ namespace QuickFiler.Controllers
 
             // Cast Frame to array of IEmailInfo
             var rows = await Task.Run(() => _frame.GetRowsAs<IEmailSortInfo>().Values.ToArray());
-                        
+
             foreach (var row in rows)
             {
                 try
@@ -268,7 +268,7 @@ namespace QuickFiler.Controllers
                 MessageBox.Show("Email Frame is empty");
                 return false;
             }
-            
+
             // Cast Frame to array of IEmailInfo
             var rows = _frame.GetRowsAs<IEmailSortInfo>().Values.ToArray();
 
@@ -297,7 +297,7 @@ namespace QuickFiler.Controllers
                 }
             }
             return true;
-            
+
         }
 
         private async Task<bool> LoadRemainingEmailsToQueueAsync(BackgroundWorker bw, CancellationToken token)
@@ -313,7 +313,7 @@ namespace QuickFiler.Controllers
                 await _frame.GetRowsAs<IEmailSortInfo>().Values.ToAsyncEnumerable().ForEachAwaitWithCancellationAsync(
                     async (row, token) => await Task.Run(() =>
                     {
-                        token.ThrowIfCancellationRequested();    
+                        token.ThrowIfCancellationRequested();
                         var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
                         _masterQueue.AddLast(item);
                         _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
@@ -326,11 +326,11 @@ namespace QuickFiler.Controllers
                 //logger.Debug($"{nameof(LoadRemainingEmailsToQueueAsync)} Task cancelled");
                 return false;
             }
-            
 
-            
 
-            
+
+
+
 
         }
 
@@ -343,12 +343,12 @@ namespace QuickFiler.Controllers
             //df.Display(new List<string> { "RowKey" });
             // Filter to the latest email in each conversation
             var dfFiltered = MostRecentByConversation(df);
-            
+
             // Sort by triage classification and then date
             var dfSorted = SortTriageDate(dfFiltered);
 
             return dfSorted;
-            
+
         }
 
         /// <summary>
@@ -369,7 +369,7 @@ namespace QuickFiler.Controllers
 
         public async Task InitDfAsync(Explorer activeExplorer, ProgressTracker progress)
         {
-            
+
             var df = await GetEmailsInViewDfAsync(activeExplorer, progress).ConfigureAwait(false);
 
             if (df is not null)
@@ -395,7 +395,7 @@ namespace QuickFiler.Controllers
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Toggle offline mode");
             var offline = await ToggleOfflineMode(_globals.Ol.NamespaceMAPI.Offline);
-            
+
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(DfDeedle.GetEmailDataInViewAsync)} ... ");
             try
             {
@@ -403,9 +403,9 @@ namespace QuickFiler.Controllers
                     activeExplorer, Token, TokenSource, progress.Increment(3).SpawnChild(78))
                     .ConfigureAwait(false);
                 await ToggleOfflineMode(offline);
-                
+
                 //df.DisplayDialog();
-                
+
                 return df;
             }
             catch (TaskCanceledException)
@@ -474,12 +474,12 @@ namespace QuickFiler.Controllers
             throw new NotImplementedException();
         }
 
-        internal void TryUnhookOrReplace(ref List<MailItem> nodes, int i) 
+        internal void TryUnhookOrReplace(ref List<MailItem> nodes, int i)
         {
-            if (nodes is null || nodes.Count == 0 || nodes.Count < i + 1) 
-            { 
+            if (nodes is null || nodes.Count == 0 || nodes.Count < i + 1)
+            {
                 logger.Error($"Error unhooking item from move monitor. No items in array or index out of range. nodes.Length = {nodes?.Count ?? 0} but index i = {i}");
-                return; 
+                return;
             }
             var node = nodes[i];
             bool processing = true;
@@ -487,7 +487,7 @@ namespace QuickFiler.Controllers
             {
                 try
                 {
-                    _moveMonitor.UnhookItem(node);                    
+                    _moveMonitor.UnhookItem(node);
                     processing = false;
                 }
                 catch (System.Exception e)
@@ -506,7 +506,7 @@ namespace QuickFiler.Controllers
                 }
             }
         }
-        
+
         public async Task<IList<MailItem>> DequeueNextItemGroupAsync(int quantity, int timeOut)
         {
             _token.ThrowIfCancellationRequested();
@@ -518,8 +518,8 @@ namespace QuickFiler.Controllers
             if (nodes is null) { return null; }
 
             try
-            {                                
-                await Task.Run(() => 
+            {
+                await Task.Run(() =>
                 {
                     var max = nodes.Count;
                     for (int i = 0; i < max; i++)
@@ -550,19 +550,19 @@ namespace QuickFiler.Controllers
                         //        }
                         //    }
                         //}
-                            
-                    }                    
-                }, _token);                    
-               
-                
+
+                    }
+                }, _token);
+
+
             }
             catch (System.Exception e)
             {
                 logger.Error("Error unhooking items from move monitor", e);
                 throw;
             }
-            
-            
+
+
             return nodes;
         }
 
@@ -577,7 +577,7 @@ namespace QuickFiler.Controllers
                 for (int i = 0; i < max; i++)
                 {
                     TryUnhookOrReplace(ref nodes, i);
-                }                   
+                }
             }
             catch (System.Exception e)
             {
@@ -618,8 +618,8 @@ namespace QuickFiler.Controllers
             {
                 logger.Error(e.Message, e);
             }
-            
-            
+
+
         }
 
         #endregion Event Handlers
@@ -654,12 +654,12 @@ namespace QuickFiler.Controllers
 
         public long GetSortKey(string triage, DateTime dateTime)
         {
-            if (_options.HasFlag(SortOptionsEnum.TriageImportantFirst) && 
+            if (_options.HasFlag(SortOptionsEnum.TriageImportantFirst) &&
                 _options.HasFlag(SortOptionsEnum.DateRecentFirst))
             {
                 try
                 {
-                    var triageKey = (long)(100000000000000 * _triageImportantLast[triage]) 
+                    var triageKey = (long)(100000000000000 * _triageImportantLast[triage])
                         + GetDateKey(dateTime);
                     return triageKey;
                 }
@@ -674,9 +674,9 @@ namespace QuickFiler.Controllers
             return -1;
         }
 
-        public long GetDateKey(DateTime dateTime) 
-        { 
-            return long.Parse(dateTime.ToString("yyyyMMddHHmmss")); 
+        public long GetDateKey(DateTime dateTime)
+        {
+            return long.Parse(dateTime.ToString("yyyyMMddHHmmss"));
         }
     }
 

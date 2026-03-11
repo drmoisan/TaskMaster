@@ -138,11 +138,11 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.Subject).Returns("TestSubjectString");
             item.SetupGet(x => x.CreationTime).Returns(new DateTime(2025, 12, 25, 12, 5, 3));
             OlItemSummary.Details options = GenericBitwiseStatic<OlItemSummary.Details>.Or(
-                new List<OlItemSummary.Details> 
-                { 
-                    OlItemSummary.Details.Type, 
-                    OlItemSummary.Details.Subject, 
-                    OlItemSummary.Details.Date 
+                new List<OlItemSummary.Details>
+                {
+                    OlItemSummary.Details.Type,
+                    OlItemSummary.Details.Subject,
+                    OlItemSummary.Details.Date
                 });
             string test = OlItemSummary.Extract(item.Object, options);
             string target = "Details.Type: Castle.Proxies.TaskItemProxy";

@@ -72,7 +72,7 @@ namespace TaskVisualization
 
         }
 
-        public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, 
+        public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection,
             ToDoDefaults defaults, IAutoAssign autoAssign, IAutoAssign projectAssign, IAutoAssign contextAssign,
             Func<string, string> projectsToPrograms, string userEmailAddress, IApplicationGlobals globals,
             Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All)
@@ -157,7 +157,7 @@ namespace TaskVisualization
                 _active.TotalWork = _defaults.DefaultTaskLength;
             _viewer.Duration.Text = _active.TotalWork.ToString();
 
-            if (_active.ReminderTime != new DateTime(4501,1,1))
+            if (_active.ReminderTime != new DateTime(4501, 1, 1))
             {
                 _viewer.DtReminder.Value = _active.ReminderTime;
                 _viewer.DtReminder.Checked = true;
@@ -182,7 +182,7 @@ namespace TaskVisualization
             _viewer.ForAllControls(control =>
             {
                 if (control.GetType().GetEvent("KeyPress") is not null)
-                { 
+                {
                     control.KeyPress += KeyboardHandler_KeyPress;
                 }
             });
@@ -250,7 +250,7 @@ namespace TaskVisualization
         private readonly ToDoDefaults _defaults;
         private readonly IAutoAssign _autoAssign;
         private string _userEmailAddress;
-        
+
 
 
         private IAutoAssign _projectAssign;
@@ -467,7 +467,7 @@ namespace TaskVisualization
             {
                 // Capture whether the task was flagged as a task
                 _active.FlagAsTask = _viewer.CbxFlagAsTask.Checked;
-                
+
                 // Capture the value of the task subject and if not empty write to ToDoItem
                 if (_options.HasFlag(Enums.FlagsToSet.Taskname))
                 {
@@ -602,22 +602,22 @@ namespace TaskVisualization
         {
             if (e.Alt)
             {
-                if (_altActive) 
+                if (_altActive)
                 {
                     ToggleXlGroupNav(Enums.ToggleState.Off);
-                    if (_xlCtrlsActive is not null) 
-                    { 
+                    if (_xlCtrlsActive is not null)
+                    {
                         (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, '\0', _altLevel);
                     }
                     _altActive = false;
                     //_activeNavGroup = -1;
-                    return true;               
+                    return true;
                 }
                 else
                 {
                     ToggleXlGroupNav(Enums.ToggleState.On);
-                    if (_activeNavGroup != -1) 
-                    { 
+                    if (_activeNavGroup != -1)
+                    {
                         var groupNumber = _activeNavGroup;
                         _activeNavGroup = -1;
                         (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(groupNumber.ToString()[0]);
@@ -637,14 +637,14 @@ namespace TaskVisualization
                 }
                 else if (e.KeyCode == Keys.Down)
                 {
-                    if (_activeNavGroup == -1) 
+                    if (_activeNavGroup == -1)
                     {
                         (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup('1', 1);
                         return true;
                     }
-                    else if (_activeNavGroup < (_xlCtrlsNav.Count)) 
+                    else if (_activeNavGroup < (_xlCtrlsNav.Count))
                     {
-                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(_activeNavGroup+1); 
+                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(_activeNavGroup + 1);
                         return true;
                     }
                     else { return false; }
@@ -658,7 +658,7 @@ namespace TaskVisualization
                     }
                     else if (_activeNavGroup > 1)
                     {
-                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(_activeNavGroup-1);
+                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(_activeNavGroup - 1);
                         return true;
                     }
                     else { return false; }
@@ -693,7 +693,7 @@ namespace TaskVisualization
                 return _altActive;
             }
         }
-        
+
         #endregion
 
         #region Private Helper Properties and Functions
@@ -710,7 +710,7 @@ namespace TaskVisualization
                 return _viewer.CategorySelection.Text != "[Category Label]" | _viewer.PeopleSelection.Text != "[Assigned People Flagged]" | _viewer.ProjectSelection.Text != "[ Projects Flagged ]" | _viewer.TopicSelection.Text != "[Other Topics Tagged]";
             }
         }
-        
+
         /// <summary>
         /// Sets value based on the flag type and value
         /// </summary>
@@ -764,7 +764,7 @@ namespace TaskVisualization
         internal ObservableCollection<string> MergeToCollection(ObservableCollection<string> original, IList<string> toMerge)
         {
             var hash = new HashSet<string>(toMerge);
-            original.ForEach(x =>  hash.Add(x));
+            original.ForEach(x => hash.Add(x));
             return new ObservableCollection<string>(hash);
         }
 
@@ -834,7 +834,7 @@ namespace TaskVisualization
                     throw new ArgumentOutOfRangeException("Duration cannot be negative");
                 }
             }
-            catch (InvalidCastException )
+            catch (InvalidCastException)
             {
                 MessageBox.Show("Could not convert to integer. Please put a positive integer in the duration box");
                 duration = -1;
@@ -855,17 +855,17 @@ namespace TaskVisualization
         /// Iterates through _todo_list and applies the values in _active for the fields in _options
         /// </summary>
         internal async Task ApplyChanges()
-        {            
+        {
             foreach (ToDoItem c in _todo_list)
             {
                 ToDoEvents.Editing.AddOrUpdate(c.OlItem.EntryID, 1, (key, existing) => existing + 1);
 
-                FlagChangeGroup fcg = (c.OlItem.GetOlItemType() == OlItemType.olMailItem) ? 
+                FlagChangeGroup fcg = (c.OlItem.GetOlItemType() == OlItemType.olMailItem) ?
                     new(Globals, c.OlItem.InnerObject as MailItem) : null;
-                
+
                 if (c.FlagAsTask != _active.FlagAsTask)
                 {
-                    c.FlagAsTask = _active.FlagAsTask; 
+                    c.FlagAsTask = _active.FlagAsTask;
                 }
 
                 c.ReadOnly = true;
@@ -885,7 +885,7 @@ namespace TaskVisualization
                     c.Bullpin = _active.Bullpin;
                     ChangedFlags |= Enums.FlagsToSet.Bullpin;
                 }
-                
+
                 //if (_options.HasFlag(Enums.FlagsToSet.Context))
                 //    c.Context.AsListNoPrefix = _active.Context.AsListNoPrefix;
                 //if (_options.HasFlag(Enums.FlagsToSet.People))
@@ -903,7 +903,7 @@ namespace TaskVisualization
                 ChangedFlags = Enums.FlagsToSet.None;
                 c.ReadOnly = false;
 
-                if (_options.HasFlag(Enums.FlagsToSet.Priority) && c.Priority != _active.Priority) 
+                if (_options.HasFlag(Enums.FlagsToSet.Priority) && c.Priority != _active.Priority)
                     c.Priority = _active.Priority;
                 if (_options.HasFlag(Enums.FlagsToSet.Taskname) && c.TaskSubject != _active.TaskSubject)
                     c.TaskSubject = _active.TaskSubject;
@@ -940,14 +940,14 @@ namespace TaskVisualization
 
         internal void ApplyChange(FlagChangeGroup fcg, string classifierName, Enums.FlagsToSet flag, FlagTranslator current, FlagTranslator revised)
         {
-            if (Options.HasFlag(flag)) 
-            {                 
-                if (fcg?.TryEnqueue(classifierName, current.AsListNoPrefix, revised.AsListNoPrefix)??false || 
-                    !AreCollectionsEqual(current.AsListNoPrefix,revised.AsListNoPrefix))
+            if (Options.HasFlag(flag))
+            {
+                if (fcg?.TryEnqueue(classifierName, current.AsListNoPrefix, revised.AsListNoPrefix) ?? false ||
+                    !AreCollectionsEqual(current.AsListNoPrefix, revised.AsListNoPrefix))
                 {
                     current.AsListNoPrefix = revised.AsListNoPrefix;
                     ChangedFlags |= flag;
-                }                
+                }
             }
         }
 
@@ -1071,8 +1071,8 @@ namespace TaskVisualization
 
         }
 
-        internal void ToggleXlGroupNav(Enums.ToggleState desiredState) 
-        { 
+        internal void ToggleXlGroupNav(Enums.ToggleState desiredState)
+        {
             _navTips.Where(tip => tip.GroupNumber == 0).ForEach(tip => tip.Toggle(desiredState, true));
         }
 
@@ -1091,7 +1091,7 @@ namespace TaskVisualization
 
         internal (Dictionary<Label, char> dictActive, bool altActive, int level) ActivateXlGroup(char selectedChar, int groupNumber)
         {
-            if ((groupNumber != _activeNavGroup)&&(groupNumber >= 1)&&(groupNumber <= _xlCtrlsNav.Count))
+            if ((groupNumber != _activeNavGroup) && (groupNumber >= 1) && (groupNumber <= _xlCtrlsNav.Count))
             {
                 DeactivateActiveXlGroup();
 
@@ -1127,9 +1127,9 @@ namespace TaskVisualization
             {
                 return ActivateXlGroup(selectedChar, groupNumber);
             }
-            else 
-            { 
-                return (null, true, 0); 
+            else
+            {
+                return (null, true, 0);
             }
         }
 
@@ -1453,8 +1453,8 @@ namespace TaskVisualization
                         { Enums.FlagsToSet.Worktime, new List<Control>{ _viewer.Duration, _viewer.LblDuration } },
                         { Enums.FlagsToSet.Reminder, new List<Control>{ _viewer.DtReminder, _viewer.LblReminder } },
                         { Enums.FlagsToSet.DueDate, new List<Control>{ _viewer.DtDuedate, _viewer.LblDuedate } },
-                        { Enums.FlagsToSet.All, new List<Control> 
-                        { 
+                        { Enums.FlagsToSet.All, new List<Control>
+                        {
                             _viewer.ShortcutMeeting,_viewer.ShortcutCalls,_viewer.ShortcutPersonal,
                             _viewer.ShortcutEmail,_viewer.ShortcutInternet,_viewer.ShortcutReadingBusiness,
                             _viewer.ShortcutNews,_viewer.ShortcutUnprocessed,_viewer.ShortcutWaitingFor,
@@ -1464,11 +1464,11 @@ namespace TaskVisualization
                 return _optionsGroups;
             }
         }
-                
+
         private IEnumerable<TipsController> _navTips;
-        internal IEnumerable<TipsController> NavTips 
-        { 
-            get => _navTips ??= new List<TipsController> 
+        internal IEnumerable<TipsController> NavTips
+        {
+            get => _navTips ??= new List<TipsController>
             {
                 new TipsController(_viewer.XlSector1, 0),
                 new TipsController (_viewer.XlSector2, 0),

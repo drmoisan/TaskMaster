@@ -8,10 +8,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
     [TestClass]
     public class IClonableBehaviorTest
     {
-        private class TestClass: ICloneable
+        private class TestClass : ICloneable
         {
-            public TestClass(){}
-            
+            public TestClass() { }
+
             private string _name;
             public string Name { get => _name; set => _name = value; }
 
@@ -83,5 +83,5 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
     }
 
-    
+
 }

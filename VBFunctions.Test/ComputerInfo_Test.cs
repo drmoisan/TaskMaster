@@ -31,9 +31,9 @@ namespace VBFunctions.Test
             availablePhysicalMemory = ComputerInfo.AvailablePhysicalMemory;
             totalVirtualMemory = ComputerInfo.TotalVirtualMemory;
             availableVirtualMemory = ComputerInfo.AvailableVirtualMemory;
-            
-            var jagged = new List<string[]> 
-            { 
+
+            var jagged = new List<string[]>
+            {
                 new string[] { "AvailablePhysicalMemory", $"{availablePhysicalMemory / (double)Math.Pow(10,9):N2} GB" },
                 new string[] { "TotalPhysicalMemory", $"{totalPhysicalMemory / (double)Math.Pow(10, 9):N2} GB" },
                 new string[] { "AvailableVirtualMemory", $"{availableVirtualMemory / (double)Math.Pow(10, 9):N2} GB" },
@@ -41,8 +41,8 @@ namespace VBFunctions.Test
             };
 
             Console.WriteLine(jagged.ToArray().ToFormattedText(
-                ["Property", "Value"], 
-                [Enums.Justification.Left, Enums.Justification.Right], 
+                ["Property", "Value"],
+                [Enums.Justification.Left, Enums.Justification.Right],
                 "Memory Stats"));
 
             // Assert

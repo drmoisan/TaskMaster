@@ -12,7 +12,7 @@ namespace UtilitiesCS
 {
     public static class CaptureEmailAddressesModule2
     {
-        
+
 
         //public static List<string> GetEmailAddresses(this MailItem OlMail, string emailRootFolder, IScoDictionary<string, string> dictRemap, string currentUserEmail)
         //{

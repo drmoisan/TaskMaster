@@ -28,17 +28,17 @@ namespace UtilitiesCS.HelperClasses
             Interlocked.CompareExchange(ref _action, action, null);
         }
         private System.Action _action;
-                
+
         private TimeSpan _frequency;
         private ThreadSafeSingleShotGuard _actionRequested = new();
         private TimerWrapper _timer;
-        
+
         public void ResetTimer()
         {
             _timer?.ResetTimer();
         }
 
-        public void CancelAction() 
+        public void CancelAction()
         {
             _timer?.StopTimer();
             _actionRequested = new();

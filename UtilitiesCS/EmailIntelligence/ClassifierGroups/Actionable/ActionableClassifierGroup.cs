@@ -15,9 +15,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
 
         #region ctor
 
-        public ActionableClassifierGroup(): base() { }
+        public ActionableClassifierGroup() : base() { }
 
-        public ActionableClassifierGroup(IApplicationGlobals globals): base(globals)
+        public ActionableClassifierGroup(IApplicationGlobals globals) : base(globals)
         {
             base.EngineName = "Actionable";
             base.ProbabilityThreshold = 0.2;
@@ -28,7 +28,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         public new async Task<ActionableClassifierGroup> InitAsync(string groupName)
         {
             var result = await base.InitAsync(groupName);
-            if (result is not null) 
+            if (result is not null)
             {
                 result.AsyncAction = (item) => (Engine as ActionableClassifierGroup)?.TestAsync(item);
                 result.AsyncCondition = (item) => Task.Run(() => Condition(item));
@@ -76,7 +76,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             }
             return success;
         }
-                
+
         #endregion Build Category Classifier
 
         #region Public Properties
@@ -87,7 +87,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             var filtered = results
                 .Where(x => x.Probability > ProbabilityThreshold)
                 .Select(x => x.Class)
-                .Where(x => x != "None")                
+                .Where(x => x != "None")
                 .ToArray();
             return filtered;
         }
@@ -112,7 +112,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             olItem.Try().SetUdf("Actionable", value, Microsoft.Office.Interop.Outlook.OlUserPropertyType.olText);
         }
 
-        
+
 
         #endregion Public Properties
 

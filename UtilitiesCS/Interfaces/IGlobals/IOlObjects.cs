@@ -8,12 +8,12 @@ using UtilitiesCS.OutlookObjects.Store;
 namespace UtilitiesCS
 {
 
-    public interface IOlObjects: INotifyPropertyChanged
+    public interface IOlObjects : INotifyPropertyChanged
     {
         Application App { get; }
         string InboxPath { get; }
         string ArchiveRootPath { get; }
-        Folder ArchiveRoot { get; }        
+        Folder ArchiveRoot { get; }
         string UserEmailAddress { get; }
         string EmailPrefixToStrip { get; }
         Folder Inbox { get; }

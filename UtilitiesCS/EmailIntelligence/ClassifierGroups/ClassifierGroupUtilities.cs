@@ -88,8 +88,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 Formatting = Formatting.Indented
             };
             var disk = new FilePathHelper();
-            if (_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) 
-            { 
+            if (_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
+            {
                 disk.FolderPath = Path.Combine(folderRoot, "Bayesian"); ;
             }
             else { return default(T); }
@@ -191,9 +191,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             var disk = new FilePathHelper();
             if (_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
             {
-                disk.FolderPath = Path.Combine(folderRoot, "Bayesian"); 
+                disk.FolderPath = Path.Combine(folderRoot, "Bayesian");
             }
-            else { return;  }
+            else { return; }
 
             SerializeFsSave(mailItem, "MailItem", serializer, disk);
 

@@ -14,7 +14,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             string[] strings = new string[] { "abc", "abcd", "abcde" };
             var expected = "abc";
             var tokenizer = new EmailTokenizer();
-            
+
             // act
             var actual = tokenizer.commonprefix(strings);
 

@@ -12,7 +12,7 @@ namespace UtilitiesCS
         {
             var regex = new Regex("[^\u0020-\u007D]");
             return regex.Replace(text, "");
-            
+
             //if (NotImplementedDialog.StopAtNotImplemented(MethodBase.GetCurrentMethod().Name))
             //{
             //    throw new NotImplementedException();

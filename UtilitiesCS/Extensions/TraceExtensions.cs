@@ -14,7 +14,7 @@ namespace UtilitiesCS.Extensions
         {
             if (methodName.IsNullOrEmpty() || methodName == "MoveNext")
                 return null;
-            
+
             MethodBase caller = null;
             bool repeat = true;
             int i = 0;
@@ -54,12 +54,12 @@ namespace UtilitiesCS.Extensions
                 var parameterName = method.GetParameterName(index);
                 return parameterName;
             }
-            catch (ArgumentOutOfRangeException e) 
-            { 
+            catch (ArgumentOutOfRangeException e)
+            {
                 logger.Error(e.Message, e);
                 return "";
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 logger.Error(e.Message, e);
                 return "";
@@ -79,7 +79,7 @@ namespace UtilitiesCS.Extensions
             }
             else if (index >= parameters.Count())
             {
-                throw new ArgumentOutOfRangeException($"Cannot call {method.Name}.{nameof(GetParameterName)}({index}) because {index} is greater than the highest index {parameters.Count()-1}");
+                throw new ArgumentOutOfRangeException($"Cannot call {method.Name}.{nameof(GetParameterName)}({index}) because {index} is greater than the highest index {parameters.Count() - 1}");
             }
             return method.GetParameters()[index].Name;
         }

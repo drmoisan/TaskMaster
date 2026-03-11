@@ -10,14 +10,14 @@ using UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList;
 
 namespace UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable
 {
-    public class SloLinkedList<T>:LockingObservableLinkedList<T>, ISmartSerializable<SloLinkedList<T>>
+    public class SloLinkedList<T> : LockingObservableLinkedList<T>, ISmartSerializable<SloLinkedList<T>>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region ctor
 
-        public SloLinkedList(): base() { ism = new SmartSerializable<SloLinkedList<T>>(this); }
+        public SloLinkedList() : base() { ism = new SmartSerializable<SloLinkedList<T>>(this); }
         public SloLinkedList(IEnumerable<T> collection) : base(collection) { ism = new SmartSerializable<SloLinkedList<T>>(this); }
 
         #endregion ctor
@@ -75,7 +75,7 @@ namespace UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion INotifyPropertyChanged

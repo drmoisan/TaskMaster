@@ -12,10 +12,10 @@ namespace UtilitiesCS
 {
     public class FilterOlFoldersController
     {
-        public FilterOlFoldersController(IApplicationGlobals appGlobals) 
-        { 
-            _globals = appGlobals;            
-            _olFolderTree = new FolderTree(_globals.Ol.ArchiveRoot,_globals.TD.FilteredFolderScraping.Keys.ToList());
+        public FilterOlFoldersController(IApplicationGlobals appGlobals)
+        {
+            _globals = appGlobals;
+            _olFolderTree = new FolderTree(_globals.Ol.ArchiveRoot, _globals.TD.FilteredFolderScraping.Keys.ToList());
             _olFolderTree.PropertyChanged += OlFolderTree_PropertyChanged;
             _viewer = new FilterOlFoldersViewer();
             _viewer.SetController(this);
@@ -28,7 +28,7 @@ namespace UtilitiesCS
             _viewer.Show();
         }
 
-        private IApplicationGlobals _globals;       
+        private IApplicationGlobals _globals;
         private FilterOlFoldersViewer _viewer;
 
         private FolderTree _olFolderTree;
@@ -52,7 +52,7 @@ namespace UtilitiesCS
 
             // add any new keys that are selected
             selected.ForEach(x => _globals.TD.FilteredFolderScraping.TryAdd(x, 1));
-            
+
             // save the settings
             _globals.TD.FilteredFolderScraping.Serialize();
         }
@@ -61,9 +61,9 @@ namespace UtilitiesCS
         {
             if (_viewer.InvokeRequired)
             {
-                _viewer.Invoke(new Action(() => OlFolderTree_PropertyChangedInternal(sender, e)));                
+                _viewer.Invoke(new Action(() => OlFolderTree_PropertyChangedInternal(sender, e)));
             }
-            else 
+            else
             {
                 OlFolderTree_PropertyChangedInternal(sender, e);
             }
@@ -130,7 +130,7 @@ namespace UtilitiesCS
         internal CheckState PutCheckedStateMethod(object rowObject, CheckState newValue, TreeListView tree)
         {
             var node = (TreeNode<FolderWrapper>)rowObject;
-                        
+
             if (!tree.IsExpanded(node))
             {
                 node.Traverse(x => x.Value.Selected = (newValue == CheckState.Checked));
@@ -141,8 +141,8 @@ namespace UtilitiesCS
             {
                 node.Value.Selected = (newValue == CheckState.Checked);
                 return newValue;
-            }           
-           
+            }
+
         }
 
         #endregion Event Handlers

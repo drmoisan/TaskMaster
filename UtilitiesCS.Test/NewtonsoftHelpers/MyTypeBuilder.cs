@@ -12,8 +12,8 @@ namespace TypeBuilderNamespace
     public static class MyTypeBuilder
     {
         public static void CreateNewObject()
-        {            
-            var myType = CompileResultType([new FieldReduced() { Name = "TestField", Type = typeof(string)}]);
+        {
+            var myType = CompileResultType([new FieldReduced() { Name = "TestField", Type = typeof(string) }]);
             var myObject = Activator.CreateInstance(myType);
         }
 
@@ -64,18 +64,18 @@ namespace TypeBuilderNamespace
 
         }
 
-        public static Type CompileResultType<T>(T instance) 
+        public static Type CompileResultType<T>(T instance)
         {
             TypeBuilder tb = GetTypeBuilder();
             ConstructorBuilder constructor = tb.DefineDefaultConstructor(MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName);
 
             var existingProperties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            
+
             foreach (var property in existingProperties)
             {
                 ReplicateProperty(tb, property);
             }
-            
+
             var existingFields = typeof(T).GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
             var capturedFields = tb.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
             var fieldsToCreate = existingFields.Except(capturedFields);

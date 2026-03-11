@@ -30,7 +30,7 @@ namespace UtilitiesCS //QuickFiler
 
         #region Constructors, Initializers, and Destructors
 
-        public MailItemHelper() 
+        public MailItemHelper()
         {
             _attachmentsInfo = new(() => AttachmentsHelper.Select(x => x.AttachmentInfo).ToArray());
         }
@@ -84,14 +84,14 @@ namespace UtilitiesCS //QuickFiler
         public MailItemHelper(DataFrame df, long indexRow, string emailPrefixToStrip)
         {
             EntryId = (string)df["EntryID"][indexRow];
-            StoreId = (string)df["Store"][indexRow];           
+            StoreId = (string)df["Store"][indexRow];
         }
 
         protected MailItemHelper(IItemInfo itemInfo)
         {
             _actionable = itemInfo.Actionable.ToLazy();
             _body = itemInfo.Body.ToLazy();
-            _conversationID = itemInfo.ConversationID.ToLazy();                
+            _conversationID = itemInfo.ConversationID.ToLazy();
             _emailPrefixToStrip = itemInfo.EmailPrefixToStrip.ToLazy();
             _entryId = itemInfo.EntryId.ToLazy();
             _storeId = itemInfo.StoreId.ToLazy();
@@ -169,8 +169,8 @@ namespace UtilitiesCS //QuickFiler
             info.FolderInfo.OlRoot = ResolveFolderRoot(appGlobals, info.FolderInfo.OlFolder.FolderPath);
 
             token.ThrowIfCancellationRequested();
-            await Task.Run(() => 
-            { 
+            await Task.Run(() =>
+            {
                 info.LoadRecipientsForce();
                 if (info.Html is not null) { }// force eval //info._html = info.GetHtml().ToLazy(); }
             }, token);
@@ -189,7 +189,7 @@ namespace UtilitiesCS //QuickFiler
                 return appGlobals.Ol.Inbox;
             }
         }
-        
+
         public static async Task<MailItemHelper> FromMailItemAsync(
             MailItem item,
             IApplicationGlobals appGlobals,
@@ -197,7 +197,7 @@ namespace UtilitiesCS //QuickFiler
             bool loadAll)
         {
             //TraceUtility.LogMethodCall(item, emailPrefixToStrip,token,loadAll);
-            
+
             token.ThrowIfCancellationRequested();
             item.ThrowIfNull();
 
@@ -233,8 +233,8 @@ namespace UtilitiesCS //QuickFiler
         public void LoadPriorityForce()
         {
             Item.ThrowIfNull();
-            _ = new object[] { EntryId, Sender, SenderName, SenderHtml, Subject, Body, Categories, 
-                Triage, SentOn, Actionable, FolderInfo, FolderName, Globals, ConversationID };            
+            _ = new object[] { EntryId, Sender, SenderName, SenderHtml, Subject, Body, Categories,
+                Triage, SentOn, Actionable, FolderInfo, FolderName, Globals, ConversationID };
         }
 
         public MailItemHelper LoadAll(IApplicationGlobals globals, Folder olRoot, bool loadTokens = false)
@@ -263,14 +263,14 @@ namespace UtilitiesCS //QuickFiler
             Sw?.LogDuration("Recipients -> Cast to array");
             ToRecipients = recipients.Where(x => x.Type == (int)OlMailRecipientType.olTo).Select(x => x.GetInfo()).ToArray();
 
-            
+
             ToRecipientsName = string.Join("; ", ToRecipients.Select(t => t.Name));
             ToRecipientsHtml = string.Join("; ", ToRecipients.Select(t => t.Html));
             CcRecipients = recipients.Where(x => x.Type == (int)OlMailRecipientType.olCC).Select(x => x.GetInfo()).ToArray();
-            
+
             CcRecipientsName = string.Join("; ", CcRecipients.Select(t => t.Name));
             CcRecipientsHtml = string.Join("; ", CcRecipients.Select(t => t.Html));
-            
+
             Sw?.LogDuration("LoadRecipients");
         }
 
@@ -313,15 +313,15 @@ namespace UtilitiesCS //QuickFiler
 
         //private string _entryId;
         //public string EntryId { get => PriorityInitialized(ref _entryId); set => _entryId = value; }
-        
+
         //private Lazy<T> _entryId = new(() => { return default; }, true);
-        private Lazy<string> _entryId; 
+        private Lazy<string> _entryId;
         public string EntryId { get => _entryId.Value; set => _entryId = value.ToLazy(); }
 
         private Lazy<IApplicationGlobals> _globals;
         [JsonIgnore]
         internal IApplicationGlobals Globals { get => _globals?.Value; set => _globals = value.ToLazy(); }
-        
+
         private Lazy<string> _storeId;
         public string StoreId { get => _storeId.Value; set => _storeId = value.ToLazy(); }
 
@@ -330,14 +330,14 @@ namespace UtilitiesCS //QuickFiler
 
         private Lazy<string> _folderName;
         public string FolderName { get => _folderName?.Value; set => _folderName = value.ToLazy(); }
-        
+
         private MailItem _item;
-        public virtual MailItem Item 
+        public virtual MailItem Item
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get => _item;
             [MethodImpl(MethodImplOptions.Synchronized)]
-            set => _item = value; 
+            set => _item = value;
         }
 
         private IItemInfo.PlainTextOptionsEnum _plainTextOptions = IItemInfo.PlainTextOptionsEnum.StripAll;
@@ -384,7 +384,7 @@ namespace UtilitiesCS //QuickFiler
             get => _ccRecipients.Value;
             protected set => _ccRecipients = value.ToLazy();
         }
-        
+
         private Lazy<string> _toRecipientsHtml;
         public virtual string ToRecipientsHtml
         {
@@ -400,10 +400,10 @@ namespace UtilitiesCS //QuickFiler
         }
 
         private Lazy<IRecipientInfo[]> _toRecipients;
-        public virtual IRecipientInfo[] ToRecipients 
-        { 
-            get => _toRecipients.Value; 
-            protected set => _toRecipients = value.ToLazy(); 
+        public virtual IRecipientInfo[] ToRecipients
+        {
+            get => _toRecipients.Value;
+            protected set => _toRecipients = value.ToLazy();
         }
 
         private Lazy<string> _triage;
@@ -417,7 +417,7 @@ namespace UtilitiesCS //QuickFiler
 
         private Lazy<DateTime> _sentDate;
         public virtual DateTime SentDate { get => _sentDate.Value; set => _sentDate = value.ToLazyValue(); }
-        
+
         private Lazy<AttachmentHelper[]> _attachmentsHelper;
         public virtual AttachmentHelper[] AttachmentsHelper { get => _attachmentsHelper.Value; protected set => _attachmentsHelper = value.ToLazy(); }
         //{
@@ -435,9 +435,9 @@ namespace UtilitiesCS //QuickFiler
             return attachments;
         }
 
-        private Lazy<IAttachment[]> _attachmentsInfo; 
+        private Lazy<IAttachment[]> _attachmentsInfo;
         public IAttachment[] AttachmentsInfo { get => _attachmentsInfo?.Value; protected set => _attachmentsInfo = value.ToLazy(); }
-        
+
         public string GetHeadersExtendedMapi()
         {
             return (string)Item.PropertyAccessor.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x007D001F/");
@@ -458,17 +458,17 @@ namespace UtilitiesCS //QuickFiler
         private IEmailTokenizer _tokenizer;
 
         private Lazy<bool> _unread;
-        public bool UnRead 
-        { 
+        public bool UnRead
+        {
             get => _unread.Value;
-            set 
-            { 
-                _unread = value.ToLazyValue(); 
+            set
+            {
+                _unread = value.ToLazyValue();
                 Item.UnRead = value;
                 Item.Save();
             }
         }
-        
+
         public int InternetCodepage
         {
             get => _internetCodepage.Value;
@@ -592,7 +592,7 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
                 }
                 return _emailHeader;
             }
-        }       
+        }
 
 #nullable disable
 
@@ -660,7 +660,7 @@ img {
 
         #region Serialization Conversion Methods
 
-        public ItemInfo ToSerializableObject() 
+        public ItemInfo ToSerializableObject()
         {
             return new ItemInfo(this);
         }
@@ -681,7 +681,7 @@ img {
         }
 
         public static MailItemHelper FromSerializableObject(ItemInfo itemInfo, Outlook.NameSpace olNs)
-        {   
+        {
             var helper = new MailItemHelper(itemInfo);
             try
             {
@@ -698,7 +698,7 @@ img {
                 var msg = $"Error in {nameof(MailItemHelper)}.{nameof(FromSerializableObject)}\n" +
                     $"{nameof(ItemInfo)} sent on {itemInfo.SentOn} from {itemInfo.Sender} in folder " +
                     $"{itemInfo.FolderName}. See exception message: \n{e.Message}";
-                logger.Error(msg,e);
+                logger.Error(msg, e);
             }
             return helper;
         }
@@ -735,6 +735,6 @@ img {
 
         #endregion IEquatable<ItemInfo> Implementation
 
-        
+
     }
 }

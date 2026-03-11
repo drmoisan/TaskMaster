@@ -13,15 +13,15 @@ using UtilitiesCS.Threading;
 
 namespace UtilitiesCS
 {
-    public class FlagClassNoItem: INotifyPropertyChanged, ICloneable
+    public class FlagClassNoItem : INotifyPropertyChanged, ICloneable
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Constructors
 
-        public FlagClassNoItem(string categoryNames) 
-        { 
+        public FlagClassNoItem(string categoryNames)
+        {
             Flags = new FlagParser(ref categoryNames);
             CategoryNames = categoryNames;
             PropertyChanged += Handler_PropertyChanged;
@@ -60,19 +60,19 @@ namespace UtilitiesCS
         public IList<Category> OlCategories { get => _olCategories; set => _olCategories = value; }
 
         private IList<Category> _olCategorySelection;
-        public IList<Category> OlCategorySelection 
-        { 
-            get => Initializer.GetOrLoad(ref _olCategorySelection, SelectionToOlCategories); 
-            private set => _olCategorySelection = value; 
+        public IList<Category> OlCategorySelection
+        {
+            get => Initializer.GetOrLoad(ref _olCategorySelection, SelectionToOlCategories);
+            private set => _olCategorySelection = value;
         }
-        public IList<Category> SelectionToOlCategories() => 
+        public IList<Category> SelectionToOlCategories() =>
             OlCategories?.Where(c => CategoryNames.Contains(c.Name))?.ToList();
 
         private string _categoryNames;
-        public string CategoryNames 
-        { 
-            get => _categoryNames; 
-            set { _categoryNames = value; NotifyPropertyChanged(); } 
+        public string CategoryNames
+        {
+            get => _categoryNames;
+            set { _categoryNames = value; NotifyPropertyChanged(); }
         }
 
         internal FlagParser _flags;
@@ -130,7 +130,7 @@ namespace UtilitiesCS
         #endregion Public Properties and Methods
 
         #region INotifyPropertyChanged Implementation
-            
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -153,7 +153,7 @@ namespace UtilitiesCS
 
         private ThreadSafeSingleShotGuard _batchRefreshRequested = new();
         private TimerWrapper _timer;
-        
+
         private void RequestBatchRefresh()
         {
             if (_batchRefreshRequested.CheckAndSetFirstCall)
@@ -175,9 +175,9 @@ namespace UtilitiesCS
                 LoadTopicAsync(),
                 LoadKBAsync(),
             };
-            
+
             await Task.WhenAll(tasks);
-            
+
             _batchRefreshRequested = new();
         }
 

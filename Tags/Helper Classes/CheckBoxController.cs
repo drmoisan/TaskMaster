@@ -6,8 +6,8 @@ namespace Tags
 {
 
     public class CheckBoxController
-    {       
-        
+    {
+
         public bool TrigByKeyChg;
         private bool TrigByValChg;
         private TagController _parent;

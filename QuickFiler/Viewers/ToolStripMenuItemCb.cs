@@ -22,7 +22,7 @@ namespace QuickFiler.Viewers
             //{
             //    base.Click += ToolStripMenuItemCb_Click;
             //}
-            
+
             base.Invalidate();
         }
 
@@ -30,10 +30,11 @@ namespace QuickFiler.Viewers
         [Browsable(true)]
         [EditorBrowsable(EditorBrowsableState.Always)]
         [RefreshProperties(RefreshProperties.Repaint)]
-        public new bool Checked 
-        { 
+        public new bool Checked
+        {
             get => _checked;
-            set {
+            set
+            {
                 _checked = value;
                 if (value)
                 {
@@ -45,23 +46,23 @@ namespace QuickFiler.Viewers
                 }
                 //base.CheckedChanged?.Invoke(sender, e);
                 CheckedChanged?.Invoke(this, new EventArgs());
-                base.Invalidate();                
+                base.Invalidate();
             }
-            
+
         }
         private bool _checked;
 
         private void ToolStripMenuItemCb_Click(object sender, EventArgs e)
         {
-                Checked = !Checked;
+            Checked = !Checked;
         }
 
         public new event EventHandler CheckedChanged;
         //public new event EventHandler Click;
 
         private bool _checkOnClick;
-        public new bool CheckOnClick 
-        { 
+        public new bool CheckOnClick
+        {
             get => _checkOnClick;
             set
             {

@@ -6,13 +6,13 @@ using UtilitiesCS;
 
 namespace QuickFiler.Controllers
 {
-    public interface IQfcHomeController: IFilerHomeController
+    public interface IQfcHomeController : IFilerHomeController
     {
-        IQfcDatamodel DataModel { get; }        
+        IQfcDatamodel DataModel { get; }
         IQfcHomeController Init();
         void Iterate();
         void Iterate2();
-        Task IterateQueueAsync();        
+        Task IterateQueueAsync();
         void SwapStopWatch();
         Task WriteMetricsAsync(string filename);
         bool WorkerComplete { get; }

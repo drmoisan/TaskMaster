@@ -28,14 +28,14 @@ namespace QuickFiler.Interfaces
         Task ToggleFocusAsync();
         int CounterEnter { get; set; }
         int CounterComboRight { get; set; }
-        bool IsExpanded {  get; }
+        bool IsExpanded { get; }
         bool IsChild { get; set; }
         bool IsActiveUI { get; set; }
         string ConvOriginID { get; set; }
         int Height { get; }
         MailItemHelper ItemHelper { get; set; }
         MailItem Mail { get; set; }
-        void ToggleExpansion(); 
+        void ToggleExpansion();
         string SelectedFolder { get; }
         int ItemNumber { get; set; }
         int ItemIndex { get; set; }

@@ -16,7 +16,7 @@ using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
-    public class CorpusInherit: ConcurrentDictionary<string, int>
+    public class CorpusInherit : ConcurrentDictionary<string, int>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -81,7 +81,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 "Must have a dictionary or create one to continue executing");
             }
         }
-        
+
         protected static DialogResult AskUser(bool askUserOnError, string messageText)
         {
             DialogResult response;
@@ -100,8 +100,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             return response;
         }
-        
-        public static CorpusInherit Deserialize(string fileName, string folderPath) 
+
+        public static CorpusInherit Deserialize(string fileName, string folderPath)
         {
             return Deserialize(fileName, folderPath, false);
         }

@@ -35,7 +35,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
             if ((x.Children?.Count ?? 0) == 0 && (y.Children?.Count ?? 0) == 0) { return true; } // Neither has children
             else if ((x.Children?.Count ?? 0) != (y.Children?.Count ?? 0)) { return false; } // Different number of children
-            else 
+            else
             {
                 var xChildren = x.Children.Select(c => c.Value).ToList();
                 var yChildren = y.Children.Select(c => c.Value).ToList();

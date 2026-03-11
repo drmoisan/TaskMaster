@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
 {
-    internal class ConfigGroupBox:GroupBox
+    internal class ConfigGroupBox : GroupBox
     {
         internal ISmartSerializableConfig.ActiveDiskEnum DiskType { get; set; }
 
@@ -20,12 +20,12 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
 
         internal TextBox RelativePathTextBox { get; set; }
         internal string RelativePath { get => RelativePathTextBox.Text; set => RelativePathTextBox.Text = value; }
-        
-        internal ComboBox SpecialFolderComboBox {  get; set; }
-        internal string SpecialFolderName 
+
+        internal ComboBox SpecialFolderComboBox { get; set; }
+        internal string SpecialFolderName
         {
             get => SpecialFolderComboBox.SelectedItem as string;
-            set => SpecialFolderComboBox.SelectedItem = SpecialFolderComboBox.Items.Contains(value) ? value : null;            
+            set => SpecialFolderComboBox.SelectedItem = SpecialFolderComboBox.Items.Contains(value) ? value : null;
         }
 
 

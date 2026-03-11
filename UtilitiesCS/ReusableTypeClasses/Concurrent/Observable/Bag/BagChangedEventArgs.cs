@@ -16,7 +16,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Bag
             OldValue = oldValue;
         }
 
-        public NotifyCollectionChangedAction Action { get; }        
+        public NotifyCollectionChangedAction Action { get; }
         public T NewValue { get; }
         public T OldValue { get; }
     }

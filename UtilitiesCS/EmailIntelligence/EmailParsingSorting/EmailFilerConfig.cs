@@ -93,7 +93,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
         #region Public Methods
 
-        public bool IsDeleteRelevant(Folder currentFolder) 
+        public bool IsDeleteRelevant(Folder currentFolder)
         {
             currentFolder.ThrowIfNull();
 
@@ -108,11 +108,11 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
                 return false;
             }
         }
-        
+
         public void ResolvePaths(Folder currentFolder)
         {
             //TraceUtility.LogMethodCall(currentFolder, DestinationOlStem, Globals, OlAncestor, FsAncestorEquivalent);
-            
+
             DestinationOlPath = $"{OlAncestor}\\{DestinationOlStem}";
             SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent);
             DeleteAndUnTrain = IsDeleteRelevant(currentFolder);
@@ -129,7 +129,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             //TraceUtility.LogMethodCall(DestinationOlStem, Globals, OlAncestor, FsAncestorEquivalent);
 
             DestinationOlPath = $"{OlAncestor}\\{DestinationOlStem}";
-            SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent);            
+            SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent);
             DestinationOlFolder = TryResolveDestinationFolder();
         }
 

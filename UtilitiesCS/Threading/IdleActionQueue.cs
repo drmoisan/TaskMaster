@@ -14,7 +14,7 @@ namespace UtilitiesCS.Threading
         private const int IdleActionDuration = 20;
         private const int GUIActivityThreshold = 700;
         private const double CPUUsageThreshold = 0.15;
-        
+
         private IdleActionQueue() { }
 
         static IdleActionQueue()

@@ -8,7 +8,7 @@ using System.Collections.Concurrent;
 namespace UtilitiesCS.Extensions
 {
 #nullable enable
-    
+
     public static class IAsyncEnumerableExtensions
     {
         public static async IAsyncEnumerable<(TFirst, TSecond)> Zip<TFirst, TSecond>(this IAsyncEnumerable<TFirst> first, IAsyncEnumerable<TSecond> second)
@@ -58,10 +58,10 @@ namespace UtilitiesCS.Extensions
         /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="keySelector"/> or <paramref name="elementSelector"/> or <paramref name="comparer"/> is null.</exception>
         /// <remarks>The return type of this operator differs from the corresponding operator on IEnumerable in order to retain asynchronous behavior.</remarks>
         public static ValueTask<SortedList<TKey, TElement>> ToSortedListAsync<TSource, TKey, TElement>(
-            this IAsyncEnumerable<TSource> source, 
-            Func<TSource, TKey> keySelector, 
-            Func<TSource, TElement> elementSelector, 
-            IComparer<TKey>? comparer, 
+            this IAsyncEnumerable<TSource> source,
+            Func<TSource, TKey> keySelector,
+            Func<TSource, TElement> elementSelector,
+            IComparer<TKey>? comparer,
             CancellationToken cancellationToken = default) where TKey : notnull
         {
             if (source == null)
@@ -86,8 +86,8 @@ namespace UtilitiesCS.Extensions
         /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="keySelector"/> is null.</exception>
         /// <remarks>The return type of this operator differs from the corresponding operator on IEnumerable in order to retain asynchronous behavior.</remarks>
         public static ValueTask<SortedList<TKey, TSource>> ToSortedListAsync<TSource, TKey>(
-            this IAsyncEnumerable<TSource> source, 
-            Func<TSource, TKey> keySelector, 
+            this IAsyncEnumerable<TSource> source,
+            Func<TSource, TKey> keySelector,
             CancellationToken cancellationToken = default) where TKey : notnull =>
             ToSortedListAsync(source, keySelector, comparer: null, cancellationToken);
 
@@ -104,14 +104,14 @@ namespace UtilitiesCS.Extensions
         /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="keySelector"/> or <paramref name="comparer"/> is null.</exception>
         /// <remarks>The return type of this operator differs from the corresponding operator on IEnumerable in order to retain asynchronous behavior.</remarks>
         public static ValueTask<SortedList<TKey, TSource>> ToSortedListAsync<TSource, TKey>(
-            this IAsyncEnumerable<TSource> source, 
-            Func<TSource, TKey> keySelector, 
-            IComparer<TKey>? comparer, 
+            this IAsyncEnumerable<TSource> source,
+            Func<TSource, TKey> keySelector,
+            IComparer<TKey>? comparer,
             CancellationToken cancellationToken = default) where TKey : notnull
         {
             source.ThrowIfNull();
             keySelector.ThrowIfNull();
-            
+
             return Core(source, keySelector, comparer, cancellationToken);
         }
 
@@ -137,9 +137,9 @@ namespace UtilitiesCS.Extensions
         }
 
         private static async ValueTask<SortedList<TKey, TSource>> Core<TKey, TSource>(
-            IAsyncEnumerable<TSource> source, 
-            Func<TSource, TKey> keySelector, 
-            IComparer<TKey>? comparer, 
+            IAsyncEnumerable<TSource> source,
+            Func<TSource, TKey> keySelector,
+            IComparer<TKey>? comparer,
             CancellationToken cancellationToken)
         {
             var sl = comparer is null ? [] : new SortedList<TKey, TSource>(comparer);
@@ -155,7 +155,7 @@ namespace UtilitiesCS.Extensions
 
         public static async Task<ConcurrentDictionary<TKey, TElement>> ToConcurrentDictionaryAsync<TKey, TElement>(
             this IAsyncEnumerable<KeyValuePair<TKey, TElement>> source)
-        { 
+        {
             var d = await source.ToConcurrentDictionaryAsync(x => x.Key, x => x.Value, new ConcurrentDictionary<TKey, TElement>(), default);
             return d;
         }
@@ -171,7 +171,7 @@ namespace UtilitiesCS.Extensions
             this IAsyncEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector,
             IEqualityComparer<TKey> comparer, CancellationToken cancellationToken)
         {
-            var d = await source.ToConcurrentDictionaryAsync(keySelector, elementSelector, new ConcurrentDictionary<TKey, TElement>(comparer), cancellationToken);            
+            var d = await source.ToConcurrentDictionaryAsync(keySelector, elementSelector, new ConcurrentDictionary<TKey, TElement>(comparer), cancellationToken);
             return d;
         }
 
@@ -184,10 +184,10 @@ namespace UtilitiesCS.Extensions
             elementSelector.ThrowIfNull();
 
             await
-                source.ForEachAsync(element => 
-                { 
-                    if(!d.TryAdd(keySelector(element), elementSelector(element)))
-                        throw new InvalidCastException($"Duplicate Key {keySelector(element)} in {nameof(ToConcurrentDictionaryAsync)}"); 
+                source.ForEachAsync(element =>
+                {
+                    if (!d.TryAdd(keySelector(element), elementSelector(element)))
+                        throw new InvalidCastException($"Duplicate Key {keySelector(element)} in {nameof(ToConcurrentDictionaryAsync)}");
                 }, cancellationToken).ConfigureAwait(
                     continueOnCapturedContext: false);
             return d;

@@ -96,8 +96,8 @@ namespace TaskVisualization
             if (Globals.AF.Manager.TryGetValue(item.ClassifierName, out var classifierTask))
             {
                 var classifier = await classifierTask;
-                if (item.UntrainFlags.Count > 0) 
-                { 
+                if (item.UntrainFlags.Count > 0)
+                {
                     await classifier.UnTrainMultiTagAsync(item.UntrainFlags, helper.Tokens, 1, cancel).ConfigureAwait(false);
                 }
                 if (item.TrainFlags.Count > 0)

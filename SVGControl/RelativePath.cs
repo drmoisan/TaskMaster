@@ -21,7 +21,7 @@ namespace SVGControl
 {
     internal static class RelativePath
     {
-     
+
         /// <summary>
         /// Creates a relative path from one file or folder to another.
         /// </summary>
@@ -110,7 +110,7 @@ namespace SVGControl
         {
             if (string.IsNullOrEmpty(path)) throw new ArgumentNullException("path");
             if (string.IsNullOrEmpty(basePath)) throw new ArgumentNullException("basePath");
-            
+
             if (!IsPathFullyQualified(basePath))
                 throw new ArgumentException("Arg_BasePathNotFullyQualified", nameof(basePath));
 
@@ -136,7 +136,7 @@ namespace SVGControl
                 // Drive relative paths
                 Debug.Assert(length == 2 || !IsDirectorySeparator(path[2]));
 
-                if (GetVolumeName(path.AsSpan()).Equals(GetVolumeName(basePath.AsSpan()),StringComparison.Ordinal))
+                if (GetVolumeName(path.AsSpan()).Equals(GetVolumeName(basePath.AsSpan()), StringComparison.Ordinal))
                 {
                     // Matching root
                     // "C:Foo" and "C:\Bar" => "C:\Bar\Foo"
@@ -230,7 +230,7 @@ namespace SVGControl
                 && IsValidDriveChar(path[0]));
         }
 
-        
+
 
         /// <summary>
         /// Get the last platform invoke error on the current thread
@@ -359,12 +359,12 @@ namespace SVGControl
 
         [DllImport("KERNEL32.dll", ExactSpelling = true, EntryPoint = "FormatMessageW", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static extern unsafe int FormatMessageW(int dwFlags, 
-                                                        IntPtr lpSource, 
-                                                        uint dwMessageId, 
-                                                        int dwLanguageId, 
-                                                        void* lpBuffer, 
-                                                        int nSize, 
+        public static extern unsafe int FormatMessageW(int dwFlags,
+                                                        IntPtr lpSource,
+                                                        uint dwMessageId,
+                                                        int dwLanguageId,
+                                                        void* lpBuffer,
+                                                        int nSize,
                                                         IntPtr arguments);
 
         [DllImport("KERNEL32.dll", ExactSpelling = true, EntryPoint = "GetFullPathNameW", SetLastError = true)]
@@ -532,8 +532,8 @@ namespace SVGControl
         //    // it doesn't root extended paths correctly. We don't currently resolve extended paths, so we'll just assert here.
         //    Debug.Assert(IsPartiallyQualified(path.AsSpan()) || !IsExtended(path));
 
-            
-            
+
+
         //    int bufsz = 1;
         //    StringBuilder sbFull = new StringBuilder(bufsz);          // Full resolved path will go here
         //    StringBuilder sbFile = new StringBuilder(bufsz);          // Filename will go here
@@ -548,8 +548,8 @@ namespace SVGControl
         //                                                                       // 'sbFull' should now contain "c:\windows\system32\desktop.ini"
         //                                                                       //    and 'sbFile' should contain "desktop.ini"
         //    }
-            
-            
+
+
 
         //    if (u == 0)
         //    {
@@ -559,7 +559,7 @@ namespace SVGControl
         //            errorCode = ERROR_BAD_PATHNAME;
         //        throw GetExceptionForWin32Error(errorCode, path.ToString());
         //    }
-            
+
         //    returnPath = sbFull.ToString();
 
         //}
@@ -578,7 +578,7 @@ namespace SVGControl
         //    Debug.Assert(IsPartiallyQualified(path) || !IsExtended(new string(path.ToArray())));
 
         //    uint result;
-            
+
         //    //GetFullPathNameW(ref MemoryMarshal.GetReference(path), (uint)builder.Capacity, ref builder.GetPinnableReference(), IntPtr.Zero))
 
         //    while ((result = GetFullPathNameW(ref MemoryMarshal.GetReference(path), (uint)builder.Capacity, ref builder.GetPinnableReference(), IntPtr.Zero)) > builder.Capacity)
@@ -630,8 +630,8 @@ namespace SVGControl
             //return result;
         }
 
-        internal static bool IsApp64Bit() 
-        { 
+        internal static bool IsApp64Bit()
+        {
             return (64 == (IntPtr.Size * 8));
         }
 
@@ -808,7 +808,7 @@ namespace SVGControl
                 return (int)GetRootLength(path2, (ulong)path.Length);
             }
         }
-                
+
         [SecurityCritical]
         private unsafe static uint GetRootLength(char* path, ulong pathLength)
         {
@@ -1036,7 +1036,7 @@ namespace SVGControl
             if (!isDevice && path.Slice(0, 2).Equals(@"\\".AsSpan(), StringComparison.Ordinal))
                 return 2;
             else if (isDevice && path.Length >= 8
-                && (path.Slice(0, 8).Equals(UncExtendedPathPrefix.AsSpan(),StringComparison.Ordinal)
+                && (path.Slice(0, 8).Equals(UncExtendedPathPrefix.AsSpan(), StringComparison.Ordinal)
                 || path.Slice(5, 4).Equals(@"UNC\".AsSpan(), StringComparison.Ordinal)))
                 return 8;
 
@@ -1057,7 +1057,7 @@ namespace SVGControl
 
             return true;
         }
-                
+
         internal static bool IsExtended(string path)
         {
             if (path.Length >= 4 && path[0] == '\\' && (path[1] == '\\' || path[1] == '?') && path[2] == '?')
@@ -1077,7 +1077,7 @@ namespace SVGControl
 
             return false;
         }
-                
+
 
         public static ReadOnlySpan<char> Concat2(this ReadOnlySpan<char> first, ReadOnlySpan<char> second)
         {
@@ -1201,7 +1201,7 @@ namespace SVGControl
             //string result = System.IO.Path.GetFullPath(filepath).ToLowerInvariant();
             string result = filepath;
 
-            if (Path.GetExtension(result)=="")
+            if (Path.GetExtension(result) == "")
             {
                 result = result.TrimEnd(new[] { '\\' });
                 result += '\\';

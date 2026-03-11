@@ -20,36 +20,37 @@ namespace UtilitiesCS
         #region "Constructors and private variables"
 
         public CtfIncidenceList() : base() { }
-        
+
         public CtfIncidenceList(string filename, string folderpath, string backupFilepath) : base(
             filename: filename, folderpath: folderpath,
             backupLoader: new CSVLoader<CtfIncidence>(ReadTextFile),
             backupFilepath: backupFilepath,
-            askUserOnError: true) { }
+            askUserOnError: true)
+        { }
 
         private int _maxFoldersPerConv = 3;
 
         #endregion
 
         //public CTF_Incidence[] CTF_Inc;
-        
+
         public int CTF_Inc_Ct = 0;
 
         public void CtfIncidencePositionAdd(int idx, CtfMapEntry CtfMap)
         {
             // Variables to hold loop counters
-            int i, j;                                                                                                     
-            
+            int i, j;
+
             bool added;
 
             added = false;
 
             // If the MaxFolders is 1 then do the second check
-            if (_maxFoldersPerConv == 1)                                                                                           
+            if (_maxFoldersPerConv == 1)
             {
                 // If the conversation count is more than the folder stored,
-                if (CtfMap.EmailCount > this[idx].EmailCounts[1])                             
-                    
+                if (CtfMap.EmailCount > this[idx].EmailCounts[1])
+
                 {
                     // then call the subroutine to replace the value
                     CTF_Incidence_SET(idx, 1, 1, CtfMap);
@@ -63,19 +64,19 @@ namespace UtilitiesCS
                 if (this[idx].FolderCount < _maxFoldersPerConv)
                 {
                     // If folder count is less than max, increase count
-                    this[idx].FolderCount++;                                               
+                    this[idx].FolderCount++;
                 }
 
                 var loopTo = _maxFoldersPerConv - 1;
                 // Sorting routine to insert the new value in sequential order
-                for (i = 1; i <= loopTo; i++)                                                                                  
+                for (i = 1; i <= loopTo; i++)
                 {
                     // from largest folder count to least folder count. Items that
                     if (CtfMap.EmailCount > this[idx].EmailCounts[i])
                     {
                         var loopTo1 = i;
                         // have a lower count than all items up to the max will not be added
-                        for (j = _maxFoldersPerConv - 1; j >= loopTo1; j -= 1)                                                                  
+                        for (j = _maxFoldersPerConv - 1; j >= loopTo1; j -= 1)
                         {
                             this[idx].EmailCounts[j + 1] = this[idx].EmailCounts[j];
                             this[idx].EmailFolders[j + 1] = this[idx].EmailFolders[j];
@@ -148,9 +149,9 @@ namespace UtilitiesCS
         }
 
         #region "Backup Loader and Writer"
-            
 
-        
+
+
         #endregion
 
         #region "Deprecated Backup Loader and Writer"
@@ -215,7 +216,7 @@ namespace UtilitiesCS
         public static CtfIncidence TryDequeueIncidence(ref Queue<string> lines)
         {
             var incidence = new CtfIncidence();
-            try 
+            try
             {
                 incidence.EmailConversationID = lines.Dequeue();
                 incidence.FolderCount = int.Parse(lines.Dequeue());
@@ -250,12 +251,12 @@ namespace UtilitiesCS
                 Debug.WriteLine(message);
                 DequeueToNextRecord(ref lines);
                 return null;
-            }   
+            }
         }
 
         internal static void DequeueToNextRecord(ref Queue<string> lines)
         {
-            while ((lines.Count > 0)&&((lines.Peek().Length!=32)||lines.Peek().Contains(" ") || lines.Peek().Contains("\\")))
+            while ((lines.Count > 0) && ((lines.Peek().Length != 32) || lines.Peek().Contains(" ") || lines.Peek().Contains("\\")))
             {
                 lines.Dequeue();
             }

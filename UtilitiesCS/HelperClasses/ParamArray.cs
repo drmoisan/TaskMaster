@@ -14,7 +14,7 @@ namespace UtilitiesCS.HelperClasses
         public ParamArray() { }
         public ParamArray(params object[] args) => _args = args;
 
-        private object[] _args; 
+        private object[] _args;
 
         public static bool AnyNull(params object[] args) => args.Any(arg => arg is null);
         public bool AnyNull() => _args.Any(arg => arg is null);

@@ -18,18 +18,18 @@ namespace UtilitiesCS.Threading
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public static async Task<ConcurrentBag<TOut>> AsyncMultiTaskChunker<T, TOut>(
-            IEnumerable<T> obj, 
-            Func<T, Task<TOut>> func, 
+            IEnumerable<T> obj,
+            Func<T, Task<TOut>> func,
             IProgress<(int Value, string JobName)> progress,
             string messagePrefix,
-            CancellationToken cancel) 
+            CancellationToken cancel)
         {
             int count = obj.Count();
             int complete = 0;
 
             int chunkNum = Environment.ProcessorCount - 1;
             int chunkSize = count / chunkNum;
-            
+
             var chunks = obj.Chunk(chunkSize);
             var result = new ConcurrentBag<TOut>();
             List<Task> tasks = [];
@@ -38,14 +38,14 @@ namespace UtilitiesCS.Threading
 
             foreach (var chunk in chunks)
             {
-                tasks.Add(Task.Run(async () => 
+                tasks.Add(Task.Run(async () =>
                 {
                     foreach (var item in chunk)
                     {
                         try
                         {
                             result.Add(await func(item));
-                            Interlocked.Increment(ref complete);                            
+                            Interlocked.Increment(ref complete);
                         }
                         catch (OperationCanceledException)
                         {
@@ -87,7 +87,7 @@ namespace UtilitiesCS.Threading
                 timer.StopTimer();
                 result.ForEach(x => sw.MergeDurations(((IItemInfo)x).Sw.Durations));
                 sw.WriteToLog();
-                
+
                 return result;
             }
             catch (TaskCanceledException)
@@ -108,7 +108,7 @@ namespace UtilitiesCS.Threading
             {
                 timer.StopTimer();
                 timer.Dispose();
-            }            
+            }
         }
 
         public static async Task AsyncMultiTaskChunker<T>(
@@ -122,7 +122,7 @@ namespace UtilitiesCS.Threading
             int complete = 0;
 
             int chunkNum = Environment.ProcessorCount - 2;
-            int chunkSize = Math.Max(1,count / chunkNum);
+            int chunkSize = Math.Max(1, count / chunkNum);
 
             var chunks = obj.Chunk(chunkSize).ToArray();
             // temp override to test
@@ -172,7 +172,7 @@ namespace UtilitiesCS.Threading
                 timer.AutoReset = true;
                 timer.StartTimer();
             });
-            
+
             try
             {
                 await Task.WhenAll(tasks);
@@ -182,7 +182,7 @@ namespace UtilitiesCS.Threading
                 //logger.Debug("Request to cancel task was received");
             }
             catch (System.Exception e)
-            {                
+            {
                 logger.Error($"{e.Message}", e);
                 timer.StopTimer();
                 timer.Dispose();

@@ -29,11 +29,11 @@ namespace UtilitiesCS
 
         public ScoCollection(IEnumerable<T> enumerable) : base(enumerable) { }
 
-        public ScoCollection(byte[] file) : base() 
+        public ScoCollection(byte[] file) : base()
         {
             DeserializeJson(file);
         }
-        
+
         public ScoCollection(
             string fileName,
             string folderPath) : base()
@@ -114,8 +114,11 @@ namespace UtilitiesCS
                 collection.Serialize(disk.FilePath);
                 return collection;
             }
-            else { throw new ArgumentNullException(
-                "Must have a list or create one to continue executing"); }
+            else
+            {
+                throw new ArgumentNullException(
+                "Must have a list or create one to continue executing");
+            }
         }
 
         private DialogResult AskUser(bool askUserOnError, string messageText)
@@ -139,8 +142,8 @@ namespace UtilitiesCS
 
         public List<T> ToList() { return new List<T>(this); }
 
-        public void FromList(IList<T> value) 
-        { 
+        public void FromList(IList<T> value)
+        {
             var collection = new ScoCollection<T>(value);
             this.Clear();
             DoBaseWrite(() => WriteCollection = collection?.DoBaseRead(() => ReadCollection));
@@ -151,13 +154,13 @@ namespace UtilitiesCS
         #region Serialization
 
         private FilePathHelper _disk = new FilePathHelper();
-        
-        public string FilePath { get => _disk.FilePath; set => _disk.FilePath = value; }
-        
-        public string FolderPath { get => _disk.FolderPath; set => _disk.FolderPath = value;}
 
-        public string FileName { get => _disk.FileName; set => _disk.FileName = value;}
-        
+        public string FilePath { get => _disk.FilePath; set => _disk.FilePath = value; }
+
+        public string FolderPath { get => _disk.FolderPath; set => _disk.FolderPath = value; }
+
+        public string FileName { get => _disk.FileName; set => _disk.FileName = value; }
+
         public void Serialize()
         {
             if (FilePath != "")
@@ -324,8 +327,30 @@ namespace UtilitiesCS
             {
                 if (response == DialogResult.Yes && !backupFilepath.IsNullOrEmpty())
                 {
-                    collection = LoadFromBackup(backupLoader, backupFilepath, disk);
-                    writeCollection = true;
+                    try
+                    {
+                        if (File.Exists(backupFilepath))
+                        {
+                            collection = LoadFromBackup(backupLoader, backupFilepath, disk);
+                            writeCollection = true;
+                        }
+                        else
+                        {
+                            logger.Error($"Backup file not found: {backupFilepath}");
+                            var response2 = AskUser(askUserOnError,
+                                $"Backup file not found: {backupFilepath}\nNeed a list to continue. Create a new list or abort execution?");
+                            collection = CreateEmpty(response2, disk);
+                            writeCollection = true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error($"Error loading backup file {backupFilepath}.", ex);
+                        var response2 = AskUser(askUserOnError,
+                            $"Backup file {backupFilepath} encountered a problem.\nNeed a list to continue. Create a new list or abort execution?");
+                        collection = CreateEmpty(response2, disk);
+                        writeCollection = true;
+                    }
                 }
                 else if (response != DialogResult.Ignore)
                 {
@@ -335,7 +360,7 @@ namespace UtilitiesCS
                     writeCollection = true;
                 }
             }
-            
+
             DoBaseWrite(() => WriteCollection = collection?.DoBaseRead(() => collection?.ReadCollection));
             if (writeCollection)
             {

@@ -23,7 +23,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             lock (this)
             {
-                base.AddFirst(item);                
+                base.AddFirst(item);
             }
         }
 
@@ -175,7 +175,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             itemToMove.ThrowIfNull();
             target.ThrowIfNull();
-            
+
             lock (this)
             {
                 if (itemToMove.list != this)
@@ -205,7 +205,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 {
                     return;
                 }
-                
+
                 base.Remove(itemToMove.innerNode);
                 base.AddBefore(target.innerNode, itemToMove.Value);
             }
@@ -328,7 +328,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                     }
                     catch (Exception)
                     {
-                        return default;                        
+                        return default;
                     }
                 }
             }

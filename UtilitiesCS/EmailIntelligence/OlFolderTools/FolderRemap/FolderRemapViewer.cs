@@ -25,9 +25,9 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             //SetupDragAndDrop();
             SetupTree();
             SetupRenderer(this.TlvOriginal.TreeColumnRenderer);
-            
+
         }
-                
+
         private void SetupRenderer(TreeListView.TreeRenderer renderer)
         {
             var penSize = 2.0f * UiThread.AutoScaleFactor.Width;
@@ -45,14 +45,14 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             this.OlvNameNotFiltered.ImageGetter = x => 0;
             this.TlvOriginal.Roots = _controller.RemapTree.Roots;
             //this.TlvOriginal.ExpandAll();
-            this.TlvOriginal.Sort(0);            
+            this.TlvOriginal.Sort(0);
 
             this.OlvMap.SetObjects(_controller.Mappings2);
             this.OlvMap.AlwaysGroupByColumn = this.OlvMap.GetColumn(1);
-            
+
             //this.TlvFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == true);
         }
-                
+
         /// <summary>
         /// Format a file size into a more intelligible value
         /// </summary>

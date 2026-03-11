@@ -23,5 +23,5 @@ namespace UtilitiesCS.Threading
         { get { return Interlocked.Exchange(ref _state, CALLED) == NOTCALLED; } }
     }
 
-    
+
 }

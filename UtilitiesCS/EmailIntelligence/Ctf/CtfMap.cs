@@ -16,12 +16,13 @@ namespace UtilitiesCS
         public CtfMap(string filename,
                       string folderpath,
                       string backupFilepath,
-                      bool askUserOnError) : base(fileName: filename, 
+                      bool askUserOnError) : base(fileName: filename,
                                                   folderPath: folderpath,
                                                   backupLoader: ReadTextFile,
                                                   backupFilepath: backupFilepath,
-                                                  askUserOnError: askUserOnError) { }
-                
+                                                  askUserOnError: askUserOnError)
+        { }
+
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public CtfMapEntry[] TopEntriesById(string id, int topN)
@@ -35,7 +36,7 @@ namespace UtilitiesCS
 
         public void Add(string emailFolder, string conversationID, int emailCount)
         {
-            var idx = this.FindIndex(x => (x.ConversationID == conversationID)&(x.EmailFolder == emailFolder));
+            var idx = this.FindIndex(x => (x.ConversationID == conversationID) & (x.EmailFolder == emailFolder));
 
             if (idx != -1)
             {
@@ -46,7 +47,7 @@ namespace UtilitiesCS
                 var entry = new CtfMapEntry(emailFolder, conversationID, emailCount);
                 this.Add(entry);
             }
-            
+
         }
 
         public bool ContainsId(string id)
@@ -62,8 +63,8 @@ namespace UtilitiesCS
         }
 
         // TODO: Implement RebuildMap method
-        public void RebuildMap(IApplicationGlobals appGlobals) 
-        { 
+        public void RebuildMap(IApplicationGlobals appGlobals)
+        {
             NotImplementedDialog.StopAtNotImplemented("RebuildMap");
         }
 
@@ -125,7 +126,7 @@ namespace UtilitiesCS
                 Debug.WriteLine(message);
                 DequeueToNextRecord(ref lines);
                 return null;
-            }   
+            }
         }
 
         public static void DequeueToNextRecord(ref Queue<string> lines)

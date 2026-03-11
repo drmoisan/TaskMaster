@@ -13,7 +13,7 @@ namespace UtilitiesCS.Test.OneDriveHelpers
     [TestClass]
     public class AngleSharpParsedEmailBodyTests
     {
-        private AngleSharpParsedEmailBodyDerived parsed; 
+        private AngleSharpParsedEmailBodyDerived parsed;
 
         [TestInitialize]
         public void TestInitialize()
@@ -34,9 +34,9 @@ namespace UtilitiesCS.Test.OneDriveHelpers
             // Arrange
             var htmlBody = Properties.Resources.HtmlBodyLinks;
             var body = new AngleSharpParsedEmailBody(htmlBody).ExtractLinks();
-            var expected = new (string, string)[] 
-            { 
-                (" 10z Week 38 Rollback CID.xlsx","https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EVpXvJ8dfZ9DmaoSjGJ16uIBuc7kN7LG9esDj9pciuoriA"), 
+            var expected = new (string, string)[]
+            {
+                (" 10z Week 38 Rollback CID.xlsx","https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EVpXvJ8dfZ9DmaoSjGJ16uIBuc7kN7LG9esDj9pciuoriA"),
                 (" Snackers Week 37 Rollback CID.xlsx","https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EZckiLtanGtMjumaLHLwsCsBwQsHSfAuMpzsMyfcIPUTdg?email=dmoisan%40sabra.com&e=YRrQJk"),
                 ("trindels@sabra.com","mailto:chollingsworth@sabra.com")
             };
@@ -68,7 +68,7 @@ namespace UtilitiesCS.Test.OneDriveHelpers
                 (" 10z Week 38 Rollback CID.xlsx","https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EVpXvJ8dfZ9DmaoSjGJ16uIBuc7kN7LG9esDj9pciuoriA"),
                 (" Snackers Week 37 Rollback CID.xlsx","https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EZckiLtanGtMjumaLHLwsCsBwQsHSfAuMpzsMyfcIPUTdg?email=dmoisan%40sabra.com&e=YRrQJk")
             };
-            
+
             string domain = "sabradipping.sharepoint.com";
 
             // Act
@@ -86,6 +86,6 @@ namespace UtilitiesCS.Test.OneDriveHelpers
             //this.mockRepository.VerifyAll();
         }
 
-        
+
     }
 }

@@ -71,8 +71,8 @@ namespace UtilitiesCS
 
         public static T GetOrLoad<T>(ref T variable, Func<T> loader, Action<T> callbackOnSet)
         {
-            if (EqualityComparer<T>.Default.Equals(variable, default(T))) 
-            { 
+            if (EqualityComparer<T>.Default.Equals(variable, default(T)))
+            {
                 variable = loader();
                 callbackOnSet(variable);
             }
@@ -100,7 +100,7 @@ namespace UtilitiesCS
         public static T GetOrLoad<T>(ref T variable, Func<T, bool> isInitialized, Func<T> loader)
         {
             if (isInitialized(variable)) { return variable; }
-            else 
+            else
             {
                 variable = loader();
                 return variable;
@@ -175,8 +175,8 @@ namespace UtilitiesCS
 
         public static bool DependenciesNotNull(bool strict, params object[] dependencies)
         {
-            if (dependencies is null) 
-            { 
+            if (dependencies is null)
+            {
                 var caller = new StackFrame(1, false).GetMethod().Name;
                 var message = $"Method {caller} failed the dependency check because {nameof(dependencies)} " +
                     "was passed as a null array";

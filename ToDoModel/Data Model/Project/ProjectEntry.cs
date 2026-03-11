@@ -20,8 +20,8 @@ namespace ToDoModel
 
         public string ProjectName { get => _projectName; set => _projectName = value; }
         public string ProgramName { get => _programName; set => _programName = value; }
-        public string ProjectID 
-        { 
+        public string ProjectID
+        {
             get => _projectID;
             //private set => _projectID = value;
             //[MethodImpl(MethodImplOptions.Synchronized)]
@@ -62,7 +62,7 @@ namespace ToDoModel
 
         public ProjectEntry(string ProjName, string ProjID, string ProgName)
         {
-            ProjectName = ProjName;                        
+            ProjectName = ProjName;
             ProjectID = ProjID;
             ProgramName = ProgName;
         }
@@ -70,13 +70,13 @@ namespace ToDoModel
         [JsonConstructor]
         public ProjectEntry(string ProjName, string ProjID, string ProgName, string programID)
         {
-            ProjectName = ProjName;            
+            ProjectName = ProjName;
             ProjectID = ProjID;
             ProgramName = ProgName;
             ProgramID = programID;
         }
 
-        public bool SetProjectId(string newID) 
+        public bool SetProjectId(string newID)
         {
             if (ProjectID.IsNullOrEmpty() && !newID.IsNullOrEmpty())
             {
@@ -97,18 +97,18 @@ namespace ToDoModel
 
                 case string s when s == ProjectID:
                     break;
-                    
+
                 case string s when s != ProjectID:
                     return ChangeId(newID);
 
                 default:
-                    throw new ArgumentException($"Unsupported value for {nameof(newID)} of {newID}");                   
+                    throw new ArgumentException($"Unsupported value for {nameof(newID)} of {newID}");
             }
-            
+
             return false;
         }
 
-        internal bool ChangeId(string newID) 
+        internal bool ChangeId(string newID)
         {
             var response = MyBox.ShowDialog($"Are you sure you want to change {nameof(ProjectID)} from" +
                     $"{ProjectID} to {newID}", "Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -128,14 +128,14 @@ namespace ToDoModel
             }
             return false;
         }
-        
+
         public async Task<bool> SetProjectIdAsync(string newID, CancellationToken cancel)
         {
             return await Task.Run(() => SetProjectId(newID), cancel);
         }
 
-        public void SetIdUpdateAction(Action<string, string> action) 
-        { 
+        public void SetIdUpdateAction(Action<string, string> action)
+        {
             _idUpdate = action;
         }
 
@@ -212,8 +212,8 @@ namespace ToDoModel
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ProgramName);
             return hashCode;
         }
-    
-        public bool IsAnyNull() 
-        { return (ProjectName is null)||(ProjectID is null)||(ProgramName is null); }
+
+        public bool IsAnyNull()
+        { return (ProjectName is null) || (ProjectID is null) || (ProgramName is null); }
     }
 }

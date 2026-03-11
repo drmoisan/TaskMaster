@@ -22,6 +22,6 @@ namespace QuickFiler.Interfaces
         Task ToggleOnNavigationAsync();
 
         IntPtr FormHandle { get; }
-        
+
     }
 }

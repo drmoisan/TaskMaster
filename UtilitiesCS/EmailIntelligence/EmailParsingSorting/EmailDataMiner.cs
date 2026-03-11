@@ -72,9 +72,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return null;
         }
 
-        public async Task DeleteStagingFilesAsync() 
+        public async Task DeleteStagingFilesAsync()
         {
-            await Task.Run(() => 
+            await Task.Run(() =>
             {
                 if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) { return; }
                 var folderPath = Path.Combine(folderRoot, "Bayesian");
@@ -573,7 +573,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public async Task<MinedMailInfo[]> FilterExcluded(MinedMailInfo[] items)
         {
             return await Task.Run(() => items
-                .Where(x => 
+                .Where(x =>
                     !_globals.TD.FilteredFolderScraping.ContainsKey(x.FolderInfo.RelativePath))
                 .ToArray());
         }
@@ -664,12 +664,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             progress.Report(100);
 
-            if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) 
+            if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
             {
                 logger.Debug($"AppData Folder Not Found. Aborting method {nameof(ToMinedMail)}");
-                return;  
+                return;
             }
-            
+
             var minedBag = new ScBag<MinedMailInfo>(cBag)
             {
                 FolderPath = Path.Combine(folderRoot, "Bayesian"),
@@ -775,7 +775,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         //        group.Key, matchFrequency, matchEmailCount, cancel);
         //}
 
-        
+
         //public async Task<bool> BuildFolderClassifiersAsync(BayesianClassifierGroup classifierGroup, MinedMailInfo[] collection, ProgressPackage ppkg)
         //{
         //    var groups = collection.GroupBy(x => x.FolderInfo.RelativePath);
@@ -813,7 +813,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         //    var collection = await Load<MinedMailInfo[]>(folderPath);
         //    collection.ThrowIfNullOrEmpty();
         //    sw.LogDuration("Load Staging");
-            
+
         //    ppkg.ProgressTrackerPane.Report(10, "Building Folder Classifier -> Getting Folder Paths");
 
         //    var folderPaths = QueryOlFolderInfo(GetOlFolderTree()).Select(x => x.RelativePath).ToList();
@@ -828,7 +828,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         //    var childPpkg = await new ProgressPackage()
         //        .InitializeAsync(ppkg.CancelSource, ppkg.Cancel, ppkg.ProgressTrackerPane.SpawnChild(), ppkg.StopWatch)
         //        .ConfigureAwait(false);
-            
+
         //    if (await BuildFolderClassifiersAsync(classifierGroup, collection, childPpkg))
         //    {
         //        _globals.AF.ProgressPane.Visible = false;
@@ -837,7 +837,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         //        MessageBox.Show("Folder Classifier Built Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         //    }
         //}
-                
+
         //[Obsolete]
         //public async Task BuildClassifierAsync1()
         //{
@@ -865,7 +865,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         //    Stopwatch psw = new Stopwatch();
         //    psw.Start();
-                        
+
         //    var tasks = folderPaths.Select(folderPath =>
         //    {
         //        return Task.Run(() =>
@@ -912,7 +912,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         //public async Task BuildClassifierAsync2() 
         //{
         //    var collection = await LoadStaging();
-            
+
         //    var tree = GetOlFolderTree();
         //    var folders = QueryOlFolders(tree).ToList();
         //    var folderPaths = folders.Select(x => x.FolderPath.Replace(_globals.Ol.ArchiveRootPath + "\\", "")).ToList();
@@ -977,7 +977,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         //    {
         //        //logger.Debug("Classifier calculation canceled");
         //    }
-            
+
 
 
 
@@ -1151,8 +1151,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 logger.Debug($"{nameof(EmailDataMiner)}.{nameof(Deserialize)} aborting due to lack of AppData Special Folder");
                 return default(T);
             }
-            
-            disk.FolderPath = Path.Combine(folderRoot, "Bayesian");;
+
+            disk.FolderPath = Path.Combine(folderRoot, "Bayesian"); ;
             var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
             disk.FileName = fileName;
             if (File.Exists(disk.FilePath))
@@ -1197,7 +1197,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 Formatting = Formatting.Indented
             };
             var serializer = JsonSerializer.Create(jsonSettings);
-            if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) 
+            if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
             {
                 logger.Debug($"{nameof(EmailDataMiner)}.{nameof(SerializeAndSave)} is aborting due to lack of AppData special folder");
                 return;
@@ -1268,18 +1268,18 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var serializer = JsonSerializer.Create(jsonSettings);
 
             var disk = new FilePathHelper();
-            if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) 
+            if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
             {
                 logger.Debug($"{nameof(EmailDataMiner)}.{nameof(SerializeMailInfo)} aborted due to lack of AppData special folder");
                 return;
             }
-            
-            disk.FolderPath = Path.Combine(folderRoot, "Bayesian");;
+
+            disk.FolderPath = Path.Combine(folderRoot, "Bayesian"); ;
             SerializeFsSave(mailItem, "MailItem", serializer, disk);
 
 
             var (mailInfo, sizeMailInfo1) = TryLoadObjectAndGetMemorySize(() =>
-                new MailItemHelper(mailItem, _globals).LoadAll(_globals, _globals.Ol.ArchiveRoot,true));
+                new MailItemHelper(mailItem, _globals).LoadAll(_globals, _globals.Ol.ArchiveRoot, true));
             var sizeMailInfo2 = 0; // ObjectSize(mailInfo);
             LogSizeComparison("GC Allocation", sizeMailInfo1, "Serialization", sizeMailInfo2, "MailItemInfo");
             SerializeFsSave(mailInfo, "MailItemInfo", serializer, disk);
@@ -1300,9 +1300,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             if (copiesToLoad < 1) { throw new ArgumentOutOfRangeException(nameof(copiesToLoad), $"{nameof(copiesToLoad)} must be greater than 0"); }
             var start = GC.GetTotalMemory(true);
             long end = 0;
-            
+
             T obj = loader();
-            
+
             if (copiesToLoad > 1)
             {
                 GCHandle[] objects = new GCHandle[copiesToLoad];
@@ -1322,8 +1322,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     logger.Error($"Error loading object of type {typeof(T).Name}\n{e.Message}", e);
                     return (default, 0);
                 }
-                finally 
-                { 
+                finally
+                {
                     for (int i = 1; i < copiesToLoad; i++)
                     {
                         if (objects[i].IsAllocated) { objects[i].Free(); }
@@ -1346,8 +1346,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return serializer;
         }
 
-        public virtual void SerializeChunk(MinedMailInfo[] chunk, JsonSerializer serializer, FilePathHelper disk, int i) 
-        { 
+        public virtual void SerializeChunk(MinedMailInfo[] chunk, JsonSerializer serializer, FilePathHelper disk, int i)
+        {
             disk.FileName = $"MinedMailInfo_{i:000}.json";
             using (StreamWriter sw = File.CreateText(disk.FilePath))
             {
@@ -1378,7 +1378,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     logger.Error($"Error deserializing {typeof(T).Name}_{fileNameSuffix}.json. \n{e.Message}", e);
                 return false;
             }
-            
+
         }
 
         #endregion Testing Sizing and Serialization Methods

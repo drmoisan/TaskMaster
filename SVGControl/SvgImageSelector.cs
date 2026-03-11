@@ -107,8 +107,8 @@ namespace SVGControl
         [Editor(typeof(DropDownEditor), typeof(UITypeEditor))]
         public ISvgResource ResourceName
         {
-            get => _svgResource ;
-            
+            get => _svgResource;
+
             set
             {
                 if (_svgResource != value)
@@ -138,16 +138,16 @@ namespace SVGControl
         public void AddResource(ISvgResource resource)
         {
             if (!ResourceNames.Contains(resource))
-            ResourceNames.Add(resource);
+                ResourceNames.Add(resource);
         }
 
         [DefaultValue(AutoSize.MaintainAspectRatio)]
         public AutoSize AutoSize { get => _renderer.AutoSize; set => _renderer.AutoSize = value; }
-        
+
         public Size Size { get => _renderer.Size; set => _renderer.Size = value; }
-        
+
         public Padding Margin { get => _renderer.Margin; set => _renderer.Margin = value; }
-        
+
         public Bitmap Render() => _renderer.Render();
 
         public bool UseDefaultImage
@@ -161,10 +161,10 @@ namespace SVGControl
                     if (_useDefaultImage) { SetDefaultImage(); }
                     else { _renderer.Document = null; }
                 }
-                    
+
             }
         }
-        
+
         public bool SaveRendering
         {
             get
@@ -240,10 +240,10 @@ namespace SVGControl
             //Debug.WriteLine("System.AppDomain.CurrentDomain.BaseDirectory is " + workingDirectory);
             //var assmbly = System.Reflection.Assembly.GetExecutingAssembly();
             //var location = assmbly.Location;
-            
+
             //var resrcs = assmbly.GetManifestResourceNames();
-            
-            
+
+
             string workingDirectory = Environment.CurrentDirectory;
             List<string> directories = new List<string>(workingDirectory.Split(Path.DirectorySeparatorChar));
             if ((directories.Count > 2) && (directories[directories.Count - 2] == "bin"))
@@ -257,7 +257,7 @@ namespace SVGControl
             }
             return workingDirectory;
         }
-                
+
         internal void SetDefaultImage()
         {
             _renderer.Document = SvgRenderer.GetSvgDocument(Defaults.GetDefault.SvgImage);
@@ -291,11 +291,11 @@ namespace SVGControl.Defaults
 {
     public static class GetDefault
     {
-        public static byte[] SvgImage 
-        { 
-            get 
+        public static byte[] SvgImage
+        {
+            get
             {
-                string svgXML = 
+                string svgXML =
 @"<svg xmlns=""http://www.w3.org/2000/svg"" viewBox=""0 0 16 16"">
   <defs>
     <style>.canvas{fill: none; opacity: 0;}.light-defaultgrey-10{fill: #212121; opacity: 0.1;}.light-defaultgrey{fill: #212121; opacity: 1;}.light-yellow{fill: #996f00; opacity: 1;}.light-blue{fill: #005dba; opacity: 1;}</style>
@@ -312,8 +312,8 @@ namespace SVGControl.Defaults
   </g>
 </svg>";
                 return Encoding.ASCII.GetBytes(svgXML);
-            } 
+            }
         }
-        
+
     }
 }

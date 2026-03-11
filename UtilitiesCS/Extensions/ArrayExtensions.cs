@@ -27,7 +27,7 @@ namespace UtilitiesCS
             }
             return stringArray;
         }
-                
+
         public static string[] ToStringArray<T>(this T[] array)
         {
             int rowCount = array.Length;
@@ -48,7 +48,7 @@ namespace UtilitiesCS
             {
                 for (int j = 0; j < columnCount; j++)
                 {
-                    if (array[i, j] is null) 
+                    if (array[i, j] is null)
                     {
                         stringArray[i, j] = nullReplacement;
                     }
@@ -67,7 +67,7 @@ namespace UtilitiesCS
             string[] stringArray = new string[rowCount];
             for (int i = 0; i < rowCount; i++)
             {
-                if(array[i] is null)
+                if (array[i] is null)
                 {
                     stringArray[i] = nullReplacement;
                 }
@@ -97,22 +97,34 @@ namespace UtilitiesCS
 
         public static T[,] To2D<T>(this T[][] source)
         {
-            try
+            if (source is null)
             {
-                int FirstDim = source.Length;
-                int SecondDim = source.GroupBy(row => row.Length).Single().Key; // throws InvalidOperationException if source is not rectangular
-
-                var result = new T[FirstDim, SecondDim];
-                for (int i = 0; i < FirstDim; ++i)
-                    for (int j = 0; j < SecondDim; ++j)
-                        result[i, j] = source[i][j];
-
-                return result;
+                throw new ArgumentNullException(nameof(source));
             }
-            catch (InvalidOperationException)
+
+            int FirstDim = source.Length;
+            if (FirstDim == 0)
+            {
+                return new T[0, 0];
+            }
+
+            if (source.Any(row => row is null))
+            {
+                throw new InvalidOperationException("The given jagged array contains null rows.");
+            }
+
+            int SecondDim = source[0].Length;
+            if (source.Any(row => row.Length != SecondDim))
             {
                 throw new InvalidOperationException("The given jagged array is not rectangular.");
             }
+
+            var result = new T[FirstDim, SecondDim];
+            for (int i = 0; i < FirstDim; ++i)
+                for (int j = 0; j < SecondDim; ++j)
+                    result[i, j] = source[i][j];
+
+            return result;
         }
 
         #endregion
@@ -182,8 +194,8 @@ namespace UtilitiesCS
         /// <param name="options">Defines how matches are performed. 
         /// See also <see cref="StringSearchOptions"/>.</param>
         /// <returns>String array with elements that match the criteria. Null if no matches</returns>
-        public static string[] SearchArry4Str(this string[] sourceArray, 
-                                              string searchString = "", 
+        public static string[] SearchArry4Str(this string[] sourceArray,
+                                              string searchString = "",
                                               SearchOptions options = SearchOptions.Standard)
         {
             if (searchString.Trim().Length != 0)
@@ -253,9 +265,9 @@ namespace UtilitiesCS
             ExactComplement = 4
         }
 
-        #endregion 
+        #endregion
 
-        
+
         public static T[] FlattenArrayTree<T>(this object node)
         {
             return FlattenArrayTree<T>(node, true).ToArray();
@@ -269,22 +281,22 @@ namespace UtilitiesCS
             }
             catch (Exception)
             {
-                return default;                
+                return default;
             }
-            
+
         }
 
-        internal static List<T> FlattenArrayTree<T>(this object node, bool strict) 
-        { 
-            if (strict || node.IsArray() || node is T) 
-            { 
+        internal static List<T> FlattenArrayTree<T>(this object node, bool strict)
+        {
+            if (strict || node.IsArray() || node is T)
+            {
                 List<T> result = new List<T>();
                 FlattenArrayTree(node, strict, ref result);
                 return result;
             }
             else { return null; }
         }
-        
+
         internal static void FlattenArrayTree<T>(this object node, bool strict, ref List<T> result)
         {
             if (node.IsArray())
@@ -297,13 +309,13 @@ namespace UtilitiesCS
                 else
                 {
                     var branches = (object[])node;
-                    foreach (var branch in branches) 
-                    { 
-                        branch.FlattenArrayTree(strict, ref result); 
+                    foreach (var branch in branches)
+                    {
+                        branch.FlattenArrayTree(strict, ref result);
                     }
                 }
             }
-            else if (node is T) { result.Append((T)node);}
+            else if (node is T) { result.Append((T)node); }
             else
             {
                 if (strict)
@@ -311,14 +323,14 @@ namespace UtilitiesCS
                     throw new ArgumentException($"node is of type {node.GetType().Name}. Array elements in " +
                                                 $"{nameof(FlattenArrayTree)} must be arrays or of type {typeof(T).Name}.");
                 }
-                else 
+                else
                 {
                     result.Add(default(T));
                 }
             }
         }
-        
-        
+
+
 
         public static bool IsArray<T>(this object container) => container.GetType().IsArray && typeof(T).IsAssignableFrom(container.GetType().GetElementType());
         public static bool IsArray(this object container) => container.GetType().IsArray;

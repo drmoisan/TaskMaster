@@ -14,13 +14,13 @@ namespace UtilitiesCS.NewtonsoftHelpers
     {
         public ConcurrentDictionary<TKey, TValue> ConcurrentDictionary { get; set; }
         public object RemainingObject { get; set; }
-        public Dictionary<string, object> AdditionalFields { get; private set; }     
+        public Dictionary<string, object> AdditionalFields { get; private set; }
         public Dictionary<string, object> AdditionalProperties { get; private set; }
 
         public DerivedCompositionConverter_ConcurrentDictionary() { }
-        
+
         public DerivedCompositionConverter_ConcurrentDictionary(TDerived derivedInstance) => ToCompositionOld(derivedInstance);
-        
+
         public DerivedCompositionConverter_ConcurrentDictionary<TDerived, TKey, TValue> ToCompositionOld(TDerived derivedInstance)
         {
             derivedInstance.ThrowIfNull();
@@ -39,7 +39,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
 
             var derivedProperties = derivedType
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(property => property.DeclaringType != baseType);                                           
+                .Where(property => property.DeclaringType != baseType);
 
             foreach (var field in derivedFields)
             {
@@ -194,7 +194,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
             return newClassInstance;
         }
 
-        public DerivedCompositionConverter_ConcurrentDictionary<TDerived, TKey, TValue> ToComposition(TDerived derivedInstance) 
+        public DerivedCompositionConverter_ConcurrentDictionary<TDerived, TKey, TValue> ToComposition(TDerived derivedInstance)
         {
             derivedInstance.ThrowIfNull();
             ConcurrentDictionary = derivedInstance;

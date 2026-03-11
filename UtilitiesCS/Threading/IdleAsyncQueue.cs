@@ -28,7 +28,7 @@ namespace UtilitiesCS.Threading
 
         public static void AddEntry(bool useUiThread, Func<Task> actionAsync)
         {
-            if (_subscribeGuard.CheckAndSetFirstCall) 
+            if (_subscribeGuard.CheckAndSetFirstCall)
             {
                 ApplicationIdleTimer.Subscribe(OnApplicationIdle);
                 logger.Debug($"{nameof(IdleAsyncQueue)}.{nameof(AddEntry)} subscribed to {nameof(ApplicationIdleTimer)}");
@@ -38,7 +38,7 @@ namespace UtilitiesCS.Threading
 
         private static ThreadSafeSingleShotGuard _subscribeGuard = new ThreadSafeSingleShotGuard();
 
-        private static TimedBatchAction _unsubscribe = new (TimeSpan.FromSeconds(3), () =>
+        private static TimedBatchAction _unsubscribe = new(TimeSpan.FromSeconds(3), () =>
         {
             ApplicationIdleTimer.Unsubscribe(OnApplicationIdle);
             logger.Debug($"{nameof(IdleAsyncQueue)} unsubscribed from {nameof(ApplicationIdleTimer)}");
@@ -46,7 +46,7 @@ namespace UtilitiesCS.Threading
         });
 
         private static ConcurrentQueue<(bool UiThread, Func<Task> AsyncAction)> Entries { get; } = new();
-                
+
         private static async void OnApplicationIdle(ApplicationIdleTimer.ApplicationIdleEventArgs e)
         {
             if (e.IdleDuration.TotalMilliseconds > IdleActionDuration)
@@ -75,7 +75,7 @@ namespace UtilitiesCS.Threading
                         logger.Error(ex.Message, ex);
                     }
                 }
-                else 
+                else
                 {
                     _unsubscribe.RequestAction();
                 }

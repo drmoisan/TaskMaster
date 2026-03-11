@@ -8,6 +8,7 @@ namespace UtilitiesCS.Test
     public class InputBox_Test
     {
         [TestMethod]
+        [Ignore("Interactive popup dialog test; excluded from unattended test runs.")]
         public void ShowDialog_Test()
         {
             string result = InputBox.ShowDialog("Test to see if this works", "Title", "Random text");

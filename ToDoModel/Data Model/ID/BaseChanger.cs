@@ -5,7 +5,6 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 
-
 namespace ToDoModel
 {
     public static class BaseChanger
@@ -13,7 +12,7 @@ namespace ToDoModel
         //public const string ConverterString = "0123456789abcdefghijklmnopqrstuvwxyz";
         public const string ConverterString = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private static int _maxBase = ConverterString.Length;
-        public static int MaxBase { get => _maxBase; }   
+        public static int MaxBase { get => _maxBase; }
 
         internal static void ValidateParams(int nbase)
         {
@@ -29,7 +28,7 @@ namespace ToDoModel
                     $"only supports conversions up to base {MaxBase}");
             }
         }
-        
+
         internal static void ValidateParams(int nbase, BigInteger num)
         {
             if (num < 0)
@@ -44,7 +43,7 @@ namespace ToDoModel
         {
             BigInteger r;
             StringBuilder baseBuilder = new StringBuilder(10);
-            
+
             ValidateParams(nbase, num);
 
             // in r we have the offset of the char that was converted to the new base
@@ -55,7 +54,7 @@ namespace ToDoModel
                 num /= nbase;
             }
 
-            baseBuilder.Insert(0,ConverterString[(int)num]);
+            baseBuilder.Insert(0, ConverterString[(int)num]);
 
             var prependCount = baseBuilder.Length % intMinDigits;
             switch (prependCount)
@@ -66,11 +65,11 @@ namespace ToDoModel
                 case 2:
                     baseBuilder.Insert(0, "00");
                     return baseBuilder.ToString();
-                default: 
+                default:
                     return baseBuilder.ToString();
             }
         }
-                
+
         public static int ToBase10(this char c, int nbase)
         {
             ValidateParams(nbase);
@@ -83,7 +82,7 @@ namespace ToDoModel
             }
             return idx;
         }
-                
+
         public static BigInteger ToBase10(this string strBase, int nbase)
         {
             string converter;
@@ -91,7 +90,7 @@ namespace ToDoModel
 
             converter = ConverterString;
             bigint.Equals(0L);
-                        
+
             var loopTo = strBase.Length;
             for (int i = 0; i < loopTo; i++)
             {
@@ -100,7 +99,7 @@ namespace ToDoModel
                 bigint += idx;
             }
 
-            return bigint;  
+            return bigint;
         }
 
     }

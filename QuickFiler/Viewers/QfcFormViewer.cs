@@ -91,7 +91,7 @@ namespace QuickFiler
         }
 
         #region IQfcFormViewer
-        
+
         public BackgroundWorker Worker => WorkerInternal;
         public TableLayoutPanel L1v0L2L3v_TableLayout { get => _l1v0L2L3v_TableLayout; set => _l1v0L2L3v_TableLayout = value; }
         public ItemViewer QfcItemViewerTemplate => _QfcItemViewerTemplate;

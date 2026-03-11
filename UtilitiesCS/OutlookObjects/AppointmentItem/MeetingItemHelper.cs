@@ -21,7 +21,7 @@ namespace UtilitiesCS
 
         #region Constructors, Initializers, and Destructors
 
-        public MeetingItemHelper() 
+        public MeetingItemHelper()
         {
             _attachmentsInfo = new(() => AttachmentsHelper.Select(x => x.AttachmentInfo).ToArray());
         }
@@ -525,7 +525,7 @@ img {
 
         internal string GetHtml()
         {
-            string body = _item.RTFBody;            
+            string body = _item.RTFBody;
             var regex = new Regex(@"(<body[\S\s]*?>)", RegexOptions.Multiline);
             string revisedBody = regex.Replace(body, "$1" + EmailHeader);
             //string revisedBody = body.Replace(@"<div class=""WordSection1"">", EmailHeader);

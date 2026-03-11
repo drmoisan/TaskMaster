@@ -20,15 +20,15 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestInitialize]
         public void TestInitialize()
         {
-            Console.SetOut(new DebugTextWriter());            
+            Console.SetOut(new DebugTextWriter());
             //this.mockRepository = new MockRepository(MockBehavior.Loose) { CallBase = true };
         }
 
         #region Helper Functions and Classes
-                
-        
 
-        
+
+
+
         #endregion Helper Functions and Classes
 
         [TestMethod]
@@ -105,7 +105,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Set up the expected output
             var expected = new SortedList<string, double>();
-            
+
             Enumerable.Range(8, 4)
                 .ForEach(i => expected.Add(
                     $".{40 - i:00}000{SampleTestSets.alphabet[i]}0",
@@ -121,7 +121,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             expected.Add($".50000new10", 0.500);
             //expected.Add($".50000shared30", 0.500);
 
-            
+
             //Console.WriteLine("Expected list should exclude:\n" +
             //    "dedicated3: does not meet minimum token count\n" +
             //    "shared3:    does not meet minimum token count\n" +
@@ -230,20 +230,20 @@ namespace UtilitiesCS.Test.EmailIntelligence
             };
 
             // Set up the expected output
-            var expected = new SortedList<string, double>() 
+            var expected = new SortedList<string, double>()
             {
                 { ".50000new10", 0.5000 },
                 { ".50000new20", 0.5000 },
                 { ".50000new30", 0.5000 }
             };
             expected.LogProbabilities("Expected Output");
-            
+
             // ===============
             // Act
             // ===============
             var actual = classifier.GetInterestingList(input);
             actual.LogProbabilities("Actual Output");
-            
+
             // ===============
             // Assert
             // ===============
@@ -418,7 +418,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Arrange
             var expected = SampleTestSets.GetClassifier3c().Standardize();
             var parent = expected.Parent.Clone() as SubClassifierGroup;
-            var matches = expected.Match.TokenFrequency.ToDictionary();            
+            var matches = expected.Match.TokenFrequency.ToDictionary();
             CancellationToken token = default;
 
             // Act
@@ -515,7 +515,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public async Task FromTokenBaseAsync_05AllNull()
         {
             // Arrange
-            
+
             CancellationToken token = default;
 
             // Act
@@ -524,7 +524,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Assert
             Console.WriteLine("Test failed because did not throw ArgumentNullException");
-            Assert.Fail(); 
+            Assert.Fail();
         }
 
 
@@ -553,7 +553,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Assert
             Console.WriteLine("Test failed because did not throw ArgumentOutOfRangeException");
-            Assert.Fail(); 
+            Assert.Fail();
         }
 
 
@@ -575,10 +575,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
             classifier.Prob = new ConcurrentDictionary<string, double>(
                 prob.Select(x => new KeyValuePair<string, double>(x.Key, Math.Round(x.Value, 5)))
                 .OrderBy(x => x.Key).ToDictionary());
-            
+
             return classifier;
         }
-        
+
         public static SubBayesianClassifier ToBayesianClassifierSub(this BayesianClassifierShared classifier)
         {
             classifier ??= new BayesianClassifierShared();
@@ -616,12 +616,12 @@ namespace UtilitiesCS.Test.EmailIntelligence
             return actual;
         }
 
-        public static SubCorpus ToCorpusSub(this Corpus corpus) 
-        { 
+        public static SubCorpus ToCorpusSub(this Corpus corpus)
+        {
             corpus ??= new Corpus();
             return new SubCorpus(corpus);
         }
-        
+
         public static void LogProbabilities(this IDictionary<string, double> probabilities, string title)
         {
             probabilities ??= new Dictionary<string, double>();
@@ -647,8 +647,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 double actualValue = 0;
                 actual.TryGetValue(key, out actualValue);
                 double diff = expectedValue - actualValue;
-                return new string[] 
-                { 
+                return new string[]
+                {
                     key,
                     expectedValue == 0 ? "" : expectedValue.ToString("N4"),
                     actualValue == 0 ? "" : actualValue.ToString("N4"),
@@ -693,26 +693,26 @@ namespace UtilitiesCS.Test.EmailIntelligence
             actual ??= new Dictionary<string, int>();
 
             var keys = expected.Keys.Union(actual.Keys).OrderBy(x => x).ToList();
-            var jagged = keys.Select(key => 
+            var jagged = keys.Select(key =>
             {
                 int expectedValue = 0;
                 expected.TryGetValue(key, out expectedValue);
                 int actualValue = 0;
                 actual.TryGetValue(key, out actualValue);
                 int diff = expectedValue - actualValue;
-                return new string[] 
-                { 
+                return new string[]
+                {
                     key,
                     expectedValue == 0 ? "" : expectedValue.ToString("N0"),
-                    actualValue == 0 ? "" : actualValue.ToString("N0"), 
+                    actualValue == 0 ? "" : actualValue.ToString("N0"),
                     diff == 0 ? "" : diff.ToString("N0") };
             }).ToArray();
 
             var text = jagged.ToFormattedText(
-                ["Token", "Expected", "Actual", "Diff"], 
+                ["Token", "Expected", "Actual", "Diff"],
                 [Enums.Justification.Left, Enums.Justification.Center, Enums.Justification.Center, Enums.Justification.Center],
                 title);
-                        
+
             Console.WriteLine(text);
         }
 

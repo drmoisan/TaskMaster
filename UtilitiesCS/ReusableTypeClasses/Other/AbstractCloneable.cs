@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 namespace UtilitiesCS.ReusableTypeClasses
 {
     // From https://stackoverflow.com/questions/21116554/proper-way-to-implement-icloneable
-    public abstract class AbstractCloneable: ICloneable
+    public abstract class AbstractCloneable : ICloneable
     {
-        public object Clone() 
-        { 
-            var clone = (AbstractCloneable) this.MemberwiseClone();
+        public object Clone()
+        {
+            var clone = (AbstractCloneable)this.MemberwiseClone();
             HandleCloned(clone);
             return clone;
         }
@@ -23,7 +23,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         }
     }
 
-    
+
     // Example of how to use the AbstractClonable class.
     class ConcreteCloneableExample : AbstractCloneable
     {

@@ -26,19 +26,20 @@ namespace UtilitiesCS
         public static Frame<int, string> GetEmailDataInView(Explorer activeExplorer)
         {
             Outlook.Table table = activeExplorer.GetTableInView();
+            var currentFolder = activeExplorer.CurrentFolder;
             var storeID = activeExplorer.CurrentFolder.StoreID;
 
-            AddQfcColumns(table);
+            AddQfcColumns(table, currentFolder);
 
             (object[,] data, Dictionary<string, int> columnInfo) = table.ETL();
-            
+
             var records = Enumerable.Range(0, data.GetLength(0)).Select(i =>
             {
                 DateTime sentOn = DateTime.MaxValue;
                 var dateField = data[i, columnInfo["SentOn"]];
                 if (dateField is not null) { DateTime.TryParse(dateField.ToString(), out sentOn); }
                 if (dateField is null) { sentOn = DateTime.MaxValue; }
-                
+
                 return new
                 {
                     EntryId = data[i, columnInfo["EntryID"]],
@@ -64,23 +65,24 @@ namespace UtilitiesCS
             //logger.Debug(strAry.ToFormattedText());
 
             var df = Frame.FromRecords(records);
-            
+
             return df;
         }
 
         public static async Task<Frame<int, string>> GetEmailDataInViewAsync(Explorer activeExplorer, CancellationToken token, CancellationTokenSource tokenSource, ProgressTracker progress)
         {
             token.ThrowIfCancellationRequested();
-            
+
             //logger.Debug($"{nameof(GetEmailDataInViewAsync)}: {activeExplorer.CurrentFolder.Name}");
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(OlTableExtensions.GetTableInViewAsync)} ...");
             Outlook.Table table = await activeExplorer.GetTableInViewAsync(token, 0);
             //table.EnumerateTable();
+            var currentFolder = activeExplorer.CurrentFolder;
             var storeID = activeExplorer.CurrentFolder.StoreID;
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(AddQfcColumnsAsync)} ...");
-            await AddQfcColumnsAsync(table, token, 0);
+            await AddQfcColumnsAsync(table, currentFolder, token, 0);
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(OlTableExtensions.EtlAsync)} ...");
             (object[,] data, Dictionary<string, int> columnInfo) = await table.EtlAsync(token, tokenSource, 0, progress.Increment(2).SpawnChild(96));
@@ -120,8 +122,8 @@ namespace UtilitiesCS
                 );
                 return record;
             });
-            
-            
+
+
             return records;
         }
 
@@ -151,7 +153,7 @@ namespace UtilitiesCS
             if (!acceptableTriage.Contains(triage)) { return "Z"; }
             return triage;
         }
-        
+
         private static DateTime DateFrom2dPosition(object[,] data, int column, int row)
         {
             DateTime date = DateTime.MaxValue;
@@ -162,8 +164,19 @@ namespace UtilitiesCS
             return date;
         }
 
-        private static void AddQfcColumns(Table table)
+        private static void AddQfcColumns(Table table, MAPIFolder folder)
         {
+            if (!EnsureTriageColumnExists(folder))
+            {
+                System.Windows.Forms.MessageBox.Show(
+                    "Cannot proceed without the required 'Triage' column. Execution will stop.",
+                    "Missing Required Column",
+                    System.Windows.Forms.MessageBoxButtons.OK,
+                    System.Windows.Forms.MessageBoxIcon.Error);
+
+                throw new InvalidOperationException("Required column 'Triage' does not exist.");
+            }
+
             table.Columns.Add("SentOn");
             table.Columns.Add(MAPIFields.Schemas.ConversationId);
             table.Columns.Add(MAPIFields.Schemas.Triage);
@@ -172,27 +185,85 @@ namespace UtilitiesCS
             table.Columns.Remove("LastModificationTime");
         }
 
-        private static async Task AddQfcColumnsAsync(Table table, CancellationToken token, int counter)
+        private static async Task AddQfcColumnsAsync(Table table, MAPIFolder folder, CancellationToken token, int counter)
         {
             try
             {
-                await Task.Run(() => AddQfcColumns(table), token).TimeoutAfter(3000);
+                await Task.Run(() => AddQfcColumns(table, folder), token).TimeoutAfter(3000);
             }
             catch (TaskCanceledException)
             {
                 if (!token.IsCancellationRequested && counter < 2)
                 {
-                    await AddQfcColumnsAsync(table, token, counter + 1);
+                    await AddQfcColumnsAsync(table, folder, token, counter + 1);
                 }
             }
             catch (TimeoutException)
             {
                 if (!token.IsCancellationRequested && counter < 2)
                 {
-                    await AddQfcColumnsAsync(table, token, counter + 1);
+                    await AddQfcColumnsAsync(table, folder, token, counter + 1);
                 }
             }
 
+        }
+
+        private static bool EnsureTriageColumnExists(MAPIFolder folder)
+        {
+            if (folder is null)
+            {
+                return false;
+            }
+
+            if (HasUserDefinedProperty(folder, "Triage"))
+            {
+                return true;
+            }
+
+            var createResult = System.Windows.Forms.MessageBox.Show(
+                "The required 'Triage' column does not exist in this folder.\nWould you like to create it now?",
+                "Create Required Column",
+                System.Windows.Forms.MessageBoxButtons.YesNo,
+                System.Windows.Forms.MessageBoxIcon.Warning);
+
+            if (createResult != System.Windows.Forms.DialogResult.Yes)
+            {
+                return false;
+            }
+
+            try
+            {
+                folder.UserDefinedProperties.Add("Triage", OlUserPropertyType.olText, true, Type.Missing);
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show(
+                    $"Failed to create 'Triage' column.\n{ex.Message}",
+                    "Column Creation Failed",
+                    System.Windows.Forms.MessageBoxButtons.OK,
+                    System.Windows.Forms.MessageBoxIcon.Error);
+
+                return false;
+            }
+        }
+
+        private static bool HasUserDefinedProperty(MAPIFolder folder, string propertyName)
+        {
+            if (folder?.UserDefinedProperties is null || string.IsNullOrWhiteSpace(propertyName))
+            {
+                return false;
+            }
+
+            foreach (UserDefinedProperty property in folder.UserDefinedProperties)
+            {
+                if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         internal static Series<int, string> GetColumnEid(object[] slice)
@@ -212,6 +283,20 @@ namespace UtilitiesCS
 
         public static Frame<int, string> FromArray2D(object[,] data, Dictionary<string, int> columnDictionary)
         {
+            if (data is null) { return null; }
+            if (columnDictionary is null) { return null; }
+
+            if (data.GetLength(0) == 0)
+            {
+                var emptyColumns = columnDictionary.Keys.Select(columnName =>
+                {
+                    var sb = new SeriesBuilder<int>();
+                    return KeyValue.Create(columnName, sb.Series);
+                });
+
+                return Frame.FromColumns(emptyColumns);
+            }
+
             var rows = Enumerable.Range(0, data.GetLength(0)).Select(i =>
             {
                 var sb = new SeriesBuilder<string>();
@@ -248,7 +333,7 @@ namespace UtilitiesCS
                 IEnumerable<string> objFields,
                 IEnumerable<int> objIndices) = await table.EtlPrepAsync(cancel);
             var jagged = await rows.EtlByRowAsync(objectConverters, binIndices, objFields, objIndices).ToArrayAsync();
-            
+
             var data = jagged.To2D();
             Frame<int, string> df = FromArray2D(data: data, columnDictionary);
 
@@ -270,7 +355,7 @@ namespace UtilitiesCS
 
             Frame<int, string> df = FromArray2D(data: data, columnInfo);
 
-            return df;   
+            return df;
         }
 
         public static Frame<int, string> FromDefaultFolder(Stores stores,
@@ -285,15 +370,28 @@ namespace UtilitiesCS
                                                         folderEnum: folderEnum,
                                                         removeColumns: removeColumns,
                                                         addColumns: addColumns);
-                
+
+                if (dfTemp is null ||
+                    dfTemp.RowCount == 0 ||
+                    !dfTemp.ColumnKeys.Contains("EntryID"))
+                {
+                    continue;
+                }
+
                 // Set the index to the EntryID to avoid duplicate integer index
-                var dfEid = dfTemp?.IndexRowsWith<int, string, string>(dfTemp.GetColumn<string>("EntryID").Values);
+                var dfEid = dfTemp.IndexRowsWith<int, string, string>(dfTemp.GetColumn<string>("EntryID").Values);
                 if (df is null) { df = dfEid; }
-                else if (dfTemp is not null) 
+                else if (dfEid is not null)
                 {
                     df = df.Merge(dfEid);
                 }
             }
+
+            if (df is null)
+            {
+                return Frame.FromColumns(new Dictionary<string, Series<int, object>>());
+            }
+
             // Set the index to the integer index as originally designed to maintain forward compatibility
             var df2 = df.IndexRowsWith(Enumerable.Range(0, df.RowCount));
             return df2;
@@ -307,7 +405,7 @@ namespace UtilitiesCS
 
         public static void DisplayDialog(this Frame<int, string> df)
         {
-            var rowNames = new List<string> { "Rows"};
+            var rowNames = new List<string> { "Rows" };
             DataTable table = df.ToDataTable(rowNames);
             table.DisplayDialog();
         }
@@ -326,16 +424,16 @@ namespace UtilitiesCS
         //    log4net.ILog logger = log4net.LogManager.GetLogger(declaringType);
         //    logger.Debug(frame.Format(15, 15, 15, 15, printTypes: false, showInfo: true));
         //}
-        
+
         public static void PrintToLog<TRowKey, TColumnKey>(this Frame<TRowKey, TColumnKey> frame, log4net.ILog logger, [CallerArgumentExpression(nameof(frame))] string frameName = "")
         {
             var frameText = frame.Format(15, 15, 15, 15, printTypes: false, showInfo: true);
-            
+
             // Find the width of the frame in characters. If multi-line, find the position of the newline character.
             // Else use the length of the entire string
             var loc = frameText.IndexOf("\n");
             if (loc == -1) { loc = frameText.Length; }
-            var separator = new string('_',loc);
+            var separator = new string('_', loc);
             logger.Debug($"\n{frameName}\n{separator}\n{frame.Format(15, 15, 15, 15, printTypes: false, showInfo: true)}\n");
         }
 
@@ -349,15 +447,15 @@ namespace UtilitiesCS
         {
             var idx = other.RowIndex.Keys.ToArray();
             if (idx.Length == 0) { return df; }
-            df = df.Where(row => !idx.Contains(row.Key));            
+            df = df.Where(row => !idx.Contains(row.Key));
             return df;
         }
 
-        
 
-        public static TColumn[] GetDuplicateEntriesByColumn<TRow, TColumn, TColumnData>(this Frame<TRow, TColumn> df, TColumn columnId)
+
+        public static TColumnData[] GetDuplicateEntriesByColumn<TRow, TColumn, TColumnData>(this Frame<TRow, TColumn> df, TColumn columnId)
         {
-            var column = df.GetColumn<TColumn>(columnId);
+            var column = df.GetColumn<TColumnData>(columnId);
             var duplicates = column.Values
                 .GroupBy(x => x)
                 .Where(group => group.Count() > 1)

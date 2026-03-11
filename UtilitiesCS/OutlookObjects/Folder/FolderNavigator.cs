@@ -8,7 +8,7 @@ namespace UtilitiesCS
 
     public static class FolderNavigator
     {
-        
+
         public static Folder GetOutlookFolder(string FolderPath, Application OlApp)
         {
             Folder TestFolder;
@@ -24,7 +24,7 @@ namespace UtilitiesCS
             TestFolder = (Folder)OlApp.Session.Folders[FoldersArray[0]];
             if (TestFolder is not null)
             {
-                var loopTo = FoldersArray.Length -1;
+                var loopTo = FoldersArray.Length - 1;
                 for (i = 0; i <= loopTo; i++)
                 {
                     Folders SubFolders;
@@ -40,7 +40,7 @@ namespace UtilitiesCS
             return TestFolder;
 
         }
-        
+
         public static string[] OlFolderlist_GetAll(IOlObjects OlObjects)
         {
             string[] OlFolderlist_GetAllRet = default;

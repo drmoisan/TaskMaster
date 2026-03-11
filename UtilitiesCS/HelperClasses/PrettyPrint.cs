@@ -29,7 +29,7 @@ namespace UtilitiesCS
         public static string Pretty(this DataFrameRow row) => row.Select(x => x?.ToString() ?? string.Empty).StringJoin(" ");
 
         public static string ToMarkdown(this DataFrame df) => ToStringArray2D(df).ToMarkdown();
-        
+
         private static string StringJoin(this IEnumerable<string> strings) => string.Join(" ", strings.Select(x => x.ToString()));
 
         private static string[,] ToStringArray2D(DataFrame df)
@@ -114,7 +114,7 @@ namespace UtilitiesCS
         }
 
         private static readonly string[] _aggregators = ["total", "subtotal","average",
-            "mean","median","min","max","stddev", "variance", "count", 
+            "mean","median","min","max","stddev", "variance", "count",
             "sum", "mode", "range","skewness", "kurtosis", "percentile", "quartile"];
 
         public static string ToFormattedText(this IDictionary<string, float> dict, float decimalPlaces)
@@ -132,11 +132,11 @@ namespace UtilitiesCS
         }
 
         public static string ToFormattedText<TKey, TValue>(
-            this IDictionary<TKey, TValue> dict, 
-            Func<TKey, string> keyConverter, 
-            Func<TValue, string> valueConverter, 
-            string[] headers = null, 
-            Enums.Justification[] justifications = default, 
+            this IDictionary<TKey, TValue> dict,
+            Func<TKey, string> keyConverter,
+            Func<TValue, string> valueConverter,
+            string[] headers = null,
+            Enums.Justification[] justifications = default,
             string title = null)
         {
             var jagged = dict.Select(kvp => new string[] { keyConverter(kvp.Key), valueConverter(kvp.Value) }).ToArray();
@@ -147,25 +147,25 @@ namespace UtilitiesCS
         {
             int columnCount = GetJaggedColumnCount(ref jagged, headers, title);
             if (columnCount == 0) { return "Object is empty and has no headers or title"; }
-            
+
 
             int[] columnWidths = GetJaggedColumnWidths(jagged, headers, columnCount);
             int tableWidth = columnWidths.Sum() + columnWidths.Length * 2 + 3;
 
             StringBuilder sb = new();
-            
+
             AppendJaggedTitle(ref sb, title, tableWidth);
 
             justifications ??= InferDefaultJustifications(jagged, columnCount);
 
             AppendJaggedHeaders(ref sb, headers, title, columnWidths, tableWidth);
-            
+
             sb.AppendLine(new string('=', tableWidth));
 
             AppendJaggedEmptyMessage(ref sb, jagged, tableWidth);
 
             AppendJaggedRows(ref sb, jagged, justifications, columnWidths, tableWidth);
-            
+
             sb.AppendLine(new string('=', tableWidth));
 
             return sb.ToString();
@@ -177,7 +177,7 @@ namespace UtilitiesCS
             if (jagged.Length == 0) { return Enumerable.Repeat(Enums.Justification.Left, columnCount).ToArray(); }
             return Enumerable
                 .Range(0, columnCount)
-                .Select(i => 
+                .Select(i =>
                 {
                     if (double.TryParse(jagged[0][i], out _))
                         return Enums.Justification.Right;
@@ -189,11 +189,11 @@ namespace UtilitiesCS
 
         private static void AppendJaggedRows(
             ref StringBuilder sb,
-            string[][] jagged, 
-            Enums.Justification[] justifications, 
-            int[] columnWidths, 
+            string[][] jagged,
+            Enums.Justification[] justifications,
+            int[] columnWidths,
             int tableWidth)
-        {   
+        {
             for (int i = 0; i < jagged.Length; i++)
             {
                 // Add divider if the row is an aggregator
@@ -205,21 +205,21 @@ namespace UtilitiesCS
         }
 
         private static void AppendJaggedRow(
-            string[] row, 
-            Enums.Justification[] justifications, 
-            int[] columnWidths, 
+            string[] row,
+            Enums.Justification[] justifications,
+            int[] columnWidths,
             StringBuilder sb)
         {
             // Add left border
             sb.Append("| ");
-            
+
             // Format and append each cell
             for (int j = 0; j < row.Length; j++)
             {
                 var cellText = FormatJaggedCell(row[j], justifications[j], columnWidths[j]);
                 sb.Append(cellText);
             }
-            
+
             // Add right border
             sb.AppendLine("|");
         }
@@ -258,23 +258,23 @@ namespace UtilitiesCS
 
         public static string ToJustifiedText(this string input, int width)
         {
-            if (width <= 0 ) { throw new ArgumentOutOfRangeException(nameof(width), $"{nameof(width)} must be greater than 0");}
-            
+            if (width <= 0) { throw new ArgumentOutOfRangeException(nameof(width), $"{nameof(width)} must be greater than 0"); }
+
             var text = input?.Trim();
             if (text.IsNullOrEmpty()) { return new string(' ', width); }
 
             if (text.Length >= width)
                 return text.Substring(0, width);
-            
+
             var spacesPerLetter = (int)Math.Truncate(width / (double)text.Length);
 
             Regex rx = new(@"([^ ]+)");
             var words = rx.Matches(text).Cast<Match>().Select(m => m.Groups[1].Value).ToArray();
             var wordCount = words.Count();
-            var letterCount = (int)(words.Sum(w => w.Length + (w.Length-1) * (double)(spacesPerLetter-1)));
+            var letterCount = (int)(words.Sum(w => w.Length + (w.Length - 1) * (double)(spacesPerLetter - 1)));
 
-            var spacesPerWord = Math.Max(1,(int)Math.Truncate((width - letterCount) / (double)(wordCount - 1)));
-            var wordSpacer = wordCount <= 1 ? " ": new string(' ', spacesPerWord);
+            var spacesPerWord = Math.Max(1, (int)Math.Truncate((width - letterCount) / (double)(wordCount - 1)));
+            var wordSpacer = wordCount <= 1 ? " " : new string(' ', spacesPerWord);
 
             if (spacesPerLetter > 1)
             {
@@ -286,7 +286,7 @@ namespace UtilitiesCS
                 text = words.StringJoin(wordSpacer);
             }
 
-            return text.PadRight(width);    
+            return text.PadRight(width);
         }
 
         private static void FormatJaggedCell2(string[] row, Enums.Justification[] justifications, int[] columnWidths, StringBuilder sb, int j)
@@ -377,9 +377,9 @@ namespace UtilitiesCS
                     }
                     if (line.Length > 0)
                         lines.Add($"| {line.ToString().PadToCenter(tableWidth - 3)}|");
-                    
+
                     foreach (var l in lines) { sb.AppendLine(l); }
-                    
+
                 }
             }
         }
@@ -527,14 +527,14 @@ namespace UtilitiesCS
         {
             DgvForm dfViewer = new();
             dfViewer.Show();
-            
+
             int diffHeight = dfViewer.Height - dfViewer.Dgv.Height;
             int diffWidth = dfViewer.Width - dfViewer.Dgv.Width;
             dfViewer.Dgv.Dock = DockStyle.None;
 
             dfViewer.Dgv.DataSource = table;
 
-            
+
             for (int i = 0; i < dfViewer.Dgv.Columns.Count - 1; i++)
             {
                 dfViewer.Dgv.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;

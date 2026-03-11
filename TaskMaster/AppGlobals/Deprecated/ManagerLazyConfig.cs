@@ -17,9 +17,9 @@ namespace TaskMaster.AppGlobals
     //        System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
     //    public ManagerLazyConfig() { }
-        
+
     //    public List<ManagerLazyConfigStruct> Configurations { get; set; }
-        
+
     //    private JsonSerializerSettings GetSettings()
     //    {
     //        var settings = GetDefaultSettings();

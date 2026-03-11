@@ -11,7 +11,7 @@ namespace TaskMaster
 {
 
     public class AppFileSystemFolderPaths : IFileSystemFolderPaths
-    {       
+    {
         public AppFileSystemFolderPaths()
         {
             LoadFolders();
@@ -23,7 +23,7 @@ namespace TaskMaster
 
         #region ctor
 
-        private AppFileSystemFolderPaths(bool async){}
+        private AppFileSystemFolderPaths(bool async) { }
 
         async public static Task<AppFileSystemFolderPaths> LoadAsync()
         {
@@ -36,7 +36,7 @@ namespace TaskMaster
         #endregion ctor
 
         #region Methods
-                
+
         private void CreateMissingPaths(string filepath)
         {
             if (!Directory.Exists(filepath))
@@ -49,7 +49,7 @@ namespace TaskMaster
         {
             if (!Directory.Exists(filepath))
             {
-                await Task.Run(()=> Directory.CreateDirectory(filepath));
+                await Task.Run(() => Directory.CreateDirectory(filepath));
             }
         }
 
@@ -63,14 +63,14 @@ namespace TaskMaster
         private bool TryAddSpecialFolder(string name, string[] pathParts)
         {
             if (name.IsNullOrEmpty()) { return false; }
-            
+
             else if (pathParts.IsNullOrEmpty())
             {
                 logger.Debug($"Error in {nameof(TryAddSpecialFolder)} for key {nameof(name)} because {nameof(pathParts)} is null or empty. {TraceUtility.GetMyTraceString(new System.Diagnostics.StackTrace())}");
                 return false;
             }
-            
-            else if (pathParts.Any(x => x is null || x.Trim().IsNullOrEmpty())) 
+
+            else if (pathParts.Any(x => x is null || x.Trim().IsNullOrEmpty()))
             {
                 var locations = Enumerable.Range(0, pathParts.Length).Where(i => pathParts[i] is null).Select(i => i.ToString()).SentenceJoin();
                 logger.Debug($"Error in {nameof(TryAddSpecialFolder)} for key {nameof(name)} because {nameof(pathParts)} has null elements at {locations}. {TraceUtility.GetMyTraceString(new System.Diagnostics.StackTrace())}");
@@ -78,14 +78,14 @@ namespace TaskMaster
             }
 
             SpecialFolders ??= [];
-            
+
             try
             {
                 SpecialFolders[name] = Path.Combine(pathParts);
                 CreateMissingPaths(SpecialFolders[name]);
                 return true;
             }
-            
+
             catch (Exception e)
             {
                 logger.Error(e.Message, e);
@@ -119,20 +119,20 @@ namespace TaskMaster
             TryAddSpecialFolder("Personal", () => [Environment.GetFolderPath(Environment.SpecialFolder.Personal)]);
             TryAddSpecialFolder("ApplicationData", () => [Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)]);
             TryAddSpecialFolder("Desktop", () => [Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)]);
-            TryAddSpecialFolder("NetworkShortcuts", () => [Environment.GetFolderPath(Environment.SpecialFolder.NetworkShortcuts)]);            
-            if (!TryAddSpecialFolder("OneDrivePersonal", () => [Environment.GetEnvironmentVariable("OneDriveConsumer")])) 
+            TryAddSpecialFolder("NetworkShortcuts", () => [Environment.GetFolderPath(Environment.SpecialFolder.NetworkShortcuts)]);
+            if (!TryAddSpecialFolder("OneDrivePersonal", () => [Environment.GetEnvironmentVariable("OneDriveConsumer")]))
             {
                 TryAddSpecialFolder("OneDrivePersonal", () => [Environment.GetEnvironmentVariable("OneDrivePersonal")]);
             }
-            if (!TryAddSpecialFolder("OneDrive", () => [Environment.GetEnvironmentVariable("OneDriveCommercial")])) 
+            if (!TryAddSpecialFolder("OneDrive", () => [Environment.GetEnvironmentVariable("OneDriveCommercial")]))
             {
-                if (!TryAddSpecialFolder("OneDrive", () => [Environment.GetEnvironmentVariable("OneDrive")])) 
+                if (!TryAddSpecialFolder("OneDrive", () => [Environment.GetEnvironmentVariable("OneDrive")]))
                 {
-                    if (!TryAddSpecialFolder("OneDrive", () => [Environment.GetEnvironmentVariable("OneDrivePersonal")])) 
+                    if (!TryAddSpecialFolder("OneDrive", () => [Environment.GetEnvironmentVariable("OneDrivePersonal")]))
                     {
-                        if(SpecialFolders.Count > 0) 
+                        if (SpecialFolders.Count > 0)
                         {
-                            if(SpecialFolders.TryGetValue("AppData", out var appData))
+                            if (SpecialFolders.TryGetValue("AppData", out var appData))
                             {
                                 TryAddSpecialFolder("OneDrive", [appData]);
                             }
@@ -151,13 +151,13 @@ namespace TaskMaster
             TryAddSpecialFolder("PreReads", [oneDrive, "_  Workflow", "_ Pre-Reads"]);
             TryAddSpecialFolder("System", () => [Environment.GetFolderPath(Environment.SpecialFolder.System)]);
             TryAddSpecialFolder("Root", () => [Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System))]);
-            
+
             if (SpecialFolders.TryGetValue("MyDocuments", out var myDocuments))
             {
                 _remap = Path.Combine(myDocuments, "dictRemap.csv");
             }
 
-            TryAddSpecialFolder("PythonStaging", [flow, "Combined", "data"]);            
+            TryAddSpecialFolder("PythonStaging", [flow, "Combined", "data"]);
         }
 
         //TODO: Cleanup Staging Files so that they are in one or two directories and not all over the place

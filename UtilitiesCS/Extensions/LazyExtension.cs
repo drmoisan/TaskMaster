@@ -8,7 +8,7 @@ namespace UtilitiesCS.Extensions.Lazy
 {
     public static class LazyExtension
     {
-        public static Lazy<T> ToLazy<T>(this T value) where T: class
+        public static Lazy<T> ToLazy<T>(this T value) where T : class
         {
             return new Lazy<T>(value.Return);
         }
@@ -28,10 +28,10 @@ namespace UtilitiesCS.Extensions.Lazy
             return new LazyTry<T>(() => value);
         }
 
-        public static Func<T> AsFunc<T>(this T value) where T: class
+        public static Func<T> AsFunc<T>(this T value) where T : class
         {
             return new Func<T>(value.Return);
-        }        
+        }
 
         internal static T Return<T>(this T value) where T : class
         {

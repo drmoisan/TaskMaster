@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
-    public interface IIDList: ISerializableList<string>
+    public interface IIDList : ISerializableList<string>
     {
         int MaxLengthOfID { get; }
         void CompressToDoIDs(IApplicationGlobals appGlobals);

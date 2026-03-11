@@ -35,8 +35,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             await Task.Run(FilterView);
         }
 
-        public void FilterView() 
-        { 
+        public void FilterView()
+        {
             var choices = new List<string> { "A", "B", "C" };
             var selections = Parent.Globals.TD.SelectFromList(choices);
             var triageValues = selections?.Select(x => x.Last()).ToArray() ?? [];
@@ -49,7 +49,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             {
                 Explorer explorer = Parent?.Globals?.Ol?.App?.ActiveExplorer();
                 if (explorer is null) { logger.Debug("Could not grab handle on Explorer"); return; }
-                
+
                 View view = explorer.CurrentView as View;
                 if (view is null) { logger.Debug("Could not grab handle on View"); return; }
 
@@ -68,7 +68,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 string strippedFilter = ParseAndStripFilter(existingFilter);
                 logger.Debug($"Stripped filter: {strippedFilter}");
 
-                string newFilter = triageValues.IsNullOrEmpty()? "" : 
+                string newFilter = triageValues.IsNullOrEmpty() ? "" :
                     string.Join(" OR ", triageValues.Select(value => $"[Triage] = '{value}'"));
 
                 if (!existingFilter.IsNullOrEmpty())
@@ -99,8 +99,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 }
 
                 view.Apply();
-                
-                
+
+
             }
             catch (System.Exception ex)
             {
@@ -108,7 +108,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             }
         }
 
-        public TreeNode<string> StripFilter(Regex regex, TreeNode<string> tree) 
+        public TreeNode<string> StripFilter(Regex regex, TreeNode<string> tree)
         {
             foreach (var child in tree.Children)
             {
@@ -116,9 +116,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             }
 
             var match = regex.Match(tree.Value);
-            if (match.Success) 
+            if (match.Success)
             {
-                if (tree.Parent is not null) 
+                if (tree.Parent is not null)
                 {
                     var parent = tree.Parent;
                     parent.Children.Remove(tree);
@@ -126,13 +126,13 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                     if (parent.Parent is not null)
                     {
                         var grandParent = parent.Parent;
-                        if (parent.ChildCount == 1) 
+                        if (parent.ChildCount == 1)
                         {
                             var brother = parent.Children.First();
                             grandParent.Parent.RemoveChild(parent);
                             parent.Parent = null;
                             grandParent.AddChild(brother);
-                            brother.Parent = grandParent;                            
+                            brother.Parent = grandParent;
                         }
                         else
                         {
@@ -165,13 +165,15 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 return tree;
             }
         }
-        
+
         public string ParseAndStripFilter(string strFilter)
         {
-            var pattern = @"((" + Regex.Escape($"\"{MAPIFields.Schemas.Triage}\" LIKE '%[ABC]%'")+ @"( OR )?){1,3}";
-            //string strRegFilter = $"((\"{RegExSchemaSite}/Triage\" LIKE '%[ABC]%')( OR )?){1,3}";
-            Regex objRegex = new(pattern);
-            return objRegex.Replace(strFilter, "");
+            var triageField = Regex.Escape($"\"{MAPIFields.Schemas.Triage}\"");
+            var pattern = $@"(?:\s*(?:\(\s*)?{triageField}\s*(?:LIKE\s*'%[ABC]%'|=\s*'[ABC]')\s*(?:\)\s*)?(?:OR\s*)?)+";
+            var strippedFilter = Regex.Replace(strFilter, pattern, "");
+            strippedFilter = Regex.Replace(strippedFilter, @"\(\s*\)", "");
+            strippedFilter = Regex.Replace(strippedFilter, @"\s{2,}", " ").Trim();
+            return strippedFilter;
         }
 
         public async Task TrainSelectionAsync(string triageId, CancellationToken token = default)
@@ -184,12 +186,12 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 .ToAsyncEnumerable()
                 .SelectAwaitWithCancellation(async (mailItem, token) => await MailItemHelper.FromMailItemAsync(mailItem, Parent.Globals, token, false))
                 //.SelectAwaitWithCancellation(async (helper, token) => await Task.Run(() => helper.Tokens, token))
-                .ForEachAwaitWithCancellationAsync(async (helper, token) => 
+                .ForEachAwaitWithCancellationAsync(async (helper, token) =>
                 {
                     await Parent.TestActionAsync(helper, triageId, token);
-                    await Parent.TrainAsync(helper.Tokens, triageId, token); 
+                    await Parent.TrainAsync(helper.Tokens, triageId, token);
                 }, token);
-                
+
             Parent.ClassifierGroup.Serialize();
         }
 

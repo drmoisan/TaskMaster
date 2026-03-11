@@ -170,7 +170,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             actual.Config.Should().BeEquivalentTo(expected.Config);
             actual.AdditionalField3.Should().Be(expected.AdditionalField3);
             actual.AdditionalField1.Should().Be(expected.AdditionalField1);
-            
+
         }
 
         [TestMethod]

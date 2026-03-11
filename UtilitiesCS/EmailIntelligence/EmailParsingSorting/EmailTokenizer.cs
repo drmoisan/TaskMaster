@@ -686,7 +686,7 @@ namespace UtilitiesCS.EmailIntelligence
         public const bool x_short_runs = true;
     }
 
-    public class CharsetCodebase 
+    public class CharsetCodebase
     {
         public CharsetCodebase() { }
         public string Name;

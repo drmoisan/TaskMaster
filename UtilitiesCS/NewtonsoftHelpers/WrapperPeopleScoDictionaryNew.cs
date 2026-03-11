@@ -78,7 +78,7 @@ namespace ToDoModel.Data_Model.People
                 var composedField = RemainingObject
                     .GetType()
                     .GetField(
-                        derivedField.Name, 
+                        derivedField.Name,
                         BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 var fieldValue = composedField?.GetValue(RemainingObject);
                 if (fieldValue is not null) { derivedField.SetValue(derivedInstance, fieldValue); }
@@ -434,11 +434,11 @@ namespace ToDoModel.Data_Model.People
         }
     }
 
-    public class PeopleScoRemainingObject 
+    public class PeopleScoRemainingObject
     {
         [JsonProperty]
         internal IApplicationGlobals Globals { get; set; }
-                
+
         [JsonProperty]
         public NewSmartSerializableConfig Config { get; set; }
 

@@ -24,7 +24,7 @@ namespace UtilitiesCS.EmailIntelligence
             {
                 return (from word in tokens where !commonWords.Contains(word) select word.StripAccents()).ToArray();
             }
-        }       
+        }
         public static string StripCommonWords(this string sentence, IList<string> commonWords)
         {
             Regex tokenizer = Tokenizer.GetRegex();
@@ -39,7 +39,7 @@ namespace UtilitiesCS.EmailIntelligence
         public static string StripAccents(this string s, char dflt = default)
         {
             StringBuilder sb = new StringBuilder(s.Normalize(NormalizationForm.FormKD));
-            for (int i = sb.Length -1; i >= 0; i--)
+            for (int i = sb.Length - 1; i >= 0; i--)
             {
                 if (sb[i] > 127)
                 {
@@ -48,12 +48,12 @@ namespace UtilitiesCS.EmailIntelligence
                         sb[i] = dflt;
                     }
                     else
-                    { 
+                    {
                         sb.Remove(i, 1);
                     }
-                } 
+                }
             }
-            
+
             return sb.ToString();
         }
 

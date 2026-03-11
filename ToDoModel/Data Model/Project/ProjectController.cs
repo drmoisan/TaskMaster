@@ -42,13 +42,13 @@ namespace ToDoModel.Data_Model.Project
 
         protected ProjectViewer _viewer;
         internal ProjectViewer Viewer { get => _viewer; set => _viewer = value; }
-        
+
         #endregion Properties
 
         #region Actions and Events
 
-        public void SaveAndClose() 
-        { 
+        public void SaveAndClose()
+        {
             DataModel.Save();
             Viewer.Close();
             Cleanup();
@@ -60,12 +60,12 @@ namespace ToDoModel.Data_Model.Project
             Cleanup();
         }
 
-        public void Cleanup() 
-        { 
+        public void Cleanup()
+        {
             DataModel = null;
             Viewer = null;
         }
-        
+
         public void DeleteSelection()
         {
             ArrayList selection = (ArrayList)Viewer.OlvProjectData.SelectedObjects;

@@ -34,7 +34,7 @@ namespace ToDoModel.Test
             return string.Join(Environment.NewLine, errorMessages);
 
         }
-        
+
         public static void Check(params Action[] assertions)
         {
             var errorMessages = new List<string>();
@@ -62,5 +62,5 @@ namespace ToDoModel.Test
             throw new AssertFailedException($"The following conditions failed: {Environment.NewLine}{errorMessageString}");
         }
     }
-    
+
 }

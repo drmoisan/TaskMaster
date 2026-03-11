@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Swordfish.NET.General.Collections
 {
-    public interface IConcurrentObservableCollection<T>:
+    public interface IConcurrentObservableCollection<T> :
         IConcurrentObservableBase<T>,
         IList<T>,
         ICollection<T>,
@@ -17,7 +17,7 @@ namespace Swordfish.NET.General.Collections
     {
         #region IList Implementation
 
-        
+
 
 
         #endregion IList Implementation

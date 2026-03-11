@@ -20,8 +20,8 @@ namespace SVGControl
             SetDevLevelPath();
         }
 
-        public override object EditValue(ITypeDescriptorContext context, 
-                                         IServiceProvider provider, 
+        public override object EditValue(ITypeDescriptorContext context,
+                                         IServiceProvider provider,
                                          object value)
         {
             if (value is string)
@@ -29,7 +29,7 @@ namespace SVGControl
                 _currentValue = (string)value;
                 _absoluteFilepath = (string)value;
                 _fileName = (string)value;
-                if (_currentValue[0].Equals('.')) 
+                if (_currentValue[0].Equals('.'))
                 {
                     _absoluteFilepath = RelativePath.AbsoluteFromURI(
                         uriToMakeAbsolute: _currentValue, anchorPath: _appPath);
@@ -60,7 +60,7 @@ namespace SVGControl
         {
             string workingDirectory = Environment.CurrentDirectory;
             List<string> directories = new List<string>(workingDirectory.Split(Path.DirectorySeparatorChar));
-            if ((directories.Count>2)&&(directories[directories.Count - 2] == "bin"))
+            if ((directories.Count > 2) && (directories[directories.Count - 2] == "bin"))
             {
                 // Backwards traverse 2 levels
                 _appPath = Directory.GetParent(workingDirectory).Parent.FullName;

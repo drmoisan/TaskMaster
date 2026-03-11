@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
 {
-    public class SimpleActionLockingLinkedListObserver<T>: ILockingLinkedListObserver<T>
+    public class SimpleActionLockingLinkedListObserver<T> : ILockingLinkedListObserver<T>
     {
         private readonly Action<LockingObservableLinkedListChangedEventArgs<T>> _action;
 
@@ -22,5 +22,5 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             _action.Invoke(args);
         }
     }
-    
+
 }

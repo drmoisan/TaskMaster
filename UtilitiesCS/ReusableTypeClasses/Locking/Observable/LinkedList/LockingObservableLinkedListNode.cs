@@ -30,20 +30,20 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
         /// or null if the current node is the last element
         /// of the <see cref="LockingObservableLinkedListNode{T}"/>.
         /// </summary>
-        public LockingObservableLinkedListNode<T> Next 
+        public LockingObservableLinkedListNode<T> Next
         {
             get
             {
                 var nextNode = innerNode?.Next;
-                if (nextNode is null) 
-                { 
-                    return null; 
+                if (nextNode is null)
+                {
+                    return null;
                 }
-                else 
+                else
                 {
                     return new LockingObservableLinkedListNode<T>(list, nextNode);
                 }
-            }            
+            }
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             item = node.Value;
             innerNode = node;
         }
-        
+
         public void MoveBefore(LockingObservableLinkedListNode<T> node)
         {
             this.list.MoveBefore(this, node);

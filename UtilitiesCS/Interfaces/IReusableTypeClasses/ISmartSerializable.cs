@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public interface ISmartSerializable<T>:INotifyPropertyChanged where T: class, ISmartSerializable<T>, new()
+    public interface ISmartSerializable<T> : INotifyPropertyChanged where T : class, ISmartSerializable<T>, new()
     {
         T Deserialize(string fileName, string folderPath);
         T Deserialize(string fileName, string folderPath, bool askUserOnError);
@@ -21,7 +21,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         void Serialize();
         void Serialize(string filePath);
         void SerializeThreadSafe(string filePath);
-        
+
 
         NewSmartSerializableConfig Config { get; set; }
 

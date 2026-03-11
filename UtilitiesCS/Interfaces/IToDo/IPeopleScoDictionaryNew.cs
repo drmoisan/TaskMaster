@@ -24,7 +24,7 @@ namespace UtilitiesCS
         string MatchToExisting(List<string> existingPeople, string newPerson);
         string RefineValidateCategory(string newPerson, IPrefix prefix);
         string SplitAddressToFirstLastName(string address);
-        
+
         #endregion IPeopleScoDictionaryNew Specific
     }
 }

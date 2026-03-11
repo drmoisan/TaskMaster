@@ -22,7 +22,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             if (obj?.Value is null) return 0;
             var comparer = new FolderWrapperNameCountSizeComparer();
             // Get the hash code for the FolderWrapper value
-            return comparer.GetHashCode(obj.Value);            
+            return comparer.GetHashCode(obj.Value);
         }
     }
 }

@@ -91,7 +91,7 @@ namespace UtilitiesCS
 
         #region Predefined Properties
 
-        public Outlook.Actions Actions => this.GetPropertyValue< Outlook.Actions>(olActions);
+        public Outlook.Actions Actions => this.GetPropertyValue<Outlook.Actions>(olActions);
 
         public Outlook.Application Application => this.GetPropertyValue<Outlook.Application>(olApplication);
 
@@ -145,7 +145,7 @@ namespace UtilitiesCS
         public Outlook.OlImportance Importance { get => this.GetPropertyValue<Outlook.OlImportance>(olImportance); set => SetPropertyValue(olImportance, value); }
 
         public bool IsConflict => this.GetPropertyValue<bool>(olIsConflict);
-        
+
         public Outlook.ItemProperties ItemProperties => this.GetPropertyValue<Outlook.ItemProperties>(olItemProperties);
 
         public System.DateTime LastModificationTime => this.GetPropertyValue<System.DateTime>(olLastModificationTime);
@@ -221,7 +221,7 @@ namespace UtilitiesCS
             var propertyInfo = TryGetPropertyInfo(propertyName);
             try
             {
-               return (T)(propertyInfo?.GetValue(_item) ?? default(T));
+                return (T)(propertyInfo?.GetValue(_item) ?? default(T));
             }
             catch (SystemException e)
             {
@@ -295,7 +295,7 @@ namespace UtilitiesCS
                 // For COM objects, use InvokeMember for late binding
                 var value = ItemType.InvokeMember(
                     propertyName,
-                    BindingFlags.Public | BindingFlags.GetField | BindingFlags.GetProperty,
+                    BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetField | BindingFlags.GetProperty,
                     null,
                     InnerObject,
                     Args);
@@ -326,7 +326,7 @@ namespace UtilitiesCS
             {
                 ItemType.InvokeMember(
                     propertyName,
-                    BindingFlags.Public | BindingFlags.SetField | BindingFlags.SetProperty,
+                    BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetField | BindingFlags.SetProperty,
                     null,
                     InnerObject,
                     [propertyValue]);
@@ -344,11 +344,11 @@ namespace UtilitiesCS
                         $"exception for property [{propertyName}]. {ex.Message}", ex);
                     throw;
                 }
-            }                        
+            }
         }
 
         internal virtual object CallMethod(string methodName)
-        {            
+        {
             try
             {
                 var obj = _type.InvokeMember(
@@ -369,7 +369,7 @@ namespace UtilitiesCS
                 catch (Exception)
                 {
                     throw;
-                }                
+                }
             }
         }
 

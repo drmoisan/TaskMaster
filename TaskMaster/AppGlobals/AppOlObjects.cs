@@ -30,6 +30,7 @@ namespace TaskMaster
         public async Task LoadAsync()
         {
             await LoadStoresAsync();
+            await Task.CompletedTask;
         }
 
         private IApplicationGlobals _globals;
@@ -39,10 +40,10 @@ namespace TaskMaster
         public Application App { get => _olApplication; }
 
         private string _viewWide;
-        public string ViewWide 
+        public string ViewWide
         {
-            get 
-            { 
+            get
+            {
                 if (_viewWide is null)
                     _viewWide = Properties.Settings.Default.View_Wide;
                 return _viewWide;
@@ -89,19 +90,20 @@ namespace TaskMaster
         internal IEnumerable<Folder> LoadInboxes()
         {
             // TODO: Test with gmail to see if I need to add a filter for non-exchange
+            var storesWrapper = StoresWrapper ?? new StoresWrapper() { };
             var stores = NamespaceMAPI.Stores.Cast<Store>().Where(
-                store => store.ExchangeStoreType != OlExchangeStoreType.olExchangePublicFolder);
-            
+                storesWrapper.ShouldIncludeStore);
+
             var inboxes = new List<Folder>();
-            foreach (var store in stores) 
+            foreach (var store in stores)
             {
                 MAPIFolder inbox = null;
                 try
-                {                    
+                {
                     inbox = store.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
                 }
-                catch (COMException e) 
-                { 
+                catch (COMException e)
+                {
                     logger.Error($"Error loading inbox from store. {e.Message}", e);
                 }
                 if (inbox is not null)
@@ -118,7 +120,7 @@ namespace TaskMaster
         {
             if (_globals.IntelRes.Config.TryGetValue("StoresWrapper", out var config))
             {
-                StoresWrapper = await SmartSerializable.DeserializeAsync(config, true, () => new StoresWrapper(_globals).Init());                
+                StoresWrapper = await SmartSerializable.DeserializeAsync(config, true, () => new StoresWrapper(_globals).Init());
             }
             else { logger.Error("StoresWrapper config not found."); }
         }, _globals.AF.CancelToken);
@@ -155,7 +157,7 @@ namespace TaskMaster
                 return _inbox;
             }
         }
-        
+
         private string _inboxRootPath;
         public string InboxPath
         {
@@ -168,7 +170,7 @@ namespace TaskMaster
                 return _inboxRootPath;
             }
         }
-                
+
         private Folder _junkPotential;
         public Folder JunkPotential => Initializer.GetOrLoad(ref _junkPotential, LoadJunkPotential);
         internal Folder LoadJunkPotential()
@@ -177,11 +179,11 @@ namespace TaskMaster
             var folderPath = Properties.Settings.Default.JunkPotential;
             if (folderPath.IsNullOrEmpty()) { return null; }
             var sequence = new Queue<string>(folderPath.Split('\\'));
-            
+
             var node = root.FindSequentialNode((current, other) => current.Name == other, sequence);
             var folder = node?.Value?.OlFolder as Folder;
-            if (folder is null) 
-            { 
+            if (folder is null)
+            {
                 MyBox.ShowDialog("Junk Potential Folder not found. Please select it manually.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 folder = NamespaceMAPI.PickFolder() as Folder;
                 if (folder is null) { return null; }
@@ -241,14 +243,14 @@ namespace TaskMaster
 
         private Folder _archiveRoot;
         public Folder ArchiveRoot => Initializer.GetOrLoad(ref _archiveRoot, LoadArchiveRoot);
-        internal Folder LoadArchiveRoot() 
+        internal Folder LoadArchiveRoot()
         {
             var folderHandler = new FolderPredictor(_globals);
             return folderHandler.GetFolder(Root.Folders, "Archive");
         }
 
         public string EmailPrefixToStrip => Properties.Resources.Email_Prefix_To_Strip;
-        
+
         private StackObjectCS<object> _movedMailsStack;
         public StackObjectCS<object> MovedMailsStack
         {
@@ -288,19 +290,65 @@ namespace TaskMaster
             {
                 if (_userEmailAddress is null)
                 {
-                    _userEmailAddress = App.ActiveExplorer().Session.CurrentUser.AddressEntry.GetExchangeUser().PrimarySmtpAddress;
+                    _userEmailAddress = ResolveCurrentUserEmailAddress();
                 }
                 return _userEmailAddress;
             }
         }
 
+        internal string ResolveCurrentUserEmailAddress()
+        {
+            try
+            {
+                var session = App?.Session ?? NamespaceMAPI;
+                var addressEntry = session?.CurrentUser?.AddressEntry;
+                return TryGetSmtpAddress(addressEntry) ?? string.Empty;
+            }
+            catch (COMException e)
+            {
+                logger.Warn($"Error retrieving current user SMTP address. {e.Message}", e);
+                return string.Empty;
+            }
+        }
+
+        internal static string TryGetSmtpAddress(AddressEntry addressEntry)
+        {
+            if (addressEntry is null) { return null; }
+
+            try
+            {
+                var primarySmtpAddress = addressEntry.GetExchangeUser()?.PrimarySmtpAddress;
+                if (!string.IsNullOrWhiteSpace(primarySmtpAddress))
+                {
+                    return primarySmtpAddress;
+                }
+            }
+            catch (COMException)
+            {
+            }
+
+            try
+            {
+                var address = addressEntry.Address;
+                if (!string.IsNullOrWhiteSpace(address) && address.Contains("@"))
+                {
+                    return address;
+                }
+            }
+            catch (COMException)
+            {
+            }
+
+            return null;
+        }
+
         private bool _darkMode = Properties.Settings.Default.DarkMode;
         [NotifyParentProperty(true)]
-        public bool DarkMode 
-        { 
+        public bool DarkMode
+        {
             get => _darkMode;
-            set 
-            { 
+            set
+            {
                 _darkMode = value;
                 Properties.Settings.Default.DarkMode = value;
                 Properties.Settings.Default.Save();
@@ -314,13 +362,13 @@ namespace TaskMaster
             return System.Windows.Forms.Screen.AllScreens.ToList().IndexOf(screen);
         }
 
-        public Size GetExplorerScreenSize() 
+        public Size GetExplorerScreenSize()
         {
             var explorer = App.ActiveExplorer();
             Rectangle bounds = new(explorer.Left, explorer.Top, explorer.Width, explorer.Height);
             return bounds.Size;
         }
-        
+
         public System.Windows.Forms.Screen GetExplorerScreen()
         {
             var explorer = App.ActiveExplorer();
@@ -332,8 +380,8 @@ namespace TaskMaster
                 return a2 > a1 ? s2 : s1;
             });
         }
-        
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName="")
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

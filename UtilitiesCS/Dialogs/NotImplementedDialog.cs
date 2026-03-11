@@ -12,7 +12,7 @@ namespace UtilitiesCS
     {
         private delegate DialogResult ResponseDelegate();
 
-        public static bool StopAtNotImplemented(string functionName) 
+        public static bool StopAtNotImplemented(string functionName)
         {
             string title = "Not Implemented Dialog";
             string message = "Function " + functionName + " is not implemented. Throw exception or keep running?";
@@ -23,7 +23,7 @@ namespace UtilitiesCS
             };
             MyBoxViewer _box = new(title, message, map);
             DialogResult result = _box.ShowDialog();
-            if (result == DialogResult.Yes) {return true;}
+            if (result == DialogResult.Yes) { return true; }
             else { return false; }
         }
 

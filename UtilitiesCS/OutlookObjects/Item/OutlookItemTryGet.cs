@@ -12,7 +12,7 @@ namespace UtilitiesCS.OutlookExtensions
     public class OutlookItemTryGet
     {
         private OutlookItem _olItem;
-        
+
         public OutlookItemTryGet(OutlookItem olItem)
         {
             _olItem = olItem;
@@ -32,7 +32,7 @@ namespace UtilitiesCS.OutlookExtensions
 
         public bool Categories(out string result) => TryGet(() => _olItem.Categories, out result);
 
-        public bool Companies(out string result) => TryGet(() => _olItem.Companies, out result); 
+        public bool Companies(out string result) => TryGet(() => _olItem.Companies, out result);
 
         public bool OlObjectClass(out Outlook.OlObjectClass result) => TryGet(() => _olItem.Class, out result);
 
@@ -64,10 +64,10 @@ namespace UtilitiesCS.OutlookExtensions
 
         public bool MarkForDownload(out Outlook.OlRemoteStatus result) => TryGet(() => _olItem.MarkForDownload, out result);
 
-        public bool MessageClass(out string result) => TryGet(() => _olItem.MessageClass, out result); 
+        public bool MessageClass(out string result) => TryGet(() => _olItem.MessageClass, out result);
 
         public bool Mileage(out string result) => TryGet(() => _olItem.Mileage, out result);
-                
+
         public bool OlItemType(out OlItemType result) => TryGet(_olItem.GetOlItemType, out result);
 
         public bool OutlookInternalVersion(out long result) => TryGet(() => _olItem.OutlookInternalVersion, out result);
@@ -96,8 +96,8 @@ namespace UtilitiesCS.OutlookExtensions
 
         #region Private Helper Functions
 
-        
-        
+
+
         internal bool TryGet<T>(Func<T> getter, out T result)
         {
             try
@@ -142,7 +142,7 @@ namespace UtilitiesCS.OutlookExtensions
         {
             try
             {
-                result= func();
+                result = func();
                 return true;
             }
             catch (SystemException)

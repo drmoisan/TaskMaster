@@ -2,7 +2,7 @@
 
 namespace UtilitiesCS.OutlookExtensions
 {
-    public interface IOutlookItemFlaggable: IOutlookItem
+    public interface IOutlookItemFlaggable : IOutlookItem
     {
         bool Complete { get; set; }
         DateTime DueDate { get; set; }

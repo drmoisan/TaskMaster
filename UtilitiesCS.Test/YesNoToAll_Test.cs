@@ -7,6 +7,7 @@ namespace UtilitiesCS.Test
     public class YesNoToAll_Test
     {
         [TestMethod]
+        [Ignore("Interactive popup dialog test; excluded from unattended test runs.")]
         public void TestMethod1()
         {
             YesNoToAllResponse response = YesNoToAll.ShowDialog("Test Message");

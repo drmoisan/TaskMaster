@@ -14,12 +14,12 @@ namespace QuickFiler
 {
     internal static class QfcThemeHelper
     {
-        public static void SetTheme(this TableLayoutPanel tlp, 
+        public static void SetTheme(this TableLayoutPanel tlp,
                                     Color backColor)
         {
             tlp.BackColor = backColor;
         }
-        
+
         public static void SetTheme(this Label lbl, Color backColor, Color forecolor)
         {
             lbl.BackColor = backColor;
@@ -228,7 +228,7 @@ namespace QuickFiler
             return themes;
         }
 
-        public static Dictionary<string, Theme> SetupFormThemes(IList<Control> panels, IList<Control> buttons) 
+        public static Dictionary<string, Theme> SetupFormThemes(IList<Control> panels, IList<Control> buttons)
         {
             var darkDarkGrey = Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30))))); //30,30,30
             var lightNormal = new Dictionary<string, ThemeControlGroup>

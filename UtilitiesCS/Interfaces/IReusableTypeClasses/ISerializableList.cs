@@ -8,7 +8,7 @@ namespace UtilitiesCS
 {
     public delegate IList<T> CSVLoader<T>(string filepath);
 
-    public interface ISerializableList<T>: INotifyPropertyChanged, IList<T>
+    public interface ISerializableList<T> : INotifyPropertyChanged, IList<T>
     {
         string Filename { get; set; }
         string Filepath { get; set; }

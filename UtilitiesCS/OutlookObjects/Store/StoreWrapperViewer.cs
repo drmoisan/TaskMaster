@@ -17,7 +17,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             JunkPotential.Click += JunkPotential_Click;
         }
 
-        public StoreWrapperViewer(StoreWrapperController controller): this()
+        public StoreWrapperViewer(StoreWrapperController controller) : this()
         {
             Controller = controller;
         }

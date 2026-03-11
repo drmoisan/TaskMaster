@@ -19,10 +19,10 @@ using System.Collections;
 using Swordfish.NET.General.Collections;
 using System.Data.SqlClient;
 
-namespace Swordfish.NET.Collections 
+namespace Swordfish.NET.Collections
 {
-    
-    
+
+
     /// <summary>
     /// This class provides a collection that can be bound to
     /// a WPF control, where the collection can be modified from a thread
@@ -98,13 +98,13 @@ namespace Swordfish.NET.Collections
         // ************************************************************************
         #region ICollection<T> Implementation
 
-        public void Add(T item) => DoBaseWrite(() => 
-        { 
-            if (WriteCollection is null) 
+        public void Add(T item) => DoBaseWrite(() =>
+        {
+            if (WriteCollection is null)
             {
                 Console.WriteLine("Error");
             }
-            WriteCollection?.Add(item); 
+            WriteCollection?.Add(item);
         });
 
         public void Clear() => DoBaseClear(() => { });

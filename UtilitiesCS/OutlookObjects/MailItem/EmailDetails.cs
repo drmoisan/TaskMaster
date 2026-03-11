@@ -13,18 +13,18 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
-    
+
     public static class EmailDetails
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private const int _numberOfFields = 13;
-        
+
         private const string PR_SMTP_ADDRESS = "http://schemas.microsoft.com/mapi/proptag/0x39FE001E";
 
         #region Public Methods and Extensions
-        
+
         public static string[] Details(this MailItem OlMail, string emailRootFolder, IScoDictionary<string, string> dictRemap = null)
         {
             string[] strAry;
@@ -48,7 +48,7 @@ namespace UtilitiesCS
             if (idx > -1) { strAry[9] = strAry[4].Substring(idx); }
             else { strAry[9] = strAry[4]; }
             strAry[10] = OlMail.ConversationID;
-            strAry[11] = OlMail.EntryID;            
+            strAry[11] = OlMail.EntryID;
             strAry[12] = GetAttachmentNames(OlMail);
             strAry[13] = GetActionTaken(OlMail);
 
@@ -86,7 +86,7 @@ namespace UtilitiesCS
             if (idx > -1) { strAry[9] = strAry[4].Substring(idx); }
             else { strAry[9] = strAry[4]; }
             strAry[10] = helper.ConversationID;
-            strAry[11] = helper.EntryId;            
+            strAry[11] = helper.EntryId;
             strAry[12] = string.Join("; ", helper.AttachmentsInfo.Select(x => x.FileName));
             try
             {
@@ -173,7 +173,7 @@ namespace UtilitiesCS
         //        senderName = olMail.SenderName;
         //    }
         //    return senderName;
-            
+
         //}
 
         //public static string GetSenderAddress(this MailItem olMail)
@@ -281,7 +281,7 @@ namespace UtilitiesCS
             }
             return attachmentNames;
         }
-        
+
         private static string GetEmailFolderPath(this MailItem OlMail, string emailRootFolder, IScoDictionary<string, string> dictRemap)
         {
             Folder OlParent = (Folder)OlMail.Parent;
@@ -302,7 +302,7 @@ namespace UtilitiesCS
             }
             return folderPath;
         }
-                        
+
 
         #endregion
     }

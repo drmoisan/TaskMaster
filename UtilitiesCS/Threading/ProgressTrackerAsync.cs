@@ -25,8 +25,8 @@ namespace UtilitiesCS.Threading
             _screen = screen;
         }
 
-        public async Task<ProgressTrackerAsync> InitializeAsync() 
-        { 
+        public async Task<ProgressTrackerAsync> InitializeAsync()
+        {
             UiDispatcher = UiThread.Dispatcher;
 
             await UiDispatcher.InvokeAsync(() =>
@@ -36,7 +36,7 @@ namespace UtilitiesCS.Threading
                     UiDispatcher = UiThread.Dispatcher,
                     CancelSource = _cancelSource
                 };
-                
+
                 if (_screen != null)
                 {
                     _progressViewer.StartPosition = FormStartPosition.Manual;
@@ -84,5 +84,5 @@ namespace UtilitiesCS.Threading
         #endregion Public Properties
     }
 
-    
+
 }

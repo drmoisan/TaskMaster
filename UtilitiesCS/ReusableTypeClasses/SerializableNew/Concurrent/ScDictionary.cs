@@ -15,7 +15,7 @@ using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public class ScDictionary<TKey, TValue>: ConcurrentDictionary<TKey, TValue>, ISmartSerializable<ScDictionary<TKey, TValue>>
+    public class ScDictionary<TKey, TValue> : ConcurrentDictionary<TKey, TValue>, ISmartSerializable<ScDictionary<TKey, TValue>>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -306,7 +306,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         //[JsonIgnore]
         //public JsonSerializerSettings LocalJsonSettings { get => _localJsonSettings; set => _localJsonSettings = value; }
         //private JsonSerializerSettings _localJsonSettings;
-                
+
         //public void SerializeThreadSafe(string filePath)
         //{
         //    // Set Status to Locked

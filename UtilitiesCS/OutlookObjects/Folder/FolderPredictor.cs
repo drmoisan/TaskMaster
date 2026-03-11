@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using Microsoft.Office.Interop.Outlook;
-using Outlook = Microsoft.Office.Interop.Outlook; 
+using Outlook = Microsoft.Office.Interop.Outlook;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -23,7 +23,7 @@ namespace UtilitiesCS
         {
             _olApp = olApp;
         }
-        
+
         public FolderPredictor(IApplicationGlobals AppGlobals)
         {
             _globals = AppGlobals;
@@ -68,12 +68,12 @@ namespace UtilitiesCS
             FromField = 2,
             Recalculate = 4
         }
-        
+
         public async Task InitializeFromEmail(object objItem) //internal
         {
             if (objItem is null) { throw new ArgumentException("Cannot initialize suggestions from email because reference is null"); }
-            else if (objItem is MailItemHelper) 
-            {                 
+            else if (objItem is MailItemHelper)
+            {
                 var mailInfo = (MailItemHelper)objItem;
                 await FromFolderKey(mailInfo);
             }
@@ -101,15 +101,15 @@ namespace UtilitiesCS
             else if (obj is string)
             {
                 string tmpString = (string)obj;
-                Suggestions.AddSuggestion(tmpString,0);
-                
+                Suggestions.AddSuggestion(tmpString, 0);
+
             }
             else
             {
                 throw new ArgumentException($"Obj is of type {obj.GetType().Name}, but selected option requires a string or string array");
             }
         }//internal
-        
+
         public void FromFolderKey(MailItem olMail)//internal
         {
             if (!Suggestions.LoadFromField(olMail, _globals))
@@ -131,11 +131,11 @@ namespace UtilitiesCS
         #region Private Fields
 
         private IApplicationGlobals _globals;
-        
+
         private Outlook.Application _olApp;
         private Regex _regex;
         //private string _searchString;
-        
+
 
         #endregion
 
@@ -151,17 +151,17 @@ namespace UtilitiesCS
                     _folderList = new List<string>();
                     if (Suggestions.Count > 0)
                         AddSuggestions(ref _folderList);
-                    if (_globals.AF.RecentsList.Count > 0) 
+                    if (_globals.AF.RecentsList.Count > 0)
                         AddRecents(ref _folderList);
                 }
-                
+
                 return _folderList.ToArray();
             }
         }
 
         private FolderScorer _suggestions;
         public FolderScorer Suggestions { get => _suggestions; set => _suggestions = value; }
-        
+
         private bool _blUpdateSuggestions;
         public bool BlUpdateSuggestions { get => _blUpdateSuggestions; set => _blUpdateSuggestions = value; }
 
@@ -194,14 +194,14 @@ namespace UtilitiesCS
 
             // Add search results
             var matchingFolders = emailSearchRoots.Select(root => GetMatchingFolders(
-                                                          searchString, 
+                                                          searchString,
                                                           root,
                                                           includeChildren: true,
                                                           exclusions.Where(x => x.root == root)
                                                                     .Select(x => (x.excludedFolder, x.excludeChildren))))
                                                   .SelectMany(x => x)
                                                   .ToList();
-            
+
             //var matchingFolders = GetMatchingFolders(searchString, emailSearchRoots);
             AddMatches(matchingFolders);
 
@@ -280,12 +280,12 @@ namespace UtilitiesCS
             var root = _globals.Ol.Root.FolderPath;
             if (!folderpath.Contains(root))
             {
-                throw new ArgumentException($"The parameter {nameof(folderpath)} value {folderpath} does not contain the root {root}", nameof(folderpath)); 
+                throw new ArgumentException($"The parameter {nameof(folderpath)} value {folderpath} does not contain the root {root}", nameof(folderpath));
             }
-            
+
             // Get the Folder
             var olFolder = GetFolder(folderpath, _olApp);
-            
+
             // If folder is null, throw exception or deliver message to user
             if (olFolder is null)
             {
@@ -340,7 +340,7 @@ namespace UtilitiesCS
                 {
                     if (!IsLegalFolderName(name))
                     {
-                        MessageBox.Show($"Folder name {name} contains the illegal characters "+
+                        MessageBox.Show($"Folder name {name} contains the illegal characters " +
                             $"{GetIllegalFolderChars(name).SentenceJoin()}. Please choose a different name.");
                         name = "";
                     }
@@ -462,7 +462,7 @@ namespace UtilitiesCS
             {
                 parentFolderpath = $"{olAncestor}\\{parentBranchPath}";
             }
-            
+
             // Get the parent folder and return null if not found
             var parentFolder = this.GetFolder(parentFolderpath, false);
             if (parentFolder is null) { return null; }
@@ -476,7 +476,7 @@ namespace UtilitiesCS
 
             // Convert the Outlook folderpath to a filesystem folderpath
             var fsFolderName = olFolder.ToFsFolderpath(olAncestor, fsAncestor);
-            
+
             // Create the new folder in the filesystem
             var fsFolder = Directory.CreateDirectory(fsFolderName);
 
@@ -536,7 +536,7 @@ namespace UtilitiesCS
                 folderList.AddRange(_globals.AF.RecentsList);
             }
         }
-        
+
         public void AddMatches(List<string> matchingFolders) // internal
         {
             if (matchingFolders is not null && matchingFolders.Count > 0)
@@ -546,13 +546,13 @@ namespace UtilitiesCS
                 _folderList.AddRange(matchingFolders);
             }
         }
-                
+
         public void AddSuggestions(ref List<string> folderList) // internal
         {
             folderList.Add("========= SUGGESTIONS =========");
             folderList.AddRange(Suggestions.ToArray(5));
         }
-        
+
         public List<string> GetMatchingFolders(string searchString,
                                                string strEmailFolderPath,
                                                bool includeChildren,
@@ -564,13 +564,13 @@ namespace UtilitiesCS
             if (searchString.Trim().Length != 0)
             {
                 (_regex, _) = SimpleRegex.MakeRegex(searchString);
-                
+
                 var folders = GetFolder(strEmailFolderPath).Folders;
                 LoopFolders(folders, ref matchingFolders, strEmailFolderPath, true, exclusions);
             }
-            
+
             return matchingFolders;
-            
+
         }
 
         public void LoopFolders(Folders folders,
@@ -600,12 +600,12 @@ namespace UtilitiesCS
                     {
                         matchingFolders.Add(folderStem);
                     }
-                
+
                     LoopFolders(f.Folders, ref matchingFolders, olAncestor, includeChildren, exclusions);
                 }
             }
         }
-        
+
         public string GetOlSubpath(string path, string olAncestor, bool includeChildren)
         {
             if (includeChildren)
@@ -629,7 +629,7 @@ namespace UtilitiesCS
         public void RefreshSuggestions(object objItem, int topNfolderKeys = -1) // Internal
         {
             var OlMail = MailResolution.TryResolveMailItem(objItem);
-            if (OlMail is not null) { RefreshSuggestions(OlMail, topNfolderKeys);}
+            if (OlMail is not null) { RefreshSuggestions(OlMail, topNfolderKeys); }
             else
             {
                 throw new ArgumentException($"{nameof(objItem)} passed as {objItem.GetType().Name} could not be cast to MailItem");

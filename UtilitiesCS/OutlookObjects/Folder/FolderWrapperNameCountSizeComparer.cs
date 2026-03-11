@@ -24,7 +24,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             int hashName = obj.Name?.ToLowerInvariant().GetHashCode() ?? 0;
             int hashCount = obj.ItemCount.GetHashCode();
             int hashSize = obj.FolderSize.GetHashCode();
-            return hashName * 31 + hashCount *31 *31 + hashSize;
+            return hashName * 31 + hashCount * 31 * 31 + hashSize;
         }
     }
 }

@@ -13,7 +13,7 @@ using UtilitiesCS.EmailIntelligence;
 
 namespace UtilitiesCS.Test.EmailIntelligence
 {
-    
+
 
     [TestClass]
     public class MailItemHelperTests
@@ -89,7 +89,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             m.Setup(x => x.Ol).Returns(mockOl.Object);
             return m;
         }
-        
+
         private Mock<MailItem> SetupMockMail()
         {
             var mockMail = mockRepository.Create<MailItem>();
@@ -110,10 +110,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
             mockFolder.Setup(f => f.Name).Returns("FolderName");
             mockFolder.Setup(f => f.StoreID).Returns("StoreID");
             mockFolder.Setup(f => f.FolderPath).Returns("EmailRootPath//FolderName");
-            
+
             var mockItems = mockRepository.Create<Items>();
             mockItems.SetupAllProperties();
-            
+
             var items = new List<object> { mockMail.Object };
             mockItems.Setup(x => x.Count).Returns(() => items.Count());
             mockItems.Setup(x => x[It.IsAny<int>()]).Returns<int>(i => items[i]);
@@ -125,16 +125,16 @@ namespace UtilitiesCS.Test.EmailIntelligence
             mockMail.Setup(m => m.Parent).Returns(mockFolder.Object);
             mockMail.Setup(m => m.HTMLBody).Returns("HTMLBody");
             mockMail.Setup(m => m.InternetCodepage).Returns(65001);
-            mockMail.Setup(m => m.ReceivedTime).Returns(new DateTime(2024,1,1));
+            mockMail.Setup(m => m.ReceivedTime).Returns(new DateTime(2024, 1, 1));
             mockRecipients = mockRepository.Create<Recipients>();
             mockRecipients.SetupAllProperties();
-            
+
             mockRecipient1 = mockRepository.Create<Recipient>();
             mockRecipient1.SetupAllProperties();
             mockRecipient1.Setup(r => r.Name).Returns("Recipient1");
             mockRecipient1.Setup(r => r.Address).Returns("recipient1@domain.com");
             mockRecipient1.Setup(r => r.Type).Returns((int)OlMailRecipientType.olTo);
-            
+
             var mockRecipient1AddressEntry = mockRepository.Create<AddressEntry>();
             mockRecipient1AddressEntry.Setup(x => x.AddressEntryUserType).Returns(OlAddressEntryUserType.olOutlookContactAddressEntry);
             mockRecipient1.Setup(r => r.AddressEntry).Returns(mockRecipient1AddressEntry.Object);
@@ -165,7 +165,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             mockMail.Setup(m => m.Recipients).Returns(mockRecipients.Object);
             mockMail.Setup(m => m.SentOn).Returns(new DateTime(2024, 1, 1));
             mockMail.Setup(m => m.UnRead).Returns(true);
-                        
+
             mockAttachment = mockRepository.Create<Attachment>();
             mockAttachment.Setup(a => a.Size).Returns(65001);
             mockAttachment.Setup(a => a.Type).Returns(OlAttachmentType.olByValue);
@@ -184,23 +184,23 @@ namespace UtilitiesCS.Test.EmailIntelligence
             mockTriageProperty.Setup(p => p.Value).Returns("Triage");
             mockTriageProperty.Setup(p => p.Name).Returns("Triage");
             List<UserProperty> userProperties = [mockTriageProperty.Object];
-            
+
             var mockUserProperties = mockRepository.Create<UserProperties>();
             mockUserProperties.Setup(p => p.Count).Returns(() => userProperties.Count);
             mockUserProperties.Setup(p => p[It.IsAny<int>()]).Returns<int>(i => userProperties[i]);
             mockUserProperties.Setup(p => p.GetEnumerator()).Returns(() => userProperties.GetEnumerator());
-            mockUserProperties.Setup(p => p.Find(It.IsAny<string>(), (object)true)).Returns<string, object>((name,custom) => userProperties.Find(x => x.Name == name));
+            mockUserProperties.Setup(p => p.Find(It.IsAny<string>(), (object)true)).Returns<string, object>((name, custom) => userProperties.Find(x => x.Name == name));
 
             mockMail.Setup(m => m.UserProperties).Returns(mockUserProperties.Object);
 
             return mockMail;
         }
 
-        private object[] GetExpectedConstructorFields() 
+        private object[] GetExpectedConstructorFields()
         {
             var senderInfo = new RecipientInfo(
-                "SenderName", 
-                "sendername@domain.com", 
+                "SenderName",
+                "sendername@domain.com",
                 "SenderName &lt;<a href=\"mailto:sendername@domain.com\">sendername@domain.com</a>&gt;");
 
             var folderInfo = new FolderWrapper((Folder)mockMailItem.Object.Parent, mockOl.Object.Inbox);
@@ -210,12 +210,12 @@ namespace UtilitiesCS.Test.EmailIntelligence
                                         .Select(x => new AttachmentHelper(x, new DateTime(2024, 1, 1), "FolderName"))
                                         .ToArray();
             var attachmentInfo = attachmentsHelper.Select(x => x.AttachmentInfo).ToArray();
-            return 
+            return
             [
                 mail,
                 mockGlobals.Object,
                 "EntryID",
-                senderInfo,    
+                senderInfo,
                 senderInfo.Html,
                 senderInfo.Name,
                 "Task",
@@ -247,7 +247,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
         private object[] GetLazyFields(MailItemHelper helper)
         {
-            object[] fields = 
+            object[] fields =
             [
                 helper.Item,                    //  0
                 helper.Globals,                 //  1
@@ -255,14 +255,14 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 helper.Sender,                  //  3
                 helper.SenderHtml,              //  4
                 helper.SenderName,              //  5
-                helper.Actionable, 
-                helper.Body, 
-                helper.ConversationID, 
-                helper.EmailPrefixToStrip, 
+                helper.Actionable,
+                helper.Body,
+                helper.ConversationID,
+                helper.EmailPrefixToStrip,
                 helper.StoreId,                 // 10
-                helper.FolderName, 
-                helper.FolderInfo, 
-                helper.HTMLBody, 
+                helper.FolderName,
+                helper.FolderInfo,
+                helper.HTMLBody,
                 helper.Html,                    // 14
                 helper.IsTaskFlagSet,           // 15
                 helper.OlRecipients,            // 16
@@ -270,17 +270,17 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 helper.ToRecipients,            // 18
                 helper.ToRecipientsName,        // 19
                 helper.ToRecipientsHtml,
-                helper.SentDate, 
-                helper.SentOn, 
-                helper.Subject, 
-                helper.Tokens, 
-                helper.Triage, 
-                helper.UnRead, 
+                helper.SentDate,
+                helper.SentOn,
+                helper.Subject,
+                helper.Tokens,
+                helper.Triage,
+                helper.UnRead,
                 helper.AttachmentsHelper,
-                helper.AttachmentsInfo, 
+                helper.AttachmentsInfo,
                 helper.InternetCodepage
             ];
-            return fields; 
+            return fields;
         }
 
         [TestMethod]
@@ -299,12 +299,12 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var helper = new MailItemHelper(item, globals);
 
             object[] actual = GetLazyFields(helper);
-            
-            var actualText = $"[\n{string.Join("\n",actual.Select(
+
+            var actualText = $"[\n{string.Join("\n", actual.Select(
                 x => x is object ? JsonConvert.SerializeObject(x) : x.ToString()).ToArray())}\n]";
             Console.WriteLine("\nACTUAL:");
             Console.WriteLine(actualText);
-            
+
             // Assert
             actual.Should().BeEquivalentTo(expected, options => options.Excluding(x => x.Path.EndsWith("FilePathSaveAlt")));
         }

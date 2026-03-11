@@ -17,8 +17,8 @@ namespace UtilitiesCS.EmailIntelligence
 
         #region Constructors and private fields
 
-        public ImageStripper() 
-        { 
+        public ImageStripper()
+        {
             //_globals = appGlobals; 
         }
 
@@ -34,7 +34,7 @@ namespace UtilitiesCS.EmailIntelligence
         #endregion Constructors and private fields
 
         //int misses, hits = 0;
-                
+
         internal (string text, HashSet<string> tokens) analyze(
             string engine_name, List<object> parts)
         {
@@ -85,7 +85,7 @@ namespace UtilitiesCS.EmailIntelligence
                     try
                     {
                         bytes = part.AttachmentData;
-                        if (bytes.IsNullOrEmpty()) 
+                        if (bytes.IsNullOrEmpty())
                         {
                             tokens.Add($"invalid-image:{part.Type}");
                         }
@@ -105,13 +105,13 @@ namespace UtilitiesCS.EmailIntelligence
                 // We're dealing with spammers and virus writers here.  Who knows
                 // what garbage they will call a GIF image to entice you to open
                 // it?
-                
+
                 Image image = null;
                 Bitmap bitmap = null;
-                
+
                 try
                 {
-                    image = bytes is not null? GetImage(GetStream(bytes)): null;
+                    image = bytes is not null ? GetImage(GetStream(bytes)) : null;
                     //image = GetImage(part);
                 }
                 catch (System.Exception)
@@ -156,7 +156,7 @@ namespace UtilitiesCS.EmailIntelligence
                         // new image, same height => extend current row
                         rows.Last.Value = imconcatlr(rows.Last.Value, bitmap);
                     }
-                }                
+                }
             }
 
             if (rows.Count == 0)
@@ -177,7 +177,7 @@ namespace UtilitiesCS.EmailIntelligence
 
             return (new List<Bitmap> { full_image }, tokens);
         }
-                
+
         internal (string text, HashSet<string> tokens) extract_ocr_info(List<Bitmap> images)
         {
             var textbits = new List<string>();
@@ -194,9 +194,9 @@ namespace UtilitiesCS.EmailIntelligence
                 {
                     logger.Error(e.Message);
                 }
-                
+
                 var ctokens = new HashSet<string>();
-                
+
                 if (ctext.Trim().IsNullOrEmpty())
                 {
                     ctokens.Add("image-text:no text found");
@@ -216,7 +216,7 @@ namespace UtilitiesCS.EmailIntelligence
             }
 
             var texts = string.Join("\n", textbits);
-            
+
             return (texts, tokens);
         }
 
@@ -233,7 +233,7 @@ namespace UtilitiesCS.EmailIntelligence
                 return top;
             }
 
-            Bitmap bitmap = new(Math.Max(w1,w2), h1 + h2, PixelFormat.Format24bppRgb);
+            Bitmap bitmap = new(Math.Max(w1, w2), h1 + h2, PixelFormat.Format24bppRgb);
             using (Graphics g = Graphics.FromImage(bitmap))
             {
                 g.Clear(Color.Black);
@@ -245,10 +245,10 @@ namespace UtilitiesCS.EmailIntelligence
                 catch (System.OutOfMemoryException e)
                 {
                     //logger.Debug($"Variables before exception: w1: {w1}, h1: {h1}, w2: {w2}, h2: {h2}");
-                    logger.Error(e.Message,e);
+                    logger.Error(e.Message, e);
                     bitmap = top;
                 }
-                
+
             }
             return bitmap;
         }
@@ -260,7 +260,7 @@ namespace UtilitiesCS.EmailIntelligence
             var w2 = right.Width;
             var h2 = right.Height;
 
-            Bitmap bitmap = new(w1 + w2, Math.Max(h1,h2), PixelFormat.Format24bppRgb);
+            Bitmap bitmap = new(w1 + w2, Math.Max(h1, h2), PixelFormat.Format24bppRgb);
             using (Graphics g = Graphics.FromImage(bitmap))
             {
                 g.Clear(Color.Black);
@@ -269,7 +269,7 @@ namespace UtilitiesCS.EmailIntelligence
             }
             return bitmap;
         }
-        
+
         /// <summary>
         /// Spammers are now using GIF image sequences.  From examining a
         /// miniscule set of multi-frame GIFs it appears the frame with
@@ -283,7 +283,7 @@ namespace UtilitiesCS.EmailIntelligence
             var frames = SeperateMultiFrame(image);
             Bitmap imageWithText = null;
             var bgpix = 1e17;
-            foreach (var frame in frames) 
+            foreach (var frame in frames)
             {
                 // Generate Histogram of image
                 var bg = frame.GenerateHistogram().Max(x => x.Value);
@@ -312,7 +312,7 @@ namespace UtilitiesCS.EmailIntelligence
                 image.SelectActiveFrame(dimension, i);
                 yield return (Bitmap)image.Clone();
             }
-            
+
         }
 
         internal Image GetImage(Attachment attachment)
@@ -334,7 +334,7 @@ namespace UtilitiesCS.EmailIntelligence
             var stream = new MemoryStream(bytes);
             return stream;
         }
-        
+
         internal byte[] GetBytes(Attachment attachment)
         {
             const string PR_ATTACH_DATA_BIN = "http://schemas.microsoft.com/mapi/proptag/0x37010102";
@@ -346,7 +346,7 @@ namespace UtilitiesCS.EmailIntelligence
         {
             // Get byte array of image
             byte[] data = bitmap.ToByte();
-            
+
             string tessdataPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}{Path.DirectorySeparatorChar}TaskMaster{Path.DirectorySeparatorChar}tessdata";
             //string tessdataPath = $"{_globals.FS.FldrAppData}{Path.DirectorySeparatorChar}tessdata";
             using (TesseractEngine engine = new TesseractEngine(tessdataPath, "eng", EngineMode.Default))
@@ -354,11 +354,11 @@ namespace UtilitiesCS.EmailIntelligence
                 //var pix = new BitmapToPixConverter().Convert(bitmap);
                 //var page = engine.Process(pix);
                 var page = engine.Process(bitmap);
-                
+
                 var text = page.GetText();
                 return text;
-                
-                
+
+
                 //using (Pix pix = Pix.LoadFromMemory(data))
                 //{
                 //    using (Tesseract.Page page = engine.Process(pix))

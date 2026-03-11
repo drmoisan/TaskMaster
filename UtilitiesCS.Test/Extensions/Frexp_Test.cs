@@ -19,7 +19,7 @@ namespace UtilitiesCS.Test.Extensions
         [TestMethod]
         public void FrexpTest()
         {
-            var inputs = new double[] { 0.00001234, 1234};
+            var inputs = new double[] { 0.00001234, 1234 };
             //var actual = inputs.Select(FrexpClass.Frexp).ToList();
             var actual = inputs.Select(input =>
             {
@@ -28,8 +28,8 @@ namespace UtilitiesCS.Test.Extensions
                 return (mantissa, exponent);
             }).ToList();
 
-            var expected = new (double,int)[] { (0.80871424,-16), (0.6025390625, 11)};
-            
+            var expected = new (double, int)[] { (0.80871424, -16), (0.6025390625, 11) };
+
             Console.WriteLine($"Actual: {actual}");
             Console.WriteLine($"Expected: {expected}");
 
