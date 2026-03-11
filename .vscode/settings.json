@@ -1,5 +1,8 @@
 {
   "dotnet.defaultSolution": "TaskMaster.sln",
   "dotnet.testWindow.useTestingPlatformProtocol": true,
-  "omnisharp.projectLoadTimeout": 120
+  "omnisharp.projectLoadTimeout": 120,
+  "chat.tools.terminal.autoApprove": {
+    "dotnet restore": true
+  }
 }

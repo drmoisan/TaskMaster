@@ -59,9 +59,14 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+        with:
+          nuget-version: latest
+
       - name: Restore solution
         shell: pwsh
-        run: dotnet restore $env:SOLUTION_PATH
+        run: nuget restore $env:SOLUTION_PATH
 
       - name: Verify formatting
         shell: pwsh
@@ -69,15 +74,19 @@ jobs:
 
       - name: Build with analyzers and code style enforcement
         shell: pwsh
-        run: >-
-          msbuild $env:SOLUTION_PATH /t:Build /p:Configuration=Debug /p:Platform='Any CPU'
-          /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true
+        run: |
+          & msbuild $env:SOLUTION_PATH /t:Build /p:Configuration=Debug `
+              "/p:Platform=Any CPU" `
+              /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Build with nullable warnings treated as errors
         shell: pwsh
-        run: >-
-          msbuild $env:SOLUTION_PATH /t:Build /p:Configuration=Debug /p:Platform='Any CPU'
-          /p:Nullable=enable /p:TreatWarningsAsErrors=true
+        run: |
+          & msbuild $env:SOLUTION_PATH /t:Build /p:Configuration=Debug `
+              "/p:Platform=Any CPU" `
+              /p:Nullable=enable /p:TreatWarningsAsErrors=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Run MSTest suite with coverage
         shell: pwsh
