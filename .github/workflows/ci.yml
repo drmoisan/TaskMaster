@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  push:
+    branches: [main, development]
+  pull_request:
+    branches: [main, development]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run actionlint
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=1.7.7
+          curl -sSL "https://github.com/rhysd/actionlint/releases/download/v${version}/actionlint_${version}_linux_amd64.tar.gz" -o actionlint.tar.gz
+          tar -xzf actionlint.tar.gz actionlint
+          ./actionlint
+
+  quality-gates:
+    name: Format, build, analyze, and test
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    env:
+      SOLUTION_PATH: TaskMaster.sln
+      BUILD_CONFIGURATION: Debug
+      BUILD_PLATFORM: Any CPU
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore solution
+        shell: pwsh
+        run: dotnet restore $env:SOLUTION_PATH
+
+      - name: Verify formatting
+        shell: pwsh
+        run: dotnet format $env:SOLUTION_PATH --verify-no-changes --no-restore
+
+      - name: Build with analyzers and code style enforcement
+        shell: pwsh
+        run: >-
+          msbuild $env:SOLUTION_PATH /t:Build /p:Configuration=Debug /p:Platform='Any CPU'
+          /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true
+
+      - name: Build with nullable warnings treated as errors
+        shell: pwsh
+        run: >-
+          msbuild $env:SOLUTION_PATH /t:Build /p:Configuration=Debug /p:Platform='Any CPU'
+          /p:Nullable=enable /p:TreatWarningsAsErrors=true
+
+      - name: Run MSTest suite with coverage
+        shell: pwsh
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+
+          $vswherePath = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+          if (-not (Test-Path $vswherePath)) {
+              throw 'vswhere.exe was not found. Install Visual Studio 2022 (or Build Tools) with Test Platform components.'
+          }
+
+          $vstestPath = & $vswherePath -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
+          if (-not $vstestPath) {
+              throw 'vstest.console.exe not found via vswhere. Install Visual Studio Test Platform components.'
+          }
+
+          $testAssemblies = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter '*.Test.dll' |
+              Where-Object {
+                  $_.FullName -match "\\bin\\$($env:BUILD_CONFIGURATION)\\" -and
+                  $_.FullName -notmatch '\\obj\\' -and
+                  $_.FullName -notmatch '\\ref\\'
+              } |
+              Select-Object -ExpandProperty FullName
+
+          if (-not $testAssemblies -or $testAssemblies.Count -eq 0) {
+              throw "No test assemblies found under '$env:GITHUB_WORKSPACE' for configuration '$env:BUILD_CONFIGURATION'."
+          }
+
+          New-Item -ItemType Directory -Path 'TestResults' -Force | Out-Null
+          & $vstestPath $testAssemblies /EnableCodeCoverage /InIsolation /Logger:trx
+          if ($LASTEXITCODE -ne 0) {
+              throw "MSTest execution failed with exit code $LASTEXITCODE"
+          }
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            TestResults/**/*.trx
+            TestResults/**/*.coverage
+          if-no-files-found: warn
