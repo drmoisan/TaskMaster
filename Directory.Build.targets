@@ -1,9 +1,14 @@
 <Project>
   <Target Name="SetTaskMasterManifestCert" BeforeTargets="ResolveKeySource" Condition="'$(MSBuildProjectName)' == 'TaskMaster'">
-    <PropertyGroup>
+    <!-- Enable manifest signing with the developer certificate when not running in CI. -->
+    <PropertyGroup Condition="'$(CI)' != 'true'">
       <SignManifests>true</SignManifests>
       <ManifestKeyFile></ManifestKeyFile>
       <ManifestCertificateThumbprint>88E95FCC6F066C07776218A398BF7046A447D802</ManifestCertificateThumbprint>
+    </PropertyGroup>
+    <!-- Disable manifest signing in CI: no developer certificate is available. -->
+    <PropertyGroup Condition="'$(CI)' == 'true'">
+      <SignManifests>false</SignManifests>
     </PropertyGroup>
   </Target>
 </Project>
