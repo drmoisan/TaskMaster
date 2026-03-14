@@ -48,7 +48,6 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             this.mockJsonReader.Verify(x => x.Value, Times.Once());
         }
 
-        [ExpectedException(typeof(JsonReaderException))]
         [TestMethod]
         public void ReadPropertyName_NullValue_Failure()
         {
@@ -60,13 +59,14 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             mockJsonReader.Setup(x => x.Value).Returns(expected);
 
             // Act
-            var actual = filePathHelperConverter.ReadPropertyName(mockJsonReader.Object);
+            Action act = () => filePathHelperConverter.ReadPropertyName(mockJsonReader.Object);
 
             // Assert
-            this.mockJsonReader.Verify(x => x.Read(), Times.Once());
+            act.Should().Throw<JsonReaderException>();
+            this.mockJsonReader.Verify(x => x.TokenType, Times.AtLeastOnce());
+            this.mockJsonReader.Verify(x => x.Value, Times.Once());
         }
 
-        [ExpectedException(typeof(JsonReaderException))]
         [TestMethod]
         public void ReadPropertyName_WrongType_Failure()
         {
@@ -78,10 +78,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             mockJsonReader.Setup(x => x.Value).Returns(expected);
 
             // Act
-            var actual = filePathHelperConverter.ReadPropertyName(mockJsonReader.Object);
+            Action act = () => filePathHelperConverter.ReadPropertyName(mockJsonReader.Object);
 
             // Assert
-            this.mockJsonReader.Verify(x => x.Read(), Times.Once());
+            act.Should().Throw<JsonReaderException>();
+            this.mockJsonReader.Verify(x => x.TokenType, Times.AtLeastOnce());
         }
 
         [TestMethod]
@@ -104,7 +105,6 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
         }
 
-        [ExpectedException(typeof(JsonReaderException))]
         [TestMethod]
         public void ReadPropertyValue_WrongType_Failure()
         {
@@ -116,10 +116,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             mockJsonReader.Setup(x => x.Value).Returns(expected);
 
             // Act
-            var actual = filePathHelperConverter.ReadPropertyValue(mockJsonReader.Object);
+            Action act = () => filePathHelperConverter.ReadPropertyValue(mockJsonReader.Object);
 
             // Assert
-            this.mockJsonReader.Verify(x => x.Read(), Times.Once());
+            act.Should().Throw<JsonReaderException>();
+            this.mockJsonReader.Verify(x => x.TokenType, Times.AtLeastOnce());
         }
 
         //[TestMethod]

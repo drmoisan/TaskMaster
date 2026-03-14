@@ -132,15 +132,13 @@ namespace UtilitiesCS.Test.HelperClasses
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void StartTimer_StateUnderTest_NoDiskWriter()
         {
             // Arrange
             var timedDiskWriter = this.CreateTimedDiskWriter();
 
             // Act
-            timedDiskWriter.StartTimer();
-
+            Assert.ThrowsExactly<InvalidOperationException>(() => timedDiskWriter.StartTimer());
         }
 
         [TestMethod]

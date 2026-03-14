@@ -43,11 +43,10 @@ namespace ObjectListViewDemo.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void Constructor_ThrowsExceptionForNullArgument()
         {
             // Arrange & Act
-            var myFileSystemInfo = new MyFileSystemInfo(default(FileSystemInfo));
+            Assert.ThrowsExactly<ArgumentNullException>(() => new MyFileSystemInfo(default(FileSystemInfo)));
         }
 
         [TestMethod]
