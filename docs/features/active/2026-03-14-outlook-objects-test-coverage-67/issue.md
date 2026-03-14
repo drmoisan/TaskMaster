@@ -36,18 +36,18 @@ Add comprehensive MSTest unit tests within `UtilitiesCS.Test\OutlookObjects` to 
 ## Acceptance Criteria (early draft)
 
 - [ ] Every public class/method in `UtilitiesCS/OutlookObjects/AppointmentItem/` has corresponding tests
-- [ ] Every public class/method in `UtilitiesCS/OutlookObjects/Attachment/` has corresponding tests
-- [ ] Every public class/method in `UtilitiesCS/OutlookObjects/Calendar/` has corresponding tests
+- [x] Every public class/method in `UtilitiesCS/OutlookObjects/Attachment/` has corresponding tests
+- [x] Every public class/method in `UtilitiesCS/OutlookObjects/Calendar/` has corresponding tests
 - [ ] Every public class/method in `UtilitiesCS/OutlookObjects/Category/` has corresponding tests
-- [ ] Every public class/method in `UtilitiesCS/OutlookObjects/Com/` has corresponding tests
+- [x] Every public class/method in `UtilitiesCS/OutlookObjects/Com/` has corresponding tests
 - [ ] Every public class/method in `UtilitiesCS/OutlookObjects/Conversation/` has corresponding tests
-- [ ] Every public class/method in `UtilitiesCS/OutlookObjects/Explorer/` has corresponding tests
+- [x] Every public class/method in `UtilitiesCS/OutlookObjects/Explorer/` has corresponding tests
 - [ ] Every public class/method in `UtilitiesCS/OutlookObjects/Fields/` has corresponding tests
-- [ ] Every public class/method in `UtilitiesCS/OutlookObjects/Filter DASL/` has corresponding tests
+- [x] Every public class/method in `UtilitiesCS/OutlookObjects/Filter DASL/` has corresponding tests
 - [ ] Every public class/method in `UtilitiesCS/OutlookObjects/Folder/` has corresponding tests (including MsgToMime)
 - [ ] Every public class/method in `UtilitiesCS/OutlookObjects/Item/` has corresponding tests
 - [ ] Every public class/method in `UtilitiesCS/OutlookObjects/MailItem/` has corresponding tests
-- [ ] Every public class/method in `UtilitiesCS/OutlookObjects/Recipient/` has corresponding tests
+- [x] Every public class/method in `UtilitiesCS/OutlookObjects/Recipient/` has corresponding tests
 - [ ] Every public class/method in `UtilitiesCS/OutlookObjects/Store/` has corresponding tests
 - [ ] Every public class/method in `UtilitiesCS/OutlookObjects/Table/` has corresponding tests
 - [ ] Per-file line coverage ≥80% for each testable OutlookObjects source file
