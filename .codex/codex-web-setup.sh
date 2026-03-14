@@ -45,12 +45,78 @@ install_apt_packages() {
     curl \
     git \
     jq \
+    lsb-release \
     mono-complete \
-    nuget \
-    powershell \
     ripgrep \
     unzip \
     zip
+}
+
+install_powershell() {
+  if command -v pwsh >/dev/null 2>&1; then
+    log "PowerShell is already available; skipping."
+    return
+  fi
+
+  if ! command -v apt-get >/dev/null 2>&1; then
+    warn "apt-get is unavailable; skipping PowerShell installation."
+    return
+  fi
+
+  local runner=""
+  if [ "$(id -u)" -ne 0 ]; then
+    if command -v sudo >/dev/null 2>&1; then
+      runner="sudo"
+    else
+      warn "PowerShell installation requires root; skipping."
+      return
+    fi
+  fi
+
+  local ubuntu_version
+  ubuntu_version="$(lsb_release -rs 2>/dev/null || echo '24.04')"
+
+  log "Registering Microsoft package repository for PowerShell (Ubuntu ${ubuntu_version})..."
+  local ms_pkg
+  ms_pkg="$(mktemp --suffix=.deb)"
+  if curl -fsSL "https://packages.microsoft.com/config/ubuntu/${ubuntu_version}/packages-microsoft-prod.deb" -o "${ms_pkg}"; then
+    ${runner} dpkg -i "${ms_pkg}" || true
+    rm -f "${ms_pkg}"
+    ${runner} apt-get update
+    ${runner} apt-get install -y powershell
+  else
+    rm -f "${ms_pkg}"
+    warn "Could not download Microsoft package repo; skipping PowerShell installation."
+  fi
+}
+
+install_nuget() {
+  if command -v nuget >/dev/null 2>&1; then
+    log "nuget is already available; skipping."
+    return
+  fi
+
+  if ! command -v mono >/dev/null 2>&1; then
+    warn "mono is unavailable; cannot install nuget wrapper."
+    return
+  fi
+
+  log "Downloading nuget.exe and creating mono wrapper..."
+  local nuget_exe="/usr/local/bin/nuget.exe"
+  local nuget_wrapper="/usr/local/bin/nuget"
+
+  local runner=""
+  if [ "$(id -u)" -ne 0 ]; then
+    runner="sudo"
+  fi
+
+  if curl -fsSL "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -o "${nuget_exe}"; then
+    printf '#!/usr/bin/env bash\nexec mono %s "$@"\n' "${nuget_exe}" | ${runner} tee "${nuget_wrapper}" >/dev/null
+    ${runner} chmod +x "${nuget_wrapper}"
+    log "nuget wrapper installed at ${nuget_wrapper}."
+  else
+    warn "Could not download nuget.exe; skipping."
+  fi
 }
 
 install_dotnet_sdk() {
@@ -142,6 +208,8 @@ main() {
   append_if_missing "${HOME}/.bashrc" 'export NUGET_XMLDOC_MODE=skip'
 
   install_apt_packages
+  install_powershell
+  install_nuget
   install_dotnet_sdk
   install_dotnet_tools
   restore_packages_if_needed
