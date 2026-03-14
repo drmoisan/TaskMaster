@@ -462,7 +462,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public async Task FromTokenBaseAsync_03NullParent()
         {
             // Arrange
@@ -473,17 +472,15 @@ namespace UtilitiesCS.Test.EmailIntelligence
             CancellationToken token = default;
 
             // Act
-            var result = await BayesianClassifierShared.FromTokenBaseAsync(
+            Func<Task> act = () => BayesianClassifierShared.FromTokenBaseAsync(
                 parent, expected.Tag, matches, expected.MatchEmailCount, true, token);
 
             // Assert
-            Console.WriteLine("Test failed because did not throw ArgumentNullException");
-            Assert.Fail();
+            await act.Should().ThrowAsync<ArgumentNullException>();
 
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public async Task FromTokenBaseAsync_04NullTag()
         {
             // Arrange
@@ -502,16 +499,14 @@ namespace UtilitiesCS.Test.EmailIntelligence
             CancellationToken token = default;
 
             // Act
-            var result = await BayesianClassifierShared.FromTokenBaseAsync(
+            Func<Task> act = () => BayesianClassifierShared.FromTokenBaseAsync(
                 parent, null, matches, expected.MatchEmailCount, true, token);
 
             // Assert
-            Console.WriteLine("Test failed because did not throw ArgumentNullException");
-            Assert.Fail();
+            await act.Should().ThrowAsync<ArgumentNullException>();
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public async Task FromTokenBaseAsync_05AllNull()
         {
             // Arrange
@@ -519,17 +514,15 @@ namespace UtilitiesCS.Test.EmailIntelligence
             CancellationToken token = default;
 
             // Act
-            var result = await BayesianClassifierShared.FromTokenBaseAsync(
+            Func<Task> act = () => BayesianClassifierShared.FromTokenBaseAsync(
                 null, null, null, 1, true, token);
 
             // Assert
-            Console.WriteLine("Test failed because did not throw ArgumentNullException");
-            Assert.Fail();
+            await act.Should().ThrowAsync<ArgumentNullException>();
         }
 
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public async Task FromTokenBaseAsync_06EmailCountOutOfRange()
         {
             // Arrange
@@ -548,12 +541,11 @@ namespace UtilitiesCS.Test.EmailIntelligence
             CancellationToken token = default;
 
             // Act
-            var result = await BayesianClassifierShared.FromTokenBaseAsync(
+            Func<Task> act = () => BayesianClassifierShared.FromTokenBaseAsync(
                 parent, expected.Tag, matches, 0, true, token);
 
             // Assert
-            Console.WriteLine("Test failed because did not throw ArgumentOutOfRangeException");
-            Assert.Fail();
+            await act.Should().ThrowAsync<ArgumentOutOfRangeException>();
         }
 
 

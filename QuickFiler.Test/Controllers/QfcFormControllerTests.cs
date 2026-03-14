@@ -642,7 +642,7 @@ namespace QuickFiler.Controllers.Tests
             _controller = CreateQfcFormController();
 
             // Act & Assert
-            Assert.ThrowsException<NotImplementedException>(() => _controller.Viewer_Activate());
+            Assert.ThrowsExactly<NotImplementedException>(() => _controller.Viewer_Activate());
         }
     }
 }
