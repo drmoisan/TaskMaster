@@ -119,9 +119,9 @@ Follow this exact sequence.
 
 1.3 Create potential entry using exact command by type:
 - If `${promotion-type}` is `feature`:
-  - `VS Code command: `drm-copilot: New Potential Entry (PowerShell Placeholder)` (command ID: `drmCopilotExtension.newPotentialEntryPsPlaceholder`) -ShortName ${short-name}`
+  - `VS Code command: `drm-copilot: New Potential Entry` (command ID: `drmCopilotExtension.newPotentialEntry`) -ShortName ${short-name}`
 - If `${promotion-type}` is `bug`:
-  - `VS Code command: `drm-copilot: New Potential Bug Entry (Python Placeholder)` (command ID: `drmCopilotExtension.newPotentialBugEntryPyPlaceholder`) --short-name ${short-name}`
+  - `VS Code command: `drm-copilot: New Potential Bug Entry` (command ID: `drmCopilotExtension.newPotentialBugEntry`) --short-name ${short-name}`
 
 1.4 Detect created potential markdown file path and save as `${relativeFile}`.
 
@@ -132,7 +132,7 @@ Follow this exact sequence.
 ### Step 2 — Promote potential item
 
 2.1 Promote to issue with exact command:
-- `VS Code command: `drm-copilot: Potential To Issue (Placeholder)` (command ID: `drmCopilotExtension.potentialToIssuePlaceholder`) --potential-path ${relativeFile} --promotion-type ${promotion-type}`
+- `VS Code command: `drm-copilot: Potential To Issue` (command ID: `drmCopilotExtension.potentialToIssue`) --potential-path ${relativeFile} --promotion-type ${promotion-type}`
 
 2.2 Set `${long-name}` from `${relativeFile}` filename without `.md`.
 
@@ -142,7 +142,7 @@ Follow this exact sequence.
 - `${promotion-type}/${short-name}-${issue-num}`
 
 2.5 Create active feature folder with exact command:
-- `VS Code command: `drm-copilot: New Active Feature Folder (Placeholder)` (command ID: `drmCopilotExtension.newActiveFeatureFolderPlaceholder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num}`
+- `VS Code command: `drm-copilot: New Active Feature Folder` (command ID: `drmCopilotExtension.newActiveFeatureFolder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num}`
 
 2.6 Capture created folder path as `${feature-folder}`.
 

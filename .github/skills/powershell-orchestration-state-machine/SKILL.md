@@ -29,7 +29,7 @@ Use this skill when:
 - `long-name`
 - `issue-num`
 - `feature-folder`
-- `work-mode` (`full` or `minor-audit`)
+- `work-mode` (`minor-audit`, `full-feature`, or `full-bug`; normalize legacy `full` to `full-feature` before persistence)
 - `plan-path` (minimal or full plan path)
 - `completed_steps`
 - `next_step`

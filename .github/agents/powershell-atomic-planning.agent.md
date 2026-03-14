@@ -91,16 +91,18 @@ Use the `atomic-plan-contract` skill as the system-of-record for plan format, Ph
 
 When planning from a feature folder, resolve mode using this ordered precedence:
 
-- Persisted marker in `issue.md` (`- Work Mode: minor-audit` or `- Work Mode: full`)
+- Persisted marker in `issue.md` (`- Work Mode: minor-audit`, `- Work Mode: full-feature`, or `- Work Mode: full-bug`)
+- Legacy compatibility marker `- Work Mode: full` resolves to `full-feature`
 - Explicit workflow override only if repo policy allows and only if reconciled against issue.md
-- fail closed to full when marker is missing or malformed
+- fail closed to `full-feature` when marker is missing or malformed
 
-If marker is missing or malformed, fail closed to `full`.
+If marker is missing or malformed, fail closed to `full-feature`.
 
 Branch-specific required task sets:
 
 - `minor-audit`: include baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks.
-- `full`: retain full-document expectations and full QA obligations.
+- `full-feature`: retain full-document expectations and full QA obligations.
+- `full-bug`: require spec-driven expectations and full QA obligations.
 
 ---
 
