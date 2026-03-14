@@ -1,4 +1,3 @@
-````chatagent
 ---
 name: csharp-atomic-planning
 description: Generate phased implementation plans with atomic checkbox tasks that have binary completion and clear acceptance criteria for C# workflows.
