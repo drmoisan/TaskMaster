@@ -81,5 +81,48 @@ namespace TaskMaster.Test.AppGlobals
             result.Should().BeNull();
             mockRepository.VerifyAll();
         }
+
+        [TestMethod]
+        public void ReadJunkPotentialSetting_ReturnsJunkPotentialValue()
+        {
+            // Arrange
+            var original = Properties.Settings.Default.JunkPotential;
+            var expected = "Inbox\\Junk Suspects SB";
+            Properties.Settings.Default.JunkPotential = expected;
+
+            try
+            {
+                // Act
+                var result = AppOlObjects.ReadJunkPotentialSetting();
+
+                // Assert
+                result.Should().Be(expected);
+            }
+            finally
+            {
+                Properties.Settings.Default.JunkPotential = original;
+            }
+        }
+
+        [TestMethod]
+        public void WriteJunkPotentialSetting_UpdatesJunkPotentialValue()
+        {
+            // Arrange
+            var original = Properties.Settings.Default.JunkPotential;
+            var expected = "Inbox\\Junk Suspects SB";
+
+            try
+            {
+                // Act
+                AppOlObjects.WriteJunkPotentialSetting(expected);
+
+                // Assert
+                Properties.Settings.Default.JunkPotential.Should().Be(expected);
+            }
+            finally
+            {
+                Properties.Settings.Default.JunkPotential = original;
+            }
+        }
     }
 }

@@ -155,9 +155,6 @@
     <Setting Name="EventsHooked" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="OlJunkPotential" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Junk Suspects SB</Value>
-    </Setting>
     <Setting Name="OlJunkCertain" Type="System.String" Scope="User">
       <Value Profile="(Default)">Junk E-Mail SB</Value>
     </Setting>
