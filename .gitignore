@@ -139,6 +139,9 @@ _TeamCity*
 *.coverage
 *.coveragexml
 
+# dotnet-coverage Cobertura output (read by Koverage extension)
+coverage/
+
 # NCrunch
 _NCrunch_*
 .*crunch*.local.xml
