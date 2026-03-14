@@ -129,11 +129,14 @@ If the epic deviates from this shape, continue anyway and document deviations.
 ## 2.5) Work-mode marker contract and doc completeness
 - Read work mode from `issue.md` using the persisted marker line:
   - `- Work Mode: minor-audit`
-  - `- Work Mode: full`
+  - `- Work Mode: full-feature`
+  - `- Work Mode: full-bug`
+- Legacy compatibility: if `issue.md` still contains `- Work Mode: full`, interpret it as `full-feature`.
 - Branch doc completeness and AC extraction by marker:
   - For `Work Mode: minor-audit`, `spec.md` and `user-story.md` may be absent by design; use `issue.md` as the AC source.
-  - For `Work Mode: full`, require and evaluate `spec.md` and `user-story.md` as AC sources.
-- Fail closed: if the marker is missing or malformed, fallback to full behavior for doc completeness and AC extraction.
+  - For `Work Mode: full-feature`, require and evaluate `spec.md` and `user-story.md` as AC sources.
+  - For `Work Mode: full-bug`, require and evaluate `spec.md` as the AC source; do not require `user-story.md` unless the docs explicitly justify it.
+- Fail closed: if the marker is missing or malformed, fallback to `full-feature` behavior for doc completeness and AC extraction.
 
 ## 3) Version selection rule (deterministic)
 For each feature folder:

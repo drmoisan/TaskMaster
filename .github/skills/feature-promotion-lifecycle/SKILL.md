@@ -23,36 +23,36 @@ Use this skill when:
 - `${long-name}`: `${relativeFile}` filename without `.md`
 - `${issue-num}`: promoted GitHub issue number
 - `${feature-folder}`: active feature folder path
-- `${work-mode}`: `full` or `minor-audit`
+- `${work-mode}`: `minor-audit`, `full-feature`, or `full-bug` (legacy `full` is accepted only as an alias for `full-feature`)
 - `${short-path-flag}`: `--work-mode minor-audit` (mandatory for short-path promotion/folder creation)
 
 ## Canonical Command Sequence
 
 1) Create potential entry by type:
-- feature: `VS Code command: `drm-copilot: New Potential Entry (PowerShell Placeholder)` (command ID: `drmCopilotExtension.newPotentialEntryPsPlaceholder`) -ShortName ${short-name}`
-- bug: `VS Code command: `drm-copilot: New Potential Bug Entry (Python Placeholder)` (command ID: `drmCopilotExtension.newPotentialBugEntryPyPlaceholder`) --short-name ${short-name}`
+- feature: `VS Code command: `drm-copilot: New Potential Entry` (command ID: `drmCopilotExtension.newPotentialEntry`) -ShortName ${short-name}`
+- bug: `VS Code command: `drm-copilot: New Potential Bug Entry` (command ID: `drmCopilotExtension.newPotentialBugEntry`) --short-name ${short-name}`
 
 2) Promote potential doc:
-- `VS Code command: `drm-copilot: Potential To Issue (Placeholder)` (command ID: `drmCopilotExtension.potentialToIssuePlaceholder`) --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode ${work-mode}`
+- `VS Code command: `drm-copilot: Potential To Issue` (command ID: `drmCopilotExtension.potentialToIssue`) --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode ${work-mode}`
 
 3) Create branch:
 - `${promotion-type}/${short-name}-${issue-num}`
 
 4) Create active feature folder:
-- `VS Code command: `drm-copilot: New Active Feature Folder (Placeholder)` (command ID: `drmCopilotExtension.newActiveFeatureFolderPlaceholder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode ${work-mode}`
+- `VS Code command: `drm-copilot: New Active Feature Folder` (command ID: `drmCopilotExtension.newActiveFeatureFolder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode ${work-mode}`
 
 ## Canonical Short-Path Sequence (Minor Audit Mode)
 
 When orchestrator routing selects short path, promotion/folder initialization still occurs and MUST use `minor-audit` mode.
 
 1) Promote potential doc with short-path flag:
-- `VS Code command: `drm-copilot: Potential To Issue (Placeholder)` (command ID: `drmCopilotExtension.potentialToIssuePlaceholder`) --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode minor-audit`
+- `VS Code command: `drm-copilot: Potential To Issue` (command ID: `drmCopilotExtension.potentialToIssue`) --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode minor-audit`
 
 2) Create branch:
 - `${promotion-type}/${short-name}-${issue-num}`
 
 3) Create active feature folder with short-path flag:
-- `VS Code command: `drm-copilot: New Active Feature Folder (Placeholder)` (command ID: `drmCopilotExtension.newActiveFeatureFolderPlaceholder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode minor-audit`
+- `VS Code command: `drm-copilot: New Active Feature Folder` (command ID: `drmCopilotExtension.newActiveFeatureFolder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode minor-audit`
 
 4) Delegate minimal-audit plan creation to `atomic_planner` with directive:
 - `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`
@@ -79,11 +79,14 @@ Before delegating research/spec/planning, provide:
 
 Mode-aware expectations:
 - For `minor-audit`, `issue.md` is the primary acceptance-criteria source and `spec.md`/`user-story.md` may be intentionally absent by design.
-- For `full`, `spec.md` and `user-story.md` are expected alongside `issue.md`.
+- For `full-feature`, `spec.md` and `user-story.md` are expected alongside `issue.md`.
+- For `full-bug`, `spec.md` is expected alongside `issue.md`; `user-story.md` should be absent unless the requirements explicitly justify it.
 
 Selected-mode persistence requirements:
 - Producer outputs MUST persist exactly one marker in `issue.md` metadata above the first `##` heading:
 	- `- Work Mode: minor-audit`
-	- `- Work Mode: full`
+	- `- Work Mode: full-feature`
+	- `- Work Mode: full-bug`
 - Persisted marker MUST represent selected mode after eligibility checks, not requested mode.
-- If a requested `minor-audit` path is rejected by eligibility checks, tooling MUST fail closed to `full`, emit fallback reason, and persist `- Work Mode: full`.
+- If a legacy requested `full` path is accepted, tooling MUST normalize it to `full-feature` before persistence.
+- If a requested `minor-audit` path is rejected by eligibility checks, tooling MUST fail closed to `full-feature`, emit fallback reason, and persist `- Work Mode: full-feature`.

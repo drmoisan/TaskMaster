@@ -145,12 +145,15 @@ When a plan is generated or validated from a feature folder, resolve selected mo
 
 1) Persisted marker in `issue.md` metadata block:
 	- `- Work Mode: minor-audit`
-	- `- Work Mode: full`
-2) Explicit workflow override only when repo policy allows and only when reconciled against `issue.md`
-3) Fail closed to `full` when marker is missing or malformed
+	- `- Work Mode: full-feature`
+	- `- Work Mode: full-bug`
+2) Legacy compatibility marker `- Work Mode: full` resolves to `full-feature`
+3) Explicit workflow override only when repo policy allows and only when reconciled against `issue.md`
+4) Fail closed to `full-feature` when marker is missing or malformed
 
 ## Mode-Specific Mandatory Plan Gates
 
 - `minor-audit` plans MUST include baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks.
 - `minor-audit` plans MUST NOT treat missing `spec.md` or `user-story.md` as automatic blockers.
-- `full` plans MUST enforce full-document expectations (`spec.md` + `user-story.md`) and full QA loop obligations.
+- `full-feature` plans MUST enforce full-document expectations (`spec.md` + `user-story.md`) and full QA loop obligations.
+- `full-bug` plans MUST enforce spec-driven expectations (`spec.md` required, `user-story.md` optional/absent by default) and full QA loop obligations.

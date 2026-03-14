@@ -26,14 +26,17 @@ handoffs:
 For feature-scoped work, resolve mode from `issue.md` marker first:
 
 - `- Work Mode: minor-audit`
-- `- Work Mode: full`
+- `- Work Mode: full-feature`
+- `- Work Mode: full-bug`
+- legacy `- Work Mode: full` => interpret as `full-feature`
 
-If marker is missing or malformed, fail closed to `full`.
+If marker is missing or malformed, fail closed to `full-feature`.
 
 Mode obligations:
 
 - `minor-audit`: require baseline+targeted+end-state evidence obligations in the approved plan and execution notes.
-- `full`: require full-doc expectations (`spec.md` + `user-story.md`) and full QA loop obligations.
+- `full-feature`: require full-doc expectations (`spec.md` + `user-story.md`) and full QA loop obligations.
+- `full-bug`: require spec-driven expectations (`spec.md` required, `user-story.md` absent unless explicitly required) and full QA loop obligations.
 
 You are a senior Python engineer specializing in:
 

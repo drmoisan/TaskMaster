@@ -127,16 +127,16 @@ S1.2 Generate `${short-name}`:
 
 S1.3 Ensure potential entry exists using exact command by type when missing:
 - If `${promotion-type}` is `feature`:
-  - `VS Code command: `drm-copilot: New Potential Entry (PowerShell Placeholder)` (command ID: `drmCopilotExtension.newPotentialEntryPsPlaceholder`) -ShortName ${short-name}`
+  - `VS Code command: `drm-copilot: New Potential Entry` (command ID: `drmCopilotExtension.newPotentialEntry`) -ShortName ${short-name}`
 - If `${promotion-type}` is `bug`:
-  - `VS Code command: `drm-copilot: New Potential Bug Entry (Python Placeholder)` (command ID: `drmCopilotExtension.newPotentialBugEntryPyPlaceholder`) --short-name ${short-name}`
+  - `VS Code command: `drm-copilot: New Potential Bug Entry` (command ID: `drmCopilotExtension.newPotentialBugEntry`) --short-name ${short-name}`
 
 S1.4 Detect created/existing potential markdown file path and save as `${relativeFile}`.
 
 ### Step S2 — Promote with short-path flag
 
 S2.1 Promote to issue using existing tooling with short-path flag set:
-- `VS Code command: `drm-copilot: Potential To Issue (Placeholder)` (command ID: `drmCopilotExtension.potentialToIssuePlaceholder`) --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode minor-audit`
+- `VS Code command: `drm-copilot: Potential To Issue` (command ID: `drmCopilotExtension.potentialToIssue`) --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode minor-audit`
 
 S2.2 Set `${long-name}` from `${relativeFile}` filename without `.md`.
 
@@ -146,9 +146,15 @@ S2.4 Create branch with exact name:
 - `${promotion-type}/${short-name}-${issue-num}`
 
 S2.5 Create active feature folder with short-path flag set:
-- `VS Code command: `drm-copilot: New Active Feature Folder (Placeholder)` (command ID: `drmCopilotExtension.newActiveFeatureFolderPlaceholder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode minor-audit`
+- `VS Code command: `drm-copilot: New Active Feature Folder` (command ID: `drmCopilotExtension.newActiveFeatureFolder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode minor-audit`
 
 S2.6 Capture created folder path as `${feature-folder}`.
+
+S2.7 Verify short-path folder integrity before proceeding:
+- `${feature-folder}/issue.md` MUST exist and contain `- Work Mode: minor-audit`.
+- `${feature-folder}/spec.md` MUST NOT exist.
+- `${feature-folder}/user-story.md` MUST NOT exist.
+- If any integrity check fails, stop and remediate before planning.
 
 ### Step S3 — Create minimal short-path plan
 
@@ -176,6 +182,7 @@ S4.1 Delegate handoff **Execute Phase 0 only** using approved `plan-path`.
 Hard enforcement for S4:
 - Execute only Phase 0.
 - Persist checkpoint with Phase 0 completion evidence.
+- Do not mark S4 complete unless `phase0-instructions-read.md` and the baseline command-step artifacts referenced by the plan exist on disk, and the corresponding Phase 0 checklist items are checked from execution evidence rather than inferred summary text.
 
 ### Step S5 — Branch by bootstrap mode
 
@@ -203,6 +210,7 @@ S7.1 Delegate handoff **Validate small-path delivery and post-QC docs**.
 Hard enforcement for S7:
 - Validation MUST be against `${feature-folder}/issue.md`.
 - Plan checklist updates MUST be persisted before audit.
+- Validation MUST fail if minor-audit integrity is broken (`spec.md` or `user-story.md` exists, required Phase 0 artifacts are missing, or checklist state contradicts artifact evidence).
 
 ### Step S8 — Run reduced audit and remediation loop
 
@@ -216,6 +224,7 @@ S8.2 If audit triggers remediation:
 
 Hard enforcement for S8:
 - Do not mark small path complete until reduced audit artifacts are present in `${feature-folder}` and remediation loop (if any) is closed.
+- Do not accept PASS reduced-audit outcomes when required baseline evidence is missing, when plan checklist state is not evidence-backed, or when minor-audit folders contain `spec.md`/`user-story.md`.
 
 ---
 
@@ -233,9 +242,9 @@ Follow this exact sequence.
 
 1.3 Create potential entry using exact command by type:
 - If `${promotion-type}` is `feature`:
-  - `VS Code command: `drm-copilot: New Potential Entry (PowerShell Placeholder)` (command ID: `drmCopilotExtension.newPotentialEntryPsPlaceholder`) -ShortName ${short-name}`
+  - `VS Code command: `drm-copilot: New Potential Entry` (command ID: `drmCopilotExtension.newPotentialEntry`) -ShortName ${short-name}`
 - If `${promotion-type}` is `bug`:
-  - `VS Code command: `drm-copilot: New Potential Bug Entry (Python Placeholder)` (command ID: `drmCopilotExtension.newPotentialBugEntryPyPlaceholder`) --short-name ${short-name}`
+  - `VS Code command: `drm-copilot: New Potential Bug Entry` (command ID: `drmCopilotExtension.newPotentialBugEntry`) --short-name ${short-name}`
 
 1.4 Detect created potential markdown file path and save as `${relativeFile}`.
 
@@ -246,7 +255,7 @@ Follow this exact sequence.
 ### Step 2 — Promote potential item
 
 2.1 Promote to issue with exact command:
-- `VS Code command: `drm-copilot: Potential To Issue (Placeholder)` (command ID: `drmCopilotExtension.potentialToIssuePlaceholder`) --potential-path ${relativeFile} --promotion-type ${promotion-type}`
+- `VS Code command: `drm-copilot: Potential To Issue` (command ID: `drmCopilotExtension.potentialToIssue`) --potential-path ${relativeFile} --promotion-type ${promotion-type}`
 
 2.2 Set `${long-name}` from `${relativeFile}` filename without `.md`.
 
@@ -256,7 +265,7 @@ Follow this exact sequence.
 - `${promotion-type}/${short-name}-${issue-num}`
 
 2.5 Create active feature folder with exact command:
-- `VS Code command: `drm-copilot: New Active Feature Folder (Placeholder)` (command ID: `drmCopilotExtension.newActiveFeatureFolderPlaceholder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num}`
+- `VS Code command: `drm-copilot: New Active Feature Folder` (command ID: `drmCopilotExtension.newActiveFeatureFolder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num}`
 
 2.6 Capture created folder path as `${feature-folder}`.
 
@@ -325,6 +334,7 @@ Checkpoint writes are mandatory after each completed sub-step in the large and s
 Artifact verification gate before mission completion (small path):
 - At least one short-path `policy-audit.<timestamp>.md` exists under `${feature-folder}`.
 - At least one short-path `feature-audit.<timestamp>.md` exists under `${feature-folder}`.
+- `phase0-instructions-read.md` and baseline command-step artifacts required by the approved plan exist under `${feature-folder}`.
 - If remediation triggered, `remediation-inputs.<timestamp>.md` and `remediation-plan.<timestamp>.md` must exist and the latest re-audit must pass.
 
 Artifact verification gate before mission completion (large path):

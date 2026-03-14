@@ -60,11 +60,14 @@ Use these reusable skills to avoid duplicating shared operations:
 ## 3) Work-mode marker contract (deterministic)
 - Read the persisted marker from `issue.md` using the exact line format:
    - `- Work Mode: minor-audit`
-   - `- Work Mode: full`
+   - `- Work Mode: full-feature`
+   - `- Work Mode: full-bug`
+- Legacy compatibility: if `issue.md` still contains `- Work Mode: full`, interpret it as `full-feature`.
 - Branch acceptance-criteria (AC) source by marker value:
    - When `Work Mode: minor-audit`, treat `issue.md` as the AC source of truth.
-   - When `Work Mode: full`, treat `spec.md` and `user-story.md` as AC sources of truth.
-- Fail closed: if marker is missing or malformed, fallback to full mode behavior (`spec.md` + `user-story.md`).
+   - When `Work Mode: full-feature`, treat `spec.md` and `user-story.md` as AC sources of truth.
+   - When `Work Mode: full-bug`, treat `spec.md` as the AC source of truth.
+- Fail closed: if marker is missing or malformed, fallback to `full-feature` behavior (`spec.md` + `user-story.md`).
 
 
 # Execution plan (phased, deterministic)

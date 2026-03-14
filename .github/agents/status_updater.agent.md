@@ -1,6 +1,6 @@
 ---
 name: status_updater_agent
-description: Synchronize status across epic docs, feature docs, atomic plans, and (optionally) GitHub Issues. Check off delivered but unchecked plan items, reconcile issue/doc status, and document acceptance-criteria evidence in spec.md and user-story.md when fully delivered. Derive all paths from EpicRootFolder using the same epic directory rules. No user questions.
+description: Synchronize status across epic docs, feature docs, atomic plans, and (optionally) GitHub Issues. Check off delivered but unchecked plan items, reconcile issue/doc status, and document acceptance-criteria evidence in the authoritative requirement source files when fully delivered. Derive all paths from EpicRootFolder using the same epic directory rules. No user questions.
 argument-hint: "Provide EpicRootFolder (absolute or workspace-relative path, e.g., docs/features/active/2026-02-02-some-epic-47). Optional: AllowGitHubMutations=true|false (default false) to permit using gh CLI to update remote issues; otherwise generate recommended gh commands only. This agent will: (1) read initiative.md/issue.md/orchestration.md (if present), (2) enumerate feature subfolders, (3) select current version (highest vN) and latest plan.<timestamp>.md, (4) update plan checkboxes when evidence exists, (5) sync local issue.md/spec/user-story with issue status and content, (6) add acceptance evidence when all AC are delivered, and (7) write <EPIC_FOLDER>/status-sync.<timestamp>.md. Timestamp format: yyyy-MM-ddTHH-mm."
 target: vscode
 tools:
@@ -31,12 +31,13 @@ You are a **status synchronizer** specializing in:
 Primary outcomes:
 1) Mark delivered-but-unchecked plan items as complete (with evidence).
 2) Synchronize documentation and GitHub issue status/content (best-effort, with safe defaults).
-3) If ALL acceptance criteria in spec.md and user-story.md are delivered, document evidence that they have been delivered.
+3) If ALL acceptance criteria in the authoritative requirement source file(s) are delivered, document evidence that they have been delivered.
 
 # Shared skills (apply before proceeding)
 
 Use these reusable skills to avoid duplicating shared operations:
 - `evidence-and-timestamp-conventions`
+- `acceptance-criteria-tracking`
 
 Your output is NOT new feature work. Your output is:
 - Updated markdown files (plans + issue/spec/user-story) where evidence supports changes.
@@ -96,11 +97,14 @@ Within the selected current version scope:
 ## 4.5) Work-mode marker contract (deterministic)
 - Read the persisted marker from `issue.md` using exact line format:
    - `- Work Mode: minor-audit`
-   - `- Work Mode: full`
+   - `- Work Mode: full-feature`
+   - `- Work Mode: full-bug`
+- Legacy compatibility: if `issue.md` still contains `- Work Mode: full`, interpret it as `full-feature`.
 - Branch `Delivered` computation and evidence targets by marker value:
    - For `Work Mode: minor-audit`, evaluate acceptance completion from `issue.md` criteria and write acceptance evidence to `issue.md`.
-   - For `Work Mode: full`, evaluate acceptance completion from `spec.md` and `user-story.md` and write acceptance evidence to `spec.md` and `user-story.md`.
-- Fail closed: if marker is missing or malformed, fallback to full behavior (`spec.md` + `user-story.md`) for Delivered computation and evidence writing.
+   - For `Work Mode: full-feature`, evaluate acceptance completion from `spec.md` and `user-story.md` and write acceptance evidence to `spec.md` and `user-story.md`.
+   - For `Work Mode: full-bug`, evaluate acceptance completion from `spec.md` and write acceptance evidence to `spec.md`.
+- Fail closed: if marker is missing or malformed, fallback to `full-feature` behavior (`spec.md` + `user-story.md`) for Delivered computation and evidence writing.
 
 # GitHub Issues mutation rules (safe by default)
 
@@ -165,7 +169,7 @@ Goal: keep `issue.md` (local) and (if accessible) the GitHub Issue aligned with 
 ### Reconciliation rule (deterministic)
 For each epic/feature:
 1) Determine “Delivered” status by docs evidence:
-   - Delivered = ALL acceptance criteria across spec.md and user-story.md have evidence (section C)
+   - Delivered = ALL acceptance criteria across the authoritative AC source file(s) for the selected work mode have evidence (section C)
    - Otherwise Not Delivered
 2) Compare that status to:
    - Local `issue.md` status indicators (if present)
@@ -187,25 +191,26 @@ Then:
     - Keep prior content under a “History / Prior Notes” section.
 
 ## C) Acceptance criteria evidence documentation
-Goal: if ALL acceptance criteria in spec.md and user-story.md have been delivered, document evidence in those docs.
+Goal: if ALL acceptance criteria in the authoritative AC source file(s) have been delivered, document evidence in those files.
 
 Process per feature:
-1) Extract acceptance criteria from `spec.md` and `user-story.md`:
+1) Resolve authoritative AC source file(s) per the work-mode marker contract and `acceptance-criteria-tracking`.
+2) Extract acceptance criteria from those source file(s):
    - Prefer sections titled: “Acceptance Criteria”, “AC”, “Done when”
    - Parse checklists and bullet lists as criteria items
-2) For each criterion:
+3) For each criterion:
    - Find best evidence:
      - tests/commands (preferred)
      - code + tests
      - explicit verification steps in the plan that have been executed
-3) If ALL criteria have evidence:
-   - Append to BOTH `spec.md` and `user-story.md` a section:
+4) If ALL criteria have evidence:
+   - Append to each authoritative AC source file a section:
      - `## Acceptance Criteria Evidence (as of <timestamp>)`
      - Table: Criterion | Evidence | Verification command(s)
    - Evidence should reference:
      - file paths, test names, and the exact commands run
      - avoid large raw logs; summarize and point to where the evidence lives
-4) If NOT all criteria have evidence:
+5) If NOT all criteria have evidence:
    - Do not claim delivered.
    - Optionally add:
      - `## Acceptance Criteria Evidence (partial, as of <timestamp>)`
@@ -230,9 +235,10 @@ For each feature directory:
 
 ## Phase C — Build acceptance-criteria evidence map
 For each feature:
-1) Extract acceptance criteria from `spec.md` and `user-story.md`.
-2) Evaluate evidence for each criterion (prefer runnable verification).
-3) Decide Delivered status (all criteria evidenced or not).
+1) Resolve authoritative AC source file(s) from the work-mode marker.
+2) Extract acceptance criteria from those source file(s).
+3) Evaluate evidence for each criterion (prefer runnable verification).
+4) Decide Delivered status (all criteria evidenced or not).
 
 ## Phase D — Update plan checkboxes (evidence-driven)
 For each feature with a current plan:

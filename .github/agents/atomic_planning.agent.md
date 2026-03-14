@@ -92,11 +92,13 @@ When planning from a feature folder, resolve the selected work mode in this exac
 
 1. Persisted marker in `issue.md` metadata block:
    - `- Work Mode: minor-audit`
-   - `- Work Mode: full`
-2. Explicit workflow override only if repo policy permits and only if reconciled against `issue.md`.
-3. fail closed to `full` when the marker is missing or malformed.
+   - `- Work Mode: full-feature`
+   - `- Work Mode: full-bug`
+2. Legacy compatibility marker `- Work Mode: full` resolves to `full-feature`.
+3. Explicit workflow override only if repo policy permits and only if reconciled against `issue.md`.
+4. fail closed to `full-feature` when the marker is missing or malformed.
 
-For `minor-audit`, preflight-required plan gates MUST include baseline evidence, targeted verification evidence, and end-state evidence tasks. For `full`, retain full-document and full QA obligations.
+For `minor-audit`, preflight-required plan gates MUST include baseline evidence, targeted verification evidence, and end-state evidence tasks. For `full-feature`, retain full-document and full QA obligations. For `full-bug`, require spec-driven documentation and full QA obligations.
 
 ---
 
