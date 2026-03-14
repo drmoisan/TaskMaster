@@ -173,10 +173,12 @@ namespace TaskMaster
 
         private Folder _junkPotential;
         public Folder JunkPotential => Initializer.GetOrLoad(ref _junkPotential, LoadJunkPotential);
+        internal static string ReadJunkPotentialSetting() => Properties.Settings.Default.JunkPotential;
+        internal static void WriteJunkPotentialSetting(string relativePath) => Properties.Settings.Default.JunkPotential = relativePath;
         internal Folder LoadJunkPotential()
         {
             var root = new FolderTree(Root).Roots.FirstOrDefault();
-            var folderPath = Properties.Settings.Default.JunkPotential;
+            var folderPath = ReadJunkPotentialSetting();
             if (folderPath.IsNullOrEmpty()) { return null; }
             var sequence = new Queue<string>(folderPath.Split('\\'));
 
@@ -188,7 +190,7 @@ namespace TaskMaster
                 folder = NamespaceMAPI.PickFolder() as Folder;
                 if (folder is null) { return null; }
                 var wrapper = new FolderWrapper(folder, Root);
-                Properties.Settings.Default.OlJunkPotential = wrapper.RelativePath;
+                WriteJunkPotentialSetting(wrapper.RelativePath);
                 Properties.Settings.Default.Save();
             }
             return folder;
