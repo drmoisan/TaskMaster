@@ -4,6 +4,13 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
+# Codex Web copies this script to /tmp before running it, so the script-relative
+# REPO_ROOT resolves to / rather than the actual checkout.  Fall back to the
+# working directory, which Codex sets to the repo root.
+if [ ! -f "${REPO_ROOT}/TaskMaster.sln" ]; then
+  REPO_ROOT="$(pwd)"
+fi
+
 log() {
   printf '[codex-web-setup] %s\n' "$*"
 }
