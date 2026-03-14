@@ -59,6 +59,27 @@
       ],
       "group": "test",
       "problemMatcher": []
+    },
+    {
+      "label": "test: MSTest with Coverage (Koverage)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/vscode/Invoke-MSTestWithCoverage.ps1",
+        "-SearchRoot",
+        ".",
+        "-Configuration",
+        "Debug"
+      ],
+      "dependsOn": [
+        "build: TaskMaster.sln (VS MSBuild)"
+      ],
+      "group": "test",
+      "problemMatcher": []
     }
   ]
 }

@@ -4,5 +4,11 @@
   "omnisharp.projectLoadTimeout": 120,
   "chat.tools.terminal.autoApprove": {
     "dotnet restore": true
-  }
+  },
+  "koverage.coverageFileNames": [
+    "coverage.cobertura.xml"
+  ],
+  "koverage.coverageFilePaths": [
+    "coverage"
+  ]
 }
