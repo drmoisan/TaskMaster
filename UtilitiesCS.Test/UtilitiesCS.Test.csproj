@@ -190,6 +190,19 @@
     <Compile Include="OutlookObjects\Store\StoreWrapperTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperViewerTests.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperTests.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemHelperProjectionTests.cs" />
+    <Compile Include="OutlookObjects\Fields\UserDefinedFieldsTests.cs" />
+    <Compile Include="OutlookObjects\Fields\MAPIFieldsTests.cs" />
+    <Compile Include="OutlookObjects\Conversation\ConversationHelperTests.cs" />
+    <Compile Include="OutlookObjects\Table\OlToDoTableTests.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensionsTransformTests.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensionsRetryTests.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensionsConversionTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperControllerTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperStateTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperTraversalTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderTreeTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderPredictorTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

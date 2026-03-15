@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
 
-namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
+namespace UtilitiesCS.Test.OutlookObjects.MailItem
 {
     [TestClass]
     public class MailItemHelperCoreTests
@@ -85,6 +85,24 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             helper.RecipientsEquivalent(null, null).Should().BeTrue();
             helper.RecipientsEquivalent(new[] { recipient }, null).Should().BeFalse();
             helper.RecipientsEquivalent(new[] { recipient }, Array.Empty<IRecipientInfo>()).Should().BeFalse();
+        }
+
+
+
+        [TestMethod]
+        public void CompressPlainText_collapses_runs_of_whitespace()
+        {
+            var result = MailItemHelper.CompressPlainText("a   b
+
+ c", IItemInfo.PlainTextOptionsEnum.None);
+            result.Should().Contain("a b c");
+        }
+
+        [TestMethod]
+        public void CompressPlainText_returns_safe_value_for_null_or_empty_input()
+        {
+            MailItemHelper.CompressPlainText(null, IItemInfo.PlainTextOptionsEnum.None).Should().NotBeNull();
+            MailItemHelper.CompressPlainText(string.Empty, IItemInfo.PlainTextOptionsEnum.None).Should().NotBeNull();
         }
 
         private static Mock<IApplicationGlobals> CreateGlobals(OutlookFolder archiveRoot, OutlookFolder inbox, string archiveRootPath)
