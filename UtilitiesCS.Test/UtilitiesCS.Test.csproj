@@ -154,11 +154,12 @@
     <Compile Include="OneDriveHelpers\OneDriveDownloaderTests.cs" />
     <Compile Include="OutlookObjects\Attachment\AttachmentHelperTests.cs" />
     <Compile Include="OutlookObjects\Attachment\AttachmentSerializableTests.cs" />
+    <Compile Include="OutlookObjects\AppointmentItem\MeetingItemHelperTests.cs" />
     <Compile Include="OutlookObjects\Calendar\CalendarTests.cs" />
+    <Compile Include="OutlookObjects\Category\CreateCategoryTests.cs" />
     <Compile Include="OutlookObjects\Com\ComTypeTests.cs" />
     <Compile Include="OutlookObjects\Explorer\ExplorerActionsTests.cs" />
     <Compile Include="OutlookObjects\Filter DASL\DASLFilterParserTests.cs" />
-    <Compile Include="OutlookObjects\MailResolutionTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperNameAndParentNameComparerTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperNameCountSizeComparerTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperNameComparerTests.cs" />
@@ -167,13 +168,25 @@
     <Compile Include="OutlookObjects\ItemComparer_Tests.cs" />
     <Compile Include="OutlookObjects\MailItem\ItemInfoTests.cs" />
     <Compile Include="OutlookObjects\Item\OlItemSummaryTests.cs" />
+    <Compile Include="OutlookObjects\Item\OlItemPseudoInterfaceTests.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemExtensionsTests.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemFlaggableTests.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemFlaggableTryTests.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemTests.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemTryTests.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemTryGetTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderConverterTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderMinimalWrapperTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderNavigatorTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderScorerTests.cs" />
     <Compile Include="OutlookObjects\MailItem\EmailDetailsTests.cs" />
     <Compile Include="OutlookObjects\MailItem\EmailDetailsWrapperTests.cs" />
+    <Compile Include="OutlookObjects\MailItem\CaptureEmailAddressesModule2Tests.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemExtensionsTests.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemHelperCoreTests.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientInfoTests.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientStaticTests.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailResolutionTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperViewerTests.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperTests.cs" />
@@ -275,17 +288,17 @@
     <Reference Include="FluentAssertions, Version=8.3.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentAssertions.8.3.0\lib\net47\FluentAssertions.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Core, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\FSharp.Core.9.0.300\lib\netstandard2.0\FSharp.Core.dll</HintPath>
+    <Reference Include="FSharp.Core, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FSharp.Core.11.0.100\lib\netstandard2.0\FSharp.Core.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=3.1.0.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.3.1.0\lib\net462\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=3.3.0.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.3.3.0\lib\net462\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ApplicationInsights, Version=2.23.0.29, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ApplicationInsights.2.23.0\lib\net46\Microsoft.ApplicationInsights.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.9.0.6\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=10.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.10.0.5\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Bcl.HashCode, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.HashCode.6.0.0\lib\net462\Microsoft.Bcl.HashCode.dll</HintPath>
@@ -429,11 +442,11 @@
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.8.12.1\lib\net472\System.IdentityModel.Tokens.Jwt.dll</HintPath>
     </Reference>
-    <Reference Include="System.Interactive, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Interactive.6.0.3\lib\net48\System.Interactive.dll</HintPath>
+    <Reference Include="System.Interactive, Version=7.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Interactive.7.0.0\lib\net48\System.Interactive.dll</HintPath>
     </Reference>
-    <Reference Include="System.Interactive.Async, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Interactive.Async.6.0.3\lib\net48\System.Interactive.Async.dll</HintPath>
+    <Reference Include="System.Interactive.Async, Version=7.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Interactive.Async.7.0.0\lib\net48\System.Interactive.Async.dll</HintPath>
     </Reference>
     <Reference Include="System.IO.Pipelines, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IO.Pipelines.9.0.6\lib\net462\System.IO.Pipelines.dll</HintPath>
@@ -443,8 +456,8 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Linq.Async, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Linq.Async.6.0.3\lib\net48\System.Linq.Async.dll</HintPath>
+    <Reference Include="System.Linq.Async, Version=7.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Linq.Async.7.0.0\lib\net48\System.Linq.Async.dll</HintPath>
     </Reference>
     <Reference Include="System.Memory, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll</HintPath>
@@ -477,8 +490,8 @@
     <Reference Include="System.Text.Encodings.Web, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Text.Encodings.Web.9.0.6\lib\net462\System.Text.Encodings.Web.dll</HintPath>
     </Reference>
-    <Reference Include="System.Text.Encoding.CodePages, Version=9.0.0.6, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encoding.CodePages.9.0.6\lib\net462\System.Text.Encoding.CodePages.dll</HintPath>
+    <Reference Include="System.Text.Encoding.CodePages, Version=10.0.0.5, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encoding.CodePages.10.0.5\lib\net462\System.Text.Encoding.CodePages.dll</HintPath>
     </Reference>
     <Reference Include="System.Text.Json, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Text.Json.9.0.6\lib\net462\System.Text.Json.dll</HintPath>

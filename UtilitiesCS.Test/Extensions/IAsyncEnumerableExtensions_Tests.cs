@@ -13,36 +13,38 @@ namespace UtilitiesCS.Test.Extensions
     public class IAsyncEnumerableExtensions_Tests
     {
         [TestMethod]
-        public async Task Zip_ShouldThrowFileLoadException_WhenAsyncInterfacesDependencyCannotLoad()
+        public async Task Zip_ShouldZipTwoSequences_StoppingAtShorterSequence()
         {
             // Arrange
             var first = GetValuesAsync(1, 2, 3);
             var second = GetValuesAsync("a", "b");
 
             // Act
-            Func<Task> act = async () => await IAsyncEnumerableExtensions.Zip(first, second).ToListAsync();
+            var result = await IAsyncEnumerableExtensions.Zip(first, second).ToListAsync();
 
             // Assert
-            await act.Should().ThrowAsync<System.IO.FileLoadException>();
+            result.Should().HaveCount(2);
+            result[0].Should().Be((1, "a"));
+            result[1].Should().Be((2, "b"));
         }
 
         [TestMethod]
-        public async Task WithProgressReporting_ShouldThrowFileLoadException_WhenAsyncSelectPipelineCannotLoad()
+        public async Task WithProgressReporting_ShouldReportProgressAndReturnAllValues()
         {
             // Arrange
             var reports = new List<int>();
             var source = GetValuesAsync(10, 20, 30, 40);
 
             // Act
-            Func<Task> act = async () => await source.WithProgressReporting(4, reports.Add).ToListAsync();
+            var result = await source.WithProgressReporting(4, reports.Add).ToListAsync();
 
             // Assert
-            await act.Should().ThrowAsync<System.IO.FileLoadException>();
-            reports.Should().BeEmpty();
+            result.Should().Equal(10, 20, 30, 40);
+            reports.Should().Equal(25, 50, 75, 100);
         }
 
         [TestMethod]
-        public void WithProgressReporting_ShouldThrowFileLoadException_BeforeNullGuardWhenAsyncDependencyCannotLoad()
+        public void WithProgressReporting_ShouldThrowArgumentNullException_WhenSourceIsNull()
         {
             // Arrange
             IAsyncEnumerable<int> source = null;
@@ -51,7 +53,7 @@ namespace UtilitiesCS.Test.Extensions
             Action act = () => source.WithProgressReporting(1, _ => { });
 
             // Assert
-            act.Should().Throw<System.IO.FileLoadException>();
+            act.Should().Throw<ArgumentNullException>();
         }
 
         [TestMethod]
@@ -69,16 +71,17 @@ namespace UtilitiesCS.Test.Extensions
         }
 
         [TestMethod]
-        public async Task ToConcurrentDictionaryAsync_ShouldThrowFileLoadException_WhenAsyncInterfacesDependencyCannotLoad()
+        public async Task ToConcurrentDictionaryAsync_ShouldCreateDictionaryFromSource()
         {
             // Arrange
             var source = GetValuesAsync("alpha", "bravo");
 
             // Act
-            Func<Task> act = async () => await source.ToConcurrentDictionaryAsync(value => value[0], value => value.Length);
+            var result = await source.ToConcurrentDictionaryAsync(value => value[0], value => value.Length);
 
             // Assert
-            await act.Should().ThrowAsync<System.IO.FileLoadException>();
+            result.Should().ContainKey('a').WhoseValue.Should().Be(5);
+            result.Should().ContainKey('b').WhoseValue.Should().Be(5);
         }
 
         private static async IAsyncEnumerable<T> GetValuesAsync<T>(params T[] values)
