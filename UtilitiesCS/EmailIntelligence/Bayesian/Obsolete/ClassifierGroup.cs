@@ -128,8 +128,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             logger.Info($"\n{jagged.ToFormattedText(
                     ["Descriptor", "Matches", "Not Match", "Probability", "Total Lines"],
-                    [Enums.Justification.Left, Enums.Justification.Right,
-                        Enums.Justification.Right, Enums.Justification.Right,
+                    [Enums.Justification.Left,
+                        Enums.Justification.Right,
+                        Enums.Justification.Right,
+                        Enums.Justification.Right,
                         Enums.Justification.Right],
                     "Classifier Manager Metrics".ToUpper())}");
         }
@@ -148,8 +150,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 .ToArray()
                 .ToFormattedText(
                     ["Classifier", "Parent", "TokenBase", "Positive", "Negative"],
-                    [Enums.Justification.Center, Enums.Justification.Center,
-                        Enums.Justification.Center, Enums.Justification.Center,
+                    [Enums.Justification.Center,
+                        Enums.Justification.Center,
+                        Enums.Justification.Center,
+                        Enums.Justification.Center,
                         Enums.Justification.Center],
                     "Classifier Manager State".ToUpper())}");
         }

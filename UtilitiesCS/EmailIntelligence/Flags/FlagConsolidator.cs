@@ -72,8 +72,11 @@ namespace UtilitiesCS.EmailIntelligence.Flags
         internal FlagParser Parser { get; set; }
         internal virtual List<string> CombineLists(bool wtag = true)
         {
-            List<IList<string>> list = [Parser.People.ListWithPrefix, Parser.Projects.ListWithPrefix,
-                Parser.Topics.ListWithPrefix, Parser.Context.ListWithPrefix, Parser.Kb.ListWithPrefix];
+            List<IList<string>> list = [Parser.People.ListWithPrefix,
+                Parser.Projects.ListWithPrefix,
+                Parser.Topics.ListWithPrefix,
+                Parser.Context.ListWithPrefix,
+                Parser.Kb.ListWithPrefix];
 
             if (!Parser.Other.IsNullOrEmpty()) { list.Add([.. Parser.Other.Split(separator: ',', trim: true)]); }
             if (Parser.Today) { list.Add([Properties.Settings.Default.Prefix_Today]); }

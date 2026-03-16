@@ -216,8 +216,13 @@ namespace ToDoModel
         {
             ToDoEvents.Editing.AddOrUpdate(OlItem.EntryID, 1, (key, existing) => existing + 1);
 
-            if (flagsToSet.HasAnyFlags([Enums.FlagsToSet.Context, Enums.FlagsToSet.People, Enums.FlagsToSet.Projects,
-                Enums.FlagsToSet.Topics, Enums.FlagsToSet.Kbf, Enums.FlagsToSet.Today, Enums.FlagsToSet.Bullpin]))
+            if (flagsToSet.HasAnyFlags([Enums.FlagsToSet.Context,
+                Enums.FlagsToSet.People,
+                Enums.FlagsToSet.Projects,
+                Enums.FlagsToSet.Topics,
+                Enums.FlagsToSet.Kbf,
+                Enums.FlagsToSet.Today,
+                Enums.FlagsToSet.Bullpin]))
             {
                 FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
             }
