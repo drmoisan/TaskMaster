@@ -2,7 +2,6 @@
 name: status_updater_agent
 description: Synchronize status across epic docs, feature docs, atomic plans, and (optionally) GitHub Issues. Check off delivered but unchecked plan items, reconcile issue/doc status, and document acceptance-criteria evidence in the authoritative requirement source files when fully delivered. Derive all paths from EpicRootFolder using the same epic directory rules. No user questions.
 argument-hint: "Provide EpicRootFolder (absolute or workspace-relative path, e.g., docs/features/active/2026-02-02-some-epic-47). Optional: AllowGitHubMutations=true|false (default false) to permit using gh CLI to update remote issues; otherwise generate recommended gh commands only. This agent will: (1) read initiative.md/issue.md/orchestration.md (if present), (2) enumerate feature subfolders, (3) select current version (highest vN) and latest plan.<timestamp>.md, (4) update plan checkboxes when evidence exists, (5) sync local issue.md/spec/user-story with issue status and content, (6) add acceptance evidence when all AC are delivered, and (7) write <EPIC_FOLDER>/status-sync.<timestamp>.md. Timestamp format: yyyy-MM-ddTHH-mm."
-target: vscode
 tools:
   ['execute/testFailure', 'execute/getTerminalOutput', 'execute/runTask', 'execute/runInTerminal', 'execute/runTests', 'read/problems', 'read/readFile', 'read/terminalSelection', 'read/terminalLastCommand', 'read/getTaskOutput', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'todo']
 handoffs:

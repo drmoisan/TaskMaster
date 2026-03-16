@@ -2,7 +2,6 @@
 name: staged_code_review_agent
 description: Review staged changes before commit. Produce PolicyAudit.md (per policy audit templates) + CodeReview.md (best practices, typed Python emphasis). If remediation is needed, generate remediation inputs and delegate plan creation to atomic_planner to write remediation-plan.md in the active feature folder. No user questions.
 argument-hint: "Stage your changes, then run this agent. It will inspect ONLY staged diffs, run repo-required checks in check-only mode where possible, and generate: (1) docs/features/active/<feature>/policy-audit.<timestamp>.md, (2) docs/features/active/<feature>/code-review.<timestamp>.md, and (3) if needed, docs/features/active/<feature>/remediation-inputs.<timestamp>.md plus an atomic_planner prompt to write remediation-plan.<timestamp>.md in the same folder. Timestamps use ISO-8601 format yyyy-MM-ddTHH-mm."
-target: vscode
 tools:
   - search
   - search/usages

@@ -2,7 +2,6 @@
 name: PowerShell Unit Test + DI Refactor Expert (Guardrailed)
 description: Plan + implement minimal DI seams and Pester v5 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and zero-regression gates.
 argument-hint: "Provide the exact script/module under test + the failing tests (or desired behaviors). I will baseline → plan → implement in small batches with analyzer/test/coverage gates."
-target: vscode
 tools:
   - search
   - search/usages

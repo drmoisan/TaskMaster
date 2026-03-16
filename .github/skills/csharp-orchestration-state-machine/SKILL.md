@@ -29,9 +29,18 @@ Use this skill when:
 - `long-name`
 - `issue-num`
 - `feature-folder`
+- `work-mode` (`minor-audit`, `full-feature`, or `full-bug`; normalize legacy `full` to `full-feature` before persistence)
+- `plan-path` (minimal or full plan path)
 - `completed_steps`
 - `next_step`
 - `last_updated`
+
+For short-path runs, also persist:
+- `small_path_qc_summary`
+- `small_path_audit_artifacts`
+- `bootstrap_mode` (`manual-bootstrap` or `auto-small-dev`)
+- `phase0_execution_summary`
+- `resume_after_manual_bootstrap` (next step token)
 
 ## Update Protocol
 
