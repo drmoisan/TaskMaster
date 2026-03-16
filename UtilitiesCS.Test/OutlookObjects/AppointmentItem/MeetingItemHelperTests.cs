@@ -166,9 +166,9 @@ namespace UtilitiesCS.Test.OutlookObjects.AppointmentItemCoverage
 
         private static MeetingItemHelper CreateHelper()
         {
-            #pragma warning disable SYSLIB0050
+#pragma warning disable SYSLIB0050
             return (MeetingItemHelper)FormatterServices.GetUninitializedObject(typeof(MeetingItemHelper));
-            #pragma warning restore SYSLIB0050
+#pragma warning restore SYSLIB0050
         }
 
         private static void SetField(MeetingItemHelper helper, string fieldName, object value)

@@ -344,3 +344,5 @@ healthchecksdb
 
 # Temporary Developer Logs
 logs/
+
+.dotnet*/

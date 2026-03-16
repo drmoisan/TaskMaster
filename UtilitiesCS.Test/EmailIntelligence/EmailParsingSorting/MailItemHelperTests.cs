@@ -229,14 +229,14 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 "HTMLBody",                             // 14
                 false,                                  // 15
                 mockRecipients.Object.Cast<Recipient>().ToArray(),
-                new IRecipientInfo[] {mockRecipient2.Object.GetInfo() },        // 17
-                new IRecipientInfo[] {mockRecipient1.Object.GetInfo() },
+                new IRecipientInfo[] { mockRecipient2.Object.GetInfo() },        // 17
+                new IRecipientInfo[] { mockRecipient1.Object.GetInfo() },
                 "Recipient1",
                 "Recipient1 &lt;<a href=\"mailto:recipient1@domain.com\">recipient1@domain.com</a>&gt;",
                 new DateTime(2024, 1, 1),
                 "1/1/2024 12:00 AM",
                 "Subject",
-                new string[] {"charset:utf-8","filename:fname:FileName","subject:Subject","from:name:sendername","from:addr:sendername","from:addr:domain.com","to:name:recipient1","to:addr:recipient1","to:addr:domain.com","cc:name:recipient2","cc:addr:recipient2","cc:addr:domain.com","to:2**0","to:2**0","body","<eom>" },
+                new string[] { "charset:utf-8", "filename:fname:FileName", "subject:Subject", "from:name:sendername", "from:addr:sendername", "from:addr:domain.com", "to:name:recipient1", "to:addr:recipient1", "to:addr:domain.com", "cc:name:recipient2", "cc:addr:recipient2", "cc:addr:domain.com", "to:2**0", "to:2**0", "body", "<eom>" },
                 "Triage",
                 true,
                 attachmentsHelper,

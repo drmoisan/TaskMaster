@@ -258,6 +258,7 @@
     <Compile Include="ReusableTypeClasses\ScoDictionaryNew_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ScoSortedDictionary_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SloLinkedList_Tests.cs" />
+    <Compile Include="ThemeHelpers\SystemThemeDetectorTests.cs" />
     <Compile Include="Threading\AppGlobalsConverterTests.cs" />
     <Compile Include="Threading\AppGlobalsConverterTests_Unfinished.cs" />
     <Compile Include="Threading\ProgressPackage_Tests.cs" />
