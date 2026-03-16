@@ -1,0 +1,53 @@
+Timestamp: 20260315T162523Z
+| File | Classification |
+|---|---|
+| UtilitiesCS\OutlookObjects\AppointmentItem\MeetingItemHelper.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Attachment\AttachmentHelper.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Attachment\AttachmentSerializable.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Calendar\Calendar.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Category\CreateCategory.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Com\ComType.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Conversation\ConversationHelper.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Explorer\ExplorerActions.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Fields\MAPIFields.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Fields\UserDefinedFields.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Filter DASL\DASLFilterParser.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Folder\FolderConverter.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Folder\FolderMinimalWrapper.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Folder\FolderNavigator.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Folder\FolderPredictor.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Folder\FolderScorer.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Folder\FolderTree.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Folder\FolderWrapper .cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Folder\FolderWrapperNameAndParentNameComparer.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Folder\FolderWrapperNameComparer.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Folder\FolderWrapperNameCountSizeComparer.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Folder\FolderWrapperNodeComparer.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Folder\FolderWrapperNodeContentsComparer.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Folder\MsgToMime\MAPIMethods.cs | excluded-non-executable |
+| UtilitiesCS\OutlookObjects\Item\ItemComparer.cs | excluded-non-executable |
+| UtilitiesCS\OutlookObjects\Item\OlItemPseudoInterface.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Item\OlItemSummary.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Item\OutlookItem.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Item\OutlookItemExtensions.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Item\OutlookItemFlaggable.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Item\OutlookItemFlaggableTry.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Item\OutlookItemTry.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Item\OutlookItemTryGet.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\MailItem\CaptureEmailAddressesModule2.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\MailItem\EmailDetails.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\MailItem\EmailDetailsWrapper.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\MailItem\ItemInfo.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\MailItem\MailItemExtensions.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\MailItem\MailItemHelper.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\MailItem\MailResolution.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Recipient\RecipientInfo.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Recipient\RecipientStatic.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Store\IStoreWrapperViewer.cs | excluded-non-executable |
+| UtilitiesCS\OutlookObjects\Store\StoreWrapper.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Store\StoreWrapperController.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Store\StoreWrapperViewer.Designer.cs | excluded-non-executable |
+| UtilitiesCS\OutlookObjects\Store\StoreWrapperViewer.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Store\StoresWrapper.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Table\OlTableExtensions.cs | coverage-target |
+| UtilitiesCS\OutlookObjects\Table\OlToDoTable.cs | coverage-target |

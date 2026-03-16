@@ -4,6 +4,9 @@ using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS.OutlookExtensions;
+using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
+using InteropMeetingItem = Microsoft.Office.Interop.Outlook.MeetingItem;
+using InteropTaskItem = Microsoft.Office.Interop.Outlook.TaskItem;
 
 namespace UtilitiesCS.Test.OutlookObjects.Item
 {
@@ -13,7 +16,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [TestMethod]
         public void Try_WhenWrappingOutlookItem_ShouldReturnSafeWrapper()
         {
-            var innerItem = new Mock<MailItem>().Object;
+            var innerItem = new Mock<InteropMailItem>().Object;
             var outlookItem = new UtilitiesCS.OutlookItem(innerItem);
 
             var result = outlookItem.Try();
@@ -26,8 +29,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         public void Try_WhenWrappingFlaggableInterface_ShouldReturnFlaggableSafeWrapper()
         {
             var flaggable = new Mock<IOutlookItemFlaggable>();
-            flaggable.SetupGet(x => x.InnerObject).Returns(new Mock<TaskItem>().Object);
-            flaggable.SetupGet(x => x.ItemType).Returns(typeof(TaskItem));
+            flaggable.SetupGet(x => x.InnerObject).Returns(new Mock<InteropTaskItem>().Object);
+            flaggable.SetupGet(x => x.ItemType).Returns(typeof(InteropTaskItem));
             flaggable.SetupGet(x => x.Args).Returns(Array.Empty<object>());
             flaggable.SetupGet(x => x.Complete).Returns(true);
 
@@ -69,7 +72,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [TestMethod]
         public void IsValid_WhenInnerObjectIsSupported_ShouldReturnTrue()
         {
-            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<MailItem>().Object);
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<InteropMailItem>().Object);
 
             var result = outlookItem.IsValid();
 
@@ -87,9 +90,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         }
 
         [DataTestMethod]
-        [DataRow(typeof(MailItem), OlItemType.olMailItem)]
-        [DataRow(typeof(TaskItem), OlItemType.olTaskItem)]
-        [DataRow(typeof(MeetingItem), OlItemType.olAppointmentItem)]
+        [DataRow(typeof(InteropMailItem), OlItemType.olMailItem)]
+        [DataRow(typeof(InteropTaskItem), OlItemType.olTaskItem)]
+        [DataRow(typeof(InteropMeetingItem), OlItemType.olAppointmentItem)]
         public void GetOlItemType_WhenInnerObjectIsSupported_ShouldReturnMappedValue(Type outlookType, OlItemType expected)
         {
             var innerObject = CreateInteropMock(outlookType);
@@ -115,19 +118,19 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
 
         private static object CreateInteropMock(Type outlookType)
         {
-            if (outlookType == typeof(MailItem))
+            if (outlookType == typeof(InteropMailItem))
             {
-                return new Mock<MailItem>().Object;
+                return new Mock<InteropMailItem>().Object;
             }
 
-            if (outlookType == typeof(TaskItem))
+            if (outlookType == typeof(InteropTaskItem))
             {
-                return new Mock<TaskItem>().Object;
+                return new Mock<InteropTaskItem>().Object;
             }
 
-            if (outlookType == typeof(MeetingItem))
+            if (outlookType == typeof(InteropMeetingItem))
             {
-                return new Mock<MeetingItem>().Object;
+                return new Mock<InteropMeetingItem>().Object;
             }
 
             throw new ArgumentOutOfRangeException(nameof(outlookType));

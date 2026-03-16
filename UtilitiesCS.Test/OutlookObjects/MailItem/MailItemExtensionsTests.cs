@@ -4,6 +4,7 @@ using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
 using UtilitiesCS.OutlookExtensions;
 using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
 
@@ -18,7 +19,7 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             // Arrange
             var expected = new byte[] { 1, 2, 3 };
             var accessor = new Mock<PropertyAccessor>();
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             accessor
                 .Setup(x => x.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x10130102"))
                 .Returns(expected);
@@ -36,7 +37,7 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
         {
             // Arrange
             var accessor = new Mock<PropertyAccessor>();
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             accessor
                 .Setup(x => x.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x10130102"))
                 .Returns("not-bytes");
@@ -66,7 +67,7 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
         public async Task TryMoveAsync_WhenFolderIsNull_ReturnsNull()
         {
             // Arrange
-            var mailItem = Mock.Of<MailItem>();
+            var mailItem = Mock.Of<InteropMailItem>();
 
             // Act
             object result = await mailItem.TryMoveAsync(null);
@@ -81,7 +82,7 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             // Arrange
             var expected = new object();
             var folder = new Mock<OutlookFolder>();
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem.Setup(x => x.Move(folder.Object)).Returns(expected);
 
             // Act
@@ -97,7 +98,7 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
         {
             // Arrange
             var folder = new Mock<OutlookFolder>();
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem
                 .Setup(x => x.Move(folder.Object))
                 .Throws(new InvalidOperationException("boom"));
@@ -116,7 +117,7 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             // Arrange
             var expected = new object();
             var folder = new Mock<OutlookFolder>();
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem
                 .SetupSequence(x => x.Move(folder.Object))
                 .Throws(new InvalidOperationException("transient"))

@@ -17,6 +17,14 @@ namespace UtilitiesCS
 {
     public class FolderWrapper : INotifyPropertyChanged, IFolderWrapper
     {
+        internal virtual void ReleaseComObjectSafe(object obj)
+        {
+            if (obj is not null && Marshal.IsComObject(obj))
+            {
+                Marshal.ReleaseComObject(obj);
+            }
+        }
+
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 

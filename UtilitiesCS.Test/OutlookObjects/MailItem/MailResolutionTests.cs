@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
 
 namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
 {
@@ -16,7 +17,7 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
         public void IsMailUnReadable_WithKnownUnreadableMessageClass_ReturnsTrue(string messageClass)
         {
             // Arrange
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem.SetupGet(x => x.MessageClass).Returns(messageClass);
 
             // Act
@@ -30,7 +31,7 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
         public void IsMailUnReadable_WithReadableMessageClass_ReturnsFalse()
         {
             // Arrange
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem.SetupGet(x => x.MessageClass).Returns("IPM.Note");
 
             // Act
@@ -44,7 +45,7 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
         public void TryResolveMailItem_WithReadableMailItem_ReturnsSameMailItem()
         {
             // Arrange
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem.SetupGet(x => x.MessageClass).Returns("IPM.Note");
 
             // Act
@@ -58,7 +59,7 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
         public void TryResolveMailItem_WithUnreadableMailItem_ReturnsNull()
         {
             // Arrange
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem.SetupGet(x => x.MessageClass).Returns("IPM.Note.Secure");
 
             // Act

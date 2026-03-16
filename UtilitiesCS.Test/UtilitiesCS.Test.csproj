@@ -190,6 +190,19 @@
     <Compile Include="OutlookObjects\Store\StoreWrapperTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperViewerTests.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperTests.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemHelperProjectionTests.cs" />
+    <Compile Include="OutlookObjects\Fields\UserDefinedFieldsTests.cs" />
+    <Compile Include="OutlookObjects\Fields\MAPIFieldsTests.cs" />
+    <Compile Include="OutlookObjects\Conversation\ConversationHelperTests.cs" />
+    <Compile Include="OutlookObjects\Table\OlToDoTableTests.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensionsTransformTests.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensionsRetryTests.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensionsConversionTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperControllerTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperStateTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperTraversalTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderTreeTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderPredictorTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -426,8 +439,8 @@
     <Reference Include="System.ClientModel, Version=1.4.2.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ClientModel.1.4.2\lib\netstandard2.0\System.ClientModel.dll</HintPath>
     </Reference>
-    <Reference Include="System.Collections.Immutable, Version=9.0.0.6, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Collections.Immutable.9.0.6\lib\net462\System.Collections.Immutable.dll</HintPath>
+    <Reference Include="System.Collections.Immutable, Version=10.0.0.5, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.10.0.5\lib\net462\System.Collections.Immutable.dll</HintPath>
     </Reference>
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />

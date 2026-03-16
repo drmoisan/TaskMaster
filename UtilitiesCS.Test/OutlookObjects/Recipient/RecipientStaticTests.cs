@@ -3,6 +3,7 @@ using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
 
 namespace UtilitiesCS.Test.OutlookObjects.Recipient
 {
@@ -50,7 +51,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
         public void GetSenderInfo_WithNullMailItem_ThrowsArgumentNullException()
         {
             // Arrange
-            MailItem mailItem = null;
+            InteropMailItem mailItem = null;
 
             // Act
             System.Action act = () => mailItem.GetSenderInfo();
@@ -79,7 +80,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
         public void GetSenderInfo_WithNullMailSender_ReturnsBlankRecipientInfo()
         {
             // Arrange
-            var mail = new Mock<MailItem>();
+            var mail = new Mock<InteropMailItem>();
             mail.SetupGet(x => x.Sender).Returns((AddressEntry)null);
 
             // Act
@@ -96,7 +97,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
         {
             // Arrange
             var sender = new Mock<AddressEntry>();
-            var mail = new Mock<MailItem>();
+            var mail = new Mock<InteropMailItem>();
             var nameSpace = new Mock<NameSpace>();
             var resolvedRecipient = new Mock<Microsoft.Office.Interop.Outlook.Recipient>();
 
@@ -121,7 +122,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
         {
             // Arrange
             var sender = new Mock<AddressEntry>();
-            var mail = new Mock<MailItem>();
+            var mail = new Mock<InteropMailItem>();
             var nameSpace = new Mock<NameSpace>();
             var unresolvedRecipient = new Mock<Microsoft.Office.Interop.Outlook.Recipient>();
 

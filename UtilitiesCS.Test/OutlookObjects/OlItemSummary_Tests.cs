@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
 using System;
 using System.Collections.Generic;
 
@@ -54,7 +55,7 @@ namespace UtilitiesCS.Test
         public void ExtractSummary_ShouldReturnExpectedValues_ForReadableMailItem()
         {
             // Arrange
-            var item = new Mock<MailItem>();
+            var item = new Mock<InteropMailItem>();
             item.SetupGet(x => x.MessageClass).Returns("IPM.Note");
             item.SetupGet(x => x.Subject).Returns("Weekly report");
             item.SetupGet(x => x.SentOn).Returns(new DateTime(2025, 12, 25, 12, 5, 3));
@@ -66,7 +67,7 @@ namespace UtilitiesCS.Test
             // Assert
             summary.Should().BeEquivalentTo(new Dictionary<OlItemSummary.Details, string>
             {
-                { OlItemSummary.Details.Type, typeof(MailItem).ToString() },
+                { OlItemSummary.Details.Type, typeof(InteropMailItem).ToString() },
                 { OlItemSummary.Details.Subject, "Weekly report" },
                 { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
                 { OlItemSummary.Details.Folderpath, @"\\Inbox\Reports" },
@@ -77,7 +78,7 @@ namespace UtilitiesCS.Test
         public void ExtractSummary_ShouldReturnFallbackValues_ForUnreadableMailItem()
         {
             // Arrange
-            var item = new Mock<MailItem>();
+            var item = new Mock<InteropMailItem>();
             item.SetupGet(x => x.MessageClass).Returns("IPM.Note.Secure");
 
             // Act
@@ -86,7 +87,7 @@ namespace UtilitiesCS.Test
             // Assert
             summary.Should().BeEquivalentTo(new Dictionary<OlItemSummary.Details, string>
             {
-                { OlItemSummary.Details.Type, typeof(MailItem).ToString() },
+                { OlItemSummary.Details.Type, typeof(InteropMailItem).ToString() },
                 { OlItemSummary.Details.Subject, "IPM.Note.Secure" },
             });
         }
@@ -95,7 +96,7 @@ namespace UtilitiesCS.Test
         public void Extract_ShouldReturnFilteredSummary_WhenFlagsSelectSubset()
         {
             // Arrange
-            var item = new Mock<MailItem>();
+            var item = new Mock<InteropMailItem>();
             item.SetupGet(x => x.MessageClass).Returns("IPM.Note");
             item.SetupGet(x => x.Subject).Returns("Weekly report");
             item.SetupGet(x => x.SentOn).Returns(new DateTime(2025, 12, 25, 12, 5, 3));
@@ -143,7 +144,7 @@ namespace UtilitiesCS.Test
             // Arrange
             var summary = new Dictionary<OlItemSummary.Details, string>
             {
-                { OlItemSummary.Details.Type, typeof(MailItem).ToString() },
+                { OlItemSummary.Details.Type, typeof(InteropMailItem).ToString() },
                 { OlItemSummary.Details.Subject, null },
                 { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
             };

@@ -3,6 +3,7 @@ using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
 
 namespace UtilitiesCS.Test.OutlookObjects.Explorer
 {
@@ -64,7 +65,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Explorer
         public void Readable_WithUnreadableMailItem_ReturnsNull()
         {
             // Arrange
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem.SetupGet(x => x.MessageClass).Returns("IPM.Note.Secure");
 
             // Act
@@ -78,7 +79,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Explorer
         public void Readable_WithReadableItem_ReturnsOriginalItem()
         {
             // Arrange
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem.SetupGet(x => x.MessageClass).Returns("IPM.Note");
 
             // Act

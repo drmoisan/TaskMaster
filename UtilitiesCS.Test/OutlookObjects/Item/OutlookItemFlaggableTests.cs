@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
 using UtilitiesCS.OutlookExtensions;
 
 namespace UtilitiesCS.Test.OutlookObjects.Item
@@ -17,7 +18,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [TestMethod]
         public void Constructor_WithIOutlookItem_ShouldWrapExistingMetadata()
         {
-            var innerItem = new Mock<MailItem>().Object;
+            var innerItem = new Mock<InteropMailItem>().Object;
             var outlookItem = new Mock<IOutlookItem>();
             outlookItem.SetupGet(x => x.InnerObject).Returns(innerItem);
             outlookItem.SetupGet(x => x.Args).Returns(Array.Empty<object>());
@@ -42,7 +43,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [TestMethod]
         public void Complete_WhenWrappingMailItem_ShouldReadFlagStatus()
         {
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem.SetupGet(x => x.FlagStatus).Returns(OlFlagStatus.olFlagComplete);
 
             var result = new OutlookItemFlaggable(mailItem.Object).Complete;
@@ -127,7 +128,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         {
             var accessor = new Mock<PropertyAccessor>();
             accessor.Setup(x => x.GetProperty(TotalWorkSchema)).Returns(42);
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem.SetupGet(x => x.PropertyAccessor).Returns(accessor.Object);
 
             var result = new OutlookItemFlaggable(mailItem.Object).TotalWork;
@@ -142,7 +143,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             accessor.SetupSequence(x => x.SetProperty(TotalWorkSchema, 90))
                 .Throws(new InvalidOperationException("Transient failure"))
                 .Pass();
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem.SetupGet(x => x.PropertyAccessor).Returns(accessor.Object);
             mailItem.SetupGet(x => x.FlagStatus).Returns(OlFlagStatus.olNoFlag);
             var wrapper = new OutlookItemFlaggable(mailItem.Object);

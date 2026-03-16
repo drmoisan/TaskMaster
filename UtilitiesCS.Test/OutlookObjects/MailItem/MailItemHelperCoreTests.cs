@@ -5,9 +5,10 @@ using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
 using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
 
-namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
+namespace UtilitiesCS.Test.OutlookObjects.MailItem
 {
     [TestClass]
     public class MailItemHelperCoreTests
@@ -59,7 +60,7 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
         [TestMethod]
         public void GetHtml_ShouldInjectEmailHeaderIntoBodyMarkup()
         {
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem.SetupGet(x => x.HTMLBody).Returns("<html><head></head><body>Original</body></html>");
             var helper = CreateHelper();
             SetField(helper, "_item", mailItem.Object);
@@ -85,6 +86,22 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             helper.RecipientsEquivalent(null, null).Should().BeTrue();
             helper.RecipientsEquivalent(new[] { recipient }, null).Should().BeFalse();
             helper.RecipientsEquivalent(new[] { recipient }, Array.Empty<IRecipientInfo>()).Should().BeFalse();
+        }
+
+
+
+        [TestMethod]
+        public void CompressPlainText_collapses_runs_of_whitespace()
+        {
+            var result = MailItemHelper.CompressPlainText("a   b\r\n\r\n c", string.Empty);
+            result.Should().Contain("a b c");
+        }
+
+        [TestMethod]
+        public void CompressPlainText_returns_safe_value_for_null_or_empty_input()
+        {
+            MailItemHelper.CompressPlainText(null, string.Empty).Should().NotBeNull();
+            MailItemHelper.CompressPlainText(string.Empty, string.Empty).Should().NotBeNull();
         }
 
         private static Mock<IApplicationGlobals> CreateGlobals(OutlookFolder archiveRoot, OutlookFolder inbox, string archiveRootPath)

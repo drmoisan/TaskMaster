@@ -22,6 +22,46 @@ namespace UtilitiesCS
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        internal static Dictionary<string, object> GetColumnDictionary(string[] names, object[] values)
+        {
+            var result = new Dictionary<string, object>();
+            if (names is null || values is null)
+            {
+                return result;
+            }
+
+            var len = Math.Min(names.Length, values.Length);
+            for (var i = 0; i < len; i++)
+            {
+                result[names[i]] = values[i];
+            }
+
+            return result;
+        }
+
+        internal static T RunTableRetry<T>(Func<T> action, int maxAttempts)
+        {
+            var tries = Math.Max(1, maxAttempts);
+            for (var i = 0; i < tries; i++)
+            {
+                try
+                {
+                    return action();
+                }
+                catch
+                {
+                    if (i == tries - 1)
+                    {
+                        return default;
+                    }
+                }
+            }
+
+            return default;
+        }
+
+        internal static object[] ToObjectRow(object[] rawValues) => rawValues ?? System.Array.Empty<object>();
+
         /// <summary>
         /// Extension method that removes all columns in the supplied array 
         /// from an Outlook Table object

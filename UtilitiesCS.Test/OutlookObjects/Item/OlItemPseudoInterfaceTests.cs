@@ -6,6 +6,7 @@ using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
 
 namespace UtilitiesCS.Test.OutlookObjects.Item
 {
@@ -15,7 +16,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [TestMethod]
         public void SetCategories_WhenItemIsSupported_ShouldAssignCategoriesAndSave()
         {
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem.SetupProperty(x => x.Categories);
 
             mailItem.Object.SetCategories("Project X");
@@ -51,7 +52,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         {
             var conflicts = new Mock<Conflicts>();
             conflicts.SetupGet(x => x.Count).Returns(0);
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem.SetupGet(x => x.Conflicts).Returns(conflicts.Object);
 
             var result = mailItem.Object.NoConflicts();
@@ -62,7 +63,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [TestMethod]
         public void NoConflicts_WhenConflictLookupThrows_ShouldReturnFalse()
         {
-            var mailItem = new Mock<MailItem>();
+            var mailItem = new Mock<InteropMailItem>();
             mailItem.SetupGet(x => x.Conflicts).Throws(new InvalidOperationException("boom"));
 
             var result = mailItem.Object.NoConflicts();
@@ -73,8 +74,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [TestMethod]
         public void OnlyMailItems_ShouldReturnOnlyMailItemsFromSelection()
         {
-            var mail1 = new Mock<MailItem>().Object;
-            var mail2 = new Mock<MailItem>().Object;
+            var mail1 = new Mock<InteropMailItem>().Object;
+            var mail2 = new Mock<InteropMailItem>().Object;
             var task = new Mock<TaskItem>().Object;
             var selection = CreateSelection(mail1, task, mail2);
             var method = typeof(UtilitiesCS.OlItemPseudoInterface).GetMethod(nameof(UtilitiesCS.OlItemPseudoInterface.OnlyMailItems), BindingFlags.Public | BindingFlags.Static);
@@ -89,7 +90,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [TestMethod]
         public void OnlySupportedObjects_ShouldReturnSupportedOutlookObjectsOnly()
         {
-            var mail = new Mock<MailItem>().Object;
+            var mail = new Mock<InteropMailItem>().Object;
             var meeting = new Mock<MeetingItem>().Object;
             var appointment = new Mock<AppointmentItem>().Object;
             var task = new Mock<TaskItem>().Object;

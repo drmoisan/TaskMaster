@@ -25,6 +25,31 @@ namespace UtilitiesCS //QuickFiler
     /// </summary>
     public class MailItemHelper : INotifyPropertyChanged, IItemInfo
     {
+        internal readonly struct MailItemProjection
+        {
+            public MailItemProjection(string subject, string entryId)
+            {
+                Subject = subject ?? string.Empty;
+                EntryId = entryId ?? string.Empty;
+            }
+
+            public string Subject { get; }
+            public string EntryId { get; }
+        }
+
+        internal static MailItemProjection TryProjectMailItemMembers(object source)
+        {
+            if (source is null)
+            {
+                return new MailItemProjection(string.Empty, string.Empty);
+            }
+
+            var type = source.GetType();
+            var subject = type.GetProperty("Subject")?.GetValue(source) as string;
+            var entryId = type.GetProperty("EntryID")?.GetValue(source) as string;
+            return new MailItemProjection(subject ?? string.Empty, entryId ?? string.Empty);
+        }
+
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
