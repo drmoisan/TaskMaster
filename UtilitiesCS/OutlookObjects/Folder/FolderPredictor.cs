@@ -17,6 +17,11 @@ namespace UtilitiesCS
 
     public class FolderPredictor
     {
+        internal static string NormalizePredictionPath(string input)
+        {
+            return input ?? string.Empty;
+        }
+
         #region Constructors and Initialization
 
         public FolderPredictor(Outlook.Application olApp)

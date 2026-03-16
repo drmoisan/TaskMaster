@@ -1,0 +1,95 @@
+using System.Collections.Generic;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UtilitiesCS.ReusableTypeClasses;
+
+namespace UtilitiesCS.Test.ReusableTypeClasses
+{
+    [TestClass]
+    public class AbstractCloneable_Tests
+    {
+        [TestMethod]
+        public void Clone_WithNestedObject_ReturnsDistinctDeepCopy()
+        {
+            // Arrange
+            var original = new CloneableNode
+            {
+                Name = "root",
+                Child = new CloneableNode { Name = "child" },
+                Tags = new List<string> { "one", "two" },
+            };
+
+            // Act
+            var clone = original.CloneTyped();
+
+            // Assert
+            clone.Should().NotBeSameAs(original);
+            clone.Name.Should().Be("root");
+            clone.Child.Should().NotBeNull();
+            clone.Child.Should().NotBeSameAs(original.Child);
+            clone.Child.Name.Should().Be("child");
+            clone.Tags.Should().NotBeSameAs(original.Tags);
+            clone.Tags.Should().Equal("one", "two");
+        }
+
+        [TestMethod]
+        public void Clone_WithNullReferenceMembers_PreservesNulls()
+        {
+            // Arrange
+            var original = new CloneableNode
+            {
+                Name = "root",
+                Child = null,
+                Tags = null,
+            };
+
+            // Act
+            var clone = original.CloneTyped();
+
+            // Assert
+            clone.Should().NotBeSameAs(original);
+            clone.Name.Should().Be("root");
+            clone.Child.Should().BeNull();
+            clone.Tags.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void Clone_WithCollection_ModifyingCloneDoesNotAffectOriginal()
+        {
+            // Arrange
+            var original = new CloneableNode
+            {
+                Name = "root",
+                Tags = new List<string> { "one", "two" },
+            };
+
+            // Act
+            var clone = original.CloneTyped();
+            clone.Tags.Add("three");
+
+            // Assert
+            original.Tags.Should().Equal("one", "two");
+            clone.Tags.Should().Equal("one", "two", "three");
+        }
+
+        private sealed class CloneableNode : AbstractCloneable
+        {
+            public string Name { get; set; }
+
+            public CloneableNode Child { get; set; }
+
+            public List<string> Tags { get; set; }
+
+            public CloneableNode CloneTyped() => (CloneableNode)Clone();
+
+            protected override void HandleCloned(AbstractCloneable clone)
+            {
+                base.HandleCloned(clone);
+
+                var typedClone = (CloneableNode)clone;
+                typedClone.Child = Child is null ? null : Child.CloneTyped();
+                typedClone.Tags = Tags is null ? null : new List<string>(Tags);
+            }
+        }
+    }
+}

@@ -11,6 +11,11 @@ namespace UtilitiesCS.OutlookObjects.Store
 {
     public class StoreWrapperController
     {
+        internal static bool RunFolderSelectionDialog(Func<bool> selector)
+        {
+            return selector?.Invoke() ?? false;
+        }
+
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 

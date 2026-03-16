@@ -1,0 +1,55 @@
+Timestamp: 20260315T162523Z
+Compiled OutlookObjects entries:
+- OutlookObjects\AppointmentItem\MeetingItemHelper.cs
+- OutlookObjects\Attachment\AttachmentHelper.cs
+- OutlookObjects\Attachment\AttachmentSerializable.cs
+- OutlookObjects\Calendar\Calendar.cs
+- OutlookObjects\Category\CreateCategory.cs
+- OutlookObjects\Com\ComType.cs
+- OutlookObjects\Conversation\ConversationHelper.cs
+- OutlookObjects\Explorer\ExplorerActions.cs
+- OutlookObjects\Fields\MAPIFields.cs
+- OutlookObjects\Fields\UserDefinedFields.cs
+- OutlookObjects\Filter DASL\DASLFilterParser.cs
+- OutlookObjects\Folder\FolderConverter.cs
+- OutlookObjects\Folder\FolderMinimalWrapper.cs
+- OutlookObjects\Folder\FolderNavigator.cs
+- OutlookObjects\Folder\FolderPredictor.cs
+- OutlookObjects\Folder\FolderScorer.cs
+- OutlookObjects\Folder\FolderTree.cs
+- OutlookObjects\Folder\FolderWrapper .cs
+- OutlookObjects\Folder\FolderWrapperNameAndParentNameComparer.cs
+- OutlookObjects\Folder\FolderWrapperNameComparer.cs
+- OutlookObjects\Folder\FolderWrapperNameCountSizeComparer.cs
+- OutlookObjects\Folder\FolderWrapperNodeComparer.cs
+- OutlookObjects\Folder\FolderWrapperNodeContentsComparer.cs
+- OutlookObjects\Folder\MsgToMime\MAPIMethods.cs
+- OutlookObjects\Item\ItemComparer.cs
+- OutlookObjects\Item\OlItemPseudoInterface.cs
+- OutlookObjects\Item\OlItemSummary.cs
+- OutlookObjects\Item\OutlookItem.cs
+- OutlookObjects\Item\OutlookItemExtensions.cs
+- OutlookObjects\Item\OutlookItemFlaggable.cs
+- OutlookObjects\Item\OutlookItemFlaggableTry.cs
+- OutlookObjects\Item\OutlookItemTry.cs
+- OutlookObjects\Item\OutlookItemTryGet.cs
+- OutlookObjects\MailItem\CaptureEmailAddressesModule2.cs
+- OutlookObjects\MailItem\EmailDetails.cs
+- OutlookObjects\MailItem\EmailDetailsWrapper.cs
+- OutlookObjects\MailItem\ItemInfo.cs
+- OutlookObjects\MailItem\MailItemExtensions.cs
+- OutlookObjects\MailItem\MailItemHelper.cs
+- OutlookObjects\MailItem\MailResolution.cs
+- OutlookObjects\Recipient\RecipientInfo.cs
+- OutlookObjects\Recipient\RecipientStatic.cs
+- OutlookObjects\Store\IStoreWrapperViewer.cs
+- OutlookObjects\Store\StoreWrapper.cs
+- OutlookObjects\Store\StoreWrapperController.cs
+- OutlookObjects\Store\StoreWrapperViewer.Designer.cs
+- OutlookObjects\Store\StoreWrapperViewer.cs
+- OutlookObjects\Store\StoresWrapper.cs
+- OutlookObjects\Table\OlTableExtensions.cs
+- OutlookObjects\Table\OlToDoTable.cs
+
+UtilitiesCS\OutlookObjects\MailItem\MailResolution.cs compiled: True
+UtilitiesCS\OutlookObjects\MailResolution.cs compiled: False

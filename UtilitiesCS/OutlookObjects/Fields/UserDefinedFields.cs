@@ -17,6 +17,11 @@ namespace UtilitiesCS.OutlookExtensions
 {
     public static class UserDefinedFields
     {
+        internal static object SafeGetPropertyAccessorValue(PropertyAccessor accessor, string schema)
+        {
+            return accessor?.TryGetProperty(schema);
+        }
+
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 

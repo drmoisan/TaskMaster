@@ -25,6 +25,23 @@ namespace UtilitiesCS
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        internal static object SafeResolveConversationItem(object namespaceRef, Func<object, string, string, object> resolver)
+        {
+            if (namespaceRef is null || resolver is null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return resolver(namespaceRef, string.Empty, string.Empty);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public enum Justify
         {
             Right = 1, Left = 2, Center = 4

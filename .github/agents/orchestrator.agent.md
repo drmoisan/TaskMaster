@@ -23,7 +23,7 @@ handoffs:
     send: true
   - label: Post-implementation small-path audit
     agent: feature_code_review_agent
-    prompt: "Use `.github/prompts/review-feature.prompt.md` for `${feature-folder}` in short-path/minor-audit mode. Generate reduced audit artifacts required for short path (policy + feature acceptance focus) and trigger remediation planning only if required by that reduced gate."
+    prompt: "Use `.github/agents/feature-review.agent.md` as the governing agent contract together with `.github/prompts/review-feature.prompt.md` for `${feature-folder}` in short-path/minor-audit mode. Generate the reduced audit artifacts required for short path (policy + feature acceptance focus) and trigger remediation planning only if required by that reduced gate. The orchestrator MUST treat the delegated review artifacts as authoritative and MUST NOT author replacement audit files directly."
     send: true
   - label: Fill potential entry details
     agent: prd_feature
@@ -223,6 +223,7 @@ S8.2 If audit triggers remediation:
 - repeat until ready-to-merge gate passes.
 
 Hard enforcement for S8:
+- Orchestrator MUST delegate the short-path audit to `feature_code_review_agent` as defined in `.github/agents/feature-review.agent.md`; direct creation or replacement of `policy-audit.*.md`, `feature-audit.*.md`, or `code-review.*.md` by the orchestrator is prohibited.
 - Do not mark small path complete until reduced audit artifacts are present in `${feature-folder}` and remediation loop (if any) is closed.
 - Do not accept PASS reduced-audit outcomes when required baseline evidence is missing, when plan checklist state is not evidence-backed, or when minor-audit folders contain `spec.md`/`user-story.md`.
 
