@@ -68,9 +68,13 @@ jobs:
         shell: pwsh
         run: nuget restore $env:SOLUTION_PATH
 
+      - name: Setup CSharpier
+        shell: pwsh
+        run: dotnet tool install --global csharpier
+
       - name: Verify formatting
         shell: pwsh
-        run: dotnet format $env:SOLUTION_PATH --verify-no-changes --no-restore
+        run: csharpier . --check
 
       - name: Build with analyzers and code style enforcement
         shell: pwsh
