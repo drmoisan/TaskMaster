@@ -1,0 +1,26 @@
+{
+  // Mirrors .codex/codex-web-setup.sh — see that file for the canonical
+  // environment rationale and known Windows/VSTO build limitations.
+  "name": "TaskMaster",
+  "build": {
+    "dockerfile": "Dockerfile",
+    // Context is the repo root so Docker can access solution files if needed.
+    "context": ".."
+  },
+  "remoteUser": "vscode",
+
+  // Mirrors restore_packages_if_needed() — run once after the container is
+  // created to hydrate the packages/ folder for legacy packages.config projects.
+  "postCreateCommand": "nuget restore TaskMaster.sln -PackagesDirectory packages || true",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // C# language support (OmniSharp-based, works for .NET Framework editing)
+        "ms-dotnettools.csharp",
+        // PowerShell language support for the scripts/ helpers
+        "ms-vscode.powershell"
+      ]
+    }
+  }
+}
