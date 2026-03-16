@@ -95,6 +95,7 @@
     <Compile Include="HelperClasses\PrettyPrintTest.cs" />
     <Compile Include="HelperClasses\NLogTraceWriter_Test.cs" />
     <Compile Include="HelperClasses\SysImageListHelperTests.cs" />
+    <Compile Include="ThemeHelpers\SystemThemeDetectorTests.cs" />
     <Compile Include="NewtonsoftHelpers\FilePathHelperConverterTests.cs" />
     <Compile Include="NewtonsoftHelpers\DerivedCompositionConverter_ConcurrentDictionaryTests.cs" />
     <Compile Include="NewtonsoftHelpers\MyTypeBuilder.cs" />

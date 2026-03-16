@@ -256,7 +256,7 @@ namespace ToDoModel.Tests.Data_Model.People
             Assert.IsNotNull(people, $"{nameof(people)} is null");
             //Assert.AreEqual(people.Globals, _mockGlobals.Object, $"{nameof(people)}.{nameof(people.Globals)} does not equal mock");
             Assert.IsNotNull(people.Config, $"{nameof(people)}.{nameof(people.Config)} is null");
-            Assert.AreEqual(people.Config.Disk.FileName, "pplkey.json");
+            Assert.AreEqual("pplkey.json", people.Config.Disk.FileName);
         }
 
         [TestMethod]
@@ -281,7 +281,7 @@ namespace ToDoModel.Tests.Data_Model.People
             Assert.IsNotNull(people);
             //Assert.AreEqual(people.Globals, _mockGlobals.Object);
             Assert.IsNotNull(people.Config);
-            Assert.AreEqual(people.Config.Disk.FileName, "pplkey.json");
+            Assert.AreEqual("pplkey.json", people.Config.Disk.FileName);
 
         }
     }

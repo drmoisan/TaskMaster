@@ -37,8 +37,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             [
                 new BayesianClassifierShared.WordStream("test1", ["d"]),
                 new BayesianClassifierShared.WordStream("test2", ["a"]),
-                new BayesianClassifierShared.WordStream("test3", ["a","b"]),
-                new BayesianClassifierShared.WordStream("test4", ["d", "a","b"]),
+                new BayesianClassifierShared.WordStream("test3", ["a", "b"]),
+                new BayesianClassifierShared.WordStream("test4", ["d", "a", "b"]),
             ];
             var actual = wordStreams.Select(x => group.Classifiers["spam"].Chi2SpamProb(x)).ToList();
             List<double> expected = [0.8448275862068967, 0.09183673469387754, 0.03252482935305728, 0.23394200608952753];

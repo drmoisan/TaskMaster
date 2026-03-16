@@ -344,7 +344,7 @@ namespace TaskMaster
             return null;
         }
 
-        private bool _darkMode = Properties.Settings.Default.DarkMode;
+        private bool _darkMode = SystemThemeDetector.IsSystemDarkMode();
         [NotifyParentProperty(true)]
         public bool DarkMode
         {

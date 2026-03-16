@@ -184,7 +184,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     .Select((MinedMail, Index) => (MinedMail, Index))
                     .AsParallel()
                     .WithMergeOptions(ParallelMergeOptions.NotBuffered)
-                    .WithDegreeOfParallelism(cores-2)
+                    .WithDegreeOfParallelism(cores - 2)
                     .Select(x => new TestOutcome
                     {
                         SourceIndex = x.Index,

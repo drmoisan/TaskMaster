@@ -113,9 +113,23 @@ namespace UtilitiesCS
             return columnLengths;
         }
 
-        private static readonly string[] _aggregators = ["total", "subtotal","average",
-            "mean","median","min","max","stddev", "variance", "count",
-            "sum", "mode", "range","skewness", "kurtosis", "percentile", "quartile"];
+        private static readonly string[] _aggregators = ["total",
+            "subtotal",
+            "average",
+            "mean",
+            "median",
+            "min",
+            "max",
+            "stddev",
+            "variance",
+            "count",
+            "sum",
+            "mode",
+            "range",
+            "skewness",
+            "kurtosis",
+            "percentile",
+            "quartile"];
 
         public static string ToFormattedText(this IDictionary<string, float> dict, float decimalPlaces)
         {

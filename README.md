@@ -133,6 +133,7 @@ Notes:
 
 * The VS Code tasks discover `MSBuild.exe` and `vstest.console.exe` using `vswhere`, so they work from a regular VS Code terminal (no Developer Command Prompt required).
 * For these tasks, install Visual Studio 2022 (or Build Tools) with MSBuild + Test Platform components.
+* If `dotnet format TaskMaster.sln` crashes with `Microsoft.Build.Shared.XMakeElements` while using .NET SDK `10.0.200`, run `scripts/vscode/Install-RepoDotNetSdk.ps1` once from the repo root. The repo's `global.json` then prefers the repo-local `.dotnet-sdk` SDK pinned to `8.0.205` for CLI commands, which restores `dotnet format` without changing your machine-wide SDK.
 
 Test projects include:
 `*.Test` projects for TaskMaster, QuickFiler, TaskVisualization, TaskTree, ToDoModel, UtilitiesCS, UtilitiesSwordfish, SVGControl, VBFunctions.

@@ -862,6 +862,7 @@
     <Compile Include="HelperClasses\Windows Forms\TableLayoutHelper.cs" />
     <Compile Include="HelperClasses\ThemeHelpers\Theme.cs" />
     <Compile Include="HelperClasses\ThemeHelpers\ThemeControlGroup.cs" />
+    <Compile Include="HelperClasses\ThemeHelpers\SystemThemeDetector.cs" />
     <Compile Include="HelperClasses\ToolTips\TipsController.cs" />
     <Compile Include="HelperClasses\Tokenizer.cs" />
     <Compile Include="HelperClasses\Logging\TraceUtility.cs" />
