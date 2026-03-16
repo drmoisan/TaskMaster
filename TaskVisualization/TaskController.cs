@@ -358,6 +358,7 @@ namespace TaskVisualization
                                                    prefixKey: prefix.Key,
                                                    objItemObject: _active.OlItem,
                                                    userEmailAddress: _userEmailAddress);
+                controller.SetCaption("Assign Project");
                 var result = viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {

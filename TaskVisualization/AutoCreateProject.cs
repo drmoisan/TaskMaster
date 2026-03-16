@@ -57,6 +57,7 @@ namespace TaskVisualization
         internal string ChooseOrCreateProgramName()
         {
             var chooser = new TagLauncher(_globals.TD.ProgramInfo.Keys, _globals);
+            chooser.Viewer.Text = "Select or Create Program";
             chooser.Viewer.ShowDialog();
             var selection = chooser.Controller.GetSelections().FirstOrDefault();
             if (selection.IsNullOrEmpty()) { return null; }
