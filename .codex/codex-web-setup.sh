@@ -153,6 +153,7 @@ install_dotnet_tools() {
 
   log "Installing dotnet global tools used by the repo..."
   dotnet tool update --global dotnet-coverage >/dev/null 2>&1 || dotnet tool install --global dotnet-coverage
+  dotnet tool update --global csharpier >/dev/null 2>&1 || dotnet tool install --global csharpier
 }
 
 restore_packages_if_needed() {

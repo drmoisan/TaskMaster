@@ -22,11 +22,15 @@ If you encounter any conflicting instructions between these documents, **halt an
 
 These are the required tools for C# code in this repo:
 
-1. **Formatting — `dotnet format`**
+1. **Formatting — `csharpier`**
 
-   - All C# code must be formatted with the .NET SDK formatter.
-   - Do not hand-format; if a diff disagrees with `dotnet format`, formatter output wins.
-   - Approved command: `dotnet format TaskMaster.sln`
+   - All C# source files (`*.cs`) must be formatted with `csharpier`.
+   - Do **not** use `dotnet format` — it loads the solution/project model and can mis-handle legacy VSTO / .NET Framework projects by rewriting `.csproj` files.
+   - `csharpier` is file-based and formats only `*.cs` without touching project files.
+   - Do not hand-format; if a diff disagrees with `csharpier`, formatter output wins.
+   - Approved commands:
+     - `dotnet tool run csharpier .`
+     - or `csharpier .` (if installed globally)
 
 2. **Linting / Static Analysis — .NET analyzers**
 

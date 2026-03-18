@@ -56,7 +56,10 @@ namespace TaskVisualization
 
         internal string ChooseOrCreateProgramName()
         {
-            var chooser = new TagLauncher(_globals.TD.ProgramInfo.Keys, _globals);
+            IPrefix prefix = _globals.TD.PrefixList.Find(x => x.PrefixType == PrefixTypeEnum.Program);
+            string userEmail = _globals.Ol.StoresWrapper.Stores.FirstOrDefault(x => !x.UserEmailAddress.IsNullOrEmpty())?.UserEmailAddress;
+            var chooser = new TagLauncher(_globals.TD.ProgramInfo.Keys, prefix, userEmail);
+            
             chooser.Viewer.Text = "Select or Create Program";
             chooser.Viewer.ShowDialog();
             var selection = chooser.Controller.GetSelections().FirstOrDefault();
@@ -67,7 +70,7 @@ namespace TaskVisualization
             }
             else
             {
-                var seedID = _globals.TD.ProgramInfo.Values.OrderByDescending(x => x).FirstOrDefault();
+                var seedID = _globals.TD.ProgramInfo.Values.OrderByDescending(x => x).FirstOrDefault() ?? "00";
                 var newProgramID = _globals.TD.IDList.GetNextToDoID(seedID);
                 _globals.TD.ProgramInfo[selection] = newProgramID;
                 _globals.TD.ProgramInfo.Serialize();

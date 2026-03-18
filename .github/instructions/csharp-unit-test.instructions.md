@@ -42,7 +42,7 @@ If there is any conflict between these documents, halt and notify the user.
 ## 3. C# Toolchain Command Selection
 
 - For C# work, use these concrete commands for the general policy toolchain loop:
-  1. `dotnet format TaskMaster.sln`
+  1. `csharpier .`
   2. `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
   3. `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
   4. `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`

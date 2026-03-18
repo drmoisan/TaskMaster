@@ -3,7 +3,7 @@ name: orchestrator
 model: GPT-5.4 (copilot)
 description: Orchestrate end-to-end feature/bug delivery by estimating change budget, routing small changes through promotion -> folder -> minimal-plan -> development -> QC -> small-audit, and routing larger efforts through scope -> promotion -> research -> spec -> atomic planning -> atomic execution -> feature review until complete.
 argument-hint: "Provide objective, affected files (if known), and whether this is likely bug or feature. The orchestrator will estimate change budget, choose the workflow path, delegate to specialist agents, and persist until completion."
-tools: [execute, read, edit, search, agent, web, todo]
+tools: [vscode/extensions, vscode/runCommand, execute, read, edit, search, agent, web, todo]
 handoffs:
   - label: Build minimal-audit atomic plan (preflight all clear)
     agent: atomic_planner
@@ -19,7 +19,7 @@ handoffs:
     send: true
   - label: Validate small-path delivery and post-QC docs
     agent: atomic_executor
-    prompt: "Validate small-path delivery for `${feature-folder}` against `${feature-folder}/issue.md`, check off completed plan tasks, and produce post-QC validation documentation deltas. If validation fails, return precise remediation deltas."
+    prompt: "Validate small-path delivery for `${feature-folder}` against `${feature-folder}/issue.md`, check off completed plan tasks, check off delivered acceptance criteria in AC source files per `acceptance-criteria-tracking`, and produce post-QC validation documentation deltas. If validation fails, return precise remediation deltas."
     send: true
   - label: Post-implementation small-path audit
     agent: feature_code_review_agent
@@ -43,7 +43,7 @@ handoffs:
     send: true
   - label: Execute approved atomic plan
     agent: atomic_executor
-    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce quality gates and suppression constraints from applicable repo policies.\n4) Complete final QA loop for every language command task explicitly present in the approved plan and report lint/type/test/coverage deltas; do not treat SKIPPED as success for final-QC command tasks unless the plan task text explicitly authorizes SKIPPED.\n5) When language policy requires coverage, execute coverage-enabled test commands and produce numeric baseline/post/new-code coverage results; if those metrics are missing, mark execution as remediation-required rather than PASS.\n\nOutput requirements:\n- execution summary\n- QA summary\n- lint/type/test/coverage deltas\n- updated plan checklist state"
+    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce quality gates and suppression constraints from applicable repo policies.\n4) Complete final QA loop for every language command task explicitly present in the approved plan and report lint/type/test/coverage deltas; do not treat SKIPPED as success for final-QC command tasks unless the plan task text explicitly authorizes SKIPPED.\n5) When language policy requires coverage, execute coverage-enabled test commands and produce numeric baseline/post/new-code coverage results; if those metrics are missing, mark execution as remediation-required rather than PASS.\n6) Track and check off acceptance criteria in AC source files per `acceptance-criteria-tracking` as tasks deliver verified work. Include AC Status Summary at completion.\n\nOutput requirements:\n- execution summary\n- QA summary\n- lint/type/test/coverage deltas\n- AC Status Summary\n- updated plan checklist state"
     send: true
   - label: Post-implementation feature review
     agent: feature_code_review_agent
@@ -65,6 +65,7 @@ Use these reusable skills to avoid duplicating shared operations:
 - `pr-base-branch-merge-base`
 - `feature-promotion-lifecycle`
 - `atomic-plan-contract`
+- `acceptance-criteria-tracking`
 
 # Non-negotiable mission behavior
 
@@ -127,16 +128,16 @@ S1.2 Generate `${short-name}`:
 
 S1.3 Ensure potential entry exists using exact command by type when missing:
 - If `${promotion-type}` is `feature`:
-  - `VS Code command: `drm-copilot: New Potential Entry` (command ID: `drmCopilotExtension.newPotentialEntry`) -ShortName ${short-name}`
+  - `drmCopilotExtension.newPotentialEntry` with `["-ShortName", "${short-name}"]`
 - If `${promotion-type}` is `bug`:
-  - `VS Code command: `drm-copilot: New Potential Bug Entry` (command ID: `drmCopilotExtension.newPotentialBugEntry`) --short-name ${short-name}`
+  - `drmCopilotExtension.newPotentialBugEntry` with `["--short-name", "${short-name}"]`
 
 S1.4 Detect created/existing potential markdown file path and save as `${relativeFile}`.
 
 ### Step S2 — Promote with short-path flag
 
 S2.1 Promote to issue using existing tooling with short-path flag set:
-- `VS Code command: `drm-copilot: Potential To Issue` (command ID: `drmCopilotExtension.potentialToIssue`) --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode minor-audit`
+- `drmCopilotExtension.potentialToIssue` with `["--potential-path", "${relativeFile}", "--promotion-type", "${promotion-type}", "--work-mode", "minor-audit"]`
 
 S2.2 Set `${long-name}` from `${relativeFile}` filename without `.md`.
 
@@ -146,7 +147,7 @@ S2.4 Create branch with exact name:
 - `${promotion-type}/${short-name}-${issue-num}`
 
 S2.5 Create active feature folder with short-path flag set:
-- `VS Code command: `drm-copilot: New Active Feature Folder` (command ID: `drmCopilotExtension.newActiveFeatureFolder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode minor-audit`
+- `drmCopilotExtension.newActiveFeatureFolder` with `["--feature-name", "${long-name}", "--type", "${promotion-type}", "--issue-number", "${issue-num}", "--work-mode", "minor-audit"]`
 
 S2.6 Capture created folder path as `${feature-folder}`.
 
@@ -243,9 +244,9 @@ Follow this exact sequence.
 
 1.3 Create potential entry using exact command by type:
 - If `${promotion-type}` is `feature`:
-  - `VS Code command: `drm-copilot: New Potential Entry` (command ID: `drmCopilotExtension.newPotentialEntry`) -ShortName ${short-name}`
+  - `drmCopilotExtension.newPotentialEntry` with `["-ShortName", "${short-name}"]`
 - If `${promotion-type}` is `bug`:
-  - `VS Code command: `drm-copilot: New Potential Bug Entry` (command ID: `drmCopilotExtension.newPotentialBugEntry`) --short-name ${short-name}`
+  - `drmCopilotExtension.newPotentialBugEntry` with `["--short-name", "${short-name}"]`
 
 1.4 Detect created potential markdown file path and save as `${relativeFile}`.
 
@@ -256,7 +257,10 @@ Follow this exact sequence.
 ### Step 2 — Promote potential item
 
 2.1 Promote to issue with exact command:
-- `VS Code command: `drm-copilot: Potential To Issue` (command ID: `drmCopilotExtension.potentialToIssue`) --potential-path ${relativeFile} --promotion-type ${promotion-type}`
+- If `${promotion-type}` is `bug`:
+  - `drmCopilotExtension.potentialToIssue` with `["--potential-path", "${relativeFile}", "--promotion-type", "${promotion-type}", "--work-mode", "full-bug"]`
+- If `${promotion-type}` is `feature`:
+  - `drmCopilotExtension.potentialToIssue` with `["--potential-path", "${relativeFile}", "--promotion-type", "${promotion-type}", "--work-mode", "full-feature"]`
 
 2.2 Set `${long-name}` from `${relativeFile}` filename without `.md`.
 
@@ -266,7 +270,10 @@ Follow this exact sequence.
 - `${promotion-type}/${short-name}-${issue-num}`
 
 2.5 Create active feature folder with exact command:
-- `VS Code command: `drm-copilot: New Active Feature Folder` (command ID: `drmCopilotExtension.newActiveFeatureFolder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num}`
+- If `${promotion-type}` is `bug`:
+  - `drmCopilotExtension.newActiveFeatureFolder` with `["--feature-name", "${long-name}", "--type", "${promotion-type}", "--issue-number", "${issue-num}", "--work-mode", "full-bug"]`
+- If `${promotion-type}` is `feature`:
+  - `drmCopilotExtension.newActiveFeatureFolder` with `["--feature-name", "${long-name}", "--type", "${promotion-type}", "--issue-number", "${issue-num}", "--work-mode", "full-feature"]`
 
 2.6 Capture created folder path as `${feature-folder}`.
 

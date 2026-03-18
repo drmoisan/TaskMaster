@@ -93,19 +93,19 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             }
         }
 
-        async public Task SortAsync(IList<MailItemHelper> mailHelpers)
+        async public Task<bool> SortAsync(IList<MailItemHelper> mailHelpers)
         {
             //TraceUtility.LogMethodCall(mailHelpers);
             mailHelpers.ThrowIfNullOrEmpty(nameof(mailHelpers));
             MailHelpers = mailHelpers;
             Config.ResolvePaths((Folder)MailHelpers.FirstOrDefault().FolderInfo.OlFolder);
-            await SortAsync();
+            return await SortAsync();
         }
 
-        async public Task SortAsync()
+        async public Task<bool> SortAsync()
         {
             //TraceUtility.LogMethodCall();
-            if (!TryValidateParameters()) { return; }
+            if (!TryValidateParameters()) { return false; }
 
             // Process each email
             foreach (var mailHelper in MailHelpers)
@@ -114,6 +114,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             }
 
             (await Globals.AF.Manager["Folder"]).Serialize();
+            return true;
         }
 
         async public Task ProcessMailHelperAsync(MailItemHelper mailHelper)
@@ -284,7 +285,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         {
             try
             {
-                ValidateParameters();
+                ValidateParameters();                
                 return Config.CanSort;
             }
             catch (System.Exception ex)

@@ -223,13 +223,20 @@ namespace QuickFiler
                 convInfo = convInfo.Where(itemInfo => itemInfo.EntryId == DataModel.Mail.EntryID).ToList();
             }
 
-            await _dataModel.MoveToFolderAsync(selectedFolder,
+            var result = await _dataModel.MoveToFolderAsync(selectedFolder,
                                           _formController.SaveAttachments,
                                           _formController.SaveEmail,
                                           _formController.SavePictures,
                                           moveConversation);
 
-            QuickFileMetrics_WRITE(_globals.FS.Filenames.EmailSession, selectedFolder, convInfo);
+            if (!result)
+            {
+                MessageBox.Show($"Cannot move to folderpath {selectedFolder}");
+            }
+            else
+            {
+                QuickFileMetrics_WRITE(_globals.FS.Filenames.EmailSession, selectedFolder, convInfo);
+            }
         }
 
         internal async Task OpenOlFolderAsync(string selectedFolder)

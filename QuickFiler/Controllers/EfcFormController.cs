@@ -420,7 +420,7 @@ namespace QuickFiler.Controllers
 
                     if (folder is not null)
                     {
-                        await _dataModel.MoveToFolder(
+                        await _dataModel.MoveToFolderAsync(
                             folder,
                             _globals.Ol.ArchiveRootPath,
                             SaveAttachments,
@@ -630,7 +630,7 @@ namespace QuickFiler.Controllers
                                                                  oneDrive)).ConfigureAwait(false);
                 if (folder is not null)
                 {
-                    await _dataModel.MoveToFolder(folder,
+                    await _dataModel.MoveToFolderAsync(folder,
                                                   _globals.Ol.ArchiveRootPath,
                                                   SaveAttachments,
                                                   SaveEmail,
