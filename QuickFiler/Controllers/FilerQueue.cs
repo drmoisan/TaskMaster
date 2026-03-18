@@ -47,7 +47,7 @@ namespace QuickFiler.Controllers
                 {
                     try
                     {
-                        await item.Filer.SortAsync(item.Helpers);
+                        _ = await item.Filer.SortAsync(item.Helpers);
                     }
                     catch (Exception e)
                     {

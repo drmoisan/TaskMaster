@@ -138,6 +138,10 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             try
             {
                 var destinationOlFolder = new FolderPredictor(Globals).GetFolder(DestinationOlPath, Globals.Ol.App);
+                if (destinationOlFolder is null) 
+                { 
+                    logger.Warn($"Cannot resolve destination folder with path {DestinationOlPath}. Emails will not be moved"); 
+                }
                 return destinationOlFolder;
             }
             catch (System.Exception e)

@@ -153,40 +153,39 @@ namespace QuickFiler.Controllers
 
         #region Public Methods
 
-        async public Task MoveToFolderAsync(string folderpath,
+        async public Task<bool> MoveToFolderAsync(string folderpath,
                                        bool saveAttachments,
                                        bool saveEmail,
                                        bool savePictures,
                                        bool moveConversation)
         {
-            if (MailInfo is not null)
+            if (MailInfo is null) { return false; }
+          
+            bool attachments = (folderpath != "Trash to Delete") ? saveAttachments : false;
+            var mailHelpers = moveConversation ? ConversationResolver.ConversationInfo.SameFolder : new List<MailItemHelper>() { MailInfo };
+
+            if (!Globals.FS.SpecialFolders.TryGetValue("OneDrive", out var folderRoot))
             {
-
-                bool attachments = (folderpath != "Trash to Delete") ? saveAttachments : false;
-                var mailHelpers = moveConversation ? ConversationResolver.ConversationInfo.SameFolder : new List<MailItemHelper>() { MailInfo };
-
-                if (!Globals.FS.SpecialFolders.TryGetValue("OneDrive", out var folderRoot))
-                {
-                    logger.Debug($"Cannot sort without OneDrive location");
-                    return;
-                }
-                var config = new EmailFilerConfig()
-                {
-                    SaveMsg = saveEmail,
-                    SaveAttachments = attachments,
-                    SavePictures = savePictures,
-                    DestinationOlStem = folderpath,
-                    Globals = Globals,
-                    OlAncestor = Globals.Ol.ArchiveRootPath,
-                    FsAncestorEquivalent = folderRoot,
-                };
-
-                var sorter = new EmailFiler(config);
-                await sorter.SortAsync(mailHelpers);
-
-                SortEmail.Cleanup_Files();
+                logger.Warn($"Cannot sort without OneDrive location");
+                return false;
             }
+            var config = new EmailFilerConfig()
+            {
+                SaveMsg = saveEmail,
+                SaveAttachments = attachments,
+                SavePictures = savePictures,
+                DestinationOlStem = folderpath,
+                Globals = Globals,
+                OlAncestor = Globals.Ol.ArchiveRootPath,
+                FsAncestorEquivalent = folderRoot,
+            };
+
+            var sorter = new EmailFiler(config);
+            var result = await sorter.SortAsync(mailHelpers);
+            SortEmail.Cleanup_Files();
+            return result;
         }
+        
 
         internal async Task OpenOlFolderAsync(string folderpath)
         {
@@ -219,7 +218,7 @@ namespace QuickFiler.Controllers
             await sorter.OpenFileSystemFolderAsync();
         }
 
-        async public Task MoveToFolder(MAPIFolder folder,
+        async public Task MoveToFolderAsync(MAPIFolder folder,
                                        string olAncestor,
                                        bool saveAttachments,
                                        bool saveEmail,
@@ -231,7 +230,8 @@ namespace QuickFiler.Controllers
             {
                 folderpath = folderpath.Substring(1);
             }
-            await MoveToFolderAsync(folderpath, saveAttachments, saveEmail, savePictures, moveConversation);
+            var result = await MoveToFolderAsync(folderpath, saveAttachments, saveEmail, savePictures, moveConversation);
+            if (!result) { MessageBox.Show($"Cannot move to folderpath {folderpath}"); }
         }
 
         public IList<MailItem> PackageItems(bool moveConversation)

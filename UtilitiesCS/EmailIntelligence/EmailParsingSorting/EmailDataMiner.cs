@@ -78,17 +78,20 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) { return; }
                 var folderPath = Path.Combine(folderRoot, "Bayesian");
-                var files = Directory.GetFiles(folderPath);
-                foreach (var file in files)
+                if (Directory.Exists(folderPath))
                 {
-                    try
+                    var files = Directory.GetFiles(folderPath);
+                    foreach (var file in files)
                     {
-                        File.Delete(file);
-                    }
-                    catch (System.Exception e)
-                    {
-                        logger.Error($"Error deleting file {file}. \n{e.Message}\n{e.StackTrace}");
-                    }
+                        try
+                        {
+                            File.Delete(file);
+                        }
+                        catch (System.Exception e)
+                        {
+                            logger.Error($"Error deleting file {file}. \n{e.Message}\n{e.StackTrace}");
+                        }
+                    }                    
                 }
             });
         }

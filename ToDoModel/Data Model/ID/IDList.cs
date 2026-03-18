@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 using System.Windows.Forms;
 using UtilitiesCS;
+using UtilitiesCS.Extensions;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.OutlookObjects.Fields;
 using Outlook = Microsoft.Office.Interop.Outlook;
@@ -73,6 +74,7 @@ namespace ToDoModel
 
         public string GetNextToDoID(string strSeed)
         {
+            strSeed.ThrowIfNullOrEmpty();
             int encoderBase = 36; // 125;
 
             bool blContinue = true;
