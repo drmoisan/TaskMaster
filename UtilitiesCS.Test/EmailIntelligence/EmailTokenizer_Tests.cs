@@ -34,7 +34,11 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var tokens = new[] { "alpha", "beta" };
 
             // Act
-            var result = await tokenizer.TokenizeAsync(tokens, Mock.Of<IApplicationGlobals>(), CancellationToken.None);
+            var result = await tokenizer.TokenizeAsync(
+                tokens,
+                Mock.Of<IApplicationGlobals>(),
+                CancellationToken.None
+            );
 
             // Assert
             result.Should().Equal(tokens);
@@ -47,7 +51,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var tokenizer = new EmailTokenizer();
 
             // Act
-            Action act = () => tokenizer.Tokenize(obj: null, globals: Mock.Of<IApplicationGlobals>()).ToArray();
+            Action act = () =>
+                tokenizer.Tokenize(obj: null, globals: Mock.Of<IApplicationGlobals>()).ToArray();
 
             // Assert
             act.Should().Throw<ArgumentNullException>().WithParameterName("obj");
@@ -60,7 +65,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var tokenizer = new EmailTokenizer();
 
             // Act
-            Action act = () => tokenizer.Tokenize(obj: 42, globals: Mock.Of<IApplicationGlobals>()).ToArray();
+            Action act = () =>
+                tokenizer.Tokenize(obj: 42, globals: Mock.Of<IApplicationGlobals>()).ToArray();
 
             // Assert
             act.Should().Throw<ArgumentException>();
@@ -77,31 +83,39 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 htmlBody: string.Empty,
                 sender: CreateRecipient("Alice", "alice@example.com"),
                 toRecipients: new[] { CreateRecipient("Bob", "bob@example.com") },
-                attachments: new[] { CreateAttachment("reports/fy2026.csv", isImage: false, size: 10) });
+                attachments: new[]
+                {
+                    CreateAttachment("reports/fy2026.csv", isImage: false, size: 10),
+                }
+            );
 
             // Act
             var tokens = tokenizer.Tokenize(item.Object).ToArray();
 
             // Assert
-            tokens.Should().Contain(new[]
-            {
-                "charset:utf-8",
-                "subject:FREE",
-                "subject:money",
-                "subject:!!",
-                "from:name:alice",
-                "from:addr:alice",
-                "from:addr:example.com",
-                "to:name:bob",
-                "to:addr:bob",
-                "to:addr:example.com",
-                "filename:fname comp:reports",
-                "filename:fname piece:fy2026",
-                "filename:fname piece:csv",
-                "hello",
-                "re?sume",
-                "world"
-            });
+            tokens
+                .Should()
+                .Contain(
+                    new[]
+                    {
+                        "charset:utf-8",
+                        "subject:FREE",
+                        "subject:money",
+                        "subject:!!",
+                        "from:name:alice",
+                        "from:addr:alice",
+                        "from:addr:example.com",
+                        "to:name:bob",
+                        "to:addr:bob",
+                        "to:addr:example.com",
+                        "filename:fname comp:reports",
+                        "filename:fname piece:fy2026",
+                        "filename:fname piece:csv",
+                        "hello",
+                        "re?sume",
+                        "world",
+                    }
+                );
         }
 
         [TestMethod]
@@ -126,7 +140,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var item = CreateItemInfo(
                 subject: "Status",
                 body: "hello",
-                htmlBody: "<script src='cid:test'></script><iframe></iframe>");
+                htmlBody: "<script src='cid:test'></script><iframe></iframe>"
+            );
 
             // Act
             var tokens = tokenizer.Tokenize(item.Object).ToArray();
@@ -143,7 +158,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             string htmlBody,
             IRecipientInfo sender = null,
             IRecipientInfo[] toRecipients = null,
-            IAttachment[] attachments = null)
+            IAttachment[] attachments = null
+        )
         {
             var mock = new Mock<IItemInfo>(MockBehavior.Loose);
             mock.SetupGet(x => x.Subject).Returns(subject);
@@ -151,9 +167,11 @@ namespace UtilitiesCS.Test.EmailIntelligence
             mock.SetupGet(x => x.HTMLBody).Returns(htmlBody);
             mock.SetupGet(x => x.InternetCodepage).Returns(65001);
             mock.SetupGet(x => x.Sender).Returns(sender);
-            mock.SetupGet(x => x.ToRecipients).Returns(toRecipients ?? Array.Empty<IRecipientInfo>());
+            mock.SetupGet(x => x.ToRecipients)
+                .Returns(toRecipients ?? Array.Empty<IRecipientInfo>());
             mock.SetupGet(x => x.CcRecipients).Returns(Array.Empty<IRecipientInfo>());
-            mock.SetupGet(x => x.AttachmentsInfo).Returns(attachments ?? Array.Empty<IAttachment>());
+            mock.SetupGet(x => x.AttachmentsInfo)
+                .Returns(attachments ?? Array.Empty<IAttachment>());
             return mock;
         }
 

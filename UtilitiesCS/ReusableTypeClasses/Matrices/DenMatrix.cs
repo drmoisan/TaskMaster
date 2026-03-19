@@ -10,22 +10,29 @@ namespace UtilitiesCS.ReusableTypeClasses.Matrices
     /// Taken from https://codereview.stackexchange.com/questions/204889/2d-matrix-with-jagged-array-isnt-faster-than-one-with-a-multidimensional-array
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class DenMatrix<T> : IDisposable where T : struct, IComparable<T>
+    public class DenMatrix<T> : IDisposable
+        where T : struct, IComparable<T>
     {
         private T[] __array1d;
         public int Width { get; set; }
         public int Height { get; set; }
-        public int Length { get { return Width * Height; } }
+        public int Length
+        {
+            get { return Width * Height; }
+        }
         public bool IsEmpty
         {
             get
             {
-                if (__array1d == null) return true;
-                else return false;
+                if (__array1d == null)
+                    return true;
+                else
+                    return false;
             }
         }
 
         public DenMatrix() { }
+
         public DenMatrix(T[,] data)
         {
             this.Set(data);
@@ -60,8 +67,10 @@ namespace UtilitiesCS.ReusableTypeClasses.Matrices
             {
                 string message = string.Empty;
 
-                if (x >= Width) message = "x-value exceeds Width ";
-                if (y >= Height) message += "y-value exceeds Height ";
+                if (x >= Width)
+                    message = "x-value exceeds Width ";
+                if (y >= Height)
+                    message += "y-value exceeds Height ";
                 message += "in Array2d.Get(x,y).";
                 throw new Exception(message);
             }
@@ -90,7 +99,6 @@ namespace UtilitiesCS.ReusableTypeClasses.Matrices
             }
             else
             {
-
                 throw new Exception(x + ", " + Width + "," + y + "," + Height);
             }
         }
@@ -116,14 +124,8 @@ namespace UtilitiesCS.ReusableTypeClasses.Matrices
 
         public T this[int x, int y]
         {
-            get
-            {
-                return Get(x, y);
-            }
-            set
-            {
-                Set(x, y, value);
-            }
+            get { return Get(x, y); }
+            set { Set(x, y, value); }
         }
 
         public void Set(T[,] arr)

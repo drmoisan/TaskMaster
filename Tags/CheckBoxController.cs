@@ -4,11 +4,8 @@ using System.Windows.Forms;
 
 namespace Tags
 {
-
     public class CheckBoxController
     {
-
-
         // By declaring Public WithEvents we can handle
         // events "collectively". In this case it is
         // the click event on a date label, and by
@@ -19,11 +16,7 @@ namespace Tags
         public virtual CheckBox ctrlCB
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return _ctrlCB;
-            }
-
+            get { return _ctrlCB; }
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
@@ -62,7 +55,6 @@ namespace Tags
             ctrlCB.PreviewKeyDown += ctrlCB_PreviewKeyDown;
         }
 
-
         internal object Init(TagController parent, string strPrefix)
         {
             _parent = parent;
@@ -96,46 +88,46 @@ namespace Tags
             switch (e.KeyCode)
             {
                 case Keys.Down:
-                    {
-                        _parent.Select_Ctrl_By_Offset(1);
-                        break;
-                    }
+                {
+                    _parent.Select_Ctrl_By_Offset(1);
+                    break;
+                }
 
                 case Keys.Up:
-                    {
-                        _parent.Select_Ctrl_By_Offset(-1);
-                        break;
-                    }
+                {
+                    _parent.Select_Ctrl_By_Offset(-1);
+                    break;
+                }
 
                 case Keys.End:
-                    {
-                        _parent.Select_Last_Control();
-                        break;
-                    }
+                {
+                    _parent.Select_Last_Control();
+                    break;
+                }
 
                 case Keys.Home:
-                    {
-                        _parent.Select_First_Control();
-                        break;
-                    }
+                {
+                    _parent.Select_First_Control();
+                    break;
+                }
 
                 case Keys.PageDown:
-                    {
-                        _parent.Select_PageDown();
-                        break;
-                    }
+                {
+                    _parent.Select_PageDown();
+                    break;
+                }
 
                 case Keys.PageUp:
-                    {
-                        _parent.Select_PageUp();
-                        break;
-                    }
+                {
+                    _parent.Select_PageUp();
+                    break;
+                }
 
                 case Keys.Enter:
-                    {
-                        _parent.OK_Action();
-                        break;
-                    }
+                {
+                    _parent.OK_Action();
+                    break;
+                }
             }
         }
 
@@ -160,15 +152,15 @@ namespace Tags
             switch (e.KeyCode)
             {
                 case Keys.Down:
-                    {
-                        e.IsInputKey = true;
-                        break;
-                    }
+                {
+                    e.IsInputKey = true;
+                    break;
+                }
                 case Keys.Up:
-                    {
-                        e.IsInputKey = true;
-                        break;
-                    }
+                {
+                    e.IsInputKey = true;
+                    break;
+                }
             }
         }
     }

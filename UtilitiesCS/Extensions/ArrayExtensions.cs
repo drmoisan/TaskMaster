@@ -21,8 +21,14 @@ namespace UtilitiesCS
             {
                 for (int j = 0; j < columnCount; j++)
                 {
-                    if (array[i, j] is null) { stringArray[i, j] = ""; }
-                    else { stringArray[i, j] = array[i, j].ToString(); }
+                    if (array[i, j] is null)
+                    {
+                        stringArray[i, j] = "";
+                    }
+                    else
+                    {
+                        stringArray[i, j] = array[i, j].ToString();
+                    }
                 }
             }
             return stringArray;
@@ -121,8 +127,8 @@ namespace UtilitiesCS
 
             var result = new T[FirstDim, SecondDim];
             for (int i = 0; i < FirstDim; ++i)
-                for (int j = 0; j < SecondDim; ++j)
-                    result[i, j] = source[i][j];
+            for (int j = 0; j < SecondDim; ++j)
+                result[i, j] = source[i][j];
 
             return result;
         }
@@ -133,12 +139,18 @@ namespace UtilitiesCS
 
         public static bool IsInitialized<T>(this T[,] array)
         {
-            if (array == null) { return false; }
+            if (array == null)
+            {
+                return false;
+            }
             for (int i = 0; i < array.GetLength(0); i++)
             {
                 for (int j = 0; j < array.GetLength(1); j++)
                 {
-                    if (array[i, j] == null) { return false; }
+                    if (array[i, j] == null)
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -147,12 +159,18 @@ namespace UtilitiesCS
 
         public static bool IsInitialized<T>(this T[,] array, bool partially)
         {
-            if (array == null) { return false; }
+            if (array == null)
+            {
+                return false;
+            }
             for (int i = 0; i < array.GetLength(0); i++)
             {
                 for (int j = 0; j < array.GetLength(1); j++)
                 {
-                    if (array[i, j] != null) { return true; }
+                    if (array[i, j] != null)
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -160,10 +178,16 @@ namespace UtilitiesCS
 
         public static bool IsInitialized<T>(this T[] array)
         {
-            if (array == null) { return false; }
+            if (array == null)
+            {
+                return false;
+            }
             for (int i = 0; i < array.GetLength(0); i++)
             {
-                if (array[i] == null) { return false; }
+                if (array[i] == null)
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -171,14 +195,19 @@ namespace UtilitiesCS
 
         public static bool IsInitialized<T>(this T[] array, bool partially)
         {
-            if (array == null) { return false; }
+            if (array == null)
+            {
+                return false;
+            }
             for (int i = 0; i < array.GetLength(0); i++)
             {
-                if (array[i] != null) { return true; }
+                if (array[i] != null)
+                {
+                    return true;
+                }
             }
             return false;
         }
-
 
         #endregion
 
@@ -186,17 +215,19 @@ namespace UtilitiesCS
 
         /// <summary>
         /// Function searches a string array and returns matching elements in a new string array.
-        /// How matches are performed is defined by the search options. See 
+        /// How matches are performed is defined by the search options. See
         /// <see cref="StringSearchOptions"/>.
         /// </summary>
         /// <param name="sourceArray">String array to search</param>
         /// <param name="searchString">Target substring to search</param>
-        /// <param name="options">Defines how matches are performed. 
+        /// <param name="options">Defines how matches are performed.
         /// See also <see cref="StringSearchOptions"/>.</param>
         /// <returns>String array with elements that match the criteria. Null if no matches</returns>
-        public static string[] SearchArry4Str(this string[] sourceArray,
-                                              string searchString = "",
-                                              SearchOptions options = SearchOptions.Standard)
+        public static string[] SearchArry4Str(
+            this string[] sourceArray,
+            string searchString = "",
+            SearchOptions options = SearchOptions.Standard
+        )
         {
             if (searchString.Trim().Length != 0)
             {
@@ -213,9 +244,10 @@ namespace UtilitiesCS
                     case SearchOptions.DeleteFromMatches:
                         (rg, searchPattern) = SimpleRegex.MakeRegex(searchString);
                         string replacePattern = SimpleRegex.MakeReplacePattern(searchPattern);
-                        return sourceArray.Where(x => rg.IsMatch(x))
-                                          .Select(x => rg.Replace(x, replacePattern))
-                                          .ToArray();
+                        return sourceArray
+                            .Where(x => rg.IsMatch(x))
+                            .Select(x => rg.Replace(x, replacePattern))
+                            .ToArray();
 
                     case SearchOptions.ExactMatch:
                         return sourceArray.Where(x => x == searchString).ToArray();
@@ -243,7 +275,7 @@ namespace UtilitiesCS
         /// </item>
         /// <item>
         /// <term>DeleteFromMatches</term>
-        /// <description>Similar to Standard except that the matching substring is removed from each 
+        /// <description>Similar to Standard except that the matching substring is removed from each
         /// matching element</description>
         /// </item>
         /// <item>
@@ -262,7 +294,7 @@ namespace UtilitiesCS
             Complement = 1,
             DeleteFromMatches = 2,
             ExactMatch = 3,
-            ExactComplement = 4
+            ExactComplement = 4,
         }
 
         #endregion
@@ -283,7 +315,6 @@ namespace UtilitiesCS
             {
                 return default;
             }
-
         }
 
         internal static List<T> FlattenArrayTree<T>(this object node, bool strict)
@@ -294,7 +325,10 @@ namespace UtilitiesCS
                 FlattenArrayTree(node, strict, ref result);
                 return result;
             }
-            else { return null; }
+            else
+            {
+                return null;
+            }
         }
 
         internal static void FlattenArrayTree<T>(this object node, bool strict, ref List<T> result)
@@ -315,13 +349,18 @@ namespace UtilitiesCS
                     }
                 }
             }
-            else if (node is T) { result.Append((T)node); }
+            else if (node is T)
+            {
+                result.Append((T)node);
+            }
             else
             {
                 if (strict)
                 {
-                    throw new ArgumentException($"node is of type {node.GetType().Name}. Array elements in " +
-                                                $"{nameof(FlattenArrayTree)} must be arrays or of type {typeof(T).Name}.");
+                    throw new ArgumentException(
+                        $"node is of type {node.GetType().Name}. Array elements in "
+                            + $"{nameof(FlattenArrayTree)} must be arrays or of type {typeof(T).Name}."
+                    );
                 }
                 else
                 {
@@ -330,9 +369,10 @@ namespace UtilitiesCS
             }
         }
 
+        public static bool IsArray<T>(this object container) =>
+            container.GetType().IsArray
+            && typeof(T).IsAssignableFrom(container.GetType().GetElementType());
 
-
-        public static bool IsArray<T>(this object container) => container.GetType().IsArray && typeof(T).IsAssignableFrom(container.GetType().GetElementType());
         public static bool IsArray(this object container) => container.GetType().IsArray;
 
         //TODO: Implement IsTringArrayTree
@@ -341,29 +381,74 @@ namespace UtilitiesCS
             return false;
         }
 
-        public static string SentenceJoin(this IEnumerable<string> array, string separator = ", ", string lastSeparator = " and ")
+        public static string SentenceJoin(
+            this IEnumerable<string> array,
+            string separator = ", ",
+            string lastSeparator = " and "
+        )
         {
             var count = array.Count();
-            if (count == 0) { return ""; }
-            if (count == 1) { return array.ElementAt(0); }
-            if (count == 2) { return array.ElementAt(0) + lastSeparator + array.ElementAt(1); }
-            return string.Join(separator, array.Take(count - 1)) + lastSeparator + array.ElementAt(count - 1);
+            if (count == 0)
+            {
+                return "";
+            }
+            if (count == 1)
+            {
+                return array.ElementAt(0);
+            }
+            if (count == 2)
+            {
+                return array.ElementAt(0) + lastSeparator + array.ElementAt(1);
+            }
+            return string.Join(separator, array.Take(count - 1))
+                + lastSeparator
+                + array.ElementAt(count - 1);
         }
 
-        public static string SentenceJoin(this string[] array, string separator = ", ", string lastSeparator = " and ")
+        public static string SentenceJoin(
+            this string[] array,
+            string separator = ", ",
+            string lastSeparator = " and "
+        )
         {
-            if (array.Length == 0) { return ""; }
-            if (array.Length == 1) { return array[0]; }
-            if (array.Length == 2) { return array[0] + lastSeparator + array[1]; }
-            return string.Join(separator, array.Take(array.Length - 1)) + lastSeparator + array[array.Length - 1];
+            if (array.Length == 0)
+            {
+                return "";
+            }
+            if (array.Length == 1)
+            {
+                return array[0];
+            }
+            if (array.Length == 2)
+            {
+                return array[0] + lastSeparator + array[1];
+            }
+            return string.Join(separator, array.Take(array.Length - 1))
+                + lastSeparator
+                + array[array.Length - 1];
         }
 
-        public static string SentenceJoin(this char[] array, string separator = ", ", string lastSeparator = " and ")
+        public static string SentenceJoin(
+            this char[] array,
+            string separator = ", ",
+            string lastSeparator = " and "
+        )
         {
-            if (array.Length == 0) { return ""; }
-            if (array.Length == 1) { return char.ToString(array[0]); }
-            if (array.Length == 2) { return array[0] + lastSeparator + array[1]; }
-            return string.Join(separator, array.Take(array.Length - 1)) + lastSeparator + array[array.Length - 1];
+            if (array.Length == 0)
+            {
+                return "";
+            }
+            if (array.Length == 1)
+            {
+                return char.ToString(array[0]);
+            }
+            if (array.Length == 2)
+            {
+                return array[0] + lastSeparator + array[1];
+            }
+            return string.Join(separator, array.Take(array.Length - 1))
+                + lastSeparator
+                + array[array.Length - 1];
         }
 
         #region Deprecated
@@ -375,24 +460,31 @@ namespace UtilitiesCS
             {
                 for (int i = 0; i < branches.Length; i++)
                 {
-                    if (branches[i] is Array) { branches[i] = FlattenStringTree((object[])branches[i]); }
+                    if (branches[i] is Array)
+                    {
+                        branches[i] = FlattenStringTree((object[])branches[i]);
+                    }
                     else if (!(branches[i] is string))
                     {
                         if (strictValidation)
                         {
-                            throw new ArgumentException($"branches[{i}] is of type {branches[i].GetType().Name}"
-                                + $". Array elements in FlattenStringTree must be arrays or strings.");
+                            throw new ArgumentException(
+                                $"branches[{i}] is of type {branches[i].GetType().Name}"
+                                    + $". Array elements in FlattenStringTree must be arrays or strings."
+                            );
                         }
                         branches[i] = "Error";
                     }
                 }
             }
             string result = string.Join(", ", branches);
-            if (result.Contains("Error")) { result = "Error"; }
+            if (result.Contains("Error"))
+            {
+                result = "Error";
+            }
 
             return result;
         }
-
 
         #endregion
     }
@@ -449,5 +541,4 @@ namespace UtilitiesCS
             return FlagEx;
         }
     }
-
 }

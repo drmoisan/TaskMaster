@@ -1,17 +1,17 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
 // Last Revised: September 2012
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Collections;
 
 namespace Swordfish.NET.Collections
 {
@@ -21,9 +21,9 @@ namespace Swordfish.NET.Collections
     /// not the GUI thread. The notify event is thrown using the dispatcher
     /// from the event listener(s).
     /// </summary>
-    public class ConcurrentObservableSortedDictionary<TKey, TValue> : ConcurrentObservableDictionary<TKey, TValue>
+    public class ConcurrentObservableSortedDictionary<TKey, TValue>
+        : ConcurrentObservableDictionary<TKey, TValue>
     {
-
         // ************************************************************************
         // Private Fields
         // ************************************************************************
@@ -61,10 +61,14 @@ namespace Swordfish.NET.Collections
         /// </param>
         protected override void BaseAdd(TKey key, TValue value)
         {
-            int index = _sorter.GetInsertIndex(WriteCollection.Count, key, delegate (int testIndex)
-            {
-                return WriteCollection[testIndex].Key;
-            });
+            int index = _sorter.GetInsertIndex(
+                WriteCollection.Count,
+                key,
+                delegate(int testIndex)
+                {
+                    return WriteCollection[testIndex].Key;
+                }
+            );
 
             if (index >= WriteCollection.Count)
             {

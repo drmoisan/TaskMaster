@@ -1,9 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
-using UtilitiesCS;
-using Newtonsoft.Json;
+﻿using System;
 using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Newtonsoft.Json;
+using UtilitiesCS;
 
 namespace UtilitiesCS.Test.Threading
 {
@@ -12,11 +12,13 @@ namespace UtilitiesCS.Test.Threading
     {
         private MockRepository mockRepository;
         private Mock<IApplicationGlobals> mockApplicationGlobals;
+
         //private Mock<IAppStagingFilenames> mockStagingFilenames;
         private Mock<IFileSystemFolderPaths> mockFileSystemsFolderPaths;
         private Mock<JsonReader> mockJsonReader;
         private Mock<Type> mockType;
         private Mock<JsonWriter> mockJsonWriter;
+
         //private Mock<JsonSerializerSub> mockJsonSerializer;
 
         [TestInitialize]
@@ -28,7 +30,8 @@ namespace UtilitiesCS.Test.Threading
             //this.mockFileSystemsFolderPaths.SetupGet(x => x.FldrPythonStaging).Returns("Working");
             this.mockApplicationGlobals = this.mockRepository.Create<IApplicationGlobals>();
             this.mockApplicationGlobals.SetupAllProperties();
-            this.mockApplicationGlobals.SetupGet(x => x.FS).Returns(this.mockFileSystemsFolderPaths.Object);
+            this.mockApplicationGlobals.SetupGet(x => x.FS)
+                .Returns(this.mockFileSystemsFolderPaths.Object);
             this.mockJsonReader = this.mockRepository.Create<JsonReader>();
             this.mockJsonReader.SetupAllProperties();
             this.mockType = this.mockRepository.Create<Type>();
@@ -51,7 +54,7 @@ namespace UtilitiesCS.Test.Threading
             var settings = new JsonSerializerSettings()
             {
                 TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented
+                Formatting = Formatting.Indented,
             };
             settings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
             settings.Converters.Add(new AppGlobalsConverter(this.mockApplicationGlobals.Object));
@@ -61,8 +64,7 @@ namespace UtilitiesCS.Test.Threading
 
         private AppGlobalsConverter CreateAppGlobalsConverter()
         {
-            return new AppGlobalsConverter(
-                this.mockApplicationGlobals.Object);
+            return new AppGlobalsConverter(this.mockApplicationGlobals.Object);
         }
 
         public class SampleClass
@@ -72,8 +74,6 @@ namespace UtilitiesCS.Test.Threading
             public IApplicationGlobals AppGlobals { get; set; }
         }
 
-
-
         #endregion Helper Methods and Classes
 
         [TestMethod]
@@ -82,7 +82,12 @@ namespace UtilitiesCS.Test.Threading
             // Arrange
             var settings = this.CreateJsonSerializerSettings();
             var appGlobals = this.mockApplicationGlobals.Object;
-            var expected = new SampleClass() { Name = "Test", Age = 47, AppGlobals = appGlobals };
+            var expected = new SampleClass()
+            {
+                Name = "Test",
+                Age = 47,
+                AppGlobals = appGlobals,
+            };
 
             // Act
             var json = JsonConvert.SerializeObject(expected, settings);
@@ -111,12 +116,11 @@ namespace UtilitiesCS.Test.Threading
                 objectType,
                 existingValue,
                 hasExistingValue,
-                serializer);
+                serializer
+            );
 
             // Assert
             result.Should().BeEquivalentTo(this.mockApplicationGlobals.Object);
         }
-
-
     }
 }

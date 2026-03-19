@@ -1,10 +1,10 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.Test.Extensions
@@ -77,7 +77,10 @@ namespace UtilitiesCS.Test.Extensions
             var source = GetValuesAsync("alpha", "bravo");
 
             // Act
-            var result = await source.ToConcurrentDictionaryAsync(value => value[0], value => value.Length);
+            var result = await source.ToConcurrentDictionaryAsync(
+                value => value[0],
+                value => value.Length
+            );
 
             // Assert
             result.Should().ContainKey('a').WhoseValue.Should().Be(5);

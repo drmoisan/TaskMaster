@@ -1,7 +1,4 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using QuickFiler.Helper_Classes;
-using QuickFiler.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -12,17 +9,23 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Helper_Classes;
+using QuickFiler.Interfaces;
 using UtilitiesCS;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace QuickFiler.Controllers
 {
-    public class QfcQueue(CancellationToken token,
-                    QfcHomeController homeController,
-                    IApplicationGlobals appGlobals) : IQfcQueue
+    public class QfcQueue(
+        CancellationToken token,
+        QfcHomeController homeController,
+        IApplicationGlobals appGlobals
+    ) : IQfcQueue
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors and Private Members
 
@@ -32,7 +35,8 @@ namespace QuickFiler.Controllers
         private IApplicationGlobals _globals = appGlobals;
 
         private int _jobsRunning = 0;
-        private BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> _queue = [];
+        private BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> _queue =
+        [];
         private EmailMoveMonitor _moveMonitor = new EmailMoveMonitor();
 
         #endregion Constructors and Private Members
@@ -42,7 +46,8 @@ namespace QuickFiler.Controllers
         public async Task CompleteAddingAsync(CancellationToken token, int timeout)
         {
             CancellationTokenSource functionTimeoutSource = new CancellationTokenSource(timeout);
-            CancellationTokenSource linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, functionTimeoutSource.Token);
+            CancellationTokenSource linkedTokenSource =
+                CancellationTokenSource.CreateLinkedTokenSource(token, functionTimeoutSource.Token);
 
             try
             {
@@ -57,22 +62,29 @@ namespace QuickFiler.Controllers
             {
                 if (!token.IsCancellationRequested)
                 {
-                    logger.Info($"{nameof(CompleteAddingAsync)} timed out after {timeout} milliseconds");
+                    logger.Info(
+                        $"{nameof(CompleteAddingAsync)} timed out after {timeout} milliseconds"
+                    );
                 }
                 throw e;
             }
-
         }
 
         public (TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups) Dequeue()
         {
             (TableLayoutPanel tlp, List<QfcItemGroup> itemGroups) = _queue.Take();
             itemGroups.ForEach(group => _moveMonitor.UnhookItem(group.MailItem));
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _queue));
+            CollectionChanged?.Invoke(
+                this,
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _queue)
+            );
             return (tlp, itemGroups);
         }
 
-        public async Task<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> TryDequeueAsync(CancellationToken token, int timeout)
+        public async Task<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> TryDequeueAsync(
+            CancellationToken token,
+            int timeout
+        )
         {
             //TraceUtility.LogMethodCall(token, timeout);
 
@@ -85,7 +97,10 @@ namespace QuickFiler.Controllers
             }
 
             var functionTimeoutSource = new CancellationTokenSource(timeout);
-            var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token, functionTimeoutSource.Token);
+            var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(
+                token,
+                functionTimeoutSource.Token
+            );
 
             int queueTimeout = Math.Min(timeout, 100);
             int pollInterval = 100;
@@ -93,7 +108,12 @@ namespace QuickFiler.Controllers
             (TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups) result = default;
             try
             {
-                while (!_queue.IsCompleted && !token.IsCancellationRequested && result == default && _queue.Count + _jobsRunning > 0)
+                while (
+                    !_queue.IsCompleted
+                    && !token.IsCancellationRequested
+                    && result == default
+                    && _queue.Count + _jobsRunning > 0
+                )
                 {
                     if (!_queue.TryTake(out result, queueTimeout, token))
                     {
@@ -108,26 +128,36 @@ namespace QuickFiler.Controllers
                 if (result != default)
                 {
                     result.ItemGroups.ForEach(group => _moveMonitor.UnhookItem(group.MailItem));
-                    CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _queue));
+                    CollectionChanged?.Invoke(
+                        this,
+                        new NotifyCollectionChangedEventArgs(
+                            NotifyCollectionChangedAction.Remove,
+                            _queue
+                        )
+                    );
                 }
-
             }
             catch (OperationCanceledException)
             {
                 if (!token.IsCancellationRequested)
                 {
-                    logger.Debug($"{nameof(TryDequeueAsync)} timed out after {timeout} milliseconds");
+                    logger.Debug(
+                        $"{nameof(TryDequeueAsync)} timed out after {timeout} milliseconds"
+                    );
                 }
-                else { logger.Debug($"{nameof(TryDequeueAsync)} was cancelled"); }
+                else
+                {
+                    logger.Debug($"{nameof(TryDequeueAsync)} was cancelled");
+                }
             }
             catch (System.Exception e)
             {
-                logger.Error($"{nameof(TryDequeueAsync)} failed to dequeue. \n {e.Message}\n{e.StackTrace}");
+                logger.Error(
+                    $"{nameof(TryDequeueAsync)} failed to dequeue. \n {e.Message}\n{e.StackTrace}"
+                );
             }
 
-
             return result;
-
         }
 
         public async Task RemoveItem(MailItem mailItem)
@@ -147,12 +177,13 @@ namespace QuickFiler.Controllers
 
             foreach (var entry in list)
             {
-
                 if (entry.ItemGroups.Any(group => group.MailItem.EntryID == mailItem.EntryID))
                 {
                     await UiIdleCallAsync(() =>
                     {
-                        var idx = entry.ItemGroups.FindIndex(group => group.MailItem.EntryID == mailItem.EntryID);
+                        var idx = entry.ItemGroups.FindIndex(group =>
+                            group.MailItem.EntryID == mailItem.EntryID
+                        );
                         entry.Tlp.RemoveSpecificRow(idx);
                         entry.ItemGroups.RemoveAt(idx);
                         RenumberGroups(entry.ItemGroups);
@@ -164,31 +195,49 @@ namespace QuickFiler.Controllers
             Interlocked.Decrement(ref _jobsRunning);
         }
 
-        public async Task EnqueueAsync(IList<MailItem> items,
-                                       IQfcCollectionController qfcCollectionController)
+        public async Task EnqueueAsync(
+            IList<MailItem> items,
+            IQfcCollectionController qfcCollectionController
+        )
         {
             //TraceUtility.LogMethodCall(items, qfcCollectionController);
 
-            if (items is null) { throw new ArgumentNullException(nameof(items)); }
-            if (items.Count == 0) { throw new ArgumentException("items is empty"); }
+            if (items is null)
+            {
+                throw new ArgumentNullException(nameof(items));
+            }
+            if (items.Count == 0)
+            {
+                throw new ArgumentException("items is empty");
+            }
 
             _qfcCollectionController = qfcCollectionController;
 
-            await Task.Run(() => items.ForEach(item => _moveMonitor.HookItem(item, async (x) => await RemoveItem(x))));
-
+            await Task.Run(() =>
+                items.ForEach(item => _moveMonitor.HookItem(item, async (x) => await RemoveItem(x)))
+            );
 
             Interlocked.Increment(ref _jobsRunning);
             //logger.Debug($"{nameof(EnqueueAsync)} called and jobsRunning increased to {_jobsRunning}");
 
-            var tlp = await UiIdleCallAsync(() => _tlpTemplate.Clone(name: "BackgroundTableLayout"));
+            var tlp = await UiIdleCallAsync(() =>
+                _tlpTemplate.Clone(name: "BackgroundTableLayout")
+            );
 
             //ActivateTlpTemplate(tlp);
 
             try
             {
                 var itemGroups = await UiIdleAsyncCallAsync(async () =>
-                    await LoadControllersViewersAsync(items, _globals,
-                    _homeController, qfcCollectionController, tlp, 0));
+                    await LoadControllersViewersAsync(
+                        items,
+                        _globals,
+                        _homeController,
+                        qfcCollectionController,
+                        tlp,
+                        0
+                    )
+                );
                 _queue.Add((tlp, itemGroups));
             }
             catch (OperationCanceledException)
@@ -197,14 +246,19 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception e)
             {
-                logger.Error($"{nameof(EnqueueAsync)} failed to load controllers and viewers. \n {e.Message}\n{e.StackTrace}");
+                logger.Error(
+                    $"{nameof(EnqueueAsync)} failed to load controllers and viewers. \n {e.Message}\n{e.StackTrace}"
+                );
             }
             finally
             {
                 Interlocked.Decrement(ref _jobsRunning);
                 //logger.Debug($"{nameof(EnqueueAsync)} completed and jobsRunning decreased to {_jobsRunning}");
 
-                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, _queue));
+                CollectionChanged?.Invoke(
+                    this,
+                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, _queue)
+                );
             }
         }
 
@@ -251,9 +305,17 @@ namespace QuickFiler.Controllers
         //private QfcFormViewer _templateViewer = new();
 
         private TlpCellStates _tlpStates;
-        public TlpCellStates TlpStates { get => _tlpStates; set => _tlpStates = value; }
+        public TlpCellStates TlpStates
+        {
+            get => _tlpStates;
+            set => _tlpStates = value;
+        }
 
-        internal async Task<QfcItemGroup> AddAsync(TableLayoutPanel tlp, MailItem mailItem, int indexNumber)
+        internal async Task<QfcItemGroup> AddAsync(
+            TableLayoutPanel tlp,
+            MailItem mailItem,
+            int indexNumber
+        )
         {
             //TraceUtility.LogMethodCall(tlp, mailItem, indexNumber);
 
@@ -288,16 +350,16 @@ namespace QuickFiler.Controllers
                     tlp.InsertSpecificRow(oldRowCount, rowStyleTemplate, diff);
                     tlp.MinimumSize = new System.Drawing.Size(
                         tlp.MinimumSize.Width,
-                        tlp.MinimumSize.Height +
-                        (int)Math.Round(rowStyleTemplate.Height * diff, 0));
+                        tlp.MinimumSize.Height + (int)Math.Round(rowStyleTemplate.Height * diff, 0)
+                    );
                 }
                 else
                 {
                     tlp.RemoveSpecificRow(newRowCount, diff);
                     tlp.MinimumSize = new System.Drawing.Size(
                         tlp.MinimumSize.Width,
-                        tlp.MinimumSize.Height -
-                        (int)Math.Round(rowStyleTemplate.Height * diff, 0));
+                        tlp.MinimumSize.Height - (int)Math.Round(rowStyleTemplate.Height * diff, 0)
+                    );
                 }
             }
         }
@@ -308,37 +370,41 @@ namespace QuickFiler.Controllers
             IFilerHomeController homeController,
             IQfcCollectionController qfcCollectionController,
             TableLayoutPanel tlp,
-            int start)
+            int start
+        )
         {
             //TraceUtility.LogMethodCall(items, appGlobals, homeController, qfcCollectionController, tlp, start);
 
             var digits = start + items.Count >= 10 ? 2 : 1;
 
-            var itemTasks = Enumerable.Range(start, items.Count)
-                    .ToAsyncEnumerable()
-                    .SelectAwait(async i => (i: i, grp: await AddAsync(tlp, items[i - start], i)))
-                    .SelectAwait(async x =>
-                    {
-                        x.grp.ItemController = new QfcItemController(
-                            appGlobals: appGlobals,
-                            homeController: homeController,
-                            parent: qfcCollectionController,
-                            itemViewer: x.grp.ItemViewer,
-                            viewerPosition: x.i + 1,
-                            itemNumberDigits: digits,
-                            x.grp.MailItem,
-                            TlpStates);
-                        await x.grp.ItemController.InitializeAsync();
-                        return x.grp;
-                    })
-                    .ToListAsync();
+            var itemTasks = Enumerable
+                .Range(start, items.Count)
+                .ToAsyncEnumerable()
+                .SelectAwait(async i => (i: i, grp: await AddAsync(tlp, items[i - start], i)))
+                .SelectAwait(async x =>
+                {
+                    x.grp.ItemController = new QfcItemController(
+                        appGlobals: appGlobals,
+                        homeController: homeController,
+                        parent: qfcCollectionController,
+                        itemViewer: x.grp.ItemViewer,
+                        viewerPosition: x.i + 1,
+                        itemNumberDigits: digits,
+                        x.grp.MailItem,
+                        TlpStates
+                    );
+                    await x.grp.ItemController.InitializeAsync();
+                    return x.grp;
+                })
+                .ToListAsync();
             return itemTasks;
         }
 
         public async Task ChangeIterationSize(
             (TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups) entry,
             int newRowCount,
-            RowStyle rowStyleTemplate)
+            RowStyle rowStyleTemplate
+        )
         {
             // Wait for all jobs to finish to prevent conflicts
             await JobsToFinish(100, _token);
@@ -346,17 +412,18 @@ namespace QuickFiler.Controllers
             // Adjust template for future jobs
             AdjustTlp(TlpTemplate, newRowCount, rowStyleTemplate);
 
-            // Cache old queue in private collection, 
+            // Cache old queue in private collection,
             var oldQueue = _queue;
 
             // Externally visible queue is now empty, but job is marked as running
-            _queue = new BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>();
+            _queue =
+                new BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>();
 
             //logger.Debug($"{nameof(ChangeIterationSize)} called and jobsRunning increased to {_jobsRunning}");
             Interlocked.Increment(ref _jobsRunning);
 
-            var queue = new BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>();
-
+            var queue =
+                new BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)>();
 
             while (oldQueue.Count > 0)
             {
@@ -366,23 +433,41 @@ namespace QuickFiler.Controllers
                 {
                     RenumberGroups(entry.ItemGroups);
                     queue.Add(entry);
-                    if (nextEntry.ItemGroups.Count > 0) { entry = nextEntry; }
+                    if (nextEntry.ItemGroups.Count > 0)
+                    {
+                        entry = nextEntry;
+                    }
                     else
                     {
-                        if (oldQueue.Count > 0) { entry = oldQueue.Take(); }
-                        else { entry = default; }
+                        if (oldQueue.Count > 0)
+                        {
+                            entry = oldQueue.Take();
+                        }
+                        else
+                        {
+                            entry = default;
+                        }
                     }
                 }
             }
 
             if (entry != default)
             {
-                var items = await _homeController.DataModel.DequeueNextItemGroupAsync(newRowCount - entry.ItemGroups.Count, 1000);
+                var items = await _homeController.DataModel.DequeueNextItemGroupAsync(
+                    newRowCount - entry.ItemGroups.Count,
+                    1000
+                );
                 if (items.Count > 0)
                 {
                     AdjustTlp(entry.Tlp, newRowCount, rowStyleTemplate);
-                    var extraGroups = await LoadControllersViewersAsync(items, _globals,
-                        _homeController, _qfcCollectionController, entry.Tlp, entry.ItemGroups.Count);
+                    var extraGroups = await LoadControllersViewersAsync(
+                        items,
+                        _globals,
+                        _homeController,
+                        _qfcCollectionController,
+                        entry.Tlp,
+                        entry.ItemGroups.Count
+                    );
                     extraGroups.ForEach(group => entry.ItemGroups.Add(group));
                 }
                 RenumberGroups(entry.ItemGroups);
@@ -412,21 +497,28 @@ namespace QuickFiler.Controllers
             ref (TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups) target,
             ref (TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups) source,
             int newRowCount,
-            RowStyle rowStyleTemplate)
+            RowStyle rowStyleTemplate
+        )
         {
             var currentCount = target.ItemGroups.Count;
             var grow = Math.Min(newRowCount - currentCount, source.ItemGroups.Count);
 
             AdjustTlp(target.Tlp, newRowCount, rowStyleTemplate);
 
-            if (grow == 0) { return; }
+            if (grow == 0)
+            {
+                return;
+            }
 
             for (int i = 0; i < grow; i++)
             {
                 var itemViewer = source.Tlp.Controls[i];
                 var position = source.Tlp.GetCellPosition(itemViewer);
                 itemViewer.Parent = target.Tlp;
-                target.Tlp.SetCellPosition(itemViewer, new TableLayoutPanelCellPosition(position.Column, currentCount + i));
+                target.Tlp.SetCellPosition(
+                    itemViewer,
+                    new TableLayoutPanelCellPosition(position.Column, currentCount + i)
+                );
                 var group = source.ItemGroups[0];
                 target.ItemGroups.Add(group);
                 source.ItemGroups.RemoveAt(0);
@@ -437,15 +529,17 @@ namespace QuickFiler.Controllers
 
             source.Tlp.MinimumSize = new System.Drawing.Size(
                 source.Tlp.MinimumSize.Width,
-                source.Tlp.MinimumSize.Height -
-                (int)Math.Round(rowStyleTemplate.Height * grow, 0));
+                source.Tlp.MinimumSize.Height - (int)Math.Round(rowStyleTemplate.Height * grow, 0)
+            );
         }
 
         #endregion Tlp Manipulation
 
         #region INotify
 
-        protected void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        protected void NotifyPropertyChanged(
+            [System.Runtime.CompilerServices.CallerMemberName] string propertyName = ""
+        )
         {
             if (PropertyChanged is not null)
             {
@@ -462,31 +556,35 @@ namespace QuickFiler.Controllers
 
         internal async Task UiIdleCallAsync(System.Action action)
         {
-            await UiThread.Dispatcher.InvokeAsync(action, System.Windows.Threading.DispatcherPriority.ContextIdle);
+            await UiThread.Dispatcher.InvokeAsync(
+                action,
+                System.Windows.Threading.DispatcherPriority.ContextIdle
+            );
         }
 
         internal async Task<T> UiIdleCallAsync<T>(Func<T> func)
         {
-            return await UiThread.Dispatcher.InvokeAsync(func, System.Windows.Threading.DispatcherPriority.ContextIdle);
+            return await UiThread.Dispatcher.InvokeAsync(
+                func,
+                System.Windows.Threading.DispatcherPriority.ContextIdle
+            );
         }
 
         internal async Task<T> UiIdleAsyncCallAsync<T>(Func<Task<T>> func)
         {
-            T result = await await UiThread.Dispatcher.InvokeAsync(async () =>
-            {
-                T result = await func();
-                await Task.Yield();
-                return result;
-            }, System.Windows.Threading.DispatcherPriority.ContextIdle);
+            T result = await await UiThread.Dispatcher.InvokeAsync(
+                async () =>
+                {
+                    T result = await func();
+                    await Task.Yield();
+                    return result;
+                },
+                System.Windows.Threading.DispatcherPriority.ContextIdle
+            );
             return result;
             //return await UiThread.Dispatcher.InvokeAsync(func, System.Windows.Threading.DispatcherPriority.ContextIdle);
         }
 
-
-
         #endregion Helper Methods
-
     }
-
 }
-

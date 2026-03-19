@@ -1,42 +1,65 @@
-﻿using QuickFiler.Viewers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Viewers;
 using UtilitiesCS;
-using UtilitiesCS.Threading;
 using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
 using UtilitiesCS.Extensions;
-using Microsoft.Office.Interop.Outlook;
+using UtilitiesCS.Threading;
 
 namespace QuickFiler.Controllers
 {
     public class BayesianPerformanceController
     {
-        public BayesianPerformanceController(IApplicationGlobals globals) { _globals = globals; }
+        public BayesianPerformanceController(IApplicationGlobals globals)
+        {
+            _globals = globals;
+        }
 
         private IApplicationGlobals _globals;
-        internal IApplicationGlobals Globals { get => _globals; set => _globals = value; }
+        internal IApplicationGlobals Globals
+        {
+            get => _globals;
+            set => _globals = value;
+        }
 
         internal BayesianSerializationHelper Serialization { get; set; }
 
-        public ClassificationErrors[] Errors { get => _errors; set => _errors = value; }
+        public ClassificationErrors[] Errors
+        {
+            get => _errors;
+            set => _errors = value;
+        }
         private ClassificationErrors[] _errors;
 
-        internal VerboseTestOutcome ActiveOutcome { get => _activeOutcome; set => _activeOutcome = value; }
+        internal VerboseTestOutcome ActiveOutcome
+        {
+            get => _activeOutcome;
+            set => _activeOutcome = value;
+        }
         private VerboseTestOutcome _activeOutcome;
 
-        internal ClassificationErrors ActiveError { get => _activeError; set => _activeError = value; }
+        internal ClassificationErrors ActiveError
+        {
+            get => _activeError;
+            set => _activeError = value;
+        }
         private ClassificationErrors _activeError;
-
 
         public async Task InvestigatePerformance()
         {
             Serialization ??= new BayesianSerializationHelper(Globals);
-            Errors ??= await Serialization.DeserializeAsync<ClassificationErrors[]>("ClassificationErrors[]");
-            var ppkg = (new ProgressPackage()).InitializeAsync(cancelSource: _globals.AF.CancelSource, cancel: _globals.AF.CancelToken, progressTrackerPane: _globals.AF.ProgressTracker);
+            Errors ??= await Serialization.DeserializeAsync<ClassificationErrors[]>(
+                "ClassificationErrors[]"
+            );
+            var ppkg = (new ProgressPackage()).InitializeAsync(
+                cancelSource: _globals.AF.CancelSource,
+                cancel: _globals.AF.CancelToken,
+                progressTrackerPane: _globals.AF.ProgressTracker
+            );
             Viewer = new BayesianPerformanceViewer(this).Init();
             var classes = Errors.Select(x => x.Class).ToArray();
             Viewer.ClassSelector.Items.AddRange(classes);
@@ -45,7 +68,6 @@ namespace QuickFiler.Controllers
             AssignFormValues(ActiveError);
             Viewer.Show();
         }
-
 
         public void AssignFormValues(ClassificationErrors error)
         {
@@ -71,7 +93,10 @@ namespace QuickFiler.Controllers
                     Viewer.OlvDrivers.SelectedIndex = 0;
                     Viewer.OlvDrivers.FocusedItem = Viewer.OlvDrivers.SelectedItems[0];
                 }
-                else { Viewer.OlvDrivers.Clear(); }
+                else
+                {
+                    Viewer.OlvDrivers.Clear();
+                }
                 ActiveOutcome = outcome;
             }
         }
@@ -82,14 +107,19 @@ namespace QuickFiler.Controllers
             if ((objects is not null) && (objects.Count != 0))
             {
                 var (token, tokenProbability) = ((string Token, double TokenProbability))objects[0];
-                var driverPresence = ActiveError.VerboseOutcomes
-                    .Where(x => x.Key.Drivers.FindIndex(y => y.Token == token) != -1)
+                var driverPresence = ActiveError
+                    .VerboseOutcomes.Where(x =>
+                        x.Key.Drivers.FindIndex(y => y.Token == token) != -1
+                    )
                     .Select(x => (x.Key.Source.Subject, x.Key.Drivers.Find(y => y.Token == token)))
                     .Select(x => (x.Subject, x.Item2.TokenProbability))
                     .ToArray();
                 Viewer.OlvDriverPresence.SetObjects(driverPresence);
             }
-            else { Viewer.OlvDriverPresence.Clear(); }
+            else
+            {
+                Viewer.OlvDriverPresence.Clear();
+            }
         }
 
         internal void ClassSelector_SelectedIndexChanged()
@@ -104,7 +134,11 @@ namespace QuickFiler.Controllers
 
         internal void ReSortItem()
         {
-            var item = (MailItem)Globals.Ol.NamespaceMAPI.GetItemFromID(ActiveOutcome.Source.EntryId, ActiveOutcome.Source.StoreId);
+            var item = (MailItem)
+                Globals.Ol.NamespaceMAPI.GetItemFromID(
+                    ActiveOutcome.Source.EntryId,
+                    ActiveOutcome.Source.StoreId
+                );
             if (item is not null)
             {
                 var sorter = new EfcHomeController(_globals, () => { }, item);
@@ -113,7 +147,10 @@ namespace QuickFiler.Controllers
         }
 
         protected BayesianPerformanceViewer _viewer;
-        internal virtual BayesianPerformanceViewer Viewer { get => _viewer; private set => _viewer = value; }
-
+        internal virtual BayesianPerformanceViewer Viewer
+        {
+            get => _viewer;
+            private set => _viewer = value;
+        }
     }
 }

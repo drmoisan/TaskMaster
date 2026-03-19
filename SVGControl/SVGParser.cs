@@ -1,5 +1,4 @@
-﻿using Svg;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -7,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Svg;
 
 namespace SVGControl
 {
@@ -83,9 +83,15 @@ namespace SVGControl
         /// <returns>Returns a resized or the original document depending on the document.</returns>
         private SvgDocument AdjustSize(SvgDocument document)
         {
-            if ((TargetSize.Height > 0) && (TargetSize.Width > 0) && ((document.Height != TargetSize.Height) || (document.Width != TargetSize.Width)))
+            if (
+                (TargetSize.Height > 0)
+                && (TargetSize.Width > 0)
+                && ((document.Height != TargetSize.Height) || (document.Width != TargetSize.Width))
+            )
             {
-                int widthAspect = (int)(TargetSize.Height * document.Width / (double)document.Height);
+                int widthAspect = (int)(
+                    TargetSize.Height * document.Width / (double)document.Height
+                );
                 if (widthAspect < TargetSize.Width)
                 {
                     document.Height = TargetSize.Height;
@@ -93,7 +99,9 @@ namespace SVGControl
                 }
                 else
                 {
-                    document.Height = (int)(TargetSize.Width * document.Height / (double)document.Width);
+                    document.Height = (int)(
+                        TargetSize.Width * document.Height / (double)document.Width
+                    );
                     document.Width = TargetSize.Width;
                 }
             }

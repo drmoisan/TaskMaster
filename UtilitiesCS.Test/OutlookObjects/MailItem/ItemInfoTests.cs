@@ -47,8 +47,14 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
         {
             // Arrange
             var sender = new RecipientInfo("Sender", "sender@example.com", "<p>sender</p>");
-            var toRecipients = new IRecipientInfo[] { new RecipientInfo("To", "to@example.com", null) };
-            var ccRecipients = new IRecipientInfo[] { new RecipientInfo("Cc", "cc@example.com", null) };
+            var toRecipients = new IRecipientInfo[]
+            {
+                new RecipientInfo("To", "to@example.com", null),
+            };
+            var ccRecipients = new IRecipientInfo[]
+            {
+                new RecipientInfo("Cc", "cc@example.com", null),
+            };
             var attachments = new[] { Mock.Of<IAttachment>() };
             var folderInfo = Mock.Of<IFolderWrapper>();
             var source = new Mock<IItemInfo>(MockBehavior.Strict);
@@ -66,12 +72,16 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             source.SetupGet(x => x.HTMLBody).Returns("<html>Body</html>");
             source.SetupGet(x => x.InternetCodepage).Returns(65001);
             source.SetupGet(x => x.IsTaskFlagSet).Returns(true);
-            source.SetupGet(x => x.PlainTextOptions).Returns(IItemInfo.PlainTextOptionsEnum.StripLinks);
+            source
+                .SetupGet(x => x.PlainTextOptions)
+                .Returns(IItemInfo.PlainTextOptionsEnum.StripLinks);
             source.SetupGet(x => x.Size).Returns(42);
             source.SetupGet(x => x.Sender).Returns(sender);
             source.SetupGet(x => x.CcRecipients).Returns(ccRecipients);
             source.SetupGet(x => x.ToRecipients).Returns(toRecipients);
-            source.SetupGet(x => x.SentDate).Returns(new DateTime(2026, 3, 13, 12, 0, 0, DateTimeKind.Utc));
+            source
+                .SetupGet(x => x.SentDate)
+                .Returns(new DateTime(2026, 3, 13, 12, 0, 0, DateTimeKind.Utc));
             source.SetupGet(x => x.SentOn).Returns("Friday");
             source.SetupGet(x => x.Subject).Returns("Subject");
             source.SetupGet(x => x.Tokens).Returns(new[] { "alpha", "beta" });
@@ -115,8 +125,22 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
         {
             // Arrange
             var sentDate = new DateTime(2026, 3, 13, 12, 0, 0, DateTimeKind.Utc);
-            var left = CreateItemInfo(sentDate, "Subject", "Body", "sender@example.com", new[] { "to@example.com" }, new[] { "cc@example.com" });
-            var right = CreateItemInfo(sentDate, "Subject", "Body", "sender@example.com", new[] { "to@example.com" }, new[] { "cc@example.com" });
+            var left = CreateItemInfo(
+                sentDate,
+                "Subject",
+                "Body",
+                "sender@example.com",
+                new[] { "to@example.com" },
+                new[] { "cc@example.com" }
+            );
+            var right = CreateItemInfo(
+                sentDate,
+                "Subject",
+                "Body",
+                "sender@example.com",
+                new[] { "to@example.com" },
+                new[] { "cc@example.com" }
+            );
 
             // Act
             bool result = left.Equals(right);
@@ -130,9 +154,30 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
         {
             // Arrange
             var sentDate = new DateTime(2026, 3, 13, 12, 0, 0, DateTimeKind.Utc);
-            var baseline = CreateItemInfo(sentDate, "Subject", "Body", "sender@example.com", new[] { "to@example.com" }, new[] { "cc@example.com" });
-            var differentSubject = CreateItemInfo(sentDate, "Other", "Body", "sender@example.com", new[] { "to@example.com" }, new[] { "cc@example.com" });
-            var differentRecipients = CreateItemInfo(sentDate, "Subject", "Body", "sender@example.com", new[] { "different@example.com" }, new[] { "cc@example.com" });
+            var baseline = CreateItemInfo(
+                sentDate,
+                "Subject",
+                "Body",
+                "sender@example.com",
+                new[] { "to@example.com" },
+                new[] { "cc@example.com" }
+            );
+            var differentSubject = CreateItemInfo(
+                sentDate,
+                "Other",
+                "Body",
+                "sender@example.com",
+                new[] { "to@example.com" },
+                new[] { "cc@example.com" }
+            );
+            var differentRecipients = CreateItemInfo(
+                sentDate,
+                "Subject",
+                "Body",
+                "sender@example.com",
+                new[] { "different@example.com" },
+                new[] { "cc@example.com" }
+            );
 
             // Act / Assert
             baseline.Equals(null).Should().BeFalse();
@@ -145,9 +190,30 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
         {
             // Arrange
             var sentDate = new DateTime(2026, 3, 13, 12, 0, 0, DateTimeKind.Utc);
-            var baseline = CreateItemInfo(sentDate, "Subject", "Body", "sender@example.com", new[] { "to@example.com" }, new[] { "cc@example.com" });
-            var equivalent = CreateItemInfo(sentDate, "Subject", "Body", "sender@example.com", new[] { "to@example.com" }, new[] { "cc@example.com" });
-            var differentSubject = CreateItemInfo(sentDate, "Other", "Body", "sender@example.com", new[] { "to@example.com" }, new[] { "cc@example.com" });
+            var baseline = CreateItemInfo(
+                sentDate,
+                "Subject",
+                "Body",
+                "sender@example.com",
+                new[] { "to@example.com" },
+                new[] { "cc@example.com" }
+            );
+            var equivalent = CreateItemInfo(
+                sentDate,
+                "Subject",
+                "Body",
+                "sender@example.com",
+                new[] { "to@example.com" },
+                new[] { "cc@example.com" }
+            );
+            var differentSubject = CreateItemInfo(
+                sentDate,
+                "Other",
+                "Body",
+                "sender@example.com",
+                new[] { "to@example.com" },
+                new[] { "cc@example.com" }
+            );
 
             // Act
             int baselineHash = baseline.GetHashCode();
@@ -165,7 +231,8 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             string body,
             string senderAddress,
             string[] toRecipients,
-            string[] ccRecipients)
+            string[] ccRecipients
+        )
         {
             return new ItemInfo
             {
@@ -173,8 +240,14 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
                 Subject = subject,
                 Body = body,
                 Sender = new RecipientInfo("Sender", senderAddress, null),
-                ToRecipients = Array.ConvertAll(toRecipients, address => (IRecipientInfo)new RecipientInfo(address, address, null)),
-                CcRecipients = Array.ConvertAll(ccRecipients, address => (IRecipientInfo)new RecipientInfo(address, address, null)),
+                ToRecipients = Array.ConvertAll(
+                    toRecipients,
+                    address => (IRecipientInfo)new RecipientInfo(address, address, null)
+                ),
+                CcRecipients = Array.ConvertAll(
+                    ccRecipients,
+                    address => (IRecipientInfo)new RecipientInfo(address, address, null)
+                ),
             };
         }
     }

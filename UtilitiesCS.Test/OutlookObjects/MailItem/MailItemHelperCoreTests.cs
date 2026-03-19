@@ -28,15 +28,17 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItem
         [TestMethod]
         public void CompressPlainText_ShouldStripConfiguredSectionsAndAppendEndMarker()
         {
-            const string text = "WARNING\r\nHello <https://example.test>\r\nFrom: Person\r\nSubject: Re: Status\r\nOlder content";
+            const string text =
+                "WARNING\r\nHello <https://example.test>\r\nFrom: Person\r\nSubject: Re: Status\r\nOlder content";
 
             var result = MailItemHelper.CompressPlainText(
                 text,
-                IItemInfo.PlainTextOptionsEnum.StripWarning |
-                IItemInfo.PlainTextOptionsEnum.StripLinks |
-                IItemInfo.PlainTextOptionsEnum.StripReplyBody |
-                IItemInfo.PlainTextOptionsEnum.StripFormatting,
-                "WARNING");
+                IItemInfo.PlainTextOptionsEnum.StripWarning
+                    | IItemInfo.PlainTextOptionsEnum.StripLinks
+                    | IItemInfo.PlainTextOptionsEnum.StripReplyBody
+                    | IItemInfo.PlainTextOptionsEnum.StripFormatting,
+                "WARNING"
+            );
 
             result.Should().StartWith("Hello");
             result.Should().NotContain("WARNING");
@@ -61,7 +63,9 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItem
         public void GetHtml_ShouldInjectEmailHeaderIntoBodyMarkup()
         {
             var mailItem = new Mock<InteropMailItem>();
-            mailItem.SetupGet(x => x.HTMLBody).Returns("<html><head></head><body>Original</body></html>");
+            mailItem
+                .SetupGet(x => x.HTMLBody)
+                .Returns("<html><head></head><body>Original</body></html>");
             var helper = CreateHelper();
             SetField(helper, "_item", mailItem.Object);
             SetLazyField(helper, "_html", "<html><head></head><body>Original</body></html>");
@@ -85,10 +89,11 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItem
 
             helper.RecipientsEquivalent(null, null).Should().BeTrue();
             helper.RecipientsEquivalent(new[] { recipient }, null).Should().BeFalse();
-            helper.RecipientsEquivalent(new[] { recipient }, Array.Empty<IRecipientInfo>()).Should().BeFalse();
+            helper
+                .RecipientsEquivalent(new[] { recipient }, Array.Empty<IRecipientInfo>())
+                .Should()
+                .BeFalse();
         }
-
-
 
         [TestMethod]
         public void CompressPlainText_collapses_runs_of_whitespace()
@@ -104,7 +109,11 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItem
             MailItemHelper.CompressPlainText(string.Empty, string.Empty).Should().NotBeNull();
         }
 
-        private static Mock<IApplicationGlobals> CreateGlobals(OutlookFolder archiveRoot, OutlookFolder inbox, string archiveRootPath)
+        private static Mock<IApplicationGlobals> CreateGlobals(
+            OutlookFolder archiveRoot,
+            OutlookFolder inbox,
+            string archiveRootPath
+        )
         {
             var olObjects = new Mock<IOlObjects>();
             olObjects.SetupGet(x => x.ArchiveRoot).Returns(archiveRoot);
@@ -125,8 +134,11 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItem
 
         private static void SetField(MailItemHelper helper, string fieldName, object value)
         {
-            var field = typeof(MailItemHelper).GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)
-                ?? throw new MissingFieldException(typeof(MailItemHelper).FullName, fieldName);
+            var field =
+                typeof(MailItemHelper).GetField(
+                    fieldName,
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                ) ?? throw new MissingFieldException(typeof(MailItemHelper).FullName, fieldName);
             field.SetValue(helper, value);
         }
 

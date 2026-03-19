@@ -1,6 +1,4 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -11,9 +9,10 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Schema;
+using Microsoft.Office.Interop.Outlook;
+using Newtonsoft.Json;
 using Tesseract;
 using UtilitiesCS.Extensions;
-
 
 namespace UtilitiesCS.EmailIntelligence
 {
@@ -22,7 +21,8 @@ namespace UtilitiesCS.EmailIntelligence
         #region Constructors and Initializers
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public EmailTokenizer()
         {
@@ -32,7 +32,7 @@ namespace UtilitiesCS.EmailIntelligence
         //public EmailTokenizer(IApplicationGlobals appGlobals) { _globals = appGlobals; }
 
         /// <summary>
-        /// Get the tokenizer ready to use; this should be 
+        /// Get the tokenizer ready to use; this should be
         /// called after all options have been set.
         /// </summary>
         public void setup()
@@ -64,16 +64,23 @@ namespace UtilitiesCS.EmailIntelligence
 
         private Regex fname_sep_re = new Regex(@"[\\\/\:]");
         private Regex urlsep_re = new Regex(@"[;?:@&=+,$.]");
-        private Regex date_hms_re = new Regex(@"(?'hour'[0-9][0-9]):(?'minute'[0-9][0-9])(?::[0-9][0-9])? ");
+        private Regex date_hms_re = new Regex(
+            @"(?'hour'[0-9][0-9]):(?'minute'[0-9][0-9])(?::[0-9][0-9])? "
+        );
         private Regex subject_word_re = new Regex(@"[\w\x80-\xff$.%]+");
+
         //private Regex punctuation_run_re = new Regex(@"\W+"); // original eliminated because it captures white spaces and needs to start with 2 consecutive to be a run
         private Regex punctuation_run_re = new Regex(@"\p{P}{2,}");
         private Regex numeric_entity_re = new Regex(@"&#(\d+);");
-        private Regex virus_re = new Regex(@"""
+        private Regex virus_re = new Regex(
+            @"""
     < /? \s* (?: script | iframe) \b
 |   \b src= ['""]? cid:
 |   \b (?: height | width) = ['""]? 0
-""", RegexOptions.Compiled);
+""",
+            RegexOptions.Compiled
+        );
+
         //private Regex whitespace_split_re = new Regex(@"\s+"); // original. Doesn't eliminate punctuation from tokens
         private Regex whitespace_split_re = new Regex(@"\p{P}*\s+");
 
@@ -86,30 +93,47 @@ namespace UtilitiesCS.EmailIntelligence
             "%a, %d %b %Y %H:%M (%Z)",
             "%a, %d %b %Y %H:%M %Z",
             "%d %b %Y %H:%M (%Z)",
-            "%d %b %Y %H:%M %Z"
+            "%d %b %Y %H:%M %Z",
         };
-
 
         #endregion Constants
 
         #region Main Methods
 
-        public async Task<string[]> TokenizeAsync(object obj, IApplicationGlobals globals, CancellationToken cancel)
+        public async Task<string[]> TokenizeAsync(
+            object obj,
+            IApplicationGlobals globals,
+            CancellationToken cancel
+        )
         {
             return await Task.Run(() => Tokenize(obj, globals).ToArray(), cancel);
         }
 
         public IEnumerable<string> Tokenize(object obj, IApplicationGlobals globals)
         {
-            if (obj is null) { throw new ArgumentNullException("obj"); }
-            else if (obj is string[]) { return (string[])obj; }
-            else if (obj is MailItemHelper) { return Tokenize((MailItemHelper)obj); }
-            else if (obj is MailItem) { return Tokenize(new MailItemHelper((MailItem)obj, globals)); }
+            if (obj is null)
+            {
+                throw new ArgumentNullException("obj");
+            }
+            else if (obj is string[])
+            {
+                return (string[])obj;
+            }
+            else if (obj is MailItemHelper)
+            {
+                return Tokenize((MailItemHelper)obj);
+            }
+            else if (obj is MailItem)
+            {
+                return Tokenize(new MailItemHelper((MailItem)obj, globals));
+            }
             else
             {
-                throw new ArgumentException($"obj type must be {typeof(string[])}, " +
-                    $"{typeof(MailItem)}, or {typeof(MailItemHelper)}. {obj.GetType()} " +
-                    $"is not supported");
+                throw new ArgumentException(
+                    $"obj type must be {typeof(string[])}, "
+                        + $"{typeof(MailItem)}, or {typeof(MailItemHelper)}. {obj.GetType()} "
+                        + $"is not supported"
+                );
             }
         }
 
@@ -147,7 +171,6 @@ namespace UtilitiesCS.EmailIntelligence
                 {
                     logger.Error($"Error tokenizing message subject: {e.Message}", e);
                 }
-
 
                 if (matches is not null)
                 {
@@ -222,7 +245,10 @@ namespace UtilitiesCS.EmailIntelligence
 
             if (SpamBayesOptions.summarize_email_prefixes)
             {
-                if (all_addrs is null) { all_addrs = addrlist.Select(x => x.value?.Address?.ToLower() ?? ""); }
+                if (all_addrs is null)
+                {
+                    all_addrs = addrlist.Select(x => x.value?.Address?.ToLower() ?? "");
+                }
 
                 if (all_addrs.Count() > 1)
                 {
@@ -255,7 +281,10 @@ namespace UtilitiesCS.EmailIntelligence
             //#       <design@mojam.com>, <rob@mojam.com>, <skip@mojam.com>
             if (SpamBayesOptions.summarize_email_suffixes)
             {
-                if (all_addrs is null) { all_addrs = addrlist.Select(x => x.value.Address.ToLower()); }
+                if (all_addrs is null)
+                {
+                    all_addrs = addrlist.Select(x => x.value.Address.ToLower());
+                }
 
                 if (all_addrs.Count() > 1)
                 {
@@ -291,13 +320,11 @@ namespace UtilitiesCS.EmailIntelligence
             var cccount = msg.ToRecipients?.Count() ?? 0;
             if (cccount > 0)
                 yield return $"to:2**{Math.Round(Math.Log(cccount, 2))}";
-
-
         }
 
         /// <summary>
         /// Generate a stream of tokens from an email Message.
-        /// If options['Tokenizer', 'check_octets'] is True, the first few 
+        /// If options['Tokenizer', 'check_octets'] is True, the first few
         /// undecoded characters of application/octet-stream parts of the
         /// message body become tokens.
         /// </summary>
@@ -325,7 +352,6 @@ namespace UtilitiesCS.EmailIntelligence
 
                 //     yield "octet:%s" % text[:options["Tokenizer",
                 //                                      "octet_prefix_size"]]
-
             }
 
             var parts = imageparts(msg);
@@ -335,7 +361,7 @@ namespace UtilitiesCS.EmailIntelligence
                 // each image.
                 //
                 // Note: this version achieves same outcome by different means
-                // using outlook attachment metadata 
+                // using outlook attachment metadata
                 var total_len = 0;
                 foreach (var part in parts)
                 {
@@ -387,11 +413,7 @@ namespace UtilitiesCS.EmailIntelligence
 
                 foreach (var t in this.tokenize_text(text))
                     yield return t;
-
-
-
             }
-
         }
 
         #endregion Main Methods
@@ -410,7 +432,6 @@ namespace UtilitiesCS.EmailIntelligence
         /// <returns></returns>
         private IEnumerable<string> tokenize_text(string texts)
         {
-
             var short_runs = new HashSet<int>();
             var short_count = 0;
             var words = whitespace_split_re.Split(texts);
@@ -446,26 +467,31 @@ namespace UtilitiesCS.EmailIntelligence
 
             if (short_runs.Count > 0 && SpamBayesOptions.x_short_runs)
                 yield return $"short:{Math.Round(Math.Log(short_runs.Max(), 2), 0):N2}";
-
         }
 
         public string commonprefix(IEnumerable<string> strings)
         {
-            var pfx = string.Join("", strings
-                .Transpose()
-                .TakeWhile(s => s.All(d => d == s.First()))
-                .Select(s => s.First()));
+            var pfx = string.Join(
+                "",
+                strings
+                    .Transpose()
+                    .TakeWhile(s => s.All(d => d == s.First()))
+                    .Select(s => s.First())
+            );
             return pfx;
         }
 
         public string commonsuffix(IEnumerable<string> strings)
         {
             var commonLength = strings.Select(s => s.Length).Min();
-            var sfx = string.Join("", strings
-                .Select(x => x.Substring(x.Length - commonLength))
-                .Transpose()
-                .TakeWhile(s => s.All(d => d == s.Last()))
-                .Select(s => s.Last()));
+            var sfx = string.Join(
+                "",
+                strings
+                    .Select(x => x.Substring(x.Length - commonLength))
+                    .Transpose()
+                    .TakeWhile(s => s.All(d => d == s.Last()))
+                    .Select(s => s.Last())
+            );
             return sfx;
         }
 
@@ -490,7 +516,6 @@ namespace UtilitiesCS.EmailIntelligence
                     }
                 }
             }
-
         }
 
         internal bool has_highbit_char(string word)
@@ -514,7 +539,8 @@ namespace UtilitiesCS.EmailIntelligence
         internal IEnumerable<string> tokenize_word(
             string word,
             Func<string, int> _len = null,
-            int maxword = SpamBayesOptions.skip_max_word_size)
+            int maxword = SpamBayesOptions.skip_max_word_size
+        )
         {
             // Workaround for C# not allowing default delegate parameters.
             if (_len == null)
@@ -524,7 +550,6 @@ namespace UtilitiesCS.EmailIntelligence
             // Make sure this range matches in tokenize().
             if (3 <= n && n <= maxword)
                 yield return word;
-
             else if (n >= 3)
             {
                 // A long word.
@@ -561,7 +586,10 @@ namespace UtilitiesCS.EmailIntelligence
                                 hicount += 1;
                             }
                         }
-                        yield return string.Format("8bit%%:{0}", Math.Round(hicount * 100.0 / word.Length));
+                        yield return string.Format(
+                            "8bit%%:{0}",
+                            Math.Round(hicount * 100.0 / word.Length)
+                        );
                     }
                 }
             }
@@ -569,9 +597,9 @@ namespace UtilitiesCS.EmailIntelligence
 
         internal Func<string, List<object>, (string texts, HashSet<string> tokens)> crack_images;
 
-        internal static List<CharsetCodebase> charsetCodebases =
-            JsonExtensions.Deserialize<List<CharsetCodebase>>(
-                Properties.Resources.charset_lookup);
+        internal static List<CharsetCodebase> charsetCodebases = JsonExtensions.Deserialize<
+            List<CharsetCodebase>
+        >(Properties.Resources.charset_lookup);
 
         /// <summary>
         /// Original code used MIME headers to extract certain information.
@@ -644,7 +672,6 @@ namespace UtilitiesCS.EmailIntelligence
             //    x = msg.get('content-transfer-encoding')
             //    if x is not None:
             //        yield 'content-transfer-encoding:' + x.lower()
-
         }
 
         string NumericEntityReplacer(Match m)
@@ -689,6 +716,7 @@ namespace UtilitiesCS.EmailIntelligence
     public class CharsetCodebase
     {
         public CharsetCodebase() { }
+
         public string Name;
         public long Codepage;
         public string Charset;

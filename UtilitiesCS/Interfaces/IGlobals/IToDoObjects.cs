@@ -7,11 +7,11 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
-
     public interface IToDoObjects
     {
         //IPeopleScoDictionary DictPPL { get; }
         IPeopleScoDictionaryNew People { get; }
+
         //Dictionary<string, string> DictPPL { get; }
         //string DictPPL_Filename { get; }
         //void DictPPL_Save();
@@ -32,6 +32,5 @@ namespace UtilitiesCS
         Func<IEnumerable<string>, IPrefix, string, string, string> FindMatchingTag { get; }
         public Func<IEnumerable<string>, List<string>> SelectFromList { get; }
         IFlagChangeTrainingQueue FlagChangeTrainingQueue { get; }
-
     }
 }

@@ -59,7 +59,9 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         [DataRow(NotifyCollectionChangedAction.Replace)]
         [DataRow(NotifyCollectionChangedAction.Move)]
         [DataRow(NotifyCollectionChangedAction.Reset)]
-        public void Constructor_WithEachSupportedAction_RetainsProvidedAction(NotifyCollectionChangedAction action)
+        public void Constructor_WithEachSupportedAction_RetainsProvidedAction(
+            NotifyCollectionChangedAction action
+        )
         {
             // Act
             var args = new BagChangedEventArgs<int>(action, 10, 2);

@@ -1,10 +1,10 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Outlook = Microsoft.Office.Interop.Outlook;
-using Newtonsoft.Json;
-using UtilitiesCS;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
+using Newtonsoft.Json;
+using UtilitiesCS;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
@@ -25,18 +25,35 @@ namespace UtilitiesCS
         }
 
         private string _folderPathOld;
-        public string FolderPathOld { get => _folderPathOld; set => _folderPathOld = value; }
+        public string FolderPathOld
+        {
+            get => _folderPathOld;
+            set => _folderPathOld = value;
+        }
 
         private string _folderPathNew;
-        public string FolderPathNew { get => _folderPathNew; set => _folderPathNew = value; }
+        public string FolderPathNew
+        {
+            get => _folderPathNew;
+            set => _folderPathNew = value;
+        }
 
         private string _entryId;
-        public string EntryId { get => _entryId; set => _entryId = value; }
+        public string EntryId
+        {
+            get => _entryId;
+            set => _entryId = value;
+        }
 
         private string _storeId;
-        public string StoreId { get => _storeId; set => _storeId = value; }
+        public string StoreId
+        {
+            get => _storeId;
+            set => _storeId = value;
+        }
 
         private Outlook.Application _olApp;
+
         [JsonIgnore]
         public Outlook.Application OlApp
         {
@@ -49,13 +66,23 @@ namespace UtilitiesCS
         }
 
         private IApplicationGlobals _globals;
+
         [JsonIgnore]
-        public IApplicationGlobals Globals { get => _globals; set => _globals = value; }
+        public IApplicationGlobals Globals
+        {
+            get => _globals;
+            set => _globals = value;
+        }
 
         private string _olRootPath;
-        public string OlRootPath { get => _olRootPath; set => _olRootPath = value; }
+        public string OlRootPath
+        {
+            get => _olRootPath;
+            set => _olRootPath = value;
+        }
 
         private MailItem _mailItem;
+
         [JsonIgnore]
         public MailItem MailItem
         {
@@ -65,7 +92,8 @@ namespace UtilitiesCS
                 {
                     try
                     {
-                        _mailItem = (MailItem)this.OlApp.Session.GetItemFromID(this.EntryId, this.StoreId);
+                        _mailItem = (MailItem)
+                            this.OlApp.Session.GetItemFromID(this.EntryId, this.StoreId);
                     }
                     catch (System.Exception)
                     {
@@ -78,6 +106,7 @@ namespace UtilitiesCS
         }
 
         private Folder _folderOld;
+
         [JsonIgnore]
         public Folder FolderOld
         {
@@ -95,7 +124,10 @@ namespace UtilitiesCS
 
         internal bool NotNull(params object[] parameters) => !parameters.Any(x => x is null);
 
-        public bool IsReadyToUndoMove { get => NotNull(MailItem, FolderOld); }
+        public bool IsReadyToUndoMove
+        {
+            get => NotNull(MailItem, FolderOld);
+        }
 
         public MailItem UndoMove()
         {
@@ -120,9 +152,9 @@ namespace UtilitiesCS
             }
             if (ready)
             {
-                return $"Undo Move of email?{Environment.NewLine}SentOn: {MailItem.SentOn.ToString("MM/dd/yyyy")}" +
-                       $"{System.Environment.NewLine}{MailItem.Subject}{System.Environment.NewLine}" +
-                       $"From: {FolderPathNew}{System.Environment.NewLine}To: {FolderPathOld}";
+                return $"Undo Move of email?{Environment.NewLine}SentOn: {MailItem.SentOn.ToString("MM/dd/yyyy")}"
+                    + $"{System.Environment.NewLine}{MailItem.Subject}{System.Environment.NewLine}"
+                    + $"From: {FolderPathNew}{System.Environment.NewLine}To: {FolderPathOld}";
             }
             else
             {

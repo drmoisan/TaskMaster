@@ -1,13 +1,12 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using QuickFiler.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Interfaces;
 using UtilitiesCS;
 using UtilitiesCS.Interfaces.IWinForm;
-
 
 namespace QuickFiler.Controllers
 {
@@ -21,7 +20,6 @@ namespace QuickFiler.Controllers
         int SpaceForEmail { get; }
         CancellationToken Token { get; }
         CancellationTokenSource TokenSource { get; }
-
 
         void ButtonSkip_Click(object sender, EventArgs e);
         void ButtonUndo_Click();

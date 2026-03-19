@@ -1,9 +1,9 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Text;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.Test.Extensions
@@ -15,7 +15,9 @@ namespace UtilitiesCS.Test.Extensions
         public void Deserialize_DeserializesValidJsonIntoReferenceType()
         {
             // Arrange
-            var payload = Encoding.UTF8.GetBytes("{\"Name\":\"alpha\",\"Child\":{\"Name\":\"beta\"}}");
+            var payload = Encoding.UTF8.GetBytes(
+                "{\"Name\":\"alpha\",\"Child\":{\"Name\":\"beta\"}}"
+            );
 
             // Act
             var result = JsonExtensions.Deserialize<SampleNode>(payload);
@@ -65,7 +67,9 @@ namespace UtilitiesCS.Test.Extensions
         public void ToJsonText_ReturnsCanonicalJsonForNestedStructures()
         {
             // Arrange
-            using var textReader = new StringReader("{\"items\":[1,{\"name\":\"value\"}],\"flag\":true}");
+            using var textReader = new StringReader(
+                "{\"items\":[1,{\"name\":\"value\"}],\"flag\":true}"
+            );
             using var reader = new JsonTextReader(textReader);
             reader.Read();
 
@@ -86,8 +90,7 @@ namespace UtilitiesCS.Test.Extensions
             Action action = () => reader.ToJsonText();
 
             // Assert
-            action.Should().Throw<ArgumentNullException>()
-                .Which.ParamName.Should().Be("reader");
+            action.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("reader");
         }
 
         private sealed class SampleNode

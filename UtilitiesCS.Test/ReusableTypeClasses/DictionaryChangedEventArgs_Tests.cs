@@ -62,7 +62,9 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         [DataRow(NotifyCollectionChangedAction.Replace)]
         [DataRow(NotifyCollectionChangedAction.Move)]
         [DataRow(NotifyCollectionChangedAction.Reset)]
-        public void Constructor_WithEachSupportedAction_RetainsProvidedAction(NotifyCollectionChangedAction action)
+        public void Constructor_WithEachSupportedAction_RetainsProvidedAction(
+            NotifyCollectionChangedAction action
+        )
         {
             // Act
             var args = new DictionaryChangedEventArgs<string, int>(action, "key", 10, 2);

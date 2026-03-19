@@ -1,8 +1,8 @@
-﻿using QuickFiler.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using QuickFiler.Interfaces;
 using UtilitiesCS.Interfaces.IWinForm;
 
 namespace QuickFiler
@@ -28,6 +28,5 @@ namespace QuickFiler
         System.Windows.Forms.Button L1v1L2h4_ButtonUndo { get; }
         System.Windows.Forms.Button L1v1L2h5_BtnSkip { get; }
         Panel L1v0L2_PanelMain { get; }
-
     }
 }

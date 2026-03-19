@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.Serialization;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Office.Interop.Outlook;
 using Newtonsoft;
 using Newtonsoft.Json;
-using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.ReusableTypeClasses;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Threading;
 
 namespace UtilitiesCS
 {
     [Serializable()]
-    public class SerializableList<T> : IList<T>, ISerializableList<T> where T : IComparable<T>
+    public class SerializableList<T> : IList<T>, ISerializableList<T>
+        where T : IComparable<T>
     {
         public SerializableList()
         {
@@ -41,7 +42,13 @@ namespace UtilitiesCS
             Deserialize();
         }
 
-        public SerializableList(string filename, string folderpath, CSVLoader<T> backupLoader, string backupFilepath, bool askUserOnError)
+        public SerializableList(
+            string filename,
+            string folderpath,
+            CSVLoader<T> backupLoader,
+            string backupFilepath,
+            bool askUserOnError
+        )
         {
             Filename = filename;
             Folderpath = folderpath;
@@ -49,7 +56,9 @@ namespace UtilitiesCS
             Deserialize(_filepath, backupLoader, askUserOnError);
         }
 
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
         private IList<T> _innerList;
         private IEnumerable<T> _lazyLoader;
         private string _backupFilepath = "";
@@ -66,16 +75,19 @@ namespace UtilitiesCS
             ensureList();
             return _innerList.IndexOf(item);
         }
+
         public void Insert(int index, T item)
         {
             ensureList();
             _innerList.Insert(index, item);
         }
+
         public void RemoveAt(int index)
         {
             ensureList();
             _innerList.RemoveAt(index);
         }
+
         public T this[int index]
         {
             get
@@ -93,8 +105,12 @@ namespace UtilitiesCS
 
         #region IList<T> Extensions
         public int FindIndex(Predicate<T> match) => _innerList.FindIndex(match);
-        public int FindIndex(int startIndex, Predicate<T> match) => _innerList.FindIndex(startIndex, match);
-        public int FindIndex(int startIndex, int count, Predicate<T> match) => _innerList.FindIndex(startIndex, count, match);
+
+        public int FindIndex(int startIndex, Predicate<T> match) =>
+            _innerList.FindIndex(startIndex, match);
+
+        public int FindIndex(int startIndex, int count, Predicate<T> match) =>
+            _innerList.FindIndex(startIndex, count, match);
         #endregion
 
         #region ICollection<T> Members
@@ -104,29 +120,38 @@ namespace UtilitiesCS
             _innerList.Add(item);
             NotifyPropertyChanged(nameof(Add));
         }
+
         public void Clear()
         {
             ensureList();
             _innerList.Clear();
         }
+
         public bool Contains(T item)
         {
             ensureList();
             return _innerList.Contains(item);
         }
+
         public void CopyTo(T[] array, int arrayIndex)
         {
             ensureList();
             _innerList.CopyTo(array, arrayIndex);
         }
+
         public int Count
         {
-            get { ensureList(); return _innerList.Count; }
+            get
+            {
+                ensureList();
+                return _innerList.Count;
+            }
         }
         public bool IsReadOnly
         {
             get { return false; }
         }
+
         public bool Remove(T item)
         {
             ensureList();
@@ -164,10 +189,7 @@ namespace UtilitiesCS
 
         public string Filepath
         {
-            get
-            {
-                return _filepath;
-            }
+            get { return _filepath; }
             set
             {
                 _filepath = value;
@@ -177,18 +199,16 @@ namespace UtilitiesCS
                 if ((value != "") && (fileExtension == "") && Directory.Exists(value))
                 {
                     throw new ArgumentException(
-                        $"{value} is a Folder Path and was passed to the field named 'Filepath'. " +
-                        "Either pass this to the 'FileName' field or include a folderpath.");
+                        $"{value} is a Folder Path and was passed to the field named 'Filepath'. "
+                            + "Either pass this to the 'FileName' field or include a folderpath."
+                    );
                 }
             }
         }
 
         public string Folderpath
         {
-            get
-            {
-                return _folderpath;
-            }
+            get { return _folderpath; }
             set
             {
                 _folderpath = value;
@@ -199,10 +219,7 @@ namespace UtilitiesCS
 
         public string Filename
         {
-            get
-            {
-                return _filename;
-            }
+            get { return _filename; }
             set
             {
                 _filename = value;
@@ -223,14 +240,16 @@ namespace UtilitiesCS
             _ = Task.Run(() => SerializeThreadSafe(filepath));
         }
 
-        async public Task SerializeAsync()
+        public async Task SerializeAsync()
         {
             if (Filepath != "")
             {
                 await SerializeAsync(Filepath);
             }
-            else { await Task.CompletedTask; }
-
+            else
+            {
+                await Task.CompletedTask;
+            }
         }
 
         public async Task SerializeAsync(string filepath)
@@ -243,7 +262,6 @@ namespace UtilitiesCS
 
         public void SerializeThreadSafe(string filepath)
         {
-
             // Set Status to Locked
             if (_readWriteLock.TryEnterWriteLock(-1))
             {
@@ -271,14 +289,12 @@ namespace UtilitiesCS
                     _readWriteLock.ExitWriteLock();
                 }
             }
-
         }
 
         public void Sort()
         {
             _innerList = _innerList.OrderBy(x => x).ToList();
         }
-
 
         //public void Serialize(string filepath)
         //{
@@ -300,17 +316,20 @@ namespace UtilitiesCS
 
         public void Deserialize()
         {
-            if (Filepath != "") Deserialize(Filepath, true);
+            if (Filepath != "")
+                Deserialize(Filepath, true);
         }
 
         public void Deserialize(bool askUserOnError)
         {
-            if (Filepath != "") Deserialize(Filepath, askUserOnError);
+            if (Filepath != "")
+                Deserialize(Filepath, askUserOnError);
         }
 
         public void Deserialize(string filepath, CSVLoader<T> backupLoader, bool askUserOnError)
         {
-            if (_filepath != filepath) this.Filepath = filepath;
+            if (_filepath != filepath)
+                this.Filepath = filepath;
 
             DialogResult response = DialogResult.Ignore;
 
@@ -323,10 +342,12 @@ namespace UtilitiesCS
                 log.Error(e.Message);
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show($"{filepath} not found. Load from backup?",
-                                               "File Not Found",
-                                               MessageBoxButtons.YesNo,
-                                               MessageBoxIcon.Error);
+                    response = MessageBox.Show(
+                        $"{filepath} not found. Load from backup?",
+                        "File Not Found",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Error
+                    );
                 }
                 else
                 {
@@ -338,11 +359,12 @@ namespace UtilitiesCS
                 log.Error(e.Message);
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show($"{filepath} encountered a problem. {e.Message} " +
-                                               " Load from backup?",
-                                               "Error!",
-                                               MessageBoxButtons.YesNo,
-                                               MessageBoxIcon.Error);
+                    response = MessageBox.Show(
+                        $"{filepath} encountered a problem. {e.Message} " + " Load from backup?",
+                        "Error!",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Error
+                    );
                 }
                 else
                 {
@@ -372,27 +394,36 @@ namespace UtilitiesCS
                 {
                     if (askUserOnError)
                     {
-                        response = MessageBox.Show("Need a list to continue. " +
-                                                   "Create a new List Or Stop Execution?",
-                                                   "Error",
-                                                   MessageBoxButtons.YesNo,
-                                                   MessageBoxIcon.Error);
+                        response = MessageBox.Show(
+                            "Need a list to continue. " + "Create a new List Or Stop Execution?",
+                            "Error",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Error
+                        );
                     }
-                    else { response = DialogResult.Yes; }
+                    else
+                    {
+                        response = DialogResult.Yes;
+                    }
 
                     if (response == DialogResult.Yes)
                     {
                         _innerList = new List<T> { };
                     }
-                    else { throw new ArgumentNullException("Must have a list or create one to continue executing"); }
+                    else
+                    {
+                        throw new ArgumentNullException(
+                            "Must have a list or create one to continue executing"
+                        );
+                    }
                 }
             }
-
         }
 
         public void Deserialize(string filepath, bool askUserOnError)
         {
-            if (_filepath != filepath) this.Filepath = filepath;
+            if (_filepath != filepath)
+                this.Filepath = filepath;
 
             DialogResult response = DialogResult.Ignore;
 
@@ -401,9 +432,14 @@ namespace UtilitiesCS
                 var settings = new JsonSerializerSettings();
                 settings.TypeNameHandling = TypeNameHandling.Auto;
                 settings.Formatting = Formatting.Indented;
-                _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath), settings);
+                _innerList = JsonConvert.DeserializeObject<List<T>>(
+                    File.ReadAllText(filepath),
+                    settings
+                );
                 if (_innerList is null)
-                { throw new FileFormatException("File could not be deserialized correctly"); }
+                {
+                    throw new FileFormatException("File could not be deserialized correctly");
+                }
                 //_innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
             }
             catch (FileNotFoundException)
@@ -411,25 +447,37 @@ namespace UtilitiesCS
                 log.Error($"File {filepath} does not exist.");
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show($"{filepath} not found. Create a new list? Excecution will stop if answer is no.",
-                                               "File Not Found",
-                                               MessageBoxButtons.YesNo,
-                                               MessageBoxIcon.Error);
+                    response = MessageBox.Show(
+                        $"{filepath} not found. Create a new list? Excecution will stop if answer is no.",
+                        "File Not Found",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Error
+                    );
                 }
-                else { response = DialogResult.Yes; }
+                else
+                {
+                    response = DialogResult.Yes;
+                }
             }
             catch (System.Exception e)
             {
                 log.Error($"Error! {e.Message}");
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(filepath + " encountered a problem. " +
-                                               e.Message + " Create a new list? Excecution will stop if answer is no.",
-                                               "Error",
-                                               MessageBoxButtons.YesNo,
-                                               MessageBoxIcon.Error);
+                    response = MessageBox.Show(
+                        filepath
+                            + " encountered a problem. "
+                            + e.Message
+                            + " Create a new list? Excecution will stop if answer is no.",
+                        "Error",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Error
+                    );
                 }
-                else { response = DialogResult.Yes; }
+                else
+                {
+                    response = DialogResult.Yes;
+                }
             }
             finally
             {
@@ -440,16 +488,23 @@ namespace UtilitiesCS
                 }
                 else if (_innerList == null)
                 {
-                    throw new ArgumentNullException("Must have a list or create one to continue executing");
+                    throw new ArgumentNullException(
+                        "Must have a list or create one to continue executing"
+                    );
                 }
             }
         }
 
-        public List<T> ToList() { return new List<T>(_innerList); }
+        public List<T> ToList()
+        {
+            return new List<T>(_innerList);
+        }
 
-        public void FromList(IList<T> value) { _innerList = value; }
+        public void FromList(IList<T> value)
+        {
+            _innerList = value;
+        }
 
         #endregion
-
     }
 }

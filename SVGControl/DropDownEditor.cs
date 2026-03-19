@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Drawing.Design;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms.Design;
 using System.Windows.Forms;
-using System.ComponentModel.Design;
-using System.Reflection;
-using System.Globalization;
-using System.Resources;
-
+using System.Windows.Forms.Design;
 
 namespace SVGControl
 {
@@ -27,7 +26,11 @@ namespace SVGControl
             return UITypeEditorEditStyle.DropDown;
         }
 
-        public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
+        public override object EditValue(
+            ITypeDescriptorContext context,
+            IServiceProvider provider,
+            object value
+        )
         {
             IDesignerHost host = provider.GetService(typeof(IDesignerHost)) as IDesignerHost;
             string typName = host.RootComponentClassName;
@@ -46,17 +49,16 @@ namespace SVGControl
             var rm = new ResourceManager($"{assemblyName}.Properties.Resources", asm);
             var rset = rm.GetResourceSet(CultureInfo.CurrentUICulture, true, true);
 
-
             var entries2 = rset.Cast<System.Collections.DictionaryEntry>()
-                              .OrderBy(x => x.Key)
-                              .Select(x => new KeyValuePair<string, object>((string)x.Key, x.Value))
-                              .ToList();
+                .OrderBy(x => x.Key)
+                .Select(x => new KeyValuePair<string, object>((string)x.Key, x.Value))
+                .ToList();
 
             var entries = rset.Cast<System.Collections.DictionaryEntry>()
-                              .Where(x => x.Value is byte[])
-                              .OrderBy(x => x.Key)
-                              .Select(x => new SvgResource((string)x.Key, (byte[])x.Value))
-                              .ToList();
+                .Where(x => x.Value is byte[])
+                .OrderBy(x => x.Key)
+                .Select(x => new SvgResource((string)x.Key, (byte[])x.Value))
+                .ToList();
 
             // get the analytic object from context
             // this is how we get the list of possible benchmarks
@@ -72,7 +74,8 @@ namespace SVGControl
             //                .Select(x => GetStringForValue(x.Key))
             //                .ToList();
 
-            _editorService = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
+            _editorService = (IWindowsFormsEditorService)
+                provider.GetService(typeof(IWindowsFormsEditorService));
 
             // use a list box
             ListBox lb = new ListBox();
@@ -81,7 +84,6 @@ namespace SVGControl
 
             // use the IBenchmark.Name property for list box display
             lb.DisplayMember = "Name";
-
 
             //foreach (string resourceName in names)
             //foreach (string resourceName in imageSelector.ResourceNames)
@@ -107,7 +109,8 @@ namespace SVGControl
 
         private static string GetStringForValue(object value)
         {
-            if (value == null) return "null";
+            if (value == null)
+                return "null";
             return value.ToString();
         }
 

@@ -1,8 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test
 {
@@ -13,26 +13,30 @@ namespace UtilitiesCS.Test
         public void GroupByEx4()
         {
             // Create a list of pets.
-            List<Pet> petsList =
-                new List<Pet>{ new Pet { Name="Barley", Age=8.3 },
-                    new Pet { Name="Boots", Age=4.9 },
-                    new Pet { Name="Whiskers", Age=1.5 },
-                    new Pet { Name="Daisy", Age=4.3 } };
+            List<Pet> petsList = new List<Pet>
+            {
+                new Pet { Name = "Barley", Age = 8.3 },
+                new Pet { Name = "Boots", Age = 4.9 },
+                new Pet { Name = "Whiskers", Age = 1.5 },
+                new Pet { Name = "Daisy", Age = 4.3 },
+            };
 
             // Group Pet.Age values by the Math.Floor of the age.
             // Then project an anonymous type from each group
             // that consists of the key, the count of the group's
             // elements, and the minimum and maximum age in the group.
             var query = petsList.GroupBy(
-                pet => Math.Floor(pet.Age), 
+                pet => Math.Floor(pet.Age),
                 pet => pet.Age,
-                (baseAge, ages) => new
-                {
-                    Key = baseAge,
-                    Count = ages.Count(),
-                    Min = ages.Min(),
-                    Max = ages.Max()
-                });
+                (baseAge, ages) =>
+                    new
+                    {
+                        Key = baseAge,
+                        Count = ages.Count(),
+                        Min = ages.Min(),
+                        Max = ages.Max(),
+                    }
+            );
 
             // Iterate over each anonymous type.
             foreach (var result in query)
@@ -61,14 +65,13 @@ namespace UtilitiesCS.Test
                 Maximum age: 1.5
             */
         }
-        
+
         [TestMethod]
         public void queueinit()
         {
-            var a = new int[]{ 1, 2, 3, 4, 5, 6, 7 };
+            var a = new int[] { 1, 2, 3, 4, 5, 6, 7 };
             var q = new Queue<int>(a);
         }
-    
     }
 
     class Pet
@@ -76,5 +79,4 @@ namespace UtilitiesCS.Test
         public string Name { get; set; }
         public double Age { get; set; }
     }
-
-    }
+}

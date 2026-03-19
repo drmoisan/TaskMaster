@@ -22,8 +22,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
 
             store.SetupGet(x => x.DisplayName).Returns("Mailbox");
             store.Setup(x => x.GetRootFolder()).Returns(rootFolder.Object);
-            store.SetupGet(x => x.ExchangeStoreType).Returns(OlExchangeStoreType.olPrimaryExchangeMailbox);
-            store.Setup(x => x.GetDefaultFolder(OlDefaultFolders.olFolderInbox)).Returns(inbox.Object);
+            store
+                .SetupGet(x => x.ExchangeStoreType)
+                .Returns(OlExchangeStoreType.olPrimaryExchangeMailbox);
+            store
+                .Setup(x => x.GetDefaultFolder(OlDefaultFolders.olFolderInbox))
+                .Returns(inbox.Object);
 
             var wrapper = new StoreWrapper(store.Object);
 
@@ -47,7 +51,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
 
             store.SetupGet(x => x.DisplayName).Returns("Public Folders");
             store.Setup(x => x.GetRootFolder()).Returns(rootFolder.Object);
-            store.SetupGet(x => x.ExchangeStoreType).Returns(OlExchangeStoreType.olExchangePublicFolder);
+            store
+                .SetupGet(x => x.ExchangeStoreType)
+                .Returns(OlExchangeStoreType.olExchangePublicFolder);
 
             var wrapper = new StoreWrapper(store.Object);
 
@@ -76,10 +82,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             currentUser.SetupGet(x => x.AddressEntry).Returns(addressEntry.Object);
             addressEntry.Setup(x => x.GetExchangeUser()).Returns((ExchangeUser)null);
 
-            var wrapper = new StoreWrapper(store.Object)
-            {
-                RootFolder = rootFolder.Object,
-            };
+            var wrapper = new StoreWrapper(store.Object) { RootFolder = rootFolder.Object };
 
             // Act
             string result = wrapper.GetSmtpAddressFromStore();
@@ -103,10 +106,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             currentUser.SetupGet(x => x.AddressEntry).Returns(addressEntry.Object);
             addressEntry.Setup(x => x.GetExchangeUser()).Throws(new COMException("Boom"));
 
-            var wrapper = new StoreWrapper(store.Object)
-            {
-                RootFolder = rootFolder.Object,
-            };
+            var wrapper = new StoreWrapper(store.Object) { RootFolder = rootFolder.Object };
 
             // Act
             string result = wrapper.GetSmtpAddressFromStore();
@@ -115,7 +115,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             result.Should().BeNull();
         }
 
-        private static Mock<OutlookFolder> CreateRootFolderWithPrimarySmtpAddress(string primarySmtpAddress)
+        private static Mock<OutlookFolder> CreateRootFolderWithPrimarySmtpAddress(
+            string primarySmtpAddress
+        )
         {
             var rootFolder = new Mock<OutlookFolder>();
             var session = new Mock<NameSpace>();

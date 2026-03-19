@@ -44,8 +44,16 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         public void GetHashCode_ShouldIncludeBoundaryValuesAndIgnoreCase()
         {
             var comparer = new FolderWrapperNameCountSizeComparer();
-            var lowerCase = CreateFolder("Archive", itemCount: int.MaxValue, folderSize: long.MaxValue);
-            var upperCase = CreateFolder("ARCHIVE", itemCount: int.MaxValue, folderSize: long.MaxValue);
+            var lowerCase = CreateFolder(
+                "Archive",
+                itemCount: int.MaxValue,
+                folderSize: long.MaxValue
+            );
+            var upperCase = CreateFolder(
+                "ARCHIVE",
+                itemCount: int.MaxValue,
+                folderSize: long.MaxValue
+            );
 
             comparer.GetHashCode(lowerCase).Should().Be(comparer.GetHashCode(upperCase));
             comparer.GetHashCode(null).Should().Be(0);
@@ -53,7 +61,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 
         private static FolderWrapper CreateFolder(string name, int itemCount, long folderSize)
         {
-            return new FolderWrapper(selected: false, itemCount: itemCount, folderSize: folderSize, name: name, relativePath: name ?? string.Empty);
+            return new FolderWrapper(
+                selected: false,
+                itemCount: itemCount,
+                folderSize: folderSize,
+                name: name,
+                relativePath: name ?? string.Empty
+            );
         }
     }
 }

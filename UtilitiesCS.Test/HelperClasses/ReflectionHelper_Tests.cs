@@ -20,8 +20,15 @@ namespace UtilitiesCS.Test.HelperClasses
             result.Should().Contain(typeof(ReflectionHelper));
             result.Should().Contain(typeof(ReflectionHelper_Tests));
             result.Should().OnlyContain(type => !type.IsNestedPrivate);
-            result.Should().OnlyContain(type =>
-                !Attribute.IsDefined(type, typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), false));
+            result
+                .Should()
+                .OnlyContain(type =>
+                    !Attribute.IsDefined(
+                        type,
+                        typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute),
+                        false
+                    )
+                );
         }
 
         [TestMethod]
@@ -43,7 +50,7 @@ namespace UtilitiesCS.Test.HelperClasses
             {
                 Contract = shared,
                 GenericWrapper = new GenericWrapper<IContract> { Value = shared },
-                Child = new ChildContainer { Parent = null, Contract = shared }
+                Child = new ChildContainer { Parent = null, Contract = shared },
             };
             root.Child.Parent = root;
 
@@ -65,13 +72,18 @@ namespace UtilitiesCS.Test.HelperClasses
             var fields = typeof(DerivedFieldContainer).GetAllFields();
 
             // Assert
-            fields.Select(field => field.Name).Should().Contain(new[]
-            {
-                "DerivedPublicField",
-                "derivedPrivateField",
-                "BasePublicField",
-                "basePrivateField"
-            });
+            fields
+                .Select(field => field.Name)
+                .Should()
+                .Contain(
+                    new[]
+                    {
+                        "DerivedPublicField",
+                        "derivedPrivateField",
+                        "BasePublicField",
+                        "basePrivateField",
+                    }
+                );
             fields.Select(field => field.Name).Should().NotContain("StaticField");
         }
 
@@ -79,29 +91,24 @@ namespace UtilitiesCS.Test.HelperClasses
         public void GetAllDerivedFields_ReturnsOnlyFieldsBelowSpecifiedBaseType()
         {
             // Act
-            var fields = typeof(MostDerivedFieldContainer).GetAllDerivedFields(typeof(BaseFieldContainer));
+            var fields = typeof(MostDerivedFieldContainer).GetAllDerivedFields(
+                typeof(BaseFieldContainer)
+            );
 
             // Assert
-            fields.Select(field => field.Name).Should().Contain(new[]
-            {
-                "MostDerivedField",
-                "DerivedPublicField",
-                "derivedPrivateField"
-            });
-            fields.Select(field => field.Name).Should().NotContain(new[]
-            {
-                "BasePublicField",
-                "basePrivateField"
-            });
+            fields
+                .Select(field => field.Name)
+                .Should()
+                .Contain(new[] { "MostDerivedField", "DerivedPublicField", "derivedPrivateField" });
+            fields
+                .Select(field => field.Name)
+                .Should()
+                .NotContain(new[] { "BasePublicField", "basePrivateField" });
         }
 
-        private interface IContract
-        {
-        }
+        private interface IContract { }
 
-        private sealed class DerivedContract : IContract
-        {
-        }
+        private sealed class DerivedContract : IContract { }
 
         private sealed class RootContainer
         {

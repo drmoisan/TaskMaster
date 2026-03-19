@@ -62,7 +62,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         {
             // Arrange
             var outlookItem = CreateBaseOutlookItem();
-            outlookItem.SetupSet(x => x.Body = It.IsAny<string>()).Throws(new InvalidOperationException("boom"));
+            outlookItem
+                .SetupSet(x => x.Body = It.IsAny<string>())
+                .Throws(new InvalidOperationException("boom"));
             var wrapper = new OutlookItemTry(outlookItem.Object);
 
             // Act

@@ -9,7 +9,12 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
             Action = action;
         }
 
-        public DictionaryChangedEventArgs(NotifyCollectionChangedAction action, TKey key, TValue newValue, TValue oldValue)
+        public DictionaryChangedEventArgs(
+            NotifyCollectionChangedAction action,
+            TKey key,
+            TValue newValue,
+            TValue oldValue
+        )
             : this(action)
         {
             Key = key;

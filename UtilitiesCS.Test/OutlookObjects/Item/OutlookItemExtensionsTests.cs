@@ -43,7 +43,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [TestMethod]
         public void TryGet_WhenWrappingOutlookItem_ShouldReturnTryGetWrapper()
         {
-            var outlookItem = new UtilitiesCS.OutlookItem(new SubjectOnlyItem { Subject = "Quarterly review" });
+            var outlookItem = new UtilitiesCS.OutlookItem(
+                new SubjectOnlyItem { Subject = "Quarterly review" }
+            );
 
             var success = outlookItem.TryGet().Subject(out string subject);
 
@@ -93,7 +95,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [DataRow(typeof(InteropMailItem), OlItemType.olMailItem)]
         [DataRow(typeof(InteropTaskItem), OlItemType.olTaskItem)]
         [DataRow(typeof(InteropMeetingItem), OlItemType.olAppointmentItem)]
-        public void GetOlItemType_WhenInnerObjectIsSupported_ShouldReturnMappedValue(Type outlookType, OlItemType expected)
+        public void GetOlItemType_WhenInnerObjectIsSupported_ShouldReturnMappedValue(
+            Type outlookType,
+            OlItemType expected
+        )
         {
             var innerObject = CreateInteropMock(outlookType);
             var outlookItem = new Mock<IOutlookItem>();
@@ -112,8 +117,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
 
             System.Action act = () => outlookItem.Object.GetOlItemType();
 
-            act.Should().Throw<ArgumentException>()
-                .WithMessage("Object is not a supported type*");
+            act.Should().Throw<ArgumentException>().WithMessage("Object is not a supported type*");
         }
 
         private static object CreateInteropMock(Type outlookType)

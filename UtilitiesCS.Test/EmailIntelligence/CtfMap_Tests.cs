@@ -26,7 +26,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var seed = new[]
             {
                 new CtfMapEntry("Inbox", "conv-1", 1),
-                new CtfMapEntry("Archive", "conv-2", 2)
+                new CtfMapEntry("Archive", "conv-2", 2),
             };
 
             // Act
@@ -56,7 +56,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var map = new CtfMap
             {
                 new CtfMapEntry("Inbox", "conv-1", 3),
-                new CtfMapEntry("Archive", "conv-2", 7)
+                new CtfMapEntry("Archive", "conv-2", 7),
             };
 
             // Act
@@ -71,10 +71,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void ContainsId_WhenConversationExists_ReturnsTrue()
         {
             // Arrange
-            var map = new CtfMap
-            {
-                new CtfMapEntry("Inbox", "conv-1", 3)
-            };
+            var map = new CtfMap { new CtfMapEntry("Inbox", "conv-1", 3) };
 
             // Act
             var contains = map.ContainsId("conv-1");
@@ -103,7 +100,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var map = new CtfMap
             {
                 new CtfMapEntry("Inbox", "conv-1", 1),
-                new CtfMapEntry("Archive", "conv-2", 2)
+                new CtfMapEntry("Archive", "conv-2", 2),
             };
 
             // Act
@@ -130,10 +127,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void Add_WhenEntryAlreadyExists_AccumulatesEmailCount()
         {
             // Arrange
-            var map = new CtfMap
-            {
-                new CtfMapEntry("Inbox", "conv-1", 2)
-            };
+            var map = new CtfMap { new CtfMapEntry("Inbox", "conv-1", 2) };
 
             // Act
             map.Add(emailFolder: "Inbox", conversationID: "conv-1", emailCount: 5);

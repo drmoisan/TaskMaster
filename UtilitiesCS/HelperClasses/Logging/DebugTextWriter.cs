@@ -26,12 +26,17 @@ namespace UtilitiesCS
             public override bool CanRead => false;
             public override bool CanSeek => false;
             public override bool CanWrite => true;
+
             public override void Flush() => Debug.Flush();
 
             public override long Length => throw bad_op;
+
             public override int Read(byte[] buffer, int offset, int count) => throw bad_op;
+
             public override long Seek(long offset, SeekOrigin origin) => throw bad_op;
+
             public override void SetLength(long value) => throw bad_op;
+
             public override long Position
             {
                 get => throw bad_op;
@@ -42,4 +47,3 @@ namespace UtilitiesCS
         };
     }
 }
-

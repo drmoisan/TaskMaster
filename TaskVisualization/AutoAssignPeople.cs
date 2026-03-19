@@ -1,9 +1,9 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 using Tags;
 using ToDoModel;
 using UtilitiesCS;
@@ -36,12 +36,18 @@ namespace TaskVisualization
         public IList<string> AutoFind(object objItem)
         {
             MailItemHelper helper = null;
-            if (objItem is null) { return []; }
+            if (objItem is null)
+            {
+                return [];
+            }
             else if (objItem is MailItemHelper)
             {
                 helper = objItem as MailItemHelper;
             }
-            else if (objItem is IOutlookItem olItem && olItem.GetOlItemType() == OlItemType.olMailItem)
+            else if (
+                objItem is IOutlookItem olItem
+                && olItem.GetOlItemType() == OlItemType.olMailItem
+            )
             {
                 helper = new MailItemHelper(olItem.InnerObject as MailItem, _globals);
             }
@@ -62,19 +68,26 @@ namespace TaskVisualization
             //        emailRootFolder: _globals.Ol.InboxPath,
             //        dictRemap: _globals.TD.DictRemap,
             //        userAddress: _globals.Ol.UserEmailAddress,
-            //        blExcludeFlagged: false);            
-
+            //        blExcludeFlagged: false);
         }
 
-        public IList<string> AddChoicesToDict(MailItem olMail, IList<IPrefix> prefixes, string prefixKey, string currentUserEmail)
+        public IList<string> AddChoicesToDict(
+            MailItem olMail,
+            IList<IPrefix> prefixes,
+            string prefixKey,
+            string currentUserEmail
+        )
         {
             return _globals.TD.People.AddMissingEntries(olMail);
         }
 
         public Category AddColorCategory(IPrefix prefix, string categoryName)
         {
-            return CreateCategoryModule.CreateCategory(olNS: _globals.Ol.NamespaceMAPI, prefix: prefix, newCatName: categoryName);
+            return CreateCategoryModule.CreateCategory(
+                olNS: _globals.Ol.NamespaceMAPI,
+                prefix: prefix,
+                newCatName: categoryName
+            );
         }
     }
-
 }

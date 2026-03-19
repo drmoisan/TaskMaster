@@ -1,6 +1,4 @@
-﻿using QuickFiler.Controllers;
-using QuickFiler.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,6 +9,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using QuickFiler.Controllers;
+using QuickFiler.Interfaces;
 using TaskVisualization;
 using UtilitiesCS;
 
@@ -27,29 +27,45 @@ namespace QuickFiler
             InitTipsLabelsList();
         }
 
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         private SynchronizationContext _context;
-        public SynchronizationContext UiSyncContext { get => _context; }
+        public SynchronizationContext UiSyncContext
+        {
+            get => _context;
+        }
 
         private TaskScheduler _uiScheduler;
-        public TaskScheduler UiScheduler { get => _uiScheduler; }
+        public TaskScheduler UiScheduler
+        {
+            get => _uiScheduler;
+        }
 
         private EfcFormController _formController;
+
         internal void SetController(EfcFormController controller)
         {
             _formController = controller;
         }
 
         private IQfcKeyboardHandler _keyboardHandler;
-        internal IQfcKeyboardHandler KeyboardHandler { get => _keyboardHandler; }
+        internal IQfcKeyboardHandler KeyboardHandler
+        {
+            get => _keyboardHandler;
+        }
+
         public void SetKeyboardHandler(IQfcKeyboardHandler keyboardHandler)
         {
             _keyboardHandler = keyboardHandler;
         }
 
         private IList<Label> _tipsLabels;
-        public IList<Label> TipsLabels { get => _tipsLabels; }
+        public IList<Label> TipsLabels
+        {
+            get => _tipsLabels;
+        }
 
         private void InitTipsLabelsList()
         {
@@ -63,9 +79,8 @@ namespace QuickFiler
                 LblAcOk,
                 LblAcCancel,
                 LblAcRefresh,
-                LblAcNewFolder
+                LblAcNewFolder,
             };
-
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

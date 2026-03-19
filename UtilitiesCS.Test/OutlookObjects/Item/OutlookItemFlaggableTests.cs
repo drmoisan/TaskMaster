@@ -5,15 +5,16 @@ using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
 using UtilitiesCS.OutlookExtensions;
+using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
 
 namespace UtilitiesCS.Test.OutlookObjects.Item
 {
     [TestClass]
     public class OutlookItemFlaggableTests
     {
-        private const string TotalWorkSchema = "http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/81110003";
+        private const string TotalWorkSchema =
+            "http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/81110003";
 
         [TestMethod]
         public void Constructor_WithIOutlookItem_ShouldWrapExistingMetadata()
@@ -100,7 +101,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [TestMethod]
         public void FlagAsTaskSetter_WhenDisableCallCannotBeBound_ShouldThrowArgumentOutOfRangeException()
         {
-            var mailItem = new ReflectionFriendlyMailItem { FlagStatus = OlFlagStatus.olFlagMarked };
+            var mailItem = new ReflectionFriendlyMailItem
+            {
+                FlagStatus = OlFlagStatus.olFlagMarked,
+            };
             var wrapper = CreateWrapper(mailItem, OlItemType.olMailItem);
 
             System.Action act = () => wrapper.FlagAsTask = false;
@@ -140,7 +144,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         public void TotalWorkSetter_WhenTrySetFails_ShouldRetryWithDirectSetProperty()
         {
             var accessor = new Mock<PropertyAccessor>();
-            accessor.SetupSequence(x => x.SetProperty(TotalWorkSchema, 90))
+            accessor
+                .SetupSequence(x => x.SetProperty(TotalWorkSchema, 90))
                 .Throws(new InvalidOperationException("Transient failure"))
                 .Pass();
             var mailItem = new Mock<InteropMailItem>();
@@ -168,7 +173,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         private static OutlookItemFlaggable CreateWrapper(object innerItem, OlItemType itemType)
         {
 #pragma warning disable SYSLIB0050
-            var wrapper = (OutlookItemFlaggable)FormatterServices.GetUninitializedObject(typeof(OutlookItemFlaggable));
+            var wrapper = (OutlookItemFlaggable)
+                FormatterServices.GetUninitializedObject(typeof(OutlookItemFlaggable));
 #pragma warning restore SYSLIB0050
 
             SetField(typeof(UtilitiesCS.OutlookItem), wrapper, "_item", innerItem);
@@ -178,9 +184,15 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             return wrapper;
         }
 
-        private static void SetField(Type declaringType, object instance, string fieldName, object value)
+        private static void SetField(
+            Type declaringType,
+            object instance,
+            string fieldName,
+            object value
+        )
         {
-            var field = declaringType.GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)
+            var field =
+                declaringType.GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)
                 ?? throw new MissingFieldException(declaringType.FullName, fieldName);
             field.SetValue(instance, value);
         }

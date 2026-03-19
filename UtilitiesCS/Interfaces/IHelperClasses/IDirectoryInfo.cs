@@ -2,7 +2,6 @@
 using System.IO;
 using System.Security.AccessControl;
 
-
 namespace UtilitiesCS
 {
     public interface IDirectoryInfo : IFileSystemInfo
@@ -17,13 +16,19 @@ namespace UtilitiesCS
         void Delete(bool recursive);
         IEnumerable<IDirectoryInfo> EnumerateDirectories();
         IEnumerable<IDirectoryInfo> EnumerateDirectories(string searchPattern);
-        IEnumerable<IDirectoryInfo> EnumerateDirectories(string searchPattern, SearchOption searchOption);
+        IEnumerable<IDirectoryInfo> EnumerateDirectories(
+            string searchPattern,
+            SearchOption searchOption
+        );
         IEnumerable<IFileInfo> EnumerateFiles();
         IEnumerable<IFileInfo> EnumerateFiles(string searchPattern);
         IEnumerable<IFileInfo> EnumerateFiles(string searchPattern, SearchOption searchOption);
         IEnumerable<IFileSystemInfo> EnumerateFileSystemInfos();
         IEnumerable<IFileSystemInfo> EnumerateFileSystemInfos(string searchPattern);
-        IEnumerable<IFileSystemInfo> EnumerateFileSystemInfos(string searchPattern, SearchOption searchOption);
+        IEnumerable<IFileSystemInfo> EnumerateFileSystemInfos(
+            string searchPattern,
+            SearchOption searchOption
+        );
         DirectorySecurity GetAccessControl();
         DirectorySecurity GetAccessControl(AccessControlSections includeSections);
         IDirectoryInfo[] GetDirectories();

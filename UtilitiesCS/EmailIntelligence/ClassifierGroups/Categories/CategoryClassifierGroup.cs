@@ -1,9 +1,4 @@
-﻿using AngleSharp.Css;
-using Microsoft.Graph.Communications.OnlineMeetings.GetAllRecordingsmeetingOrganizerUserIdMeetingOrganizerUserIdWithStartDateTimeWithEndDateTime;
-using Microsoft.Graph.Drives.Item.Items.Item.GetActivitiesByInterval;
-using Microsoft.Office.Interop.Outlook;
-using SDILReader;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +6,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using AngleSharp.Css;
+using Microsoft.Graph.Communications.OnlineMeetings.GetAllRecordingsmeetingOrganizerUserIdMeetingOrganizerUserIdWithStartDateTimeWithEndDateTime;
+using Microsoft.Graph.Drives.Item.Items.Item.GetActivitiesByInterval;
+using Microsoft.Office.Interop.Outlook;
+using SDILReader;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.Extensions.Lazy;
@@ -24,7 +24,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
     public class CategoryClassifierGroup : IConditionalEngine<MailItemHelper>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region ctor
 
@@ -47,20 +48,22 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
                 EngineName = groupName;
                 return this;
             }
-            else { return null; }
-
+            else
+            {
+                return null;
+            }
         }
 
         public static async Task<CategoryClassifierGroup> CreateEngineAsync(
             IApplicationGlobals globals,
             string categoryGroup,
-            CancellationToken token = default)
+            CancellationToken token = default
+        )
         {
             var cg = new CategoryClassifierGroup();
             cg.Globals = globals;
 
             return await Task.Run(() => cg.InitAsync(categoryGroup), token);
-
         }
 
         #endregion ctor
@@ -75,14 +78,15 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
         {
             var miner = new EmailDataMiner(Globals);
 
-            // Set up Progress Tracking            
+            // Set up Progress Tracking
             var (ppkg, sw) = await SetupProgressTracking();
 
-            // Load the staging data            
+            // Load the staging data
             MinedMailInfo[] collection = await LoadStagingData(ppkg, sw);
-            var allocation = Globals.TD.PrefixList.Count > 1 ?
-                (100 - ppkg.ProgressTrackerPane.Progress) / Globals.TD.PrefixList.Count :
-                100 - ppkg.ProgressTrackerPane.Progress;
+            var allocation =
+                Globals.TD.PrefixList.Count > 1
+                    ? (100 - ppkg.ProgressTrackerPane.Progress) / Globals.TD.PrefixList.Count
+                    : 100 - ppkg.ProgressTrackerPane.Progress;
 
             List<string> prefixList = ["Context", "Project"];
             foreach (var prefixLu in prefixList)
@@ -92,80 +96,167 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
                 Globals.AF.Manager.TryRemove(prefix.Key, out _);
 
                 var childPpkg = await new ProgressPackage()
-                    .InitializeAsync(ppkg.CancelSource, ppkg.Cancel, ppkg.ProgressTrackerPane.SpawnChild(allocation), ppkg.StopWatch)
+                    .InitializeAsync(
+                        ppkg.CancelSource,
+                        ppkg.Cancel,
+                        ppkg.ProgressTrackerPane.SpawnChild(allocation),
+                        ppkg.StopWatch
+                    )
                     .ConfigureAwait(false);
 
                 // Get or Create the Classifier Group
-                BayesianClassifierGroup classifierGroup = await LoadClassifierGroup(childPpkg, sw, collection, prefix);
+                BayesianClassifierGroup classifierGroup = await LoadClassifierGroup(
+                    childPpkg,
+                    sw,
+                    collection,
+                    prefix
+                );
 
                 var childPpkg2 = await new ProgressPackage()
-                    .InitializeAsync(childPpkg.CancelSource, childPpkg.Cancel, childPpkg.ProgressTrackerPane.SpawnChild(), childPpkg.StopWatch)
+                    .InitializeAsync(
+                        childPpkg.CancelSource,
+                        childPpkg.Cancel,
+                        childPpkg.ProgressTrackerPane.SpawnChild(),
+                        childPpkg.StopWatch
+                    )
                     .ConfigureAwait(false);
 
                 if (await BuildClassifiersAsync(classifierGroup, collection, childPpkg2, prefix))
                 {
-
                     // set the configuration of classifierGroup
-                    if ((await Globals.AF.Manager.Configuration).TryGetValue(prefix.Key, out var loader))
+                    if (
+                        (await Globals.AF.Manager.Configuration).TryGetValue(
+                            prefix.Key,
+                            out var loader
+                        )
+                    )
                     {
-                        classifierGroup.Config = loader.Config.DeepCopy() as NewSmartSerializableConfig;
+                        classifierGroup.Config =
+                            loader.Config.DeepCopy() as NewSmartSerializableConfig;
                         classifierGroup.Serialize();
 
                         Globals.AF.Manager[prefix.Key] = classifierGroup.ToAsyncLazy();
                         //Globals.AF.Manager.Serialize();
-                        MyBox.ShowDialog($"{prefix.Key} Classifier Built Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MyBox.ShowDialog(
+                            $"{prefix.Key} Classifier Built Successfully",
+                            "Success",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information
+                        );
                     }
                 }
             }
             Globals.AF.ProgressPane.Visible = false;
-
         }
 
-        private async Task<((CancellationTokenSource CancelSource, CancellationToken Cancel,
-            ProgressTrackerPane ProgressTrackerPane, SegmentStopWatch StopWatch), SegmentStopWatch)> SetupProgressTracking()
+        private async Task<(
+            (
+                CancellationTokenSource CancelSource,
+                CancellationToken Cancel,
+                ProgressTrackerPane ProgressTrackerPane,
+                SegmentStopWatch StopWatch
+            ),
+            SegmentStopWatch
+        )> SetupProgressTracking()
         {
-            var ppkg = await ProgressPackage.CreateAsTuplePaneAsync(
-                            progressTrackerPane: Globals.AF.ProgressTracker)
-                            .ConfigureAwait(false);
+            var ppkg = await ProgressPackage
+                .CreateAsTuplePaneAsync(progressTrackerPane: Globals.AF.ProgressTracker)
+                .ConfigureAwait(false);
             var sw = ppkg.StopWatch;
             Globals.AF.ProgressPane.Visible = true;
             return (ppkg, sw);
         }
 
-        private async Task<BayesianClassifierGroup> LoadClassifierGroup((CancellationTokenSource CancelSource, CancellationToken Cancel, ProgressTrackerPane ProgressTrackerPane, SegmentStopWatch StopWatch) ppkg, SegmentStopWatch sw, MinedMailInfo[] collection, IPrefix prefix)
+        private async Task<BayesianClassifierGroup> LoadClassifierGroup(
+            (
+                CancellationTokenSource CancelSource,
+                CancellationToken Cancel,
+                ProgressTrackerPane ProgressTrackerPane,
+                SegmentStopWatch StopWatch
+            ) ppkg,
+            SegmentStopWatch sw,
+            MinedMailInfo[] collection,
+            IPrefix prefix
+        )
         {
-            ppkg.ProgressTrackerPane.Report(0, $"Building {prefix.Key} Classifier -> Creating Classifier Group");
-            var classifierGroup = await CgUtilities.GetOrCreateClassifierGroupAsync(collection, prefix.Key);
+            ppkg.ProgressTrackerPane.Report(
+                0,
+                $"Building {prefix.Key} Classifier -> Creating Classifier Group"
+            );
+            var classifierGroup = await CgUtilities.GetOrCreateClassifierGroupAsync(
+                collection,
+                prefix.Key
+            );
             sw.LogDuration("Get or Create Classifier Group and shared token base");
             sw.WriteToLog(clear: false);
-            ppkg.ProgressTrackerPane.Report(20, $"Building {prefix.Key} Classifier -> Creating Classifier Group");
+            ppkg.ProgressTrackerPane.Report(
+                20,
+                $"Building {prefix.Key} Classifier -> Creating Classifier Group"
+            );
             return classifierGroup;
         }
 
-        private async Task<BayesianClassifierGroup> LoadClassifierGroup(ProgressPackage ppkg, SegmentStopWatch sw, MinedMailInfo[] collection, IPrefix prefix)
+        private async Task<BayesianClassifierGroup> LoadClassifierGroup(
+            ProgressPackage ppkg,
+            SegmentStopWatch sw,
+            MinedMailInfo[] collection,
+            IPrefix prefix
+        )
         {
-            ppkg.ProgressTrackerPane.Report(20, $"Building {prefix.Key} Classifier -> Creating Classifier Group");
-            var classifierGroup = await CgUtilities.GetOrCreateClassifierGroupAsync(collection, prefix.Key);
+            ppkg.ProgressTrackerPane.Report(
+                20,
+                $"Building {prefix.Key} Classifier -> Creating Classifier Group"
+            );
+            var classifierGroup = await CgUtilities.GetOrCreateClassifierGroupAsync(
+                collection,
+                prefix.Key
+            );
             sw.LogDuration("Get or Create Classifier Group and shared token base");
             sw.WriteToLog(clear: false);
             return classifierGroup;
         }
 
-        private async Task<MinedMailInfo[]> LoadStagingData((CancellationTokenSource CancelSource, CancellationToken Cancel, ProgressTrackerPane ProgressTrackerPane, SegmentStopWatch StopWatch) ppkg, SegmentStopWatch sw)
+        private async Task<MinedMailInfo[]> LoadStagingData(
+            (
+                CancellationTokenSource CancelSource,
+                CancellationToken Cancel,
+                ProgressTrackerPane ProgressTrackerPane,
+                SegmentStopWatch StopWatch
+            ) ppkg,
+            SegmentStopWatch sw
+        )
         {
-            ppkg.ProgressTrackerPane.Report(0, "Building Category Classifiers -> Load Mined Mail Info");
-            if (!Globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) { return default; }
+            ppkg.ProgressTrackerPane.Report(
+                0,
+                "Building Category Classifiers -> Load Mined Mail Info"
+            );
+            if (!Globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
+            {
+                return default;
+            }
             var folderPath = Path.Combine(folderRoot, "Bayesian");
             var collection = await EmailDataMiner.Load<MinedMailInfo[]>(folderPath);
             collection.ThrowIfNullOrEmpty();
             sw?.LogDuration("Load Staging");
-            ppkg.ProgressTrackerPane.Report(10, "Building Category Classifiers -> Loaded Mined Mail Info");
+            ppkg.ProgressTrackerPane.Report(
+                10,
+                "Building Category Classifiers -> Loaded Mined Mail Info"
+            );
             return collection;
         }
 
-        public async Task<bool> BuildClassifiersAsync(BayesianClassifierGroup classifierGroup, MinedMailInfo[] collection, ProgressPackage ppkg, IPrefix prefix)
+        public async Task<bool> BuildClassifiersAsync(
+            BayesianClassifierGroup classifierGroup,
+            MinedMailInfo[] collection,
+            ProgressPackage ppkg,
+            IPrefix prefix
+        )
         {
-            var exploded = collection.Where(x => !x.Categories.IsNullOrEmpty()).Select(x => ExplodeMailsByCategory(x, prefix)).SelectMany(x => x).ToList();
+            var exploded = collection
+                .Where(x => !x.Categories.IsNullOrEmpty())
+                .Select(x => ExplodeMailsByCategory(x, prefix))
+                .SelectMany(x => x)
+                .ToList();
 
             var groups = exploded.GroupBy(x => x.GroupingKey);
 
@@ -174,10 +265,16 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             bool success = false;
             try
             {
-                await AsyncMultiTasker.AsyncMultiTaskChunker(groups, async (group) =>
-                {
-                    await BuildClassifierAsync(group, classifierGroup, ppkg.Cancel);
-                }, ppkg.ProgressTrackerPane, "Building Classifiers", ppkg.Cancel);
+                await AsyncMultiTasker.AsyncMultiTaskChunker(
+                    groups,
+                    async (group) =>
+                    {
+                        await BuildClassifierAsync(group, classifierGroup, ppkg.Cancel);
+                    },
+                    ppkg.ProgressTrackerPane,
+                    "Building Classifiers",
+                    ppkg.Cancel
+                );
                 sw.LogDuration("Build Classifiers");
                 sw.WriteToLog(clear: false);
                 success = true;
@@ -191,9 +288,13 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
 
         internal IEnumerable<MinedMailInfo> ExplodeMailsByCategory(MinedMailInfo m, IPrefix prefix)
         {
-            if (m.Categories.IsNullOrEmpty()) { return new List<MinedMailInfo> { m }; }
+            if (m.Categories.IsNullOrEmpty())
+            {
+                return new List<MinedMailInfo> { m };
+            }
             var categories = new FlagParser([.. m.Categories.Split(separator: ',', trim: true)])
-                .Combined.AsListWithPrefix.Where(x => x.Contains(prefix.Value)).ToList();
+                .Combined.AsListWithPrefix.Where(x => x.Contains(prefix.Value))
+                .ToList();
 
             var exploded = categories.Select(x =>
             {
@@ -207,16 +308,22 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
         public virtual async Task BuildClassifierAsync(
             IGrouping<string, MinedMailInfo> group,
             BayesianClassifierGroup classifierGroup,
-            CancellationToken cancel)
+            CancellationToken cancel
+        )
         {
-            var matchFrequency = group.Select(minedMail => minedMail.Tokens)
-                                      .SelectMany(x => x)
-                                      .GroupAndCount();
+            var matchFrequency = group
+                .Select(minedMail => minedMail.Tokens)
+                .SelectMany(x => x)
+                .GroupAndCount();
 
             var matchCorpus = new Corpus(matchFrequency);
             var matchEmailCount = group.Count();
             await classifierGroup.RebuildClassifier(
-                group.Key, matchFrequency, matchEmailCount, cancel);
+                group.Key,
+                matchFrequency,
+                matchEmailCount,
+                cancel
+            );
         }
         #endregion Build Category Classifier
 
@@ -234,14 +341,18 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
         public async Task TestAsync(MailItemHelper helper)
         {
             var results = await GetMatchingCategoriesAsync(helper);
-            if (results.Count() > 0) { await CategorySetter(results, helper); }
+            if (results.Count() > 0)
+            {
+                await CategorySetter(results, helper);
+            }
         }
 
         public async Task<string[]> GetMatchingCategoriesAsync(MailItemHelper helper)
         {
             var results = await ClassifierGroup.ClassifyAsync(helper.Tokens, default);
             var filtered = results
-                .Where(x => x.Probability > ProbabilityThreshold).Select(x => x.Class)
+                .Where(x => x.Probability > ProbabilityThreshold)
+                .Select(x => x.Class)
                 .ToArray();
             return filtered;
         }
@@ -251,7 +362,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             var results = ClassifierGroup.Classify(helper.Tokens);
             // var results2 = results.ToList();
             var filtered = results
-                .Where(x => x.Probability > ProbabilityThreshold).Select(x => x.Class)
+                .Where(x => x.Probability > ProbabilityThreshold)
+                .Select(x => x.Class)
                 .ToArray();
             return filtered;
         }
@@ -274,17 +386,27 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             this.ClassifierGroup.Serialize();
         }
 
-        public Func<MailItemHelper, Task> AsyncAction => (item) =>
-            (Engine is not null && CategorySetter is not null) ?
-            ((CategoryClassifierGroup)Engine).TestAsync(item) : null;
+        public Func<MailItemHelper, Task> AsyncAction =>
+            (item) =>
+                (Engine is not null && CategorySetter is not null)
+                    ? ((CategoryClassifierGroup)Engine).TestAsync(item)
+                    : null;
+
         //public Func<MailItemHelper, Task> AsyncAction { get; set; }
 
-        public Func<object, Task<bool>> AsyncCondition => (item) => Task.Run(() => ConditionLog(item));
+        public Func<object, Task<bool>> AsyncCondition =>
+            (item) => Task.Run(() => ConditionLog(item));
 
         private bool Condition(object item)
         {
-            if (item is not MailItem mailItem) { return false; }
-            if (mailItem.MessageClass != "IPM.Note") { return false; }
+            if (item is not MailItem mailItem)
+            {
+                return false;
+            }
+            if (mailItem.MessageClass != "IPM.Note")
+            {
+                return false;
+            }
             //if (mailItem.UserProperties.Find("Spam") is not null) { return false; }
             return true;
         }
@@ -316,8 +438,12 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
 
         private string GetOlItemString(OutlookItem olItem)
         {
-            var type = olItem.TryGet().OlItemType(out var typeVal) ? $"{typeVal}" : $"{olItem.InnerObject.GetType()}";
-            var created = olItem.TryGet().CreationTime(out var result) ? $" created on {result:g}" : "";
+            var type = olItem.TryGet().OlItemType(out var typeVal)
+                ? $"{typeVal}"
+                : $"{olItem.InnerObject.GetType()}";
+            var created = olItem.TryGet().CreationTime(out var result)
+                ? $" created on {result:g}"
+                : "";
             var subject = olItem.Try().Subject;
             subject = subject.IsNullOrEmpty() ? "" : $" with subject {subject}";
             var sender = olItem.Try().SenderName;
@@ -327,7 +453,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
 
         public object Engine => this;
 
-        public Func<IApplicationGlobals, Task> EngineInitializer => async (globals) => await Task.CompletedTask;
+        public Func<IApplicationGlobals, Task> EngineInitializer =>
+            async (globals) => await Task.CompletedTask;
 
         public string EngineName { get; internal set; }
 
@@ -335,8 +462,6 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
 
         public MailItemHelper TypedItem { get; set; }
 
-
         #endregion IConditionalEngine Implementation
-
     }
 }

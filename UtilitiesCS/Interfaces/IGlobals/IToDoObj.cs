@@ -1,9 +1,8 @@
-﻿using Outlook = Microsoft.Office.Interop.Outlook;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
-
     public interface IToDoObj<T>
     {
         string Filename { get; set; }

@@ -66,11 +66,14 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             int observedCount = -1;
 
             // Act
-            list.AddLast("alpha", item =>
-            {
-                observed = item;
-                observedCount = list.Count;
-            });
+            list.AddLast(
+                "alpha",
+                item =>
+                {
+                    observed = item;
+                    observedCount = list.Count;
+                }
+            );
 
             // Assert
             observed.Should().Be("alpha");

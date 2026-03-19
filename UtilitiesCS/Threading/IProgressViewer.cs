@@ -14,8 +14,9 @@ namespace UtilitiesCS
         public ProgressBar Bar { get; }
         public Label JobName { get; }
         public Button ButtonCancel { get; }
-        public void SetCancellationTokenSource(System.Threading.CancellationTokenSource tokenSource);
+        public void SetCancellationTokenSource(
+            System.Threading.CancellationTokenSource tokenSource
+        );
         public System.Windows.Threading.Dispatcher UiDispatcher { get; set; }
-
     }
 }

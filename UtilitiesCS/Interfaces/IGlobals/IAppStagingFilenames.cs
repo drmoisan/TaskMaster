@@ -1,5 +1,4 @@
-﻿
-namespace UtilitiesCS
+﻿namespace UtilitiesCS
 {
     public interface IAppStagingFilenames
     {

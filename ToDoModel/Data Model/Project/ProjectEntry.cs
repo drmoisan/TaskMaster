@@ -1,12 +1,12 @@
 ﻿using System;
-using UtilitiesCS;
 using System.Collections.Generic;
-using System.Windows.Forms;
-using Newtonsoft.Json;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using Microsoft.Office.Core;
+using Newtonsoft.Json;
+using UtilitiesCS;
 
 namespace ToDoModel
 {
@@ -18,8 +18,16 @@ namespace ToDoModel
         private string _programName;
         private Action<string, string> _idUpdate;
 
-        public string ProjectName { get => _projectName; set => _projectName = value; }
-        public string ProgramName { get => _programName; set => _programName = value; }
+        public string ProjectName
+        {
+            get => _projectName;
+            set => _projectName = value;
+        }
+        public string ProgramName
+        {
+            get => _programName;
+            set => _programName = value;
+        }
         public string ProjectID
         {
             get => _projectID;
@@ -29,8 +37,10 @@ namespace ToDoModel
             {
                 if ((value is not null) && (value.Length != 4))
                 {
-                    MessageBox.Show($"{nameof(ProjectID)} cannot be set with malformed value {value}." +
-                        "Value should be 4 digits or characters");
+                    MessageBox.Show(
+                        $"{nameof(ProjectID)} cannot be set with malformed value {value}."
+                            + "Value should be 4 digits or characters"
+                    );
                 }
                 else if (_projectID is null)
                 {
@@ -38,14 +48,24 @@ namespace ToDoModel
                 }
                 else if (_projectID != value)
                 {
-                    var response = MessageBox.Show($"Are you sure you want to change {nameof(ProjectID)} from" +
-                        $"{_projectID} to {value}", "Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    var response = MessageBox.Show(
+                        $"Are you sure you want to change {nameof(ProjectID)} from"
+                            + $"{_projectID} to {value}",
+                        "Dialog",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question
+                    );
                     if (response == DialogResult.Yes)
                     {
                         if (_idUpdate is not null)
                         {
-                            var response2 = MessageBox.Show("Would you like to change underlying outlook objects, " +
-                            "child objects, and update ID List?", "Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                            var response2 = MessageBox.Show(
+                                "Would you like to change underlying outlook objects, "
+                                    + "child objects, and update ID List?",
+                                "Dialog",
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Question
+                            );
                             if (response2 == DialogResult.Yes)
                             {
                                 _idUpdate.Invoke(_projectID, value);
@@ -54,11 +74,14 @@ namespace ToDoModel
                         _projectID = value;
                     }
                 }
-
             }
         }
         private string _programID;
-        public string ProgramID { get => _programID; set => _programID = value; }
+        public string ProgramID
+        {
+            get => _programID;
+            set => _programID = value;
+        }
 
         public ProjectEntry(string ProjName, string ProjID, string ProgName)
         {
@@ -91,8 +114,13 @@ namespace ToDoModel
                     return true;
 
                 case string s when s.Length != 4:
-                    MyBox.ShowDialog($"{nameof(ProjectID)} cannot be set with malformed value {newID}." +
-                        "Value should be 4 digits or characters", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MyBox.ShowDialog(
+                        $"{nameof(ProjectID)} cannot be set with malformed value {newID}."
+                            + "Value should be 4 digits or characters",
+                        "Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    );
                     return false;
 
                 case string s when s == ProjectID:
@@ -102,7 +130,9 @@ namespace ToDoModel
                     return ChangeId(newID);
 
                 default:
-                    throw new ArgumentException($"Unsupported value for {nameof(newID)} of {newID}");
+                    throw new ArgumentException(
+                        $"Unsupported value for {nameof(newID)} of {newID}"
+                    );
             }
 
             return false;
@@ -110,14 +140,24 @@ namespace ToDoModel
 
         internal bool ChangeId(string newID)
         {
-            var response = MyBox.ShowDialog($"Are you sure you want to change {nameof(ProjectID)} from" +
-                    $"{ProjectID} to {newID}", "Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var response = MyBox.ShowDialog(
+                $"Are you sure you want to change {nameof(ProjectID)} from"
+                    + $"{ProjectID} to {newID}",
+                "Dialog",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question
+            );
             if (response == DialogResult.Yes)
             {
                 if (_idUpdate is not null)
                 {
-                    var response2 = MyBox.ShowDialog("Would you like to change underlying outlook objects, " +
-                    "child objects, and update ID List?", "Dialog", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    var response2 = MyBox.ShowDialog(
+                        "Would you like to change underlying outlook objects, "
+                            + "child objects, and update ID List?",
+                        "Dialog",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question
+                    );
                     if (response2 == DialogResult.Yes)
                     {
                         _idUpdate.Invoke(ProjectID, newID);
@@ -141,8 +181,14 @@ namespace ToDoModel
 
         public int CompareTo(IProjectEntry other)
         {
-            if (other is null) { return 1; }
-            else if (ProjectID is null) { return -1; }
+            if (other is null)
+            {
+                return 1;
+            }
+            else if (ProjectID is null)
+            {
+                return -1;
+            }
             else
             {
                 int x = string.CompareOrdinal(ProjectID, other.ProjectID);
@@ -190,30 +236,35 @@ namespace ToDoModel
 
         public bool Equals(ProjectEntry other)
         {
-            return other is not null &&
-                   ProjectName == other.ProjectName &&
-                   ProjectID == other.ProjectID &&
-                   ProgramName == other.ProgramName;
+            return other is not null
+                && ProjectName == other.ProjectName
+                && ProjectID == other.ProjectID
+                && ProgramName == other.ProgramName;
         }
 
         public bool Equals(IProjectEntry other)
         {
-            return other is not null &&
-                   ProjectName == other.ProjectName &&
-                   ProjectID == other.ProjectID &&
-                   ProgramName == other.ProgramName;
+            return other is not null
+                && ProjectName == other.ProjectName
+                && ProjectID == other.ProjectID
+                && ProgramName == other.ProgramName;
         }
 
         public override int GetHashCode()
         {
             int hashCode = 682028280;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ProjectName);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ProjectID);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ProgramName);
+            hashCode =
+                hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ProjectName);
+            hashCode =
+                hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ProjectID);
+            hashCode =
+                hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ProgramName);
             return hashCode;
         }
 
         public bool IsAnyNull()
-        { return (ProjectName is null) || (ProjectID is null) || (ProgramName is null); }
+        {
+            return (ProjectName is null) || (ProjectID is null) || (ProgramName is null);
+        }
     }
 }

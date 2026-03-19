@@ -31,8 +31,7 @@ namespace UtilitiesCS.Test.HelperClasses
             Action act = () => "value".ToJustifiedText(0);
 
             // Assert
-            act.Should().Throw<ArgumentOutOfRangeException>()
-                .WithParameterName("width");
+            act.Should().Throw<ArgumentOutOfRangeException>().WithParameterName("width");
         }
 
         [TestMethod]
@@ -52,17 +51,14 @@ namespace UtilitiesCS.Test.HelperClasses
         public void ToFormattedText_WithHeadersAndAggregatorRow_FormatsTitleHeadersAndDivider()
         {
             // Arrange
-            string[][] rows =
-            {
-                new[] { "subtotal", "10" },
-                new[] { "item", "2" },
-            };
+            string[][] rows = { new[] { "subtotal", "10" }, new[] { "item", "2" } };
 
             // Act
             var formatted = rows.ToFormattedText(
                 headers: new[] { "Name", "Count" },
                 justifications: new[] { Enums.Justification.Left, Enums.Justification.Right },
-                title: "Summary Report");
+                title: "Summary Report"
+            );
 
             // Assert
             formatted.Should().Contain("Summary Report");
@@ -77,11 +73,7 @@ namespace UtilitiesCS.Test.HelperClasses
         public void ToFormattedText_ForGenericDictionary_UsesConvertersAndTitle()
         {
             // Arrange
-            var dict = new Dictionary<int, decimal>
-            {
-                [7] = 12.5m,
-                [9] = 2m,
-            };
+            var dict = new Dictionary<int, decimal> { [7] = 12.5m, [9] = 2m };
 
             // Act
             var formatted = dict.ToFormattedText(
@@ -89,7 +81,8 @@ namespace UtilitiesCS.Test.HelperClasses
                 value => value.ToString("0.0"),
                 headers: new[] { "Id", "Amount" },
                 justifications: new[] { Enums.Justification.Left, Enums.Justification.Right },
-                title: "Nested Values");
+                title: "Nested Values"
+            );
 
             // Assert
             formatted.Should().Contain("Nested Values");
@@ -143,11 +136,15 @@ namespace UtilitiesCS.Test.HelperClasses
         public void ArrayToDatatable_WithHeaderLengthMismatch_ThrowsArgumentException()
         {
             // Arrange
-            object[,] values = { { 1, 2 } };
+            object[,] values =
+            {
+                { 1, 2 },
+            };
             Action act = () => PrettyPrinters.ArraytoDatatable(values, new[] { "OnlyOne" });
 
             // Assert
-            act.Should().Throw<ArgumentException>()
+            act.Should()
+                .Throw<ArgumentException>()
                 .WithMessage("*must match number of columns 2*");
         }
 

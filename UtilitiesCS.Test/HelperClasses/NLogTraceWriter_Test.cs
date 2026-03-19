@@ -1,10 +1,10 @@
-﻿using log4net.Repository.Hierarchy;
-using log4net;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json.Serialization;
+﻿using System;
 using System.Diagnostics;
+using log4net;
+using log4net.Repository.Hierarchy;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
+using Newtonsoft.Json.Serialization;
 
 namespace UtilitiesCS.Test.HelperClasses
 {
@@ -29,10 +29,14 @@ namespace UtilitiesCS.Test.HelperClasses
         internal Mock<ILog> SetupLogger()
         {
             var l = this.mockRepository.Create<ILog>();
-            l.Setup(x => x.Error(It.IsAny<object>(), It.IsAny<Exception>())).Callback<object, Exception>((message, ex) => PrintLogCall("Error", message, ex));
-            l.Setup(x => x.Warn(It.IsAny<object>(), It.IsAny<Exception>())).Callback<object, Exception>((message, ex) => PrintLogCall("Warn", message, ex));
-            l.Setup(x => x.Info(It.IsAny<object>(), It.IsAny<Exception>())).Callback<object, Exception>((message, ex) => PrintLogCall("Info", message, ex));
-            l.Setup(x => x.Debug(It.IsAny<object>(), It.IsAny<Exception>())).Callback<object, Exception>((message, ex) => PrintLogCall("Debug", message, ex));
+            l.Setup(x => x.Error(It.IsAny<object>(), It.IsAny<Exception>()))
+                .Callback<object, Exception>((message, ex) => PrintLogCall("Error", message, ex));
+            l.Setup(x => x.Warn(It.IsAny<object>(), It.IsAny<Exception>()))
+                .Callback<object, Exception>((message, ex) => PrintLogCall("Warn", message, ex));
+            l.Setup(x => x.Info(It.IsAny<object>(), It.IsAny<Exception>()))
+                .Callback<object, Exception>((message, ex) => PrintLogCall("Info", message, ex));
+            l.Setup(x => x.Debug(It.IsAny<object>(), It.IsAny<Exception>()))
+                .Callback<object, Exception>((message, ex) => PrintLogCall("Debug", message, ex));
 
             return l;
         }

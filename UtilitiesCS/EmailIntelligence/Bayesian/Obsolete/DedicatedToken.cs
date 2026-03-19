@@ -16,10 +16,18 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         private string _token;
-        public string Token { get => _token; set => _token = value; }
+        public string Token
+        {
+            get => _token;
+            set => _token = value;
+        }
 
         private string _folderPath;
-        public string FolderPath { get => _folderPath; set => _folderPath = value; }
+        public string FolderPath
+        {
+            get => _folderPath;
+            set => _folderPath = value;
+        }
 
         //private int _count;
         //public int Count { get => _count; set => _count = value; }
@@ -40,10 +48,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
 #nullable enable
 
-        public event PropertyChangedEventHandler? PropertyChanged { add { } remove { } }
+        public event PropertyChangedEventHandler? PropertyChanged
+        {
+            add { }
+            remove { }
+        }
 
         #endregion INotifyPropertyChanged
-
-
     }
 }

@@ -1,27 +1,28 @@
-﻿using log4net;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using log4net;
 
 namespace UtilitiesCS.Threading
 {
     /// <summary>
-	/// ApplicationIdleTimer provides a convenient way of
-	/// processing events only during application dormancy.
-	/// Why use this instead of the Application.Idle event?
-	/// That event gets fired EVERY TIME the message stack
-	/// is exhausted, which basically means it fires very
-	/// frequently.  With this, you only get events when 
-	/// the application is actually idle.
-	/// </summary>
-	public class ApplicationIdleTimer
+    /// ApplicationIdleTimer provides a convenient way of
+    /// processing events only during application dormancy.
+    /// Why use this instead of the Application.Idle event?
+    /// That event gets fired EVERY TIME the message stack
+    /// is exhausted, which basically means it fires very
+    /// frequently.  With this, you only get events when
+    /// the application is actually idle.
+    /// </summary>
+    public class ApplicationIdleTimer
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Static Members and Events
 
@@ -30,10 +31,10 @@ namespace UtilitiesCS.Threading
         private SynchronizationContext syncContext;
 
         // Notes:
-        // Could have utilized the System.Timers.ElapsedEventArgs, but that 
+        // Could have utilized the System.Timers.ElapsedEventArgs, but that
         // only provides the time an event happend (even though it's called
         // "Elapsed" not "Timed" EventArgs).  I figgure most listeners care
-        // less *WHEN* the app went idle, but rather *HOW LONG* it has been 
+        // less *WHEN* the app went idle, but rather *HOW LONG* it has been
         // idle.
 
         /// <summary>
@@ -43,6 +44,7 @@ namespace UtilitiesCS.Threading
         {
             // time of last idle
             private DateTime _idleSince;
+
             // duration of "idleness"
             private TimeSpan _idleTime;
 
@@ -50,7 +52,8 @@ namespace UtilitiesCS.Threading
             /// Internal constructor
             /// </summary>
             /// <param name="idleSince">Time app was declared idle</param>
-            internal ApplicationIdleEventArgs(DateTime idleSince) : base()
+            internal ApplicationIdleEventArgs(DateTime idleSince)
+                : base()
             {
                 _idleSince = idleSince;
                 _idleTime = new TimeSpan(DateTime.Now.Ticks - idleSince.Ticks);
@@ -72,6 +75,7 @@ namespace UtilitiesCS.Threading
                 get { return _idleTime; }
             }
         }
+
         /// <summary>
         /// ApplicationIdle event handler.
         /// </summary>
@@ -90,15 +94,20 @@ namespace UtilitiesCS.Threading
 
         // Tracks idle state
         private bool isIdle;
+
         // Last time application was declared "idle"
         private System.DateTime lastAppIdleTime;
+
         // Last time we checked for GUI activity
         private long lastIdleCheckpoint;
+
         // Running count of Application.Idle events recorded since a checkpoint.
         // Expressed as a long (instead of int) for math.
         private long idlesSinceCheckpoint;
+
         // Number of ticks used by application process at last checkpoint
         private long cpuTime;
+
         // Last time we checked for cpu activity
         private long lastCpuCheckpoint;
 
@@ -106,6 +115,7 @@ namespace UtilitiesCS.Threading
         // Maximum "activity" (Application.Idle events per second) that will be considered "idle"
         // Here it is expressed as minimum ticks between idles.
         private long guiThreshold = TimeSpan.TicksPerMillisecond * 50L;
+
         // Maximum CPU use (percentage) that is considered "idle"
         private double cpuThreshold = 0.10;
 
@@ -115,7 +125,7 @@ namespace UtilitiesCS.Threading
         #region Constructors
         /// <summary>
         /// Private constructor.  One instance is plenty.
-        /// </summary> 
+        /// </summary>
         private ApplicationIdleTimer()
         {
             syncContext = SynchronizationContext.Current;
@@ -137,7 +147,9 @@ namespace UtilitiesCS.Threading
 
             // Hook into the events
             _timer.Elapsed += Heartbeat;
-            logger.Debug($"{nameof(ApplicationIdle)} is subscribing to {nameof(System.Windows.Forms.Application.Idle)} event. \n{TraceUtility.GetMethodCallLogString()}");
+            logger.Debug(
+                $"{nameof(ApplicationIdle)} is subscribing to {nameof(System.Windows.Forms.Application.Idle)} event. \n{TraceUtility.GetMethodCallLogString()}"
+            );
 
             System.Windows.Forms.Application.Idle += Application_Idle;
             Interlocked.Increment(ref subscriptionCount);
@@ -152,14 +164,19 @@ namespace UtilitiesCS.Threading
             _timer.Elapsed -= Heartbeat;
             if (syncContext != null)
             {
-                syncContext.Post(_ => System.Windows.Forms.Application.Idle -= Application_Idle, null);
+                syncContext.Post(
+                    _ => System.Windows.Forms.Application.Idle -= Application_Idle,
+                    null
+                );
             }
             else
             {
                 System.Windows.Forms.Application.Idle -= Application_Idle;
             }
             //System.Windows.Forms.Application.Idle -= Application_Idle;
-            logger.Debug($"{nameof(ApplicationIdle)} unsubscribed from {nameof(System.Windows.Forms.Application.Idle)} event. \n{TraceUtility.GetMethodCallLogString()}");
+            logger.Debug(
+                $"{nameof(ApplicationIdle)} unsubscribed from {nameof(System.Windows.Forms.Application.Idle)} event. \n{TraceUtility.GetMethodCallLogString()}"
+            );
             Interlocked.Decrement(ref subscriptionCount);
         }
 
@@ -191,11 +208,11 @@ namespace UtilitiesCS.Threading
             long delta = DateTime.UtcNow.Ticks - lastIdleCheckpoint;
 
             // Determine average idle events per second.  Done manually here
-            // instead of using the ComputeGUIActivity() method to avoid the 
+            // instead of using the ComputeGUIActivity() method to avoid the
             // unnecessary numeric conversion and use of a TimeSpan object.
             if (delta >= TimeSpan.TicksPerSecond)
             {
-                // It's been over a second since last checkpoint, 
+                // It's been over a second since last checkpoint,
                 // so determine how "busy" the app has been over that timeframe.
                 if (idlesSinceCheckpoint == 0 || delta / idlesSinceCheckpoint >= guiThreshold)
                 {
@@ -227,6 +244,7 @@ namespace UtilitiesCS.Threading
                     OnApplicationIdle();
             }
         }
+
         private void Application_Idle(object sender, EventArgs e)
         {
             // Increment idle counter.
@@ -239,13 +257,19 @@ namespace UtilitiesCS.Threading
 
         private Delegate FindTriggeringEventHandler(object sender, EventArgs e)
         {
-            EventInfo idleEventInfo = typeof(System.Windows.Forms.Application)
-                .GetEvent("Idle", BindingFlags.Static | BindingFlags.Public);
-            if (idleEventInfo == null) return null;
+            EventInfo idleEventInfo = typeof(System.Windows.Forms.Application).GetEvent(
+                "Idle",
+                BindingFlags.Static | BindingFlags.Public
+            );
+            if (idleEventInfo == null)
+                return null;
 
-            FieldInfo eventField = typeof(System.Windows.Forms.Application)
-                .GetField("Idle", BindingFlags.Static | BindingFlags.NonPublic);
-            if (eventField == null) return null;
+            FieldInfo eventField = typeof(System.Windows.Forms.Application).GetField(
+                "Idle",
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
+            if (eventField == null)
+                return null;
 
             object eventFieldValue = eventField.GetValue(null);
             if (eventFieldValue is MulticastDelegate eventDelegate)
@@ -299,14 +323,19 @@ namespace UtilitiesCS.Threading
 
         internal double ComputeGUIActivity()
         {
-            if (idlesSinceCheckpoint <= 0) return 0.0;
+            if (idlesSinceCheckpoint <= 0)
+                return 0.0;
 
             TimeSpan delta = new TimeSpan(DateTime.UtcNow.Ticks - lastIdleCheckpoint);
             if (delta.Ticks == 0)
             {
                 // Clock hasn't updated yet.  Return a "real" value
                 // based on counter (either 0 or twice the threshold).
-                return (idlesSinceCheckpoint == 0 ? 0.0 : ((double)TimeSpan.TicksPerSecond / (double)instance.guiThreshold) * 2.0);
+                return (
+                    idlesSinceCheckpoint == 0
+                        ? 0.0
+                        : ((double)TimeSpan.TicksPerSecond / (double)instance.guiThreshold) * 2.0
+                );
             }
 
             // Expressed as activity (number of idles) per second.
@@ -315,10 +344,12 @@ namespace UtilitiesCS.Threading
             // Note that this method, unlike his CPU brother, does not reset any counters.
             // The gui activity counters are reset once a second by the Heartbeat.
         }
+
         private void OnApplicationIdle()
         {
             // Check to see if anyone cares.
-            if (ApplicationIdle == null) return;
+            if (ApplicationIdle == null)
+                return;
 
             // Build the message
             ApplicationIdleEventArgs e = new ApplicationIdleEventArgs(this.lastAppIdleTime);
@@ -343,9 +374,9 @@ namespace UtilitiesCS.Threading
         }
 
         /// <summary>
-        /// Returns an "indication" of the gui activity, expressed as 
+        /// Returns an "indication" of the gui activity, expressed as
         /// activity per second.  0 indicates no activity.
-        /// GUI activity includes user interactions (typing, 
+        /// GUI activity includes user interactions (typing,
         /// moving mouse) as well as events, paint operations, etc.
         /// </summary>
         public static double CurrentGUIActivity
@@ -354,7 +385,7 @@ namespace UtilitiesCS.Threading
         }
 
         /// <summary>
-        /// Returns the *last determined* idle state.  Idle state is 
+        /// Returns the *last determined* idle state.  Idle state is
         /// recomputed once per second.  Both the gui and the cpu must
         /// be idle for this property to be true.
         /// </summary>
@@ -369,15 +400,16 @@ namespace UtilitiesCS.Threading
         /// </summary>
         public static double GUIActivityThreshold
         {
-            get
-            {
-                return ((double)TimeSpan.TicksPerSecond / (double)instance.guiThreshold);
-            }
+            get { return ((double)TimeSpan.TicksPerSecond / (double)instance.guiThreshold); }
             set
             {
                 // validate value
                 if (value <= 0.0)
-                    throw new ArgumentOutOfRangeException("GUIActivityThreshold", value, "GUIActivityThreshold must be greater than zero.");
+                    throw new ArgumentOutOfRangeException(
+                        "GUIActivityThreshold",
+                        value,
+                        "GUIActivityThreshold must be greater than zero."
+                    );
 
                 instance.guiThreshold = (long)((double)TimeSpan.TicksPerSecond / value);
             }
@@ -398,13 +430,18 @@ namespace UtilitiesCS.Threading
 
                 // validate value
                 if (value < 0.0)
-                    throw new ArgumentOutOfRangeException("CPUUsageThreshold", value, "Negative values are not allowed.");
+                    throw new ArgumentOutOfRangeException(
+                        "CPUUsageThreshold",
+                        value,
+                        "Negative values are not allowed."
+                    );
 
                 instance.cpuThreshold = value;
             }
         }
 
-        internal static ThreadSafeSingleShotGuard Guard { get; private set; } = new ThreadSafeSingleShotGuard();
+        internal static ThreadSafeSingleShotGuard Guard { get; private set; } =
+            new ThreadSafeSingleShotGuard();
 
         #endregion
 
@@ -441,5 +478,4 @@ namespace UtilitiesCS.Threading
 
         #endregion Static Public Methods
     }
-
 }

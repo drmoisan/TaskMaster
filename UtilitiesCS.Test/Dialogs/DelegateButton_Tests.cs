@@ -1,8 +1,8 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test
 {
@@ -29,7 +29,12 @@ namespace UtilitiesCS.Test
         public void Constructor_WithNameTextAndTemplate_ClonesTemplateAndCreatesVisibleEnabledButton()
         {
             // Arrange
-            var template = new Button { BackColor = Color.CadetBlue, Enabled = false, Visible = false };
+            var template = new Button
+            {
+                BackColor = Color.CadetBlue,
+                Enabled = false,
+                Visible = false,
+            };
             var callback = new Action(() => { });
 
             // Act
@@ -67,7 +72,11 @@ namespace UtilitiesCS.Test
             // Arrange
             var clicked = false;
             var button = new Button();
-            var delegateButton = DelegateButton.FromButton(button, DialogResult.Retry, new Action(() => clicked = true));
+            var delegateButton = DelegateButton.FromButton(
+                button,
+                DialogResult.Retry,
+                new Action(() => clicked = true)
+            );
 
             // Act
             button.PerformClick();
@@ -86,7 +95,11 @@ namespace UtilitiesCS.Test
             var newClicked = false;
             var oldButton = new Button();
             var newButton = new Button();
-            var delegateButton = new DelegateButton(oldButton, DialogResult.OK, new Action(() => oldClicked = true));
+            var delegateButton = new DelegateButton(
+                oldButton,
+                DialogResult.OK,
+                new Action(() => oldClicked = true)
+            );
             delegateButton.Delegate = new Action(() => newClicked = true);
 
             // Act

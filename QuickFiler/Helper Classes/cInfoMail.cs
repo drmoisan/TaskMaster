@@ -30,9 +30,8 @@ using UtilitiesCS;
 //        //private Collection _col;
 //        private Dictionary<string, long> _dict;
 
-
 //        /// <summary>
-//        /// This is actually a reverse sort. 
+//        /// This is actually a reverse sort.
 //        /// </summary>
 //        private void ReverseSortDictionary()
 //        {

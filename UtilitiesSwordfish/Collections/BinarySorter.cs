@@ -1,7 +1,7 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
@@ -14,13 +14,11 @@ using System.Text;
 
 namespace Swordfish.NET.Collections
 {
-
     /// <summary>
     /// This class is a helper for creating binary sorted lists
     /// </summary>
     internal class BinarySorter<TKey>
     {
-
         // ************************************************************************
         // Private Fields
         // ************************************************************************
@@ -78,7 +76,11 @@ namespace Swordfish.NET.Collections
             }
             else
             {
-                return string.Compare(key1.ToString(), key2.ToString(), StringComparison.InvariantCultureIgnoreCase);
+                return string.Compare(
+                    key1.ToString(),
+                    key2.ToString(),
+                    StringComparison.InvariantCultureIgnoreCase
+                );
             }
         }
 
@@ -94,7 +96,6 @@ namespace Swordfish.NET.Collections
         {
             while (high >= low)
             {
-
                 // Calculate the mid point and determine if the key passed in
                 // should be inserted at this point, below it, or above it.
                 int mid = low + ((high - low) >> 1);

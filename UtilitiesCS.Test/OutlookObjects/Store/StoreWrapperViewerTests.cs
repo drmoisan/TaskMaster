@@ -2,16 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Forms;
-
 using FluentAssertions;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using Moq;
-
 using UtilitiesCS;
 using UtilitiesCS.OutlookObjects.Store;
-
 using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
 
 namespace UtilitiesCS.Test.OutlookObjects.Store
@@ -60,7 +55,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         {
             var controller = CreateController();
             using var viewer = CreateViewer(controller);
-            var store = CreateProjectedStore("Mailbox", "Inbox Path", "Root Path", "owner@example.com");
+            var store = CreateProjectedStore(
+                "Mailbox",
+                "Inbox Path",
+                "Root Path",
+                "owner@example.com"
+            );
             var model = new StoresWrapper { Stores = new List<StoreWrapper> { store } };
 
             SetInternalProperty(controller, "Model", model);
@@ -117,7 +117,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             string displayName,
             string inboxPath,
             string rootPath,
-            string userEmailAddress)
+            string userEmailAddress
+        )
         {
             var inbox = new Mock<OutlookFolder>();
             var rootFolder = new Mock<OutlookFolder>();
@@ -140,14 +141,24 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
 
         private static T GetInternalProperty<T>(object instance, string propertyName)
         {
-            var property = instance.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            var property = instance
+                .GetType()
+                .GetProperty(
+                    propertyName,
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+                );
             property.Should().NotBeNull($"property {propertyName} should exist");
             return (T)property!.GetValue(instance);
         }
 
         private static void SetInternalProperty(object instance, string propertyName, object value)
         {
-            var property = instance.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            var property = instance
+                .GetType()
+                .GetProperty(
+                    propertyName,
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+                );
             property.Should().NotBeNull($"property {propertyName} should exist");
             property!.SetValue(instance, value);
         }

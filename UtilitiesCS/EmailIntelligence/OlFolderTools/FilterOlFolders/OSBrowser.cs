@@ -1,6 +1,4 @@
-﻿using BrightIdeasSoftware;
-using ObjectListViewDemo;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,6 +10,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BrightIdeasSoftware;
+using ObjectListViewDemo;
 using UtilitiesCS.HelperClasses.FileSystem;
 
 namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
@@ -33,7 +33,6 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
 
         private void SetupDragAndDrop()
         {
-
             // Setup the tree so that it can drop and drop.
 
             // Dropping doesn't do anything, but it does show how it works
@@ -41,7 +40,7 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
             treeListView.IsSimpleDragSource = true;
             treeListView.IsSimpleDropSink = true;
 
-            treeListView.ModelCanDrop += delegate (object sender, ModelDropEventArgs e)
+            treeListView.ModelCanDrop += delegate(object sender, ModelDropEventArgs e)
             {
                 e.Effect = DragDropEffects.None;
                 if (e.TargetModel == null)
@@ -53,38 +52,46 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
                     e.InfoMessage = "Can only drop on directories";
             };
 
-            treeListView.ModelDropped += delegate (object sender, ModelDropEventArgs e)
+            treeListView.ModelDropped += delegate(object sender, ModelDropEventArgs e)
             {
-                String msg = String.Format("{2} items were dropped on '{1}' as a {0} operation.",
-                    e.Effect, ((DirectoryInfo)e.TargetModel).Name, e.SourceModels.Count);
-                MessageBox.Show(msg, "Object List View Demo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                String msg = String.Format(
+                    "{2} items were dropped on '{1}' as a {0} operation.",
+                    e.Effect,
+                    ((DirectoryInfo)e.TargetModel).Name,
+                    e.SourceModels.Count
+                );
+                MessageBox.Show(
+                    msg,
+                    "Object List View Demo",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
             };
         }
 
         private void SetupTree()
         {
-
             // TreeListView require two delegates:
             // 1. CanExpandGetter - Can a particular model be expanded?
             // 2. ChildrenGetter - Once the CanExpandGetter returns true, ChildrenGetter should return the list of children
 
             // CanExpandGetter is called very often! It must be very fast.
 
-            this.treeListView.CanExpandGetter = delegate (object x)
+            this.treeListView.CanExpandGetter = delegate(object x)
             {
                 return ((MyFileSystemInfo)x).IsDirectory;
             };
 
             // We just want to get the children of the given directory.
-            // This becomes a little complicated when we can't (for whatever reason). We need to report the error 
+            // This becomes a little complicated when we can't (for whatever reason). We need to report the error
             // to the user, but we can't just call MessageBox.Show() directly, since that would stall the UI thread
             // leaving the tree in a potentially undefined state (not good). We also don't want to keep trying to
             // get the contents of the given directory if the tree is refreshed. To get around the first problem,
-            // we immediately return an empty list of children and use BeginInvoke to show the MessageBox at the 
+            // we immediately return an empty list of children and use BeginInvoke to show the MessageBox at the
             // earliest opportunity. We get around the second problem by collapsing the branch again, so it's children
             // will not be fetched when the tree is refreshed. The user could still explicitly unroll it again --
             // that's their problem :)
-            this.treeListView.ChildrenGetter = delegate (object x)
+            this.treeListView.ChildrenGetter = delegate(object x)
             {
                 try
                 {
@@ -92,11 +99,20 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
                 }
                 catch (UnauthorizedAccessException ex)
                 {
-                    this.BeginInvoke((MethodInvoker)delegate ()
-                    {
-                        this.treeListView.Collapse(x);
-                        MessageBox.Show(this, ex.Message, "ObjectListViewDemo", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    });
+                    this.BeginInvoke(
+                        (MethodInvoker)
+                            delegate()
+                            {
+                                this.treeListView.Collapse(x);
+                                MessageBox.Show(
+                                    this,
+                                    ex.Message,
+                                    "ObjectListViewDemo",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Exclamation
+                                );
+                            }
+                    );
                     return new ArrayList();
                 }
             };
@@ -109,9 +125,10 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
             foreach (DriveInfo di in DriveInfo.GetDrives())
             {
                 if (di.IsReady)
-
                     // Update the code to use DirectoryInfoWrapper
-                    roots.Add(new MyFileSystemInfo(new DirectoryInfoWrapper(new DirectoryInfo(di.Name))));
+                    roots.Add(
+                        new MyFileSystemInfo(new DirectoryInfoWrapper(new DirectoryInfo(di.Name)))
+                    );
                 //roots.Add(new MyFileSystemInfo(new DirectoryInfo(di.Name)));
             }
             this.treeListView.Roots = roots;
@@ -120,20 +137,20 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
         private void SetupColumns()
         {
             // The column setup here is identical to the File Explorer example tab --
-            // nothing specific to the TreeListView. 
+            // nothing specific to the TreeListView.
 
             // The only difference is that we don't setup anything to do with grouping,
             // since TreeListViews can't show groups.
 
             SysImageListHelper helper = new SysImageListHelper(this.treeListView);
-            this.olvColumnName.ImageGetter = delegate (object x)
+            this.olvColumnName.ImageGetter = delegate(object x)
             {
                 return helper.GetImageIndex(((MyFileSystemInfo)x).FullName);
             };
 
-            // Get the size of the file system entity. 
+            // Get the size of the file system entity.
             // Folders and errors are represented as negative numbers
-            this.olvColumnSize.AspectGetter = delegate (object x)
+            this.olvColumnSize.AspectGetter = delegate(object x)
             {
                 MyFileSystemInfo myFileSystemInfo = (MyFileSystemInfo)x;
 
@@ -152,10 +169,10 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
             };
 
             // Show the size of files as GB, MB and KBs. By returning the actual
-            // size in the AspectGetter, and doing the conversion in the 
+            // size in the AspectGetter, and doing the conversion in the
             // AspectToStringConverter, sorting on this column will work off the
             // actual sizes, rather than the formatted string.
-            this.olvColumnSize.AspectToStringConverter = delegate (object x)
+            this.olvColumnSize.AspectToStringConverter = delegate(object x)
             {
                 long sizeInBytes = (long)x;
                 if (sizeInBytes < 0) // folder or error
@@ -164,15 +181,15 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
             };
 
             // Show the system description for this object
-            this.olvColumnFileType.AspectGetter = delegate (object x)
+            this.olvColumnFileType.AspectGetter = delegate(object x)
             {
                 return ShellUtilitiesStatic.GetFileType(((MyFileSystemInfo)x).FullName);
             };
 
             // Show the file attributes for this object
-            // A FlagRenderer masks off various values and draws zero or images based 
+            // A FlagRenderer masks off various values and draws zero or images based
             // on the presence of individual bits.
-            this.olvColumnAttributes.AspectGetter = delegate (object x)
+            this.olvColumnAttributes.AspectGetter = delegate(object x)
             {
                 return ((MyFileSystemInfo)x).Attributes;
             };
@@ -186,7 +203,9 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
             this.olvColumnAttributes.Renderer = attributesRenderer;
 
             // Tell the filtering subsystem that the attributes column is a collection of flags
-            this.olvColumnAttributes.ClusteringStrategy = new FlagClusteringStrategy(typeof(FileAttributes));
+            this.olvColumnAttributes.ClusteringStrategy = new FlagClusteringStrategy(
+                typeof(FileAttributes)
+            );
         }
 
         /// <summary>
@@ -208,10 +227,4 @@ namespace UtilitiesCS.EmailIntelligence.FilterOlFolders
             return String.Format("{0} bytes", size);
         }
     }
-
-
-
-
 }
-
-

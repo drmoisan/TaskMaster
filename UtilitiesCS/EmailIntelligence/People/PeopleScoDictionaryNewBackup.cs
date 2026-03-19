@@ -1,7 +1,4 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Outlook = Microsoft.Office.Interop.Outlook;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -10,27 +7,57 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
+using Microsoft.Office.Interop.Outlook;
+using Newtonsoft.Json;
 using Tags;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace ToDoModel.Data_Model.People
 {
-    public class PeopleScoDictionaryNew: ScoDictionaryNew<string, string>
+    public class PeopleScoDictionaryNew : ScoDictionaryNew<string, string>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors
 
-        public PeopleScoDictionaryNew() : base() { }
-        public PeopleScoDictionaryNew(IEnumerable<KeyValuePair<string, string>> collection) : base(collection) { }
-        public PeopleScoDictionaryNew(IEqualityComparer<string> comparer) : base(comparer) { }
-        public PeopleScoDictionaryNew(IEnumerable<KeyValuePair<string, string>> collection, IEqualityComparer<string> comparer) : base(collection, comparer) { }
-        public PeopleScoDictionaryNew(int concurrencyLevel, int capacity) : base(concurrencyLevel, capacity) { }
-        public PeopleScoDictionaryNew(int concurrencyLevel, IEnumerable<KeyValuePair<string, string>> collection, IEqualityComparer<string> comparer) : base(concurrencyLevel, collection, comparer) { }
-        public PeopleScoDictionaryNew(int concurrencyLevel, int capacity, IEqualityComparer<string> comparer) : base(concurrencyLevel, capacity, comparer) { }
-        public PeopleScoDictionaryNew(ScoDictionaryNew<string, string> dictionary) : base(dictionary) { }
+        public PeopleScoDictionaryNew()
+            : base() { }
+
+        public PeopleScoDictionaryNew(IEnumerable<KeyValuePair<string, string>> collection)
+            : base(collection) { }
+
+        public PeopleScoDictionaryNew(IEqualityComparer<string> comparer)
+            : base(comparer) { }
+
+        public PeopleScoDictionaryNew(
+            IEnumerable<KeyValuePair<string, string>> collection,
+            IEqualityComparer<string> comparer
+        )
+            : base(collection, comparer) { }
+
+        public PeopleScoDictionaryNew(int concurrencyLevel, int capacity)
+            : base(concurrencyLevel, capacity) { }
+
+        public PeopleScoDictionaryNew(
+            int concurrencyLevel,
+            IEnumerable<KeyValuePair<string, string>> collection,
+            IEqualityComparer<string> comparer
+        )
+            : base(concurrencyLevel, collection, comparer) { }
+
+        public PeopleScoDictionaryNew(
+            int concurrencyLevel,
+            int capacity,
+            IEqualityComparer<string> comparer
+        )
+            : base(concurrencyLevel, capacity, comparer) { }
+
+        public PeopleScoDictionaryNew(ScoDictionaryNew<string, string> dictionary)
+            : base(dictionary) { }
 
         #endregion Constructors
 
@@ -38,44 +65,73 @@ namespace ToDoModel.Data_Model.People
 
         [JsonIgnore]
         private IPrefix _prefix;
-        public IPrefix Prefix { get => _prefix; set => _prefix = value; }
+        public IPrefix Prefix
+        {
+            get => _prefix;
+            set => _prefix = value;
+        }
 
         public bool IsPeopleCategory(string test)
         {
-            return (test is not null) && (test.Length >= _prefix.Value.Length) && (test.Substring(0, _prefix.Value.Length) == _prefix.Value);
+            return (test is not null)
+                && (test.Length >= _prefix.Value.Length)
+                && (test.Substring(0, _prefix.Value.Length) == _prefix.Value);
         }
 
         public List<string> GetPeopleCatNames()
         {
-            return _globals.Ol.App.Session.Categories.Cast<Outlook.Category>().Where(cat => IsPeopleCategory(cat.Name)).Select(cat => cat.Name).ToList();
+            return _globals
+                .Ol.App.Session.Categories.Cast<Outlook.Category>()
+                .Where(cat => IsPeopleCategory(cat.Name))
+                .Select(cat => cat.Name)
+                .ToList();
         }
 
         public bool CategoryExists(string category)
         {
-            return _globals.Ol.App.Session.Categories.Cast<Outlook.Category>().Any(cat => cat.Name == category);
+            return _globals
+                .Ol.App.Session.Categories.Cast<Outlook.Category>()
+                .Any(cat => cat.Name == category);
         }
 
         public IList<string> AddMissingEntries(Outlook.MailItem olMail)
         {
-            var addressList = olMail.GetEmailAddresses(_globals.Ol.EmailRootPath,
-                                                       _globals.TD.DictRemap,
-                                                       _globals.Ol.UserEmailAddress)
-                                                       .Where(x => !this.ContainsKey(x))
-                                                       .Select(x => x)
-                                                       .ToList();
+            var addressList = olMail
+                .GetEmailAddresses(
+                    _globals.Ol.EmailRootPath,
+                    _globals.TD.DictRemap,
+                    _globals.Ol.UserEmailAddress
+                )
+                .Where(x => !this.ContainsKey(x))
+                .Select(x => x)
+                .ToList();
             IList<string> newPeople = new List<string>();
 
             foreach (var address in addressList)
             {
-                var response = MessageBox.Show($"Add mapping for {address}?", "Dialog", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-                if (response == DialogResult.Cancel) { break; }
+                var response = MessageBox.Show(
+                    $"Add mapping for {address}?",
+                    "Dialog",
+                    MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Question
+                );
+                if (response == DialogResult.Cancel)
+                {
+                    break;
+                }
                 if (response == DialogResult.Yes)
                 {
                     var entry = AddMissingEntry(address);
-                    if (entry is not null) { newPeople.Add(entry); }
+                    if (entry is not null)
+                    {
+                        newPeople.Add(entry);
+                    }
                 }
             }
-            if (!newPeople.IsNullOrEmpty()) { this.Serialize(); }
+            if (!newPeople.IsNullOrEmpty())
+            {
+                this.Serialize();
+            }
             return newPeople;
         }
 
@@ -87,7 +143,10 @@ namespace ToDoModel.Data_Model.People
             if (matchResult.IsNullOrEmpty())
             {
                 newPerson = RefineValidateCategory(newPerson, _prefix);
-                if (newPerson is null) { return null; }
+                if (newPerson is null)
+                {
+                    return null;
+                }
                 AddColorCategory(newPerson);
                 return newPerson;
             }
@@ -101,10 +160,22 @@ namespace ToDoModel.Data_Model.People
 
         public string AddPrefix(string seed, string prefix)
         {
-            if (seed is null) { throw new ArgumentNullException(nameof(seed)); }
-            if (prefix is null) { throw new ArgumentNullException(nameof(prefix)); }
-            if (seed.StartsWith(prefix)) { return seed; }
-            else { return $"{prefix}{seed}"; }
+            if (seed is null)
+            {
+                throw new ArgumentNullException(nameof(seed));
+            }
+            if (prefix is null)
+            {
+                throw new ArgumentNullException(nameof(prefix));
+            }
+            if (seed.StartsWith(prefix))
+            {
+                return seed;
+            }
+            else
+            {
+                return $"{prefix}{seed}";
+            }
         }
 
         public string RefineValidateCategory(string newPerson, IPrefix prefix)
@@ -112,11 +183,21 @@ namespace ToDoModel.Data_Model.People
             bool continueAsking = true;
             while (continueAsking)
             {
-                newPerson = InputBox.ShowDialog("The following category name will be added:", "Add Category Dialog", DefaultResponse: newPerson);
+                newPerson = InputBox.ShowDialog(
+                    "The following category name will be added:",
+                    "Add Category Dialog",
+                    DefaultResponse: newPerson
+                );
                 // if user cancels, return null
-                if (newPerson is null) { continueAsking = false; }
+                if (newPerson is null)
+                {
+                    continueAsking = false;
+                }
                 // if user leaves blank, continue asking
-                else if (newPerson == "") { continueAsking = true; }
+                else if (newPerson == "")
+                {
+                    continueAsking = true;
+                }
                 // else check if input is valid
                 else
                 {
@@ -125,11 +206,19 @@ namespace ToDoModel.Data_Model.People
                     // if category already exists, tell the user and continue asking
                     if (CategoryExists(newPerson))
                     {
-                        MessageBox.Show($"Category {newPerson} already exists. Please choose another name.", "Category Exists", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show(
+                            $"Category {newPerson} already exists. Please choose another name.",
+                            "Category Exists",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error
+                        );
                         continueAsking = true;
                     }
                     // else accept the category name and stop asking
-                    else { continueAsking = false; }
+                    else
+                    {
+                        continueAsking = false;
+                    }
                 }
             }
             return newPerson;
@@ -137,12 +226,19 @@ namespace ToDoModel.Data_Model.People
 
         public void AddColorCategory(string newPerson)
         {
-            _globals.Ol.NamespaceMAPI.Categories.Add(newPerson, _prefix.Color, OlCategoryShortcutKey.olCategoryShortcutKeyNone);
+            _globals.Ol.NamespaceMAPI.Categories.Add(
+                newPerson,
+                _prefix.Color,
+                OlCategoryShortcutKey.olCategoryShortcutKeyNone
+            );
         }
 
         public string SplitAddressToFirstLastName(string address)
         {
-            var regex = new Regex(@"([a-zA-z\d]+)\.([a-zA-z]+)\d*@([a-zA-z\d]+)\.com", RegexOptions.Multiline);
+            var regex = new Regex(
+                @"([a-zA-z\d]+)\.([a-zA-z]+)\d*@([a-zA-z\d]+)\.com",
+                RegexOptions.Multiline
+            );
             string newPplTag = regex.Replace(address, ("$1 $2")).Trim();
             if (!newPplTag.IsNullOrEmpty())
             {
@@ -157,7 +253,5 @@ namespace ToDoModel.Data_Model.People
             var launcher = new TagLauncher(existingPeople, _prefix, _globals.Ol.UserEmailAddress);
             return launcher.FindMatch(searchString);
         }
-
-
     }
 }

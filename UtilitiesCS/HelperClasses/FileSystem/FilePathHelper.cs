@@ -13,11 +13,15 @@ namespace UtilitiesCS
     public class FilePathHelper : INotifyPropertyChanged, ICloneable
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors
 
-        public FilePathHelper() { PropertyChanged += FilePathHelper_PropertyChanged; }
+        public FilePathHelper()
+        {
+            PropertyChanged += FilePathHelper_PropertyChanged;
+        }
 
         public FilePathHelper(string fileName, string folderPath)
         {
@@ -27,7 +31,12 @@ namespace UtilitiesCS
             PropertyChanged += FilePathHelper_PropertyChanged;
         }
 
-        private FilePathHelper(string fileNameSeed, string fileExtension, string fileNameSuffix, string folderPath)
+        private FilePathHelper(
+            string fileNameSeed,
+            string fileExtension,
+            string fileNameSuffix,
+            string folderPath
+        )
         {
             FileStemSeed = fileNameSeed;
             FileStemSuffix = fileNameSuffix;
@@ -37,7 +46,12 @@ namespace UtilitiesCS
             PropertyChanged += FilePathHelper_PropertyChanged;
         }
 
-        public static FilePathHelper FromSeed(string fileNameSeed, string fileExtension, string fileNameSuffix, string folderPath)
+        public static FilePathHelper FromSeed(
+            string fileNameSeed,
+            string fileExtension,
+            string fileNameSuffix,
+            string folderPath
+        )
         {
             var fph = new FilePathHelper(fileNameSeed, fileExtension, fileNameSuffix, folderPath);
 
@@ -49,25 +63,77 @@ namespace UtilitiesCS
         #region Public Properties
 
         private string _filePath = "";
-        public string FilePath { get => _filePath; set { _filePath = value; NotifyPropertyChanged(); } }
+        public string FilePath
+        {
+            get => _filePath;
+            set
+            {
+                _filePath = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private string _folderPath = "";
-        public string FolderPath { get => _folderPath; set { _folderPath = value; NotifyPropertyChanged(); } }
+        public string FolderPath
+        {
+            get => _folderPath;
+            set
+            {
+                _folderPath = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private string _fileName = "";
-        public string FileName { get => _fileName; set { _fileName = value; NotifyPropertyChanged(); } }
+        public string FileName
+        {
+            get => _fileName;
+            set
+            {
+                _fileName = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private string _fileStemSeed = null;
-        public string FileStemSeed { get => _fileStemSeed; set { _fileStemSeed = value; NotifyPropertyChanged(); } }
+        public string FileStemSeed
+        {
+            get => _fileStemSeed;
+            set
+            {
+                _fileStemSeed = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private string _fileStemSuffix = null;
-        public string FileStemSuffix { get => _fileStemSuffix; set { _fileStemSuffix = value; NotifyPropertyChanged(); } }
+        public string FileStemSuffix
+        {
+            get => _fileStemSuffix;
+            set
+            {
+                _fileStemSuffix = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private string _fileStem = null;
-        public string FileStem { get => _fileStem; protected set => _fileStem = value; }
+        public string FileStem
+        {
+            get => _fileStem;
+            protected set => _fileStem = value;
+        }
 
         private string _fileExtension = null;
-        public string FileExtension { get => _fileExtension; set { _fileExtension = value; NotifyPropertyChanged(); } }
+        public string FileExtension
+        {
+            get => _fileExtension;
+            set
+            {
+                _fileExtension = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         public const int MAX_PATH = 256;
 
@@ -85,7 +151,9 @@ namespace UtilitiesCS
             }
             catch (Exception e)
             {
-                logger.Error($"{e.StackTrace}\n{e.Message}\nError checking if file exists for FilePath {FilePath}");
+                logger.Error(
+                    $"{e.StackTrace}\n{e.Message}\nError checking if file exists for FilePath {FilePath}"
+                );
                 return false;
             }
         }
@@ -99,7 +167,9 @@ namespace UtilitiesCS
                 }
                 catch (Exception e)
                 {
-                    logger.Error($"{e.StackTrace}\n{e.Message}\nError getting last write time for FilePath {FilePath}");
+                    logger.Error(
+                        $"{e.StackTrace}\n{e.Message}\nError getting last write time for FilePath {FilePath}"
+                    );
                     return default;
                 }
             else
@@ -138,7 +208,11 @@ namespace UtilitiesCS
             return (fileStem, fileExtension ?? "");
         }
 
-        public bool TryParseFileStem(string fileStem, out string fileStemSeed, out string fileStemSuffix)
+        public bool TryParseFileStem(
+            string fileStem,
+            out string fileStemSeed,
+            out string fileStemSuffix
+        )
         {
             fileStemSeed = FileStemSeed ?? "";
             fileStemSuffix = FileStemSuffix ?? "";
@@ -157,11 +231,16 @@ namespace UtilitiesCS
 
             // case 3: Some part of seed or suffix remains
             // step 1 strip existing seed if it exists
-            if (!fileStemSeed.IsNullOrEmpty() && (remainingChars?.StartsWith(fileStemSeed) ?? false))
+            if (
+                !fileStemSeed.IsNullOrEmpty() && (remainingChars?.StartsWith(fileStemSeed) ?? false)
+            )
                 remainingChars = remainingChars.Replace(fileStemSeed, "");
 
             // step 2 strip existing suffix if it exists and append any remaining chars to seed
-            if (!fileStemSuffix.IsNullOrEmpty() && (remainingChars?.EndsWith(fileStemSuffix) ?? false))
+            if (
+                !fileStemSuffix.IsNullOrEmpty()
+                && (remainingChars?.EndsWith(fileStemSuffix) ?? false)
+            )
             {
                 remainingChars = remainingChars.Replace(fileStemSuffix, "");
                 fileStemSeed += remainingChars;
@@ -211,7 +290,8 @@ namespace UtilitiesCS
             if (!StemInitialized())
                 return false;
 
-            var maxSeedLength = MAX_PATH - FolderPath.Length - FileExtension.Length - FileStemSuffix.Length;
+            var maxSeedLength =
+                MAX_PATH - FolderPath.Length - FileExtension.Length - FileStemSuffix.Length;
 
             var fileName = $"{FileStemSeed}{FileStemSuffix}{FileExtension}";
             var filePath = Path.Combine(FolderPath, fileName);
@@ -223,7 +303,12 @@ namespace UtilitiesCS
             return true;
         }
 
-        public static string AdjustForMaxPath(string folderPath, string filenameSeed, string fileExtension, string filenameSuffix = "")
+        public static string AdjustForMaxPath(
+            string folderPath,
+            string filenameSeed,
+            string fileExtension,
+            string filenameSuffix = ""
+        )
         {
             var filename = $"{filenameSeed}{filenameSuffix}{fileExtension}";
             var filepath = Path.Combine(folderPath, filename);
@@ -231,7 +316,8 @@ namespace UtilitiesCS
             {
                 var maxSeedLength = filenameSeed.Length + MAX_PATH - filepath.Length;
                 filenameSeed = filenameSeed.Substring(0, maxSeedLength);
-                filename = $"{filenameSeed.Substring(0, maxSeedLength)}{filenameSuffix}{fileExtension}";
+                filename =
+                    $"{filenameSeed.Substring(0, maxSeedLength)}{filenameSuffix}{fileExtension}";
                 filepath = Path.Combine(folderPath, filename);
             }
             return filepath;
@@ -241,7 +327,9 @@ namespace UtilitiesCS
 
         #region INotifyPropertyChanged Implementation
 
-        private void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        private void NotifyPropertyChanged(
+            [System.Runtime.CompilerServices.CallerMemberName] string propertyName = ""
+        )
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -287,7 +375,9 @@ namespace UtilitiesCS
 
                     _fileName = Path.GetFileName(_filePath);
                     if (_fileName == "")
-                        throw new ArgumentException($"FilePath {_filePath} must include a FileName");
+                        throw new ArgumentException(
+                            $"FilePath {_filePath} must include a FileName"
+                        );
                     break;
                 case "FileStemSeed":
                     if (AdjustForMaxPath())
@@ -336,7 +426,7 @@ namespace UtilitiesCS
                 _fileStemSeed = _fileStemSeed,
                 _fileStemSuffix = _fileStemSuffix,
                 _fileStem = _fileStem,
-                _fileExtension = _fileExtension
+                _fileExtension = _fileExtension,
             };
             return clone;
         }

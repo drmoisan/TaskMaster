@@ -1,10 +1,10 @@
+using System;
+using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
-using System;
-using System.Collections.Generic;
 
 namespace UtilitiesCS.Test
 {
@@ -22,16 +22,22 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.Parent).Returns(CreateFolder(@"\\Inbox\Calendar"));
 
             // Act
-            Dictionary<OlItemSummary.Details, string> summary = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> summary = OlItemSummary.ExtractSummary(
+                item.Object
+            );
 
             // Assert
-            summary.Should().BeEquivalentTo(new Dictionary<OlItemSummary.Details, string>
-            {
-                { OlItemSummary.Details.Type, typeof(AppointmentItem).ToString() },
-                { OlItemSummary.Details.Subject, "Project sync" },
-                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
-                { OlItemSummary.Details.Folderpath, @"\\Inbox\Calendar" },
-            });
+            summary
+                .Should()
+                .BeEquivalentTo(
+                    new Dictionary<OlItemSummary.Details, string>
+                    {
+                        { OlItemSummary.Details.Type, typeof(AppointmentItem).ToString() },
+                        { OlItemSummary.Details.Subject, "Project sync" },
+                        { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
+                        { OlItemSummary.Details.Folderpath, @"\\Inbox\Calendar" },
+                    }
+                );
         }
 
         [TestMethod]
@@ -44,7 +50,9 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.Parent).Returns(CreateFolder(@"\\Inbox\Calendar"));
 
             // Act
-            Dictionary<OlItemSummary.Details, string> summary = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> summary = OlItemSummary.ExtractSummary(
+                item.Object
+            );
 
             // Assert
             summary[OlItemSummary.Details.Subject].Should().BeNull();
@@ -62,16 +70,22 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.Parent).Returns(CreateFolder(@"\\Inbox\Reports"));
 
             // Act
-            Dictionary<OlItemSummary.Details, string> summary = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> summary = OlItemSummary.ExtractSummary(
+                item.Object
+            );
 
             // Assert
-            summary.Should().BeEquivalentTo(new Dictionary<OlItemSummary.Details, string>
-            {
-                { OlItemSummary.Details.Type, typeof(InteropMailItem).ToString() },
-                { OlItemSummary.Details.Subject, "Weekly report" },
-                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
-                { OlItemSummary.Details.Folderpath, @"\\Inbox\Reports" },
-            });
+            summary
+                .Should()
+                .BeEquivalentTo(
+                    new Dictionary<OlItemSummary.Details, string>
+                    {
+                        { OlItemSummary.Details.Type, typeof(InteropMailItem).ToString() },
+                        { OlItemSummary.Details.Subject, "Weekly report" },
+                        { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
+                        { OlItemSummary.Details.Folderpath, @"\\Inbox\Reports" },
+                    }
+                );
         }
 
         [TestMethod]
@@ -82,14 +96,20 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.MessageClass).Returns("IPM.Note.Secure");
 
             // Act
-            Dictionary<OlItemSummary.Details, string> summary = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> summary = OlItemSummary.ExtractSummary(
+                item.Object
+            );
 
             // Assert
-            summary.Should().BeEquivalentTo(new Dictionary<OlItemSummary.Details, string>
-            {
-                { OlItemSummary.Details.Type, typeof(InteropMailItem).ToString() },
-                { OlItemSummary.Details.Subject, "IPM.Note.Secure" },
-            });
+            summary
+                .Should()
+                .BeEquivalentTo(
+                    new Dictionary<OlItemSummary.Details, string>
+                    {
+                        { OlItemSummary.Details.Type, typeof(InteropMailItem).ToString() },
+                        { OlItemSummary.Details.Subject, "IPM.Note.Secure" },
+                    }
+                );
         }
 
         [TestMethod]
@@ -101,7 +121,8 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.Subject).Returns("Weekly report");
             item.SetupGet(x => x.SentOn).Returns(new DateTime(2025, 12, 25, 12, 5, 3));
             item.SetupGet(x => x.Parent).Returns(CreateFolder(@"\\Inbox\Reports"));
-            OlItemSummary.Details flags = OlItemSummary.Details.Subject | OlItemSummary.Details.Date;
+            OlItemSummary.Details flags =
+                OlItemSummary.Details.Subject | OlItemSummary.Details.Date;
 
             // Act
             string summary = OlItemSummary.Extract(item.Object, flags);
@@ -134,7 +155,9 @@ namespace UtilitiesCS.Test
             System.Action action = () => OlItemSummary.ExtractSummary(item);
 
             // Assert
-            action.Should().Throw<ArgumentException>()
+            action
+                .Should()
+                .Throw<ArgumentException>()
                 .WithMessage("System.Object is an unsupported type");
         }
 
@@ -150,7 +173,9 @@ namespace UtilitiesCS.Test
             };
 
             // Act
-            string result = summary.ToString(OlItemSummary.Details.Subject | OlItemSummary.Details.Date);
+            string result = summary.ToString(
+                OlItemSummary.Details.Subject | OlItemSummary.Details.Date
+            );
 
             // Assert
             result.Should().Be("Subject: , Date: 12-25-2025 12:05 PM");

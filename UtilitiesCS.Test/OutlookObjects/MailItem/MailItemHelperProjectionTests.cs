@@ -9,7 +9,9 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItem
         [TestMethod]
         public void Projection_returns_subject_and_entry_id_from_mock_mail_item()
         {
-            var projection = MailItemHelper.TryProjectMailItemMembers(new { Subject = "S", EntryID = "E" });
+            var projection = MailItemHelper.TryProjectMailItemMembers(
+                new { Subject = "S", EntryID = "E" }
+            );
             projection.Subject.Should().Be("S");
             projection.EntryId.Should().Be("E");
         }

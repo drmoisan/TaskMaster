@@ -1,15 +1,15 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System.Linq;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
-using UtilitiesCS.HelperClasses;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections;
-using UtilitiesCS.OutlookObjects.Folder;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
+using UtilitiesCS.HelperClasses;
+using UtilitiesCS.OutlookObjects.Folder;
 
 namespace UtilitiesCS
 {
@@ -18,7 +18,8 @@ namespace UtilitiesCS
         #region ctor
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public FolderTree() { }
 
@@ -68,7 +69,7 @@ namespace UtilitiesCS
             progress.Report(100);
         }
 
-        public async static Task<FolderTree> CreateAsync(MAPIFolder olRoot)
+        public static async Task<FolderTree> CreateAsync(MAPIFolder olRoot)
         {
             var tree = new FolderTree();
             await Task.Run(() =>
@@ -80,7 +81,7 @@ namespace UtilitiesCS
             return tree;
         }
 
-        public async static Task<FolderTree> CreateAsync(IEnumerable<MAPIFolder> olRoots)
+        public static async Task<FolderTree> CreateAsync(IEnumerable<MAPIFolder> olRoots)
         {
             var tree = new FolderTree();
             await Task.Run(() =>
@@ -101,15 +102,22 @@ namespace UtilitiesCS
         {
             if (_roots.Count > 1)
             {
-                int i = 0, j = 0;
-                var dict = _roots.Select(x => (Key: x, Value: x.Flatten().ToList())).ToDictionary(x => x.Key, x => x.Value);
+                int i = 0,
+                    j = 0;
+                var dict = _roots
+                    .Select(x => (Key: x, Value: x.Flatten().ToList()))
+                    .ToDictionary(x => x.Key, x => x.Value);
 
                 while (i < _roots.Count - 1)
                 {
                     j = 0;
                     while (j < _roots.Count - 1)
                     {
-                        if (i == j) { j++; continue; }
+                        if (i == j)
+                        {
+                            j++;
+                            continue;
+                        }
                         if (dict.ElementAt(i).Value.IsSubsetOf(dict.ElementAt(j).Value))
                         {
                             _roots.RemoveAt(i);
@@ -124,11 +132,19 @@ namespace UtilitiesCS
 
         public void LoadItemCounts()
         {
-            Roots.ForEach(root => root.TraverseByLevel(false, node =>
-            {
-                var descendantItemCount = node.ChildCount == 0 ? 0 : node.Children.Sum(child => child.Value.ItemCountSubFolders);
-                node.Value.ItemCountSubFolders = node.Value.ItemCount + descendantItemCount;
-            }));
+            Roots.ForEach(root =>
+                root.TraverseByLevel(
+                    false,
+                    node =>
+                    {
+                        var descendantItemCount =
+                            node.ChildCount == 0
+                                ? 0
+                                : node.Children.Sum(child => child.Value.ItemCountSubFolders);
+                        node.Value.ItemCountSubFolders = node.Value.ItemCount + descendantItemCount;
+                    }
+                )
+            );
         }
 
         private TreeNode<FolderWrapper> RootFromFolder(MAPIFolder olRoot)
@@ -139,7 +155,11 @@ namespace UtilitiesCS
             return root;
         }
 
-        private TreeNode<FolderWrapper> RootFromFolder(MAPIFolder olRoot, ProgressTracker progress, ref int runningCount)
+        private TreeNode<FolderWrapper> RootFromFolder(
+            MAPIFolder olRoot,
+            ProgressTracker progress,
+            ref int runningCount
+        )
         {
             var info = new FolderWrapper(olRoot, olRoot);
             var root = new TreeNode<FolderWrapper>(info);
@@ -157,7 +177,10 @@ namespace UtilitiesCS
         }
 
         private List<TreeNode<FolderWrapper>> _roots;
-        public List<TreeNode<FolderWrapper>> Roots { get => _roots; }
+        public List<TreeNode<FolderWrapper>> Roots
+        {
+            get => _roots;
+        }
 
         private void InitializeChildren(TreeNode<FolderWrapper> node, MAPIFolder olRoot)
         {
@@ -170,7 +193,12 @@ namespace UtilitiesCS
                 });
         }
 
-        private void InitializeChildren(TreeNode<FolderWrapper> node, MAPIFolder olRoot, ProgressTracker progress, ref int runningTotal)
+        private void InitializeChildren(
+            TreeNode<FolderWrapper> node,
+            MAPIFolder olRoot,
+            ProgressTracker progress,
+            ref int runningTotal
+        )
         {
             var children = node.Value.OlFolder.Folders.Cast<MAPIFolder>().ToArray();
             var count = children.Count();
@@ -192,7 +220,10 @@ namespace UtilitiesCS
                     }
                     else
                     {
-                        progress.Report(rt, $"Building Outlook Folder Tree ({runningTotal} completed)");
+                        progress.Report(
+                            rt,
+                            $"Building Outlook Folder Tree ({runningTotal} completed)"
+                        );
                         //progress.Increment(increment);
                     }
                 }
@@ -215,24 +246,40 @@ namespace UtilitiesCS
             return [.. _roots.SelectMany(root => root.FlattenNodes())];
         }
 
-        public (List<TreeNode<FolderWrapper>> nodes, List<TreeNode<FolderWrapper>> contents, List<TreeNode<FolderWrapper>> sameName, List<TreeNode<FolderWrapper>> currentOnly, List<TreeNode<FolderWrapper>> otherOnly) Compare(FolderTree other)
+        public (
+            List<TreeNode<FolderWrapper>> nodes,
+            List<TreeNode<FolderWrapper>> contents,
+            List<TreeNode<FolderWrapper>> sameName,
+            List<TreeNode<FolderWrapper>> currentOnly,
+            List<TreeNode<FolderWrapper>> otherOnly
+        ) Compare(FolderTree other)
         {
             var compareNodes = new FolderWrapperNodeComparer();
             var (nodes, onlyCurrentNodes, onlyOtherNodes) = CompareMembers(other, compareNodes);
             var compareContents = new FolderWrapperNodeContentsComparer();
             //var (contents, onlyCurrentContents, onlyOtherContents) = CompareMembers(other, compareContents);
-            var (contents, onlyCurrentContents, onlyOtherContents) = CompareMembers(onlyCurrentNodes, onlyOtherNodes, compareContents);
+            var (contents, onlyCurrentContents, onlyOtherContents) = CompareMembers(
+                onlyCurrentNodes,
+                onlyOtherNodes,
+                compareContents
+            );
             var compareNames = new FolderWrapperNameAndParentNameComparer();
             var currentContentsSplit = onlyCurrentContents.Split(compareNames);
             var otherContentsSplit = onlyOtherContents.Split(compareNames);
             var uniqueNameMatch = new List<TreeNode<FolderWrapper>>();
             if (currentContentsSplit.Unique.Count > 0 && otherContentsSplit.Unique.Count > 0)
             {
-                uniqueNameMatch = currentContentsSplit.Unique.Intersect(otherContentsSplit.Unique, compareNames).ToList();
+                uniqueNameMatch = currentContentsSplit
+                    .Unique.Intersect(otherContentsSplit.Unique, compareNames)
+                    .ToList();
                 if (uniqueNameMatch.Count > 0)
                 {
-                    onlyCurrentContents = onlyCurrentContents.Except(uniqueNameMatch, compareNames).ToList();
-                    onlyOtherContents = onlyOtherContents.Except(uniqueNameMatch, compareNames).ToList();
+                    onlyCurrentContents = onlyCurrentContents
+                        .Except(uniqueNameMatch, compareNames)
+                        .ToList();
+                    onlyOtherContents = onlyOtherContents
+                        .Except(uniqueNameMatch, compareNames)
+                        .ToList();
                 }
             }
 
@@ -240,9 +287,15 @@ namespace UtilitiesCS
             return (nodes, contents, uniqueNameMatch, onlyCurrentContents, onlyOtherContents);
         }
 
-
-
-        public (List<TreeNode<FolderWrapper>> same, List<TreeNode<FolderWrapper>> onlyCurrent, List<TreeNode<FolderWrapper>> onlyOther) CompareMembers(List<TreeNode<FolderWrapper>> current, List<TreeNode<FolderWrapper>> other, IEqualityComparer<TreeNode<FolderWrapper>> comparer)
+        public (
+            List<TreeNode<FolderWrapper>> same,
+            List<TreeNode<FolderWrapper>> onlyCurrent,
+            List<TreeNode<FolderWrapper>> onlyOther
+        ) CompareMembers(
+            List<TreeNode<FolderWrapper>> current,
+            List<TreeNode<FolderWrapper>> other,
+            IEqualityComparer<TreeNode<FolderWrapper>> comparer
+        )
         {
             var same = current.Intersect(other, comparer).ToList();
             var onlyCurrent = current.Except(other, comparer).ToList();
@@ -250,22 +303,37 @@ namespace UtilitiesCS
             return (same, onlyCurrent, onlyOther);
         }
 
-
-        public (List<TreeNode<FolderWrapper>> same, List<TreeNode<FolderWrapper>> onlyCurrent, List<TreeNode<FolderWrapper>> onlyOther) CompareMembers(FolderTree other, IEqualityComparer<TreeNode<FolderWrapper>> comparer)
+        public (
+            List<TreeNode<FolderWrapper>> same,
+            List<TreeNode<FolderWrapper>> onlyCurrent,
+            List<TreeNode<FolderWrapper>> onlyOther
+        ) CompareMembers(FolderTree other, IEqualityComparer<TreeNode<FolderWrapper>> comparer)
         {
             var currentFlat = this.FlattenNodes();
             var otherFlat = other.FlattenNodes();
             return CompareMembers(currentFlat, otherFlat, comparer);
         }
 
-        public (List<FolderWrapper> same, List<FolderWrapper> onlyCurrent, List<FolderWrapper> onlyOther) CompareMembers(FolderTree other, IEqualityComparer<FolderWrapper> comparer)
+        public (
+            List<FolderWrapper> same,
+            List<FolderWrapper> onlyCurrent,
+            List<FolderWrapper> onlyOther
+        ) CompareMembers(FolderTree other, IEqualityComparer<FolderWrapper> comparer)
         {
             var thisFlat = this.Flatten();
             var otherFlat = other.Flatten();
             return CompareMembers(thisFlat, otherFlat, comparer);
         }
 
-        public (List<FolderWrapper> same, List<FolderWrapper> onlyCurrent, List<FolderWrapper> onlyOther) CompareMembers(List<FolderWrapper> current, List<FolderWrapper> other, IEqualityComparer<FolderWrapper> comparer)
+        public (
+            List<FolderWrapper> same,
+            List<FolderWrapper> onlyCurrent,
+            List<FolderWrapper> onlyOther
+        ) CompareMembers(
+            List<FolderWrapper> current,
+            List<FolderWrapper> other,
+            IEqualityComparer<FolderWrapper> comparer
+        )
         {
             var same = current.Intersect(other, comparer).ToList();
             var onlyCurrent = current.Except(other, comparer).ToList();
@@ -283,7 +351,6 @@ namespace UtilitiesCS
             {
                 node.Traverse(node => node.Selected = true);
             }
-
         }
 
         public List<TreeNode<FolderWrapper>> FilterSelected(bool include)
@@ -297,7 +364,11 @@ namespace UtilitiesCS
             return selected;
         }
 
-        private void FilterChildren(TreeNode<FolderWrapper> source, TreeNode<FolderWrapper> destination, bool include)
+        private void FilterChildren(
+            TreeNode<FolderWrapper> source,
+            TreeNode<FolderWrapper> destination,
+            bool include
+        )
         {
             foreach (var sourceChild in source.Children)
             {
@@ -319,7 +390,9 @@ namespace UtilitiesCS
 
         internal void WireNotifications()
         {
-            _roots.ForEach(root => root.Traverse(node => node.Value.PropertyChanged += Child_PropertyChanged));
+            _roots.ForEach(root =>
+                root.Traverse(node => node.Value.PropertyChanged += Child_PropertyChanged)
+            );
         }
 
         private TimedBatchAction _batchNotifier = new(TimeSpan.FromMilliseconds(50));
@@ -338,7 +411,4 @@ namespace UtilitiesCS
 
         #endregion INotifyPropertyChanged
     }
-
-
-
 }

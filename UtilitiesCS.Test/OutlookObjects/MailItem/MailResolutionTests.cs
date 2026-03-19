@@ -14,7 +14,9 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
         [DataRow("IPM.Note.Secure")]
         [DataRow("IPM.Note.Secure.Sign")]
         [DataRow("IPM.Outlook.Recall")]
-        public void IsMailUnReadable_WithKnownUnreadableMessageClass_ReturnsTrue(string messageClass)
+        public void IsMailUnReadable_WithKnownUnreadableMessageClass_ReturnsTrue(
+            string messageClass
+        )
         {
             // Arrange
             var mailItem = new Mock<InteropMailItem>();

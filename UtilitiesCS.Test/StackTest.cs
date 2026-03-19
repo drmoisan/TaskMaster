@@ -1,8 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test
 {
@@ -16,8 +16,8 @@ namespace UtilitiesCS.Test
             stack.Push("Bottom");
             stack.Push("Middle");
             stack.Push("Top");
-            foreach (string item in stack) 
-            { 
+            foreach (string item in stack)
+            {
                 Debug.WriteLine(item);
             }
         }

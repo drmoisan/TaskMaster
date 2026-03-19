@@ -12,15 +12,19 @@ namespace UtilitiesCS.OutlookObjects.Folder
     {
         public bool Equals(FolderWrapper x, FolderWrapper y)
         {
-            if (ReferenceEquals(x, y)) return true;
-            if (x is null || y is null) return false;
+            if (ReferenceEquals(x, y))
+                return true;
+            if (x is null || y is null)
+                return false;
             return string.Equals(x.Name, y.Name, StringComparison.OrdinalIgnoreCase)
-                && x.ItemCount == y.ItemCount && x.FolderSize == y.FolderSize;
+                && x.ItemCount == y.ItemCount
+                && x.FolderSize == y.FolderSize;
         }
 
         public int GetHashCode(FolderWrapper obj)
         {
-            if (obj is null) return 0;
+            if (obj is null)
+                return 0;
             int hashName = obj.Name?.ToLowerInvariant().GetHashCode() ?? 0;
             int hashCount = obj.ItemCount.GetHashCode();
             int hashSize = obj.FolderSize.GetHashCode();
@@ -28,5 +32,3 @@ namespace UtilitiesCS.OutlookObjects.Folder
         }
     }
 }
-
-

@@ -1,17 +1,17 @@
-﻿using System.Collections.Concurrent;
-using System;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Input;
-using UtilitiesCS.ReusableTypeClasses;
 using log4net.Repository.Hierarchy;
 using Newtonsoft.Json;
-using System.IO;
-using System.Threading;
-using System.Windows.Forms;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
@@ -19,31 +19,62 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
     public class CorpusInherit : ConcurrentDictionary<string, int>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors
 
-        public CorpusInherit() : base() { }
-        public CorpusInherit(IEnumerable<KeyValuePair<string, int>> collection) : base(collection) { }
-        public CorpusInherit(IEqualityComparer<string> comparer) : base(comparer) { }
-        public CorpusInherit(IEnumerable<KeyValuePair<string, int>> collection, IEqualityComparer<string> comparer) : base(collection, comparer) { }
-        public CorpusInherit(int concurrencyLevel, int capacity) : base(concurrencyLevel, capacity) { }
-        public CorpusInherit(int concurrencyLevel, IEnumerable<KeyValuePair<string, int>> collection, IEqualityComparer<string> comparer) : base(concurrencyLevel, collection, comparer) { }
-        public CorpusInherit(int concurrencyLevel, int capacity, IEqualityComparer<string> comparer) : base(concurrencyLevel, capacity, comparer) { }
+        public CorpusInherit()
+            : base() { }
+
+        public CorpusInherit(IEnumerable<KeyValuePair<string, int>> collection)
+            : base(collection) { }
+
+        public CorpusInherit(IEqualityComparer<string> comparer)
+            : base(comparer) { }
+
+        public CorpusInherit(
+            IEnumerable<KeyValuePair<string, int>> collection,
+            IEqualityComparer<string> comparer
+        )
+            : base(collection, comparer) { }
+
+        public CorpusInherit(int concurrencyLevel, int capacity)
+            : base(concurrencyLevel, capacity) { }
+
+        public CorpusInherit(
+            int concurrencyLevel,
+            IEnumerable<KeyValuePair<string, int>> collection,
+            IEqualityComparer<string> comparer
+        )
+            : base(concurrencyLevel, collection, comparer) { }
+
+        public CorpusInherit(int concurrencyLevel, int capacity, IEqualityComparer<string> comparer)
+            : base(concurrencyLevel, capacity, comparer) { }
 
         #endregion Constructors
 
         #region Public Properties and Methods
 
         private string _id;
-        public string Id { get => _id; set => _id = value; }
+        public string Id
+        {
+            get => _id;
+            set => _id = value;
+        }
 
-        public Enums.Corpus Indicator { get => _indicator; set => _indicator = value; }
+        public Enums.Corpus Indicator
+        {
+            get => _indicator;
+            set => _indicator = value;
+        }
         private Enums.Corpus _indicator;
 
-        public void AddOrIncrementToken(string token) => this.AddOrUpdate(token, 1, (key, count) => count++);
+        public void AddOrIncrementToken(string token) =>
+            this.AddOrUpdate(token, 1, (key, count) => count++);
 
-        public void AddOrIncrementTokens(IEnumerable<string> tokens) => tokens.ForEach(AddOrIncrementToken);
+        public void AddOrIncrementTokens(IEnumerable<string> tokens) =>
+            tokens.ForEach(AddOrIncrementToken);
 
         public void DecrementOrRemoveToken(string token)
         {
@@ -78,7 +109,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             else
             {
                 throw new ArgumentNullException(
-                "Must have a dictionary or create one to continue executing");
+                    "Must have a dictionary or create one to continue executing"
+                );
             }
         }
 
@@ -91,7 +123,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     messageText,
                     "Error",
                     MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Error);
+                    MessageBoxIcon.Error
+                );
             }
             else
             {
@@ -106,7 +139,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return Deserialize(fileName, folderPath, false);
         }
 
-        public static CorpusInherit Deserialize(string fileName, string folderPath, bool askUserOnError)
+        public static CorpusInherit Deserialize(
+            string fileName,
+            string folderPath,
+            bool askUserOnError
+        )
         {
             var disk = new FilePathHelper(fileName, folderPath);
             Deserialize(disk, askUserOnError);
@@ -130,18 +167,22 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             catch (FileNotFoundException e)
             {
                 logger.Error(e.Message);
-                response = AskUser(askUserOnError,
-                    $"{disk.FilePath} not found. Need a dictionary to " +
-                    $"continue. Create a new dictionary or abort execution?");
+                response = AskUser(
+                    askUserOnError,
+                    $"{disk.FilePath} not found. Need a dictionary to "
+                        + $"continue. Create a new dictionary or abort execution?"
+                );
                 dictionary = CreateEmpty(response, disk);
                 writeDictionary = true;
             }
             catch (System.Exception e)
             {
                 logger.Error($"Error! {e.Message}");
-                response = AskUser(askUserOnError,
-                    $"{disk.FilePath} encountered a problem. \n{e.Message}\n" +
-                    $"Need a dictionary to continue. Create a new dictionary or abort execution?");
+                response = AskUser(
+                    askUserOnError,
+                    $"{disk.FilePath} encountered a problem. \n{e.Message}\n"
+                        + $"Need a dictionary to continue. Create a new dictionary or abort execution?"
+                );
                 dictionary = CreateEmpty(response, disk);
                 writeDictionary = true;
             }
@@ -160,7 +201,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             settings.TypeNameHandling = TypeNameHandling.Auto;
             settings.Formatting = Formatting.Indented;
             collection = JsonConvert.DeserializeObject<CorpusInherit>(
-                File.ReadAllText(disk.FilePath), settings);
+                File.ReadAllText(disk.FilePath),
+                settings
+            );
             return collection;
         }
 
@@ -170,11 +213,23 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         protected FilePathHelper _disk = new FilePathHelper();
 
-        public string FilePath { get => _disk.FilePath; set => _disk.FilePath = value; }
+        public string FilePath
+        {
+            get => _disk.FilePath;
+            set => _disk.FilePath = value;
+        }
 
-        public string FolderPath { get => _disk.FolderPath; set => _disk.FolderPath = value; }
+        public string FolderPath
+        {
+            get => _disk.FolderPath;
+            set => _disk.FolderPath = value;
+        }
 
-        public string FileName { get => _disk.FileName; set => _disk.FileName = value; }
+        public string FileName
+        {
+            get => _disk.FileName;
+            set => _disk.FileName = value;
+        }
 
         public void Serialize()
         {
@@ -221,11 +276,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     _readWriteLock.ExitWriteLock();
                 }
             }
-
         }
 
         private ThreadSafeSingleShotGuard _serializationRequested = new();
         private TimerWrapper _timer;
+
         protected void RequestSerialization(string filePath)
         {
             if (_serializationRequested.CheckAndSetFirstCall)
@@ -238,6 +293,5 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         #endregion Serialization
-
     }
 }

@@ -1,7 +1,7 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
 
@@ -20,7 +20,13 @@ namespace UtilitiesCS.Test
             var package = new ProgressPackage();
 
             // Act
-            ProgressPackage result = await package.InitializeAsync(cancelSource, default, progressTracker, stopWatch, screen: null);
+            ProgressPackage result = await package.InitializeAsync(
+                cancelSource,
+                default,
+                progressTracker,
+                stopWatch,
+                screen: null
+            );
 
             // Assert
             result.Should().BeSameAs(package);
@@ -40,7 +46,13 @@ namespace UtilitiesCS.Test
             var stopWatch = new SegmentStopWatch();
 
             // Act
-            var tuple = await ProgressPackage.CreateAsTupleAsync(cancelSource, default, progressTracker, stopWatch, screen: null);
+            var tuple = await ProgressPackage.CreateAsTupleAsync(
+                cancelSource,
+                default,
+                progressTracker,
+                stopWatch,
+                screen: null
+            );
 
             // Assert
             tuple.CancelSource.Should().BeSameAs(cancelSource);

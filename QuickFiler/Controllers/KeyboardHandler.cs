@@ -1,29 +1,29 @@
-﻿using QuickFiler.Interfaces;
-using System;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using System.Windows.Forms;
+using System.Windows.Input;
+using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Interfaces;
+using Swordfish.NET.Collections;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
-using Swordfish.NET.Collections;
-using Microsoft.Office.Interop.Outlook;
-using System.Windows.Input;
-using System.Collections.ObjectModel;
-using System.Collections;
-using System.Web.UI.WebControls;
-using System.Diagnostics;
-using System.Threading;
-
 
 namespace QuickFiler.Controllers
 {
     internal class KeyboardHandler : IQfcKeyboardHandler
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public KeyboardHandler(IQfcFormViewer viewer, IFilerHomeController parent)
         {
@@ -41,10 +41,18 @@ namespace QuickFiler.Controllers
         private bool _kbdActive = false;
 
         private KbdActions<char, KaChar, Action<char>> _charActions = [];
-        public KbdActions<char, KaChar, Action<char>> CharActions { get => _charActions; set => _charActions = value; }
+        public KbdActions<char, KaChar, Action<char>> CharActions
+        {
+            get => _charActions;
+            set => _charActions = value;
+        }
 
         private KbdActions<char, KaCharAsync, Func<char, Task>> _charActionsAsync = [];
-        public KbdActions<char, KaCharAsync, Func<char, Task>> CharActionsAsync { get => _charActionsAsync; set => _charActionsAsync = value; }
+        public KbdActions<char, KaCharAsync, Func<char, Task>> CharActionsAsync
+        {
+            get => _charActionsAsync;
+            set => _charActionsAsync = value;
+        }
 
         private KbdActions<Keys, KaKey, Action<Keys>> _keyActions = [];
         public KbdActions<Keys, KaKey, Action<Keys>> KeyActions
@@ -54,24 +62,34 @@ namespace QuickFiler.Controllers
         }
 
         private KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> _alwaysOnKeyActionsAsync = [];
-        public KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> AlwaysOnKeyActionsAsync { get => _alwaysOnKeyActionsAsync; set => _alwaysOnKeyActionsAsync = value; }
+        public KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> AlwaysOnKeyActionsAsync
+        {
+            get => _alwaysOnKeyActionsAsync;
+            set => _alwaysOnKeyActionsAsync = value;
+        }
 
         private KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> _keyActionsAsync = [];
-        public KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> KeyActionsAsync { get => _keyActionsAsync; set => _keyActionsAsync = value; }
+        public KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> KeyActionsAsync
+        {
+            get => _keyActionsAsync;
+            set => _keyActionsAsync = value;
+        }
 
         private StringBuilder _filterBuilder = new StringBuilder();
+
         public void ClearFilter() => _filterBuilder = new StringBuilder();
 
         private KbdActions<string, KaStringAsync, Func<string, Task>> _stringActionsAsync = [];
-        public KbdActions<string, KaStringAsync, Func<string, Task>> StringActionsAsync { get => _stringActionsAsync; set => _stringActionsAsync = value; }
+        public KbdActions<string, KaStringAsync, Func<string, Task>> StringActionsAsync
+        {
+            get => _stringActionsAsync;
+            set => _stringActionsAsync = value;
+        }
 
         public bool KbdActive
         {
             get => _kbdActive;
-            set
-            {
-                _kbdActive = value;
-            }
+            set { _kbdActive = value; }
         }
 
         public void KeyboardHandler_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
@@ -108,7 +126,6 @@ namespace QuickFiler.Controllers
                     e.Handled = true;
                     CharActions[(char)e.KeyValue].DynamicInvoke((char)e.KeyValue);
                 }
-
             }
         }
 
@@ -122,7 +139,10 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                logger.Error($"Error in {nameof(KeyboardHandler_KeyDownAsync)} for key {e.KeyValue}. {ex.Message}", ex);
+                logger.Error(
+                    $"Error in {nameof(KeyboardHandler_KeyDownAsync)} for key {e.KeyValue}. {ex.Message}",
+                    ex
+                );
             }
         }
 
@@ -146,7 +166,9 @@ namespace QuickFiler.Controllers
                     e.Handled = true;
                     await KeyActionsAsync[e.KeyCode](e.KeyCode);
                 }
-                else if ((CharActionsAsync != null) && CharActionsAsync.ContainsKey((char)e.KeyValue))
+                else if (
+                    (CharActionsAsync != null) && CharActionsAsync.ContainsKey((char)e.KeyValue)
+                )
                 {
                     e.SuppressKeyPress = true;
                     e.Handled = true;
@@ -182,8 +204,14 @@ namespace QuickFiler.Controllers
 
         public void ToggleKeyboardDialog()
         {
-            if (_kbdActive) { _parent.FormController.ToggleOffNavigation(async: false); }
-            else { _parent.FormController.ToggleOnNavigation(async: false); }
+            if (_kbdActive)
+            {
+                _parent.FormController.ToggleOffNavigation(async: false);
+            }
+            else
+            {
+                _parent.FormController.ToggleOnNavigation(async: false);
+            }
             _kbdActive = !_kbdActive;
         }
 
@@ -195,8 +223,14 @@ namespace QuickFiler.Controllers
 
         public async Task ToggleKeyboardDialogAsync()
         {
-            if (_kbdActive) { await _parent.FormController.ToggleOffNavigationAsync(); }
-            else { await _parent.FormController.ToggleOnNavigationAsync(); }
+            if (_kbdActive)
+            {
+                await _parent.FormController.ToggleOffNavigationAsync();
+            }
+            else
+            {
+                await _parent.FormController.ToggleOnNavigationAsync();
+            }
             _kbdActive = !_kbdActive;
         }
 
@@ -211,24 +245,154 @@ namespace QuickFiler.Controllers
 
         internal ItemViewer GetItemViewer(Control control)
         {
-            if (control as ItemViewer != null) { return (control as ItemViewer); }
-            else if (control.Parent != null) { return GetItemViewer(control.Parent); }
-            else { return null; }
+            if (control as ItemViewer != null)
+            {
+                return (control as ItemViewer);
+            }
+            else if (control.Parent != null)
+            {
+                return GetItemViewer(control.Parent);
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        private List<Keys> _cboKeys = new List<Keys> { Keys.Up, Keys.Down, Keys.Left, Keys.Right, Keys.Escape, Keys.Return };
+        private List<Keys> _cboKeys = new List<Keys>
+        {
+            Keys.Up,
+            Keys.Down,
+            Keys.Left,
+            Keys.Right,
+            Keys.Escape,
+            Keys.Return,
+        };
 
         public void CboFolders_KeyDown(object sender, KeyEventArgs e)
         {
             if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext()
+                );
 
             ItemViewer viewer = null;
-            if (_cboKeys.Contains(e.KeyCode)) { viewer = GetItemViewer(sender as Control); }
+            if (_cboKeys.Contains(e.KeyCode))
+            {
+                viewer = GetItemViewer(sender as Control);
+            }
 
             switch (e.KeyCode)
             {
                 case Keys.Escape:
+                {
+                    viewer.Controller.CounterEnter = 1;
+                    viewer.Controller.CounterComboRight = 0;
+                    viewer.CboFolders.DroppedDown = false;
+                    e.SuppressKeyPress = true;
+                    e.Handled = true;
+                    break;
+                }
+                case Keys.Up:
+                {
+                    viewer.Controller.CounterEnter = 0;
+                    break;
+                }
+                case Keys.Down:
+                {
+                    viewer.Controller.CounterEnter = 0;
+                    break;
+                }
+                case Keys.Right:
+                {
+                    viewer.Controller.CounterEnter = 0;
+                    switch (viewer.Controller.CounterComboRight)
+                    {
+                        case 0:
+                        {
+                            viewer.CboFolders.DroppedDown = true;
+                            viewer.Controller.CounterComboRight++;
+                            break;
+                        }
+                        case 1:
+                        {
+                            viewer.CboFolders.DroppedDown = false;
+                            viewer.Controller.CounterComboRight = 0;
+                            MyBox.ShowDialog(
+                                "Pop Out Item or Enumerate Conversation?",
+                                "Dialog",
+                                BoxIcon.Question,
+                                viewer.Controller.RightKeyActions
+                            );
+                            break;
+                        }
+                        default:
+                        {
+                            MessageBox.Show(
+                                "Error in intComboRightCtr ... setting to 0 and continuing",
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error
+                            );
+                            viewer.Controller.CounterComboRight = 0;
+                            break;
+                        }
+                    }
+                    e.SuppressKeyPress = true;
+                    e.Handled = true;
+                    break;
+                }
+                case Keys.Left:
+                {
+                    viewer.Controller.CounterEnter = 1;
+                    viewer.Controller.CounterComboRight = 0;
+                    if (viewer.CboFolders.DroppedDown)
+                    {
+                        viewer.CboFolders.DroppedDown = false;
+                        e.SuppressKeyPress = true;
+                        e.Handled = true;
+                    }
+                    else
+                    {
+                        this.KeyboardHandler_KeyDown(sender, e);
+                    }
+
+                    break;
+                }
+                case Keys.Return:
+                {
+                    if (viewer.Controller.CounterEnter == 1)
+                    {
+                        viewer.Controller.CounterEnter = 0;
+                        viewer.Controller.CounterComboRight = 0;
+                        KeyboardHandler_KeyDown(sender, e);
+                    }
+                    else
+                    {
+                        viewer.Controller.CounterEnter = 1;
+                        viewer.Controller.CounterComboRight = 0;
+                        viewer.CboFolders.DroppedDown = false;
+                        e.SuppressKeyPress = true;
+                        e.Handled = true;
+                    }
+                    break;
+                }
+            }
+        }
+
+        public async void CboFolders_KeyDownAsyncOld(object sender, KeyEventArgs e)
+        {
+            await UiThread.Dispatcher.InvokeAsync(() =>
+            {
+                ItemViewer viewer = null;
+                if (_cboKeys.Contains(e.KeyCode))
+                {
+                    viewer = GetItemViewer(sender as Control);
+                }
+
+                switch (e.KeyCode)
+                {
+                    case Keys.Escape:
                     {
                         viewer.Controller.CounterEnter = 1;
                         viewer.Controller.CounterComboRight = 0;
@@ -237,51 +401,56 @@ namespace QuickFiler.Controllers
                         e.Handled = true;
                         break;
                     }
-                case Keys.Up:
+                    case Keys.Up:
                     {
                         viewer.Controller.CounterEnter = 0;
                         break;
                     }
-                case Keys.Down:
+                    case Keys.Down:
                     {
                         viewer.Controller.CounterEnter = 0;
                         break;
                     }
-                case Keys.Right:
+                    case Keys.Right:
                     {
                         viewer.Controller.CounterEnter = 0;
                         switch (viewer.Controller.CounterComboRight)
                         {
                             case 0:
-                                {
-                                    viewer.CboFolders.DroppedDown = true;
-                                    viewer.Controller.CounterComboRight++;
-                                    break;
-                                }
+                            {
+                                viewer.CboFolders.DroppedDown = true;
+                                viewer.Controller.CounterComboRight++;
+                                break;
+                            }
                             case 1:
-                                {
-                                    viewer.CboFolders.DroppedDown = false;
-                                    viewer.Controller.CounterComboRight = 0;
-                                    MyBox.ShowDialog("Pop Out Item or Enumerate Conversation?",
-                                        "Dialog", BoxIcon.Question, viewer.Controller.RightKeyActions);
-                                    break;
-                                }
+                            {
+                                viewer.CboFolders.DroppedDown = false;
+                                viewer.Controller.CounterComboRight = 0;
+                                MyBox.ShowDialog(
+                                    "Pop Out Item or Enumerate Conversation?",
+                                    "Dialog",
+                                    BoxIcon.Question,
+                                    viewer.Controller.RightKeyActions
+                                );
+                                break;
+                            }
                             default:
-                                {
-                                    MessageBox.Show(
-                                        "Error in intComboRightCtr ... setting to 0 and continuing",
-                                        "Error",
-                                        MessageBoxButtons.OK,
-                                        MessageBoxIcon.Error);
-                                    viewer.Controller.CounterComboRight = 0;
-                                    break;
-                                }
+                            {
+                                MessageBox.Show(
+                                    "Error in intComboRightCtr ... setting to 0 and continuing",
+                                    "Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Error
+                                );
+                                viewer.Controller.CounterComboRight = 0;
+                                break;
+                            }
                         }
                         e.SuppressKeyPress = true;
                         e.Handled = true;
                         break;
                     }
-                case Keys.Left:
+                    case Keys.Left:
                     {
                         viewer.Controller.CounterEnter = 1;
                         viewer.Controller.CounterComboRight = 0;
@@ -291,17 +460,20 @@ namespace QuickFiler.Controllers
                             e.SuppressKeyPress = true;
                             e.Handled = true;
                         }
-                        else { this.KeyboardHandler_KeyDown(sender, e); }
+                        else
+                        {
+                            this.KeyboardHandler_KeyDownAsync(sender, e);
+                        }
 
                         break;
                     }
-                case Keys.Return:
+                    case Keys.Return:
                     {
                         if (viewer.Controller.CounterEnter == 1)
                         {
                             viewer.Controller.CounterEnter = 0;
                             viewer.Controller.CounterComboRight = 0;
-                            KeyboardHandler_KeyDown(sender, e);
+                            KeyboardHandler_KeyDownAsync(sender, e);
                         }
                         else
                         {
@@ -313,103 +485,6 @@ namespace QuickFiler.Controllers
                         }
                         break;
                     }
-            }
-        }
-
-        public async void CboFolders_KeyDownAsyncOld(object sender, KeyEventArgs e)
-        {
-            await UiThread.Dispatcher.InvokeAsync(() =>
-            {
-                ItemViewer viewer = null;
-                if (_cboKeys.Contains(e.KeyCode)) { viewer = GetItemViewer(sender as Control); }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.Escape:
-                        {
-                            viewer.Controller.CounterEnter = 1;
-                            viewer.Controller.CounterComboRight = 0;
-                            viewer.CboFolders.DroppedDown = false;
-                            e.SuppressKeyPress = true;
-                            e.Handled = true;
-                            break;
-                        }
-                    case Keys.Up:
-                        {
-                            viewer.Controller.CounterEnter = 0;
-                            break;
-                        }
-                    case Keys.Down:
-                        {
-                            viewer.Controller.CounterEnter = 0;
-                            break;
-                        }
-                    case Keys.Right:
-                        {
-                            viewer.Controller.CounterEnter = 0;
-                            switch (viewer.Controller.CounterComboRight)
-                            {
-                                case 0:
-                                    {
-                                        viewer.CboFolders.DroppedDown = true;
-                                        viewer.Controller.CounterComboRight++;
-                                        break;
-                                    }
-                                case 1:
-                                    {
-                                        viewer.CboFolders.DroppedDown = false;
-                                        viewer.Controller.CounterComboRight = 0;
-                                        MyBox.ShowDialog("Pop Out Item or Enumerate Conversation?",
-                                            "Dialog", BoxIcon.Question, viewer.Controller.RightKeyActions);
-                                        break;
-                                    }
-                                default:
-                                    {
-                                        MessageBox.Show(
-                                            "Error in intComboRightCtr ... setting to 0 and continuing",
-                                            "Error",
-                                            MessageBoxButtons.OK,
-                                            MessageBoxIcon.Error);
-                                        viewer.Controller.CounterComboRight = 0;
-                                        break;
-                                    }
-                            }
-                            e.SuppressKeyPress = true;
-                            e.Handled = true;
-                            break;
-                        }
-                    case Keys.Left:
-                        {
-                            viewer.Controller.CounterEnter = 1;
-                            viewer.Controller.CounterComboRight = 0;
-                            if (viewer.CboFolders.DroppedDown)
-                            {
-                                viewer.CboFolders.DroppedDown = false;
-                                e.SuppressKeyPress = true;
-                                e.Handled = true;
-                            }
-                            else { this.KeyboardHandler_KeyDownAsync(sender, e); }
-
-                            break;
-                        }
-                    case Keys.Return:
-                        {
-                            if (viewer.Controller.CounterEnter == 1)
-                            {
-                                viewer.Controller.CounterEnter = 0;
-                                viewer.Controller.CounterComboRight = 0;
-                                KeyboardHandler_KeyDownAsync(sender, e);
-                            }
-                            else
-                            {
-                                viewer.Controller.CounterEnter = 1;
-                                viewer.Controller.CounterComboRight = 0;
-                                viewer.CboFolders.DroppedDown = false;
-                                e.SuppressKeyPress = true;
-                                e.Handled = true;
-                            }
-                            break;
-                        }
                 }
             });
         }
@@ -417,22 +492,33 @@ namespace QuickFiler.Controllers
         public async void CboFolders_KeyDownAsync(object sender, KeyEventArgs e)
         {
             if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext()
+                );
             if (sender is not ComboBox)
             {
                 throw new ArgumentException(
-                $"{nameof(CboFolders_KeyDownAsync)} event handler can " +
-                $"only be assigned to a ComboBox.  must be a ComboBox");
+                    $"{nameof(CboFolders_KeyDownAsync)} event handler can "
+                        + $"only be assigned to a ComboBox.  must be a ComboBox"
+                );
             }
             var cb = (ComboBox)sender;
-            if (cb.DroppedDown) { await DdOpen_KeyDownAsync(cb, e); }
-            else { await DdClosed_KeyDownAsync(cb, e); }
+            if (cb.DroppedDown)
+            {
+                await DdOpen_KeyDownAsync(cb, e);
+            }
+            else
+            {
+                await DdClosed_KeyDownAsync(cb, e);
+            }
         }
 
         public async Task DdOpen_KeyDownAsync(ComboBox cbo, KeyEventArgs e)
         {
             if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext()
+                );
             switch (e.KeyCode)
             {
                 //case Keys.Escape:
@@ -444,34 +530,37 @@ namespace QuickFiler.Controllers
                 //        break;
                 //    }
                 case Keys k when (k == Keys.Up || k == Keys.Down):
-                    {
-                        // Don't handle the instruction so that it moves the selection up
-                        break;
-                    }
+                {
+                    // Don't handle the instruction so that it moves the selection up
+                    break;
+                }
                 //case Keys.Down:
                 //    {
                 //        // Don't handle the instruction so that it moves the selection down
                 //        break;
                 //    }
                 case Keys.Right:
-                    {
-                        var controller = cbo.GetAncestor<ItemViewer>();
-                        e.SuppressKeyPress = true;
-                        e.Handled = true;
+                {
+                    var controller = cbo.GetAncestor<ItemViewer>();
+                    e.SuppressKeyPress = true;
+                    e.Handled = true;
 
-                        MyBox.ShowDialog("Pop Out Item or Enumerate Conversation?",
-                                         "Dialog", BoxIcon.Question,
-                                         cbo.GetAncestor<ItemViewer>().Controller.RightKeyActions);
-                        break;
-                    }
+                    MyBox.ShowDialog(
+                        "Pop Out Item or Enumerate Conversation?",
+                        "Dialog",
+                        BoxIcon.Question,
+                        cbo.GetAncestor<ItemViewer>().Controller.RightKeyActions
+                    );
+                    break;
+                }
                 case Keys k when (k == Keys.Left || k == Keys.Return || k == Keys.Escape):
-                    {
-                        // Close the drop down box
-                        UiThread.Dispatcher.Invoke(() => cbo.DroppedDown = false);
-                        e.SuppressKeyPress = true;
-                        e.Handled = true;
-                        break;
-                    }
+                {
+                    // Close the drop down box
+                    UiThread.Dispatcher.Invoke(() => cbo.DroppedDown = false);
+                    e.SuppressKeyPress = true;
+                    e.Handled = true;
+                    break;
+                }
                 //case Keys.Return:
                 //    {
                 //        UIThreadExtensions.UiDispatcher.Invoke(() => cbo.DroppedDown = false);
@@ -480,35 +569,35 @@ namespace QuickFiler.Controllers
                 //        break;
                 //    }
                 default:
-                    {
-                        // Pass on the instruction to the normal handler
-                        await KeyDownTaskAsync((object)cbo, e);
-                        break;
-                    }
+                {
+                    // Pass on the instruction to the normal handler
+                    await KeyDownTaskAsync((object)cbo, e);
+                    break;
+                }
             }
         }
 
         public async Task DdClosed_KeyDownAsync(ComboBox cbo, KeyEventArgs e)
         {
             if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext()
+                );
             switch (e.KeyCode)
             {
                 case Keys.Right:
-                    {
-                        await UiThread.Dispatcher.InvokeAsync(() => cbo.DroppedDown = true);
-                        e.SuppressKeyPress = true;
-                        e.Handled = true;
-                        break;
-                    }
+                {
+                    await UiThread.Dispatcher.InvokeAsync(() => cbo.DroppedDown = true);
+                    e.SuppressKeyPress = true;
+                    e.Handled = true;
+                    break;
+                }
                 default:
-                    {
-                        await KeyDownTaskAsync((object)cbo, e);
-                        break;
-                    }
-
+                {
+                    await KeyDownTaskAsync((object)cbo, e);
+                    break;
+                }
             }
         }
-
     }
 }

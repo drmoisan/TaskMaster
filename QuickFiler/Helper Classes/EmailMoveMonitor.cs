@@ -1,6 +1,4 @@
-﻿using log4net.Repository.Hierarchy;
-using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,6 +7,8 @@ using System.Reactive.Disposables;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using log4net.Repository.Hierarchy;
+using Microsoft.Office.Interop.Outlook;
 
 namespace QuickFiler.Helper_Classes
 {
@@ -16,7 +16,8 @@ namespace QuickFiler.Helper_Classes
     internal class EmailMoveMonitor
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public EmailMoveMonitor()
         {
@@ -25,9 +26,7 @@ namespace QuickFiler.Helper_Classes
 
         private List<EmailMoveAction> _hookedItems = [];
 
-        public void HookItem(
-            MailItem mail,
-            Action<MailItem> moveAction)
+        public void HookItem(MailItem mail, Action<MailItem> moveAction)
         {
             lock (_hookedItems)
             {
@@ -40,10 +39,15 @@ namespace QuickFiler.Helper_Classes
 
         public void UnhookItem(MailItem mail)
         {
-            if (mail is null) { return; }
+            if (mail is null)
+            {
+                return;
+            }
             lock (_hookedItems)
             {
-                var count = _hookedItems.Count(x => x.Folder.EntryID == (mail.Parent as Folder)?.EntryID);
+                var count = _hookedItems.Count(x =>
+                    x.Folder.EntryID == (mail.Parent as Folder)?.EntryID
+                );
                 var hookedItem = _hookedItems.FirstOrDefault(x => x.Mail.EntryID == mail.EntryID);
                 if (hookedItem != null)
                 {
@@ -84,7 +88,10 @@ namespace QuickFiler.Helper_Classes
 
         private async Task<Folder> GetParentFolderAsync(MailItem mail, int remaining = 2)
         {
-            if (mail is null) { return null; }
+            if (mail is null)
+            {
+                return null;
+            }
 
             var parentFolder = await Task.Run(async () =>
             {
@@ -106,20 +113,23 @@ namespace QuickFiler.Helper_Classes
 
                     if (remaining > 0)
                     {
-                        logger.Error($"Error getting parent folder for mail item {entryId}. {remaining} remaining attempts.");
+                        logger.Error(
+                            $"Error getting parent folder for mail item {entryId}. {remaining} remaining attempts."
+                        );
                         return await GetParentFolderAsync(mail, remaining - 1);
                     }
                     else
                     {
-                        logger.Error($"Error getting parent folder for mail item {entryId}. No remaining attempts. Returning null", e);
+                        logger.Error(
+                            $"Error getting parent folder for mail item {entryId}. No remaining attempts. Returning null",
+                            e
+                        );
                         return null;
                     }
                 }
-
             });
 
             return parentFolder;
-
         }
 
         public void UnhookAll()
@@ -135,15 +145,18 @@ namespace QuickFiler.Helper_Classes
         }
 
         private MAPIFolderEvents_12_BeforeItemMoveEventHandler BeforeItemMove;
+
         private void SetupBeforeItemMove()
         {
-            BeforeItemMove = delegate (object item, MAPIFolder moveTo, ref bool cancel)
+            BeforeItemMove = delegate(object item, MAPIFolder moveTo, ref bool cancel)
             {
                 if (item is MailItem mail)
                 {
                     lock (_hookedItems)
                     {
-                        var hookedItem = _hookedItems.FirstOrDefault(x => x.Mail.EntryID == mail.EntryID);
+                        var hookedItem = _hookedItems.FirstOrDefault(x =>
+                            x.Mail.EntryID == mail.EntryID
+                        );
                         if (hookedItem != null)
                         {
                             hookedItem.MoveAction(mail);
@@ -153,18 +166,11 @@ namespace QuickFiler.Helper_Classes
                 }
             };
         }
-
-
-
-
     }
 
     internal class EmailMoveAction
     {
-        public EmailMoveAction(
-            MailItem mail,
-            Folder folder,
-            Action<MailItem> moveAction)
+        public EmailMoveAction(MailItem mail, Folder folder, Action<MailItem> moveAction)
         {
             _mail = mail;
             _folder = folder;
@@ -180,6 +186,4 @@ namespace QuickFiler.Helper_Classes
         private Action<MailItem> _moveAction;
         public Action<MailItem> MoveAction => _moveAction;
     }
-
-
 }

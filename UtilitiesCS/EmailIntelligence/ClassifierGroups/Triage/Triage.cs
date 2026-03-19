@@ -1,11 +1,11 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups;
 using UtilitiesCS.Extensions;
@@ -18,13 +18,12 @@ namespace UtilitiesCS.EmailIntelligence
     public class Triage : IConditionalEngine<MailItemHelper>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region ctor
 
-        public Triage(
-            IApplicationGlobals globals,
-            CancellationToken token = default)
+        public Triage(IApplicationGlobals globals, CancellationToken token = default)
         {
             //Manager = manager;
             Globals = globals;
@@ -32,12 +31,16 @@ namespace UtilitiesCS.EmailIntelligence
             OlLogic = new(this);
         }
 
-        private Triage() { OlLogic = new(this); }
+        private Triage()
+        {
+            OlLogic = new(this);
+        }
 
         public async Task<Triage> InitAsync()
         {
             TokenizeAsync = new EmailTokenizer().TokenizeAsync;
-            CallbackAsync = (item, value) => Task.Run(() => ((MailItem)item).SetUdf("Triage", value));
+            CallbackAsync = (item, value) =>
+                Task.Run(() => ((MailItem)item).SetUdf("Triage", value));
 
             ClassifierGroup = await Globals.AF.Manager[GroupName];
             return this;
@@ -47,19 +50,25 @@ namespace UtilitiesCS.EmailIntelligence
             IApplicationGlobals globals,
             bool initialize = true,
             Enums.NotFoundEnum treatment = Enums.NotFoundEnum.Skip,
-            CancellationToken token = default)
+            CancellationToken token = default
+        )
         {
             var triage = new Triage();
             triage.Globals = globals;
 
-            if (!await triage.ValidateTriageManagerAsync(
-                triage.HasValidTriageManagerAsync,
-                triage.TriageMissingHandlerAsync,
-                treatment,
-                token)) { return null; }
+            if (
+                !await triage.ValidateTriageManagerAsync(
+                    triage.HasValidTriageManagerAsync,
+                    triage.TriageMissingHandlerAsync,
+                    treatment,
+                    token
+                )
+            )
+            {
+                return null;
+            }
 
             return await Task.Run(triage.InitAsync, token);
-
         }
 
         #endregion ctor
@@ -73,7 +82,8 @@ namespace UtilitiesCS.EmailIntelligence
             Func<CancellationToken, Task<(bool, string)>> asyncValidator,
             Func<Enums.NotFoundEnum, string, CancellationToken, Task<bool>> asyncAction,
             Enums.NotFoundEnum treatment,
-            CancellationToken cancel)
+            CancellationToken cancel
+        )
         {
             var (isValid, message) = await asyncValidator(cancel);
             return isValid ? true : await asyncAction(treatment, message, cancel);
@@ -101,14 +111,21 @@ namespace UtilitiesCS.EmailIntelligence
                 {
                     if (!classifierGroup.Classifiers.TryGetValue(name, out var classifier))
                     {
-                        return (false, $"{GroupName} classifier group cannot find classifier named {name}.");
+                        return (
+                            false,
+                            $"{GroupName} classifier group cannot find classifier named {name}."
+                        );
                     }
                 }
                 return (true, "");
             }
         }
 
-        public async Task<bool> TriageMissingHandlerAsync(Enums.NotFoundEnum treatment, string message, CancellationToken cancel)
+        public async Task<bool> TriageMissingHandlerAsync(
+            Enums.NotFoundEnum treatment,
+            string message,
+            CancellationToken cancel
+        )
         {
             switch (treatment)
             {
@@ -119,7 +136,12 @@ namespace UtilitiesCS.EmailIntelligence
                 case Enums.NotFoundEnum.Create:
                     logger.Warn($"{message} Creating new classifier");
                     ClassifierGroup = await CreateTriageClassifiersAsync(ClassNames, cancel);
-                    if ((await Globals.AF.Manager.Configuration).TryGetValue($"Config{GroupName}", out var loader))
+                    if (
+                        (await Globals.AF.Manager.Configuration).TryGetValue(
+                            $"Config{GroupName}",
+                            out var loader
+                        )
+                    )
                     {
                         ClassifierGroup.Config = loader.Config;
                         ClassifierGroup.Serialize();
@@ -137,11 +159,17 @@ namespace UtilitiesCS.EmailIntelligence
                         $"{message} Would you like to create a new classifier?",
                         $"Cannot Load {GroupName}",
                         MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Warning);
+                        MessageBoxIcon.Warning
+                    );
                     if (result == DialogResult.Yes)
                     {
                         ClassifierGroup = await CreateTriageClassifiersAsync(ClassNames, cancel);
-                        if ((await Globals.AF.Manager.Configuration).TryGetValue($"Config{GroupName}", out loader))
+                        if (
+                            (await Globals.AF.Manager.Configuration).TryGetValue(
+                                $"Config{GroupName}",
+                                out loader
+                            )
+                        )
                         {
                             ClassifierGroup.Config = loader.Config;
                             ClassifierGroup.Serialize();
@@ -165,7 +193,7 @@ namespace UtilitiesCS.EmailIntelligence
             var group = new BayesianClassifierGroup
             {
                 TotalEmailCount = 0,
-                SharedTokenBase = new Corpus()
+                SharedTokenBase = new Corpus(),
             };
             foreach (var name in ClassNames)
             {
@@ -175,7 +203,10 @@ namespace UtilitiesCS.EmailIntelligence
             return group;
         }
 
-        public static async Task<BayesianClassifierGroup> CreateTriageClassifiersAsync(HashSet<string> classNames, CancellationToken token = default)
+        public static async Task<BayesianClassifierGroup> CreateTriageClassifiersAsync(
+            HashSet<string> classNames,
+            CancellationToken token = default
+        )
         {
             return await Task.Run(CreateClassifier, token);
         }
@@ -184,7 +215,11 @@ namespace UtilitiesCS.EmailIntelligence
 
         #region Properties
 
-        public BayesianClassifierGroup ClassifierGroup { get => _classifierGroup; set => _classifierGroup = value; }
+        public BayesianClassifierGroup ClassifierGroup
+        {
+            get => _classifierGroup;
+            set => _classifierGroup = value;
+        }
         private BayesianClassifierGroup _classifierGroup;
 
         public ISmartSerializableConfig Config => ClassifierGroup.Config;
@@ -197,30 +232,46 @@ namespace UtilitiesCS.EmailIntelligence
         /// <summary>
         /// Async Delegate Function that extracts an array of string tokens from an object
         /// </summary>
-        public Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> TokenizeAsync { get => _tokenizeAsync; set => _tokenizeAsync = value; }
+        public Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> TokenizeAsync
+        {
+            get => _tokenizeAsync;
+            set => _tokenizeAsync = value;
+        }
         private Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> _tokenizeAsync;
 
-        public Func<object, string, Task> CallbackAsync { get => _callbackAsync; set => _callbackAsync = value; }
+        public Func<object, string, Task> CallbackAsync
+        {
+            get => _callbackAsync;
+            set => _callbackAsync = value;
+        }
 
         #endregion Properties
 
         #region IConditionalEngine
 
-        public static async Task<IConditionalEngine<MailItemHelper>> CreateEngineAsync(IApplicationGlobals globals)
+        public static async Task<IConditionalEngine<MailItemHelper>> CreateEngineAsync(
+            IApplicationGlobals globals
+        )
         {
             var triage = await CreateAsync(globals);
             return triage;
         }
 
-        public Func<MailItemHelper, Task> AsyncAction => (item) => Engine is not null ? ((Triage)Engine).TestAsync(item) : null;
+        public Func<MailItemHelper, Task> AsyncAction =>
+            (item) => Engine is not null ? ((Triage)Engine).TestAsync(item) : null;
 
-        public Func<object, Task<bool>> AsyncCondition => (item) => Task.Run(() =>
-                item is MailItem mailItem && mailItem.MessageClass == "IPM.Note" &&
-                mailItem.UserProperties.Find("Triage") is null);
+        public Func<object, Task<bool>> AsyncCondition =>
+            (item) =>
+                Task.Run(() =>
+                    item is MailItem mailItem
+                    && mailItem.MessageClass == "IPM.Note"
+                    && mailItem.UserProperties.Find("Triage") is null
+                );
 
         public object Engine => this;
 
-        public Func<IApplicationGlobals, Task> EngineInitializer => throw new NotImplementedException();
+        public Func<IApplicationGlobals, Task> EngineInitializer =>
+            throw new NotImplementedException();
 
         public string EngineName => "Triage";
 
@@ -234,53 +285,88 @@ namespace UtilitiesCS.EmailIntelligence
 
         public async Task CreateNewTriageClassifierGroupAsync(CancellationToken token)
         {
-            await Task.Run(async () =>
-            {
-                ClassifierGroup = new BayesianClassifierGroup();
-                if ((await Globals.AF.Manager.Configuration).TryGetValue($"Config{GroupName}", out var loader))
+            await Task.Run(
+                async () =>
                 {
-                    ClassifierGroup.Config = loader.Config;
-                    ClassifierGroup.Serialize();
-                }
-                Globals.AF.Manager[GroupName] = ClassifierGroup.ToAsyncLazy();
-
-            }, token);
+                    ClassifierGroup = new BayesianClassifierGroup();
+                    if (
+                        (await Globals.AF.Manager.Configuration).TryGetValue(
+                            $"Config{GroupName}",
+                            out var loader
+                        )
+                    )
+                    {
+                        ClassifierGroup.Config = loader.Config;
+                        ClassifierGroup.Serialize();
+                    }
+                    Globals.AF.Manager[GroupName] = ClassifierGroup.ToAsyncLazy();
+                },
+                token
+            );
         }
 
         public async Task ClassifyAsync(Selection selection, CancellationToken token = default)
         {
-            await selection.Cast<object>()
+            await selection
+                .Cast<object>()
                 .Where(x => x is MailItem)
                 .ToAsyncEnumerable()
-                .ForEachAwaitWithCancellationAsync(async (item, token) =>
-                {
-                    var predictions = await ClassifierGroup.ClassifyAsync(item, token);
-                    var mostLikely = predictions.FirstOrDefault().Class;
-                    if (CallbackAsync is not null) { await CallbackAsync(item, mostLikely); }
-                }, token);
+                .ForEachAwaitWithCancellationAsync(
+                    async (item, token) =>
+                    {
+                        var predictions = await ClassifierGroup.ClassifyAsync(item, token);
+                        var mostLikely = predictions.FirstOrDefault().Class;
+                        if (CallbackAsync is not null)
+                        {
+                            await CallbackAsync(item, mostLikely);
+                        }
+                    },
+                    token
+                );
         }
 
-        public async Task TrainAsync(Selection selection, string triageId, CancellationToken token = default)
+        public async Task TrainAsync(
+            Selection selection,
+            string triageId,
+            CancellationToken token = default
+        )
         {
-            await selection.Cast<object>()
-                           .Where(x => x is MailItem)
-                           .Cast<MailItem>()
-                           .ToAsyncEnumerable()
-                           .ForEachAwaitWithCancellationAsync((item, token) => TrainAsync(item, triageId), token);
+            await selection
+                .Cast<object>()
+                .Where(x => x is MailItem)
+                .Cast<MailItem>()
+                .ToAsyncEnumerable()
+                .ForEachAwaitWithCancellationAsync(
+                    (item, token) => TrainAsync(item, triageId),
+                    token
+                );
 
             ClassifierGroup.Serialize();
         }
 
-        public async Task TrainAsync(object item, string triageId, CancellationToken cancel = default)
+        public async Task TrainAsync(
+            object item,
+            string triageId,
+            CancellationToken cancel = default
+        )
         {
-            TokenizeAsync.ThrowIfNull($"{nameof(TokenizeAsync)} delegate function cannot be null to Train classifier");
+            TokenizeAsync.ThrowIfNull(
+                $"{nameof(TokenizeAsync)} delegate function cannot be null to Train classifier"
+            );
             item.ThrowIfNull($"{nameof(item)} cannot be null to Train classifier");
             var tokens = await TokenizeAsync(item, Globals, Token);
             await TrainAsync(tokens, triageId);
-            if (CallbackAsync is not null) { await CallbackAsync(item, triageId); }
+            if (CallbackAsync is not null)
+            {
+                await CallbackAsync(item, triageId);
+            }
         }
 
-        public async Task TrainAsync(string[] tokens, string triageId, CancellationToken cancel = default)
+        public async Task TrainAsync(
+            string[] tokens,
+            string triageId,
+            CancellationToken cancel = default
+        )
         {
             var classifierName = triageId;
             //Manager["Triage"].Classifiers[classifierName].Train(await tokens.GroupAndCountAsync(), 1);
@@ -289,40 +375,54 @@ namespace UtilitiesCS.EmailIntelligence
 
         public async Task TestAsync(Selection selection, CancellationToken token = default)
         {
-            if (selection is null) { return; }
+            if (selection is null)
+            {
+                return;
+            }
 
             await selection
                 .Cast<object>()
                 .ToAsyncEnumerable()
                 .Where(x => x is MailItem)
                 .Cast<MailItem>()
-                .SelectAwaitWithCancellation(async (item, token) =>
-                {
-                    var h = await MailItemHelper.FromMailItemAsync(item, Globals, token, false);
-                    _ = h.Tokens;
-                    return h;
-                }).ForEachAwaitWithCancellationAsync(TestAsync, token);
+                .SelectAwaitWithCancellation(
+                    async (item, token) =>
+                    {
+                        var h = await MailItemHelper.FromMailItemAsync(item, Globals, token, false);
+                        _ = h.Tokens;
+                        return h;
+                    }
+                )
+                .ForEachAwaitWithCancellationAsync(TestAsync, token);
         }
 
         public async Task TestAsync(MailItemHelper helper, CancellationToken token = default)
         {
             var predictions = await ClassifierGroup.ClassifyAsync(helper.Tokens, token);
-            var predictedClass = predictions.Count() == 0 ? UnknownClassMarker : predictions.First().Class;
+            var predictedClass =
+                predictions.Count() == 0 ? UnknownClassMarker : predictions.First().Class;
             await TestActionAsync(helper, predictedClass, token);
         }
 
         public async Task TestAsync(MailItem mailItem, CancellationToken cancel = default)
         {
-            TokenizeAsync.ThrowIfNull($"{nameof(TokenizeAsync)} delegate function cannot " +
-                $"be null to Predict {GroupName} from a {nameof(MailItem)}");
+            TokenizeAsync.ThrowIfNull(
+                $"{nameof(TokenizeAsync)} delegate function cannot "
+                    + $"be null to Predict {GroupName} from a {nameof(MailItem)}"
+            );
 
             var tokens = await TokenizeAsync(mailItem, Globals, cancel);
             var predictions = await ClassifierGroup.ClassifyAsync(tokens, cancel);
-            var predictedClass = predictions.Count() == 0 ? UnknownClassMarker : predictions.First().Class;
+            var predictedClass =
+                predictions.Count() == 0 ? UnknownClassMarker : predictions.First().Class;
             await TestActionAsync(mailItem, predictedClass, cancel);
         }
 
-        public async Task TestActionAsync(MailItemHelper helper, string predictedClass, CancellationToken token = default)
+        public async Task TestActionAsync(
+            MailItemHelper helper,
+            string predictedClass,
+            CancellationToken token = default
+        )
         {
             await Task.Run(() =>
             {
@@ -331,10 +431,13 @@ namespace UtilitiesCS.EmailIntelligence
             });
         }
 
-        public async Task TestActionAsync(MailItem mailItem, string predictedClass, CancellationToken token = default)
+        public async Task TestActionAsync(
+            MailItem mailItem,
+            string predictedClass,
+            CancellationToken token = default
+        )
         {
             await Task.Run(() => mailItem.SetUdf("Triage", predictedClass), token);
         }
-
     }
 }

@@ -5,17 +5,17 @@ using System.IO;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using Microsoft.Office.Interop.Outlook;
-using Outlook = Microsoft.Office.Interop.Outlook;
 using ToDoModel;
 using UtilitiesCS;
 //using Windows.Win32;
 using UtilitiesCS.OutlookExtensions;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 [assembly: log4net.Config.XmlConfigurator(Watch = true)]
 
 namespace QuickFiler.Legacy
 {
-    public class QuickFileController 
+    public class QuickFileController
     {
         //private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -26,9 +26,11 @@ namespace QuickFiler.Legacy
         //private int _intEmailPosition;
         private int _intEmailsPerIteration;
         private long _lngAcceleratorDialogueTop;
+
         //private long _lngAcceleratorDialogueLeft;
         private bool _blSuppressEvents;
         private bool _blRunningModalCode = false;
+
         //private bool _boolRemoteMouseApp;
         private cStopWatch _stopWatch;
 
@@ -47,6 +49,7 @@ namespace QuickFiler.Legacy
         private long _heightFormMin;
         private long _heightPanelMainMax;
         private long _heightPanelMainMin;
+
         //private long _lngPanelMainSCTop;
         private long _lngTopButtonOkMin;
         private long _lngTopButtonCancelMin;
@@ -54,15 +57,16 @@ namespace QuickFiler.Legacy
         private long _lngTopAcceleratorDialogueMin;
         private long _lngTopSpnMin;
 
-        /* Old design used absolute pixels for a particular resolution (1920 x 1080). 
+        /* Old design used absolute pixels for a particular resolution (1920 x 1080).
          * This variable uses PInvoke to grab the current resolution and adjust. Autoscaling
          * is handled by forms class. This will be deprecated eventually. */
-        //private double _multiplier;  
+        //private double _multiplier;
         #endregion
         #region Global Variables, Window Handles and Collections
         // Globals
         private readonly IApplicationGlobals _globals;
         private readonly Explorer _activeExplorer;
+
         //private readonly IOlObjects _olObjects;
         private readonly Outlook.Application _olApp;
         private readonly QfcFormLegacyViewer _viewer;
@@ -87,7 +91,8 @@ namespace QuickFiler.Legacy
             IApplicationGlobals AppGlobals,
             QfcFormLegacyViewer Viewer,
             Queue<MailItem> ListEmailsInFolder,
-            ParentCleanupMethod ParentCleanup)
+            ParentCleanupMethod ParentCleanup
+        )
         {
             // Link _itemViewer to _itemController
             _viewer = Viewer;
@@ -99,7 +104,7 @@ namespace QuickFiler.Legacy
 
             _parentCleanup = ParentCleanup;
 
-            // Link _itemController to global variables 
+            // Link _itemController to global variables
             _globals = AppGlobals;
             //_olObjects = AppGlobals.Ol;
             _olApp = AppGlobals.Ol.App;
@@ -150,8 +155,13 @@ namespace QuickFiler.Legacy
             RemoveControlsTabstops();
             InitializeToleranceMinimums();
             _heightPanelMainMax = ResizeForToleranceMax();
-             
-            _intEmailsPerIteration = (int)Math.Round(_heightPanelMainMax / ((double)(QfcConstants.Panel.Height + QfcConstants.FrmSp)), 0);
+
+            _intEmailsPerIteration = (int)
+                Math.Round(
+                    _heightPanelMainMax
+                        / ((double)(QfcConstants.Panel.Height + QfcConstants.FrmSp)),
+                    0
+                );
             _viewer.L1v2L2h5_SpnEmailPerLoad.Value = _intEmailsPerIteration;
 
             _blSuppressEvents = false;
@@ -172,7 +182,11 @@ namespace QuickFiler.Legacy
             }
         }
 
-        public bool BlShowInConversations { get => blShowInConversations; set => blShowInConversations = value; }
+        public bool BlShowInConversations
+        {
+            get => blShowInConversations;
+            set => blShowInConversations = value;
+        }
 
         #endregion
 
@@ -208,12 +222,20 @@ namespace QuickFiler.Legacy
             long lngPreviousHeight;
             long lngHeightDifference;
             lngHeightDifference = _heightFormMin - _viewer.Height;
-            _viewer.L1v2L2h3_ButtonOK.Top = (int)(_viewer.L1v2L2h3_ButtonOK.Top + lngHeightDifference);
-            _viewer.L1v2L2h4_ButtonCancel.Top = (int)(_viewer.L1v2L2h4_ButtonCancel.Top + lngHeightDifference);
-            _viewer.L1v2L2h4_ButtonUndo.Top = (int)(_viewer.L1v2L2h4_ButtonUndo.Top + lngHeightDifference);
+            _viewer.L1v2L2h3_ButtonOK.Top = (int)(
+                _viewer.L1v2L2h3_ButtonOK.Top + lngHeightDifference
+            );
+            _viewer.L1v2L2h4_ButtonCancel.Top = (int)(
+                _viewer.L1v2L2h4_ButtonCancel.Top + lngHeightDifference
+            );
+            _viewer.L1v2L2h4_ButtonUndo.Top = (int)(
+                _viewer.L1v2L2h4_ButtonUndo.Top + lngHeightDifference
+            );
             _lngAcceleratorDialogueTop = _viewer.KeyboardDialog.Top + lngHeightDifference;
             _viewer.KeyboardDialog.Top = (int)_lngAcceleratorDialogueTop;
-            _viewer.L1v2L2h5_SpnEmailPerLoad.Top = (int)(_viewer.L1v2L2h5_SpnEmailPerLoad.Top + lngHeightDifference);
+            _viewer.L1v2L2h5_SpnEmailPerLoad.Top = (int)(
+                _viewer.L1v2L2h5_SpnEmailPerLoad.Top + lngHeightDifference
+            );
             _lngTopSpnMin = _viewer.L1v2L2h5_SpnEmailPerLoad.Top;
             //_lngAcceleratorDialogueLeft = _viewer.KeyboardDialog.Left;
 
@@ -221,16 +243,26 @@ namespace QuickFiler.Legacy
             lngPreviousHeight = _viewer.Height;
             _viewer.Height = (int)_heightFormMax;
             lngHeightDifference = _viewer.Height - lngPreviousHeight;
-            _viewer.L1v2L2h3_ButtonOK.Top = (int)(_viewer.L1v2L2h3_ButtonOK.Top + lngHeightDifference);
-            _viewer.L1v2L2h4_ButtonCancel.Top = (int)(_viewer.L1v2L2h4_ButtonCancel.Top + lngHeightDifference);
-            _viewer.L1v2L2h4_ButtonUndo.Top = (int)(_viewer.L1v2L2h4_ButtonUndo.Top + lngHeightDifference);
+            _viewer.L1v2L2h3_ButtonOK.Top = (int)(
+                _viewer.L1v2L2h3_ButtonOK.Top + lngHeightDifference
+            );
+            _viewer.L1v2L2h4_ButtonCancel.Top = (int)(
+                _viewer.L1v2L2h4_ButtonCancel.Top + lngHeightDifference
+            );
+            _viewer.L1v2L2h4_ButtonUndo.Top = (int)(
+                _viewer.L1v2L2h4_ButtonUndo.Top + lngHeightDifference
+            );
             _lngAcceleratorDialogueTop = _viewer.KeyboardDialog.Top + lngHeightDifference;
             _viewer.KeyboardDialog.Top = (int)_lngAcceleratorDialogueTop;
             //_lngAcceleratorDialogueLeft = _viewer.KeyboardDialog.Left;
-            _viewer.L1v2L2h5_SpnEmailPerLoad.Top = (int)(_viewer.L1v2L2h5_SpnEmailPerLoad.Top + lngHeightDifference);
+            _viewer.L1v2L2h5_SpnEmailPerLoad.Top = (int)(
+                _viewer.L1v2L2h5_SpnEmailPerLoad.Top + lngHeightDifference
+            );
 
             // Set Max Size of the main _tlp based on resizing
-            _viewer.L1v1L2_PanelMain.Height = (int)(_viewer.L1v1L2_PanelMain.Height + lngHeightDifference);
+            _viewer.L1v1L2_PanelMain.Height = (int)(
+                _viewer.L1v1L2_PanelMain.Height + lngHeightDifference
+            );
 
             return _viewer.L1v1L2_PanelMain.Height;
         }
@@ -243,29 +275,37 @@ namespace QuickFiler.Legacy
             // MsgBox "App Width " & Me.Width & vbCrLf & "Screen Width " & ScreenWidth * PointsPerPixel
             if (!_blSuppressEvents | Force)
             {
+                intDiffx = (int)(
+                    _viewer.Width >= QfcConstants.Width_UserForm - 100L
+                        ? _viewer.Width - QfcConstants.Width_UserForm
+                        : 0L
+                );
 
-                intDiffx = (int)(_viewer.Width >= QfcConstants.Width_UserForm - 100L ? _viewer.Width - QfcConstants.Width_UserForm : 0L);
-
-                intDiffy = (int)(_viewer.Height >= _heightFormMin ? _viewer.Height - _heightFormMin : 0L);
+                intDiffy = (int)(
+                    _viewer.Height >= _heightFormMin ? _viewer.Height - _heightFormMin : 0L
+                );
 
                 _viewer.L1v1L2_PanelMain.Width = (int)(QfcConstants.Width_PanelMain + intDiffx);
                 _viewer.L1v1L2_PanelMain.Height = (int)(_heightPanelMainMin + intDiffy);
 
                 _viewer.L1v2L2h3_ButtonOK.Top = (int)(_lngTopButtonOkMin + intDiffy);
-                _viewer.L1v2L2h3_ButtonOK.Left = (int)Math.Round(QfcConstants.OK_left + intDiffx / 2d);
+                _viewer.L1v2L2h3_ButtonOK.Left = (int)
+                    Math.Round(QfcConstants.OK_left + intDiffx / 2d);
                 _viewer.L1v2L2h4_ButtonCancel.Top = (int)(_lngTopButtonCancelMin + intDiffy);
-                _viewer.L1v2L2h4_ButtonCancel.Left = (int)(_viewer.L1v2L2h3_ButtonOK.Left + QfcConstants.CANCEL_left - QfcConstants.OK_left);
+                _viewer.L1v2L2h4_ButtonCancel.Left = (int)(
+                    _viewer.L1v2L2h3_ButtonOK.Left + QfcConstants.CANCEL_left - QfcConstants.OK_left
+                );
                 _viewer.L1v2L2h4_ButtonUndo.Top = (int)(_lngTopButtonUndoMin + intDiffy);
-                _viewer.L1v2L2h4_ButtonUndo.Left = (int)(_viewer.L1v2L2h3_ButtonOK.Left + QfcConstants.UNDO_left - QfcConstants.OK_left);
+                _viewer.L1v2L2h4_ButtonUndo.Left = (int)(
+                    _viewer.L1v2L2h3_ButtonOK.Left + QfcConstants.UNDO_left - QfcConstants.OK_left
+                );
                 // Button1._top = lngTop_Button1_Min + intDiffy
                 _viewer.KeyboardDialog.Top = (int)(_lngTopAcceleratorDialogueMin + intDiffy);
                 _viewer.L1v2L2h5_SpnEmailPerLoad.Top = (int)(_lngTopSpnMin + intDiffy);
                 _viewer.L1v2L2h5_SpnEmailPerLoad.Left = (int)(QfcConstants.Spn_left + intDiffx);
 
                 _legacy.ResizeChildren(intDiffx);
-
             }
-
         }
 
         #endregion
@@ -371,32 +411,35 @@ namespace QuickFiler.Legacy
             switch (e.KeyCode)
             {
                 case Keys.Alt:
-                    {
-                        e.Handled = true;
-                        _legacy.ToggleKeyboardDialog();
-                        break;
-                    }
+                {
+                    e.Handled = true;
+                    _legacy.ToggleKeyboardDialog();
+                    break;
+                }
                 case Keys.Down:
-                    {
-                        e.Handled = true;
-                        _legacy.SelectNextItem();
-                        break;
-                    }
+                {
+                    e.Handled = true;
+                    _legacy.SelectNextItem();
+                    break;
+                }
                 case Keys.Up:
-                    {
-                        e.Handled = true;
-                        _legacy.SelectPreviousItem();
-                        break;
-                    }
+                {
+                    e.Handled = true;
+                    _legacy.SelectPreviousItem();
+                    break;
+                }
                 case Keys.A:
+                {
+                    if (
+                        (Control.ModifierKeys & Keys.Shift) == Keys.Shift
+                        & (Control.ModifierKeys & Keys.Control) == Keys.Control
+                    )
                     {
-                        if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift & (Control.ModifierKeys & Keys.Control) == Keys.Control)
-                        {
-                            _legacy.ToggleRemoteMouseLabels();
-                        }
-
-                        break;
+                        _legacy.ToggleRemoteMouseLabels();
                     }
+
+                    break;
+                }
             }
         }
 
@@ -421,31 +464,30 @@ namespace QuickFiler.Legacy
                 switch (e.KeyCode)
                 {
                     case Keys.Right:
+                    {
+                        if (accelerator.Visible)
                         {
-                            if (accelerator.Visible)
-                            {
-                                _legacy.MakeSpaceToEnumerateConversation();
-                            }
-
-                            break;
+                            _legacy.MakeSpaceToEnumerateConversation();
                         }
+
+                        break;
+                    }
                     case Keys.Left:
+                    {
+                        if (accelerator.Visible)
                         {
-                            if (accelerator.Visible)
-                            {
-                                _legacy.RemoveSpaceToCollapseConversation();
-                            }
-
-                            break;
+                            _legacy.RemoveSpaceToCollapseConversation();
                         }
+
+                        break;
+                    }
 
                     default:
-                        {
-                            break;
-                        }
+                    {
+                        break;
+                    }
                 }
             }
-
         }
 
         internal void ButtonCancel_KeyDown(object sender, KeyEventArgs e)
@@ -509,9 +551,9 @@ namespace QuickFiler.Legacy
                 switch (e.KeyChar)
                 {
                     default:
-                        {
-                            break;
-                        }
+                    {
+                        break;
+                    }
                 }
             }
         }
@@ -523,46 +565,46 @@ namespace QuickFiler.Legacy
                 switch (e.KeyCode)
                 {
                     case Keys.Alt:
+                    {
+                        if (_viewer.KeyboardDialog.Visible)
                         {
-                            if (_viewer.KeyboardDialog.Visible)
-                            {
-                                _viewer.KeyboardDialog.Focus();
-                                _viewer.KeyboardDialog.SelectionStart = _viewer.KeyboardDialog.TextLength;
-                            }
-                            else
-                            {
-                                _viewer.L1v1L2_PanelMain.Focus();
-                            }
-                            SendKeys.Send("{ESC}");
-                            break;
+                            _viewer.KeyboardDialog.Focus();
+                            _viewer.KeyboardDialog.SelectionStart = _viewer
+                                .KeyboardDialog
+                                .TextLength;
                         }
+                        else
+                        {
+                            _viewer.L1v1L2_PanelMain.Focus();
+                        }
+                        SendKeys.Send("{ESC}");
+                        break;
+                    }
                     case Keys.Up:
-                        {
-                            if (_viewer.KeyboardDialog.Visible)
-                                _viewer.KeyboardDialog.Focus();
-                            break;
-                        }
+                    {
+                        if (_viewer.KeyboardDialog.Visible)
+                            _viewer.KeyboardDialog.Focus();
+                        break;
+                    }
                     case Keys.Down:
-                        {
-                            if (_viewer.KeyboardDialog.Visible)
-                                _viewer.KeyboardDialog.Focus();
-                            break;
-                        }
+                    {
+                        if (_viewer.KeyboardDialog.Visible)
+                            _viewer.KeyboardDialog.Focus();
+                        break;
+                    }
 
                     default:
-                        {
-                            break;
-                        }
+                    {
+                        break;
+                    }
                 }
             }
         }
 
         public void KeyboardHandler_KeyDown(object sender, KeyEventArgs e)
         {
-
             if (!_blSuppressEvents)
             {
-
                 if (e.Alt)
                 {
                     _legacy.ToggleKeyboardDialog();
@@ -575,39 +617,36 @@ namespace QuickFiler.Legacy
                         _viewer.L1v1L2_PanelMain.Focus();
                     }
                 }
-
                 else
                 {
                     switch (e.KeyCode)
                     {
                         case Keys.Enter:
-                            {
-                                ButtonOK_Click();
-                                break;
-                            }
+                        {
+                            ButtonOK_Click();
+                            break;
+                        }
                         case Keys.Tab:
-                            {
-                                _legacy.ToggleKeyboardDialog();
-                                // Case vbKeyEscape
-                                // vbMsgResponse = MsgBox("Stop all filing actions and close quick-filer?", vbOKCancel)
-                                // If vbMsgResponse = vbOK Then ButtonCancel_Click
-                                if (_viewer.KeyboardDialog.Visible)
-                                    _viewer.KeyboardDialog.Focus();
-                                break;
-                            }
+                        {
+                            _legacy.ToggleKeyboardDialog();
+                            // Case vbKeyEscape
+                            // vbMsgResponse = MsgBox("Stop all filing actions and close quick-filer?", vbOKCancel)
+                            // If vbMsgResponse = vbOK Then ButtonCancel_Click
+                            if (_viewer.KeyboardDialog.Visible)
+                                _viewer.KeyboardDialog.Focus();
+                            break;
+                        }
 
                         default:
+                        {
+                            if (_viewer.KeyboardDialog.Visible)
                             {
-                                if (_viewer.KeyboardDialog.Visible)
-                                {
-                                    KeyboardDialog_KeyDown(sender, e);
-                                }
-                                else
-                                {
-                                }
-
-                                break;
+                                KeyboardDialog_KeyDown(sender, e);
                             }
+                            else { }
+
+                            break;
+                        }
                     }
                 }
             }
@@ -661,7 +700,12 @@ namespace QuickFiler.Legacy
                 }
                 else
                 {
-                    MessageBox.Show("Can't Execute While Running Modal Code", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(
+                        "Can't Execute While Running Modal Code",
+                        "Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    );
                 }
             }
             else
@@ -699,15 +743,28 @@ namespace QuickFiler.Legacy
                     oMail_Old = item1;
 
                 // oMail_Old = _movedObjects.Pop
-                if (MailResolution.IsMailUnReadable(oMail_Current) == false & MailResolution.IsMailUnReadable(oMail_Old) == false)
+                if (
+                    MailResolution.IsMailUnReadable(oMail_Current) == false
+                    & MailResolution.IsMailUnReadable(oMail_Old) == false
+                )
                 {
                     oFolder_Current = (Folder)oMail_Current.Parent;
                     oFolder_Old = (Folder)oMail_Old.Parent;
-                    undoResponse = MessageBox.Show("Undo Move of email?" + Environment.NewLine +
-                        "Sent On: " + oMail_Current.SentOn.ToString("MM/dd/yyyy") + System.Environment.NewLine +
-                        oMail_Current.Subject, "Undo Dialog", MessageBoxButtons.YesNo);
+                    undoResponse = MessageBox.Show(
+                        "Undo Move of email?"
+                            + Environment.NewLine
+                            + "Sent On: "
+                            + oMail_Current.SentOn.ToString("MM/dd/yyyy")
+                            + System.Environment.NewLine
+                            + oMail_Current.Subject,
+                        "Undo Dialog",
+                        MessageBoxButtons.YesNo
+                    );
 
-                    if (undoResponse == DialogResult.Yes & (oFolder_Current.FolderPath != oFolder_Old.FolderPath))
+                    if (
+                        undoResponse == DialogResult.Yes
+                        & (oFolder_Current.FolderPath != oFolder_Old.FolderPath)
+                    )
                     {
                         oMail_Current.Move(oFolder_Old);
                         _movedMails.Pop(i);
@@ -715,7 +772,11 @@ namespace QuickFiler.Legacy
                     }
                 }
                 i -= 2;
-                repeatResponse = MessageBox.Show("Continue Undoing Moves?", "Undo Dialog", MessageBoxButtons.YesNo);
+                repeatResponse = MessageBox.Show(
+                    "Continue Undoing Moves?",
+                    "Undo Dialog",
+                    MessageBoxButtons.YesNo
+                );
             }
         }
 
@@ -789,7 +850,6 @@ namespace QuickFiler.Legacy
 
         public void ExplConvView_Cleanup()
         {
-
             ObjView = _activeExplorer.CurrentFolder.Views[_objViewMem];
             try
             {
@@ -799,9 +859,11 @@ namespace QuickFiler.Legacy
             }
             catch (System.Exception)
             {
-                ObjViewTemp = GetSiblingView((Outlook.View)_activeExplorer.CurrentView, 
-                                             "tmpNoConversation");
-                
+                ObjViewTemp = GetSiblingView(
+                    (Outlook.View)_activeExplorer.CurrentView,
+                    "tmpNoConversation"
+                );
+
                 ObjViewTemp?.Delete();
             }
         }
@@ -832,7 +894,6 @@ namespace QuickFiler.Legacy
                 {
                     if (_activeExplorer.CommandBars.GetPressedMso("ShowInConversations"))
                     {
-
                         ObjView.XML = ObjView.XML.Replace("<upgradetoconv>1</upgradetoconv>", "");
                         ObjView.Save();
                         ObjView.Apply();
@@ -843,18 +904,19 @@ namespace QuickFiler.Legacy
                     _objViewMem = _globals.Ol.ViewWide;
 
                 //ObjViewTemp = ObjView.Parent("tmpNoConversation");
-                ObjViewTemp = GetSiblingView(ObjView,"tmpNoConversation");
+                ObjViewTemp = GetSiblingView(ObjView, "tmpNoConversation");
 
                 if (ObjViewTemp is null)
                 {
-                    ObjViewTemp = ObjView.Copy("tmpNoConversation", OlViewSaveOption.olViewSaveOptionThisFolderOnlyMe);
+                    ObjViewTemp = ObjView.Copy(
+                        "tmpNoConversation",
+                        OlViewSaveOption.olViewSaveOptionThisFolderOnlyMe
+                    );
                     ObjViewTemp.XML = ObjView.XML.Replace("<upgradetoconv>1</upgradetoconv>", "");
                     ObjViewTemp.Save();
-
                 }
                 ObjViewTemp.Apply();
             }
-
         }
 
         public void ExplConvView_ToggleOn()
@@ -865,7 +927,6 @@ namespace QuickFiler.Legacy
                 ObjView.Apply();
                 BlShowInConversations = false;
             }
-
         }
 
         internal void ExplConvView_ReturnState()
@@ -877,7 +938,10 @@ namespace QuickFiler.Legacy
         internal void OpenQFMail(MailItem OlMail)
         {
             NavigateToOutlookFolder(OlMail);
-            if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort) & AutoFile.AreConversationsGrouped(_activeExplorer))
+            if (
+                _initType.HasFlag(QfEnums.InitTypeEnum.Sort)
+                & AutoFile.AreConversationsGrouped(_activeExplorer)
+            )
                 ExplConvView_ToggleOff();
             QFD_Minimize();
             if (_activeExplorer.IsItemSelectableInView(OlMail))
@@ -886,19 +950,26 @@ namespace QuickFiler.Legacy
                 _activeExplorer.AddToSelection(OlMail);
 
                 MAPIFolder tmp = _activeExplorer.CurrentFolder;
-                MAPIFolder drafts = _globals.Ol.NamespaceMAPI.GetDefaultFolder(OlDefaultFolders.olFolderDrafts);
+                MAPIFolder drafts = _globals.Ol.NamespaceMAPI.GetDefaultFolder(
+                    OlDefaultFolders.olFolderDrafts
+                );
                 _activeExplorer.CurrentFolder = drafts;
                 _activeExplorer.CurrentFolder.Display();
                 _activeExplorer.CurrentFolder = tmp;
                 _activeExplorer.CurrentFolder.Display();
-
-
             }
             else
             {
-                DialogResult result = MessageBox.Show("Selected message is not in view. Would you like to open it?",
-                    "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-                if (result == DialogResult.Yes) { OlMail.Display(); }
+                DialogResult result = MessageBox.Show(
+                    "Selected message is not in view. Would you like to open it?",
+                    "Error",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Error
+                );
+                if (result == DialogResult.Yes)
+                {
+                    OlMail.Display();
+                }
             }
             if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort) & BlShowInConversations)
                 ExplConvView_ToggleOn();
@@ -906,8 +977,10 @@ namespace QuickFiler.Legacy
 
         private void NavigateToOutlookFolder(MailItem olMail)
         {
-            if (_globals.Ol.App.ActiveExplorer().CurrentFolder.FolderPath != 
-                ((MAPIFolder)olMail.Parent).FolderPath)
+            if (
+                _globals.Ol.App.ActiveExplorer().CurrentFolder.FolderPath
+                != ((MAPIFolder)olMail.Parent).FolderPath
+            )
             {
                 ExplConvView_ReturnState();
                 _globals.Ol.App.ActiveExplorer().CurrentFolder = (MAPIFolder)olMail.Parent;
@@ -921,16 +994,17 @@ namespace QuickFiler.Legacy
 
         private void QuickFileMetrics_WRITE(string filename)
         {
-
             //string LOC_TXT_FILE;
-            string curDateText, curTimeText, durationText, durationMinutesText;
+            string curDateText,
+                curTimeText,
+                durationText,
+                durationMinutesText;
             double Duration;
             string dataLineBeg;
             DateTime OlEndTime;
             DateTime OlStartTime;
             AppointmentItem OlAppointment;
             Folder OlEmailCalendar;
-
 
             // Create a line of comma seperated valued to store data
             curDateText = DateTime.Now.ToString("mm/dd/yyyy");
@@ -969,10 +1043,16 @@ namespace QuickFiler.Legacy
                 OlAppointment.Save();
             }
 
-            string[] strOutput = _legacy.GetMoveDiagnostics(durationText, durationMinutesText, Duration, dataLineBeg, OlEndTime, ref OlAppointment);
+            string[] strOutput = _legacy.GetMoveDiagnostics(
+                durationText,
+                durationMinutesText,
+                Duration,
+                dataLineBeg,
+                OlEndTime,
+                ref OlAppointment
+            );
 
             FileIO2.WriteTextFile(filename, strOutput, _globals.FS.FldrMyD);
-
         }
 
         //private void GetDetails(string durationText, string durationMinutesText, double Duration, ref string dataLine, string dataLineBeg, ref QfcController QF, DateTime OlEndTime, cInfoMail infoMail, ref AppointmentItem OlAppointment, string[] strOutput)
@@ -980,8 +1060,6 @@ namespace QuickFiler.Legacy
 
         //}
 
-
         #endregion
-
     }
 }

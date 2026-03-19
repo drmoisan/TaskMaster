@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UtilitiesCS.Interfaces;
 using System.Timers;
+using UtilitiesCS.Interfaces;
 
 namespace UtilitiesCS.HelperClasses
 {
@@ -29,8 +29,16 @@ namespace UtilitiesCS.HelperClasses
 
         public event EventHandler<TimeElapsedEventArgs> Elapsed;
 
-        public bool AutoReset { get => this.timer.AutoReset; set => this.timer.AutoReset = value; }
-        public bool Enabled { get => this.timer.Enabled; set => this.timer.Enabled = value; }
+        public bool AutoReset
+        {
+            get => this.timer.AutoReset;
+            set => this.timer.AutoReset = value;
+        }
+        public bool Enabled
+        {
+            get => this.timer.Enabled;
+            set => this.timer.Enabled = value;
+        }
 
         public TimeSpan Interval
         {
@@ -38,7 +46,11 @@ namespace UtilitiesCS.HelperClasses
             set => this.timer.Interval = value.TotalMilliseconds;
         }
 
-        public double IntervalInMilliseconds { get => this.timer.Interval; set => this.timer.Interval = value; }
+        public double IntervalInMilliseconds
+        {
+            get => this.timer.Interval;
+            set => this.timer.Interval = value;
+        }
 
         private void WhenTimerElapsed(object sender, ElapsedEventArgs elapsedEventArgs)
         {

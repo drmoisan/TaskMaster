@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Swordfish.NET.Collections;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,28 +6,40 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json;
+using Swordfish.NET.Collections;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-    public class ScoSortedDictionary<TKey, TValue> : ConcurrentObservableSortedDictionary<TKey, TValue>
+    public class ScoSortedDictionary<TKey, TValue>
+        : ConcurrentObservableSortedDictionary<TKey, TValue>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
-        public ScoSortedDictionary() : base(null) { }
-        public ScoSortedDictionary(IComparer<TKey> comparer) : base(comparer) { }
-        public ScoSortedDictionary(IDictionary<TKey, TValue> dictionary, IComparer<TKey> comparer) : base(comparer)
+        public ScoSortedDictionary()
+            : base(null) { }
+
+        public ScoSortedDictionary(IComparer<TKey> comparer)
+            : base(comparer) { }
+
+        public ScoSortedDictionary(IDictionary<TKey, TValue> dictionary, IComparer<TKey> comparer)
+            : base(comparer)
         {
             foreach (var kvp in dictionary)
             {
                 Add(kvp.Key, kvp.Value);
             }
         }
-        public ScoSortedDictionary(IDictionary<TKey, TValue> dictionary) : this(dictionary, null) { }
 
-        public ScoSortedDictionary(string fileName, string folderPath) : base(null)
+        public ScoSortedDictionary(IDictionary<TKey, TValue> dictionary)
+            : this(dictionary, null) { }
+
+        public ScoSortedDictionary(string fileName, string folderPath)
+            : base(null)
         {
             FileName = fileName;
             FolderPath = folderPath;
@@ -49,7 +59,8 @@ namespace UtilitiesCS.ReusableTypeClasses
                     messageText,
                     "Error",
                     MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Error);
+                    MessageBoxIcon.Error
+                );
             }
             else
             {
@@ -59,7 +70,10 @@ namespace UtilitiesCS.ReusableTypeClasses
             return response;
         }
 
-        protected ScoSortedDictionary<TKey, TValue> CreateEmpty(DialogResult response, FilePathHelper disk)
+        protected ScoSortedDictionary<TKey, TValue> CreateEmpty(
+            DialogResult response,
+            FilePathHelper disk
+        )
         {
             if (response == DialogResult.Yes)
             {
@@ -70,15 +84,28 @@ namespace UtilitiesCS.ReusableTypeClasses
             else
             {
                 throw new ArgumentNullException(
-                "Must have a dictionary or create one to continue executing");
+                    "Must have a dictionary or create one to continue executing"
+                );
             }
         }
 
-        public string FilePath { get => _disk.FilePath; set => _disk.FilePath = value; }
+        public string FilePath
+        {
+            get => _disk.FilePath;
+            set => _disk.FilePath = value;
+        }
 
-        public string FolderPath { get => _disk.FolderPath; set => _disk.FolderPath = value; }
+        public string FolderPath
+        {
+            get => _disk.FolderPath;
+            set => _disk.FolderPath = value;
+        }
 
-        public string FileName { get => _disk.FileName; set => _disk.FileName = value; }
+        public string FileName
+        {
+            get => _disk.FileName;
+            set => _disk.FileName = value;
+        }
 
         public void Serialize()
         {
@@ -125,11 +152,11 @@ namespace UtilitiesCS.ReusableTypeClasses
                     _readWriteLock.ExitWriteLock();
                 }
             }
-
         }
 
         protected ThreadSafeSingleShotGuard _serializationRequested = new();
         protected TimerWrapper _timer;
+
         protected void RequestSerialization(string filePath)
         {
             if (_serializationRequested.CheckAndSetFirstCall)
@@ -143,12 +170,14 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public void Deserialize()
         {
-            if (FilePath != "") Deserialize(_disk, true);
+            if (FilePath != "")
+                Deserialize(_disk, true);
         }
 
         public void Deserialize(bool askUserOnError)
         {
-            if (FilePath != "") Deserialize(_disk, askUserOnError);
+            if (FilePath != "")
+                Deserialize(_disk, askUserOnError);
         }
 
         public void Deserialize(string fileName, string folderPath, bool askUserOnError)
@@ -174,23 +203,29 @@ namespace UtilitiesCS.ReusableTypeClasses
             catch (FileNotFoundException e)
             {
                 logger.Error(e.Message);
-                response = AskUser(askUserOnError,
-                    $"{disk.FilePath} not found. Need a dictionary to " +
-                    $"continue. Create a new dictionary or abort execution?");
+                response = AskUser(
+                    askUserOnError,
+                    $"{disk.FilePath} not found. Need a dictionary to "
+                        + $"continue. Create a new dictionary or abort execution?"
+                );
                 dictionary = CreateEmpty(response, disk);
                 writeDictionary = true;
             }
             catch (System.Exception e)
             {
                 logger.Error($"Error! {e.Message}");
-                response = AskUser(askUserOnError,
-                    $"{disk.FilePath} encountered a problem. \n{e.Message}\n" +
-                    $"Need a dictionary to continue. Create a new dictionary or abort execution?");
+                response = AskUser(
+                    askUserOnError,
+                    $"{disk.FilePath} encountered a problem. \n{e.Message}\n"
+                        + $"Need a dictionary to continue. Create a new dictionary or abort execution?"
+                );
                 dictionary = CreateEmpty(response, disk);
                 writeDictionary = true;
             }
 
-            DoBaseWrite(() => WriteCollection = dictionary?.DoBaseRead(() => dictionary?.ReadCollection));
+            DoBaseWrite(() =>
+                WriteCollection = dictionary?.DoBaseRead(() => dictionary?.ReadCollection)
+            );
             if (writeDictionary)
             {
                 Serialize();
@@ -204,14 +239,12 @@ namespace UtilitiesCS.ReusableTypeClasses
             settings.TypeNameHandling = TypeNameHandling.Auto;
             settings.Formatting = Formatting.Indented;
             collection = JsonConvert.DeserializeObject<ScoSortedDictionary<TKey, TValue>>(
-                File.ReadAllText(disk.FilePath), settings);
+                File.ReadAllText(disk.FilePath),
+                settings
+            );
             return collection;
         }
 
         #endregion Serialization
-
-
-
-
     }
 }

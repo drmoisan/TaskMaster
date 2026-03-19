@@ -1,8 +1,8 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test
 {
@@ -55,7 +55,12 @@ namespace UtilitiesCS.Test
             Func<int> function = () => 7;
 
             // Act
-            int result = await function.RunWithTimeout(CancellationToken.None, milliseconds: 100, maxAttempts: 0, strict: true);
+            int result = await function.RunWithTimeout(
+                CancellationToken.None,
+                milliseconds: 100,
+                maxAttempts: 0,
+                strict: true
+            );
 
             // Assert
             result.Should().Be(7);
@@ -72,7 +77,12 @@ namespace UtilitiesCS.Test
             };
 
             // Act
-            int result = await function.RunWithTimeout(CancellationToken.None, milliseconds: 10, maxAttempts: 0, strict: false);
+            int result = await function.RunWithTimeout(
+                CancellationToken.None,
+                milliseconds: 10,
+                maxAttempts: 0,
+                strict: false
+            );
 
             // Assert
             result.Should().Be(0);
@@ -85,7 +95,13 @@ namespace UtilitiesCS.Test
             Func<int> function = () => throw new InvalidOperationException("boom");
 
             // Act
-            Func<Task> act = async () => await function.RunWithTimeout(CancellationToken.None, milliseconds: 100, maxAttempts: 0, strict: true);
+            Func<Task> act = async () =>
+                await function.RunWithTimeout(
+                    CancellationToken.None,
+                    milliseconds: 100,
+                    maxAttempts: 0,
+                    strict: true
+                );
 
             // Assert
             await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("boom");
@@ -104,7 +120,13 @@ namespace UtilitiesCS.Test
             };
 
             // Act
-            Func<Task> act = async () => await function.RunWithTimeout(source.Token, milliseconds: 100, maxAttempts: 0, strict: true);
+            Func<Task> act = async () =>
+                await function.RunWithTimeout(
+                    source.Token,
+                    milliseconds: 100,
+                    maxAttempts: 0,
+                    strict: true
+                );
 
             // Assert
             await act.Should().ThrowAsync<OperationCanceledException>();

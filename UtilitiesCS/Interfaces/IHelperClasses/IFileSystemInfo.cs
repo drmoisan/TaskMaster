@@ -22,6 +22,4 @@ namespace UtilitiesCS
         void GetObjectData(SerializationInfo info, StreamingContext context);
         void Refresh();
     }
-
-
 }

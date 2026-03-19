@@ -1,7 +1,7 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
@@ -14,7 +14,6 @@ using System.Text;
 
 namespace Swordfish.NET.Collections
 {
-
     /// <summary>
     /// This class is used for linked objects in a 2 way linked list,
     /// which are also all held in a dictionary. The purpose of this
@@ -23,7 +22,6 @@ namespace Swordfish.NET.Collections
     /// </summary>
     public class DoubleLinkListIndexNode
     {
-
         // ************************************************************************
         // Public Fields
         // ************************************************************************
@@ -33,10 +31,12 @@ namespace Swordfish.NET.Collections
         /// The previous node in the linked list
         /// </summary>
         public DoubleLinkListIndexNode Previous;
+
         /// <summary>
         /// The next node in the linked list
         /// </summary>
         public DoubleLinkListIndexNode Next;
+
         /// <summary>
         /// The position within the linked list
         /// </summary>
@@ -70,7 +70,10 @@ namespace Swordfish.NET.Collections
         /// </summary>
         /// <param name="previous"></param>
         /// <param name="index"></param>
-        public DoubleLinkListIndexNode(DoubleLinkListIndexNode previous, DoubleLinkListIndexNode next)
+        public DoubleLinkListIndexNode(
+            DoubleLinkListIndexNode previous,
+            DoubleLinkListIndexNode next
+        )
         {
             Previous = previous;
             Next = next;

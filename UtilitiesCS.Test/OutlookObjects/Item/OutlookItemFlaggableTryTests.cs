@@ -35,7 +35,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         public void DueDateSetter_WhenUnderlyingSetterThrowsSystemException_ShouldNotThrow()
         {
             var item = CreateBaseFlaggable();
-            item.SetupSet(x => x.DueDate = It.IsAny<DateTime>()).Throws(new InvalidOperationException("boom"));
+            item.SetupSet(x => x.DueDate = It.IsAny<DateTime>())
+                .Throws(new InvalidOperationException("boom"));
             var wrapper = new OutlookItemFlaggableTry(item.Object);
 
             System.Action act = () => wrapper.DueDate = new DateTime(2026, 5, 1);
@@ -48,7 +49,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         {
             var item = CreateBaseFlaggable();
             bool assigned = false;
-            item.SetupSet(x => x.FlagAsTask = It.IsAny<bool>()).Callback<bool>(value => assigned = value);
+            item.SetupSet(x => x.FlagAsTask = It.IsAny<bool>())
+                .Callback<bool>(value => assigned = value);
             var wrapper = new OutlookItemFlaggableTry(item.Object);
 
             wrapper.FlagAsTask = true;
@@ -83,7 +85,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         {
             var item = CreateBaseFlaggable();
             var userProperties = new Mock<Microsoft.Office.Interop.Outlook.UserProperties>();
-            userProperties.Setup(x => x.Find("Priority", true)).Throws(new InvalidOperationException("boom"));
+            userProperties
+                .Setup(x => x.Find("Priority", true))
+                .Throws(new InvalidOperationException("boom"));
             item.SetupGet(x => x.UserProperties).Returns(userProperties.Object);
 
             var result = new OutlookItemFlaggableTry(item.Object).GetUdfString("Priority");

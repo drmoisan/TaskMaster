@@ -1,9 +1,9 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 using Tags;
 using ToDoModel;
 using UtilitiesCS;
@@ -15,11 +15,17 @@ namespace TaskVisualization
     public class AutoCreateProject(IApplicationGlobals globals) : IAutoAssign
     {
         private readonly IApplicationGlobals _globals = globals;
+
         //private readonly IList<IPrefix> _prefixes;
 
         public IList<string> FilterList => [.. _globals.TD.CategoryFilters];
 
-        public IList<string> AddChoicesToDict(MailItem olMail, IList<IPrefix> prefixes, string prefixKey, string currentUserEmail)
+        public IList<string> AddChoicesToDict(
+            MailItem olMail,
+            IList<IPrefix> prefixes,
+            string prefixKey,
+            string currentUserEmail
+        )
         {
             throw new NotImplementedException();
         }
@@ -34,12 +40,21 @@ namespace TaskVisualization
                 {
                     programName = ChooseOrCreateProgramName();
                 }
-                if (programName.IsNullOrEmpty()) { return null; }
+                if (programName.IsNullOrEmpty())
+                {
+                    return null;
+                }
                 var programID = _globals.TD.ProgramInfo[programName];
                 var projectID = GetNextProjectID(programID);
-                _globals.TD.ProjInfo.Add(new ProjectEntry(projectName, projectID, programName, programID));
+                _globals.TD.ProjInfo.Add(
+                    new ProjectEntry(projectName, projectID, programName, programID)
+                );
                 _globals.TD.ProjInfo.Serialize();
-                var cat = CreateCategoryModule.CreateCategory(olNS: _globals.Ol.NamespaceMAPI, prefix: prefix, newCatName: projectName);
+                var cat = CreateCategoryModule.CreateCategory(
+                    olNS: _globals.Ol.NamespaceMAPI,
+                    prefix: prefix,
+                    newCatName: projectName
+                );
                 CreateProjectTaskItem(projectName, projectID);
                 return cat;
             }
@@ -49,34 +64,45 @@ namespace TaskVisualization
         public string GetNextProjectID(string programID)
         {
             programID.ThrowIfNullOrEmpty();
-            var projects = _globals.TD.ProjInfo.Where(entry => entry.ProgramID == programID).OrderByDescending(entry => entry.ProjectID).FirstOrDefault();
+            var projects = _globals
+                .TD.ProjInfo.Where(entry => entry.ProgramID == programID)
+                .OrderByDescending(entry => entry.ProjectID)
+                .FirstOrDefault();
             var seedId = projects?.ProjectID ?? $"{programID}00";
             return _globals.TD.IDList.GetNextToDoID(seedId);
         }
 
         internal string ChooseOrCreateProgramName()
         {
-            IPrefix prefix = _globals.TD.PrefixList.Find(x => x.PrefixType == PrefixTypeEnum.Program);
-            string userEmail = _globals.Ol.StoresWrapper.Stores.FirstOrDefault(x => !x.UserEmailAddress.IsNullOrEmpty())?.UserEmailAddress;
+            IPrefix prefix = _globals.TD.PrefixList.Find(x =>
+                x.PrefixType == PrefixTypeEnum.Program
+            );
+            string userEmail = _globals
+                .Ol.StoresWrapper.Stores.FirstOrDefault(x => !x.UserEmailAddress.IsNullOrEmpty())
+                ?.UserEmailAddress;
             var chooser = new TagLauncher(_globals.TD.ProgramInfo.Keys, prefix, userEmail);
-            
+
             chooser.Viewer.Text = "Select or Create Program";
             chooser.Viewer.ShowDialog();
             var selection = chooser.Controller.GetSelections().FirstOrDefault();
-            if (selection.IsNullOrEmpty()) { return null; }
+            if (selection.IsNullOrEmpty())
+            {
+                return null;
+            }
             else if (_globals.TD.ProgramInfo.TryGetValue(selection, out var programID))
             {
                 return selection;
             }
             else
             {
-                var seedID = _globals.TD.ProgramInfo.Values.OrderByDescending(x => x).FirstOrDefault() ?? "00";
+                var seedID =
+                    _globals.TD.ProgramInfo.Values.OrderByDescending(x => x).FirstOrDefault()
+                    ?? "00";
                 var newProgramID = _globals.TD.IDList.GetNextToDoID(seedID);
                 _globals.TD.ProgramInfo[selection] = newProgramID;
                 _globals.TD.ProgramInfo.Serialize();
                 return selection;
             }
-
         }
 
         internal bool TryAutoExtractProgram(string projectName, out string programName)
@@ -109,7 +135,9 @@ namespace TaskVisualization
 
         internal Items GetTaskItems()
         {
-            var olTasksFolder = _globals.Ol.App.Session.GetDefaultFolder(OlDefaultFolders.olFolderTasks);
+            var olTasksFolder = _globals.Ol.App.Session.GetDefaultFolder(
+                OlDefaultFolders.olFolderTasks
+            );
             return olTasksFolder?.Items;
         }
 
@@ -129,15 +157,19 @@ namespace TaskVisualization
         {
             // TODO: Link this to the Bayesian project prediction model
             throw new NotImplementedException();
-
         }
 
         public async Task<IList<string>> AutoFindAsync(object objItem)
         {
             var helper = await ToHelper(objItem);
-            if (helper is null) { return []; }
+            if (helper is null)
+            {
+                return [];
+            }
 
-            var project = await CategoryClassifierGroup.CreateEngineAsync(_globals, "Project", default).ConfigureAwait(true);
+            var project = await CategoryClassifierGroup
+                .CreateEngineAsync(_globals, "Project", default)
+                .ConfigureAwait(true);
             project.ProbabilityThreshold = 0.2;
 
             var results = (await project.GetMatchingCategoriesAsync(helper)).ToList();
@@ -155,14 +187,21 @@ namespace TaskVisualization
             {
                 if (olItem.InnerObject is MailItem mailItem)
                 {
-                    helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false).ConfigureAwait(true);
+                    helper = await MailItemHelper
+                        .FromMailItemAsync(mailItem, _globals, default, false)
+                        .ConfigureAwait(true);
                 }
             }
             else if (objItem is MailItem mailItem)
             {
-                helper = await MailItemHelper.FromMailItemAsync(mailItem, _globals, default, false).ConfigureAwait(true);
+                helper = await MailItemHelper
+                    .FromMailItemAsync(mailItem, _globals, default, false)
+                    .ConfigureAwait(true);
             }
-            if (helper is null) { return null; }
+            if (helper is null)
+            {
+                return null;
+            }
             else
             {
                 await Task.Run(() => _ = helper.Tokens).ConfigureAwait(true);
@@ -170,5 +209,4 @@ namespace TaskVisualization
             }
         }
     }
-
 }

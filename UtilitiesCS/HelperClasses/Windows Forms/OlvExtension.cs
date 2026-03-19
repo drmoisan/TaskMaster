@@ -3,7 +3,6 @@ using BrightIdeasSoftware;
 
 namespace UtilitiesCS
 {
-
     public static class OlvExtension
     {
         public static void AutoScaleColumnsToContainer(this ObjectListView olv)
@@ -16,7 +15,8 @@ namespace UtilitiesCS
             if (colswidth != 0)
             {
                 foreach (OLVColumn c in olv.Columns)
-                    c.Width = (int)Math.Round(Math.Round(c.Width * (double)containerwidth / colswidth));
+                    c.Width = (int)
+                        Math.Round(Math.Round(c.Width * (double)containerwidth / colswidth));
             }
             olv.EndUpdate();
         }

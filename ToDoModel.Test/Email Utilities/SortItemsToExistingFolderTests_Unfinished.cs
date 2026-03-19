@@ -1,9 +1,9 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using UtilitiesCS;
 
 namespace Z.Unfinished.ToDoModel.Test.Email_Utilities

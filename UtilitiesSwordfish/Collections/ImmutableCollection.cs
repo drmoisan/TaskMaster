@@ -1,7 +1,7 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
@@ -9,9 +9,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Collections.ObjectModel;
 
 namespace Swordfish.NET.Collections
 {
@@ -20,7 +20,6 @@ namespace Swordfish.NET.Collections
     /// </summary>
     public class ImmutableCollection<T> : ImmutableCollectionBase<T>
     {
-
         // ************************************************************************
         // Private Fields
         // ************************************************************************
@@ -40,8 +39,14 @@ namespace Swordfish.NET.Collections
 
         public ImmutableCollection(IEnumerable<T> source)
         {
-            if (source is null) { _baseCollection = new List<T>(); }
-            else { _baseCollection = new List<T>(source); }
+            if (source is null)
+            {
+                _baseCollection = new List<T>();
+            }
+            else
+            {
+                _baseCollection = new List<T>(source);
+            }
         }
 
         public ImmutableCollection()
@@ -58,10 +63,7 @@ namespace Swordfish.NET.Collections
 
         public override int Count
         {
-            get
-            {
-                return _baseCollection.Count;
-            }
+            get { return _baseCollection.Count; }
         }
 
         public override bool Contains(T item)

@@ -59,15 +59,10 @@ namespace UtilitiesCS.Test.HelperClasses
         {
             // Arrange
             var shared = new ObjectWithFields { Number = 7, Text = "same" };
-            ICollection collection = new ArrayList
-            {
-                shared,
-                shared,
-                5,
-                "xy"
-            };
+            ICollection collection = new ArrayList { shared, shared, 5, "xy" };
 
-            var expected = Marshal.SizeOf(5)
+            var expected =
+                Marshal.SizeOf(5)
                 + ("xy".Length * sizeof(char))
                 + Marshal.SizeOf(shared.Number)
                 + (shared.Text.Length * sizeof(char));
@@ -88,10 +83,11 @@ namespace UtilitiesCS.Test.HelperClasses
             {
                 Count = 3,
                 Label = "root",
-                Child = nested
+                Child = nested,
             };
 
-            var expected = Marshal.SizeOf(root.Count)
+            var expected =
+                Marshal.SizeOf(root.Count)
                 + (root.Label.Length * sizeof(char))
                 + Marshal.SizeOf(nested.Number)
                 + (nested.Text.Length * sizeof(char));
@@ -103,9 +99,7 @@ namespace UtilitiesCS.Test.HelperClasses
             size.Should().Be(expected);
         }
 
-        private sealed class EmptyObject
-        {
-        }
+        private sealed class EmptyObject { }
 
         private sealed class ContainerObject
         {

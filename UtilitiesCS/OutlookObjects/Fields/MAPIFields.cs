@@ -49,68 +49,82 @@ namespace UtilitiesCS.OutlookObjects.Fields
 
         public struct Schemas
         {
-            public static string ConversationTopic { get; private set; } = PROPTAG_SPECIFIER + PR_CONVERSATION_TOPIC + PT_TSTRING;
-            public static string FolderName { get; private set; } = PROPTAG_SPECIFIER + PR_PARENT_DISPLAY + PT_TSTRING;
-            public static string MessageStore { get; private set; } = PROPTAG_SPECIFIER + PR_STORE_ENTRYID + PT_BINARY;
-            public static string ConversationDepth { get; private set; } = PROPTAG_SPECIFIER + PR_DEPTH + PT_LONG;
-            public static string ConversationIndex { get; private set; } = PROPTAG_SPECIFIER + PR_CONVERSATION_INDEX + PT_BINARY;
-            public static string CustomPrefix { get; private set; } = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/";
-            public static string Triage { get; private set; } = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage";
-            public static string ToDoID { get; private set; } = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/ToDoID";
-            public static string ConversationId { get; private set; } = PROPTAG_SPECIFIER + PR_CONVERSATION_ID + PT_BINARY;
-            public static string SenderName { get; private set; } = PROPTAG_SPECIFIER + PR_SENDER_NAME + PT_TSTRING;
-            public static string SenderSmtpAddress { get; private set; } = PROPTAG_SPECIFIER + PR_SENDER_SMTP_ADDRESS + PT_TSTRING;
-            public static string SenderAddrType { get; private set; } = PROPTAG_SPECIFIER + PR_SENDER_ADDRTYPE + PT_TSTRING;
-            public static string ReceivedByName { get; private set; } = "http://schemas.microsoft.com/mapi/proptag/0x0040001E";
-            public static string MessageRecipients { get; private set; } = "http://schemas.microsoft.com/mapi/proptag/0x0E12000D";
+            public static string ConversationTopic { get; private set; } =
+                PROPTAG_SPECIFIER + PR_CONVERSATION_TOPIC + PT_TSTRING;
+            public static string FolderName { get; private set; } =
+                PROPTAG_SPECIFIER + PR_PARENT_DISPLAY + PT_TSTRING;
+            public static string MessageStore { get; private set; } =
+                PROPTAG_SPECIFIER + PR_STORE_ENTRYID + PT_BINARY;
+            public static string ConversationDepth { get; private set; } =
+                PROPTAG_SPECIFIER + PR_DEPTH + PT_LONG;
+            public static string ConversationIndex { get; private set; } =
+                PROPTAG_SPECIFIER + PR_CONVERSATION_INDEX + PT_BINARY;
+            public static string CustomPrefix { get; private set; } =
+                "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/";
+            public static string Triage { get; private set; } =
+                "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage";
+            public static string ToDoID { get; private set; } =
+                "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/ToDoID";
+            public static string ConversationId { get; private set; } =
+                PROPTAG_SPECIFIER + PR_CONVERSATION_ID + PT_BINARY;
+            public static string SenderName { get; private set; } =
+                PROPTAG_SPECIFIER + PR_SENDER_NAME + PT_TSTRING;
+            public static string SenderSmtpAddress { get; private set; } =
+                PROPTAG_SPECIFIER + PR_SENDER_SMTP_ADDRESS + PT_TSTRING;
+            public static string SenderAddrType { get; private set; } =
+                PROPTAG_SPECIFIER + PR_SENDER_ADDRTYPE + PT_TSTRING;
+            public static string ReceivedByName { get; private set; } =
+                "http://schemas.microsoft.com/mapi/proptag/0x0040001E";
+            public static string MessageRecipients { get; private set; } =
+                "http://schemas.microsoft.com/mapi/proptag/0x0E12000D";
         }
 
-        public static ImmutableDictionary<string, string> SchemaToField { get; private set; } = new Dictionary<string, string>()
-        {
-            {Schemas.FolderName, "Folder Name" },
-            {Schemas.MessageStore, "Store"},
-            {Schemas.ConversationDepth, "ConvDepth" },
-            {Schemas.ConversationIndex, "ConversationIndex" },
-            {Schemas.ConversationTopic, "ConversationTopic" },
-            {Schemas.ConversationId, "ConversationId" },
-            {Schemas.ToDoID, "ToDoID" },
-            {Schemas.Triage, "Triage" },
-            {Schemas.SenderName, "SenderName" },
-            {Schemas.SenderSmtpAddress, "SenderSmtpAddress" },
-            {Schemas.SenderAddrType, "SenderAddrType" },
-            {Schemas.ReceivedByName, "ReceivedByName" },
-            {Schemas.MessageRecipients, "MessageRecipients" }
-        }.ToImmutableDictionary();
+        public static ImmutableDictionary<string, string> SchemaToField { get; private set; } =
+            new Dictionary<string, string>()
+            {
+                { Schemas.FolderName, "Folder Name" },
+                { Schemas.MessageStore, "Store" },
+                { Schemas.ConversationDepth, "ConvDepth" },
+                { Schemas.ConversationIndex, "ConversationIndex" },
+                { Schemas.ConversationTopic, "ConversationTopic" },
+                { Schemas.ConversationId, "ConversationId" },
+                { Schemas.ToDoID, "ToDoID" },
+                { Schemas.Triage, "Triage" },
+                { Schemas.SenderName, "SenderName" },
+                { Schemas.SenderSmtpAddress, "SenderSmtpAddress" },
+                { Schemas.SenderAddrType, "SenderAddrType" },
+                { Schemas.ReceivedByName, "ReceivedByName" },
+                { Schemas.MessageRecipients, "MessageRecipients" },
+            }.ToImmutableDictionary();
 
-
-        public static ImmutableDictionary<string, string> FieldToSchema = new Dictionary<string, string>()
+        public static ImmutableDictionary<string, string> FieldToSchema = new Dictionary<
+            string,
+            string
+        >()
         {
-            {"Folder Name", Schemas.FolderName },
-            {"Store", Schemas.MessageStore},
-            {"ConvDepth", Schemas.ConversationDepth },
-            {"ConversationIndex", Schemas.ConversationIndex },
-            {"ConversationTopic", Schemas.ConversationTopic },
-            {"ConversationId", Schemas.ConversationId },
-            {"ToDoID", Schemas.ToDoID },
-            {"Triage", Schemas.Triage },
-            {"SenderName", Schemas.SenderName },
-            {"SenderSmtpAddress", Schemas.SenderSmtpAddress },
-            {"SenderAddrType", Schemas.SenderAddrType },
-            {"ReceivedByName", Schemas.ReceivedByName },
-            {"MessageRecipients", Schemas.MessageRecipients }
+            { "Folder Name", Schemas.FolderName },
+            { "Store", Schemas.MessageStore },
+            { "ConvDepth", Schemas.ConversationDepth },
+            { "ConversationIndex", Schemas.ConversationIndex },
+            { "ConversationTopic", Schemas.ConversationTopic },
+            { "ConversationId", Schemas.ConversationId },
+            { "ToDoID", Schemas.ToDoID },
+            { "Triage", Schemas.Triage },
+            { "SenderName", Schemas.SenderName },
+            { "SenderSmtpAddress", Schemas.SenderSmtpAddress },
+            { "SenderAddrType", Schemas.SenderAddrType },
+            { "ReceivedByName", Schemas.ReceivedByName },
+            { "MessageRecipients", Schemas.MessageRecipients },
         }.ToImmutableDictionary();
 
         public static ImmutableList<string> BinaryToStringFields =
         [
             "ConversationIndex",
             "ConversationId",
-            "Store"//,
+            "Store", //,
             //"ReceivedByName"
         ];
 
-        public static ImmutableList<string> ObjectFields =
-        [
-            "MessageRecipients"
-        ];
+        public static ImmutableList<string> ObjectFields = ["MessageRecipients"];
     }
 }

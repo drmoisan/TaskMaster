@@ -163,7 +163,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             json.Should().NotContain("Globals");
         }
 
-        private static T CreateComProxy<T>() where T : class
+        private static T CreateComProxy<T>()
+            where T : class
         {
             return new Mock<T>(MockBehavior.Loose).Object;
         }

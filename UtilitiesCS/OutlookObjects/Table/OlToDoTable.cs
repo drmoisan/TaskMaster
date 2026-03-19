@@ -1,5 +1,5 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.OutlookObjects.Fields;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
@@ -59,7 +59,8 @@ namespace UtilitiesCS.OutlookExtensions
                         fieldName,
                         OlUserPropertyType.olText,
                         Type.Missing,
-                        Type.Missing);
+                        Type.Missing
+                    );
                 }
             }
             catch
@@ -122,7 +123,5 @@ namespace UtilitiesCS.OutlookExtensions
                 // Ignore provider/folder limitations.
             }
         }
-
-
     }
 }

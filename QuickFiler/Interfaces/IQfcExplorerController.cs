@@ -1,5 +1,5 @@
-using Microsoft.Office.Interop.Outlook;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 
 namespace QuickFiler.Interfaces
 {

@@ -1,6 +1,6 @@
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Reflection;
 using UtilitiesCS.NewtonsoftHelpers;
 
 namespace UtilitiesCS.Test

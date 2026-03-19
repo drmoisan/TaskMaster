@@ -1,7 +1,4 @@
-﻿using ExCSS;
-using Microsoft.IO;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,6 +6,9 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ExCSS;
+using Microsoft.IO;
+using Newtonsoft.Json;
 
 namespace UtilitiesCS
 {
@@ -22,8 +22,10 @@ namespace UtilitiesCS
             return $"{mb:N1} MB";
         }
 
-
-        public static async Task<string> ReadTextAsync(string filePath, IProgress<(double current, double total)> progress)
+        public static async Task<string> ReadTextAsync(
+            string filePath,
+            IProgress<(double current, double total)> progress
+        )
         {
             using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
             using var reader = new StreamReader(stream, Encoding.UTF8);
@@ -44,7 +46,11 @@ namespace UtilitiesCS
             return readTask.Result;
         }
 
-        public static async Task<string> ReadTextWithProgressAsync(this FilePathHelper disk, ProgressTrackerPane progress, string messagePrefix = "")
+        public static async Task<string> ReadTextWithProgressAsync(
+            this FilePathHelper disk,
+            ProgressTrackerPane progress,
+            string messagePrefix = ""
+        )
         {
             var sw = await Task.Run(Stopwatch.StartNew).ConfigureAwait(false);
 
@@ -70,7 +76,11 @@ namespace UtilitiesCS
             return readTask.Result;
         }
 
-        public static async Task<string> ReadTextWithProgressAsync(this FilePathHelper disk, ProgressTracker progress, string messagePrefix = "")
+        public static async Task<string> ReadTextWithProgressAsync(
+            this FilePathHelper disk,
+            ProgressTracker progress,
+            string messagePrefix = ""
+        )
         {
             var sw = await Task.Run(Stopwatch.StartNew).ConfigureAwait(false);
 
@@ -96,7 +106,12 @@ namespace UtilitiesCS
             return readTask.Result;
         }
 
-        public static async Task WriteTextWithProgressAsync(this FilePathHelper disk, string texts, ProgressTrackerPane progress, string messagePrefix = "")
+        public static async Task WriteTextWithProgressAsync(
+            this FilePathHelper disk,
+            string texts,
+            ProgressTrackerPane progress,
+            string messagePrefix = ""
+        )
         {
             var length = Encoding.UTF8.GetByteCount(texts);
 
@@ -119,10 +134,16 @@ namespace UtilitiesCS
             });
 
             await Task.WhenAll(writeTask, progressTask);
-
         }
 
-        public static async Task SerializeWithProgressAsync<T>(this JsonSerializer serializer, T obj, FilePathHelper disk, ProgressTrackerPane progress, CancellationToken cancel, string messagePrefix = "")
+        public static async Task SerializeWithProgressAsync<T>(
+            this JsonSerializer serializer,
+            T obj,
+            FilePathHelper disk,
+            ProgressTrackerPane progress,
+            CancellationToken cancel,
+            string messagePrefix = ""
+        )
         {
             // create this in the constructor, stream manages can be reused
             // see details in this answer https://stackoverflow.com/a/42599288/185498
@@ -148,20 +169,22 @@ namespace UtilitiesCS
             var writeTask = copyTask.ContinueWith(t => file.FlushAsync(), cancel);
 
             var sw = await Task.Run(Stopwatch.StartNew).ConfigureAwait(false);
-            var progressTask = Task.Run(async () =>
-            {
-                while (file.Position < length)
+            var progressTask = Task.Run(
+                async () =>
                 {
-                    await Task.Delay(TimeSpan.FromMilliseconds(200));
-                    var percent = ((double)file.Position / length) * 100;
-                    var msg = GetProgressMessage(file.Position, length, sw, messagePrefix);
+                    while (file.Position < length)
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(200));
+                        var percent = ((double)file.Position / length) * 100;
+                        var msg = GetProgressMessage(file.Position, length, sw, messagePrefix);
 
-                    progress.Report(percent, msg);
-                }
-            }, cancel);
+                        progress.Report(percent, msg);
+                    }
+                },
+                cancel
+            );
 
             await Task.WhenAll(writeTask, progressTask);
-
         }
 
         public static async Task CopyToAsync(
@@ -171,7 +194,8 @@ namespace UtilitiesCS
             int bufferSize,
             ProgressTrackerPane progress,
             string messagePrefix,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken
+        )
         {
             const int _DefaultBufferSize = 81920;
             var sw = await Task.Run(Stopwatch.StartNew).ConfigureAwait(false);
@@ -184,7 +208,12 @@ namespace UtilitiesCS
                 sourceLength = source.Length - source.Position;
             var totalBytesCopied = 0L;
 
-            var (percent, message) = GetProgressParams(totalBytesCopied, sourceLength, sw, messagePrefix);
+            var (percent, message) = GetProgressParams(
+                totalBytesCopied,
+                sourceLength,
+                sw,
+                messagePrefix
+            );
             progress?.Report(percent, message);
 
             var bytesRead = -1;
@@ -196,7 +225,12 @@ namespace UtilitiesCS
                     break;
                 await destination.WriteAsync(buffer, 0, buffer.Length);
                 totalBytesCopied += bytesRead;
-                (percent, message) = GetProgressParams(totalBytesCopied, sourceLength, sw, messagePrefix);
+                (percent, message) = GetProgressParams(
+                    totalBytesCopied,
+                    sourceLength,
+                    sw,
+                    messagePrefix
+                );
                 progress?.Report(percent, message);
             }
 
@@ -208,16 +242,15 @@ namespace UtilitiesCS
             cancellationToken.ThrowIfCancellationRequested();
         }
 
-
         /// <summary>
         /// Copys a stream to another stream
         /// </summary>
         /// <param name="source">The source <see cref="Stream"/> to copy from</param>
-        /// <param name="sourceLength">The length of the source stream, 
+        /// <param name="sourceLength">The length of the source stream,
         /// if known - used for progress reporting</param>
         /// <param name="destination">The destination <see cref="Stream"/> to copy to</param>
         /// <param name="bufferSize">The size of the copy block buffer</param>
-        /// <param name="progress">An <see cref="IProgress{T}"/> implementation 
+        /// <param name="progress">An <see cref="IProgress{T}"/> implementation
         /// for reporting progress</param>
         /// <param name="cancellationToken">A cancellation token</param>
         /// <returns>A task representing the operation</returns>
@@ -227,7 +260,8 @@ namespace UtilitiesCS
             Stream destination,
             int bufferSize,
             IProgress<KeyValuePair<long, long>> progress,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken
+        )
         {
             const int _DefaultBufferSize = 81920;
 
@@ -258,21 +292,32 @@ namespace UtilitiesCS
             cancellationToken.ThrowIfCancellationRequested();
         }
 
-        private static (double Percent, string Message) GetProgressParams(long complete, long count, Stopwatch sw, string messagePrefix)
+        private static (double Percent, string Message) GetProgressParams(
+            long complete,
+            long count,
+            Stopwatch sw,
+            string messagePrefix
+        )
         {
             var percent = ((double)complete / count) * 100;
             var msg = GetProgressMessage(complete, count, sw, messagePrefix);
             return (percent, msg);
         }
 
-        private static string GetProgressMessage(long complete, long count, Stopwatch sw, string prefix)
+        private static string GetProgressMessage(
+            long complete,
+            long count,
+            Stopwatch sw,
+            string prefix
+        )
         {
             double seconds = complete > 0 ? sw.Elapsed.TotalSeconds / complete : 0;
             var remaining = count - complete;
             var remainingSeconds = remaining * seconds;
             var ts = TimeSpan.FromSeconds(remainingSeconds);
-            string msg = $"{prefix}Completed {complete.ToMbString()} of {count.ToMbString()} ({MB * seconds:N2} mps) " +
-                $"({sw.Elapsed:%m\\:ss} elapsed {ts:%m\\:ss} remaining)";
+            string msg =
+                $"{prefix}Completed {complete.ToMbString()} of {count.ToMbString()} ({MB * seconds:N2} mps) "
+                + $"({sw.Elapsed:%m\\:ss} elapsed {ts:%m\\:ss} remaining)";
             return msg;
         }
     }

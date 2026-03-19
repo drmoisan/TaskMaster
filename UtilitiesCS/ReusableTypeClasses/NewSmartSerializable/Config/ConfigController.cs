@@ -11,7 +11,6 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
 {
     public class ConfigController
     {
-
         #region ctor
 
         public ConfigController(IApplicationGlobals globals, ISmartSerializableConfig config)
@@ -30,15 +29,21 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
             Viewer = new ConfigViewer();
 
             Viewer.ComboSpecialFolderLocal.DataSource = Globals.FS.SpecialFolders.Keys;
-            var (specialFolderLocal, relativePathLocal) = FilePathConverter.GetSerializablePath(ConfigCopy.LocalDisk.FolderPath);
-            var specialFolderSelectionLocal = specialFolderLocal == "Not Found" ? "None" : specialFolderLocal;
+            var (specialFolderLocal, relativePathLocal) = FilePathConverter.GetSerializablePath(
+                ConfigCopy.LocalDisk.FolderPath
+            );
+            var specialFolderSelectionLocal =
+                specialFolderLocal == "Not Found" ? "None" : specialFolderLocal;
             Viewer.ComboSpecialFolderLocal.SelectedItem = specialFolderSelectionLocal;
             Viewer.RelativePathLocal.Text = relativePathLocal;
             Viewer.FileNameLocal.Text = ConfigCopy.LocalDisk.FileName;
 
             Viewer.ComboSpecialFolderNet.DataSource = Globals.FS.SpecialFolders.Keys;
-            var (specialFolderNet, relativePathNet) = FilePathConverter.GetSerializablePath(ConfigCopy.NetDisk.FolderPath);
-            var specialFolderSelectionNet = specialFolderNet == "Not Found" ? "None" : specialFolderNet;
+            var (specialFolderNet, relativePathNet) = FilePathConverter.GetSerializablePath(
+                ConfigCopy.NetDisk.FolderPath
+            );
+            var specialFolderSelectionNet =
+                specialFolderNet == "Not Found" ? "None" : specialFolderNet;
             Viewer.ComboSpecialFolderNet.SelectedItem = specialFolderSelectionNet;
             Viewer.RelativePathNet.Text = relativePathNet;
             Viewer.FileNameNet.Text = ConfigCopy.NetDisk.FileName;
@@ -49,7 +54,10 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
             return this;
         }
 
-        public static ConfigController Show(IApplicationGlobals globals, ISmartSerializableConfig config)
+        public static ConfigController Show(
+            IApplicationGlobals globals,
+            ISmartSerializableConfig config
+        )
         {
             var controller = new ConfigController(globals, config).Init();
             controller.Viewer.Show();
@@ -74,10 +82,17 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
             Viewer.Close();
         }
 
-        internal void ChangeSpecialFolder(string specialFolderName, string relativePath, ISmartSerializableConfig.ActiveDiskEnum diskType)
+        internal void ChangeSpecialFolder(
+            string specialFolderName,
+            string relativePath,
+            ISmartSerializableConfig.ActiveDiskEnum diskType
+        )
         {
             var folderPath = FilePathConverter.ExtractFolderPath(specialFolderName, relativePath);
-            if (ConfigCopy.ActiveDisk == diskType) { ConfigCopy.Disk.FolderPath = folderPath; }
+            if (ConfigCopy.ActiveDisk == diskType)
+            {
+                ConfigCopy.Disk.FolderPath = folderPath;
+            }
 
             switch (diskType)
             {
@@ -119,7 +134,8 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext());
+                    new WindowsFormsSynchronizationContext()
+                );
             Viewer.Enabled = false;
             await Task.Run(() => Config.CopyChanged(ConfigCopy, true, true));
 
@@ -127,7 +143,5 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
         }
 
         #endregion Events
-
-
     }
 }

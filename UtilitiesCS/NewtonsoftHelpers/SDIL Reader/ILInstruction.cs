@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Reflection.Emit;
+using System.Text;
 
 namespace SDILReader
 {
@@ -51,35 +51,53 @@ namespace SDILReader
                 switch (code.OperandType)
                 {
                     case OperandType.InlineField:
-                        System.Reflection.FieldInfo fOperand = ((System.Reflection.FieldInfo)operand);
-                        result += " " + ILGlobals.ProcessSpecialTypes(fOperand.FieldType.ToString()) + " " +
-                            ILGlobals.ProcessSpecialTypes(fOperand.ReflectedType.ToString()) +
-                            "::" + fOperand.Name + "";
+                        System.Reflection.FieldInfo fOperand = (
+                            (System.Reflection.FieldInfo)operand
+                        );
+                        result +=
+                            " "
+                            + ILGlobals.ProcessSpecialTypes(fOperand.FieldType.ToString())
+                            + " "
+                            + ILGlobals.ProcessSpecialTypes(fOperand.ReflectedType.ToString())
+                            + "::"
+                            + fOperand.Name
+                            + "";
                         break;
                     case OperandType.InlineMethod:
                         try
                         {
-                            System.Reflection.MethodInfo mOperand = (System.Reflection.MethodInfo)operand;
+                            System.Reflection.MethodInfo mOperand =
+                                (System.Reflection.MethodInfo)operand;
                             result += " ";
-                            if (!mOperand.IsStatic) result += "instance ";
-                            result += ILGlobals.ProcessSpecialTypes(mOperand.ReturnType.ToString()) +
-                                " " + ILGlobals.ProcessSpecialTypes(mOperand.ReflectedType.ToString()) +
-                                "::" + mOperand.Name + "()";
+                            if (!mOperand.IsStatic)
+                                result += "instance ";
+                            result +=
+                                ILGlobals.ProcessSpecialTypes(mOperand.ReturnType.ToString())
+                                + " "
+                                + ILGlobals.ProcessSpecialTypes(mOperand.ReflectedType.ToString())
+                                + "::"
+                                + mOperand.Name
+                                + "()";
                         }
                         catch
                         {
                             try
                             {
-                                System.Reflection.ConstructorInfo mOperand = (System.Reflection.ConstructorInfo)operand;
+                                System.Reflection.ConstructorInfo mOperand =
+                                    (System.Reflection.ConstructorInfo)operand;
                                 result += " ";
-                                if (!mOperand.IsStatic) result += "instance ";
-                                result += "void " +
-                                    ILGlobals.ProcessSpecialTypes(mOperand.ReflectedType.ToString()) +
-                                    "::" + mOperand.Name + "()";
+                                if (!mOperand.IsStatic)
+                                    result += "instance ";
+                                result +=
+                                    "void "
+                                    + ILGlobals.ProcessSpecialTypes(
+                                        mOperand.ReflectedType.ToString()
+                                    )
+                                    + "::"
+                                    + mOperand.Name
+                                    + "()";
                             }
-                            catch
-                            {
-                            }
+                            catch { }
                         }
                         break;
                     case OperandType.ShortInlineBrTarget:
@@ -90,8 +108,10 @@ namespace SDILReader
                         result += " " + ILGlobals.ProcessSpecialTypes(operand.ToString());
                         break;
                     case OperandType.InlineString:
-                        if (operand.ToString() == "\r\n") result += " \"\\r\\n\"";
-                        else result += " \"" + operand.ToString() + "\"";
+                        if (operand.ToString() == "\r\n")
+                            result += " \"\\r\\n\"";
+                        else
+                            result += " \"" + operand.ToString() + "\"";
                         break;
                     case OperandType.ShortInlineVar:
                         result += operand.ToString();
@@ -110,11 +130,12 @@ namespace SDILReader
                             result += "not supported";
                         break;
 
-                    default: result += "not supported"; break;
+                    default:
+                        result += "not supported";
+                        break;
                 }
             }
             return result;
-
         }
 
         /// <summary>
@@ -135,9 +156,6 @@ namespace SDILReader
             return result;
         }
 
-        public ILInstruction()
-        {
-
-        }
+        public ILInstruction() { }
     }
 }

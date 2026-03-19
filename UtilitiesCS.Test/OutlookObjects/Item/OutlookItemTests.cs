@@ -78,7 +78,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             System.Action action = () => outlookItem.GetPropertyValue<string>("DoesNotExist");
 
             // Assert
-            action.Should().Throw<MissingMemberException>()
+            action
+                .Should()
+                .Throw<MissingMemberException>()
                 .WithMessage("Member 'ReflectionFriendlyItem.DoesNotExist' not found.");
         }
 
@@ -92,7 +94,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             System.Action action = () => outlookItem.GetPropertyValue<string>("Subject");
 
             // Assert
-            action.Should().Throw<TargetInvocationException>()
+            action
+                .Should()
+                .Throw<TargetInvocationException>()
                 .WithInnerException<InvalidOperationException>();
         }
 
@@ -100,7 +104,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         public void TaskStartDate_WhenPropertyIsMissing_ShouldReturnDefaultValue()
         {
             // Arrange
-            var missingPropertyItem = new UtilitiesCS.OutlookItem(new ReflectionFriendlyItemWithoutTaskStartDate());
+            var missingPropertyItem = new UtilitiesCS.OutlookItem(
+                new ReflectionFriendlyItemWithoutTaskStartDate()
+            );
 
             // Act
             var missingResult = missingPropertyItem.TaskStartDate;
@@ -119,7 +125,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             System.Action action = () => _ = throwingPropertyItem.TaskStartDate;
 
             // Assert
-            action.Should().Throw<TargetInvocationException>()
+            action
+                .Should()
+                .Throw<TargetInvocationException>()
                 .WithInnerException<InvalidOperationException>();
         }
 
@@ -151,14 +159,25 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             // Arrange
             var innerItem = new ReflectionFriendlyItem();
             var outlookItem = new UtilitiesCS.OutlookItem(innerItem);
-            var callMethod = typeof(UtilitiesCS.OutlookItem)
-                .GetMethod("CallMethod", BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(string), typeof(object[]) }, null);
+            var callMethod = typeof(UtilitiesCS.OutlookItem).GetMethod(
+                "CallMethod",
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                null,
+                new[] { typeof(string), typeof(object[]) },
+                null
+            );
 
             // Act
-            System.Action action = () => callMethod!.Invoke(outlookItem, new object[] { "Combine", new object[] { "report", 2026 } });
+            System.Action action = () =>
+                callMethod!.Invoke(
+                    outlookItem,
+                    new object[] { "Combine", new object[] { "report", 2026 } }
+                );
 
             // Assert
-            action.Should().Throw<TargetInvocationException>()
+            action
+                .Should()
+                .Throw<TargetInvocationException>()
                 .WithInnerException<MissingMethodException>();
         }
 
@@ -219,7 +238,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
 
         private sealed class ThrowingTaskStartDateItem
         {
-            public DateTime TaskStartDate => throw new InvalidOperationException("TaskStartDate access failed.");
+            public DateTime TaskStartDate =>
+                throw new InvalidOperationException("TaskStartDate access failed.");
         }
     }
 }

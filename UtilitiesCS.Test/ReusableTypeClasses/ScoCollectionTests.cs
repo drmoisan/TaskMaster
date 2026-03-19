@@ -1,13 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
-using System.Threading.Tasks;
-using UtilitiesCS;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using UtilitiesCS;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
 {
@@ -20,7 +20,6 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void TestInitialize()
         {
             this.mockRepository = new MockRepository(MockBehavior.Strict);
-
         }
 
         #region Helper Methods and Classes
@@ -29,15 +28,17 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             return new ScoCollection<string>();
         }
+
         private List<string[]> _receivedEvents;
 
-
-        public void CollectionChangedHandler(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        public void CollectionChangedHandler(
+            object sender,
+            System.Collections.Specialized.NotifyCollectionChangedEventArgs e
+        )
         {
             var newItems = e.NewItems.Cast<object>().Select(obj => obj.ToString()).StringJoin(",");
 
             _receivedEvents.Add([e.Action.ToString(), newItems]);
-
         }
 
         #endregion Helper Methods and Classes
@@ -56,20 +57,30 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             _receivedEvents = [];
             scoCollection.CollectionChanged += CollectionChangedHandler;
-            List<string[]> expected = [["Add", "One"], ["Add", "Two"]];
+            List<string[]> expected =
+            [
+                ["Add", "One"],
+                ["Add", "Two"],
+            ];
 
             // Act
             scoCollection.Add("One");
             scoCollection.Add("Two");
 
             // Assert
-            Console.WriteLine(expected.ToArray().ToFormattedText(["Action", "New Items"], title: "Expected Events"));
+            Console.WriteLine(
+                expected
+                    .ToArray()
+                    .ToFormattedText(["Action", "New Items"], title: "Expected Events")
+            );
 
-            Console.WriteLine(_receivedEvents.ToArray().ToFormattedText(["Action", "New Items"], title: "Actual Events"));
+            Console.WriteLine(
+                _receivedEvents
+                    .ToArray()
+                    .ToFormattedText(["Action", "New Items"], title: "Actual Events")
+            );
 
             _receivedEvents.Should().BeEquivalentTo(expected);
-
         }
-
     }
 }

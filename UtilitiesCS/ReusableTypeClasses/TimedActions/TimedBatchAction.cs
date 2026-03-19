@@ -1,11 +1,11 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.HelperClasses
@@ -27,6 +27,7 @@ namespace UtilitiesCS.HelperClasses
         {
             Interlocked.CompareExchange(ref _action, action, null);
         }
+
         private System.Action _action;
 
         private TimeSpan _frequency;
@@ -48,7 +49,10 @@ namespace UtilitiesCS.HelperClasses
         {
             if (_actionRequested.CheckAndSetFirstCall)
             {
-                if (_action is null) { throw new NullReferenceException("Action is null"); }
+                if (_action is null)
+                {
+                    throw new NullReferenceException("Action is null");
+                }
                 var action2 = ResetAfterAction(_action);
                 _timer = new TimerWrapper(_frequency);
                 _timer.Elapsed += (sender, e) => action2();
@@ -61,7 +65,10 @@ namespace UtilitiesCS.HelperClasses
         {
             if (_actionRequested.CheckAndSetFirstCall)
             {
-                if (action is null) { throw new NullReferenceException("Action is null"); }
+                if (action is null)
+                {
+                    throw new NullReferenceException("Action is null");
+                }
                 var action2 = ResetAfterAction(action);
                 _timer = new TimerWrapper(_frequency);
                 _timer.Elapsed += (sender, e) => action2();

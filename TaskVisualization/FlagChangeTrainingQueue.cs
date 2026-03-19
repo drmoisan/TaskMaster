@@ -6,15 +6,16 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UtilitiesCS.HelperClasses;
-using UtilitiesCS.Threading;
 using UtilitiesCS.Interfaces;
+using UtilitiesCS.Threading;
 
 namespace TaskVisualization
 {
     public class FlagChangeTrainingQueue : IFlagChangeTrainingQueue
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public FlagChangeTrainingQueue() { }
 
@@ -24,8 +25,8 @@ namespace TaskVisualization
             return this;
         }
 
-
-        public IFlagChangeTrainingQueue.QueueOptions Options { get; set; } = IFlagChangeTrainingQueue.QueueOptions.Timed;
+        public IFlagChangeTrainingQueue.QueueOptions Options { get; set; } =
+            IFlagChangeTrainingQueue.QueueOptions.Timed;
         internal CancellationToken Cancel { get; private set; } = default;
         internal BlockingCollection<IFlagChangeGroup> Queue { get; private set; } = [];
         private ThreadSafeSingleShotGuard _guard = new();
@@ -35,22 +36,27 @@ namespace TaskVisualization
 
         internal async Task ConsumeAsync()
         {
-            await Task.Run(async () =>
-            {
-                while (Queue.TryTake(out var item))
+            await Task.Run(
+                async () =>
                 {
-                    try
+                    while (Queue.TryTake(out var item))
                     {
-                        await item.ProcessGroupAsync();
+                        try
+                        {
+                            await item.ProcessGroupAsync();
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Error(
+                                $"Error training flags for email with subject: {(item as FlagChangeGroup)?.Subject}. {e.Message}",
+                                e
+                            );
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        logger.Error($"Error training flags for email with subject: {(item as FlagChangeGroup)?.Subject}. {e.Message}", e);
-                    }
-
-                }
-                _guard = new ThreadSafeSingleShotGuard();
-            }, Cancel);
+                    _guard = new ThreadSafeSingleShotGuard();
+                },
+                Cancel
+            );
         }
 
         public void Enqueue(IFlagChangeGroup item)
@@ -68,6 +74,5 @@ namespace TaskVisualization
                 ConsumerTimer?.RequestOrResetTask();
             }
         }
-
     }
 }

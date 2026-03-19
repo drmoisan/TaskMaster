@@ -40,7 +40,9 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             var values = Enumerable.Range(1, 25).ToArray();
 
             // Act
-            await Task.WhenAll(values.Select(value => Task.Run(() => dictionary[value] = $"value-{value}")));
+            await Task.WhenAll(
+                values.Select(value => Task.Run(() => dictionary[value] = $"value-{value}"))
+            );
 
             // Assert
             dictionary.Count.Should().Be(values.Length);
@@ -53,10 +55,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void SerializeToString_ContainsStoredEntries()
         {
             // Arrange
-            var dictionary = new ScoDictionaryNew<string, int>
-            {
-                Name = "numbers",
-            };
+            var dictionary = new ScoDictionaryNew<string, int> { Name = "numbers" };
             dictionary["one"] = 1;
             dictionary["two"] = 2;
 

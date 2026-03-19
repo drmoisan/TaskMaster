@@ -1,8 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using UtilitiesCS;
 
 namespace Z.Unfinished.ToDoModel.Test.Data_Model.Tree
@@ -10,7 +10,6 @@ namespace Z.Unfinished.ToDoModel.Test.Data_Model.Tree
     [TestClass]
     public class TreeNodeTests_UnfinishedStubs
     {
-
         private MockRepository mockRepository;
         private DebugTextWriter tw;
 
@@ -27,7 +26,6 @@ namespace Z.Unfinished.ToDoModel.Test.Data_Model.Tree
             this.mockRepository = new MockRepository(MockBehavior.Strict);
             tw = new DebugTextWriter();
             Console.SetOut(tw);
-
         }
 
         #region Helper Methods and Classes
@@ -40,6 +38,7 @@ namespace Z.Unfinished.ToDoModel.Test.Data_Model.Tree
                 currentChar = (char)(c + 1);
             return currentChar;
         }
+
         private char currentChar = 'z';
 
         private TreeNode<string> CreateTreeNode()
@@ -59,7 +58,8 @@ namespace Z.Unfinished.ToDoModel.Test.Data_Model.Tree
 
         private List<TreeNode<string>> CreateChildren(TreeNode<string> parent, int levels)
         {
-            if (levels-- == 0) return null;
+            if (levels-- == 0)
+                return null;
 
             var r = new Random();
             var childCount = r.Next(1, 5);
@@ -67,15 +67,17 @@ namespace Z.Unfinished.ToDoModel.Test.Data_Model.Tree
             List<TreeNode<string>> children = new List<TreeNode<string>>();
             if (parent != null)
             {
-                children = Enumerable.Range(0, childCount)
-                    .Select(i => parent
-                    .AddChild($"{parent?.Value ?? ""}{NextChar(currentChar)}"))
+                children = Enumerable
+                    .Range(0, childCount)
+                    .Select(i => parent.AddChild($"{parent?.Value ?? ""}{NextChar(currentChar)}"))
                     .ToList();
             }
             else
             {
-                children = Enumerable.Range(0, childCount)
-                    .Select(i => CreateTreeNode($"{NextChar(currentChar)}")).ToList();
+                children = Enumerable
+                    .Range(0, childCount)
+                    .Select(i => CreateTreeNode($"{NextChar(currentChar)}"))
+                    .ToList();
             }
             children.ForEach(child => CreateChildren(child, levels));
             return children;

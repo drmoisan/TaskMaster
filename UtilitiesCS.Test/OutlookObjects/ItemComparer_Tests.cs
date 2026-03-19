@@ -1,6 +1,6 @@
+using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 
 namespace UtilitiesCS.Test
 {
@@ -11,7 +11,9 @@ namespace UtilitiesCS.Test
         public void ItemComparer_ShouldNotBeLoadable_BecauseProductionFileContainsNoLiveType()
         {
             // Arrange
-            Type itemComparerType = typeof(OutlookItem).Assembly.GetType("UtilitiesCS.ItemComparer");
+            Type itemComparerType = typeof(OutlookItem).Assembly.GetType(
+                "UtilitiesCS.ItemComparer"
+            );
 
             // Act / Assert
             itemComparerType.Should().BeNull();

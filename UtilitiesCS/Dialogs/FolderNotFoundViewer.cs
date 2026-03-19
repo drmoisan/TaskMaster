@@ -21,14 +21,8 @@ namespace UtilitiesCS
 
         public string FolderName
         {
-            get
-            {
-                return FolderNameTxtBox.Text;
-            }
-            set
-            {
-                FolderNameTxtBox.Text = value;
-            }
+            get { return FolderNameTxtBox.Text; }
+            set { FolderNameTxtBox.Text = value; }
         }
 
         private void CreateFolder_Click(object sender, EventArgs e)

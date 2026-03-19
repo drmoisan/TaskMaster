@@ -1,8 +1,8 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS;
-using System;
-using System.Collections.Generic;
 
 namespace UtilitiesCS.Test
 {
@@ -14,15 +14,15 @@ namespace UtilitiesCS.Test
         {
             Dictionary<string, string> target = new()
             {
-                {"Type", typeof(AppointmentItem).ToString() },
-                {"Subject", "TestSubjectString" },
-                {"Date", "2025-12-25 12:05 PM" }
+                { "Type", typeof(AppointmentItem).ToString() },
+                { "Subject", "TestSubjectString" },
+                { "Date", "2025-12-25 12:05 PM" },
             };
             Dictionary<string, string> test = new()
             {
-                {"Type", typeof(AppointmentItem).ToString() },
-                {"Subject", "TestSubjectString" },
-                {"Date", "2025-12-25 12:05 PM" }
+                { "Type", typeof(AppointmentItem).ToString() },
+                { "Subject", "TestSubjectString" },
+                { "Date", "2025-12-25 12:05 PM" },
             };
             bool result = test.ContentEquals(target);
             Assert.IsTrue(result);
@@ -33,15 +33,15 @@ namespace UtilitiesCS.Test
         {
             Dictionary<string, string> target = new()
             {
-                {"Type", typeof(AppointmentItem).ToString() },
-                {"Subject", "TestSubjectString" },
-                {"Date", "2025-12-25 12:05 PM" }
+                { "Type", typeof(AppointmentItem).ToString() },
+                { "Subject", "TestSubjectString" },
+                { "Date", "2025-12-25 12:05 PM" },
             };
             Dictionary<string, string> test = new()
             {
-                {"Subject", "TestSubjectString" },
-                {"Type", typeof(AppointmentItem).ToString() },
-                {"Date", "2025-12-25 12:05 PM" }
+                { "Subject", "TestSubjectString" },
+                { "Type", typeof(AppointmentItem).ToString() },
+                { "Date", "2025-12-25 12:05 PM" },
             };
             bool result = test.ContentEquals(target);
             Assert.IsTrue(result);
@@ -52,14 +52,14 @@ namespace UtilitiesCS.Test
         {
             Dictionary<string, string> target = new()
             {
-                {"Type", typeof(AppointmentItem).ToString() },
-                {"Subject", "TestSubjectString" },
-                {"Date", "2025-12-25 12:05 PM" }
+                { "Type", typeof(AppointmentItem).ToString() },
+                { "Subject", "TestSubjectString" },
+                { "Date", "2025-12-25 12:05 PM" },
             };
             Dictionary<string, string> test = new()
             {
-                {"Subject", "TestSubjectString" },
-                {"Date", "2025-12-25 12:05 PM" }
+                { "Subject", "TestSubjectString" },
+                { "Date", "2025-12-25 12:05 PM" },
             };
             bool result = test.ContentEquals(target);
             Assert.IsFalse(result);
@@ -70,15 +70,15 @@ namespace UtilitiesCS.Test
         {
             Dictionary<string, string> target = new()
             {
-                {"Type", typeof(AppointmentItem).ToString() },
-                {"Subject", "TestSubjectString" },
-                {"Date", "2025-12-25 12:05 PM" }
+                { "Type", typeof(AppointmentItem).ToString() },
+                { "Subject", "TestSubjectString" },
+                { "Date", "2025-12-25 12:05 PM" },
             };
             Dictionary<string, string> test = new()
             {
-                {"Type", typeof(AppointmentItem).ToString() },
-                {"Subject", "TestSubjectString2" },
-                {"Date", "2025-12-25 12:05 PM" }
+                { "Type", typeof(AppointmentItem).ToString() },
+                { "Subject", "TestSubjectString2" },
+                { "Date", "2025-12-25 12:05 PM" },
             };
             bool result = test.ContentEquals(target);
             Assert.IsFalse(result);
@@ -89,15 +89,15 @@ namespace UtilitiesCS.Test
         {
             Dictionary<string, string> target = new()
             {
-                {"Type", typeof(AppointmentItem).ToString() },
-                {"Subject", "TestSubjectString" },
-                {"Date", "2025-12-25 12:05 PM" }
+                { "Type", typeof(AppointmentItem).ToString() },
+                { "Subject", "TestSubjectString" },
+                { "Date", "2025-12-25 12:05 PM" },
             };
             Dictionary<string, string> test = new()
             {
-                {"Type", typeof(AppointmentItem).ToString() },
-                {"Subject2", "TestSubjectString" },
-                {"Date", "2025-12-25 12:05 PM" }
+                { "Type", typeof(AppointmentItem).ToString() },
+                { "Subject2", "TestSubjectString" },
+                { "Date", "2025-12-25 12:05 PM" },
             };
             bool result = test.ContentEquals(target);
             Assert.IsFalse(result);

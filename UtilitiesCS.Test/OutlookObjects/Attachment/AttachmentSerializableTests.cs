@@ -38,7 +38,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
             var parent = new object();
 
             outlookAttachment.SetupGet(x => x.Type).Returns(OlAttachmentType.olByValue);
-            outlookAttachment.SetupGet(x => x.BlockLevel).Returns(OlAttachmentBlockLevel.olAttachmentBlockLevelNone);
+            outlookAttachment
+                .SetupGet(x => x.BlockLevel)
+                .Returns(OlAttachmentBlockLevel.olAttachmentBlockLevelNone);
             outlookAttachment.SetupGet(x => x.Class).Returns(OlObjectClass.olAttachment);
             outlookAttachment.SetupGet(x => x.DisplayName).Returns("chart.png");
             outlookAttachment.SetupGet(x => x.FileName).Returns("chart.png");
@@ -75,10 +77,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
         public void IsImage_UsesFileExtension_WhenNoExplicitValueWasAssigned()
         {
             // Arrange
-            var attachment = new AttachmentSerializable
-            {
-                FileExtension = ".png",
-            };
+            var attachment = new AttachmentSerializable { FileExtension = ".png" };
 
             // Act
             bool isImage = attachment.IsImage;
@@ -106,7 +105,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
         [DataTestMethod]
         [DataRow("report.pdf", "report", ".pdf")]
         [DataRow(".gitignore", ".gitignore", "")]
-        public void ParseFileName_SplitsSeedAndExtensionAsExpected(string fileName, string expectedSeed, string expectedExtension)
+        public void ParseFileName_SplitsSeedAndExtensionAsExpected(
+            string fileName,
+            string expectedSeed,
+            string expectedExtension
+        )
         {
             // Arrange
             var attachment = new AttachmentSerializable();
@@ -142,7 +145,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
 
             // Act
             string json = JsonConvert.SerializeObject(original);
-            AttachmentSerializable clone = JsonConvert.DeserializeObject<AttachmentSerializable>(json);
+            AttachmentSerializable clone = JsonConvert.DeserializeObject<AttachmentSerializable>(
+                json
+            );
 
             // Assert
             clone.Should().NotBeNull();

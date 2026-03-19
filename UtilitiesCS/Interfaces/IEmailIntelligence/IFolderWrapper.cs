@@ -1,8 +1,8 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.Interfaces.IReusableTypeClasses;
 
 namespace UtilitiesCS
@@ -18,7 +18,7 @@ namespace UtilitiesCS
             FolderSize = 8,
             Name = 16,
             RelativePath = 32,
-            All = OlRoot | OlFolder | ItemCount | FolderSize | Name | RelativePath
+            All = OlRoot | OlFolder | ItemCount | FolderSize | Name | RelativePath,
         }
 
         long FolderSize { get; set; }
@@ -39,6 +39,4 @@ namespace UtilitiesCS
         void SubscribeToPropertyChanged(PropertyEnum properties);
         void UnSubscribeToPropertyChanged(PropertyEnum properties);
     }
-
-
 }

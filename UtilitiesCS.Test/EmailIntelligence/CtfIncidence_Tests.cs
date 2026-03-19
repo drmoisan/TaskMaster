@@ -52,7 +52,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 emailConversationID: "conversation-1",
                 folderCount: 2,
                 emailFolder: expectedFolders,
-                emailConversationCount: expectedCounts);
+                emailConversationCount: expectedCounts
+            );
 
             // Assert
             incidence.EmailConversationID.Should().Be("conversation-1");
@@ -71,7 +72,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 emailConversationID: null,
                 folderCount: -4,
                 emailFolder: null,
-                emailConversationCount: null);
+                emailConversationCount: null
+            );
 
             // Assert
             incidence.EmailConversationID.Should().BeNull();

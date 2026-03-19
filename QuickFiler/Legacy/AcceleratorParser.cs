@@ -1,12 +1,12 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Diagnostics.Eventing.Reader;
+using Microsoft.Office.Interop.Outlook;
+
 //using Microsoft.VisualBasic;
 //using Microsoft.VisualBasic.CompilerServices;
 
 namespace QuickFiler.Legacy
 {
-    
     internal class AcceleratorParser
     {
         private IAcceleratorCallbacks _parent;
@@ -35,12 +35,18 @@ namespace QuickFiler.Legacy
                                 blExpanded = _parent.ToggleOffActiveItem(blExpanded);
                             if (IsActivatingNode(intNewSelection))
                             {
-                                _intActiveSelection = _parent.ActivateByIndex(intNewSelection, blExpanded);
+                                _intActiveSelection = _parent.ActivateByIndex(
+                                    intNewSelection,
+                                    blExpanded
+                                );
                             }
-                            else { _intActiveSelection = intNewSelection; }
+                            else
+                            {
+                                _intActiveSelection = intNewSelection;
+                            }
                         }
 
-                        if (AdditionalInstructions(idxLastNum, strToParse)) 
+                        if (AdditionalInstructions(idxLastNum, strToParse))
                         {
                             if (IsAnythingActive(_intActiveSelection))
                             {
@@ -50,94 +56,108 @@ namespace QuickFiler.Legacy
                                 switch (strCommand ?? "")
                                 {
                                     case "O":
-                                        {
-                                            _parent.ToggleKeyboardDialog();
-                                            QF.ApplyReadEmailFormat();
-                                            _parent.OpenQFMail(QF.Mail);
-                                            break;
-                                        }
+                                    {
+                                        _parent.ToggleKeyboardDialog();
+                                        QF.ApplyReadEmailFormat();
+                                        _parent.OpenQFMail(QF.Mail);
+                                        break;
+                                    }
                                     case "C":
-                                        {
-                                            _parent.ToggleKeyboardDialog();
-                                            QF.ToggleConversationCheckbox();
-                                            break;
-                                        }
+                                    {
+                                        _parent.ToggleKeyboardDialog();
+                                        QF.ToggleConversationCheckbox();
+                                        break;
+                                    }
                                     case "T":
-                                        {
-                                            _parent.ToggleKeyboardDialog();
-                                            QF.FlagAsTask();
-                                            break;
-                                        }
+                                    {
+                                        _parent.ToggleKeyboardDialog();
+                                        QF.FlagAsTask();
+                                        break;
+                                    }
                                     case "F":
-                                        {
-                                            _parent.ToggleKeyboardDialog();
-                                            QF.JumpToSearchTextbox();
-                                            break;
-                                        }
+                                    {
+                                        _parent.ToggleKeyboardDialog();
+                                        QF.JumpToSearchTextbox();
+                                        break;
+                                    }
                                     case "D":
-                                        {
-                                            _parent.ToggleKeyboardDialog();
-                                            QF.JumpToFolderDropDown();
-                                            break;
-                                        }
+                                    {
+                                        _parent.ToggleKeyboardDialog();
+                                        QF.JumpToFolderDropDown();
+                                        break;
+                                    }
                                     case "X":
-                                        {
-                                            _parent.ToggleKeyboardDialog();
-                                            QF.MarkItemForDeletion();
-                                            break;
-                                        }
+                                    {
+                                        _parent.ToggleKeyboardDialog();
+                                        QF.MarkItemForDeletion();
+                                        break;
+                                    }
                                     case "R":
-                                        {
-                                            _parent.ToggleKeyboardDialog();
-                                            _parent.RemoveSpecificControlGroup(_intActiveSelection - 1);
-                                            break;
-                                        }
+                                    {
+                                        _parent.ToggleKeyboardDialog();
+                                        _parent.RemoveSpecificControlGroup(_intActiveSelection - 1);
+                                        break;
+                                    }
                                     case "A":
-                                        {
-                                            QF.ToggleSaveAttachments();
-                                            break;
-                                        }
+                                    {
+                                        QF.ToggleSaveAttachments();
+                                        break;
+                                    }
                                     case "W":
-                                        {
-                                            QF.ToggleDeleteFlow();
-                                            break;
-                                        }
+                                    {
+                                        QF.ToggleDeleteFlow();
+                                        break;
+                                    }
                                     case "M":
-                                        {
-                                            QF.ToggleSaveCopyOfMail();
-                                            break;
-                                        }
+                                    {
+                                        QF.ToggleSaveCopyOfMail();
+                                        break;
+                                    }
                                     case "E":
+                                    {
+                                        if (QF.BlExpanded)
                                         {
-                                            if (QF.BlExpanded)
-                                            {
-                                                _parent.MoveDownPix(_intActiveSelection + 1, (int)Math.Round(QF.Height * -0.5d));
-                                                QF.ExpandCtrls1();
-                                            }
-                                            else
-                                            {
-                                                _parent.MoveDownPix(_intActiveSelection + 1, QF.Height);
-                                                QF.ExpandCtrls1();
-                                            }
-
-                                            break;
+                                            _parent.MoveDownPix(
+                                                _intActiveSelection + 1,
+                                                (int)Math.Round(QF.Height * -0.5d)
+                                            );
+                                            QF.ExpandCtrls1();
                                         }
+                                        else
+                                        {
+                                            _parent.MoveDownPix(_intActiveSelection + 1, QF.Height);
+                                            QF.ExpandCtrls1();
+                                        }
+
+                                        break;
+                                    }
 
                                     default:
-                                        {
-                                            break;
-                                        }
+                                    {
+                                        break;
+                                    }
                                 }
                             }
-                            else { _parent.ResetAcceleratorSilently(); }
+                            else
+                            {
+                                _parent.ResetAcceleratorSilently();
+                            }
                         }
                     }
-                    else { _parent.ResetAcceleratorSilently();}
+                    else
+                    {
+                        _parent.ResetAcceleratorSilently();
+                    }
                 }
-
-                else { blExpanded = _parent.ToggleOffActiveItem(blExpanded);}
+                else
+                {
+                    blExpanded = _parent.ToggleOffActiveItem(blExpanded);
+                }
             }
-            else { blExpanded = _parent.ToggleOffActiveItem(blExpanded); }
+            else
+            {
+                blExpanded = _parent.ToggleOffActiveItem(blExpanded);
+            }
         }
 
         private string ExtractInstruction(int idxLastNum, string strToParse)
@@ -159,9 +179,9 @@ namespace QuickFiler.Legacy
 
         private bool IsActivatingNode(int NewSelection)
         {
-            return (NewSelection != 0) ? true : false; 
+            return (NewSelection != 0) ? true : false;
         }
-        
+
         private bool IsAnythingActive(int ActiveSelection)
         {
             if (ActiveSelection != 0)
@@ -214,8 +234,8 @@ namespace QuickFiler.Legacy
         {
             if (idxLastNum > -1)
             {
-                // Get last digit 
-                // TODO: Add support for multiple digit numbers 
+                // Get last digit
+                // TODO: Add support for multiple digit numbers
                 return int.Parse(strToParse.Substring(idxLastNum, 1));
             }
             else
@@ -225,10 +245,10 @@ namespace QuickFiler.Legacy
         }
 
         /// <summary>
-    /// Gets the index of the last number in a string. Returns 0 if none is found
-    /// </summary>
-    /// <param name="strToParse"></param>
-    /// <returns></returns>
+        /// Gets the index of the last number in a string. Returns 0 if none is found
+        /// </summary>
+        /// <param name="strToParse"></param>
+        /// <returns></returns>
         private int GetFinalNumericIndex(string strToParse)
         {
             int i;
@@ -250,6 +270,5 @@ namespace QuickFiler.Legacy
             }
             return intLastIndex;
         }
-
     }
 }

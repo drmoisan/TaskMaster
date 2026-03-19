@@ -1,10 +1,9 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-
+using Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
@@ -12,18 +11,31 @@ namespace UtilitiesCS
     {
         public static object GetCurrentItem(Application OlApp)
         {
-            if (OlApp == null) { throw new ArgumentNullException(nameof(OlApp)); }
-            else if (OlApp.ActiveWindow() is Explorer) { return Readable(OlApp.ActiveExplorer().Selection[0]); }
-            else if (OlApp.ActiveWindow() is Inspector) { return Readable(OlApp.ActiveInspector().CurrentItem); }
-            else { return null; }
+            if (OlApp == null)
+            {
+                throw new ArgumentNullException(nameof(OlApp));
+            }
+            else if (OlApp.ActiveWindow() is Explorer)
+            {
+                return Readable(OlApp.ActiveExplorer().Selection[0]);
+            }
+            else if (OlApp.ActiveWindow() is Inspector)
+            {
+                return Readable(OlApp.ActiveInspector().CurrentItem);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         internal static object Readable(object item)
         {
             if ((item is MailItem) && ((MailItem)item).IsMailUnReadable())
-            { return null; }
+            {
+                return null;
+            }
             return item;
         }
-
     }
 }

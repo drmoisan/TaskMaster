@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-
 namespace QuickFiler.Viewers
 {
     [RefreshProperties(RefreshProperties.Repaint)]
@@ -48,7 +47,6 @@ namespace QuickFiler.Viewers
                 CheckedChanged?.Invoke(this, new EventArgs());
                 base.Invalidate();
             }
-
         }
         private bool _checked;
 
@@ -58,6 +56,7 @@ namespace QuickFiler.Viewers
         }
 
         public new event EventHandler CheckedChanged;
+
         //public new event EventHandler Click;
 
         private bool _checkOnClick;
@@ -77,7 +76,6 @@ namespace QuickFiler.Viewers
                     base.Click -= ToolStripMenuItemCb_Click;
                 }
             }
-
         }
 
         private new Image Image

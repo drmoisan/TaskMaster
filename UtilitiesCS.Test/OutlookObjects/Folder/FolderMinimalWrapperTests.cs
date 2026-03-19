@@ -94,7 +94,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         {
             // Arrange
             var grandchild = CreateFolder("\\Mailbox\\Projects\\FY26", name: "FY26");
-            var child = CreateFolder("\\Mailbox\\Projects", name: "Projects", children: grandchild.Object);
+            var child = CreateFolder(
+                "\\Mailbox\\Projects",
+                name: "Projects",
+                children: grandchild.Object
+            );
             var root = CreateFolder("\\Mailbox", name: "Mailbox", children: child.Object);
             var wrapper = new FolderMinimalWrapper("FY26", @"projects\fy26");
 
@@ -146,7 +150,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             clone.OlFolder.Should().BeNull();
         }
 
-        private static Mock<OutlookFolder> CreateFolder(string folderPath, string name = null, params OutlookFolder[] children)
+        private static Mock<OutlookFolder> CreateFolder(
+            string folderPath,
+            string name = null,
+            params OutlookFolder[] children
+        )
         {
             var folder = new Mock<OutlookFolder>();
             var folders = new Mock<OutlookFolders>();

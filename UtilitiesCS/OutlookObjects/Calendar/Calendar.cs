@@ -2,7 +2,6 @@
 
 namespace UtilitiesCS
 {
-
     public static class Calendar
     {
         public static Folder GetCalendar(string CalendarName, NameSpace Session)
@@ -20,7 +19,6 @@ namespace UtilitiesCS
             }
 
             return foundCalendar;
-
         }
     }
 }

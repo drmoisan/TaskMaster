@@ -10,9 +10,12 @@ namespace UtilitiesCS.OutlookObjects.Folder
     {
         public bool Equals(TreeNode<FolderWrapper> x, TreeNode<FolderWrapper> y)
         {
-            if (ReferenceEquals(x, y)) return true;
-            if (x?.Value is null || y?.Value is null) return false;
-            if (x.Value.Name.IsNullOrEmpty() || y.Value.Name.IsNullOrEmpty()) return false;
+            if (ReferenceEquals(x, y))
+                return true;
+            if (x?.Value is null || y?.Value is null)
+                return false;
+            if (x.Value.Name.IsNullOrEmpty() || y.Value.Name.IsNullOrEmpty())
+                return false;
             return x.Value.Name == y.Value.Name;
         }
 
@@ -22,5 +25,3 @@ namespace UtilitiesCS.OutlookObjects.Folder
         }
     }
 }
-
-

@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using TaskVisualization;
 using UtilitiesCS;
 using Outlook = Microsoft.Office.Interop.Outlook;
-using System.Threading.Tasks;
 
 namespace TaskMaster
 {

@@ -1,20 +1,20 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using TaskMaster;
+using ToDoModel.Data_Model.People;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.ReusableTypeClasses;
-using ToDoModel.Data_Model.People;
-using System.Threading;
-using System.Collections.Specialized;
-using FluentAssertions;
-using System.Linq;
 using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
-using System.Reflection;
 
 namespace TaskMaster.Test.AppGlobals
 {
@@ -27,7 +27,8 @@ namespace TaskMaster.Test.AppGlobals
             Console.SetOut(new DebugTextWriter());
             this.mockRepository = new MockRepository(MockBehavior.Strict);
             this.mockApplicationGlobals = this.mockRepository.Create<IApplicationGlobals>();
-            this.mockApplicationGlobals.SetupGet(x => x.AF.CancelToken).Returns(CancellationToken.None);
+            this.mockApplicationGlobals.SetupGet(x => x.AF.CancelToken)
+                .Returns(CancellationToken.None);
         }
 
         #region Helper Classes and Variables
@@ -41,7 +42,13 @@ namespace TaskMaster.Test.AppGlobals
         {
             var mockSS = this.mockRepository.Create<ISmartSerializableNonTyped>();
             mockSS
-                .Setup(m => m.DeserializeAsync(It.IsAny<SmartSerializableLoader>(), true, It.IsAny<Func<PeopleScoDictionaryNew>>()))
+                .Setup(m =>
+                    m.DeserializeAsync(
+                        It.IsAny<SmartSerializableLoader>(),
+                        true,
+                        It.IsAny<Func<PeopleScoDictionaryNew>>()
+                    )
+                )
                 .ReturnsAsync(new PeopleScoDictionaryNew(mockApplicationGlobals.Object));
 
             return mockSS;
@@ -52,7 +59,7 @@ namespace TaskMaster.Test.AppGlobals
             var intel = this.mockRepository.Create<IntelligenceConfig>(mockGlobals.Object);
             var config = new Dictionary<string, SmartSerializableLoader>
             {
-                { "People", new SmartSerializableLoader()   }
+                { "People", new SmartSerializableLoader() },
             }.ToConcurrentDictionary();
             intel.SetupGet(x => x.Config).Returns(config);
             mockGlobals.SetupGet(x => x.IntelRes).Returns(intel.Object);
@@ -64,20 +71,46 @@ namespace TaskMaster.Test.AppGlobals
         {
             public static Delegate[] GetEventInvocationList(object target, string eventName)
             {
-                if (target == null) throw new ArgumentNullException(nameof(target));
-                if (string.IsNullOrEmpty(eventName)) throw new ArgumentNullException(nameof(eventName));
+                if (target == null)
+                    throw new ArgumentNullException(nameof(target));
+                if (string.IsNullOrEmpty(eventName))
+                    throw new ArgumentNullException(nameof(eventName));
 
                 Type targetType = target.GetType();
-                EventInfo eventInfo = targetType.GetEvent(eventName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public) ?? throw new ArgumentException($"Event '{eventName}' not found on type '{targetType}'.");
+                EventInfo eventInfo =
+                    targetType.GetEvent(
+                        eventName,
+                        BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+                    )
+                    ?? throw new ArgumentException(
+                        $"Event '{eventName}' not found on type '{targetType}'."
+                    );
 
                 // Get the method that adds the event handler
                 //MethodInfo addMethod = eventInfo.GetAddMethod(true) ?? throw new ArgumentException($"Event '{eventName}' does not have an accessible add method.");
 
                 // Get the declaring type of the event
-                Type declaringType = eventInfo.DeclaringType ?? throw new ArgumentException($"Event '{eventName}' does not have a declaring type.");
+                Type declaringType =
+                    eventInfo.DeclaringType
+                    ?? throw new ArgumentException(
+                        $"Event '{eventName}' does not have a declaring type."
+                    );
 
                 // Get the field that stores the event handlers
-                FieldInfo eventField = (declaringType.GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy) ?? FindEventFieldInBaseClasses(declaringType, eventName)) ?? throw new ArgumentException($"Event field '{eventName}' not found on type '{declaringType}'.");
+                FieldInfo eventField =
+                    (
+                        declaringType.GetField(
+                            eventName,
+                            BindingFlags.Instance
+                                | BindingFlags.NonPublic
+                                | BindingFlags.Public
+                                | BindingFlags.Static
+                                | BindingFlags.FlattenHierarchy
+                        ) ?? FindEventFieldInBaseClasses(declaringType, eventName)
+                    )
+                    ?? throw new ArgumentException(
+                        $"Event field '{eventName}' not found on type '{declaringType}'."
+                    );
                 object eventFieldValue = eventField.GetValue(target);
                 if (eventFieldValue is Delegate eventDelegate)
                 {
@@ -91,7 +124,14 @@ namespace TaskMaster.Test.AppGlobals
             {
                 while (type != null)
                 {
-                    FieldInfo field = type.GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+                    FieldInfo field = type.GetField(
+                        eventName,
+                        BindingFlags.Instance
+                            | BindingFlags.NonPublic
+                            | BindingFlags.Public
+                            | BindingFlags.Static
+                            | BindingFlags.FlattenHierarchy
+                    );
                     if (field != null)
                     {
                         return field;
@@ -112,7 +152,10 @@ namespace TaskMaster.Test.AppGlobals
             var appToDoObjects = new AppToDoObjects(mockApplicationGlobals.Object);
             this.mockSmartSerializable = GetMockSS();
             appToDoObjects.SmartSerializable = mockSmartSerializable.Object;
-            var expectedHandler = typeof(AppToDoObjects).GetMethod("People_CollectionChanged", [typeof(object), typeof(DictionaryChangedEventArgs<string, string>)]);
+            var expectedHandler = typeof(AppToDoObjects).GetMethod(
+                "People_CollectionChanged",
+                [typeof(object), typeof(DictionaryChangedEventArgs<string, string>)]
+            );
 
             // Act
             await appToDoObjects.LoadPeopleAsync();
@@ -123,11 +166,24 @@ namespace TaskMaster.Test.AppGlobals
             // the return value was properly assigned to the People property,
             // and the CollectionChanged event was properly assigned
 
-            mockSmartSerializable.Verify(m => m.DeserializeAsync(It.IsAny<SmartSerializableLoader>(), true, It.IsAny<Func<PeopleScoDictionaryNew>>()), Times.Once);
+            mockSmartSerializable.Verify(
+                m =>
+                    m.DeserializeAsync(
+                        It.IsAny<SmartSerializableLoader>(),
+                        true,
+                        It.IsAny<Func<PeopleScoDictionaryNew>>()
+                    ),
+                Times.Once
+            );
             Assert.IsNotNull(appToDoObjects.People);
-            var assignedHandlers = EventHelper.GetEventInvocationList(appToDoObjects.People, "CollectionChanged");
-            Assert.IsTrue(assignedHandlers.Any(d => d.Method == expectedHandler), "CollectionChanged event does not contain the expected handler");
-
+            var assignedHandlers = EventHelper.GetEventInvocationList(
+                appToDoObjects.People,
+                "CollectionChanged"
+            );
+            Assert.IsTrue(
+                assignedHandlers.Any(d => d.Method == expectedHandler),
+                "CollectionChanged event does not contain the expected handler"
+            );
         }
 
         //[TestMethod]
@@ -137,20 +193,19 @@ namespace TaskMaster.Test.AppGlobals
         //    mockApplicationGlobals.SetupGet(x => x.FS).Returns(new AppFileSystemFolderPaths());
         //    var intelRes = await IntelligenceConfig.LoadAsync(mockApplicationGlobals.Object);
         //    mockApplicationGlobals.SetupGet(x => x.IntelRes).Returns(intelRes);
-        //    var appToDoObjects = new AppToDoObjects(mockApplicationGlobals.Object);                       
+        //    var appToDoObjects = new AppToDoObjects(mockApplicationGlobals.Object);
 
         //    // Act
-        //    await appToDoObjects.LoadPeopleAsync();            
+        //    await appToDoObjects.LoadPeopleAsync();
 
         //    // Assert
 
         //    // the return value was properly assigned to the People property,
         //    // and the CollectionChanged event was properly assigned
 
-        //    Assert.IsNotNull(appToDoObjects.People);            
+        //    Assert.IsNotNull(appToDoObjects.People);
 
         //}
-
 
         #region Commented Tests
 

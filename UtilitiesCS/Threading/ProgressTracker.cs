@@ -34,7 +34,7 @@ namespace UtilitiesCS
                 _progressViewer = new ProgressViewer
                 {
                     UiDispatcher = UiThread.Dispatcher,
-                    CancelSource = _cancelSource
+                    CancelSource = _cancelSource,
                 };
                 if (_screen != null)
                 {
@@ -56,7 +56,11 @@ namespace UtilitiesCS
 
         public ProgressTracker(ProgressTracker parent, int allocation, int startingAt)
         {
-            _parent = new ParentProgress<(int Value, string JobName)>(parent, allocation, startingAt);
+            _parent = new ParentProgress<(int Value, string JobName)>(
+                parent,
+                allocation,
+                startingAt
+            );
             _jobName = parent._jobName;
             _progressViewer = parent.ProgressViewer;
         }
@@ -73,14 +77,25 @@ namespace UtilitiesCS
         private CancellationTokenSource _cancelSource;
         private Screen _screen;
 
-        internal Dispatcher UiDispatcher { get => _uiDispatcher; set => _uiDispatcher = value; }
+        internal Dispatcher UiDispatcher
+        {
+            get => _uiDispatcher;
+            set => _uiDispatcher = value;
+        }
         private Dispatcher _uiDispatcher;
 
         private ProgressViewer _progressViewer;
-        public ProgressViewer ProgressViewer { get => _progressViewer; protected set => _progressViewer = value; }
+        public ProgressViewer ProgressViewer
+        {
+            get => _progressViewer;
+            protected set => _progressViewer = value;
+        }
 
         private double _progress;
-        public double Progress { get => _progress; }
+        public double Progress
+        {
+            get => _progress;
+        }
 
         public virtual ProgressTracker Increment(double value, string jobName)
         {
@@ -105,8 +120,9 @@ namespace UtilitiesCS
             if (value < 0)
             {
                 var caller = new StackFrame(1, false).GetMethod().Name;
-                throw new ArgumentOutOfRangeException($"Progress reported " +
-                    $"by {caller} must be an integer between 0 and 100");
+                throw new ArgumentOutOfRangeException(
+                    $"Progress reported " + $"by {caller} must be an integer between 0 and 100"
+                );
             }
             if (value > 100)
             {
@@ -124,7 +140,9 @@ namespace UtilitiesCS
             if (value < 0)
             {
                 var caller = new StackFrame(1, false).GetMethod().Name;
-                throw new ArgumentOutOfRangeException($"Progress reported by {caller} must be an integer between 0 and 100");
+                throw new ArgumentOutOfRangeException(
+                    $"Progress reported by {caller} must be an integer between 0 and 100"
+                );
             }
             else if (value > 100)
             {
@@ -133,7 +151,8 @@ namespace UtilitiesCS
             else
             {
                 _progress = value;
-                var parentProgress = (int)Math.Round(_parent.Allocation * value / 100, 0) + _parent.StartingAt;
+                var parentProgress =
+                    (int)Math.Round(_parent.Allocation * value / 100, 0) + _parent.StartingAt;
 
                 // Updates UI
                 _parent.Progress.Report((parentProgress, _jobName));
@@ -155,12 +174,14 @@ namespace UtilitiesCS
             }
         }
 
-        public async virtual Task ReportAsync(double value)
+        public virtual async Task ReportAsync(double value)
         {
             if (value < 0)
             {
                 var caller = new StackFrame(1, false).GetMethod().Name;
-                throw new ArgumentOutOfRangeException($"Progress reported by {caller} must be an integer between 0 and 100");
+                throw new ArgumentOutOfRangeException(
+                    $"Progress reported by {caller} must be an integer between 0 and 100"
+                );
             }
             else if (value > 100)
             {
@@ -169,14 +190,23 @@ namespace UtilitiesCS
             else
             {
                 _progress = value;
-                var parentProgress = (int)Math.Round(_parent.Allocation * value / 100, 0) + _parent.StartingAt;
+                var parentProgress =
+                    (int)Math.Round(_parent.Allocation * value / 100, 0) + _parent.StartingAt;
                 _parent.Progress.Report((parentProgress, _jobName));
                 if (_isRoot && parentProgress == 100)
                 {
                     if (_progressViewer.InvokeRequired)
-                        await _progressViewer.UiDispatcher.InvokeAsync(() => { if (!_progressViewer.IsDisposed) { _progressViewer.Close(); } });
-                    else
-                        if (!_progressViewer.IsDisposed) { _progressViewer.Close(); }
+                        await _progressViewer.UiDispatcher.InvokeAsync(() =>
+                        {
+                            if (!_progressViewer.IsDisposed)
+                            {
+                                _progressViewer.Close();
+                            }
+                        });
+                    else if (!_progressViewer.IsDisposed)
+                    {
+                        _progressViewer.Close();
+                    }
                 }
             }
         }
@@ -207,13 +237,26 @@ namespace UtilitiesCS
             _allocation = allocation;
             _startingAt = startingAt;
         }
+
         private IProgress<T> _progress;
-        public IProgress<T> Progress { get => _progress; set => _progress = value; }
+        public IProgress<T> Progress
+        {
+            get => _progress;
+            set => _progress = value;
+        }
 
         private int _allocation;
-        public int Allocation { get => _allocation; set => _allocation = value; }
+        public int Allocation
+        {
+            get => _allocation;
+            set => _allocation = value;
+        }
 
         private int _startingAt;
-        public int StartingAt { get => _startingAt; set => _startingAt = value; }
+        public int StartingAt
+        {
+            get => _startingAt;
+            set => _startingAt = value;
+        }
     }
 }

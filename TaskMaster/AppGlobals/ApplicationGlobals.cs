@@ -1,10 +1,10 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.HelperClasses;
@@ -12,32 +12,49 @@ using UtilitiesCS.Threading;
 
 namespace TaskMaster
 {
-
     public class ApplicationGlobals : IApplicationGlobals
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         private Application _outlookApp;
 
         public ApplicationGlobals(Application olApp)
         {
             _outlookApp = olApp;
-            BasicLoaded = new Lazy<bool>(() => { LoadBasicMethod(); return true; });
+            BasicLoaded = new Lazy<bool>(() =>
+            {
+                LoadBasicMethod();
+                return true;
+            });
         }
 
         public ApplicationGlobals(Application olApp, bool loadBasic)
         {
             _outlookApp = olApp;
-            BasicLoaded = new Lazy<bool>(() => { LoadBasicMethod(); return true; });
-            if (loadBasic) { ForceBasicLoad(); }
+            BasicLoaded = new Lazy<bool>(() =>
+            {
+                LoadBasicMethod();
+                return true;
+            });
+            if (loadBasic)
+            {
+                ForceBasicLoad();
+            }
         }
 
-        async public Task LoadAsync(bool parallel = true)
+        public async Task LoadAsync(bool parallel = true)
         {
             ForceBasicLoad();
-            if (parallel) { await LoadParallelAsync(); }
-            else { await LoadSequentialAsync(); }
+            if (parallel)
+            {
+                await LoadParallelAsync();
+            }
+            else
+            {
+                await LoadSequentialAsync();
+            }
         }
 
         internal Lazy<bool> BasicLoaded;
@@ -58,15 +75,19 @@ namespace TaskMaster
             Engines = new AppItemEngines(this);
         }
 
-        async public Task LoadParallelAsync()
+        public async Task LoadParallelAsync()
         {
             await LoadIntelConfigAsync();
-            await Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync(), _olObjects.LoadAsync());
+            await Task.WhenAll(
+                _toDoObjects.LoadAsync(),
+                _autoFileObjects.LoadAsync(),
+                _olObjects.LoadAsync()
+            );
             await Engines.InitAsync();
             await _events.LoadAsync();
         }
 
-        async public Task LoadSequentialAsync()
+        public async Task LoadSequentialAsync()
         {
             await LoadIntelConfigAsync();
             await _olObjects.LoadAsync();
@@ -78,7 +99,10 @@ namespace TaskMaster
 
         public void LoadWhenIdle()
         {
-            IdleAsyncQueue.AddEntry(false, () => Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync()));
+            IdleAsyncQueue.AddEntry(
+                false,
+                () => Task.WhenAll(_toDoObjects.LoadAsync(), _autoFileObjects.LoadAsync())
+            );
             IdleAsyncQueue.AddEntry(false, Engines.InitAsync);
             IdleAsyncQueue.AddEntry(false, _events.LoadAsync);
         }
@@ -103,8 +127,12 @@ namespace TaskMaster
         internal AppQuickFilerSettings InternalQfSettings => _quickFilerSettings;
 
         public IntelligenceConfig IntelRes { get; private set; }
-        async private Task LoadIntelConfigAsync() => await Task.Run(async () => IntelRes = await IntelligenceConfig.LoadAsync(this), default);
 
+        private async Task LoadIntelConfigAsync() =>
+            await Task.Run(
+                async () => IntelRes = await IntelligenceConfig.LoadAsync(this),
+                default
+            );
 
         public IAppItemEngines Engines { get; private set; }
 
@@ -116,8 +144,8 @@ namespace TaskMaster
         public string[] GetProjectNames()
         {
             //ProjectCollection.GlobalProjectCollection.LoadedProjects
-            return AppDomain.CurrentDomain
-                .GetAssemblies()
+            return AppDomain
+                .CurrentDomain.GetAssemblies()
                 .Select(assembly => assembly.GetName().Name)
                 .ToArray();
         }
@@ -126,6 +154,5 @@ namespace TaskMaster
 
 
         #endregion
-
     }
 }

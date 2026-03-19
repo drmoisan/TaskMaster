@@ -35,8 +35,16 @@ namespace Swordfish.NET.Test
         {
             UnsortedView.InitializeList(new ObservableDictionary<string, string>(), 10, false);
             SortedView.InitializeList(new ObservableSortedDictionary<string, string>(), 10, false);
-            ConcurrentUnsortedView.InitializeList(new ConcurrentObservableDictionary<string, string>(), 10, true);
-            ConcurrentSortedView.InitializeList(new ConcurrentObservableSortedDictionary<string, string>(), 10, true);
+            ConcurrentUnsortedView.InitializeList(
+                new ConcurrentObservableDictionary<string, string>(),
+                10,
+                true
+            );
+            ConcurrentSortedView.InitializeList(
+                new ConcurrentObservableSortedDictionary<string, string>(),
+                10,
+                true
+            );
         }
     }
 }

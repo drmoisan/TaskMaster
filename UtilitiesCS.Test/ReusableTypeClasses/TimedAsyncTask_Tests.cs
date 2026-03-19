@@ -15,17 +15,22 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var completion = new TaskCompletionSource<bool>();
-            var timedTask = new TimedAsyncTask(TimeSpan.FromMilliseconds(20), () =>
-            {
-                completion.TrySetResult(true);
-                return Task.CompletedTask;
-            });
+            var timedTask = new TimedAsyncTask(
+                TimeSpan.FromMilliseconds(20),
+                () =>
+                {
+                    completion.TrySetResult(true);
+                    return Task.CompletedTask;
+                }
+            );
 
             // Act
             timedTask.RequestTask();
 
             // Assert
-            (await Task.WhenAny(completion.Task, Task.Delay(1000))).Should().BeSameAs(completion.Task);
+            (await Task.WhenAny(completion.Task, Task.Delay(1000)))
+                .Should()
+                .BeSameAs(completion.Task);
             (await completion.Task).Should().BeTrue();
         }
 
@@ -44,7 +49,9 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             });
 
             // Assert
-            (await Task.WhenAny(completion.Task, Task.Delay(1000))).Should().BeSameAs(completion.Task);
+            (await Task.WhenAny(completion.Task, Task.Delay(1000)))
+                .Should()
+                .BeSameAs(completion.Task);
             (await completion.Task).Should().BeTrue();
         }
 
@@ -53,18 +60,23 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var completion = new TaskCompletionSource<bool>();
-            var timedTask = new TimedAsyncTask(TimeSpan.FromMilliseconds(150), () =>
-            {
-                completion.TrySetResult(true);
-                return Task.CompletedTask;
-            });
+            var timedTask = new TimedAsyncTask(
+                TimeSpan.FromMilliseconds(150),
+                () =>
+                {
+                    completion.TrySetResult(true);
+                    return Task.CompletedTask;
+                }
+            );
 
             // Act
             timedTask.RequestTask();
             timedTask.CancelTask();
 
             // Assert
-            (await Task.WhenAny(completion.Task, Task.Delay(250))).Should().NotBeSameAs(completion.Task);
+            (await Task.WhenAny(completion.Task, Task.Delay(250)))
+                .Should()
+                .NotBeSameAs(completion.Task);
         }
 
         [TestMethod]
@@ -86,11 +98,14 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var completion = new TaskCompletionSource<DateTime>();
             var startedAt = DateTime.UtcNow;
-            var timedTask = new TimedAsyncTask(TimeSpan.FromMilliseconds(80), () =>
-            {
-                completion.TrySetResult(DateTime.UtcNow);
-                return Task.CompletedTask;
-            });
+            var timedTask = new TimedAsyncTask(
+                TimeSpan.FromMilliseconds(80),
+                () =>
+                {
+                    completion.TrySetResult(DateTime.UtcNow);
+                    return Task.CompletedTask;
+                }
+            );
 
             // Act
             timedTask.RequestOrResetTask();

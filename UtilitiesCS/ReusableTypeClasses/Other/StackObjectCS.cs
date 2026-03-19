@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,7 +41,9 @@ namespace UtilitiesCS
         public T Peek(int index)
         {
             if (_list.Count - 1 < index)
-                throw new IndexOutOfRangeException($"Index {index} out of range. Stack only has {_list.Count} elements.");
+                throw new IndexOutOfRangeException(
+                    $"Index {index} out of range. Stack only has {_list.Count} elements."
+                );
             return _list[index];
         }
 
@@ -57,7 +59,9 @@ namespace UtilitiesCS
         public T Pop(int index)
         {
             if (_list.Count - 1 < index)
-                throw new IndexOutOfRangeException($"Index {index} out of range. Stack only has {_list.Count} elements.");
+                throw new IndexOutOfRangeException(
+                    $"Index {index} out of range. Stack only has {_list.Count} elements."
+                );
             T result = _list[index];
             _list.RemoveAt(index);
             return result;
@@ -69,16 +73,28 @@ namespace UtilitiesCS
 
         public T[] ToArray(bool reverse)
         {
-            if (reverse) { return Enumerable.Reverse(_list).ToArray(); }
-            else { return _list.ToArray(); }
+            if (reverse)
+            {
+                return Enumerable.Reverse(_list).ToArray();
+            }
+            else
+            {
+                return _list.ToArray();
+            }
         }
 
         public List<T> ToList() => _list;
 
         public List<T> ToList(bool reverse)
         {
-            if (reverse) { return new List<T>(Enumerable.Reverse(_list)); }
-            else { return _list; }
+            if (reverse)
+            {
+                return new List<T>(Enumerable.Reverse(_list));
+            }
+            else
+            {
+                return _list;
+            }
         }
 
         public bool TryPeek(out T result)
@@ -164,7 +180,6 @@ namespace UtilitiesCS
         //public bool IsSynchronized => throw new NotImplementedException();
 
         //public void CopyTo(Array array, int index) => _list.CopyTo(array, index);
-
 
         //#endregion
 

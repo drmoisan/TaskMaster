@@ -16,8 +16,9 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             Type moduleType = typeof(CaptureEmailAddressesModule2);
 
             // Act
-            MethodInfo[] declaredPublicMethods = moduleType
-                .GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+            MethodInfo[] declaredPublicMethods = moduleType.GetMethods(
+                BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly
+            );
 
             // Assert
             moduleType.IsAbstract.Should().BeTrue();
@@ -33,8 +34,16 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
 
             // Act
             bool hasLegacyMethod = moduleType
-                .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly)
-                .Any(method => string.Equals(method.Name, "GetEmailAddresses", StringComparison.Ordinal));
+                .GetMethods(
+                    BindingFlags.Public
+                        | BindingFlags.NonPublic
+                        | BindingFlags.Static
+                        | BindingFlags.Instance
+                        | BindingFlags.DeclaredOnly
+                )
+                .Any(method =>
+                    string.Equals(method.Name, "GetEmailAddresses", StringComparison.Ordinal)
+                );
 
             // Assert
             hasLegacyMethod.Should().BeFalse();

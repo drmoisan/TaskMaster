@@ -44,11 +44,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void ConstructorWithJaggedArray_UsesFirstRowLengthAsHeightAndPreservesValues()
         {
             // Arrange
-            var values = new[]
-            {
-                new[] { 1, 2 },
-                new[] { 3, 4 },
-            };
+            var values = new[] { new[] { 1, 2 }, new[] { 3, 4 } };
 
             // Act
             var matrix = new JagMatrix<int>(values);
@@ -66,12 +62,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var matrix = new JagMatrix<int>(1, 1);
-            var replacement = new[]
-            {
-                new[] { 7 },
-                new[] { 8 },
-                new[] { 9 },
-            };
+            var replacement = new[] { new[] { 7 }, new[] { 8 }, new[] { 9 } };
 
             // Act
             matrix.Set(replacement);
@@ -87,11 +78,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void To2d_ConvertsRectangularJaggedArrayToMultidimensionalArray()
         {
             // Arrange
-            var values = new[]
-            {
-                new[] { 1, 2 },
-                new[] { 3, 4 },
-            };
+            var values = new[] { new[] { 1, 2 }, new[] { 3, 4 } };
 
             // Act
             var matrix = JagMatrix<int>.To2d(values);
@@ -107,11 +94,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void To2d_WhenRowsAreRagged_ThrowsIndexOutOfRangeException()
         {
             // Arrange
-            var values = new[]
-            {
-                new[] { 1, 2 },
-                new[] { 3 },
-            };
+            var values = new[] { new[] { 1, 2 }, new[] { 3 } };
 
             // Act
             Action act = () => JagMatrix<int>.To2d(values);
@@ -130,8 +113,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             Action act = () => _ = matrix.Get(0, 0);
 
             // Assert
-            act.Should().Throw<Exception>()
-                .WithMessage("array is empty");
+            act.Should().Throw<Exception>().WithMessage("array is empty");
         }
 
         [TestMethod]
@@ -145,9 +127,11 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             Action yAct = () => _ = matrix.Get(0, 1);
 
             // Assert
-            xAct.Should().Throw<Exception>()
+            xAct.Should()
+                .Throw<Exception>()
                 .WithMessage("x-value exceeds Width *in Array2d.Get(x,y).");
-            yAct.Should().Throw<Exception>()
+            yAct.Should()
+                .Throw<Exception>()
                 .WithMessage("y-value exceeds Height *in Array2d.Get(x,y).");
         }
 
@@ -161,8 +145,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             Action act = () => matrix.Set((int[][])null);
 
             // Assert
-            act.Should().Throw<Exception>()
-                .WithMessage("array is null");
+            act.Should().Throw<Exception>().WithMessage("array is null");
         }
 
         [TestMethod]

@@ -12,16 +12,23 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
     {
         public SubClassifierGroup() { }
 
-        [Obsolete("This method is not used in the current implementation of the Bayesian Classifier.")]
+        [Obsolete(
+            "This method is not used in the current implementation of the Bayesian Classifier."
+        )]
         public SubClassifierGroup(
             ConcurrentDictionary<string, DedicatedToken> dedicated,
-            Corpus sharedTokenBase)
+            Corpus sharedTokenBase
+        )
         {
             base._sharedTokenBase = sharedTokenBase;
             base._totalEmailCount = sharedTokenBase.TokenCount + dedicated.Sum(x => x.Value.Count);
         }
 
-        public new virtual SubCorpus SharedTokenBase { get => (SubCorpus)base._sharedTokenBase; set => base._sharedTokenBase = value; }
+        public new virtual SubCorpus SharedTokenBase
+        {
+            get => (SubCorpus)base._sharedTokenBase;
+            set => base._sharedTokenBase = value;
+        }
 
         public object Clone()
         {

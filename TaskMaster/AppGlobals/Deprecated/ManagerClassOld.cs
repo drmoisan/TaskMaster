@@ -1,21 +1,19 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using TaskMaster;
+using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence.Bayesian;
+using UtilitiesCS.Extensions;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
-using UtilitiesCS;
-using System.IO;
-using UtilitiesCS.Extensions;
-using System.Collections.Concurrent;
-using Newtonsoft.Json.Linq;
-using System.Windows.Input;
-using TaskMaster;
-
-
 
 namespace TaskMaster.AppGlobals
 {
@@ -68,8 +66,6 @@ namespace TaskMaster.AppGlobals
     //    {
     //        var manager = new ManagerClass();
 
-
-
     //        //var network = new FilePathHelper(fileName, networkPath);
     //        //var networkDt = File.Exists(network.FilePath) ? File.GetLastWriteTimeUtc(network.FilePath) : default;
 
@@ -103,7 +99,6 @@ namespace TaskMaster.AppGlobals
     //        await Task.CompletedTask; // TODO: remove this line once the method is implemented
     //        return manager;
     //    }
-
 
     //    //private ScDictionary<string, BayesianClassifierGroup> GetManager(
     //    //    FilePathHelper disk,
@@ -174,7 +169,7 @@ namespace TaskMaster.AppGlobals
     //        public static async Task<ManagerClass> DeserializeAsync(SmartSerializableConfig config) =>
     //            await GetInstance().DeserializeAsync(config);
 
-    //        internal static JsonSerializerSettings GetDefaultSettings() => 
+    //        internal static JsonSerializerSettings GetDefaultSettings() =>
     //            SmartSerializable<ManagerClass>.GetDefaultSettings();
     //    }
 

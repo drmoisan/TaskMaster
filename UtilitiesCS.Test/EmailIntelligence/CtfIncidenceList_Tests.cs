@@ -29,7 +29,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var list = new CtfIncidenceList
             {
                 CreateIncidence("conv-1", folderCount: 1, firstFolder: "Inbox", firstCount: 2),
-                CreateIncidence("conv-2", folderCount: 1, firstFolder: "Archive", firstCount: 4)
+                CreateIncidence("conv-2", folderCount: 1, firstFolder: "Archive", firstCount: 4),
             };
 
             // Act
@@ -83,7 +83,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
                     secondFolder: "Archive",
                     secondCount: 4,
                     thirdFolder: "Reference",
-                    thirdCount: 1)
+                    thirdCount: 1
+                ),
             };
 
             // Act
@@ -92,7 +93,14 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Assert
             list[0].FolderCount.Should().Be(0);
             list[0].EmailCounts.Should().Equal(0, 0, 0, 0);
-            list[0].EmailFolders.Should().Equal(string.Empty, "===============================", "===============================", "===============================");
+            list[0]
+                .EmailFolders.Should()
+                .Equal(
+                    string.Empty,
+                    "===============================",
+                    "===============================",
+                    "==============================="
+                );
         }
 
         [TestMethod]
@@ -109,7 +117,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
                     secondFolder: "Archive",
                     secondCount: 5,
                     thirdFolder: "Reference",
-                    thirdCount: 1)
+                    thirdCount: 1
+                ),
             };
             var entry = new CtfMapEntry("Projects", "conv-5", 7);
 
@@ -136,7 +145,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
                     secondFolder: "Archive",
                     secondCount: 7,
                     thirdFolder: "Reference",
-                    thirdCount: 3)
+                    thirdCount: 3
+                ),
             };
             var entry = new CtfMapEntry("Projects", "conv-6", 5);
 
@@ -163,7 +173,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
                     secondFolder: "Archive",
                     secondCount: 1,
                     thirdFolder: "Reference",
-                    thirdCount: 0)
+                    thirdCount: 0
+                ),
             };
             typeof(CtfIncidenceList)
                 .GetField("_maxFoldersPerConv", BindingFlags.Instance | BindingFlags.NonPublic)
@@ -185,7 +196,12 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Arrange
             var list = new CtfIncidenceList();
             var first = CreateIncidence("dup", folderCount: 1, firstFolder: "Inbox", firstCount: 1);
-            var second = CreateIncidence("dup", folderCount: 1, firstFolder: "Archive", firstCount: 2);
+            var second = CreateIncidence(
+                "dup",
+                folderCount: 1,
+                firstFolder: "Archive",
+                firstCount: 2
+            );
 
             // Act
             list.Add(first);
@@ -206,13 +222,21 @@ namespace UtilitiesCS.Test.EmailIntelligence
             string secondFolder = "",
             int secondCount = 0,
             string thirdFolder = "",
-            int thirdCount = 0)
+            int thirdCount = 0
+        )
         {
             return new CtfIncidence(
                 emailConversationID: conversationId,
                 folderCount: folderCount,
-                emailFolder: new List<string> { string.Empty, firstFolder, secondFolder, thirdFolder },
-                emailConversationCount: new List<int> { 0, firstCount, secondCount, thirdCount });
+                emailFolder: new List<string>
+                {
+                    string.Empty,
+                    firstFolder,
+                    secondFolder,
+                    thirdFolder,
+                },
+                emailConversationCount: new List<int> { 0, firstCount, secondCount, thirdCount }
+            );
         }
 #pragma warning restore CS0618
     }

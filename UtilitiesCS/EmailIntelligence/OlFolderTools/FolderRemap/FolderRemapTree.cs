@@ -1,5 +1,4 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS.EmailIntelligence.FolderRemap
@@ -28,8 +28,10 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
 
             foreach (var mapping in mappings)
             {
-                var fromNode = root.FindAll(x => x.Value.RelativePath == mapping.Key).FirstOrDefault();
-                var toNode = root.FindAll(x => x.Value.RelativePath == mapping.Value).FirstOrDefault();
+                var fromNode = root.FindAll(x => x.Value.RelativePath == mapping.Key)
+                    .FirstOrDefault();
+                var toNode = root.FindAll(x => x.Value.RelativePath == mapping.Value)
+                    .FirstOrDefault();
                 if (fromNode is not null && toNode is not null)
                     fromNode.Value.MappedTo = toNode.Value;
             }
@@ -46,7 +48,10 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         }
 
         private List<TreeNode<OlFolderRemap>> _roots;
-        public List<TreeNode<OlFolderRemap>> Roots { get => _roots; }
+        public List<TreeNode<OlFolderRemap>> Roots
+        {
+            get => _roots;
+        }
 
         private void InitializeChildren(TreeNode<OlFolderRemap> node, MAPIFolder olRoot)
         {
@@ -61,11 +66,11 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
 
         public List<OlFolderRemap> GetRemapList()
         {
-            return _roots.SelectMany(node => node
-                         .FindAll(node => node.Value.MappedTo is not null))
-                         //.OrderBy(node => node.Depth)
-                         .Select(node => node.Value)
-                         .ToList();
+            return _roots
+                .SelectMany(node => node.FindAll(node => node.Value.MappedTo is not null))
+                //.OrderBy(node => node.Depth)
+                .Select(node => node.Value)
+                .ToList();
         }
 
         public List<TreeNode<OlFolderRemap>> GetInvertedMapTree()
@@ -74,8 +79,10 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             var remapTree = new List<TreeNode<OlFolderRemap>>();
             foreach (var mapping in remapList)
             {
-                TreeNode<OlFolderRemap> mapNode = remapTree.SelectMany(x => x
-                    .FindAll(x => x.Value.RelativePath == mapping.MappedTo.RelativePath))
+                TreeNode<OlFolderRemap> mapNode = remapTree
+                    .SelectMany(x =>
+                        x.FindAll(x => x.Value.RelativePath == mapping.MappedTo.RelativePath)
+                    )
                     .FirstOrDefault();
 
                 if (mapNode == default(TreeNode<OlFolderRemap>))
@@ -99,7 +106,11 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             return selected;
         }
 
-        private void FilterChildren(TreeNode<OlFolderRemap> source, TreeNode<OlFolderRemap> destination, bool include)
+        private void FilterChildren(
+            TreeNode<OlFolderRemap> source,
+            TreeNode<OlFolderRemap> destination,
+            bool include
+        )
         {
             foreach (var sourceChild in source.Children)
             {
@@ -119,7 +130,9 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
 
         internal void WireNotifications()
         {
-            _roots.ForEach(root => root.Traverse(node => node.Value.PropertyChanged += Child_PropertyChanged));
+            _roots.ForEach(root =>
+                root.Traverse(node => node.Value.PropertyChanged += Child_PropertyChanged)
+            );
         }
 
         private TimedBatchAction _batchNotifier = new(TimeSpan.FromMilliseconds(50));
@@ -139,7 +152,6 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         #endregion INotifyPropertyChanged
     }
 
-
     public class OlFolderRemap : INotifyPropertyChanged
     {
         public OlFolderRemap() { }
@@ -153,7 +165,11 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         }
 
         private MAPIFolder _olRoot;
-        public MAPIFolder OlRoot { get => _olRoot; set => _olRoot = value; }
+        public MAPIFolder OlRoot
+        {
+            get => _olRoot;
+            set => _olRoot = value;
+        }
 
         private MAPIFolder _olFolder;
         public MAPIFolder OlFolder
@@ -168,10 +184,18 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         }
 
         private string _name;
-        public string Name { get => _name; private set => _name = value; }
+        public string Name
+        {
+            get => _name;
+            private set => _name = value;
+        }
 
         private string _relativePath;
-        public string RelativePath { get => _relativePath; private set => _relativePath = value; }
+        public string RelativePath
+        {
+            get => _relativePath;
+            private set => _relativePath = value;
+        }
 
         private OlFolderRemap _mappedTo;
         public OlFolderRemap MappedTo
@@ -183,6 +207,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
                 NotifyPropertyChanged();
             }
         }
+
         //private object _mappedTo;
         //public object MappedTo
         //{
@@ -200,8 +225,5 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-
     }
 }
-

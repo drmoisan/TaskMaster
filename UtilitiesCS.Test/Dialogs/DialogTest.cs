@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS;
 
 namespace Z.Disabled.UtilitiesCS.Test
@@ -14,7 +14,6 @@ namespace Z.Disabled.UtilitiesCS.Test
         [TestMethod]
         public void Form_TestMethod1()
         {
-
             //string title, string message, Dictionary< string,Delegate > map
             string title = "TestDialog";
             string message = "This is a test to see if this is working properly";
@@ -27,7 +26,6 @@ namespace Z.Disabled.UtilitiesCS.Test
             //Disabled
             //DialogResult result = _box.ShowDialog();
             //Assert.IsTrue(result == DialogResult.OK);
-
         }
 
         private DialogResult buttonOk()
@@ -44,10 +42,7 @@ namespace Z.Disabled.UtilitiesCS.Test
         {
             return DialogResult.Cancel;
         }
-
-
     }
-
 
     //public static class MyDelegates
     //{
@@ -56,10 +51,9 @@ namespace Z.Disabled.UtilitiesCS.Test
     //        return DialogResult.OK;
     //    }
 
-    //    public static DialogResult buttonCancel() 
-    //    { 
+    //    public static DialogResult buttonCancel()
+    //    {
     //        return DialogResult.Cancel;
     //    }
     //}
-
 }

@@ -63,7 +63,11 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             // Act
             await Task.WhenAll(values.Select(value => Task.Run(() => list.AddLast(value))));
-            await Task.WhenAll(values.Where(value => value % 2 == 0).Select(value => Task.Run(() => list.Remove(value))));
+            await Task.WhenAll(
+                values
+                    .Where(value => value % 2 == 0)
+                    .Select(value => Task.Run(() => list.Remove(value)))
+            );
 
             // Assert
             list.Count.Should().Be(15);

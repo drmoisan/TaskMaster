@@ -12,17 +12,22 @@ using System.Threading.Tasks;
 using Deedle.Internal;
 using log4net.Repository.Hierarchy;
 using Microsoft.Office.Interop.Outlook;
+using UtilitiesCS.OutlookObjects.Fields;
 using static UtilitiesCS.ConvHelper;
 using Outlook = Microsoft.Office.Interop.Outlook;
-using UtilitiesCS.OutlookObjects.Fields;
 
 namespace UtilitiesCS
 {
     public static class OlTableExtensions
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
-        internal static Dictionary<string, object> GetColumnDictionary(string[] names, object[] values)
+        internal static Dictionary<string, object> GetColumnDictionary(
+            string[] names,
+            object[] values
+        )
         {
             var result = new Dictionary<string, object>();
             if (names is null || values is null)
@@ -60,10 +65,11 @@ namespace UtilitiesCS
             return default;
         }
 
-        internal static object[] ToObjectRow(object[] rawValues) => rawValues ?? System.Array.Empty<object>();
+        internal static object[] ToObjectRow(object[] rawValues) =>
+            rawValues ?? System.Array.Empty<object>();
 
         /// <summary>
-        /// Extension method that removes all columns in the supplied array 
+        /// Extension method that removes all columns in the supplied array
         /// from an Outlook Table object
         /// </summary>
         /// <param name="table">Outlook table object</param>
@@ -81,12 +87,16 @@ namespace UtilitiesCS
                     catch (COMException e)
                     {
                         var inner = e.InnerException;
-                        logger.Warn($"Error in {nameof(RemoveColumns)}\ne.Message  {e.Message}\n" +
-                            $"e.ErrorCode  {e.ErrorCode}\ne.HResult  {e.HResult}\nStackTrace\n{e.StackTrace}");
+                        logger.Warn(
+                            $"Error in {nameof(RemoveColumns)}\ne.Message  {e.Message}\n"
+                                + $"e.ErrorCode  {e.ErrorCode}\ne.HResult  {e.HResult}\nStackTrace\n{e.StackTrace}"
+                        );
                         if (inner is not null)
                         {
-                            logger.Error($"InnerException in {nameof(RemoveColumns)}\ninner.Message  {inner.Message}\n" +
-                            $"e.HResult  {inner.HResult}\nStackTrace\n{inner.StackTrace}");
+                            logger.Error(
+                                $"InnerException in {nameof(RemoveColumns)}\ninner.Message  {inner.Message}\n"
+                                    + $"e.HResult  {inner.HResult}\nStackTrace\n{inner.StackTrace}"
+                            );
                         }
                         if (e.ErrorCode == -2147221233)
                         {
@@ -108,9 +118,7 @@ namespace UtilitiesCS
                         {
                             throw;
                         }
-
                     }
-
                 }
                 //columnNames.ForEach(column => table.Columns.Remove(column));
             }
@@ -125,11 +133,16 @@ namespace UtilitiesCS
         }
 
         //TODO: Wire this to an asnyc version of GetConversationTable
-        public static async Task RemoveColumnsAsync(this Outlook.Table table, string[] columnNames, CancellationToken cancel, int timeOutMiliseconds)
+        public static async Task RemoveColumnsAsync(
+            this Outlook.Table table,
+            string[] columnNames,
+            CancellationToken cancel,
+            int timeOutMiliseconds
+        )
         {
-            await Task.Run(() => RemoveColumns(table, columnNames), cancel).TimeoutAfter(timeOutMiliseconds);
+            await Task.Run(() => RemoveColumns(table, columnNames), cancel)
+                .TimeoutAfter(timeOutMiliseconds);
         }
-
 
         /// <summary>
         /// Extension method that iterates through an array of column names or
@@ -139,20 +152,25 @@ namespace UtilitiesCS
         /// <param name="columnNames">Array of column names or schemas</param>
         public static void AddColumns(this Outlook.Table table, string[] columnNames)
         {
-            if (table is null) { return; }
+            if (table is null)
+            {
+                return;
+            }
             try
             {
-                foreach (var column in columnNames) { table.Columns.Add(column); }
+                foreach (var column in columnNames)
+                {
+                    table.Columns.Add(column);
+                }
             }
             catch (System.Exception e)
             {
                 logger.Error(e.Message, e);
             }
-
         }
 
         /// <summary>
-        /// Extension that extracts a dictionary of column names and zero-based 
+        /// Extension that extracts a dictionary of column names and zero-based
         /// positional indices. If columns are supplied as schemas and the schemas
         /// are known, columnn headers are converted from schema to semantic name
         /// </summary>
@@ -160,14 +178,20 @@ namespace UtilitiesCS
         /// <returns>Resulting Outlook Table object</returns>
         public static Dictionary<string, int> GetColumnDictionary(this Outlook.Table table)
         {
-            var kvps = Enumerable.Range(1, table.Columns.Count)
-                                 .Select(i =>
-                                 {
-                                     var name = table.Columns[i].Name;
-                                     if (MAPIFields.SchemaToField.TryGetValue(name, out var adjustedName))
-                                     { return new KeyValuePair<string, int>(adjustedName, i - 1); }
-                                     else { return new KeyValuePair<string, int>(name, i - 1); }
-                                 });
+            var kvps = Enumerable
+                .Range(1, table.Columns.Count)
+                .Select(i =>
+                {
+                    var name = table.Columns[i].Name;
+                    if (MAPIFields.SchemaToField.TryGetValue(name, out var adjustedName))
+                    {
+                        return new KeyValuePair<string, int>(adjustedName, i - 1);
+                    }
+                    else
+                    {
+                        return new KeyValuePair<string, int>(name, i - 1);
+                    }
+                });
 
             Dictionary<string, int> dict = new();
             try
@@ -178,20 +202,28 @@ namespace UtilitiesCS
             {
                 foreach (var kvp in kvps)
                 {
-                    if (!dict.ContainsKey(kvp.Key)) { dict.Add(kvp.Key, kvp.Value); }
-                    else { dict[$"{kvp.Key}{kvp.Value}"] = kvp.Value; }
+                    if (!dict.ContainsKey(kvp.Key))
+                    {
+                        dict.Add(kvp.Key, kvp.Value);
+                    }
+                    else
+                    {
+                        dict[$"{kvp.Key}{kvp.Value}"] = kvp.Value;
+                    }
                 }
             }
             return dict;
         }
 
         /// <summary>
-        /// Extension method extracts a 2D object array of data and a dictionary of 
+        /// Extension method extracts a 2D object array of data and a dictionary of
         /// column names and indices. See <see cref="GetColumnDictionary(Table)"/>
         /// </summary>
         /// <param name="table"></param>
         /// <returns>ValueTuple of a 2D object array and a column dictionary</returns>
-        public static (object[,] data, Dictionary<string, int> columnInfo) ExtractData2(this Outlook.Table table)
+        public static (object[,] data, Dictionary<string, int> columnInfo) ExtractData2(
+            this Outlook.Table table
+        )
         {
             var columnDictionary = table.GetColumnDictionary();
             var rowCount = table.GetRowCount();
@@ -214,12 +246,21 @@ namespace UtilitiesCS
                     //values[columnDictionary["Store"]] = storeID;
                     for (int j = 0; j < columnCount; j++)
                     {
-                        if (j == storeIndex) { data[i, j] = storeID; }
-                        else { data[i, j] = values[j]; }
+                        if (j == storeIndex)
+                        {
+                            data[i, j] = storeID;
+                        }
+                        else
+                        {
+                            data[i, j] = values[j];
+                        }
                     }
                 }
             }
-            else { data = (object[,])table.GetArray(rowCount); }
+            else
+            {
+                data = (object[,])table.GetArray(rowCount);
+            }
             return (data, columnDictionary);
         }
 
@@ -227,12 +268,14 @@ namespace UtilitiesCS
         /// Extract, transform, and load data from an Outlook Table object into a 2D object array
         /// </summary>
         /// <param name="table">Outlook.Table</param>
-        /// <param name="objectConverters">Dictionary with column names and functions to convert the 
+        /// <param name="objectConverters">Dictionary with column names and functions to convert the
         /// object in the column into string representation</param>
         /// <returns>2D object array with string data</returns>
-        public static (object[,] data, Dictionary<string, int> columnInfo) ETL(this Outlook.Table table,
-                                                                               Dictionary<string, Func<object, string>> objectConverters = null,
-                                                                               ProgressTracker progress = null)
+        public static (object[,] data, Dictionary<string, int> columnInfo) ETL(
+            this Outlook.Table table,
+            Dictionary<string, Func<object, string>> objectConverters = null,
+            ProgressTracker progress = null
+        )
         {
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(GetColumnDictionary)} ...");
             if (table is null)
@@ -253,9 +296,13 @@ namespace UtilitiesCS
                 return (data, columnDictionary);
             }
 
-            if (MAPIFields.BinaryToStringFields.Any(x => columnDictionary.ContainsKey(x)) ||
-               (objectConverters is not null &&
-               objectConverters.Keys.Any(x => columnDictionary.ContainsKey(x))))
+            if (
+                MAPIFields.BinaryToStringFields.Any(x => columnDictionary.ContainsKey(x))
+                || (
+                    objectConverters is not null
+                    && objectConverters.Keys.Any(x => columnDictionary.ContainsKey(x))
+                )
+            )
             {
                 //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(EtlByRow)} ...");
                 data = EtlByRow(table, objectConverters, columnDictionary, progress);
@@ -267,14 +314,14 @@ namespace UtilitiesCS
             return (data, columnDictionary);
         }
 
-
         public static async Task<(object[,] data, Dictionary<string, int> columnInfo)> EtlAsync(
             this Outlook.Table table,
             CancellationToken token,
             CancellationTokenSource tokenSource,
             int counter,
             ProgressTracker progress,
-            Dictionary<string, Func<object, string>> objectConverters = null)
+            Dictionary<string, Func<object, string>> objectConverters = null
+        )
         {
             token.ThrowIfCancellationRequested();
 
@@ -290,22 +337,34 @@ namespace UtilitiesCS
 
             try
             {
-
-                if (MAPIFields.BinaryToStringFields.Any(x => columnDictionary.ContainsKey(x)) ||
-                   (objectConverters is not null &&
-                   objectConverters.Keys.Any(x => columnDictionary.ContainsKey(x))))
+                if (
+                    MAPIFields.BinaryToStringFields.Any(x => columnDictionary.ContainsKey(x))
+                    || (
+                        objectConverters is not null
+                        && objectConverters.Keys.Any(x => columnDictionary.ContainsKey(x))
+                    )
+                )
                 {
                     //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(EtlByRowAsync)} ...");
-                    data = await EtlByRowAsync(table, objectConverters, columnDictionary, token, milliseconds, attempts, progress);
+                    data = await EtlByRowAsync(
+                        table,
+                        objectConverters,
+                        columnDictionary,
+                        token,
+                        milliseconds,
+                        attempts,
+                        progress
+                    );
                 }
                 else
                 {
-                    data = await Task.Run(() => table?.GetArray(table.GetRowCount()) as object[,],
-                        token).TimeoutAfter(milliseconds, attempts);
+                    data = await Task.Run(
+                            () => table?.GetArray(table.GetRowCount()) as object[,],
+                            token
+                        )
+                        .TimeoutAfter(milliseconds, attempts);
                 }
-
             }
-
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(ETL)} with a timeout of {milliseconds.ToString("#,##0")}");
             //try
             //{
@@ -314,10 +373,11 @@ namespace UtilitiesCS
             //}
             catch (TimeoutException)
             {
-                logger.Error($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(ETL)} timed out {attempts} times with a timeout of {milliseconds} milliseconds. Canceling");
+                logger.Error(
+                    $"{DateTime.Now.ToString("mm:ss.fff")} {nameof(ETL)} timed out {attempts} times with a timeout of {milliseconds} milliseconds. Canceling"
+                );
                 tokenSource.Cancel();
             }
-
 
             return (data, columnDictionary);
         }
@@ -328,7 +388,8 @@ namespace UtilitiesCS
             CancellationTokenSource tokenSource,
             int counter,
             ProgressTracker progress,
-            Dictionary<string, Func<object, string>> objectConverters = null)
+            Dictionary<string, Func<object, string>> objectConverters = null
+        )
         {
             token.ThrowIfCancellationRequested();
 
@@ -341,14 +402,19 @@ namespace UtilitiesCS
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(ETL)} with a timeout of {milliseconds.ToString("#,##0")}");
             try
             {
-                (data, columnInfo) = await Task.Run(() => table.ETL(objectConverters, progress), token).TimeoutAfter(milliseconds, attempts);
+                (data, columnInfo) = await Task.Run(
+                        () => table.ETL(objectConverters, progress),
+                        token
+                    )
+                    .TimeoutAfter(milliseconds, attempts);
             }
             catch (TimeoutException)
             {
-                logger.Error($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(ETL)} timed out {attempts} times with a timeout of {milliseconds} milliseconds. Canceling");
+                logger.Error(
+                    $"{DateTime.Now.ToString("mm:ss.fff")} {nameof(ETL)} timed out {attempts} times with a timeout of {milliseconds} milliseconds. Canceling"
+                );
                 tokenSource.Cancel();
             }
-
 
             return (data, columnInfo);
         }
@@ -357,7 +423,8 @@ namespace UtilitiesCS
             Table table,
             Dictionary<string, Func<object, string>> objectConverters,
             Dictionary<string, int> columnDictionary,
-            CancellationToken token)
+            CancellationToken token
+        )
         {
             token.ThrowIfCancellationRequested();
 
@@ -372,7 +439,9 @@ namespace UtilitiesCS
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
 
             int completed = 0;
-            var jagged = rows.Select(rows => EtlRow(ref completed, rows, objectConverters, binIndices, objFields, objIndices));
+            var jagged = rows.Select(rows =>
+                EtlRow(ref completed, rows, objectConverters, binIndices, objFields, objIndices)
+            );
             return jagged;
         }
 
@@ -382,11 +451,18 @@ namespace UtilitiesCS
             Dictionary<string, Func<object, string>> objectConverters,
             IOrderedEnumerable<int> binIndices,
             IEnumerable<string> objFields,
-            IEnumerable<int> objIndices)> EtlPrepAsync(this Outlook.Table table, CancellationToken cancel, Dictionary<string, Func<object, string>> objectConverters = null)
+            IEnumerable<int> objIndices
+        )> EtlPrepAsync(
+            this Outlook.Table table,
+            CancellationToken cancel,
+            Dictionary<string, Func<object, string>> objectConverters = null
+        )
         {
             var columnDictionary = await Task.Run(table.GetColumnDictionary);
             (var binFields, var binIndices) = await Task.Run(() => GetBinFields(columnDictionary));
-            (var objFields, var objIndices) = await Task.Run(() => GetObjectFields(objectConverters, columnDictionary));
+            (var objFields, var objIndices) = await Task.Run(() =>
+                GetObjectFields(objectConverters, columnDictionary)
+            );
             var rows = await Task.Run(() => table.GetRows().ToAsyncEnumerable(), cancel);
             return (rows, columnDictionary, objectConverters, binIndices, objFields, objIndices);
         }
@@ -396,18 +472,23 @@ namespace UtilitiesCS
             Dictionary<string, Func<object, string>> objectConverters,
             IOrderedEnumerable<int> binIndices,
             IEnumerable<string> objFields,
-            IEnumerable<int> objIndices)
+            IEnumerable<int> objIndices
+        )
         {
-            return rows.Select(rows => EtlRow(rows, objectConverters, binIndices, objFields, objIndices));
+            return rows.Select(rows =>
+                EtlRow(rows, objectConverters, binIndices, objFields, objIndices)
+            );
         }
 
-        private static async Task<object[,]> EtlByRowAsync(Table table,
-                                                           Dictionary<string, Func<object, string>> objectConverters,
-                                                           Dictionary<string, int> columnDictionary,
-                                                           CancellationToken token,
-                                                           int timeout,
-                                                           int attempts,
-                                                           ProgressTracker progress = null)
+        private static async Task<object[,]> EtlByRowAsync(
+            Table table,
+            Dictionary<string, Func<object, string>> objectConverters,
+            Dictionary<string, int> columnDictionary,
+            CancellationToken token,
+            int timeout,
+            int attempts,
+            ProgressTracker progress = null
+        )
         {
             token.ThrowIfCancellationRequested();
 
@@ -416,12 +497,23 @@ namespace UtilitiesCS
             (var objFields, var objIndices) = GetObjectFields(objectConverters, columnDictionary);
 
             //var rows = table.CastToRowArray(progress?.SpawnChild(65));
-            var rows = await Task.Run(() => table.CastToRowArray(progress?.SpawnChild(65)), token).TimeoutAfter(timeout, attempts);
+            var rows = await Task.Run(() => table.CastToRowArray(progress?.SpawnChild(65)), token)
+                .TimeoutAfter(timeout, attempts);
 
             token.ThrowIfCancellationRequested();
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
-            var jagged = await Task.Run(() => rows.EtlByRow(objectConverters, binIndices, objFields, objIndices, progress?.SpawnChild()),
-                token).TimeoutAfter(timeout, attempts);
+            var jagged = await Task.Run(
+                    () =>
+                        rows.EtlByRow(
+                            objectConverters,
+                            binIndices,
+                            objFields,
+                            objIndices,
+                            progress?.SpawnChild()
+                        ),
+                    token
+                )
+                .TimeoutAfter(timeout, attempts);
 
             //var jagged = rows.EtlByRow(objectConverters, binIndices, objFields, objIndices, progress?.SpawnChild());
             var data = jagged.To2D();
@@ -431,15 +523,20 @@ namespace UtilitiesCS
         }
 
         /// <summary>
-        /// Extract, transform, and load data from an Outlook Table object into a 2D object 
+        /// Extract, transform, and load data from an Outlook Table object into a 2D object
         /// array by row to convert non-string data to string equivalents
         /// </summary>
         /// <param name="table">Outlook.Table</param>
-        /// <param name="objectConverters">Dictionary with column names and functions to convert the 
+        /// <param name="objectConverters">Dictionary with column names and functions to convert the
         /// object in the column into string representation</param>
         /// <param name="columnDictionary">Dictionary with column indices and column names</param>
         /// <returns>2D object array with string data</returns>
-        private static object[,] EtlByRow(Table table, Dictionary<string, Func<object, string>> objectConverters, Dictionary<string, int> columnDictionary, ProgressTracker progress = null)
+        private static object[,] EtlByRow(
+            Table table,
+            Dictionary<string, Func<object, string>> objectConverters,
+            Dictionary<string, int> columnDictionary,
+            ProgressTracker progress = null
+        )
         {
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Setting up EtlByRow");
 
@@ -449,19 +546,27 @@ namespace UtilitiesCS
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Running Etl on each row");
 
-            var jagged = rows.EtlByRow(objectConverters, binIndices, objFields, objIndices, progress?.SpawnChild());
+            var jagged = rows.EtlByRow(
+                objectConverters,
+                binIndices,
+                objFields,
+                objIndices,
+                progress?.SpawnChild()
+            );
             var data = jagged.To2D();
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} EtlByRow complete");
             return data;
         }
 
-        private static object[][] EtlByRow(this Row[] rows,
-                                           Dictionary<string, Func<object, string>> objectConverters,
-                                           IOrderedEnumerable<int> binIndices,
-                                           IEnumerable<string> objFields,
-                                           IEnumerable<int> objIndices,
-                                           ProgressTracker progress)
+        private static object[][] EtlByRow(
+            this Row[] rows,
+            Dictionary<string, Func<object, string>> objectConverters,
+            IOrderedEnumerable<int> binIndices,
+            IEnumerable<string> objFields,
+            IEnumerable<int> objIndices,
+            ProgressTracker progress
+        )
         {
             int completed = 0;
             int rowCount = rows.Count();
@@ -470,12 +575,9 @@ namespace UtilitiesCS
             {
                 query = query.AsParallel();
             }
-            var query2 = query.Select(i => EtlRow(ref completed,
-                                                  rows[i],
-                                                  objectConverters,
-                                                  binIndices,
-                                                  objFields,
-                                                  objIndices));
+            var query2 = query.Select(i =>
+                EtlRow(ref completed, rows[i], objectConverters, binIndices, objFields, objIndices)
+            );
 
             object[][] jagged;
 
@@ -485,8 +587,18 @@ namespace UtilitiesCS
             }
             else
             {
-                using (new Timer(
-                _ => progress.Report((int)((double)completed / rowCount), $"Etl row {completed} of {rowCount}"), null, 0, 500))
+                using (
+                    new Timer(
+                        _ =>
+                            progress.Report(
+                                (int)((double)completed / rowCount),
+                                $"Etl row {completed} of {rowCount}"
+                            ),
+                        null,
+                        0,
+                        500
+                    )
+                )
                 {
                     jagged = query2.ToArray();
                 }
@@ -496,13 +608,14 @@ namespace UtilitiesCS
             //return new object[][] { };
         }
 
-
-
-
-        private static (IEnumerable<string>, IOrderedEnumerable<int>) GetBinFields(Dictionary<string, int> columnDictionary)
+        private static (IEnumerable<string>, IOrderedEnumerable<int>) GetBinFields(
+            Dictionary<string, int> columnDictionary
+        )
         {
             // Get the column headers of the binary fields
-            var binFields = MAPIFields.BinaryToStringFields.Where(x => columnDictionary.ContainsKey(x));
+            var binFields = MAPIFields.BinaryToStringFields.Where(x =>
+                columnDictionary.ContainsKey(x)
+            );
 
             // Get the indices of the binary fields
             var binIndices = binFields.Select(x => columnDictionary[x]).OrderBy(x => x);
@@ -518,32 +631,53 @@ namespace UtilitiesCS
             int completed = 0;
             if (progress is not null)
             {
-                progress.Report(0, $"Capturing email table rows {(int)((double)completed * (double)rowCount / 100)} of {rowCount}");
-                using (new Timer(_ => progress.Report(
-                    completed,
-                    $"Capturing email table rows {(int)((double)completed * (double)rowCount / 100)} of {rowCount}"),
-                    null, 0, 500))
+                progress.Report(
+                    0,
+                    $"Capturing email table rows {(int)((double)completed * (double)rowCount / 100)} of {rowCount}"
+                );
+                using (
+                    new Timer(
+                        _ =>
+                            progress.Report(
+                                completed,
+                                $"Capturing email table rows {(int)((double)completed * (double)rowCount / 100)} of {rowCount}"
+                            ),
+                        null,
+                        0,
+                        500
+                    )
+                )
                 {
-                    rows = table.GetRows().WithProgressReporting(rowCount, (x) => completed = x).ToArray();
+                    rows = table
+                        .GetRows()
+                        .WithProgressReporting(rowCount, (x) => completed = x)
+                        .ToArray();
                 }
             }
-            else { rows = table.GetRows().ToArray(); }
+            else
+            {
+                rows = table.GetRows().ToArray();
+            }
             return rows;
         }
 
         /// <summary>
         /// Check if objectConverters is null and if not, get the object fields and indices
         /// </summary>
-        /// <param name="objectConverters">Dictionary with column names and functions to convert the 
+        /// <param name="objectConverters">Dictionary with column names and functions to convert the
         /// object in the column into string representation</param>
         /// <param name="columnDictionary">Dictionary with column indices and column names</param>
-        /// <returns>Tuple with IEnumerable of Field names with object data and 
+        /// <returns>Tuple with IEnumerable of Field names with object data and
         /// IEnumerable of indices of columns with object data</returns>
         private static (IEnumerable<string>, IEnumerable<int>) GetObjectFields(
             Dictionary<string, Func<object, string>> objectConverters,
-            Dictionary<string, int> columnDictionary)
+            Dictionary<string, int> columnDictionary
+        )
         {
-            if (objectConverters is null) { return (null, null); }
+            if (objectConverters is null)
+            {
+                return (null, null);
+            }
             else
             {
                 // Get the column headers of the object fields
@@ -557,54 +691,79 @@ namespace UtilitiesCS
         }
 
         /// <summary>
-        /// Extract, Transform, and Load a row of data from an Outlook.Table into a 
+        /// Extract, Transform, and Load a row of data from an Outlook.Table into a
         /// 2D object array containing the data from all rows
         /// </summary>
         /// <param name="data">Reference to 2D object array</param>
         /// <param name="row">Outlook.Row</param>
-        /// <param name="objectConverters">Dictionary with column names and functions to convert the 
+        /// <param name="objectConverters">Dictionary with column names and functions to convert the
         /// object in the column into string representation</param>
         /// <param name="columnDictionary">Dictionary with column indices and column names</param>
         /// <param name="binIndices">Indices of columns with binary information</param>
         /// <param name="objFields">Field names with object data</param>
         /// <param name="objIndices">Indices of columns with object data</param>
         /// <param name="rowNumber">Zero based counter to map row to </param>
-        private static void EtlRow(ref object[,] data,
-                                   Outlook.Row row,
-                                   Dictionary<string, Func<object, string>> objectConverters,
-                                   Dictionary<string, int> columnDictionary,
-                                   IOrderedEnumerable<int> binIndices,
-                                   IEnumerable<string> objFields,
-                                   IEnumerable<int> objIndices,
-                                   int rowNumber)
+        private static void EtlRow(
+            ref object[,] data,
+            Outlook.Row row,
+            Dictionary<string, Func<object, string>> objectConverters,
+            Dictionary<string, int> columnDictionary,
+            IOrderedEnumerable<int> binIndices,
+            IEnumerable<string> objFields,
+            IEnumerable<int> objIndices,
+            int rowNumber
+        )
         {
             object[] rawValues = (object[])row.GetValues();
             var binStrings = ConvertBinColumnsToString(row, binIndices);
-            var objStrings = ConvertObjectColumnsToString(row, objIndices, objFields, objectConverters);
-            WriteValuesToData(ref data, columnDictionary, binIndices, rowNumber, binStrings, objIndices, objStrings, rawValues);
+            var objStrings = ConvertObjectColumnsToString(
+                row,
+                objIndices,
+                objFields,
+                objectConverters
+            );
+            WriteValuesToData(
+                ref data,
+                columnDictionary,
+                binIndices,
+                rowNumber,
+                binStrings,
+                objIndices,
+                objStrings,
+                rawValues
+            );
         }
 
-        private static object[] EtlRow(ref int rowsCompleted,
-                                       Outlook.Row row,
-                                       Dictionary<string, Func<object, string>> objectConverters,
-                                       IOrderedEnumerable<int> binIndices,
-                                       IEnumerable<string> objFields,
-                                       IEnumerable<int> objIndices)
+        private static object[] EtlRow(
+            ref int rowsCompleted,
+            Outlook.Row row,
+            Dictionary<string, Func<object, string>> objectConverters,
+            IOrderedEnumerable<int> binIndices,
+            IEnumerable<string> objFields,
+            IEnumerable<int> objIndices
+        )
         {
             var objectRow = EtlRow(row, objectConverters, binIndices, objFields, objIndices);
             Interlocked.Increment(ref rowsCompleted);
             return objectRow;
         }
 
-        private static object[] EtlRow(Outlook.Row row,
-                                       Dictionary<string, Func<object, string>> objectConverters,
-                                       IOrderedEnumerable<int> binIndices,
-                                       IEnumerable<string> objFields,
-                                       IEnumerable<int> objIndices)
+        private static object[] EtlRow(
+            Outlook.Row row,
+            Dictionary<string, Func<object, string>> objectConverters,
+            IOrderedEnumerable<int> binIndices,
+            IEnumerable<string> objFields,
+            IEnumerable<int> objIndices
+        )
         {
             object[] rawValues = (object[])row.GetValues();
             var binStrings = ConvertBinColumnsToString(row, binIndices);
-            var objStrings = ConvertObjectColumnsToString(row, objIndices, objFields, objectConverters);
+            var objStrings = ConvertObjectColumnsToString(
+                row,
+                objIndices,
+                objFields,
+                objectConverters
+            );
             var objectRow = rawValues.ToObjectRow(binIndices, binStrings, objIndices, objStrings);
             return objectRow;
         }
@@ -620,32 +779,51 @@ namespace UtilitiesCS
         /// <param name="objIndices">Indices of columns with object data</param>
         /// <param name="objStrings">Dictionary of column indices and string representation of object data</param>
         /// <param name="rawValues">Raw values obtained from table</param>
-        internal static void WriteValuesToData(ref object[,] data,
-                                               Dictionary<string, int> columnDictionary,
-                                               IOrderedEnumerable<int> binIndices,
-                                               int rowNumber,
-                                               Dictionary<int, string> binStrings,
-                                               IEnumerable<int> objIndices,
-                                               Dictionary<int, string> objStrings,
-                                               object[] rawValues)
+        internal static void WriteValuesToData(
+            ref object[,] data,
+            Dictionary<string, int> columnDictionary,
+            IOrderedEnumerable<int> binIndices,
+            int rowNumber,
+            Dictionary<int, string> binStrings,
+            IEnumerable<int> objIndices,
+            Dictionary<int, string> objStrings,
+            object[] rawValues
+        )
         {
             for (int j = 0; j < columnDictionary.Count; j++)
             {
-                if ((binIndices is not null) && binIndices.Contains(j)) { data[rowNumber, j] = binStrings[j]; }
-                else if (objIndices is not null && objIndices.Contains(j)) { data[rowNumber, j] = objStrings[j]; }
-                else { data[rowNumber, j] = rawValues[j]; }
+                if ((binIndices is not null) && binIndices.Contains(j))
+                {
+                    data[rowNumber, j] = binStrings[j];
+                }
+                else if (objIndices is not null && objIndices.Contains(j))
+                {
+                    data[rowNumber, j] = objStrings[j];
+                }
+                else
+                {
+                    data[rowNumber, j] = rawValues[j];
+                }
             }
             //logger.Debug(data.SliceRow(rowNumber).Select(x => (x ?? "null").ToString()).SentenceJoin());
         }
 
-        internal static object[] ToObjectRow(this object[] rawValues,
-                                             IOrderedEnumerable<int> binIndices,
-                                             Dictionary<int, string> binStrings,
-                                             IEnumerable<int> objIndices,
-                                             Dictionary<int, string> objStrings)
+        internal static object[] ToObjectRow(
+            this object[] rawValues,
+            IOrderedEnumerable<int> binIndices,
+            Dictionary<int, string> binStrings,
+            IEnumerable<int> objIndices,
+            Dictionary<int, string> objStrings
+        )
         {
-            if (binIndices is not null) { binIndices.ForEach(i => rawValues[i] = binStrings[i]); }
-            if (objIndices is not null) { objIndices.ForEach(i => rawValues[i] = objStrings[i]); }
+            if (binIndices is not null)
+            {
+                binIndices.ForEach(i => rawValues[i] = binStrings[i]);
+            }
+            if (objIndices is not null)
+            {
+                objIndices.ForEach(i => rawValues[i] = objStrings[i]);
+            }
             //logger.Debug(rawValues.Select(x => (x ?? "null").ToString()).SentenceJoin());
             return rawValues;
         }
@@ -658,13 +836,15 @@ namespace UtilitiesCS
         /// <returns>Dictionary of column indices and string representation of binary data</returns>
         internal static Dictionary<int, string> ConvertBinColumnsToString(
             Outlook.Row row,
-            IOrderedEnumerable<int> binIndices)
+            IOrderedEnumerable<int> binIndices
+        )
         {
-            return binIndices.Select(binIndex =>
-                        new KeyValuePair<int, string>(
-                            binIndex,
-                            row.BinaryToString(binIndex + 1)))
-                        .ToDictionary();
+            return binIndices
+                .Select(binIndex => new KeyValuePair<int, string>(
+                    binIndex,
+                    row.BinaryToString(binIndex + 1)
+                ))
+                .ToDictionary();
         }
 
         /// <summary>
@@ -673,14 +853,15 @@ namespace UtilitiesCS
         /// <param name="row">Outlook.Row</param>
         /// <param name="objIndices">Indices of columns with object data</param>
         /// <param name="objFields">Field names with object data</param>
-        /// <param name="objectConverters">Dictionary with column names and functions to convert the 
+        /// <param name="objectConverters">Dictionary with column names and functions to convert the
         /// object in the column into string representation</param>
         /// <returns>Dictionary of column indices and string representation of object data</returns>
         internal static Dictionary<int, string> ConvertObjectColumnsToString(
             Outlook.Row row,
             IEnumerable<int> objIndices,
             IEnumerable<string> objFields,
-            Dictionary<string, Func<object, string>> objectConverters)
+            Dictionary<string, Func<object, string>> objectConverters
+        )
         {
             var objStrings = new Dictionary<int, string>();
             if (objectConverters is not null && objIndices is not null && objFields is not null)
@@ -697,9 +878,9 @@ namespace UtilitiesCS
 
         /// <summary>
         /// Get an Outlook <seealso cref="Table"/> object representing items that are
-        /// visible in the current view within the active instance of the 
-        /// Outlook.<seealso cref="Explorer"/>. Throws an exception if the current 
-        /// view cannot be cast to Outlook.<seealso cref="TableView"/> type. 
+        /// visible in the current view within the active instance of the
+        /// Outlook.<seealso cref="Explorer"/>. Throws an exception if the current
+        /// view cannot be cast to Outlook.<seealso cref="TableView"/> type.
         /// </summary>
         /// <param name="activeExplorer">Object representing the active <seealso cref="Explorer"/></param>
         /// <returns></returns>
@@ -710,21 +891,27 @@ namespace UtilitiesCS
             if (view is null)
             {
                 throw new InvalidOperationException(
-                    $"Current view in Outlook, {((Outlook.View)activeExplorer.CurrentView).Name}," +
-                    $" cannot be cast to {nameof(Outlook.TableView)}");
+                    $"Current view in Outlook, {((Outlook.View)activeExplorer.CurrentView).Name},"
+                        + $" cannot be cast to {nameof(Outlook.TableView)}"
+                );
             }
             return view.GetTable();
         }
 
-        public static async Task<Outlook.Table> GetTableInViewAsync(this Explorer activeExplorer, CancellationToken token, int counter)
+        public static async Task<Outlook.Table> GetTableInViewAsync(
+            this Explorer activeExplorer,
+            CancellationToken token,
+            int counter
+        )
         {
             Outlook.Table table = null;
             Outlook.TableView view = activeExplorer.CurrentView as Outlook.TableView;
             if (view is null)
             {
                 throw new InvalidOperationException(
-                    $"Current view in Outlook, {((Outlook.View)activeExplorer.CurrentView).Name}," +
-                    $" cannot be cast to {nameof(Outlook.TableView)}");
+                    $"Current view in Outlook, {((Outlook.View)activeExplorer.CurrentView).Name},"
+                        + $" cannot be cast to {nameof(Outlook.TableView)}"
+                );
             }
 
             try
@@ -768,9 +955,19 @@ namespace UtilitiesCS
             return table;
         }
 
-        public static async Task<object> TryGetTableAsync(this Store store, OlDefaultFolders folderEnum, string[] removeColumns, string[] addColumns, CancellationToken cancel, int maxAttempts)
+        public static async Task<object> TryGetTableAsync(
+            this Store store,
+            OlDefaultFolders folderEnum,
+            string[] removeColumns,
+            string[] addColumns,
+            CancellationToken cancel,
+            int maxAttempts
+        )
         {
-            if (store is null) { throw new ArgumentNullException(nameof(store)); }
+            if (store is null)
+            {
+                throw new ArgumentNullException(nameof(store));
+            }
             MAPIFolder folder = null;
             try
             {
@@ -784,9 +981,19 @@ namespace UtilitiesCS
             return await folder.TryGetTableAsync(removeColumns, addColumns, cancel, maxAttempts);
         }
 
-        public static async Task<object> GetTableAsync(this Store store, OlDefaultFolders folderEnum, string[] removeColumns, string[] addColumns, CancellationToken cancel, int maxAttempts)
+        public static async Task<object> GetTableAsync(
+            this Store store,
+            OlDefaultFolders folderEnum,
+            string[] removeColumns,
+            string[] addColumns,
+            CancellationToken cancel,
+            int maxAttempts
+        )
         {
-            if (store is null) { throw new ArgumentNullException(nameof(store)); }
+            if (store is null)
+            {
+                throw new ArgumentNullException(nameof(store));
+            }
             MAPIFolder folder = null;
             try
             {
@@ -800,9 +1007,17 @@ namespace UtilitiesCS
             return await folder.GetTableAsync(removeColumns, addColumns, cancel, maxAttempts);
         }
 
-        public static Outlook.Table GetTable(this Store store, OlDefaultFolders folderEnum, string[] removeColumns, string[] addColumns)
+        public static Outlook.Table GetTable(
+            this Store store,
+            OlDefaultFolders folderEnum,
+            string[] removeColumns,
+            string[] addColumns
+        )
         {
-            if (store is null) { throw new ArgumentNullException(nameof(store)); }
+            if (store is null)
+            {
+                throw new ArgumentNullException(nameof(store));
+            }
             MAPIFolder folder = null;
             try
             {
@@ -815,7 +1030,13 @@ namespace UtilitiesCS
             return folder.GetTable(removeColumns: removeColumns, addColumns: addColumns);
         }
 
-        public static async Task<object> TryGetTableAsync(this MAPIFolder folder, string[] removeColumns, string[] addColumns, CancellationToken cancel, int maxAttempts)
+        public static async Task<object> TryGetTableAsync(
+            this MAPIFolder folder,
+            string[] removeColumns,
+            string[] addColumns,
+            CancellationToken cancel,
+            int maxAttempts
+        )
         {
             try
             {
@@ -823,17 +1044,27 @@ namespace UtilitiesCS
             }
             catch (TaskCanceledException e)
             {
-                logger.Info($"Task canceled in {nameof(TryGetTableAsync)}\n{e.Message}\n{e.StackTrace}");
+                logger.Info(
+                    $"Task canceled in {nameof(TryGetTableAsync)}\n{e.Message}\n{e.StackTrace}"
+                );
                 return null;
             }
             catch (System.Exception)
             {
-                logger.Warn($"{nameof(GetTableAsync)} failed after {maxAttempts} attempts. Returning null");
+                logger.Warn(
+                    $"{nameof(GetTableAsync)} failed after {maxAttempts} attempts. Returning null"
+                );
                 return null;
             }
         }
 
-        public static async Task<object> GetTableAsync(this MAPIFolder folder, string[] removeColumns, string[] addColumns, CancellationToken cancel, int maxAttempts)
+        public static async Task<object> GetTableAsync(
+            this MAPIFolder folder,
+            string[] removeColumns,
+            string[] addColumns,
+            CancellationToken cancel,
+            int maxAttempts
+        )
         {
             try
             {
@@ -841,24 +1072,37 @@ namespace UtilitiesCS
             }
             catch (COMException e)
             {
-                logger.Warn($"Error in {nameof(GetTableAsync)}\ne.Message  {e.Message}\n" +
-                        $"e.ErrorCode  {e.ErrorCode}\ne.HResult  {e.HResult}\nStackTrace\n{e.StackTrace}");
+                logger.Warn(
+                    $"Error in {nameof(GetTableAsync)}\ne.Message  {e.Message}\n"
+                        + $"e.ErrorCode  {e.ErrorCode}\ne.HResult  {e.HResult}\nStackTrace\n{e.StackTrace}"
+                );
 
                 if (maxAttempts > 1)
                 {
                     logger.Info($"Retrying {maxAttempts - 1} times ...");
-                    return await folder.GetTableAsync(removeColumns, addColumns, cancel, maxAttempts - 1);
+                    return await folder.GetTableAsync(
+                        removeColumns,
+                        addColumns,
+                        cancel,
+                        maxAttempts - 1
+                    );
                 }
-                else { throw; }
+                else
+                {
+                    throw;
+                }
             }
-
             catch (System.Exception)
             {
                 throw;
             }
         }
 
-        public static Outlook.Table GetTable(this MAPIFolder folder, string[] removeColumns, string[] addColumns)
+        public static Outlook.Table GetTable(
+            this MAPIFolder folder,
+            string[] removeColumns,
+            string[] addColumns
+        )
         {
             var table = folder.GetTable();
             table.RemoveColumns(removeColumns);
@@ -866,15 +1110,28 @@ namespace UtilitiesCS
             return table;
         }
 
-        public static async Task<object> TryGetTableAsync(this Conversation conversation, string[] removeColumns, string[] addColumns, CancellationToken cancel, int maxAttempts)
+        public static async Task<object> TryGetTableAsync(
+            this Conversation conversation,
+            string[] removeColumns,
+            string[] addColumns,
+            CancellationToken cancel,
+            int maxAttempts
+        )
         {
             try
             {
-                return await conversation.GetTableAsync(removeColumns, addColumns, cancel, maxAttempts);
+                return await conversation.GetTableAsync(
+                    removeColumns,
+                    addColumns,
+                    cancel,
+                    maxAttempts
+                );
             }
             catch (TaskCanceledException e)
             {
-                logger.Info($"Task canceled in {nameof(TryGetTableAsync)}\n{e.Message}\n{e.StackTrace}");
+                logger.Info(
+                    $"Task canceled in {nameof(TryGetTableAsync)}\n{e.Message}\n{e.StackTrace}"
+                );
                 return null;
             }
             catch (System.Exception)
@@ -884,7 +1141,13 @@ namespace UtilitiesCS
             }
         }
 
-        public static async Task<object> GetTableAsync(this Conversation conversation, string[] removeColumns, string[] addColumns, CancellationToken cancel, int maxAttempts)
+        public static async Task<object> GetTableAsync(
+            this Conversation conversation,
+            string[] removeColumns,
+            string[] addColumns,
+            CancellationToken cancel,
+            int maxAttempts
+        )
         {
             try
             {
@@ -892,24 +1155,37 @@ namespace UtilitiesCS
             }
             catch (COMException e)
             {
-                logger.Warn($"Error in {nameof(GetTableAsync)}\ne.Message  {e.Message}\n" +
-                        $"e.ErrorCode  {e.ErrorCode}\ne.HResult  {e.HResult}\nStackTrace\n{e.StackTrace}");
+                logger.Warn(
+                    $"Error in {nameof(GetTableAsync)}\ne.Message  {e.Message}\n"
+                        + $"e.ErrorCode  {e.ErrorCode}\ne.HResult  {e.HResult}\nStackTrace\n{e.StackTrace}"
+                );
 
                 if (maxAttempts > 1)
                 {
                     logger.Debug($"Retrying {maxAttempts - 1} times ...");
-                    return await conversation.GetTableAsync(removeColumns, addColumns, cancel, maxAttempts - 1);
+                    return await conversation.GetTableAsync(
+                        removeColumns,
+                        addColumns,
+                        cancel,
+                        maxAttempts - 1
+                    );
                 }
-                else { throw; }
+                else
+                {
+                    throw;
+                }
             }
-
             catch (System.Exception)
             {
                 throw;
             }
         }
 
-        public static Outlook.Table GetTable(this Conversation conversation, string[] removeColumns, string[] addColumns)
+        public static Outlook.Table GetTable(
+            this Conversation conversation,
+            string[] removeColumns,
+            string[] addColumns
+        )
         {
             var table = conversation.GetTable();
             table.RemoveColumns(removeColumns);
@@ -948,12 +1224,19 @@ namespace UtilitiesCS
             int[] charSpacing = Enumerable.Repeat(20, columnCount).ToArray();
             Justify[] justification = Enumerable.Repeat(Justify.Left, columnCount).ToArray();
             Justify[] headerCenter = Enumerable.Repeat(Justify.Center, columnCount).ToArray();
-            var styleParams = charSpacing.Zip(justification, (space, align) => (Spacing: space, Justification: align)).ToArray();
-            var headerStyles = charSpacing.Zip(headerCenter, (space, align) => (Spacing: space, Justification: align)).ToArray();
+            var styleParams = charSpacing
+                .Zip(justification, (space, align) => (Spacing: space, Justification: align))
+                .ToArray();
+            var headerStyles = charSpacing
+                .Zip(headerCenter, (space, align) => (Spacing: space, Justification: align))
+                .ToArray();
 
             string columnDivider = "   ";
             string rowBookends = " ";
-            int lineLength = charSpacing.Sum() + columnDivider.Length * (columnCount - 1) + rowBookends.Length * 2;
+            int lineLength =
+                charSpacing.Sum()
+                + columnDivider.Length * (columnCount - 1)
+                + rowBookends.Length * 2;
             //string lineDivider = string.Join("",Enumerable.Repeat("*", lineLength));
 
             string[] dividerParts = new string[columnCount];
@@ -961,17 +1244,17 @@ namespace UtilitiesCS
             {
                 dividerParts[i] = string.Join("", Enumerable.Repeat("=", charSpacing[i]));
             }
-            string lineDivider = rowBookends + string.Join(columnDivider, dividerParts) + rowBookends;
+            string lineDivider =
+                rowBookends + string.Join(columnDivider, dividerParts) + rowBookends;
 
             //+ string.Join(columnDivider, Enumerable.Repeat("_"))
-
 
             string[] headers = table.GetColumnHeaders();
             List<string> rows = new List<string>
             {
                 lineDivider,
                 table.EnumerateColumnHeaders(headerStyles, columnDivider, rowBookends),
-                lineDivider
+                lineDivider,
             };
             object[,] array = (object[,])table.GetArray(table.GetRowCount());
             string[,] stringArray = array.ToStringArray();
@@ -984,7 +1267,6 @@ namespace UtilitiesCS
 
             rows.Add(lineDivider);
             string output = string.Join("\n", rows.ToArray());
-
 
             Console.WriteLine("");
             Console.WriteLine("");

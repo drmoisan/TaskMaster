@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace QuickFiler.Legacy
 {
-    using Microsoft.Office.Interop.Outlook;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Microsoft.Office.Interop.Outlook;
 
     public interface IQfcItemController
     {
@@ -19,7 +19,6 @@ namespace QuickFiler.Legacy
         /// Toggles special formatting for one group to highlight the group of controls that is active
         /// </summary>
         void Accel_FocusToggle(); // Turn on or off the formatting to highlight this QfcItem
-
 
         void Accel_Toggle();
         void ctrlsRemove(); // May not be necessary
@@ -40,4 +39,3 @@ namespace QuickFiler.Legacy
         void ToggleConversationCheckbox();
     }
 }
-

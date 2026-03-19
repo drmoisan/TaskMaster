@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace UtilitiesCS.Interfaces
 {
     /// <summary>
-    /// This is a wrapper for the EventArgs class that is similar to 
+    /// This is a wrapper for the EventArgs class that is similar to
     /// ElapsedEventArgs but has a public constructor.
     /// https://stackoverflow.com/questions/8940982/how-can-i-run-the-event-handler-assigned-to-a-mock
     /// </summary>
@@ -15,9 +15,8 @@ namespace UtilitiesCS.Interfaces
     {
         public DateTime SignalTime { get; private set; }
 
-        public TimeElapsedEventArgs() : this(DateTime.Now)
-        {
-        }
+        public TimeElapsedEventArgs()
+            : this(DateTime.Now) { }
 
         public TimeElapsedEventArgs(DateTime signalTime)
         {
@@ -43,5 +42,4 @@ namespace UtilitiesCS.Interfaces
 
         bool Enabled { get; set; }
     }
-
 }

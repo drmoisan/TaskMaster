@@ -1,5 +1,5 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
+using Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {

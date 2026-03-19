@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-
 namespace UtilitiesCS
 {
     public interface IProjectData : ISerializableList<IProjectEntry>

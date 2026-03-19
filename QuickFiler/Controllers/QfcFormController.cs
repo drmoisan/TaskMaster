@@ -1,6 +1,4 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using QuickFiler.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,6 +6,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Interfaces;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.Extensions;
@@ -18,18 +18,21 @@ namespace QuickFiler.Controllers
     internal class QfcFormController : IQfcFormController
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Contructors
 
-        public QfcFormController(IApplicationGlobals appGlobals,
-                                 IQfcFormViewer formViewer,
-                                 IQfcQueue qfcQueue,
-                                 QfEnums.InitTypeEnum initType,
-                                 System.Action parentCleanup,
-                                 IQfcHomeController parent,
-                                 CancellationTokenSource tokenSource,
-                                 CancellationToken token)
+        public QfcFormController(
+            IApplicationGlobals appGlobals,
+            IQfcFormViewer formViewer,
+            IQfcQueue qfcQueue,
+            QfEnums.InitTypeEnum initType,
+            System.Action parentCleanup,
+            IQfcHomeController parent,
+            CancellationTokenSource tokenSource,
+            CancellationToken token
+        )
         {
             _token = token;
             _tokenSource = tokenSource;
@@ -61,7 +64,8 @@ namespace QuickFiler.Controllers
         #region Private Variables
 
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         private IApplicationGlobals _globals;
         private System.Action _parentCleanup;
@@ -70,6 +74,7 @@ namespace QuickFiler.Controllers
 
         private Padding _itemMarginTemplate;
         private QfEnums.InitTypeEnum _initType;
+
         //private bool _blRunningModalCode = false;
         //private bool _blSuppressEvents = false;
         private IQfcHomeController _parent;
@@ -91,7 +96,10 @@ namespace QuickFiler.Controllers
 
         public void CaptureItemSettings()
         {
-            if (_formViewer?.L1v0L2L3v_TableLayout?.RowStyles is null || _formViewer.L1v0L2L3v_TableLayout.RowStyles.Count < 2)
+            if (
+                _formViewer?.L1v0L2L3v_TableLayout?.RowStyles is null
+                || _formViewer.L1v0L2L3v_TableLayout.RowStyles.Count < 2
+            )
             {
                 return;
             }
@@ -101,51 +109,90 @@ namespace QuickFiler.Controllers
             _rowStyleExpanded = _formViewer.L1v0L2L3v_TableLayout.RowStyles[1];
             _itemMarginTemplate = _formViewer.QfcItemViewerTemplate?.Margin ?? default;
 
-            if (_formViewer.QfcItemViewerExpandedTemplate is null || _formViewer.QfcItemViewerTemplate is null)
+            if (
+                _formViewer.QfcItemViewerExpandedTemplate is null
+                || _formViewer.QfcItemViewerTemplate is null
+            )
             {
                 _formViewer.Hide();
                 return;
             }
 
-            _states = new(new List<KeyValuePair<string, List<TlpCellSnapShot>>>()
-            {
-                new KeyValuePair<string, List<TlpCellSnapShot>>("Expanded", new List<TlpCellSnapShot>()
+            _states = new(
+                new List<KeyValuePair<string, List<TlpCellSnapShot>>>()
                 {
-                    new TlpCellSnapShot(_formViewer.QfcItemViewerExpandedTemplate.L0vh_Tlp,
-                        _formViewer.QfcItemViewerExpandedTemplate.L1h0L2hv3h_TlpBodyToggle),
-                    new TlpCellSnapShot(_formViewer.QfcItemViewerExpandedTemplate.L1h0L2hv3h_TlpBodyToggle,
-                        _formViewer.QfcItemViewerExpandedTemplate.TxtboxBody),
-                    new TlpCellSnapShot(_formViewer.QfcItemViewerExpandedTemplate.L1h0L2hv3h_TlpBodyToggle,
-                        _formViewer.QfcItemViewerExpandedTemplate.TopicThread),
-                    new TlpCellSnapShot(_formViewer.QfcItemViewerExpandedTemplate.L0vh_Tlp,
-                        _formViewer.QfcItemViewerExpandedTemplate.L0v2h2_WebView2),
-                    new TlpCellSnapShot(_formViewer.QfcItemViewerExpandedTemplate.L0vh_Tlp,
-                        _formViewer.QfcItemViewerExpandedTemplate.LblAcOpen),
-                    new TlpCellSnapShot(_formViewer.QfcItemViewerExpandedTemplate.L0vh_Tlp,
-                        _formViewer.QfcItemViewerExpandedTemplate.LblAcBody),
-                }),
-                new KeyValuePair<string, List<TlpCellSnapShot>>("Compressed", new List<TlpCellSnapShot>()
-                {
-                    new TlpCellSnapShot(_formViewer.QfcItemViewerTemplate.L0vh_Tlp,
-                        _formViewer.QfcItemViewerTemplate.L1h0L2hv3h_TlpBodyToggle),
-                    new TlpCellSnapShot(_formViewer.QfcItemViewerTemplate.L1h0L2hv3h_TlpBodyToggle,
-                        _formViewer.QfcItemViewerTemplate.TxtboxBody),
-                    new TlpCellSnapShot(_formViewer.QfcItemViewerTemplate.L1h0L2hv3h_TlpBodyToggle,
-                        _formViewer.QfcItemViewerTemplate.TopicThread),
-                    new TlpCellSnapShot(_formViewer.QfcItemViewerTemplate.L0vh_Tlp,
-                        _formViewer.QfcItemViewerTemplate.L0v2h2_WebView2),
-                    new TlpCellSnapShot(_formViewer.QfcItemViewerTemplate.L0vh_Tlp,
-                        _formViewer.QfcItemViewerTemplate.LblAcOpen),
-                    new TlpCellSnapShot(_formViewer.QfcItemViewerTemplate.L0vh_Tlp,
-                        _formViewer.QfcItemViewerTemplate.LblAcBody),
-                }),
-            });
+                    new KeyValuePair<string, List<TlpCellSnapShot>>(
+                        "Expanded",
+                        new List<TlpCellSnapShot>()
+                        {
+                            new TlpCellSnapShot(
+                                _formViewer.QfcItemViewerExpandedTemplate.L0vh_Tlp,
+                                _formViewer.QfcItemViewerExpandedTemplate.L1h0L2hv3h_TlpBodyToggle
+                            ),
+                            new TlpCellSnapShot(
+                                _formViewer.QfcItemViewerExpandedTemplate.L1h0L2hv3h_TlpBodyToggle,
+                                _formViewer.QfcItemViewerExpandedTemplate.TxtboxBody
+                            ),
+                            new TlpCellSnapShot(
+                                _formViewer.QfcItemViewerExpandedTemplate.L1h0L2hv3h_TlpBodyToggle,
+                                _formViewer.QfcItemViewerExpandedTemplate.TopicThread
+                            ),
+                            new TlpCellSnapShot(
+                                _formViewer.QfcItemViewerExpandedTemplate.L0vh_Tlp,
+                                _formViewer.QfcItemViewerExpandedTemplate.L0v2h2_WebView2
+                            ),
+                            new TlpCellSnapShot(
+                                _formViewer.QfcItemViewerExpandedTemplate.L0vh_Tlp,
+                                _formViewer.QfcItemViewerExpandedTemplate.LblAcOpen
+                            ),
+                            new TlpCellSnapShot(
+                                _formViewer.QfcItemViewerExpandedTemplate.L0vh_Tlp,
+                                _formViewer.QfcItemViewerExpandedTemplate.LblAcBody
+                            ),
+                        }
+                    ),
+                    new KeyValuePair<string, List<TlpCellSnapShot>>(
+                        "Compressed",
+                        new List<TlpCellSnapShot>()
+                        {
+                            new TlpCellSnapShot(
+                                _formViewer.QfcItemViewerTemplate.L0vh_Tlp,
+                                _formViewer.QfcItemViewerTemplate.L1h0L2hv3h_TlpBodyToggle
+                            ),
+                            new TlpCellSnapShot(
+                                _formViewer.QfcItemViewerTemplate.L1h0L2hv3h_TlpBodyToggle,
+                                _formViewer.QfcItemViewerTemplate.TxtboxBody
+                            ),
+                            new TlpCellSnapShot(
+                                _formViewer.QfcItemViewerTemplate.L1h0L2hv3h_TlpBodyToggle,
+                                _formViewer.QfcItemViewerTemplate.TopicThread
+                            ),
+                            new TlpCellSnapShot(
+                                _formViewer.QfcItemViewerTemplate.L0vh_Tlp,
+                                _formViewer.QfcItemViewerTemplate.L0v2h2_WebView2
+                            ),
+                            new TlpCellSnapShot(
+                                _formViewer.QfcItemViewerTemplate.L0vh_Tlp,
+                                _formViewer.QfcItemViewerTemplate.LblAcOpen
+                            ),
+                            new TlpCellSnapShot(
+                                _formViewer.QfcItemViewerTemplate.L0vh_Tlp,
+                                _formViewer.QfcItemViewerTemplate.LblAcBody
+                            ),
+                        }
+                    ),
+                }
+            );
             _formViewer.Hide();
         }
 
         public void RemoveTemplatesAndSetupTlp()
         {
-            if (_formViewer?.L1v0L2L3v_TableLayout is null || _qfcQueue is null || _rowStyleTemplate is null)
+            if (
+                _formViewer?.L1v0L2L3v_TableLayout is null
+                || _qfcQueue is null
+                || _rowStyleTemplate is null
+            )
             {
                 return;
             }
@@ -159,8 +206,9 @@ namespace QuickFiler.Controllers
             _formViewer.L1v0L2L3v_TableLayout.InsertSpecificRow(0, _rowStyleTemplate, count);
             _formViewer.L1v0L2L3v_TableLayout.MinimumSize = new System.Drawing.Size(
                 _formViewer.L1v0L2L3v_TableLayout.MinimumSize.Width,
-                _formViewer.L1v0L2L3v_TableLayout.MinimumSize.Height +
-                (int)Math.Round(_rowStyleTemplate.Height * count, 0));
+                _formViewer.L1v0L2L3v_TableLayout.MinimumSize.Height
+                    + (int)Math.Round(_rowStyleTemplate.Height * count, 0)
+            );
             _qfcQueue.TlpTemplate = _formViewer.L1v0L2L3v_TableLayout;
             _qfcQueue.TlpStates = _states;
         }
@@ -181,7 +229,10 @@ namespace QuickFiler.Controllers
         {
             get
             {
-                if (_formViewer?.L1v_TableLayout?.RowStyles is null || _formViewer.L1v_TableLayout.RowStyles.Count < 2)
+                if (
+                    _formViewer?.L1v_TableLayout?.RowStyles is null
+                    || _formViewer.L1v_TableLayout.RowStyles.Count < 2
+                )
                 {
                     return 0;
                 }
@@ -199,7 +250,9 @@ namespace QuickFiler.Controllers
                     _screen = Screen.PrimaryScreen;
                 }
 
-                int nonEmailSpace = (int)Math.Round(_formViewer.L1v_TableLayout.RowStyles[1].Height, 0) + frameSize.Height;
+                int nonEmailSpace =
+                    (int)Math.Round(_formViewer.L1v_TableLayout.RowStyles[1].Height, 0)
+                    + frameSize.Height;
                 int workingSpace = _screen?.WorkingArea.Height ?? 0;
                 return workingSpace - nonEmailSpace;
             }
@@ -208,13 +261,29 @@ namespace QuickFiler.Controllers
         private int _itemsPerIteration = -1;
         public int ItemsPerIteration
         {
-            get => Initializer.GetOrLoad(ref _itemsPerIteration, (x) => x != -1, LoadItemsPerIteration);
-            set => Initializer.SetAndSave(ref _itemsPerIteration, value, (x) => _formViewer.Invoke(new System.Action(() => _formViewer.L1v1L2h5_SpnEmailPerLoad.Value = x)));
+            get =>
+                Initializer.GetOrLoad(
+                    ref _itemsPerIteration,
+                    (x) => x != -1,
+                    LoadItemsPerIteration
+                );
+            set =>
+                Initializer.SetAndSave(
+                    ref _itemsPerIteration,
+                    value,
+                    (x) =>
+                        _formViewer.Invoke(
+                            new System.Action(() => _formViewer.L1v1L2h5_SpnEmailPerLoad.Value = x)
+                        )
+                );
         }
+
         public int LoadItemsPerIteration()
         {
             var result = (int)Math.Round(SpaceForEmail / _rowStyleTemplate.Height, 0);
-            _formViewer.Invoke(new System.Action(() => _formViewer.L1v1L2h5_SpnEmailPerLoad.Value = result));
+            _formViewer.Invoke(
+                new System.Action(() => _formViewer.L1v1L2h5_SpnEmailPerLoad.Value = result)
+            );
             return result;
         }
 
@@ -225,13 +294,19 @@ namespace QuickFiler.Controllers
                 return;
             }
 
-            _formViewer.Controls.ForAllControls(x =>
-            {
-                x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(_parent.KeyboardHandler.KeyboardHandler_PreviewKeyDownAsync);
-                //x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyDown);
-                x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHandler.KeyboardHandler_KeyDownAsync);
-            },
-            new List<Control> { _formViewer.QfcItemViewerTemplate });
+            _formViewer.Controls.ForAllControls(
+                x =>
+                {
+                    x.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(
+                        _parent.KeyboardHandler.KeyboardHandler_PreviewKeyDownAsync
+                    );
+                    //x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyDown);
+                    x.KeyDown += new System.Windows.Forms.KeyEventHandler(
+                        _parent.KeyboardHandler.KeyboardHandler_KeyDownAsync
+                    );
+                },
+                new List<Control> { _formViewer.QfcItemViewerTemplate }
+            );
 
             _formViewer.L1v1L2h2_ButtonOK.Click += this.ButtonOK_Click;
             _formViewer.L1v1L2h3_ButtonCancel.Click += this.ButtonCancel_Click;
@@ -247,13 +322,19 @@ namespace QuickFiler.Controllers
                 return;
             }
 
-            _formViewer.Controls.ForAllControls(x =>
-            {
-                x.PreviewKeyDown -= new System.Windows.Forms.PreviewKeyDownEventHandler(_parent.KeyboardHandler.KeyboardHandler_PreviewKeyDownAsync);
-                //x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyDown);
-                x.KeyDown -= new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHandler.KeyboardHandler_KeyDownAsync);
-            },
-            new List<Control> { _formViewer.QfcItemViewerTemplate });
+            _formViewer.Controls.ForAllControls(
+                x =>
+                {
+                    x.PreviewKeyDown -= new System.Windows.Forms.PreviewKeyDownEventHandler(
+                        _parent.KeyboardHandler.KeyboardHandler_PreviewKeyDownAsync
+                    );
+                    //x.KeyDown += new System.Windows.Forms.KeyEventHandler(_parent.KeyboardHndlr.KeyboardHandler_KeyDown);
+                    x.KeyDown -= new System.Windows.Forms.KeyEventHandler(
+                        _parent.KeyboardHandler.KeyboardHandler_KeyDownAsync
+                    );
+                },
+                new List<Control> { _formViewer.QfcItemViewerTemplate }
+            );
 
             _formViewer.L1v1L2h2_ButtonOK.Click -= this.ButtonOK_Click;
             _formViewer.L1v1L2h3_ButtonCancel.Click -= this.ButtonCancel_Click;
@@ -294,17 +375,24 @@ namespace QuickFiler.Controllers
         private string _activeTheme;
         public string ActiveTheme
         {
-            get => _themes is null
-                ? _activeTheme
-                : Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
-            set => Initializer.SetAndSave<string>(ref _activeTheme, value, (x) =>
-            {
-                if (_themes is not null && _themes.TryGetValue(x, out var theme))
-                {
-                    theme.SetTheme(async: true);
-                }
-            });
+            get =>
+                _themes is null
+                    ? _activeTheme
+                    : Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
+            set =>
+                Initializer.SetAndSave<string>(
+                    ref _activeTheme,
+                    value,
+                    (x) =>
+                    {
+                        if (_themes is not null && _themes.TryGetValue(x, out var theme))
+                        {
+                            theme.SetTheme(async: true);
+                        }
+                    }
+                );
         }
+
         internal string LoadTheme()
         {
             var activeTheme = (_globals?.Ol?.DarkMode ?? _darkMode) ? "DarkNormal" : "LightNormal";
@@ -318,36 +406,66 @@ namespace QuickFiler.Controllers
         private bool _darkMode;
         public bool DarkMode
         {
-            get => _globals?.Ol is null
-                ? _darkMode
-                : Initializer.GetOrLoad(ref _darkMode, () => _globals.Ol.DarkMode, false, _globals, _globals.Ol);
-            set => Initializer.SetAndSave(ref _darkMode, value, (x) =>
-            {
-                if (_globals?.Ol is not null)
-                {
-                    _globals.Ol.DarkMode = x;
-                }
-            });
+            get =>
+                _globals?.Ol is null
+                    ? _darkMode
+                    : Initializer.GetOrLoad(
+                        ref _darkMode,
+                        () => _globals.Ol.DarkMode,
+                        false,
+                        _globals,
+                        _globals.Ol
+                    );
+            set =>
+                Initializer.SetAndSave(
+                    ref _darkMode,
+                    value,
+                    (x) =>
+                    {
+                        if (_globals?.Ol is not null)
+                        {
+                            _globals.Ol.DarkMode = x;
+                        }
+                    }
+                );
         }
 
         private IQfcCollectionController _groups;
-        public IQfcCollectionController Groups { get => _groups; }
+        public IQfcCollectionController Groups
+        {
+            get => _groups;
+        }
 
-        public IntPtr FormHandle { get => _formViewer.Handle; }
+        public IntPtr FormHandle
+        {
+            get => _formViewer.Handle;
+        }
 
         private IQfcFormViewer _formViewer;
-        public IQfcFormViewer FormViewer { get => _formViewer; }
+        public IQfcFormViewer FormViewer
+        {
+            get => _formViewer;
+        }
 
         public void ToggleOffNavigation(bool async) => _groups.ToggleOffNavigation(async);
+
         public async Task ToggleOffNavigationAsync() => await _groups.ToggleOffNavigationAsync();
+
         public void ToggleOnNavigation(bool async) => _groups.ToggleOnNavigation(async);
+
         public async Task ToggleOnNavigationAsync() => await _groups.ToggleOnNavigationAsync();
 
         private CancellationToken _token;
-        public CancellationToken Token { get => _token; }
+        public CancellationToken Token
+        {
+            get => _token;
+        }
 
         private CancellationTokenSource _tokenSource;
-        public CancellationTokenSource TokenSource { get => _tokenSource; }
+        public CancellationTokenSource TokenSource
+        {
+            get => _tokenSource;
+        }
 
         #endregion
 
@@ -361,8 +479,14 @@ namespace QuickFiler.Controllers
             }
 
             _darkMode = _globals?.Ol?.DarkMode ?? _darkMode;
-            if (DarkMode) { ActiveTheme = "DarkNormal"; }
-            else { ActiveTheme = "LightNormal"; }
+            if (DarkMode)
+            {
+                ActiveTheme = "DarkNormal";
+            }
+            else
+            {
+                ActiveTheme = "LightNormal";
+            }
         }
 
         //private void SetDarkMode()
@@ -395,7 +519,7 @@ namespace QuickFiler.Controllers
         //    _formViewer.BackColor = System.Drawing.SystemColors.ControlLightLight;
         //}
 
-        async public void ButtonCancel_Click(object sender, EventArgs e)
+        public async void ButtonCancel_Click(object sender, EventArgs e)
         {
             try
             {
@@ -409,7 +533,7 @@ namespace QuickFiler.Controllers
             }
         }
 
-        async public Task ActionCancelAsync()
+        public async Task ActionCancelAsync()
         {
             _parent?.TokenSource?.Cancel();
             if (_formViewer?.UiSyncContext is not null)
@@ -421,7 +545,7 @@ namespace QuickFiler.Controllers
             Cleanup();
         }
 
-        async public void ButtonOK_Click(object sender, EventArgs e)
+        public async void ButtonOK_Click(object sender, EventArgs e)
         {
             try
             {
@@ -435,28 +559,30 @@ namespace QuickFiler.Controllers
             }
         }
 
-        async public Task ActionOkAsync()
+        public async Task ActionOkAsync()
         {
             //TraceUtility.LogMethodCall();
 
             if (!_initType.HasFlag(QfEnums.InitTypeEnum.Sort))
             {
                 throw new NotImplementedException(
-                    $"Method {nameof(QfcFormController)}.{nameof(ActionOkAsync)} has not been " +
-                    $"implemented for {nameof(_initType)} {_initType}");
+                    $"Method {nameof(QfcFormController)}.{nameof(ActionOkAsync)} has not been "
+                        + $"implemented for {nameof(_initType)} {_initType}"
+                );
             }
-
             else if (_groups?.ReadyForMove == true)
             {
                 //_blRunningModalCode = true;
 
-                if (_parent.KeyboardHandler.KbdActive) { _parent.KeyboardHandler.ToggleKeyboardDialog(); }
+                if (_parent.KeyboardHandler.KbdActive)
+                {
+                    _parent.KeyboardHandler.ToggleKeyboardDialog();
+                }
 
                 await MoveAndIterate();
 
                 //_blRunningModalCode = false;
             }
-
         }
 
         internal async Task LoadUiFromQueue()
@@ -503,7 +629,12 @@ namespace QuickFiler.Controllers
             }
             else if (_formViewer.Worker?.IsBusy == true)
             {
-                MessageBox.Show("Still loading emails. Please try again in a few seconds.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    "Still loading emails. Please try again in a few seconds.",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
             }
             else
             {
@@ -519,14 +650,17 @@ namespace QuickFiler.Controllers
                     // Since most common error is cross-thread error, we will try to load the queue again using the Ui Dispatcher
                     await UiThread.Dispatcher.InvokeAsync(_parent.IterateQueueAsync);
                 }
-
                 // We have reached the end of the email database
                 else
                 {
-                    MessageBox.Show("Finished Moving Emails", "Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(
+                        "Finished Moving Emails",
+                        "Finished",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
                     await ActionCancelAsync();
                 }
-
             }
         }
 
@@ -545,10 +679,10 @@ namespace QuickFiler.Controllers
             // Write Move Metrics
             await UiThread.Dispatcher.InvokeAsync(
                 async () => await WriteMetrics(_globals.FS.Filenames.EmailSession),
-                System.Windows.Threading.DispatcherPriority.ContextIdle);
+                System.Windows.Threading.DispatcherPriority.ContextIdle
+            );
 
             await UiThread.Dispatcher.InvokeAsync(() => _groups.CleanupBackground());
-
         }
 
         public void ButtonUndo_Click(object sender, EventArgs e)
@@ -582,7 +716,10 @@ namespace QuickFiler.Controllers
                     // group actions for count greater than _itemsPerIteration
                     _groups.UnregisterNavigation();
                     await _qfcQueue.ChangeIterationSize(
-                        (_formViewer.L1v0L2L3v_TableLayout, _groups.ItemGroups), count, _rowStyleTemplate);
+                        (_formViewer.L1v0L2L3v_TableLayout, _groups.ItemGroups),
+                        count,
+                        _rowStyleTemplate
+                    );
                     _groups.RegisterNavigation();
                     _itemsPerIteration = count;
                     break;
@@ -626,8 +763,8 @@ namespace QuickFiler.Controllers
                     tlp.InsertSpecificRow(oldCount, _rowStyleTemplate, diff);
                     tlp.MinimumSize = new System.Drawing.Size(
                         tlp.MinimumSize.Width,
-                        tlp.MinimumSize.Height +
-                        (int)Math.Round(_rowStyleTemplate.Height * diff, 0));
+                        tlp.MinimumSize.Height + (int)Math.Round(_rowStyleTemplate.Height * diff, 0)
+                    );
                 }
                 else
                 {
@@ -635,13 +772,14 @@ namespace QuickFiler.Controllers
                     tlp.RemoveSpecificRow(newCount, removeCount);
                     tlp.MinimumSize = new System.Drawing.Size(
                         tlp.MinimumSize.Width,
-                        tlp.MinimumSize.Height -
-                        (int)Math.Round(_rowStyleTemplate.Height * removeCount, 0));
+                        tlp.MinimumSize.Height
+                            - (int)Math.Round(_rowStyleTemplate.Height * removeCount, 0)
+                    );
                 }
             }
         }
 
-        async public Task ButtonSkipHandler(object sender, EventArgs e)
+        public async Task ButtonSkipHandler(object sender, EventArgs e)
         {
             if (_formViewer?.L1v1L2h5_BtnSkip is null)
             {
@@ -656,7 +794,7 @@ namespace QuickFiler.Controllers
             _formViewer.L1v1L2h5_BtnSkip.Enabled = true;
         }
 
-        async public void ButtonSkip_Click(object sender, EventArgs e)
+        public async void ButtonSkip_Click(object sender, EventArgs e)
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
@@ -672,7 +810,7 @@ namespace QuickFiler.Controllers
             }
         }
 
-        async public Task SkipGroupAsync()
+        public async Task SkipGroupAsync()
         {
             if (_qfcQueue is null)
             {
@@ -693,11 +831,18 @@ namespace QuickFiler.Controllers
             }
             else if (_formViewer?.Worker?.IsBusy == true)
             {
-                MessageBox.Show("Still loading emails. Please try again in a few seconds.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    "Still loading emails. Please try again in a few seconds.",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
             }
             else
             {
-                logger.Info("Skip requested but queue is exhausted; no additional groups are available.");
+                logger.Info(
+                    "Skip requested but queue is exhausted; no additional groups are available."
+                );
             }
         }
 
@@ -717,20 +862,31 @@ namespace QuickFiler.Controllers
 
         public void LoadItems(IList<MailItem> listObjects)
         {
-            if (listObjects is null || _globals is null || _formViewer is null || _parent is null || _tokenSource is null || _states is null)
+            if (
+                listObjects is null
+                || _globals is null
+                || _formViewer is null
+                || _parent is null
+                || _tokenSource is null
+                || _states is null
+            )
             {
                 return;
             }
 
-            _helperTasks = listObjects.Select(x => MailItemHelper.FromMailItemAsync(x, _globals, Token, false)).ToList();
-            _groups = new QfcCollectionController(AppGlobals: _globals,
-                                                  viewerInstance: _formViewer,
-                                                  InitType: QfEnums.InitTypeEnum.Sort,
-                                                  homeController: _parent,
-                                                  parent: this,
-                                                  tokenSource: TokenSource,
-                                                  token: Token,
-                                                  _states);
+            _helperTasks = listObjects
+                .Select(x => MailItemHelper.FromMailItemAsync(x, _globals, Token, false))
+                .ToList();
+            _groups = new QfcCollectionController(
+                AppGlobals: _globals,
+                viewerInstance: _formViewer,
+                InitType: QfEnums.InitTypeEnum.Sort,
+                homeController: _parent,
+                parent: this,
+                tokenSource: TokenSource,
+                token: Token,
+                _states
+            );
             _groups.LoadControlsAndHandlers_01(listObjects, _rowStyleTemplate, _rowStyleExpanded);
         }
 
@@ -741,22 +897,35 @@ namespace QuickFiler.Controllers
 
         public async Task LoadItemsAsync(IList<MailItem> listObjects, ProgressTracker progress)
         {
-            if (listObjects is null || _globals is null || _formViewer is null || _parent is null || _tokenSource is null || _states is null)
+            if (
+                listObjects is null
+                || _globals is null
+                || _formViewer is null
+                || _parent is null
+                || _tokenSource is null
+                || _states is null
+            )
             {
                 return;
             }
 
             Token.ThrowIfCancellationRequested();
 
-            _groups = new QfcCollectionController(AppGlobals: _globals,
-                                                  viewerInstance: _formViewer,
-                                                  InitType: QfEnums.InitTypeEnum.Sort,
-                                                  homeController: _parent,
-                                                  parent: this,
-                                                  tokenSource: TokenSource,
-                                                  token: Token,
-                                                  _states);
-            await _groups.LoadControlsAndHandlers_01Async(listObjects, _rowStyleTemplate, _rowStyleExpanded);
+            _groups = new QfcCollectionController(
+                AppGlobals: _globals,
+                viewerInstance: _formViewer,
+                InitType: QfEnums.InitTypeEnum.Sort,
+                homeController: _parent,
+                parent: this,
+                tokenSource: TokenSource,
+                token: Token,
+                _states
+            );
+            await _groups.LoadControlsAndHandlers_01Async(
+                listObjects,
+                _rowStyleTemplate,
+                _rowStyleExpanded
+            );
             progress?.Report(100);
 
             _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -771,7 +940,9 @@ namespace QuickFiler.Controllers
         /// </summary>
         public void MaximizeFormViewer()
         {
-            _formViewer.Invoke(new System.Action(() => _formViewer.WindowState = FormWindowState.Maximized));
+            _formViewer.Invoke(
+                new System.Action(() => _formViewer.WindowState = FormWindowState.Maximized)
+            );
         }
 
         /// <summary>
@@ -779,7 +950,9 @@ namespace QuickFiler.Controllers
         /// </summary>
         public void MinimizeFormViewer()
         {
-            _formViewer.Invoke(new System.Action(() => _formViewer.WindowState = FormWindowState.Minimized));
+            _formViewer.Invoke(
+                new System.Action(() => _formViewer.WindowState = FormWindowState.Minimized)
+            );
         }
 
         internal void UndoDialog()
@@ -794,25 +967,40 @@ namespace QuickFiler.Controllers
             DialogResult repeatResponse = DialogResult.Yes;
             var i = 0;
 
-
             while (i < _movedItems.Count && repeatResponse == DialogResult.Yes)
             {
                 var message = _movedItems[i].UndoMoveMessage(olApp);
-                if (message is null) { i++; }
+                if (message is null)
+                {
+                    i++;
+                }
                 else
                 {
-                    var undoResponse = MessageBox.Show(message, "Undo Dialog", MessageBoxButtons.YesNo);
+                    var undoResponse = MessageBox.Show(
+                        message,
+                        "Undo Dialog",
+                        MessageBoxButtons.YesNo
+                    );
                     if (undoResponse == DialogResult.Yes)
                     {
                         _undoQueue.Add(_movedItems.Pop(i));
                     }
-                    else { i++; }
-                    repeatResponse = MessageBox.Show("Continue Undoing Moves?", "Undo Dialog", MessageBoxButtons.YesNo);
+                    else
+                    {
+                        i++;
+                    }
+                    repeatResponse = MessageBox.Show(
+                        "Continue Undoing Moves?",
+                        "Undo Dialog",
+                        MessageBoxButtons.YesNo
+                    );
                 }
             }
 
-
-            if (repeatResponse == DialogResult.Yes) { MessageBox.Show("Nothing to undo"); }
+            if (repeatResponse == DialogResult.Yes)
+            {
+                MessageBox.Show("Nothing to undo");
+            }
             _movedItems.Serialize();
         }
 
@@ -825,17 +1013,36 @@ namespace QuickFiler.Controllers
             {
                 if (_undoQueue.TryTake(out var item))
                 {
-                    var helper = await MailItemHelper.FromMailItemAsync(item.MailItem, _globals, default, true);
-                    (await _globals.AF.Manager["Folder"]).UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
+                    var helper = await MailItemHelper.FromMailItemAsync(
+                        item.MailItem,
+                        _globals,
+                        default,
+                        true
+                    );
+                    (await _globals.AF.Manager["Folder"]).UnTrain(
+                        helper.FolderInfo.RelativePath,
+                        helper.Tokens,
+                        1
+                    );
                     var mail = item.UndoMove();
                     await UiThread.Dispatcher.InvokeAsync(
                         () => _groups.AddItemGroup(mail),
-                        System.Windows.Threading.DispatcherPriority.ContextIdle);
+                        System.Windows.Threading.DispatcherPriority.ContextIdle
+                    );
                 }
-                else if (sw.ElapsedMilliseconds > 10000) { exit = true; }
-                else { await Task.Delay(200); }
+                else if (sw.ElapsedMilliseconds > 10000)
+                {
+                    exit = true;
+                }
+                else
+                {
+                    await Task.Delay(200);
+                }
             }
-            if (exit) { _undoConsumerTask = null; }
+            if (exit)
+            {
+                _undoConsumerTask = null;
+            }
         }
 
         // TODO: Implement Viewer_Activate
@@ -845,6 +1052,5 @@ namespace QuickFiler.Controllers
         }
 
         #endregion
-
     }
 }

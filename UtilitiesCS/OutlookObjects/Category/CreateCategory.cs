@@ -2,13 +2,15 @@
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 
-
 namespace UtilitiesCS
 {
-
     public static class CreateCategoryModule
     {
-        public static Category CreateCategory(this NameSpace olNS, IPrefix prefix, string newCatName)
+        public static Category CreateCategory(
+            this NameSpace olNS,
+            IPrefix prefix,
+            string newCatName
+        )
         {
             Category objCategory = null;
 
@@ -33,10 +35,10 @@ namespace UtilitiesCS
                     {
                         strTemp = prefix.Value + newCatName;
                     }
-                    //strTemp = newCatName.Length > prefix.Value.Length ? 
-                    //    newCatName.Substring(0,prefix.Value.Length) != prefix.Value ? 
-                    //        prefix.Value + newCatName : 
-                    //        newCatName : 
+                    //strTemp = newCatName.Length > prefix.Value.Length ?
+                    //    newCatName.Substring(0,prefix.Value.Length) != prefix.Value ?
+                    //        prefix.Value + newCatName :
+                    //        newCatName :
                     //    prefix.Value + newCatName;
                 }
                 else
@@ -51,7 +53,9 @@ namespace UtilitiesCS
                     if (objCategory.Name == strTemp)
                     {
                         exists = true;
-                        MessageBox.Show($"Color category {strTemp} already exists. Cannot add a duplicate.");
+                        MessageBox.Show(
+                            $"Color category {strTemp} already exists. Cannot add a duplicate."
+                        );
                         return objCategory;
                     }
                 }
@@ -60,7 +64,11 @@ namespace UtilitiesCS
                 {
                     try
                     {
-                        objCategory = olNS.Categories.Add(strTemp, prefix.Color, OlCategoryShortcutKey.olCategoryShortcutKeyNone);
+                        objCategory = olNS.Categories.Add(
+                            strTemp,
+                            prefix.Color,
+                            OlCategoryShortcutKey.olCategoryShortcutKeyNone
+                        );
                     }
                     catch (System.Exception ex)
                     {
@@ -71,11 +79,12 @@ namespace UtilitiesCS
             }
             else
             {
-                MessageBox.Show($"Error: Parameter {nameof(newCatName)} must have a value to create a category.");
+                MessageBox.Show(
+                    $"Error: Parameter {nameof(newCatName)} must have a value to create a category."
+                );
             }
 
             return objCategory;
-
         }
     }
 }

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Drawing;
 using System.Windows.Forms;
-using Microsoft.Office.Interop.Outlook;
 using BrightIdeasSoftware;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
@@ -15,48 +15,50 @@ namespace UtilitiesCS
     {
         #region Constructors and Initializers
 
-        public Theme(string name,
-                     Label lblItemNumber,
-                     Label lblSender,
-                     Label lblSubject,
-                     IList<TableLayoutPanel> tableLayoutPanels,
-                     IList<Button> buttons,
-                     IList<System.ComponentModel.Component> menuItems,
-                     MenuStrip menuStrip,
-                     IList<IQfcTipsDetails> tipsDetailsLabels,
-                     IList<IQfcTipsDetails> tipsExpanded,
-                     TextBox textboxSearch,
-                     TextBox textboxBody,
-                     ComboBox comboFolders,
-                     FastObjectListView topicThread,
-                     Microsoft.Web.WebView2.WinForms.WebView2 webView2,
-                     Control viewer,
-                     Func<bool> mailRead,
-                     Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme web2ViewScheme,
-                     Action<Enums.ToggleState> htmlConverter,
-                     Enums.ToggleState htmlDark,
-                     Color navBackgColor,
-                     Color navForeColor,
-                     Color tlpBackColor,
-                     Color tipsForeColor,
-                     Color tipsBackColor,
-                     Color mailReadForeColor,
-                     Color mailReadBackColor,
-                     Color mailUnreadForeColor,
-                     Color mailUnreadBackColor,
-                     Color tipsDetailsBackColor,
-                     Color tipsDetailsForeColor,
-                     Color buttonBackColor,
-                     Color buttonMouseOverColor,
-                     Color buttonClickedColor,
-                     Color txtboxSearchBackColor,
-                     Color txtboxSearchForeColor,
-                     Color txtboxBodyBackColor,
-                     Color txtboxBodyForeColor,
-                     Color cboFoldersBackColor,
-                     Color cboFoldersForeColor,
-                     Color defaultBackColor,
-                     Color defaultForeColor)
+        public Theme(
+            string name,
+            Label lblItemNumber,
+            Label lblSender,
+            Label lblSubject,
+            IList<TableLayoutPanel> tableLayoutPanels,
+            IList<Button> buttons,
+            IList<System.ComponentModel.Component> menuItems,
+            MenuStrip menuStrip,
+            IList<IQfcTipsDetails> tipsDetailsLabels,
+            IList<IQfcTipsDetails> tipsExpanded,
+            TextBox textboxSearch,
+            TextBox textboxBody,
+            ComboBox comboFolders,
+            FastObjectListView topicThread,
+            Microsoft.Web.WebView2.WinForms.WebView2 webView2,
+            Control viewer,
+            Func<bool> mailRead,
+            Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme web2ViewScheme,
+            Action<Enums.ToggleState> htmlConverter,
+            Enums.ToggleState htmlDark,
+            Color navBackgColor,
+            Color navForeColor,
+            Color tlpBackColor,
+            Color tipsForeColor,
+            Color tipsBackColor,
+            Color mailReadForeColor,
+            Color mailReadBackColor,
+            Color mailUnreadForeColor,
+            Color mailUnreadBackColor,
+            Color tipsDetailsBackColor,
+            Color tipsDetailsForeColor,
+            Color buttonBackColor,
+            Color buttonMouseOverColor,
+            Color buttonClickedColor,
+            Color txtboxSearchBackColor,
+            Color txtboxSearchForeColor,
+            Color txtboxBodyBackColor,
+            Color txtboxBodyForeColor,
+            Color cboFoldersBackColor,
+            Color cboFoldersForeColor,
+            Color defaultBackColor,
+            Color defaultForeColor
+        )
         {
             _name = name;
             _lblItemNumber = lblItemNumber;
@@ -121,14 +123,15 @@ namespace UtilitiesCS
 
         public Theme() { }
 
-        public Theme(string name,
-                     Dictionary<string, ThemeControlGroup> controlGroups)
+        public Theme(string name, Dictionary<string, ThemeControlGroup> controlGroups)
         {
-            if (controlGroups is null) { throw new ArgumentNullException(nameof(controlGroups)); }
+            if (controlGroups is null)
+            {
+                throw new ArgumentNullException(nameof(controlGroups));
+            }
             _name = name;
             _controlGroups = controlGroups;
         }
-
 
         #endregion
 
@@ -136,85 +139,193 @@ namespace UtilitiesCS
         #region Public Properties
 
         private Color _navBackColor;
-        public Color NavBackColor { get => _navBackColor; set => _navBackColor = value; }
+        public Color NavBackColor
+        {
+            get => _navBackColor;
+            set => _navBackColor = value;
+        }
 
         private Color _navForeColor;
-        public Color NavForeColor { get => _navForeColor; set => _navForeColor = value; }
+        public Color NavForeColor
+        {
+            get => _navForeColor;
+            set => _navForeColor = value;
+        }
 
         private Action<Enums.ToggleState> _htmlConverter;
-        public Action<Enums.ToggleState> HtmlConverter { get => _htmlConverter; set => _htmlConverter = value; }
+        public Action<Enums.ToggleState> HtmlConverter
+        {
+            get => _htmlConverter;
+            set => _htmlConverter = value;
+        }
 
         private Color _buttonBackColor;
-        public Color ButtonBackColor { get => _buttonBackColor; set => _buttonBackColor = value; }
+        public Color ButtonBackColor
+        {
+            get => _buttonBackColor;
+            set => _buttonBackColor = value;
+        }
 
         private Color _buttonMouseOverColor;
-        public Color ButtonMouseOverColor { get => _buttonMouseOverColor; set => _buttonMouseOverColor = value; }
+        public Color ButtonMouseOverColor
+        {
+            get => _buttonMouseOverColor;
+            set => _buttonMouseOverColor = value;
+        }
 
         private Color _buttonClickedColor;
-        public Color ButtonClickedColor { get => _buttonClickedColor; set => _buttonClickedColor = value; }
+        public Color ButtonClickedColor
+        {
+            get => _buttonClickedColor;
+            set => _buttonClickedColor = value;
+        }
 
         private Color _cboFoldersBackColor;
-        public Color CboFoldersBackColor { get => _cboFoldersBackColor; set => _cboFoldersBackColor = value; }
+        public Color CboFoldersBackColor
+        {
+            get => _cboFoldersBackColor;
+            set => _cboFoldersBackColor = value;
+        }
 
         private Color _cboFoldersForeColor;
-        public Color CboFoldersForeColor { get => _cboFoldersForeColor; set => _cboFoldersForeColor = value; }
+        public Color CboFoldersForeColor
+        {
+            get => _cboFoldersForeColor;
+            set => _cboFoldersForeColor = value;
+        }
 
         private Color _defaultBackColor;
-        public Color DefaultBackColor { get => _defaultBackColor; set => _defaultBackColor = value; }
+        public Color DefaultBackColor
+        {
+            get => _defaultBackColor;
+            set => _defaultBackColor = value;
+        }
 
         private Color _defaultForeColor;
-        public Color DefaultForeColor { get => _defaultForeColor; set => _defaultForeColor = value; }
+        public Color DefaultForeColor
+        {
+            get => _defaultForeColor;
+            set => _defaultForeColor = value;
+        }
 
         private Color _mailReadBackColor;
-        public Color MailReadBackColor { get => _mailReadBackColor; set => _mailReadBackColor = value; }
+        public Color MailReadBackColor
+        {
+            get => _mailReadBackColor;
+            set => _mailReadBackColor = value;
+        }
 
         private Color _mailReadForeColor;
-        public Color MailReadForeColor { get => _mailReadForeColor; set => _mailReadForeColor = value; }
+        public Color MailReadForeColor
+        {
+            get => _mailReadForeColor;
+            set => _mailReadForeColor = value;
+        }
 
         private Color _mailUnreadBackColor;
-        public Color MailUnreadBackColor { get => _mailUnreadBackColor; set => _mailUnreadBackColor = value; }
+        public Color MailUnreadBackColor
+        {
+            get => _mailUnreadBackColor;
+            set => _mailUnreadBackColor = value;
+        }
 
         private Color _mailUnreadForeColor;
-        public Color MailUnreadForeColor { get => _mailUnreadForeColor; set => _mailUnreadForeColor = value; }
+        public Color MailUnreadForeColor
+        {
+            get => _mailUnreadForeColor;
+            set => _mailUnreadForeColor = value;
+        }
 
         private Color _tipsBackColor;
-        public Color TipsBackColor { get => _tipsBackColor; set => _tipsBackColor = value; }
+        public Color TipsBackColor
+        {
+            get => _tipsBackColor;
+            set => _tipsBackColor = value;
+        }
 
         private Color _tipsDetailsBackColor;
-        public Color TipsDetailsBackColor { get => _tipsDetailsBackColor; set => _tipsDetailsBackColor = value; }
+        public Color TipsDetailsBackColor
+        {
+            get => _tipsDetailsBackColor;
+            set => _tipsDetailsBackColor = value;
+        }
 
         private Color _tipsDetailsForeColor;
-        public Color TipsDetailsForeColor { get => _tipsDetailsForeColor; set => _tipsDetailsForeColor = value; }
+        public Color TipsDetailsForeColor
+        {
+            get => _tipsDetailsForeColor;
+            set => _tipsDetailsForeColor = value;
+        }
 
         private Color _tipsForeColor;
-        public Color TipsForeColor { get => _tipsForeColor; set => _tipsForeColor = value; }
+        public Color TipsForeColor
+        {
+            get => _tipsForeColor;
+            set => _tipsForeColor = value;
+        }
 
         private Color _tlpBackColor;
-        public Color TlpBackColor { get => _tlpBackColor; set => _tlpBackColor = value; }
+        public Color TlpBackColor
+        {
+            get => _tlpBackColor;
+            set => _tlpBackColor = value;
+        }
 
         private Color _txtboxBodyBackColor;
-        public Color TxtboxBodyBackColor { get => _txtboxBodyBackColor; set => _txtboxBodyBackColor = value; }
+        public Color TxtboxBodyBackColor
+        {
+            get => _txtboxBodyBackColor;
+            set => _txtboxBodyBackColor = value;
+        }
 
         private Color _txtboxBodyForeColor;
-        public Color TxtboxBodyForeColor { get => _txtboxBodyForeColor; set => _txtboxBodyForeColor = value; }
+        public Color TxtboxBodyForeColor
+        {
+            get => _txtboxBodyForeColor;
+            set => _txtboxBodyForeColor = value;
+        }
 
         private Color _txtboxSearchBackColor;
-        public Color TxtboxSearchBackColor { get => _txtboxSearchBackColor; set => _txtboxSearchBackColor = value; }
+        public Color TxtboxSearchBackColor
+        {
+            get => _txtboxSearchBackColor;
+            set => _txtboxSearchBackColor = value;
+        }
 
         private Color _txtboxSearchForeColor;
-        public Color TxtboxSearchForeColor { get => _txtboxSearchForeColor; set => _txtboxSearchForeColor = value; }
+        public Color TxtboxSearchForeColor
+        {
+            get => _txtboxSearchForeColor;
+            set => _txtboxSearchForeColor = value;
+        }
 
         private Enums.ToggleState _htmlDark;
-        public Enums.ToggleState HtmlDark { get => _htmlDark; set => _htmlDark = value; }
+        public Enums.ToggleState HtmlDark
+        {
+            get => _htmlDark;
+            set => _htmlDark = value;
+        }
 
         private Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme _web2ViewScheme;
-        public Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme Web2ViewScheme { get => _web2ViewScheme; set => _web2ViewScheme = value; }
+        public Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme Web2ViewScheme
+        {
+            get => _web2ViewScheme;
+            set => _web2ViewScheme = value;
+        }
 
         private string _name;
-        public string Name { get => _name; set => _name = value; }
+        public string Name
+        {
+            get => _name;
+            set => _name = value;
+        }
 
         private Dictionary<string, ThemeControlGroup> _controlGroups;
-        public Dictionary<string, ThemeControlGroup> ControlGroups { get => _controlGroups; set => _controlGroups = value; }
+        public Dictionary<string, ThemeControlGroup> ControlGroups
+        {
+            get => _controlGroups;
+            set => _controlGroups = value;
+        }
 
         #endregion
 
@@ -225,10 +336,17 @@ namespace UtilitiesCS
             if (_lblSender is null)
             {
                 throw new System.InvalidOperationException(
-                $"Variable {nameof(_lblSender)} is null");
+                    $"Variable {nameof(_lblSender)} is null"
+                );
             }
-            if (async) { _lblSender.BeginInvoke(new System.Action(() => SetMailRead())); }
-            else { _lblSender.Invoke(new System.Action(() => SetMailRead())); }
+            if (async)
+            {
+                _lblSender.BeginInvoke(new System.Action(() => SetMailRead()));
+            }
+            else
+            {
+                _lblSender.Invoke(new System.Action(() => SetMailRead()));
+            }
         }
 
         public void SetMailRead()
@@ -236,12 +354,14 @@ namespace UtilitiesCS
             if (_lblSender is null)
             {
                 throw new System.InvalidOperationException(
-                $"Variable {nameof(_lblSender)} is null");
+                    $"Variable {nameof(_lblSender)} is null"
+                );
             }
             if (_lblSubject is null)
             {
                 throw new System.InvalidOperationException(
-                $"Variable {nameof(_lblSubject)} is null");
+                    $"Variable {nameof(_lblSubject)} is null"
+                );
             }
             _lblSender.BackColor = _mailReadBackColor;
             _lblSender.ForeColor = _mailReadForeColor;
@@ -254,10 +374,17 @@ namespace UtilitiesCS
             if (_lblSender is null)
             {
                 throw new System.InvalidOperationException(
-                $"Variable {nameof(_lblSender)} is null");
+                    $"Variable {nameof(_lblSender)} is null"
+                );
             }
-            if (async) { _lblSender.BeginInvoke(new System.Action(() => SetMailUnread())); }
-            else { _lblSender.Invoke(new System.Action(() => SetMailUnread())); }
+            if (async)
+            {
+                _lblSender.BeginInvoke(new System.Action(() => SetMailUnread()));
+            }
+            else
+            {
+                _lblSender.Invoke(new System.Action(() => SetMailUnread()));
+            }
         }
 
         private void SetMailUnread()
@@ -265,12 +392,14 @@ namespace UtilitiesCS
             if (_lblSender is null)
             {
                 throw new System.InvalidOperationException(
-                $"Variable {nameof(_lblSender)} is null");
+                    $"Variable {nameof(_lblSender)} is null"
+                );
             }
             if (_lblSubject is null)
             {
                 throw new System.InvalidOperationException(
-                $"Variable {nameof(_lblSubject)} is null");
+                    $"Variable {nameof(_lblSubject)} is null"
+                );
             }
             _lblSender.BackColor = _mailUnreadBackColor;
             _lblSender.ForeColor = _mailUnreadForeColor;
@@ -280,13 +409,19 @@ namespace UtilitiesCS
 
         public void SetQfcTheme(bool async)
         {
-            if (async) { UiThread.Dispatcher.InvokeAsync(() => SetQfcTheme()); }
+            if (async)
+            {
+                UiThread.Dispatcher.InvokeAsync(() => SetQfcTheme());
+            }
             else if (_lblItemNumber.InvokeRequired)
             {
                 _lblItemNumber.Invoke(() => SetQfcTheme());
             }
-            else { SetQfcTheme(); }
-            //UiThread.Dispatcher.Invoke(() => SetQfcTheme()); 
+            else
+            {
+                SetQfcTheme();
+            }
+            //UiThread.Dispatcher.Invoke(() => SetQfcTheme());
 
             //if (async) { _lblSender.BeginInvoke(new System.Action(() => SetQfcTheme())); }
             //else { _lblSender.Invoke(new System.Action(() => SetQfcTheme())); }
@@ -309,7 +444,7 @@ namespace UtilitiesCS
                 tlp.BackColor = TlpBackColor;
             }
 
-            // Shortcut accelerator colors  
+            // Shortcut accelerator colors
             foreach (var tipsDetails in _tipsDetailsLabels)
             {
                 tipsDetails.LabelControl.BackColor = TipsDetailsBackColor;
@@ -323,14 +458,26 @@ namespace UtilitiesCS
             }
 
             // Mail item colors
-            if (!MailRead()) { SetMailUnread(); }
-            else { SetMailRead(); }
+            if (!MailRead())
+            {
+                SetMailUnread();
+            }
+            else
+            {
+                SetMailRead();
+            }
 
             // Button colors
             foreach (Button btn in _buttons)
             {
-                if (btn.DialogResult == DialogResult.OK) { btn.BackColor = ButtonClickedColor; }
-                else { btn.BackColor = ButtonBackColor; }
+                if (btn.DialogResult == DialogResult.OK)
+                {
+                    btn.BackColor = ButtonClickedColor;
+                }
+                else
+                {
+                    btn.BackColor = ButtonBackColor;
+                }
             }
 
             foreach (System.ComponentModel.Component menuItem in _menuItems)
@@ -377,7 +524,7 @@ namespace UtilitiesCS
                 HtmlConverter(HtmlDark);
             }
 
-            // Default colors   
+            // Default colors
             _viewer.BackColor = DefaultBackColor;
             _viewer.ForeColor = DefaultForeColor;
         }
@@ -393,8 +540,5 @@ namespace UtilitiesCS
         }
 
         #endregion
-
     }
 }
-
-

@@ -8,11 +8,20 @@ namespace UtilitiesCS
 {
     public class ScoStack<T> : ScoCollection<T>
     {
-        public ScoStack() : base() { }
-        public ScoStack(List<T> listOfT) : base(listOfT) { }
-        public ScoStack(IEnumerable<T> IEnumerableOfT) : base(IEnumerableOfT) { }
-        public ScoStack(string filename, string folderpath) : base(filename, folderpath) { }
-        public ScoStack(string filename, string folderpath, bool askUserOnError) : base(filename, folderpath, askUserOnError) { }
+        public ScoStack()
+            : base() { }
+
+        public ScoStack(List<T> listOfT)
+            : base(listOfT) { }
+
+        public ScoStack(IEnumerable<T> IEnumerableOfT)
+            : base(IEnumerableOfT) { }
+
+        public ScoStack(string filename, string folderpath)
+            : base(filename, folderpath) { }
+
+        public ScoStack(string filename, string folderpath, bool askUserOnError)
+            : base(filename, folderpath, askUserOnError) { }
 
         #region Stack
 
@@ -26,7 +35,9 @@ namespace UtilitiesCS
         public T Peek(int index)
         {
             if (this.Count - 1 < index)
-                throw new IndexOutOfRangeException($"Index {index} out of range. Stack only has {this.Count} elements.");
+                throw new IndexOutOfRangeException(
+                    $"Index {index} out of range. Stack only has {this.Count} elements."
+                );
             return this[index];
         }
 
@@ -42,7 +53,9 @@ namespace UtilitiesCS
         public T Pop(int index)
         {
             if (this.Count - 1 < index)
-                throw new IndexOutOfRangeException($"Index {index} out of range. Stack only has {this.Count} elements.");
+                throw new IndexOutOfRangeException(
+                    $"Index {index} out of range. Stack only has {this.Count} elements."
+                );
             T result = this[index];
             this.RemoveAt(index);
             return result;
@@ -54,15 +67,26 @@ namespace UtilitiesCS
 
         public T[] ToArray(bool reverse)
         {
-            if (reverse) { return Enumerable.Reverse(this).ToArray(); }
-            else { return this.ToArray(); }
+            if (reverse)
+            {
+                return Enumerable.Reverse(this).ToArray();
+            }
+            else
+            {
+                return this.ToArray();
+            }
         }
-
 
         public List<T> ToList(bool reverse)
         {
-            if (reverse) { return new List<T>(Enumerable.Reverse(this)); }
-            else { return this.ToList(); }
+            if (reverse)
+            {
+                return new List<T>(Enumerable.Reverse(this));
+            }
+            else
+            {
+                return this.ToList();
+            }
         }
 
         public bool TryPeek(out T result)

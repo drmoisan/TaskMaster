@@ -30,22 +30,41 @@ namespace QuickFiler
         //private IList<Control> _rightControls;
 
         private IList<Label> _tipsLabels;
-        public IList<Label> TipsLabels { get => _tipsLabels; }
+        public IList<Label> TipsLabels
+        {
+            get => _tipsLabels;
+        }
 
         private IList<Label> _leftTipsLabels;
-        public IList<Label> LeftTipsLabels { get => _leftTipsLabels; }
+        public IList<Label> LeftTipsLabels
+        {
+            get => _leftTipsLabels;
+        }
 
         private IList<Label> _expandedTipsLabels;
-        public IList<Label> ExpandedTipsLabels { get => _expandedTipsLabels; }
+        public IList<Label> ExpandedTipsLabels
+        {
+            get => _expandedTipsLabels;
+        }
 
         private IItemControler _controller;
-        public IItemControler Controller { get => _controller; set => _controller = value; }
+        public IItemControler Controller
+        {
+            get => _controller;
+            set => _controller = value;
+        }
 
         private SynchronizationContext _context;
-        public SynchronizationContext UiSyncContext { get => _context; }
+        public SynchronizationContext UiSyncContext
+        {
+            get => _context;
+        }
 
         private TaskScheduler _uiScheduler;
-        public TaskScheduler UiScheduler { get => _uiScheduler; }
+        public TaskScheduler UiScheduler
+        {
+            get => _uiScheduler;
+        }
 
         public void RemoveControlsColsRightOf(Control furthestRight)
         {
@@ -59,7 +78,6 @@ namespace QuickFiler
                 {
                     var columnsToRemove = tlp.ColumnCount - columnNumber;
                     tlp.RemoveSpecificColumn(columnNumber, columnsToRemove);
-
                 }
             }
             else
@@ -101,29 +119,25 @@ namespace QuickFiler
                 LblAcBody,
             };
 
-            _leftTipsLabels = new List<Label>
-            {
-                LblAcOpen,
-                LblAcBody,
-            };
+            _leftTipsLabels = new List<Label> { LblAcOpen, LblAcBody };
 
             //_rightControls = ControlsRightOf(this.LblConvCt);
 
-            _expandedTipsLabels = new List<Label>
-            {
-                LblAcBody,
-            };
+            _expandedTipsLabels = new List<Label> { LblAcBody };
         }
 
         private List<Control> ControlsRightOf(Control furthestRight)
         {
             var controlLocation = new List<(Control Control, Point Point)>();
-            this.ForAllControls(new Point(0, 0), (Control control, Point point) =>
-            {
-                var trueLocation = control.Location + new Size(point);
-                controlLocation.Add((control, trueLocation));
-                return trueLocation;
-            });
+            this.ForAllControls(
+                new Point(0, 0),
+                (Control control, Point point) =>
+                {
+                    var trueLocation = control.Location + new Size(point);
+                    controlLocation.Add((control, trueLocation));
+                    return trueLocation;
+                }
+            );
 
             Point limit;
             if (controlLocation.Any(tup => tup.Control == furthestRight))
@@ -135,7 +149,10 @@ namespace QuickFiler
             {
                 limit = furthestRight.Location + furthestRight.Size;
             }
-            return controlLocation.Where(tup => tup.Point.X > limit.X).Select(tup => tup.Control).ToList();
+            return controlLocation
+                .Where(tup => tup.Point.X > limit.X)
+                .Select(tup => tup.Control)
+                .ToList();
         }
 
         private void L0v2h2_WebView2_ParentChanged(object sender, EventArgs e)
@@ -162,4 +179,3 @@ namespace QuickFiler
         }
     }
 }
-

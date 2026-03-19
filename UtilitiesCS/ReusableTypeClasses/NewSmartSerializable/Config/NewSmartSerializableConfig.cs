@@ -1,11 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.IO;
-using UtilitiesCS.Extensions.Lazy;
-using UtilitiesCS.Extensions;
-using System.ComponentModel;
+﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
+using UtilitiesCS.Extensions;
+using UtilitiesCS.Extensions.Lazy;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
@@ -20,24 +20,46 @@ namespace UtilitiesCS.ReusableTypeClasses
         #region SerializationConfig
 
         protected FilePathHelper _disk = new FilePathHelper();
-        public FilePathHelper Disk { get => _disk; set => _disk = value; }
+        public FilePathHelper Disk
+        {
+            get => _disk;
+            set => _disk = value;
+        }
 
-        public FilePathHelper LocalDisk { get => _localDisk; set => _localDisk = value; }
+        public FilePathHelper LocalDisk
+        {
+            get => _localDisk;
+            set => _localDisk = value;
+        }
         private FilePathHelper _localDisk = new FilePathHelper();
 
-        public FilePathHelper NetDisk { get => _netDisk; set => _netDisk = value; }
+        public FilePathHelper NetDisk
+        {
+            get => _netDisk;
+            set => _netDisk = value;
+        }
         private FilePathHelper _netDisk = new();
 
         [JsonIgnore]
-        public DateTime NetworkDate => File.Exists(NetDisk.FilePath) ?
-            File.GetLastWriteTimeUtc(NetDisk.FilePath) : default;
+        public DateTime NetworkDate =>
+            File.Exists(NetDisk.FilePath) ? File.GetLastWriteTimeUtc(NetDisk.FilePath) : default;
 
         [JsonIgnore]
-        public DateTime LocalDate => File.Exists(LocalDisk.FilePath) ?
-            File.GetLastWriteTimeUtc(LocalDisk.FilePath) : default;
+        public DateTime LocalDate =>
+            File.Exists(LocalDisk.FilePath)
+                ? File.GetLastWriteTimeUtc(LocalDisk.FilePath)
+                : default;
 
         private bool _classifierActivated;
-        public bool ClassifierActivated { get => _classifierActivated; set { _classifierActivated = value; Notify(); } }
+        public bool ClassifierActivated
+        {
+            get => _classifierActivated;
+            set
+            {
+                _classifierActivated = value;
+                Notify();
+            }
+        }
 
         public void ResetLazy()
         {
@@ -49,7 +71,8 @@ namespace UtilitiesCS.ReusableTypeClasses
         public void ResetLazy(
             Lazy<JsonSerializerSettings> localJsonSettings,
             Lazy<JsonSerializerSettings> netJsonSettings,
-            Lazy<JsonSerializerSettings> jsonSettings)
+            Lazy<JsonSerializerSettings> jsonSettings
+        )
         {
             _localJsonSettings = localJsonSettings;
             _netJsonSettings = netJsonSettings;
@@ -57,18 +80,50 @@ namespace UtilitiesCS.ReusableTypeClasses
         }
 
         [JsonIgnore]
-        public JsonSerializerSettings JsonSettings { get => _jsonSettings.Value; set { _jsonSettings = value.ToLazy(); Notify(); } }
+        public JsonSerializerSettings JsonSettings
+        {
+            get => _jsonSettings.Value;
+            set
+            {
+                _jsonSettings = value.ToLazy();
+                Notify();
+            }
+        }
         protected Lazy<JsonSerializerSettings> _jsonSettings;
 
         [JsonIgnore]
-        public JsonSerializerSettings NetJsonSettings { get => _netJsonSettings.Value; set { _netJsonSettings = value.ToLazy(); Notify(); } }
+        public JsonSerializerSettings NetJsonSettings
+        {
+            get => _netJsonSettings.Value;
+            set
+            {
+                _netJsonSettings = value.ToLazy();
+                Notify();
+            }
+        }
         protected Lazy<JsonSerializerSettings> _netJsonSettings;
 
         [JsonIgnore]
-        public JsonSerializerSettings LocalJsonSettings { get => _localJsonSettings.Value; set { _localJsonSettings = value.ToLazy(); Notify(); } }
+        public JsonSerializerSettings LocalJsonSettings
+        {
+            get => _localJsonSettings.Value;
+            set
+            {
+                _localJsonSettings = value.ToLazy();
+                Notify();
+            }
+        }
         protected Lazy<JsonSerializerSettings> _localJsonSettings;
 
-        public ISmartSerializableConfig.ActiveDiskEnum ActiveDisk { get => _activeDisk; protected set { _activeDisk = value; Notify(); } }
+        public ISmartSerializableConfig.ActiveDiskEnum ActiveDisk
+        {
+            get => _activeDisk;
+            protected set
+            {
+                _activeDisk = value;
+                Notify();
+            }
+        }
         protected ISmartSerializableConfig.ActiveDiskEnum _activeDisk;
 
         public static JsonSerializerSettings GetDefaultSettings()
@@ -76,7 +131,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             return new JsonSerializerSettings()
             {
                 TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented
+                Formatting = Formatting.Indented,
             };
         }
 
@@ -127,14 +182,17 @@ namespace UtilitiesCS.ReusableTypeClasses
                 _netDisk = _netDisk.DeepCopy(),
                 _jsonSettings = JsonSettings.DeepCopy().ToLazy(),
                 _netJsonSettings = NetJsonSettings.DeepCopy().ToLazy(),
-                _localJsonSettings = LocalJsonSettings.DeepCopy().ToLazy()
+                _localJsonSettings = LocalJsonSettings.DeepCopy().ToLazy(),
             };
             return clone;
         }
 
         public void CopyFrom(ISmartSerializableConfig other, bool deep)
         {
-            if (deep) { other = other.DeepCopy(); }
+            if (deep)
+            {
+                other = other.DeepCopy();
+            }
 
             // Using private fields to avoid triggering events recursively
             _activeDisk = other.ActiveDisk;
@@ -174,8 +232,12 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
 
             changed.AddRange(Disk.CopyChanged(other.Disk).Select(x => $"{nameof(Disk)}.{x}"));
-            changed.AddRange(LocalDisk.CopyChanged(other.LocalDisk).Select(x => $"{nameof(LocalDisk)}.{x}"));
-            changed.AddRange(NetDisk.CopyChanged(other.NetDisk).Select(x => $"{nameof(NetDisk)}.{x}"));
+            changed.AddRange(
+                LocalDisk.CopyChanged(other.LocalDisk).Select(x => $"{nameof(LocalDisk)}.{x}")
+            );
+            changed.AddRange(
+                NetDisk.CopyChanged(other.NetDisk).Select(x => $"{nameof(NetDisk)}.{x}")
+            );
 
             if (JsonSettings != other.JsonSettings)
             {
@@ -196,15 +258,15 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
 
             return changed;
-
-
         }
 
         #endregion IClonable
 
         #region INotifyPropertyChanged
 
-        public void Notify([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+        public void Notify(
+            [System.Runtime.CompilerServices.CallerMemberName] string propertyName = ""
+        )
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -212,7 +274,5 @@ namespace UtilitiesCS.ReusableTypeClasses
         public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion INotifyPropertyChanged
-
-
     }
 }

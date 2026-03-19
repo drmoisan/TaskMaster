@@ -76,29 +76,55 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         public void QueryCombined_ShouldMergeDuplicateFolderScoresAndKeepTopResults()
         {
             var scorer = new FolderScorer();
-            var nestedType = typeof(FolderScorer).GetNestedType("FolderScoring", BindingFlags.NonPublic)
+            var nestedType =
+                typeof(FolderScorer).GetNestedType("FolderScoring", BindingFlags.NonPublic)
                 ?? throw new InvalidOperationException("FolderScoring type not found.");
-            var create = typeof(FolderScorerTests).GetMethod(nameof(CreateFolderScoring), BindingFlags.Static | BindingFlags.NonPublic)
-                ?? throw new InvalidOperationException("Factory method not found.");
-            var queryCombined = typeof(FolderScorer).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-                .SingleOrDefault(m =>
-                    m.Name == "QueryCombined" &&
-                    m.GetParameters().Length == 2 &&
-                    m.GetParameters()[0].ParameterType.IsGenericType &&
-                    m.GetParameters()[0].ParameterType.GetGenericTypeDefinition() == typeof(System.Collections.Generic.IEnumerable<>) &&
-                    m.GetParameters()[1].ParameterType.IsGenericType &&
-                    m.GetParameters()[1].ParameterType.GetGenericTypeDefinition() == typeof(System.Collections.Generic.IEnumerable<>))
+            var create =
+                typeof(FolderScorerTests).GetMethod(
+                    nameof(CreateFolderScoring),
+                    BindingFlags.Static | BindingFlags.NonPublic
+                ) ?? throw new InvalidOperationException("Factory method not found.");
+            var queryCombined =
+                typeof(FolderScorer)
+                    .GetMethods(
+                        BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+                    )
+                    .SingleOrDefault(m =>
+                        m.Name == "QueryCombined"
+                        && m.GetParameters().Length == 2
+                        && m.GetParameters()[0].ParameterType.IsGenericType
+                        && m.GetParameters()[0].ParameterType.GetGenericTypeDefinition()
+                            == typeof(System.Collections.Generic.IEnumerable<>)
+                        && m.GetParameters()[1].ParameterType.IsGenericType
+                        && m.GetParameters()[1].ParameterType.GetGenericTypeDefinition()
+                            == typeof(System.Collections.Generic.IEnumerable<>)
+                    )
                 ?? throw new InvalidOperationException("QueryCombined overload not found.");
 
             var subjectEntries = Array.CreateInstance(nestedType, 2);
-            subjectEntries.SetValue(create.Invoke(null, new object[] { nestedType, "Inbox\\Alpha", "Alpha", 8 }), 0);
-            subjectEntries.SetValue(create.Invoke(null, new object[] { nestedType, "Inbox\\Beta", "Beta", 5 }), 1);
+            subjectEntries.SetValue(
+                create.Invoke(null, new object[] { nestedType, "Inbox\\Alpha", "Alpha", 8 }),
+                0
+            );
+            subjectEntries.SetValue(
+                create.Invoke(null, new object[] { nestedType, "Inbox\\Beta", "Beta", 5 }),
+                1
+            );
 
             var folderEntries = Array.CreateInstance(nestedType, 2);
-            folderEntries.SetValue(create.Invoke(null, new object[] { nestedType, "Inbox\\Alpha", "Alpha", 4 }), 0);
-            folderEntries.SetValue(create.Invoke(null, new object[] { nestedType, "Inbox\\Gamma", "Gamma", 6 }), 1);
+            folderEntries.SetValue(
+                create.Invoke(null, new object[] { nestedType, "Inbox\\Alpha", "Alpha", 4 }),
+                0
+            );
+            folderEntries.SetValue(
+                create.Invoke(null, new object[] { nestedType, "Inbox\\Gamma", "Gamma", 6 }),
+                1
+            );
 
-            var result = ((IEnumerable)queryCombined.Invoke(scorer, new object[] { subjectEntries, folderEntries }))
+            var result = (
+                (IEnumerable)
+                    queryCombined.Invoke(scorer, new object[] { subjectEntries, folderEntries })
+            )
                 .Cast<object>()
                 .Select(entry => new
                 {
@@ -110,10 +136,18 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             result.Should().HaveCount(3);
             result[0].FolderPath.Should().Be("Inbox\\Alpha");
             result[0].Score.Should().Be(12);
-            result.Select(x => x.FolderPath).Should().Contain(new[] { "Inbox\\Beta", "Inbox\\Gamma" });
+            result
+                .Select(x => x.FolderPath)
+                .Should()
+                .Contain(new[] { "Inbox\\Beta", "Inbox\\Gamma" });
         }
 
-        private static object CreateFolderScoring(Type nestedType, string folderPath, string folderName, int score)
+        private static object CreateFolderScoring(
+            Type nestedType,
+            string folderPath,
+            string folderName,
+            int score
+        )
         {
             var instance = Activator.CreateInstance(nestedType);
             nestedType.GetField("FolderPath")!.SetValue(instance, folderPath);

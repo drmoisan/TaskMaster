@@ -1,9 +1,9 @@
+using System;
+using System.Globalization;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using System;
-using System.Globalization;
 using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.Test.Extensions
@@ -109,8 +109,11 @@ namespace UtilitiesCS.Test.Extensions
             // Assert
             serializerCopyAction.Should().Throw<NullReferenceException>();
             settingsCopyAction.Should().Throw<NullReferenceException>();
-            extractAction.Should().Throw<ArgumentNullException>()
-                .Which.ParamName.Should().Be("serializer");
+            extractAction
+                .Should()
+                .Throw<ArgumentNullException>()
+                .Which.ParamName.Should()
+                .Be("serializer");
         }
 
         private sealed class SamplePayload

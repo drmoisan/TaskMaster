@@ -1,12 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Resources;
-using System.Globalization;
-using System.Diagnostics;
+﻿using System;
 using System.Collections;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
+using System.Resources;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test
 {
@@ -19,24 +19,32 @@ namespace UtilitiesCS.Test
             Form1 frm = new Form1();
             frm.ShowDialog();
         }
+
         [TestMethod]
         public void TestMethod2()
         {
             Form2 frm = new Form2();
             frm.ShowDialog();
         }
+
         [TestMethod]
         public void TestMethod3()
         {
             //using (ResXResourceReader resxReader = new ResXResourceReader(Properties.Resources.ResourceManager)) { }
-            using ResourceSet rs = Properties.Resources.ResourceManager.GetResourceSet(CultureInfo.CurrentUICulture, true, true);
+            using ResourceSet rs = Properties.Resources.ResourceManager.GetResourceSet(
+                CultureInfo.CurrentUICulture,
+                true,
+                true
+            );
             {
                 // Create an IDictionaryEnumerator to read the data in the ResourceSet.
                 IDictionaryEnumerator id = rs.GetEnumerator();
 
-                var resrcs = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceNames();
+                var resrcs = System
+                    .Reflection.Assembly.GetExecutingAssembly()
+                    .GetManifestResourceNames();
                 var bdir = System.AppDomain.CurrentDomain.BaseDirectory;
-                // Iterate through the ResourceSet and display the contents to the console. 
+                // Iterate through the ResourceSet and display the contents to the console.
                 while (id.MoveNext())
                 {
                     Debug.WriteLine("\n[{0}] \t{1}", id.Key, id.Value);
@@ -46,17 +54,16 @@ namespace UtilitiesCS.Test
                     {
                         byte[] b = (byte[])id.Value;
                         MemoryStream ms = new MemoryStream(b);
-                        if (IsSvgFile(ms)) 
+                        if (IsSvgFile(ms))
                         {
                             msg = ($"Item {id.Key} is an SVG file");
                         }
                     }
-                    Debug.WriteLine(msg);                    
+                    Debug.WriteLine(msg);
                 }
-                
+
                 var rd = rs.GetDefaultReader();
             }
-            
 
             Debug.WriteLine("d");
             //Properties.Resources
@@ -85,7 +92,8 @@ namespace UtilitiesCS.Test
             {
                 using (var xmlReader = XmlReader.Create(fileStream))
                 {
-                    return xmlReader.MoveToContent() == XmlNodeType.Element && "svg".Equals(xmlReader.Name, StringComparison.OrdinalIgnoreCase);
+                    return xmlReader.MoveToContent() == XmlNodeType.Element
+                        && "svg".Equals(xmlReader.Name, StringComparison.OrdinalIgnoreCase);
                 }
             }
             catch
@@ -100,6 +108,5 @@ namespace UtilitiesCS.Test
             Form2 frm = new Form2();
             frm.ShowDialog();
         }
-
     }
 }

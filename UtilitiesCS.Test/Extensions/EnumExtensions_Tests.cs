@@ -1,7 +1,7 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS;
 
 namespace UtilitiesCS.Test.Extensions
@@ -47,8 +47,14 @@ namespace UtilitiesCS.Test.Extensions
 
             // Act / Assert
             combined.HasAllFlags(SampleFlags.First, SampleFlags.Third).Should().BeTrue();
-            combined.HasAllFlags(SampleFlags.First, SampleFlags.Second, SampleFlags.Third).Should().BeTrue();
-            combined.HasAllFlags(SampleFlags.First, SampleFlags.Second, (SampleFlags)8).Should().BeFalse();
+            combined
+                .HasAllFlags(SampleFlags.First, SampleFlags.Second, SampleFlags.Third)
+                .Should()
+                .BeTrue();
+            combined
+                .HasAllFlags(SampleFlags.First, SampleFlags.Second, (SampleFlags)8)
+                .Should()
+                .BeFalse();
             combined.HasAllFlags().Should().BeFalse();
             combined.HasAllFlags(noFlags).Should().BeFalse();
         }
@@ -57,7 +63,12 @@ namespace UtilitiesCS.Test.Extensions
         public void AddFlagsAndToCombined_CombineEnumeratedFlagsIntoSingleValue()
         {
             // Arrange
-            IEnumerable<SampleFlags> values = new[] { SampleFlags.First, SampleFlags.Second, SampleFlags.Third };
+            IEnumerable<SampleFlags> values = new[]
+            {
+                SampleFlags.First,
+                SampleFlags.Second,
+                SampleFlags.Third,
+            };
 
             // Act
             var addFlagsResult = values.AddFlags();
@@ -76,7 +87,9 @@ namespace UtilitiesCS.Test.Extensions
 
             // Act
             var simulated = values.ToArray(Base1Simulation: true);
-            var regular = new List<BaseOneItem> { BaseOneItem.Value }.ToArray(Base1Simulation: false);
+            var regular = new List<BaseOneItem> { BaseOneItem.Value }.ToArray(
+                Base1Simulation: false
+            );
 
             // Assert
             simulated.Should().Equal(BaseOneItem.Default, BaseOneItem.Value);

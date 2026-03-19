@@ -1,10 +1,10 @@
 using System;
-using ToDoModel;
-using System.Threading.Tasks;
-using System.Threading;
-using UtilitiesCS;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using QuickFiler.Controllers;
+using ToDoModel;
+using UtilitiesCS;
 
 namespace QuickFiler.Interfaces
 {
@@ -25,6 +25,7 @@ namespace QuickFiler.Interfaces
         CancellationToken Token { get; }
         bool Loaded { get; }
         Stopwatch StopWatch { get; }
+
         //IQfcDatamodel DataModel { get; }
         IQfcExplorerController ExplorerController { get; set; }
         IFilerFormController FormController { get; }

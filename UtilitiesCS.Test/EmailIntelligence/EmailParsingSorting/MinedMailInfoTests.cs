@@ -1,10 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using UtilitiesCS.EmailIntelligence.Bayesian;
-using Microsoft.Office.Interop.Outlook;
+﻿using System;
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Newtonsoft.Json;
-using System;
+using UtilitiesCS.EmailIntelligence.Bayesian;
 
 namespace UtilitiesCS.Test.EmailIntelligence
 {
@@ -30,14 +30,22 @@ namespace UtilitiesCS.Test.EmailIntelligence
             this.mockRepository = new MockRepository(MockBehavior.Strict);
             this.mockFolder = this.CreateMockFolder("FolderL1\\FolderL2\\FolderL3\\FolderName");
             this.mockFolderRoot = this.CreateMockFolder("FolderL1");
-            this.mockOlFolderInfo = this.CreateMockOlFolderInfo(this.mockFolder.Object, this.mockFolderRoot.Object);
+            this.mockOlFolderInfo = this.CreateMockOlFolderInfo(
+                this.mockFolder.Object,
+                this.mockFolderRoot.Object
+            );
             this.categories = "Category1, Category2, Category3";
             this.tokens = ["Token1", "Token2", "Token3"];
             this.conversationId = "1A2B3C4DMockConversationId5E6F7G";
             this.mockSender = this.CreateMockRecipientInfo("sender", "sender@domain.com");
             (this.ccRecipients, this.toRecipients) = this.CreateMockRecipients();
-            this.mockIItemInfo = CreateMockIItemInfo(this.mockOlFolderInfo.Object, this.mockSender.Object,
-                this.ccRecipients, this.toRecipients, this.conversationId);
+            this.mockIItemInfo = CreateMockIItemInfo(
+                this.mockOlFolderInfo.Object,
+                this.mockSender.Object,
+                this.ccRecipients,
+                this.toRecipients,
+                this.conversationId
+            );
         }
 
         private (RecipientInfo[] ccRecipients, RecipientInfo[] toRecipients) CreateMockRecipients()
@@ -86,7 +94,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
             item.Setup(x => x.Name).Returns(folder.Name);
             item.Setup(x => x.OlRoot).Returns(folderRoot);
             var relativePath = folder.FolderPath.Replace(folderRoot.FolderPath, "");
-            while (relativePath.StartsWith("\\")) { relativePath = relativePath.Substring(1); }
+            while (relativePath.StartsWith("\\"))
+            {
+                relativePath = relativePath.Substring(1);
+            }
             item.Setup(x => x.RelativePath).Returns(relativePath);
             item.Setup(x => x.Selected).Returns(true);
             item.Setup(x => x.SubscriptionStatus).Returns(IFolderWrapper.PropertyEnum.All);
@@ -94,8 +105,12 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         private Mock<IItemInfo> CreateMockIItemInfo(
-            IFolderWrapper folderInfo, RecipientInfo sender, RecipientInfo[] ccRecipients,
-            RecipientInfo[] toRecipients, string conversationId)
+            IFolderWrapper folderInfo,
+            RecipientInfo sender,
+            RecipientInfo[] ccRecipients,
+            RecipientInfo[] toRecipients,
+            string conversationId
+        )
         {
             var itemInfo = this.mockRepository.Create<IItemInfo>();
             itemInfo.SetupAllProperties();

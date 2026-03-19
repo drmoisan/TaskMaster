@@ -1,11 +1,11 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿using System;
+using System.Collections.Generic;
+using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS;
-using System;
-using System.Collections.Generic;
 using UtilitiesCS.OutlookExtensions;
-using FluentAssertions;
 
 namespace UtilitiesCS.Test
 {
@@ -24,12 +24,14 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.Parent).Returns(mockFolder.Object);
             Dictionary<OlItemSummary.Details, string> target = new()
             {
-                {OlItemSummary.Details.Type, typeof(AppointmentItem).ToString() },
-                {OlItemSummary.Details.Subject, "TestSubjectString" },
-                {OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
-                {OlItemSummary.Details.Folderpath, @"\\Test\Path" }
+                { OlItemSummary.Details.Type, typeof(AppointmentItem).ToString() },
+                { OlItemSummary.Details.Subject, "TestSubjectString" },
+                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
+                { OlItemSummary.Details.Folderpath, @"\\Test\Path" },
             };
-            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(
+                item.Object
+            );
             //Assert.IsTrue(test.ContentEquals(target));
             test.Should().BeEquivalentTo(target);
         }
@@ -45,12 +47,14 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.Parent).Returns(mockFolder.Object);
             Dictionary<OlItemSummary.Details, string> target = new()
             {
-                {OlItemSummary.Details.Type, typeof(MeetingItem).ToString() },
-                {OlItemSummary.Details.Subject, "TestSubjectString" },
-                {OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
-                {OlItemSummary.Details.Folderpath, @"\\Test\Path" }
+                { OlItemSummary.Details.Type, typeof(MeetingItem).ToString() },
+                { OlItemSummary.Details.Subject, "TestSubjectString" },
+                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
+                { OlItemSummary.Details.Folderpath, @"\\Test\Path" },
             };
-            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(
+                item.Object
+            );
             test.Should().BeEquivalentTo(target);
         }
 
@@ -65,12 +69,14 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.Parent).Returns(mockFolder.Object);
             Dictionary<OlItemSummary.Details, string> target = new()
             {
-                {OlItemSummary.Details.Type, typeof(TaskRequestItem).ToString() },
-                {OlItemSummary.Details.Subject, "TestSubjectString" },
-                {OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
-                {OlItemSummary.Details.Folderpath, @"\\Test\Path" }
+                { OlItemSummary.Details.Type, typeof(TaskRequestItem).ToString() },
+                { OlItemSummary.Details.Subject, "TestSubjectString" },
+                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
+                { OlItemSummary.Details.Folderpath, @"\\Test\Path" },
             };
-            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(
+                item.Object
+            );
             test.Should().BeEquivalentTo(target);
         }
 
@@ -79,18 +85,21 @@ namespace UtilitiesCS.Test
         {
             Mock<TaskRequestUpdateItem> item = new Mock<TaskRequestUpdateItem>();
             item.SetupGet(x => x.Subject).Returns("TestSubjectString");
-            item.SetupGet(x => x.LastModificationTime).Returns(new DateTime(2025, 12, 25, 12, 5, 3));
+            item.SetupGet(x => x.LastModificationTime)
+                .Returns(new DateTime(2025, 12, 25, 12, 5, 3));
             Mock<Folder> mockFolder = new Mock<Folder>();
             mockFolder.SetupGet(x => x.FolderPath).Returns(@"\\Test\Path");
             item.SetupGet(x => x.Parent).Returns(mockFolder.Object);
             Dictionary<OlItemSummary.Details, string> target = new()
             {
-                {OlItemSummary.Details.Type, typeof(TaskRequestUpdateItem).ToString() },
-                {OlItemSummary.Details.Subject, "TestSubjectString" },
-                {OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
-                {OlItemSummary.Details.Folderpath, @"\\Test\Path" }
+                { OlItemSummary.Details.Type, typeof(TaskRequestUpdateItem).ToString() },
+                { OlItemSummary.Details.Subject, "TestSubjectString" },
+                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
+                { OlItemSummary.Details.Folderpath, @"\\Test\Path" },
             };
-            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(
+                item.Object
+            );
             test.Should().BeEquivalentTo(target);
         }
 
@@ -106,12 +115,14 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.Parent).Returns(mockFolder.Object);
             Dictionary<OlItemSummary.Details, string> target = new()
             {
-                {OlItemSummary.Details.Type, typeof(MailItem).ToString() },
-                {OlItemSummary.Details.Subject, "TestSubjectString" },
-                {OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
-                {OlItemSummary.Details.Folderpath, @"\\Test\Path" }
+                { OlItemSummary.Details.Type, typeof(MailItem).ToString() },
+                { OlItemSummary.Details.Subject, "TestSubjectString" },
+                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
+                { OlItemSummary.Details.Folderpath, @"\\Test\Path" },
             };
-            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(
+                item.Object
+            );
             //Assert.IsTrue(test.ContentEquals(target));
             test.Should().BeEquivalentTo(target);
         }
@@ -124,10 +135,12 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.MessageClass).Returns("IPM.Note.Secure");
             Dictionary<OlItemSummary.Details, string> target = new()
             {
-                {OlItemSummary.Details.Type, typeof(MailItem).ToString() },
-                {OlItemSummary.Details.Subject, "IPM.Note.Secure" }
+                { OlItemSummary.Details.Type, typeof(MailItem).ToString() },
+                { OlItemSummary.Details.Subject, "IPM.Note.Secure" },
             };
-            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(
+                item.Object
+            );
             Assert.IsTrue(test.ContentEquals(target));
         }
 
@@ -142,8 +155,9 @@ namespace UtilitiesCS.Test
                 {
                     OlItemSummary.Details.Type,
                     OlItemSummary.Details.Subject,
-                    OlItemSummary.Details.Date
-                });
+                    OlItemSummary.Details.Date,
+                }
+            );
             string test = OlItemSummary.Extract(item.Object, options);
             string target = "Details.Type: Castle.Proxies.TaskItemProxy";
             Assert.AreEqual(target, test);
@@ -154,11 +168,12 @@ namespace UtilitiesCS.Test
         {
             Dictionary<OlItemSummary.Details, string> testDict = new()
             {
-                {OlItemSummary.Details.Type, typeof(MailItem).ToString() },
-                {OlItemSummary.Details.Subject, "TestSubjectString" },
-                {OlItemSummary.Details.Date, "12-25-2025 12:05 PM" }
+                { OlItemSummary.Details.Type, typeof(MailItem).ToString() },
+                { OlItemSummary.Details.Subject, "TestSubjectString" },
+                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
             };
-            string target = "Type: Microsoft.Office.Interop.Outlook.MailItem, Subject: TestSubjectString, Date: 12-25-2025 12:05 PM";
+            string target =
+                "Type: Microsoft.Office.Interop.Outlook.MailItem, Subject: TestSubjectString, Date: 12-25-2025 12:05 PM";
             string test = testDict.ToString(OlItemSummary.Details.All);
             Assert.AreEqual(target, test);
         }
@@ -168,16 +183,17 @@ namespace UtilitiesCS.Test
         {
             Dictionary<OlItemSummary.Details, string> testDict = new()
             {
-                {OlItemSummary.Details.Type, typeof(MailItem).ToString() },
-                {OlItemSummary.Details.Subject, "TestSubjectString" },
-                {OlItemSummary.Details.Date, "12-25-2025 12:05 PM" }
+                { OlItemSummary.Details.Type, typeof(MailItem).ToString() },
+                { OlItemSummary.Details.Subject, "TestSubjectString" },
+                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
             };
             OlItemSummary.Details options = GenericBitwiseStatic<OlItemSummary.Details>.Or(
                 new List<OlItemSummary.Details>
                 {
                     OlItemSummary.Details.Subject,
-                    OlItemSummary.Details.Date
-                });
+                    OlItemSummary.Details.Date,
+                }
+            );
             string target = "Subject: TestSubjectString, Date: 12-25-2025 12:05 PM";
             string test = testDict.ToString(options);
             Assert.AreEqual(target, test);
@@ -193,7 +209,8 @@ namespace UtilitiesCS.Test
             Mock<Folder> mockFolder = new Mock<Folder>();
             mockFolder.SetupGet(x => x.FolderPath).Returns(@"\\Test\Path");
             item.SetupGet(x => x.Parent).Returns(mockFolder.Object);
-            string target = "Type: Microsoft.Office.Interop.Outlook.MailItem, Subject: TestSubjectString, Date: 12-25-2025 12:05 PM";
+            string target =
+                "Type: Microsoft.Office.Interop.Outlook.MailItem, Subject: TestSubjectString, Date: 12-25-2025 12:05 PM";
             string test = OlItemSummary.Extract(item.Object, OlItemSummary.Details.All);
             Console.WriteLine($"Target: {target}");
             Console.WriteLine($"Test: {test}");
@@ -215,8 +232,9 @@ namespace UtilitiesCS.Test
                 new List<OlItemSummary.Details>
                 {
                     OlItemSummary.Details.Subject,
-                    OlItemSummary.Details.Date
-                });
+                    OlItemSummary.Details.Date,
+                }
+            );
             string test = OlItemSummary.Extract(item.Object, options);
             Assert.AreEqual(target, test);
         }

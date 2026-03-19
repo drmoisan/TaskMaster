@@ -17,7 +17,8 @@ namespace UtilitiesCS.OutlookObjects.Store
             JunkPotential.Click += JunkPotential_Click;
         }
 
-        public StoreWrapperViewer(StoreWrapperController controller) : this()
+        public StoreWrapperViewer(StoreWrapperController controller)
+            : this()
         {
             Controller = controller;
         }
@@ -65,16 +66,56 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         #region Make testable
 
-        public Label JunkEmail { get => _junkEmail; set => _junkEmail = value; }
-        public Label JunkPotential { get => _junkPotential; set => _junkPotential = value; }
-        public Label ArchiveFS { get => _archiveFS; set => _archiveFS = value; }
-        public Label ArchiveOutlook { get => _archiveOutlook; set => _archiveOutlook = value; }
-        public Label UserEmail { get => _userEmail; set => _userEmail = value; }
-        public Label RootFolder { get => _rootFolder; set => _rootFolder = value; }
-        public Label Inbox { get => _inbox; set => _inbox = value; }
-        public Button ButtonOk { get => _buttonOk; set => _buttonOk = value; }
-        public Button ButtonCancel { get => _buttonCancel; set => _buttonCancel = value; }
-        public ComboBox DisplayName { get => _displayName; set => _displayName = value; }
+        public Label JunkEmail
+        {
+            get => _junkEmail;
+            set => _junkEmail = value;
+        }
+        public Label JunkPotential
+        {
+            get => _junkPotential;
+            set => _junkPotential = value;
+        }
+        public Label ArchiveFS
+        {
+            get => _archiveFS;
+            set => _archiveFS = value;
+        }
+        public Label ArchiveOutlook
+        {
+            get => _archiveOutlook;
+            set => _archiveOutlook = value;
+        }
+        public Label UserEmail
+        {
+            get => _userEmail;
+            set => _userEmail = value;
+        }
+        public Label RootFolder
+        {
+            get => _rootFolder;
+            set => _rootFolder = value;
+        }
+        public Label Inbox
+        {
+            get => _inbox;
+            set => _inbox = value;
+        }
+        public Button ButtonOk
+        {
+            get => _buttonOk;
+            set => _buttonOk = value;
+        }
+        public Button ButtonCancel
+        {
+            get => _buttonCancel;
+            set => _buttonCancel = value;
+        }
+        public ComboBox DisplayName
+        {
+            get => _displayName;
+            set => _displayName = value;
+        }
 
         #endregion Make testable
     }

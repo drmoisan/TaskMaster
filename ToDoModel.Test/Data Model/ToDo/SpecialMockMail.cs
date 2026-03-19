@@ -1,10 +1,10 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 
 namespace ToDoModel.Test.Data_Model.ToDo
 {
@@ -40,7 +40,8 @@ namespace ToDoModel.Test.Data_Model.ToDo
             throw new NotImplementedException();
         }
 
-        public ConcurrentDictionary<string, int> CallDictionary { get; set; } = new ConcurrentDictionary<string, int>();
+        public ConcurrentDictionary<string, int> CallDictionary { get; set; } =
+            new ConcurrentDictionary<string, int>();
 
         public void Save()
         {
@@ -261,93 +262,142 @@ namespace ToDoModel.Test.Data_Model.ToDo
 
         public DateTime RetentionExpirationDate { get; set; }
 
-        public event ItemEvents_10_OpenEventHandler Open { add { } remove { } }
-        public event ItemEvents_10_CustomActionEventHandler CustomAction { add { } remove { } }
-        public event ItemEvents_10_CustomPropertyChangeEventHandler CustomPropertyChange { add { } remove { } }
+        public event ItemEvents_10_OpenEventHandler Open
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_CustomActionEventHandler CustomAction
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_CustomPropertyChangeEventHandler CustomPropertyChange
+        {
+            add { }
+            remove { }
+        }
 
         event ItemEvents_10_ForwardEventHandler ItemEvents_10_Event.Forward
         {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
+            add { throw new NotImplementedException(); }
+            remove { throw new NotImplementedException(); }
         }
 
         event ItemEvents_10_CloseEventHandler ItemEvents_10_Event.Close
         {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
+            add { throw new NotImplementedException(); }
+            remove { throw new NotImplementedException(); }
         }
 
-        public event ItemEvents_10_PropertyChangeEventHandler PropertyChange { add { } remove { } }
-        public event ItemEvents_10_ReadEventHandler Read { add { } remove { } }
+        public event ItemEvents_10_PropertyChangeEventHandler PropertyChange
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_ReadEventHandler Read
+        {
+            add { }
+            remove { }
+        }
 
         event ItemEvents_10_ReplyEventHandler ItemEvents_10_Event.Reply
         {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
+            add { throw new NotImplementedException(); }
+            remove { throw new NotImplementedException(); }
         }
 
         event ItemEvents_10_ReplyAllEventHandler ItemEvents_10_Event.ReplyAll
         {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
+            add { throw new NotImplementedException(); }
+            remove { throw new NotImplementedException(); }
         }
 
         event ItemEvents_10_SendEventHandler ItemEvents_10_Event.Send
         {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
+            add { throw new NotImplementedException(); }
+            remove { throw new NotImplementedException(); }
         }
 
-        public event ItemEvents_10_WriteEventHandler Write { add { } remove { } }
-        public event ItemEvents_10_BeforeCheckNamesEventHandler BeforeCheckNames { add { } remove { } }
-        public event ItemEvents_10_AttachmentAddEventHandler AttachmentAdd { add { } remove { } }
-        public event ItemEvents_10_AttachmentReadEventHandler AttachmentRead { add { } remove { } }
-        public event ItemEvents_10_BeforeAttachmentSaveEventHandler BeforeAttachmentSave { add { } remove { } }
-        public event ItemEvents_10_BeforeDeleteEventHandler BeforeDelete { add { } remove { } }
-        public event ItemEvents_10_AttachmentRemoveEventHandler AttachmentRemove { add { } remove { } }
-        public event ItemEvents_10_BeforeAttachmentAddEventHandler BeforeAttachmentAdd { add { } remove { } }
-        public event ItemEvents_10_BeforeAttachmentPreviewEventHandler BeforeAttachmentPreview { add { } remove { } }
-        public event ItemEvents_10_BeforeAttachmentReadEventHandler BeforeAttachmentRead { add { } remove { } }
-        public event ItemEvents_10_BeforeAttachmentWriteToTempFileEventHandler BeforeAttachmentWriteToTempFile { add { } remove { } }
-        public event ItemEvents_10_UnloadEventHandler Unload { add { } remove { } }
-        public event ItemEvents_10_BeforeAutoSaveEventHandler BeforeAutoSave { add { } remove { } }
-        public event ItemEvents_10_BeforeReadEventHandler BeforeRead { add { } remove { } }
-        public event ItemEvents_10_AfterWriteEventHandler AfterWrite { add { } remove { } }
-        public event ItemEvents_10_ReadCompleteEventHandler ReadComplete { add { } remove { } }
+        public event ItemEvents_10_WriteEventHandler Write
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_BeforeCheckNamesEventHandler BeforeCheckNames
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_AttachmentAddEventHandler AttachmentAdd
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_AttachmentReadEventHandler AttachmentRead
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_BeforeAttachmentSaveEventHandler BeforeAttachmentSave
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_BeforeDeleteEventHandler BeforeDelete
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_AttachmentRemoveEventHandler AttachmentRemove
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_BeforeAttachmentAddEventHandler BeforeAttachmentAdd
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_BeforeAttachmentPreviewEventHandler BeforeAttachmentPreview
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_BeforeAttachmentReadEventHandler BeforeAttachmentRead
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_BeforeAttachmentWriteToTempFileEventHandler BeforeAttachmentWriteToTempFile
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_UnloadEventHandler Unload
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_BeforeAutoSaveEventHandler BeforeAutoSave
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_BeforeReadEventHandler BeforeRead
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_AfterWriteEventHandler AfterWrite
+        {
+            add { }
+            remove { }
+        }
+        public event ItemEvents_10_ReadCompleteEventHandler ReadComplete
+        {
+            add { }
+            remove { }
+        }
     }
 }

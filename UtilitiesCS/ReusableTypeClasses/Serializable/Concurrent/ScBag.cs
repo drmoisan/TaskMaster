@@ -1,6 +1,4 @@
-﻿using log4net.Repository.Hierarchy;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
+using log4net.Repository.Hierarchy;
+using Newtonsoft.Json;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
 
@@ -18,12 +18,16 @@ namespace UtilitiesCS.ReusableTypeClasses
     public class ScBag<T> : ConcurrentBag<T>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors
 
-        public ScBag() : base() { }
-        public ScBag(IEnumerable<T> collection) : base(collection) { }
+        public ScBag()
+            : base() { }
+
+        public ScBag(IEnumerable<T> collection)
+            : base(collection) { }
 
         #endregion Constructors
 
@@ -40,11 +44,16 @@ namespace UtilitiesCS.ReusableTypeClasses
             else
             {
                 throw new ArgumentNullException(
-                "Must have a collection or create one to continue executing");
+                    "Must have a collection or create one to continue executing"
+                );
             }
         }
 
-        protected static ScBag<T> CreateEmpty(DialogResult response, FilePathHelper disk, JsonSerializerSettings settings)
+        protected static ScBag<T> CreateEmpty(
+            DialogResult response,
+            FilePathHelper disk,
+            JsonSerializerSettings settings
+        )
         {
             if (response == DialogResult.Yes)
             {
@@ -56,7 +65,8 @@ namespace UtilitiesCS.ReusableTypeClasses
             else
             {
                 throw new ArgumentNullException(
-                "Must have a collection or create one to continue executing");
+                    "Must have a collection or create one to continue executing"
+                );
             }
         }
 
@@ -68,8 +78,9 @@ namespace UtilitiesCS.ReusableTypeClasses
                 response = MessageBox.Show(
                     messageText,
                     "Error",
-                MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Error);
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Error
+                );
             }
             else
             {
@@ -90,13 +101,22 @@ namespace UtilitiesCS.ReusableTypeClasses
             return Deserialize(disk, askUserOnError, settings);
         }
 
-        public static ScBag<T> Deserialize(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings)
+        public static ScBag<T> Deserialize(
+            string fileName,
+            string folderPath,
+            bool askUserOnError,
+            JsonSerializerSettings settings
+        )
         {
             var disk = new FilePathHelper(fileName, folderPath);
             return Deserialize(disk, askUserOnError, settings);
         }
 
-        internal static ScBag<T> Deserialize(FilePathHelper disk, bool askUserOnError, JsonSerializerSettings settings)
+        internal static ScBag<T> Deserialize(
+            FilePathHelper disk,
+            bool askUserOnError,
+            JsonSerializerSettings settings
+        )
         {
             bool writeBag = false;
             ScBag<T> bag;
@@ -109,23 +129,26 @@ namespace UtilitiesCS.ReusableTypeClasses
                 {
                     throw new InvalidOperationException($"{disk.FilePath} deserialized to null.");
                 }
-
             }
             catch (FileNotFoundException e)
             {
                 logger.Error(e.Message);
-                response = AskUser(askUserOnError,
-                    $"{disk.FilePath} not found. Need a collection to " +
-                    $"continue. Create a new collection or abort execution?");
+                response = AskUser(
+                    askUserOnError,
+                    $"{disk.FilePath} not found. Need a collection to "
+                        + $"continue. Create a new collection or abort execution?"
+                );
                 bag = CreateEmpty(response, disk, settings);
                 writeBag = true;
             }
             catch (System.Exception e)
             {
                 logger.Error($"Error! {e.Message}");
-                response = AskUser(askUserOnError,
-                    $"{disk.FilePath} encountered a problem. \n{e.Message}\n" +
-                    $"Need a collection to continue. Create a new collection or abort execution?");
+                response = AskUser(
+                    askUserOnError,
+                    $"{disk.FilePath} encountered a problem. \n{e.Message}\n"
+                        + $"Need a collection to continue. Create a new collection or abort execution?"
+                );
                 bag = CreateEmpty(response, disk, settings);
                 writeBag = true;
             }
@@ -138,10 +161,15 @@ namespace UtilitiesCS.ReusableTypeClasses
             return bag;
         }
 
-        protected static ScBag<T> DeserializeJson(FilePathHelper disk, JsonSerializerSettings settings)
+        protected static ScBag<T> DeserializeJson(
+            FilePathHelper disk,
+            JsonSerializerSettings settings
+        )
         {
             var collection = JsonConvert.DeserializeObject<ScBag<T>>(
-                File.ReadAllText(disk.FilePath), settings);
+                File.ReadAllText(disk.FilePath),
+                settings
+            );
             collection.JsonSettings = settings;
             return collection;
         }
@@ -158,16 +186,36 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         protected FilePathHelper _disk = new();
 
-        public string FilePath { get => _disk.FilePath; set => _disk.FilePath = value; }
+        public string FilePath
+        {
+            get => _disk.FilePath;
+            set => _disk.FilePath = value;
+        }
 
-        public string FolderPath { get => _disk.FolderPath; set => _disk.FolderPath = value; }
+        public string FolderPath
+        {
+            get => _disk.FolderPath;
+            set => _disk.FolderPath = value;
+        }
 
-        public string FileName { get => _disk.FileName; set => _disk.FileName = value; }
+        public string FileName
+        {
+            get => _disk.FileName;
+            set => _disk.FileName = value;
+        }
 
-        public FilePathHelper LocalDisk { get => _localDisk; set => _localDisk = value; }
+        public FilePathHelper LocalDisk
+        {
+            get => _localDisk;
+            set => _localDisk = value;
+        }
         private FilePathHelper _localDisk = new();
 
-        public FilePathHelper NetDisk { get => _netDisk; set => _netDisk = value; }
+        public FilePathHelper NetDisk
+        {
+            get => _netDisk;
+            set => _netDisk = value;
+        }
         private FilePathHelper _netDisk = new();
 
         public void ActivateLocalDisk()
@@ -199,15 +247,27 @@ namespace UtilitiesCS.ReusableTypeClasses
         protected static ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
 
         [JsonIgnore]
-        public JsonSerializerSettings JsonSettings { get => _jsonSettings; set => _jsonSettings = value; }
+        public JsonSerializerSettings JsonSettings
+        {
+            get => _jsonSettings;
+            set => _jsonSettings = value;
+        }
         private JsonSerializerSettings _jsonSettings = GetDefaultSettings();
 
         [JsonIgnore]
-        public JsonSerializerSettings NetJsonSettings { get => _netJsonSettings; set => _netJsonSettings = value; }
+        public JsonSerializerSettings NetJsonSettings
+        {
+            get => _netJsonSettings;
+            set => _netJsonSettings = value;
+        }
         private JsonSerializerSettings _netJsonSettings;
 
         [JsonIgnore]
-        public JsonSerializerSettings LocalJsonSettings { get => _localJsonSettings; set => _localJsonSettings = value; }
+        public JsonSerializerSettings LocalJsonSettings
+        {
+            get => _localJsonSettings;
+            set => _localJsonSettings = value;
+        }
         private JsonSerializerSettings _localJsonSettings;
 
         public static JsonSerializerSettings GetDefaultSettings()
@@ -215,7 +275,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             return new JsonSerializerSettings()
             {
                 TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented
+                Formatting = Formatting.Indented,
             };
         }
 
@@ -248,6 +308,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         private ThreadSafeSingleShotGuard _serializationRequested = new();
         private TimerWrapper _timer;
+
         protected void RequestSerialization(string filePath)
         {
             if (_serializationRequested.CheckAndSetFirstCall)
@@ -260,6 +321,5 @@ namespace UtilitiesCS.ReusableTypeClasses
         }
 
         #endregion Serialization
-
     }
 }

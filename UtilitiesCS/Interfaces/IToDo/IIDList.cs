@@ -1,6 +1,6 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {

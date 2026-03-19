@@ -1,5 +1,4 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -7,25 +6,31 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
-
     public static class EmailDetails
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         private const int _numberOfFields = 13;
 
-        private const string PR_SMTP_ADDRESS = "http://schemas.microsoft.com/mapi/proptag/0x39FE001E";
+        private const string PR_SMTP_ADDRESS =
+            "http://schemas.microsoft.com/mapi/proptag/0x39FE001E";
 
         #region Public Methods and Extensions
 
-        public static string[] Details(this MailItem OlMail, string emailRootFolder, IScoDictionary<string, string> dictRemap = null)
+        public static string[] Details(
+            this MailItem OlMail,
+            string emailRootFolder,
+            IScoDictionary<string, string> dictRemap = null
+        )
         {
             string[] strAry;
 
@@ -45,18 +50,26 @@ namespace UtilitiesCS
             strAry[7] = OlMail.Subject;
             strAry[8] = OlMail.Body;
             int idx = strAry[4]?.LastIndexOf("@") ?? -1;
-            if (idx > -1) { strAry[9] = strAry[4].Substring(idx); }
-            else { strAry[9] = strAry[4]; }
+            if (idx > -1)
+            {
+                strAry[9] = strAry[4].Substring(idx);
+            }
+            else
+            {
+                strAry[9] = strAry[4];
+            }
             strAry[10] = OlMail.ConversationID;
             strAry[11] = OlMail.EntryID;
             strAry[12] = GetAttachmentNames(OlMail);
             strAry[13] = GetActionTaken(OlMail);
 
             return strAry;
-
         }
 
-        public static string[] Details(this MailItemHelper helper, IScoDictionary<string, string> dictRemap = null)
+        public static string[] Details(
+            this MailItemHelper helper,
+            IScoDictionary<string, string> dictRemap = null
+        )
         {
             string[] strAry;
 
@@ -66,7 +79,10 @@ namespace UtilitiesCS
             // "http://schemas.microsoft.com/mapi/proptag/0x39FE001E"
 
             strAry[1] = helper.Triage;
-            if (dictRemap is not null && dictRemap.TryGetValue(helper.FolderInfo.RelativePath, out string folderPath))
+            if (
+                dictRemap is not null
+                && dictRemap.TryGetValue(helper.FolderInfo.RelativePath, out string folderPath)
+            )
             {
                 strAry[2] = folderPath;
             }
@@ -83,8 +99,14 @@ namespace UtilitiesCS
             strAry[7] = helper.Subject;
             strAry[8] = helper.Body;
             int idx = strAry[4]?.LastIndexOf("@") ?? -1;
-            if (idx > -1) { strAry[9] = strAry[4].Substring(idx); }
-            else { strAry[9] = strAry[4]; }
+            if (idx > -1)
+            {
+                strAry[9] = strAry[4].Substring(idx);
+            }
+            else
+            {
+                strAry[9] = strAry[4];
+            }
             strAry[10] = helper.ConversationID;
             strAry[11] = helper.EntryId;
             strAry[12] = string.Join("; ", helper.AttachmentsInfo.Select(x => x.FileName));
@@ -98,10 +120,7 @@ namespace UtilitiesCS
             }
 
             return strAry;
-
         }
-
-
 
         public static string GetActionTaken(this MailItem OlMail)
         {
@@ -109,7 +128,8 @@ namespace UtilitiesCS
             const int Last_Verb_Reply_All = 103;
             const int Last_Verb_Reply_Sender = 102;
             const int Last_Verb_Reply_Forward = 104;
-            const string PR_LAST_VERB_EXECUTED = "http://schemas.microsoft.com/mapi/proptag/0x10810003";
+            const string PR_LAST_VERB_EXECUTED =
+                "http://schemas.microsoft.com/mapi/proptag/0x10810003";
             string action;
 
             if (OlMail.IsMarkedAsTask == true)
@@ -135,16 +155,16 @@ namespace UtilitiesCS
                     case Last_Verb_Reply_All:
                     case Last_Verb_Reply_Sender:
                     case Last_Verb_Reply_Forward:
-                        {
-                            action = "Acted";
-                            break;
-                        }
+                    {
+                        action = "Acted";
+                        break;
+                    }
 
                     default:
-                        {
-                            action = "None";
-                            break;
-                        }
+                    {
+                        action = "None";
+                        break;
+                    }
                 }
             }
 
@@ -237,7 +257,7 @@ namespace UtilitiesCS
         //        var address = olMail.GetSenderAddress();
         //        var html = ConvertRecipientToHtml(name, address);
         //        return new RecipientInfo(name, address, html);
-        //    }                
+        //    }
         //}
 
         public static string GetTriage(this MailItem olMail)
@@ -282,7 +302,11 @@ namespace UtilitiesCS
             return attachmentNames;
         }
 
-        private static string GetEmailFolderPath(this MailItem OlMail, string emailRootFolder, IScoDictionary<string, string> dictRemap)
+        private static string GetEmailFolderPath(
+            this MailItem OlMail,
+            string emailRootFolder,
+            IScoDictionary<string, string> dictRemap
+        )
         {
             Folder OlParent = (Folder)OlMail.Parent;
             string folderPath = OlParent.FolderPath;
@@ -302,7 +326,6 @@ namespace UtilitiesCS
             }
             return folderPath;
         }
-
 
         #endregion
     }

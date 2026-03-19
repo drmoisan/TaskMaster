@@ -48,7 +48,11 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var flagDetails = new FlagDetails("Tag PROJECT ");
             NotifyCollectionChangedEventArgs eventArgs = null;
             flagDetails.CollectionChanged += (_, args) => eventArgs = args;
-            var incomingList = new ObservableCollection<string> { "Tag PROJECT Alpha", "Tag PROJECT Beta" };
+            var incomingList = new ObservableCollection<string>
+            {
+                "Tag PROJECT Alpha",
+                "Tag PROJECT Beta",
+            };
 
             // Act
             flagDetails.List = incomingList;

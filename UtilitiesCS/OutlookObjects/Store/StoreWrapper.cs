@@ -1,10 +1,10 @@
-﻿using Deedle.Internal;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using Deedle.Internal;
 using Microsoft.Graph.Models.TermStore;
 using Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
 using UtilitiesCS.OutlookObjects.Folder;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
@@ -13,11 +13,15 @@ namespace UtilitiesCS.OutlookObjects.Store
     public class StoreWrapper
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region ctor
 
-        public StoreWrapper(Outlook.Store store) { InnerStore = store; }
+        public StoreWrapper(Outlook.Store store)
+        {
+            InnerStore = store;
+        }
 
         public StoreWrapper Init()
         {
@@ -25,7 +29,9 @@ namespace UtilitiesCS.OutlookObjects.Store
             RootFolder = InnerStore.GetRootFolder() as Outlook.Folder;
             if (InnerStore.ExchangeStoreType != Outlook.OlExchangeStoreType.olExchangePublicFolder)
             {
-                Inbox = InnerStore.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox) as Outlook.Folder;
+                Inbox =
+                    InnerStore.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox)
+                    as Outlook.Folder;
             }
             UserEmailAddress = GetSmtpAddressFromStore();
             return this;
@@ -40,7 +46,9 @@ namespace UtilitiesCS.OutlookObjects.Store
             }
             catch (System.Exception e)
             {
-                logger.Error($"Error restoring {nameof(StoreWrapper)} named {DisplayName} {e.Message}");
+                logger.Error(
+                    $"Error restoring {nameof(StoreWrapper)} named {DisplayName} {e.Message}"
+                );
                 return false;
             }
         }
@@ -56,11 +64,10 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         public void RestoreGlobalAddresses(Application olApp)
         {
-            GlobalAddressBook = InnerStore?
-                .GetGlobalAddressList(olApp)?
-                .AddressEntries?
-                .Cast<AddressEntry>()?
-                .ToList();
+            GlobalAddressBook = InnerStore
+                ?.GetGlobalAddressList(olApp)
+                ?.AddressEntries?.Cast<AddressEntry>()
+                ?.ToList();
         }
 
         #endregion ctor
@@ -94,7 +101,10 @@ namespace UtilitiesCS.OutlookObjects.Store
             }
             catch (COMException e)
             {
-                logger.Error($"Error retrieving PrimarySmtpAddress from secondary inbox. {e.Message}", e);
+                logger.Error(
+                    $"Error retrieving PrimarySmtpAddress from secondary inbox. {e.Message}",
+                    e
+                );
                 return null;
             }
         }

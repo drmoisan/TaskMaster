@@ -13,7 +13,8 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public DirectoryInfoWrapper(DirectoryInfo directoryInfo)
         {
-            _directoryInfo = directoryInfo ?? throw new ArgumentNullException(nameof(directoryInfo));
+            _directoryInfo =
+                directoryInfo ?? throw new ArgumentNullException(nameof(directoryInfo));
         }
 
         public FileAttributes Attributes
@@ -87,7 +88,9 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public IDirectoryInfo CreateSubdirectory(string path, DirectorySecurity directorySecurity)
         {
-            return new DirectoryInfoWrapper(_directoryInfo.CreateSubdirectory(path, directorySecurity));
+            return new DirectoryInfoWrapper(
+                _directoryInfo.CreateSubdirectory(path, directorySecurity)
+            );
         }
 
         public void Delete(bool recursive)
@@ -102,12 +105,19 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public IEnumerable<IDirectoryInfo> EnumerateDirectories(string searchPattern)
         {
-            return _directoryInfo.EnumerateDirectories(searchPattern).Select(d => new DirectoryInfoWrapper(d));
+            return _directoryInfo
+                .EnumerateDirectories(searchPattern)
+                .Select(d => new DirectoryInfoWrapper(d));
         }
 
-        public IEnumerable<IDirectoryInfo> EnumerateDirectories(string searchPattern, SearchOption searchOption)
+        public IEnumerable<IDirectoryInfo> EnumerateDirectories(
+            string searchPattern,
+            SearchOption searchOption
+        )
         {
-            return _directoryInfo.EnumerateDirectories(searchPattern, searchOption).Select(d => new DirectoryInfoWrapper(d));
+            return _directoryInfo
+                .EnumerateDirectories(searchPattern, searchOption)
+                .Select(d => new DirectoryInfoWrapper(d));
         }
 
         public IEnumerable<IFileInfo> EnumerateFiles()
@@ -120,9 +130,14 @@ namespace UtilitiesCS.HelperClasses.FileSystem
             return _directoryInfo.EnumerateFiles(searchPattern).Select(f => new FileInfoWrapper(f));
         }
 
-        public IEnumerable<IFileInfo> EnumerateFiles(string searchPattern, SearchOption searchOption)
+        public IEnumerable<IFileInfo> EnumerateFiles(
+            string searchPattern,
+            SearchOption searchOption
+        )
         {
-            return _directoryInfo.EnumerateFiles(searchPattern, searchOption).Select(f => new FileInfoWrapper(f));
+            return _directoryInfo
+                .EnumerateFiles(searchPattern, searchOption)
+                .Select(f => new FileInfoWrapper(f));
         }
 
         public IEnumerable<IFileSystemInfo> EnumerateFileSystemInfos()
@@ -132,12 +147,19 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public IEnumerable<IFileSystemInfo> EnumerateFileSystemInfos(string searchPattern)
         {
-            return _directoryInfo.EnumerateFileSystemInfos(searchPattern).Select(fsi => WrapFileSystemInfo(fsi));
+            return _directoryInfo
+                .EnumerateFileSystemInfos(searchPattern)
+                .Select(fsi => WrapFileSystemInfo(fsi));
         }
 
-        public IEnumerable<IFileSystemInfo> EnumerateFileSystemInfos(string searchPattern, SearchOption searchOption)
+        public IEnumerable<IFileSystemInfo> EnumerateFileSystemInfos(
+            string searchPattern,
+            SearchOption searchOption
+        )
         {
-            return _directoryInfo.EnumerateFileSystemInfos(searchPattern, searchOption).Select(fsi => WrapFileSystemInfo(fsi));
+            return _directoryInfo
+                .EnumerateFileSystemInfos(searchPattern, searchOption)
+                .Select(fsi => WrapFileSystemInfo(fsi));
         }
 
         public DirectorySecurity GetAccessControl()
@@ -152,17 +174,26 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public IDirectoryInfo[] GetDirectories()
         {
-            return _directoryInfo.GetDirectories().Select(d => new DirectoryInfoWrapper(d)).ToArray();
+            return _directoryInfo
+                .GetDirectories()
+                .Select(d => new DirectoryInfoWrapper(d))
+                .ToArray();
         }
 
         public IDirectoryInfo[] GetDirectories(string searchPattern)
         {
-            return _directoryInfo.GetDirectories(searchPattern).Select(d => new DirectoryInfoWrapper(d)).ToArray();
+            return _directoryInfo
+                .GetDirectories(searchPattern)
+                .Select(d => new DirectoryInfoWrapper(d))
+                .ToArray();
         }
 
         public IDirectoryInfo[] GetDirectories(string searchPattern, SearchOption searchOption)
         {
-            return _directoryInfo.GetDirectories(searchPattern, searchOption).Select(d => new DirectoryInfoWrapper(d)).ToArray();
+            return _directoryInfo
+                .GetDirectories(searchPattern, searchOption)
+                .Select(d => new DirectoryInfoWrapper(d))
+                .ToArray();
         }
 
         public IFileInfo[] GetFiles()
@@ -172,27 +203,42 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public IFileInfo[] GetFiles(string searchPattern)
         {
-            return _directoryInfo.GetFiles(searchPattern).Select(f => new FileInfoWrapper(f)).ToArray();
+            return _directoryInfo
+                .GetFiles(searchPattern)
+                .Select(f => new FileInfoWrapper(f))
+                .ToArray();
         }
 
         public IFileInfo[] GetFiles(string searchPattern, SearchOption searchOption)
         {
-            return _directoryInfo.GetFiles(searchPattern, searchOption).Select(f => new FileInfoWrapper(f)).ToArray();
+            return _directoryInfo
+                .GetFiles(searchPattern, searchOption)
+                .Select(f => new FileInfoWrapper(f))
+                .ToArray();
         }
 
         public IFileSystemInfo[] GetFileSystemInfos()
         {
-            return _directoryInfo.GetFileSystemInfos().Select(fsi => WrapFileSystemInfo(fsi)).ToArray();
+            return _directoryInfo
+                .GetFileSystemInfos()
+                .Select(fsi => WrapFileSystemInfo(fsi))
+                .ToArray();
         }
 
         public IFileSystemInfo[] GetFileSystemInfos(string searchPattern)
         {
-            return _directoryInfo.GetFileSystemInfos(searchPattern).Select(fsi => WrapFileSystemInfo(fsi)).ToArray();
+            return _directoryInfo
+                .GetFileSystemInfos(searchPattern)
+                .Select(fsi => WrapFileSystemInfo(fsi))
+                .ToArray();
         }
 
         public IFileSystemInfo[] GetFileSystemInfos(string searchPattern, SearchOption searchOption)
         {
-            return _directoryInfo.GetFileSystemInfos(searchPattern, searchOption).Select(fsi => WrapFileSystemInfo(fsi)).ToArray();
+            return _directoryInfo
+                .GetFileSystemInfos(searchPattern, searchOption)
+                .Select(fsi => WrapFileSystemInfo(fsi))
+                .ToArray();
         }
 
         public void MoveTo(string destDirName)

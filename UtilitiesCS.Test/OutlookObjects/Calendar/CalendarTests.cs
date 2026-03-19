@@ -64,7 +64,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Calendar
 
             folders.Setup(x => x.GetEnumerator()).Returns(() => collection.GetEnumerator());
             calendarRoot.SetupGet(x => x.Folders).Returns(folders.Object);
-            session.Setup(x => x.GetDefaultFolder(OlDefaultFolders.olFolderCalendar)).Returns(calendarRoot.Object);
+            session
+                .Setup(x => x.GetDefaultFolder(OlDefaultFolders.olFolderCalendar))
+                .Returns(calendarRoot.Object);
 
             return session;
         }

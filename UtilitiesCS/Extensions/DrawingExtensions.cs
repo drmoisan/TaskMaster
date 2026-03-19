@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Drawing;
 
 namespace UtilitiesCS
 {
@@ -21,8 +21,9 @@ namespace UtilitiesCS
 
         public static Size MultiplyRound(this Size sz, PointF scaleRatio)
         {
-            return Size.Round(new SizeF((float)sz.Width * scaleRatio.X, (float)sz.Height * scaleRatio.Y));
+            return Size.Round(
+                new SizeF((float)sz.Width * scaleRatio.X, (float)sz.Height * scaleRatio.Y)
+            );
         }
-
     }
 }

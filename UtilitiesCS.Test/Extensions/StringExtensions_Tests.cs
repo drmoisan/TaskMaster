@@ -1,6 +1,6 @@
+using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using UtilitiesCS;
 
 namespace UtilitiesCS.Test.Extensions
@@ -12,7 +12,10 @@ namespace UtilitiesCS.Test.Extensions
         public void IsNullOrEmpty_ReturnsExpectedValuesForNullEmptyWhitespaceAndText()
         {
             // Act / Assert
-            ((string)null).IsNullOrEmpty().Should().BeTrue();
+            ((string)null)
+                .IsNullOrEmpty()
+                .Should()
+                .BeTrue();
             string.Empty.IsNullOrEmpty().Should().BeTrue();
             " ".IsNullOrEmpty().Should().BeFalse();
             "x".IsNullOrEmpty().Should().BeFalse();
@@ -72,8 +75,16 @@ namespace UtilitiesCS.Test.Extensions
 
             // Act
             var standard = source.SearchDelimitedString("*ell*", "|");
-            var deleteFromMatches = source.SearchDelimitedString("h*o", "|", ArrayExtensions.SearchOptions.DeleteFromMatches);
-            var exactComplement = source.SearchDelimitedString("world", "|", ArrayExtensions.SearchOptions.ExactComplement);
+            var deleteFromMatches = source.SearchDelimitedString(
+                "h*o",
+                "|",
+                ArrayExtensions.SearchOptions.DeleteFromMatches
+            );
+            var exactComplement = source.SearchDelimitedString(
+                "world",
+                "|",
+                ArrayExtensions.SearchOptions.ExactComplement
+            );
 
             // Assert
             standard.Should().Be("hello|yellow");

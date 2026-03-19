@@ -6,13 +6,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using static Deedle.Vectors.VectorConstruction;
 
-
 namespace UtilitiesCS
 {
     public static class FileIO2
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public static void DELETE_TextFile(string filename, string stagingPath)
         {
@@ -22,7 +22,6 @@ namespace UtilitiesCS
             {
                 File.Delete(filepath);
             }
-
         }
 
         [Flags]
@@ -30,7 +29,7 @@ namespace UtilitiesCS
         {
             None = 0,
             AppendNewLine = 1,
-            OpenAsAppend = 2
+            OpenAsAppend = 2,
         }
 
         public static void WriteTextFile(string filename, string[] strOutput, string folderpath)
@@ -40,12 +39,19 @@ namespace UtilitiesCS
             string filepath = Path.Combine(folderpath, filename);
             var listOutput = new List<string>(strOutput);
             foreach (var output in listOutput)
-                WriteUTF8(filepath, output, (WriteOptions.AppendNewLine | WriteOptions.OpenAsAppend));
-
-
+                WriteUTF8(
+                    filepath,
+                    output,
+                    (WriteOptions.AppendNewLine | WriteOptions.OpenAsAppend)
+                );
         }
 
-        public static async Task WriteTextFileAsync(string filename, string[] strOutput, string folderpath, CancellationToken token)
+        public static async Task WriteTextFileAsync(
+            string filename,
+            string[] strOutput,
+            string folderpath,
+            CancellationToken token
+        )
         {
             //TraceUtility.LogMethodCall(filename, strOutput, folderpath, token);
 
@@ -83,7 +89,6 @@ namespace UtilitiesCS
 
         private static void WriteUTF8(string filepath, string textString, WriteOptions options)
         {
-
             bool asAppend = options.HasFlag(WriteOptions.OpenAsAppend);
 
             using (var sw = new StreamWriter(filepath, asAppend, System.Text.Encoding.UTF8))
@@ -98,12 +103,14 @@ namespace UtilitiesCS
                 }
                 sw.Close();
             }
-
         }
 
-        public static string[] CSV_ReadTxtF(string filename, string folderpath, bool skipHeaders = true)
+        public static string[] CSV_ReadTxtF(
+            string filename,
+            string folderpath,
+            bool skipHeaders = true
+        )
         {
-
             string filepath = Path.Combine(folderpath, filename);
 
             if (File.Exists(filepath))
@@ -118,17 +125,14 @@ namespace UtilitiesCS
                     return File.ReadAllLines(filepath);
                 }
             }
-
             else
             {
                 return null;
             }
-
         }
 
         public static string[] CsvRead(string filename, string folderpath, bool skipHeaders = false)
         {
-
             string filepath = Path.Combine(folderpath, filename);
 
             if (File.Exists(filepath))
@@ -143,17 +147,20 @@ namespace UtilitiesCS
                     return lines;
                 }
             }
-
             else
             {
                 return null;
             }
-
         }
 
-        public static string[,] SplitArrayTo2D(string[] str1D, string delimeter = ",", bool zerobased = false)
+        public static string[,] SplitArrayTo2D(
+            string[] str1D,
+            string delimeter = ",",
+            bool zerobased = false
+        )
         {
-            int i, j;
+            int i,
+                j;
             int Count;
             var maxj = default(int);
 
@@ -194,13 +201,23 @@ namespace UtilitiesCS
             return strD2_tmp;
         }
 
-        public static string[,] CsvReadTo2D(string filename, string folderpath, bool skipHeaders = false, string delimiter = ",")
+        public static string[,] CsvReadTo2D(
+            string filename,
+            string folderpath,
+            bool skipHeaders = false,
+            string delimiter = ","
+        )
         {
             string[] array1D = CsvRead(filename, folderpath, skipHeaders);
             return SplitArrayTo2D(array1D, delimiter);
         }
 
-        public static string[][] CsvReadToJagged(string filename, string folderpath, bool skipHeaders = false, string delimiter = ",")
+        public static string[][] CsvReadToJagged(
+            string filename,
+            string folderpath,
+            bool skipHeaders = false,
+            string delimiter = ","
+        )
         {
             string[] array1D = CsvRead(filename, folderpath, skipHeaders);
             var jagged = array1D.Select(x => x.Split(delimiter, trim: true)).ToArray();

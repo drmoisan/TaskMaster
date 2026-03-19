@@ -14,10 +14,8 @@ using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
 
-
 namespace TaskVisualization
 {
-
     public class TaskController
     {
         #region Constructors and Initializers
@@ -32,7 +30,15 @@ namespace TaskVisualization
         /// <param name="autoAssign">Class implementing <seealso cref="IAutoAssign"/> interface</param>
         /// <param name="userEmailAddress">Email address of user to avoid auto-tagging everything with user tag</param>
         /// <param name="flagOptions">Enumeration of fields to activate</param>
-        public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection, ToDoDefaults defaults, IAutoAssign autoAssign, string userEmailAddress, Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All)
+        public TaskController(
+            TaskViewer formInstance,
+            Categories olCategories,
+            List<ToDoItem> toDoSelection,
+            ToDoDefaults defaults,
+            IAutoAssign autoAssign,
+            string userEmailAddress,
+            Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All
+        )
         {
             //TODO: Add description of olCategories and defaults in documentation
             // Save parameters to internal variables
@@ -48,7 +54,6 @@ namespace TaskVisualization
             formInstance.AcceptButton = formInstance.OKButton;
             formInstance.CancelButton = formInstance.Cancel_Button;
 
-
             // First ToDoItem in list is cloned to _active and set to readonly
             _active = _todo_list[0].DeepCopy();
             _active.ReadOnly = true;
@@ -63,19 +68,29 @@ namespace TaskVisualization
             _xlCtrlLookup = GetControlLookup();
             _xlCtrlOptions = GetOptionsLookup();
             _xlCtrlCaptions = GetCaptionLookup();
-            _xlCtrlsNav = (from controlCaption in GetCaptionLookup(0)
-                           where GetOptionsLookup(0)[controlCaption.Key]
-                           select controlCaption)
-                                .ToDictionary(
-                                    controlCaption => controlCaption.Key,
-                                    controlCaption => controlCaption.Value[0]);
-
+            _xlCtrlsNav = (
+                from controlCaption in GetCaptionLookup(0)
+                where GetOptionsLookup(0)[controlCaption.Key]
+                select controlCaption
+            ).ToDictionary(
+                controlCaption => controlCaption.Key,
+                controlCaption => controlCaption.Value[0]
+            );
         }
 
-        public TaskController(TaskViewer formInstance, Categories olCategories, List<ToDoItem> toDoSelection,
-            ToDoDefaults defaults, IAutoAssign autoAssign, IAutoAssign projectAssign, IAutoAssign contextAssign,
-            Func<string, string> projectsToPrograms, string userEmailAddress, IApplicationGlobals globals,
-            Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All)
+        public TaskController(
+            TaskViewer formInstance,
+            Categories olCategories,
+            List<ToDoItem> toDoSelection,
+            ToDoDefaults defaults,
+            IAutoAssign autoAssign,
+            IAutoAssign projectAssign,
+            IAutoAssign contextAssign,
+            Func<string, string> projectsToPrograms,
+            string userEmailAddress,
+            IApplicationGlobals globals,
+            Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All
+        )
         {
             _viewer = formInstance;
             _todo_list = toDoSelection;
@@ -90,7 +105,6 @@ namespace TaskVisualization
             formInstance.AcceptButton = formInstance.OKButton;
             formInstance.CancelButton = formInstance.Cancel_Button;
 
-
             // First ToDoItem in list is cloned to _active and set to readonly
             _active = _todo_list[0].DeepCopy();
             _active.ReadOnly = true;
@@ -105,12 +119,14 @@ namespace TaskVisualization
             _xlCtrlLookup = GetControlLookup();
             _xlCtrlOptions = GetOptionsLookup();
             _xlCtrlCaptions = GetCaptionLookup();
-            _xlCtrlsNav = (from controlCaption in GetCaptionLookup(0)
-                           where GetOptionsLookup(0)[controlCaption.Key]
-                           select controlCaption)
-                                .ToDictionary(
-                                    controlCaption => controlCaption.Key,
-                                    controlCaption => controlCaption.Value[0]);
+            _xlCtrlsNav = (
+                from controlCaption in GetCaptionLookup(0)
+                where GetOptionsLookup(0)[controlCaption.Key]
+                select controlCaption
+            ).ToDictionary(
+                controlCaption => controlCaption.Key,
+                controlCaption => controlCaption.Value[0]
+            );
 
             ProjectAssign = projectAssign;
             ProjectsToPrograms = projectsToPrograms;
@@ -135,23 +151,25 @@ namespace TaskVisualization
             switch (_active.Priority)
             {
                 case OlImportance.olImportanceHigh:
-                    {
-                        _viewer.PriorityBox.SelectedItem = "High";
-                        break;
-                    }
+                {
+                    _viewer.PriorityBox.SelectedItem = "High";
+                    break;
+                }
                 case OlImportance.olImportanceLow:
-                    {
-                        _viewer.PriorityBox.SelectedItem = "Low";
-                        break;
-                    }
+                {
+                    _viewer.PriorityBox.SelectedItem = "Low";
+                    break;
+                }
                 case OlImportance.olImportanceNormal:
-                    {
-                        _viewer.PriorityBox.SelectedItem = "Normal";
-                        break;
-                    }
+                {
+                    _viewer.PriorityBox.SelectedItem = "Normal";
+                    break;
+                }
             }
 
-            _viewer.KbSelector.SelectedItem = _active.KB.AsStringNoPrefix.IsNullOrEmpty() ? "Backlog" : _active.KB.AsStringNoPrefix;
+            _viewer.KbSelector.SelectedItem = _active.KB.AsStringNoPrefix.IsNullOrEmpty()
+                ? "Backlog"
+                : _active.KB.AsStringNoPrefix;
 
             if (_active.TotalWork == 0)
                 _active.TotalWork = _defaults.DefaultTaskLength;
@@ -172,7 +190,8 @@ namespace TaskVisualization
             NavTips.ForEach(x => x.ToggleColumnOnly(Enums.ToggleState.Off));
             ToggleXl(
                 (from x in _xlCtrlLookup select x).ToDictionary(x => x.Key, x => 'A'),
-                Enums.ToggleState.Off);
+                Enums.ToggleState.Off
+            );
 
             // Deactivate controls that are not set in _options
             if (_options != Enums.FlagsToSet.All)
@@ -210,6 +229,7 @@ namespace TaskVisualization
         internal IApplicationGlobals Globals { get; set; }
 
         private Enums.FlagsToSet _options;
+
         /// <summary>
         /// Sets options for which controls / fields to activate using Enums.FlagsToSet enumeration
         /// </summary>
@@ -237,6 +257,7 @@ namespace TaskVisualization
         private readonly ToDoItem _active;
 
         private readonly SortedDictionary<string, bool> _dict_categories;
+
         //private string _exit_type = "Cancel";
         private readonly Dictionary<Label, string> _xlCtrlCaptions;
         private readonly Dictionary<Label, Control> _xlCtrlLookup;
@@ -246,12 +267,11 @@ namespace TaskVisualization
         private int _activeNavGroup = -1;
         private bool _altActive = false;
         private int _altLevel = 0;
+
         //private readonly string _keyCapture = "";
         private readonly ToDoDefaults _defaults;
         private readonly IAutoAssign _autoAssign;
         private string _userEmailAddress;
-
-
 
         private IAutoAssign _projectAssign;
         public IAutoAssign ProjectAssign
@@ -263,7 +283,11 @@ namespace TaskVisualization
         public IAutoAssign ContextAssign { get; set; }
 
         private Func<string, string> _projectsToPrograms;
-        internal Func<string, string> ProjectsToPrograms { get => _projectsToPrograms; private protected set => _projectsToPrograms = value; }
+        internal Func<string, string> ProjectsToPrograms
+        {
+            get => _projectsToPrograms;
+            private protected set => _projectsToPrograms = value;
+        }
 
         #endregion
 
@@ -276,9 +300,11 @@ namespace TaskVisualization
         {
             var prefix = _defaults.PrefixList.Find(x => x.Key == "People");
 
-            var filtered_cats = (from x in _dict_categories
-                                 where x.Key.Contains(prefix.Value)
-                                 select x).ToSortedDictionary();
+            var filtered_cats = (
+                from x in _dict_categories
+                where x.Key.Contains(prefix.Value)
+                select x
+            ).ToSortedDictionary();
 
             IList<string> selections = _active.People.AsListWithPrefix;
 
@@ -286,14 +312,16 @@ namespace TaskVisualization
 
             using (var viewer = new TagViewer())
             {
-                var controller = new TagController(viewerInstance: viewer,
-                                                   dictOptions: filtered_cats,
-                                                   autoAssigner: _autoAssign,
-                                                   prefixes: _defaults.PrefixList,
-                                                   selections: selections,
-                                                   prefixKey: prefix.Key,
-                                                   objItemObject: _active.OlItem.InnerObject,
-                                                   userEmailAddress: _userEmailAddress);
+                var controller = new TagController(
+                    viewerInstance: viewer,
+                    dictOptions: filtered_cats,
+                    autoAssigner: _autoAssign,
+                    prefixes: _defaults.PrefixList,
+                    selections: selections,
+                    prefixKey: prefix.Key,
+                    objItemObject: _active.OlItem.InnerObject,
+                    userEmailAddress: _userEmailAddress
+                );
                 viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
@@ -310,23 +338,27 @@ namespace TaskVisualization
         {
             var prefix = _defaults.PrefixList.Find(x => x.Key == "Context");
 
-            var filtered_cats = (from x in _dict_categories
-                                 where x.Key.Contains(prefix.Value)
-                                 select x).ToSortedDictionary();
+            var filtered_cats = (
+                from x in _dict_categories
+                where x.Key.Contains(prefix.Value)
+                select x
+            ).ToSortedDictionary();
 
             IList<string> selections = _active.Context.AsListNoPrefix;
             bool unused1 = selections.Remove("");
 
             using (var viewer = new TagViewer())
             {
-                var controller = new TagController(viewerInstance: viewer,
-                                                   dictOptions: filtered_cats,
-                                                   autoAssigner: _autoAssign,
-                                                   prefixes: _defaults.PrefixList,
-                                                   selections: selections,
-                                                   prefixKey: prefix.Key,
-                                                   objItemObject: _active.OlItem,
-                                                   userEmailAddress: _userEmailAddress);
+                var controller = new TagController(
+                    viewerInstance: viewer,
+                    dictOptions: filtered_cats,
+                    autoAssigner: _autoAssign,
+                    prefixes: _defaults.PrefixList,
+                    selections: selections,
+                    prefixKey: prefix.Key,
+                    objItemObject: _active.OlItem,
+                    userEmailAddress: _userEmailAddress
+                );
                 viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
@@ -334,37 +366,42 @@ namespace TaskVisualization
                     _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
                 }
             }
-
         }
 
         public void AssignProject()
         {
             var prefix = _defaults.PrefixList.Find(x => x.Key == "Project");
 
-            var filtered_cats = (from x in _dict_categories
-                                 where x.Key.Contains(prefix.Value)
-                                 select x).ToSortedDictionary();
+            var filtered_cats = (
+                from x in _dict_categories
+                where x.Key.Contains(prefix.Value)
+                select x
+            ).ToSortedDictionary();
 
             IList<string> selections = _active.Projects.AsListNoPrefix;
             bool unused1 = selections.Remove("");
 
             using (var viewer = new TagViewer())
             {
-                var controller = new TagController(viewerInstance: viewer,
-                                                   dictOptions: filtered_cats,
-                                                   autoAssigner: ProjectAssign,
-                                                   prefixes: _defaults.PrefixList,
-                                                   selections: selections,
-                                                   prefixKey: prefix.Key,
-                                                   objItemObject: _active.OlItem,
-                                                   userEmailAddress: _userEmailAddress);
+                var controller = new TagController(
+                    viewerInstance: viewer,
+                    dictOptions: filtered_cats,
+                    autoAssigner: ProjectAssign,
+                    prefixes: _defaults.PrefixList,
+                    selections: selections,
+                    prefixKey: prefix.Key,
+                    objItemObject: _active.OlItem,
+                    userEmailAddress: _userEmailAddress
+                );
                 controller.SetCaption("Assign Project");
                 var result = viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
                     _active.Projects.AsStringNoPrefix = controller.SelectionAsString();
                     _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
-                    _active.Program.AsStringNoPrefix = ProjectsToPrograms(_active.Projects.AsStringNoPrefix);
+                    _active.Program.AsStringNoPrefix = ProjectsToPrograms(
+                        _active.Projects.AsStringNoPrefix
+                    );
                 }
             }
         }
@@ -376,23 +413,27 @@ namespace TaskVisualization
         {
             var prefix = _defaults.PrefixList.Find(x => x.Key == "Topic");
 
-            var filtered_cats = (from x in _dict_categories
-                                 where x.Key.Contains(prefix.Value)
-                                 select x).ToSortedDictionary();
+            var filtered_cats = (
+                from x in _dict_categories
+                where x.Key.Contains(prefix.Value)
+                select x
+            ).ToSortedDictionary();
 
             IList<string> selections = _active.Topics.AsListNoPrefix;
             bool unused1 = selections.Remove("");
 
             using (var viewer = new TagViewer())
             {
-                var controller = new TagController(viewerInstance: viewer,
-                                                   dictOptions: filtered_cats,
-                                                   autoAssigner: _autoAssign,
-                                                   prefixes: _defaults.PrefixList,
-                                                   selections: selections,
-                                                   prefixKey: prefix.Key,
-                                                   objItemObject: _active.OlItem,
-                                                   userEmailAddress: _userEmailAddress);
+                var controller = new TagController(
+                    viewerInstance: viewer,
+                    dictOptions: filtered_cats,
+                    autoAssigner: _autoAssign,
+                    prefixes: _defaults.PrefixList,
+                    selections: selections,
+                    prefixKey: prefix.Key,
+                    objItemObject: _active.OlItem,
+                    userEmailAddress: _userEmailAddress
+                );
                 var result = viewer.ShowDialog();
                 if (controller.ExitType != "Cancel")
                 {
@@ -454,7 +495,7 @@ namespace TaskVisualization
         }
 
         /// <summary>
-        /// Method determines if any category has been selected and copies the flags from the 
+        /// Method determines if any category has been selected and copies the flags from the
         /// sample _active item to all members of _todo_list based on flags set in _options
         /// </summary>
         public async Task OK_Action()
@@ -490,9 +531,8 @@ namespace TaskVisualization
             }
         }
 
-
         /// <summary>
-        /// Handles cancel button click. Sets the controller exit type to 
+        /// Handles cancel button click. Sets the controller exit type to
         /// "Cancel" and disposes of the viewer
         /// </summary>
         public void Cancel_Action()
@@ -577,8 +617,13 @@ namespace TaskVisualization
 
         internal async Task AutoAssignAllAsync()
         {
-            if (_active?.OlItem?.InnerObject is not MailItem mailItem) { return; }
-            var helper = await MailItemHelper.FromMailItemAsync(mailItem, Globals, default, false).ConfigureAwait(true);
+            if (_active?.OlItem?.InnerObject is not MailItem mailItem)
+            {
+                return;
+            }
+            var helper = await MailItemHelper
+                .FromMailItemAsync(mailItem, Globals, default, false)
+                .ConfigureAwait(true);
 
             var projects = await ProjectAssign.AutoFindAsync(helper).ConfigureAwait(true);
             if (projects?.Count > 0)
@@ -608,7 +653,12 @@ namespace TaskVisualization
                     ToggleXlGroupNav(Enums.ToggleState.Off);
                     if (_xlCtrlsActive is not null)
                     {
-                        (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, '\0', _altLevel);
+                        (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(
+                            _xlCtrlsActive,
+                            _altActive,
+                            '\0',
+                            _altLevel
+                        );
                     }
                     _altActive = false;
                     //_activeNavGroup = -1;
@@ -621,7 +671,9 @@ namespace TaskVisualization
                     {
                         var groupNumber = _activeNavGroup;
                         _activeNavGroup = -1;
-                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(groupNumber.ToString()[0]);
+                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(
+                            groupNumber.ToString()[0]
+                        );
                     }
                     _altActive = true;
                     return true;
@@ -633,7 +685,12 @@ namespace TaskVisualization
                 {
                     e.SuppressKeyPress = true;
                     if (_xlCtrlsActive is not null)
-                        (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(_xlCtrlsActive, _altActive, e.KeyCode.ToString().ToUpper()[0], _altLevel);
+                        (_xlCtrlsActive, _altActive, _altLevel) = RecurseXl(
+                            _xlCtrlsActive,
+                            _altActive,
+                            e.KeyCode.ToString().ToUpper()[0],
+                            _altLevel
+                        );
                     return true;
                 }
                 else if (e.KeyCode == Keys.Down)
@@ -645,32 +702,46 @@ namespace TaskVisualization
                     }
                     else if (_activeNavGroup < (_xlCtrlsNav.Count))
                     {
-                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(_activeNavGroup + 1);
+                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(
+                            _activeNavGroup + 1
+                        );
                         return true;
                     }
-                    else { return false; }
+                    else
+                    {
+                        return false;
+                    }
                 }
                 else if (e.KeyCode == Keys.Up)
                 {
                     if (_activeNavGroup == -1)
                     {
-                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(_xlCtrlsNav.Count);
+                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(
+                            _xlCtrlsNav.Count
+                        );
                         return true;
                     }
                     else if (_activeNavGroup > 1)
                     {
-                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(_activeNavGroup - 1);
+                        (_xlCtrlsActive, _altActive, _altLevel) = ActivateXlGroup(
+                            _activeNavGroup - 1
+                        );
                         return true;
                     }
-                    else { return false; }
+                    else
+                    {
+                        return false;
+                    }
                 }
-                else { return false; }
+                else
+                {
+                    return false;
+                }
             }
             else
             {
                 return false;
             }
-
         }
 
         public void KeyboardHandler_KeyPress(object sender, KeyPressEventArgs e)
@@ -689,10 +760,7 @@ namespace TaskVisualization
 
         public bool SuppressKeystrokes
         {
-            get
-            {
-                return _altActive;
-            }
+            get { return _altActive; }
         }
 
         #endregion
@@ -708,7 +776,10 @@ namespace TaskVisualization
             //TODO: Rewrite AnyCategorySelected property to be more stable
             get
             {
-                return _viewer.CategorySelection.Text != "[Category Label]" | _viewer.PeopleSelection.Text != "[Assigned People Flagged]" | _viewer.ProjectSelection.Text != "[ Projects Flagged ]" | _viewer.TopicSelection.Text != "[Other Topics Tagged]";
+                return _viewer.CategorySelection.Text != "[Category Label]"
+                    | _viewer.PeopleSelection.Text != "[Assigned People Flagged]"
+                    | _viewer.ProjectSelection.Text != "[ Projects Flagged ]"
+                    | _viewer.TopicSelection.Text != "[Other Topics Tagged]";
             }
         }
 
@@ -722,47 +793,48 @@ namespace TaskVisualization
             switch (flagType)
             {
                 case Enums.FlagsToSet.Context:
-                    {
-                        _active.Context.AsStringNoPrefix = value;
-                        _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
-                        break;
-                    }
+                {
+                    _active.Context.AsStringNoPrefix = value;
+                    _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
+                    break;
+                }
                 case Enums.FlagsToSet.People:
-                    {
-                        _active.People.AsStringNoPrefix = value;
-                        _viewer.PeopleSelection.Text = _active.People.AsStringNoPrefix;
-                        break;
-                    }
+                {
+                    _active.People.AsStringNoPrefix = value;
+                    _viewer.PeopleSelection.Text = _active.People.AsStringNoPrefix;
+                    break;
+                }
                 case Enums.FlagsToSet.Projects:
-                    {
-                        _active.Projects.AsStringNoPrefix = value;
-                        _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
-                        break;
-                    }
+                {
+                    _active.Projects.AsStringNoPrefix = value;
+                    _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
+                    break;
+                }
                 case Enums.FlagsToSet.Topics:
-                    {
-                        _active.Topics.AsStringNoPrefix = value;
-                        _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
-                        break;
-                    }
+                {
+                    _active.Topics.AsStringNoPrefix = value;
+                    _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
+                    break;
+                }
                 case Enums.FlagsToSet.Taskname:
-                    {
-                        _active.TaskSubject = value;
-                        _viewer.TaskName.Text = value;
-                        break;
-                    }
+                {
+                    _active.TaskSubject = value;
+                    _viewer.TaskName.Text = value;
+                    break;
+                }
                 case Enums.FlagsToSet.Worktime:
-                    {
-                        _viewer.Duration.Text = value;
-                        break;
-                    }
-                    // Note that _active is set after OK click
+                {
+                    _viewer.Duration.Text = value;
+                    break;
+                }
+                // Note that _active is set after OK click
             }
-
         }
 
-
-        internal ObservableCollection<string> MergeToCollection(ObservableCollection<string> original, IList<string> toMerge)
+        internal ObservableCollection<string> MergeToCollection(
+            ObservableCollection<string> original,
+            IList<string> toMerge
+        )
         {
             var hash = new HashSet<string>(toMerge);
             original.ForEach(x => hash.Add(x));
@@ -782,45 +854,54 @@ namespace TaskVisualization
                 return;
             }
 
-            if (value.IsNullOrEmpty()) { return; }
+            if (value.IsNullOrEmpty())
+            {
+                return;
+            }
             switch (flagType)
             {
                 case Enums.FlagsToSet.Context:
-                    {
-                        _active.Context.AsListWithPrefix = MergeToCollection(
-                            _active.Context.AsListWithPrefix, value);
-                        _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
-                        break;
-                    }
+                {
+                    _active.Context.AsListWithPrefix = MergeToCollection(
+                        _active.Context.AsListWithPrefix,
+                        value
+                    );
+                    _viewer.CategorySelection.Text = _active.Context.AsStringNoPrefix;
+                    break;
+                }
                 case Enums.FlagsToSet.People:
-                    {
-                        _active.People.AsListWithPrefix = MergeToCollection(
-                            _active.People.AsListWithPrefix, value);
-                        _viewer.PeopleSelection.Text = _active.People.AsStringNoPrefix;
-                        break;
-                    }
+                {
+                    _active.People.AsListWithPrefix = MergeToCollection(
+                        _active.People.AsListWithPrefix,
+                        value
+                    );
+                    _viewer.PeopleSelection.Text = _active.People.AsStringNoPrefix;
+                    break;
+                }
                 case Enums.FlagsToSet.Projects:
-                    {
-                        _active.Projects.AsListWithPrefix = MergeToCollection(
-                            _active.Projects.AsListWithPrefix, value);
-                        _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
-                        break;
-                    }
+                {
+                    _active.Projects.AsListWithPrefix = MergeToCollection(
+                        _active.Projects.AsListWithPrefix,
+                        value
+                    );
+                    _viewer.ProjectSelection.Text = _active.Projects.AsStringNoPrefix;
+                    break;
+                }
                 case Enums.FlagsToSet.Topics:
-                    {
-                        _active.Topics.AsListWithPrefix = MergeToCollection(
-                            _active.Topics.AsListWithPrefix, value);
-                        _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
-                        break;
-                    }                    // Note that _active is set after OK click
+                {
+                    _active.Topics.AsListWithPrefix = MergeToCollection(
+                        _active.Topics.AsListWithPrefix,
+                        value
+                    );
+                    _viewer.TopicSelection.Text = _active.Topics.AsStringNoPrefix;
+                    break;
+                } // Note that _active is set after OK click
             }
-
         }
 
-
         /// <summary>
-        /// Method grabs the work Duration out of a text box, converts to an integer, 
-        /// and sets totalwork on the ToDoItem. 
+        /// Method grabs the work Duration out of a text box, converts to an integer,
+        /// and sets totalwork on the ToDoItem.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Duration must be >= 0 </exception>
         /// <exception cref="InvalidCastException">Value must be an integer </exception>
@@ -837,7 +918,9 @@ namespace TaskVisualization
             }
             catch (InvalidCastException)
             {
-                MessageBox.Show("Could not convert to integer. Please put a positive integer in the duration box");
+                MessageBox.Show(
+                    "Could not convert to integer. Please put a positive integer in the duration box"
+                );
                 duration = -1;
             }
             catch (ArgumentOutOfRangeException ex)
@@ -859,10 +942,16 @@ namespace TaskVisualization
         {
             foreach (ToDoItem c in _todo_list)
             {
-                ToDoEvents.Editing.AddOrUpdate(c.OlItem.EntryID, 1, (key, existing) => existing + 1);
+                ToDoEvents.Editing.AddOrUpdate(
+                    c.OlItem.EntryID,
+                    1,
+                    (key, existing) => existing + 1
+                );
 
-                FlagChangeGroup fcg = (c.OlItem.GetOlItemType() == OlItemType.olMailItem) ?
-                    new(Globals, c.OlItem.InnerObject as MailItem) : null;
+                FlagChangeGroup fcg =
+                    (c.OlItem.GetOlItemType() == OlItemType.olMailItem)
+                        ? new(Globals, c.OlItem.InnerObject as MailItem)
+                        : null;
 
                 if (c.FlagAsTask != _active.FlagAsTask)
                 {
@@ -872,7 +961,13 @@ namespace TaskVisualization
                 c.ReadOnly = true;
                 ApplyChange(fcg, "Context", Enums.FlagsToSet.Context, c.Context, _active.Context);
                 ApplyChange(Enums.FlagsToSet.People, c.People, _active.People);
-                ApplyChange(fcg, "Project", Enums.FlagsToSet.Projects, c.Projects, _active.Projects);
+                ApplyChange(
+                    fcg,
+                    "Project",
+                    Enums.FlagsToSet.Projects,
+                    c.Projects,
+                    _active.Projects
+                );
                 ApplyChange(Enums.FlagsToSet.Program, c.Program, _active.Program);
                 ApplyChange(Enums.FlagsToSet.Topics, c.Topics, _active.Topics);
                 ApplyChange(Enums.FlagsToSet.Kbf, c.KB, _active.KB);
@@ -906,13 +1001,19 @@ namespace TaskVisualization
 
                 if (_options.HasFlag(Enums.FlagsToSet.Priority) && c.Priority != _active.Priority)
                     c.Priority = _active.Priority;
-                if (_options.HasFlag(Enums.FlagsToSet.Taskname) && c.TaskSubject != _active.TaskSubject)
+                if (
+                    _options.HasFlag(Enums.FlagsToSet.Taskname)
+                    && c.TaskSubject != _active.TaskSubject
+                )
                     c.TaskSubject = _active.TaskSubject;
                 if (_options.HasFlag(Enums.FlagsToSet.Worktime) && c.TotalWork != _active.TotalWork)
                     c.TotalWork = _active.TotalWork;
                 if (_options.HasFlag(Enums.FlagsToSet.DueDate) && c.DueDate != _active.DueDate)
                     c.DueDate = _active.DueDate;
-                if (_options.HasFlag(Enums.FlagsToSet.Reminder) && c.ReminderTime != _active.ReminderTime)
+                if (
+                    _options.HasFlag(Enums.FlagsToSet.Reminder)
+                    && c.ReminderTime != _active.ReminderTime
+                )
                     c.ReminderTime = _active.ReminderTime;
                 if (_options == Enums.FlagsToSet.All && c.ActiveBranch != true)
                     c.ActiveBranch = true;
@@ -922,11 +1023,20 @@ namespace TaskVisualization
                     Globals.TD.FlagChangeTrainingQueue.Enqueue(fcg);
                 }
 
-                ToDoEvents.Editing.UpdateOrRemove(c.OlItem.EntryID, (key, existing) => existing == 1, (key, existing) => existing - 1, out _);
+                ToDoEvents.Editing.UpdateOrRemove(
+                    c.OlItem.EntryID,
+                    (key, existing) => existing == 1,
+                    (key, existing) => existing - 1,
+                    out _
+                );
             }
         }
 
-        internal void ApplyChange(Enums.FlagsToSet flag, FlagTranslator current, FlagTranslator revised)
+        internal void ApplyChange(
+            Enums.FlagsToSet flag,
+            FlagTranslator current,
+            FlagTranslator revised
+        )
         {
             if (Options.HasFlag(flag))
             {
@@ -938,13 +1048,20 @@ namespace TaskVisualization
             }
         }
 
-
-        internal void ApplyChange(FlagChangeGroup fcg, string classifierName, Enums.FlagsToSet flag, FlagTranslator current, FlagTranslator revised)
+        internal void ApplyChange(
+            FlagChangeGroup fcg,
+            string classifierName,
+            Enums.FlagsToSet flag,
+            FlagTranslator current,
+            FlagTranslator revised
+        )
         {
             if (Options.HasFlag(flag))
             {
-                if (fcg?.TryEnqueue(classifierName, current.AsListNoPrefix, revised.AsListNoPrefix) ?? false ||
-                    !AreCollectionsEqual(current.AsListNoPrefix, revised.AsListNoPrefix))
+                if (
+                    fcg?.TryEnqueue(classifierName, current.AsListNoPrefix, revised.AsListNoPrefix)
+                    ?? false || !AreCollectionsEqual(current.AsListNoPrefix, revised.AsListNoPrefix)
+                )
                 {
                     current.AsListNoPrefix = revised.AsListNoPrefix;
                     ChangedFlags |= flag;
@@ -952,7 +1069,10 @@ namespace TaskVisualization
             }
         }
 
-        private bool AreCollectionsEqual(ObservableCollection<string> collectionA, ObservableCollection<string> collectionB)
+        private bool AreCollectionsEqual(
+            ObservableCollection<string> collectionA,
+            ObservableCollection<string> collectionB
+        )
         {
             if (collectionA == null || collectionB == null)
                 return collectionA == collectionB;
@@ -963,8 +1083,6 @@ namespace TaskVisualization
             return setA.SetEquals(setB);
         }
 
-
-
         #endregion
 
         #region Keyboard UI
@@ -974,26 +1092,25 @@ namespace TaskVisualization
             switch (desiredState)
             {
                 case Enums.ToggleState.On:
-                    {
-                        foreach (var row in dictLabels)
-                            row.Key.Visible = true;
-                        break;
-                    }
+                {
+                    foreach (var row in dictLabels)
+                        row.Key.Visible = true;
+                    break;
+                }
 
                 case Enums.ToggleState.Off:
-                    {
-                        foreach (var row in dictLabels)
-                            row.Key.Visible = false;
-                        break;
-                    }
+                {
+                    foreach (var row in dictLabels)
+                        row.Key.Visible = false;
+                    break;
+                }
                 default:
-                    {
-                        foreach (var row in dictLabels)
-                            row.Key.Visible = !row.Key.Visible;
-                        break;
-                    }
+                {
+                    foreach (var row in dictLabels)
+                        row.Key.Visible = !row.Key.Visible;
+                    break;
+                }
             }
-
         }
 
         private void UpdateCaptions(Dictionary<Label, char> dictLabels)
@@ -1010,27 +1127,23 @@ namespace TaskVisualization
                 Button btn = ctrl as Button;
                 btn.PerformClick();
             }
-
             else if (ctrl is CheckBox)
             {
                 CheckBox checkBox = ctrl as CheckBox;
                 checkBox.Checked = !checkBox.Checked;
             }
-
             else if (ctrl is TextBox)
             {
                 TextBox txt = ctrl as TextBox;
                 txt.Select();
                 txt.SelectionStart = txt.Text.Length;
             }
-
             else if (ctrl is ComboBox)
             {
                 ComboBox combo = (ComboBox)ctrl;
                 combo.Select();
                 combo.DroppedDown = true;
             }
-
             else if (ctrl is DateTimePicker)
             {
                 DateTimePicker dt = (DateTimePicker)ctrl;
@@ -1040,10 +1153,8 @@ namespace TaskVisualization
                 int lParam = x + y * 0x10000;
                 bool unused = PostMessage(dt.Handle, WM_LBUTTONDOWN, 1, lParam);
             }
-
             else if (ctrl is Label)
             {
-
                 if (lbl.Equals(_viewer.XlProject))
                 {
                     AssignProject();
@@ -1062,24 +1173,35 @@ namespace TaskVisualization
                 }
                 else
                 {
-                    throw new ArgumentException("lbl not assigned properly to control", nameof(lbl));
+                    throw new ArgumentException(
+                        "lbl not assigned properly to control",
+                        nameof(lbl)
+                    );
                 }
             }
             else
             {
                 throw new ArgumentException("lbl not assigned properly to control", nameof(lbl));
             }
-
         }
 
         internal void ToggleXlGroupNav(Enums.ToggleState desiredState)
         {
-            _navTips.Where(tip => tip.GroupNumber == 0).ForEach(tip => tip.Toggle(desiredState, true));
+            _navTips
+                .Where(tip => tip.GroupNumber == 0)
+                .ForEach(tip => tip.Toggle(desiredState, true));
         }
 
-        internal (Dictionary<Label, char> dictActive, bool altActive, int level) DeactivateActiveXlGroup()
+        internal (
+            Dictionary<Label, char> dictActive,
+            bool altActive,
+            int level
+        ) DeactivateActiveXlGroup()
         {
-            if (_xlCtrlsActive is not null) { ToggleXl(_xlCtrlsActive, Enums.ToggleState.Off); }
+            if (_xlCtrlsActive is not null)
+            {
+                ToggleXl(_xlCtrlsActive, Enums.ToggleState.Off);
+            }
             if (_activeNavGroup != -1)
             {
                 var tips = NavTips.Where(x => x.GroupNumber == _activeNavGroup);
@@ -1090,19 +1212,28 @@ namespace TaskVisualization
             return (null, true, 0);
         }
 
-        internal (Dictionary<Label, char> dictActive, bool altActive, int level) ActivateXlGroup(char selectedChar, int groupNumber)
+        internal (Dictionary<Label, char> dictActive, bool altActive, int level) ActivateXlGroup(
+            char selectedChar,
+            int groupNumber
+        )
         {
-            if ((groupNumber != _activeNavGroup) && (groupNumber >= 1) && (groupNumber <= _xlCtrlsNav.Count))
+            if (
+                (groupNumber != _activeNavGroup)
+                && (groupNumber >= 1)
+                && (groupNumber <= _xlCtrlsNav.Count)
+            )
             {
                 DeactivateActiveXlGroup();
 
                 var captionLookup = GetCaptionLookup(groupNumber);
-                var dictActivate = (from controlCaption in captionLookup
-                                    where _xlCtrlOptions[controlCaption.Key]
-                                    select controlCaption)
-                                    .ToDictionary(
-                                        controlCaption => controlCaption.Key,
-                                        controlCaption => controlCaption.Value[0]);
+                var dictActivate = (
+                    from controlCaption in captionLookup
+                    where _xlCtrlOptions[controlCaption.Key]
+                    select controlCaption
+                ).ToDictionary(
+                    controlCaption => controlCaption.Key,
+                    controlCaption => controlCaption.Value[0]
+                );
                 if (dictActivate.Count == 0)
                 {
                     return (null, true, 0);
@@ -1118,10 +1249,15 @@ namespace TaskVisualization
                     return (dictActivate, true, 1);
                 }
             }
-            else { return (_xlCtrlsActive, _altActive, _altLevel); }
+            else
+            {
+                return (_xlCtrlsActive, _altActive, _altLevel);
+            }
         }
 
-        internal (Dictionary<Label, char> dictActive, bool altActive, int level) ActivateXlGroup(char selectedChar)
+        internal (Dictionary<Label, char> dictActive, bool altActive, int level) ActivateXlGroup(
+            char selectedChar
+        )
         {
             int.TryParse(selectedChar.ToString(), out int groupNumber);
             if (groupNumber != 0)
@@ -1134,7 +1270,9 @@ namespace TaskVisualization
             }
         }
 
-        internal (Dictionary<Label, char> dictActive, bool altActive, int level) ActivateXlGroup(int groupNumber)
+        internal (Dictionary<Label, char> dictActive, bool altActive, int level) ActivateXlGroup(
+            int groupNumber
+        )
         {
             if (groupNumber != 0)
             {
@@ -1146,31 +1284,35 @@ namespace TaskVisualization
             }
         }
 
-        internal (Dictionary<Label, char> dictActive, bool altActive, int level) RecurseXl(Dictionary<Label, char> dictSeed, bool altActive, char selectedChar, int level)
+        internal (Dictionary<Label, char> dictActive, bool altActive, int level) RecurseXl(
+            Dictionary<Label, char> dictSeed,
+            bool altActive,
+            char selectedChar,
+            int level
+        )
         {
             Dictionary<Label, char> dictDeactivate;
             Dictionary<Label, char> dictActivate;
 
             if (!altActive)
             {
-                dictActivate = (from x in _xlCtrlCaptions
-                                where _xlCtrlOptions[x.Key]
-                                select x).ToDictionary(x => x.Key, x => char.ToUpper(x.Value[0]));
+                dictActivate = (
+                    from x in _xlCtrlCaptions
+                    where _xlCtrlOptions[x.Key]
+                    select x
+                ).ToDictionary(x => x.Key, x => char.ToUpper(x.Value[0]));
 
                 ToggleXl(dictActivate, Enums.ToggleState.On);
                 UpdateCaptions(dictActivate);
 
                 return (dictActivate, true, 1);
             }
-
-
             else if (dictSeed is null)
             {
                 // Ensure that dictSeed is assigned. Alt key should not be
                 // active if there is no seed value
                 throw new ArgumentNullException(nameof(dictSeed));
             }
-
             else if (selectedChar == '\0')
             {
                 // Empty character is only passed if Alt key is pressed again.
@@ -1180,58 +1322,57 @@ namespace TaskVisualization
                 ToggleXlGroupNav(Enums.ToggleState.Off);
                 return (null, false, 0);
             }
-
             else
             {
                 // Get accelerator labels that match the key stroke
-                dictActivate = (from x in dictSeed
-                                where x.Value == selectedChar
-                                select x).ToDictionary(x => x.Key, x => char.ToUpper(_xlCtrlCaptions[x.Key][level]));
+                dictActivate = (
+                    from x in dictSeed
+                    where x.Value == selectedChar
+                    select x
+                ).ToDictionary(x => x.Key, x => char.ToUpper(_xlCtrlCaptions[x.Key][level]));
 
                 switch (dictActivate.Count)
                 {
                     case 0:
-                        {
-                            // If character doesn't match, ignore it
-                            return (dictSeed, true, 0);
-                        }
+                    {
+                        // If character doesn't match, ignore it
+                        return (dictSeed, true, 0);
+                    }
 
                     case 1:
-                        {
-                            // If only 1 element, we have found a match. 
+                    {
+                        // If only 1 element, we have found a match.
 
-                            // Turn off all remaining accelerator labels, including the match
-                            DeactivateActiveXlGroup();
-                            ToggleXlGroupNav(Enums.ToggleState.Off);
-                            //ToggleXl(dictSeed, Enums.ToggleState.Off);
+                        // Turn off all remaining accelerator labels, including the match
+                        DeactivateActiveXlGroup();
+                        ToggleXlGroupNav(Enums.ToggleState.Off);
+                        //ToggleXl(dictSeed, Enums.ToggleState.Off);
 
-                            // Execute the designated action for the control
-                            ExecuteXlAction(dictActivate.First().Key);
+                        // Execute the designated action for the control
+                        ExecuteXlAction(dictActivate.First().Key);
 
-                            // Return values to reset the seed values
-                            return (null, false, 0);
-                        }
+                        // Return values to reset the seed values
+                        return (null, false, 0);
+                    }
 
                     default:
-                        {
-                            // If more than 1 element, we need to keep searching letters
+                    {
+                        // If more than 1 element, we need to keep searching letters
 
-                            // Get controls to deactivate
-                            dictDeactivate = (from x in dictSeed
-                                              where x.Value != selectedChar
-                                              select x).ToDictionary(x => x.Key, x => x.Value);
-                            ToggleXl(dictDeactivate, Enums.ToggleState.Off);
-                            UpdateCaptions(dictActivate);
+                        // Get controls to deactivate
+                        dictDeactivate = (
+                            from x in dictSeed
+                            where x.Value != selectedChar
+                            select x
+                        ).ToDictionary(x => x.Key, x => x.Value);
+                        ToggleXl(dictDeactivate, Enums.ToggleState.Off);
+                        UpdateCaptions(dictActivate);
 
-                            // Return values to seed the next recursion
-                            return (dictActivate, true, level + 1);
-                        }
-
+                        // Return values to seed the next recursion
+                        return (dictActivate, true, level + 1);
+                    }
                 }
-
-
             }
-
         }
 
         #endregion
@@ -1272,15 +1413,17 @@ namespace TaskVisualization
 
         internal Dictionary<Label, bool> GetOptionsLookup(int group)
         {
-            return GetControlRelationships().Where(x => x.Group == group)
-                                            .Select(x => new KeyValuePair<Label, bool>(x.Accelerator, x.Active))
-                                            .ToDictionary();
+            return GetControlRelationships()
+                .Where(x => x.Group == group)
+                .Select(x => new KeyValuePair<Label, bool>(x.Accelerator, x.Active))
+                .ToDictionary();
         }
 
         internal Dictionary<Label, bool> GetOptionsLookup()
         {
-            return GetControlRelationships().Select(x => new KeyValuePair<Label, bool>(x.Accelerator, x.Active))
-                                            .ToDictionary();
+            return GetControlRelationships()
+                .Select(x => new KeyValuePair<Label, bool>(x.Accelerator, x.Active))
+                .ToDictionary();
         }
 
         //internal Dictionary<Label, string> CreateCaptionLookup()
@@ -1318,15 +1461,17 @@ namespace TaskVisualization
 
         internal Dictionary<Label, string> GetCaptionLookup(int group)
         {
-            return GetControlRelationships().Where(x => x.Group == group)
-                                            .Select(x => new KeyValuePair<Label, string>(x.Accelerator, x.Caption))
-                                            .ToDictionary();
+            return GetControlRelationships()
+                .Where(x => x.Group == group)
+                .Select(x => new KeyValuePair<Label, string>(x.Accelerator, x.Caption))
+                .ToDictionary();
         }
 
         internal Dictionary<Label, string> GetCaptionLookup()
         {
-            return GetControlRelationships().Select(x => new KeyValuePair<Label, string>(x.Accelerator, x.Caption))
-                                            .ToDictionary();
+            return GetControlRelationships()
+                .Select(x => new KeyValuePair<Label, string>(x.Accelerator, x.Caption))
+                .ToDictionary();
         }
 
         //internal Dictionary<Label, Control> CreateControlLookup()
@@ -1364,61 +1509,241 @@ namespace TaskVisualization
 
         internal Dictionary<Label, Control> GetControlLookup(int group)
         {
-            return GetControlRelationships().Where(x => x.Group == group)
-                                            .Select(x => new KeyValuePair<Label, Control>(x.Accelerator, x.Control))
-                                            .ToDictionary();
+            return GetControlRelationships()
+                .Where(x => x.Group == group)
+                .Select(x => new KeyValuePair<Label, Control>(x.Accelerator, x.Control))
+                .ToDictionary();
         }
 
         internal Dictionary<Label, Control> GetControlLookup()
         {
-            return GetControlRelationships().Select(x => new KeyValuePair<Label, Control>(x.Accelerator, x.Control))
-                                            .ToDictionary();
+            return GetControlRelationships()
+                .Select(x => new KeyValuePair<Label, Control>(x.Accelerator, x.Control))
+                .ToDictionary();
         }
 
         private List<ControlRelationship> GetControlRelationships()
         {
             var list = new List<ControlRelationship>
             {
-                new ControlRelationship(0, _viewer.XlSector1,  true,  _viewer.XlSector1.Text,  _viewer.XlSector1),
-                new ControlRelationship(0, _viewer.XlSector2,  true,  _viewer.XlSector2.Text,  _viewer.XlSector2),
-                new ControlRelationship(0, _viewer.XlSector3,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.XlSector3.Text,  _viewer.XlSector3),
-                new ControlRelationship(0, _viewer.XlSector4,  true,  _viewer.XlSector4.Text,  _viewer.XlSector4),
-                new ControlRelationship(2, _viewer.XlTopic,  _options.HasFlag(Enums.FlagsToSet.Topics),  _viewer.LblTopic.Text,  _viewer.LblTopic),
-                new ControlRelationship(2, _viewer.XlProject,  _options.HasFlag(Enums.FlagsToSet.Projects),  _viewer.LblProject.Text,  _viewer.LblProject),
-                new ControlRelationship(2, _viewer.XlPeople,  _options.HasFlag(Enums.FlagsToSet.People),  _viewer.LblPeople.Text,  _viewer.LblPeople),
-                new ControlRelationship(2, _viewer.XlContext,  _options.HasFlag(Enums.FlagsToSet.Context),  _viewer.LblContext.Text,  _viewer.LblContext),
-                new ControlRelationship(1, _viewer.XlTaskname,  _options.HasFlag(Enums.FlagsToSet.Taskname),  _viewer.LblTaskname.Text,  _viewer.TaskName),
-                new ControlRelationship(1, _viewer.XlImportance,  _options.HasFlag(Enums.FlagsToSet.Priority),  _viewer.LblPriority.Text,  _viewer.PriorityBox),
-                new ControlRelationship(1, _viewer.XlKanban,  _options.HasFlag(Enums.FlagsToSet.Kbf),  _viewer.LblKbf.Text,  _viewer.KbSelector),
-                new ControlRelationship(1, _viewer.XlWorktime,  _options.HasFlag(Enums.FlagsToSet.Worktime),  _viewer.LblDuration.Text,  _viewer.Duration),
-                new ControlRelationship(4, _viewer.XlOk,  true,  _viewer.OKButton.Text,  _viewer.OKButton),
-                new ControlRelationship(4, _viewer.XlCancel,  true,  _viewer.Cancel_Button.Text,  _viewer.Cancel_Button),
-                new ControlRelationship(4, _viewer.XlAutotag,  true,  _viewer.AutoTagButton.Text,  _viewer.AutoTagButton),
-                new ControlRelationship(1, _viewer.XlReminder,  _options.HasFlag(Enums.FlagsToSet.Reminder),  _viewer.LblReminder.Text,  _viewer.DtReminder),
-                new ControlRelationship(1, _viewer.XlDuedate,  _options.HasFlag(Enums.FlagsToSet.DueDate),  _viewer.LblDuedate.Text,  _viewer.DtDuedate),
-                new ControlRelationship(3, _viewer.XlScWaiting,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutWaitingFor.Text,  _viewer.ShortcutWaitingFor),
-                new ControlRelationship(3, _viewer.XlScUnprocessed,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutUnprocessed.Text,  _viewer.ShortcutUnprocessed),
-                new ControlRelationship(3, _viewer.XlScNews,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutNews.Text,  _viewer.ShortcutNews),
-                new ControlRelationship(3, _viewer.XlScEmail,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutEmail.Text,  _viewer.ShortcutEmail),
-                new ControlRelationship(3, _viewer.XlScReadingbusiness,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutReadingBusiness.Text,  _viewer.ShortcutReadingBusiness),
-                new ControlRelationship(3, _viewer.XlScCalls,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutCalls.Text,  _viewer.ShortcutCalls),
-                new ControlRelationship(3, _viewer.XlScInternet,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutInternet.Text,  _viewer.ShortcutInternet),
-                new ControlRelationship(3, _viewer.XlScPreread,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutPreRead.Text,  _viewer.ShortcutPreRead),
-                new ControlRelationship(3, _viewer.XlScMeeting,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutMeeting.Text,  _viewer.ShortcutMeeting),
-                new ControlRelationship(3, _viewer.XlScPersonal,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.ShortcutPersonal.Text,  _viewer.ShortcutPersonal),
-                new ControlRelationship(3, _viewer.XlScBullpin,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.CbxBullpin.Text,  _viewer.CbxBullpin),
-                new ControlRelationship(3, _viewer.XlScToday,  _options.HasFlag(Enums.FlagsToSet.All),  _viewer.CbxToday.Text,  _viewer.CbxToday)
+                new ControlRelationship(
+                    0,
+                    _viewer.XlSector1,
+                    true,
+                    _viewer.XlSector1.Text,
+                    _viewer.XlSector1
+                ),
+                new ControlRelationship(
+                    0,
+                    _viewer.XlSector2,
+                    true,
+                    _viewer.XlSector2.Text,
+                    _viewer.XlSector2
+                ),
+                new ControlRelationship(
+                    0,
+                    _viewer.XlSector3,
+                    _options.HasFlag(Enums.FlagsToSet.All),
+                    _viewer.XlSector3.Text,
+                    _viewer.XlSector3
+                ),
+                new ControlRelationship(
+                    0,
+                    _viewer.XlSector4,
+                    true,
+                    _viewer.XlSector4.Text,
+                    _viewer.XlSector4
+                ),
+                new ControlRelationship(
+                    2,
+                    _viewer.XlTopic,
+                    _options.HasFlag(Enums.FlagsToSet.Topics),
+                    _viewer.LblTopic.Text,
+                    _viewer.LblTopic
+                ),
+                new ControlRelationship(
+                    2,
+                    _viewer.XlProject,
+                    _options.HasFlag(Enums.FlagsToSet.Projects),
+                    _viewer.LblProject.Text,
+                    _viewer.LblProject
+                ),
+                new ControlRelationship(
+                    2,
+                    _viewer.XlPeople,
+                    _options.HasFlag(Enums.FlagsToSet.People),
+                    _viewer.LblPeople.Text,
+                    _viewer.LblPeople
+                ),
+                new ControlRelationship(
+                    2,
+                    _viewer.XlContext,
+                    _options.HasFlag(Enums.FlagsToSet.Context),
+                    _viewer.LblContext.Text,
+                    _viewer.LblContext
+                ),
+                new ControlRelationship(
+                    1,
+                    _viewer.XlTaskname,
+                    _options.HasFlag(Enums.FlagsToSet.Taskname),
+                    _viewer.LblTaskname.Text,
+                    _viewer.TaskName
+                ),
+                new ControlRelationship(
+                    1,
+                    _viewer.XlImportance,
+                    _options.HasFlag(Enums.FlagsToSet.Priority),
+                    _viewer.LblPriority.Text,
+                    _viewer.PriorityBox
+                ),
+                new ControlRelationship(
+                    1,
+                    _viewer.XlKanban,
+                    _options.HasFlag(Enums.FlagsToSet.Kbf),
+                    _viewer.LblKbf.Text,
+                    _viewer.KbSelector
+                ),
+                new ControlRelationship(
+                    1,
+                    _viewer.XlWorktime,
+                    _options.HasFlag(Enums.FlagsToSet.Worktime),
+                    _viewer.LblDuration.Text,
+                    _viewer.Duration
+                ),
+                new ControlRelationship(
+                    4,
+                    _viewer.XlOk,
+                    true,
+                    _viewer.OKButton.Text,
+                    _viewer.OKButton
+                ),
+                new ControlRelationship(
+                    4,
+                    _viewer.XlCancel,
+                    true,
+                    _viewer.Cancel_Button.Text,
+                    _viewer.Cancel_Button
+                ),
+                new ControlRelationship(
+                    4,
+                    _viewer.XlAutotag,
+                    true,
+                    _viewer.AutoTagButton.Text,
+                    _viewer.AutoTagButton
+                ),
+                new ControlRelationship(
+                    1,
+                    _viewer.XlReminder,
+                    _options.HasFlag(Enums.FlagsToSet.Reminder),
+                    _viewer.LblReminder.Text,
+                    _viewer.DtReminder
+                ),
+                new ControlRelationship(
+                    1,
+                    _viewer.XlDuedate,
+                    _options.HasFlag(Enums.FlagsToSet.DueDate),
+                    _viewer.LblDuedate.Text,
+                    _viewer.DtDuedate
+                ),
+                new ControlRelationship(
+                    3,
+                    _viewer.XlScWaiting,
+                    _options.HasFlag(Enums.FlagsToSet.All),
+                    _viewer.ShortcutWaitingFor.Text,
+                    _viewer.ShortcutWaitingFor
+                ),
+                new ControlRelationship(
+                    3,
+                    _viewer.XlScUnprocessed,
+                    _options.HasFlag(Enums.FlagsToSet.All),
+                    _viewer.ShortcutUnprocessed.Text,
+                    _viewer.ShortcutUnprocessed
+                ),
+                new ControlRelationship(
+                    3,
+                    _viewer.XlScNews,
+                    _options.HasFlag(Enums.FlagsToSet.All),
+                    _viewer.ShortcutNews.Text,
+                    _viewer.ShortcutNews
+                ),
+                new ControlRelationship(
+                    3,
+                    _viewer.XlScEmail,
+                    _options.HasFlag(Enums.FlagsToSet.All),
+                    _viewer.ShortcutEmail.Text,
+                    _viewer.ShortcutEmail
+                ),
+                new ControlRelationship(
+                    3,
+                    _viewer.XlScReadingbusiness,
+                    _options.HasFlag(Enums.FlagsToSet.All),
+                    _viewer.ShortcutReadingBusiness.Text,
+                    _viewer.ShortcutReadingBusiness
+                ),
+                new ControlRelationship(
+                    3,
+                    _viewer.XlScCalls,
+                    _options.HasFlag(Enums.FlagsToSet.All),
+                    _viewer.ShortcutCalls.Text,
+                    _viewer.ShortcutCalls
+                ),
+                new ControlRelationship(
+                    3,
+                    _viewer.XlScInternet,
+                    _options.HasFlag(Enums.FlagsToSet.All),
+                    _viewer.ShortcutInternet.Text,
+                    _viewer.ShortcutInternet
+                ),
+                new ControlRelationship(
+                    3,
+                    _viewer.XlScPreread,
+                    _options.HasFlag(Enums.FlagsToSet.All),
+                    _viewer.ShortcutPreRead.Text,
+                    _viewer.ShortcutPreRead
+                ),
+                new ControlRelationship(
+                    3,
+                    _viewer.XlScMeeting,
+                    _options.HasFlag(Enums.FlagsToSet.All),
+                    _viewer.ShortcutMeeting.Text,
+                    _viewer.ShortcutMeeting
+                ),
+                new ControlRelationship(
+                    3,
+                    _viewer.XlScPersonal,
+                    _options.HasFlag(Enums.FlagsToSet.All),
+                    _viewer.ShortcutPersonal.Text,
+                    _viewer.ShortcutPersonal
+                ),
+                new ControlRelationship(
+                    3,
+                    _viewer.XlScBullpin,
+                    _options.HasFlag(Enums.FlagsToSet.All),
+                    _viewer.CbxBullpin.Text,
+                    _viewer.CbxBullpin
+                ),
+                new ControlRelationship(
+                    3,
+                    _viewer.XlScToday,
+                    _options.HasFlag(Enums.FlagsToSet.All),
+                    _viewer.CbxToday.Text,
+                    _viewer.CbxToday
+                ),
             };
             return list;
         }
-
-
 
         private struct ControlRelationship
         {
             public ControlRelationship() { }
 
-            public ControlRelationship(int group, Label accelerator, bool active, string caption, Control control)
+            public ControlRelationship(
+                int group,
+                Label accelerator,
+                bool active,
+                string caption,
+                Control control
+            )
             {
                 Group = group;
                 Accelerator = accelerator;
@@ -1432,7 +1757,6 @@ namespace TaskVisualization
             public bool Active;
             public string Caption;
             public Control Control;
-
         }
 
         private Dictionary<Enums.FlagsToSet, List<Control>> _optionsGroups;
@@ -1444,22 +1768,62 @@ namespace TaskVisualization
                 {
                     _optionsGroups = new()
                     {
-                        { Enums.FlagsToSet.Context, new List<Control> { _viewer.CategorySelection, _viewer.LblContext } },
-                        { Enums.FlagsToSet.Topics, new List<Control>{ _viewer.TopicSelection, _viewer.LblTopic } },
-                        { Enums.FlagsToSet.Projects, new List<Control>{ _viewer.ProjectSelection, _viewer.LblProject } },
-                        { Enums.FlagsToSet.People, new List<Control>{ _viewer.PeopleSelection, _viewer.LblPeople } },
-                        { Enums.FlagsToSet.Taskname, new List<Control>{ _viewer.TaskName, _viewer.LblTaskname } },
-                        { Enums.FlagsToSet.Priority, new List<Control>{ _viewer.PriorityBox, _viewer.LblPriority } },
-                        { Enums.FlagsToSet.Kbf, new List<Control>{ _viewer.KbSelector, _viewer.LblKbf } },
-                        { Enums.FlagsToSet.Worktime, new List<Control>{ _viewer.Duration, _viewer.LblDuration } },
-                        { Enums.FlagsToSet.Reminder, new List<Control>{ _viewer.DtReminder, _viewer.LblReminder } },
-                        { Enums.FlagsToSet.DueDate, new List<Control>{ _viewer.DtDuedate, _viewer.LblDuedate } },
-                        { Enums.FlagsToSet.All, new List<Control>
                         {
-                            _viewer.ShortcutMeeting,_viewer.ShortcutCalls,_viewer.ShortcutPersonal,
-                            _viewer.ShortcutEmail,_viewer.ShortcutInternet,_viewer.ShortcutReadingBusiness,
-                            _viewer.ShortcutNews,_viewer.ShortcutUnprocessed,_viewer.ShortcutWaitingFor,
-                            _viewer.ShortcutPreRead}}
+                            Enums.FlagsToSet.Context,
+                            new List<Control> { _viewer.CategorySelection, _viewer.LblContext }
+                        },
+                        {
+                            Enums.FlagsToSet.Topics,
+                            new List<Control> { _viewer.TopicSelection, _viewer.LblTopic }
+                        },
+                        {
+                            Enums.FlagsToSet.Projects,
+                            new List<Control> { _viewer.ProjectSelection, _viewer.LblProject }
+                        },
+                        {
+                            Enums.FlagsToSet.People,
+                            new List<Control> { _viewer.PeopleSelection, _viewer.LblPeople }
+                        },
+                        {
+                            Enums.FlagsToSet.Taskname,
+                            new List<Control> { _viewer.TaskName, _viewer.LblTaskname }
+                        },
+                        {
+                            Enums.FlagsToSet.Priority,
+                            new List<Control> { _viewer.PriorityBox, _viewer.LblPriority }
+                        },
+                        {
+                            Enums.FlagsToSet.Kbf,
+                            new List<Control> { _viewer.KbSelector, _viewer.LblKbf }
+                        },
+                        {
+                            Enums.FlagsToSet.Worktime,
+                            new List<Control> { _viewer.Duration, _viewer.LblDuration }
+                        },
+                        {
+                            Enums.FlagsToSet.Reminder,
+                            new List<Control> { _viewer.DtReminder, _viewer.LblReminder }
+                        },
+                        {
+                            Enums.FlagsToSet.DueDate,
+                            new List<Control> { _viewer.DtDuedate, _viewer.LblDuedate }
+                        },
+                        {
+                            Enums.FlagsToSet.All,
+                            new List<Control>
+                            {
+                                _viewer.ShortcutMeeting,
+                                _viewer.ShortcutCalls,
+                                _viewer.ShortcutPersonal,
+                                _viewer.ShortcutEmail,
+                                _viewer.ShortcutInternet,
+                                _viewer.ShortcutReadingBusiness,
+                                _viewer.ShortcutNews,
+                                _viewer.ShortcutUnprocessed,
+                                _viewer.ShortcutWaitingFor,
+                                _viewer.ShortcutPreRead,
+                            }
+                        },
                     };
                 }
                 return _optionsGroups;
@@ -1469,27 +1833,27 @@ namespace TaskVisualization
         private IEnumerable<TipsController> _navTips;
         internal IEnumerable<TipsController> NavTips
         {
-            get => _navTips ??= new List<TipsController>
-            {
-                new TipsController(_viewer.XlSector1, 0),
-                new TipsController (_viewer.XlSector2, 0),
-                new TipsController (_viewer.XlSector3, 0),
-                new TipsController (_viewer.XlSector4, 0),
-                new TipsController (_viewer.C1S1, 1),
-                new TipsController (_viewer.C3S1, 1),
-                new TipsController (_viewer.C4S1, 1),
-                new TipsController (_viewer.C2S2, 2),
-                new TipsController (_viewer.C3S2, 2),
-                new TipsController (_viewer.C4S2, 2),
-                new TipsController (_viewer.C2S3, 3),
-                new TipsController (_viewer.C3S3, 3),
-                new TipsController (_viewer.C4S3, 3),
-                new TipsController (_viewer.C2S4, 4),
-                new TipsController (_viewer.C3S4, 4)
-            };
+            get =>
+                _navTips ??= new List<TipsController>
+                {
+                    new TipsController(_viewer.XlSector1, 0),
+                    new TipsController(_viewer.XlSector2, 0),
+                    new TipsController(_viewer.XlSector3, 0),
+                    new TipsController(_viewer.XlSector4, 0),
+                    new TipsController(_viewer.C1S1, 1),
+                    new TipsController(_viewer.C3S1, 1),
+                    new TipsController(_viewer.C4S1, 1),
+                    new TipsController(_viewer.C2S2, 2),
+                    new TipsController(_viewer.C3S2, 2),
+                    new TipsController(_viewer.C4S2, 2),
+                    new TipsController(_viewer.C2S3, 3),
+                    new TipsController(_viewer.C3S3, 3),
+                    new TipsController(_viewer.C4S3, 3),
+                    new TipsController(_viewer.C2S4, 4),
+                    new TipsController(_viewer.C3S4, 4),
+                };
         }
 
         #endregion
-
     }
 }

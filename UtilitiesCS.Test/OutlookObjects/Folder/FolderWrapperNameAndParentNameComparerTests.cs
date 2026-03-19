@@ -72,9 +72,19 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             return node;
         }
 
-        private static FolderWrapper CreateFolder(string name, int itemCount = 0, long folderSize = 0L)
+        private static FolderWrapper CreateFolder(
+            string name,
+            int itemCount = 0,
+            long folderSize = 0L
+        )
         {
-            return new FolderWrapper(selected: false, itemCount: itemCount, folderSize: folderSize, name: name, relativePath: name ?? string.Empty);
+            return new FolderWrapper(
+                selected: false,
+                itemCount: itemCount,
+                folderSize: folderSize,
+                name: name,
+                relativePath: name ?? string.Empty
+            );
         }
     }
 }

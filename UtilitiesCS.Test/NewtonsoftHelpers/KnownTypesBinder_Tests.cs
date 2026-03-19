@@ -1,7 +1,7 @@
+using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-using System;
 using UtilitiesCS.NewtonsoftHelpers;
 
 namespace UtilitiesCS.Test
@@ -29,10 +29,7 @@ namespace UtilitiesCS.Test
         public void BindToType_ShouldReturnNull_ForUnknownOrNullTypeName()
         {
             // Arrange
-            var binder = new KnownTypesBinder
-            {
-                KnownTypes = new[] { typeof(BinderDog) },
-            };
+            var binder = new KnownTypesBinder { KnownTypes = new[] { typeof(BinderDog) } };
 
             // Act
             Type unknownType = binder.BindToType("ignored", "MissingType");
@@ -61,10 +58,7 @@ namespace UtilitiesCS.Test
         public void JsonSerializer_ShouldRoundTripRegisteredType()
         {
             // Arrange
-            var binder = new KnownTypesBinder
-            {
-                KnownTypes = new[] { typeof(BinderDog) },
-            };
+            var binder = new KnownTypesBinder { KnownTypes = new[] { typeof(BinderDog) } };
             var settings = new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Objects,

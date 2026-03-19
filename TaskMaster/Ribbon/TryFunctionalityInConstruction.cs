@@ -1,7 +1,4 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using SDILReader;
-using stdole;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -9,6 +6,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Office.Interop.Outlook;
+using SDILReader;
+using stdole;
 using TaskVisualization;
 using ToDoModel;
 using UtilitiesCS;
@@ -22,10 +22,11 @@ namespace TaskMaster.Ribbon
 {
     public class TryFunctionalityInConstruction(IApplicationGlobals globals)
     {
-        public IApplicationGlobals AppGlobals { get; internal protected set; } = globals;
+        public IApplicationGlobals AppGlobals { get; protected internal set; } = globals;
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Try specific methods
 
@@ -37,6 +38,7 @@ namespace TaskMaster.Ribbon
             //logger.Debug(df.PrettyText());
             df.Display();
         }
+
         internal void TryGetConversationOutlookTable()
         {
             var Mail = AppGlobals.Ol.App.ActiveExplorer().Selection[1];
@@ -44,6 +46,7 @@ namespace TaskMaster.Ribbon
             var table = conv.GetTable(WithFolder: true, WithStore: true);
             table.EnumerateTable();
         }
+
         internal void TryGetMailItemInfo()
         {
             var mailItem = AppGlobals.Ol.App.ActiveExplorer().Selection[1] as MailItem;
@@ -60,20 +63,24 @@ namespace TaskMaster.Ribbon
             //var mInfo = new MailItemHelper(df, 0, Globals.Ol.EmailPrefixToStrip);
             var info = MailItemHelper.FromDf(df, 0, AppGlobals);
         }
+
         internal void TryGetQfcDataModel()
         {
             var cts = new CancellationTokenSource();
             var token = cts.Token;
             var dc = new QuickFiler.Controllers.QfcDatamodel(AppGlobals, token);
         }
+
         internal void TryGetTableInView()
         {
             Outlook.Table table = AppGlobals.Ol.App.ActiveExplorer().GetTableInView();
         }
+
         internal void TryRebuildProjInfo()
         {
             AppGlobals.TD.ProjInfo.Rebuild(AppGlobals.Ol.App);
         }
+
         internal void TryRecipientGetInfo()
         {
             var Mail = (Outlook.MailItem)AppGlobals.Ol.App.ActiveExplorer().Selection[1];
@@ -85,13 +92,14 @@ namespace TaskMaster.Ribbon
             //}
             //var stores = AppGlobals.Ol.NamespaceMAPI.Stores.Cast<Store>();
             //var globalAddresses = stores
-            //    .Select(store => store.GetGlobalAddressList(AppGlobals.Ol.App))                
+            //    .Select(store => store.GetGlobalAddressList(AppGlobals.Ol.App))
             //    .ToArray();
             //var globalEntries = globalAddresses
             //    .Select(ga => ga.AddressEntries.Cast<AddressEntry>().ToArray())
             //    .ToArray();
             //Mail.Recipients.ResolveAll();
-            var recipients = Mail.Recipients.Cast<Recipient>()
+            var recipients = Mail
+                .Recipients.Cast<Recipient>()
                 .Select(recipient => recipient.ToResolvedRecipient(AppGlobals.Ol.NamespaceMAPI))
                 .ToArray();
             //ExchangeUser exchangeUser = null;
@@ -100,10 +108,10 @@ namespace TaskMaster.Ribbon
             //    foreach (var entries in globalEntries)
             //    {
             //        var entry = entries.FirstOrDefault(x => x.Name == recipient.Name);
-            //        if (entry != default) 
+            //        if (entry != default)
             //        {
             //            exchangeUser = entry.GetExchangeUser();
-            //            break; 
+            //            break;
             //        }
             //    }
             //}
@@ -115,6 +123,7 @@ namespace TaskMaster.Ribbon
         {
             AppGlobals.TD.IDList.SubstituteIdRoot("9710", "2501");
         }
+
         internal void TryGetImage()
         {
             var ae = AppGlobals.Ol.App.ActiveExplorer();
@@ -130,9 +139,8 @@ namespace TaskMaster.Ribbon
 
             //System.Drawing.Image image6 = GetImage(image5);
             //image6.Save(@"C:\Temp\Reply.png", ImageFormat.Png);
-
-
         }
+
         internal System.Drawing.Image GetImage(IPictureDisp disp)
         {
             return System.Drawing.Image.FromHbitmap((IntPtr)disp.Handle, (IntPtr)disp.hPal);
@@ -154,7 +162,8 @@ namespace TaskMaster.Ribbon
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext());
+                    new WindowsFormsSynchronizationContext()
+                );
             await AppGlobals.AF.SubjectMap.RebuildAsync(AppGlobals);
         }
 
@@ -167,7 +176,8 @@ namespace TaskMaster.Ribbon
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext());
+                    new WindowsFormsSynchronizationContext()
+                );
 
             CancellationTokenSource cts = new CancellationTokenSource();
             var token = cts.Token;
@@ -186,7 +196,8 @@ namespace TaskMaster.Ribbon
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext());
+                    new WindowsFormsSynchronizationContext()
+                );
             var miner = new UtilitiesCS.EmailIntelligence.Bayesian.EmailDataMiner(AppGlobals);
             await miner.MineEmails();
         }
@@ -195,7 +206,8 @@ namespace TaskMaster.Ribbon
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext());
+                    new WindowsFormsSynchronizationContext()
+                );
             var miner = new OlFolderClassifierGroup(AppGlobals);
             await miner.BuildClassifiersAsync();
         }
@@ -211,14 +223,14 @@ namespace TaskMaster.Ribbon
             //var ae = Globals.Ol.App.ActiveExplorer();
             //var mail = (Outlook.MailItem)ae.Selection[1];
             //new EmailDataMiner(Globals).SerializeMailInfo(mail);
-
         }
 
         internal async Task TryTestClassifierAsync()
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext());
+                    new WindowsFormsSynchronizationContext()
+                );
             var tuner = new BayesianPerformanceMeasurement(AppGlobals);
             await tuner.TestFolderClassifierAsync();
         }
@@ -227,7 +239,8 @@ namespace TaskMaster.Ribbon
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext());
+                    new WindowsFormsSynchronizationContext()
+                );
             var tuner = new BayesianPerformanceMeasurement(AppGlobals);
             await tuner.TestFolderClassifierAsync(verbose: true);
         }
@@ -237,9 +250,11 @@ namespace TaskMaster.Ribbon
             var projectCreator = new AutoCreateProject(AppGlobals);
             var prefix = new PrefixItem(
                 prefixType: PrefixTypeEnum.Project,
-                key: "Project", value: Properties.Settings.Default.Prefix_Project,
+                key: "Project",
+                value: Properties.Settings.Default.Prefix_Project,
                 color: OlCategoryColor.olCategoryColorTeal,
-                olUserFieldName: "TagProject");
+                olUserFieldName: "TagProject"
+            );
             projectCreator.CreateProjectTaskItem("T3 ROUTINE - Reading", "T305");
         }
 
@@ -258,15 +273,17 @@ namespace TaskMaster.Ribbon
                     {
                         return null;
                     }
-
                 })
-                .Where(store => store is not null).ToArray();
-            var mailboxes = inboxes.Select(x => x.FolderPath.Split("\\").Where(x => !x.IsNullOrEmpty()).FirstOrDefault()).ToArray();
+                .Where(store => store is not null)
+                .ToArray();
+            var mailboxes = inboxes
+                .Select(x =>
+                    x.FolderPath.Split("\\").Where(x => !x.IsNullOrEmpty()).FirstOrDefault()
+                )
+                .ToArray();
             logger.Debug($"Inboxes: {mailboxes.SentenceJoin()}");
         }
 
         #endregion
-
-
     }
 }

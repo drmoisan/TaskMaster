@@ -5,7 +5,12 @@ namespace UtilitiesCS
     public static class Enums
     {
         [System.Flags]
-        public enum ToggleState { Off = 0, On = 1, Force = 2 }
+        public enum ToggleState
+        {
+            Off = 0,
+            On = 1,
+            Force = 2,
+        }
 
         /// <summary>
         /// Enumeration that controls whether keypair matches are found by Subject or by Folder
@@ -23,13 +28,13 @@ namespace UtilitiesCS
         public enum FindBy
         {
             Subject = 1,
-            Folder = 2
+            Folder = 2,
         }
 
         public enum Corpus
         {
             Negative = 0,
-            Positive = 1
+            Positive = 1,
         }
 
         public enum WorkerState
@@ -38,14 +43,14 @@ namespace UtilitiesCS
             Working = 1,
             Paused = 2,
             Stopped = 3,
-            Completed = 4
+            Completed = 4,
         }
 
         public enum LoadState
         {
             NotLoaded = 0,
             Loading = 1,
-            Loaded = 2
+            Loaded = 2,
         }
 
         public enum SerializationOptions
@@ -59,15 +64,15 @@ namespace UtilitiesCS
             Left = 0,
             Center = 1,
             Right = 2,
-            Justified = 3
+            Justified = 3,
         }
 
         [Flags]
         public enum DictionaryResult
         {
-            KeyExists = 1,          // 001
-            KeysChanged = 2,        // 010
-            ValueChanged = 4,       // 100
+            KeyExists = 1, // 001
+            KeysChanged = 2, // 010
+            ValueChanged = 4, // 100
             // Key removed would be    X10
             // Key added would be      011
             // Value updated would be  101
@@ -77,7 +82,7 @@ namespace UtilitiesCS
         {
             Undetermined = -1,
             False = 0,
-            True = 1
+            True = 1,
         }
 
         [Flags]
@@ -97,7 +102,7 @@ namespace UtilitiesCS
             Kbf = 1024,
             DueDate = 2048,
             Reminder = 4096,
-            All = 8191
+            All = 8191,
         }
 
         public enum NotFoundEnum
@@ -105,8 +110,7 @@ namespace UtilitiesCS
             Skip = 0,
             Create = 1,
             Ask = 2,
-            Throw = 3
+            Throw = 3,
         }
-
     }
 }

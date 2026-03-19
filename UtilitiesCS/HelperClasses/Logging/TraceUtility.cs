@@ -64,14 +64,20 @@ namespace UtilitiesCS
                 List<string> parameterList = new List<string>();
                 foreach (var parameter in methodParamsExcludingOut)
                 {
-                    parameterList.Add($"{parameter.Name}={callingMethodParamValues[parameter.Position]}");
+                    parameterList.Add(
+                        $"{parameter.Name}={callingMethodParamValues[parameter.Position]}"
+                    );
                 }
 
-                logger.Info($"TRACE\t{methodCaller} -> {methodName}({string.Join(", ", parameterList)})");
+                logger.Info(
+                    $"TRACE\t{methodCaller} -> {methodName}({string.Join(", ", parameterList)})"
+                );
             }
             else
             {
-                logger.Info($"TRACE\t{methodCaller} -> {method.Name}(/* Please update to pass in all parameters */)");
+                logger.Info(
+                    $"TRACE\t{methodCaller} -> {method.Name}(/* Please update to pass in all parameters */)"
+                );
             }
         }
 
@@ -88,10 +94,14 @@ namespace UtilitiesCS
             int level = 0;
 
             var method = st.GetCallerMethod(ref level);
-            var methodName = method is null ? "Error getting method name" : $"{GetClassName(method)}.{method.Name}";
+            var methodName = method is null
+                ? "Error getting method name"
+                : $"{GetClassName(method)}.{method.Name}";
 
             var methodCalledBy = st.GetCallerMethod(ref level);
-            var methodCaller = methodCalledBy is null ? "Error getting caller name" : $"{GetClassName(methodCalledBy)}.{methodCalledBy.Name}";
+            var methodCaller = methodCalledBy is null
+                ? "Error getting caller name"
+                : $"{GetClassName(methodCalledBy)}.{methodCalledBy.Name}";
 
             var paramString = method.GetParameterString(callingMethodParamValues);
             return $"TRACE\t{methodCaller} -> {method.Name}({paramString})";
@@ -109,20 +119,31 @@ namespace UtilitiesCS
             var st = new StackTrace(1);
             var methods = st.GetMyMethods();
             var lastMethod = methods.Pop();
-            var paramString = lastMethod is null ? "method not resolved" : lastMethod.GetParameterString(callingMethodParamValues);
+            var paramString = lastMethod is null
+                ? "method not resolved"
+                : lastMethod.GetParameterString(callingMethodParamValues);
             var lastName = $"{GetClassName(lastMethod)}.{lastMethod.Name}({paramString})";
-            var methodNames = methods.Select(m => $"{GetClassName(m)}.{m.Name}({GetParameterNames(m)})").ToList();
+            var methodNames = methods
+                .Select(m => $"{GetClassName(m)}.{m.Name}({GetParameterNames(m)})")
+                .ToList();
             methodNames.Add(lastName);
             return string.Join(" -> ", methodNames);
         }
 
-        public static string GetMethodTraceString(this StackTrace st, params object[] callingMethodParamValues)
+        public static string GetMethodTraceString(
+            this StackTrace st,
+            params object[] callingMethodParamValues
+        )
         {
             var methods = st.GetMyMethods();
             var lastMethod = methods.Pop();
-            var paramString = lastMethod is null ? "method not resolved" : lastMethod.GetParameterString(callingMethodParamValues);
+            var paramString = lastMethod is null
+                ? "method not resolved"
+                : lastMethod.GetParameterString(callingMethodParamValues);
             var lastName = $"{GetClassName(lastMethod)}.{lastMethod.Name}({paramString})";
-            var methodNames = methods.Select(m => $"{GetClassName(m)}.{m.Name}({GetParameterNames(m)})").ToList();
+            var methodNames = methods
+                .Select(m => $"{GetClassName(m)}.{m.Name}({GetParameterNames(m)})")
+                .ToList();
             methodNames.Add(lastName);
             return string.Join(" -> ", methodNames);
         }
@@ -135,13 +156,19 @@ namespace UtilitiesCS
 
         private static T Pop<T>(this List<T> list)
         {
-            if (list.IsNullOrEmpty()) { return default; }
+            if (list.IsNullOrEmpty())
+            {
+                return default;
+            }
             var result = list.Last();
             list.RemoveAt(list.Count - 1);
             return result;
         }
 
-        private static string GetParameterString(this MethodBase method, params object[] callingMethodParamValues)
+        private static string GetParameterString(
+            this MethodBase method,
+            params object[] callingMethodParamValues
+        )
         {
             var methodParameters = method?.GetParameters();
 
@@ -152,7 +179,9 @@ namespace UtilitiesCS
                 List<string> parameterList = new List<string>();
                 foreach (var parameter in methodParamsExcludingOut)
                 {
-                    parameterList.Add($"{parameter.Name}={callingMethodParamValues[parameter.Position]}");
+                    parameterList.Add(
+                        $"{parameter.Name}={callingMethodParamValues[parameter.Position]}"
+                    );
                 }
 
                 return string.Join(", ", parameterList);
@@ -163,9 +192,11 @@ namespace UtilitiesCS
             }
         }
 
-        public static ParameterInfo[] GetCallerParameters(this StackTrace st) => st.GetCallerMethod()?.GetParameters();
+        public static ParameterInfo[] GetCallerParameters(this StackTrace st) =>
+            st.GetCallerMethod()?.GetParameters();
 
-        public static ParameterInfo[] GetCallerParameters(this StackTrace st, ref int frameLevel) => st.GetCallerMethod(ref frameLevel)?.GetParameters();
+        public static ParameterInfo[] GetCallerParameters(this StackTrace st, ref int frameLevel) =>
+            st.GetCallerMethod(ref frameLevel)?.GetParameters();
 
         public static MethodBase GetCallerMethod(this StackTrace st)
         {
@@ -213,11 +244,13 @@ namespace UtilitiesCS
             }
             catch (Exception e)
             {
-                logger.Error($"Error in TryGetMyTraceString. Returning empty string. Details: {e.Message}", e);
+                logger.Error(
+                    $"Error in TryGetMyTraceString. Returning empty string. Details: {e.Message}",
+                    e
+                );
                 return altFailure;
             }
         }
-
 
         public static string GetMyTraceString(this StackTrace trace)
         {
@@ -226,14 +259,26 @@ namespace UtilitiesCS
 
         private static string GetClassName(this MethodBase m)
         {
-            if (m.IsStatic) { return m.Module.Name; }
-            else { return m.DeclaringType.Name; }
+            if (m.IsStatic)
+            {
+                return m.Module.Name;
+            }
+            else
+            {
+                return m.DeclaringType.Name;
+            }
         }
 
         public static Assembly GetAssembly(this MethodBase m)
         {
-            if (m.IsStatic) { return m.Module.Assembly; }
-            else { return m.DeclaringType.Assembly; }
+            if (m.IsStatic)
+            {
+                return m.Module.Assembly;
+            }
+            else
+            {
+                return m.DeclaringType.Assembly;
+            }
         }
 
         public static List<(StackFrame Frame, MethodBase Method)> GetMyFrames(this StackTrace trace)
@@ -245,9 +290,11 @@ namespace UtilitiesCS
                 var frame = trace.GetFrame(i);
                 var method = frame.GetMethod();
 
-                if (method is not null &&
-                    method.Name != "MoveNext" &&
-                    method.GetAssembly().IsMine())
+                if (
+                    method is not null
+                    && method.Name != "MoveNext"
+                    && method.GetAssembly().IsMine()
+                )
                 {
                     result.Add((frame, method));
                 }
@@ -283,17 +330,28 @@ namespace UtilitiesCS
                         var m = trace.GetFrame(i).GetMethod();
                         string assemblyName;
 
-                        if (m.IsStatic) { assemblyName = m.Module.Assembly.GetName().Name; }
-                        else { assemblyName = m.DeclaringType.Assembly.GetName().Name; }
+                        if (m.IsStatic)
+                        {
+                            assemblyName = m.Module.Assembly.GetName().Name;
+                        }
+                        else
+                        {
+                            assemblyName = m.DeclaringType.Assembly.GetName().Name;
+                        }
 
                         if (ProjectNames.Contains(assemblyName))
                         {
                             methodCalledBy = trace.GetFrame(i).GetMethod();
-                            if (methodCalledBy.Name == "MoveNext") { methodCalledBy = null; }
-                            else { repeat = false; }
+                            if (methodCalledBy.Name == "MoveNext")
+                            {
+                                methodCalledBy = null;
+                            }
+                            else
+                            {
+                                repeat = false;
+                            }
                         }
                     }
-
                 }
                 catch (Exception)
                 {
@@ -304,7 +362,9 @@ namespace UtilitiesCS
             return methodCalledBy;
         }
 
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         private static List<string> _projectNames;
         internal static List<string> ProjectNames
@@ -315,18 +375,27 @@ namespace UtilitiesCS
                 {
                     _projectNames = new List<string>
                     {
-                        "Tags", "ToDoModel", "ToDoModel.Test", "TaskVisualization",
-                        "TaskMaster.Test", "UtilitiesCS", "UtilitiesCS.Test", "QuickFiler",
-                        "QuickFiler.Test", "TaskVisualization.Test", "SVGControl",
-                        "SVGControl.Test", "TaskTree", "TaskMaster", "UtilitiesSwordfish.NET.General",
-                        "UtilitiesSwordfish.NET.Test", "Tags.Test"
+                        "Tags",
+                        "ToDoModel",
+                        "ToDoModel.Test",
+                        "TaskVisualization",
+                        "TaskMaster.Test",
+                        "UtilitiesCS",
+                        "UtilitiesCS.Test",
+                        "QuickFiler",
+                        "QuickFiler.Test",
+                        "TaskVisualization.Test",
+                        "SVGControl",
+                        "SVGControl.Test",
+                        "TaskTree",
+                        "TaskMaster",
+                        "UtilitiesSwordfish.NET.General",
+                        "UtilitiesSwordfish.NET.Test",
+                        "Tags.Test",
                     };
                 }
                 return _projectNames;
             }
         }
-
-
     }
-
 }

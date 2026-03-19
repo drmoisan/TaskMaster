@@ -1,15 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
+﻿using System;
 //using static UtilitiesCS.Test.EmailIntelligence.Bayesian.BayesianClassifierTests;
 using System.Collections.Concurrent;
-using UtilitiesCS.EmailIntelligence.Bayesian;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Threading;
-using UtilitiesCS.HelperClasses;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence.Bayesian;
+using UtilitiesCS.HelperClasses;
 
 namespace Z.Unfinished.UtilitiesCS.Test.EmailIntelligence.Bayesian
 {
@@ -314,9 +314,6 @@ namespace Z.Unfinished.UtilitiesCS.Test.EmailIntelligence.Bayesian
         //    //this.mockRepository.VerifyAll();
         //}
 
-
-
         #endregion Unfinished Tests
-
     }
 }

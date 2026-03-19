@@ -1,41 +1,39 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
 // Last Revised: September 2012
 
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Collections.Concurrent;
-using System.Linq;
-using System.Text;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Windows.Threading;
-using System.Collections;
-using System.Collections.ObjectModel;
-using System.Security.Cryptography;
 
 namespace Swordfish.NET.Collections
 {
-
     /// <summary>
-    /// This class provides the base for concurrent collections that 
+    /// This class provides the base for concurrent collections that
     /// can be bound to user interface elements
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <remarks>
     /// TODO: Use ReaderWriterLockSlim instead of ReaderWriterLock
     /// </remarks>
-    public abstract class ConcurrentObservableBase<T> :
-      IObservable<NotifyCollectionChangedEventArgs>,
-      INotifyCollectionChanged,
-      IEnumerable<T>
+    public abstract class ConcurrentObservableBase<T>
+        : IObservable<NotifyCollectionChangedEventArgs>,
+            INotifyCollectionChanged,
+            IEnumerable<T>
     {
-
         // ************************************************************************
         // Private Fields
         // ************************************************************************
@@ -45,6 +43,7 @@ namespace Swordfish.NET.Collections
         /// The lock that controls read/write access to the base collection
         /// </summary>
         private ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
+
         /// <summary>
         /// The underlying base enumerable that is used to store the items,
         /// used for creating an immutable collection from which an enumerator
@@ -62,11 +61,13 @@ namespace Swordfish.NET.Collections
         /// taking a snapshot of the collection needs to be updated.
         /// </summary>
         private bool _newSnapshotRequired = false;
+
         /// <summary>
         /// The enumerable lock to prevent threading conflicts on allocating
         /// the enumerable of the fixed collection
         /// </summary>
         private ReaderWriterLockSlim _snapshotLock = new ReaderWriterLockSlim();
+
         /// <summary>
         /// The collection used for generating an enumerable that iterates
         /// over a snapshot of the base collection
@@ -77,14 +78,17 @@ namespace Swordfish.NET.Collections
         /// A list of observers
         /// </summary>
         private Dictionary<int, IObserver<NotifyCollectionChangedEventArgs>> _subscribers;
+
         /// <summary>
         /// The key for new observers, incremented with each new observer
         /// </summary>
         private int _subscriberKey;
+
         /// <summary>
         /// Flag indicating this collection is disposed
         /// </summary>
         private bool _isDisposed;
+
         /// <summary>
         /// The view model that is used to allow this collection to be bound to the UI.
         /// Relevant methods determine if they are being called on the UI thread, and if
@@ -102,9 +106,8 @@ namespace Swordfish.NET.Collections
         /// <summary>
         /// Default Constructor
         /// </summary>
-        protected ConcurrentObservableBase() : this(new T[] { })
-        {
-        }
+        protected ConcurrentObservableBase()
+            : this(new T[] { }) { }
 
         /// <summary>
         /// Constructor that takes an eumerable
@@ -191,7 +194,7 @@ namespace Swordfish.NET.Collections
             //    }
             //  }
             //
-            //  Output: 
+            //  Output:
             //  Removed from start 4494ms
             //  Removed from end 3ms
 
@@ -224,15 +227,20 @@ namespace Swordfish.NET.Collections
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected void HandleBaseCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        protected void HandleBaseCollectionChanged(
+            object sender,
+            NotifyCollectionChangedEventArgs e
+        )
         {
-
             // As this is a concurrent collection we don't want a change event to result in the listener
             // later coming back to enumerate over the whole collection again, possible before the listener
             // gets other changed events, but after the collection has been added to.
 
             bool actionTypeIsOk = e.Action != NotifyCollectionChangedAction.Reset;
-            System.Diagnostics.Debug.Assert(actionTypeIsOk, "Reset called on concurrent observable collection. This shouldn't happen");
+            System.Diagnostics.Debug.Assert(
+                actionTypeIsOk,
+                "Reset called on concurrent observable collection. This shouldn't happen"
+            );
 
             OnNext(e);
         }
@@ -297,7 +305,11 @@ namespace Swordfish.NET.Collections
         /// then calls the next read function, else calls the write
         /// function.
         /// </summary>
-        protected TResult DoBaseReadWrite<TResult>(Func<bool> readFuncTest, Func<TResult> readFunc, Func<TResult> writeFunc)
+        protected TResult DoBaseReadWrite<TResult>(
+            Func<bool> readFuncTest,
+            Func<TResult> readFunc,
+            Func<TResult> writeFunc
+        )
         {
             _readWriteLock.TryEnterUpgradeableReadLock(Timeout.Infinite);
             try
@@ -337,7 +349,12 @@ namespace Swordfish.NET.Collections
         /// calls the write
         /// function.
         /// </summary>
-        protected TResult DoBaseReadWrite<TResult>(Func<bool> readFuncTest, Func<TResult> readFunc, Action preWriteFunc, Func<TResult> writeFunc)
+        protected TResult DoBaseReadWrite<TResult>(
+            Func<bool> readFuncTest,
+            Func<TResult> readFunc,
+            Action preWriteFunc,
+            Func<TResult> writeFunc
+        )
         {
             _readWriteLock.TryEnterReadLock(Timeout.Infinite);
             try
@@ -444,10 +461,7 @@ namespace Swordfish.NET.Collections
         /// </summary>
         protected ObservableCollectionViewModel<T> ViewModel
         {
-            get
-            {
-                return _viewModel;
-            }
+            get { return _viewModel; }
         }
 
         /// <summary>
@@ -455,10 +469,7 @@ namespace Swordfish.NET.Collections
         /// </summary>
         protected static bool IsDispatcherThread
         {
-            get
-            {
-                return DispatcherQueueProcessor.Instance.IsDispatcherThread;
-            }
+            get { return DispatcherQueueProcessor.Instance.IsDispatcherThread; }
         }
 
         #endregion Properties
@@ -490,11 +501,14 @@ namespace Swordfish.NET.Collections
                 throw new ObjectDisposedException("Observable<T>");
             }
 
-            foreach (IObserver<NotifyCollectionChangedEventArgs> observer in _subscribers.Select(kv => kv.Value))
+            foreach (
+                IObserver<NotifyCollectionChangedEventArgs> observer in _subscribers.Select(kv =>
+                    kv.Value
+                )
+            )
             {
                 observer.OnNext(value);
             }
-
         }
 
         protected void OnError(Exception exception)
@@ -509,7 +523,11 @@ namespace Swordfish.NET.Collections
                 throw new ArgumentNullException("exception");
             }
 
-            foreach (IObserver<NotifyCollectionChangedEventArgs> observer in _subscribers.Select(kv => kv.Value))
+            foreach (
+                IObserver<NotifyCollectionChangedEventArgs> observer in _subscribers.Select(kv =>
+                    kv.Value
+                )
+            )
             {
                 observer.OnError(exception);
             }
@@ -522,7 +540,11 @@ namespace Swordfish.NET.Collections
                 throw new ObjectDisposedException("Observable<T>");
             }
 
-            foreach (IObserver<NotifyCollectionChangedEventArgs> observer in _subscribers.Select(kv => kv.Value))
+            foreach (
+                IObserver<NotifyCollectionChangedEventArgs> observer in _subscribers.Select(kv =>
+                    kv.Value
+                )
+            )
             {
                 observer.OnCompleted();
             }
@@ -541,7 +563,12 @@ namespace Swordfish.NET.Collections
                 UpdateSnapshot();
                 foreach (var item in _baseSnapshot)
                 {
-                    observer.OnNext(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+                    observer.OnNext(
+                        new NotifyCollectionChangedEventArgs(
+                            NotifyCollectionChangedAction.Add,
+                            item
+                        )
+                    );
                 }
 
                 return new DoDispose(() =>
@@ -560,6 +587,7 @@ namespace Swordfish.NET.Collections
         private class DoDispose : IDisposable
         {
             private Action _doDispose;
+
             public DoDispose(Action doDispose)
             {
                 _doDispose = doDispose;
@@ -592,7 +620,7 @@ namespace Swordfish.NET.Collections
         /// <remarks>
         /// Note that the Enumerator should really only be used on the Dispatcher thread,
         /// if not then should enumerate over the Snapshot instead.
-        /// 
+        ///
         /// </remarks>
         public IEnumerator<T> GetEnumerator()
         {
@@ -615,6 +643,5 @@ namespace Swordfish.NET.Collections
         }
 
         #endregion IEnumerable<T> Implementation
-
     }
 }

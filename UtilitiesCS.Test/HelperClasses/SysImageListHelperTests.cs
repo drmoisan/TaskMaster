@@ -1,10 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using ObjectListViewDemo;
-using BrightIdeasSoftware;
-using Moq;
+﻿using System;
 using System.Reflection;
 using System.Windows.Forms;
+using BrightIdeasSoftware;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using ObjectListViewDemo;
 
 namespace UtilitiesCS.Test.HelperClasses
 {
@@ -62,7 +62,10 @@ namespace UtilitiesCS.Test.HelperClasses
         public void SmallImageCollection_ReturnsSmallImageCollection()
         {
             // Arrange & Act
-            var result = GetProtectedProperty<ImageList.ImageCollection>(_listViewHelper, "SmallImageCollection");
+            var result = GetProtectedProperty<ImageList.ImageCollection>(
+                _listViewHelper,
+                "SmallImageCollection"
+            );
 
             // Assert
             Assert.IsNotNull(result);
@@ -72,7 +75,10 @@ namespace UtilitiesCS.Test.HelperClasses
         public void LargeImageCollection_ReturnsLargeImageCollection()
         {
             // Arrange & Act
-            var result = GetProtectedProperty<ImageList.ImageCollection>(_listViewHelper, "LargeImageCollection");
+            var result = GetProtectedProperty<ImageList.ImageCollection>(
+                _listViewHelper,
+                "LargeImageCollection"
+            );
 
             // Assert
             Assert.IsNotNull(result);
@@ -100,7 +106,9 @@ namespace UtilitiesCS.Test.HelperClasses
 
         private T GetProtectedProperty<T>(object instance, string propertyName)
         {
-            var property = instance.GetType().GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Instance);
+            var property = instance
+                .GetType()
+                .GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Instance);
             return (T)property.GetValue(instance);
         }
     }

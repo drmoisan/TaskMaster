@@ -87,7 +87,11 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             // Act
             await Task.WhenAll(keys.Select(key => Task.Run(() => dictionary[key] = key * 10)));
-            var readResults = await Task.WhenAll(keys.Select(key => Task.Run(() => dictionary.TryGetValue(key, out var value) ? value : -1)));
+            var readResults = await Task.WhenAll(
+                keys.Select(key =>
+                    Task.Run(() => dictionary.TryGetValue(key, out var value) ? value : -1)
+                )
+            );
 
             // Assert
             dictionary.Count.Should().Be(keys.Length);

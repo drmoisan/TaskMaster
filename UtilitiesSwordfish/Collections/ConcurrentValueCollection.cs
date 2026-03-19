@@ -1,17 +1,17 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
 // Last Revised: September 2012
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Collections;
 
 namespace Swordfish.NET.Collections
 {
@@ -20,7 +20,6 @@ namespace Swordfish.NET.Collections
     /// </summary>
     public class ConcurrentValueCollection<TKey, TValue> : ImmutableCollectionBase<TValue>
     {
-
         // ************************************************************************
         // Private Fields
         // ************************************************************************
@@ -101,10 +100,7 @@ namespace Swordfish.NET.Collections
         /// </summary>
         public override int Count
         {
-            get
-            {
-                return _pairs.Count;
-            }
+            get { return _pairs.Count; }
         }
 
         #endregion ImmutableCollectionBase implementation

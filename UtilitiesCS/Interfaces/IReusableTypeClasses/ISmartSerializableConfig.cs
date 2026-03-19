@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.ComponentModel;
+using Newtonsoft.Json;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
@@ -24,13 +24,17 @@ namespace UtilitiesCS.ReusableTypeClasses
         void ActivateMostRecent();
         void ActivateNetDisk();
         void ResetLazy();
-        void ResetLazy(Lazy<JsonSerializerSettings> localJsonSettings, Lazy<JsonSerializerSettings> netJsonSettings, Lazy<JsonSerializerSettings> jsonSettings);
+        void ResetLazy(
+            Lazy<JsonSerializerSettings> localJsonSettings,
+            Lazy<JsonSerializerSettings> netJsonSettings,
+            Lazy<JsonSerializerSettings> jsonSettings
+        );
 
         enum ActiveDiskEnum
         {
             Neither,
             Local,
-            Net
+            Net,
         }
     }
 }

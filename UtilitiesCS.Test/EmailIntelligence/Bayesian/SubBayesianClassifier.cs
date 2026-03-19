@@ -11,13 +11,20 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
     public class SubBayesianClassifier : BayesianClassifierShared, ICloneable
     {
         public SubBayesianClassifier() { }
+
         public SubBayesianClassifier(ConcurrentDictionary<string, double> prob)
         {
             base._prob = prob;
         }
-        public SubBayesianClassifier(BayesianClassifierShared classifier) : base(classifier) { }
 
-        public new ConcurrentDictionary<string, double> Prob { get => base._prob; set => base._prob = value; }
+        public SubBayesianClassifier(BayesianClassifierShared classifier)
+            : base(classifier) { }
+
+        public new ConcurrentDictionary<string, double> Prob
+        {
+            get => base._prob;
+            set => base._prob = value;
+        }
 
         public new SubClassifierGroup Parent
         {
@@ -25,13 +32,19 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             set => base._parent = value;
         }
 
-        public new SubCorpus Match { get => (base._match).ToCorpusSub(); set => base._match = value; }
+        public new SubCorpus Match
+        {
+            get => (base._match).ToCorpusSub();
+            set => base._match = value;
+        }
 
         public object Clone()
         {
             var result = this.MemberwiseClone() as SubBayesianClassifier;
             result.Match = (SubCorpus)this.Match.Clone();
-            result.Prob = new ConcurrentDictionary<string, double>(this.Prob ?? new ConcurrentDictionary<string, double>());
+            result.Prob = new ConcurrentDictionary<string, double>(
+                this.Prob ?? new ConcurrentDictionary<string, double>()
+            );
             result.Parent = (SubClassifierGroup)this.Parent.Clone();
             return result;
         }

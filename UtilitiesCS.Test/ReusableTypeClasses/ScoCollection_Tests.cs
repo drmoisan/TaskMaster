@@ -75,9 +75,11 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var collection = new ScoCollection<int>(Enumerable.Range(1, 50));
-            var addTasks = Enumerable.Range(51, 25)
+            var addTasks = Enumerable
+                .Range(51, 25)
                 .Select(value => Task.Run(() => collection.Add(value)));
-            var removeTasks = Enumerable.Range(1, 25)
+            var removeTasks = Enumerable
+                .Range(1, 25)
                 .Select(value => Task.Run(() => collection.Remove(value)));
 
             // Act

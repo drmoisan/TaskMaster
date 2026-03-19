@@ -39,7 +39,7 @@ namespace UtilitiesCS.Extensions
                 TraceWriter = serializer.TraceWriter,
                 TypeNameHandling = serializer.TypeNameHandling,
                 SerializationBinder = serializer.SerializationBinder,
-                TypeNameAssemblyFormatHandling = serializer.TypeNameAssemblyFormatHandling
+                TypeNameAssemblyFormatHandling = serializer.TypeNameAssemblyFormatHandling,
             };
             foreach (var converter in serializer.Converters)
             {
@@ -77,7 +77,7 @@ namespace UtilitiesCS.Extensions
                 TraceWriter = settings.TraceWriter,
                 TypeNameHandling = settings.TypeNameHandling,
                 SerializationBinder = settings.SerializationBinder,
-                TypeNameAssemblyFormatHandling = settings.TypeNameAssemblyFormatHandling
+                TypeNameAssemblyFormatHandling = settings.TypeNameAssemblyFormatHandling,
             };
             foreach (var converter in settings.Converters)
             {
@@ -117,11 +117,10 @@ namespace UtilitiesCS.Extensions
                 Context = serializer.Context,
                 SerializationBinder = serializer.SerializationBinder,
                 TraceWriter = serializer.TraceWriter,
-                EqualityComparer = serializer.EqualityComparer
+                EqualityComparer = serializer.EqualityComparer,
             };
 
             return settings;
         }
-
     }
 }

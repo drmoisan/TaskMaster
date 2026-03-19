@@ -92,8 +92,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             Action act = () => _ = matrix.Get(0, 0);
 
             // Assert
-            act.Should().Throw<Exception>()
-                .WithMessage("array is empty");
+            act.Should().Throw<Exception>().WithMessage("array is empty");
         }
 
         [TestMethod]
@@ -107,9 +106,11 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             Action yAct = () => _ = matrix.Get(0, 1);
 
             // Assert
-            xAct.Should().Throw<Exception>()
+            xAct.Should()
+                .Throw<Exception>()
                 .WithMessage("x-value exceeds Width *in Array2d.Get(x,y).");
-            yAct.Should().Throw<Exception>()
+            yAct.Should()
+                .Throw<Exception>()
                 .WithMessage("y-value exceeds Height *in Array2d.Get(x,y).");
         }
 
@@ -123,8 +124,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             Action act = () => matrix.Set(1, 0, 5);
 
             // Assert
-            act.Should().Throw<Exception>()
-                .WithMessage("1, 1,0,1");
+            act.Should().Throw<Exception>().WithMessage("1, 1,0,1");
         }
 
         [TestMethod]
@@ -137,15 +137,19 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             Action act = () => matrix.Set((int[,])null);
 
             // Assert
-            act.Should().Throw<Exception>()
-                .WithMessage("array is null");
+            act.Should().Throw<Exception>().WithMessage("array is null");
         }
 
         [TestMethod]
         public void Dispose_ClearsBackingStoreAndResetsDimensions()
         {
             // Arrange
-            var matrix = new DenMatrix<int>(new[,] { { 11 } });
+            var matrix = new DenMatrix<int>(
+                new[,]
+                {
+                    { 11 },
+                }
+            );
 
             // Act
             matrix.Dispose();

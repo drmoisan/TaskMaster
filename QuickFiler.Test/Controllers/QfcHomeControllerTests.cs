@@ -1,19 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using UtilitiesCS;
-using Microsoft.Office.Interop.Outlook;
-using Outlook = Microsoft.Office.Interop.Outlook;
-using System.Diagnostics;
-using System.Windows.Forms;
-using System.ComponentModel;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.ReusableTypeClasses;
-using FluentAssertions;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -22,6 +22,7 @@ namespace QuickFiler.Controllers.Tests
     {
         private MockRepository _mockRepository;
         private Mock<IApplicationGlobals> _mockApplicationGlobals;
+
         //private Mock<IntelligenceConfig> mockIntelligenceConfig;
         private Mock<System.Action> _mockParentCleanup;
         private QfcHomeController _controller;
@@ -31,7 +32,12 @@ namespace QuickFiler.Controllers.Tests
 
         private void SetPrivateField<T>(object obj, string fieldName, T value)
         {
-            var field = obj.GetType().GetField(fieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var field = obj.GetType()
+                .GetField(
+                    fieldName,
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                );
             field.SetValue(obj, value);
         }
 
@@ -41,7 +47,8 @@ namespace QuickFiler.Controllers.Tests
             Console.SetOut(new DebugTextWriter());
             this._mockRepository = new MockRepository(MockBehavior.Strict);
             this._mockApplicationGlobals = this._mockRepository.Create<IApplicationGlobals>();
-            this._mockApplicationGlobals.SetupGet(x => x.AF.CancelToken).Returns(CancellationToken.None);
+            this._mockApplicationGlobals.SetupGet(x => x.AF.CancelToken)
+                .Returns(CancellationToken.None);
 
             this._mockOlApp = this._mockRepository.Create<Outlook.Application>();
             this._mockExplorer = this._mockRepository.Create<Explorer>();
@@ -51,10 +58,15 @@ namespace QuickFiler.Controllers.Tests
             _ = SetUpMockIntelRes(_mockApplicationGlobals);
 
             _mockParentCleanup = new Mock<System.Action>();
-            _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
+            _controller = new QfcHomeController(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object
+            );
         }
 
-        private Mock<ProgressTracker> SetupMockProgressTracker(CancellationTokenSource cancellationTokenSource)
+        private Mock<ProgressTracker> SetupMockProgressTracker(
+            CancellationTokenSource cancellationTokenSource
+        )
         {
             var mockProgressTracker = new Mock<ProgressTracker>(cancellationTokenSource);
             mockProgressTracker.SetupAllProperties();
@@ -62,8 +74,12 @@ namespace QuickFiler.Controllers.Tests
             mockProgressTracker.Setup(m => m.Report(It.IsAny<double>(), It.IsAny<string>()));
             mockProgressTracker.Setup(m => m.Report(It.IsAny<ValueTuple<int, string>>()));
             mockProgressTracker.Setup(m => m.SpawnChild()).Returns(mockProgressTracker.Object);
-            mockProgressTracker.Setup(m => m.SpawnChild(It.IsAny<double>())).Returns(mockProgressTracker.Object);
-            mockProgressTracker.Setup(m => m.SpawnChild(It.IsAny<int>())).Returns(mockProgressTracker.Object);
+            mockProgressTracker
+                .Setup(m => m.SpawnChild(It.IsAny<double>()))
+                .Returns(mockProgressTracker.Object);
+            mockProgressTracker
+                .Setup(m => m.SpawnChild(It.IsAny<int>()))
+                .Returns(mockProgressTracker.Object);
             return mockProgressTracker;
         }
 
@@ -72,7 +88,7 @@ namespace QuickFiler.Controllers.Tests
             var intel = this._mockRepository.Create<IntelligenceConfig>(mockGlobals.Object);
             var config = new Dictionary<string, SmartSerializableLoader>
             {
-                { "Folder", new SmartSerializableLoader()   }
+                { "Folder", new SmartSerializableLoader() },
             }.ToConcurrentDictionary();
             intel.SetupGet(x => x.Config).Returns(config);
             mockGlobals.SetupGet(x => x.IntelRes).Returns(intel.Object);
@@ -84,44 +100,76 @@ namespace QuickFiler.Controllers.Tests
         public void Constructor_InitializesCorrectly()
         {
             // Arrange & Act
-            _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
+            _controller = new QfcHomeController(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object
+            );
 
             // Assert
             Assert.IsNotNull(_controller, "Controller is null");
-            Assert.AreEqual(_mockApplicationGlobals.Object, _controller.Globals, "Applications Globals not set correctly");
-            Assert.AreEqual(_mockParentCleanup.Object, _controller.ParentCleanup, "ParentCleanup not set correctly");
+            Assert.AreEqual(
+                _mockApplicationGlobals.Object,
+                _controller.Globals,
+                "Applications Globals not set correctly"
+            );
+            Assert.AreEqual(
+                _mockParentCleanup.Object,
+                _controller.ParentCleanup,
+                "ParentCleanup not set correctly"
+            );
         }
 
         [TestMethod]
         public void Init_InitializesCorrectly()
         {
             // Arrange
-            _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
+            _controller = new QfcHomeController(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object
+            );
 
             var mockData = new Mock<IQfcDatamodel>();
             _controller.QfcDataModelLoader = (globals, token) => mockData.Object;
 
             var mockExplorer = new Mock<IQfcExplorerController>();
-            _controller.QfcExplorerControllerLoader = (initType, globals, homeController) => mockExplorer.Object;
+            _controller.QfcExplorerControllerLoader = (initType, globals, homeController) =>
+                mockExplorer.Object;
 
             var mockKeyboardHandlerLoader = new Mock<IQfcKeyboardHandler>();
-            _controller.QfcKeyboardHandlerLoader = (viewer, homeController) => mockKeyboardHandlerLoader.Object;
+            _controller.QfcKeyboardHandlerLoader = (viewer, homeController) =>
+                mockKeyboardHandlerLoader.Object;
 
             var mockQueue = new Mock<IQfcQueue>();
             _controller.QfcQueueLoader = (globals, viewer, homeController) => mockQueue.Object;
 
             var mockFormController = new Mock<IQfcFormController>();
-            _controller.QfcFormControllerLoader = (globals, viewer, queue, initType, parentCleanup,
-                homeController, tokenSource, token) => mockFormController.Object;
+            _controller.QfcFormControllerLoader = (
+                globals,
+                viewer,
+                queue,
+                initType,
+                parentCleanup,
+                homeController,
+                tokenSource,
+                token
+            ) => mockFormController.Object;
 
             // Act
             _controller.Init();
 
             // Assert
             Assert.AreEqual(mockData.Object, _controller.DataModel, "Data model not set correctly");
-            Assert.AreEqual(mockKeyboardHandlerLoader.Object, _controller.KeyboardHandler, "Keyboard handler not set correctly");
+            Assert.AreEqual(
+                mockKeyboardHandlerLoader.Object,
+                _controller.KeyboardHandler,
+                "Keyboard handler not set correctly"
+            );
             Assert.AreEqual(mockQueue.Object, _controller.QfcQueue, "Queue not set correctly");
-            Assert.AreEqual(mockFormController.Object, _controller.FormController, "Form controller not set correctly");
+            Assert.AreEqual(
+                mockFormController.Object,
+                _controller.FormController,
+                "Form controller not set correctly"
+            );
         }
 
         //[TestMethod]
@@ -147,35 +195,67 @@ namespace QuickFiler.Controllers.Tests
             var progress = _mockProgressTracker.Object;
 
             var mockData = new Mock<IQfcDatamodel>();
-            _controller.QfcAsyncDataModelLoader = async (globals, cancel, cancelSource, progressTracker) => await Task.FromResult(mockData.Object);
+            _controller.QfcAsyncDataModelLoader = async (
+                globals,
+                cancel,
+                cancelSource,
+                progressTracker
+            ) => await Task.FromResult(mockData.Object);
 
             var mockExplorer = new Mock<IQfcExplorerController>();
-            _controller.QfcExplorerControllerLoader = (initType, globals, homeController) => mockExplorer.Object;
+            _controller.QfcExplorerControllerLoader = (initType, globals, homeController) =>
+                mockExplorer.Object;
 
             var mockKeyboardHandlerLoader = new Mock<IQfcKeyboardHandler>();
-            _controller.QfcKeyboardHandlerLoader = (viewer, homeController) => mockKeyboardHandlerLoader.Object;
+            _controller.QfcKeyboardHandlerLoader = (viewer, homeController) =>
+                mockKeyboardHandlerLoader.Object;
 
             var mockQueue = new Mock<IQfcQueue>();
             _controller.QfcQueueLoader = (globals, viewer, homeController) => mockQueue.Object;
 
             var mockFormController = new Mock<IQfcFormController>();
-            _controller.QfcFormControllerLoader = (globals, viewer, queue, initType, parentCleanup,
-                homeController, cancelSource, cancel) => mockFormController.Object;
+            _controller.QfcFormControllerLoader = (
+                globals,
+                viewer,
+                queue,
+                initType,
+                parentCleanup,
+                homeController,
+                cancelSource,
+                cancel
+            ) => mockFormController.Object;
 
             // Act
-            await _controller.InitAsync(_mockApplicationGlobals.Object, _mockParentCleanup.Object, tokenSource, token, progress);
+            await _controller.InitAsync(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object,
+                tokenSource,
+                token,
+                progress
+            );
 
-            // Assert            
+            // Assert
             Assert.AreEqual(mockData.Object, _controller.DataModel, "Data model not set correctly");
-            Assert.AreEqual(mockKeyboardHandlerLoader.Object, _controller.KeyboardHandler, "Keyboard handler not set correctly");
+            Assert.AreEqual(
+                mockKeyboardHandlerLoader.Object,
+                _controller.KeyboardHandler,
+                "Keyboard handler not set correctly"
+            );
             Assert.AreEqual(mockQueue.Object, _controller.QfcQueue, "Queue not set correctly");
-            Assert.AreEqual(mockFormController.Object, _controller.FormController, "Form controller not set correctly");
+            Assert.AreEqual(
+                mockFormController.Object,
+                _controller.FormController,
+                "Form controller not set correctly"
+            );
         }
 
         public class QfcFormViewerDerived : QfcFormViewer
         {
-            public QfcFormViewerDerived() : base() { }
+            public QfcFormViewerDerived()
+                : base() { }
+
             public new virtual void Show() => base.Show();
+
             //public new virtual DialogResult ShowDialog() => base.ShowDialog();
             public new virtual FormWindowState WindowState { get; set; }
         }
@@ -183,11 +263,13 @@ namespace QuickFiler.Controllers.Tests
         [TestMethod]
         public void Run_ExecutesCorrectly()
         {
-            // Arrange            
+            // Arrange
 
             // Mock the QfcDataModel
             var mockDataModel = new Mock<IQfcDatamodel>();
-            mockDataModel.Setup(x => x.InitEmailQueue(It.IsAny<int>(), It.IsAny<BackgroundWorker>())).Returns(new List<MailItem>());
+            mockDataModel
+                .Setup(x => x.InitEmailQueue(It.IsAny<int>(), It.IsAny<BackgroundWorker>()))
+                .Returns(new List<MailItem>());
 
             _controller.DataModel = mockDataModel.Object;
 
@@ -195,8 +277,13 @@ namespace QuickFiler.Controllers.Tests
             var mockFormController = new Mock<IQfcFormController>();
             mockFormController.Setup(x => x.LoadItems(It.IsAny<IList<MailItem>>())).Verifiable();
 
-            _controller.GetType().GetField("_formController",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            _controller
+                .GetType()
+                .GetField(
+                    "_formController",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
                 .SetValue(_controller, mockFormController.Object);
 
             // Mock the QfcFormViewer
@@ -204,14 +291,21 @@ namespace QuickFiler.Controllers.Tests
             mockFormViewer.Setup(x => x.ShowDialog()).Returns(DialogResult.OK);
             mockFormViewer.Setup(x => x.Show()).Verifiable();
             var windowState = FormWindowState.Normal;
-            mockFormViewer.SetupSet(x => x.WindowState = It.IsAny<FormWindowState>())
-                .Callback<FormWindowState>(state => windowState = state).Verifiable();
+            mockFormViewer
+                .SetupSet(x => x.WindowState = It.IsAny<FormWindowState>())
+                .Callback<FormWindowState>(state => windowState = state)
+                .Verifiable();
             mockFormViewer.SetupGet(x => x.WindowState).Returns(() => windowState);
             mockFormViewer.Setup(x => x.Refresh()).Verifiable();
 
-            //var formViewer = new QfcFormViewer();            
-            _controller.GetType().GetField("_formViewer",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            //var formViewer = new QfcFormViewer();
+            _controller
+                .GetType()
+                .GetField(
+                    "_formViewer",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
                 .SetValue(_controller, mockFormViewer.Object);
 
             // Act
@@ -224,7 +318,6 @@ namespace QuickFiler.Controllers.Tests
             mockFormViewer.VerifySet(m => m.WindowState = FormWindowState.Maximized);
             mockFormViewer.Verify(m => m.Show(), Times.Once);
             mockFormViewer.Verify(m => m.Refresh(), Times.Once);
-
         }
 
         [TestMethod]
@@ -239,16 +332,26 @@ namespace QuickFiler.Controllers.Tests
 
             // Mock the QfcDataModel
             var mockDataModel = new Mock<IQfcDatamodel>();
-            mockDataModel.Setup(x => x.InitEmailQueue(It.IsAny<int>(), It.IsAny<BackgroundWorker>())).Returns(new List<MailItem>());
+            mockDataModel
+                .Setup(x => x.InitEmailQueue(It.IsAny<int>(), It.IsAny<BackgroundWorker>()))
+                .Returns(new List<MailItem>());
             mockDataModel.Setup(x => x.Complete).Returns(true);
             _controller.DataModel = mockDataModel.Object;
 
             // Mock the QfcFormController
             var mockFormController = new Mock<IQfcFormController>();
-            mockFormController.Setup(x => x.LoadItemsAsync(It.IsAny<IList<MailItem>>())).Returns(Task.CompletedTask).Verifiable();
+            mockFormController
+                .Setup(x => x.LoadItemsAsync(It.IsAny<IList<MailItem>>()))
+                .Returns(Task.CompletedTask)
+                .Verifiable();
 
-            _controller.GetType().GetField("_formController",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            _controller
+                .GetType()
+                .GetField(
+                    "_formController",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
                 .SetValue(_controller, mockFormController.Object);
 
             // Mock the QfcFormViewer
@@ -256,14 +359,21 @@ namespace QuickFiler.Controllers.Tests
             mockFormViewer.Setup(x => x.ShowDialog()).Returns(DialogResult.OK);
             mockFormViewer.Setup(x => x.Show()).Verifiable();
             var windowState = FormWindowState.Normal;
-            mockFormViewer.SetupSet(x => x.WindowState = It.IsAny<FormWindowState>())
-                .Callback<FormWindowState>(state => windowState = state).Verifiable();
+            mockFormViewer
+                .SetupSet(x => x.WindowState = It.IsAny<FormWindowState>())
+                .Callback<FormWindowState>(state => windowState = state)
+                .Verifiable();
             mockFormViewer.SetupGet(x => x.WindowState).Returns(() => windowState);
             mockFormViewer.Setup(x => x.Refresh()).Verifiable();
 
-            //var formViewer = new QfcFormViewer();            
-            _controller.GetType().GetField("_formViewer",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            //var formViewer = new QfcFormViewer();
+            _controller
+                .GetType()
+                .GetField(
+                    "_formViewer",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
                 .SetValue(_controller, mockFormViewer.Object);
 
             // Act
@@ -271,9 +381,24 @@ namespace QuickFiler.Controllers.Tests
 
             // Assert
             Assert.IsTrue(_controller.StopWatch.IsRunning);
-            mockDataModel.Verify(m => m.InitEmailQueueAsync(It.IsAny<int>(), It.IsAny<BackgroundWorker>(), It.IsAny<CancellationToken>(), It.IsAny<CancellationTokenSource>()), Times.Once);
-            mockFormController.Verify(m => m.LoadItemsAsync(It.IsAny<IList<MailItem>>()), Times.Once);
-            _mockProgressTracker.Verify(m => m.Report(It.IsAny<double>(), It.IsAny<string>()), Times.Exactly(2));
+            mockDataModel.Verify(
+                m =>
+                    m.InitEmailQueueAsync(
+                        It.IsAny<int>(),
+                        It.IsAny<BackgroundWorker>(),
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<CancellationTokenSource>()
+                    ),
+                Times.Once
+            );
+            mockFormController.Verify(
+                m => m.LoadItemsAsync(It.IsAny<IList<MailItem>>()),
+                Times.Once
+            );
+            _mockProgressTracker.Verify(
+                m => m.Report(It.IsAny<double>(), It.IsAny<string>()),
+                Times.Exactly(2)
+            );
             _mockProgressTracker.Verify(m => m.Report(It.IsAny<double>()), Times.Exactly(1));
         }
 
@@ -288,12 +413,26 @@ namespace QuickFiler.Controllers.Tests
             var button = new Button() { Enabled = false };
             mockFormViewer.SetupGet(m => m.L1v1L2h5_SpnEmailPerLoad).Returns(spinner).Verifiable();
             mockFormViewer.SetupGet(m => m.L1v1L2h5_BtnSkip).Returns(button).Verifiable();
-            _controller.GetType().GetField("_formViewer", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_controller, mockFormViewer.Object);
+            _controller
+                .GetType()
+                .GetField(
+                    "_formViewer",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .SetValue(_controller, mockFormViewer.Object);
 
             var eventArgs = new RunWorkerCompletedEventArgs(null, null, false);
 
             // Act
-            _controller.GetType().GetMethod("Worker_RunWorkerCompleted", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(_controller, new object[] { null, eventArgs });
+            _controller
+                .GetType()
+                .GetMethod(
+                    "Worker_RunWorkerCompleted",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .Invoke(_controller, new object[] { null, eventArgs });
 
             // Assert
             Assert.IsTrue(spinner.Enabled);
@@ -306,10 +445,21 @@ namespace QuickFiler.Controllers.Tests
             // Arrange
             var mockDataModel = new Mock<IQfcDatamodel>();
             mockDataModel.Setup(m => m.Complete).Returns(true);
-            mockDataModel.Setup(m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>())).Returns(Task.FromResult((IList<MailItem>)new List<MailItem>()));
+            mockDataModel
+                .Setup(m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(Task.FromResult((IList<MailItem>)new List<MailItem>()));
             var mockQfcQueue = new Mock<IQfcQueue>();
-            mockQfcQueue.Setup(m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>())).Returns(Task.CompletedTask);
-            mockQfcQueue.Setup(m => m.EnqueueAsync(It.IsAny<IList<MailItem>>(), It.IsAny<IQfcCollectionController>())).Returns(Task.CompletedTask);
+            mockQfcQueue
+                .Setup(m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()))
+                .Returns(Task.CompletedTask);
+            mockQfcQueue
+                .Setup(m =>
+                    m.EnqueueAsync(
+                        It.IsAny<IList<MailItem>>(),
+                        It.IsAny<IQfcCollectionController>()
+                    )
+                )
+                .Returns(Task.CompletedTask);
             _controller.DataModel = mockDataModel.Object;
             _controller.QfcQueue = mockQfcQueue.Object;
 
@@ -317,9 +467,22 @@ namespace QuickFiler.Controllers.Tests
             await _controller.IterateQueueAsync();
 
             // Assert
-            mockDataModel.Verify(m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-            mockQfcQueue.Verify(m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()), Times.Never);
-            mockQfcQueue.Verify(m => m.EnqueueAsync(It.IsAny<IList<MailItem>>(), It.IsAny<IQfcCollectionController>()), Times.Never);
+            mockDataModel.Verify(
+                m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()),
+                Times.Never
+            );
+            mockQfcQueue.Verify(
+                m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()),
+                Times.Never
+            );
+            mockQfcQueue.Verify(
+                m =>
+                    m.EnqueueAsync(
+                        It.IsAny<IList<MailItem>>(),
+                        It.IsAny<IQfcCollectionController>()
+                    ),
+                Times.Never
+            );
         }
 
         [TestMethod]
@@ -328,12 +491,23 @@ namespace QuickFiler.Controllers.Tests
             // Arrange
             var mockDataModel = new Mock<IQfcDatamodel>();
             mockDataModel.Setup(m => m.Complete).Returns(false);
-            mockDataModel.Setup(m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>())).Returns(Task.FromResult((IList<MailItem>)new List<MailItem>()));
+            mockDataModel
+                .Setup(m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(Task.FromResult((IList<MailItem>)new List<MailItem>()));
             _controller.DataModel = mockDataModel.Object;
 
             var mockQfcQueue = new Mock<IQfcQueue>();
-            mockQfcQueue.Setup(m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>())).Returns(Task.CompletedTask);
-            mockQfcQueue.Setup(m => m.EnqueueAsync(It.IsAny<IList<MailItem>>(), It.IsAny<IQfcCollectionController>())).Returns(Task.CompletedTask);
+            mockQfcQueue
+                .Setup(m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()))
+                .Returns(Task.CompletedTask);
+            mockQfcQueue
+                .Setup(m =>
+                    m.EnqueueAsync(
+                        It.IsAny<IList<MailItem>>(),
+                        It.IsAny<IQfcCollectionController>()
+                    )
+                )
+                .Returns(Task.CompletedTask);
             _controller.QfcQueue = mockQfcQueue.Object;
 
             // Mock the QfcFormController
@@ -341,17 +515,35 @@ namespace QuickFiler.Controllers.Tests
             mockFormController.Setup(m => m.ItemsPerIteration).Returns(8);
             var mockQfcCollectionController = new Mock<IQfcCollectionController>();
             mockFormController.Setup(m => m.Groups).Returns(mockQfcCollectionController.Object);
-            _controller.GetType().GetField("_formController",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            _controller
+                .GetType()
+                .GetField(
+                    "_formController",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
                 .SetValue(_controller, mockFormController.Object);
 
             // Act
             await _controller.IterateQueueAsync();
 
             // Assert
-            mockDataModel.Verify(m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Once);
-            mockQfcQueue.Verify(m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()), Times.Once);
-            mockQfcQueue.Verify(m => m.EnqueueAsync(It.IsAny<IList<MailItem>>(), It.IsAny<IQfcCollectionController>()), Times.Never);
+            mockDataModel.Verify(
+                m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()),
+                Times.Once
+            );
+            mockQfcQueue.Verify(
+                m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()),
+                Times.Once
+            );
+            mockQfcQueue.Verify(
+                m =>
+                    m.EnqueueAsync(
+                        It.IsAny<IList<MailItem>>(),
+                        It.IsAny<IQfcCollectionController>()
+                    ),
+                Times.Never
+            );
         }
 
         [TestMethod]
@@ -365,16 +557,31 @@ namespace QuickFiler.Controllers.Tests
 
             // Setup DequeueNextItemGroupAsync to return 2 mail items
             var mockMailItem = new Mock<MailItem>();
-            IList<MailItem> mailItems = new List<MailItem> { mockMailItem.Object, mockMailItem.Object };
-            mockDataModel.Setup(m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>())).Returns(Task.FromResult(mailItems));
+            IList<MailItem> mailItems = new List<MailItem>
+            {
+                mockMailItem.Object,
+                mockMailItem.Object,
+            };
+            mockDataModel
+                .Setup(m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(Task.FromResult(mailItems));
 
             // Set the DataModel in the controller to the mock
             _controller.DataModel = mockDataModel.Object;
 
             // Mock the QfcQueue
             var mockQfcQueue = new Mock<IQfcQueue>();
-            mockQfcQueue.Setup(m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>())).Returns(Task.CompletedTask);
-            mockQfcQueue.Setup(m => m.EnqueueAsync(It.IsAny<IList<MailItem>>(), It.IsAny<IQfcCollectionController>())).Returns(Task.CompletedTask);
+            mockQfcQueue
+                .Setup(m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()))
+                .Returns(Task.CompletedTask);
+            mockQfcQueue
+                .Setup(m =>
+                    m.EnqueueAsync(
+                        It.IsAny<IList<MailItem>>(),
+                        It.IsAny<IQfcCollectionController>()
+                    )
+                )
+                .Returns(Task.CompletedTask);
             _controller.QfcQueue = mockQfcQueue.Object;
 
             // Mock the QfcFormController
@@ -382,15 +589,35 @@ namespace QuickFiler.Controllers.Tests
             mockFormController.Setup(m => m.ItemsPerIteration).Returns(8);
             var mockQfcCollectionController = new Mock<IQfcCollectionController>();
             mockFormController.Setup(m => m.Groups).Returns(mockQfcCollectionController.Object);
-            _controller.GetType().GetField("_formController", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_controller, mockFormController.Object);
+            _controller
+                .GetType()
+                .GetField(
+                    "_formController",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .SetValue(_controller, mockFormController.Object);
 
             // Act
             await _controller.IterateQueueAsync();
 
             // Assert
-            mockDataModel.Verify(m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Once);
-            mockQfcQueue.Verify(m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()), Times.Never);
-            mockQfcQueue.Verify(m => m.EnqueueAsync(It.IsAny<IList<MailItem>>(), It.IsAny<IQfcCollectionController>()), Times.Once);
+            mockDataModel.Verify(
+                m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()),
+                Times.Once
+            );
+            mockQfcQueue.Verify(
+                m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()),
+                Times.Never
+            );
+            mockQfcQueue.Verify(
+                m =>
+                    m.EnqueueAsync(
+                        It.IsAny<IList<MailItem>>(),
+                        It.IsAny<IQfcCollectionController>()
+                    ),
+                Times.Once
+            );
         }
 
         [TestMethod]
@@ -401,14 +628,22 @@ namespace QuickFiler.Controllers.Tests
             // Setup the DataModel to return 2 mocked mail items
             var mockDataModel = new Mock<IQfcDatamodel>();
             var mockMailItem = new Mock<MailItem>();
-            IList<MailItem> mailItems = new List<MailItem> { mockMailItem.Object, mockMailItem.Object };
-            mockDataModel.Setup(m => m.DequeueNextItemGroup(It.IsAny<int>()))
-                .Returns(mailItems);
+            IList<MailItem> mailItems = new List<MailItem>
+            {
+                mockMailItem.Object,
+                mockMailItem.Object,
+            };
+            mockDataModel.Setup(m => m.DequeueNextItemGroup(It.IsAny<int>())).Returns(mailItems);
             _controller.DataModel = mockDataModel.Object;
 
             var mockFormController = new Mock<IQfcFormController>();
-            _controller.GetType().GetField("_formController",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            _controller
+                .GetType()
+                .GetField(
+                    "_formController",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
                 .SetValue(_controller, mockFormController.Object);
 
             // Act
@@ -417,9 +652,15 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             mockDataModel.Verify(m => m.DequeueNextItemGroup(It.IsAny<int>()), Times.Once);
 
-            mockFormController.Verify(m => m.LoadItems(It.Is<IList<MailItem>>(
-                items => items.Count == 2 && items.Contains(mockMailItem.Object))), Times.Once);
-
+            mockFormController.Verify(
+                m =>
+                    m.LoadItems(
+                        It.Is<IList<MailItem>>(items =>
+                            items.Count == 2 && items.Contains(mockMailItem.Object)
+                        )
+                    ),
+                Times.Once
+            );
         }
 
         [TestMethod]
@@ -431,7 +672,14 @@ namespace QuickFiler.Controllers.Tests
             var mockQfcQueue = new Mock<IQfcQueue>();
             var mockFormController = new Mock<IQfcFormController>();
             _controller.QfcQueue = mockQfcQueue.Object;
-            _controller.GetType().GetField("_formController", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_controller, mockFormController.Object);
+            _controller
+                .GetType()
+                .GetField(
+                    "_formController",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .SetValue(_controller, mockFormController.Object);
             _controller.DataModel = mockDataModel.Object;
 
             // Act
@@ -439,7 +687,10 @@ namespace QuickFiler.Controllers.Tests
 
             // Assert
             mockQfcQueue.Verify(m => m.Dequeue(), Times.Once);
-            mockFormController.Verify(m => m.LoadItems(It.IsAny<TableLayoutPanel>(), It.IsAny<List<QfcItemGroup>>()), Times.Once);
+            mockFormController.Verify(
+                m => m.LoadItems(It.IsAny<TableLayoutPanel>(), It.IsAny<List<QfcItemGroup>>()),
+                Times.Once
+            );
         }
 
         [TestMethod]
@@ -447,15 +698,28 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange
             var stopWatch = new Stopwatch();
-            _controller.GetType().GetField("_stopWatch", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_controller, stopWatch);
+            _controller
+                .GetType()
+                .GetField(
+                    "_stopWatch",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .SetValue(_controller, stopWatch);
 
             // Act
             _controller.SwapStopWatch();
 
             // Assert
-            var actual = _controller.GetType().GetField(
-                "_stopWatchMoved", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                .GetValue(_controller) as Stopwatch;
+            var actual =
+                _controller
+                    .GetType()
+                    .GetField(
+                        "_stopWatchMoved",
+                        System.Reflection.BindingFlags.NonPublic
+                            | System.Reflection.BindingFlags.Instance
+                    )
+                    .GetValue(_controller) as Stopwatch;
             Assert.AreEqual(stopWatch, actual);
         }
 
@@ -497,8 +761,18 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange
             var mockDataModel = new Mock<IQfcDatamodel>();
-            _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
-            _controller.GetType().GetField("_datamodel", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_controller, mockDataModel.Object);
+            _controller = new QfcHomeController(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object
+            );
+            _controller
+                .GetType()
+                .GetField(
+                    "_datamodel",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .SetValue(_controller, mockDataModel.Object);
 
             // Act
             _controller.Cleanup();
@@ -512,7 +786,10 @@ namespace QuickFiler.Controllers.Tests
         public void Loaded_PropertyWorksCorrectly()
         {
             // Arrange & Act
-            _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
+            _controller = new QfcHomeController(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object
+            );
             _controller.Loaded = true;
 
             // Assert
@@ -536,11 +813,21 @@ namespace QuickFiler.Controllers.Tests
         public void FormController_PropertyWorksCorrectly()
         {
             // Arrange
-            _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
+            _controller = new QfcHomeController(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object
+            );
             var mockFormController = new Mock<IQfcFormController>();
 
             // Act
-            _controller.GetType().GetField("_formController", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_controller, mockFormController.Object);
+            _controller
+                .GetType()
+                .GetField(
+                    "_formController",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .SetValue(_controller, mockFormController.Object);
 
             // Assert
             Assert.AreEqual(mockFormController.Object, _controller.FormController);
@@ -550,7 +837,10 @@ namespace QuickFiler.Controllers.Tests
         public void KeyboardHandler_PropertyWorksCorrectly()
         {
             // Arrange
-            _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
+            _controller = new QfcHomeController(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object
+            );
             var mockKeyboardHandler = new Mock<IQfcKeyboardHandler>();
 
             // Act
@@ -564,11 +854,17 @@ namespace QuickFiler.Controllers.Tests
         public void DataModel_PropertyWorksCorrectly()
         {
             // Arrange
-            _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
+            _controller = new QfcHomeController(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object
+            );
             var mockDataModel = new Mock<IQfcDatamodel>();
 
             // Act
-            _controller.GetType().GetProperty("DataModel").SetValue(_controller, mockDataModel.Object);
+            _controller
+                .GetType()
+                .GetProperty("DataModel")
+                .SetValue(_controller, mockDataModel.Object);
 
             // Assert
             Assert.AreEqual(mockDataModel.Object, _controller.DataModel);
@@ -578,7 +874,10 @@ namespace QuickFiler.Controllers.Tests
         public void FilerQueue_PropertyWorksCorrectly()
         {
             // Arrange & Act
-            _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
+            _controller = new QfcHomeController(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object
+            );
             var result = _controller.FilerQueue;
 
             // Assert
@@ -589,11 +888,21 @@ namespace QuickFiler.Controllers.Tests
         public void UiScheduler_PropertyWorksCorrectly()
         {
             // Arrange
-            _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
+            _controller = new QfcHomeController(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object
+            );
             var mockUiScheduler = new Mock<TaskScheduler>();
 
             // Act
-            _controller.GetType().GetField("_uiScheduler", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_controller, mockUiScheduler.Object);
+            _controller
+                .GetType()
+                .GetField(
+                    "_uiScheduler",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .SetValue(_controller, mockUiScheduler.Object);
 
             // Assert
             Assert.AreEqual(mockUiScheduler.Object, _controller.UiScheduler);
@@ -603,11 +912,21 @@ namespace QuickFiler.Controllers.Tests
         public void StopWatch_PropertyWorksCorrectly()
         {
             // Arrange
-            _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
+            _controller = new QfcHomeController(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object
+            );
             var mockStopWatch = new Mock<Stopwatch>();
 
             // Act
-            _controller.GetType().GetField("_stopWatch", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_controller, mockStopWatch.Object);
+            _controller
+                .GetType()
+                .GetField(
+                    "_stopWatch",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .SetValue(_controller, mockStopWatch.Object);
 
             // Assert
             Assert.AreEqual(mockStopWatch.Object, _controller.StopWatch);
@@ -617,11 +936,21 @@ namespace QuickFiler.Controllers.Tests
         public void TokenSource_PropertyWorksCorrectly()
         {
             // Arrange
-            _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
+            _controller = new QfcHomeController(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object
+            );
             var mockTokenSource = new Mock<CancellationTokenSource>();
 
             // Act
-            _controller.GetType().GetField("_tokenSource", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_controller, mockTokenSource.Object);
+            _controller
+                .GetType()
+                .GetField(
+                    "_tokenSource",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .SetValue(_controller, mockTokenSource.Object);
 
             // Assert
             Assert.AreEqual(mockTokenSource.Object, _controller.TokenSource);
@@ -631,12 +960,22 @@ namespace QuickFiler.Controllers.Tests
         public void Token_PropertyWorksCorrectly()
         {
             // Arrange
-            _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
+            _controller = new QfcHomeController(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object
+            );
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
 
             // Act
-            _controller.GetType().GetField("_token", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_controller, token);
+            _controller
+                .GetType()
+                .GetField(
+                    "_token",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .SetValue(_controller, token);
 
             // Assert
             Assert.AreEqual(token, _controller.Token);
@@ -646,7 +985,10 @@ namespace QuickFiler.Controllers.Tests
         public void WorkerComplete_PropertyWorksCorrectly()
         {
             // Arrange
-            _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
+            _controller = new QfcHomeController(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object
+            );
 
             // Act & Assert
             SetPrivateField(_controller, "_workerComplete", true);
@@ -660,15 +1002,24 @@ namespace QuickFiler.Controllers.Tests
         public void UiSyncContext_PropertyWorksCorrectly()
         {
             // Arrange
-            _controller = new QfcHomeController(_mockApplicationGlobals.Object, _mockParentCleanup.Object);
+            _controller = new QfcHomeController(
+                _mockApplicationGlobals.Object,
+                _mockParentCleanup.Object
+            );
             var mockUiSyncContext = new Mock<SynchronizationContext>();
 
             // Act
-            _controller.GetType().GetField("_uiSyncContext", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_controller, mockUiSyncContext.Object);
+            _controller
+                .GetType()
+                .GetField(
+                    "_uiSyncContext",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .SetValue(_controller, mockUiSyncContext.Object);
 
             // Assert
             Assert.AreEqual(mockUiSyncContext.Object, _controller.UiSyncContext);
         }
     }
 }
-

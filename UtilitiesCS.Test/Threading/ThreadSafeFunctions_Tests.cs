@@ -1,8 +1,8 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.Test
@@ -46,7 +46,11 @@ namespace UtilitiesCS.Test
             double value = 10d;
 
             // Act
-            ThreadSafeFunctions.AdjustThreadSafe(ref value, current => current * 3, adjusted => Math.Min(adjusted, 25d));
+            ThreadSafeFunctions.AdjustThreadSafe(
+                ref value,
+                current => current * 3,
+                adjusted => Math.Min(adjusted, 25d)
+            );
 
             // Assert
             value.Should().Be(25d);
@@ -72,7 +76,10 @@ namespace UtilitiesCS.Test
             double value = 0d;
 
             // Act
-            Parallel.ForEach(Enumerable.Range(0, 100), _ => ThreadSafeFunctions.AddThreadSafe(ref value, 1d));
+            Parallel.ForEach(
+                Enumerable.Range(0, 100),
+                _ => ThreadSafeFunctions.AddThreadSafe(ref value, 1d)
+            );
 
             // Assert
             value.Should().Be(100d);

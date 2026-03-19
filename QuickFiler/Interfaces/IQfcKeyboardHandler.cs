@@ -1,8 +1,8 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using QuickFiler.Controllers;
-using System.Threading.Tasks;
 
 namespace QuickFiler.Interfaces
 {
@@ -16,6 +16,7 @@ namespace QuickFiler.Interfaces
         void KeyboardHandler_PreviewKeyDownAsync(object sender, PreviewKeyDownEventArgs e);
         void KeyboardHandler_KeyDown(object sender, KeyEventArgs e);
         void KeyboardHandler_KeyDownAsync(object sender, KeyEventArgs e);
+
         //Dictionary<char, Action<char>> CharActions { get; set; }
         KbdActions<char, KaChar, Action<char>> CharActions { get; set; }
         KbdActions<char, KaCharAsync, Func<char, Task>> CharActionsAsync { get; set; }

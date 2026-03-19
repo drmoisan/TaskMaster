@@ -12,10 +12,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         public void Subject_WhenWrappedPropertyExists_ShouldReturnTrueAndValue()
         {
             // Arrange
-            var wrapper = new OutlookItemTryGet(new UtilitiesCS.OutlookItem(new TryGetFriendlyItem
-            {
-                Subject = "Project update"
-            }));
+            var wrapper = new OutlookItemTryGet(
+                new UtilitiesCS.OutlookItem(new TryGetFriendlyItem { Subject = "Project update" })
+            );
 
             // Act
             var success = wrapper.Subject(out string result);
@@ -29,7 +28,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         public void Subject_WhenWrappedPropertyIsMissing_ShouldReturnFalseAndNull()
         {
             // Arrange
-            var wrapper = new OutlookItemTryGet(new UtilitiesCS.OutlookItem(new MissingSubjectItem()));
+            var wrapper = new OutlookItemTryGet(
+                new UtilitiesCS.OutlookItem(new MissingSubjectItem())
+            );
 
             // Act
             var success = wrapper.Subject(out string result);
@@ -43,10 +44,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         public void Size_WhenWrappedPropertyExists_ShouldReturnTrueAndValue()
         {
             // Arrange
-            var wrapper = new OutlookItemTryGet(new UtilitiesCS.OutlookItem(new TryGetFriendlyItem
-            {
-                Size = 42
-            }));
+            var wrapper = new OutlookItemTryGet(
+                new UtilitiesCS.OutlookItem(new TryGetFriendlyItem { Size = 42 })
+            );
 
             // Act
             var success = wrapper.Size(out long result);

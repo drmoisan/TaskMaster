@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using Newtonsoft.Json;
 
 /// <summary>
 /// Converts an object to and from JSON, with guarding to prevent recursive calls into the custom converter.
@@ -26,12 +26,19 @@ public abstract class NonRecursiveConverter<TConverter> : JsonConverter
 
 #nullable enable
     /// <inheritdoc/>
-    public override sealed object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+    public override sealed object? ReadJson(
+        JsonReader reader,
+        Type objectType,
+        object? existingValue,
+        JsonSerializer serializer
+    )
     {
         if (s_reading)
         {
             // Protect against any changes to Newtonsoft that somehow cause concurrent access in the same thread recursively
-            throw new InvalidOperationException($"Concurrent read detected on {nameof(NonRecursiveConverter<TConverter>)}");
+            throw new InvalidOperationException(
+                $"Concurrent read detected on {nameof(NonRecursiveConverter<TConverter>)}"
+            );
         }
 
         s_reading = true;
@@ -45,14 +52,19 @@ public abstract class NonRecursiveConverter<TConverter> : JsonConverter
         }
     }
 
-
     /// <inheritdoc/>
-    public override sealed void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+    public sealed override void WriteJson(
+        JsonWriter writer,
+        object? value,
+        JsonSerializer serializer
+    )
     {
         if (s_writing)
         {
             // Protect against any changes to Newtonsoft that somehow cause concurrent access in the same thread recursively
-            throw new InvalidOperationException($"Concurrent write detected on {nameof(NonRecursiveConverter<TConverter>)}");
+            throw new InvalidOperationException(
+                $"Concurrent write detected on {nameof(NonRecursiveConverter<TConverter>)}"
+            );
         }
 
         s_writing = true;
@@ -67,8 +79,17 @@ public abstract class NonRecursiveConverter<TConverter> : JsonConverter
     }
 
     /// <inheritdoc cref="ReadJson(JsonReader, Type, object?, JsonSerializer)"/>
-    protected abstract object? OnReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer);
+    protected abstract object? OnReadJson(
+        JsonReader reader,
+        Type objectType,
+        object? existingValue,
+        JsonSerializer serializer
+    );
 
     /// <inheritdoc cref="WriteJson(JsonWriter, object?, JsonSerializer)"/>
-    protected abstract void OnWriteJson(JsonWriter writer, object? value, JsonSerializer serializer);
+    protected abstract void OnWriteJson(
+        JsonWriter writer,
+        object? value,
+        JsonSerializer serializer
+    );
 }

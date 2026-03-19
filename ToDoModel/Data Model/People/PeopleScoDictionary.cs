@@ -128,7 +128,7 @@
 //                }
 //            }
 //            if (!newPeople.IsNullOrEmpty()) { this.Serialize(); }
-//            return newPeople;            
+//            return newPeople;
 //        }
 
 //        public string AddMissingEntry(string address) //internal
@@ -158,7 +158,7 @@
 //            else { return $"{prefix}{seed}"; }
 //        }
 
-//        public string RefineValidateCategory(string newPerson, IPrefix prefix) 
+//        public string RefineValidateCategory(string newPerson, IPrefix prefix)
 //        {
 //            bool continueAsking = true;
 //            while (continueAsking)
@@ -169,13 +169,13 @@
 //                // if user leaves blank, continue asking
 //                else if (newPerson == "") { continueAsking = true; }
 //                // else check if input is valid
-//                else 
+//                else
 //                {
 //                    // Add prefix if not already there
 //                    newPerson = AddPrefix(newPerson, prefix.Value);
 //                    // if category already exists, tell the user and continue asking
-//                    if (CategoryExists(newPerson)) 
-//                    { 
+//                    if (CategoryExists(newPerson))
+//                    {
 //                        MessageBox.Show($"Category {newPerson} already exists. Please choose another name.", "Category Exists", MessageBoxButtons.OK, MessageBoxIcon.Error);
 //                        continueAsking = true;
 //                    }
@@ -186,8 +186,8 @@
 //            return newPerson;
 //        }
 
-//        public void AddColorCategory(string newPerson) 
-//        { 
+//        public void AddColorCategory(string newPerson)
+//        {
 //            _globals.Ol.NamespaceMAPI.Categories.Add(newPerson, _prefix.Color, OlCategoryShortcutKey.olCategoryShortcutKeyNone);
 //        }
 

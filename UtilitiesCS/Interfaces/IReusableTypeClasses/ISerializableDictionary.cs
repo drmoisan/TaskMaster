@@ -5,9 +5,9 @@ using System.Collections.Specialized;
 //namespace UtilitiesCS.ReusableTypeClasses
 //{
 //    public interface ISerializableDictionary<TKey, TValue> : IObservableDictionary<TKey, TValue>
-//    //IDictionary<TKey, TValue>, 
-//    //ICollection<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>>, 
-//    //System.Runtime.Serialization.IDeserializationCallback, 
+//    //IDictionary<TKey, TValue>,
+//    //ICollection<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>>,
+//    //System.Runtime.Serialization.IDeserializationCallback,
 //    //System.Runtime.Serialization.ISerializable
 //    {
 //        // removed IDictionary, IReadOnlyDictionary<TKey, TValue>,
@@ -21,7 +21,6 @@ using System.Collections.Specialized;
 //        void Deserialize(string filepath, bool askUserOnError);
 //        void Serialize();
 //        void Serialize(string filepath);
-
 
 //    }
 //}

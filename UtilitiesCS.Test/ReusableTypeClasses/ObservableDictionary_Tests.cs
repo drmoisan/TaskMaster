@@ -46,10 +46,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void IndexerSettingExistingKey_UpdatesValueAndRaisesReplaceNotification()
         {
             // Arrange
-            var dictionary = new ObservableDictionary<string, int>
-            {
-                ["alpha"] = 1,
-            };
+            var dictionary = new ObservableDictionary<string, int> { ["alpha"] = 1 };
             NotifyCollectionChangedEventArgs lastArgs = null;
             dictionary.CollectionChanged += (_, args) => lastArgs = args;
 
@@ -83,11 +80,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void Remove_ExistingAndMissingKeys_ReturnExpectedResultsAndNotification()
         {
             // Arrange
-            var dictionary = new ObservableDictionary<string, int>
-            {
-                ["alpha"] = 1,
-                ["beta"] = 2,
-            };
+            var dictionary = new ObservableDictionary<string, int> { ["alpha"] = 1, ["beta"] = 2 };
             NotifyCollectionChangedEventArgs lastArgs = null;
             dictionary.CollectionChanged += (_, args) => lastArgs = args;
 
@@ -107,11 +100,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void Clear_RemovesAllEntriesAndRaisesResetNotification()
         {
             // Arrange
-            var dictionary = new ObservableDictionary<string, int>
-            {
-                ["alpha"] = 1,
-                ["beta"] = 2,
-            };
+            var dictionary = new ObservableDictionary<string, int> { ["alpha"] = 1, ["beta"] = 2 };
             NotifyCollectionChangedEventArgs lastArgs = null;
             dictionary.CollectionChanged += (_, args) => lastArgs = args;
 

@@ -1,30 +1,30 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using Microsoft.Office.Interop.Outlook;
+using TaskMaster.Properties;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
-using UtilitiesCS.OutlookExtensions;
-using System.Windows.Forms;
-using System.Threading;
 using UtilitiesCS.Extensions;
-using System.Collections.Concurrent;
-using TaskMaster.Properties;
-using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
-using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.OutlookObjects.Fields;
-
+using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 
 namespace TaskMaster
 {
     public class AppEvents : IAppEvents
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public AppEvents(IApplicationGlobals globals)
         {
@@ -35,7 +35,10 @@ namespace TaskMaster
 
         internal async Task<AppEvents> LoadAsync()
         {
-            if (Settings.Default.EventsHooked) { Hook(); }
+            if (Settings.Default.EventsHooked)
+            {
+                Hook();
+            }
             await ProcessNewInboxItemsAsync();
             return this;
         }
@@ -46,11 +49,7 @@ namespace TaskMaster
         public Items OlToDoItems
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return _olToDoItems;
-            }
-
+            get { return _olToDoItems; }
             [MethodImpl(MethodImplOptions.Synchronized)]
             private set
             {
@@ -99,16 +98,9 @@ namespace TaskMaster
         private Reminders OlReminders
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return _olReminders;
-            }
-
+            get { return _olReminders; }
             [MethodImpl(MethodImplOptions.Synchronized)]
-            set
-            {
-                _olReminders = value;
-            }
+            set { _olReminders = value; }
         }
 
         #region Events
@@ -118,7 +110,9 @@ namespace TaskMaster
             {
                 OlToDoItems = Globals.Ol.ToDoFolder.Items;
                 OlReminders = Globals.Ol.OlReminders;
-                Globals.Ol.Inboxes.ForEach(x => OlInboxes.AddLast(x.Items, items => items.ItemAdd += OlInboxItems_ItemAdd));
+                Globals.Ol.Inboxes.ForEach(x =>
+                    OlInboxes.AddLast(x.Items, items => items.ItemAdd += OlInboxItems_ItemAdd)
+                );
             }
         }
 
@@ -147,7 +141,6 @@ namespace TaskMaster
             }
             catch (System.Exception)
             {
-
                 throw;
             }
         }
@@ -168,8 +161,8 @@ namespace TaskMaster
         {
             if (item is MailItem mailItem)
             {
-                var enginesAvailable = Globals.Engines.InboxEngines
-                    .Where(kvp => kvp.Value is not null)
+                var enginesAvailable = Globals
+                    .Engines.InboxEngines.Where(kvp => kvp.Value is not null)
                     .ToArray();
                 var enginesApplicable = await enginesAvailable
                     .ToAsyncEnumerable()
@@ -178,25 +171,40 @@ namespace TaskMaster
                     .Where(kvp => kvp.Value.Engine is not null)
                     .ToArrayAsync();
 
-                if (!enginesAvailable.Any()) { logger.Debug("No engines available"); return false; }
+                if (!enginesAvailable.Any())
+                {
+                    logger.Debug("No engines available");
+                    return false;
+                }
                 else if (enginesApplicable.Length > 0)
                 {
-                    var helper = await MailItemHelper.FromMailItemAsync(mailItem, Globals, default, false);
+                    var helper = await MailItemHelper.FromMailItemAsync(
+                        mailItem,
+                        Globals,
+                        default,
+                        false
+                    );
                     await Task.Run(() => _ = helper.Tokens);
-                    await enginesApplicable.ToAsyncEnumerable().ForEachAwaitAsync(async e => await e.Value.AsyncAction(helper));
+                    await enginesApplicable
+                        .ToAsyncEnumerable()
+                        .ForEachAwaitAsync(async e => await e.Value.AsyncAction(helper));
                     helper.Item.SetUdf("AutoProcessed", true, OlUserPropertyType.olYesNo);
                     return true;
                 }
                 else
                 {
-                    logger.Debug($"No applicable engines for item with Subject: {mailItem.Subject}");
+                    logger.Debug(
+                        $"No applicable engines for item with Subject: {mailItem.Subject}"
+                    );
                     mailItem.SetUdf("AutoProcessed", true, OlUserPropertyType.olYesNo);
                 }
             }
             else
             {
                 var olItem = new OutlookItem(item);
-                logger.Debug($"Skipping item of type {olItem.Try().GetOlItemType()} with Subject: {olItem.Try().Subject}");
+                logger.Debug(
+                    $"Skipping item of type {olItem.Try().GetOlItemType()} with Subject: {olItem.Try().Subject}"
+                );
             }
             return false;
         }
@@ -212,14 +220,18 @@ namespace TaskMaster
                 foreach (var inbox in OlInboxes)
                 {
                     var olMailItems = inbox.Restrict("[MessageClass] = 'IPM.Note'");
-                    var unprocessedItems = olMailItems?.Restrict(filter)?
-                        .Cast<object>()
+                    var unprocessedItems = olMailItems
+                        ?.Restrict(filter)
+                        ?.Cast<object>()
                         .Where(x => x is MailItem)
                         .Cast<MailItem>()
                         .Where(x => x.UserProperties.Find("AutoProcessed") is null)
                         .ToArray();
                     //var unprocessedItems = olMailItems?.Restrict("[AutoProcessed] Is Null")?.Cast<object>();
-                    if (unprocessedItems is null) { continue; }
+                    if (unprocessedItems is null)
+                    {
+                        continue;
+                    }
                     unprocessedItems.ForEach(x => unprocessedQueue.Enqueue(x));
                 }
 
@@ -233,26 +245,39 @@ namespace TaskMaster
                 while (unprocessedQueue.Count > 0)
                 {
                     var remaining = unprocessedQueue.Count();
-                    if (unprocessedQueue.TryDequeue(out var item) && await ProcessMailItemAsync(item))
+                    if (
+                        unprocessedQueue.TryDequeue(out var item)
+                        && await ProcessMailItemAsync(item)
+                    )
                     {
                         success++;
-                        logger.Debug($"Successfully processed item {success + errors} of {unprocessedCount} in the unprocessed Queue");
+                        logger.Debug(
+                            $"Successfully processed item {success + errors} of {unprocessedCount} in the unprocessed Queue"
+                        );
                     }
                     else if (++errors == 3)
                     {
-                        var response = MyBox.ShowDialog($"Tried to process remaining {remaining} unprocessed " +
-                            $"items 3 times without success. Continue trying?", "Error",
-                            MessageBoxButtons.YesNo, MessageBoxIcon.Hand);
+                        var response = MyBox.ShowDialog(
+                            $"Tried to process remaining {remaining} unprocessed "
+                                + $"items 3 times without success. Continue trying?",
+                            "Error",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Hand
+                        );
 
                         if (response == DialogResult.No)
                         {
-                            logger.Warn($"Tried to process remaining {remaining} unprocessed items 3 times without success. Exiting loop.");
+                            logger.Warn(
+                                $"Tried to process remaining {remaining} unprocessed items 3 times without success. Exiting loop."
+                            );
                             break;
                         }
                     }
                     else
                     {
-                        logger.Debug($"Error processing item {success + errors} of {unprocessedCount} in the unprocessed Queue");
+                        logger.Debug(
+                            $"Error processing item {success + errors} of {unprocessedCount} in the unprocessed Queue"
+                        );
                         //if (item != default) { unprocessedQueue.Enqueue(item); }
                         await Task.Delay(100);
                     }
@@ -260,14 +285,15 @@ namespace TaskMaster
                     // Pump messages to keep the UI responsive
                     syncContext?.Post(_ => System.Windows.Forms.Application.DoEvents(), null);
                 }
-                logger.Debug($"Successfully processed {success} of {unprocessedCount} items in the " +
-                    $"unprocessed Queue with {errors} errors");
+                logger.Debug(
+                    $"Successfully processed {success} of {unprocessedCount} items in the "
+                        + $"unprocessed Queue with {errors} errors"
+                );
 
                 logger.Debug("Finished processing new inbox items");
             }
         }
 
         #endregion
-
     }
 }

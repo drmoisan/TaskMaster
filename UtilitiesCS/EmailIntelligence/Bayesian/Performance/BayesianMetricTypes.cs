@@ -1,7 +1,7 @@
-﻿using System.Windows.Forms.DataVisualization.Charting;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms.DataVisualization.Charting;
+using Newtonsoft.Json;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 {
@@ -49,7 +49,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             get => VerboseOutcomes?.ToArray() ?? [];
             set => VerboseOutcomes = value?.ToDictionary();
         }
-
     }
 
     //public record VerboseClassCounts()
@@ -114,7 +113,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             get => VerboseOutcomes?.ToArray() ?? [];
             set => VerboseOutcomes = value?.ToDictionary();
         }
-
     }
 
     public record GroupedTestOutcome()
@@ -144,7 +142,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             int falseNegatives,
             double precision,
             double recall,
-            double f1)
+            double f1
+        )
         {
             Class = @class;
             VerboseOutcomesJson = verboseOutcomes;
@@ -177,10 +176,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         public double F1 { get; set; }
     }
 
-    public class VerboseOutcomeClass
-    {
-
-    }
+    public class VerboseOutcomeClass { }
 
     public record ThresholdMetric()
     {
@@ -199,5 +195,4 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         public Series Recall { get; set; }
         public Series F1 { get; set; }
     }
-
 }

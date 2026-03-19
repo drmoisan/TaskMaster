@@ -1,15 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
+﻿using System;
 using System.Collections;
-using System.Threading.Tasks;
-using System.Threading;
-using UtilitiesCS.EmailIntelligence.Bayesian;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
-
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using UtilitiesCS.EmailIntelligence.Bayesian;
 
 namespace UtilitiesCS.Test.EmailIntelligence
 {
@@ -40,26 +39,46 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 new BayesianClassifierShared.WordStream("test3", ["a", "b"]),
                 new BayesianClassifierShared.WordStream("test4", ["d", "a", "b"]),
             ];
-            var actual = wordStreams.Select(x => group.Classifiers["spam"].Chi2SpamProb(x)).ToList();
-            List<double> expected = [0.8448275862068967, 0.09183673469387754, 0.03252482935305728, 0.23394200608952753];
+            var actual = wordStreams
+                .Select(x => group.Classifiers["spam"].Chi2SpamProb(x))
+                .ToList();
+            List<double> expected =
+            [
+                0.8448275862068967,
+                0.09183673469387754,
+                0.03252482935305728,
+                0.23394200608952753,
+            ];
 
-            var jagged = Enumerable.Range(0, wordStreams.Count).Select(i => new string[]
-            {
-                wordStreams[i].Words.SentenceJoin(),
-                actual[i].ToString("F6"),
-                expected[i].ToString("F6"),
-                (actual[i] - expected[i]) == 0 ? "-": (actual[i] - expected[i]).ToString("F6")
-            }).ToArray();
+            var jagged = Enumerable
+                .Range(0, wordStreams.Count)
+                .Select(i =>
+                    new string[]
+                    {
+                        wordStreams[i].Words.SentenceJoin(),
+                        actual[i].ToString("F6"),
+                        expected[i].ToString("F6"),
+                        (actual[i] - expected[i]) == 0
+                            ? "-"
+                            : (actual[i] - expected[i]).ToString("F6"),
+                    }
+                )
+                .ToArray();
 
             var text = jagged.ToFormattedText(
                 ["WordStream", "Actual", "Expected", "Difference"],
-                [Enums.Justification.Left, Enums.Justification.Right, Enums.Justification.Right, Enums.Justification.Center],
-                "Probability Integration Test");
+                [
+                    Enums.Justification.Left,
+                    Enums.Justification.Right,
+                    Enums.Justification.Right,
+                    Enums.Justification.Center,
+                ],
+                "Probability Integration Test"
+            );
 
             Console.WriteLine(text);
 
             actual.Should().BeEquivalentTo(expected, options => options.WithStrictOrdering());
-
         }
 
         //private SubClassifierGroup CreateBayesianClassifierGroup()

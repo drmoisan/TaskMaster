@@ -1,11 +1,11 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualBasic;
 using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
 
@@ -17,14 +17,24 @@ namespace Tags
         {
             _globals = appGlobals;
             _viewer = new TagViewer();
-            var dictOptions = options.Select(option => new KeyValuePair<string, bool>(option, false)).ToSortedDictionary();
-            _controller = new TagController(_viewer, dictOptions, GetAutoAssign(), _globals.TD.PrefixList, _globals.Ol.UserEmailAddress);
+            var dictOptions = options
+                .Select(option => new KeyValuePair<string, bool>(option, false))
+                .ToSortedDictionary();
+            _controller = new TagController(
+                _viewer,
+                dictOptions,
+                GetAutoAssign(),
+                _globals.TD.PrefixList,
+                _globals.Ol.UserEmailAddress
+            );
         }
 
         public TagLauncher(IEnumerable<string> options, IPrefix prefix, string userEmail)
         {
             _viewer = new TagViewer();
-            var dictOptions = options.Select(option => new KeyValuePair<string, bool>(option, false)).ToSortedDictionary();
+            var dictOptions = options
+                .Select(option => new KeyValuePair<string, bool>(option, false))
+                .ToSortedDictionary();
             if (prefix is null)
             {
                 _controller = new TagController(_viewer, dictOptions, null, null, userEmail);
@@ -32,11 +42,21 @@ namespace Tags
             else
             {
                 var prefixList = new List<IPrefix> { prefix };
-                _controller = new TagController(_viewer, dictOptions, null, prefixList, userEmail, prefixKey: prefix.Key);
+                _controller = new TagController(
+                    _viewer,
+                    dictOptions,
+                    null,
+                    prefixList,
+                    userEmail,
+                    prefixKey: prefix.Key
+                );
             }
         }
 
-        public static List<string> LaunchAndSelect(IEnumerable<string> options, IApplicationGlobals appGlobals)
+        public static List<string> LaunchAndSelect(
+            IEnumerable<string> options,
+            IApplicationGlobals appGlobals
+        )
         {
             var launcher = new TagLauncher(options, appGlobals);
             launcher.Viewer.ShowDialog();
@@ -44,9 +64,18 @@ namespace Tags
             {
                 return launcher.Controller.SelectionAsList();
             }
-            else { return []; }
+            else
+            {
+                return [];
+            }
         }
-        public static string LaunchAndFindMatch(IEnumerable<string> options, IPrefix prefix, string userEmail, string searchString)
+
+        public static string LaunchAndFindMatch(
+            IEnumerable<string> options,
+            IPrefix prefix,
+            string userEmail,
+            string searchString
+        )
         {
             var launcher = new TagLauncher(options, prefix, userEmail);
             launcher.Viewer.Controls.Remove(launcher.Viewer.ButtonNew);
@@ -67,20 +96,32 @@ namespace Tags
         private IApplicationGlobals _globals;
 
         private TagViewer _viewer;
-        public TagViewer Viewer { get => _viewer; set => _viewer = value; }
+        public TagViewer Viewer
+        {
+            get => _viewer;
+            set => _viewer = value;
+        }
 
         private TagController _controller;
-        public TagController Controller { get => _controller; set => _controller = value; }
+        public TagController Controller
+        {
+            get => _controller;
+            set => _controller = value;
+        }
 
-        public static IAutoAssign GetAutoAssign(IList<string> filterList,
+        public static IAutoAssign GetAutoAssign(
+            IList<string> filterList,
             Func<MailItem, IList<string>> addChoicesToDictDelegate,
             Func<IPrefix, string, Category> addColorCategoryDelegate,
-            Func<object, IList<string>> autoFindDelegate)
+            Func<object, IList<string>> autoFindDelegate
+        )
         {
-            return new LauncherAutoAssign(filterList,
-                                          addChoicesToDictDelegate,
-                                          addColorCategoryDelegate,
-                                          autoFindDelegate);
+            return new LauncherAutoAssign(
+                filterList,
+                addChoicesToDictDelegate,
+                addColorCategoryDelegate,
+                autoFindDelegate
+            );
         }
 
         public IAutoAssign GetAutoAssign()
@@ -89,12 +130,19 @@ namespace Tags
             autoAssign.FilterList = new List<string>();
             autoAssign.AddChoicesToDictDelegate = _globals.TD.People.AddMissingEntries;
             autoAssign.AddColorCategoryDelegate = (IPrefix prefix, string categoryName) =>
-                CreateCategoryModule.CreateCategory(olNS: _globals.Ol.NamespaceMAPI, prefix: prefix, newCatName: categoryName);
+                CreateCategoryModule.CreateCategory(
+                    olNS: _globals.Ol.NamespaceMAPI,
+                    prefix: prefix,
+                    newCatName: categoryName
+                );
 
             autoAssign.AutoFindDelegate = (object objItem) =>
             {
                 var helper = GetHelper(objItem);
-                if (helper is null) { return []; }
+                if (helper is null)
+                {
+                    return [];
+                }
                 return AutoFile.AutoFindPeople(helper, _globals.TD.People, true, false);
                 //return AutoFile2.AutoFindPeople(
                 //    objItem: objItem,
@@ -114,7 +162,10 @@ namespace Tags
             {
                 return new MailItemHelper(mailItem, _globals);
             }
-            else if (objItem is IOutlookItem olItem && olItem.GetOlItemType() == OlItemType.olMailItem)
+            else if (
+                objItem is IOutlookItem olItem
+                && olItem.GetOlItemType() == OlItemType.olMailItem
+            )
             {
                 return new MailItemHelper(olItem.InnerObject as MailItem, _globals);
             }
@@ -128,16 +179,16 @@ namespace Tags
             }
         }
 
-
-
         internal class LauncherAutoAssign : IAutoAssign
         {
             public LauncherAutoAssign() { }
 
-            public LauncherAutoAssign(IList<string> filterList,
-                                      Func<MailItem, IList<string>> addChoicesToDictDelegate,
-                                      Func<IPrefix, string, Category> addColorCategoryDelegate,
-                                      Func<object, IList<string>> autoFindDelegate)
+            public LauncherAutoAssign(
+                IList<string> filterList,
+                Func<MailItem, IList<string>> addChoicesToDictDelegate,
+                Func<IPrefix, string, Category> addColorCategoryDelegate,
+                Func<object, IList<string>> autoFindDelegate
+            )
             {
                 _filterList = filterList;
                 _addChoicesToDictDelegate = addChoicesToDictDelegate;
@@ -146,25 +197,48 @@ namespace Tags
             }
 
             private IList<string> _filterList;
-            public IList<string> FilterList { get => _filterList; set => _filterList = value; }
+            public IList<string> FilterList
+            {
+                get => _filterList;
+                set => _filterList = value;
+            }
 
             private Func<MailItem, IList<string>> _addChoicesToDictDelegate;
-            public Func<MailItem, IList<string>> AddChoicesToDictDelegate { get => _addChoicesToDictDelegate; set => _addChoicesToDictDelegate = value; }
+            public Func<MailItem, IList<string>> AddChoicesToDictDelegate
+            {
+                get => _addChoicesToDictDelegate;
+                set => _addChoicesToDictDelegate = value;
+            }
 
-            public IList<string> AddChoicesToDict(MailItem olMail, IList<IPrefix> prefixes, string prefixKey, string currentUserEmail)
+            public IList<string> AddChoicesToDict(
+                MailItem olMail,
+                IList<IPrefix> prefixes,
+                string prefixKey,
+                string currentUserEmail
+            )
             {
                 return _addChoicesToDictDelegate(olMail);
             }
 
             private Func<IPrefix, string, Category> _addColorCategoryDelegate;
-            public Func<IPrefix, string, Category> AddColorCategoryDelegate { get => _addColorCategoryDelegate; set => _addColorCategoryDelegate = value; }
+            public Func<IPrefix, string, Category> AddColorCategoryDelegate
+            {
+                get => _addColorCategoryDelegate;
+                set => _addColorCategoryDelegate = value;
+            }
+
             public Category AddColorCategory(IPrefix prefix, string categoryName)
             {
                 return _addColorCategoryDelegate(prefix, categoryName);
             }
 
             private Func<object, IList<string>> _autoFindDelegate;
-            public Func<object, IList<string>> AutoFindDelegate { get => _autoFindDelegate; set => _autoFindDelegate = value; }
+            public Func<object, IList<string>> AutoFindDelegate
+            {
+                get => _autoFindDelegate;
+                set => _autoFindDelegate = value;
+            }
+
             public IList<string> AutoFind(object objItem)
             {
                 return _autoFindDelegate(objItem);
@@ -178,7 +252,6 @@ namespace Tags
                 }
                 catch (System.Exception)
                 {
-
                     throw;
                 }
             }

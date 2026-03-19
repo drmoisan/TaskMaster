@@ -1,8 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test
 {
@@ -13,7 +13,8 @@ namespace UtilitiesCS.Test
         public void Constructor_WithCategoryString_InitializesCorrectly()
         {
             // Arrange
-            string categoryString = "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
+            string categoryString =
+                "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
 
             // Act
             var parser = new FlagParser(ref categoryString);
@@ -30,7 +31,14 @@ namespace UtilitiesCS.Test
         public void Constructor_WithCategoryList_InitializesCorrectly()
         {
             // Arrange
-            var categories = new List<string> { "Tag PPL John", "Tag PROJECT ProjectA", "Tag TOPIC Topic1", "_@Context1", "Tag KB KB1" };
+            var categories = new List<string>
+            {
+                "Tag PPL John",
+                "Tag PROJECT ProjectA",
+                "Tag TOPIC Topic1",
+                "_@Context1",
+                "Tag KB KB1",
+            };
 
             // Act
             var parser = new FlagParser(categories);
@@ -145,9 +153,11 @@ namespace UtilitiesCS.Test
         public void AreEquivalentTo_StringComparison_ReturnsTrue()
         {
             // Arrange
-            string categoryString = "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
+            string categoryString =
+                "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
             var parser = new FlagParser(ref categoryString);
-            string other = "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
+            string other =
+                "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
 
             // Act
             bool result = parser.AreEquivalentTo(other);
@@ -160,9 +170,17 @@ namespace UtilitiesCS.Test
         public void AreEquivalentTo_ListComparison_ReturnsTrue()
         {
             // Arrange
-            string categoryString = "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
+            string categoryString =
+                "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
             var parser = new FlagParser(ref categoryString);
-            var other = new List<string> { "Tag PPL John", "Tag PROJECT ProjectA", "Tag TOPIC Topic1", "_@Context1", "Tag KB KB1" };
+            var other = new List<string>
+            {
+                "Tag PPL John",
+                "Tag PROJECT ProjectA",
+                "Tag TOPIC Topic1",
+                "_@Context1",
+                "Tag KB KB1",
+            };
 
             // Act
             bool result = parser.AreEquivalentTo(other);
@@ -175,7 +193,8 @@ namespace UtilitiesCS.Test
         public void Clone_CreatesShallowCopy()
         {
             // Arrange
-            string categoryString = "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
+            string categoryString =
+                "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
             var parser = new FlagParser(ref categoryString);
 
             // Act
@@ -193,7 +212,8 @@ namespace UtilitiesCS.Test
         public void DeepCopy_CreatesDeepCopy()
         {
             // Arrange
-            string categoryString = "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
+            string categoryString =
+                "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
             var parser = new FlagParser(ref categoryString);
 
             // Act
@@ -255,7 +275,8 @@ namespace UtilitiesCS.Test
         public void Constructor_WithMixedCaseValues_PreservesValueCasing()
         {
             // Arrange
-            string categoryString = "Tag PPL jOhN, Tag PROJECT ProJectA, Tag TOPIC TopicOne, _@ConText1, Tag KB kbOne";
+            string categoryString =
+                "Tag PPL jOhN, Tag PROJECT ProJectA, Tag TOPIC TopicOne, _@ConText1, Tag KB kbOne";
 
             // Act
             var parser = new FlagParser(ref categoryString);

@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
@@ -7,6 +6,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
     public class MinedMailInfo : ICloneable
     {
         public MinedMailInfo() { }
+
         public MinedMailInfo(IItemInfo info)
         {
             Categories = info.Categories;
@@ -23,34 +23,74 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         private string _categories;
-        public string Categories { get => _categories; set => _categories = value; }
+        public string Categories
+        {
+            get => _categories;
+            set => _categories = value;
+        }
 
         private string[] _tokens;
-        public string[] Tokens { get => _tokens; set => _tokens = value; }
+        public string[] Tokens
+        {
+            get => _tokens;
+            set => _tokens = value;
+        }
 
         private IFolderWrapper _folderInfo;
-        public IFolderWrapper FolderInfo { get => _folderInfo; set => _folderInfo = value; }
+        public IFolderWrapper FolderInfo
+        {
+            get => _folderInfo;
+            set => _folderInfo = value;
+        }
 
         private IRecipientInfo[] _toRecipients;
-        public IRecipientInfo[] ToRecipients { get => _toRecipients; set => _toRecipients = value; }
+        public IRecipientInfo[] ToRecipients
+        {
+            get => _toRecipients;
+            set => _toRecipients = value;
+        }
 
         private IRecipientInfo[] _ccRecipients;
-        public IRecipientInfo[] CcRecipients { get => _ccRecipients; set => _ccRecipients = value; }
+        public IRecipientInfo[] CcRecipients
+        {
+            get => _ccRecipients;
+            set => _ccRecipients = value;
+        }
 
         private IRecipientInfo _sender;
-        public IRecipientInfo Sender { get => _sender; set => _sender = value; }
+        public IRecipientInfo Sender
+        {
+            get => _sender;
+            set => _sender = value;
+        }
 
         private string _conversationId;
-        public string ConversationId { get => _conversationId; set => _conversationId = value; }
+        public string ConversationId
+        {
+            get => _conversationId;
+            set => _conversationId = value;
+        }
 
         private string _entryID;
-        public string EntryId { get => _entryID; set => _entryID = value; }
+        public string EntryId
+        {
+            get => _entryID;
+            set => _entryID = value;
+        }
 
         private string _storeID;
-        public string StoreId { get => _storeID; set => _storeID = value; }
+        public string StoreId
+        {
+            get => _storeID;
+            set => _storeID = value;
+        }
 
         private string _subject;
-        public string Subject { get => _subject; set => _subject = value; }
+        public string Subject
+        {
+            get => _subject;
+            set => _subject = value;
+        }
 
         public string Actionable { get; set; }
 
@@ -78,12 +118,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 StoreId = this.StoreId,
                 Subject = this.Subject,
                 Actionable = this.Actionable,
-                GroupingKey = this.GroupingKey
+                GroupingKey = this.GroupingKey,
             };
 
             return deepCopy;
 
-            #endregion IClonable
+        #endregion IClonable
         }
     }
 }

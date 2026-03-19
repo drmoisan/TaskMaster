@@ -1,14 +1,9 @@
 using System;
 using System.Collections.Concurrent;
-
 using FluentAssertions;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using Moq;
-
 using UtilitiesCS;
-
 using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
 
 namespace UtilitiesCS.Test.OutlookObjects.Folder
@@ -19,13 +14,20 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         [TestMethod]
         public void ToFsFolderpath_WithStringInputs_MapsOutlookBranchIntoFilesystemBranch()
         {
-            const string olBranchPath = "first.last@company.com\\Ol Level 1\\Common Level A\\Common Level B";
+            const string olBranchPath =
+                "first.last@company.com\\Ol Level 1\\Common Level A\\Common Level B";
             const string olAncestorPath = "first.last@company.com\\Ol Level 1";
             const string fsAncestorEquivalent = "C:\\Fs Level 1\\Fs Level 2\\Fs Level 3";
 
-            string actual = FolderConverter.ToFsFolderpath(olBranchPath, olAncestorPath, fsAncestorEquivalent);
+            string actual = FolderConverter.ToFsFolderpath(
+                olBranchPath,
+                olAncestorPath,
+                fsAncestorEquivalent
+            );
 
-            actual.Should().Be("C:\\Fs Level 1\\Fs Level 2\\Fs Level 3\\Common Level A\\Common Level B");
+            actual
+                .Should()
+                .Be("C:\\Fs Level 1\\Fs Level 2\\Fs Level 3\\Common Level A\\Common Level B");
         }
 
         [TestMethod]
@@ -39,21 +41,29 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         [TestMethod]
         public void ToFsFolderpath_WhenMappedBranchContainsIllegalCharacters_ThrowsArgumentException()
         {
-            Action act = () => FolderConverter.ToFsFolderpath(
-                "Archive\\Needs?Cleanup",
-                "Archive",
-                "C:\\OneDriveRoot");
+            Action act = () =>
+                FolderConverter.ToFsFolderpath(
+                    "Archive\\Needs?Cleanup",
+                    "Archive",
+                    "C:\\OneDriveRoot"
+                );
 
-            act.Should().Throw<ArgumentException>()
-                .WithParameterName("fsPath");
+            act.Should().Throw<ArgumentException>().WithParameterName("fsPath");
         }
 
         [TestMethod]
         public void ResolveOlRoot_WhenBranchIsUnderArchiveRoot_ReturnsArchiveRootPath()
         {
-            var globals = CreateGlobals(archiveRootPath: "\\Archive", inboxPath: "\\Inbox", oneDrivePath: "C:\\OneDrive");
+            var globals = CreateGlobals(
+                archiveRootPath: "\\Archive",
+                inboxPath: "\\Inbox",
+                oneDrivePath: "C:\\OneDrive"
+            );
 
-            string actual = FolderConverter.ResolveOlRoot("\\Archive\\Projects\\2026", globals.Object);
+            string actual = FolderConverter.ResolveOlRoot(
+                "\\Archive\\Projects\\2026",
+                globals.Object
+            );
 
             actual.Should().Be("\\Archive");
         }
@@ -61,7 +71,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         [TestMethod]
         public void ResolveOlRoot_WhenBranchIsUnderInboxRoot_ReturnsInboxPath()
         {
-            var globals = CreateGlobals(archiveRootPath: "\\Archive", inboxPath: "\\Inbox", oneDrivePath: "C:\\OneDrive");
+            var globals = CreateGlobals(
+                archiveRootPath: "\\Archive",
+                inboxPath: "\\Inbox",
+                oneDrivePath: "C:\\OneDrive"
+            );
 
             string actual = FolderConverter.ResolveOlRoot("\\Inbox\\Triage", globals.Object);
 
@@ -71,11 +85,16 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         [TestMethod]
         public void ResolveOlRoot_WhenBranchDoesNotMatchKnownRoots_ThrowsArgumentException()
         {
-            var globals = CreateGlobals(archiveRootPath: "\\Archive", inboxPath: "\\Inbox", oneDrivePath: "C:\\OneDrive");
+            var globals = CreateGlobals(
+                archiveRootPath: "\\Archive",
+                inboxPath: "\\Inbox",
+                oneDrivePath: "C:\\OneDrive"
+            );
 
             Action act = () => FolderConverter.ResolveOlRoot("\\Elsewhere\\Folder", globals.Object);
 
-            act.Should().Throw<ArgumentException>()
+            act.Should()
+                .Throw<ArgumentException>()
                 .WithMessage("*is not a branch of any known root folder*");
         }
 
@@ -84,7 +103,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         {
             var folder = new Mock<OutlookFolder>();
             folder.SetupGet(x => x.FolderPath).Returns("\\Archive\\Projects\\2026");
-            var globals = CreateGlobals(archiveRootPath: "\\Archive", inboxPath: "\\Inbox", oneDrivePath: "C:\\OneDrive");
+            var globals = CreateGlobals(
+                archiveRootPath: "\\Archive",
+                inboxPath: "\\Inbox",
+                oneDrivePath: "C:\\OneDrive"
+            );
 
             string actual = FolderConverter.ToFsFolderpath(folder.Object, globals.Object);
 
@@ -96,14 +119,22 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         {
             var folder = new Mock<OutlookFolder>();
             folder.SetupGet(x => x.FolderPath).Returns("\\Inbox\\Triage");
-            var globals = CreateGlobals(archiveRootPath: "\\Archive", inboxPath: "\\Inbox", oneDrivePath: null);
+            var globals = CreateGlobals(
+                archiveRootPath: "\\Archive",
+                inboxPath: "\\Inbox",
+                oneDrivePath: null
+            );
 
             string actual = FolderConverter.ToFsFolderpath(folder.Object, globals.Object);
 
             actual.Should().BeNull();
         }
 
-        private static Mock<IApplicationGlobals> CreateGlobals(string archiveRootPath, string inboxPath, string oneDrivePath)
+        private static Mock<IApplicationGlobals> CreateGlobals(
+            string archiveRootPath,
+            string inboxPath,
+            string oneDrivePath
+        )
         {
             var fileSystem = new Mock<IFileSystemFolderPaths>();
             var specialFolders = new ConcurrentDictionary<string, string>();

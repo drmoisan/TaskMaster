@@ -35,7 +35,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void Constructor_WithCategoryString_ParsesKnownFlagsAndExposesTranslators()
         {
             // Arrange
-            const string categoryNames = "Tag PPL John, Tag PROJECT Alpha, Tag TOPIC TopicOne, _@ContextOne, Tag KB Knowledge, Tag A Top Priority Today, Tag Bullpin Priorities";
+            const string categoryNames =
+                "Tag PPL John, Tag PROJECT Alpha, Tag TOPIC TopicOne, _@ContextOne, Tag KB Knowledge, Tag A Top Priority Today, Tag Bullpin Priorities";
 
             // Act
             var flagClass = new FlagClassNoItem(categoryNames);
@@ -80,7 +81,11 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Arrange
             var selectedCategory = CreateCategory("Tag PPL John");
             var unselectedCategory = CreateCategory("Tag PROJECT Alpha");
-            IList<Category> categories = new List<Category> { selectedCategory, unselectedCategory };
+            IList<Category> categories = new List<Category>
+            {
+                selectedCategory,
+                unselectedCategory,
+            };
 
             // Act
             var flagClass = new FlagClassNoItem(categories);
@@ -119,7 +124,12 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var unrelatedCategory = CreateCategory("Tag PROJECT Alpha");
             var flagClass = new FlagClassNoItem("Tag PPL John, _@ContextOne")
             {
-                OlCategories = new List<Category> { peopleCategory, contextCategory, unrelatedCategory },
+                OlCategories = new List<Category>
+                {
+                    peopleCategory,
+                    contextCategory,
+                    unrelatedCategory,
+                },
             };
 
             // Act

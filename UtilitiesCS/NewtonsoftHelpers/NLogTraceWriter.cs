@@ -1,23 +1,32 @@
-﻿using log4net.Repository.Hierarchy;
-using log4net;
-using Newtonsoft.Json.Serialization;
-using System.Diagnostics;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using log4net;
+using log4net.Repository.Hierarchy;
+using Newtonsoft.Json.Serialization;
 
 public class NLogTraceWriter : ITraceWriter
 {
     private static readonly log4net.ILog _logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+    );
 
     internal virtual ILog Logger => _logger;
 
     private TraceLevel _levelFilter = TraceLevel.Verbose;
-    public TraceLevel LevelFilter { get => _levelFilter; set => _levelFilter = value; }
+    public TraceLevel LevelFilter
+    {
+        get => _levelFilter;
+        set => _levelFilter = value;
+    }
 
     private List<string> _messageFilter = ["Deserialized JSON:", "Serialized JSON:"];
-    public List<string> MessageFilter { get => _messageFilter; set => _messageFilter = value; }
+    public List<string> MessageFilter
+    {
+        get => _messageFilter;
+        set => _messageFilter = value;
+    }
 
     public void Trace(TraceLevel level, string message, Exception ex)
     {
@@ -44,5 +53,4 @@ public class NLogTraceWriter : ITraceWriter
                 return Logger.Debug;
         }
     }
-
 }

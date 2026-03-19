@@ -1,5 +1,3 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -7,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS;
 
 namespace UtilitiesCS.Test.Extensions
@@ -33,16 +33,8 @@ namespace UtilitiesCS.Test.Extensions
         public void ContentEquals_ReturnsTrueForEquivalentDictionariesRegardlessOfOrder()
         {
             // Arrange
-            var first = new Dictionary<string, int>
-            {
-                ["alpha"] = 1,
-                ["beta"] = 2
-            };
-            var second = new Dictionary<string, int>
-            {
-                ["beta"] = 2,
-                ["alpha"] = 1
-            };
+            var first = new Dictionary<string, int> { ["alpha"] = 1, ["beta"] = 2 };
+            var second = new Dictionary<string, int> { ["beta"] = 2, ["alpha"] = 1 };
 
             // Act
             var actual = first.ContentEquals(second);
@@ -58,7 +50,7 @@ namespace UtilitiesCS.Test.Extensions
             IEnumerable<KeyValuePair<string, int>> source =
             [
                 new KeyValuePair<string, int>("zeta", 6),
-                new KeyValuePair<string, int>("alpha", 1)
+                new KeyValuePair<string, int>("alpha", 1),
             ];
 
             // Act
@@ -77,7 +69,7 @@ namespace UtilitiesCS.Test.Extensions
             IEnumerable<KeyValuePair<string, int>> nullSource = null;
             IEnumerable<KeyValuePair<string, int>> singleEntry =
             [
-                new KeyValuePair<string, int>("only", 42)
+                new KeyValuePair<string, int>("only", 42),
             ];
 
             // Act
@@ -86,7 +78,11 @@ namespace UtilitiesCS.Test.Extensions
 
             // Assert
             nullResult.Should().BeEmpty();
-            singleResult.Should().ContainSingle().Which.Should().BeEquivalentTo(new KeyValuePair<string, int>("only", 42));
+            singleResult
+                .Should()
+                .ContainSingle()
+                .Which.Should()
+                .BeEquivalentTo(new KeyValuePair<string, int>("only", 42));
         }
 
         [TestMethod]
@@ -96,15 +92,14 @@ namespace UtilitiesCS.Test.Extensions
             IEnumerable<KeyValuePair<string, int>> duplicateKeys =
             [
                 new KeyValuePair<string, int>("dup", 1),
-                new KeyValuePair<string, int>("dup", 2)
+                new KeyValuePair<string, int>("dup", 2),
             ];
 
             // Act
             Action action = () => duplicateKeys.ToDictionary();
 
             // Assert
-            action.Should().Throw<InvalidOperationException>()
-                .WithMessage("*duplicate keys*");
+            action.Should().Throw<InvalidOperationException>().WithMessage("*duplicate keys*");
         }
 
         [TestMethod]
@@ -114,18 +109,14 @@ namespace UtilitiesCS.Test.Extensions
             IEnumerable<DictionaryEntry> entries =
             [
                 new DictionaryEntry("alpha", 1),
-                new DictionaryEntry("beta", 2)
+                new DictionaryEntry("beta", 2),
             ];
 
             // Act
             var actual = entries.ToDictionary<string, int>();
 
             // Assert
-            actual.Should().Equal(new Dictionary<string, int>
-            {
-                ["alpha"] = 1,
-                ["beta"] = 2
-            });
+            actual.Should().Equal(new Dictionary<string, int> { ["alpha"] = 1, ["beta"] = 2 });
         }
 
         [TestMethod]
@@ -135,15 +126,14 @@ namespace UtilitiesCS.Test.Extensions
             IEnumerable<KeyValuePair<string, int>> duplicateKeys =
             [
                 new KeyValuePair<string, int>("dup", 1),
-                new KeyValuePair<string, int>("dup", 2)
+                new KeyValuePair<string, int>("dup", 2),
             ];
 
             // Act
             Action action = () => duplicateKeys.ToConcurrentDictionary();
 
             // Assert
-            action.Should().Throw<InvalidOperationException>()
-                .WithMessage("*duplicate keys*");
+            action.Should().Throw<InvalidOperationException>().WithMessage("*duplicate keys*");
         }
 
         [TestMethod]
@@ -153,29 +143,23 @@ namespace UtilitiesCS.Test.Extensions
             IEnumerable<KeyValuePair<string, int>> source =
             [
                 new KeyValuePair<string, int>("alpha", 1),
-                new KeyValuePair<string, int>("beta", 2)
+                new KeyValuePair<string, int>("beta", 2),
             ];
 
             // Act
             var actual = source.ToConcurrentDictionary();
 
             // Assert
-            actual.Should().BeEquivalentTo(new Dictionary<string, int>
-            {
-                ["alpha"] = 1,
-                ["beta"] = 2
-            });
+            actual
+                .Should()
+                .BeEquivalentTo(new Dictionary<string, int> { ["alpha"] = 1, ["beta"] = 2 });
         }
 
         [TestMethod]
         public void ToSortedDictionary_FromDictionary_CopiesExistingEntries()
         {
             // Arrange
-            var existing = new Dictionary<string, int>
-            {
-                ["gamma"] = 3,
-                ["alpha"] = 1
-            };
+            var existing = new Dictionary<string, int> { ["gamma"] = 3, ["alpha"] = 1 };
 
             // Act
             var actual = existing.ToSortedDictionary();
@@ -193,7 +177,7 @@ namespace UtilitiesCS.Test.Extensions
             {
                 ["alpha"] = true,
                 ["alphabet"] = false,
-                ["beta"] = true
+                ["beta"] = true,
             };
 
             // Act
@@ -232,8 +216,16 @@ namespace UtilitiesCS.Test.Extensions
             dictionary["value"] = 4;
 
             // Act
-            var updateResult = dictionary.TryOperateValues("value", 3, static (existing, operand) => existing * operand);
-            var missingResult = dictionary.TryOperateValues("missing", 3, static (existing, operand) => existing * operand);
+            var updateResult = dictionary.TryOperateValues(
+                "value",
+                3,
+                static (existing, operand) => existing * operand
+            );
+            var missingResult = dictionary.TryOperateValues(
+                "missing",
+                3,
+                static (existing, operand) => existing * operand
+            );
 
             // Assert
             updateResult.Should().BeTrue();
@@ -271,24 +263,29 @@ namespace UtilitiesCS.Test.Extensions
                 "remove",
                 static (_, value) => value == 5,
                 static (_, value) => value + 1,
-                out var removedValue);
+                out var removedValue
+            );
             var updateResult = updateDictionary.UpdateOrRemove(
                 "update",
                 static (_, value) => value < 0,
                 static (_, value) => value + 2,
-                out var updatedValue);
+                out var updatedValue
+            );
             var missingResult = missingDictionary.UpdateOrRemove(
                 "missing",
                 static (_, _) => true,
                 static (_, value) => value,
-                out var missingValue);
+                out var missingValue
+            );
 
             // Assert
             removeResult.Should().Be(Enums.DictionaryResult.KeysChanged);
             removeDictionary.Should().BeEmpty();
             removedValue.Should().Be(0);
 
-            updateResult.Should().Be(Enums.DictionaryResult.KeyExists | Enums.DictionaryResult.ValueChanged);
+            updateResult
+                .Should()
+                .Be(Enums.DictionaryResult.KeyExists | Enums.DictionaryResult.ValueChanged);
             updateDictionary["update"].Should().Be(9);
             updatedValue.Should().Be(7);
 

@@ -1,7 +1,7 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
@@ -13,7 +13,11 @@ using System.Collections.Specialized;
 
 namespace Swordfish.NET.Collections
 {
-    public interface IConcurrentObservableBase<T> : IObservable<NotifyCollectionChangedEventArgs>, INotifyCollectionChanged, IEnumerable<T>, IDisposable
+    public interface IConcurrentObservableBase<T>
+        : IObservable<NotifyCollectionChangedEventArgs>,
+            INotifyCollectionChanged,
+            IEnumerable<T>,
+            IDisposable
     {
         ImmutableCollectionBase<T> Snapshot { get; }
     }

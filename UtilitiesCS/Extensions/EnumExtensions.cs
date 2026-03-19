@@ -8,17 +8,18 @@ using System.Threading.Tasks;
 namespace UtilitiesCS
 {
     /// <summary>
-    /// Generic Extension to combine flags in an enumeration. 
+    /// Generic Extension to combine flags in an enumeration.
     /// Extension takes the following overloads:
     /// var genericBitwise = new GenericBitwise<FlagType>();
     /// var combinedAnd = genericBitwise.And(new[] { FlagType.First, FlagType.Second, FlagType.Fourth });
     /// var combinedOr = genericBitwise.Or(new[] { FlagType.First, FlagType.Second, FlagType.Fourth });
-    /// Solution from 
+    /// Solution from
     /// https://stackoverflow.com/questions/53636974/c-sharp-method-to-combine-a-generic-list-of-enum-values-to-a-single-value
     /// by @madreflection and doctor-jones
     /// </summary>
     /// <typeparam _name="TFlagEnum"></typeparam>
-    public static class GenericBitwiseStatic<TFlagEnum> where TFlagEnum : Enum
+    public static class GenericBitwiseStatic<TFlagEnum>
+        where TFlagEnum : Enum
     {
         private static readonly Func<TFlagEnum, TFlagEnum, TFlagEnum> _and = And().Compile();
         private static readonly Func<TFlagEnum, TFlagEnum> _not = Not().Compile();
@@ -35,11 +36,17 @@ namespace UtilitiesCS
 
         //public static TFlagEnum operator &(GenericBitwiseOrig<TFlagEnum> a, GenericBitwiseOrig<TFlagEnum> b) => And(a, b);
         public static TFlagEnum And(TFlagEnum value1, TFlagEnum value2) => _and(value1, value2);
+
         public static TFlagEnum And(IEnumerable<TFlagEnum> list) => list.Aggregate(And);
+
         public static TFlagEnum Not(TFlagEnum value) => _not(value);
+
         public static TFlagEnum Or(TFlagEnum value1, TFlagEnum value2) => _or(value1, value2);
+
         public static TFlagEnum Or(IEnumerable<TFlagEnum> list) => list.Aggregate(Or);
+
         public static TFlagEnum Xor(TFlagEnum value1, TFlagEnum value2) => _xor(value1, value2);
+
         public static TFlagEnum Xor(IEnumerable<TFlagEnum> list) => list.Aggregate(Xor);
 
         public static TFlagEnum All()
@@ -122,23 +129,32 @@ namespace UtilitiesCS
         }
     }
 
-
-
-
     public static class EnumExtensions
     {
-        public static bool HasAnyFlags<TEnum>(this TEnum optionsSelected, params TEnum[] flagsToCheck) where TEnum : Enum
+        public static bool HasAnyFlags<TEnum>(
+            this TEnum optionsSelected,
+            params TEnum[] flagsToCheck
+        )
+            where TEnum : Enum
         {
             return flagsToCheck.Any(flag => optionsSelected.HasFlag(flag));
         }
 
-        public static bool HasAllFlags<TEnum>(this TEnum optionsSelected, params TEnum[] flagsToCheck) where TEnum : Enum
+        public static bool HasAllFlags<TEnum>(
+            this TEnum optionsSelected,
+            params TEnum[] flagsToCheck
+        )
+            where TEnum : Enum
         {
-            if (flagsToCheck is null || flagsToCheck.Length == 0) { return false; }
+            if (flagsToCheck is null || flagsToCheck.Length == 0)
+            {
+                return false;
+            }
             return optionsSelected.HasFlag(GenericBitwiseStatic<TEnum>.Or(flagsToCheck));
         }
 
-        public static TEnum AddFlags<TEnum>(this IEnumerable<TEnum> flags) where TEnum : Enum
+        public static TEnum AddFlags<TEnum>(this IEnumerable<TEnum> flags)
+            where TEnum : Enum
         {
             return GenericBitwiseStatic<TEnum>.Or(flags);
         }
@@ -151,22 +167,25 @@ namespace UtilitiesCS
             var currentParameter = Expression.Parameter(typeof(T), "current");
             var nextParameter = Expression.Parameter(typeof(T), "next");
 
-            Func<T, T, T> aggregator = Expression.Lambda<Func<T, T, T>>(
-                Expression.Convert(
-                    Expression.Or(
-                        Expression.Convert(currentParameter, underlyingType),
-                        Expression.Convert(nextParameter, underlyingType)
+            Func<T, T, T> aggregator = Expression
+                .Lambda<Func<T, T, T>>(
+                    Expression.Convert(
+                        Expression.Or(
+                            Expression.Convert(currentParameter, underlyingType),
+                            Expression.Convert(nextParameter, underlyingType)
                         ),
-                    typeof(T)
+                        typeof(T)
                     ),
-                currentParameter,
-                nextParameter
-                ).Compile();
+                    currentParameter,
+                    nextParameter
+                )
+                .Compile();
 
             return list.Aggregate(aggregator);
         }
 
-        public static T[] ToArray<T>(this IList<T> listT, bool Base1Simulation) where T : new()
+        public static T[] ToArray<T>(this IList<T> listT, bool Base1Simulation)
+            where T : new()
         {
             if (Base1Simulation)
             {
@@ -176,5 +195,4 @@ namespace UtilitiesCS
             return listT.ToArray();
         }
     }
-
 }

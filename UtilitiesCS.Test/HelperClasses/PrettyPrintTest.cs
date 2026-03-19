@@ -1,5 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test.HelperClasses
 {
@@ -17,7 +17,8 @@ namespace UtilitiesCS.Test.HelperClasses
         {
             // Arrange
             string input = "   Test of the ToJustifiedText method.   ";
-            string expected = "T e s t     o f     t h e     T o J u s t i f i e d T e x t     m e t h o d .   ";
+            string expected =
+                "T e s t     o f     t h e     T o J u s t i f i e d T e x t     m e t h o d .   ";
 
             // Act
             string actual = input.ToJustifiedText(80);
@@ -25,10 +26,8 @@ namespace UtilitiesCS.Test.HelperClasses
             Console.WriteLine($"Expected: {expected.Length} {expected}");
             Console.WriteLine($"Actual:   {actual.Length} {actual}");
 
-
             // Assert
             Assert.AreEqual(expected, actual);
-
         }
 
         [TestMethod]
@@ -44,10 +43,8 @@ namespace UtilitiesCS.Test.HelperClasses
             Console.WriteLine($"Expected: {expected.Length} {expected}");
             Console.WriteLine($"Actual:   {actual.Length} {actual}");
 
-
             // Assert
             Assert.AreEqual(expected, actual);
-
         }
     }
 }

@@ -4,23 +4,26 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace UtilitiesCS.HelperClasses
 {
     public class SegmentStopWatch : Stopwatch
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
-        public SegmentStopWatch() : base()
+        public SegmentStopWatch()
+            : base()
         {
             if (UiThread.UiThreadId == Thread.CurrentThread.ManagedThreadId)
             {
-
-                logger.Warn($"SegmentStopWatch created on UI thread {Thread.CurrentThread.ManagedThreadId}" +
-                    $"\nStackTrace: {string.Join(" => ", TraceUtility.GetMyMethodNames(new StackTrace()))}");
+                logger.Warn(
+                    $"SegmentStopWatch created on UI thread {Thread.CurrentThread.ManagedThreadId}"
+                        + $"\nStackTrace: {string.Join(" => ", TraceUtility.GetMyMethodNames(new StackTrace()))}"
+                );
             }
         }
 
@@ -87,15 +90,21 @@ namespace UtilitiesCS.HelperClasses
             _durations.Push(("TOTAL", this.Elapsed));
             var durs = _durations
                 .Reverse()
-                .Select(x => new[] 
-                //{ x.Duration.ToString("c"), x.ActionName })
-                { x.Duration.ToString("%m\\:ss\\.ff"), x.ActionName })
+                .Select(x =>
+                    new[]
+                    //{ x.Duration.ToString("c"), x.ActionName })
+                    {
+                        x.Duration.ToString("%m\\:ss\\.ff"),
+                        x.ActionName,
+                    }
+                )
                 .ToArray();
 
             var text = durs.ToFormattedText(
                 ["Duration", "Action"],
                 [Enums.Justification.Right, Enums.Justification.Left],
-                $"SEGMENT DURATIONS {methodName.ToUpper()}");
+                $"SEGMENT DURATIONS {methodName.ToUpper()}"
+            );
             return text;
         }
 
@@ -103,7 +112,9 @@ namespace UtilitiesCS.HelperClasses
         {
             var text = GetDurations(methodName);
             if (clear)
-            { _durations.Clear(); }
+            {
+                _durations.Clear();
+            }
             logger.Info($"\n{text}");
         }
 
@@ -123,11 +134,11 @@ namespace UtilitiesCS.HelperClasses
         }
 
         public static Stack<(string ActionName, TimeSpan Duration)> GroupDurations(
-                       Stack<(string ActionName, TimeSpan Duration)> d1,
-                       Stack<(string ActionName, TimeSpan Duration)> d2)
+            Stack<(string ActionName, TimeSpan Duration)> d1,
+            Stack<(string ActionName, TimeSpan Duration)> d2
+        )
         {
-            return d1
-                .Concat(d2)
+            return d1.Concat(d2)
                 .GroupBy(x => x.ActionName)
                 .Select(group =>
                 {

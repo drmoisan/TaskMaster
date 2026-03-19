@@ -25,7 +25,7 @@ namespace UtilitiesCS
         Today,
         Bullpin,
         KB,
-        Other
+        Other,
     }
 
     public interface IPrefix

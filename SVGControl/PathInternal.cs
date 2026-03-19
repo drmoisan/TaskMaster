@@ -1,17 +1,17 @@
 ﻿#nullable enable
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SVGControl
 {
     //    /// <summary>Contains internal path helpers that are shared between many projects.</summary>
     //    internal class PathInternal7
-    //    {   
+    //    {
     //        /// <summary>
     //        /// Returns true if the path starts in a directory separator.
     //        /// </summary>
@@ -248,5 +248,4 @@ namespace SVGControl
     //        internal static bool EndsInDirectorySeparator(ReadOnlySpan<char> path) =>
     //            path.Length > 0 && IsDirectorySeparator(path[path.Length - 1]);
     //    }
-
 }

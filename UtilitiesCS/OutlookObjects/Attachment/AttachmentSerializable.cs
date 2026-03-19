@@ -1,10 +1,10 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using Microsoft.Office.Interop.Outlook;
+using Newtonsoft.Json;
 using UtilitiesCS.Extensions.Lazy;
 
 namespace UtilitiesCS.EmailIntelligence.EmailParsing
@@ -13,7 +13,8 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
     public class AttachmentSerializable : IAttachment
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors
 
@@ -32,7 +33,10 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
             }
             catch (System.Exception e)
             {
-                logger.Error($"Error assigning PathName for type {(OlAttachmentType)Type}. {e.Message}", e);
+                logger.Error(
+                    $"Error assigning PathName for type {(OlAttachmentType)Type}. {e.Message}",
+                    e
+                );
                 FileName = "";
             }
 
@@ -45,7 +49,10 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
                 }
                 catch (System.Exception e)
                 {
-                    logger.Error($"Error assigning PathName for type {(OlAttachmentType)Type}. {e.Message}", e);
+                    logger.Error(
+                        $"Error assigning PathName for type {(OlAttachmentType)Type}. {e.Message}",
+                        e
+                    );
                 }
             }
 
@@ -64,6 +71,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
             _data = new Lazy<byte[]>(() => GetBytes(_a));
             _isImage = new Lazy<bool>(IsAnImage);
         }
+
         private Attachment _a;
 
         #endregion Constructors
@@ -81,9 +89,13 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
                 if (_isImage is null)
                 {
                     _isImage = new Lazy<bool>(IsAnImage);
-                    var caller = new System.Diagnostics.StackTrace().GetMyMethodNames().FirstOrDefault();
-                    logger.Warn($"{caller} called {nameof(AttachmentSerializable)}.{nameof(IsImage)}.Get " +
-                        $"before underlying {_isImage.GetType()} was set");
+                    var caller = new System.Diagnostics.StackTrace()
+                        .GetMyMethodNames()
+                        .FirstOrDefault();
+                    logger.Warn(
+                        $"{caller} called {nameof(AttachmentSerializable)}.{nameof(IsImage)}.Get "
+                            + $"before underlying {_isImage.GetType()} was set"
+                    );
                 }
                 return _isImage.Value;
             }
@@ -91,7 +103,11 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
         }
 
         private Lazy<byte[]> _data;
-        public byte[] AttachmentData { get => _data?.Value; set => _data = value?.ToLazy(); }
+        public byte[] AttachmentData
+        {
+            get => _data?.Value;
+            set => _data = value?.ToLazy();
+        }
 
         #endregion Serialized Custom Properties
 
@@ -115,7 +131,10 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
         {
             byte[] bytes = null;
 
-            if (!IsImage & ImageBytesOnly) { return bytes; }
+            if (!IsImage & ImageBytesOnly)
+            {
+                return bytes;
+            }
 
             if (Type != OlAttachmentType.olByValue)
             {
@@ -139,7 +158,9 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
         internal bool TryFromSaveAsLoad(Attachment attachment, out byte[] bytes)
         {
             bytes = null;
-            var tempFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var tempFolderPath = Environment.GetFolderPath(
+                Environment.SpecialFolder.LocalApplicationData
+            );
             var fileName = $"temp_{DateTime.Now:yyyyMMddHHmmssf}";
             var tempFilePath = Path.Combine(tempFolderPath, fileName);
             try
@@ -157,7 +178,8 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
 
         internal bool TryFromAccessor(Attachment attachment, out byte[] bytes)
         {
-            const string PR_ATTACH_DATA_BIN = "http://schemas.microsoft.com/mapi/proptag/0x37010102";
+            const string PR_ATTACH_DATA_BIN =
+                "http://schemas.microsoft.com/mapi/proptag/0x37010102";
             bytes = null;
             try
             {
@@ -178,6 +200,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
         }
 
         private List<string> _imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp"];
+
         public bool IsAnImage() => _imageExtensions.Contains(FileExtension ?? "");
 
         internal virtual (string FileNameSeed, string FileExtension) ParseFileName(string fileName)

@@ -6,19 +6,18 @@ using System.Text.RegularExpressions;
 //using Microsoft.VisualStudio.Services.Common;
 //using UtilitiesCS;
 
-
 namespace UtilitiesCS
 {
-
     public static class SmithWaterman
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public enum SW_Options
         {
             ByWords = 0,
-            ByLetters = 1
+            ByLetters = 1,
         }
 
         internal static string[] GetWords(this string sentence, SW_Options SWOptions)
@@ -38,11 +37,24 @@ namespace UtilitiesCS
             return sentence.ToCharArray().Select(c => c.ToString()).ToArray();
         }
 
-        public static int CalculateScore(string Str_X, string Str_Y, ref object[,] Matrix, IAppAutoFileObjects AFSettings, SW_Options SWOptions = SW_Options.ByWords)
+        public static int CalculateScore(
+            string Str_X,
+            string Str_Y,
+            ref object[,] Matrix,
+            IAppAutoFileObjects AFSettings,
+            SW_Options SWOptions = SW_Options.ByWords
+        )
         {
             //TODO: Migrate Current SW Matrix which is not efficient because it is of object and mixes string and int.
             int result = default;
-            int LenX, LenY, x, y, calcA, calcB, calcC, tempa;
+            int LenX,
+                LenY,
+                x,
+                y,
+                calcA,
+                calcB,
+                calcC,
+                tempa;
             var maxSmith_Watterman = default(int);
 
             int matchScore = AFSettings.SmithWatterman_MatchScore;
@@ -96,8 +108,12 @@ namespace UtilitiesCS
                         calcA = calcA + mismatchScore;
                     }
 
-                    calcB = (int)((int)Matrix[x, y - 1] + gapPenalty * ((string)Matrix[1, y]).Length);
-                    calcC = (int)((int)Matrix[x - 1, y] + gapPenalty * ((string)Matrix[x, 1]).Length);
+                    calcB = (int)(
+                        (int)Matrix[x, y - 1] + gapPenalty * ((string)Matrix[1, y]).Length
+                    );
+                    calcC = (int)(
+                        (int)Matrix[x - 1, y] + gapPenalty * ((string)Matrix[x, 1]).Length
+                    );
                     tempa = max(0, calcA, calcB, calcC);
                     Matrix[x, y] = tempa;
                     if (tempa > maxSmith_Watterman)
@@ -121,37 +137,54 @@ namespace UtilitiesCS
 
             // StopWatch_SW.Pause
             return result;
-
         }
 
-        public static int CalculateScore(int[] wordsX,
-                                         int[] wordLengthX,
-                                         int[] wordsY,
-                                         int[] wordLengthY,
-                                         int matchScore,
-                                         int mismatchScore,
-                                         int gapPenalty,
-                                         string xString,
-                                         string yString,
-                                         int logThreshhold)
+        public static int CalculateScore(
+            int[] wordsX,
+            int[] wordLengthX,
+            int[] wordsY,
+            int[] wordLengthY,
+            int matchScore,
+            int mismatchScore,
+            int gapPenalty,
+            string xString,
+            string yString,
+            int logThreshhold
+        )
         {
-
-            var tup = CalculateMatrixTuple(wordsX, wordLengthX, wordsY, wordLengthY, matchScore, mismatchScore, gapPenalty);
+            var tup = CalculateMatrixTuple(
+                wordsX,
+                wordLengthX,
+                wordsY,
+                wordLengthY,
+                matchScore,
+                mismatchScore,
+                gapPenalty
+            );
             if (logThreshhold > -1 && tup.Score > logThreshhold)
                 LogMatrixState(tup.Matrix, xString, yString);
             return tup.Score;
         }
 
-        public static int CalculateScore(int[] wordsX,
-                                         int[] wordLengthX,
-                                         int[] wordsY,
-                                         int[] wordLengthY,
-                                         int matchScore,
-                                         int mismatchScore,
-                                         int gapPenalty)
+        public static int CalculateScore(
+            int[] wordsX,
+            int[] wordLengthX,
+            int[] wordsY,
+            int[] wordLengthY,
+            int matchScore,
+            int mismatchScore,
+            int gapPenalty
+        )
         {
-
-            var tup = CalculateMatrixTuple(wordsX, wordLengthX, wordsY, wordLengthY, matchScore, mismatchScore, gapPenalty);
+            var tup = CalculateMatrixTuple(
+                wordsX,
+                wordLengthX,
+                wordsY,
+                wordLengthY,
+                matchScore,
+                mismatchScore,
+                gapPenalty
+            );
             return tup.Score;
         }
 
@@ -162,13 +195,20 @@ namespace UtilitiesCS
             int[] wordLengthY,
             int matchScore,
             int mismatchScore,
-            int gapPenalty)
+            int gapPenalty
+        )
         {
             ValidateInputs(wordsX, wordLengthX, wordsY, wordLengthY);
-            DeclareMatrix(wordsX, wordsY, out int lengthX, out int lengthY, out int maxValue, out int[,] matrix);
+            DeclareMatrix(
+                wordsX,
+                wordsY,
+                out int lengthX,
+                out int lengthY,
+                out int maxValue,
+                out int[,] matrix
+            );
 
             //LogMatrixState(matrix);
-
 
             for (int x = 3; x < lengthX + 3; x++)
                 matrix[x, 1] = wordsX[x - 3];
@@ -176,11 +216,13 @@ namespace UtilitiesCS
             for (int y = 3; y < lengthY + 3; y++)
                 matrix[1, y] = wordsY[y - 3];
 
-
             //LogMatrixState(matrix);
 
             int result = default;
-            int calcA, calcB, calcC, tempA;
+            int calcA,
+                calcB,
+                calcC,
+                tempA;
             // *********************************
 
             // *********************************
@@ -221,9 +263,7 @@ namespace UtilitiesCS
 
             result = maxValue;
 
-
             return (matrix, result);
-
         }
 
         internal static void LogMatrixState(int[,] matrix)
@@ -240,13 +280,20 @@ namespace UtilitiesCS
         {
             string[,] matrixString = new string[matrix.GetLength(0), matrix.GetLength(1)];
             for (int x = 0; x < matrix.GetLength(0); x++)
-                for (int y = 0; y < matrix.GetLength(1); y++)
-                    matrixString[x, y] = matrix[x, y].ToString();
+            for (int y = 0; y < matrix.GetLength(1); y++)
+                matrixString[x, y] = matrix[x, y].ToString();
             var matrixText = matrixString.ToFormattedText();
             return matrixText;
         }
 
-        private static void DeclareMatrix(int[] wordsX, int[] wordsY, out int lengthX, out int lengthY, out int maxSmith_Watterman, out int[,] Matrix)
+        private static void DeclareMatrix(
+            int[] wordsX,
+            int[] wordsY,
+            out int lengthX,
+            out int lengthY,
+            out int maxSmith_Watterman,
+            out int[,] Matrix
+        )
         {
             lengthX = wordsX.Length;
             lengthY = wordsY.Length;
@@ -255,7 +302,12 @@ namespace UtilitiesCS
             Matrix = new int[lengthX + 3 + 1, lengthY + 3 + 1];
         }
 
-        private static void ValidateInputs(int[] words_X, int[] wordLength_X, int[] words_Y, int[] wordLength_Y)
+        private static void ValidateInputs(
+            int[] words_X,
+            int[] wordLength_X,
+            int[] words_Y,
+            int[] wordLength_Y
+        )
         {
             ThrowIfNull(words_X, wordLength_X, words_Y, wordLength_Y);
             ThrowIfLengthsDiffer(words_X, wordLength_X);
@@ -273,7 +325,8 @@ namespace UtilitiesCS
                     var frame = stackTrace.GetFrame(1);
                     var callingMethod = frame.GetMethod();
                     var parameterName = callingMethod.GetParameters()[i].Name;
-                    var message = $"{callingMethod.Name} received a null parameter named {parameterName}";
+                    var message =
+                        $"{callingMethod.Name} received a null parameter named {parameterName}";
                     logger.Warn(message);
                     throw new ArgumentNullException(message);
                 }
@@ -293,14 +346,14 @@ namespace UtilitiesCS
                     var frame = stackTrace.GetFrame(1);
                     var callingMethod = frame.GetMethod();
                     var parameterReferences = callingMethod.GetParameters();
-                    var message = $"{callingMethod.Name} parameter {parameterReferences[0].Name} has " +
-                        $"a length of {lengths[0]}, but parameter {parameterReferences[i].Name} has " +
-                        $"a length of {lengths[i]}. The two arrays should have the same length.";
+                    var message =
+                        $"{callingMethod.Name} parameter {parameterReferences[0].Name} has "
+                        + $"a length of {lengths[0]}, but parameter {parameterReferences[i].Name} has "
+                        + $"a length of {lengths[i]}. The two arrays should have the same length.";
                     logger.Warn(message);
                     throw new ArgumentOutOfRangeException(message);
                 }
             }
-
         }
 
         public static int max(params int[] values)
@@ -312,6 +365,5 @@ namespace UtilitiesCS
             }
             return max;
         }
-
     }
 }

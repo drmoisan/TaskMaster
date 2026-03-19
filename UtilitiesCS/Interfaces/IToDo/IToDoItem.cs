@@ -1,7 +1,7 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {

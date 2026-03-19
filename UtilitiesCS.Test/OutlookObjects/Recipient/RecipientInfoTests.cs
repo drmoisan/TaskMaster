@@ -39,7 +39,12 @@ namespace UtilitiesCS.Test.OutlookObjects.RecipientCoverage
         [DataRow("Ada", "ada@example.com", "Ada", "ada@example.com")]
         [DataRow(null, "ada@example.com", null, "ada@example.com")]
         [DataRow("Ada", null, "Ada", null)]
-        public void Equals_ShouldReturnTrue_WhenNameAndAddressMatch(string leftName, string leftAddress, string rightName, string rightAddress)
+        public void Equals_ShouldReturnTrue_WhenNameAndAddressMatch(
+            string leftName,
+            string leftAddress,
+            string rightName,
+            string rightAddress
+        )
         {
             // Arrange
             var left = new RecipientInfo(leftName, leftAddress, "<left />");
