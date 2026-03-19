@@ -303,7 +303,11 @@ namespace Tags
 
         public void SetSearchText(string searchText) => _viewer.SearchText.Text = searchText;
 
-        public void SetCaption(string caption) => _viewer?.Text = caption;
+        public void SetCaption(string caption)
+        {
+            if (_viewer != null)
+                _viewer.Text = caption;
+        }
 
         public string ExitType
         {
