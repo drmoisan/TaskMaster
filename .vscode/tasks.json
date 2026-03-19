@@ -4,10 +4,19 @@
     {
       "label": "restore: TaskMaster.sln",
       "type": "shell",
-      "command": "dotnet",
+      "command": "pwsh",
       "args": [
-        "restore",
-        "TaskMaster.sln"
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/vscode/Invoke-Restore.ps1",
+        "-SolutionPath",
+        "TaskMaster.sln",
+        "-Configuration",
+        "Debug",
+        "-Platform",
+        "Any CPU"
       ],
       "group": "build"
     },

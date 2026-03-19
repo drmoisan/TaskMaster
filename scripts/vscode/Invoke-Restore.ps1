@@ -31,15 +31,9 @@ if (-not $msbuildPath) {
 
 Write-Host "Using MSBuild: $msbuildPath"
 
-# Sync csproj HintPaths with packages.config versions before building.
-# This resolves mismatches created when NuGet updates packages.config in VS
-# but the csproj reference paths are not persisted to disk.
-$syncScript = Join-Path $PSScriptRoot 'Sync-PackageReferences.ps1'
-if (Test-Path $syncScript) {
-    & $syncScript -SolutionRoot $repoRoot
-}
-
-& $msbuildPath $resolvedSolutionPath /t:Build "/p:Configuration=$Configuration" "/p:Platform=$Platform" /m
+# Restore using MSBuild with RestorePackagesConfig=true to handle
+# both SDK-style (PackageReference) and legacy (packages.config) projects.
+& $msbuildPath $resolvedSolutionPath /t:Restore "/p:Configuration=$Configuration" "/p:Platform=$Platform" /p:RestorePackagesConfig=true /m
 if ($LASTEXITCODE -ne 0) {
-    throw "MSBuild failed with exit code $LASTEXITCODE"
+    throw "MSBuild Restore failed with exit code $LASTEXITCODE"
 }
