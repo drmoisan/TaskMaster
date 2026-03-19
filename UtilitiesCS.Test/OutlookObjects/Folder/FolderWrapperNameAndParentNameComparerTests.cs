@@ -51,6 +51,43 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         [TestMethod]
+        public void Equals_ShouldReturnTrue_WhenBothParentNamesAreNull()
+        {
+            var comparer = new FolderWrapperNameAndParentNameComparer();
+            var left = CreateNode("Inbox");
+            var right = CreateNode("INBOX");
+            left.Parent = new TreeNode<FolderWrapper>(CreateFolder(null));
+            right.Parent = new TreeNode<FolderWrapper>(CreateFolder(string.Empty));
+
+            comparer.Equals(left, right).Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void Equals_ShouldReturnFalse_WhenOnlyOneParentNameIsNull()
+        {
+            var comparer = new FolderWrapperNameAndParentNameComparer();
+            var left = CreateNode("Inbox");
+            var right = CreateNode("INBOX", parentName: "Projects");
+            left.Parent = new TreeNode<FolderWrapper>(CreateFolder(null));
+
+            comparer.Equals(left, right).Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void Equals_ShouldHandleNullParentValueNodes()
+        {
+            var comparer = new FolderWrapperNameAndParentNameComparer();
+            var left = CreateNode("Inbox");
+            var right = CreateNode("INBOX");
+            left.Parent = new TreeNode<FolderWrapper>((FolderWrapper)null);
+            right.Parent = new TreeNode<FolderWrapper>((FolderWrapper)null);
+
+            comparer.Equals(left, right).Should().BeTrue();
+            right.Parent = new TreeNode<FolderWrapper>(CreateFolder("Projects"));
+            comparer.Equals(left, right).Should().BeFalse();
+        }
+
+        [TestMethod]
         public void GetHashCode_ShouldCombineNameAndParentNameConsistently()
         {
             var comparer = new FolderWrapperNameAndParentNameComparer();

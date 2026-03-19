@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence;
 
 namespace UtilitiesCS.Test.OutlookObjects.Folder
 {
@@ -79,6 +81,52 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             exception.Which.ParamName.Should().Be("Globals");
         }
 
+        [TestMethod]
+        public async Task CompareItemsAsync_WhenHelpersAreLoaded_ReturnsMatchingAndExclusiveItems()
+        {
+            var shared = CreateItemInfo("shared");
+            var currentExclusive = CreateItemInfo("current");
+            var otherExclusive = CreateItemInfo("other");
+            var globals = new Mock<IApplicationGlobals>().Object;
+            var current = CreateFolderWrapper(itemCount: 2);
+            var other = CreateFolderWrapper(itemCount: 2);
+            current.Globals = globals;
+            other.Globals = globals;
+            current.ItemHelpers = CreateAsyncLazy(shared, currentExclusive);
+            other.ItemHelpers = CreateAsyncLazy(shared, otherExclusive);
+
+            var (matching, currentOnly, otherOnly) = await current.CompareItemsAsync(
+                other,
+                CancellationToken.None
+            );
+
+            matching.Should().ContainSingle().Which.Should().BeSameAs(shared);
+            currentOnly.Should().ContainSingle().Which.Should().BeSameAs(currentExclusive);
+            otherOnly.Should().ContainSingle().Which.Should().BeSameAs(otherExclusive);
+        }
+
+        [TestMethod]
+        public async Task CalculateItemMatchPercentageAsync_WhenHelpersAreLoaded_ReturnsExpectedRatio()
+        {
+            var shared = CreateItemInfo("shared");
+            var currentExclusive = CreateItemInfo("current");
+            var otherExclusive = CreateItemInfo("other");
+            var globals = new Mock<IApplicationGlobals>().Object;
+            var current = CreateFolderWrapper(itemCount: 2);
+            var other = CreateFolderWrapper(itemCount: 2);
+            current.Globals = globals;
+            other.Globals = globals;
+            current.ItemHelpers = CreateAsyncLazy(shared, currentExclusive);
+            other.ItemHelpers = CreateAsyncLazy(shared, otherExclusive);
+
+            var result = await current.CalculateItemMatchPercentageAsync(
+                other,
+                CancellationToken.None
+            );
+
+            result.Should().Be(0.5);
+        }
+
         private static FolderWrapper CreateFolderWrapper(int itemCount = 0)
         {
             return new FolderWrapper(
@@ -92,7 +140,29 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 
         private static IItemInfo[] CreateItemInfos(int count)
         {
-            return Enumerable.Range(0, count).Select(_ => new Mock<IItemInfo>().Object).ToArray();
+            return Enumerable
+                .Range(0, count)
+                .Select(index => CreateItemInfo($"item-{index}"))
+                .ToArray();
+        }
+
+        private static AsyncLazy<IItemInfo[]> CreateAsyncLazy(params IItemInfo[] items)
+        {
+            return new AsyncLazy<IItemInfo[]>(() => items);
+        }
+
+        private static IItemInfo CreateItemInfo(string key)
+        {
+            var sender = new Mock<IRecipientInfo>().Object;
+            return new ItemInfo
+            {
+                Subject = key,
+                Body = key,
+                Sender = sender,
+                CcRecipients = Array.Empty<IRecipientInfo>(),
+                ToRecipients = Array.Empty<IRecipientInfo>(),
+                SentDate = new DateTime(2026, 3, 19),
+            };
         }
     }
 }
