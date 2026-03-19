@@ -13,6 +13,28 @@ namespace UtilitiesCS
 {
     public static class FolderConverter
     {
+        internal static Func<
+            string,
+            (bool legal, string revisedFolder)
+        > AlternativeFolderPrompt { get; set; } = AskUserForAlternatives;
+
+        internal static Func<
+            string,
+            string,
+            BoxIcon,
+            Dictionary<string, Func<Task<string>>>,
+            string
+        > AlternativeFolderSelectionDialog { get; set; } =
+            (message, title, icon, options) => MyBox.ShowDialog(message, title, icon, options);
+
+        internal static Func<
+            string,
+            string,
+            string,
+            string
+        > AlternativeFolderInputDialog { get; set; } =
+            (prompt, title, defaultValue) => InputBox.ShowDialog(prompt, title, defaultValue);
+
         private static char[] IllegalFolderCharacters
         {
             get => @"[\/:*?""<>|].".ToCharArray();
@@ -39,7 +61,7 @@ namespace UtilitiesCS
             var legal = IsLegalFolderName(revisedFolder);
             if (!legal && askUser)
             {
-                (legal, revisedFolder) = AskUserForAlternatives(revisedFolder);
+                (legal, revisedFolder) = AlternativeFolderPrompt(revisedFolder);
             }
             return (legal, revisedFolder);
         }
@@ -50,7 +72,7 @@ namespace UtilitiesCS
         {
             var illegal = GetIllegalFolderChars(illegalFolderName).SentenceJoin();
             var dict = BuildAlternativesDictionary(illegalFolderName);
-            var result = MyBox.ShowDialog(
+            var result = AlternativeFolderSelectionDialog(
                 $"Folder cannot contain characters {illegal}. How should we proceed?",
                 "Folder Error",
                 BoxIcon.Question,
@@ -92,7 +114,7 @@ namespace UtilitiesCS
                 "Enter new folder name",
                 async () =>
                     await Task.Run(() =>
-                        InputBox.ShowDialog(
+                        AlternativeFolderInputDialog(
                             "Enter new folder name",
                             "Folder Error",
                             SanitizeFilename(illegalFolderName)

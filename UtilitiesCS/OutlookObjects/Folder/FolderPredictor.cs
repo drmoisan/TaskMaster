@@ -148,7 +148,59 @@ namespace UtilitiesCS
 
         private Outlook.Application _olApp;
         private Regex _regex;
+
         //private string _searchString;
+
+        internal static Func<string, string, string> PromptForFolderNameDialog { get; set; } =
+            (prompt, title) => InputBox.ShowDialog(prompt, title);
+
+        internal static Func<
+            string,
+            string,
+            string,
+            string
+        > PromptForFolderNameWithDefaultDialog { get; set; } =
+            (prompt, title, defaultValue) => InputBox.ShowDialog(prompt, title, defaultValue);
+
+        internal static Action<string> ShowPromptMessageAction { get; set; } =
+            message => MessageBox.Show(message);
+
+        internal static Func<Task> EnterUiContextAsyncAction { get; set; } =
+            () =>
+            {
+                var taskCompletionSource = new TaskCompletionSource<bool>();
+                UiThread.UiSyncContext.Post(_ => taskCompletionSource.SetResult(true), null);
+                return taskCompletionSource.Task;
+            };
+
+        internal static Func<string, DirectoryInfo> CreateDirectoryPathFactory { get; set; } =
+            path => Directory.CreateDirectory(path);
+
+        internal virtual string PromptForFolderName(
+            string prompt,
+            string title,
+            string defaultValue = null
+        )
+        {
+            return defaultValue is null
+                ? PromptForFolderNameDialog(prompt, title)
+                : PromptForFolderNameWithDefaultDialog(prompt, title, defaultValue);
+        }
+
+        internal virtual void ShowPromptMessage(string message)
+        {
+            ShowPromptMessageAction(message);
+        }
+
+        internal virtual Task EnterUiContextAsync()
+        {
+            return EnterUiContextAsyncAction();
+        }
+
+        internal virtual DirectoryInfo CreateDirectoryPath(string path)
+        {
+            return CreateDirectoryPathFactory(path);
+        }
 
         #endregion
 
@@ -348,7 +400,7 @@ namespace UtilitiesCS
                 }
                 else
                 {
-                    MessageBox.Show(message);
+                    ShowPromptMessage(message);
                 }
             }
             return olFolder;
@@ -388,7 +440,7 @@ namespace UtilitiesCS
             string name = "";
             while (name is not null && name == "")
             {
-                name = InputBox.ShowDialog(
+                name = PromptForFolderName(
                     $"Please enter a new subfolder name for {parent.Name}",
                     "New folder dialog"
                 );
@@ -397,7 +449,7 @@ namespace UtilitiesCS
                 {
                     if (!IsLegalFolderName(name))
                     {
-                        MessageBox.Show(
+                        ShowPromptMessage(
                             $"Folder name {name} contains the illegal characters "
                                 + $"{GetIllegalFolderChars(name).SentenceJoin()}. Please choose a different name."
                         );
@@ -405,14 +457,14 @@ namespace UtilitiesCS
                     }
                     else if (name.Length > 30)
                     {
-                        MessageBox.Show(
+                        ShowPromptMessage(
                             "Outlook limits folder names to 30 characters. Please choose a different name."
                         );
                         name = "";
                     }
                     else if (GetFolder(parent.Folders, name) is not null)
                     {
-                        MessageBox.Show("Folder already exists. Please choose a different name.");
+                        ShowPromptMessage("Folder already exists. Please choose a different name.");
                         name = "";
                     }
                 }
@@ -433,8 +485,8 @@ namespace UtilitiesCS
             string name = "";
             while (name is not null && name == "")
             {
-                await UiThread.UiSyncContext;
-                name = InputBox.ShowDialog(
+                await EnterUiContextAsync();
+                name = PromptForFolderName(
                     $"Please enter a new subfolder name for {parent.Name}",
                     "New folder dialog"
                 );
@@ -444,7 +496,7 @@ namespace UtilitiesCS
                 {
                     if (!IsLegalFolderName(name))
                     {
-                        MessageBox.Show(
+                        ShowPromptMessage(
                             $"Folder name {name} contains the illegal characters "
                                 + $"{GetIllegalFolderChars(name).SentenceJoin()}. Please choose a different name."
                         );
@@ -452,14 +504,14 @@ namespace UtilitiesCS
                     }
                     else if (name.Length > 30)
                     {
-                        MessageBox.Show(
+                        ShowPromptMessage(
                             "Outlook limits folder names to 30 characters. Please choose a different name."
                         );
                         name = "";
                     }
                     else if (GetFolder(parent.Folders, name) is not null)
                     {
-                        MessageBox.Show("Folder already exists. Please choose a different name.");
+                        ShowPromptMessage("Folder already exists. Please choose a different name.");
                         name = "";
                     }
                 }
@@ -560,7 +612,7 @@ namespace UtilitiesCS
             var fsFolderName = olFolder.ToFsFolderpath(olAncestor, fsAncestor);
 
             // Create the new folder in the filesystem
-            var fsFolder = Directory.CreateDirectory(fsFolderName);
+            var fsFolder = CreateDirectoryPath(fsFolderName);
 
             // Return the new Outlook folder
             return olFolder;
@@ -614,7 +666,7 @@ namespace UtilitiesCS
             var fsFolderName = olFolder.ToFsFolderpath(olAncestor, fsAncestor);
 
             // Create the new folder in the filesystem
-            var fsFolder = Directory.CreateDirectory(fsFolderName);
+            var fsFolder = CreateDirectoryPath(fsFolderName);
 
             // Return the new Outlook folder
             return olFolder;

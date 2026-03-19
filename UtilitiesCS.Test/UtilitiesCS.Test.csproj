@@ -224,6 +224,7 @@
     <Compile Include="OutlookObjects\Folder\FolderWrapperTraversalTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictorTests.cs" />
+    <Compile Include="OutlookObjects\Folder\MAPIMethodsTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

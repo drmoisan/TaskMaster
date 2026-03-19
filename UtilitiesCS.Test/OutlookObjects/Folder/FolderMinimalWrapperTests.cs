@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json;
 using UtilitiesCS.OutlookObjects.Folder;
+using Outlook = Microsoft.Office.Interop.Outlook;
 using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
 using OutlookFolders = Microsoft.Office.Interop.Outlook.Folders;
 
@@ -127,6 +128,53 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         [TestMethod]
+        public void RestoreFromRelativePath_WhenUncPathUsesNameSpaceStoreTraversal_LoadsNestedFolder()
+        {
+            // Arrange
+            var grandchild = CreateFolder("\\\\Mailbox\\Projects\\FY26", name: "FY26");
+            var child = CreateFolder(
+                "\\\\Mailbox\\Projects",
+                name: "Projects",
+                children: grandchild.Object
+            );
+            var root = CreateFolder("\\Mailbox", name: "Mailbox");
+            var storeRoot = CreateFolder("\\\\Mailbox", name: "Mailbox", children: child.Object);
+            var store = new Mock<Outlook.Store>();
+            store.Setup(x => x.GetRootFolder()).Returns((Outlook.MAPIFolder)storeRoot.Object);
+            var stores = new Mock<Outlook.Stores>();
+            stores
+                .Setup(x => x.GetEnumerator())
+                .Returns(() => new ArrayList(new[] { store.Object }).GetEnumerator());
+            var session = new Mock<Outlook.NameSpace>();
+            session.SetupGet(x => x.Stores).Returns(stores.Object);
+            root.SetupGet(x => x.Parent).Returns(session.Object);
+            var wrapper = new FolderMinimalWrapper("FY26", @"\\Mailbox\Projects\FY26");
+
+            // Act
+            wrapper.RestoreFromRelativePath(root.Object);
+
+            // Assert
+            wrapper.OlRoot.Should().BeSameAs(storeRoot.Object);
+            wrapper.OlFolder.Should().BeSameAs(grandchild.Object);
+        }
+
+        [TestMethod]
+        public void RestoreFromRelativePath_WhenUncParentLookupThrows_LeavesFolderUnsetButRetainsRoot()
+        {
+            // Arrange
+            var root = CreateFolder("\\Mailbox", name: "Mailbox");
+            root.SetupGet(x => x.Parent).Throws(new InvalidOperationException("boom"));
+            var wrapper = new FolderMinimalWrapper("Projects", @"\\Mailbox\Projects");
+
+            // Act
+            wrapper.RestoreFromRelativePath(root.Object);
+
+            // Assert
+            wrapper.OlRoot.Should().BeSameAs(root.Object);
+            wrapper.OlFolder.Should().BeNull();
+        }
+
+        [TestMethod]
         public void JsonSerialization_RoundTripsSerializedState_AndIgnoresRuntimeOnlyFolderReferences()
         {
             // Arrange
@@ -153,6 +201,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         private static Mock<OutlookFolder> CreateFolder(
             string folderPath,
             string name = null,
+            object parent = null,
             params OutlookFolder[] children
         )
         {
@@ -162,6 +211,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 
             folder.SetupGet(x => x.FolderPath).Returns(folderPath);
             folder.SetupGet(x => x.Name).Returns(name ?? folderPath?.Split('\\')[^1]);
+            folder.SetupGet(x => x.Parent).Returns(parent);
             folders.Setup(x => x.GetEnumerator()).Returns(() => collection.GetEnumerator());
             folder.SetupGet(x => x.Folders).Returns(folders.Object);
 
