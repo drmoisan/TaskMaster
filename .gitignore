@@ -140,7 +140,8 @@ _TeamCity*
 *.coveragexml
 
 # dotnet-coverage Cobertura output (read by Koverage extension)
-coverage/
+coverage/*
+!coverage/.gitkeep
 
 # NCrunch
 _NCrunch_*
