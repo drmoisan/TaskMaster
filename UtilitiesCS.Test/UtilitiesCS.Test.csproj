@@ -155,6 +155,7 @@
     <Compile Include="OutlookObjects\Attachment\AttachmentHelperTests.cs" />
     <Compile Include="OutlookObjects\Attachment\AttachmentSerializableTests.cs" />
     <Compile Include="OutlookObjects\AppointmentItem\MeetingItemHelperTests.cs" />
+    <Compile Include="OutlookObjects\AppointmentItem\MeetingItemHelperTests.Part2.cs" />
     <Compile Include="OutlookObjects\Calendar\CalendarTests.cs" />
     <Compile Include="OutlookObjects\Category\CreateCategoryTests.cs" />
     <Compile Include="OutlookObjects\Com\ComTypeTests.cs" />
