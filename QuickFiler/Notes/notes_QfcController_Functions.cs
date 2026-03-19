@@ -19,7 +19,7 @@ namespace QuickFiler.Notes
         TextBox TxtBoxBody { get; set; }
 
         //TODO: Create a function to set a few styles upfront so that we can just apply them
-		void CreateStyles()
+		void CreateStyles();
 		
 		//TODO: Functions to adapt to new QfcItemViewer
 		void Accel_FocusToggle(); 
