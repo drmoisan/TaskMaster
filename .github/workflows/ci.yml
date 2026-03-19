@@ -74,7 +74,7 @@ jobs:
 
       - name: Verify formatting
         shell: pwsh
-        run: csharpier . --check
+        run: csharpier check .
 
       - name: Build with analyzers and code style enforcement
         shell: pwsh
