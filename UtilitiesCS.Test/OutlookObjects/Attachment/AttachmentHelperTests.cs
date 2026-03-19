@@ -70,14 +70,16 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
             helper
                 .ErrorMessages.Should()
                 .Contain(message =>
-                    message.Contains("attachment is null", StringComparison.OrdinalIgnoreCase)
+                    message.IndexOf("attachment is null", StringComparison.OrdinalIgnoreCase) >= 0
                 );
             helper
                 .ErrorMessages.Should()
-                .Contain(message => message.Contains(saveFolderPath, StringComparison.Ordinal));
+                .Contain(message => message.IndexOf(saveFolderPath, StringComparison.Ordinal) >= 0);
             helper
                 .ErrorMessages.Should()
-                .Contain(message => message.Contains(deleteFolderPath, StringComparison.Ordinal));
+                .Contain(message =>
+                    message.IndexOf(deleteFolderPath, StringComparison.Ordinal) >= 0
+                );
         }
 
         [TestMethod]

@@ -196,7 +196,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             var property = new Mock<Outlook.UserProperty>();
             property.SetupGet(x => x.Value).Returns(new[] { "Archive\\Finance", "Archive\\Ops" });
             var userProperties = new Mock<Outlook.UserProperties>();
-            userProperties.Setup(x => x.Find("FolderKey")).Returns(property.Object);
+            userProperties
+                .Setup(x => x.Find("FolderKey", It.IsAny<object>()))
+                .Returns(property.Object);
             var mailItem = new Mock<Outlook.MailItem>();
             mailItem.SetupGet(x => x.UserProperties).Returns(userProperties.Object);
             var scorer = new FolderScorer();
@@ -215,7 +217,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         public void QueryAddOlFolderKeys_WhenFolderKeyIsMissing_ReturnsFalse()
         {
             var userProperties = new Mock<Outlook.UserProperties>();
-            userProperties.Setup(x => x.Find("FolderKey")).Returns((Outlook.UserProperty)null);
+            userProperties
+                .Setup(x => x.Find("FolderKey", It.IsAny<object>()))
+                .Returns((Outlook.UserProperty)null);
             var mailItem = new Mock<Outlook.MailItem>();
             mailItem.SetupGet(x => x.UserProperties).Returns(userProperties.Object);
             var scorer = new FolderScorer();
@@ -265,7 +269,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             var property = new Mock<Outlook.UserProperty>();
             property.Setup(x => x.Value).Returns("Archive\\Finance");
             var userProperties = new Mock<Outlook.UserProperties>();
-            userProperties.Setup(x => x.Find("FolderKey")).Returns(property.Object);
+            userProperties
+                .Setup(x => x.Find("FolderKey", It.IsAny<object>()))
+                .Returns(property.Object);
             var mailItem = new Mock<Outlook.MailItem>();
             mailItem.SetupGet(x => x.UserProperties).Returns(userProperties.Object);
             mailItem.SetupGet(x => x.ConversationID).Returns("conv-2");
@@ -389,7 +395,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             var property = new Mock<Outlook.UserProperty>();
             property.SetupGet(x => x.Value).Returns(new[] { "Archive\\Finance", "Archive\\Ops" });
             var userProperties = new Mock<Outlook.UserProperties>();
-            userProperties.Setup(x => x.Find("FolderKey")).Returns(property.Object);
+            userProperties
+                .Setup(x => x.Find("FolderKey", It.IsAny<object>()))
+                .Returns(property.Object);
             var mailItem = new Mock<Outlook.MailItem>();
             mailItem.SetupGet(x => x.UserProperties).Returns(userProperties.Object);
             mailItem.SetupGet(x => x.Subject).Returns((string)null);
@@ -456,7 +464,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         public void LoadFromField_WithMailItemHelperAndMissingFolderKey_ReturnsFalse()
         {
             var userProperties = new Mock<Outlook.UserProperties>();
-            userProperties.Setup(x => x.Find("FolderKey")).Returns((Outlook.UserProperty)null);
+            userProperties
+                .Setup(x => x.Find("FolderKey", It.IsAny<object>()))
+                .Returns((Outlook.UserProperty)null);
             var mailItem = new Mock<Outlook.MailItem>();
             mailItem.SetupGet(x => x.UserProperties).Returns(userProperties.Object);
             mailItem.SetupGet(x => x.ConversationID).Returns("conv-4");
@@ -648,13 +658,17 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 
             if (value is null)
             {
-                userProperties.Setup(x => x.Find("FolderKey")).Returns((Outlook.UserProperty)null);
+                userProperties
+                    .Setup(x => x.Find("FolderKey", It.IsAny<object>()))
+                    .Returns((Outlook.UserProperty)null);
             }
             else
             {
                 var property = new Mock<Outlook.UserProperty>();
                 property.SetupGet(x => x.Value).Returns(value);
-                userProperties.Setup(x => x.Find("FolderKey")).Returns(property.Object);
+                userProperties
+                    .Setup(x => x.Find("FolderKey", It.IsAny<object>()))
+                    .Returns(property.Object);
             }
 
             mailItem.SetupGet(x => x.UserProperties).Returns(userProperties.Object);

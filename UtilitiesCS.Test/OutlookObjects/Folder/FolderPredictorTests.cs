@@ -543,7 +543,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             );
             var childFolders = new Mock<OutlookFolders>();
             childFolders
-                .Setup(x => x.Add("FY26"))
+                .Setup(x => x.Add("FY26", It.IsAny<object>()))
                 .Returns((Outlook.MAPIFolder)createdFolder.Object);
             childFolders
                 .Setup(x => x.GetEnumerator())
@@ -606,7 +606,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             );
             var childFolders = new Mock<OutlookFolders>();
             childFolders
-                .Setup(x => x.Add("Fresh"))
+                .Setup(x => x.Add("Fresh", It.IsAny<object>()))
                 .Returns((Outlook.MAPIFolder)createdFolder.Object);
             childFolders
                 .Setup(x => x.GetEnumerator())
@@ -738,7 +738,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             );
             var childFolders = new Mock<OutlookFolders>();
             childFolders
-                .Setup(x => x.Add("FY26"))
+                .Setup(x => x.Add("FY26", It.IsAny<object>()))
                 .Returns((Outlook.MAPIFolder)createdFolder.Object);
             childFolders
                 .Setup(x => x.GetEnumerator())
@@ -774,7 +774,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             );
             var childFolders = new Mock<OutlookFolders>();
             childFolders
-                .Setup(x => x.Add("FY26"))
+                .Setup(x => x.Add("FY26", It.IsAny<object>()))
                 .Returns((Outlook.MAPIFolder)createdFolder.Object);
             childFolders
                 .Setup(x => x.GetEnumerator())
