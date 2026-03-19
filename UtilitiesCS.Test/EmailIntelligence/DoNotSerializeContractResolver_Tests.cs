@@ -17,11 +17,16 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var resolver = new TestableResolver();
 
             // Act
-            var properties = resolver.CreatePropertiesFor(typeof(SampleSettings), MemberSerialization.OptOut);
+            var properties = resolver.CreatePropertiesFor(
+                typeof(SampleSettings),
+                MemberSerialization.OptOut
+            );
 
             // Assert
-            properties.Select(property => property.PropertyName)
-                .Should().Contain(new[] { nameof(SampleSettings.Visible), nameof(SampleSettings.Hidden) });
+            properties
+                .Select(property => property.PropertyName)
+                .Should()
+                .Contain(new[] { nameof(SampleSettings.Visible), nameof(SampleSettings.Hidden) });
         }
 
         [TestMethod]
@@ -31,10 +36,18 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var resolver = new TestableResolver(nameof(SampleSettings.Hidden));
 
             // Act
-            var properties = resolver.CreatePropertiesFor(typeof(SampleSettings), MemberSerialization.OptOut);
+            var properties = resolver.CreatePropertiesFor(
+                typeof(SampleSettings),
+                MemberSerialization.OptOut
+            );
 
             // Assert
-            properties.Select(property => property.PropertyName).Should().ContainSingle().Which.Should().Be(nameof(SampleSettings.Visible));
+            properties
+                .Select(property => property.PropertyName)
+                .Should()
+                .ContainSingle()
+                .Which.Should()
+                .Be(nameof(SampleSettings.Visible));
         }
 
         [TestMethod]
@@ -56,8 +69,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Arrange
             var settings = new JsonSerializerSettings
             {
-                ContractResolver = new DoNotSerializeContractResolver(nameof(SampleSettings.Hidden)),
-                Formatting = Formatting.None
+                ContractResolver = new DoNotSerializeContractResolver(
+                    nameof(SampleSettings.Hidden)
+                ),
+                Formatting = Formatting.None,
             };
             var value = new SampleSettings { Visible = "shown", Hidden = "secret" };
 
@@ -76,11 +91,12 @@ namespace UtilitiesCS.Test.EmailIntelligence
         private sealed class TestableResolver : DoNotSerializeContractResolver
         {
             public TestableResolver(params string[] propertyNames)
-                : base(propertyNames)
-            {
-            }
+                : base(propertyNames) { }
 
-            public System.Collections.Generic.IList<JsonProperty> CreatePropertiesFor(Type type, MemberSerialization memberSerialization)
+            public System.Collections.Generic.IList<JsonProperty> CreatePropertiesFor(
+                Type type,
+                MemberSerialization memberSerialization
+            )
             {
                 return base.CreateProperties(type, memberSerialization);
             }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
 using System.Threading;
 
 namespace SDILReader
@@ -21,33 +21,60 @@ namespace SDILReader
         {
             return ((il[position++] | (il[position++] << 8)));
         }
+
         private ushort ReadUInt16(byte[] _il, ref int position)
         {
             return (ushort)((il[position++] | (il[position++] << 8)));
         }
+
         private int ReadInt32(byte[] _il, ref int position)
         {
-            return (((il[position++] | (il[position++] << 8)) | (il[position++] << 0x10)) | (il[position++] << 0x18));
+            return (
+                ((il[position++] | (il[position++] << 8)) | (il[position++] << 0x10))
+                | (il[position++] << 0x18)
+            );
         }
+
         private ulong ReadInt64(byte[] _il, ref int position)
         {
-            return (ulong)(((il[position++] | (il[position++] << 8)) | (il[position++] << 0x10)) | (il[position++] << 0x18) | (il[position++] << 0x20) | (il[position++] << 0x28) | (il[position++] << 0x30) | (il[position++] << 0x38));
+            return (ulong)(
+                ((il[position++] | (il[position++] << 8)) | (il[position++] << 0x10))
+                | (il[position++] << 0x18)
+                | (il[position++] << 0x20)
+                | (il[position++] << 0x28)
+                | (il[position++] << 0x30)
+                | (il[position++] << 0x38)
+            );
         }
+
         private double ReadDouble(byte[] _il, ref int position)
         {
-            return (((il[position++] | (il[position++] << 8)) | (il[position++] << 0x10)) | (il[position++] << 0x18) | (il[position++] << 0x20) | (il[position++] << 0x28) | (il[position++] << 0x30) | (il[position++] << 0x38));
+            return (
+                ((il[position++] | (il[position++] << 8)) | (il[position++] << 0x10))
+                | (il[position++] << 0x18)
+                | (il[position++] << 0x20)
+                | (il[position++] << 0x28)
+                | (il[position++] << 0x30)
+                | (il[position++] << 0x38)
+            );
         }
+
         private sbyte ReadSByte(byte[] _il, ref int position)
         {
             return (sbyte)il[position++];
         }
+
         private byte ReadByte(byte[] _il, ref int position)
         {
             return (byte)il[position++];
         }
+
         private Single ReadSingle(byte[] _il, ref int position)
         {
-            return (Single)(((il[position++] | (il[position++] << 8)) | (il[position++] << 0x10)) | (il[position++] << 0x18));
+            return (Single)(
+                ((il[position++] | (il[position++] << 8)) | (il[position++] << 0x10))
+                | (il[position++] << 0x18)
+            );
         }
         #endregion
 
@@ -117,10 +144,7 @@ namespace SDILReader
                         {
                             instruction.Operand = module.ResolveType(metadataToken);
                         }
-                        catch
-                        {
-
-                        }
+                        catch { }
                         // SSS : see what to do here
                         break;
                     case OperandType.InlineType:
@@ -130,78 +154,82 @@ namespace SDILReader
 
                         // thanks to the guys from code project who commented on this missing feature
 
-                        instruction.Operand = module.ResolveType(metadataToken, this.mi.DeclaringType.GetGenericArguments(), this.mi.GetGenericArguments());
+                        instruction.Operand = module.ResolveType(
+                            metadataToken,
+                            this.mi.DeclaringType.GetGenericArguments(),
+                            this.mi.GetGenericArguments()
+                        );
                         break;
                     case OperandType.InlineI:
-                        {
-                            instruction.Operand = ReadInt32(il, ref position);
-                            break;
-                        }
+                    {
+                        instruction.Operand = ReadInt32(il, ref position);
+                        break;
+                    }
                     case OperandType.InlineI8:
-                        {
-                            instruction.Operand = ReadInt64(il, ref position);
-                            break;
-                        }
+                    {
+                        instruction.Operand = ReadInt64(il, ref position);
+                        break;
+                    }
                     case OperandType.InlineNone:
-                        {
-                            instruction.Operand = null;
-                            break;
-                        }
+                    {
+                        instruction.Operand = null;
+                        break;
+                    }
                     case OperandType.InlineR:
-                        {
-                            instruction.Operand = ReadDouble(il, ref position);
-                            break;
-                        }
+                    {
+                        instruction.Operand = ReadDouble(il, ref position);
+                        break;
+                    }
                     case OperandType.InlineString:
-                        {
-                            metadataToken = ReadInt32(il, ref position);
-                            instruction.Operand = module.ResolveString(metadataToken);
-                            break;
-                        }
+                    {
+                        metadataToken = ReadInt32(il, ref position);
+                        instruction.Operand = module.ResolveString(metadataToken);
+                        break;
+                    }
                     case OperandType.InlineSwitch:
+                    {
+                        int count = ReadInt32(il, ref position);
+                        int[] casesAddresses = new int[count];
+                        for (int i = 0; i < count; i++)
                         {
-                            int count = ReadInt32(il, ref position);
-                            int[] casesAddresses = new int[count];
-                            for (int i = 0; i < count; i++)
-                            {
-                                casesAddresses[i] = ReadInt32(il, ref position);
-                            }
-                            int[] cases = new int[count];
-                            for (int i = 0; i < count; i++)
-                            {
-                                cases[i] = position + casesAddresses[i];
-                            }
-                            break;
+                            casesAddresses[i] = ReadInt32(il, ref position);
                         }
+                        int[] cases = new int[count];
+                        for (int i = 0; i < count; i++)
+                        {
+                            cases[i] = position + casesAddresses[i];
+                        }
+                        break;
+                    }
                     case OperandType.InlineVar:
-                        {
-                            instruction.Operand = ReadUInt16(il, ref position);
-                            break;
-                        }
+                    {
+                        instruction.Operand = ReadUInt16(il, ref position);
+                        break;
+                    }
                     case OperandType.ShortInlineBrTarget:
-                        {
-                            instruction.Operand = ReadSByte(il, ref position) + position;
-                            break;
-                        }
+                    {
+                        instruction.Operand = ReadSByte(il, ref position) + position;
+                        break;
+                    }
                     case OperandType.ShortInlineI:
-                        {
-                            instruction.Operand = ReadSByte(il, ref position);
-                            break;
-                        }
+                    {
+                        instruction.Operand = ReadSByte(il, ref position);
+                        break;
+                    }
                     case OperandType.ShortInlineR:
-                        {
-                            instruction.Operand = ReadSingle(il, ref position);
-                            break;
-                        }
+                    {
+                        instruction.Operand = ReadSingle(il, ref position);
+                        break;
+                    }
                     case OperandType.ShortInlineVar:
-                        {
-                            instruction.Operand = ReadByte(il, ref position);
-                            break;
-                        }
+                    {
+                        instruction.Operand = ReadByte(il, ref position);
+                        break;
+                    }
                     default:
-                        {
-                            throw new Exception("Unknown operand type.");
-                        }
+                    {
+                        throw new Exception("Unknown operand type.");
+                    }
                 }
                 instructions.Add(instruction);
             }
@@ -220,17 +248,13 @@ namespace SDILReader
                         Type t = modules[j].ResolveType(metadataToken);
                         return t;
                     }
-                    catch
-                    {
-
-                    }
-
+                    catch { }
                 }
             }
             return null;
             //System.Reflection.Assembly.Load(module.Assembly.GetReferencedAssemblies()[3]).GetModules()[0].ResolveType(metadataToken)
-
         }
+
         /// <summary>
         /// Gets the IL code of the method
         /// </summary>
@@ -246,7 +270,6 @@ namespace SDILReader
                 }
             }
             return result;
-
         }
 
         /// <summary>

@@ -1,9 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using ToDoModel;
 using UtilitiesCS;
 
@@ -28,7 +28,6 @@ namespace ToDoModel.Test
             this.mockRepository = new MockRepository(MockBehavior.Strict);
             tw = new DebugTextWriter();
             Console.SetOut(tw);
-
         }
 
         #region Helper Methods and Classes
@@ -41,6 +40,7 @@ namespace ToDoModel.Test
                 currentChar = (char)(c + 1);
             return currentChar;
         }
+
         private char currentChar = 'z';
 
         private TreeNode<string> CreateTreeNode()
@@ -60,7 +60,8 @@ namespace ToDoModel.Test
 
         private List<TreeNode<string>> CreateChildren(TreeNode<string> parent, int levels)
         {
-            if (levels-- == 0) return null;
+            if (levels-- == 0)
+                return null;
 
             var r = new Random();
             var childCount = r.Next(1, 5);
@@ -68,15 +69,17 @@ namespace ToDoModel.Test
             List<TreeNode<string>> children = new List<TreeNode<string>>();
             if (parent != null)
             {
-                children = Enumerable.Range(0, childCount)
-                    .Select(i => parent
-                    .AddChild($"{parent?.Value ?? ""}{NextChar(currentChar)}"))
+                children = Enumerable
+                    .Range(0, childCount)
+                    .Select(i => parent.AddChild($"{parent?.Value ?? ""}{NextChar(currentChar)}"))
                     .ToList();
             }
             else
             {
-                children = Enumerable.Range(0, childCount)
-                    .Select(i => CreateTreeNode($"{NextChar(currentChar)}")).ToList();
+                children = Enumerable
+                    .Range(0, childCount)
+                    .Select(i => CreateTreeNode($"{NextChar(currentChar)}"))
+                    .ToList();
             }
             children.ForEach(child => CreateChildren(child, levels));
             return children;
@@ -131,7 +134,15 @@ namespace ToDoModel.Test
             //  \-c
             //    \-g
 
-            var expected = new List<TreeNode<string>> { childB, childD, childE, childF, childC, childG };
+            var expected = new List<TreeNode<string>>
+            {
+                childB,
+                childD,
+                childE,
+                childF,
+                childC,
+                childG,
+            };
 
             // Act
             Console.WriteLine("Original Tree");
@@ -152,6 +163,5 @@ namespace ToDoModel.Test
             // Assert
             Assert.IsTrue(actual.SequenceEqual(expected));
         }
-
     }
 }

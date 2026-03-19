@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -8,19 +9,32 @@ using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
-using System.Collections.Generic;
 
 namespace ToDoModel
 {
-
     public static class SortItemsToExistingFolder
     {
-        public static void InitializeSortToExisting(string InitType = "Sort", bool QuickLoad = false, bool WholeConversation = true, string strSeed = "", object objItem = null)
+        public static void InitializeSortToExisting(
+            string InitType = "Sort",
+            bool QuickLoad = false,
+            bool WholeConversation = true,
+            string strSeed = "",
+            object objItem = null
+        )
         {
             throw new NotImplementedException();
         }
 
-        public static void MASTER_SortEmailsToExistingFolder(IList<MailItem> selItems, bool Pictures_Checkbox, string SortFolderpath, bool Save_MSG, bool Attchments, bool Remove_Flow_File, IApplicationGlobals AppGlobals, string StrRoot = "")
+        public static void MASTER_SortEmailsToExistingFolder(
+            IList<MailItem> selItems,
+            bool Pictures_Checkbox,
+            string SortFolderpath,
+            bool Save_MSG,
+            bool Attchments,
+            bool Remove_Flow_File,
+            IApplicationGlobals AppGlobals,
+            string StrRoot = ""
+        )
         {
             string loc;
             string FileSystem_LOC;
@@ -30,9 +44,9 @@ namespace ToDoModel
             // Dim selItems            As Collection
             object objItem;
             MailItem MSG;
-            object objFSO;       // Computer's file system object.
-            object objShell;       // Windows Shell application object.
-            object objFolder;       // The selected folder object from Browse for Folder dialog box.
+            object objFSO; // Computer's file system object.
+            object objShell; // Windows Shell application object.
+            object objFolder; // The selected folder object from Browse for Folder dialog box.
             object objSubFolders;
             object objNewFolder;
             Folder sortFolder;
@@ -58,10 +72,12 @@ namespace ToDoModel
             var _olApp = _globals.Ol.App;
             var OlNS = _globals.Ol.NamespaceMAPI;
 
-
             if (selItems.Count > 0)
             {
-                folderCurrent = GetCurrentExplorerFolder(_globals.Ol.App.ActiveExplorer(), selItems[0]);
+                folderCurrent = GetCurrentExplorerFolder(
+                    _globals.Ol.App.ActiveExplorer(),
+                    selItems[0]
+                );
             }
             else
             {
@@ -71,17 +87,17 @@ namespace ToDoModel
             {
                 strFolderPath = _globals.FS.FldrFlow;
             }
-            else if (folderCurrent.FolderPath.Contains(StrRoot) & (folderCurrent.FolderPath != StrRoot ))
+            else if (
+                folderCurrent.FolderPath.Contains(StrRoot) & (folderCurrent.FolderPath != StrRoot)
+            )
             {
-                strFolderPath = folderCurrent.ToFsFolder(OlFolderRoot: _globals.Ol.ArchiveRootPath, FsFolderRoot: _globals.FS.FldrRoot);
+                strFolderPath = folderCurrent.ToFsFolder(
+                    OlFolderRoot: _globals.Ol.ArchiveRootPath,
+                    FsFolderRoot: _globals.FS.FldrRoot
+                );
             }
             // strFolderPath = _globals.FS.FldrRoot & Right(folderCurrent.FolderPath, Len(folderCurrent.FolderPath) - Len(_globals.Ol.ArchiveRootPath) - 1)
-            else
-            {
-
-            }
-
-
+            else { }
 
             // *************************************************************************
             // ************** SAVE ATTACHMENTS IF ENABLED*******************************
@@ -91,7 +107,7 @@ namespace ToDoModel
             if ((StrRoot ?? "") != (_globals.Ol.ArchiveRootPath ?? ""))
             {
                 strTemp2 = _globals.Ol.ArchiveRootPath.Substring(_globals.Ol.EmailRootPath.Length);
-                FileSystem_LOC = _globals.FS.FldrRoot + strTemp2 + @"\" + SortFolderpath;  // Parent Directory
+                FileSystem_LOC = _globals.FS.FldrRoot + strTemp2 + @"\" + SortFolderpath; // Parent Directory
             }
             else
             {
@@ -108,26 +124,32 @@ namespace ToDoModel
             {
                 SaveMessageAsMSG(FileSystem_LOC, selItems);
             }
-            // 
-
-
+            //
 
             // ****Save Attachment to OneDrive directory****
 
             if (Attchments == true)
             {
                 // Email_SortSaveAttachment.SaveAttachmentsFromSelection(SavePath:=FileSystem_LOC, Verify_Action:=Pictures_Checkbox, selItems:=selItems, save_images:=Pictures_Checkbox, SaveMSG:=Save_MSG)
-                SaveAttachmentsModule.SaveAttachmentsFromSelection(AppGlobals: AppGlobals, SavePath: FileSystem_LOC, Verify_Action: Pictures_Checkbox, selItems: selItems, save_images: Pictures_Checkbox, SaveMSG: Save_MSG);
+                SaveAttachmentsModule.SaveAttachmentsFromSelection(
+                    AppGlobals: AppGlobals,
+                    SavePath: FileSystem_LOC,
+                    Verify_Action: Pictures_Checkbox,
+                    selItems: selItems,
+                    save_images: Pictures_Checkbox,
+                    SaveMSG: Save_MSG
+                );
             }
-
-
 
             if (Remove_Flow_File == true)
             {
-                SaveAttachmentsModule.SaveAttachmentsFromSelection(AppGlobals: AppGlobals, SavePath: strFolderPath, DELFILE: true, selItems: selItems);
+                SaveAttachmentsModule.SaveAttachmentsFromSelection(
+                    AppGlobals: AppGlobals,
+                    SavePath: strFolderPath,
+                    DELFILE: true,
+                    selItems: selItems
+                );
             }
-
-
 
             // *************************************************************************
             // *********** LABEL EMAIL AS AUTOSORTED AND MOVE TO EMAIL FOLDER***********
@@ -147,7 +169,6 @@ namespace ToDoModel
             }
             else
             {
-
                 for (i = selItems.Count - 1; i >= 0; i -= 1)
                 {
                     if (selItems[i] is MailItem)
@@ -158,8 +179,14 @@ namespace ToDoModel
                             if (string.IsNullOrEmpty(strTemp2))
                             {
                                 // Email_AutoCategorize.UpdateForMove(MSG, SortFolderpath)
-                                UpdateForMove(MSG, SortFolderpath, AppGlobals.AF.CtfMap, AppGlobals.AF.SubjectMap);
-                            };
+                                UpdateForMove(
+                                    MSG,
+                                    SortFolderpath,
+                                    AppGlobals.AF.CtfMap,
+                                    AppGlobals.AF.SubjectMap
+                                );
+                            }
+                            ;
                             try
                             {
                                 MSG.SetUdf("Autosort", "True");
@@ -180,7 +207,12 @@ namespace ToDoModel
             }
         }
 
-        private static void CaptureMoveDetails(MailItem MSG, MailItem oMailTmp, string[] strOutput, IApplicationGlobals _globals)
+        private static void CaptureMoveDetails(
+            MailItem MSG,
+            MailItem oMailTmp,
+            string[] strOutput,
+            IApplicationGlobals _globals
+        )
         {
             if (_globals.Ol.MovedMails_Stack is null)
                 _globals.Ol.MovedMails_Stack = new StackObjectCS<object>();
@@ -188,7 +220,10 @@ namespace ToDoModel
             _globals.Ol.MovedMails_Stack.Push(oMailTmp);
 
             // TODO: Change this into a JSON file
-            WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.EmailMoves, _globals.FS.FldrMyD);
+            WriteCSV_StartNewFileIfDoesNotExist(
+                _globals.FS.Filenames.EmailMoves,
+                _globals.FS.FldrMyD
+            );
             //string[] strAry = CaptureEmailDetailsModule.CaptureEmailDetails(oMailTmp, _globals.Ol.ArchiveRootPath);
             string[] strAry = oMailTmp.Details(_globals.Ol.ArchiveRootPath);
             strOutput[1] = SanitizeArrayLineTSV(ref strAry);
@@ -221,12 +256,18 @@ namespace ToDoModel
         {
             if (strOutput.IsInitialized())
             {
-                return string.Join("\t",strOutput
-                             .Where(s => !string.IsNullOrEmpty(s))
-                             .Select(s => StripTabsCrLf(s))
-                             .ToArray());
+                return string.Join(
+                    "\t",
+                    strOutput
+                        .Where(s => !string.IsNullOrEmpty(s))
+                        .Select(s => StripTabsCrLf(s))
+                        .ToArray()
+                );
             }
-            else { return ""; }
+            else
+            {
+                return "";
+            }
         }
 
         internal static string StripTabsCrLf(string str)
@@ -241,7 +282,10 @@ namespace ToDoModel
             return result;
         }
 
-        private static void WriteCSV_StartNewFileIfDoesNotExist(string strFileName, string strFileLocation)
+        private static void WriteCSV_StartNewFileIfDoesNotExist(
+            string strFileName,
+            string strFileLocation
+        )
         {
             string[] strOutput = null;
             string[,] strAryOutput;
@@ -265,7 +309,6 @@ namespace ToDoModel
 
                 SanitizeArray(strAryOutput, ref strOutput);
                 FileIO2.WriteTextFile(strFileName, strOutput, folderpath: strFileLocation);
-
             }
             strOutput = null;
             strAryOutput = null;
@@ -273,7 +316,7 @@ namespace ToDoModel
 
         private static void SanitizeArray(string[,] strAryOutput, ref string[] strOutput)
         {
-            if (strAryOutput == null) 
+            if (strAryOutput == null)
             {
                 Debug.WriteLine($"The array {nameof(strAryOutput)} is empty.");
             }
@@ -281,27 +324,38 @@ namespace ToDoModel
             {
                 for (int j = 0; j < strAryOutput.GetLength(0); j++)
                 {
-                    strOutput[j] = string.Join("\t", strAryOutput
-                                         .SliceRow(j)
-                                         .Where(s => !string.IsNullOrEmpty(s))
-                                         .Select(s => StripTabsCrLf(s))
-                                         .ToArray());
+                    strOutput[j] = string.Join(
+                        "\t",
+                        strAryOutput
+                            .SliceRow(j)
+                            .Where(s => !string.IsNullOrEmpty(s))
+                            .Select(s => StripTabsCrLf(s))
+                            .ToArray()
+                    );
                 }
             }
         }
 
-        private static void UpdateForMove(MailItem mailItem, string fldr, CtfMap ctfMap, ISubjectMapSL subMap)
+        private static void UpdateForMove(
+            MailItem mailItem,
+            string fldr,
+            CtfMap ctfMap,
+            ISubjectMapSL subMap
+        )
         {
             ctfMap.Add(mailItem.ConversationID, fldr, 1);
             subMap.Add(mailItem.Subject, fldr);
         }
-                
+
         private static void SaveMessageAsMSG(string fileSystem_LOC, IList<MailItem> selItems)
         {
             throw new NotImplementedException();
         }
 
-        private static Folder GetCurrentExplorerFolder(Explorer ActiveExplorer, object objItem = null)
+        private static Folder GetCurrentExplorerFolder(
+            Explorer ActiveExplorer,
+            object objItem = null
+        )
         {
             if (objItem is null)
             {
@@ -313,42 +367,36 @@ namespace ToDoModel
                 MailItem OlMail = (MailItem)objItem;
                 return (Folder)OlMail.Parent;
             }
-
             else if (objItem is AppointmentItem)
             {
                 AppointmentItem OlAppointment = (AppointmentItem)objItem;
                 return (Folder)OlAppointment.Parent;
             }
-
             else if (objItem is MeetingItem)
             {
                 MeetingItem OlMeeting = (MeetingItem)objItem;
                 return (Folder)OlMeeting.Parent;
             }
-
             else if (objItem is TaskItem)
             {
                 TaskItem OlTask = (TaskItem)objItem;
                 return (Folder)OlTask.Parent;
             }
-
             else
             {
                 return null;
             }
-
         }
 
         public static void Cleanup_Files()
         {
             // Call WRITE_Text_File     - Writes to the recents list
-            // Call Email_AutoCategorize.CTF_Incidence_Text_File_WRITE - Writes to the CTF_Incidence file   
+            // Call Email_AutoCategorize.CTF_Incidence_Text_File_WRITE - Writes to the CTF_Incidence file
             // Call Email_AutoCategorize.Subject_MAP_Text_File_WRITE - Writes to the Subject_MAP file
         }
 
         // Public Function DialogueThrowNotImplemented() As Boolean
         // Return MsgBox("")
         // End Function
-
     }
 }

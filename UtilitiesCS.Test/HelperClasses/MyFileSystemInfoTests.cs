@@ -1,7 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using System;
 using System.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using UtilitiesCS;
 
 namespace ObjectListViewDemo.Tests
@@ -46,7 +46,9 @@ namespace ObjectListViewDemo.Tests
         public void Constructor_ThrowsExceptionForNullArgument()
         {
             // Arrange & Act
-            Assert.ThrowsExactly<ArgumentNullException>(() => new MyFileSystemInfo(default(FileSystemInfo)));
+            Assert.ThrowsExactly<ArgumentNullException>(() =>
+                new MyFileSystemInfo(default(FileSystemInfo))
+            );
         }
 
         [TestMethod]
@@ -213,7 +215,9 @@ namespace ObjectListViewDemo.Tests
             var mockChildFile = new Mock<IFileInfo>();
             mockChildFile.Setup(f => f.FullName).Returns("ChildFile.txt");
 
-            _mockDirectoryInfo.Setup(d => d.GetFileSystemInfos()).Returns(new IFileSystemInfo[] { mockChildFile.Object });
+            _mockDirectoryInfo
+                .Setup(d => d.GetFileSystemInfos())
+                .Returns(new IFileSystemInfo[] { mockChildFile.Object });
 
             // Act
             var result = myFileSystemInfo.GetFileSystemInfos();

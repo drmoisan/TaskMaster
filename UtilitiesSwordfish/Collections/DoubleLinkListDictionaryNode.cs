@@ -1,7 +1,7 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
@@ -21,7 +21,11 @@ namespace Swordfish.NET.Collections
         public TKey Key;
         public TValue Value;
 
-        public DoubleLinkListDictionaryNode(TKey key, TValue value, DoubleLinkListDictionaryNode<TKey, TValue> next)
+        public DoubleLinkListDictionaryNode(
+            TKey key,
+            TValue value,
+            DoubleLinkListDictionaryNode<TKey, TValue> next
+        )
         {
             Next = next;
             Key = key;
@@ -36,7 +40,5 @@ namespace Swordfish.NET.Collections
         {
             return string.Format("{0}, {1}", Key, Value);
         }
-
-
     }
 }

@@ -1,6 +1,4 @@
-﻿using BrightIdeasSoftware;
-using ObjectListViewDemo;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -8,6 +6,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BrightIdeasSoftware;
+using ObjectListViewDemo;
 
 namespace ObjectListViewDemo
 {
@@ -15,7 +15,7 @@ namespace ObjectListViewDemo
     /// This helper class allows listviews and tree views to use image from the system image list.
     /// </summary>
     /// <remarks>Instances of this helper class know how to retrieve icon from the Windows shell for
-    /// a given file path. These icons are then added to the imagelist on the given control. ListViews need 
+    /// a given file path. These icons are then added to the imagelist on the given control. ListViews need
     /// special handling since they have two image lists which need to be kept in sync.</remarks>
     public class SysImageListHelper
     {
@@ -65,7 +65,6 @@ namespace ObjectListViewDemo
             }
         }
 
-
         /// <summary>
         /// Create a SysImageListHelper that will fetch images for the given tree control
         /// </summary>
@@ -79,6 +78,7 @@ namespace ObjectListViewDemo
             }
             this.treeView = treeView;
         }
+
         protected TreeView treeView;
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace ObjectListViewDemo
         /// </summary>
         /// <param name="listView">The listview that will use the images</param>
         /// <remarks>Listviews manage two image lists, but each item can only have one image index.
-        /// This means that the image for an item must occur at the same index in the two lists. 
+        /// This means that the image for an item must occur at the same index in the two lists.
         /// SysImageListHelper instances handle this requirement. However, if the listview already
         /// has image lists installed, they <b>must</b> be of the same length.</remarks>
         public SysImageListHelper(ObjectListView listView)
@@ -110,6 +110,7 @@ namespace ObjectListViewDemo
 
             this.listView = listView;
         }
+
         protected ObjectListView listView;
 
         /// <summary>
@@ -121,8 +122,7 @@ namespace ObjectListViewDemo
         {
             if (System.IO.Directory.Exists(path))
                 path = System.Environment.SystemDirectory; // optimization! give all directories the same image
-            else
-                if (System.IO.Path.HasExtension(path))
+            else if (System.IO.Path.HasExtension(path))
                 path = System.IO.Path.GetExtension(path);
 
             if (this.SmallImageCollection.ContainsKey(path))
@@ -130,8 +130,16 @@ namespace ObjectListViewDemo
 
             try
             {
-                this.AddImageToCollection(path, this.SmallImageList, ShellUtilitiesStatic.GetFileIcon(path, true, true));
-                this.AddImageToCollection(path, this.LargeImageList, ShellUtilitiesStatic.GetFileIcon(path, false, true));
+                this.AddImageToCollection(
+                    path,
+                    this.SmallImageList,
+                    ShellUtilitiesStatic.GetFileIcon(path, true, true)
+                );
+                this.AddImageToCollection(
+                    path,
+                    this.LargeImageList,
+                    ShellUtilitiesStatic.GetFileIcon(path, false, true)
+                );
             }
             catch (ArgumentNullException)
             {
@@ -165,5 +173,4 @@ namespace ObjectListViewDemo
             }
         }
     }
-
 }

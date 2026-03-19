@@ -1,8 +1,4 @@
-﻿using Deedle;
-using Microsoft.Office.Interop.Outlook;
-using QuickFiler.Helper_Classes;
-using QuickFiler.Interfaces;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,19 +9,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using Deedle;
+using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Helper_Classes;
+using QuickFiler.Interfaces;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
 using Outlook = Microsoft.Office.Interop.Outlook;
-
-
 
 namespace QuickFiler.Controllers
 {
     public class QfcDatamodel : IQfcDatamodel
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors and Initializers
 
@@ -47,7 +46,12 @@ namespace QuickFiler.Controllers
             _globals.Ol.App.NewMailEx += Application_NewMailEx;
         }
 
-        public static async Task<QfcDatamodel> LoadAsync(IApplicationGlobals appGlobals, CancellationToken token, CancellationTokenSource tokenSource, ProgressTracker progress)
+        public static async Task<QfcDatamodel> LoadAsync(
+            IApplicationGlobals appGlobals,
+            CancellationToken token,
+            CancellationTokenSource tokenSource,
+            ProgressTracker progress
+        )
         {
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Creating new {nameof(QfcDatamodel)} ... ");
             progress.Report(0, "Initializing Data Model");
@@ -57,7 +61,9 @@ namespace QuickFiler.Controllers
             model.TokenSource = tokenSource;
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(InitDfAsync)} ... ");
-            await model.InitDfAsync(appGlobals.Ol.App.ActiveExplorer(), progress.Increment(2)).ConfigureAwait(false);
+            await model
+                .InitDfAsync(appGlobals.Ol.App.ActiveExplorer(), progress.Increment(2))
+                .ConfigureAwait(false);
             return model;
         }
 
@@ -83,7 +89,9 @@ namespace QuickFiler.Controllers
 
         #region Private Variables
 
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
         private IApplicationGlobals _globals;
         private Explorer _activeExplorer;
         private LockingLinkedList<MailItem> _masterQueue = [];
@@ -97,15 +105,30 @@ namespace QuickFiler.Controllers
         #region Public Properties
 
         private bool _complete = false;
-        public bool Complete { get => _complete; set => _complete = value; }
+        public bool Complete
+        {
+            get => _complete;
+            set => _complete = value;
+        }
 
-        public ScoStack<IMovedMailInfo> MovedItems { get => _globals.AF.MovedMails; }
+        public ScoStack<IMovedMailInfo> MovedItems
+        {
+            get => _globals.AF.MovedMails;
+        }
 
         private CancellationToken _token;
-        public CancellationToken Token { get => _token; set => _token = value; }
+        public CancellationToken Token
+        {
+            get => _token;
+            set => _token = value;
+        }
 
         private CancellationTokenSource _tokenSource;
-        public CancellationTokenSource TokenSource { get => _tokenSource; set => _tokenSource = value; }
+        public CancellationTokenSource TokenSource
+        {
+            get => _tokenSource;
+            set => _tokenSource = value;
+        }
 
         #endregion Public Properties
 
@@ -124,9 +147,8 @@ namespace QuickFiler.Controllers
         {
             try
             {
-
                 // Do not access the form's BackgroundWorker reference directly.
-                // Instead, use the reference provided by the sender parameter.            
+                // Instead, use the reference provided by the sender parameter.
                 BackgroundWorker bw = sender as BackgroundWorker;
 
                 // Extract the argument.
@@ -148,7 +170,6 @@ namespace QuickFiler.Controllers
             {
                 logger.Error($"Error in Worker_DoWork {ex.Message}", ex);
             }
-
         }
 
         // This event handler demonstrates how to interpret
@@ -188,14 +209,19 @@ namespace QuickFiler.Controllers
             var firstIteration = _frame.GetRowsAt(Enumerable.Range(0, batchSize).ToArray());
 
             // Drop extracted range from source table
-            _frame = _frame.GetRowsAt(Enumerable.Range(batchSize, _frame.RowCount - batchSize).ToArray());
+            _frame = _frame.GetRowsAt(
+                Enumerable.Range(batchSize, _frame.RowCount - batchSize).ToArray()
+            );
 
             // Cast Frame to array of IEmailInfo
             var rows = firstIteration.GetRowsAs<IEmailSortInfo>().Values.ToArray();
 
             //BUGFIX: StoreId ID is being converted to the literal string "byte[]" instead of the string equivalent of the byte array
             // Convert array of IEmailInfo to List<MailItem>
-            var emailList = rows.Select(row => (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)).ToList();
+            var emailList = rows.Select(row =>
+                    (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId)
+                )
+                .ToList();
 
             SetupWorker(worker);
             worker.RunWorkerAsync();
@@ -203,10 +229,12 @@ namespace QuickFiler.Controllers
             return emailList;
         }
 
-        public async Task<IList<MailItem>> InitEmailQueueAsync(int batchSize,
-                                                               BackgroundWorker worker,
-                                                               CancellationToken token,
-                                                               CancellationTokenSource tokenSource)
+        public async Task<IList<MailItem>> InitEmailQueueAsync(
+            int batchSize,
+            BackgroundWorker worker,
+            CancellationToken token,
+            CancellationTokenSource tokenSource
+        )
         {
             token.ThrowIfCancellationRequested();
 
@@ -215,7 +243,6 @@ namespace QuickFiler.Controllers
             _worker = worker;
 
             var emailList = await Task.Run(() => InitEmailQueue(batchSize, worker), token);
-
 
             return emailList;
         }
@@ -237,7 +264,10 @@ namespace QuickFiler.Controllers
                 {
                     cancel.ThrowIfCancellationRequested();
                     //var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
-                    var item = await Task.Run(() => _olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId), cancel);
+                    var item = await Task.Run(
+                        () => _olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId),
+                        cancel
+                    );
                     if (item is not null && item is MailItem mailItem)
                     {
                         _masterQueue.AddLast(mailItem);
@@ -251,15 +281,15 @@ namespace QuickFiler.Controllers
                 }
                 catch (System.Exception e)
                 {
-                    logger.Error($"{nameof(LoadRemainingEmailsToQueue)} Error. \n {e.Message}\n{e.StackTrace}");
+                    logger.Error(
+                        $"{nameof(LoadRemainingEmailsToQueue)} Error. \n {e.Message}\n{e.StackTrace}"
+                    );
                     throw e;
                 }
                 await Task.Yield();
             }
             return true;
-
         }
-
 
         private bool LoadRemainingEmailsToQueue(BackgroundWorker bw, CancellationToken token)
         {
@@ -292,15 +322,19 @@ namespace QuickFiler.Controllers
                 }
                 catch (System.Exception e)
                 {
-                    logger.Error($"{nameof(LoadRemainingEmailsToQueue)} Error. \n {e.Message}\n{e.StackTrace}");
+                    logger.Error(
+                        $"{nameof(LoadRemainingEmailsToQueue)} Error. \n {e.Message}\n{e.StackTrace}"
+                    );
                     throw e;
                 }
             }
             return true;
-
         }
 
-        private async Task<bool> LoadRemainingEmailsToQueueAsync(BackgroundWorker bw, CancellationToken token)
+        private async Task<bool> LoadRemainingEmailsToQueueAsync(
+            BackgroundWorker bw,
+            CancellationToken token
+        )
         {
             if ((_frame is null) || (_frame.RowCount == 0))
             {
@@ -310,15 +344,26 @@ namespace QuickFiler.Controllers
 
             try
             {
-                await _frame.GetRowsAs<IEmailSortInfo>().Values.ToAsyncEnumerable().ForEachAwaitWithCancellationAsync(
-                    async (row, token) => await Task.Run(() =>
-                    {
-                        token.ThrowIfCancellationRequested();
-                        var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
-                        _masterQueue.AddLast(item);
-                        _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
-                    }, token),
-                    token);
+                await _frame
+                    .GetRowsAs<IEmailSortInfo>()
+                    .Values.ToAsyncEnumerable()
+                    .ForEachAwaitWithCancellationAsync(
+                        async (row, token) =>
+                            await Task.Run(
+                                () =>
+                                {
+                                    token.ThrowIfCancellationRequested();
+                                    var item = (MailItem)
+                                        _olApp
+                                            .GetNamespace("MAPI")
+                                            .GetItemFromID(row.EntryId, row.StoreId);
+                                    _masterQueue.AddLast(item);
+                                    _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
+                                },
+                                token
+                            ),
+                        token
+                    );
                 return true;
             }
             catch (TaskCanceledException)
@@ -326,12 +371,6 @@ namespace QuickFiler.Controllers
                 //logger.Debug($"{nameof(LoadRemainingEmailsToQueueAsync)} Task cancelled");
                 return false;
             }
-
-
-
-
-
-
         }
 
         public Frame<int, string> InitDf(Explorer activeExplorer)
@@ -348,7 +387,6 @@ namespace QuickFiler.Controllers
             var dfSorted = SortTriageDate(dfFiltered);
 
             return dfSorted;
-
         }
 
         /// <summary>
@@ -361,7 +399,10 @@ namespace QuickFiler.Controllers
             if (!offline)
             {
                 var commandBars = _activeExplorer.CommandBars;
-                if (!offline) { commandBars.ExecuteMso("ToggleOnline"); }
+                if (!offline)
+                {
+                    commandBars.ExecuteMso("ToggleOnline");
+                }
                 await Task.Delay(5);
             }
             return offline;
@@ -369,7 +410,6 @@ namespace QuickFiler.Controllers
 
         public async Task InitDfAsync(Explorer activeExplorer, ProgressTracker progress)
         {
-
             var df = await GetEmailsInViewDfAsync(activeExplorer, progress).ConfigureAwait(false);
 
             if (df is not null)
@@ -389,7 +429,10 @@ namespace QuickFiler.Controllers
             }
         }
 
-        private async Task<Frame<int, string>> GetEmailsInViewDfAsync(Explorer activeExplorer, ProgressTracker progress)
+        private async Task<Frame<int, string>> GetEmailsInViewDfAsync(
+            Explorer activeExplorer,
+            ProgressTracker progress
+        )
         {
             Frame<int, string> df = null;
 
@@ -399,8 +442,13 @@ namespace QuickFiler.Controllers
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(DfDeedle.GetEmailDataInViewAsync)} ... ");
             try
             {
-                df = await DfDeedle.GetEmailDataInViewAsync(
-                    activeExplorer, Token, TokenSource, progress.Increment(3).SpawnChild(78))
+                df = await DfDeedle
+                    .GetEmailDataInViewAsync(
+                        activeExplorer,
+                        Token,
+                        TokenSource,
+                        progress.Increment(3).SpawnChild(78)
+                    )
                     .ConfigureAwait(false);
                 await ToggleOfflineMode(offline);
 
@@ -417,10 +465,11 @@ namespace QuickFiler.Controllers
             catch (System.Exception e)
             {
                 await ToggleOfflineMode(offline);
-                logger.Error($"{nameof(DfDeedle.GetEmailDataInViewAsync)} Error. \n {e.Message}\n{e.StackTrace}");
+                logger.Error(
+                    $"{nameof(DfDeedle.GetEmailDataInViewAsync)} Error. \n {e.Message}\n{e.StackTrace}"
+                );
                 throw e;
             }
-
         }
 
         public Frame<int, string> SortTriageDate(Frame<int, string> df)
@@ -431,7 +480,8 @@ namespace QuickFiler.Controllers
 
             var s1 = dfClone.GetColumn<DateTime>("SentOn");
             var s2 = dfClone.GetColumn<string>("Triage");
-            var added = s1.ZipInner(s2).Select(t => sorter.GetSortKey(triage: t.Value.Item2, dateTime: t.Value.Item1));
+            var added = s1.ZipInner(s2)
+                .Select(t => sorter.GetSortKey(triage: t.Value.Item2, dateTime: t.Value.Item1));
             dfClone.AddColumn("NewKey", added);
 
             dfClone = dfClone.SortRows("NewKey");
@@ -478,7 +528,9 @@ namespace QuickFiler.Controllers
         {
             if (nodes is null || nodes.Count == 0 || nodes.Count < i + 1)
             {
-                logger.Error($"Error unhooking item from move monitor. No items in array or index out of range. nodes.Length = {nodes?.Count ?? 0} but index i = {i}");
+                logger.Error(
+                    $"Error unhooking item from move monitor. No items in array or index out of range. nodes.Length = {nodes?.Count ?? 0} but index i = {i}"
+                );
                 return;
             }
             var node = nodes[i];
@@ -492,7 +544,9 @@ namespace QuickFiler.Controllers
                 }
                 catch (System.Exception e)
                 {
-                    logger.Error($"Error unhooking item from move monitor. Getting next item from Queue {e.Message}");
+                    logger.Error(
+                        $"Error unhooking item from move monitor. Getting next item from Queue {e.Message}"
+                    );
                     nodes.Remove(node);
                     node = _masterQueue.TryTakeFirst();
                     if (node is null)
@@ -515,53 +569,55 @@ namespace QuickFiler.Controllers
                 await WaitForQueue(quantity, _token);
 
             var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
-            if (nodes is null) { return null; }
+            if (nodes is null)
+            {
+                return null;
+            }
 
             try
             {
-                await Task.Run(() =>
-                {
-                    var max = nodes.Count;
-                    for (int i = 0; i < max; i++)
+                await Task.Run(
+                    () =>
                     {
-                        TryUnhookOrReplace(ref nodes, i);
-                        //var node = nodes[i];
-                        //_token.ThrowIfCancellationRequested();
-                        //bool processing = true;
-                        //while (processing) 
-                        //{
-                        //    try
-                        //    {
-                        //        await _moveMonitor.UnhookItemAsync(node, _token);
-                        //        processing = false;
-                        //    }
-                        //    catch (System.Exception e)
-                        //    {
-                        //        logger.Error($"Error unhooking item from move monitor. Getting next item from Queue {e.Message}");                                    
-                        //        nodes.Remove(node);
-                        //        node = _masterQueue.TryTakeFirst();
-                        //        if (node is null) 
-                        //        {
-                        //            processing = false;
-                        //        }
-                        //        else
-                        //        {
-                        //            nodes.Insert(i, node);
-                        //        }
-                        //    }
-                        //}
-
-                    }
-                }, _token);
-
-
+                        var max = nodes.Count;
+                        for (int i = 0; i < max; i++)
+                        {
+                            TryUnhookOrReplace(ref nodes, i);
+                            //var node = nodes[i];
+                            //_token.ThrowIfCancellationRequested();
+                            //bool processing = true;
+                            //while (processing)
+                            //{
+                            //    try
+                            //    {
+                            //        await _moveMonitor.UnhookItemAsync(node, _token);
+                            //        processing = false;
+                            //    }
+                            //    catch (System.Exception e)
+                            //    {
+                            //        logger.Error($"Error unhooking item from move monitor. Getting next item from Queue {e.Message}");
+                            //        nodes.Remove(node);
+                            //        node = _masterQueue.TryTakeFirst();
+                            //        if (node is null)
+                            //        {
+                            //            processing = false;
+                            //        }
+                            //        else
+                            //        {
+                            //            nodes.Insert(i, node);
+                            //        }
+                            //    }
+                            //}
+                        }
+                    },
+                    _token
+                );
             }
             catch (System.Exception e)
             {
                 logger.Error("Error unhooking items from move monitor", e);
                 throw;
             }
-
 
             return nodes;
         }
@@ -601,7 +657,6 @@ namespace QuickFiler.Controllers
         #region Linked List Locking
 
 
-
         #endregion Linked List Locking
 
         #region Event Handlers
@@ -612,14 +667,15 @@ namespace QuickFiler.Controllers
             try
             {
                 var item = _globals.Ol.App.Session.GetItemFromID(entryID) as MailItem;
-                if (item is not null) { _masterQueue.AddFirst(item); }
+                if (item is not null)
+                {
+                    _masterQueue.AddFirst(item);
+                }
             }
             catch (System.Exception e)
             {
                 logger.Error(e.Message, e);
             }
-
-
         }
 
         #endregion Event Handlers
@@ -628,10 +684,15 @@ namespace QuickFiler.Controllers
     internal class EmailSorter
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public EmailSorter() { }
-        public EmailSorter(SortOptionsEnum options) { _options = options; }
+
+        public EmailSorter(SortOptionsEnum options)
+        {
+            _options = options;
+        }
 
         private SortOptionsEnum _options = SortOptionsEnum.Default;
         private Dictionary<string, int> _triageImportantFirst = new Dictionary<string, int>
@@ -639,7 +700,7 @@ namespace QuickFiler.Controllers
             { "A", 1 },
             { "B", 2 },
             { "C", 3 },
-            { "Z", 4 }
+            { "Z", 4 },
         };
 
         private Dictionary<string, int> _triageImportantLast = new Dictionary<string, int>
@@ -647,27 +708,36 @@ namespace QuickFiler.Controllers
             { "A", 4 },
             { "B", 3 },
             { "C", 2 },
-            { "Z", 1 }
+            { "Z", 1 },
         };
 
-        public SortOptionsEnum Options { get => _options; set => _options = value; }
+        public SortOptionsEnum Options
+        {
+            get => _options;
+            set => _options = value;
+        }
 
         public long GetSortKey(string triage, DateTime dateTime)
         {
-            if (_options.HasFlag(SortOptionsEnum.TriageImportantFirst) &&
-                _options.HasFlag(SortOptionsEnum.DateRecentFirst))
+            if (
+                _options.HasFlag(SortOptionsEnum.TriageImportantFirst)
+                && _options.HasFlag(SortOptionsEnum.DateRecentFirst)
+            )
             {
                 try
                 {
-                    var triageKey = (long)(100000000000000 * _triageImportantLast[triage])
+                    var triageKey =
+                        (long)(100000000000000 * _triageImportantLast[triage])
                         + GetDateKey(dateTime);
                     return triageKey;
                 }
                 catch (KeyNotFoundException e)
                 {
-                    logger.Error($"Triage value {triage} not found in " +
-                        $"dictionary from date {GetDateKey(dateTime)} " +
-                        $"\n {e.Message} \n {e.StackTrace}");
+                    logger.Error(
+                        $"Triage value {triage} not found in "
+                            + $"dictionary from date {GetDateKey(dateTime)} "
+                            + $"\n {e.Message} \n {e.StackTrace}"
+                    );
                     throw;
                 }
             }
@@ -689,5 +759,4 @@ namespace QuickFiler.Controllers
         string Triage { get; }
         string StoreId { get; }
     }
-
 }

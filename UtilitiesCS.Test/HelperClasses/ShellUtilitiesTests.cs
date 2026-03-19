@@ -1,14 +1,14 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using System;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
-using UtilitiesCS.Extensions.Lazy;
-using UtilitiesCS;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using ObjectListViewDemo;
+using UtilitiesCS;
+using UtilitiesCS.Extensions.Lazy;
 
 namespace UtilitiesCS.Test.HelperClasses.ObjListViewDemo
 {
@@ -90,6 +90,4 @@ namespace UtilitiesCS.Test.HelperClasses.ObjListViewDemo
     //        Assert.IsTrue(result >= 0);
     //    }
     //}
-
-
 }

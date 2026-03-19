@@ -1,17 +1,17 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
 // Last Revised: September 2012
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Collections;
 
 namespace Swordfish.NET.Collections
 {
@@ -21,7 +21,6 @@ namespace Swordfish.NET.Collections
     /// </summary>
     public class ObservableSortedDictionary<TKey, TValue> : ObservableDictionary<TKey, TValue>
     {
-
         // ************************************************************************
         // Private Fields
         // ************************************************************************
@@ -59,10 +58,14 @@ namespace Swordfish.NET.Collections
         /// </param>
         public override void Add(TKey key, TValue value)
         {
-            int index = _sorter.GetInsertIndex(_masterList.Count, key, delegate (int mid)
-            {
-                return _masterList[mid].Key;
-            });
+            int index = _sorter.GetInsertIndex(
+                _masterList.Count,
+                key,
+                delegate(int mid)
+                {
+                    return _masterList[mid].Key;
+                }
+            );
 
             if (index >= _masterList.Count)
             {

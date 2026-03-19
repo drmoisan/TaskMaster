@@ -1,19 +1,21 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.ReusableTypeClasses
 {
-
     public static class SmartSerializableStatic
     {
         public static bool IsSmartSerializable(this Type type)
         {
-            return type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ISmartSerializable<>));
+            return type.GetInterfaces()
+                .Any(i =>
+                    i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ISmartSerializable<>)
+                );
         }
     }
 

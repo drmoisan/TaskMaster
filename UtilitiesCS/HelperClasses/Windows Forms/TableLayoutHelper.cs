@@ -9,7 +9,12 @@ namespace UtilitiesCS
 {
     public static class TableLayoutHelper
     {
-        public static void InsertSpecificRow(this TableLayoutPanel panel, int rowIndex, RowStyle templateStyle, int insertCount = 1)
+        public static void InsertSpecificRow(
+            this TableLayoutPanel panel,
+            int rowIndex,
+            RowStyle templateStyle,
+            int insertCount = 1
+        )
         {
             // If not on the UI thread, invoke the method on the UI thread
             if (panel.InvokeRequired)
@@ -44,10 +49,13 @@ namespace UtilitiesCS
                     }
                 }
             }
-
         }
 
-        public static void RemoveSpecificRow(this TableLayoutPanel panel, int rowIndex, int removeCount = 1)
+        public static void RemoveSpecificRow(
+            this TableLayoutPanel panel,
+            int rowIndex,
+            int removeCount = 1
+        )
         {
             // If not on the UI thread, invoke the method on the UI thread
             if (panel.InvokeRequired)
@@ -70,7 +78,6 @@ namespace UtilitiesCS
                     panel.Controls.Remove(control);
                 }
             }
-
 
             // move up row controls that comes after row we want to remove
             for (int i = rowIndex + removeCount; i < panel.RowCount; i++)
@@ -95,7 +102,11 @@ namespace UtilitiesCS
             panel.RowCount -= removeCount;
         }
 
-        public static void RemoveSpecificColumn(this TableLayoutPanel panel, int colIndex, int removeCount = 1)
+        public static void RemoveSpecificColumn(
+            this TableLayoutPanel panel,
+            int colIndex,
+            int removeCount = 1
+        )
         {
             // If not on the UI thread, invoke the method on the UI thread
             if (panel.InvokeRequired)
@@ -118,7 +129,6 @@ namespace UtilitiesCS
                     if (control is not null)
                         panel.Controls.Remove(control);
                 }
-
             }
 
             // move over column controls that come after row we want to remove
@@ -138,8 +148,6 @@ namespace UtilitiesCS
             {
                 panel.ColumnStyles.RemoveAt(i);
             }
-
-
 
             panel.ColumnCount -= removeCount;
         }

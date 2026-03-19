@@ -1,11 +1,11 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Office.Interop.Outlook;
 using Tags;
 using ToDoModel;
 using UtilitiesCS;
@@ -15,7 +15,8 @@ namespace TaskVisualization
     internal class EditFilterController
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors and Initializers
 
@@ -28,7 +29,8 @@ namespace TaskVisualization
 
         public EditFilterController(
             IApplicationGlobals appGlobals,
-            Action<EditFilterController, FilterEntry> callback)
+            Action<EditFilterController, FilterEntry> callback
+        )
         {
             _callback = callback;
             _filterEntry = new FilterEntry();
@@ -36,9 +38,7 @@ namespace TaskVisualization
             Initialize();
         }
 
-        public EditFilterController(
-            IApplicationGlobals appGlobals,
-            FilterEntry filterEntry)
+        public EditFilterController(IApplicationGlobals appGlobals, FilterEntry filterEntry)
         {
             _filterEntryCopy = (FilterEntry)filterEntry.Clone();
             _filterEntry = filterEntry;
@@ -48,7 +48,8 @@ namespace TaskVisualization
 
         public static bool DeleteFilterDialog(
             IApplicationGlobals appGlobals,
-            FilterEntry filterEntry)
+            FilterEntry filterEntry
+        )
         {
             var fd = new EditFilterController(appGlobals);
             var viewer = fd.InitializeFactory();
@@ -126,11 +127,12 @@ namespace TaskVisualization
             FlagTranslator options,
             FlagTranslator selections,
             IPrefix prefix,
-            System.Windows.Forms.Label label)
+            System.Windows.Forms.Label label
+        )
         {
-            var dictOptions = options.AsListWithPrefix
-                                     .Select(s => new KeyValuePair<string, bool>(s, false))
-                                     .ToSortedDictionary();
+            var dictOptions = options
+                .AsListWithPrefix.Select(s => new KeyValuePair<string, bool>(s, false))
+                .ToSortedDictionary();
 
             using (var viewer = new TagViewer())
             {
@@ -144,10 +146,7 @@ namespace TaskVisualization
             }
         }
 
-        internal void SetUpDeleteDialog()
-        {
-
-        }
+        internal void SetUpDeleteDialog() { }
 
         #endregion Major Actions
 
@@ -167,19 +166,34 @@ namespace TaskVisualization
         private void CategorySelection_Click(object sender, EventArgs e)
         {
             var prefix = _defaults.PrefixList.Find(x => x.PrefixType == PrefixTypeEnum.Context);
-            SelectItems(_olFlags.Context, _filterEntry.Flags.Context, prefix, _viewer.ContextSelection);
+            SelectItems(
+                _olFlags.Context,
+                _filterEntry.Flags.Context,
+                prefix,
+                _viewer.ContextSelection
+            );
         }
 
         private void PeopleSelection_Click(object sender, EventArgs e)
         {
             var prefix = _defaults.PrefixList.Find(x => x.PrefixType == PrefixTypeEnum.People);
-            SelectItems(_olFlags.People, _filterEntry.Flags.People, prefix, _viewer.PeopleSelection);
+            SelectItems(
+                _olFlags.People,
+                _filterEntry.Flags.People,
+                prefix,
+                _viewer.PeopleSelection
+            );
         }
 
         private void ProjectSelection_Click(object sender, EventArgs e)
         {
             var prefix = _defaults.PrefixList.Find(x => x.PrefixType == PrefixTypeEnum.Project);
-            SelectItems(_olFlags.Projects, _filterEntry.Flags.Projects, prefix, _viewer.ProjectSelection);
+            SelectItems(
+                _olFlags.Projects,
+                _filterEntry.Flags.Projects,
+                prefix,
+                _viewer.ProjectSelection
+            );
         }
 
         private void TopicSelection_Click(object sender, EventArgs e)
@@ -188,10 +202,7 @@ namespace TaskVisualization
             SelectItems(_olFlags.Topics, _filterEntry.Flags.Topics, prefix, _viewer.TopicSelection);
         }
 
-        private void FoldersSelected_Click(object sender, EventArgs e)
-        {
-
-        }
+        private void FoldersSelected_Click(object sender, EventArgs e) { }
 
         private void BtnCancel_Click(object sender, EventArgs e)
         {
@@ -214,6 +225,5 @@ namespace TaskVisualization
         }
 
         #endregion Event Handlers
-
     }
 }

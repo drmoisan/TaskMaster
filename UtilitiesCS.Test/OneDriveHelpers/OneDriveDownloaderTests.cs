@@ -1,15 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using UtilitiesCS.OneDriveHelpers;
-using System.Net.Http;
-using System.Net;
-using System.IO;
-using System.Text;
-using System.Linq;
 using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using UtilitiesCS.OneDriveHelpers;
 
 namespace UtilitiesCS.Test.OneDriveHelpers
 {
@@ -17,26 +17,28 @@ namespace UtilitiesCS.Test.OneDriveHelpers
     public class OneDriveDownloaderTests
     {
         private MockRepository mockRepository;
+
         //private Mock<OneDriveDownloader> downloaderMock;
         //private Mock<HttpClient> clientMock;
         //private HttpResponseMessage httpResponseMessage;
-
-
-
 
         [TestInitialize]
         public void TestInitialize()
         {
             this.mockRepository = new MockRepository(MockBehavior.Loose);
-
-
         }
 
         public class Downloader : OneDriveDownloader
         {
-            public Downloader() : base() { }
-            public void SetClientGetter(Func<string, CancellationToken, Task<HttpResponseMessage>> clientGetter) => ClientGetAsync = clientGetter;
-            public void SetFilestreamWriterGetter(Func<string, Stream> filestreamWriterGetter) => GetFileStreamWriter = filestreamWriterGetter;
+            public Downloader()
+                : base() { }
+
+            public void SetClientGetter(
+                Func<string, CancellationToken, Task<HttpResponseMessage>> clientGetter
+            ) => ClientGetAsync = clientGetter;
+
+            public void SetFilestreamWriterGetter(Func<string, Stream> filestreamWriterGetter) =>
+                GetFileStreamWriter = filestreamWriterGetter;
         }
 
         private OneDriveDownloader CreateOneDriveDownloader()
@@ -126,7 +128,6 @@ namespace UtilitiesCS.Test.OneDriveHelpers
         //        timeoutMs,
         //        cancel);
         //    var actual = StreamToByteArray(result);
-
 
         //    // Assert
         //    actual.Should().BeEquivalentTo(expected);

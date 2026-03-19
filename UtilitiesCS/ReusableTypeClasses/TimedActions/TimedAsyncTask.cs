@@ -1,11 +1,11 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.HelperClasses
@@ -27,6 +27,7 @@ namespace UtilitiesCS.HelperClasses
         {
             Interlocked.CompareExchange(ref _action, action, null);
         }
+
         private Func<Task> _action;
 
         private TimeSpan _frequency;
@@ -48,7 +49,10 @@ namespace UtilitiesCS.HelperClasses
         {
             if (_taskRequested.CheckAndSetFirstCall)
             {
-                if (_action is null) { throw new NullReferenceException("Task is null"); }
+                if (_action is null)
+                {
+                    throw new NullReferenceException("Task is null");
+                }
                 var action2 = ResetAfterTask(_action);
                 _timer = new TimerWrapper(_frequency);
                 _timer.Elapsed += (sender, e) => action2();
@@ -65,7 +69,10 @@ namespace UtilitiesCS.HelperClasses
         {
             if (_taskRequested.CheckAndSetFirstCall)
             {
-                if (_action is null) { throw new NullReferenceException("Task is null"); }
+                if (_action is null)
+                {
+                    throw new NullReferenceException("Task is null");
+                }
                 var action2 = ResetAfterTask(_action);
                 _timer = new TimerWrapper(_frequency);
                 _timer.Elapsed += (sender, e) => action2();
@@ -78,7 +85,10 @@ namespace UtilitiesCS.HelperClasses
         {
             if (_taskRequested.CheckAndSetFirstCall)
             {
-                if (task is null) { throw new NullReferenceException("Task is null"); }
+                if (task is null)
+                {
+                    throw new NullReferenceException("Task is null");
+                }
                 var task2 = ResetAfterTask(task);
                 _timer = new TimerWrapper(_frequency);
                 _timer.Elapsed += async (sender, e) => await task2();

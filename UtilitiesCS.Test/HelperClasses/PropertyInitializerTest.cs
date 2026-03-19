@@ -1,8 +1,8 @@
-﻿using Deedle.Internal;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using UtilitiesCS;
+﻿using System;
 using System.Collections.Generic;
+using Deedle.Internal;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UtilitiesCS;
 
 namespace UtilitiesCS.Test.HelperClasses
 {
@@ -20,6 +20,7 @@ namespace UtilitiesCS.Test.HelperClasses
             var test = Initializer.DependenciesNotNull(strict, variable1, variable2, variable3);
             Assert.IsTrue(test);
         }
+
         [TestMethod]
         public void DependenciesNotNull_ExpectedState_False_ParamsIsNull()
         {
@@ -48,14 +49,18 @@ namespace UtilitiesCS.Test.HelperClasses
         public void DependenciesNotNull_ExpectedState_Exception_ParamsIsNull()
         {
             bool strict = true;
-            Assert.ThrowsExactly<ArgumentNullException>(() => Initializer.DependenciesNotNull(strict, null));
+            Assert.ThrowsExactly<ArgumentNullException>(() =>
+                Initializer.DependenciesNotNull(strict, null)
+            );
         }
 
         [TestMethod]
         public void DependenciesNotNull_ExpectedState_Exception_ParamsIsEmpty()
         {
             bool strict = true;
-            Assert.ThrowsExactly<ArgumentNullException>(() => Initializer.DependenciesNotNull(strict));
+            Assert.ThrowsExactly<ArgumentNullException>(() =>
+                Initializer.DependenciesNotNull(strict)
+            );
         }
 
         [TestMethod]
@@ -66,7 +71,9 @@ namespace UtilitiesCS.Test.HelperClasses
             List<bool> variable2 = null;
             int variable3 = 1;
 
-            Assert.ThrowsExactly<ArgumentNullException>(() => Initializer.DependenciesNotNull(strict, variable1, variable2, variable3));
+            Assert.ThrowsExactly<ArgumentNullException>(() =>
+                Initializer.DependenciesNotNull(strict, variable1, variable2, variable3)
+            );
         }
     }
 }

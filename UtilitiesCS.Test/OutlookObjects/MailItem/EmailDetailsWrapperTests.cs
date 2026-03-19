@@ -44,7 +44,9 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             IRecipientInfo senderInfo = wrapper.GetSenderInfo(mailItem.Object);
             senderInfo.Name.Should().Be("Ada Lovelace");
             senderInfo.Address.Should().Be("ada@example.com");
-            senderInfo.Html.Should().Be("Ada Lovelace &lt;<a href=\"mailto:ada@example.com\">ada@example.com</a>&gt;");
+            senderInfo
+                .Html.Should()
+                .Be("Ada Lovelace &lt;<a href=\"mailto:ada@example.com\">ada@example.com</a>&gt;");
         }
 
         [TestMethod]
@@ -56,7 +58,9 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             mailItem.SetupGet(x => x.Recipients).Returns((Recipients)null);
 
             // Act
-            (string recipientsTo, string recipientsCC) result = wrapper.GetRecipients(mailItem.Object);
+            (string recipientsTo, string recipientsCC) result = wrapper.GetRecipients(
+                mailItem.Object
+            );
 
             // Assert
             result.recipientsTo.Should().BeEmpty();
@@ -68,17 +72,29 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
         {
             // Arrange
             var wrapper = new EmailDetailsWrapper();
-            var toRecipient = CreateRecipient("Grace Hopper", "grace@example.com", OlMailRecipientType.olTo);
-            var ccRecipient = CreateRecipient("Alan Turing", "alan@example.com", OlMailRecipientType.olCC);
+            var toRecipient = CreateRecipient(
+                "Grace Hopper",
+                "grace@example.com",
+                OlMailRecipientType.olTo
+            );
+            var ccRecipient = CreateRecipient(
+                "Alan Turing",
+                "alan@example.com",
+                OlMailRecipientType.olCC
+            );
             var recipients = CreateRecipientsCollection(toRecipient.Object, ccRecipient.Object);
             var mailItem = new Mock<OutlookMailItem>();
             mailItem.SetupGet(x => x.Recipients).Returns(recipients.Object);
 
             // Act
-            (string recipientsTo, string recipientsCC) recipientsText = wrapper.GetRecipients(mailItem.Object);
+            (string recipientsTo, string recipientsCC) recipientsText = wrapper.GetRecipients(
+                mailItem.Object
+            );
             OutlookRecipient[] toRecipients = wrapper.GetToRecipients(mailItem.Object).ToArray();
             OutlookRecipient[] ccRecipients = wrapper.GetCcRecipients(mailItem.Object).ToArray();
-            RecipientInfo[] infos = wrapper.GetInfo(new[] { toRecipient.Object, ccRecipient.Object }).ToArray();
+            RecipientInfo[] infos = wrapper
+                .GetInfo(new[] { toRecipient.Object, ccRecipient.Object })
+                .ToArray();
             RecipientInfo singleInfo = wrapper.GetInfo(toRecipient.Object);
 
             // Assert
@@ -101,8 +117,16 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             var userProperties = new Mock<UserProperties>();
             var attachments = new Mock<Attachments>();
             var parentFolder = new Mock<OutlookFolder>();
-            var toRecipient = CreateRecipient("Grace Hopper", "grace@example.com", OlMailRecipientType.olTo);
-            var ccRecipient = CreateRecipient("Alan Turing", "alan@example.com", OlMailRecipientType.olCC);
+            var toRecipient = CreateRecipient(
+                "Grace Hopper",
+                "grace@example.com",
+                OlMailRecipientType.olTo
+            );
+            var ccRecipient = CreateRecipient(
+                "Alan Turing",
+                "alan@example.com",
+                OlMailRecipientType.olCC
+            );
             var recipients = CreateRecipientsCollection(toRecipient.Object, ccRecipient.Object);
             var mailItem = new Mock<OutlookMailItem>();
 
@@ -126,10 +150,8 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             parentFolder.SetupGet(x => x.FolderPath).Returns("\\\\Inbox\\Projects");
 
             var dictRemap = new ScoDictionary<string, string>(
-                new Dictionary<string, string>
-                {
-                    ["Projects"] = "Archive Projects",
-                });
+                new Dictionary<string, string> { ["Projects"] = "Archive Projects" }
+            );
 
             // Act
             string[] result = wrapper.Details(mailItem.Object, "\\\\Inbox", dictRemap);
@@ -149,7 +171,11 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             result[13].Should().Be("Task");
         }
 
-        private static Mock<OutlookRecipient> CreateRecipient(string name, string address, OlMailRecipientType recipientType)
+        private static Mock<OutlookRecipient> CreateRecipient(
+            string name,
+            string address,
+            OlMailRecipientType recipientType
+        )
         {
             var recipient = new Mock<OutlookRecipient>();
             var addressEntry = new Mock<AddressEntry>();
@@ -158,16 +184,22 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             recipient.SetupGet(x => x.Address).Returns(address);
             recipient.SetupGet(x => x.Type).Returns((int)recipientType);
             recipient.SetupGet(x => x.AddressEntry).Returns(addressEntry.Object);
-            addressEntry.SetupGet(x => x.AddressEntryUserType).Returns(OlAddressEntryUserType.olOutlookContactAddressEntry);
+            addressEntry
+                .SetupGet(x => x.AddressEntryUserType)
+                .Returns(OlAddressEntryUserType.olOutlookContactAddressEntry);
 
             return recipient;
         }
 
-        private static Mock<Recipients> CreateRecipientsCollection(params OutlookRecipient[] recipients)
+        private static Mock<Recipients> CreateRecipientsCollection(
+            params OutlookRecipient[] recipients
+        )
         {
             var collection = new ArrayList(recipients);
             var recipientsCollection = new Mock<Recipients>();
-            recipientsCollection.Setup(x => x.GetEnumerator()).Returns(() => collection.GetEnumerator());
+            recipientsCollection
+                .Setup(x => x.GetEnumerator())
+                .Returns(() => collection.GetEnumerator());
             return recipientsCollection;
         }
     }

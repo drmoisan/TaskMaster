@@ -17,17 +17,24 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
             string html = RecipientStatic.ConvertRecipientToHtml("Ada Lovelace", "ada@example.com");
 
             // Assert
-            html.Should().Be("Ada Lovelace &lt;<a href=\"mailto:ada@example.com\">ada@example.com</a>&gt;");
+            html.Should()
+                .Be("Ada Lovelace &lt;<a href=\"mailto:ada@example.com\">ada@example.com</a>&gt;");
         }
 
         [DataTestMethod]
         [DataRow("ada@example.com", "ada", null, "example.com")]
         [DataRow("ada.lovelace@example.com", "ada", "lovelace", "example.com")]
         [DataRow("a.b.charles.babbage@example.com", "charles", "babbage", "example.com")]
-        public void ExtractNameFromAddress_ShouldReturnExpectedNameParts(string address, string expectedFirstName, string expectedLastName, string expectedDomain)
+        public void ExtractNameFromAddress_ShouldReturnExpectedNameParts(
+            string address,
+            string expectedFirstName,
+            string expectedLastName,
+            string expectedDomain
+        )
         {
             // Arrange / Act
-            (string firstName, string lastName, string domain) = RecipientStatic.ExtractNameFromAddress(address);
+            (string firstName, string lastName, string domain) =
+                RecipientStatic.ExtractNameFromAddress(address);
 
             // Assert
             firstName.Should().Be(expectedFirstName);
@@ -39,7 +46,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
         public void ExtractNameFromAddress_WithMalformedAddress_ReturnsNullParts()
         {
             // Arrange / Act
-            (string firstName, string lastName, string domain) = RecipientStatic.ExtractNameFromAddress("not-an-email");
+            (string firstName, string lastName, string domain) =
+                RecipientStatic.ExtractNameFromAddress("not-an-email");
 
             // Assert
             firstName.Should().BeNull();
@@ -103,7 +111,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
 
             sender.SetupGet(x => x.Name).Returns("Ada Lovelace");
             mail.SetupGet(x => x.Sender).Returns(sender.Object);
-            nameSpace.Setup(x => x.CreateRecipient("Ada Lovelace")).Returns(resolvedRecipient.Object);
+            nameSpace
+                .Setup(x => x.CreateRecipient("Ada Lovelace"))
+                .Returns(resolvedRecipient.Object);
             resolvedRecipient.Setup(x => x.Resolve()).Returns(true);
             resolvedRecipient.SetupGet(x => x.Name).Returns("Ada Lovelace");
             resolvedRecipient.SetupGet(x => x.Address).Returns("ada@example.com");
@@ -114,7 +124,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
             // Assert
             result.Name.Should().Be("Ada Lovelace");
             result.Address.Should().Be("ada@example.com");
-            result.Html.Should().Be("Ada Lovelace &lt;<a href=\"mailto:ada@example.com\">ada@example.com</a>&gt;");
+            result
+                .Html.Should()
+                .Be("Ada Lovelace &lt;<a href=\"mailto:ada@example.com\">ada@example.com</a>&gt;");
         }
 
         [TestMethod]
@@ -130,7 +142,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
             mail.SetupGet(x => x.Sender).Returns(sender.Object);
             mail.SetupGet(x => x.SenderName).Returns("Ada Lovelace");
             mail.SetupGet(x => x.SenderEmailAddress).Returns("ada@example.com");
-            nameSpace.Setup(x => x.CreateRecipient("Ada Lovelace")).Returns(unresolvedRecipient.Object);
+            nameSpace
+                .Setup(x => x.CreateRecipient("Ada Lovelace"))
+                .Returns(unresolvedRecipient.Object);
             unresolvedRecipient.Setup(x => x.Resolve()).Returns(false);
 
             // Act
@@ -139,7 +153,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
             // Assert
             result.Name.Should().Be("Ada Lovelace");
             result.Address.Should().Be("ada@example.com");
-            result.Html.Should().Be("Ada Lovelace &lt;<a href=\"mailto:ada@example.com\">ada@example.com</a>&gt;");
+            result
+                .Html.Should()
+                .Be("Ada Lovelace &lt;<a href=\"mailto:ada@example.com\">ada@example.com</a>&gt;");
         }
 
         [TestMethod]
@@ -152,7 +168,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
 
             recipient.SetupGet(x => x.Name).Returns("Ada Lovelace");
             recipient.Setup(x => x.Resolve()).Returns(true);
-            nameSpace.Setup(x => x.CreateRecipient("Ada Lovelace")).Returns(createdRecipient.Object);
+            nameSpace
+                .Setup(x => x.CreateRecipient("Ada Lovelace"))
+                .Returns(createdRecipient.Object);
             createdRecipient.Setup(x => x.Resolve()).Returns(false);
 
             // Act

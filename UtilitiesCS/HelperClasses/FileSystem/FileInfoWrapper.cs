@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using System.Security.AccessControl;
-using System.Runtime.Serialization;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Security.AccessControl;
 
 namespace UtilitiesCS.HelperClasses.FileSystem
 {
@@ -159,12 +159,24 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public IFileInfo Replace(string destinationFileName, string destinationBackupFileName)
         {
-            return new FileInfoWrapper(_fileInfo.Replace(destinationFileName, destinationBackupFileName));
+            return new FileInfoWrapper(
+                _fileInfo.Replace(destinationFileName, destinationBackupFileName)
+            );
         }
 
-        public IFileInfo Replace(string destinationFileName, string destinationBackupFileName, bool ignoreMetadataErrors)
+        public IFileInfo Replace(
+            string destinationFileName,
+            string destinationBackupFileName,
+            bool ignoreMetadataErrors
+        )
         {
-            return new FileInfoWrapper(_fileInfo.Replace(destinationFileName, destinationBackupFileName, ignoreMetadataErrors));
+            return new FileInfoWrapper(
+                _fileInfo.Replace(
+                    destinationFileName,
+                    destinationBackupFileName,
+                    ignoreMetadataErrors
+                )
+            );
         }
 
         public void SetAccessControl(FileSecurity fileSecurity)

@@ -17,8 +17,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Explorer
             System.Action act = () => UtilitiesCS.ExplorerActions.GetCurrentItem(null);
 
             // Act / Assert
-            act.Should().Throw<ArgumentNullException>()
-                .Which.ParamName.Should().Be("OlApp");
+            act.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("OlApp");
         }
 
         [TestMethod]

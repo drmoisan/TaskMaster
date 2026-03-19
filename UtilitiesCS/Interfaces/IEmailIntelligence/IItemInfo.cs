@@ -1,8 +1,8 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
+using Newtonsoft.Json;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.HelperClasses;
@@ -22,7 +22,7 @@ public interface IItemInfo : IEquatable<IItemInfo>
         StripReplyHeader = 16,
         StripReplyBody = 32,
         StripAllSilently = 62,
-        StripAll = 63
+        StripAll = 63,
     }
 
     string Actionable { get; set; }

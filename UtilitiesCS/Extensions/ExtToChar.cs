@@ -1,9 +1,8 @@
-﻿using Microsoft.VisualBasic;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
+using Microsoft.VisualBasic;
 
 namespace UtilitiesCS
 {
-
     public static class ExtToChar
     {
         //public static char ToChar(this Keys key)

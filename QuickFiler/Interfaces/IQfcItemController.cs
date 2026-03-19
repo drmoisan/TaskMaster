@@ -1,7 +1,4 @@
-﻿using Microsoft.Data.Analysis;
-using Microsoft.Office.Interop.Outlook;
-using QuickFiler.Helper_Classes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -9,6 +6,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Data.Analysis;
+using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Helper_Classes;
 using UtilitiesCS;
 
 namespace QuickFiler.Interfaces
@@ -16,13 +16,18 @@ namespace QuickFiler.Interfaces
     public interface IQfcItemController
     {
         void AssignFolderComboBox();
+
         /// <summary>
         /// Toggles special formatting for one group to highlight the group of controls that is active
-        /// </summary>        
+        /// </summary>
         Task InitializeAsync();
         Task InitializeSequentialAsync();
         void Initialize(bool async);
-        Task LoadConversationResolverAsync(CancellationTokenSource tokenSource, CancellationToken token, bool loadAll);
+        Task LoadConversationResolverAsync(
+            CancellationTokenSource tokenSource,
+            CancellationToken token,
+            bool loadAll
+        );
         void ToggleFocus(); // Turn on or off the formatting to highlight this QfcItem
         void ToggleFocus(Enums.ToggleState desiredState);
         Task ToggleFocusAsync();
@@ -53,7 +58,12 @@ namespace QuickFiler.Interfaces
         void ToggleConversationCheckbox(Enums.ToggleState desiredState);
         IQfcCollectionController Parent { get; }
         void PopulateConversation();
-        Task PopulateConversationAsync(CancellationTokenSource tokenSource, CancellationToken token, bool loadAll);
+        Task PopulateConversationAsync(
+            CancellationTokenSource tokenSource,
+            CancellationToken token,
+            bool loadAll
+        );
+
         //void PopulateConversation(DataFrame df);
         void PopulateConversation(int countOnly);
         void PopulateConversation(ConversationResolver resolver);
@@ -66,6 +76,7 @@ namespace QuickFiler.Interfaces
         void SetThemeLight(bool async);
         void Cleanup();
         Task MoveMailAsync();
+
         //string Subject { get; }
         //string To { get; }
         //string Sender { get; }

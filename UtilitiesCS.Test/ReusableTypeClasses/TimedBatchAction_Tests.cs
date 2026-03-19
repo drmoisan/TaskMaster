@@ -71,11 +71,14 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var count = 0;
             using var signal = new ManualResetEventSlim(false);
-            var action = new TimedBatchAction(TimeSpan.FromMilliseconds(20), () =>
-            {
-                Interlocked.Increment(ref count);
-                signal.Set();
-            });
+            var action = new TimedBatchAction(
+                TimeSpan.FromMilliseconds(20),
+                () =>
+                {
+                    Interlocked.Increment(ref count);
+                    signal.Set();
+                }
+            );
 
             // Act
             action.RequestAction();
@@ -94,18 +97,21 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             var count = 0;
             using var first = new ManualResetEventSlim(false);
             using var second = new ManualResetEventSlim(false);
-            var action = new TimedBatchAction(TimeSpan.FromMilliseconds(20), () =>
-            {
-                var current = Interlocked.Increment(ref count);
-                if (current == 1)
+            var action = new TimedBatchAction(
+                TimeSpan.FromMilliseconds(20),
+                () =>
                 {
-                    first.Set();
+                    var current = Interlocked.Increment(ref count);
+                    if (current == 1)
+                    {
+                        first.Set();
+                    }
+                    else
+                    {
+                        second.Set();
+                    }
                 }
-                else
-                {
-                    second.Set();
-                }
-            });
+            );
 
             // Act
             action.RequestAction();

@@ -26,7 +26,11 @@ namespace UtilitiesCS.Test.ThemeHelpers
         public void TryGetIsSystemDarkMode_ReturnsTrue_WhenRegistryReadable()
         {
             bool gotValue = SystemThemeDetector.TryGetIsSystemDarkMode(out bool isDarkMode);
-            gotValue.Should().BeTrue("the AppsUseLightTheme registry key is expected to exist on a standard Windows machine");
+            gotValue
+                .Should()
+                .BeTrue(
+                    "the AppsUseLightTheme registry key is expected to exist on a standard Windows machine"
+                );
             ((object)isDarkMode).Should().BeOfType<bool>();
         }
     }

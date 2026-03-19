@@ -1,8 +1,8 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS;
 
 namespace UtilitiesCS.Test.Extensions
@@ -17,14 +17,22 @@ namespace UtilitiesCS.Test.Extensions
             string[,] values =
             {
                 { "a", null },
-                { "c", "d" }
+                { "c", "d" },
             };
 
             // Act
             var actual = values.ToStringArray();
 
             // Assert
-            actual.Should().BeEquivalentTo(new string[,] { { "a", "" }, { "c", "d" } });
+            actual
+                .Should()
+                .BeEquivalentTo(
+                    new string[,]
+                    {
+                        { "a", "" },
+                        { "c", "d" },
+                    }
+                );
         }
 
         [TestMethod]
@@ -60,7 +68,7 @@ namespace UtilitiesCS.Test.Extensions
             int[,] values =
             {
                 { 1, 2, 3 },
-                { 4, 5, 6 }
+                { 4, 5, 6 },
             };
 
             // Act
@@ -79,14 +87,22 @@ namespace UtilitiesCS.Test.Extensions
             int[][] source =
             [
                 [1, 2],
-                [3, 4]
+                [3, 4],
             ];
 
             // Act
             var actual = source.To2D();
 
             // Assert
-            actual.Should().BeEquivalentTo(new int[,] { { 1, 2 }, { 3, 4 } });
+            actual
+                .Should()
+                .BeEquivalentTo(
+                    new int[,]
+                    {
+                        { 1, 2 },
+                        { 3, 4 },
+                    }
+                );
         }
 
         [TestMethod]
@@ -99,25 +115,36 @@ namespace UtilitiesCS.Test.Extensions
             Action action = () => source.To2D();
 
             // Assert
-            action.Should().Throw<ArgumentNullException>()
-                .Which.ParamName.Should().Be("source");
+            action.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("source");
         }
 
         [TestMethod]
         public void To2D_WhenRowsAreNullOrNonRectangular_ThrowsInvalidOperationException()
         {
             // Arrange
-            int[][] withNullRow = [[1], null];
-            int[][] nonRectangular = [[1, 2], [3]];
+            int[][] withNullRow =
+            [
+                [1],
+                null,
+            ];
+            int[][] nonRectangular =
+            [
+                [1, 2],
+                [3],
+            ];
 
             // Act
             Action nullRowAction = () => withNullRow.To2D();
             Action nonRectangularAction = () => nonRectangular.To2D();
 
             // Assert
-            nullRowAction.Should().Throw<InvalidOperationException>()
+            nullRowAction
+                .Should()
+                .Throw<InvalidOperationException>()
                 .WithMessage("*contains null rows*");
-            nonRectangularAction.Should().Throw<InvalidOperationException>()
+            nonRectangularAction
+                .Should()
+                .Throw<InvalidOperationException>()
                 .WithMessage("*not rectangular*");
         }
 
@@ -127,8 +154,16 @@ namespace UtilitiesCS.Test.Extensions
             // Arrange
             string[] full1D = ["a", "b"];
             string[] partial1D = ["a", null];
-            string[,] full2D = { { "a", "b" }, { "c", "d" } };
-            string[,] partial2D = { { "a", null }, { null, null } };
+            string[,] full2D =
+            {
+                { "a", "b" },
+                { "c", "d" },
+            };
+            string[,] partial2D =
+            {
+                { "a", null },
+                { null, null },
+            };
 
             // Act / Assert
             full1D.IsInitialized().Should().BeTrue();
@@ -150,10 +185,22 @@ namespace UtilitiesCS.Test.Extensions
 
             // Act
             var standard = source.SearchArry4Str("*ell*", ArrayExtensions.SearchOptions.Standard);
-            var complement = source.SearchArry4Str("*ell*", ArrayExtensions.SearchOptions.Complement);
-            var deleteFromMatches = source.SearchArry4Str("h*o", ArrayExtensions.SearchOptions.DeleteFromMatches);
-            var exactMatch = source.SearchArry4Str("hello", ArrayExtensions.SearchOptions.ExactMatch);
-            var exactComplement = source.SearchArry4Str("hello", ArrayExtensions.SearchOptions.ExactComplement);
+            var complement = source.SearchArry4Str(
+                "*ell*",
+                ArrayExtensions.SearchOptions.Complement
+            );
+            var deleteFromMatches = source.SearchArry4Str(
+                "h*o",
+                ArrayExtensions.SearchOptions.DeleteFromMatches
+            );
+            var exactMatch = source.SearchArry4Str(
+                "hello",
+                ArrayExtensions.SearchOptions.ExactMatch
+            );
+            var exactComplement = source.SearchArry4Str(
+                "hello",
+                ArrayExtensions.SearchOptions.ExactComplement
+            );
             var blankSearch = source.SearchArry4Str();
 
             // Assert
@@ -172,10 +219,7 @@ namespace UtilitiesCS.Test.Extensions
             object node = new object[]
             {
                 new[] { "alpha", "beta" },
-                new object[]
-                {
-                    new[] { "gamma" }
-                }
+                new object[] { new[] { "gamma" } },
             };
 
             // Act
@@ -189,18 +233,13 @@ namespace UtilitiesCS.Test.Extensions
         public void FlattenArrayTree_WhenStrictAndEncounteringInvalidNode_ThrowsArgumentException()
         {
             // Arrange
-            object node = new object[]
-            {
-                new[] { "alpha" },
-                42
-            };
+            object node = new object[] { new[] { "alpha" }, 42 };
 
             // Act
             Action action = () => node.FlattenArrayTree<string>();
 
             // Assert
-            action.Should().Throw<ArgumentException>()
-                .WithMessage("*FlattenArrayTree*");
+            action.Should().Throw<ArgumentException>().WithMessage("*FlattenArrayTree*");
         }
 
         [TestMethod]
@@ -252,16 +291,8 @@ namespace UtilitiesCS.Test.Extensions
         public void FlattenStringTree_FlattensNestedStringArraysAndCanReturnErrorForInvalidNodes()
         {
             // Arrange
-            object[] valid =
-            {
-                "alpha",
-                new object[] { "beta", "gamma" }
-            };
-            object[] invalid =
-            {
-                "alpha",
-                5
-            };
+            object[] valid = { "alpha", new object[] { "beta", "gamma" } };
+            object[] invalid = { "alpha", 5 };
 
             // Act
 #pragma warning disable CS0618 // FlattenStringTree is intentionally covered because it is still public on ArrayExtensions.

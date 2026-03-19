@@ -12,7 +12,7 @@ using System.Windows.Threading;
 
 namespace UtilitiesCS
 {
-    public partial class ProgressViewer : Form//, IProgressViewer
+    public partial class ProgressViewer : Form //, IProgressViewer
     {
         public ProgressViewer()
         {
@@ -24,19 +24,38 @@ namespace UtilitiesCS
         }
 
         private System.Windows.Threading.Dispatcher _dispatcher;
-        public System.Windows.Threading.Dispatcher UiDispatcher { get => _dispatcher; set => _dispatcher = value; }
+        public System.Windows.Threading.Dispatcher UiDispatcher
+        {
+            get => _dispatcher;
+            set => _dispatcher = value;
+        }
 
         private SynchronizationContext _context;
-        public SynchronizationContext UiSyncContext { get => _context; }
+        public SynchronizationContext UiSyncContext
+        {
+            get => _context;
+        }
 
         private TaskScheduler _uiScheduler;
-        public TaskScheduler UiScheduler { get => _uiScheduler; }
+        public TaskScheduler UiScheduler
+        {
+            get => _uiScheduler;
+        }
 
         private int _uiThreadNumber;
-        public int UiThreadNumber { get => _uiThreadNumber; set => _uiThreadNumber = value; }
+        public int UiThreadNumber
+        {
+            get => _uiThreadNumber;
+            set => _uiThreadNumber = value;
+        }
 
         private CancellationTokenSource _cancelSource;
-        public CancellationTokenSource CancelSource { get => _cancelSource; set => _cancelSource = value; }
+        public CancellationTokenSource CancelSource
+        {
+            get => _cancelSource;
+            set => _cancelSource = value;
+        }
+
         public void SetCancellationTokenSource(CancellationTokenSource tokenSource)
         {
             _cancelSource = tokenSource;

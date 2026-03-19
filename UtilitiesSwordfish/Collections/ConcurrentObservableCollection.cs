@@ -1,28 +1,26 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
 // Last Revised: September 2012
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Threading;
 using System.ComponentModel;
-using System.Collections;
-using Swordfish.NET.General.Collections;
 using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using Swordfish.NET.General.Collections;
 
 namespace Swordfish.NET.Collections
 {
-
-
     /// <summary>
     /// This class provides a collection that can be bound to
     /// a WPF control, where the collection can be modified from a thread
@@ -30,14 +28,13 @@ namespace Swordfish.NET.Collections
     /// dispatcher from the event listener(s).
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ConcurrentObservableCollection<T> :
-        ConcurrentObservableBase<T>,
-        IList<T>,
-        ICollection<T>,
-        IList,
-        ICollection
+    public class ConcurrentObservableCollection<T>
+        : ConcurrentObservableBase<T>,
+            IList<T>,
+            ICollection<T>,
+            IList,
+            ICollection
     {
-
         // ************************************************************************
         // Constructors
         // ************************************************************************
@@ -52,7 +49,8 @@ namespace Swordfish.NET.Collections
         /// Constructor that takes an enumerable from which the collection is populated
         /// </summary>
         /// <param name="enumerable"></param>
-        public ConcurrentObservableCollection(IEnumerable<T> enumerable) : base(enumerable) { }
+        public ConcurrentObservableCollection(IEnumerable<T> enumerable)
+            : base(enumerable) { }
 
         #endregion Constructors
 
@@ -98,20 +96,22 @@ namespace Swordfish.NET.Collections
         // ************************************************************************
         #region ICollection<T> Implementation
 
-        public void Add(T item) => DoBaseWrite(() =>
-        {
-            if (WriteCollection is null)
+        public void Add(T item) =>
+            DoBaseWrite(() =>
             {
-                Console.WriteLine("Error");
-            }
-            WriteCollection?.Add(item);
-        });
+                if (WriteCollection is null)
+                {
+                    Console.WriteLine("Error");
+                }
+                WriteCollection?.Add(item);
+            });
 
         public void Clear() => DoBaseClear(() => { });
 
         public bool Contains(T item) => DoBaseRead(() => ReadCollection.Contains(item));
 
-        public void CopyTo(T[] array, int arrayIndex) => DoBaseRead(() => ReadCollection.CopyTo(array, arrayIndex));
+        public void CopyTo(T[] array, int arrayIndex) =>
+            DoBaseRead(() => ReadCollection.CopyTo(array, arrayIndex));
 
         public int Count => DoBaseRead(() => ReadCollection?.Count ?? 0);
 
@@ -275,9 +275,11 @@ namespace Swordfish.NET.Collections
             if ((uint)startIndex > (uint)this.Count)
             {
                 throw new ArgumentOutOfRangeException(
-                    nameof(startIndex), $"{nameof(startIndex)} " +
-                    $"has a value of {startIndex} which is greater " +
-                    $"than the list length of {this.Count}");
+                    nameof(startIndex),
+                    $"{nameof(startIndex)} "
+                        + $"has a value of {startIndex} which is greater "
+                        + $"than the list length of {this.Count}"
+                );
             }
 
             if (count < 0 || startIndex > this.Count - count)
@@ -319,9 +321,11 @@ namespace Swordfish.NET.Collections
             if ((uint)startIndex > (uint)this.Count)
             {
                 throw new ArgumentOutOfRangeException(
-                    nameof(startIndex), $"{nameof(startIndex)} has " +
-                    $"a value of {startIndex} which is greater than " +
-                    $"the list length of {this.Count}");
+                    nameof(startIndex),
+                    $"{nameof(startIndex)} has "
+                        + $"a value of {startIndex} which is greater than "
+                        + $"the list length of {this.Count}"
+                );
             }
 
             if (count < 0 || startIndex > this.Count - count)

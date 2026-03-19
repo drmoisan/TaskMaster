@@ -1,5 +1,4 @@
-﻿using BrightIdeasSoftware;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -9,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BrightIdeasSoftware;
 
 namespace UtilitiesCS.EmailIntelligence.FolderRemap
 {
@@ -18,14 +18,15 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         {
             InitializeComponent();
         }
+
         private FolderRemapController _controller;
+
         public void SetController(FolderRemapController controller)
         {
             _controller = controller;
             //SetupDragAndDrop();
             SetupTree();
             SetupRenderer(this.TlvOriginal.TreeColumnRenderer);
-
         }
 
         private void SetupRenderer(TreeListView.TreeRenderer renderer)
@@ -73,6 +74,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         }
 
         private void BtnDiscard_Click(object sender, EventArgs e) => _controller?.Discard();
+
         private void BtnSave_Click(object sender, EventArgs e) => _controller?.Save();
 
         private void TlvOriginal_ModelDropped(object sender, ModelDropEventArgs e)

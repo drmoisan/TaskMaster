@@ -3,7 +3,7 @@
 namespace UtilitiesCS
 {
     /// <summary>
-    /// Simple encoder that converts between word tokens and integers. 
+    /// Simple encoder that converts between word tokens and integers.
     /// Integer values assigned on a FIFO basis
     /// </summary>
     public interface ISubjectMapEncoder
@@ -14,15 +14,15 @@ namespace UtilitiesCS
         IScoDictionary<string, int> Encoder { get; }
 
         /// <summary>
-        /// Matches array of tokens against existing values. Integers are 
+        /// Matches array of tokens against existing values. Integers are
         /// assigned to each new token on a FIFO basis in increments of 1
         /// </summary>
         /// <param name="tokens">String array of tokens</param>
         void AugmentTokenDict(string[] tokens);
 
         /// <summary>
-        /// Tokenizes a string of text and matches resulting array of tokens 
-        /// with existing dictionary values. Integers are assigned to each new 
+        /// Tokenizes a string of text and matches resulting array of tokens
+        /// with existing dictionary values. Integers are assigned to each new
         /// token on a FIFO basis in increments of 1
         /// </summary>
         /// <param name="text">string of text to be tokenized and encoded</param>
@@ -50,14 +50,14 @@ namespace UtilitiesCS
         int[] Encode(string[] words);
 
         /// <summary>
-        /// Rebuilds encoding dictionary based and re-encodes elements within 
+        /// Rebuilds encoding dictionary based and re-encodes elements within
         /// the map passed as a variable
         /// </summary>
         /// <param name="map">Serializable list of <see cref="ISubjectMapEntry"/></param>
         void RebuildEncoding(SubjectMapSco map);
 
         /// <summary>
-        /// Rebuilds encoding dictionary based and re-encodes elements within 
+        /// Rebuilds encoding dictionary based and re-encodes elements within
         /// the map stored in the class
         /// </summary>
         void RebuildEncoding();

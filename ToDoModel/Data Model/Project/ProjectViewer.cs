@@ -13,7 +13,8 @@ namespace ToDoModel
     public partial class ProjectViewer
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public ProjectViewer()
         {
@@ -24,12 +25,22 @@ namespace ToDoModel
         private bool _isEditing = false;
 
         private ProjectController _controller;
-        public ProjectController Controller { get => _controller; set => _controller = value; }
+        public ProjectController Controller
+        {
+            get => _controller;
+            set => _controller = value;
+        }
 
-        public ScDictionary<string, string> ProgramData { get => Controller?.ProgramData; }
+        public ScDictionary<string, string> ProgramData
+        {
+            get => Controller?.ProgramData;
+        }
 
         protected readonly ControlResizer _resizer = new ControlResizer();
-        internal ControlResizer Resizer { get => _resizer; }
+        internal ControlResizer Resizer
+        {
+            get => _resizer;
+        }
 
         private void ButtonOk_Click(object sender, EventArgs e) => Controller.SaveAndClose();
 
@@ -83,7 +94,9 @@ namespace ToDoModel
                 {
                     var id = cb.SelectedItem as string;
 
-                    var kvp = id.IsNullOrEmpty() ? default : ProgramData.FirstOrDefault(x => x.Value == id);
+                    var kvp = id.IsNullOrEmpty()
+                        ? default
+                        : ProgramData.FirstOrDefault(x => x.Value == id);
                     if (!kvp.Key.IsNullOrEmpty() && !kvp.Value.IsNullOrEmpty())
                     {
                         projectEntry.ProgramID = kvp.Value;
@@ -114,7 +127,6 @@ namespace ToDoModel
                 e.Control = cb;
             }
 
-
             // Create the ComboBox to get the selection
             //ComboBox cb = new ComboBox();
             //cb.Bounds = e.CellBounds;
@@ -125,13 +137,15 @@ namespace ToDoModel
             //var currentValue = e.Value as string;
             //var index = Math.Max(cb.Items.IndexOf(currentValue), 0);
             //cb.SelectedIndex = index;
-
         }
 
         private void OlvProjInfo_CellEditFinishing(object sender, CellEditEventArgs e)
         {
             _isEditing = false;
-            if ((e.Column == this.OlvProgramID || e.Column == this.OlvProgramName) && !ProgramData.IsNullOrEmpty())
+            if (
+                (e.Column == this.OlvProgramID || e.Column == this.OlvProgramName)
+                && !ProgramData.IsNullOrEmpty()
+            )
             {
                 // Any updating will have been down in the SelectedIndexChanged event handler
                 // Here we simply make the list redraw the involved ListViewItem
@@ -158,21 +172,20 @@ namespace ToDoModel
 
                 try
                 {
-                    var clipboardText = string
-                        .Join("\n", selectedItems?
-                        .CastNullSafe<IProjectEntry>()
-                        .Where(x => x is not null)
-                        .Select(x => x.ToCSV()));
+                    var clipboardText = string.Join(
+                        "\n",
+                        selectedItems
+                            ?.CastNullSafe<IProjectEntry>()
+                            .Where(x => x is not null)
+                            .Select(x => x.ToCSV())
+                    );
                     Clipboard.SetDataObject(selectedItems, true);
                 }
                 catch (Exception e)
                 {
                     logger.Error($"Copy to clipboard failed. {e.Message}", e);
                 }
-
             }
         }
-
-
     }
 }

@@ -1,8 +1,8 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS;
 
 namespace UtilitiesCS.Test.Extensions
@@ -57,7 +57,10 @@ namespace UtilitiesCS.Test.Extensions
             IList<int> numbers = new List<int> { 2, 4, 6 };
 
             // Act / Assert
-            IListExtensions.Contains(strings, "ALPHA", StringComparison.OrdinalIgnoreCase).Should().BeTrue();
+            IListExtensions
+                .Contains(strings, "ALPHA", StringComparison.OrdinalIgnoreCase)
+                .Should()
+                .BeTrue();
             IListExtensions.Contains(strings, "delta", StringComparison.Ordinal).Should().BeFalse();
             numbers.Exists(value => value > 5).Should().BeTrue();
             numbers.Exists(value => value < 0).Should().BeFalse();
@@ -91,7 +94,9 @@ namespace UtilitiesCS.Test.Extensions
             difference.DifferenceCount.Should().Be(2);
             difference.OnlyThis.Should().Equal(1);
             difference.OnlyOther.Should().Equal(4);
-            bothNullAction.Should().Throw<ArgumentException>()
+            bothNullAction
+                .Should()
+                .Throw<ArgumentException>()
                 .WithMessage("*both lists were null*");
         }
 
@@ -113,12 +118,21 @@ namespace UtilitiesCS.Test.Extensions
             allMatches.Should().Equal(1, 3);
             startMatches.Should().Equal(1, 3, 4);
             rangeMatches.Should().Equal(1, 3);
-            invalidStartAction.Should().Throw<ArgumentOutOfRangeException>()
-                .Which.ParamName.Should().Be("startIndex");
-            invalidCountAction.Should().Throw<ArgumentOutOfRangeException>()
-                .Which.ParamName.Should().Be("count");
-            nullMatchAction.Should().Throw<ArgumentNullException>()
-                .Which.ParamName.Should().Be("match");
+            invalidStartAction
+                .Should()
+                .Throw<ArgumentOutOfRangeException>()
+                .Which.ParamName.Should()
+                .Be("startIndex");
+            invalidCountAction
+                .Should()
+                .Throw<ArgumentOutOfRangeException>()
+                .Which.ParamName.Should()
+                .Be("count");
+            nullMatchAction
+                .Should()
+                .Throw<ArgumentNullException>()
+                .Which.ParamName.Should()
+                .Be("match");
         }
 
         [TestMethod]
@@ -135,7 +149,10 @@ namespace UtilitiesCS.Test.Extensions
             numbers.FindIndex(value => value % 2 == 0).Should().Be(3);
             numbers.FindIndex(2, value => value % 2 == 0).Should().Be(3);
             numbers.FindIndex(1, 2, value => value % 2 == 0).Should().Be(-1);
-            IListExtensions.FindIndex(strings, "BETA", StringComparison.OrdinalIgnoreCase).Should().Be(1);
+            IListExtensions
+                .FindIndex(strings, "BETA", StringComparison.OrdinalIgnoreCase)
+                .Should()
+                .Be(1);
             invalidStartAction.Should().Throw<ArgumentOutOfRangeException>();
             invalidCountAction.Should().Throw<ArgumentOutOfRangeException>();
             nullMatchAction.Should().Throw<ArgumentNullException>();
@@ -151,11 +168,22 @@ namespace UtilitiesCS.Test.Extensions
 
             // Act
             var maxNumber = numbers.FindMax((left, right) => left >= right ? left : right);
-            var maxStringLength = strings.FindMax((left, right) => left.Length >= right.Length ? left : right);
-            var success = numbers.TryFindMax((left, right) => left >= right ? left : right, out var tryMax);
-            var nullListResult = ((IList<int>)null).TryFindMax((left, right) => left, out var nullListMax);
+            var maxStringLength = strings.FindMax(
+                (left, right) => left.Length >= right.Length ? left : right
+            );
+            var success = numbers.TryFindMax(
+                (left, right) => left >= right ? left : right,
+                out var tryMax
+            );
+            var nullListResult = ((IList<int>)null).TryFindMax(
+                (left, right) => left,
+                out var nullListMax
+            );
             var nullSelectorResult = numbers.TryFindMax<int>(null, out var nullSelectorMax);
-            var throwingSelectorResult = numbers.TryFindMax((left, right) => throw new InvalidOperationException("boom"), out var throwingMax);
+            var throwingSelectorResult = numbers.TryFindMax(
+                (left, right) => throw new InvalidOperationException("boom"),
+                out var throwingMax
+            );
             Action emptyAction = () => empty.FindMax((left, right) => left >= right ? left : right);
 
             // Assert

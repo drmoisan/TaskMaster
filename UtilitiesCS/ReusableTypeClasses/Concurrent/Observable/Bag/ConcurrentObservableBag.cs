@@ -54,7 +54,6 @@
 //        public ConcurrentObservableBag(IEnumerable<T> collection)
 //            : base(collection) { }
 
-
 //        #endregion
 
 //        public new void Clear()

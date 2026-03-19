@@ -13,7 +13,9 @@ namespace UtilitiesCS.HelperClasses
         {
             List<(string, object, object)> differences = new List<(string, object, object)>();
 
-            var properties = DispatchUtility.GetType(obj1, true).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var properties = DispatchUtility
+                .GetType(obj1, true)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance);
             //var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (var property in properties)
             {

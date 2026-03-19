@@ -18,14 +18,17 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var received = new List<int>();
             using var signal = new ManualResetEventSlim(false);
-            var queue = new TimedQueueOfActions<int>(TimeSpan.FromMilliseconds(20), items =>
-            {
-                lock (received)
+            var queue = new TimedQueueOfActions<int>(
+                TimeSpan.FromMilliseconds(20),
+                items =>
                 {
-                    received.AddRange(items);
+                    lock (received)
+                    {
+                        received.AddRange(items);
+                    }
+                    signal.Set();
                 }
-                signal.Set();
-            });
+            );
 
             // Act
             queue.Enqueue(1);
@@ -74,17 +77,20 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             var values = Enumerable.Range(1, 25).ToArray();
             var received = new List<int>();
             using var signal = new ManualResetEventSlim(false);
-            var queue = new TimedQueueOfActions<int>(TimeSpan.FromMilliseconds(20), items =>
-            {
-                lock (received)
+            var queue = new TimedQueueOfActions<int>(
+                TimeSpan.FromMilliseconds(20),
+                items =>
                 {
-                    received.AddRange(items);
-                    if (received.Count >= values.Length)
+                    lock (received)
                     {
-                        signal.Set();
+                        received.AddRange(items);
+                        if (received.Count >= values.Length)
+                        {
+                            signal.Set();
+                        }
                     }
                 }
-            });
+            );
 
             // Act
             await Task.WhenAll(values.Select(value => Task.Run(() => queue.Enqueue(value))));

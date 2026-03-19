@@ -7,7 +7,6 @@ using System.Windows.Forms;
 using QuickFiler.Interfaces;
 using UtilitiesCS.Interfaces.IWinForm;
 
-
 namespace UtilitiesCS.Extensions
 {
     public static class IControlExtensions

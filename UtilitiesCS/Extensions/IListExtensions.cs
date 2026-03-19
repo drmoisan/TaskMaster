@@ -1,9 +1,9 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS
@@ -61,7 +61,11 @@ namespace UtilitiesCS
             return true;
         }
 
-        public static bool Contains(this IList<string> list, string value, StringComparison comparison)
+        public static bool Contains(
+            this IList<string> list,
+            string value,
+            StringComparison comparison
+        )
         {
             return list.FindIndex(value, comparison) != -1;
         }
@@ -84,14 +88,28 @@ namespace UtilitiesCS
             }
         }
 
-        public static (int DifferenceCount, IList<T> OnlyThis, IList<T> OnlyOther) CompareTo<T>(this IList<T> list, IList<T> other)
+        public static (int DifferenceCount, IList<T> OnlyThis, IList<T> OnlyOther) CompareTo<T>(
+            this IList<T> list,
+            IList<T> other
+        )
         {
             if (list is null)
             {
-                if (other is null) { throw new ArgumentException($"Cannot compare differences because both lists were null"); }
-                else { return (other.Count, [], [.. other]); }
+                if (other is null)
+                {
+                    throw new ArgumentException(
+                        $"Cannot compare differences because both lists were null"
+                    );
+                }
+                else
+                {
+                    return (other.Count, [], [.. other]);
+                }
             }
-            else if (other is null) { return (list.Count, [.. list], []); }
+            else if (other is null)
+            {
+                return (list.Count, [.. list], []);
+            }
             else
             {
                 var onlyThis = list.Except(other).ToList();
@@ -111,11 +129,19 @@ namespace UtilitiesCS
             return list.FindIndices(startIndex, list.Count, match);
         }
 
-        public static int[] FindIndices<T>(this IList<T> list, int startIndex, int count, Predicate<T> match)
+        public static int[] FindIndices<T>(
+            this IList<T> list,
+            int startIndex,
+            int count,
+            Predicate<T> match
+        )
         {
             if ((uint)startIndex > (uint)list.Count)
             {
-                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(startIndex)} has a value of {startIndex} which is greater than the list length of {list.Count}");
+                throw new ArgumentOutOfRangeException(
+                    nameof(startIndex),
+                    $"{nameof(startIndex)} has a value of {startIndex} which is greater than the list length of {list.Count}"
+                );
             }
 
             if (count < 0 || startIndex > list.Count - count)
@@ -152,11 +178,19 @@ namespace UtilitiesCS
             return list.FindIndex(startIndex, list.Count - startIndex, match);
         }
 
-        public static int FindIndex<T>(this IList<T> list, int startIndex, int count, Predicate<T> match)
+        public static int FindIndex<T>(
+            this IList<T> list,
+            int startIndex,
+            int count,
+            Predicate<T> match
+        )
         {
             if ((uint)startIndex > (uint)list.Count)
             {
-                throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(startIndex)} has a value of {startIndex} which is greater than the list length of {list.Count}");
+                throw new ArgumentOutOfRangeException(
+                    nameof(startIndex),
+                    $"{nameof(startIndex)} has a value of {startIndex} which is greater than the list length of {list.Count}"
+                );
             }
 
             if (count < 0 || startIndex > list.Count - count)
@@ -181,7 +215,11 @@ namespace UtilitiesCS
             return -1;
         }
 
-        public static int FindIndex(this IList<string> list, string value, StringComparison comparison)
+        public static int FindIndex(
+            this IList<string> list,
+            string value,
+            StringComparison comparison
+        )
         {
             return list.FindIndex(x => string.Equals(x, value, comparison));
         }
@@ -213,9 +251,13 @@ namespace UtilitiesCS
             return true;
         }
 
-        public static bool IsNullOrEmpty(this IList<string> list) => list is null || list.Count == 0;
+        public static bool IsNullOrEmpty(this IList<string> list) =>
+            list is null || list.Count == 0;
 
-        public static (IList<T> Unique, IList<T> Duplicates) Split<T>(this IList<T> list, IEqualityComparer<T> comparer)
+        public static (IList<T> Unique, IList<T> Duplicates) Split<T>(
+            this IList<T> list,
+            IEqualityComparer<T> comparer
+        )
         {
             if (list == null)
                 return (new List<T>(), new List<T>());

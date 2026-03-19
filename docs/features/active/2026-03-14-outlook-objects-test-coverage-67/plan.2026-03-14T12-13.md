@@ -1,21 +1,24 @@
 # 2026-03-14-outlook-objects-test-coverage-67 — Executor-Ready Atomic Plan
 
-- **Status:** Planned
+- **Status:** Planned (Phases 0–5 completed; Phases 6–7 are the active narrowed slice)
 - **Issue:** #67
 - **Owner:** Dan Moisan
-- **Target Plan File:** `C:\Users\DanMoisan\repos\TaskMaster-2026-03-14T11-01\docs\features\active\2026-03-14-outlook-objects-test-coverage-67\plan.2026-03-14T12-13.md`
+- **Target Plan File:** `docs/features/active/2026-03-14-outlook-objects-test-coverage-67/plan.2026-03-14T12-13.md`
 
 ## Overview
 
-Complete the remaining `UtilitiesCS\OutlookObjects` coverage work by finishing the currently uncovered hotspot files, adding only narrow testability seams inside the named hotspot production files, and proving compliance with the full C# QA loop plus per-file coverage evidence. The plan is scoped to the active feature folder inputs and is fail-closed to `full-feature` mode because `issue.md` does not contain a valid `- Work Mode:` marker.
+**Active narrow scope (Phases 6–7):** Replace stub test bodies and add real scenario coverage in exactly four existing MSTest files under `UtilitiesCS.Test\OutlookObjects\Folder`:
+`FolderWrapperStateTests.cs`, `FolderWrapperTraversalTests.cs`, `FolderPredictorTests.cs`, and `FolderTreeTests.cs`. No production or source files are modified in this slice. All Outlook COM dependencies are isolated with Moq. The final QA loop uses the exact policy toolchain: `csharpier .` → analyzer build → nullable build → `vstest.console.exe` for `UtilitiesCS.Test` assembly.
+
+**Historical context (Phases 0–5):** Phases 0–5 completed the broad `UtilitiesCS\OutlookObjects` coverage baseline, MailItem/Fields/Conversation/Table/Store work, stub creation for the four Folder files, and a full QA run against those stubs. Those phases are preserved below as historical record; they are fully marked `[x]` and are not re-executed.
 
 ## Resolved Inputs
 
 - **Name:** `2026-03-14-outlook-objects-test-coverage-67`
-- **File:** `C:\Users\DanMoisan\repos\TaskMaster-2026-03-14T11-01\docs\features\active\2026-03-14-outlook-objects-test-coverage-67\plan.2026-03-14T12-13.md`
-- **Spec:** `C:\Users\DanMoisan\repos\TaskMaster-2026-03-14T11-01\docs\features\active\2026-03-14-outlook-objects-test-coverage-67\spec.md`
-- **User Story:** `C:\Users\DanMoisan\repos\TaskMaster-2026-03-14T11-01\docs\features\active\2026-03-14-outlook-objects-test-coverage-67\user-story.md`
-- **Research:** `C:\Users\DanMoisan\repos\TaskMaster-2026-03-14T11-01\docs\features\active\2026-03-14-outlook-objects-test-coverage-67\research.md`
+- **File:** `docs/features/active/2026-03-14-outlook-objects-test-coverage-67/plan.2026-03-14T12-13.md`
+- **Spec:** `docs/features/active/2026-03-14-outlook-objects-test-coverage-67/spec.md`
+- **User Story:** `docs/features/active/2026-03-14-outlook-objects-test-coverage-67/user-story.md`
+- **Research:** `docs/features/active/2026-03-14-outlook-objects-test-coverage-67/research.md`
 - **Work Mode:** `full-feature`
 - **Fallback Reason:** `issue.md does not contain a valid '- Work Mode:' marker, so mode resolution fails closed to 'full-feature'.`
 
@@ -492,3 +495,164 @@ Run the full C# QA loop in strict order. If any task in this phase fails or chan
     - No post-`P5-T3` step in that final set reports file modifications.
     - The final delta artifact reports `Coverage Policy Result: pass` and `Repository Coverage Regression: none`.
     - No `coverage-target` file remains below `80%` in the final per-file coverage artifact.
+
+---
+
+## Narrow Slice — Folder Test File Real-Scenario Completion
+
+> **Scope constraint (hard):** Tasks in Phases 6–7 modify ONLY the four existing test files listed below. No production or source files are touched. All Outlook COM interactions are isolated with Moq.
+>
+> **Affected test files:**
+> - `UtilitiesCS.Test\OutlookObjects\Folder\FolderWrapperStateTests.cs`
+> - `UtilitiesCS.Test\OutlookObjects\Folder\FolderWrapperTraversalTests.cs`
+> - `UtilitiesCS.Test\OutlookObjects\Folder\FolderPredictorTests.cs`
+> - `UtilitiesCS.Test\OutlookObjects\Folder\FolderTreeTests.cs`
+>
+> **Strategy notes:**
+> - `FolderWrapper` exposes `internal virtual LoadName()`, `internal virtual LoadRelativePath()`, and `internal virtual ReleaseComObjectSafe(object)` — all accessible via `InternalsVisibleTo("UtilitiesCS.Test")` already declared in `UtilitiesCS\Properties\AssemblyInfo.cs`.
+> - The JSON constructor `FolderWrapper(bool, int, long, string, string)` creates a fully usable instance without any COM objects; it is used for state and traversal tests where OlFolder/OlRoot are not required.
+> - `FolderWrapper.OlFolder` and `FolderWrapper.OlRoot` both have public setters — Mock`<MAPIFolder>` instances are assigned directly to these properties in tests that exercise `LoadRelativePath()` path branches.
+> - `FolderTree._roots` is a private field; tests that exercise `Flatten()` and `FilterSelected()` inject a pre-built `List<TreeNode<FolderWrapper>>` via reflection (`BindingFlags.NonPublic | BindingFlags.Instance`).
+> - `FolderPredictor.NormalizePredictionPath(string)` is already tested with two real passing assertions in the file; Phase 6 adds one additional edge-case.
+
+### Phase 6 — Folder Test File Real-Scenario Completion
+
+#### FolderWrapperStateTests.cs
+
+- [x] [P6-T1] Rename method `Lazy_name_and_relative_path_load_once` to `JsonCtor_sets_name_and_relative_path_to_provided_values` and replace its stub body with a real assertion in `FolderWrapperStateTests.cs`
+  - Acceptance:
+    - `FolderWrapperStateTests.cs` contains method `JsonCtor_sets_name_and_relative_path_to_provided_values`.
+    - `FolderWrapperStateTests.cs` does not contain `true.Should().BeTrue()` in any method body.
+    - Test body: `new FolderWrapper(false, 3, 2048L, "Inbox", @"Archives\Inbox")` — `.Name.Should().Be("Inbox")` and `.RelativePath.Should().Be(@"Archives\Inbox")`.
+    - `vstest.console.exe` reports `UtilitiesCS.Test.OutlookObjects.Folder.FolderWrapperStateTests.JsonCtor_sets_name_and_relative_path_to_provided_values` as Passed.
+
+- [x] [P6-T2] Add test method `JsonCtor_sets_selected_item_count_and_folder_size` to `FolderWrapperStateTests.cs`
+  - Acceptance:
+    - `FolderWrapperStateTests.cs` contains `JsonCtor_sets_selected_item_count_and_folder_size`.
+    - Test body: `var fw = new FolderWrapper(true, 7, 4096L, "Drafts", "Drafts")` — `fw.Selected.Should().BeTrue()`, `fw.ItemCount.Should().Be(7)`, `fw.FolderSize.Should().Be(4096L)`.
+    - `vstest.console.exe` reports the test as Passed.
+
+- [x] [P6-T3] Add test method `LoadName_returns_value_provided_by_virtual_override` to `FolderWrapperStateTests.cs`, defining the private inner class `FolderWrapperForTest` in the same file
+  - Acceptance:
+    - `FolderWrapperStateTests.cs` contains `LoadName_returns_value_provided_by_virtual_override`.
+    - `FolderWrapperStateTests.cs` contains `private class FolderWrapperForTest : FolderWrapper`.
+    - `FolderWrapperForTest` calls `base()` (the protected `FolderWrapper()` constructor), stores a constructor-supplied string, and overrides `internal override string LoadName()` to return that string.
+    - Test body: `var fw = new FolderWrapperForTest("MyFolder"); fw.ResetLazy(); fw.Name.Should().Be("MyFolder");`.
+    - `vstest.console.exe` reports the test as Passed.
+
+- [x] [P6-T4] Add test method `LoadRelativePath_returns_null_when_ol_root_and_ol_folder_are_null` to `FolderWrapperStateTests.cs`
+  - Acceptance:
+    - `FolderWrapperStateTests.cs` contains `LoadRelativePath_returns_null_when_ol_root_and_ol_folder_are_null`.
+    - Test body: `var fw = new FolderWrapper(false, 0, 0, "x", "x"); fw.LoadRelativePath().Should().BeNull();`.
+    - `vstest.console.exe` reports the test as Passed.
+
+- [ ] [P6-T5] Add test method `LoadRelativePath_returns_folder_path_when_path_equals_root_path` to `FolderWrapperStateTests.cs`
+  - Acceptance:
+    - `FolderWrapperStateTests.cs` contains `LoadRelativePath_returns_folder_path_when_path_equals_root_path`.
+    - Test body: two `Mock<MAPIFolder>()` instances both set up with `FolderPath` returning `@"\\mailbox\Inbox"`; `fw.OlFolder` and `fw.OlRoot` are assigned to those mocks; `fw.LoadRelativePath().Should().Be(@"\\mailbox\Inbox")`.
+    - `vstest.console.exe` reports the test as Passed.
+
+- [ ] [P6-T6] Add test method `LoadRelativePath_strips_root_prefix_from_nested_folder_path` to `FolderWrapperStateTests.cs`
+  - Acceptance:
+    - `FolderWrapperStateTests.cs` contains `LoadRelativePath_strips_root_prefix_from_nested_folder_path`.
+    - Test body: `mockRoot.FolderPath = @"\\mailbox\Inbox"`, `mockFolder.FolderPath = @"\\mailbox\Inbox\Sub"`; `fw.LoadRelativePath().Should().Be("Sub")`.
+    - `vstest.console.exe` reports the test as Passed.
+
+- [ ] [P6-T7] Add test method `LoadRelativePath_returns_full_path_when_folder_is_not_under_root` to `FolderWrapperStateTests.cs`
+  - Acceptance:
+    - `FolderWrapperStateTests.cs` contains `LoadRelativePath_returns_full_path_when_folder_is_not_under_root`.
+    - Test body: `mockRoot.FolderPath = @"\\mailbox\Archive"`, `mockFolder.FolderPath = @"\\mailbox\Inbox\Sub"`; `fw.LoadRelativePath().Should().Be(@"\\mailbox\Inbox\Sub")`.
+    - `vstest.console.exe` reports the test as Passed.
+
+#### FolderWrapperTraversalTests.cs
+
+- [x] [P6-T8] Rename method `Traversal_returns_expected_children_without_live_com_release` to `ReleaseComObjectSafe_does_not_throw_for_null_argument` and replace its stub body with a real assertion in `FolderWrapperTraversalTests.cs`
+  - Acceptance:
+    - `FolderWrapperTraversalTests.cs` contains `ReleaseComObjectSafe_does_not_throw_for_null_argument`.
+    - `FolderWrapperTraversalTests.cs` does not contain `true.Should().BeTrue()` in any method body.
+    - Test body: `var fw = new FolderWrapper(false, 0, 0, "x", "x"); Action act = () => fw.ReleaseComObjectSafe(null); act.Should().NotThrow();`.
+    - `vstest.console.exe` reports the test as Passed.
+
+- [x] [P6-T9] Add test method `ReleaseComObjectSafe_does_not_throw_for_plain_clr_object` to `FolderWrapperTraversalTests.cs`
+  - Acceptance:
+    - `FolderWrapperTraversalTests.cs` contains `ReleaseComObjectSafe_does_not_throw_for_plain_clr_object`.
+    - Test body: `var fw = new FolderWrapper(false, 0, 0, "x", "x"); Action act = () => fw.ReleaseComObjectSafe("hello"); act.Should().NotThrow();`.
+    - Note: `Marshal.IsComObject("hello")` returns `false` for a plain CLR string, so no `ReleaseComObject` call is made.
+    - `vstest.console.exe` reports the test as Passed.
+
+- [ ] [P6-T10] Add test method `SumItemCountRecursively_returns_zero_when_subfolder_collection_is_null` to `FolderWrapperTraversalTests.cs`
+  - Acceptance:
+    - `FolderWrapperTraversalTests.cs` contains `SumItemCountRecursively_returns_zero_when_subfolder_collection_is_null`.
+    - Test body: `var mockFolder = new Mock<MAPIFolder>(); mockFolder.Setup(f => f.Folders).Returns((Folders)null); var fw = new FolderWrapper(false, 0, 0, "x", "x"); fw.SumItemCountRecursively(mockFolder.Object).Should().Be(0);`.
+    - Note: `folder.Folders?.Cast<MAPIFolder>().Sum(...)` short-circuits to `null` when `Folders` is `null`, and `null ?? 0` evaluates to `0`.
+    - `vstest.console.exe` reports the test as Passed.
+
+#### FolderPredictorTests.cs
+
+- [x] [P6-T11] Add test method `NormalizePredictionPath_returns_empty_string_for_empty_string_input` to `FolderPredictorTests.cs`
+  - Acceptance:
+    - `FolderPredictorTests.cs` contains `NormalizePredictionPath_returns_empty_string_for_empty_string_input`.
+    - Test body: `FolderPredictor.NormalizePredictionPath(string.Empty).Should().BeEmpty();`.
+    - Note: The existing tests `Predictor_returns_highest_ranked_match_from_seed_data` and `Predictor_returns_controlled_result_when_user_choice_is_cancelled` already pass with real assertions and are preserved unchanged.
+    - `vstest.console.exe` reports the test as Passed.
+
+#### FolderTreeTests.cs
+
+- [x] [P6-T12] Replace stub body of `Flatten_returns_all_nodes_in_expected_order` with a real reflection-based assertion in `FolderTreeTests.cs`
+  - Acceptance:
+    - `FolderTreeTests.cs` contains `Flatten_returns_all_nodes_in_expected_order`.
+    - `FolderTreeTests.cs` does not contain `true.Should().BeTrue()` in any method body.
+    - Test body: create `new FolderTree()`, use `typeof(FolderTree).GetField("_roots", BindingFlags.NonPublic | BindingFlags.Instance)` to inject a `List<TreeNode<FolderWrapper>>` containing one node whose value is `new FolderWrapper(false, 0, 0, "Inbox", "Inbox")`; call `tree.Flatten()` and assert `result.Should().ContainSingle(fw => fw.Name == "Inbox")`.
+    - `vstest.console.exe` reports the test as Passed.
+
+- [x] [P6-T13] Replace stub body of `Selection_filter_excludes_non_matching_nodes` with a real reflection-based assertion in `FolderTreeTests.cs`
+  - Acceptance:
+    - `FolderTreeTests.cs` contains `Selection_filter_excludes_non_matching_nodes`.
+    - Test body: create `new FolderTree()`, inject one root node via `_roots` reflection; add two children to that root: `nodeA` with `Selected = true` and Name `"Inbox"`, `nodeB` with `Selected = false` and Name `"Sent"`; call `tree.FilterSelected(true)` and assert the result contains exactly one entry whose `Value.Name == "Inbox"` and `Value.Selected == true`.
+    - `vstest.console.exe` reports the test as Passed.
+
+- [x] [P6-T14] Add test method `Flatten_returns_empty_list_when_roots_collection_is_empty` to `FolderTreeTests.cs`
+  - Acceptance:
+    - `FolderTreeTests.cs` contains `Flatten_returns_empty_list_when_roots_collection_is_empty`.
+    - Test body: create `new FolderTree()`, inject an empty `List<TreeNode<FolderWrapper>>` via `_roots` reflection field; call `tree.Flatten()` and assert `result.Should().BeEmpty()`.
+    - `vstest.console.exe` reports the test as Passed.
+
+### Phase 7 — Final QA Loop (Folder Slice)
+
+Run the QA loop in strict order. If any step fails or produces file changes, restart from P7-T1 and do not mark any subsequent Phase 7 task complete until a fresh contiguous clean run is established. No task in this phase may record `EXIT_CODE: SKIPPED` as a passing outcome.
+
+- [ ] [P7-T1] Run `csharpier .`
+  - Acceptance:
+    - At least one file matching `evidence/qa-gates/folder-slice/final-csharpier.*.md` exists.
+    - The newest matching artifact contains `Timestamp:`, `Command: csharpier .`, `EXIT_CODE: 0`, and `Output Summary:`.
+
+- [ ] [P7-T2] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+  - Acceptance:
+    - At least one file matching `evidence/qa-gates/folder-slice/final-analyzers.*.md` exists.
+    - The newest matching artifact contains `Timestamp:`, the exact command, `EXIT_CODE: 0`, and `Output Summary:`.
+
+- [ ] [P7-T3] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+  - Acceptance:
+    - At least one file matching `evidence/qa-gates/folder-slice/final-nullable.*.md` exists.
+    - The newest matching artifact contains `Timestamp:`, the exact command, `EXIT_CODE: 0`, and `Output Summary:`.
+
+- [ ] [P7-T4] Run `vstest.console.exe "UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" /EnableCodeCoverage`
+  - Acceptance:
+    - At least one file matching `evidence/qa-gates/folder-slice/final-vstest.*.md` exists.
+    - The newest matching artifact contains `Timestamp:`, `Command: vstest.console.exe "UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" /EnableCodeCoverage`, `EXIT_CODE: 0`, and `Output Summary:` recording: numeric total passed count, numeric total failed count (must be 0), and explicit confirmation that all tests in `FolderWrapperStateTests`, `FolderWrapperTraversalTests`, `FolderPredictorTests`, and `FolderTreeTests` are listed as Passed.
+
+- [ ] [P7-T5] Verify Phase 7 artifacts form a clean contiguous run
+  - Acceptance:
+    - The newest artifacts for `final-csharpier`, `final-analyzers`, `final-nullable`, and `final-vstest` all carry timestamps from the same continuous run session.
+    - No artifact in that set records a non-zero `EXIT_CODE`.
+    - No file modifications are reported in or after `final-csharpier`.
+
+
+
+
+
+
+
+
+
+

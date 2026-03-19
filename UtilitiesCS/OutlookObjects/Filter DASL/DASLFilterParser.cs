@@ -10,7 +10,10 @@ namespace UtilitiesCS
         public TreeNode<string> Parse(string daslFilter)
         {
             if (string.IsNullOrEmpty(daslFilter))
-                throw new ArgumentException("DASL filter cannot be null or empty", nameof(daslFilter));
+                throw new ArgumentException(
+                    "DASL filter cannot be null or empty",
+                    nameof(daslFilter)
+                );
 
             return ParseExpression(daslFilter);
         }
@@ -70,7 +73,11 @@ namespace UtilitiesCS
                 }
                 else if (depth == 0)
                 {
-                    if (expression.Substring(i).StartsWith(operatorStr, StringComparison.OrdinalIgnoreCase))
+                    if (
+                        expression
+                            .Substring(i)
+                            .StartsWith(operatorStr, StringComparison.OrdinalIgnoreCase)
+                    )
                     {
                         return i;
                     }
@@ -78,6 +85,7 @@ namespace UtilitiesCS
             }
             return -1;
         }
+
         //private int FindOperatorIndex(string expression, string operatorStr)
         //{
         //    var regex = new Regex($@"\b{operatorStr}\b", RegexOptions.IgnoreCase);
@@ -109,8 +117,5 @@ namespace UtilitiesCS
                 return $"{left} {node.Value} {right}";
             }
         }
-
     }
-
-
 }

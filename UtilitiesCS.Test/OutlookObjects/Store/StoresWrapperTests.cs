@@ -5,17 +5,12 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-
 using FluentAssertions;
-
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using Moq;
-
 using UtilitiesCS;
 using UtilitiesCS.OutlookObjects.Store;
-
 using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
 using OutlookStore = Microsoft.Office.Interop.Outlook.Store;
 
@@ -31,7 +26,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             using var cancellation = new CancellationTokenSource();
             cancellation.Cancel();
 
-            Func<Task> act = async () => await StoresWrapper.CreateAsync(globals.Object, cancellation.Token);
+            Func<Task> act = async () =>
+                await StoresWrapper.CreateAsync(globals.Object, cancellation.Token);
 
             await act.Should().ThrowAsync<OperationCanceledException>();
         }
@@ -39,7 +35,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         [TestMethod]
         public async Task CreateAsync_WhenGlobalsAreNull_ThrowsNullReferenceException()
         {
-            Func<Task> act = async () => await StoresWrapper.CreateAsync(null, CancellationToken.None);
+            Func<Task> act = async () =>
+                await StoresWrapper.CreateAsync(null, CancellationToken.None);
 
             await act.Should().ThrowAsync<NullReferenceException>();
         }
@@ -53,9 +50,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             wrapper.Stores.Should().BeNull();
             wrapper.ExcludePublicFolderStores.Should().BeTrue();
             wrapper.ExcludeGwsoStores.Should().BeTrue();
-            wrapper.GwsoFilePathContains.Should().Equal(
-                @"\Google\Google Apps Sync\",
-                @"\Google\Google Workspace Sync\");
+            wrapper
+                .GwsoFilePathContains.Should()
+                .Equal(@"\Google\Google Apps Sync\", @"\Google\Google Workspace Sync\");
             wrapper.ExcludedStoreNameContains.Should().BeEmpty();
             wrapper.ExcludedStoreFilePathContains.Should().BeEmpty();
         }
@@ -74,24 +71,37 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         public void Init_WhenStoresMatchFilters_ProjectsOnlyIncludedStores()
         {
             var includedStore = CreateStore("Mailbox", @"C:\Data\mailbox.ost", "owner@example.com");
-            var excludedByName = CreateStore("Archive Mailbox", @"C:\Data\archive.ost", "archive@example.com");
+            var excludedByName = CreateStore(
+                "Archive Mailbox",
+                @"C:\Data\archive.ost",
+                "archive@example.com"
+            );
             var excludedPublicFolder = CreateStore(
                 "Public Folders",
                 @"C:\Data\public.ost",
                 "public@example.com",
-                OlExchangeStoreType.olExchangePublicFolder);
-            var excludedByPath = CreateStore("Temp Store", @"C:\Temp\store.pst", "temp@example.com");
+                OlExchangeStoreType.olExchangePublicFolder
+            );
+            var excludedByPath = CreateStore(
+                "Temp Store",
+                @"C:\Temp\store.pst",
+                "temp@example.com"
+            );
             var excludedGwso = CreateStore(
                 "Google Workspace",
                 @"C:\Users\Dan\Google\Google Workspace Sync\sync.ost",
-                "gwso@example.com");
+                "gwso@example.com"
+            );
 
-            var wrapper = new StoresWrapper(CreateGlobalsWithStores(
-                includedStore.Object,
-                excludedByName.Object,
-                excludedPublicFolder.Object,
-                excludedByPath.Object,
-                excludedGwso.Object).Object)
+            var wrapper = new StoresWrapper(
+                CreateGlobalsWithStores(
+                    includedStore.Object,
+                    excludedByName.Object,
+                    excludedPublicFolder.Object,
+                    excludedByPath.Object,
+                    excludedGwso.Object
+                ).Object
+            )
             {
                 ExcludedStoreNameContains = new List<string> { "Archive" },
                 ExcludedStoreFilePathContains = new List<string> { "Temp" },
@@ -109,9 +119,15 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         public async Task RewireOlObjectsAsync_WhenStoresCollectionIsNull_InitializesAndAddsFilteredStores()
         {
             var includedStore = CreateStore("Mailbox", @"C:\Data\mailbox.ost", "owner@example.com");
-            var excludedStore = CreateStore("Archive", @"C:\Temp\archive.pst", "archive@example.com");
+            var excludedStore = CreateStore(
+                "Archive",
+                @"C:\Temp\archive.pst",
+                "archive@example.com"
+            );
 
-            var wrapper = new TestableStoresWrapper(CreateGlobalsWithStores(includedStore.Object, excludedStore.Object).Object)
+            var wrapper = new TestableStoresWrapper(
+                CreateGlobalsWithStores(includedStore.Object, excludedStore.Object).Object
+            )
             {
                 Stores = null,
                 ExcludedStoreNameContains = new List<string> { "Archive" },
@@ -132,7 +148,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             var updatedStore = CreateStore("Mailbox", @"C:\Data\new.ost", "new@example.com");
             var existingWrapper = new StoreWrapper(originalStore.Object).Init();
 
-            var wrapper = new TestableStoresWrapper(CreateGlobalsWithStores(updatedStore.Object).Object)
+            var wrapper = new TestableStoresWrapper(
+                CreateGlobalsWithStores(updatedStore.Object).Object
+            )
             {
                 Stores = new List<StoreWrapper> { existingWrapper },
                 ExcludedStoreNameContains = new List<string>(),
@@ -157,7 +175,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
                 "Public Folders",
                 @"C:\Data\public.ost",
                 "public@example.com",
-                OlExchangeStoreType.olExchangePublicFolder);
+                OlExchangeStoreType.olExchangePublicFolder
+            );
 
             AssertInclusionDecision(
                 store.Object,
@@ -166,13 +185,17 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
                 gwsoPaths: new List<string>(),
                 excludePublicFolders: true,
                 excludeGwso: false,
-                expected: false);
+                expected: false
+            );
         }
 
         [DataTestMethod]
         [DataRow("Archive", "Team Archive")]
         [DataRow("archive", "TEAM ARCHIVE")]
-        public void InclusionFilters_ExcludeMatchingDisplayNames_IgnoringCase(string excludedName, string displayName)
+        public void InclusionFilters_ExcludeMatchingDisplayNames_IgnoringCase(
+            string excludedName,
+            string displayName
+        )
         {
             var store = CreateStore(displayName, @"C:\Data\mailbox.ost", "user@example.com");
 
@@ -183,7 +206,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
                 gwsoPaths: new List<string>(),
                 excludePublicFolders: false,
                 excludeGwso: false,
-                expected: false);
+                expected: false
+            );
         }
 
         [TestMethod]
@@ -192,7 +216,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             var store = CreateStore(
                 "Workspace",
                 @"C:\Users\Dan\GOOGLE\Google Apps Sync\sync.ost",
-                "user@example.com");
+                "user@example.com"
+            );
 
             AssertInclusionDecision(
                 store.Object,
@@ -201,7 +226,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
                 gwsoPaths: new List<string> { "", @"\google\google apps sync\" },
                 excludePublicFolders: false,
                 excludeGwso: true,
-                expected: false);
+                expected: false
+            );
         }
 
         [TestMethod]
@@ -216,7 +242,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
                 gwsoPaths: new List<string>(),
                 excludePublicFolders: false,
                 excludeGwso: false,
-                expected: false);
+                expected: false
+            );
         }
 
         [TestMethod]
@@ -226,7 +253,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
                 "Mailbox",
                 filePath: @"C:\ShouldNotMatter\mailbox.ost",
                 primarySmtpAddress: "user@example.com",
-                throwOnFilePathAccess: true);
+                throwOnFilePathAccess: true
+            );
 
             AssertInclusionDecision(
                 store.Object,
@@ -235,7 +263,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
                 gwsoPaths: new List<string> { @"\Google\Google Apps Sync\" },
                 excludePublicFolders: false,
                 excludeGwso: true,
-                expected: true);
+                expected: true
+            );
         }
 
         [TestMethod]
@@ -250,7 +279,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
                 gwsoPaths: new List<string> { @"\Google\Google Apps Sync\" },
                 excludePublicFolders: true,
                 excludeGwso: true,
-                expected: true);
+                expected: true
+            );
         }
 
         private static void AssertInclusionDecision(
@@ -260,7 +290,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             IList<string> gwsoPaths,
             bool excludePublicFolders,
             bool excludeGwso,
-            bool expected)
+            bool expected
+        )
         {
             var wrapper = new StoresWrapper
             {
@@ -272,17 +303,22 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             };
 
             wrapper.ShouldIncludeStore(store).Should().Be(expected);
-            StoresWrapper.StoreIsIncluded(
+            StoresWrapper
+                .StoreIsIncluded(
                     store,
                     excludedNames,
                     excludedPaths,
                     gwsoPaths ?? new List<string>(),
                     excludePublicFolders,
-                    excludeGwso)
-                .Should().Be(expected);
+                    excludeGwso
+                )
+                .Should()
+                .Be(expected);
         }
 
-        private static Mock<IApplicationGlobals> CreateGlobalsWithStores(params OutlookStore[] stores)
+        private static Mock<IApplicationGlobals> CreateGlobalsWithStores(
+            params OutlookStore[] stores
+        )
         {
             var storesCollection = new Mock<Stores>();
             storesCollection
@@ -306,7 +342,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             string filePath,
             string primarySmtpAddress,
             OlExchangeStoreType exchangeStoreType = OlExchangeStoreType.olPrimaryExchangeMailbox,
-            bool throwOnFilePathAccess = false)
+            bool throwOnFilePathAccess = false
+        )
         {
             var store = new Mock<OutlookStore>();
             var rootFolder = CreateRootFolderWithPrimarySmtpAddress(primarySmtpAddress);
@@ -317,12 +354,16 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
 
             if (exchangeStoreType != OlExchangeStoreType.olExchangePublicFolder)
             {
-                store.Setup(x => x.GetDefaultFolder(OlDefaultFolders.olFolderInbox)).Returns(new Mock<OutlookFolder>().Object);
+                store
+                    .Setup(x => x.GetDefaultFolder(OlDefaultFolders.olFolderInbox))
+                    .Returns(new Mock<OutlookFolder>().Object);
             }
 
             if (throwOnFilePathAccess)
             {
-                store.SetupGet(x => x.FilePath).Throws(new InvalidOperationException("FilePath unavailable"));
+                store
+                    .SetupGet(x => x.FilePath)
+                    .Throws(new InvalidOperationException("FilePath unavailable"));
             }
             else
             {
@@ -332,7 +373,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             return store;
         }
 
-        private static Mock<OutlookFolder> CreateRootFolderWithPrimarySmtpAddress(string primarySmtpAddress)
+        private static Mock<OutlookFolder> CreateRootFolderWithPrimarySmtpAddress(
+            string primarySmtpAddress
+        )
         {
             var rootFolder = new Mock<OutlookFolder>();
             var session = new Mock<NameSpace>();
@@ -352,9 +395,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         private sealed class TestableStoresWrapper : StoresWrapper
         {
             public TestableStoresWrapper(IApplicationGlobals globals)
-                : base(globals)
-            {
-            }
+                : base(globals) { }
 
             public new Task RewireOlObjectsAsync(StreamingContext context)
             {

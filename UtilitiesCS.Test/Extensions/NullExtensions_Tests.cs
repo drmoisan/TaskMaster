@@ -1,7 +1,7 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.Test.Extensions
@@ -35,11 +35,19 @@ namespace UtilitiesCS.Test.Extensions
             Action nullableValueAction = () => nullableNumber.ThrowIfNull("number is required");
 
             // Assert
-            referenceAction.Should().Throw<ArgumentNullException>()
-                .Which.ParamName.Should().Be("text");
+            referenceAction
+                .Should()
+                .Throw<ArgumentNullException>()
+                .Which.ParamName.Should()
+                .Be("text");
 
-            nullableValueAction.Should().Throw<ArgumentNullException>()
-                .Where(exception => exception.ParamName == "nullableNumber" && exception.Message.Contains("number is required"));
+            nullableValueAction
+                .Should()
+                .Throw<ArgumentNullException>()
+                .Where(exception =>
+                    exception.ParamName == "nullableNumber"
+                    && exception.Message.Contains("number is required")
+                );
         }
 
         [TestMethod]
@@ -71,10 +79,18 @@ namespace UtilitiesCS.Test.Extensions
 
             // Assert
             result.Should().Equal("alpha");
-            nullAction.Should().Throw<ArgumentNullException>()
-                .Which.ParamName.Should().Be("nullValues");
-            emptyAction.Should().Throw<ArgumentNullException>()
-                .Where(exception => exception.ParamName == "emptyValues" && exception.Message.Contains("sequence required"));
+            nullAction
+                .Should()
+                .Throw<ArgumentNullException>()
+                .Which.ParamName.Should()
+                .Be("nullValues");
+            emptyAction
+                .Should()
+                .Throw<ArgumentNullException>()
+                .Where(exception =>
+                    exception.ParamName == "emptyValues"
+                    && exception.Message.Contains("sequence required")
+                );
         }
 
         [TestMethod]
@@ -94,14 +110,26 @@ namespace UtilitiesCS.Test.Extensions
             // Assert
             collectionResult.Should().BeSameAs(values);
             stringResult.Should().Be("text");
-            nullCollectionAction.Should().Throw<ArgumentNullException>()
-                .Which.ParamName.Should().Be("values");
-            emptyCollectionAction.Should().Throw<ArgumentNullException>()
-                .Which.ParamName.Should().Be("values");
-            nullStringAction.Should().Throw<ArgumentNullException>()
-                .Which.ParamName.Should().Be("text");
-            emptyStringAction.Should().Throw<ArgumentNullException>()
-                .Which.ParamName.Should().Be("text");
+            nullCollectionAction
+                .Should()
+                .Throw<ArgumentNullException>()
+                .Which.ParamName.Should()
+                .Be("values");
+            emptyCollectionAction
+                .Should()
+                .Throw<ArgumentNullException>()
+                .Which.ParamName.Should()
+                .Be("values");
+            nullStringAction
+                .Should()
+                .Throw<ArgumentNullException>()
+                .Which.ParamName.Should()
+                .Be("text");
+            emptyStringAction
+                .Should()
+                .Throw<ArgumentNullException>()
+                .Which.ParamName.Should()
+                .Be("text");
         }
 
         private static List<int> PassThroughCollection(List<int> values)

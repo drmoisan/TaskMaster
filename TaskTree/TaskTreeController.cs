@@ -6,13 +6,13 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
-using Outlook = Microsoft.Office.Interop.Outlook;
+using Microsoft.Office.Interop.Outlook;
 using ToDoModel;
 using UtilitiesCS;
-using Microsoft.Office.Interop.Outlook;
-using System.Threading.Tasks;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace TaskTree
 {
@@ -23,7 +23,8 @@ namespace TaskTree
         public TaskTreeController(
             IApplicationGlobals AppGlobals,
             TaskTreeForm Viewer,
-            TreeOfToDoItems DataModel)
+            TreeOfToDoItems DataModel
+        )
         {
             _globals = AppGlobals;
             _viewer = Viewer;
@@ -37,10 +38,11 @@ namespace TaskTree
                 _viewer.TreeLv.CanExpandGetter = x => ((TreeNode<ToDoItem>)x).ChildCount > 0;
                 _viewer.TreeLv.ChildrenGetter = x => ((TreeNode<ToDoItem>)x).Children;
                 _viewer.TreeLv.ParentGetter = x => ((TreeNode<ToDoItem>)x).Parent;
-                _viewer.TreeLv.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
+                _viewer.TreeLv.ModelFilter = new ModelFilter(x =>
+                    ((TreeNode<ToDoItem>)x).Value.Complete == false
+                );
                 _viewer.TreeLv.Roots = _dataModel.Roots;
                 _viewer.TreeLv.Sort(_viewer.OlvToDoID, SortOrder.Ascending);
-
             }
 
             SimpleDropSink sink1 = (SimpleDropSink)_viewer.TreeLv.DropSink;
@@ -49,8 +51,16 @@ namespace TaskTree
             sink1.CanDropOnBackground = true;
 
             _rs.FindAllControls(_viewer);
-            _rs.SetResizeDimensions(_viewer.SplitContainer1, ControlResizer.ResizeDimensions.None, true);
-            _rs.SetResizeDimensions(_viewer.SplitContainer1.Panel2, ControlResizer.ResizeDimensions.Position | ControlResizer.ResizeDimensions.Size, true);
+            _rs.SetResizeDimensions(
+                _viewer.SplitContainer1,
+                ControlResizer.ResizeDimensions.None,
+                true
+            );
+            _rs.SetResizeDimensions(
+                _viewer.SplitContainer1.Panel2,
+                ControlResizer.ResizeDimensions.Position | ControlResizer.ResizeDimensions.Size,
+                true
+            );
             _rs.ResizeAllControls(_viewer);
             //_rs.PrintDict();
         }
@@ -87,7 +97,10 @@ namespace TaskTree
 
                 if (e.DropTargetLocation == DropTargetLocation.Background)
                 {
-                    if (ReferenceEquals(e.SourceListView, e.ListView) && sourceModels.All(x => x.Parent is null))
+                    if (
+                        ReferenceEquals(e.SourceListView, e.ListView)
+                        && sourceModels.All(x => x.Parent is null)
+                    )
                     {
                         e.InfoMessage = "Dragged objects are already roots";
                     }
@@ -108,7 +121,8 @@ namespace TaskTree
 
                     if (sourceModels.Any(x => target.IsAncestor(x)))
                     {
-                        e.InfoMessage = "Cannot drop on descendant (think of the temporal paradoxes!)";
+                        e.InfoMessage =
+                            "Cannot drop on descendant (think of the temporal paradoxes!)";
                     }
                     else
                     {
@@ -126,34 +140,57 @@ namespace TaskTree
             switch (e.DropTargetLocation)
             {
                 case DropTargetLocation.AboveItem:
-                    {
-                        MoveObjectsToSibling(e.ListView as TreeListView, e.SourceListView as TreeListView, (TreeNode<ToDoItem>)e.TargetModel, e.SourceModels, 0);
-                        break;
-                    }
+                {
+                    MoveObjectsToSibling(
+                        e.ListView as TreeListView,
+                        e.SourceListView as TreeListView,
+                        (TreeNode<ToDoItem>)e.TargetModel,
+                        e.SourceModels,
+                        0
+                    );
+                    break;
+                }
                 case DropTargetLocation.BelowItem:
-                    {
-                        MoveObjectsToSibling(e.ListView as TreeListView, e.SourceListView as TreeListView, (TreeNode<ToDoItem>)e.TargetModel, e.SourceModels, 1);
-                        break;
-                    }
+                {
+                    MoveObjectsToSibling(
+                        e.ListView as TreeListView,
+                        e.SourceListView as TreeListView,
+                        (TreeNode<ToDoItem>)e.TargetModel,
+                        e.SourceModels,
+                        1
+                    );
+                    break;
+                }
                 case DropTargetLocation.Background:
-                    {
-                        MoveObjectsToRoots(e.ListView as TreeListView, e.SourceListView as TreeListView, e.SourceModels);
-                        break;
-                    }
+                {
+                    MoveObjectsToRoots(
+                        e.ListView as TreeListView,
+                        e.SourceListView as TreeListView,
+                        e.SourceModels
+                    );
+                    break;
+                }
                 case DropTargetLocation.Item:
-                    {
-                        MoveObjectsToChildren(e.ListView as TreeListView, e.SourceListView as TreeListView, (TreeNode<ToDoItem>)e.TargetModel, e.SourceModels);
-                        break;
-                    }
+                {
+                    MoveObjectsToChildren(
+                        e.ListView as TreeListView,
+                        e.SourceListView as TreeListView,
+                        (TreeNode<ToDoItem>)e.TargetModel,
+                        e.SourceModels
+                    );
+                    break;
+                }
 
                 default:
-                    {
-                        return;
-                    }
+                {
+                    return;
+                }
             }
             e.RefreshObjects();
             if (_filterCompleted)
-                _viewer.TreeLv.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
+                _viewer.TreeLv.ModelFilter = new ModelFilter(x =>
+                    ((TreeNode<ToDoItem>)x).Value.Complete == false
+                );
             _viewer.TreeLv.Sort();
             // this.lastSortColumn = Column;
             // this.lastSortOrder = order;
@@ -173,7 +210,10 @@ namespace TaskTree
                     activeExplorer.ClearSelection();
                     activeExplorer.AddToSelection(item);
                 }
-                else { item.Display(); }
+                else
+                {
+                    item.Display();
+                }
             }
         }
 
@@ -189,7 +229,10 @@ namespace TaskTree
                         activeExplorer.ClearSelection();
                         activeExplorer.AddToSelection(item);
                     }
-                    else { item.Display(); }
+                    else
+                    {
+                        item.Display();
+                    }
                 });
                 await Task.Run(activeExplorer.Activate);
             }
@@ -199,47 +242,56 @@ namespace TaskTree
         {
             var node = (TreeNode<ToDoItem>)e.Model;
             var todo = node.Value;
-            e.Item.Font = todo.Complete ? new Font(e.Item.Font, e.Item.Font.Style | FontStyle.Strikeout) : new Font(e.Item.Font, e.Item.Font.Style & ~FontStyle.Strikeout);
+            e.Item.Font = todo.Complete
+                ? new Font(e.Item.Font, e.Item.Font.Style | FontStyle.Strikeout)
+                : new Font(e.Item.Font, e.Item.Font.Style & ~FontStyle.Strikeout);
         }
 
-        internal void MoveObjectsToRoots(TreeListView targetTree, TreeListView sourceTree, IList toMove)
+        internal void MoveObjectsToRoots(
+            TreeListView targetTree,
+            TreeListView sourceTree,
+            IList toMove
+        )
         {
-            if (ReferenceEquals(sourceTree, targetTree))                // Data Model: Check to see if the desination tree roots are in the same tree
+            if (ReferenceEquals(sourceTree, targetTree)) // Data Model: Check to see if the desination tree roots are in the same tree
             {
                 foreach (TreeNode<ToDoItem> x in toMove)
                 {
-
                     if (x.Parent is not null)
                     {
-                        x.Parent.RemoveChild(x);             // Data Model: Remove pointer to node from parent.children list
-                                                             // x.Parent.Children.Remove(x)         'Data Model: Remove pointer to node from parent.children list
-                                                             // x.Parent = Nothing                  'Data Model: Set the pointer to the parent inside the node to nothing
-                        sourceTree.AddObject(x);             // TreeListView: Add the node to the source tree as a FldrRoot node
+                        x.Parent.RemoveChild(x); // Data Model: Remove pointer to node from parent.children list
+                        // x.Parent.Children.Remove(x)         'Data Model: Remove pointer to node from parent.children list
+                        // x.Parent = Nothing                  'Data Model: Set the pointer to the parent inside the node to nothing
+                        sourceTree.AddObject(x); // TreeListView: Add the node to the source tree as a FldrRoot node
                     }
                 }
             }
-            else                                            // Data Model: If the destination tree is different than the source tree
+            else // Data Model: If the destination tree is different than the source tree
             {
-
                 foreach (TreeNode<ToDoItem> x in toMove)
                 {
-
-                    if (x.Parent is null)             // Data Model: If the node was a root in the old tree
+                    if (x.Parent is null) // Data Model: If the node was a root in the old tree
                     {
-                        sourceTree.RemoveObject(x);          // TreeListView: Delete the pointer in the tree to the node
+                        sourceTree.RemoveObject(x); // TreeListView: Delete the pointer in the tree to the node
                     }
-                    else                                    // Data Model: If the node was NOT a root in the old tree
+                    else // Data Model: If the node was NOT a root in the old tree
                     {
                         x.Parent.RemoveChild(x);
-                    }             // Data Model: Grab the parent node and delete the pointer from the list of children
+                    } // Data Model: Grab the parent node and delete the pointer from the list of children
 
-                    x.Parent = null;                      // Data Model: Delete the pointer in the node to the parent
-                    targetTree.AddObject(x);                 // TreeListView: Add the node to the new tree as a root
+                    x.Parent = null; // Data Model: Delete the pointer in the node to the parent
+                    targetTree.AddObject(x); // TreeListView: Add the node to the new tree as a root
                 }
             }
         }
 
-        internal void MoveObjectsToSibling(TreeListView targetTree, TreeListView sourceTree, TreeNode<ToDoItem> target, IList toMove, int siblingOffset)
+        internal void MoveObjectsToSibling(
+            TreeListView targetTree,
+            TreeListView sourceTree,
+            TreeNode<ToDoItem> target,
+            IList toMove,
+            int siblingOffset
+        )
         {
             foreach (TreeNode<ToDoItem> x in toMove)
             {
@@ -247,11 +299,13 @@ namespace TaskTree
                 {
                     if (_dataModel.Roots.Contains(x))
                     {
-                        _dataModel.Roots.Remove(x);         // Data Model: Remove node from roots
+                        _dataModel.Roots.Remove(x); // Data Model: Remove node from roots
                     }
                     else
                     {
-                        MessageBox.Show("Error in MoveObjectsToSibling: TreeListView and DataModel out of sync at roots");
+                        MessageBox.Show(
+                            "Error in MoveObjectsToSibling: TreeListView and DataModel out of sync at roots"
+                        );
                     }
                 }
                 else
@@ -269,7 +323,10 @@ namespace TaskTree
                 // targetRoots.InsertRange(targetRoots.IndexOf(target) + siblingOffset, toMove) 'TreeListview: Inserted into new tree
                 // DataModel: Nothing here. Is this dealt with?
                 _dataModel.Roots.AddRange((IEnumerable<TreeNode<ToDoItem>>)toMove);
-                string strSeed = _dataModel.Roots.Count > toMove.Count ? _dataModel.Roots[_dataModel.Roots.Count - toMove.Count - 2].Value.ToDoID : "00";
+                string strSeed =
+                    _dataModel.Roots.Count > toMove.Count
+                        ? _dataModel.Roots[_dataModel.Roots.Count - toMove.Count - 2].Value.ToDoID
+                        : "00";
 
                 var loopTo = _dataModel.Roots.Count - 1;
                 for (int i = _dataModel.Roots.Count - toMove.Count - 1; i <= loopTo; i++)
@@ -283,15 +340,17 @@ namespace TaskTree
                 // Insert moved object into DATAMODEL children of new parent
                 int idx = target.Parent.Children.IndexOf(target) + siblingOffset;
                 // Inconsistent with case of Parent is nothing
-                target.Parent.Children.InsertRange(idx, toMove.Cast<TreeNode<ToDoItem>>()); // DataModel: Inserted into new data model tree. 
+                target.Parent.Children.InsertRange(idx, toMove.Cast<TreeNode<ToDoItem>>()); // DataModel: Inserted into new data model tree.
                 _dataModel.ReNumberChildrenIDs(target.Parent.Children, (IDList)_globals.TD.IDList);
-
             }
-
-
         }
 
-        internal void MoveObjectsToChildren(TreeListView targetTree, TreeListView sourceTree, TreeNode<ToDoItem> target, IList toMove)
+        internal void MoveObjectsToChildren(
+            TreeListView targetTree,
+            TreeListView sourceTree,
+            TreeNode<ToDoItem> target,
+            IList toMove
+        )
         {
             foreach (TreeNode<ToDoItem> x in toMove)
             {
@@ -304,7 +363,9 @@ namespace TaskTree
                     }
                     else
                     {
-                        MessageBox.Show("Error in MoveObjectsToChildren: TreeListView and DataModel out of sync at roots");
+                        MessageBox.Show(
+                            "Error in MoveObjectsToChildren: TreeListView and DataModel out of sync at roots"
+                        );
                     }
                 }
                 else
@@ -328,7 +389,6 @@ namespace TaskTree
                 _viewer.TreeLv.ExpandAll();
             }
             _expanded = !_expanded;
-
         }
 
         internal void ResizeForm()
@@ -352,7 +412,9 @@ namespace TaskTree
             }
             else
             {
-                _viewer.TreeLv.ModelFilter = new ModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
+                _viewer.TreeLv.ModelFilter = new ModelFilter(x =>
+                    ((TreeNode<ToDoItem>)x).Value.Complete == false
+                );
                 _filterCompleted = true;
             }
         }
@@ -363,8 +425,14 @@ namespace TaskTree
             if (node is not null)
             {
                 var objItem = node.Value.OlItem.InnerObject;
-                if (IsValidType(objItem)) { ActivateOlItem(objItem); }
-                else { MessageBox.Show($"Unsupported type. Selection is of type {objItem.GetType()}"); }
+                if (IsValidType(objItem))
+                {
+                    ActivateOlItem(objItem);
+                }
+                else
+                {
+                    MessageBox.Show($"Unsupported type. Selection is of type {objItem.GetType()}");
+                }
             }
         }
 
@@ -378,7 +446,10 @@ namespace TaskTree
                 {
                     await ActivateOlItemAsync(objItem);
                 }
-                else { MessageBox.Show($"Unsupported type. Selection is of type {objItem.GetType()}"); }
+                else
+                {
+                    MessageBox.Show($"Unsupported type. Selection is of type {objItem.GetType()}");
+                }
             }
         }
 
@@ -408,21 +479,19 @@ namespace TaskTree
             }
 
             return null;
-
         }
 
         internal TreeNode<ToDoItem> GetSelectedTreeNode()
         {
             try
             {
-                return _viewer.TreeLv.GetItem(_viewer.TreeLv.SelectedIndex).RowObject as TreeNode<ToDoItem>;
+                return _viewer.TreeLv.GetItem(_viewer.TreeLv.SelectedIndex).RowObject
+                    as TreeNode<ToDoItem>;
             }
             catch (System.Exception)
             {
                 return null;
             }
-
-
         }
 
         internal bool IsValidType(object item)
@@ -445,13 +514,20 @@ namespace TaskTree
             LoopTreeToWrite(ToDoTree, filename, "");
         }
 
-        public void LoopTreeToWrite(List<TreeNode<ToDoItem>> nodes, string filename, string lineprefix)
+        public void LoopTreeToWrite(
+            List<TreeNode<ToDoItem>> nodes,
+            string filename,
+            string lineprefix
+        )
         {
             if (nodes is not null)
             {
                 foreach (TreeNode<ToDoItem> node in nodes)
                 {
-                    AppendLineToCSV(filename, lineprefix + node.Value.ToDoID + " " + node.Value.TaskSubject);
+                    AppendLineToCSV(
+                        filename,
+                        lineprefix + node.Value.ToDoID + " " + node.Value.TaskSubject
+                    );
                     LoopTreeToWrite(node.Children, filename, lineprefix + node.Value.ToDoID + ",");
                 }
             }
@@ -466,6 +542,5 @@ namespace TaskTree
         }
 
         #endregion
-
     }
 }

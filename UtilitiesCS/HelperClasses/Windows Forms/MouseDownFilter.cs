@@ -4,10 +4,8 @@ using System.Windows.Forms;
 
 namespace UtilitiesCS
 {
-
     public class MouseDownFilter : IMessageFilter
     {
-
         public event EventHandler FormClicked;
         private readonly int WM_LBUTTONDOWN = 0x201;
         private readonly Form form = null;
@@ -24,7 +22,6 @@ namespace UtilitiesCS
         {
             if (m.Msg == WM_LBUTTONDOWN)
             {
-
                 if (Form.ActiveForm is not null && Form.ActiveForm.Equals(form))
                 {
                     OnFormClicked();
@@ -40,7 +37,5 @@ namespace UtilitiesCS
         {
             FormClicked?.Invoke(form, EventArgs.Empty);
         }
-
-
     }
 }

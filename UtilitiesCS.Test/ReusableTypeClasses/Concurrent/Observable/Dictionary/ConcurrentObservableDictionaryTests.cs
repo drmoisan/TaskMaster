@@ -1,8 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 
 namespace ConcurrentObservableCollection.Tests
@@ -237,7 +237,8 @@ namespace ConcurrentObservableCollection.Tests
 
         private class TestObserver<TKey, TValue> : IDictionaryObserver<TKey, TValue>
         {
-            public List<DictionaryChangedEventArgs<TKey, TValue>> ReceivedEvents { get; } = new List<DictionaryChangedEventArgs<TKey, TValue>>();
+            public List<DictionaryChangedEventArgs<TKey, TValue>> ReceivedEvents { get; } =
+                new List<DictionaryChangedEventArgs<TKey, TValue>>();
 
             public void OnEventOccur(DictionaryChangedEventArgs<TKey, TValue> args)
             {

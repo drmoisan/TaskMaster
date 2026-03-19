@@ -1,8 +1,8 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test.Extensions
 {
@@ -23,8 +23,8 @@ namespace UtilitiesCS.Test.Extensions
         public void CallerArgumentExpressionAttribute_HasExpectedUsageMetadata()
         {
             // Arrange
-            var usage = typeof(CallerArgumentExpressionAttribute)
-                .GetCustomAttribute<AttributeUsageAttribute>();
+            var usage =
+                typeof(CallerArgumentExpressionAttribute).GetCustomAttribute<AttributeUsageAttribute>();
 
             // Act / Assert
             usage.Should().NotBeNull();

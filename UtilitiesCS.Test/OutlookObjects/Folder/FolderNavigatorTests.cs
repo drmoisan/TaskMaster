@@ -23,21 +23,21 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                 childFolders: new Dictionary<string, OutlookFolder>
                 {
                     ["Projects"] = projects.Object,
-                });
+                }
+            );
             var sessionRoot = CreateFolder(
                 "\\\\SessionRoot",
-                childFolders: new Dictionary<string, OutlookFolder>
-                {
-                    ["Mailbox"] = mailbox.Object,
-                });
+                childFolders: new Dictionary<string, OutlookFolder> { ["Mailbox"] = mailbox.Object }
+            );
             var app = CreateApplication(
-                new Dictionary<string, OutlookFolder>
-                {
-                    ["Mailbox"] = sessionRoot.Object,
-                });
+                new Dictionary<string, OutlookFolder> { ["Mailbox"] = sessionRoot.Object }
+            );
 
             // Act
-            OutlookFolder result = FolderNavigator.GetOutlookFolder("\\\\Mailbox\\Projects", app.Object);
+            OutlookFolder result = FolderNavigator.GetOutlookFolder(
+                "\\\\Mailbox\\Projects",
+                app.Object
+            );
 
             // Assert
             result.Should().BeSameAs(projects.Object);
@@ -60,21 +60,23 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         public void GetOutlookFolder_WhenAnySubFolderLookupReturnsNull_ReturnsNull()
         {
             // Arrange
-            var mailbox = CreateFolder("\\\\Mailbox", childFolders: new Dictionary<string, OutlookFolder>());
+            var mailbox = CreateFolder(
+                "\\\\Mailbox",
+                childFolders: new Dictionary<string, OutlookFolder>()
+            );
             var sessionRoot = CreateFolder(
                 "\\\\SessionRoot",
-                childFolders: new Dictionary<string, OutlookFolder>
-                {
-                    ["Mailbox"] = mailbox.Object,
-                });
+                childFolders: new Dictionary<string, OutlookFolder> { ["Mailbox"] = mailbox.Object }
+            );
             var app = CreateApplication(
-                new Dictionary<string, OutlookFolder>
-                {
-                    ["Mailbox"] = sessionRoot.Object,
-                });
+                new Dictionary<string, OutlookFolder> { ["Mailbox"] = sessionRoot.Object }
+            );
 
             // Act
-            OutlookFolder result = FolderNavigator.GetOutlookFolder("\\\\Mailbox\\Missing", app.Object);
+            OutlookFolder result = FolderNavigator.GetOutlookFolder(
+                "\\\\Mailbox\\Missing",
+                app.Object
+            );
 
             // Assert
             result.Should().BeNull();
@@ -87,27 +89,25 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             var fy26 = CreateFolder("\\\\ArchiveRoot\\Projects\\FY26", childFolders: null);
             var projects = CreateFolder(
                 "\\\\ArchiveRoot\\Projects",
-                childFolders: new Dictionary<string, OutlookFolder>
-                {
-                    ["FY26"] = fy26.Object,
-                },
-                enumerableChildren: fy26.Object);
+                childFolders: new Dictionary<string, OutlookFolder> { ["FY26"] = fy26.Object },
+                enumerableChildren: fy26.Object
+            );
             var reference = CreateFolder("\\\\ArchiveRoot\\Reference", childFolders: null);
             var archiveRoot = CreateFolder(
                 "\\\\ArchiveRoot",
                 childFolders: new Dictionary<string, OutlookFolder>(),
-                enumerableChildren: new[] { projects.Object, reference.Object });
+                enumerableChildren: new[] { projects.Object, reference.Object }
+            );
             var sessionRoot = CreateFolder(
                 "\\\\SessionRoot",
                 childFolders: new Dictionary<string, OutlookFolder>
                 {
                     ["ArchiveRoot"] = archiveRoot.Object,
-                });
+                }
+            );
             var app = CreateApplication(
-                new Dictionary<string, OutlookFolder>
-                {
-                    ["ArchiveRoot"] = sessionRoot.Object,
-                });
+                new Dictionary<string, OutlookFolder> { ["ArchiveRoot"] = sessionRoot.Object }
+            );
             var olObjects = new Mock<IOlObjects>();
             olObjects.SetupGet(x => x.ArchiveRootPath).Returns("\\\\ArchiveRoot");
             olObjects.SetupGet(x => x.App).Returns(app.Object);
@@ -119,7 +119,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             result.Should().Equal("\\Projects", "\\Projects\\FY26", "\\Reference");
         }
 
-        private static Mock<Application> CreateApplication(IDictionary<string, OutlookFolder> rootFolders)
+        private static Mock<Application> CreateApplication(
+            IDictionary<string, OutlookFolder> rootFolders
+        )
         {
             var app = new Mock<Application>();
             var nameSpace = new Mock<NameSpace>();
@@ -133,31 +135,45 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         private static Mock<OutlookFolder> CreateFolder(
             string folderPath,
             IDictionary<string, OutlookFolder> childFolders,
-            params OutlookFolder[] enumerableChildren)
+            params OutlookFolder[] enumerableChildren
+        )
         {
             var folder = new Mock<OutlookFolder>();
             folder.SetupGet(x => x.FolderPath).Returns(folderPath);
-            folder.SetupGet(x => x.Folders).Returns(CreateFoldersCollection(childFolders ?? new Dictionary<string, OutlookFolder>(), enumerableChildren).Object);
+            folder
+                .SetupGet(x => x.Folders)
+                .Returns(
+                    CreateFoldersCollection(
+                        childFolders ?? new Dictionary<string, OutlookFolder>(),
+                        enumerableChildren
+                    ).Object
+                );
             return folder;
         }
 
         private static Mock<OutlookFolders> CreateFoldersCollection(
             IDictionary<string, OutlookFolder> foldersByName,
-            params OutlookFolder[] enumerableChildren)
+            params OutlookFolder[] enumerableChildren
+        )
         {
             var folders = new Mock<OutlookFolders>();
             var enumerableItems = enumerableChildren ?? [];
             var collection = new ArrayList(enumerableItems);
 
-            folders.Setup(x => x[It.IsAny<object>()]).Returns<object>(key =>
-            {
-                if (key is string name && foldersByName.TryGetValue(name, out OutlookFolder folder))
+            folders
+                .Setup(x => x[It.IsAny<object>()])
+                .Returns<object>(key =>
                 {
-                    return folder;
-                }
+                    if (
+                        key is string name
+                        && foldersByName.TryGetValue(name, out OutlookFolder folder)
+                    )
+                    {
+                        return folder;
+                    }
 
-                return null;
-            });
+                    return null;
+                });
             folders.Setup(x => x.GetEnumerator()).Returns(() => collection.GetEnumerator());
 
             return folders;

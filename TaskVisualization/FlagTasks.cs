@@ -18,7 +18,6 @@ namespace TaskVisualization
 {
     public class FlagTasks
     {
-
         private readonly List<ToDoItem> _todoSelection;
         private readonly Explorer _olExplorer;
         private TaskViewer _viewer;
@@ -31,14 +30,25 @@ namespace TaskVisualization
         private readonly IApplicationGlobals _globals;
         private string _userEmailAddress;
 
-        public FlagTasks(IApplicationGlobals globals, IList itemList = null, bool blFile = true, IntPtr hWndCaller = default, string strNameOfFunctionCalling = "")
+        public FlagTasks(
+            IApplicationGlobals globals,
+            IList itemList = null,
+            bool blFile = true,
+            IntPtr hWndCaller = default,
+            string strNameOfFunctionCalling = ""
+        )
         {
             _globals = globals;
             _olExplorer = globals.Ol.App.ActiveExplorer();
             _todoSelection = InitializeToDoList(itemList, globals);
             if (_todoSelection.Count == 0)
             {
-                MessageBox.Show("No items selected. Exiting.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(
+                    "No items selected. Exiting.",
+                    "Information",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
                 return;
             }
             _flagsToSet = GetFlagsToSet(_todoSelection.Count);
@@ -47,17 +57,19 @@ namespace TaskVisualization
             _autoAssignPeople = new AutoAssignPeople(globals);
             _autoCreateProject = new AutoCreateProject(globals);
             var autoAssignContext = new AutoAssignContext(globals);
-            _controller = new TaskController(formInstance: _viewer,
-                                             olCategories: globals.Ol.NamespaceMAPI.Categories,
-                                             toDoSelection: _todoSelection,
-                                             defaults: _defaultsToDo,
-                                             autoAssign: _autoAssignPeople,
-                                             projectAssign: _autoCreateProject,
-                                             contextAssign: autoAssignContext,
-                                             projectsToPrograms: globals.TD.ProjInfo.Programs_ByProjectNames,
-                                             flagOptions: _flagsToSet,
-                                             userEmailAddress: globals.Ol.UserEmailAddress,
-                                             globals: _globals);
+            _controller = new TaskController(
+                formInstance: _viewer,
+                olCategories: globals.Ol.NamespaceMAPI.Categories,
+                toDoSelection: _todoSelection,
+                defaults: _defaultsToDo,
+                autoAssign: _autoAssignPeople,
+                projectAssign: _autoCreateProject,
+                contextAssign: autoAssignContext,
+                projectsToPrograms: globals.TD.ProjInfo.Programs_ByProjectNames,
+                flagOptions: _flagsToSet,
+                userEmailAddress: globals.Ol.UserEmailAddress,
+                globals: _globals
+            );
             _userEmailAddress = globals.Ol.UserEmailAddress;
         }
 
@@ -80,20 +92,30 @@ namespace TaskVisualization
 
         public static List<ToDoItem> InitializeToDoList(IList itemList, IApplicationGlobals globals)
         {
-            var olItems = (itemList?.Cast<object>() ?? GetSelection(globals.Ol.App.ActiveExplorer()))
-                ?.Select(x => new OutlookItem(x)).ToList();
+            var olItems = (
+                itemList?.Cast<object>() ?? GetSelection(globals.Ol.App.ActiveExplorer())
+            )
+                ?.Select(x => new OutlookItem(x))
+                .ToList();
             if (olItems.Count() == 0)
             {
-                var response = MessageBox.Show("No items selected. Would you like to create a new task?", "Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                var response = MessageBox.Show(
+                    "No items selected. Would you like to create a new task?",
+                    "Question",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
                 if (response == DialogResult.Yes)
                 {
-                    var taskItems = globals.Ol.App.Session.GetDefaultFolder(OlDefaultFolders.olFolderTasks).Items;
+                    var taskItems = globals
+                        .Ol.App.Session.GetDefaultFolder(OlDefaultFolders.olFolderTasks)
+                        .Items;
                     olItems.Add(new OutlookItem(taskItems.Add(OlItemType.olTaskItem)));
                 }
             }
 
-
-            var todoList = Enumerable.Range(0, olItems.Count())
+            var todoList = Enumerable
+                .Range(0, olItems.Count())
                 .Select(i =>
                 {
                     var todo = new ToDoItem(olItems[i]);
@@ -154,26 +176,44 @@ namespace TaskVisualization
             else
             {
                 Enums.FlagsToSet flag;
-                var flagsList = (from x in flagStrings
-                                 where Enum.TryParse(x, out flag)
-                                 select Enum.Parse(typeof(Enums.FlagsToSet), x)).ToList().OfType<Enums.FlagsToSet>();
+                var flagsList = (
+                    from x in flagStrings
+                    where Enum.TryParse(x, out flag)
+                    select Enum.Parse(typeof(Enums.FlagsToSet), x)
+                )
+                    .ToList()
+                    .OfType<Enums.FlagsToSet>();
 
-                Enums.FlagsToSet selectedFlags = (Enums.FlagsToSet)Conversions.ToInteger(GenericBitwiseStatic<Enums.FlagsToSet>.Or(flagsList));
+                Enums.FlagsToSet selectedFlags = (Enums.FlagsToSet)
+                    Conversions.ToInteger(GenericBitwiseStatic<Enums.FlagsToSet>.Or(flagsList));
                 return selectedFlags;
             }
         }
 
         private static SortedDictionary<string, bool> GetSymbolsDictionary()
         {
-            Enums.FlagsToSet[] excludedMembers = new[] { Enums.FlagsToSet.All, Enums.FlagsToSet.None };
-            var symbolsDict = Enum.GetValues(typeof(Enums.FlagsToSet)).Cast<Enums.FlagsToSet>().ToList().AsEnumerable().Where(x => excludedMembers.Contains(x) == false).Select(x => x).ToDictionary(x => Enum.GetName(typeof(Enums.FlagsToSet), x), x => x);
+            Enums.FlagsToSet[] excludedMembers = new[]
+            {
+                Enums.FlagsToSet.All,
+                Enums.FlagsToSet.None,
+            };
+            var symbolsDict = Enum.GetValues(typeof(Enums.FlagsToSet))
+                .Cast<Enums.FlagsToSet>()
+                .ToList()
+                .AsEnumerable()
+                .Where(x => excludedMembers.Contains(x) == false)
+                .Select(x => x)
+                .ToDictionary(x => Enum.GetName(typeof(Enums.FlagsToSet), x), x => x);
 
-            var symbolSelectionDict = (from x in symbolsDict
-                                       select x.Key).ToDictionary(x => x, x => false).ToSortedDictionary();
+            var symbolSelectionDict = (from x in symbolsDict select x.Key)
+                .ToDictionary(x => x, x => false)
+                .ToSortedDictionary();
             return symbolSelectionDict;
         }
 
-        private static List<string> GetUserInputFlagsToAdjust(SortedDictionary<string, bool> symbolSelectionDict)
+        private static List<string> GetUserInputFlagsToAdjust(
+            SortedDictionary<string, bool> symbolSelectionDict
+        )
         {
             var listSelections = new List<string>();
 
@@ -184,7 +224,8 @@ namespace TaskVisualization
                     dictOptions: symbolSelectionDict,
                     autoAssigner: null,
                     prefixes: ToDoDefaults.Instance.PrefixList,
-                    userEmailAddress: "UnusedFieldDiscardText");
+                    userEmailAddress: "UnusedFieldDiscardText"
+                );
 
                 optionsViewer.ShowDialog();
                 if (flagController.ExitType != "Cancel")
@@ -195,7 +236,5 @@ namespace TaskVisualization
 
             return listSelections;
         }
-
-
     }
 }

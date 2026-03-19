@@ -1,9 +1,9 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows.Input;
+using ConcurrentObservableCollection.ConcurrentObservableDictionary;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
-using ConcurrentObservableCollection.ConcurrentObservableDictionary;
 
 namespace UtilitiesCS
 {

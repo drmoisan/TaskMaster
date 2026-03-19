@@ -1,10 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
 using ToDoModel;
 using UtilitiesCS;
-using Microsoft.Office.Interop.Outlook;
-using System.Collections.Generic;
 
 namespace ToDoModel.Test
 {
@@ -29,8 +29,7 @@ namespace ToDoModel.Test
 
         private FolderPredictor CreateFolderHandler()
         {
-            return new FolderPredictor(
-                this.mockApplicationGlobals.Object);
+            return new FolderPredictor(this.mockApplicationGlobals.Object);
         }
 
         [TestMethod]
@@ -44,10 +43,7 @@ namespace ToDoModel.Test
             string expected = "Folder 3";
 
             // Act
-            var actual = folderHandler.GetOlSubpath(
-                path,
-                root,
-                includeChildren);
+            var actual = folderHandler.GetOlSubpath(path, root, includeChildren);
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -64,14 +60,10 @@ namespace ToDoModel.Test
             string expected = "Folder 1\\Folder 2\\Folder 3";
 
             // Act
-            var actual = folderHandler.GetOlSubpath(
-                path,
-                root,
-                includeChildren);
+            var actual = folderHandler.GetOlSubpath(path, root, includeChildren);
 
             // Assert
             Assert.AreEqual(expected, actual);
         }
-
     }
 }

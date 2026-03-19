@@ -22,34 +22,45 @@ namespace ObjectListViewDemo
     {
         public MyFileSystemInfo(FileSystemInfo fileSystemInfo)
         {
-            if (fileSystemInfo == null) throw new ArgumentNullException("fileSystemInfo");
+            if (fileSystemInfo == null)
+                throw new ArgumentNullException("fileSystemInfo");
             this.info = new FileSystemInfoWrapper(fileSystemInfo);
         }
 
         public MyFileSystemInfo(FileInfo fileInfo)
         {
-            if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
+            if (fileInfo == null)
+                throw new ArgumentNullException(nameof(fileInfo));
             this.info = new FileInfoWrapper(fileInfo);
         }
 
         public MyFileSystemInfo(DirectoryInfo fileInfo)
         {
-            if (fileInfo == null) throw new ArgumentNullException(nameof(fileInfo));
+            if (fileInfo == null)
+                throw new ArgumentNullException(nameof(fileInfo));
             this.info = new DirectoryInfoWrapper(fileInfo);
         }
 
         public MyFileSystemInfo(IFileSystemInfo fileSystemInfo)
         {
-            if (fileSystemInfo == null) throw new ArgumentNullException(nameof(fileSystemInfo));
+            if (fileSystemInfo == null)
+                throw new ArgumentNullException(nameof(fileSystemInfo));
             this.info = fileSystemInfo;
         }
 
-        public bool IsDirectory { get { return this.AsDirectory != null; } }
+        public bool IsDirectory
+        {
+            get { return this.AsDirectory != null; }
+        }
 
-        public IDirectoryInfo AsDirectory { get { return this.info as IDirectoryInfo; } }
-        //public IDirectoryInfo AsDirectory 
-        //{ 
-        //    get 
+        public IDirectoryInfo AsDirectory
+        {
+            get { return this.info as IDirectoryInfo; }
+        }
+
+        //public IDirectoryInfo AsDirectory
+        //{
+        //    get
         //    {
         //        var di = this.info as IDirectoryInfo;
         //        if (di is null)
@@ -57,10 +68,13 @@ namespace ObjectListViewDemo
         //            var fi = this.info as IFileInfo;
         //            if (fi is not null) { di = fi.Directory; }
         //        }
-        //        return di; 
-        //    } 
+        //        return di;
+        //    }
         //}
-        public IFileInfo AsFile { get { return this.info as IFileInfo; } }
+        public IFileInfo AsFile
+        {
+            get { return this.info as IFileInfo; }
+        }
 
         public IFileSystemInfo Info
         {
@@ -118,25 +132,34 @@ namespace ObjectListViewDemo
 
         public bool Equals(MyFileSystemInfo other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other))
+                return false;
+            if (ReferenceEquals(this, other))
+                return true;
             return Equals(other.info.FullName, this.info.FullName);
         }
+
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof(MyFileSystemInfo)) return false;
+            if (ReferenceEquals(null, obj))
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != typeof(MyFileSystemInfo))
+                return false;
             return Equals((MyFileSystemInfo)obj);
         }
+
         public override int GetHashCode()
         {
             return (this.info != null ? this.info.FullName.GetHashCode() : 0);
         }
+
         public static bool operator ==(MyFileSystemInfo left, MyFileSystemInfo right)
         {
             return Equals(left, right);
         }
+
         public static bool operator !=(MyFileSystemInfo left, MyFileSystemInfo right)
         {
             return !Equals(left, right);

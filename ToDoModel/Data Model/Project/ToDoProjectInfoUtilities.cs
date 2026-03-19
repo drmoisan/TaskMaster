@@ -6,7 +6,6 @@ using ToDoModel.Legacy;
 
 namespace ToDoModel
 {
-
     public static class ToDoProjectInfoUtilities
     {
         public static ProjectInfoLegacy LoadToDoProjectInfo(string filePath)
@@ -44,7 +43,6 @@ namespace ToDoModel
                 ProjInfo.Save(filePath);
                 return ProjInfo;
             }
-
         }
     }
 }

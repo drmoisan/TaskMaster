@@ -1,13 +1,12 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.OutlookObjects.Store;
 
 namespace UtilitiesCS
 {
-
     public interface IOlObjects : INotifyPropertyChanged
     {
         Application App { get; }

@@ -20,7 +20,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
         #endregion internal properties
 
         /// <summary>
-        /// Gets a reference to the <see cref="LockingObservableLinkedList{T}"/> 
+        /// Gets a reference to the <see cref="LockingObservableLinkedList{T}"/>
         /// that contains the <see cref="LockingObservableLinkedListNode{T}"/>.
         /// </summary>
         public LockingObservableLinkedList<T> List => list;
@@ -67,13 +67,17 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             }
         }
 
-        /// <summary>      
+        /// <summary>
         /// The value contained in the node.
         /// </summary>
-        public T Value { get => item; set => item = value; }
+        public T Value
+        {
+            get => item;
+            set => item = value;
+        }
 
         /// <summary>
-        /// Initializas a new instance of the <see cref="LockingObservableLinkedListNode{T}"/>  
+        /// Initializas a new instance of the <see cref="LockingObservableLinkedListNode{T}"/>
         /// class containing the specific value.
         /// </summary>
         /// <param name="value">The value to contain in the <see cref="LockingObservableLinkedListNode{T}"/></param>
@@ -82,7 +86,10 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             item = value;
         }
 
-        internal LockingObservableLinkedListNode(LockingObservableLinkedList<T> list, LockingLinkedListNode<T> node)
+        internal LockingObservableLinkedListNode(
+            LockingObservableLinkedList<T> list,
+            LockingLinkedListNode<T> node
+        )
         {
             this.list = list;
             item = node.Value;

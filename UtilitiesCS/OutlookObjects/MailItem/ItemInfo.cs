@@ -1,7 +1,7 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Linq;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS.EmailIntelligence
@@ -10,7 +10,8 @@ namespace UtilitiesCS.EmailIntelligence
     public class ItemInfo : IItemInfo
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public ItemInfo() { }
 
@@ -74,44 +75,61 @@ namespace UtilitiesCS.EmailIntelligence
 
         public bool Equals(IItemInfo other)
         {
-            if (other is null) { return false; }
-            else if (ReferenceEquals(this, other)) { return true; }
+            if (other is null)
+            {
+                return false;
+            }
+            else if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
             else
             {
                 //if (Size != other.Size) return false;
-                if (SentDate != other.SentDate) return false;
-                if (Subject != other.Subject) return false;
-                if (Body != other.Body) return false;
-                if (!Sender.Equals(other.Sender)) return false;
-                if (!RecipientsEquivalent(CcRecipients, other.CcRecipients)) return false;
-                if (!RecipientsEquivalent(ToRecipients, other.ToRecipients)) return false;
+                if (SentDate != other.SentDate)
+                    return false;
+                if (Subject != other.Subject)
+                    return false;
+                if (Body != other.Body)
+                    return false;
+                if (!Sender.Equals(other.Sender))
+                    return false;
+                if (!RecipientsEquivalent(CcRecipients, other.CcRecipients))
+                    return false;
+                if (!RecipientsEquivalent(ToRecipients, other.ToRecipients))
+                    return false;
                 return true;
             }
         }
 
         public override int GetHashCode()
         {
-            // Use a simple hash code based on EntryId, StoreId, and Subject            
+            // Use a simple hash code based on EntryId, StoreId, and Subject
             //return Size.GetHashCode() + SentDate.GetHashCode() * 31 +
-            return (Subject ?? "").GetHashCode() * 31 * 31 +
-                (Body ?? "").GetHashCode() * 31 * 31 * 31 +
-                Sender.GetHashCode() * 31 * 31 * 31 * 31 +
-                GetRecipientsHashCode(CcRecipients) * 31 * 31 * 31 * 31 * 31 +
-                GetRecipientsHashCode(ToRecipients) * 31 * 31 * 31 * 31 * 31 * 31;
+            return (Subject ?? "").GetHashCode() * 31 * 31
+                + (Body ?? "").GetHashCode() * 31 * 31 * 31
+                + Sender.GetHashCode() * 31 * 31 * 31 * 31
+                + GetRecipientsHashCode(CcRecipients) * 31 * 31 * 31 * 31 * 31
+                + GetRecipientsHashCode(ToRecipients) * 31 * 31 * 31 * 31 * 31 * 31;
         }
 
         internal bool RecipientsEquivalent(IRecipientInfo[] source, IRecipientInfo[] other)
         {
-            if (source == null && other == null) return true;
-            if (source == null || other == null) return false;
-            if (source.Length != other.Length) return false;
-            if (source.Intersect(other).Count() != other.Length) return false;
+            if (source == null && other == null)
+                return true;
+            if (source == null || other == null)
+                return false;
+            if (source.Length != other.Length)
+                return false;
+            if (source.Intersect(other).Count() != other.Length)
+                return false;
             return true;
         }
 
         internal int GetRecipientsHashCode(IRecipientInfo[] recipients)
         {
-            if (recipients == null || recipients.Length == 0) return 0;
+            if (recipients == null || recipients.Length == 0)
+                return 0;
             int hash = 0;
             int i = 0;
             foreach (var recipient in recipients)

@@ -1,21 +1,22 @@
-﻿using Mono.Reflection;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
-using UtilitiesCS.Extensions;
-using UtilitiesCS.ReusableTypeClasses;
-using UtilitiesCS.NewtonsoftHelpers.MonoExtension;
-using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
+using Mono.Reflection;
 using Newtonsoft.Json;
+using UtilitiesCS.Extensions;
+using UtilitiesCS.NewtonsoftHelpers.MonoExtension;
+using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 
 namespace UtilitiesCS.NewtonsoftHelpers
 {
-    public class WrapperScoDictionary<TDerived, TKey, TValue> where TDerived : ScoDictionaryNew<TKey, TValue>
+    public class WrapperScoDictionary<TDerived, TKey, TValue>
+        where TDerived : ScoDictionaryNew<TKey, TValue>
     {
         [JsonProperty("CoDictionary")]
         public ConcurrentObservableDictionary<TKey, TValue> CoDictionary { get; set; }
@@ -49,15 +50,26 @@ namespace UtilitiesCS.NewtonsoftHelpers
                 derivedInstance.TryAdd(kvp.Key, kvp.Value);
             }
 
-            // Set up the config field            
+            // Set up the config field
             var remainingObjectType = RemainingObject.GetType();
-            var configField = remainingObjectType.GetField("<Config>k__BackingField", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                ?? remainingObjectType.GetField("_Config", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var configField =
+                remainingObjectType.GetField(
+                    "<Config>k__BackingField",
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                )
+                ?? remainingObjectType.GetField(
+                    "_Config",
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                );
             var configValue = configField?.GetValue(RemainingObject) as NewSmartSerializableConfig;
             if (configValue is null)
             {
-                var configProperty = remainingObjectType.GetProperty("Config", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                configValue = configProperty?.GetValue(RemainingObject) as NewSmartSerializableConfig;
+                var configProperty = remainingObjectType.GetProperty(
+                    "Config",
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                );
+                configValue =
+                    configProperty?.GetValue(RemainingObject) as NewSmartSerializableConfig;
             }
 
             if (configValue is not null)
@@ -67,11 +79,19 @@ namespace UtilitiesCS.NewtonsoftHelpers
             // Set additional fields
             var derivedType = typeof(TDerived);
 
-            var additionalFields = RemainingObject.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).ToArray();
-            var drvdFields = derivedType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).ToArray();
+            var additionalFields = RemainingObject
+                .GetType()
+                .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .ToArray();
+            var drvdFields = derivedType
+                .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .ToArray();
             foreach (var field in additionalFields)
             {
-                var fieldInfo = derivedType.GetField(field.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var fieldInfo = derivedType.GetField(
+                    field.Name,
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                );
 
                 if (fieldInfo != null)
                 {
@@ -80,7 +100,8 @@ namespace UtilitiesCS.NewtonsoftHelpers
                 }
             }
 
-            var additionalProperties = remainingObjectType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            var additionalProperties = remainingObjectType
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .Where(p => p.Name != nameof(ScoDictionaryNew<TKey, TValue>.Config));
 
             foreach (var property in additionalProperties)
@@ -90,7 +111,10 @@ namespace UtilitiesCS.NewtonsoftHelpers
                     continue;
                 }
 
-                var targetProperty = derivedType.GetProperty(property.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var targetProperty = derivedType.GetProperty(
+                    property.Name,
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                );
                 if (targetProperty is null || !targetProperty.CanWrite)
                 {
                     continue;
@@ -136,15 +160,21 @@ namespace UtilitiesCS.NewtonsoftHelpers
 
             var derivedProperties = derivedType
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(property => (property.DeclaringType != baseType) && (property.Name != "Config"))
+                .Where(property =>
+                    (property.DeclaringType != baseType) && (property.Name != "Config")
+                )
                 .ToArray();
 
-            var derivedFields = derivedType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                                           .Where(field => (field.DeclaringType != baseType) && (field.Name != "ism"));
+            var derivedFields = derivedType
+                .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(field => (field.DeclaringType != baseType) && (field.Name != "ism"));
 
             TypeBuilder tb = GetTypeBuilder();
             ConstructorBuilder constructor = tb.DefineDefaultConstructor(
-                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName);
+                MethodAttributes.Public
+                    | MethodAttributes.SpecialName
+                    | MethodAttributes.RTSpecialName
+            );
 
             CreateConfigProperty(tb);
 
@@ -154,7 +184,9 @@ namespace UtilitiesCS.NewtonsoftHelpers
                 ReplicateProperty(tb, property, ref capturedFields);
             }
 
-            var fieldsToCreate = derivedFields.Where(field => !capturedFields.ContainsKey(field.Name)).ToArray();
+            var fieldsToCreate = derivedFields
+                .Where(field => !capturedFields.ContainsKey(field.Name))
+                .ToArray();
 
             foreach (var field in fieldsToCreate)
             {
@@ -170,17 +202,26 @@ namespace UtilitiesCS.NewtonsoftHelpers
             var derivedType = typeof(TDerived);
 
             // Set up the config field
-            objectType.GetField("_Config", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.SetValue(myObject, instance.Config);
+            objectType
+                .GetField(
+                    "_Config",
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                )
+                ?.SetValue(myObject, instance.Config);
 
             // Get all other fields in the derived type except for ism which was captured by the _Config field
-            var derivedFields = derivedType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            var derivedFields = derivedType
+                .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .Where(field => field.Name != "ism")
                 .ToArray();
 
             foreach (var field in derivedFields)
             {
                 var fieldValue = field.GetValue(instance);
-                var fieldInfo = objectType.GetField(field.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var fieldInfo = objectType.GetField(
+                    field.Name,
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                );
                 fieldInfo?.SetValue(myObject, fieldValue);
             }
             return myObject;
@@ -191,34 +232,57 @@ namespace UtilitiesCS.NewtonsoftHelpers
             var typeSignature = $"{typeof(TDerived).Name}_ExDictionary";
             var assemblyName = new AssemblyName(typeSignature);
             AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(
-                assemblyName, AssemblyBuilderAccess.Run);
+                assemblyName,
+                AssemblyBuilderAccess.Run
+            );
 
             ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule("MainModule");
 
-            TypeBuilder tb = moduleBuilder.DefineType(typeSignature,
-                    TypeAttributes.Public |
-                    TypeAttributes.Class |
-                    TypeAttributes.AutoClass |
-                    TypeAttributes.AnsiClass |
-                    TypeAttributes.BeforeFieldInit |
-                    TypeAttributes.AutoLayout,
-                    null);
+            TypeBuilder tb = moduleBuilder.DefineType(
+                typeSignature,
+                TypeAttributes.Public
+                    | TypeAttributes.Class
+                    | TypeAttributes.AutoClass
+                    | TypeAttributes.AnsiClass
+                    | TypeAttributes.BeforeFieldInit
+                    | TypeAttributes.AutoLayout,
+                null
+            );
             return tb;
         }
 
         public void CreateConfigProperty(TypeBuilder tb)
         {
-            var propertyBuilder = tb.DefineProperty("Config", PropertyAttributes.None, typeof(NewSmartSerializableConfig), null);
-            var fieldBuilder = tb.DefineField("_Config", typeof(NewSmartSerializableConfig), FieldAttributes.Private);
+            var propertyBuilder = tb.DefineProperty(
+                "Config",
+                PropertyAttributes.None,
+                typeof(NewSmartSerializableConfig),
+                null
+            );
+            var fieldBuilder = tb.DefineField(
+                "_Config",
+                typeof(NewSmartSerializableConfig),
+                FieldAttributes.Private
+            );
 
-            var getMethod = tb.DefineMethod("get_Config", MethodAttributes.Public, typeof(NewSmartSerializableConfig), Type.EmptyTypes);
+            var getMethod = tb.DefineMethod(
+                "get_Config",
+                MethodAttributes.Public,
+                typeof(NewSmartSerializableConfig),
+                Type.EmptyTypes
+            );
             var getIl = getMethod.GetILGenerator();
             getIl.Emit(OpCodes.Ldarg_0);
             getIl.Emit(OpCodes.Ldfld, fieldBuilder);
             getIl.Emit(OpCodes.Ret);
             propertyBuilder.SetGetMethod(getMethod);
 
-            var setMethod = tb.DefineMethod("set_Config", MethodAttributes.Public, null, new[] { typeof(NewSmartSerializableConfig) });
+            var setMethod = tb.DefineMethod(
+                "set_Config",
+                MethodAttributes.Public,
+                null,
+                new[] { typeof(NewSmartSerializableConfig) }
+            );
             var setIl = setMethod.GetILGenerator();
             Label modifyProperty = setIl.DefineLabel();
             Label exitSet = setIl.DefineLabel();
@@ -231,38 +295,83 @@ namespace UtilitiesCS.NewtonsoftHelpers
             setIl.Emit(OpCodes.Ret);
         }
 
-        public void ReplicateProperty(TypeBuilder tb, PropertyInfo property, ref Dictionary<string, FieldBuilder> capturedFields)
+        public void ReplicateProperty(
+            TypeBuilder tb,
+            PropertyInfo property,
+            ref Dictionary<string, FieldBuilder> capturedFields
+        )
         {
-            PropertyBuilder propertyBuilder = tb.DefineProperty(property.Name, property.Attributes, property.PropertyType, property.DeclaringType.GetGenericArguments());
+            PropertyBuilder propertyBuilder = tb.DefineProperty(
+                property.Name,
+                property.Attributes,
+                property.PropertyType,
+                property.DeclaringType.GetGenericArguments()
+            );
             var getMethod = ModifyGetMethod(tb, property, ref capturedFields);
-            if (getMethod is not null) { propertyBuilder.SetGetMethod(getMethod); }
+            if (getMethod is not null)
+            {
+                propertyBuilder.SetGetMethod(getMethod);
+            }
 
             var setMethod = ModifySetMethod(tb, property, ref capturedFields);
-            if (setMethod is not null) { propertyBuilder.SetSetMethod(setMethod); }
+            if (setMethod is not null)
+            {
+                propertyBuilder.SetSetMethod(setMethod);
+            }
             ;
         }
 
-        public void ReplicateProperty(TypeBuilder tb, PropertyInfo property, FieldInfo existingField)
+        public void ReplicateProperty(
+            TypeBuilder tb,
+            PropertyInfo property,
+            FieldInfo existingField
+        )
         {
             //FieldBuilder fieldBuilder = tb.DefineField("_" + propertyName, propertyType, FieldAttributes.Private);
-            var fieldBuilder = tb.DefineField(existingField.Name, existingField.FieldType, existingField.Attributes);
+            var fieldBuilder = tb.DefineField(
+                existingField.Name,
+                existingField.FieldType,
+                existingField.Attributes
+            );
             var getAttributes = property.GetGetMethod().Attributes;
             var setAttributes = property.GetSetMethod().Attributes;
 
-            PropertyBuilder propertyBuilder = tb.DefineProperty(property.Name, property.Attributes, property.PropertyType, null);
-            MethodBuilder getPropMthdBldr = GenerateGetMethod(tb, property, fieldBuilder, getAttributes);
-            MethodBuilder setPropMthdBldr = GenerateSetMethod(tb, property, fieldBuilder, setAttributes);
+            PropertyBuilder propertyBuilder = tb.DefineProperty(
+                property.Name,
+                property.Attributes,
+                property.PropertyType,
+                null
+            );
+            MethodBuilder getPropMthdBldr = GenerateGetMethod(
+                tb,
+                property,
+                fieldBuilder,
+                getAttributes
+            );
+            MethodBuilder setPropMthdBldr = GenerateSetMethod(
+                tb,
+                property,
+                fieldBuilder,
+                setAttributes
+            );
 
             propertyBuilder.SetGetMethod(getPropMthdBldr);
             propertyBuilder.SetSetMethod(setPropMthdBldr);
         }
 
-        private static MethodBuilder GenerateSetMethod(TypeBuilder tb, PropertyInfo property, FieldBuilder fieldBuilder, MethodAttributes setAttributes)
+        private static MethodBuilder GenerateSetMethod(
+            TypeBuilder tb,
+            PropertyInfo property,
+            FieldBuilder fieldBuilder,
+            MethodAttributes setAttributes
+        )
         {
-            MethodBuilder setPropMthdBldr =
-                            tb.DefineMethod("set_" + property.Name,
-                              setAttributes,
-                              null, new[] { property.PropertyType });
+            MethodBuilder setPropMthdBldr = tb.DefineMethod(
+                "set_" + property.Name,
+                setAttributes,
+                null,
+                new[] { property.PropertyType }
+            );
 
             ILGenerator setIl = setPropMthdBldr.GetILGenerator();
             Label modifyProperty = setIl.DefineLabel();
@@ -279,12 +388,19 @@ namespace UtilitiesCS.NewtonsoftHelpers
             return setPropMthdBldr;
         }
 
-        private MethodBuilder ModifySetMethod(TypeBuilder tb, PropertyInfo property, ref Dictionary<string, FieldBuilder> backingFields)
+        private MethodBuilder ModifySetMethod(
+            TypeBuilder tb,
+            PropertyInfo property,
+            ref Dictionary<string, FieldBuilder> backingFields
+        )
         {
             //Type[] method_arguments = null;
             Type[] type_arguments = null;
             var oldSetMethod = property.GetSetMethod(true);
-            if (oldSetMethod == null) { return null; }
+            if (oldSetMethod == null)
+            {
+                return null;
+            }
 
             //if (!(oldGetMethod is ConstructorInfo))
             //    method_arguments = oldGetMethod.GetGenericArguments();
@@ -295,7 +411,12 @@ namespace UtilitiesCS.NewtonsoftHelpers
             var oldInstructions = Disassembler.GetInstructions(oldSetMethod);
             //var newInstructions = new List<Instruction>();
 
-            MethodBuilder setPropMthdBldr = tb.DefineMethod("set_" + property.Name, oldSetMethod.Attributes, property.PropertyType, type_arguments);
+            MethodBuilder setPropMthdBldr = tb.DefineMethod(
+                "set_" + property.Name,
+                oldSetMethod.Attributes,
+                property.PropertyType,
+                type_arguments
+            );
             ILGenerator setIl = setPropMthdBldr.GetILGenerator();
 
             foreach (var instruction in oldInstructions)
@@ -331,15 +452,21 @@ namespace UtilitiesCS.NewtonsoftHelpers
             }
 
             return setPropMthdBldr;
-
         }
 
-        private MethodBuilder ModifyGetMethod(TypeBuilder tb, PropertyInfo property, ref Dictionary<string, FieldBuilder> backingFields)
+        private MethodBuilder ModifyGetMethod(
+            TypeBuilder tb,
+            PropertyInfo property,
+            ref Dictionary<string, FieldBuilder> backingFields
+        )
         {
             //Type[] method_arguments = null;
             Type[] type_arguments = null;
             var oldGetMethod = property.GetGetMethod(true);
-            if (oldGetMethod == null) { throw new InvalidOperationException("Property does not have a getter."); }
+            if (oldGetMethod == null)
+            {
+                throw new InvalidOperationException("Property does not have a getter.");
+            }
 
             //if (!(oldGetMethod is ConstructorInfo))
             //    method_arguments = oldGetMethod.GetGenericArguments();
@@ -350,7 +477,12 @@ namespace UtilitiesCS.NewtonsoftHelpers
             var oldInstructions = Disassembler.GetInstructions(oldGetMethod);
             //var newInstructions = new List<Instruction>();
 
-            MethodBuilder getPropMthdBldr = tb.DefineMethod("get_" + property.Name, oldGetMethod.Attributes, property.PropertyType, type_arguments);
+            MethodBuilder getPropMthdBldr = tb.DefineMethod(
+                "get_" + property.Name,
+                oldGetMethod.Attributes,
+                property.PropertyType,
+                type_arguments
+            );
             ILGenerator getIl = getPropMthdBldr.GetILGenerator();
 
             foreach (var instruction in oldInstructions)
@@ -386,12 +518,21 @@ namespace UtilitiesCS.NewtonsoftHelpers
             }
 
             return getPropMthdBldr;
-
         }
 
-        private static MethodBuilder GenerateGetMethod(TypeBuilder tb, PropertyInfo property, FieldBuilder fieldBuilder, MethodAttributes getAttributes)
+        private static MethodBuilder GenerateGetMethod(
+            TypeBuilder tb,
+            PropertyInfo property,
+            FieldBuilder fieldBuilder,
+            MethodAttributes getAttributes
+        )
         {
-            MethodBuilder getPropMthdBldr = tb.DefineMethod("get_" + property.Name, getAttributes, property.PropertyType, Type.EmptyTypes);
+            MethodBuilder getPropMthdBldr = tb.DefineMethod(
+                "get_" + property.Name,
+                getAttributes,
+                property.PropertyType,
+                Type.EmptyTypes
+            );
             ILGenerator getIl = getPropMthdBldr.GetILGenerator();
 
             getIl.Emit(OpCodes.Ldarg_0);
@@ -418,7 +559,10 @@ namespace UtilitiesCS.NewtonsoftHelpers
             for (int i = 0; i < instructions.Length; i++)
             {
                 // Look for the "ldfld" or "stfld" opcode, which is used to load or store a field
-                if (instructions[i] == OpCodes.Ldfld.Value || instructions[i] == OpCodes.Stfld.Value)
+                if (
+                    instructions[i] == OpCodes.Ldfld.Value
+                    || instructions[i] == OpCodes.Stfld.Value
+                )
                 {
                     // The next bytes represent the metadata token for the field
                     int metadataToken = BitConverter.ToInt32(instructions, i + 1);

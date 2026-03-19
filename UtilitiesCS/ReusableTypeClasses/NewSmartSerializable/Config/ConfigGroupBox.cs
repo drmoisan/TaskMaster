@@ -12,22 +12,31 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
         internal ISmartSerializableConfig.ActiveDiskEnum DiskType { get; set; }
 
         internal TextBox FileNameTextBox { get; set; }
-        internal string FileName { get => FileNameTextBox.Text; set => FileNameTextBox.Text = value; }
+        internal string FileName
+        {
+            get => FileNameTextBox.Text;
+            set => FileNameTextBox.Text = value;
+        }
 
         internal bool IsActive { get; set; }
 
         internal Label LabelActive { get; set; }
 
         internal TextBox RelativePathTextBox { get; set; }
-        internal string RelativePath { get => RelativePathTextBox.Text; set => RelativePathTextBox.Text = value; }
+        internal string RelativePath
+        {
+            get => RelativePathTextBox.Text;
+            set => RelativePathTextBox.Text = value;
+        }
 
         internal ComboBox SpecialFolderComboBox { get; set; }
         internal string SpecialFolderName
         {
             get => SpecialFolderComboBox.SelectedItem as string;
-            set => SpecialFolderComboBox.SelectedItem = SpecialFolderComboBox.Items.Contains(value) ? value : null;
+            set =>
+                SpecialFolderComboBox.SelectedItem = SpecialFolderComboBox.Items.Contains(value)
+                    ? value
+                    : null;
         }
-
-
     }
 }

@@ -30,7 +30,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Category
             result.Should().BeSameAs(createdCategory.Object);
             categories.Verify(
                 x => x.Add("PRJ:Inbox", It.IsAny<object>(), It.IsAny<object>()),
-                Times.Once);
+                Times.Once
+            );
         }
 
         [TestMethod]
@@ -53,7 +54,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Category
             result.Should().BeSameAs(createdCategory.Object);
             categories.Verify(
                 x => x.Add("PRJ:Inbox", It.IsAny<object>(), It.IsAny<object>()),
-                Times.Once);
+                Times.Once
+            );
         }
 
         [TestMethod]
@@ -76,7 +78,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Category
             result.Should().BeSameAs(createdCategory.Object);
             categories.Verify(
                 x => x.Add("Inbox", It.IsAny<object>(), It.IsAny<object>()),
-                Times.Once);
+                Times.Once
+            );
         }
 
         [TestMethod]
@@ -99,7 +102,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Category
             result.Should().BeSameAs(createdCategory.Object);
             categories.Verify(
                 x => x.Add("PRJ:A", It.IsAny<object>(), It.IsAny<object>()),
-                Times.Once);
+                Times.Once
+            );
         }
 
         [TestMethod]
@@ -109,7 +113,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Category
             var prefix = CreatePrefix("PRJ:", OlCategoryColor.olCategoryColorBlue);
             var categories = CreateCategoriesCollection();
             categories
-                .Setup(x => x.Add("PRJ:Inbox", OlCategoryColor.olCategoryColorBlue, OlCategoryShortcutKey.olCategoryShortcutKeyNone))
+                .Setup(x =>
+                    x.Add(
+                        "PRJ:Inbox",
+                        OlCategoryColor.olCategoryColorBlue,
+                        OlCategoryShortcutKey.olCategoryShortcutKeyNone
+                    )
+                )
                 .Throws(new InvalidOperationException("Add failed"));
             var session = new Mock<NameSpace>();
             session.SetupGet(x => x.Categories).Returns(categories.Object);
@@ -129,7 +139,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Category
             return prefix;
         }
 
-        private static Mock<Categories> CreateCategoriesCollection(params Microsoft.Office.Interop.Outlook.Category[] categories)
+        private static Mock<Categories> CreateCategoriesCollection(
+            params Microsoft.Office.Interop.Outlook.Category[] categories
+        )
         {
             var collection = new ArrayList(categories);
             var categoriesMock = new Mock<Categories>();

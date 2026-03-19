@@ -54,9 +54,13 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             Action popAct = () => stack.Pop();
 
             // Assert
-            peekAct.Should().Throw<InvalidOperationException>()
+            peekAct
+                .Should()
+                .Throw<InvalidOperationException>()
                 .WithMessage("Stack is empty. No element to peek at");
-            popAct.Should().Throw<InvalidOperationException>()
+            popAct
+                .Should()
+                .Throw<InvalidOperationException>()
                 .WithMessage("Stack is empty. Cannot pop an element");
         }
 
@@ -71,9 +75,13 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             Action popAct = () => stack.Pop(1);
 
             // Assert
-            peekAct.Should().Throw<IndexOutOfRangeException>()
+            peekAct
+                .Should()
+                .Throw<IndexOutOfRangeException>()
                 .WithMessage("Index 1 out of range. Stack only has 1 elements.");
-            popAct.Should().Throw<IndexOutOfRangeException>()
+            popAct
+                .Should()
+                .Throw<IndexOutOfRangeException>()
                 .WithMessage("Index 1 out of range. Stack only has 1 elements.");
         }
 

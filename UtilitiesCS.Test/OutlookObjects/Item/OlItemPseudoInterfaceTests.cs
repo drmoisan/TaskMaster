@@ -43,8 +43,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
 
             System.Action act = () => unsupported.SetCategories("Ignored");
 
-            act.Should().Throw<ArgumentException>()
-                .WithMessage("Unsupported type*");
+            act.Should().Throw<ArgumentException>().WithMessage("Unsupported type*");
         }
 
         [TestMethod]
@@ -78,9 +77,15 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             var mail2 = new Mock<InteropMailItem>().Object;
             var task = new Mock<TaskItem>().Object;
             var selection = CreateSelection(mail1, task, mail2);
-            var method = typeof(UtilitiesCS.OlItemPseudoInterface).GetMethod(nameof(UtilitiesCS.OlItemPseudoInterface.OnlyMailItems), BindingFlags.Public | BindingFlags.Static);
+            var method = typeof(UtilitiesCS.OlItemPseudoInterface).GetMethod(
+                nameof(UtilitiesCS.OlItemPseudoInterface.OnlyMailItems),
+                BindingFlags.Public | BindingFlags.Static
+            );
 
-            var result = ((System.Collections.IEnumerable)method!.Invoke(null, new object[] { selection.Object }))
+            var result = (
+                (System.Collections.IEnumerable)
+                    method!.Invoke(null, new object[] { selection.Object })
+            )
                 .Cast<object>()
                 .ToArray();
 
@@ -105,7 +110,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         private static Mock<Selection> CreateSelection(params object[] items)
         {
             var selection = new Mock<Selection>();
-            selection.Setup(x => x.GetEnumerator()).Returns(((IEnumerable<object>)items).GetEnumerator());
+            selection
+                .Setup(x => x.GetEnumerator())
+                .Returns(((IEnumerable<object>)items).GetEnumerator());
             return selection;
         }
     }

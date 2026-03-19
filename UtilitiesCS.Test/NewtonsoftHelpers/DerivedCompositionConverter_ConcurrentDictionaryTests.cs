@@ -1,10 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using UtilitiesCS.NewtonsoftHelpers;
 using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using UtilitiesCS.NewtonsoftHelpers;
 
 namespace UtilitiesCS.Test.NewtonsoftHelpers
 {
@@ -16,8 +16,13 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             public string AdditionalField1 { get; set; }
             private int AdditionalField2;
             private string _additionalField3;
+
             [JsonProperty]
-            public string AdditionalField3 { get => _additionalField3; set => _additionalField3 = value; }
+            public string AdditionalField3
+            {
+                get => _additionalField3;
+                set => _additionalField3 = value;
+            }
 
             public TestDerived()
             {
@@ -32,7 +37,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         private class SimpleProperty()
         {
             private string _testElement;
-            public string TestElement { get => _testElement; set => _testElement = value; }
+            public string TestElement
+            {
+                get => _testElement;
+                set => _testElement = value;
+            }
         }
 
         //[TestMethod]
@@ -139,7 +148,5 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         //    actual.Should().BeEquivalentTo(expected);
 
         //}
-
-
     }
 }

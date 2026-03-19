@@ -45,7 +45,12 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void EmailSubject_Setter_WithNull_ClearsSubjectState()
         {
             // Arrange
-            var entry = new SubjectMapEntry("Inbox\\Reports", "Status update", 2, new List<string>());
+            var entry = new SubjectMapEntry(
+                "Inbox\\Reports",
+                "Status update",
+                2,
+                new List<string>()
+            );
 
             // Act
             entry.EmailSubject = null;
@@ -60,9 +65,24 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void Equals_ReturnsTrueOnlyWhenFolderAndSubjectMatch()
         {
             // Arrange
-            var left = new SubjectMapEntry("Inbox\\Reports", "Status update", 1, new List<string>());
-            var same = new SubjectMapEntry("Inbox\\Reports", "Status update", 5, new List<string>());
-            var different = new SubjectMapEntry("Inbox\\Reports", "Different subject", 1, new List<string>());
+            var left = new SubjectMapEntry(
+                "Inbox\\Reports",
+                "Status update",
+                1,
+                new List<string>()
+            );
+            var same = new SubjectMapEntry(
+                "Inbox\\Reports",
+                "Status update",
+                5,
+                new List<string>()
+            );
+            var different = new SubjectMapEntry(
+                "Inbox\\Reports",
+                "Different subject",
+                1,
+                new List<string>()
+            );
 
             // Act
             var sameResult = left.Equals(same);
@@ -78,20 +98,31 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             // Arrange
             var encoder = new Mock<ISubjectMapEncoder>(MockBehavior.Strict);
-            encoder.Setup(mock => mock.AugmentTokenDict(It.IsAny<string[]>()))
-                .Verifiable();
-            var entry = new SubjectMapEntry("Inbox\\Reports", "Status update", 2, new List<string>());
+            encoder.Setup(mock => mock.AugmentTokenDict(It.IsAny<string[]>())).Verifiable();
+            var entry = new SubjectMapEntry(
+                "Inbox\\Reports",
+                "Status update",
+                2,
+                new List<string>()
+            );
 
             // Act
             var ready = entry.ReadyToEncode(encoder.Object);
 
             // Assert
             ready.Should().BeTrue();
-            encoder.Verify(mock => mock.AugmentTokenDict(It.Is<string[]>(tokens =>
-                tokens.Length == 3 &&
-                Array.Exists(tokens, token => token == "reports") &&
-                Array.Exists(tokens, token => token == "status") &&
-                Array.Exists(tokens, token => token == "update"))), Times.Once);
+            encoder.Verify(
+                mock =>
+                    mock.AugmentTokenDict(
+                        It.Is<string[]>(tokens =>
+                            tokens.Length == 3
+                            && Array.Exists(tokens, token => token == "reports")
+                            && Array.Exists(tokens, token => token == "status")
+                            && Array.Exists(tokens, token => token == "update")
+                        )
+                    ),
+                Times.Once
+            );
         }
 
         [TestMethod]
@@ -108,8 +139,14 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Assert
             encoded.Should().Equal(10, 20);
-            encoder.Verify(mock => mock.AugmentTokenDict(It.Is<string[]>(tokens => tokens.Length == 2)), Times.Once);
-            encoder.Verify(mock => mock.Encode(It.Is<string[]>(tokens => tokens.Length == 2)), Times.Once);
+            encoder.Verify(
+                mock => mock.AugmentTokenDict(It.Is<string[]>(tokens => tokens.Length == 2)),
+                Times.Once
+            );
+            encoder.Verify(
+                mock => mock.Encode(It.Is<string[]>(tokens => tokens.Length == 2)),
+                Times.Once
+            );
         }
 
         [TestMethod]
@@ -122,8 +159,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             Action act = () => new SubjectMapEntry("Fwd", 1, commonWords);
 
             // Assert
-            act.Should().Throw<InvalidOperationException>()
-                .WithMessage("*has no valid tokens*");
+            act.Should().Throw<InvalidOperationException>().WithMessage("*has no valid tokens*");
         }
     }
 }

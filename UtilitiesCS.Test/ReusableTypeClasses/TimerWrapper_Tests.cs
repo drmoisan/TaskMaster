@@ -63,7 +63,11 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             using var signal = new ManualResetEventSlim(false);
 
             // Act
-            using var timer = TimerWrapper.StartNew(TimeSpan.FromMilliseconds(20), autoReset: false, callback: signal.Set);
+            using var timer = TimerWrapper.StartNew(
+                TimeSpan.FromMilliseconds(20),
+                autoReset: false,
+                callback: signal.Set
+            );
 
             // Assert
             timer.AutoReset.Should().BeFalse();

@@ -34,12 +34,19 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
             string filenameSeed = new string('b', 80);
 
             // Act
-            string result = AttachmentHelper.AdjustForMaxPath(folderPath, filenameSeed, ".pdf", "_copy");
+            string result = AttachmentHelper.AdjustForMaxPath(
+                folderPath,
+                filenameSeed,
+                ".pdf",
+                "_copy"
+            );
 
             // Assert
             result.Length.Should().BeLessThanOrEqualTo(AttachmentHelper.MAX_PATH);
             Path.GetFileName(result).Should().EndWith("_copy.pdf");
-            Path.GetFileNameWithoutExtension(result).Length.Should().BeLessThan(filenameSeed.Length + "_copy".Length);
+            Path.GetFileNameWithoutExtension(result)
+                .Length.Should()
+                .BeLessThan(filenameSeed.Length + "_copy".Length);
         }
 
         [TestMethod]
@@ -51,13 +58,26 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
             string deleteFolderPath = new string('d', AttachmentHelper.MAX_PATH);
 
             // Act
-            bool result = helper.CheckParameters(null, new DateTime(2026, 3, 14), saveFolderPath, deleteFolderPath);
+            bool result = helper.CheckParameters(
+                null,
+                new DateTime(2026, 3, 14),
+                saveFolderPath,
+                deleteFolderPath
+            );
 
             // Assert
             result.Should().BeFalse();
-            helper.ErrorMessages.Should().Contain(message => message.Contains("attachment is null", StringComparison.OrdinalIgnoreCase));
-            helper.ErrorMessages.Should().Contain(message => message.Contains(saveFolderPath, StringComparison.Ordinal));
-            helper.ErrorMessages.Should().Contain(message => message.Contains(deleteFolderPath, StringComparison.Ordinal));
+            helper
+                .ErrorMessages.Should()
+                .Contain(message =>
+                    message.Contains("attachment is null", StringComparison.OrdinalIgnoreCase)
+                );
+            helper
+                .ErrorMessages.Should()
+                .Contain(message => message.Contains(saveFolderPath, StringComparison.Ordinal));
+            helper
+                .ErrorMessages.Should()
+                .Contain(message => message.Contains(deleteFolderPath, StringComparison.Ordinal));
         }
 
         [TestMethod]
@@ -80,7 +100,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
         {
             // Arrange
             var sentOn = new DateTime(2026, 3, 14, 9, 30, 0, DateTimeKind.Local);
-            var attachment = CreateAttachmentMock(fileName: "report?.pdf", displayName: "display?.pdf", type: OlAttachmentType.olByValue, size: 123);
+            var attachment = CreateAttachmentMock(
+                fileName: "report?.pdf",
+                displayName: "display?.pdf",
+                type: OlAttachmentType.olByValue,
+                size: 123
+            );
             var helper = new AttachmentHelper();
 
             // Act
@@ -95,7 +120,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
             helper.FilePathDelete.Should().Be(@"C:\delete-root\20260314_report_.pdf");
             helper.FilePathSaveAlt.Should().StartWith(@"C:\save-root\20260314_report__");
             helper.FilePathSaveAlt.Should().EndWith(".pdf");
-            Regex.IsMatch(Path.GetFileNameWithoutExtension(helper.FilePathSaveAlt), "^20260314_report__\\d{14}$").Should().BeTrue();
+            Regex
+                .IsMatch(
+                    Path.GetFileNameWithoutExtension(helper.FilePathSaveAlt),
+                    "^20260314_report__\\d{14}$"
+                )
+                .Should()
+                .BeTrue();
         }
 
         [TestMethod]
@@ -103,7 +134,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
         {
             // Arrange
             var sentOn = new DateTime(2026, 3, 14);
-            var attachment = CreateAttachmentMock(fileName: string.Empty, displayName: string.Empty, type: OlAttachmentType.olOLE, size: 50);
+            var attachment = CreateAttachmentMock(
+                fileName: string.Empty,
+                displayName: string.Empty,
+                type: OlAttachmentType.olOLE,
+                size: 50
+            );
             var helper = new AttachmentHelper();
 
             // Act
@@ -131,7 +167,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
             Regex.IsMatch(suffix, "^_\\d{14}$").Should().BeTrue();
         }
 
-        private static Mock<OutlookAttachment> CreateAttachmentMock(string fileName, string displayName = null, OlAttachmentType type = OlAttachmentType.olByValue, int size = 1)
+        private static Mock<OutlookAttachment> CreateAttachmentMock(
+            string fileName,
+            string displayName = null,
+            OlAttachmentType type = OlAttachmentType.olByValue,
+            int size = 1
+        )
         {
             var attachment = new Mock<OutlookAttachment>();
             attachment.SetupGet(x => x.Type).Returns(type);
@@ -140,7 +181,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
             attachment.SetupGet(x => x.DisplayName).Returns(displayName ?? fileName);
             attachment.SetupGet(x => x.FileName).Returns(fileName);
             attachment.SetupGet(x => x.Index).Returns(1);
-            attachment.SetupGet(x => x.PathName).Returns(Path.Combine(@"C:\temp", fileName ?? string.Empty));
+            attachment
+                .SetupGet(x => x.PathName)
+                .Returns(Path.Combine(@"C:\temp", fileName ?? string.Empty));
             attachment.SetupGet(x => x.Position).Returns(2);
             attachment.SetupGet(x => x.Size).Returns(size);
             return attachment;

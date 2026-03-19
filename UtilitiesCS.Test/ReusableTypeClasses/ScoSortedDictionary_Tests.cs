@@ -84,7 +84,9 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             var values = Enumerable.Range(1, 20).ToArray();
 
             // Act
-            await Task.WhenAll(values.Select(value => Task.Run(() => dictionary[value] = $"value-{value}")));
+            await Task.WhenAll(
+                values.Select(value => Task.Run(() => dictionary[value] = $"value-{value}"))
+            );
 
             // Assert
             dictionary.Count.Should().Be(values.Length);

@@ -26,7 +26,8 @@ namespace UtilitiesCS.HelperClasses
             }
 
             // Don't serialize a null object, simply return the default for that object
-            if (ReferenceEquals(source, null)) return default;
+            if (ReferenceEquals(source, null))
+                return default;
 
             using Stream stream = new MemoryStream();
             IFormatter formatter = new BinaryFormatter();

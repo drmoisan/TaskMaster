@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using UtilitiesCS;
-using System.Windows.Forms;
-using System.Diagnostics;
-using System;
-
 
 namespace UtilitiesCS
 {
@@ -15,18 +14,23 @@ namespace UtilitiesCS
     [Obsolete("This class is deprecated, use CtfMap instead")]
     public class CtfIncidenceList : SerializableList<CtfIncidence>
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region "Constructors and private variables"
 
-        public CtfIncidenceList() : base() { }
+        public CtfIncidenceList()
+            : base() { }
 
-        public CtfIncidenceList(string filename, string folderpath, string backupFilepath) : base(
-            filename: filename, folderpath: folderpath,
-            backupLoader: new CSVLoader<CtfIncidence>(ReadTextFile),
-            backupFilepath: backupFilepath,
-            askUserOnError: true)
-        { }
+        public CtfIncidenceList(string filename, string folderpath, string backupFilepath)
+            : base(
+                filename: filename,
+                folderpath: folderpath,
+                backupLoader: new CSVLoader<CtfIncidence>(ReadTextFile),
+                backupFilepath: backupFilepath,
+                askUserOnError: true
+            ) { }
 
         private int _maxFoldersPerConv = 3;
 
@@ -39,7 +43,8 @@ namespace UtilitiesCS
         public void CtfIncidencePositionAdd(int idx, CtfMapEntry CtfMap)
         {
             // Variables to hold loop counters
-            int i, j;
+            int i,
+                j;
 
             bool added;
 
@@ -50,17 +55,14 @@ namespace UtilitiesCS
             {
                 // If the conversation count is more than the folder stored,
                 if (CtfMap.EmailCount > this[idx].EmailCounts[1])
-
                 {
                     // then call the subroutine to replace the value
                     CTF_Incidence_SET(idx, 1, 1, CtfMap);
                 }
             }
-
             // SECTION FOR WHEN MaxFolders IS MORE THAN 1
             else
             {
-
                 if (this[idx].FolderCount < _maxFoldersPerConv)
                 {
                     // If folder count is less than max, increase count
@@ -96,7 +98,6 @@ namespace UtilitiesCS
                         this[idx].EmailFolders[_maxFoldersPerConv] = CtfMap.EmailFolder;
                     }
                 }
-
             }
         }
 
@@ -124,7 +125,6 @@ namespace UtilitiesCS
             //}
 
             //return CTF_Incidence_FINDRet;
-
         }
 
         public void CTF_Incidence_INIT(int Inc_Num)
@@ -132,15 +132,20 @@ namespace UtilitiesCS
             int i;
 
             var loopTo = _maxFoldersPerConv;
-            for (i = 1; i <= loopTo; i++)                                                      // Loop through the number of Folders we are saving
+            for (i = 1; i <= loopTo; i++) // Loop through the number of Folders we are saving
             {
                 this[Inc_Num].FolderCount = 0;
-                this[Inc_Num].EmailCounts[i] = 0;                                // Set count to 0 so any value wins
-                this[Inc_Num].EmailFolders[i] = "===============================";            // Set Folder name to lines so that they will not be accepted if they show up in selection list
+                this[Inc_Num].EmailCounts[i] = 0; // Set count to 0 so any value wins
+                this[Inc_Num].EmailFolders[i] = "==============================="; // Set Folder name to lines so that they will not be accepted if they show up in selection list
             }
         }
 
-        public void CTF_Incidence_SET(int Inc_Num, int Inc_Position, int Folder_Count, CtfMapEntry Map)
+        public void CTF_Incidence_SET(
+            int Inc_Num,
+            int Inc_Position,
+            int Folder_Count,
+            CtfMapEntry Map
+        )
         {
             this[Inc_Num].FolderCount = Folder_Count;
             this[Inc_Num].EmailConversationID = Map.ConversationID;
@@ -151,24 +156,25 @@ namespace UtilitiesCS
         #region "Backup Loader and Writer"
 
 
-
         #endregion
 
         #region "Deprecated Backup Loader and Writer"
 
         /// <summary>
-        /// Method Writes a csv to the File System the conversation id's with 
+        /// Method Writes a csv to the File System the conversation id's with
         /// the Folders that have the most emails from the conversation in them
         /// </summary>
         /// <param name="folderpath"></param>
         /// <param name="filename"></param>
         public void CTF_Incidence_Text_File_WRITE(string folderpath, string filename)
         {
-
             var listOutput = new List<string>();
-            listOutput.Add("This file contains a mapping of folders to email conversations based on incidence");
+            listOutput.Add(
+                "This file contains a mapping of folders to email conversations based on incidence"
+            );
 
-            int i, j;
+            int i,
+                j;
             var loopTo = CTF_Inc_Ct;
             for (i = 1; i <= loopTo; i++)
             {
@@ -188,7 +194,6 @@ namespace UtilitiesCS
                 foreach (var line in listOutput)
                     sw.WriteLine(line);
             }
-
         }
 
         public static IList<CtfIncidence> ReadTextFile(string filepath)
@@ -207,7 +212,10 @@ namespace UtilitiesCS
             while (lines.Count > 0)
             {
                 var incidence = TryDequeueIncidence(ref lines);
-                if (incidence is not null) { listCTF.Add(incidence); }
+                if (incidence is not null)
+                {
+                    listCTF.Add(incidence);
+                }
             }
 
             return listCTF;
@@ -230,7 +238,8 @@ namespace UtilitiesCS
             }
             catch (System.FormatException e)
             {
-                string message = $"Error converting to int at line {e.GetLineNumber()} in {nameof(CtfIncidence)}.{nameof(TryDequeueIncidence)} of the backup loader";
+                string message =
+                    $"Error converting to int at line {e.GetLineNumber()} in {nameof(CtfIncidence)}.{nameof(TryDequeueIncidence)} of the backup loader";
                 log.Error(message, e);
                 Debug.WriteLine(message);
                 DequeueToNextRecord(ref lines);
@@ -238,7 +247,8 @@ namespace UtilitiesCS
             }
             catch (System.OverflowException e)
             {
-                string message = $"Error converting to int at line {e.GetLineNumber()} in {nameof(CtfIncidence)}.{nameof(TryDequeueIncidence)} of the backup loader";
+                string message =
+                    $"Error converting to int at line {e.GetLineNumber()} in {nameof(CtfIncidence)}.{nameof(TryDequeueIncidence)} of the backup loader";
                 log.Error(message, e);
                 Debug.WriteLine(message);
                 DequeueToNextRecord(ref lines);
@@ -246,7 +256,8 @@ namespace UtilitiesCS
             }
             catch (System.InvalidOperationException e)
             {
-                string message = $"Error dequeuing at line {e.GetLineNumber()} in {nameof(CtfIncidence)}.{nameof(TryDequeueIncidence)} of the backup loader";
+                string message =
+                    $"Error dequeuing at line {e.GetLineNumber()} in {nameof(CtfIncidence)}.{nameof(TryDequeueIncidence)} of the backup loader";
                 log.Error(message, e);
                 Debug.WriteLine(message);
                 DequeueToNextRecord(ref lines);
@@ -256,7 +267,14 @@ namespace UtilitiesCS
 
         internal static void DequeueToNextRecord(ref Queue<string> lines)
         {
-            while ((lines.Count > 0) && ((lines.Peek().Length != 32) || lines.Peek().Contains(" ") || lines.Peek().Contains("\\")))
+            while (
+                (lines.Count > 0)
+                && (
+                    (lines.Peek().Length != 32)
+                    || lines.Peek().Contains(" ")
+                    || lines.Peek().Contains("\\")
+                )
+            )
             {
                 lines.Dequeue();
             }
@@ -291,7 +309,6 @@ namespace UtilitiesCS
             }
 
             return filecontents;
-
         }
 
         #endregion

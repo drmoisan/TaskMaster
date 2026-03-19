@@ -1,7 +1,7 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test
 {
@@ -74,9 +74,8 @@ namespace UtilitiesCS.Test
 
         private sealed class CapturingProgressTracker : ProgressTracker
         {
-            public CapturingProgressTracker() : base(new CancellationTokenSource())
-            {
-            }
+            public CapturingProgressTracker()
+                : base(new CancellationTokenSource()) { }
 
             public int? LastValue { get; private set; }
 

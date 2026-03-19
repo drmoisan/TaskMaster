@@ -18,10 +18,11 @@ namespace UtilitiesCS.Threading
         private static int NOTCALLED = 0;
         private static int CALLED = 1;
         private int _state = NOTCALLED;
+
         /// <summary>Explicit call to check and set if this is the first call</summary>
         public bool CheckAndSetFirstCall
-        { get { return Interlocked.Exchange(ref _state, CALLED) == NOTCALLED; } }
+        {
+            get { return Interlocked.Exchange(ref _state, CALLED) == NOTCALLED; }
+        }
     }
-
-
 }

@@ -1,9 +1,9 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS;
-using System;
-using System.Collections.Generic;
 
 namespace UtilitiesCS.Test
 {
@@ -18,11 +18,13 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.Start).Returns(new DateTime(2025, 12, 25, 12, 5, 3));
             Dictionary<OlItemSummary.Details, string> target = new()
             {
-                {OlItemSummary.Details.Type, typeof(AppointmentItem).ToString() },
-                {OlItemSummary.Details.Subject, "TestSubjectString" },
-                {OlItemSummary.Details.Date, "12-25-2025 12:05 PM" }
+                { OlItemSummary.Details.Type, typeof(AppointmentItem).ToString() },
+                { OlItemSummary.Details.Subject, "TestSubjectString" },
+                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
             };
-            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(
+                item.Object
+            );
             Assert.IsTrue(test.ContentEquals(target));
         }
 
@@ -34,11 +36,13 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.SentOn).Returns(new DateTime(2025, 12, 25, 12, 5, 3));
             Dictionary<OlItemSummary.Details, string> target = new()
             {
-                {OlItemSummary.Details.Type, typeof(MeetingItem).ToString() },
-                {OlItemSummary.Details.Subject, "TestSubjectString" },
-                {OlItemSummary.Details.Date, "12-25-2025 12:05 PM" }
+                { OlItemSummary.Details.Type, typeof(MeetingItem).ToString() },
+                { OlItemSummary.Details.Subject, "TestSubjectString" },
+                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
             };
-            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(
+                item.Object
+            );
             Assert.IsTrue(test.ContentEquals(target));
         }
 
@@ -50,11 +54,13 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.CreationTime).Returns(new DateTime(2025, 12, 25, 12, 5, 3));
             Dictionary<OlItemSummary.Details, string> target = new()
             {
-                {OlItemSummary.Details.Type, typeof(TaskRequestItem).ToString() },
-                {OlItemSummary.Details.Subject, "TestSubjectString" },
-                {OlItemSummary.Details.Date, "12-25-2025 12:05 PM" }
+                { OlItemSummary.Details.Type, typeof(TaskRequestItem).ToString() },
+                { OlItemSummary.Details.Subject, "TestSubjectString" },
+                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
             };
-            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(
+                item.Object
+            );
             Assert.IsTrue(test.ContentEquals(target));
         }
 
@@ -63,14 +69,17 @@ namespace UtilitiesCS.Test
         {
             Mock<TaskRequestUpdateItem> item = new Mock<TaskRequestUpdateItem>();
             item.SetupGet(x => x.Subject).Returns("TestSubjectString");
-            item.SetupGet(x => x.LastModificationTime).Returns(new DateTime(2025, 12, 25, 12, 5, 3));
+            item.SetupGet(x => x.LastModificationTime)
+                .Returns(new DateTime(2025, 12, 25, 12, 5, 3));
             Dictionary<OlItemSummary.Details, string> target = new()
             {
-                {OlItemSummary.Details.Type, typeof(TaskRequestUpdateItem).ToString() },
-                {OlItemSummary.Details.Subject, "TestSubjectString" },
-                {OlItemSummary.Details.Date, "12-25-2025 12:05 PM" }
+                { OlItemSummary.Details.Type, typeof(TaskRequestUpdateItem).ToString() },
+                { OlItemSummary.Details.Subject, "TestSubjectString" },
+                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
             };
-            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(
+                item.Object
+            );
             Assert.IsTrue(test.ContentEquals(target));
         }
 
@@ -83,11 +92,13 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.SentOn).Returns(new DateTime(2025, 12, 25, 12, 5, 3));
             Dictionary<OlItemSummary.Details, string> target = new()
             {
-                {OlItemSummary.Details.Type, typeof(MailItem).ToString() },
-                {OlItemSummary.Details.Subject, "TestSubjectString" },
-                {OlItemSummary.Details.Date, "12-25-2025 12:05 PM" }
+                { OlItemSummary.Details.Type, typeof(MailItem).ToString() },
+                { OlItemSummary.Details.Subject, "TestSubjectString" },
+                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
             };
-            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(
+                item.Object
+            );
             Assert.IsTrue(test.ContentEquals(target));
         }
 
@@ -99,10 +110,12 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.MessageClass).Returns("IPM.Note.Secure");
             Dictionary<OlItemSummary.Details, string> target = new()
             {
-                {OlItemSummary.Details.Type, typeof(MailItem).ToString() },
-                {OlItemSummary.Details.Subject, "IPM.Note.Secure" }
+                { OlItemSummary.Details.Type, typeof(MailItem).ToString() },
+                { OlItemSummary.Details.Subject, "IPM.Note.Secure" },
             };
-            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(item.Object);
+            Dictionary<OlItemSummary.Details, string> test = OlItemSummary.ExtractSummary(
+                item.Object
+            );
             Assert.IsTrue(test.ContentEquals(target));
         }
 
@@ -113,12 +126,13 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.Subject).Returns("TestSubjectString");
             item.SetupGet(x => x.CreationTime).Returns(new DateTime(2025, 12, 25, 12, 5, 3));
             OlItemSummary.Details options = GenericBitwise<OlItemSummary.Details>.Or(
-                new List<OlItemSummary.Details> 
-                { 
-                    OlItemSummary.Details.Type, 
-                    OlItemSummary.Details.Subject, 
-                    OlItemSummary.Details.Date 
-                });
+                new List<OlItemSummary.Details>
+                {
+                    OlItemSummary.Details.Type,
+                    OlItemSummary.Details.Subject,
+                    OlItemSummary.Details.Date,
+                }
+            );
             string test = OlItemSummary.Extract(item.Object, options);
             string target = "Details.Type: Castle.Proxies.TaskItemProxy";
             Assert.AreEqual(target, test);
@@ -129,11 +143,12 @@ namespace UtilitiesCS.Test
         {
             Dictionary<OlItemSummary.Details, string> testDict = new()
             {
-                {OlItemSummary.Details.Type, typeof(MailItem).ToString() },
-                {OlItemSummary.Details.Subject, "TestSubjectString" },
-                {OlItemSummary.Details.Date, "12-25-2025 12:05 PM" }
+                { OlItemSummary.Details.Type, typeof(MailItem).ToString() },
+                { OlItemSummary.Details.Subject, "TestSubjectString" },
+                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
             };
-            string target = "Type: Microsoft.Office.Interop.Outlook.MailItem, Subject: TestSubjectString, Date: 12-25-2025 12:05 PM";
+            string target =
+                "Type: Microsoft.Office.Interop.Outlook.MailItem, Subject: TestSubjectString, Date: 12-25-2025 12:05 PM";
             string test = testDict.ToString(OlItemSummary.Details.All);
             Assert.AreEqual(target, test);
         }
@@ -143,16 +158,17 @@ namespace UtilitiesCS.Test
         {
             Dictionary<OlItemSummary.Details, string> testDict = new()
             {
-                {OlItemSummary.Details.Type, typeof(MailItem).ToString() },
-                {OlItemSummary.Details.Subject, "TestSubjectString" },
-                {OlItemSummary.Details.Date, "12-25-2025 12:05 PM" }
+                { OlItemSummary.Details.Type, typeof(MailItem).ToString() },
+                { OlItemSummary.Details.Subject, "TestSubjectString" },
+                { OlItemSummary.Details.Date, "12-25-2025 12:05 PM" },
             };
             OlItemSummary.Details options = GenericBitwise<OlItemSummary.Details>.Or(
                 new List<OlItemSummary.Details>
                 {
                     OlItemSummary.Details.Subject,
-                    OlItemSummary.Details.Date
-                });
+                    OlItemSummary.Details.Date,
+                }
+            );
             string target = "Subject: TestSubjectString, Date: 12-25-2025 12:05 PM";
             string test = testDict.ToString(options);
             Assert.AreEqual(target, test);
@@ -165,7 +181,8 @@ namespace UtilitiesCS.Test
             item.SetupGet(x => x.MessageClass).Returns("Dummy Readable Message Class");
             item.SetupGet(x => x.Subject).Returns("TestSubjectString");
             item.SetupGet(x => x.SentOn).Returns(new DateTime(2025, 12, 25, 12, 5, 3));
-            string target = "Type: Microsoft.Office.Interop.Outlook.MailItem, Subject: TestSubjectString, Date: 12-25-2025 12:05 PM";
+            string target =
+                "Type: Microsoft.Office.Interop.Outlook.MailItem, Subject: TestSubjectString, Date: 12-25-2025 12:05 PM";
             string test = OlItemSummary.Extract(item.Object, OlItemSummary.Details.All);
             Assert.AreEqual(target, test);
         }
@@ -182,8 +199,9 @@ namespace UtilitiesCS.Test
                 new List<OlItemSummary.Details>
                 {
                     OlItemSummary.Details.Subject,
-                    OlItemSummary.Details.Date
-                });
+                    OlItemSummary.Details.Date,
+                }
+            );
             string test = OlItemSummary.Extract(item.Object, options);
             Assert.AreEqual(target, test);
         }

@@ -11,8 +11,16 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         public void Equals_ShouldReturnTrue_WhenNodesParentsAndChildrenMatch()
         {
             var comparer = new FolderWrapperNodeComparer();
-            var left = CreateTree("Inbox", parentName: "Projects", childDescriptors: [("Archive", 1, 20L), ("Sent", 2, 40L)]);
-            var right = CreateTree("INBOX", parentName: "PROJECTS", childDescriptors: [("archive", 1, 20L), ("sent", 2, 40L)]);
+            var left = CreateTree(
+                "Inbox",
+                parentName: "Projects",
+                childDescriptors: [("Archive", 1, 20L), ("Sent", 2, 40L)]
+            );
+            var right = CreateTree(
+                "INBOX",
+                parentName: "PROJECTS",
+                childDescriptors: [("archive", 1, 20L), ("sent", 2, 40L)]
+            );
 
             comparer.Equals(left, right).Should().BeTrue();
         }
@@ -31,8 +39,16 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         public void Equals_ShouldReturnFalse_WhenChildCountsDifferAcrossTreeDepths()
         {
             var comparer = new FolderWrapperNodeComparer();
-            var left = CreateTree("Inbox", parentName: "Projects", childDescriptors: [("Archive", 1, 20L)]);
-            var right = CreateTree("Inbox", parentName: "Projects", childDescriptors: [("Archive", 1, 20L), ("Sent", 2, 40L)]);
+            var left = CreateTree(
+                "Inbox",
+                parentName: "Projects",
+                childDescriptors: [("Archive", 1, 20L)]
+            );
+            var right = CreateTree(
+                "Inbox",
+                parentName: "Projects",
+                childDescriptors: [("Archive", 1, 20L), ("Sent", 2, 40L)]
+            );
 
             comparer.Equals(left, right).Should().BeFalse();
         }
@@ -54,8 +70,16 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         public void GetHashCode_ShouldReturnSameValue_ForEquivalentNodes()
         {
             var comparer = new FolderWrapperNodeComparer();
-            var left = CreateTree("Inbox", parentName: "Projects", childDescriptors: [("Archive", 1, 20L)]);
-            var right = CreateTree("INBOX", parentName: "PROJECTS", childDescriptors: [("archive", 1, 20L)]);
+            var left = CreateTree(
+                "Inbox",
+                parentName: "Projects",
+                childDescriptors: [("Archive", 1, 20L)]
+            );
+            var right = CreateTree(
+                "INBOX",
+                parentName: "PROJECTS",
+                childDescriptors: [("archive", 1, 20L)]
+            );
 
             comparer.GetHashCode(left).Should().Be(comparer.GetHashCode(right));
             comparer.GetHashCode(new TreeNode<FolderWrapper>((FolderWrapper)null)).Should().Be(0);
@@ -64,7 +88,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         private static TreeNode<FolderWrapper> CreateTree(
             string name,
             string parentName = null,
-            (string name, int itemCount, long folderSize)[] childDescriptors = null)
+            (string name, int itemCount, long folderSize)[] childDescriptors = null
+        )
         {
             var node = new TreeNode<FolderWrapper>(CreateFolder(name, 2, 200L));
             if (parentName is not null)
@@ -74,7 +99,15 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 
             foreach (var childDescriptor in childDescriptors ?? [])
             {
-                node.Children.Add(new TreeNode<FolderWrapper>(CreateFolder(childDescriptor.name, childDescriptor.itemCount, childDescriptor.folderSize)));
+                node.Children.Add(
+                    new TreeNode<FolderWrapper>(
+                        CreateFolder(
+                            childDescriptor.name,
+                            childDescriptor.itemCount,
+                            childDescriptor.folderSize
+                        )
+                    )
+                );
             }
 
             return node;
@@ -82,7 +115,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 
         private static FolderWrapper CreateFolder(string name, int itemCount, long folderSize)
         {
-            return new FolderWrapper(selected: false, itemCount: itemCount, folderSize: folderSize, name: name, relativePath: name ?? string.Empty);
+            return new FolderWrapper(
+                selected: false,
+                itemCount: itemCount,
+                folderSize: folderSize,
+                name: name,
+                relativePath: name ?? string.Empty
+            );
         }
     }
 }

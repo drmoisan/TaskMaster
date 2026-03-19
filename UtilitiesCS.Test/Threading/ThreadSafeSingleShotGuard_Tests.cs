@@ -1,8 +1,8 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.Test
@@ -31,12 +31,15 @@ namespace UtilitiesCS.Test
             // Arrange
             var guard = new ThreadSafeSingleShotGuard();
             var start = new ManualResetEventSlim(false);
-            var tasks = Enumerable.Range(0, 16)
-                .Select(_ => Task.Run(() =>
-                {
-                    start.Wait();
-                    return guard.CheckAndSetFirstCall;
-                }))
+            var tasks = Enumerable
+                .Range(0, 16)
+                .Select(_ =>
+                    Task.Run(() =>
+                    {
+                        start.Wait();
+                        return guard.CheckAndSetFirstCall;
+                    })
+                )
                 .ToArray();
 
             // Act

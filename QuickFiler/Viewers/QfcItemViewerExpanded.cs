@@ -1,6 +1,4 @@
-﻿using Microsoft.Web.WebView2.Core;
-using QuickFiler.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,6 +9,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Web.WebView2.Core;
+using QuickFiler.Interfaces;
 
 namespace QuickFiler
 {
@@ -28,9 +28,19 @@ namespace QuickFiler
 
         private SynchronizationContext _context;
 
-        public IList<Label> TipsLabels { get => _tipsLabels; }
-        public IQfcItemController Controller { get => _controller; set => _controller = value; }
-        public SynchronizationContext UiSyncContext { get => _context; }
+        public IList<Label> TipsLabels
+        {
+            get => _tipsLabels;
+        }
+        public IQfcItemController Controller
+        {
+            get => _controller;
+            set => _controller = value;
+        }
+        public SynchronizationContext UiSyncContext
+        {
+            get => _context;
+        }
 
         private void InitTipsLabelsList()
         {
@@ -44,11 +54,8 @@ namespace QuickFiler
                 LblAcConversation,
                 LblAcEmail,
                 LblAcFolder,
-                LblAcSearch
+                LblAcSearch,
             };
-
         }
-
-
     }
 }

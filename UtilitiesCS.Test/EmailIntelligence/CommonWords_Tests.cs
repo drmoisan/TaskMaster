@@ -122,17 +122,24 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             public void Deserialize(bool askUserOnError) => throw new NotSupportedException();
 
-            public void Deserialize(string filepath, bool askUserOnError) => throw new NotSupportedException();
+            public void Deserialize(string filepath, bool askUserOnError) =>
+                throw new NotSupportedException();
 
-            public void Deserialize(string filepath, CSVLoader<string> backupLoader, bool askUserOnError) => throw new NotSupportedException();
+            public void Deserialize(
+                string filepath,
+                CSVLoader<string> backupLoader,
+                bool askUserOnError
+            ) => throw new NotSupportedException();
 
             public void Serialize() => throw new NotSupportedException();
 
             public void Serialize(string filepath) => throw new NotSupportedException();
 
-            public System.Threading.Tasks.Task SerializeAsync() => throw new NotSupportedException();
+            public System.Threading.Tasks.Task SerializeAsync() =>
+                throw new NotSupportedException();
 
-            public System.Threading.Tasks.Task SerializeAsync(string filepath) => throw new NotSupportedException();
+            public System.Threading.Tasks.Task SerializeAsync(string filepath) =>
+                throw new NotSupportedException();
 
             public List<string> ToList() => new List<string>(this);
 
@@ -140,7 +147,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
             {
                 Clear();
                 AddRange(value);
-                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Count)));
+                PropertyChanged?.Invoke(
+                    this,
+                    new System.ComponentModel.PropertyChangedEventArgs(nameof(Count))
+                );
             }
         }
     }

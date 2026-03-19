@@ -1,18 +1,16 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UtilitiesCS.ReusableTypeClasses;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
-
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
     public static class CaptureEmailAddressesModule2
     {
-
 
         //public static List<string> GetEmailAddresses(this MailItem OlMail, string emailRootFolder, IScoDictionary<string, string> dictRemap, string currentUserEmail)
         //{
@@ -59,7 +57,5 @@ namespace UtilitiesCS
         //    }
         //    return emailAddressList;
         //}
-
-
     }
 }

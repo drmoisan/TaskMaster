@@ -30,7 +30,9 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
         [DataRow(102)]
         [DataRow(103)]
         [DataRow(104)]
-        public void GetActionTaken_WhenLastVerbExecutedIsReplyOrForward_ReturnsActed(int lastVerbExecuted)
+        public void GetActionTaken_WhenLastVerbExecutedIsReplyOrForward_ReturnsActed(
+            int lastVerbExecuted
+        )
         {
             // Arrange
             var propertyAccessor = new Mock<PropertyAccessor>();
@@ -136,17 +138,12 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             helper.FolderInfo = folderInfo.Object;
             helper.SetRecipients(
                 [new RecipientInfo("Grace Hopper", "grace@example.com", null)],
-                [new RecipientInfo("Alan Turing", "alan@example.com", null)]);
-            helper.SetAttachments(
-                [
-                    CreateAttachment("report.pdf"),
-                    CreateAttachment("chart.png"),
-                ]);
+                [new RecipientInfo("Alan Turing", "alan@example.com", null)]
+            );
+            helper.SetAttachments([CreateAttachment("report.pdf"), CreateAttachment("chart.png")]);
             var dictRemap = new ScoDictionary<string, string>(
-                new Dictionary<string, string>
-                {
-                    [@"Inbox\Projects"] = @"Archive\Projects",
-                });
+                new Dictionary<string, string> { [@"Inbox\Projects"] = @"Archive\Projects" }
+            );
 
             // Act
             string[] result = helper.Details(dictRemap);

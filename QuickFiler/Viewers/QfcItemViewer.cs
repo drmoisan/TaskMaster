@@ -1,6 +1,4 @@
-﻿using Microsoft.Web.WebView2.Core;
-using QuickFiler.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,6 +9,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Web.WebView2.Core;
+using QuickFiler.Interfaces;
 
 namespace QuickFiler
 {
@@ -24,24 +24,42 @@ namespace QuickFiler
             InitTips();
         }
 
-
         private IList<Label> _tipsLabels;
-        public IList<Label> TipsLabels { get => _tipsLabels; }
+        public IList<Label> TipsLabels
+        {
+            get => _tipsLabels;
+        }
 
         private IList<Label> _leftTipsLabels;
-        public IList<Label> LeftTipsLabels { get => _leftTipsLabels; }
+        public IList<Label> LeftTipsLabels
+        {
+            get => _leftTipsLabels;
+        }
 
         private IList<Label> _expandedTipsLabels;
-        public IList<Label> ExpandedTipsLabels { get => _expandedTipsLabels; }
+        public IList<Label> ExpandedTipsLabels
+        {
+            get => _expandedTipsLabels;
+        }
 
         private IItemControler _controller;
-        public IItemControler Controller { get => _controller; set => _controller = value; }
-        
+        public IItemControler Controller
+        {
+            get => _controller;
+            set => _controller = value;
+        }
+
         private SynchronizationContext _context;
-        public SynchronizationContext UiSyncContext { get => _context; }
+        public SynchronizationContext UiSyncContext
+        {
+            get => _context;
+        }
 
         private TaskScheduler _uiScheduler;
-        public TaskScheduler UiScheduler { get => _uiScheduler; }
+        public TaskScheduler UiScheduler
+        {
+            get => _uiScheduler;
+        }
 
         private void InitTips()
         {
@@ -58,15 +76,9 @@ namespace QuickFiler
                 LblAcSearch,
             };
 
-            _leftTipsLabels = new List<Label>
-            {
-                LblAcOpen,
-            };
+            _leftTipsLabels = new List<Label> { LblAcOpen };
 
-            _expandedTipsLabels = new List<Label>
-            {
-                LblAcBody,
-            };
+            _expandedTipsLabels = new List<Label> { LblAcBody };
         }
     }
 }

@@ -3,13 +3,14 @@ using UtilitiesCS;
 
 namespace TaskMaster
 {
-
     public class AppStagingFilenames : IAppStagingFilenames
     {
         private string _conditionalReminders;
         public string ConditionalReminders
         {
-            get => _conditionalReminders ?? InitProp(ref _conditionalReminders, Settings.Default.File_ConditionalReminders);
+            get =>
+                _conditionalReminders
+                ?? InitProp(ref _conditionalReminders, Settings.Default.File_ConditionalReminders);
             set
             {
                 _conditionalReminders = value;
@@ -58,7 +59,6 @@ namespace TaskMaster
         public string CtfMap
         {
             get => _ctfMap ?? InitProp(ref _ctfMap, Settings.Default.File_CTF_Map);
-
             set
             {
                 _ctfMap = value;
@@ -70,8 +70,9 @@ namespace TaskMaster
         private string _emailSessionTemp;
         public string EmailSessionTemp
         {
-            get => _emailSessionTemp ?? InitProp(ref _emailSessionTemp, Settings.Default.FileName_EmailSessionTmp);
-
+            get =>
+                _emailSessionTemp
+                ?? InitProp(ref _emailSessionTemp, Settings.Default.FileName_EmailSessionTmp);
             set
             {
                 _emailSessionTemp = value;
@@ -83,7 +84,9 @@ namespace TaskMaster
         private string _emailSession;
         public string EmailSession
         {
-            get => _emailSession ?? InitProp(ref _emailSession, Settings.Default.FileName_EmailSession);
+            get =>
+                _emailSession
+                ?? InitProp(ref _emailSession, Settings.Default.FileName_EmailSession);
             set
             {
                 _emailSession = value;
@@ -95,7 +98,9 @@ namespace TaskMaster
         private string _movedMails;
         public string MovedMails
         {
-            get => _movedMails ?? InitProp(ref _movedMails, Settings.Default.FileName_MovedEmailsBackup);
+            get =>
+                _movedMails
+                ?? InitProp(ref _movedMails, Settings.Default.FileName_MovedEmailsBackup);
             set
             {
                 _movedMails = value;
@@ -117,7 +122,13 @@ namespace TaskMaster
         }
 
         private string _emailInfoStagingFile;
-        public string EmailInfoStagingFile { get => _emailInfoStagingFile ?? InitProp(ref _emailInfoStagingFile, Settings.Default.FileName_EmailInfoStaging); set => _emailInfoStagingFile = value; }
+        public string EmailInfoStagingFile
+        {
+            get =>
+                _emailInfoStagingFile
+                ?? InitProp(ref _emailInfoStagingFile, Settings.Default.FileName_EmailInfoStaging);
+            set => _emailInfoStagingFile = value;
+        }
 
         internal string InitProp(ref string prop, string value)
         {

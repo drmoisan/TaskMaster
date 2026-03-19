@@ -1,8 +1,8 @@
+using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System.Runtime.InteropServices;
 
 namespace TaskMaster.Test.AppGlobals
 {
@@ -71,7 +71,9 @@ namespace TaskMaster.Test.AppGlobals
         {
             // Arrange
             var addressEntry = mockRepository.Create<AddressEntry>();
-            addressEntry.Setup(x => x.GetExchangeUser()).Throws(new COMException("The operation failed."));
+            addressEntry
+                .Setup(x => x.GetExchangeUser())
+                .Throws(new COMException("The operation failed."));
             addressEntry.SetupGet(x => x.Address).Throws(new COMException("The operation failed."));
 
             // Act

@@ -1,9 +1,9 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 
 namespace ToDoModel.Test.Data_Model.ToDo
@@ -18,13 +18,25 @@ namespace ToDoModel.Test.Data_Model.ToDo
 
         public Attachments Attachments => throw new NotImplementedException();
 
-        public string BillingInformation { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string Body { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string BillingInformation
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+        public string Body
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
         public string Categories { get; set; }
 
         public OlObjectClass Class => throw new NotImplementedException();
 
-        public string Companies { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string Companies
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
 
         public string ConversationIndex => throw new NotImplementedException();
 
@@ -52,10 +64,26 @@ namespace ToDoModel.Test.Data_Model.ToDo
 
         public Links Links => throw new NotImplementedException();
 
-        public OlRemoteStatus MarkForDownload { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string MessageClass { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string Mileage { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool NoAging { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public OlRemoteStatus MarkForDownload
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+        public string MessageClass
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+        public string Mileage
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+        public bool NoAging
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
 
         public long OutlookInternalVersion => throw new NotImplementedException();
 
@@ -65,21 +93,37 @@ namespace ToDoModel.Test.Data_Model.ToDo
 
         public PropertyAccessor PropertyAccessor => throw new NotImplementedException();
 
-        public DateTime ReminderTime { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public DateTime ReminderTime
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
 
         public bool Saved => throw new NotImplementedException();
 
-        public OlSensitivity Sensitivity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public OlSensitivity Sensitivity
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
 
         public NameSpace Session => throw new NotImplementedException();
 
         public int Size => throw new NotImplementedException();
 
-        public string Subject { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string Subject
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
 
         public DateTime TaskStartDate { get; set; }
 
-        public bool UnRead { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool UnRead
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
 
         public UserProperties UserProperties => throw new NotImplementedException();
 
@@ -128,6 +172,9 @@ namespace ToDoModel.Test.Data_Model.ToDo
             throw new NotImplementedException();
         }
 
-        public Type ItemType { get => throw new NotImplementedException(); }
+        public Type ItemType
+        {
+            get => throw new NotImplementedException();
+        }
     }
 }

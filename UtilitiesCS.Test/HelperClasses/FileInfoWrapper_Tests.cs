@@ -1,7 +1,7 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.HelperClasses.FileSystem;
 
 namespace UtilitiesCS.Test.HelperClasses
@@ -16,8 +16,7 @@ namespace UtilitiesCS.Test.HelperClasses
             Action act = () => new FileInfoWrapper(null);
 
             // Assert
-            act.Should().Throw<ArgumentNullException>()
-                .And.ParamName.Should().Be("fileInfo");
+            act.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("fileInfo");
         }
 
         [TestMethod]
@@ -93,7 +92,9 @@ namespace UtilitiesCS.Test.HelperClasses
                 current = current.Parent;
             }
 
-            throw new InvalidOperationException("The TaskMaster solution file could not be located from the test assembly path.");
+            throw new InvalidOperationException(
+                "The TaskMaster solution file could not be located from the test assembly path."
+            );
         }
     }
 }

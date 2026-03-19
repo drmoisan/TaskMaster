@@ -1,24 +1,23 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
 // Last Revised: September 2012
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using System.Collections.ObjectModel;
-using System.Collections;
-using System.ComponentModel;
-using System.Collections.Specialized;
 
 namespace Swordfish.NET.Collections
 {
-
     /// <summary>
     /// This class provides a dictionary that can be bound to a WPF control,
     /// where the dictionary can be modified from a thread that is not the
@@ -28,17 +27,16 @@ namespace Swordfish.NET.Collections
     /// <remarks>
     /// Used a Dictionary to map keys to the index in the underlying observable
     /// collection.
-    /// 
+    ///
     /// TODO: Implement all of the methods offered by the framework
     /// ConcurrentDictionary.
     /// </remarks>
-    public class ConcurrentObservableDictionary<TKey, TValue> :
-      ConcurrentObservableBase<KeyValuePair<TKey, TValue>>,
-      IDictionary<TKey, TValue>,
-      ICollection<KeyValuePair<TKey, TValue>>,
-      ICollection
+    public class ConcurrentObservableDictionary<TKey, TValue>
+        : ConcurrentObservableBase<KeyValuePair<TKey, TValue>>,
+            IDictionary<TKey, TValue>,
+            ICollection<KeyValuePair<TKey, TValue>>,
+            ICollection
     {
-
         // ************************************************************************
         // Private Fields
         // ************************************************************************
@@ -49,6 +47,7 @@ namespace Swordfish.NET.Collections
         /// index for the master list, key list, and value list.
         /// </summary>
         protected Dictionary<TKey, DoubleLinkListIndexNode> _keyToIndex;
+
         /// <summary>
         /// The last node of the link list, used for adding new nodes to the end
         /// </summary>
@@ -78,9 +77,8 @@ namespace Swordfish.NET.Collections
         /// </summary>
         /// <param name="source"></param>
         public ConcurrentObservableDictionary(IDictionary<TKey, TValue> source)
-          : this()
+            : this()
         {
-
             foreach (KeyValuePair<TKey, TValue> pair in source)
             {
                 Add(pair);
@@ -93,9 +91,8 @@ namespace Swordfish.NET.Collections
         /// </summary>
         /// <param name="equalityComparer"></param>
         public ConcurrentObservableDictionary(IEqualityComparer<TKey> equalityComparer)
-          : this()
+            : this()
         {
-
             _keyToIndex = new Dictionary<TKey, DoubleLinkListIndexNode>(equalityComparer);
         }
 
@@ -106,9 +103,8 @@ namespace Swordfish.NET.Collections
         /// </summary>
         /// <param name="capactity"></param>
         public ConcurrentObservableDictionary(int capactity)
-          : this()
+            : this()
         {
-
             _keyToIndex = new Dictionary<TKey, DoubleLinkListIndexNode>(capactity);
         }
 
@@ -119,10 +115,12 @@ namespace Swordfish.NET.Collections
         /// </summary>
         /// <param name="source"></param>
         /// <param name="equalityComparer"></param>
-        public ConcurrentObservableDictionary(IDictionary<TKey, TValue> source, IEqualityComparer<TKey> equalityComparer)
-          : this(equalityComparer)
+        public ConcurrentObservableDictionary(
+            IDictionary<TKey, TValue> source,
+            IEqualityComparer<TKey> equalityComparer
+        )
+            : this(equalityComparer)
         {
-
             foreach (KeyValuePair<TKey, TValue> pair in source)
             {
                 Add(pair);
@@ -136,10 +134,12 @@ namespace Swordfish.NET.Collections
         /// </summary>
         /// <param name="capacity"></param>
         /// <param name="equalityComparer"></param>
-        public ConcurrentObservableDictionary(int capacity, IEqualityComparer<TKey> equalityComparer)
-          : this()
+        public ConcurrentObservableDictionary(
+            int capacity,
+            IEqualityComparer<TKey> equalityComparer
+        )
+            : this()
         {
-
             _keyToIndex = new Dictionary<TKey, DoubleLinkListIndexNode>(capacity, equalityComparer);
         }
 
@@ -206,7 +206,7 @@ namespace Swordfish.NET.Collections
         }
 
         /// <summary>
-        /// Tries adding a new key value pair. 
+        /// Tries adding a new key value pair.
         /// </summary>
         /// <param name="key">
         /// The object to use as the key of the element to add.
@@ -219,17 +219,21 @@ namespace Swordfish.NET.Collections
         /// </returns>
         public bool TryAdd(TKey key, TValue value)
         {
-            return DoBaseReadWrite(() =>
-            {
-                return _keyToIndex.ContainsKey(key);
-            }, () =>
-            {
-                return false;
-            }, () =>
-            {
-                BaseAdd(key, value);
-                return true;
-            });
+            return DoBaseReadWrite(
+                () =>
+                {
+                    return _keyToIndex.ContainsKey(key);
+                },
+                () =>
+                {
+                    return false;
+                },
+                () =>
+                {
+                    BaseAdd(key, value);
+                    return true;
+                }
+            );
         }
 
         /// <summary>
@@ -246,30 +250,38 @@ namespace Swordfish.NET.Collections
         public TValue RetrieveOrAdd(TKey key, Func<TValue> getValue)
         {
             TValue value = default(TValue);
-            return DoBaseReadWrite(() =>
-            {
-                // Test for read or write
-                return _keyToIndex.ContainsKey(key);
-            }, () =>
-            {
-                // Read func
-                int index = _keyToIndex[key].Index;
-                return WriteCollection[index].Value;
-            }, () =>
-            {
-                // Pre write func (outside of locking the collection)
-                value = getValue();
-            }, () =>
-            {
-                // Write func
-                BaseAdd(key, value);
-                return value;
-            });
+            return DoBaseReadWrite(
+                () =>
+                {
+                    // Test for read or write
+                    return _keyToIndex.ContainsKey(key);
+                },
+                () =>
+                {
+                    // Read func
+                    int index = _keyToIndex[key].Index;
+                    return WriteCollection[index].Value;
+                },
+                () =>
+                {
+                    // Pre write func (outside of locking the collection)
+                    value = getValue();
+                },
+                () =>
+                {
+                    // Write func
+                    BaseAdd(key, value);
+                    return value;
+                }
+            );
         }
 
         protected virtual void BaseAdd(TKey key, TValue value)
         {
-            DoubleLinkListIndexNode node = new DoubleLinkListIndexNode(_lastNode, _keyToIndex.Count);
+            DoubleLinkListIndexNode node = new DoubleLinkListIndexNode(
+                _lastNode,
+                _keyToIndex.Count
+            );
             _keyToIndex.Add(key, node);
             _lastNode = node;
             WriteCollection.Add(new KeyValuePair<TKey, TValue>(key, value));
@@ -299,11 +311,11 @@ namespace Swordfish.NET.Collections
         /// Note that the returned collection is immutable. This was deliberate, and
         /// is related to the implementation of GetEnumerator() which also returns a
         /// snapshot.
-        /// 
+        ///
         /// If you hand off the Enumerator, Values, or Keys to a GUI object you'll
         /// potentially get a crash because the collection can be modified by another
         /// thread while the GUI is enumerating.
-        /// 
+        ///
         /// I thought about having an enumerator where the underlying collection
         /// could be modified without causing an exception, and have new objects
         /// added to the end, but then how would that work for the sorted version
@@ -311,10 +323,7 @@ namespace Swordfish.NET.Collections
         /// </remarks>
         public ICollection<TKey> Keys
         {
-            get
-            {
-                return new ConcurrentKeyCollection<TKey, TValue>(this);
-            }
+            get { return new ConcurrentKeyCollection<TKey, TValue>(this); }
         }
 
         /// <summary>
@@ -383,11 +392,11 @@ namespace Swordfish.NET.Collections
         /// Note that the returned collection is immutable. This was deliberate, and
         /// is related to the implementation of GetEnumerator() which also returns a
         /// snapshot.
-        /// 
+        ///
         /// If you hand off the Enumerator, Values, or Keys to a GUI object you'll
         /// potentially get a crash because the collection can be modified by another
         /// thread while the GUI is enumerating.
-        /// 
+        ///
         /// I thought about having an enumerator where the underlying collection
         /// could be modified without causing an exception, and have new objects
         /// added to the end, but then how would that work for the sorted version
@@ -395,10 +404,7 @@ namespace Swordfish.NET.Collections
         /// </remarks>
         public ICollection<TValue> Values
         {
-            get
-            {
-                return new ConcurrentValueCollection<TKey, TValue>(this);
-            }
+            get { return new ConcurrentValueCollection<TKey, TValue>(this); }
         }
 
         /// <summary>
@@ -536,10 +542,7 @@ namespace Swordfish.NET.Collections
         /// </summary>
         public bool IsReadOnly
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
         }
 
         #endregion ICollection<KeyValuePair<TKey, TValue>> Members
@@ -591,6 +594,5 @@ namespace Swordfish.NET.Collections
         }
 
         #endregion ICollection Members
-
     }
 }

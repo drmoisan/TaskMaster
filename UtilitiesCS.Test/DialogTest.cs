@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS;
 
 namespace UtilitiesCS.Test
@@ -10,14 +10,13 @@ namespace UtilitiesCS.Test
     public class DialogTest
     {
         private delegate DialogResult TestDelegate();
+
         //private TestDelegate testDelegate1 = buttonOK;
         //private TestDelegate testDelegate2 = buttonCancel;
-        
 
         [TestMethod]
         public void TestMethod1()
         {
-            
             //string title, string message, Dictionary< string,Delegate > map
             string title = "TestDialog";
             string message = "This is a test to see if this is working properly";
@@ -25,12 +24,10 @@ namespace UtilitiesCS.Test
             map.Add("OK", new TestDelegate(buttonOk));
             map.Add("CANCEL", new TestDelegate(buttonCancel));
 
-
             //MyBoxTemplate _box = new MyBoxTemplate();
             MyBoxViewer _box = new MyBoxViewer(title, message, map);
             DialogResult result = _box.ShowDialog();
             Assert.IsTrue(result == DialogResult.OK);
-
         }
 
         private DialogResult buttonOk()
@@ -47,11 +44,8 @@ namespace UtilitiesCS.Test
         {
             return DialogResult.Cancel;
         }
-
-        
     }
 
-    
     //public static class MyDelegates
     //{
     //    public static DialogResult buttonOK()
@@ -59,10 +53,9 @@ namespace UtilitiesCS.Test
     //        return DialogResult.OK;
     //    }
 
-    //    public static DialogResult buttonCancel() 
-    //    { 
+    //    public static DialogResult buttonCancel()
+    //    {
     //        return DialogResult.Cancel;
     //    }
     //}
-
 }

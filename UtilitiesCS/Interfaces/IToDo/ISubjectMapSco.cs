@@ -4,8 +4,6 @@ using System.Text.RegularExpressions;
 
 namespace UtilitiesCS
 {
-
-
     public interface ISubjectMapSco : IScoCollection<SubjectMapEntry>
     {
         void Add(string subject, string folderName);

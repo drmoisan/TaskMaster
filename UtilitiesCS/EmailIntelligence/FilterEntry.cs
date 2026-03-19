@@ -15,13 +15,20 @@ namespace UtilitiesCS
             _folders = new();
             _flags = new("");
         }
+
         public FilterEntry(string name, List<string> folders, IList<string> categoryList)
         {
             _name = name;
             _folders = folders;
             _flags = new(categoryList);
         }
-        public FilterEntry(string name, string description, List<string> folders, FlagClassNoItem flags)
+
+        public FilterEntry(
+            string name,
+            string description,
+            List<string> folders,
+            FlagClassNoItem flags
+        )
         {
             _name = name;
             _description = description;
@@ -30,16 +37,32 @@ namespace UtilitiesCS
         }
 
         private string _name;
-        public string Name { get => _name; set => _name = value; }
+        public string Name
+        {
+            get => _name;
+            set => _name = value;
+        }
 
         private string _description;
-        public string Description { get => _description; set => _description = value; }
+        public string Description
+        {
+            get => _description;
+            set => _description = value;
+        }
 
         private List<string> _folders;
-        public List<string> Folders { get => _folders; set => _folders = value; }
+        public List<string> Folders
+        {
+            get => _folders;
+            set => _folders = value;
+        }
 
         private FlagClassNoItem _flags;
-        public FlagClassNoItem Flags { get => _flags; set => _flags = value; }
+        public FlagClassNoItem Flags
+        {
+            get => _flags;
+            set => _flags = value;
+        }
 
         public object Clone()
         {

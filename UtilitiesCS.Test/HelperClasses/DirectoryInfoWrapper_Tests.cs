@@ -1,8 +1,8 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Linq;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.HelperClasses.FileSystem;
 
 namespace UtilitiesCS.Test.HelperClasses
@@ -17,8 +17,7 @@ namespace UtilitiesCS.Test.HelperClasses
             Action act = () => new DirectoryInfoWrapper(null);
 
             // Assert
-            act.Should().Throw<ArgumentNullException>()
-                .And.ParamName.Should().Be("directoryInfo");
+            act.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("directoryInfo");
         }
 
         [TestMethod]
@@ -69,8 +68,12 @@ namespace UtilitiesCS.Test.HelperClasses
             var fileSystemInfos = wrapper.EnumerateFileSystemInfos().ToArray();
 
             // Assert
-            fileSystemInfos.Should().Contain(item => item is DirectoryInfoWrapper && item.Name == "UtilitiesCS");
-            fileSystemInfos.Should().Contain(item => item is FileInfoWrapper && item.Name == "TaskMaster.sln");
+            fileSystemInfos
+                .Should()
+                .Contain(item => item is DirectoryInfoWrapper && item.Name == "UtilitiesCS");
+            fileSystemInfos
+                .Should()
+                .Contain(item => item is FileInfoWrapper && item.Name == "TaskMaster.sln");
         }
 
         [TestMethod]
@@ -91,12 +94,17 @@ namespace UtilitiesCS.Test.HelperClasses
         {
             var current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
 
-            while (current is not null && !File.Exists(Path.Combine(current.FullName, "TaskMaster.sln")))
+            while (
+                current is not null
+                && !File.Exists(Path.Combine(current.FullName, "TaskMaster.sln"))
+            )
             {
                 current = current.Parent;
             }
 
-            current.Should().NotBeNull("the test assembly should run inside the TaskMaster repository");
+            current
+                .Should()
+                .NotBeNull("the test assembly should run inside the TaskMaster repository");
             return current;
         }
     }

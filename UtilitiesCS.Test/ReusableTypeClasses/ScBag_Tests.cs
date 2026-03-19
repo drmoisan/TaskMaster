@@ -87,7 +87,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
                 LocalDisk = new FilePathHelper("local.json", @"C:\local"),
                 NetDisk = new FilePathHelper("net.json", @"C:\net"),
                 LocalJsonSettings = new JsonSerializerSettings { Formatting = Formatting.None },
-                NetJsonSettings = new JsonSerializerSettings { Formatting = Formatting.Indented }
+                NetJsonSettings = new JsonSerializerSettings { Formatting = Formatting.Indented },
             };
 
             // Act

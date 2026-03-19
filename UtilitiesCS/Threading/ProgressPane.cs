@@ -22,16 +22,26 @@ namespace UtilitiesCS.EmailIntelligence.TaskPane
         }
 
         private System.Windows.Threading.Dispatcher _dispatcher;
-        public System.Windows.Threading.Dispatcher UiDispatcher { get => _dispatcher; set => _dispatcher = value; }
+        public System.Windows.Threading.Dispatcher UiDispatcher
+        {
+            get => _dispatcher;
+            set => _dispatcher = value;
+        }
 
         private SynchronizationContext _context;
-        public SynchronizationContext UiSyncContext { get => _context; }
+        public SynchronizationContext UiSyncContext
+        {
+            get => _context;
+        }
 
         private TaskScheduler _uiScheduler;
-        public TaskScheduler UiScheduler { get => _uiScheduler; }
-
+        public TaskScheduler UiScheduler
+        {
+            get => _uiScheduler;
+        }
 
         private CancellationTokenSource _tokenSource;
+
         public void SetCancellationTokenSource(CancellationTokenSource tokenSource)
         {
             _tokenSource = tokenSource;

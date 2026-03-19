@@ -8,12 +8,13 @@ namespace UtilitiesCS
 {
     public class LazyTry<T> : Lazy<T>
     {
-        public LazyTry() : base() { }
-        public LazyTry(Func<T> valueFactory) : base(
-            () =>
+        public LazyTry()
+            : base() { }
+
+        public LazyTry(Func<T> valueFactory)
+            : base(() =>
             {
                 try
-
                 {
                     return valueFactory();
                 }
@@ -21,40 +22,41 @@ namespace UtilitiesCS
                 {
                     return default(T);
                 }
-            })
-        { }
-        public LazyTry(LazyThreadSafetyMode mode) : base(mode) { }
-        public LazyTry(Func<T> valueFactory, bool isThreadSafe) : base(
-            () =>
-            {
-                try
+            }) { }
 
-                {
-                    return valueFactory();
-                }
-                catch (global::System.Exception)
-                {
-                    return default(T);
-                }
-            },
-            isThreadSafe)
-        { }
-        public LazyTry(Func<T> valueFactory, LazyThreadSafetyMode mode) : base(
-            () =>
-            {
-                try
+        public LazyTry(LazyThreadSafetyMode mode)
+            : base(mode) { }
 
+        public LazyTry(Func<T> valueFactory, bool isThreadSafe)
+            : base(
+                () =>
                 {
-                    return valueFactory();
-                }
-                catch (global::System.Exception)
-                {
-                    return default(T);
-                }
-            },
-            mode)
-        { }
+                    try
+                    {
+                        return valueFactory();
+                    }
+                    catch (global::System.Exception)
+                    {
+                        return default(T);
+                    }
+                },
+                isThreadSafe
+            ) { }
 
+        public LazyTry(Func<T> valueFactory, LazyThreadSafetyMode mode)
+            : base(
+                () =>
+                {
+                    try
+                    {
+                        return valueFactory();
+                    }
+                    catch (global::System.Exception)
+                    {
+                        return default(T);
+                    }
+                },
+                mode
+            ) { }
     }
 }
-

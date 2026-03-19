@@ -1,25 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Drawing;
-using System.Runtime.Remoting.Contexts;
-using System.Runtime.CompilerServices;
 
 namespace UtilitiesCS.Dialogs
 {
     public class FunctionButton<T>
     {
-        private log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public FunctionButton() { }
 
-        public FunctionButton(
-            Button button,
-            DialogResult dialogResult,
-            Func<T> function)
+        public FunctionButton(Button button, DialogResult dialogResult, Func<T> function)
         {
             _button = button;
             _button.DialogResult = dialogResult;
@@ -28,10 +27,7 @@ namespace UtilitiesCS.Dialogs
             _buttonClicked = function;
         }
 
-        public FunctionButton(
-            string name,
-            string buttonText,
-            Func<T> function)
+        public FunctionButton(string name, string buttonText, Func<T> function)
         {
             _name = name;
             _function = function;
@@ -39,11 +35,7 @@ namespace UtilitiesCS.Dialogs
             ButtonClicked = function;
         }
 
-        public FunctionButton(
-            string name,
-            string buttonText,
-            Func<T> function,
-            Button template)
+        public FunctionButton(string name, string buttonText, Func<T> function, Button template)
         {
             _template = template.Clone();
             _name = name;
@@ -56,7 +48,8 @@ namespace UtilitiesCS.Dialogs
             string name,
             string buttonText,
             DialogResult dialogResult,
-            Func<T> function)
+            Func<T> function
+        )
         {
             _name = name;
             _function = function;
@@ -69,7 +62,8 @@ namespace UtilitiesCS.Dialogs
             string buttonText,
             DialogResult dialogResult,
             Func<T> function,
-            Button template)
+            Button template
+        )
         {
             _template = template.Clone();
             _name = name;
@@ -83,7 +77,8 @@ namespace UtilitiesCS.Dialogs
             Image buttonImage,
             string buttonText,
             DialogResult dialogResult,
-            Func<T> function)
+            Func<T> function
+        )
         {
             _name = name;
             _function = function;
@@ -97,7 +92,8 @@ namespace UtilitiesCS.Dialogs
             string buttonText,
             DialogResult dialogResult,
             Func<T> function,
-            Button template)
+            Button template
+        )
         {
             _template = template.Clone();
             _name = name;
@@ -106,10 +102,7 @@ namespace UtilitiesCS.Dialogs
             ButtonClicked = function;
         }
 
-        public FunctionButton(
-            Button button,
-            DialogResult dialogResult,
-            Func<Task<T>> function)
+        public FunctionButton(Button button, DialogResult dialogResult, Func<Task<T>> function)
         {
             _button = button;
             _button.DialogResult = dialogResult;
@@ -118,10 +111,7 @@ namespace UtilitiesCS.Dialogs
             ButtonClickedAsync = function;
         }
 
-        public FunctionButton(
-            string name,
-            string buttonText,
-            Func<Task<T>> function)
+        public FunctionButton(string name, string buttonText, Func<Task<T>> function)
         {
             _name = name;
             //_function = function;
@@ -133,7 +123,8 @@ namespace UtilitiesCS.Dialogs
             string name,
             string buttonText,
             Func<Task<T>> function,
-            Button template)
+            Button template
+        )
         {
             _template = template.Clone();
             _name = name;
@@ -146,7 +137,8 @@ namespace UtilitiesCS.Dialogs
             string name,
             string buttonText,
             DialogResult dialogResult,
-            Func<Task<T>> function)
+            Func<Task<T>> function
+        )
         {
             _name = name;
             //_function = function;
@@ -159,7 +151,8 @@ namespace UtilitiesCS.Dialogs
             string buttonText,
             DialogResult dialogResult,
             Func<Task<T>> function,
-            Button template)
+            Button template
+        )
         {
             _template = template.Clone();
             _name = name;
@@ -173,7 +166,8 @@ namespace UtilitiesCS.Dialogs
             Image buttonImage,
             string buttonText,
             DialogResult dialogResult,
-            Func<Task<T>> function)
+            Func<Task<T>> function
+        )
         {
             _name = name;
             Button = MakeButton(buttonText, buttonImage, dialogResult);
@@ -186,7 +180,8 @@ namespace UtilitiesCS.Dialogs
             string buttonText,
             DialogResult dialogResult,
             Func<Task<T>> function,
-            Button template)
+            Button template
+        )
         {
             _template = template.Clone();
             _name = name;
@@ -199,11 +194,11 @@ namespace UtilitiesCS.Dialogs
         private Button _template = new DelegateButtonTemplate().Button1; //.Clone();
         private Func<T> _function;
 
-
         public static FunctionButton<T> FromButton(
             Button button,
             DialogResult dialogResult,
-            Func<T> function)
+            Func<T> function
+        )
         {
             var db = new FunctionButton<T>();
             db.Button = button;
@@ -213,7 +208,11 @@ namespace UtilitiesCS.Dialogs
             return db;
         }
 
-        public string Name { get => _name; set => _name = value; }
+        public string Name
+        {
+            get => _name;
+            set => _name = value;
+        }
 
         public Button Button
         {
@@ -223,21 +222,40 @@ namespace UtilitiesCS.Dialogs
             {
                 if (_button != null)
                 {
-                    if (ButtonClicked is not null) { _button.Click -= Button_Click; }
-                    if (ButtonClickedAsync is not null) { _button.Click -= Button_ClickAsync; }
+                    if (ButtonClicked is not null)
+                    {
+                        _button.Click -= Button_Click;
+                    }
+                    if (ButtonClickedAsync is not null)
+                    {
+                        _button.Click -= Button_ClickAsync;
+                    }
                 }
                 _button = value;
                 {
-                    if (ButtonClicked is not null) { _button.Click += Button_Click; }
-                    if (ButtonClickedAsync is not null) { _button.Click += Button_ClickAsync; }
+                    if (ButtonClicked is not null)
+                    {
+                        _button.Click += Button_Click;
+                    }
+                    if (ButtonClickedAsync is not null)
+                    {
+                        _button.Click += Button_ClickAsync;
+                    }
                 }
-
             }
         }
 
-        public Func<T> Delegate { get => _function; set => _function = value; }
+        public Func<T> Delegate
+        {
+            get => _function;
+            set => _function = value;
+        }
 
-        public Button ButtonTemplate { get => _template; set => _template = value.Clone(); }
+        public Button ButtonTemplate
+        {
+            get => _template;
+            set => _template = value.Clone();
+        }
 
         public Button MakeButton(string text)
         {
@@ -284,9 +302,15 @@ namespace UtilitiesCS.Dialogs
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
-                if (_buttonClicked is not null && _button is not null) { _button.Click -= Button_Click; }
+                if (_buttonClicked is not null && _button is not null)
+                {
+                    _button.Click -= Button_Click;
+                }
                 _buttonClicked = value;
-                if (_buttonClicked is not null && _button is not null) { _button.Click += Button_Click; }
+                if (_buttonClicked is not null && _button is not null)
+                {
+                    _button.Click += Button_Click;
+                }
             }
         }
 
@@ -296,9 +320,15 @@ namespace UtilitiesCS.Dialogs
             get => _buttonClickedAsync;
             set
             {
-                if (_buttonClickedAsync is not null && _button is not null) { _button.Click -= Button_ClickAsync; }
+                if (_buttonClickedAsync is not null && _button is not null)
+                {
+                    _button.Click -= Button_ClickAsync;
+                }
                 _buttonClickedAsync = value;
-                if (_buttonClickedAsync is not null && _button is not null) { _button.Click += Button_ClickAsync; }
+                if (_buttonClickedAsync is not null && _button is not null)
+                {
+                    _button.Click += Button_ClickAsync;
+                }
             }
         }
 
@@ -315,8 +345,8 @@ namespace UtilitiesCS.Dialogs
                 logger.Error($"Error in Button_Click: {ex.Message}", ex);
                 throw;
             }
-
         }
+
         internal async void Button_ClickAsync(object sender, EventArgs e)
         {
             try
@@ -328,8 +358,6 @@ namespace UtilitiesCS.Dialogs
                 logger.Error($"Error in Button_ClickAsync: {ex.Message}", ex);
                 throw;
             }
-
         }
-
     }
 }

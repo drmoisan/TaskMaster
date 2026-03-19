@@ -1,10 +1,10 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.Test.Extensions
@@ -20,7 +20,13 @@ namespace UtilitiesCS.Test.Extensions
             using var destination = new MemoryStream();
 
             // Act
-            bool copied = await source.TryCopyToAsyncWithTimeout(destination, CancellationToken.None, timeoutMs: 100, maxRetries: 0, throwOnFail: true);
+            bool copied = await source.TryCopyToAsyncWithTimeout(
+                destination,
+                CancellationToken.None,
+                timeoutMs: 100,
+                maxRetries: 0,
+                throwOnFail: true
+            );
 
             // Assert
             copied.Should().BeTrue();
@@ -37,7 +43,13 @@ namespace UtilitiesCS.Test.Extensions
             cancellationSource.Cancel();
 
             // Act
-            bool copied = await source.TryCopyToAsyncWithTimeout(destination, cancellationSource.Token, timeoutMs: 100, maxRetries: 0, throwOnFail: true);
+            bool copied = await source.TryCopyToAsyncWithTimeout(
+                destination,
+                cancellationSource.Token,
+                timeoutMs: 100,
+                maxRetries: 0,
+                throwOnFail: true
+            );
 
             // Assert
             copied.Should().BeFalse();
@@ -48,11 +60,20 @@ namespace UtilitiesCS.Test.Extensions
         public async Task TryCopyToAsyncWithTimeout_ShouldStillReturnTrue_WhenCopyIsSlowButCancellationDoesNotOccur()
         {
             // Arrange
-            using var source = new SlowMemoryStream(Encoding.UTF8.GetBytes("hello world"), delayMilliseconds: 100);
+            using var source = new SlowMemoryStream(
+                Encoding.UTF8.GetBytes("hello world"),
+                delayMilliseconds: 100
+            );
             using var destination = new MemoryStream();
 
             // Act
-            bool copied = await source.TryCopyToAsyncWithTimeout(destination, CancellationToken.None, timeoutMs: 10, maxRetries: 0, throwOnFail: true);
+            bool copied = await source.TryCopyToAsyncWithTimeout(
+                destination,
+                CancellationToken.None,
+                timeoutMs: 10,
+                maxRetries: 0,
+                throwOnFail: true
+            );
 
             // Assert
             copied.Should().BeTrue();
@@ -63,12 +84,18 @@ namespace UtilitiesCS.Test.Extensions
         {
             private readonly int _delayMilliseconds;
 
-            public SlowMemoryStream(byte[] buffer, int delayMilliseconds) : base(buffer)
+            public SlowMemoryStream(byte[] buffer, int delayMilliseconds)
+                : base(buffer)
             {
                 _delayMilliseconds = delayMilliseconds;
             }
 
-            public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+            public override async Task<int> ReadAsync(
+                byte[] buffer,
+                int offset,
+                int count,
+                CancellationToken cancellationToken
+            )
             {
                 await Task.Delay(_delayMilliseconds, cancellationToken);
                 return await base.ReadAsync(buffer, offset, count, cancellationToken);

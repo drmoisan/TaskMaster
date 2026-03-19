@@ -1,9 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
-using UtilitiesCS;
-using Newtonsoft.Json;
+﻿using System;
 using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Newtonsoft.Json;
+using UtilitiesCS;
 
 namespace UtilitiesCS.Test.NewtonsoftHelpers
 {
@@ -25,8 +25,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
         private FilePathHelperConverter CreateFilePathHelperConverter()
         {
-            return new FilePathHelperConverter(
-                this.mockFileSystemFolderPaths.Object);
+            return new FilePathHelperConverter(this.mockFileSystemFolderPaths.Object);
         }
 
         [TestMethod]
@@ -102,7 +101,6 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             actual.Should().BeEquivalentTo(expected);
             this.mockJsonReader.Verify(x => x.TokenType, Times.Once());
             this.mockJsonReader.Verify(x => x.Value, Times.Once());
-
         }
 
         [TestMethod]

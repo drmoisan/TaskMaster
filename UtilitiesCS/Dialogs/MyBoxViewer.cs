@@ -12,7 +12,6 @@ namespace UtilitiesCS
 {
     public partial class MyBoxViewer : Form
     {
-
         private bool ableToRemoveStandard = true;
         private readonly Dictionary<string, Delegate> _map;
 
@@ -31,6 +30,7 @@ namespace UtilitiesCS
             Button2.Text = keys[1];
             this._map = map;
         }
+
         private void Button1_Click(object sender, EventArgs e)
         {
             string key = _map.Keys.ToList()[0];
@@ -95,13 +95,23 @@ namespace UtilitiesCS
         private void GrowTextbox()
         {
             //var textWidth = TextRenderer.MeasureText(TextMessage.Text, TextMessage.Font).Width;
-            var textHeight = TextRenderer.MeasureText(TextMessage.Text, TextMessage.Font, TextMessage.Size, TextFormatFlags.WordBreak).Height;
+            var textHeight = TextRenderer
+                .MeasureText(
+                    TextMessage.Text,
+                    TextMessage.Font,
+                    TextMessage.Size,
+                    TextFormatFlags.WordBreak
+                )
+                .Height;
             if (textHeight > TextMessage.Height)
             {
                 var textUsage = (double)textHeight * TextMessage.Width;
                 var textArea = (double)TextMessage.Height * TextMessage.Width;
                 var ratio = textUsage / textArea;
-                var newTextSize = new Size((int)(ratio * TextMessage.Width), (int)(ratio * TextMessage.Height));
+                var newTextSize = new Size(
+                    (int)(ratio * TextMessage.Width),
+                    (int)(ratio * TextMessage.Height)
+                );
                 var sizeDiff = newTextSize - TextMessage.Size;
                 this.Size += sizeDiff;
                 this.MinimumSize += sizeDiff;

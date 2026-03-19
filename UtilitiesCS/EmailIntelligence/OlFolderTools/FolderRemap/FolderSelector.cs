@@ -1,5 +1,4 @@
-﻿using BrightIdeasSoftware;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -8,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BrightIdeasSoftware;
 
 namespace UtilitiesCS.EmailIntelligence.FolderRemap
 {
@@ -35,14 +35,17 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             this.TlvOriginal.ParentGetter = x => ((TreeNode<OlFolderRemap>)x).Parent;
             this.OlvNameNotFiltered.ImageGetter = x => 0;
             this.TlvOriginal.Roots = roots;
-            this.TlvOriginal.CheckStatePutter = delegate (object rowObject, CheckState newValue)
+            this.TlvOriginal.CheckStatePutter = delegate(object rowObject, CheckState newValue)
             {
                 _selection = ((TreeNode<OlFolderRemap>)rowObject).Value;
                 this.Hide();
                 return CheckState.Checked;
             };
 
-            this.TlvOriginal.CheckStateGetter = delegate (object rowObject) { return CheckState.Unchecked; };
+            this.TlvOriginal.CheckStateGetter = delegate(object rowObject)
+            {
+                return CheckState.Unchecked;
+            };
         }
 
         internal OlFolderRemap Selection => _selection;

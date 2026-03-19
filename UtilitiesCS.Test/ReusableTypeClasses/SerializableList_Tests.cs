@@ -75,12 +75,18 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void FindIndexOverloadsAndEnumeration_ReturnExpectedMatches()
         {
             // Arrange
-            var list = new SerializableList<string>(new List<string> { "ant", "bear", "cat", "dog", "emu" });
+            var list = new SerializableList<string>(
+                new List<string> { "ant", "bear", "cat", "dog", "emu" }
+            );
 
             // Act
             var firstThreeLetterIndex = list.FindIndex(value => value.Length == 3);
             var laterThreeLetterIndex = list.FindIndex(2, value => value.Length == 3);
-            var rangedIndex = list.FindIndex(1, 3, value => value.StartsWith("d", StringComparison.Ordinal));
+            var rangedIndex = list.FindIndex(
+                1,
+                3,
+                value => value.StartsWith("d", StringComparison.Ordinal)
+            );
             var enumerated = list.ToArray();
 
             // Assert
@@ -102,7 +108,11 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             list.Add("value");
 
             // Assert
-            raisedNames.Should().ContainSingle().Which.Should().Be(nameof(SerializableList<string>.Add));
+            raisedNames
+                .Should()
+                .ContainSingle()
+                .Which.Should()
+                .Be(nameof(SerializableList<string>.Add));
         }
 
         [TestMethod]
@@ -125,14 +135,15 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var list = new SerializableList<string>();
-            var existingFolder = AppDomain.CurrentDomain.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
+            var existingFolder = AppDomain.CurrentDomain.BaseDirectory.TrimEnd(
+                Path.DirectorySeparatorChar
+            );
 
             // Act
             Action act = () => list.Filepath = existingFolder;
 
             // Assert
-            act.Should().Throw<ArgumentException>()
-                .WithMessage("*Folder Path*");
+            act.Should().Throw<ArgumentException>().WithMessage("*Folder Path*");
         }
 
         [TestMethod]
@@ -142,12 +153,12 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             var source = new SerializableList<int>(new List<int> { 2, 1, 3 })
             {
                 Filename = "values.json",
-                Folderpath = @"C:\Lists"
+                Folderpath = @"C:\Lists",
             };
             var settings = new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented
+                Formatting = Formatting.Indented,
             };
 
             // Act

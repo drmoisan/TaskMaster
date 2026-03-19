@@ -25,8 +25,15 @@ namespace UtilitiesCS.Test.OutlookObjects.Com
         public void GetTypeName_WithDispatchObject_ReturnsComTypeName()
         {
             // Arrange
-            var scriptingDictionaryType = Type.GetTypeFromProgID("Scripting.Dictionary", throwOnError: false);
-            scriptingDictionaryType.Should().NotBeNull("the Windows scripting runtime should be available in this Windows test environment");
+            var scriptingDictionaryType = Type.GetTypeFromProgID(
+                "Scripting.Dictionary",
+                throwOnError: false
+            );
+            scriptingDictionaryType
+                .Should()
+                .NotBeNull(
+                    "the Windows scripting runtime should be available in this Windows test environment"
+                );
 
             var dispatchObject = Activator.CreateInstance(scriptingDictionaryType!);
 

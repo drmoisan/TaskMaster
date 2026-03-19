@@ -1,7 +1,7 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Reflection;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test
 {
@@ -43,7 +43,12 @@ namespace UtilitiesCS.Test
                 InvokeInternalResponder(expectation.methodName);
 
                 // Assert
-                YesNoToAll.Response.Should().Be(expectation.response, $"{expectation.methodName} should update the shared response state");
+                YesNoToAll
+                    .Response.Should()
+                    .Be(
+                        expectation.response,
+                        $"{expectation.methodName} should update the shared response state"
+                    );
             }
         }
 
@@ -72,7 +77,10 @@ namespace UtilitiesCS.Test
 
         private static void InvokeInternalResponder(string methodName)
         {
-            MethodInfo responder = typeof(YesNoToAll).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static);
+            MethodInfo responder = typeof(YesNoToAll).GetMethod(
+                methodName,
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
             responder.Should().NotBeNull();
             responder.Invoke(null, null);
         }

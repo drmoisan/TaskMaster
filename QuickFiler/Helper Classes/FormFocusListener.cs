@@ -1,5 +1,4 @@
-﻿
-namespace QuickFiler
+﻿namespace QuickFiler
 {
     public class FormFocusListener
     {
@@ -9,12 +8,7 @@ namespace QuickFiler
 
         public bool ChangeFocusMessage
         {
-            set
-            {
-                ChangeFocus?.Invoke(value);
-            }
-
+            set { ChangeFocus?.Invoke(value); }
         }
-
     }
 }

@@ -12,7 +12,7 @@ namespace UtilitiesCS
     public static class Initializer
     {
         /// <summary>
-        /// Sets the value of a private variable passed as reference. It also sets the value of the corresponding 
+        /// Sets the value of a private variable passed as reference. It also sets the value of the corresponding
         /// property in an underlying object such as but not limited to <seealso cref="OutlookItem"/>. A condition
         /// function may be passed to determine whether to write to the underlying object"/>
         /// </summary>
@@ -23,13 +23,26 @@ namespace UtilitiesCS
         /// <param name="objectSaver">Action to save the object</param>
         /// <param name="strict">If true throws exception, else it skips execution</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static void SetAndSave<T>(ref T variable, T value, Action<T> objectSetter, System.Action objectSaver, Func<bool> condition, bool strict)
+        public static void SetAndSave<T>(
+            ref T variable,
+            T value,
+            Action<T> objectSetter,
+            System.Action objectSaver,
+            Func<bool> condition,
+            bool strict
+        )
         {
             variable = value;
             SetAndSave(value, objectSetter, objectSaver, condition, strict);
         }
 
-        public static void SetAndSave<T>(ref T variable, T value, Action<T> objectSetter, Func<bool> condition, bool strict)
+        public static void SetAndSave<T>(
+            ref T variable,
+            T value,
+            Action<T> objectSetter,
+            Func<bool> condition,
+            bool strict
+        )
         {
             variable = value;
             SetAndSave(value, objectSetter, condition, strict);
@@ -41,31 +54,57 @@ namespace UtilitiesCS
             SetAndSave(value, objectSetter);
         }
 
-        public static void SetAndSave<T>(T value, Action<T> objectSetter, System.Action objectSaver, Func<bool> condition, bool strict)
+        public static void SetAndSave<T>(
+            T value,
+            Action<T> objectSetter,
+            System.Action objectSaver,
+            Func<bool> condition,
+            bool strict
+        )
         {
             if (!DependenciesNotNull(strict, condition) || condition())
             {
-                if (DependenciesNotNull(strict, objectSetter)) { objectSetter(value); }
-                if (DependenciesNotNull(strict, objectSaver)) { objectSaver(); }
+                if (DependenciesNotNull(strict, objectSetter))
+                {
+                    objectSetter(value);
+                }
+                if (DependenciesNotNull(strict, objectSaver))
+                {
+                    objectSaver();
+                }
             }
         }
 
-        public static void SetAndSave<T>(T value, Action<T> objectSetter, Func<bool> condition, bool strict)
+        public static void SetAndSave<T>(
+            T value,
+            Action<T> objectSetter,
+            Func<bool> condition,
+            bool strict
+        )
         {
             if (!DependenciesNotNull(strict, condition) || condition())
             {
-                if (DependenciesNotNull(strict, objectSetter)) { objectSetter(value); }
+                if (DependenciesNotNull(strict, objectSetter))
+                {
+                    objectSetter(value);
+                }
             }
         }
 
         public static void SetAndSave<T>(T value, Action<T> objectSetter)
         {
-            if (DependenciesNotNull(false, objectSetter)) { objectSetter(value); }
+            if (DependenciesNotNull(false, objectSetter))
+            {
+                objectSetter(value);
+            }
         }
 
         public static T GetOrLoad<T>(ref T variable, Func<T> loader)
         {
-            if (EqualityComparer<T>.Default.Equals(variable, default(T))) { variable = loader(); }
+            if (EqualityComparer<T>.Default.Equals(variable, default(T)))
+            {
+                variable = loader();
+            }
             return variable;
         }
 
@@ -79,27 +118,65 @@ namespace UtilitiesCS
             return variable;
         }
 
-        public static T GetOrLoad<T>(ref T variable, Func<T> loader, bool strict, params object[] dependencies)
+        public static T GetOrLoad<T>(
+            ref T variable,
+            Func<T> loader,
+            bool strict,
+            params object[] dependencies
+        )
         {
-            if (DependenciesNotNull(strict, dependencies)) { return GetOrLoad(ref variable, loader); }
-            else { return default(T); }
+            if (DependenciesNotNull(strict, dependencies))
+            {
+                return GetOrLoad(ref variable, loader);
+            }
+            else
+            {
+                return default(T);
+            }
         }
 
-        public static T GetOrLoad<T>(ref T variable, Func<T> loader, Action<T> callbackOnSet, bool strict, params object[] dependencies)
+        public static T GetOrLoad<T>(
+            ref T variable,
+            Func<T> loader,
+            Action<T> callbackOnSet,
+            bool strict,
+            params object[] dependencies
+        )
         {
-            if (DependenciesNotNull(strict, dependencies)) { return GetOrLoad(ref variable, loader, callbackOnSet); }
-            else { return default(T); }
+            if (DependenciesNotNull(strict, dependencies))
+            {
+                return GetOrLoad(ref variable, loader, callbackOnSet);
+            }
+            else
+            {
+                return default(T);
+            }
         }
 
-        public static T GetOrLoad<T>(ref T variable, Func<T, bool> isInitialized, Func<T> loader, bool strict, params object[] dependencies)
+        public static T GetOrLoad<T>(
+            ref T variable,
+            Func<T, bool> isInitialized,
+            Func<T> loader,
+            bool strict,
+            params object[] dependencies
+        )
         {
-            if (DependenciesNotNull(strict, dependencies)) { return GetOrLoad(ref variable, loader); }
-            else { return variable; }
+            if (DependenciesNotNull(strict, dependencies))
+            {
+                return GetOrLoad(ref variable, loader);
+            }
+            else
+            {
+                return variable;
+            }
         }
 
         public static T GetOrLoad<T>(ref T variable, Func<T, bool> isInitialized, Func<T> loader)
         {
-            if (isInitialized(variable)) { return variable; }
+            if (isInitialized(variable))
+            {
+                return variable;
+            }
             else
             {
                 variable = loader();
@@ -107,7 +184,12 @@ namespace UtilitiesCS
             }
         }
 
-        public static T GetOrLoad<T>(ref T variable, T defaultValue, Func<T> loader, params object[] dependencies)
+        public static T GetOrLoad<T>(
+            ref T variable,
+            T defaultValue,
+            Func<T> loader,
+            params object[] dependencies
+        )
         {
             if (!DependenciesNotNull(false, dependencies))
             {
@@ -118,8 +200,14 @@ namespace UtilitiesCS
             {
                 try
                 {
-                    if (EqualityComparer<T>.Default.Equals(variable, default(T))) { variable = loader(); }
-                    if (EqualityComparer<T>.Default.Equals(variable, default(T))) { variable = defaultValue; }
+                    if (EqualityComparer<T>.Default.Equals(variable, default(T)))
+                    {
+                        variable = loader();
+                    }
+                    if (EqualityComparer<T>.Default.Equals(variable, default(T)))
+                    {
+                        variable = defaultValue;
+                    }
                 }
                 catch (System.Exception)
                 {
@@ -130,7 +218,13 @@ namespace UtilitiesCS
             }
         }
 
-        public static T GetOrLoad<T>(ref T variable, T defaultValue, Func<T> loader, Action<T> defaultSetAndSaver, params object[] dependencies)
+        public static T GetOrLoad<T>(
+            ref T variable,
+            T defaultValue,
+            Func<T> loader,
+            Action<T> defaultSetAndSaver,
+            params object[] dependencies
+        )
         {
             if (!DependenciesNotNull(false, dependencies))
             {
@@ -142,7 +236,10 @@ namespace UtilitiesCS
                 try
                 {
                     // If no value is set try to load it
-                    if (EqualityComparer<T>.Default.Equals(variable, default(T))) { variable = loader(); }
+                    if (EqualityComparer<T>.Default.Equals(variable, default(T)))
+                    {
+                        variable = loader();
+                    }
                     // Repeat check in case the loader returned default. In that case load defaultValue
                     if (EqualityComparer<T>.Default.Equals(variable, default(T)))
                     {
@@ -163,14 +260,26 @@ namespace UtilitiesCS
 
         public static T Load<T>(Func<T> loader, bool strict, params object[] dependencies)
         {
-            if (DependenciesNotNull(strict, dependencies)) { return loader(); }
-            else { return default(T); }
+            if (DependenciesNotNull(strict, dependencies))
+            {
+                return loader();
+            }
+            else
+            {
+                return default(T);
+            }
         }
 
         public static T Load<T>(Func<T> loader, T defaultValue, params object[] dependencies)
         {
-            if (!DependenciesNotNull(false, dependencies)) { return defaultValue; }
-            else { return loader(); }
+            if (!DependenciesNotNull(false, dependencies))
+            {
+                return defaultValue;
+            }
+            else
+            {
+                return loader();
+            }
         }
 
         public static bool DependenciesNotNull(bool strict, params object[] dependencies)
@@ -178,23 +287,32 @@ namespace UtilitiesCS
             if (dependencies is null)
             {
                 var caller = new StackFrame(1, false).GetMethod().Name;
-                var message = $"Method {caller} failed the dependency check because {nameof(dependencies)} " +
-                    "was passed as a null array";
-                return strict ? throw new ArgumentNullException(nameof(dependencies), message) : false;
+                var message =
+                    $"Method {caller} failed the dependency check because {nameof(dependencies)} "
+                    + "was passed as a null array";
+                return strict
+                    ? throw new ArgumentNullException(nameof(dependencies), message)
+                    : false;
             }
             if (dependencies.Count() == 0)
             {
                 var caller = new StackFrame(1, false).GetMethod().Name;
-                var message = $"Method {caller} failed the dependency check because {nameof(dependencies)} " +
-                    "was empty";
+                var message =
+                    $"Method {caller} failed the dependency check because {nameof(dependencies)} "
+                    + "was empty";
                 return strict ? throw new ArgumentNullException(message) : false;
             }
             if (dependencies.Any(x => x is null))
             {
-                var errors = dependencies.FindIndices(x => x is null).Select(x => x.ToString()).ToArray().SentenceJoin();
+                var errors = dependencies
+                    .FindIndices(x => x is null)
+                    .Select(x => x.ToString())
+                    .ToArray()
+                    .SentenceJoin();
                 var caller = new StackFrame(1, false).GetMethod().Name;
-                var message = $"Method {caller} failed the dependency check because {nameof(dependencies)} " +
-                    $"contains a null value at position {errors}";
+                var message =
+                    $"Method {caller} failed the dependency check because {nameof(dependencies)} "
+                    + $"contains a null value at position {errors}";
                 return strict ? throw new ArgumentNullException(message) : false;
             }
             return true;

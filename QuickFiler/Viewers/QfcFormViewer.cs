@@ -1,5 +1,4 @@
-﻿using QuickFiler.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -9,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using QuickFiler.Interfaces;
 using UtilitiesCS;
 
 namespace QuickFiler
@@ -23,15 +23,23 @@ namespace QuickFiler
             //this.KeyPreview = true;
         }
 
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
         private IFilerFormController _formController;
         private IQfcKeyboardHandler _keyboardHandler;
 
         private SynchronizationContext _context;
-        public SynchronizationContext UiSyncContext { get => _context; }
+        public SynchronizationContext UiSyncContext
+        {
+            get => _context;
+        }
 
         private TaskScheduler _uiScheduler;
-        public TaskScheduler UiScheduler { get => _uiScheduler; }
+        public TaskScheduler UiScheduler
+        {
+            get => _uiScheduler;
+        }
 
         public virtual void SetController(IFilerFormController controller)
         {
@@ -61,6 +69,7 @@ namespace QuickFiler
 
         private List<Control> _panels;
         public virtual List<Control> Panels => Initializer.GetOrLoad(ref _panels, LoadPanels);
+
         private List<Control> LoadPanels()
         {
             var panels = new List<Control>
@@ -75,7 +84,6 @@ namespace QuickFiler
 
         private List<Control> _buttons;
         public virtual List<Control> Buttons => Initializer.GetOrLoad(ref _buttons, LoadButtons);
-
 
         private List<Control> LoadButtons()
         {
@@ -93,17 +101,21 @@ namespace QuickFiler
         #region IQfcFormViewer
 
         public BackgroundWorker Worker => WorkerInternal;
-        public TableLayoutPanel L1v0L2L3v_TableLayout { get => _l1v0L2L3v_TableLayout; set => _l1v0L2L3v_TableLayout = value; }
+        public TableLayoutPanel L1v0L2L3v_TableLayout
+        {
+            get => _l1v0L2L3v_TableLayout;
+            set => _l1v0L2L3v_TableLayout = value;
+        }
         public ItemViewer QfcItemViewerTemplate => _QfcItemViewerTemplate;
         public ItemViewerExpanded QfcItemViewerExpandedTemplate => _qfcItemViewerExpandedTemplate;
         public TableLayoutPanel L1v_TableLayout => _l1v_TableLayout;
-        public System.Windows.Forms.NumericUpDown L1v1L2h5_SpnEmailPerLoad => _l1v1L2h5_SpnEmailPerLoad;
+        public System.Windows.Forms.NumericUpDown L1v1L2h5_SpnEmailPerLoad =>
+            _l1v1L2h5_SpnEmailPerLoad;
         public System.Windows.Forms.Button L1v1L2h2_ButtonOK => _l1v1L2h2_ButtonOK;
         public System.Windows.Forms.Button L1v1L2h3_ButtonCancel => _l1v1L2h3_ButtonCancel;
         public System.Windows.Forms.Button L1v1L2h4_ButtonUndo => _l1v1L2h4_ButtonUndo;
         public System.Windows.Forms.Button L1v1L2h5_BtnSkip => _l1v1L2h5_BtnSkip;
         public Panel L1v0L2_PanelMain => _l1v0L2_PanelMain;
         #endregion IQfcFormViewer
-
     }
 }

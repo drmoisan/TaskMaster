@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 
 namespace ConcurrentObservableCollection.Tests
 {
@@ -12,7 +12,10 @@ namespace ConcurrentObservableCollection.Tests
         {
             var data = new ConcurrentObservableDictionary<string, double>();
             var updated = false;
-            data.CollectionChanged += (_, _) => { updated = true; };
+            data.CollectionChanged += (_, _) =>
+            {
+                updated = true;
+            };
 
             data.AddOrUpdate("test", 1.0);
 
@@ -57,13 +60,21 @@ namespace ConcurrentObservableCollection.Tests
             data.AddOrUpdate("test", 1.0);
             Assert.AreEqual(1.0, obs.LastValue, "Error in test key");
 
-            Assert.IsTrue(data.RemovePartialObserver(obs, "test").All(
-                pair => pair.Key == "test" && pair.Value.Count == 1 && pair.Value.Contains(obs)), "remove <obs, test>");
+            Assert.IsTrue(
+                data.RemovePartialObserver(obs, "test")
+                    .All(pair =>
+                        pair.Key == "test" && pair.Value.Count == 1 && pair.Value.Contains(obs)
+                    ),
+                "remove <obs, test>"
+            );
 
             data.AddOrUpdate("test", 10.0);
             Assert.AreEqual(1.0, obs.LastValue, "Error in test key after remove <obs, test>");
 
-            Assert.IsTrue(data.RemovePartialObserver("test3").All(pair => pair.Key == "test3"), "remove test3 key");
+            Assert.IsTrue(
+                data.RemovePartialObserver("test3").All(pair => pair.Key == "test3"),
+                "remove test3 key"
+            );
 
             data.AddOrUpdate("test3", 30.0);
             Assert.AreEqual(1.0, obs.LastValue, "Error in test3 key after remove test3 key");
@@ -71,8 +82,11 @@ namespace ConcurrentObservableCollection.Tests
             data.AddOrUpdate("test2", 2.0);
             Assert.AreEqual(2.0, obs.LastValue, "Error in test2 key");
 
-            Assert.IsTrue(data.RemovePartialObserver(obs).All(
-                pair => pair.Value.Count == 1 && pair.Value.Contains(obs)), "remove obs");
+            Assert.IsTrue(
+                data.RemovePartialObserver(obs)
+                    .All(pair => pair.Value.Count == 1 && pair.Value.Contains(obs)),
+                "remove obs"
+            );
 
             data.AddOrUpdate("test2", 20.0);
             Assert.AreEqual(2.0, obs.LastValue, "Error in test2 key after remove obs");
@@ -88,8 +102,11 @@ namespace ConcurrentObservableCollection.Tests
             data.AddOrUpdate("test2", 2.0);
             Assert.AreEqual(2.0, obs.LastValue, "Error in test2 key");
 
-            Assert.IsTrue(data.RemoveAllObservers().All(
-                pair => pair.Value.Count == 1 && pair.Value.Contains(obs)), "remove all");
+            Assert.IsTrue(
+                data.RemoveAllObservers()
+                    .All(pair => pair.Value.Count == 1 && pair.Value.Contains(obs)),
+                "remove all"
+            );
 
             data.AddOrUpdate("test2", 20.0);
             Assert.AreEqual(2.0, obs.LastValue, "Error in test2 key after remove obs");

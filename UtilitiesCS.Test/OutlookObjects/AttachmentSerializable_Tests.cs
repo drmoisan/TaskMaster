@@ -28,10 +28,7 @@ namespace UtilitiesCS.Test
         public void IsImage_ShouldUseFileExtension_WhenNoExplicitValueWasAssigned()
         {
             // Arrange
-            var attachment = new AttachmentSerializable
-            {
-                FileExtension = ".png",
-            };
+            var attachment = new AttachmentSerializable { FileExtension = ".png" };
 
             // Act
             bool isImage = attachment.IsImage;
@@ -102,7 +99,9 @@ namespace UtilitiesCS.Test
 
             // Act
             string json = JsonConvert.SerializeObject(original);
-            AttachmentSerializable clone = JsonConvert.DeserializeObject<AttachmentSerializable>(json);
+            AttachmentSerializable clone = JsonConvert.DeserializeObject<AttachmentSerializable>(
+                json
+            );
 
             // Assert
             clone.Should().NotBeNull();

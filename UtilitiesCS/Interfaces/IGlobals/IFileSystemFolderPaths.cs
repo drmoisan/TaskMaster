@@ -1,11 +1,11 @@
-﻿
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace UtilitiesCS
 {
     public interface IFileSystemFolderPaths
     {
         ConcurrentDictionary<string, string> SpecialFolders { get; }
+
         //string FldrAppData { get; }
         //string FldrFlow { get; }
         //string FldrMyDocuments { get; }

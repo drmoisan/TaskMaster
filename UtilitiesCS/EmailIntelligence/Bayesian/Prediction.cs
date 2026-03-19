@@ -17,15 +17,29 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         private T _class;
-        public T Class { get => _class; set => _class = value; }
+        public T Class
+        {
+            get => _class;
+            set => _class = value;
+        }
 
         private double _probability;
-        public double Probability { get => _probability; set => _probability = value; }
+        public double Probability
+        {
+            get => _probability;
+            set => _probability = value;
+        }
 
         public int CompareTo(Prediction<T> other)
         {
-            if (other is null) { return 1; }
-            else { return _probability.CompareTo(other._probability); }
+            if (other is null)
+            {
+                return 1;
+            }
+            else
+            {
+                return _probability.CompareTo(other._probability);
+            }
         }
     }
 }

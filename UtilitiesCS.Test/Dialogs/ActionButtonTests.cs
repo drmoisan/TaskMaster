@@ -1,7 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test
 {
@@ -88,7 +88,13 @@ namespace UtilitiesCS.Test
             var template = new Button { BackColor = Color.Red };
 
             // Act
-            var actionButton = new ActionButton(name, buttonText, DialogResult.OK, action, template);
+            var actionButton = new ActionButton(
+                name,
+                buttonText,
+                DialogResult.OK,
+                action,
+                template
+            );
 
             // Assert
             Assert.AreEqual(name, actionButton.Name);
@@ -129,7 +135,14 @@ namespace UtilitiesCS.Test
             var template = new Button { BackColor = Color.Red };
 
             // Act
-            var actionButton = new ActionButton(name, image, buttonText, DialogResult.OK, action, template);
+            var actionButton = new ActionButton(
+                name,
+                image,
+                buttonText,
+                DialogResult.OK,
+                action,
+                template
+            );
 
             // Assert
             Assert.AreEqual(name, actionButton.Name);
@@ -231,7 +244,10 @@ namespace UtilitiesCS.Test
         {
             // Arrange
             bool actionInvoked = false;
-            var action = new Action(() => { actionInvoked = true; });
+            var action = new Action(() =>
+            {
+                actionInvoked = true;
+            });
             var button = new Button();
             var actionButton = new ActionButton(button, DialogResult.OK, action);
 

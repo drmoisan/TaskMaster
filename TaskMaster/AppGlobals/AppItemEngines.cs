@@ -1,6 +1,4 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using SDILReader;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Office.Interop.Outlook;
+using SDILReader;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
@@ -25,7 +25,8 @@ namespace TaskMaster
     public class AppItemEngines : IAppItemEngines
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region ctor
 
@@ -40,9 +41,14 @@ namespace TaskMaster
 
             InboxEngines = await configs
                 .Where(config => config.Value.Engine)
-                .Select(config => (
-                    config.Key,
-                    EngineFunc: EngineInitializer.TryGetValue(config.Key, out var engineAsync) ? engineAsync : null))
+                .Select(config =>
+                    (
+                        config.Key,
+                        EngineFunc: EngineInitializer.TryGetValue(config.Key, out var engineAsync)
+                            ? engineAsync
+                            : null
+                    )
+                )
                 .Where(tup => tup.EngineFunc is not null)
                 .ToAsyncEnumerable()
                 .SelectAwait(async tup =>
@@ -84,10 +90,20 @@ namespace TaskMaster
             }
         }
 
-        public ConcurrentDictionary<string, IConditionalEngine<MailItemHelper>> InboxEngines { get; protected set; } = [];
+        public ConcurrentDictionary<string, IConditionalEngine<MailItemHelper>> InboxEngines
+        {
+            get;
+            protected set;
+        } = [];
 
-        private Dictionary<string, Func<IApplicationGlobals, Task<IConditionalEngine<MailItemHelper>>>> _engineInitializer;
-        internal Dictionary<string, Func<IApplicationGlobals, Task<IConditionalEngine<MailItemHelper>>>> EngineInitializer
+        private Dictionary<
+            string,
+            Func<IApplicationGlobals, Task<IConditionalEngine<MailItemHelper>>>
+        > _engineInitializer;
+        internal Dictionary<
+            string,
+            Func<IApplicationGlobals, Task<IConditionalEngine<MailItemHelper>>>
+        > EngineInitializer
         {
             get
             {
@@ -95,39 +111,65 @@ namespace TaskMaster
                 return _engineInitializer;
             }
         }
-        internal Dictionary<string, Func<IApplicationGlobals, Task<IConditionalEngine<MailItemHelper>>>> GetEngineInitializer()
+
+        internal Dictionary<
+            string,
+            Func<IApplicationGlobals, Task<IConditionalEngine<MailItemHelper>>>
+        > GetEngineInitializer()
         {
-            Dictionary<string, Func<IApplicationGlobals, Task<IConditionalEngine<MailItemHelper>>>> ei = new()
+            Dictionary<
+                string,
+                Func<IApplicationGlobals, Task<IConditionalEngine<MailItemHelper>>>
+            > ei = new()
             {
-                { "Spam", async globals =>
+                {
+                    "Spam",
+                    async globals =>
                     {
                         var sb = await SpamBayes.CreateEngineAsync(globals);
                         return sb;
                     }
                 },
-                { "Triage", async globals =>
+                {
+                    "Triage",
+                    async globals =>
                     {
                         var triage = await Triage.CreateEngineAsync(globals);
                         return triage;
                     }
                 },
-                { "Project", async globals =>
+                {
+                    "Project",
+                    async globals =>
                     {
-                        var project = await CategoryClassifierGroup.CreateEngineAsync(globals, "Project");
+                        var project = await CategoryClassifierGroup.CreateEngineAsync(
+                            globals,
+                            "Project"
+                        );
                         project.CategorySetter = ProjectCategorySetterAsync;
                         return project;
                     }
                 },
-                { "Context", async globals =>
+                {
+                    "Context",
+                    async globals =>
                     {
-                        var context = await CategoryClassifierGroup.CreateEngineAsync(globals, "Context");
+                        var context = await CategoryClassifierGroup.CreateEngineAsync(
+                            globals,
+                            "Context"
+                        );
                         context.CategorySetter = ContextCategorySetterAsync;
                         return context;
                     }
                 },
-                { "Actionable", async globals =>
+                {
+                    "Actionable",
+                    async globals =>
                     {
-                        var actionable = await ActionableClassifierGroup.CreateEngineAsync(globals, "Actionable");
+                        var actionable = await ActionableClassifierGroup.CreateEngineAsync(
+                            globals,
+                            "Actionable"
+                        );
                         return actionable;
                     }
                 },
@@ -137,7 +179,10 @@ namespace TaskMaster
 
         #region CategoryClassifierActions
 
-        internal async Task ProjectCategorySetterAsync(IEnumerable<string> categories, MailItemHelper helper)
+        internal async Task ProjectCategorySetterAsync(
+            IEnumerable<string> categories,
+            MailItemHelper helper
+        )
         {
             await Task.Run(() =>
             {
@@ -147,7 +192,10 @@ namespace TaskMaster
             });
         }
 
-        internal async Task ContextCategorySetterAsync(IEnumerable<string> categories, MailItemHelper helper)
+        internal async Task ContextCategorySetterAsync(
+            IEnumerable<string> categories,
+            MailItemHelper helper
+        )
         {
             await Task.Run(() =>
             {
@@ -164,10 +212,16 @@ namespace TaskMaster
         {
             if (InboxEngines.TryGetValue(engineName, out var engine))
             {
-                if (local) { engine.Config.ActivateLocalDisk(); }
-                else { engine.Config.ActivateNetDisk(); }
+                if (local)
+                {
+                    engine.Config.ActivateLocalDisk();
+                }
+                else
+                {
+                    engine.Config.ActivateNetDisk();
+                }
                 await Task.CompletedTask;
-                //await ChangeDiskCallback(engine, local);                
+                //await ChangeDiskCallback(engine, local);
             }
         }
 
@@ -188,7 +242,7 @@ namespace TaskMaster
         //            if (configs.TryGetValue(engine.EngineName, out var loader))
         //            {
         //                Globals.AF.Manager.ResetLoadClassifierAsyncLazy(engine.EngineName, loader);
-        //            } 
+        //            }
         //        }
         //    }
         //}

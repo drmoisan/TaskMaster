@@ -7,7 +7,5 @@ namespace UtilitiesCS.Interfaces
     {
         bool AutoReset { get; set; }
         void ResetTimer();
-
-
     }
 }

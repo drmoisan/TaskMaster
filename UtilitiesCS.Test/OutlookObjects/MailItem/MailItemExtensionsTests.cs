@@ -4,8 +4,8 @@ using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
 using UtilitiesCS.OutlookExtensions;
+using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
 using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
 
 namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage

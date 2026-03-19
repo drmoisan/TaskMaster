@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS
@@ -17,9 +17,19 @@ namespace UtilitiesCS
         }
 
         protected IFileSystemFolderPaths _fileSystemFolders;
-        internal virtual IFileSystemFolderPaths FileSystemFolders { get => _fileSystemFolders; set => _fileSystemFolders = value; }
+        internal virtual IFileSystemFolderPaths FileSystemFolders
+        {
+            get => _fileSystemFolders;
+            set => _fileSystemFolders = value;
+        }
 
-        public override FilePathHelper ReadJson(JsonReader reader, Type objectType, FilePathHelper existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override FilePathHelper ReadJson(
+            JsonReader reader,
+            Type objectType,
+            FilePathHelper existingValue,
+            bool hasExistingValue,
+            JsonSerializer serializer
+        )
         {
             var filePathHelper = new FilePathHelper();
             var info = ReadToDictionary(reader);
@@ -30,7 +40,10 @@ namespace UtilitiesCS
 
         internal string ExtractFolderPath(Dictionary<string, string> info)
         {
-            if (!info.TryGetValue("SpecialFolderName", out string folderName)) { return null; }
+            if (!info.TryGetValue("SpecialFolderName", out string folderName))
+            {
+                return null;
+            }
             if (FileSystemFolders.SpecialFolders.TryGetValue(folderName, out string folderPath))
             {
                 if (info.TryGetValue("RelativePath", out string relativePath))
@@ -50,7 +63,13 @@ namespace UtilitiesCS
 
         internal string ExtractFolderPath(string specialFolderName, string relativePath)
         {
-            if (specialFolderName != "None" && FileSystemFolders.SpecialFolders.TryGetValue(specialFolderName, out string folderPath))
+            if (
+                specialFolderName != "None"
+                && FileSystemFolders.SpecialFolders.TryGetValue(
+                    specialFolderName,
+                    out string folderPath
+                )
+            )
             {
                 if (relativePath.IsNullOrEmpty())
                 {
@@ -97,8 +116,9 @@ namespace UtilitiesCS
         {
             if (reader.TokenType != JsonToken.PropertyName)
             {
-                string message = $"{GetErrorMessage(reader)}. Reader found a token of type " +
-                    $"{reader.TokenType} when it was expecting a token of type {JsonToken.PropertyName}.";
+                string message =
+                    $"{GetErrorMessage(reader)}. Reader found a token of type "
+                    + $"{reader.TokenType} when it was expecting a token of type {JsonToken.PropertyName}.";
                 throw new JsonReaderException(message);
             }
 
@@ -108,16 +128,17 @@ namespace UtilitiesCS
             }
             catch (ArgumentNullException e)
             {
-                string message = $"{GetErrorMessage(reader)}. Reader found a token with a property " +
-                    $"name that was null or empty.";
+                string message =
+                    $"{GetErrorMessage(reader)}. Reader found a token with a property "
+                    + $"name that was null or empty.";
                 throw new JsonReaderException(message, e);
             }
-
         }
 
         private static string GetErrorMessage(JsonReader reader)
         {
-            var message = $"{nameof(FilePathHelperConverter)}.{nameof(ReadJson)} encountered a problem";
+            var message =
+                $"{nameof(FilePathHelperConverter)}.{nameof(ReadJson)} encountered a problem";
             if (reader is JsonTextReader)
             {
                 var textReader = reader as JsonTextReader;
@@ -128,12 +149,13 @@ namespace UtilitiesCS
 
         internal string ReadPropertyValue(JsonReader reader)
         {
-            //if (reader.TokenType != JsonToken.String)            
+            //if (reader.TokenType != JsonToken.String)
             Enum[] tokenTypes = [JsonToken.String, JsonToken.Null];
             if (!tokenTypes.Contains(reader.TokenType))
             {
-                var message = $"{GetErrorMessage(reader)}. Reader found a token of type {reader.TokenType} " +
-                    $"when it was expecting a token of type {JsonToken.String}.";
+                var message =
+                    $"{GetErrorMessage(reader)}. Reader found a token of type {reader.TokenType} "
+                    + $"when it was expecting a token of type {JsonToken.String}.";
                 throw new JsonReaderException(message);
             }
             return reader.Value as string ?? "";
@@ -145,8 +167,9 @@ namespace UtilitiesCS
             string relativePath = "";
             KeyValuePair<string, string> match = default;
 
-            var matchingFolders = FileSystemFolders.SpecialFolders
-                .Where(x => folderPath.Contains(x.Value));
+            var matchingFolders = FileSystemFolders.SpecialFolders.Where(x =>
+                folderPath.Contains(x.Value)
+            );
 
             if (matchingFolders.Count() == 0)
             {
@@ -163,12 +186,17 @@ namespace UtilitiesCS
             }
 
             name = match.Key;
-            relativePath = match.Value.Length > 0 ? folderPath.Replace(match.Value, "") : folderPath;
+            relativePath =
+                match.Value.Length > 0 ? folderPath.Replace(match.Value, "") : folderPath;
 
             return (name, relativePath);
         }
 
-        public override void WriteJson(JsonWriter writer, FilePathHelper value, JsonSerializer serializer)
+        public override void WriteJson(
+            JsonWriter writer,
+            FilePathHelper value,
+            JsonSerializer serializer
+        )
         {
             var (name, relativePath) = GetSerializablePath(value.FolderPath);
 

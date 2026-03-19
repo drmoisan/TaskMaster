@@ -1,13 +1,13 @@
-using BrightIdeasSoftware;
-using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using UtilitiesCS.EmailIntelligence.Bayesian;
+using BrightIdeasSoftware;
+using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using UtilitiesCS.EmailIntelligence;
+using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups;
 
 namespace UtilitiesCS.Test.EmailIntelligence
@@ -26,7 +26,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             _mockGlobals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
             _triage = new Triage(_mockGlobals.Object, CancellationToken.None)
             {
-                ClassifierGroup = new BayesianClassifierGroup()
+                ClassifierGroup = new BayesianClassifierGroup(),
             };
             _triageOlLogic = new Triage_OlLogic(_triage);
         }
@@ -46,7 +46,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var mockExplorer = new Mock<Explorer>(MockBehavior.Strict);
             var mockView = new Mock<View>(MockBehavior.Strict);
 
-            mockToDoObjects.SetupGet(td => td.SelectFromList)
+            mockToDoObjects
+                .SetupGet(td => td.SelectFromList)
                 .Returns(_ => new List<string> { "A" });
             _mockGlobals.Setup(g => g.TD).Returns(mockToDoObjects.Object);
             _mockGlobals.Setup(g => g.Ol).Returns(mockOlObjects.Object);
@@ -73,7 +74,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var mockView = new Mock<View>(MockBehavior.Strict);
 
             var choices = new List<string> { "A", "B", "C" };
-            mockToDoObjects.SetupGet(td => td.SelectFromList)
+            mockToDoObjects
+                .SetupGet(td => td.SelectFromList)
                 .Returns(_ => new List<string> { "A", "B" });
             _mockGlobals.Setup(g => g.TD).Returns(mockToDoObjects.Object);
             _mockGlobals.Setup(g => g.Ol).Returns(mockOlObjects.Object);
@@ -117,7 +119,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestMethod]
         public void ParseAndStripFilter_ShouldReturnStrippedFilter()
         {
-            string filter = "\"http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage\" LIKE '%A%' OR \"http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage\" LIKE '%B%'";
+            string filter =
+                "\"http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage\" LIKE '%A%' OR \"http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage\" LIKE '%B%'";
 
             string result = _triageOlLogic.ParseAndStripFilter(filter);
 
@@ -128,7 +131,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void ParseAndStripFilter_ShouldReturnStrippedFilter2()
         {
             //string filter = @"(""http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Actionable"" = 'Task' AND (""http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage"" = 'A' OR ""http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage"" = 'B'))";
-            var filter = "(\"http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Actionable\" LIKE '%Task%' AND (\"http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage\" LIKE '%A%' OR \"http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage\" = 'B'))";
+            var filter =
+                "(\"http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Actionable\" LIKE '%Task%' AND (\"http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage\" LIKE '%A%' OR \"http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage\" = 'B'))";
 
             Console.WriteLine(filter);
             var parser = new DASLFilterParser();

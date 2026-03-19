@@ -1,5 +1,11 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Controllers;
 using QuickFiler.Interfaces;
@@ -7,12 +13,6 @@ using UtilitiesCS;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.Interfaces;
 using UtilitiesCS.Interfaces.IWinForm;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Microsoft.Office.Interop.Outlook;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -30,16 +30,25 @@ namespace QuickFiler.Controllers.Tests
         private System.Action _maxQfWindow;
         private IFilerFormController _filerFormController;
 
-
         private T GetPrivateField<T>(object obj, string fieldName)
         {
-            var field = obj.GetType().GetField(fieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var field = obj.GetType()
+                .GetField(
+                    fieldName,
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                );
             return (T)field.GetValue(obj);
         }
 
         private void SetPrivateField<T>(object obj, string fieldName, T value)
         {
-            var field = obj.GetType().GetField(fieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var field = obj.GetType()
+                .GetField(
+                    fieldName,
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                );
             field.SetValue(obj, value);
         }
 
@@ -52,8 +61,14 @@ namespace QuickFiler.Controllers.Tests
         {
             return new Dictionary<string, Theme>
             {
-                { "DarkNormal", new Theme("DarkNormal", new Dictionary<string, ThemeControlGroup>()) },
-                { "LightNormal", new Theme("LightNormal", new Dictionary<string, ThemeControlGroup>()) }
+                {
+                    "DarkNormal",
+                    new Theme("DarkNormal", new Dictionary<string, ThemeControlGroup>())
+                },
+                {
+                    "LightNormal",
+                    new Theme("LightNormal", new Dictionary<string, ThemeControlGroup>())
+                },
             };
         }
 
@@ -67,7 +82,8 @@ namespace QuickFiler.Controllers.Tests
                 () => { },
                 _mockParent.Object,
                 _tokenSource,
-                _token);
+                _token
+            );
         }
 
         [TestInitialize]
@@ -76,7 +92,8 @@ namespace QuickFiler.Controllers.Tests
             Console.SetOut(new DebugTextWriter());
             _mockGlobals = new Mock<IApplicationGlobals>();
             _mockAF = new Mock<IAppAutoFileObjects>();
-            _mockAF.SetupSet(af => af.MaximizeQuickFileWindow = It.IsAny<System.Action>())
+            _mockAF
+                .SetupSet(af => af.MaximizeQuickFileWindow = It.IsAny<System.Action>())
                 .Callback<System.Action>(action => _maxQfWindow = action)
                 .Verifiable();
 
@@ -84,7 +101,8 @@ namespace QuickFiler.Controllers.Tests
 
             _mockGlobals.Setup(g => g.AF).Returns(_mockAF.Object);
             _mockFormViewer = new Mock<IQfcFormViewer>();
-            _mockFormViewer.Setup(x => x.SetController(It.IsAny<IFilerFormController>()))
+            _mockFormViewer
+                .Setup(x => x.SetController(It.IsAny<IFilerFormController>()))
                 .Callback<IFilerFormController>(c => _filerFormController = c)
                 .Verifiable();
 
@@ -92,7 +110,6 @@ namespace QuickFiler.Controllers.Tests
             _mockParent = new Mock<IQfcHomeController>();
             _tokenSource = new CancellationTokenSource();
             _token = _tokenSource.Token;
-
         }
 
         #region ctor Tests
@@ -109,21 +126,39 @@ namespace QuickFiler.Controllers.Tests
                 () => { },
                 _mockParent.Object,
                 _tokenSource,
-                _token);
-
+                _token
+            );
 
             // Assert
             Assert.IsNotNull(controller);
-            Assert.AreEqual(_mockGlobals.Object, GetPrivateField<IApplicationGlobals>(controller, "_globals"), ErrMsg("_globals"));
-            Assert.AreEqual(_mockQfcQueue.Object, GetPrivateField<IQfcQueue>(controller, "_qfcQueue"), ErrMsg("_qfcQueue"));
-            Assert.AreEqual(QfEnums.InitTypeEnum.Sort, GetPrivateField<QfEnums.InitTypeEnum>(controller, "_initType"), ErrMsg("_initType"));
-            Assert.AreEqual(_mockParent.Object, GetPrivateField<IQfcHomeController>(controller, "_parent"), ErrMsg("_parent"));
-            Assert.AreEqual(_maxQfWindow.Method, controller.GetType().GetMethod("MaximizeFormViewer"));
+            Assert.AreEqual(
+                _mockGlobals.Object,
+                GetPrivateField<IApplicationGlobals>(controller, "_globals"),
+                ErrMsg("_globals")
+            );
+            Assert.AreEqual(
+                _mockQfcQueue.Object,
+                GetPrivateField<IQfcQueue>(controller, "_qfcQueue"),
+                ErrMsg("_qfcQueue")
+            );
+            Assert.AreEqual(
+                QfEnums.InitTypeEnum.Sort,
+                GetPrivateField<QfEnums.InitTypeEnum>(controller, "_initType"),
+                ErrMsg("_initType")
+            );
+            Assert.AreEqual(
+                _mockParent.Object,
+                GetPrivateField<IQfcHomeController>(controller, "_parent"),
+                ErrMsg("_parent")
+            );
+            Assert.AreEqual(
+                _maxQfWindow.Method,
+                controller.GetType().GetMethod("MaximizeFormViewer")
+            );
             Assert.AreEqual(_mockFormViewer.Object, controller.FormViewer);
             Assert.AreEqual((IFilerFormController)controller, _filerFormController);
             Assert.AreEqual(_tokenSource, controller.TokenSource);
             Assert.AreEqual(_token, controller.Token);
-
         }
 
         #endregion ctor Tests
@@ -159,7 +194,7 @@ namespace QuickFiler.Controllers.Tests
         [TestMethod]
         public void SetupLightDark_ShouldSetupThemes()
         {
-            // Arrange 
+            // Arrange
             _controller = CreateQfcFormController();
 
             // Act
@@ -459,10 +494,14 @@ namespace QuickFiler.Controllers.Tests
             spn.Value = 9;
             _mockFormViewer.SetupGet(x => x.L1v1L2h5_SpnEmailPerLoad).Returns(spn);
 
-            _mockQfcQueue.Setup(q => q.ChangeIterationSize(
-                It.IsAny<ValueTuple<TableLayoutPanel, List<QfcItemGroup>>>(),
-                It.IsAny<int>(),
-                It.IsAny<RowStyle>()))
+            _mockQfcQueue
+                .Setup(q =>
+                    q.ChangeIterationSize(
+                        It.IsAny<ValueTuple<TableLayoutPanel, List<QfcItemGroup>>>(),
+                        It.IsAny<int>(),
+                        It.IsAny<RowStyle>()
+                    )
+                )
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
@@ -478,13 +517,21 @@ namespace QuickFiler.Controllers.Tests
             await _controller.SpnEmailPerLoadHandler(this, EventArgs.Empty);
 
             // Assert
-            Assert.AreEqual(GetPrivateField<int>(_controller, "_itemsPerIteration"), (int)spn.Value);
+            Assert.AreEqual(
+                GetPrivateField<int>(_controller, "_itemsPerIteration"),
+                (int)spn.Value
+            );
             mockQfcCollectionController.Verify(x => x.UnregisterNavigation(), Times.Once);
             mockQfcCollectionController.Verify(x => x.RegisterNavigation(), Times.Once);
-            _mockQfcQueue.Verify(x => x.ChangeIterationSize(
-                It.IsAny<ValueTuple<TableLayoutPanel, List<QfcItemGroup>>>(),
-                It.IsAny<int>(),
-                It.IsAny<RowStyle>()), Times.Once);
+            _mockQfcQueue.Verify(
+                x =>
+                    x.ChangeIterationSize(
+                        It.IsAny<ValueTuple<TableLayoutPanel, List<QfcItemGroup>>>(),
+                        It.IsAny<int>(),
+                        It.IsAny<RowStyle>()
+                    ),
+                Times.Once
+            );
         }
 
         [TestMethod]
@@ -516,7 +563,10 @@ namespace QuickFiler.Controllers.Tests
             await _controller.ButtonSkipHandler(this, EventArgs.Empty);
 
             // Assert
-            _mockQfcQueue.Verify(q => q.TryDequeueAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()), Times.Once);
+            _mockQfcQueue.Verify(
+                q => q.TryDequeueAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()),
+                Times.Once
+            );
         }
 
         [TestMethod]
@@ -534,7 +584,10 @@ namespace QuickFiler.Controllers.Tests
             await _controller.SkipGroupAsync();
 
             // Assert
-            _mockQfcQueue.Verify(q => q.TryDequeueAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()), Times.Once);
+            _mockQfcQueue.Verify(
+                q => q.TryDequeueAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()),
+                Times.Once
+            );
         }
 
         [TestMethod]
@@ -586,8 +639,12 @@ namespace QuickFiler.Controllers.Tests
             // Arrange
             _controller = CreateQfcFormController();
             FormWindowState windowState = FormWindowState.Normal;
-            _mockFormViewer.Setup(fv => fv.Invoke(It.IsAny<Delegate>())).Callback<Delegate>(action => action.DynamicInvoke());
-            _mockFormViewer.SetupSet(fv => fv.WindowState = It.IsAny<FormWindowState>()).Callback<FormWindowState>(state => windowState = state);
+            _mockFormViewer
+                .Setup(fv => fv.Invoke(It.IsAny<Delegate>()))
+                .Callback<Delegate>(action => action.DynamicInvoke());
+            _mockFormViewer
+                .SetupSet(fv => fv.WindowState = It.IsAny<FormWindowState>())
+                .Callback<FormWindowState>(state => windowState = state);
 
             // Act
             _controller.MaximizeFormViewer();
@@ -602,8 +659,12 @@ namespace QuickFiler.Controllers.Tests
             // Arrange
             _controller = CreateQfcFormController();
             FormWindowState windowState = FormWindowState.Normal;
-            _mockFormViewer.Setup(fv => fv.Invoke(It.IsAny<Delegate>())).Callback<Delegate>(action => action.DynamicInvoke());
-            _mockFormViewer.SetupSet(fv => fv.WindowState = It.IsAny<FormWindowState>()).Callback<FormWindowState>(state => windowState = state);
+            _mockFormViewer
+                .Setup(fv => fv.Invoke(It.IsAny<Delegate>()))
+                .Callback<Delegate>(action => action.DynamicInvoke());
+            _mockFormViewer
+                .SetupSet(fv => fv.WindowState = It.IsAny<FormWindowState>())
+                .Callback<FormWindowState>(state => windowState = state);
 
             // Act
             _controller.MinimizeFormViewer();

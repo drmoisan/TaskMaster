@@ -12,20 +12,25 @@ namespace ToDoModel
         //public const string ConverterString = "0123456789abcdefghijklmnopqrstuvwxyz";
         public const string ConverterString = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private static int _maxBase = ConverterString.Length;
-        public static int MaxBase { get => _maxBase; }
+        public static int MaxBase
+        {
+            get => _maxBase;
+        }
 
         internal static void ValidateParams(int nbase)
         {
             if (nbase < 1)
             {
                 throw new ArgumentOutOfRangeException(
-                    $"Cannot convert base {nbase} because it must be a positive number");
+                    $"Cannot convert base {nbase} because it must be a positive number"
+                );
             }
             if (nbase > MaxBase)
             {
                 throw new ArgumentOutOfRangeException(
-                    $"Cannot convert base {nbase} because {nameof(ConverterString)} " +
-                    $"only supports conversions up to base {MaxBase}");
+                    $"Cannot convert base {nbase} because {nameof(ConverterString)} "
+                        + $"only supports conversions up to base {MaxBase}"
+                );
             }
         }
 
@@ -34,7 +39,8 @@ namespace ToDoModel
             if (num < 0)
             {
                 throw new ArgumentOutOfRangeException(
-                    $"Cannot convert number {num} because it must be 0 or greater");
+                    $"Cannot convert number {num} because it must be 0 or greater"
+                );
             }
             ValidateParams(nbase);
         }
@@ -77,8 +83,10 @@ namespace ToDoModel
             int idx = ConverterString.IndexOf(c);
             if (idx == -1)
             {
-                throw new ArgumentOutOfRangeException(nameof(c), $"Character {c} is not part of this " +
-                $"implementation of base {nbase}");
+                throw new ArgumentOutOfRangeException(
+                    nameof(c),
+                    $"Character {c} is not part of this " + $"implementation of base {nbase}"
+                );
             }
             return idx;
         }
@@ -101,6 +109,5 @@ namespace ToDoModel
 
             return bigint;
         }
-
     }
 }

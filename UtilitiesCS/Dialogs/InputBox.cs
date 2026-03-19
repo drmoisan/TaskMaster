@@ -9,7 +9,11 @@ namespace UtilitiesCS
 {
     public static class InputBox
     {
-        public static string ShowDialog(string Prompt, string Title = "", string DefaultResponse = "")
+        public static string ShowDialog(
+            string Prompt,
+            string Title = "",
+            string DefaultResponse = ""
+        )
         {
             //if (!InputBoxViewer.DpiCalled) { InputBoxViewer.DpiAware(); }
             var viewer = new InputBoxViewer();

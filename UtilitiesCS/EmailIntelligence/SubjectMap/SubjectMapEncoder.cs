@@ -40,24 +40,44 @@ namespace UtilitiesCS
                         _encoder.Deserialize();
                     }
                     // _decoder = new SCODictionary<int, string>(_encoder.ToDictionary().Select(x => new KeyValuePair<int, string>(x.Value, x.Key)).ToDictionary());
-                    var iEnumerableOfKVPs = _encoder.Select(x => new KeyValuePair<int, string>(x.Value, x.Key));
+                    var iEnumerableOfKVPs = _encoder.Select(x => new KeyValuePair<int, string>(
+                        x.Value,
+                        x.Key
+                    ));
                     try
                     {
                         _decoder = new ScoDictionary<int, string>(iEnumerableOfKVPs.ToDictionary());
                     }
                     catch (InvalidOperationException)
                     {
-                        if (iEnumerableOfKVPs.GroupBy(kvp => kvp.Key).Where(g => g.Count() > 1).Any())
+                        if (
+                            iEnumerableOfKVPs
+                                .GroupBy(kvp => kvp.Key)
+                                .Where(g => g.Count() > 1)
+                                .Any()
+                        )
                         {
-                            var response = MessageBox.Show("Encoder is corrupt. " +
-                                "Duplicate keys found in decoder. " +
-                                "Would you like to rebuild the encoder / decoder?",
-                                "Duplicate Keys", MessageBoxButtons.YesNo);
+                            var response = MessageBox.Show(
+                                "Encoder is corrupt. "
+                                    + "Duplicate keys found in decoder. "
+                                    + "Would you like to rebuild the encoder / decoder?",
+                                "Duplicate Keys",
+                                MessageBoxButtons.YesNo
+                            );
 
-                            if (response == DialogResult.Yes) { RebuildEncoding(); }
-                            else { throw; }
+                            if (response == DialogResult.Yes)
+                            {
+                                RebuildEncoding();
+                            }
+                            else
+                            {
+                                throw;
+                            }
                         }
-                        else { throw; }
+                        else
+                        {
+                            throw;
+                        }
                     }
                 }
                 return _decoder;
@@ -68,8 +88,10 @@ namespace UtilitiesCS
             get
             {
                 if (_encoder is null)
-                    _encoder = new ScoDictionary<string, int>(filename: _filename,
-                                                              folderpath: _folderpath);
+                    _encoder = new ScoDictionary<string, int>(
+                        filename: _filename,
+                        folderpath: _folderpath
+                    );
                 return _encoder;
             }
         }
@@ -79,7 +101,8 @@ namespace UtilitiesCS
             if (_subjectMap is null)
             {
                 throw new NullReferenceException(
-                $"{nameof(_subjectMap)} is null within class {nameof(SubjectMapEncoder)}");
+                    $"{nameof(_subjectMap)} is null within class {nameof(SubjectMapEncoder)}"
+                );
             }
             RebuildEncoding(_subjectMap);
         }
@@ -87,24 +110,28 @@ namespace UtilitiesCS
         public void RebuildEncoding(SubjectMapSco map)
         {
             var words = map.ToList()
-                           .Select(x => string.Concat(x.EmailSubject,
-                                                      " ",
-                                                      x.Folderpath.Split("\\").Last())
-                           .Tokenize(_tokenizerRegex))
-                           .SelectMany(x => x)
-                           .Distinct()
-                           .Select((input, index) => new { input, index })
-                           .ToDictionary(x => x.input, x => x.index);
+                .Select(x =>
+                    string.Concat(x.EmailSubject, " ", x.Folderpath.Split("\\").Last())
+                        .Tokenize(_tokenizerRegex)
+                )
+                .SelectMany(x => x)
+                .Distinct()
+                .Select((input, index) => new { input, index })
+                .ToDictionary(x => x.input, x => x.index);
 
-            _encoder = new ScoDictionary<string, int>(dictionary: words,
-                                                      filename: _filename,
-                                                      folderpath: _folderpath);
+            _encoder = new ScoDictionary<string, int>(
+                dictionary: words,
+                filename: _filename,
+                folderpath: _folderpath
+            );
 
             _encoder.Serialize();
             _decoder = new ScoDictionary<int, string>(
-                _encoder.ToDictionary()
-                .Select(x => new KeyValuePair<int, string>(x.Value, x.Key))
-                .ToDictionary());
+                _encoder
+                    .ToDictionary()
+                    .Select(x => new KeyValuePair<int, string>(x.Value, x.Key))
+                    .ToDictionary()
+            );
 
             foreach (var entry in map)
             {
@@ -116,7 +143,10 @@ namespace UtilitiesCS
         public void AugmentTokenDict(string[] tokens)
         {
             bool changed = false;
-            if (tokens is null) { throw new ArgumentNullException(nameof(tokens)); }
+            if (tokens is null)
+            {
+                throw new ArgumentNullException(nameof(tokens));
+            }
             foreach (var token in tokens)
             {
                 lock (Encoder)
@@ -128,15 +158,20 @@ namespace UtilitiesCS
                         while (tryAgain)
                         {
                             code = Encoder.Values.Max() + 1;
-                            if (Decoder.TryAdd(code, token)) { tryAgain = false; }
+                            if (Decoder.TryAdd(code, token))
+                            {
+                                tryAgain = false;
+                            }
                         }
                         Encoder.Add(token, code);
                         changed = true;
                     }
                 }
-
             }
-            if (changed) { _encoder.Serialize(); }
+            if (changed)
+            {
+                _encoder.Serialize();
+            }
         }
 
         public void AugmentTokenDict(string text)
@@ -158,7 +193,5 @@ namespace UtilitiesCS
         {
             return string.Join(" ", encodedWords.Select(value => Decoder[value]).ToArray());
         }
-
-
     }
 }

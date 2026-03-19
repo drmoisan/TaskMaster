@@ -69,7 +69,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 
         private static TreeNode<FolderWrapper> CreateNode(string name)
         {
-            var folder = new FolderWrapper(selected: false, itemCount: 0, folderSize: 0L, name: name, relativePath: name ?? string.Empty);
+            var folder = new FolderWrapper(
+                selected: false,
+                itemCount: 0,
+                folderSize: 0L,
+                name: name,
+                relativePath: name ?? string.Empty
+            );
             return new TreeNode<FolderWrapper>(folder);
         }
     }

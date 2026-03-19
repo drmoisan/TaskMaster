@@ -1,5 +1,5 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.ReusableTypeClasses;
 
@@ -7,7 +7,11 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 {
     public interface IEmailDetailsWrapper
     {
-        string[] Details(MailItem olMail, string emailRootFolder, IScoDictionary<string, string> dictRemap = null);
+        string[] Details(
+            MailItem olMail,
+            string emailRootFolder,
+            IScoDictionary<string, string> dictRemap = null
+        );
         string GetActionTaken(MailItem OlMail);
         IEnumerable<Recipient> GetCcRecipients(MailItem olMail);
         IEnumerable<RecipientInfo> GetInfo(IEnumerable<Recipient> recipients);

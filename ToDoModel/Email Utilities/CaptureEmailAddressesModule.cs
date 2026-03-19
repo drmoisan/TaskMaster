@@ -6,7 +6,6 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace ToDoModel
 {
-
     public static class CaptureEmailAddressesModule
     {
         //public static List<string> GetEmailAddresses(this MailItem olMail, string emailRootFolder, IScoDictionary<string, string> dictRemap, string currentUserEmail)
@@ -54,6 +53,5 @@ namespace ToDoModel
         //    }
         //    return emailAddressList;
         //}
-
     }
 }

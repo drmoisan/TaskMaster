@@ -19,10 +19,8 @@ namespace UtilitiesCS.Test.OutlookObjects.FilterDASL
             Action emptyAct = () => parser.Parse(string.Empty);
 
             // Assert
-            nullAct.Should().Throw<ArgumentException>()
-                .WithParameterName("daslFilter");
-            emptyAct.Should().Throw<ArgumentException>()
-                .WithParameterName("daslFilter");
+            nullAct.Should().Throw<ArgumentException>().WithParameterName("daslFilter");
+            emptyAct.Should().Throw<ArgumentException>().WithParameterName("daslFilter");
         }
 
         [TestMethod]
@@ -45,7 +43,8 @@ namespace UtilitiesCS.Test.OutlookObjects.FilterDASL
         {
             // Arrange
             var parser = new DASLFilterParser();
-            const string filter = "urn:schemas:httpmail:subject LIKE '%status%' AND (urn:schemas:httpmail:fromemail = 'a@b.com' OR urn:schemas:httpmail:fromemail = 'c@d.com')";
+            const string filter =
+                "urn:schemas:httpmail:subject LIKE '%status%' AND (urn:schemas:httpmail:fromemail = 'a@b.com' OR urn:schemas:httpmail:fromemail = 'c@d.com')";
 
             // Act
             var tree = parser.Parse(filter);
@@ -81,7 +80,8 @@ namespace UtilitiesCS.Test.OutlookObjects.FilterDASL
         {
             // Arrange
             var parser = new DASLFilterParser();
-            const string filter = "(urn:schemas:httpmail:subject LIKE '%status%' AND urn:schemas:httpmail:fromemail = 'a@b.com'";
+            const string filter =
+                "(urn:schemas:httpmail:subject LIKE '%status%' AND urn:schemas:httpmail:fromemail = 'a@b.com'";
 
             // Act
             var tree = parser.Parse(filter);
@@ -112,9 +112,7 @@ namespace UtilitiesCS.Test.OutlookObjects.FilterDASL
             }
 
             // Assert
-            writer.ToString().Should().Contain("AND")
-                .And.Contain("  A")
-                .And.Contain("  B");
+            writer.ToString().Should().Contain("AND").And.Contain("  A").And.Contain("  B");
         }
     }
 }

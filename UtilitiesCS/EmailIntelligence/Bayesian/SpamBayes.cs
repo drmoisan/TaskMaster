@@ -6,7 +6,5 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
-    internal class SpamBayes
-    {
-    }
+    internal class SpamBayes { }
 }

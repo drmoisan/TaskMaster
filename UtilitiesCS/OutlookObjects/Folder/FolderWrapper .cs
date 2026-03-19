@@ -1,6 +1,4 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -9,6 +7,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
+using Newtonsoft.Json;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.OutlookExtensions;
@@ -26,12 +26,19 @@ namespace UtilitiesCS
         }
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         protected FolderWrapper() { }
 
         [JsonConstructor]
-        public FolderWrapper(bool selected, int itemCount, long folderSize, string name, string relativePath)
+        public FolderWrapper(
+            bool selected,
+            int itemCount,
+            long folderSize,
+            string name,
+            string relativePath
+        )
         {
             Selected = selected;
             ItemCount = itemCount;
@@ -50,6 +57,7 @@ namespace UtilitiesCS
         }
 
         private MAPIFolder _olRoot;
+
         [JsonIgnore]
         public MAPIFolder OlRoot
         {
@@ -62,6 +70,7 @@ namespace UtilitiesCS
         }
 
         private MAPIFolder _olFolder;
+
         [JsonIgnore]
         public MAPIFolder OlFolder
         {
@@ -87,21 +96,39 @@ namespace UtilitiesCS
         #region Lazy Properties
 
         private Lazy<int> _lazyItemCount;
-        public int ItemCount { get => _lazyItemCount.Value; set => _lazyItemCount = value.ToLazyValue(); }
+        public int ItemCount
+        {
+            get => _lazyItemCount.Value;
+            set => _lazyItemCount = value.ToLazyValue();
+        }
 
         private Lazy<int> _lazyItemCountSubFolders;
-        public int ItemCountSubFolders { get => _lazyItemCountSubFolders.Value; set => _lazyItemCountSubFolders = value.ToLazyValue(); }
+        public int ItemCountSubFolders
+        {
+            get => _lazyItemCountSubFolders.Value;
+            set => _lazyItemCountSubFolders = value.ToLazyValue();
+        }
+
         internal int LoadItemCountSubFolders()
         {
             return ItemCount + SumItemCountRecursively(OlFolder);
         }
+
         internal int SumItemCountRecursively(MAPIFolder folder)
         {
-            return folder.Folders?.Cast<MAPIFolder>().Sum(f => f.Items.Count + SumItemCountRecursively(f)) ?? 0;
+            return folder
+                    .Folders?.Cast<MAPIFolder>()
+                    .Sum(f => f.Items.Count + SumItemCountRecursively(f))
+                ?? 0;
         }
 
         private Lazy<long> _lazyFolderSize;
-        public long FolderSize { get => _lazyFolderSize.Value; set => _lazyFolderSize = value.ToLazyValue(); }
+        public long FolderSize
+        {
+            get => _lazyFolderSize.Value;
+            set => _lazyFolderSize = value.ToLazyValue();
+        }
+
         private long LoadFolderSize()
         {
             var items = OlFolder.Items;
@@ -111,10 +138,14 @@ namespace UtilitiesCS
                 try
                 {
                     var olItem = new OutlookItem(objItem);
-                    if (olItem.IsValid()) { totalSize += olItem.Size; }
+                    if (olItem.IsValid())
+                    {
+                        totalSize += olItem.Size;
+                    }
                     else if (HasProperty(objItem, "Size")) // Fallback for items that don't implement IOutlookItem
                     {
-                        totalSize += (long)objItem.GetType().GetProperty("Size").GetValue(objItem, null);
+                        totalSize += (long)
+                            objItem.GetType().GetProperty("Size").GetValue(objItem, null);
                     }
                 }
                 catch (System.Exception e)
@@ -134,35 +165,53 @@ namespace UtilitiesCS
 
         private bool HasProperty(object obj, string propertyName)
         {
-            if (obj == null) return false;
+            if (obj == null)
+                return false;
             return obj.GetType().GetProperty(propertyName) != null;
         }
 
         private Lazy<string> _lazyName;
-        public string Name { get => _lazyName.Value; private set => _lazyName = value.ToLazy(); }
+        public string Name
+        {
+            get => _lazyName.Value;
+            private set => _lazyName = value.ToLazy();
+        }
+
         internal virtual string LoadName() => OlFolder?.Name;
 
         private Lazy<string> _lazyRelativePath;
+
         [JsonProperty]
-        public string RelativePath { get => _lazyRelativePath.Value; set => _lazyRelativePath = value.ToLazy(); }
+        public string RelativePath
+        {
+            get => _lazyRelativePath.Value;
+            set => _lazyRelativePath = value.ToLazy();
+        }
+
         internal virtual string LoadRelativePath()
         {
             if (OlRoot is null || OlFolder is null)
             {
-                logger.Warn($"{nameof(OlRoot)} or {nameof(OlFolder)} is null. Unable to load {nameof(RelativePath)}.\n" +
-                    $"Call hierarchy {new StackTrace().GetMyTraceString()}");
+                logger.Warn(
+                    $"{nameof(OlRoot)} or {nameof(OlFolder)} is null. Unable to load {nameof(RelativePath)}.\n"
+                        + $"Call hierarchy {new StackTrace().GetMyTraceString()}"
+                );
                 return null;
             }
             else if (OlFolder.FolderPath == OlRoot.FolderPath)
             {
-                logger.Warn($"{nameof(OlFolder.FolderPath)} is the same as {nameof(OlRoot.FolderPath)}. " +
-                    $"Returning full path.\nCall hierarchy {new StackTrace().GetMyTraceString()}");
+                logger.Warn(
+                    $"{nameof(OlFolder.FolderPath)} is the same as {nameof(OlRoot.FolderPath)}. "
+                        + $"Returning full path.\nCall hierarchy {new StackTrace().GetMyTraceString()}"
+                );
                 return OlFolder.FolderPath;
             }
             else if (!OlFolder.FolderPath.Contains(OlRoot.FolderPath))
             {
-                logger.Warn($"{nameof(OlFolder.FolderPath)} does not contain {nameof(OlRoot.FolderPath)}. " +
-                    $"Returning full path.\nCall hierarchy {new StackTrace().GetMyTraceString()}");
+                logger.Warn(
+                    $"{nameof(OlFolder.FolderPath)} does not contain {nameof(OlRoot.FolderPath)}. "
+                        + $"Returning full path.\nCall hierarchy {new StackTrace().GetMyTraceString()}"
+                );
                 return OlFolder.FolderPath;
             }
             else
@@ -189,7 +238,9 @@ namespace UtilitiesCS
             _lazyName = new Lazy<string>(LoadName);
             _lazyRelativePath = new Lazy<string>(LoadRelativePath);
             _lazyItemCountSubFolders = new Lazy<int>(LoadItemCountSubFolders);
-            ItemHelpers = new AsyncLazy<IItemInfo[]>(async () => await Task.Run(() => LoadItemHelpers()));
+            ItemHelpers = new AsyncLazy<IItemInfo[]>(async () =>
+                await Task.Run(() => LoadItemHelpers())
+            );
         }
 
         #endregion Lazy Properties
@@ -326,10 +377,12 @@ namespace UtilitiesCS
         public AsyncLazy<IItemInfo[]> ItemHelpers { get; set; }
         public IApplicationGlobals Globals { get; set; }
 
-
         internal IItemInfo[] LoadItemHelpers()
         {
-            if (Globals is null) { throw new ArgumentNullException("Globals"); }
+            if (Globals is null)
+            {
+                throw new ArgumentNullException("Globals");
+            }
             List<IItemInfo> helpers = [];
             var items = OlFolder.Items;
             foreach (var objItem in items)
@@ -342,7 +395,9 @@ namespace UtilitiesCS
                     }
                     else if (objItem is MeetingItem meetingItem)
                     {
-                        helpers.Add(new MeetingItemHelper(meetingItem, Globals).ToMatchableObject());
+                        helpers.Add(
+                            new MeetingItemHelper(meetingItem, Globals).ToMatchableObject()
+                        );
                     }
                 }
                 catch (System.Exception e)
@@ -358,39 +413,83 @@ namespace UtilitiesCS
             return helpers.ToArray();
         }
 
-        public async Task<double> CalculateItemMatchPercentageAsync(FolderWrapper other, IApplicationGlobals globals, CancellationToken cancel)
+        public async Task<double> CalculateItemMatchPercentageAsync(
+            FolderWrapper other,
+            IApplicationGlobals globals,
+            CancellationToken cancel
+        )
         {
             Globals = globals;
             return await CalculateItemMatchPercentageAsync(other, cancel).ConfigureAwait(false);
         }
 
-        public async Task<double> CalculateItemMatchPercentageAsync(FolderWrapper other, CancellationToken cancel)
+        public async Task<double> CalculateItemMatchPercentageAsync(
+            FolderWrapper other,
+            CancellationToken cancel
+        )
         {
-            if (Globals is null) { throw new ArgumentNullException("Globals"); }
-            if (other.Globals is null) { other.Globals = Globals; }
-            if (ItemCount == 0 || other.ItemCount == 0) { return 0; }
+            if (Globals is null)
+            {
+                throw new ArgumentNullException("Globals");
+            }
+            if (other.Globals is null)
+            {
+                other.Globals = Globals;
+            }
+            if (ItemCount == 0 || other.ItemCount == 0)
+            {
+                return 0;
+            }
 
-            var (matching, currentOnly, otherOnly) = await CompareItemsAsync(other, cancel).ConfigureAwait(false);
+            var (matching, currentOnly, otherOnly) = await CompareItemsAsync(other, cancel)
+                .ConfigureAwait(false);
             return CalculateItemMatchPercentage(matching, currentOnly, otherOnly);
         }
 
-        public double CalculateItemMatchPercentage(IItemInfo[] matching, IItemInfo[] currentOnly, IItemInfo[] otherOnly)
+        public double CalculateItemMatchPercentage(
+            IItemInfo[] matching,
+            IItemInfo[] currentOnly,
+            IItemInfo[] otherOnly
+        )
         {
-            if (matching.IsNullOrEmpty()) { return 0; }
-            double matchPercentage = (matching.Length * 2) / (double)(matching.Length * 2 + currentOnly.Length + otherOnly.Length);
+            if (matching.IsNullOrEmpty())
+            {
+                return 0;
+            }
+            double matchPercentage =
+                (matching.Length * 2)
+                / (double)(matching.Length * 2 + currentOnly.Length + otherOnly.Length);
             return matchPercentage;
         }
 
-        public async Task<(IItemInfo[] matching, IItemInfo[] currentOnly, IItemInfo[] otherOnly)> CompareItemsAsync(FolderWrapper other, IApplicationGlobals globals, CancellationToken cancel)
+        public async Task<(
+            IItemInfo[] matching,
+            IItemInfo[] currentOnly,
+            IItemInfo[] otherOnly
+        )> CompareItemsAsync(
+            FolderWrapper other,
+            IApplicationGlobals globals,
+            CancellationToken cancel
+        )
         {
             Globals = globals;
             return await CompareItemsAsync(other, cancel).ConfigureAwait(false);
         }
 
-        public async Task<(IItemInfo[] matching, IItemInfo[] currentOnly, IItemInfo[] otherOnly)> CompareItemsAsync(FolderWrapper other, CancellationToken cancel)
+        public async Task<(
+            IItemInfo[] matching,
+            IItemInfo[] currentOnly,
+            IItemInfo[] otherOnly
+        )> CompareItemsAsync(FolderWrapper other, CancellationToken cancel)
         {
-            if (Globals is null) { throw new ArgumentNullException("Globals"); }
-            if (other.Globals is null) { other.Globals = Globals; }
+            if (Globals is null)
+            {
+                throw new ArgumentNullException("Globals");
+            }
+            if (other.Globals is null)
+            {
+                other.Globals = Globals;
+            }
             var currentHelpers = await ItemHelpers;
             var otherHelpers = await other.ItemHelpers;
             if (currentHelpers.IsNullOrEmpty() || otherHelpers.IsNullOrEmpty())
@@ -422,9 +521,6 @@ namespace UtilitiesCS
             }
         }
 
-
-
         #endregion Folder Comparison
-
     }
 }

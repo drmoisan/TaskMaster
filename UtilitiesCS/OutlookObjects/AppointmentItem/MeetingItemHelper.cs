@@ -1,5 +1,4 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -7,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.Extensions.Lazy;
@@ -17,7 +17,8 @@ namespace UtilitiesCS
     public class MeetingItemHelper : INotifyPropertyChanged, IItemInfo
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors, Initializers, and Destructors
 
@@ -71,17 +72,48 @@ namespace UtilitiesCS
             _emailPrefixToStrip = new(() => Globals.Ol.EmailPrefixToStrip, true);
             _storeId = new(() => ((Folder)_item.Parent).StoreID, true);
             _folderName = new(() => ((Folder)_item.Parent).Name, true);
-            _folderInfo = new(() => new FolderWrapper((Folder)Item.Parent, ResolveFolderRoot(globals, ((Folder)Item.Parent).FolderPath)));
+            _folderInfo = new(() =>
+                new FolderWrapper(
+                    (Folder)Item.Parent,
+                    ResolveFolderRoot(globals, ((Folder)Item.Parent).FolderPath)
+                )
+            );
             _htmlBody = new(() => _item.RTFBody, true);
             _html = new(() => GetHtml(HTMLBody), true);
             _isTaskFlagSet = new(() => _item.FlagStatus == OlFlagStatus.olFlagMarked);
             _olRecipients = new(() => _item.Recipients?.Cast<Recipient>().ToArray(), true);
-            _ccRecipients = new(() => OlRecipients?.Where(x => x.Type == (int)OlMailRecipientType.olCC).Select(x => x.GetInfo()).ToArray(), true);
-            _toRecipients = new(() => OlRecipients?.Where(x => x.Type == (int)OlMailRecipientType.olTo).Select(x => x.GetInfo()).ToArray(), true);
-            _toRecipientsName = new(() => string.Join("; ", ToRecipients?.Select(t => t.Name) ?? [""]), true);
-            _toRecipientsHtml = new(() => string.Join("; ", ToRecipients?.Select(t => t.Html) ?? [""]), true);
-            _ccRecipientsName = new(() => string.Join("; ", CcRecipients?.Select(t => t.Name) ?? [""]), true);
-            _ccRecipientsHtml = new(() => string.Join("; ", CcRecipients?.Select(t => t.Html) ?? [""]), true);
+            _ccRecipients = new(
+                () =>
+                    OlRecipients
+                        ?.Where(x => x.Type == (int)OlMailRecipientType.olCC)
+                        .Select(x => x.GetInfo())
+                        .ToArray(),
+                true
+            );
+            _toRecipients = new(
+                () =>
+                    OlRecipients
+                        ?.Where(x => x.Type == (int)OlMailRecipientType.olTo)
+                        .Select(x => x.GetInfo())
+                        .ToArray(),
+                true
+            );
+            _toRecipientsName = new(
+                () => string.Join("; ", ToRecipients?.Select(t => t.Name) ?? [""]),
+                true
+            );
+            _toRecipientsHtml = new(
+                () => string.Join("; ", ToRecipients?.Select(t => t.Html) ?? [""]),
+                true
+            );
+            _ccRecipientsName = new(
+                () => string.Join("; ", CcRecipients?.Select(t => t.Name) ?? [""]),
+                true
+            );
+            _ccRecipientsHtml = new(
+                () => string.Join("; ", CcRecipients?.Select(t => t.Html) ?? [""]),
+                true
+            );
             _sentDate = new(() => _item.SentOn, true);
             _sentOn = new(() => this.SentDate.ToString("g"), true);
             _size = new(() => _item.Size, true);
@@ -89,11 +121,17 @@ namespace UtilitiesCS
             _tokens = new(() => Tokenizer.Tokenize(this).ToArray(), true);
             _triage = new(() => _item.GetTriage(), true);
             _unread = new(() => _item.UnRead, true);
-            _attachmentsHelper = new(() => _item.Attachments
-                                                .Cast<Attachment>()
-                                                .Select(x => new AttachmentHelper(x, SentDate, FolderName))
-                                                .ToArray(), true);
-            _attachmentsInfo = new(() => AttachmentsHelper?.Select(x => x.AttachmentInfo)?.ToArray());
+            _attachmentsHelper = new(
+                () =>
+                    _item
+                        .Attachments.Cast<Attachment>()
+                        .Select(x => new AttachmentHelper(x, SentDate, FolderName))
+                        .ToArray(),
+                true
+            );
+            _attachmentsInfo = new(() =>
+                AttachmentsHelper?.Select(x => x.AttachmentInfo)?.ToArray()
+            );
             _appointment = new(() => _item.GetAssociatedAppointment(false), true);
             _internetCodepage = new(() => Appointment.InternetCodepage, true);
         }
@@ -102,45 +140,80 @@ namespace UtilitiesCS
             MeetingItem item,
             IApplicationGlobals appGlobals,
             CancellationToken token,
-            bool loadAll)
+            bool loadAll
+        )
         {
             //TraceUtility.LogMethodCall(item, emailPrefixToStrip,token,loadAll);
 
             token.ThrowIfCancellationRequested();
             item.ThrowIfNull();
 
-            return await Task.Run(() =>
-            {
-                var info = new MeetingItemHelper(item, appGlobals);
-                info.Sw = new SegmentStopWatch().Start();
-                return info;
-            }, token);
+            return await Task.Run(
+                () =>
+                {
+                    var info = new MeetingItemHelper(item, appGlobals);
+                    info.Sw = new SegmentStopWatch().Start();
+                    return info;
+                },
+                token
+            );
         }
 
-        public MeetingItemHelper LoadAll(IApplicationGlobals globals, Folder olRoot, bool loadTokens = false)
+        public MeetingItemHelper LoadAll(
+            IApplicationGlobals globals,
+            Folder olRoot,
+            bool loadTokens = false
+        )
         {
-            if (Item is null) { throw new ArgumentNullException(); }
+            if (Item is null)
+            {
+                throw new ArgumentNullException();
+            }
             InitLazyFields(globals);
 
             LoadPriorityForce();
             FolderInfo.OlRoot = olRoot;
             LoadRecipientsForce();
-            if (Html is not null) { }//{ _html = GetHtml().ToLazy(); }
+            if (Html is not null) { } //{ _html = GetHtml().ToLazy(); }
             //if (loadTokens) { LoadTokens(); }
-            if (loadTokens) { _ = Tokens; }
+            if (loadTokens)
+            {
+                _ = Tokens;
+            }
             return this;
         }
 
         public void LoadPriorityForce()
         {
             Item.ThrowIfNull();
-            _ = new object[] { EntryId, Sender, SenderName, SenderHtml, Subject, Body, Categories,
-                Triage, SentOn, Actionable, FolderInfo, FolderName, Globals, ConversationID };
+            _ = new object[]
+            {
+                EntryId,
+                Sender,
+                SenderName,
+                SenderHtml,
+                Subject,
+                Body,
+                Categories,
+                Triage,
+                SentOn,
+                Actionable,
+                FolderInfo,
+                FolderName,
+                Globals,
+                ConversationID,
+            };
         }
 
         public void LoadRecipientsForce()
         {
-            _ = new string[] { ToRecipientsName, ToRecipientsHtml, CcRecipientsName, CcRecipientsHtml };
+            _ = new string[]
+            {
+                ToRecipientsName,
+                ToRecipientsHtml,
+                CcRecipientsName,
+                CcRecipientsHtml,
+            };
             Sw?.LogDuration("LoadRecipientsForce");
         }
 
@@ -148,12 +221,17 @@ namespace UtilitiesCS
         {
             var recipients = Item.Recipients.Cast<Recipient>().ToArray();
             Sw?.LogDuration("Recipients -> Cast to array");
-            ToRecipients = recipients.Where(x => x.Type == (int)OlMailRecipientType.olTo).Select(x => x.GetInfo()).ToArray();
-
+            ToRecipients = recipients
+                .Where(x => x.Type == (int)OlMailRecipientType.olTo)
+                .Select(x => x.GetInfo())
+                .ToArray();
 
             ToRecipientsName = string.Join("; ", ToRecipients.Select(t => t.Name));
             ToRecipientsHtml = string.Join("; ", ToRecipients.Select(t => t.Html));
-            CcRecipients = recipients.Where(x => x.Type == (int)OlMailRecipientType.olCC).Select(x => x.GetInfo()).ToArray();
+            CcRecipients = recipients
+                .Where(x => x.Type == (int)OlMailRecipientType.olCC)
+                .Select(x => x.GetInfo())
+                .ToArray();
 
             CcRecipientsName = string.Join("; ", CcRecipients.Select(t => t.Name));
             CcRecipientsHtml = string.Join("; ", CcRecipients.Select(t => t.Html));
@@ -168,12 +246,12 @@ namespace UtilitiesCS
             _senderHtml = sender.Html.ToLazy();
         }
 
-
         #endregion Constructors, Initializers, and Destructors
 
         #region Private and Internal Fields and Properties
 
         private Enums.ToggleState _darkMode = Enums.ToggleState.Off;
+
         internal static Folder ResolveFolderRoot(IApplicationGlobals appGlobals, string folderPath)
         {
             if (folderPath.Contains(appGlobals.Ol.ArchiveRootPath))
@@ -191,43 +269,87 @@ namespace UtilitiesCS
         #region Public Properties
 
         internal Lazy<AppointmentItem> _appointment;
-        public AppointmentItem Appointment { get => _appointment?.Value; set => _appointment = value.ToLazy(); }
+        public AppointmentItem Appointment
+        {
+            get => _appointment?.Value;
+            set => _appointment = value.ToLazy();
+        }
 
         private MeetingItem _item;
 
         private Lazy<string> _actionable;
-        public string Actionable { get => _actionable?.Value; set => _actionable = value.ToLazy(); }
+        public string Actionable
+        {
+            get => _actionable?.Value;
+            set => _actionable = value.ToLazy();
+        }
 
         private Lazy<string> _body;
-        public string Body { get => _body?.Value; set => _body = value.ToLazy(); }
+        public string Body
+        {
+            get => _body?.Value;
+            set => _body = value.ToLazy();
+        }
 
         private Lazy<string> _categories;
-        public string Categories { get => _categories?.Value; set => _categories = value.ToLazy(); }
+        public string Categories
+        {
+            get => _categories?.Value;
+            set => _categories = value.ToLazy();
+        }
 
         private Lazy<string> _conversationID;
-        public string ConversationID { get => _conversationID?.Value; set => _conversationID = value.ToLazy(); }
+        public string ConversationID
+        {
+            get => _conversationID?.Value;
+            set => _conversationID = value.ToLazy();
+        }
 
         private Lazy<string> _emailPrefixToStrip;
-        public string EmailPrefixToStrip { get => _emailPrefixToStrip?.Value; internal set => _emailPrefixToStrip = value.ToLazy(); }
+        public string EmailPrefixToStrip
+        {
+            get => _emailPrefixToStrip?.Value;
+            internal set => _emailPrefixToStrip = value.ToLazy();
+        }
 
         //private string _entryId;
         //public string EntryId { get => PriorityInitialized(ref _entryId); set => _entryId = value; }
 
         //private Lazy<T> _entryId = new(() => { return default; }, true);
         private Lazy<string> _entryId;
-        public string EntryId { get => _entryId.Value; set => _entryId = value.ToLazy(); }
+        public string EntryId
+        {
+            get => _entryId.Value;
+            set => _entryId = value.ToLazy();
+        }
 
         private Lazy<IApplicationGlobals> _globals;
-        internal IApplicationGlobals Globals { get => _globals?.Value; set => _globals = value.ToLazy(); }
+        internal IApplicationGlobals Globals
+        {
+            get => _globals?.Value;
+            set => _globals = value.ToLazy();
+        }
 
         private Lazy<string> _storeId;
-        public string StoreId { get => _storeId.Value; set => _storeId = value.ToLazy(); }
+        public string StoreId
+        {
+            get => _storeId.Value;
+            set => _storeId = value.ToLazy();
+        }
 
         private Lazy<IFolderWrapper> _folderInfo;
-        public IFolderWrapper FolderInfo { get => _folderInfo?.Value; set => _folderInfo = value.ToLazy(); }
+        public IFolderWrapper FolderInfo
+        {
+            get => _folderInfo?.Value;
+            set => _folderInfo = value.ToLazy();
+        }
 
         private Lazy<string> _folderName;
-        public string FolderName { get => _folderName?.Value; set => _folderName = value.ToLazy(); }
+        public string FolderName
+        {
+            get => _folderName?.Value;
+            set => _folderName = value.ToLazy();
+        }
 
         public virtual MeetingItem Item
         {
@@ -237,44 +359,86 @@ namespace UtilitiesCS
             set => _item = value;
         }
 
-        private IItemInfo.PlainTextOptionsEnum _plainTextOptions = IItemInfo.PlainTextOptionsEnum.StripAll;
-        public virtual IItemInfo.PlainTextOptionsEnum PlainTextOptions { get => _plainTextOptions; set => _plainTextOptions = value; }
+        private IItemInfo.PlainTextOptionsEnum _plainTextOptions = IItemInfo
+            .PlainTextOptionsEnum
+            .StripAll;
+        public virtual IItemInfo.PlainTextOptionsEnum PlainTextOptions
+        {
+            get => _plainTextOptions;
+            set => _plainTextOptions = value;
+        }
 
         public SegmentStopWatch Sw { get; set; }
 
         private Lazy<string> _sentOn;
-        public virtual string SentOn { get => _sentOn?.Value; set => _sentOn = value.ToLazy(); }
+        public virtual string SentOn
+        {
+            get => _sentOn?.Value;
+            set => _sentOn = value.ToLazy();
+        }
 
         private Lazy<string> _subject;
-        public virtual string Subject { get => _subject?.Value; set => _subject = value.ToLazy(); }
+        public virtual string Subject
+        {
+            get => _subject?.Value;
+            set => _subject = value.ToLazy();
+        }
 
         private Lazy<string> _senderHtml;
-        public virtual string SenderHtml { get => _senderHtml?.Value; set => _senderHtml = value.ToLazy(); }
+        public virtual string SenderHtml
+        {
+            get => _senderHtml?.Value;
+            set => _senderHtml = value.ToLazy();
+        }
 
         private Lazy<string> _senderName;
-        public virtual string SenderName { get => _senderName?.Value; set => _senderName = value.ToLazy(); }
+        public virtual string SenderName
+        {
+            get => _senderName?.Value;
+            set => _senderName = value.ToLazy();
+        }
 
         private Lazy<IRecipientInfo> _sender;
-        public virtual IRecipientInfo Sender { get => _sender.Value; set => _sender = value.ToLazy(); }
+        public virtual IRecipientInfo Sender
+        {
+            get => _sender.Value;
+            set => _sender = value.ToLazy();
+        }
 
         private Lazy<int> _size;
-        public virtual int Size { get => _size.Value; set => _size = value.ToLazyValue(); }
+        public virtual int Size
+        {
+            get => _size.Value;
+            set => _size = value.ToLazyValue();
+        }
 
         private LazyTry<Recipient[]> _olRecipients;
-        internal virtual Recipient[] OlRecipients { get => _olRecipients.Value; set => _olRecipients = value.ToLazyTry(); }
+        internal virtual Recipient[] OlRecipients
+        {
+            get => _olRecipients.Value;
+            set => _olRecipients = value.ToLazyTry();
+        }
 
         private Lazy<string> _ccRecipientsHtml;
         public virtual string CcRecipientsHtml
         {
             get => _ccRecipientsHtml.Value;
-            set { _ccRecipientsHtml = value.ToLazy(); NotifyPropertyChanged(); }
+            set
+            {
+                _ccRecipientsHtml = value.ToLazy();
+                NotifyPropertyChanged();
+            }
         }
 
         private Lazy<string> _ccRecipientsName;
         public virtual string CcRecipientsName
         {
             get => _ccRecipientsName.Value;
-            set { _ccRecipientsName = value.ToLazy(); NotifyPropertyChanged(); }
+            set
+            {
+                _ccRecipientsName = value.ToLazy();
+                NotifyPropertyChanged();
+            }
         }
 
         private Lazy<IRecipientInfo[]> _ccRecipients;
@@ -288,14 +452,22 @@ namespace UtilitiesCS
         public virtual string ToRecipientsHtml
         {
             get => _toRecipientsHtml.Value;
-            set { _toRecipientsHtml = value.ToLazy(); NotifyPropertyChanged(); }
+            set
+            {
+                _toRecipientsHtml = value.ToLazy();
+                NotifyPropertyChanged();
+            }
         }
 
         private Lazy<string> _toRecipientsName;
         public virtual string ToRecipientsName
         {
             get => _toRecipientsName.Value;
-            set { _toRecipientsName = value.ToLazy(); NotifyPropertyChanged(); }
+            set
+            {
+                _toRecipientsName = value.ToLazy();
+                NotifyPropertyChanged();
+            }
         }
 
         private Lazy<IRecipientInfo[]> _toRecipients;
@@ -306,19 +478,40 @@ namespace UtilitiesCS
         }
 
         private Lazy<string> _triage;
-        public virtual string Triage { get => _triage.Value; set => _triage = value.ToLazy(); }
+        public virtual string Triage
+        {
+            get => _triage.Value;
+            set => _triage = value.ToLazy();
+        }
 
         private Lazy<string> _html = null;
-        public virtual string Html { get => _html.Value; private set => _html = value.ToLazy(); }
+        public virtual string Html
+        {
+            get => _html.Value;
+            private set => _html = value.ToLazy();
+        }
 
         private Lazy<string> _htmlBody;
-        public virtual string HTMLBody { get => _htmlBody.Value; protected set => _htmlBody = value.ToLazy(); }
+        public virtual string HTMLBody
+        {
+            get => _htmlBody.Value;
+            protected set => _htmlBody = value.ToLazy();
+        }
 
         private Lazy<DateTime> _sentDate;
-        public virtual DateTime SentDate { get => _sentDate.Value; set => _sentDate = value.ToLazyValue(); }
+        public virtual DateTime SentDate
+        {
+            get => _sentDate.Value;
+            set => _sentDate = value.ToLazyValue();
+        }
 
         private Lazy<AttachmentHelper[]> _attachmentsHelper;
-        public virtual AttachmentHelper[] AttachmentsHelper { get => _attachmentsHelper.Value; protected set => _attachmentsHelper = value.ToLazy(); }
+        public virtual AttachmentHelper[] AttachmentsHelper
+        {
+            get => _attachmentsHelper.Value;
+            protected set => _attachmentsHelper = value.ToLazy();
+        }
+
         //{
         //    get => Initializer.GetOrLoad(ref _attachments, LoadAttachmentsInfo);
         //    private set => _attachments = value;
@@ -326,23 +519,34 @@ namespace UtilitiesCS
 
         internal AttachmentHelper[] LoadAttachmentsInfo()
         {
-            var attachments = Item.Attachments
-                                  .Cast<Attachment>()
-                                  .Select(x => new AttachmentHelper(x, SentDate, FolderName, EmailPrefixToStrip))
-                                  .ToArray();
+            var attachments = Item
+                .Attachments.Cast<Attachment>()
+                .Select(x => new AttachmentHelper(x, SentDate, FolderName, EmailPrefixToStrip))
+                .ToArray();
             AttachmentsInfo = attachments.Select(x => x.AttachmentInfo).ToArray();
             return attachments;
         }
 
         private Lazy<IAttachment[]> _attachmentsInfo;
-        public IAttachment[] AttachmentsInfo { get => _attachmentsInfo?.Value; protected set => _attachmentsInfo = value.ToLazy(); }
+        public IAttachment[] AttachmentsInfo
+        {
+            get => _attachmentsInfo?.Value;
+            protected set => _attachmentsInfo = value.ToLazy();
+        }
 
         public string GetHeadersExtendedMapi()
         {
-            return (string)Item.PropertyAccessor.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x007D001F/");
+            return (string)
+                Item.PropertyAccessor.GetProperty(
+                    "http://schemas.microsoft.com/mapi/proptag/0x007D001F/"
+                );
         }
 
-        public string[] Tokens { get => _tokens.Value; protected set => _tokens = value.ToLazy(); }
+        public string[] Tokens
+        {
+            get => _tokens.Value;
+            protected set => _tokens = value.ToLazy();
+        }
         private Lazy<string[]> _tokens;
 
         public async Task<IEnumerable<string>> TokenizeAsync()
@@ -352,7 +556,10 @@ namespace UtilitiesCS
             return Tokens;
         }
 
-        public IEmailTokenizer Tokenizer { get => _tokenizer ??= new EmailTokenizer(); }
+        public IEmailTokenizer Tokenizer
+        {
+            get => _tokenizer ??= new EmailTokenizer();
+        }
         private IEmailTokenizer _tokenizer;
 
         private Lazy<bool> _unread;
@@ -373,13 +580,18 @@ namespace UtilitiesCS
             set => _internetCodepage = value.ToLazyValue();
         }
         private Lazy<int> _internetCodepage;
+
         private int LoadInternetCodepage()
         {
             return Appointment.ThrowIfNull().InternetCodepage;
         }
 
         private Lazy<bool> _isTaskFlagSet;
-        public bool IsTaskFlagSet { get => _isTaskFlagSet.Value; set => _isTaskFlagSet = value.ToLazyValue(); }
+        public bool IsTaskFlagSet
+        {
+            get => _isTaskFlagSet.Value;
+            set => _isTaskFlagSet = value.ToLazyValue();
+        }
 
         #endregion Public Properties
 
@@ -387,12 +599,23 @@ namespace UtilitiesCS
 
         internal static string CompressPlainText(string text, string emailPrefixToStrip)
         {
-            return CompressPlainText(text ?? "", IItemInfo.PlainTextOptionsEnum.StripAll, emailPrefixToStrip ?? "");
+            return CompressPlainText(
+                text ?? "",
+                IItemInfo.PlainTextOptionsEnum.StripAll,
+                emailPrefixToStrip ?? ""
+            );
         }
 
-        internal static string CompressPlainText(string text, IItemInfo.PlainTextOptionsEnum options, string emailPrefixToStrip)
+        internal static string CompressPlainText(
+            string text,
+            IItemInfo.PlainTextOptionsEnum options,
+            string emailPrefixToStrip
+        )
         {
-            if (options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripWarning) && emailPrefixToStrip != "")
+            if (
+                options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripWarning)
+                && emailPrefixToStrip != ""
+            )
                 text = text.Replace(emailPrefixToStrip, "");
 
             if (options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripLinks))
@@ -403,19 +626,29 @@ namespace UtilitiesCS
                 text = Regex.Replace(text, @"<https://[^>]+>", replacementText); //Strip links
             }
 
-            if (options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyHeader) ||
-                options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyBody))
+            if (
+                options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyHeader)
+                || options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyBody)
+            )
             {
                 var replacementText = "";
-                if (options.HasFlag(IItemInfo.PlainTextOptionsEnum.ShowStripped | IItemInfo.PlainTextOptionsEnum.StripReplyHeader) &&
-                    !options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyBody))
+                if (
+                    options.HasFlag(
+                        IItemInfo.PlainTextOptionsEnum.ShowStripped
+                            | IItemInfo.PlainTextOptionsEnum.StripReplyHeader
+                    ) && !options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyBody)
+                )
                     replacementText = "<EOM> Chain: $3";
                 else if (!options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyHeader))
                     replacementText += "$1";
                 else if (!options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyBody))
                     replacementText += "$3";
 
-                text = Regex.Replace(text, @"(From:([^\n]*\n){1,4}Subject: {0,1}[rR][eE]:.*)(.|\n|\r)*\z", replacementText); //Strip reply footer
+                text = Regex.Replace(
+                    text,
+                    @"(From:([^\n]*\n){1,4}Subject: {0,1}[rR][eE]:.*)(.|\n|\r)*\z",
+                    replacementText
+                ); //Strip reply footer
             }
 
             if (options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripFormatting))
@@ -431,26 +664,34 @@ namespace UtilitiesCS
         internal string EmailHeader2
         {
             get => //@"<div class=""WordSection1"">
-@"
+                @"
 <p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
 225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
 style='color:black'>From:<span style='mso-tab-count:1'> </span></span></b><span
-style='color:black'>" + this.SenderName + @"<o:p></o:p></span></p>
+style='color:black'>"
+                + this.SenderName
+                + @"<o:p></o:p></span></p>
 
 <p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
 225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
 style='color:black'>Sent:<span style='mso-tab-count:1'> </span></span></b><span
-style='color:black'>" + this.SentOn + @"<o:p></o:p></span></p>
+style='color:black'>"
+                + this.SentOn
+                + @"<o:p></o:p></span></p>
 
 <p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
 225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
 style='color:black'>To:<span style='mso-tab-count:1'> </span></span></b><span
-style='color:black'>" + this.ToRecipientsName + @"<o:p></o:p></span></p>
+style='color:black'>"
+                + this.ToRecipientsName
+                + @"<o:p></o:p></span></p>
 
 <p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
 225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
 style='color:black'>Subject:<span style='mso-tab-count:1'></span></span></b><span
-style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
+style='color:black'>"
+                + this.Subject
+                + @"<o:p></o:p></span></p>
 
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>";
         }
@@ -463,15 +704,26 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
             {
                 if (_emailHeader is null)
                 {
-                    _emailHeader = @"
+                    _emailHeader =
+                        @"
     <div>
 		<div style=""font-family:Calibri,serif;border-right:none;border-bottom:1pt solid rgb(225,225,225);border-left:none;border-top:none;padding:3pt 0in 0in"">
 			<p class=""MsoNormal"">
-				<b>From:</b>" + this.SenderHtml + @"<br>
-				<b>Sent:</b>" + this.SentOn + @"<br>
-				<b>To:</b>" + this.ToRecipientsHtml + @"<br>
-				<b>Cc:</b>" + this.CcRecipientsHtml + @"<br>
-				<b>Subject:</b>" + this.Subject + @"
+				<b>From:</b>"
+                        + this.SenderHtml
+                        + @"<br>
+				<b>Sent:</b>"
+                        + this.SentOn
+                        + @"<br>
+				<b>To:</b>"
+                        + this.ToRecipientsHtml
+                        + @"<br>
+				<b>Cc:</b>"
+                        + this.CcRecipientsHtml
+                        + @"<br>
+				<b>Subject:</b>"
+                        + this.Subject
+                        + @"
 			</p>
 		</div>
 	</div>
@@ -485,7 +737,8 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
 
         internal string DarkModeHeader
         {
-            get => @"
+            get =>
+                @"
 <style>
 body { filter: invert(100%) }
 * { backdrop-filter: invert(20%) }
@@ -502,8 +755,13 @@ img {
         public string ToggleDark()
         {
             if (_darkMode == Enums.ToggleState.On)
-            { return ToggleDark(Enums.ToggleState.Off); }
-            else { return ToggleDark(Enums.ToggleState.On); }
+            {
+                return ToggleDark(Enums.ToggleState.Off);
+            }
+            else
+            {
+                return ToggleDark(Enums.ToggleState.On);
+            }
         }
 
         public string ToggleDark(Enums.ToggleState desiredState)
@@ -585,6 +843,5 @@ img {
             info.StoreId = StoreId;
             return info;
         }
-
     }
 }

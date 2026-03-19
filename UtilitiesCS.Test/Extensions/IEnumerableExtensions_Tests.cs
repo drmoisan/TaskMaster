@@ -1,10 +1,10 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS;
 
 namespace UtilitiesCS.Test.Extensions
@@ -38,8 +38,7 @@ namespace UtilitiesCS.Test.Extensions
             Action action = () => source.CastNullSafe<string>().ToArray();
 
             // Assert
-            action.Should().Throw<ArgumentNullException>()
-                .Which.ParamName.Should().Be("source");
+            action.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("source");
         }
 
         [TestMethod]
@@ -70,7 +69,9 @@ namespace UtilitiesCS.Test.Extensions
             difference.OnlyThis.Should().Equal(1);
             difference.OnlyOther.Should().Equal(4);
 
-            bothNullAction.Should().Throw<ArgumentException>()
+            bothNullAction
+                .Should()
+                .Throw<ArgumentException>()
                 .WithMessage("*both IEnumerable*parameters were null*");
         }
 
@@ -78,7 +79,10 @@ namespace UtilitiesCS.Test.Extensions
         public void IsSubsetOf_ReturnsFalseForNullAndTrueForContainedValues()
         {
             // Act / Assert
-            ((IEnumerable<int>)null).IsSubsetOf(new[] { 1, 2 }).Should().BeFalse();
+            ((IEnumerable<int>)null)
+                .IsSubsetOf(new[] { 1, 2 })
+                .Should()
+                .BeFalse();
             new[] { 1, 2 }.IsSubsetOf(null).Should().BeFalse();
             new[] { 1, 2 }.IsSubsetOf(new[] { 1, 2, 3 }).Should().BeTrue();
             new[] { 1, 4 }.IsSubsetOf(new[] { 1, 2, 3 }).Should().BeFalse();
@@ -92,7 +96,7 @@ namespace UtilitiesCS.Test.Extensions
             {
                 new { Key = "odd", Value = 1 },
                 new { Key = "even", Value = 2 },
-                new { Key = "odd", Value = 3 }
+                new { Key = "odd", Value = 3 },
             }.GroupBy(x => x.Key, x => x.Value);
 
             // Act
@@ -149,7 +153,9 @@ namespace UtilitiesCS.Test.Extensions
             var source = Enumerable.Range(1, 105);
 
             // Act
-            var actual = source.WithProgressReporting(105L, (completed, total) => updates.Add((completed, total))).ToArray();
+            var actual = source
+                .WithProgressReporting(105L, (completed, total) => updates.Add((completed, total)))
+                .ToArray();
 
             // Assert
             actual.Should().HaveCount(105);
@@ -168,13 +174,20 @@ namespace UtilitiesCS.Test.Extensions
 
             // Act
             Action intProgressAction = () => source.WithProgressReporting(1L, _ => { }).ToArray();
-            Action longProgressAction = () => source.WithProgressReporting(1L, (_, _) => { }).ToArray();
+            Action longProgressAction = () =>
+                source.WithProgressReporting(1L, (_, _) => { }).ToArray();
 
             // Assert
-            intProgressAction.Should().Throw<ArgumentNullException>()
-                .Which.ParamName.Should().Be("enumerable");
-            longProgressAction.Should().Throw<ArgumentNullException>()
-                .Which.ParamName.Should().Be("enumerable");
+            intProgressAction
+                .Should()
+                .Throw<ArgumentNullException>()
+                .Which.ParamName.Should()
+                .Be("enumerable");
+            longProgressAction
+                .Should()
+                .Throw<ArgumentNullException>()
+                .Which.ParamName.Should()
+                .Be("enumerable");
         }
 
         [TestMethod]
@@ -202,14 +215,18 @@ namespace UtilitiesCS.Test.Extensions
             var source = new[]
             {
                 new SampleRow { Id = 1, Name = "alpha" },
-                new SampleRow { Id = 2, Name = "beta" }
+                new SampleRow { Id = 2, Name = "beta" },
             };
 
             // Act
             DataTable actual = IEnumerableExtensions.ToDataTable(source);
 
             // Assert
-            actual.Columns.Cast<DataColumn>().Select(column => column.ColumnName).Should().Equal("Id", "Name");
+            actual
+                .Columns.Cast<DataColumn>()
+                .Select(column => column.ColumnName)
+                .Should()
+                .Equal("Id", "Name");
             actual.Rows.Count.Should().Be(2);
             actual.Rows[0]["Id"].Should().Be(1);
             actual.Rows[1]["Name"].Should().Be("beta");
@@ -238,11 +255,7 @@ namespace UtilitiesCS.Test.Extensions
         public void Transpose_ConvertsRectangularSequencesIntoColumns()
         {
             // Arrange
-            IEnumerable<IEnumerable<int>> rectangular =
-            [
-                new[] { 1, 2, 3 },
-                new[] { 4, 5, 6 }
-            ];
+            IEnumerable<IEnumerable<int>> rectangular = [new[] { 1, 2, 3 }, new[] { 4, 5, 6 }];
 
             // Act
             var actual = rectangular.Transpose().Select(row => row.ToArray()).ToArray();
@@ -270,10 +283,16 @@ namespace UtilitiesCS.Test.Extensions
             var largeResult = large.Chunk(10).ToArray();
 
             // Assert
-            nullAction.Should().Throw<ArgumentNullException>()
-                .Which.ParamName.Should().Be("source");
-            invalidSizeAction.Should().Throw<ArgumentOutOfRangeException>()
-                .Which.ParamName.Should().Be("size");
+            nullAction
+                .Should()
+                .Throw<ArgumentNullException>()
+                .Which.ParamName.Should()
+                .Be("source");
+            invalidSizeAction
+                .Should()
+                .Throw<ArgumentOutOfRangeException>()
+                .Which.ParamName.Should()
+                .Be("size");
             empty.Should().BeEmpty();
             singleResult.Should().HaveCount(1);
             singleResult[0].Should().Equal(7);
@@ -301,10 +320,16 @@ namespace UtilitiesCS.Test.Extensions
             // Assert
             nullAction.Should().Throw<ArgumentNullException>();
             emptyAction.Should().Throw<ArgumentNullException>();
-            invalidLowAction.Should().Throw<ArgumentOutOfRangeException>()
-                .Which.ParamName.Should().Be("trainPercent");
-            invalidHighAction.Should().Throw<ArgumentOutOfRangeException>()
-                .Which.ParamName.Should().Be("trainPercent");
+            invalidLowAction
+                .Should()
+                .Throw<ArgumentOutOfRangeException>()
+                .Which.ParamName.Should()
+                .Be("trainPercent");
+            invalidHighAction
+                .Should()
+                .Throw<ArgumentOutOfRangeException>()
+                .Which.ParamName.Should()
+                .Be("trainPercent");
 
             train.Concat(test).Should().BeEquivalentTo(source);
             train.Intersect(test).Should().BeEmpty();

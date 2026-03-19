@@ -1,13 +1,12 @@
-﻿using log4net.Repository.Hierarchy;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using log4net.Repository.Hierarchy;
+using Newtonsoft.Json;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
-
 
 namespace TaskMaster.AppGlobals
 {
@@ -23,7 +22,7 @@ namespace TaskMaster.AppGlobals
     //    private JsonSerializerSettings GetSettings()
     //    {
     //        var settings = GetDefaultSettings();
-    //        settings.PreserveReferencesHandling = PreserveReferencesHandling.All;            
+    //        settings.PreserveReferencesHandling = PreserveReferencesHandling.All;
     //        return settings;
     //    }
 

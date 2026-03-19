@@ -28,20 +28,40 @@ namespace ToDoModel.Data_Model.Project
         internal void InitResizer()
         {
             Viewer.Resizer.FindAllControls(_viewer);
-            Viewer.Resizer.SetResizeDimensions(_viewer.SplitContainer1.Panel2, ControlResizer.ResizeDimensions.Position, true);
-            Viewer.Resizer.SetResizeDimensions(_viewer.SplitContainer1, ControlResizer.ResizeDimensions.None, true);
-            Viewer.Resizer.SetResizeDimensions(_viewer.SplitContainer1.Panel1, ControlResizer.ResizeDimensions.Position | ControlResizer.ResizeDimensions.Size, true);
+            Viewer.Resizer.SetResizeDimensions(
+                _viewer.SplitContainer1.Panel2,
+                ControlResizer.ResizeDimensions.Position,
+                true
+            );
+            Viewer.Resizer.SetResizeDimensions(
+                _viewer.SplitContainer1,
+                ControlResizer.ResizeDimensions.None,
+                true
+            );
+            Viewer.Resizer.SetResizeDimensions(
+                _viewer.SplitContainer1.Panel1,
+                ControlResizer.ResizeDimensions.Position | ControlResizer.ResizeDimensions.Size,
+                true
+            );
             Viewer.Resizer.PrintDict();
         }
 
         #region Properties
 
         protected IProjectData _dataModel;
-        internal IProjectData DataModel { get => _dataModel; set => _dataModel = value; }
+        internal IProjectData DataModel
+        {
+            get => _dataModel;
+            set => _dataModel = value;
+        }
         internal ScDictionary<string, string> ProgramData { get; set; }
 
         protected ProjectViewer _viewer;
-        internal ProjectViewer Viewer { get => _viewer; set => _viewer = value; }
+        internal ProjectViewer Viewer
+        {
+            get => _viewer;
+            set => _viewer = value;
+        }
 
         #endregion Properties
 

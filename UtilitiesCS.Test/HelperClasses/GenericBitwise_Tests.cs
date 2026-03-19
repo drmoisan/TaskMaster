@@ -16,11 +16,12 @@ namespace UtilitiesCS.Test.HelperClasses
 
             // Act / Assert
             sut.And(IntFlags.First | IntFlags.Second, IntFlags.Second | IntFlags.Third)
-                .Should().Be(IntFlags.Second);
-            sut.Or(IntFlags.First, IntFlags.Third)
-                .Should().Be(IntFlags.First | IntFlags.Third);
+                .Should()
+                .Be(IntFlags.Second);
+            sut.Or(IntFlags.First, IntFlags.Third).Should().Be(IntFlags.First | IntFlags.Third);
             sut.Xor(IntFlags.First | IntFlags.Second, IntFlags.Second | IntFlags.Third)
-                .Should().Be(IntFlags.First | IntFlags.Third);
+                .Should()
+                .Be(IntFlags.First | IntFlags.Third);
             sut.Not(IntFlags.First).Should().Be(~IntFlags.First);
         }
 
@@ -32,11 +33,14 @@ namespace UtilitiesCS.Test.HelperClasses
 
             // Act / Assert
             sut.Or(new[] { IntFlags.None, IntFlags.First, IntFlags.Third })
-                .Should().Be(IntFlags.First | IntFlags.Third);
+                .Should()
+                .Be(IntFlags.First | IntFlags.Third);
             sut.And(new[] { IntFlags.All, IntFlags.First | IntFlags.Second, IntFlags.First })
-                .Should().Be(IntFlags.First);
+                .Should()
+                .Be(IntFlags.First);
             sut.Xor(new[] { IntFlags.First, IntFlags.Second, IntFlags.Second })
-                .Should().Be(IntFlags.First);
+                .Should()
+                .Be(IntFlags.First);
         }
 
         [TestMethod]

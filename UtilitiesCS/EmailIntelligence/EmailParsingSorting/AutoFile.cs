@@ -1,20 +1,22 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
     public static class AutoFile
     {
-        public static IList<string> AutoFindPeople(MailItemHelper helper,
-                                                   IScoDictionaryNew<string, string> ppl_dict,
-                                                   bool blNotifyMissing = true,
-                                                   bool blExcludeFlagged = true)
+        public static IList<string> AutoFindPeople(
+            MailItemHelper helper,
+            IScoDictionaryNew<string, string> ppl_dict,
+            bool blNotifyMissing = true,
+            bool blExcludeFlagged = true
+        )
         {
             MailItem OlMail;
             //List<string> emailAddressList;
@@ -32,7 +34,6 @@ namespace UtilitiesCS
                 strTmp = emailAddressList[i];
                 if (ppl_dict.ContainsKey(strTmp))
                 {
-
                     if (blExcludeFlagged)
                     {
                         if (!Category_IsAlreadySelected(helper.Item, ppl_dict[strTmp]))
@@ -57,15 +58,12 @@ namespace UtilitiesCS
                     $"Recipients not in list of people: {strMissing}",
                     "Unknown Recipients",
                     MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+                    MessageBoxIcon.Warning
+                );
             }
-
-
 
             return peopleList;
         }
-
-
 
         //public static IList<string> AutoFindPeople(object objItem,
         //                                           IScoDictionaryNew<string, string> ppl_dict,
@@ -140,7 +138,6 @@ namespace UtilitiesCS
 
         private static bool Category_IsAlreadySelected(dynamic objItem, string strCat)
         {
-
             int i;
             bool blSelected;
 

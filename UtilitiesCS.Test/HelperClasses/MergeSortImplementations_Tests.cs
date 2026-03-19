@@ -1,7 +1,7 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS;
 
 namespace UtilitiesCS.Test.HelperClasses
@@ -24,7 +24,10 @@ namespace UtilitiesCS.Test.HelperClasses
             single.MergeSort((left, right) => left.CompareTo(right)).Should().Equal(5);
             sorted.MergeSort((left, right) => left.CompareTo(right)).Should().Equal(1, 2, 3, 4);
             reverse.MergeSort((left, right) => left.CompareTo(right)).Should().Equal(1, 2, 3, 4);
-            duplicates.MergeSort((left, right) => left.CompareTo(right)).Should().Equal(1, 1, 2, 3, 3);
+            duplicates
+                .MergeSort((left, right) => left.CompareTo(right))
+                .Should()
+                .Equal(1, 1, 2, 3, 3);
         }
 
         [TestMethod]
@@ -50,7 +53,9 @@ namespace UtilitiesCS.Test.HelperClasses
 
             // Act
             var sortedLarge = large.MergeSort((left, right) => left.CompareTo(right));
-            var sortedStrings = strings.MergeSort((left, right) => string.CompareOrdinal(left, right));
+            var sortedStrings = strings.MergeSort(
+                (left, right) => string.CompareOrdinal(left, right)
+            );
 
             // Assert
             sortedLarge.Should().Equal(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Diagnostics;
 using Deedle;
 
 namespace UtilitiesCS.Extensions
@@ -18,11 +18,14 @@ namespace UtilitiesCS.Extensions
             string? message = default,
             [CallerMemberName] string callerName = "",
             [CallerArgumentExpression(nameof(argument))] string argumentExpression = ""
-        ) where T : notnull
+        )
+            where T : notnull
         {
             if (argument is null)
             {
-                var traceString = new StackTrace().TryGetMyTraceString("[unable to get trace info]");
+                var traceString = new StackTrace().TryGetMyTraceString(
+                    "[unable to get trace info]"
+                );
 
                 var paramName = argumentExpression;
                 if (string.IsNullOrEmpty(message))
@@ -38,8 +41,7 @@ namespace UtilitiesCS.Extensions
             }
         }
 
-        public static bool IsNullOrEmpty<T>(
-            this IEnumerable<T> argument)
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> argument)
         {
             if (argument is null || argument.Count() == 0)
             {
@@ -60,7 +62,9 @@ namespace UtilitiesCS.Extensions
         {
             if (argument is null || argument.Count() == 0)
             {
-                var traceString = new StackTrace().TryGetMyTraceString("[unable to get trace info]");
+                var traceString = new StackTrace().TryGetMyTraceString(
+                    "[unable to get trace info]"
+                );
                 var paramName = argumentExpression;
                 if (string.IsNullOrEmpty(message))
                 {
@@ -78,7 +82,8 @@ namespace UtilitiesCS.Extensions
             this T? argument,
             string? message = default,
             [CallerMemberName] string callerName = ""
-        ) where T : System.Collections.ICollection
+        )
+            where T : System.Collections.ICollection
         {
             if (argument is null || argument.Count == 0)
             {
@@ -107,9 +112,5 @@ namespace UtilitiesCS.Extensions
                 return argument;
             }
         }
-
-
-
-
     }
 }

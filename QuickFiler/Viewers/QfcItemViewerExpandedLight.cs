@@ -19,7 +19,11 @@ namespace QuickFiler
         }
 
         private IList<Label> _tipsLabels;
-        public IList<Label> TipsLabels { get => _tipsLabels; }
+        public IList<Label> TipsLabels
+        {
+            get => _tipsLabels;
+        }
+
         private void InitTipsLabelsList()
         {
             _tipsLabels = new List<Label>
@@ -32,10 +36,8 @@ namespace QuickFiler
                 LblAcConversation,
                 LblAcEmail,
                 LblAcFolder,
-                LblAcSearch
+                LblAcSearch,
             };
-
         }
-
     }
 }

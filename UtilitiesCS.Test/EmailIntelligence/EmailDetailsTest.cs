@@ -1,9 +1,9 @@
-﻿using Microsoft.FSharp.Data.UnitSystems.SI.UnitNames;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Linq;
-using UtilitiesCS;
 using FluentAssertions;
+using Microsoft.FSharp.Data.UnitSystems.SI.UnitNames;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UtilitiesCS;
 
 namespace UtilitiesCS.Test.EmailIntelligence
 {

@@ -1,6 +1,6 @@
+using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS.Test.HelperClasses

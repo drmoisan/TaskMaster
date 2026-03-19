@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -32,7 +32,8 @@ namespace UtilitiesCS
                     out pBstrName,
                     out pBstrDocString,
                     out pdwHelpContext,
-                    out pBstrHelpFile);
+                    out pBstrHelpFile
+                );
 
                 string str = pBstrName;
                 if (str[0] == 95)
@@ -54,14 +55,16 @@ namespace UtilitiesCS
                 [return: MarshalAs(UnmanagedType.Interface)]
                 ITypeInfo GetTypeInfo(
                     [In, MarshalAs(UnmanagedType.U4)] int iTInfo,
-                    [In, MarshalAs(UnmanagedType.U4)] int lcid);
+                    [In, MarshalAs(UnmanagedType.U4)] int lcid
+                );
 
                 void GetIDsOfNames(
                     [In] ref Guid riid,
                     [In, MarshalAs(UnmanagedType.LPArray)] string[] rgszNames,
                     [In, MarshalAs(UnmanagedType.U4)] int cNames,
                     [In, MarshalAs(UnmanagedType.U4)] int lcid,
-                    [Out, MarshalAs(UnmanagedType.LPArray)] int[] rgDispId);
+                    [Out, MarshalAs(UnmanagedType.LPArray)] int[] rgDispId
+                );
             }
         }
     }

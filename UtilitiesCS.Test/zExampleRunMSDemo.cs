@@ -1,5 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.Examples;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
@@ -13,7 +13,10 @@ namespace UtilitiesCS.Test
         {
             var OlApp = new Outlook.Application();
             Outlook.NameSpace session = OlApp.Session;
-            Outlook.MailItem Item = (Outlook.MailItem)session.GetItemFromID("00000000DBBA8359AE186B459B8593980990086E07002ABB4C43D6CADA4EAF5B95F147DA9D9D00000000010C00003E29CCD1546FF744A2936EDCC51E7D580001DDA889FA0000");
+            Outlook.MailItem Item = (Outlook.MailItem)
+                session.GetItemFromID(
+                    "00000000DBBA8359AE186B459B8593980990086E07002ABB4C43D6CADA4EAF5B95F147DA9D9D00000000010C00003E29CCD1546FF744A2936EDCC51E7D580001DDA889FA0000"
+                );
             MSDemoConv.DemoConversation(Item);
         }
     }

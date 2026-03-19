@@ -1,10 +1,10 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using UtilitiesCS;
 
 namespace ToDoModel.Test
@@ -14,6 +14,7 @@ namespace ToDoModel.Test
     {
         private Mock<MailItem> mockMailItem;
         private Mock<IOutlookItem> mockOutlookItem;
+
         //private Mock<IOutlookItemFlaggable> mockFlaggableItem;
 
         /// <summary>
@@ -27,7 +28,9 @@ namespace ToDoModel.Test
             //mockFlaggableItem = new Mock<IOutlookItemFlaggable>(MockBehavior.Strict);
         }
 
-        private ToDoModel.Test.Data_Model.ToDo.SpecialMockMail CreateSpecialMockMail(DateTime timestamp)
+        private ToDoModel.Test.Data_Model.ToDo.SpecialMockMail CreateSpecialMockMail(
+            DateTime timestamp
+        )
         {
             var mock = new ToDoModel.Test.Data_Model.ToDo.SpecialMockMail
             {
@@ -36,7 +39,7 @@ namespace ToDoModel.Test
 
                 CreationTime = timestamp,
                 TaskStartDate = timestamp,
-                Categories = "Category1,Category2"
+                Categories = "Category1,Category2",
             };
             var mockUserProps = GetMockUserProperties();
             mock.UserProperties = mockUserProps.Object;
@@ -52,10 +55,15 @@ namespace ToDoModel.Test
 
             // Set up the Find method
             mock.Setup(x => x.Find(It.IsAny<string>(), It.IsAny<object>()))
-                .Returns((string name, object custom) => userProperties.FirstOrDefault(p => p.Name == name));
+                .Returns(
+                    (string name, object custom) =>
+                        userProperties.FirstOrDefault(p => p.Name == name)
+                );
 
             // Set up the IEnumerable implementation
-            mock.As<IEnumerable>().Setup(x => x.GetEnumerator()).Returns(userProperties.GetEnumerator());
+            mock.As<IEnumerable>()
+                .Setup(x => x.GetEnumerator())
+                .Returns(userProperties.GetEnumerator());
 
             // Set up the Count property
             mock.Setup(x => x.Count).Returns(userProperties.Count);
@@ -65,17 +73,29 @@ namespace ToDoModel.Test
 
         internal IEnumerable<UserProperty> GetUserPropertyCollection()
         {
-            UserProperty TagProgram = MockProperty<string>("TagProgram", "TestProgram", OlUserPropertyType.olText);
+            UserProperty TagProgram = MockProperty<string>(
+                "TagProgram",
+                "TestProgram",
+                OlUserPropertyType.olText
+            );
             UserProperty AB = MockProperty<bool>("AB", true, OlUserPropertyType.olYesNo);
             UserProperty EC2 = MockProperty<bool>("EC2", true, OlUserPropertyType.olYesNo);
             UserProperty EC = MockProperty<string>("EC", "EcVal", OlUserPropertyType.olText);
-            UserProperty EcState = MockProperty<string>("EcState", "EcStateVal", OlUserPropertyType.olText);
+            UserProperty EcState = MockProperty<string>(
+                "EcState",
+                "EcStateVal",
+                OlUserPropertyType.olText
+            );
 
             var list = new List<UserProperty> { TagProgram, AB, EC2, EC, EcState };
             return list;
         }
 
-        public UserProperty MockProperty<T>(string propertyName, T value, OlUserPropertyType olPropertyType = OlUserPropertyType.olText)
+        public UserProperty MockProperty<T>(
+            string propertyName,
+            T value,
+            OlUserPropertyType olPropertyType = OlUserPropertyType.olText
+        )
         {
             var mockUser = new Mock<UserProperty>();
             mockUser.Setup(x => x.Name).Returns(propertyName);
@@ -102,19 +122,52 @@ namespace ToDoModel.Test
             var toDoItem = new ToDoItem(outlookItem);
 
             // Assert
-            var flaggableItem = typeof(ToDoItem).GetProperty("FlaggableItem", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(toDoItem);
+            var flaggableItem = typeof(ToDoItem)
+                .GetProperty(
+                    "FlaggableItem",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .GetValue(toDoItem);
             Assert.IsNotNull(flaggableItem, "FlaggableItem is null");
             Assert.IsNotNull(toDoItem.Flags, "Flags are null");
-            Assert.AreEqual("Test Task", toDoItem.TaskSubject, "TaskSubject does not match expected");
-            Assert.AreEqual(OlImportance.olImportanceNormal, toDoItem.Priority, "Importance does not match expected");
-            Assert.AreEqual(timestamp, toDoItem.TaskCreateDate, "TaskCreateDate does not match expected timestamp");
-            Assert.AreEqual(timestamp, toDoItem.StartDate, "StartDate does not match expected timestamp");
-            Assert.IsTrue(toDoItem.Flags.AreEquivalentTo("Category1,Category2"), "Flags are not equivalent to expected");
+            Assert.AreEqual(
+                "Test Task",
+                toDoItem.TaskSubject,
+                "TaskSubject does not match expected"
+            );
+            Assert.AreEqual(
+                OlImportance.olImportanceNormal,
+                toDoItem.Priority,
+                "Importance does not match expected"
+            );
+            Assert.AreEqual(
+                timestamp,
+                toDoItem.TaskCreateDate,
+                "TaskCreateDate does not match expected timestamp"
+            );
+            Assert.AreEqual(
+                timestamp,
+                toDoItem.StartDate,
+                "StartDate does not match expected timestamp"
+            );
+            Assert.IsTrue(
+                toDoItem.Flags.AreEquivalentTo("Category1,Category2"),
+                "Flags are not equivalent to expected"
+            );
             //Assert.AreEqual("TestProgram", toDoItem.Program.AsStringNoPrefix);
             Assert.IsTrue(toDoItem.ActiveBranch, "ActiveBranch value did not match expected");
             Assert.IsTrue(toDoItem.EC2, "EC2 value did not match expected");
-            Assert.AreEqual("EcVal", toDoItem.ExpandChildren, "ExpandChildren did not match expected");
-            Assert.AreEqual("EcStateVal", toDoItem.ExpandChildrenState, "ExpandChildrenState did not match expected");
+            Assert.AreEqual(
+                "EcVal",
+                toDoItem.ExpandChildren,
+                "ExpandChildren did not match expected"
+            );
+            Assert.AreEqual(
+                "EcStateVal",
+                toDoItem.ExpandChildrenState,
+                "ExpandChildrenState did not match expected"
+            );
         }
 
         [TestMethod]
@@ -131,16 +184,34 @@ namespace ToDoModel.Test
             // Assert
 
             // Verify the flaggableItem was initialized
-            var flaggableItem = typeof(ToDoItem).GetProperty("FlaggableItem", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(toDoItem);
+            var flaggableItem = typeof(ToDoItem)
+                .GetProperty(
+                    "FlaggableItem",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .GetValue(toDoItem);
             Assert.IsNotNull(flaggableItem);
 
             // Verify that flags was not initialized
-            var flags = typeof(ToDoItem).GetField("_flags", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(toDoItem);
+            var flags = typeof(ToDoItem)
+                .GetField(
+                    "_flags",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .GetValue(toDoItem);
             Assert.IsNull(flags);
 
             // Verify that flags could have been initialized but was not
             _ = toDoItem.Flags;
-            flags = typeof(ToDoItem).GetField("_flags", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(toDoItem);
+            flags = typeof(ToDoItem)
+                .GetField(
+                    "_flags",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .GetValue(toDoItem);
             Assert.IsNotNull(flags);
         }
 
@@ -205,7 +276,7 @@ namespace ToDoModel.Test
         //    mockFlaggableItem.Setup(x => x.SaveAs(It.IsAny<string>(), It.IsAny<OlSaveAsType>())).Callback<string, OlSaveAsType>(outlookItem.SaveAs);
         //    mockFlaggableItem.Setup(x => x.ShowCategoriesDialog()).Callback(outlookItem.ShowCategoriesDialog);
 
-        //    mockFlaggableItem.Setup(x => x.Save()).Verifiable();            
+        //    mockFlaggableItem.Setup(x => x.Save()).Verifiable();
         //    var toDoItem = new ToDoItem(mockFlaggableItem.Object);
 
         //    // Act

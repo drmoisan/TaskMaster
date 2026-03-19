@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Microsoft.Office.Interop.Outlook;
-using Outlook = Microsoft.Office.Interop.Outlook;
-using System.IO;
-using UtilitiesCS;
 using System.Windows.Forms;
+using Microsoft.Office.Interop.Outlook;
+using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace ToDoModel
 {
-
     public class FileOperationsPST
     {
         private readonly IApplicationGlobals _globals;
@@ -38,7 +37,9 @@ namespace ToDoModel
             {
                 Folder OlFolder = (Folder)Application.Session.Folders[FoldersArray[0]];
                 var OlFolders = OlFolder.Folders;
-                Debug.WriteLine(OlFolder.FolderPath + " has " + OlFolders.Count.ToString() + " folders");
+                Debug.WriteLine(
+                    OlFolder.FolderPath + " has " + OlFolders.Count.ToString() + " folders"
+                );
                 foreach (Folder currentOlFolder in OlFolders)
                 {
                     OlFolder = currentOlFolder;
@@ -55,7 +56,6 @@ namespace ToDoModel
                 Debug.WriteLine("Folder Does Not Exist");
                 return null;
             }
-
         }
 
         public void HookEvents()
@@ -99,17 +99,11 @@ namespace ToDoModel
             private Items _itemsPST
             {
                 [MethodImpl(MethodImplOptions.Synchronized)]
-                get
-                {
-                    return __itemsPST;
-                }
-
+                get { return __itemsPST; }
                 [MethodImpl(MethodImplOptions.Synchronized)]
-                set
-                {
-                    __itemsPST = value;
-                }
+                set { __itemsPST = value; }
             }
+
             //private readonly Store _store;
             private readonly IApplicationGlobals _globals;
 
@@ -139,19 +133,16 @@ namespace ToDoModel
                 // TODO: Morph Functionality to handle proactively rather than reactively
                 if (__itemsPST_ItemChange_blIsRunning == false)
                 {
-
                     __itemsPST_ItemChange_blIsRunning = true;
                     //var todo = new ToDoItem(olItem, OnDemand: true);
                     var todo = new ToDoItem(olItem, onDemand: true);
                     UserProperty objProperty_ToDoID = olItem.GetUdf("ToDoID");
                     UserProperty objProperty_Project = olItem.GetUdf("TagProject");
 
-
                     // AUTOCODE ToDoID based on Project
                     // Check to see if the project exists before attempting to autocode the id
                     if (objProperty_Project is not null)
                     {
-
                         string strProject;
                         string strProjectToDo;
                         // Check to see whether there is an existing ID
@@ -162,14 +153,12 @@ namespace ToDoModel
                             // Don't autocode branches that existed to another project previously
                             if (strToDoID.Length != 0 & strToDoID.Length <= 4)
                             {
-
                                 // Get Project Name
                                 strProject = todo.Projects.AsStringNoPrefix;
 
                                 // Check to see if the Project name returned a value before attempting to autocode
                                 if (strProject.Length != 0)
                                 {
-
                                     // Check to ensure it is in the dictionary before autocoding
                                     if (_globals.TD.ProjInfo.Contains_ProjectName(strProject))
                                     {
@@ -183,36 +172,51 @@ namespace ToDoModel
                                                 if (context != "Tag PROJECTS")
                                                 {
                                                     // Change the Item's todoid to be a node of the project
-                                                    strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
-                                                    todo.Program.AsStringNoPrefix = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
-                                                    todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
+                                                    strProjectToDo = _globals
+                                                        .TD.ProjInfo.Find_ByProjectName(strProject)
+                                                        .First()
+                                                        .ProjectID;
+                                                    todo.Program.AsStringNoPrefix = _globals
+                                                        .TD.ProjInfo.Find_ByProjectName(strProject)
+                                                        .First()
+                                                        .ProgramName;
+                                                    todo.ToDoID = _globals.TD.IDList.GetNextToDoID(
+                                                        strProjectToDo + "00"
+                                                    );
                                                     // strToDoID = IDList.GetNextToDoID(strProjectToDo & "00")
                                                     // SetUdf("ToDoID", Value:=strToDoID, SpecificItem:=Item)
-                                                    _globals.TD.IDList.Serialize(_globals.TD.FnameIDList);
+                                                    _globals.TD.IDList.Serialize(
+                                                        _globals.TD.FnameIDList
+                                                    );
                                                     // Split_ToDoID(objItem:=Item)
                                                     todo.SplitID();
                                                 }
                                             }
-
                                         }
                                     }
-
-
                                     else if (strToDoID.Length == 4) // If it is not in the dictionary, see if this is a project we should add
                                     {
-                                        var response = MessageBox.Show($"Add Project {strProject} to the Master List?", "", MessageBoxButtons.YesNo);
+                                        var response = MessageBox.Show(
+                                            $"Add Project {strProject} to the Master List?",
+                                            "",
+                                            MessageBoxButtons.YesNo
+                                        );
                                         if (response == DialogResult.Yes)
                                         {
                                             // ProjDict.ProjectDictionary.Add(strProject, strToDoID)
                                             // SaveDict()
-                                            string strProgram = InputBox.ShowDialog($"What is the program name for {strProject}?", DefaultResponse: "");
-                                            _globals.TD.ProjInfo.Add(new ProjectEntry(strProject, strToDoID, strProgram));
+                                            string strProgram = InputBox.ShowDialog(
+                                                $"What is the program name for {strProject}?",
+                                                DefaultResponse: ""
+                                            );
+                                            _globals.TD.ProjInfo.Add(
+                                                new ProjectEntry(strProject, strToDoID, strProgram)
+                                            );
                                             _globals.TD.ProjInfo.Save();
                                         }
                                     }
                                 }
                             }
-
                             else if (strToDoID.Length == 0)
                             {
                                 strProject = todo.Projects.AsStringNoPrefix;
@@ -223,18 +227,25 @@ namespace ToDoModel
                                 // End If
                                 if (_globals.TD.ProjInfo.Contains_ProjectName(strProject))
                                 {
-                                    strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
-                                    todo.Program.AsStringNoPrefix = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
+                                    strProjectToDo = _globals
+                                        .TD.ProjInfo.Find_ByProjectName(strProject)
+                                        .First()
+                                        .ProjectID;
+                                    todo.Program.AsStringNoPrefix = _globals
+                                        .TD.ProjInfo.Find_ByProjectName(strProject)
+                                        .First()
+                                        .ProgramName;
                                     // If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
                                     // strProjectToDo = ProjDict.ProjectDictionary(strProject)
-                                    todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
+                                    todo.ToDoID = _globals.TD.IDList.GetNextToDoID(
+                                        strProjectToDo + "00"
+                                    );
                                     // strToDoID = IDList.GetNextToDoID(strProjectToDo & "00")
                                     // SetUdf("ToDoID", Value:=strToDoID, SpecificItem:=Item)
                                     _globals.TD.IDList.Serialize(_globals.TD.FnameIDList);
                                     // Split_ToDoID(objItem:=Item)
                                     todo.SplitID();
                                 }
-
                             }
                         }
                         else // In this case, the project name exists but the todo id does not
@@ -248,10 +259,18 @@ namespace ToDoModel
                                 // If ProjDict.ProjectDictionary.ContainsKey(strProject) Then
                                 if (_globals.TD.ProjInfo.Contains_ProjectName(strProject))
                                 {
-                                    strProjectToDo = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProjectID;
+                                    strProjectToDo = _globals
+                                        .TD.ProjInfo.Find_ByProjectName(strProject)
+                                        .First()
+                                        .ProjectID;
                                     // Add the next ToDoID available in that branch
-                                    todo.ToDoID = _globals.TD.IDList.GetNextToDoID(strProjectToDo + "00");
-                                    todo.Program.AsStringNoPrefix = _globals.TD.ProjInfo.Find_ByProjectName(strProject).First().ProgramName;
+                                    todo.ToDoID = _globals.TD.IDList.GetNextToDoID(
+                                        strProjectToDo + "00"
+                                    );
+                                    todo.Program.AsStringNoPrefix = _globals
+                                        .TD.ProjInfo.Find_ByProjectName(strProject)
+                                        .First()
+                                        .ProgramName;
                                     _globals.TD.IDList.Serialize(_globals.TD.FnameIDList);
 
                                     todo.SplitID();
@@ -261,18 +280,19 @@ namespace ToDoModel
                                 }
                             }
                         }
-
-
                     }
 
                     // If OlToDoItem_IsMarkedComplete(Item) Then
-                    // Check to see if todo was just marked complete 
+                    // Check to see if todo was just marked complete
                     // If So, adjust Kan Ban fields and categories
                     if (todo.Complete)
                     {
                         if (olItem.GetCategories().Contains("Tag KB Completed"))
                         {
-                            string strCats = olItem.GetCategories().Replace("Tag KB Backlog", "").Replace(",,", ",");
+                            string strCats = olItem
+                                .GetCategories()
+                                .Replace("Tag KB Backlog", "")
+                                .Replace(",,", ",");
                             strCats = strCats.Replace("Tag KB InProgress", "").Replace(",,", ",");
                             strCats = strCats.Replace("Tag KB Planned", "").Replace(",,", ",");
 
@@ -327,12 +347,9 @@ namespace ToDoModel
                         }
                         olItem.SetCategories(strCats);
                         todo.KB.AsStringNoPrefix = strKB;
-
                     }
                     __itemsPST_ItemChange_blIsRunning = false;
                 }
-
-
             }
         }
 
@@ -357,7 +374,5 @@ namespace ToDoModel
                 return null;
             }
         }
-
-
     }
 }

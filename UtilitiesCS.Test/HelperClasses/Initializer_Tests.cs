@@ -1,8 +1,8 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test.HelperClasses
 {
@@ -41,7 +41,11 @@ namespace UtilitiesCS.Test.HelperClasses
             string callbackValue = null;
 
             // Act
-            var result = Initializer.GetOrLoad(ref value, () => "loaded", loaded => callbackValue = loaded);
+            var result = Initializer.GetOrLoad(
+                ref value,
+                () => "loaded",
+                loaded => callbackValue = loaded
+            );
 
             // Assert
             result.Should().Be("loaded");
@@ -56,11 +60,16 @@ namespace UtilitiesCS.Test.HelperClasses
             bool loaderCalled = false;
 
             // Act
-            var result = Initializer.GetOrLoad(ref value, () =>
-            {
-                loaderCalled = true;
-                return "loaded";
-            }, strict: false, dependencies: null);
+            var result = Initializer.GetOrLoad(
+                ref value,
+                () =>
+                {
+                    loaderCalled = true;
+                    return "loaded";
+                },
+                strict: false,
+                dependencies: null
+            );
 
             // Assert
             result.Should().BeNull();
@@ -81,7 +90,8 @@ namespace UtilitiesCS.Test.HelperClasses
                 defaultValue: "fallback",
                 loader: () => throw new InvalidOperationException("boom"),
                 defaultSetAndSaver: loaded => savedValue = loaded,
-                dependencies: new object[] { "dependency" });
+                dependencies: new object[] { "dependency" }
+            );
 
             // Assert
             result.Should().Be("fallback");
@@ -98,7 +108,14 @@ namespace UtilitiesCS.Test.HelperClasses
             int saveCount = 0;
 
             // Act
-            Initializer.SetAndSave(ref cached, "after", value => setValue = value, () => saveCount++, () => true, strict: true);
+            Initializer.SetAndSave(
+                ref cached,
+                "after",
+                value => setValue = value,
+                () => saveCount++,
+                () => true,
+                strict: true
+            );
 
             // Assert
             cached.Should().Be("after");
@@ -115,7 +132,14 @@ namespace UtilitiesCS.Test.HelperClasses
             int saveCount = 0;
 
             // Act
-            Initializer.SetAndSave(ref cached, "after", value => setValue = value, () => saveCount++, () => false, strict: true);
+            Initializer.SetAndSave(
+                ref cached,
+                "after",
+                value => setValue = value,
+                () => saveCount++,
+                () => false,
+                strict: true
+            );
 
             // Assert
             cached.Should().Be("after");
@@ -130,7 +154,14 @@ namespace UtilitiesCS.Test.HelperClasses
             string cached = "before";
 
             // Act
-            Action act = () => Initializer.SetAndSave(ref cached, "after", (Action<string>)null, () => true, strict: true);
+            Action act = () =>
+                Initializer.SetAndSave(
+                    ref cached,
+                    "after",
+                    (Action<string>)null,
+                    () => true,
+                    strict: true
+                );
 
             // Assert
             act.Should().Throw<ArgumentNullException>();
@@ -140,8 +171,11 @@ namespace UtilitiesCS.Test.HelperClasses
         public void DependenciesNotNull_WhenCalledConcurrentlyWithValidDependencies_ReturnsTrueForAllCalls()
         {
             // Arrange
-            var tasks = Enumerable.Range(0, 8)
-                .Select(_ => Task.Run(() => Initializer.DependenciesNotNull(strict: true, "dependency", 5)))
+            var tasks = Enumerable
+                .Range(0, 8)
+                .Select(_ =>
+                    Task.Run(() => Initializer.DependenciesNotNull(strict: true, "dependency", 5))
+                )
                 .ToArray();
 
             // Act

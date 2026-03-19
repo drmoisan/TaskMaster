@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
-using System.Reflection;
-using System.ComponentModel;
 
 namespace UtilitiesCS
 {
@@ -20,12 +20,18 @@ namespace UtilitiesCS
 
         public ThemeControlGroup(IList<Control> controls, Color back)
         {
-            if (controls is null) { throw new ArgumentNullException(nameof(controls)); }
+            if (controls is null)
+            {
+                throw new ArgumentNullException(nameof(controls));
+            }
             if (controls.Count == 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(controls), $"To create a " +
-                    $"{nameof(ThemeControlGroup)}, the parameter " +
-                    $"{nameof(controls)} must contain at least one {nameof(Control)}");
+                throw new ArgumentOutOfRangeException(
+                    nameof(controls),
+                    $"To create a "
+                        + $"{nameof(ThemeControlGroup)}, the parameter "
+                        + $"{nameof(controls)} must contain at least one {nameof(Control)}"
+                );
             }
             _controls = controls;
             _backColor = back;
@@ -34,12 +40,18 @@ namespace UtilitiesCS
 
         public ThemeControlGroup(IList<Control> controls, Color fore, Color back)
         {
-            if (controls is null) { throw new ArgumentNullException(nameof(controls)); }
+            if (controls is null)
+            {
+                throw new ArgumentNullException(nameof(controls));
+            }
             if (controls.Count == 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(controls), $"To create a " +
-                    $"{nameof(ThemeControlGroup)}, the parameter " +
-                    $"{nameof(controls)} must contain at least one {nameof(Control)}");
+                throw new ArgumentOutOfRangeException(
+                    nameof(controls),
+                    $"To create a "
+                        + $"{nameof(ThemeControlGroup)}, the parameter "
+                        + $"{nameof(controls)} must contain at least one {nameof(Control)}"
+                );
             }
 
             _controls = controls;
@@ -48,12 +60,14 @@ namespace UtilitiesCS
             _groupType = GroupTypeEnum.TwoField;
         }
 
-        public ThemeControlGroup(IList<Control> controls,
-                                 Color foreMain,
-                                 Color backMain,
-                                 Color foreAlt,
-                                 Color backAlt,
-                                 Func<bool> isAlt)
+        public ThemeControlGroup(
+            IList<Control> controls,
+            Color foreMain,
+            Color backMain,
+            Color foreAlt,
+            Color backAlt,
+            Func<bool> isAlt
+        )
         {
             _controls = controls;
             _foreColorMain = foreMain;
@@ -64,13 +78,15 @@ namespace UtilitiesCS
             _groupType = GroupTypeEnum.TwoFieldAlt;
         }
 
-        public ThemeControlGroup(IList<Control> controls,
-                                 Color foreMain,
-                                 Color backMain,
-                                 Color foreAlt,
-                                 Color backAlt,
-                                 Color hover,
-                                 Func<object, bool> isAltHover)
+        public ThemeControlGroup(
+            IList<Control> controls,
+            Color foreMain,
+            Color backMain,
+            Color foreAlt,
+            Color backAlt,
+            Color hover,
+            Func<object, bool> isAltHover
+        )
         {
             _controls = controls;
             _foreColorMain = foreMain;
@@ -82,10 +98,12 @@ namespace UtilitiesCS
             _groupType = GroupTypeEnum.TwoFieldAltHover;
         }
 
-        public ThemeControlGroup(IList<object> objects,
-                                 Color fore,
-                                 Color back,
-                                 Action<IList<object>, Color, Color> objectSetter)
+        public ThemeControlGroup(
+            IList<object> objects,
+            Color fore,
+            Color back,
+            Action<IList<object>, Color, Color> objectSetter
+        )
         {
             _objects = objects;
             _foreColor = fore;
@@ -94,10 +112,12 @@ namespace UtilitiesCS
             _groupType = GroupTypeEnum.TwoFieldObjWithSetter;
         }
 
-        public ThemeControlGroup(Microsoft.Web.WebView2.WinForms.WebView2 webView2,
-                                 Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme web2ViewScheme,
-                                 Action<Enums.ToggleState> htmlConverter,
-                                 Enums.ToggleState htmlDark)
+        public ThemeControlGroup(
+            Microsoft.Web.WebView2.WinForms.WebView2 webView2,
+            Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme web2ViewScheme,
+            Action<Enums.ToggleState> htmlConverter,
+            Enums.ToggleState htmlDark
+        )
         {
             _webView2 = webView2;
             _controls = new List<Control> { webView2 };
@@ -119,8 +139,9 @@ namespace UtilitiesCS
             TwoFieldAlt,
             TwoFieldAltHover,
             TwoFieldObjWithSetter,
-            WebView2
+            WebView2,
         }
+
         private GroupTypeEnum _groupType;
         private IList<Control> _controls;
         private IList<object> _objects;
@@ -128,6 +149,7 @@ namespace UtilitiesCS
         private Color _foreColor;
         private Color _backColor;
         private Color _hoverColor;
+
         //private Color _clickedColor;
         private Color _foreColorMain;
         private Color _backColorMain;
@@ -143,9 +165,12 @@ namespace UtilitiesCS
         #endregion Private Variables
 
 
-
         private string _groupName;
-        public string GroupName { get => _groupName; set => _groupName = value; }
+        public string GroupName
+        {
+            get => _groupName;
+            set => _groupName = value;
+        }
 
         #region Apply Theme
 
@@ -172,7 +197,10 @@ namespace UtilitiesCS
                     ApplyThemeWebView2();
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(_groupType), $"Unsupported group type");
+                    throw new ArgumentOutOfRangeException(
+                        nameof(_groupType),
+                        $"Unsupported group type"
+                    );
             }
         }
 
@@ -180,10 +208,19 @@ namespace UtilitiesCS
         {
             if (_controls is not null)
             {
-                if (async) { UiThread.Dispatcher.InvokeAsync(new Action(() => ApplyTheme())); }
-                else { UiThread.Dispatcher.Invoke(new Action(() => ApplyTheme())); }
+                if (async)
+                {
+                    UiThread.Dispatcher.InvokeAsync(new Action(() => ApplyTheme()));
+                }
+                else
+                {
+                    UiThread.Dispatcher.Invoke(new Action(() => ApplyTheme()));
+                }
             }
-            else { ApplyTheme(); }
+            else
+            {
+                ApplyTheme();
+            }
         }
 
         private void ApplyThemeOneField()
@@ -241,7 +278,8 @@ namespace UtilitiesCS
             });
         }
 
-        private void ApplyThemeTwoFieldWithSetter() => ObjectSetter(_objects, _foreColor, _backColor);
+        private void ApplyThemeTwoFieldWithSetter() =>
+            ObjectSetter(_objects, _foreColor, _backColor);
 
         private void ApplyThemeWebView2()
         {
@@ -256,12 +294,19 @@ namespace UtilitiesCS
 
         #region Event Wiring and Handlers
 
-        private void Control_MouseEnter(object sender, EventArgs e) => ((Control)sender).BackColor = _hoverColor;
+        private void Control_MouseEnter(object sender, EventArgs e) =>
+            ((Control)sender).BackColor = _hoverColor;
 
         private void Control_MouseLeave(object sender, EventArgs e)
         {
-            if (IsAltHover(sender)) { ((Control)sender).BackColor = _backColorAlt; }
-            else { ((Control)sender).BackColor = _backColorMain; }
+            if (IsAltHover(sender))
+            {
+                ((Control)sender).BackColor = _backColorAlt;
+            }
+            else
+            {
+                ((Control)sender).BackColor = _backColorMain;
+            }
         }
 
         public void DeactivateEvents()
@@ -286,8 +331,5 @@ namespace UtilitiesCS
         }
 
         #endregion Event Wiring and Handlers
-
-
-
     }
 }

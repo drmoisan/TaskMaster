@@ -1,11 +1,11 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualBasic;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualBasic;
 using UtilitiesCS;
 
 namespace ToDoModel
@@ -21,19 +21,36 @@ namespace ToDoModel
         }
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         private IApplicationGlobals _globals;
-        internal IApplicationGlobals Globals { get => _globals; set => _globals = value; }
+        internal IApplicationGlobals Globals
+        {
+            get => _globals;
+            set => _globals = value;
+        }
 
         private IIDList _idList;
-        internal IIDList IdList { get => _idList; set => _idList = value; }
+        internal IIDList IdList
+        {
+            get => _idList;
+            set => _idList = value;
+        }
 
         private NameSpace _ns;
-        internal NameSpace Ns { get => _ns; set => _ns = value; }
+        internal NameSpace Ns
+        {
+            get => _ns;
+            set => _ns = value;
+        }
 
         private IProjectData _projInfo;
-        internal IProjectData ProjInfo { get => _projInfo; set => _projInfo = value; }
+        internal IProjectData ProjInfo
+        {
+            get => _projInfo;
+            set => _projInfo = value;
+        }
 
         private static ConcurrentDictionary<string, int> _synchronizing = new();
         internal static ConcurrentDictionary<string, int> Synchronizing => _synchronizing;
@@ -52,8 +69,6 @@ namespace ToDoModel
             }
         }
 
-
-
         private ToDoItem ToDoFromId(string entryId)
         {
             var item = Ns.GetItemFromID(entryId);
@@ -67,7 +82,7 @@ namespace ToDoModel
         private static void SynchronizeKanban(object Item, ToDoItem todo)
         {
             // If OlToDoItem_IsMarkedComplete(item) Then
-            // Check to see if todo was just marked complete 
+            // Check to see if todo was just marked complete
             // If So, adjust Kan Ban fields and categories
             if (todo.Complete)
             {
@@ -134,21 +149,27 @@ namespace ToDoModel
                 olItem.Save();
                 todo.KB.AsStringNoPrefix = strKB;
                 //todo.SetKB(value: strKB);
-
             }
         }
 
         private static void SynchronizeEC(Items OlToDoItems, ToDoItem todo)
         {
             bool blTmp = todo.EC2; // This reads the button and keeps the Other field in sync if there is a change
-                                   // Check to see if change was in the EC
+            // Check to see if change was in the EC
             if (todo.EC_Change)
             {
                 string strEC = todo.ExpandChildren;
                 // Extremely expensive. I wonder why it is done this way?
                 if (!string.IsNullOrEmpty(todo.ToDoID))
                 {
-                    string strChFilter = "@SQL=" + '"' + "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/ToDoID" + '"' + " like '" + todo.ToDoID + "%'";
+                    string strChFilter =
+                        "@SQL="
+                        + '"'
+                        + "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/ToDoID"
+                        + '"'
+                        + " like '"
+                        + todo.ToDoID
+                        + "%'";
                     var OlChildren = OlToDoItems.Restrict(strChFilter);
 
                     // Identify the tree depth of the current ToDoID (Length of ToDoID / 2)
@@ -161,7 +182,10 @@ namespace ToDoModel
                         if ((todoTmp.ToDoID ?? "") != (todo.ToDoID ?? ""))
                         {
                             // Added if statement to correct for the fact that Restrict is not case sensitive
-                            if ((todoTmp.ToDoID.Substring(0, todo.ToDoID.Length) ?? "") == (todo.ToDoID ?? ""))
+                            if (
+                                (todoTmp.ToDoID.Substring(0, todo.ToDoID.Length) ?? "")
+                                == (todo.ToDoID ?? "")
+                            )
                             {
                                 if (strEC == "-")
                                 {
@@ -172,15 +196,16 @@ namespace ToDoModel
                                     todoTmp.set_VisibleTreeStateLVL(intLVL + 1, false);
                                 }
                                 // Check to see if visible
-                                int VisibleMask = (int)Math.Round(Math.Pow(2d, todoTmp.ToDoID.Length / 2d) - 1d);
-                                bool blnewAB = (todoTmp.VisibleTreeState & VisibleMask) == VisibleMask;
+                                int VisibleMask = (int)
+                                    Math.Round(Math.Pow(2d, todoTmp.ToDoID.Length / 2d) - 1d);
+                                bool blnewAB =
+                                    (todoTmp.VisibleTreeState & VisibleMask) == VisibleMask;
                                 if (blnewAB != todoTmp.ActiveBranch)
                                 {
                                     todoTmp.ActiveBranch = blnewAB;
                                 }
                             }
                         }
-
                     }
                 }
                 todo.EC_Change = false;

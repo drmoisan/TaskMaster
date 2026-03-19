@@ -18,11 +18,13 @@ namespace UtilitiesCS.Threading
             CancellationToken cancel = default,
             ProgressTracker progressTracker = null,
             SegmentStopWatch stopWatch = null,
-            Screen screen = null)
+            Screen screen = null
+        )
         {
             _cancelSource = cancelSource ?? new CancellationTokenSource();
             _cancel = cancel == default ? _cancelSource.Token : cancel;
-            _progressTracker = progressTracker ?? new ProgressTracker(_cancelSource, screen).Initialize();
+            _progressTracker =
+                progressTracker ?? new ProgressTracker(_cancelSource, screen).Initialize();
             _stopWatch = stopWatch ?? await Task.Run(() => new SegmentStopWatch().Start());
             return this;
         }
@@ -31,7 +33,8 @@ namespace UtilitiesCS.Threading
             CancellationTokenSource cancelSource = null,
             CancellationToken cancel = default,
             ProgressTrackerPane progressTrackerPane = null,
-            SegmentStopWatch stopWatch = null)
+            SegmentStopWatch stopWatch = null
+        )
         {
             _cancelSource = cancelSource ?? new CancellationTokenSource();
             _cancel = cancel == default ? _cancelSource.Token : cancel;
@@ -44,12 +47,14 @@ namespace UtilitiesCS.Threading
             CancellationTokenSource CancelSource,
             CancellationToken Cancel,
             ProgressTracker ProgressTracker,
-            SegmentStopWatch StopWatch)> CreateAsTupleAsync(
+            SegmentStopWatch StopWatch
+        )> CreateAsTupleAsync(
             CancellationTokenSource cancelSource = null,
             CancellationToken cancel = default,
             ProgressTracker progressTracker = null,
             SegmentStopWatch stopWatch = null,
-            Screen screen = null)
+            Screen screen = null
+        )
         {
             var package = new ProgressPackage();
             await package.InitializeAsync(cancelSource, cancel, progressTracker, stopWatch, screen);
@@ -60,11 +65,13 @@ namespace UtilitiesCS.Threading
             CancellationTokenSource CancelSource,
             CancellationToken Cancel,
             ProgressTrackerPane ProgressTrackerPane,
-            SegmentStopWatch StopWatch)> CreateAsTuplePaneAsync(
+            SegmentStopWatch StopWatch
+        )> CreateAsTuplePaneAsync(
             CancellationTokenSource cancelSource = null,
             CancellationToken cancel = default,
             ProgressTrackerPane progressTrackerPane = null,
-            SegmentStopWatch stopWatch = null)
+            SegmentStopWatch stopWatch = null
+        )
         {
             var package = new ProgressPackage();
             await package.InitializeAsync(cancelSource, cancel, progressTrackerPane, stopWatch);
@@ -72,19 +79,39 @@ namespace UtilitiesCS.Threading
         }
 
         private CancellationTokenSource _cancelSource;
-        public CancellationTokenSource CancelSource { get => _cancelSource; set => _cancelSource = value; }
+        public CancellationTokenSource CancelSource
+        {
+            get => _cancelSource;
+            set => _cancelSource = value;
+        }
 
         private CancellationToken _cancel;
-        public CancellationToken Cancel { get => _cancel; set => _cancel = value; }
+        public CancellationToken Cancel
+        {
+            get => _cancel;
+            set => _cancel = value;
+        }
 
         private ProgressTracker _progressTracker;
-        public ProgressTracker ProgressTracker { get => _progressTracker; set => _progressTracker = value; }
+        public ProgressTracker ProgressTracker
+        {
+            get => _progressTracker;
+            set => _progressTracker = value;
+        }
 
         private ProgressTrackerPane _progressTrackerPane;
-        public ProgressTrackerPane ProgressTrackerPane { get => _progressTrackerPane; set => _progressTrackerPane = value; }
+        public ProgressTrackerPane ProgressTrackerPane
+        {
+            get => _progressTrackerPane;
+            set => _progressTrackerPane = value;
+        }
 
         // Note: Should be run on a background thread to avoid locking the UI thread
-        public SegmentStopWatch StopWatch { get => _stopWatch; set => _stopWatch = value; }
+        public SegmentStopWatch StopWatch
+        {
+            get => _stopWatch;
+            set => _stopWatch = value;
+        }
         private SegmentStopWatch _stopWatch;
 
         public ProgressPackage SpawnChild(int allocation)
@@ -95,18 +122,26 @@ namespace UtilitiesCS.Threading
                 Cancel = this.Cancel,
                 StopWatch = this.StopWatch,
                 ProgressTracker = this.ProgressTracker?.SpawnChild(allocation),
-                ProgressTrackerPane = this.ProgressTrackerPane?.SpawnChild(allocation)
+                ProgressTrackerPane = this.ProgressTrackerPane?.SpawnChild(allocation),
             };
         }
 
-        public (CancellationTokenSource CancelSource, CancellationToken Cancel, ProgressTracker ProgressTracker, SegmentStopWatch StopWatch)
-            ToTuple()
+        public (
+            CancellationTokenSource CancelSource,
+            CancellationToken Cancel,
+            ProgressTracker ProgressTracker,
+            SegmentStopWatch StopWatch
+        ) ToTuple()
         {
             return (CancelSource, Cancel, ProgressTracker, StopWatch);
         }
 
-        public (CancellationTokenSource CancelSource, CancellationToken Cancel, ProgressTrackerPane ProgressTrackerPane, SegmentStopWatch StopWatch)
-            ToTuplePane()
+        public (
+            CancellationTokenSource CancelSource,
+            CancellationToken Cancel,
+            ProgressTrackerPane ProgressTrackerPane,
+            SegmentStopWatch StopWatch
+        ) ToTuplePane()
         {
             return (CancelSource, Cancel, ProgressTrackerPane, StopWatch);
         }

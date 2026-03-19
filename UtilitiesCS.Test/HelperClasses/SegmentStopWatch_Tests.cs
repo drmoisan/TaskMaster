@@ -46,8 +46,10 @@ namespace UtilitiesCS.Test.HelperClasses
 
             // Assert
             sut.Durations.Should().HaveCount(2);
-            sut.Durations.Should().ContainSingle(x => x.ActionName == "first" && x.Duration > TimeSpan.Zero);
-            sut.Durations.Should().ContainSingle(x => x.ActionName == "second" && x.Duration > TimeSpan.Zero);
+            sut.Durations.Should()
+                .ContainSingle(x => x.ActionName == "first" && x.Duration > TimeSpan.Zero);
+            sut.Durations.Should()
+                .ContainSingle(x => x.ActionName == "second" && x.Duration > TimeSpan.Zero);
         }
 
         [TestMethod]
@@ -66,11 +68,22 @@ namespace UtilitiesCS.Test.HelperClasses
             // Assert
             groupedCopy.Should().NotBeNull();
             groupedCopy.Should().HaveCount(2);
-            groupedCopy.Should().Contain(x => x.ActionName == "alpha" && x.Duration == TimeSpan.FromMilliseconds(20));
-            groupedCopy.Should().Contain(x => x.ActionName == "beta" && x.Duration == TimeSpan.FromMilliseconds(10));
+            groupedCopy
+                .Should()
+                .Contain(x =>
+                    x.ActionName == "alpha" && x.Duration == TimeSpan.FromMilliseconds(20)
+                );
+            groupedCopy
+                .Should()
+                .Contain(x =>
+                    x.ActionName == "beta" && x.Duration == TimeSpan.FromMilliseconds(10)
+                );
             inPlaceResult.Should().BeNull();
             sut.Durations.Should().HaveCount(2);
-            sut.Durations.Should().Contain(x => x.ActionName == "alpha" && x.Duration == TimeSpan.FromMilliseconds(20));
+            sut.Durations.Should()
+                .Contain(x =>
+                    x.ActionName == "alpha" && x.Duration == TimeSpan.FromMilliseconds(20)
+                );
         }
 
         [TestMethod]
@@ -81,7 +94,10 @@ namespace UtilitiesCS.Test.HelperClasses
             sut.Durations.Push(("existing", TimeSpan.FromMilliseconds(10)));
             sut.Durations.Push(("shared", TimeSpan.FromMilliseconds(15)));
 
-            var incoming = new System.Collections.Generic.Stack<(string ActionName, TimeSpan Duration)>();
+            var incoming = new System.Collections.Generic.Stack<(
+                string ActionName,
+                TimeSpan Duration
+            )>();
             incoming.Push(("shared", TimeSpan.FromMilliseconds(5)));
             incoming.Push(("incoming", TimeSpan.FromMilliseconds(8)));
 
@@ -89,17 +105,45 @@ namespace UtilitiesCS.Test.HelperClasses
             sut.MergeDurations(incoming);
             var grouped = SegmentStopWatch.GroupDurations(
                 new System.Collections.Generic.Stack<(string ActionName, TimeSpan Duration)>(
-                    new[] { ("x", TimeSpan.FromMilliseconds(1)), ("shared", TimeSpan.FromMilliseconds(2)) }),
+                    new[]
+                    {
+                        ("x", TimeSpan.FromMilliseconds(1)),
+                        ("shared", TimeSpan.FromMilliseconds(2)),
+                    }
+                ),
                 new System.Collections.Generic.Stack<(string ActionName, TimeSpan Duration)>(
-                    new[] { ("shared", TimeSpan.FromMilliseconds(3)), ("y", TimeSpan.FromMilliseconds(4)) }));
+                    new[]
+                    {
+                        ("shared", TimeSpan.FromMilliseconds(3)),
+                        ("y", TimeSpan.FromMilliseconds(4)),
+                    }
+                )
+            );
 
             // Assert
-            sut.Durations.Should().Contain(x => x.ActionName == "existing" && x.Duration == TimeSpan.FromMilliseconds(10));
-            sut.Durations.Should().Contain(x => x.ActionName == "incoming" && x.Duration == TimeSpan.FromMilliseconds(8));
-            sut.Durations.Should().Contain(x => x.ActionName == "shared" && x.Duration == TimeSpan.FromMilliseconds(20));
-            grouped.Should().Contain(x => x.ActionName == "shared" && x.Duration == TimeSpan.FromMilliseconds(5));
-            grouped.Should().Contain(x => x.ActionName == "x" && x.Duration == TimeSpan.FromMilliseconds(1));
-            grouped.Should().Contain(x => x.ActionName == "y" && x.Duration == TimeSpan.FromMilliseconds(4));
+            sut.Durations.Should()
+                .Contain(x =>
+                    x.ActionName == "existing" && x.Duration == TimeSpan.FromMilliseconds(10)
+                );
+            sut.Durations.Should()
+                .Contain(x =>
+                    x.ActionName == "incoming" && x.Duration == TimeSpan.FromMilliseconds(8)
+                );
+            sut.Durations.Should()
+                .Contain(x =>
+                    x.ActionName == "shared" && x.Duration == TimeSpan.FromMilliseconds(20)
+                );
+            grouped
+                .Should()
+                .Contain(x =>
+                    x.ActionName == "shared" && x.Duration == TimeSpan.FromMilliseconds(5)
+                );
+            grouped
+                .Should()
+                .Contain(x => x.ActionName == "x" && x.Duration == TimeSpan.FromMilliseconds(1));
+            grouped
+                .Should()
+                .Contain(x => x.ActionName == "y" && x.Duration == TimeSpan.FromMilliseconds(4));
         }
 
         [TestMethod]

@@ -1,8 +1,4 @@
-﻿using AngleSharp.Css;
-using log4net.Repository.Hierarchy;
-using Microsoft.Office.Interop.Outlook;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -10,6 +6,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using AngleSharp.Css;
+using log4net.Repository.Hierarchy;
+using Microsoft.Office.Interop.Outlook;
+using Newtonsoft.Json;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;
 
@@ -18,16 +18,23 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
     internal class ClassifierGroupUtilities(IApplicationGlobals globals)
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         private IApplicationGlobals _globals = globals;
         internal IApplicationGlobals Globals => _globals;
 
-        public virtual async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(MinedMailInfo[] collection, string name, int minimumCountPerToken = 0)
+        public virtual async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(
+            MinedMailInfo[] collection,
+            string name,
+            int minimumCountPerToken = 0
+        )
         {
             collection.ThrowIfNull();
 
-            var group = await Task.Run(() => Deserialize<BayesianClassifierGroup>($"Staging_{name}"));
+            var group = await Task.Run(() =>
+                Deserialize<BayesianClassifierGroup>($"Staging_{name}")
+            );
             if (group is null)
             {
                 group = await CreateClassifierGroupAsync(collection, minimumCountPerToken);
@@ -37,22 +44,29 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         }
 
         public virtual async Task<BayesianClassifierGroup> CreateClassifierGroupAsync(
-            MinedMailInfo[] collection, int minimumCountPerToken = 0)
+            MinedMailInfo[] collection,
+            int minimumCountPerToken = 0
+        )
         {
             return await Task.Run(() =>
             {
                 var group = new BayesianClassifierGroup
                 {
                     TotalEmailCount = collection.Count(),
-                    SharedTokenBase = minimumCountPerToken == 0 ?
-                        new Corpus(collection.SelectMany(x => x.Tokens).GroupAndCount()) :
-                        new Corpus(collection.SelectMany(x => x.Tokens).GroupAndCount()
-                            .Where(kvp => kvp.Value >= minimumCountPerToken).ToDictionary())
+                    SharedTokenBase =
+                        minimumCountPerToken == 0
+                            ? new Corpus(collection.SelectMany(x => x.Tokens).GroupAndCount())
+                            : new Corpus(
+                                collection
+                                    .SelectMany(x => x.Tokens)
+                                    .GroupAndCount()
+                                    .Where(kvp => kvp.Value >= minimumCountPerToken)
+                                    .ToDictionary()
+                            ),
                 };
                 return group;
             });
         }
-
 
         #region Testing Sizing and Serialization Methods
 
@@ -61,40 +75,60 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             var jsonSettings = new JsonSerializerSettings()
             {
                 TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented
+                Formatting = Formatting.Indented,
             };
             if (_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
             {
                 var disk = new FilePathHelper();
-                disk.FolderPath = Path.Combine(folderRoot, "Bayesian"); ;
-                var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
+                disk.FolderPath = Path.Combine(folderRoot, "Bayesian");
+                ;
+                var fileName = fileNameSuffix.IsNullOrEmpty()
+                    ? $"{fileNameSeed}.json"
+                    : $"{fileNameSeed}_{fileNameSuffix}.json";
                 disk.FileName = fileName;
                 if (File.Exists(disk.FilePath))
                 {
                     var item = JsonConvert.DeserializeObject<T>(
-                        File.ReadAllText(disk.FilePath), jsonSettings);
+                        File.ReadAllText(disk.FilePath),
+                        jsonSettings
+                    );
                     return item;
                 }
-                else { return default(T); }
+                else
+                {
+                    return default(T);
+                }
             }
-            else { return default(T); }
+            else
+            {
+                return default(T);
+            }
         }
 
-        internal async virtual Task<T> DeserializeAsync<T>(string fileNameSeed, string fileNameSuffix = "")
+        internal virtual async Task<T> DeserializeAsync<T>(
+            string fileNameSeed,
+            string fileNameSuffix = ""
+        )
         {
             var jsonSettings = new JsonSerializerSettings()
             {
                 TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented
+                Formatting = Formatting.Indented,
             };
             var disk = new FilePathHelper();
             if (_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
             {
-                disk.FolderPath = Path.Combine(folderRoot, "Bayesian"); ;
+                disk.FolderPath = Path.Combine(folderRoot, "Bayesian");
+                ;
             }
-            else { return default(T); }
+            else
+            {
+                return default(T);
+            }
 
-            var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
+            var fileName = fileNameSuffix.IsNullOrEmpty()
+                ? $"{fileNameSeed}.json"
+                : $"{fileNameSeed}_{fileNameSuffix}.json";
             disk.FileName = fileName;
             if (File.Exists(disk.FilePath))
             {
@@ -107,15 +141,22 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 var item = JsonConvert.DeserializeObject<T>(fileText, jsonSettings);
                 return item;
             }
-            else { return default(T); }
+            else
+            {
+                return default(T);
+            }
         }
 
-        internal virtual void SerializeAndSave<T>(T obj, string fileNameSeed, string fileNameSuffix = "")
+        internal virtual void SerializeAndSave<T>(
+            T obj,
+            string fileNameSeed,
+            string fileNameSuffix = ""
+        )
         {
             var jsonSettings = new JsonSerializerSettings()
             {
                 TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented
+                Formatting = Formatting.Indented,
             };
             var serializer = JsonSerializer.Create(jsonSettings);
             var disk = new FilePathHelper();
@@ -123,14 +164,23 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             {
                 disk.FolderPath = Path.Combine(folderRoot, "Bayesian");
             }
-            else { return; }
+            else
+            {
+                return;
+            }
 
-            var fileName = fileNameSuffix.IsNullOrEmpty() ? $"{fileNameSeed}.json" : $"{fileNameSeed}_{fileNameSuffix}.json";
+            var fileName = fileNameSuffix.IsNullOrEmpty()
+                ? $"{fileNameSeed}.json"
+                : $"{fileNameSeed}_{fileNameSuffix}.json";
             disk.FileName = fileName;
             SerializeAndSave(obj, serializer, disk);
         }
 
-        internal virtual void SerializeAndSave<T>(T obj, JsonSerializer serializer, FilePathHelper disk)
+        internal virtual void SerializeAndSave<T>(
+            T obj,
+            JsonSerializer serializer,
+            FilePathHelper disk
+        )
         {
             Directory.CreateDirectory(disk.FolderPath);
             using (StreamWriter sw = File.CreateText(disk.FilePath))
@@ -140,7 +190,12 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             }
         }
 
-        internal virtual void SerializeFsSave<T>(T obj, string objName, JsonSerializer serializer, FilePathHelper disk)
+        internal virtual void SerializeFsSave<T>(
+            T obj,
+            string objName,
+            JsonSerializer serializer,
+            FilePathHelper disk
+        )
         {
             disk.FileName = $"{objName}_Example.json";
             Directory.CreateDirectory(disk.FolderPath);
@@ -152,31 +207,38 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             }
         }
 
-        internal virtual void LogSizeComparison(string m1, long s1, string m2, long s2, string objectName)
+        internal virtual void LogSizeComparison(
+            string m1,
+            long s1,
+            string m2,
+            long s2,
+            string objectName
+        )
         {
-            var jagged = new string[][]
-            {
-                [m1, $"{s1:N0}"],
-                [m2, $"{s2:N0}"],
-            };
+            var jagged = new string[][] { [m1, $"{s1:N0}"], [m2, $"{s2:N0}"] };
 
             var text = jagged.ToFormattedText(
                 ["Method", "Size"],
                 [Enums.Justification.Left, Enums.Justification.Right],
-                $"{objectName} Size");
+                $"{objectName} Size"
+            );
 
             //logger.Debug($"Object size calculations:\n{text}");
         }
 
         public virtual void SerializeActiveItem()
         {
-            var (mailItem, s1) = TryLoadObjectAndGetMemorySize(() => _globals.Ol.App.ActiveExplorer().Selection[1]);
+            var (mailItem, s1) = TryLoadObjectAndGetMemorySize(() =>
+                _globals.Ol.App.ActiveExplorer().Selection[1]
+            );
             var s2 = 0; //ObjectSize(mailItem);
 
             LogSizeComparison("GC Allocation", s1, "Serialization", s2, "MailItem");
 
-            if (mailItem is not null) { SerializeMailInfo(mailItem); }
-
+            if (mailItem is not null)
+            {
+                SerializeMailInfo(mailItem);
+            }
         }
 
         internal virtual void SerializeMailInfo(MailItem mailItem)
@@ -184,7 +246,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             var jsonSettings = new JsonSerializerSettings()
             {
                 TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented
+                Formatting = Formatting.Indented,
             };
             var serializer = JsonSerializer.Create(jsonSettings);
 
@@ -193,31 +255,57 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             {
                 disk.FolderPath = Path.Combine(folderRoot, "Bayesian");
             }
-            else { return; }
+            else
+            {
+                return;
+            }
 
             SerializeFsSave(mailItem, "MailItem", serializer, disk);
 
-
             var (mailInfo, sizeMailInfo1) = TryLoadObjectAndGetMemorySize(() =>
-                new MailItemHelper(mailItem, _globals).LoadAll(_globals, _globals.Ol.ArchiveRoot, true));
+                new MailItemHelper(mailItem, _globals).LoadAll(
+                    _globals,
+                    _globals.Ol.ArchiveRoot,
+                    true
+                )
+            );
             var sizeMailInfo2 = 0; // ObjectSize(mailInfo);
-            LogSizeComparison("GC Allocation", sizeMailInfo1, "Serialization", sizeMailInfo2, "MailItemInfo");
+            LogSizeComparison(
+                "GC Allocation",
+                sizeMailInfo1,
+                "Serialization",
+                sizeMailInfo2,
+                "MailItemInfo"
+            );
             SerializeFsSave(mailInfo, "MailItemInfo", serializer, disk);
 
-
-
             var (minedInfo, sizeMinedInfo1) = TryLoadObjectAndGetMemorySize(() =>
-                new MinedMailInfo(mailInfo));
+                new MinedMailInfo(mailInfo)
+            );
             var sizeMinedInfo2 = 0; // ObjectSize(minedInfo);
-            LogSizeComparison("GC Allocation", sizeMinedInfo1, "Serialization", sizeMinedInfo2, "MinedMailInfo");
+            LogSizeComparison(
+                "GC Allocation",
+                sizeMinedInfo1,
+                "Serialization",
+                sizeMinedInfo2,
+                "MinedMailInfo"
+            );
             SerializeFsSave(minedInfo, "MinedMailInfo", serializer, disk);
-
         }
 
-        internal virtual (T Object, long Size) TryLoadObjectAndGetMemorySize<T>(Func<T> loader, int copiesToLoad = 1)
+        internal virtual (T Object, long Size) TryLoadObjectAndGetMemorySize<T>(
+            Func<T> loader,
+            int copiesToLoad = 1
+        )
         {
             loader.ThrowIfNull();
-            if (copiesToLoad < 1) { throw new ArgumentOutOfRangeException(nameof(copiesToLoad), $"{nameof(copiesToLoad)} must be greater than 0"); }
+            if (copiesToLoad < 1)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(copiesToLoad),
+                    $"{nameof(copiesToLoad)} must be greater than 0"
+                );
+            }
             var start = GC.GetTotalMemory(true);
             long end = 0;
 
@@ -235,7 +323,6 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                         objects[i] = handle;
                     }
                     end = GC.GetTotalMemory(true);
-
                 }
                 catch (System.Exception e)
                 {
@@ -246,7 +333,10 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 {
                     for (int i = 1; i < copiesToLoad; i++)
                     {
-                        if (objects[i].IsAllocated) { objects[i].Free(); }
+                        if (objects[i].IsAllocated)
+                        {
+                            objects[i].Free();
+                        }
                     }
                 }
             }
@@ -260,13 +350,18 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             var jsonSettings = new JsonSerializerSettings()
             {
                 TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented
+                Formatting = Formatting.Indented,
             };
             var serializer = JsonSerializer.Create(jsonSettings);
             return serializer;
         }
 
-        public virtual void SerializeChunk(MinedMailInfo[] chunk, JsonSerializer serializer, FilePathHelper disk, int i)
+        public virtual void SerializeChunk(
+            MinedMailInfo[] chunk,
+            JsonSerializer serializer,
+            FilePathHelper disk,
+            int i
+        )
         {
             disk.FileName = $"MinedMailInfo_{i:000}.json";
             using (StreamWriter sw = File.CreateText(disk.FilePath))
@@ -278,7 +373,10 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             disk.FileName = null;
         }
 
-        public async virtual Task<bool> ValidateJson<T>(string fileNameSeed, string fileNameSuffix = "")
+        public virtual async Task<bool> ValidateJson<T>(
+            string fileNameSeed,
+            string fileNameSuffix = ""
+        )
         {
             try
             {
@@ -293,12 +391,13 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 if (fileNameSuffix.IsNullOrEmpty())
                     logger.Error($"Error deserializing {typeof(T).Name}.json. \n{e.Message}", e);
                 else
-                    logger.Error($"Error deserializing {typeof(T).Name}_{fileNameSuffix}.json. \n{e.Message}", e);
+                    logger.Error(
+                        $"Error deserializing {typeof(T).Name}_{fileNameSuffix}.json. \n{e.Message}",
+                        e
+                    );
                 return false;
             }
-
         }
-
 
         #endregion Testing Sizing and Serialization Methods
 
@@ -310,8 +409,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             var remaining = count - complete;
             var remainingSeconds = remaining * seconds;
             var ts = TimeSpan.FromSeconds(remainingSeconds);
-            string msg = $"Completed {complete} of {count} ({seconds:N2} spm) " +
-                $"({sw.Elapsed:%m\\:ss} elapsed {ts:%m\\:ss} remaining)";
+            string msg =
+                $"Completed {complete} of {count} ({seconds:N2} spm) "
+                + $"({sw.Elapsed:%m\\:ss} elapsed {ts:%m\\:ss} remaining)";
             return msg;
         }
 
@@ -325,13 +425,15 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             if (!offline)
             {
                 var commandBars = _globals.Ol.App.ActiveExplorer().CommandBars;
-                if (!offline) { commandBars.ExecuteMso("ToggleOnline"); }
+                if (!offline)
+                {
+                    commandBars.ExecuteMso("ToggleOnline");
+                }
                 await Task.Delay(5);
             }
             return offline;
         }
 
         #endregion Helper Methods
-
     }
 }

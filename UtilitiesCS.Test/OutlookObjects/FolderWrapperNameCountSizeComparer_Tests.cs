@@ -58,8 +58,16 @@ namespace UtilitiesCS.Test
         {
             // Arrange
             var comparer = new FolderWrapperNameCountSizeComparer();
-            var lowerCase = CreateFolder("Archive", itemCount: int.MaxValue, folderSize: long.MaxValue);
-            var upperCase = CreateFolder("ARCHIVE", itemCount: int.MaxValue, folderSize: long.MaxValue);
+            var lowerCase = CreateFolder(
+                "Archive",
+                itemCount: int.MaxValue,
+                folderSize: long.MaxValue
+            );
+            var upperCase = CreateFolder(
+                "ARCHIVE",
+                itemCount: int.MaxValue,
+                folderSize: long.MaxValue
+            );
 
             // Act
             int lowerCaseHash = comparer.GetHashCode(lowerCase);
@@ -73,7 +81,13 @@ namespace UtilitiesCS.Test
 
         private static FolderWrapper CreateFolder(string name, int itemCount, long folderSize)
         {
-            return new FolderWrapper(selected: false, itemCount: itemCount, folderSize: folderSize, name: name, relativePath: name ?? string.Empty);
+            return new FolderWrapper(
+                selected: false,
+                itemCount: itemCount,
+                folderSize: folderSize,
+                name: name,
+                relativePath: name ?? string.Empty
+            );
         }
     }
 }

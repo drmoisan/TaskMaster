@@ -1,12 +1,12 @@
-using Microsoft.Office.Interop.Outlook;
-using System.Collections.Generic;
-using System.Collections;
-using System.Windows.Forms;
-using UtilitiesCS;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using QuickFiler.Helper_Classes;
+using System.Windows.Forms;
+using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Controllers;
+using QuickFiler.Helper_Classes;
+using UtilitiesCS;
 
 namespace QuickFiler.Interfaces
 {
@@ -17,10 +17,23 @@ namespace QuickFiler.Interfaces
 
         // UI Add and Remove QfcItems
         Task LoadSecondaryAsync();
-        void LoadControlsAndHandlers_01(IList<MailItem> listObjects, RowStyle template, RowStyle templateExpanded);
+        void LoadControlsAndHandlers_01(
+            IList<MailItem> listObjects,
+            RowStyle template,
+            RowStyle templateExpanded
+        );
         void LoadControlsAndHandlers_01(TableLayoutPanel tlp, List<QfcItemGroup> itemGroups);
-        Task LoadControlsAndHandlers_01Async(IList<MailItem> listObjects, RowStyle template, RowStyle templateExpanded);
-        ItemViewer LoadItemViewer_03(int intItemNumber, RowStyle template, bool blGroupConversation = true, int columnNumber = 0);
+        Task LoadControlsAndHandlers_01Async(
+            IList<MailItem> listObjects,
+            RowStyle template,
+            RowStyle templateExpanded
+        );
+        ItemViewer LoadItemViewer_03(
+            int intItemNumber,
+            RowStyle template,
+            bool blGroupConversation = true,
+            int columnNumber = 0
+        );
         void PopOutControlGroup(int intPosition);
         Task PopOutControlGroupAsync(int selection);
         void RemoveControls();
@@ -44,7 +57,12 @@ namespace QuickFiler.Interfaces
         // UI Converations Expansion
         void ToggleGroupConv(int childCount, int indexOriginal);
         void ToggleGroupConv(string originalId);
-        void ToggleUnGroupConv(ConversationResolver resolver, string entryID, int conversationCount, object folderList);
+        void ToggleUnGroupConv(
+            ConversationResolver resolver,
+            string entryID,
+            int conversationCount,
+            object folderList
+        );
         void MakeSpaceForItems(int insertionIndex, int insertCount);
 
         // UI Light Dark
@@ -67,7 +85,13 @@ namespace QuickFiler.Interfaces
 
         void Cleanup();
 
-        string[] GetMoveDiagnostics(string durationText, string durationMinutesText, double Duration, string dataLineBeg, DateTime OlEndTime, ref AppointmentItem OlAppointment);
-
+        string[] GetMoveDiagnostics(
+            string durationText,
+            string durationMinutesText,
+            double Duration,
+            string dataLineBeg,
+            DateTime OlEndTime,
+            ref AppointmentItem OlAppointment
+        );
     }
 }

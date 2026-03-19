@@ -7,7 +7,6 @@ using System.Resources;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 
-
 namespace SVGControl
 {
     public partial class ButtonSVG : Button
@@ -19,9 +18,11 @@ namespace SVGControl
             //var caller = System.Reflection.Assembly.GetCallingAssembly();
             InitializeComponent();
             //var caller = this.Parent.GetType().Assembly;
-            _imageSVG = new SvgImageSelector(base.Size,
-                                             new Padding(3),
-                                             SVGControl.AutoSize.MaintainAspectRatio);
+            _imageSVG = new SvgImageSelector(
+                base.Size,
+                new Padding(3),
+                SVGControl.AutoSize.MaintainAspectRatio
+            );
             _imageSVG.PropertyChanged += ImageSVG_PropertyChanged;
             this.Resize += ButtonSVG_Resize;
         }
@@ -44,7 +45,10 @@ namespace SVGControl
         {
             base.Image = ImageSVG.Render();
             //this.Refresh();
-            this.InvokePaint(this, new PaintEventArgs(this.CreateGraphics(), this.DisplayRectangle));
+            this.InvokePaint(
+                this,
+                new PaintEventArgs(this.CreateGraphics(), this.DisplayRectangle)
+            );
             //this.Image = ImageSVG.Render();
         }
 
@@ -71,7 +75,8 @@ namespace SVGControl
 
         private static string GetStringForValue(object value)
         {
-            if (value == null) return "null";
+            if (value == null)
+                return "null";
             return value.ToString();
         }
     }

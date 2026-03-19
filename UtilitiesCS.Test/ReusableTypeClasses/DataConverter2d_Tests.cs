@@ -12,11 +12,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void ToDouble_WithJaggedIntArray_NormalizesEachValueBy255()
         {
             // Arrange
-            var image = new[]
-            {
-                new[] { 0, 255 },
-                new[] { 128, 64 },
-            };
+            var image = new[] { new[] { 0, 255 }, new[] { 128, 64 } };
 
             // Act
             var result = DataConverter2d.ToDouble(image);

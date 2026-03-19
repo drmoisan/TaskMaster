@@ -1,21 +1,23 @@
-﻿using log4net.Repository.Hierarchy;
-using QuickFiler.Interfaces;
-using Swordfish.NET.Collections;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using log4net.Repository.Hierarchy;
+using QuickFiler.Interfaces;
+using Swordfish.NET.Collections;
 using UtilitiesCS;
 
 namespace QuickFiler.Controllers
 {
-    public class KbdActions<TKey, UClass, VDelegate> : IEnumerable<UClass> where UClass : IKbdAction<TKey, VDelegate>, new()
+    public class KbdActions<TKey, UClass, VDelegate> : IEnumerable<UClass>
+        where UClass : IKbdAction<TKey, VDelegate>, new()
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public KbdActions()
         {
@@ -32,7 +34,6 @@ namespace QuickFiler.Controllers
         public VDelegate this[TKey key]
         {
             get => this.Find(key).Delegate;
-
             set
             {
                 var element = this.Find(key);
@@ -58,7 +59,8 @@ namespace QuickFiler.Controllers
                 case 1:
                     return matches.First();
                 default:
-                    var message = $"Multiple sources have registered actions for Key {key}. SourceId list ";
+                    var message =
+                        $"Multiple sources have registered actions for Key {key}. SourceId list ";
                     message += $"[{matches.Select(x => x.SourceId).SentenceJoin()}]";
                     throw new InvalidOperationException(message);
             }
@@ -75,7 +77,8 @@ namespace QuickFiler.Controllers
                 case 1:
                     return _list.FindIndex(x => x.KeyEquals(key));
                 default:
-                    var message = $"Multiple sources have registered actions for Key {key}. SourceId list ";
+                    var message =
+                        $"Multiple sources have registered actions for Key {key}. SourceId list ";
                     message += $"[{matches.Select(x => x.SourceId).SentenceJoin()}]";
                     logger.Error(message);
                     throw new InvalidOperationException(message);
@@ -86,7 +89,8 @@ namespace QuickFiler.Controllers
         {
             if (_list.Any(x => x.SourceId == sourceId && x.KeyEquals(key)))
             {
-                string message = $"Cannot add key because it already exists. Key {key} SourceId {sourceId}";
+                string message =
+                    $"Cannot add key because it already exists. Key {key} SourceId {sourceId}";
                 logger.Error(message);
                 throw new ArgumentException(message);
             }
@@ -99,10 +103,10 @@ namespace QuickFiler.Controllers
 
         public void Add(UClass instance)
         {
-
             if (_list.Any(x => x.SourceId == instance.SourceId && x.KeyEquals(instance.Key)))
             {
-                string message = $"Cannot add key because it already exists. Key {instance.Key} SourceId {instance.SourceId}";
+                string message =
+                    $"Cannot add key because it already exists. Key {instance.Key} SourceId {instance.SourceId}";
 
                 logger.Error(message);
                 throw new ArgumentException(message, nameof(instance));
@@ -113,7 +117,10 @@ namespace QuickFiler.Controllers
         public bool Remove(string sourceId, TKey key)
         {
             var index = _list.FindIndex(x => x.SourceId == sourceId && x.KeyEquals(key));
-            if (index == -1) { return false; }
+            if (index == -1)
+            {
+                return false;
+            }
             else
             {
                 _list.RemoveAt(index);
@@ -125,7 +132,9 @@ namespace QuickFiler.Controllers
 
         IEnumerator IEnumerable.GetEnumerator() => _list.GetEnumerator();
 
-        public ICollection<TKey> Keys { get => _list.Select(x => x.Key).ToList(); }
+        public ICollection<TKey> Keys
+        {
+            get => _list.Select(x => x.Key).ToList();
+        }
     }
-
 }

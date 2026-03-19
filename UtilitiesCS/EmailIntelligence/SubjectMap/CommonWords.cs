@@ -10,10 +10,14 @@ namespace UtilitiesCS.EmailIntelligence
 {
     public static class CommonWords
     {
-        public static string StripCommonWords(this string sentence, ISerializableList<string> commonWords)
+        public static string StripCommonWords(
+            this string sentence,
+            ISerializableList<string> commonWords
+        )
         {
             return sentence.StripCommonWords((IList<string>)commonWords);
         }
+
         public static string[] StripCommonWords(this string[] tokens, IList<string> commonWords)
         {
             if (tokens.Length == 0)
@@ -22,15 +26,25 @@ namespace UtilitiesCS.EmailIntelligence
             }
             else
             {
-                return (from word in tokens where !commonWords.Contains(word) select word.StripAccents()).ToArray();
+                return (
+                    from word in tokens
+                    where !commonWords.Contains(word)
+                    select word.StripAccents()
+                ).ToArray();
             }
         }
+
         public static string StripCommonWords(this string sentence, IList<string> commonWords)
         {
             Regex tokenizer = Tokenizer.GetRegex();
             return sentence.StripCommonWords(commonWords, tokenizer);
         }
-        public static string StripCommonWords(this string sentence, IList<string> commonWords, Regex tokenizer)
+
+        public static string StripCommonWords(
+            this string sentence,
+            IList<string> commonWords,
+            Regex tokenizer
+        )
         {
             var tokens = sentence.Tokenize(tokenizer);
             return string.Join(" ", tokens.StripCommonWords(commonWords));
@@ -75,6 +89,5 @@ namespace UtilitiesCS.EmailIntelligence
                 }
             return sb.ToString();
         }
-
     }
 }

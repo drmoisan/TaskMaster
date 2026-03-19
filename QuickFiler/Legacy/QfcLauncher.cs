@@ -1,13 +1,11 @@
-﻿using ToDoModel;
-using UtilitiesCS;
+﻿using System.Collections.Generic;
 using Microsoft.Office.Interop.Outlook;
-using System.Collections.Generic;
-
+using ToDoModel;
+using UtilitiesCS;
 
 namespace QuickFiler.Legacy
 {
-
-    public class QfcLauncher 
+    public class QfcLauncher
     {
         private QfcFormLegacyViewer _viewer;
         private QuickFileController _controller;
@@ -20,11 +18,13 @@ namespace QuickFiler.Legacy
             _globals = AppGlobals;
             _parentCleanup = ParentCleanup;
             _viewer = new QfcFormLegacyViewer();
-            
-            var listEmailsInFolder = FolderSuggestions.LoadEmailDataBase(_globals.Ol.App.ActiveExplorer()); //as List<MailItem>;
+
+            var listEmailsInFolder = FolderSuggestions.LoadEmailDataBase(
+                _globals.Ol.App.ActiveExplorer()
+            ); //as List<MailItem>;
             Queue<MailItem> MasterQueue = new Queue<MailItem>();
-            foreach (MailItem email in listEmailsInFolder) 
-            { 
+            foreach (MailItem email in listEmailsInFolder)
+            {
                 MasterQueue.Enqueue(email);
             }
             _controller = new QuickFileController(_globals, _viewer, MasterQueue, Cleanup);

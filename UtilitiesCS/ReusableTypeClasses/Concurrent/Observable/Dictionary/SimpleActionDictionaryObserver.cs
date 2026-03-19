@@ -6,7 +6,9 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
     {
         private readonly Action<DictionaryChangedEventArgs<TKey, TValue>> _action;
 
-        public SimpleActionDictionaryObserver(Action<DictionaryChangedEventArgs<TKey, TValue>> action)
+        public SimpleActionDictionaryObserver(
+            Action<DictionaryChangedEventArgs<TKey, TValue>> action
+        )
         {
             _action = action;
         }

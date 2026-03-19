@@ -1,7 +1,7 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS.Test.HelperClasses
@@ -32,9 +32,11 @@ namespace UtilitiesCS.Test.HelperClasses
             Action act = () => ObjectCopier.Clone(source);
 
             // Assert
-            act.Should().Throw<ArgumentException>()
+            act.Should()
+                .Throw<ArgumentException>()
                 .WithMessage("*serializable*")
-                .And.ParamName.Should().Be("source");
+                .And.ParamName.Should()
+                .Be("source");
         }
 
         [TestMethod]
@@ -44,7 +46,7 @@ namespace UtilitiesCS.Test.HelperClasses
             var source = new SerializablePerson
             {
                 Name = "Ada",
-                Address = new SerializableAddress { City = "Montreal" }
+                Address = new SerializableAddress { City = "Montreal" },
             };
 
             // Act
@@ -66,7 +68,7 @@ namespace UtilitiesCS.Test.HelperClasses
             var source = new SerializablePerson
             {
                 Name = "Ada",
-                Aliases = new List<string> { "A", "B" }
+                Aliases = new List<string> { "A", "B" },
             };
 
             // Act

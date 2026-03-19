@@ -69,7 +69,9 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             root.AddChild("right");
 
             // Act
-            var descendents = root.Descendents(includeSelf: true).Select(node => node.Value).ToArray();
+            var descendents = root.Descendents(includeSelf: true)
+                .Select(node => node.Value)
+                .ToArray();
             var flattenedValues = root.Flatten().ToArray();
             var flattenedNodes = root.FlattenNodes().Select(node => node.Value).ToArray();
 
@@ -109,10 +111,18 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             root.AddChild("other");
 
             // Act
-            var firstByDepth = root.FindNode(value => value.StartsWith("leaf"), descendByLevel: true);
-            var allContainingO = root.FindAll(value => value.Contains('o')).Select(node => node.Value).ToArray();
+            var firstByDepth = root.FindNode(
+                value => value.StartsWith("leaf"),
+                descendByLevel: true
+            );
+            var allContainingO = root.FindAll(value => value.Contains('o'))
+                .Select(node => node.Value)
+                .ToArray();
             var ancestor = leaf.FirstAncestor(value => value == "root");
-            var sequential = root.FindSequentialNode((current, expected) => current == expected, new Queue<string>(new[] { "root", "branch", "leaf" }));
+            var sequential = root.FindSequentialNode(
+                (current, expected) => current == expected,
+                new Queue<string>(new[] { "root", "branch", "leaf" })
+            );
 
             // Assert
             firstByDepth.Value.Should().Be("leaf");

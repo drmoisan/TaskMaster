@@ -40,15 +40,17 @@ namespace UtilitiesCS.Test.OutlookObjects.AppointmentItemCoverage
         [TestMethod]
         public void CompressPlainText_ShouldStripConfiguredSectionsAndAppendEndMarker()
         {
-            const string text = "WARNING\r\nHello <https://example.test>\r\nFrom: Person\r\nSubject: Re: Status\r\nOlder content";
+            const string text =
+                "WARNING\r\nHello <https://example.test>\r\nFrom: Person\r\nSubject: Re: Status\r\nOlder content";
 
             var result = MeetingItemHelper.CompressPlainText(
                 text,
-                IItemInfo.PlainTextOptionsEnum.StripWarning |
-                IItemInfo.PlainTextOptionsEnum.StripLinks |
-                IItemInfo.PlainTextOptionsEnum.StripReplyBody |
-                IItemInfo.PlainTextOptionsEnum.StripFormatting,
-                "WARNING");
+                IItemInfo.PlainTextOptionsEnum.StripWarning
+                    | IItemInfo.PlainTextOptionsEnum.StripLinks
+                    | IItemInfo.PlainTextOptionsEnum.StripReplyBody
+                    | IItemInfo.PlainTextOptionsEnum.StripFormatting,
+                "WARNING"
+            );
 
             result.Should().StartWith("Hello");
             result.Should().NotContain("WARNING");
@@ -152,7 +154,11 @@ namespace UtilitiesCS.Test.OutlookObjects.AppointmentItemCoverage
             result.Size.Should().Be(128);
         }
 
-        private static Mock<IApplicationGlobals> CreateGlobals(OutlookFolder archiveRoot, OutlookFolder inbox, string archiveRootPath)
+        private static Mock<IApplicationGlobals> CreateGlobals(
+            OutlookFolder archiveRoot,
+            OutlookFolder inbox,
+            string archiveRootPath
+        )
         {
             var olObjects = new Mock<IOlObjects>();
             olObjects.SetupGet(x => x.ArchiveRoot).Returns(archiveRoot);
@@ -167,14 +173,18 @@ namespace UtilitiesCS.Test.OutlookObjects.AppointmentItemCoverage
         private static MeetingItemHelper CreateHelper()
         {
 #pragma warning disable SYSLIB0050
-            return (MeetingItemHelper)FormatterServices.GetUninitializedObject(typeof(MeetingItemHelper));
+            return (MeetingItemHelper)
+                FormatterServices.GetUninitializedObject(typeof(MeetingItemHelper));
 #pragma warning restore SYSLIB0050
         }
 
         private static void SetField(MeetingItemHelper helper, string fieldName, object value)
         {
-            var field = typeof(MeetingItemHelper).GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)
-                ?? throw new MissingFieldException(typeof(MeetingItemHelper).FullName, fieldName);
+            var field =
+                typeof(MeetingItemHelper).GetField(
+                    fieldName,
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                ) ?? throw new MissingFieldException(typeof(MeetingItemHelper).FullName, fieldName);
             field.SetValue(helper, value);
         }
 

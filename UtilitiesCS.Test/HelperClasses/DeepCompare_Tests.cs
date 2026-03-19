@@ -19,8 +19,7 @@ namespace UtilitiesCS.Test.HelperClasses
             Action act = () => Deep.DeepDifferences<PlainNode>(null, obj2);
 
             // Assert
-            act.Should().Throw<ArgumentNullException>()
-                .WithParameterName("obj");
+            act.Should().Throw<ArgumentNullException>().WithParameterName("obj");
         }
 
         [TestMethod]
@@ -41,8 +40,16 @@ namespace UtilitiesCS.Test.HelperClasses
         public void DeepDifferences_PlainNestedCollectionAndCircularObjects_ThrowInvalidCastException()
         {
             // Arrange
-            var obj1 = new GraphNode { Label = "root", Items = new List<int> { 1, 2, 3 } };
-            var obj2 = new GraphNode { Label = "other", Items = new List<int> { 1, 2, 4 } };
+            var obj1 = new GraphNode
+            {
+                Label = "root",
+                Items = new List<int> { 1, 2, 3 },
+            };
+            var obj2 = new GraphNode
+            {
+                Label = "other",
+                Items = new List<int> { 1, 2, 4 },
+            };
             obj1.Next = obj1;
             obj2.Next = obj2;
 

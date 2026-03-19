@@ -1,14 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Windows.Forms;
-using UtilitiesCS;
-using Moq;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Windows.Forms;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using QuickFiler;
 using QuickFiler.Controllers;
 using QuickFiler.Interfaces;
 using TaskVisualization;
-using QuickFiler;
+using UtilitiesCS;
 
 namespace Z.Disabled.QuickFiler.Test
 {
@@ -18,8 +18,6 @@ namespace Z.Disabled.QuickFiler.Test
         //private QfcFormViewer qf;
         //private ItemViewer iv;
         //private Mock<IFilerFormController> formController;
-
-
 
         [TestInitialize]
         public void Disabled_Init()
@@ -51,14 +49,13 @@ namespace Z.Disabled.QuickFiler.Test
 
             //qf.Refresh();
 
-
             //qf.L1v0L2L3v_TableLayout.Controls.Add(iv, 0, 0);
             //iv.AutoSize = true;
             //iv.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             //iv.BorderStyle = BorderStyle.FixedSingle;
             //iv.Dock = DockStyle.Fill;
 
-            ////iv.Show(); 
+            ////iv.Show();
             ////qf.Refresh();
             //qf.Hide();
             //qf.ShowDialog();
@@ -72,7 +69,7 @@ namespace Z.Disabled.QuickFiler.Test
 
             //IList<Label> tipsLabels = qf.QfcItemViewerTemplate.TipsLabels;
             //IList<QfcTipsDetails> listTipsDetails = new List<QfcTipsDetails>();
-            //foreach (Label tipsLabel in tipsLabels) 
+            //foreach (Label tipsLabel in tipsLabels)
             //{
             //    listTipsDetails.Add(new QfcTipsDetails(tipsLabel));
             //}

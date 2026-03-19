@@ -15,7 +15,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         [TestMethod]
         public void Resolver_failure_returns_controlled_result_without_live_outlook()
         {
-            ConvHelper.SafeResolveConversationItem(new object(), (ns, id, sid) => throw new System.Exception()).Should().BeNull();
+            ConvHelper
+                .SafeResolveConversationItem(
+                    new object(),
+                    (ns, id, sid) => throw new System.Exception()
+                )
+                .Should()
+                .BeNull();
         }
     }
 }

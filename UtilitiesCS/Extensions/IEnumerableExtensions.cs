@@ -11,7 +11,6 @@ using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.Threading;
 
-
 namespace UtilitiesCS
 {
     public static class IEnumerableExtensions
@@ -48,18 +47,36 @@ namespace UtilitiesCS
                 {
                     yield return default(TResult);
                 }
-                else { yield return (TResult)item; }
+                else
+                {
+                    yield return (TResult)item;
+                }
             }
         }
 
-        public static (int DifferenceCount, IEnumerable<T> OnlyThis, IEnumerable<T> OnlyOther) CompareTo<T>(this IEnumerable<T> enumerable, IEnumerable<T> other)
+        public static (
+            int DifferenceCount,
+            IEnumerable<T> OnlyThis,
+            IEnumerable<T> OnlyOther
+        ) CompareTo<T>(this IEnumerable<T> enumerable, IEnumerable<T> other)
         {
             if (enumerable is null)
             {
-                if (other is null) { throw new ArgumentException($"Cannot compare differences because both {nameof(IEnumerable<T>)} parameters were null"); }
-                else { return (other.Count(), [], [.. other]); }
+                if (other is null)
+                {
+                    throw new ArgumentException(
+                        $"Cannot compare differences because both {nameof(IEnumerable<T>)} parameters were null"
+                    );
+                }
+                else
+                {
+                    return (other.Count(), [], [.. other]);
+                }
             }
-            else if (other is null) { return (enumerable.Count(), [.. enumerable], []); }
+            else if (other is null)
+            {
+                return (enumerable.Count(), [.. enumerable], []);
+            }
             else
             {
                 var onlyThis = enumerable.Except(other);
@@ -68,7 +85,6 @@ namespace UtilitiesCS
                 return (differenceCount, onlyThis, onlyOther);
             }
         }
-
 
         //public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
         //{
@@ -80,29 +96,49 @@ namespace UtilitiesCS
 
         public static bool IsSubsetOf<T>(this IEnumerable<T> source, IEnumerable<T> other)
         {
-            if (source is null || other is null) { return false; }
+            if (source is null || other is null)
+            {
+                return false;
+            }
             return !source.Except(other).Any();
         }
 
-        public static IEnumerable<TValue> SelectGroup<TKey, TValue>(this IEnumerable<IGrouping<TKey, TValue>> groups, TKey key)
+        public static IEnumerable<TValue> SelectGroup<TKey, TValue>(
+            this IEnumerable<IGrouping<TKey, TValue>> groups,
+            TKey key
+        )
         {
             return groups.Where(x => x.Key.Equals(key)).SelectMany(x => x);
         }
 
-        public static string StringJoin(this IEnumerable<string> strings, string seperator = ",") => string.Join(seperator, strings);
+        public static string StringJoin(this IEnumerable<string> strings, string seperator = ",") =>
+            string.Join(seperator, strings);
 
-        public static string StringJoin(this IEnumerable<char> chars, string seperator = "") => string.Join(seperator, chars);
+        public static string StringJoin(this IEnumerable<char> chars, string seperator = "") =>
+            string.Join(seperator, chars);
 
-        internal static List<T> ToList<T>(this IEnumerable<T> enumerable, int count, ProgressTracker progress)
+        internal static List<T> ToList<T>(
+            this IEnumerable<T> enumerable,
+            int count,
+            ProgressTracker progress
+        )
         {
             int completed = 0;
             List<T> list = null;
             progress.Report(0, $"Consuming {0:N0} of {count:N0}");
 
-            using (new System.Threading.Timer(_ => progress.Report(
-                    completed,
-                    $"Consuming {(int)((double)completed * (double)count / 100):N0} of {count:N0}"),
-                    null, 0, 500))
+            using (
+                new System.Threading.Timer(
+                    _ =>
+                        progress.Report(
+                            completed,
+                            $"Consuming {(int)((double)completed * (double)count / 100):N0} of {count:N0}"
+                        ),
+                    null,
+                    0,
+                    500
+                )
+            )
             {
                 list = enumerable.WithProgressReporting(count, (x) => completed = x).ToList();
             }
@@ -114,9 +150,16 @@ namespace UtilitiesCS
             return new Stack<T>(enumerable);
         }
 
-        public static IEnumerable<T> WithProgressReporting<T>(this IEnumerable<T> enumerable, long count, Action<int> progress)
+        public static IEnumerable<T> WithProgressReporting<T>(
+            this IEnumerable<T> enumerable,
+            long count,
+            Action<int> progress
+        )
         {
-            if (enumerable is null) { throw new ArgumentNullException($"{nameof(enumerable)}"); }
+            if (enumerable is null)
+            {
+                throw new ArgumentNullException($"{nameof(enumerable)}");
+            }
 
             int completed = 0;
             foreach (var item in enumerable)
@@ -128,9 +171,16 @@ namespace UtilitiesCS
             }
         }
 
-        public static IEnumerable<T> WithProgressReporting<T>(this IEnumerable<T> enumerable, long count, Action<long, long> progress)
+        public static IEnumerable<T> WithProgressReporting<T>(
+            this IEnumerable<T> enumerable,
+            long count,
+            Action<long, long> progress
+        )
         {
-            if (enumerable is null) { throw new ArgumentNullException($"{nameof(enumerable)}"); }
+            if (enumerable is null)
+            {
+                throw new ArgumentNullException($"{nameof(enumerable)}");
+            }
 
             long completed = 0;
             foreach (var item in enumerable)
@@ -142,7 +192,12 @@ namespace UtilitiesCS
             }
         }
 
-        public static IEnumerable<T> WithProgressReporting<T>(this IEnumerable<T> enumerable, int count, ProgressTrackerPane progress, Stopwatch sw)
+        public static IEnumerable<T> WithProgressReporting<T>(
+            this IEnumerable<T> enumerable,
+            int count,
+            ProgressTrackerPane progress,
+            Stopwatch sw
+        )
         {
             enumerable.ThrowIfNullOrEmpty();
             progress.ThrowIfNull();
@@ -157,7 +212,8 @@ namespace UtilitiesCS
 
                 progress.Report(
                     (double)completed / count * 100,
-                    $"Testing Classifiers -> {GetProgressMessage(completed, count, sw)}");
+                    $"Testing Classifiers -> {GetProgressMessage(completed, count, sw)}"
+                );
             }
         }
 
@@ -167,15 +223,21 @@ namespace UtilitiesCS
             var remaining = count - complete;
             var remainingSeconds = remaining * seconds;
             var ts = TimeSpan.FromSeconds(remainingSeconds);
-            string msg = $"Completed {complete} of {count} ({seconds:N2} spm) " +
-                $"({sw.Elapsed:%m\\:ss} elapsed {ts:%m\\:ss} remaining)";
+            string msg =
+                $"Completed {complete} of {count} ({seconds:N2} spm) "
+                + $"({sw.Elapsed:%m\\:ss} elapsed {ts:%m\\:ss} remaining)";
             return msg;
         }
 
-
-        public static IEnumerable<T> WithAction<T>(this IEnumerable<T> enumerable, System.Action action)
+        public static IEnumerable<T> WithAction<T>(
+            this IEnumerable<T> enumerable,
+            System.Action action
+        )
         {
-            if (enumerable is null) { throw new ArgumentNullException($"{nameof(enumerable)}"); }
+            if (enumerable is null)
+            {
+                throw new ArgumentNullException($"{nameof(enumerable)}");
+            }
 
             foreach (var item in enumerable)
             {
@@ -190,17 +252,19 @@ namespace UtilitiesCS
 
             var dt = new DataTable();
             dt.Columns.AddRange(
-              props.Select(p => new DataColumn(p.Name, p.PropertyType)).ToArray()
+                props.Select(p => new DataColumn(p.Name, p.PropertyType)).ToArray()
             );
 
-            source.ToList().ForEach(
-              i => dt.Rows.Add(props.Select(p => p.GetValue(i, null)).ToArray())
-            );
+            source
+                .ToList()
+                .ForEach(i => dt.Rows.Add(props.Select(p => p.GetValue(i, null)).ToArray()));
 
             return dt;
         }
 
-        public static Tuple<IEnumerable<T>, IEnumerable<U>> Unzip<T, U>(this IEnumerable<(T, U)> source)
+        public static Tuple<IEnumerable<T>, IEnumerable<U>> Unzip<T, U>(
+            this IEnumerable<(T, U)> source
+        )
         {
             var first = new List<T>();
             var second = new List<U>();
@@ -214,7 +278,9 @@ namespace UtilitiesCS
             return new Tuple<IEnumerable<T>, IEnumerable<U>>(first, second);
         }
 
-        public static Tuple<IEnumerable<T>, IEnumerable<U>, IEnumerable<V>> Unzip<T, U, V>(this IEnumerable<(T, U, V)> source)
+        public static Tuple<IEnumerable<T>, IEnumerable<U>, IEnumerable<V>> Unzip<T, U, V>(
+            this IEnumerable<(T, U, V)> source
+        )
         {
             var first = new List<T>();
             var second = new List<U>();
@@ -231,7 +297,8 @@ namespace UtilitiesCS
         }
 
         public static IEnumerable<IEnumerable<T>> Transpose<T>(
-            this IEnumerable<IEnumerable<T>> source)
+            this IEnumerable<IEnumerable<T>> source
+        )
         {
             var enumerators = source.Select(e => e.GetEnumerator()).ToArray();
             try
@@ -247,7 +314,10 @@ namespace UtilitiesCS
             }
         }
 
-        public static IEnumerable<TSource[]> Chunk<TSource>(this IEnumerable<TSource> source, int size)
+        public static IEnumerable<TSource[]> Chunk<TSource>(
+            this IEnumerable<TSource> source,
+            int size
+        )
         {
             if (source == null)
             {
@@ -262,7 +332,10 @@ namespace UtilitiesCS
             return ChunkIterator(source, size);
         }
 
-        private static IEnumerable<TSource[]> ChunkIterator<TSource>(IEnumerable<TSource> source, int size)
+        private static IEnumerable<TSource[]> ChunkIterator<TSource>(
+            IEnumerable<TSource> source,
+            int size
+        )
         {
             using IEnumerator<TSource> e = source.GetEnumerator();
 
@@ -314,8 +387,7 @@ namespace UtilitiesCS
                     }
 
                     yield return array;
-                }
-                while (i >= size && e.MoveNext());
+                } while (i >= size && e.MoveNext());
             }
         }
 
@@ -371,17 +443,22 @@ namespace UtilitiesCS
                     }
 
                     yield return array;
-                }
-                while (i >= size && e.MoveNext());
+                } while (i >= size && e.MoveNext());
             }
         }
 
-        public static (T[] Train, T[] Test) SplitTestTrain<T>(this IEnumerable<T> collection, double trainPercent)
+        public static (T[] Train, T[] Test) SplitTestTrain<T>(
+            this IEnumerable<T> collection,
+            double trainPercent
+        )
         {
             collection.ThrowIfNullOrEmpty();
             if (trainPercent < 0 || trainPercent > 1)
             {
-                throw new ArgumentOutOfRangeException(nameof(trainPercent), "Train percentage must be between 0 and 1");
+                throw new ArgumentOutOfRangeException(
+                    nameof(trainPercent),
+                    "Train percentage must be between 0 and 1"
+                );
             }
 
             var array = collection.ToArray();
@@ -390,13 +467,17 @@ namespace UtilitiesCS
             var rnd = new Random();
 
             // Must consume IEnumerable to avoid generating a different random numbers on each iteration
-            var assignments = Enumerable.Range(0, count).Select(x => rnd.NextDouble() > trainPercent ? "Test" : "Train").ToArray();
-            var zipped = array.Zip(assignments, (tElement, grouping) => (grouping, tElement)).ToArray();
+            var assignments = Enumerable
+                .Range(0, count)
+                .Select(x => rnd.NextDouble() > trainPercent ? "Test" : "Train")
+                .ToArray();
+            var zipped = array
+                .Zip(assignments, (tElement, grouping) => (grouping, tElement))
+                .ToArray();
             var train = zipped.Where(x => x.grouping == "Train").Select(x => x.tElement).ToArray();
             var test = zipped.Where(x => x.grouping == "Test").Select(x => x.tElement).ToArray();
 
             return (train, test);
         }
-
     }
 }

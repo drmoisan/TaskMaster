@@ -117,15 +117,39 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
                 var utilitiesAssembly = typeof(UtilitiesCS.StackObjectCS<int>).Assembly;
                 gfgType = utilitiesAssembly.GetType("UtilitiesCS.GFG", throwOnError: true);
                 stackType = gfgType.GetNestedType("myStack", BindingFlags.Public);
-                createStackMethod = gfgType.GetMethod("createMyStack", BindingFlags.Instance | BindingFlags.NonPublic);
-                pushMethod = gfgType.GetMethod("push", BindingFlags.Instance | BindingFlags.NonPublic);
-                popMethod = gfgType.GetMethod("pop", BindingFlags.Instance | BindingFlags.NonPublic);
-                findMiddleMethod = gfgType.GetMethod("findMiddle", BindingFlags.Instance | BindingFlags.NonPublic);
-                deleteMiddleMethod = gfgType.GetMethod("deleteMiddle", BindingFlags.Instance | BindingFlags.NonPublic);
-                countProperty = stackType.GetProperty("count", BindingFlags.Instance | BindingFlags.Public);
-                countField = stackType.GetField("count", BindingFlags.Instance | BindingFlags.Public);
+                createStackMethod = gfgType.GetMethod(
+                    "createMyStack",
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                );
+                pushMethod = gfgType.GetMethod(
+                    "push",
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                );
+                popMethod = gfgType.GetMethod(
+                    "pop",
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                );
+                findMiddleMethod = gfgType.GetMethod(
+                    "findMiddle",
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                );
+                deleteMiddleMethod = gfgType.GetMethod(
+                    "deleteMiddle",
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                );
+                countProperty = stackType.GetProperty(
+                    "count",
+                    BindingFlags.Instance | BindingFlags.Public
+                );
+                countField = stackType.GetField(
+                    "count",
+                    BindingFlags.Instance | BindingFlags.Public
+                );
                 headField = stackType.GetField("head", BindingFlags.Instance | BindingFlags.Public);
-                middleField = stackType.GetField("mid", BindingFlags.Instance | BindingFlags.Public);
+                middleField = stackType.GetField(
+                    "mid",
+                    BindingFlags.Instance | BindingFlags.Public
+                );
             }
 
             public object CreateStack()

@@ -1,7 +1,7 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test.HelperClasses
 {
@@ -87,13 +87,9 @@ namespace UtilitiesCS.Test.HelperClasses
 
         private sealed class SampleTarget
         {
-            public void Alpha()
-            {
-            }
+            public void Alpha() { }
 
-            public void Beta()
-            {
-            }
+            public void Beta() { }
         }
     }
 }

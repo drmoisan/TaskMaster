@@ -1,23 +1,32 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
 using System.Threading.Tasks;
-using System.IO;
+using Newtonsoft.Json;
 using UtilitiesCS.Extensions;
-using System.Collections.Concurrent;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.NewtonsoftHelpers
 {
-    public class ScDictionaryConverter<TDerived, TKey, TValue> : JsonConverter<TDerived> where TDerived : ScDictionary<TKey, TValue>
+    public class ScDictionaryConverter<TDerived, TKey, TValue> : JsonConverter<TDerived>
+        where TDerived : ScDictionary<TKey, TValue>
     {
         public ScDictionaryConverter() { }
 
-        public override TDerived ReadJson(JsonReader reader, Type typeToConvert, TDerived existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override TDerived ReadJson(
+            JsonReader reader,
+            Type typeToConvert,
+            TDerived existingValue,
+            bool hasExistingValue,
+            JsonSerializer serializer
+        )
         {
-            var wrapper = serializer.Deserialize(reader, typeof(WrapperScDictionary<TDerived, TKey, TValue>)) as WrapperScDictionary<TDerived, TKey, TValue>;
+            var wrapper =
+                serializer.Deserialize(reader, typeof(WrapperScDictionary<TDerived, TKey, TValue>))
+                as WrapperScDictionary<TDerived, TKey, TValue>;
             return wrapper?.ToDerived();
         }
 

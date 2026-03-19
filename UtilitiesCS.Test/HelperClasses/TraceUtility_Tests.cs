@@ -1,7 +1,7 @@
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
 using System.Reflection;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test.HelperClasses
 {
@@ -16,7 +16,9 @@ namespace UtilitiesCS.Test.HelperClasses
 
             // Assert
             result.Should().StartWith("TRACE\t");
-            result.Should().Contain(nameof(GetMethodCallLogString_ShouldIncludeCallerMethodAndParameters));
+            result
+                .Should()
+                .Contain(nameof(GetMethodCallLogString_ShouldIncludeCallerMethodAndParameters));
             result.Should().Contain(nameof(CaptureMethodCallLogString));
             result.Should().Contain("count=7");
             result.Should().Contain("name=Ada");
@@ -62,7 +64,10 @@ namespace UtilitiesCS.Test.HelperClasses
         public void GetAssembly_ShouldReturnDeclaringAssemblyForInstanceMethod()
         {
             // Arrange
-            var method = typeof(TraceUtility_Tests).GetMethod(nameof(CaptureMethodCallLogString), BindingFlags.Instance | BindingFlags.NonPublic);
+            var method = typeof(TraceUtility_Tests).GetMethod(
+                nameof(CaptureMethodCallLogString),
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
 
             // Act
             var assembly = method.GetAssembly();

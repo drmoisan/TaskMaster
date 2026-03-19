@@ -1,6 +1,6 @@
-﻿using QuickFiler.Controllers;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows.Forms;
+using QuickFiler.Controllers;
 using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
 
 namespace QuickFiler.Viewers
@@ -25,7 +25,11 @@ namespace QuickFiler.Viewers
         }
 
         private BayesianPerformanceController _controller;
-        public virtual BayesianPerformanceController Controller { get => _controller; internal set => _controller = value; }
+        public virtual BayesianPerformanceController Controller
+        {
+            get => _controller;
+            internal set => _controller = value;
+        }
 
         internal object GroupKeyGetter(object rowObject)
         {
@@ -49,7 +53,6 @@ namespace QuickFiler.Viewers
         {
             Controller?.OlvDrivers_SelectionChanged();
         }
-
 
         private void ClassSelector_SelectedIndexChanged(object sender, System.EventArgs e)
         {

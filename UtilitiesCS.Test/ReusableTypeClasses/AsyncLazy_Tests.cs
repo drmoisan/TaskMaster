@@ -70,10 +70,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             Func<Task> secondAwait = async () => _ = await lazy;
 
             // Assert
-            await firstAwait.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("boom");
-            await secondAwait.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("boom");
+            await firstAwait.Should().ThrowAsync<InvalidOperationException>().WithMessage("boom");
+            await secondAwait.Should().ThrowAsync<InvalidOperationException>().WithMessage("boom");
             factoryCalls.Should().Be(1);
         }
 
@@ -109,9 +107,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
                 return 99;
             });
 
-            var tasks = Enumerable.Range(0, 5)
-                .Select(async _ => await lazy)
-                .ToArray();
+            var tasks = Enumerable.Range(0, 5).Select(async _ => await lazy).ToArray();
 
             // Act
             var results = await Task.WhenAll(tasks);

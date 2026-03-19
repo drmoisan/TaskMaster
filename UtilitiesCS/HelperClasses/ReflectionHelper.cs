@@ -24,15 +24,26 @@ namespace UtilitiesCS.HelperClasses
                     Type[] types = assembly.GetTypes();
 
                     // Filter out only the classes and exclude anonymous and lambda classes
-                    var classes = types.Where(t => t.IsClass && IsMyAssembly(t.Assembly) && !IsAnonymousOrLambdaType(t))
-                        .Where(t => !t.IsNestedPrivate).ToList();
+                    var classes = types
+                        .Where(t =>
+                            t.IsClass && IsMyAssembly(t.Assembly) && !IsAnonymousOrLambdaType(t)
+                        )
+                        .Where(t => !t.IsNestedPrivate)
+                        .ToList();
                     allClasses.AddRange(classes);
                 }
                 catch (ReflectionTypeLoadException ex)
                 {
                     // Handle the exception if some types cannot be loaded
-                    var types = ex.Types.Where(t => t != null && t.IsClass && IsMyAssembly(t.Assembly) && !IsAnonymousOrLambdaType(t))
-                        .Where(t => !t.IsNestedPrivate).ToList();
+                    var types = ex
+                        .Types.Where(t =>
+                            t != null
+                            && t.IsClass
+                            && IsMyAssembly(t.Assembly)
+                            && !IsAnonymousOrLambdaType(t)
+                        )
+                        .Where(t => !t.IsNestedPrivate)
+                        .ToList();
                     allClasses.AddRange(types);
                 }
             }
@@ -48,13 +59,17 @@ namespace UtilitiesCS.HelperClasses
         private static bool IsAnonymousOrLambdaType(Type type)
         {
             //return (type.Name.Contains("AnonymousType") || type.Name.Contains("<>")) &&
-            return type.IsDefined(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), false);
+            return type.IsDefined(
+                typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute),
+                false
+            );
         }
 
         public static List<Type> GetAllContainedTypes(object obj)
         {
             var types = new HashSet<Type>();
-            if (obj == null) return types.ToList();
+            if (obj == null)
+                return types.ToList();
 
             var visited = new HashSet<object>();
             CollectTypes(obj, types, visited);
@@ -63,14 +78,19 @@ namespace UtilitiesCS.HelperClasses
 
         private static void CollectTypes(object obj, HashSet<Type> types, HashSet<object> visited)
         {
-            if (obj == null || visited.Contains(obj)) return;
+            if (obj == null || visited.Contains(obj))
+                return;
 
             visited.Add(obj);
             var type = obj.GetType();
             types.Add(type);
 
             // Collect types from properties
-            foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            foreach (
+                var property in type.GetProperties(
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+                )
+            )
             {
                 if (property.CanRead)
                 {
@@ -80,7 +100,11 @@ namespace UtilitiesCS.HelperClasses
             }
 
             // Collect types from fields
-            foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            foreach (
+                var field in type.GetFields(
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+                )
+            )
             {
                 var value = field.GetValue(obj);
                 CollectTypes(value, types, visited);
@@ -101,7 +125,14 @@ namespace UtilitiesCS.HelperClasses
             var fields = new List<FieldInfo>();
             while (type != null)
             {
-                fields.AddRange(type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly));
+                fields.AddRange(
+                    type.GetFields(
+                        BindingFlags.Instance
+                            | BindingFlags.NonPublic
+                            | BindingFlags.Public
+                            | BindingFlags.DeclaredOnly
+                    )
+                );
                 type = type.BaseType;
             }
             return fields;
@@ -112,11 +143,17 @@ namespace UtilitiesCS.HelperClasses
             var fields = new List<FieldInfo>();
             while (type != null && type != baseType)
             {
-                fields.AddRange(type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly));
+                fields.AddRange(
+                    type.GetFields(
+                        BindingFlags.Instance
+                            | BindingFlags.NonPublic
+                            | BindingFlags.Public
+                            | BindingFlags.DeclaredOnly
+                    )
+                );
                 type = type.BaseType;
             }
             return fields;
         }
-
     }
 }

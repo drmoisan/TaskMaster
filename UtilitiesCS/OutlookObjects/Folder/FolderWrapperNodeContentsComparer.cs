@@ -10,8 +10,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
     {
         public bool Equals(TreeNode<FolderWrapper> x, TreeNode<FolderWrapper> y)
         {
-            if (ReferenceEquals(x, y)) return true;
-            if (x?.Value is null || y?.Value is null) return false;
+            if (ReferenceEquals(x, y))
+                return true;
+            if (x?.Value is null || y?.Value is null)
+                return false;
             // Compare FolderWrapper values using the FolderWrapperNameCountSizeComparer
             var comparer = new FolderWrapperNameCountSizeComparer();
             return comparer.Equals(x.Value, y.Value);
@@ -19,7 +21,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         public int GetHashCode(TreeNode<FolderWrapper> obj)
         {
-            if (obj?.Value is null) return 0;
+            if (obj?.Value is null)
+                return 0;
             var comparer = new FolderWrapperNameCountSizeComparer();
             // Get the hash code for the FolderWrapper value
             return comparer.GetHashCode(obj.Value);

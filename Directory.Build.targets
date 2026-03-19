@@ -16,8 +16,11 @@
     Developer builds only: override the VSTO manifest certificate
     thumbprint so the local developer certificate is used.
   -->
-  <Target Name="SetTaskMasterManifestCert" BeforeTargets="ResolveKeySource"
-          Condition="'$(MSBuildProjectName)' == 'TaskMaster' and '$(CI)' != 'true'">
+  <Target
+    Name="SetTaskMasterManifestCert"
+    BeforeTargets="ResolveKeySource"
+    Condition="'$(MSBuildProjectName)' == 'TaskMaster' and '$(CI)' != 'true'"
+  >
     <PropertyGroup>
       <SignManifests>true</SignManifests>
       <ManifestKeyFile></ManifestKeyFile>

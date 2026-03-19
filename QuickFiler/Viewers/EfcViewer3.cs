@@ -1,6 +1,4 @@
-﻿using QuickFiler.Controllers;
-using QuickFiler.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -10,6 +8,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using QuickFiler.Controllers;
+using QuickFiler.Interfaces;
 
 namespace QuickFiler
 {
@@ -22,25 +22,35 @@ namespace QuickFiler
             InitTipsLabelsList();
         }
 
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         private SynchronizationContext _context;
-        public SynchronizationContext UiSyncContext { get => _context; }
+        public SynchronizationContext UiSyncContext
+        {
+            get => _context;
+        }
 
         private EfcFormController _formController;
+
         internal void SetController(EfcFormController controller)
         {
             _formController = controller;
         }
 
         private IQfcKeyboardHandler _keyboardHandler;
+
         public void SetKeyboardHandler(IQfcKeyboardHandler keyboardHandler)
         {
             _keyboardHandler = keyboardHandler;
         }
 
         private IList<Label> _tipsLabels;
-        public IList<Label> TipsLabels { get => _tipsLabels; }
+        public IList<Label> TipsLabels
+        {
+            get => _tipsLabels;
+        }
 
         private void InitTipsLabelsList()
         {
@@ -56,11 +66,10 @@ namespace QuickFiler
                 LblAcOk,
                 LblAcCancel,
                 LblAcRefresh,
-                LblAcNewFolder
+                LblAcNewFolder,
             };
-
         }
-        
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if ((_keyboardHandler is not null) && (keyData.HasFlag(Keys.Alt)))

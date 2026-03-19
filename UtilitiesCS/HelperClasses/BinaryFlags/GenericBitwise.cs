@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.HelperClasses
 {
-    public class GenericBitwise<TFlagEnum> where TFlagEnum : Enum
+    public class GenericBitwise<TFlagEnum>
+        where TFlagEnum : Enum
     {
         private readonly Func<TFlagEnum, TFlagEnum, TFlagEnum> _and = null;
         private readonly Func<TFlagEnum, TFlagEnum> _not = null;
@@ -23,11 +24,17 @@ namespace UtilitiesCS.HelperClasses
         }
 
         public TFlagEnum And(TFlagEnum value1, TFlagEnum value2) => _and(value1, value2);
+
         public TFlagEnum And(IEnumerable<TFlagEnum> list) => list.Aggregate(And);
+
         public TFlagEnum Not(TFlagEnum value) => _not(value);
+
         public TFlagEnum Or(TFlagEnum value1, TFlagEnum value2) => _or(value1, value2);
+
         public TFlagEnum Or(IEnumerable<TFlagEnum> list) => list.Aggregate(Or);
+
         public TFlagEnum Xor(TFlagEnum value1, TFlagEnum value2) => _xor(value1, value2);
+
         public TFlagEnum Xor(IEnumerable<TFlagEnum> list) => list.Aggregate(Xor);
 
         public TFlagEnum All()

@@ -1,6 +1,4 @@
-﻿using Deedle;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -9,6 +7,8 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Windows.Forms;
+using Deedle;
+using Newtonsoft.Json;
 using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
 using Outlook = Microsoft.Office.Interop.Outlook;
@@ -19,28 +19,36 @@ namespace ToDoModel
     public class ProjectData : SerializableList<IProjectEntry>, IProjectData
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
-        public ProjectData() : base() { }
-        public ProjectData(IList<IProjectEntry> projInfoEntries) : base(projInfoEntries) { }
-        public ProjectData(IEnumerable<IProjectEntry> projInfoEntries) : base(projInfoEntries) { }
-        public ProjectData(string filename, string folderpath) : base(filename, folderpath) { }
-        public ProjectData(string filename,
-                           string folderpath,
-                           CSVLoader<IProjectEntry> backupLoader,
-                           string backupFilepath,
-                           bool askUserOnError) : base(filename,
-                                                       folderpath,
-                                                       backupLoader,
-                                                       backupFilepath,
-                                                       askUserOnError)
-        { }
+        public ProjectData()
+            : base() { }
+
+        public ProjectData(IList<IProjectEntry> projInfoEntries)
+            : base(projInfoEntries) { }
+
+        public ProjectData(IEnumerable<IProjectEntry> projInfoEntries)
+            : base(projInfoEntries) { }
+
+        public ProjectData(string filename, string folderpath)
+            : base(filename, folderpath) { }
+
+        public ProjectData(
+            string filename,
+            string folderpath,
+            CSVLoader<IProjectEntry> backupLoader,
+            string backupFilepath,
+            bool askUserOnError
+        )
+            : base(filename, folderpath, backupLoader, backupFilepath, askUserOnError) { }
 
         public void Save(string filepath)
         {
             base.Sort();
             base.Serialize(filepath);
         }
+
         public void Save()
         {
             base.Sort();
@@ -48,6 +56,7 @@ namespace ToDoModel
         }
 
         private Action<string, string> _idUpdateAction;
+
         public void SetIdUpdateAction(Action<string, string> action)
         {
             _idUpdateAction = action;
@@ -61,40 +70,60 @@ namespace ToDoModel
         {
             if (this.Any())
             {
-                var indices = Enumerable.Range(0, this.Count).Where(i => this[i].IsAnyNull()).ToArray();
-                if (indices.Any()) { return (true, indices); }
-                else { return (false, indices); }
+                var indices = Enumerable
+                    .Range(0, this.Count)
+                    .Where(i => this[i].IsAnyNull())
+                    .ToArray();
+                if (indices.Any())
+                {
+                    return (true, indices);
+                }
+                else
+                {
+                    return (false, indices);
+                }
             }
-            else { return (false, new int[] { -1 }); }
+            else
+            {
+                return (false, new int[] { -1 });
+            }
         }
 
         internal Frame<string, string> GetDfToDo(Outlook.Store store)
         {
             var table = store.GetToDoTable();
 
-            if (table is null) { return null; }
+            if (table is null)
+            {
+                return null;
+            }
 
             (var data, var columnInfo) = table.ETL();
 
             var df = DfDeedle.FromArray2D(data: data, columnInfo);
             if (df is null)
             {
-                logger.Error("GetDfToDo: Data frame creation from Outlook ToDo table returned null.");
+                logger.Error(
+                    "GetDfToDo: Data frame creation from Outlook ToDo table returned null."
+                );
                 return null;
             }
 
             if (!df.ColumnKeys.Contains("ToDoID"))
             {
                 logger.Error(
-                    $"GetDfToDo: Expected 'ToDoID' column not found in Outlook ToDo table. " +
-                    $"Available columns: {string.Join(", ", df.ColumnKeys)}");
+                    $"GetDfToDo: Expected 'ToDoID' column not found in Outlook ToDo table. "
+                        + $"Available columns: {string.Join(", ", df.ColumnKeys)}"
+                );
                 return null;
             }
 
             df = df.FillMissing("");
             df = df.Where(x => (string)x.Value["ToDoID"] != "");
-            if (df.RowCount == 0) { return null; }
-
+            if (df.RowCount == 0)
+            {
+                return null;
+            }
 
             Frame<string, string> dfToDo = null;
             try
@@ -107,7 +136,9 @@ namespace ToDoModel
 
                 if (duplicateIDs.Length > 0)
                 {
-                    var duplicateRowsGroups = duplicateIDs.Select(x => df.FilterRowsBy("ToDoID", x));
+                    var duplicateRowsGroups = duplicateIDs.Select(x =>
+                        df.FilterRowsBy("ToDoID", x)
+                    );
                     LogDuplicates(duplicateRowsGroups);
                     var dfTemp = DropDuplicates(df, duplicateRowsGroups);
                     try
@@ -120,7 +151,6 @@ namespace ToDoModel
                         throw;
                     }
                 }
-
                 else
                 {
                     logger.Error(e.Message, e);
@@ -131,7 +161,10 @@ namespace ToDoModel
             return dfToDo;
         }
 
-        private static Frame<int, string> DropDuplicates(Frame<int, string> df, IEnumerable<Frame<int, string>> duplicateRows)
+        private static Frame<int, string> DropDuplicates(
+            Frame<int, string> df,
+            IEnumerable<Frame<int, string>> duplicateRows
+        )
         {
             var dfTemp = df.Clone();
             foreach (var frame in duplicateRows)
@@ -152,7 +185,7 @@ namespace ToDoModel
         }
 
         /// <summary>
-        /// Function filters a Deedle dataframe to entries that relate to projects 
+        /// Function filters a Deedle dataframe to entries that relate to projects
         /// by utilizing the fact that project IDs are only 4 digits
         /// </summary>
         /// <param name="df">Deedle dataframe</param>
@@ -160,7 +193,10 @@ namespace ToDoModel
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         internal Frame<string, string> FilterToProjectIDs(Frame<string, string> df)
         {
-            if (df is null) { return df; }
+            if (df is null)
+            {
+                return df;
+            }
 
             df.AddColumn("IdLength", df.RowIndex.Keys.Select(id => id.Length));
             df = df.FilterRowsBy("IdLength", 4);
@@ -171,10 +207,10 @@ namespace ToDoModel
         }
 
         /// <summary>
-        /// Converts from a Deedle dataframe containing Project IDs and a list of 
-        /// Outlook Categories to a list of project info entries. 
-        /// Function parses Categories using <seealso cref=" FlagParser"/> class 
-        /// and extracts suggested program name using a dash mark as a delimeter 
+        /// Converts from a Deedle dataframe containing Project IDs and a list of
+        /// Outlook Categories to a list of project info entries.
+        /// Function parses Categories using <seealso cref=" FlagParser"/> class
+        /// and extracts suggested program name using a dash mark as a delimeter
         /// between program name and project details in the project name. If no
         /// delimiter is present, project name is the same as program name
         /// </summary>
@@ -182,24 +218,23 @@ namespace ToDoModel
         /// <returns>A new <seealso cref="List{T}"/> where T is <seealso cref="IProjectEntry"/></returns>
         internal List<IProjectEntry> DfToListEntries(Frame<string, string> df)
         {
-            return df.Rows
-                     .Select(row => new
-                     {
-                         ID = row.Key,
-                         //ID = row.Value.GetAs<string>("ToDoID"),
-                         Categories = row.Value.GetAs<string>("Categories")
-                     })
-                     .Values
-                     .Select(x =>
-                     {
-                         var categories = x.Categories;
-                         FlagParser parser = new(ref categories);
-                         var projectName = parser.GetProjects();
-                         var programName = projectName.Split('-')[0];
-                         IProjectEntry entry = new ProjectEntry(projectName, x.ID, programName);
-                         return entry;
-                     })
-                     .ToList();
+            return df
+                .Rows.Select(row => new
+                {
+                    ID = row.Key,
+                    //ID = row.Value.GetAs<string>("ToDoID"),
+                    Categories = row.Value.GetAs<string>("Categories"),
+                })
+                .Values.Select(x =>
+                {
+                    var categories = x.Categories;
+                    FlagParser parser = new(ref categories);
+                    var projectName = parser.GetProjects();
+                    var programName = projectName.Split('-')[0];
+                    IProjectEntry entry = new ProjectEntry(projectName, x.ID, programName);
+                    return entry;
+                })
+                .ToList();
         }
 
         /// <summary>
@@ -213,7 +248,10 @@ namespace ToDoModel
             foreach (Outlook.Store store in olApp.Session.Stores)
             {
                 var dfTemp = GetDfToDo(store);
-                if (df is null) { df = dfTemp; }
+                if (df is null)
+                {
+                    df = dfTemp;
+                }
                 else if (dfTemp is not null)
                 {
                     //df.Print();
@@ -224,12 +262,14 @@ namespace ToDoModel
                     }
                     catch (Exception e)
                     {
-
                         logger.Debug($"\n{TraceUtility.GetMyTraceString(new StackTrace())}\n");
                         var overlapIDs = df.RowIndex.Keys.Intersect(dfTemp.RowIndex.Keys).ToArray();
                         if (overlapIDs.Count() > 0)
                         {
-                            logger.Error($"{e.Message}\n\nOverlap found in following ToDoID's: {overlapIDs.SentenceJoin()}", e);
+                            logger.Error(
+                                $"{e.Message}\n\nOverlap found in following ToDoID's: {overlapIDs.SentenceJoin()}",
+                                e
+                            );
                             var dfOverlap = df.Where(x => overlapIDs.Contains(x.Key));
                             dfOverlap.PrintToLog(logger);
                             var dfTempOverlap = dfTemp.Where(x => overlapIDs.Contains(x.Key));
@@ -242,7 +282,6 @@ namespace ToDoModel
                             logger.Error(e.Message, e);
                             throw;
                         }
-
                     }
 
                     df.PrintToLog(logger);
@@ -266,9 +305,10 @@ namespace ToDoModel
         {
             try
             {
-                var query = from project in projectNames.Split(',').Select(x => x.Trim())
-                            join projectInfo in this on project equals projectInfo.ProjectName
-                            select projectInfo.ProgramName;
+                var query =
+                    from project in projectNames.Split(',').Select(x => x.Trim())
+                    join projectInfo in this on project equals projectInfo.ProjectName
+                    select projectInfo.ProgramName;
 
                 //string strTemp = query.First().ToString();
                 string strTemp = string.Join(",", query.Distinct());
@@ -281,7 +321,6 @@ namespace ToDoModel
                 Debug.WriteLine(ex.StackTrace);
                 return "";
             }
-
         }
 
         public List<IProjectEntry> Find_ByProjectName(string projectName)
@@ -316,13 +355,13 @@ namespace ToDoModel
 
         internal bool UpdateProjectID(string newID)
         {
-            if (Contains_ProjectID(newID)) { return false; }
+            if (Contains_ProjectID(newID))
+            {
+                return false;
+            }
             return true;
         }
 
         #endregion Update Callbacks
-
     }
-
-
 }

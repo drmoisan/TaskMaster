@@ -1,13 +1,13 @@
-﻿using Fizzler;
-using Microsoft.Graph.Models;
-using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Fizzler;
+using Microsoft.Graph.Models;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;
@@ -18,7 +18,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
     public class Triage_OlLogic
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public Triage_OlLogic(EmailIntelligence.Triage parent)
         {
@@ -27,8 +28,10 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
 
         internal EmailIntelligence.Triage Parent { get; set; }
 
-        private const string SchemaSite = "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}";
-        private const string RegExSchemaSite = "http://schemas\\.microsoft\\.com/mapi/string/{00020329-0000-0000-C000-000000000046}";
+        private const string SchemaSite =
+            "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}";
+        private const string RegExSchemaSite =
+            "http://schemas\\.microsoft\\.com/mapi/string/{00020329-0000-0000-C000-000000000046}";
 
         public async Task FilterViewAsync()
         {
@@ -48,10 +51,18 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             try
             {
                 Explorer explorer = Parent?.Globals?.Ol?.App?.ActiveExplorer();
-                if (explorer is null) { logger.Debug("Could not grab handle on Explorer"); return; }
+                if (explorer is null)
+                {
+                    logger.Debug("Could not grab handle on Explorer");
+                    return;
+                }
 
                 View view = explorer.CurrentView as View;
-                if (view is null) { logger.Debug("Could not grab handle on View"); return; }
+                if (view is null)
+                {
+                    logger.Debug("Could not grab handle on View");
+                    return;
+                }
 
                 string existingFilter = view.Filter;
                 logger.Debug($"Existing filter: {existingFilter}");
@@ -60,20 +71,21 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 var logicTree = parser.Parse(existingFilter);
                 parser.PrintTree(logicTree, 0);
 
-                var pattern = @"""http://schemas\.microsoft\.com/mapi/string/\{00020329-0000-0000-C000-000000000046}/Triage"" (= '[ABC]'|LIKE '%[ABC]%')";
+                var pattern =
+                    @"""http://schemas\.microsoft\.com/mapi/string/\{00020329-0000-0000-C000-000000000046}/Triage"" (= '[ABC]'|LIKE '%[ABC]%')";
                 Regex objRegex = new(pattern);
-
-
 
                 string strippedFilter = ParseAndStripFilter(existingFilter);
                 logger.Debug($"Stripped filter: {strippedFilter}");
 
-                string newFilter = triageValues.IsNullOrEmpty() ? "" :
-                    string.Join(" OR ", triageValues.Select(value => $"[Triage] = '{value}'"));
+                string newFilter = triageValues.IsNullOrEmpty()
+                    ? ""
+                    : string.Join(" OR ", triageValues.Select(value => $"[Triage] = '{value}'"));
 
                 if (!existingFilter.IsNullOrEmpty())
                 {
-                    string pattern2 = @"\[Triage\]\s*=\s*'[^']*'(\s*OR\s*\[Triage\]\s*=\s*'[^']*')*";
+                    string pattern2 =
+                        @"\[Triage\]\s*=\s*'[^']*'(\s*OR\s*\[Triage\]\s*=\s*'[^']*')*";
                     if (Regex.IsMatch(existingFilter, pattern2))
                     {
                         // Replace existing Triage filter
@@ -99,8 +111,6 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 }
 
                 view.Apply();
-
-
             }
             catch (System.Exception ex)
             {
@@ -169,7 +179,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         public string ParseAndStripFilter(string strFilter)
         {
             var triageField = Regex.Escape($"\"{MAPIFields.Schemas.Triage}\"");
-            var pattern = $@"(?:\s*(?:\(\s*)?{triageField}\s*(?:LIKE\s*'%[ABC]%'|=\s*'[ABC]')\s*(?:\)\s*)?(?:OR\s*)?)+";
+            var pattern =
+                $@"(?:\s*(?:\(\s*)?{triageField}\s*(?:LIKE\s*'%[ABC]%'|=\s*'[ABC]')\s*(?:\)\s*)?(?:OR\s*)?)+";
             var strippedFilter = Regex.Replace(strFilter, pattern, "");
             strippedFilter = Regex.Replace(strippedFilter, @"\(\s*\)", "");
             strippedFilter = Regex.Replace(strippedFilter, @"\s{2,}", " ").Trim();
@@ -179,22 +190,36 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         public async Task TrainSelectionAsync(string triageId, CancellationToken token = default)
         {
             var selection = Parent?.Globals?.Ol?.App?.ActiveExplorer()?.Selection;
-            if (selection is null) { logger.Debug("Could not grab handle on Selection"); return; }
-            await selection.Cast<object>()
+            if (selection is null)
+            {
+                logger.Debug("Could not grab handle on Selection");
+                return;
+            }
+            await selection
+                .Cast<object>()
                 .Where(x => x is MailItem)
                 .Cast<MailItem>()
                 .ToAsyncEnumerable()
-                .SelectAwaitWithCancellation(async (mailItem, token) => await MailItemHelper.FromMailItemAsync(mailItem, Parent.Globals, token, false))
+                .SelectAwaitWithCancellation(
+                    async (mailItem, token) =>
+                        await MailItemHelper.FromMailItemAsync(
+                            mailItem,
+                            Parent.Globals,
+                            token,
+                            false
+                        )
+                )
                 //.SelectAwaitWithCancellation(async (helper, token) => await Task.Run(() => helper.Tokens, token))
-                .ForEachAwaitWithCancellationAsync(async (helper, token) =>
-                {
-                    await Parent.TestActionAsync(helper, triageId, token);
-                    await Parent.TrainAsync(helper.Tokens, triageId, token);
-                }, token);
+                .ForEachAwaitWithCancellationAsync(
+                    async (helper, token) =>
+                    {
+                        await Parent.TestActionAsync(helper, triageId, token);
+                        await Parent.TrainAsync(helper.Tokens, triageId, token);
+                    },
+                    token
+                );
 
             Parent.ClassifierGroup.Serialize();
         }
-
     }
 }
-
