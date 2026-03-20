@@ -182,7 +182,7 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
 
 **Goal:** Cover WinForms UI classes and deep COM interop classes. Strategy: extract testable logic from code-behind where needed, use Moq for COM interfaces, use STAThread context for control instantiation where required. Testability seams are permitted only when required to reach 80% coverage (per spec non-goals).
 
-- [ ] [P3-T1] Create or extend tests for ConversationHelper by mocking COM conversation traversal APIs
+- [x] [P3-T1] Create or extend tests for ConversationHelper by mocking COM conversation traversal APIs
   - Acceptance: Coverage report shows `ConversationHelper.cs` (4%) at >= 80% line rate
 
 - [ ] [P3-T2] Create or extend tests for MailItemHelper by mocking COM mail operations

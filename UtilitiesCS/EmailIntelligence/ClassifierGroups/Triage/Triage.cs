@@ -253,7 +253,7 @@ namespace UtilitiesCS.EmailIntelligence
             IApplicationGlobals globals
         )
         {
-            var triage = await CreateAsync(globals);
+            var triage = await CreateAsync(globals, treatment:Enums.NotFoundEnum.Create);
             return triage;
         }
 

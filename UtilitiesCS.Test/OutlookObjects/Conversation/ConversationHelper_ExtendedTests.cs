@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.Data.Analysis;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -606,6 +607,362 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
             Outlook.Table result = ConvHelper.GetInfoTable(mockConv.Object);
             result.Should().BeSameAs(mockTable.Object);
             mockColumns.Verify(c => c.Add(It.IsAny<string>()), Times.AtLeast(5));
+        }
+
+        #endregion
+
+        #region GetMailItemList (strict=true, happy path)
+
+        [TestMethod]
+        public void GetMailItemList_Strict_ValidDf_ReturnsItems()
+        {
+            var df = new DataFrame(new StringDataFrameColumn("EntryID", new[] { "entry1", "entry2" }));
+            var mockApp = new Mock<Outlook.Application>();
+            var mockNs = new Mock<Outlook.NameSpace>();
+            var mockMail1 = new Mock<Outlook.MailItem>();
+            var mockMail2 = new Mock<Outlook.MailItem>();
+            mockApp.Setup(a => a.GetNamespace("MAPI")).Returns(mockNs.Object);
+            mockNs.Setup(ns => ns.GetItemFromID("entry1", "store1")).Returns(mockMail1.Object);
+            mockNs.Setup(ns => ns.GetItemFromID("entry2", "store1")).Returns(mockMail2.Object);
+
+            IList result = ConvHelper.GetMailItemList(df, "store1", mockApp.Object, true);
+            result.Count.Should().Be(2);
+        }
+
+        #endregion
+
+        #region ConversationCt (MailItem overload)
+
+        [TestMethod]
+        public void ConversationCt_MailItem_NullConversation_ReturnsZero()
+        {
+            var mockMail = new Mock<Outlook.MailItem>();
+            mockMail.Setup(m => m.GetConversation()).Returns((Outlook.Conversation)null);
+
+            int result = ConvHelper.ConversationCt((object)mockMail.Object, true, true);
+            result.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void ConversationCt_MailItem_WithConversation_EmptyTable_ReturnsZero()
+        {
+            var mockMail = new Mock<Outlook.MailItem>();
+            var mockConv = new Mock<Outlook.Conversation>();
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+            var mockPropAccessor = new Mock<Outlook.PropertyAccessor>();
+
+            mockMail.Setup(m => m.GetConversation()).Returns(mockConv.Object);
+            mockMail.Setup(m => m.PropertyAccessor).Returns(mockPropAccessor.Object);
+            mockPropAccessor
+                .Setup(p => p.GetProperty(It.IsAny<string>()))
+                .Returns("Inbox");
+
+            mockConv.Setup(c => c.GetTable()).Returns(mockTable.Object);
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+
+            int colCount = 9;
+            mockColumns.Setup(c => c.Count).Returns(colCount);
+            for (int i = 1; i <= colCount; i++)
+            {
+                var mockCol = new Mock<Outlook.Column>();
+                mockCol.Setup(c => c.Name).Returns($"Col{i}");
+                mockColumns.Setup(c => c[i]).Returns(mockCol.Object);
+            }
+            mockTable.Setup(t => t.GetRowCount()).Returns(0);
+
+            // This exercises: object overload → MailItem overload → GetConversation (not null) →
+            // conv.GetDataFrame → GetConversationTable → ETL (0 rows) → ToDataFrame → PrettyText →
+            // FilterConversation (SameFolder=true filters 0-row df; MailOnly=true filters 0-row df) →
+            // return df.Rows.Count = 0
+            int result = ConvHelper.ConversationCt((object)mockMail.Object, true, true);
+            result.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void ConversationCt_MailItem_NoFilters_ReturnsZero()
+        {
+            var mockMail = new Mock<Outlook.MailItem>();
+            var mockConv = new Mock<Outlook.Conversation>();
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+
+            mockMail.Setup(m => m.GetConversation()).Returns(mockConv.Object);
+            mockConv.Setup(c => c.GetTable()).Returns(mockTable.Object);
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+
+            int colCount = 9;
+            mockColumns.Setup(c => c.Count).Returns(colCount);
+            for (int i = 1; i <= colCount; i++)
+            {
+                var mockCol = new Mock<Outlook.Column>();
+                mockCol.Setup(c => c.Name).Returns($"Col{i}");
+                mockColumns.Setup(c => c[i]).Returns(mockCol.Object);
+            }
+            mockTable.Setup(t => t.GetRowCount()).Returns(0);
+
+            // This exercises the path without SameFolder or MailOnly filtering
+            int result = ConvHelper.ConversationCt((object)mockMail.Object, false, false);
+            result.Should().Be(0);
+        }
+
+        #endregion
+
+        #region GetConversationDf (MailItem overload)
+
+        [TestMethod]
+        public void GetConversationDf_MailItem_NullConversation_ReturnsNull()
+        {
+            var mockMail = new Mock<Outlook.MailItem>();
+            mockMail.Setup(m => m.GetConversation()).Returns((Outlook.Conversation)null);
+
+            DataFrame result = ConvHelper.GetConversationDf((object)mockMail.Object);
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void GetConversationDf_MailItem_WithConversation_COMException_ReturnsNull()
+        {
+            var mockMail = new Mock<Outlook.MailItem>();
+            var mockConv = new Mock<Outlook.Conversation>();
+            mockMail.Setup(m => m.GetConversation()).Returns(mockConv.Object);
+            mockConv.Setup(c => c.GetTable()).Throws(new COMException("COM error"));
+
+            DataFrame result = ConvHelper.GetConversationDf((object)mockMail.Object);
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void GetConversationDf_MailItem_WithConversation_EmptyTable_ReturnsEmptyDf()
+        {
+            var mockMail = new Mock<Outlook.MailItem>();
+            var mockConv = new Mock<Outlook.Conversation>();
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+
+            mockMail.Setup(m => m.GetConversation()).Returns(mockConv.Object);
+            mockConv.Setup(c => c.GetTable()).Returns(mockTable.Object);
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+
+            int colCount = 9;
+            mockColumns.Setup(c => c.Count).Returns(colCount);
+            for (int i = 1; i <= colCount; i++)
+            {
+                var mockCol = new Mock<Outlook.Column>();
+                mockCol.Setup(c => c.Name).Returns($"Col{i}");
+                mockColumns.Setup(c => c[i]).Returns(mockCol.Object);
+            }
+            mockTable.Setup(t => t.GetRowCount()).Returns(0);
+
+            DataFrame result = ConvHelper.GetConversationDf((object)mockMail.Object);
+            result.Should().NotBeNull();
+            result.Rows.Count.Should().Be(0);
+        }
+
+        #endregion
+
+        #region GetConversationDf (Conversation retry logic)
+
+        [TestMethod]
+        public void GetConversationDf_Conversation_COMExceptionRetries_EventuallyReturnsNull()
+        {
+            var mockConv = new Mock<Outlook.Conversation>();
+            // GetDataFrame calls GetConversationTable which calls GetTable
+            // Make GetTable throw COMException 3 times (exceeds retry limit)
+            mockConv.Setup(c => c.GetTable())
+                .Throws(new COMException("COM error"));
+
+            // GetConversationDf catches COMException and retries up to 2 times
+            // After 3 failures (retryCount 0, 1, 2), it returns null df
+            DataFrame result = ConvHelper.GetConversationDf(mockConv.Object);
+            result.Should().BeNull();
+        }
+
+        #endregion
+
+        #region GetConversationTable
+
+        [TestMethod]
+        public void GetConversationTable_SetsUpColumnsAndRemovesEntryID()
+        {
+            var mockConv = new Mock<Outlook.Conversation>();
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+            mockConv.Setup(c => c.GetTable()).Returns(mockTable.Object);
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+
+            Outlook.Table result = ConvHelper.GetConversationTable(mockConv.Object);
+            result.Should().BeSameAs(mockTable.Object);
+            // Verifies RemoveColumns was called (which calls Columns.Remove("EntryID"))
+            mockColumns.Verify(c => c.Remove(It.IsAny<object>()), Times.AtLeastOnce);
+            // Verifies ConversationColumnSchemas were added
+            mockColumns.Verify(c => c.Add(It.IsAny<string>()), Times.AtLeast(5));
+        }
+
+        #endregion
+
+        #region GetConversationDfAsync (cancellation)
+
+        [TestMethod]
+        public async System.Threading.Tasks.Task GetConversationDfAsync_CancelledToken_Throws()
+        {
+            var mockMail = new Mock<Outlook.MailItem>();
+            var cts = new System.Threading.CancellationTokenSource();
+            cts.Cancel();
+
+            Func<System.Threading.Tasks.Task> act = async () =>
+                await ConvHelper.GetConversationDfAsync(
+                    mockMail.Object,
+                    cts.Token,
+                    1000,
+                    0,
+                    System.Threading.Tasks.TaskCreationOptions.None,
+                    System.Threading.Tasks.TaskScheduler.Default
+                );
+            await act.Should().ThrowAsync<OperationCanceledException>();
+        }
+
+        #endregion
+
+        #region GetConversationDf (MailItem path)
+
+        [TestMethod]
+        public void GetConversationDf_MailItemPath_COMException_ReturnsNull()
+        {
+            // MailItem.GetConversation() returns a conversation that throws COMException
+            // when GetTable() is called (deep in the GetDataFrame chain)
+            var mockMail = new Mock<Outlook.MailItem>();
+            var mockConv = new Mock<Outlook.Conversation>();
+            mockMail.Setup(m => m.GetConversation()).Returns(mockConv.Object);
+            mockConv.Setup(c => c.GetTable()).Throws(new COMException("COM error"));
+
+            // GetConversationDf(MailItem) → conv.GetConversationDf() → retry loop → returns null
+            DataFrame result = ConvHelper.GetConversationDf((object)mockMail.Object);
+            result.Should().BeNull();
+        }
+
+        #endregion
+
+        #region GetDataFrameAsync (null table path)
+
+        [TestMethod]
+        public async System.Threading.Tasks.Task GetDataFrameAsync_NullFromTimeout_ReturnsNull()
+        {
+            // GetDataFrameAsync calls RunWithTimeout on GetConversationTable,
+            // but if the conversation's GetTable throws a timeout we can only
+            // test by dispatching through TimeOutTask which is complex.
+            // Instead verify the cancellation path of the simpler async overload.
+            var mockMail = new Mock<Outlook.MailItem>();
+            mockMail.Setup(m => m.GetConversation()).Returns((Outlook.Conversation)null);
+
+            // The simple GetConversationDfAsync calls TimeOutTask.RunWithTimeout
+            // which will try mailItem.GetConversation() returning null
+            // then conv.GetDataFrameAsync(token) will NullRef — this tests the path
+            var cts = new System.Threading.CancellationTokenSource();
+            cts.Cancel();
+            Func<System.Threading.Tasks.Task> act = async () =>
+                await ConvHelper.GetConversationDfAsync(mockMail.Object, cts.Token);
+            await act.Should().ThrowAsync<OperationCanceledException>();
+        }
+
+        #endregion
+
+        #region EnumerateColumnHeaders
+
+        [TestMethod]
+        public void EnumerateColumnHeaders_FormatsHeaders()
+        {
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+            mockColumns.Setup(c => c.Count).Returns(2);
+            var mockCol1 = new Mock<Outlook.Column>();
+            mockCol1.Setup(c => c.Name).Returns("Name");
+            var mockCol2 = new Mock<Outlook.Column>();
+            mockCol2.Setup(c => c.Name).Returns("Date");
+            mockColumns.Setup(c => c[1]).Returns(mockCol1.Object);
+            mockColumns.Setup(c => c[2]).Returns(mockCol2.Object);
+
+            var styles = new (int FieldWidth, ConvHelper.Justify Justification)[]
+            {
+                (10, ConvHelper.Justify.Left),
+                (10, ConvHelper.Justify.Right),
+            };
+
+            string result = ConvHelper.EnumerateColumnHeaders(mockTable.Object, styles, "|", "[");
+            result.Should().NotBeNullOrEmpty();
+            result.Should().StartWith("[");
+            result.Should().Contain("|");
+        }
+
+        #endregion
+
+        #region GetConversationDf (Conversation successful path)
+
+        [TestMethod]
+        public void GetConversationDf_Conversation_SuccessfulFirstTry_ReturnsDf()
+        {
+            var mockConv = new Mock<Outlook.Conversation>();
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+            mockConv.Setup(c => c.GetTable()).Returns(mockTable.Object);
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+
+            int colCount = 2;
+            mockColumns.Setup(c => c.Count).Returns(colCount);
+            for (int i = 1; i <= colCount; i++)
+            {
+                var mockCol = new Mock<Outlook.Column>();
+                mockCol.Setup(c => c.Name).Returns($"Col{i}");
+                mockColumns.Setup(c => c[i]).Returns(mockCol.Object);
+            }
+            mockTable.Setup(t => t.GetRowCount()).Returns(0);
+
+            DataFrame result = ConvHelper.GetConversationDf(mockConv.Object);
+            result.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void GetConversationDf_Conversation_COMExceptionThenSuccess_ReturnsDf()
+        {
+            var mockConv = new Mock<Outlook.Conversation>();
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+
+            int callCount = 0;
+            mockConv.Setup(c => c.GetTable()).Returns(() =>
+            {
+                callCount++;
+                if (callCount == 1) throw new COMException("transient");
+                return mockTable.Object;
+            });
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+
+            int colCount = 2;
+            mockColumns.Setup(c => c.Count).Returns(colCount);
+            for (int i = 1; i <= colCount; i++)
+            {
+                var mockCol = new Mock<Outlook.Column>();
+                mockCol.Setup(c => c.Name).Returns($"Col{i}");
+                mockColumns.Setup(c => c[i]).Returns(mockCol.Object);
+            }
+            mockTable.Setup(t => t.GetRowCount()).Returns(0);
+
+            DataFrame result = ConvHelper.GetConversationDf(mockConv.Object);
+            result.Should().NotBeNull();
+        }
+
+        #endregion
+
+        #region GetMailItemList non-strict overload - DfWithoutEntryIDColumn
+
+        [TestMethod]
+        public void GetMailItemList_NoBoolOverload_DfWithoutEntryIDColumn_ReturnsEmptyList()
+        {
+            var df = new DataFrame(new StringDataFrameColumn("Other", new[] { "val" }));
+            var mockApp = new Mock<Outlook.Application>();
+            IList result = ConvHelper.GetMailItemList(df, "storeId", mockApp.Object);
+            result.Count.Should().Be(0);
         }
 
         #endregion

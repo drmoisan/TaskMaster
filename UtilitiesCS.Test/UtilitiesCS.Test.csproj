@@ -329,6 +329,32 @@
     <Compile Include="Threading\ThreadSafeFunctions_Tests.cs" />
     <Compile Include="Threading\ThreadSafeSingleShotGuard_Tests.cs" />
     <Compile Include="Threading\TimeOutTask_Tests.cs" />
+    <Compile Include="Threading\ApplicationIdleTimer_Tests.cs" />
+    <Compile Include="Threading\UiThread_Tests.cs" />
+    <Compile Include="Dialogs\DialogTests.cs" />
+    <Compile Include="Dialogs\FunctionButton_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\ConditionalItemEngine_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\EngineTests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\MulticlassEngine_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\Triage_Tests.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFiler_Tests.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemapTree_Tests.cs" />
+    <Compile Include="Extensions\WinFormsExtensions_Tests.cs" />
+    <Compile Include="HelperClasses\ComStreamWrapper_Tests.cs" />
+    <Compile Include="HelperClasses\DispatchUtility_Tests.cs" />
+    <Compile Include="HelperClasses\ShellUtilities_Tests.cs" />
+    <Compile Include="HelperClasses\ThemeHelpers\ThemeTests.cs" />
+    <Compile Include="HelperClasses\WindowsForms\ScreenAndTableLayoutTests.cs" />
+    <Compile Include="HelperClasses\WindowsForms\WinFormsInteractionTests.cs" />
+    <Compile Include="HelperClasses\WindowsForms\WinFormsLayoutTests.cs" />
+    <Compile Include="NewtonsoftHelpers\SDILReader\MethodBodyReader_Tests.cs" />
+    <Compile Include="OneDriveHelpers\OneDriveDownloader_Tests.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemHelper_ExtendedTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensions_Tests.cs" />
+    <Compile Include="OutlookObjects\Table\OlToDoTable_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\ConfigController_Tests.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
