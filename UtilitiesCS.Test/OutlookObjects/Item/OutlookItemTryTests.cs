@@ -139,6 +139,156 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             assignedValue.Should().Be("Forwarded subject");
         }
 
+        [TestMethod]
+        public void Categories_WhenUnderlyingGetterSucceeds_ShouldReturnValue()
+        {
+            var outlookItem = CreateBaseOutlookItem();
+            outlookItem.SetupGet(x => x.Categories).Returns("cat1; cat2");
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            wrapper.Categories.Should().Be("cat1; cat2");
+        }
+
+        [TestMethod]
+        public void CategoriesSetter_WhenUnderlyingSetterSucceeds_ShouldForwardValue()
+        {
+            string assigned = null;
+            var outlookItem = CreateBaseOutlookItem();
+            outlookItem.SetupSet(x => x.Categories = It.IsAny<string>())
+                .Callback<string>(v => assigned = v);
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            wrapper.Categories = "NewCat";
+
+            assigned.Should().Be("NewCat");
+        }
+
+        [TestMethod]
+        public void UnRead_WhenUnderlyingGetterSucceeds_ShouldReturnValue()
+        {
+            var outlookItem = CreateBaseOutlookItem();
+            outlookItem.SetupGet(x => x.UnRead).Returns(true);
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            wrapper.UnRead.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void UnRead_WhenUnderlyingGetterThrowsSystemException_ShouldReturnFalse()
+        {
+            var outlookItem = CreateBaseOutlookItem();
+            outlookItem.SetupGet(x => x.UnRead).Throws(new InvalidOperationException("boom"));
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            wrapper.UnRead.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void Size_WhenUnderlyingGetterSucceeds_ShouldReturnValue()
+        {
+            var outlookItem = CreateBaseOutlookItem();
+            outlookItem.SetupGet(x => x.Size).Returns(42);
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            wrapper.Size.Should().Be(42);
+        }
+
+        [TestMethod]
+        public void EntryID_WhenUnderlyingGetterSucceeds_ShouldReturnValue()
+        {
+            var outlookItem = CreateBaseOutlookItem();
+            outlookItem.SetupGet(x => x.EntryID).Returns("ABCD1234");
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            wrapper.EntryID.Should().Be("ABCD1234");
+        }
+
+        [TestMethod]
+        public void ConversationTopic_WhenUnderlyingGetterSucceeds_ShouldReturnValue()
+        {
+            var outlookItem = CreateBaseOutlookItem();
+            outlookItem.SetupGet(x => x.ConversationTopic).Returns("RE: Meeting");
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            wrapper.ConversationTopic.Should().Be("RE: Meeting");
+        }
+
+        [TestMethod]
+        public void MessageClass_WhenUnderlyingGetterSucceeds_ShouldReturnValue()
+        {
+            var outlookItem = CreateBaseOutlookItem();
+            outlookItem.SetupGet(x => x.MessageClass).Returns("IPM.Note");
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            wrapper.MessageClass.Should().Be("IPM.Note");
+        }
+
+        [TestMethod]
+        public void Saved_WhenUnderlyingGetterSucceeds_ShouldReturnValue()
+        {
+            var outlookItem = CreateBaseOutlookItem();
+            outlookItem.SetupGet(x => x.Saved).Returns(true);
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            wrapper.Saved.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void Close_WhenUnderlyingCallSucceeds_ShouldNotThrow()
+        {
+            var outlookItem = CreateBaseOutlookItem();
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            System.Action action = () =>
+                wrapper.Close(Microsoft.Office.Interop.Outlook.OlInspectorClose.olDiscard);
+
+            action.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void Display_WhenUnderlyingCallThrowsSystemException_ShouldNotThrow()
+        {
+            var outlookItem = CreateBaseOutlookItem();
+            outlookItem.Setup(x => x.Display()).Throws(new InvalidOperationException("boom"));
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            System.Action action = () => wrapper.Display();
+
+            action.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void NoAging_WhenUnderlyingGetterSucceeds_ShouldReturnValue()
+        {
+            var outlookItem = CreateBaseOutlookItem();
+            outlookItem.SetupGet(x => x.NoAging).Returns(true);
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            wrapper.NoAging.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void BillingInformation_WhenUnderlyingGetterSucceeds_ShouldReturnValue()
+        {
+            var outlookItem = CreateBaseOutlookItem();
+            outlookItem.SetupGet(x => x.BillingInformation).Returns("B123");
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            wrapper.BillingInformation.Should().Be("B123");
+        }
+
+        [TestMethod]
+        public void OlItemType_WhenUnderlyingCallSucceeds_ShouldReturnValue()
+        {
+            var outlookItem = CreateBaseOutlookItem();
+            outlookItem.Setup(x => x.GetOlItemType())
+                .Returns(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            wrapper.OlItemType.Should()
+                .Be(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
+        }
+
         private static Mock<IOutlookItem> CreateBaseOutlookItem()
         {
             var outlookItem = new Mock<IOutlookItem>();

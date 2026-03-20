@@ -132,6 +132,61 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
+        public void FindNode_WhenNotFound_ReturnsNull()
+        {
+            // Arrange
+            var root = new UtilitiesCS.TreeNode<string>("root");
+            root.AddChild("child");
+
+            // Act
+            var result = root.FindNode(v => v == "nonexistent", descendByLevel: true);
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void RemoveChild_WhenChildNotInTree_ReturnsFalse()
+        {
+            // Arrange
+            var root = new UtilitiesCS.TreeNode<string>("root");
+            var orphan = new UtilitiesCS.TreeNode<string>("orphan");
+
+            // Act
+            var result = root.RemoveChild(orphan);
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void FirstAncestor_WhenNoMatch_ReturnsNull()
+        {
+            // Arrange
+            var root = new UtilitiesCS.TreeNode<string>("root");
+            var child = root.AddChild("child");
+
+            // Act
+            var result = child.FirstAncestor(v => v == "nonexistent");
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void Indexer_ReturnsChildAtSpecifiedIndex()
+        {
+            // Arrange
+            var root = new UtilitiesCS.TreeNode<int>(0);
+            root.AddChildren(10, 20, 30);
+
+            // Act / Assert
+            root[0].Value.Should().Be(10);
+            root[1].Value.Should().Be(20);
+            root[2].Value.Should().Be(30);
+        }
+
+        [TestMethod]
         public void TraverseAndTraverseAncestors_VisitNodesInExpectedOrder()
         {
             // Arrange

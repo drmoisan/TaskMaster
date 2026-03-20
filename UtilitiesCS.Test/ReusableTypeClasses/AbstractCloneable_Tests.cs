@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -70,6 +71,43 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Assert
             original.Tags.Should().Equal("one", "two");
             clone.Tags.Should().Equal("one", "two", "three");
+        }
+
+        [TestMethod]
+        public void Clone_ViaICloneableInterface_ReturnsDistinctCopy()
+        {
+            // Arrange
+            var original = new CloneableNode { Name = "test" };
+            ICloneable cloneable = original;
+
+            // Act
+            var clone = cloneable.Clone() as CloneableNode;
+
+            // Assert
+            clone.Should().NotBeNull();
+            clone.Should().NotBeSameAs(original);
+            clone.Name.Should().Be("test");
+        }
+
+        [TestMethod]
+        public void Clone_WithPrimitiveFields_CopiesPrimitiveValues()
+        {
+            // Arrange
+            var original = new CloneableNode
+            {
+                Name = "primitive-test",
+                Child = null,
+                Tags = new List<string> { "tag1" },
+            };
+
+            // Act
+            var clone1 = original.CloneTyped();
+            var clone2 = original.CloneTyped();
+
+            // Assert
+            clone1.Name.Should().Be("primitive-test");
+            clone2.Name.Should().Be("primitive-test");
+            clone1.Should().NotBeSameAs(clone2);
         }
 
         private sealed class CloneableNode : AbstractCloneable

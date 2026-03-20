@@ -180,5 +180,136 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
             result.Should().BeSameAs(recipient.Object);
             recipient.Verify(x => x.Resolve(), Times.Once);
         }
+
+        [TestMethod]
+        public void GetSenderName_ForMailItem_ShouldReturnSenderName()
+        {
+            var mail = new Mock<InteropMailItem>();
+            mail.SetupGet(x => x.SenderName).Returns("Ada Lovelace");
+
+            var result = mail.Object.GetSenderName();
+
+            result.Should().Be("Ada Lovelace");
+        }
+
+        [TestMethod]
+        public void GetSenderName_ForMeetingItem_ShouldReturnSenderName()
+        {
+            var meeting = new Mock<MeetingItem>();
+            meeting.SetupGet(x => x.SenderName).Returns("Charles Babbage");
+
+            var result = meeting.Object.GetSenderName();
+
+            result.Should().Be("Charles Babbage");
+        }
+
+        [TestMethod]
+        public void GetSenderAddress_ForMailItem_ShouldReturnSenderEmailAddress()
+        {
+            var mail = new Mock<InteropMailItem>();
+            mail.SetupGet(x => x.SenderEmailAddress).Returns("ada@example.com");
+
+            var result = mail.Object.GetSenderAddress();
+
+            result.Should().Be("ada@example.com");
+        }
+
+        [TestMethod]
+        public void GetSenderAddress_ForMeetingItem_ShouldReturnSenderEmailAddress()
+        {
+            var meeting = new Mock<MeetingItem>();
+            meeting.SetupGet(x => x.SenderEmailAddress).Returns("charles@example.com");
+
+            var result = meeting.Object.GetSenderAddress();
+
+            result.Should().Be("charles@example.com");
+        }
+
+        [TestMethod]
+        public void GetSenderInfo_ForMeetingWithValidSender_ShouldReturnPopulatedRecipientInfo()
+        {
+            var meeting = new Mock<MeetingItem>();
+            meeting.SetupGet(x => x.SenderName).Returns("Ada Lovelace");
+            meeting.SetupGet(x => x.SenderEmailAddress).Returns("ada@example.com");
+
+            var result = meeting.Object.GetSenderInfo();
+
+            result.Name.Should().Be("Ada Lovelace");
+            result.Address.Should().Be("ada@example.com");
+            result.Html.Should().Contain("ada@example.com");
+        }
+
+        [TestMethod]
+        public void GetSenderInfo_ForMailWithValidSender_ShouldReturnPopulatedRecipientInfo()
+        {
+            var sender = new Mock<AddressEntry>();
+            var mail = new Mock<InteropMailItem>();
+            var accessor = new Mock<PropertyAccessor>();
+
+            sender.SetupGet(x => x.PropertyAccessor).Returns(accessor.Object);
+            mail.SetupGet(x => x.Sender).Returns(sender.Object);
+            mail.SetupGet(x => x.SenderName).Returns("Ada Lovelace");
+            mail.SetupGet(x => x.SenderEmailAddress).Returns("ada@example.com");
+
+            var result = mail.Object.GetSenderInfo();
+
+            result.Name.Should().Be("Ada Lovelace");
+            result.Address.Should().Be("ada@example.com");
+        }
+
+        [TestMethod]
+        public void GetRecipientInfo_ShouldReturnNameAndAddress()
+        {
+            var recipient = new Mock<Microsoft.Office.Interop.Outlook.Recipient>();
+            recipient.SetupGet(x => x.Name).Returns("Ada");
+            recipient.SetupGet(x => x.Address).Returns("ada@example.com");
+
+            var (name, address) = RecipientStatic.GetRecipientInfo(recipient.Object);
+
+            name.Should().Be("Ada");
+            address.Should().Be("ada@example.com");
+        }
+
+        [TestMethod]
+        public void GetSenderInfo_ForNullMeetingItem_ShouldThrowArgumentNullException()
+        {
+            MeetingItem meeting = null;
+
+            System.Action act = () => meeting.GetSenderInfo();
+
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void ToResolvedRecipient_AddressEntry_WhenResolves_ShouldReturnResolvedRecipient()
+        {
+            var addressEntry = new Mock<AddressEntry>();
+            var nameSpace = new Mock<NameSpace>();
+            var resolvedRecipient = new Mock<Microsoft.Office.Interop.Outlook.Recipient>();
+
+            addressEntry.SetupGet(x => x.Name).Returns("Ada");
+            nameSpace.Setup(x => x.CreateRecipient("Ada")).Returns(resolvedRecipient.Object);
+            resolvedRecipient.Setup(x => x.Resolve()).Returns(true);
+
+            var result = addressEntry.Object.ToResolvedRecipient(nameSpace.Object);
+
+            result.Should().BeSameAs(resolvedRecipient.Object);
+        }
+
+        [TestMethod]
+        public void ToResolvedRecipient_AddressEntry_WhenNotResolved_ShouldReturnDefault()
+        {
+            var addressEntry = new Mock<AddressEntry>();
+            var nameSpace = new Mock<NameSpace>();
+            var unresolvedRecipient = new Mock<Microsoft.Office.Interop.Outlook.Recipient>();
+
+            addressEntry.SetupGet(x => x.Name).Returns("Ghost");
+            nameSpace.Setup(x => x.CreateRecipient("Ghost")).Returns(unresolvedRecipient.Object);
+            unresolvedRecipient.Setup(x => x.Resolve()).Returns(false);
+
+            var result = addressEntry.Object.ToResolvedRecipient(nameSpace.Object);
+
+            result.Should().BeNull();
+        }
     }
 }

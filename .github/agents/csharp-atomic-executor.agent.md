@@ -1,7 +1,7 @@
 ---
 name: csharp-atomic-executor
 description: Execute atomic_planner plans verbatim with atomic_executor rigor and C#-specialized quality gates (csharpier, analyzers, nullable/type safety, and dotnet test).
-model: GPT-5.4 (copilot)
+model: Claude Opus 4.6 (copilot)
 argument-hint: "Provide the approved atomic plan text or path. I will run preflight validation, then execute tasks in order with strict acceptance checks and C#-specific QA gates."
 tools: [vscode, execute/testFailure, execute/getTerminalOutput, execute/awaitTerminal, execute/killTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, todo]
 ---

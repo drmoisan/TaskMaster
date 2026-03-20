@@ -130,23 +130,169 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             TypeBuilderNamespace.MyTypeBuilder.CreateNewObject();
         }
 
-        //[TestMethod]
-        //public void MyTypeBuilderTest2()
-        //{
-        //    var expected = new SimpleProperty() { TestElement = "test1" };
-        //    var actual = TypeBuilderNamespace.MyTypeBuilder.CreateReplica(expected);
-        //    actual.Should().BeEquivalentTo(expected);
-        //}
+        [TestMethod]
+        public void DefaultConstructor_CreatesInstance()
+        {
+            // Arrange & Act
+            var converter =
+                new DerivedCompositionConverter_ConcurrentDictionary<
+                    TestDerived,
+                    string,
+                    int
+                >();
 
-        //[TestMethod]
-        //public void MyTypeBuilderTest3()
-        //{
-        //    var expected = new TestDerived();
-        //    expected.TryAdd("key1", 1);
-        //    expected.TryAdd("key2", 2);
-        //    var actual = TypeBuilderNamespace.MyTypeBuilder.CreateReplica(expected);
-        //    actual.Should().BeEquivalentTo(expected);
+            // Assert
+            converter.Should().NotBeNull();
+        }
 
-        //}
+        [TestMethod]
+        public void Constructor_WithDerivedInstance_ExtractsComposition()
+        {
+            // Arrange
+            var derived = new TestDerived();
+            derived.TryAdd("key1", 1);
+            derived.TryAdd("key2", 2);
+
+            // Act
+            var converter =
+                new DerivedCompositionConverter_ConcurrentDictionary<
+                    TestDerived,
+                    string,
+                    int
+                >(derived);
+
+            // Assert
+            converter.ConcurrentDictionary.Should().NotBeNull();
+            converter.ConcurrentDictionary.Should().HaveCount(2);
+            converter.AdditionalFields.Should().NotBeNull();
+            converter.AdditionalProperties.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void ToCompositionOld_ExtractsDictionaryEntries()
+        {
+            // Arrange
+            var derived = new TestDerived();
+            derived.TryAdd("a", 10);
+            derived.TryAdd("b", 20);
+            var converter =
+                new DerivedCompositionConverter_ConcurrentDictionary<
+                    TestDerived,
+                    string,
+                    int
+                >();
+
+            // Act
+            converter.ToCompositionOld(derived);
+
+            // Assert
+            converter.ConcurrentDictionary.Should().ContainKey("a").WhoseValue.Should().Be(10);
+            converter.ConcurrentDictionary.Should().ContainKey("b").WhoseValue.Should().Be(20);
+        }
+
+        [TestMethod]
+        public void ToCompositionOld_ExtractsAdditionalFields()
+        {
+            // Arrange
+            var derived = new TestDerived();
+            var converter =
+                new DerivedCompositionConverter_ConcurrentDictionary<
+                    TestDerived,
+                    string,
+                    int
+                >();
+
+            // Act
+            converter.ToCompositionOld(derived);
+
+            // Assert
+            converter.AdditionalFields.Should().NotBeEmpty();
+        }
+
+        [TestMethod]
+        public void ToDerivedOld_RecreatesDictionaryEntries()
+        {
+            // Arrange
+            var original = new TestDerived();
+            original.TryAdd("key1", 1);
+            original.TryAdd("key2", 2);
+            var converter =
+                new DerivedCompositionConverter_ConcurrentDictionary<
+                    TestDerived,
+                    string,
+                    int
+                >(original);
+
+            // Act
+            var recreated = converter.ToDerivedOld();
+
+            // Assert
+            recreated.Should().ContainKey("key1").WhoseValue.Should().Be(1);
+            recreated.Should().ContainKey("key2").WhoseValue.Should().Be(2);
+        }
+
+        [TestMethod]
+        public void ToDerivedOld_RestoresAdditionalFields()
+        {
+            // Arrange
+            var original = new TestDerived();
+            original.TryAdd("x", 99);
+            var converter =
+                new DerivedCompositionConverter_ConcurrentDictionary<
+                    TestDerived,
+                    string,
+                    int
+                >(original);
+
+            // Act
+            var recreated = converter.ToDerivedOld();
+
+            // Assert
+            recreated.AdditionalField1.Should().Be("Test");
+            recreated.GetAdditionalField2().Should().Be(42);
+        }
+
+        [TestMethod]
+        public void EmitNewClass_CreatesType()
+        {
+            // Arrange
+            var converter =
+                new DerivedCompositionConverter_ConcurrentDictionary<
+                    TestDerived,
+                    string,
+                    int
+                >();
+
+            // Act
+            var newType = converter.EmitNewClass();
+
+            // Assert
+            newType.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void RoundTrip_ToCompositionAndToDerived_PreservesEntries()
+        {
+            // Arrange
+            var original = new TestDerived();
+            original.TryAdd("r1", 100);
+            original.TryAdd("r2", 200);
+
+            var converter =
+                new DerivedCompositionConverter_ConcurrentDictionary<
+                    TestDerived,
+                    string,
+                    int
+                >();
+
+            // Act
+            converter.ToCompositionOld(original);
+            var restored = converter.ToDerivedOld();
+
+            // Assert
+            restored.Should().HaveCount(2);
+            restored["r1"].Should().Be(100);
+            restored["r2"].Should().Be(200);
+        }
     }
 }

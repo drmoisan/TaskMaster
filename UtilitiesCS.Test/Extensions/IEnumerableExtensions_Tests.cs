@@ -339,6 +339,45 @@ namespace UtilitiesCS.Test.Extensions
             singleSplit.Test.Should().BeEmpty();
         }
 
+        [TestMethod]
+        public void WithAction_WhenEnumerableIsNull_ThrowsArgumentNullException()
+        {
+            // Arrange
+            IEnumerable<int> source = null;
+
+            // Act
+            Action act = () => source.WithAction(() => { }).ToArray();
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("enumerable");
+        }
+
+        [TestMethod]
+        public void StringJoin_WithDefaultSeparator_JoinsWithComma()
+        {
+            // Arrange
+            var strings = new[] { "a", "b", "c" };
+
+            // Act
+            var result = strings.StringJoin();
+
+            // Assert
+            result.Should().Be("a,b,c");
+        }
+
+        [TestMethod]
+        public void StringJoin_Chars_WithDefaultSeparator_JoinsWithEmpty()
+        {
+            // Arrange
+            var chars = new[] { 'x', 'y', 'z' };
+
+            // Act
+            var result = chars.StringJoin();
+
+            // Assert
+            result.Should().Be("xyz");
+        }
+
         private sealed class SampleRow
         {
             public int Id { get; set; }

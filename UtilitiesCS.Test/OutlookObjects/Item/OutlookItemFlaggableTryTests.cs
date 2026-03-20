@@ -95,6 +95,56 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             result.Should().BeNull();
         }
 
+        [TestMethod]
+        public void TaskStartDate_WhenUnderlyingGetterSucceeds_ShouldReturnValue()
+        {
+            var expected = new DateTime(2026, 4, 1);
+            var item = CreateBaseFlaggable();
+            item.SetupGet(x => x.TaskStartDate).Returns(expected);
+
+            var result = new OutlookItemFlaggableTry(item.Object).TaskStartDate;
+
+            result.Should().Be(expected);
+        }
+
+        [TestMethod]
+        public void TaskStartDateSetter_WhenUnderlyingSetterThrows_ShouldNotThrow()
+        {
+            var item = CreateBaseFlaggable();
+            item.SetupSet(x => x.TaskStartDate = It.IsAny<DateTime>())
+                .Throws(new InvalidOperationException("boom"));
+            var wrapper = new OutlookItemFlaggableTry(item.Object);
+
+            System.Action act = () => wrapper.TaskStartDate = new DateTime(2026, 5, 1);
+
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void TotalWorkSetter_WhenUnderlyingSetterThrows_ShouldNotThrow()
+        {
+            var item = CreateBaseFlaggable();
+            item.SetupSet(x => x.TotalWork = It.IsAny<int>())
+                .Throws(new InvalidOperationException("boom"));
+            var wrapper = new OutlookItemFlaggableTry(item.Object);
+
+            System.Action act = () => wrapper.TotalWork = 42;
+
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void IOutlookItem_TaskStartDate_WhenGetterSucceeds_ShouldReturnValue()
+        {
+            var expected = new DateTime(2026, 6, 15);
+            var item = CreateBaseFlaggable();
+            item.SetupGet(x => x.TaskStartDate).Returns(expected);
+
+            IOutlookItem wrapper = new OutlookItemFlaggableTry(item.Object);
+
+            wrapper.TaskStartDate.Should().Be(expected);
+        }
+
         private static Mock<IOutlookItemFlaggable> CreateBaseFlaggable()
         {
             var item = new Mock<IOutlookItemFlaggable>();

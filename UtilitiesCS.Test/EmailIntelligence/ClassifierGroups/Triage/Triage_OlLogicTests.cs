@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using BrightIdeasSoftware;
+using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -153,6 +154,103 @@ namespace UtilitiesCS.Test.EmailIntelligence
             _triageOlLogic = new Triage_OlLogic(_triage);
             Assert.IsNotNull(_triageOlLogic);
             await Task.CompletedTask;
+        }
+
+        [TestMethod]
+        public void ParseAndStripFilter_WithEmptyString_ShouldReturnEmpty()
+        {
+            var result = _triageOlLogic.ParseAndStripFilter("");
+            result.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public void ParseAndStripFilter_WithNoTriageReferences_ShouldReturnOriginal()
+        {
+            var filter = "[Subject] = 'Meeting'";
+            var result = _triageOlLogic.ParseAndStripFilter(filter);
+            result.Should().Be(filter);
+        }
+
+        [TestMethod]
+        public void ParseAndStripFilter_WithSingleTriageEquals_ShouldRemoveIt()
+        {
+            var schema =
+                "\"http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage\"";
+            var filter = $"{schema} = 'A'";
+            var result = _triageOlLogic.ParseAndStripFilter(filter);
+            result.Should().NotContain("/Triage");
+        }
+
+        [TestMethod]
+        public void StripFilter_WithNullParent_ShouldReturnNull()
+        {
+            var regex = new System.Text.RegularExpressions.Regex("Triage");
+            var tree = new TreeNode<string>("Triage = 'A'");
+
+            var result = _triageOlLogic.StripFilter(regex, tree);
+
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void StripFilter_WithNoMatch_ShouldReturnOriginalTree()
+        {
+            var regex = new System.Text.RegularExpressions.Regex("Triage");
+            var tree = new TreeNode<string>("Subject = 'Hello'");
+
+            var result = _triageOlLogic.StripFilter(regex, tree);
+
+            result.Should().BeSameAs(tree);
+        }
+
+        [TestMethod]
+        public void StripFilter_WithMatchAndParent_ShouldRemoveNode()
+        {
+            var regex = new System.Text.RegularExpressions.Regex("Triage");
+            var parent = new TreeNode<string>("AND");
+            var child1 = new TreeNode<string>("Triage = 'A'");
+            var child2 = new TreeNode<string>("Subject = 'Hello'");
+            parent.AddChild(child1);
+            parent.AddChild(child2);
+
+            var result = _triageOlLogic.StripFilter(regex, child1);
+
+            result.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void FilterView_WithEmptyTriageValues_ShouldHandleGracefully()
+        {
+            var mockExplorer = new Mock<Explorer>(MockBehavior.Strict);
+            var mockView = new Mock<View>(MockBehavior.Strict);
+            var mockApplication = new Mock<Application>(MockBehavior.Strict);
+            var mockOlObjects = new Mock<IOlObjects>(MockBehavior.Strict);
+
+            _mockGlobals.Setup(g => g.Ol).Returns(mockOlObjects.Object);
+            mockOlObjects.Setup(o => o.App).Returns(mockApplication.Object);
+            mockApplication.Setup(a => a.ActiveExplorer()).Returns(mockExplorer.Object);
+            mockExplorer.Setup(e => e.CurrentView).Returns(mockView.Object);
+            mockView.SetupProperty(v => v.Filter, "");
+            mockView.Setup(v => v.Apply());
+
+            _triageOlLogic.FilterView(System.Array.Empty<char>());
+
+            mockView.Verify(v => v.Apply(), Times.Once);
+        }
+
+        [TestMethod]
+        public void FilterView_WhenExplorerIsNull_ShouldReturnGracefully()
+        {
+            var mockOlObjects = new Mock<IOlObjects>(MockBehavior.Strict);
+            var mockApplication = new Mock<Application>(MockBehavior.Strict);
+
+            _mockGlobals.Setup(g => g.Ol).Returns(mockOlObjects.Object);
+            mockOlObjects.Setup(o => o.App).Returns(mockApplication.Object);
+            mockApplication.Setup(a => a.ActiveExplorer()).Returns((Explorer)null);
+
+            System.Action act = () => _triageOlLogic.FilterView(new char[] { 'A' });
+
+            act.Should().NotThrow();
         }
     }
 }

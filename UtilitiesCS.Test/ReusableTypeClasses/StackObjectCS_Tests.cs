@@ -125,6 +125,56 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
+        public void IsReadOnly_ReturnsFalse()
+        {
+            // Arrange
+            var stack = new UtilitiesCS.StackObjectCS<int>();
+
+            // Act / Assert
+            stack.IsReadOnly.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void Constructor_FromEnumerable_InitializesWithItems()
+        {
+            // Arrange / Act
+            var stack = new UtilitiesCS.StackObjectCS<string>(new[] { "a", "b", "c" });
+
+            // Assert
+            stack.Count.Should().Be(3);
+            stack.Peek().Should().Be("a");
+        }
+
+        [TestMethod]
+        public void TryPeek_WhenStackHasItem_ReturnsTrueAndItem()
+        {
+            // Arrange
+            var stack = new UtilitiesCS.StackObjectCS<int>(new[] { 42 });
+
+            // Act
+            var result = stack.TryPeek(out var value);
+
+            // Assert
+            result.Should().BeTrue();
+            value.Should().Be(42);
+        }
+
+        [TestMethod]
+        public void TryPop_WhenStackHasItem_ReturnsTrueAndItem()
+        {
+            // Arrange
+            var stack = new UtilitiesCS.StackObjectCS<int>(new[] { 7 });
+
+            // Act
+            var result = stack.TryPop(out var value);
+
+            // Assert
+            result.Should().BeTrue();
+            value.Should().Be(7);
+            stack.Count.Should().Be(0);
+        }
+
+        [TestMethod]
         public void ToArrayToListAndCopyTo_SupportNormalAndReversedOrdering()
         {
             // Arrange

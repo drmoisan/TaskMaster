@@ -117,6 +117,69 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             factoryCalls.Should().Be(1);
         }
 
+        [TestMethod]
+        public async Task Constructor_SyncFactory_WithCancellationToken_ProducesValueAsync()
+        {
+            // Arrange
+            var lazy = new AsyncLazy<int>(() => 77, CancellationToken.None);
+
+            // Act
+            var result = await lazy;
+
+            // Assert
+            result.Should().Be(77);
+        }
+
+        [TestMethod]
+        public async Task Constructor_AsyncFactory_WithCancellationToken_ProducesValueAsync()
+        {
+            // Arrange
+            var lazy = new AsyncLazy<string>(
+                async () =>
+                {
+                    await Task.Delay(5);
+                    return "hello";
+                },
+                CancellationToken.None
+            );
+
+            // Act
+            var result = await lazy;
+
+            // Assert
+            result.Should().Be("hello");
+        }
+
+        [TestMethod]
+        public async Task Constructor_SyncFactory_WithCancelledToken_ThrowsCancelledAsync()
+        {
+            // Arrange
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+            var lazy = new AsyncLazy<int>(() => 1, cts.Token);
+
+            // Act
+            Func<Task> act = async () => await lazy;
+
+            // Assert
+            await act.Should().ThrowAsync<TaskCanceledException>();
+        }
+
+        [TestMethod]
+        public async Task GetAwaiter_ReturnsTaskAwaiter_ThatCompletesSuccessfully()
+        {
+            // Arrange
+            var lazy = new AsyncLazy<int>(() => 5);
+
+            // Act
+            var awaiter = lazy.GetAwaiter();
+            var result = await lazy;
+
+            // Assert
+            result.Should().Be(5);
+            awaiter.IsCompleted.Should().BeTrue();
+        }
+
         private sealed class SampleReferenceType
         {
             public SampleReferenceType(string name)

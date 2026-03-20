@@ -144,5 +144,122 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         {
             public string Subject { get; set; }
         }
+
+        #region Extended Tests — P2-T13
+
+        [TestMethod]
+        public void TryGet_ShouldReturnValueWhenCallSucceeds()
+        {
+            string result = OutlookItemExtensions.TryGet(() => "hello");
+            result.Should().Be("hello");
+        }
+
+        [TestMethod]
+        public void TryGet_ShouldReturnDefault_WhenCallThrowsSystemException()
+        {
+            string result = OutlookItemExtensions.TryGet<string>(() => throw new InvalidOperationException());
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void TrySet_ShouldNotThrow_WhenSetterThrowsSystemException()
+        {
+            System.Action act = () => OutlookItemExtensions.TrySet<string>(
+                _ => throw new InvalidOperationException(), "value");
+
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void TryCall_Action_ShouldNotThrow_WhenActionThrowsSystemException()
+        {
+            System.Action act = () => OutlookItemExtensions.TryCall(
+                () => throw new InvalidOperationException());
+
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void TryCall_Func_ShouldReturnDefault_WhenFuncThrowsSystemException()
+        {
+            var result = OutlookItemExtensions.TryCall<string>(
+                () => throw new InvalidOperationException());
+
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void TryCall_Func_ShouldReturnValue_WhenFuncSucceeds()
+        {
+            var result = OutlookItemExtensions.TryCall(() => 42);
+
+            result.Should().Be(42);
+        }
+
+        [DataTestMethod]
+        [DataRow(typeof(AppointmentItem), OlItemType.olAppointmentItem)]
+        [DataRow(typeof(ContactItem), OlItemType.olContactItem)]
+        [DataRow(typeof(JournalItem), OlItemType.olJournalItem)]
+        [DataRow(typeof(NoteItem), OlItemType.olNoteItem)]
+        [DataRow(typeof(PostItem), OlItemType.olPostItem)]
+        public void GetOlItemType_WhenInnerObjectIsAdditionalSupportedType_ShouldReturnMappedValue(
+            Type outlookType,
+            OlItemType expected)
+        {
+            var innerObject = CreateInteropMockExtended(outlookType);
+            var outlookItem = new Mock<IOutlookItem>();
+            outlookItem.SetupGet(x => x.InnerObject).Returns(innerObject);
+
+            var result = outlookItem.Object.GetOlItemType();
+
+            result.Should().Be(expected);
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsAppointment_ShouldReturnTrue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<AppointmentItem>().Object);
+            outlookItem.IsValid().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsTask_ShouldReturnTrue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<InteropTaskItem>().Object);
+            outlookItem.IsValid().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsContact_ShouldReturnTrue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<ContactItem>().Object);
+            outlookItem.IsValid().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsNote_ShouldReturnTrue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<NoteItem>().Object);
+            outlookItem.IsValid().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsPost_ShouldReturnTrue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<PostItem>().Object);
+            outlookItem.IsValid().Should().BeTrue();
+        }
+
+        private static object CreateInteropMockExtended(Type outlookType)
+        {
+            if (outlookType == typeof(AppointmentItem)) return new Mock<AppointmentItem>().Object;
+            if (outlookType == typeof(ContactItem)) return new Mock<ContactItem>().Object;
+            if (outlookType == typeof(JournalItem)) return new Mock<JournalItem>().Object;
+            if (outlookType == typeof(NoteItem)) return new Mock<NoteItem>().Object;
+            if (outlookType == typeof(PostItem)) return new Mock<PostItem>().Object;
+            throw new ArgumentOutOfRangeException(nameof(outlookType));
+        }
+
+        #endregion
     }
 }

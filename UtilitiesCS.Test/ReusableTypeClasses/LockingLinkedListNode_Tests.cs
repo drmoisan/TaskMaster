@@ -81,5 +81,79 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             last.Next.Should().BeNull();
             last.Previous.Value.Should().Be(7);
         }
+
+        [TestMethod]
+        public void MoveAfter_ReordersNodeAfterTarget()
+        {
+            // Arrange – list: A, B, C
+            var list = new LockingLinkedList<string>(new[] { "A", "B", "C" });
+            var nodeA = list.Find("A");
+            var nodeB = list.Find("B");
+
+            // Act – move A after B → B, A, C
+            nodeA.MoveAfter(nodeB);
+
+            // Assert
+            list.Should().Equal("B", "A", "C");
+        }
+
+        [TestMethod]
+        public void MoveBefore_ReordersNodeBeforeTarget()
+        {
+            // Arrange – list: A, B, C
+            var list = new LockingLinkedList<string>(new[] { "A", "B", "C" });
+            var nodeC = list.Find("C");
+            var nodeB = list.Find("B");
+
+            // Act – move C before B → A, C, B
+            nodeC.MoveBefore(nodeB);
+
+            // Assert
+            list.Should().Equal("A", "C", "B");
+        }
+
+        [TestMethod]
+        public void MoveUp_ShiftsNodeOnePositionEarlier()
+        {
+            // Arrange – list: 10, 20, 30
+            var list = new LockingLinkedList<int>(new[] { 10, 20, 30 });
+            var node20 = list.Find(20);
+
+            // Act
+            node20.MoveUp();
+
+            // Assert – 20, 10, 30
+            list.Should().Equal(20, 10, 30);
+        }
+
+        [TestMethod]
+        public void MoveDown_ShiftsNodeOnePositionLater()
+        {
+            // Arrange – list: 10, 20, 30
+            var list = new LockingLinkedList<int>(new[] { 10, 20, 30 });
+            var node20 = list.Find(20);
+
+            // Act
+            node20.MoveDown();
+
+            // Assert – 10, 30, 20
+            list.Should().Equal(10, 30, 20);
+        }
+
+        [TestMethod]
+        public void Invalidate_ClearsAllInternalReferences()
+        {
+            // Arrange
+            var list = new LockingLinkedList<int>(new[] { 1 });
+            var node = list.First;
+
+            // Act
+            node.Invalidate();
+
+            // Assert
+            node.List.Should().BeNull();
+            node.Next.Should().BeNull();
+            node.Previous.Should().BeNull();
+        }
     }
 }

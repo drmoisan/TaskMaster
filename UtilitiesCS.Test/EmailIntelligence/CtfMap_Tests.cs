@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -135,6 +136,135 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Assert
             map.Should().ContainSingle();
             map[0].EmailCount.Should().Be(7);
+        }
+
+        [TestMethod]
+        public void Add_WhenEntryDoesNotExist_CreatesNewEntry()
+        {
+            // Arrange
+            var map = new CtfMap { new CtfMapEntry("Inbox", "conv-1", 2) };
+
+            // Act
+            map.Add(emailFolder: "Archive", conversationID: "conv-2", emailCount: 3);
+
+            // Assert
+            map.Should().HaveCount(2);
+            map[1].EmailFolder.Should().Be("Archive");
+            map[1].ConversationID.Should().Be("conv-2");
+            map[1].EmailCount.Should().Be(3);
+        }
+
+        [TestMethod]
+        public void TopEntriesById_WithMultipleMatches_ReturnsTopNByEmailCountDescending()
+        {
+            // Arrange
+            var map = new CtfMap
+            {
+                new CtfMapEntry("Inbox", "conv-1", 3),
+                new CtfMapEntry("Archive", "conv-1", 7),
+                new CtfMapEntry("Projects", "conv-1", 5),
+                new CtfMapEntry("Other", "conv-2", 10),
+            };
+
+            // Act
+            var entries = map.TopEntriesById(id: "conv-1", topN: 2);
+
+            // Assert
+            entries.Should().HaveCount(2);
+            entries[0].EmailCount.Should().Be(7);
+            entries[1].EmailCount.Should().Be(5);
+        }
+
+        [TestMethod]
+        public void ProcessQueue_WithValidEntries_ReturnsAllEntries()
+        {
+            // Arrange
+            var lines = new Queue<string>(
+                new[] { "Inbox", "AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHH", "5" }
+            );
+
+            // Act
+            var result = CtfMap.ProcessQueue(lines);
+
+            // Assert
+            result.Should().ContainSingle();
+            result[0].EmailFolder.Should().Be("Inbox");
+            result[0].ConversationID.Should().Be("AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHH");
+            result[0].EmailCount.Should().Be(5);
+        }
+
+        [TestMethod]
+        public void TryDequeueEntry_WithValidEntry_ReturnsEntry()
+        {
+            // Arrange
+            var lines = new Queue<string>(new[] { "Inbox", "conv-1", "7" });
+
+            // Act
+            var result = CtfMap.TryDequeueEntry(ref lines);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.EmailFolder.Should().Be("Inbox");
+            result.EmailCount.Should().Be(7);
+        }
+
+        [TestMethod]
+        public void TryDequeueEntry_WithInvalidIntegerFormat_ReturnsNull()
+        {
+            // Arrange
+            var lines = new Queue<string>(new[] { "Inbox", "conv-1", "not-a-number" });
+
+            // Act
+            var result = CtfMap.TryDequeueEntry(ref lines);
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void IsEntryID_WithValid32CharString_ReturnsTrue()
+        {
+            // Act / Assert
+            CtfMap.IsEntryID("AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHH").Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsEntryID_WithSpacesOrBackslash_ReturnsFalse()
+        {
+            // Act / Assert
+            CtfMap.IsEntryID("AAAABBBB CCCCDDDDEEEEFFFFGGGGHHHH").Should().BeFalse();
+            CtfMap.IsEntryID("AAAABBBB\\CCCDDDDEEEEFFFFGGGGHHHH").Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void IsEntryID_WhenLengthIsNot32_ReturnsFalse()
+        {
+            // Act / Assert
+            CtfMap.IsEntryID("short").Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void DequeueToNextRecord_SkipsLinesUntilEntryIdFound()
+        {
+            // Arrange – two garbage lines precede the entry-ID so the method
+            // actually dequeues one of them (it looks ahead at ElementAt(1)).
+            var lines = new Queue<string>(
+                new[]
+                {
+                    "garbage-1",
+                    "garbage-2",
+                    "AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHH",
+                    "next-record",
+                }
+            );
+
+            // Act
+            CtfMap.DequeueToNextRecord(ref lines);
+
+            // Assert – the method stops when ElementAt(1) is an entry-ID,
+            // leaving the element just before the entry-ID at the front.
+            lines.Count.Should().Be(3);
+            lines.Peek().Should().Be("garbage-2");
         }
     }
 }

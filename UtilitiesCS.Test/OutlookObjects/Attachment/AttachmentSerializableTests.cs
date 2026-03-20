@@ -123,6 +123,74 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
         }
 
         [TestMethod]
+        public void IsAnImage_WhenPngExtension_ShouldReturnTrue()
+        {
+            var attachment = new AttachmentSerializable { FileExtension = ".png" };
+            attachment.IsAnImage().Should().BeTrue();
+        }
+
+        [DataTestMethod]
+        [DataRow(".jpg")]
+        [DataRow(".jpeg")]
+        [DataRow(".gif")]
+        [DataRow(".bmp")]
+        public void IsAnImage_WhenImageExtension_ShouldReturnTrue(string ext)
+        {
+            var attachment = new AttachmentSerializable { FileExtension = ext };
+            attachment.IsAnImage().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsAnImage_WhenPdfExtension_ShouldReturnFalse()
+        {
+            var attachment = new AttachmentSerializable { FileExtension = ".pdf" };
+            attachment.IsAnImage().Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void IsAnImage_WhenNullExtension_ShouldReturnFalse()
+        {
+            var attachment = new AttachmentSerializable { FileExtension = null };
+            attachment.IsAnImage().Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void TryFromAccessor_WhenAccessorReturnsBytes_ShouldReturnTrueAndSetBytes()
+        {
+            var expected = new byte[] { 1, 2, 3 };
+            var accessor = new Mock<PropertyAccessor>();
+            accessor
+                .Setup(x => x.GetProperty(
+                    "http://schemas.microsoft.com/mapi/proptag/0x37010102"))
+                .Returns(expected);
+            var outlookAttachment = new Mock<Microsoft.Office.Interop.Outlook.Attachment>();
+            outlookAttachment.SetupGet(x => x.PropertyAccessor).Returns(accessor.Object);
+
+            var attachment = new AttachmentSerializable();
+            var result = attachment.TryFromAccessor(outlookAttachment.Object, out byte[] bytes);
+
+            result.Should().BeTrue();
+            bytes.Should().Equal(expected);
+        }
+
+        [TestMethod]
+        public void TryFromAccessor_WhenAccessorThrows_ShouldReturnFalse()
+        {
+            var accessor = new Mock<PropertyAccessor>();
+            accessor
+                .Setup(x => x.GetProperty(It.IsAny<string>()))
+                .Throws(new System.InvalidOperationException("COM error"));
+            var outlookAttachment = new Mock<Microsoft.Office.Interop.Outlook.Attachment>();
+            outlookAttachment.SetupGet(x => x.PropertyAccessor).Returns(accessor.Object);
+
+            var attachment = new AttachmentSerializable();
+            var result = attachment.TryFromAccessor(outlookAttachment.Object, out byte[] bytes);
+
+            result.Should().BeFalse();
+            bytes.Should().BeNull();
+        }
+
+        [TestMethod]
         public void JsonSerialization_RoundTripsSerializedProperties_AndOmitsRuntimeOnlyReferences()
         {
             // Arrange

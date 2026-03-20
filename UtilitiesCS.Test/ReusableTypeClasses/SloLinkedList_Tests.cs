@@ -73,5 +73,120 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             list.Count.Should().Be(15);
             list.OrderBy(value => value).Should().Equal(values.Where(value => value % 2 != 0));
         }
+
+        [TestMethod]
+        public void Config_IsNotNull()
+        {
+            // Arrange
+            var list = new SloLinkedList<int>();
+
+            // Act & Assert
+            list.Config.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void Config_Set_UpdatesConfig()
+        {
+            // Arrange
+            var list = new SloLinkedList<int>();
+            var config = new UtilitiesCS.ReusableTypeClasses.NewSmartSerializableConfig();
+
+            // Act
+            list.Config = config;
+
+            // Assert
+            list.Config.Should().BeSameAs(config);
+        }
+
+        [TestMethod]
+        public void Name_SetAndGet_Works()
+        {
+            // Arrange
+            var list = new SloLinkedList<int>();
+
+            // Act
+            list.Name = "TestList";
+
+            // Assert
+            list.Name.Should().Be("TestList");
+        }
+
+        [TestMethod]
+        public void Serialize_WithNoPath_IsNoOp()
+        {
+            // Arrange
+            var list = new SloLinkedList<int>();
+            list.AddLast(42);
+
+            // Act
+            list.Serialize();
+
+            // Assert
+            list.Count.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void DeserializeObject_ThrowsNotImplementedException()
+        {
+            // Arrange
+            var list = new SloLinkedList<int>();
+            var settings = new Newtonsoft.Json.JsonSerializerSettings();
+
+            // Act
+            System.Action act = () => list.DeserializeObject("{}", settings);
+
+            // Assert
+            act.Should().Throw<System.NotImplementedException>();
+        }
+
+        [TestMethod]
+        public void PropertyChanged_RaisedOnConfigChange()
+        {
+            // Arrange
+            var list = new SloLinkedList<int>();
+            var raised = new System.Collections.Generic.List<string>();
+            list.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+            // Act
+            list.Notify("TestProp");
+
+            // Assert
+            raised.Should().Contain("TestProp");
+        }
+
+        [TestMethod]
+        public void Clear_RemovesAllNodes()
+        {
+            // Arrange
+            var list = new SloLinkedList<int>(new[] { 1, 2, 3 });
+
+            // Act
+            list.Clear();
+
+            // Assert
+            list.Count.Should().Be(0);
+            list.First.Should().BeNull();
+            list.Last.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void Contains_ExistingItem_ReturnsTrue()
+        {
+            // Arrange
+            var list = new SloLinkedList<int>(new[] { 1, 2, 3 });
+
+            // Act & Assert
+            list.Contains(2).Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void Contains_MissingItem_ReturnsFalse()
+        {
+            // Arrange
+            var list = new SloLinkedList<int>(new[] { 1, 2, 3 });
+
+            // Act & Assert
+            list.Contains(99).Should().BeFalse();
+        }
     }
 }

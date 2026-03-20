@@ -133,5 +133,64 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
 
             return rootFolder;
         }
+
+        [TestMethod]
+        public void TryRestore_WhenRestoreSucceeds_ShouldReturnTrue()
+        {
+            var store = new Mock<OutlookStore>();
+            var rootFolder = CreateRootFolderWithPrimarySmtpAddress("user@example.com");
+            var inbox = new Mock<OutlookFolder>();
+
+            store.SetupGet(x => x.DisplayName).Returns("Mailbox");
+            store.Setup(x => x.GetRootFolder()).Returns(rootFolder.Object);
+            store.SetupGet(x => x.ExchangeStoreType)
+                .Returns(OlExchangeStoreType.olPrimaryExchangeMailbox);
+            store.Setup(x => x.GetDefaultFolder(OlDefaultFolders.olFolderInbox))
+                .Returns(inbox.Object);
+
+            var wrapper = new StoreWrapper(store.Object);
+
+            var result = wrapper.TryRestore(store.Object);
+
+            result.Should().BeTrue();
+            wrapper.DisplayName.Should().Be("Mailbox");
+        }
+
+        [TestMethod]
+        public void TryRestore_WhenRestoreThrows_ShouldReturnFalse()
+        {
+            var store = new Mock<OutlookStore>();
+            store.SetupGet(x => x.DisplayName).Throws(new COMException("fail"));
+
+            var wrapper = new StoreWrapper(store.Object);
+            wrapper.DisplayName = "Old";
+
+            var result = wrapper.TryRestore(store.Object);
+
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void ConfigurableProperties_ShouldHaveDefaultValues()
+        {
+            var store = new Mock<OutlookStore>();
+            var wrapper = new StoreWrapper(store.Object);
+
+            wrapper.ArchiveRoot.Should().NotBeNull();
+            wrapper.ArchiveFsRoot.Should().NotBeNull();
+            wrapper.JunkPotential.Should().NotBeNull();
+            wrapper.JunkCertain.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void GetSmtpAddressFromStore_WhenRootFolderIsNull_ShouldReturnNull()
+        {
+            var store = new Mock<OutlookStore>();
+            var wrapper = new StoreWrapper(store.Object) { RootFolder = null };
+
+            var result = wrapper.GetSmtpAddressFromStore();
+
+            result.Should().BeNull();
+        }
     }
 }

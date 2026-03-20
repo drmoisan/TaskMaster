@@ -115,5 +115,138 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
                 .Returns(((IEnumerable<object>)items).GetEnumerator());
             return selection;
         }
+
+        #region Extended Tests — P2-T13
+
+        [TestMethod]
+        public void SetCategories_WhenItemIsTaskItem_ShouldAssignCategoriesAndSave()
+        {
+            var taskItem = new Mock<TaskItem>();
+            taskItem.SetupProperty(x => x.Categories);
+
+            taskItem.Object.SetCategories("Task Category");
+
+            taskItem.Object.Categories.Should().Be("Task Category");
+            taskItem.Verify(x => x.Save(), Times.Once);
+        }
+
+        [TestMethod]
+        public void SetCategories_WhenItemIsAppointmentItem_ShouldAssignCategoriesAndSave()
+        {
+            var apptItem = new Mock<AppointmentItem>();
+            apptItem.SetupProperty(x => x.Categories);
+
+            apptItem.Object.SetCategories("Appt Category");
+
+            apptItem.Object.Categories.Should().Be("Appt Category");
+            apptItem.Verify(x => x.Save(), Times.Once);
+        }
+
+        [TestMethod]
+        public void SetCategories_WhenItemIsMeetingItem_ShouldAssignCategoriesAndSave()
+        {
+            var meetingItem = new Mock<MeetingItem>();
+            meetingItem.SetupProperty(x => x.Categories);
+
+            meetingItem.Object.SetCategories("Meeting Category");
+
+            meetingItem.Object.Categories.Should().Be("Meeting Category");
+            meetingItem.Verify(x => x.Save(), Times.Once);
+        }
+
+        [TestMethod]
+        public void GetCategories_WhenItemIsMailItem_ShouldReturnCategories()
+        {
+            var mailItem = new Mock<InteropMailItem>();
+            mailItem.SetupGet(x => x.Categories).Returns("Mail Cat");
+
+            var result = mailItem.Object.GetCategories();
+
+            result.Should().Be("Mail Cat");
+        }
+
+        [TestMethod]
+        public void GetCategories_WhenItemIsAppointmentItem_ShouldReturnCategories()
+        {
+            var apptItem = new Mock<AppointmentItem>();
+            apptItem.SetupGet(x => x.Categories).Returns("Appt Cat");
+
+            var result = apptItem.Object.GetCategories();
+
+            result.Should().Be("Appt Cat");
+        }
+
+        [TestMethod]
+        public void GetCategories_WhenItemIsMeetingItem_ShouldReturnCategories()
+        {
+            var meetingItem = new Mock<MeetingItem>();
+            meetingItem.SetupGet(x => x.Categories).Returns("Meeting Cat");
+
+            var result = meetingItem.Object.GetCategories();
+
+            result.Should().Be("Meeting Cat");
+        }
+
+        [TestMethod]
+        public void GetCategories_WhenItemIsUnsupported_ShouldThrowArgumentException()
+        {
+            var unsupported = new object();
+
+            System.Action act = () => unsupported.GetCategories();
+
+            act.Should().Throw<ArgumentException>().WithMessage("Unsupported type*");
+        }
+
+        [TestMethod]
+        public void NoConflicts_WhenItemIsTaskItem_ShouldReturnTrue()
+        {
+            var conflicts = new Mock<Conflicts>();
+            conflicts.SetupGet(x => x.Count).Returns(0);
+            var taskItem = new Mock<TaskItem>();
+            taskItem.SetupGet(x => x.Conflicts).Returns(conflicts.Object);
+
+            var result = taskItem.Object.NoConflicts();
+
+            result.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void NoConflicts_WhenItemIsMeetingItem_ShouldReturnTrue()
+        {
+            var conflicts = new Mock<Conflicts>();
+            conflicts.SetupGet(x => x.Count).Returns(0);
+            var meetingItem = new Mock<MeetingItem>();
+            meetingItem.SetupGet(x => x.Conflicts).Returns(conflicts.Object);
+
+            var result = meetingItem.Object.NoConflicts();
+
+            result.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void NoConflicts_WhenItemIsAppointmentItem_ShouldReturnTrue()
+        {
+            var conflicts = new Mock<Conflicts>();
+            conflicts.SetupGet(x => x.Count).Returns(0);
+            var apptItem = new Mock<AppointmentItem>();
+            apptItem.SetupGet(x => x.Conflicts).Returns(conflicts.Object);
+
+            var result = apptItem.Object.NoConflicts();
+
+            result.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void NoConflicts_WhenItemIsUnsupported_ShouldReturnFalse()
+        {
+            var unsupported = new object();
+
+            var result = unsupported.NoConflicts();
+
+            // The unsupported type throws ArgumentException which is caught and returns false
+            result.Should().BeFalse();
+        }
+
+        #endregion
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 
@@ -204,6 +205,111 @@ namespace ConcurrentObservableCollection.Tests
         }
 
         [TestMethod]
+        public void ContainsKey_ReturnsTrueForExistingAndFalseForMissing()
+        {
+            // Arrange
+            _dictionary.TryAdd("exists", 42);
+
+            // Act / Assert
+            Assert.IsTrue(_dictionary.ContainsKey("exists"));
+            Assert.IsFalse(_dictionary.ContainsKey("missing"));
+        }
+
+        [TestMethod]
+        public void Keys_ReturnsAllAddedKeys()
+        {
+            // Arrange
+            _dictionary.TryAdd("a", 1);
+            _dictionary.TryAdd("b", 2);
+
+            // Act
+            var keys = _dictionary.Keys;
+
+            // Assert
+            CollectionAssert.AreEquivalent(new[] { "a", "b" }, keys.ToArray());
+        }
+
+        [TestMethod]
+        public void Values_ReturnsAllAddedValues()
+        {
+            // Arrange
+            _dictionary.TryAdd("a", 1);
+            _dictionary.TryAdd("b", 2);
+
+            // Act
+            var values = _dictionary.Values;
+
+            // Assert
+            CollectionAssert.AreEquivalent(new[] { 1, 2 }, values.ToArray());
+        }
+
+        [TestMethod]
+        public void Indexer_ReturnsValueForExistingKey()
+        {
+            // Arrange
+            _dictionary.TryAdd("key", 99);
+
+            // Act
+            var value = _dictionary["key"];
+
+            // Assert
+            Assert.AreEqual(99, value);
+        }
+
+        [TestMethod]
+        public void Count_ReturnsNumberOfEntries()
+        {
+            // Arrange
+            _dictionary.TryAdd("a", 1);
+            _dictionary.TryAdd("b", 2);
+
+            // Act / Assert
+            Assert.AreEqual(2, _dictionary.Count);
+        }
+
+        [TestMethod]
+        public void GetEnumerator_IteratesOverAllEntries()
+        {
+            // Arrange
+            _dictionary.TryAdd("a", 1);
+            _dictionary.TryAdd("b", 2);
+
+            // Act
+            var entries = _dictionary.ToList();
+
+            // Assert
+            Assert.AreEqual(2, entries.Count);
+        }
+
+        [TestMethod]
+        public void ToList_ReturnsListOfKeyValuePairs()
+        {
+            // Arrange
+            _dictionary.TryAdd("a", 1);
+            _dictionary.TryAdd("b", 2);
+
+            // Act
+            var list = _dictionary.ToList();
+
+            // Assert
+            Assert.AreEqual(2, list.Count);
+        }
+
+        [TestMethod]
+        public void ToArray_ReturnsArrayOfKeyValuePairs()
+        {
+            // Arrange
+            _dictionary.TryAdd("a", 1);
+
+            // Act
+            var array = _dictionary.ToArray();
+
+            // Assert
+            Assert.AreEqual(1, array.Length);
+            Assert.AreEqual("a", array[0].Key);
+        }
+
+        [TestMethod]
         public void RemovePartialObserver_RemovesObserverForKey()
         {
             // Arrange
@@ -233,6 +339,95 @@ namespace ConcurrentObservableCollection.Tests
 
             // Assert
             Assert.AreEqual(0, observer.ReceivedEvents.Count);
+        }
+
+        [TestMethod]
+        public void ContainsKey_WhenKeyExists_ReturnsTrue()
+        {
+            // Arrange
+            _dictionary.TryAdd("x", 9);
+
+            // Act / Assert
+            _dictionary.ContainsKey("x").Should().BeTrue();
+            _dictionary.ContainsKey("missing").Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void Keys_ReturnsAllKeys()
+        {
+            // Arrange
+            _dictionary.TryAdd("a", 1);
+            _dictionary.TryAdd("b", 2);
+
+            // Act
+            var keys = _dictionary.Keys;
+
+            // Assert
+            keys.Should().BeEquivalentTo(new[] { "a", "b" });
+        }
+
+        [TestMethod]
+        public void Values_ReturnsAllValues()
+        {
+            // Arrange
+            _dictionary.TryAdd("a", 1);
+            _dictionary.TryAdd("b", 2);
+
+            // Act
+            var values = _dictionary.Values;
+
+            // Assert
+            values.Should().BeEquivalentTo(new[] { 1, 2 });
+        }
+
+        [TestMethod]
+        public void Indexer_Get_ReturnsValueForExistingKey()
+        {
+            // Arrange
+            _dictionary.TryAdd("k", 42);
+
+            // Act
+            var result = _dictionary["k"];
+
+            // Assert
+            result.Should().Be(42);
+        }
+
+        [TestMethod]
+        public void Indexer_Set_UpdatesExistingKey()
+        {
+            // Arrange
+            _dictionary.TryAdd("k", 1);
+
+            // Act
+            _dictionary["k"] = 99;
+
+            // Assert
+            _dictionary["k"].Should().Be(99);
+        }
+
+        [TestMethod]
+        public void GetOrAdd_WhenKeyMissing_AddsAndReturnsValue()
+        {
+            // Act
+            var result = _dictionary.GetOrAdd("new", 7);
+
+            // Assert
+            result.Should().Be(7);
+            _dictionary["new"].Should().Be(7);
+        }
+
+        [TestMethod]
+        public void GetOrAdd_WhenKeyExists_ReturnsExistingValue()
+        {
+            // Arrange
+            _dictionary.TryAdd("existing", 5);
+
+            // Act
+            var result = _dictionary.GetOrAdd("existing", 99);
+
+            // Assert
+            result.Should().Be(5);
         }
 
         private class TestObserver<TKey, TValue> : IDictionaryObserver<TKey, TValue>

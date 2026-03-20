@@ -63,5 +63,43 @@ namespace UtilitiesCS.Test.HelperClasses
             getPosition.Should().Throw<InvalidOperationException>();
             setPosition.Should().Throw<InvalidOperationException>();
         }
+
+        [TestMethod]
+        public void Write_ShouldWriteBytesWithoutThrowing()
+        {
+            // Arrange
+            using var logger = new DebugTextLogger();
+            var stream = logger.BaseStream;
+
+            // Act
+            Action act = () =>
+            {
+                var bytes = System.Text.Encoding.Unicode.GetBytes("test");
+                stream.Write(bytes, 0, bytes.Length);
+                stream.Flush();
+            };
+
+            // Assert
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void Write_WithVariousCharSequences_ShouldNotThrow()
+        {
+            // Arrange
+            using var logger = new DebugTextLogger();
+
+            // Act
+            Action act = () =>
+            {
+                logger.Write('A');
+                logger.Write("Test string");
+                logger.Write(new char[] { 'x', 'y', 'z' });
+                logger.Flush();
+            };
+
+            // Assert
+            act.Should().NotThrow();
+        }
     }
 }

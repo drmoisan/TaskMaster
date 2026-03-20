@@ -77,6 +77,61 @@ namespace UtilitiesCS.Test.HelperClasses
             assembly.FullName.Should().Be(typeof(TraceUtility_Tests).Assembly.FullName);
         }
 
+        [TestMethod]
+        public void TryGetMyTraceString_WithValidTrace_ReturnsNonEmptyString()
+        {
+            // Act
+            var result = new StackTrace().TryGetMyTraceString("fallback");
+
+            // Assert
+            result.Should().NotBe("fallback");
+            result.Should().NotBeNullOrWhiteSpace();
+        }
+
+        [TestMethod]
+        public void GetCallerParameters_ShouldReturnParameterInfoArray()
+        {
+            // Arrange
+            var trace = new StackTrace();
+
+            // Act
+            var parameters = trace.GetCallerParameters();
+
+            // Assert
+            parameters.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void GetMethodTraceString_ExtensionOnStackTrace_ReturnsChain()
+        {
+            // Act
+            var result = CaptureMethodTraceStringViaExtension("data");
+
+            // Assert
+            result.Should().NotBeNullOrWhiteSpace();
+            result.Should().Contain("GetMethodTraceString_ExtensionOnStackTrace_ReturnsChain");
+        }
+
+        [TestMethod]
+        public void GetMethodCallLogString_WithoutParams_StillReturnsTrace()
+        {
+            // Act
+            var result = CaptureCallWithNoParams();
+
+            // Assert
+            result.Should().StartWith("TRACE");
+        }
+
+        private string CaptureCallWithNoParams()
+        {
+            return TraceUtility.GetMethodCallLogString();
+        }
+
+        private string CaptureMethodTraceStringViaExtension(string value)
+        {
+            return new StackTrace(1).GetMethodTraceString(value);
+        }
+
         private string CaptureMethodCallLogString(int count, string name)
         {
             return TraceUtility.GetMethodCallLogString(count, name);

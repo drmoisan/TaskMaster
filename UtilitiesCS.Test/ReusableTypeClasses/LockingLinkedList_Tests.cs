@@ -211,5 +211,270 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             list.Should().BeEmpty();
             list.Count.Should().Be(0);
         }
+
+        [TestMethod]
+        public void Remove_WithUnwireAction_InvokesActionBeforeRemoval()
+        {
+            // Arrange
+            var list = new LockingLinkedList<string>(new[] { "a", "b" });
+            string unwired = null;
+
+            // Act
+            var removed = list.Remove("a", item => unwired = item);
+
+            // Assert
+            removed.Should().BeTrue();
+            unwired.Should().Be("a");
+            list.Should().ContainSingle().Which.Should().Be("b");
+        }
+
+        [TestMethod]
+        public void Remove_LockingLinkedListNode_RemovesSpecificNode()
+        {
+            // Arrange
+            var list = new LockingLinkedList<int>(new[] { 1, 2, 3 });
+            var node = list.Find(2);
+
+            // Act
+            list.Remove(node);
+
+            // Assert
+            list.Should().Equal(1, 3);
+        }
+
+        [TestMethod]
+        public void RemoveFirst_RemovesHeadElement()
+        {
+            // Arrange
+            var list = new LockingLinkedList<int>(new[] { 10, 20, 30 });
+
+            // Act
+            list.RemoveFirst();
+
+            // Assert
+            list.Should().Equal(20, 30);
+        }
+
+        [TestMethod]
+        public void Clear_WithoutAction_EmptiesList()
+        {
+            // Arrange
+            var list = new LockingLinkedList<int>(new[] { 1, 2, 3 });
+
+            // Act
+            list.Clear();
+
+            // Assert
+            list.Should().BeEmpty();
+            list.Count.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void TakeFirst_N_ThrowsWhenNExceedsCount()
+        {
+            // Arrange
+            var list = new LockingLinkedList<int>(new[] { 1 });
+
+            // Act
+            Action act = () => list.TakeFirst(5);
+
+            // Assert
+            act.Should().Throw<ArgumentOutOfRangeException>();
+        }
+
+        [TestMethod]
+        public void TryTakeFirst_N_ReturnsNull_WhenNIsZeroOrNegative()
+        {
+            // Arrange
+            var list = new LockingLinkedList<int>(new[] { 1, 2 });
+
+            // Act
+            var result = list.TryTakeFirst(0);
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void TakeLast_N_RemovesAndReturnsLastNItems()
+        {
+            // Arrange
+            var list = new LockingLinkedList<int>(new[] { 1, 2, 3, 4 });
+
+            // Act
+            var taken = list.TakeLast(2);
+
+            // Assert
+            taken.Should().Equal(3, 4);
+            list.Should().Equal(1, 2);
+        }
+
+        [TestMethod]
+        public void AddBefore_WithLinkedListNode_InsertsBeforeNode()
+        {
+            // Arrange
+            var list = new LockingLinkedList<int>(new[] { 1, 3 });
+            var baseNode = ((LinkedList<int>)list).Find(3);
+
+            // Act
+            list.AddBefore(baseNode, 2);
+
+            // Assert
+            list.Should().Equal(1, 2, 3);
+        }
+
+        [TestMethod]
+        public void AddAfter_WithLinkedListNode_InsertsAfterNode()
+        {
+            // Arrange
+            var list = new LockingLinkedList<int>(new[] { 1, 3 });
+            var baseNode = ((LinkedList<int>)list).Find(1);
+
+            // Act
+            list.AddAfter(baseNode, 2);
+
+            // Assert
+            list.Should().Equal(1, 2, 3);
+        }
+
+        [TestMethod]
+        public void AddAfter_WithLockingNode_InsertsAfterNode()
+        {
+            // Arrange
+            var list = new LockingLinkedList<int>(new[] { 1, 3 });
+            var lockingNode = list.Find(1);
+
+            // Act
+            list.AddAfter(lockingNode, 2);
+
+            // Assert
+            list.Should().Equal(1, 2, 3);
+        }
+
+        [TestMethod]
+        public void MoveAfter_MovesNodeAfterTarget()
+        {
+            // Arrange – list: 1, 2, 3
+            var list = new LockingLinkedList<int>(new[] { 1, 2, 3 });
+            var nodeToMove = list.Find(1);
+            var target = list.Find(2);
+
+            // Act
+            nodeToMove.MoveAfter(target);
+
+            // Assert – should become 2, 1, 3
+            list.Should().Equal(2, 1, 3);
+        }
+
+        [TestMethod]
+        public void MoveBefore_MovesNodeBeforeTarget()
+        {
+            // Arrange – list: 1, 2, 3
+            var list = new LockingLinkedList<int>(new[] { 1, 2, 3 });
+            var nodeToMove = list.Find(3);
+            var target = list.Find(2);
+
+            // Act
+            nodeToMove.MoveBefore(target);
+
+            // Assert – should become 1, 3, 2
+            list.Should().Equal(1, 3, 2);
+        }
+
+        [TestMethod]
+        public void MoveUp_MovesNodeOnePositionEarlier()
+        {
+            // Arrange – list: 1, 2, 3
+            var list = new LockingLinkedList<int>(new[] { 1, 2, 3 });
+            var node = list.Find(3);
+
+            // Act
+            node.MoveUp();
+
+            // Assert – should become 1, 3, 2
+            list.Should().Equal(1, 3, 2);
+        }
+
+        [TestMethod]
+        public void MoveUp_AtHead_DoesNothing()
+        {
+            // Arrange
+            var list = new LockingLinkedList<int>(new[] { 1, 2, 3 });
+            var head = list.First;
+
+            // Act
+            head.MoveUp();
+
+            // Assert
+            list.Should().Equal(1, 2, 3);
+        }
+
+        [TestMethod]
+        public void MoveDown_MovesNodeOnePositionLater()
+        {
+            // Arrange – list: 1, 2, 3
+            var list = new LockingLinkedList<int>(new[] { 1, 2, 3 });
+            var node = list.Find(1);
+
+            // Act
+            node.MoveDown();
+
+            // Assert – should become 2, 1, 3
+            list.Should().Equal(2, 1, 3);
+        }
+
+        [TestMethod]
+        public void MoveDown_AtTail_DoesNothing()
+        {
+            // Arrange
+            var list = new LockingLinkedList<int>(new[] { 1, 2, 3 });
+            var tail = list.Last;
+
+            // Act
+            tail.MoveDown();
+
+            // Assert
+            list.Should().Equal(1, 2, 3);
+        }
+
+        [TestMethod]
+        public void Find_Predicate_ReturnsNull_WhenNoMatch()
+        {
+            // Arrange
+            var list = new LockingLinkedList<int>(new[] { 1, 2, 3 });
+
+            // Act
+            var result = list.Find(v => v > 100);
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void FindLast_ReturnsNull_WhenNotFound()
+        {
+            // Arrange
+            var list = new LockingLinkedList<int>(new[] { 1, 2 });
+
+            // Act
+            var result = list.FindLast(99);
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void Remove_LinkedListNode_RemovesNode()
+        {
+            // Arrange
+            var list = new LockingLinkedList<int>(new[] { 1, 2, 3 });
+            var baseNode = ((LinkedList<int>)list).Find(2);
+
+            // Act
+            list.Remove(baseNode);
+
+            // Assert
+            list.Should().Equal(1, 3);
+        }
     }
 }

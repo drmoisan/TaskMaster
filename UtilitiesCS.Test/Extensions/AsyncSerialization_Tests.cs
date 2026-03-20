@@ -12,6 +12,113 @@ namespace UtilitiesCS.Test.Extensions
     public class AsyncSerialization_Tests
     {
         [TestMethod]
+        public void ToMbString_ShouldFormatBytesAsMegabytes()
+        {
+            // Arrange / Act / Assert
+            ((long)1000000).ToMbString().Should().Be("1.0 MB");
+            ((long)500000).ToMbString().Should().Be("0.5 MB");
+            ((long)0).ToMbString().Should().Be("0.0 MB");
+            ((long)2500000).ToMbString().Should().Be("2.5 MB");
+        }
+
+        [TestMethod]
+        public void MB_Constant_ShouldBeOneMillion()
+        {
+            AsyncSerialization.MB.Should().Be(1000000);
+        }
+
+        [TestMethod]
+        public async Task CopyToAsync_WithIProgress_ShouldCopyAndReportProgress()
+        {
+            // Arrange
+            var data = new byte[] { 10, 20, 30, 40, 50, 60, 70, 80 };
+            using var source = new MemoryStream(data);
+            using var destination = new MemoryStream();
+            var reports = new List<KeyValuePair<long, long>>();
+            var progress = new Progress<KeyValuePair<long, long>>(reports.Add);
+
+            // Act
+            await source.CopyToAsync(
+                sourceLength: source.Length,
+                destination,
+                bufferSize: 4,
+                progress,
+                CancellationToken.None
+            );
+
+            // Assert
+            destination.ToArray().Should().StartWith(data);
+        }
+
+        [TestMethod]
+        public async Task CopyToAsync_WithNullProgress_ShouldCopyWithoutError()
+        {
+            // Arrange
+            var data = new byte[] { 1, 2, 3 };
+            using var source = new MemoryStream(data);
+            using var destination = new MemoryStream();
+
+            // Act
+            await source.CopyToAsync(
+                sourceLength: source.Length,
+                destination,
+                bufferSize: 0,
+                (ProgressTrackerPane)null,
+                messagePrefix: "",
+                CancellationToken.None
+            );
+
+            // Assert
+            destination.ToArray().Should().StartWith(data);
+        }
+
+        [TestMethod]
+        public async Task CopyToAsync_WithZeroBufferSize_UsesDefaultBuffer()
+        {
+            // Arrange
+            var data = new byte[] { 1, 2, 3 };
+            using var source = new MemoryStream(data);
+            using var destination = new MemoryStream();
+            var reports = new List<KeyValuePair<long, long>>();
+            var progress = new Progress<KeyValuePair<long, long>>(reports.Add);
+
+            // Act
+            await source.CopyToAsync(
+                sourceLength: source.Length,
+                destination,
+                bufferSize: 0,
+                progress,
+                CancellationToken.None
+            );
+
+            // Assert
+            destination.ToArray().Should().StartWith(data);
+        }
+
+        [TestMethod]
+        public async Task CopyToAsync_WithNegativeSourceLength_InfersLengthFromStream()
+        {
+            // Arrange
+            var data = new byte[] { 5, 6, 7 };
+            using var source = new MemoryStream(data);
+            using var destination = new MemoryStream();
+            var reports = new List<KeyValuePair<long, long>>();
+            var progress = new Progress<KeyValuePair<long, long>>(reports.Add);
+
+            // Act
+            await source.CopyToAsync(
+                sourceLength: -1,
+                destination,
+                bufferSize: 3,
+                progress,
+                CancellationToken.None
+            );
+
+            // Assert
+            destination.ToArray().Should().StartWith(data);
+        }
+
+        [TestMethod]
         public async Task CopyToAsync_ShouldCopyStreamAndReportProgress()
         {
             // Arrange

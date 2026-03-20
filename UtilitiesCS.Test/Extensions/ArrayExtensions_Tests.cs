@@ -306,6 +306,124 @@ namespace UtilitiesCS.Test.Extensions
         }
 
         [TestMethod]
+        public void ToStringArray_1DArray_ConvertsNonNullValuesToStrings()
+        {
+            // Arrange
+            int[] values = [10, 20, 30];
+
+            // Act
+            var actual = values.ToStringArray();
+
+            // Assert
+            actual.Should().Equal("10", "20", "30");
+        }
+
+        [TestMethod]
+        public void ToStringArray_2DArray_WithNullReplacement_UsesReplacementForNullEntries()
+        {
+            // Arrange
+            string[,] values =
+            {
+                { "a", null },
+                { null, "d" },
+            };
+
+            // Act
+            var actual = values.ToStringArray("N/A");
+
+            // Assert
+            actual
+                .Should()
+                .BeEquivalentTo(
+                    new string[,]
+                    {
+                        { "a", "N/A" },
+                        { "N/A", "d" },
+                    }
+                );
+        }
+
+        [TestMethod]
+        public void To2D_EmptyJaggedArray_ReturnsEmpty2DArray()
+        {
+            // Arrange
+            int[][] source = [];
+
+            // Act
+            var actual = source.To2D();
+
+            // Assert
+            actual.GetLength(0).Should().Be(0);
+            actual.GetLength(1).Should().Be(0);
+        }
+
+        [TestMethod]
+        public void IsInitialized_1DArrayPartially_WithAllNulls_ReturnsFalse()
+        {
+            // Arrange
+            string[] allNulls = [null, null, null];
+
+            // Act
+            var result = allNulls.IsInitialized(partially: true);
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void IsInitialized_2DArrayPartially_WithAllNulls_ReturnsFalse()
+        {
+            // Arrange
+            string[,] allNulls =
+            {
+                { null, null },
+                { null, null },
+            };
+
+            // Act
+            var result = allNulls.IsInitialized(partially: true);
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void SentenceJoin_CharArrayEdgeCases_FormatsCorrectly()
+        {
+            // Act / Assert
+            Array.Empty<char>().SentenceJoin().Should().BeEmpty();
+            new[] { 'x' }.SentenceJoin().Should().Be("x");
+            new[] { 'a', 'b' }.SentenceJoin().Should().Be("a and b");
+        }
+
+        [TestMethod]
+        public void SentenceJoin_IEnumerableOverload_EmptyAndSingleCases()
+        {
+            // Arrange
+            IEnumerable<string> empty = Array.Empty<string>();
+            IEnumerable<string> single = new List<string> { "only" };
+            IEnumerable<string> pair = new List<string> { "first", "second" };
+
+            // Act / Assert
+            empty.SentenceJoin().Should().BeEmpty();
+            single.SentenceJoin().Should().Be("only");
+            pair.SentenceJoin().Should().Be("first and second");
+        }
+
+        [TestMethod]
+        public void TryFlattenArrayTree_WithValidNestedArray_ReturnsFlattenedArray()
+        {
+            // Arrange
+            object node = new object[] { new[] { "a", "b" }, new[] { "c" } };
+
+            // Act
+            var actual = node.TryFlattenArrayTree<string>();
+
+            // Assert
+            actual.Should().Equal("a", "b", "c");
+        }
+
+        [TestMethod]
         public void ArrayIsAllocated_ReturnsExpectedValuesForArrayAndStringArrayOverloads()
         {
             // Arrange

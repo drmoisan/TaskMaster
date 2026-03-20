@@ -184,5 +184,175 @@ namespace UtilitiesCS.Test.HelperClasses
             // Assert
             tasks.Select(task => task.Result).Should().OnlyContain(result => result);
         }
+
+        [TestMethod]
+        public void GetOrLoad_WithIsInitializedPredicate_SkipsLoaderWhenAlreadyInitialized()
+        {
+            // Arrange
+            string value = "already";
+            bool loaderCalled = false;
+
+            // Act
+            var result = Initializer.GetOrLoad(
+                ref value,
+                v => v != null,
+                () =>
+                {
+                    loaderCalled = true;
+                    return "loaded";
+                }
+            );
+
+            // Assert
+            result.Should().Be("already");
+            loaderCalled.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void GetOrLoad_WithIsInitializedPredicate_LoadsWhenNotInitialized()
+        {
+            // Arrange
+            string value = null;
+
+            // Act
+            var result = Initializer.GetOrLoad(ref value, v => v != null, () => "loaded");
+
+            // Assert
+            result.Should().Be("loaded");
+        }
+
+        [TestMethod]
+        public void DependenciesNotNull_WithNullDependencies_AndStrictTrue_ThrowsArgumentNullException()
+        {
+            // Act
+            Action act = () => Initializer.DependenciesNotNull(strict: true, dependencies: null);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>().WithMessage("*dependencies*");
+        }
+
+        [TestMethod]
+        public void DependenciesNotNull_WithEmptyDependencies_AndStrictFalse_ReturnsFalse()
+        {
+            // Act
+            var result = Initializer.DependenciesNotNull(strict: false);
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void DependenciesNotNull_WithSomeNullElements_AndStrictFalse_ReturnsFalse()
+        {
+            // Act
+            var result = Initializer.DependenciesNotNull(strict: false, "a", null, "b");
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void Load_WithStrictAndValidDependencies_InvokesLoader()
+        {
+            // Act
+            var result = Initializer.Load(() => 42, strict: true, "dep");
+
+            // Assert
+            result.Should().Be(42);
+        }
+
+        [TestMethod]
+        public void Load_WithMissingDependencies_ReturnsDefault()
+        {
+            // Act
+            var result = Initializer.Load(() => 42, strict: false, dependencies: null);
+
+            // Assert
+            result.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void Load_WithDefaultValue_WhenDependenciesNull_ReturnsDefaultValue()
+        {
+            // Act
+            var result = Initializer.Load(() => 42, defaultValue: -1, dependencies: null);
+
+            // Assert
+            result.Should().Be(-1);
+        }
+
+        [TestMethod]
+        public void Load_WithDefaultValue_WhenDependenciesValid_InvokesLoader()
+        {
+            // Act
+            var result = Initializer.Load(() => 42, defaultValue: -1, "dep");
+
+            // Assert
+            result.Should().Be(42);
+        }
+
+        [TestMethod]
+        public void SetAndSave_WithObjectSetterOnly_SetsVariableAndCallsSetter()
+        {
+            // Arrange
+            string cached = null;
+            string setValue = null;
+
+            // Act
+            Initializer.SetAndSave(ref cached, "newValue", v => setValue = v);
+
+            // Assert
+            cached.Should().Be("newValue");
+            setValue.Should().Be("newValue");
+        }
+
+        [TestMethod]
+        public void SetAndSave_WithoutRef_JustCallsSetter()
+        {
+            // Arrange
+            string setValue = null;
+
+            // Act
+            Initializer.SetAndSave("newValue", v => setValue = v);
+
+            // Assert
+            setValue.Should().Be("newValue");
+        }
+
+        [TestMethod]
+        public void GetOrLoad_WithDefaultValue_WhenLoaderReturnsDefault_SetsDefaultValue()
+        {
+            // Arrange
+            string value = null;
+
+            // Act
+            var result = Initializer.GetOrLoad(
+                ref value,
+                defaultValue: "fallback",
+                loader: () => null,
+                dependencies: new object[] { "dep" }
+            );
+
+            // Assert
+            result.Should().Be("fallback");
+        }
+
+        [TestMethod]
+        public void GetOrLoad_WithDefaultValue_WhenNoDependencies_SetsDefaultValue()
+        {
+            // Arrange
+            string value = null;
+
+            // Act
+            var result = Initializer.GetOrLoad(
+                ref value,
+                defaultValue: "fallback",
+                loader: () => "loaded",
+                dependencies: null
+            );
+
+            // Assert
+            result.Should().Be("fallback");
+        }
     }
 }

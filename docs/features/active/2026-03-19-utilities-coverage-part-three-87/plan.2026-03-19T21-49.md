@@ -1,0 +1,331 @@
+# 2026-03-19-utilities-coverage-part-three - Plan
+
+- **Issue:** #87
+- **Parent (optional):** none
+- **Owner:** drmoisan
+- **Last Updated:** 2026-03-19T22-30
+- **Status:** In Review
+- **Version:** 1.0
+
+## Required References
+
+- General Coding Standards: [`.github/instructions/general-code-change.instructions.md`](../../../../.github/instructions/general-code-change.instructions.md)
+- General Unit Test Policy: [`.github/instructions/general-unit-test.instructions.md`](../../../../.github/instructions/general-unit-test.instructions.md)
+- C# Code Change Policy: [`.github/instructions/csharp-code-change.instructions.md`](../../../../.github/instructions/csharp-code-change.instructions.md)
+- C# Unit Test Policy: [`.github/instructions/csharp-unit-test.instructions.md`](../../../../.github/instructions/csharp-unit-test.instructions.md)
+- Spec: [`spec.md`](spec.md)
+- User Story: [`user-story.md`](user-story.md)
+- Research: [`../../../../artifacts/research/20260319-utilities-coverage-part-three-87-research.md`](../../../../artifacts/research/20260319-utilities-coverage-part-three-87-research.md)
+
+**All work must comply with these policies; do not duplicate their content here.**
+
+## Overview
+
+Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line coverage by adding or extending MSTest unit tests in UtilitiesCS.Test. Work is phased by testability difficulty (Easy → Medium → Hard), followed by skip evaluation for untestable files (Designer.cs, commented stubs, pure interfaces) and a final QA loop verifying the full C# toolchain passes clean. Approximately 155 files have explicit line-rate below 80% in the Cobertura report, plus ~16 Designer.cs files, ~4 commented stubs, and ~40+ pure interface files with no executable code.
+
+## Acceptance Criteria Traceability
+
+| AC | Source (issue.md) | Plan Coverage |
+|---|---|---|
+| AC1 | Every .cs file compiled by UtilitiesCS.csproj >= 80% line coverage | P1–P3 implementation tasks + P5-T5 verification |
+| AC2 | No pre-existing tests broken or removed | P0-T3 baseline + P5-T6 verification |
+| AC3 | All new tests follow MSTest + Moq + FluentAssertions conventions | P0-T1 policy read + all P1–P3 implementation tasks |
+| AC4 | All new tests deterministic, isolated, no external deps | P0-T1 policy read + all P1–P3 implementation tasks |
+| AC5 | All new test files registered in UtilitiesCS.Test.csproj | P1-T13, P2-T24, P3-T26 registration tasks |
+| AC6 | C# toolchain loop passes clean | P5-T1 through P5-T4 |
+| AC7 | Repo-wide coverage does not regress below baseline | P0-T3 baseline + P5-T5 comparison |
+
+## Implementation Plan (Atomic Tasks)
+
+### Phase 0 — Compliance & Baseline Capture
+
+- [x] [P0-T1] Read all repo policy files in required order: `.github/copilot-instructions.md`, `general-code-change.instructions.md`, `general-unit-test.instructions.md`, `csharp-code-change.instructions.md`, `csharp-unit-test.instructions.md`
+  - Acceptance: Evidence artifact at `evidence/baseline/phase0-instructions-read.md` contains `Timestamp:`, `Policy Order:`, and explicit list of all five files read
+
+- [x] [P0-T2] Capture baseline build state by running `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"`
+  - Acceptance: Evidence artifact at `evidence/baseline/baseline-build.md` contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
+
+- [x] [P0-T3] Capture baseline test results with coverage by running `vstest.console.exe` with `/EnableCodeCoverage` over all `*.Test.dll` assemblies
+  - Acceptance: Evidence artifact at `evidence/baseline/baseline-test-coverage.md` contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:` including total test count, pass count, and repo-wide UtilitiesCS line coverage percentage
+
+- [x] [P0-T4] Record per-file baseline coverage for all UtilitiesCS production files below 80% line rate from the current `coverage/coverage.cobertura.xml`
+  - Acceptance: Evidence artifact at `evidence/baseline/baseline-per-file-coverage.md` lists each file with its current line-rate percentage, categorized by difficulty (Easy/Medium/Hard/Skip)
+
+### Phase 1 — Easy Files: Quick Wins (~45 files)
+
+**Goal:** Maximum coverage uplift per effort. All tasks target files categorized as Easy difficulty in research. Tests must follow MSTest + Moq + FluentAssertions conventions with AAA pattern, deterministic, isolated, no external dependencies, no temp files.
+
+- [x] [P1-T1] Extend tests for close-to-80% Extensions: `ArrayExtensions.cs` (77.7%), `IEnumerableExtensions.cs` (70.6%), `IAsyncEnumerableExtensions.cs` (60.9%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [x] [P1-T2] Extend tests for close-to-80% ReusableTypeClasses: `ConcurrentObservableDictionary.cs` (77.4%), `AbstractCloneable.cs` (77.8%), `TreeNodeOfT.cs` (76.8%), `StackGeek.cs` (72.2%), `StackObjectCS.cs` (72%)
+  - Acceptance: Coverage report shows all five files at >= 80% line rate
+
+- [x] [P1-T3] Extend tests for close-to-80% NewtonsoftHelpers wrappers: `WrapperScDictionary.cs` (70.7%), `WrapperScoDictionary.cs` (76%), `FilePathHelperConverter.cs` (72%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [x] [P1-T4] Extend tests for close-to-80% EmailIntelligence: `EmailTokenizer.cs` (74.8%), `CtfIncidenceList.cs` (64.5%), `CtfMap.cs` (68.6%), `SubjectMapEntry.cs` (50.8%)
+  - Acceptance: Coverage report shows all four files at >= 80% line rate
+
+- [x] [P1-T5] Extend tests for close-to-80% HelperClasses: `MyFileSystemInfo.cs` (71%), `PrettyPrint.cs` (67.2%)
+  - Acceptance: Coverage report shows both files at >= 80% line rate
+
+- [x] [P1-T6] Create or extend tests for pure-logic HelperClasses: `DeepCompare.cs` (31.2%), `Initializer.cs` (60.3%), `DebugTextWriter.cs` (63.6%), `TraceUtility.cs` (60.6%)
+  - Acceptance: Coverage report shows all four files at >= 80% line rate
+
+- [x] [P1-T7] Create or extend tests for pure-algorithm classes: `SmithWaterman.cs` (48.6%), `ImageStripper.cs` (53.5%), `StringManipulation.cs` (0%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [x] [P1-T8] Create tests for zero-coverage data classes: `FilterEntry.cs` (0%), `BayesianMetricTypes.cs` (0%), `EmailFilerConfig.cs` (0%), `NConsoleTraceWriter.cs` (0%), `PropertyStore.cs` (0%)
+  - Acceptance: Test classes exist for all five files; coverage report shows all five at >= 80% line rate
+
+- [x] [P1-T9] Extend tests for partial-coverage data classes: `MovedMailInfo.cs` (35.4%), `DedicatedToken.cs` (22.2%)
+  - Acceptance: Coverage report shows both files at >= 80% line rate
+
+- [x] [P1-T10] Create or extend tests for data structures: `LockingLinkedList.cs` (58.2%), `LockingLinkedListNode.cs` (61.7%), `AsyncLazy.cs` (25%), `TimedQueueOfActions.cs` (58.8%)
+  - Acceptance: Coverage report shows all four files at >= 80% line rate
+
+- [x] [P1-T11] Create tests for observer implementations: `SimpleActionBagObserver.cs` (0%), `SimpleActionLockingLinkedListObserver.cs` (0%)
+  - Acceptance: Test classes exist for both; coverage report shows both at >= 80% line rate
+
+- [x] [P1-T12] Create or extend tests for easy threading utilities: `ThreadSafeFunctions.cs` (54.8%), `TimeOutTask.cs` (24.1%)
+  - Acceptance: Coverage report shows both files at >= 80% line rate
+
+- [x] [P1-T13] Register all new Phase 1 test files in `UtilitiesCS.Test.csproj` via `<Compile Include>` entries
+  - Acceptance: Every new `.cs` test file created in Phase 1 has a corresponding `<Compile Include>` entry in `UtilitiesCS.Test.csproj`; `msbuild` resolves all test files without missing-reference errors
+
+- [x] [P1-T14] Run Phase 1 checkpoint: build solution and run tests with coverage; verify all Phase 1 target files reach >= 80% line coverage
+  - Preconditions: P1-T1 through P1-T13 complete
+  - Acceptance: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits 0; `vstest.console.exe` exits 0 with no test failures; coverage report confirms all ~39 Phase 1 target files at >= 80%
+
+### Phase 2 — Medium Files: Mocking-Dependent (~55 files)
+
+**Goal:** Cover classes requiring Moq-based mocking for interfaces, file system, Newtonsoft JSON, Bayesian logic, and COM interop with established mock patterns. Tests must use MemoryStream/StringWriter injection for any serialization testing (no temp files per policy).
+
+- [x] [P2-T1] Create or extend tests for JSON converters batch 1: `ScDictionaryConverter.cs` (9.1%), `NonRecursiveConverter.cs` (0%), `PeopleScoConverter.cs` (66.7%), `PeopleScoRemainingObjectConverter.cs` (40%)
+  - Acceptance: Coverage report shows all four files at >= 80% line rate
+
+- [x] [P2-T2] Create or extend tests for JSON converters batch 2: `DerivedCompositionConverter_ConcurrentDictionary.cs` (0%), `MonoExtension.cs` (39.1%)
+  - Acceptance: Coverage report shows both files at >= 80% line rate
+
+- [x] [P2-T3] Create tests for SDIL Reader data models: `ILGlobals.cs` (0%), `ILInstruction.cs` (0%)
+  - Acceptance: Test classes exist; coverage report shows both files at >= 80% line rate
+
+- [x] [P2-T4] Create or extend tests for NewtonsoftHelpers wrapper: `WrapperPeopleScoDictionaryNew.cs` (12.6%)
+  - Acceptance: Coverage report shows file at >= 80% line rate
+
+- [x] [P2-T5] Create or extend tests for SCO core collections: `ScBag.cs` (20.4%), `ScDictionary.cs` (8.6%), `SCODictionary.cs` (4.3%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [x] [P2-T6] Create or extend tests for SCO variant collections: `ScoCollection.cs` (4.4%), `ScoSortedDictionary.cs` (7.4%), `ScoStack.cs` (40.2%), `ScoDictionaryNew.cs` (15.5%)
+  - Acceptance: Coverage report shows all four files at >= 80% line rate
+
+- [x] [P2-T7] Create or extend tests for serializable lists: `SerializableList.cs` (35.9%), `SloLinkedList.cs` (29.7%)
+  - Acceptance: Coverage report shows both files at >= 80% line rate
+
+- [x] [P2-T8] Create or extend tests for SmartSerializable core: `SmartSerializable.cs` (15.9%), `SmartSerializableBase.cs` (0%), `SmartSerializableNonTyped.cs` (72%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [x] [P2-T9] Create or extend tests for SmartSerializable infrastructure: `SmartSerializableLoader.cs` (7.1%), `SmartSerializableStatic.cs` (0%), `NewSmartSerializableConfig.cs` (29.5%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [x] [P2-T10] Extend tests for Bayesian classifiers: `BayesianClassifierShared.cs` (63.8%), `BayesianClassifierGroup.cs` (22.5%), `BayesianClassifierExtensions.cs` (20.5%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [x] [P2-T11] Create or extend tests for Corpus and legacy Bayesian: `Corpus.cs` (33.9%), `CorpusInherit.cs` (0%), `Obsolete/BayesianClassifier.cs` (65.1%), `Obsolete/ClassifierGroup.cs` (8.2%)
+  - Acceptance: Coverage report shows all four files at >= 80% line rate
+
+- [x] [P2-T12] Create tests for Bayesian performance measurement: `BayesianPerformanceMeasurement.cs` (0%), `BayesianSerializationHelper.cs` (0%)
+  - Acceptance: Test classes exist; coverage report shows both files at >= 80% line rate
+
+- [x] [P2-T13] Extend tests for OutlookItem core using Moq COM mocking: `OutlookItem.cs` (54.5%), `OutlookItemExtensions.cs` (44.9%), `OlItemPseudoInterface.cs` (55.4%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [x] [P2-T14] Extend tests for OutlookItem try-patterns: `OutlookItemTry.cs` (35.5%), `OutlookItemTryGet.cs` (21.6%), `OutlookItemFlaggable.cs` (58.2%), `OutlookItemFlaggableTry.cs` (51%)
+  - Acceptance: Coverage report shows all four files at >= 80% line rate
+
+- [x] [P2-T15] Extend tests for OutlookObjects helpers: `AttachmentHelper.cs` (69.9%), `AttachmentSerializable.cs` (54.7%), `CreateCategory.cs` (65.5%), `RecipientStatic.cs` (46.7%), `UserDefinedFields.cs` (26%), `StoreWrapper.cs` (71.7%)
+  - Acceptance: Coverage report shows all six files at >= 80% line rate
+
+- [x] [P2-T16] Create or extend tests for file system wrappers with mocked I/O: `FileInfoWrapper.cs` (17.8%), `DirectoryInfoWrapper.cs` (20.3%), `FileSystemInfoWrapper.cs` (0%), `FilePathHelper.cs` (18.8%)
+  - Acceptance: Coverage report shows all four files at >= 80% line rate
+
+- [x] [P2-T17] Create or extend tests for progress and thread tracking: `ProgressTracker.cs` (47%), `ProgressTrackerAsync.cs` (0%), `AsyncMultiTasker.cs` (0%), `ThreadMonitor.cs` (0%)
+  - Acceptance: Coverage report shows all four files at >= 80% line rate
+
+- [x] [P2-T18] Create or extend tests for EmailIntelligence domain logic: `FlagTranslator.cs` (41.2%), `IntelligenceConfig.cs` (7.3%), `SubjectMapEncoder.cs` (0%), `SubjectMapSco.cs` (4.1%)
+  - Acceptance: Coverage report shows all four files at >= 80% line rate
+
+- [x] [P2-T19] Create or extend tests for EmailIntelligence collections: `PeopleScoDictionaryNew.cs` (3.2%), `RecentsList.cs` (0%)
+  - Acceptance: Coverage report shows both files at >= 80% line rate
+
+- [x] [P2-T20] Extend tests for observable linked lists: `LockingObservableLinkedList.cs` (24.8%), `LockingObservableLinkedListNode.cs` (20.4%)
+  - Acceptance: Coverage report shows both files at >= 80% line rate
+
+- [x] [P2-T21] Extend tests for timed and system helpers: `TimedDiskWriter.cs` (66.3%), `SystemThemeDetector.cs` (62.5%)
+  - Acceptance: Coverage report shows both files at >= 80% line rate
+
+- [x] [P2-T22] Create or extend tests for miscellaneous medium helpers: `QfcTipsDetails.cs` (0%), `ShellUtilitiesStatic.cs` (33.3%), `ClassifierGroupUtilities.cs` (0%), `Triage_OlLogic.cs` (40.4%)
+  - Acceptance: Coverage report shows all four files at >= 80% line rate
+
+- [x] [P2-T23] Create or extend tests for data-dependent Extensions: `DrawingExtensions.cs` (0%), `ImageExtensions.cs` (35.9%), `AsyncSerialization.cs` (11.6%), `DfDeedle.cs` (0%), `DfMLNet.cs` (0%)
+  - Acceptance: Coverage report shows all five files at >= 80% line rate
+
+- [x] [P2-T24] Register all new Phase 2 test files in `UtilitiesCS.Test.csproj` via `<Compile Include>` entries
+  - Acceptance: Every new `.cs` test file created in Phase 2 has a corresponding `<Compile Include>` entry in `UtilitiesCS.Test.csproj`; `msbuild` resolves all test files without missing-reference errors
+
+- [ ] [P2-T25] Run Phase 2 checkpoint: build solution and run tests with coverage; verify all Phase 2 target files reach >= 80% line coverage
+  - Preconditions: P2-T1 through P2-T24 complete
+  - Acceptance: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits 0; `vstest.console.exe` exits 0 with no test failures; coverage report confirms all Phase 2 target files at >= 80%
+
+### Phase 3 — Hard Files: WinForms & Deep COM (~55 files)
+
+**Goal:** Cover WinForms UI classes and deep COM interop classes. Strategy: extract testable logic from code-behind where needed, use Moq for COM interfaces, use STAThread context for control instantiation where required. Testability seams are permitted only when required to reach 80% coverage (per spec non-goals).
+
+- [ ] [P3-T1] Create or extend tests for ConversationHelper by mocking COM conversation traversal APIs
+  - Acceptance: Coverage report shows `ConversationHelper.cs` (4%) at >= 80% line rate
+
+- [ ] [P3-T2] Create or extend tests for MailItemHelper by mocking COM mail operations
+  - Acceptance: Coverage report shows `MailItemHelper.cs` (45.8%) at >= 80% line rate
+
+- [ ] [P3-T3] Create or extend tests for StoreWrapperController by mocking store/session COM objects
+  - Acceptance: Coverage report shows `StoreWrapperController.cs` (33.9%) at >= 80% line rate
+
+- [ ] [P3-T4] Create or extend tests for OlTable classes by mocking COM Table interface: `OlTableExtensions.cs` (4.7%), `OlToDoTable.cs` (0%)
+  - Acceptance: Coverage report shows both files at >= 80% line rate
+
+- [ ] [P3-T5] Create tests for ClassifierGroups with mocked IApplicationGlobals: `ActionableClassifierGroup.cs` (0%), `CategoryClassifierGroup.cs` (0%), `OlFolderClassifierGroup.cs` (0%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [ ] [P3-T6] Create tests for classifier engines with mocked COM items: `ConditionalItemEngine.cs` (0%), `MulticlassEngine.cs` (0%), `TristateEngine.cs` (0%), `SpamBayes.cs` (0%)
+  - Acceptance: Coverage report shows all four files at >= 80% line rate
+
+- [ ] [P3-T7] Create tests for classifier infrastructure with mocked globals: `ManagerAsyncLazy.cs` (0%), `Triage.cs` (8.5%)
+  - Acceptance: Coverage report shows both files at >= 80% line rate
+
+- [ ] [P3-T8] Extract testable logic from dialog classes and create tests: `InputBox.cs` (0%), `MyBox.cs` (0%), `NotImplementedDialog.cs` (0%), `MyBoxViewer.cs` (28.1%)
+  - Acceptance: Coverage report shows all four files at >= 80% line rate
+
+- [ ] [P3-T9] Create or extend tests for button and dialog result logic: `DelegateButton.cs` (51.6%), `FunctionButton.cs` (0%), `YesNoToAll.cs` (28.8%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [ ] [P3-T10] Create tests for WinForms layout helpers with control instantiation: `ControlPosition.cs` (0%), `ControlResizer.cs` (0%), `TableLayoutHelper.cs` (0%), `ScreenHelper.cs` (0%)
+  - Acceptance: Coverage report shows all four files at >= 80% line rate
+
+- [ ] [P3-T11] Create tests for WinForms interaction helpers: `MouseDownFilter.cs` (0%), `ImageHelper.cs` (0%), `OlvExtension.cs` (0%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [ ] [P3-T12] Create tests for theme infrastructure with control instantiation: `Theme.cs` (3.3%), `ThemeControlGroup.cs` (0%), `TipsController.cs` (0%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [ ] [P3-T13] Extract and test controller logic from OlFolderTools: `FilterOlFoldersController.cs` (0%), `FolderRemapController.cs` (0%), `FolderRemapTree.cs` (0%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [ ] [P3-T14] Extract and test controller logic from ConfigController: `ConfigController.cs` (0%)
+  - Acceptance: Coverage report shows `ConfigController.cs` at >= 80% line rate
+
+- [ ] [P3-T15] Create tests for COM dispatch and system interop: `DispatchUtility.cs` (10.5%), `ShellUtilities.cs` (0%), `ComStreamWrapper.cs` (0%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [ ] [P3-T16] Create tests for OneDriveDownloader by mocking Microsoft.Graph API calls
+  - Acceptance: Coverage report shows `OneDriveDownloader.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T17] Create tests for idle and async queues: `IdleActionQueue.cs` (0%), `IdleAsyncQueue.cs` (0%), `ApplicationIdleTimer.cs` (0%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [ ] [P3-T18] Create tests for UI thread utilities: `UiThread.cs` (60%), `DvgForm.cs` (0%)
+  - Acceptance: Coverage report shows both files at >= 80% line rate
+
+- [ ] [P3-T19] Create tests for EmailParsingSorting COM-dependent classes by mocking Outlook APIs: `AutoFile.cs` (0%), `EmailDataMiner.cs` (0%), `EmailFiler.cs` (0%)
+  - Acceptance: Coverage report shows all three files at >= 80% line rate
+
+- [ ] [P3-T20] Create tests for MethodBodyReader (SDIL Reader) by mocking IL reflection APIs: `MethodBodyReader.cs` (0%)
+  - Acceptance: Coverage report shows `MethodBodyReader.cs` at >= 80% line rate
+
+- [ ] [P3-T21] Create tests for WinForms progress components by extracting testable logic: `ProgressPane.cs` (0%), `ProgressViewer.cs` (0%), `ProgressMultiStepViewer.cs` (0%), `ProgressTrackerPane.cs` (0%)
+  - Acceptance: Coverage report shows all four files at >= 80% line rate
+
+- [ ] [P3-T22] Create tests for WinForms viewer logic batch 1: `FolderInfoViewer.cs` (0%), `FolderSelector.cs` (0%), `ConfigViewer.cs` (0%), `ConfigGroupBox.cs` (0%), `SubjectMapMetrics.cs` (0%), `OSBrowser.cs` (0%)
+  - Note: If a viewer has zero extractable logic after inspection, document as skip candidate in Phase 4
+  - Acceptance: For each file, either coverage report shows >= 80% line rate or file is documented as a skip candidate in `evidence/other/skip-candidates.md` with rationale
+
+- [ ] [P3-T23] Create tests for WinForms viewer logic batch 2: `FolderNotFoundViewer.cs` (0%), `InputBoxViewer.cs` (0%), `FolderRemapViewer.cs` (0%), `FilterOlFoldersViewer.cs` (0%), `ConfusionViewer.cs` (0%), `MetricChartViewer.cs` (0%)
+  - Note: If a viewer has zero extractable logic after inspection, document as skip candidate in Phase 4
+  - Acceptance: For each file, either coverage report shows >= 80% line rate or file is documented as a skip candidate in `evidence/other/skip-candidates.md` with rationale
+
+- [ ] [P3-T24] Create tests for WinFormsExtensions: `WinFormsExtensions.cs` (13%)
+  - Acceptance: Coverage report shows `WinFormsExtensions.cs` at >= 80% line rate
+
+- [ ] [P3-T25] Create tests for CaptureEmailAddressesModule2 with mocked COM interfaces
+  - Acceptance: Coverage report shows `CaptureEmailAddressesModule2.cs` at >= 80% line rate; or confirmed not compiled by UtilitiesCS.csproj (excluded from scope)
+
+- [ ] [P3-T26] Register all new Phase 3 test files in `UtilitiesCS.Test.csproj` via `<Compile Include>` entries; register any new production helper classes extracted for testability
+  - Acceptance: Every new `.cs` file created in Phase 3 has a corresponding `<Compile Include>` entry in the appropriate `.csproj`; `msbuild` resolves all files without missing-reference errors
+
+- [ ] [P3-T27] Run Phase 3 checkpoint: build solution and run tests with coverage; verify all Phase 3 target files reach >= 80% line coverage
+  - Preconditions: P3-T1 through P3-T26 complete
+  - Acceptance: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits 0; `vstest.console.exe` exits 0 with no test failures; coverage report confirms all Phase 3 target files at >= 80% (excluding files deferred to Phase 4 skip evaluation)
+
+### Phase 4 — Skip Evaluation & Documentation
+
+**Goal:** Evaluate files that cannot meaningfully be tested and document skip decisions with per-file rationale. No coverage gap may remain unevaluated.
+
+- [ ] [P4-T1] Evaluate all ~16 Designer.cs auto-generated files and document skip rationale for each: `DvgForm.Designer.cs`, `ConfusionViewer.Designer.cs`, `MetricChartViewer.Designer.cs`, `FilterOlFoldersViewer.Designer.cs`, `FolderInfoViewer.Designer.cs`, `OSBrowser.Designer.cs`, `FolderRemapViewer.Designer.cs`, `FolderSelector.Designer.cs`, `SubjectMapMetrics.Designer.cs`, `ConfigViewer.Designer.cs`, `ProgressMultiStepViewer.Designer.cs`, `ProgressPane.Designer.cs`, `ProgressViewer.Designer.cs`, `SyncContextForm.Designer.cs`, `FolderNotFoundViewer.Designer.cs`, `InputBoxViewer.Designer.cs`
+  - Acceptance: `evidence/other/skip-candidates.md` lists each Designer.cs file with rationale (auto-generated by WinForms designer, no testable logic, coverage via parent form instantiation only)
+
+- [ ] [P4-T2] Evaluate ~4 commented-out stubs and confirm zero executable lines: `ReusableTypeClasses/Observable/ObservableDictionary.cs`, `ReusableTypeClasses/Concurrent/Observable/Bag/ConcurrentObservableBag.cs`, `To Depricate/StackObjectVB.cs`, `To Depricate/FlattenArray.cs`
+  - Acceptance: `evidence/other/skip-candidates.md` confirms each file has zero executable lines with explanation (entirely commented out; live implementations exist elsewhere or code is dead)
+
+- [ ] [P4-T3] Evaluate deprecated files and document decision: `CSVDictUtilities.cs` (0%), `FileIO2.cs` (0%)
+  - Acceptance: `evidence/other/skip-candidates.md` records decision for each file (skip with rationale or removal deferred to separate cleanup issue)
+
+- [ ] [P4-T4] Evaluate ~40+ pure-interface files in `Interfaces/` subfolder and confirm no executable code to test
+  - Acceptance: `evidence/other/skip-candidates.md` lists all pure-interface files with confirmation that each has zero executable lines
+
+- [ ] [P4-T5] Finalize skip evaluation for any Phase 3 WinForms viewers deferred as untestable
+  - Acceptance: `evidence/other/skip-candidates.md` is complete; every UtilitiesCS production file is either at >= 80% coverage or documented as a skip candidate with rationale; no file is left unevaluated
+
+### Phase 5 — Final QA Loop
+
+**Goal:** Run the full C# toolchain loop and verify all coverage targets are met. If any step fails or changes files, restart the loop from step 1 (format check) until a clean pass completes.
+
+- [ ] [P5-T1] Run csharpier format check on all modified and new `.cs` files: `csharpier .`
+  - Acceptance: `csharpier .` exits 0 with no files changed; evidence artifact at `evidence/qa-gates/final-qa-format.md` with `Timestamp:`, `Command: csharpier .`, `EXIT_CODE: 0`, `Output Summary:`
+
+- [ ] [P5-T2] Run analyzer build: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+  - Acceptance: Build exits 0 with zero analyzer errors; evidence artifact at `evidence/qa-gates/final-qa-analyzer-build.md` with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
+
+- [ ] [P5-T3] Run nullable build: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+  - Acceptance: Build exits 0 with zero nullable warnings; evidence artifact at `evidence/qa-gates/final-qa-nullable-build.md` with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
+
+- [ ] [P5-T4] Run full test suite with coverage: `vstest.console.exe <all-test-assemblies> /EnableCodeCoverage /InIsolation /Logger:trx`
+  - Acceptance: All tests pass (zero failures); evidence artifact at `evidence/qa-gates/final-qa-test-coverage.md` with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:` including total test count, pass count, and UtilitiesCS line coverage percentage
+
+- [ ] [P5-T5] Verify all UtilitiesCS production files reach >= 80% line coverage (excluding documented skip candidates from Phase 4), and verify repo-wide coverage does not regress below P0-T3 baseline
+  - Acceptance: Coverage analysis shows zero non-skip files below 80%; evidence artifact at `evidence/qa-gates/final-coverage-verification.md` comparing baseline per-file rates (from P0-T4) with post-change rates; repo-wide UtilitiesCS coverage >= baseline value from P0-T3
+
+- [ ] [P5-T6] Verify no pre-existing test regressions by comparing test counts and pass rates against P0-T3 baseline
+  - Acceptance: Total test count >= baseline count from P0-T3; pass rate >= baseline pass rate; zero previously-passing tests now failing
+
+- [ ] [P5-T7] Store final coverage evidence and update feature folder status
+  - Acceptance: Updated `coverage/coverage.cobertura.xml` reflects final state; `issue.md` acceptance criteria checkboxes updated to reflect verified state; plan status updated to "Complete"
+
+## Test Plan
+
+- **Unit:** MSTest test classes in UtilitiesCS.Test for every UtilitiesCS production file, organized by namespace mirroring subfolder structure (e.g., `UtilitiesCS.Test.Extensions`, `UtilitiesCS.Test.HelperClasses`, `UtilitiesCS.Test.ReusableTypeClasses`)
+- **Naming:** Test class `{ProductionClass}_Tests`; test method `{Method}_{Scenario}_{Expected}`; AAA comments
+- **Coverage gate:** >= 80% line rate per file as reported by Cobertura XML from `vstest.console.exe /EnableCodeCoverage`
+- **Mocking:** Moq for COM interop (`Mock<Outlook.MailItem>`, `Mock<Outlook.MAPIFolder>`, etc.), file system wrappers, and IApplicationGlobals
+- **No integration tests:** All tests are unit-level with Moq mocking for COM, file system, and external dependencies
+- **No temp files:** All file I/O is mocked via MemoryStream/StringWriter injection per repo policy
+- **Verification checkpoints:** Phase 1 (P1-T14), Phase 2 (P2-T25), Phase 3 (P3-T27), and final QA (Phase 5)
+
+## Open Questions / Notes
+
+- **File count discrepancy:** Issue states ~196 files below 80%, but research identifies ~155 with explicit line-rate below 80% in Cobertura plus ~16 Designer.cs at 0%, ~4 commented stubs, and ~40+ pure interfaces. The plan covers all categories; Phase 4 reconciles the full count.
+- **Obsolete Bayesian code:** Files in `EmailIntelligence/Bayesian/Obsolete/` are legacy but still compiled. Included in Phase 2 testing (P2-T11).
+- **CaptureEmailAddressesModule2.cs:** Not in coverage report. Phase 3 task P3-T25 will verify whether it is compiled by UtilitiesCS.csproj before testing.
+- **WinForms viewer testability:** Some viewers (P3-T22, P3-T23) may have zero extractable logic. If so, they are documented as skip candidates in Phase 4 rather than blocking Phase 3 completion.
+- **UtilitiesCS.Test explicit Compile Include:** Per repo convention (old-style csproj), every new test .cs file must be registered in `UtilitiesCS.Test.csproj` or it silently fails to compile. Enforced by registration tasks P1-T13, P2-T24, P3-T26.
+- **Rollback strategy:** Each phase is independently verifiable. If a phase introduces test failures, revert that phase's changes and re-examine the failing files before retrying.
+- **Silent-failure risk:** Unregistered test files compile silently as absent. The registration tasks and phase checkpoints catch this by verifying build resolution.
