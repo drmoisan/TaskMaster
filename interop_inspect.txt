@@ -1,0 +1,60 @@
+=== Folders interface ===
+
+=== MAPIFolder interface ===
+get_Application | 
+get_Class | 
+get_Session | 
+get_Parent | 
+get_DefaultItemType | 
+get_DefaultMessageClass | 
+get_Description | 
+set_Description | Description:String:Opt=False
+get_EntryID | 
+get_Folders | 
+get_Items | 
+get_Name | 
+set_Name | Name:String:Opt=False
+get_StoreID | 
+get_UnReadItemCount | 
+CopyTo | DestinationFolder:MAPIFolder:Opt=False
+Delete | 
+Display | 
+GetExplorer | DisplayMode:Object:Opt=True
+MoveTo | DestinationFolder:MAPIFolder:Opt=False
+get_UserPermissions | 
+get_WebViewOn | 
+set_WebViewOn | WebViewOn:Boolean:Opt=False
+get_WebViewURL | 
+set_WebViewURL | WebViewURL:String:Opt=False
+get_WebViewAllowNavigation | 
+set_WebViewAllowNavigation | WebViewAllowNavigation:Boolean:Opt=False
+AddToPFFavorites | 
+get_AddressBookName | 
+set_AddressBookName | AddressBookName:String:Opt=False
+get_ShowAsOutlookAB | 
+set_ShowAsOutlookAB | ShowAsOutlookAB:Boolean:Opt=False
+get_FolderPath | 
+AddToFavorites | fNoUI:Object:Opt=True, Name:Object:Opt=True
+get_InAppFolderSyncObject | 
+set_InAppFolderSyncObject | InAppFolderSyncObject:Boolean:Opt=False
+get_CurrentView | 
+get_CustomViewsOnly | 
+set_CustomViewsOnly | CustomViewsOnly:Boolean:Opt=False
+get_Views | 
+get_MAPIOBJECT | 
+get_FullFolderPath | 
+get_IsSharePointFolder | 
+get_ShowItemCount | 
+set_ShowItemCount | ShowItemCount:OlShowItemCount:Opt=False
+get_Store | 
+GetStorage | StorageIdentifier:String:Opt=False, StorageIdentifierType:OlStorageIdentifierType:Opt=False
+GetTable | Filter:Object:Opt=True, TableContents:Object:Opt=True
+get_PropertyAccessor | 
+GetCalendarExporter | 
+get_UserDefinedProperties | 
+GetCustomIcon | 
+SetCustomIcon | Picture:StdPicture:Opt=False
+
+=== MAPIFolder.Folders property ===
+ReturnType: Microsoft.Office.Interop.Outlook.Folders
+Getter params: 
