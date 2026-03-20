@@ -3,7 +3,7 @@
 - **Issue:** #87
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-03-19T22-30
+- **Last Updated:** 2026-03-20T09-00
 - **Status:** In Review
 - **Version:** 1.0
 
@@ -31,7 +31,7 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
 | AC2 | No pre-existing tests broken or removed | P0-T3 baseline + P5-T6 verification |
 | AC3 | All new tests follow MSTest + Moq + FluentAssertions conventions | P0-T1 policy read + all P1–P3 implementation tasks |
 | AC4 | All new tests deterministic, isolated, no external deps | P0-T1 policy read + all P1–P3 implementation tasks |
-| AC5 | All new test files registered in UtilitiesCS.Test.csproj | P1-T13, P2-T24, P3-T26 registration tasks |
+| AC5 | All new test files registered in UtilitiesCS.Test.csproj | P1-T13, P2-T24, P3-T67 registration tasks |
 | AC6 | C# toolchain loop passes clean | P5-T1 through P5-T4 |
 | AC7 | Repo-wide coverage does not regress below baseline | P0-T3 baseline + P5-T5 comparison |
 
@@ -178,92 +178,225 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
   - Preconditions: P2-T1 through P2-T24 complete
   - Acceptance: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits 0; `vstest.console.exe` exits 0 with no test failures; coverage report confirms all Phase 2 target files at >= 80%
 
-### Phase 3 — Hard Files: WinForms & Deep COM (~55 files)
+### Phase 3 — Hard Files: WinForms & Deep COM (~66 files)
 
-**Goal:** Cover WinForms UI classes and deep COM interop classes. Strategy: extract testable logic from code-behind where needed, use Moq for COM interfaces, use STAThread context for control instantiation where required. Testability seams are permitted only when required to reach 80% coverage (per spec non-goals).
+**Goal:** Cover WinForms UI classes and deep COM interop classes. Strategy: extract testable logic from code-behind where needed, use Moq for COM interfaces, use STAThread context for control instantiation where required. Testability seams are permitted only when required to reach 80% coverage (per spec non-goals). Each task targets exactly one production file for true atomicity.
 
-- [x] [P3-T1] Create or extend tests for ConversationHelper by mocking COM conversation traversal APIs
+- [x] [P3-T1] Create or extend tests for `ConversationHelper.cs` by mocking COM conversation traversal APIs
   - Acceptance: Coverage report shows `ConversationHelper.cs` (4%) at >= 80% line rate
 
-- [ ] [P3-T2] Create or extend tests for MailItemHelper by mocking COM mail operations
+- [ ] [P3-T2] Create or extend tests for `MailItemHelper.cs` by mocking COM mail operations
   - Acceptance: Coverage report shows `MailItemHelper.cs` (45.8%) at >= 80% line rate
 
-- [ ] [P3-T3] Create or extend tests for StoreWrapperController by mocking store/session COM objects
+- [ ] [P3-T3] Create or extend tests for `StoreWrapperController.cs` by mocking store/session COM objects
   - Acceptance: Coverage report shows `StoreWrapperController.cs` (33.9%) at >= 80% line rate
 
-- [ ] [P3-T4] Create or extend tests for OlTable classes by mocking COM Table interface: `OlTableExtensions.cs` (4.7%), `OlToDoTable.cs` (0%)
-  - Acceptance: Coverage report shows both files at >= 80% line rate
+- [ ] [P3-T4] Create or extend tests for `OlTableExtensions.cs` by mocking COM Table interface
+  - Acceptance: Coverage report shows `OlTableExtensions.cs` (4.7%) at >= 80% line rate
 
-- [ ] [P3-T5] Create tests for ClassifierGroups with mocked IApplicationGlobals: `ActionableClassifierGroup.cs` (0%), `CategoryClassifierGroup.cs` (0%), `OlFolderClassifierGroup.cs` (0%)
-  - Acceptance: Coverage report shows all three files at >= 80% line rate
+- [ ] [P3-T5] Create or extend tests for `OlToDoTable.cs` by mocking COM Table interface
+  - Acceptance: Coverage report shows `OlToDoTable.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T6] Create tests for classifier engines with mocked COM items: `ConditionalItemEngine.cs` (0%), `MulticlassEngine.cs` (0%), `TristateEngine.cs` (0%), `SpamBayes.cs` (0%)
-  - Acceptance: Coverage report shows all four files at >= 80% line rate
+- [ ] [P3-T6] Create tests for `ActionableClassifierGroup.cs` with mocked IApplicationGlobals
+  - Acceptance: Coverage report shows `ActionableClassifierGroup.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T7] Create tests for classifier infrastructure with mocked globals: `ManagerAsyncLazy.cs` (0%), `Triage.cs` (8.5%)
-  - Acceptance: Coverage report shows both files at >= 80% line rate
+- [ ] [P3-T7] Create tests for `CategoryClassifierGroup.cs` with mocked IApplicationGlobals
+  - Acceptance: Coverage report shows `CategoryClassifierGroup.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T8] Extract testable logic from dialog classes and create tests: `InputBox.cs` (0%), `MyBox.cs` (0%), `NotImplementedDialog.cs` (0%), `MyBoxViewer.cs` (28.1%)
-  - Acceptance: Coverage report shows all four files at >= 80% line rate
+- [ ] [P3-T8] Create tests for `OlFolderClassifierGroup.cs` with mocked IApplicationGlobals
+  - Acceptance: Coverage report shows `OlFolderClassifierGroup.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T9] Create or extend tests for button and dialog result logic: `DelegateButton.cs` (51.6%), `FunctionButton.cs` (0%), `YesNoToAll.cs` (28.8%)
-  - Acceptance: Coverage report shows all three files at >= 80% line rate
+- [ ] [P3-T9] Create tests for `ConditionalItemEngine.cs` with mocked COM items
+  - Acceptance: Coverage report shows `ConditionalItemEngine.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T10] Create tests for WinForms layout helpers with control instantiation: `ControlPosition.cs` (0%), `ControlResizer.cs` (0%), `TableLayoutHelper.cs` (0%), `ScreenHelper.cs` (0%)
-  - Acceptance: Coverage report shows all four files at >= 80% line rate
+- [ ] [P3-T10] Create tests for `MulticlassEngine.cs` with mocked COM items
+  - Acceptance: Coverage report shows `MulticlassEngine.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T11] Create tests for WinForms interaction helpers: `MouseDownFilter.cs` (0%), `ImageHelper.cs` (0%), `OlvExtension.cs` (0%)
-  - Acceptance: Coverage report shows all three files at >= 80% line rate
+- [ ] [P3-T11] Create tests for `TristateEngine.cs` with mocked COM items
+  - Acceptance: Coverage report shows `TristateEngine.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T12] Create tests for theme infrastructure with control instantiation: `Theme.cs` (3.3%), `ThemeControlGroup.cs` (0%), `TipsController.cs` (0%)
-  - Acceptance: Coverage report shows all three files at >= 80% line rate
+- [ ] [P3-T12] Create tests for `SpamBayes.cs` with mocked COM items
+  - Acceptance: Coverage report shows `SpamBayes.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T13] Extract and test controller logic from OlFolderTools: `FilterOlFoldersController.cs` (0%), `FolderRemapController.cs` (0%), `FolderRemapTree.cs` (0%)
-  - Acceptance: Coverage report shows all three files at >= 80% line rate
+- [ ] [P3-T13] Create tests for `ManagerAsyncLazy.cs` with mocked globals
+  - Acceptance: Coverage report shows `ManagerAsyncLazy.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T14] Extract and test controller logic from ConfigController: `ConfigController.cs` (0%)
-  - Acceptance: Coverage report shows `ConfigController.cs` at >= 80% line rate
+- [ ] [P3-T14] Create or extend tests for `Triage.cs` with mocked globals
+  - Acceptance: Coverage report shows `Triage.cs` (8.5%) at >= 80% line rate
 
-- [ ] [P3-T15] Create tests for COM dispatch and system interop: `DispatchUtility.cs` (10.5%), `ShellUtilities.cs` (0%), `ComStreamWrapper.cs` (0%)
-  - Acceptance: Coverage report shows all three files at >= 80% line rate
+- [ ] [P3-T15] Extract testable logic from `InputBox.cs` and create tests
+  - Acceptance: Coverage report shows `InputBox.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T16] Create tests for OneDriveDownloader by mocking Microsoft.Graph API calls
+- [ ] [P3-T16] Extract testable logic from `MyBox.cs` and create tests
+  - Acceptance: Coverage report shows `MyBox.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T17] Extract testable logic from `NotImplementedDialog.cs` and create tests
+  - Acceptance: Coverage report shows `NotImplementedDialog.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T18] Extract testable logic from `MyBoxViewer.cs` and create tests
+  - Acceptance: Coverage report shows `MyBoxViewer.cs` (28.1%) at >= 80% line rate
+
+- [ ] [P3-T19] Extend tests for `DelegateButton.cs` button and dialog result logic
+  - Acceptance: Coverage report shows `DelegateButton.cs` (51.6%) at >= 80% line rate
+
+- [ ] [P3-T20] Create tests for `FunctionButton.cs` button and dialog result logic
+  - Acceptance: Coverage report shows `FunctionButton.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T21] Create or extend tests for `YesNoToAll.cs` button and dialog result logic
+  - Acceptance: Coverage report shows `YesNoToAll.cs` (28.8%) at >= 80% line rate
+
+- [ ] [P3-T22] Create tests for `ControlPosition.cs` with WinForms control instantiation
+  - Acceptance: Coverage report shows `ControlPosition.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T23] Create tests for `ControlResizer.cs` with WinForms control instantiation
+  - Acceptance: Coverage report shows `ControlResizer.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T24] Create tests for `TableLayoutHelper.cs` with WinForms control instantiation
+  - Acceptance: Coverage report shows `TableLayoutHelper.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T25] Create tests for `ScreenHelper.cs` with WinForms control instantiation
+  - Acceptance: Coverage report shows `ScreenHelper.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T26] Create tests for `MouseDownFilter.cs` WinForms interaction helper
+  - Acceptance: Coverage report shows `MouseDownFilter.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T27] Create tests for `ImageHelper.cs` WinForms interaction helper
+  - Acceptance: Coverage report shows `ImageHelper.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T28] Create tests for `OlvExtension.cs` WinForms interaction helper
+  - Acceptance: Coverage report shows `OlvExtension.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T29] Create or extend tests for `Theme.cs` with control instantiation
+  - Acceptance: Coverage report shows `Theme.cs` (3.3%) at >= 80% line rate
+
+- [ ] [P3-T30] Create tests for `ThemeControlGroup.cs` with control instantiation
+  - Acceptance: Coverage report shows `ThemeControlGroup.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T31] Create tests for `TipsController.cs` with control instantiation
+  - Acceptance: Coverage report shows `TipsController.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T32] Extract and test controller logic from `FilterOlFoldersController.cs`
+  - Acceptance: Coverage report shows `FilterOlFoldersController.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T33] Extract and test controller logic from `FolderRemapController.cs`
+  - Acceptance: Coverage report shows `FolderRemapController.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T34] Extract and test controller logic from `FolderRemapTree.cs`
+  - Acceptance: Coverage report shows `FolderRemapTree.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T35] Extract and test controller logic from `ConfigController.cs`
+  - Acceptance: Coverage report shows `ConfigController.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T36] Create tests for `DispatchUtility.cs` COM dispatch interop
+  - Acceptance: Coverage report shows `DispatchUtility.cs` (10.5%) at >= 80% line rate
+
+- [ ] [P3-T37] Create tests for `ShellUtilities.cs` system interop
+  - Acceptance: Coverage report shows `ShellUtilities.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T38] Create tests for `ComStreamWrapper.cs` COM stream interop
+  - Acceptance: Coverage report shows `ComStreamWrapper.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T39] Create tests for `OneDriveDownloader.cs` by mocking Microsoft.Graph API calls
   - Acceptance: Coverage report shows `OneDriveDownloader.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T17] Create tests for idle and async queues: `IdleActionQueue.cs` (0%), `IdleAsyncQueue.cs` (0%), `ApplicationIdleTimer.cs` (0%)
-  - Acceptance: Coverage report shows all three files at >= 80% line rate
+- [ ] [P3-T40] Create tests for `IdleActionQueue.cs` idle queue logic
+  - Acceptance: Coverage report shows `IdleActionQueue.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T18] Create tests for UI thread utilities: `UiThread.cs` (60%), `DvgForm.cs` (0%)
-  - Acceptance: Coverage report shows both files at >= 80% line rate
+- [ ] [P3-T41] Create tests for `IdleAsyncQueue.cs` async queue logic
+  - Acceptance: Coverage report shows `IdleAsyncQueue.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T19] Create tests for EmailParsingSorting COM-dependent classes by mocking Outlook APIs: `AutoFile.cs` (0%), `EmailDataMiner.cs` (0%), `EmailFiler.cs` (0%)
-  - Acceptance: Coverage report shows all three files at >= 80% line rate
+- [ ] [P3-T42] Create tests for `ApplicationIdleTimer.cs` idle timer logic
+  - Acceptance: Coverage report shows `ApplicationIdleTimer.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T20] Create tests for MethodBodyReader (SDIL Reader) by mocking IL reflection APIs: `MethodBodyReader.cs` (0%)
-  - Acceptance: Coverage report shows `MethodBodyReader.cs` at >= 80% line rate
+- [ ] [P3-T43] Extend tests for `UiThread.cs` UI thread utilities
+  - Acceptance: Coverage report shows `UiThread.cs` (60%) at >= 80% line rate
 
-- [ ] [P3-T21] Create tests for WinForms progress components by extracting testable logic: `ProgressPane.cs` (0%), `ProgressViewer.cs` (0%), `ProgressMultiStepViewer.cs` (0%), `ProgressTrackerPane.cs` (0%)
-  - Acceptance: Coverage report shows all four files at >= 80% line rate
+- [ ] [P3-T44] Create tests for `DvgForm.cs` by extracting testable logic
+  - Acceptance: Coverage report shows `DvgForm.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T22] Create tests for WinForms viewer logic batch 1: `FolderInfoViewer.cs` (0%), `FolderSelector.cs` (0%), `ConfigViewer.cs` (0%), `ConfigGroupBox.cs` (0%), `SubjectMapMetrics.cs` (0%), `OSBrowser.cs` (0%)
-  - Note: If a viewer has zero extractable logic after inspection, document as skip candidate in Phase 4
-  - Acceptance: For each file, either coverage report shows >= 80% line rate or file is documented as a skip candidate in `evidence/other/skip-candidates.md` with rationale
+- [ ] [P3-T45] Create tests for `AutoFile.cs` by mocking Outlook APIs
+  - Acceptance: Coverage report shows `AutoFile.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T23] Create tests for WinForms viewer logic batch 2: `FolderNotFoundViewer.cs` (0%), `InputBoxViewer.cs` (0%), `FolderRemapViewer.cs` (0%), `FilterOlFoldersViewer.cs` (0%), `ConfusionViewer.cs` (0%), `MetricChartViewer.cs` (0%)
-  - Note: If a viewer has zero extractable logic after inspection, document as skip candidate in Phase 4
-  - Acceptance: For each file, either coverage report shows >= 80% line rate or file is documented as a skip candidate in `evidence/other/skip-candidates.md` with rationale
+- [ ] [P3-T46] Create tests for `EmailDataMiner.cs` by mocking Outlook APIs
+  - Acceptance: Coverage report shows `EmailDataMiner.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T24] Create tests for WinFormsExtensions: `WinFormsExtensions.cs` (13%)
-  - Acceptance: Coverage report shows `WinFormsExtensions.cs` at >= 80% line rate
+- [ ] [P3-T47] Create tests for `EmailFiler.cs` by mocking Outlook APIs
+  - Acceptance: Coverage report shows `EmailFiler.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T25] Create tests for CaptureEmailAddressesModule2 with mocked COM interfaces
+- [ ] [P3-T48] Create tests for `MethodBodyReader.cs` by mocking IL reflection APIs
+  - Acceptance: Coverage report shows `MethodBodyReader.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T49] Create tests for `ProgressPane.cs` by extracting testable logic from WinForms component
+  - Acceptance: Coverage report shows `ProgressPane.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T50] Create tests for `ProgressViewer.cs` by extracting testable logic from WinForms component
+  - Acceptance: Coverage report shows `ProgressViewer.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T51] Create tests for `ProgressMultiStepViewer.cs` by extracting testable logic from WinForms component
+  - Acceptance: Coverage report shows `ProgressMultiStepViewer.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T52] Create tests for `ProgressTrackerPane.cs` by extracting testable logic from WinForms component
+  - Acceptance: Coverage report shows `ProgressTrackerPane.cs` (0%) at >= 80% line rate
+
+- [ ] [P3-T53] Create tests for `FolderInfoViewer.cs` by extracting testable logic
+  - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
+  - Acceptance: Coverage report shows `FolderInfoViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
+
+- [ ] [P3-T54] Create tests for `FolderSelector.cs` by extracting testable logic
+  - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
+  - Acceptance: Coverage report shows `FolderSelector.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
+
+- [ ] [P3-T55] Create tests for `ConfigViewer.cs` by extracting testable logic
+  - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
+  - Acceptance: Coverage report shows `ConfigViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
+
+- [ ] [P3-T56] Create tests for `ConfigGroupBox.cs` by extracting testable logic
+  - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
+  - Acceptance: Coverage report shows `ConfigGroupBox.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
+
+- [ ] [P3-T57] Create tests for `SubjectMapMetrics.cs` by extracting testable logic
+  - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
+  - Acceptance: Coverage report shows `SubjectMapMetrics.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
+
+- [ ] [P3-T58] Create tests for `OSBrowser.cs` by extracting testable logic
+  - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
+  - Acceptance: Coverage report shows `OSBrowser.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
+
+- [ ] [P3-T59] Create tests for `FolderNotFoundViewer.cs` by extracting testable logic
+  - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
+  - Acceptance: Coverage report shows `FolderNotFoundViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
+
+- [ ] [P3-T60] Create tests for `InputBoxViewer.cs` by extracting testable logic
+  - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
+  - Acceptance: Coverage report shows `InputBoxViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
+
+- [ ] [P3-T61] Create tests for `FolderRemapViewer.cs` by extracting testable logic
+  - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
+  - Acceptance: Coverage report shows `FolderRemapViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
+
+- [ ] [P3-T62] Create tests for `FilterOlFoldersViewer.cs` by extracting testable logic
+  - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
+  - Acceptance: Coverage report shows `FilterOlFoldersViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
+
+- [ ] [P3-T63] Create tests for `ConfusionViewer.cs` by extracting testable logic
+  - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
+  - Acceptance: Coverage report shows `ConfusionViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
+
+- [ ] [P3-T64] Create tests for `MetricChartViewer.cs` by extracting testable logic
+  - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
+  - Acceptance: Coverage report shows `MetricChartViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
+
+- [ ] [P3-T65] Create or extend tests for `WinFormsExtensions.cs`
+  - Acceptance: Coverage report shows `WinFormsExtensions.cs` (13%) at >= 80% line rate
+
+- [ ] [P3-T66] Create tests for `CaptureEmailAddressesModule2.cs` with mocked COM interfaces
   - Acceptance: Coverage report shows `CaptureEmailAddressesModule2.cs` at >= 80% line rate; or confirmed not compiled by UtilitiesCS.csproj (excluded from scope)
 
-- [ ] [P3-T26] Register all new Phase 3 test files in `UtilitiesCS.Test.csproj` via `<Compile Include>` entries; register any new production helper classes extracted for testability
+- [ ] [P3-T67] Register all new Phase 3 test files in `UtilitiesCS.Test.csproj` via `<Compile Include>` entries; register any new production helper classes extracted for testability
   - Acceptance: Every new `.cs` file created in Phase 3 has a corresponding `<Compile Include>` entry in the appropriate `.csproj`; `msbuild` resolves all files without missing-reference errors
 
-- [ ] [P3-T27] Run Phase 3 checkpoint: build solution and run tests with coverage; verify all Phase 3 target files reach >= 80% line coverage
-  - Preconditions: P3-T1 through P3-T26 complete
+- [ ] [P3-T68] Run Phase 3 checkpoint: build solution and run tests with coverage; verify all Phase 3 target files reach >= 80% line coverage
+  - Preconditions: P3-T1 through P3-T67 complete
   - Acceptance: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits 0; `vstest.console.exe` exits 0 with no test failures; coverage report confirms all Phase 3 target files at >= 80% (excluding files deferred to Phase 4 skip evaluation)
 
 ### Phase 4 — Skip Evaluation & Documentation
@@ -318,7 +451,7 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
 - **Mocking:** Moq for COM interop (`Mock<Outlook.MailItem>`, `Mock<Outlook.MAPIFolder>`, etc.), file system wrappers, and IApplicationGlobals
 - **No integration tests:** All tests are unit-level with Moq mocking for COM, file system, and external dependencies
 - **No temp files:** All file I/O is mocked via MemoryStream/StringWriter injection per repo policy
-- **Verification checkpoints:** Phase 1 (P1-T14), Phase 2 (P2-T25), Phase 3 (P3-T27), and final QA (Phase 5)
+- **Verification checkpoints:** Phase 1 (P1-T14), Phase 2 (P2-T25), Phase 3 (P3-T68), and final QA (Phase 5)
 
 ## Open Questions / Notes
 
