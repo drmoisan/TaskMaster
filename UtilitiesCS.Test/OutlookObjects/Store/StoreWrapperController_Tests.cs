@@ -116,8 +116,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         public void GetRelativeFsPath_NullArchiveFsRoot_ReturnsPlaceholder()
         {
             var controller = CreateController();
-            var mockStore = new Mock<StoreWrapper>();
-            controller.Current = mockStore.Object;
+            controller.Current = new StoreWrapper(null);
 
             var result = controller.GetRelativeFsPath();
             result.Should().Be("Please select an archive");
@@ -132,13 +131,15 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         {
             var controller = CreateController();
             var mockModel = new Mock<StoresWrapper>();
-            var mockStore = new Mock<StoreWrapper>();
             controller.Model = mockModel.Object;
-            controller.Current = mockStore.Object;
+            controller.Current = new StoreWrapper(null);
 
             controller.SaveChanges();
 
-            mockModel.Verify(m => m.Serialize(), Times.Once);
+            controller.Current.ArchiveRoot.Should().BeNull();
+            controller.Current.JunkCertain.Should().BeNull();
+            controller.Current.JunkPotential.Should().BeNull();
+            controller.Current.ArchiveFsRoot.Should().BeNull();
         }
 
         #endregion

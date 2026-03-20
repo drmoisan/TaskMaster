@@ -70,7 +70,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         [TestMethod]
         public void PadOrTrunc_RightJustify_LongString_TruncatesWithDots()
         {
-            string result = PadOrTruncHelper("VeryLongFieldName", 10, ConvHelper.Justify.Right, ' ');
+            string result = PadOrTruncHelper(
+                "VeryLongFieldName",
+                10,
+                ConvHelper.Justify.Right,
+                ' '
+            );
             result.Should().StartWith("..");
         }
 
@@ -101,7 +106,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         [TestMethod]
         public void PadOrTrunc_CenterJustify_LongString_TruncatesWithDots()
         {
-            string result = PadOrTruncHelper("VeryLongFieldName", 10, ConvHelper.Justify.Center, ' ');
+            string result = PadOrTruncHelper(
+                "VeryLongFieldName",
+                10,
+                ConvHelper.Justify.Center,
+                ' '
+            );
             result.Should().EndWith("..");
             result.Should().HaveLength(10);
         }
@@ -124,7 +134,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
                 "PadOrTrunc",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static
             );
-            return (string)method.Invoke(null, new object[] { fieldName, fieldWidth, justification, paddingChar });
+            return (string)
+                method.Invoke(
+                    null,
+                    new object[] { fieldName, fieldWidth, justification, paddingChar }
+                );
         }
 
         #endregion
@@ -168,7 +182,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         public void GetMailItemList_Strict_NullDf_ThrowsArgumentNullException()
         {
             var mockApp = new Mock<Outlook.Application>();
-            System.Action act = () => ConvHelper.GetMailItemList(null, "storeId", mockApp.Object, true);
+            System.Action act = () =>
+                ConvHelper.GetMailItemList(null, "storeId", mockApp.Object, true);
             act.Should().Throw<ArgumentNullException>();
         }
 
@@ -177,7 +192,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         {
             var df = new DataFrame(new StringDataFrameColumn("Other", new[] { "val" }));
             var mockApp = new Mock<Outlook.Application>();
-            System.Action act = () => ConvHelper.GetMailItemList(df, "storeId", mockApp.Object, true);
+            System.Action act = () =>
+                ConvHelper.GetMailItemList(df, "storeId", mockApp.Object, true);
             act.Should().Throw<ArgumentOutOfRangeException>();
         }
 
@@ -186,7 +202,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         {
             var df = new DataFrame(new StringDataFrameColumn("EntryID", 0));
             var mockApp = new Mock<Outlook.Application>();
-            System.Action act = () => ConvHelper.GetMailItemList(df, "storeId", mockApp.Object, true);
+            System.Action act = () =>
+                ConvHelper.GetMailItemList(df, "storeId", mockApp.Object, true);
             act.Should().Throw<ArgumentOutOfRangeException>();
         }
 
@@ -242,14 +259,19 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         }
 
         [TestMethod]
-        public void GetMailItemList_NoBoolOverload_DfWithEntryIDColumn_ReturnsEmptyList()
+        public void GetMailItemList_NoBoolOverload_DfWithEntryIDColumn_ReturnsItems()
         {
-            // The non-strict overload has a logic issue in its OR condition:
-            // it returns empty when EntryID column IS present
             var df = new DataFrame(new StringDataFrameColumn("EntryID", new[] { "id1" }));
             var mockApp = new Mock<Outlook.Application>();
+            var mockNs = new Mock<Outlook.NameSpace>();
+            var mockMail = new Mock<Outlook.MailItem>();
+
+            mockApp.Setup(a => a.GetNamespace("MAPI")).Returns(mockNs.Object);
+            mockNs.Setup(ns => ns.GetItemFromID("id1", "storeId")).Returns(mockMail.Object);
+
             IList result = ConvHelper.GetMailItemList(df, "storeId", mockApp.Object);
-            result.Count.Should().Be(0);
+            result.Count.Should().Be(1);
+            result[0].Should().BeSameAs(mockMail.Object);
         }
 
         #endregion
@@ -279,7 +301,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         {
             var df = new DataFrame(
                 new StringDataFrameColumn("Folder Name", new[] { "Inbox", "Sent", "Inbox" }),
-                new StringDataFrameColumn("MessageClass", new[] { "IPM.Note", "IPM.Note", "IPM.Other" })
+                new StringDataFrameColumn(
+                    "MessageClass",
+                    new[] { "IPM.Note", "IPM.Note", "IPM.Other" }
+                )
             );
             DataFrame result = ConvHelper.FilterConversation(df, "Inbox", true, false);
             result.Rows.Count.Should().Be(2);
@@ -290,7 +315,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         {
             var df = new DataFrame(
                 new StringDataFrameColumn("Folder Name", new[] { "Inbox", "Inbox", "Inbox" }),
-                new StringDataFrameColumn("MessageClass", new[] { "IPM.Note", "IPM.Other", "IPM.Note" })
+                new StringDataFrameColumn(
+                    "MessageClass",
+                    new[] { "IPM.Note", "IPM.Other", "IPM.Note" }
+                )
             );
             DataFrame result = ConvHelper.FilterConversation(df, "Inbox", false, true);
             result.Rows.Count.Should().Be(2);
@@ -301,7 +329,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         {
             var df = new DataFrame(
                 new StringDataFrameColumn("Folder Name", new[] { "Inbox", "Sent", "Inbox" }),
-                new StringDataFrameColumn("MessageClass", new[] { "IPM.Note", "IPM.Note", "IPM.Other" })
+                new StringDataFrameColumn(
+                    "MessageClass",
+                    new[] { "IPM.Note", "IPM.Note", "IPM.Other" }
+                )
             );
             DataFrame result = ConvHelper.FilterConversation(df, "Inbox", true, true);
             result.Rows.Count.Should().Be(1);
@@ -444,7 +475,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static
             );
             System.Action act = () => method.Invoke(null, new object[] { "unsupported" });
-            act.Should().Throw<System.Reflection.TargetInvocationException>()
+            act.Should()
+                .Throw<System.Reflection.TargetInvocationException>()
                 .WithInnerException<ArgumentException>();
         }
 
@@ -616,7 +648,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         [TestMethod]
         public void GetMailItemList_Strict_ValidDf_ReturnsItems()
         {
-            var df = new DataFrame(new StringDataFrameColumn("EntryID", new[] { "entry1", "entry2" }));
+            var df = new DataFrame(
+                new StringDataFrameColumn("EntryID", new[] { "entry1", "entry2" })
+            );
             var mockApp = new Mock<Outlook.Application>();
             var mockNs = new Mock<Outlook.NameSpace>();
             var mockMail1 = new Mock<Outlook.MailItem>();
@@ -654,9 +688,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
 
             mockMail.Setup(m => m.GetConversation()).Returns(mockConv.Object);
             mockMail.Setup(m => m.PropertyAccessor).Returns(mockPropAccessor.Object);
-            mockPropAccessor
-                .Setup(p => p.GetProperty(It.IsAny<string>()))
-                .Returns("Inbox");
+            mockPropAccessor.Setup(p => p.GetProperty(It.IsAny<string>())).Returns("Inbox");
 
             mockConv.Setup(c => c.GetTable()).Returns(mockTable.Object);
             mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
@@ -769,8 +801,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
             var mockConv = new Mock<Outlook.Conversation>();
             // GetDataFrame calls GetConversationTable which calls GetTable
             // Make GetTable throw COMException 3 times (exceeds retry limit)
-            mockConv.Setup(c => c.GetTable())
-                .Throws(new COMException("COM error"));
+            mockConv.Setup(c => c.GetTable()).Throws(new COMException("COM error"));
 
             // GetConversationDf catches COMException and retries up to 2 times
             // After 3 failures (retryCount 0, 1, 2), it returns null df
@@ -930,12 +961,15 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
             var mockColumns = new Mock<Outlook.Columns>();
 
             int callCount = 0;
-            mockConv.Setup(c => c.GetTable()).Returns(() =>
-            {
-                callCount++;
-                if (callCount == 1) throw new COMException("transient");
-                return mockTable.Object;
-            });
+            mockConv
+                .Setup(c => c.GetTable())
+                .Returns(() =>
+                {
+                    callCount++;
+                    if (callCount == 1)
+                        throw new COMException("transient");
+                    return mockTable.Object;
+                });
             mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
 
             int colCount = 2;
