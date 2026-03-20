@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -193,6 +194,31 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
         }
 
         [TestMethod]
+        public async Task TriageMissingHandlerAsync_CreateTreatment_AppliesStoredTriageConfig()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var mockAf = new Mock<IAppAutoFileObjects>();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+
+            mockAf.Setup(a => a.Manager).Returns(manager);
+            mockGlobals.Setup(g => g.AF).Returns(mockAf.Object);
+
+            var triage = new TriageClass(mockGlobals.Object);
+
+            var result = await triage.TriageMissingHandlerAsync(
+                Enums.NotFoundEnum.Create,
+                "missing triage classifier",
+                default
+            );
+
+            result.Should().BeTrue();
+            triage.ClassifierGroup.Should().NotBeNull();
+            triage.ClassifierGroup.Config.Disk.FileName.Should().Be("ManagerTriage.json");
+            triage.ClassifierGroup.Config.Disk.FilePath.Should().EndWith("ManagerTriage.json");
+            manager.Should().ContainKey(TriageClass.GroupName);
+        }
+
+        [TestMethod]
         public void TriageMissingHandlerAsync_ThrowTreatment_ThrowsArgumentNullException()
         {
             var mockGlobals = CreateMockGlobals();
@@ -346,9 +372,18 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             var mockOl = new Mock<IOlObjects>();
             var mockFs = new Mock<IFileSystemFolderPaths>();
             var mockAf = new Mock<IAppAutoFileObjects>();
+            var specialFolders = new ConcurrentDictionary<string, string>(
+                new[]
+                {
+                    new KeyValuePair<string, string>("AppData", @"Z:\TaskMasterAppData"),
+                    new KeyValuePair<string, string>("Flow", @"Z:\TaskMasterFlow")
+                }
+            );
+
             mockGlobals.Setup(g => g.Ol).Returns(mockOl.Object);
             mockGlobals.Setup(g => g.FS).Returns(mockFs.Object);
             mockGlobals.Setup(g => g.AF).Returns(mockAf.Object);
+            mockFs.Setup(f => f.SpecialFolders).Returns(specialFolders);
             return mockGlobals;
         }
 

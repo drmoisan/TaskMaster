@@ -63,6 +63,60 @@
       ]
     },
     {
+      "label": "lint: TaskMaster.sln (.NET analyzers)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/vscode/Invoke-VSBuild.ps1",
+        "-SolutionPath",
+        "TaskMaster.sln",
+        "-Configuration",
+        "Debug",
+        "-Platform",
+        "Any CPU",
+        "-EnableNETAnalyzers",
+        "-EnforceCodeStyleInBuild"
+      ],
+      "dependsOn": [
+        "restore: TaskMaster.sln"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
+      "label": "type-check: TaskMaster.sln (nullable warnings as errors)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/vscode/Invoke-VSBuild.ps1",
+        "-SolutionPath",
+        "TaskMaster.sln",
+        "-Configuration",
+        "Debug",
+        "-Platform",
+        "Any CPU",
+        "-EnableNullable",
+        "-TreatWarningsAsErrors"
+      ],
+      "dependsOn": [
+        "restore: TaskMaster.sln"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
       "label": "test: MSTest (vstest.console)",
       "type": "shell",
       "command": "pwsh",

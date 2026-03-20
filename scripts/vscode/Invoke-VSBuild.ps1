@@ -6,8 +6,113 @@ param(
     [string]$Configuration = 'Debug',
 
     [Parameter(Mandatory = $false)]
-    [string]$Platform = 'Any CPU'
+    [string]$Platform = 'Any CPU',
+
+    [Parameter(Mandatory = $false)]
+    [string[]]$MSBuildProperty = @(),
+
+    [Parameter(Mandatory = $false)]
+    [switch]$EnableNETAnalyzers,
+
+    [Parameter(Mandatory = $false)]
+    [switch]$EnforceCodeStyleInBuild,
+
+    [Parameter(Mandatory = $false)]
+    [switch]$EnableNullable,
+
+    [Parameter(Mandatory = $false)]
+    [switch]$TreatWarningsAsErrors,
+
+    [Parameter(Mandatory = $false)]
+    [switch]$NoExecute
 )
+
+function ConvertTo-MSBuildPropertyArgument {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Property
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Property)) {
+        throw 'MSBuildProperty entries must not be empty.'
+    }
+
+    if ($Property.StartsWith('/p:')) {
+        return $Property
+    }
+
+    return "/p:$Property"
+}
+
+function Get-MSBuildBuildArguments {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ResolvedSolutionPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Configuration,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Platform,
+
+        [Parameter(Mandatory = $false)]
+        [string[]]$MSBuildProperty = @()
+    )
+
+    $arguments = @(
+        $ResolvedSolutionPath,
+        '/t:Build',
+        "/p:Configuration=$Configuration",
+        "/p:Platform=$Platform"
+    )
+
+    foreach ($property in $MSBuildProperty) {
+        $arguments += ConvertTo-MSBuildPropertyArgument -Property $property
+    }
+
+    $arguments += '/m'
+
+    return $arguments
+}
+
+function Get-RequestedMSBuildProperties {
+    param(
+        [Parameter(Mandatory = $false)]
+        [string[]]$MSBuildProperty = @(),
+
+        [Parameter(Mandatory = $false)]
+        [switch]$EnableNETAnalyzers,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$EnforceCodeStyleInBuild,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$EnableNullable,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$TreatWarningsAsErrors
+    )
+
+    $properties = @($MSBuildProperty)
+
+    if ($EnableNETAnalyzers) {
+        $properties += 'EnableNETAnalyzers=true'
+    }
+
+    if ($EnforceCodeStyleInBuild) {
+        $properties += 'EnforceCodeStyleInBuild=true'
+    }
+
+    if ($EnableNullable) {
+        $properties += 'Nullable=enable'
+    }
+
+    if ($TreatWarningsAsErrors) {
+        $properties += 'TreatWarningsAsErrors=true'
+    }
+
+    return $properties
+}
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -39,7 +144,14 @@ if (Test-Path $syncScript) {
     & $syncScript -SolutionRoot $repoRoot
 }
 
-& $msbuildPath $resolvedSolutionPath /t:Build "/p:Configuration=$Configuration" "/p:Platform=$Platform" /m
+$requestedMSBuildProperties = Get-RequestedMSBuildProperties -MSBuildProperty $MSBuildProperty -EnableNETAnalyzers:$EnableNETAnalyzers -EnforceCodeStyleInBuild:$EnforceCodeStyleInBuild -EnableNullable:$EnableNullable -TreatWarningsAsErrors:$TreatWarningsAsErrors
+$msbuildArguments = Get-MSBuildBuildArguments -ResolvedSolutionPath $resolvedSolutionPath -Configuration $Configuration -Platform $Platform -MSBuildProperty $requestedMSBuildProperties
+
+if ($NoExecute) {
+    return
+}
+
+& $msbuildPath @msbuildArguments
 if ($LASTEXITCODE -ne 0) {
     throw "MSBuild failed with exit code $LASTEXITCODE"
 }

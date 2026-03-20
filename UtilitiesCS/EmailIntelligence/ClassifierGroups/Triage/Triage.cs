@@ -138,7 +138,7 @@ namespace UtilitiesCS.EmailIntelligence
                     ClassifierGroup = await CreateTriageClassifiersAsync(ClassNames, cancel);
                     if (
                         (await Globals.AF.Manager.Configuration).TryGetValue(
-                            $"Config{GroupName}",
+                            GroupName,
                             out var loader
                         )
                     )
@@ -166,7 +166,7 @@ namespace UtilitiesCS.EmailIntelligence
                         ClassifierGroup = await CreateTriageClassifiersAsync(ClassNames, cancel);
                         if (
                             (await Globals.AF.Manager.Configuration).TryGetValue(
-                                $"Config{GroupName}",
+                                GroupName,
                                 out loader
                             )
                         )
@@ -291,7 +291,7 @@ namespace UtilitiesCS.EmailIntelligence
                     ClassifierGroup = CreateClassifier();
                     if (
                         (await Globals.AF.Manager.Configuration).TryGetValue(
-                            $"Config{GroupName}",
+                            GroupName,
                             out var loader
                         )
                     )
