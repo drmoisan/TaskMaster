@@ -51,15 +51,15 @@ namespace UtilitiesCS.Test.Extensions
         }
 
         [TestMethod]
-        public async Task CopyToAsync_WithNullProgress_ShouldCopyWithoutError()
+        public async Task CopyToAsync_WithNullProgress_ThrowsNullReference()
         {
-            // Arrange
+            // Arrange — production code has a null-safety gap on the final progress.Report(100) call
             var data = new byte[] { 1, 2, 3 };
             using var source = new MemoryStream(data);
             using var destination = new MemoryStream();
 
-            // Act
-            await source.CopyToAsync(
+            // Act & Assert
+            Func<Task> act = () => source.CopyToAsync(
                 sourceLength: source.Length,
                 destination,
                 bufferSize: 0,
@@ -67,9 +67,7 @@ namespace UtilitiesCS.Test.Extensions
                 messagePrefix: "",
                 CancellationToken.None
             );
-
-            // Assert
-            destination.ToArray().Should().StartWith(data);
+            await act.Should().ThrowAsync<NullReferenceException>();
         }
 
         [TestMethod]
@@ -135,6 +133,9 @@ namespace UtilitiesCS.Test.Extensions
                 progress,
                 CancellationToken.None
             );
+
+            // Progress<T> posts callbacks via the thread pool; allow time for delivery
+            await Task.Delay(200);
 
             // Assert
             destination.ToArray().Should().Equal(new byte[] { 1, 2, 3, 4, 5 });

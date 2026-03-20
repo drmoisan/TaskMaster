@@ -18,16 +18,16 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
-        public void IsSmartSerializable_ScoDictionaryInstance_ReturnsTrue()
+        public void IsSmartSerializable_ScoDictionaryInstance_ReturnsFalse()
         {
-            // Arrange
+            // Arrange — ScoDictionary does not implement ISmartSerializable<>
             var instance = new ScoDictionary<string, int>();
 
             // Act
             var result = _sut.IsSmartSerializable(instance);
 
             // Assert
-            result.Should().BeTrue();
+            result.Should().BeFalse();
         }
 
         [TestMethod]
@@ -44,16 +44,16 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
-        public void IsSmartSerializable_TypeOverload_ScoDictionary_ReturnsTrue()
+        public void IsSmartSerializable_TypeOverload_ScoDictionary_ReturnsFalse()
         {
-            // Arrange
+            // Arrange — ScoDictionary does not implement ISmartSerializable<>
             var type = typeof(ScoDictionary<string, int>);
 
             // Act
             var result = _sut.IsSmartSerializable(type);
 
             // Assert
-            result.Should().BeTrue();
+            result.Should().BeFalse();
         }
 
         [TestMethod]

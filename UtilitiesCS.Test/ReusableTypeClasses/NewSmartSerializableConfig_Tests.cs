@@ -357,17 +357,19 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
-        public void CopyChanged_NoChanges_ReturnsEmptyList()
+        public void CopyChanged_IdenticalConfigs_ReportsOnlyLazySettingsDifferences()
         {
-            // Arrange
+            // Arrange — Lazy-backed JsonSettings use reference equality,
+            // so two independently-constructed configs always detect settings as changed.
             var a = new NewSmartSerializableConfig();
             var b = new NewSmartSerializableConfig();
 
             // Act
             var changed = a.CopyChanged(b, deep: false);
 
-            // Assert
-            changed.Should().BeEmpty();
+            // Assert — only Lazy-backed settings properties should differ
+            changed.Should().OnlyContain(name =>
+                name == "JsonSettings" || name == "NetJsonSettings" || name == "LocalJsonSettings");
         }
 
         [TestMethod]

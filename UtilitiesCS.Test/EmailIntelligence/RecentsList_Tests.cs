@@ -48,11 +48,14 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         [TestMethod]
-        public void Constructor_WithFilenameAndFolderpath_ShouldSetMax()
+        public void Constructor_WithEnumerableAndMax_ShouldSetMax()
         {
-            var list = new RecentsList<string>("recents.json", @"C:\data", 7);
+            // The filename/folderpath constructor attempts file-system deserialization,
+            // so use the IEnumerable constructor instead for deterministic testing.
+            var list = new RecentsList<string>(new[] { "a", "b" }, 7);
 
             list.Max.Should().Be(7);
+            list.Count.Should().Be(2);
         }
     }
 }

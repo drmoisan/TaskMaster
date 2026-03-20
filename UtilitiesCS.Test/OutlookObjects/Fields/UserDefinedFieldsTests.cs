@@ -181,7 +181,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Fields
         public void GetUdfString_WhenPropertyIsNull_ShouldReturnEmpty()
         {
             var result = ((UserProperty)null).GetUdfString();
-            result.Should().BeNull();
+            result.Should().BeEmpty();
         }
 
         [TestMethod]

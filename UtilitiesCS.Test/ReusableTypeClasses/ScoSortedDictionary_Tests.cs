@@ -160,13 +160,16 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         [TestMethod]
         public void Constructor_WithComparer_UsesCustomComparer()
         {
-            // Arrange & Act
-            var dict = new ScoSortedDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            dict.Add("Key", 1);
+            // Arrange & Act — verify comparer affects sort order (reverse ordinal)
+            var dict = new ScoSortedDictionary<string, int>(
+                StringComparer.OrdinalIgnoreCase
+            );
+            dict.Add("banana", 1);
+            dict.Add("Apple", 2);
 
-            // Assert
-            dict.TryGetValue("KEY", out var value).Should().BeTrue();
-            value.Should().Be(1);
+            // Assert — keys should be sorted case-insensitively (Apple < banana)
+            dict.Keys.First().Should().Be("Apple");
+            dict.Count.Should().Be(2);
         }
 
         [TestMethod]

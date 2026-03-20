@@ -244,6 +244,7 @@
     <Compile Include="OutlookObjects\Fields\UserDefinedFieldsTests.cs" />
     <Compile Include="OutlookObjects\Fields\MAPIFieldsTests.cs" />
     <Compile Include="OutlookObjects\Conversation\ConversationHelperTests.cs" />
+    <Compile Include="OutlookObjects\Conversation\ConversationHelper_ExtendedTests.cs" />
     <Compile Include="OutlookObjects\Table\OlToDoTableTests.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensionsTransformTests.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensionsRetryTests.cs" />
@@ -387,6 +388,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Data.Analysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Data.Analysis.0.23.0\lib\netstandard2.0\Microsoft.Data.Analysis.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ML.DataView, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ML.DataView.5.0.0\lib\netstandard2.0\Microsoft.ML.DataView.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=10.0.0.5, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.10.0.5\lib\net462\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>

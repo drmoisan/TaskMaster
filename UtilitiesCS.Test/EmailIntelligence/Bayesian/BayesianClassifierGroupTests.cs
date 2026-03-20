@@ -293,10 +293,11 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestMethod]
         public async Task RebuildClassifier_ReplacesExistingClassifier()
         {
-            // Arrange
+            // Arrange — rebuild tokens must exist in SharedTokenBase (addToParent=false
+            // uses direct lookup on parent.SharedTokenBase.TokenFrequency)
             var group = new BayesianClassifierGroup();
             group.Train("tag1", new[] { "a", "b" }, 1);
-            var newTokens = new Dictionary<string, int> { ["c"] = 2, ["d"] = 1 };
+            var newTokens = new Dictionary<string, int> { ["a"] = 1, ["b"] = 1 };
 
             // Act
             await group.RebuildClassifier("tag1", newTokens, 3, CancellationToken.None);

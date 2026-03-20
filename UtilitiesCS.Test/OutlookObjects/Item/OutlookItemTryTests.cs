@@ -278,11 +278,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         }
 
         [TestMethod]
-        public void OlItemType_WhenUnderlyingCallSucceeds_ShouldReturnValue()
+        public void OlItemType_WhenInnerObjectIsMailItem_ShouldReturnMailItem()
         {
+            // GetOlItemType is an extension method — mock the InnerObject type instead
             var outlookItem = CreateBaseOutlookItem();
-            outlookItem.Setup(x => x.GetOlItemType())
-                .Returns(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
+            var mockMailItem = new Mock<Microsoft.Office.Interop.Outlook.MailItem>();
+            outlookItem.SetupGet(x => x.InnerObject).Returns(mockMailItem.Object);
             var wrapper = new OutlookItemTry(outlookItem.Object);
 
             wrapper.OlItemType.Should()

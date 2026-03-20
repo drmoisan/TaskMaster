@@ -174,7 +174,7 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
 - [x] [P2-T24] Register all new Phase 2 test files in `UtilitiesCS.Test.csproj` via `<Compile Include>` entries
   - Acceptance: Every new `.cs` test file created in Phase 2 has a corresponding `<Compile Include>` entry in `UtilitiesCS.Test.csproj`; `msbuild` resolves all test files without missing-reference errors
 
-- [ ] [P2-T25] Run Phase 2 checkpoint: build solution and run tests with coverage; verify all Phase 2 target files reach >= 80% line coverage
+- [x] [P2-T25] Run Phase 2 checkpoint: build solution and run tests with coverage; verify all Phase 2 target files reach >= 80% line coverage
   - Preconditions: P2-T1 through P2-T24 complete
   - Acceptance: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits 0; `vstest.console.exe` exits 0 with no test failures; coverage report confirms all Phase 2 target files at >= 80%
 

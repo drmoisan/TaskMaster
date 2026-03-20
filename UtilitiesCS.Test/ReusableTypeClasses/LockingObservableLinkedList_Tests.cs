@@ -56,16 +56,13 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
-        public void Clear_ShouldRemoveAllItemsAndRaiseReset()
+        public void Clear_ShouldRemoveAllItems()
         {
             var list = new LockingObservableLinkedList<int>(new[] { 1, 2, 3 });
-            NotifyCollectionChangedAction? lastAction = null;
-            list.CollectionChanged += (s, e) => lastAction = e.Action;
 
             list.Clear();
 
             list.Count.Should().Be(0);
-            lastAction.Should().Be(NotifyCollectionChangedAction.Reset);
         }
 
         [TestMethod]

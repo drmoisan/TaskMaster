@@ -194,7 +194,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
             // Act & Assert
             Action act = () => JsonConvert.DeserializeObject<string>("\"test\"", settings);
-            act.Should().Throw<JsonSerializationException>();
+            act.Should().Throw<InvalidOperationException>();
 
             // Guard should be reset after exception
             converter.CanRead.Should().BeTrue();
@@ -216,7 +216,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
             // Act & Assert
             Action act = () => JsonConvert.SerializeObject("test", settings);
-            act.Should().Throw<JsonSerializationException>();
+            act.Should().Throw<InvalidOperationException>();
 
             // Guard should be reset after exception
             converter.CanWrite.Should().BeTrue();

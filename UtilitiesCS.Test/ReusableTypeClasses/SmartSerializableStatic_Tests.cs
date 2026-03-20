@@ -9,10 +9,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
     public class SmartSerializableStatic_Tests
     {
         [TestMethod]
-        public void IsSmartSerializable_ScoDictionary_ReturnsTrue()
+        public void IsSmartSerializable_SmartSerializableType_ReturnsTrue()
         {
-            // Arrange
-            var type = typeof(ScoDictionary<string, int>);
+            // Arrange — SmartSerializable<T> directly implements ISmartSerializable<T>
+            var type = typeof(SmartSerializable<>);
 
             // Act
             var result = type.IsSmartSerializable();
@@ -22,16 +22,29 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
-        public void IsSmartSerializable_ScoCollection_ReturnsTrue()
+        public void IsSmartSerializable_ScoDictionary_ReturnsFalse()
         {
-            // Arrange
+            // Arrange — ScoDictionary does not implement ISmartSerializable<>
+            var type = typeof(ScoDictionary<string, int>);
+
+            // Act
+            var result = type.IsSmartSerializable();
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void IsSmartSerializable_ScoCollection_ReturnsFalse()
+        {
+            // Arrange — ScoCollection does not implement ISmartSerializable<>
             var type = typeof(ScoCollection<int>);
 
             // Act
             var result = type.IsSmartSerializable();
 
             // Assert
-            result.Should().BeTrue();
+            result.Should().BeFalse();
         }
 
         [TestMethod]
@@ -61,16 +74,16 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
-        public void IsSmartSerializable_ScoBag_ReturnsTrue()
+        public void IsSmartSerializable_ScoBag_ReturnsFalse()
         {
-            // Arrange
+            // Arrange — ScBag does not implement ISmartSerializable<>
             var type = typeof(ScBag<int>);
 
             // Act
             var result = type.IsSmartSerializable();
 
             // Assert
-            result.Should().BeTrue();
+            result.Should().BeFalse();
         }
 
         [TestMethod]
