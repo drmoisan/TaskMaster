@@ -56,6 +56,7 @@ namespace TaskMaster
                     var engine = await tup.EngineFunc(Globals);
                     return (tup.Key, Engine: engine);
                 })
+                .Where(tup => tup.Engine is not null)
                 .ToConcurrentDictionaryAsync(tup => tup.Key, tup => tup.Engine);
         }
 

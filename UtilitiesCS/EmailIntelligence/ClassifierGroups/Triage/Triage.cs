@@ -288,7 +288,7 @@ namespace UtilitiesCS.EmailIntelligence
             await Task.Run(
                 async () =>
                 {
-                    ClassifierGroup = new BayesianClassifierGroup();
+                    ClassifierGroup = CreateClassifier();
                     if (
                         (await Globals.AF.Manager.Configuration).TryGetValue(
                             $"Config{GroupName}",
