@@ -3,7 +3,9 @@
   "dotnet.testWindow.useTestingPlatformProtocol": true,
   "omnisharp.projectLoadTimeout": 120,
   "chat.tools.terminal.autoApprove": {
-    "dotnet restore": true
+    "dotnet restore": true,
+    "git checkout": true,
+    "Test-Path": true
   },
   "koverage.coverageFileNames": [
     "coverage.cobertura.xml"

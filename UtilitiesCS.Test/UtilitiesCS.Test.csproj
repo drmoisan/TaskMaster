@@ -101,6 +101,7 @@
     <Compile Include="EmailIntelligence\Bayesian\BayesianPerformanceMeasurement_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Corpus_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\CorpusInherit_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\Triage\TriageCreationTests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities_Tests.cs" />
     <Compile Include="EmailIntelligence\CtfIncidence_Tests.cs" />
