@@ -16,16 +16,19 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
     /// </summary>
     internal class TestMulticlassEngine : MulticlassEngine<TestMulticlassEngine>
     {
-        public TestMulticlassEngine() : base() { }
+        public TestMulticlassEngine()
+            : base() { }
 
-        public TestMulticlassEngine(IApplicationGlobals globals) : base(globals) { }
+        public TestMulticlassEngine(IApplicationGlobals globals)
+            : base(globals) { }
 
         public override Task<bool> BuildClassifiersAsync(
             BayesianClassifierGroup classifierGroup,
             MinedMailInfo[] collection,
             ProgressPackage ppkg,
             string groupName,
-            int minimumCountPerToken = 0)
+            int minimumCountPerToken = 0
+        )
         {
             return Task.FromResult(true);
         }

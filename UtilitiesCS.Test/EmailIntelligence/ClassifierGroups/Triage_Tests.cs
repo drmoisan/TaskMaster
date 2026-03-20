@@ -91,7 +91,8 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
                 _ => Task.FromResult<(bool, string)>((true, "")),
                 (_, __, ___) => Task.FromResult(false),
                 Enums.NotFoundEnum.Skip,
-                default);
+                default
+            );
 
             result.Should().BeTrue();
         }
@@ -105,9 +106,14 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
 
             var result = await triage.ValidateTriageManagerAsync(
                 _ => Task.FromResult<(bool, string)>((false, "missing")),
-                (treatment, msg, token) => { actionCalled = true; return Task.FromResult(false); },
+                (treatment, msg, token) =>
+                {
+                    actionCalled = true;
+                    return Task.FromResult(false);
+                },
                 Enums.NotFoundEnum.Skip,
-                default);
+                default
+            );
 
             result.Should().BeFalse();
             actionCalled.Should().BeTrue();
@@ -178,7 +184,10 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             var triage = new TriageClass(mockGlobals.Object);
 
             var result = await triage.TriageMissingHandlerAsync(
-                Enums.NotFoundEnum.Skip, "test", default);
+                Enums.NotFoundEnum.Skip,
+                "test",
+                default
+            );
 
             result.Should().BeFalse();
         }
@@ -189,8 +198,12 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             var mockGlobals = CreateMockGlobals();
             var triage = new TriageClass(mockGlobals.Object);
 
-            Func<Task> act = async () => await triage.TriageMissingHandlerAsync(
-                Enums.NotFoundEnum.Throw, "error message", default);
+            Func<Task> act = async () =>
+                await triage.TriageMissingHandlerAsync(
+                    Enums.NotFoundEnum.Throw,
+                    "error message",
+                    default
+                );
 
             act.Should().ThrowAsync<ArgumentNullException>();
         }
@@ -201,8 +214,8 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             var mockGlobals = CreateMockGlobals();
             var triage = new TriageClass(mockGlobals.Object);
 
-            Func<Task> act = async () => await triage.TriageMissingHandlerAsync(
-                (Enums.NotFoundEnum)999, "test", default);
+            Func<Task> act = async () =>
+                await triage.TriageMissingHandlerAsync((Enums.NotFoundEnum)999, "test", default);
 
             act.Should().ThrowAsync<ArgumentOutOfRangeException>();
         }
@@ -276,8 +289,11 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
         {
             var mockGlobals = CreateMockGlobals();
             var triage = new TriageClass(mockGlobals.Object);
-            Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> tokenizer =
-                (_, __, ___) => Task.FromResult(new[] { "token" });
+            Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> tokenizer = (
+                _,
+                __,
+                ___
+            ) => Task.FromResult(new[] { "token" });
             triage.TokenizeAsync = tokenizer;
 
             triage.TokenizeAsync.Should().BeSameAs(tokenizer);

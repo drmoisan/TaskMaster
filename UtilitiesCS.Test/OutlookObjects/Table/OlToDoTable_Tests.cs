@@ -1,11 +1,11 @@
 using System;
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.OutlookExtensions;
-using Outlook = Microsoft.Office.Interop.Outlook;
 using Exception = System.Exception;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.Test.OutlookObjects.Table
 {
@@ -18,7 +18,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
         public void GetToDoTable_StoreThrowsOnGetDefaultFolder_ReturnsNull()
         {
             var mockStore = new Mock<Outlook.Store>();
-            mockStore.Setup(s => s.GetDefaultFolder(It.IsAny<OlDefaultFolders>()))
+            mockStore
+                .Setup(s => s.GetDefaultFolder(It.IsAny<OlDefaultFolders>()))
                 .Throws(new Exception("not available"));
 
             var result = OlToDoTable.GetToDoTable(mockStore.Object);
@@ -35,7 +36,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             var mockItems = new Mock<Items>();
             var mockUserProps = new Mock<UserDefinedProperties>();
 
-            mockStore.Setup(s => s.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
+            mockStore
+                .Setup(s => s.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
                 .Returns(mockFolder.Object);
             mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
             mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
@@ -63,7 +65,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             var mockUserProps = new Mock<UserDefinedProperties>();
             var mockField = new Mock<UserDefinedProperty>();
 
-            mockStore.Setup(s => s.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
+            mockStore
+                .Setup(s => s.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
                 .Returns(mockFolder.Object);
             mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
             mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);

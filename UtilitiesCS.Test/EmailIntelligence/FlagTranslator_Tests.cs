@@ -16,9 +16,20 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             return new FlagTranslator(
                 getStrFunc: prefix => prefix ? $"P:{_storedStr}" : _storedStr,
-                setStrFunc: (prefix, val) => { _lastPrefix = prefix; _storedStr = val; },
-                getListFunc: prefix => prefix ? new ObservableCollection<string> { $"P:{_storedList[0]}" } : _storedList,
-                setListFunc: (prefix, val) => { _lastPrefix = prefix; _storedList = val; }
+                setStrFunc: (prefix, val) =>
+                {
+                    _lastPrefix = prefix;
+                    _storedStr = val;
+                },
+                getListFunc: prefix =>
+                    prefix
+                        ? new ObservableCollection<string> { $"P:{_storedList[0]}" }
+                        : _storedList,
+                setListFunc: (prefix, val) =>
+                {
+                    _lastPrefix = prefix;
+                    _storedList = val;
+                }
             );
         }
 
@@ -47,12 +58,13 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestMethod]
         public void Constructor_NullGetStrFunc_ShouldThrowArgumentNullException()
         {
-            Action act = () => new FlagTranslator(
-                null,
-                (p, v) => { },
-                p => new ObservableCollection<string>(),
-                (p, v) => { }
-            );
+            Action act = () =>
+                new FlagTranslator(
+                    null,
+                    (p, v) => { },
+                    p => new ObservableCollection<string>(),
+                    (p, v) => { }
+                );
 
             act.Should().Throw<ArgumentNullException>();
         }
@@ -60,12 +72,13 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestMethod]
         public void Constructor_NullSetStrFunc_ShouldThrowArgumentNullException()
         {
-            Action act = () => new FlagTranslator(
-                p => "",
-                null,
-                p => new ObservableCollection<string>(),
-                (p, v) => { }
-            );
+            Action act = () =>
+                new FlagTranslator(
+                    p => "",
+                    null,
+                    p => new ObservableCollection<string>(),
+                    (p, v) => { }
+                );
 
             act.Should().Throw<ArgumentNullException>();
         }
@@ -73,12 +86,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestMethod]
         public void Constructor_NullGetListFunc_ShouldThrowArgumentNullException()
         {
-            Action act = () => new FlagTranslator(
-                p => "",
-                (p, v) => { },
-                null,
-                (p, v) => { }
-            );
+            Action act = () => new FlagTranslator(p => "", (p, v) => { }, null, (p, v) => { });
 
             act.Should().Throw<ArgumentNullException>();
         }
@@ -86,12 +94,13 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestMethod]
         public void Constructor_NullSetListFunc_ShouldThrowArgumentNullException()
         {
-            Action act = () => new FlagTranslator(
-                p => "",
-                (p, v) => { },
-                p => new ObservableCollection<string>(),
-                null
-            );
+            Action act = () =>
+                new FlagTranslator(
+                    p => "",
+                    (p, v) => { },
+                    p => new ObservableCollection<string>(),
+                    null
+                );
 
             act.Should().Throw<ArgumentNullException>();
         }

@@ -79,12 +79,16 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
         public void RunTableRetry_FailsThenSucceeds_ReturnsResult()
         {
             int callCount = 0;
-            var result = OlTableExtensions.RunTableRetry(() =>
-            {
-                callCount++;
-                if (callCount < 3) throw new Exception("fail");
-                return 99;
-            }, 5);
+            var result = OlTableExtensions.RunTableRetry(
+                () =>
+                {
+                    callCount++;
+                    if (callCount < 3)
+                        throw new Exception("fail");
+                    return 99;
+                },
+                5
+            );
             result.Should().Be(99);
         }
 
@@ -137,7 +141,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
         public void RemoveColumns_EmptyColumnNames_NoException()
         {
             var mockTable = new Mock<Outlook.Table>();
-            System.Action act = () => OlTableExtensions.RemoveColumns(mockTable.Object, Array.Empty<string>());
+            System.Action act = () =>
+                OlTableExtensions.RemoveColumns(mockTable.Object, Array.Empty<string>());
             act.Should().NotThrow();
         }
 
@@ -158,10 +163,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             var mockTable = new Mock<Outlook.Table>();
             var mockColumns = new Mock<Outlook.Columns>();
             mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
-            mockColumns.Setup(c => c.Remove(It.IsAny<object>()))
+            mockColumns
+                .Setup(c => c.Remove(It.IsAny<object>()))
                 .Throws(new COMException("not found", -2147221233));
 
-            System.Action act = () => OlTableExtensions.RemoveColumns(mockTable.Object, new[] { "Missing" });
+            System.Action act = () =>
+                OlTableExtensions.RemoveColumns(mockTable.Object, new[] { "Missing" });
             act.Should().NotThrow();
         }
 
@@ -171,10 +178,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             var mockTable = new Mock<Outlook.Table>();
             var mockColumns = new Mock<Outlook.Columns>();
             mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
-            mockColumns.Setup(c => c.Remove(It.IsAny<object>()))
+            mockColumns
+                .Setup(c => c.Remove(It.IsAny<object>()))
                 .Throws(new COMException("read-only", -2147352567));
 
-            System.Action act = () => OlTableExtensions.RemoveColumns(mockTable.Object, new[] { "ReadOnly" });
+            System.Action act = () =>
+                OlTableExtensions.RemoveColumns(mockTable.Object, new[] { "ReadOnly" });
             act.Should().NotThrow();
         }
 
@@ -184,10 +193,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             var mockTable = new Mock<Outlook.Table>();
             var mockColumns = new Mock<Outlook.Columns>();
             mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
-            mockColumns.Setup(c => c.Remove(It.IsAny<object>()))
+            mockColumns
+                .Setup(c => c.Remove(It.IsAny<object>()))
                 .Throws(new COMException("timeout in operation", -555728891));
 
-            System.Action act = () => OlTableExtensions.RemoveColumns(mockTable.Object, new[] { "col" });
+            System.Action act = () =>
+                OlTableExtensions.RemoveColumns(mockTable.Object, new[] { "col" });
             act.Should().Throw<TimeoutException>();
         }
 
@@ -197,10 +208,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             var mockTable = new Mock<Outlook.Table>();
             var mockColumns = new Mock<Outlook.Columns>();
             mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
-            mockColumns.Setup(c => c.Remove(It.IsAny<object>()))
+            mockColumns
+                .Setup(c => c.Remove(It.IsAny<object>()))
                 .Throws(new COMException("timeout occurred", 0));
 
-            System.Action act = () => OlTableExtensions.RemoveColumns(mockTable.Object, new[] { "col" });
+            System.Action act = () =>
+                OlTableExtensions.RemoveColumns(mockTable.Object, new[] { "col" });
             act.Should().Throw<TimeoutException>();
         }
 

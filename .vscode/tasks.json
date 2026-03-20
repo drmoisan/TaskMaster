@@ -2,6 +2,20 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "format: csharpier",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "tool",
+        "run",
+        "csharpier",
+        "format",
+        "."
+      ],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
       "label": "restore: TaskMaster.sln",
       "type": "shell",
       "command": "pwsh",

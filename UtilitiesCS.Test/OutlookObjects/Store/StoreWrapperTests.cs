@@ -143,9 +143,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
 
             store.SetupGet(x => x.DisplayName).Returns("Mailbox");
             store.Setup(x => x.GetRootFolder()).Returns(rootFolder.Object);
-            store.SetupGet(x => x.ExchangeStoreType)
+            store
+                .SetupGet(x => x.ExchangeStoreType)
                 .Returns(OlExchangeStoreType.olPrimaryExchangeMailbox);
-            store.Setup(x => x.GetDefaultFolder(OlDefaultFolders.olFolderInbox))
+            store
+                .Setup(x => x.GetDefaultFolder(OlDefaultFolders.olFolderInbox))
                 .Returns(inbox.Object);
 
             var wrapper = new StoreWrapper(store.Object);

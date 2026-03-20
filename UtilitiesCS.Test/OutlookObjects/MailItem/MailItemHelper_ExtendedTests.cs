@@ -273,7 +273,10 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItem
         {
             var helper = new MailItemHelper();
             var r = new Mock<IRecipientInfo>().Object;
-            helper.RecipientsEquivalent(new[] { r }, Array.Empty<IRecipientInfo>()).Should().BeFalse();
+            helper
+                .RecipientsEquivalent(new[] { r }, Array.Empty<IRecipientInfo>())
+                .Should()
+                .BeFalse();
         }
 
         [TestMethod]
@@ -322,7 +325,8 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItem
         [TestMethod]
         public void CompressPlainText_StripReplyHeader_RemovesReplyHeaderOnly()
         {
-            const string text = "Hello\r\nFrom: Person\r\nSent: Date\r\nTo: Other\r\nSubject: Re: Topic\r\nOlder text";
+            const string text =
+                "Hello\r\nFrom: Person\r\nSent: Date\r\nTo: Other\r\nSubject: Re: Topic\r\nOlder text";
 
             var result = MailItemHelper.CompressPlainText(
                 text,
@@ -336,7 +340,8 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItem
         [TestMethod]
         public void CompressPlainText_StripReplyBody_RemovesBody()
         {
-            const string text = "Hello\r\nFrom: Person\r\nSent: Date\r\nTo: Other\r\nSubject: Re: Topic\r\nOlder text";
+            const string text =
+                "Hello\r\nFrom: Person\r\nSent: Date\r\nTo: Other\r\nSubject: Re: Topic\r\nOlder text";
 
             var result = MailItemHelper.CompressPlainText(
                 text,
@@ -354,7 +359,8 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItem
 
             var result = MailItemHelper.CompressPlainText(
                 text,
-                IItemInfo.PlainTextOptionsEnum.StripLinks | IItemInfo.PlainTextOptionsEnum.ShowStripped,
+                IItemInfo.PlainTextOptionsEnum.StripLinks
+                    | IItemInfo.PlainTextOptionsEnum.ShowStripped,
                 ""
             );
 
@@ -479,10 +485,11 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItem
 
         private static void SetField(MailItemHelper helper, string fieldName, object value)
         {
-            var field = typeof(MailItemHelper).GetField(
-                fieldName,
-                BindingFlags.Instance | BindingFlags.NonPublic
-            ) ?? throw new MissingFieldException(typeof(MailItemHelper).FullName, fieldName);
+            var field =
+                typeof(MailItemHelper).GetField(
+                    fieldName,
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                ) ?? throw new MissingFieldException(typeof(MailItemHelper).FullName, fieldName);
             field.SetValue(helper, value);
         }
 

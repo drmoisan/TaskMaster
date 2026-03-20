@@ -100,7 +100,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var sut = CreateSut();
             var settings = sut.GetDefaultSettings();
-            var json = JsonConvert.SerializeObject(new TestData { Name = "test", Value = 99 }, settings);
+            var json = JsonConvert.SerializeObject(
+                new TestData { Name = "test", Value = 99 },
+                settings
+            );
 
             // Act
             var result = sut.DeserializeObject<TestData>(json, settings);

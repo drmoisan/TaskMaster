@@ -47,7 +47,10 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
         {
             var tlp = new System.Windows.Forms.TableLayoutPanel();
             tlp.RowCount = 2;
-            var style = new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30);
+            var style = new System.Windows.Forms.RowStyle(
+                System.Windows.Forms.SizeType.Absolute,
+                30
+            );
 
             Action act = () => tlp.InsertSpecificRow(-1, style);
             act.Should().Throw<ArgumentOutOfRangeException>();
@@ -59,7 +62,10 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
         {
             var tlp = new System.Windows.Forms.TableLayoutPanel();
             tlp.RowCount = 2;
-            var style = new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30);
+            var style = new System.Windows.Forms.RowStyle(
+                System.Windows.Forms.SizeType.Absolute,
+                30
+            );
 
             Action act = () => tlp.InsertSpecificRow(0, style, insertCount: 0);
             act.Should().Throw<ArgumentOutOfRangeException>();
@@ -72,7 +78,10 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
             var tlp = new System.Windows.Forms.TableLayoutPanel();
             tlp.RowCount = 2;
             tlp.ColumnCount = 1;
-            var style = new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30);
+            var style = new System.Windows.Forms.RowStyle(
+                System.Windows.Forms.SizeType.Absolute,
+                30
+            );
 
             tlp.InsertSpecificRow(0, style);
             tlp.RowCount.Should().Be(3);

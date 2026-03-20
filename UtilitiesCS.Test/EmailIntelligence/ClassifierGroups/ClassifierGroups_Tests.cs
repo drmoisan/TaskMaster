@@ -48,9 +48,10 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
         public void Constructor_WithGlobals_CreatesInstance()
         {
             var mockGlobals = CreateMockGlobals();
-            var group = new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
-                mockGlobals.Object
-            );
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                );
             group.Should().NotBeNull();
         }
 
@@ -74,9 +75,10 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
         public void Constructor_WithGlobals_CreatesInstance()
         {
             var mockGlobals = CreateMockGlobals();
-            var group = new UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder.OlFolderClassifierGroup(
-                mockGlobals.Object
-            );
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder.OlFolderClassifierGroup(
+                    mockGlobals.Object
+                );
             group.Should().NotBeNull();
             group.Globals.Should().BeSameAs(mockGlobals.Object);
         }

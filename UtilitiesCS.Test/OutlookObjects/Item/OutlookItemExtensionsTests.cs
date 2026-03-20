@@ -157,15 +157,20 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [TestMethod]
         public void TryGet_ShouldReturnDefault_WhenCallThrowsSystemException()
         {
-            string result = OutlookItemExtensions.TryGet<string>(() => throw new InvalidOperationException());
+            string result = OutlookItemExtensions.TryGet<string>(() =>
+                throw new InvalidOperationException()
+            );
             result.Should().BeNull();
         }
 
         [TestMethod]
         public void TrySet_ShouldNotThrow_WhenSetterThrowsSystemException()
         {
-            System.Action act = () => OutlookItemExtensions.TrySet<string>(
-                _ => throw new InvalidOperationException(), "value");
+            System.Action act = () =>
+                OutlookItemExtensions.TrySet<string>(
+                    _ => throw new InvalidOperationException(),
+                    "value"
+                );
 
             act.Should().NotThrow();
         }
@@ -173,8 +178,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [TestMethod]
         public void TryCall_Action_ShouldNotThrow_WhenActionThrowsSystemException()
         {
-            System.Action act = () => OutlookItemExtensions.TryCall(
-                () => throw new InvalidOperationException());
+            System.Action act = () =>
+                OutlookItemExtensions.TryCall(() => throw new InvalidOperationException());
 
             act.Should().NotThrow();
         }
@@ -182,8 +187,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [TestMethod]
         public void TryCall_Func_ShouldReturnDefault_WhenFuncThrowsSystemException()
         {
-            var result = OutlookItemExtensions.TryCall<string>(
-                () => throw new InvalidOperationException());
+            var result = OutlookItemExtensions.TryCall<string>(() =>
+                throw new InvalidOperationException()
+            );
 
             result.Should().BeNull();
         }
@@ -204,7 +210,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [DataRow(typeof(PostItem), OlItemType.olPostItem)]
         public void GetOlItemType_WhenInnerObjectIsAdditionalSupportedType_ShouldReturnMappedValue(
             Type outlookType,
-            OlItemType expected)
+            OlItemType expected
+        )
         {
             var innerObject = CreateInteropMockExtended(outlookType);
             var outlookItem = new Mock<IOutlookItem>();
@@ -252,11 +259,16 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
 
         private static object CreateInteropMockExtended(Type outlookType)
         {
-            if (outlookType == typeof(AppointmentItem)) return new Mock<AppointmentItem>().Object;
-            if (outlookType == typeof(ContactItem)) return new Mock<ContactItem>().Object;
-            if (outlookType == typeof(JournalItem)) return new Mock<JournalItem>().Object;
-            if (outlookType == typeof(NoteItem)) return new Mock<NoteItem>().Object;
-            if (outlookType == typeof(PostItem)) return new Mock<PostItem>().Object;
+            if (outlookType == typeof(AppointmentItem))
+                return new Mock<AppointmentItem>().Object;
+            if (outlookType == typeof(ContactItem))
+                return new Mock<ContactItem>().Object;
+            if (outlookType == typeof(JournalItem))
+                return new Mock<JournalItem>().Object;
+            if (outlookType == typeof(NoteItem))
+                return new Mock<NoteItem>().Object;
+            if (outlookType == typeof(PostItem))
+                return new Mock<PostItem>().Object;
             throw new ArgumentOutOfRangeException(nameof(outlookType));
         }
 

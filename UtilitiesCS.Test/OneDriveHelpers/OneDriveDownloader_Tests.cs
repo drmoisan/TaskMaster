@@ -13,7 +13,9 @@ namespace UtilitiesCS.Test.OneDriveHelpers
 {
     internal class TestableOneDriveDownloader : OneDriveDownloader
     {
-        public void SetClientGetAsync(Func<string, CancellationToken, Task<HttpResponseMessage>> func)
+        public void SetClientGetAsync(
+            Func<string, CancellationToken, Task<HttpResponseMessage>> func
+        )
         {
             ClientGetAsync = func;
         }
@@ -45,7 +47,11 @@ namespace UtilitiesCS.Test.OneDriveHelpers
 
             downloader.SetClientGetAsync((url, token) => Task.FromResult(response));
 
-            var result = await downloader.TryGetUrlStreamAsync("http://example.com/test", 5000, default);
+            var result = await downloader.TryGetUrlStreamAsync(
+                "http://example.com/test",
+                5000,
+                default
+            );
             result.Should().NotBeNull();
         }
 
@@ -57,7 +63,11 @@ namespace UtilitiesCS.Test.OneDriveHelpers
 
             downloader.SetClientGetAsync((url, token) => Task.FromResult(response));
 
-            var result = await downloader.TryGetUrlStreamAsync("http://example.com/test", 5000, default);
+            var result = await downloader.TryGetUrlStreamAsync(
+                "http://example.com/test",
+                5000,
+                default
+            );
             result.Should().BeNull();
         }
 

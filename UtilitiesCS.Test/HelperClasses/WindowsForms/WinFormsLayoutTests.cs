@@ -208,8 +208,18 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
         {
             var resizer = new ControlResizer();
             var form = new Form { Width = 400, Height = 300 };
-            var panel = new Panel { Name = "panel1", Width = 200, Height = 100 };
-            var button = new Button { Name = "button1", Width = 80, Height = 30 };
+            var panel = new Panel
+            {
+                Name = "panel1",
+                Width = 200,
+                Height = 100,
+            };
+            var button = new Button
+            {
+                Name = "button1",
+                Width = 80,
+                Height = 30,
+            };
             panel.Controls.Add(button);
             form.Controls.Add(panel);
 
@@ -227,7 +237,12 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
         {
             var resizer = new ControlResizer();
             var form = new Form { Width = 400, Height = 300 };
-            var panel = new Panel { Name = "panel1", Width = 200, Height = 100 };
+            var panel = new Panel
+            {
+                Name = "panel1",
+                Width = 200,
+                Height = 100,
+            };
             form.Controls.Add(panel);
 
             resizer.FindAllControls(form);
@@ -245,12 +260,20 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
         {
             var resizer = new ControlResizer();
             var form = new Form { Width = 400, Height = 300 };
-            var label = new Label { Name = "label1", Width = 100, Height = 30 };
+            var label = new Label
+            {
+                Name = "label1",
+                Width = 100,
+                Height = 30,
+            };
             form.Controls.Add(label);
             resizer.FindAllControls(form);
 
             var result = resizer.SetResizeDimensions(
-                label, ControlResizer.ResizeDimensions.Size, false);
+                label,
+                ControlResizer.ResizeDimensions.Size,
+                false
+            );
 
             result.Should().BeTrue();
         }
@@ -263,9 +286,17 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
             var form = new Form { Width = 400, Height = 300 };
             resizer.FindAllControls(form);
 
-            var unknownLabel = new Label { Name = "unknown", Width = 100, Height = 30 };
+            var unknownLabel = new Label
+            {
+                Name = "unknown",
+                Width = 100,
+                Height = 30,
+            };
             var result = resizer.SetResizeDimensions(
-                unknownLabel, ControlResizer.ResizeDimensions.All, false);
+                unknownLabel,
+                ControlResizer.ResizeDimensions.All,
+                false
+            );
 
             result.Should().BeFalse();
         }

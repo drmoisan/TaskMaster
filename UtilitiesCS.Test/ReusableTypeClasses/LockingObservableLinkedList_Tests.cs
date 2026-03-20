@@ -344,10 +344,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             var list = new LockingObservableLinkedList<int>(new[] { 1 });
             var node = list.First;
 
-            Action act = () => list.AddPartialObserver(
-                (ILockingLinkedListObserver<int>)null,
-                node
-            );
+            Action act = () => list.AddPartialObserver((ILockingLinkedListObserver<int>)null, node);
 
             act.Should().Throw<ArgumentNullException>();
         }

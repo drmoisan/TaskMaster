@@ -160,8 +160,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
             var expected = new byte[] { 1, 2, 3 };
             var accessor = new Mock<PropertyAccessor>();
             accessor
-                .Setup(x => x.GetProperty(
-                    "http://schemas.microsoft.com/mapi/proptag/0x37010102"))
+                .Setup(x => x.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x37010102"))
                 .Returns(expected);
             var outlookAttachment = new Mock<Microsoft.Office.Interop.Outlook.Attachment>();
             outlookAttachment.SetupGet(x => x.PropertyAccessor).Returns(accessor.Object);

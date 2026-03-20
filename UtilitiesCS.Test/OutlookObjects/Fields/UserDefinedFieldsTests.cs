@@ -27,7 +27,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Fields
         [TestMethod]
         public void ValidPropertyArgs_WhenStringValueForTextType_ShouldReturnTrue()
         {
-            UserDefinedFields.ValidPropertyArgs("hello", OlUserPropertyType.olText).Should().BeTrue();
+            UserDefinedFields
+                .ValidPropertyArgs("hello", OlUserPropertyType.olText)
+                .Should()
+                .BeTrue();
         }
 
         [TestMethod]
@@ -51,7 +54,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Fields
         [TestMethod]
         public void ValidPropertyArgs_WhenWrongTypeForField_ShouldReturnFalse()
         {
-            UserDefinedFields.ValidPropertyArgs("not-a-bool", OlUserPropertyType.olYesNo).Should().BeFalse();
+            UserDefinedFields
+                .ValidPropertyArgs("not-a-bool", OlUserPropertyType.olYesNo)
+                .Should()
+                .BeFalse();
         }
 
         [TestMethod]
@@ -69,7 +75,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Fields
         public void TryGetProperty_WhenAccessorThrows_ShouldReturnNull()
         {
             var accessor = new Mock<PropertyAccessor>();
-            accessor.Setup(x => x.GetProperty("schema://test"))
+            accessor
+                .Setup(x => x.GetProperty("schema://test"))
                 .Throws(new InvalidOperationException("COM error"));
 
             var result = accessor.Object.TryGetProperty("schema://test");
@@ -92,7 +99,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Fields
         public void TryGetPropertyGeneric_WhenAccessorThrows_ShouldReturnDefault()
         {
             var accessor = new Mock<PropertyAccessor>();
-            accessor.Setup(x => x.GetProperty("schema://int"))
+            accessor
+                .Setup(x => x.GetProperty("schema://int"))
                 .Throws(new InvalidOperationException("COM error"));
 
             var result = accessor.Object.TryGetProperty<int>("schema://int");
@@ -113,7 +121,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Fields
         public void Exists_WhenPropertyThrows_ShouldReturnFalse()
         {
             var accessor = new Mock<PropertyAccessor>();
-            accessor.Setup(x => x.GetProperty("schema://missing"))
+            accessor
+                .Setup(x => x.GetProperty("schema://missing"))
                 .Throws(new InvalidOperationException("missing"));
 
             accessor.Object.Exists("schema://missing").Should().BeFalse();
@@ -134,7 +143,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Fields
         public void TrySetProperty_WhenSetThrows_ShouldReturnFalse()
         {
             var accessor = new Mock<PropertyAccessor>();
-            accessor.Setup(x => x.SetProperty("schema://prop", "value"))
+            accessor
+                .Setup(x => x.SetProperty("schema://prop", "value"))
                 .Throws(new InvalidOperationException("fail"));
 
             var result = accessor.Object.TrySetProperty("schema://prop", "value");
@@ -195,10 +205,14 @@ namespace UtilitiesCS.Test.OutlookObjects.Fields
         public void SafeGetPropertyAccessorValue_WhenAccessorThrows_ShouldReturnNull()
         {
             var accessor = new Mock<PropertyAccessor>();
-            accessor.Setup(x => x.GetProperty("schema://test"))
+            accessor
+                .Setup(x => x.GetProperty("schema://test"))
                 .Throws(new InvalidOperationException("fail"));
 
-            var result = UserDefinedFields.SafeGetPropertyAccessorValue(accessor.Object, "schema://test");
+            var result = UserDefinedFields.SafeGetPropertyAccessorValue(
+                accessor.Object,
+                "schema://test"
+            );
 
             result.Should().BeNull();
         }

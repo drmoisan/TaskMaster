@@ -311,7 +311,14 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         public void OperatorMinus_SubtractsCorpora()
         {
             // Arrange
-            var c1 = new Corpus(new Dictionary<string, int> { ["a"] = 5, ["b"] = 3, ["c"] = 1 });
+            var c1 = new Corpus(
+                new Dictionary<string, int>
+                {
+                    ["a"] = 5,
+                    ["b"] = 3,
+                    ["c"] = 1,
+                }
+            );
             var c2 = new Corpus(new Dictionary<string, int> { ["a"] = 2, ["c"] = 5 });
 
             // Act
@@ -327,14 +334,12 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         public async Task SubtractAsync_SubtractsCorpora()
         {
             // Arrange — c2 must have enough entries so chunkSize > 0 on multi-core machines
-            var c1Tokens = Enumerable.Range(1, 60)
-                .ToDictionary(i => $"t{i}", i => 10);
+            var c1Tokens = Enumerable.Range(1, 60).ToDictionary(i => $"t{i}", i => 10);
             c1Tokens["a"] = 5;
             c1Tokens["b"] = 3;
             var c1 = new Corpus(c1Tokens);
 
-            var c2Tokens = Enumerable.Range(1, 60)
-                .ToDictionary(i => $"t{i}", i => 0);
+            var c2Tokens = Enumerable.Range(1, 60).ToDictionary(i => $"t{i}", i => 0);
             c2Tokens["a"] = 2;
             var c2 = new Corpus(c2Tokens);
 
@@ -350,7 +355,14 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         public void SubtractFilter_FiltersAndSubtracts()
         {
             // Arrange
-            var all = new Corpus(new Dictionary<string, int> { ["a"] = 10, ["b"] = 5, ["c"] = 1 });
+            var all = new Corpus(
+                new Dictionary<string, int>
+                {
+                    ["a"] = 10,
+                    ["b"] = 5,
+                    ["c"] = 1,
+                }
+            );
             var match = new Corpus(new Dictionary<string, int> { ["a"] = 3, ["c"] = 1 });
 
             // Act

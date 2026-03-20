@@ -135,11 +135,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         {
             // Arrange & Act
             var converter =
-                new DerivedCompositionConverter_ConcurrentDictionary<
-                    TestDerived,
-                    string,
-                    int
-                >();
+                new DerivedCompositionConverter_ConcurrentDictionary<TestDerived, string, int>();
 
             // Assert
             converter.Should().NotBeNull();
@@ -154,12 +150,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             derived.TryAdd("key2", 2);
 
             // Act
-            var converter =
-                new DerivedCompositionConverter_ConcurrentDictionary<
-                    TestDerived,
-                    string,
-                    int
-                >(derived);
+            var converter = new DerivedCompositionConverter_ConcurrentDictionary<
+                TestDerived,
+                string,
+                int
+            >(derived);
 
             // Assert
             converter.ConcurrentDictionary.Should().NotBeNull();
@@ -176,11 +171,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             derived.TryAdd("a", 10);
             derived.TryAdd("b", 20);
             var converter =
-                new DerivedCompositionConverter_ConcurrentDictionary<
-                    TestDerived,
-                    string,
-                    int
-                >();
+                new DerivedCompositionConverter_ConcurrentDictionary<TestDerived, string, int>();
 
             // Act
             converter.ToCompositionOld(derived);
@@ -196,11 +187,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             // Arrange
             var derived = new TestDerived();
             var converter =
-                new DerivedCompositionConverter_ConcurrentDictionary<
-                    TestDerived,
-                    string,
-                    int
-                >();
+                new DerivedCompositionConverter_ConcurrentDictionary<TestDerived, string, int>();
 
             // Act
             converter.ToCompositionOld(derived);
@@ -216,12 +203,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             var original = new TestDerived();
             original.TryAdd("key1", 1);
             original.TryAdd("key2", 2);
-            var converter =
-                new DerivedCompositionConverter_ConcurrentDictionary<
-                    TestDerived,
-                    string,
-                    int
-                >(original);
+            var converter = new DerivedCompositionConverter_ConcurrentDictionary<
+                TestDerived,
+                string,
+                int
+            >(original);
 
             // Act
             var recreated = converter.ToDerivedOld();
@@ -237,12 +223,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             // Arrange
             var original = new TestDerived();
             original.TryAdd("x", 99);
-            var converter =
-                new DerivedCompositionConverter_ConcurrentDictionary<
-                    TestDerived,
-                    string,
-                    int
-                >(original);
+            var converter = new DerivedCompositionConverter_ConcurrentDictionary<
+                TestDerived,
+                string,
+                int
+            >(original);
 
             // Act
             var recreated = converter.ToDerivedOld();
@@ -257,11 +242,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         {
             // Arrange
             var converter =
-                new DerivedCompositionConverter_ConcurrentDictionary<
-                    TestDerived,
-                    string,
-                    int
-                >();
+                new DerivedCompositionConverter_ConcurrentDictionary<TestDerived, string, int>();
 
             // Act
             var newType = converter.EmitNewClass();
@@ -279,11 +260,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             original.TryAdd("r2", 200);
 
             var converter =
-                new DerivedCompositionConverter_ConcurrentDictionary<
-                    TestDerived,
-                    string,
-                    int
-                >();
+                new DerivedCompositionConverter_ConcurrentDictionary<TestDerived, string, int>();
 
             // Act
             converter.ToCompositionOld(original);

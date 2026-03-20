@@ -150,7 +150,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             // Act
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(original, settings);
-            var restored = Newtonsoft.Json.JsonConvert.DeserializeObject<ScoStack<int>>(json, settings);
+            var restored = Newtonsoft.Json.JsonConvert.DeserializeObject<ScoStack<int>>(
+                json,
+                settings
+            );
 
             // Assert
             restored.Should().NotBeNull();

@@ -271,10 +271,14 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
                 BindingFlags.Instance | BindingFlags.NonPublic
             );
 
-            System.Action action = () => method!.MakeGenericMethod(typeof(string))
-                .Invoke(outlookItem, new object[] { "MissingProperty", "value" });
+            System.Action action = () =>
+                method!
+                    .MakeGenericMethod(typeof(string))
+                    .Invoke(outlookItem, new object[] { "MissingProperty", "value" });
 
-            action.Should().Throw<TargetInvocationException>()
+            action
+                .Should()
+                .Throw<TargetInvocationException>()
                 .WithInnerException<MissingMemberException>();
         }
 
@@ -289,7 +293,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
                 BindingFlags.Instance | BindingFlags.NonPublic
             );
 
-            var result = method!.MakeGenericMethod(typeof(string))
+            var result = method!
+                .MakeGenericMethod(typeof(string))
                 .Invoke(outlookItem, new object[] { "DoesNotExist" });
 
             result.Should().BeNull();
@@ -401,7 +406,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         [TestMethod]
         public void CallMethod_NoArgs_WhenInvokeMemberFails_ShouldFallbackToGetMethod()
         {
-            // ReflectionFriendlyItem.Copy() is accessible via InvokeMember on POCOs, 
+            // ReflectionFriendlyItem.Copy() is accessible via InvokeMember on POCOs,
             // but let's verify the primary path works end-to-end
             var innerItem = new ReflectionFriendlyItem();
             var outlookItem = new UtilitiesCS.OutlookItem(innerItem);

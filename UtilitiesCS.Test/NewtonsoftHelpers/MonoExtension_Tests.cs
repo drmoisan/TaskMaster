@@ -12,10 +12,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
     [TestClass]
     public class MonoExtension_Tests
     {
-        private static (TypeBuilder Type, MethodBuilder Method, ILGenerator Gen) CreateMethodContext(
-            Type returnType = null,
-            Type[] parameterTypes = null
-        )
+        private static (
+            TypeBuilder Type,
+            MethodBuilder Method,
+            ILGenerator Gen
+        ) CreateMethodContext(Type returnType = null, Type[] parameterTypes = null)
         {
             returnType = returnType ?? typeof(void);
             parameterTypes = parameterTypes ?? Type.EmptyTypes;
@@ -50,7 +51,9 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             var (_, mb, gen) = CreateMethodContext();
 
             // Act & Assert
-            inlineNoneInstrs.Should().NotBeEmpty("SimpleVoidMethod should produce InlineNone opcodes");
+            inlineNoneInstrs
+                .Should()
+                .NotBeEmpty("SimpleVoidMethod should produce InlineNone opcodes");
             foreach (var instr in inlineNoneInstrs)
             {
                 Action act = () => instr.EmitOperand(gen, mb);
@@ -106,8 +109,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
                 .GetInstructions();
             var shortInInstr = instructions
                 .Where(i =>
-                    i.OpCode.OperandType == OperandType.ShortInlineI
-                    && i.OpCode == OpCodes.Ldc_I4_S
+                    i.OpCode.OperandType == OperandType.ShortInlineI && i.OpCode == OpCodes.Ldc_I4_S
                 )
                 .ToArray();
             var (_, mb, gen) = CreateMethodContext(typeof(int));
@@ -283,15 +285,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         {
             // Arrange: call is InlineMethod with MethodInfo operand
             var instructions = typeof(MonoExtension_Tests)
-                .GetMethod(
-                    nameof(CallMethodMethod),
-                    BindingFlags.NonPublic | BindingFlags.Static
-                )
+                .GetMethod(nameof(CallMethodMethod), BindingFlags.NonPublic | BindingFlags.Static)
                 .GetInstructions();
             var methodInstrs = instructions
                 .Where(i =>
-                    i.OpCode.OperandType == OperandType.InlineMethod
-                    && i.Operand is MethodInfo
+                    i.OpCode.OperandType == OperandType.InlineMethod && i.Operand is MethodInfo
                 )
                 .ToArray();
             var (_, mb, gen) = CreateMethodContext(typeof(string));
@@ -315,15 +313,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         {
             // Arrange: newobj is InlineMethod with ConstructorInfo operand
             var instructions = typeof(MonoExtension_Tests)
-                .GetMethod(
-                    nameof(NewObjMethod),
-                    BindingFlags.NonPublic | BindingFlags.Static
-                )
+                .GetMethod(nameof(NewObjMethod), BindingFlags.NonPublic | BindingFlags.Static)
                 .GetInstructions();
             var ctorInstrs = instructions
                 .Where(i =>
-                    i.OpCode.OperandType == OperandType.InlineMethod
-                    && i.Operand is ConstructorInfo
+                    i.OpCode.OperandType == OperandType.InlineMethod && i.Operand is ConstructorInfo
                 )
                 .ToArray();
             var (_, mb, gen) = CreateMethodContext(typeof(object));
@@ -415,10 +409,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         {
             // Arrange: switch IL instruction has InlineSwitch operand type
             var instructions = typeof(MonoExtension_Tests)
-                .GetMethod(
-                    nameof(SwitchMethod),
-                    BindingFlags.NonPublic | BindingFlags.Static
-                )
+                .GetMethod(nameof(SwitchMethod), BindingFlags.NonPublic | BindingFlags.Static)
                 .GetInstructions();
             var switchInstr = instructions.FirstOrDefault(i =>
                 i.OpCode.OperandType == OperandType.InlineSwitch
@@ -466,15 +457,14 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         {
             // Arrange: stloc.s/ldloc.s is ShortInlineVar with LocalVariableInfo
             var instructions = typeof(MonoExtension_Tests)
-                .GetMethod(
-                    nameof(LocalVarMethod),
-                    BindingFlags.NonPublic | BindingFlags.Static
-                )
+                .GetMethod(nameof(LocalVarMethod), BindingFlags.NonPublic | BindingFlags.Static)
                 .GetInstructions();
             var localInstrs = instructions
                 .Where(i =>
-                    (i.OpCode.OperandType == OperandType.ShortInlineVar
-                        || i.OpCode.OperandType == OperandType.InlineVar)
+                    (
+                        i.OpCode.OperandType == OperandType.ShortInlineVar
+                        || i.OpCode.OperandType == OperandType.InlineVar
+                    )
                     && i.Operand is LocalVariableInfo
                     && i.OpCode.Name.Contains("loc")
                 )
@@ -505,15 +495,14 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         {
             // Arrange: ldarg.s is ShortInlineVar with ParameterInfo (not a local)
             var instructions = typeof(MonoExtension_Tests)
-                .GetMethod(
-                    nameof(ManyArgMethod),
-                    BindingFlags.NonPublic | BindingFlags.Static
-                )
+                .GetMethod(nameof(ManyArgMethod), BindingFlags.NonPublic | BindingFlags.Static)
                 .GetInstructions();
             var argInstrs = instructions
                 .Where(i =>
-                    (i.OpCode.OperandType == OperandType.ShortInlineVar
-                        || i.OpCode.OperandType == OperandType.InlineVar)
+                    (
+                        i.OpCode.OperandType == OperandType.ShortInlineVar
+                        || i.OpCode.OperandType == OperandType.InlineVar
+                    )
                     && i.Operand is ParameterInfo
                 )
                 .ToArray();
@@ -534,8 +523,16 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         }
 
         private static int ManyArgMethod(
-            int a, int b, int c, int d, int e,
-            int f, int g, int h, int i, int j
+            int a,
+            int b,
+            int c,
+            int d,
+            int e,
+            int f,
+            int g,
+            int h,
+            int i,
+            int j
         )
         {
             // ldarg.s for args beyond index 3
@@ -551,15 +548,10 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         {
             // Arrange: ldtoken is InlineTok, used with typeof
             var instructions = typeof(MonoExtension_Tests)
-                .GetMethod(
-                    nameof(TypeTokenMethod),
-                    BindingFlags.NonPublic | BindingFlags.Static
-                )
+                .GetMethod(nameof(TypeTokenMethod), BindingFlags.NonPublic | BindingFlags.Static)
                 .GetInstructions();
             var tokInstrs = instructions
-                .Where(i =>
-                    i.OpCode.OperandType == OperandType.InlineTok && i.Operand is Type
-                )
+                .Where(i => i.OpCode.OperandType == OperandType.InlineTok && i.Operand is Type)
                 .ToArray();
             var (_, mb, gen) = CreateMethodContext(typeof(Type));
 

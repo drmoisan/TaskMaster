@@ -162,7 +162,14 @@ namespace UtilitiesCS.Test.Extensions
             parent.Controls.Add(child);
 
             int callCount = 0;
-            parent.ForAllControls(0, (c, val) => { callCount++; return val + 1; });
+            parent.ForAllControls(
+                0,
+                (c, val) =>
+                {
+                    callCount++;
+                    return val + 1;
+                }
+            );
 
             callCount.Should().BeGreaterThanOrEqualTo(2);
         }

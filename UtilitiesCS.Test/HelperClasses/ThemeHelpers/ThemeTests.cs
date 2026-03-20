@@ -125,8 +125,13 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         {
             var controls = new List<Control> { new Label() };
             var group = new ThemeControlGroup(
-                controls, Color.White, Color.Black, Color.Gray, Color.DarkGray,
-                () => false);
+                controls,
+                Color.White,
+                Color.Black,
+                Color.Gray,
+                Color.DarkGray,
+                () => false
+            );
 
             group.Should().NotBeNull();
         }
@@ -141,8 +146,14 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         {
             var controls = new List<Control> { new Label() };
             var group = new ThemeControlGroup(
-                controls, Color.White, Color.Black, Color.Gray, Color.DarkGray,
-                Color.LightBlue, (obj) => false);
+                controls,
+                Color.White,
+                Color.Black,
+                Color.Gray,
+                Color.DarkGray,
+                Color.LightBlue,
+                (obj) => false
+            );
 
             group.Should().NotBeNull();
         }

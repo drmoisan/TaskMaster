@@ -15,7 +15,10 @@ namespace UtilitiesCS.Test.Extensions
         public void ToMbString_ShouldFormatBytesAsMegabytes()
         {
             // Arrange / Act / Assert
-            ((long)1000000).ToMbString().Should().Be("1.0 MB");
+            ((long)1000000)
+                .ToMbString()
+                .Should()
+                .Be("1.0 MB");
             ((long)500000).ToMbString().Should().Be("0.5 MB");
             ((long)0).ToMbString().Should().Be("0.0 MB");
             ((long)2500000).ToMbString().Should().Be("2.5 MB");
@@ -59,14 +62,15 @@ namespace UtilitiesCS.Test.Extensions
             using var destination = new MemoryStream();
 
             // Act & Assert
-            Func<Task> act = () => source.CopyToAsync(
-                sourceLength: source.Length,
-                destination,
-                bufferSize: 0,
-                (ProgressTrackerPane)null,
-                messagePrefix: "",
-                CancellationToken.None
-            );
+            Func<Task> act = () =>
+                source.CopyToAsync(
+                    sourceLength: source.Length,
+                    destination,
+                    bufferSize: 0,
+                    (ProgressTrackerPane)null,
+                    messagePrefix: "",
+                    CancellationToken.None
+                );
             await act.Should().ThrowAsync<NullReferenceException>();
         }
 

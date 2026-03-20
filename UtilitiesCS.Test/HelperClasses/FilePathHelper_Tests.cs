@@ -86,7 +86,9 @@ namespace UtilitiesCS.Test.HelperClasses
 
             var result = fph.CalcMaxSeedLength();
 
-            result.Should().Be(FilePathHelper.MAX_PATH - @"C:\output".Length - ".json".Length - "_bk".Length);
+            result
+                .Should()
+                .Be(FilePathHelper.MAX_PATH - @"C:\output".Length - ".json".Length - "_bk".Length);
         }
 
         [TestMethod]

@@ -200,14 +200,14 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var config = new NewSmartSerializableConfig();
-            var customLocal = new Lazy<JsonSerializerSettings>(
-                () => new JsonSerializerSettings { Formatting = Formatting.None }
+            var customLocal = new Lazy<JsonSerializerSettings>(() =>
+                new JsonSerializerSettings { Formatting = Formatting.None }
             );
-            var customNet = new Lazy<JsonSerializerSettings>(
-                () => new JsonSerializerSettings { Formatting = Formatting.None }
+            var customNet = new Lazy<JsonSerializerSettings>(() =>
+                new JsonSerializerSettings { Formatting = Formatting.None }
             );
-            var customJson = new Lazy<JsonSerializerSettings>(
-                () => new JsonSerializerSettings { Formatting = Formatting.None }
+            var customJson = new Lazy<JsonSerializerSettings>(() =>
+                new JsonSerializerSettings { Formatting = Formatting.None }
             );
 
             // Act
@@ -368,8 +368,13 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             var changed = a.CopyChanged(b, deep: false);
 
             // Assert — only Lazy-backed settings properties should differ
-            changed.Should().OnlyContain(name =>
-                name == "JsonSettings" || name == "NetJsonSettings" || name == "LocalJsonSettings");
+            changed
+                .Should()
+                .OnlyContain(name =>
+                    name == "JsonSettings"
+                    || name == "NetJsonSettings"
+                    || name == "LocalJsonSettings"
+                );
         }
 
         [TestMethod]

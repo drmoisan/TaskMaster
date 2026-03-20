@@ -249,7 +249,11 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
 
             var result = await sb.ValidateSpamClassifierAsync(
                 _ => Task.FromResult<(bool, string)>((false, "missing")),
-                (treatment, msg, token) => { actionCalled = true; return Task.FromResult(false); },
+                (treatment, msg, token) =>
+                {
+                    actionCalled = true;
+                    return Task.FromResult(false);
+                },
                 Enums.NotFoundEnum.Skip,
                 default
             );
@@ -264,7 +268,9 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             var sb = new SpamBayes(mockGlobals.Object);
 
             var result = await sb.SpamBayesMissingHandlerAsync(
-                Enums.NotFoundEnum.Skip, "test", default
+                Enums.NotFoundEnum.Skip,
+                "test",
+                default
             );
             result.Should().BeFalse();
         }

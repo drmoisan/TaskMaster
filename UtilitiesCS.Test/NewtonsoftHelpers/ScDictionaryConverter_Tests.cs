@@ -81,10 +81,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         {
             // Arrange
             var converter = new ScDictionaryConverter<ScDictionary<string, int>, string, int>();
-            var settings = new JsonSerializerSettings
-            {
-                Converters = { converter },
-            };
+            var settings = new JsonSerializerSettings { Converters = { converter } };
 
             // Act
             var result = JsonConvert.DeserializeObject<ScDictionary<string, int>>("null", settings);

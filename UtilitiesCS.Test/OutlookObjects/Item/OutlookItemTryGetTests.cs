@@ -115,9 +115,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         public void BillingInformation_WhenPropertyExists_ShouldReturnTrueAndValue()
         {
             var wrapper = new OutlookItemTryGet(
-                new UtilitiesCS.OutlookItem(
-                    new TryGetFriendlyItem { BillingInformation = "B999" }
-                )
+                new UtilitiesCS.OutlookItem(new TryGetFriendlyItem { BillingInformation = "B999" })
             );
 
             var success = wrapper.BillingInformation(out string result);

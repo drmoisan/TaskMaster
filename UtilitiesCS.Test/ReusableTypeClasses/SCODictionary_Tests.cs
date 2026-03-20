@@ -151,7 +151,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             // Act
             var json = JsonConvert.SerializeObject(dict, settings);
-            var restored = JsonConvert.DeserializeObject<ScoDictionary<string, int>>(json, settings);
+            var restored = JsonConvert.DeserializeObject<ScoDictionary<string, int>>(
+                json,
+                settings
+            );
 
             // Assert
             restored.Should().NotBeNull();

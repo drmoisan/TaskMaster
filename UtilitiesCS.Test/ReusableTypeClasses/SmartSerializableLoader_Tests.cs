@@ -69,8 +69,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public async Task DeserializeAsync_NullGlobals_ThrowsArgumentNullException()
         {
             // Act
-            Func<Task> act = async () =>
-                await SmartSerializableLoader.DeserializeAsync(null, "{}");
+            Func<Task> act = async () => await SmartSerializableLoader.DeserializeAsync(null, "{}");
 
             // Assert
             await act.Should().ThrowAsync<ArgumentNullException>();
@@ -136,11 +135,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             cts.Cancel();
 
             // Act
-            var result = await SmartSerializableLoader.DeserializeAsync(
-                globals,
-                "{}",
-                cts.Token
-            );
+            var result = await SmartSerializableLoader.DeserializeAsync(globals, "{}", cts.Token);
 
             // Assert
             result.Should().BeNull();

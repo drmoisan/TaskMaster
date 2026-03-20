@@ -149,7 +149,9 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             // Act
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(original, settings);
-            var restored = Newtonsoft.Json.JsonConvert.DeserializeObject<ScoSortedDictionary<string, int>>(json, settings);
+            var restored = Newtonsoft.Json.JsonConvert.DeserializeObject<
+                ScoSortedDictionary<string, int>
+            >(json, settings);
 
             // Assert
             restored.Should().NotBeNull();
@@ -161,9 +163,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void Constructor_WithComparer_UsesCustomComparer()
         {
             // Arrange & Act — verify comparer affects sort order (reverse ordinal)
-            var dict = new ScoSortedDictionary<string, int>(
-                StringComparer.OrdinalIgnoreCase
-            );
+            var dict = new ScoSortedDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             dict.Add("banana", 1);
             dict.Add("Apple", 2);
 

@@ -154,7 +154,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         {
             string assigned = null;
             var outlookItem = CreateBaseOutlookItem();
-            outlookItem.SetupSet(x => x.Categories = It.IsAny<string>())
+            outlookItem
+                .SetupSet(x => x.Categories = It.IsAny<string>())
                 .Callback<string>(v => assigned = v);
             var wrapper = new OutlookItemTry(outlookItem.Object);
 
@@ -286,8 +287,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             outlookItem.SetupGet(x => x.InnerObject).Returns(mockMailItem.Object);
             var wrapper = new OutlookItemTry(outlookItem.Object);
 
-            wrapper.OlItemType.Should()
-                .Be(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
+            wrapper.OlItemType.Should().Be(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
         }
 
         private static Mock<IOutlookItem> CreateBaseOutlookItem()

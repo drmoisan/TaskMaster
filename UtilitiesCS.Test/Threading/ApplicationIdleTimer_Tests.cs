@@ -62,15 +62,21 @@ namespace UtilitiesCS.Test.Threading
 
         #region Helpers
 
-        private static ApplicationIdleTimer.ApplicationIdleEventArgs CreateEventArgs(DateTime idleSince)
+        private static ApplicationIdleTimer.ApplicationIdleEventArgs CreateEventArgs(
+            DateTime idleSince
+        )
         {
             // Use reflection to create the internal-constructor EventArgs
             var type = typeof(ApplicationIdleTimer.ApplicationIdleEventArgs);
             var ctor = type.GetConstructor(
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
-                null, new[] { typeof(DateTime) }, null);
+                null,
+                new[] { typeof(DateTime) },
+                null
+            );
 
-            return (ApplicationIdleTimer.ApplicationIdleEventArgs)ctor.Invoke(new object[] { idleSince });
+            return (ApplicationIdleTimer.ApplicationIdleEventArgs)
+                ctor.Invoke(new object[] { idleSince });
         }
 
         #endregion

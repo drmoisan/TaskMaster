@@ -254,10 +254,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             group.Train("tag2", new[] { "c", "d" }, 1);
 
             // Act
-            var results = await group.ClassifyAsync(
-                new[] { "a", "b" },
-                CancellationToken.None
-            );
+            var results = await group.ClassifyAsync(new[] { "a", "b" }, CancellationToken.None);
 
             // Assert
             results.Should().NotBeNull();

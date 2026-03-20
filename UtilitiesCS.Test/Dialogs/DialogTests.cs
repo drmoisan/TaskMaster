@@ -158,7 +158,10 @@ namespace UtilitiesCS.Test.Dialogs
             YesNoToAll.Response = YesNoToAllResponse.Empty;
             // Use reflection to call internal method
             typeof(YesNoToAll)
-                .GetMethod("RespondYes", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                .GetMethod(
+                    "RespondYes",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static
+                )
                 .Invoke(null, null);
             YesNoToAll.Response.Should().Be(YesNoToAllResponse.Yes);
         }
@@ -168,7 +171,10 @@ namespace UtilitiesCS.Test.Dialogs
         {
             YesNoToAll.Response = YesNoToAllResponse.Empty;
             typeof(YesNoToAll)
-                .GetMethod("RespondYesToAll", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                .GetMethod(
+                    "RespondYesToAll",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static
+                )
                 .Invoke(null, null);
             YesNoToAll.Response.Should().Be(YesNoToAllResponse.YesToAll);
         }
@@ -178,7 +184,10 @@ namespace UtilitiesCS.Test.Dialogs
         {
             YesNoToAll.Response = YesNoToAllResponse.Empty;
             typeof(YesNoToAll)
-                .GetMethod("RespondNo", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                .GetMethod(
+                    "RespondNo",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static
+                )
                 .Invoke(null, null);
             YesNoToAll.Response.Should().Be(YesNoToAllResponse.No);
         }
@@ -188,7 +197,10 @@ namespace UtilitiesCS.Test.Dialogs
         {
             YesNoToAll.Response = YesNoToAllResponse.Empty;
             typeof(YesNoToAll)
-                .GetMethod("RespondNoToAll", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                .GetMethod(
+                    "RespondNoToAll",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static
+                )
                 .Invoke(null, null);
             YesNoToAll.Response.Should().Be(YesNoToAllResponse.NoToAll);
         }
@@ -198,7 +210,10 @@ namespace UtilitiesCS.Test.Dialogs
         {
             YesNoToAll.Response = YesNoToAllResponse.Yes;
             typeof(YesNoToAll)
-                .GetMethod("RespondCancel", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                .GetMethod(
+                    "RespondCancel",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static
+                )
                 .Invoke(null, null);
             YesNoToAll.Response.Should().Be(YesNoToAllResponse.Empty);
         }
