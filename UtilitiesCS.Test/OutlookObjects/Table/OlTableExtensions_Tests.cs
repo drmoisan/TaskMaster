@@ -526,6 +526,235 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             act.Should().Throw<InvalidOperationException>();
         }
 
+        [TestMethod]
+        public void GetTableInView_TableViewCurrent_ReturnsTable()
+        {
+            var mockTable = new Mock<Outlook.Table>();
+            var mockTableView = new Mock<Outlook.TableView>();
+            var mockExplorer = new Mock<Outlook.Explorer>();
+
+            mockTableView.Setup(v => v.GetTable()).Returns(mockTable.Object);
+            mockExplorer.Setup(e => e.CurrentView).Returns(mockTableView.Object);
+
+            var result = OlTableExtensions.GetTableInView(mockExplorer.Object);
+            result.Should().BeSameAs(mockTable.Object);
+        }
+
+        #endregion
+
+        #region GetColumnHeaders
+
+        [TestMethod]
+        public void GetColumnHeaders_NullTable_ReturnsEmptyArray()
+        {
+            var result = OlTableExtensions.GetColumnHeaders(null);
+            result.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public void GetColumnHeaders_NullColumns_ReturnsEmptyArray()
+        {
+            var mockTable = new Mock<Outlook.Table>();
+            mockTable.Setup(t => t.Columns).Returns((Outlook.Columns)null);
+
+            var result = OlTableExtensions.GetColumnHeaders(mockTable.Object);
+            result.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public void GetColumnHeaders_ZeroCount_ReturnsEmptyArray()
+        {
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+            mockColumns.Setup(c => c.Count).Returns(0);
+
+            var result = OlTableExtensions.GetColumnHeaders(mockTable.Object);
+            result.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public void GetColumnHeaders_WithColumns_ReturnsNames()
+        {
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+            mockColumns.Setup(c => c.Count).Returns(2);
+
+            var mockCol1 = new Mock<Outlook.Column>();
+            mockCol1.Setup(c => c.Name).Returns("Subject");
+            var mockCol2 = new Mock<Outlook.Column>();
+            mockCol2.Setup(c => c.Name).Returns("EntryID");
+            mockColumns.Setup(c => c[1]).Returns(mockCol1.Object);
+            mockColumns.Setup(c => c[2]).Returns(mockCol2.Object);
+
+            var result = OlTableExtensions.GetColumnHeaders(mockTable.Object);
+            result.Should().HaveCount(2);
+            result[0].Should().Be("Subject");
+            result[1].Should().Be("EntryID");
+        }
+
+        [TestMethod]
+        public void GetColumnHeaders_ColumnWithNullName_UsesEmptyString()
+        {
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+            mockColumns.Setup(c => c.Count).Returns(1);
+
+            var mockCol = new Mock<Outlook.Column>();
+            mockCol.Setup(c => c.Name).Returns((string)null);
+            mockColumns.Setup(c => c[1]).Returns(mockCol.Object);
+
+            var result = OlTableExtensions.GetColumnHeaders(mockTable.Object);
+            result.Should().HaveCount(1);
+            result[0].Should().BeEmpty();
+        }
+
+        #endregion
+
+        #region GetRows
+
+        [TestMethod]
+        public void GetRows_EmptyTable_ReturnsNoRows()
+        {
+            var mockTable = new Mock<Outlook.Table>();
+            mockTable.Setup(t => t.EndOfTable).Returns(true);
+
+            var result = OlTableExtensions.GetRows(mockTable.Object).ToList();
+
+            result.Should().BeEmpty();
+            mockTable.Verify(t => t.MoveToStart(), Times.Once);
+        }
+
+        [TestMethod]
+        public void GetRows_WithTwoRows_ReturnsBothRows()
+        {
+            var mockTable = new Mock<Outlook.Table>();
+            var mockRow1 = new Mock<Outlook.Row>();
+            var mockRow2 = new Mock<Outlook.Row>();
+
+            mockTable.SetupSequence(t => t.EndOfTable).Returns(false).Returns(false).Returns(true);
+
+            mockTable
+                .SetupSequence(t => t.GetNextRow())
+                .Returns(mockRow1.Object)
+                .Returns(mockRow2.Object);
+
+            var result = OlTableExtensions.GetRows(mockTable.Object).ToList();
+
+            result.Should().HaveCount(2);
+            result[0].Should().BeSameAs(mockRow1.Object);
+            result[1].Should().BeSameAs(mockRow2.Object);
+        }
+
+        #endregion
+
+        #region GetTable (Store overload)
+
+        [TestMethod]
+        public void GetTable_Store_NullStore_ThrowsArgumentNullException()
+        {
+            System.Action act = () =>
+                OlTableExtensions.GetTable(
+                    (Outlook.Store)null,
+                    Outlook.OlDefaultFolders.olFolderInbox,
+                    new[] { "col" },
+                    new[] { "col2" }
+                );
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void GetTable_Store_GetDefaultFolderThrows_ReturnsNull()
+        {
+            var mockStore = new Mock<Outlook.Store>();
+            mockStore
+                .Setup(s => s.GetDefaultFolder(It.IsAny<Outlook.OlDefaultFolders>()))
+                .Throws(new COMException("folder not found"));
+
+            var result = OlTableExtensions.GetTable(
+                mockStore.Object,
+                Outlook.OlDefaultFolders.olFolderInbox,
+                null,
+                null
+            );
+            result.Should().BeNull();
+        }
+
+        #endregion
+
+        #region AddColumns exception handling
+
+        [TestMethod]
+        public void AddColumns_ExceptionDuringAdd_LogsAndContinues()
+        {
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+            mockColumns
+                .Setup(c => c.Add(It.IsAny<string>()))
+                .Throws(new COMException("add failed"));
+
+            System.Action act = () =>
+                OlTableExtensions.AddColumns(mockTable.Object, new[] { "col" });
+            act.Should().NotThrow();
+        }
+
+        #endregion
+
+        #region ConvertBinColumnsToString
+
+        [TestMethod]
+        public void ConvertBinColumnsToString_EmptyIndices_ReturnsEmptyDictionary()
+        {
+            var mockRow = new Mock<Outlook.Row>();
+            var emptyIndices = Enumerable.Empty<int>().OrderBy(x => x);
+
+            var result = OlTableExtensions.ConvertBinColumnsToString(mockRow.Object, emptyIndices);
+            result.Should().BeEmpty();
+        }
+
+        #endregion
+
+        #region ConvertObjectColumnsToString (non-null converters)
+
+        [TestMethod]
+        public void ConvertObjectColumnsToString_NullObjIndices_ReturnsEmpty()
+        {
+            var mockRow = new Mock<Outlook.Row>();
+            var converters = new Dictionary<string, Func<object, string>>
+            {
+                { "Col1", o => o?.ToString() },
+            };
+
+            var result = OlTableExtensions.ConvertObjectColumnsToString(
+                mockRow.Object,
+                null,
+                new[] { "Col1" },
+                converters
+            );
+            result.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public void ConvertObjectColumnsToString_NullObjFields_ReturnsEmpty()
+        {
+            var mockRow = new Mock<Outlook.Row>();
+            var converters = new Dictionary<string, Func<object, string>>
+            {
+                { "Col1", o => o?.ToString() },
+            };
+
+            var result = OlTableExtensions.ConvertObjectColumnsToString(
+                mockRow.Object,
+                new[] { 0 },
+                null,
+                converters
+            );
+            result.Should().BeEmpty();
+        }
+
         #endregion
     }
 }
