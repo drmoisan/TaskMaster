@@ -57,7 +57,7 @@ Plan format, Phase 0 requirements, baseline capture schema, and final QA loop ru
 
 ### 1.2 Forbidden behaviors (hard constraints)
 - You MUST NOT Invent additional phases/tasks.
-- You MUST NOT Reorder tasks "for efficiency."
+- You MUST NOT Reorder tasks “for efficiency.”
 - You MUST NOT Replace the plan with a different approach.
 - You MUST NOT Perform work that is not described by the plan.
 - You MUST NOT Use the `manage_todo_list` tool or any in-session tracker as a substitute for the plan file. The plan `.md` file is the only todo list; check-offs MUST be written to disk via `replace_string_in_file`.

@@ -1,6 +1,5 @@
 ---
 name: feature_code_review_agent
-model: GPT-5.4 (copilot)
 description: Review an entire feature branch relative to a base branch (PR-style). Read pr_context.summary.txt thoroughly, use pr_context.appendix.txt for full baseline diff evidence, and produce PolicyAudit + CodeReview + FeatureAudit (Acceptance Criteria). If remediation is needed, generate remediation inputs and delegate plan creation to atomic_planner to write remediation-plan.md in the active feature folder. No user questions.
 argument-hint: "Checkout the feature branch. Provide PRBaseBranch (e.g., development). Run this agent to (re)generate the PR context artifacts (summary + appendix) per `pr-context-artifacts` via VS Code command: `drm-copilot: Collect PR Context` (command ID: `drmCopilotExtension.collectPrContext`) --base ${input:PRBaseBranch} when needed, then produce: (1) docs/features/active/<feature>/policy-audit.<timestamp>.md, (2) docs/features/active/<feature>/code-review.<timestamp>.md, (3) docs/features/active/<feature>/feature-audit.<timestamp>.md (acceptance criteria), and (4) if needed, docs/features/active/<feature>/remediation-inputs.<timestamp>.md AND AUTOMATICALLY DELEGATE to atomic_planner to write docs/features/active/<feature>/remediation-plan.<timestamp>.md in the same folder. Timestamps use ISO-8601 format yyyy-MM-ddTHH-mm."
 tools:
@@ -35,6 +34,7 @@ Use these reusable skills to avoid duplicating shared operations:
 - `policy-audit-template-usage`
 - `remediation-handoff-atomic-planner`
  - `pr-context-artifacts`
+- `acceptance-criteria-tracking`
 
 # Constraints (feature review)
 
@@ -196,6 +196,11 @@ Create `<FEATURE_FOLDER>/feature-audit.<timestamp>.md` (same timestamp) with:
    - Overall feature readiness: PASS / NEEDS REVISION / BLOCKED
    - Top gaps preventing PASS (if any)
    - Recommended follow-up verification steps (only when UNVERIFIED criteria exist)
+
+5) Acceptance criteria check-off
+   - For each criterion evaluated as **PASS**, check it off in the AC source file(s) per `acceptance-criteria-tracking` (change `- [ ]` to `- [x]`).
+   - For criteria evaluated as PARTIAL, FAIL, or UNVERIFIED, leave them unchecked.
+   - Include the AC Status Summary defined in `acceptance-criteria-tracking`.
 
 ## Phase G — Remediation (only if necessary)
 Trigger remediation if ANY of the following:

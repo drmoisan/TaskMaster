@@ -236,8 +236,8 @@ For each feature directory:
 For each feature:
 1) Resolve authoritative AC source file(s) from the work-mode marker.
 2) Extract acceptance criteria from those source file(s).
-3) Evaluate evidence for each criterion (prefer runnable verification).
-4) Decide Delivered status (all criteria evidenced or not).
+2) Evaluate evidence for each criterion (prefer runnable verification).
+3) Decide Delivered status (all criteria evidenced or not).
 
 ## Phase D — Update plan checkboxes (evidence-driven)
 For each feature with a current plan:
