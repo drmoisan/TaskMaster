@@ -79,7 +79,7 @@ namespace UtilitiesCS.OutlookExtensions
         {
             if ((property is null) || (property.Value is null))
                 return default(T);
-            var result = property.Value;
+            object result = property.Value;
             if (flatten && result.IsArray())
             {
                 result = (object)result.FlattenArrayTree<T>();
