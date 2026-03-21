@@ -224,6 +224,7 @@
     <Compile Include="OutlookObjects\Item\OutlookItemExtensionsTests.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItemFlaggableTests.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItemFlaggableTryTests.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItem_Tests.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItemTests.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItemTryTests.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItemTryGetTests.cs" />
