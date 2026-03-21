@@ -1,3 +1,5 @@
+using System;
+using System.Reflection;
 using System.Reflection.Emit;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -8,6 +10,25 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers.SDILReader
     [TestClass]
     public class ILInstruction_Tests
     {
+        private sealed class TestOperandContainer
+        {
+            static TestOperandContainer() { }
+
+            public int ValueField = 1;
+
+            public TestOperandContainer() { }
+
+            public int InstanceMethod()
+            {
+                return ValueField;
+            }
+
+            public static int StaticMethod()
+            {
+                return 42;
+            }
+        }
+
         [TestMethod]
         public void DefaultConstructor_CreatesInstance()
         {
@@ -246,6 +267,192 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers.SDILReader
 
             // Assert
             result.Should().Contain("0001");
+        }
+
+        [TestMethod]
+        public void GetCode_WithFieldOperand_ShowsFieldSignature()
+        {
+            // Arrange
+            var field = typeof(TestOperandContainer).GetField(
+                nameof(TestOperandContainer.ValueField)
+            );
+            var instruction = new ILInstruction
+            {
+                Code = OpCodes.Ldfld,
+                Offset = 2,
+                Operand = field,
+            };
+
+            // Act
+            var result = instruction.GetCode();
+
+            // Assert
+            result.Should().Contain("int");
+            result
+                .Should()
+                .Contain(
+                    "UtilitiesCS.Test.NewtonsoftHelpers.SDILReader.ILInstruction_Tests+TestOperandContainer::ValueField"
+                );
+        }
+
+        [TestMethod]
+        public void GetCode_WithInstanceMethodOperand_IncludesInstanceKeyword()
+        {
+            // Arrange
+            var method = typeof(TestOperandContainer).GetMethod(
+                nameof(TestOperandContainer.InstanceMethod)
+            );
+            var instruction = new ILInstruction
+            {
+                Code = OpCodes.Call,
+                Offset = 3,
+                Operand = method,
+            };
+
+            // Act
+            var result = instruction.GetCode();
+
+            // Assert
+            result.Should().Contain("instance int");
+            result.Should().Contain("TestOperandContainer::InstanceMethod()");
+        }
+
+        [TestMethod]
+        public void GetCode_WithStaticMethodOperand_OmitsInstanceKeyword()
+        {
+            // Arrange
+            var method = typeof(TestOperandContainer).GetMethod(
+                nameof(TestOperandContainer.StaticMethod)
+            );
+            var instruction = new ILInstruction
+            {
+                Code = OpCodes.Call,
+                Offset = 4,
+                Operand = method,
+            };
+
+            // Act
+            var result = instruction.GetCode();
+
+            // Assert
+            result.Should().Contain("int");
+            result.Should().Contain("TestOperandContainer::StaticMethod()");
+            result.Should().NotContain("instance");
+        }
+
+        [TestMethod]
+        public void GetCode_WithConstructorOperand_ShowsInstanceConstructorSignature()
+        {
+            // Arrange
+            var constructor = typeof(TestOperandContainer).GetConstructor(Type.EmptyTypes);
+            var instruction = new ILInstruction
+            {
+                Code = OpCodes.Newobj,
+                Offset = 5,
+                Operand = constructor,
+            };
+
+            // Act
+            var result = instruction.GetCode();
+
+            // Assert
+            result.Should().Contain("instance void");
+            result.Should().Contain("TestOperandContainer::.ctor()");
+        }
+
+        [TestMethod]
+        public void GetCode_WithStaticConstructorOperand_OmitsInstanceKeyword()
+        {
+            // Arrange
+            var staticConstructor = typeof(TestOperandContainer).TypeInitializer;
+            var instruction = new ILInstruction
+            {
+                Code = OpCodes.Newobj,
+                Offset = 6,
+                Operand = staticConstructor,
+            };
+
+            // Act
+            var result = instruction.GetCode();
+
+            // Assert
+            result.Should().Contain("void");
+            result.Should().Contain("TestOperandContainer::.cctor()");
+            result.Should().NotContain("instance");
+        }
+
+        [TestMethod]
+        public void GetCode_WithInvalidInlineMethodOperand_ReturnsOpcodeOnly()
+        {
+            // Arrange
+            var instruction = new ILInstruction
+            {
+                Code = OpCodes.Call,
+                Offset = 0,
+                Operand = "not a method",
+            };
+
+            // Act
+            var result = instruction.GetCode();
+
+            // Assert
+            result.Should().Be("0000 : call");
+        }
+
+        [TestMethod]
+        public void GetCode_WithShortInlineVarOperand_AppendsOperandValue()
+        {
+            // Arrange
+            var instruction = new ILInstruction
+            {
+                Code = OpCodes.Ldarg_S,
+                Offset = 7,
+                Operand = (byte)3,
+            };
+
+            // Act
+            var result = instruction.GetCode();
+
+            // Assert
+            result.Should().Contain("ldarg.s");
+            result.Should().EndWith("3");
+        }
+
+        [TestMethod]
+        public void GetCode_WithNonTypeTokenOperand_ShowsNotSupported()
+        {
+            // Arrange
+            var instruction = new ILInstruction
+            {
+                Code = OpCodes.Ldtoken,
+                Offset = 8,
+                Operand = "token",
+            };
+
+            // Act
+            var result = instruction.GetCode();
+
+            // Assert
+            result.Should().Contain("not supported");
+        }
+
+        [TestMethod]
+        public void GetCode_WithUnsupportedOperandType_ShowsNotSupported()
+        {
+            // Arrange
+            var instruction = new ILInstruction
+            {
+                Code = OpCodes.Switch,
+                Offset = 9,
+                Operand = new[] { 1, 2, 3 },
+            };
+
+            // Act
+            var result = instruction.GetCode();
+
+            // Assert
+            result.Should().Contain("switch");
+            result.Should().Contain("not supported");
         }
     }
 }

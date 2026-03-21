@@ -430,6 +430,53 @@ namespace ConcurrentObservableCollection.Tests
             result.Should().Be(5);
         }
 
+        [TestMethod]
+        public void AdditionalConstructors_InitializeDictionaryState()
+        {
+            // Arrange
+            var initialValues = new[] { new KeyValuePair<string, int>("a", 1) };
+
+            // Act
+            var withCapacity = new ConcurrentObservableDictionary<string, int>(2, 4);
+            var withCollectionComparer = new ConcurrentObservableDictionary<string, int>(
+                initialValues,
+                StringComparer.OrdinalIgnoreCase
+            );
+            var withCapacityComparer = new ConcurrentObservableDictionary<string, int>(
+                2,
+                4,
+                StringComparer.OrdinalIgnoreCase
+            );
+            var withCapacityCollectionComparer = new ConcurrentObservableDictionary<string, int>(
+                2,
+                initialValues,
+                StringComparer.OrdinalIgnoreCase
+            );
+
+            // Assert
+            withCapacity.TryAdd("x", 9).Should().BeTrue();
+            withCapacity["x"].Should().Be(9);
+            withCollectionComparer.ContainsKey("A").Should().BeTrue();
+            withCapacityComparer.TryAdd("b", 2).Should().BeTrue();
+            withCapacityComparer.ContainsKey("B").Should().BeTrue();
+            withCapacityCollectionComparer.ContainsKey("A").Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void ProtectedSimpleCollectionChanged_IgnoresUnsupportedActions()
+        {
+            // Arrange
+            var dictionary = new TestableConcurrentObservableDictionary<string, int>();
+            var raised = false;
+            dictionary.CollectionChanged += (_, _) => raised = true;
+
+            // Act
+            dictionary.RaiseSimpleCollectionChanged(NotifyCollectionChangedAction.Reset, "k", 1);
+
+            // Assert
+            raised.Should().BeFalse();
+        }
+
         private class TestObserver<TKey, TValue> : IDictionaryObserver<TKey, TValue>
         {
             public List<DictionaryChangedEventArgs<TKey, TValue>> ReceivedEvents { get; } =
@@ -438,6 +485,19 @@ namespace ConcurrentObservableCollection.Tests
             public void OnEventOccur(DictionaryChangedEventArgs<TKey, TValue> args)
             {
                 ReceivedEvents.Add(args);
+            }
+        }
+
+        private sealed class TestableConcurrentObservableDictionary<TKey, TValue>
+            : ConcurrentObservableDictionary<TKey, TValue>
+        {
+            public void RaiseSimpleCollectionChanged(
+                NotifyCollectionChangedAction action,
+                TKey key,
+                TValue value
+            )
+            {
+                OnCollectionChanged(action, key, value);
             }
         }
     }

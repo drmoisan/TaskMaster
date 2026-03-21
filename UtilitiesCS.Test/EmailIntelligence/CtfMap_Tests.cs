@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -265,6 +268,73 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // leaving the element just before the entry-ID at the front.
             lines.Count.Should().Be(3);
             lines.Peek().Should().Be("garbage-2");
+        }
+
+        [TestMethod]
+        public void TryDequeueEntry_WithOverflowInteger_ReturnsNull()
+        {
+            // Arrange
+            var lines = new Queue<string>(
+                new[]
+                {
+                    "Inbox",
+                    "AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHH",
+                    ((long)int.MaxValue + 1).ToString(),
+                }
+            );
+
+            // Act
+            var result = CtfMap.TryDequeueEntry(ref lines);
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void PrivateHelpers_ArrayToQueueAndReadFileToArray_CoverRemainingFileBranches()
+        {
+            // Arrange
+            var arrayToQueue = typeof(CtfMap).GetMethod(
+                "ArrayToQueue",
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
+            var readFileToArray = typeof(CtfMap).GetMethod(
+                "ReadFileToArray",
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
+
+            // Act
+            var queue =
+                (Queue<string>)
+                    arrayToQueue.Invoke(
+                        null,
+                        new object[] { new[] { "header", "Inbox", "conv", "1" } }
+                    );
+            Action act = () =>
+                readFileToArray.Invoke(null, new object[] { GetMissingFilePath("ctf-map") });
+
+            // Assert
+            queue.Should().ContainInOrder("Inbox", "conv", "1");
+            act.Should()
+                .Throw<TargetInvocationException>()
+                .WithInnerException<FileNotFoundException>();
+        }
+
+        [TestMethod]
+        public void ReadTextFile_WhenFileIsMissing_ThrowsFileNotFoundException()
+        {
+            // Arrange
+
+            // Act
+            Action act = () => CtfMap.ReadTextFile(GetMissingFilePath("ctf-map-read"));
+
+            // Assert
+            act.Should().Throw<FileNotFoundException>();
+        }
+
+        private static string GetMissingFilePath(string name)
+        {
+            return Path.Combine(Environment.CurrentDirectory, $"{name}-{Guid.NewGuid():N}.txt");
         }
     }
 }

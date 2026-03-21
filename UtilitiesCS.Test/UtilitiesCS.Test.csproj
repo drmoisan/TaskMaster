@@ -191,6 +191,7 @@
     <Compile Include="NewtonsoftHelpers\WrapperScoDictionaryTest.cs" />
     <Compile Include="NewtonsoftHelpers\WrapperScDictionaryTest.cs" />
     <Compile Include="NewtonsoftHelpers\NConsoleTraceWriter_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\MonoExtension\MonoExtensionCoverageTests.cs" />
     <Compile Include="NewtonsoftHelpers\MonoExtension_Tests.cs" />
     <Compile Include="NewtonsoftHelpers\NonRecursiveConverter_Tests.cs" />
     <Compile Include="NewtonsoftHelpers\PeopleScoConverter_Tests.cs" />

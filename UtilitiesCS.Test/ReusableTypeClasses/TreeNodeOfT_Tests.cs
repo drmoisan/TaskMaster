@@ -217,5 +217,37 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             breadthFirst.Should().Equal("root", "left", "right", "leaf");
             upwardByLevel.Should().Equal("leaf", "left", "root");
         }
+
+        [TestMethod]
+        public void AdditionalOverloadsAndHelpers_ReturnExpectedResults()
+        {
+            // Arrange
+            var root = new UtilitiesCS.TreeNode<string>("root");
+            var first = root.AddChild("first", "ignored-id");
+            var second = root.AddChild("second");
+            first.AddChild("leaf");
+
+            // Act
+            var copy = new UtilitiesCS.TreeNode<string>(first);
+            var foundByStringDelegate = (UtilitiesCS.TreeNode<string>)
+                root.FindByDelegate((current, expected) => current == expected, "root");
+            var foundByValueDelegate = (UtilitiesCS.TreeNode<string>)
+                root.FindByDelegate((current, expected) => current == expected, "root");
+            var matchingNodes = root.FindAll(node => node.Value.Contains('o'))
+                .Select(node => node.Value)
+                .ToArray();
+            var nextLevelFromNull = root.GetNextLevel(null);
+            var previousLevelFromNull = root.GetPreviousLevel(null);
+
+            // Assert
+            copy.Value.Should().Be("first");
+            copy.Parent.Should().BeSameAs(root);
+            copy.Children.Should().BeSameAs(first.Children);
+            foundByStringDelegate.Should().BeSameAs(first);
+            foundByValueDelegate.Should().BeSameAs(first);
+            matchingNodes.Should().Equal("root", "second");
+            nextLevelFromNull.Should().BeNull();
+            previousLevelFromNull.Should().BeNull();
+        }
     }
 }

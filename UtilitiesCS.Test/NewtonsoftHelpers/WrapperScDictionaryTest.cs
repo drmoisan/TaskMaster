@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Reflection;
+using System.Reflection.Emit;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -343,6 +345,143 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
                     .GetValue(newClassInstance)
             );
             wrapper.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        public void ReplicateProperty_WithExplicitField_CreatesRoundTrippableProperty()
+        {
+            // Arrange
+            var wrapper = new WrapperScDictionary<TestDerived, string, int>();
+            var property = typeof(TestDerived).GetProperty(nameof(TestDerived.AdditionalField3));
+            var backingField = typeof(TestDerived).GetField(
+                "_additionalField3",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            using var typeBuilderScope = new TypeBuilderScope("WrapperScDictionaryExplicitField");
+
+            // Act
+            wrapper.ReplicateProperty(typeBuilderScope.TypeBuilder, property, backingField);
+            var replicatedType = typeBuilderScope.TypeBuilder.CreateType();
+            var replicatedInstance = Activator.CreateInstance(replicatedType);
+            replicatedType.GetProperty(property.Name).SetValue(replicatedInstance, "replicated");
+
+            // Assert
+            replicatedType
+                .GetProperty(property.Name)
+                .GetValue(replicatedInstance)
+                .Should()
+                .Be("replicated");
+            replicatedType
+                .GetField("_additionalField3", BindingFlags.Instance | BindingFlags.NonPublic)
+                .GetValue(replicatedInstance)
+                .Should()
+                .Be("replicated");
+        }
+
+        [TestMethod]
+        public void ReplicateProperty_WhenSetterIsMissing_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var wrapper = new WrapperScDictionary<TestDerived, string, int>();
+            var property = typeof(GetterOnlyHolder).GetProperty(nameof(GetterOnlyHolder.Value));
+            var capturedFields = new Dictionary<string, FieldBuilder>();
+            using var typeBuilderScope = new TypeBuilderScope("WrapperScDictionaryGetterOnly");
+
+            // Act
+            Action act = () =>
+                wrapper.ReplicateProperty(
+                    typeBuilderScope.TypeBuilder,
+                    property,
+                    ref capturedFields
+                );
+
+            // Assert
+            act.Should().Throw<InvalidOperationException>().WithMessage("*setter*");
+        }
+
+        [TestMethod]
+        public void ReplicateProperty_WhenGetterIsMissing_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var wrapper = new WrapperScDictionary<TestDerived, string, int>();
+            var property = typeof(SetterOnlyHolder).GetProperty(nameof(SetterOnlyHolder.Value));
+            var capturedFields = new Dictionary<string, FieldBuilder>();
+            using var typeBuilderScope = new TypeBuilderScope("WrapperScDictionarySetterOnly");
+
+            // Act
+            Action act = () =>
+                wrapper.ReplicateProperty(
+                    typeBuilderScope.TypeBuilder,
+                    property,
+                    ref capturedFields
+                );
+
+            // Assert
+            act.Should().Throw<InvalidOperationException>().WithMessage("*getter*");
+        }
+
+        [TestMethod]
+        public void GetBackingField_WhenPropertyHasBackingField_ReturnsUnderlyingField()
+        {
+            // Arrange
+            var wrapper = new WrapperScDictionary<TestDerived, string, int>();
+            var property = typeof(TestDerived).GetProperty(nameof(TestDerived.AdditionalField3));
+
+            // Act
+            var field = wrapper.GetBackingField(property);
+
+            // Assert
+            field.Name.Should().Be("_additionalField3");
+        }
+
+        [TestMethod]
+        public void GetBackingField_WhenGetterIsMissing_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var wrapper = new WrapperScDictionary<TestDerived, string, int>();
+            var property = typeof(SetterOnlyHolder).GetProperty(nameof(SetterOnlyHolder.Value));
+
+            // Act
+            Action act = () => wrapper.GetBackingField(property);
+
+            // Assert
+            act.Should().Throw<InvalidOperationException>().WithMessage("*getter*");
+        }
+
+        private sealed class GetterOnlyHolder
+        {
+            public string Value => "getter";
+        }
+
+        private sealed class SetterOnlyHolder
+        {
+            public string Value
+            {
+                set => Stored = value;
+            }
+
+            public string Stored { get; private set; }
+        }
+
+        private sealed class TypeBuilderScope : IDisposable
+        {
+            public TypeBuilderScope(string typeName)
+            {
+                var assemblyName = new AssemblyName($"{typeName}_{Guid.NewGuid():N}");
+                var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(
+                    assemblyName,
+                    AssemblyBuilderAccess.Run
+                );
+                var moduleBuilder = assemblyBuilder.DefineDynamicModule("MainModule");
+                TypeBuilder = moduleBuilder.DefineType(
+                    typeName,
+                    TypeAttributes.Public | TypeAttributes.Class
+                );
+            }
+
+            public TypeBuilder TypeBuilder { get; }
+
+            public void Dispose() { }
         }
     }
 }

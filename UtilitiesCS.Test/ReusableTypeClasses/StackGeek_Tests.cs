@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -98,6 +99,49 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             helper.GetCount(stack).Should().Be(0);
         }
 
+        [TestMethod]
+        public void DeleteMiddle_WhenCountBecomesOdd_PromotesNextMiddle()
+        {
+            // Arrange
+            var helper = new StackGeekReflectionHelper();
+            var stack = helper.CreateStack();
+            helper.Push(stack, 11);
+            helper.Push(stack, 22);
+            helper.Push(stack, 33);
+            helper.Push(stack, 44);
+
+            // Act
+            helper.DeleteMiddle(stack);
+
+            // Assert
+            helper.GetCount(stack).Should().Be(3);
+            helper.FindMiddle(stack).Should().Be(11);
+        }
+
+        [TestMethod]
+        public void Main_RunsSampleScenarioWithoutThrowing()
+        {
+            // Arrange
+            var helper = new StackGeekReflectionHelper();
+            var originalOut = Console.Out;
+            using var writer = new StringWriter();
+            Console.SetOut(writer);
+
+            try
+            {
+                // Act
+                helper.InvokeMain(Array.Empty<string>());
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+            }
+
+            // Assert
+            writer.ToString().Should().Contain("Middle Element :");
+            writer.ToString().Should().Contain("New Middle Element :");
+        }
+
         private sealed class StackGeekReflectionHelper
         {
             private readonly Type gfgType;
@@ -107,6 +151,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             private readonly MethodInfo popMethod;
             private readonly MethodInfo findMiddleMethod;
             private readonly MethodInfo deleteMiddleMethod;
+            private readonly MethodInfo mainMethod;
             private readonly PropertyInfo countProperty;
             private readonly FieldInfo countField;
             private readonly FieldInfo headField;
@@ -137,6 +182,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
                     "deleteMiddle",
                     BindingFlags.Instance | BindingFlags.NonPublic
                 );
+                mainMethod = gfgType.GetMethod("Main", BindingFlags.Static | BindingFlags.Public);
                 countProperty = stackType.GetProperty(
                     "count",
                     BindingFlags.Instance | BindingFlags.Public
@@ -180,6 +226,11 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             {
                 var instance = Activator.CreateInstance(gfgType, nonPublic: true);
                 deleteMiddleMethod.Invoke(instance, new[] { stack });
+            }
+
+            public void InvokeMain(string[] args)
+            {
+                mainMethod.Invoke(null, new object[] { args });
             }
 
             public int GetCount(object stack)

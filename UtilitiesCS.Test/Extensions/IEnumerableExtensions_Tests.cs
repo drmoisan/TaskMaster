@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS;
@@ -76,6 +78,22 @@ namespace UtilitiesCS.Test.Extensions
         }
 
         [TestMethod]
+        public void CompareTo_WhenSequencesMatch_ReturnsNoDifferences()
+        {
+            // Arrange
+            var left = new[] { 1, 2, 3 };
+            var right = new[] { 1, 2, 3 };
+
+            // Act
+            var result = left.CompareTo(right);
+
+            // Assert
+            result.DifferenceCount.Should().Be(0);
+            result.OnlyThis.Should().BeEmpty();
+            result.OnlyOther.Should().BeEmpty();
+        }
+
+        [TestMethod]
         public void IsSubsetOf_ReturnsFalseForNullAndTrueForContainedValues()
         {
             // Act / Assert
@@ -126,6 +144,78 @@ namespace UtilitiesCS.Test.Extensions
             manyStack.Pop().Should().Be(3);
             manyStack.Pop().Should().Be(2);
             manyStack.Pop().Should().Be(1);
+        }
+
+        [TestMethod]
+        public void GetProgressMessage_WhenNoItemsAreComplete_UsesZeroRate()
+        {
+            // Arrange
+            var method = typeof(IEnumerableExtensions).GetMethod(
+                "GetProgressMessage",
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
+            method.Should().NotBeNull();
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+            // Act
+            var result = (string)method.Invoke(null, new object[] { 0, 5, stopwatch });
+
+            // Assert
+            result.Should().Contain("Completed 0 of 5");
+            result.Should().Contain("0.00 spm");
+        }
+
+        [TestMethod]
+        public void GetProgressMessage_WhenItemsAreComplete_UsesMeasuredRate()
+        {
+            // Arrange
+            var method = typeof(IEnumerableExtensions).GetMethod(
+                "GetProgressMessage",
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
+            method.Should().NotBeNull();
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            System.Threading.Thread.Sleep(25);
+
+            // Act
+            var result = (string)method.Invoke(null, new object[] { 2, 5, stopwatch });
+
+            // Assert
+            result.Should().Contain("Completed 2 of 5");
+            result.Should().Contain("spm");
+            result.Should().Contain("remaining");
+        }
+
+        [TestMethod]
+        public void ToList_InternalHelper_ConsumesEnumerableAndReportsProgress()
+        {
+            // Arrange
+            var tracker = new CapturingProgressTracker();
+            IEnumerable<int> source = Enumerable
+                .Range(1, 3)
+                .Select(value =>
+                {
+                    System.Threading.Thread.Sleep(550);
+                    return value;
+                });
+            var method = typeof(IEnumerableExtensions).GetMethod(
+                "ToList",
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
+            method.Should().NotBeNull();
+
+            // Act
+            var result =
+                (List<int>)
+                    method
+                        .MakeGenericMethod(typeof(int))
+                        .Invoke(null, new object[] { source, 3, tracker });
+
+            // Assert
+            result.Should().Equal(1, 2, 3);
+            tracker.Reports.Should().Contain(report => report.Value == 0);
+            tracker.Reports.Should().Contain(report => report.Value > 0);
+            tracker.Reports.Should().Contain(report => report.JobName.Contains("of 3"));
         }
 
         [TestMethod]
@@ -383,6 +473,29 @@ namespace UtilitiesCS.Test.Extensions
             public int Id { get; set; }
 
             public string Name { get; set; }
+        }
+
+        private sealed class CapturingProgressTracker : ProgressTracker
+        {
+            public CapturingProgressTracker()
+                : base(new System.Threading.CancellationTokenSource()) { }
+
+            public ConcurrentQueue<(int Value, string JobName)> Reports { get; } = new();
+
+            public override void Report((int Value, string JobName) report)
+            {
+                Reports.Enqueue(report);
+            }
+
+            public override void Report(double value, string jobName)
+            {
+                Reports.Enqueue(((int)value, jobName ?? string.Empty));
+            }
+
+            public override void Report(double value)
+            {
+                Reports.Enqueue(((int)value, string.Empty));
+            }
         }
     }
 }
