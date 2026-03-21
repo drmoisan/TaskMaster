@@ -81,3 +81,71 @@
 
 Pure interface files contain zero executable lines and zero method bodies. They define contracts only.
 A complete listing will be provided during P4-T4 execution.
+
+## WinForms Controls & Dialogs (P3-T19 through P3-T31)
+
+| File | Rationale |
+|---|---|
+| `DelegateButton.cs` | WinForms Button wrapper; all methods create/configure System.Windows.Forms.Button instances; deeply coupled to WinForms control lifecycle |
+| `FunctionButton.cs` | WinForms Form subclass wrapping FunctionButton dialogs; deeply coupled to WinForms control creation and layout |
+| `YesNoToAll.cs` | Static ShowDialog creates MyBoxViewer with WinForms MessageBox semantics; internal delegates are trivial setters |
+| `ControlPosition.cs` | WinForms control position calculator; all methods operate on System.Windows.Forms.Control instances |
+| `ControlResizer.cs` | WinForms control resizer; all methods operate on System.Windows.Forms.Control.Size and Form references |
+| `TableLayoutHelper.cs` | WinForms TableLayoutPanel helper; creates and configures WinForms layout controls |
+| `ScreenHelper.cs` | WinForms Screen positioning; uses Screen.PrimaryScreen, Form.DesktopBounds, and WinForms control layout |
+| `MouseDownFilter.cs` | IMessageFilter implementation with P/Invoke (IsChild); uses Form.ActiveForm; no testable logic without WinForms message loop |
+| `ImageHelper.cs` | Static ImageCodecInfo.GetImageDecoders(); returns system-installed codec data; non-deterministic in test |
+| `OlvExtension.cs` | BrightIdeasSoftware.ObjectListView extension; operates directly on WinForms control columns |
+| `Theme.cs` | WinForms theme management; deeply coupled to Control.BackColor, Font, ForeColor across control trees |
+| `ThemeControlGroup.cs` | WinForms theme control group; wraps collections of WinForms Controls for theming |
+| `TipsController.cs` | WinForms ToolTip management; creates and configures ToolTip components bound to WinForms controls |
+
+## WinForms Controllers & Trees (P3-T34, P3-T35)
+
+| File | Rationale |
+|---|---|
+| `FolderRemapTree.cs` | WinForms TreeView for COM Outlook folder remapping; deeply coupled to TreeNode creation and COM MAPIFolder traversal |
+| `ConfigController.cs` | Config dialog controller; creates WinForms ConfigViewer form; deeply coupled to WinForms UI |
+
+## COM Interop & P/Invoke (P3-T36 through P3-T38)
+
+| File | Rationale |
+|---|---|
+| `DispatchUtility.cs` | COM IDispatch interop helper; uses P/Invoke (GetIDsOfNames, Invoke) and requires COM runtime; no pure logic extractable |
+| `ShellUtilities.cs` | Shell utilities with P/Invoke (SHGetFileInfo, DestroyIcon); requires Windows shell runtime |
+| `ComStreamWrapper.cs` | COM IStream wrapper as System.IO.Stream; uses Marshal.AllocCoTaskMem; requires live COM runtime |
+
+## Microsoft Graph / External API (P3-T39)
+
+| File | Rationale |
+|---|---|
+| `OneDriveDownloader.cs` | Microsoft.Graph SDK API calls; all methods require authenticated Graph client session |
+
+## Application Idle & UI Thread (P3-T40 through P3-T43)
+
+| File | Rationale |
+|---|---|
+| `IdleActionQueue.cs` | Static class using ApplicationIdleTimer subscription and UiThread.Dispatcher.InvokeAsync; requires WinForms message loop |
+| `IdleAsyncQueue.cs` | Static class using ApplicationIdleTimer subscription and UiThread.Dispatcher.InvokeAsync; requires WinForms message loop |
+| `ApplicationIdleTimer.cs` | P/Invoke idle timer (GetLastInputInfo, GetTickCount64); CPU performance counter; requires Windows runtime |
+| `UiThread.cs` | Static Init/Initialize creates SyncContextForm (WinForms); SynchronizationContextAwaiter struct IS separately tested |
+
+## Deep Outlook COM (P3-T45 through P3-T47)
+
+| File | Rationale |
+|---|---|
+| `AutoFile.cs` | Outlook COM filing automation; all methods require live Outlook.Application session |
+| `EmailDataMiner.cs` | 1643-line Outlook COM data miner; requires live Outlook store/folder/item access throughout |
+| `EmailFiler.cs` | Outlook COM email filing; deeply coupled to MailItem.Move, Folder.Items |
+
+## IL Reflection (P3-T48)
+
+| File | Rationale |
+|---|---|
+| `MethodBodyReader.cs` | IL instruction reader using System.Reflection.Emit opcodes; reads raw method body bytes; highly coupled to runtime reflection |
+
+## WinForms Extensions (P3-T65)
+
+| File | Rationale |
+|---|---|
+| `WinFormsExtensions.cs` | Extension methods operating on System.Windows.Forms.Control hierarchy (ForAllControls, Clone); all methods require live WinForms Control instances |

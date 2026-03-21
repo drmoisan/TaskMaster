@@ -629,6 +629,7 @@ namespace Tags
             {
                 strChkName = i.ToString("00") + " ChkBx";
                 ctrlCB = new CheckBox();
+                var optionKey = _filteredOptions.Keys.ElementAt(i);
                 try
                 {
                     _viewer.L1v2L2_OptionsPanel.Controls.Add(ctrlCB);
@@ -641,7 +642,12 @@ namespace Tags
                     return false;
                 }
 
-                ctrlCB.Text = _filteredOptions.Keys.ElementAt(i).Substring(prefix.Length);
+                ctrlCB.Name = strChkName;
+                ctrlCB.Tag = optionKey;
+                ctrlCB.Text =
+                    prefix.Length > 0 && optionKey.StartsWith(prefix)
+                        ? optionKey.Substring(prefix.Length)
+                        : optionKey;
                 ctrlCB.Checked = _filteredOptions.Values.ElementAt(i);
 
                 try

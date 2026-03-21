@@ -59,7 +59,11 @@ namespace Tags
         {
             if (!TrigByKeyChg)
             {
-                strTemp = strTagPrefix + CtrlCB.Text;
+                strTemp = CtrlCB.Tag as string;
+                if (string.IsNullOrEmpty(strTemp))
+                {
+                    strTemp = strTagPrefix + CtrlCB.Text;
+                }
                 _parent.ToggleChoice(strTemp);
                 _parent.FocusCheckbox(CtrlCB);
             }

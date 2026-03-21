@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -314,6 +315,215 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
 
             var result = OlTableExtensions.GetColumnDictionary(mockTable.Object);
             result.Should().ContainKey("Subject");
+        }
+
+        [TestMethod]
+        public void GetColumnDictionary_DuplicateColumnNames_HandlesGracefully()
+        {
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+            mockColumns.Setup(c => c.Count).Returns(2);
+
+            var mockCol1 = new Mock<Outlook.Column>();
+            mockCol1.Setup(c => c.Name).Returns("Subject");
+            var mockCol2 = new Mock<Outlook.Column>();
+            mockCol2.Setup(c => c.Name).Returns("Subject");
+            mockColumns.Setup(c => c[1]).Returns(mockCol1.Object);
+            mockColumns.Setup(c => c[2]).Returns(mockCol2.Object);
+
+            var result = OlTableExtensions.GetColumnDictionary(mockTable.Object);
+            result.Should().HaveCountGreaterThanOrEqualTo(2);
+        }
+
+        #endregion
+
+        #region WriteValuesToData
+
+        [TestMethod]
+        public void WriteValuesToData_RawValues_WritesCorrectly()
+        {
+            var data = new object[1, 3];
+            var columnDictionary = new Dictionary<string, int>
+            {
+                { "Col1", 0 },
+                { "Col2", 1 },
+                { "Col3", 2 },
+            };
+            var rawValues = new object[] { "a", "b", "c" };
+            var emptyBinIndices = Enumerable.Empty<int>().OrderBy(x => x);
+
+            OlTableExtensions.WriteValuesToData(
+                ref data,
+                columnDictionary,
+                emptyBinIndices,
+                0,
+                new Dictionary<int, string>(),
+                Enumerable.Empty<int>(),
+                new Dictionary<int, string>(),
+                rawValues
+            );
+
+            data[0, 0].Should().Be("a");
+            data[0, 1].Should().Be("b");
+            data[0, 2].Should().Be("c");
+        }
+
+        [TestMethod]
+        public void WriteValuesToData_WithBinIndices_OverridesCorrectly()
+        {
+            var data = new object[1, 2];
+            var columnDictionary = new Dictionary<string, int> { { "Col1", 0 }, { "Col2", 1 } };
+            var rawValues = new object[] { "raw1", "raw2" };
+            var binIndices = new[] { 0 }.OrderBy(x => x);
+            var binStrings = new Dictionary<int, string> { { 0, "binVal" } };
+
+            OlTableExtensions.WriteValuesToData(
+                ref data,
+                columnDictionary,
+                binIndices,
+                0,
+                binStrings,
+                Enumerable.Empty<int>(),
+                new Dictionary<int, string>(),
+                rawValues
+            );
+
+            data[0, 0].Should().Be("binVal");
+            data[0, 1].Should().Be("raw2");
+        }
+
+        [TestMethod]
+        public void WriteValuesToData_WithObjIndices_OverridesCorrectly()
+        {
+            var data = new object[1, 2];
+            var columnDictionary = new Dictionary<string, int> { { "Col1", 0 }, { "Col2", 1 } };
+            var rawValues = new object[] { "raw1", "raw2" };
+            var emptyBinIndices = Enumerable.Empty<int>().OrderBy(x => x);
+            var objIndices = new[] { 1 }.AsEnumerable();
+            var objStrings = new Dictionary<int, string> { { 1, "objVal" } };
+
+            OlTableExtensions.WriteValuesToData(
+                ref data,
+                columnDictionary,
+                emptyBinIndices,
+                0,
+                new Dictionary<int, string>(),
+                objIndices,
+                objStrings,
+                rawValues
+            );
+
+            data[0, 0].Should().Be("raw1");
+            data[0, 1].Should().Be("objVal");
+        }
+
+        #endregion
+
+        #region ToObjectRow (extension with indices)
+
+        [TestMethod]
+        public void ToObjectRow_WithBinIndices_OverridesValues()
+        {
+            var rawValues = new object[] { "original", "keep" };
+            var binIndices = new[] { 0 }.OrderBy(x => x);
+            var binStrings = new Dictionary<int, string> { { 0, "replaced" } };
+
+            var result = rawValues.ToObjectRow(
+                binIndices,
+                binStrings,
+                null,
+                new Dictionary<int, string>()
+            );
+
+            result[0].Should().Be("replaced");
+            result[1].Should().Be("keep");
+        }
+
+        [TestMethod]
+        public void ToObjectRow_WithObjIndices_OverridesValues()
+        {
+            var rawValues = new object[] { "keep", "original" };
+            var objIndices = new[] { 1 }.AsEnumerable();
+            var objStrings = new Dictionary<int, string> { { 1, "replaced" } };
+
+            var result = rawValues.ToObjectRow(
+                null,
+                new Dictionary<int, string>(),
+                objIndices,
+                objStrings
+            );
+
+            result[0].Should().Be("keep");
+            result[1].Should().Be("replaced");
+        }
+
+        [TestMethod]
+        public void ToObjectRow_NullIndices_ReturnsUnchanged()
+        {
+            var rawValues = new object[] { "a", "b" };
+
+            var result = rawValues.ToObjectRow(
+                null,
+                new Dictionary<int, string>(),
+                null,
+                new Dictionary<int, string>()
+            );
+
+            result[0].Should().Be("a");
+            result[1].Should().Be("b");
+        }
+
+        #endregion
+
+        #region RemoveColumns COMException rethrow
+
+        [TestMethod]
+        public void RemoveColumns_COMExceptionUnknownCode_Rethrows()
+        {
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+            mockColumns
+                .Setup(c => c.Remove(It.IsAny<object>()))
+                .Throws(new COMException("unknown error", -99999));
+
+            System.Action act = () =>
+                OlTableExtensions.RemoveColumns(mockTable.Object, new[] { "col" });
+            act.Should().Throw<COMException>();
+        }
+
+        #endregion
+
+        #region ConvertObjectColumnsToString
+
+        [TestMethod]
+        public void ConvertObjectColumnsToString_NullConverters_ReturnsEmpty()
+        {
+            var row = new Mock<Outlook.Row>();
+            var result = OlTableExtensions.ConvertObjectColumnsToString(
+                row.Object,
+                null,
+                null,
+                null
+            );
+            result.Should().BeEmpty();
+        }
+
+        #endregion
+
+        #region GetTableInView
+
+        [TestMethod]
+        public void GetTableInView_NullView_ThrowsInvalidOperationException()
+        {
+            var mockExplorer = new Mock<Outlook.Explorer>();
+            var mockView = new Mock<Outlook.View>();
+            mockView.Setup(v => v.Name).Returns("TestView");
+            mockExplorer.Setup(e => e.CurrentView).Returns(mockView.Object);
+
+            System.Action act = () => OlTableExtensions.GetTableInView(mockExplorer.Object);
+            act.Should().Throw<InvalidOperationException>();
         }
 
         #endregion

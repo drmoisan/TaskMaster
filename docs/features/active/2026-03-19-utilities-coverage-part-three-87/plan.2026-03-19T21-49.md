@@ -185,217 +185,217 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
 - [x] [P3-T1] Create or extend tests for `ConversationHelper.cs` by mocking COM conversation traversal APIs
   - Acceptance: Coverage report shows `ConversationHelper.cs` (4%) at >= 80% line rate
 
-- [ ] [P3-T2] Create or extend tests for `MailItemHelper.cs` by mocking COM mail operations
+- [x] [P3-T2] Create or extend tests for `MailItemHelper.cs` by mocking COM mail operations
   - Acceptance: Coverage report shows `MailItemHelper.cs` (45.8%) at >= 80% line rate
 
-- [ ] [P3-T3] Create or extend tests for `StoreWrapperController.cs` by mocking store/session COM objects
+- [x] [P3-T3] Create or extend tests for `StoreWrapperController.cs` by mocking store/session COM objects
   - Acceptance: Coverage report shows `StoreWrapperController.cs` (33.9%) at >= 80% line rate
 
-- [ ] [P3-T4] Create or extend tests for `OlTableExtensions.cs` by mocking COM Table interface
+- [x] [P3-T4] Create or extend tests for `OlTableExtensions.cs` by mocking COM Table interface
   - Acceptance: Coverage report shows `OlTableExtensions.cs` (4.7%) at >= 80% line rate
 
-- [ ] [P3-T5] Create or extend tests for `OlToDoTable.cs` by mocking COM Table interface
+- [x] [P3-T5] Create or extend tests for `OlToDoTable.cs` by mocking COM Table interface
   - Acceptance: Coverage report shows `OlToDoTable.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T6] Create tests for `ActionableClassifierGroup.cs` with mocked IApplicationGlobals
+- [x] [P3-T6] Create tests for `ActionableClassifierGroup.cs` with mocked IApplicationGlobals
   - Acceptance: Coverage report shows `ActionableClassifierGroup.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T7] Create tests for `CategoryClassifierGroup.cs` with mocked IApplicationGlobals
+- [x] [P3-T7] Create tests for `CategoryClassifierGroup.cs` with mocked IApplicationGlobals
   - Acceptance: Coverage report shows `CategoryClassifierGroup.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T8] Create tests for `OlFolderClassifierGroup.cs` with mocked IApplicationGlobals
+- [x] [P3-T8] Create tests for `OlFolderClassifierGroup.cs` with mocked IApplicationGlobals
   - Acceptance: Coverage report shows `OlFolderClassifierGroup.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T9] Create tests for `ConditionalItemEngine.cs` with mocked COM items
+- [x] [P3-T9] Create tests for `ConditionalItemEngine.cs` with mocked COM items
   - Acceptance: Coverage report shows `ConditionalItemEngine.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T10] Create tests for `MulticlassEngine.cs` with mocked COM items
+- [x] [P3-T10] Create tests for `MulticlassEngine.cs` with mocked COM items
   - Acceptance: Coverage report shows `MulticlassEngine.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T11] Create tests for `TristateEngine.cs` with mocked COM items
+- [x] [P3-T11] Create tests for `TristateEngine.cs` with mocked COM items
   - Acceptance: Coverage report shows `TristateEngine.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T12] Create tests for `SpamBayes.cs` with mocked COM items
+- [x] [P3-T12] Create tests for `SpamBayes.cs` with mocked COM items
   - Acceptance: Coverage report shows `SpamBayes.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T13] Create tests for `ManagerAsyncLazy.cs` with mocked globals
+- [x] [P3-T13] Create tests for `ManagerAsyncLazy.cs` with mocked globals
   - Acceptance: Coverage report shows `ManagerAsyncLazy.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T14] Create or extend tests for `Triage.cs` with mocked globals
+- [x] [P3-T14] Create or extend tests for `Triage.cs` with mocked globals
   - Acceptance: Coverage report shows `Triage.cs` (8.5%) at >= 80% line rate
 
-- [ ] [P3-T15] Extract testable logic from `InputBox.cs` and create tests
+- [x] [P3-T15] Extract testable logic from `InputBox.cs` and create tests
   - Acceptance: Coverage report shows `InputBox.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T16] Extract testable logic from `MyBox.cs` and create tests
+- [x] [P3-T16] Extract testable logic from `MyBox.cs` and create tests
   - Acceptance: Coverage report shows `MyBox.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T17] Extract testable logic from `NotImplementedDialog.cs` and create tests
+- [x] [P3-T17] Extract testable logic from `NotImplementedDialog.cs` and create tests
   - Acceptance: Coverage report shows `NotImplementedDialog.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T18] Extract testable logic from `MyBoxViewer.cs` and create tests
+- [x] [P3-T18] Extract testable logic from `MyBoxViewer.cs` and create tests
   - Acceptance: Coverage report shows `MyBoxViewer.cs` (28.1%) at >= 80% line rate
 
-- [ ] [P3-T19] Extend tests for `DelegateButton.cs` button and dialog result logic
+- [x] [P3-T19] Extend tests for `DelegateButton.cs` button and dialog result logic
   - Acceptance: Coverage report shows `DelegateButton.cs` (51.6%) at >= 80% line rate
 
-- [ ] [P3-T20] Create tests for `FunctionButton.cs` button and dialog result logic
+- [x] [P3-T20] Create tests for `FunctionButton.cs` button and dialog result logic
   - Acceptance: Coverage report shows `FunctionButton.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T21] Create or extend tests for `YesNoToAll.cs` button and dialog result logic
+- [x] [P3-T21] Create or extend tests for `YesNoToAll.cs` button and dialog result logic
   - Acceptance: Coverage report shows `YesNoToAll.cs` (28.8%) at >= 80% line rate
 
-- [ ] [P3-T22] Create tests for `ControlPosition.cs` with WinForms control instantiation
+- [x] [P3-T22] Create tests for `ControlPosition.cs` with WinForms control instantiation
   - Acceptance: Coverage report shows `ControlPosition.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T23] Create tests for `ControlResizer.cs` with WinForms control instantiation
+- [x] [P3-T23] Create tests for `ControlResizer.cs` with WinForms control instantiation
   - Acceptance: Coverage report shows `ControlResizer.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T24] Create tests for `TableLayoutHelper.cs` with WinForms control instantiation
+- [x] [P3-T24] Create tests for `TableLayoutHelper.cs` with WinForms control instantiation
   - Acceptance: Coverage report shows `TableLayoutHelper.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T25] Create tests for `ScreenHelper.cs` with WinForms control instantiation
+- [x] [P3-T25] Create tests for `ScreenHelper.cs` with WinForms control instantiation
   - Acceptance: Coverage report shows `ScreenHelper.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T26] Create tests for `MouseDownFilter.cs` WinForms interaction helper
+- [x] [P3-T26] Create tests for `MouseDownFilter.cs` WinForms interaction helper
   - Acceptance: Coverage report shows `MouseDownFilter.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T27] Create tests for `ImageHelper.cs` WinForms interaction helper
+- [x] [P3-T27] Create tests for `ImageHelper.cs` WinForms interaction helper
   - Acceptance: Coverage report shows `ImageHelper.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T28] Create tests for `OlvExtension.cs` WinForms interaction helper
+- [x] [P3-T28] Create tests for `OlvExtension.cs` WinForms interaction helper
   - Acceptance: Coverage report shows `OlvExtension.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T29] Create or extend tests for `Theme.cs` with control instantiation
+- [x] [P3-T29] Create or extend tests for `Theme.cs` with control instantiation
   - Acceptance: Coverage report shows `Theme.cs` (3.3%) at >= 80% line rate
 
-- [ ] [P3-T30] Create tests for `ThemeControlGroup.cs` with control instantiation
+- [x] [P3-T30] Create tests for `ThemeControlGroup.cs` with control instantiation
   - Acceptance: Coverage report shows `ThemeControlGroup.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T31] Create tests for `TipsController.cs` with control instantiation
+- [x] [P3-T31] Create tests for `TipsController.cs` with control instantiation
   - Acceptance: Coverage report shows `TipsController.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T32] Extract and test controller logic from `FilterOlFoldersController.cs`
+- [x] [P3-T32] Extract and test controller logic from `FilterOlFoldersController.cs`
   - Acceptance: Coverage report shows `FilterOlFoldersController.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T33] Extract and test controller logic from `FolderRemapController.cs`
+- [x] [P3-T33] Extract and test controller logic from `FolderRemapController.cs`
   - Acceptance: Coverage report shows `FolderRemapController.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T34] Extract and test controller logic from `FolderRemapTree.cs`
+- [x] [P3-T34] Extract and test controller logic from `FolderRemapTree.cs`
   - Acceptance: Coverage report shows `FolderRemapTree.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T35] Extract and test controller logic from `ConfigController.cs`
+- [x] [P3-T35] Extract and test controller logic from `ConfigController.cs`
   - Acceptance: Coverage report shows `ConfigController.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T36] Create tests for `DispatchUtility.cs` COM dispatch interop
+- [x] [P3-T36] Create tests for `DispatchUtility.cs` COM dispatch interop
   - Acceptance: Coverage report shows `DispatchUtility.cs` (10.5%) at >= 80% line rate
 
-- [ ] [P3-T37] Create tests for `ShellUtilities.cs` system interop
+- [x] [P3-T37] Create tests for `ShellUtilities.cs` system interop
   - Acceptance: Coverage report shows `ShellUtilities.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T38] Create tests for `ComStreamWrapper.cs` COM stream interop
+- [x] [P3-T38] Create tests for `ComStreamWrapper.cs` COM stream interop
   - Acceptance: Coverage report shows `ComStreamWrapper.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T39] Create tests for `OneDriveDownloader.cs` by mocking Microsoft.Graph API calls
+- [x] [P3-T39] Create tests for `OneDriveDownloader.cs` by mocking Microsoft.Graph API calls
   - Acceptance: Coverage report shows `OneDriveDownloader.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T40] Create tests for `IdleActionQueue.cs` idle queue logic
+- [x] [P3-T40] Create tests for `IdleActionQueue.cs` idle queue logic
   - Acceptance: Coverage report shows `IdleActionQueue.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T41] Create tests for `IdleAsyncQueue.cs` async queue logic
+- [x] [P3-T41] Create tests for `IdleAsyncQueue.cs` async queue logic
   - Acceptance: Coverage report shows `IdleAsyncQueue.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T42] Create tests for `ApplicationIdleTimer.cs` idle timer logic
+- [x] [P3-T42] Create tests for `ApplicationIdleTimer.cs` idle timer logic
   - Acceptance: Coverage report shows `ApplicationIdleTimer.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T43] Extend tests for `UiThread.cs` UI thread utilities
+- [x] [P3-T43] Extend tests for `UiThread.cs` UI thread utilities
   - Acceptance: Coverage report shows `UiThread.cs` (60%) at >= 80% line rate
 
-- [ ] [P3-T44] Create tests for `DvgForm.cs` by extracting testable logic
+- [x] [P3-T44] Create tests for `DvgForm.cs` by extracting testable logic
   - Acceptance: Coverage report shows `DvgForm.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T45] Create tests for `AutoFile.cs` by mocking Outlook APIs
+- [x] [P3-T45] Create tests for `AutoFile.cs` by mocking Outlook APIs
   - Acceptance: Coverage report shows `AutoFile.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T46] Create tests for `EmailDataMiner.cs` by mocking Outlook APIs
+- [x] [P3-T46] Create tests for `EmailDataMiner.cs` by mocking Outlook APIs
   - Acceptance: Coverage report shows `EmailDataMiner.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T47] Create tests for `EmailFiler.cs` by mocking Outlook APIs
+- [x] [P3-T47] Create tests for `EmailFiler.cs` by mocking Outlook APIs
   - Acceptance: Coverage report shows `EmailFiler.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T48] Create tests for `MethodBodyReader.cs` by mocking IL reflection APIs
+- [x] [P3-T48] Create tests for `MethodBodyReader.cs` by mocking IL reflection APIs
   - Acceptance: Coverage report shows `MethodBodyReader.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T49] Create tests for `ProgressPane.cs` by extracting testable logic from WinForms component
+- [x] [P3-T49] Create tests for `ProgressPane.cs` by extracting testable logic from WinForms component
   - Acceptance: Coverage report shows `ProgressPane.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T50] Create tests for `ProgressViewer.cs` by extracting testable logic from WinForms component
+- [x] [P3-T50] Create tests for `ProgressViewer.cs` by extracting testable logic from WinForms component
   - Acceptance: Coverage report shows `ProgressViewer.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T51] Create tests for `ProgressMultiStepViewer.cs` by extracting testable logic from WinForms component
+- [x] [P3-T51] Create tests for `ProgressMultiStepViewer.cs` by extracting testable logic from WinForms component
   - Acceptance: Coverage report shows `ProgressMultiStepViewer.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T52] Create tests for `ProgressTrackerPane.cs` by extracting testable logic from WinForms component
+- [x] [P3-T52] Create tests for `ProgressTrackerPane.cs` by extracting testable logic from WinForms component
   - Acceptance: Coverage report shows `ProgressTrackerPane.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T53] Create tests for `FolderInfoViewer.cs` by extracting testable logic
+- [x] [P3-T53] Create tests for `FolderInfoViewer.cs` by extracting testable logic
   - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
   - Acceptance: Coverage report shows `FolderInfoViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
 
-- [ ] [P3-T54] Create tests for `FolderSelector.cs` by extracting testable logic
+- [x] [P3-T54] Create tests for `FolderSelector.cs` by extracting testable logic
   - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
   - Acceptance: Coverage report shows `FolderSelector.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
 
-- [ ] [P3-T55] Create tests for `ConfigViewer.cs` by extracting testable logic
+- [x] [P3-T55] Create tests for `ConfigViewer.cs` by extracting testable logic
   - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
   - Acceptance: Coverage report shows `ConfigViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
 
-- [ ] [P3-T56] Create tests for `ConfigGroupBox.cs` by extracting testable logic
+- [x] [P3-T56] Create tests for `ConfigGroupBox.cs` by extracting testable logic
   - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
   - Acceptance: Coverage report shows `ConfigGroupBox.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
 
-- [ ] [P3-T57] Create tests for `SubjectMapMetrics.cs` by extracting testable logic
+- [x] [P3-T57] Create tests for `SubjectMapMetrics.cs` by extracting testable logic
   - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
   - Acceptance: Coverage report shows `SubjectMapMetrics.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
 
-- [ ] [P3-T58] Create tests for `OSBrowser.cs` by extracting testable logic
+- [x] [P3-T58] Create tests for `OSBrowser.cs` by extracting testable logic
   - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
   - Acceptance: Coverage report shows `OSBrowser.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
 
-- [ ] [P3-T59] Create tests for `FolderNotFoundViewer.cs` by extracting testable logic
+- [x] [P3-T59] Create tests for `FolderNotFoundViewer.cs` by extracting testable logic
   - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
   - Acceptance: Coverage report shows `FolderNotFoundViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
 
-- [ ] [P3-T60] Create tests for `InputBoxViewer.cs` by extracting testable logic
+- [x] [P3-T60] Create tests for `InputBoxViewer.cs` by extracting testable logic
   - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
   - Acceptance: Coverage report shows `InputBoxViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
 
-- [ ] [P3-T61] Create tests for `FolderRemapViewer.cs` by extracting testable logic
+- [x] [P3-T61] Create tests for `FolderRemapViewer.cs` by extracting testable logic
   - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
   - Acceptance: Coverage report shows `FolderRemapViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
 
-- [ ] [P3-T62] Create tests for `FilterOlFoldersViewer.cs` by extracting testable logic
+- [x] [P3-T62] Create tests for `FilterOlFoldersViewer.cs` by extracting testable logic
   - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
   - Acceptance: Coverage report shows `FilterOlFoldersViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
 
-- [ ] [P3-T63] Create tests for `ConfusionViewer.cs` by extracting testable logic
+- [x] [P3-T63] Create tests for `ConfusionViewer.cs` by extracting testable logic
   - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
   - Acceptance: Coverage report shows `ConfusionViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
 
-- [ ] [P3-T64] Create tests for `MetricChartViewer.cs` by extracting testable logic
+- [x] [P3-T64] Create tests for `MetricChartViewer.cs` by extracting testable logic
   - Note: If zero extractable logic after inspection, document as skip candidate in Phase 4
   - Acceptance: Coverage report shows `MetricChartViewer.cs` (0%) at >= 80% line rate; or file is documented as skip candidate in `evidence/other/skip-candidates.md` with rationale
 
-- [ ] [P3-T65] Create or extend tests for `WinFormsExtensions.cs`
+- [x] [P3-T65] Create or extend tests for `WinFormsExtensions.cs`
   - Acceptance: Coverage report shows `WinFormsExtensions.cs` (13%) at >= 80% line rate
 
-- [ ] [P3-T66] Create tests for `CaptureEmailAddressesModule2.cs` with mocked COM interfaces
+- [x] [P3-T66] Create tests for `CaptureEmailAddressesModule2.cs` with mocked COM interfaces
   - Acceptance: Coverage report shows `CaptureEmailAddressesModule2.cs` at >= 80% line rate; or confirmed not compiled by UtilitiesCS.csproj (excluded from scope)
 
-- [ ] [P3-T67] Register all new Phase 3 test files in `UtilitiesCS.Test.csproj` via `<Compile Include>` entries; register any new production helper classes extracted for testability
+- [x] [P3-T67] Register all new Phase 3 test files in `UtilitiesCS.Test.csproj` via `<Compile Include>` entries; register any new production helper classes extracted for testability
   - Acceptance: Every new `.cs` file created in Phase 3 has a corresponding `<Compile Include>` entry in the appropriate `.csproj`; `msbuild` resolves all files without missing-reference errors
 
-- [ ] [P3-T68] Run Phase 3 checkpoint: build solution and run tests with coverage; verify all Phase 3 target files reach >= 80% line coverage
+- [x] [P3-T68] Run Phase 3 checkpoint: build solution and run tests with coverage; verify all Phase 3 target files reach >= 80% line coverage
   - Preconditions: P3-T1 through P3-T67 complete
   - Acceptance: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits 0; `vstest.console.exe` exits 0 with no test failures; coverage report confirms all Phase 3 target files at >= 80% (excluding files deferred to Phase 4 skip evaluation)
 
@@ -405,113 +405,113 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
 
 #### Designer.cs Auto-Generated Files (P4-T1 through P4-T16)
 
-- [ ] [P4-T1] Evaluate `DvgForm.Designer.cs` and document skip rationale
+- [x] [P4-T1] Evaluate `DvgForm.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `DvgForm.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
-- [ ] [P4-T2] Evaluate `ConfusionViewer.Designer.cs` and document skip rationale
+- [x] [P4-T2] Evaluate `ConfusionViewer.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `ConfusionViewer.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
-- [ ] [P4-T3] Evaluate `MetricChartViewer.Designer.cs` and document skip rationale
+- [x] [P4-T3] Evaluate `MetricChartViewer.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `MetricChartViewer.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
-- [ ] [P4-T4] Evaluate `FilterOlFoldersViewer.Designer.cs` and document skip rationale
+- [x] [P4-T4] Evaluate `FilterOlFoldersViewer.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `FilterOlFoldersViewer.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
-- [ ] [P4-T5] Evaluate `FolderInfoViewer.Designer.cs` and document skip rationale
+- [x] [P4-T5] Evaluate `FolderInfoViewer.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `FolderInfoViewer.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
-- [ ] [P4-T6] Evaluate `OSBrowser.Designer.cs` and document skip rationale
+- [x] [P4-T6] Evaluate `OSBrowser.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `OSBrowser.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
-- [ ] [P4-T7] Evaluate `FolderRemapViewer.Designer.cs` and document skip rationale
+- [x] [P4-T7] Evaluate `FolderRemapViewer.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `FolderRemapViewer.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
-- [ ] [P4-T8] Evaluate `FolderSelector.Designer.cs` and document skip rationale
+- [x] [P4-T8] Evaluate `FolderSelector.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `FolderSelector.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
-- [ ] [P4-T9] Evaluate `SubjectMapMetrics.Designer.cs` and document skip rationale
+- [x] [P4-T9] Evaluate `SubjectMapMetrics.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `SubjectMapMetrics.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
-- [ ] [P4-T10] Evaluate `ConfigViewer.Designer.cs` and document skip rationale
+- [x] [P4-T10] Evaluate `ConfigViewer.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `ConfigViewer.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
-- [ ] [P4-T11] Evaluate `ProgressMultiStepViewer.Designer.cs` and document skip rationale
+- [x] [P4-T11] Evaluate `ProgressMultiStepViewer.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `ProgressMultiStepViewer.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
-- [ ] [P4-T12] Evaluate `ProgressPane.Designer.cs` and document skip rationale
+- [x] [P4-T12] Evaluate `ProgressPane.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `ProgressPane.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
-- [ ] [P4-T13] Evaluate `ProgressViewer.Designer.cs` and document skip rationale
+- [x] [P4-T13] Evaluate `ProgressViewer.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `ProgressViewer.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
-- [ ] [P4-T14] Evaluate `SyncContextForm.Designer.cs` and document skip rationale
+- [x] [P4-T14] Evaluate `SyncContextForm.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `SyncContextForm.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
-- [ ] [P4-T15] Evaluate `FolderNotFoundViewer.Designer.cs` and document skip rationale
+- [x] [P4-T15] Evaluate `FolderNotFoundViewer.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `FolderNotFoundViewer.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
-- [ ] [P4-T16] Evaluate `InputBoxViewer.Designer.cs` and document skip rationale
+- [x] [P4-T16] Evaluate `InputBoxViewer.Designer.cs` and document skip rationale
   - Acceptance: `evidence/other/skip-candidates.md` lists `InputBoxViewer.Designer.cs` with rationale (auto-generated by WinForms designer, no testable logic)
 
 #### Commented-Out Stubs (P4-T17 through P4-T20)
 
-- [ ] [P4-T17] Evaluate `ReusableTypeClasses/Observable/ObservableDictionary.cs` and confirm zero executable lines
+- [x] [P4-T17] Evaluate `ReusableTypeClasses/Observable/ObservableDictionary.cs` and confirm zero executable lines
   - Acceptance: `evidence/other/skip-candidates.md` confirms file has zero executable lines with explanation (entirely commented out; live implementation exists in UtilitiesSwordfish)
 
-- [ ] [P4-T18] Evaluate `ReusableTypeClasses/Concurrent/Observable/Bag/ConcurrentObservableBag.cs` and confirm zero executable lines
+- [x] [P4-T18] Evaluate `ReusableTypeClasses/Concurrent/Observable/Bag/ConcurrentObservableBag.cs` and confirm zero executable lines
   - Acceptance: `evidence/other/skip-candidates.md` confirms file has zero executable lines with explanation (entirely commented out; no live implementation found in solution)
 
-- [ ] [P4-T19] Evaluate `To Depricate/StackObjectVB.cs` and confirm zero executable lines
+- [x] [P4-T19] Evaluate `To Depricate/StackObjectVB.cs` and confirm zero executable lines
   - Acceptance: `evidence/other/skip-candidates.md` confirms file has zero executable lines with explanation (entirely commented out or dead code)
 
-- [ ] [P4-T20] Evaluate `To Depricate/FlattenArray.cs` and confirm zero executable lines
+- [x] [P4-T20] Evaluate `To Depricate/FlattenArray.cs` and confirm zero executable lines
   - Acceptance: `evidence/other/skip-candidates.md` confirms file has zero executable lines with explanation (entirely commented out or dead code)
 
 #### Deprecated Files (P4-T21 through P4-T22)
 
-- [ ] [P4-T21] Evaluate `CSVDictUtilities.cs` (0%) and document skip or removal decision
+- [x] [P4-T21] Evaluate `CSVDictUtilities.cs` (0%) and document skip or removal decision
   - Acceptance: `evidence/other/skip-candidates.md` records decision for `CSVDictUtilities.cs` (skip with rationale or removal deferred to separate cleanup issue)
 
-- [ ] [P4-T22] Evaluate `FileIO2.cs` (0%) and document skip or removal decision
+- [x] [P4-T22] Evaluate `FileIO2.cs` (0%) and document skip or removal decision
   - Acceptance: `evidence/other/skip-candidates.md` records decision for `FileIO2.cs` (skip with rationale or removal deferred to separate cleanup issue)
 
 #### Pure-Interface Files by Subdirectory (P4-T23 through P4-T32)
 
-- [ ] [P4-T23] Evaluate `Interfaces/` root-level files and confirm no executable code: `PrefixInterface.cs`, `ITimerWrapper.cs`, `IGenericTimer.cs`, `Enums.cs`
+- [x] [P4-T23] Evaluate `Interfaces/` root-level files and confirm no executable code: `PrefixInterface.cs`, `ITimerWrapper.cs`, `IGenericTimer.cs`, `Enums.cs`
   - Note: `Enums.cs` contains enum definitions rather than interfaces; confirm zero executable method bodies
   - Acceptance: `evidence/other/skip-candidates.md` lists each root-level file with confirmation of zero executable lines
 
-- [ ] [P4-T24] Evaluate `Interfaces/IWinForm/` files and confirm no executable code: `IUserControl.cs`, `IScrollableControl.cs`, `IForm.cs`, `IControlCollection.cs`, `IControl.cs`, `IContainerControl.cs`
+- [x] [P4-T24] Evaluate `Interfaces/IWinForm/` files and confirm no executable code: `IUserControl.cs`, `IScrollableControl.cs`, `IForm.cs`, `IControlCollection.cs`, `IControl.cs`, `IContainerControl.cs`
   - Note: `PropertyStore.cs` in this directory was already covered in P1-T8; exclude from skip evaluation
   - Acceptance: `evidence/other/skip-candidates.md` lists each IWinForm interface file with confirmation of zero executable lines
 
-- [ ] [P4-T25] Evaluate `Interfaces/IToDo/` files and confirm no executable code: `IToDoItem.cs`, `ISubjectMapSco.cs`, `ISubjectMapEntry.cs`, `ISubjectMapEncoder.cs`, `IProjectInfoLegacy.cs`, `IProjectEntry.cs`, `IProjectData.cs`, `IPrefix.cs`, `IPeopleScoDictionaryNew.cs`, `IPeopleScoDictionary.cs`, `IIDList.cs`, `IFlagChangeTrainingQueue.cs`, `IFlagChangeItem.cs`, `IFlagChangeGroup.cs`, `IAutoAssign.cs`
+- [x] [P4-T25] Evaluate `Interfaces/IToDo/` files and confirm no executable code: `IToDoItem.cs`, `ISubjectMapSco.cs`, `ISubjectMapEntry.cs`, `ISubjectMapEncoder.cs`, `IProjectInfoLegacy.cs`, `IProjectEntry.cs`, `IProjectData.cs`, `IPrefix.cs`, `IPeopleScoDictionaryNew.cs`, `IPeopleScoDictionary.cs`, `IIDList.cs`, `IFlagChangeTrainingQueue.cs`, `IFlagChangeItem.cs`, `IFlagChangeGroup.cs`, `IAutoAssign.cs`
   - Acceptance: `evidence/other/skip-candidates.md` lists each IToDo interface file (15 files) with confirmation of zero executable lines
 
-- [ ] [P4-T26] Evaluate `Interfaces/IReusableTypeClasses/` root-level files and confirm no executable code: `IPercentageMatchable.cs`, `IOutlookItem.cs`, `ISerializableDictionary.cs`, `ISCODictionary.cs`, `IScoCollection2.cs`, `IScoCollection.cs`, `ISmartSerializable.cs`, `ISerializableList.cs`, `ISmartSerializableConfig.cs`, `ISmartSerializableNonTyped.cs`
+- [x] [P4-T26] Evaluate `Interfaces/IReusableTypeClasses/` root-level files and confirm no executable code: `IPercentageMatchable.cs`, `IOutlookItem.cs`, `ISerializableDictionary.cs`, `ISCODictionary.cs`, `IScoCollection2.cs`, `IScoCollection.cs`, `ISmartSerializable.cs`, `ISerializableList.cs`, `ISmartSerializableConfig.cs`, `ISmartSerializableNonTyped.cs`
   - Acceptance: `evidence/other/skip-candidates.md` lists each root-level IReusableTypeClasses interface file (10 files) with confirmation of zero executable lines
 
-- [ ] [P4-T27] Evaluate `Interfaces/IReusableTypeClasses/` nested subdirectory files and confirm no executable code: `Concurrent/IConcurrentDictionary.cs`, `Observable/IObservableDictionary.cs`, `Concurrent/Observable/Dictionary/IDictionaryObserver.cs`, `Concurrent/Observable/Dictionary/IConcurrentObservableDictionary.cs`, `SerializableNew/Concurrent/Observable/IScoDictionaryNew.cs`
+- [x] [P4-T27] Evaluate `Interfaces/IReusableTypeClasses/` nested subdirectory files and confirm no executable code: `Concurrent/IConcurrentDictionary.cs`, `Observable/IObservableDictionary.cs`, `Concurrent/Observable/Dictionary/IDictionaryObserver.cs`, `Concurrent/Observable/Dictionary/IConcurrentObservableDictionary.cs`, `SerializableNew/Concurrent/Observable/IScoDictionaryNew.cs`
   - Acceptance: `evidence/other/skip-candidates.md` lists each nested IReusableTypeClasses interface file (5 files) with confirmation of zero executable lines
 
-- [ ] [P4-T28] Evaluate `Interfaces/IEmailIntelligence/` files and confirm no executable code: `IMovedMailInfo.cs`, `IItemInfo.cs`, `IFolderWrapper.cs`, `IAttachment.cs`
+- [x] [P4-T28] Evaluate `Interfaces/IEmailIntelligence/` files and confirm no executable code: `IMovedMailInfo.cs`, `IItemInfo.cs`, `IFolderWrapper.cs`, `IAttachment.cs`
   - Acceptance: `evidence/other/skip-candidates.md` lists each IEmailIntelligence interface file (4 files) with confirmation of zero executable lines
 
-- [ ] [P4-T29] Evaluate `Interfaces/IHelperClasses/` files and confirm no executable code: `IFileSystemInfo.cs`, `IFileInfo.cs`, `IDirectoryInfo.cs`
+- [x] [P4-T29] Evaluate `Interfaces/IHelperClasses/` files and confirm no executable code: `IFileSystemInfo.cs`, `IFileInfo.cs`, `IDirectoryInfo.cs`
   - Acceptance: `evidence/other/skip-candidates.md` lists each IHelperClasses interface file (3 files) with confirmation of zero executable lines
 
-- [ ] [P4-T30] Evaluate `Interfaces/IGlobals/` files and confirm no executable code: `IToDoObjects.cs`, `IToDoObj.cs`, `IOlObjects.cs`, `IFileSystemFolderPaths.cs`, `IConditionalEngine.cs`, `IAppStagingFilenames.cs`, `IAppQuickFilerSettings.cs`, `IApplicationGlobals.cs`, `IAppItemEngines.cs`, `IAppEvents.cs`, `IAppAutoFileObjects.cs`
+- [x] [P4-T30] Evaluate `Interfaces/IGlobals/` files and confirm no executable code: `IToDoObjects.cs`, `IToDoObj.cs`, `IOlObjects.cs`, `IFileSystemFolderPaths.cs`, `IConditionalEngine.cs`, `IAppStagingFilenames.cs`, `IAppQuickFilerSettings.cs`, `IApplicationGlobals.cs`, `IAppItemEngines.cs`, `IAppEvents.cs`, `IAppAutoFileObjects.cs`
   - Acceptance: `evidence/other/skip-candidates.md` lists each IGlobals interface file (11 files) with confirmation of zero executable lines
 
-- [ ] [P4-T31] Evaluate `Interfaces/IQuickFiler/` files and confirm no executable code: `IQfcTipsDetails.cs`
+- [x] [P4-T31] Evaluate `Interfaces/IQuickFiler/` files and confirm no executable code: `IQfcTipsDetails.cs`
   - Acceptance: `evidence/other/skip-candidates.md` lists `IQfcTipsDetails.cs` with confirmation of zero executable lines
 
-- [ ] [P4-T32] Evaluate `Interfaces/IOutlookObjects/` files and confirm no executable code: `IRecipientInfo.cs`, `IOutlookItemFlaggable.cs`, `IEmailDetailsWrapper.cs`
+- [x] [P4-T32] Evaluate `Interfaces/IOutlookObjects/` files and confirm no executable code: `IRecipientInfo.cs`, `IOutlookItemFlaggable.cs`, `IEmailDetailsWrapper.cs`
   - Acceptance: `evidence/other/skip-candidates.md` lists each IOutlookObjects interface file (3 files) with confirmation of zero executable lines
 
 #### Finalization (P4-T33)
 
-- [ ] [P4-T33] Finalize skip evaluation for any Phase 3 WinForms viewers deferred as untestable
+- [x] [P4-T33] Finalize skip evaluation for any Phase 3 WinForms viewers deferred as untestable
   - Acceptance: `evidence/other/skip-candidates.md` is complete; every UtilitiesCS production file is either at >= 80% coverage or documented as a skip candidate with rationale; no file is left unevaluated
 
 ### Phase 5 — Final QA Loop

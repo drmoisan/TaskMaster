@@ -7,6 +7,7 @@ using Moq;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups;
+using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
@@ -149,6 +150,124 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
 
             // Serialize should not throw
             ((IConditionalEngine<MailItemHelper>)engine).Serialize();
+        }
+
+        #endregion
+
+        #region Condition
+
+        [TestMethod]
+        public void Condition_MailItem_WithIPMNote_ReturnsTrue()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var engine = new TestMulticlassEngine(mockGlobals.Object);
+
+            var mockMailItem = new Mock<Microsoft.Office.Interop.Outlook.MailItem>();
+            mockMailItem
+                .Setup(m => m.Class)
+                .Returns(Microsoft.Office.Interop.Outlook.OlObjectClass.olMail);
+            mockMailItem.Setup(m => m.MessageClass).Returns("IPM.Note");
+
+            var result = engine.Condition(mockMailItem.Object);
+            result.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void Condition_MailItem_NonIPMNote_ReturnsFalse()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var engine = new TestMulticlassEngine(mockGlobals.Object);
+
+            var mockMailItem = new Mock<Microsoft.Office.Interop.Outlook.MailItem>();
+            mockMailItem
+                .Setup(m => m.Class)
+                .Returns(Microsoft.Office.Interop.Outlook.OlObjectClass.olMail);
+            mockMailItem.Setup(m => m.MessageClass).Returns("IPM.Schedule.Meeting.Request");
+
+            var result = engine.Condition(mockMailItem.Object);
+            result.Should().BeFalse();
+        }
+
+        #endregion
+
+        #region CreateEngineAsync
+
+        [TestMethod]
+        public async Task CreateEngineAsync_GroupNotInManager_ReturnsDefault()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var mockAf = new Mock<IAppAutoFileObjects>();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+            mockAf.Setup(a => a.Manager).Returns(manager);
+            mockGlobals.Setup(g => g.AF).Returns(mockAf.Object);
+
+            var result = await TestMulticlassEngine.CreateEngineAsync(
+                mockGlobals.Object,
+                "NonExistent"
+            );
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task CreateEngineAsync_GroupInManager_ReturnsEngine()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var mockAf = new Mock<IAppAutoFileObjects>();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+            var classifierGroup = new BayesianClassifierGroup();
+            manager["TestGroup"] = classifierGroup.ToAsyncLazy();
+            mockAf.Setup(a => a.Manager).Returns(manager);
+            mockGlobals.Setup(g => g.AF).Returns(mockAf.Object);
+
+            var result = await TestMulticlassEngine.CreateEngineAsync(
+                mockGlobals.Object,
+                "TestGroup"
+            );
+            result.Should().NotBeNull();
+            result.ClassifierGroup.Should().BeSameAs(classifierGroup);
+            result.EngineName.Should().Be("TestGroup");
+        }
+
+        #endregion
+
+        #region Config
+
+        [TestMethod]
+        public void Config_ReturnsClassifierGroupConfig()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var engine = new TestMulticlassEngine(mockGlobals.Object);
+            var group = new BayesianClassifierGroup();
+            engine.ClassifierGroup = group;
+
+            engine.Config.Should().BeSameAs(group.Config);
+        }
+
+        #endregion
+
+        #region TypedItem
+
+        [TestMethod]
+        public void TypedItem_SetAndGet()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var engine = new TestMulticlassEngine(mockGlobals.Object);
+            engine.TypedItem = null;
+
+            engine.TypedItem.Should().BeNull();
+        }
+
+        #endregion
+
+        #region EngineInitializer
+
+        [TestMethod]
+        public void EngineInitializer_IsNotNull()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var engine = new TestMulticlassEngine(mockGlobals.Object);
+
+            engine.EngineInitializer.Should().NotBeNull();
         }
 
         #endregion

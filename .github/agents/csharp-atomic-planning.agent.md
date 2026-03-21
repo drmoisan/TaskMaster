@@ -1,8 +1,9 @@
+````chatagent
 ---
 name: csharp-atomic-planning
 description: Generate phased implementation plans with atomic checkbox tasks that have binary completion and clear acceptance criteria for C# workflows.
 argument-hint: "Describe the goal or change you want a phased atomic plan for."
-model: Claude Opus 4.6 (copilot)
+model: GPT-5.4 (copilot)
 tools:
   ['read/readFile', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'agent', 'todo']
 handoffs:

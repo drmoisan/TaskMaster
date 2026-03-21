@@ -5,6 +5,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
+using UtilitiesCS.Extensions.Lazy;
+using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
 {
@@ -284,6 +286,112 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             Func<Task> act = async () =>
                 await sb.SpamBayesMissingHandlerAsync(Enums.NotFoundEnum.Throw, "err", default);
             act.Should().ThrowAsync<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void SpamBayes_MissingHandler_InvalidTreatment_ThrowsOutOfRange()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var sb = new SpamBayes(mockGlobals.Object);
+
+            Func<Task> act = async () =>
+                await sb.SpamBayesMissingHandlerAsync((Enums.NotFoundEnum)999, "test", default);
+            act.Should().ThrowAsync<ArgumentOutOfRangeException>();
+        }
+
+        [TestMethod]
+        public async Task SpamBayes_CreateSpamClassifiersAsync_ReturnsGroup()
+        {
+            var group = await SpamBayes.CreateSpamClassifiersAsync();
+            group.Should().NotBeNull();
+            group.Classifiers.Should().ContainKey("Spam");
+            group.Classifiers.Should().ContainKey("Ham");
+        }
+
+        [TestMethod]
+        public void SpamBayes_ClassifierGroup_SetAndGet()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var sb = new SpamBayes(mockGlobals.Object);
+            var group = new BayesianClassifierGroup();
+            sb.ClassifierGroup = group;
+
+            sb.ClassifierGroup.Should().BeSameAs(group);
+            sb.IsActivated.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void SpamBayes_GetDestinationFolder_NullMailItem_ReturnsNull()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var sb = new SpamBayes(mockGlobals.Object);
+
+            var result = sb.GetDestinationFolder(null, true);
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void SpamBayes_GetDestinationFolder_IsSpamFalse_ReturnsNull()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var mockOl = new Mock<IOlObjects>();
+            var mockInbox = new Mock<Microsoft.Office.Interop.Outlook.Folder>();
+            mockOl.Setup(o => o.Inbox).Returns(mockInbox.Object);
+            mockGlobals.Setup(g => g.Ol).Returns(mockOl.Object);
+
+            var sb = new SpamBayes(mockGlobals.Object);
+
+            var mockMailItem = new Mock<Microsoft.Office.Interop.Outlook.MailItem>();
+            mockMailItem.Setup(m => m.Parent).Returns((object)null);
+
+            var result = sb.GetDestinationFolder(mockMailItem.Object, false);
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task SpamBayes_HasValidSpamClassifierAsync_NullAF_ReturnsFalse()
+        {
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            mockGlobals.Setup(g => g.AF).Returns((IAppAutoFileObjects)null);
+            var sb = new SpamBayes(mockGlobals.Object);
+
+            var (isValid, message) = await sb.HasValidSpamClassifierAsync(default);
+            isValid.Should().BeFalse();
+            message.Should().NotBeNullOrEmpty();
+        }
+
+        [TestMethod]
+        public async Task SpamBayes_HasValidSpamClassifierAsync_NoSpamGroup_ReturnsFalse()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var mockAf = new Mock<IAppAutoFileObjects>();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+            mockAf.Setup(a => a.Manager).Returns(manager);
+            mockGlobals.Setup(g => g.AF).Returns(mockAf.Object);
+
+            var sb = new SpamBayes(mockGlobals.Object);
+
+            var (isValid, message) = await sb.HasValidSpamClassifierAsync(default);
+            isValid.Should().BeFalse();
+            message.Should().Contain("Spam");
+        }
+
+        [TestMethod]
+        public async Task SpamBayes_HasValidSpamClassifierAsync_ValidGroup_ReturnsTrue()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var mockAf = new Mock<IAppAutoFileObjects>();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+            var group = SpamBayes.CreateNewClassifier();
+            manager["Spam"] = group.ToAsyncLazy();
+            mockAf.Setup(a => a.Manager).Returns(manager);
+            mockGlobals.Setup(g => g.AF).Returns(mockAf.Object);
+
+            var sb = new SpamBayes(mockGlobals.Object);
+
+            var (isValid, message) = await sb.HasValidSpamClassifierAsync(default);
+            isValid.Should().BeTrue();
+            message.Should().BeEmpty();
         }
 
         #endregion

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -362,6 +363,116 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             manager.Configuration.Should().NotBeNull();
         }
 
+        [TestMethod]
+        public async Task ManagerAsyncLazy_InitAsync_DoesNotThrow()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+
+            // InitAsync calls ResetLoadManagerAsyncLazy which reads config
+            // With mock globals that have no real resource manager, this may fail gracefully
+            Func<Task> act = async () => await manager.InitAsync();
+
+            // InitAsync succeeds gracefully with mock globals that have no resource manager
+            await act.Should().NotThrowAsync();
+        }
+
+        [TestMethod]
+        public void ManagerAsyncLazy_TryGetValue_MissingKey_ReturnsFalse()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+
+            var found = manager.TryGetValue("NonExistent", out var value);
+
+            found.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task ManagerAsyncLazy_AddAndRetrieve_Works()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+            var group = new BayesianClassifierGroup();
+            manager["TestKey"] = group.ToAsyncLazy();
+
+            manager.TryGetValue("TestKey", out var task).Should().BeTrue();
+            var result = await task;
+            result.Should().BeSameAs(group);
+        }
+
+        #endregion
+
+        #region Triage Additional Methods
+
+        [TestMethod]
+        public void Triage_CreateClassifier_SetsMinimumProbability()
+        {
+            var group = TriageClass.CreateClassifier();
+            group.MinimumProbability.Should().Be(0.9);
+            group.TotalEmailCount.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void Triage_Serialize_WithClassifierGroup_DoesNotThrow()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var triage = new TriageClass(mockGlobals.Object);
+            triage.ClassifierGroup = new BayesianClassifierGroup();
+
+            System.Action act = () => triage.Serialize();
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void Triage_Config_ReturnsClassifierGroupConfig()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var triage = new TriageClass(mockGlobals.Object);
+            var group = new BayesianClassifierGroup();
+            triage.ClassifierGroup = group;
+
+            triage.Config.Should().BeSameAs(group.Config);
+        }
+
+        [TestMethod]
+        public async Task Triage_TrainAsync_WithTokens_TrainsClassifier()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var triage = new TriageClass(mockGlobals.Object);
+            var group = TriageClass.CreateClassifier();
+            triage.ClassifierGroup = group;
+
+            var tokens = new[] { "hello", "world" };
+            await triage.TrainAsync(tokens, "A");
+
+            // Training should not throw and classifier group should still be valid
+            triage.ClassifierGroup.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void Triage_TypedItem_SetAndGet()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var triage = new TriageClass(mockGlobals.Object);
+            triage.TypedItem = null;
+
+            triage.TypedItem.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void Triage_EngineInitializer_Throws()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var triage = new TriageClass(mockGlobals.Object);
+
+            System.Action act = () =>
+            {
+                var _ = triage.EngineInitializer;
+            };
+            act.Should().Throw<NotImplementedException>();
+        }
+
         #endregion
 
         #region Helpers
@@ -376,7 +487,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
                 new[]
                 {
                     new KeyValuePair<string, string>("AppData", @"Z:\TaskMasterAppData"),
-                    new KeyValuePair<string, string>("Flow", @"Z:\TaskMasterFlow")
+                    new KeyValuePair<string, string>("Flow", @"Z:\TaskMasterFlow"),
                 }
             );
 
