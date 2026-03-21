@@ -9,7 +9,7 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
     [TestClass]
     public class MailItemMailResolutionTests
     {
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("IPM.Note.SMIME")]
         [DataRow("IPM.Note.Secure")]
         [DataRow("IPM.Note.Secure.Sign")]

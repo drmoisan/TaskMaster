@@ -91,7 +91,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             result.Should().BeFalse();
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(typeof(InteropMailItem), OlItemType.olMailItem)]
         [DataRow(typeof(InteropTaskItem), OlItemType.olTaskItem)]
         [DataRow(typeof(InteropMeetingItem), OlItemType.olAppointmentItem)]
@@ -202,7 +202,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             result.Should().Be(42);
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(typeof(AppointmentItem), OlItemType.olAppointmentItem)]
         [DataRow(typeof(ContactItem), OlItemType.olContactItem)]
         [DataRow(typeof(JournalItem), OlItemType.olJournalItem)]

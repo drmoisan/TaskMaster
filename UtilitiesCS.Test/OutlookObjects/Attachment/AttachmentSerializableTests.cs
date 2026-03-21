@@ -102,7 +102,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
             stream.ToArray().Should().Equal(expected);
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("report.pdf", "report", ".pdf")]
         [DataRow(".gitignore", ".gitignore", "")]
         public void ParseFileName_SplitsSeedAndExtensionAsExpected(
@@ -129,7 +129,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
             attachment.IsAnImage().Should().BeTrue();
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(".jpg")]
         [DataRow(".jpeg")]
         [DataRow(".gif")]

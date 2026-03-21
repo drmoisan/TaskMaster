@@ -23,8 +23,7 @@ namespace UtilitiesCS.Test.Dialogs
         [STAThread]
         public void Constructor_WithNameAndText_CreatesButton()
         {
-            bool called = false;
-            Action del = () => called = true;
+            Action del = () => { };
             var db = new DelegateButton("btn1", "Click Me", del);
 
             db.Name.Should().Be("btn1");

@@ -9,7 +9,7 @@ namespace UtilitiesCS.Test.OutlookObjects
     [TestClass]
     public class MailResolutionTests
     {
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("IPM.Note.SMIME")]
         [DataRow("IPM.Note.Secure")]
         [DataRow("IPM.Note.Secure.Sign")]

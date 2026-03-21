@@ -518,22 +518,22 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
 
 **Goal:** Run the full C# toolchain loop and verify all coverage targets are met. If any step fails or changes files, restart the loop from step 1 (format check) until a clean pass completes.
 
-- [ ] [P5-T1] Run csharpier format check on all modified and new `.cs` files: `csharpier .`
+- [x] [P5-T1] Run csharpier format check on all modified and new `.cs` files: `csharpier .`
   - Acceptance: `csharpier .` exits 0 with no files changed; evidence artifact at `evidence/qa-gates/final-qa-format.md` with `Timestamp:`, `Command: csharpier .`, `EXIT_CODE: 0`, `Output Summary:`
 
-- [ ] [P5-T2] Run analyzer build: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+- [x] [P5-T2] Run analyzer build: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
   - Acceptance: Build exits 0 with zero analyzer errors; evidence artifact at `evidence/qa-gates/final-qa-analyzer-build.md` with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
 
-- [ ] [P5-T3] Run nullable build: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+- [x] [P5-T3] Run nullable build: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
   - Acceptance: Build exits 0 with zero nullable warnings; evidence artifact at `evidence/qa-gates/final-qa-nullable-build.md` with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
 
-- [ ] [P5-T4] Run full test suite with coverage: `vstest.console.exe <all-test-assemblies> /EnableCodeCoverage /InIsolation /Logger:trx`
+- [x] [P5-T4] Run full test suite with coverage: `vstest.console.exe <all-test-assemblies> /EnableCodeCoverage /InIsolation /Logger:trx`
   - Acceptance: All tests pass (zero failures); evidence artifact at `evidence/qa-gates/final-qa-test-coverage.md` with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:` including total test count, pass count, and UtilitiesCS line coverage percentage
 
 - [ ] [P5-T5] Verify all UtilitiesCS production files reach >= 80% line coverage (excluding documented skip candidates from Phase 4), and verify repo-wide coverage does not regress below P0-T3 baseline
   - Acceptance: Coverage analysis shows zero non-skip files below 80%; evidence artifact at `evidence/qa-gates/final-coverage-verification.md` comparing baseline per-file rates (from P0-T4) with post-change rates; repo-wide UtilitiesCS coverage >= baseline value from P0-T3
 
-- [ ] [P5-T6] Verify no pre-existing test regressions by comparing test counts and pass rates against P0-T3 baseline
+- [x] [P5-T6] Verify no pre-existing test regressions by comparing test counts and pass rates against P0-T3 baseline
   - Acceptance: Total test count >= baseline count from P0-T3; pass rate >= baseline pass rate; zero previously-passing tests now failing
 
 - [ ] [P5-T7] Store final coverage evidence and update feature folder status

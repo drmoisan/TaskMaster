@@ -53,7 +53,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             args.OldValue.Should().BeNull();
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(NotifyCollectionChangedAction.Add)]
         [DataRow(NotifyCollectionChangedAction.Remove)]
         [DataRow(NotifyCollectionChangedAction.Replace)]

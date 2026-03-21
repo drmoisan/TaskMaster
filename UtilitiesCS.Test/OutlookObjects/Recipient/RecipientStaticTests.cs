@@ -21,7 +21,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
                 .Be("Ada Lovelace &lt;<a href=\"mailto:ada@example.com\">ada@example.com</a>&gt;");
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("ada@example.com", "ada", null, "example.com")]
         [DataRow("ada.lovelace@example.com", "ada", "lovelace", "example.com")]
         [DataRow("a.b.charles.babbage@example.com", "charles", "babbage", "example.com")]
