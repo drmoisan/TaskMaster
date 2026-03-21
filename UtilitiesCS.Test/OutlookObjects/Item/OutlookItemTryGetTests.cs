@@ -1,6 +1,7 @@
 using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using UtilitiesCS.OutlookExtensions;
 
 namespace UtilitiesCS.Test.OutlookObjects.Item
@@ -252,6 +253,145 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             result.Should().BeTrue();
         }
 
+        [TestMethod]
+        public void WrapperMethods_WhenPropertiesExist_ShouldReturnExpectedResults()
+        {
+            var created = new DateTime(2026, 3, 1, 8, 30, 0, DateTimeKind.Utc);
+            var modified = new DateTime(2026, 3, 2, 9, 45, 0, DateTimeKind.Utc);
+            var inner = new TryGetRichItem
+            {
+                Companies = "Contoso",
+                Class = (int)Microsoft.Office.Interop.Outlook.OlObjectClass.olMail,
+                ConversationIndex = "abc123",
+                CreationTime = created,
+                DownloadState = Microsoft.Office.Interop.Outlook.OlDownloadState.olHeaderOnly,
+                IsConflict = true,
+                LastModificationTime = modified,
+                MarkForDownload = Microsoft
+                    .Office
+                    .Interop
+                    .Outlook
+                    .OlRemoteStatus
+                    .olMarkedForDownload,
+                MessageClass = "IPM.Note",
+                Mileage = "77",
+                OutlookInternalVersion = 16,
+                OutlookVersion = "16.0",
+                Sensitivity = Microsoft.Office.Interop.Outlook.OlSensitivity.olPrivate,
+            };
+            var wrapper = new OutlookItemTryGet(new UtilitiesCS.OutlookItem(inner));
+
+            wrapper.Actions(out Microsoft.Office.Interop.Outlook.Actions actions).Should().BeTrue();
+            actions.Should().BeNull();
+            wrapper
+                .Application(out Microsoft.Office.Interop.Outlook.Application application)
+                .Should()
+                .BeTrue();
+            application.Should().BeNull();
+            wrapper
+                .Attachments(out Microsoft.Office.Interop.Outlook.Attachments attachments)
+                .Should()
+                .BeTrue();
+            attachments.Should().BeNull();
+            wrapper.Companies(out string companies).Should().BeTrue();
+            companies.Should().Be("Contoso");
+            wrapper
+                .OlObjectClass(out Microsoft.Office.Interop.Outlook.OlObjectClass objectClass)
+                .Should()
+                .BeTrue();
+            objectClass.Should().Be(Microsoft.Office.Interop.Outlook.OlObjectClass.olMail);
+            wrapper.ConversationIndex(out string conversationIndex).Should().BeTrue();
+            conversationIndex.Should().Be("abc123");
+            wrapper.CreationTime(out DateTime creationTime).Should().BeTrue();
+            creationTime.Should().Be(created);
+            wrapper
+                .DownloadState(out Microsoft.Office.Interop.Outlook.OlDownloadState downloadState)
+                .Should()
+                .BeTrue();
+            downloadState
+                .Should()
+                .Be(Microsoft.Office.Interop.Outlook.OlDownloadState.olHeaderOnly);
+            wrapper
+                .FormDescription(
+                    out Microsoft.Office.Interop.Outlook.FormDescription formDescription
+                )
+                .Should()
+                .BeTrue();
+            formDescription.Should().BeNull();
+            wrapper
+                .GetInspector(out Microsoft.Office.Interop.Outlook.Inspector inspector)
+                .Should()
+                .BeTrue();
+            inspector.Should().BeNull();
+            wrapper.IsConflict(out bool isConflict).Should().BeTrue();
+            isConflict.Should().BeTrue();
+            wrapper
+                .ItemProperties(out Microsoft.Office.Interop.Outlook.ItemProperties itemProperties)
+                .Should()
+                .BeTrue();
+            itemProperties.Should().BeNull();
+            wrapper.LastModificationTime(out DateTime lastModificationTime).Should().BeTrue();
+            lastModificationTime.Should().Be(modified);
+            wrapper.Links(out Microsoft.Office.Interop.Outlook.Links links).Should().BeTrue();
+            links.Should().BeNull();
+            wrapper
+                .MarkForDownload(
+                    out Microsoft.Office.Interop.Outlook.OlRemoteStatus markForDownload
+                )
+                .Should()
+                .BeTrue();
+            markForDownload
+                .Should()
+                .Be(Microsoft.Office.Interop.Outlook.OlRemoteStatus.olMarkedForDownload);
+            wrapper.MessageClass(out string messageClass).Should().BeTrue();
+            messageClass.Should().Be("IPM.Note");
+            wrapper.Mileage(out string mileage).Should().BeTrue();
+            mileage.Should().Be("77");
+            wrapper.OutlookInternalVersion(out long internalVersion).Should().BeTrue();
+            internalVersion.Should().Be(16);
+            wrapper.OutlookVersion(out string outlookVersion).Should().BeTrue();
+            outlookVersion.Should().Be("16.0");
+            wrapper.Parent(out Microsoft.Office.Interop.Outlook.Folder parent).Should().BeTrue();
+            parent.Should().BeNull();
+            wrapper
+                .PropertyAccessor(out Microsoft.Office.Interop.Outlook.PropertyAccessor accessor)
+                .Should()
+                .BeTrue();
+            accessor.Should().BeNull();
+            wrapper
+                .Sensitivity(out Microsoft.Office.Interop.Outlook.OlSensitivity sensitivity)
+                .Should()
+                .BeTrue();
+            sensitivity.Should().Be(Microsoft.Office.Interop.Outlook.OlSensitivity.olPrivate);
+            wrapper
+                .Session(out Microsoft.Office.Interop.Outlook.NameSpace session)
+                .Should()
+                .BeTrue();
+            session.Should().BeNull();
+            wrapper
+                .UserProperties(out Microsoft.Office.Interop.Outlook.UserProperties userProperties)
+                .Should()
+                .BeTrue();
+            userProperties.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void OlItemType_WhenWrappedObjectIsMailItem_ShouldReturnTrueAndValue()
+        {
+            var wrapper = new OutlookItemTryGet(
+                new UtilitiesCS.OutlookItem(
+                    new Mock<Microsoft.Office.Interop.Outlook.MailItem>().Object
+                )
+            );
+
+            var success = wrapper.OlItemType(
+                out Microsoft.Office.Interop.Outlook.OlItemType result
+            );
+
+            success.Should().BeTrue();
+            result.Should().Be(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
+        }
+
         private sealed class TryGetFriendlyItem
         {
             public string Subject { get; set; }
@@ -277,6 +417,57 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         private sealed class MissingSizeItem
         {
             public string Subject { get; set; }
+        }
+
+        private sealed class TryGetRichItem
+        {
+            public Microsoft.Office.Interop.Outlook.Actions Actions { get; set; }
+
+            public Microsoft.Office.Interop.Outlook.Application Application { get; set; }
+
+            public Microsoft.Office.Interop.Outlook.Attachments Attachments { get; set; }
+
+            public string Companies { get; set; }
+
+            public int Class { get; set; }
+
+            public string ConversationIndex { get; set; }
+
+            public DateTime CreationTime { get; set; }
+
+            public Microsoft.Office.Interop.Outlook.OlDownloadState DownloadState { get; set; }
+
+            public Microsoft.Office.Interop.Outlook.FormDescription FormDescription { get; set; }
+
+            public Microsoft.Office.Interop.Outlook.Inspector GetInspector { get; set; }
+
+            public bool IsConflict { get; set; }
+
+            public Microsoft.Office.Interop.Outlook.ItemProperties ItemProperties { get; set; }
+
+            public DateTime LastModificationTime { get; set; }
+
+            public Microsoft.Office.Interop.Outlook.Links Links { get; set; }
+
+            public Microsoft.Office.Interop.Outlook.OlRemoteStatus MarkForDownload { get; set; }
+
+            public string MessageClass { get; set; }
+
+            public string Mileage { get; set; }
+
+            public long OutlookInternalVersion { get; set; }
+
+            public string OutlookVersion { get; set; }
+
+            public Microsoft.Office.Interop.Outlook.Folder Parent { get; set; }
+
+            public Microsoft.Office.Interop.Outlook.PropertyAccessor PropertyAccessor { get; set; }
+
+            public Microsoft.Office.Interop.Outlook.OlSensitivity Sensitivity { get; set; }
+
+            public Microsoft.Office.Interop.Outlook.NameSpace Session { get; set; }
+
+            public Microsoft.Office.Interop.Outlook.UserProperties UserProperties { get; set; }
         }
     }
 }

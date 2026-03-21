@@ -290,6 +290,200 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             wrapper.OlItemType.Should().Be(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
         }
 
+        [TestMethod]
+        public void PropertyWrappers_WhenUnderlyingGettersSucceed_ShouldReturnExpectedValues()
+        {
+            var created = new DateTime(2026, 3, 10, 7, 0, 0, DateTimeKind.Utc);
+            var modified = new DateTime(2026, 3, 11, 8, 0, 0, DateTimeKind.Utc);
+            var reminder = new DateTime(2026, 3, 12, 9, 0, 0, DateTimeKind.Utc);
+            var outlookItem = CreateBaseOutlookItem();
+            outlookItem
+                .SetupGet(x => x.Actions)
+                .Returns((Microsoft.Office.Interop.Outlook.Actions)null);
+            outlookItem
+                .SetupGet(x => x.Application)
+                .Returns((Microsoft.Office.Interop.Outlook.Application)null);
+            outlookItem.SetupGet(x => x.Companies).Returns("Contoso");
+            outlookItem
+                .SetupGet(x => x.Class)
+                .Returns(Microsoft.Office.Interop.Outlook.OlObjectClass.olMail);
+            outlookItem.SetupGet(x => x.ConversationIndex).Returns("abc123");
+            outlookItem.SetupGet(x => x.CreationTime).Returns(created);
+            outlookItem
+                .SetupGet(x => x.DownloadState)
+                .Returns(Microsoft.Office.Interop.Outlook.OlDownloadState.olHeaderOnly);
+            outlookItem
+                .SetupGet(x => x.FormDescription)
+                .Returns((Microsoft.Office.Interop.Outlook.FormDescription)null);
+            outlookItem
+                .SetupGet(x => x.Inspector)
+                .Returns((Microsoft.Office.Interop.Outlook.Inspector)null);
+            outlookItem
+                .SetupGet(x => x.Importance)
+                .Returns(Microsoft.Office.Interop.Outlook.OlImportance.olImportanceHigh);
+            outlookItem.SetupGet(x => x.IsConflict).Returns(true);
+            outlookItem
+                .SetupGet(x => x.ItemProperties)
+                .Returns((Microsoft.Office.Interop.Outlook.ItemProperties)null);
+            outlookItem.SetupGet(x => x.LastModificationTime).Returns(modified);
+            outlookItem
+                .SetupGet(x => x.Links)
+                .Returns((Microsoft.Office.Interop.Outlook.Links)null);
+            outlookItem
+                .SetupGet(x => x.MarkForDownload)
+                .Returns(Microsoft.Office.Interop.Outlook.OlRemoteStatus.olMarkedForDownload);
+            outlookItem.SetupGet(x => x.Mileage).Returns("101");
+            outlookItem
+                .Setup(x => x.Move(It.IsAny<Microsoft.Office.Interop.Outlook.Folder>()))
+                .Returns("moved");
+            outlookItem.SetupGet(x => x.OutlookInternalVersion).Returns(16L);
+            outlookItem.SetupGet(x => x.OutlookVersion).Returns("16.0");
+            outlookItem
+                .SetupGet(x => x.Parent)
+                .Returns((Microsoft.Office.Interop.Outlook.Folder)null);
+            outlookItem
+                .SetupGet(x => x.PropertyAccessor)
+                .Returns((Microsoft.Office.Interop.Outlook.PropertyAccessor)null);
+            outlookItem
+                .SetupGet(x => x.Sensitivity)
+                .Returns(Microsoft.Office.Interop.Outlook.OlSensitivity.olPrivate);
+            outlookItem
+                .SetupGet(x => x.Session)
+                .Returns((Microsoft.Office.Interop.Outlook.NameSpace)null);
+            outlookItem
+                .SetupGet(x => x.UserProperties)
+                .Returns((Microsoft.Office.Interop.Outlook.UserProperties)null);
+            outlookItem.SetupGet(x => x.ReminderTime).Returns(reminder);
+            outlookItem.SetupGet(x => x.TaskStartDate).Returns(created);
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            wrapper.Actions.Should().BeNull();
+            wrapper.Application.Should().BeNull();
+            wrapper.Companies.Should().Be("Contoso");
+            wrapper
+                .OlObjectClass.Should()
+                .Be(Microsoft.Office.Interop.Outlook.OlObjectClass.olMail);
+            wrapper.ConversationIndex.Should().Be("abc123");
+            wrapper.CreationTime.Should().Be(created);
+            wrapper
+                .DownloadState.Should()
+                .Be(Microsoft.Office.Interop.Outlook.OlDownloadState.olHeaderOnly);
+            wrapper.FormDescription.Should().BeNull();
+            wrapper.GetInspector.Should().BeNull();
+            wrapper
+                .Importance.Should()
+                .Be(Microsoft.Office.Interop.Outlook.OlImportance.olImportanceHigh);
+            wrapper.IsConflict.Should().BeTrue();
+            wrapper.ItemProperties.Should().BeNull();
+            wrapper.LastModificationTime.Should().Be(modified);
+            wrapper.Links.Should().BeNull();
+            wrapper
+                .MarkForDownload.Should()
+                .Be(Microsoft.Office.Interop.Outlook.OlRemoteStatus.olMarkedForDownload);
+            wrapper.Mileage.Should().Be("101");
+            wrapper.Move(null).Should().Be("moved");
+            wrapper.OutlookInternalVersion.Should().Be(16L);
+            wrapper.OutlookVersion.Should().Be("16.0");
+            wrapper.Parent.Should().BeNull();
+            wrapper.PropertyAccessor.Should().BeNull();
+            wrapper
+                .Sensitivity.Should()
+                .Be(Microsoft.Office.Interop.Outlook.OlSensitivity.olPrivate);
+            wrapper.Session.Should().BeNull();
+            wrapper.UserProperties.Should().BeNull();
+            wrapper.ReminderTime.Should().Be(reminder);
+            wrapper.TaskStartDate.Should().Be(created);
+            wrapper.Class.Should().Be(Microsoft.Office.Interop.Outlook.OlObjectClass.olMail);
+            wrapper.Inspector.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void SetterAndMethodWrappers_WhenUnderlyingMembersSucceed_ShouldForwardValues()
+        {
+            var reminder = new DateTime(2026, 3, 13, 10, 0, 0, DateTimeKind.Utc);
+            var outlookItem = CreateBaseOutlookItem();
+            bool printed = false;
+            bool savedAs = false;
+            bool showedCategories = false;
+            Microsoft.Office.Interop.Outlook.OlSaveAsType saveAsType = default;
+            string saveAsPath = null;
+            outlookItem.SetupProperty(x => x.BillingInformation);
+            outlookItem.SetupProperty(x => x.Companies);
+            outlookItem.SetupProperty(x => x.Importance);
+            outlookItem.SetupProperty(x => x.MarkForDownload);
+            outlookItem.SetupProperty(x => x.MessageClass);
+            outlookItem.SetupProperty(x => x.Mileage);
+            outlookItem.SetupProperty(x => x.Sensitivity);
+            outlookItem.SetupProperty(x => x.UnRead);
+            outlookItem.SetupProperty(x => x.NoAging);
+            outlookItem.SetupProperty(x => x.ReminderTime);
+            outlookItem.Setup(x => x.PrintOut()).Callback(() => printed = true);
+            outlookItem
+                .Setup(x =>
+                    x.SaveAs(
+                        It.IsAny<string>(),
+                        It.IsAny<Microsoft.Office.Interop.Outlook.OlSaveAsType>()
+                    )
+                )
+                .Callback<string, Microsoft.Office.Interop.Outlook.OlSaveAsType>(
+                    (path, type) =>
+                    {
+                        savedAs = true;
+                        saveAsPath = path;
+                        saveAsType = type;
+                    }
+                );
+            outlookItem
+                .Setup(x => x.ShowCategoriesDialog())
+                .Callback(() => showedCategories = true);
+            var wrapper = new OutlookItemTry(outlookItem.Object);
+
+            wrapper.BillingInformation = "B999";
+            wrapper.Companies = "Fabrikam";
+            wrapper.Importance = Microsoft.Office.Interop.Outlook.OlImportance.olImportanceHigh;
+            wrapper.MarkForDownload = Microsoft
+                .Office
+                .Interop
+                .Outlook
+                .OlRemoteStatus
+                .olMarkedForDownload;
+            wrapper.MessageClass = "IPM.Note";
+            wrapper.Mileage = "22";
+            wrapper.Sensitivity = Microsoft.Office.Interop.Outlook.OlSensitivity.olConfidential;
+            wrapper.UnRead = true;
+            wrapper.NoAging = true;
+            wrapper.ReminderTime = reminder;
+            wrapper.PrintOut();
+            wrapper.SaveAs("mail.msg", Microsoft.Office.Interop.Outlook.OlSaveAsType.olMSG);
+            wrapper.ShowCategoriesDialog();
+            wrapper
+                .GetOlItemType()
+                .Should()
+                .Be(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
+
+            outlookItem.Object.BillingInformation.Should().Be("B999");
+            outlookItem.Object.Companies.Should().Be("Fabrikam");
+            outlookItem
+                .Object.Importance.Should()
+                .Be(Microsoft.Office.Interop.Outlook.OlImportance.olImportanceHigh);
+            outlookItem
+                .Object.MarkForDownload.Should()
+                .Be(Microsoft.Office.Interop.Outlook.OlRemoteStatus.olMarkedForDownload);
+            outlookItem.Object.MessageClass.Should().Be("IPM.Note");
+            outlookItem.Object.Mileage.Should().Be("22");
+            outlookItem
+                .Object.Sensitivity.Should()
+                .Be(Microsoft.Office.Interop.Outlook.OlSensitivity.olConfidential);
+            outlookItem.Object.UnRead.Should().BeTrue();
+            outlookItem.Object.NoAging.Should().BeTrue();
+            outlookItem.Object.ReminderTime.Should().Be(reminder);
+            printed.Should().BeTrue();
+            savedAs.Should().BeTrue();
+            saveAsPath.Should().Be("mail.msg");
+            saveAsType.Should().Be(Microsoft.Office.Interop.Outlook.OlSaveAsType.olMSG);
+            showedCategories.Should().BeTrue();
+        }
+
         private static Mock<IOutlookItem> CreateBaseOutlookItem()
         {
             var outlookItem = new Mock<IOutlookItem>();

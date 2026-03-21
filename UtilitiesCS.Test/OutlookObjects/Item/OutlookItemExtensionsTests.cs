@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -257,19 +259,235 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             outlookItem.IsValid().Should().BeTrue();
         }
 
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsDistributionList_ShouldReturnTrue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<DistListItem>().Object);
+
+            outlookItem.IsValid().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsMobile_ShouldReturnTrue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<MobileItem>().Object);
+
+            outlookItem.IsValid().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void TryGetPropertyInfo_WhenItemTypeIsUnavailable_ShouldReturnNull()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(null);
+
+            var result = OutlookItemExtensions.TryGetPropertyInfo(outlookItem, "Subject");
+
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void TryGetPropertyValueGeneric_WhenPrimaryValueExists_ShouldUsePrimaryConverter()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(
+                new ConvertiblePropertyItem { PrimaryText = "41" }
+            );
+
+            var result = OutlookItemExtensions.TryGetPropertyValue(
+                outlookItem,
+                "PrimaryText",
+                "AlternateNumber",
+                value => int.Parse((string)value),
+                value => ((int?)value).Value
+            );
+
+            result.Should().Be(41);
+        }
+
+        [TestMethod]
+        public void TryGetPropertyValueGeneric_WhenPrimaryValueExistsAndConverterIsNull_ShouldReturnRawValue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(
+                new ConvertiblePropertyItem { PrimaryText = "41" }
+            );
+
+            var result = OutlookItemExtensions.TryGetPropertyValue<string>(
+                outlookItem,
+                "PrimaryText",
+                "AlternateText",
+                null,
+                value => (string)value
+            );
+
+            result.Should().Be("41");
+        }
+
+        [TestMethod]
+        public void TryGetPropertyValueGeneric_WhenAlternateValueExists_ShouldUseAlternateConverter()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(
+                new ConvertiblePropertyItem { AlternateNumber = 42 }
+            );
+
+            var result = OutlookItemExtensions.TryGetPropertyValue(
+                outlookItem,
+                "PrimaryText",
+                "AlternateNumber",
+                value => int.Parse((string)value),
+                value => (int)value
+            );
+
+            result.Should().Be(42);
+        }
+
+        [TestMethod]
+        public void TryGetPropertyValueGeneric_WhenAlternateValueExistsAndConverterIsNull_ShouldReturnRawValue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(
+                new ConvertiblePropertyItem { AlternateText = "backup" }
+            );
+
+            var result = OutlookItemExtensions.TryGetPropertyValue<string>(
+                outlookItem,
+                "PrimaryText",
+                "AlternateText",
+                value => (string)value,
+                null
+            );
+
+            result.Should().Be("backup");
+        }
+
+        [TestMethod]
+        public void TryGetPropertyValueGeneric_WhenNoValueExists_ShouldReturnNull()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new ConvertiblePropertyItem());
+
+            var result = OutlookItemExtensions.TryGetPropertyValue<int>(
+                outlookItem,
+                "PrimaryText",
+                "AlternateNumber",
+                value => int.Parse((string)value),
+                value => ((int?)value).Value
+            );
+
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void TrySetPropertyValueGeneric_WhenPrimaryPropertyExists_ShouldThrowMissingMethodException()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new ConvertiblePropertyItem());
+
+            System.Action act = () =>
+                _ = InvokeGenericTrySetPropertyValue(
+                    outlookItem,
+                    "SettableNumber",
+                    "AlternateTable",
+                    "7",
+                    value => int.Parse((string)value)
+                );
+
+            act.Should()
+                .Throw<TargetInvocationException>()
+                .WithInnerException<MissingMethodException>();
+        }
+
+        [TestMethod]
+        public void TrySetPropertyValue_WithAlternateObjectValueOverload_ShouldThrowMissingMethodException()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new ConvertiblePropertyItem());
+
+            System.Action act = () =>
+                _ = OutlookItemExtensions.TrySetPropertyValue(
+                    outlookItem,
+                    "PrimaryText",
+                    "AlternateText",
+                    "Alpha",
+                    "Beta"
+                );
+
+            act.Should().Throw<MissingMethodException>();
+        }
+
+        [TestMethod]
+        public void TrySetPropertyValue_WithSharedValueOverload_ShouldThrowMissingMethodException()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new ConvertiblePropertyItem());
+
+            System.Action act = () =>
+                _ = OutlookItemExtensions.TrySetPropertyValue(
+                    outlookItem,
+                    "PrimaryText",
+                    "AlternateText",
+                    "Gamma"
+                );
+
+            act.Should().Throw<MissingMethodException>();
+        }
+
+        [TestMethod]
+        public void TrySetPropertyValue_WhenPropertyExists_ShouldThrowMissingMethodException()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new ConvertiblePropertyItem());
+
+            System.Action act = () =>
+                _ = OutlookItemExtensions.TrySetPropertyValue(outlookItem, "SettableNumber", 99);
+
+            act.Should().Throw<MissingMethodException>();
+        }
+
         private static object CreateInteropMockExtended(Type outlookType)
         {
             if (outlookType == typeof(AppointmentItem))
                 return new Mock<AppointmentItem>().Object;
             if (outlookType == typeof(ContactItem))
                 return new Mock<ContactItem>().Object;
+            if (outlookType == typeof(DistListItem))
+                return new Mock<DistListItem>().Object;
             if (outlookType == typeof(JournalItem))
                 return new Mock<JournalItem>().Object;
+            if (outlookType == typeof(MobileItem))
+                return new Mock<MobileItem>().Object;
             if (outlookType == typeof(NoteItem))
                 return new Mock<NoteItem>().Object;
             if (outlookType == typeof(PostItem))
                 return new Mock<PostItem>().Object;
             throw new ArgumentOutOfRangeException(nameof(outlookType));
+        }
+
+        private static bool InvokeGenericTrySetPropertyValue<T>(
+            UtilitiesCS.OutlookItem outlookItem,
+            string propertyName,
+            string propertyNameAlt,
+            object propertyValue,
+            Func<object, T> converter
+        )
+        {
+            var method = typeof(OutlookItemExtensions)
+                .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
+                .Single(x =>
+                    x.Name == "TrySetPropertyValue"
+                    && x.IsGenericMethodDefinition
+                    && x.GetParameters().Length == 6
+                )
+                .MakeGenericMethod(typeof(T));
+
+            return (bool)
+                method.Invoke(
+                    null,
+                    [outlookItem, propertyName, propertyNameAlt, propertyValue, converter, null]
+                );
+        }
+
+        private sealed class ConvertiblePropertyItem
+        {
+            public string PrimaryText { get; set; }
+
+            public int? AlternateNumber { get; set; }
+
+            public string AlternateText { get; set; }
+
+            public int SettableNumber { get; set; }
         }
 
         #endregion
