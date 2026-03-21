@@ -37,7 +37,10 @@
       "Grep",
       "TodoWrite",
       "WebSearch",
-      "WebFetch"
+      "WebFetch",
+      "Edit(/.claude/skills/**)",
+      "Edit(/.claude/skills/atomic-executor/**)",
+      "Edit(/.claude/skills/feature-reviewer/**)"
     ],
     "deny": []
   }

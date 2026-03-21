@@ -3,8 +3,6 @@ name: task-researcher
 description: 'Deep research specialist for comprehensive project analysis. Researches implementation approaches, evaluates alternatives, and writes structured findings to artifacts/research/. Use when asked to research a topic, implementation approach, or technology before planning.'
 argument-hint: 'Describe the research topic or implementation question.'
 disable-model-invocation: true
-model: opus
-allowed-tools: Read, Grep, Glob, WebSearch, WebFetch, Write, Bash
 ---
 
 # Task Researcher Instructions

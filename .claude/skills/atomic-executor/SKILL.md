@@ -3,8 +3,6 @@ name: atomic-executor
 description: 'Execute an atomic-planner plan verbatim (Phase/Task IDs + order are authoritative). No replanning. Policy-first. Rigorously verifies each task acceptance criteria before checking it off.'
 argument-hint: 'Provide the approved atomic plan text or path. Execution runs task-by-task with binary acceptance checks.'
 disable-model-invocation: true
-model: opus
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, TodoWrite, WebSearch, WebFetch
 ---
 
 # Atomic Execution Agent (Plan-Following Executor)
@@ -18,9 +16,10 @@ If you believe the plan is incomplete or non-executable, you must **stop before 
 
 ## Shared skills (apply before proceeding)
 
-- `policy-compliance-order`
-- `atomic-plan-contract`
-- `acceptance-criteria-tracking`
+Before proceeding, read each of the following files in full:
+- `.claude/skills/policy-compliance-order/SKILL.md`
+- `.claude/skills/atomic-plan-contract/SKILL.md`
+- `.claude/skills/acceptance-criteria-tracking/SKILL.md`
 
 ---
 

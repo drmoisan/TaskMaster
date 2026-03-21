@@ -3,7 +3,6 @@ name: orchestrator
 description: 'Orchestrate end-to-end feature/bug delivery by estimating change budget, routing small changes through promotion -> folder -> minimal-plan -> development -> QC -> small-audit, and routing larger efforts through scope -> promotion -> research -> spec -> atomic planning -> atomic execution -> feature review until complete.'
 argument-hint: 'Provide objective, affected files (if known), and whether this is likely bug or feature.'
 disable-model-invocation: true
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, TodoWrite, WebSearch, WebFetch
 ---
 
 # Orchestrator Agent
@@ -14,13 +13,13 @@ You do not perform deep implementation yourself when a delegated specialist exis
 
 ## Shared skills (apply before proceeding)
 
-Use these reusable skills to avoid duplicating shared operations:
-- `policy-compliance-order`
-- `pr-context-artifacts`
-- `pr-base-branch-merge-base`
-- `feature-promotion-lifecycle`
-- `atomic-plan-contract`
-- `acceptance-criteria-tracking`
+Before proceeding, read each of the following files in full:
+- `.claude/skills/policy-compliance-order/SKILL.md`
+- `.claude/skills/pr-context-artifacts/SKILL.md`
+- `.claude/skills/pr-base-branch-merge-base/SKILL.md`
+- `.claude/skills/feature-promotion-lifecycle/SKILL.md`
+- `.claude/skills/atomic-plan-contract/SKILL.md`
+- `.claude/skills/acceptance-criteria-tracking/SKILL.md`
 
 ## Non-negotiable mission behavior
 

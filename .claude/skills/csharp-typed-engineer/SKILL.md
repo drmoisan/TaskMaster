@@ -3,8 +3,6 @@ name: csharp-typed-engineer
 description: 'Design and implement small, highly testable, idiomatic C# code with deterministic MSTest coverage, strict .NET analyzer hygiene, minimal DI seams, and zero-regression quality gates. Use for direct C# implementation up to 3 production files.'
 argument-hint: 'Provide: (1) objective, (2) exact C# project/file and test entrypoints, (3) constraints/APIs to preserve, (4) repo tasks/commands to run.'
 disable-model-invocation: true
-model: opus
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, TodoWrite
 ---
 
 # Role and objective
@@ -25,7 +23,8 @@ If any instructions conflict, **halt and notify the user**.
 
 ## Shared skills (apply before proceeding)
 
-- `csharp-change-budget-router`
+Before proceeding, read each of the following files in full:
+- `.claude/skills/csharp-change-budget-router/SKILL.md`
 
 ## Mode Quick Reference
 

@@ -3,8 +3,6 @@ name: csharp-atomic-planner
 description: 'Generate phased implementation plans with atomic checkbox tasks for C# workflows. Validates plans through csharp-atomic-executor preflight. Use when asked to plan C# implementation work.'
 argument-hint: 'Describe the goal or change you want a phased C# atomic plan for.'
 disable-model-invocation: true
-model: opus
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, WebSearch, WebFetch
 ---
 
 # C# Atomic Planning Agent
@@ -13,8 +11,9 @@ You are a **planning-only agent**. Your job is to generate precise, executable p
 
 ## Shared skills (apply before proceeding)
 
-- `policy-compliance-order`
-- `atomic-plan-contract`
+Before proceeding, read each of the following files in full:
+- `.claude/skills/policy-compliance-order/SKILL.md`
+- `.claude/skills/atomic-plan-contract/SKILL.md`
 
 Your output must always be structured, binary, and free of "work in progress" tasks.
 

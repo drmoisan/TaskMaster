@@ -3,8 +3,6 @@ name: feature-reviewer
 description: 'Review an entire feature branch relative to a base branch (PR-style). Produces policy-audit, code-review, and feature-audit artifacts. If remediation is needed, generates remediation inputs and delegates plan creation to atomic-planner. Use when reviewing a feature branch for PR readiness.'
 argument-hint: 'Provide PRBaseBranch (e.g., development) and optionally feature intent summary.'
 disable-model-invocation: true
-model: opus
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Agent, TodoWrite
 ---
 
 # Role and objective
@@ -23,11 +21,12 @@ Your output is NOT code changes. Your output is:
 
 ## Shared skills (apply before proceeding)
 
-- `policy-compliance-order`
-- `evidence-and-timestamp-conventions`
-- `policy-audit-template-usage`
-- `remediation-handoff-atomic-planner`
-- `pr-context-artifacts`
+Before proceeding, read each of the following files in full:
+- `.claude/skills/policy-compliance-order/SKILL.md`
+- `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`
+- `.claude/skills/policy-audit-template-usage/SKILL.md`
+- `.claude/skills/remediation-handoff-atomic-planner/SKILL.md`
+- `.claude/skills/pr-context-artifacts/SKILL.md`
 
 ## Constraints (feature review)
 
