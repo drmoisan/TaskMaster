@@ -101,6 +101,7 @@
     <Compile Include="EmailIntelligence\Bayesian\BayesianPerformanceMeasurement_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Corpus_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\CorpusInherit_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\ObsoleteBayesianClassifier_Tests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\TriageCreationTests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities_Tests.cs" />
@@ -314,6 +315,8 @@
     <Compile Include="ReusableTypeClasses\ScoSortedDictionary_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SloLinkedList_Tests.cs" />
     <Compile Include="ReusableTypeClasses\LockingObservableLinkedList_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\LockingObservableLinkedListNode_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\ScDictionary_Tests.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializableConfig_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializable_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializableBase_Tests.cs" />

@@ -23,11 +23,38 @@ namespace UtilitiesCS.Test.HelperClasses
         }
 
         [TestMethod]
+        public void DeepDifferences_NullSecondObject_ThrowsArgumentNullException()
+        {
+            // Arrange
+            PlainNode obj1 = new PlainNode();
+
+            // Act
+            Action act = () => Deep.DeepDifferences<PlainNode>(obj1, null);
+
+            // Assert
+            act.Should().Throw<InvalidCastException>();
+        }
+
+        [TestMethod]
         public void DeepDifferences_PlainEqualObjects_ThrowsInvalidCastException()
         {
             // Arrange
             var obj1 = new PlainNode { Value = 1 };
             var obj2 = new PlainNode { Value = 1 };
+
+            // Act
+            Action act = () => Deep.DeepDifferences(obj1, obj2);
+
+            // Assert
+            act.Should().Throw<InvalidCastException>();
+        }
+
+        [TestMethod]
+        public void DeepDifferences_PlainDifferentValues_ThrowsInvalidCastException()
+        {
+            // Arrange
+            var obj1 = new PlainNode { Value = 1 };
+            var obj2 = new PlainNode { Value = 2 };
 
             // Act
             Action act = () => Deep.DeepDifferences(obj1, obj2);
@@ -55,6 +82,26 @@ namespace UtilitiesCS.Test.HelperClasses
 
             // Act
             Action act = () => Deep.DeepDifferences(obj1, obj2);
+
+            // Assert
+            act.Should().Throw<InvalidCastException>();
+        }
+
+        [TestMethod]
+        public void DeepDifferences_BothNull_ThrowsArgumentNullException()
+        {
+            // Act
+            Action act = () => Deep.DeepDifferences<PlainNode>(null, null);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void DeepDifferences_StringValues_ThrowsInvalidCastException()
+        {
+            // Act
+            Action act = () => Deep.DeepDifferences("hello", "world");
 
             // Assert
             act.Should().Throw<InvalidCastException>();

@@ -126,6 +126,148 @@ namespace UtilitiesCS.Test.EmailIntelligence
             tokens.Should().BeEmpty();
         }
 
+        [TestMethod]
+        public void Imconcattb_WithValidBitmaps_ReturnsCombinedBitmap()
+        {
+            // Arrange
+            var stripper = new ImageStripper();
+            var top = CreateBitmap(width: 4, height: 3, color: Color.Red);
+            var bottom = CreateBitmap(width: 4, height: 2, color: Color.Blue);
+
+            // Act
+            var result = stripper.imconcattb(top, bottom);
+
+            // Assert
+            result.Width.Should().Be(4);
+            result.Height.Should().Be(5);
+        }
+
+        [TestMethod]
+        public void Imconcattb_WithSmallBitmaps_ReturnsCombined()
+        {
+            // Arrange
+            var stripper = new ImageStripper();
+            var top = CreateBitmap(width: 2, height: 1, color: Color.Red);
+            var bottom = CreateBitmap(width: 2, height: 1, color: Color.Blue);
+
+            // Act
+            var result = stripper.imconcattb(top, bottom);
+
+            // Assert
+            result.Width.Should().Be(2);
+            result.Height.Should().Be(2);
+        }
+
+        [TestMethod]
+        public void Imconcatlr_WithValidBitmaps_ReturnsCombinedBitmap()
+        {
+            // Arrange
+            var stripper = new ImageStripper();
+            var left = CreateBitmap(width: 3, height: 4, color: Color.Red);
+            var right = CreateBitmap(width: 2, height: 4, color: Color.Blue);
+
+            // Act
+            var result = stripper.imconcatlr(left, right);
+
+            // Assert
+            result.Width.Should().Be(5);
+            result.Height.Should().Be(4);
+        }
+
+        [TestMethod]
+        public void ExtractOcrInfo_WithEmptyBitmapList_ReturnsEmptyResult()
+        {
+            // Arrange
+            var stripper = new ImageStripper();
+
+            // Act
+            var (text, tokens) = stripper.extract_ocr_info(new List<Bitmap>());
+
+            // Assert
+            text.Should().BeEmpty();
+            tokens.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public void GetStream_WithBytes_ReturnsMemoryStream()
+        {
+            // Arrange
+            var stripper = new ImageStripper();
+            var bytes = new byte[] { 1, 2, 3 };
+
+            // Act
+            var stream = stripper.GetStream(bytes);
+
+            // Assert
+            stream.Should().NotBeNull();
+            stream.Length.Should().Be(3);
+        }
+
+        [TestMethod]
+        public void GetImage_WithValidStream_ReturnsImage()
+        {
+            // Arrange
+            var stripper = new ImageStripper();
+            var bitmap = CreateBitmap(width: 2, height: 2, color: Color.White);
+            using var ms = new MemoryStream();
+            bitmap.Save(ms, ImageFormat.Png);
+            ms.Position = 0;
+
+            // Act
+            var image = stripper.GetImage(ms);
+
+            // Assert
+            image.Should().NotBeNull();
+            image.Width.Should().Be(2);
+            image.Height.Should().Be(2);
+        }
+
+        [TestMethod]
+        public void Constructor_WithCacheFile_DoesNotThrow()
+        {
+            // Act
+            System.Action act = () => new ImageStripper("test-cache");
+
+            // Assert
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void Analyze_WithTesseractAndAttachment_WhenNoImagesExtracted_ReturnsTokensOnly()
+        {
+            // Arrange
+            var stripper = new ImageStripper();
+            var attachment = CreateAttachment(
+                size: 10,
+                data: new byte[] { 0xFF, 0xFE },
+                attachmentType: OlAttachmentType.olByValue
+            );
+
+            // Act
+            var (text, tokens) = stripper.analyze("Tesseract", new List<object> { attachment });
+
+            // Assert
+            tokens.Should().Contain(t => t.StartsWith("invalid-image:"));
+        }
+
+        [TestMethod]
+        public void PilDecodeParts_WithEmptyAttachmentData_AddsInvalidImageToken()
+        {
+            // Arrange
+            var stripper = new ImageStripper();
+            var attachment = CreateAttachment(
+                size: 10,
+                data: Array.Empty<byte>(),
+                attachmentType: OlAttachmentType.olByValue
+            );
+
+            // Act
+            var (images, tokens) = stripper.PIL_decode_parts(new List<object> { attachment });
+
+            // Assert
+            tokens.Should().Contain("invalid-image:olByValue");
+        }
+
         private static IAttachment CreateAttachment(
             int size,
             byte[] data,

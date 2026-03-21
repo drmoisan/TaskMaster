@@ -70,31 +70,31 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
 - [x] [P1-T5] Extend tests for close-to-80% HelperClasses: `MyFileSystemInfo.cs` (71%), `PrettyPrint.cs` (67.2%)
   - Acceptance: Coverage report shows both files at >= 80% line rate
 
-- [ ] [P1-T6] Create or extend tests for pure-logic HelperClasses: `DeepCompare.cs` (31.2%), `Initializer.cs` (60.3%), `DebugTextWriter.cs` (63.6%), `TraceUtility.cs` (60.6%)
+- [x] [P1-T6] Create or extend tests for pure-logic HelperClasses: `DeepCompare.cs` (31.2%), `Initializer.cs` (60.3%), `DebugTextWriter.cs` (63.6%), `TraceUtility.cs` (60.6%)
   - Acceptance: Coverage report shows all four files at >= 80% line rate
 
-- [ ] [P1-T7] Create or extend tests for pure-algorithm classes: `SmithWaterman.cs` (48.6%), `ImageStripper.cs` (53.5%), `StringManipulation.cs` (0%)
+- [x] [P1-T7] Create or extend tests for pure-algorithm classes: `SmithWaterman.cs` (48.6%), `ImageStripper.cs` (53.5%), `StringManipulation.cs` (0%)
   - Acceptance: Coverage report shows all three files at >= 80% line rate
 
-- [ ] [P1-T8] Create tests for zero-coverage data classes: `FilterEntry.cs` (0%), `BayesianMetricTypes.cs` (0%), `EmailFilerConfig.cs` (0%), `NConsoleTraceWriter.cs` (0%), `PropertyStore.cs` (0%)
+- [x] [P1-T8] Create tests for zero-coverage data classes: `FilterEntry.cs` (0%), `BayesianMetricTypes.cs` (0%), `EmailFilerConfig.cs` (0%), `NConsoleTraceWriter.cs` (0%), `PropertyStore.cs` (0%)
   - Acceptance: Test classes exist for all five files; coverage report shows all five at >= 80% line rate
 
-- [ ] [P1-T9] Extend tests for partial-coverage data classes: `MovedMailInfo.cs` (35.4%), `DedicatedToken.cs` (22.2%)
+- [x] [P1-T9] Extend tests for partial-coverage data classes: `MovedMailInfo.cs` (35.4%), `DedicatedToken.cs` (22.2%)
   - Acceptance: Coverage report shows both files at >= 80% line rate
 
-- [ ] [P1-T10] Create or extend tests for data structures: `LockingLinkedList.cs` (58.2%), `LockingLinkedListNode.cs` (61.7%), `AsyncLazy.cs` (25%), `TimedQueueOfActions.cs` (58.8%)
+- [x] [P1-T10] Create or extend tests for data structures: `LockingLinkedList.cs` (58.2%), `LockingLinkedListNode.cs` (61.7%), `AsyncLazy.cs` (25%), `TimedQueueOfActions.cs` (58.8%)
   - Acceptance: Coverage report shows all four files at >= 80% line rate
 
 - [x] [P1-T11] Create tests for observer implementations: `SimpleActionBagObserver.cs` (0%), `SimpleActionLockingLinkedListObserver.cs` (0%)
   - Acceptance: Test classes exist for both; coverage report shows both at >= 80% line rate
 
-- [ ] [P1-T12] Create or extend tests for easy threading utilities: `ThreadSafeFunctions.cs` (54.8%), `TimeOutTask.cs` (24.1%)
+- [x] [P1-T12] Create or extend tests for easy threading utilities: `ThreadSafeFunctions.cs` (54.8%), `TimeOutTask.cs` (24.1%)
   - Acceptance: Coverage report shows both files at >= 80% line rate
 
 - [x] [P1-T13] Register all new Phase 1 test files in `UtilitiesCS.Test.csproj` via `<Compile Include>` entries
   - Acceptance: Every new `.cs` test file created in Phase 1 has a corresponding `<Compile Include>` entry in `UtilitiesCS.Test.csproj`; `msbuild` resolves all test files without missing-reference errors
 
-- [ ] [P1-T14] Run Phase 1 checkpoint: build solution and run tests with coverage; verify all Phase 1 target files reach >= 80% line coverage
+- [x] [P1-T14] Run Phase 1 checkpoint: build solution and run tests with coverage; verify all Phase 1 target files reach >= 80% line coverage
   - Preconditions: P1-T1 through P1-T13 complete
   - Acceptance: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits 0; `vstest.console.exe` exits 0 with no test failures; coverage report confirms all ~39 Phase 1 target files at >= 80%
 
@@ -102,28 +102,28 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
 
 **Goal:** Cover classes requiring Moq-based mocking for interfaces, file system, Newtonsoft JSON, Bayesian logic, and COM interop with established mock patterns. Tests must use MemoryStream/StringWriter injection for any serialization testing (no temp files per policy).
 
-- [ ] [P2-T1] Create or extend tests for JSON converters batch 1: `ScDictionaryConverter.cs` (9.1%), `NonRecursiveConverter.cs` (0%), `PeopleScoConverter.cs` (66.7%), `PeopleScoRemainingObjectConverter.cs` (40%)
+- [x] [P2-T1] Create or extend tests for JSON converters batch 1: `ScDictionaryConverter.cs` (9.1%), `NonRecursiveConverter.cs` (0%), `PeopleScoConverter.cs` (66.7%), `PeopleScoRemainingObjectConverter.cs` (40%)
   - Acceptance: Coverage report shows all four files at >= 80% line rate
 
-- [ ] [P2-T2] Create or extend tests for JSON converters batch 2: `DerivedCompositionConverter_ConcurrentDictionary.cs` (0%), `MonoExtension.cs` (39.1%)
+- [x] [P2-T2] Create or extend tests for JSON converters batch 2: `DerivedCompositionConverter_ConcurrentDictionary.cs` (0%), `MonoExtension.cs` (39.1%)
   - Acceptance: Coverage report shows both files at >= 80% line rate
 
-- [ ] [P2-T3] Create tests for SDIL Reader data models: `ILGlobals.cs` (0%), `ILInstruction.cs` (0%)
+- [x] [P2-T3] Create tests for SDIL Reader data models: `ILGlobals.cs` (0%), `ILInstruction.cs` (0%)
   - Acceptance: Test classes exist; coverage report shows both files at >= 80% line rate
 
-- [ ] [P2-T4] Create or extend tests for NewtonsoftHelpers wrapper: `WrapperPeopleScoDictionaryNew.cs` (12.6%)
+- [x] [P2-T4] Create or extend tests for NewtonsoftHelpers wrapper: `WrapperPeopleScoDictionaryNew.cs` (12.6%)
   - Acceptance: Coverage report shows file at >= 80% line rate
 
 - [ ] [P2-T5] Create or extend tests for SCO core collections: `ScBag.cs` (20.4%), `ScDictionary.cs` (8.6%), `SCODictionary.cs` (4.3%)
   - Acceptance: Coverage report shows all three files at >= 80% line rate
 
-- [ ] [P2-T6] Create or extend tests for SCO variant collections: `ScoCollection.cs` (4.4%), `ScoSortedDictionary.cs` (7.4%), `ScoStack.cs` (40.2%), `ScoDictionaryNew.cs` (15.5%)
+- [x] [P2-T6] Create or extend tests for SCO variant collections: `ScoCollection.cs` (4.4%), `ScoSortedDictionary.cs` (7.4%), `ScoStack.cs` (40.2%), `ScoDictionaryNew.cs` (15.5%)
   - Acceptance: Coverage report shows all four files at >= 80% line rate
 
-- [ ] [P2-T7] Create or extend tests for serializable lists: `SerializableList.cs` (35.9%), `SloLinkedList.cs` (29.7%)
+- [x] [P2-T7] Create or extend tests for serializable lists: `SerializableList.cs` (35.9%), `SloLinkedList.cs` (29.7%)
   - Acceptance: Coverage report shows both files at >= 80% line rate
 
-- [ ] [P2-T8] Create or extend tests for SmartSerializable core: `SmartSerializable.cs` (15.9%), `SmartSerializableBase.cs` (0%), `SmartSerializableNonTyped.cs` (72%)
+- [x] [P2-T8] Create or extend tests for SmartSerializable core: `SmartSerializable.cs` (15.9%), `SmartSerializableBase.cs` (0%), `SmartSerializableNonTyped.cs` (72%)
   - Acceptance: Coverage report shows all three files at >= 80% line rate
 
 - [x] [P2-T9] Create or extend tests for SmartSerializable infrastructure: `SmartSerializableLoader.cs` (7.1%), `SmartSerializableStatic.cs` (0%), `NewSmartSerializableConfig.cs` (29.5%)
@@ -135,7 +135,7 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
 - [ ] [P2-T11] Create or extend tests for Corpus and legacy Bayesian: `Corpus.cs` (33.9%), `CorpusInherit.cs` (0%), `Obsolete/BayesianClassifier.cs` (65.1%), `Obsolete/ClassifierGroup.cs` (8.2%)
   - Acceptance: Coverage report shows all four files at >= 80% line rate
 
-- [ ] [P2-T12] Create tests for Bayesian performance measurement: `BayesianPerformanceMeasurement.cs` (0%), `BayesianSerializationHelper.cs` (0%)
+- [x] [P2-T12] Create tests for Bayesian performance measurement: `BayesianPerformanceMeasurement.cs` (0%), `BayesianSerializationHelper.cs` (0%)
   - Acceptance: Test classes exist; coverage report shows both files at >= 80% line rate
 
 - [ ] [P2-T13] Extend tests for OutlookItem core using Moq COM mocking: `OutlookItem.cs` (54.5%), `OutlookItemExtensions.cs` (44.9%), `OlItemPseudoInterface.cs` (55.4%)
@@ -147,7 +147,7 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
 - [ ] [P2-T15] Extend tests for OutlookObjects helpers: `AttachmentHelper.cs` (69.9%), `AttachmentSerializable.cs` (54.7%), `CreateCategory.cs` (65.5%), `RecipientStatic.cs` (46.7%), `UserDefinedFields.cs` (26%), `StoreWrapper.cs` (71.7%)
   - Acceptance: Coverage report shows all six files at >= 80% line rate
 
-- [ ] [P2-T16] Create or extend tests for file system wrappers with mocked I/O: `FileInfoWrapper.cs` (17.8%), `DirectoryInfoWrapper.cs` (20.3%), `FileSystemInfoWrapper.cs` (0%), `FilePathHelper.cs` (18.8%)
+- [x] [P2-T16] Create or extend tests for file system wrappers with mocked I/O: `FileInfoWrapper.cs` (17.8%), `DirectoryInfoWrapper.cs` (20.3%), `FileSystemInfoWrapper.cs` (0%), `FilePathHelper.cs` (18.8%)
   - Acceptance: Coverage report shows all four files at >= 80% line rate
 
 - [ ] [P2-T17] Create or extend tests for progress and thread tracking: `ProgressTracker.cs` (47%), `ProgressTrackerAsync.cs` (0%), `AsyncMultiTasker.cs` (0%), `ThreadMonitor.cs` (0%)
@@ -156,7 +156,7 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
 - [ ] [P2-T18] Create or extend tests for EmailIntelligence domain logic: `FlagTranslator.cs` (41.2%), `IntelligenceConfig.cs` (7.3%), `SubjectMapEncoder.cs` (0%), `SubjectMapSco.cs` (4.1%)
   - Acceptance: Coverage report shows all four files at >= 80% line rate
 
-- [ ] [P2-T19] Create or extend tests for EmailIntelligence collections: `PeopleScoDictionaryNew.cs` (3.2%), `RecentsList.cs` (0%)
+- [x] [P2-T19] Create or extend tests for EmailIntelligence collections: `PeopleScoDictionaryNew.cs` (3.2%), `RecentsList.cs` (0%)
   - Acceptance: Coverage report shows both files at >= 80% line rate
 
 - [ ] [P2-T20] Extend tests for observable linked lists: `LockingObservableLinkedList.cs` (24.8%), `LockingObservableLinkedListNode.cs` (20.4%)
@@ -185,31 +185,31 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
 - [x] [P3-T1] Create or extend tests for `ConversationHelper.cs` by mocking COM conversation traversal APIs
   - Acceptance: Coverage report shows `ConversationHelper.cs` (4%) at >= 80% line rate
 
-- [ ] [P3-T2] Create or extend tests for `MailItemHelper.cs` by mocking COM mail operations
+- [x] [P3-T2] Create or extend tests for `MailItemHelper.cs` by mocking COM mail operations
   - Acceptance: Coverage report shows `MailItemHelper.cs` (45.8%) at >= 80% line rate
 
-- [ ] [P3-T3] Create or extend tests for `StoreWrapperController.cs` by mocking store/session COM objects
+- [x] [P3-T3] Create or extend tests for `StoreWrapperController.cs` by mocking store/session COM objects
   - Acceptance: Coverage report shows `StoreWrapperController.cs` (33.9%) at >= 80% line rate
 
-- [ ] [P3-T4] Create or extend tests for `OlTableExtensions.cs` by mocking COM Table interface
+- [x] [P3-T4] Create or extend tests for `OlTableExtensions.cs` by mocking COM Table interface
   - Acceptance: Coverage report shows `OlTableExtensions.cs` (4.7%) at >= 80% line rate
 
-- [ ] [P3-T5] Create or extend tests for `OlToDoTable.cs` by mocking COM Table interface
+- [x] [P3-T5] Create or extend tests for `OlToDoTable.cs` by mocking COM Table interface
   - Acceptance: Coverage report shows `OlToDoTable.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T6] Create tests for `ActionableClassifierGroup.cs` with mocked IApplicationGlobals
+- [x] [P3-T6] Create tests for `ActionableClassifierGroup.cs` with mocked IApplicationGlobals
   - Acceptance: Coverage report shows `ActionableClassifierGroup.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T7] Create tests for `CategoryClassifierGroup.cs` with mocked IApplicationGlobals
+- [x] [P3-T7] Create tests for `CategoryClassifierGroup.cs` with mocked IApplicationGlobals
   - Acceptance: Coverage report shows `CategoryClassifierGroup.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T8] Create tests for `OlFolderClassifierGroup.cs` with mocked IApplicationGlobals
+- [x] [P3-T8] Create tests for `OlFolderClassifierGroup.cs` with mocked IApplicationGlobals
   - Acceptance: Coverage report shows `OlFolderClassifierGroup.cs` (0%) at >= 80% line rate
 
 - [x] [P3-T9] Create tests for `ConditionalItemEngine.cs` with mocked COM items
   - Acceptance: Coverage report shows `ConditionalItemEngine.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T10] Create tests for `MulticlassEngine.cs` with mocked COM items
+- [x] [P3-T10] Create tests for `MulticlassEngine.cs` with mocked COM items
   - Acceptance: Coverage report shows `MulticlassEngine.cs` (0%) at >= 80% line rate
 
 - [x] [P3-T11] Create tests for `TristateEngine.cs` with mocked COM items
@@ -221,7 +221,7 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
 - [ ] [P3-T13] Create tests for `ManagerAsyncLazy.cs` with mocked globals
   - Acceptance: Coverage report shows `ManagerAsyncLazy.cs` (0%) at >= 80% line rate
 
-- [ ] [P3-T14] Create or extend tests for `Triage.cs` with mocked globals
+- [x] [P3-T14] Create or extend tests for `Triage.cs` with mocked globals
   - Acceptance: Coverage report shows `Triage.cs` (8.5%) at >= 80% line rate
 
 - [x] [P3-T15] Extract testable logic from `InputBox.cs` and create tests

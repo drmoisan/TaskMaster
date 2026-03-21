@@ -214,6 +214,164 @@ namespace UtilitiesCS.Test.HelperClasses
             result.Should().BeFalse();
         }
 
+        [TestMethod]
+        public void InternalIsMine_ShouldReturnTrueForProjectAssembly()
+        {
+            // Arrange
+            var method = typeof(TraceUtility).GetMethod(
+                "IsMine",
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
+
+            // Act
+            var result = (bool)method.Invoke(null, new object[] { typeof(TraceUtility).Assembly });
+
+            // Assert
+            result.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void ProjectNames_ShouldContainKnownProjectNames()
+        {
+            // Arrange
+            var prop = typeof(TraceUtility).GetProperty(
+                "ProjectNames",
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
+
+            // Act
+            var names = (List<string>)prop.GetValue(null);
+
+            // Assert
+            names.Should().Contain("UtilitiesCS");
+            names.Should().Contain("TaskMaster");
+        }
+
+        [TestMethod]
+        public void GetMyMethodNames_WithCurrentTrace_ReturnsNonEmptyArray()
+        {
+            // Act
+            var names = new StackTrace().GetMyMethodNames();
+
+            // Assert
+            names.Should().NotBeEmpty();
+            names
+                .Should()
+                .Contain(n =>
+                    n.Contains(nameof(GetMyMethodNames_WithCurrentTrace_ReturnsNonEmptyArray))
+                );
+        }
+
+        [TestMethod]
+        public void GetClassName_ForStaticMethod_ReturnsModuleName()
+        {
+            // Arrange
+            var getClassName = typeof(TraceUtility).GetMethod(
+                "GetClassName",
+                BindingFlags.Static | BindingFlags.NonPublic,
+                null,
+                new[] { typeof(MethodBase) },
+                null
+            );
+            var staticMethod = typeof(TraceUtility).GetMethod(
+                nameof(TraceUtility.GetMethodCallLogString),
+                BindingFlags.Public | BindingFlags.Static
+            );
+
+            // Act
+            var result = (string)getClassName.Invoke(null, new object[] { staticMethod });
+
+            // Assert
+            result.Should().NotBeNullOrWhiteSpace();
+            result.Should().Contain("UtilitiesCS");
+        }
+
+        [TestMethod]
+        public void GetClassName_ForInstanceMethod_ReturnsDeclaringTypeName()
+        {
+            // Arrange
+            var getClassName = typeof(TraceUtility).GetMethod(
+                "GetClassName",
+                BindingFlags.Static | BindingFlags.NonPublic,
+                null,
+                new[] { typeof(MethodBase) },
+                null
+            );
+            var instanceMethod = typeof(TraceUtility_Tests).GetMethod(
+                nameof(CaptureMethodCallLogString),
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+
+            // Act
+            var result = (string)getClassName.Invoke(null, new object[] { instanceMethod });
+
+            // Assert
+            result.Should().Be(nameof(TraceUtility_Tests));
+        }
+
+        [TestMethod]
+        public void GetCallerMethod_WithRefFrameLevel_IncrementsLevel()
+        {
+            // Arrange
+            var trace = new StackTrace();
+            int level = 0;
+
+            // Act
+            var method = trace.GetCallerMethod(ref level);
+
+            // Assert
+            level.Should().BeGreaterThan(0);
+        }
+
+        [TestMethod]
+        public void GetCallerParameters_WithRefFrameLevel_ReturnsParameterInfo()
+        {
+            // Arrange
+            var trace = new StackTrace();
+            int level = 0;
+
+            // Act
+            var parameters = trace.GetCallerParameters(ref level);
+
+            // Assert
+            parameters.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void TryGetMyTraceString_NoArgs_ReturnsNonEmptyString()
+        {
+            // Act
+            var result = new StackTrace().TryGetMyTraceString();
+
+            // Assert
+            result.Should().NotBeNullOrWhiteSpace();
+        }
+
+        [TestMethod]
+        public void GetMethodCallLogString_NoParams_ReturnsUpdateMessage()
+        {
+            // Act
+            var result = TraceUtility.GetMethodCallLogString();
+
+            // Assert
+            result.Should().StartWith("TRACE");
+        }
+
+        [TestMethod]
+        public void GetMethodTraceString_StackTraceExtension_WithMatchingParams_ContainsParamValues()
+        {
+            // Act
+            var result = CaptureMethodTraceStringViaExtensionMatched(42, "test");
+
+            // Assert
+            result.Should().NotBeNullOrWhiteSpace();
+        }
+
+        private string CaptureMethodTraceStringViaExtensionMatched(int count, string name)
+        {
+            return new StackTrace(1).GetMethodTraceString(count, name);
+        }
+
         private string CaptureCallWithNoParams()
         {
             return TraceUtility.GetMethodCallLogString();
