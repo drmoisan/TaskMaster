@@ -196,7 +196,7 @@ install_dotnet_coverage() {
   mkdir -p "${dotnet_tools_dir}"
 
   export PATH="${dotnet_tools_dir}:${PATH}"
-  append_if_missing "${HOME}/.bashrc" 'export PATH="$HOME/.dotnet/tools:$PATH"'
+  append_if_missing "${HOME}/.bashrc" "export PATH=\"\$HOME/.dotnet/tools:\$PATH\""
 
   if command -v dotnet-coverage >/dev/null 2>&1; then
     log "dotnet-coverage is already available; skipping."
