@@ -16,6 +16,7 @@ Fix `.codex/codex-web-setup.sh` so a Linux-based Codex Web bootstrap does not fa
 2. Detect non-Windows PowerShell hosts and downgrade the Visual Studio-specific task verification from a hard failure to a warning.
 3. Update the script's repo notes so they describe partial verification on Linux instead of an expected non-zero exit.
 4. Update `.github/workflows/codex-web-setup-test.yml` so CI expects the new Linux warning-and-success behavior rather than the previous hard failure.
+5. Add non-default-branch CI triggers so the setup workflow can run from branch pushes and pull requests, not only from `workflow_dispatch` on the default branch.
 
 ## Verification
 
