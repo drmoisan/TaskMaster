@@ -1,5 +1,4 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -8,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.OutlookObjects.Store;
 using UtilitiesCS.ReusableTypeClasses;
@@ -18,7 +18,8 @@ namespace TaskMaster
     public class AppOlObjects : IOlObjects
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public AppOlObjects(Application olApplication, IApplicationGlobals appGlobals)
         {
@@ -34,10 +35,14 @@ namespace TaskMaster
         }
 
         private IApplicationGlobals _globals;
-        internal ISmartSerializableNonTyped SmartSerializable { get; set; } = new SmartSerializableNonTyped();
+        internal ISmartSerializableNonTyped SmartSerializable { get; set; } =
+            new SmartSerializableNonTyped();
 
         private Application _olApplication;
-        public Application App { get => _olApplication; }
+        public Application App
+        {
+            get => _olApplication;
+        }
 
         private string _viewWide;
         public string ViewWide
@@ -80,19 +85,20 @@ namespace TaskMaster
             get
             {
                 if (_toDoFolder is null)
-                    _toDoFolder = (Folder)NamespaceMAPI.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
+                    _toDoFolder = (Folder)
+                        NamespaceMAPI.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
                 return _toDoFolder;
             }
         }
 
         private Lazy<IEnumerable<Folder>> _inboxes;
         public IEnumerable<Folder> Inboxes => _inboxes.Value;
+
         internal IEnumerable<Folder> LoadInboxes()
         {
             // TODO: Test with gmail to see if I need to add a filter for non-exchange
             var storesWrapper = StoresWrapper ?? new StoresWrapper() { };
-            var stores = NamespaceMAPI.Stores.Cast<Store>().Where(
-                storesWrapper.ShouldIncludeStore);
+            var stores = NamespaceMAPI.Stores.Cast<Store>().Where(storesWrapper.ShouldIncludeStore);
 
             var inboxes = new List<Folder>();
             foreach (var store in stores)
@@ -113,17 +119,30 @@ namespace TaskMaster
             }
             return inboxes;
         }
+
         internal void ResetLazyInboxes() => _inboxes = new Lazy<IEnumerable<Folder>>(LoadInboxes);
 
         public StoresWrapper StoresWrapper { get; set; }
-        async internal Task LoadStoresAsync() => await Task.Run(async () =>
-        {
-            if (_globals.IntelRes.Config.TryGetValue("StoresWrapper", out var config))
-            {
-                StoresWrapper = await SmartSerializable.DeserializeAsync(config, true, () => new StoresWrapper(_globals).Init());
-            }
-            else { logger.Error("StoresWrapper config not found."); }
-        }, _globals.AF.CancelToken);
+
+        internal async Task LoadStoresAsync() =>
+            await Task.Run(
+                async () =>
+                {
+                    if (_globals.IntelRes.Config.TryGetValue("StoresWrapper", out var config))
+                    {
+                        StoresWrapper = await SmartSerializable.DeserializeAsync(
+                            config,
+                            true,
+                            () => new StoresWrapper(_globals).Init()
+                        );
+                    }
+                    else
+                    {
+                        logger.Error("StoresWrapper config not found.");
+                    }
+                },
+                _globals.AF.CancelToken
+            );
 
         private Reminders _olReminders;
         public Reminders OlReminders
@@ -153,7 +172,8 @@ namespace TaskMaster
             get
             {
                 if (_inbox is null)
-                    _inbox = (Folder)App.Session.DefaultStore.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+                    _inbox = (Folder)
+                        App.Session.DefaultStore.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
                 return _inbox;
             }
         }
@@ -173,28 +193,47 @@ namespace TaskMaster
 
         private Folder _junkPotential;
         public Folder JunkPotential => Initializer.GetOrLoad(ref _junkPotential, LoadJunkPotential);
+
+        internal static string ReadJunkPotentialSetting() =>
+            Properties.Settings.Default.JunkPotential;
+
+        internal static void WriteJunkPotentialSetting(string relativePath) =>
+            Properties.Settings.Default.JunkPotential = relativePath;
+
         internal Folder LoadJunkPotential()
         {
             var root = new FolderTree(Root).Roots.FirstOrDefault();
-            var folderPath = Properties.Settings.Default.JunkPotential;
-            if (folderPath.IsNullOrEmpty()) { return null; }
+            var folderPath = ReadJunkPotentialSetting();
+            if (folderPath.IsNullOrEmpty())
+            {
+                return null;
+            }
             var sequence = new Queue<string>(folderPath.Split('\\'));
 
             var node = root.FindSequentialNode((current, other) => current.Name == other, sequence);
             var folder = node?.Value?.OlFolder as Folder;
             if (folder is null)
             {
-                MyBox.ShowDialog("Junk Potential Folder not found. Please select it manually.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                MyBox.ShowDialog(
+                    "Junk Potential Folder not found. Please select it manually.",
+                    "Error",
+                    System.Windows.Forms.MessageBoxButtons.OK,
+                    System.Windows.Forms.MessageBoxIcon.Error
+                );
                 folder = NamespaceMAPI.PickFolder() as Folder;
-                if (folder is null) { return null; }
+                if (folder is null)
+                {
+                    return null;
+                }
                 var wrapper = new FolderWrapper(folder, Root);
-                Properties.Settings.Default.OlJunkPotential = wrapper.RelativePath;
+                WriteJunkPotentialSetting(wrapper.RelativePath);
                 Properties.Settings.Default.Save();
             }
             return folder;
         }
 
         private Folder _junkCertain;
+
         //public Folder JunkCertain
         //{
         //    get
@@ -207,20 +246,32 @@ namespace TaskMaster
         //    }
         //}
         public Folder JunkCertain => Initializer.GetOrLoad(ref _junkCertain, LoadJunkCertain);
+
         internal Folder LoadJunkCertain()
         {
             var root = new FolderTree(Root).Roots.FirstOrDefault();
             var folderPath = Properties.Settings.Default.OlJunkCertain;
-            if (folderPath.IsNullOrEmpty()) { return null; }
+            if (folderPath.IsNullOrEmpty())
+            {
+                return null;
+            }
             var sequence = new Queue<string>(folderPath.Split('\\'));
 
             var node = root.FindSequentialNode((current, other) => current.Name == other, sequence);
             var folder = node?.Value?.OlFolder as Folder;
             if (folder is null)
             {
-                MyBox.ShowDialog("Junk Potential Folder not found. Please select it manually.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                MyBox.ShowDialog(
+                    "Junk Potential Folder not found. Please select it manually.",
+                    "Error",
+                    System.Windows.Forms.MessageBoxButtons.OK,
+                    System.Windows.Forms.MessageBoxIcon.Error
+                );
                 folder = NamespaceMAPI.PickFolder() as Folder;
-                if (folder is null) { return null; }
+                if (folder is null)
+                {
+                    return null;
+                }
                 var wrapper = new FolderWrapper(folder, Root);
                 Properties.Settings.Default.OlJunkCertain = wrapper.RelativePath;
                 Properties.Settings.Default.Save();
@@ -243,6 +294,7 @@ namespace TaskMaster
 
         private Folder _archiveRoot;
         public Folder ArchiveRoot => Initializer.GetOrLoad(ref _archiveRoot, LoadArchiveRoot);
+
         internal Folder LoadArchiveRoot()
         {
             var folderHandler = new FolderPredictor(_globals);
@@ -254,18 +306,14 @@ namespace TaskMaster
         private StackObjectCS<object> _movedMailsStack;
         public StackObjectCS<object> MovedMailsStack
         {
-            get
-            {
-                return _movedMailsStack;
-            }
-            set
-            {
-                _movedMailsStack = value;
-            }
+            get { return _movedMailsStack; }
+            set { _movedMailsStack = value; }
         }
 
         private TimedDiskWriter<string> _emailMoveWriter;
-        public TimedDiskWriter<string> EmailMoveWriter => Initializer.GetOrLoad(ref _emailMoveWriter, LoadEmailMoveWriter);
+        public TimedDiskWriter<string> EmailMoveWriter =>
+            Initializer.GetOrLoad(ref _emailMoveWriter, LoadEmailMoveWriter);
+
         public TimedDiskWriter<string> LoadEmailMoveWriter()
         {
             var writer = new TimedDiskWriter<string>();
@@ -273,11 +321,23 @@ namespace TaskMaster
             writer.Config.TryAddTimeout = 20;
             if (_globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var myDocuments))
             {
-                SortEmail.WriteCSV_StartNewFileIfDoesNotExist(_globals.FS.Filenames.MovedMails, myDocuments);
-                writer.DiskWriter = async (items) => await FileIO2.WriteTextFileAsync(_globals.FS.Filenames.MovedMails, items.ToArray(), myDocuments, default);
+                SortEmail.WriteCSV_StartNewFileIfDoesNotExist(
+                    _globals.FS.Filenames.MovedMails,
+                    myDocuments
+                );
+                writer.DiskWriter = async (items) =>
+                    await FileIO2.WriteTextFileAsync(
+                        _globals.FS.Filenames.MovedMails,
+                        items.ToArray(),
+                        myDocuments,
+                        default
+                    );
                 return writer;
             }
-            else { return null; }
+            else
+            {
+                return null;
+            }
         }
 
         private string _userEmailAddress;
@@ -313,7 +373,10 @@ namespace TaskMaster
 
         internal static string TryGetSmtpAddress(AddressEntry addressEntry)
         {
-            if (addressEntry is null) { return null; }
+            if (addressEntry is null)
+            {
+                return null;
+            }
 
             try
             {
@@ -323,9 +386,7 @@ namespace TaskMaster
                     return primarySmtpAddress;
                 }
             }
-            catch (COMException)
-            {
-            }
+            catch (COMException) { }
 
             try
             {
@@ -335,14 +396,13 @@ namespace TaskMaster
                     return address;
                 }
             }
-            catch (COMException)
-            {
-            }
+            catch (COMException) { }
 
             return null;
         }
 
         private bool _darkMode = Properties.Settings.Default.DarkMode;
+
         [NotifyParentProperty(true)]
         public bool DarkMode
         {
@@ -373,12 +433,14 @@ namespace TaskMaster
         {
             var explorer = App.ActiveExplorer();
             Rectangle bounds = new(explorer.Left, explorer.Top, explorer.Width, explorer.Height);
-            return System.Windows.Forms.Screen.AllScreens.FindMax((s1, s2) =>
-            {
-                var a1 = Rectangle.Intersect(s1.Bounds, bounds).Area();
-                var a2 = Rectangle.Intersect(s2.Bounds, bounds).Area();
-                return a2 > a1 ? s2 : s1;
-            });
+            return System.Windows.Forms.Screen.AllScreens.FindMax(
+                (s1, s2) =>
+                {
+                    var a1 = Rectangle.Intersect(s1.Bounds, bounds).Area();
+                    var a2 = Rectangle.Intersect(s2.Bounds, bounds).Area();
+                    return a2 > a1 ? s2 : s1;
+                }
+            );
         }
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -417,6 +479,5 @@ namespace TaskMaster
         //        }
         //    }
         //}
-
     }
 }

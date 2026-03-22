@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
 using System.Drawing.Design;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Forms;
-using System.Drawing;
-using System.Diagnostics;
 using Svg;
-using System.Runtime.CompilerServices;
-
 
 namespace SVGControl
 {
@@ -18,13 +17,15 @@ namespace SVGControl
     {
         Disabled = 0,
         MaintainAspectRatio = 1,
-        AllowStretching = 2
+        AllowStretching = 2,
     }
 
     [TypeConverter(typeof(SvgOptionsConverter))]
     public class SvgImageSelector : INotifyPropertyChanged
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public SvgImageSelector(Size outer, Padding margin, AutoSize autoSize)
         {
@@ -40,12 +41,12 @@ namespace SVGControl
             _useDefaultImage = useDefaultImage;
             if (useDefaultImage)
             {
-                _renderer = new SvgRenderer(Defaults.GetDefault.SvgImage,
-                                            outer,
-                                            margin,
-                                            autoSize);
+                _renderer = new SvgRenderer(Defaults.GetDefault.SvgImage, outer, margin, autoSize);
             }
-            else { _renderer = new SvgRenderer(outer, margin, autoSize); }
+            else
+            {
+                _renderer = new SvgRenderer(outer, margin, autoSize);
+            }
             _renderer.PropertyChanged += Renderer_PropertyChanged;
             //logger.Debug("SvgImageSelector Initialized");
         }
@@ -78,7 +79,6 @@ namespace SVGControl
                 {
                     return _relativeImagePath;
                 }
-
             }
             set
             {
@@ -108,7 +108,6 @@ namespace SVGControl
         public ISvgResource ResourceName
         {
             get => _svgResource;
-
             set
             {
                 if (_svgResource != value)
@@ -116,8 +115,14 @@ namespace SVGControl
                     if (value is null || value.Name == "")
                     {
                         _svgResource = value;
-                        if (_useDefaultImage) { SetDefaultImage(); }
-                        else { _renderer.Document = null; }
+                        if (_useDefaultImage)
+                        {
+                            SetDefaultImage();
+                        }
+                        else
+                        {
+                            _renderer.Document = null;
+                        }
                     }
                     else
                     {
@@ -142,11 +147,23 @@ namespace SVGControl
         }
 
         [DefaultValue(AutoSize.MaintainAspectRatio)]
-        public AutoSize AutoSize { get => _renderer.AutoSize; set => _renderer.AutoSize = value; }
+        public AutoSize AutoSize
+        {
+            get => _renderer.AutoSize;
+            set => _renderer.AutoSize = value;
+        }
 
-        public Size Size { get => _renderer.Size; set => _renderer.Size = value; }
+        public Size Size
+        {
+            get => _renderer.Size;
+            set => _renderer.Size = value;
+        }
 
-        public Padding Margin { get => _renderer.Margin; set => _renderer.Margin = value; }
+        public Padding Margin
+        {
+            get => _renderer.Margin;
+            set => _renderer.Margin = value;
+        }
 
         public Bitmap Render() => _renderer.Render();
 
@@ -158,26 +175,29 @@ namespace SVGControl
                 _useDefaultImage = value;
                 if ((_relativeImagePath == "") | (_relativeImagePath == "(none)"))
                 {
-                    if (_useDefaultImage) { SetDefaultImage(); }
-                    else { _renderer.Document = null; }
+                    if (_useDefaultImage)
+                    {
+                        SetDefaultImage();
+                    }
+                    else
+                    {
+                        _renderer.Document = null;
+                    }
                 }
-
             }
         }
 
         public bool SaveRendering
         {
-            get
-            {
-                return _saveRendering;
-            }
+            get { return _saveRendering; }
             set
             {
                 if ((value == true) && (_relativeImagePath != "") && (_renderer.Document != null))
                 {
                     // Launch file save dialog with appropriate filters
                     SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-                    saveFileDialog1.Filter = "Png Image|*.png|JPeg Image|*.jpg|Bitmap Image|*.bmp|Gif Image|*.gif";
+                    saveFileDialog1.Filter =
+                        "Png Image|*.png|JPeg Image|*.jpg|Bitmap Image|*.bmp|Gif Image|*.gif";
                     saveFileDialog1.Title = "Save rendered Image File";
                     saveFileDialog1.InitialDirectory = Path.GetFullPath(_relativeImagePath);
                     saveFileDialog1.FileName = Path.GetFileNameWithoutExtension(_relativeImagePath);
@@ -211,20 +231,16 @@ namespace SVGControl
                             }
                         } // end using FileStream fs
                     }
-
                 }
                 else if ((value == true) && (_relativeImagePath == ""))
                 {
                     MessageBox.Show("Image path must have a value to save the rendering");
-
                 }
                 else if (_renderer.Document == null)
                 {
                     // MessageBox.Show("Image path does not refer to a valid SVG document");
-
                 }
                 _saveRendering = false;
-
             }
         }
 
@@ -232,7 +248,11 @@ namespace SVGControl
 
         #region Internal and Private Functions
 
-        internal Size Outer { get => _renderer.Outer; set => _renderer.Outer = value; }
+        internal Size Outer
+        {
+            get => _renderer.Outer;
+            set => _renderer.Outer = value;
+        }
 
         private string GetAnchorPath()
         {
@@ -243,9 +263,10 @@ namespace SVGControl
 
             //var resrcs = assmbly.GetManifestResourceNames();
 
-
             string workingDirectory = Environment.CurrentDirectory;
-            List<string> directories = new List<string>(workingDirectory.Split(Path.DirectorySeparatorChar));
+            List<string> directories = new List<string>(
+                workingDirectory.Split(Path.DirectorySeparatorChar)
+            );
             if ((directories.Count > 2) && (directories[directories.Count - 2] == "bin"))
             {
                 // Backwards traverse 2 levels
@@ -280,11 +301,7 @@ namespace SVGControl
         }
 
         #endregion
-
-
     }
-
-
 }
 
 namespace SVGControl.Defaults
@@ -296,7 +313,7 @@ namespace SVGControl.Defaults
             get
             {
                 string svgXML =
-@"<svg xmlns=""http://www.w3.org/2000/svg"" viewBox=""0 0 16 16"">
+                    @"<svg xmlns=""http://www.w3.org/2000/svg"" viewBox=""0 0 16 16"">
   <defs>
     <style>.canvas{fill: none; opacity: 0;}.light-defaultgrey-10{fill: #212121; opacity: 0.1;}.light-defaultgrey{fill: #212121; opacity: 1;}.light-yellow{fill: #996f00; opacity: 1;}.light-blue{fill: #005dba; opacity: 1;}</style>
   </defs>
@@ -314,6 +331,5 @@ namespace SVGControl.Defaults
                 return Encoding.ASCII.GetBytes(svgXML);
             }
         }
-
     }
 }

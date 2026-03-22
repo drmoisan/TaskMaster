@@ -20,12 +20,22 @@ namespace UtilitiesCS
             _globals = globals;
         }
 
-        public override IApplicationGlobals ReadJson(JsonReader reader, Type objectType, IApplicationGlobals existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override IApplicationGlobals ReadJson(
+            JsonReader reader,
+            Type objectType,
+            IApplicationGlobals existingValue,
+            bool hasExistingValue,
+            JsonSerializer serializer
+        )
         {
             return _globals;
         }
 
-        public override void WriteJson(JsonWriter writer, IApplicationGlobals value, JsonSerializer serializer)
+        public override void WriteJson(
+            JsonWriter writer,
+            IApplicationGlobals value,
+            JsonSerializer serializer
+        )
         {
             object message = "default";
             serializer.Serialize(writer, message);

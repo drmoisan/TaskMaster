@@ -1,10 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
 using ToDoModel;
 using UtilitiesCS;
-using Microsoft.Office.Interop.Outlook;
-using System.Collections.Generic;
 
 namespace Z.Unfinished.ToDoModel.Test
 {
@@ -29,8 +29,7 @@ namespace Z.Unfinished.ToDoModel.Test
 
         private FolderPredictor CreateFolderHandler()
         {
-            return new FolderPredictor(
-                this.mockApplicationGlobals.Object);
+            return new FolderPredictor(this.mockApplicationGlobals.Object);
         }
 
         [TestMethod]

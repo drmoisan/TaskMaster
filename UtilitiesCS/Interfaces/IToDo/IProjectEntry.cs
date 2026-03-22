@@ -1,9 +1,11 @@
-﻿
-using System;
+﻿using System;
 
 namespace UtilitiesCS
 {
-    public interface IProjectEntry : IComparable<IProjectEntry>, IEquatable<IProjectEntry>, IComparable
+    public interface IProjectEntry
+        : IComparable<IProjectEntry>,
+            IEquatable<IProjectEntry>,
+            IComparable
     {
         string ProgramName { get; set; }
         string ProjectID { get; }

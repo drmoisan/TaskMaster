@@ -17,10 +17,17 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             IEnumerable<string> matchTokens,
             int emailCount,
             bool addToSharedTokens,
-            CancellationToken token)
+            CancellationToken token
+        )
         {
-            return await BayesianClassifierShared.FromTokenBaseAsync(parent, tag,
-                matchTokens.GroupAndCount(), emailCount, addToSharedTokens, token);
+            return await BayesianClassifierShared.FromTokenBaseAsync(
+                parent,
+                tag,
+                matchTokens.GroupAndCount(),
+                emailCount,
+                addToSharedTokens,
+                token
+            );
         }
 
         public static async Task<BayesianClassifierShared> ToClassifierAsync(
@@ -29,29 +36,36 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             IDictionary<string, int> matchFrequency,
             int emailCount,
             bool addToSharedTokens,
-            CancellationToken token)
+            CancellationToken token
+        )
         {
-            return await BayesianClassifierShared.FromTokenBaseAsync(parent, tag,
-                matchFrequency, emailCount, addToSharedTokens, token);
+            return await BayesianClassifierShared.FromTokenBaseAsync(
+                parent,
+                tag,
+                matchFrequency,
+                emailCount,
+                addToSharedTokens,
+                token
+            );
         }
 
         public static Dictionary<string, int> GroupAndCount(this IEnumerable<string> items)
         {
-            return items.GroupBy(item => item)
-            .ToDictionary(group => group.Key, group => group.Count());
+            return items
+                .GroupBy(item => item)
+                .ToDictionary(group => group.Key, group => group.Count());
         }
 
         public static async Task<Dictionary<string, int>> GroupAndCountAsync(
-            this IEnumerable<string> items)
+            this IEnumerable<string> items
+        )
         {
-            return await Task.Run(() => items.GroupBy(item => item)
-                                             .ToDictionary(
-                                                 group => group.Key,
-                                                 group => group.Count()));
+            return await Task.Run(() =>
+                items.GroupBy(item => item).ToDictionary(group => group.Key, group => group.Count())
+            );
         }
 
         #endregion BayesianClassifierShared
-
     }
 
     [Obsolete("This class is not used in the current implementation of the Bayesian Classifier.")]
@@ -61,7 +75,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public static BayesianClassifier ToClassifier(
             this ClassifierGroup parent,
             string tag,
-            IEnumerable<string> positiveTokens)
+            IEnumerable<string> positiveTokens
+        )
         {
             return BayesianClassifier.FromTokenBase(parent, tag, positiveTokens);
         }
@@ -70,7 +85,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             this ClassifierGroup parent,
             string tag,
             IEnumerable<string> matchTokens,
-            CancellationToken token)
+            CancellationToken token
+        )
         {
             return await BayesianClassifier.FromTokenBaseAsync(parent, tag, matchTokens, token);
         }

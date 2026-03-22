@@ -41,6 +41,22 @@ All filenames must include a timestamp in ISO-8601 format `yyyy-MM-ddTHH-mm` (e.
    - Must clearly state overall feature readiness (PASS / NEEDS REVISION / BLOCKED).
    - If required coverage metrics are missing, overall readiness MUST be `NEEDS REVISION` (not PASS).
 
+### Minor-audit integrity gate (mandatory when `issue.md` declares `- Work Mode: minor-audit`)
+
+For short-path/minor-audit reviews, the reviewer MUST verify all of the following before issuing any PASS-style outcome:
+
+- `${feature-folder}/issue.md` exists and is the sole requirements source used for acceptance validation.
+- `${feature-folder}/spec.md` does not exist.
+- `${feature-folder}/user-story.md` does not exist.
+- `phase0-instructions-read.md` exists in the canonical baseline location with the required metadata fields.
+- every baseline command-step artifact required by the approved plan exists and includes `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+- plan checklist state matches artifact evidence on disk; do not accept blanket or inferred checkoffs.
+
+If any minor-audit integrity condition fails:
+- `policy-audit` MUST NOT report PASS,
+- `feature-audit` overall readiness MUST be `NEEDS REVISION` or `BLOCKED`,
+- remediation inputs MUST explicitly call out the missing/contradictory evidence.
+
 ### Conditional deliverables (only if remediation is required)
 
 4. `remediation-inputs.<timestamp>.md`

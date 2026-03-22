@@ -1,0 +1,109 @@
+name: Codex Web Setup Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-codex-web-setup:
+    name: Validate codex-web-setup.sh
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Verify shell syntax
+        shell: bash
+        run: bash -n .codex/codex-web-setup.sh
+
+      - name: Install ShellCheck
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck
+        shell: bash
+        run: shellcheck .codex/codex-web-setup.sh
+
+      - name: Prepare lightweight test harness
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          script_bin="${GITHUB_WORKSPACE}/.github/test-bin"
+          mkdir -p "${script_bin}"
+
+          cat > "${script_bin}/sudo" <<'EOF'
+          #!/usr/bin/env bash
+          exec "$@"
+          EOF
+          chmod +x "${script_bin}/sudo"
+
+          cat > "${script_bin}/apt-get" <<'EOF'
+          #!/usr/bin/env bash
+          exit 0
+          EOF
+          chmod +x "${script_bin}/apt-get"
+
+          cat > "${script_bin}/nuget" <<'EOF'
+          #!/usr/bin/env bash
+          exit 0
+          EOF
+          chmod +x "${script_bin}/nuget"
+
+          sdk_version="$(
+            grep -oE '"version"[[:space:]]*:[[:space:]]*"[^"]+"' "${GITHUB_WORKSPACE}/global.json" |
+              head -n 1 |
+              sed -E 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/'
+          )"
+
+          mkdir -p "${GITHUB_WORKSPACE}/.dotnet-sdk/sdk/${sdk_version}"
+          cat > "${GITHUB_WORKSPACE}/.dotnet-sdk/dotnet" <<'EOF'
+          #!/usr/bin/env bash
+          exit 0
+          EOF
+          chmod +x "${GITHUB_WORKSPACE}/.dotnet-sdk/dotnet"
+
+          mkdir -p "${HOME}/.dotnet/tools"
+          cat > "${HOME}/.dotnet/tools/dotnet-coverage" <<'EOF'
+          #!/usr/bin/env bash
+          exit 0
+          EOF
+          chmod +x "${HOME}/.dotnet/tools/dotnet-coverage"
+
+      - name: Execute script and assert expected Linux failure
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          export PATH="${GITHUB_WORKSPACE}/.github/test-bin:${PATH}"
+
+          set +e
+          bash .codex/codex-web-setup.sh > codex-web-setup.log 2>&1
+          exit_code=$?
+          set -e
+
+          cat codex-web-setup.log
+
+          if [ "${exit_code}" -eq 0 ]; then
+            echo "Expected .codex/codex-web-setup.sh to fail on Linux verification, but it succeeded."
+            exit 1
+          fi
+
+          grep -F "Windows-only Visual Studio task requirements" codex-web-setup.log
+
+      - name: Upload script log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-web-setup-log
+          path: codex-web-setup.log
+          if-no-files-found: error

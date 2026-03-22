@@ -20,7 +20,6 @@ namespace Expat.Bayesian
 
     //    private SortedDictionary<string, int> _tokens = new SortedDictionary<string, int>();
 
-
     //    /// <summary>
     //    /// A sorted list of all the words that show up in the text, along with counts of how many times they appear.
     //    /// </summary>
@@ -101,7 +100,5 @@ namespace Expat.Bayesian
     //        }
     //    }
 
-
     //}
-
 }

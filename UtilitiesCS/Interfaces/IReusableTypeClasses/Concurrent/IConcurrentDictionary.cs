@@ -7,7 +7,11 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.Interfaces.ReusableTypeClasses
 {
-    public interface IConcurrentDictionary<TKey, TValue> : IDictionary<TKey, TValue>, ICollection<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>>, IEnumerable
+    public interface IConcurrentDictionary<TKey, TValue>
+        : IDictionary<TKey, TValue>,
+            ICollection<KeyValuePair<TKey, TValue>>,
+            IEnumerable<KeyValuePair<TKey, TValue>>,
+            IEnumerable
     {
         new TValue this[TKey key] { get; set; }
         new int Count { get; }
@@ -23,9 +27,26 @@ namespace UtilitiesCS.Interfaces.ReusableTypeClasses
         KeyValuePair<TKey, TValue>[] ToArray();
         TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory);
         TValue GetOrAdd(TKey key, TValue value);
-        TValue GetOrAdd<TArg>(TKey key, Func<TKey, TArg, TValue> valueFactory, TArg factoryArgument);
-        TValue AddOrUpdate<TArg>(TKey key, Func<TKey, TArg, TValue> addValueFactory, Func<TKey, TValue, TArg, TValue> updateValueFactory, TArg factoryArgument);
-        TValue AddOrUpdate(TKey key, Func<TKey, TValue> addValueFactory, Func<TKey, TValue, TValue> updateValueFactory);
-        TValue AddOrUpdate(TKey key, TValue addValue, Func<TKey, TValue, TValue> updateValueFactory);
+        TValue GetOrAdd<TArg>(
+            TKey key,
+            Func<TKey, TArg, TValue> valueFactory,
+            TArg factoryArgument
+        );
+        TValue AddOrUpdate<TArg>(
+            TKey key,
+            Func<TKey, TArg, TValue> addValueFactory,
+            Func<TKey, TValue, TArg, TValue> updateValueFactory,
+            TArg factoryArgument
+        );
+        TValue AddOrUpdate(
+            TKey key,
+            Func<TKey, TValue> addValueFactory,
+            Func<TKey, TValue, TValue> updateValueFactory
+        );
+        TValue AddOrUpdate(
+            TKey key,
+            TValue addValue,
+            Func<TKey, TValue, TValue> updateValueFactory
+        );
     }
 }

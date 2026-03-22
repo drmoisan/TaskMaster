@@ -5,7 +5,7 @@
         public enum QueueOptions
         {
             Immediate,
-            Timed
+            Timed,
         }
 
         QueueOptions Options { get; set; }

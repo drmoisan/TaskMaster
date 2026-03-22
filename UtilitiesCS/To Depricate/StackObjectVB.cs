@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
+
 //using Microsoft.VisualBasic;
 
 namespace UtilitiesCS
 {
-
     //public class StackObjectVB
     //{
     //    private Collection _colObj = new Collection();
@@ -54,8 +54,6 @@ namespace UtilitiesCS
     //            listObj.Add(objItem);
     //        return listObj;
     //    }
-
-
 
     //}
 }

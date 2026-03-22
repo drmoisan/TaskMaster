@@ -19,7 +19,11 @@ namespace UtilitiesCS
             public DLLNode prev;
             public int data;
             public DLLNode next;
-            public DLLNode(int d) { data = d; }
+
+            public DLLNode(int d)
+            {
+                data = d;
+            }
         }
 
         /* Representation of the stack
@@ -48,7 +52,6 @@ namespace UtilitiesCS
         /* Function to push an element to the stack */
         void push(myStack ms, int new_data)
         {
-
             /* allocate DLLNode and put in data */
             DLLNode new_DLLNode = new DLLNode(new_data);
 
@@ -144,7 +147,6 @@ namespace UtilitiesCS
             {
                 ms.mid = ms.mid.prev;
             }
-
         }
 
         // Driver code
@@ -164,11 +166,9 @@ namespace UtilitiesCS
 
             Console.WriteLine("Popped : " + ob.pop(ms));
             Console.WriteLine("Popped : " + ob.pop(ms));
-            Console.WriteLine("Middle Element : "
-                            + ob.findMiddle(ms));
+            Console.WriteLine("Middle Element : " + ob.findMiddle(ms));
             ob.deleteMiddle(ms);
-            Console.WriteLine("New Middle Element : "
-                                + ob.findMiddle(ms));
+            Console.WriteLine("New Middle Element : " + ob.findMiddle(ms));
         }
     }
 
@@ -176,5 +176,4 @@ namespace UtilitiesCS
     // by Arnab Kundu
 
     // Updated by Amsavarthan Lv
-
 }

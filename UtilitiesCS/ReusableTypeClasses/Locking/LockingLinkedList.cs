@@ -12,12 +12,42 @@ namespace UtilitiesCS.ReusableTypeClasses
     // GetEnumerator(), GetObjectData(), and OnDeserialization().
     public class LockingLinkedList<T> : LinkedList<T>
     {
-        public LockingLinkedList() : base() { }
-        public LockingLinkedList(IEnumerable<T> collection) : base(collection) { }
+        public LockingLinkedList()
+            : base() { }
 
-        public new LockingLinkedListNode<T> First { get { lock (this) { return ToLocking(base.First); } } }
-        public new LockingLinkedListNode<T> Last { get { lock (this) { return ToLocking(base.Last); } } }
-        public new int Count { get { lock (this) { return base.Count; } } }
+        public LockingLinkedList(IEnumerable<T> collection)
+            : base(collection) { }
+
+        public new LockingLinkedListNode<T> First
+        {
+            get
+            {
+                lock (this)
+                {
+                    return ToLocking(base.First);
+                }
+            }
+        }
+        public new LockingLinkedListNode<T> Last
+        {
+            get
+            {
+                lock (this)
+                {
+                    return ToLocking(base.Last);
+                }
+            }
+        }
+        public new int Count
+        {
+            get
+            {
+                lock (this)
+                {
+                    return base.Count;
+                }
+            }
+        }
 
         public new void AddFirst(T item)
         {
@@ -49,7 +79,6 @@ namespace UtilitiesCS.ReusableTypeClasses
                 lockedAction(item);
             }
         }
-
 
         public new void AddBefore(LinkedListNode<T> node, T item)
         {
@@ -151,7 +180,10 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-        internal void MoveAfter(LockingLinkedListNode<T> itemToMove, LockingLinkedListNode<T> target)
+        internal void MoveAfter(
+            LockingLinkedListNode<T> itemToMove,
+            LockingLinkedListNode<T> target
+        )
         {
             itemToMove.ThrowIfNull();
             target.ThrowIfNull();
@@ -171,7 +203,10 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-        internal void MoveBefore(LockingLinkedListNode<T> itemToMove, LockingLinkedListNode<T> target)
+        internal void MoveBefore(
+            LockingLinkedListNode<T> itemToMove,
+            LockingLinkedListNode<T> target
+        )
         {
             itemToMove.ThrowIfNull();
             target.ThrowIfNull();
@@ -240,7 +275,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         }
 
         /// <summary>
-        /// Removes an item from the <see cref="LockingLinkedList{T}"/>. 
+        /// Removes an item from the <see cref="LockingLinkedList{T}"/>.
         /// Action is performed on the item before it is removed and it intended
         /// to allow an unwiring of events in a locked state.
         /// </summary>
@@ -317,7 +352,10 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             lock (this)
             {
-                if (base.Count == 0) { return default; }
+                if (base.Count == 0)
+                {
+                    return default;
+                }
                 else
                 {
                     try
@@ -340,7 +378,10 @@ namespace UtilitiesCS.ReusableTypeClasses
             {
                 if (n > base.Count || n < 1)
                 {
-                    throw new ArgumentOutOfRangeException("n", $"n must be between 1 and Count {base.Count}");
+                    throw new ArgumentOutOfRangeException(
+                        "n",
+                        $"n must be between 1 and Count {base.Count}"
+                    );
                 }
                 var nodes = new T[n];
                 for (int i = 0; i < n; i++)
@@ -356,9 +397,15 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             lock (this)
             {
-                if (n < 1) { return null; }
+                if (n < 1)
+                {
+                    return null;
+                }
                 // Take the lesser of n and the number of elements in the list
-                if (n > base.Count) { n = base.Count; }
+                if (n > base.Count)
+                {
+                    n = base.Count;
+                }
 
                 var nodes = new T[n];
                 var nAdj = Math.Min(n, base.Count);
@@ -399,7 +446,10 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         private LockingLinkedListNode<T> ToLocking(LinkedListNode<T> node)
         {
-            if (node is null) { return null; }
+            if (node is null)
+            {
+                return null;
+            }
             return new LockingLinkedListNode<T>(this, node);
         }
     }

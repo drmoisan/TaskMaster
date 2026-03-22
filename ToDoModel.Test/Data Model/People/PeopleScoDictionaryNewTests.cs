@@ -1,17 +1,17 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Outlook = Microsoft.Office.Interop.Outlook;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Newtonsoft.Json;
 using ToDoModel.Data_Model.People;
 using ToDoModel.Test.Properties;
 using UtilitiesCS;
 using UtilitiesCS.NewtonsoftHelpers.Sco;
 using UtilitiesCS.ReusableTypeClasses;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace ToDoModel.Tests.Data_Model.People
 {
@@ -36,7 +36,7 @@ namespace ToDoModel.Tests.Data_Model.People
                 { "MyDocuments", "C:\\Users\\user\\Documents" },
                 { "PreReads", "C:\\Users\\user\\Documents\\PreReads" },
                 { "OneDrive", "C:\\Users\\user\\OneDrive" },
-                { "PythonStaging", "C:\\Users\\user\\Documents\\PythonStaging" }
+                { "PythonStaging", "C:\\Users\\user\\Documents\\PythonStaging" },
             }.ToConcurrentDictionary();
             fs.Setup(f => f.SpecialFolders).Returns(specialFolders);
             _mockGlobals.Setup(g => g.FS).Returns(fs.Object);
@@ -56,7 +56,7 @@ namespace ToDoModel.Tests.Data_Model.People
                 //TypeNameHandling = TypeNameHandling.Auto,
                 Formatting = Formatting.Indented,
                 PreserveReferencesHandling = PreserveReferencesHandling.All,
-                TraceWriter = new NLogTraceWriter()
+                TraceWriter = new NLogTraceWriter(),
             };
             settings.Converters.Add(new AppGlobalsConverter(globals));
             settings.Converters.Add(new FilePathHelperConverter(globals.FS));
@@ -91,7 +91,6 @@ namespace ToDoModel.Tests.Data_Model.People
         //    // Assert
         //    Assert.IsFalse(result);
         //}
-
 
         //[TestMethod]
         //public void GetPeopleCatNames_ReturnsCategoryNames()
@@ -230,7 +229,6 @@ namespace ToDoModel.Tests.Data_Model.People
         //    Assert.AreEqual("John Doe", result);
         //}
 
-
         [TestMethod]
         [TestCategory("ProductionBugSuspected")]
         [Ignore("ProductionBugSuspected")]
@@ -239,10 +237,11 @@ namespace ToDoModel.Tests.Data_Model.People
             // Arrange
             string json = Encoding.UTF8.GetString(Resources.pplkey);
             var settings = GetSettings(_mockGlobals.Object);
-            settings.Converters.Add(new ScoDictionaryConverter<PeopleScoDictionaryNew, string, string>());
+            settings.Converters.Add(
+                new ScoDictionaryConverter<PeopleScoDictionaryNew, string, string>()
+            );
             settings.TypeNameHandling = TypeNameHandling.None;
             var loader = new SmartSerializableNonTyped();
-
 
             //var loader = new SmartSerializableLoader(_mockGlobals.Object);
             //loader.Config.JsonSettings.Converters.Add(new ScoDictionaryConverter<PeopleScoDictionaryNew, string, string>());
@@ -256,7 +255,7 @@ namespace ToDoModel.Tests.Data_Model.People
             Assert.IsNotNull(people, $"{nameof(people)} is null");
             //Assert.AreEqual(people.Globals, _mockGlobals.Object, $"{nameof(people)}.{nameof(people.Globals)} does not equal mock");
             Assert.IsNotNull(people.Config, $"{nameof(people)}.{nameof(people.Config)} is null");
-            Assert.AreEqual(people.Config.Disk.FileName, "pplkey.json");
+            Assert.AreEqual("pplkey.json", people.Config.Disk.FileName);
         }
 
         [TestMethod]
@@ -275,14 +274,15 @@ namespace ToDoModel.Tests.Data_Model.People
 
             // Act
             //var obj = loader.DeserializeObject<PeopleScoDictionaryNew>(json, loader.Config.JsonSettings);
-            var people = loader.DeserializeObject<PeopleScoDictionaryNew>(json, settings) as PeopleScoDictionaryNew;
+            var people =
+                loader.DeserializeObject<PeopleScoDictionaryNew>(json, settings)
+                as PeopleScoDictionaryNew;
 
             // Assert
             Assert.IsNotNull(people);
             //Assert.AreEqual(people.Globals, _mockGlobals.Object);
             Assert.IsNotNull(people.Config);
-            Assert.AreEqual(people.Config.Disk.FileName, "pplkey.json");
-
+            Assert.AreEqual("pplkey.json", people.Config.Disk.FileName);
         }
     }
 }

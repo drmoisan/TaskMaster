@@ -13,7 +13,9 @@ namespace QuickFiler.Controllers
 {
     public class FilerQueue
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         internal BlockingCollection<FilerQueueItem> Queue { get; private set; } = [];
 
@@ -47,19 +49,20 @@ namespace QuickFiler.Controllers
                 {
                     try
                     {
-                        await item.Filer.SortAsync(item.Helpers);
+                        _ = await item.Filer.SortAsync(item.Helpers);
                     }
                     catch (Exception e)
                     {
                         var first = item.Helpers.First();
-                        logger.Error($"Error sorting mail items Subject: {first.Subject} Sent On: {first.SentOn} from {first.SenderName} {e.Message}", e);
+                        logger.Error(
+                            $"Error sorting mail items Subject: {first.Subject} Sent On: {first.SentOn} from {first.SenderName} {e.Message}",
+                            e
+                        );
                     }
-
                 }
                 guard = new ThreadSafeSingleShotGuard();
             });
         }
-
     }
 
     public class FilerQueueItem
@@ -73,6 +76,7 @@ namespace QuickFiler.Controllers
                 throw new ArgumentNullException("Helpers cannot contain null values");
             }
         }
+
         public EmailFiler Filer { get; private set; }
         public IList<MailItemHelper> Helpers { get; private set; }
     }

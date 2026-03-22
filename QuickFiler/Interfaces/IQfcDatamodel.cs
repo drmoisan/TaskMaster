@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
-using System.Threading.Tasks;
-using System.Threading;
-
 
 namespace QuickFiler.Interfaces
 {
@@ -18,7 +17,7 @@ namespace QuickFiler.Interfaces
         TriageImportantLast = 4,
         DateRecentFirst = 8,
         DateOldestFirst = 16,
-        ConversationUniqueOnly = 32
+        ConversationUniqueOnly = 32,
     }
 
     public interface IQfcDatamodel
@@ -28,7 +27,12 @@ namespace QuickFiler.Interfaces
         void UndoMove();
         ScoStack<IMovedMailInfo> MovedItems { get; }
         IList<MailItem> InitEmailQueue(int batchSize, BackgroundWorker worker);
-        Task<IList<MailItem>> InitEmailQueueAsync(int batchSize, BackgroundWorker worker, CancellationToken token, CancellationTokenSource tokenSource);
+        Task<IList<MailItem>> InitEmailQueueAsync(
+            int batchSize,
+            BackgroundWorker worker,
+            CancellationToken token,
+            CancellationTokenSource tokenSource
+        );
         bool Complete { get; set; }
         void Cleanup();
     }

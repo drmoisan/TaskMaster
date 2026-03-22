@@ -1,12 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
-using UtilitiesCS.OneDriveHelpers;
-using FluentAssertions;
-using System.Linq;
-using UtilitiesCS.Extensions.Lazy;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using UtilitiesCS.Extensions.Lazy;
+using UtilitiesCS.OneDriveHelpers;
 
 namespace UtilitiesCS.Test.OneDriveHelpers
 {
@@ -24,7 +24,9 @@ namespace UtilitiesCS.Test.OneDriveHelpers
 
         public class AngleSharpParsedEmailBodyDerived : AngleSharpParsedEmailBody
         {
-            public AngleSharpParsedEmailBodyDerived() : base("") { }
+            public AngleSharpParsedEmailBodyDerived()
+                : base("") { }
+
             public void SetLinks(IEnumerable<(string, string)> links) => Links = links;
         }
 
@@ -36,9 +38,15 @@ namespace UtilitiesCS.Test.OneDriveHelpers
             var body = new AngleSharpParsedEmailBody(htmlBody).ExtractLinks();
             var expected = new (string, string)[]
             {
-                (" 10z Week 38 Rollback CID.xlsx","https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EVpXvJ8dfZ9DmaoSjGJ16uIBuc7kN7LG9esDj9pciuoriA"),
-                (" Snackers Week 37 Rollback CID.xlsx","https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EZckiLtanGtMjumaLHLwsCsBwQsHSfAuMpzsMyfcIPUTdg?email=dmoisan%40sabra.com&e=YRrQJk"),
-                ("trindels@sabra.com","mailto:chollingsworth@sabra.com")
+                (
+                    " 10z Week 38 Rollback CID.xlsx",
+                    "https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EVpXvJ8dfZ9DmaoSjGJ16uIBuc7kN7LG9esDj9pciuoriA"
+                ),
+                (
+                    " Snackers Week 37 Rollback CID.xlsx",
+                    "https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EZckiLtanGtMjumaLHLwsCsBwQsHSfAuMpzsMyfcIPUTdg?email=dmoisan%40sabra.com&e=YRrQJk"
+                ),
+                ("trindels@sabra.com", "mailto:chollingsworth@sabra.com"),
             };
 
             // Act
@@ -59,14 +67,26 @@ namespace UtilitiesCS.Test.OneDriveHelpers
             // Arrange
             var source = new (string, string)[]
             {
-                (" 10z Week 38 Rollback CID.xlsx","https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EVpXvJ8dfZ9DmaoSjGJ16uIBuc7kN7LG9esDj9pciuoriA"),
-                (" Snackers Week 37 Rollback CID.xlsx","https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EZckiLtanGtMjumaLHLwsCsBwQsHSfAuMpzsMyfcIPUTdg?email=dmoisan%40sabra.com&e=YRrQJk"),
-                ("trindels@sabra.com","mailto:chollingsworth@sabra.com")
+                (
+                    " 10z Week 38 Rollback CID.xlsx",
+                    "https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EVpXvJ8dfZ9DmaoSjGJ16uIBuc7kN7LG9esDj9pciuoriA"
+                ),
+                (
+                    " Snackers Week 37 Rollback CID.xlsx",
+                    "https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EZckiLtanGtMjumaLHLwsCsBwQsHSfAuMpzsMyfcIPUTdg?email=dmoisan%40sabra.com&e=YRrQJk"
+                ),
+                ("trindels@sabra.com", "mailto:chollingsworth@sabra.com"),
             };
             var expected = new (string, string)[]
             {
-                (" 10z Week 38 Rollback CID.xlsx","https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EVpXvJ8dfZ9DmaoSjGJ16uIBuc7kN7LG9esDj9pciuoriA"),
-                (" Snackers Week 37 Rollback CID.xlsx","https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EZckiLtanGtMjumaLHLwsCsBwQsHSfAuMpzsMyfcIPUTdg?email=dmoisan%40sabra.com&e=YRrQJk")
+                (
+                    " 10z Week 38 Rollback CID.xlsx",
+                    "https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EVpXvJ8dfZ9DmaoSjGJ16uIBuc7kN7LG9esDj9pciuoriA"
+                ),
+                (
+                    " Snackers Week 37 Rollback CID.xlsx",
+                    "https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EZckiLtanGtMjumaLHLwsCsBwQsHSfAuMpzsMyfcIPUTdg?email=dmoisan%40sabra.com&e=YRrQJk"
+                ),
             };
 
             string domain = "sabradipping.sharepoint.com";
@@ -85,7 +105,5 @@ namespace UtilitiesCS.Test.OneDriveHelpers
             actual.Should().BeEquivalentTo(expected);
             //this.mockRepository.VerifyAll();
         }
-
-
     }
 }

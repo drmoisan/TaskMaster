@@ -8,6 +8,7 @@ namespace QuickFiler.Test
         {
             InitializeComponent();
         }
+
         private void Button1_Click(object sender, EventArgs e)
         {
             Dispose();
@@ -23,11 +24,13 @@ namespace QuickFiler.Test
             var _controlGroup = new ItemViewer();
             TableLayoutPanel1.SuspendLayout();
             TableLayoutPanel1.RowCount += 1;
-            TableLayoutPanel1.RowStyles.Insert(TableLayoutPanel1.RowCount - 2, new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110.0f));
+            TableLayoutPanel1.RowStyles.Insert(
+                TableLayoutPanel1.RowCount - 2,
+                new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110.0f)
+            );
             TableLayoutPanel1.Controls.Add(_controlGroup, 0, TableLayoutPanel1.RowCount - 2);
             SetControlGroupOptions(_controlGroup);
             TableLayoutPanel1.ResumeLayout(true);
-
         }
 
         private void SetControlGroupOptions(ItemViewer group)

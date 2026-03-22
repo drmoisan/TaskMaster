@@ -1,24 +1,23 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
 // Last Revised: September 2012
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Collections.ObjectModel;
-using System.Collections;
 
 namespace Swordfish.NET.Collections
 {
     public class MostRecentlyUsedDictionary<TKey, TValue>
     {
-
         // ************************************************************************
         // Nested Classes
         // ************************************************************************
@@ -26,11 +25,12 @@ namespace Swordfish.NET.Collections
 
         protected class DictionaryNode : DoubleLinkListDictionaryNode<TKey, TValue>
         {
-
-            public DictionaryNode(TKey key, TValue value, DoubleLinkListDictionaryNode<TKey, TValue> next)
-              : base(key, value, next)
-            {
-            }
+            public DictionaryNode(
+                TKey key,
+                TValue value,
+                DoubleLinkListDictionaryNode<TKey, TValue> next
+            )
+                : base(key, value, next) { }
         }
 
         #endregion Nested Classes
@@ -45,10 +45,12 @@ namespace Swordfish.NET.Collections
         /// index for the master list, key list, and value list.
         /// </summary>
         protected Dictionary<TKey, DictionaryNode> _keyToIndex;
+
         /// <summary>
         /// The last node of the link list, used for removing old nodes from the end
         /// </summary>
         protected DoubleLinkListDictionaryNode<TKey, TValue> _lastNode = null;
+
         /// <summary>
         /// The first node, for adding new nodes to the beginning
         /// </summary>
@@ -78,9 +80,8 @@ namespace Swordfish.NET.Collections
         /// </summary>
         /// <param name="source"></param>
         public MostRecentlyUsedDictionary(IDictionary<TKey, TValue> source)
-          : this()
+            : this()
         {
-
             foreach (KeyValuePair<TKey, TValue> pair in source)
             {
                 Add(pair.Key, pair.Value);
@@ -93,9 +94,8 @@ namespace Swordfish.NET.Collections
         /// </summary>
         /// <param name="equalityComparer"></param>
         public MostRecentlyUsedDictionary(IEqualityComparer<TKey> equalityComparer)
-          : this()
+            : this()
         {
-
             _keyToIndex = new Dictionary<TKey, DictionaryNode>(equalityComparer);
         }
 
@@ -106,9 +106,8 @@ namespace Swordfish.NET.Collections
         /// </summary>
         /// <param name="capactity"></param>
         public MostRecentlyUsedDictionary(int capactity)
-          : this()
+            : this()
         {
-
             _keyToIndex = new Dictionary<TKey, DictionaryNode>(capactity);
         }
 
@@ -119,10 +118,12 @@ namespace Swordfish.NET.Collections
         /// </summary>
         /// <param name="source"></param>
         /// <param name="equalityComparer"></param>
-        public MostRecentlyUsedDictionary(IDictionary<TKey, TValue> source, IEqualityComparer<TKey> equalityComparer)
-          : this(equalityComparer)
+        public MostRecentlyUsedDictionary(
+            IDictionary<TKey, TValue> source,
+            IEqualityComparer<TKey> equalityComparer
+        )
+            : this(equalityComparer)
         {
-
             foreach (KeyValuePair<TKey, TValue> pair in source)
             {
                 Add(pair.Key, pair.Value);
@@ -137,9 +138,8 @@ namespace Swordfish.NET.Collections
         /// <param name="capacity"></param>
         /// <param name="equalityComparer"></param>
         public MostRecentlyUsedDictionary(int capacity, IEqualityComparer<TKey> equalityComparer)
-          : this()
+            : this()
         {
-
             _keyToIndex = new Dictionary<TKey, DictionaryNode>(capacity, equalityComparer);
         }
 
@@ -318,6 +318,7 @@ namespace Swordfish.NET.Collections
                 RemoveNode(_lastNode);
             }
         }
+
         /// <summary>
         /// Removes all items from the ICollection<T>.
         /// </summary>
@@ -332,10 +333,7 @@ namespace Swordfish.NET.Collections
         /// </summary>
         public int Count
         {
-            get
-            {
-                return _keyToIndex.Count;
-            }
+            get { return _keyToIndex.Count; }
         }
     }
 }

@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 
-
 namespace Expat.Bayesian
 {
     ///// <summary>
@@ -171,13 +170,13 @@ namespace Expat.Bayesian
     //        /*
     //* This is a direct implementation of Paul Graham's algorithm from
     //* http://www.paulgraham.com/spam.html
-    //* 
+    //*
     //*	(let ((g (* 2 (or (gethash word good) 0)))
     //*		  (b (or (gethash word bad) 0)))
     //*	   (unless (< (+ g b) 5)
     //*		 (max .01
     //*			  (min .99 (float (/ (min 1 (/ b nbad))
-    //*								 (+ (min 1 (/ g ngood))   
+    //*								 (+ (min 1 (/ g ngood))
     //*									(min 1 (/ b nbad)))))))))
     //*/
 
@@ -290,7 +289,7 @@ namespace Expat.Bayesian
     //            string token = m.Groups[1].Value;
     //            if (_prob.ContainsKey(token))
     //            {
-    //                // "interestingness" == how far our score is from 50%.  
+    //                // "interestingness" == how far our score is from 50%.
     //                // The crazy math below is building a string that lets us sort alphabetically by interestingness.
     //                double prob = _prob[token];
     //                string key = (0.5 - Math.Abs(0.5 - prob)).ToString(".00000") + token + index++;
@@ -301,11 +300,11 @@ namespace Expat.Bayesian
     //            m = m.NextMatch();
     //        }
 
-    //        /* Combine the 15 most interesting probabilities together into one.  
+    //        /* Combine the 15 most interesting probabilities together into one.
     //* The algorithm to do this is shown below and described here:
     //* http://www.paulgraham.com/naivebayes.html
-    //* 
-    //*				abc           
+    //*
+    //*				abc
     //*	---------------------------
     //*	abc + (1 - a)(1 - b)(1 - c)
     //*

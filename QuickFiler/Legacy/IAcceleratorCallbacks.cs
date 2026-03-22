@@ -1,8 +1,9 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Microsoft.Office.Interop.Outlook;
 
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+
 namespace QuickFiler.Legacy
 {
     internal interface IAcceleratorCallbacks

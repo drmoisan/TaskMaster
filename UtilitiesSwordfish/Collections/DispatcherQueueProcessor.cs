@@ -1,7 +1,7 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
@@ -18,7 +18,6 @@ using System.Windows.Threading;
 
 namespace Swordfish.NET.Collections
 {
-
     /// <summary>
     /// Executes a stream on actions on the dispatcher thread
     /// </summary>
@@ -32,27 +31,33 @@ namespace Swordfish.NET.Collections
         /// <summary>
         /// This class is a singleton class. Below is the instance.
         /// </summary>
-        private static readonly Lazy<DispatcherQueueProcessor> _instance = new Lazy<DispatcherQueueProcessor>(() => new DispatcherQueueProcessor(), true);
+        private static readonly Lazy<DispatcherQueueProcessor> _instance =
+            new Lazy<DispatcherQueueProcessor>(() => new DispatcherQueueProcessor(), true);
+
         /// <summary>
         /// A queue of actions to be called on the dispatcher thread
         /// </summary>
         private BlockingCollection<Action> _actionQueue;
+
         /// <summary>
         /// A list of pending subscribers, processed once the Dispather is created.
         /// Using a ConcurrentDictionary because this is the only framework collection
         /// that has a remove method.
         /// </summary>
         private ConcurrentDictionary<WeakReference, object> _subscriberQueue;
+
         /// <summary>
         /// The Application Dispatcher
         /// </summary>
         private Dispatcher _dispatcher = null;
+
         /// <summary>
         /// The current action that is awaiting processing on the Dispatcher thread
         /// </summary>
         private Action _actionWaiting = null;
+
         /// <summary>
-        /// Semaphore used to prevent a race condition on _actionWaiting 
+        /// Semaphore used to prevent a race condition on _actionWaiting
         /// </summary>
         private Semaphore _actionWaitingSemaphore = new Semaphore(0, 1);
 
@@ -94,7 +99,6 @@ namespace Swordfish.NET.Collections
         /// <param name="action"></param>
         public void Add(Action action)
         {
-
             // If we are running on the dispatcher thread, we could call the
             // action directly, but then we've got the problem with queue
             // jumping. It's desirable to immediately update the view model,
@@ -109,7 +113,6 @@ namespace Swordfish.NET.Collections
 
             if (IsDispatcherThread)
             {
-
                 // Use this semaphore to prevent race conditions on _actionWaiting
                 _actionWaitingSemaphore.WaitOne();
 
@@ -144,9 +147,7 @@ namespace Swordfish.NET.Collections
             public Action _subscribeAction = null;
             private Action _doDispose = null;
 
-            public DoDispose()
-            {
-            }
+            public DoDispose() { }
 
             public DoDispose(Action subscribeAction, Action doDispose)
             {
@@ -164,14 +165,12 @@ namespace Swordfish.NET.Collections
             }
         }
 
-
         /// <summary>
         /// Adds a subscribe action to the subscriber queue
         /// </summary>
         /// <param name="subscribeRef"></param>
         public IDisposable QueueSubscribe(Action subscribeAction)
         {
-
             // Subscriber queue is set to null after the Dispatcher has been created.
             // So subscriptions can be handled directly once the dispatcher queue is
             // being processed.
@@ -184,17 +183,19 @@ namespace Swordfish.NET.Collections
                     _subscriberQueue[weakRef] = null;
 
                     // Return a disposable for removing subscriber from the queue
-                    return new DoDispose(subscribeAction, () =>
-                    {
-                        // Copy to avoid race condition
-                        var subscriberQueue = _subscriberQueue;
-                        if (subscriberQueue != null)
+                    return new DoDispose(
+                        subscribeAction,
+                        () =>
                         {
-                            object dummy;
-                            subscriberQueue.TryRemove(weakRef, out dummy);
+                            // Copy to avoid race condition
+                            var subscriberQueue = _subscriberQueue;
+                            if (subscriberQueue != null)
+                            {
+                                object dummy;
+                                subscriberQueue.TryRemove(weakRef, out dummy);
+                            }
                         }
-                    });
-
+                    );
                 }
                 catch
                 {
@@ -269,52 +270,57 @@ namespace Swordfish.NET.Collections
             }
             keys = null;
 
-            Thread actionThread = new Thread(new ThreadStart(() =>
-            {
-                try
+            Thread actionThread = new Thread(
+                new ThreadStart(() =>
                 {
-                    foreach (Action action in _actionQueue.GetConsumingEnumerable())
+                    try
                     {
-
-                        // Set the current action waiting then allow access to _actionWaiting
-                        _actionWaiting = action;
-                        _actionWaitingSemaphore.Release(1);
-
-
-                        // Wait to join to the dispatcher thread
-                        _dispatcher.Invoke((Action)(() =>
+                        foreach (Action action in _actionQueue.GetConsumingEnumerable())
                         {
+                            // Set the current action waiting then allow access to _actionWaiting
+                            _actionWaiting = action;
+                            _actionWaitingSemaphore.Release(1);
 
-                            // _actionWaiting may have been executed, and cleared on the
-                            // dispatcher thread inside the Add(action) method.
-                            if (_actionWaiting != null)
-                            {
-                                _actionWaiting();
-                                _actionWaiting = null;
-                            }
+                            // Wait to join to the dispatcher thread
+                            _dispatcher.Invoke(
+                                (Action)(
+                                    () =>
+                                    {
+                                        // _actionWaiting may have been executed, and cleared on the
+                                        // dispatcher thread inside the Add(action) method.
+                                        if (_actionWaiting != null)
+                                        {
+                                            _actionWaiting();
+                                            _actionWaiting = null;
+                                        }
 
-                            // Clear the more of the action queue, up to 100 items at a time.
-                            // Batch up processing into lots of 100 so as to give some
-                            // responsiveness if the collection is being bombarded.
-                            int countDown = 100;
-                            Action nextCommand = null;
+                                        // Clear the more of the action queue, up to 100 items at a time.
+                                        // Batch up processing into lots of 100 so as to give some
+                                        // responsiveness if the collection is being bombarded.
+                                        int countDown = 100;
+                                        Action nextCommand = null;
 
-                            // Note that countDown must be tested first, otherwise we throw away a queue item
-                            while (countDown > 0 && _actionQueue.TryTake(out nextCommand))
-                            {
-                                --countDown;
-                                nextCommand();
-                            }
-                        }));
-                        _actionWaitingSemaphore.WaitOne();
+                                        // Note that countDown must be tested first, otherwise we throw away a queue item
+                                        while (
+                                            countDown > 0 && _actionQueue.TryTake(out nextCommand)
+                                        )
+                                        {
+                                            --countDown;
+                                            nextCommand();
+                                        }
+                                    }
+                                )
+                            );
+                            _actionWaitingSemaphore.WaitOne();
+                        }
                     }
-                }
-                catch (Exception)
-                {
-                    // TODO: Some diagnostics
-                    // Assume render thread is dead, so exit
-                }
-            }));
+                    catch (Exception)
+                    {
+                        // TODO: Some diagnostics
+                        // Assume render thread is dead, so exit
+                    }
+                })
+            );
             actionThread.IsBackground = true;
             actionThread.Start();
         }
@@ -331,10 +337,7 @@ namespace Swordfish.NET.Collections
         /// </summary>
         public static DispatcherQueueProcessor Instance
         {
-            get
-            {
-                return _instance.Value;
-            }
+            get { return _instance.Value; }
         }
 
         /// <summary>
@@ -356,6 +359,5 @@ namespace Swordfish.NET.Collections
         }
 
         #endregion Properties
-
     }
 }

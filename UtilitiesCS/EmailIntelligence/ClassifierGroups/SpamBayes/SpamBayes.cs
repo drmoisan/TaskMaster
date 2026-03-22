@@ -7,16 +7,16 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.FSharp.Data.UnitSystems.SI.UnitNames;
 using Microsoft.Office.Interop.Outlook;
+using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.ReusableTypeClasses;
-using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config;
 using UtilitiesCS.Threading;
-using Microsoft.FSharp.Data.UnitSystems.SI.UnitNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace UtilitiesCS.EmailIntelligence
@@ -24,40 +24,49 @@ namespace UtilitiesCS.EmailIntelligence
     public class SpamBayes : TristateEngine, IConditionalEngine<MailItemHelper>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors and Static Methods
 
-        public SpamBayes(IApplicationGlobals globals) : base()
+        public SpamBayes(IApplicationGlobals globals)
+            : base()
         {
             Globals = globals;
             //Init();
         }
 
-        private SpamBayes() : base() { }
+        private SpamBayes()
+            : base() { }
 
         public static async Task<SpamBayes> CreateAsync(
             IApplicationGlobals globals,
             bool initialize = true,
             Enums.NotFoundEnum treatment = Enums.NotFoundEnum.Skip,
-            CancellationToken token = default)
+            CancellationToken token = default
+        )
         {
             var sb = new SpamBayes();
             sb.Globals = globals;
 
-            if (!sb.ValidatePathsSet()) { return null; }
+            if (!sb.ValidatePathsSet())
+            {
+                return null;
+            }
 
-            if (!await sb.ValidateSpamClassifierAsync(
-                sb.HasValidSpamClassifierAsync,
-                sb.SpamBayesMissingHandlerAsync,
-                treatment,
-                token))
+            if (
+                !await sb.ValidateSpamClassifierAsync(
+                    sb.HasValidSpamClassifierAsync,
+                    sb.SpamBayesMissingHandlerAsync,
+                    treatment,
+                    token
+                )
+            )
             {
                 return null;
             }
 
             return await Task.Run(sb.InitAsync, token);
-
         }
 
         public async Task<SpamBayes> InitAsync()
@@ -88,7 +97,7 @@ namespace UtilitiesCS.EmailIntelligence
             {
                 TotalEmailCount = 0,
                 SharedTokenBase = new Corpus(),
-                Name = GroupName
+                Name = GroupName,
             };
             foreach (var name in ClassNames)
             {
@@ -97,7 +106,9 @@ namespace UtilitiesCS.EmailIntelligence
             return group;
         }
 
-        public static async Task<BayesianClassifierGroup> CreateSpamClassifiersAsync(CancellationToken token = default)
+        public static async Task<BayesianClassifierGroup> CreateSpamClassifiersAsync(
+            CancellationToken token = default
+        )
         {
             return await Task.Run(CreateNewClassifier, token);
         }
@@ -116,18 +127,20 @@ namespace UtilitiesCS.EmailIntelligence
             }
             catch (ArgumentNullException e)
             {
-                logger.Error($"Error initializing {nameof(SpamBayes)} in {nameof(ValidatePathsSet)}: {e.Message}");
+                logger.Error(
+                    $"Error initializing {nameof(SpamBayes)} in {nameof(ValidatePathsSet)}: {e.Message}"
+                );
                 return false;
             }
             return true;
-
         }
 
         internal async Task<bool> ValidateSpamClassifierAsync(
             Func<CancellationToken, Task<(bool, string)>> asyncValidator,
             Func<Enums.NotFoundEnum, string, CancellationToken, Task<bool>> asyncAction,
             Enums.NotFoundEnum treatment,
-            CancellationToken cancel)
+            CancellationToken cancel
+        )
         {
             var (isValid, message) = await asyncValidator(cancel);
             return isValid ? true : await asyncAction(treatment, message, cancel);
@@ -150,16 +163,21 @@ namespace UtilitiesCS.EmailIntelligence
             }
             else
             {
-
                 var classifierGroup = await classifierGroupTask;
-                if (classifierGroup is null) { return (false, $"No classifier group named {GroupName} was found in manager."); }
+                if (classifierGroup is null)
+                {
+                    return (false, $"No classifier group named {GroupName} was found in manager.");
+                }
                 else
                 {
                     foreach (var name in ClassNames)
                     {
                         if (!classifierGroup.Classifiers.TryGetValue(name, out var classifier))
                         {
-                            return (false, $"{GroupName} classifier group cannot find classifier named {name}.");
+                            return (
+                                false,
+                                $"{GroupName} classifier group cannot find classifier named {name}."
+                            );
                         }
                     }
                 }
@@ -167,7 +185,11 @@ namespace UtilitiesCS.EmailIntelligence
             }
         }
 
-        public async Task<bool> SpamBayesMissingHandlerAsync(Enums.NotFoundEnum treatment, string message, CancellationToken cancel)
+        public async Task<bool> SpamBayesMissingHandlerAsync(
+            Enums.NotFoundEnum treatment,
+            string message,
+            CancellationToken cancel
+        )
         {
             switch (treatment)
             {
@@ -177,7 +199,9 @@ namespace UtilitiesCS.EmailIntelligence
 
                 case Enums.NotFoundEnum.Create:
                     logger.Warn($"{message} Creating new classifier");
-                    Globals.AF.Manager[GroupName] = (await CreateSpamClassifiersAsync(cancel)).ToAsyncLazy();
+                    Globals.AF.Manager[GroupName] = (
+                        await CreateSpamClassifiersAsync(cancel)
+                    ).ToAsyncLazy();
                     return true;
 
                 case Enums.NotFoundEnum.Throw:
@@ -190,12 +214,19 @@ namespace UtilitiesCS.EmailIntelligence
                         $"{message} Would you like to create a new classifier?",
                         $"Cannot Load {GroupName}",
                         MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Warning);
+                        MessageBoxIcon.Warning
+                    );
                     if (result == DialogResult.Yes)
                     {
                         ClassifierGroup = await CreateSpamClassifiersAsync(cancel);
                         Globals.AF.Manager[GroupName] = ClassifierGroup.ToAsyncLazy();
-                        if ((await Globals.AF.Manager.Configuration)?.TryGetValue("Spam", out var loader) ?? false && loader is not null)
+                        if (
+                            (await Globals.AF.Manager.Configuration)?.TryGetValue(
+                                "Spam",
+                                out var loader
+                            )
+                            ?? false && loader is not null
+                        )
                         {
                             ClassifierGroup.Config = loader.Config;
                             ClassifierGroup.Serialize();
@@ -203,8 +234,12 @@ namespace UtilitiesCS.EmailIntelligence
                         }
                         else
                         {
-                            MyBox.ShowDialog("Could not create Spam classifier because configuration could not be found.",
-                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MyBox.ShowDialog(
+                                "Could not create Spam classifier because configuration could not be found.",
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error
+                            );
                             return false;
                         }
                     }
@@ -225,10 +260,18 @@ namespace UtilitiesCS.EmailIntelligence
 
         public ISmartSerializableConfig Config => ClassifierGroup.Config;
 
-        protected internal IApplicationGlobals Globals { get => _globals; protected set => _globals = value; }
+        protected internal IApplicationGlobals Globals
+        {
+            get => _globals;
+            protected set => _globals = value;
+        }
         private IApplicationGlobals _globals;
 
-        public BayesianClassifierGroup ClassifierGroup { get => _classifierGroup; set => _classifierGroup = value; }
+        public BayesianClassifierGroup ClassifierGroup
+        {
+            get => _classifierGroup;
+            set => _classifierGroup = value;
+        }
         private BayesianClassifierGroup _classifierGroup;
 
         public static readonly HashSet<string> ClassNames = ["Spam", "Ham"];
@@ -242,7 +285,10 @@ namespace UtilitiesCS.EmailIntelligence
 
         public async Task TestAsync(Selection selection)
         {
-            if (ClassifierGroup is null) { return; }
+            if (ClassifierGroup is null)
+            {
+                return;
+            }
             foreach (object item in selection)
             {
                 if (item is MailItem mailItem)
@@ -268,12 +314,18 @@ namespace UtilitiesCS.EmailIntelligence
                 var probability = await CalculateProbabilityAsync(tokens);
                 await TestActionAsync(mailItem, probability);
             }
-            else { logger.Warn("Skipping SpamBayes for unknown item type"); }
+            else
+            {
+                logger.Warn("Skipping SpamBayes for unknown item type");
+            }
         }
 
         public async Task TrainAsync(Selection selection, bool isSpam)
         {
-            if (ClassifierGroup is null) { return; }
+            if (ClassifierGroup is null)
+            {
+                return;
+            }
             foreach (object item in selection)
             {
                 if (item is MailItem mailItem)
@@ -288,17 +340,32 @@ namespace UtilitiesCS.EmailIntelligence
         public override async Task TrainAsync(string[] tokens, bool isSpam)
         {
             var spamOrHam = isSpam ? "Spam" : "Ham";
-            await ClassifierGroup.Classifiers[spamOrHam].TrainAsync(await tokens.GroupAndCountAsync(), 1, default);
+            await ClassifierGroup
+                .Classifiers[spamOrHam]
+                .TrainAsync(await tokens.GroupAndCountAsync(), 1, default);
         }
 
         public string[] TokenizeEmail(object email)
         {
-            return email as MailItem is null ? [] : new MailItemHelper(email as MailItem, Globals).LoadAll(Globals, Globals.Ol.Inbox, true).Tokens;
+            return email as MailItem is null
+                ? []
+                : new MailItemHelper(email as MailItem, Globals)
+                    .LoadAll(Globals, Globals.Ol.Inbox, true)
+                    .Tokens;
         }
 
         public async Task<string[]> TokenizeEmailAsync(object email)
         {
-            return email as MailItem is null ? [] : (await MailItemHelper.FromMailItemAsync(email as MailItem, Globals, default, true)).Tokens;
+            return email as MailItem is null
+                ? []
+                : (
+                    await MailItemHelper.FromMailItemAsync(
+                        email as MailItem,
+                        Globals,
+                        default,
+                        true
+                    )
+                ).Tokens;
         }
 
         public async Task TrainCallbackAsync(object item, bool isSpam)
@@ -323,7 +390,6 @@ namespace UtilitiesCS.EmailIntelligence
                     }
                 }
             });
-
         }
 
         internal void MoveSpamOrHam(object item, double probability)
@@ -333,7 +399,6 @@ namespace UtilitiesCS.EmailIntelligence
             {
                 helper.Item.SetUdf("Spam", probability, OlUserPropertyType.olPercent);
                 MoveSpamOrHam(helper, isSpam);
-
             }
             else if (item is MailItem mailItem)
             {
@@ -367,10 +432,16 @@ namespace UtilitiesCS.EmailIntelligence
 
         internal Folder GetDestinationFolder(MailItem mailItem, bool? isSpam)
         {
-            if (mailItem is null) { return null; }
+            if (mailItem is null)
+            {
+                return null;
+            }
             if (isSpam == true)
             {
-                if (((mailItem.Parent as Folder)?.FolderPath ?? "") != Globals.Ol.JunkCertain.FolderPath) { }
+                if (
+                    ((mailItem.Parent as Folder)?.FolderPath ?? "")
+                    != Globals.Ol.JunkCertain.FolderPath
+                ) { }
                 return Globals.Ol.JunkCertain;
             }
             else if (isSpam == false)
@@ -381,7 +452,10 @@ namespace UtilitiesCS.EmailIntelligence
             }
             else
             {
-                if (((mailItem.Parent as Folder)?.FolderPath ?? "") != Globals.Ol.JunkPotential.FolderPath)
+                if (
+                    ((mailItem.Parent as Folder)?.FolderPath ?? "")
+                    != Globals.Ol.JunkPotential.FolderPath
+                )
                     return Globals.Ol.JunkPotential;
             }
             return null;
@@ -394,7 +468,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         //public async Task TestActionAsync(object item, double probability)
         //{
-        //    await Task.Run(async () => 
+        //    await Task.Run(async () =>
         //    {
         //        var mailItem = item as MailItem;
         //        if (mailItem is not null)
@@ -491,7 +565,10 @@ namespace UtilitiesCS.EmailIntelligence
 
         #region Not Implemented
 
-        public override void Train(string[] tokens, bool isSpam) { throw new NotImplementedException(); }
+        public override void Train(string[] tokens, bool isSpam)
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion Not Implemented
 
@@ -511,7 +588,9 @@ namespace UtilitiesCS.EmailIntelligence
         //    return ce;
         //}
 
-        public static async Task<IConditionalEngine<MailItemHelper>> CreateEngineAsync(IApplicationGlobals globals)
+        public static async Task<IConditionalEngine<MailItemHelper>> CreateEngineAsync(
+            IApplicationGlobals globals
+        )
         {
             var sb = await CreateAsync(globals);
             return sb;
@@ -522,14 +601,22 @@ namespace UtilitiesCS.EmailIntelligence
             this.ClassifierGroup.Serialize();
         }
 
-        public Func<MailItemHelper, Task> AsyncAction => (item) => Engine is not null ? ((SpamBayes)Engine).TestAsync(item) : null;
+        public Func<MailItemHelper, Task> AsyncAction =>
+            (item) => Engine is not null ? ((SpamBayes)Engine).TestAsync(item) : null;
 
-        public Func<object, Task<bool>> AsyncCondition => (item) => Task.Run(() => ConditionLog(item));
+        public Func<object, Task<bool>> AsyncCondition =>
+            (item) => Task.Run(() => ConditionLog(item));
 
         private bool Condition(object item)
         {
-            if (item is not MailItem mailItem) { return false; }
-            if (mailItem.MessageClass != "IPM.Note") { return false; }
+            if (item is not MailItem mailItem)
+            {
+                return false;
+            }
+            if (mailItem.MessageClass != "IPM.Note")
+            {
+                return false;
+            }
             if (mailItem.UserProperties.Find("Spam") is not null)
             {
                 var autoCodeProp = mailItem.UserProperties.Find("AutoProcessed");
@@ -570,11 +657,17 @@ namespace UtilitiesCS.EmailIntelligence
                 }
                 else
                 {
-                    autoCodeProp = olItem.UserProperties.Add("AutoProcessed", OlUserPropertyType.olYesNo, true);
+                    autoCodeProp = olItem.UserProperties.Add(
+                        "AutoProcessed",
+                        OlUserPropertyType.olYesNo,
+                        true
+                    );
                     autoCodeProp.Value = true;
                     olItem.Save();
                 }
-                logger.Debug($"Skipping: Has Spam property with value of {spamProp.Value} -> {GetOlItemString(olItem)}");
+                logger.Debug(
+                    $"Skipping: Has Spam property with value of {spamProp.Value} -> {GetOlItemString(olItem)}"
+                );
                 return false;
             }
 
@@ -583,8 +676,12 @@ namespace UtilitiesCS.EmailIntelligence
 
         private string GetOlItemString(OutlookItem olItem)
         {
-            var type = olItem.TryGet().OlItemType(out var typeVal) ? $"{typeVal}" : $"{olItem.InnerObject.GetType()}";
-            var created = olItem.TryGet().CreationTime(out var result) ? $" created on {result:g}" : "";
+            var type = olItem.TryGet().OlItemType(out var typeVal)
+                ? $"{typeVal}"
+                : $"{olItem.InnerObject.GetType()}";
+            var created = olItem.TryGet().CreationTime(out var result)
+                ? $" created on {result:g}"
+                : "";
             var subject = olItem.Try().Subject;
             subject = subject.IsNullOrEmpty() ? "" : $" with subject {subject}";
             var sender = olItem.Try().SenderName;
@@ -594,7 +691,8 @@ namespace UtilitiesCS.EmailIntelligence
 
         public object Engine => this;
 
-        public Func<IApplicationGlobals, Task> EngineInitializer => async (globals) => await Task.CompletedTask;
+        public Func<IApplicationGlobals, Task> EngineInitializer =>
+            async (globals) => await Task.CompletedTask;
 
         public string EngineName => "Spam";
 
@@ -603,7 +701,5 @@ namespace UtilitiesCS.EmailIntelligence
         public MailItemHelper TypedItem { get; set; }
 
         #endregion IConditionalEngine Implementation
-
     }
-
 }

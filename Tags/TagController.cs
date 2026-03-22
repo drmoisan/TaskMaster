@@ -7,38 +7,42 @@ using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 
-
 namespace Tags
 {
     public class TagController
     {
         #region Contructors and Initializers
 
-        public TagController(TagViewer viewerInstance,
-                             SortedDictionary<string, bool> dictOptions,
-                             IAutoAssign autoAssigner,
-                             IList<IPrefix> prefixes,
-                             string userEmailAddress,
-                             IList<string> selections = null,
-                             string prefixKey = "",
-                             object objItemObject = null,
-                             object objCallerObj = null)
+        public TagController(
+            TagViewer viewerInstance,
+            SortedDictionary<string, bool> dictOptions,
+            IAutoAssign autoAssigner,
+            IList<IPrefix> prefixes,
+            string userEmailAddress,
+            IList<string> selections = null,
+            string prefixKey = "",
+            object objItemObject = null,
+            object objCallerObj = null
+        )
         {
-
             viewerInstance.SetController(this);
             _autoAssigner = autoAssigner;
             _prefixes = prefixes;
             _viewer = viewerInstance;
             _objItem = objItemObject;
             _dictOriginal = dictOptions;
-            _dictOptions = _viewer.HideArchive.Checked == true ? FilterArchive(dictOptions) : dictOptions;
+            _dictOptions =
+                _viewer.HideArchive.Checked == true ? FilterArchive(dictOptions) : dictOptions;
             _userEmailAddress = userEmailAddress;
             _selections = selections;
             _objCaller = objCallerObj;
 
             _olMail = ResolveMailItem(_objItem);
 
-            if (_olMail is not null) { _isMail = true; }
+            if (_olMail is not null)
+            {
+                _isMail = true;
+            }
 
             _gridTemplate = CaptureAndRemoveTemplate();
 
@@ -51,13 +55,14 @@ namespace Tags
             LoadControls(_dictOptions, _prefix.Value);
 
             WireEvents();
-
         }
 
-        public TagController(TagViewer viewerInstance,
-                             SortedDictionary<string, bool> dictOptions,
-                             IList<string> selections = null,
-                             IPrefix prefix = null)
+        public TagController(
+            TagViewer viewerInstance,
+            SortedDictionary<string, bool> dictOptions,
+            IList<string> selections = null,
+            IPrefix prefix = null
+        )
         {
             viewerInstance.SetController(this);
             _viewer = viewerInstance;
@@ -86,10 +91,12 @@ namespace Tags
             {
                 return (MailItem)_objItem;
             }
-            else return null;
+            else
+                return null;
         }
 
-        internal IPrefix GetDefaultPrefix() => new PrefixItem(PrefixTypeEnum.Other, "", "", OlCategoryColor.olCategoryColorNone);
+        internal IPrefix GetDefaultPrefix() =>
+            new PrefixItem(PrefixTypeEnum.Other, "", "", OlCategoryColor.olCategoryColorNone);
 
         public void ResolvePrefix(IList<IPrefix> prefixes, string prefixKey) //internal
         {
@@ -106,7 +113,9 @@ namespace Tags
             // Else throw an error
             else
             {
-                throw new ArgumentException(nameof(prefixes) + " must contain " + nameof(prefixKey) + " value " + prefixKey);
+                throw new ArgumentException(
+                    nameof(prefixes) + " must contain " + nameof(prefixKey) + " value " + prefixKey
+                );
             }
         }
 
@@ -142,7 +151,11 @@ namespace Tags
                     }
                     else
                     {
-                        var tmp_response = MessageBox.Show($"{choice} does not exist. Would you like to add it?", "Dialog", MessageBoxButtons.YesNo);
+                        var tmp_response = MessageBox.Show(
+                            $"{choice} does not exist. Would you like to add it?",
+                            "Dialog",
+                            MessageBoxButtons.YesNo
+                        );
                         if (tmp_response == DialogResult.Yes)
                         {
                             AddColorCategory(rawchoice);
@@ -208,7 +221,8 @@ namespace Tags
 
         #region Public Functions and Properties
 
-        public void ToggleChoice(string str_choice) => _dictOptions[str_choice] = !_dictOptions[str_choice];
+        public void ToggleChoice(string str_choice) =>
+            _dictOptions[str_choice] = !_dictOptions[str_choice];
 
         public void ToggleOn(string str_choice) => _dictOptions[str_choice] = true; //internal
 
@@ -222,7 +236,7 @@ namespace Tags
 
         public void SearchAndReload() //internal
         {
-            // Get search strings 
+            // Get search strings
             var searchStrings = ParseSearchStrings(_viewer.SearchText.Text);
 
             // Filter the dictionary based on the search strings
@@ -236,19 +250,27 @@ namespace Tags
             }
         }
 
-        public SortedDictionary<string, bool> Search(SortedDictionary<string, bool> source, List<string> searchStrings)
+        public SortedDictionary<string, bool> Search(
+            SortedDictionary<string, bool> source,
+            List<string> searchStrings
+        )
         {
             // If there are no search strings, then the filtered dictionary is the original dictionary
-            if (searchStrings.Count == 0) { return source; }
+            if (searchStrings.Count == 0)
+            {
+                return source;
+            }
 
             // Else, filter the original dictionary based on the search strings
-            return searchStrings.Select(search => source
-                                            .Where(x => x.Key.IndexOf(
-                                                search, StringComparison.OrdinalIgnoreCase) >= 0))
-                                            .SelectMany(x => x)
-                                            .Distinct()
-                                            .ToSortedDictionary();
-
+            return searchStrings
+                .Select(search =>
+                    source.Where(x =>
+                        x.Key.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0
+                    )
+                )
+                .SelectMany(x => x)
+                .Distinct()
+                .ToSortedDictionary();
         }
 
         public List<string> ParseSearchStrings(string searchText)
@@ -256,20 +278,41 @@ namespace Tags
             searchText = searchText.Trim();
             if (searchText.IsNullOrEmpty())
                 return new List<string>();
-            return searchText.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            return searchText
+                .Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries)
+                .ToList();
         }
 
         //public string SelectionAsString() => string.Join(", ", _dictOptions.Where(item => item.Value).Select(item => item.Key).ToList());
         public string SelectionAsString() => string.Join(", ", SelectionAsList());
-        public List<string> SelectionAsList() => _dictOptions.Where(item => item.Value).Select(item => item.Key).ToList();
 
-        public bool ButtonNewActive { get => _viewer.ButtonNew.Visible; set => _viewer.ButtonNew.Visible = value; }
+        public List<string> SelectionAsList() =>
+            _dictOptions.Where(item => item.Value).Select(item => item.Key).ToList();
 
-        public bool ButtonAutoAssignActive { get => _viewer.ButtonAutoAssign.Visible; set => _viewer.ButtonAutoAssign.Visible = value; }
+        public bool ButtonNewActive
+        {
+            get => _viewer.ButtonNew.Visible;
+            set => _viewer.ButtonNew.Visible = value;
+        }
+
+        public bool ButtonAutoAssignActive
+        {
+            get => _viewer.ButtonAutoAssign.Visible;
+            set => _viewer.ButtonAutoAssign.Visible = value;
+        }
 
         public void SetSearchText(string searchText) => _viewer.SearchText.Text = searchText;
 
-        public string ExitType { get => _exitType; }
+        public void SetCaption(string caption)
+        {
+            if (_viewer != null)
+                _viewer.Text = caption;
+        }
+
+        public string ExitType
+        {
+            get => _exitType;
+        }
 
         #endregion
 
@@ -277,23 +320,27 @@ namespace Tags
 
         public void WireEvents()
         {
-            _viewer.L1v2L2_OptionsPanel.KeyDown += new System.Windows.Forms.KeyEventHandler(L1v2L2_OptionsPanel_KeyDown);
-            _viewer.L1v2L2_OptionsPanel.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(OptionsPanel_PreviewKeyDown);
+            _viewer.L1v2L2_OptionsPanel.KeyDown += new System.Windows.Forms.KeyEventHandler(
+                L1v2L2_OptionsPanel_KeyDown
+            );
+            _viewer.L1v2L2_OptionsPanel.PreviewKeyDown +=
+                new System.Windows.Forms.PreviewKeyDownEventHandler(OptionsPanel_PreviewKeyDown);
             _viewer.ButtonOk.Click += new System.EventHandler(ButtonOk_Click);
             _viewer.ButtonCancel.Click += new System.EventHandler(ButtonCancel_Click);
             _viewer.ButtonNew.Click += new System.EventHandler(ButtonNew_Click);
             _viewer.ButtonAutoAssign.Click += new System.EventHandler(ButtonAutoAssign_Click);
             _viewer.SearchText.TextChanged += new System.EventHandler(SearchText_TextChanged);
-            _viewer.SearchText.KeyDown += new System.Windows.Forms.KeyEventHandler(SearchText_KeyDown);
+            _viewer.SearchText.KeyDown += new System.Windows.Forms.KeyEventHandler(
+                SearchText_KeyDown
+            );
             _viewer.SearchText.KeyUp += new System.Windows.Forms.KeyEventHandler(SearchText_KeyUp);
-            _viewer.HideArchive.CheckedChanged += new System.EventHandler(HideArchive_CheckedChanged);
+            _viewer.HideArchive.CheckedChanged += new System.EventHandler(
+                HideArchive_CheckedChanged
+            );
             _viewer.KeyDown += new System.Windows.Forms.KeyEventHandler(TagViewer_KeyDown);
         }
 
-        private void L1v2L2_OptionsPanel_KeyDown(object sender, KeyEventArgs e)
-        {
-
-        }
+        private void L1v2L2_OptionsPanel_KeyDown(object sender, KeyEventArgs e) { }
 
         private void ButtonOk_Click(object sender, EventArgs e) => ButtonOk_Action();
 
@@ -326,10 +373,8 @@ namespace Tags
             }
             catch (System.Exception)
             {
-
                 throw;
             }
-
         }
 
         private void ButtonCancel_Click(object sender, EventArgs e)
@@ -342,7 +387,8 @@ namespace Tags
 
         private void HideArchive_CheckedChanged(object sender, EventArgs e)
         {
-            _dictOptions = _viewer.HideArchive.Checked == true ? FilterArchive(_dictOptions) : _dictOriginal;
+            _dictOptions =
+                _viewer.HideArchive.Checked == true ? FilterArchive(_dictOptions) : _dictOriginal;
             SearchAndReload();
         }
 
@@ -350,9 +396,10 @@ namespace Tags
 
         #region Old Event Actions
 
-        public SortedDictionary<string, bool> FilterArchive(SortedDictionary<string, bool> sourceDict) //internal
+        public SortedDictionary<string, bool> FilterArchive(
+            SortedDictionary<string, bool> sourceDict
+        ) //internal
         {
-
             if (_autoAssigner is not null)
             {
                 var exclude = _autoAssigner.FilterList;
@@ -362,16 +409,17 @@ namespace Tags
                 //var filteredDict = (from x in sourceDict
                 //                    where exclude.FindIndex(x.Key, (int)StringComparison.OrdinalIgnoreCase) < 0
                 //                    select x).ToSortedDictionary();
-                var filteredDict = (from x in sourceDict
-                                    where !exclude.Contains(x.Key, StringComparison.OrdinalIgnoreCase)
-                                    select x).ToSortedDictionary();
+                var filteredDict = (
+                    from x in sourceDict
+                    where !exclude.Contains(x.Key, StringComparison.OrdinalIgnoreCase)
+                    select x
+                ).ToSortedDictionary();
                 return filteredDict;
             }
             else
             {
                 return sourceDict;
             }
-
         }
 
         internal bool TryGetAutoAssignment(out IList<string> assignments)
@@ -383,11 +431,20 @@ namespace Tags
             if (_autoAssigner is not null & _isMail)
             {
                 // Ask user if they want to auto-add
-                var vbR = MessageBox.Show("Auto-add new from email details?", "Dialog", MessageBoxButtons.YesNo);
+                var vbR = MessageBox.Show(
+                    "Auto-add new from email details?",
+                    "Dialog",
+                    MessageBoxButtons.YesNo
+                );
 
                 if (vbR == DialogResult.Yes)
                 {
-                    assignments = _autoAssigner.AddChoicesToDict(_olMail, _prefixes, _prefix.Key, _userEmailAddress);
+                    assignments = _autoAssigner.AddChoicesToDict(
+                        _olMail,
+                        _prefixes,
+                        _prefix.Key,
+                        _userEmailAddress
+                    );
 
                     foreach (string newCatName in assignments)
                     {
@@ -414,7 +471,10 @@ namespace Tags
                     if (_autoAssigner is not null)
                     {
                         var newCategory = _autoAssigner.AddColorCategory(_prefix, categoryName);
-                        if (newCategory is null) { return; }
+                        if (newCategory is null)
+                        {
+                            return;
+                        }
                         categoryName = newCategory.Name;
                     }
                     AddOption(categoryName, blClickTrue: true);
@@ -430,7 +490,11 @@ namespace Tags
         {
             if (!string.IsNullOrEmpty(categoryName))
             {
-                categoryName = InputBox.ShowDialog("The following category name will be added:", "Add Category Dialog", DefaultResponse: categoryName);
+                categoryName = InputBox.ShowDialog(
+                    "The following category name will be added:",
+                    "Add Category Dialog",
+                    DefaultResponse: categoryName
+                );
             }
             else
             {
@@ -438,7 +502,11 @@ namespace Tags
                 string msg = "Enter new category name:";
                 while (!advance)
                 {
-                    categoryName = InputBox.ShowDialog(msg, "Add Category Dialog", DefaultResponse: " ");
+                    categoryName = InputBox.ShowDialog(
+                        msg,
+                        "Add Category Dialog",
+                        DefaultResponse: " "
+                    );
                     if (categoryName != " ")
                         advance = true;
                     msg = "Please enter a name or hit cancel:";
@@ -463,15 +531,15 @@ namespace Tags
             switch (e.KeyCode)
             {
                 case Keys.Down:
-                    {
-                        e.IsInputKey = true;
-                        break;
-                    }
+                {
+                    e.IsInputKey = true;
+                    break;
+                }
                 case Keys.Up:
-                    {
-                        e.IsInputKey = true;
-                        break;
-                    }
+                {
+                    e.IsInputKey = true;
+                    break;
+                }
             }
         }
 
@@ -480,15 +548,15 @@ namespace Tags
             switch (e.KeyCode)
             {
                 case Keys.Down:
-                    {
-                        Select_Ctrl_By_Offset(1);
-                        break;
-                    }
+                {
+                    Select_Ctrl_By_Offset(1);
+                    break;
+                }
                 case Keys.Up:
-                    {
-                        Select_Ctrl_By_Offset(-1);
-                        break;
-                    }
+                {
+                    Select_Ctrl_By_Offset(-1);
+                    break;
+                }
             }
         }
 
@@ -497,10 +565,10 @@ namespace Tags
             switch (e.KeyCode)
             {
                 case Keys.Enter:
-                    {
-                        ButtonOk_Action();
-                        break;
-                    }
+                {
+                    ButtonOk_Action();
+                    break;
+                }
             }
         }
 
@@ -509,15 +577,15 @@ namespace Tags
             switch (e.KeyCode)
             {
                 case Keys.Right:
-                    {
-                        _cursorPosition = _viewer.SearchText.SelectionStart;
-                        break;
-                    }
+                {
+                    _cursorPosition = _viewer.SearchText.SelectionStart;
+                    break;
+                }
                 case Keys.Down:
-                    {
-                        Select_Ctrl_By_Offset(1);
-                        break;
-                    }
+                {
+                    Select_Ctrl_By_Offset(1);
+                    break;
+                }
             }
         }
 
@@ -526,19 +594,19 @@ namespace Tags
             switch (e.KeyCode)
             {
                 case Keys.Right:
+                {
+                    if (_viewer.SearchText.SelectionStart == _cursorPosition)
                     {
-                        if (_viewer.SearchText.SelectionStart == _cursorPosition)
-                        {
-                            FilterToSelected();
-                        }
+                        FilterToSelected();
+                    }
 
-                        break;
-                    }
+                    break;
+                }
                 case Keys.Enter:
-                    {
-                        ButtonOk_Action();
-                        break;
-                    }
+                {
+                    ButtonOk_Action();
+                    break;
+                }
             }
         }
 
@@ -561,17 +629,25 @@ namespace Tags
             {
                 strChkName = i.ToString("00") + " ChkBx";
                 ctrlCB = new CheckBox();
+                var optionKey = _filteredOptions.Keys.ElementAt(i);
                 try
                 {
                     _viewer.L1v2L2_OptionsPanel.Controls.Add(ctrlCB);
                 }
                 catch
                 {
-                    MessageBox.Show($"Error adding {nameof(CheckBox)} in {nameof(Tags)}.{nameof(LoadControls)}");
+                    MessageBox.Show(
+                        $"Error adding {nameof(CheckBox)} in {nameof(Tags)}.{nameof(LoadControls)}"
+                    );
                     return false;
                 }
 
-                ctrlCB.Text = _filteredOptions.Keys.ElementAt(i).Substring(prefix.Length);
+                ctrlCB.Name = strChkName;
+                ctrlCB.Tag = optionKey;
+                ctrlCB.Text =
+                    prefix.Length > 0 && optionKey.StartsWith(prefix)
+                        ? optionKey.Substring(prefix.Length)
+                        : optionKey;
                 ctrlCB.Checked = _filteredOptions.Values.ElementAt(i);
 
                 try
@@ -651,18 +727,17 @@ namespace Tags
         {
             RemoveControls();
             // _filtered_options = _dict_options.Where(Function(x) x.Value = True).Select(Function(x) x)
-            var tmp = (from x in _dictOptions
-                       where x.Value
-                       select x).ToDictionary(x => x.Key, x => x.Value);
+            var tmp = (from x in _dictOptions where x.Value select x).ToDictionary(
+                x => x.Key,
+                x => x.Value
+            );
             _filteredOptions = new SortedDictionary<string, bool>(tmp);
             bool unused = LoadControls(_filteredOptions, _prefix.Value);
         }
 
         public List<string> GetSelections()
         {
-            return (from x in _dictOptions
-                    where x.Value == true
-                    select x.Key).ToList();
+            return (from x in _dictOptions where x.Value == true select x.Key).ToList();
         }
 
         #endregion
@@ -681,7 +756,10 @@ namespace Tags
             {
                 _colCbxCtrl[newpos].Focus();
                 CheckBox cbx = (CheckBox)_colCbxCtrl[newpos];
-                ControlPaint.DrawFocusRectangle(System.Drawing.Graphics.FromHwnd(cbx.Handle), cbx.ClientRectangle);
+                ControlPaint.DrawFocusRectangle(
+                    System.Drawing.Graphics.FromHwnd(cbx.Handle),
+                    cbx.ClientRectangle
+                );
                 intFocus = newpos;
             }
         }
@@ -698,65 +776,69 @@ namespace Tags
 
         public void Select_PageDown() //internal
         {
-
-            if (_viewer.L1v2L2_OptionsPanel.VerticalScroll.Maximum > _viewer.L1v2L2_OptionsPanel.Height)
+            if (
+                _viewer.L1v2L2_OptionsPanel.VerticalScroll.Maximum
+                > _viewer.L1v2L2_OptionsPanel.Height
+            )
             {
                 int start = Math.Max(intFocus, 0);
                 int y = _viewer.L1v2L2_OptionsPanel.Height;
-                var filteredIEnumerable = _colCbxCtrl.Select((n, i) =>
-                                                       new { Value = n, Index = i })
-                                                       .Where(p =>
-                                                       (p.Index > intFocus) &
-                                                       (p.Value.Bottom > y));
+                var filteredIEnumerable = _colCbxCtrl
+                    .Select((n, i) => new { Value = n, Index = i })
+                    .Where(p => (p.Index > intFocus) & (p.Value.Bottom > y));
 
                 if (filteredIEnumerable.Count() == 0)
                 {
                     Select_Last_Control();
                 }
-
                 else
                 {
                     int idx = filteredIEnumerable.First().Index;
 
                     Select_Ctrl_By_Position(idx);
 
-                    int y_scroll = _colCbxCtrl[idx].Top - _viewer.L1v2L2_OptionsPanel.AutoScrollPosition.Y;
+                    int y_scroll =
+                        _colCbxCtrl[idx].Top - _viewer.L1v2L2_OptionsPanel.AutoScrollPosition.Y;
 
                     _viewer.L1v2L2_OptionsPanel.AutoScrollPosition = new System.Drawing.Point(
-                        _viewer.L1v2L2_OptionsPanel.AutoScrollPosition.X, y_scroll);
-
+                        _viewer.L1v2L2_OptionsPanel.AutoScrollPosition.X,
+                        y_scroll
+                    );
                 }
-
             }
         }
 
         public void Select_PageUp() //internal
         {
-            if (_viewer.L1v2L2_OptionsPanel.VerticalScroll.Maximum > _viewer.L1v2L2_OptionsPanel.Height)
+            if (
+                _viewer.L1v2L2_OptionsPanel.VerticalScroll.Maximum
+                > _viewer.L1v2L2_OptionsPanel.Height
+            )
             {
                 int start = Math.Max(intFocus, 0);
                 int idx_top;
 
-                var filteredIEnumerable = _colCbxCtrl.Select((n, i) => new { Value = n, Index = i })
-                                                       .Where(p => p.Value.Top < 0);
+                var filteredIEnumerable = _colCbxCtrl
+                    .Select((n, i) => new { Value = n, Index = i })
+                    .Where(p => p.Value.Top < 0);
 
                 if (filteredIEnumerable.Count() == 0)
                 {
                     Select_First_Control();
                 }
-
                 else
                 {
                     idx_top = filteredIEnumerable.Last().Index;
                     Select_Ctrl_By_Position(idx_top);
-                    int y_scroll = (-1 * _viewer.L1v2L2_OptionsPanel.AutoScrollPosition.Y)
+                    int y_scroll =
+                        (-1 * _viewer.L1v2L2_OptionsPanel.AutoScrollPosition.Y)
                         - (_viewer.L1v2L2_OptionsPanel.Height - _colCbxCtrl[idx_top].Height);
 
                     _viewer.L1v2L2_OptionsPanel.AutoScrollPosition = new System.Drawing.Point(
-                        _viewer.L1v2L2_OptionsPanel.AutoScrollPosition.X, y_scroll);
-
+                        _viewer.L1v2L2_OptionsPanel.AutoScrollPosition.X,
+                        y_scroll
+                    );
                 }
-
             }
         }
 
@@ -764,20 +846,23 @@ namespace Tags
         {
             if (position < -1 | position > _colCbxCtrl.Count - 1)
             {
-                throw new ArgumentOutOfRangeException("Cannot select control with postition " + position);
+                throw new ArgumentOutOfRangeException(
+                    "Cannot select control with postition " + position
+                );
             }
-
             else if (position == -1)
             {
                 _viewer.SearchText.Select();
                 intFocus = position;
             }
-
             else
             {
                 _colCbxCtrl[position].Focus();
                 CheckBox cbx = (CheckBox)_colCbxCtrl[position];
-                ControlPaint.DrawFocusRectangle(System.Drawing.Graphics.FromHwnd(cbx.Handle), cbx.ClientRectangle);
+                ControlPaint.DrawFocusRectangle(
+                    System.Drawing.Graphics.FromHwnd(cbx.Handle),
+                    cbx.ClientRectangle
+                );
                 intFocus = position;
             }
         }
@@ -787,8 +872,6 @@ namespace Tags
         #region Helper Functions
 
 
-
         #endregion
-
     }
 }

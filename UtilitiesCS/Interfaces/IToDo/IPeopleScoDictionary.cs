@@ -1,5 +1,5 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS

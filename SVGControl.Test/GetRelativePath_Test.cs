@@ -1,5 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SVGControl;
 
 namespace SVGControl.Test
@@ -13,8 +13,10 @@ namespace SVGControl.Test
             string anchorPath = "C:\\L1\\L2\\L3\\";
             string pathToMakeRelative = "C:\\L1\\L2\\L3\\L4\\L5\\test.txt";
             string testRelative = RelativePath.MakeRelativePath(
-                pathToMakeRelative: pathToMakeRelative, anchorPath: anchorPath);
-            
+                pathToMakeRelative: pathToMakeRelative,
+                anchorPath: anchorPath
+            );
+
             string targetRelative = "L4\\L5\\test.txt";
             Assert.AreEqual(targetRelative, testRelative);
         }
@@ -25,7 +27,9 @@ namespace SVGControl.Test
             string anchorPath = "C:\\L1\\L2\\L3\\";
             string pathToMakeRelative = "C:\\L1\\L4\\L5\\test.txt";
             string testRelative = RelativePath.MakeRelativePath(
-                pathToMakeRelative: pathToMakeRelative, anchorPath: anchorPath);
+                pathToMakeRelative: pathToMakeRelative,
+                anchorPath: anchorPath
+            );
 
             string targetRelative = "..\\..\\L4\\L5\\test.txt";
             Assert.AreEqual(targetRelative, testRelative);
@@ -37,7 +41,9 @@ namespace SVGControl.Test
             string anchorPath = "C:\\L1 L01\\L2\\L3\\";
             string pathToMakeRelative = "C:\\L1 L01\\L2\\L3\\L4\\L5\\test.txt";
             string testRelative = RelativePath.GetRelativeURI(
-                pathToMakeRelative: pathToMakeRelative, anchorPath: anchorPath);
+                pathToMakeRelative: pathToMakeRelative,
+                anchorPath: anchorPath
+            );
 
             string targetRelative = "./L4/L5/test.txt";
             Assert.AreEqual(targetRelative, testRelative);
@@ -48,9 +54,11 @@ namespace SVGControl.Test
         {
             string anchorPath = "C:\\L1\\L2\\L3";
             string uriToMakeAbsolute = "./L4/L5/test.txt";
-            
+
             string testAbsolute = RelativePath.AbsoluteFromURI(
-                uriToMakeAbsolute: uriToMakeAbsolute, anchorPath: anchorPath);
+                uriToMakeAbsolute: uriToMakeAbsolute,
+                anchorPath: anchorPath
+            );
 
             string targetAbsolute = "C:\\L1\\L2\\L3\\L4\\L5\\test.txt";
 
@@ -64,7 +72,9 @@ namespace SVGControl.Test
             string uriToMakeAbsolute = "./L4/L5/test.txt";
 
             string testAbsolute = RelativePath.AbsoluteFromURI(
-                uriToMakeAbsolute: uriToMakeAbsolute, anchorPath: anchorPath);
+                uriToMakeAbsolute: uriToMakeAbsolute,
+                anchorPath: anchorPath
+            );
 
             string targetAbsolute = "C:\\L1\\L2\\L3\\L4\\L5\\test.txt";
 
@@ -78,7 +88,9 @@ namespace SVGControl.Test
             string uriToMakeAbsolute = "../../L4/L5/test.txt";
 
             string testAbsolute = RelativePath.AbsoluteFromURI(
-                uriToMakeAbsolute: uriToMakeAbsolute, anchorPath: anchorPath);
+                uriToMakeAbsolute: uriToMakeAbsolute,
+                anchorPath: anchorPath
+            );
 
             string targetAbsolute = "C:\\L1\\L4\\L5\\test.txt";
 

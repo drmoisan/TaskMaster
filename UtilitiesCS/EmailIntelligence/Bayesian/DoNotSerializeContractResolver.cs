@@ -1,11 +1,11 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace UtilitiesCS
 {
@@ -18,14 +18,15 @@ namespace UtilitiesCS
             _propertyNames = propertyNames;
         }
 
-        protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
+        protected override IList<JsonProperty> CreateProperties(
+            Type type,
+            MemberSerialization memberSerialization
+        )
         {
             IList<JsonProperty> properties = base.CreateProperties(type, memberSerialization);
 
             // only serializer properties that start with the specified character
-            properties = properties.Where(
-                p => !_propertyNames.Contains(p.PropertyName))
-                .ToList();
+            properties = properties.Where(p => !_propertyNames.Contains(p.PropertyName)).ToList();
 
             return properties;
         }

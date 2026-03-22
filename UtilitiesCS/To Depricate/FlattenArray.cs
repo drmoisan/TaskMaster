@@ -1,4 +1,5 @@
 ﻿using System;
+
 //using Microsoft.VisualBasic;
 //using Microsoft.VisualBasic.CompilerServices;
 
@@ -9,7 +10,7 @@ namespace UtilitiesCS
     //    public static string FlattenStringTree(object[] varBranch)
     //    {
     //        string FlattenArryRet = default;
-    //        // CLEANUP: Move to a library 
+    //        // CLEANUP: Move to a library
     //        int i;
     //        string strTemp;
 

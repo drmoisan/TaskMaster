@@ -8,6 +8,10 @@ namespace UtilitiesCS.EmailIntelligence
     {
         IEnumerable<string> Tokenize(IItemInfo msg);
         IEnumerable<string> Tokenize(object obj, IApplicationGlobals globals);
-        Task<string[]> TokenizeAsync(object obj, IApplicationGlobals globals, CancellationToken cancel);
+        Task<string[]> TokenizeAsync(
+            object obj,
+            IApplicationGlobals globals,
+            CancellationToken cancel
+        );
     }
 }

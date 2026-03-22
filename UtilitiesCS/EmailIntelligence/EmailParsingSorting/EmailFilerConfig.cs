@@ -1,31 +1,35 @@
-﻿using log4net.Repository.Hierarchy;
-using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using log4net.Repository.Hierarchy;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 {
     public class EmailFilerConfig
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors and Initializers
 
         public EmailFilerConfig() { }
 
-        public EmailFilerConfig(bool savePictures,
-                                   string destinationOlStem,
-                                   bool saveMsg,
-                                   bool saveAttachments,
-                                   bool removePreviousFsFiles,
-                                   IApplicationGlobals appGlobals,
-                                   string olAncestor,
-                                   string fsAncestorEquivalent)
+        public EmailFilerConfig(
+            bool savePictures,
+            string destinationOlStem,
+            bool saveMsg,
+            bool saveAttachments,
+            bool removePreviousFsFiles,
+            IApplicationGlobals appGlobals,
+            string olAncestor,
+            string fsAncestorEquivalent
+        )
         {
             SavePictures = savePictures;
             DestinationOlStem = destinationOlStem;
@@ -42,52 +46,116 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         #region Public Properties
 
         private bool _savePictures = false;
-        public bool SavePictures { get => _savePictures; set => _savePictures = value; }
+        public bool SavePictures
+        {
+            get => _savePictures;
+            set => _savePictures = value;
+        }
 
         private string _destinationOlStem = "";
-        public string DestinationOlStem { get => _destinationOlStem; set => _destinationOlStem = value; }
+        public string DestinationOlStem
+        {
+            get => _destinationOlStem;
+            set => _destinationOlStem = value;
+        }
 
         private string _destinationOlPath;
-        public string DestinationOlPath { get => _destinationOlPath; set => _destinationOlPath = value; }
+        public string DestinationOlPath
+        {
+            get => _destinationOlPath;
+            set => _destinationOlPath = value;
+        }
 
         private bool _saveMsg = false;
-        public bool SaveMsg { get => _saveMsg; set => _saveMsg = value; }
+        public bool SaveMsg
+        {
+            get => _saveMsg;
+            set => _saveMsg = value;
+        }
 
         private bool _saveAttachments = false;
-        public bool SaveAttachments { get => _saveAttachments; set => _saveAttachments = value; }
+        public bool SaveAttachments
+        {
+            get => _saveAttachments;
+            set => _saveAttachments = value;
+        }
 
         private bool _removePreviousFsFiles = false;
-        public bool RemovePreviousFsFiles { get => _removePreviousFsFiles; set => _removePreviousFsFiles = value; }
+        public bool RemovePreviousFsFiles
+        {
+            get => _removePreviousFsFiles;
+            set => _removePreviousFsFiles = value;
+        }
 
         private IApplicationGlobals _globals;
-        public IApplicationGlobals Globals { get => _globals; set => _globals = value; }
+        public IApplicationGlobals Globals
+        {
+            get => _globals;
+            set => _globals = value;
+        }
 
         private string _olAncestor = "";
-        public string OlAncestor { get => _olAncestor; set => _olAncestor = value; }
+        public string OlAncestor
+        {
+            get => _olAncestor;
+            set => _olAncestor = value;
+        }
 
         private string _fsAncestorEquivalent;
-        public string FsAncestorEquivalent { get => _fsAncestorEquivalent; set => _fsAncestorEquivalent = value; }
+        public string FsAncestorEquivalent
+        {
+            get => _fsAncestorEquivalent;
+            set => _fsAncestorEquivalent = value;
+        }
 
         private string _saveFsPath;
-        public string SaveFsPath { get => _saveFsPath; set => _saveFsPath = value; }
+        public string SaveFsPath
+        {
+            get => _saveFsPath;
+            set => _saveFsPath = value;
+        }
 
         private string _deleteFsPath;
-        public string DeleteFsPath { get => _deleteFsPath; set => _deleteFsPath = value; }
+        public string DeleteFsPath
+        {
+            get => _deleteFsPath;
+            set => _deleteFsPath = value;
+        }
 
         private Folder _originFolder;
-        public Folder OriginFolder { get => _originFolder; set => _originFolder = value; }
+        public Folder OriginFolder
+        {
+            get => _originFolder;
+            set => _originFolder = value;
+        }
 
         private string _originOlStem;
-        public string OriginOlStem { get => _originOlStem; set => _originOlStem = value; }
+        public string OriginOlStem
+        {
+            get => _originOlStem;
+            set => _originOlStem = value;
+        }
 
         private Folder _destinationOlFolder;
-        public Folder DestinationOlFolder { get => _destinationOlFolder; set => _destinationOlFolder = value; }
+        public Folder DestinationOlFolder
+        {
+            get => _destinationOlFolder;
+            set => _destinationOlFolder = value;
+        }
 
         private bool _deleteAndUnTrain;
-        public bool DeleteAndUnTrain { get => _deleteAndUnTrain; set => _deleteAndUnTrain = value; }
+        public bool DeleteAndUnTrain
+        {
+            get => _deleteAndUnTrain;
+            set => _deleteAndUnTrain = value;
+        }
 
         private bool _canSort;
-        public bool CanSort { get => _canSort; set => _canSort = value; }
+        public bool CanSort
+        {
+            get => _canSort;
+            set => _canSort = value;
+        }
 
         #endregion Public Properties
 
@@ -97,9 +165,11 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         {
             currentFolder.ThrowIfNull();
 
-            if ((currentFolder.FolderPath != Globals.Ol.InboxPath) &&
-                (currentFolder.FolderPath.Contains(OlAncestor)) &&
-                (currentFolder.FolderPath != OlAncestor))
+            if (
+                (currentFolder.FolderPath != Globals.Ol.InboxPath)
+                && (currentFolder.FolderPath.Contains(OlAncestor))
+                && (currentFolder.FolderPath != OlAncestor)
+            )
             {
                 return true;
             }
@@ -116,12 +186,13 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             DestinationOlPath = $"{OlAncestor}\\{DestinationOlStem}";
             SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent);
             DeleteAndUnTrain = IsDeleteRelevant(currentFolder);
-            DeleteFsPath = DeleteAndUnTrain ? currentFolder.ToFsFolderpath(OlAncestor, FsAncestorEquivalent) : null;
+            DeleteFsPath = DeleteAndUnTrain
+                ? currentFolder.ToFsFolderpath(OlAncestor, FsAncestorEquivalent)
+                : null;
             DestinationOlFolder = TryResolveDestinationFolder();
             OriginFolder = currentFolder;
             OriginOlStem = GetStem(OlAncestor, currentFolder.FolderPath);
             CanSort = DestinationOlFolder is not null;
-
         }
 
         public void ResolvePaths()
@@ -137,7 +208,16 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         {
             try
             {
-                var destinationOlFolder = new FolderPredictor(Globals).GetFolder(DestinationOlPath, Globals.Ol.App);
+                var destinationOlFolder = new FolderPredictor(Globals).GetFolder(
+                    DestinationOlPath,
+                    Globals.Ol.App
+                );
+                if (destinationOlFolder is null)
+                {
+                    logger.Warn(
+                        $"Cannot resolve destination folder with path {DestinationOlPath}. Emails will not be moved"
+                    );
+                }
                 return destinationOlFolder;
             }
             catch (System.Exception e)

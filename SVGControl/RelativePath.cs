@@ -17,11 +17,11 @@ using System.Windows.Forms;
 #nullable enable
 
 [assembly: InternalsVisibleTo("SVGControl.Test")]
+
 namespace SVGControl
 {
     internal static class RelativePath
     {
-
         /// <summary>
         /// Creates a relative path from one file or folder to another.
         /// </summary>
@@ -33,20 +33,28 @@ namespace SVGControl
         /// <exception cref="InvalidOperationException"></exception>
         public static string MakeRelativePath(this String pathToMakeRelative, String anchorPath)
         {
-            if (String.IsNullOrEmpty(anchorPath)) throw new ArgumentNullException("anchorPath");
-            if (String.IsNullOrEmpty(pathToMakeRelative)) throw new ArgumentNullException("pathToMakeRelative");
+            if (String.IsNullOrEmpty(anchorPath))
+                throw new ArgumentNullException("anchorPath");
+            if (String.IsNullOrEmpty(pathToMakeRelative))
+                throw new ArgumentNullException("pathToMakeRelative");
 
             Uri fromUri = new Uri(anchorPath);
             Uri toUri = new Uri(pathToMakeRelative);
 
-            if (fromUri.Scheme != toUri.Scheme) { return pathToMakeRelative; } // path can't be made relative.
+            if (fromUri.Scheme != toUri.Scheme)
+            {
+                return pathToMakeRelative;
+            } // path can't be made relative.
 
             Uri relativeUri = fromUri.MakeRelativeUri(toUri);
             String relativePath = Uri.UnescapeDataString(relativeUri.ToString());
 
             if (toUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase))
             {
-                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+                relativePath = relativePath.Replace(
+                    Path.AltDirectorySeparatorChar,
+                    Path.DirectorySeparatorChar
+                );
             }
 
             return relativePath;
@@ -54,13 +62,18 @@ namespace SVGControl
 
         public static string GetRelativeURI(this String pathToMakeRelative, String anchorPath)
         {
-            if (String.IsNullOrEmpty(anchorPath)) throw new ArgumentNullException("anchorPath");
-            if (String.IsNullOrEmpty(pathToMakeRelative)) throw new ArgumentNullException("pathToMakeRelative");
+            if (String.IsNullOrEmpty(anchorPath))
+                throw new ArgumentNullException("anchorPath");
+            if (String.IsNullOrEmpty(pathToMakeRelative))
+                throw new ArgumentNullException("pathToMakeRelative");
 
             Uri fromUri = new Uri(anchorPath);
             Uri toUri = new Uri(pathToMakeRelative);
 
-            if (fromUri.Scheme != toUri.Scheme) { return pathToMakeRelative; } // path can't be made relative.
+            if (fromUri.Scheme != toUri.Scheme)
+            {
+                return pathToMakeRelative;
+            } // path can't be made relative.
 
             Uri relativeUri = fromUri.MakeRelativeUri(toUri);
             String relativePath = Uri.UnescapeDataString(relativeUri.ToString());
@@ -72,8 +85,10 @@ namespace SVGControl
 
         public static string AbsoluteFromPath(this String pathToMakeAbsolute, String anchorPath)
         {
-            if (String.IsNullOrEmpty(anchorPath)) throw new ArgumentNullException("anchorPath");
-            if (String.IsNullOrEmpty(pathToMakeAbsolute)) throw new ArgumentNullException("pathToMakeAbsolute");
+            if (String.IsNullOrEmpty(anchorPath))
+                throw new ArgumentNullException("anchorPath");
+            if (String.IsNullOrEmpty(pathToMakeAbsolute))
+                throw new ArgumentNullException("pathToMakeAbsolute");
 
             anchorPath = NormalizeFolderpath(anchorPath);
             string absolutePath = Path.GetFullPath(anchorPath + pathToMakeAbsolute);
@@ -108,8 +123,10 @@ namespace SVGControl
         /// <exception cref="ArgumentException"></exception>
         static public string GetFullPath(string path, string basePath)
         {
-            if (string.IsNullOrEmpty(path)) throw new ArgumentNullException("path");
-            if (string.IsNullOrEmpty(basePath)) throw new ArgumentNullException("basePath");
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException("path");
+            if (string.IsNullOrEmpty(basePath))
+                throw new ArgumentNullException("basePath");
 
             if (!IsPathFullyQualified(basePath))
                 throw new ArgumentException("Arg_BasePathNotFullyQualified", nameof(basePath));
@@ -127,16 +144,22 @@ namespace SVGControl
                 // Path is current drive rooted i.e. starts with \:
                 // "\Foo" and "C:\Bar" => "C:\Foo"
                 // "\Foo" and "\\?\C:\Bar" => "\\?\C:\Foo"
-                //combinedPath = Join(Path.GetPathRoot(basePath), path.AsSpan(1)); replaced with Concat2 
+                //combinedPath = Join(Path.GetPathRoot(basePath), path.AsSpan(1)); replaced with Concat2
                 combinedPath = Path.GetPathRoot(basePath).Concat2(path.AsSpan(1)); // Cut the separator to ensure we don't end up with two separators when joining with the root.
-
             }
-            else if (length >= 2 && IsValidDriveChar(path[0]) && path[1] == Path.VolumeSeparatorChar)
+            else if (
+                length >= 2
+                && IsValidDriveChar(path[0])
+                && path[1] == Path.VolumeSeparatorChar
+            )
             {
                 // Drive relative paths
                 Debug.Assert(length == 2 || !IsDirectorySeparator(path[2]));
 
-                if (GetVolumeName(path.AsSpan()).Equals(GetVolumeName(basePath.AsSpan()), StringComparison.Ordinal))
+                if (
+                    GetVolumeName(path.AsSpan())
+                        .Equals(GetVolumeName(basePath.AsSpan()), StringComparison.Ordinal)
+                )
                 {
                     // Matching root
                     // "C:Foo" and "C:\Bar" => "C:\Bar\Foo"
@@ -148,11 +171,24 @@ namespace SVGControl
                     // No matching root, root to specified drive
                     // "D:Foo" and "C:\Bar" => "D:Foo"
                     // "D:Foo" and "\\?\C:\Bar" => "\\?\D:\Foo"
-                    combinedPath = !IsDevice(basePath)
-                        ? path.Insert(2, @"\")
+                    combinedPath =
+                        !IsDevice(basePath) ? path.Insert(2, @"\")
                         : length == 2
-                            ? new string(basePath.AsSpan(0, 4).Concat2(path.AsSpan()).Concat2(@"\".AsSpan()).ToArray())
-                            : new string(basePath.AsSpan(0, 4).Concat2(path.AsSpan(0, 2)).Concat2(@"\".AsSpan()).Concat2(path.AsSpan(2)).ToArray());
+                            ? new string(
+                                basePath
+                                    .AsSpan(0, 4)
+                                    .Concat2(path.AsSpan())
+                                    .Concat2(@"\".AsSpan())
+                                    .ToArray()
+                            )
+                        : new string(
+                            basePath
+                                .AsSpan(0, 4)
+                                .Concat2(path.AsSpan(0, 2))
+                                .Concat2(@"\".AsSpan())
+                                .Concat2(path.AsSpan(2))
+                                .ToArray()
+                        );
                 }
             }
             else
@@ -222,15 +258,15 @@ namespace SVGControl
 
             // The only way to specify a fixed path that doesn't begin with two slashes
             // is the drive, colon, slash format- i.e. C:\
-            return !((path.Length >= 3)
+            return !(
+                (path.Length >= 3)
                 && (path[1] == VolumeSeparatorChar)
                 && IsDirectorySeparator(path[2])
                 // To match old behavior we'll check the drive character for validity as the path is technically
                 // not qualified if you don't have a valid drive. "=:\" is the "=" file's default data stream.
-                && IsValidDriveChar(path[0]));
+                && IsValidDriveChar(path[0])
+            );
         }
-
-
 
         /// <summary>
         /// Get the last platform invoke error on the current thread
@@ -344,12 +380,10 @@ namespace SVGControl
         internal const int ERROR_EVT_MESSAGE_ID_NOT_FOUND = 0x3AB4;
         internal const int ERROR_EVT_PUBLISHER_DISABLED = 0x3ABD;
 
-
         /// <summary>
         ///     Returns a string message for the specified Win32 error code.
         /// </summary>
-        internal static string GetMessage(int errorCode) =>
-            GetMessage(errorCode, IntPtr.Zero);
+        internal static string GetMessage(int errorCode) => GetMessage(errorCode, IntPtr.Zero);
 
         private const int FORMAT_MESSAGE_IGNORE_INSERTS = 0x00000200;
         private const int FORMAT_MESSAGE_FROM_HMODULE = 0x00000800;
@@ -357,21 +391,35 @@ namespace SVGControl
         private const int FORMAT_MESSAGE_ARGUMENT_ARRAY = 0x00002000;
         private const int FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x00000100;
 
-        [DllImport("KERNEL32.dll", ExactSpelling = true, EntryPoint = "FormatMessageW", SetLastError = true)]
+        [DllImport(
+            "KERNEL32.dll",
+            ExactSpelling = true,
+            EntryPoint = "FormatMessageW",
+            SetLastError = true
+        )]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static extern unsafe int FormatMessageW(int dwFlags,
-                                                        IntPtr lpSource,
-                                                        uint dwMessageId,
-                                                        int dwLanguageId,
-                                                        void* lpBuffer,
-                                                        int nSize,
-                                                        IntPtr arguments);
+        public static extern unsafe int FormatMessageW(
+            int dwFlags,
+            IntPtr lpSource,
+            uint dwMessageId,
+            int dwLanguageId,
+            void* lpBuffer,
+            int nSize,
+            IntPtr arguments
+        );
 
-        [DllImport("KERNEL32.dll", ExactSpelling = true, EntryPoint = "GetFullPathNameW", SetLastError = true)]
+        [DllImport(
+            "KERNEL32.dll",
+            ExactSpelling = true,
+            EntryPoint = "GetFullPathNameW",
+            SetLastError = true
+        )]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static extern unsafe uint GetLongPathNameW(ref char lpszShortPath,
-                                                          ref char lpszLongPath,
-                                                          uint cchBuffer);
+        public static extern unsafe uint GetLongPathNameW(
+            ref char lpszShortPath,
+            ref char lpszLongPath,
+            uint cchBuffer
+        );
 
         private static string GetAndTrimString(Span<char> buffer)
         {
@@ -385,7 +433,10 @@ namespace SVGControl
 
         internal static unsafe string GetMessage(int errorCode, IntPtr moduleHandle)
         {
-            int flags = FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ARGUMENT_ARRAY;
+            int flags =
+                FORMAT_MESSAGE_IGNORE_INSERTS
+                | FORMAT_MESSAGE_FROM_SYSTEM
+                | FORMAT_MESSAGE_ARGUMENT_ARRAY;
             if (moduleHandle != IntPtr.Zero)
             {
                 flags |= FORMAT_MESSAGE_FROM_HMODULE;
@@ -395,7 +446,15 @@ namespace SVGControl
             Span<char> stackBuffer = stackalloc char[256]; // arbitrary stack limit
             fixed (char* bufferPtr = stackBuffer)
             {
-                int length = FormatMessageW(flags, moduleHandle, unchecked((uint)errorCode), 0, bufferPtr, stackBuffer.Length, IntPtr.Zero);
+                int length = FormatMessageW(
+                    flags,
+                    moduleHandle,
+                    unchecked((uint)errorCode),
+                    0,
+                    bufferPtr,
+                    stackBuffer.Length,
+                    IntPtr.Zero
+                );
                 if (length > 0)
                 {
                     return GetAndTrimString(stackBuffer.Slice(0, length));
@@ -410,7 +469,15 @@ namespace SVGControl
                 IntPtr nativeMsgPtr = default;
                 try
                 {
-                    int length = FormatMessageW(flags | FORMAT_MESSAGE_ALLOCATE_BUFFER, moduleHandle, unchecked((uint)errorCode), 0, &nativeMsgPtr, 0, IntPtr.Zero);
+                    int length = FormatMessageW(
+                        flags | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+                        moduleHandle,
+                        unchecked((uint)errorCode),
+                        0,
+                        &nativeMsgPtr,
+                        0,
+                        IntPtr.Zero
+                    );
                     if (length > 0)
                     {
                         return GetAndTrimString(new Span<char>((char*)nativeMsgPtr, length));
@@ -440,28 +507,50 @@ namespace SVGControl
             {
                 case ERROR_FILE_NOT_FOUND:
                     return new FileNotFoundException(
-                        string.IsNullOrEmpty(path) ? SR.IO_FileNotFound : SR.Format(SR.IO_FileNotFound_FileName, path), path);
+                        string.IsNullOrEmpty(path)
+                            ? SR.IO_FileNotFound
+                            : SR.Format(SR.IO_FileNotFound_FileName, path),
+                        path
+                    );
                 case ERROR_PATH_NOT_FOUND:
                     return new DirectoryNotFoundException(
-                        string.IsNullOrEmpty(path) ? SR.IO_PathNotFound_NoPathName : SR.Format(SR.IO_PathNotFound_Path, path));
+                        string.IsNullOrEmpty(path)
+                            ? SR.IO_PathNotFound_NoPathName
+                            : SR.Format(SR.IO_PathNotFound_Path, path)
+                    );
                 case ERROR_ACCESS_DENIED:
                     return new UnauthorizedAccessException(
-                        string.IsNullOrEmpty(path) ? SR.UnauthorizedAccess_IODenied_NoPathName : SR.Format(SR.UnauthorizedAccess_IODenied_Path, path));
+                        string.IsNullOrEmpty(path)
+                            ? SR.UnauthorizedAccess_IODenied_NoPathName
+                            : SR.Format(SR.UnauthorizedAccess_IODenied_Path, path)
+                    );
                 case ERROR_ALREADY_EXISTS:
                     if (string.IsNullOrEmpty(path))
                         goto default;
-                    return new IOException(SR.Format(SR.IO_AlreadyExists_Name, path), MakeHRFromErrorCode(errorCode));
+                    return new IOException(
+                        SR.Format(SR.IO_AlreadyExists_Name, path),
+                        MakeHRFromErrorCode(errorCode)
+                    );
                 case ERROR_FILENAME_EXCED_RANGE:
                     return new PathTooLongException(
-                        string.IsNullOrEmpty(path) ? SR.IO_PathTooLong : SR.Format(SR.IO_PathTooLong_Path, path));
+                        string.IsNullOrEmpty(path)
+                            ? SR.IO_PathTooLong
+                            : SR.Format(SR.IO_PathTooLong_Path, path)
+                    );
                 case ERROR_SHARING_VIOLATION:
                     return new IOException(
-                        string.IsNullOrEmpty(path) ? SR.IO_SharingViolation_NoFileName : SR.Format(SR.IO_SharingViolation_File, path),
-                        MakeHRFromErrorCode(errorCode));
+                        string.IsNullOrEmpty(path)
+                            ? SR.IO_SharingViolation_NoFileName
+                            : SR.Format(SR.IO_SharingViolation_File, path),
+                        MakeHRFromErrorCode(errorCode)
+                    );
                 case ERROR_FILE_EXISTS:
                     if (string.IsNullOrEmpty(path))
                         goto default;
-                    return new IOException(SR.Format(SR.IO_FileExists_Name, path), MakeHRFromErrorCode(errorCode));
+                    return new IOException(
+                        SR.Format(SR.IO_FileExists_Name, path),
+                        MakeHRFromErrorCode(errorCode)
+                    );
                 case ERROR_OPERATION_ABORTED:
                     return new OperationCanceledException();
                 case ERROR_INVALID_PARAMETER:
@@ -469,9 +558,7 @@ namespace SVGControl
                     string msg = string.IsNullOrEmpty(path)
                         ? GetPInvokeErrorMessage(errorCode)
                         : $"{GetPInvokeErrorMessage(errorCode)} : '{path}'";
-                    return new IOException(
-                        msg,
-                        MakeHRFromErrorCode(errorCode));
+                    return new IOException(msg, MakeHRFromErrorCode(errorCode));
             }
 
             static string GetPInvokeErrorMessage(int errorCode)
@@ -532,8 +619,6 @@ namespace SVGControl
         //    // it doesn't root extended paths correctly. We don't currently resolve extended paths, so we'll just assert here.
         //    Debug.Assert(IsPartiallyQualified(path.AsSpan()) || !IsExtended(path));
 
-
-
         //    int bufsz = 1;
         //    StringBuilder sbFull = new StringBuilder(bufsz);          // Full resolved path will go here
         //    StringBuilder sbFile = new StringBuilder(bufsz);          // Filename will go here
@@ -549,8 +634,6 @@ namespace SVGControl
         //                                                                       //    and 'sbFile' should contain "desktop.ini"
         //    }
 
-
-
         //    if (u == 0)
         //    {
         //        // Failure, get the error and throw
@@ -563,8 +646,6 @@ namespace SVGControl
         //    returnPath = sbFull.ToString();
 
         //}
-
-
 
         ///// <summary>
         ///// Calls GetFullPathName on the given path.
@@ -635,12 +716,18 @@ namespace SVGControl
             return (64 == (IntPtr.Size * 8));
         }
 
-        internal static string TryExpandShortFileName(ref ValueStringBuilder outputBuilder, string? originalPath)
+        internal static string TryExpandShortFileName(
+            ref ValueStringBuilder outputBuilder,
+            string? originalPath
+        )
         {
             // We guarantee we'll expand short names for paths that only partially exist. As such, we need to find the part of the path that actually does exist. To
             // avoid allocating a lot we'll create only one input array and modify the contents with embedded nulls.
 
-            Debug.Assert(!IsPartiallyQualified(outputBuilder.AsSpan()), "should have resolved by now");
+            Debug.Assert(
+                !IsPartiallyQualified(outputBuilder.AsSpan()),
+                "should have resolved by now"
+            );
 
             // We'll have one of a few cases by now (the normalized path will have already:
             //
@@ -676,8 +763,16 @@ namespace SVGControl
             }
             else
             {
-                isDosUnc = !IsDevice(new string(outputBuilder.AsSpan().ToArray())) && outputBuilder.Length > 1 && outputBuilder[0] == '\\' && outputBuilder[1] == '\\';
-                rootDifference = PrependDevicePathChars(ref outputBuilder, isDosUnc, ref inputBuilder);
+                isDosUnc =
+                    !IsDevice(new string(outputBuilder.AsSpan().ToArray()))
+                    && outputBuilder.Length > 1
+                    && outputBuilder[0] == '\\'
+                    && outputBuilder[1] == '\\';
+                rootDifference = PrependDevicePathChars(
+                    ref outputBuilder,
+                    isDosUnc,
+                    ref inputBuilder
+                );
             }
 
             rootLength += rootDifference;
@@ -689,10 +784,14 @@ namespace SVGControl
             while (!success)
             {
                 uint result = GetLongPathNameW(
-                    ref inputBuilder.GetPinnableReference(terminate: true), ref outputBuilder.GetPinnableReference(), (uint)outputBuilder.Capacity);
+                    ref inputBuilder.GetPinnableReference(terminate: true),
+                    ref outputBuilder.GetPinnableReference(),
+                    (uint)outputBuilder.Capacity
+                );
 
                 // Replace any temporary null we added
-                if (inputBuilder[foundIndex] == '\0') inputBuilder[foundIndex] = '\\';
+                if (inputBuilder[foundIndex] == '\0')
+                    inputBuilder[foundIndex] = '\\';
 
                 if (result == 0)
                 {
@@ -707,7 +806,12 @@ namespace SVGControl
                     // We couldn't find the path at the given index, start looking further back in the string.
                     foundIndex--;
 
-                    for (; foundIndex > rootLength && inputBuilder[foundIndex] != '\\'; foundIndex--) ;
+                    for (
+                        ;
+                        foundIndex > rootLength && inputBuilder[foundIndex] != '\\';
+                        foundIndex--
+                    )
+                        ;
                     if (foundIndex == rootLength)
                     {
                         // Can't trim the path back any further
@@ -732,13 +836,17 @@ namespace SVGControl
                     if (foundIndex < inputLength - 1)
                     {
                         // It was a partial find, put the non-existent part of the path back
-                        outputBuilder.Append(inputBuilder.AsSpan(foundIndex, inputBuilder.Length - foundIndex));
+                        outputBuilder.Append(
+                            inputBuilder.AsSpan(foundIndex, inputBuilder.Length - foundIndex)
+                        );
                     }
                 }
             }
 
             // If we were able to expand the path, use it, otherwise use the original full path result
-            ref ValueStringBuilder builderToUse = ref (success ? ref outputBuilder : ref inputBuilder);
+            ref ValueStringBuilder builderToUse = ref (
+                success ? ref outputBuilder : ref inputBuilder
+            );
 
             // Switch back from \\?\ to \\.\ if necessary
             if (wasDotDevice)
@@ -751,8 +859,13 @@ namespace SVGControl
             // Strip out any added characters at the front of the string
             ReadOnlySpan<char> output = builderToUse.AsSpan(rootDifference);
 
-            string returnValue = ((originalPath != null) && output.Equals(originalPath.AsSpan(), StringComparison.Ordinal))
-                ? originalPath : output.ToString();
+            string returnValue =
+                (
+                    (originalPath != null)
+                    && output.Equals(originalPath.AsSpan(), StringComparison.Ordinal)
+                )
+                    ? originalPath
+                    : output.ToString();
 
             inputBuilder.Dispose();
             return returnValue;
@@ -760,8 +873,10 @@ namespace SVGControl
 
         // \\
         internal const int UncPrefixLength = 2;
+
         // \\?\UNC\, \\.\UNC\
         internal const int UncExtendedPrefixLength = 8;
+
         // \\?\, \\.\, \??\
         internal const int DevicePrefixLength = 4;
         internal const string UncExtendedPrefixToInsert = @"?\UNC\";
@@ -769,13 +884,15 @@ namespace SVGControl
         internal const string UncNTPathPrefix = @"\??\UNC\";
         internal const string ExtendedPathPrefix = @"\\?\";
 
-        internal static int PrependDevicePathChars(ref ValueStringBuilder content, bool isDosUnc, ref ValueStringBuilder buffer)
+        internal static int PrependDevicePathChars(
+            ref ValueStringBuilder content,
+            bool isDosUnc,
+            ref ValueStringBuilder buffer
+        )
         {
             int length = content.Length;
 
-            length += isDosUnc
-                ? UncExtendedPrefixLength - UncPrefixLength
-                : DevicePrefixLength;
+            length += isDosUnc ? UncExtendedPrefixLength - UncPrefixLength : DevicePrefixLength;
 
             buffer.EnsureCapacity(length + 1);
             buffer.Length = 0;
@@ -801,7 +918,7 @@ namespace SVGControl
         }
 
         [SecuritySafeCritical]
-        internal unsafe static int GetRootLength(string path)
+        internal static unsafe int GetRootLength(string path)
         {
             fixed (char* path2 = path)
             {
@@ -810,7 +927,7 @@ namespace SVGControl
         }
 
         [SecurityCritical]
-        private unsafe static uint GetRootLength(char* path, ulong pathLength)
+        private static unsafe uint GetRootLength(char* path, ulong pathLength)
         {
             uint num = 0u;
             uint num2 = 2u;
@@ -858,7 +975,7 @@ namespace SVGControl
         }
 
         [SecurityCritical]
-        private unsafe static bool StartsWithOrdinal(char* source, ulong sourceLength, string value)
+        private static unsafe bool StartsWithOrdinal(char* source, ulong sourceLength, string value)
         {
             if (sourceLength < (ulong)value.Length)
             {
@@ -883,7 +1000,11 @@ namespace SVGControl
         /// <param name="rootLength">The length of the root of the given path</param>
         internal static string RemoveRelativeSegments(string path, int rootLength)
         {
-            var sb = new ValueStringBuilder(stackalloc char[260 /* PathInternal.MaxShortPath */]);
+            var sb = new ValueStringBuilder(
+                stackalloc char[
+                    260 /* PathInternal.MaxShortPath */
+                ]
+            );
 
             if (RemoveRelativeSegments(path.AsSpan(), rootLength, ref sb))
             {
@@ -904,7 +1025,11 @@ namespace SVGControl
         /// <param name="rootLength">The length of the root of the given path</param>
         /// <param name="sb">String builder that will store the result</param>
         /// <returns>"true" if the path was modified</returns>
-        internal static bool RemoveRelativeSegments(ReadOnlySpan<char> path, int rootLength, ref ValueStringBuilder sb)
+        internal static bool RemoveRelativeSegments(
+            ReadOnlySpan<char> path,
+            int rootLength,
+            ref ValueStringBuilder sb
+        )
         {
             Debug.Assert(rootLength > 0);
             bool flippedSeparator = false;
@@ -939,8 +1064,10 @@ namespace SVGControl
 
                     // Skip this character and the next if it's referring to the current directory,
                     // e.g. "parent/./child" => "parent/child"
-                    if ((i + 2 == path.Length || IsDirectorySeparator(path[i + 2])) &&
-                        path[i + 1] == '.')
+                    if (
+                        (i + 2 == path.Length || IsDirectorySeparator(path[i + 2]))
+                        && path[i + 1] == '.'
+                    )
                     {
                         i++;
                         continue;
@@ -948,9 +1075,12 @@ namespace SVGControl
 
                     // Skip this character and the next two if it's referring to the parent directory,
                     // e.g. "parent/child/../grandchild" => "parent/grandchild"
-                    if (i + 2 < path.Length &&
-                        (i + 3 == path.Length || IsDirectorySeparator(path[i + 3])) &&
-                        path[i + 1] == '.' && path[i + 2] == '.')
+                    if (
+                        i + 2 < path.Length
+                        && (i + 3 == path.Length || IsDirectorySeparator(path[i + 3]))
+                        && path[i + 1] == '.'
+                        && path[i + 2] == '.'
+                    )
                     {
                         // Unwind back to the last slash (and if there isn't one, clear out everything).
                         int s;
@@ -997,7 +1127,6 @@ namespace SVGControl
             return true;
         }
 
-
         internal static ReadOnlySpan<char> GetVolumeName(ReadOnlySpan<char> path)
         {
             // 3 cases: UNC ("\\server\share"), Device ("\\?\C:\"), or Dos ("C:\")
@@ -1021,7 +1150,9 @@ namespace SVGControl
             }
 
             ReadOnlySpan<char> pathToTrim = root.Slice(startOffset);
-            return EndsInDirectorySeparator(pathToTrim) ? pathToTrim.Slice(0, pathToTrim.Length - 1) : pathToTrim;
+            return EndsInDirectorySeparator(pathToTrim)
+                ? pathToTrim.Slice(0, pathToTrim.Length - 1)
+                : pathToTrim;
         }
 
         internal static bool EndsInDirectorySeparator(ReadOnlySpan<char> path)
@@ -1035,9 +1166,15 @@ namespace SVGControl
             bool isDevice = IsDevice(new string(path.ToArray()));
             if (!isDevice && path.Slice(0, 2).Equals(@"\\".AsSpan(), StringComparison.Ordinal))
                 return 2;
-            else if (isDevice && path.Length >= 8
-                && (path.Slice(0, 8).Equals(UncExtendedPathPrefix.AsSpan(), StringComparison.Ordinal)
-                || path.Slice(5, 4).Equals(@"UNC\".AsSpan(), StringComparison.Ordinal)))
+            else if (
+                isDevice
+                && path.Length >= 8
+                && (
+                    path.Slice(0, 8)
+                        .Equals(UncExtendedPathPrefix.AsSpan(), StringComparison.Ordinal)
+                    || path.Slice(5, 4).Equals(@"UNC\".AsSpan(), StringComparison.Ordinal)
+                )
+            )
                 return 8;
 
             return -1;
@@ -1047,7 +1184,12 @@ namespace SVGControl
         {
             if (!IsExtended(path))
             {
-                if (path.Length >= 4 && IsDirectorySeparator(path[0]) && IsDirectorySeparator(path[1]) && (path[2] == '.' || path[2] == '?'))
+                if (
+                    path.Length >= 4
+                    && IsDirectorySeparator(path[0])
+                    && IsDirectorySeparator(path[1])
+                    && (path[2] == '.' || path[2] == '?')
+                )
                 {
                     return IsDirectorySeparator(path[3]);
                 }
@@ -1060,7 +1202,12 @@ namespace SVGControl
 
         internal static bool IsExtended(string path)
         {
-            if (path.Length >= 4 && path[0] == '\\' && (path[1] == '\\' || path[1] == '?') && path[2] == '?')
+            if (
+                path.Length >= 4
+                && path[0] == '\\'
+                && (path[1] == '\\' || path[1] == '?')
+                && path[2] == '?'
+            )
             {
                 return path[3] == '\\';
             }
@@ -1070,7 +1217,12 @@ namespace SVGControl
 
         internal static bool IsExtended(StringBuilder path)
         {
-            if (path.Length >= 4 && path[0] == '\\' && (path[1] == '\\' || path[1] == '?') && path[2] == '?')
+            if (
+                path.Length >= 4
+                && path[0] == '\\'
+                && (path[1] == '\\' || path[1] == '?')
+                && path[2] == '?'
+            )
             {
                 return path[3] == '\\';
             }
@@ -1078,8 +1230,10 @@ namespace SVGControl
             return false;
         }
 
-
-        public static ReadOnlySpan<char> Concat2(this ReadOnlySpan<char> first, ReadOnlySpan<char> second)
+        public static ReadOnlySpan<char> Concat2(
+            this ReadOnlySpan<char> first,
+            ReadOnlySpan<char> second
+        )
         {
             return new string(first.ToArray().Concat(second.ToArray()).ToArray()).AsSpan();
         }
@@ -1143,8 +1297,8 @@ namespace SVGControl
         //public static string Create(IFormatProvider? provider, Span<char> initialBuffer, [InterpolatedStringHandlerArgument("provider", "initialBuffer")] ref DefaultInterpolatedStringHandler handler) =>
         //    handler.ToStringAndClear();
 
-
-        static public bool IsDirectorySeparator(char character) => character == Path.DirectorySeparatorChar;
+        public static bool IsDirectorySeparator(char character) =>
+            character == Path.DirectorySeparatorChar;
 
         /// <summary>
         /// Decompiled from PathInternal
@@ -1196,7 +1350,7 @@ namespace SVGControl
             return !IsPartiallyQualified(path);
         }
 
-        static public string NormalizeFolderpath(string filepath)
+        public static string NormalizeFolderpath(string filepath)
         {
             //string result = System.IO.Path.GetFullPath(filepath).ToLowerInvariant();
             string result = filepath;
@@ -1218,66 +1372,166 @@ namespace SVGControl
 
     internal static class SR
     {
-
         /// <summary>Enum value was out of legal range.</summary>
-        internal static string @ArgumentOutOfRange_Enum => GetResourceString("ArgumentOutOfRange_Enum", @"Enum value was out of legal range.");
+        internal static string @ArgumentOutOfRange_Enum =>
+            GetResourceString("ArgumentOutOfRange_Enum", @"Enum value was out of legal range.");
+
         /// <summary>Non-negative number required.</summary>
-        internal static string @ArgumentOutOfRange_NeedNonNegNum => GetResourceString("ArgumentOutOfRange_NeedNonNegNum", @"Non-negative number required.");
+        internal static string @ArgumentOutOfRange_NeedNonNegNum =>
+            GetResourceString("ArgumentOutOfRange_NeedNonNegNum", @"Non-negative number required.");
+
         /// <summary>Positive number required.</summary>
-        internal static string @ArgumentOutOfRange_NeedPosNum => GetResourceString("ArgumentOutOfRange_NeedPosNum", @"Positive number required.");
+        internal static string @ArgumentOutOfRange_NeedPosNum =>
+            GetResourceString("ArgumentOutOfRange_NeedPosNum", @"Positive number required.");
+
         /// <summary>Empty name is not legal.</summary>
-        internal static string @Argument_EmptyName => GetResourceString("Argument_EmptyName", @"Empty name is not legal.");
+        internal static string @Argument_EmptyName =>
+            GetResourceString("Argument_EmptyName", @"Empty name is not legal.");
+
         /// <summary>The initial count for the semaphore must be greater than or equal to zero and less than the maximum count.</summary>
-        internal static string @Argument_SemaphoreInitialMaximum => GetResourceString("Argument_SemaphoreInitialMaximum", @"The initial count for the semaphore must be greater than or equal to zero and less than the maximum count.");
+        internal static string @Argument_SemaphoreInitialMaximum =>
+            GetResourceString(
+                "Argument_SemaphoreInitialMaximum",
+                @"The initial count for the semaphore must be greater than or equal to zero and less than the maximum count."
+            );
+
         /// <summary>The length of the name exceeds the maximum limit.</summary>
-        internal static string @Argument_WaitHandleNameTooLong => GetResourceString("Argument_WaitHandleNameTooLong", @"The length of the name exceeds the maximum limit.");
+        internal static string @Argument_WaitHandleNameTooLong =>
+            GetResourceString(
+                "Argument_WaitHandleNameTooLong",
+                @"The length of the name exceeds the maximum limit."
+            );
+
         /// <summary>Cannot create '{0}' because a file or directory with the same name already exists.</summary>
-        internal static string @IO_AlreadyExists_Name => GetResourceString("IO_AlreadyExists_Name", @"Cannot create '{0}' because a file or directory with the same name already exists.");
+        internal static string @IO_AlreadyExists_Name =>
+            GetResourceString(
+                "IO_AlreadyExists_Name",
+                @"Cannot create '{0}' because a file or directory with the same name already exists."
+            );
+
         /// <summary>The file '{0}' already exists.</summary>
-        internal static string @IO_FileExists_Name => GetResourceString("IO_FileExists_Name", @"The file '{0}' already exists.");
+        internal static string @IO_FileExists_Name =>
+            GetResourceString("IO_FileExists_Name", @"The file '{0}' already exists.");
+
         /// <summary>Unable to find the specified file.</summary>
-        internal static string @IO_FileNotFound => GetResourceString("IO_FileNotFound", @"Unable to find the specified file.");
+        internal static string @IO_FileNotFound =>
+            GetResourceString("IO_FileNotFound", @"Unable to find the specified file.");
+
         /// <summary>Could not find file '{0}'.</summary>
-        internal static string @IO_FileNotFound_FileName => GetResourceString("IO_FileNotFound_FileName", @"Could not find file '{0}'.");
+        internal static string @IO_FileNotFound_FileName =>
+            GetResourceString("IO_FileNotFound_FileName", @"Could not find file '{0}'.");
+
         /// <summary>Could not find a part of the path.</summary>
-        internal static string @IO_PathNotFound_NoPathName => GetResourceString("IO_PathNotFound_NoPathName", @"Could not find a part of the path.");
+        internal static string @IO_PathNotFound_NoPathName =>
+            GetResourceString("IO_PathNotFound_NoPathName", @"Could not find a part of the path.");
+
         /// <summary>Could not find a part of the path '{0}'.</summary>
-        internal static string @IO_PathNotFound_Path => GetResourceString("IO_PathNotFound_Path", @"Could not find a part of the path '{0}'.");
+        internal static string @IO_PathNotFound_Path =>
+            GetResourceString("IO_PathNotFound_Path", @"Could not find a part of the path '{0}'.");
+
         /// <summary>The specified file name or path is too long, or a component of the specified path is too long.</summary>
-        internal static string @IO_PathTooLong => GetResourceString("IO_PathTooLong", @"The specified file name or path is too long, or a component of the specified path is too long.");
+        internal static string @IO_PathTooLong =>
+            GetResourceString(
+                "IO_PathTooLong",
+                @"The specified file name or path is too long, or a component of the specified path is too long."
+            );
+
         /// <summary>The path '{0}' is too long, or a component of the specified path is too long.</summary>
-        internal static string @IO_PathTooLong_Path => GetResourceString("IO_PathTooLong_Path", @"The path '{0}' is too long, or a component of the specified path is too long.");
+        internal static string @IO_PathTooLong_Path =>
+            GetResourceString(
+                "IO_PathTooLong_Path",
+                @"The path '{0}' is too long, or a component of the specified path is too long."
+            );
+
         /// <summary>The process cannot access the file '{0}' because it is being used by another process.</summary>
-        internal static string @IO_SharingViolation_File => GetResourceString("IO_SharingViolation_File", @"The process cannot access the file '{0}' because it is being used by another process.");
+        internal static string @IO_SharingViolation_File =>
+            GetResourceString(
+                "IO_SharingViolation_File",
+                @"The process cannot access the file '{0}' because it is being used by another process."
+            );
+
         /// <summary>The process cannot access the file because it is being used by another process.</summary>
-        internal static string @IO_SharingViolation_NoFileName => GetResourceString("IO_SharingViolation_NoFileName", @"The process cannot access the file because it is being used by another process.");
+        internal static string @IO_SharingViolation_NoFileName =>
+            GetResourceString(
+                "IO_SharingViolation_NoFileName",
+                @"The process cannot access the file because it is being used by another process."
+            );
+
         /// <summary>Access Control List (ACL) APIs are part of resource management on Windows and are not supported on this platform.</summary>
-        internal static string @PlatformNotSupported_AccessControl => GetResourceString("PlatformNotSupported_AccessControl", @"Access Control List (ACL) APIs are part of resource management on Windows and are not supported on this platform.");
+        internal static string @PlatformNotSupported_AccessControl =>
+            GetResourceString(
+                "PlatformNotSupported_AccessControl",
+                @"Access Control List (ACL) APIs are part of resource management on Windows and are not supported on this platform."
+            );
+
         /// <summary>A WaitHandle with system-wide name '{0}' cannot be created. A WaitHandle of a different type might have the same name.</summary>
-        internal static string @Threading_WaitHandleCannotBeOpenedException_InvalidHandle => GetResourceString("Threading_WaitHandleCannotBeOpenedException_InvalidHandle", @"A WaitHandle with system-wide name '{0}' cannot be created. A WaitHandle of a different type might have the same name.");
+        internal static string @Threading_WaitHandleCannotBeOpenedException_InvalidHandle =>
+            GetResourceString(
+                "Threading_WaitHandleCannotBeOpenedException_InvalidHandle",
+                @"A WaitHandle with system-wide name '{0}' cannot be created. A WaitHandle of a different type might have the same name."
+            );
+
         /// <summary>Access to the path is denied.</summary>
-        internal static string @UnauthorizedAccess_IODenied_NoPathName => GetResourceString("UnauthorizedAccess_IODenied_NoPathName", @"Access to the path is denied.");
+        internal static string @UnauthorizedAccess_IODenied_NoPathName =>
+            GetResourceString(
+                "UnauthorizedAccess_IODenied_NoPathName",
+                @"Access to the path is denied."
+            );
+
         /// <summary>Access to the path '{0}' is denied.</summary>
-        internal static string @UnauthorizedAccess_IODenied_Path => GetResourceString("UnauthorizedAccess_IODenied_Path", @"Access to the path '{0}' is denied.");
+        internal static string @UnauthorizedAccess_IODenied_Path =>
+            GetResourceString(
+                "UnauthorizedAccess_IODenied_Path",
+                @"Access to the path '{0}' is denied."
+            );
+
         /// <summary>A WaitHandle with system-wide name '{0}' cannot be created. A WaitHandle of a different type might have the same name.</summary>
-        internal static string @WaitHandleCannotBeOpenedException_InvalidHandle => GetResourceString("WaitHandleCannotBeOpenedException_InvalidHandle", @"A WaitHandle with system-wide name '{0}' cannot be created. A WaitHandle of a different type might have the same name.");
+        internal static string @WaitHandleCannotBeOpenedException_InvalidHandle =>
+            GetResourceString(
+                "WaitHandleCannotBeOpenedException_InvalidHandle",
+                @"A WaitHandle with system-wide name '{0}' cannot be created. A WaitHandle of a different type might have the same name."
+            );
 
-
-        private static global::System.Resources.ResourceManager s_resourceManager = s_resourceManager = new global::System.Resources.ResourceManager(typeof(SR));
-        internal static global::System.Resources.ResourceManager ResourceManager => s_resourceManager;
+        private static global::System.Resources.ResourceManager s_resourceManager =
+            s_resourceManager = new global::System.Resources.ResourceManager(typeof(SR));
+        internal static global::System.Resources.ResourceManager ResourceManager =>
+            s_resourceManager;
 
         /// <summary>Failed to create system events window thread.</summary>
-        internal static string @ErrorCreateSystemEvents => GetResourceString("ErrorCreateSystemEvents", @"Failed to create system events window thread.");
-        /// <summary>Cannot create timer.</summary>
-        internal static string @ErrorCreateTimer => GetResourceString("ErrorCreateTimer", @"Cannot create timer.");
-        /// <summary>Cannot end timer.</summary>
-        internal static string @ErrorKillTimer => GetResourceString("ErrorKillTimer", @"Cannot end timer.");
-        /// <summary>'{1}' is not a valid value for '{0}'. '{0}' must be greater than {2}.</summary>
-        internal static string @InvalidLowBoundArgument => GetResourceString("InvalidLowBoundArgument", @"'{1}' is not a valid value for '{0}'. '{0}' must be greater than {2}.");
-        /// <summary>SystemEvents is not supported on this platform.</summary>
-        internal static string @PlatformNotSupported_SystemEvents => GetResourceString("PlatformNotSupported_SystemEvents", @"SystemEvents is not supported on this platform.");
+        internal static string @ErrorCreateSystemEvents =>
+            GetResourceString(
+                "ErrorCreateSystemEvents",
+                @"Failed to create system events window thread."
+            );
 
-        private static readonly bool s_usingResourceKeys = AppContext.TryGetSwitch("System.Resources.UseSystemResourceKeys", out bool usingResourceKeys) ? usingResourceKeys : false;
+        /// <summary>Cannot create timer.</summary>
+        internal static string @ErrorCreateTimer =>
+            GetResourceString("ErrorCreateTimer", @"Cannot create timer.");
+
+        /// <summary>Cannot end timer.</summary>
+        internal static string @ErrorKillTimer =>
+            GetResourceString("ErrorKillTimer", @"Cannot end timer.");
+
+        /// <summary>'{1}' is not a valid value for '{0}'. '{0}' must be greater than {2}.</summary>
+        internal static string @InvalidLowBoundArgument =>
+            GetResourceString(
+                "InvalidLowBoundArgument",
+                @"'{1}' is not a valid value for '{0}'. '{0}' must be greater than {2}."
+            );
+
+        /// <summary>SystemEvents is not supported on this platform.</summary>
+        internal static string @PlatformNotSupported_SystemEvents =>
+            GetResourceString(
+                "PlatformNotSupported_SystemEvents",
+                @"SystemEvents is not supported on this platform."
+            );
+
+        private static readonly bool s_usingResourceKeys = AppContext.TryGetSwitch(
+            "System.Resources.UseSystemResourceKeys",
+            out bool usingResourceKeys
+        )
+            ? usingResourceKeys
+            : false;
 
         // This method is used to decide if we need to append the exception message parameters to the message when calling SR.Format.
         // by default it returns the value of System.Resources.UseSystemResourceKeys AppContext switch or false if not specified.
@@ -1297,9 +1551,9 @@ namespace SVGControl
             {
                 resourceString =
 #if SYSTEM_PRIVATE_CORELIB || NATIVEAOT
-                    InternalGetResourceString(resourceKey);
+                InternalGetResourceString(resourceKey);
 #else
-                    ResourceManager.GetString(resourceKey);
+                ResourceManager.GetString(resourceKey);
 #endif
             }
             catch (MissingManifestResourceException) { }
@@ -1311,7 +1565,9 @@ namespace SVGControl
         {
             string resourceString = GetResourceString(resourceKey);
 
-            return resourceKey == resourceString || resourceString == null ? defaultString : resourceString;
+            return resourceKey == resourceString || resourceString == null
+                ? defaultString
+                : resourceString;
         }
 
         internal static string Format(string resourceFormat, object? p1)
@@ -1369,7 +1625,12 @@ namespace SVGControl
             return string.Format(provider, resourceFormat, p1);
         }
 
-        internal static string Format(IFormatProvider? provider, string resourceFormat, object? p1, object? p2)
+        internal static string Format(
+            IFormatProvider? provider,
+            string resourceFormat,
+            object? p1,
+            object? p2
+        )
         {
             if (UsingResourceKeys())
             {
@@ -1379,7 +1640,13 @@ namespace SVGControl
             return string.Format(provider, resourceFormat, p1, p2);
         }
 
-        internal static string Format(IFormatProvider? provider, string resourceFormat, object? p1, object? p2, object? p3)
+        internal static string Format(
+            IFormatProvider? provider,
+            string resourceFormat,
+            object? p1,
+            object? p2,
+            object? p3
+        )
         {
             if (UsingResourceKeys())
             {
@@ -1389,7 +1656,11 @@ namespace SVGControl
             return string.Format(provider, resourceFormat, p1, p2, p3);
         }
 
-        internal static string Format(IFormatProvider? provider, string resourceFormat, params object?[]? args)
+        internal static string Format(
+            IFormatProvider? provider,
+            string resourceFormat,
+            params object?[]? args
+        )
         {
             if (args != null)
             {

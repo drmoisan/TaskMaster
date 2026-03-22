@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Properties;
@@ -17,13 +17,15 @@ namespace UtilitiesCS.ReusableTypeClasses
     public class SmartSerializableBase
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public SmartSerializableBase() { }
 
         #region Deserialization
 
-        protected T CreateEmpty<T>(DialogResult response, FilePathHelper disk) where T : class, new()
+        protected T CreateEmpty<T>(DialogResult response, FilePathHelper disk)
+            where T : class, new()
         {
             if (response == DialogResult.Yes)
             {
@@ -36,11 +38,17 @@ namespace UtilitiesCS.ReusableTypeClasses
             else
             {
                 throw new ArgumentNullException(
-                $"Must have an instance of {typeof(T)} or create one to continue executing");
+                    $"Must have an instance of {typeof(T)} or create one to continue executing"
+                );
             }
         }
 
-        protected T CreateEmpty<T>(DialogResult response, FilePathHelper disk, JsonSerializerSettings settings, Func<T> altLoader)
+        protected T CreateEmpty<T>(
+            DialogResult response,
+            FilePathHelper disk,
+            JsonSerializerSettings settings,
+            Func<T> altLoader
+        )
             where T : class, new()
         {
             if (response == DialogResult.Yes)
@@ -56,11 +64,17 @@ namespace UtilitiesCS.ReusableTypeClasses
             else
             {
                 throw new ArgumentNullException(
-                $"Must have an instance of {typeof(T)} or create one to continue executing");
+                    $"Must have an instance of {typeof(T)} or create one to continue executing"
+                );
             }
         }
 
-        protected T CreateEmpty<T>(DialogResult response, FilePathHelper disk, JsonSerializerSettings settings) where T : class, new()
+        protected T CreateEmpty<T>(
+            DialogResult response,
+            FilePathHelper disk,
+            JsonSerializerSettings settings
+        )
+            where T : class, new()
         {
             return CreateEmpty<T>(response, disk, settings, null);
         }
@@ -73,8 +87,9 @@ namespace UtilitiesCS.ReusableTypeClasses
                 response = MyBox.ShowDialog(
                     messageText,
                     "Error",
-                MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Error);
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Error
+                );
             }
             else
             {
@@ -83,19 +98,27 @@ namespace UtilitiesCS.ReusableTypeClasses
             return response;
         }
 
-        public T Deserialize<T>(string fileName, string folderPath) where T : class, new()
+        public T Deserialize<T>(string fileName, string folderPath)
+            where T : class, new()
         {
             return Deserialize<T>(fileName, folderPath, false);
         }
 
-        public T Deserialize<T>(string fileName, string folderPath, bool askUserOnError) where T : class, new()
+        public T Deserialize<T>(string fileName, string folderPath, bool askUserOnError)
+            where T : class, new()
         {
             var disk = new FilePathHelper(fileName, folderPath);
             var settings = GetDefaultSettings();
             return Deserialize<T>(disk, askUserOnError, settings);
         }
 
-        public T Deserialize<T>(string fileName, string folderPath, bool askUserOnError, JsonSerializerSettings settings) where T : class, new()
+        public T Deserialize<T>(
+            string fileName,
+            string folderPath,
+            bool askUserOnError,
+            JsonSerializerSettings settings
+        )
+            where T : class, new()
         {
             var disk = new FilePathHelper(fileName, folderPath);
             return Deserialize<T>(disk, askUserOnError, settings);
@@ -139,7 +162,11 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-        public T Deserialize<T, U>(SmartSerializable<U> loader, bool askUserOnError, Func<T> altLoader)
+        public T Deserialize<T, U>(
+            SmartSerializable<U> loader,
+            bool askUserOnError,
+            Func<T> altLoader
+        )
             where T : class, new()
             where U : class, ISmartSerializable<U>, new()
         {
@@ -160,18 +187,22 @@ namespace UtilitiesCS.ReusableTypeClasses
             catch (FileNotFoundException e)
             {
                 logger.Error(e.Message);
-                var response = AskUser(askUserOnError,
-                    $"{disk.FilePath} not found. Need an instance of {typeof(T)} to " +
-                    $"continue. Create a new dictionary or abort execution?");
+                var response = AskUser(
+                    askUserOnError,
+                    $"{disk.FilePath} not found. Need an instance of {typeof(T)} to "
+                        + $"continue. Create a new dictionary or abort execution?"
+                );
                 instance = CreateEmpty<T>(response, disk, settings, altLoader);
                 writeInstance = true;
             }
             catch (System.Exception e)
             {
                 logger.Error($"Error! {e.Message}");
-                var response = AskUser(askUserOnError,
-                    $"{disk.FilePath} encountered a problem. \n{e.Message}\n" +
-                    $"Need a dictionary to continue. Create a new dictionary or abort execution?");
+                var response = AskUser(
+                    askUserOnError,
+                    $"{disk.FilePath} encountered a problem. \n{e.Message}\n"
+                        + $"Need a dictionary to continue. Create a new dictionary or abort execution?"
+                );
                 instance = CreateEmpty(response, disk, settings, altLoader);
                 writeInstance = true;
             }
@@ -186,7 +217,12 @@ namespace UtilitiesCS.ReusableTypeClasses
             return instance;
         }
 
-        protected T Deserialize<T>(FilePathHelper disk, bool askUserOnError, JsonSerializerSettings settings) where T : class, new()
+        protected T Deserialize<T>(
+            FilePathHelper disk,
+            bool askUserOnError,
+            JsonSerializerSettings settings
+        )
+            where T : class, new()
         {
             bool writeInstance = false;
             T instance;
@@ -199,23 +235,26 @@ namespace UtilitiesCS.ReusableTypeClasses
                 {
                     throw new InvalidOperationException($"{disk.FilePath} deserialized to null.");
                 }
-
             }
             catch (FileNotFoundException e)
             {
                 logger.Error(e.Message);
-                response = AskUser(askUserOnError,
-                    $"{disk.FilePath} not found. Need an instance of {typeof(T)} to " +
-                    $"continue. Create a new dictionary or abort execution?");
+                response = AskUser(
+                    askUserOnError,
+                    $"{disk.FilePath} not found. Need an instance of {typeof(T)} to "
+                        + $"continue. Create a new dictionary or abort execution?"
+                );
                 instance = CreateEmpty<T>(response, disk, settings);
                 writeInstance = true;
             }
             catch (System.Exception e)
             {
                 logger.Error($"Error! {e.Message}");
-                response = AskUser(askUserOnError,
-                    $"{disk.FilePath} encountered a problem. \n{e.Message}\n" +
-                    $"Need a dictionary to continue. Create a new dictionary or abort execution?");
+                response = AskUser(
+                    askUserOnError,
+                    $"{disk.FilePath} encountered a problem. \n{e.Message}\n"
+                        + $"Need a dictionary to continue. Create a new dictionary or abort execution?"
+                );
                 instance = CreateEmpty<T>(response, disk, settings);
                 writeInstance = true;
             }
@@ -241,14 +280,21 @@ namespace UtilitiesCS.ReusableTypeClasses
             return await Task.Run(() => Deserialize<T, U>(config));
         }
 
-        public async Task<T> DeserializeAsync<T, U>(SmartSerializable<U> config, bool askUserOnError)
+        public async Task<T> DeserializeAsync<T, U>(
+            SmartSerializable<U> config,
+            bool askUserOnError
+        )
             where T : class, new()
             where U : class, ISmartSerializable<U>, new()
         {
             return await Task.Run(() => Deserialize<T, U>(config, askUserOnError, null));
         }
 
-        public async Task<T> DeserializeAsync<T, U>(SmartSerializable<U> config, bool askUserOnError, Func<T> altLoader)
+        public async Task<T> DeserializeAsync<T, U>(
+            SmartSerializable<U> config,
+            bool askUserOnError,
+            Func<T> altLoader
+        )
             where T : class, new()
             where U : class, ISmartSerializable<U>, new()
         {
@@ -259,11 +305,16 @@ namespace UtilitiesCS.ReusableTypeClasses
             where T : class, new()
         {
             T instance = null;
-            if (!disk.Exists()) { return instance; }
+            if (!disk.Exists())
+            {
+                return instance;
+            }
             try
             {
                 instance = JsonConvert.DeserializeObject<T>(
-                    File.ReadAllText(disk.FilePath), settings);
+                    File.ReadAllText(disk.FilePath),
+                    settings
+                );
             }
             catch (Exception e)
             {
@@ -280,7 +331,8 @@ namespace UtilitiesCS.ReusableTypeClasses
             return instance;
         }
 
-        public T DeserializeObject<T>(string json, JsonSerializerSettings settings) where T : class, new()
+        public T DeserializeObject<T>(string json, JsonSerializerSettings settings)
+            where T : class, new()
         {
             T instance = null;
             try
@@ -299,7 +351,8 @@ namespace UtilitiesCS.ReusableTypeClasses
             return instance;
         }
 
-        protected T DeserializeJson<T>(FilePathHelper disk) where T : class, new()
+        protected T DeserializeJson<T>(FilePathHelper disk)
+            where T : class, new()
         {
             var settings = GetDefaultSettings();
             return DeserializeJson<T>(disk, settings);
@@ -310,10 +363,9 @@ namespace UtilitiesCS.ReusableTypeClasses
             return new JsonSerializerSettings()
             {
                 TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented
+                Formatting = Formatting.Indented,
             };
         }
-
 
         #endregion Deserialization
 
@@ -321,12 +373,14 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         protected NewSmartSerializableConfig GetConfig<T>(T instance)
         {
-            return typeof(T).GetProperty("Config")?.GetValue(instance) as NewSmartSerializableConfig;
+            return typeof(T).GetProperty("Config")?.GetValue(instance)
+                as NewSmartSerializableConfig;
         }
 
         protected void SetConfig<T>(T instance, JsonSerializerSettings settings)
         {
-            var config = typeof(T).GetProperty("Config")?.GetValue(instance) as NewSmartSerializableConfig;
+            var config =
+                typeof(T).GetProperty("Config")?.GetValue(instance) as NewSmartSerializableConfig;
             if (config is not null)
             {
                 config.JsonSettings = settings;
@@ -359,11 +413,17 @@ namespace UtilitiesCS.ReusableTypeClasses
         protected ReaderWriterLockSlim _readWriteLock = new();
 
         private Func<string, StreamWriter> _createStreamWriter = File.CreateText;
-        protected Func<string, StreamWriter> CreateStreamWriter { get => _createStreamWriter; set => _createStreamWriter = value; }
+        protected Func<string, StreamWriter> CreateStreamWriter
+        {
+            get => _createStreamWriter;
+            set => _createStreamWriter = value;
+        }
 
         public void SerializeThreadSafe<T>(T instance, string filePath)
         {
-            instance.ThrowIfNull($"{nameof(SmartSerializableBase)}.{nameof(instance)} is null. It must be linked to the instance it is serializing.");
+            instance.ThrowIfNull(
+                $"{nameof(SmartSerializableBase)}.{nameof(instance)} is null. It must be linked to the instance it is serializing."
+            );
             // Set Status to Locked
             if (_readWriteLock.TryEnterWriteLock(-1))
             {
@@ -386,7 +446,6 @@ namespace UtilitiesCS.ReusableTypeClasses
                     _serializationRequested = new ThreadSafeSingleShotGuard();
                 }
             }
-
         }
 
         public string SerializeToString<T>(T instance)
@@ -440,10 +499,6 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-
         #endregion Serialization
-
-
     }
 }
-

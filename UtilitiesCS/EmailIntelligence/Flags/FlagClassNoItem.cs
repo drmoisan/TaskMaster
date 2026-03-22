@@ -1,5 +1,4 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -7,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
@@ -16,7 +16,8 @@ namespace UtilitiesCS
     public class FlagClassNoItem : INotifyPropertyChanged, ICloneable
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors
 
@@ -57,7 +58,11 @@ namespace UtilitiesCS
         #region Public Properties and Methods
 
         private IList<Category> _olCategories;
-        public IList<Category> OlCategories { get => _olCategories; set => _olCategories = value; }
+        public IList<Category> OlCategories
+        {
+            get => _olCategories;
+            set => _olCategories = value;
+        }
 
         private IList<Category> _olCategorySelection;
         public IList<Category> OlCategorySelection
@@ -65,6 +70,7 @@ namespace UtilitiesCS
             get => Initializer.GetOrLoad(ref _olCategorySelection, SelectionToOlCategories);
             private set => _olCategorySelection = value;
         }
+
         public IList<Category> SelectionToOlCategories() =>
             OlCategories?.Where(c => CategoryNames.Contains(c.Name))?.ToList();
 
@@ -72,11 +78,19 @@ namespace UtilitiesCS
         public string CategoryNames
         {
             get => _categoryNames;
-            set { _categoryNames = value; NotifyPropertyChanged(); }
+            set
+            {
+                _categoryNames = value;
+                NotifyPropertyChanged();
+            }
         }
 
         internal FlagParser _flags;
-        public FlagParser Flags { get => _flags; private set => _flags = value; }
+        public FlagParser Flags
+        {
+            get => _flags;
+            private set => _flags = value;
+        }
 
         private FlagTranslator _people;
         public FlagTranslator People
@@ -84,8 +98,11 @@ namespace UtilitiesCS
             get => Initializer.GetOrLoad(ref _people, () => LoadPeople(), false, Flags);
             private set => _people = value;
         }
-        private FlagTranslator LoadPeople() => new(Flags.GetPeople, Flags.SetPeople, Flags.GetPeopleList, Flags.SetPeopleList);
-        async private Task LoadPeopleAsync() => await Task.Run(() => _people = LoadPeople());
+
+        private FlagTranslator LoadPeople() =>
+            new(Flags.GetPeople, Flags.SetPeople, Flags.GetPeopleList, Flags.SetPeopleList);
+
+        private async Task LoadPeopleAsync() => await Task.Run(() => _people = LoadPeople());
 
         private FlagTranslator _projects;
         public FlagTranslator Projects
@@ -93,8 +110,11 @@ namespace UtilitiesCS
             get => Initializer.GetOrLoad(ref _projects, LoadProjects, false, Flags);
             private set => _projects = value;
         }
-        private FlagTranslator LoadProjects() => new(Flags.GetProjects, Flags.SetProjects, Flags.GetProjectList, Flags.SetProjectList);
-        async private Task LoadProjectAsync() => await Task.Run(() => _projects = LoadProjects());
+
+        private FlagTranslator LoadProjects() =>
+            new(Flags.GetProjects, Flags.SetProjects, Flags.GetProjectList, Flags.SetProjectList);
+
+        private async Task LoadProjectAsync() => await Task.Run(() => _projects = LoadProjects());
 
         private FlagTranslator _context;
         public FlagTranslator Context
@@ -102,8 +122,11 @@ namespace UtilitiesCS
             get => Initializer.GetOrLoad(ref _context, LoadContext, false, Flags);
             private set => _context = value;
         }
-        private FlagTranslator LoadContext() => new(Flags.GetContext, Flags.SetContext, Flags.GetContextList, Flags.SetContextList);
-        async private Task LoadContextAsync() => await Task.Run(() => _context = LoadContext());
+
+        private FlagTranslator LoadContext() =>
+            new(Flags.GetContext, Flags.SetContext, Flags.GetContextList, Flags.SetContextList);
+
+        private async Task LoadContextAsync() => await Task.Run(() => _context = LoadContext());
 
         private FlagTranslator _topic;
         public FlagTranslator Topics
@@ -111,8 +134,11 @@ namespace UtilitiesCS
             get => Initializer.GetOrLoad(ref _topic, LoadTopic, false, Flags);
             private set => _topic = value;
         }
-        private FlagTranslator LoadTopic() => new(Flags.GetTopics, Flags.SetTopics, Flags.GetTopicList, Flags.SetTopicList);
-        async private Task LoadTopicAsync() => await Task.Run(() => _topic = LoadTopic());
+
+        private FlagTranslator LoadTopic() =>
+            new(Flags.GetTopics, Flags.SetTopics, Flags.GetTopicList, Flags.SetTopicList);
+
+        private async Task LoadTopicAsync() => await Task.Run(() => _topic = LoadTopic());
 
         private FlagTranslator _kb;
 
@@ -121,11 +147,22 @@ namespace UtilitiesCS
             get => Initializer.GetOrLoad(ref _kb, LoadKB, false, Flags);
             private set => _kb = value;
         }
-        private FlagTranslator LoadKB() => new(Flags.GetKb, Flags.SetKb, Flags.GetKbList, Flags.SetKbList);
-        async private Task LoadKBAsync() => await Task.Run(() => _kb = LoadKB());
 
-        public bool Bullpin { get => Flags.Bullpin; set => Flags.Bullpin = value; }
-        public bool Today { get => Flags.Today; set => Flags.Today = value; }
+        private FlagTranslator LoadKB() =>
+            new(Flags.GetKb, Flags.SetKb, Flags.GetKbList, Flags.SetKbList);
+
+        private async Task LoadKBAsync() => await Task.Run(() => _kb = LoadKB());
+
+        public bool Bullpin
+        {
+            get => Flags.Bullpin;
+            set => Flags.Bullpin = value;
+        }
+        public bool Today
+        {
+            get => Flags.Today;
+            set => Flags.Today = value;
+        }
 
         #endregion Public Properties and Methods
 
@@ -198,6 +235,5 @@ namespace UtilitiesCS
         }
 
         #endregion ICloneable Implementation
-
     }
 }

@@ -1,8 +1,8 @@
-﻿using Deedle.Internal;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using UtilitiesCS;
+﻿using System;
 using System.Collections.Generic;
+using Deedle.Internal;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UtilitiesCS;
 
 namespace UtilitiesCS.Test.HelperClasses
 {
@@ -20,6 +20,7 @@ namespace UtilitiesCS.Test.HelperClasses
             var test = Initializer.DependenciesNotNull(strict, variable1, variable2, variable3);
             Assert.IsTrue(test);
         }
+
         [TestMethod]
         public void DependenciesNotNull_ExpectedState_False_ParamsIsNull()
         {
@@ -45,31 +46,34 @@ namespace UtilitiesCS.Test.HelperClasses
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void DependenciesNotNull_ExpectedState_Exception_ParamsIsNull()
         {
             bool strict = true;
-            var test = Initializer.DependenciesNotNull(strict, null);
+            Assert.ThrowsExactly<ArgumentNullException>(() =>
+                Initializer.DependenciesNotNull(strict, null)
+            );
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void DependenciesNotNull_ExpectedState_Exception_ParamsIsEmpty()
         {
             bool strict = true;
-            var test = Initializer.DependenciesNotNull(strict);
+            Assert.ThrowsExactly<ArgumentNullException>(() =>
+                Initializer.DependenciesNotNull(strict)
+            );
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void DependenciesNotNull_ExpectedState_Exception_MultipleParamsNull()
         {
             bool strict = true;
             string variable1 = null;
             List<bool> variable2 = null;
             int variable3 = 1;
-            var test = Initializer.DependenciesNotNull(strict, variable1, variable2, variable3);
-            Assert.IsFalse(test);
+
+            Assert.ThrowsExactly<ArgumentNullException>(() =>
+                Initializer.DependenciesNotNull(strict, variable1, variable2, variable3)
+            );
         }
     }
 }

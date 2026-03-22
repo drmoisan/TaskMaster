@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test.EmailIntelligence
 {
@@ -13,10 +13,18 @@ namespace UtilitiesCS.Test.EmailIntelligence
             public TestClass() { }
 
             private string _name;
-            public string Name { get => _name; set => _name = value; }
+            public string Name
+            {
+                get => _name;
+                set => _name = value;
+            }
 
             private ConcurrentDictionary<string, int> _dict = new();
-            public ConcurrentDictionary<string, int> Dict { get => _dict; set => _dict = value; }
+            public ConcurrentDictionary<string, int> Dict
+            {
+                get => _dict;
+                set => _dict = value;
+            }
 
             public object Clone()
             {
@@ -53,7 +61,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Assert
             original.Should().BeEquivalentTo(expected);
-
         }
 
         [TestMethod]
@@ -78,10 +85,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Assert
             original.Should().BeEquivalentTo(expected);
-
         }
-
     }
-
-
 }

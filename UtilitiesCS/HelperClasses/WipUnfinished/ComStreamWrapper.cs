@@ -1,6 +1,6 @@
 ﻿using System;
-using iop = System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using iop = System.Runtime.InteropServices;
 
 public class ComStreamWrapper : System.IO.Stream
 {
@@ -18,9 +18,18 @@ public class ComStreamWrapper : System.IO.Stream
         iop.Marshal.FreeCoTaskMem(mInt64);
     }
 
-    public override bool CanRead { get { return true; } }
-    public override bool CanSeek { get { return true; } }
-    public override bool CanWrite { get { return true; } }
+    public override bool CanRead
+    {
+        get { return true; }
+    }
+    public override bool CanSeek
+    {
+        get { return true; }
+    }
+    public override bool CanWrite
+    {
+        get { return true; }
+    }
 
     public override void Flush()
     {
@@ -41,7 +50,8 @@ public class ComStreamWrapper : System.IO.Stream
 
     public override int Read(byte[] buffer, int offset, int count)
     {
-        if (offset != 0) throw new NotImplementedException();
+        if (offset != 0)
+            throw new NotImplementedException();
         mSource.Read(buffer, count, mInt64);
         Position += count;
         return iop.Marshal.ReadInt32(mInt64);
@@ -61,7 +71,8 @@ public class ComStreamWrapper : System.IO.Stream
 
     public override void Write(byte[] buffer, int offset, int count)
     {
-        if (offset != 0) throw new NotImplementedException();
+        if (offset != 0)
+            throw new NotImplementedException();
         mSource.Write(buffer, count, IntPtr.Zero);
     }
 }

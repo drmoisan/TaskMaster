@@ -15,5 +15,4 @@ namespace QuickFiler.Interfaces
         //Action<string> Update { get; set; }
         //Type DelegateType { get; }
     }
-
 }

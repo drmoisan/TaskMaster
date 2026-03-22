@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UtilitiesCS.Threading;
 using UtilitiesCS;
-using System.Diagnostics;
+using UtilitiesCS.Threading;
 
 namespace QuickFiler
 {
     public static class EfcViewerQueue
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
         private static Queue<EfcViewer> _queue = new Queue<EfcViewer>();
 
         public static void BuildQueue(int count)
@@ -24,10 +26,11 @@ namespace QuickFiler
                         _queue.Enqueue(new EfcViewer());
                         //logger.Debug($"Enqueued {_queue.Count}");
                     },
-                    System.Windows.Threading.DispatcherPriority.Background);
+                    System.Windows.Threading.DispatcherPriority.Background
+                );
 
-                //IdleActionQueue.AddEntry(()=> 
-                //{ 
+                //IdleActionQueue.AddEntry(()=>
+                //{
                 //    _queue.Enqueue(new EfcViewer());
                 //    //logger.Debug($"Enqueued {_queue.Count}");
                 //});
@@ -42,7 +45,6 @@ namespace QuickFiler
                 viewer = _queue.Dequeue();
                 //logger.Debug($"Dequeued 1, {_queue.Count} remaining");
                 BuildQueue(1);
-
             }
             else
             {
@@ -52,7 +54,5 @@ namespace QuickFiler
             }
             return viewer;
         }
-
     }
 }
-

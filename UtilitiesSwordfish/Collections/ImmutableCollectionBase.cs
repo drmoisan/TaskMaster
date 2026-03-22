@@ -1,27 +1,29 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
 // Last Revised: September 2012
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Collections;
 
 namespace Swordfish.NET.Collections
 {
-
     /// <summary>
     /// This class provides the base restrictions for an immutable collection
     /// </summary>
-    public abstract class ImmutableCollectionBase<T> : ICollection<T>, IEnumerable<T>, ICollection, IEnumerable
+    public abstract class ImmutableCollectionBase<T>
+        : ICollection<T>,
+            IEnumerable<T>,
+            ICollection,
+            IEnumerable
     {
-
         /// <summary>
         /// Gets the number of elements contained in the collection<T>.
         /// </summary>
@@ -32,10 +34,7 @@ namespace Swordfish.NET.Collections
         /// </summary>
         public bool IsReadOnly
         {
-            get
-            {
-                return true;
-            }
+            get { return true; }
         }
 
         /// <summary>
@@ -43,7 +42,11 @@ namespace Swordfish.NET.Collections
         /// </param>
         public void Add(T item)
         {
-            throw (new System.NotSupportedException("The Swordfish.NET.Collections.KeyCollection<TKey,TValue> is read-only."));
+            throw (
+                new System.NotSupportedException(
+                    "The Swordfish.NET.Collections.KeyCollection<TKey,TValue> is read-only."
+                )
+            );
         }
 
         /// <summary>
@@ -51,7 +54,11 @@ namespace Swordfish.NET.Collections
         /// </param>
         public void Clear()
         {
-            throw (new System.NotSupportedException("The Swordfish.NET.Collections.KeyCollection<TKey,TValue> is read-only."));
+            throw (
+                new System.NotSupportedException(
+                    "The Swordfish.NET.Collections.KeyCollection<TKey,TValue> is read-only."
+                )
+            );
         }
 
         /// </summary>
@@ -70,7 +77,11 @@ namespace Swordfish.NET.Collections
         /// </param>
         public bool Remove(T item)
         {
-            throw (new System.NotSupportedException("The Swordfish.NET.Collections.KeyCollection<TKey,TValue> is read-only."));
+            throw (
+                new System.NotSupportedException(
+                    "The Swordfish.NET.Collections.KeyCollection<TKey,TValue> is read-only."
+                )
+            );
         }
 
         /// <summary>

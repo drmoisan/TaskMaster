@@ -5,7 +5,6 @@ using UtilitiesCS;
 
 namespace UtilitiesCS
 {
-
     public static class StringManipulation
     {
         public static string GetStrippedText(string text)

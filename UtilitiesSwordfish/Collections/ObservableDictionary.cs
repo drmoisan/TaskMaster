@@ -1,36 +1,34 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
 // Last Revised: September 2012
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using System.Collections.ObjectModel;
-using System.Collections;
-using System.ComponentModel;
-using System.Collections.Specialized;
 
 namespace Swordfish.NET.Collections
 {
-
     /// <summary>
     /// This class provides a dictionary that can be bound to a WPF control.
     /// </summary>
-    public class ObservableDictionary<TKey, TValue> :
-      INotifyCollectionChanged,
-      IDictionary<TKey, TValue>,
-      ICollection<KeyValuePair<TKey, TValue>>,
-      IEnumerable<KeyValuePair<TKey, TValue>>,
-      IEnumerable,
-      ICollection
+    public class ObservableDictionary<TKey, TValue>
+        : INotifyCollectionChanged,
+            IDictionary<TKey, TValue>,
+            ICollection<KeyValuePair<TKey, TValue>>,
+            IEnumerable<KeyValuePair<TKey, TValue>>,
+            IEnumerable,
+            ICollection
     {
-
         // ************************************************************************
         // Private Fields
         // ************************************************************************
@@ -41,18 +39,22 @@ namespace Swordfish.NET.Collections
         /// index for the master list, key list, and value list.
         /// </summary>
         protected Dictionary<TKey, DoubleLinkListIndexNode> _keyToIndex;
+
         /// <summary>
         /// An observable list of key value pairs
         /// </summary>
         protected ObservableCollection<KeyValuePair<TKey, TValue>> _masterList;
+
         /// <summary>
         /// The last node of the link list, used for adding new nodes to the end
         /// </summary>
         protected DoubleLinkListIndexNode _lastNode = null;
+
         /// <summary>
         /// The list of keys for the keys property
         /// </summary>
         protected KeyCollection<TKey, TValue> _keys;
+
         /// <summary>
         /// The list of values for the values property
         /// </summary>
@@ -74,7 +76,9 @@ namespace Swordfish.NET.Collections
         {
             _keyToIndex = new Dictionary<TKey, DoubleLinkListIndexNode>();
             _masterList = new ObservableCollection<KeyValuePair<TKey, TValue>>();
-            _masterList.CollectionChanged += new NotifyCollectionChangedEventHandler(masterList_CollectionChanged);
+            _masterList.CollectionChanged += new NotifyCollectionChangedEventHandler(
+                masterList_CollectionChanged
+            );
 
             _keys = new KeyCollection<TKey, TValue>(this);
             _values = new ValueCollection<TKey, TValue>(this);
@@ -87,9 +91,8 @@ namespace Swordfish.NET.Collections
         /// </summary>
         /// <param name="source"></param>
         public ObservableDictionary(IDictionary<TKey, TValue> source)
-          : this()
+            : this()
         {
-
             foreach (KeyValuePair<TKey, TValue> pair in source)
             {
                 Add(pair);
@@ -102,9 +105,8 @@ namespace Swordfish.NET.Collections
         /// </summary>
         /// <param name="equalityComparer"></param>
         public ObservableDictionary(IEqualityComparer<TKey> equalityComparer)
-          : this()
+            : this()
         {
-
             _keyToIndex = new Dictionary<TKey, DoubleLinkListIndexNode>(equalityComparer);
         }
 
@@ -115,9 +117,8 @@ namespace Swordfish.NET.Collections
         /// </summary>
         /// <param name="capactity"></param>
         public ObservableDictionary(int capactity)
-          : this()
+            : this()
         {
-
             _keyToIndex = new Dictionary<TKey, DoubleLinkListIndexNode>(capactity);
         }
 
@@ -128,10 +129,12 @@ namespace Swordfish.NET.Collections
         /// </summary>
         /// <param name="source"></param>
         /// <param name="equalityComparer"></param>
-        public ObservableDictionary(IDictionary<TKey, TValue> source, IEqualityComparer<TKey> equalityComparer)
-          : this(equalityComparer)
+        public ObservableDictionary(
+            IDictionary<TKey, TValue> source,
+            IEqualityComparer<TKey> equalityComparer
+        )
+            : this(equalityComparer)
         {
-
             foreach (KeyValuePair<TKey, TValue> pair in source)
             {
                 Add(pair);
@@ -146,9 +149,8 @@ namespace Swordfish.NET.Collections
         /// <param name="capacity"></param>
         /// <param name="equalityComparer"></param>
         public ObservableDictionary(int capacity, IEqualityComparer<TKey> equalityComparer)
-          : this()
+            : this()
         {
-
             _keyToIndex = new Dictionary<TKey, DoubleLinkListIndexNode>(capacity, equalityComparer);
         }
 
@@ -235,7 +237,10 @@ namespace Swordfish.NET.Collections
         /// </param>
         public virtual void Add(TKey key, TValue value)
         {
-            DoubleLinkListIndexNode node = new DoubleLinkListIndexNode(_lastNode, _keyToIndex.Count);
+            DoubleLinkListIndexNode node = new DoubleLinkListIndexNode(
+                _lastNode,
+                _keyToIndex.Count
+            );
             _keyToIndex.Add(key, node);
             _lastNode = node;
             _masterList.Add(new KeyValuePair<TKey, TValue>(key, value));
@@ -260,10 +265,7 @@ namespace Swordfish.NET.Collections
         /// </summary>
         public ICollection<TKey> Keys
         {
-            get
-            {
-                return _keys;
-            }
+            get { return _keys; }
         }
 
         /// <summary>
@@ -322,10 +324,7 @@ namespace Swordfish.NET.Collections
         /// </summary>
         public ICollection<TValue> Values
         {
-            get
-            {
-                return _values;
-            }
+            get { return _values; }
         }
 
         /// <summary>
@@ -430,10 +429,7 @@ namespace Swordfish.NET.Collections
         /// </summary>
         public int Count
         {
-            get
-            {
-                return _masterList.Count;
-            }
+            get { return _masterList.Count; }
         }
 
         /// <summary>
@@ -441,10 +437,7 @@ namespace Swordfish.NET.Collections
         /// </summary>
         public bool IsReadOnly
         {
-            get
-            {
-                return ((ICollection<KeyValuePair<TKey, TValue>>)_masterList).IsReadOnly;
-            }
+            get { return ((ICollection<KeyValuePair<TKey, TValue>>)_masterList).IsReadOnly; }
         }
 
         #endregion ICollection<KeyValuePair<TKey, TValue>> Members
@@ -517,6 +510,5 @@ namespace Swordfish.NET.Collections
         }
 
         #endregion ICollection Members
-
     }
 }

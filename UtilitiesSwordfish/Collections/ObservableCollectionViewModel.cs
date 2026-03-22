@@ -1,7 +1,7 @@
 ﻿// Authored by: John Stewien
 // Year: 2011
 // Company: Swordfish Computing
-// License: 
+// License:
 // The Code Project Open License http://www.codeproject.com/info/cpol10.aspx
 // Originally published at:
 // http://www.codeproject.com/Articles/208361/Concurrent-Observable-Collection-Dictionary-and-So
@@ -20,21 +20,23 @@ using System.Windows.Threading;
 
 namespace Swordfish.NET.Collections
 {
-
     /// <summary>
     /// This is the view model for the ConcurrentObservableCollectionBase that can be bound to a view.
     /// This is exposed by ConcurrentObservableCollectionBase when it is used from the Dispatcher thread.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ObservableCollectionViewModel<T> : ObservableCollection<T>, IObserver<NotifyCollectionChangedEventArgs>, IDisposable
+    public class ObservableCollectionViewModel<T>
+        : ObservableCollection<T>,
+            IObserver<NotifyCollectionChangedEventArgs>,
+            IDisposable
     {
-
         #region Private Fields
 
         /// <summary>
         /// Token that comes back when subscribing to the IObservable<> BaseCollection
         /// </summary>
         private IDisposable _unsubscribeToken = null;
+
         /// <summary>
         /// Token for removing the subscription action from the queue
         /// </summary>
@@ -51,9 +53,10 @@ namespace Swordfish.NET.Collections
         /// Constructor. Queues subscribing to the IObservable<> passed in.
         /// </summary>
         /// <param name="observable"></param>
-        public ObservableCollectionViewModel(IObservable<NotifyCollectionChangedEventArgs> observable)
+        public ObservableCollectionViewModel(
+            IObservable<NotifyCollectionChangedEventArgs> observable
+        )
         {
-
             // We create a subscribe action, which has a reference to this object.
             // If the DispatcherQueueProcessor isn't started (because the Dispatcher hasn't been
             // created), then the subscriber action will sit in the queue forever, hence will
@@ -194,6 +197,5 @@ namespace Swordfish.NET.Collections
         }
 
         #endregion Private Methods
-
     }
 }

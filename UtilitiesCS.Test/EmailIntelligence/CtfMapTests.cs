@@ -1,10 +1,9 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Collections.Generic;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
-using System.Collections.Generic;
 using UtilitiesCS;
-
 
 namespace UtilitiesCS.Test.EmailIntelligence
 {
@@ -17,31 +16,25 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Arrange
             var input = new CtfMap
             {
-                new CtfMapEntry("Reference\\Computer Information",
-                                "68109D5D0ED86B4B8384B64247D96451",
-                                1),
-                new CtfMapEntry("Reference\\Computer Information",
-                                "719401DA247C4C479AD40FEF2873039F",
-                                1),
-                new CtfMapEntry("Reference\\2nd Winner",
-                                "719401DA247C4C479AD40FEF2873039F",
-                                5),
-                new CtfMapEntry("Random",
-                                "68109D5D0ED86B4B8384B64247D96451",
-                                1),
-                new CtfMapEntry("Reference\\1st Winner",
-                                "719401DA247C4C479AD40FEF2873039F",
-                                10),
+                new CtfMapEntry(
+                    "Reference\\Computer Information",
+                    "68109D5D0ED86B4B8384B64247D96451",
+                    1
+                ),
+                new CtfMapEntry(
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    1
+                ),
+                new CtfMapEntry("Reference\\2nd Winner", "719401DA247C4C479AD40FEF2873039F", 5),
+                new CtfMapEntry("Random", "68109D5D0ED86B4B8384B64247D96451", 1),
+                new CtfMapEntry("Reference\\1st Winner", "719401DA247C4C479AD40FEF2873039F", 10),
             };
 
             var expected = new CtfMapEntry[]
             {
-                new CtfMapEntry("Reference\\1st Winner",
-                                "719401DA247C4C479AD40FEF2873039F",
-                                10),
-                new CtfMapEntry("Reference\\2nd Winner",
-                                "719401DA247C4C479AD40FEF2873039F",
-                                5)
+                new CtfMapEntry("Reference\\1st Winner", "719401DA247C4C479AD40FEF2873039F", 10),
+                new CtfMapEntry("Reference\\2nd Winner", "719401DA247C4C479AD40FEF2873039F", 5),
             };
 
             string id = "719401DA247C4C479AD40FEF2873039F";
@@ -60,25 +53,35 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Arrange
             var test = new CtfMap
             {
-                new CtfMapEntry("Reference\\Computer Information",
-                                "68109D5D0ED86B4B8384B64247D96451",
-                                1),
-                new CtfMapEntry("Reference\\Computer Information",
-                                "719401DA247C4C479AD40FEF2873039F",
-                                1)
+                new CtfMapEntry(
+                    "Reference\\Computer Information",
+                    "68109D5D0ED86B4B8384B64247D96451",
+                    1
+                ),
+                new CtfMapEntry(
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    1
+                ),
             };
 
             var expected = new CtfMap
             {
-                new CtfMapEntry("Reference\\Computer Information",
-                                "68109D5D0ED86B4B8384B64247D96451",
-                                1),
-                new CtfMapEntry("Reference\\Computer Information",
-                                "719401DA247C4C479AD40FEF2873039F",
-                                1),
-                new CtfMapEntry("Reference\\Computer Information",
-                                "719401DA247C4C479AD40FEF2873039G",
-                                3)
+                new CtfMapEntry(
+                    "Reference\\Computer Information",
+                    "68109D5D0ED86B4B8384B64247D96451",
+                    1
+                ),
+                new CtfMapEntry(
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    1
+                ),
+                new CtfMapEntry(
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039G",
+                    3
+                ),
             };
 
             string emailFolder = "Reference\\Computer Information";
@@ -98,22 +101,30 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Arrange
             var test = new CtfMap
             {
-                new CtfMapEntry("Reference\\Computer Information",
-                                "68109D5D0ED86B4B8384B64247D96451",
-                                1),
-                new CtfMapEntry("Reference\\Computer Information",
-                                "719401DA247C4C479AD40FEF2873039F",
-                                1)
+                new CtfMapEntry(
+                    "Reference\\Computer Information",
+                    "68109D5D0ED86B4B8384B64247D96451",
+                    1
+                ),
+                new CtfMapEntry(
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    1
+                ),
             };
 
             var expected = new CtfMap
             {
-                new CtfMapEntry("Reference\\Computer Information",
-                                "68109D5D0ED86B4B8384B64247D96451",
-                                1),
-                new CtfMapEntry("Reference\\Computer Information",
-                                "719401DA247C4C479AD40FEF2873039F",
-                                4)
+                new CtfMapEntry(
+                    "Reference\\Computer Information",
+                    "68109D5D0ED86B4B8384B64247D96451",
+                    1
+                ),
+                new CtfMapEntry(
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    4
+                ),
             };
 
             string emailFolder = "Reference\\Computer Information";
@@ -131,24 +142,30 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void ProcessQueue_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            Queue<string> lines = new(new List<string>
-            {
-                "Reference\\Computer Information",
-                "68109D5D0ED86B4B8384B64247D96451",
-                "1",
-                "Reference\\Computer Information",
-                "719401DA247C4C479AD40FEF2873039F",
-                "1"
-            });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "Reference\\Computer Information",
+                    "68109D5D0ED86B4B8384B64247D96451",
+                    "1",
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    "1",
+                }
+            );
 
             var expected = new CtfMap
             {
-                new CtfMapEntry("Reference\\Computer Information",
-                                "68109D5D0ED86B4B8384B64247D96451",
-                                1),
-                new CtfMapEntry("Reference\\Computer Information",
-                                "719401DA247C4C479AD40FEF2873039F",
-                                1)
+                new CtfMapEntry(
+                    "Reference\\Computer Information",
+                    "68109D5D0ED86B4B8384B64247D96451",
+                    1
+                ),
+                new CtfMapEntry(
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    1
+                ),
             };
 
             // Act
@@ -162,21 +179,25 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void ProcessQueue_StateUnderTest_MalformedEntry1()
         {
             // Arrange
-            Queue<string> lines = new(new List<string>
-            {
-                "Reference\\Computer Information",
-                "68109D5D0ED86B4B8384B64247D96451",
-                "error",
-                "Reference\\Computer Information",
-                "719401DA247C4C479AD40FEF2873039F",
-                "1"
-            });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "Reference\\Computer Information",
+                    "68109D5D0ED86B4B8384B64247D96451",
+                    "error",
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    "1",
+                }
+            );
 
             var expected = new CtfMap
             {
-                new CtfMapEntry("Reference\\Computer Information",
-                                "719401DA247C4C479AD40FEF2873039F",
-                                1)
+                new CtfMapEntry(
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    1
+                ),
             };
 
             // Act
@@ -190,21 +211,25 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void ProcessQueue_StateUnderTest_MalformedEntry2()
         {
             // Arrange
-            Queue<string> lines = new(new List<string>
-            {
-                "Reference\\Computer Information",
-                "68109D5D0ED86B4B8384B64247D96451",
-                "1.5",
-                "Reference\\Computer Information",
-                "719401DA247C4C479AD40FEF2873039F",
-                "1"
-            });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "Reference\\Computer Information",
+                    "68109D5D0ED86B4B8384B64247D96451",
+                    "1.5",
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    "1",
+                }
+            );
 
             var expected = new CtfMap
             {
-                new CtfMapEntry("Reference\\Computer Information",
-                                "719401DA247C4C479AD40FEF2873039F",
-                                1)
+                new CtfMapEntry(
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    1
+                ),
             };
 
             // Act
@@ -218,20 +243,23 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void TryDequeueEntry_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            Queue<string> lines = new(new List<string>
-            {
-                "Reference\\Computer Information",
-                "68109D5D0ED86B4B8384B64247D96451",
-                "1",
-                "Reference\\Computer Information",
-                "719401DA247C4C479AD40FEF2873039F",
-                "1"
-            });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "Reference\\Computer Information",
+                    "68109D5D0ED86B4B8384B64247D96451",
+                    "1",
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    "1",
+                }
+            );
 
             var expected = new CtfMapEntry(
                 "Reference\\Computer Information",
                 "68109D5D0ED86B4B8384B64247D96451",
-                1);
+                1
+            );
 
             // Act
             var actual = CtfMap.TryDequeueEntry(ref lines);
@@ -244,11 +272,13 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void TryDequeueEntry_StateUnderTest_IncompleteQueue()
         {
             // Arrange
-            Queue<string> lines = new(new List<string>
-            {
-                "Reference\\Computer Information",
-                "68109D5D0ED86B4B8384B64247D96451"
-            });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "Reference\\Computer Information",
+                    "68109D5D0ED86B4B8384B64247D96451",
+                }
+            );
 
             // Act
             var actual = CtfMap.TryDequeueEntry(ref lines);
@@ -261,12 +291,14 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void TryDequeueEntry_StateUnderTest_IncorrectType1()
         {
             // Arrange
-            Queue<string> lines = new(new List<string>
-            {
-                "Reference\\Computer Information",
-                "719401DA247C4C479AD40FEF2873039F",
-                "malformed"
-            });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    "malformed",
+                }
+            );
 
             // Act
             var actual = CtfMap.TryDequeueEntry(ref lines);
@@ -279,12 +311,14 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void TryDequeueEntry_StateUnderTest_IncorrectType2()
         {
             // Arrange
-            Queue<string> lines = new(new List<string>
-            {
-                "Reference\\Computer Information",
-                "719401DA247C4C479AD40FEF2873039F",
-                "1.5"
-            });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    "1.5",
+                }
+            );
 
             // Act
             var actual = CtfMap.TryDequeueEntry(ref lines);
@@ -297,19 +331,23 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void DequeueToNextRecord_StateUnderTest_Remove0()
         {
             // Arrange
-            Queue<string> lines = new(new List<string>
-            {
-                "Reference\\Computer Information",
-                "719401DA247C4C479AD40FEF2873039F",
-                "1"
-            });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    "1",
+                }
+            );
 
-            Queue<string> expected = new(new List<string>
-            {
-                "Reference\\Computer Information",
-                "719401DA247C4C479AD40FEF2873039F",
-                "1"
-            });
+            Queue<string> expected = new(
+                new List<string>
+                {
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    "1",
+                }
+            );
 
             // Act
             CtfMap.DequeueToNextRecord(ref lines);
@@ -323,21 +361,25 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void DequeueToNextRecord_StateUnderTest_Remove2()
         {
             // Arrange
-            Queue<string> lines = new(new List<string>
-            {
-                "68109D5D0ED86B4B8384B64247D96451",
-                "1",
-                "Reference\\Computer Information",
-                "719401DA247C4C479AD40FEF2873039F",
-                "1"
-            });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "68109D5D0ED86B4B8384B64247D96451",
+                    "1",
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    "1",
+                }
+            );
 
-            Queue<string> expected = new(new List<string>
-            {
-                "Reference\\Computer Information",
-                "719401DA247C4C479AD40FEF2873039F",
-                "1"
-            });
+            Queue<string> expected = new(
+                new List<string>
+                {
+                    "Reference\\Computer Information",
+                    "719401DA247C4C479AD40FEF2873039F",
+                    "1",
+                }
+            );
 
             // Act
             CtfMap.DequeueToNextRecord(ref lines);
@@ -351,11 +393,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void DequeueToNextRecord_StateUnderTest_RemoveAll()
         {
             // Arrange
-            Queue<string> lines = new(new List<string>
-            {
-                "719401DA247C4C479AD40FEF2873039F",
-                "1"
-            });
+            Queue<string> lines = new(new List<string> { "719401DA247C4C479AD40FEF2873039F", "1" });
 
             Queue<string> expected = new();
 

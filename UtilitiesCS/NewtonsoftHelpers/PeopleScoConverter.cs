@@ -1,10 +1,10 @@
-﻿using UtilitiesCS.ReusableTypeClasses;
-using Newtonsoft.Json;
-using System;
-using UtilitiesCS.Properties;
+﻿using System;
 using System.IO;
-using System.Text;
 using System.Runtime;
+using System.Text;
+using Newtonsoft.Json;
+using UtilitiesCS.Properties;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace ToDoModel.Data_Model.People
 {
@@ -12,20 +12,31 @@ namespace ToDoModel.Data_Model.People
     {
         public PeopleScoConverter() { }
 
-        public override PeopleScoDictionaryNew ReadJson(JsonReader reader, Type typeToConvert, PeopleScoDictionaryNew existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override PeopleScoDictionaryNew ReadJson(
+            JsonReader reader,
+            Type typeToConvert,
+            PeopleScoDictionaryNew existingValue,
+            bool hasExistingValue,
+            JsonSerializer serializer
+        )
         {
-            var wrapper = serializer.Deserialize(reader, typeof(WrapperPeopleScoDictionaryNew)) as WrapperPeopleScoDictionaryNew;
+            var wrapper =
+                serializer.Deserialize(reader, typeof(WrapperPeopleScoDictionaryNew))
+                as WrapperPeopleScoDictionaryNew;
             return wrapper?.ToDerived();
         }
 
-        public override void WriteJson(JsonWriter writer, PeopleScoDictionaryNew value, JsonSerializer serializer)
+        public override void WriteJson(
+            JsonWriter writer,
+            PeopleScoDictionaryNew value,
+            JsonSerializer serializer
+        )
         {
             var wrapper = new WrapperPeopleScoDictionaryNew().ToComposition(value);
             serializer.Serialize(writer, wrapper);
         }
 
         public override bool CanRead => base.CanRead;
-
     }
 
     //public class ScoDictionaryConverter : JsonConverter
@@ -52,7 +63,7 @@ namespace ToDoModel.Data_Model.People
     //    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     //    {
     //        //Type valueType = value.GetType();
-    //        //Type[] genericArguments = valueType.GetScoDictionaryNewGenerics();            
+    //        //Type[] genericArguments = valueType.GetScoDictionaryNewGenerics();
     //        //Type wrapperType = typeof(WrapperScoDictionary<,,>).MakeGenericType(valueType, genericArguments[0], genericArguments[1]);
     //        Type wrapperType = typeof(WrapperPeopleScoDictionaryNew);
     //        var wrapper = Activator.CreateInstance(wrapperType);

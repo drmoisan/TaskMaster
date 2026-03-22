@@ -1,9 +1,7 @@
-````chatagent
 ---
 name: csharp-atomic-planning
 description: Generate phased implementation plans with atomic checkbox tasks that have binary completion and clear acceptance criteria for C# workflows.
 argument-hint: "Describe the goal or change you want a phased atomic plan for."
-model: GPT-5.4 (copilot)
 tools:
   ['read/readFile', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'agent', 'todo']
 handoffs:
@@ -93,14 +91,17 @@ Use the `atomic-plan-contract` skill as the system-of-record for plan format, Ph
 When planning from a feature folder, resolve mode from `issue.md` marker first:
 
 - `- Work Mode: minor-audit`
-- `- Work Mode: full`
+- `- Work Mode: full-feature`
+- `- Work Mode: full-bug`
+- legacy `- Work Mode: full` => interpret as `full-feature`
 
-If marker is missing or malformed, fail closed to `full`.
+If marker is missing or malformed, fail closed to `full-feature`.
 
 Branch-specific required task sets:
 
 - `minor-audit`: include baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks.
-- `full`: retain full-document expectations and full QA obligations.
+- `full-feature`: retain full-document expectations and full QA obligations.
+- `full-bug`: require spec-driven expectations and full QA obligations.
 
 ---
 

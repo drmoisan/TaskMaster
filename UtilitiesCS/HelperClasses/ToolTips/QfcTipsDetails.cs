@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
 //using UtilitiesCS;
 
 //[assembly: InternalsVisibleTo("QuickFiler.Test")]
@@ -15,7 +16,10 @@ namespace UtilitiesCS
 {
     public class QfcTipsDetails : IQfcTipsDetails
     {
-        private QfcTipsDetails(System.Windows.Forms.Label labelControl, SynchronizationContext uiContext)
+        private QfcTipsDetails(
+            System.Windows.Forms.Label labelControl,
+            SynchronizationContext uiContext
+        )
         {
             _labelControl = labelControl;
             _uiContext = uiContext;
@@ -56,17 +60,26 @@ namespace UtilitiesCS
                 _columnNumber = 0;
                 _columnWidth = 0;
             }
-            else if (parentType == typeof(System.Windows.Forms.Panel) && _labelControl.Parent != null)
+            else if (
+                parentType == typeof(System.Windows.Forms.Panel)
+                && _labelControl.Parent != null
+            )
             {
                 _panel = (System.Windows.Forms.Panel)_labelControl.Parent;
             }
             else
             {
-                throw new ArgumentException($"Type {parentType} is not a supported type for the parent of {nameof(LabelControl)}. It must be of type {typeof(TableLayoutPanel)} or {typeof(System.Windows.Forms.Panel)} but it is of type {parentType}");
+                throw new ArgumentException(
+                    $"Type {parentType} is not a supported type for the parent of {nameof(LabelControl)}. It must be of type {typeof(TableLayoutPanel)} or {typeof(System.Windows.Forms.Panel)} but it is of type {parentType}"
+                );
             }
         }
 
-        public static async ValueTask<IQfcTipsDetails> CreateAsync(System.Windows.Forms.Label labelControl, SynchronizationContext uiContext, CancellationToken token)
+        public static async ValueTask<IQfcTipsDetails> CreateAsync(
+            System.Windows.Forms.Label labelControl,
+            SynchronizationContext uiContext,
+            CancellationToken token
+        )
         {
             token.ThrowIfCancellationRequested();
             var tip = new QfcTipsDetails(labelControl, uiContext);
@@ -83,17 +96,24 @@ namespace UtilitiesCS
 
             if (_labelControl.Parent == null)
             {
-                throw new ArgumentException($"The parent of {nameof(LabelControl)} is null. " +
-                $"Must be of type {typeof(TableLayoutPanel)}");
+                throw new ArgumentException(
+                    $"The parent of {nameof(LabelControl)} is null. "
+                        + $"Must be of type {typeof(TableLayoutPanel)}"
+                );
             }
-            else if (!new List<Type>{typeof(TableLayoutPanel),
-                                    typeof(System.Windows.Forms.Panel)}
-                                    .Contains(
-                                    _labelControl.Parent.GetType()))
+            else if (
+                !new List<Type>
+                {
+                    typeof(TableLayoutPanel),
+                    typeof(System.Windows.Forms.Panel),
+                }.Contains(_labelControl.Parent.GetType())
+            )
             {
-                throw new ArgumentException($"The parent of {nameof(LabelControl)} must " +
-                                            $"be of type {typeof(TableLayoutPanel)} but it is of " +
-                                            $"type {LabelControl.Parent.GetType()}");
+                throw new ArgumentException(
+                    $"The parent of {nameof(LabelControl)} must "
+                        + $"be of type {typeof(TableLayoutPanel)} but it is of "
+                        + $"type {LabelControl.Parent.GetType()}"
+                );
             }
             return _labelControl.Parent.GetType();
         }
@@ -122,19 +142,36 @@ namespace UtilitiesCS
         private CancellationToken _token;
 
         private System.Windows.Forms.Label _labelControl;
-        public System.Windows.Forms.Label LabelControl { get => _labelControl; internal set => _labelControl = value; }
+        public System.Windows.Forms.Label LabelControl
+        {
+            get => _labelControl;
+            internal set => _labelControl = value;
+        }
 
         private TableLayoutPanel _tlp;
-        public TableLayoutPanel TLP { get => _tlp; }
+        public TableLayoutPanel TLP
+        {
+            get => _tlp;
+        }
 
         private int _columnNumber;
-        public int ColumnNumber { get => _columnNumber; }
+        public int ColumnNumber
+        {
+            get => _columnNumber;
+        }
 
         private bool _isNavColumn = false;
-        public bool IsNavColumn { get => _isNavColumn; set => _isNavColumn = value; }
+        public bool IsNavColumn
+        {
+            get => _isNavColumn;
+            set => _isNavColumn = value;
+        }
 
         private System.Single _columnWidth;
-        public float ColumnWidth { get => _columnWidth; }
+        public float ColumnWidth
+        {
+            get => _columnWidth;
+        }
 
         public void Toggle()
         {
@@ -166,14 +203,22 @@ namespace UtilitiesCS
             {
                 _labelControl.Visible = true;
                 _labelControl.Enabled = true;
-                if (_parentType == typeof(TableLayoutPanel) && (!IsNavColumn) && ((_tlp.RowCount == 1) | (sharedColumn)))
+                if (
+                    _parentType == typeof(TableLayoutPanel)
+                    && (!IsNavColumn)
+                    && ((_tlp.RowCount == 1) | (sharedColumn))
+                )
                     _tlp.ColumnStyles[_columnNumber].Width = _columnWidth;
             }
             else
             {
                 _labelControl.Visible = false;
                 _labelControl.Enabled = false;
-                if (_parentType == typeof(TableLayoutPanel) && (!IsNavColumn) && ((_tlp.RowCount == 1) | (sharedColumn)))
+                if (
+                    _parentType == typeof(TableLayoutPanel)
+                    && (!IsNavColumn)
+                    && ((_tlp.RowCount == 1) | (sharedColumn))
+                )
                     _tlp.ColumnStyles[_columnNumber].Width = 0;
             }
             _state = desiredState;

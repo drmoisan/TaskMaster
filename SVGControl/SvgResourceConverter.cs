@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
-
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SVGControl
 {
@@ -18,7 +17,12 @@ namespace SVGControl
             return typeof(string) == destinationType;
         }
 
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        public override object ConvertTo(
+            ITypeDescriptorContext context,
+            CultureInfo culture,
+            object value,
+            Type destinationType
+        )
         {
             if (typeof(string) == destinationType)
             {

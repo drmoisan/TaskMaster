@@ -1,10 +1,29 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\MSTest.TestAdapter.3.9.3\build\net462\MSTest.TestAdapter.props" Condition="Exists('..\packages\MSTest.TestAdapter.3.9.3\build\net462\MSTest.TestAdapter.props')" />
-  <Import Project="..\packages\Microsoft.Testing.Extensions.Telemetry.1.7.3\build\netstandard2.0\Microsoft.Testing.Extensions.Telemetry.props" Condition="Exists('..\packages\Microsoft.Testing.Extensions.Telemetry.1.7.3\build\netstandard2.0\Microsoft.Testing.Extensions.Telemetry.props')" />
-  <Import Project="..\packages\Microsoft.Testing.Platform.MSBuild.1.7.3\build\Microsoft.Testing.Platform.MSBuild.props" Condition="Exists('..\packages\Microsoft.Testing.Platform.MSBuild.1.7.3\build\Microsoft.Testing.Platform.MSBuild.props')" />
-  <Import Project="..\packages\Microsoft.Testing.Platform.1.7.3\build\netstandard2.0\Microsoft.Testing.Platform.props" Condition="Exists('..\packages\Microsoft.Testing.Platform.1.7.3\build\netstandard2.0\Microsoft.Testing.Platform.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<?xml version="1.0" encoding="utf-8"?>
+<Project
+  ToolsVersion="15.0"
+  DefaultTargets="Build"
+  xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+>
+  <Import
+    Project="..\packages\MSTest.TestAdapter.4.1.0\build\net462\MSTest.TestAdapter.props"
+    Condition="Exists('..\packages\MSTest.TestAdapter.4.1.0\build\net462\MSTest.TestAdapter.props')"
+  />
+  <Import
+    Project="..\packages\Microsoft.Testing.Extensions.Telemetry.2.1.0\build\netstandard2.0\Microsoft.Testing.Extensions.Telemetry.props"
+    Condition="Exists('..\packages\Microsoft.Testing.Extensions.Telemetry.2.1.0\build\netstandard2.0\Microsoft.Testing.Extensions.Telemetry.props')"
+  />
+  <Import
+    Project="..\packages\Microsoft.Testing.Platform.MSBuild.2.1.0\build\Microsoft.Testing.Platform.MSBuild.props"
+    Condition="Exists('..\packages\Microsoft.Testing.Platform.MSBuild.2.1.0\build\Microsoft.Testing.Platform.MSBuild.props')"
+  />
+  <Import
+    Project="..\packages\Microsoft.Testing.Platform.2.1.0\build\netstandard2.0\Microsoft.Testing.Platform.props"
+    Condition="Exists('..\packages\Microsoft.Testing.Platform.2.1.0\build\netstandard2.0\Microsoft.Testing.Platform.props')"
+  />
+  <Import
+    Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"
+    Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"
+  />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -18,12 +37,13 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''"
+      >$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath
+    >
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <NuGetPackageImportStamp></NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -68,6 +88,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Dialogs\ActionButtonTests.cs" />
+    <Compile Include="Dialogs\DelegateButton_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroupTests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierTests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierTests_UnfinishedStubs.cs" />
@@ -76,9 +97,33 @@
     <Compile Include="EmailIntelligence\Bayesian\SubCorpus.cs" />
     <Compile Include="EmailIntelligence\Bayesian\SubClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\Bayesian\SubBayesianClassifier.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierExtensions_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianPerformanceMeasurement_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Corpus_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\CorpusInherit_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\ObsoleteBayesianClassifier_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\Triage\TriageCreationTests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities_Tests.cs" />
+    <Compile Include="EmailIntelligence\CtfIncidence_Tests.cs" />
+    <Compile Include="EmailIntelligence\CtfIncidenceList_Tests.cs" />
+    <Compile Include="EmailIntelligence\DoNotSerializeContractResolver_Tests.cs" />
     <Compile Include="EmailIntelligence\CtfIncidenceListTests.cs" />
+    <Compile Include="EmailIntelligence\CtfMap_Tests.cs" />
     <Compile Include="EmailIntelligence\CtfMapTests.cs" />
+    <Compile Include="EmailIntelligence\CommonWords_Tests.cs" />
+    <Compile Include="EmailIntelligence\EmailTokenizer_Tests.cs" />
+    <Compile Include="EmailIntelligence\FlagClassNoItem_Tests.cs" />
+    <Compile Include="EmailIntelligence\FlagDetails_Tests.cs" />
+    <Compile Include="EmailIntelligence\ImageStripper_Tests.cs" />
+    <Compile Include="EmailIntelligence\MinedMailInfo_Tests.cs" />
+    <Compile Include="EmailIntelligence\MovedMailInfo_Tests.cs" />
+    <Compile Include="EmailIntelligence\SubjectMapEntry_Tests.cs" />
+    <Compile Include="EmailIntelligence\SmithWaterman_Tests.cs" />
+    <Compile Include="EmailIntelligence\FilterEntry_Tests.cs" />
+    <Compile Include="EmailIntelligence\BayesianMetricTypes_Tests.cs" />
+    <Compile Include="EmailIntelligence\DedicatedToken_Tests.cs" />
+    <Compile Include="EmailIntelligence\EmailFilerConfig_Tests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MailItemHelperTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MinedMailInfoTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\AttachmentInfoTests.cs" />
@@ -86,26 +131,133 @@
     <Compile Include="EmailIntelligence\UnitTest1.cs" />
     <Compile Include="EmailIntelligence\EmailTokenizerTests.cs" />
     <Compile Include="EmailIntelligence\EmailDetailsTest.cs" />
+    <Compile Include="EmailIntelligence\Prediction_Tests.cs" />
     <Compile Include="EmailIntelligence\IClonableBehaviorTest.cs" />
+    <Compile Include="EmailIntelligence\FlagTranslator_Tests.cs" />
+    <Compile Include="EmailIntelligence\PeopleScoDictionaryNew_Tests.cs" />
+    <Compile Include="EmailIntelligence\RecentsList_Tests.cs" />
+    <Compile Include="Extensions\ArrayExtensions_Tests.cs" />
+    <Compile Include="Extensions\AsyncSerialization_Tests.cs" />
+    <Compile Include="Extensions\CompilerServicesExtensions_Tests.cs" />
+    <Compile Include="Extensions\DictionaryExtensions_Tests.cs" />
+    <Compile Include="Extensions\EnumExtensions_Tests.cs" />
+    <Compile Include="Extensions\ExtToChar_Tests.cs" />
+    <Compile Include="Extensions\ExceptionExtensions_Tests.cs" />
     <Compile Include="Extensions\Frexp_Test.cs" />
+    <Compile Include="Extensions\IAsyncEnumerableExtensions_Tests.cs" />
+    <Compile Include="Extensions\IEnumerableExtensions_Tests.cs" />
+    <Compile Include="Extensions\IListExtensions_Tests.cs" />
+    <Compile Include="Extensions\JsonExtensions_Tests.cs" />
+    <Compile Include="Extensions\JsonSerializerExtensions_Tests.cs" />
+    <Compile Include="Extensions\LazyExtension_Tests.cs" />
+    <Compile Include="Extensions\NullExtensions_Tests.cs" />
+    <Compile Include="Extensions\QueueExtensions_Tests.cs" />
+    <Compile Include="Extensions\StringExtensions_Tests.cs" />
+    <Compile Include="Extensions\StreamExtensions_Tests.cs" />
+    <Compile Include="Extensions\TraceExtensions_Tests.cs" />
+    <Compile Include="Extensions\DrawingExtensions_Tests.cs" />
+    <Compile Include="Extensions\ImageExtensions_Tests.cs" />
     <Compile Include="HelperClasses\MyFileSystemInfoTests.cs" />
     <Compile Include="HelperClasses\PropertyInitializerTest.cs" />
+    <Compile Include="HelperClasses\Initializer_Tests.cs" />
+    <Compile Include="HelperClasses\MergeSortImplementations_Tests.cs" />
+    <Compile Include="HelperClasses\ObjectCopier_Tests.cs" />
+    <Compile Include="HelperClasses\ParamArray_Tests.cs" />
+    <Compile Include="HelperClasses\ObjectSize_Tests.cs" />
+    <Compile Include="HelperClasses\ReflectionHelper_Tests.cs" />
+    <Compile Include="HelperClasses\SegmentStopWatch_Tests.cs" />
+    <Compile Include="HelperClasses\GenericBitwise_Tests.cs" />
+    <Compile Include="HelperClasses\DeepCompare_Tests.cs" />
+    <Compile Include="HelperClasses\DirectoryInfoWrapper_Tests.cs" />
+    <Compile Include="HelperClasses\FileInfoWrapper_Tests.cs" />
+    <Compile Include="HelperClasses\DebugTextLogger_Tests.cs" />
+    <Compile Include="HelperClasses\TraceUtility_Tests.cs" />
+    <Compile Include="HelperClasses\VerboseLogger_Tests.cs" />
     <Compile Include="HelperClasses\ShellUtilitiesTests.cs" />
     <Compile Include="HelperClasses\TimedDiskWriterTests.cs" />
+    <Compile Include="HelperClasses\PrettyPrint_Tests.cs" />
     <Compile Include="HelperClasses\PrettyPrintTest.cs" />
     <Compile Include="HelperClasses\NLogTraceWriter_Test.cs" />
     <Compile Include="HelperClasses\SysImageListHelperTests.cs" />
+    <Compile Include="HelperClasses\StringManipulation_Tests.cs" />
+    <Compile Include="HelperClasses\FilePathHelper_Tests.cs" />
+    <Compile Include="HelperClasses\FileSystemInfoWrapper_Tests.cs" />
+    <Compile Include="Interfaces\PropertyStore_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\AllInclusiveBinder_Tests.cs" />
     <Compile Include="NewtonsoftHelpers\FilePathHelperConverterTests.cs" />
     <Compile Include="NewtonsoftHelpers\DerivedCompositionConverter_ConcurrentDictionaryTests.cs" />
+    <Compile Include="NewtonsoftHelpers\KnownTypesBinder_Tests.cs" />
     <Compile Include="NewtonsoftHelpers\MyTypeBuilder.cs" />
     <Compile Include="NewtonsoftHelpers\ScoDictionaryConverterTests.cs" />
     <Compile Include="NewtonsoftHelpers\WrapperScoDictionaryTest.cs" />
     <Compile Include="NewtonsoftHelpers\WrapperScDictionaryTest.cs" />
+    <Compile Include="NewtonsoftHelpers\NConsoleTraceWriter_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\MonoExtension\MonoExtensionCoverageTests.cs" />
+    <Compile Include="NewtonsoftHelpers\MonoExtension_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\NonRecursiveConverter_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\PeopleScoConverter_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\PeopleScoRemainingObjectConverter_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\ScDictionaryConverter_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\SDILReader\ILGlobals_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\SDILReader\ILInstruction_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\WrapperPeopleScoDictionaryNew_Tests.cs" />
     <Compile Include="OneDriveHelpers\AngleSharpParsedEmailBodyTests.cs" />
     <Compile Include="OneDriveHelpers\OneDriveDownloaderTests.cs" />
-    <Compile Include="OutlookExtensions\FolderConverter_Tests.cs" />
+    <Compile Include="OutlookObjects\Attachment\AttachmentHelperTests.cs" />
+    <Compile Include="OutlookObjects\Attachment\AttachmentSerializableTests.cs" />
+    <Compile Include="OutlookObjects\AppointmentItem\MeetingItemHelperTests.cs" />
+    <Compile Include="OutlookObjects\AppointmentItem\MeetingItemHelperTests.Part2.cs" />
+    <Compile Include="OutlookObjects\Calendar\CalendarTests.cs" />
+    <Compile Include="OutlookObjects\Category\CreateCategoryTests.cs" />
+    <Compile Include="OutlookObjects\Com\ComTypeTests.cs" />
+    <Compile Include="OutlookObjects\Explorer\ExplorerActionsTests.cs" />
+    <Compile Include="OutlookObjects\Filter DASL\DASLFilterParserTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperNameAndParentNameComparerTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperNameCountSizeComparerTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperNameComparerTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperNodeComparerTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperNodeContentsComparerTests.cs" />
+    <Compile Include="OutlookObjects\ItemComparer_Tests.cs" />
+    <Compile Include="OutlookObjects\MailItem\ItemInfoTests.cs" />
+    <Compile Include="OutlookObjects\Item\OlItemSummaryTests.cs" />
+    <Compile Include="OutlookObjects\Item\OlItemPseudoInterfaceTests.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemExtensionsTests.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemFlaggableTests.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemFlaggableTryTests.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItem_Tests.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemTests.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemTryTests.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItemTryGetTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderConverterTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderMinimalWrapperTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderNavigatorTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderScorerTests.cs" />
+    <Compile Include="OutlookObjects\MailItem\EmailDetailsTests.cs" />
+    <Compile Include="OutlookObjects\MailItem\EmailDetailsWrapperTests.cs" />
+    <Compile Include="OutlookObjects\MailItem\CaptureEmailAddressesModule2Tests.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemExtensionsTests.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemHelperCoreTests.cs" />
+    <Compile Include="OutlookObjects\Recipient\RecipientInfoTests.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientStaticTests.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailResolutionTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperViewerTests.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperTests.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemHelperProjectionTests.cs" />
+    <Compile Include="OutlookObjects\Fields\UserDefinedFieldsTests.cs" />
+    <Compile Include="OutlookObjects\Fields\MAPIFieldsTests.cs" />
+    <Compile Include="OutlookObjects\Conversation\ConversationHelperTests.cs" />
+    <Compile Include="OutlookObjects\Conversation\ConversationHelper_ExtendedTests.cs" />
+    <Compile Include="OutlookObjects\Table\OlToDoTableTests.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensionsTransformTests.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensionsRetryTests.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensionsConversionTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperControllerTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperStateTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperTraversalTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderTreeTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderPredictorTests.cs" />
+    <Compile Include="OutlookObjects\Folder\MAPIMethodsTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -119,17 +271,95 @@
     <Compile Include="EmailIntelligence\CommonWords_Test.cs" />
     <Compile Include="Dialogs\InputBox_Test.cs" />
     <Compile Include="HelperClasses\Tokenizer_Test.cs" />
+    <Compile Include="HelperClasses\Tokenizer_Tests.cs" />
     <Compile Include="Extensions\DeedleTests.cs" />
     <Compile Include="HelperClasses\SimpleRegex_Test.cs" />
+    <Compile Include="HelperClasses\SimpleRegex_Tests.cs" />
     <Compile Include="Dialogs\YesNoToAll_Test.cs" />
+    <Compile Include="Dialogs\YesNoToAll_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\AsyncLazy_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\DataConverter2d_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\DenMatrix_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\JaggedMatrix_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\LazyTry_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\Matrix_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SCODictionary_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\ScBag_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableList_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\StackGeek_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\ScoStack_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\StackObjectCS_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\TreeNodeOfT_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionaryTest\ConcurrentObservableDictionaryTest.cs" />
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionaryTest\SimpleObserver.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\ConcurrentObservableDictionaryTests.cs" />
+    <Compile Include="ReusableTypeClasses\ScoCollection_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests_UnfinishedStubs.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryNewTests.cs" />
+    <Compile Include="ReusableTypeClasses\ObservableCollectionBatchUpdate_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\ObservableDictionary_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\ObserverHelper_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\DictionaryChangedEventArgs_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\BagChangedEventArgs_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\LockingLinkedList_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\LockingLinkedListNode_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SimpleActionBagObserver_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SimpleActionLockingLinkedListObserver_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\AsyncQueue_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\AbstractCloneable_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\TimerWrapper_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\TimedBatchAction_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\TimedQueueOfActions_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\TimedAsyncTask_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\ScoDictionaryNew_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\ScoSortedDictionary_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SloLinkedList_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\LockingObservableLinkedList_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\LockingObservableLinkedListNode_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\ScDictionary_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializableConfig_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializable_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializableBase_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializableLoader_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializableNonTyped_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializableStatic_Tests.cs" />
+    <Compile Include="ThemeHelpers\SystemThemeDetectorTests.cs" />
     <Compile Include="Threading\AppGlobalsConverterTests.cs" />
     <Compile Include="Threading\AppGlobalsConverterTests_Unfinished.cs" />
+    <Compile Include="Threading\ProgressPackage_Tests.cs" />
+    <Compile Include="Threading\ProgressTracker_Tests.cs" />
+    <Compile Include="Threading\ProgressTrackerAsync_Tests.cs" />
+    <Compile Include="Threading\TaskPriority_Tests.cs" />
+    <Compile Include="Threading\ThreadSafeFunctions_Tests.cs" />
+    <Compile Include="Threading\ThreadSafeSingleShotGuard_Tests.cs" />
+    <Compile Include="Threading\TimeOutTask_Tests.cs" />
+    <Compile Include="Threading\ApplicationIdleTimer_Tests.cs" />
+    <Compile Include="Threading\UiThread_Tests.cs" />
+    <Compile Include="Dialogs\DialogTests.cs" />
+    <Compile Include="Dialogs\FunctionButton_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\ConditionalItemEngine_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\EngineTests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\MulticlassEngine_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\Triage_Tests.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFiler_Tests.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemapTree_Tests.cs" />
+    <Compile Include="Extensions\WinFormsExtensions_Tests.cs" />
+    <Compile Include="HelperClasses\ComStreamWrapper_Tests.cs" />
+    <Compile Include="HelperClasses\DispatchUtility_Tests.cs" />
+    <Compile Include="HelperClasses\ShellUtilities_Tests.cs" />
+    <Compile Include="HelperClasses\ThemeHelpers\ThemeTests.cs" />
+    <Compile Include="HelperClasses\WindowsForms\ScreenAndTableLayoutTests.cs" />
+    <Compile Include="HelperClasses\WindowsForms\WinFormsInteractionTests.cs" />
+    <Compile Include="HelperClasses\WindowsForms\WinFormsLayoutTests.cs" />
+    <Compile Include="NewtonsoftHelpers\SDILReader\MethodBodyReader_Tests.cs" />
+    <Compile Include="OneDriveHelpers\OneDriveDownloader_Tests.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemHelper_ExtendedTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensions_Tests.cs" />
+    <Compile Include="OutlookObjects\Table\OlToDoTable_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\ConfigController_Tests.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -150,8 +380,8 @@
     <None Include="Resources\EmailHtmlBodyWithDownloadableLinks.html" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Azure.Core, Version=1.46.2.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
-      <HintPath>..\packages\Azure.Core.1.46.2\lib\net472\Azure.Core.dll</HintPath>
+    <Reference Include="Azure.Core, Version=1.51.1.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Azure.Core.1.51.1\lib\net472\Azure.Core.dll</HintPath>
     </Reference>
     <Reference Include="C.math, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\C.math.NET.1.1\lib\net20\C.math.dll</HintPath>
@@ -165,210 +395,219 @@
     <Reference Include="FluentAssertions, Version=8.3.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentAssertions.8.3.0\lib\net47\FluentAssertions.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Core, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\FSharp.Core.9.0.300\lib\netstandard2.0\FSharp.Core.dll</HintPath>
+    <Reference Include="FSharp.Core, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FSharp.Core.11.0.100\lib\netstandard2.0\FSharp.Core.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=3.1.0.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.3.1.0\lib\net462\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=3.3.0.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.3.3.0\lib\net462\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.ApplicationInsights, Version=2.23.0.29, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.2.23.0\lib\net46\Microsoft.ApplicationInsights.dll</HintPath>
+    <Reference Include="Microsoft.ApplicationInsights, Version=3.0.0.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.3.0.0\lib\net462\Microsoft.ApplicationInsights.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.9.0.6\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=10.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.10.0.5\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Bcl.HashCode, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.HashCode.6.0.0\lib\net462\Microsoft.Bcl.HashCode.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bcl.Memory, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.Memory.9.0.6\lib\net462\Microsoft.Bcl.Memory.dll</HintPath>
+    <Reference Include="Microsoft.Bcl.Memory, Version=10.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.Memory.10.0.5\lib\net462\Microsoft.Bcl.Memory.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bcl.TimeProvider, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.TimeProvider.9.0.6\lib\net462\Microsoft.Bcl.TimeProvider.dll</HintPath>
+    <Reference Include="Microsoft.Bcl.TimeProvider, Version=10.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.TimeProvider.10.0.5\lib\net462\Microsoft.Bcl.TimeProvider.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=9.0.0.6, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.9.0.6\lib\net462\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    <Reference Include="Microsoft.Data.Analysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Data.Analysis.0.23.0\lib\netstandard2.0\Microsoft.Data.Analysis.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=9.0.0.6, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.9.0.6\lib\net462\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    <Reference Include="Microsoft.ML.DataView, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ML.DataView.5.0.0\lib\netstandard2.0\Microsoft.ML.DataView.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Graph, Version=5.82.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Graph.5.82.0\lib\netstandard2.0\Microsoft.Graph.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=10.0.0.5, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.10.0.5\lib\net462\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Graph.Core, Version=3.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Graph.Core.3.2.4\lib\net462\Microsoft.Graph.Core.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=10.0.0.5, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.10.0.5\lib\net462\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Identity.Client, Version=4.73.0.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Identity.Client.4.73.0\lib\net472\Microsoft.Identity.Client.dll</HintPath>
+    <Reference Include="Microsoft.Graph, Version=5.103.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Graph.5.103.0\lib\netstandard2.0\Microsoft.Graph.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.Abstractions, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Abstractions.8.12.1\lib\net472\Microsoft.IdentityModel.Abstractions.dll</HintPath>
+    <Reference Include="Microsoft.Graph.Core, Version=3.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Graph.Core.3.2.5\lib\net462\Microsoft.Graph.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.8.12.1\lib\net472\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
+    <Reference Include="Microsoft.Identity.Client, Version=4.83.1.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Identity.Client.4.83.1\lib\net472\Microsoft.Identity.Client.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.Logging, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Logging.8.12.1\lib\net472\Microsoft.IdentityModel.Logging.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.Abstractions, Version=8.16.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Abstractions.8.16.0\lib\net472\Microsoft.IdentityModel.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.Protocols, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Protocols.8.12.1\lib\net472\Microsoft.IdentityModel.Protocols.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=8.16.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.8.16.0\lib\net472\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Protocols.OpenIdConnect.8.12.1\lib\net472\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.Logging, Version=8.16.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Logging.8.16.0\lib\net472\Microsoft.IdentityModel.Logging.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.Tokens, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.8.12.1\lib\net472\Microsoft.IdentityModel.Tokens.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.Protocols, Version=8.16.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Protocols.8.16.0\lib\net472\Microsoft.IdentityModel.Protocols.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.Validators, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Validators.8.12.1\lib\net472\Microsoft.IdentityModel.Validators.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect, Version=8.16.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Protocols.OpenIdConnect.8.16.0\lib\net472\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Abstractions, Version=1.19.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Abstractions.1.19.0\lib\netstandard2.0\Microsoft.Kiota.Abstractions.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.Tokens, Version=8.16.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.8.16.0\lib\net472\Microsoft.IdentityModel.Tokens.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Authentication.Azure, Version=1.19.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Authentication.Azure.1.19.0\lib\netstandard2.0\Microsoft.Kiota.Authentication.Azure.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.Validators, Version=8.16.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Validators.8.16.0\lib\net472\Microsoft.IdentityModel.Validators.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Http.HttpClientLibrary, Version=1.19.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Http.HttpClientLibrary.1.19.0\lib\net462\Microsoft.Kiota.Http.HttpClientLibrary.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Abstractions, Version=1.22.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Abstractions.1.22.0\lib\netstandard2.0\Microsoft.Kiota.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Serialization.Form, Version=1.19.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Serialization.Form.1.19.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Form.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Authentication.Azure, Version=1.22.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Authentication.Azure.1.22.0\lib\netstandard2.0\Microsoft.Kiota.Authentication.Azure.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Serialization.Json, Version=1.19.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Serialization.Json.1.19.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Json.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Http.HttpClientLibrary, Version=1.22.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Http.HttpClientLibrary.1.22.0\lib\net462\Microsoft.Kiota.Http.HttpClientLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Serialization.Multipart, Version=1.19.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Serialization.Multipart.1.19.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Multipart.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Serialization.Form, Version=1.22.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Form.1.22.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Form.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Serialization.Text, Version=1.19.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Serialization.Text.1.19.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Text.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Serialization.Json, Version=1.22.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Json.1.22.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Kiota.Serialization.Multipart, Version=1.22.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Multipart.1.22.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Multipart.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Kiota.Serialization.Text, Version=1.22.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Text.1.22.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Text.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.Testing.Extensions.MSBuild, Version=1.7.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Testing.Platform.MSBuild.1.7.3\lib\netstandard2.0\Microsoft.Testing.Extensions.MSBuild.dll</HintPath>
+    <Reference Include="Microsoft.Testing.Extensions.MSBuild, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Testing.Platform.MSBuild.2.1.0\lib\netstandard2.0\Microsoft.Testing.Extensions.MSBuild.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Testing.Extensions.Telemetry, Version=1.7.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Testing.Extensions.Telemetry.1.7.3\lib\netstandard2.0\Microsoft.Testing.Extensions.Telemetry.dll</HintPath>
+    <Reference Include="Microsoft.Testing.Extensions.Telemetry, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Testing.Extensions.Telemetry.2.1.0\lib\netstandard2.0\Microsoft.Testing.Extensions.Telemetry.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Testing.Extensions.TrxReport.Abstractions, Version=1.7.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Testing.Extensions.TrxReport.Abstractions.1.7.3\lib\netstandard2.0\Microsoft.Testing.Extensions.TrxReport.Abstractions.dll</HintPath>
+    <Reference Include="Microsoft.Testing.Extensions.TrxReport.Abstractions, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Testing.Extensions.TrxReport.Abstractions.2.1.0\lib\netstandard2.0\Microsoft.Testing.Extensions.TrxReport.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Testing.Extensions.VSTestBridge, Version=1.7.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Testing.Extensions.VSTestBridge.1.7.3\lib\netstandard2.0\Microsoft.Testing.Extensions.VSTestBridge.dll</HintPath>
+    <Reference Include="Microsoft.Testing.Extensions.VSTestBridge, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Testing.Extensions.VSTestBridge.2.1.0\lib\netstandard2.0\Microsoft.Testing.Extensions.VSTestBridge.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Testing.Platform, Version=1.7.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Testing.Platform.1.7.3\lib\netstandard2.0\Microsoft.Testing.Platform.dll</HintPath>
+    <Reference Include="Microsoft.Testing.Platform, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Testing.Platform.2.1.0\lib\netstandard2.0\Microsoft.Testing.Platform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.TestPlatform.AdapterUtilities, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.TestPlatform.AdapterUtilities.17.14.1\lib\net462\Microsoft.TestPlatform.AdapterUtilities.dll</HintPath>
+      <HintPath>..\packages\Microsoft.TestPlatform.AdapterUtilities.18.3.0\lib\net462\Microsoft.TestPlatform.AdapterUtilities.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.TestPlatform.CoreUtilities, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.TestPlatform.ObjectModel.17.14.1\lib\net462\Microsoft.TestPlatform.CoreUtilities.dll</HintPath>
+      <HintPath>..\packages\Microsoft.TestPlatform.ObjectModel.18.3.0\lib\net462\Microsoft.TestPlatform.CoreUtilities.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.TestPlatform.PlatformAbstractions, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.TestPlatform.ObjectModel.17.14.1\lib\net462\Microsoft.TestPlatform.PlatformAbstractions.dll</HintPath>
+      <HintPath>..\packages\Microsoft.TestPlatform.ObjectModel.18.3.0\lib\net462\Microsoft.TestPlatform.PlatformAbstractions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.TestPlatform.ObjectModel.17.14.1\lib\net462\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll</HintPath>
+      <HintPath>..\packages\Microsoft.TestPlatform.ObjectModel.18.3.0\lib\net462\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\MSTest.TestFramework.3.9.3\lib\net462\Microsoft.VisualStudio.TestPlatform.TestFramework.dll</HintPath>
+    <Reference Include="MSTest.TestFramework, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MSTest.TestFramework.4.1.0\lib\net462\MSTest.TestFramework.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\MSTest.TestFramework.3.9.3\lib\net462\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll</HintPath>
+    <Reference Include="MSTest.TestFramework.Extensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MSTest.TestFramework.4.1.0\lib\net462\MSTest.TestFramework.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Reflection, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Reflection.2.0.0\lib\net40\Mono.Reflection.dll</HintPath>
     </Reference>
     <Reference Include="Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.20.72\lib\net462\Moq.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="ObjectListView, Version=2.9.1.1072, Culture=neutral, PublicKeyToken=b1c5bf581481bcd4, processorArchitecture=MSIL">
       <HintPath>..\packages\ObjectListView.Official.2.9.1\lib\net20\ObjectListView.dll</HintPath>
     </Reference>
-    <Reference Include="Std.UriTemplate, Version=2.0.5.0, Culture=neutral, PublicKeyToken=c118b0afb4598f9a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Std.UriTemplate.2.0.5\lib\netstandard2.0\Std.UriTemplate.dll</HintPath>
+    <Reference Include="Std.UriTemplate, Version=2.0.8.0, Culture=neutral, PublicKeyToken=c118b0afb4598f9a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Std.UriTemplate.2.0.8\lib\netstandard2.0\Std.UriTemplate.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.6.1\lib\net462\System.Buffers.dll</HintPath>
     </Reference>
-    <Reference Include="System.ClientModel, Version=1.4.2.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ClientModel.1.4.2\lib\netstandard2.0\System.ClientModel.dll</HintPath>
+    <Reference Include="System.ClientModel, Version=1.9.0.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ClientModel.1.9.0\lib\netstandard2.0\System.ClientModel.dll</HintPath>
     </Reference>
-    <Reference Include="System.Collections.Immutable, Version=9.0.0.6, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Collections.Immutable.9.0.6\lib\net462\System.Collections.Immutable.dll</HintPath>
+    <Reference Include="System.Collections.Immutable, Version=10.0.0.5, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.10.0.5\lib\net462\System.Collections.Immutable.dll</HintPath>
     </Reference>
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Diagnostics.DiagnosticSource, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.9.0.6\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=10.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.10.0.5\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Drawing.Design" />
     <Reference Include="System.IdentityModel" />
-    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=8.12.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.8.12.1\lib\net472\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=8.16.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.8.16.0\lib\net472\System.IdentityModel.Tokens.Jwt.dll</HintPath>
     </Reference>
-    <Reference Include="System.Interactive, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Interactive.6.0.3\lib\net48\System.Interactive.dll</HintPath>
+    <Reference Include="System.Interactive, Version=7.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Interactive.7.0.0\lib\net48\System.Interactive.dll</HintPath>
     </Reference>
-    <Reference Include="System.Interactive.Async, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Interactive.Async.6.0.3\lib\net48\System.Interactive.Async.dll</HintPath>
+    <Reference Include="System.Interactive.Async, Version=7.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Interactive.Async.7.0.0\lib\net48\System.Interactive.Async.dll</HintPath>
     </Reference>
-    <Reference Include="System.IO.Pipelines, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.IO.Pipelines.9.0.6\lib\net462\System.IO.Pipelines.dll</HintPath>
+    <Reference Include="System.IO.Pipelines, Version=10.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Pipelines.10.0.5\lib\net462\System.IO.Pipelines.dll</HintPath>
     </Reference>
     <Reference Include="System.Linq, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Linq.4.3.0\lib\net463\System.Linq.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Linq.Async, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Linq.Async.6.0.3\lib\net48\System.Linq.Async.dll</HintPath>
+    <Reference Include="System.Linq.Async, Version=7.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Linq.Async.7.0.0\lib\net48\System.Linq.Async.dll</HintPath>
     </Reference>
     <Reference Include="System.Memory, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll</HintPath>
     </Reference>
-    <Reference Include="System.Memory.Data, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.Data.9.0.6\lib\net462\System.Memory.Data.dll</HintPath>
+    <Reference Include="System.Memory.Data, Version=10.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.Data.10.0.5\lib\net462\System.Memory.Data.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Net.Http.WinHttpHandler, Version=9.0.0.6, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Net.Http.WinHttpHandler.9.0.6\lib\net462\System.Net.Http.WinHttpHandler.dll</HintPath>
+    <Reference Include="System.Net.Http.WinHttpHandler, Version=10.0.0.5, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.Http.WinHttpHandler.10.0.5\lib\net462\System.Net.Http.WinHttpHandler.dll</HintPath>
     </Reference>
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors, Version=4.1.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.6.1\lib\net462\System.Numerics.Vectors.dll</HintPath>
     </Reference>
-    <Reference Include="System.Reactive, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reactive.6.0.1\lib\net472\System.Reactive.dll</HintPath>
+    <Reference Include="System.Reactive, Version=6.1.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.6.1.0\lib\net472\System.Reactive.dll</HintPath>
     </Reference>
     <Reference Include="System.Reactive.Async, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reactive.Async.6.0.0-alpha.18\lib\netstandard2.0\System.Reactive.Async.dll</HintPath>
     </Reference>
-    <Reference Include="System.Reflection.Metadata, Version=9.0.0.6, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reflection.Metadata.9.0.6\lib\net462\System.Reflection.Metadata.dll</HintPath>
+    <Reference Include="System.Reflection.Metadata, Version=10.0.0.5, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reflection.Metadata.10.0.5\lib\net462\System.Reflection.Metadata.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime" />
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Text.Encodings.Web, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encodings.Web.9.0.6\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+    <Reference Include="System.Text.Encodings.Web, Version=10.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.10.0.5\lib\net462\System.Text.Encodings.Web.dll</HintPath>
     </Reference>
-    <Reference Include="System.Text.Encoding.CodePages, Version=9.0.0.6, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encoding.CodePages.9.0.6\lib\net462\System.Text.Encoding.CodePages.dll</HintPath>
+    <Reference Include="System.Text.Encoding.CodePages, Version=10.0.0.5, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encoding.CodePages.10.0.5\lib\net462\System.Text.Encoding.CodePages.dll</HintPath>
     </Reference>
-    <Reference Include="System.Text.Json, Version=9.0.0.6, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Json.9.0.6\lib\net462\System.Text.Json.dll</HintPath>
+    <Reference Include="System.Text.Json, Version=10.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.10.0.5\lib\net462\System.Text.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.6.3\lib\net462\System.Threading.Tasks.Extensions.dll</HintPath>
@@ -395,8 +634,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\MSTest.Analyzers.3.9.3\analyzers\dotnet\cs\MSTest.Analyzers.CodeFixes.dll" />
-    <Analyzer Include="..\packages\MSTest.Analyzers.3.9.3\analyzers\dotnet\cs\MSTest.Analyzers.dll" />
+    <Analyzer Include="..\packages\MSTest.Analyzers.4.1.0\analyzers\dotnet\cs\MSTest.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\packages\MSTest.Analyzers.4.1.0\analyzers\dotnet\cs\MSTest.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8.1">
@@ -410,23 +649,66 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
+  <Import
+    Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets"
+    Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')"
+  />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Testing.Platform.1.7.3\build\netstandard2.0\Microsoft.Testing.Platform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Testing.Platform.1.7.3\build\netstandard2.0\Microsoft.Testing.Platform.props'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Testing.Platform.1.7.3\build\netstandard2.0\Microsoft.Testing.Platform.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Testing.Platform.1.7.3\build\netstandard2.0\Microsoft.Testing.Platform.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Testing.Platform.MSBuild.1.7.3\build\Microsoft.Testing.Platform.MSBuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Testing.Platform.MSBuild.1.7.3\build\Microsoft.Testing.Platform.MSBuild.props'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Testing.Platform.MSBuild.1.7.3\build\Microsoft.Testing.Platform.MSBuild.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Testing.Platform.MSBuild.1.7.3\build\Microsoft.Testing.Platform.MSBuild.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Testing.Extensions.Telemetry.1.7.3\build\netstandard2.0\Microsoft.Testing.Extensions.Telemetry.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Testing.Extensions.Telemetry.1.7.3\build\netstandard2.0\Microsoft.Testing.Extensions.Telemetry.props'))" />
-    <Error Condition="!Exists('..\packages\MSTest.TestAdapter.3.9.3\build\net462\MSTest.TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestAdapter.3.9.3\build\net462\MSTest.TestAdapter.props'))" />
-    <Error Condition="!Exists('..\packages\MSTest.TestAdapter.3.9.3\build\net462\MSTest.TestAdapter.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestAdapter.3.9.3\build\net462\MSTest.TestAdapter.targets'))" />
+    <Error
+      Condition="!Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')"
+      Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets'))"
+    />
+    <Error
+      Condition="!Exists('..\packages\Microsoft.Testing.Platform.2.1.0\build\netstandard2.0\Microsoft.Testing.Platform.props')"
+      Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Testing.Platform.2.1.0\build\netstandard2.0\Microsoft.Testing.Platform.props'))"
+    />
+    <Error
+      Condition="!Exists('..\packages\Microsoft.Testing.Platform.2.1.0\build\netstandard2.0\Microsoft.Testing.Platform.targets')"
+      Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Testing.Platform.2.1.0\build\netstandard2.0\Microsoft.Testing.Platform.targets'))"
+    />
+    <Error
+      Condition="!Exists('..\packages\Microsoft.Testing.Platform.MSBuild.2.1.0\build\Microsoft.Testing.Platform.MSBuild.props')"
+      Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Testing.Platform.MSBuild.2.1.0\build\Microsoft.Testing.Platform.MSBuild.props'))"
+    />
+    <Error
+      Condition="!Exists('..\packages\Microsoft.Testing.Platform.MSBuild.2.1.0\build\Microsoft.Testing.Platform.MSBuild.targets')"
+      Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Testing.Platform.MSBuild.2.1.0\build\Microsoft.Testing.Platform.MSBuild.targets'))"
+    />
+    <Error
+      Condition="!Exists('..\packages\Microsoft.Testing.Extensions.Telemetry.2.1.0\build\netstandard2.0\Microsoft.Testing.Extensions.Telemetry.props')"
+      Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Testing.Extensions.Telemetry.2.1.0\build\netstandard2.0\Microsoft.Testing.Extensions.Telemetry.props'))"
+    />
+    <Error
+      Condition="!Exists('..\packages\MSTest.TestFramework.4.1.0\build\net462\MSTest.TestFramework.targets')"
+      Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestFramework.4.1.0\build\net462\MSTest.TestFramework.targets'))"
+    />
+    <Error
+      Condition="!Exists('..\packages\MSTest.TestAdapter.4.1.0\build\net462\MSTest.TestAdapter.props')"
+      Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestAdapter.4.1.0\build\net462\MSTest.TestAdapter.props'))"
+    />
+    <Error
+      Condition="!Exists('..\packages\MSTest.TestAdapter.4.1.0\build\net462\MSTest.TestAdapter.targets')"
+      Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestAdapter.4.1.0\build\net462\MSTest.TestAdapter.targets'))"
+    />
   </Target>
-  <Import Project="..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" />
-  <Import Project="..\packages\Microsoft.Testing.Platform.1.7.3\build\netstandard2.0\Microsoft.Testing.Platform.targets" Condition="Exists('..\packages\Microsoft.Testing.Platform.1.7.3\build\netstandard2.0\Microsoft.Testing.Platform.targets')" />
-  <Import Project="..\packages\Microsoft.Testing.Platform.MSBuild.1.7.3\build\Microsoft.Testing.Platform.MSBuild.targets" Condition="Exists('..\packages\Microsoft.Testing.Platform.MSBuild.1.7.3\build\Microsoft.Testing.Platform.MSBuild.targets')" />
-  <Import Project="..\packages\MSTest.TestAdapter.3.9.3\build\net462\MSTest.TestAdapter.targets" Condition="Exists('..\packages\MSTest.TestAdapter.3.9.3\build\net462\MSTest.TestAdapter.targets')" />
+  <Import
+    Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets"
+    Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')"
+  />
+  <Import
+    Project="..\packages\Microsoft.Testing.Platform.2.1.0\build\netstandard2.0\Microsoft.Testing.Platform.targets"
+    Condition="Exists('..\packages\Microsoft.Testing.Platform.2.1.0\build\netstandard2.0\Microsoft.Testing.Platform.targets')"
+  />
+  <Import
+    Project="..\packages\Microsoft.Testing.Platform.MSBuild.2.1.0\build\Microsoft.Testing.Platform.MSBuild.targets"
+    Condition="Exists('..\packages\Microsoft.Testing.Platform.MSBuild.2.1.0\build\Microsoft.Testing.Platform.MSBuild.targets')"
+  />
+  <Import
+    Project="..\packages\MSTest.TestAdapter.4.1.0\build\net462\MSTest.TestAdapter.targets"
+    Condition="Exists('..\packages\MSTest.TestAdapter.4.1.0\build\net462\MSTest.TestAdapter.targets')"
+  />
 </Project>

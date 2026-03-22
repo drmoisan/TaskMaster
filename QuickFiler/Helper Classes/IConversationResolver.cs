@@ -1,10 +1,10 @@
-﻿using Microsoft.Data.Analysis;
-using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Data.Analysis;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 
 namespace QuickFiler.Helper_Classes
@@ -23,7 +23,10 @@ namespace QuickFiler.Helper_Classes
 
         Task BackgroundInitInfoItemsAsync(CancellationToken token);
         void Handler_PropertyChanged(object sender, PropertyChangedEventArgs e);
-        Task<Pair<List<MailItemHelper>>> LoadConversationInfoAsync(CancellationToken token, bool backgroundLoad);
+        Task<Pair<List<MailItemHelper>>> LoadConversationInfoAsync(
+            CancellationToken token,
+            bool backgroundLoad
+        );
         Task LoadConversationItemsAsync(CancellationToken token, bool backgroundLoad);
         Task LoadDfAsync(CancellationToken token, bool backgroundLoad);
     }

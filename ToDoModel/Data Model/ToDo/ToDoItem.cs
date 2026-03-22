@@ -15,19 +15,22 @@ using UtilitiesCS.HelperClasses;
 using UtilitiesCS.OutlookExtensions;
 
 [assembly: InternalsVisibleTo("ToDoModel.Test")]
+
 namespace ToDoModel
 {
     [Serializable()]
     public class ToDoItem : ICloneable, IToDoItem
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors
 
         private ToDoItem() { }
 
-        public ToDoItem(IOutlookItem outlookItem) : this(new OutlookItemFlaggable(outlookItem))
+        public ToDoItem(IOutlookItem outlookItem)
+            : this(new OutlookItemFlaggable(outlookItem))
         {
             //FlaggableItem = new OutlookItemFlaggable(outlookItem);
             //Loader = new ToDoLoader(() => FlaggableItem.Save(), IsReadOnly);
@@ -82,9 +85,11 @@ namespace ToDoModel
 
         #region Private Variables
 
-        private const string PA_TOTAL_WORK = "http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/81110003";
+        private const string PA_TOTAL_WORK =
+            "http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/81110003";
         private string _metaTaskSubject = "";
         private string _metaTaskLvl = "";
+
         //private string _tagProgram = "";
         private bool? _activeBranch = null;
         private string _expandChildren = "";
@@ -176,7 +181,12 @@ namespace ToDoModel
             // Return read only variable to its original state
             ReadOnly = tmpReadOnly_state;
 
-            ToDoEvents.Editing.UpdateOrRemove(OlItem.EntryID, (key, existing) => existing == 1, (key, existing) => existing - 1, out _);
+            ToDoEvents.Editing.UpdateOrRemove(
+                OlItem.EntryID,
+                (key, existing) => existing == 1,
+                (key, existing) => existing - 1,
+                out _
+            );
         }
 
         public async Task WriteFlagsBatch()
@@ -188,24 +198,53 @@ namespace ToDoModel
 
             FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
 
-            FlaggableItem.TrySetUdf(GetUdfName(PrefixTypeEnum.Context), Context.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
-            FlaggableItem.TrySetUdf(GetUdfName(PrefixTypeEnum.People), People.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
-            FlaggableItem.TrySetUdf(GetUdfName(PrefixTypeEnum.Topic), Topics.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+            FlaggableItem.TrySetUdf(
+                GetUdfName(PrefixTypeEnum.Context),
+                Context.AsListNoPrefix.ToArray(),
+                OlUserPropertyType.olKeywords
+            );
+            FlaggableItem.TrySetUdf(
+                GetUdfName(PrefixTypeEnum.People),
+                People.AsListNoPrefix.ToArray(),
+                OlUserPropertyType.olKeywords
+            );
+            FlaggableItem.TrySetUdf(
+                GetUdfName(PrefixTypeEnum.Topic),
+                Topics.AsListNoPrefix.ToArray(),
+                OlUserPropertyType.olKeywords
+            );
             FlaggableItem.TrySetUdf(GetUdfName(PrefixTypeEnum.KB), Flags.GetKb(false));
-            FlaggableItem.TrySetUdf(GetUdfName(PrefixTypeEnum.Program), Program.AsStringNoPrefix, OlUserPropertyType.olText);
+            FlaggableItem.TrySetUdf(
+                GetUdfName(PrefixTypeEnum.Program),
+                Program.AsStringNoPrefix,
+                OlUserPropertyType.olText
+            );
 
             var projField = GetUdfName(PrefixTypeEnum.Project);
             if (FlaggableItem.GetUdfValue(projField) as string != Projects.AsStringNoPrefix)
             {
-                FlaggableItem.TrySetUdf(projField, Projects.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
-                if (IdAutoCoding) { await Task.Run(AutoCodeIdAsync); }
+                FlaggableItem.TrySetUdf(
+                    projField,
+                    Projects.AsListNoPrefix.ToArray(),
+                    OlUserPropertyType.olKeywords
+                );
+                if (IdAutoCoding)
+                {
+                    await Task.Run(AutoCodeIdAsync);
+                }
             }
 
             ReadOnly = ro;
-            ToDoEvents.Editing.UpdateOrRemove(OlItem.EntryID, (key, existing) => existing == 1, (key, existing) => existing - 1, out _);
+            ToDoEvents.Editing.UpdateOrRemove(
+                OlItem.EntryID,
+                (key, existing) => existing == 1,
+                (key, existing) => existing - 1,
+                out _
+            );
         }
 
-        private string GetUdfName(PrefixTypeEnum type) => Prefixes.Find(x => x.PrefixType == type).OlUserFieldName;
+        private string GetUdfName(PrefixTypeEnum type) =>
+            Prefixes.Find(x => x.PrefixType == type).OlUserFieldName;
 
         public async Task WriteFlagsBatchAsync(Enums.FlagsToSet flagsToSet)
         {
@@ -216,8 +255,17 @@ namespace ToDoModel
         {
             ToDoEvents.Editing.AddOrUpdate(OlItem.EntryID, 1, (key, existing) => existing + 1);
 
-            if (flagsToSet.HasAnyFlags([Enums.FlagsToSet.Context, Enums.FlagsToSet.People, Enums.FlagsToSet.Projects,
-                Enums.FlagsToSet.Topics, Enums.FlagsToSet.Kbf, Enums.FlagsToSet.Today, Enums.FlagsToSet.Bullpin]))
+            if (
+                flagsToSet.HasAnyFlags([
+                    Enums.FlagsToSet.Context,
+                    Enums.FlagsToSet.People,
+                    Enums.FlagsToSet.Projects,
+                    Enums.FlagsToSet.Topics,
+                    Enums.FlagsToSet.Kbf,
+                    Enums.FlagsToSet.Today,
+                    Enums.FlagsToSet.Bullpin,
+                ])
+            )
             {
                 FlaggableItem.Categories = Flags.Combined.AsStringWithPrefix;
             }
@@ -225,27 +273,47 @@ namespace ToDoModel
             if (flagsToSet.HasFlag(Enums.FlagsToSet.Context))
             {
                 var prefix = Prefixes.Find(x => x.PrefixType == PrefixTypeEnum.Context);
-                FlaggableItem.SetUdf(prefix.OlUserFieldName, Context.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+                FlaggableItem.SetUdf(
+                    prefix.OlUserFieldName,
+                    Context.AsListNoPrefix.ToArray(),
+                    OlUserPropertyType.olKeywords
+                );
             }
             if (flagsToSet.HasFlag(Enums.FlagsToSet.People))
             {
                 var prefix = Prefixes.Find(x => x.PrefixType == PrefixTypeEnum.People);
-                FlaggableItem.SetUdf(prefix.OlUserFieldName, People.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+                FlaggableItem.SetUdf(
+                    prefix.OlUserFieldName,
+                    People.AsListNoPrefix.ToArray(),
+                    OlUserPropertyType.olKeywords
+                );
             }
             if (flagsToSet.HasFlag(Enums.FlagsToSet.Projects))
             {
                 var prefix = Prefixes.Find(x => x.PrefixType == PrefixTypeEnum.Project);
-                FlaggableItem.SetUdf(prefix.OlUserFieldName, Projects.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+                FlaggableItem.SetUdf(
+                    prefix.OlUserFieldName,
+                    Projects.AsListNoPrefix.ToArray(),
+                    OlUserPropertyType.olKeywords
+                );
             }
             if (flagsToSet.HasFlag(Enums.FlagsToSet.Program))
             {
                 var prefix = Prefixes.Find(x => x.PrefixType == PrefixTypeEnum.Program);
-                FlaggableItem.SetUdf(prefix.OlUserFieldName, Program.AsStringNoPrefix, OlUserPropertyType.olText);
+                FlaggableItem.SetUdf(
+                    prefix.OlUserFieldName,
+                    Program.AsStringNoPrefix,
+                    OlUserPropertyType.olText
+                );
             }
             if (flagsToSet.HasFlag(Enums.FlagsToSet.Topics))
             {
                 var prefix = Prefixes.Find(x => x.PrefixType == PrefixTypeEnum.Topic);
-                FlaggableItem.SetUdf(prefix.OlUserFieldName, Topics.AsListNoPrefix.ToArray(), OlUserPropertyType.olKeywords);
+                FlaggableItem.SetUdf(
+                    prefix.OlUserFieldName,
+                    Topics.AsListNoPrefix.ToArray(),
+                    OlUserPropertyType.olKeywords
+                );
             }
             if (flagsToSet.HasFlag(Enums.FlagsToSet.Kbf))
             {
@@ -253,7 +321,12 @@ namespace ToDoModel
                 FlaggableItem.SetUdf(prefix.OlUserFieldName, Flags.GetKb(false));
             }
 
-            ToDoEvents.Editing.UpdateOrRemove(OlItem.EntryID, (key, existing) => existing == 1, (key, existing) => existing - 1, out _);
+            ToDoEvents.Editing.UpdateOrRemove(
+                OlItem.EntryID,
+                (key, existing) => existing == 1,
+                (key, existing) => existing - 1,
+                out _
+            );
         }
 
         #endregion IClonable / Serialization
@@ -284,7 +357,10 @@ namespace ToDoModel
             }
             if (!ReadOnly)
             {
-                if (IdAutoCoding) { await Task.Run(AutoCodeIdAsync); }
+                if (IdAutoCoding)
+                {
+                    await Task.Run(AutoCodeIdAsync);
+                }
                 WriteFlagsBatch(Enums.FlagsToSet.Projects);
             }
         }
@@ -337,18 +413,39 @@ namespace ToDoModel
         /// </summary>
         /// <returns>Boolean</returns>
         public bool ReadOnly { get; set; } = false;
-        internal bool IsReadOnly() { return ReadOnly; }
+
+        internal bool IsReadOnly()
+        {
+            return ReadOnly;
+        }
 
         public bool FlagAsTask
         {
-            get => (bool)Loader.GetOrLoad(ref _flagAsTask, () => FlaggableItem.Try().FlagAsTask, FlaggableItem);
-            set => Loader.SetAndSave(ref _flagAsTask, value, (x) => FlaggableItem.Try().FlagAsTask = (bool)x);
+            get =>
+                (bool)
+                    Loader.GetOrLoad(
+                        ref _flagAsTask,
+                        () => FlaggableItem.Try().FlagAsTask,
+                        FlaggableItem
+                    );
+            set =>
+                Loader.SetAndSave(
+                    ref _flagAsTask,
+                    value,
+                    (x) => FlaggableItem.Try().FlagAsTask = (bool)x
+                );
         }
         private bool? _flagAsTask = null;
 
         public DateTime TaskCreateDate
         {
-            get => (DateTime)Loader.GetOrLoad(ref _taskCreateDate, () => FlaggableItem.Try().CreationTime, FlaggableItem);
+            get =>
+                (DateTime)
+                    Loader.GetOrLoad(
+                        ref _taskCreateDate,
+                        () => FlaggableItem.Try().CreationTime,
+                        FlaggableItem
+                    );
             set => _taskCreateDate = value;
         }
         private DateTime? _taskCreateDate = null;
@@ -356,10 +453,7 @@ namespace ToDoModel
         //Convert Bullpin
         public bool Bullpin
         {
-            get
-            {
-                return Flags.Bullpin;
-            }
+            get { return Flags.Bullpin; }
             set
             {
                 Flags.Bullpin = value;
@@ -374,10 +468,7 @@ namespace ToDoModel
         //Convert Today Field
         public bool Today
         {
-            get
-            {
-                return Flags.Today;
-            }
+            get { return Flags.Today; }
             set
             {
                 Flags.Today = value;
@@ -391,42 +482,91 @@ namespace ToDoModel
 
         public DateTime ReminderTime
         {
-            get => (DateTime)Loader.GetOrLoad(ref _reminderTime, () => FlaggableItem.Try().ReminderTime, FlaggableItem);
+            get =>
+                (DateTime)
+                    Loader.GetOrLoad(
+                        ref _reminderTime,
+                        () => FlaggableItem.Try().ReminderTime,
+                        FlaggableItem
+                    );
             set => _reminderTime = value;
         }
         private DateTime? _reminderTime = null;
 
         public DateTime DueDate
         {
-            get => (DateTime)Loader.GetOrLoad(ref _dueDate, DateTime.Parse("1/1/4501"), () => FlaggableItem.Try().DueDate, FlaggableItem);
-            set => Loader.SetAndSave(ref _dueDate, value, (x) => FlaggableItem.DueDate = (DateTime)x);
+            get =>
+                (DateTime)
+                    Loader.GetOrLoad(
+                        ref _dueDate,
+                        DateTime.Parse("1/1/4501"),
+                        () => FlaggableItem.Try().DueDate,
+                        FlaggableItem
+                    );
+            set =>
+                Loader.SetAndSave(ref _dueDate, value, (x) => FlaggableItem.DueDate = (DateTime)x);
         }
         private DateTime? _dueDate = null;
 
         public DateTime StartDate
         {
-            get => (DateTime)Loader.GetOrLoad(ref _startDate, TaskCreateDate, () => FlaggableItem.Try().TaskStartDate, FlaggableItem);
-            set => Loader.SetAndSave(ref _dueDate, value, (x) => FlaggableItem.TaskStartDate = (DateTime)x);
+            get =>
+                (DateTime)
+                    Loader.GetOrLoad(
+                        ref _startDate,
+                        TaskCreateDate,
+                        () => FlaggableItem.Try().TaskStartDate,
+                        FlaggableItem
+                    );
+            set =>
+                Loader.SetAndSave(
+                    ref _dueDate,
+                    value,
+                    (x) => FlaggableItem.TaskStartDate = (DateTime)x
+                );
         }
         private DateTime? _startDate = null;
 
         public OlImportance Priority
         {
-            get => (OlImportance)Loader.GetOrLoad(ref _priority, OlImportance.olImportanceNormal, () => FlaggableItem.Try().Importance, FlaggableItem);
-            set => Loader.SetAndSave(ref _priority, value, (x) => FlaggableItem.Importance = (OlImportance)x);
+            get =>
+                (OlImportance)
+                    Loader.GetOrLoad(
+                        ref _priority,
+                        OlImportance.olImportanceNormal,
+                        () => FlaggableItem.Try().Importance,
+                        FlaggableItem
+                    );
+            set =>
+                Loader.SetAndSave(
+                    ref _priority,
+                    value,
+                    (x) => FlaggableItem.Importance = (OlImportance)x
+                );
         }
         private OlImportance? _priority = null;
 
         public bool Complete
         {
-            get => (bool)Loader.GetOrLoad(ref _complete, () => FlaggableItem.Try().Complete, FlaggableItem);
+            get =>
+                (bool)
+                    Loader.GetOrLoad(
+                        ref _complete,
+                        () => FlaggableItem.Try().Complete,
+                        FlaggableItem
+                    );
             set => Loader.SetAndSave(ref _complete, value, (x) => FlaggableItem.Complete = (bool)x);
         }
         private bool? _complete = null;
 
         public string TaskSubject
         {
-            get => Loader.GetOrLoad(ref _taskSubject, () => FlaggableItem.Try().TaskSubject, FlaggableItem);
+            get =>
+                Loader.GetOrLoad(
+                    ref _taskSubject,
+                    () => FlaggableItem.Try().TaskSubject,
+                    FlaggableItem
+                );
             set => Loader.SetAndSave(ref _taskSubject, value, (x) => FlaggableItem.TaskSubject = x);
         }
         private string _taskSubject = null;
@@ -445,18 +585,24 @@ namespace ToDoModel
             [MethodImpl(MethodImplOptions.Synchronized)]
             internal set
             {
-                if (_flags is not null) { UnWireFlagParser(); }
+                if (_flags is not null)
+                {
+                    UnWireFlagParser();
+                }
                 _flags = value;
                 WireFlagParser();
             }
         }
         internal FlagParser _flags;
+
         private FlagParser FlagsLoader()
         {
             if (FlaggableItem is null)
             {
                 var callerName = new StackTrace().GetFrame(1).GetMethod().Name;
-                throw new ArgumentNullException("Cannot get property " + callerName + " if both _flags AND olObject are Null");
+                throw new ArgumentNullException(
+                    "Cannot get property " + callerName + " if both _flags AND olObject are Null"
+                );
             }
             var categories = FlaggableItem.Categories;
             var flags = new FlagParser(ref categories);
@@ -470,6 +616,7 @@ namespace ToDoModel
             ;
             return flags;
         }
+
         private void WireFlagParser()
         {
             _flags.CollectionChanged += FlagDetails_Changed;
@@ -480,6 +627,7 @@ namespace ToDoModel
             _flags.TopicsChanged += Topics_Changed;
             _flags.KbChanged += KB_Changed;
         }
+
         private void UnWireFlagParser()
         {
             _flags.CollectionChanged -= FlagDetails_Changed;
@@ -497,6 +645,7 @@ namespace ToDoModel
         {
             return [People, Projects, Program, Context, Topics, KB];
         }
+
         protected async Task ReloadFlagTranslatorsAsync()
         {
             await Task.WhenAll(
@@ -508,6 +657,7 @@ namespace ToDoModel
                 LoadKbAsync()
             );
         }
+
         protected void ReloadFlagTranslators()
         {
             _people = LoadPeople();
@@ -527,9 +677,12 @@ namespace ToDoModel
             get => Loader.GetOrLoad(ref _people, () => LoadPeople(), Flags);
             //set => SetAndSave(ref _people, value, (x) => UdfCategorySetter("TagPeople", x.AsStringNoPrefix));
         }
+
         [MethodImpl(MethodImplOptions.Synchronized)]
-        private FlagTranslator LoadPeople() => new(Flags.GetPeople, Flags.SetPeople, Flags.GetPeopleList, Flags.SetPeopleList);
-        async protected Task LoadPeopleAsync() => await Task.Run(() => _people = LoadPeople());
+        private FlagTranslator LoadPeople() =>
+            new(Flags.GetPeople, Flags.SetPeople, Flags.GetPeopleList, Flags.SetPeopleList);
+
+        protected async Task LoadPeopleAsync() => await Task.Run(() => _people = LoadPeople());
 
         #endregion People
 
@@ -541,9 +694,12 @@ namespace ToDoModel
             get => Loader.GetOrLoad(ref _projects, LoadProjects, Flags);
             //set => SetAndSave(ref _projects, value, (x) => UdfCategorySetter("TagProject", x.AsStringNoPrefix));
         }
+
         [MethodImpl(MethodImplOptions.Synchronized)]
-        private FlagTranslator LoadProjects() => new(Flags.GetProjects, Flags.SetProjects, Flags.GetProjectList, Flags.SetProjectList);
-        async protected Task LoadProjectAsync() => await Task.Run(() => _projects = LoadProjects());
+        private FlagTranslator LoadProjects() =>
+            new(Flags.GetProjects, Flags.SetProjects, Flags.GetProjectList, Flags.SetProjectList);
+
+        protected async Task LoadProjectAsync() => await Task.Run(() => _projects = LoadProjects());
 
         #endregion Projects
 
@@ -551,9 +707,12 @@ namespace ToDoModel
 
         private FlagTranslator _program;
         public FlagTranslator Program => Loader.GetOrLoad(ref _program, LoadProgram, Flags);
+
         [MethodImpl(MethodImplOptions.Synchronized)]
-        private FlagTranslator LoadProgram() => new(Flags.GetProgram, Flags.SetProgram, Flags.GetProgramList, Flags.SetProgramList);
-        async protected Task LoadProgramAsync() => await Task.Run(() => _program = LoadProgram());
+        private FlagTranslator LoadProgram() =>
+            new(Flags.GetProgram, Flags.SetProgram, Flags.GetProgramList, Flags.SetProgramList);
+
+        protected async Task LoadProgramAsync() => await Task.Run(() => _program = LoadProgram());
 
         #endregion Program
 
@@ -565,9 +724,12 @@ namespace ToDoModel
             get => Loader.GetOrLoad(ref _context, LoadContext, Flags);
             //set => SetAndSave(ref _context, value, (x) => UdfCategorySetter("TagContext", x.AsStringNoPrefix));
         }
+
         [MethodImpl(MethodImplOptions.Synchronized)]
-        private FlagTranslator LoadContext() => new(Flags.GetContext, Flags.SetContext, Flags.GetContextList, Flags.SetContextList);
-        async protected Task LoadContextAsync() => await Task.Run(() => _context = LoadContext());
+        private FlagTranslator LoadContext() =>
+            new(Flags.GetContext, Flags.SetContext, Flags.GetContextList, Flags.SetContextList);
+
+        protected async Task LoadContextAsync() => await Task.Run(() => _context = LoadContext());
 
         #endregion Context
 
@@ -579,9 +741,12 @@ namespace ToDoModel
             get => Loader.GetOrLoad(ref _topic, LoadTopic, Flags);
             //set => SetAndSave(ref _topic, value, (x) => UdfCategorySetter("TagTopic", x.AsStringNoPrefix));
         }
+
         [MethodImpl(MethodImplOptions.Synchronized)]
-        private FlagTranslator LoadTopic() => new(Flags.GetTopics, Flags.SetTopics, Flags.GetTopicList, Flags.SetTopicList);
-        async private Task LoadTopicAsync() => await Task.Run(() => _topic = LoadTopic());
+        private FlagTranslator LoadTopic() =>
+            new(Flags.GetTopics, Flags.SetTopics, Flags.GetTopicList, Flags.SetTopicList);
+
+        private async Task LoadTopicAsync() => await Task.Run(() => _topic = LoadTopic());
 
         #endregion Topic
 
@@ -592,9 +757,12 @@ namespace ToDoModel
         {
             get => Loader.GetOrLoad(ref _kb, LoadKb, Flags);
         }
+
         [MethodImpl(MethodImplOptions.Synchronized)]
-        private FlagTranslator LoadKb() => new(Flags.GetKb, Flags.SetKb, Flags.GetKbList, Flags.SetKbList);
-        async private Task LoadKbAsync() => await Task.Run(() => _kb = LoadKb());
+        private FlagTranslator LoadKb() =>
+            new(Flags.GetKb, Flags.SetKb, Flags.GetKbList, Flags.SetKbList);
+
+        private async Task LoadKbAsync() => await Task.Run(() => _kb = LoadKb());
 
         #endregion KB
 
@@ -609,22 +777,42 @@ namespace ToDoModel
         private int? _totalWork = null;
         public int TotalWork
         {
-            get => (int)Loader.GetOrLoad(ref _totalWork, () => FlaggableItem.Try().TotalWork, FlaggableItem);
-            set => Loader.SetAndSave(ref _totalWork, value, (x) => FlaggableItem.TotalWork = (int)x);
+            get =>
+                (int)
+                    Loader.GetOrLoad(
+                        ref _totalWork,
+                        () => FlaggableItem.Try().TotalWork,
+                        FlaggableItem
+                    );
+            set =>
+                Loader.SetAndSave(ref _totalWork, value, (x) => FlaggableItem.TotalWork = (int)x);
         }
 
         private string _toDoID = null;
         public string ToDoID
         {
-            get => Loader.GetOrLoad(ref _toDoID, () => FlaggableItem.Try().GetUdfString("ToDoID"), FlaggableItem);
-            set => Loader.SetAndSave(ref _toDoID, value, (x) =>
-            {
-                if (!ReadOnly && FlaggableItem is not null)
-                {
-                    FlaggableItem.TrySetUdf("ToDoID", x);
-                    if (!x.IsNullOrEmpty() && x.Length > 0) { SplitID(); }
-                }
-            });
+            get =>
+                Loader.GetOrLoad(
+                    ref _toDoID,
+                    () => FlaggableItem.Try().GetUdfString("ToDoID"),
+                    FlaggableItem
+                );
+            set =>
+                Loader.SetAndSave(
+                    ref _toDoID,
+                    value,
+                    (x) =>
+                    {
+                        if (!ReadOnly && FlaggableItem is not null)
+                        {
+                            FlaggableItem.TrySetUdf("ToDoID", x);
+                            if (!x.IsNullOrEmpty() && x.Length > 0)
+                            {
+                                SplitID();
+                            }
+                        }
+                    }
+                );
         }
 
         // _VisibleTreeState
@@ -637,36 +825,64 @@ namespace ToDoModel
         {
             if (value == true)
             {
-                VisibleTreeState = (int)((long)VisibleTreeState | (long)Math.Round(Math.Pow(2d, Lvl - 1)));
+                VisibleTreeState = (int)(
+                    (long)VisibleTreeState | (long)Math.Round(Math.Pow(2d, Lvl - 1))
+                );
             }
             else
             {
-                VisibleTreeState = (int)(VisibleTreeState - (VisibleTreeState & (long)Math.Round(Math.Pow(2d, Lvl - 1))));
+                VisibleTreeState = (int)(
+                    VisibleTreeState - (VisibleTreeState & (long)Math.Round(Math.Pow(2d, Lvl - 1)))
+                );
             }
         }
 
         private int? _visibleTreeState;
         public int VisibleTreeState
         {
-            get => (int)Loader.GetOrLoad(ref _visibleTreeState, 63, () => FlaggableItem.GetUdfValue<int>("VTS"), (x) => VisibleTreeSetAndSaver((int)x), FlaggableItem);
+            get =>
+                (int)
+                    Loader.GetOrLoad(
+                        ref _visibleTreeState,
+                        63,
+                        () => FlaggableItem.GetUdfValue<int>("VTS"),
+                        (x) => VisibleTreeSetAndSaver((int)x),
+                        FlaggableItem
+                    );
             set => VisibleTreeSetAndSaver(value);
         }
+
         private void VisibleTreeSetAndSaver(int value)
         {
-            Loader.SetAndSave(ref _visibleTreeState, value, (x) => { FlaggableItem.TrySetUdf("VTS", x, OlUserPropertyType.olInteger); SplitID(); });
+            Loader.SetAndSave(
+                ref _visibleTreeState,
+                value,
+                (x) =>
+                {
+                    FlaggableItem.TrySetUdf("VTS", x, OlUserPropertyType.olInteger);
+                    SplitID();
+                }
+            );
         }
 
         public bool ActiveBranch
         {
             get
             {
-                if (_activeBranch != null) { return (bool)_activeBranch; }
-                else if (FlaggableItem is null) { return false; }
+                if (_activeBranch != null)
+                {
+                    return (bool)_activeBranch;
+                }
+                else if (FlaggableItem is null)
+                {
+                    return false;
+                }
                 else
                 {
                     if (FlaggableItem.UdfExists("AB"))
                     {
-                        _activeBranch = (bool)FlaggableItem.GetUdfValue("AB", OlUserPropertyType.olYesNo);
+                        _activeBranch = (bool)
+                            FlaggableItem.GetUdfValue("AB", OlUserPropertyType.olYesNo);
                     }
                     else
                     {
@@ -688,25 +904,41 @@ namespace ToDoModel
         }
 
         private bool _ec2;
+
         //internal bool EC2 { get => _ec2; set => _ec2 = value; }
         public bool EC3
         {
             //internal T GetOrLoad<T>(ref T value, T defaultValue, Func<T> loader, Action<T> defaultSetAndSaver, params object[] dependencies)
-            get => Loader.GetOrLoad(value: ref _ec2, defaultValue: false, loader: () => FlaggableItem.GetUdfValue<bool>("EC2"), EC2SetAndSaver, FlaggableItem);
+            get =>
+                Loader.GetOrLoad(
+                    value: ref _ec2,
+                    defaultValue: false,
+                    loader: () => FlaggableItem.GetUdfValue<bool>("EC2"),
+                    EC2SetAndSaver,
+                    FlaggableItem
+                );
             set => EC2SetAndSaver(value);
         }
+
         private void EC2SetAndSaver(bool value)
         {
-            Loader.SetAndSave(ref _ec2, value, (x) =>
-            {
-                if (!ReadOnly) { FlaggableItem.TrySetUdf("EC2", value, OlUserPropertyType.olYesNo); }
-                var ecSymbolMeaning = ExpandChildren == "+";
-                if (value != (ExpandChildren == "+"))
+            Loader.SetAndSave(
+                ref _ec2,
+                value,
+                (x) =>
                 {
-                    ExpandChildren = _ec2 ? "+" : "-";
+                    if (!ReadOnly)
+                    {
+                        FlaggableItem.TrySetUdf("EC2", value, OlUserPropertyType.olYesNo);
+                    }
+                    var ecSymbolMeaning = ExpandChildren == "+";
+                    if (value != (ExpandChildren == "+"))
+                    {
+                        ExpandChildren = _ec2 ? "+" : "-";
+                    }
+                    _expandChildrenState = "";
                 }
-                _expandChildrenState = "";
-            });
+            );
         }
 
         public bool EC2
@@ -949,8 +1181,14 @@ namespace ToDoModel
 
         internal async Task AutoCodeIdAsync(string newRoot, string newProject)
         {
-            if (ParamArray.AnyNull(this.ProjectData, IdList)) { return; }
-            if (ParamArray<string>.AnyNullOrEmpty(newProject, newRoot)) { return; }
+            if (ParamArray.AnyNull(this.ProjectData, IdList))
+            {
+                return;
+            }
+            if (ParamArray<string>.AnyNullOrEmpty(newProject, newRoot))
+            {
+                return;
+            }
 
             var oldId = ToDoID;
             switch (oldId)
@@ -966,8 +1204,8 @@ namespace ToDoModel
                 case string s when s.Substring(0, 4) == newRoot:
                     break; // If the ToDoID is already a child of the new ProjectId STOP processing
                 default:
-                    // If the ToDoID is of a length greater than 4, make the ToDo a child of the new ProjectId 
-                    // and then use the newId and the oldId as the roots for changes in the children                    
+                    // If the ToDoID is of a length greater than 4, make the ToDo a child of the new ProjectId
+                    // and then use the newId and the oldId as the roots for changes in the children
                     await Task.Run(() => AssignIdFromNewRoot(newRoot));
                     await AutoCodeChildren(newProject, ToDoID, oldId);
                     break;
@@ -982,19 +1220,27 @@ namespace ToDoModel
 
         internal async Task AutoCodeChildren(string newProject, string newRoot, string oldRoot)
         {
-
             // Use the newId and the oldId as the roots for changes in the children
             var items = await IdList.GetItemsWithRootIdAsync(oldRoot).ToArrayAsync();
 
             foreach (var todo in items)
             {
-                ToDoEvents.Editing.AddOrUpdate(todo.OlItem.EntryID, 1, (key, existing) => existing + 1);
+                ToDoEvents.Editing.AddOrUpdate(
+                    todo.OlItem.EntryID,
+                    1,
+                    (key, existing) => existing + 1
+                );
                 todo.IdAutoCoding = false;
                 var oldId = todo.ToDoID;
                 todo.ToDoID = await IdList.SubstituteIdRootAsync(oldId, newRoot, oldRoot);
                 todo.ProjectsToPrograms = ProjectsToPrograms;
                 todo.Projects.AsStringNoPrefix = newProject;
-                ToDoEvents.Editing.UpdateOrRemove(todo.OlItem.EntryID, (key, existing) => existing == 1, (key, existing) => existing - 1, out _);
+                ToDoEvents.Editing.UpdateOrRemove(
+                    todo.OlItem.EntryID,
+                    (key, existing) => existing == 1,
+                    (key, existing) => existing - 1,
+                    out _
+                );
             }
 
             //var items = IdList.GetItemsWithRootIdAsync(oldRoot);
@@ -1044,6 +1290,5 @@ namespace ToDoModel
         }
 
         #endregion Other Methods
-
     }
 }

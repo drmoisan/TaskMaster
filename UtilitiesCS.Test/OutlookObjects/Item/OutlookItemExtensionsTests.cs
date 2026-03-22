@@ -1,0 +1,495 @@
+using System;
+using System.Linq;
+using System.Reflection;
+using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using UtilitiesCS.OutlookExtensions;
+using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
+using InteropMeetingItem = Microsoft.Office.Interop.Outlook.MeetingItem;
+using InteropTaskItem = Microsoft.Office.Interop.Outlook.TaskItem;
+
+namespace UtilitiesCS.Test.OutlookObjects.Item
+{
+    [TestClass]
+    public class OutlookItemExtensionsTests
+    {
+        [TestMethod]
+        public void Try_WhenWrappingOutlookItem_ShouldReturnSafeWrapper()
+        {
+            var innerItem = new Mock<InteropMailItem>().Object;
+            var outlookItem = new UtilitiesCS.OutlookItem(innerItem);
+
+            var result = outlookItem.Try();
+
+            result.Should().BeOfType<OutlookItemTry>();
+            result.InnerObject.Should().BeSameAs(innerItem);
+        }
+
+        [TestMethod]
+        public void Try_WhenWrappingFlaggableInterface_ShouldReturnFlaggableSafeWrapper()
+        {
+            var flaggable = new Mock<IOutlookItemFlaggable>();
+            flaggable.SetupGet(x => x.InnerObject).Returns(new Mock<InteropTaskItem>().Object);
+            flaggable.SetupGet(x => x.ItemType).Returns(typeof(InteropTaskItem));
+            flaggable.SetupGet(x => x.Args).Returns(Array.Empty<object>());
+            flaggable.SetupGet(x => x.Complete).Returns(true);
+
+            var result = flaggable.Object.Try();
+
+            result.Should().BeOfType<OutlookItemFlaggableTry>();
+            result.Complete.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void TryGet_WhenWrappingOutlookItem_ShouldReturnTryGetWrapper()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(
+                new SubjectOnlyItem { Subject = "Quarterly review" }
+            );
+
+            var success = outlookItem.TryGet().Subject(out string subject);
+
+            success.Should().BeTrue();
+            subject.Should().Be("Quarterly review");
+        }
+
+        [TestMethod]
+        public void IsValid_WhenItemIsNull_ShouldReturnFalse()
+        {
+            UtilitiesCS.OutlookItem outlookItem = null;
+
+            var result = outlookItem.IsValid();
+
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsNull_ShouldReturnFalse()
+        {
+            var result = new UtilitiesCS.OutlookItem(null).IsValid();
+
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsSupported_ShouldReturnTrue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<InteropMailItem>().Object);
+
+            var result = outlookItem.IsValid();
+
+            result.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsUnsupported_ShouldReturnFalse()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new object());
+
+            var result = outlookItem.IsValid();
+
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        [DataRow(typeof(InteropMailItem), OlItemType.olMailItem)]
+        [DataRow(typeof(InteropTaskItem), OlItemType.olTaskItem)]
+        [DataRow(typeof(InteropMeetingItem), OlItemType.olAppointmentItem)]
+        public void GetOlItemType_WhenInnerObjectIsSupported_ShouldReturnMappedValue(
+            Type outlookType,
+            OlItemType expected
+        )
+        {
+            var innerObject = CreateInteropMock(outlookType);
+            var outlookItem = new Mock<IOutlookItem>();
+            outlookItem.SetupGet(x => x.InnerObject).Returns(innerObject);
+
+            var result = outlookItem.Object.GetOlItemType();
+
+            result.Should().Be(expected);
+        }
+
+        [TestMethod]
+        public void GetOlItemType_WhenInnerObjectIsUnsupported_ShouldThrowArgumentException()
+        {
+            var outlookItem = new Mock<IOutlookItem>();
+            outlookItem.SetupGet(x => x.InnerObject).Returns(new object());
+
+            System.Action act = () => outlookItem.Object.GetOlItemType();
+
+            act.Should().Throw<ArgumentException>().WithMessage("Object is not a supported type*");
+        }
+
+        private static object CreateInteropMock(Type outlookType)
+        {
+            if (outlookType == typeof(InteropMailItem))
+            {
+                return new Mock<InteropMailItem>().Object;
+            }
+
+            if (outlookType == typeof(InteropTaskItem))
+            {
+                return new Mock<InteropTaskItem>().Object;
+            }
+
+            if (outlookType == typeof(InteropMeetingItem))
+            {
+                return new Mock<InteropMeetingItem>().Object;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(outlookType));
+        }
+
+        private sealed class SubjectOnlyItem
+        {
+            public string Subject { get; set; }
+        }
+
+        #region Extended Tests — P2-T13
+
+        [TestMethod]
+        public void TryGet_ShouldReturnValueWhenCallSucceeds()
+        {
+            string result = OutlookItemExtensions.TryGet(() => "hello");
+            result.Should().Be("hello");
+        }
+
+        [TestMethod]
+        public void TryGet_ShouldReturnDefault_WhenCallThrowsSystemException()
+        {
+            string result = OutlookItemExtensions.TryGet<string>(() =>
+                throw new InvalidOperationException()
+            );
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void TrySet_ShouldNotThrow_WhenSetterThrowsSystemException()
+        {
+            System.Action act = () =>
+                OutlookItemExtensions.TrySet<string>(
+                    _ => throw new InvalidOperationException(),
+                    "value"
+                );
+
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void TryCall_Action_ShouldNotThrow_WhenActionThrowsSystemException()
+        {
+            System.Action act = () =>
+                OutlookItemExtensions.TryCall(() => throw new InvalidOperationException());
+
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void TryCall_Func_ShouldReturnDefault_WhenFuncThrowsSystemException()
+        {
+            var result = OutlookItemExtensions.TryCall<string>(() =>
+                throw new InvalidOperationException()
+            );
+
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void TryCall_Func_ShouldReturnValue_WhenFuncSucceeds()
+        {
+            var result = OutlookItemExtensions.TryCall(() => 42);
+
+            result.Should().Be(42);
+        }
+
+        [TestMethod]
+        [DataRow(typeof(AppointmentItem), OlItemType.olAppointmentItem)]
+        [DataRow(typeof(ContactItem), OlItemType.olContactItem)]
+        [DataRow(typeof(JournalItem), OlItemType.olJournalItem)]
+        [DataRow(typeof(NoteItem), OlItemType.olNoteItem)]
+        [DataRow(typeof(PostItem), OlItemType.olPostItem)]
+        public void GetOlItemType_WhenInnerObjectIsAdditionalSupportedType_ShouldReturnMappedValue(
+            Type outlookType,
+            OlItemType expected
+        )
+        {
+            var innerObject = CreateInteropMockExtended(outlookType);
+            var outlookItem = new Mock<IOutlookItem>();
+            outlookItem.SetupGet(x => x.InnerObject).Returns(innerObject);
+
+            var result = outlookItem.Object.GetOlItemType();
+
+            result.Should().Be(expected);
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsAppointment_ShouldReturnTrue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<AppointmentItem>().Object);
+            outlookItem.IsValid().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsTask_ShouldReturnTrue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<InteropTaskItem>().Object);
+            outlookItem.IsValid().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsContact_ShouldReturnTrue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<ContactItem>().Object);
+            outlookItem.IsValid().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsNote_ShouldReturnTrue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<NoteItem>().Object);
+            outlookItem.IsValid().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsPost_ShouldReturnTrue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<PostItem>().Object);
+            outlookItem.IsValid().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsDistributionList_ShouldReturnTrue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<DistListItem>().Object);
+
+            outlookItem.IsValid().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsValid_WhenInnerObjectIsMobile_ShouldReturnTrue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new Mock<MobileItem>().Object);
+
+            outlookItem.IsValid().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void TryGetPropertyInfo_WhenItemTypeIsUnavailable_ShouldReturnNull()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(null);
+
+            var result = OutlookItemExtensions.TryGetPropertyInfo(outlookItem, "Subject");
+
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void TryGetPropertyValueGeneric_WhenPrimaryValueExists_ShouldUsePrimaryConverter()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(
+                new ConvertiblePropertyItem { PrimaryText = "41" }
+            );
+
+            var result = OutlookItemExtensions.TryGetPropertyValue(
+                outlookItem,
+                "PrimaryText",
+                "AlternateNumber",
+                value => int.Parse((string)value),
+                value => ((int?)value).Value
+            );
+
+            result.Should().Be(41);
+        }
+
+        [TestMethod]
+        public void TryGetPropertyValueGeneric_WhenPrimaryValueExistsAndConverterIsNull_ShouldReturnRawValue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(
+                new ConvertiblePropertyItem { PrimaryText = "41" }
+            );
+
+            var result = OutlookItemExtensions.TryGetPropertyValue<string>(
+                outlookItem,
+                "PrimaryText",
+                "AlternateText",
+                null,
+                value => (string)value
+            );
+
+            result.Should().Be("41");
+        }
+
+        [TestMethod]
+        public void TryGetPropertyValueGeneric_WhenAlternateValueExists_ShouldUseAlternateConverter()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(
+                new ConvertiblePropertyItem { AlternateNumber = 42 }
+            );
+
+            var result = OutlookItemExtensions.TryGetPropertyValue(
+                outlookItem,
+                "PrimaryText",
+                "AlternateNumber",
+                value => int.Parse((string)value),
+                value => (int)value
+            );
+
+            result.Should().Be(42);
+        }
+
+        [TestMethod]
+        public void TryGetPropertyValueGeneric_WhenAlternateValueExistsAndConverterIsNull_ShouldReturnRawValue()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(
+                new ConvertiblePropertyItem { AlternateText = "backup" }
+            );
+
+            var result = OutlookItemExtensions.TryGetPropertyValue<string>(
+                outlookItem,
+                "PrimaryText",
+                "AlternateText",
+                value => (string)value,
+                null
+            );
+
+            result.Should().Be("backup");
+        }
+
+        [TestMethod]
+        public void TryGetPropertyValueGeneric_WhenNoValueExists_ShouldReturnNull()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new ConvertiblePropertyItem());
+
+            var result = OutlookItemExtensions.TryGetPropertyValue<int>(
+                outlookItem,
+                "PrimaryText",
+                "AlternateNumber",
+                value => int.Parse((string)value),
+                value => ((int?)value).Value
+            );
+
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void TrySetPropertyValueGeneric_WhenPrimaryPropertyExists_ShouldThrowMissingMethodException()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new ConvertiblePropertyItem());
+
+            System.Action act = () =>
+                _ = InvokeGenericTrySetPropertyValue(
+                    outlookItem,
+                    "SettableNumber",
+                    "AlternateTable",
+                    "7",
+                    value => int.Parse((string)value)
+                );
+
+            act.Should()
+                .Throw<TargetInvocationException>()
+                .WithInnerException<MissingMethodException>();
+        }
+
+        [TestMethod]
+        public void TrySetPropertyValue_WithAlternateObjectValueOverload_ShouldThrowMissingMethodException()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new ConvertiblePropertyItem());
+
+            System.Action act = () =>
+                _ = OutlookItemExtensions.TrySetPropertyValue(
+                    outlookItem,
+                    "PrimaryText",
+                    "AlternateText",
+                    "Alpha",
+                    "Beta"
+                );
+
+            act.Should().Throw<MissingMethodException>();
+        }
+
+        [TestMethod]
+        public void TrySetPropertyValue_WithSharedValueOverload_ShouldThrowMissingMethodException()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new ConvertiblePropertyItem());
+
+            System.Action act = () =>
+                _ = OutlookItemExtensions.TrySetPropertyValue(
+                    outlookItem,
+                    "PrimaryText",
+                    "AlternateText",
+                    "Gamma"
+                );
+
+            act.Should().Throw<MissingMethodException>();
+        }
+
+        [TestMethod]
+        public void TrySetPropertyValue_WhenPropertyExists_ShouldThrowMissingMethodException()
+        {
+            var outlookItem = new UtilitiesCS.OutlookItem(new ConvertiblePropertyItem());
+
+            System.Action act = () =>
+                _ = OutlookItemExtensions.TrySetPropertyValue(outlookItem, "SettableNumber", 99);
+
+            act.Should().Throw<MissingMethodException>();
+        }
+
+        private static object CreateInteropMockExtended(Type outlookType)
+        {
+            if (outlookType == typeof(AppointmentItem))
+                return new Mock<AppointmentItem>().Object;
+            if (outlookType == typeof(ContactItem))
+                return new Mock<ContactItem>().Object;
+            if (outlookType == typeof(DistListItem))
+                return new Mock<DistListItem>().Object;
+            if (outlookType == typeof(JournalItem))
+                return new Mock<JournalItem>().Object;
+            if (outlookType == typeof(MobileItem))
+                return new Mock<MobileItem>().Object;
+            if (outlookType == typeof(NoteItem))
+                return new Mock<NoteItem>().Object;
+            if (outlookType == typeof(PostItem))
+                return new Mock<PostItem>().Object;
+            throw new ArgumentOutOfRangeException(nameof(outlookType));
+        }
+
+        private static bool InvokeGenericTrySetPropertyValue<T>(
+            UtilitiesCS.OutlookItem outlookItem,
+            string propertyName,
+            string propertyNameAlt,
+            object propertyValue,
+            Func<object, T> converter
+        )
+        {
+            var method = typeof(OutlookItemExtensions)
+                .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
+                .Single(x =>
+                    x.Name == "TrySetPropertyValue"
+                    && x.IsGenericMethodDefinition
+                    && x.GetParameters().Length == 6
+                )
+                .MakeGenericMethod(typeof(T));
+
+            return (bool)
+                method.Invoke(
+                    null,
+                    [outlookItem, propertyName, propertyNameAlt, propertyValue, converter, null]
+                );
+        }
+
+        private sealed class ConvertiblePropertyItem
+        {
+            public string PrimaryText { get; set; }
+
+            public int? AlternateNumber { get; set; }
+
+            public string AlternateText { get; set; }
+
+            public int SettableNumber { get; set; }
+        }
+
+        #endregion
+    }
+}

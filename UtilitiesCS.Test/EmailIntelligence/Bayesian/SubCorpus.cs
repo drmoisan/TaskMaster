@@ -8,8 +8,13 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
     public class SubCorpus : Corpus
     {
         public SubCorpus() { }
-        public SubCorpus(Corpus corpus) : base(corpus) { }
-        public SubCorpus(IEnumerable<KeyValuePair<string, int>> tb) : base(tb) { }
+
+        public SubCorpus(Corpus corpus)
+            : base(corpus) { }
+
+        public SubCorpus(IEnumerable<KeyValuePair<string, int>> tb)
+            : base(tb) { }
+
         public SubCorpus(ConcurrentDictionary<string, int> tb)
         {
             this.TokenFrequency = tb;

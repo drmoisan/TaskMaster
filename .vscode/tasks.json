@@ -2,12 +2,35 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "restore: TaskMaster.sln",
+      "label": "format: csharpier",
       "type": "shell",
       "command": "dotnet",
       "args": [
-        "restore",
-        "TaskMaster.sln"
+        "tool",
+        "run",
+        "csharpier",
+        "format",
+        "."
+      ],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "restore: TaskMaster.sln",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/vscode/Invoke-Restore.ps1",
+        "-SolutionPath",
+        "TaskMaster.sln",
+        "-Configuration",
+        "Debug",
+        "-Platform",
+        "Any CPU"
       ],
       "group": "build"
     },
@@ -40,6 +63,60 @@
       ]
     },
     {
+      "label": "lint: TaskMaster.sln (.NET analyzers)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/vscode/Invoke-VSBuild.ps1",
+        "-SolutionPath",
+        "TaskMaster.sln",
+        "-Configuration",
+        "Debug",
+        "-Platform",
+        "Any CPU",
+        "-EnableNETAnalyzers",
+        "-EnforceCodeStyleInBuild"
+      ],
+      "dependsOn": [
+        "restore: TaskMaster.sln"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
+      "label": "type-check: TaskMaster.sln (nullable warnings as errors)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/vscode/Invoke-VSBuild.ps1",
+        "-SolutionPath",
+        "TaskMaster.sln",
+        "-Configuration",
+        "Debug",
+        "-Platform",
+        "Any CPU",
+        "-EnableNullable",
+        "-TreatWarningsAsErrors"
+      ],
+      "dependsOn": [
+        "restore: TaskMaster.sln"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
       "label": "test: MSTest (vstest.console)",
       "type": "shell",
       "command": "pwsh",
@@ -53,6 +130,27 @@
         ".",
         "-Configuration",
         "Debug",
+      ],
+      "dependsOn": [
+        "build: TaskMaster.sln (VS MSBuild)"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "test: MSTest with Coverage (Koverage)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/vscode/Invoke-MSTestWithCoverage.ps1",
+        "-SearchRoot",
+        ".",
+        "-Configuration",
+        "Debug"
       ],
       "dependsOn": [
         "build: TaskMaster.sln (VS MSBuild)"

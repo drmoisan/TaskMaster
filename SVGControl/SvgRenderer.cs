@@ -1,5 +1,4 @@
-﻿using Svg;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -11,12 +10,15 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Svg;
 
 namespace SVGControl
 {
     internal class SvgRenderer : INotifyPropertyChanged
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public SvgRenderer(byte[] doc, Size size, AutoSize autoSize)
         {
@@ -83,7 +85,11 @@ namespace SVGControl
         }
 
         [NotifyParentProperty(true)]
-        public Size Size { get => _size; set => _size = value; }
+        public Size Size
+        {
+            get => _size;
+            set => _size = value;
+        }
 
         [NotifyParentProperty(true)]
         public Padding Margin
@@ -99,7 +105,11 @@ namespace SVGControl
 
         [NotifyParentProperty(true)]
         [DefaultValue(AutoSize.MaintainAspectRatio)]
-        public AutoSize AutoSize { get => _autoSize; set => _autoSize = value; }
+        public AutoSize AutoSize
+        {
+            get => _autoSize;
+            set => _autoSize = value;
+        }
 
         [NotifyParentProperty(true)]
         public SvgDocument Document
@@ -108,7 +118,10 @@ namespace SVGControl
             set
             {
                 _doc = value;
-                if (value != null) { _original = _doc.Draw().Size; }
+                if (value != null)
+                {
+                    _original = _doc.Draw().Size;
+                }
                 NotifyPropertyChanged();
             }
         }
@@ -126,7 +139,12 @@ namespace SVGControl
             {
                 return null;
             }
-            else if ((AutoSize == AutoSize.Disabled) || (Size == null) || (Size.Height == 0) || (Size.Width == 0))
+            else if (
+                (AutoSize == AutoSize.Disabled)
+                || (Size == null)
+                || (Size.Height == 0)
+                || (Size.Width == 0)
+            )
             {
                 return _doc.Draw();
             }
@@ -145,37 +163,51 @@ namespace SVGControl
                 return _doc.Draw();
             }
             else
-            { return null; }
+            {
+                return null;
+            }
         }
 
         private void AddMargins(int widthCurrent, int heightCurrent)
         {
             var group = new SvgGroup();
             _doc.Children.Add(group);
-            group.Children.Add(new SvgRectangle
-            {
-                X = -_margin.Left,
-                Y = -_margin.Top,
-                Width = widthCurrent + Margin.Left + Margin.Right,
-                Height = heightCurrent + Margin.Top + Margin.Bottom,
-                Stroke = new SvgColourServer(Color.Transparent),
-                Fill = new SvgColourServer(Color.Transparent)
-            });
+            group.Children.Add(
+                new SvgRectangle
+                {
+                    X = -_margin.Left,
+                    Y = -_margin.Top,
+                    Width = widthCurrent + Margin.Left + Margin.Right,
+                    Height = heightCurrent + Margin.Top + Margin.Bottom,
+                    Stroke = new SvgColourServer(Color.Transparent),
+                    Fill = new SvgColourServer(Color.Transparent),
+                }
+            );
         }
 
         private Size AdjustSizeProportionately(Size proportions, Size targetSize)
         {
-            if ((targetSize.Height > 0) && (targetSize.Width > 0) && ((proportions.Height != targetSize.Height) || (proportions.Width != targetSize.Width)))
+            if (
+                (targetSize.Height > 0)
+                && (targetSize.Width > 0)
+                && (
+                    (proportions.Height != targetSize.Height)
+                    || (proportions.Width != targetSize.Width)
+                )
+            )
             {
-                int widthAspect = (int)(targetSize.Height * proportions.Width / (double)proportions.Height);
+                int widthAspect = (int)(
+                    targetSize.Height * proportions.Width / (double)proportions.Height
+                );
                 if (widthAspect < targetSize.Width)
                 {
                     return new Size(widthAspect, targetSize.Height);
-
                 }
                 else
                 {
-                    int heightAspect = (int)(targetSize.Width * proportions.Height / (double)proportions.Width);
+                    int heightAspect = (int)(
+                        targetSize.Width * proportions.Height / (double)proportions.Width
+                    );
                     return new Size(targetSize.Width, heightAspect);
                 }
             }

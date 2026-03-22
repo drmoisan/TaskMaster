@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using Microsoft.Office.Interop.Outlook;
 
-
 namespace UtilitiesCS
 {
-
     public static class FolderNavigator
     {
-
         public static Folder GetOutlookFolder(string FolderPath, Application OlApp)
         {
             Folder TestFolder;
@@ -38,7 +35,6 @@ namespace UtilitiesCS
             }
 
             return TestFolder;
-
         }
 
         public static string[] OlFolderlist_GetAll(IOlObjects OlObjects)
@@ -56,9 +52,12 @@ namespace UtilitiesCS
             return OlFolderlist_GetAllRet;
         }
 
-        private static void OlFolder_GetDescendants(ref List<string> ResultList, ref Folders Children, ref string RootPath)
+        private static void OlFolder_GetDescendants(
+            ref List<string> ResultList,
+            ref Folders Children,
+            ref string RootPath
+        )
         {
-
             foreach (Folder child in Children)
             {
                 string fPath = child.FolderPath;
@@ -68,7 +67,6 @@ namespace UtilitiesCS
                 var argChildren = child.Folders;
                 OlFolder_GetDescendants(ref ResultList, ref argChildren, ref RootPath);
             }
-
         }
     }
 }

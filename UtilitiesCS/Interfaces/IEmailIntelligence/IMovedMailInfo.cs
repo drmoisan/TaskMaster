@@ -1,6 +1,6 @@
 ﻿using Microsoft.Office.Interop.Outlook;
-using Outlook = Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
@@ -19,6 +19,7 @@ namespace UtilitiesCS
 
         [JsonIgnore]
         Application OlApp { get; set; }
+
         [JsonIgnore]
         IApplicationGlobals Globals { get; set; }
 

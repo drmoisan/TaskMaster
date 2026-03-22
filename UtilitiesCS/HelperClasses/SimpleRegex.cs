@@ -10,8 +10,8 @@ namespace UtilitiesCS
     public static class SimpleRegex
     {
         /// <summary>
-        /// Creates a simple Regex Pattern that treats '%' or '*' as wildcards. 
-        /// Wildcards are enclosed in parenthesis to aid in the execution of 
+        /// Creates a simple Regex Pattern that treats '%' or '*' as wildcards.
+        /// Wildcards are enclosed in parenthesis to aid in the execution of
         /// <seealso cref="SearchOptions.DeleteFromMatches"/>
         /// </summary>
         /// <param name="searchString"></param>
@@ -21,9 +21,10 @@ namespace UtilitiesCS
             string searchPattern = searchString.Replace("%", "*");
             if (searchPattern.Contains("*"))
             {
-                searchPattern = string.Join("(.*)",
-                                            searchPattern.Split('*')
-                                            .Select(x => Regex.Escape(x)));
+                searchPattern = string.Join(
+                    "(.*)",
+                    searchPattern.Split('*').Select(x => Regex.Escape(x))
+                );
             }
             else
             {
@@ -36,8 +37,13 @@ namespace UtilitiesCS
         public static string MakeReplacePattern(string searchPattern)
         {
             int groupNum = searchPattern.Count(x => (x == '*'));
-            string replacePattern = string.Join("", (from number in Enumerable.Range(1, groupNum)
-                                                     select string.Concat("$", number.ToString())));
+            string replacePattern = string.Join(
+                "",
+                (
+                    from number in Enumerable.Range(1, groupNum)
+                    select string.Concat("$", number.ToString())
+                )
+            );
             return replacePattern;
         }
 
@@ -65,6 +71,5 @@ namespace UtilitiesCS
 
             return [];
         }
-
     }
 }

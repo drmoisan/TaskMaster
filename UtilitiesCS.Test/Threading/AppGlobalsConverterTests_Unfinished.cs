@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json;
-using System;
 using UtilitiesCS;
 
 namespace Z.Disabled.UtilitiesCS.Test.Threading
@@ -22,8 +22,8 @@ namespace Z.Disabled.UtilitiesCS.Test.Threading
             //this.mockFileSystemsFolderPaths.SetupGet(x => x.FldrPythonStaging).Returns("Working");
             this.mockApplicationGlobals = this.mockRepository.Create<IApplicationGlobals>();
             this.mockApplicationGlobals.SetupAllProperties();
-            this.mockApplicationGlobals.SetupGet(x => x.FS).Returns(this.mockFileSystemsFolderPaths.Object);
-
+            this.mockApplicationGlobals.SetupGet(x => x.FS)
+                .Returns(this.mockFileSystemsFolderPaths.Object);
         }
 
         private JsonSerializerSettings CreateJsonSerializerSettings()
@@ -31,7 +31,7 @@ namespace Z.Disabled.UtilitiesCS.Test.Threading
             var settings = new JsonSerializerSettings()
             {
                 TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented
+                Formatting = Formatting.Indented,
             };
             settings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
             settings.Converters.Add(new AppGlobalsConverter(this.mockApplicationGlobals.Object));
@@ -41,8 +41,7 @@ namespace Z.Disabled.UtilitiesCS.Test.Threading
 
         private AppGlobalsConverter CreateAppGlobalsConverter()
         {
-            return new AppGlobalsConverter(
-                this.mockApplicationGlobals.Object);
+            return new AppGlobalsConverter(this.mockApplicationGlobals.Object);
         }
 
         public class SampleClass
@@ -73,7 +72,6 @@ namespace Z.Disabled.UtilitiesCS.Test.Threading
             //this.mockJsonSerializer.Verify(x => x.Serialize(It.IsAny<JsonWriter>(), It.IsAny<object>()), Times.Once);
             //this.mockJsonSerializer.Verify(x => x.Serialize(It.Is<JsonWriter>(x => x == writer), It.Is<string>(y => y == "default")));
             //this.mockJsonSerializer.Verify(x => x.Serialize(writer, "default"), Times.Once);
-
         }
     }
 }

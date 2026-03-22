@@ -1,11 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using Microsoft.Office.Interop.Outlook;
-using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using TaskVisualization;
 using UtilitiesCS;
-using Moq;
-using System.Collections.Generic;
-using System.Collections;
 
 namespace Z.Disabled.TaskVisualization.Test
 {
@@ -15,7 +15,6 @@ namespace Z.Disabled.TaskVisualization.Test
         [TestMethod]
         public void Disabled_GetFlagsToSet_TestMultiple()
         {
-
             //MoqOlToDo mockGlobals = new MoqOlToDo();
 
             //FlagTasks testFlagger = new FlagTasks(mockGlobals.MockGlobals());

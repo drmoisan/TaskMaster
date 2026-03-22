@@ -1,46 +1,51 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Outlook = Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using UtilitiesCS.HelperClasses;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.Extensions;
+using UtilitiesCS.HelperClasses;
 using UtilitiesCS.OutlookObjects.Store;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
     public static class RecipientStatic
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         private const int _numberOfFields = 13;
 
-        private const string PR_SMTP_ADDRESS = "http://schemas.microsoft.com/mapi/proptag/0x39FE001E";
+        private const string PR_SMTP_ADDRESS =
+            "http://schemas.microsoft.com/mapi/proptag/0x39FE001E";
 
-        public static Outlook.AddressList GetGlobalAddressList(this Outlook.Store store, Outlook.Application olApp)
+        public static Outlook.AddressList GetGlobalAddressList(
+            this Outlook.Store store,
+            Outlook.Application olApp
+        )
         {
-            string PR_EMSMDB_SECTION_UID =
-                @"http://schemas.microsoft.com/mapi/proptag/0x3D150102";
+            string PR_EMSMDB_SECTION_UID = @"http://schemas.microsoft.com/mapi/proptag/0x3D150102";
             if (store == null)
             {
                 throw new ArgumentNullException();
             }
             Outlook.PropertyAccessor oPAStore = store.PropertyAccessor;
-            string storeUID = oPAStore.BinaryToString(
-                oPAStore.GetProperty(PR_EMSMDB_SECTION_UID));
-            foreach (Outlook.AddressList addrList
-                in olApp.Session.AddressLists)
+            string storeUID = oPAStore.BinaryToString(oPAStore.GetProperty(PR_EMSMDB_SECTION_UID));
+            foreach (Outlook.AddressList addrList in olApp.Session.AddressLists)
             {
-                Outlook.PropertyAccessor oPAAddrList =
-                    addrList.PropertyAccessor;
+                Outlook.PropertyAccessor oPAAddrList = addrList.PropertyAccessor;
                 string addrListUID = oPAAddrList.BinaryToString(
-                    oPAAddrList.GetProperty(PR_EMSMDB_SECTION_UID));
+                    oPAAddrList.GetProperty(PR_EMSMDB_SECTION_UID)
+                );
                 // Return addrList if match on storeUID
                 // and type is olExchangeGlobalAddressList.
-                if (addrListUID == storeUID && addrList.AddressListType ==
-                    Outlook.OlAddressListType.olExchangeGlobalAddressList)
+                if (
+                    addrListUID == storeUID
+                    && addrList.AddressListType
+                        == Outlook.OlAddressListType.olExchangeGlobalAddressList
+                )
                 {
                     return addrList;
                 }
@@ -77,7 +82,6 @@ namespace UtilitiesCS
             //    senderName = olMail.SenderName;
             //}
             //return senderName;
-
         }
 
         public static string GetSenderName(this MeetingItem olMeeting)
@@ -182,7 +186,10 @@ namespace UtilitiesCS
             else
             {
                 var recipient = olMail.Sender.ToResolvedRecipient(ns)?.GetInfo();
-                if (recipient is not null) { return recipient; }
+                if (recipient is not null)
+                {
+                    return recipient;
+                }
                 else
                 {
                     var name = olMail.GetSenderName();
@@ -193,10 +200,16 @@ namespace UtilitiesCS
             }
         }
 
-        public static (string recipientsTo, string recipientsCC) GetRecipients(this MailItem olMail, Outlook.NameSpace ns)
+        public static (string recipientsTo, string recipientsCC) GetRecipients(
+            this MailItem olMail,
+            Outlook.NameSpace ns
+        )
         {
             var olRecipients = olMail.Recipients;
-            if (olRecipients is null) { return ("", ""); }
+            if (olRecipients is null)
+            {
+                return ("", "");
+            }
 
             List<string> recipientsTo = [];
             List<string> recipientsCC = [];
@@ -218,10 +231,16 @@ namespace UtilitiesCS
             return (string.Join("; ", recipientsTo), string.Join("; ", recipientsCC));
         }
 
-        public static (string recipientsTo, string recipientsCC) GetRecipients(this MeetingItem olMeeting, Outlook.NameSpace ns)
+        public static (string recipientsTo, string recipientsCC) GetRecipients(
+            this MeetingItem olMeeting,
+            Outlook.NameSpace ns
+        )
         {
             var olRecipients = olMeeting.Recipients;
-            if (olRecipients is null) { return ("", ""); }
+            if (olRecipients is null)
+            {
+                return ("", "");
+            }
 
             List<string> recipientsTo = [];
             List<string> recipientsCC = [];
@@ -246,14 +265,16 @@ namespace UtilitiesCS
         public static (string recipientsTo, string recipientsCC) GetRecipients(this MailItem olMail)
         {
             var olRecipients = olMail.Recipients;
-            if (olRecipients is null) { return ("", ""); }
+            if (olRecipients is null)
+            {
+                return ("", "");
+            }
 
             List<string> recipientsTo = [];
             List<string> recipientsCC = [];
 
             foreach (Recipient olRecipient in olRecipients)
             {
-
                 var smtpAddress = GetRecipientAddress(olRecipient);
                 if (olRecipient.Type == (int)OlMailRecipientType.olTo)
                 {
@@ -268,17 +289,21 @@ namespace UtilitiesCS
             return (string.Join("; ", recipientsTo), string.Join("; ", recipientsCC));
         }
 
-        public static (string recipientsTo, string recipientsCC) GetRecipients(this MeetingItem olMeeting)
+        public static (string recipientsTo, string recipientsCC) GetRecipients(
+            this MeetingItem olMeeting
+        )
         {
             var olRecipients = olMeeting.Recipients;
-            if (olRecipients is null) { return ("", ""); }
+            if (olRecipients is null)
+            {
+                return ("", "");
+            }
 
             List<string> recipientsTo = [];
             List<string> recipientsCC = [];
 
             foreach (Recipient olRecipient in olRecipients)
             {
-
                 var smtpAddress = GetRecipientAddress(olRecipient);
                 if (olRecipient.Type == (int)OlMailRecipientType.olTo)
                 {
@@ -293,7 +318,10 @@ namespace UtilitiesCS
             return (string.Join("; ", recipientsTo), string.Join("; ", recipientsCC));
         }
 
-        public static IEnumerable<RecipientInfo> GetInfo(this IEnumerable<Recipient> recipients, StoresWrapper storesWrapper)
+        public static IEnumerable<RecipientInfo> GetInfo(
+            this IEnumerable<Recipient> recipients,
+            StoresWrapper storesWrapper
+        )
         {
             foreach (var recipient in recipients)
             {
@@ -304,7 +332,10 @@ namespace UtilitiesCS
             }
         }
 
-        public static Recipient ToResolvedRecipient(this AddressEntry addressEntry, Outlook.NameSpace ns)
+        public static Recipient ToResolvedRecipient(
+            this AddressEntry addressEntry,
+            Outlook.NameSpace ns
+        )
         {
             var resolvedRecipient = ns.CreateRecipient(addressEntry.Name);
             if (resolvedRecipient.Resolve())
@@ -354,29 +385,42 @@ namespace UtilitiesCS
 
         public static IEnumerable<Recipient> GetToRecipients(this MailItem olMail)
         {
-            return olMail.Recipients.Cast<Recipient>().Where(r => r.Type == (int)OlMailRecipientType.olTo);
+            return olMail
+                .Recipients.Cast<Recipient>()
+                .Where(r => r.Type == (int)OlMailRecipientType.olTo);
         }
 
         public static IEnumerable<Recipient> GetToRecipients(this MeetingItem olMeeting)
         {
-            return olMeeting.Recipients.Cast<Recipient>().Where(r => r.Type == (int)OlMailRecipientType.olTo);
+            return olMeeting
+                .Recipients.Cast<Recipient>()
+                .Where(r => r.Type == (int)OlMailRecipientType.olTo);
         }
 
         public static IEnumerable<Recipient> GetCcRecipients(this MailItem olMail)
         {
-            return olMail.Recipients.Cast<Recipient>().Where(r => r.Type == (int)OlMailRecipientType.olCC);
+            return olMail
+                .Recipients.Cast<Recipient>()
+                .Where(r => r.Type == (int)OlMailRecipientType.olCC);
         }
 
         public static IEnumerable<Recipient> GetCcRecipients(this MeetingItem olMeeting)
         {
-            return olMeeting.Recipients.Cast<Recipient>().Where(r => r.Type == (int)OlMailRecipientType.olCC);
+            return olMeeting
+                .Recipients.Cast<Recipient>()
+                .Where(r => r.Type == (int)OlMailRecipientType.olCC);
         }
 
         private static string GetRecipientAddress(Recipient olRecipient)
         {
             string smtpAddress;
 
-            if (olRecipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || olRecipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
+            if (
+                olRecipient.AddressEntry.AddressEntryUserType
+                    == OlAddressEntryUserType.olExchangeUserAddressEntry
+                || olRecipient.AddressEntry.AddressEntryUserType
+                    == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry
+            )
             {
                 ExchangeUser exchUser = olRecipient.AddressEntry.GetExchangeUser();
                 if (exchUser != null)
@@ -406,8 +450,12 @@ namespace UtilitiesCS
                     try
                     {
                         smtpAddress = olRecipient.Name;
-                        if (smtpAddress.IsNullOrEmpty() || smtpAddress.StartsWith("/o=ExchangeLabs"))
-                            throw new InvalidOperationException("SMTP address and name are null, empty, or malformed");
+                        if (
+                            smtpAddress.IsNullOrEmpty() || smtpAddress.StartsWith("/o=ExchangeLabs")
+                        )
+                            throw new InvalidOperationException(
+                                "SMTP address and name are null, empty, or malformed"
+                            );
                     }
                     catch (System.Exception)
                     {
@@ -443,7 +491,11 @@ namespace UtilitiesCS
             //return StrSMTPAddress;
         }
 
-        internal static (string FirstName, string LastName, string DomainName) ExtractNameFromAddress(string address)
+        internal static (
+            string FirstName,
+            string LastName,
+            string DomainName
+        ) ExtractNameFromAddress(string address)
         {
             var rx = new Regex(@"^(.+)@([^@]+)$");
             var match = rx.Match(address);
@@ -452,7 +504,10 @@ namespace UtilitiesCS
             string domain = match.Groups[2].Value;
             string mailbox = match.Groups[1].Value;
             rx = new Regex(@"(?:^|\.)(?=[^""]|""?|)""?((?(1)[^""]*|[^\.""]*))""?(?=\.|$|@)");
-            var nameParts = rx.Matches(mailbox).Cast<Match>().Select(m => m.Groups[1].Value).ToArray();
+            var nameParts = rx.Matches(mailbox)
+                .Cast<Match>()
+                .Select(m => m.Groups[1].Value)
+                .ToArray();
             //var nameParts = mailbox.Split('.');
             switch (nameParts.Length)
             {
@@ -469,7 +524,8 @@ namespace UtilitiesCS
 
         internal static (string Name, string Address) GetRecipientInfo(Recipient recipient)
         {
-            string name, address;
+            string name,
+                address;
             name = recipient.Name;
             address = recipient.Address;
             //try
@@ -499,9 +555,8 @@ namespace UtilitiesCS
             //catch (System.Exception)
             //{
             //    name = recipient.Name;
-            //    address = recipient.Address;                
+            //    address = recipient.Address;
             //}
-
 
             return (name, address);
         }
@@ -509,7 +564,12 @@ namespace UtilitiesCS
         private static string GetRecipientName(Recipient olRecipient)
         {
             string recipientName;
-            if (olRecipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || olRecipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
+            if (
+                olRecipient.AddressEntry.AddressEntryUserType
+                    == OlAddressEntryUserType.olExchangeUserAddressEntry
+                || olRecipient.AddressEntry.AddressEntryUserType
+                    == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry
+            )
             {
                 ExchangeUser exchUser = olRecipient.AddressEntry.GetExchangeUser();
                 if (exchUser != null)
@@ -521,7 +581,10 @@ namespace UtilitiesCS
                     recipientName = olRecipient.Name;
                 }
             }
-            else { recipientName = olRecipient.Name; }
+            else
+            {
+                recipientName = olRecipient.Name;
+            }
             return recipientName;
         }
 
@@ -529,9 +592,8 @@ namespace UtilitiesCS
         {
             return ConvertRecipientToHtml(
                 GetRecipientName(olRecipient),
-                GetRecipientAddress(olRecipient));
+                GetRecipientAddress(olRecipient)
+            );
         }
-
-
     }
 }

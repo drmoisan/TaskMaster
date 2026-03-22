@@ -1,9 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq;
-using System;
-using UtilitiesCS.EmailIntelligence;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UtilitiesCS.EmailIntelligence;
 
 namespace UtilitiesCS.Test
 {
@@ -23,7 +23,7 @@ namespace UtilitiesCS.Test
         public void StripAccents_Test()
         {
             string[] original = { "dale", "estás", "añadiendo", "una", "prueba" };
-            string[] target = { "dale","estas","anadiendo","una","prueba" };
+            string[] target = { "dale", "estas", "anadiendo", "una", "prueba" };
             string[] test = (from string word in original select word.StripAccents()).ToArray();
             CollectionAssert.AreEqual(test, target);
         }
@@ -33,7 +33,15 @@ namespace UtilitiesCS.Test
         {
             string original = "Fwd: Dale ... Estás añadiendo una prueba?";
             string target = "dale anadiendo prueba";
-            IList<string> stopWords = new List<string>{ "re", "el", "ella", "fwd", "estás", "una" };
+            IList<string> stopWords = new List<string>
+            {
+                "re",
+                "el",
+                "ella",
+                "fwd",
+                "estás",
+                "una",
+            };
             string test = original.StripCommonWords(stopWords);
             Assert.AreEqual(test, target);
         }

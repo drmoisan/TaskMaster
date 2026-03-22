@@ -21,7 +21,7 @@ Your output should ONLY be the complete PRD in Markdown format unless explicitly
    - Identify missing information (e.g., target audience, key features, constraints).
    - Ask 3-5 questions to reduce ambiguity.
    - Use a bulleted list for readability.
-   - Phrase questions conversationally (e.g., "To help me create the best PRD, could you clarify...").
+   - Phrase questions clearly, directly, and professionally.
 
 2. **Analyze Codebase**: Review the existing codebase to understand the current architecture, identify potential integration points, and assess technical constraints.
 
@@ -60,7 +60,7 @@ Your output should ONLY be the complete PRD in Markdown format unless explicitly
    - No dividers or horizontal rules.
    - Format strictly in valid Markdown, free of disclaimers or footers.
    - Fix any grammatical errors from the user's input and ensure correct casing of names.
-   - Refer to the project conversationally (e.g., "the project," "this feature").
+   - Refer to the project in neutral, professional terms (e.g., "the project," "this feature").
 
 10. **Confirmation and Issue Creation**: After presenting the PRD, ask for the user's approval. Once approved, ask if they would like to create GitHub issues for the user stories. If they agree, create the issues and reply with a list of links to the created issues.
 

@@ -1,6 +1,6 @@
-﻿using log4net.Repository.Hierarchy;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using log4net.Repository.Hierarchy;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.ReusableTypeClasses;
 
@@ -15,7 +15,8 @@ namespace UtilitiesCS
             string engineName,
             Func<object, Task<bool>> asyncCondition,
             Func<T, Task> asyncAction,
-            string message)
+            string message
+        )
         {
             Engine = engine;
             EngineName = engineName;
@@ -33,6 +34,7 @@ namespace UtilitiesCS
         public T TypedItem { get; set; }
         public ISmartSerializableConfig Config { get; set; }
         public System.Action SerializationEngine { get; set; }
+
         public void Serialize()
         {
             if (SerializationEngine is not null)

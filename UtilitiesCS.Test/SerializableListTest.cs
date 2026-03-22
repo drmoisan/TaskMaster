@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test
 {
@@ -24,6 +24,7 @@ namespace UtilitiesCS.Test
             testList.Serialize();
             Assert.IsTrue(File.Exists(filepath));
         }
+
         [TestMethod]
         public void Deserialize_Test()
         {

@@ -20,6 +20,7 @@ namespace UtilitiesCS
         }
 
         private FilterOlFoldersController _controller;
+
         public void SetController(FilterOlFoldersController controller)
         {
             _controller = controller;
@@ -31,7 +32,6 @@ namespace UtilitiesCS
 
         private void SetupDragAndDrop()
         {
-
             // Setup the tree so that it can drop and drop.
 
             // Dropping doesn't do anything, but it does show how it works
@@ -39,7 +39,7 @@ namespace UtilitiesCS
             TlvNotFiltered.IsSimpleDragSource = true;
             TlvNotFiltered.IsSimpleDropSink = true;
 
-            TlvNotFiltered.ModelCanDrop += delegate (object sender, ModelDropEventArgs e)
+            TlvNotFiltered.ModelCanDrop += delegate(object sender, ModelDropEventArgs e)
             {
                 e.Effect = DragDropEffects.None;
                 if (e.TargetModel == null)
@@ -51,11 +51,20 @@ namespace UtilitiesCS
                     e.InfoMessage = "Can only drop on directories";
             };
 
-            TlvNotFiltered.ModelDropped += delegate (object sender, ModelDropEventArgs e)
+            TlvNotFiltered.ModelDropped += delegate(object sender, ModelDropEventArgs e)
             {
-                String msg = String.Format("{2} items were dropped on '{1}' as a {0} operation.",
-                    e.Effect, ((DirectoryInfo)e.TargetModel).Name, e.SourceModels.Count);
-                MessageBox.Show(msg, "Object List View Demo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                String msg = String.Format(
+                    "{2} items were dropped on '{1}' as a {0} operation.",
+                    e.Effect,
+                    ((DirectoryInfo)e.TargetModel).Name,
+                    e.SourceModels.Count
+                );
+                MessageBox.Show(
+                    msg,
+                    "Object List View Demo",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
             };
         }
 
@@ -78,7 +87,6 @@ namespace UtilitiesCS
             //this.TlvNotFiltered.Roots = _controller.OlFolderTree.Roots;
             //this.TlvNotFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == false);
 
-
             this.TlvFiltered.CanExpandGetter = x => ((TreeNode<FolderWrapper>)x).ChildCount > 0;
             this.TlvFiltered.ChildrenGetter = x => ((TreeNode<FolderWrapper>)x).Children;
             this.TlvFiltered.ParentGetter = x => ((TreeNode<FolderWrapper>)x).Parent;
@@ -87,8 +95,6 @@ namespace UtilitiesCS
             //this.TlvFiltered.Roots = _controller.OlFolderTree.Roots;
             //this.TlvFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == true);
         }
-
-
 
         /// <summary>
         /// Format a file size into a more intelligible value
@@ -110,6 +116,7 @@ namespace UtilitiesCS
         }
 
         private void BtnDiscard_Click(object sender, EventArgs e) => _controller?.Discard();
+
         private void BtnSave_Click(object sender, EventArgs e) => _controller?.Save();
     }
 }

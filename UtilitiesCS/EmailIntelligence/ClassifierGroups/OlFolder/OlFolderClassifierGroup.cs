@@ -1,28 +1,29 @@
-﻿using log4net.Repository.Hierarchy;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using log4net.Repository.Hierarchy;
 using UtilitiesCS.EmailIntelligence.Bayesian;
-using UtilitiesCS.Extensions;
-using UtilitiesCS.HelperClasses;
-using UtilitiesCS.Threading;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups;
-using System.IO;
+using UtilitiesCS.Extensions;
 using UtilitiesCS.Extensions.Lazy;
+using UtilitiesCS.HelperClasses;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
 {
     public class OlFolderClassifierGroup(IApplicationGlobals globals)
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         private IApplicationGlobals _globals = globals;
         internal IApplicationGlobals Globals => _globals;
@@ -37,9 +38,15 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             {
                 if (Globals.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
                 {
-                    return new ScoCollection<MinedMailInfo>(Globals.FS.Filenames.EmailInfoStagingFile, pythonStaging);
+                    return new ScoCollection<MinedMailInfo>(
+                        Globals.FS.Filenames.EmailInfoStagingFile,
+                        pythonStaging
+                    );
                 }
-                else { return null; }
+                else
+                {
+                    return null;
+                }
             });
 
             return _mailInfoCollection;
@@ -47,11 +54,15 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
 
         protected ScoCollection<MinedMailInfo> _mailInfoCollection;
 
-        public virtual async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(MinedMailInfo[] collection)
+        public virtual async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(
+            MinedMailInfo[] collection
+        )
         {
             collection.ThrowIfNull();
 
-            var group = await Task.Run(() => CgUtilities.Deserialize<BayesianClassifierGroup>("StagingClassifierGroup"));
+            var group = await Task.Run(() =>
+                CgUtilities.Deserialize<BayesianClassifierGroup>("StagingClassifierGroup")
+            );
             if (group is null)
             {
                 group = await CreateClassifierGroupAsync(collection);
@@ -61,7 +72,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
         }
 
         public virtual async Task<BayesianClassifierGroup> CreateClassifierGroupAsync(
-            MinedMailInfo[] collection)
+            MinedMailInfo[] collection
+        )
         {
             return await Task.Run(() =>
             {
@@ -69,7 +81,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
                 {
                     TotalEmailCount = collection.Count(),
                     SharedTokenBase = new Corpus(
-                        collection.SelectMany(x => x.Tokens).GroupAndCount())
+                        collection.SelectMany(x => x.Tokens).GroupAndCount()
+                    ),
                 };
                 return group;
             });
@@ -78,19 +91,29 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
         public virtual async Task BuildClassifierAsync(
             IGrouping<string, MinedMailInfo> group,
             BayesianClassifierGroup classifierGroup,
-            CancellationToken cancel)
+            CancellationToken cancel
+        )
         {
-            var matchFrequency = group.Select(minedMail => minedMail.Tokens)
-                                      .SelectMany(x => x)
-                                      .GroupAndCount();
+            var matchFrequency = group
+                .Select(minedMail => minedMail.Tokens)
+                .SelectMany(x => x)
+                .GroupAndCount();
 
             var matchCorpus = new Corpus(matchFrequency);
             var matchEmailCount = group.Count();
             await classifierGroup.RebuildClassifier(
-                group.Key, matchFrequency, matchEmailCount, cancel);
+                group.Key,
+                matchFrequency,
+                matchEmailCount,
+                cancel
+            );
         }
 
-        public async Task<bool> BuildFolderClassifiersAsync(BayesianClassifierGroup classifierGroup, MinedMailInfo[] collection, ProgressPackage ppkg)
+        public async Task<bool> BuildFolderClassifiersAsync(
+            BayesianClassifierGroup classifierGroup,
+            MinedMailInfo[] collection,
+            ProgressPackage ppkg
+        )
         {
             var groups = collection.GroupBy(x => x.FolderInfo.RelativePath);
             var sw = ppkg.StopWatch;
@@ -98,10 +121,16 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             bool success = false;
             try
             {
-                await AsyncMultiTasker.AsyncMultiTaskChunker(groups, async (group) =>
-                {
-                    await BuildClassifierAsync(group, classifierGroup, ppkg.Cancel);
-                }, ppkg.ProgressTrackerPane, "Building Classifiers", ppkg.Cancel);
+                await AsyncMultiTasker.AsyncMultiTaskChunker(
+                    groups,
+                    async (group) =>
+                    {
+                        await BuildClassifierAsync(group, classifierGroup, ppkg.Cancel);
+                    },
+                    ppkg.ProgressTrackerPane,
+                    "Building Classifiers",
+                    ppkg.Cancel
+                );
                 sw.LogDuration("Build Classifiers");
                 sw.WriteToLog(clear: false);
                 success = true;
@@ -119,31 +148,55 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             var miner = new EmailDataMiner(Globals);
 
             var ppkg = await ProgressPackage //.CreateAsTupleAsync(screen: Globals.Ol.GetExplorerScreen());
-                .CreateAsTuplePaneAsync(progressTrackerPane: Globals.AF.ProgressTracker).ConfigureAwait(false);
+                .CreateAsTuplePaneAsync(progressTrackerPane: Globals.AF.ProgressTracker)
+                .ConfigureAwait(false);
             var sw = ppkg.StopWatch;
             Globals.AF.ProgressPane.Visible = true;
-            ppkg.ProgressTrackerPane.Report(0, "Building Folder Classifier -> Load Mined Mail Info");
+            ppkg.ProgressTrackerPane.Report(
+                0,
+                "Building Folder Classifier -> Load Mined Mail Info"
+            );
 
-            if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot)) { return; }
+            if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
+            {
+                return;
+            }
 
             var folderPath = Path.Combine(folderRoot, "Bayesian");
             var collection = await EmailDataMiner.Load<MinedMailInfo[]>(folderPath);
             collection.ThrowIfNullOrEmpty();
             sw.LogDuration("Load Staging");
 
-            ppkg.ProgressTrackerPane.Report(10, "Building Folder Classifier -> Getting Folder Paths");
+            ppkg.ProgressTrackerPane.Report(
+                10,
+                "Building Folder Classifier -> Getting Folder Paths"
+            );
 
-            var folderPaths = miner.QueryOlFolderInfo(miner.GetOlFolderTree()).Select(x => x.RelativePath).ToList();
+            var folderPaths = miner
+                .QueryOlFolderInfo(miner.GetOlFolderTree())
+                .Select(x => x.RelativePath)
+                .ToList();
             sw.LogDuration("Get Folder Paths");
 
-            ppkg.ProgressTrackerPane.Report(20, "Building Folder Classifier -> Creating Classifier Group");
+            ppkg.ProgressTrackerPane.Report(
+                20,
+                "Building Folder Classifier -> Creating Classifier Group"
+            );
             var classifierGroup = await GetOrCreateClassifierGroupAsync(collection);
             sw.LogDuration("Get or Create Classifier Group and shared token base");
             sw.WriteToLog(clear: false);
-            ppkg.ProgressTrackerPane.Report(30, "Building Folder Classifier -> Building Classifiers");
+            ppkg.ProgressTrackerPane.Report(
+                30,
+                "Building Folder Classifier -> Building Classifiers"
+            );
 
             var childPpkg = await new ProgressPackage()
-                .InitializeAsync(ppkg.CancelSource, ppkg.Cancel, ppkg.ProgressTrackerPane.SpawnChild(), ppkg.StopWatch)
+                .InitializeAsync(
+                    ppkg.CancelSource,
+                    ppkg.Cancel,
+                    ppkg.ProgressTrackerPane.SpawnChild(),
+                    ppkg.StopWatch
+                )
                 .ConfigureAwait(false);
 
             if (await BuildFolderClassifiersAsync(classifierGroup, collection, childPpkg))
@@ -157,7 +210,12 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
 
                     Globals.AF.Manager["Folder"] = classifierGroup.ToAsyncLazy();
                     //Globals.AF.Manager.Serialize();
-                    MyBox.ShowDialog("Folder Classifier Built Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MyBox.ShowDialog(
+                        "Folder Classifier Built Successfully",
+                        "Success",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
                 }
             }
         }
@@ -169,7 +227,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
                 var group = new BayesianClassifierGroup
                 {
                     TotalEmailCount = 0,
-                    SharedTokenBase = new Corpus()
+                    SharedTokenBase = new Corpus(),
                 };
                 return group;
             });
@@ -184,6 +242,5 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
         }
 
         #endregion Build Classifiers
-
     }
 }

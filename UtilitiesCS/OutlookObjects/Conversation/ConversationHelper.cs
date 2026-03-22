@@ -1,6 +1,4 @@
-﻿using Microsoft.Data.Analysis;
-using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +10,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using Microsoft.Data.Analysis;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.OutlookObjects.Fields;
 using static System.Net.WebRequestMethods;
 using Outlook = Microsoft.Office.Interop.Outlook;
@@ -19,58 +19,103 @@ using Reflection = System.Reflection;
 
 namespace UtilitiesCS
 {
-    //public enum 
+    //public enum
 
     public static class ConvHelper
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
+
+        internal static object SafeResolveConversationItem(
+            object namespaceRef,
+            Func<object, string, string, object> resolver
+        )
+        {
+            if (namespaceRef is null || resolver is null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return resolver(namespaceRef, string.Empty, string.Empty);
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         public enum Justify
         {
-            Right = 1, Left = 2, Center = 4
+            Right = 1,
+            Left = 2,
+            Center = 4,
         }
 
-        public static IList GetMailItemList(DataFrame df,
-                                            string storeID,
-                                            Outlook.Application olApp,
-                                            bool strict)
+        public static IList GetMailItemList(
+            DataFrame df,
+            string storeID,
+            Outlook.Application olApp,
+            bool strict
+        )
         {
             IList emails = new List<MailItem>();
             string EntryID = "EntryID";
 
             if (df == null)
             {
-                if (strict) { throw new ArgumentNullException(nameof(df)); }
-                else { return emails; }
+                if (strict)
+                {
+                    throw new ArgumentNullException(nameof(df));
+                }
+                else
+                {
+                    return emails;
+                }
             }
-
             else if (!df.Columns.GetNames().Contains(EntryID))
             {
                 if (strict)
                 {
                     throw new ArgumentOutOfRangeException(
-                        $"{nameof(df)} is missing {EntryID} columns: {string.Join(",", df.Columns.GetNames())}");
+                        $"{nameof(df)} is missing {EntryID} columns: {string.Join(",", df.Columns.GetNames())}"
+                    );
                 }
-                else { return emails; }
+                else
+                {
+                    return emails;
+                }
             }
-
             else if (df.Rows.Count == 0)
             {
-                if (strict) { throw new ArgumentOutOfRangeException("df is empty"); }
-                else { return emails; }
+                if (strict)
+                {
+                    throw new ArgumentOutOfRangeException("df is empty");
+                }
+                else
+                {
+                    return emails;
+                }
             }
-
             else
             {
-                emails = df["EntryID"][0, (int)df.Rows.Count]
-                    .Select(x => olApp.GetNamespace("MAPI")
-                    .GetItemFromID((string)x, storeID))
+                emails = df["EntryID"]
+                    [0, (int)df.Rows.Count]
+                    .Select(x => olApp.GetNamespace("MAPI").GetItemFromID((string)x, storeID))
                     .ToList();
                 return emails;
             }
         }
 
-        async public static Task<T> GetItemAsync<T>(this DataFrameRow row, Outlook.NameSpace olNs, int indexEntryId, int indexStoreId) where T : MailItem, TaskItem, AppointmentItem, MeetingItem
+        public static async Task<T> GetItemAsync<T>(
+            this DataFrameRow row,
+            Outlook.NameSpace olNs,
+            int indexEntryId,
+            int indexStoreId
+        )
+            where T : MailItem, TaskItem, AppointmentItem, MeetingItem
         {
             string entryId = (string)row[indexEntryId];
             string storeId = (string)row[indexStoreId];
@@ -78,22 +123,20 @@ namespace UtilitiesCS
             return item;
         }
 
-        public static IList GetMailItemList(DataFrame df,
-                                            string storeID,
-                                            Outlook.Application olApp)
+        public static IList GetMailItemList(DataFrame df, string storeID, Outlook.Application olApp)
         {
             IList emails = new List<MailItem>();
             string EntryID = "EntryID";
 
-            if ((df == null) || (df.Columns.GetNames().Contains(EntryID)) || (df.Rows.Count == 0))
+            if ((df == null) || (!df.Columns.GetNames().Contains(EntryID)) || (df.Rows.Count == 0))
             {
                 return emails;
             }
             else
             {
-                emails = df["EntryID"][0, (int)df.Rows.Count]
-                    .Select(x => olApp.GetNamespace("MAPI")
-                    .GetItemFromID((string)x, storeID))
+                emails = df["EntryID"]
+                    [0, (int)df.Rows.Count]
+                    .Select(x => olApp.GetNamespace("MAPI").GetItemFromID((string)x, storeID))
                     .ToList();
                 return emails;
             }
@@ -104,7 +147,7 @@ namespace UtilitiesCS
             if (ObjItem is MailItem)
             {
                 MailItem mailItem = (MailItem)ObjItem;
-                return mailItem.ConversationCt(true, true);
+                return mailItem.ConversationCt(SameFolder, MailOnly);
             }
             return -1;
         }
@@ -118,18 +161,23 @@ namespace UtilitiesCS
                 //                      .GetConversation()
                 //                      .GetTable(true, false);
                 DataFrame df = conv.GetDataFrame();
-                Debug.WriteLine(df.PrettyText());
-                if (SameFolder)
+                if (df is null)
                 {
-                    string FolderName = ObjItem.PropertyAccessor.GetProperty(MAPIFields.Schemas.FolderName) as string;
-                    df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(FolderName));
-                }
-                if (MailOnly)
-                {
-                    df = df.Filter(df["MessageClass"].ElementwiseEquals<string>("IPM.Note"));
+                    return 0;
                 }
 
-                return (int)df.Rows.Count;
+                Debug.WriteLine(df.PrettyText());
+                string folderName = null;
+                if (SameFolder)
+                {
+                    folderName =
+                        ObjItem.PropertyAccessor?.GetProperty(MAPIFields.Schemas.FolderName)
+                        as string;
+                }
+
+                df = df.FilterConversation(folderName, SameFolder, MailOnly);
+
+                return (int)(df?.Rows.Count ?? 0);
             }
             return 0;
         }
@@ -144,9 +192,7 @@ namespace UtilitiesCS
             return null;
         }
 
-
-
-        //PERFORMANCE: Add async version of GetConversationDf 
+        //PERFORMANCE: Add async version of GetConversationDf
         public static DataFrame GetConversationDf(this Conversation conversation)
         {
             if (conversation != null)
@@ -173,9 +219,18 @@ namespace UtilitiesCS
             return null;
         }
 
-        public static async Task<DataFrame> GetConversationDfAsync(this MailItem mailItem, CancellationToken token)
+        public static async Task<DataFrame> GetConversationDfAsync(
+            this MailItem mailItem,
+            CancellationToken token
+        )
         {
-            var conv = await TimeOutTask.RunWithTimeout(() => mailItem.GetConversation(), token, 1000, 3, false);
+            var conv = await TimeOutTask.RunWithTimeout(
+                () => mailItem.GetConversation(),
+                token,
+                1000,
+                3,
+                false
+            );
             var df = await conv.GetDataFrameAsync(token);
             return df;
         }
@@ -186,23 +241,29 @@ namespace UtilitiesCS
             int timeout,
             int retryCount,
             TaskCreationOptions options,
-            TaskScheduler scheduler)
+            TaskScheduler scheduler
+        )
         {
             token.ThrowIfCancellationRequested();
 
             var timeoutCancellation = new CancellationTokenSource(timeout);
-            var combinedCancellation = CancellationTokenSource.CreateLinkedTokenSource(token, timeoutCancellation.Token);
+            var combinedCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+                token,
+                timeoutCancellation.Token
+            );
 
             DataFrame df = null;
 
             try
             {
-                await Task.Run(() =>
+                await Task.Run(
+                    () =>
                     {
                         Outlook.Conversation conv = mailItem.GetConversation();
                         df = conv.GetDataFrame();
                     },
-                    combinedCancellation.Token);
+                    combinedCancellation.Token
+                );
                 //await Task.Factory.StartNew(
                 //    () =>
                 //    {
@@ -217,16 +278,30 @@ namespace UtilitiesCS
             {
                 token.ThrowIfCancellationRequested();
 
-                logger.Warn($"{nameof(GetConversationDfAsync)} timed out {retryCount + 1} time for email {mailItem.Subject}");
+                logger.Warn(
+                    $"{nameof(GetConversationDfAsync)} timed out {retryCount + 1} time for email {mailItem.Subject}"
+                );
                 if (retryCount < 2)
                 {
-                    df = await mailItem.GetConversationDfAsync(token, timeout, retryCount + 1, options, scheduler);
+                    df = await mailItem.GetConversationDfAsync(
+                        token,
+                        timeout,
+                        retryCount + 1,
+                        options,
+                        scheduler
+                    );
                 }
                 else
                 {
-                    var message = $"{nameof(GetConversationDfAsync)} timed out {retryCount + 1} times for email {mailItem.Subject} and was canceled";
+                    var message =
+                        $"{nameof(GetConversationDfAsync)} timed out {retryCount + 1} times for email {mailItem.Subject} and was canceled";
                     logger.Warn($"{message} {e.StackTrace}");
-                    MyBox.ShowDialog(message, "Operation Cancelled", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MyBox.ShowDialog(
+                        message,
+                        "Operation Cancelled",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    );
                 }
             }
 
@@ -240,17 +315,29 @@ namespace UtilitiesCS
         }
 
         //PERFORMANCE: Add async version of FilterConversation
-        public static DataFrame FilterConversation(this DataFrame df, string foldername, bool SameFolder, bool MailOnly)
+        public static DataFrame FilterConversation(
+            this DataFrame df,
+            string foldername,
+            bool SameFolder,
+            bool MailOnly
+        )
         {
             if (df != null)
             {
+                var columnNames = df.Columns.GetNames();
                 if (SameFolder)
                 {
-                    df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(foldername));
+                    if (columnNames.Contains("Folder Name"))
+                    {
+                        df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(foldername));
+                    }
                 }
                 if (MailOnly)
                 {
-                    df = df.Filter(df["MessageClass"].ElementwiseEquals<string>("IPM.Note"));
+                    if (columnNames.Contains("MessageClass"))
+                    {
+                        df = df.Filter(df["MessageClass"].ElementwiseEquals<string>("IPM.Note"));
+                    }
                 }
                 return df;
             }
@@ -283,15 +370,18 @@ namespace UtilitiesCS
                     MAPIFields.Schemas.ConversationIndex,
                     MAPIFields.Schemas.ConversationTopic,
                     MAPIFields.Schemas.ConversationId,
-                    MAPIFields.Schemas.ReceivedByName
-
+                    MAPIFields.Schemas.ReceivedByName,
                 };
-                foreach (string columnName in columnsToAdd) { table.Columns.Add(columnName); }
+                foreach (string columnName in columnsToAdd)
+                {
+                    table.Columns.Add(columnName);
+                }
             }
             return table;
         }
 
-        internal static string[] ConversationColumnSchemas => new string[]
+        internal static string[] ConversationColumnSchemas =>
+            new string[]
             {
                 "SentOn",
                 MAPIFields.Schemas.FolderName,
@@ -301,7 +391,7 @@ namespace UtilitiesCS
                 "EntryID",
                 MAPIFields.Schemas.MessageStore,
                 MAPIFields.Schemas.ConversationDepth,
-                MAPIFields.Schemas.ConversationIndex
+                MAPIFields.Schemas.ConversationIndex,
             };
 
         public static DataFrame GetDataFrame(this Outlook.Conversation conversation)
@@ -313,16 +403,27 @@ namespace UtilitiesCS
             return data.ToDataFrame(columnInfo.Keys.ToArray());
         }
 
-        public static async Task<DataFrame> GetDataFrameAsync(this Outlook.Conversation conversation, CancellationToken token)
+        public static async Task<DataFrame> GetDataFrameAsync(
+            this Outlook.Conversation conversation,
+            CancellationToken token
+        )
         {
-            Table table = await TimeOutTask.RunWithTimeout(GetConversationTable, conversation, token, 1000, 3, false);
+            Table table = await TimeOutTask.RunWithTimeout(
+                GetConversationTable,
+                conversation,
+                token,
+                1000,
+                3,
+                false
+            );
             if (table is null)
             {
                 return null;
             }
             else
             {
-                (object[,] data, Dictionary<string, int> columnInfo) = await TimeOutTask.RunWithTimeout(() => table.ETL(), token, 1000, 3, false);
+                (object[,] data, Dictionary<string, int> columnInfo) =
+                    await TimeOutTask.RunWithTimeout(() => table.ETL(), token, 1000, 3, false);
                 return data.ToDataFrame(columnInfo.Keys.ToArray());
             }
         }
@@ -335,20 +436,38 @@ namespace UtilitiesCS
             return table;
         }
 
-        public static Outlook.Table GetTable(this Outlook.Conversation conversation, bool WithFolder, bool WithStore)
+        public static Outlook.Table GetTable(
+            this Outlook.Conversation conversation,
+            bool WithFolder,
+            bool WithStore
+        )
         {
             if (conversation != null)
             {
                 Outlook.Table table = conversation.GetTable();
                 table.Columns.Add("SentOn");
-                if (WithFolder) { table.Columns.Add(MAPIFields.Schemas.FolderName); }
-                if (WithStore) { table.Columns.Add(MAPIFields.Schemas.MessageStore); }
+                if (WithFolder)
+                {
+                    table.Columns.Add(MAPIFields.Schemas.FolderName);
+                }
+                if (WithStore)
+                {
+                    table.Columns.Add(MAPIFields.Schemas.MessageStore);
+                }
                 return table;
             }
-            else { return null; }
+            else
+            {
+                return null;
+            }
         }
 
-        public static string EnumerateColumnHeaders(this Outlook.Table table, (int FieldWidth, Justify Justification)[] styleParams, string columnDivider, string rowBookends)
+        public static string EnumerateColumnHeaders(
+            this Outlook.Table table,
+            (int FieldWidth, Justify Justification)[] styleParams,
+            string columnDivider,
+            string rowBookends
+        )
         {
             string[] headers = table.GetColumnHeaders();
             //for (int j = 0; j < headers.Length; j++)
@@ -365,29 +484,45 @@ namespace UtilitiesCS
             return headerString;
         }
 
-        internal static string PadOrTrunc(this string fieldName, int fieldWidth, Justify justification, char paddingChar)
+        internal static string PadOrTrunc(
+            this string fieldName,
+            int fieldWidth,
+            Justify justification,
+            char paddingChar
+        )
         {
             switch (justification)
             {
                 case Justify.Right:
                     if (fieldName.Length > fieldWidth)
-                    { fieldName = ".." + fieldName.Substring(fieldName.Length - fieldWidth - 2); }
+                    {
+                        fieldName = ".." + fieldName.Substring(fieldName.Length - fieldWidth - 2);
+                    }
                     else
-                    { fieldName = fieldName.PadLeft(fieldWidth, paddingChar); }
+                    {
+                        fieldName = fieldName.PadLeft(fieldWidth, paddingChar);
+                    }
                     break;
                 case Justify.Left:
                     if (fieldName.Length > fieldWidth)
-                    { fieldName = fieldName.Substring(0, fieldWidth - 2) + ".."; }
+                    {
+                        fieldName = fieldName.Substring(0, fieldWidth - 2) + "..";
+                    }
                     else
-                    { fieldName = fieldName.PadRight(fieldWidth, paddingChar); }
+                    {
+                        fieldName = fieldName.PadRight(fieldWidth, paddingChar);
+                    }
                     break;
                 case Justify.Center:
                     if (fieldName.Length > fieldWidth)
-                    { fieldName = fieldName.Substring(0, fieldWidth - 2) + ".."; }
+                    {
+                        fieldName = fieldName.Substring(0, fieldWidth - 2) + "..";
+                    }
                     else
                     {
                         int paddingLength = fieldWidth - fieldName.Length;
-                        int lenWithPadLeft = (int)Math.Round(paddingLength / 2.0, 0) + fieldName.Length;
+                        int lenWithPadLeft =
+                            (int)Math.Round(paddingLength / 2.0, 0) + fieldName.Length;
                         fieldName = fieldName.PadLeft(lenWithPadLeft, paddingChar);
                         fieldName = fieldName.PadRight(fieldWidth, paddingChar);
                     }
@@ -396,11 +531,17 @@ namespace UtilitiesCS
             return fieldName;
         }
 
-        public static string JoinFixedWidth(this string[] rowCells, (int FieldWidth, Justify Justification)[] styleParams, string columnDivider, string rowBookends)
+        public static string JoinFixedWidth(
+            this string[] rowCells,
+            (int FieldWidth, Justify Justification)[] styleParams,
+            string columnDivider,
+            string rowBookends
+        )
         {
             for (int j = 0; j < rowCells.Length; j++)
             {
-                rowCells[j] = rowCells[j].PadOrTrunc(styleParams[j].FieldWidth, styleParams[j].Justification, ' ');
+                rowCells[j] = rowCells[j]
+                    .PadOrTrunc(styleParams[j].FieldWidth, styleParams[j].Justification, ' ');
             }
             string rowString = rowBookends + string.Join(columnDivider, rowCells) + rowBookends;
 
@@ -410,10 +551,22 @@ namespace UtilitiesCS
 
         public static Outlook.Conversation GetConversation(this object ObjItem)
         {
-            if (ObjItem == null) { return null; }
-            else if (ObjItem is MailItem) { return ((MailItem)ObjItem).GetConversation(); }
-            else if (ObjItem is MeetingItem) { return ((MeetingItem)ObjItem).GetConversation(); }
-            else if (ObjItem is PostItem) { return ((PostItem)ObjItem).GetConversation(); }
+            if (ObjItem == null)
+            {
+                return null;
+            }
+            else if (ObjItem is MailItem)
+            {
+                return ((MailItem)ObjItem).GetConversation();
+            }
+            else if (ObjItem is MeetingItem)
+            {
+                return ((MeetingItem)ObjItem).GetConversation();
+            }
+            else if (ObjItem is PostItem)
+            {
+                return ((PostItem)ObjItem).GetConversation();
+            }
             return null;
         }
 
@@ -434,21 +587,37 @@ namespace UtilitiesCS
         //}
 
         public static bool IsSupportedType(this object ObjItem)
-        { return ((ObjItem is MailItem) || (ObjItem is MeetingItem) || (ObjItem is PostItem)); }
+        {
+            return ((ObjItem is MailItem) || (ObjItem is MeetingItem) || (ObjItem is PostItem));
+        }
 
         internal static Type ResolveType(object Item)
         {
-            string errMessage = $"{Item.GetType()} is not a member of Outlook.Conversation. "
+            string errMessage =
+                $"{Item.GetType()} is not a member of Outlook.Conversation. "
                 + "Item must belong to one of the following \n"
-                + typeof(MailItem) + "\n"
-                + typeof(PostItem) + " or\n"
+                + typeof(MailItem)
+                + "\n"
+                + typeof(PostItem)
+                + " or\n"
                 + typeof(MeetingItem);
 
-            if (Item is MailItem) { return typeof(MailItem); }
-            else if (Item is MeetingItem) { return typeof(MeetingItem); }
-            else if (Item is PostItem) { return typeof(PostItem); }
-            else { throw new ArgumentException(errMessage); }
+            if (Item is MailItem)
+            {
+                return typeof(MailItem);
+            }
+            else if (Item is MeetingItem)
+            {
+                return typeof(MeetingItem);
+            }
+            else if (Item is PostItem)
+            {
+                return typeof(PostItem);
+            }
+            else
+            {
+                throw new ArgumentException(errMessage);
+            }
         }
     }
-
 }

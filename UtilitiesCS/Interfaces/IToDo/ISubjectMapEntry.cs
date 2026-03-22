@@ -5,14 +5,14 @@ using System.Text.RegularExpressions;
 namespace UtilitiesCS
 {
     /// <summary>
-    /// Subject Map Entry holds information regarding email folders and the subject line of 
-    /// the emails within the folder. Each entry contains a unique combination of a folder 
-    /// name and an email subject. Class is to be used in conjunction with 
+    /// Subject Map Entry holds information regarding email folders and the subject line of
+    /// the emails within the folder. Each entry contains a unique combination of a folder
+    /// name and an email subject. Class is to be used in conjunction with
     /// </summary>
     public interface ISubjectMapEntry : IEquatable<ISubjectMapEntry>
     {
         /// <summary>
-        /// List of common words to strip from tokens to make token 
+        /// List of common words to strip from tokens to make token
         /// list as distinct as possible
         /// </summary>
         IList<string> CommonWords { get; set; }
@@ -23,7 +23,7 @@ namespace UtilitiesCS
         string Folderpath { get; set; }
 
         /// <summary>
-        /// String with the name of an email folder 
+        /// String with the name of an email folder
         /// </summary>
         string Foldername { get; }
 
@@ -70,7 +70,7 @@ namespace UtilitiesCS
         public ISubjectMapEncoder Encoder { get; set; }
 
         /// <summary>
-        /// Tokenize Foldername and Subject and Encode using the supplied 
+        /// Tokenize Foldername and Subject and Encode using the supplied
         /// tokenizer regex pattern and encoder
         /// </summary>
         /// <param name="encoder">Maps the tokenized strings to integer equivalents</param>
@@ -78,7 +78,7 @@ namespace UtilitiesCS
         void Encode(ISubjectMapEncoder encoder, Regex tokenizerRegex);
 
         /// <summary>
-        /// Encode Foldername and Subject using the supplied encoder  
+        /// Encode Foldername and Subject using the supplied encoder
         /// </summary>
         /// <param name="encoder">
         /// Maps the tokenized strings to integer equivalents
@@ -86,7 +86,7 @@ namespace UtilitiesCS
         public void Encode(ISubjectMapEncoder encoder);
 
         /// <summary>
-        /// Encode the array of tokens using the supplied encoder 
+        /// Encode the array of tokens using the supplied encoder
         /// </summary>
         /// <param name="encoder">Maps the tokenized strings to integer equivalents</param>
         /// <param name="tokens">Array of tokens to be encoded</param>
@@ -99,7 +99,7 @@ namespace UtilitiesCS
         //public void Encode();
 
         /// <summary>
-        /// Determine if the class members are ready to be encoded. 
+        /// Determine if the class members are ready to be encoded.
         /// </summary>
         /// <param name="encoder"><inheritdoc cref="ISubjectMapEncoder"/></param>
         /// <returns></returns>

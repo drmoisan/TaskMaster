@@ -1,24 +1,29 @@
-﻿using Outlook = Microsoft.Office.Interop.Outlook;
-using Microsoft.Office.Interop.Outlook;
-using Newtonsoft.Json;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using UtilitiesCS.ReusableTypeClasses;
 using System.Runtime.Serialization;
 using System.Threading;
-using System;
+using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
+using Newtonsoft.Json;
+using UtilitiesCS.ReusableTypeClasses;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.OutlookObjects.Store
 {
     public class StoresWrapper : SmartSerializable<StoresWrapper>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region ctor
 
-        public StoresWrapper() : base() { base._parent = this; }
+        public StoresWrapper()
+            : base()
+        {
+            base._parent = this;
+        }
 
         public StoresWrapper(IApplicationGlobals globals)
         {
@@ -28,13 +33,14 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         public virtual StoresWrapper Init()
         {
-            Stores = GetFilteredStores()
-                .Select(store => new StoreWrapper(store).Init())
-                .ToList();
+            Stores = GetFilteredStores().Select(store => new StoreWrapper(store).Init()).ToList();
             return this;
         }
 
-        public static async Task<StoresWrapper> CreateAsync(IApplicationGlobals globals, CancellationToken cancel)
+        public static async Task<StoresWrapper> CreateAsync(
+            IApplicationGlobals globals,
+            CancellationToken cancel
+        )
         {
             return await Task.Run(() => new StoresWrapper(globals).Init(), cancel);
         }
@@ -59,7 +65,6 @@ namespace UtilitiesCS.OutlookObjects.Store
 
             foreach (var store in stores)
             {
-
                 var storeWrapper = Stores.Find(x => x.DisplayName == store.DisplayName);
                 if (storeWrapper is null)
                 {
@@ -70,18 +75,14 @@ namespace UtilitiesCS.OutlookObjects.Store
                 {
                     await Task.Run(() => storeWrapper.Restore(store));
                     //await Task.Run(() => storeWrapper.RestoreGlobalAddresses(Globals.Ol.App));
-
                 }
             }
         }
 
         private IEnumerable<Outlook.Store> GetFilteredStores()
         {
-            return Globals.Ol.NamespaceMAPI.Stores
-                .Cast<Outlook.Store>()
-                .Where(ShouldIncludeStore);
+            return Globals.Ol.NamespaceMAPI.Stores.Cast<Outlook.Store>().Where(ShouldIncludeStore);
         }
-
 
         public static bool StoreIsIncluded(
             Outlook.Store store,
@@ -89,16 +90,25 @@ namespace UtilitiesCS.OutlookObjects.Store
             IList<string> excludedStoreFilePathContains,
             IList<string> gwsoFilePathContains,
             bool excludePublicFolderStores,
-            bool excludeGwsoStores)
+            bool excludeGwsoStores
+        )
         {
-            if (excludePublicFolderStores && store.ExchangeStoreType == OlExchangeStoreType.olExchangePublicFolder)
+            if (
+                excludePublicFolderStores
+                && store.ExchangeStoreType == OlExchangeStoreType.olExchangePublicFolder
+            )
             {
                 return false;
             }
 
-            if (excludedStoreNameContains is not null
-                && excludedStoreNameContains.Any(x => !string.IsNullOrWhiteSpace(x)
-                    && (store.DisplayName?.IndexOf(x, StringComparison.OrdinalIgnoreCase) ?? -1) >= 0))
+            if (
+                excludedStoreNameContains is not null
+                && excludedStoreNameContains.Any(x =>
+                    !string.IsNullOrWhiteSpace(x)
+                    && (store.DisplayName?.IndexOf(x, StringComparison.OrdinalIgnoreCase) ?? -1)
+                        >= 0
+                )
+            )
             {
                 return false;
             }
@@ -108,38 +118,53 @@ namespace UtilitiesCS.OutlookObjects.Store
             {
                 filePath = store.FilePath;
             }
-            catch
-            {
-            }
+            catch { }
 
-            if (excludeGwsoStores
+            if (
+                excludeGwsoStores
                 && !string.IsNullOrWhiteSpace(filePath)
-                && gwsoFilePathContains.Any(x => !string.IsNullOrWhiteSpace(x)
-                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0))
+                && gwsoFilePathContains.Any(x =>
+                    !string.IsNullOrWhiteSpace(x)
+                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
+                )
+            )
             {
                 return false;
             }
 
-            if (excludedStoreFilePathContains is not null
+            if (
+                excludedStoreFilePathContains is not null
                 && !string.IsNullOrWhiteSpace(filePath)
-                && excludedStoreFilePathContains.Any(x => !string.IsNullOrWhiteSpace(x)
-                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0))
+                && excludedStoreFilePathContains.Any(x =>
+                    !string.IsNullOrWhiteSpace(x)
+                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
+                )
+            )
             {
                 return false;
             }
 
             return true;
         }
+
         public bool ShouldIncludeStore(Outlook.Store store)
         {
-            if (ExcludePublicFolderStores && store.ExchangeStoreType == OlExchangeStoreType.olExchangePublicFolder)
+            if (
+                ExcludePublicFolderStores
+                && store.ExchangeStoreType == OlExchangeStoreType.olExchangePublicFolder
+            )
             {
                 return false;
             }
 
-            if (ExcludedStoreNameContains is not null
-                && ExcludedStoreNameContains.Any(x => !string.IsNullOrWhiteSpace(x)
-                    && (store.DisplayName?.IndexOf(x, StringComparison.OrdinalIgnoreCase) ?? -1) >= 0))
+            if (
+                ExcludedStoreNameContains is not null
+                && ExcludedStoreNameContains.Any(x =>
+                    !string.IsNullOrWhiteSpace(x)
+                    && (store.DisplayName?.IndexOf(x, StringComparison.OrdinalIgnoreCase) ?? -1)
+                        >= 0
+                )
+            )
             {
                 return false;
             }
@@ -149,22 +174,28 @@ namespace UtilitiesCS.OutlookObjects.Store
             {
                 filePath = store.FilePath;
             }
-            catch
-            {
-            }
+            catch { }
 
-            if (ExcludeGwsoStores
+            if (
+                ExcludeGwsoStores
                 && !string.IsNullOrWhiteSpace(filePath)
-                && GwsoFilePathContains.Any(x => !string.IsNullOrWhiteSpace(x)
-                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0))
+                && GwsoFilePathContains.Any(x =>
+                    !string.IsNullOrWhiteSpace(x)
+                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
+                )
+            )
             {
                 return false;
             }
 
-            if (ExcludedStoreFilePathContains is not null
+            if (
+                ExcludedStoreFilePathContains is not null
                 && !string.IsNullOrWhiteSpace(filePath)
-                && ExcludedStoreFilePathContains.Any(x => !string.IsNullOrWhiteSpace(x)
-                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0))
+                && ExcludedStoreFilePathContains.Any(x =>
+                    !string.IsNullOrWhiteSpace(x)
+                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
+                )
+            )
             {
                 return false;
             }
@@ -188,16 +219,12 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         [JsonProperty]
         public List<string> GwsoFilePathContains { get; set; } =
-        [
-            @"\Google\Google Apps Sync\",
-            @"\Google\Google Workspace Sync\"
-        ];
+        [@"\Google\Google Apps Sync\", @"\Google\Google Workspace Sync\"];
 
         [JsonProperty]
         public List<string> ExcludedStoreNameContains { get; set; } = [];
 
         [JsonProperty]
         public List<string> ExcludedStoreFilePathContains { get; set; } = [];
-
     }
 }

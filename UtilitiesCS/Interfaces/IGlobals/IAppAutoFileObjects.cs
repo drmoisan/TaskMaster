@@ -9,7 +9,6 @@ using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 
 namespace UtilitiesCS
 {
-
     public interface IAppAutoFileObjects
     {
         Task LoadAsync(bool parallel);
@@ -17,6 +16,7 @@ namespace UtilitiesCS
         int Conversation_Weight { get; set; }
         int LngConvCtPwr { get; set; }
         int MaxRecents { get; set; }
+
         //RecentsList<string> RecentsList { get; set; }
         SloLinkedList<string> RecentsList { get; }
         CtfMap CtfMap { get; set; }

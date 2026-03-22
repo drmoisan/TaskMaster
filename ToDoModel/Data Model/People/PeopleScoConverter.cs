@@ -8,7 +8,7 @@
 
 //namespace ToDoModel.Data_Model.People
 //{
-//    public class PeopleScoConverter : JsonConverter<PeopleScoDictionaryNew> 
+//    public class PeopleScoConverter : JsonConverter<PeopleScoDictionaryNew>
 //    {
 //        public PeopleScoConverter() { }
 
@@ -52,7 +52,7 @@
 //    //    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 //    //    {
 //    //        //Type valueType = value.GetType();
-//    //        //Type[] genericArguments = valueType.GetScoDictionaryNewGenerics();            
+//    //        //Type[] genericArguments = valueType.GetScoDictionaryNewGenerics();
 //    //        //Type wrapperType = typeof(WrapperScoDictionary<,,>).MakeGenericType(valueType, genericArguments[0], genericArguments[1]);
 //    //        Type wrapperType = typeof(WrapperPeopleScoDictionaryNew);
 //    //        var wrapper = Activator.CreateInstance(wrapperType);

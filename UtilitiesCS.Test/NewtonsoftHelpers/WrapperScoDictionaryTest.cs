@@ -1,12 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Reflection;
-using UtilitiesCS.NewtonsoftHelpers;
+using System.Reflection.Emit;
 using FluentAssertions;
-using UtilitiesCS.ReusableTypeClasses;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-
+using UtilitiesCS.NewtonsoftHelpers;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.Test.NewtonsoftHelpers
 {
@@ -32,7 +33,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             public string AdditionalField1 { get; set; }
             private int AdditionalField2;
             private string _additionalField3;
-            public string AdditionalField3 { get => _additionalField3; set => _additionalField3 = value; }
+            public string AdditionalField3
+            {
+                get => _additionalField3;
+                set => _additionalField3 = value;
+            }
 
             public TestDerived()
             {
@@ -48,9 +53,15 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         {
             public string AdditionalField1 { get; set; }
             private int AdditionalField2;
+
             public int GetAdditionalField2() => AdditionalField2;
+
             private string _additionalField3;
-            public string AdditionalField3 { get => _additionalField3; set => _additionalField3 = value; }
+            public string AdditionalField3
+            {
+                get => _additionalField3;
+                set => _additionalField3 = value;
+            }
 
             public RemainingObjectClass()
             {
@@ -70,7 +81,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             public string AdditionalField1 { get; set; }
             private int AdditionalField2;
             private string _additionalField3;
-            public string AdditionalField3 { get => _additionalField3; set => _additionalField3 = value; }
+            public string AdditionalField3
+            {
+                get => _additionalField3;
+                set => _additionalField3 = value;
+            }
 
             public DerivedTest2()
             {
@@ -78,6 +93,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
                 AdditionalField2 = 42;
                 AdditionalField3 = "Test3";
             }
+
             public int GetAdditionalField2() => AdditionalField2;
         }
 
@@ -97,8 +113,14 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             public string AdditionalField1 { get; set; }
             private int AdditionalField2;
             private string _additionalField3;
-            public string AdditionalField3 { get => _additionalField3; set => _additionalField3 = value; }
+            public string AdditionalField3
+            {
+                get => _additionalField3;
+                set => _additionalField3 = value;
+            }
+
             public int GetAdditionalField2() => AdditionalField2;
+
             public RemainingObjectClass2()
             {
                 AdditionalField1 = "Test";
@@ -120,7 +142,10 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
         public static class ConfigInitializer
         {
-            public static NewSmartSerializableConfig InitConfig(NewSmartSerializableConfig config, IApplicationGlobals globals)
+            public static NewSmartSerializableConfig InitConfig(
+                NewSmartSerializableConfig config,
+                IApplicationGlobals globals
+            )
             {
                 config.Disk.FileName = "testdict.json";
                 if (globals.FS.SpecialFolders.TryGetValue("AppData", out var appData))
@@ -129,15 +154,19 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
                     config.NetDisk.FileName = "testdict.json";
                     config.NetDisk.FolderPath = appData;
                     config.LocalDisk = config.Disk;
-                    config.JsonSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+                    config.JsonSettings.PreserveReferencesHandling = Newtonsoft
+                        .Json
+                        .PreserveReferencesHandling
+                        .All;
                     config.JsonSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;
                     config.JsonSettings.Converters.Add(new AppGlobalsConverter(globals));
                     config.JsonSettings.Converters.Add(new FilePathHelperConverter(globals.FS));
-                    config.JsonSettings.Converters.Add(new ScDictionaryConverter<ScDictionary<string, string>, string, string>());
+                    config.JsonSettings.Converters.Add(
+                        new ScDictionaryConverter<ScDictionary<string, string>, string, string>()
+                    );
                     return config;
                 }
                 return null;
-
             }
         }
 
@@ -149,9 +178,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             var expected = GetWrapperComposedTest2();
 
             // Act
-            var actual = new WrapperScoDictionary<DerivedTest2, string, string>().ToComposition(derived);
+            var actual = new WrapperScoDictionary<DerivedTest2, string, string>().ToComposition(
+                derived
+            );
 
-            // Assert            
+            // Assert
             actual.Should().BeEquivalentTo(expected);
         }
 
@@ -170,7 +201,6 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             actual.Config.Should().BeEquivalentTo(expected.Config);
             actual.AdditionalField3.Should().Be(expected.AdditionalField3);
             actual.AdditionalField1.Should().Be(expected.AdditionalField1);
-
         }
 
         [TestMethod]
@@ -192,8 +222,14 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             Assert.AreEqual(2, wrapper.CoDictionary["key2"]);
 
             var remainingObjectType = wrapper.RemainingObject.GetType();
-            var additionalProperty1 = remainingObjectType.GetProperty("AdditionalField1", BindingFlags.Instance | BindingFlags.Public);
-            var additionalField2 = remainingObjectType.GetField("AdditionalField2", BindingFlags.Instance | BindingFlags.NonPublic);
+            var additionalProperty1 = remainingObjectType.GetProperty(
+                "AdditionalField1",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            var additionalField2 = remainingObjectType.GetField(
+                "AdditionalField2",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
 
             Assert.IsNotNull(additionalProperty1);
             Assert.IsNotNull(additionalField2);
@@ -213,7 +249,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             expected.TryAdd("key1", 1);
             expected.TryAdd("key2", 2);
 
-            // Act            
+            // Act
             var recreatedInstance = composedInstance.ToDerived(composedInstance);
 
             // Assert
@@ -231,9 +267,10 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             derivedInstance.TryAdd("key1", 1);
             derivedInstance.TryAdd("key2", 2);
 
-
             // Act
-            var wrapper = new WrapperScoDictionary<TestDerived, string, int>().ToComposition(derivedInstance);
+            var wrapper = new WrapperScoDictionary<TestDerived, string, int>().ToComposition(
+                derivedInstance
+            );
             var recreatedInstance = wrapper.ToDerived();
 
             // Assert
@@ -254,10 +291,22 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
             // Assert
             Assert.IsNotNull(newType);
-            var additionalProperty1 = newType.GetProperty("AdditionalField1", BindingFlags.Instance | BindingFlags.Public);
-            var additionalField2 = newType.GetField("AdditionalField2", BindingFlags.Instance | BindingFlags.NonPublic);
-            var additionalProperty3 = newType.GetProperty("AdditionalField3", BindingFlags.Instance | BindingFlags.Public);
-            var additionalField3 = newType.GetField("_additionalField3", BindingFlags.Instance | BindingFlags.NonPublic);
+            var additionalProperty1 = newType.GetProperty(
+                "AdditionalField1",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            var additionalField2 = newType.GetField(
+                "AdditionalField2",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            var additionalProperty3 = newType.GetProperty(
+                "AdditionalField3",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            var additionalField3 = newType.GetField(
+                "_additionalField3",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
 
             Assert.IsNotNull(additionalProperty1);
             Assert.IsNotNull(additionalField2);
@@ -278,18 +327,167 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             expected.RemainingObject = new RemainingObjectClass();
 
             // Act
-            var wrapper = new WrapperScoDictionary<TestDerived, string, int>().ToComposition(derivedInstance);
+            var wrapper = new WrapperScoDictionary<TestDerived, string, int>().ToComposition(
+                derivedInstance
+            );
 
             var newClassInstance = wrapper.RemainingObject;
             var newClassType = newClassInstance.GetType();
 
             // Assert
             Assert.IsNotNull(newClassInstance);
-            var property = newClassType.GetProperty("AdditionalField1", BindingFlags.Instance | BindingFlags.Public);
+            var property = newClassType.GetProperty(
+                "AdditionalField1",
+                BindingFlags.Instance | BindingFlags.Public
+            );
             var value = property.GetValue(newClassInstance);
-            Assert.AreEqual("Test", newClassType.GetProperty("AdditionalField1", BindingFlags.Instance | BindingFlags.Public).GetValue(newClassInstance));
-            Assert.AreEqual(42, newClassType.GetField("AdditionalField2", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(newClassInstance));
+            Assert.AreEqual(
+                "Test",
+                newClassType
+                    .GetProperty("AdditionalField1", BindingFlags.Instance | BindingFlags.Public)
+                    .GetValue(newClassInstance)
+            );
+            Assert.AreEqual(
+                42,
+                newClassType
+                    .GetField("AdditionalField2", BindingFlags.Instance | BindingFlags.NonPublic)
+                    .GetValue(newClassInstance)
+            );
             wrapper.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        public void ReplicateProperty_WithExplicitField_CreatesRoundTrippableProperty()
+        {
+            // Arrange
+            var wrapper = new WrapperScoDictionary<TestDerived, string, int>();
+            var property = typeof(TestDerived).GetProperty(nameof(TestDerived.AdditionalField3));
+            var backingField = typeof(TestDerived).GetField(
+                "_additionalField3",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            using var typeBuilderScope = new TypeBuilderScope("WrapperScoDictionaryExplicitField");
+
+            // Act
+            wrapper.ReplicateProperty(typeBuilderScope.TypeBuilder, property, backingField);
+            var replicatedType = typeBuilderScope.TypeBuilder.CreateType();
+            var replicatedInstance = Activator.CreateInstance(replicatedType);
+            replicatedType.GetProperty(property.Name).SetValue(replicatedInstance, "replicated");
+
+            // Assert
+            replicatedType
+                .GetProperty(property.Name)
+                .GetValue(replicatedInstance)
+                .Should()
+                .Be("replicated");
+            replicatedType
+                .GetField("_additionalField3", BindingFlags.Instance | BindingFlags.NonPublic)
+                .GetValue(replicatedInstance)
+                .Should()
+                .Be("replicated");
+        }
+
+        [TestMethod]
+        public void ReplicateProperty_WhenSetterIsMissing_SkipsSetterAndCreatesReadableProperty()
+        {
+            // Arrange
+            var wrapper = new WrapperScoDictionary<TestDerived, string, int>();
+            var property = typeof(GetterOnlyHolder).GetProperty(nameof(GetterOnlyHolder.Value));
+            var capturedFields = new Dictionary<string, FieldBuilder>();
+            using var typeBuilderScope = new TypeBuilderScope("WrapperScoDictionaryGetterOnly");
+
+            // Act
+            wrapper.ReplicateProperty(typeBuilderScope.TypeBuilder, property, ref capturedFields);
+            var replicatedType = typeBuilderScope.TypeBuilder.CreateType();
+
+            // Assert
+            replicatedType.GetProperty(property.Name).CanRead.Should().BeTrue();
+            replicatedType.GetProperty(property.Name).CanWrite.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void ReplicateProperty_WhenGetterIsMissing_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var wrapper = new WrapperScoDictionary<TestDerived, string, int>();
+            var property = typeof(SetterOnlyHolder).GetProperty(nameof(SetterOnlyHolder.Value));
+            var capturedFields = new Dictionary<string, FieldBuilder>();
+            using var typeBuilderScope = new TypeBuilderScope("WrapperScoDictionarySetterOnly");
+
+            // Act
+            Action act = () =>
+                wrapper.ReplicateProperty(
+                    typeBuilderScope.TypeBuilder,
+                    property,
+                    ref capturedFields
+                );
+
+            // Assert
+            act.Should().Throw<InvalidOperationException>().WithMessage("*getter*");
+        }
+
+        [TestMethod]
+        public void GetBackingField_WhenPropertyHasBackingField_ReturnsUnderlyingField()
+        {
+            // Arrange
+            var wrapper = new WrapperScoDictionary<TestDerived, string, int>();
+            var property = typeof(TestDerived).GetProperty(nameof(TestDerived.AdditionalField3));
+
+            // Act
+            var field = wrapper.GetBackingField(property);
+
+            // Assert
+            field.Name.Should().Be("_additionalField3");
+        }
+
+        [TestMethod]
+        public void GetBackingField_WhenGetterIsMissing_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var wrapper = new WrapperScoDictionary<TestDerived, string, int>();
+            var property = typeof(SetterOnlyHolder).GetProperty(nameof(SetterOnlyHolder.Value));
+
+            // Act
+            Action act = () => wrapper.GetBackingField(property);
+
+            // Assert
+            act.Should().Throw<InvalidOperationException>().WithMessage("*getter*");
+        }
+
+        private sealed class GetterOnlyHolder
+        {
+            public string Value => "getter";
+        }
+
+        private sealed class SetterOnlyHolder
+        {
+            public string Value
+            {
+                set => Stored = value;
+            }
+
+            public string Stored { get; private set; }
+        }
+
+        private sealed class TypeBuilderScope : IDisposable
+        {
+            public TypeBuilderScope(string typeName)
+            {
+                var assemblyName = new AssemblyName($"{typeName}_{Guid.NewGuid():N}");
+                var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(
+                    assemblyName,
+                    AssemblyBuilderAccess.Run
+                );
+                var moduleBuilder = assemblyBuilder.DefineDynamicModule("MainModule");
+                TypeBuilder = moduleBuilder.DefineType(
+                    typeName,
+                    TypeAttributes.Public | TypeAttributes.Class
+                );
+            }
+
+            public TypeBuilder TypeBuilder { get; }
+
+            public void Dispose() { }
         }
     }
 }

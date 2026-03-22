@@ -139,6 +139,10 @@ _TeamCity*
 *.coverage
 *.coveragexml
 
+# dotnet-coverage Cobertura output (read by Koverage extension)
+coverage/*
+!coverage/.gitkeep
+
 # NCrunch
 _NCrunch_*
 .*crunch*.local.xml
@@ -341,3 +345,5 @@ healthchecksdb
 
 # Temporary Developer Logs
 logs/
+
+.dotnet*/

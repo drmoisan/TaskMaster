@@ -1,5 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS;
 
 namespace UtilitiesCS.Test
@@ -11,7 +11,11 @@ namespace UtilitiesCS.Test
         [Ignore("Interactive popup dialog test; excluded from unattended test runs.")]
         public void ShowDialog_Test()
         {
-            string result = InputBox.ShowDialog("Test to see if this works", "Title", "Random text");
+            string result = InputBox.ShowDialog(
+                "Test to see if this works",
+                "Title",
+                "Random text"
+            );
             Assert.AreEqual("Random text47", result);
         }
     }

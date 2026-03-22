@@ -39,9 +39,9 @@ namespace TaskVisualization
             _state = Enums.ToggleState.On;
         }
 
-        public T ResolveParent<T>(Control control) where T : Control
+        public T ResolveParent<T>(Control control)
+            where T : Control
         {
-
             return (T)_labelControl.Parent;
         }
 
@@ -49,15 +49,22 @@ namespace TaskVisualization
         {
             if (_labelControl.Parent == null)
             {
-                throw new ArgumentException($"The parent of {nameof(LabelControl)} is null. " +
-                $"Must be of type {typeof(TableLayoutPanel)}");
+                throw new ArgumentException(
+                    $"The parent of {nameof(LabelControl)} is null. "
+                        + $"Must be of type {typeof(TableLayoutPanel)}"
+                );
             }
-            else if (!new List<Type> { typeof(TableLayoutPanel), typeof(Panel) }
-                                    .Contains(_labelControl.Parent.GetType()))
+            else if (
+                !new List<Type> { typeof(TableLayoutPanel), typeof(Panel) }.Contains(
+                    _labelControl.Parent.GetType()
+                )
+            )
             {
-                throw new ArgumentException($"The parent of {nameof(LabelControl)} must " +
-                                            $"be of type {typeof(TableLayoutPanel)} but it is of " +
-                                            $"type {LabelControl.Parent.GetType()}");
+                throw new ArgumentException(
+                    $"The parent of {nameof(LabelControl)} must "
+                        + $"be of type {typeof(TableLayoutPanel)} but it is of "
+                        + $"type {LabelControl.Parent.GetType()}"
+                );
             }
             return _labelControl.Parent.GetType();
         }
@@ -66,21 +73,37 @@ namespace TaskVisualization
         private Type _parentType;
 
         private Label _labelControl;
-        public Label LabelControl { get => _labelControl; }
+        public Label LabelControl
+        {
+            get => _labelControl;
+        }
 
         private TableLayoutPanel _tlp;
-        public TableLayoutPanel TLP { get => _tlp; }
+        public TableLayoutPanel TLP
+        {
+            get => _tlp;
+        }
 
         private Panel _panel;
 
         private int _columnNumber;
-        public int ColumnNumber { get => _columnNumber; }
+        public int ColumnNumber
+        {
+            get => _columnNumber;
+        }
 
         private float _columnWidth;
-        public float ColumnWidth { get => _columnWidth; }
+        public float ColumnWidth
+        {
+            get => _columnWidth;
+        }
 
         private int _groupNumber;
-        public int GroupNumber { get => _groupNumber; set => _groupNumber = value; }
+        public int GroupNumber
+        {
+            get => _groupNumber;
+            set => _groupNumber = value;
+        }
 
         public void Toggle()
         {
@@ -112,14 +135,20 @@ namespace TaskVisualization
             {
                 _labelControl.Visible = false;
                 _labelControl.Enabled = false;
-                if (_parentType == typeof(TableLayoutPanel) && ((_tlp.RowCount == 1) | (sharedColumn)))
+                if (
+                    _parentType == typeof(TableLayoutPanel)
+                    && ((_tlp.RowCount == 1) | (sharedColumn))
+                )
                     _tlp.ColumnStyles[_columnNumber].Width = 0;
             }
             else
             {
                 _labelControl.Visible = true;
                 _labelControl.Enabled = true;
-                if (_parentType == typeof(TableLayoutPanel) && ((_tlp.RowCount == 1) | (sharedColumn)))
+                if (
+                    _parentType == typeof(TableLayoutPanel)
+                    && ((_tlp.RowCount == 1) | (sharedColumn))
+                )
                     _tlp.ColumnStyles[_columnNumber].Width = _columnWidth;
             }
             _state = desiredState;

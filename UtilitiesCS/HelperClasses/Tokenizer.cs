@@ -8,12 +8,13 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 [assembly: InternalsVisibleTo("UtilitiesCS.Test")]
+
 namespace UtilitiesCS
 {
     public static class Tokenizer
     {
         /// <summary>
-        /// Converts a string into array of tokens. 
+        /// Converts a string into array of tokens.
         /// Words must be at least 2 characters to be a token
         /// </summary>
         /// <param name="doc">text to be tokenized</param>
@@ -25,7 +26,7 @@ namespace UtilitiesCS
         }
 
         /// <summary>
-        /// Converts a string into array of tokens. 
+        /// Converts a string into array of tokens.
         /// Minimum token size passed as parameter
         /// </summary>
         /// <param name="doc">text to be tokenized</param>
@@ -37,11 +38,11 @@ namespace UtilitiesCS
         }
 
         /// <summary>
-        /// Converts a string into array of tokens. 
+        /// Converts a string into array of tokens.
         /// Minimum token size passed as parameter
         /// </summary>
         /// <param name="doc">text to be tokenized</param>
-        /// <param name="chars">array of whitespace characters to 
+        /// <param name="chars">array of whitespace characters to
         /// be interpreted as string literals</param>
         /// <returns>array of word tokens</returns>
         public static string[] Tokenize(this string doc, char[] chars)
@@ -50,7 +51,7 @@ namespace UtilitiesCS
         }
 
         /// <summary>
-        /// Converts a string into array of tokens. 
+        /// Converts a string into array of tokens.
         /// Minimum token size passed as parameter
         /// </summary>
         /// <param name="doc">text to be tokenized</param>
@@ -58,12 +59,7 @@ namespace UtilitiesCS
         /// <returns>array of word tokens</returns>
         public static string[] Tokenize(this string doc, Regex regex)
         {
-
-            return regex.Matches(doc)
-                        .Cast<Match>()
-                        .Select(x => x.Value
-                        .ToLower())
-                        .ToArray();
+            return regex.Matches(doc).Cast<Match>().Select(x => x.Value.ToLower()).ToArray();
         }
 
         /// <summary>
@@ -79,10 +75,11 @@ namespace UtilitiesCS
         }
 
         public static Regex GetRegex(string tokenPattern) => new Regex(tokenPattern);
+
         public static Regex GetRegex() => new Regex(@"\b\w\w+\b");
 
         /// <summary>
-        /// Defines regex pattern for tokenizer based on expanded definition of a 
+        /// Defines regex pattern for tokenizer based on expanded definition of a
         /// word character and a minimum token size
         /// </summary>
         /// <param name="wordPattern">Expanded Regex pattern to define a word character</param>
@@ -99,16 +96,22 @@ namespace UtilitiesCS
         }
 
         /// <summary>
-        /// Expands the definition of a regex word character to 
+        /// Expands the definition of a regex word character to
         /// include the whitespace characters in the parameter
         /// </summary>
-        /// <param name="chars">array of whitespace characters to 
+        /// <param name="chars">array of whitespace characters to
         /// be interpreted as string literals</param>
         /// <returns>Expanded Regex pattern for word</returns>
         public static string AsRegexWord(this char[] chars)
         {
-            if ((chars is null) || (chars.Length == 0)) { return @"\w"; }
-            else { return @"[\w" + new string(chars) + @"]"; }
+            if ((chars is null) || (chars.Length == 0))
+            {
+                return @"\w";
+            }
+            else
+            {
+                return @"[\w" + new string(chars) + @"]";
+            }
         }
     }
 }

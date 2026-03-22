@@ -6,7 +6,10 @@ namespace UtilitiesCS
     {
         public static bool IsMailUnReadable(this MailItem item)
         {
-            return item.MessageClass == "IPM.Note.SMIME" | item.MessageClass == "IPM.Note.Secure" | item.MessageClass == "IPM.Note.Secure.Sign" | item.MessageClass == "IPM.Outlook.Recall";
+            return item.MessageClass == "IPM.Note.SMIME"
+                | item.MessageClass == "IPM.Note.Secure"
+                | item.MessageClass == "IPM.Note.Secure.Sign"
+                | item.MessageClass == "IPM.Outlook.Recall";
         }
 
         public static MailItem TryResolveMailItem(object objItem)
@@ -22,6 +25,5 @@ namespace UtilitiesCS
             }
             return olMail;
         }
-
     }
 }

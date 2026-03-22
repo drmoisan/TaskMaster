@@ -1,9 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Linq;
-using UtilitiesCS.Extensions;
-using FluentAssertions;
 using C;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.Test.Extensions
 {
@@ -21,12 +21,14 @@ namespace UtilitiesCS.Test.Extensions
         {
             var inputs = new double[] { 0.00001234, 1234 };
             //var actual = inputs.Select(FrexpClass.Frexp).ToList();
-            var actual = inputs.Select(input =>
-            {
-                int exponent = 0;
-                double mantissa = math.frexp(input, ref exponent);
-                return (mantissa, exponent);
-            }).ToList();
+            var actual = inputs
+                .Select(input =>
+                {
+                    int exponent = 0;
+                    double mantissa = math.frexp(input, ref exponent);
+                    return (mantissa, exponent);
+                })
+                .ToList();
 
             var expected = new (double, int)[] { (0.80871424, -16), (0.6025390625, 11) };
 
@@ -35,6 +37,5 @@ namespace UtilitiesCS.Test.Extensions
 
             actual.Should().BeEquivalentTo(expected);
         }
-
     }
 }

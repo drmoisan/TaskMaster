@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Drawing;
 using UtilitiesCS.Dialogs;
 
 namespace UtilitiesCS
@@ -15,12 +15,17 @@ namespace UtilitiesCS
         None = 0,
         Critical = 1,
         Warning = 2,
-        Question = 4
+        Question = 4,
     }
 
     public static class MyBox
     {
-        public static DialogResult ShowDialog(string Message, string Title, BoxIcon icon, IList<DelegateButton> delegateButtons)
+        public static DialogResult ShowDialog(
+            string Message,
+            string Title,
+            BoxIcon icon,
+            IList<DelegateButton> delegateButtons
+        )
         {
             using (MyBoxViewer _viewer = new MyBoxViewer())
             {
@@ -29,7 +34,6 @@ namespace UtilitiesCS
                 _viewer.RemoveStandardButtons();
                 _viewer.Text = Title;
                 _viewer.TextMessage.Text = Message;
-
 
                 Size tmp = _viewer.MinimumSize;
 
@@ -47,7 +51,13 @@ namespace UtilitiesCS
             }
         }
 
-        public static DialogResult ShowDialog(MyBoxViewer viewer, string Message, string Title, BoxIcon icon, IList<ActionButton> actionButtons)
+        public static DialogResult ShowDialog(
+            MyBoxViewer viewer,
+            string Message,
+            string Title,
+            BoxIcon icon,
+            IList<ActionButton> actionButtons
+        )
         {
             viewer.Show();
             ReplaceButtons(viewer, actionButtons);
@@ -60,7 +70,13 @@ namespace UtilitiesCS
             return result;
         }
 
-        public static T ShowDialog<T>(MyBoxViewer viewer, string Message, string Title, BoxIcon icon, FunctionButtonGroup<T> group)
+        public static T ShowDialog<T>(
+            MyBoxViewer viewer,
+            string Message,
+            string Title,
+            BoxIcon icon,
+            FunctionButtonGroup<T> group
+        )
         {
             viewer.Show();
             ReplaceButtons(viewer, group.FunctionButtons);
@@ -73,7 +89,13 @@ namespace UtilitiesCS
             return group.Result;
         }
 
-        public static DialogResult ShowDialog(MyBoxViewer viewer, string Message, string Title, MessageBoxIcon icon, IList<ActionButton> actionButtons)
+        public static DialogResult ShowDialog(
+            MyBoxViewer viewer,
+            string Message,
+            string Title,
+            MessageBoxIcon icon,
+            IList<ActionButton> actionButtons
+        )
         {
             viewer.Show();
             ReplaceButtons(viewer, actionButtons);
@@ -86,21 +108,36 @@ namespace UtilitiesCS
             return result;
         }
 
-        public static DialogResult ShowDialog(string message, string title, MessageBoxButtons buttons, MessageBoxIcon icon)
+        public static DialogResult ShowDialog(
+            string message,
+            string title,
+            MessageBoxButtons buttons,
+            MessageBoxIcon icon
+        )
         {
             var actionButtons = GetStandardButtons(buttons);
             using MyBoxViewer viewer = new();
             return ShowDialog(viewer, message, title, icon, actionButtons);
         }
 
-        public static DialogResult ShowDialog(string message, string title, BoxIcon icon, Dictionary<string, Action> actions)
+        public static DialogResult ShowDialog(
+            string message,
+            string title,
+            BoxIcon icon,
+            Dictionary<string, Action> actions
+        )
         {
             using MyBoxViewer viewer = new();
             var actionButtons = actions.ToActionButtons(viewer);
             return ShowDialog(viewer, message, title, icon, actionButtons);
         }
 
-        public static T ShowDialog<T>(string message, string title, BoxIcon icon, Dictionary<string, Func<Task<T>>> functions)
+        public static T ShowDialog<T>(
+            string message,
+            string title,
+            BoxIcon icon,
+            Dictionary<string, Func<Task<T>>> functions
+        )
         {
             using MyBoxViewer viewer = new();
             var group = functions.ToFunctionButtonsAsync(viewer);
@@ -122,7 +159,10 @@ namespace UtilitiesCS
             viewer.MinimumSize = minSize;
         }
 
-        internal static void ReplaceButtons<T>(MyBoxViewer viewer, IList<FunctionButton<T>> functionButtons)
+        internal static void ReplaceButtons<T>(
+            MyBoxViewer viewer,
+            IList<FunctionButton<T>> functionButtons
+        )
         {
             int columnWidth = viewer.L2Bottom.GetColumnWidths()[1];
             viewer.RemoveStandardButtons();
@@ -137,7 +177,10 @@ namespace UtilitiesCS
             viewer.MinimumSize = minSize;
         }
 
-        internal static IList<ActionButton> ToActionButtons(this Dictionary<string, Action> actions, MyBoxViewer _viewer)
+        internal static IList<ActionButton> ToActionButtons(
+            this Dictionary<string, Action> actions,
+            MyBoxViewer _viewer
+        )
         {
             IList<ActionButton> actionButtons = new List<ActionButton>();
             int i = 0;
@@ -148,12 +191,20 @@ namespace UtilitiesCS
                 if (actionPair.Key.Contains("Cancel"))
                 {
                     actionButton = new ActionButton(
-                        $"button{i}", actionPair.Key, DialogResult.Cancel, actionPair.Value);
+                        $"button{i}",
+                        actionPair.Key,
+                        DialogResult.Cancel,
+                        actionPair.Value
+                    );
                 }
                 else
                 {
                     actionButton = new ActionButton(
-                        $"button{i}", actionPair.Key, DialogResult.OK, actionPair.Value);
+                        $"button{i}",
+                        actionPair.Key,
+                        DialogResult.OK,
+                        actionPair.Value
+                    );
                 }
 
                 actionButtons.Add(actionButton);
@@ -168,7 +219,10 @@ namespace UtilitiesCS
             public T Result { get; set; }
         }
 
-        internal static FunctionButtonGroup<T> ToFunctionButtonsAsync<T>(this Dictionary<string, Func<Task<T>>> functions, MyBoxViewer _viewer)
+        internal static FunctionButtonGroup<T> ToFunctionButtonsAsync<T>(
+            this Dictionary<string, Func<Task<T>>> functions,
+            MyBoxViewer _viewer
+        )
         {
             IList<FunctionButton<T>> functionButtons = new List<FunctionButton<T>>();
             int i = 0;
@@ -183,7 +237,11 @@ namespace UtilitiesCS
                 };
 
                 var functionButton = new FunctionButton<T>(
-                    $"button{i}", functionPair.Key, DialogResult.OK, function);
+                    $"button{i}",
+                    functionPair.Key,
+                    DialogResult.OK,
+                    function
+                );
 
                 group.FunctionButtons.Add(functionButton);
                 i++;
@@ -191,33 +249,45 @@ namespace UtilitiesCS
             return group;
         }
 
-        internal static void AppendButtonInColumn(TableLayoutPanel tlp, DelegateButton dlb, Single width)
+        internal static void AppendButtonInColumn(
+            TableLayoutPanel tlp,
+            DelegateButton dlb,
+            Single width
+        )
         {
             tlp.ColumnCount++;
-            tlp.ColumnStyles.Insert(tlp.ColumnCount - 2,
-                                    new System.Windows.Forms.ColumnStyle(
-                                        System.Windows.Forms.SizeType.Absolute,
-                                        width));
+            tlp.ColumnStyles.Insert(
+                tlp.ColumnCount - 2,
+                new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, width)
+            );
             tlp.Controls.Add(dlb.Button, tlp.ColumnCount - 2, 0);
         }
 
-        internal static void AppendButtonInColumn(TableLayoutPanel tlp, ActionButton actionButton, Single width)
+        internal static void AppendButtonInColumn(
+            TableLayoutPanel tlp,
+            ActionButton actionButton,
+            Single width
+        )
         {
             tlp.ColumnCount++;
-            tlp.ColumnStyles.Insert(tlp.ColumnCount - 2,
-                                    new System.Windows.Forms.ColumnStyle(
-                                        System.Windows.Forms.SizeType.Absolute,
-                                        width));
+            tlp.ColumnStyles.Insert(
+                tlp.ColumnCount - 2,
+                new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, width)
+            );
             tlp.Controls.Add(actionButton.Button, tlp.ColumnCount - 2, 0);
         }
 
-        internal static void AppendButtonInColumn<T>(TableLayoutPanel tlp, FunctionButton<T> functionButton, Single width)
+        internal static void AppendButtonInColumn<T>(
+            TableLayoutPanel tlp,
+            FunctionButton<T> functionButton,
+            Single width
+        )
         {
             tlp.ColumnCount++;
-            tlp.ColumnStyles.Insert(tlp.ColumnCount - 2,
-                                    new System.Windows.Forms.ColumnStyle(
-                                        System.Windows.Forms.SizeType.Absolute,
-                                        width));
+            tlp.ColumnStyles.Insert(
+                tlp.ColumnCount - 2,
+                new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, width)
+            );
             tlp.Controls.Add(functionButton.Button, tlp.ColumnCount - 2, 0);
         }
 
@@ -247,7 +317,6 @@ namespace UtilitiesCS
             }
         }
 
-
         private static void SetDialogIcon(this MyBoxViewer viewer, BoxIcon icon)
         {
             switch (icon)
@@ -264,7 +333,8 @@ namespace UtilitiesCS
                 case BoxIcon.Question:
                     viewer.SvgIcon.Image = SystemIcons.Question.ToBitmap();
                     break;
-                default: break;
+                default:
+                    break;
             }
         }
 
@@ -274,50 +344,52 @@ namespace UtilitiesCS
             switch (buttons)
             {
                 case MessageBoxButtons.OK:
-                    actionButtons = [new ActionButton("ButtonOk", "Ok", DialogResult.OK, () => { })];
+                    actionButtons =
+                    [
+                        new ActionButton("ButtonOk", "Ok", DialogResult.OK, () => { }),
+                    ];
                     break;
                 case MessageBoxButtons.OKCancel:
                     actionButtons =
-                        [
-                            new ActionButton("ButtonOk", "Ok", DialogResult.OK, () => { }),
-                            new ActionButton("ButtonCancel", "Cancel", DialogResult.Cancel, () => { })
-                        ];
+                    [
+                        new ActionButton("ButtonOk", "Ok", DialogResult.OK, () => { }),
+                        new ActionButton("ButtonCancel", "Cancel", DialogResult.Cancel, () => { }),
+                    ];
                     break;
                 case MessageBoxButtons.AbortRetryIgnore:
                     actionButtons =
-                        [
-                            new ActionButton("ButtonAbort", "Abort", DialogResult.Abort, () => { }),
-                            new ActionButton("ButtonRetry", "Retry", DialogResult.Retry, () => { }),
-                            new ActionButton("ButtonIgnore", "Ignore", DialogResult.Ignore, () => { })
-                        ];
+                    [
+                        new ActionButton("ButtonAbort", "Abort", DialogResult.Abort, () => { }),
+                        new ActionButton("ButtonRetry", "Retry", DialogResult.Retry, () => { }),
+                        new ActionButton("ButtonIgnore", "Ignore", DialogResult.Ignore, () => { }),
+                    ];
                     break;
                 case MessageBoxButtons.YesNoCancel:
                     actionButtons =
-                        [
-                            new ActionButton("ButtonYes", "Yes", DialogResult.Yes, () => { }),
-                            new ActionButton("ButtonNo", "No", DialogResult.No, () => { }),
-                            new ActionButton("ButtonCancel", "Cancel", DialogResult.Cancel, () => { })
-                        ];
+                    [
+                        new ActionButton("ButtonYes", "Yes", DialogResult.Yes, () => { }),
+                        new ActionButton("ButtonNo", "No", DialogResult.No, () => { }),
+                        new ActionButton("ButtonCancel", "Cancel", DialogResult.Cancel, () => { }),
+                    ];
                     break;
                 case MessageBoxButtons.YesNo:
                     actionButtons =
-                        [
-                            new ActionButton("ButtonYes", "Yes", DialogResult.Yes, () => { }),
-                            new ActionButton("ButtonNo", "No", DialogResult.No, () => { }),
-                        ];
+                    [
+                        new ActionButton("ButtonYes", "Yes", DialogResult.Yes, () => { }),
+                        new ActionButton("ButtonNo", "No", DialogResult.No, () => { }),
+                    ];
                     break;
                 case MessageBoxButtons.RetryCancel:
                     actionButtons =
-                        [
-                            new ActionButton("ButtonRetry", "Retry", DialogResult.Yes, () => { }),
-                            new ActionButton("ButtonCancel", "Cancel", DialogResult.Cancel, () => { })
-                        ];
+                    [
+                        new ActionButton("ButtonRetry", "Retry", DialogResult.Yes, () => { }),
+                        new ActionButton("ButtonCancel", "Cancel", DialogResult.Cancel, () => { }),
+                    ];
                     break;
                 default:
                     break;
             }
             return actionButtons;
         }
-
     }
 }

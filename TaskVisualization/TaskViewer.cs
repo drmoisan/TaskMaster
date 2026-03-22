@@ -31,11 +31,7 @@ namespace TaskVisualization
         private MouseDownFilter _mouseFilter
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return __mouseFilter;
-            }
-
+            get { return __mouseFilter; }
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
@@ -163,7 +159,9 @@ namespace TaskVisualization
         private async void OKButton_Click(object sender, EventArgs e)
         {
             if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                SynchronizationContext.SetSynchronizationContext(
+                    new WindowsFormsSynchronizationContext()
+                );
             await _controller.OK_Action();
         }
 
@@ -255,10 +253,8 @@ namespace TaskVisualization
             }
             catch (Exception)
             {
-
                 throw;
             }
-
         }
     }
 }

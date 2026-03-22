@@ -28,6 +28,4 @@ namespace UtilitiesCS.ReusableTypeClasses
             _suppressNotification = false;
         }
     }
-
-
 }

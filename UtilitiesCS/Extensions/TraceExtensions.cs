@@ -8,7 +8,8 @@ namespace UtilitiesCS.Extensions
     public static class TraceExtensions
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public static MethodBase GetCallerByName(this StackTrace sf, string methodName)
         {
@@ -36,7 +37,6 @@ namespace UtilitiesCS.Extensions
                             repeat = false;
                         }
                     }
-
                 }
                 catch (System.Exception)
                 {
@@ -71,15 +71,21 @@ namespace UtilitiesCS.Extensions
             var parameters = method.GetParameters();
             if (parameters is null || parameters.Count() == 0)
             {
-                throw new ArgumentOutOfRangeException($"Cannot call {method.Name}.{nameof(GetParameterName)}({index}) because {method.Name} does not have any parameters");
+                throw new ArgumentOutOfRangeException(
+                    $"Cannot call {method.Name}.{nameof(GetParameterName)}({index}) because {method.Name} does not have any parameters"
+                );
             }
             else if (index < 0)
             {
-                throw new ArgumentOutOfRangeException($"Cannot call {method.Name}.{nameof(GetParameterName)}({index}) because {index} is less than 0");
+                throw new ArgumentOutOfRangeException(
+                    $"Cannot call {method.Name}.{nameof(GetParameterName)}({index}) because {index} is less than 0"
+                );
             }
             else if (index >= parameters.Count())
             {
-                throw new ArgumentOutOfRangeException($"Cannot call {method.Name}.{nameof(GetParameterName)}({index}) because {index} is greater than the highest index {parameters.Count() - 1}");
+                throw new ArgumentOutOfRangeException(
+                    $"Cannot call {method.Name}.{nameof(GetParameterName)}({index}) because {index} is greater than the highest index {parameters.Count() - 1}"
+                );
             }
             return method.GetParameters()[index].Name;
         }

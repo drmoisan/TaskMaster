@@ -10,15 +10,14 @@ using System.Threading.Tasks;
 namespace UtilitiesCS.HelperClasses
 {
     /// <summary>
-	/// Provides helper methods for working with COM IDispatch objects that have a registered type library.
-	/// </summary>
-	public static class DispatchUtility
+    /// Provides helper methods for working with COM IDispatch objects that have a registered type library.
+    /// </summary>
+    public static class DispatchUtility
     {
         #region Private Constants
 
         private const int S_OK = 0; //From WinError.h
         private const int LOCALE_SYSTEM_DEFAULT = 2 << 10; //From WinNT.h == 2048 == 0x800
-
         #endregion
 
         #region Public Methods
@@ -41,7 +40,10 @@ namespace UtilitiesCS.HelperClasses
         /// <param name="throwIfNotFound">Whether an exception should be thrown if a Type can't be obtained.</param>
         /// <returns>A .NET Type that can be used with reflection.</returns>
         /// <exception cref="InvalidCastException">If <paramref name="obj"/> doesn't implement IDispatch.</exception>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [SecurityPermission(
+            SecurityAction.LinkDemand,
+            Flags = SecurityPermissionFlag.UnmanagedCode
+        )]
         public static Type GetType(object obj, bool throwIfNotFound)
         {
             RequireReference(obj, "obj");
@@ -58,7 +60,10 @@ namespace UtilitiesCS.HelperClasses
         /// If the method returns false, this value should be ignored.</param>
         /// <returns>True if the member was found and resolved to a DISPID.  False otherwise.</returns>
         /// <exception cref="InvalidCastException">If <paramref name="obj"/> doesn't implement IDispatch.</exception>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [SecurityPermission(
+            SecurityAction.LinkDemand,
+            Flags = SecurityPermissionFlag.UnmanagedCode
+        )]
         public static bool TryGetDispId(object obj, string name, out int dispId)
         {
             RequireReference(obj, "obj");
@@ -98,8 +103,14 @@ namespace UtilitiesCS.HelperClasses
         {
             RequireReference(obj, "obj");
             Type type = obj.GetType();
-            object result = type.InvokeMember(memberName, BindingFlags.InvokeMethod | BindingFlags.GetProperty,
-                null, obj, args, null);
+            object result = type.InvokeMember(
+                memberName,
+                BindingFlags.InvokeMethod | BindingFlags.GetProperty,
+                null,
+                obj,
+                args,
+                null
+            );
             return result;
         }
 
@@ -113,7 +124,8 @@ namespace UtilitiesCS.HelperClasses
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="value">The value to check.</param>
         /// <param name="name">The name of the value.</param>
-        private static void RequireReference<T>(T value, string name) where T : class
+        private static void RequireReference<T>(T value, string name)
+            where T : class
         {
             if (value == null)
             {
@@ -173,7 +185,13 @@ namespace UtilitiesCS.HelperClasses
             // pass the default locale instead of looking up the current thread's LCID each time
             // (via CultureInfo.CurrentCulture.LCID).
             Guid iidNull = Guid.Empty;
-            int hr = dispatch.GetDispId(ref iidNull, ref name, 1, LOCALE_SYSTEM_DEFAULT, out dispId);
+            int hr = dispatch.GetDispId(
+                ref iidNull,
+                ref name,
+                1,
+                LOCALE_SYSTEM_DEFAULT,
+                out dispId
+            );
 
             const int DISP_E_UNKNOWNNAME = unchecked((int)0x80020006); //From WinError.h
             const int DISPID_UNKNOWN = -1; //From OAIdl.idl
@@ -236,8 +254,15 @@ namespace UtilitiesCS.HelperClasses
             /// <remarks>
             /// http://msdn.microsoft.com/en-us/library/cc1ec9aa-6c40-4e70-819c-a7c6dd6b8c99(VS.85)
             /// </remarks>
-            void GetTypeInfo(int typeInfoIndex, int lcid, [MarshalAs(UnmanagedType.CustomMarshaler,
-                MarshalTypeRef = typeof(System.Runtime.InteropServices.CustomMarshalers.TypeToTypeInfoMarshaler))] out Type typeInfo);
+            void GetTypeInfo(
+                int typeInfoIndex,
+                int lcid,
+                [MarshalAs(
+                    UnmanagedType.CustomMarshaler,
+                    MarshalTypeRef = typeof(System.Runtime.InteropServices.CustomMarshalers.TypeToTypeInfoMarshaler)
+                )]
+                    out Type typeInfo
+            );
 
             /// <summary>
             /// Gets the DISPID of the specified member name.

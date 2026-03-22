@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Office.Interop.Outlook;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.Interfaces.IWinForm;
-
 
 namespace QuickFiler.Interfaces
 {
@@ -22,6 +21,5 @@ namespace QuickFiler.Interfaces
         Task ToggleOnNavigationAsync();
 
         IntPtr FormHandle { get; }
-
     }
 }

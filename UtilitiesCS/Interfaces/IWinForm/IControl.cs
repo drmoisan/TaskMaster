@@ -1,12 +1,18 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Windows.Forms.Layout;
 using System.Windows.Forms;
+using System.Windows.Forms.Layout;
 
 namespace UtilitiesCS.Interfaces.IWinForm
 {
-    public interface IControl : IComponent, IDropTarget, ISynchronizeInvoke, IWin32Window, IDisposable, IBindableComponent //,IArrangedElement
+    public interface IControl
+        : IComponent,
+            IDropTarget,
+            ISynchronizeInvoke,
+            IWin32Window,
+            IDisposable,
+            IBindableComponent //,IArrangedElement
     {
         AccessibleObject AccessibilityObject { get; }
         string AccessibleDefaultActionDescription { get; set; }

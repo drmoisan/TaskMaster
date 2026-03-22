@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
 
@@ -18,7 +18,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
     public class ClassifierGroup
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors
 
@@ -31,42 +32,70 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Public Properties
 
-        public ConcurrentDictionary<string, BayesianClassifier> Classifiers { get => _classifiers; protected set => _classifiers = value; }
+        public ConcurrentDictionary<string, BayesianClassifier> Classifiers
+        {
+            get => _classifiers;
+            protected set => _classifiers = value;
+        }
         protected ConcurrentDictionary<string, BayesianClassifier> _classifiers;
 
         [JsonProperty(Order = -3)]
-        public ConcurrentDictionary<string, DedicatedToken> DedicatedTokens { get => _dedicatedTokens; set => _dedicatedTokens = value; }
+        public ConcurrentDictionary<string, DedicatedToken> DedicatedTokens
+        {
+            get => _dedicatedTokens;
+            set => _dedicatedTokens = value;
+        }
         protected ConcurrentDictionary<string, DedicatedToken> _dedicatedTokens = new();
 
         [JsonProperty(Order = -2)]
-        public Corpus SharedTokenBase { get => _sharedTokenBase; set => _sharedTokenBase = value; }
+        public Corpus SharedTokenBase
+        {
+            get => _sharedTokenBase;
+            set => _sharedTokenBase = value;
+        }
         protected Corpus _sharedTokenBase = new();
 
         [JsonProperty(Order = -1)]
-        public int TotalTokenCount { get => _totalTokenCount; set => _totalTokenCount = value; }
+        public int TotalTokenCount
+        {
+            get => _totalTokenCount;
+            set => _totalTokenCount = value;
+        }
         protected int _totalTokenCount;
 
         public IApplicationGlobals AppGlobals { get; set; }
 
         //[JsonIgnore]
-        public Func<object, IApplicationGlobals, IEnumerable<string>> Tokenizer { get => _tokenizer; set => _tokenizer = value; }
-        private Func<object, IApplicationGlobals, IEnumerable<string>> _tokenizer = new EmailTokenizer().Tokenize;
+        public Func<object, IApplicationGlobals, IEnumerable<string>> Tokenizer
+        {
+            get => _tokenizer;
+            set => _tokenizer = value;
+        }
+        private Func<object, IApplicationGlobals, IEnumerable<string>> _tokenizer =
+            new EmailTokenizer().Tokenize;
 
         #endregion Public Properties
 
         #region Public Methods
 
-        public void ForceClassifierUpdate(string tag, IEnumerable<string> positiveTokens, IEnumerable<string> negativeTokens)
+        public void ForceClassifierUpdate(
+            string tag,
+            IEnumerable<string> positiveTokens,
+            IEnumerable<string> negativeTokens
+        )
         {
             _classifiers[tag] = new BayesianClassifier(tag, positiveTokens, negativeTokens);
             _classifiers[tag].Parent ??= this;
         }
 
-        public void AddOrUpdateClassifier(string tag, IEnumerable<string> positiveTokens, IEnumerable<string> negativeTokens)
+        public void AddOrUpdateClassifier(
+            string tag,
+            IEnumerable<string> positiveTokens,
+            IEnumerable<string> negativeTokens
+        )
         {
             var classifier = _classifiers.GetOrAdd(tag, new BayesianClassifier(tag));
             classifier.AddTokens(positiveTokens, negativeTokens);
-
         }
 
         public IOrderedEnumerable<Prediction<string>> Classify(object source)
@@ -76,9 +105,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public IOrderedEnumerable<Prediction<string>> Classify(IEnumerable<string> tokens)
         {
-            var results = Classifiers.Select(
-                classifier => new Prediction<string>(
-                    classifier.Key, classifier.Value.GetMatchProbability(tokens))).OrderBy(x => x);
+            var results = Classifiers
+                .Select(classifier => new Prediction<string>(
+                    classifier.Key,
+                    classifier.Value.GetMatchProbability(tokens)
+                ))
+                .OrderBy(x => x);
             return results;
         }
 
@@ -88,55 +120,82 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public void LogMetrics()
         {
-            var metrics = Classifiers.Select(x => new
-            {
-                Descriptor = x.Value?.Tag ?? "",
-                Match = x.Value?.Match?.TokenFrequency?.Keys?.Count() ?? 0,
-                NotMatch = x.Value?.NotMatch?.TokenFrequency?.Keys?.Count() ?? 0,
-                Probability = x.Value?.Prob?.Keys?.Count() ?? 0,
-                Total = x.Value?.Match?.TokenFrequency?.Keys?.Count() ?? 0 +
-                        x.Value?.NotMatch?.TokenFrequency?.Keys?.Count() ?? 0 +
-                        x.Value?.Prob?.Keys?.Count() ?? 0
-            }).ToList();
-            metrics.Insert(0, new
-            {
-                Descriptor = "Dedicated",
-                Match = this.DedicatedTokens.Count(),
-                NotMatch = 0,
-                Probability = 0,
-                Total = (int)((double)this.DedicatedTokens.Count() * 6)
-            });
-            metrics.Insert(1, new
-            {
-                Descriptor = "TokenBase",
-                Match = this.SharedTokenBase.TokenFrequency.Keys.Count(),
-                NotMatch = 0,
-                Probability = 0,
-                Total = this.SharedTokenBase.TokenFrequency.Keys.Count()
-            });
-            metrics.Add(new
-            {
-                Descriptor = "Total",
-                Match = metrics.Select(x => x.Match).Sum(),
-                NotMatch = metrics.Select(x => x.NotMatch).Sum(),
-                Probability = metrics.Select(x => x.Probability).Sum(),
-                Total = metrics.Select(x => x.Total).Sum()
-            });
+            var metrics = Classifiers
+                .Select(x => new
+                {
+                    Descriptor = x.Value?.Tag ?? "",
+                    Match = x.Value?.Match?.TokenFrequency?.Keys?.Count() ?? 0,
+                    NotMatch = x.Value?.NotMatch?.TokenFrequency?.Keys?.Count() ?? 0,
+                    Probability = x.Value?.Prob?.Keys?.Count() ?? 0,
+                    Total = x.Value?.Match?.TokenFrequency?.Keys?.Count()
+                        ?? 0 + x.Value?.NotMatch?.TokenFrequency?.Keys?.Count()
+                        ?? 0 + x.Value?.Prob?.Keys?.Count()
+                        ?? 0,
+                })
+                .ToList();
+            metrics.Insert(
+                0,
+                new
+                {
+                    Descriptor = "Dedicated",
+                    Match = this.DedicatedTokens.Count(),
+                    NotMatch = 0,
+                    Probability = 0,
+                    Total = (int)((double)this.DedicatedTokens.Count() * 6),
+                }
+            );
+            metrics.Insert(
+                1,
+                new
+                {
+                    Descriptor = "TokenBase",
+                    Match = this.SharedTokenBase.TokenFrequency.Keys.Count(),
+                    NotMatch = 0,
+                    Probability = 0,
+                    Total = this.SharedTokenBase.TokenFrequency.Keys.Count(),
+                }
+            );
+            metrics.Add(
+                new
+                {
+                    Descriptor = "Total",
+                    Match = metrics.Select(x => x.Match).Sum(),
+                    NotMatch = metrics.Select(x => x.NotMatch).Sum(),
+                    Probability = metrics.Select(x => x.Probability).Sum(),
+                    Total = metrics.Select(x => x.Total).Sum(),
+                }
+            );
 
-            var jagged = metrics.Select(x => new[] { x.Descriptor, x.Match.ToString("N0"), x.NotMatch.ToString("N0"), x.Probability.ToString("N0"), x.Total.ToString("N0") }).ToArray();
+            var jagged = metrics
+                .Select(x =>
+                    new[]
+                    {
+                        x.Descriptor,
+                        x.Match.ToString("N0"),
+                        x.NotMatch.ToString("N0"),
+                        x.Probability.ToString("N0"),
+                        x.Total.ToString("N0"),
+                    }
+                )
+                .ToArray();
             //var jagged = metrics.Select(x => new object[] { x.Descriptor, x.Match, x.NotMatch, x.Probability, x.Total }).ToArray();
 
-            logger.Info($"\n{jagged.ToFormattedText(
+            logger.Info(
+                $"\n{jagged.ToFormattedText(
                     ["Descriptor", "Matches", "Not Match", "Probability", "Total Lines"],
-                    [Enums.Justification.Left, Enums.Justification.Right,
-                        Enums.Justification.Right, Enums.Justification.Right,
+                    [Enums.Justification.Left,
+                        Enums.Justification.Right,
+                        Enums.Justification.Right,
+                        Enums.Justification.Right,
                         Enums.Justification.Right],
-                    "Classifier Manager Metrics".ToUpper())}");
+                    "Classifier Manager Metrics".ToUpper())}"
+            );
         }
 
         public void LogState()
         {
-            logger.Info($"\n{Classifiers
+            logger.Info(
+                $"\n{Classifiers
                 .Select(x => new[]
                     {
                         x.Value.Tag,
@@ -148,10 +207,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 .ToArray()
                 .ToFormattedText(
                     ["Classifier", "Parent", "TokenBase", "Positive", "Negative"],
-                    [Enums.Justification.Center, Enums.Justification.Center,
-                        Enums.Justification.Center, Enums.Justification.Center,
+                    [Enums.Justification.Center,
+                        Enums.Justification.Center,
+                        Enums.Justification.Center,
+                        Enums.Justification.Center,
                         Enums.Justification.Center],
-                    "Classifier Manager State".ToUpper())}");
+                    "Classifier Manager State".ToUpper())}"
+            );
         }
 
         #endregion Debug Methods
@@ -185,51 +247,61 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             sw.WriteToLog();
 
             AppGlobals.AF.ProgressTracker.Report(100, $"Completed in {sw.Elapsed:mm\\:ss}");
-
         }
 
         internal async Task AfterDeserialized_HeavyParallelizationAsync(
-            CancellationToken token, SegmentStopWatch sw)
+            CancellationToken token,
+            SegmentStopWatch sw
+        )
         {
-            await Task.Run(async () =>
-            {
-                // Memory issue with infer negative. 
-                await InferNegative(token);
-                sw.LogDuration("InferNegative Tokens");
+            await Task.Run(
+                async () =>
+                {
+                    // Memory issue with infer negative.
+                    await InferNegative(token);
+                    sw.LogDuration("InferNegative Tokens");
 
-                await RecalcNullProbs(token);
-                sw.LogDuration("Update Probabilities");
-            }, token);
+                    await RecalcNullProbs(token);
+                    sw.LogDuration("Update Probabilities");
+                },
+                token
+            );
         }
 
         internal async Task RecalcNullProbs(CancellationToken token)
         {
             if (Classifiers.Values.Any(x => x.Prob is null))
             {
-                AppGlobals.AF.ProgressTracker.Report(
-                    0, "Starting to Recalculate Probabilities");
+                AppGlobals.AF.ProgressTracker.Report(0, "Starting to Recalculate Probabilities");
                 var count = Classifiers.Count;
                 int completed = 0;
                 var sw = new SegmentStopWatch().Start();
 
-                await Classifiers.Values.ToAsyncEnumerable()
-                        .ForEachAsync(async (classifier) =>
+                await Classifiers
+                    .Values.ToAsyncEnumerable()
+                    .ForEachAsync(
+                        async (classifier) =>
                         {
                             await classifier.RecalcProbsAsync(token);
                             Interlocked.Increment(ref completed);
-                            AppGlobals.AF.ProgressTracker.Report((int)((double)completed / (double)count * 100),
-                                GetReportMessage(completed, count, sw, "Recalc Probabilities: Completed"));
-                        });
-
+                            AppGlobals.AF.ProgressTracker.Report(
+                                (int)((double)completed / (double)count * 100),
+                                GetReportMessage(
+                                    completed,
+                                    count,
+                                    sw,
+                                    "Recalc Probabilities: Completed"
+                                )
+                            );
+                        }
+                    );
             }
-
         }
 
         // Parallelization made this slower because memory usage was too high
         internal async Task InferNegative(CancellationToken token)
         {
-            AppGlobals.AF.ProgressTracker.Report(
-                0, "Starting Negative Token Inference");
+            AppGlobals.AF.ProgressTracker.Report(0, "Starting Negative Token Inference");
             var count = Classifiers.Count;
             int completed = 0;
 
@@ -239,17 +311,28 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             var sw = new SegmentStopWatch();
             // Start the chunked tasks to multiprocess async
-            var tasks = chunks.Select(
-                chunk => Task.Run(async () => await
-                chunk.ToAsyncEnumerable()
-                .ForEachAsync(async (classifier) =>
-                {
-                    await classifier.InferNegativeTokensAsync(token);
-                    Interlocked.Increment(ref completed);
-                    AppGlobals.AF.ProgressTracker.Report(
-                        (int)((double)completed / (double)count * 100),
-                        GetReportMessage(completed, count, sw, "Infer Negative Tokens: Completed"));
-                })));
+            var tasks = chunks.Select(chunk =>
+                Task.Run(async () =>
+                    await chunk
+                        .ToAsyncEnumerable()
+                        .ForEachAsync(
+                            async (classifier) =>
+                            {
+                                await classifier.InferNegativeTokensAsync(token);
+                                Interlocked.Increment(ref completed);
+                                AppGlobals.AF.ProgressTracker.Report(
+                                    (int)((double)completed / (double)count * 100),
+                                    GetReportMessage(
+                                        completed,
+                                        count,
+                                        sw,
+                                        "Infer Negative Tokens: Completed"
+                                    )
+                                );
+                            }
+                        )
+                )
+            );
 
             sw.Start();
 
@@ -275,8 +358,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     AppGlobals.AF.CancelToken.ThrowIfCancellationRequested();
                     await classifier.Value.AfterDeserialize(AppGlobals.AF.CancelToken, sw);
                     Interlocked.Increment(ref completed);
-                    AppGlobals.AF.ProgressTracker.Report((int)((double)completed / (double)count * 100),
-                        GetReportMessage(completed, count, sw));
+                    AppGlobals.AF.ProgressTracker.Report(
+                        (int)((double)completed / (double)count * 100),
+                        GetReportMessage(completed, count, sw)
+                    );
                 }
             }
             catch (OperationCanceledException)
@@ -285,14 +370,20 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
         }
 
-        internal string GetReportMessage(int completed, int count, SegmentStopWatch sw, string header = "Completed")
+        internal string GetReportMessage(
+            int completed,
+            int count,
+            SegmentStopWatch sw,
+            string header = "Completed"
+        )
         {
             string message;
             if (completed > 0)
             {
                 var speed = sw.Elapsed.TotalSeconds / (double)completed;
                 var remaining = TimeSpan.FromSeconds((count - completed) * speed);
-                message = $"{header} {completed} of {count} @ {speed:N2} per sec ({remaining:mm\\:ss} remaining)";
+                message =
+                    $"{header} {completed} of {count} @ {speed:N2} per sec ({remaining:mm\\:ss} remaining)";
             }
             else
             {

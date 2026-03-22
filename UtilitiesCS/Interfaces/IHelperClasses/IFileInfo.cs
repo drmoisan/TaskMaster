@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Security.AccessControl;
 
-
 namespace UtilitiesCS
 {
     public interface IFileInfo : IFileSystemInfo
@@ -28,7 +27,11 @@ namespace UtilitiesCS
         StreamReader OpenText();
         FileStream OpenWrite();
         IFileInfo Replace(string destinationFileName, string destinationBackupFileName);
-        IFileInfo Replace(string destinationFileName, string destinationBackupFileName, bool ignoreMetadataErrors);
+        IFileInfo Replace(
+            string destinationFileName,
+            string destinationBackupFileName,
+            bool ignoreMetadataErrors
+        );
         void SetAccessControl(FileSecurity fileSecurity);
         string ToString();
     }

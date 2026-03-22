@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using Mono.Reflection;
-using System.Reflection.Emit;
-using System.Reflection;
+
 //using Mono.Cecil.Cil;
 
 namespace UtilitiesCS.NewtonsoftHelpers.MonoExtension
 {
     public static class MonoExtension
     {
-        public static void EmitOperand(this Instruction instruction, ILGenerator gen, MethodBuilder mb)
+        public static void EmitOperand(
+            this Instruction instruction,
+            ILGenerator gen,
+            MethodBuilder mb
+        )
         {
             switch (instruction.OpCode.OperandType)
             {
@@ -85,7 +90,9 @@ namespace UtilitiesCS.NewtonsoftHelpers.MonoExtension
                     }
                     else
                     {
-                        throw new InvalidCastException("Operand is not a valid type, method, or field.");
+                        throw new InvalidCastException(
+                            "Operand is not a valid type, method, or field."
+                        );
                     }
                     break;
                 case OperandType.InlineType:
@@ -102,7 +109,9 @@ namespace UtilitiesCS.NewtonsoftHelpers.MonoExtension
                     }
                     else
                     {
-                        throw new InvalidCastException("Operand is neither MethodInfo nor ConstructorInfo.");
+                        throw new InvalidCastException(
+                            "Operand is neither MethodInfo nor ConstructorInfo."
+                        );
                     }
                     //gen.Emit(instruction.OpCode, (MethodInfo)instruction.Operand);
                     break;
@@ -111,7 +120,7 @@ namespace UtilitiesCS.NewtonsoftHelpers.MonoExtension
                     gen.Emit(instruction.OpCode, (FieldInfo)instruction.Operand);
                     break;
                 case OperandType.ShortInlineVar:
-                //instruction.Operand = GetVariable(instruction, il.ReadByte());                    
+                //instruction.Operand = GetVariable(instruction, il.ReadByte());
                 case OperandType.InlineVar:
                     if (instruction.OpCode.Name.Contains("loc"))
                     {

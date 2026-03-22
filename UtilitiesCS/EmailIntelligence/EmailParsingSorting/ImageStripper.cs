@@ -1,10 +1,10 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using Microsoft.Office.Interop.Outlook;
 using Tesseract;
 using UtilitiesCS.Extensions;
 
@@ -13,13 +13,14 @@ namespace UtilitiesCS.EmailIntelligence
     public class ImageStripper
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors and private fields
 
         public ImageStripper()
         {
-            //_globals = appGlobals; 
+            //_globals = appGlobals;
         }
 
         public ImageStripper(string cachefile)
@@ -36,13 +37,17 @@ namespace UtilitiesCS.EmailIntelligence
         //int misses, hits = 0;
 
         internal (string text, HashSet<string> tokens) analyze(
-            string engine_name, List<object> parts)
+            string engine_name,
+            List<object> parts
+        )
         {
             if (engine_name != "Tesseract")
             {
-                logger.Error($"Engine {engine_name} has not been implemented. " +
-                    $"invalid engine name {engine_name} - OCR disabled\n" +
-                    $"Only Tesseract OCR engine has been implemented. ");
+                logger.Error(
+                    $"Engine {engine_name} has not been implemented. "
+                        + $"invalid engine name {engine_name} - OCR disabled\n"
+                        + $"Only Tesseract OCR engine has been implemented. "
+                );
                 return ("", new HashSet<string>());
             }
 
@@ -71,7 +76,8 @@ namespace UtilitiesCS.EmailIntelligence
             var rows = new LinkedList<Bitmap>();
             var max_image_size = SpamBayesOptions.max_image_size;
 
-            var attachmentParts = parts.Where(x => x is IAttachment)?.Cast<IAttachment>()?.ToList() ?? [];
+            var attachmentParts =
+                parts.Where(x => x is IAttachment)?.Cast<IAttachment>()?.ToList() ?? [];
             var htmlParts = parts.Where(x => x is string)?.Cast<string>()?.ToList() ?? [];
             foreach (var part in attachmentParts)
             {
@@ -248,7 +254,6 @@ namespace UtilitiesCS.EmailIntelligence
                     logger.Error(e.Message, e);
                     bitmap = top;
                 }
-
             }
             return bitmap;
         }
@@ -312,7 +317,6 @@ namespace UtilitiesCS.EmailIntelligence
                 image.SelectActiveFrame(dimension, i);
                 yield return (Bitmap)image.Clone();
             }
-
         }
 
         internal Image GetImage(Attachment attachment)
@@ -337,7 +341,8 @@ namespace UtilitiesCS.EmailIntelligence
 
         internal byte[] GetBytes(Attachment attachment)
         {
-            const string PR_ATTACH_DATA_BIN = "http://schemas.microsoft.com/mapi/proptag/0x37010102";
+            const string PR_ATTACH_DATA_BIN =
+                "http://schemas.microsoft.com/mapi/proptag/0x37010102";
             var bytes = attachment.PropertyAccessor.GetProperty(PR_ATTACH_DATA_BIN);
             return bytes;
         }
@@ -347,9 +352,16 @@ namespace UtilitiesCS.EmailIntelligence
             // Get byte array of image
             byte[] data = bitmap.ToByte();
 
-            string tessdataPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}{Path.DirectorySeparatorChar}TaskMaster{Path.DirectorySeparatorChar}tessdata";
+            string tessdataPath =
+                $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}{Path.DirectorySeparatorChar}TaskMaster{Path.DirectorySeparatorChar}tessdata";
             //string tessdataPath = $"{_globals.FS.FldrAppData}{Path.DirectorySeparatorChar}tessdata";
-            using (TesseractEngine engine = new TesseractEngine(tessdataPath, "eng", EngineMode.Default))
+            using (
+                TesseractEngine engine = new TesseractEngine(
+                    tessdataPath,
+                    "eng",
+                    EngineMode.Default
+                )
+            )
             {
                 //var pix = new BitmapToPixConverter().Convert(bitmap);
                 //var page = engine.Process(pix);
@@ -357,7 +369,6 @@ namespace UtilitiesCS.EmailIntelligence
 
                 var text = page.GetText();
                 return text;
-
 
                 //using (Pix pix = Pix.LoadFromMemory(data))
                 //{
@@ -368,6 +379,5 @@ namespace UtilitiesCS.EmailIntelligence
                 //}
             }
         }
-
     }
 }

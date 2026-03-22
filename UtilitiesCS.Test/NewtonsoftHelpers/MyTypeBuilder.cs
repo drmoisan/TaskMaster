@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections;
-using System.Reflection;
-using System.Reflection.Emit;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.InteropServices;
 
 namespace TypeBuilderNamespace
 {
@@ -13,7 +13,9 @@ namespace TypeBuilderNamespace
     {
         public static void CreateNewObject()
         {
-            var myType = CompileResultType([new FieldReduced() { Name = "TestField", Type = typeof(string) }]);
+            var myType = CompileResultType([
+                new FieldReduced() { Name = "TestField", Type = typeof(string) },
+            ]);
             var myObject = Activator.CreateInstance(myType);
         }
 
@@ -26,7 +28,11 @@ namespace TypeBuilderNamespace
         public static Type CompileResultType(IEnumerable<FieldReduced> yourListOfFields)
         {
             TypeBuilder tb = GetTypeBuilder();
-            ConstructorBuilder constructor = tb.DefineDefaultConstructor(MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName);
+            ConstructorBuilder constructor = tb.DefineDefaultConstructor(
+                MethodAttributes.Public
+                    | MethodAttributes.SpecialName
+                    | MethodAttributes.RTSpecialName
+            );
 
             // NOTE: assuming your list contains Field objects with fields FieldName(string) and FieldType(Type)
             foreach (var field in yourListOfFields)
@@ -50,34 +56,48 @@ namespace TypeBuilderNamespace
         {
             var myObject = Activator.CreateInstance(objectType);
             var derivedType = typeof(T);
-            var derivedFields = derivedType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var derivedFields = derivedType.GetFields(
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+            );
             foreach (var field in derivedFields)
             {
                 var fieldValue = field.GetValue(instance);
-                var fieldInfo = objectType.GetField(field.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var fieldInfo = objectType.GetField(
+                    field.Name,
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                );
                 if (fieldInfo != null)
                 {
                     fieldInfo.SetValue(myObject, fieldValue);
                 }
             }
             return myObject;
-
         }
 
         public static Type CompileResultType<T>(T instance)
         {
             TypeBuilder tb = GetTypeBuilder();
-            ConstructorBuilder constructor = tb.DefineDefaultConstructor(MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName);
+            ConstructorBuilder constructor = tb.DefineDefaultConstructor(
+                MethodAttributes.Public
+                    | MethodAttributes.SpecialName
+                    | MethodAttributes.RTSpecialName
+            );
 
-            var existingProperties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var existingProperties = typeof(T).GetProperties(
+                BindingFlags.Public | BindingFlags.Instance
+            );
 
             foreach (var property in existingProperties)
             {
                 ReplicateProperty(tb, property);
             }
 
-            var existingFields = typeof(T).GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
-            var capturedFields = tb.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+            var existingFields = typeof(T).GetFields(
+                BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            var capturedFields = tb.GetFields(
+                BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic
+            );
             var fieldsToCreate = existingFields.Except(capturedFields);
             foreach (var field in fieldsToCreate)
             {
@@ -92,16 +112,21 @@ namespace TypeBuilderNamespace
         {
             var typeSignature = "MyDynamicType";
             var an = new AssemblyName(typeSignature);
-            AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(an, AssemblyBuilderAccess.Run);
+            AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(
+                an,
+                AssemblyBuilderAccess.Run
+            );
             ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule("MainModule");
-            TypeBuilder tb = moduleBuilder.DefineType(typeSignature,
-                    TypeAttributes.Public |
-                    TypeAttributes.Class |
-                    TypeAttributes.AutoClass |
-                    TypeAttributes.AnsiClass |
-                    TypeAttributes.BeforeFieldInit |
-                    TypeAttributes.AutoLayout,
-                    null);
+            TypeBuilder tb = moduleBuilder.DefineType(
+                typeSignature,
+                TypeAttributes.Public
+                    | TypeAttributes.Class
+                    | TypeAttributes.AutoClass
+                    | TypeAttributes.AnsiClass
+                    | TypeAttributes.BeforeFieldInit
+                    | TypeAttributes.AutoLayout,
+                null
+            );
             return tb;
         }
 
@@ -109,22 +134,38 @@ namespace TypeBuilderNamespace
         {
             //FieldBuilder fieldBuilder = tb.DefineField("_" + propertyName, propertyType, FieldAttributes.Private);
             FieldInfo existingField = GetBackingField(property);
-            var fieldBuilder = tb.DefineField(existingField.Name, existingField.FieldType, existingField.Attributes);
+            var fieldBuilder = tb.DefineField(
+                existingField.Name,
+                existingField.FieldType,
+                existingField.Attributes
+            );
             var getAttributes = property.GetGetMethod().Attributes;
             var setAttributes = property.GetSetMethod().Attributes;
 
-            PropertyBuilder propertyBuilder = tb.DefineProperty(property.Name, property.Attributes, property.PropertyType, null);
-            MethodBuilder getPropMthdBldr = tb.DefineMethod("get_" + property.Name, getAttributes, property.PropertyType, Type.EmptyTypes);
+            PropertyBuilder propertyBuilder = tb.DefineProperty(
+                property.Name,
+                property.Attributes,
+                property.PropertyType,
+                null
+            );
+            MethodBuilder getPropMthdBldr = tb.DefineMethod(
+                "get_" + property.Name,
+                getAttributes,
+                property.PropertyType,
+                Type.EmptyTypes
+            );
             ILGenerator getIl = getPropMthdBldr.GetILGenerator();
 
             getIl.Emit(OpCodes.Ldarg_0);
             getIl.Emit(OpCodes.Ldfld, fieldBuilder);
             getIl.Emit(OpCodes.Ret);
 
-            MethodBuilder setPropMthdBldr =
-                tb.DefineMethod("set_" + property.Name,
-                  setAttributes,
-                  null, new[] { property.PropertyType });
+            MethodBuilder setPropMthdBldr = tb.DefineMethod(
+                "set_" + property.Name,
+                setAttributes,
+                null,
+                new[] { property.PropertyType }
+            );
 
             ILGenerator setIl = setPropMthdBldr.GetILGenerator();
             Label modifyProperty = setIl.DefineLabel();
@@ -143,25 +184,38 @@ namespace TypeBuilderNamespace
             propertyBuilder.SetSetMethod(setPropMthdBldr);
         }
 
-
         private static void CreateProperty(TypeBuilder tb, string propertyName, Type propertyType)
         {
-            FieldBuilder fieldBuilder = tb.DefineField("_" + propertyName, propertyType, FieldAttributes.Private);
+            FieldBuilder fieldBuilder = tb.DefineField(
+                "_" + propertyName,
+                propertyType,
+                FieldAttributes.Private
+            );
 
-            PropertyBuilder propertyBuilder = tb.DefineProperty(propertyName, PropertyAttributes.HasDefault, propertyType, null);
-            MethodBuilder getPropMthdBldr = tb.DefineMethod("get_" + propertyName, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig, propertyType, Type.EmptyTypes);
+            PropertyBuilder propertyBuilder = tb.DefineProperty(
+                propertyName,
+                PropertyAttributes.HasDefault,
+                propertyType,
+                null
+            );
+            MethodBuilder getPropMthdBldr = tb.DefineMethod(
+                "get_" + propertyName,
+                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+                propertyType,
+                Type.EmptyTypes
+            );
             ILGenerator getIl = getPropMthdBldr.GetILGenerator();
 
             getIl.Emit(OpCodes.Ldarg_0);
             getIl.Emit(OpCodes.Ldfld, fieldBuilder);
             getIl.Emit(OpCodes.Ret);
 
-            MethodBuilder setPropMthdBldr =
-                tb.DefineMethod("set_" + propertyName,
-                  MethodAttributes.Public |
-                  MethodAttributes.SpecialName |
-                  MethodAttributes.HideBySig,
-                  null, new[] { propertyType });
+            MethodBuilder setPropMthdBldr = tb.DefineMethod(
+                "set_" + propertyName,
+                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+                null,
+                new[] { propertyType }
+            );
 
             ILGenerator setIl = setPropMthdBldr.GetILGenerator();
             Label modifyProperty = setIl.DefineLabel();
@@ -192,7 +246,10 @@ namespace TypeBuilderNamespace
             for (int i = 0; i < instructions.Length; i++)
             {
                 // Look for the "ldfld" or "stfld" opcode, which is used to load or store a field
-                if (instructions[i] == OpCodes.Ldfld.Value || instructions[i] == OpCodes.Stfld.Value)
+                if (
+                    instructions[i] == OpCodes.Ldfld.Value
+                    || instructions[i] == OpCodes.Stfld.Value
+                )
                 {
                     // The next bytes represent the metadata token for the field
                     int metadataToken = BitConverter.ToInt32(instructions, i + 1);

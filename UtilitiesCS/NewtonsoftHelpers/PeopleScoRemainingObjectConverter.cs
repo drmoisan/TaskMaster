@@ -1,6 +1,6 @@
+using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 
 namespace ToDoModel.Data_Model.People
 {
@@ -11,7 +11,12 @@ namespace ToDoModel.Data_Model.People
             return objectType == typeof(object);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(
+            JsonReader reader,
+            Type objectType,
+            object existingValue,
+            JsonSerializer serializer
+        )
         {
             JObject jObject = JObject.Load(reader);
             return jObject.ToObject<PeopleScoRemainingObject>(serializer);

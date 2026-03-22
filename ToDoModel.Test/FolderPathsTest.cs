@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UtilitiesCS;
-using System.IO;
 
 namespace ToDoModel.Test
 {
@@ -26,12 +26,12 @@ namespace ToDoModel.Test
 
     //    string IFileSystemFolderPaths.FldrPythonStaging
     //    {
-    //        get 
+    //        get
     //        {
     //            return Path.Combine(
     //                Environment.GetEnvironmentVariable("OneDriveCommercial"),
-    //                "Email attachments from Flow", 
-    //                "Combined", 
+    //                "Email attachments from Flow",
+    //                "Combined",
     //                "data");
     //        }
     //    }

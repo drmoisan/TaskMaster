@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -8,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json.Linq;
 
 namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
 {
@@ -58,11 +58,13 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
 
         #region Events
 
-        private async void ButtonSave_Click(object sender, EventArgs e) => await Controller?.SaveAsync();
+        private async void ButtonSave_Click(object sender, EventArgs e) =>
+            await Controller?.SaveAsync();
 
         private void ButtonCancel_Click(object sender, EventArgs e) => Controller?.Cancel();
 
-        private async void ButtonOpen_Click(object sender, EventArgs e) => await Controller?.OpenFileChooserAsync();
+        private async void ButtonOpen_Click(object sender, EventArgs e) =>
+            await Controller?.OpenFileChooserAsync();
 
         private void GroupBox_Enter(object sender, EventArgs e)
         {
@@ -81,7 +83,6 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
             {
                 Controller?.ActivateDiskGroup(box.DiskType);
             }
-
         }
 
         private void GroupBox_Leave(object sender, EventArgs e)
@@ -110,11 +111,17 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
             {
                 if (box.DiskType == diskType)
                 {
-                    if (!box.IsActive) { ActivateUiBox(box); }
+                    if (!box.IsActive)
+                    {
+                        ActivateUiBox(box);
+                    }
                 }
                 else
                 {
-                    if (box.IsActive) { DeactivateUiBox(box); }
+                    if (box.IsActive)
+                    {
+                        DeactivateUiBox(box);
+                    }
                 }
             }
         }
@@ -136,6 +143,5 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
         }
 
         #endregion Methods
-
     }
 }

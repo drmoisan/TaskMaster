@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Windows.Forms;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SVGControl
 {
@@ -42,8 +42,9 @@ namespace SVGControl
                 path.CloseFigure();
                 e.Graphics.FillPath(Checked ? Brushes.DarkGray : Brushes.LightGray, path);
                 r = Height - 1;
-                var rect = Checked ? new Rectangle(Width - r - 1, 0, r, r)
-                                   : new Rectangle(0, 0, r, r);
+                var rect = Checked
+                    ? new Rectangle(Width - r - 1, 0, r, r)
+                    : new Rectangle(0, 0, r, r);
                 e.Graphics.FillEllipse(Checked ? Brushes.Green : Brushes.WhiteSmoke, rect);
             }
         }

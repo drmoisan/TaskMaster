@@ -10,7 +10,8 @@ namespace UtilitiesCS.ReusableTypeClasses.Matrices
     /// Taken from https://codereview.stackexchange.com/questions/204889/2d-matrix-with-jagged-array-isnt-faster-than-one-with-a-multidimensional-array
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class JagMatrix<T> : IDisposable where T : struct, IComparable<T>
+    public class JagMatrix<T> : IDisposable
+        where T : struct, IComparable<T>
     {
         private T[][] __array2d;
         public int Width { get; set; }
@@ -19,12 +20,15 @@ namespace UtilitiesCS.ReusableTypeClasses.Matrices
         {
             get
             {
-                if (__array2d == null) return true;
-                else return false;
+                if (__array2d == null)
+                    return true;
+                else
+                    return false;
             }
         }
 
         public JagMatrix() { }
+
         public JagMatrix(T[][] data)
         {
             this.Set(data);
@@ -41,6 +45,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Matrices
                 __array2d[i] = new T[Height];
             }
         }
+
         public T Get(int x, int y)
         {
             if (__array2d == null)
@@ -62,8 +67,10 @@ namespace UtilitiesCS.ReusableTypeClasses.Matrices
             {
                 string message = string.Empty;
 
-                if (x >= Width) message = "x-value exceeds Width ";
-                if (y >= Height) message += "y-value exceeds Height ";
+                if (x >= Width)
+                    message = "x-value exceeds Width ";
+                if (y >= Height)
+                    message += "y-value exceeds Height ";
                 message += "in Array2d.Get(x,y).";
 
                 throw new Exception(message);
@@ -100,7 +107,6 @@ namespace UtilitiesCS.ReusableTypeClasses.Matrices
             }
             else
             {
-
                 throw new Exception(x + ", " + Width + "," + y + "," + Height);
             }
         }
@@ -122,14 +128,8 @@ namespace UtilitiesCS.ReusableTypeClasses.Matrices
 
         public T this[int x, int y]
         {
-            get
-            {
-                return Get(x, y);
-            }
-            set
-            {
-                Set(x, y, value);
-            }
+            get { return Get(x, y); }
+            set { Set(x, y, value); }
         }
 
         public void Set(T[][] arr)

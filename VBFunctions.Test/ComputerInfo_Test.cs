@@ -1,8 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using VBFunctions;
-using UtilitiesCS;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UtilitiesCS;
+using VBFunctions;
 
 namespace VBFunctions.Test
 {
@@ -34,23 +34,47 @@ namespace VBFunctions.Test
 
             var jagged = new List<string[]>
             {
-                new string[] { "AvailablePhysicalMemory", $"{availablePhysicalMemory / (double)Math.Pow(10,9):N2} GB" },
-                new string[] { "TotalPhysicalMemory", $"{totalPhysicalMemory / (double)Math.Pow(10, 9):N2} GB" },
-                new string[] { "AvailableVirtualMemory", $"{availableVirtualMemory / (double)Math.Pow(10, 9):N2} GB" },
-                new string[] { "TotalVirtualMemory", $"{totalVirtualMemory / (double)Math.Pow(10, 9):N2} GB" }
+                new string[]
+                {
+                    "AvailablePhysicalMemory",
+                    $"{availablePhysicalMemory / (double)Math.Pow(10, 9):N2} GB",
+                },
+                new string[]
+                {
+                    "TotalPhysicalMemory",
+                    $"{totalPhysicalMemory / (double)Math.Pow(10, 9):N2} GB",
+                },
+                new string[]
+                {
+                    "AvailableVirtualMemory",
+                    $"{availableVirtualMemory / (double)Math.Pow(10, 9):N2} GB",
+                },
+                new string[]
+                {
+                    "TotalVirtualMemory",
+                    $"{totalVirtualMemory / (double)Math.Pow(10, 9):N2} GB",
+                },
             };
 
-            Console.WriteLine(jagged.ToArray().ToFormattedText(
-                ["Property", "Value"],
-                [Enums.Justification.Left, Enums.Justification.Right],
-                "Memory Stats"));
+            Console.WriteLine(
+                jagged
+                    .ToArray()
+                    .ToFormattedText(
+                        ["Property", "Value"],
+                        [Enums.Justification.Left, Enums.Justification.Right],
+                        "Memory Stats"
+                    )
+            );
 
             // Assert
 
-            Assert.IsTrue(totalPhysicalMemory > availablePhysicalMemory && availablePhysicalMemory > 0);
-            Assert.IsTrue(totalVirtualMemory > availableVirtualMemory && availableVirtualMemory > 0);
+            Assert.IsTrue(
+                totalPhysicalMemory > availablePhysicalMemory && availablePhysicalMemory > 0
+            );
+            Assert.IsTrue(
+                totalVirtualMemory > availableVirtualMemory && availableVirtualMemory > 0
+            );
             Assert.IsTrue(totalVirtualMemory > totalPhysicalMemory);
-
         }
     }
 }

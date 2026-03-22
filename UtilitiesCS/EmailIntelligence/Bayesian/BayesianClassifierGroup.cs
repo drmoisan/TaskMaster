@@ -1,11 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.ReusableTypeClasses;
@@ -15,7 +15,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
     public class BayesianClassifierGroup : SmartSerializable<BayesianClassifierGroup>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors
 
@@ -29,28 +30,58 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Public Properties
 
-        public ConcurrentDictionary<string, BayesianClassifierShared> Classifiers { get => _classifiers; protected set => _classifiers = value; }
+        public ConcurrentDictionary<string, BayesianClassifierShared> Classifiers
+        {
+            get => _classifiers;
+            protected set => _classifiers = value;
+        }
         protected ConcurrentDictionary<string, BayesianClassifierShared> _classifiers;
 
         [JsonProperty(Order = -2)]
-        public Corpus SharedTokenBase { get => _sharedTokenBase; set => _sharedTokenBase = value; }
+        public Corpus SharedTokenBase
+        {
+            get => _sharedTokenBase;
+            set => _sharedTokenBase = value;
+        }
         protected Corpus _sharedTokenBase = new();
 
         [JsonProperty(Order = -1)]
-        public int TotalEmailCount { get => _totalEmailCount; set => _totalEmailCount = value; }
+        public int TotalEmailCount
+        {
+            get => _totalEmailCount;
+            set => _totalEmailCount = value;
+        }
         protected int _totalEmailCount;
 
         public IApplicationGlobals Globals { get; set; }
 
         [JsonIgnore]
-        public Func<object, IApplicationGlobals, IEnumerable<string>> Tokenize { get => _tokenize; set => _tokenize = value; }
-        private Func<object, IApplicationGlobals, IEnumerable<string>> _tokenize = new EmailTokenizer().Tokenize;
+        public Func<object, IApplicationGlobals, IEnumerable<string>> Tokenize
+        {
+            get => _tokenize;
+            set => _tokenize = value;
+        }
+        private Func<object, IApplicationGlobals, IEnumerable<string>> _tokenize =
+            new EmailTokenizer().Tokenize;
 
         [JsonIgnore]
-        public Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> TokenizeAsync { get => _tokenizeAsync; set => _tokenizeAsync = value; }
-        private Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> _tokenizeAsync = new EmailTokenizer().TokenizeAsync;
+        public Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> TokenizeAsync
+        {
+            get => _tokenizeAsync;
+            set => _tokenizeAsync = value;
+        }
+        private Func<
+            object,
+            IApplicationGlobals,
+            CancellationToken,
+            Task<string[]>
+        > _tokenizeAsync = new EmailTokenizer().TokenizeAsync;
 
-        public double MinimumProbability { get => _minimumProbability; set => _minimumProbability = value; }
+        public double MinimumProbability
+        {
+            get => _minimumProbability;
+            set => _minimumProbability = value;
+        }
         protected double _minimumProbability = 0.0;
 
         #endregion Public Properties
@@ -71,26 +102,37 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     }
                 }
             }
-
         }
 
-        public async Task UnTrainMultiTagAsync(IEnumerable<string> tags, IEnumerable<string> matchTokens, int emailCount, CancellationToken cancel)
+        public async Task UnTrainMultiTagAsync(
+            IEnumerable<string> tags,
+            IEnumerable<string> matchTokens,
+            int emailCount,
+            CancellationToken cancel
+        )
         {
-            await Task.Run(() => UnTrainMultiTag(tags, matchTokens, emailCount), cancel).ConfigureAwait(false);
+            await Task.Run(() => UnTrainMultiTag(tags, matchTokens, emailCount), cancel)
+                .ConfigureAwait(false);
         }
 
-        public void UnTrainMultiTag(IEnumerable<string> tags, IEnumerable<string> matchTokens, int emailCount)
+        public void UnTrainMultiTag(
+            IEnumerable<string> tags,
+            IEnumerable<string> matchTokens,
+            int emailCount
+        )
         {
             var matchFrequency = matchTokens.GroupAndCount();
 
             AddToEmailCount(-emailCount);
 
-            matchFrequency.ForEach(
-                kvp => SharedTokenBase.TokenFrequency.UpdateOrRemove(
+            matchFrequency.ForEach(kvp =>
+                SharedTokenBase.TokenFrequency.UpdateOrRemove(
                     kvp.Key,
                     (key, oldValue) => oldValue - kvp.Value <= 0,
                     (key, oldValue) => oldValue - kvp.Value,
-                    out int tokenCount));
+                    out int tokenCount
+                )
+            );
 
             foreach (var tag in tags)
             {
@@ -98,7 +140,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 {
                     classifier.UnTrainMultiTag(matchFrequency, emailCount);
                 }
-
             }
         }
 
@@ -109,22 +150,34 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             classifier.Train(matchFrequency, emailCount);
         }
 
-        public async Task TrainMultiTagAsync(IEnumerable<string> tags, IEnumerable<string> matchTokens, int emailCount, CancellationToken cancel)
+        public async Task TrainMultiTagAsync(
+            IEnumerable<string> tags,
+            IEnumerable<string> matchTokens,
+            int emailCount,
+            CancellationToken cancel
+        )
         {
-            await Task.Run(() => TrainMultiTag(tags, matchTokens, emailCount), cancel).ConfigureAwait(false);
+            await Task.Run(() => TrainMultiTag(tags, matchTokens, emailCount), cancel)
+                .ConfigureAwait(false);
         }
 
-        public void TrainMultiTag(IEnumerable<string> tags, IEnumerable<string> matchTokens, int emailCount)
+        public void TrainMultiTag(
+            IEnumerable<string> tags,
+            IEnumerable<string> matchTokens,
+            int emailCount
+        )
         {
             var matchFrequency = matchTokens.GroupAndCount();
 
             AddToEmailCount(emailCount);
 
-            matchFrequency.ForEach(
-                kvp => SharedTokenBase.TokenFrequency.AddOrUpdate(
+            matchFrequency.ForEach(kvp =>
+                SharedTokenBase.TokenFrequency.AddOrUpdate(
                     kvp.Key,
                     kvp.Value,
-                    (sharedKey, existingValue) => existingValue + kvp.Value));
+                    (sharedKey, existingValue) => existingValue + kvp.Value
+                )
+            );
 
             foreach (var tag in tags)
             {
@@ -133,17 +186,31 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
         }
 
-        private BayesianClassifierShared CreateNewClassifier(string tag, BayesianClassifierGroup instance) => new BayesianClassifierShared(tag, instance);
+        private BayesianClassifierShared CreateNewClassifier(
+            string tag,
+            BayesianClassifierGroup instance
+        ) => new BayesianClassifierShared(tag, instance);
 
         public void AddToEmailCount(int count)
         {
             Interlocked.Add(ref _totalEmailCount, count);
         }
 
-        public async Task RebuildClassifier(string tag, IDictionary<string, int> matchTokens, int matchEmailCount, CancellationToken cancel)
+        public async Task RebuildClassifier(
+            string tag,
+            IDictionary<string, int> matchTokens,
+            int matchEmailCount,
+            CancellationToken cancel
+        )
         {
             _classifiers[tag] = await BayesianClassifierShared.FromTokenBaseAsync(
-                this, tag, matchTokens, matchEmailCount, false, cancel);
+                this,
+                tag,
+                matchTokens,
+                matchEmailCount,
+                false,
+                cancel
+            );
         }
 
         #endregion Public Model Training Methods
@@ -166,19 +233,25 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         public OrderedParallelQuery<Prediction<string>> Classify(
-            IDictionary<string, int> tokenIncidence)
+            IDictionary<string, int> tokenIncidence
+        )
         {
-            var results = Classifiers.AsParallel()
+            var results = Classifiers
+                .AsParallel()
                 .Select(classifier => new Prediction<string>(
                     classifier.Key,
                     //classifier.Value.GetMatchProbability(tokenIncidence)))
-                    classifier.Value.Chi2SpamProb(tokenIncidence)))
+                    classifier.Value.Chi2SpamProb(tokenIncidence)
+                ))
                 .Where(x => x.Probability >= MinimumProbability)
                 .OrderByDescending(x => x.Probability);
             return results;
         }
 
-        public async ValueTask<Prediction<string>[]> ClassifyAsync(object source, CancellationToken cancel)
+        public async ValueTask<Prediction<string>[]> ClassifyAsync(
+            object source,
+            CancellationToken cancel
+        )
         {
             var tokens = await TokenizeAsync(source, Globals, cancel);
             var tokenIncidence = await tokens.GroupAndCountAsync();
@@ -186,20 +259,29 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return result;
         }
 
-        public async ValueTask<Prediction<string>[]> ClassifyAsync(string[] tokens, CancellationToken cancel)
+        public async ValueTask<Prediction<string>[]> ClassifyAsync(
+            string[] tokens,
+            CancellationToken cancel
+        )
         {
             var tokenIncidence = tokens.GroupAndCount();
             return await ClassifyAsync(tokenIncidence, cancel).ToArrayAsync();
         }
 
-
         public IOrderedAsyncEnumerable<Prediction<string>> ClassifyAsync(
-            IDictionary<string, int> tokenIncidence, CancellationToken cancel)
+            IDictionary<string, int> tokenIncidence,
+            CancellationToken cancel
+        )
         {
-            var results = Classifiers.ToAsyncEnumerable()
-                .SelectAwait(async (classifier) => new Prediction<string>(
-                    classifier.Key,
-                    await classifier.Value.Chi2SpamProbAsync(tokenIncidence.Keys.ToArray())))
+            var results = Classifiers
+                .ToAsyncEnumerable()
+                .SelectAwait(
+                    async (classifier) =>
+                        new Prediction<string>(
+                            classifier.Key,
+                            await classifier.Value.Chi2SpamProbAsync(tokenIncidence.Keys.ToArray())
+                        )
+                )
                 //await classifier.Value.GetMatchProbabilityAsync(tokenIncidence, cancel)))
                 .Where(x => x.Probability >= MinimumProbability)
                 .OrderByDescending(prediction => prediction.Probability);
@@ -289,14 +371,20 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         //    //LogMetrics();
         //}
 
-        internal string GetReportMessage(int completed, int count, SegmentStopWatch sw, string header = "Completed")
+        internal string GetReportMessage(
+            int completed,
+            int count,
+            SegmentStopWatch sw,
+            string header = "Completed"
+        )
         {
             string message;
             if (completed > 0)
             {
                 var speed = sw.Elapsed.TotalSeconds / (double)completed;
                 var remaining = TimeSpan.FromSeconds((count - completed) * speed);
-                message = $"{header} {completed} of {count} @ {speed:N2} per sec ({remaining:mm\\:ss} remaining)";
+                message =
+                    $"{header} {completed} of {count} @ {speed:N2} per sec ({remaining:mm\\:ss} remaining)";
             }
             else
             {
@@ -362,7 +450,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             //        }
             //        else
             //        {
-            //            // If Not, it means it has become a shared token. 
+            //            // If Not, it means it has become a shared token.
             //            // Remove the token and mark it for migration to shared tokens
             //            moveDedicatedToShared = _dedicatedTokens3.Remove(key);
             //        }
@@ -375,8 +463,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             //    }
             //    else
             //    {
-            //        // Token is new. Add to dedicated tokens 
-            //        _dedicatedTokens3.Add(key, new DedicatedToken 
+            //        // Token is new. Add to dedicated tokens
+            //        _dedicatedTokens3.Add(key, new DedicatedToken
             //            { Token = key, FolderPath = tag, Count = count });
             //        return;
             //    }
@@ -391,7 +479,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             //    // Add to dedicated tokens
             //}
             //    // Add to the bayesian clasifier and update the probability
-
         }
 
         [Obsolete]
@@ -420,7 +507,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             //    { Token = key, FolderPath = tag, Count = value });
             //}
         }
-
 
         #endregion obsolete
     }

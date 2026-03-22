@@ -24,28 +24,38 @@ namespace UtilitiesCS.Threading
             ApplicationIdleTimer.CPUUsageThreshold = CPUUsageThreshold;
         }
 
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public static void AddEntry(bool useUiThread, Func<Task> actionAsync)
         {
             if (_subscribeGuard.CheckAndSetFirstCall)
             {
                 ApplicationIdleTimer.Subscribe(OnApplicationIdle);
-                logger.Debug($"{nameof(IdleAsyncQueue)}.{nameof(AddEntry)} subscribed to {nameof(ApplicationIdleTimer)}");
+                logger.Debug(
+                    $"{nameof(IdleAsyncQueue)}.{nameof(AddEntry)} subscribed to {nameof(ApplicationIdleTimer)}"
+                );
             }
             Entries.Enqueue((useUiThread, actionAsync));
         }
 
         private static ThreadSafeSingleShotGuard _subscribeGuard = new ThreadSafeSingleShotGuard();
 
-        private static TimedBatchAction _unsubscribe = new(TimeSpan.FromSeconds(3), () =>
-        {
-            ApplicationIdleTimer.Unsubscribe(OnApplicationIdle);
-            logger.Debug($"{nameof(IdleAsyncQueue)} unsubscribed from {nameof(ApplicationIdleTimer)}");
-            _subscribeGuard = new ThreadSafeSingleShotGuard();
-        });
+        private static TimedBatchAction _unsubscribe = new(
+            TimeSpan.FromSeconds(3),
+            () =>
+            {
+                ApplicationIdleTimer.Unsubscribe(OnApplicationIdle);
+                logger.Debug(
+                    $"{nameof(IdleAsyncQueue)} unsubscribed from {nameof(ApplicationIdleTimer)}"
+                );
+                _subscribeGuard = new ThreadSafeSingleShotGuard();
+            }
+        );
 
-        private static ConcurrentQueue<(bool UiThread, Func<Task> AsyncAction)> Entries { get; } = new();
+        private static ConcurrentQueue<(bool UiThread, Func<Task> AsyncAction)> Entries { get; } =
+            new();
 
         private static async void OnApplicationIdle(ApplicationIdleTimer.ApplicationIdleEventArgs e)
         {
@@ -71,7 +81,9 @@ namespace UtilitiesCS.Threading
                     }
                     catch (Exception ex)
                     {
-                        logger.Error($"Failed to execute {nameof(IdleAsyncQueue)}.{nameof(entry.actionAsync)}");
+                        logger.Error(
+                            $"Failed to execute {nameof(IdleAsyncQueue)}.{nameof(entry.actionAsync)}"
+                        );
                         logger.Error(ex.Message, ex);
                     }
                 }

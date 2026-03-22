@@ -37,22 +37,32 @@ namespace UtilitiesCS
         #region Public Properties
 
         private string identifier = "not set";
-        public string Identifier { get => identifier; set => identifier = value; }
+        public string Identifier
+        {
+            get => identifier;
+            set => identifier = value;
+        }
 
         private ObservableCollection<string> _list = new();
         public ObservableCollection<string> List
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get => _list;
-
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
-                if (value is null) { _list.Clear(); }
+                if (value is null)
+                {
+                    _list.Clear();
+                }
                 else
                 {
                     //IEnumerable<string> temp;
-                    if (value.Count > 0 && value[0].Length >= Prefix.Length && value[0].Substring(0, Prefix.Length) == Prefix)
+                    if (
+                        value.Count > 0
+                        && value[0].Length >= Prefix.Length
+                        && value[0].Substring(0, Prefix.Length) == Prefix
+                    )
                     {
                         //temp = value.Select(x => x.Replace(Prefix, ""));
                         for (int i = 0; i < value.Count; i++)
@@ -70,7 +80,14 @@ namespace UtilitiesCS
                         var oldValue = _list;
                         _list = value;
                         Subscribe();
-                        List_CollectionChanged(_list, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, oldValue, value));
+                        List_CollectionChanged(
+                            _list,
+                            new NotifyCollectionChangedEventArgs(
+                                NotifyCollectionChangedAction.Replace,
+                                oldValue,
+                                value
+                            )
+                        );
                     }
                 }
             }
@@ -83,15 +100,24 @@ namespace UtilitiesCS
             get => _listWithPrefix;
         }
 
-
         private string _withPrefix = "";
-        public string WithPrefix { get => _withPrefix; }
+        public string WithPrefix
+        {
+            get => _withPrefix;
+        }
 
         private string _noPrefix = "";
-        public string NoPrefix { get => _noPrefix; }
+        public string NoPrefix
+        {
+            get => _noPrefix;
+        }
 
         private string _prefix = "";
-        public string Prefix { get => _prefix; set => _prefix = value; }
+        public string Prefix
+        {
+            get => _prefix;
+            set => _prefix = value;
+        }
 
         #endregion
 
@@ -141,10 +167,15 @@ namespace UtilitiesCS
             CollectionChanged?.Invoke(this, e);
         }
 
-        private void ListWithPrefix_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void ListWithPrefix_CollectionChanged(
+            object sender,
+            NotifyCollectionChangedEventArgs e
+        )
         {
             Unsubscribe();
-            _list = new ObservableCollection<string>(_listWithPrefix.Select(x => x.Replace(Prefix, "")));
+            _list = new ObservableCollection<string>(
+                _listWithPrefix.Select(x => x.Replace(Prefix, ""))
+            );
             _withPrefix = string.Join(", ", _listWithPrefix);
             _noPrefix = string.Join(", ", _list);
             Subscribe();
@@ -183,6 +214,5 @@ namespace UtilitiesCS
         }
 
         #endregion IClonable
-
     }
 }

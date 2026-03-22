@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -11,8 +13,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Collections.Concurrent;
-using System.Threading;
 
 namespace Swordfish.NET.Test
 {
@@ -22,7 +22,6 @@ namespace Swordfish.NET.Test
     /// </summary>
     public partial class DictionaryTester : UserControl
     {
-
         // ************************************************************************
         // Private Fields
         // ************************************************************************
@@ -32,18 +31,22 @@ namespace Swordfish.NET.Test
         /// The list being tested
         /// </summary>
         private IDictionary<string, string> list;
+
         /// <summary>
         /// A dictionary mapping how many times a key has been updated
         /// </summary>
         private Dictionary<string, int> versions;
+
         /// <summary>
         /// Random number generator for generating list items
         /// </summary>
         private Random random;
+
         /// <summary>
         /// List of actions to be taken on the list being tested
         /// </summary>
         private BlockingCollection<Action> actions;
+
         /// <summary>
         /// Flag indicating if values should be added to the collection
         /// concurrently or not
@@ -69,20 +72,19 @@ namespace Swordfish.NET.Test
 
             actions = new BlockingCollection<Action>();
             Thread collectionUpdater = new Thread(
-              delegate ()
-              {
-                  while (true)
-                  {
-                      foreach (Action d in actions.GetConsumingEnumerable())
-                      {
-                          d();
-                      }
-                  }
-              }
+                delegate()
+                {
+                    while (true)
+                    {
+                        foreach (Action d in actions.GetConsumingEnumerable())
+                        {
+                            d();
+                        }
+                    }
+                }
             );
             collectionUpdater.IsBackground = true;
             collectionUpdater.Start();
-
         }
 
         /// <summary>
@@ -91,7 +93,11 @@ namespace Swordfish.NET.Test
         /// </summary>
         /// <param name="list"></param>
         /// <param name="elementCount"></param>
-        public void InitializeList(IDictionary<string, string> list, int elementCount, bool concurrent)
+        public void InitializeList(
+            IDictionary<string, string> list,
+            int elementCount,
+            bool concurrent
+        )
         {
             this.list = list;
             this.random = new Random(100);
@@ -183,29 +189,29 @@ namespace Swordfish.NET.Test
         /// <param name="e"></param>
         private void KeyValueRemove_Click(object sender, RoutedEventArgs e)
         {
-
             // Check if an item is selected
             if (KeyValueList.SelectedItem != null)
             {
-
                 // Retain the selected indicies as the selection gets lost on an update
                 lastKeyValueSelectedIndex = this.KeyValueList.SelectedIndex;
                 lastKeySelectedIndex = this.KeyList.SelectedIndex;
 
                 // Get the selected item
-                KeyValuePair<string, string> pair = (KeyValuePair<string, string>)KeyValueList.SelectedItem;
+                KeyValuePair<string, string> pair =
+                    (KeyValuePair<string, string>)KeyValueList.SelectedItem;
 
                 // Exectue the collection update on a separate thread by adding this
                 // annoymous delegate to our delegate queue.
-                AddAction(delegate ()
-                {
-                    list.Remove(pair);
-                    versions.Remove(pair.Key);
-                });
+                AddAction(
+                    delegate()
+                    {
+                        list.Remove(pair);
+                        versions.Remove(pair.Key);
+                    }
+                );
 
                 // Update the status at the bottom to reflect the last action
                 LastActionMessage.Text = "Action: Removed " + pair.ToString();
-
             }
         }
 
@@ -216,11 +222,9 @@ namespace Swordfish.NET.Test
         /// <param name="e"></param>
         private void KeyRemove_Click(object sender, RoutedEventArgs e)
         {
-
             // Check if an item is selected
             if (KeyList.SelectedItem != null)
             {
-
                 // Retain the selected indicies as the selection gets lost on an update
                 lastKeyValueSelectedIndex = this.KeyValueList.SelectedIndex;
                 lastKeySelectedIndex = this.KeyList.SelectedIndex;
@@ -230,15 +234,16 @@ namespace Swordfish.NET.Test
 
                 // Exectue the collection update on a separate thread by adding this
                 // annoymous delegate to our delegate queue.
-                AddAction(delegate ()
-                {
-                    list.Remove(key);
-                    versions.Remove(key);
-                });
+                AddAction(
+                    delegate()
+                    {
+                        list.Remove(key);
+                        versions.Remove(key);
+                    }
+                );
 
                 // Update the status at the bottom to reflect the last action
                 LastActionMessage.Text = "Action: Removed " + key.ToString();
-
             }
         }
 
@@ -249,11 +254,9 @@ namespace Swordfish.NET.Test
         /// <param name="e"></param>
         private void KeyUpdate_Click(object sender, RoutedEventArgs e)
         {
-
             // Check if an item is selected
             if (KeyList.SelectedItem != null)
             {
-
                 // Retain the selected indicies as the selection gets lost on an update
                 lastKeyValueSelectedIndex = this.KeyValueList.SelectedIndex;
                 lastKeySelectedIndex = this.KeyList.SelectedIndex;
@@ -264,14 +267,15 @@ namespace Swordfish.NET.Test
 
                 // Exectue the collection update on a separate thread by adding this
                 // annoymous delegate to our delegate queue.
-                AddAction(delegate ()
-                {
-                    list[key] = value;
-                });
+                AddAction(
+                    delegate()
+                    {
+                        list[key] = value;
+                    }
+                );
 
                 // Update the status at the bottom to reflect the last action
                 LastActionMessage.Text = "Action: Updated " + key.ToString();
-
             }
         }
 
@@ -282,7 +286,6 @@ namespace Swordfish.NET.Test
         /// <param name="e"></param>
         private void AddNew_Click(object sender, RoutedEventArgs e)
         {
-
             // Don't want to propagate an invalid index after an item could
             // be inserted before the current selected index so clear these
 
@@ -295,11 +298,13 @@ namespace Swordfish.NET.Test
 
             // Exectue the collection update on a separate thread by adding this
             // annoymous delegate to our delegate queue.
-            AddAction(delegate ()
-            {
-                list.Add(key, value);
-                versions[key] = 0;
-            });
+            AddAction(
+                delegate()
+                {
+                    list.Add(key, value);
+                    versions[key] = 0;
+                }
+            );
 
             // Update the status at the bottom to reflect the last action
             LastActionMessage.Text = "Action: Added " + key.ToString();
@@ -312,7 +317,6 @@ namespace Swordfish.NET.Test
         /// <param name="e"></param>
         private void AddNewOrUpdate_Click(object sender, RoutedEventArgs e)
         {
-
             // Get a random key to create or update depending on whether it
             // already exists or not.
             string key = GetRandomKey();
@@ -320,7 +324,6 @@ namespace Swordfish.NET.Test
             // Check if the key exists
             if (versions.ContainsKey(key))
             {
-
                 // Retain the selected indicies as the selection gets lost on an update
                 lastKeyValueSelectedIndex = this.KeyValueList.SelectedIndex;
                 lastKeySelectedIndex = this.KeyList.SelectedIndex;
@@ -330,15 +333,15 @@ namespace Swordfish.NET.Test
 
                 // Exectue the collection update on a separate thread by adding this
                 // annoymous delegate to our delegate queue.
-                AddAction(delegate ()
-                {
-                    list[key] = value;
-                });
-
+                AddAction(
+                    delegate()
+                    {
+                        list[key] = value;
+                    }
+                );
             }
             else
             {
-
                 // Don't want to propagate an invalid index after an item could
                 // be inserted before the current selected index so clear these
                 lastKeyValueSelectedIndex = -1;
@@ -350,11 +353,12 @@ namespace Swordfish.NET.Test
 
                 // Exectue the collection update on a separate thread by adding this
                 // annoymous delegate to our delegate queue.
-                AddAction(delegate ()
-                {
-                    list[key] = value;
-                });
-
+                AddAction(
+                    delegate()
+                    {
+                        list[key] = value;
+                    }
+                );
             }
 
             // Update the status at the bottom to reflect the last action
@@ -370,7 +374,10 @@ namespace Swordfish.NET.Test
             {
                 if (this.lastKeyValueSelectedIndex > -1 && this.KeyValueList.Items.Count > 0)
                 {
-                    this.KeyValueList.SelectedIndex = Math.Min(this.lastKeyValueSelectedIndex, this.KeyValueList.Items.Count - 1);
+                    this.KeyValueList.SelectedIndex = Math.Min(
+                        this.lastKeyValueSelectedIndex,
+                        this.KeyValueList.Items.Count - 1
+                    );
                 }
             }
         }
@@ -384,11 +391,13 @@ namespace Swordfish.NET.Test
             {
                 if (this.lastKeySelectedIndex > -1 && this.KeyList.Items.Count > 0)
                 {
-                    this.KeyList.SelectedIndex = Math.Min(this.lastKeySelectedIndex, this.KeyList.Items.Count - 1);
+                    this.KeyList.SelectedIndex = Math.Min(
+                        this.lastKeySelectedIndex,
+                        this.KeyList.Items.Count - 1
+                    );
                 }
             }
         }
-
 
         #endregion Event Handlers
     }

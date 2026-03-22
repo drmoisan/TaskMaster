@@ -1,7 +1,7 @@
-﻿using QuickFiler.Interfaces;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using QuickFiler.Interfaces;
 using UtilitiesCS;
 
 namespace QuickFiler.Controllers

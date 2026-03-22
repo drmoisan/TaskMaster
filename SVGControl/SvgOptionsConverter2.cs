@@ -15,7 +15,8 @@ namespace SVGControl
             ITypeDescriptorContext context,
             CultureInfo culture,
             object value,
-            Type destinationType)
+            Type destinationType
+        )
         {
             if (destinationType == typeof(string))
             {
@@ -28,15 +29,22 @@ namespace SVGControl
                         string autoSizeCode;
                         switch (image.AutoSize)
                         {
-                            case AutoSize.Disabled: autoSizeCode = "[Static]"; break;
-                            case AutoSize.MaintainAspectRatio: autoSizeCode = "[Proportional]"; break;
-                            case AutoSize.AllowStretching: autoSizeCode = "[Stretchable]"; break;
-                            default: autoSizeCode = "[]"; break;
+                            case AutoSize.Disabled:
+                                autoSizeCode = "[Static]";
+                                break;
+                            case AutoSize.MaintainAspectRatio:
+                                autoSizeCode = "[Proportional]";
+                                break;
+                            case AutoSize.AllowStretching:
+                                autoSizeCode = "[Stretchable]";
+                                break;
+                            default:
+                                autoSizeCode = "[]";
+                                break;
                         }
 
                         return $"{resourceName} {autoSizeCode}";
                     }
-
                     //if (image.AboluteImagePath != null)
                     //{
                     //    string filename = Path.GetFileName(image.AboluteImagePath);
@@ -51,18 +59,15 @@ namespace SVGControl
 
                     //    return $"{filename} {autoSizeCode}";
                     //}
-                    else { return "(none)"; }
-
+                    else
+                    {
+                        return "(none)";
+                    }
                 }
                 return "";
             }
 
-            return base.ConvertTo(
-                context,
-                culture,
-                value,
-                destinationType);
+            return base.ConvertTo(context, culture, value, destinationType);
         }
     }
-
 }

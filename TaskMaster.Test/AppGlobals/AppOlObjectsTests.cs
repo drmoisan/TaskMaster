@@ -1,8 +1,8 @@
+using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System.Runtime.InteropServices;
 
 namespace TaskMaster.Test.AppGlobals
 {
@@ -71,7 +71,9 @@ namespace TaskMaster.Test.AppGlobals
         {
             // Arrange
             var addressEntry = mockRepository.Create<AddressEntry>();
-            addressEntry.Setup(x => x.GetExchangeUser()).Throws(new COMException("The operation failed."));
+            addressEntry
+                .Setup(x => x.GetExchangeUser())
+                .Throws(new COMException("The operation failed."));
             addressEntry.SetupGet(x => x.Address).Throws(new COMException("The operation failed."));
 
             // Act
@@ -80,6 +82,49 @@ namespace TaskMaster.Test.AppGlobals
             // Assert
             result.Should().BeNull();
             mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void ReadJunkPotentialSetting_ReturnsJunkPotentialValue()
+        {
+            // Arrange
+            var original = Properties.Settings.Default.JunkPotential;
+            var expected = "Inbox\\Junk Suspects SB";
+            Properties.Settings.Default.JunkPotential = expected;
+
+            try
+            {
+                // Act
+                var result = AppOlObjects.ReadJunkPotentialSetting();
+
+                // Assert
+                result.Should().Be(expected);
+            }
+            finally
+            {
+                Properties.Settings.Default.JunkPotential = original;
+            }
+        }
+
+        [TestMethod]
+        public void WriteJunkPotentialSetting_UpdatesJunkPotentialValue()
+        {
+            // Arrange
+            var original = Properties.Settings.Default.JunkPotential;
+            var expected = "Inbox\\Junk Suspects SB";
+
+            try
+            {
+                // Act
+                AppOlObjects.WriteJunkPotentialSetting(expected);
+
+                // Assert
+                Properties.Settings.Default.JunkPotential.Should().Be(expected);
+            }
+            finally
+            {
+                Properties.Settings.Default.JunkPotential = original;
+            }
         }
     }
 }

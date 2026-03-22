@@ -1,6 +1,6 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 
 namespace TaskMaster

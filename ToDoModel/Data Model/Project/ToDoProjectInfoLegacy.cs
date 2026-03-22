@@ -6,12 +6,11 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
-using UtilitiesCS;
 using ToDoModel.Legacy;
+using UtilitiesCS;
 
 namespace ToDoModel.Legacy
 {
-
     [Serializable()]
     public class ProjectInfoLegacy : List<IProjectEntry>, IProjectInfoLegacy
     {
@@ -54,9 +53,10 @@ namespace ToDoModel.Legacy
         {
             try
             {
-                var query = from project in projectNames.Split(',').Select(x => x.Trim())
-                            join projectInfo in this on project equals projectInfo.ProjectName
-                            select projectInfo.ProgramName;
+                var query =
+                    from project in projectNames.Split(',').Select(x => x.Trim())
+                    join projectInfo in this on project equals projectInfo.ProjectName
+                    select projectInfo.ProgramName;
 
                 string strTemp = query.First().ToString();
 
@@ -68,7 +68,6 @@ namespace ToDoModel.Legacy
                 Debug.WriteLine(ex.StackTrace);
                 return "";
             }
-
         }
 
         public List<IProjectEntry> Find_ByProjectName(string projectName)

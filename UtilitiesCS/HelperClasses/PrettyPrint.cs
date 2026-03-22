@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
-    using Microsoft.Data.Analysis;
-    using Microsoft.Office.Interop.Outlook;
-    using Svg;
     using System.Data;
     using System.Diagnostics;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Windows.Forms;
     using System.Windows.Input;
+    using Microsoft.Data.Analysis;
+    using Microsoft.Office.Interop.Outlook;
+    using Svg;
 
     /// <summary>
     /// Class written to transform Dataframe objects for printing
@@ -22,15 +22,18 @@ namespace UtilitiesCS
     public static class PrettyPrinters
     {
         public static void PrettyPrint(this DataFrame df) => Console.WriteLine(PrettyText(df));
+
         public static void PrettyPrint(this DataFrameRow row) => Console.WriteLine(Pretty(row));
 
         public static string PrettyText(this DataFrame df) => ToStringArray2D(df).ToFormattedText();
 
-        public static string Pretty(this DataFrameRow row) => row.Select(x => x?.ToString() ?? string.Empty).StringJoin(" ");
+        public static string Pretty(this DataFrameRow row) =>
+            row.Select(x => x?.ToString() ?? string.Empty).StringJoin(" ");
 
         public static string ToMarkdown(this DataFrame df) => ToStringArray2D(df).ToMarkdown();
 
-        private static string StringJoin(this IEnumerable<string> strings) => string.Join(" ", strings.Select(x => x.ToString()));
+        private static string StringJoin(this IEnumerable<string> strings) =>
+            string.Join(" ", strings.Select(x => x.ToString()));
 
         private static string[,] ToStringArray2D(DataFrame df)
         {
@@ -40,8 +43,8 @@ namespace UtilitiesCS
                 strings[0, i] = df.Columns[i].Name;
 
             for (int i = 0; i < df.Rows.Count; i++)
-                for (int j = 0; j < df.Columns.Count; j++)
-                    strings[i + 1, j] = df[i, j]?.ToString() ?? string.Empty;
+            for (int j = 0; j < df.Columns.Count; j++)
+                strings[i + 1, j] = df[i, j]?.ToString() ?? string.Empty;
 
             return strings;
         }
@@ -70,8 +73,10 @@ namespace UtilitiesCS
         {
             if (numbers.GetLength(1) != headers.Length)
             {
-                throw new ArgumentException($"Number of headers {headers.Length} " +
-                    $"must match number of columns {numbers.GetLength(1)}");
+                throw new ArgumentException(
+                    $"Number of headers {headers.Length} "
+                        + $"must match number of columns {numbers.GetLength(1)}"
+                );
             }
 
             DataTable dt = new();
@@ -97,13 +102,15 @@ namespace UtilitiesCS
             int[] maxLengthsByColumn = new int[strings.GetLength(1)];
 
             for (int y = 0; y < strings.GetLength(0); y++)
-                for (int x = 0; x < strings.GetLength(1); x++)
-                    maxLengthsByColumn[x] = Math.Max(maxLengthsByColumn[x], strings[y, x].Length);
+            for (int x = 0; x < strings.GetLength(1); x++)
+                maxLengthsByColumn[x] = Math.Max(maxLengthsByColumn[x], strings[y, x].Length);
 
             return maxLengthsByColumn;
         }
 
-        internal static int[] GetMaxLengthsByColumn<TKey, TValue>(this IDictionary<TKey, TValue> dict)
+        internal static int[] GetMaxLengthsByColumn<TKey, TValue>(
+            this IDictionary<TKey, TValue> dict
+        )
         {
             int[] columnLengths =
             [
@@ -113,14 +120,36 @@ namespace UtilitiesCS
             return columnLengths;
         }
 
-        private static readonly string[] _aggregators = ["total", "subtotal","average",
-            "mean","median","min","max","stddev", "variance", "count",
-            "sum", "mode", "range","skewness", "kurtosis", "percentile", "quartile"];
+        private static readonly string[] _aggregators =
+        [
+            "total",
+            "subtotal",
+            "average",
+            "mean",
+            "median",
+            "min",
+            "max",
+            "stddev",
+            "variance",
+            "count",
+            "sum",
+            "mode",
+            "range",
+            "skewness",
+            "kurtosis",
+            "percentile",
+            "quartile",
+        ];
 
-        public static string ToFormattedText(this IDictionary<string, float> dict, float decimalPlaces)
+        public static string ToFormattedText(
+            this IDictionary<string, float> dict,
+            float decimalPlaces
+        )
         {
             var keyConverter = new Func<string, string>(key => key);
-            var valueConverter = new Func<float, string>(value => value.ToString($"N{decimalPlaces}"));
+            var valueConverter = new Func<float, string>(value =>
+                value.ToString($"N{decimalPlaces}")
+            );
             return dict.ToFormattedText(keyConverter, valueConverter);
         }
 
@@ -137,17 +166,28 @@ namespace UtilitiesCS
             Func<TValue, string> valueConverter,
             string[] headers = null,
             Enums.Justification[] justifications = default,
-            string title = null)
+            string title = null
+        )
         {
-            var jagged = dict.Select(kvp => new string[] { keyConverter(kvp.Key), valueConverter(kvp.Value) }).ToArray();
+            var jagged = dict.Select(kvp =>
+                    new string[] { keyConverter(kvp.Key), valueConverter(kvp.Value) }
+                )
+                .ToArray();
             return jagged.ToFormattedText(headers, justifications, title);
         }
 
-        public static string ToFormattedText(this string[][] jagged, string[] headers = null, Enums.Justification[] justifications = default, string title = null)
+        public static string ToFormattedText(
+            this string[][] jagged,
+            string[] headers = null,
+            Enums.Justification[] justifications = default,
+            string title = null
+        )
         {
             int columnCount = GetJaggedColumnCount(ref jagged, headers, title);
-            if (columnCount == 0) { return "Object is empty and has no headers or title"; }
-
+            if (columnCount == 0)
+            {
+                return "Object is empty and has no headers or title";
+            }
 
             int[] columnWidths = GetJaggedColumnWidths(jagged, headers, columnCount);
             int tableWidth = columnWidths.Sum() + columnWidths.Length * 2 + 3;
@@ -169,12 +209,17 @@ namespace UtilitiesCS
             sb.AppendLine(new string('=', tableWidth));
 
             return sb.ToString();
-
         }
 
-        private static Enums.Justification[] InferDefaultJustifications(string[][] jagged, int columnCount)
+        private static Enums.Justification[] InferDefaultJustifications(
+            string[][] jagged,
+            int columnCount
+        )
         {
-            if (jagged.Length == 0) { return Enumerable.Repeat(Enums.Justification.Left, columnCount).ToArray(); }
+            if (jagged.Length == 0)
+            {
+                return Enumerable.Repeat(Enums.Justification.Left, columnCount).ToArray();
+            }
             return Enumerable
                 .Range(0, columnCount)
                 .Select(i =>
@@ -192,13 +237,17 @@ namespace UtilitiesCS
             string[][] jagged,
             Enums.Justification[] justifications,
             int[] columnWidths,
-            int tableWidth)
+            int tableWidth
+        )
         {
             for (int i = 0; i < jagged.Length; i++)
             {
                 // Add divider if the row is an aggregator
                 var isAggregator = _aggregators.Contains(jagged[i][0].ToLower());
-                if (isAggregator) { sb.AppendLine(new string('_', tableWidth)); }
+                if (isAggregator)
+                {
+                    sb.AppendLine(new string('_', tableWidth));
+                }
 
                 AppendJaggedRow(jagged[i], justifications, columnWidths, sb);
             }
@@ -208,7 +257,8 @@ namespace UtilitiesCS
             string[] row,
             Enums.Justification[] justifications,
             int[] columnWidths,
-            StringBuilder sb)
+            StringBuilder sb
+        )
         {
             // Add left border
             sb.Append("| ");
@@ -224,13 +274,16 @@ namespace UtilitiesCS
             sb.AppendLine("|");
         }
 
-        private static string FormatJaggedCell(string cell, Enums.Justification justification, int columnWidth)
+        private static string FormatJaggedCell(
+            string cell,
+            Enums.Justification justification,
+            int columnWidth
+        )
         {
             switch (justification)
             {
                 case Enums.Justification.Right:
-                    return cell.PadLeft(columnWidth)
-                               .PadRight(columnWidth + 2);
+                    return cell.PadLeft(columnWidth).PadRight(columnWidth + 2);
 
                 case Enums.Justification.Center:
                     if (cell.Length > columnWidth)
@@ -240,7 +293,9 @@ namespace UtilitiesCS
                     }
                     else
                     {
-                        var padLeft = cell.Length + (int)Math.Round((columnWidth - cell.Length) / (double)2, 0);
+                        var padLeft =
+                            cell.Length
+                            + (int)Math.Round((columnWidth - cell.Length) / (double)2, 0);
                         return cell.PadLeft(padLeft).PadRight(columnWidth + 2);
                     }
 
@@ -258,10 +313,19 @@ namespace UtilitiesCS
 
         public static string ToJustifiedText(this string input, int width)
         {
-            if (width <= 0) { throw new ArgumentOutOfRangeException(nameof(width), $"{nameof(width)} must be greater than 0"); }
+            if (width <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(width),
+                    $"{nameof(width)} must be greater than 0"
+                );
+            }
 
             var text = input?.Trim();
-            if (text.IsNullOrEmpty()) { return new string(' ', width); }
+            if (text.IsNullOrEmpty())
+            {
+                return new string(' ', width);
+            }
 
             if (text.Length >= width)
                 return text.Substring(0, width);
@@ -271,15 +335,22 @@ namespace UtilitiesCS
             Regex rx = new(@"([^ ]+)");
             var words = rx.Matches(text).Cast<Match>().Select(m => m.Groups[1].Value).ToArray();
             var wordCount = words.Count();
-            var letterCount = (int)(words.Sum(w => w.Length + (w.Length - 1) * (double)(spacesPerLetter - 1)));
+            var letterCount = (int)(
+                words.Sum(w => w.Length + (w.Length - 1) * (double)(spacesPerLetter - 1))
+            );
 
-            var spacesPerWord = Math.Max(1, (int)Math.Truncate((width - letterCount) / (double)(wordCount - 1)));
+            var spacesPerWord = Math.Max(
+                1,
+                (int)Math.Truncate((width - letterCount) / (double)(wordCount - 1))
+            );
             var wordSpacer = wordCount <= 1 ? " " : new string(' ', spacesPerWord);
 
             if (spacesPerLetter > 1)
             {
                 var letterSpacer = new string(' ', spacesPerLetter - 1);
-                text = words.Select(w => w.ToCharArray().StringJoin(letterSpacer)).StringJoin(wordSpacer);
+                text = words
+                    .Select(w => w.ToCharArray().StringJoin(letterSpacer))
+                    .StringJoin(wordSpacer);
             }
             else
             {
@@ -289,14 +360,18 @@ namespace UtilitiesCS
             return text.PadRight(width);
         }
 
-        private static void FormatJaggedCell2(string[] row, Enums.Justification[] justifications, int[] columnWidths, StringBuilder sb, int j)
+        private static void FormatJaggedCell2(
+            string[] row,
+            Enums.Justification[] justifications,
+            int[] columnWidths,
+            StringBuilder sb,
+            int j
+        )
         {
             switch (justifications[j])
             {
                 case Enums.Justification.Right:
-                    sb.Append((row[j]
-                        .PadLeft(columnWidths[j]))
-                        .PadRight(columnWidths[j] + 2));
+                    sb.Append((row[j].PadLeft(columnWidths[j])).PadRight(columnWidths[j] + 2));
                     break;
 
                 case Enums.Justification.Center:
@@ -304,7 +379,9 @@ namespace UtilitiesCS
                     {
                         row[j] = row[j].Substring(0, columnWidths[j]);
                     }
-                    var padLeft = row[j].Length + (int)Math.Round((double)(columnWidths[j] - row[j].Length) / (double)2, 0);
+                    var padLeft =
+                        row[j].Length
+                        + (int)Math.Round((double)(columnWidths[j] - row[j].Length) / (double)2, 0);
                     sb.Append(row[j].PadLeft(padLeft).PadRight(columnWidths[j] + 2));
                     break;
 
@@ -314,7 +391,11 @@ namespace UtilitiesCS
             }
         }
 
-        private static void AppendJaggedEmptyMessage(ref StringBuilder sb, string[][] jagged, int tableWidth)
+        private static void AppendJaggedEmptyMessage(
+            ref StringBuilder sb,
+            string[][] jagged,
+            int tableWidth
+        )
         {
             if (jagged.Length == 0)
             {
@@ -330,7 +411,13 @@ namespace UtilitiesCS
             }
         }
 
-        private static void AppendJaggedHeaders(ref StringBuilder sb, string[] headers, string title, int[] columnWidths, int tableWidth)
+        private static void AppendJaggedHeaders(
+            ref StringBuilder sb,
+            string[] headers,
+            string title,
+            int[] columnWidths,
+            int tableWidth
+        )
         {
             if (headers != null)
             {
@@ -373,18 +460,23 @@ namespace UtilitiesCS
                             line.Clear();
                             line.Append(match);
                         }
-
                     }
                     if (line.Length > 0)
                         lines.Add($"| {line.ToString().PadToCenter(tableWidth - 3)}|");
 
-                    foreach (var l in lines) { sb.AppendLine(l); }
-
+                    foreach (var l in lines)
+                    {
+                        sb.AppendLine(l);
+                    }
                 }
             }
         }
 
-        private static int[] GetJaggedColumnWidths(string[][] jagged, string[] headers, int columnCount)
+        private static int[] GetJaggedColumnWidths(
+            string[][] jagged,
+            string[] headers,
+            int columnCount
+        )
         {
             // Get the max length of each data column
             var columnLengths = new int[columnCount];
@@ -392,7 +484,10 @@ namespace UtilitiesCS
             {
                 for (int i = 0; i < row.Length; i++)
                 {
-                    if (row[i] is null) { row[i] = ""; }
+                    if (row[i] is null)
+                    {
+                        row[i] = "";
+                    }
                     columnLengths[i] = Math.Max(columnLengths[i], row[i].Length);
                 }
             });
@@ -400,13 +495,19 @@ namespace UtilitiesCS
             // Adjust Column widths for headers
             if (headers != null)
             {
-                Enumerable.Range(0, columnCount).ForEach(i => columnLengths[i] = Math.Max(columnLengths[i], headers[i].Length));
+                Enumerable
+                    .Range(0, columnCount)
+                    .ForEach(i => columnLengths[i] = Math.Max(columnLengths[i], headers[i].Length));
             }
 
             return columnLengths;
         }
 
-        private static int GetJaggedColumnCount(ref string[][] jagged, string[] headers, string title)
+        private static int GetJaggedColumnCount(
+            ref string[][] jagged,
+            string[] headers,
+            string title
+        )
         {
             // Get the max number of columns
             int columnCount = 0;
@@ -419,7 +520,10 @@ namespace UtilitiesCS
                 else if (!title.IsNullOrEmpty())
                 {
                     columnCount = 1;
-                    jagged = [["Object is empty and has no headers"]];
+                    jagged =
+                    [
+                        ["Object is empty and has no headers"],
+                    ];
                 }
             }
             else
@@ -512,10 +616,9 @@ namespace UtilitiesCS
             }
             dfViewer.Dgv.Width = dgvWidth + dfViewer.Dgv.RowHeadersWidth;
             int lastRowHeight = dfViewer.Dgv.Rows[dfViewer.Dgv.Rows.Count - 1].Height;
-            dfViewer.Dgv.Height = dfViewer.Dgv.Rows
-                                  .Cast<DataGridViewRow>()
-                                  .Select(row => row.Height)
-                                  .Sum() + dfViewer.Dgv.ColumnHeadersHeight;
+            dfViewer.Dgv.Height =
+                dfViewer.Dgv.Rows.Cast<DataGridViewRow>().Select(row => row.Height).Sum()
+                + dfViewer.Dgv.ColumnHeadersHeight;
             //dfViewer.Width = dgvWidth + diffWidth + dfViewer.Dgv.RowHeadersWidth;
             dfViewer.Width = dfViewer.Dgv.Width + diffWidth + 6;
             dfViewer.Height = dfViewer.Dgv.Height + diffHeight + 6;
@@ -523,6 +626,7 @@ namespace UtilitiesCS
             Debug.WriteLine($"Size is {dfViewer.Size}");
             dfViewer.Dgv.Dock = DockStyle.Fill;
         }
+
         public static void DisplayDialog(this DataTable table)
         {
             DgvForm dfViewer = new();
@@ -534,13 +638,12 @@ namespace UtilitiesCS
 
             dfViewer.Dgv.DataSource = table;
 
-
             for (int i = 0; i < dfViewer.Dgv.Columns.Count - 1; i++)
             {
                 dfViewer.Dgv.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             }
-            dfViewer.Dgv.Columns[dfViewer.Dgv.Columns.Count - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-
+            dfViewer.Dgv.Columns[dfViewer.Dgv.Columns.Count - 1].AutoSizeMode =
+                DataGridViewAutoSizeColumnMode.Fill;
 
             int dgvWidth = 0;
             for (int i = 0; i <= dfViewer.Dgv.Columns.Count - 1; i++)
@@ -559,10 +662,9 @@ namespace UtilitiesCS
             dfViewer.Hide();
             dfViewer.Dgv.Width = dgvWidth + dfViewer.Dgv.RowHeadersWidth;
             int lastRowHeight = dfViewer.Dgv.Rows[dfViewer.Dgv.Rows.Count - 1].Height;
-            dfViewer.Dgv.Height = dfViewer.Dgv.Rows
-                                  .Cast<DataGridViewRow>()
-                                  .Select(row => row.Height)
-                                  .Sum() + dfViewer.Dgv.ColumnHeadersHeight;
+            dfViewer.Dgv.Height =
+                dfViewer.Dgv.Rows.Cast<DataGridViewRow>().Select(row => row.Height).Sum()
+                + dfViewer.Dgv.ColumnHeadersHeight;
             //dfViewer.Width = dgvWidth + diffWidth + dfViewer.Dgv.RowHeadersWidth;
             dfViewer.Width = dfViewer.Dgv.Width + diffWidth + 6;
             dfViewer.Height = dfViewer.Dgv.Height + diffHeight + 6;

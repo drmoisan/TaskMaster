@@ -61,6 +61,7 @@ Required planner outputs for this directive:
 	- Phase 0 baseline capture,
 	- Phase 1 placeholder for constrained small-path implementation,
 	- Phase 2 final QC loop,
+- final-QC command tasks in the generated plan MUST be unconditional when present; no IN_SCOPE/OUT_OF_SCOPE branches and no SKIPPED completion path unless the task text explicitly authorizes a skip branch,
 - planner MUST return `plan-path` and final preflight signal.
 
 ## Phase-0-Only Execution Contract (Small Path)
@@ -82,6 +83,7 @@ Phase 0 must also capture baseline toolchain results for the languages touched. 
 For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both artifacts exist:
 - `phase0-instructions-read.md` with at least: `Timestamp:`, `Policy Order:`, and explicit list of files read.
 - baseline command-step artifacts with at least: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for each baseline check executed.
+- approved-plan checklist state MUST remain unchecked for any Phase 0 task whose artifact is absent or whose artifact fields are incomplete.
 
 `Output Summary:` is mandatory for each command-step artifact and must concisely summarize the essential result signal (for example: pass/fail status, key counts, coverage headline, or primary diagnostic).
 
@@ -145,12 +147,16 @@ When a plan is generated or validated from a feature folder, resolve selected mo
 
 1) Persisted marker in `issue.md` metadata block:
 	- `- Work Mode: minor-audit`
-	- `- Work Mode: full`
-2) Explicit workflow override only when repo policy allows and only when reconciled against `issue.md`
-3) Fail closed to `full` when marker is missing or malformed
+	- `- Work Mode: full-feature`
+	- `- Work Mode: full-bug`
+2) Legacy compatibility marker `- Work Mode: full` resolves to `full-feature`
+3) Explicit workflow override only when repo policy allows and only when reconciled against `issue.md`
+4) Fail closed to `full-feature` when marker is missing or malformed
 
 ## Mode-Specific Mandatory Plan Gates
 
 - `minor-audit` plans MUST include baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks.
 - `minor-audit` plans MUST NOT treat missing `spec.md` or `user-story.md` as automatic blockers.
-- `full` plans MUST enforce full-document expectations (`spec.md` + `user-story.md`) and full QA loop obligations.
+- `minor-audit` execution/validation/audit MUST fail closed when `spec.md` or `user-story.md` exists unexpectedly in the active folder, when required Phase 0 artifacts are missing, or when checklist state contradicts evidence on disk.
+- `full-feature` plans MUST enforce full-document expectations (`spec.md` + `user-story.md`) and full QA loop obligations.
+- `full-bug` plans MUST enforce spec-driven expectations (`spec.md` required, `user-story.md` optional/absent by default) and full QA loop obligations.

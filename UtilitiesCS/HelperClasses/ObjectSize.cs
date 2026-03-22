@@ -39,7 +39,13 @@ namespace UtilitiesCS.HelperClasses
                 }
                 else
                 {
-                    foreach (var field in type.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic))
+                    foreach (
+                        var field in type.GetFields(
+                            System.Reflection.BindingFlags.Instance
+                                | System.Reflection.BindingFlags.Public
+                                | System.Reflection.BindingFlags.NonPublic
+                        )
+                    )
                     {
                         var childObj = field.GetValue(obj);
                         size += GetObjectSize(childObj, visited);

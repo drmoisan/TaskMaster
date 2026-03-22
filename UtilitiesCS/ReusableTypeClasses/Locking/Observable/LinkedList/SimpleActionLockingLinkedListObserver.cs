@@ -1,10 +1,10 @@
-﻿using ConcurrentObservableCollection.ConcurrentObservableDictionary;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ConcurrentObservableCollection.ConcurrentObservableDictionary;
 
 namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
 {
@@ -12,7 +12,9 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
     {
         private readonly Action<LockingObservableLinkedListChangedEventArgs<T>> _action;
 
-        public SimpleActionLockingLinkedListObserver(Action<LockingObservableLinkedListChangedEventArgs<T>> action)
+        public SimpleActionLockingLinkedListObserver(
+            Action<LockingObservableLinkedListChangedEventArgs<T>> action
+        )
         {
             _action = action;
         }
@@ -22,5 +24,4 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             _action.Invoke(args);
         }
     }
-
 }

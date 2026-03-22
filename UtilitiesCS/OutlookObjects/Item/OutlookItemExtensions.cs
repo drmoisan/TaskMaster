@@ -1,6 +1,4 @@
-﻿using ExCSS;
-using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,6 +6,8 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using ExCSS;
+using Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.OutlookExtensions
 {
@@ -15,7 +15,8 @@ namespace UtilitiesCS.OutlookExtensions
     public static class OutlookItemExtensions
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public static OutlookItemTry Try(this OutlookItem item) => new(item);
 
@@ -25,40 +26,107 @@ namespace UtilitiesCS.OutlookExtensions
 
         public static bool IsValid(this OutlookItem item)
         {
-            if (item is null) { return false; }
-            else if (item.InnerObject is null) { return false; }
-            else if (item.InnerObject is AppointmentItem) { return true; }
-            else if (item.InnerObject is ContactItem) { return true; }
-            else if (item.InnerObject is DistListItem) { return true; }
-            else if (item.InnerObject is JournalItem) { return true; }
-            else if (item.InnerObject is MailItem) { return true; }
-            else if (item.InnerObject is MobileItem) { return true; }
-            else if (item.InnerObject is NoteItem) { return true; }
-            else if (item.InnerObject is PostItem) { return true; }
-            else if (item.InnerObject is TaskItem) { return true; }
-            else { return false; }
+            if (item is null)
+            {
+                return false;
+            }
+            else if (item.InnerObject is null)
+            {
+                return false;
+            }
+            else if (item.InnerObject is AppointmentItem)
+            {
+                return true;
+            }
+            else if (item.InnerObject is ContactItem)
+            {
+                return true;
+            }
+            else if (item.InnerObject is DistListItem)
+            {
+                return true;
+            }
+            else if (item.InnerObject is JournalItem)
+            {
+                return true;
+            }
+            else if (item.InnerObject is MailItem)
+            {
+                return true;
+            }
+            else if (item.InnerObject is MobileItem)
+            {
+                return true;
+            }
+            else if (item.InnerObject is NoteItem)
+            {
+                return true;
+            }
+            else if (item.InnerObject is PostItem)
+            {
+                return true;
+            }
+            else if (item.InnerObject is TaskItem)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public static OlItemType GetOlItemType(this IOutlookItem item)
         {
-            if (item.InnerObject is AppointmentItem) { return OlItemType.olAppointmentItem; }
-            else if (item.InnerObject is ContactItem) { return OlItemType.olContactItem; }
-            else if (item.InnerObject is DistListItem) { return OlItemType.olDistributionListItem; }
-            else if (item.InnerObject is JournalItem) { return OlItemType.olJournalItem; }
-            else if (item.InnerObject is MailItem) { return OlItemType.olMailItem; }
-            else if (item.InnerObject is MobileItem) { return OlItemType.olMobileItemMMS; }
-            else if (item.InnerObject is NoteItem) { return OlItemType.olNoteItem; }
-            else if (item.InnerObject is PostItem) { return OlItemType.olPostItem; }
-            else if (item.InnerObject is TaskItem) { return OlItemType.olTaskItem; }
+            if (item.InnerObject is AppointmentItem)
+            {
+                return OlItemType.olAppointmentItem;
+            }
+            else if (item.InnerObject is ContactItem)
+            {
+                return OlItemType.olContactItem;
+            }
+            else if (item.InnerObject is DistListItem)
+            {
+                return OlItemType.olDistributionListItem;
+            }
+            else if (item.InnerObject is JournalItem)
+            {
+                return OlItemType.olJournalItem;
+            }
+            else if (item.InnerObject is MailItem)
+            {
+                return OlItemType.olMailItem;
+            }
+            else if (item.InnerObject is MobileItem)
+            {
+                return OlItemType.olMobileItemMMS;
+            }
+            else if (item.InnerObject is NoteItem)
+            {
+                return OlItemType.olNoteItem;
+            }
+            else if (item.InnerObject is PostItem)
+            {
+                return OlItemType.olPostItem;
+            }
+            else if (item.InnerObject is TaskItem)
+            {
+                return OlItemType.olTaskItem;
+            }
             // Technically the item type is incorrect for a meeting response, but it will serve the purpose of identifying
             // the item as a meeting-related item and should contain the same properties.
-            else if (item.InnerObject is MeetingItem) { return OlItemType.olAppointmentItem; }
+            else if (item.InnerObject is MeetingItem)
+            {
+                return OlItemType.olAppointmentItem;
+            }
             else
             {
-                throw new ArgumentException($"{item.InnerObject.GetType().Name} is not a supported type for {nameof(OlItemType)} class.");
+                throw new ArgumentException(
+                    $"{item.InnerObject.GetType().Name} is not a supported type for {nameof(OlItemType)} class."
+                );
             }
         }
-
 
         #region Helper Methods
 
@@ -80,9 +148,7 @@ namespace UtilitiesCS.OutlookExtensions
             {
                 setter(value);
             }
-            catch (SystemException)
-            {
-            }
+            catch (SystemException) { }
         }
 
         internal static void TryCall(System.Action action)
@@ -91,9 +157,7 @@ namespace UtilitiesCS.OutlookExtensions
             {
                 action();
             }
-            catch (SystemException)
-            {
-            }
+            catch (SystemException) { }
         }
 
         internal static T TryCall<T>(Func<T> func)
@@ -108,21 +172,42 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        internal static object TryGetPropertyValue<T>(this OutlookItem item, string propertyName, string propertyNameAlt, Func<object, T> converter, Func<object, T> converterAlt)
+        internal static object TryGetPropertyValue<T>(
+            this OutlookItem item,
+            string propertyName,
+            string propertyNameAlt,
+            Func<object, T> converter,
+            Func<object, T> converterAlt
+        )
         {
             var value = TryGetPropertyValue(item, propertyName);
             if (value is not null)
             {
-                if (converter is null) { return value; }
-                else { return converter(value); }
+                if (converter is null)
+                {
+                    return value;
+                }
+                else
+                {
+                    return converter(value);
+                }
             }
             value = TryGetPropertyValue(item, propertyNameAlt);
             if (value is not null)
             {
-                if (converterAlt is null) { return value; }
-                else { return converterAlt(value); }
+                if (converterAlt is null)
+                {
+                    return value;
+                }
+                else
+                {
+                    return converterAlt(value);
+                }
             }
-            else { return null; }
+            else
+            {
+                return null;
+            }
         }
 
         internal static PropertyInfo TryGetPropertyInfo(this OutlookItem item, string propertyName)
@@ -133,17 +218,23 @@ namespace UtilitiesCS.OutlookExtensions
             }
             catch (SystemException e)
             {
-                logger.Info($"{nameof(OutlookItem)}.{nameof(TryGetPropertyInfo)} threw an " +
-                    $"exception for property [{propertyName}]. {e.Message}", e);
+                logger.Info(
+                    $"{nameof(OutlookItem)}.{nameof(TryGetPropertyInfo)} threw an "
+                        + $"exception for property [{propertyName}]. {e.Message}",
+                    e
+                );
                 return null;
             }
         }
 
-        internal static object TryGetPropertyValue(this OutlookItem item, string propertyName, string propertyNameAlt) => TryGetPropertyValue(item, propertyName) ?? TryGetPropertyValue(item, propertyNameAlt);
+        internal static object TryGetPropertyValue(
+            this OutlookItem item,
+            string propertyName,
+            string propertyNameAlt
+        ) => TryGetPropertyValue(item, propertyName) ?? TryGetPropertyValue(item, propertyNameAlt);
 
         internal static object TryGetPropertyValue(this OutlookItem item, string propertyName)
         {
-
             try
             {
                 return item.ItemType.InvokeMember(
@@ -151,7 +242,8 @@ namespace UtilitiesCS.OutlookExtensions
                     BindingFlags.Public | BindingFlags.GetField | BindingFlags.GetProperty,
                     null,
                     item.InnerObject,
-                    item.Args);
+                    item.Args
+                );
             }
             catch (System.Exception)
             {
@@ -162,35 +254,76 @@ namespace UtilitiesCS.OutlookExtensions
                 }
                 catch (COMException e)
                 {
-                    logger.Debug($"{nameof(OutlookItemExtensions)}.{nameof(TryGetPropertyValue)} threw an " +
-                        $"exception for property [{propertyName}]. {e.Message}", e);
+                    logger.Debug(
+                        $"{nameof(OutlookItemExtensions)}.{nameof(TryGetPropertyValue)} threw an "
+                            + $"exception for property [{propertyName}]. {e.Message}",
+                        e
+                    );
                     return null;
                 }
             }
-
         }
 
-        internal static bool TrySetPropertyValue<T>(this OutlookItem item, string propertyName, string propertyNameAlt, object propertyValue, Func<object, T> converter, Func<object, Table> converterAlt)
+        internal static bool TrySetPropertyValue<T>(
+            this OutlookItem item,
+            string propertyName,
+            string propertyNameAlt,
+            object propertyValue,
+            Func<object, T> converter,
+            Func<object, Table> converterAlt
+        )
         {
-            if (TrySetPropertyValue(item, propertyName, converter(propertyValue))) { return true; }
-            else { return TrySetPropertyValue(item, propertyNameAlt, converterAlt(propertyValue)); }
+            if (TrySetPropertyValue(item, propertyName, converter(propertyValue)))
+            {
+                return true;
+            }
+            else
+            {
+                return TrySetPropertyValue(item, propertyNameAlt, converterAlt(propertyValue));
+            }
         }
 
-        internal static bool TrySetPropertyValue(this OutlookItem item, string propertyName, string propertyNameAlt, object propertyValue, object propertyValueAlt)
+        internal static bool TrySetPropertyValue(
+            this OutlookItem item,
+            string propertyName,
+            string propertyNameAlt,
+            object propertyValue,
+            object propertyValueAlt
+        )
         {
-            if (TrySetPropertyValue(item, propertyName, propertyValue)) { return true; }
-            else { return TrySetPropertyValue(item, propertyNameAlt, propertyValueAlt); }
+            if (TrySetPropertyValue(item, propertyName, propertyValue))
+            {
+                return true;
+            }
+            else
+            {
+                return TrySetPropertyValue(item, propertyNameAlt, propertyValueAlt);
+            }
         }
 
-        internal static bool TrySetPropertyValue(this OutlookItem item, string propertyName, string propertyNameAlt, object propertyValue)
+        internal static bool TrySetPropertyValue(
+            this OutlookItem item,
+            string propertyName,
+            string propertyNameAlt,
+            object propertyValue
+        )
         {
-            if (TrySetPropertyValue(item, propertyName, propertyValue)) { return true; }
-            else { return TrySetPropertyValue(item, propertyNameAlt, propertyValue); }
+            if (TrySetPropertyValue(item, propertyName, propertyValue))
+            {
+                return true;
+            }
+            else
+            {
+                return TrySetPropertyValue(item, propertyNameAlt, propertyValue);
+            }
         }
 
-        internal static bool TrySetPropertyValue(this OutlookItem item, string propertyName, object propertyValue)
+        internal static bool TrySetPropertyValue(
+            this OutlookItem item,
+            string propertyName,
+            object propertyValue
+        )
         {
-
             try
             {
                 item.ItemType.InvokeMember(
@@ -198,12 +331,15 @@ namespace UtilitiesCS.OutlookExtensions
                     BindingFlags.Public | BindingFlags.SetField | BindingFlags.SetProperty,
                     null,
                     item.InnerObject,
-                    [propertyValue]);
+                    [propertyValue]
+                );
                 return true;
             }
             catch (COMException)
             {
-                var propertyInfo = item.TryGetPropertyInfo(propertyName) ?? throw new MissingMemberException(item.ItemType.Name, propertyName);
+                var propertyInfo =
+                    item.TryGetPropertyInfo(propertyName)
+                    ?? throw new MissingMemberException(item.ItemType.Name, propertyName);
                 try
                 {
                     propertyInfo.SetValue(item.InnerObject, propertyValue);
@@ -211,15 +347,15 @@ namespace UtilitiesCS.OutlookExtensions
                 }
                 catch (COMException e)
                 {
-                    logger.Debug($"{nameof(OutlookItemExtensions)}.{nameof(TrySetPropertyValue)} threw a " +
-                        $"COM exception for property [{propertyName}] and value {propertyValue}. \n{e.Message}", e);
+                    logger.Debug(
+                        $"{nameof(OutlookItemExtensions)}.{nameof(TrySetPropertyValue)} threw a "
+                            + $"COM exception for property [{propertyName}] and value {propertyValue}. \n{e.Message}",
+                        e
+                    );
 
                     return false;
                 }
             }
-
-
-
         }
 
         internal static object TryCallMethod(this OutlookItem item, string methodName)
@@ -232,18 +368,26 @@ namespace UtilitiesCS.OutlookExtensions
                     BindingFlags.Public | BindingFlags.InvokeMethod,
                     null,
                     item.InnerObject,
-                    item.Args);
+                    item.Args
+                );
             }
             catch (SystemException e)
             {
-                logger.Debug($"{nameof(OutlookItemExtensions)}.{nameof(TryCallMethod)} threw an " +
-                    $"exception for property [{methodName}]. \n{e.Message}", e);
+                logger.Debug(
+                    $"{nameof(OutlookItemExtensions)}.{nameof(TryCallMethod)} threw an "
+                        + $"exception for property [{methodName}]. \n{e.Message}",
+                    e
+                );
 
                 return null;
             }
         }
 
-        internal static object TryCallMethod(this OutlookItem item, string methodName, object[] args)
+        internal static object TryCallMethod(
+            this OutlookItem item,
+            string methodName,
+            object[] args
+        )
         {
             try
             {
@@ -253,19 +397,20 @@ namespace UtilitiesCS.OutlookExtensions
                     BindingFlags.Public | BindingFlags.InvokeMethod,
                     null,
                     item.InnerObject,
-                    args);
+                    args
+                );
             }
             catch (SystemException e)
             {
-                logger.Debug($"{nameof(OutlookItemExtensions)}.{nameof(TryCallMethod)} threw an " +
-                    $"exception for property [{methodName}]. \n{e.Message}", e);
+                logger.Debug(
+                    $"{nameof(OutlookItemExtensions)}.{nameof(TryCallMethod)} threw an "
+                        + $"exception for property [{methodName}]. \n{e.Message}",
+                    e
+                );
                 return null;
             }
         }
 
         #endregion
-
     }
-
-
 }

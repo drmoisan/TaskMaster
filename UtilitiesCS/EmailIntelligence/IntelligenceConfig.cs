@@ -1,25 +1,25 @@
-﻿using AngleSharp.Common;
-using System;
-using System.Collections.Concurrent;
+﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
-using UtilitiesCS.ReusableTypeClasses;
-using UtilitiesCS;
-using System.IO;
-using System.Resources;
-using UtilitiesCS.Extensions;
+using AngleSharp.Common;
 using ToDoModel.Data_Model.People;
-
-
+using UtilitiesCS;
+using UtilitiesCS.Extensions;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.EmailIntelligence
 {
     public class IntelligenceConfig(IApplicationGlobals globals)
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public static async Task<IntelligenceConfig> LoadAsync(IApplicationGlobals globals)
         {
@@ -34,12 +34,22 @@ namespace UtilitiesCS.EmailIntelligence
 
         internal IApplicationGlobals Globals { get; } = globals;
 
-        public virtual ConcurrentDictionary<string, SmartSerializableLoader> Config { get; protected set; }
+        public virtual ConcurrentDictionary<string, SmartSerializableLoader> Config
+        {
+            get;
+            protected set;
+        }
 
-        internal async Task<ConcurrentDictionary<string, SmartSerializableLoader>> ReadConfigurationAsync()
+        internal async Task<
+            ConcurrentDictionary<string, SmartSerializableLoader>
+        > ReadConfigurationAsync()
         {
             var resourceManager = IntelligenceResources.ResourceManager;
-            var resourceSet = resourceManager.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
+            var resourceSet = resourceManager.GetResourceSet(
+                System.Globalization.CultureInfo.CurrentCulture,
+                true,
+                true
+            );
             var resourceDictionary = await resourceSet
                 .Cast<DictionaryEntry>()
                 .ToDictionary<string, string>()
@@ -49,7 +59,9 @@ namespace UtilitiesCS.EmailIntelligence
                     var loader = await SmartSerializableLoader.DeserializeAsync(Globals, kvp.Value);
                     if (loader is null)
                     {
-                        logger.Error($"Error in {nameof(ReadConfigurationAsync)}. Loader for {kvp.Key} is null");
+                        logger.Error(
+                            $"Error in {nameof(ReadConfigurationAsync)}. Loader for {kvp.Key} is null"
+                        );
                         return new KeyValuePair<string, SmartSerializableLoader>(kvp.Key, null);
                     }
                     if (loader.T is not null)
@@ -60,18 +72,25 @@ namespace UtilitiesCS.EmailIntelligence
                         }
                         else if (IsDerivedFromScoDictionaryNew(loader.T))
                         {
-                            loader.Config.JsonSettings.Converters.Add(new NewtonsoftHelpers.Sco.ScoDictionaryConverter());
+                            loader.Config.JsonSettings.Converters.Add(
+                                new NewtonsoftHelpers.Sco.ScoDictionaryConverter()
+                            );
                         }
                     }
 
                     loader.PropertyChanged += Loader_PropertyChanged;
                     return new KeyValuePair<string, SmartSerializableLoader>(kvp.Key, loader);
-                }).Where(kvp => kvp.Value is not null).ToConcurrentDictionaryAsync();
+                })
+                .Where(kvp => kvp.Value is not null)
+                .ToConcurrentDictionaryAsync();
 
             return resourceDictionary;
         }
 
-        internal void Loader_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        internal void Loader_PropertyChanged(
+            object sender,
+            System.ComponentModel.PropertyChangedEventArgs e
+        )
         {
             if (e.PropertyName.Contains(nameof(SmartSerializableLoader.Config.ClassifierActivated)))
             {
@@ -83,11 +102,16 @@ namespace UtilitiesCS.EmailIntelligence
 
         internal void WriteConfiguration()
         {
-            string assemblyDirectory = Path.GetDirectoryName(typeof(IntelligenceResources).Assembly.Location);
+            string assemblyDirectory = Path.GetDirectoryName(
+                typeof(IntelligenceResources).Assembly.Location
+            );
             string resxFilePath = Path.Combine(assemblyDirectory, "IntelligenceResources.resx");
 
             var configurations = Config
-                .Select(kvp => new KeyValuePair<string, string>(kvp.Key, kvp.Value.SerializeToString()))
+                .Select(kvp => new KeyValuePair<string, string>(
+                    kvp.Key,
+                    kvp.Value.SerializeToString()
+                ))
                 .ToDictionary();
 
             using (var resxWriter = new ResXResourceWriter(resxFilePath))

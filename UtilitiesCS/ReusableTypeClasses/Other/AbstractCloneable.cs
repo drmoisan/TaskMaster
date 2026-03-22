@@ -23,7 +23,6 @@ namespace UtilitiesCS.ReusableTypeClasses
         }
     }
 
-
     // Example of how to use the AbstractClonable class.
     class ConcreteCloneableExample : AbstractCloneable
     {
@@ -35,11 +34,10 @@ namespace UtilitiesCS.ReusableTypeClasses
             //Clone is of the current type.
             ConcreteCloneableExample obj = (ConcreteCloneableExample)clone;
 
-            //Here you have a superficial copy of "this". You can do whathever 
+            //Here you have a superficial copy of "this". You can do whathever
             //specific task you need to do.
             //e.g.:
             //obj.SomeReferencedProperty = this.SomeReferencedProperty.Clone();
         }
     }
-
 }

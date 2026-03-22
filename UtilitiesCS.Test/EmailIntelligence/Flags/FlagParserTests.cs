@@ -1,7 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test
 {
@@ -12,7 +13,8 @@ namespace UtilitiesCS.Test
         public void Constructor_WithCategoryString_InitializesCorrectly()
         {
             // Arrange
-            string categoryString = "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
+            string categoryString =
+                "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
 
             // Act
             var parser = new FlagParser(ref categoryString);
@@ -29,7 +31,14 @@ namespace UtilitiesCS.Test
         public void Constructor_WithCategoryList_InitializesCorrectly()
         {
             // Arrange
-            var categories = new List<string> { "Tag PPL John", "Tag PROJECT ProjectA", "Tag TOPIC Topic1", "_@Context1", "Tag KB KB1" };
+            var categories = new List<string>
+            {
+                "Tag PPL John",
+                "Tag PROJECT ProjectA",
+                "Tag TOPIC Topic1",
+                "_@Context1",
+                "Tag KB KB1",
+            };
 
             // Act
             var parser = new FlagParser(categories);
@@ -144,9 +153,11 @@ namespace UtilitiesCS.Test
         public void AreEquivalentTo_StringComparison_ReturnsTrue()
         {
             // Arrange
-            string categoryString = "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
+            string categoryString =
+                "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
             var parser = new FlagParser(ref categoryString);
-            string other = "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
+            string other =
+                "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
 
             // Act
             bool result = parser.AreEquivalentTo(other);
@@ -159,9 +170,17 @@ namespace UtilitiesCS.Test
         public void AreEquivalentTo_ListComparison_ReturnsTrue()
         {
             // Arrange
-            string categoryString = "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
+            string categoryString =
+                "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
             var parser = new FlagParser(ref categoryString);
-            var other = new List<string> { "Tag PPL John", "Tag PROJECT ProjectA", "Tag TOPIC Topic1", "_@Context1", "Tag KB KB1" };
+            var other = new List<string>
+            {
+                "Tag PPL John",
+                "Tag PROJECT ProjectA",
+                "Tag TOPIC Topic1",
+                "_@Context1",
+                "Tag KB KB1",
+            };
 
             // Act
             bool result = parser.AreEquivalentTo(other);
@@ -174,7 +193,8 @@ namespace UtilitiesCS.Test
         public void Clone_CreatesShallowCopy()
         {
             // Arrange
-            string categoryString = "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
+            string categoryString =
+                "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
             var parser = new FlagParser(ref categoryString);
 
             // Act
@@ -192,7 +212,8 @@ namespace UtilitiesCS.Test
         public void DeepCopy_CreatesDeepCopy()
         {
             // Arrange
-            string categoryString = "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
+            string categoryString =
+                "Tag PPL John, Tag PROJECT ProjectA, Tag TOPIC Topic1, _@Context1, Tag KB KB1";
             var parser = new FlagParser(ref categoryString);
 
             // Act
@@ -204,6 +225,95 @@ namespace UtilitiesCS.Test
             Assert.AreEqual(parser.GetTopics(), deepCopy.GetTopics());
             Assert.AreEqual(parser.GetContext(), deepCopy.GetContext());
             Assert.AreEqual(parser.GetKb(), deepCopy.GetKb());
+        }
+
+        [TestMethod]
+        public void Constructor_WithNullCategoryString_NormalizesToEmptyState()
+        {
+            // Arrange
+            string categoryString = null;
+
+            // Act
+            var parser = new FlagParser(ref categoryString);
+
+            // Assert
+            categoryString.Should().BeEmpty();
+            parser.GetPeople().Should().BeEmpty();
+            parser.GetProjects().Should().BeEmpty();
+            parser.GetTopics().Should().BeEmpty();
+            parser.GetContext().Should().BeEmpty();
+            parser.GetKb().Should().BeEmpty();
+            parser.Other.Should().BeEmpty();
+            parser.Today.Should().BeFalse();
+            parser.Bullpin.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void Constructor_WithUnknownFlags_PreservesThemInOtherAndTracksKnownFlags()
+        {
+            // Arrange
+            var categories = new List<string>
+            {
+                "Tag PPL John",
+                "Tag A Top Priority Today",
+                "Tag Bullpin Priorities",
+                "Unmapped One",
+                "Unmapped Two",
+            };
+
+            // Act
+            var parser = new FlagParser(categories);
+
+            // Assert
+            parser.GetPeople().Should().Be("John");
+            parser.Today.Should().BeTrue();
+            parser.Bullpin.Should().BeTrue();
+            parser.Other.Should().Be("Unmapped One, Unmapped Two");
+        }
+
+        [TestMethod]
+        public void Constructor_WithMixedCaseValues_PreservesValueCasing()
+        {
+            // Arrange
+            string categoryString =
+                "Tag PPL jOhN, Tag PROJECT ProJectA, Tag TOPIC TopicOne, _@ConText1, Tag KB kbOne";
+
+            // Act
+            var parser = new FlagParser(ref categoryString);
+
+            // Assert
+            parser.GetPeople().Should().Be("jOhN");
+            parser.GetProjects().Should().Be("ProJectA");
+            parser.GetTopics().Should().Be("TopicOne");
+            parser.GetContext().Should().Be("ConText1");
+            parser.GetKb().Should().Be("kbOne");
+        }
+
+        [TestMethod]
+        public void SetProjects_WithCommaDelimitedValues_ParsesMultipleProjects()
+        {
+            // Arrange
+            var parser = new FlagParser(new List<string>());
+
+            // Act
+            parser.SetProjects(value: "Tag PROJECT Alpha, Tag PROJECT Beta");
+
+            // Assert
+            parser.GetProjectList().Should().Equal("Alpha", "Beta");
+            parser.GetProjects().Should().Be("Alpha, Beta");
+        }
+
+        [TestMethod]
+        public void AreEquivalentTo_WithEmptyParserAndNullComparison_ReturnsTrue()
+        {
+            // Arrange
+            var parser = new FlagParser(new List<string>());
+
+            // Act
+            var result = parser.AreEquivalentTo((string)null);
+
+            // Assert
+            result.Should().BeTrue();
         }
     }
 }

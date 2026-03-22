@@ -14,18 +14,59 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
     public class Corpus : ICloneable
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors
 
-        public Corpus() { _tokenFrequency = []; }
-        public Corpus(IEnumerable<string> tokens) { _tokenFrequency = new(); AddOrIncrementTokens(tokens); }
-        public Corpus(IEnumerable<KeyValuePair<string, int>> collection) { _tokenFrequency = new(collection); }
-        public Corpus(IEqualityComparer<string> comparer) { _tokenFrequency = new ConcurrentDictionary<string, int>(comparer); }
-        public Corpus(IEnumerable<KeyValuePair<string, int>> collection, IEqualityComparer<string> comparer) { _tokenFrequency = new ConcurrentDictionary<string, int>(collection, comparer); }
-        public Corpus(int concurrencyLevel, int capacity) { _tokenFrequency = new ConcurrentDictionary<string, int>(concurrencyLevel, capacity); }
-        public Corpus(int concurrencyLevel, IEnumerable<KeyValuePair<string, int>> collection, IEqualityComparer<string> comparer) { new ConcurrentDictionary<string, int>(concurrencyLevel, collection, comparer); }
-        public Corpus(int concurrencyLevel, int capacity, IEqualityComparer<string> comparer) { new ConcurrentDictionary<string, int>(concurrencyLevel, capacity, comparer); }
+        public Corpus()
+        {
+            _tokenFrequency = [];
+        }
+
+        public Corpus(IEnumerable<string> tokens)
+        {
+            _tokenFrequency = new();
+            AddOrIncrementTokens(tokens);
+        }
+
+        public Corpus(IEnumerable<KeyValuePair<string, int>> collection)
+        {
+            _tokenFrequency = new(collection);
+        }
+
+        public Corpus(IEqualityComparer<string> comparer)
+        {
+            _tokenFrequency = new ConcurrentDictionary<string, int>(comparer);
+        }
+
+        public Corpus(
+            IEnumerable<KeyValuePair<string, int>> collection,
+            IEqualityComparer<string> comparer
+        )
+        {
+            _tokenFrequency = new ConcurrentDictionary<string, int>(collection, comparer);
+        }
+
+        public Corpus(int concurrencyLevel, int capacity)
+        {
+            _tokenFrequency = new ConcurrentDictionary<string, int>(concurrencyLevel, capacity);
+        }
+
+        public Corpus(
+            int concurrencyLevel,
+            IEnumerable<KeyValuePair<string, int>> collection,
+            IEqualityComparer<string> comparer
+        )
+        {
+            new ConcurrentDictionary<string, int>(concurrencyLevel, collection, comparer);
+        }
+
+        public Corpus(int concurrencyLevel, int capacity, IEqualityComparer<string> comparer)
+        {
+            new ConcurrentDictionary<string, int>(concurrencyLevel, capacity, comparer);
+        }
+
         protected Corpus(Corpus corpus)
         {
             _tokenFrequency = corpus.TokenFrequency;
@@ -42,16 +83,28 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             Failed = 0,
             ValueUpdated = 1,
             ItemAdded = 2,
-            ItemRemoved = 3
+            ItemRemoved = 3,
         }
 
-        public ConcurrentDictionary<string, int> TokenFrequency { get => _tokenFrequency; protected set => _tokenFrequency = value; }
+        public ConcurrentDictionary<string, int> TokenFrequency
+        {
+            get => _tokenFrequency;
+            protected set => _tokenFrequency = value;
+        }
         protected ConcurrentDictionary<string, int> _tokenFrequency;
 
-        public int TokenCount { get => _tokenCount; protected set => _tokenCount = value; }
+        public int TokenCount
+        {
+            get => _tokenCount;
+            protected set => _tokenCount = value;
+        }
         private int _tokenCount;
 
-        public Enums.Corpus Indicator { get => _indicator; set => _indicator = value; }
+        public Enums.Corpus Indicator
+        {
+            get => _indicator;
+            set => _indicator = value;
+        }
         private Enums.Corpus _indicator;
 
         public int AddTokenCount(int increment)
@@ -64,7 +117,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             TokenFrequency.AddOrUpdate(token, 1, (key, count) => ++count);
         }
 
-        public void AddOrIncrementTokens(IEnumerable<string> tokens) => tokens.ForEach(AddOrIncrementToken);
+        public void AddOrIncrementTokens(IEnumerable<string> tokens) =>
+            tokens.ForEach(AddOrIncrementToken);
 
         public bool DecrementOrRemoveToken(string token)
         {
@@ -82,7 +136,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     return true;
                 }
             }
-            else { return false; }
+            else
+            {
+                return false;
+            }
         }
 
         public void AddTokenOrSumValues(IEnumerable<KeyValuePair<string, int>> tokenFrequency)
@@ -112,7 +169,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 token,
                 (key, oldValue) => oldValue - value <= 0,
                 (key, oldValue) => oldValue - value,
-                out int result);
+                out int result
+            );
             return result;
         }
 
@@ -134,7 +192,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             foreach (var kvp in c2.TokenFrequency)
             {
-                result.TokenFrequency.AddOrUpdate(kvp.Key, kvp.Value, (key, count) => count + kvp.Value);
+                result.TokenFrequency.AddOrUpdate(
+                    kvp.Key,
+                    kvp.Value,
+                    (key, count) => count + kvp.Value
+                );
             }
             return result;
         }
@@ -143,7 +205,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             Corpus c1,
             Corpus c2,
             CancellationToken token,
-            SegmentStopWatch sw = null)
+            SegmentStopWatch sw = null
+        )
         {
             sw ??= new SegmentStopWatch().Start();
             sw.LogDuration("SubtractAsync Start");
@@ -152,28 +215,34 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             sw.LogDuration("clone universe");
 
             var processors = Math.Max(Environment.ProcessorCount - 2, 1);
-            var chunkSize = (int)Math.Round((double)c2.TokenFrequency.Count() / (double)processors, 0);
+            var chunkSize = (int)
+                Math.Round((double)c2.TokenFrequency.Count() / (double)processors, 0);
             if (chunkSize == 0)
                 return result;
             chunkSize = Math.Min(Math.Max(chunkSize, 50), c2.TokenFrequency.Count());
             var chunks = c2.TokenFrequency.Chunk(chunkSize);
             sw.LogDuration("chunk positive tokens");
 
-            var tasks = chunks.Select(chunk => Task.Run(() => chunk.ForEach(x =>
-            {
-                if (result.TokenFrequency.TryGetValue(x.Key, out int count))
-                {
-                    if (count > x.Value)
-                    {
-                        result.TokenFrequency.TryUpdate(x.Key, count - x.Value, count);
-                    }
-                    else
-                    {
-                        result.TokenFrequency.TryRemove(x.Key, out _);
-                    }
-                }
-            }),
-            token));
+            var tasks = chunks.Select(chunk =>
+                Task.Run(
+                    () =>
+                        chunk.ForEach(x =>
+                        {
+                            if (result.TokenFrequency.TryGetValue(x.Key, out int count))
+                            {
+                                if (count > x.Value)
+                                {
+                                    result.TokenFrequency.TryUpdate(x.Key, count - x.Value, count);
+                                }
+                                else
+                                {
+                                    result.TokenFrequency.TryRemove(x.Key, out _);
+                                }
+                            }
+                        }),
+                    token
+                )
+            );
 
             await Task.WhenAll(tasks);
             sw.LogDuration("subtract positive tokens");
@@ -201,12 +270,19 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return result;
         }
 
-        public static (Corpus NotMatchFiltered, Corpus MatchFiltered) SubtractFilter(Corpus all, Corpus match, int negTokenWt, int minCt)
+        public static (Corpus NotMatchFiltered, Corpus MatchFiltered) SubtractFilter(
+            Corpus all,
+            Corpus match,
+            int negTokenWt,
+            int minCt
+        )
         {
             var result = all.Clone() as Corpus;
             var matchClone = match.Clone() as Corpus;
 
-            result.TokenFrequency = new ConcurrentDictionary<string, int>(result.TokenFrequency.Where(x => x.Value * negTokenWt >= minCt));
+            result.TokenFrequency = new ConcurrentDictionary<string, int>(
+                result.TokenFrequency.Where(x => x.Value * negTokenWt >= minCt)
+            );
             foreach (var kvp in matchClone.TokenFrequency)
             {
                 if (result.TokenFrequency.TryGetValue(kvp.Key, out int count))
@@ -226,14 +302,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     }
                 }
             }
-            matchClone.TokenFrequency = new ConcurrentDictionary<string, int>(matchClone.TokenFrequency.Where(x => x.Value > 0));
+            matchClone.TokenFrequency = new ConcurrentDictionary<string, int>(
+                matchClone.TokenFrequency.Where(x => x.Value > 0)
+            );
             return (result, matchClone);
-
         }
 
-
-
         #endregion Operator Overloads
-
     }
 }

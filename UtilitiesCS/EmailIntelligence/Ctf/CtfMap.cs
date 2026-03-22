@@ -9,34 +9,44 @@ namespace UtilitiesCS
 {
     public class CtfMap : ScoCollection<CtfMapEntry>
     {
-        public CtfMap() : base() { }
+        public CtfMap()
+            : base() { }
 
-        public CtfMap(IEnumerable<CtfMapEntry> enumerable) : base(enumerable) { }
+        public CtfMap(IEnumerable<CtfMapEntry> enumerable)
+            : base(enumerable) { }
 
-        public CtfMap(string filename,
-                      string folderpath,
-                      string backupFilepath,
-                      bool askUserOnError) : base(fileName: filename,
-                                                  folderPath: folderpath,
-                                                  backupLoader: ReadTextFile,
-                                                  backupFilepath: backupFilepath,
-                                                  askUserOnError: askUserOnError)
-        { }
+        public CtfMap(
+            string filename,
+            string folderpath,
+            string backupFilepath,
+            bool askUserOnError
+        )
+            : base(
+                fileName: filename,
+                folderPath: folderpath,
+                backupLoader: ReadTextFile,
+                backupFilepath: backupFilepath,
+                askUserOnError: askUserOnError
+            ) { }
 
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public CtfMapEntry[] TopEntriesById(string id, int topN)
         {
             var entries = this.Where(x => x.ConversationID == id)
-                              .OrderByDescending(x => x.EmailCount)
-                              .Take(topN)
-                              .ToArray();
+                .OrderByDescending(x => x.EmailCount)
+                .Take(topN)
+                .ToArray();
             return entries;
         }
 
         public void Add(string emailFolder, string conversationID, int emailCount)
         {
-            var idx = this.FindIndex(x => (x.ConversationID == conversationID) & (x.EmailFolder == emailFolder));
+            var idx = this.FindIndex(x =>
+                (x.ConversationID == conversationID) & (x.EmailFolder == emailFolder)
+            );
 
             if (idx != -1)
             {
@@ -47,7 +57,6 @@ namespace UtilitiesCS
                 var entry = new CtfMapEntry(emailFolder, conversationID, emailCount);
                 this.Add(entry);
             }
-
         }
 
         public bool ContainsId(string id)
@@ -86,7 +95,10 @@ namespace UtilitiesCS
             while (lines.Count > 0)
             {
                 var incidence = TryDequeueEntry(ref lines);
-                if (incidence is not null) { listCTF.Add(incidence); }
+                if (incidence is not null)
+                {
+                    listCTF.Add(incidence);
+                }
             }
 
             return listCTF;
@@ -105,7 +117,8 @@ namespace UtilitiesCS
             }
             catch (System.FormatException e)
             {
-                string message = $"Error converting to int at line {e.GetLineNumber()} in {nameof(CtfMapEntry)}.{nameof(TryDequeueEntry)} of the backup loader";
+                string message =
+                    $"Error converting to int at line {e.GetLineNumber()} in {nameof(CtfMapEntry)}.{nameof(TryDequeueEntry)} of the backup loader";
                 log.Error(message, e);
                 Debug.WriteLine(message);
                 DequeueToNextRecord(ref lines);
@@ -113,7 +126,8 @@ namespace UtilitiesCS
             }
             catch (System.OverflowException e)
             {
-                string message = $"Error converting to int at line {e.GetLineNumber()} in {nameof(CtfMapEntry)}.{nameof(TryDequeueEntry)} of the backup loader";
+                string message =
+                    $"Error converting to int at line {e.GetLineNumber()} in {nameof(CtfMapEntry)}.{nameof(TryDequeueEntry)} of the backup loader";
                 log.Error(message, e);
                 Debug.WriteLine(message);
                 DequeueToNextRecord(ref lines);
@@ -121,7 +135,8 @@ namespace UtilitiesCS
             }
             catch (System.InvalidOperationException e)
             {
-                string message = $"Error dequeuing at line {e.GetLineNumber()} in {nameof(CtfMapEntry)}.{nameof(TryDequeueEntry)} of the backup loader";
+                string message =
+                    $"Error dequeuing at line {e.GetLineNumber()} in {nameof(CtfMapEntry)}.{nameof(TryDequeueEntry)} of the backup loader";
                 log.Error(message, e);
                 Debug.WriteLine(message);
                 DequeueToNextRecord(ref lines);
@@ -139,9 +154,15 @@ namespace UtilitiesCS
                 {
                     continueLoop = false;
                 }
-                else { lines.Dequeue(); }
+                else
+                {
+                    lines.Dequeue();
+                }
             }
-            if (lines.Count == 1) { lines.Dequeue(); }
+            if (lines.Count == 1)
+            {
+                lines.Dequeue();
+            }
         }
 
         public static bool IsEntryID(string line)
@@ -150,7 +171,10 @@ namespace UtilitiesCS
             {
                 return true;
             }
-            else { return false; }
+            else
+            {
+                return false;
+            }
         }
 
         private static Queue<string> ArrayToQueue(string[] array)
@@ -182,9 +206,8 @@ namespace UtilitiesCS
             }
 
             return filecontents;
-
         }
 
-        #endregion 
+        #endregion
     }
 }

@@ -1,22 +1,22 @@
-﻿using Microsoft.Data.Analysis;
-using Microsoft.Office.Interop.Outlook;
-using Outlook = Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Fizzler;
+using Microsoft.Data.Analysis;
+using Microsoft.Office.Interop.Outlook;
+using Newtonsoft.Json;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
-using UtilitiesCS.Threading;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using Newtonsoft.Json;
-using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.Extensions;
+using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.HelperClasses;
-using Fizzler;
+using UtilitiesCS.Threading;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS //QuickFiler
 {
@@ -25,13 +25,40 @@ namespace UtilitiesCS //QuickFiler
     /// </summary>
     public class MailItemHelper : INotifyPropertyChanged, IItemInfo
     {
+        internal readonly struct MailItemProjection
+        {
+            public MailItemProjection(string subject, string entryId)
+            {
+                Subject = subject ?? string.Empty;
+                EntryId = entryId ?? string.Empty;
+            }
+
+            public string Subject { get; }
+            public string EntryId { get; }
+        }
+
+        internal static MailItemProjection TryProjectMailItemMembers(object source)
+        {
+            if (source is null)
+            {
+                return new MailItemProjection(string.Empty, string.Empty);
+            }
+
+            var type = source.GetType();
+            var subject = type.GetProperty("Subject")?.GetValue(source) as string;
+            var entryId = type.GetProperty("EntryID")?.GetValue(source) as string;
+            return new MailItemProjection(subject ?? string.Empty, entryId ?? string.Empty);
+        }
+
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region Constructors, Initializers, and Destructors
 
         public MailItemHelper()
         {
+            InitializeSafeDefaults();
             _attachmentsInfo = new(() => AttachmentsHelper.Select(x => x.AttachmentInfo).ToArray());
         }
 
@@ -55,17 +82,48 @@ namespace UtilitiesCS //QuickFiler
             _emailPrefixToStrip = new(() => Globals.Ol.EmailPrefixToStrip, true);
             _storeId = new(() => ((Folder)_item.Parent).StoreID, true);
             _folderName = new(() => ((Folder)_item.Parent).Name, true);
-            _folderInfo = new(() => new FolderWrapper((Folder)Item.Parent, ResolveFolderRoot(globals, ((Folder)Item.Parent).FolderPath)));
+            _folderInfo = new(() =>
+                new FolderWrapper(
+                    (Folder)Item.Parent,
+                    ResolveFolderRoot(globals, ((Folder)Item.Parent).FolderPath)
+                )
+            );
             _htmlBody = new(() => _item.HTMLBody, true);
             _html = new(() => GetHtml(HTMLBody), true);
             _isTaskFlagSet = new(() => _item.FlagStatus == OlFlagStatus.olFlagMarked);
             _olRecipients = new(() => _item.Recipients?.Cast<Recipient>().ToArray(), true);
-            _ccRecipients = new(() => OlRecipients?.Where(x => x.Type == (int)OlMailRecipientType.olCC).Select(x => x.GetInfo()).ToArray(), true);
-            _toRecipients = new(() => OlRecipients?.Where(x => x.Type == (int)OlMailRecipientType.olTo).Select(x => x.GetInfo()).ToArray(), true);
-            _toRecipientsName = new(() => string.Join("; ", ToRecipients?.Select(t => t.Name) ?? [""]), true);
-            _toRecipientsHtml = new(() => string.Join("; ", ToRecipients?.Select(t => t.Html) ?? [""]), true);
-            _ccRecipientsName = new(() => string.Join("; ", CcRecipients?.Select(t => t.Name) ?? [""]), true);
-            _ccRecipientsHtml = new(() => string.Join("; ", CcRecipients?.Select(t => t.Html) ?? [""]), true);
+            _ccRecipients = new(
+                () =>
+                    OlRecipients
+                        ?.Where(x => x.Type == (int)OlMailRecipientType.olCC)
+                        .Select(x => x.GetInfo())
+                        .ToArray(),
+                true
+            );
+            _toRecipients = new(
+                () =>
+                    OlRecipients
+                        ?.Where(x => x.Type == (int)OlMailRecipientType.olTo)
+                        .Select(x => x.GetInfo())
+                        .ToArray(),
+                true
+            );
+            _toRecipientsName = new(
+                () => string.Join("; ", ToRecipients?.Select(t => t.Name) ?? [""]),
+                true
+            );
+            _toRecipientsHtml = new(
+                () => string.Join("; ", ToRecipients?.Select(t => t.Html) ?? [""]),
+                true
+            );
+            _ccRecipientsName = new(
+                () => string.Join("; ", CcRecipients?.Select(t => t.Name) ?? [""]),
+                true
+            );
+            _ccRecipientsHtml = new(
+                () => string.Join("; ", CcRecipients?.Select(t => t.Html) ?? [""]),
+                true
+            );
             _sentDate = new(() => _item.SentOn, true);
             _sentOn = new(() => this.SentDate.ToString("g"), true);
             _size = new(() => _item.Size, true);
@@ -73,12 +131,55 @@ namespace UtilitiesCS //QuickFiler
             _tokens = new(() => Tokenizer.Tokenize(this).ToArray(), true);
             _triage = new(() => _item.GetTriage(), true);
             _unread = new(() => _item.UnRead, true);
-            _attachmentsHelper = new(() => _item.Attachments
-                                                .Cast<Attachment>()
-                                                .Select(x => new AttachmentHelper(x, SentDate, FolderName))
-                                                .ToArray(), true);
-            _attachmentsInfo = new(() => AttachmentsHelper?.Select(x => x.AttachmentInfo)?.ToArray());
+            _attachmentsHelper = new(
+                () =>
+                    _item
+                        .Attachments.Cast<Attachment>()
+                        .Select(x => new AttachmentHelper(x, SentDate, FolderName))
+                        .ToArray(),
+                true
+            );
+            _attachmentsInfo = new(() =>
+                AttachmentsHelper?.Select(x => x.AttachmentInfo)?.ToArray()
+            );
             _internetCodepage = new(() => _item.InternetCodepage, true);
+        }
+
+        private void InitializeSafeDefaults()
+        {
+            _actionable = string.Empty.ToLazy();
+            _body = string.Empty.ToLazy();
+            _categories = string.Empty.ToLazy();
+            _conversationID = string.Empty.ToLazy();
+            _emailPrefixToStrip = string.Empty.ToLazy();
+            _entryId = string.Empty.ToLazy();
+            _globals = new Lazy<IApplicationGlobals>(() => null, true);
+            _storeId = string.Empty.ToLazy();
+            _folderInfo = new Lazy<IFolderWrapper>(() => null, true);
+            _folderName = string.Empty.ToLazy();
+            _sentOn = string.Empty.ToLazy();
+            _subject = string.Empty.ToLazy();
+            _senderHtml = string.Empty.ToLazy();
+            _senderName = string.Empty.ToLazy();
+            _sender = new Lazy<IRecipientInfo>(() => null, true);
+            _size = 0.ToLazyValue();
+            _olRecipients = Array.Empty<Recipient>().ToLazyTry();
+            _ccRecipientsHtml = string.Empty.ToLazy();
+            _ccRecipientsName = string.Empty.ToLazy();
+            _ccRecipients = Array.Empty<IRecipientInfo>().ToLazy();
+            _toRecipientsHtml = string.Empty.ToLazy();
+            _toRecipientsName = string.Empty.ToLazy();
+            _toRecipients = Array.Empty<IRecipientInfo>().ToLazy();
+            _triage = string.Empty.ToLazy();
+            _html = string.Empty.ToLazy();
+            _htmlBody = string.Empty.ToLazy();
+            _sentDate = DateTime.MinValue.ToLazyValue();
+            _attachmentsHelper = Array.Empty<AttachmentHelper>().ToLazy();
+            _attachmentsInfo = Array.Empty<IAttachment>().ToLazy();
+            _tokens = Array.Empty<string>().ToLazy();
+            _unread = false.ToLazyValue();
+            _internetCodepage = 0.ToLazyValue();
+            _isTaskFlagSet = false.ToLazyValue();
         }
 
         public MailItemHelper(DataFrame df, long indexRow, string emailPrefixToStrip)
@@ -112,18 +213,33 @@ namespace UtilitiesCS //QuickFiler
             _attachmentsInfo = itemInfo.AttachmentsInfo.ToLazy();
         }
 
-        public static MailItemHelper FromDf(DataFrame df, long indexRow, IApplicationGlobals appGlobals, CancellationToken token = default)
+        public static MailItemHelper FromDf(
+            DataFrame df,
+            long indexRow,
+            IApplicationGlobals appGlobals,
+            CancellationToken token = default
+        )
         {
             var info = new MailItemHelper(df, indexRow, appGlobals.Ol.EmailPrefixToStrip);
             info.ResolveMail(appGlobals.Ol.NamespaceMAPI, strict: true);
             info.InitLazyFields(appGlobals);
             //info.LoadPriority(appGlobals, token);
             info.LoadPriorityForce();
-            info.FolderInfo.OlRoot = ResolveFolderRoot(appGlobals, info.FolderInfo.OlFolder.FolderPath);
+            info.FolderInfo.OlRoot = ResolveFolderRoot(
+                appGlobals,
+                info.FolderInfo.OlFolder.FolderPath
+            );
             return info;
         }
 
-        public static async Task<MailItemHelper> FromDfAsync(DataFrame df, long indexRow, IApplicationGlobals appGlobals, CancellationToken token, bool background, bool resolveOnly)
+        public static async Task<MailItemHelper> FromDfAsync(
+            DataFrame df,
+            long indexRow,
+            IApplicationGlobals appGlobals,
+            CancellationToken token,
+            bool background,
+            bool resolveOnly
+        )
         {
             token.ThrowIfCancellationRequested();
 
@@ -131,7 +247,10 @@ namespace UtilitiesCS //QuickFiler
             await info.ResolveMailAsync(appGlobals.Ol.NamespaceMAPI, token, background);
             info.InitLazyFields(appGlobals);
 
-            if (!resolveOnly) { await info.FromDfAfterResolved(); }
+            if (!resolveOnly)
+            {
+                await info.FromDfAfterResolved();
+            }
 
             return info;
         }
@@ -145,16 +264,25 @@ namespace UtilitiesCS //QuickFiler
             FolderInfo.OlRoot = ResolveFolderRoot(Globals, FolderInfo.OlFolder.FolderPath);
 
             _token.ThrowIfCancellationRequested();
-            await Task.Run(() =>
-            {
-                LoadRecipientsForce();
-                if (Html is not null) { } // Force Html to evaluate //{ _html = GetHtml().ToLazy(); }
-            }, _token);
+            await Task.Run(
+                () =>
+                {
+                    LoadRecipientsForce();
+                    if (Html is not null) { } // Force Html to evaluate //{ _html = GetHtml().ToLazy(); }
+                },
+                _token
+            );
 
             return this;
         }
 
-        public static async Task<MailItemHelper> FromDfAsync(DataFrame df, long indexRow, IApplicationGlobals appGlobals, CancellationToken token, bool background)
+        public static async Task<MailItemHelper> FromDfAsync(
+            DataFrame df,
+            long indexRow,
+            IApplicationGlobals appGlobals,
+            CancellationToken token,
+            bool background
+        )
         {
             token.ThrowIfCancellationRequested();
 
@@ -165,15 +293,20 @@ namespace UtilitiesCS //QuickFiler
             //await Task.Run(() => info.LoadPriorityItems(appGlobals, token), token);
             info.InitLazyFields(appGlobals);
 
-
-            info.FolderInfo.OlRoot = ResolveFolderRoot(appGlobals, info.FolderInfo.OlFolder.FolderPath);
+            info.FolderInfo.OlRoot = ResolveFolderRoot(
+                appGlobals,
+                info.FolderInfo.OlFolder.FolderPath
+            );
 
             token.ThrowIfCancellationRequested();
-            await Task.Run(() =>
-            {
-                info.LoadRecipientsForce();
-                if (info.Html is not null) { }// force eval //info._html = info.GetHtml().ToLazy(); }
-            }, token);
+            await Task.Run(
+                () =>
+                {
+                    info.LoadRecipientsForce();
+                    if (info.Html is not null) { } // force eval //info._html = info.GetHtml().ToLazy(); }
+                },
+                token
+            );
 
             return info;
         }
@@ -194,19 +327,23 @@ namespace UtilitiesCS //QuickFiler
             MailItem item,
             IApplicationGlobals appGlobals,
             CancellationToken token,
-            bool loadAll)
+            bool loadAll
+        )
         {
             //TraceUtility.LogMethodCall(item, emailPrefixToStrip,token,loadAll);
 
             token.ThrowIfCancellationRequested();
             item.ThrowIfNull();
 
-            return await Task.Run(() =>
-            {
-                var info = new MailItemHelper(item, appGlobals);
-                info.Sw = new SegmentStopWatch().Start();
-                return info;
-            }, token);
+            return await Task.Run(
+                () =>
+                {
+                    var info = new MailItemHelper(item, appGlobals);
+                    info.Sw = new SegmentStopWatch().Start();
+                    return info;
+                },
+                token
+            );
         }
 
         public MailItem ResolveMail(Outlook.NameSpace olNs, bool strict = false)
@@ -216,44 +353,78 @@ namespace UtilitiesCS //QuickFiler
                 () => (MailItem)olNs.GetItemFromID(EntryId, StoreId),
                 strict,
                 _entryId,
-                _storeId);
+                _storeId
+            );
         }
 
-        public async Task<MailItem> ResolveMailAsync(Outlook.NameSpace olNs, CancellationToken token, bool background)
+        public async Task<MailItem> ResolveMailAsync(
+            Outlook.NameSpace olNs,
+            CancellationToken token,
+            bool background
+        )
         {
             //TaskScheduler priority = background ? PriorityScheduler.BelowNormal : PriorityScheduler.AboveNormal;
 
-            return await Task.Run(
-                () => ResolveMail(olNs, strict: true),
-                token);//,
-                       //TaskCreationOptions.None,
-                       //priority);
+            return await Task.Run(() => ResolveMail(olNs, strict: true), token); //,
+            //TaskCreationOptions.None,
+            //priority);
         }
 
         public void LoadPriorityForce()
         {
             Item.ThrowIfNull();
-            _ = new object[] { EntryId, Sender, SenderName, SenderHtml, Subject, Body, Categories,
-                Triage, SentOn, Actionable, FolderInfo, FolderName, Globals, ConversationID };
+            _ = new object[]
+            {
+                EntryId,
+                Sender,
+                SenderName,
+                SenderHtml,
+                Subject,
+                Body,
+                Categories,
+                Triage,
+                SentOn,
+                Actionable,
+                FolderInfo,
+                FolderName,
+                Globals,
+                ConversationID,
+            };
         }
 
-        public MailItemHelper LoadAll(IApplicationGlobals globals, Folder olRoot, bool loadTokens = false)
+        public MailItemHelper LoadAll(
+            IApplicationGlobals globals,
+            Folder olRoot,
+            bool loadTokens = false
+        )
         {
-            if (Item is null) { throw new ArgumentNullException(); }
+            if (Item is null)
+            {
+                throw new ArgumentNullException();
+            }
             InitLazyFields(globals);
 
             LoadPriorityForce();
             FolderInfo.OlRoot = olRoot;
             LoadRecipientsForce();
-            if (Html is not null) { }//{ _html = GetHtml().ToLazy(); }
+            if (Html is not null) { } //{ _html = GetHtml().ToLazy(); }
             //if (loadTokens) { LoadTokens(); }
-            if (loadTokens) { _ = Tokens; }
+            if (loadTokens)
+            {
+                _ = Tokens;
+            }
             return this;
         }
 
         public void LoadRecipientsForce()
         {
-            _ = new string[] { ToRecipientsName, ToRecipientsHtml, CcRecipientsName, CcRecipientsHtml };
+            _ = new string[]
+            {
+                ToRecipientsName,
+                ToRecipientsHtml,
+                CcRecipientsName,
+                CcRecipientsHtml,
+            };
             Sw?.LogDuration("LoadRecipientsForce");
         }
 
@@ -261,12 +432,17 @@ namespace UtilitiesCS //QuickFiler
         {
             var recipients = Item.Recipients.Cast<Recipient>().ToArray();
             Sw?.LogDuration("Recipients -> Cast to array");
-            ToRecipients = recipients.Where(x => x.Type == (int)OlMailRecipientType.olTo).Select(x => x.GetInfo()).ToArray();
-
+            ToRecipients = recipients
+                .Where(x => x.Type == (int)OlMailRecipientType.olTo)
+                .Select(x => x.GetInfo())
+                .ToArray();
 
             ToRecipientsName = string.Join("; ", ToRecipients.Select(t => t.Name));
             ToRecipientsHtml = string.Join("; ", ToRecipients.Select(t => t.Html));
-            CcRecipients = recipients.Where(x => x.Type == (int)OlMailRecipientType.olCC).Select(x => x.GetInfo()).ToArray();
+            CcRecipients = recipients
+                .Where(x => x.Type == (int)OlMailRecipientType.olCC)
+                .Select(x => x.GetInfo())
+                .ToArray();
 
             CcRecipientsName = string.Join("; ", CcRecipients.Select(t => t.Name));
             CcRecipientsHtml = string.Join("; ", CcRecipients.Select(t => t.Html));
@@ -289,6 +465,7 @@ namespace UtilitiesCS //QuickFiler
         private ThreadSafeSingleShotGuard _recipientsStarted = new();
         private CancellationToken _token;
         private readonly ThreadSafeSingleShotGuard _loadNotStarted = new();
+
         //private bool _completedLoadingPriority;
         public SegmentStopWatch Sw { get; set; }
 
@@ -297,39 +474,80 @@ namespace UtilitiesCS //QuickFiler
         #region Public Properties
 
         private Lazy<string> _actionable;
-        public string Actionable { get => _actionable?.Value; set => _actionable = value.ToLazy(); }
+        public string Actionable
+        {
+            get => _actionable?.Value ?? string.Empty;
+            set => _actionable = value.ToLazy();
+        }
 
         private Lazy<string> _body;
-        public string Body { get => _body?.Value; set => _body = value.ToLazy(); }
+        public string Body
+        {
+            get => _body?.Value ?? string.Empty;
+            set => _body = value.ToLazy();
+        }
 
         private Lazy<string> _categories;
-        public string Categories { get => _categories?.Value; set => _categories = value.ToLazy(); }
+        public string Categories
+        {
+            get => _categories?.Value ?? string.Empty;
+            set => _categories = value.ToLazy();
+        }
 
         private Lazy<string> _conversationID;
-        public string ConversationID { get => _conversationID?.Value; set => _conversationID = value.ToLazy(); }
+        public string ConversationID
+        {
+            get => _conversationID?.Value ?? string.Empty;
+            set => _conversationID = value.ToLazy();
+        }
 
         private Lazy<string> _emailPrefixToStrip;
-        public string EmailPrefixToStrip { get => _emailPrefixToStrip?.Value; internal set => _emailPrefixToStrip = value.ToLazy(); }
+        public string EmailPrefixToStrip
+        {
+            get => _emailPrefixToStrip?.Value ?? string.Empty;
+            internal set => _emailPrefixToStrip = value.ToLazy();
+        }
 
         //private string _entryId;
         //public string EntryId { get => PriorityInitialized(ref _entryId); set => _entryId = value; }
 
         //private Lazy<T> _entryId = new(() => { return default; }, true);
         private Lazy<string> _entryId;
-        public string EntryId { get => _entryId.Value; set => _entryId = value.ToLazy(); }
+        public string EntryId
+        {
+            get => _entryId?.Value ?? string.Empty;
+            set => _entryId = value.ToLazy();
+        }
 
         private Lazy<IApplicationGlobals> _globals;
+
         [JsonIgnore]
-        internal IApplicationGlobals Globals { get => _globals?.Value; set => _globals = value.ToLazy(); }
+        internal IApplicationGlobals Globals
+        {
+            get => _globals?.Value;
+            set => _globals = value.ToLazy();
+        }
 
         private Lazy<string> _storeId;
-        public string StoreId { get => _storeId.Value; set => _storeId = value.ToLazy(); }
+        public string StoreId
+        {
+            get => _storeId?.Value ?? string.Empty;
+            set => _storeId = value.ToLazy();
+        }
 
         private Lazy<IFolderWrapper> _folderInfo;
-        public IFolderWrapper FolderInfo { get => _folderInfo?.Value; set => _folderInfo = value.ToLazy(); }
+        public IFolderWrapper FolderInfo
+        {
+            get => _folderInfo?.Value;
+            set => _folderInfo = value.ToLazy();
+        }
 
         private Lazy<string> _folderName;
-        public string FolderName { get => _folderName?.Value; set => _folderName = value.ToLazy(); }
+        public string FolderName
+        {
+            get => _folderName?.Value ?? string.Empty;
+            set => _folderName = value.ToLazy();
+        }
 
         private MailItem _item;
         public virtual MailItem Item
@@ -340,86 +558,157 @@ namespace UtilitiesCS //QuickFiler
             set => _item = value;
         }
 
-        private IItemInfo.PlainTextOptionsEnum _plainTextOptions = IItemInfo.PlainTextOptionsEnum.StripAll;
-        public virtual IItemInfo.PlainTextOptionsEnum PlainTextOptions { get => _plainTextOptions; set => _plainTextOptions = value; }
+        private IItemInfo.PlainTextOptionsEnum _plainTextOptions = IItemInfo
+            .PlainTextOptionsEnum
+            .StripAll;
+        public virtual IItemInfo.PlainTextOptionsEnum PlainTextOptions
+        {
+            get => _plainTextOptions;
+            set => _plainTextOptions = value;
+        }
 
         private Lazy<string> _sentOn;
-        public virtual string SentOn { get => _sentOn?.Value; set => _sentOn = value.ToLazy(); }
+        public virtual string SentOn
+        {
+            get => _sentOn?.Value ?? string.Empty;
+            set => _sentOn = value.ToLazy();
+        }
 
         private Lazy<string> _subject;
-        public virtual string Subject { get => _subject?.Value; set => _subject = value.ToLazy(); }
+        public virtual string Subject
+        {
+            get => _subject?.Value ?? string.Empty;
+            set => _subject = value.ToLazy();
+        }
 
         private Lazy<string> _senderHtml;
-        public virtual string SenderHtml { get => _senderHtml?.Value; set => _senderHtml = value.ToLazy(); }
+        public virtual string SenderHtml
+        {
+            get => _senderHtml?.Value ?? string.Empty;
+            set => _senderHtml = value.ToLazy();
+        }
 
         private Lazy<string> _senderName;
-        public virtual string SenderName { get => _senderName?.Value; set => _senderName = value.ToLazy(); }
+        public virtual string SenderName
+        {
+            get => _senderName?.Value ?? string.Empty;
+            set => _senderName = value.ToLazy();
+        }
 
         private Lazy<IRecipientInfo> _sender;
-        public virtual IRecipientInfo Sender { get => _sender.Value; set => _sender = value.ToLazy(); }
+        public virtual IRecipientInfo Sender
+        {
+            get => _sender?.Value;
+            set => _sender = value.ToLazy();
+        }
 
         private Lazy<int> _size;
-        public virtual int Size { get => _size.Value; set => _size = value.ToLazyValue(); }
+        public virtual int Size
+        {
+            get => _size?.Value ?? 0;
+            set => _size = value.ToLazyValue();
+        }
 
         private LazyTry<Recipient[]> _olRecipients;
-        internal virtual Recipient[] OlRecipients { get => _olRecipients.Value; set => _olRecipients = value.ToLazyTry(); }
+        internal virtual Recipient[] OlRecipients
+        {
+            get => _olRecipients?.Value ?? Array.Empty<Recipient>();
+            set => _olRecipients = value.ToLazyTry();
+        }
 
         private Lazy<string> _ccRecipientsHtml;
         public virtual string CcRecipientsHtml
         {
-            get => _ccRecipientsHtml.Value;
-            set { _ccRecipientsHtml = value.ToLazy(); NotifyPropertyChanged(); }
+            get => _ccRecipientsHtml?.Value ?? string.Empty;
+            set
+            {
+                _ccRecipientsHtml = value.ToLazy();
+                NotifyPropertyChanged();
+            }
         }
 
         private Lazy<string> _ccRecipientsName;
         public virtual string CcRecipientsName
         {
-            get => _ccRecipientsName.Value;
-            set { _ccRecipientsName = value.ToLazy(); NotifyPropertyChanged(); }
+            get => _ccRecipientsName?.Value ?? string.Empty;
+            set
+            {
+                _ccRecipientsName = value.ToLazy();
+                NotifyPropertyChanged();
+            }
         }
 
         private Lazy<IRecipientInfo[]> _ccRecipients;
         public virtual IRecipientInfo[] CcRecipients
         {
-            get => _ccRecipients.Value;
+            get => _ccRecipients?.Value ?? Array.Empty<IRecipientInfo>();
             protected set => _ccRecipients = value.ToLazy();
         }
 
         private Lazy<string> _toRecipientsHtml;
         public virtual string ToRecipientsHtml
         {
-            get => _toRecipientsHtml.Value;
-            set { _toRecipientsHtml = value.ToLazy(); NotifyPropertyChanged(); }
+            get => _toRecipientsHtml?.Value ?? string.Empty;
+            set
+            {
+                _toRecipientsHtml = value.ToLazy();
+                NotifyPropertyChanged();
+            }
         }
 
         private Lazy<string> _toRecipientsName;
         public virtual string ToRecipientsName
         {
-            get => _toRecipientsName.Value;
-            set { _toRecipientsName = value.ToLazy(); NotifyPropertyChanged(); }
+            get => _toRecipientsName?.Value ?? string.Empty;
+            set
+            {
+                _toRecipientsName = value.ToLazy();
+                NotifyPropertyChanged();
+            }
         }
 
         private Lazy<IRecipientInfo[]> _toRecipients;
         public virtual IRecipientInfo[] ToRecipients
         {
-            get => _toRecipients.Value;
+            get => _toRecipients?.Value ?? Array.Empty<IRecipientInfo>();
             protected set => _toRecipients = value.ToLazy();
         }
 
         private Lazy<string> _triage;
-        public virtual string Triage { get => _triage.Value; set => _triage = value.ToLazy(); }
+        public virtual string Triage
+        {
+            get => _triage?.Value ?? string.Empty;
+            set => _triage = value.ToLazy();
+        }
 
         private Lazy<string> _html = null;
-        public virtual string Html { get => _html.Value; private set => _html = value.ToLazy(); }
+        public virtual string Html
+        {
+            get => _html?.Value ?? string.Empty;
+            private set => _html = value.ToLazy();
+        }
 
         private Lazy<string> _htmlBody;
-        public virtual string HTMLBody { get => _htmlBody.Value; protected set => _htmlBody = value.ToLazy(); }
+        public virtual string HTMLBody
+        {
+            get => _htmlBody?.Value ?? string.Empty;
+            protected set => _htmlBody = value.ToLazy();
+        }
 
         private Lazy<DateTime> _sentDate;
-        public virtual DateTime SentDate { get => _sentDate.Value; set => _sentDate = value.ToLazyValue(); }
+        public virtual DateTime SentDate
+        {
+            get => _sentDate?.Value ?? default;
+            set => _sentDate = value.ToLazyValue();
+        }
 
         private Lazy<AttachmentHelper[]> _attachmentsHelper;
-        public virtual AttachmentHelper[] AttachmentsHelper { get => _attachmentsHelper.Value; protected set => _attachmentsHelper = value.ToLazy(); }
+        public virtual AttachmentHelper[] AttachmentsHelper
+        {
+            get => _attachmentsHelper?.Value ?? Array.Empty<AttachmentHelper>();
+            protected set => _attachmentsHelper = value.ToLazy();
+        }
+
         //{
         //    get => Initializer.GetOrLoad(ref _attachments, LoadAttachmentsInfo);
         //    private set => _attachments = value;
@@ -427,23 +716,34 @@ namespace UtilitiesCS //QuickFiler
 
         internal AttachmentHelper[] LoadAttachmentsInfo()
         {
-            var attachments = Item.Attachments
-                                  .Cast<Attachment>()
-                                  .Select(x => new AttachmentHelper(x, SentDate, FolderName, EmailPrefixToStrip))
-                                  .ToArray();
+            var attachments = Item
+                .Attachments.Cast<Attachment>()
+                .Select(x => new AttachmentHelper(x, SentDate, FolderName, EmailPrefixToStrip))
+                .ToArray();
             AttachmentsInfo = attachments.Select(x => x.AttachmentInfo).ToArray();
             return attachments;
         }
 
         private Lazy<IAttachment[]> _attachmentsInfo;
-        public IAttachment[] AttachmentsInfo { get => _attachmentsInfo?.Value; protected set => _attachmentsInfo = value.ToLazy(); }
+        public IAttachment[] AttachmentsInfo
+        {
+            get => _attachmentsInfo?.Value;
+            protected set => _attachmentsInfo = value.ToLazy();
+        }
 
         public string GetHeadersExtendedMapi()
         {
-            return (string)Item.PropertyAccessor.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x007D001F/");
+            return (string)
+                Item.PropertyAccessor.GetProperty(
+                    "http://schemas.microsoft.com/mapi/proptag/0x007D001F/"
+                );
         }
 
-        public string[] Tokens { get => _tokens.Value; protected set => _tokens = value.ToLazy(); }
+        public string[] Tokens
+        {
+            get => _tokens?.Value ?? Array.Empty<string>();
+            protected set => _tokens = value.ToLazy();
+        }
         private Lazy<string[]> _tokens;
 
         public async Task<IEnumerable<string>> TokenizeAsync()
@@ -454,13 +754,16 @@ namespace UtilitiesCS //QuickFiler
         }
 
         [JsonIgnore]
-        public IEmailTokenizer Tokenizer { get => _tokenizer ??= new EmailTokenizer(); }
+        public IEmailTokenizer Tokenizer
+        {
+            get => _tokenizer ??= new EmailTokenizer();
+        }
         private IEmailTokenizer _tokenizer;
 
         private Lazy<bool> _unread;
         public bool UnRead
         {
-            get => _unread.Value;
+            get => _unread?.Value ?? false;
             set
             {
                 _unread = value.ToLazyValue();
@@ -471,17 +774,22 @@ namespace UtilitiesCS //QuickFiler
 
         public int InternetCodepage
         {
-            get => _internetCodepage.Value;
+            get => _internetCodepage?.Value ?? 0;
             set => _internetCodepage = value.ToLazyValue();
         }
         private Lazy<int> _internetCodepage;
+
         private int LoadInternetCodepage()
         {
             return _item.ThrowIfNull().InternetCodepage;
         }
 
         private Lazy<bool> _isTaskFlagSet;
-        public bool IsTaskFlagSet { get => _isTaskFlagSet.Value; set => _isTaskFlagSet = value.ToLazyValue(); }
+        public bool IsTaskFlagSet
+        {
+            get => _isTaskFlagSet?.Value ?? false;
+            set => _isTaskFlagSet = value.ToLazyValue();
+        }
 
         #endregion
 
@@ -500,12 +808,23 @@ namespace UtilitiesCS //QuickFiler
 
         internal static string CompressPlainText(string text, string emailPrefixToStrip)
         {
-            return CompressPlainText(text ?? "", IItemInfo.PlainTextOptionsEnum.StripAll, emailPrefixToStrip ?? "");
+            return CompressPlainText(
+                text ?? "",
+                IItemInfo.PlainTextOptionsEnum.StripAll,
+                emailPrefixToStrip ?? ""
+            );
         }
 
-        internal static string CompressPlainText(string text, IItemInfo.PlainTextOptionsEnum options, string emailPrefixToStrip)
+        internal static string CompressPlainText(
+            string text,
+            IItemInfo.PlainTextOptionsEnum options,
+            string emailPrefixToStrip
+        )
         {
-            if (options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripWarning) && emailPrefixToStrip != "")
+            if (
+                options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripWarning)
+                && emailPrefixToStrip != ""
+            )
                 text = text.Replace(emailPrefixToStrip, "");
 
             if (options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripLinks))
@@ -516,19 +835,29 @@ namespace UtilitiesCS //QuickFiler
                 text = Regex.Replace(text, @"<https://[^>]+>", replacementText); //Strip links
             }
 
-            if (options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyHeader) ||
-                options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyBody))
+            if (
+                options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyHeader)
+                || options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyBody)
+            )
             {
                 var replacementText = "";
-                if (options.HasFlag(IItemInfo.PlainTextOptionsEnum.ShowStripped | IItemInfo.PlainTextOptionsEnum.StripReplyHeader) &&
-                    !options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyBody))
+                if (
+                    options.HasFlag(
+                        IItemInfo.PlainTextOptionsEnum.ShowStripped
+                            | IItemInfo.PlainTextOptionsEnum.StripReplyHeader
+                    ) && !options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyBody)
+                )
                     replacementText = "<EOM> Chain: $3";
                 else if (!options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyHeader))
                     replacementText += "$1";
                 else if (!options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripReplyBody))
                     replacementText += "$3";
 
-                text = Regex.Replace(text, @"(From:([^\n]*\n){1,4}Subject: {0,1}[rR][eE]:.*)(.|\n|\r)*\z", replacementText); //Strip reply footer
+                text = Regex.Replace(
+                    text,
+                    @"(From:([^\n]*\n){1,4}Subject: {0,1}[rR][eE]:.*)(.|\n|\r)*\z",
+                    replacementText
+                ); //Strip reply footer
             }
 
             if (options.HasFlag(IItemInfo.PlainTextOptionsEnum.StripFormatting))
@@ -544,26 +873,34 @@ namespace UtilitiesCS //QuickFiler
         internal string EmailHeader2
         {
             get => //@"<div class=""WordSection1"">
-@"
+                @"
 <p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
 225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
 style='color:black'>From:<span style='mso-tab-count:1'> </span></span></b><span
-style='color:black'>" + this.SenderName + @"<o:p></o:p></span></p>
+style='color:black'>"
+                + this.SenderName
+                + @"<o:p></o:p></span></p>
 
 <p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
 225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
 style='color:black'>Sent:<span style='mso-tab-count:1'> </span></span></b><span
-style='color:black'>" + this.SentOn + @"<o:p></o:p></span></p>
+style='color:black'>"
+                + this.SentOn
+                + @"<o:p></o:p></span></p>
 
 <p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
 225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
 style='color:black'>To:<span style='mso-tab-count:1'> </span></span></b><span
-style='color:black'>" + this.ToRecipientsName + @"<o:p></o:p></span></p>
+style='color:black'>"
+                + this.ToRecipientsName
+                + @"<o:p></o:p></span></p>
 
 <p class=MsoNormal style='margin-left:225.0pt;text-indent:-225.0pt;tab-stops:
 225.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
 style='color:black'>Subject:<span style='mso-tab-count:1'></span></span></b><span
-style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
+style='color:black'>"
+                + this.Subject
+                + @"<o:p></o:p></span></p>
 
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>";
         }
@@ -576,15 +913,26 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
             {
                 if (_emailHeader is null)
                 {
-                    _emailHeader = @"
+                    _emailHeader =
+                        @"
     <div>
 		<div style=""font-family:Calibri,serif;border-right:none;border-bottom:1pt solid rgb(225,225,225);border-left:none;border-top:none;padding:3pt 0in 0in"">
 			<p class=""MsoNormal"">
-				<b>From:</b>" + this.SenderHtml + @"<br>
-				<b>Sent:</b>" + this.SentOn + @"<br>
-				<b>To:</b>" + this.ToRecipientsHtml + @"<br>
-				<b>Cc:</b>" + this.CcRecipientsHtml + @"<br>
-				<b>Subject:</b>" + this.Subject + @"
+				<b>From:</b>"
+                        + this.SenderHtml
+                        + @"<br>
+				<b>Sent:</b>"
+                        + this.SentOn
+                        + @"<br>
+				<b>To:</b>"
+                        + this.ToRecipientsHtml
+                        + @"<br>
+				<b>Cc:</b>"
+                        + this.CcRecipientsHtml
+                        + @"<br>
+				<b>Subject:</b>"
+                        + this.Subject
+                        + @"
 			</p>
 		</div>
 	</div>
@@ -598,7 +946,8 @@ style='color:black'>" + this.Subject + @"<o:p></o:p></span></p>
 
         internal string DarkModeHeader
         {
-            get => @"
+            get =>
+                @"
 <style>
 body { filter: invert(100%) }
 * { backdrop-filter: invert(20%) }
@@ -615,8 +964,13 @@ img {
         public string ToggleDark()
         {
             if (_darkMode == Enums.ToggleState.On)
-            { return ToggleDark(Enums.ToggleState.Off); }
-            else { return ToggleDark(Enums.ToggleState.On); }
+            {
+                return ToggleDark(Enums.ToggleState.Off);
+            }
+            else
+            {
+                return ToggleDark(Enums.ToggleState.On);
+            }
         }
 
         public string ToggleDark(Enums.ToggleState desiredState)
@@ -680,24 +1034,31 @@ img {
             return info;
         }
 
-        public static MailItemHelper FromSerializableObject(ItemInfo itemInfo, Outlook.NameSpace olNs)
+        public static MailItemHelper FromSerializableObject(
+            ItemInfo itemInfo,
+            Outlook.NameSpace olNs
+        )
         {
             var helper = new MailItemHelper(itemInfo);
             try
             {
                 helper.ResolveMail(olNs, strict: true);
                 helper.AttachmentsHelper = helper
-                    .Item.Attachments
-                    .Cast<Attachment>()
+                    .Item.Attachments.Cast<Attachment>()
                     .Select(x => new AttachmentHelper(
-                        x, helper.SentDate, helper.FolderName, helper.EmailPrefixToStrip))
+                        x,
+                        helper.SentDate,
+                        helper.FolderName,
+                        helper.EmailPrefixToStrip
+                    ))
                     .ToArray();
             }
             catch (System.Exception e)
             {
-                var msg = $"Error in {nameof(MailItemHelper)}.{nameof(FromSerializableObject)}\n" +
-                    $"{nameof(ItemInfo)} sent on {itemInfo.SentOn} from {itemInfo.Sender} in folder " +
-                    $"{itemInfo.FolderName}. See exception message: \n{e.Message}";
+                var msg =
+                    $"Error in {nameof(MailItemHelper)}.{nameof(FromSerializableObject)}\n"
+                    + $"{nameof(ItemInfo)} sent on {itemInfo.SentOn} from {itemInfo.Sender} in folder "
+                    + $"{itemInfo.FolderName}. See exception message: \n{e.Message}";
                 logger.Error(msg, e);
             }
             return helper;
@@ -709,32 +1070,105 @@ img {
 
         public bool Equals(IItemInfo other)
         {
-            if (other is null) { return false; }
-            else if (ReferenceEquals(this, other)) { return true; }
+            if (other is null)
+            {
+                return false;
+            }
+            else if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
             else
             {
-                if (Size != other.Size) return false;
-                if (SentDate != other.SentDate) return false;
-                if (Subject != other.Subject) return false;
-                if (Body != other.Body) return false;
-                if (Sender != other.Sender) return false;
-                if (!RecipientsEquivalent(CcRecipients, other.CcRecipients)) return false;
-                if (!RecipientsEquivalent(ToRecipients, other.ToRecipients)) return false;
+                if (Size != other.Size)
+                    return false;
+                if (SentDate != other.SentDate)
+                    return false;
+                if (Subject != other.Subject)
+                    return false;
+                if (Body != other.Body)
+                    return false;
+                if (Sender != other.Sender)
+                    return false;
+                if (!RecipientsEquivalent(CcRecipients, other.CcRecipients))
+                    return false;
+                if (!RecipientsEquivalent(ToRecipients, other.ToRecipients))
+                    return false;
                 return true;
             }
         }
 
         internal bool RecipientsEquivalent(IRecipientInfo[] source, IRecipientInfo[] other)
         {
-            if (source == null && other == null) return true;
-            if (source == null || other == null) return false;
-            if (source.Length != other.Length) return false;
-            if (source.Intersect(other).Count() != other.Length) return false;
+            if (source == null && other == null)
+                return true;
+            if (source == null || other == null)
+                return false;
+            if (source.Length != other.Length)
+                return false;
+
+            var matched = new bool[other.Length];
+            foreach (var sourceRecipient in source)
+            {
+                var foundMatch = false;
+                for (var i = 0; i < other.Length; i++)
+                {
+                    if (matched[i])
+                    {
+                        continue;
+                    }
+
+                    if (RecipientInfosMatch(sourceRecipient, other[i]))
+                    {
+                        matched[i] = true;
+                        foundMatch = true;
+                        break;
+                    }
+                }
+
+                if (!foundMatch)
+                {
+                    return false;
+                }
+            }
+
             return true;
         }
 
+        private static bool RecipientInfosMatch(IRecipientInfo left, IRecipientInfo right)
+        {
+            if (ReferenceEquals(left, right))
+            {
+                return true;
+            }
+
+            if (left is null || right is null)
+            {
+                return false;
+            }
+
+            if (left.Equals(right) || right.Equals(left))
+            {
+                return true;
+            }
+
+            return string.Equals(
+                    left.Name ?? string.Empty,
+                    right.Name ?? string.Empty,
+                    StringComparison.Ordinal
+                )
+                && string.Equals(
+                    left.Address ?? string.Empty,
+                    right.Address ?? string.Empty,
+                    StringComparison.Ordinal
+                )
+                && string.Equals(
+                    left.Html ?? string.Empty,
+                    right.Html ?? string.Empty,
+                    StringComparison.Ordinal
+                );
+        }
+
         #endregion IEquatable<ItemInfo> Implementation
-
-
     }
 }

@@ -2,18 +2,20 @@
 using System.Globalization;
 using Microsoft.Office.Interop.Outlook;
 
-
-
 namespace ToDoModel
 {
-
     public static class CaptureEmailDetailsModule
     {
         private const int NumberOfFields = 13;
-        private readonly static Dictionary<string, string> dict_remap;
-        private const string PR_SMTP_ADDRESS = "http://schemas.microsoft.com/mapi/proptag/0x39FE001E";
+        private static readonly Dictionary<string, string> dict_remap;
+        private const string PR_SMTP_ADDRESS =
+            "http://schemas.microsoft.com/mapi/proptag/0x39FE001E";
 
-        public static string[] Details(this MailItem OlMail, string emailRootFolder, Dictionary<string, string> dictRemap = null)
+        public static string[] Details(
+            this MailItem OlMail,
+            string emailRootFolder,
+            Dictionary<string, string> dictRemap = null
+        )
         {
             string[] strAry;
 
@@ -33,15 +35,20 @@ namespace ToDoModel
             strAry[7] = OlMail.Subject;
             strAry[8] = OlMail.Body;
             int idx = strAry[4].LastIndexOf("@");
-            if (idx > -1) { strAry[9] = strAry[4].Substring(idx); }
-            else { strAry[9] = strAry[4]; }
+            if (idx > -1)
+            {
+                strAry[9] = strAry[4].Substring(idx);
+            }
+            else
+            {
+                strAry[9] = strAry[4];
+            }
             strAry[10] = OlMail.ConversationID;
             strAry[11] = OlMail.EntryID;
             strAry[12] = GetAttachmentNames(OlMail);
             strAry[13] = GetActionTaken(OlMail);
 
             return strAry;
-
         }
 
         public static string GetActionTaken(this MailItem OlMail)
@@ -50,7 +57,8 @@ namespace ToDoModel
             const int Last_Verb_Reply_All = 103;
             const int Last_Verb_Reply_Sender = 102;
             const int Last_Verb_Reply_Forward = 104;
-            const string PR_LAST_VERB_EXECUTED = "http://schemas.microsoft.com/mapi/proptag/0x10810003";
+            const string PR_LAST_VERB_EXECUTED =
+                "http://schemas.microsoft.com/mapi/proptag/0x10810003";
             string action;
 
             if (OlMail.IsMarkedAsTask == true)
@@ -76,16 +84,16 @@ namespace ToDoModel
                     case Last_Verb_Reply_All:
                     case Last_Verb_Reply_Sender:
                     case Last_Verb_Reply_Forward:
-                        {
-                            action = "Acted";
-                            break;
-                        }
+                    {
+                        action = "Acted";
+                        break;
+                    }
 
                     default:
-                        {
-                            action = "None";
-                            break;
-                        }
+                    {
+                        action = "None";
+                        break;
+                    }
                 }
             }
 
@@ -129,7 +137,9 @@ namespace ToDoModel
                 {
                     var OlPA = OlMail.Sender.PropertyAccessor;
                     string senderAddress = (string)OlPA.GetProperty(PR_SMTP_ADDRESS);
-                    return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(senderAddress.Split('@')[0].Replace(".", " "));
+                    return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(
+                        senderAddress.Split('@')[0].Replace(".", " ")
+                    );
                 }
                 catch
                 {
@@ -140,7 +150,6 @@ namespace ToDoModel
             {
                 return OlMail.Sender.Name;
             }
-
         }
 
         public static string GetSenderAddress(this MailItem OlMail)
@@ -152,7 +161,7 @@ namespace ToDoModel
                 var OlPA = OlMail.Sender.PropertyAccessor;
                 try
                 {
-                    senderAddress =(string)OlPA.GetProperty(PR_SMTP_ADDRESS);
+                    senderAddress = (string)OlPA.GetProperty(PR_SMTP_ADDRESS);
                 }
                 catch
                 {
@@ -202,7 +211,6 @@ namespace ToDoModel
 
         public static (string recipientsTo, string recipientsCC) GetRecipients(this MailItem OlMail)
         {
-
             string StrSMTPAddress;
             Recipients OlRecipients;
             string recipientsTo = "";

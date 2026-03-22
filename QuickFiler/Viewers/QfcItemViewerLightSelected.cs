@@ -20,7 +20,11 @@ namespace QuickFiler
         }
 
         private IList<Label> _tipsLabels;
-        public IList<Label> TipsLabels { get => _tipsLabels; }
+        public IList<Label> TipsLabels
+        {
+            get => _tipsLabels;
+        }
+
         private void InitTipsLabelsList()
         {
             _tipsLabels = new List<Label>
@@ -33,9 +37,8 @@ namespace QuickFiler
                 LblAcConversation,
                 LblAcEmail,
                 LblAcFolder,
-                LblAcSearch
+                LblAcSearch,
             };
-
         }
 
         private void CboFolders_DrawItem(object sender, DrawItemEventArgs e)
@@ -45,8 +48,17 @@ namespace QuickFiler
 
                 var Point = new Point(2, e.Index * e.Bounds.Height + 1);
                 int index = e.Index >= 0 ? e.Index : 0;
-                e.Graphics.FillRectangle(new SolidBrush(CboFolders.BackColor), new Rectangle(Point, e.Bounds.Size));
-                e.Graphics.DrawString(CboFolders.Items[index].ToString(), e.Font, Brush, e.Bounds, StringFormat.GenericDefault);
+                e.Graphics.FillRectangle(
+                    new SolidBrush(CboFolders.BackColor),
+                    new Rectangle(Point, e.Bounds.Size)
+                );
+                e.Graphics.DrawString(
+                    CboFolders.Items[index].ToString(),
+                    e.Font,
+                    Brush,
+                    e.Bounds,
+                    StringFormat.GenericDefault
+                );
             }
         }
     }

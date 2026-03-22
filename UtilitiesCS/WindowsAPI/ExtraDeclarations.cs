@@ -6,9 +6,9 @@ using global::System.Runtime.CompilerServices;
 using global::System.Runtime.InteropServices;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using winmdroot = global::Windows.Win32;
+
 namespace Windows.Win32
 {
-
     /// <content>
     /// Contains extern methods from "USER32.dll".
     /// </content>
@@ -60,8 +60,8 @@ namespace Windows.Win32
     //        /// <remarks>Only applies to dialog boxes.</remarks>
     //        DWLP_DLGPROC = 4
     //    }
-    
+
     //    public static int ScreenHeight = GetSystemMetrics(winmdroot.UI.WindowsAndMessaging.SYSTEM_METRICS_INDEX.SM_CYSCREEN);
-        
+
     //}
 }

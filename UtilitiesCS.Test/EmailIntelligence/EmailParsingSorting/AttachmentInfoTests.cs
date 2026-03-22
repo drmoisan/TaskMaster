@@ -1,9 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
+﻿using System;
 using System.Threading.Tasks;
-using UtilitiesCS.EmailIntelligence;
 using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using UtilitiesCS.EmailIntelligence;
 
 namespace Z.Unfinished.UtilitiesCS.Test.EmailIntelligence.EmailParsing
 {

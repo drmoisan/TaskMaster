@@ -1,12 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
-using ToDoModel;
-using UtilitiesCS;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Microsoft.Office.Interop.Outlook;
 using System.Threading.Tasks;
+using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using ToDoModel;
+using UtilitiesCS;
 
 namespace Z.Disabled.ToDoModel.Test.Email_Utilities
 {
@@ -58,7 +58,6 @@ namespace Z.Disabled.ToDoModel.Test.Email_Utilities
             //string actualFilename = "";
             //string actualExtension = "";
 
-
             //// Act
             //(filenameActual, extensionActual) = SortItemsToExistingFolder.GetAttachmentFilename(attachment);
 
@@ -68,8 +67,6 @@ namespace Z.Disabled.ToDoModel.Test.Email_Utilities
             //    () => Assert.AreEqual(filenameExpected, actualFilename),
             //    () => Assert.AreEqual(extensionExpected, actualExtension)
             //);
-
         }
-
     }
 }

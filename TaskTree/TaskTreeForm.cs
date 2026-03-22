@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using ToDoModel;
@@ -10,7 +10,7 @@ namespace TaskTree
 {
     public partial class TaskTreeForm : Form
     {
-        #region Constructors 
+        #region Constructors
 
         public TaskTreeForm()
         {
@@ -19,21 +19,28 @@ namespace TaskTree
             _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
         }
 
-        #endregion Constructors 
+        #endregion Constructors
 
         #region Public Methods and Properties
 
         private TaskTreeController _controller;
+
         public void SetController(TaskTreeController Controller)
         {
             _controller = Controller;
         }
 
         private SynchronizationContext _context;
-        public SynchronizationContext UiSyncContext { get => _context; }
+        public SynchronizationContext UiSyncContext
+        {
+            get => _context;
+        }
 
         private TaskScheduler _uiScheduler;
-        public TaskScheduler UiScheduler { get => _uiScheduler; }
+        public TaskScheduler UiScheduler
+        {
+            get => _uiScheduler;
+        }
 
         #endregion Public Methods and Properties
 
@@ -97,6 +104,5 @@ namespace TaskTree
         }
 
         #endregion Event Handlers
-
     }
 }

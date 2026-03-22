@@ -13,7 +13,9 @@ namespace QuickFiler
 {
     public static class ItemViewerQueue
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
         private static Queue<ItemViewer> _queue = new Queue<ItemViewer>();
 
         public static void BuildQueueWhenIdle(int count)
@@ -25,7 +27,8 @@ namespace QuickFiler
                     {
                         _queue.Enqueue(new ItemViewer());
                     },
-                    System.Windows.Threading.DispatcherPriority.ContextIdle);
+                    System.Windows.Threading.DispatcherPriority.ContextIdle
+                );
             }
         }
 
@@ -39,7 +42,8 @@ namespace QuickFiler
                         _queue.Enqueue(new ItemViewer());
                         //logger.Debug($"Enqueued {_queue.Count}");
                     },
-                    System.Windows.Threading.DispatcherPriority.Background);
+                    System.Windows.Threading.DispatcherPriority.Background
+                );
             }
         }
 
@@ -60,11 +64,13 @@ namespace QuickFiler
                 viewer = _queue.Dequeue();
                 //logger.Debug($"Dequeued 1, {_queue.Count} remaining");
                 BuildQueueWhenIdle(1);
-
             }
             else
             {
-                viewer = UiThread.Dispatcher.Invoke(() => new ItemViewer(), DispatcherPriority.Render);
+                viewer = UiThread.Dispatcher.Invoke(
+                    () => new ItemViewer(),
+                    DispatcherPriority.Render
+                );
                 BuildQueueWhenIdle(1);
             }
             return viewer;
@@ -75,11 +81,13 @@ namespace QuickFiler
             var countOriginal = _queue.Count;
             if (countOriginal < count)
             {
-                UiThread.Dispatcher.Invoke(() => BuildQueue(count - countOriginal), DispatcherPriority.Render);
+                UiThread.Dispatcher.Invoke(
+                    () => BuildQueue(count - countOriginal),
+                    DispatcherPriority.Render
+                );
             }
             BuildQueueWhenIdle(countOriginal);
             return _queue.DequeueChunk(count);
         }
-
     }
 }

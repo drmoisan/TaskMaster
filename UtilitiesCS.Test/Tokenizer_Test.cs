@@ -1,8 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test
 {
@@ -75,7 +75,7 @@ namespace UtilitiesCS.Test
             string target = @"\b[\w&!][\w&!][\w&!][\w&!]+\b";
             Assert.AreEqual(target, test);
         }
-                
+
         [TestMethod]
         public void Tokenize_SpecialChar()
         {
@@ -102,7 +102,7 @@ namespace UtilitiesCS.Test
             string doc = @"T&E";
             var regex = new Regex(@"\b\w\w+\b");
             string[] test = doc.Tokenize(regex);
-            string[] target = {};
+            string[] target = { };
             Assert.IsTrue(test.SequenceEqual(target));
         }
 
@@ -112,7 +112,7 @@ namespace UtilitiesCS.Test
             string doc = @"T&E";
             var regex = new Regex(@"\b[\w&][\w&]+\b");
             string[] test = doc.Tokenize(regex);
-            string[] target = { "t&e"};
+            string[] target = { "t&e" };
             Assert.IsTrue(test.SequenceEqual(target));
         }
     }

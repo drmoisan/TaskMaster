@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using UtilitiesCS;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using UtilitiesCS.Extensions.Lazy;
-using Microsoft.Office.Interop.Outlook;
 using System.ComponentModel;
+using System.Data;
+using System.Linq;
 using System.Runtime.CompilerServices;
-using UtilitiesCS.Threading;
+using Microsoft.Office.Interop.Outlook;
+using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence.Flags;
+using UtilitiesCS.Extensions.Lazy;
+using UtilitiesCS.Threading;
 
 namespace UtilitiesCS
 {
@@ -22,7 +22,7 @@ namespace UtilitiesCS
         #region ctor
 
         /// <summary>
-        /// Constructor for the FlagParser class accepts a comma delimited string containing 
+        /// Constructor for the FlagParser class accepts a comma delimited string containing
         /// color categories and initializes
         /// </summary>
         /// <param name="categoryString"></param>
@@ -52,12 +52,13 @@ namespace UtilitiesCS
             Context.List = FindMatches(categories, Context.Prefix);
             Kb.List = FindMatches(categories, Kb.Prefix);
 
-            categories = categories.Except(_people.ListWithPrefix)
-                                   .Except(_projects.ListWithPrefix)
-                                   .Except(_topics.ListWithPrefix)
-                                   .Except(_context.ListWithPrefix)
-                                   .Except(_kb.ListWithPrefix)
-                                   .ToList();
+            categories = categories
+                .Except(_people.ListWithPrefix)
+                .Except(_projects.ListWithPrefix)
+                .Except(_topics.ListWithPrefix)
+                .Except(_context.ListWithPrefix)
+                .Except(_kb.ListWithPrefix)
+                .ToList();
 
             Today = categories.Remove(Properties.Settings.Default.Prefix_Today);
             Bullpin = categories.Remove(Properties.Settings.Default.Prefix_Bullpin);
@@ -87,8 +88,8 @@ namespace UtilitiesCS
         internal FlagDetails Context => _context;
 
         /// <summary>
-        /// Property accesses a private instance of FlagDetails. 
-        /// SET splits a comma delimited String to a list excluding 
+        /// Property accesses a private instance of FlagDetails.
+        /// SET splits a comma delimited String to a list excluding
         /// the Prefix which is passed to the FlagDetails class.
         /// </summary>
         /// <param name="includePrefix">Determines whether GET includes the category Prefix</param>
@@ -103,8 +104,13 @@ namespace UtilitiesCS
             _context.List = SplitToList(value, ",", _context.Prefix);
         }
 
-        public ObservableCollection<string> GetContextList(bool IncludePrefix = false) => IncludePrefix ? _context.ListWithPrefix : _context.List;
-        public void SetContextList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _context.List = value;
+        public ObservableCollection<string> GetContextList(bool IncludePrefix = false) =>
+            IncludePrefix ? _context.ListWithPrefix : _context.List;
+
+        public void SetContextList(
+            bool IncludePrefix = false,
+            ObservableCollection<string> value = default
+        ) => _context.List = value;
 
         #endregion
 
@@ -114,8 +120,8 @@ namespace UtilitiesCS
         internal FlagDetails Projects => _projects;
 
         /// <summary>
-        /// Property accesses a private instance of FlagDetails. 
-        /// SET splits a comma delimited String to a list excluding 
+        /// Property accesses a private instance of FlagDetails.
+        /// SET splits a comma delimited String to a list excluding
         /// the Prefix which is passed to the FlagDetails class.
         /// </summary>
         /// <param name="includePrefix">Determines whether GET includes the category Prefix</param>
@@ -130,8 +136,13 @@ namespace UtilitiesCS
             _projects.List = SplitToList(value, ",", _projects.Prefix);
         }
 
-        public ObservableCollection<string> GetProjectList(bool IncludePrefix = false) => IncludePrefix ? _projects.ListWithPrefix : _projects.List;
-        public void SetProjectList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _projects.List = value;
+        public ObservableCollection<string> GetProjectList(bool IncludePrefix = false) =>
+            IncludePrefix ? _projects.ListWithPrefix : _projects.List;
+
+        public void SetProjectList(
+            bool IncludePrefix = false,
+            ObservableCollection<string> value = default
+        ) => _projects.List = value;
 
         #endregion
 
@@ -141,8 +152,8 @@ namespace UtilitiesCS
         internal FlagDetails Program => _program;
 
         /// <summary>
-        /// Property accesses a private instance of FlagDetails. 
-        /// SET splits a comma delimited String to a list excluding 
+        /// Property accesses a private instance of FlagDetails.
+        /// SET splits a comma delimited String to a list excluding
         /// the Prefix which is passed to the FlagDetails class.
         /// </summary>
         /// <param name="includePrefix">Determines whether GET includes the category Prefix</param>
@@ -157,8 +168,13 @@ namespace UtilitiesCS
             _program.List = SplitToList(value, ",", _program.Prefix);
         }
 
-        public ObservableCollection<string> GetProgramList(bool IncludePrefix = false) => IncludePrefix ? _program.ListWithPrefix : _program.List;
-        public void SetProgramList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _program.List = value;
+        public ObservableCollection<string> GetProgramList(bool IncludePrefix = false) =>
+            IncludePrefix ? _program.ListWithPrefix : _program.List;
+
+        public void SetProgramList(
+            bool IncludePrefix = false,
+            ObservableCollection<string> value = default
+        ) => _program.List = value;
 
         #endregion Program
 
@@ -168,8 +184,8 @@ namespace UtilitiesCS
         internal FlagDetails Topics => _topics;
 
         /// <summary>
-        /// Property accesses a private instance of FlagDetails. 
-        /// SET splits a comma delimited String to a list excluding 
+        /// Property accesses a private instance of FlagDetails.
+        /// SET splits a comma delimited String to a list excluding
         /// the Prefix which is passed to the FlagDetails class.
         /// </summary>
         /// <param name="IncludePrefix">Determines whether GET includes the category Prefix</param>
@@ -184,8 +200,13 @@ namespace UtilitiesCS
             _topics.List = SplitToList(value, ",", _topics.Prefix);
         }
 
-        public ObservableCollection<string> GetTopicList(bool IncludePrefix = false) => IncludePrefix ? _topics.ListWithPrefix : _topics.List;
-        public void SetTopicList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _topics.List = value;
+        public ObservableCollection<string> GetTopicList(bool IncludePrefix = false) =>
+            IncludePrefix ? _topics.ListWithPrefix : _topics.List;
+
+        public void SetTopicList(
+            bool IncludePrefix = false,
+            ObservableCollection<string> value = default
+        ) => _topics.List = value;
 
         #endregion Topics
 
@@ -195,23 +216,29 @@ namespace UtilitiesCS
         internal FlagDetails People => _people;
 
         /// <summary>
-        /// Property accesses a private instance of FlagDetails. 
-        /// SET splits a comma delimited String to a list excluding 
+        /// Property accesses a private instance of FlagDetails.
+        /// SET splits a comma delimited String to a list excluding
         /// the Prefix which is passed to the FlagDetails class.
         /// </summary>
         /// <param name="IncludePrefix">Determines whether GET includes the category Prefix</param>
         /// <returns>A string containing a comma separated Topic names</returns>
-        public string GetPeople(bool IncludePrefix = false) => IncludePrefix ? _people.WithPrefix : _people.NoPrefix;
+        public string GetPeople(bool IncludePrefix = false) =>
+            IncludePrefix ? _people.WithPrefix : _people.NoPrefix;
 
-        public void SetPeople(bool IncludePrefix = false, string value = default) => _people.List = SplitToList(value, ",", _people.Prefix);
+        public void SetPeople(bool IncludePrefix = false, string value = default) =>
+            _people.List = SplitToList(value, ",", _people.Prefix);
 
-        public ObservableCollection<string> GetPeopleList(bool IncludePrefix = false) => IncludePrefix ? _people.ListWithPrefix : _people.List;
-        public void SetPeopleList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _people.List = value;
+        public ObservableCollection<string> GetPeopleList(bool IncludePrefix = false) =>
+            IncludePrefix ? _people.ListWithPrefix : _people.List;
+
+        public void SetPeopleList(
+            bool IncludePrefix = false,
+            ObservableCollection<string> value = default
+        ) => _people.List = value;
         //{
-        //    if (IncludePrefix) { _people.ListWithPrefix = value; } 
+        //    if (IncludePrefix) { _people.ListWithPrefix = value; }
         //    else { _people.List = value; }
         //}
-
 
         #endregion People
 
@@ -224,13 +251,19 @@ namespace UtilitiesCS
         {
             return includePrefix ? _kb.WithPrefix : _kb.NoPrefix;
         }
+
         public void SetKb(bool includePrefix = false, string value = default)
         {
             _kb.List = SplitToList(value, ",", _kb.Prefix);
         }
 
-        public ObservableCollection<string> GetKbList(bool IncludePrefix = false) => IncludePrefix ? _kb.ListWithPrefix : _kb.List;
-        public void SetKbList(bool IncludePrefix = false, ObservableCollection<string> value = default) => _kb.List = value;
+        public ObservableCollection<string> GetKbList(bool IncludePrefix = false) =>
+            IncludePrefix ? _kb.ListWithPrefix : _kb.List;
+
+        public void SetKbList(
+            bool IncludePrefix = false,
+            ObservableCollection<string> value = default
+        ) => _kb.List = value;
 
         #endregion Kanban
 
@@ -276,8 +309,9 @@ namespace UtilitiesCS
             }
         }
 
-        private void Update() => Combined.RequestUpdate();//updated = false;
-                                                          //protected bool updated;
+        private void Update() => Combined.RequestUpdate(); //updated = false;
+
+        //protected bool updated;
 
         public FlagConsolidator Combined { get; protected set; }
 
@@ -301,7 +335,6 @@ namespace UtilitiesCS
         //    if (Bullpin)
         //        string_return = string_return + ", " + "Tag Bullpin Priorities";
 
-
         //    if (string_return.Length > 2)
         //    {
         //        string_return = string_return.Substring(2);
@@ -315,7 +348,11 @@ namespace UtilitiesCS
 
         #region INotifyCollectionChanged and INotifyPropertyChanged Implementations
 
-        public event NotifyCollectionChangedEventHandler CollectionChanged { add { } remove { } }
+        public event NotifyCollectionChangedEventHandler CollectionChanged
+        {
+            add { }
+            remove { }
+        }
         public event NotifyCollectionChangedEventHandler PeopleChanged;
         public event NotifyCollectionChangedEventHandler ProjectsChanged;
         public event NotifyCollectionChangedEventHandler ProgramChanged;
@@ -324,13 +361,46 @@ namespace UtilitiesCS
         public event NotifyCollectionChangedEventHandler KbChanged;
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void People_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { PeopleChanged?.Invoke(sender, e); Update(); }
-        private void Projects_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { ProjectsChanged?.Invoke(sender, e); Update(); }
-        private void Program_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { ProgramChanged?.Invoke(sender, e); Update(); }
-        private void Topics_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { TopicsChanged?.Invoke(sender, e); Update(); }
-        private void Context_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { ContextChanged?.Invoke(sender, e); Update(); }
-        private void Kb_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { KbChanged?.Invoke(sender, e); Update(); }
-        private void PropertyChanged_CollectionChanged(object sender, PropertyChangedEventArgs e) { Update(); }
+        private void People_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            PeopleChanged?.Invoke(sender, e);
+            Update();
+        }
+
+        private void Projects_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            ProjectsChanged?.Invoke(sender, e);
+            Update();
+        }
+
+        private void Program_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            ProgramChanged?.Invoke(sender, e);
+            Update();
+        }
+
+        private void Topics_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            TopicsChanged?.Invoke(sender, e);
+            Update();
+        }
+
+        private void Context_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            ContextChanged?.Invoke(sender, e);
+            Update();
+        }
+
+        private void Kb_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            KbChanged?.Invoke(sender, e);
+            Update();
+        }
+
+        private void PropertyChanged_CollectionChanged(object sender, PropertyChangedEventArgs e)
+        {
+            Update();
+        }
 
         protected virtual void Notify([CallerMemberName] string propertyName = "")
         {
@@ -339,17 +409,21 @@ namespace UtilitiesCS
 
         //private Lazy<Dictionary<FlagDetails, NotifyCollectionChangedEventHandler>> _wiring;
         //internal Dictionary<FlagDetails, NotifyCollectionChangedEventHandler> Wiring { get => _wiring.Value; set => _wiring = value.ToLazy(); }
-        internal Dictionary<FlagDetails, NotifyCollectionChangedEventHandler> Wiring { get => GetWiring(); }
+        internal Dictionary<FlagDetails, NotifyCollectionChangedEventHandler> Wiring
+        {
+            get => GetWiring();
+        }
+
         private Dictionary<FlagDetails, NotifyCollectionChangedEventHandler> GetWiring()
         {
             return new()
             {
-                { People,  People_CollectionChanged },
-                { Projects , Projects_CollectionChanged },
-                { Program , Program_CollectionChanged   },
-                { Topics , Topics_CollectionChanged },
-                { Context , Context_CollectionChanged },
-                { Kb , Kb_CollectionChanged }
+                { People, People_CollectionChanged },
+                { Projects, Projects_CollectionChanged },
+                { Program, Program_CollectionChanged },
+                { Topics, Topics_CollectionChanged },
+                { Context, Context_CollectionChanged },
+                { Kb, Kb_CollectionChanged },
             };
         }
 
@@ -365,7 +439,10 @@ namespace UtilitiesCS
 
         public void UnWireEvents() => Wiring.ForEach(x => UnWireFlagParserEvent(x.Key, x.Value));
 
-        public void UnWireFlagParserEvent(FlagDetails flagDetails, NotifyCollectionChangedEventHandler handler)
+        public void UnWireFlagParserEvent(
+            FlagDetails flagDetails,
+            NotifyCollectionChangedEventHandler handler
+        )
         {
             if (flagDetails is not null)
             {
@@ -411,7 +488,9 @@ namespace UtilitiesCS
 
         private string AppendDetails(string @base, FlagDetails details, bool wtag)
         {
-            return details.WithPrefix.Length == 0 ? @base : wtag ? @base + ", " + details.WithPrefix : @base + ", " + details.NoPrefix;
+            return details.WithPrefix.Length == 0 ? @base
+                : wtag ? @base + ", " + details.WithPrefix
+                : @base + ", " + details.NoPrefix;
         }
 
         /// <summary>
@@ -422,7 +501,12 @@ namespace UtilitiesCS
         /// <param name="trailing">If true, a wildcard is added at the end</param>
         /// <param name="charWC">Character representing wildcard. Default is *</param>
         /// <returns>A search string with wildcards added</returns>
-        public string AddWildcards(string sourceString, bool leading = true, bool trailing = true, string charWC = "*")
+        public string AddWildcards(
+            string sourceString,
+            bool leading = true,
+            bool trailing = true,
+            string charWC = "*"
+        )
         {
             string AddWildcardsRet = default;
 
@@ -435,10 +519,13 @@ namespace UtilitiesCS
 
             AddWildcardsRet = strTemp;
             return AddWildcardsRet;
-
         }
 
-        private ObservableCollection<string> SplitToList(string MainString, string Delimiter, string ReplaceString = "XXXXX")
+        private ObservableCollection<string> SplitToList(
+            string MainString,
+            string Delimiter,
+            string ReplaceString = "XXXXX"
+        )
         {
             ObservableCollection<string> list_return;
             if (MainString is null)
@@ -451,24 +538,38 @@ namespace UtilitiesCS
             }
             else
             {
-                list_return = new ObservableCollection<string>(MainString.Split(Delimiter[0]).Select(x => x.Replace(ReplaceString, "").Trim()));
+                list_return = new ObservableCollection<string>(
+                    MainString.Split(Delimiter[0]).Select(x => x.Replace(ReplaceString, "").Trim())
+                );
             }
             return list_return;
         }
 
-        private ObservableCollection<string> FindMatches(IList<string> source, string substring, bool return_nonmatches = false)
+        private ObservableCollection<string> FindMatches(
+            IList<string> source,
+            string substring,
+            bool return_nonmatches = false
+        )
         {
             if (return_nonmatches)
             {
-                return new ObservableCollection<string>(source.Where(x => x.IndexOf(substring, StringComparison.OrdinalIgnoreCase) == -1));
+                return new ObservableCollection<string>(
+                    source.Where(x =>
+                        x.IndexOf(substring, StringComparison.OrdinalIgnoreCase) == -1
+                    )
+                );
             }
             else
             {
-                return new ObservableCollection<string>(source.Where(x => x.IndexOf(substring, StringComparison.OrdinalIgnoreCase) != -1).Select(x => x.Replace(substring, "")).ToList());
+                return new ObservableCollection<string>(
+                    source
+                        .Where(x => x.IndexOf(substring, StringComparison.OrdinalIgnoreCase) != -1)
+                        .Select(x => x.Replace(substring, ""))
+                        .ToList()
+                );
             }
             //var list_return = return_nonmatches ? source.Where(x => x.IndexOf(substring, StringComparison.OrdinalIgnoreCase) == -1).Select(x => x).ToList() : source.Where(x => x.IndexOf(substring, StringComparison.OrdinalIgnoreCase) != -1).Select(x => x.Replace(substring, "")).ToList();
             //return list_return;
-
         }
 
         #endregion Helper Methods
@@ -479,11 +580,23 @@ namespace UtilitiesCS
         {
             if (Combined.AsStringWithPrefix.IsNullOrEmpty())
             {
-                if (other.IsNullOrEmpty()) { return true; }
-                else { return false; }
+                if (other.IsNullOrEmpty())
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
-            else if (other.IsNullOrEmpty()) { return false; }
-            else if (Combined.AsStringWithPrefix == other) { return true; }
+            else if (other.IsNullOrEmpty())
+            {
+                return false;
+            }
+            else if (Combined.AsStringWithPrefix == other)
+            {
+                return true;
+            }
             else
             {
                 var otherList = other.Split(separator: ',', trim: true).OrderBy(x => x).ToList();
@@ -495,10 +608,19 @@ namespace UtilitiesCS
         {
             if (Combined.AsListWithPrefix.IsNullOrEmpty())
             {
-                if (other.IsNullOrEmpty()) { return true; }
-                else { return false; }
+                if (other.IsNullOrEmpty())
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
-            else if (other.IsNullOrEmpty()) { return false; }
+            else if (other.IsNullOrEmpty())
+            {
+                return false;
+            }
             else
             {
                 other = other.OrderBy(x => x).ToList();
@@ -507,8 +629,5 @@ namespace UtilitiesCS
         }
 
         #endregion Comparison
-
     }
-
-
 }

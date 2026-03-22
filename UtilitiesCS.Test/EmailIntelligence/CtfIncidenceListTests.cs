@@ -1,8 +1,8 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Collections.Generic;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
-using System.Collections.Generic;
 using UtilitiesCS;
 
 namespace Z.Obsolete.UtilitiesCS.Test.EmailIntelligence
@@ -17,8 +17,6 @@ namespace Z.Obsolete.UtilitiesCS.Test.EmailIntelligence
         public void TestInitialize()
         {
             this.mockRepository = new MockRepository(MockBehavior.Strict);
-
-
         }
 
         //private CtfIncidenceList CreateCtfIncidenceList()
@@ -135,35 +133,43 @@ namespace Z.Obsolete.UtilitiesCS.Test.EmailIntelligence
         public void ProcessQueue_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            Queue<string> lines = new(new List<string>
-            {
-                "68109D5D0ED86B4B8384B64247D96451", "1",
-                "Reference\\Computer Information", "1",
-                "D5A990D48B6B2B40ADC28F23CE8D6FAC", "2",
-                "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT", "4",
-                "Reference\\Computer Information", "3"
-            });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "68109D5D0ED86B4B8384B64247D96451",
+                    "1",
+                    "Reference\\Computer Information",
+                    "1",
+                    "D5A990D48B6B2B40ADC28F23CE8D6FAC",
+                    "2",
+                    "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT",
+                    "4",
+                    "Reference\\Computer Information",
+                    "3",
+                }
+            );
 
             var expected = new CtfIncidenceList();
             expected.Add(
-                new CtfIncidence(emailConversationID: "68109D5D0ED86B4B8384B64247D96451",
-                                 folderCount: 1,
-                                 emailFolder: new List<string>
-                                 {
-                                     "Reference\\Computer Information"
-                                 },
-                                 emailConversationCount: new List<int> { 1 }
-                ));
+                new CtfIncidence(
+                    emailConversationID: "68109D5D0ED86B4B8384B64247D96451",
+                    folderCount: 1,
+                    emailFolder: new List<string> { "Reference\\Computer Information" },
+                    emailConversationCount: new List<int> { 1 }
+                )
+            );
             expected.Add(
-                new CtfIncidence(emailConversationID: "D5A990D48B6B2B40ADC28F23CE8D6FAC",
-                                 folderCount: 2,
-                                 emailFolder: new List<string>
-                                 {
-                                     "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT",
-                                     "Reference\\Computer Information"
-                                 },
-                                 emailConversationCount: new List<int> { 4, 3 }
-                ));
+                new CtfIncidence(
+                    emailConversationID: "D5A990D48B6B2B40ADC28F23CE8D6FAC",
+                    folderCount: 2,
+                    emailFolder: new List<string>
+                    {
+                        "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT",
+                        "Reference\\Computer Information",
+                    },
+                    emailConversationCount: new List<int> { 4, 3 }
+                )
+            );
 
             // Act
             var actual = CtfIncidenceList.ProcessQueue(lines);
@@ -176,26 +182,35 @@ namespace Z.Obsolete.UtilitiesCS.Test.EmailIntelligence
         public void ProcessQueue_StateUnderTest_MalformedEntry1()
         {
             // Arrange
-            Queue<string> lines = new(new List<string>
-            {
-                "68109D5D0ED86B4B8384B64247D96451", "malformed",
-                "Reference\\Computer Information", "1",
-                "D5A990D48B6B2B40ADC28F23CE8D6FAC", "2",
-                "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT", "4",
-                "Reference\\Computer Information", "3"
-            });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "68109D5D0ED86B4B8384B64247D96451",
+                    "malformed",
+                    "Reference\\Computer Information",
+                    "1",
+                    "D5A990D48B6B2B40ADC28F23CE8D6FAC",
+                    "2",
+                    "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT",
+                    "4",
+                    "Reference\\Computer Information",
+                    "3",
+                }
+            );
 
             var expected = new CtfIncidenceList();
             expected.Add(
-                new CtfIncidence(emailConversationID: "D5A990D48B6B2B40ADC28F23CE8D6FAC",
-                                 folderCount: 2,
-                                 emailFolder: new List<string>
-                                 {
-                                     "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT",
-                                     "Reference\\Computer Information"
-                                 },
-                                 emailConversationCount: new List<int> { 4, 3 }
-                ));
+                new CtfIncidence(
+                    emailConversationID: "D5A990D48B6B2B40ADC28F23CE8D6FAC",
+                    folderCount: 2,
+                    emailFolder: new List<string>
+                    {
+                        "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT",
+                        "Reference\\Computer Information",
+                    },
+                    emailConversationCount: new List<int> { 4, 3 }
+                )
+            );
 
             // Act
             var actual = CtfIncidenceList.ProcessQueue(lines);
@@ -208,24 +223,29 @@ namespace Z.Obsolete.UtilitiesCS.Test.EmailIntelligence
         public void ProcessQueue_StateUnderTest_MalformedEntry2()
         {
             // Arrange
-            Queue<string> lines = new(new List<string>
-            {
-                "68109D5D0ED86B4B8384B64247D96451", "1",
-                "Reference\\Computer Information", "1",
-                "D5A990D48B6B2B40ADC28F23CE8D6FAC", "2",
-                "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT", "4"
-            });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "68109D5D0ED86B4B8384B64247D96451",
+                    "1",
+                    "Reference\\Computer Information",
+                    "1",
+                    "D5A990D48B6B2B40ADC28F23CE8D6FAC",
+                    "2",
+                    "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT",
+                    "4",
+                }
+            );
 
             var expected = new CtfIncidenceList();
             expected.Add(
-                new CtfIncidence(emailConversationID: "68109D5D0ED86B4B8384B64247D96451",
-                                 folderCount: 1,
-                                 emailFolder: new List<string>
-                                 {
-                                     "Reference\\Computer Information"
-                                 },
-                                 emailConversationCount: new List<int> { 1 }
-                ));
+                new CtfIncidence(
+                    emailConversationID: "68109D5D0ED86B4B8384B64247D96451",
+                    folderCount: 1,
+                    emailFolder: new List<string> { "Reference\\Computer Information" },
+                    emailConversationCount: new List<int> { 1 }
+                )
+            );
 
             // Act
             var actual = CtfIncidenceList.ProcessQueue(lines);
@@ -238,15 +258,27 @@ namespace Z.Obsolete.UtilitiesCS.Test.EmailIntelligence
         public void TryDequeueIncidence_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            Queue<string> lines = new(new List<string> { "D5A990D48B6B2B40ADC28F23CE8D6FAC", "2",
-                "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT", "4",
-                "Reference\\Computer Information", "3" });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "D5A990D48B6B2B40ADC28F23CE8D6FAC",
+                    "2",
+                    "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT",
+                    "4",
+                    "Reference\\Computer Information",
+                    "3",
+                }
+            );
             var expected = new CtfIncidence(
                 emailConversationID: "D5A990D48B6B2B40ADC28F23CE8D6FAC",
                 folderCount: 2,
-                emailFolder: new List<string> { "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT", "Reference\\Computer Information" },
+                emailFolder: new List<string>
+                {
+                    "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT",
+                    "Reference\\Computer Information",
+                },
                 emailConversationCount: new List<int> { 4, 3 }
-                );
+            );
 
             // Act
             var actual = CtfIncidenceList.TryDequeueIncidence(ref lines);
@@ -259,8 +291,15 @@ namespace Z.Obsolete.UtilitiesCS.Test.EmailIntelligence
         public void TryDequeueIncidence_HandlesIncompleteQueue()
         {
             // Arrange
-            Queue<string> lines = new(new List<string> { "D5A990D48B6B2B40ADC28F23CE8D6FAC", "2",
-                "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT", "4" });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "D5A990D48B6B2B40ADC28F23CE8D6FAC",
+                    "2",
+                    "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT",
+                    "4",
+                }
+            );
 
             // Act
             var actual = CtfIncidenceList.TryDequeueIncidence(ref lines);
@@ -273,9 +312,17 @@ namespace Z.Obsolete.UtilitiesCS.Test.EmailIntelligence
         public void TryDequeueIncidence_HandlesIncorrectType1()
         {
             // Arrange
-            Queue<string> lines = new(new List<string> { "D5A990D48B6B2B40ADC28F23CE8D6FAC", "malformed",
-                "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT", "4",
-                "Reference\\Computer Information", "3" });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "D5A990D48B6B2B40ADC28F23CE8D6FAC",
+                    "malformed",
+                    "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT",
+                    "4",
+                    "Reference\\Computer Information",
+                    "3",
+                }
+            );
 
             // Act
             var actual = CtfIncidenceList.TryDequeueIncidence(ref lines);
@@ -288,9 +335,17 @@ namespace Z.Obsolete.UtilitiesCS.Test.EmailIntelligence
         public void TryDequeueIncidence_HandlesIncorrectType2()
         {
             // Arrange
-            Queue<string> lines = new(new List<string> { "D5A990D48B6B2B40ADC28F23CE8D6FAC", "2",
-                "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT", "4.3",
-                "Reference\\Computer Information", "3" });
+            Queue<string> lines = new(
+                new List<string>
+                {
+                    "D5A990D48B6B2B40ADC28F23CE8D6FAC",
+                    "2",
+                    "Completed Jobs - 02 PLANET\\_ Active Projects\\02 SETUP\\02 SETUP - IT",
+                    "4.3",
+                    "Reference\\Computer Information",
+                    "3",
+                }
+            );
 
             // Act
             var actual = CtfIncidenceList.TryDequeueIncidence(ref lines);

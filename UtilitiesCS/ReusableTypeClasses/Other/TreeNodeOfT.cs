@@ -9,6 +9,7 @@ namespace UtilitiesCS
     public class TreeNode<T>
     {
         public TreeNode(T value) => Value = value;
+
         public TreeNode(TreeNode<T> node)
         {
             Parent = node.Parent;
@@ -19,22 +20,34 @@ namespace UtilitiesCS
         #region Public Properties
 
         private TreeNode<T> _parent;
-        public TreeNode<T> Parent { get => _parent; set => _parent = value; }
-
-        private T _value;
-        public T Value { get => _value; private set => _value = value; }
-
-        private List<TreeNode<T>> _children = new List<TreeNode<T>>();
-        public List<TreeNode<T>> Children { get => _children; set => _children = value; }
-        public TreeNode<T> this[int i]
+        public TreeNode<T> Parent
         {
-            get
-            {
-                return Children[i];
-            }
+            get => _parent;
+            set => _parent = value;
         }
 
-        public int ChildCount { get => Children.Count; }
+        private T _value;
+        public T Value
+        {
+            get => _value;
+            private set => _value = value;
+        }
+
+        private List<TreeNode<T>> _children = new List<TreeNode<T>>();
+        public List<TreeNode<T>> Children
+        {
+            get => _children;
+            set => _children = value;
+        }
+        public TreeNode<T> this[int i]
+        {
+            get { return Children[i]; }
+        }
+
+        public int ChildCount
+        {
+            get => Children.Count;
+        }
 
         public int Depth
         {
@@ -123,7 +136,6 @@ namespace UtilitiesCS
 
         public object FindByDelegate(Func<T, T, bool> comparator, T T2)
         {
-
             foreach (var node in Children)
             {
                 if (comparator(Value, T2))
@@ -159,12 +171,17 @@ namespace UtilitiesCS
                 while (!nodes.IsNullOrEmpty())
                 {
                     var first = nodes.FirstOrDefault(node => comparator(node.Value));
-                    if (first != default) { return first; }
-                    else { nodes = GetNextLevel(nodes).Where(node => node is not null).ToArray(); }
+                    if (first != default)
+                    {
+                        return first;
+                    }
+                    else
+                    {
+                        nodes = GetNextLevel(nodes).Where(node => node is not null).ToArray();
+                    }
                 }
                 return default;
             }
-
         }
 
         public TreeNode<T>[] GetLeavesAtMaxDepth()
@@ -176,30 +193,51 @@ namespace UtilitiesCS
 
         public TreeNode<T>[] GetNextLevel(TreeNode<T>[] nodes)
         {
-            if (nodes is null) { return null; }
-            return nodes.Where(x => !x.Children.IsNullOrEmpty()).SelectMany(x => x.Children).ToArray();
+            if (nodes is null)
+            {
+                return null;
+            }
+            return nodes
+                .Where(x => !x.Children.IsNullOrEmpty())
+                .SelectMany(x => x.Children)
+                .ToArray();
         }
 
         public TreeNode<T>[] GetPreviousLevel(TreeNode<T>[] nodes)
         {
-            if (nodes is null) { return null; }
-            return nodes.Where(x => x.Parent is not null).Select(x => x.Parent).Distinct().ToArray();
+            if (nodes is null)
+            {
+                return null;
+            }
+            return nodes
+                .Where(x => x.Parent is not null)
+                .Select(x => x.Parent)
+                .Distinct()
+                .ToArray();
         }
 
         public IEnumerable<TreeNode<T>> FindAll(Func<T, bool> comparator)
         {
             if (comparator(this.Value))
-                return new TreeNode<T>[] { this }.Concat(Children.SelectMany(x => x.FindAll(comparator)));
+                return new TreeNode<T>[] { this }.Concat(
+                    Children.SelectMany(x => x.FindAll(comparator))
+                );
             else
-                return new TreeNode<T>[] { }.Concat(Children.SelectMany(x => x.FindAll(comparator)));
+                return new TreeNode<T>[] { }.Concat(
+                    Children.SelectMany(x => x.FindAll(comparator))
+                );
         }
 
         public IEnumerable<TreeNode<T>> FindAll(Func<TreeNode<T>, bool> comparator)
         {
             if (comparator(this))
-                return new TreeNode<T>[] { this }.Concat(Children.SelectMany(x => x.FindAll(comparator)));
+                return new TreeNode<T>[] { this }.Concat(
+                    Children.SelectMany(x => x.FindAll(comparator))
+                );
             else
-                return new TreeNode<T>[] { }.Concat(Children.SelectMany(x => x.FindAll(comparator)));
+                return new TreeNode<T>[] { }.Concat(
+                    Children.SelectMany(x => x.FindAll(comparator))
+                );
         }
 
         public IEnumerable<T> Flatten()
@@ -229,13 +267,15 @@ namespace UtilitiesCS
         public virtual IEnumerable<TreeNode<T>> Leaves()
         {
             TreeNode<T>[] nodes = [];
-            return nodes.Concat(Children.SelectMany(x =>
-            {
-                if (x.Children.Count == 0)
-                    return new[] { x };
-                else
-                    return x.Leaves();
-            }));
+            return nodes.Concat(
+                Children.SelectMany(x =>
+                {
+                    if (x.Children.Count == 0)
+                        return new[] { x };
+                    else
+                        return x.Leaves();
+                })
+            );
         }
 
         public void Traverse(Action<T> action)

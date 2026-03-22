@@ -1,9 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
-using ToDoModel;
+﻿using System;
 using System.Numerics;
-
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using ToDoModel;
 
 namespace ToDoModel.Test
 {
@@ -12,14 +11,10 @@ namespace ToDoModel.Test
     {
         private MockRepository mockRepository;
 
-
-
         [TestInitialize]
         public void TestInitialize()
         {
             this.mockRepository = new MockRepository(MockBehavior.Strict);
-
-
         }
 
         [TestMethod]
@@ -31,9 +26,7 @@ namespace ToDoModel.Test
             int nbase = 36;
 
             // Act
-            var actual = BaseChanger.ToBase10(
-                input,
-                nbase);
+            var actual = BaseChanger.ToBase10(input, nbase);
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -48,9 +41,7 @@ namespace ToDoModel.Test
             int nbase = 36;
 
             // Act
-            var actual = BaseChanger.ToBase10(
-                input,
-                nbase);
+            var actual = BaseChanger.ToBase10(input, nbase);
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -65,9 +56,7 @@ namespace ToDoModel.Test
             int nbase = 36;
 
             // Act
-            var actual = BaseChanger.ToBase10(
-                input,
-                nbase);
+            var actual = BaseChanger.ToBase10(input, nbase);
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -82,14 +71,11 @@ namespace ToDoModel.Test
             int nbase = 36;
 
             // Act
-            var actual = BaseChanger.ToBase10(
-                input,
-                nbase);
+            var actual = BaseChanger.ToBase10(input, nbase);
 
             // Assert
             Assert.AreEqual(expected, actual);
         }
-
 
         [TestMethod]
         public void ToBase10_StateUnderTest_ExpectedBehavior_131Z()
@@ -100,9 +86,7 @@ namespace ToDoModel.Test
             int nbase = 36;
 
             // Act
-            var actual = BaseChanger.ToBase10(
-                input,
-                nbase);
+            var actual = BaseChanger.ToBase10(input, nbase);
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -119,9 +103,7 @@ namespace ToDoModel.Test
             string expected = "131Z";
 
             // Act
-            var actual = input.ToBase(
-                nbase,
-                intMinDigits);
+            var actual = input.ToBase(nbase, intMinDigits);
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -138,9 +120,7 @@ namespace ToDoModel.Test
             string expected = "11";
 
             // Act
-            var actual = input.ToBase(
-                nbase,
-                intMinDigits);
+            var actual = input.ToBase(nbase, intMinDigits);
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -157,9 +137,7 @@ namespace ToDoModel.Test
             string expected = "10";
 
             // Act
-            var actual = input.ToBase(
-                nbase,
-                intMinDigits);
+            var actual = input.ToBase(nbase, intMinDigits);
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -176,9 +154,7 @@ namespace ToDoModel.Test
             string expected = "12";
 
             // Act
-            var actual = input.ToBase(
-                nbase,
-                intMinDigits);
+            var actual = input.ToBase(nbase, intMinDigits);
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -195,9 +171,7 @@ namespace ToDoModel.Test
             string expected = "1Z";
 
             // Act
-            var actual = input.ToBase(
-                nbase,
-                intMinDigits);
+            var actual = input.ToBase(nbase, intMinDigits);
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -214,9 +188,7 @@ namespace ToDoModel.Test
             string expected = "21";
 
             // Act
-            var actual = input.ToBase(
-                nbase,
-                intMinDigits);
+            var actual = input.ToBase(nbase, intMinDigits);
 
             // Assert
             Assert.AreEqual(expected, actual);

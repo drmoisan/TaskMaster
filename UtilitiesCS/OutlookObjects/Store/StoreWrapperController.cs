@@ -1,18 +1,24 @@
-﻿using log4net.Repository.Hierarchy;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using log4net.Repository.Hierarchy;
 using UtilitiesCS.OutlookObjects.Folder;
 
 namespace UtilitiesCS.OutlookObjects.Store
 {
     public class StoreWrapperController
     {
+        internal static bool RunFolderSelectionDialog(Func<bool> selector)
+        {
+            return selector?.Invoke() ?? false;
+        }
+
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         public StoreWrapperController(IApplicationGlobals globals)
         {
@@ -33,7 +39,6 @@ namespace UtilitiesCS.OutlookObjects.Store
         internal FolderMinimalWrapper JunkPotential { get; set; }
         internal Func<string, (string, string)> FsConverter { get; set; }
 
-
         #region Events
 
         public void Launch()
@@ -41,14 +46,19 @@ namespace UtilitiesCS.OutlookObjects.Store
             FsConverter = new FilePathHelperConverter(Globals.FS).GetSerializablePath;
             Model = Globals.Ol.StoresWrapper;
             Viewer = new StoreWrapperViewer(this);
-            Viewer.DisplayName.DataSource = Model.Stores.Select(store => store.DisplayName).ToList();
+            Viewer.DisplayName.DataSource = Model
+                .Stores.Select(store => store.DisplayName)
+                .ToList();
 
             Viewer.ShowDialog();
         }
 
         public void ButtonOk_Click()
         {
-            if (AnyChanges()) { SaveChanges(); }
+            if (AnyChanges())
+            {
+                SaveChanges();
+            }
             Viewer.Close();
         }
 
@@ -61,9 +71,16 @@ namespace UtilitiesCS.OutlookObjects.Store
         {
             if (AnyChanges())
             {
-                var response = MyBox.ShowDialog("Save changes?", "Save Changes",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (response == DialogResult.Yes) { SaveChanges(); }
+                var response = MyBox.ShowDialog(
+                    "Save changes?",
+                    "Save Changes",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+                if (response == DialogResult.Yes)
+                {
+                    SaveChanges();
+                }
             }
             var displayName = Viewer.DisplayName.SelectedValue.ToString();
             Current = Model.Stores.Find(store => store.DisplayName == displayName);
@@ -78,7 +95,10 @@ namespace UtilitiesCS.OutlookObjects.Store
                 return;
             }
             var folderPath = SelectFsFolder();
-            if (folderPath.IsNullOrEmpty()) { return; }
+            if (folderPath.IsNullOrEmpty())
+            {
+                return;
+            }
             else
             {
                 ArchiveFS.FolderPath = folderPath;
@@ -125,28 +145,39 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         internal bool AnyChanges()
         {
-            return !PairwiseEquals(ArchiveOutlook, Current?.ArchiveRoot) ||
-                !PairwiseEquals(JunkEmail, Current?.JunkCertain) ||
-                !PairwiseEquals(JunkPotential, Current?.JunkPotential) ||
-                !PairwiseEquals(ArchiveFS, Current?.ArchiveFsRoot);
+            return !PairwiseEquals(ArchiveOutlook, Current?.ArchiveRoot)
+                || !PairwiseEquals(JunkEmail, Current?.JunkCertain)
+                || !PairwiseEquals(JunkPotential, Current?.JunkPotential)
+                || !PairwiseEquals(ArchiveFS, Current?.ArchiveFsRoot);
         }
 
         internal bool PairwiseEquals<T>(T a, T b)
         {
-            if (a is null && b is null) { return true; }
-            if (a is null || b is null) { return false; }
+            if (a is null && b is null)
+            {
+                return true;
+            }
+            if (a is null || b is null)
+            {
+                return false;
+            }
             return a.Equals(b);
         }
 
         internal void PopulateWithCurrent()
         {
-            if (Viewer.InvokeRequired) { Viewer.Invoke(() => PopulateWithCurrent()); return; }
+            if (Viewer.InvokeRequired)
+            {
+                Viewer.Invoke(() => PopulateWithCurrent());
+                return;
+            }
 
             // Populate Form
             Viewer.Inbox.Text = Current?.Inbox?.FolderPath ?? "Error Loading";
             Viewer.RootFolder.Text = Current?.RootFolder?.FolderPath ?? "Error Loading";
             Viewer.UserEmail.Text = Current?.UserEmailAddress ?? "Error Loading";
-            Viewer.ArchiveOutlook.Text = Current?.ArchiveRoot?.RelativePath ?? "Please select an archive";
+            Viewer.ArchiveOutlook.Text =
+                Current?.ArchiveRoot?.RelativePath ?? "Please select an archive";
             Viewer.ArchiveFS.Text = GetRelativeFsPath();
             //if (Current.ArchiveFsRoot is not null && !Current.ArchiveFsRoot.FolderPath.IsNullOrEmpty())
             //{
@@ -184,7 +215,10 @@ namespace UtilitiesCS.OutlookObjects.Store
             try
             {
                 var folder = Globals.Ol.NamespaceMAPI.PickFolder();
-                if (folder is null) { return null; }
+                if (folder is null)
+                {
+                    return null;
+                }
                 return new FolderMinimalWrapper(folder, Current.RootFolder);
             }
             catch (Exception e)
@@ -213,7 +247,10 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         internal string GetRelativeFsPath()
         {
-            if (Current.ArchiveFsRoot is not null && !Current.ArchiveFsRoot.FolderPath.IsNullOrEmpty())
+            if (
+                Current.ArchiveFsRoot is not null
+                && !Current.ArchiveFsRoot.FolderPath.IsNullOrEmpty()
+            )
             {
                 var (specialFolder, relativePath) = FsConverter(Current.ArchiveFsRoot.FolderPath);
                 if (specialFolder.IsNullOrEmpty() & relativePath.IsNullOrEmpty())
@@ -229,6 +266,5 @@ namespace UtilitiesCS.OutlookObjects.Store
         }
 
         #endregion Methods
-
     }
 }

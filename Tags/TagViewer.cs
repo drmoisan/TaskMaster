@@ -3,7 +3,6 @@ using System.Windows.Forms;
 
 namespace Tags
 {
-
     public partial class TagViewer
     {
         private TagController _controller;
@@ -21,6 +20,5 @@ namespace Tags
         {
             _controller = controller;
         }
-
     }
 }

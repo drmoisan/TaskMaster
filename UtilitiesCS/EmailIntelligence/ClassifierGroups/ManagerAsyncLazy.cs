@@ -12,26 +12,28 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
-using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using log4net.Repository.Hierarchy;
 using Microsoft.Graph.Security.AttackSimulation.Trainings.Item.LanguageDetails;
 using Newtonsoft.Json;
-
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS
 {
-    public class ManagerAsyncLazy : ConcurrentObservableDictionary<string, AsyncLazy<BayesianClassifierGroup>>
+    public class ManagerAsyncLazy
+        : ConcurrentObservableDictionary<string, AsyncLazy<BayesianClassifierGroup>>
     {
         #region ctors
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
-        public ManagerAsyncLazy(IApplicationGlobals globals) : base()
+        public ManagerAsyncLazy(IApplicationGlobals globals)
+            : base()
         {
             Globals = globals;
             ResetConfigAsyncLazy();
@@ -45,13 +47,23 @@ namespace UtilitiesCS
 
         #region Configuration
 
-        public AsyncLazy<ConcurrentDictionary<string, SmartSerializableLoader>> Configuration { get; protected set; }
+        public AsyncLazy<ConcurrentDictionary<string, SmartSerializableLoader>> Configuration
+        {
+            get;
+            protected set;
+        }
         private ConcurrentDictionary<string, SmartSerializableLoader> _privateConfig;
 
-        internal async Task<ConcurrentDictionary<string, SmartSerializableLoader>> ReadConfiguration()
+        internal async Task<
+            ConcurrentDictionary<string, SmartSerializableLoader>
+        > ReadConfiguration()
         {
             var resourceManager = ManagerResources.ResourceManager;
-            var resourceSet = resourceManager.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
+            var resourceSet = resourceManager.GetResourceSet(
+                System.Globalization.CultureInfo.CurrentCulture,
+                true,
+                true
+            );
             var resourceDictionary = await resourceSet
                 .Cast<DictionaryEntry>()
                 .ToDictionary<string, string>()
@@ -61,7 +73,8 @@ namespace UtilitiesCS
                     var loader = await SmartSerializableLoader.DeserializeAsync(Globals, kvp.Value);
                     loader.PropertyChanged += Loader_PropertyChanged;
                     return new KeyValuePair<string, SmartSerializableLoader>(kvp.Key, loader);
-                }).ToConcurrentDictionaryAsync();
+                })
+                .ToConcurrentDictionaryAsync();
 
             return resourceDictionary;
         }
@@ -70,11 +83,16 @@ namespace UtilitiesCS
 
         internal async Task WriteConfigurationAsync()
         {
-            string assemblyDirectory = Path.GetDirectoryName(typeof(ManagerResources).Assembly.Location);
+            string assemblyDirectory = Path.GetDirectoryName(
+                typeof(ManagerResources).Assembly.Location
+            );
             string resxFilePath = Path.Combine(assemblyDirectory, "ManagerResources.resx");
 
             var configurations = (await Configuration)
-                .Select(kvp => new KeyValuePair<string, string>(kvp.Key, kvp.Value.SerializeToString()))
+                .Select(kvp => new KeyValuePair<string, string>(
+                    kvp.Key,
+                    kvp.Value.SerializeToString()
+                ))
                 .ToDictionary();
 
             using (var resxWriter = new ResXResourceWriter(resxFilePath))
@@ -87,12 +105,18 @@ namespace UtilitiesCS
             }
         }
 
-        internal async void Loader_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        internal async void Loader_PropertyChanged(
+            object sender,
+            System.ComponentModel.PropertyChangedEventArgs e
+        )
         {
             if (e.PropertyName.Contains(nameof(SmartSerializableLoader.Config.ClassifierActivated)))
             {
                 var loader = (SmartSerializableLoader)sender;
-                if (loader.Config.ClassifierActivated && !this.TryGetValue(nameof(loader.Name), out var classifier))
+                if (
+                    loader.Config.ClassifierActivated
+                    && !this.TryGetValue(nameof(loader.Name), out var classifier)
+                )
                 {
                     var classifierGroup = GetAsyncLazyClassifierLoader(loader);
                     if (classifierGroup != null)
@@ -109,10 +133,15 @@ namespace UtilitiesCS
                 await WriteConfigurationAsync();
             }
             else if (e.PropertyName.Contains(nameof(SmartSerializableLoader.T)))
-            { await WriteConfigurationAsync(); }
+            {
+                await WriteConfigurationAsync();
+            }
         }
 
-        internal async void Config_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        internal async void Config_PropertyChanged(
+            object sender,
+            System.ComponentModel.PropertyChangedEventArgs e
+        )
         {
             // using reflection because the sender is a smart serializable object of base type T
             Type sst = sender.GetType();
@@ -131,15 +160,21 @@ namespace UtilitiesCS
             var configurations = (await Configuration);
             _privateConfig = configurations;
 
-            if (!configurations.TryGetValue(name, out var loader)) { return; }
+            if (!configurations.TryGetValue(name, out var loader))
+            {
+                return;
+            }
 
             await UpdateLoaderConfigAsync(config, loader);
             await ChangeDiskCallbackAsync(sender, e, sst, local, name, loader);
         }
 
-        private async Task UpdateLoaderConfigAsync(ISmartSerializableConfig config, SmartSerializableLoader loader)
+        private async Task UpdateLoaderConfigAsync(
+            ISmartSerializableConfig config,
+            SmartSerializableLoader loader
+        )
         {
-            // Unwire the event handler that synchronizes base item since action  
+            // Unwire the event handler that synchronizes base item since action
             // is generated by the base item itself
             loader.PropertyChanged -= Loader_PropertyChanged;
             loader.Config.CopyChanged(config, true);
@@ -147,14 +182,23 @@ namespace UtilitiesCS
             await WriteConfigurationAsync();
         }
 
-        private async Task ChangeDiskCallbackAsync(object sender, PropertyChangedEventArgs e, Type sst, bool local, string name, SmartSerializableLoader loader)
+        private async Task ChangeDiskCallbackAsync(
+            object sender,
+            PropertyChangedEventArgs e,
+            Type sst,
+            bool local,
+            string name,
+            SmartSerializableLoader loader
+        )
         {
             if (e.PropertyName.Contains("ActiveDisk"))
             {
-                var response = MyBox.ShowDialog($"SpamBayes is now using {(local ? "local" : "network")} disk. Would you like to save the current classifier?",
-                            "Save Configuration",
-                            MessageBoxButtons.YesNo,
-                            MessageBoxIcon.Question);
+                var response = MyBox.ShowDialog(
+                    $"SpamBayes is now using {(local ? "local" : "network")} disk. Would you like to save the current classifier?",
+                    "Save Configuration",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
                 //var response = MessageBox.Show($"SpamBayes is now using {(local ? "local" : "network")} disk. Would you like to save the current classifier?",
                 //            "Save Configuration",
                 //            MessageBoxButtons.YesNo,
@@ -165,11 +209,14 @@ namespace UtilitiesCS
                     MethodInfo serializeMethod = sst.GetMethod("Serialize", []);
                     serializeMethod.Invoke(sender, null);
                 }
-
                 else
                 {
-                    response = MyBox.ShowDialog($"Would you like to reload the classifier from {(local ? "local" : "network")}", "Reload Classifier",
-                        MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    response = MyBox.ShowDialog(
+                        $"Would you like to reload the classifier from {(local ? "local" : "network")}",
+                        "Reload Classifier",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question
+                    );
                     //response = MessageBox.Show($"Would you like to reload the classifier from {(local ? "local" : "network")}", "Reload Classifier",
                     //    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (response == DialogResult.Yes)
@@ -185,7 +232,9 @@ namespace UtilitiesCS
 
         #region Manager Initialization
 
-        internal AsyncLazy<BayesianClassifierGroup> GetAsyncLazyClassifierLoader(SmartSerializableLoader loader)
+        internal AsyncLazy<BayesianClassifierGroup> GetAsyncLazyClassifierLoader(
+            SmartSerializableLoader loader
+        )
         {
             return new AsyncLazy<BayesianClassifierGroup>(async () =>
             {
@@ -224,7 +273,11 @@ namespace UtilitiesCS
                 //    return null;
                 //}
 
-                var classifier = await BayesianClassifierGroup.Static.DeserializeAsync(loader, true, GetAltLoader(loader));
+                var classifier = await BayesianClassifierGroup.Static.DeserializeAsync(
+                    loader,
+                    true,
+                    GetAltLoader(loader)
+                );
                 classifier.PropertyChanged += Config_PropertyChanged;
                 return classifier;
             });
@@ -236,17 +289,25 @@ namespace UtilitiesCS
             MethodInfo staticMethod = null;
             if (loader.T is not null)
             {
-                staticMethod = loader.T.GetMethod("CreateNewClassifier", BindingFlags.Static | BindingFlags.Public);
+                staticMethod = loader.T.GetMethod(
+                    "CreateNewClassifier",
+                    BindingFlags.Static | BindingFlags.Public
+                );
             }
 
-            Func<BayesianClassifierGroup> altLoader = staticMethod is null ? null : () => staticMethod.Invoke(null, null) as BayesianClassifierGroup;
+            Func<BayesianClassifierGroup> altLoader = staticMethod is null
+                ? null
+                : () => staticMethod.Invoke(null, null) as BayesianClassifierGroup;
 
             return altLoader;
         }
 
         public async Task ResetLoadManagerAsyncLazy()
         {
-            if (Configuration is null) { ResetConfigAsyncLazy(); }
+            if (Configuration is null)
+            {
+                ResetConfigAsyncLazy();
+            }
             foreach (var configuration in await Configuration)
             {
                 ResetLoadClassifierAsyncLazy(configuration.Key, configuration.Value);
@@ -258,7 +319,10 @@ namespace UtilitiesCS
             if (loader.Config.ClassifierActivated)
             {
                 var classifierGroup = GetAsyncLazyClassifierLoader(loader);
-                if (classifierGroup != null) { this[name] = classifierGroup; }
+                if (classifierGroup != null)
+                {
+                    this[name] = classifierGroup;
+                }
             }
             else
             {
@@ -267,6 +331,5 @@ namespace UtilitiesCS
         }
 
         #endregion Manager Initialization
-
     }
 }

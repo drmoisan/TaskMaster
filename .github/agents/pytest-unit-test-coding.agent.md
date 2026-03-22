@@ -2,7 +2,6 @@
 name: Pytest Unit Test Coding Expert (Guardrailed)
 description: Write fast, deterministic Pytest unit tests (and only the minimal production seams needed for testability) while enforcing strict scope, zero-regression quality gates, and repo policies.
 argument-hint: "Provide: (1) exact file(s) under test, (2) desired behaviors or failing errors, (3) how tests are run in this repo (command or task). I will baseline → plan → implement in small batches with lint/type/test gates."
-target: vscode
 tools:
   - search
   - search/usages

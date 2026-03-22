@@ -1,18 +1,18 @@
-﻿using Fizzler;
-using Svg;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Design;
 using System.Linq;
+using System.Reflection;
+using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using System.Reflection;
-using System.Resources;
+using Fizzler;
+using Svg;
 
 namespace SVGControl
 {
@@ -21,16 +21,19 @@ namespace SVGControl
         public PictureBoxSVG()
         {
             InitializeComponent();
-            _imageSvg = new SvgImageSelector(base.Size,
-                                             new Padding(0),
-                                             SVGControl.AutoSize.MaintainAspectRatio,
-                                             useDefaultImage: true);
+            _imageSvg = new SvgImageSelector(
+                base.Size,
+                new Padding(0),
+                SVGControl.AutoSize.MaintainAspectRatio,
+                useDefaultImage: true
+            );
             this.Image = _imageSvg.Render();
             _imageSvg.PropertyChanged += ImageSVG_PropertyChanged;
             this.SizeChanged += Control_SizeChanged;
         }
 
         private SvgImageSelector _imageSvg;
+
         //private ResourceManager _resMgr;
         //private Assembly _parentCaller;
 
@@ -51,7 +54,10 @@ namespace SVGControl
         private void ImageSVG_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             base.Image = ImageSvg.Render();
-            this.InvokePaint(this, new PaintEventArgs(this.CreateGraphics(), this.DisplayRectangle));
+            this.InvokePaint(
+                this,
+                new PaintEventArgs(this.CreateGraphics(), this.DisplayRectangle)
+            );
         }
     }
 }

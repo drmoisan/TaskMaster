@@ -120,7 +120,7 @@
       <Value Profile="(Default)">999999PrefixList.json</Value>
     </Setting>
     <Setting Name="DarkMode" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="FileName_Filters" Type="System.String" Scope="User">
       <Value Profile="(Default)">999999Filters.json</Value>
@@ -154,9 +154,6 @@
     </Setting>
     <Setting Name="EventsHooked" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="OlJunkPotential" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Junk Suspects SB</Value>
     </Setting>
     <Setting Name="OlJunkCertain" Type="System.String" Scope="User">
       <Value Profile="(Default)">Junk E-Mail SB</Value>

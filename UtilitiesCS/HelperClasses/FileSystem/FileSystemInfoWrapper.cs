@@ -10,7 +10,8 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public FileSystemInfoWrapper(FileSystemInfo fileSystemInfo)
         {
-            _fileSystemInfo = fileSystemInfo ?? throw new ArgumentNullException(nameof(fileSystemInfo));
+            _fileSystemInfo =
+                fileSystemInfo ?? throw new ArgumentNullException(nameof(fileSystemInfo));
         }
 
         public FileAttributes Attributes

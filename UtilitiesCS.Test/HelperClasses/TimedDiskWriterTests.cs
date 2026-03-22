@@ -1,13 +1,13 @@
-﻿using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using UtilitiesCS;
 using UtilitiesCS.Interfaces;
 
@@ -33,20 +33,22 @@ namespace UtilitiesCS.Test.HelperClasses
             //this.mockTimer.SetupSet(x => x.Elapsed += It.IsAny<EventHandler<TimeElapsedEventArgs>>());
             this.mockTimer.SetupSet(x => x.AutoReset = It.IsAny<bool>());
             this.mockTimer.SetupSet(x => x.Enabled = It.IsAny<bool>());
-            this.mockTimer.Setup(x => x.StartTimer()).Callback(
-                () => this.mockTimer.SetupGet(y => y.Enabled).Returns(true));
-            this.mockTimer.Setup(x => x.StopTimer()).Callback(
-                () => this.mockTimer.SetupGet(y => y.Enabled).Returns(false));
+            this.mockTimer.Setup(x => x.StartTimer())
+                .Callback(() => this.mockTimer.SetupGet(y => y.Enabled).Returns(true));
+            this.mockTimer.Setup(x => x.StopTimer())
+                .Callback(() => this.mockTimer.SetupGet(y => y.Enabled).Returns(false));
 
             this.mockTimedDiskWriter = new Mock<TimedDiskWriter<string>> { CallBase = true };
             //this.mockTimedDiskWriter.SetupAllProperties();
             this.mockTimedDiskWriter.Setup(x => x.StartTimer())
-                .Callback(() => this.mockTimedDiskWriter.SetupGet(
-                    y => y.TimerActive).Returns(true));
+                .Callback(() =>
+                    this.mockTimedDiskWriter.SetupGet(y => y.TimerActive).Returns(true)
+                );
 
             this.mockTimedDiskWriter.Setup(x => x.StopTimer())
-                .Callback(() => this.mockTimedDiskWriter.SetupGet(
-                    y => y.TimerActive).Returns(false));
+                .Callback(() =>
+                    this.mockTimedDiskWriter.SetupGet(y => y.TimerActive).Returns(false)
+                );
 
             //this.mockTimedDiskWriter.SetupSet(x => x.Timer = It.IsAny<ITimerWrapper>());
         }
@@ -71,7 +73,7 @@ namespace UtilitiesCS.Test.HelperClasses
             var expected = new BlockingCollection<string>(new ConcurrentQueue<string>())
             {
                 item1,
-                item2
+                item2,
             };
 
             // Act
@@ -100,7 +102,7 @@ namespace UtilitiesCS.Test.HelperClasses
             var expected = new BlockingCollection<string>(new ConcurrentQueue<string>())
             {
                 item1,
-                item2
+                item2,
             };
 
             CancellationToken token = default;
@@ -114,7 +116,6 @@ namespace UtilitiesCS.Test.HelperClasses
 
             // Assert
             actual.Should().BeEquivalentTo(expected);
-
         }
 
         [TestMethod]
@@ -132,15 +133,13 @@ namespace UtilitiesCS.Test.HelperClasses
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void StartTimer_StateUnderTest_NoDiskWriter()
         {
             // Arrange
             var timedDiskWriter = this.CreateTimedDiskWriter();
 
             // Act
-            timedDiskWriter.StartTimer();
-
+            Assert.ThrowsExactly<InvalidOperationException>(() => timedDiskWriter.StartTimer());
         }
 
         [TestMethod]
@@ -212,13 +211,18 @@ namespace UtilitiesCS.Test.HelperClasses
 
             string item1 = "Queued String 1";
             string item2 = "Queued String 2";
-            timedDiskWriter.Queue =
-                new BlockingCollection<string>(
-                    new ConcurrentQueue<string>()) { item1, item2 };
+            timedDiskWriter.Queue = new BlockingCollection<string>(new ConcurrentQueue<string>())
+            {
+                item1,
+                item2,
+            };
 
             var expected = new List<string> { item1, item2 };
             var actual = new List<string>();
-            timedDiskWriter.DiskWriter = (items) => { actual = items.ToList(); };
+            timedDiskWriter.DiskWriter = (items) =>
+            {
+                actual = items.ToList();
+            };
 
             object sender = null;
             var e = new TimeElapsedEventArgs();
@@ -236,10 +240,8 @@ namespace UtilitiesCS.Test.HelperClasses
             // Arrange
             var timedDiskWriter = this.mockTimedDiskWriter.Object;
 
-            timedDiskWriter.Queue =
-                new BlockingCollection<string>(
-                    new ConcurrentQueue<string>())
-                { };
+            timedDiskWriter.Queue = new BlockingCollection<string>(new ConcurrentQueue<string>())
+            { };
 
             timedDiskWriter.DiskWriter = (items) => { };
 
@@ -265,10 +267,8 @@ namespace UtilitiesCS.Test.HelperClasses
             // Arrange
             var timedDiskWriter = this.mockTimedDiskWriter.Object;
 
-            timedDiskWriter.Queue =
-                new BlockingCollection<string>(
-                    new ConcurrentQueue<string>())
-                { };
+            timedDiskWriter.Queue = new BlockingCollection<string>(new ConcurrentQueue<string>())
+            { };
 
             timedDiskWriter.DiskWriter = (items) => { };
 

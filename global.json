@@ -1,0 +1,12 @@
+{
+  "sdk": {
+    "version": "10.0.200",
+    "rollForward": "latestFeature",
+    "allowPrerelease": false,
+    "paths": [
+      ".dotnet-sdk",
+      "$host$"
+    ],
+    "errorMessage": "The repo-local .NET SDK is missing. Run ./scripts/vscode/Install-RepoDotNetSdk.ps1 from the repository root, then retry dotnet format TaskMaster.sln."
+  }
+}

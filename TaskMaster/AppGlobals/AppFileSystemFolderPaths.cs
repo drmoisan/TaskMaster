@@ -1,15 +1,14 @@
-﻿using log4net.Repository.Hierarchy;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using log4net.Repository.Hierarchy;
 using UtilitiesCS;
 using UtilitiesCS.Extensions;
 
 namespace TaskMaster
 {
-
     public class AppFileSystemFolderPaths : IFileSystemFolderPaths
     {
         public AppFileSystemFolderPaths()
@@ -19,13 +18,14 @@ namespace TaskMaster
         }
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         #region ctor
 
         private AppFileSystemFolderPaths(bool async) { }
 
-        async public static Task<AppFileSystemFolderPaths> LoadAsync()
+        public static async Task<AppFileSystemFolderPaths> LoadAsync()
         {
             var fs = new AppFileSystemFolderPaths(true);
             await fs.LoadFoldersAsync();
@@ -45,7 +45,7 @@ namespace TaskMaster
             }
         }
 
-        async private Task CreateMissingPathsAsync(string filepath)
+        private async Task CreateMissingPathsAsync(string filepath)
         {
             if (!Directory.Exists(filepath))
             {
@@ -55,25 +55,40 @@ namespace TaskMaster
 
         public string MatchBestSpecialFolder(string path)
         {
-            if (SpecialFolders.IsNullOrEmpty()) { return null; }
-            var bestMatch = SpecialFolders.Where(x => path.Contains(x.Value)).OrderByDescending(x => x.Value.Length).FirstOrDefault();
+            if (SpecialFolders.IsNullOrEmpty())
+            {
+                return null;
+            }
+            var bestMatch = SpecialFolders
+                .Where(x => path.Contains(x.Value))
+                .OrderByDescending(x => x.Value.Length)
+                .FirstOrDefault();
             return bestMatch.Key;
         }
 
         private bool TryAddSpecialFolder(string name, string[] pathParts)
         {
-            if (name.IsNullOrEmpty()) { return false; }
-
-            else if (pathParts.IsNullOrEmpty())
+            if (name.IsNullOrEmpty())
             {
-                logger.Debug($"Error in {nameof(TryAddSpecialFolder)} for key {nameof(name)} because {nameof(pathParts)} is null or empty. {TraceUtility.GetMyTraceString(new System.Diagnostics.StackTrace())}");
                 return false;
             }
-
+            else if (pathParts.IsNullOrEmpty())
+            {
+                logger.Debug(
+                    $"Error in {nameof(TryAddSpecialFolder)} for key {nameof(name)} because {nameof(pathParts)} is null or empty. {TraceUtility.GetMyTraceString(new System.Diagnostics.StackTrace())}"
+                );
+                return false;
+            }
             else if (pathParts.Any(x => x is null || x.Trim().IsNullOrEmpty()))
             {
-                var locations = Enumerable.Range(0, pathParts.Length).Where(i => pathParts[i] is null).Select(i => i.ToString()).SentenceJoin();
-                logger.Debug($"Error in {nameof(TryAddSpecialFolder)} for key {nameof(name)} because {nameof(pathParts)} has null elements at {locations}. {TraceUtility.GetMyTraceString(new System.Diagnostics.StackTrace())}");
+                var locations = Enumerable
+                    .Range(0, pathParts.Length)
+                    .Where(i => pathParts[i] is null)
+                    .Select(i => i.ToString())
+                    .SentenceJoin();
+                logger.Debug(
+                    $"Error in {nameof(TryAddSpecialFolder)} for key {nameof(name)} because {nameof(pathParts)} has null elements at {locations}. {TraceUtility.GetMyTraceString(new System.Diagnostics.StackTrace())}"
+                );
                 return false;
             }
 
@@ -85,13 +100,11 @@ namespace TaskMaster
                 CreateMissingPaths(SpecialFolders[name]);
                 return true;
             }
-
             catch (Exception e)
             {
                 logger.Error(e.Message, e);
                 return false;
             }
-
         }
 
         private bool TryAddSpecialFolder(string name, Func<string[]> predicate)
@@ -103,7 +116,10 @@ namespace TaskMaster
             }
             catch (Exception e)
             {
-                logger.Error($"Error in {nameof(TryAddSpecialFolder)}. {nameof(predicate)} threw the following exception {e.Message}", e);
+                logger.Error(
+                    $"Error in {nameof(TryAddSpecialFolder)}. {nameof(predicate)} threw the following exception {e.Message}",
+                    e
+                );
                 return false;
             }
         }
@@ -111,24 +127,78 @@ namespace TaskMaster
         private void LoadFolders()
         {
             SpecialFolders = [];
-            TryAddSpecialFolder("AppData", () => [Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), nameof(TaskMaster)]);
-            TryAddSpecialFolder("MyDocuments", () => [Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)]);
-            TryAddSpecialFolder("UserProfile", () => [Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)]);
-            TryAddSpecialFolder("MyComputer", () => [Environment.GetFolderPath(Environment.SpecialFolder.MyComputer)]);
-            TryAddSpecialFolder("Favorites", () => [Environment.GetFolderPath(Environment.SpecialFolder.Favorites)]);
-            TryAddSpecialFolder("Personal", () => [Environment.GetFolderPath(Environment.SpecialFolder.Personal)]);
-            TryAddSpecialFolder("ApplicationData", () => [Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)]);
-            TryAddSpecialFolder("Desktop", () => [Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)]);
-            TryAddSpecialFolder("NetworkShortcuts", () => [Environment.GetFolderPath(Environment.SpecialFolder.NetworkShortcuts)]);
-            if (!TryAddSpecialFolder("OneDrivePersonal", () => [Environment.GetEnvironmentVariable("OneDriveConsumer")]))
+            TryAddSpecialFolder(
+                "AppData",
+                () =>
+                    [
+                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                        nameof(TaskMaster),
+                    ]
+            );
+            TryAddSpecialFolder(
+                "MyDocuments",
+                () => [Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)]
+            );
+            TryAddSpecialFolder(
+                "UserProfile",
+                () => [Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)]
+            );
+            TryAddSpecialFolder(
+                "MyComputer",
+                () => [Environment.GetFolderPath(Environment.SpecialFolder.MyComputer)]
+            );
+            TryAddSpecialFolder(
+                "Favorites",
+                () => [Environment.GetFolderPath(Environment.SpecialFolder.Favorites)]
+            );
+            TryAddSpecialFolder(
+                "Personal",
+                () => [Environment.GetFolderPath(Environment.SpecialFolder.Personal)]
+            );
+            TryAddSpecialFolder(
+                "ApplicationData",
+                () => [Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)]
+            );
+            TryAddSpecialFolder(
+                "Desktop",
+                () => [Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)]
+            );
+            TryAddSpecialFolder(
+                "NetworkShortcuts",
+                () => [Environment.GetFolderPath(Environment.SpecialFolder.NetworkShortcuts)]
+            );
+            if (
+                !TryAddSpecialFolder(
+                    "OneDrivePersonal",
+                    () => [Environment.GetEnvironmentVariable("OneDriveConsumer")]
+                )
+            )
             {
-                TryAddSpecialFolder("OneDrivePersonal", () => [Environment.GetEnvironmentVariable("OneDrivePersonal")]);
+                TryAddSpecialFolder(
+                    "OneDrivePersonal",
+                    () => [Environment.GetEnvironmentVariable("OneDrivePersonal")]
+                );
             }
-            if (!TryAddSpecialFolder("OneDrive", () => [Environment.GetEnvironmentVariable("OneDriveCommercial")]))
+            if (
+                !TryAddSpecialFolder(
+                    "OneDrive",
+                    () => [Environment.GetEnvironmentVariable("OneDriveCommercial")]
+                )
+            )
             {
-                if (!TryAddSpecialFolder("OneDrive", () => [Environment.GetEnvironmentVariable("OneDrive")]))
+                if (
+                    !TryAddSpecialFolder(
+                        "OneDrive",
+                        () => [Environment.GetEnvironmentVariable("OneDrive")]
+                    )
+                )
                 {
-                    if (!TryAddSpecialFolder("OneDrive", () => [Environment.GetEnvironmentVariable("OneDrivePersonal")]))
+                    if (
+                        !TryAddSpecialFolder(
+                            "OneDrive",
+                            () => [Environment.GetEnvironmentVariable("OneDrivePersonal")]
+                        )
+                    )
                     {
                         if (SpecialFolders.Count > 0)
                         {
@@ -141,7 +211,12 @@ namespace TaskMaster
                                 TryAddSpecialFolder("OneDrive", [SpecialFolders.First().Value]);
                             }
                         }
-                        else { throw new InvalidOperationException("No know network or local folders set in environment variables"); }
+                        else
+                        {
+                            throw new InvalidOperationException(
+                                "No know network or local folders set in environment variables"
+                            );
+                        }
                     }
                 }
             }
@@ -149,8 +224,15 @@ namespace TaskMaster
             TryAddSpecialFolder("Flow", [oneDrive, "Email attachments from Flow"]);
             SpecialFolders.TryGetValue("Flow", out var flow);
             TryAddSpecialFolder("PreReads", [oneDrive, "_  Workflow", "_ Pre-Reads"]);
-            TryAddSpecialFolder("System", () => [Environment.GetFolderPath(Environment.SpecialFolder.System)]);
-            TryAddSpecialFolder("Root", () => [Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System))]);
+            TryAddSpecialFolder(
+                "System",
+                () => [Environment.GetFolderPath(Environment.SpecialFolder.System)]
+            );
+            TryAddSpecialFolder(
+                "Root",
+                () =>
+                    [Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System))]
+            );
 
             if (SpecialFolders.TryGetValue("MyDocuments", out var myDocuments))
             {
@@ -161,7 +243,7 @@ namespace TaskMaster
         }
 
         //TODO: Cleanup Staging Files so that they are in one or two directories and not all over the place
-        async private Task LoadFoldersAsync()
+        private async Task LoadFoldersAsync()
         {
             await Task.Run(LoadFolders);
         }
@@ -194,10 +276,18 @@ namespace TaskMaster
         //public string FldrPythonStaging { get => _fldrPythonStaging; protected set => _fldrPythonStaging = value; }
 
         private IAppStagingFilenames _filenames;
-        public IAppStagingFilenames Filenames { get => _filenames; protected set => _filenames = value; }
+        public IAppStagingFilenames Filenames
+        {
+            get => _filenames;
+            protected set => _filenames = value;
+        }
 
         private ConcurrentDictionary<string, string> _specialFolders;
-        public ConcurrentDictionary<string, string> SpecialFolders { get => _specialFolders; protected set => _specialFolders = value; }
+        public ConcurrentDictionary<string, string> SpecialFolders
+        {
+            get => _specialFolders;
+            protected set => _specialFolders = value;
+        }
 
         private string _remap;
 

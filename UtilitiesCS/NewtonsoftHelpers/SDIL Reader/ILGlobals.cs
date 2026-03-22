@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
 
 namespace SDILReader
 {
@@ -72,7 +72,6 @@ namespace SDILReader
     //    None,
     //}
 
-
     //public enum ResourceVisibility
     //{
     //    Public,
@@ -106,8 +105,6 @@ namespace SDILReader
     //    PostIncrement,
     //    PostDecrement
     //}
-
-
 
     public static class ILGlobals
     {
@@ -145,7 +142,6 @@ namespace SDILReader
             }
         }
 
-
         /// <summary>
         /// Retrieve the friendly name of a type
         /// </summary>
@@ -163,11 +159,13 @@ namespace SDILReader
                 case "System.string":
                 case "System.String":
                 case "String":
-                    result = "string"; break;
+                    result = "string";
+                    break;
                 case "System.Int32":
                 case "Int":
                 case "Int32":
-                    result = "int"; break;
+                    result = "int";
+                    break;
             }
             return result;
         }

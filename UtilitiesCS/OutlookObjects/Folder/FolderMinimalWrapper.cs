@@ -1,9 +1,9 @@
-﻿using Microsoft.Graph.Drives.Item.Items.Item.SearchWithQ;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Graph.Drives.Item.Items.Item.SearchWithQ;
+using Newtonsoft.Json;
 using UtilitiesCS.Extensions.Lazy;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
@@ -12,7 +12,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
     public class FolderMinimalWrapper
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         internal FolderMinimalWrapper() { }
 
@@ -36,30 +37,45 @@ namespace UtilitiesCS.OutlookObjects.Folder
         public Outlook.Folder OlFolder { get; set; }
 
         [JsonProperty]
-        public string Name { get => _lazyName?.Value; private set => _lazyName = value?.ToLazy(); }
+        public string Name
+        {
+            get => _lazyName?.Value;
+            private set => _lazyName = value?.ToLazy();
+        }
         private Lazy<string> _lazyName;
 
         [JsonProperty]
-        public string RelativePath { get => _lazyRelativePath?.Value; set => _lazyRelativePath = value?.ToLazy(); }
+        public string RelativePath
+        {
+            get => _lazyRelativePath?.Value;
+            set => _lazyRelativePath = value?.ToLazy();
+        }
         private Lazy<string> _lazyRelativePath;
+
         internal virtual string ToRelativePath()
         {
             if (OlRoot is null || OlFolder is null)
             {
-                logger.Warn($"{nameof(OlRoot)} or {nameof(OlFolder)} is null. Unable to load {nameof(RelativePath)}.\n" +
-                    $"Call hierarchy {new StackTrace().GetMyTraceString()}");
+                logger.Warn(
+                    $"{nameof(OlRoot)} or {nameof(OlFolder)} is null. Unable to load {nameof(RelativePath)}.\n"
+                        + $"Call hierarchy {new StackTrace().GetMyTraceString()}"
+                );
                 return null;
             }
             else if (OlFolder.FolderPath == OlRoot.FolderPath)
             {
-                logger.Warn($"{nameof(OlFolder.FolderPath)} is the same as {nameof(OlRoot.FolderPath)}. " +
-                    $"Returning full path.\nCall hierarchy {new StackTrace().GetMyTraceString()}");
+                logger.Warn(
+                    $"{nameof(OlFolder.FolderPath)} is the same as {nameof(OlRoot.FolderPath)}. "
+                        + $"Returning full path.\nCall hierarchy {new StackTrace().GetMyTraceString()}"
+                );
                 return OlFolder.FolderPath;
             }
             else if (!OlFolder.FolderPath.Contains(OlRoot.FolderPath))
             {
-                logger.Warn($"{nameof(OlFolder.FolderPath)} does not contain {nameof(OlRoot.FolderPath)}. " +
-                    $"Returning full path.\nCall hierarchy {new StackTrace().GetMyTraceString()}");
+                logger.Warn(
+                    $"{nameof(OlFolder.FolderPath)} does not contain {nameof(OlRoot.FolderPath)}. "
+                        + $"Returning full path.\nCall hierarchy {new StackTrace().GetMyTraceString()}"
+                );
                 return OlFolder.FolderPath;
             }
             else
@@ -72,11 +88,15 @@ namespace UtilitiesCS.OutlookObjects.Folder
         {
             if (olRoot is null || string.IsNullOrEmpty(RelativePath))
             {
-                logger.Warn($"{nameof(olRoot)} is null or {nameof(RelativePath)} is empty. Unable to load folder from relative path.");
+                logger.Warn(
+                    $"{nameof(olRoot)} is null or {nameof(RelativePath)} is empty. Unable to load folder from relative path."
+                );
                 return;
             }
 
-            var pathParts = RelativePath.Split(['\\'], StringSplitOptions.RemoveEmptyEntries).ToList();
+            var pathParts = RelativePath
+                .Split(['\\'], StringSplitOptions.RemoveEmptyEntries)
+                .ToList();
 
             try
             {
@@ -91,11 +111,13 @@ namespace UtilitiesCS.OutlookObjects.Folder
                         }
                         else if (olRoot.Parent is Outlook.NameSpace ns)
                         {
-                            olRoot = ns.Stores.Cast<Outlook.Store>()
-                                .FirstOrDefault(store => store.GetRootFolder().FolderPath == $"\\\\{pathParts[0]}")
-                                .GetRootFolder() as Outlook.Folder;
+                            olRoot =
+                                ns.Stores.Cast<Outlook.Store>()
+                                    .FirstOrDefault(store =>
+                                        store.GetRootFolder().FolderPath == $"\\\\{pathParts[0]}"
+                                    )
+                                    .GetRootFolder() as Outlook.Folder;
                             pathParts.RemoveAt(0);
-
                         }
                         rp = rp.Substring(2);
                     }
@@ -115,10 +137,16 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 foreach (var part in pathParts)
                 {
                     //currentFolder.Folders.Cast<Outlook.Folder>().ForEach(f => logger.Debug($"Folder: {f.Name}"));
-                    currentFolder = currentFolder.Folders.Cast<Outlook.Folder>().FirstOrDefault(f => f.Name.Equals(part, StringComparison.OrdinalIgnoreCase));
+                    currentFolder = currentFolder
+                        .Folders.Cast<Outlook.Folder>()
+                        .FirstOrDefault(f =>
+                            f.Name.Equals(part, StringComparison.OrdinalIgnoreCase)
+                        );
                     if (currentFolder == null)
                     {
-                        logger.Warn($"Folder part '{part}' not found in the path '{RelativePath}'.");
+                        logger.Warn(
+                            $"Folder part '{part}' not found in the path '{RelativePath}'."
+                        );
                         return;
                     }
                 }
@@ -127,7 +155,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
             catch (Exception e)
             {
-                logger.Error($"Error loading folder from relative path '{RelativePath}'. {e.Message}", e);
+                logger.Error(
+                    $"Error loading folder from relative path '{RelativePath}'. {e.Message}",
+                    e
+                );
             }
         }
 
@@ -136,7 +167,5 @@ namespace UtilitiesCS.OutlookObjects.Folder
             _lazyRelativePath = new Lazy<string>(ToRelativePath);
             _lazyName = new Lazy<string>(() => OlFolder?.Name);
         }
-
-
     }
 }

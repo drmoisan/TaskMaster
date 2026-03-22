@@ -1,13 +1,14 @@
 ﻿using System;
-using Microsoft.Office.Interop.Outlook;
-using Microsoft.Office.Core;
-using UtilitiesCS;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Microsoft.Office.Core;
+using Microsoft.Office.Interop.Outlook;
+using UtilitiesCS;
 using UtilitiesCS.Threading;
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
 [assembly: InternalsVisibleTo("TaskMaster.Test")]
+
 namespace TaskMaster
 {
     public partial class ThisAddIn
@@ -28,8 +29,8 @@ namespace TaskMaster
         private void Application_Startup()
         {
             logger.Debug("Application_Startup() fired");
-            //IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => 
-            //{ 
+            //IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() =>
+            //{
             SetUpBrightIdeasSettings();
             SetUpDeedle();
             //}));
@@ -38,15 +39,21 @@ namespace TaskMaster
             _ribbonController.SetGlobals(_globals);
             _externalUtilities.SetGlobals(_globals, _ribbonController);
 
-            IdleAsyncQueue.AddEntry(true, async () =>
-            {
-                await _globals.LoadAsync(false);
-                logger.Debug("Finished loading globals");
-            });
+            IdleAsyncQueue.AddEntry(
+                true,
+                async () =>
+                {
+                    await _globals.LoadAsync(false);
+                    logger.Debug("Finished loading globals");
+                }
+            );
 
             //IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => _ribbonController.SetGlobals(_globals)));
             //IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => _externalUtilities.SetGlobals(_globals, _ribbonController)));
-            IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() => logger.Debug("IdleAsyncQueue Complete")));
+            IdleAsyncQueue.AddEntry(
+                false,
+                async () => await Task.Run(() => logger.Debug("IdleAsyncQueue Complete"))
+            );
             logger.Debug("Application_Startup() complete");
         }
 
@@ -69,14 +76,16 @@ namespace TaskMaster
             BrightIdeasSoftware.TreeListView.TreeRenderer.PIXELS_PER_LEVEL = tlvIndent;
         }
 
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
         private ApplicationGlobals _globals;
         private AddInUtilities _externalUtilities;
         private RibbonController _ribbonController;
 
         /// <summary>
         /// Overrides the default behavior of the COM add-in to create an XML ribbon
-        /// <seealso cref="RibbonViewer"/> which is controlled by 
+        /// <seealso cref="RibbonViewer"/> which is controlled by
         /// <seealso cref="RibbonController"/>.
         /// </summary>
         /// <returns><seealso cref="IRibbonExtensibility"/> object</returns>
@@ -97,7 +106,7 @@ namespace TaskMaster
         }
 
         /// <summary>
-        /// Overrides the default behavior of the COM add-in to expose specific methods 
+        /// Overrides the default behavior of the COM add-in to expose specific methods
         /// to other office applications so that they can be called from VBA.
         /// </summary>
         /// <returns>Instance of the <seealso cref="AddInUtilities"/> class</returns>
@@ -117,7 +126,7 @@ namespace TaskMaster
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
         {
-            // Note: Outlook no longer raises this event. If you have code that 
+            // Note: Outlook no longer raises this event. If you have code that
             //    must run when Outlook shuts down, see https://go.microsoft.com/fwlink/?LinkId=506785
         }
 

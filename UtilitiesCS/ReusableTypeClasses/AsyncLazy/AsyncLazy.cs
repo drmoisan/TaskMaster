@@ -1,11 +1,11 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Security.Policy;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json.Linq;
 
 namespace UtilitiesCS
 {
@@ -104,8 +104,8 @@ namespace UtilitiesCS
         // awaiting the AsyncLazy<T> instance receive the value.
         //
         // It takes a few minutes to wrap your head around the theory, but it’s really easy in practice:
-        private static readonly AsyncLazy<MyResource> myResource = new AsyncLazy<MyResource>(
-        () => new MyResource()
+        private static readonly AsyncLazy<MyResource> myResource = new AsyncLazy<MyResource>(() =>
+            new MyResource()
         // or:
         // async () => { var ret = new MyResource(); await ret.InitAsync(); return ret; }
         );
@@ -131,10 +131,12 @@ namespace UtilitiesCS
         // has been determined.
 
         public event PropertyChangedEventHandler PropertyChanged;
+
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+            if (handler != null)
+                handler(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private int? myProperty;
@@ -153,7 +155,5 @@ namespace UtilitiesCS
             await Task.Delay(100);
             MyProperty = 13;
         }
-
     }
-
 }

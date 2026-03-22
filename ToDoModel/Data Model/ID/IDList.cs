@@ -1,13 +1,14 @@
-﻿using Deedle;
-using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 using System.Windows.Forms;
+using Deedle;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
+using UtilitiesCS.Extensions;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.OutlookObjects.Fields;
 using Outlook = Microsoft.Office.Interop.Outlook;
@@ -18,38 +19,42 @@ namespace ToDoModel
     {
         #region constructors
 
-        public IDList() : base() { }
-        public IDList(IList<string> list) : base(list) { }
-        public IDList(IEnumerable<string> IEnumerableOfString) : base(IEnumerableOfString) { }
-        public IDList(string filename, string folderpath) : base(filename, folderpath) { }
-        public IDList(string filename,
-                      string folderpath,
-                      Outlook.Application olApp) : base(filename, folderpath)
+        public IDList()
+            : base() { }
+
+        public IDList(IList<string> list)
+            : base(list) { }
+
+        public IDList(IEnumerable<string> IEnumerableOfString)
+            : base(IEnumerableOfString) { }
+
+        public IDList(string filename, string folderpath)
+            : base(filename, folderpath) { }
+
+        public IDList(string filename, string folderpath, Outlook.Application olApp)
+            : base(filename, folderpath)
         {
             _olApp = olApp;
         }
 
-        public IDList(string filename,
-                      string folderpath,
-                      CSVLoader<string> backupLoader,
-                      string backupFilepath,
-                      bool askUserOnError) : base(filename,
-                                                  folderpath,
-                                                  backupLoader,
-                                                  backupFilepath,
-                                                  askUserOnError)
-        { }
+        public IDList(
+            string filename,
+            string folderpath,
+            CSVLoader<string> backupLoader,
+            string backupFilepath,
+            bool askUserOnError
+        )
+            : base(filename, folderpath, backupLoader, backupFilepath, askUserOnError) { }
 
-        public IDList(string filename,
-                      string folderpath,
-                      CSVLoader<string> backupLoader,
-                      string backupFilepath,
-                      bool askUserOnError,
-                      Outlook.Application olApp) : base(filename,
-                                                        folderpath,
-                                                        backupLoader,
-                                                        backupFilepath,
-                                                        askUserOnError)
+        public IDList(
+            string filename,
+            string folderpath,
+            CSVLoader<string> backupLoader,
+            string backupFilepath,
+            bool askUserOnError,
+            Outlook.Application olApp
+        )
+            : base(filename, folderpath, backupLoader, backupFilepath, askUserOnError)
         {
             _olApp = olApp;
         }
@@ -73,6 +78,7 @@ namespace ToDoModel
 
         public string GetNextToDoID(string strSeed)
         {
+            strSeed.ThrowIfNullOrEmpty();
             int encoderBase = 36; // 125;
 
             bool blContinue = true;
@@ -95,7 +101,10 @@ namespace ToDoModel
                 Properties.Settings.Default.MaxLengthOfID = (int)_maxIDLength;
                 Properties.Settings.Default.Save();
             }
-            if (this.Filepath is not null) { this.Serialize(); }
+            if (this.Filepath is not null)
+            {
+                this.Serialize();
+            }
             return strMaxID;
         }
 
@@ -113,15 +122,17 @@ namespace ToDoModel
 
         public void RefreshIDList()
         {
-            var df = DfDeedle.FromDefaultFolder(stores: _olApp.Session.Stores,
-                                                folderEnum: OlDefaultFolders.olFolderToDo,
-                                                removeColumns: null,
-                                                addColumns: new string[]
-                                                {
-                                                    MAPIFields.Schemas.ToDoID,
-                                                    "Categories",
-                                                    MAPIFields.Schemas.MessageStore
-                                                });
+            var df = DfDeedle.FromDefaultFolder(
+                stores: _olApp.Session.Stores,
+                folderEnum: OlDefaultFolders.olFolderToDo,
+                removeColumns: null,
+                addColumns: new string[]
+                {
+                    MAPIFields.Schemas.ToDoID,
+                    "Categories",
+                    MAPIFields.Schemas.MessageStore,
+                }
+            );
 
             var toDoColumn = ResolveColumnKey(df, "ToDoID", MAPIFields.Schemas.ToDoID);
             if (string.IsNullOrEmpty(toDoColumn))
@@ -150,7 +161,11 @@ namespace ToDoModel
             this.Serialize();
         }
 
-        public async Task<string> SubstituteIdRootAsync(string oldId, string newRoot, string oldRoot)
+        public async Task<string> SubstituteIdRootAsync(
+            string oldId,
+            string newRoot,
+            string oldRoot
+        )
         {
             return await Task.Run(() =>
             {
@@ -160,25 +175,23 @@ namespace ToDoModel
                 this.Serialize();
                 return newId;
             });
-
-
         }
 
         public IAsyncEnumerable<IToDoItem> GetItemsWithRootIdAsync(string rootId)
         {
             var strFilter = $"@SQL={MAPIFields.Schemas.ToDoID} like '{rootId}%'";
-            var items = _olApp.Session.Stores
-                ?.Cast<Store>()
+            var items = _olApp
+                .Session.Stores?.Cast<Store>()
                 ?.ToAsyncEnumerable()
                 ?.Select(TryGetDefaultToDoFolder)
                 ?.Where(store => store is not null)
                 ?.SelectMany(folder =>
-                    folder?
-                    .Items?
-                    .Restrict(strFilter)?
-                    .Cast<object>()?
-                    .ToAsyncEnumerable()?
-                    .Select(x => new ToDoItem(new OutlookItem(x))));
+                    folder
+                        ?.Items?.Restrict(strFilter)
+                        ?.Cast<object>()
+                        ?.ToAsyncEnumerable()
+                        ?.Select(x => new ToDoItem(new OutlookItem(x)))
+                );
             return items;
         }
 
@@ -198,20 +211,24 @@ namespace ToDoModel
         {
             if (_olApp is null)
             {
-                MessageBox.Show($"Coding Error. Cannot substitute id root without a handle to " +
-                    $"the Outlook Application. Please use the {nameof(SetOlApp)} method.");
+                MessageBox.Show(
+                    $"Coding Error. Cannot substitute id root without a handle to "
+                        + $"the Outlook Application. Please use the {nameof(SetOlApp)} method."
+                );
             }
             else
             {
-                var df = DfDeedle.FromDefaultFolder(stores: _olApp.Session.Stores,
-                                                    folderEnum: OlDefaultFolders.olFolderToDo,
-                                                    removeColumns: null,
-                                                    addColumns:
-                                                    [
-                                                        MAPIFields.Schemas.ToDoID,
-                                                        "Categories",
-                                                        MAPIFields.Schemas.MessageStore
-                                                    ]);
+                var df = DfDeedle.FromDefaultFolder(
+                    stores: _olApp.Session.Stores,
+                    folderEnum: OlDefaultFolders.olFolderToDo,
+                    removeColumns: null,
+                    addColumns:
+                    [
+                        MAPIFields.Schemas.ToDoID,
+                        "Categories",
+                        MAPIFields.Schemas.MessageStore,
+                    ]
+                );
 
                 var toDoColumn = ResolveColumnKey(df, "ToDoID", MAPIFields.Schemas.ToDoID);
                 var storeColumn = ResolveColumnKey(df, "Store", MAPIFields.Schemas.MessageStore);
@@ -251,7 +268,10 @@ namespace ToDoModel
 
         private static string ResolveColumnKey(Frame<int, string> df, params string[] candidates)
         {
-            if (df is null) { return null; }
+            if (df is null)
+            {
+                return null;
+            }
 
             foreach (var candidate in candidates)
             {
@@ -265,7 +285,7 @@ namespace ToDoModel
         }
 
         /// <summary>
-        /// Function Invokes the DataModel_ToDoTree.ReNumberIDs() method at the root level which 
+        /// Function Invokes the DataModel_ToDoTree.ReNumberIDs() method at the root level which
         /// recursively calls DataModel_ToDoTree.ReNumberChildrenIDs() and then invokes the
         /// ListOfIDsLegacy.Save() Method
         /// </summary>
@@ -285,6 +305,9 @@ namespace ToDoModel
             this.Serialize();
         }
 
-        public void SetOlApp(Outlook.Application olApp) { _olApp = olApp; }
+        public void SetOlApp(Outlook.Application olApp)
+        {
+            _olApp = olApp;
+        }
     }
 }

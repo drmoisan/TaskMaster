@@ -11,7 +11,14 @@ namespace UtilitiesCS
     {
         public ControlPosition() { }
 
-        public ControlPosition(int left, int top, int width, int height, Padding margin, Padding padding)
+        public ControlPosition(
+            int left,
+            int top,
+            int width,
+            int height,
+            Padding margin,
+            Padding padding
+        )
         {
             Left = left;
             Top = top;
@@ -23,12 +30,14 @@ namespace UtilitiesCS
 
         public static ControlPosition CreateTemplate(Control control)
         {
-            var cp = new ControlPosition(control.Left,
-                                         control.Top,
-                                         control.Width,
-                                         control.Height,
-                                         control.Margin,
-                                         control.Padding);
+            var cp = new ControlPosition(
+                control.Left,
+                control.Top,
+                control.Width,
+                control.Height,
+                control.Margin,
+                control.Padding
+            );
             cp.FixedLeft = cp.Left - cp.Margin.Left;
             cp.FixedTop = cp.Top - cp.Margin.Top;
             return cp;
@@ -36,7 +45,7 @@ namespace UtilitiesCS
 
         /// <summary>
         /// Method sets the position of a control based on the virtual grid defined
-        /// by this <see cref="ControlPosition"/>. cellVertical and cellHorizontal 
+        /// by this <see cref="ControlPosition"/>. cellVertical and cellHorizontal
         /// are zero based integer values that represent the grid position.
         /// </summary>
         /// <param name="control">Targeted <seealso cref="Control"/> to receive position</param>
@@ -48,7 +57,12 @@ namespace UtilitiesCS
             Set(control, cp);
         }
 
-        public static void Set(Control control, ControlPosition template, int cellVertical, int cellHorizontal)
+        public static void Set(
+            Control control,
+            ControlPosition template,
+            int cellVertical,
+            int cellHorizontal
+        )
         {
             var cp = FromTemplate(template, cellVertical, cellHorizontal);
             Set(control, cp);
@@ -64,17 +78,25 @@ namespace UtilitiesCS
             control.Padding = cp.Padding;
         }
 
-        public static ControlPosition FromTemplate(ControlPosition template, int cellVertical, int cellHorizontal)
+        public static ControlPosition FromTemplate(
+            ControlPosition template,
+            int cellVertical,
+            int cellHorizontal
+        )
         {
-            var top = template.FixedTop + (template.Height + template.Margin.Vertical) * cellVertical;
-            var left = template.FixedLeft + (template.Width + template.Margin.Horizontal) * cellHorizontal;
+            var top =
+                template.FixedTop + (template.Height + template.Margin.Vertical) * cellVertical;
+            var left =
+                template.FixedLeft + (template.Width + template.Margin.Horizontal) * cellHorizontal;
 
-            var cp = new ControlPosition(left,
-                                         top,
-                                         template.Width,
-                                         template.Height,
-                                         template.Margin,
-                                         template.Padding);
+            var cp = new ControlPosition(
+                left,
+                top,
+                template.Width,
+                template.Height,
+                template.Margin,
+                template.Padding
+            );
 
             cp.FixedLeft = cp.Left - cp.Margin.Left;
             cp.FixedTop = cp.Top - cp.Margin.Top;
@@ -83,34 +105,73 @@ namespace UtilitiesCS
         }
 
         private int _left;
-        public int Left { get => _left; set => _left = value; }
+        public int Left
+        {
+            get => _left;
+            set => _left = value;
+        }
 
         private int _top;
-        public int Top { get => _top; set => _top = value; }
+        public int Top
+        {
+            get => _top;
+            set => _top = value;
+        }
 
         private int _width;
-        public int Width { get => _width; set => _width = value; }
+        public int Width
+        {
+            get => _width;
+            set => _width = value;
+        }
 
         private int _height;
-        public int Height { get => _height; set => _height = value; }
+        public int Height
+        {
+            get => _height;
+            set => _height = value;
+        }
 
         private Padding _margin;
-        public Padding Margin { get => _margin; set => _margin = value; }
+        public Padding Margin
+        {
+            get => _margin;
+            set => _margin = value;
+        }
 
         private Padding _padding;
-        public Padding Padding { get => _padding; set => _padding = value; }
+        public Padding Padding
+        {
+            get => _padding;
+            set => _padding = value;
+        }
 
         private int _variableVertical;
-        public int VariableVertical { get => _variableVertical; set => _variableVertical = value; }
+        public int VariableVertical
+        {
+            get => _variableVertical;
+            set => _variableVertical = value;
+        }
 
         private int _variableHorizontal;
-        public int VariableHorizontal { get => _variableHorizontal; set => _variableHorizontal = value; }
+        public int VariableHorizontal
+        {
+            get => _variableHorizontal;
+            set => _variableHorizontal = value;
+        }
 
         private int _fixedLeft;
-        public int FixedLeft { get => _fixedLeft; set => _fixedLeft = value; }
+        public int FixedLeft
+        {
+            get => _fixedLeft;
+            set => _fixedLeft = value;
+        }
 
         private int _fixedTop;
-        public int FixedTop { get => _fixedTop; set => _fixedTop = value; }
-
+        public int FixedTop
+        {
+            get => _fixedTop;
+            set => _fixedTop = value;
+        }
     }
 }

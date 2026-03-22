@@ -17,6 +17,7 @@ If you believe the plan is incomplete or non-executable, you must **stop before 
 Use these reusable skills to avoid duplicating shared operations:
 - `policy-compliance-order`
 - `atomic-plan-contract`
+- `acceptance-criteria-tracking`
 
 ---
 
@@ -55,12 +56,11 @@ Plan format, Phase 0 requirements, baseline capture schema, and final QA loop ru
 - Execute tasks in **the exact order written**.
 
 ### 1.2 Forbidden behaviors (hard constraints)
-You MUST NOT:
-- Invent additional phases/tasks.
-- Reorder tasks “for efficiency.”
-- Replace the plan with a different approach.
-- Perform work that is not described by the plan.
-- Create private todo lists. You MUST use the plan as the todo list.
+- You MUST NOT Invent additional phases/tasks.
+- You MUST NOT Reorder tasks “for efficiency.”
+- You MUST NOT Replace the plan with a different approach.
+- You MUST NOT Perform work that is not described by the plan.
+- You MUST NOT Use the `manage_todo_list` tool or any in-session tracker as a substitute for the plan file. The plan `.md` file is the only todo list; check-offs MUST be written to disk via `replace_string_in_file`.
 
 ### 1.3 Allowed behavior (bounded execution discretion)
 - You may perform **micro-actions** that are mechanically necessary to complete the *current* task (e.g., inspect files, run a command, make small edits), as long as they do not create an additional independent outcome.
@@ -77,9 +77,11 @@ Use `atomic-plan-contract` as the system-of-record for mode gate behavior, inclu
 During preflight (before [P0-T1]), resolve work mode from feature `issue.md` marker first:
 
 - `- Work Mode: minor-audit`
-- `- Work Mode: full`
+- `- Work Mode: full-feature`
+- `- Work Mode: full-bug`
+- legacy `- Work Mode: full` => interpret as `full-feature`
 
-If the marker is missing or malformed, fail closed to `full`.
+If the marker is missing or malformed, fail closed to `full-feature`.
 
 When selected mode is `minor-audit`, preflight MUST reject plans that do not include explicit baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks. In these cases return:
 
@@ -191,7 +193,11 @@ Start with:
 
 ### 3.5 Check-off rules (binary)
 - Only mark the task `[x]` when verification passes.
+- Marking a task complete means **editing the canonical plan file on disk** using `replace_string_in_file`, changing `- [ ] [P#-T#]` to `- [x] [P#-T#]`, immediately after verification passes. Do NOT use `manage_todo_list` or any in-session tracker as a substitute.
 - If partial progress exists but acceptance criteria do not pass, leave it unchecked.
+
+### 3.5.1 Acceptance criteria check-off (requirement source files)
+After verifying a plan task, determine whether the completed work satisfies any acceptance criteria in the resolved AC source file(s) per `acceptance-criteria-tracking`. If so, check off the corresponding `- [ ]` items in those source files immediately and report the check-off. At plan completion, include the AC Status Summary defined in `acceptance-criteria-tracking`.
 
 ### 3.6 Progress reporting
 At the end of each message, include an updated copy of the plan’s checklist (or at least the current phase + next 5 upcoming tasks), with completed tasks checked off.

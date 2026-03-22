@@ -10,6 +10,10 @@ namespace UtilitiesCS.Interfaces
         BlockingCollection<IFlagChangeItem> FlagChangeItems { get; set; }
 
         Task ProcessGroupAsync(CancellationToken cancel = default);
-        bool TryEnqueue(string classifierName, IEnumerable<string> original, IEnumerable<string> revised);
+        bool TryEnqueue(
+            string classifierName,
+            IEnumerable<string> original,
+            IEnumerable<string> revised
+        );
     }
 }

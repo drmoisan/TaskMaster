@@ -12,14 +12,15 @@ using UtilitiesCS.Interfaces;
 namespace UtilitiesCS.HelperClasses.TimedActions
 {
     /// <summary>
-    /// Producer/Consumer pattern for performing <seealso cref="Action"/> to a 
+    /// Producer/Consumer pattern for performing <seealso cref="Action"/> to a
     /// <seealso cref="BlockingCollection{T}"/> on a regular interval
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class TimedQueueOfActions<T>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         /// <summary>
         /// Constructor for <see cref="TimedQueueOfActions{T}"/>
@@ -53,23 +54,39 @@ namespace UtilitiesCS.HelperClasses.TimedActions
         #region Public Properties
 
         /// <inheritdoc cref="Configuration"/>
-        public virtual Configuration Config { get => _config; private set => _config = value; }
+        public virtual Configuration Config
+        {
+            get => _config;
+            private set => _config = value;
+        }
         private Configuration _config;
 
         /// <summary>
         /// Delegate to perform a batch of <seealso cref="Action"/>s to an <see cref="IEnumerable{T}">IEnumerable&lt;T&gt;</see>
         /// </summary>
-        public Action<IEnumerable<T>> BatchActions { get => _batchActions; set => _batchActions = value; }
+        public Action<IEnumerable<T>> BatchActions
+        {
+            get => _batchActions;
+            set => _batchActions = value;
+        }
         private Action<IEnumerable<T>> _batchActions;
 
         /// <summary>
         /// Queue of items to be written to disk
         /// </summary>
-        public BlockingCollection<T> Queue { get => _queue; internal set => _queue = value; }
+        public BlockingCollection<T> Queue
+        {
+            get => _queue;
+            internal set => _queue = value;
+        }
         private BlockingCollection<T> _queue = new(new ConcurrentQueue<T>());
 
         private ITimerWrapper _timer;
-        internal ITimerWrapper Timer { get => _timer; set => _timer = value; }
+        internal ITimerWrapper Timer
+        {
+            get => _timer;
+            set => _timer = value;
+        }
 
         #endregion
 
@@ -77,10 +94,20 @@ namespace UtilitiesCS.HelperClasses.TimedActions
 
         public void Enqueue(T item)
         {
-            if (BatchActions is null) { logger.Warn($"{nameof(TimedDiskWriter<T>)} is Enqueuing items with no function to write the items to disk"); }
+            if (BatchActions is null)
+            {
+                logger.Warn(
+                    $"{nameof(TimedDiskWriter<T>)} is Enqueuing items with no function to write the items to disk"
+                );
+            }
             if (!TimerActive)
             {
-                if (!TryStartTimer()) { logger.Warn($"{nameof(TimedDiskWriter<T>)} is Enqueuing items and is unable to start the timer to write the items to disk"); }
+                if (!TryStartTimer())
+                {
+                    logger.Warn(
+                        $"{nameof(TimedDiskWriter<T>)} is Enqueuing items and is unable to start the timer to write the items to disk"
+                    );
+                }
             }
             CancellationTokenSource cts = new();
             var token = cts.Token;
@@ -94,7 +121,10 @@ namespace UtilitiesCS.HelperClasses.TimedActions
                 }
                 catch (OperationCanceledException)
                 {
-                    if (token.IsCancellationRequested) { break; }
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
                     else
                     {
                         //logger.Debug($"Timeout adding {item}");
@@ -107,10 +137,20 @@ namespace UtilitiesCS.HelperClasses.TimedActions
         {
             token.ThrowIfCancellationRequested();
 
-            if (BatchActions is null) { logger.Warn($"{nameof(TimedDiskWriter<T>)} is Enqueuing items with no function to write the items to disk"); }
+            if (BatchActions is null)
+            {
+                logger.Warn(
+                    $"{nameof(TimedDiskWriter<T>)} is Enqueuing items with no function to write the items to disk"
+                );
+            }
             if (!TimerActive)
             {
-                if (!TryStartTimer()) { logger.Warn($"{nameof(TimedDiskWriter<T>)} is Enqueuing items and is unable to start the timer to write the items to disk"); }
+                if (!TryStartTimer())
+                {
+                    logger.Warn(
+                        $"{nameof(TimedDiskWriter<T>)} is Enqueuing items and is unable to start the timer to write the items to disk"
+                    );
+                }
             }
 
             var success = false;
@@ -123,7 +163,10 @@ namespace UtilitiesCS.HelperClasses.TimedActions
                 }
                 catch (OperationCanceledException)
                 {
-                    if (token.IsCancellationRequested) { break; }
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
                     else
                     {
                         //logger.Debug($"Timeout adding {item}");
@@ -136,8 +179,9 @@ namespace UtilitiesCS.HelperClasses.TimedActions
         public virtual bool TimerActive => _timer is not null && _timer.Enabled;
 
         private int _emptyQueueChecks = 0;
+
         /// <summary>
-        /// Callback function for the <seealso cref="System.Timers.Timer">Timer</seealso> and 
+        /// Callback function for the <seealso cref="System.Timers.Timer">Timer</seealso> and
         /// "Consumer" for <see cref="Queue"/> which invokes the <see cref="BatchActions"/>
         /// </summary>
         /// <param name="sender">Timer object</param>
@@ -173,9 +217,11 @@ namespace UtilitiesCS.HelperClasses.TimedActions
         {
             if (BatchActions is null)
             {
-                throw new InvalidOperationException($"{nameof(TimedDiskWriter<T>)} is " +
-                    $"attempting to start the timer with no action assigned to " +
-                    $"the callback {nameof(BatchActions)} ");
+                throw new InvalidOperationException(
+                    $"{nameof(TimedDiskWriter<T>)} is "
+                        + $"attempting to start the timer with no action assigned to "
+                        + $"the callback {nameof(BatchActions)} "
+                );
             }
             else
             {
@@ -234,7 +280,7 @@ namespace UtilitiesCS.HelperClasses.TimedActions
         }
 
         /// <summary>
-        /// Holds configuration settings for the <see cref="TimedDiskWriter{T}"/> 
+        /// Holds configuration settings for the <see cref="TimedDiskWriter{T}"/>
         /// class and notifies when the properties change
         /// </summary>
         public class Configuration : INotifyPropertyChanged
@@ -249,7 +295,7 @@ namespace UtilitiesCS.HelperClasses.TimedActions
             /// <list type="bullet">
             /// <item>
             /// <term>tryAddTimeout</term>
-            /// <description>Timeout interval in milliseconds for the 
+            /// <description>Timeout interval in milliseconds for the
             /// <seealso cref="BlockingCollection{T}.TryAdd(T)"/> method</description>
             /// </item>
             /// /// <item>
@@ -258,8 +304,8 @@ namespace UtilitiesCS.HelperClasses.TimedActions
             /// </item>
             /// </list>
             /// </summary>
-            /// <param name="tryAddTimeout">Timeout interval in milliseconds for the 
-            /// <seealso cref="BlockingCollection{T}.TryAdd(T)"/> method 
+            /// <param name="tryAddTimeout">Timeout interval in milliseconds for the
+            /// <seealso cref="BlockingCollection{T}.TryAdd(T)"/> method
             /// within <seealso cref="EnqueueAsync(T, CancellationToken)"/></param>
             /// <param name="actionInterval"></param>
             public Configuration(int tryAddTimeout, TimeSpan actionInterval)
@@ -271,7 +317,11 @@ namespace UtilitiesCS.HelperClasses.TimedActions
             /// <summary>
             /// Timeout in milliseconds for adding to the queue
             /// </summary>
-            public int TryAddTimeout { get => _tryAddTimeout; set => _tryAddTimeout = value; }
+            public int TryAddTimeout
+            {
+                get => _tryAddTimeout;
+                set => _tryAddTimeout = value;
+            }
             private int _tryAddTimeout = 20;
 
             /// <summary>
@@ -291,7 +341,7 @@ namespace UtilitiesCS.HelperClasses.TimedActions
             /// <summary>
             /// Helper method to raise the <see cref="PropertyChanged"/> event
             /// </summary>
-            /// <param name="propertyName">Argument that specifies the property that changed. 
+            /// <param name="propertyName">Argument that specifies the property that changed.
             /// If left blank, it is inferred from the caller member name</param>
             public void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
             {

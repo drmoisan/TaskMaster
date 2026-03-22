@@ -1,30 +1,34 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.Office.Interop.Outlook;
-using System;
-using TaskVisualization;
-using UtilitiesCS;
-using Moq;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections;
-using System.Runtime.InteropServices;
+using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
-using ToDoModel;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using TaskVisualization;
+using ToDoModel;
+using UtilitiesCS;
 
 namespace TaskVisualization.Test
 {
-
     public class MoqOlToDo
     {
         public PropertyAccessor MockPA()
         {
-            const string PA_TOTAL_WORK = "http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/81110003";
+            const string PA_TOTAL_WORK =
+                "http://schemas.microsoft.com/mapi/id/{00062003-0000-0000-C000-000000000046}/81110003";
             var mockPA = new Mock<PropertyAccessor>();
             mockPA.Setup(x => x.GetProperty(PA_TOTAL_WORK)).Returns(20);
             return mockPA.Object;
         }
 
-        public UserProperty MockProperty<T>(T value, string FieldName, OlUserPropertyType OlFieldType = OlUserPropertyType.olText)
+        public UserProperty MockProperty<T>(
+            T value,
+            string FieldName,
+            OlUserPropertyType OlFieldType = OlUserPropertyType.olText
+        )
         {
             var mockUser = new Mock<UserProperty>();
             mockUser.Setup(x => x.Name).Returns(FieldName);
@@ -59,14 +63,22 @@ namespace TaskVisualization.Test
             while (uPpty.MoveNext())
             {
                 UserProperty current = (UserProperty)uPpty.Current;
-                if (current.Name == Name) { result = current; break; }
+                if (current.Name == Name)
+                {
+                    result = current;
+                    break;
+                }
             }
             return result;
         }
 
         internal IEnumerator UserPropertyCollection()
         {
-            UserProperty TagProgram = MockProperty<string>("TestProgram", "TagProgram", OlUserPropertyType.olText);
+            UserProperty TagProgram = MockProperty<string>(
+                "TestProgram",
+                "TagProgram",
+                OlUserPropertyType.olText
+            );
             UserProperty AB = MockProperty<Boolean>(true, "AB", OlUserPropertyType.olYesNo);
             UserProperty EC2 = MockProperty<Boolean>(true, "EC2", OlUserPropertyType.olYesNo);
             UserProperty EC = MockProperty<string>("+", "EC", OlUserPropertyType.olText);
@@ -82,32 +94,44 @@ namespace TaskVisualization.Test
         internal UserProperties MockUserProperties()
         {
             var mockUserProperties = new Mock<UserProperties>();
-            mockUserProperties.As<IEnumerable>().Setup(x => x.GetEnumerator()).Returns(UserPropertyCollection());
+            mockUserProperties
+                .As<IEnumerable>()
+                .Setup(x => x.GetEnumerator())
+                .Returns(UserPropertyCollection());
 
-            mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "TagProgram"), It.IsAny<object[]>()))
-                .Returns(MockProperty<string>("TestProgram", "TagProgram", OlUserPropertyType.olText));
+            mockUserProperties
+                .Setup(x => x.Find(It.Is<string>(s => s == "TagProgram"), It.IsAny<object[]>()))
+                .Returns(
+                    MockProperty<string>("TestProgram", "TagProgram", OlUserPropertyType.olText)
+                );
 
-            mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "AB"), It.IsAny<object[]>()))
+            mockUserProperties
+                .Setup(x => x.Find(It.Is<string>(s => s == "AB"), It.IsAny<object[]>()))
                 .Returns(MockProperty<bool>(true, "AB", OlUserPropertyType.olYesNo));
 
-            mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "EC2"), It.IsAny<object[]>()))
+            mockUserProperties
+                .Setup(x => x.Find(It.Is<string>(s => s == "EC2"), It.IsAny<object[]>()))
                 .Returns(MockProperty<bool>(true, "EC2", OlUserPropertyType.olYesNo));
 
-            mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "EC"), It.IsAny<object[]>()))
+            mockUserProperties
+                .Setup(x => x.Find(It.Is<string>(s => s == "EC"), It.IsAny<object[]>()))
                 .Returns(MockProperty<string>("+", "EC", OlUserPropertyType.olText));
 
-            mockUserProperties.Setup(x => x.Find(It.Is<string>(s => s == "EcState"), It.IsAny<object[]>()))
+            mockUserProperties
+                .Setup(x => x.Find(It.Is<string>(s => s == "EcState"), It.IsAny<object[]>()))
                 .Returns(MockProperty<string>("+", "EcState", OlUserPropertyType.olText));
 
             return mockUserProperties.Object;
         }
 
-        internal Mock<MailItem> MailItemMock(string TaskSubject,
-                                             OlImportance olImportance,
-                                             DateTime creationTime,
-                                             DateTime taskStartDate,
-                                             OlFlagStatus olFlagStatus,
-                                             string categoryNames)
+        internal Mock<MailItem> MailItemMock(
+            string TaskSubject,
+            OlImportance olImportance,
+            DateTime creationTime,
+            DateTime taskStartDate,
+            OlFlagStatus olFlagStatus,
+            string categoryNames
+        )
         {
             var email = new Mock<MailItem>();
             email.Setup(x => x.TaskSubject).Returns(TaskSubject);
@@ -149,14 +173,31 @@ namespace TaskVisualization.Test
         {
             var categories = new Mock<Categories>();
             categories.Setup(x => x.ToString()).Returns(categoryString);
-            categories.As<IEnumerable>().Setup(x => x.GetEnumerator()).Returns(CategoryCollection());
+            categories
+                .As<IEnumerable>()
+                .Setup(x => x.GetEnumerator())
+                .Returns(CategoryCollection());
             return categories.Object;
         }
 
         internal IEnumerator EmailCollection()
         {
-            var email1 = MailItemMock("Task1", OlImportance.olImportanceHigh, DateTime.Now, DateTime.Now, OlFlagStatus.olFlagMarked, "");
-            var email2 = MailItemMock("Task2", OlImportance.olImportanceLow, DateTime.Now, DateTime.Now, OlFlagStatus.olFlagMarked, "");
+            var email1 = MailItemMock(
+                "Task1",
+                OlImportance.olImportanceHigh,
+                DateTime.Now,
+                DateTime.Now,
+                OlFlagStatus.olFlagMarked,
+                ""
+            );
+            var email2 = MailItemMock(
+                "Task2",
+                OlImportance.olImportanceLow,
+                DateTime.Now,
+                DateTime.Now,
+                OlFlagStatus.olFlagMarked,
+                ""
+            );
 
             yield return email1.Object;
             yield return email2.Object;
@@ -165,7 +206,10 @@ namespace TaskVisualization.Test
         internal IApplicationGlobals MockGlobals()
         {
             var mockSelection = new Mock<Selection>();
-            mockSelection.As<IEnumerable>().Setup(x => x.GetEnumerator()).Returns(EmailCollection());
+            mockSelection
+                .As<IEnumerable>()
+                .Setup(x => x.GetEnumerator())
+                .Returns(EmailCollection());
 
             var mockExplorer = new Mock<Explorer>();
             mockExplorer.Setup(x => x.Selection).Returns(mockSelection.Object);
@@ -176,7 +220,9 @@ namespace TaskVisualization.Test
             var mockCategories = new Mock<Categories>();
 
             var mockNamespaceMAPI = new Mock<Microsoft.Office.Interop.Outlook.NameSpace>();
-            mockNamespaceMAPI.Setup(x => x.Categories).Returns(MockCategories("Tag PROJECT TestProject"));
+            mockNamespaceMAPI
+                .Setup(x => x.Categories)
+                .Returns(MockCategories("Tag PROJECT TestProject"));
 
             var mockOlObjects = new Mock<IOlObjects>();
             mockOlObjects.Setup(x => x.App).Returns(mockOlApp.Object);
@@ -187,6 +233,5 @@ namespace TaskVisualization.Test
 
             return mockGlobals.Object;
         }
-
     }
 }

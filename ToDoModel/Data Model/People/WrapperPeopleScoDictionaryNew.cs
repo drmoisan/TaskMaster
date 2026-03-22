@@ -52,7 +52,7 @@
 //                derivedInstance.TryAdd(kvp.Key, kvp.Value);
 //            }
 
-//            // Set up the config field            
+//            // Set up the config field
 //            var configField = typeof(PeopleScoRemainingObject).GetField("<Config>k__BackingField", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 //            var configValue = configField?.GetValue(RemainingObject) as NewSmartSerializableConfig;
 //            derivedInstance.Config = configValue;
@@ -68,7 +68,7 @@
 //                var composedField = RemainingObject
 //                    .GetType()
 //                    .GetField(
-//                        derivedField.Name, 
+//                        derivedField.Name,
 //                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 //                var fieldValue = composedField?.GetValue(RemainingObject);
 //                if (fieldValue is not null) { derivedField.SetValue(derivedInstance, fieldValue); }
@@ -419,7 +419,7 @@
 //        }
 //    }
 
-//    public class PeopleScoRemainingObject 
+//    public class PeopleScoRemainingObject
 //    {
 //        [JsonProperty]
 //        internal IApplicationGlobals Globals { get; set; }

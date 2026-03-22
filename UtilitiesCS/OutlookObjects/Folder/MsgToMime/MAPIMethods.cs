@@ -1,8 +1,8 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using Microsoft.Office.Interop.Outlook;
 
 namespace Exchange.Export.MAPIMessageConverter
 {
@@ -30,12 +30,16 @@ namespace Exchange.Export.MAPIMessageConverter
             CLSCTX_REMOTE_SERVER = 0x10,
             CLSCTX_INPROC = CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
             CLSCTX_SERVER = CLSCTX_INPROC_SERVER | CLSCTX_LOCAL_SERVER | CLSCTX_REMOTE_SERVER,
-            CLSCTX_ALL = CLSCTX_SERVER | CLSCTX_INPROC_HANDLER
+            CLSCTX_ALL = CLSCTX_SERVER | CLSCTX_INPROC_HANDLER,
         }
 
-        public static Guid CLSID_IConverterSession = new Guid("{4e3a7680-b77a-11d0-9da5-00c04fd65685}");
+        public static Guid CLSID_IConverterSession = new Guid(
+            "{4e3a7680-b77a-11d0-9da5-00c04fd65685}"
+        );
 
-        public static Guid IID_IConverterSession = new Guid("{4b401570-b77b-11d0-9da5-00c04fd65685}");
+        public static Guid IID_IConverterSession = new Guid(
+            "{4b401570-b77b-11d0-9da5-00c04fd65685}"
+        );
 
         public enum ENCODINGTYPE
         {
@@ -52,22 +56,20 @@ namespace Exchange.Export.MAPIMessageConverter
             IET_CURRENT = 10,
             IET_UNKNOWN = 11,
             IET_BINHEX40 = 12,
-            IET_LAST = 13
+            IET_LAST = 13,
         }
 
         public enum MIMESAVETYPE
         {
             SAVE_RFC822 = 0,
-            SAVE_RFC1521 = 1
+            SAVE_RFC1521 = 1,
         }
 
         [ComVisible(false)]
         [ComImport()]
         [Guid("00020307-0000-0000-C000-000000000046")]
         [InterfaceTypeAttribute(ComInterfaceType.InterfaceIsIUnknown)]
-        public interface IMessage
-        {
-        }
+        public interface IMessage { }
 
         [ComImport]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
@@ -78,29 +80,23 @@ namespace Exchange.Export.MAPIMessageConverter
             int Placeholder0();
 
             [PreserveSig]
-            uint SetEncoding(
-            [In, MarshalAs(UnmanagedType.I4)] ENCODINGTYPE DispId
-            );
+            uint SetEncoding([In, MarshalAs(UnmanagedType.I4)] ENCODINGTYPE DispId);
 
             [PreserveSig]
             int Placeholder1();
 
             [PreserveSig]
             uint MIMEToMAPI(
-                [In, MarshalAs(UnmanagedType.Interface)]
-                Stream pstm,
-                [Out, MarshalAs(UnmanagedType.Interface)]
-                MailItem pmsg,
+                [In, MarshalAs(UnmanagedType.Interface)] Stream pstm,
+                [Out, MarshalAs(UnmanagedType.Interface)] MailItem pmsg,
                 object pszSrcSrv,
                 uint ulFlags
             );
 
             [PreserveSig]
             uint MAPIToMIMEStm(
-                [In, MarshalAs(UnmanagedType.Interface)]
-                IMessage pmsg,
-                [Out, MarshalAs(UnmanagedType.Interface)]
-                IStream pstm,
+                [In, MarshalAs(UnmanagedType.Interface)] IMessage pmsg,
+                [Out, MarshalAs(UnmanagedType.Interface)] IStream pstm,
                 MAPITOMIMEFLAGS ulFlags
             );
 
@@ -114,16 +110,10 @@ namespace Exchange.Export.MAPIMessageConverter
             int Placeholder4();
 
             [PreserveSig]
-            int SetTextWrapping(
-                bool fWrapText,
-                uint ulWrapWidth
-            );
+            int SetTextWrapping(bool fWrapText, uint ulWrapWidth);
 
             [PreserveSig]
-            uint SetSaveFormat(
-                [In, MarshalAs(UnmanagedType.I4)]
-                MIMESAVETYPE mstSaveFormat
-            );
+            uint SetSaveFormat([In, MarshalAs(UnmanagedType.I4)] MIMESAVETYPE mstSaveFormat);
 
             [PreserveSig]
             int Placeholder5();

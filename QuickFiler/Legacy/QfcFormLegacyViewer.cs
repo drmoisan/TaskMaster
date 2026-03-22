@@ -4,7 +4,6 @@ using System.Windows.Forms;
 
 namespace QuickFiler.Legacy
 {
-
     public partial class QfcFormLegacyViewer
     {
         private QuickFileController _controller;

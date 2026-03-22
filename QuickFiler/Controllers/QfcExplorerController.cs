@@ -1,7 +1,4 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using Outlook = Microsoft.Office.Interop.Outlook;
-using QuickFiler.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -10,17 +7,26 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Interfaces;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace QuickFiler.Controllers
 {
     internal class QfcExplorerController : IQfcExplorerController
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
-        public QfcExplorerController(QfEnums.InitTypeEnum initType, IApplicationGlobals appGlobals, IFilerHomeController parent)
+        public QfcExplorerController(
+            QfEnums.InitTypeEnum initType,
+            IApplicationGlobals appGlobals,
+            IFilerHomeController parent
+        )
         {
             _initType = initType;
             _globals = appGlobals;
@@ -36,19 +42,24 @@ namespace QuickFiler.Controllers
         private string _objViewMem;
         public Outlook.View ObjViewTemp;
 
-
         //PRIORITY: Implement BlShowInConversations
         private bool _blShowInConversations;
-        public bool BlShowInConversations { get => _blShowInConversations; set => _blShowInConversations = value; }
+        public bool BlShowInConversations
+        {
+            get => _blShowInConversations;
+            set => _blShowInConversations = value;
+        }
 
-        internal bool CurrentConversationState { get => _activeExplorer.CommandBars.GetPressedMso("ShowInConversations"); }
+        internal bool CurrentConversationState
+        {
+            get => _activeExplorer.CommandBars.GetPressedMso("ShowInConversations");
+        }
 
         //PRIORITY: Implement ExplConvView_Cleanup
         public void ExplConvView_Cleanup()
         {
             throw new NotImplementedException();
         }
-
 
         public void ExplConvView_ReturnState()
         {
@@ -67,7 +78,6 @@ namespace QuickFiler.Controllers
                 {
                     if (_activeExplorer.CommandBars.GetPressedMso("ShowInConversations"))
                     {
-
                         _objView.XML = _objView.XML.Replace("<upgradetoconv>1</upgradetoconv>", "");
                         _objView.Save();
                         _objView.Apply();
@@ -82,10 +92,12 @@ namespace QuickFiler.Controllers
 
                 if (ObjViewTemp is null)
                 {
-                    ObjViewTemp = _objView.Copy("tmpNoConversation", OlViewSaveOption.olViewSaveOptionThisFolderOnlyMe);
+                    ObjViewTemp = _objView.Copy(
+                        "tmpNoConversation",
+                        OlViewSaveOption.olViewSaveOptionThisFolderOnlyMe
+                    );
                     ObjViewTemp.XML = _objView.XML.Replace("<upgradetoconv>1</upgradetoconv>", "");
                     ObjViewTemp.Save();
-
                 }
                 ObjViewTemp.Apply();
             }
@@ -118,8 +130,9 @@ namespace QuickFiler.Controllers
 
         private void NavigateToOutlookFolder(MailItem mailItem)
         {
-            if (_activeExplorer.CurrentFolder.FolderPath !=
-                ((MAPIFolder)mailItem.Parent).FolderPath)
+            if (
+                _activeExplorer.CurrentFolder.FolderPath != ((MAPIFolder)mailItem.Parent).FolderPath
+            )
             {
                 ExplConvView_ReturnState();
                 _globals.Ol.App.ActiveExplorer().CurrentFolder = (MAPIFolder)mailItem.Parent;
@@ -128,11 +141,14 @@ namespace QuickFiler.Controllers
         }
 
         //PRIORITY: Implement OpenQFItem
-        async public Task OpenQFItem(MailItem mailItem)
+        public async Task OpenQFItem(MailItem mailItem)
         {
             _parent.FormController.MinimizeFormViewer();
             NavigateToOutlookFolder(mailItem);
-            if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort) & AutoFile.AreConversationsGrouped(_activeExplorer))
+            if (
+                _initType.HasFlag(QfEnums.InitTypeEnum.Sort)
+                & AutoFile.AreConversationsGrouped(_activeExplorer)
+            )
                 await Task.Run(() => ExplConvView_ToggleOff());
 
             if (_activeExplorer.IsItemSelectableInView(mailItem))
@@ -147,9 +163,16 @@ namespace QuickFiler.Controllers
             }
             else
             {
-                DialogResult result = MessageBox.Show("Selected message is not in view. Would you like to open it?",
-                    "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-                if (result == DialogResult.Yes) { mailItem.Display(); }
+                DialogResult result = MessageBox.Show(
+                    "Selected message is not in view. Would you like to open it?",
+                    "Error",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Error
+                );
+                if (result == DialogResult.Yes)
+                {
+                    mailItem.Display();
+                }
             }
             if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort) & BlShowInConversations)
                 await Task.Run(() => ExplConvView_ToggleOn());
@@ -161,12 +184,18 @@ namespace QuickFiler.Controllers
         {
             if (strOutput.IsInitialized())
             {
-                return string.Join("\t", strOutput
-                             .Where(s => !string.IsNullOrEmpty(s))
-                             .Select(s => StripTabsCrLf(s))
-                             .ToArray());
+                return string.Join(
+                    "\t",
+                    strOutput
+                        .Where(s => !string.IsNullOrEmpty(s))
+                        .Select(s => StripTabsCrLf(s))
+                        .ToArray()
+                );
             }
-            else { return ""; }
+            else
+            {
+                return "";
+            }
         }
 
         internal static string StripTabsCrLf(string str)
@@ -182,7 +211,10 @@ namespace QuickFiler.Controllers
         }
 
         //TODO: Rewrite WriteCSV_StartNewFileIfDoesNotExist To Split it into one task per function
-        private static void WriteCSV_StartNewFileIfDoesNotExist(string strFileName, string strFileLocation)
+        private static void WriteCSV_StartNewFileIfDoesNotExist(
+            string strFileName,
+            string strFileLocation
+        )
         {
             string[] strOutput = null;
             string[,] strAryOutput;
@@ -206,7 +238,6 @@ namespace QuickFiler.Controllers
 
                 SanitizeArray(strAryOutput, ref strOutput);
                 FileIO2.WriteTextFile(strFileName, strOutput, folderpath: strFileLocation);
-
             }
             strOutput = null;
             strAryOutput = null;
@@ -223,16 +254,24 @@ namespace QuickFiler.Controllers
             {
                 for (int j = 0; j < strAryOutput.GetLength(0); j++)
                 {
-                    strOutput[j] = string.Join("\t", strAryOutput
-                                         .SliceRow(j)
-                                         .Where(s => !string.IsNullOrEmpty(s))
-                                         .Select(s => StripTabsCrLf(s))
-                                         .ToArray());
+                    strOutput[j] = string.Join(
+                        "\t",
+                        strAryOutput
+                            .SliceRow(j)
+                            .Where(s => !string.IsNullOrEmpty(s))
+                            .Select(s => StripTabsCrLf(s))
+                            .ToArray()
+                    );
                 }
             }
         }
 
-        private static void UpdateForMove(MailItem mailItem, string fldr, CtfMap ctfMap, ISubjectMapSco subMap)
+        private static void UpdateForMove(
+            MailItem mailItem,
+            string fldr,
+            CtfMap ctfMap,
+            ISubjectMapSco subMap
+        )
         {
             ctfMap.Add(mailItem.ConversationID, fldr, 1);
             subMap.Add(mailItem.Subject, fldr);
@@ -245,7 +284,10 @@ namespace QuickFiler.Controllers
         }
 
         //TODO: Convert GetCurrentExplorerFolder to use the folder handler class
-        private static Folder GetCurrentExplorerFolder(Explorer ActiveExplorer, object objItem = null)
+        private static Folder GetCurrentExplorerFolder(
+            Explorer ActiveExplorer,
+            object objItem = null
+        )
         {
             if (objItem is null)
             {
@@ -257,40 +299,34 @@ namespace QuickFiler.Controllers
                 MailItem OlMail = (MailItem)objItem;
                 return (Folder)OlMail.Parent;
             }
-
             else if (objItem is AppointmentItem)
             {
                 AppointmentItem OlAppointment = (AppointmentItem)objItem;
                 return (Folder)OlAppointment.Parent;
             }
-
             else if (objItem is MeetingItem)
             {
                 MeetingItem OlMeeting = (MeetingItem)objItem;
                 return (Folder)OlMeeting.Parent;
             }
-
             else if (objItem is TaskItem)
             {
                 TaskItem OlTask = (TaskItem)objItem;
                 return (Folder)OlTask.Parent;
             }
-
             else
             {
                 return null;
             }
-
         }
 
         //public static void Cleanup_Files()
         //{
         //    // Call WRITE_Text_File     - Writes to the recents list
-        //    // Call Email_AutoCategorize.CTF_Incidence_Text_File_WRITE - Writes to the CTF_Incidence file   
+        //    // Call Email_AutoCategorize.CTF_Incidence_Text_File_WRITE - Writes to the CTF_Incidence file
         //    // Call Email_AutoCategorize.Subject_MAP_Text_File_WRITE - Writes to the Subject_MAP file
         //}
 
         #endregion
-
     }
 }

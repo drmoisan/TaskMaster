@@ -4,10 +4,8 @@ using System.Windows.Forms;
 
 namespace Tags
 {
-
     public class CheckBoxController
     {
-
         public bool TrigByKeyChg;
         private bool TrigByValChg;
         private TagController _parent;
@@ -32,11 +30,7 @@ namespace Tags
         public virtual CheckBox CtrlCB
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return _ctrlCB;
-            }
-
+            get { return _ctrlCB; }
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
@@ -65,7 +59,11 @@ namespace Tags
         {
             if (!TrigByKeyChg)
             {
-                strTemp = strTagPrefix + CtrlCB.Text;
+                strTemp = CtrlCB.Tag as string;
+                if (string.IsNullOrEmpty(strTemp))
+                {
+                    strTemp = strTagPrefix + CtrlCB.Text;
+                }
                 _parent.ToggleChoice(strTemp);
                 _parent.FocusCheckbox(CtrlCB);
             }
@@ -87,46 +85,46 @@ namespace Tags
             switch (e.KeyCode)
             {
                 case Keys.Down:
-                    {
-                        _parent.Select_Ctrl_By_Offset(1);
-                        break;
-                    }
+                {
+                    _parent.Select_Ctrl_By_Offset(1);
+                    break;
+                }
 
                 case Keys.Up:
-                    {
-                        _parent.Select_Ctrl_By_Offset(-1);
-                        break;
-                    }
+                {
+                    _parent.Select_Ctrl_By_Offset(-1);
+                    break;
+                }
 
                 case Keys.End:
-                    {
-                        _parent.Select_Last_Control();
-                        break;
-                    }
+                {
+                    _parent.Select_Last_Control();
+                    break;
+                }
 
                 case Keys.Home:
-                    {
-                        _parent.Select_First_Control();
-                        break;
-                    }
+                {
+                    _parent.Select_First_Control();
+                    break;
+                }
 
                 case Keys.PageDown:
-                    {
-                        _parent.Select_PageDown();
-                        break;
-                    }
+                {
+                    _parent.Select_PageDown();
+                    break;
+                }
 
                 case Keys.PageUp:
-                    {
-                        _parent.Select_PageUp();
-                        break;
-                    }
+                {
+                    _parent.Select_PageUp();
+                    break;
+                }
 
                 case Keys.Enter:
-                    {
-                        _parent.ButtonOk_Action();
-                        break;
-                    }
+                {
+                    _parent.ButtonOk_Action();
+                    break;
+                }
             }
         }
 
@@ -151,15 +149,15 @@ namespace Tags
             switch (e.KeyCode)
             {
                 case Keys.Down:
-                    {
-                        e.IsInputKey = true;
-                        break;
-                    }
+                {
+                    e.IsInputKey = true;
+                    break;
+                }
                 case Keys.Up:
-                    {
-                        e.IsInputKey = true;
-                        break;
-                    }
+                {
+                    e.IsInputKey = true;
+                    break;
+                }
             }
         }
     }
