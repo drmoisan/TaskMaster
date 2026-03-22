@@ -2,6 +2,14 @@ name: Codex Web Setup Test
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - ".codex/codex-web-setup.sh"
+      - ".github/workflows/codex-web-setup-test.yml"
+  pull_request:
+    paths:
+      - ".codex/codex-web-setup.sh"
+      - ".github/workflows/codex-web-setup-test.yml"
 
 permissions:
   contents: read
