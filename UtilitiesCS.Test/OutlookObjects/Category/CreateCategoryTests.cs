@@ -107,19 +107,41 @@ namespace UtilitiesCS.Test.OutlookObjects.Category
         }
 
         [TestMethod]
+        public void CreateCategory_WhenExistingCategoriesDoNotMatch_AddsCategory()
+        {
+            // Arrange
+            var prefix = CreatePrefix("PRJ:", OlCategoryColor.olCategoryColorBlue);
+            var existingCategory = new Mock<Microsoft.Office.Interop.Outlook.Category>();
+            existingCategory.SetupGet(x => x.Name).Returns("PRJ:Archive");
+
+            var createdCategory = new Mock<Microsoft.Office.Interop.Outlook.Category>();
+            var categories = CreateCategoriesCollection(existingCategory.Object);
+            categories
+                .Setup(x => x.Add("PRJ:Inbox", It.IsAny<object>(), It.IsAny<object>()))
+                .Returns(createdCategory.Object);
+
+            var session = new Mock<NameSpace>();
+            session.SetupGet(x => x.Categories).Returns(categories.Object);
+
+            // Act
+            var result = session.Object.CreateCategory(prefix.Object, "Inbox");
+
+            // Assert
+            result.Should().BeSameAs(createdCategory.Object);
+            categories.Verify(
+                x => x.Add("PRJ:Inbox", It.IsAny<object>(), It.IsAny<object>()),
+                Times.Once
+            );
+        }
+
+        [TestMethod]
         public void CreateCategory_WhenAddThrows_ReturnsNull()
         {
             // Arrange
             var prefix = CreatePrefix("PRJ:", OlCategoryColor.olCategoryColorBlue);
             var categories = CreateCategoriesCollection();
             categories
-                .Setup(x =>
-                    x.Add(
-                        "PRJ:Inbox",
-                        OlCategoryColor.olCategoryColorBlue,
-                        OlCategoryShortcutKey.olCategoryShortcutKeyNone
-                    )
-                )
+                .Setup(x => x.Add("PRJ:Inbox", It.IsAny<object>(), It.IsAny<object>()))
                 .Throws(new InvalidOperationException("Add failed"));
             var session = new Mock<NameSpace>();
             session.SetupGet(x => x.Categories).Returns(categories.Object);
@@ -129,6 +151,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Category
 
             // Assert
             result.Should().BeNull();
+            categories.Verify(
+                x => x.Add("PRJ:Inbox", It.IsAny<object>(), It.IsAny<object>()),
+                Times.Once
+            );
         }
 
         private static Mock<IPrefix> CreatePrefix(string value, OlCategoryColor color)

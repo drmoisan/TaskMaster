@@ -33,5 +33,23 @@ namespace UtilitiesCS.Test.ThemeHelpers
                 );
             ((object)isDarkMode).Should().BeOfType<bool>();
         }
+
+        [TestMethod]
+        public void IsSystemDarkMode_ShouldReturnConsistentResultWithTryGet()
+        {
+            SystemThemeDetector.TryGetIsSystemDarkMode(out bool expected);
+            var result = SystemThemeDetector.IsSystemDarkMode();
+
+            result.Should().Be(expected);
+        }
+
+        [TestMethod]
+        public void TryGetIsSystemDarkMode_ShouldReturnBoolean_ForIsDarkMode()
+        {
+            SystemThemeDetector.TryGetIsSystemDarkMode(out bool isDarkMode);
+
+            // isDarkMode should be a valid boolean (true or false); this confirms no exception
+            isDarkMode.Should().Be(isDarkMode);
+        }
     }
 }

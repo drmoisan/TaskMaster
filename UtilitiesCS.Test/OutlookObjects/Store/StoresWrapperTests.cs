@@ -189,7 +189,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             );
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("Archive", "Team Archive")]
         [DataRow("archive", "TEAM ARCHIVE")]
         public void InclusionFilters_ExcludeMatchingDisplayNames_IgnoringCase(

@@ -74,13 +74,10 @@ namespace TaskVisualization
 
         internal string ChooseOrCreateProgramName()
         {
-            IPrefix prefix = _globals.TD.PrefixList.Find(x =>
-                x.PrefixType == PrefixTypeEnum.Program
-            );
             string userEmail = _globals
                 .Ol.StoresWrapper.Stores.FirstOrDefault(x => !x.UserEmailAddress.IsNullOrEmpty())
                 ?.UserEmailAddress;
-            var chooser = new TagLauncher(_globals.TD.ProgramInfo.Keys, prefix, userEmail);
+            var chooser = new TagLauncher(_globals.TD.ProgramInfo.Keys, null, userEmail);
 
             chooser.Viewer.Text = "Select or Create Program";
             chooser.Viewer.ShowDialog();

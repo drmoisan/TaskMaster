@@ -2,6 +2,20 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "format: csharpier",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "tool",
+        "run",
+        "csharpier",
+        "format",
+        "."
+      ],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
       "label": "restore: TaskMaster.sln",
       "type": "shell",
       "command": "pwsh",
@@ -44,6 +58,60 @@
         "kind": "build",
         "isDefault": true
       },
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
+      "label": "lint: TaskMaster.sln (.NET analyzers)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/vscode/Invoke-VSBuild.ps1",
+        "-SolutionPath",
+        "TaskMaster.sln",
+        "-Configuration",
+        "Debug",
+        "-Platform",
+        "Any CPU",
+        "-EnableNETAnalyzers",
+        "-EnforceCodeStyleInBuild"
+      ],
+      "dependsOn": [
+        "restore: TaskMaster.sln"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
+      "label": "type-check: TaskMaster.sln (nullable warnings as errors)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/vscode/Invoke-VSBuild.ps1",
+        "-SolutionPath",
+        "TaskMaster.sln",
+        "-Configuration",
+        "Debug",
+        "-Platform",
+        "Any CPU",
+        "-EnableNullable",
+        "-TreatWarningsAsErrors"
+      ],
+      "dependsOn": [
+        "restore: TaskMaster.sln"
+      ],
+      "group": "build",
       "problemMatcher": [
         "$msCompile"
       ]

@@ -128,7 +128,7 @@ namespace UtilitiesCS
             IList emails = new List<MailItem>();
             string EntryID = "EntryID";
 
-            if ((df == null) || (df.Columns.GetNames().Contains(EntryID)) || (df.Rows.Count == 0))
+            if ((df == null) || (!df.Columns.GetNames().Contains(EntryID)) || (df.Rows.Count == 0))
             {
                 return emails;
             }
@@ -147,7 +147,7 @@ namespace UtilitiesCS
             if (ObjItem is MailItem)
             {
                 MailItem mailItem = (MailItem)ObjItem;
-                return mailItem.ConversationCt(true, true);
+                return mailItem.ConversationCt(SameFolder, MailOnly);
             }
             return -1;
         }
@@ -161,20 +161,23 @@ namespace UtilitiesCS
                 //                      .GetConversation()
                 //                      .GetTable(true, false);
                 DataFrame df = conv.GetDataFrame();
-                Debug.WriteLine(df.PrettyText());
-                if (SameFolder)
+                if (df is null)
                 {
-                    string FolderName =
-                        ObjItem.PropertyAccessor.GetProperty(MAPIFields.Schemas.FolderName)
-                        as string;
-                    df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(FolderName));
-                }
-                if (MailOnly)
-                {
-                    df = df.Filter(df["MessageClass"].ElementwiseEquals<string>("IPM.Note"));
+                    return 0;
                 }
 
-                return (int)df.Rows.Count;
+                Debug.WriteLine(df.PrettyText());
+                string folderName = null;
+                if (SameFolder)
+                {
+                    folderName =
+                        ObjItem.PropertyAccessor?.GetProperty(MAPIFields.Schemas.FolderName)
+                        as string;
+                }
+
+                df = df.FilterConversation(folderName, SameFolder, MailOnly);
+
+                return (int)(df?.Rows.Count ?? 0);
             }
             return 0;
         }
@@ -321,13 +324,20 @@ namespace UtilitiesCS
         {
             if (df != null)
             {
+                var columnNames = df.Columns.GetNames();
                 if (SameFolder)
                 {
-                    df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(foldername));
+                    if (columnNames.Contains("Folder Name"))
+                    {
+                        df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(foldername));
+                    }
                 }
                 if (MailOnly)
                 {
-                    df = df.Filter(df["MessageClass"].ElementwiseEquals<string>("IPM.Note"));
+                    if (columnNames.Contains("MessageClass"))
+                    {
+                        df = df.Filter(df["MessageClass"].ElementwiseEquals<string>("IPM.Note"));
+                    }
                 }
                 return df;
             }

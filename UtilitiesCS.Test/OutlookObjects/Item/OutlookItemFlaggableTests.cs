@@ -77,6 +77,62 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         }
 
         [TestMethod]
+        public void CompleteSetter_WhenWrappingTaskLikeItem_ShouldThrowMissingMethodException()
+        {
+            var taskItem = new ReflectionFriendlyTaskItem { Complete = false };
+            var wrapper = CreateWrapper(taskItem, OlItemType.olTaskItem);
+
+            System.Action act = () => wrapper.Complete = true;
+
+            act.Should().Throw<MissingMethodException>();
+            taskItem.Complete.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void DueDateSetter_WhenWrappingTaskLikeItem_ShouldThrowMissingMethodException()
+        {
+            var original = new DateTime(2026, 4, 2, 9, 15, 0);
+            var taskItem = new ReflectionFriendlyTaskItem { DueDate = original };
+            var wrapper = CreateWrapper(taskItem, OlItemType.olTaskItem);
+            var expected = new DateTime(2026, 4, 4, 10, 0, 0);
+
+            System.Action act = () => wrapper.DueDate = expected;
+
+            act.Should().Throw<MissingMethodException>();
+            taskItem.DueDate.Should().Be(original);
+        }
+
+        [TestMethod]
+        public void DueDate_WhenMailPropertiesAreMissing_ShouldReturnDefaultDate()
+        {
+            var wrapper = CreateWrapper(new ReflectionFriendlyMailItem(), OlItemType.olMailItem);
+
+            var result = wrapper.DueDate;
+
+            result.Should().Be(default(DateTime));
+        }
+
+        [TestMethod]
+        public void Complete_WhenWrappedMailLikeObjectHasNoFlagStatus_ShouldThrowArgumentException()
+        {
+            var wrapper = CreateWrapper(new object(), OlItemType.olMailItem);
+
+            System.Action act = () => _ = wrapper.Complete;
+
+            act.Should().Throw<ArgumentException>().WithMessage("*Complete*");
+        }
+
+        [TestMethod]
+        public void DueDate_WhenWrappedTaskLikeObjectHasNoDueDate_ShouldThrowArgumentException()
+        {
+            var wrapper = CreateWrapper(new object(), OlItemType.olTaskItem);
+
+            System.Action act = () => _ = wrapper.DueDate;
+
+            act.Should().Throw<ArgumentException>().WithMessage("*DueDate*");
+        }
+
+        [TestMethod]
         public void FlagAsTask_WhenWrappingTaskItem_ShouldAlwaysBeTrue()
         {
             var taskItem = new Mock<TaskItem>();
@@ -170,6 +226,93 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
             result.Should().Be(expected);
         }
 
+        [TestMethod]
+        public void FlagAsTask_WhenMailFlagStatusIsUnavailable_ShouldReturnFalse()
+        {
+            var wrapper = CreateWrapper(new ReflectionFriendlyMailItem(), OlItemType.olMailItem);
+
+            var result = wrapper.FlagAsTask;
+
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void FlagAsTask_WhenWrappedMailLikeObjectHasNoFlagStatus_ShouldThrowArgumentException()
+        {
+            var wrapper = CreateWrapper(new object(), OlItemType.olMailItem);
+
+            System.Action act = () => _ = wrapper.FlagAsTask;
+
+            act.Should().Throw<ArgumentException>().WithMessage("*FlagAsTask*");
+        }
+
+        [TestMethod]
+        public void TaskStartDateSetter_WhenWrappingMailLikeItem_ShouldThrowMissingMethodException()
+        {
+            var original = new DateTime(2026, 4, 1, 8, 0, 0);
+            var mailItem = new ReflectionFriendlyMailItem
+            {
+                TaskStartDate = original,
+                CreationTime = new DateTime(2026, 3, 31, 16, 0, 0),
+            };
+            var wrapper = CreateWrapper(mailItem, OlItemType.olMailItem);
+            var expected = new DateTime(2026, 4, 5, 12, 30, 0);
+
+            System.Action act = () => wrapper.TaskStartDate = expected;
+
+            act.Should().Throw<MissingMethodException>();
+            mailItem.TaskStartDate.Should().Be(original);
+        }
+
+        [TestMethod]
+        public void TaskStartDate_WhenWrappedTaskLikeObjectHasNoDates_ShouldThrowArgumentException()
+        {
+            var wrapper = CreateWrapper(new object(), OlItemType.olTaskItem);
+
+            System.Action act = () => _ = wrapper.TaskStartDate;
+
+            act.Should().Throw<ArgumentException>().WithMessage("*TaskStartDate*");
+        }
+
+        [TestMethod]
+        public void TaskSubjectSetter_WhenWrappingMailLikeItem_ShouldThrowMissingMethodException()
+        {
+            var mailItem = new ReflectionFriendlyMailItem
+            {
+                TaskSubject = "Original subject",
+                Subject = "Original subject",
+            };
+            var wrapper = CreateWrapper(mailItem, OlItemType.olMailItem);
+
+            System.Action act = () => wrapper.TaskSubject = "Updated subject";
+
+            act.Should().Throw<MissingMethodException>();
+            mailItem.TaskSubject.Should().Be("Original subject");
+        }
+
+        [TestMethod]
+        public void TaskSubject_WhenWrappedMailLikeObjectHasNoSubject_ShouldThrowArgumentException()
+        {
+            var wrapper = CreateWrapper(new object(), OlItemType.olMailItem);
+
+            System.Action act = () => _ = wrapper.TaskSubject;
+
+            act.Should().Throw<ArgumentException>().WithMessage("*TaskSubject*");
+        }
+
+        [TestMethod]
+        public void TotalWork_WhenWrappingTaskLikeItem_ShouldIgnoreSetterFailure()
+        {
+            var taskItem = new ReflectionFriendlyTaskItem { TotalWork = 30 };
+            var wrapper = CreateWrapper(taskItem, OlItemType.olTaskItem);
+
+            wrapper.TotalWork.Should().Be(30);
+
+            wrapper.TotalWork = 45;
+
+            taskItem.TotalWork.Should().Be(30);
+        }
+
         private static OutlookItemFlaggable CreateWrapper(object innerItem, OlItemType itemType)
         {
 #pragma warning disable SYSLIB0050
@@ -201,6 +344,18 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
         {
             public OlFlagStatus FlagStatus { get; set; }
 
+            public DateTime DueDate { get; set; }
+
+            public DateTime TaskDueDate { get; set; }
+
+            public DateTime TaskStartDate { get; set; }
+
+            public DateTime CreationTime { get; set; }
+
+            public string TaskSubject { get; set; }
+
+            public string Subject { get; set; }
+
             public int MarkAsTaskCalls { get; private set; }
 
             public int ClearTaskFlagCalls { get; private set; }
@@ -217,6 +372,15 @@ namespace UtilitiesCS.Test.OutlookObjects.Item
                 MarkAsTaskCalls++;
                 FlagStatus = OlFlagStatus.olFlagMarked;
             }
+        }
+
+        public sealed class ReflectionFriendlyTaskItem
+        {
+            public bool Complete { get; set; }
+
+            public DateTime DueDate { get; set; }
+
+            public int TotalWork { get; set; }
         }
     }
 }

@@ -132,6 +132,61 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
+        public void FindNode_WhenNotFound_ReturnsNull()
+        {
+            // Arrange
+            var root = new UtilitiesCS.TreeNode<string>("root");
+            root.AddChild("child");
+
+            // Act
+            var result = root.FindNode(v => v == "nonexistent", descendByLevel: true);
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void RemoveChild_WhenChildNotInTree_ReturnsFalse()
+        {
+            // Arrange
+            var root = new UtilitiesCS.TreeNode<string>("root");
+            var orphan = new UtilitiesCS.TreeNode<string>("orphan");
+
+            // Act
+            var result = root.RemoveChild(orphan);
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void FirstAncestor_WhenNoMatch_ReturnsNull()
+        {
+            // Arrange
+            var root = new UtilitiesCS.TreeNode<string>("root");
+            var child = root.AddChild("child");
+
+            // Act
+            var result = child.FirstAncestor(v => v == "nonexistent");
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void Indexer_ReturnsChildAtSpecifiedIndex()
+        {
+            // Arrange
+            var root = new UtilitiesCS.TreeNode<int>(0);
+            root.AddChildren(10, 20, 30);
+
+            // Act / Assert
+            root[0].Value.Should().Be(10);
+            root[1].Value.Should().Be(20);
+            root[2].Value.Should().Be(30);
+        }
+
+        [TestMethod]
         public void TraverseAndTraverseAncestors_VisitNodesInExpectedOrder()
         {
             // Arrange
@@ -161,6 +216,38 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             ancestorNodes.Should().Equal("leaf", "left", "root");
             breadthFirst.Should().Equal("root", "left", "right", "leaf");
             upwardByLevel.Should().Equal("leaf", "left", "root");
+        }
+
+        [TestMethod]
+        public void AdditionalOverloadsAndHelpers_ReturnExpectedResults()
+        {
+            // Arrange
+            var root = new UtilitiesCS.TreeNode<string>("root");
+            var first = root.AddChild("first", "ignored-id");
+            var second = root.AddChild("second");
+            first.AddChild("leaf");
+
+            // Act
+            var copy = new UtilitiesCS.TreeNode<string>(first);
+            var foundByStringDelegate = (UtilitiesCS.TreeNode<string>)
+                root.FindByDelegate((current, expected) => current == expected, "root");
+            var foundByValueDelegate = (UtilitiesCS.TreeNode<string>)
+                root.FindByDelegate((current, expected) => current == expected, "root");
+            var matchingNodes = root.FindAll(node => node.Value.Contains('o'))
+                .Select(node => node.Value)
+                .ToArray();
+            var nextLevelFromNull = root.GetNextLevel(null);
+            var previousLevelFromNull = root.GetPreviousLevel(null);
+
+            // Assert
+            copy.Value.Should().Be("first");
+            copy.Parent.Should().BeSameAs(root);
+            copy.Children.Should().BeSameAs(first.Children);
+            foundByStringDelegate.Should().BeSameAs(first);
+            foundByValueDelegate.Should().BeSameAs(first);
+            matchingNodes.Should().Equal("root", "second");
+            nextLevelFromNull.Should().BeNull();
+            previousLevelFromNull.Should().BeNull();
         }
     }
 }

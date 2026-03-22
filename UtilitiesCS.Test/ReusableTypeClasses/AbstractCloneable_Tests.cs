@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.ReusableTypeClasses;
@@ -70,6 +72,66 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Assert
             original.Tags.Should().Equal("one", "two");
             clone.Tags.Should().Equal("one", "two", "three");
+        }
+
+        [TestMethod]
+        public void Clone_ViaICloneableInterface_ReturnsDistinctCopy()
+        {
+            // Arrange
+            var original = new CloneableNode { Name = "test" };
+            ICloneable cloneable = original;
+
+            // Act
+            var clone = cloneable.Clone() as CloneableNode;
+
+            // Assert
+            clone.Should().NotBeNull();
+            clone.Should().NotBeSameAs(original);
+            clone.Name.Should().Be("test");
+        }
+
+        [TestMethod]
+        public void Clone_WithPrimitiveFields_CopiesPrimitiveValues()
+        {
+            // Arrange
+            var original = new CloneableNode
+            {
+                Name = "primitive-test",
+                Child = null,
+                Tags = new List<string> { "tag1" },
+            };
+
+            // Act
+            var clone1 = original.CloneTyped();
+            var clone2 = original.CloneTyped();
+
+            // Assert
+            clone1.Name.Should().Be("primitive-test");
+            clone2.Name.Should().Be("primitive-test");
+            clone1.Should().NotBeSameAs(clone2);
+        }
+
+        [TestMethod]
+        public void Clone_ConcreteCloneableExample_InvokesOverridePath()
+        {
+            // Arrange
+            var exampleType = typeof(AbstractCloneable).Assembly.GetType(
+                "UtilitiesCS.ReusableTypeClasses.ConcreteCloneableExample",
+                throwOnError: true
+            );
+            var cloneMethod = exampleType.GetMethod(
+                nameof(AbstractCloneable.Clone),
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            var instance = Activator.CreateInstance(exampleType, nonPublic: true);
+
+            // Act
+            var clone = cloneMethod.Invoke(instance, null);
+
+            // Assert
+            clone.Should().NotBeNull();
+            clone.Should().NotBeSameAs(instance);
+            clone.GetType().Should().Be(exampleType);
         }
 
         private sealed class CloneableNode : AbstractCloneable

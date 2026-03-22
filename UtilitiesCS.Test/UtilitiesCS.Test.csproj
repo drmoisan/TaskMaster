@@ -97,7 +97,14 @@
     <Compile Include="EmailIntelligence\Bayesian\SubCorpus.cs" />
     <Compile Include="EmailIntelligence\Bayesian\SubClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\Bayesian\SubBayesianClassifier.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierExtensions_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianPerformanceMeasurement_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\Corpus_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\CorpusInherit_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\ObsoleteBayesianClassifier_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\Triage\TriageCreationTests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities_Tests.cs" />
     <Compile Include="EmailIntelligence\CtfIncidence_Tests.cs" />
     <Compile Include="EmailIntelligence\CtfIncidenceList_Tests.cs" />
     <Compile Include="EmailIntelligence\DoNotSerializeContractResolver_Tests.cs" />
@@ -112,6 +119,11 @@
     <Compile Include="EmailIntelligence\MinedMailInfo_Tests.cs" />
     <Compile Include="EmailIntelligence\MovedMailInfo_Tests.cs" />
     <Compile Include="EmailIntelligence\SubjectMapEntry_Tests.cs" />
+    <Compile Include="EmailIntelligence\SmithWaterman_Tests.cs" />
+    <Compile Include="EmailIntelligence\FilterEntry_Tests.cs" />
+    <Compile Include="EmailIntelligence\BayesianMetricTypes_Tests.cs" />
+    <Compile Include="EmailIntelligence\DedicatedToken_Tests.cs" />
+    <Compile Include="EmailIntelligence\EmailFilerConfig_Tests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MailItemHelperTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MinedMailInfoTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\AttachmentInfoTests.cs" />
@@ -121,6 +133,9 @@
     <Compile Include="EmailIntelligence\EmailDetailsTest.cs" />
     <Compile Include="EmailIntelligence\Prediction_Tests.cs" />
     <Compile Include="EmailIntelligence\IClonableBehaviorTest.cs" />
+    <Compile Include="EmailIntelligence\FlagTranslator_Tests.cs" />
+    <Compile Include="EmailIntelligence\PeopleScoDictionaryNew_Tests.cs" />
+    <Compile Include="EmailIntelligence\RecentsList_Tests.cs" />
     <Compile Include="Extensions\ArrayExtensions_Tests.cs" />
     <Compile Include="Extensions\AsyncSerialization_Tests.cs" />
     <Compile Include="Extensions\CompilerServicesExtensions_Tests.cs" />
@@ -140,6 +155,8 @@
     <Compile Include="Extensions\StringExtensions_Tests.cs" />
     <Compile Include="Extensions\StreamExtensions_Tests.cs" />
     <Compile Include="Extensions\TraceExtensions_Tests.cs" />
+    <Compile Include="Extensions\DrawingExtensions_Tests.cs" />
+    <Compile Include="Extensions\ImageExtensions_Tests.cs" />
     <Compile Include="HelperClasses\MyFileSystemInfoTests.cs" />
     <Compile Include="HelperClasses\PropertyInitializerTest.cs" />
     <Compile Include="HelperClasses\Initializer_Tests.cs" />
@@ -162,6 +179,10 @@
     <Compile Include="HelperClasses\PrettyPrintTest.cs" />
     <Compile Include="HelperClasses\NLogTraceWriter_Test.cs" />
     <Compile Include="HelperClasses\SysImageListHelperTests.cs" />
+    <Compile Include="HelperClasses\StringManipulation_Tests.cs" />
+    <Compile Include="HelperClasses\FilePathHelper_Tests.cs" />
+    <Compile Include="HelperClasses\FileSystemInfoWrapper_Tests.cs" />
+    <Compile Include="Interfaces\PropertyStore_Tests.cs" />
     <Compile Include="NewtonsoftHelpers\AllInclusiveBinder_Tests.cs" />
     <Compile Include="NewtonsoftHelpers\FilePathHelperConverterTests.cs" />
     <Compile Include="NewtonsoftHelpers\DerivedCompositionConverter_ConcurrentDictionaryTests.cs" />
@@ -170,6 +191,16 @@
     <Compile Include="NewtonsoftHelpers\ScoDictionaryConverterTests.cs" />
     <Compile Include="NewtonsoftHelpers\WrapperScoDictionaryTest.cs" />
     <Compile Include="NewtonsoftHelpers\WrapperScDictionaryTest.cs" />
+    <Compile Include="NewtonsoftHelpers\NConsoleTraceWriter_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\MonoExtension\MonoExtensionCoverageTests.cs" />
+    <Compile Include="NewtonsoftHelpers\MonoExtension_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\NonRecursiveConverter_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\PeopleScoConverter_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\PeopleScoRemainingObjectConverter_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\ScDictionaryConverter_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\SDILReader\ILGlobals_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\SDILReader\ILInstruction_Tests.cs" />
+    <Compile Include="NewtonsoftHelpers\WrapperPeopleScoDictionaryNew_Tests.cs" />
     <Compile Include="OneDriveHelpers\AngleSharpParsedEmailBodyTests.cs" />
     <Compile Include="OneDriveHelpers\OneDriveDownloaderTests.cs" />
     <Compile Include="OutlookObjects\Attachment\AttachmentHelperTests.cs" />
@@ -193,6 +224,7 @@
     <Compile Include="OutlookObjects\Item\OutlookItemExtensionsTests.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItemFlaggableTests.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItemFlaggableTryTests.cs" />
+    <Compile Include="OutlookObjects\Item\OutlookItem_Tests.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItemTests.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItemTryTests.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItemTryGetTests.cs" />
@@ -215,6 +247,7 @@
     <Compile Include="OutlookObjects\Fields\UserDefinedFieldsTests.cs" />
     <Compile Include="OutlookObjects\Fields\MAPIFieldsTests.cs" />
     <Compile Include="OutlookObjects\Conversation\ConversationHelperTests.cs" />
+    <Compile Include="OutlookObjects\Conversation\ConversationHelper_ExtendedTests.cs" />
     <Compile Include="OutlookObjects\Table\OlToDoTableTests.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensionsTransformTests.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensionsRetryTests.cs" />
@@ -271,6 +304,8 @@
     <Compile Include="ReusableTypeClasses\BagChangedEventArgs_Tests.cs" />
     <Compile Include="ReusableTypeClasses\LockingLinkedList_Tests.cs" />
     <Compile Include="ReusableTypeClasses\LockingLinkedListNode_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SimpleActionBagObserver_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SimpleActionLockingLinkedListObserver_Tests.cs" />
     <Compile Include="ReusableTypeClasses\AsyncQueue_Tests.cs" />
     <Compile Include="ReusableTypeClasses\AbstractCloneable_Tests.cs" />
     <Compile Include="ReusableTypeClasses\TimerWrapper_Tests.cs" />
@@ -280,15 +315,51 @@
     <Compile Include="ReusableTypeClasses\ScoDictionaryNew_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ScoSortedDictionary_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SloLinkedList_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\LockingObservableLinkedList_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\LockingObservableLinkedListNode_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\ScDictionary_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializableConfig_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializable_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializableBase_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializableLoader_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializableNonTyped_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializableStatic_Tests.cs" />
     <Compile Include="ThemeHelpers\SystemThemeDetectorTests.cs" />
     <Compile Include="Threading\AppGlobalsConverterTests.cs" />
     <Compile Include="Threading\AppGlobalsConverterTests_Unfinished.cs" />
     <Compile Include="Threading\ProgressPackage_Tests.cs" />
     <Compile Include="Threading\ProgressTracker_Tests.cs" />
+    <Compile Include="Threading\ProgressTrackerAsync_Tests.cs" />
     <Compile Include="Threading\TaskPriority_Tests.cs" />
     <Compile Include="Threading\ThreadSafeFunctions_Tests.cs" />
     <Compile Include="Threading\ThreadSafeSingleShotGuard_Tests.cs" />
     <Compile Include="Threading\TimeOutTask_Tests.cs" />
+    <Compile Include="Threading\ApplicationIdleTimer_Tests.cs" />
+    <Compile Include="Threading\UiThread_Tests.cs" />
+    <Compile Include="Dialogs\DialogTests.cs" />
+    <Compile Include="Dialogs\FunctionButton_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\ConditionalItemEngine_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\EngineTests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\MulticlassEngine_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\Triage_Tests.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFiler_Tests.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemapTree_Tests.cs" />
+    <Compile Include="Extensions\WinFormsExtensions_Tests.cs" />
+    <Compile Include="HelperClasses\ComStreamWrapper_Tests.cs" />
+    <Compile Include="HelperClasses\DispatchUtility_Tests.cs" />
+    <Compile Include="HelperClasses\ShellUtilities_Tests.cs" />
+    <Compile Include="HelperClasses\ThemeHelpers\ThemeTests.cs" />
+    <Compile Include="HelperClasses\WindowsForms\ScreenAndTableLayoutTests.cs" />
+    <Compile Include="HelperClasses\WindowsForms\WinFormsInteractionTests.cs" />
+    <Compile Include="HelperClasses\WindowsForms\WinFormsLayoutTests.cs" />
+    <Compile Include="NewtonsoftHelpers\SDILReader\MethodBodyReader_Tests.cs" />
+    <Compile Include="OneDriveHelpers\OneDriveDownloader_Tests.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemHelper_ExtendedTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensions_Tests.cs" />
+    <Compile Include="OutlookObjects\Table\OlToDoTable_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\NewSmartSerializable\ConfigController_Tests.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -348,6 +419,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Data.Analysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Data.Analysis.0.23.0\lib\netstandard2.0\Microsoft.Data.Analysis.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ML.DataView, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ML.DataView.5.0.0\lib\netstandard2.0\Microsoft.ML.DataView.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=10.0.0.5, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.10.0.5\lib\net462\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
@@ -443,6 +517,9 @@
     <Reference Include="MSTest.TestFramework.Extensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\MSTest.TestFramework.4.1.0\lib\net462\MSTest.TestFramework.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.Reflection, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mono.Reflection.2.0.0\lib\net40\Mono.Reflection.dll</HintPath>
+    </Reference>
     <Reference Include="Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.20.72\lib\net462\Moq.dll</HintPath>
     </Reference>
@@ -515,8 +592,8 @@
     <Reference Include="System.Reactive.Async, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reactive.Async.6.0.0-alpha.18\lib\netstandard2.0\System.Reactive.Async.dll</HintPath>
     </Reference>
-    <Reference Include="System.Reflection.Metadata, Version=9.0.0.6, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reflection.Metadata.9.0.6\lib\net462\System.Reflection.Metadata.dll</HintPath>
+    <Reference Include="System.Reflection.Metadata, Version=10.0.0.5, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reflection.Metadata.10.0.5\lib\net462\System.Reflection.Metadata.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime" />
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">

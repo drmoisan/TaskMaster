@@ -1,5 +1,8 @@
 using System;
+using System.Collections;
 using System.IO;
+using System.Linq;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS;
@@ -49,6 +52,52 @@ namespace ObjectListViewDemo.Tests
             Assert.ThrowsExactly<ArgumentNullException>(() =>
                 new MyFileSystemInfo(default(FileSystemInfo))
             );
+        }
+
+        [TestMethod]
+        public void Constructors_WithConcreteFileSystemInfoWrappers_ExposeExpectedKinds()
+        {
+            // Arrange
+            var assemblyFile = new FileInfo(typeof(MyFileSystemInfoTests).Assembly.Location);
+            var assemblyDirectory = assemblyFile.Directory;
+
+            // Act
+            var fromFile = new MyFileSystemInfo(assemblyFile);
+            var fromDirectory = new MyFileSystemInfo(assemblyDirectory);
+
+            // Assert
+            fromFile.AsFile.Should().NotBeNull();
+            fromFile.AsDirectory.Should().BeNull();
+            fromFile.FullName.Should().Be(assemblyFile.FullName);
+            fromDirectory.AsDirectory.Should().NotBeNull();
+            fromDirectory.AsFile.Should().BeNull();
+            fromDirectory.FullName.Should().Be(assemblyDirectory.FullName);
+        }
+
+        [TestMethod]
+        public void Constructors_WithNullConcreteInputs_ThrowArgumentNullException()
+        {
+            // Act
+            Action nullFileAct = () => new MyFileSystemInfo((FileInfo)null);
+            Action nullDirectoryAct = () => new MyFileSystemInfo((DirectoryInfo)null);
+            Action nullWrapperAct = () => new MyFileSystemInfo((IFileSystemInfo)null);
+
+            // Assert
+            nullFileAct
+                .Should()
+                .Throw<ArgumentNullException>()
+                .And.ParamName.Should()
+                .Be("fileInfo");
+            nullDirectoryAct
+                .Should()
+                .Throw<ArgumentNullException>()
+                .And.ParamName.Should()
+                .Be("fileInfo");
+            nullWrapperAct
+                .Should()
+                .Throw<ArgumentNullException>()
+                .And.ParamName.Should()
+                .Be("fileSystemInfo");
         }
 
         [TestMethod]
@@ -230,6 +279,22 @@ namespace ObjectListViewDemo.Tests
         }
 
         [TestMethod]
+        public void GetFileSystemInfos_ForFile_ReturnsEmptyCollection()
+        {
+            // Arrange
+            var myFileSystemInfo = new MyFileSystemInfo(_mockFileInfo.Object);
+
+            // Act
+            var result = myFileSystemInfo.GetFileSystemInfos();
+
+            // Assert
+            ((IEnumerable)result)
+                .Cast<object>()
+                .Should()
+                .BeEmpty();
+        }
+
+        [TestMethod]
         public void Equals_ReturnsTrueForSamePath()
         {
             // Arrange
@@ -270,6 +335,25 @@ namespace ObjectListViewDemo.Tests
 
             // Assert
             Assert.AreEqual(hashCode1, hashCode2);
+        }
+
+        [TestMethod]
+        public void Equals_HandlesNullSelfAndDifferentObjectTypes()
+        {
+            // Arrange
+            var myFileSystemInfo = new MyFileSystemInfo(_mockFileInfo.Object);
+
+            // Act
+            var equalsNullTyped = myFileSystemInfo.Equals((MyFileSystemInfo)null);
+            var equalsNullObject = myFileSystemInfo.Equals((object)null);
+            var equalsSelf = myFileSystemInfo.Equals((object)myFileSystemInfo);
+            var equalsDifferentType = myFileSystemInfo.Equals("TestFile.txt");
+
+            // Assert
+            equalsNullTyped.Should().BeFalse();
+            equalsNullObject.Should().BeFalse();
+            equalsSelf.Should().BeTrue();
+            equalsDifferentType.Should().BeFalse();
         }
 
         [TestMethod]

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
@@ -102,7 +103,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
             stream.ToArray().Should().Equal(expected);
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("report.pdf", "report", ".pdf")]
         [DataRow(".gitignore", ".gitignore", "")]
         public void ParseFileName_SplitsSeedAndExtensionAsExpected(
@@ -120,6 +121,242 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
             // Assert
             fileNameSeed.Should().Be(expectedSeed);
             fileExtension.Should().Be(expectedExtension);
+        }
+
+        [TestMethod]
+        public void IsAnImage_WhenPngExtension_ShouldReturnTrue()
+        {
+            var attachment = new AttachmentSerializable { FileExtension = ".png" };
+            attachment.IsAnImage().Should().BeTrue();
+        }
+
+        [TestMethod]
+        [DataRow(".jpg")]
+        [DataRow(".jpeg")]
+        [DataRow(".gif")]
+        [DataRow(".bmp")]
+        public void IsAnImage_WhenImageExtension_ShouldReturnTrue(string ext)
+        {
+            var attachment = new AttachmentSerializable { FileExtension = ext };
+            attachment.IsAnImage().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsAnImage_WhenPdfExtension_ShouldReturnFalse()
+        {
+            var attachment = new AttachmentSerializable { FileExtension = ".pdf" };
+            attachment.IsAnImage().Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void IsAnImage_WhenNullExtension_ShouldReturnFalse()
+        {
+            var attachment = new AttachmentSerializable { FileExtension = null };
+            attachment.IsAnImage().Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void TryFromAccessor_WhenAccessorReturnsBytes_ShouldReturnTrueAndSetBytes()
+        {
+            var expected = new byte[] { 1, 2, 3 };
+            var accessor = new Mock<PropertyAccessor>();
+            accessor
+                .Setup(x => x.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x37010102"))
+                .Returns(expected);
+            var outlookAttachment = new Mock<Microsoft.Office.Interop.Outlook.Attachment>();
+            outlookAttachment.SetupGet(x => x.PropertyAccessor).Returns(accessor.Object);
+
+            var attachment = new AttachmentSerializable();
+            var result = attachment.TryFromAccessor(outlookAttachment.Object, out byte[] bytes);
+
+            result.Should().BeTrue();
+            bytes.Should().Equal(expected);
+        }
+
+        [TestMethod]
+        public void TryFromAccessor_WhenAccessorThrows_ShouldReturnFalse()
+        {
+            var accessor = new Mock<PropertyAccessor>();
+            accessor
+                .Setup(x => x.GetProperty(It.IsAny<string>()))
+                .Throws(new System.InvalidOperationException("COM error"));
+            var outlookAttachment = new Mock<Microsoft.Office.Interop.Outlook.Attachment>();
+            outlookAttachment.SetupGet(x => x.PropertyAccessor).Returns(accessor.Object);
+
+            var attachment = new AttachmentSerializable();
+            var result = attachment.TryFromAccessor(outlookAttachment.Object, out byte[] bytes);
+
+            result.Should().BeFalse();
+            bytes.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void Constructor_WithAttachment_WhenFileNameThrows_SetsFileNameToEmptyString()
+        {
+            // Arrange
+            var outlookAttachment = CreateAttachmentMockCore(type: OlAttachmentType.olByValue);
+            outlookAttachment
+                .SetupGet(x => x.FileName)
+                .Throws(new InvalidOperationException("boom"));
+
+            // Act
+            var attachment = new AttachmentSerializable(outlookAttachment.Object);
+
+            // Assert
+            attachment.FileName.Should().BeEmpty();
+            attachment.DisplayName.Should().Be("chart.png");
+            attachment.Type.Should().Be(OlAttachmentType.olByValue);
+        }
+
+        [TestMethod]
+        public void Constructor_WithAttachment_WhenPathNameThrows_LeavesPathNameUnset()
+        {
+            // Arrange
+            var outlookAttachment = CreateAttachmentMockCore(type: OlAttachmentType.olByValue);
+            outlookAttachment
+                .SetupGet(x => x.PathName)
+                .Throws(new InvalidOperationException("boom"));
+
+            // Act
+            var attachment = new AttachmentSerializable(outlookAttachment.Object);
+
+            // Assert
+            attachment.PathName.Should().BeNull();
+            attachment.FileName.Should().Be("chart.png");
+        }
+
+        [TestMethod]
+        public void Constructor_WithEmbeddedAttachment_DoesNotReadPathName()
+        {
+            // Arrange
+            var outlookAttachment = CreateAttachmentMockCore(type: OlAttachmentType.olEmbeddeditem);
+
+            // Act
+            var attachment = new AttachmentSerializable(outlookAttachment.Object);
+
+            // Assert
+            attachment.Type.Should().Be(OlAttachmentType.olEmbeddeditem);
+            attachment.PathName.Should().BeNull();
+            outlookAttachment.VerifyGet(x => x.PathName, Times.Never);
+        }
+
+        [TestMethod]
+        public void AttachmentData_WhenSetToNull_ReturnsNullFromGetter()
+        {
+            // Arrange
+            var attachment = new AttachmentSerializable { AttachmentData = new byte[] { 1, 2, 3 } };
+
+            // Act
+            attachment.AttachmentData = null;
+
+            // Assert
+            attachment.AttachmentData.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void GetBytes_WhenByValueAndAccessorReturnsBytes_UsesAccessorBytes()
+        {
+            // Arrange
+            var expected = new byte[] { 9, 8, 7 };
+            var accessor = new Mock<PropertyAccessor>();
+            accessor
+                .Setup(x => x.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x37010102"))
+                .Returns(expected);
+
+            var outlookAttachment = new Mock<Microsoft.Office.Interop.Outlook.Attachment>();
+            outlookAttachment.SetupGet(x => x.PropertyAccessor).Returns(accessor.Object);
+
+            var attachment = new AttachmentSerializable
+            {
+                Type = OlAttachmentType.olByValue,
+                ImageBytesOnly = false,
+                FileExtension = ".pdf",
+            };
+
+            // Act
+            var bytes = attachment.GetBytes(outlookAttachment.Object);
+
+            // Assert
+            bytes.Should().Equal(expected);
+        }
+
+        [TestMethod]
+        public void GetBytes_WhenNonByValueTempPathReadFails_FallsBackToAccessor()
+        {
+            // Arrange
+            var expected = new byte[] { 4, 5, 6 };
+            var accessor = new Mock<PropertyAccessor>();
+            accessor
+                .Setup(x => x.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x37010102"))
+                .Returns(expected);
+
+            var outlookAttachment = new Mock<Microsoft.Office.Interop.Outlook.Attachment>();
+            outlookAttachment.SetupGet(x => x.PathName).Returns(@"Z:\does-not-exist\missing.bin");
+            outlookAttachment.SetupGet(x => x.PropertyAccessor).Returns(accessor.Object);
+            outlookAttachment.SetupGet(x => x.FileName).Returns("missing.bin");
+
+            var attachment = new AttachmentSerializable
+            {
+                Type = OlAttachmentType.olByReference,
+                ImageBytesOnly = false,
+                FileExtension = ".pdf",
+            };
+
+            // Act
+            var bytes = attachment.GetBytes(outlookAttachment.Object);
+
+            // Assert
+            bytes.Should().Equal(expected);
+        }
+
+        [TestMethod]
+        public void GetBytes_WhenAccessorAndSaveAsLoadFail_ReturnsNull()
+        {
+            // Arrange
+            var accessor = new Mock<PropertyAccessor>();
+            accessor
+                .Setup(x => x.GetProperty(It.IsAny<string>()))
+                .Throws(new InvalidOperationException("accessor failure"));
+
+            var outlookAttachment = new Mock<Microsoft.Office.Interop.Outlook.Attachment>();
+            outlookAttachment.SetupGet(x => x.PropertyAccessor).Returns(accessor.Object);
+            outlookAttachment.SetupGet(x => x.FileName).Returns("chart.png");
+            outlookAttachment
+                .Setup(x => x.SaveAsFile(It.IsAny<string>()))
+                .Throws(new InvalidOperationException("save failed"));
+
+            var attachment = new AttachmentSerializable
+            {
+                Type = OlAttachmentType.olByValue,
+                ImageBytesOnly = false,
+                FileExtension = ".pdf",
+            };
+
+            // Act
+            var bytes = attachment.GetBytes(outlookAttachment.Object);
+
+            // Assert
+            bytes.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void TryFromSaveAsLoad_WhenSaveAsFileThrows_ReturnsFalseAndNullBytes()
+        {
+            // Arrange
+            var outlookAttachment = new Mock<Microsoft.Office.Interop.Outlook.Attachment>();
+            outlookAttachment.SetupGet(x => x.FileName).Returns("failure.bin");
+            outlookAttachment
+                .Setup(x => x.SaveAsFile(It.IsAny<string>()))
+                .Throws(new InvalidOperationException("save failed"));
+
+            var attachment = new AttachmentSerializable();
+
+            // Act
+            bool result = attachment.TryFromSaveAsLoad(outlookAttachment.Object, out byte[] bytes);
+
+            // Assert
+            result.Should().BeFalse();
+            bytes.Should().BeNull();
         }
 
         [TestMethod]
@@ -163,6 +400,34 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
             clone.IsImage.Should().BeTrue();
             clone.Application.Should().BeNull();
             clone.Session.Should().BeNull();
+        }
+
+        private static Mock<Microsoft.Office.Interop.Outlook.Attachment> CreateAttachmentMockCore(
+            OlAttachmentType type
+        )
+        {
+            var outlookAttachment = new Mock<Microsoft.Office.Interop.Outlook.Attachment>();
+            var application = new Mock<Application>();
+            var accessor = new Mock<PropertyAccessor>();
+            var session = new Mock<NameSpace>();
+            var parent = new object();
+
+            outlookAttachment.SetupGet(x => x.Type).Returns(type);
+            outlookAttachment
+                .SetupGet(x => x.BlockLevel)
+                .Returns(OlAttachmentBlockLevel.olAttachmentBlockLevelNone);
+            outlookAttachment.SetupGet(x => x.Class).Returns(OlObjectClass.olAttachment);
+            outlookAttachment.SetupGet(x => x.DisplayName).Returns("chart.png");
+            outlookAttachment.SetupGet(x => x.FileName).Returns("chart.png");
+            outlookAttachment.SetupGet(x => x.Index).Returns(2);
+            outlookAttachment.SetupGet(x => x.PathName).Returns(@"C:\mail\chart.png");
+            outlookAttachment.SetupGet(x => x.Position).Returns(4);
+            outlookAttachment.SetupGet(x => x.Size).Returns(128);
+            outlookAttachment.SetupGet(x => x.Application).Returns(application.Object);
+            outlookAttachment.SetupGet(x => x.Parent).Returns(parent);
+            outlookAttachment.SetupGet(x => x.PropertyAccessor).Returns(accessor.Object);
+            outlookAttachment.SetupGet(x => x.Session).Returns(session.Object);
+            return outlookAttachment;
         }
     }
 }

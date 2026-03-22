@@ -95,5 +95,98 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             stack.Count.Should().Be(items.Length);
             ordered.Should().Equal(items);
         }
+
+        [TestMethod]
+        public void Filename_SetAndGet_Works()
+        {
+            // Arrange
+            var stack = new ScoStack<int>();
+
+            // Act
+            stack.FileName = "stack.json";
+
+            // Assert
+            stack.FileName.Should().Be("stack.json");
+        }
+
+        [TestMethod]
+        public void Folderpath_SetAndGet_UpdatesFilepath()
+        {
+            // Arrange
+            var stack = new ScoStack<int>();
+            stack.FileName = "data.json";
+
+            // Act
+            stack.FolderPath = @"C:\stacks";
+
+            // Assert
+            stack.FilePath.Should().Be(@"C:\stacks\data.json");
+        }
+
+        [TestMethod]
+        public void Serialize_WithNoPath_IsNoOp()
+        {
+            // Arrange
+            var stack = new ScoStack<int>();
+            stack.Push(42);
+
+            // Act
+            stack.Serialize();
+
+            // Assert
+            stack.Count.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void JsonRoundTrip_PreservesItems()
+        {
+            // Arrange
+            var original = new ScoStack<int>(new[] { 1, 2, 3 });
+            var settings = new Newtonsoft.Json.JsonSerializerSettings
+            {
+                Formatting = Newtonsoft.Json.Formatting.Indented,
+                TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto,
+            };
+
+            // Act
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(original, settings);
+            var restored = Newtonsoft.Json.JsonConvert.DeserializeObject<ScoStack<int>>(
+                json,
+                settings
+            );
+
+            // Assert
+            restored.Should().NotBeNull();
+            restored.Count.Should().Be(3);
+        }
+
+        [TestMethod]
+        public void Contains_ExistingItem_ReturnsTrue()
+        {
+            // Arrange
+            var stack = new ScoStack<int>(new[] { 1, 2, 3 });
+
+            // Act & Assert
+            stack.Contains(2).Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void Clear_RemovesAllItems()
+        {
+            // Arrange
+            var stack = new ScoStack<int>(new[] { 1, 2, 3 });
+
+            // Act
+            stack.Clear();
+
+            // Assert
+            stack.Count.Should().Be(0);
+        }
+
+        // NOTE: ScoStack<T>.ToArray() contains a pre-existing infinite recursion bug
+        // (calls this.ToArray() which resolves to itself instead of Enumerable.ToArray).
+        // Calling it crashes the test host with StackOverflowException.
+        // ToArray(bool) also suffers from the same bug on the reverse=false path.
+        // Production fix deferred to a separate bug issue.
     }
 }

@@ -2,8 +2,11 @@
   "dotnet.defaultSolution": "TaskMaster.sln",
   "dotnet.testWindow.useTestingPlatformProtocol": true,
   "omnisharp.projectLoadTimeout": 120,
+  "github.copilot.chat.cli.sessionController.enabled": false,
   "chat.tools.terminal.autoApprove": {
-    "dotnet restore": true
+    "dotnet restore": true,
+    "git checkout": true,
+    "Test-Path": true
   },
   "koverage.coverageFileNames": [
     "coverage.cobertura.xml"

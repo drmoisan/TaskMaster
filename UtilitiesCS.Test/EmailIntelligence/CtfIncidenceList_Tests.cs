@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -214,6 +216,113 @@ namespace UtilitiesCS.Test.EmailIntelligence
             list[0].Should().BeSameAs(second);
         }
 
+        [TestMethod]
+        public void TryDequeueIncidence_WithOverflowCount_ReturnsNull()
+        {
+            // Arrange
+            var lines = new Queue<string>(
+                new[]
+                {
+                    "AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHH",
+                    "1",
+                    "Inbox",
+                    ((long)int.MaxValue + 1).ToString(),
+                }
+            );
+
+            // Act
+            var result = CtfIncidenceList.TryDequeueIncidence(ref lines);
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void ArrayToQueue_SkipsHeaderLine()
+        {
+            // Arrange
+            var method = typeof(CtfIncidenceList).GetMethod(
+                "ArrayToQueue",
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
+
+            // Act
+            var queue =
+                (Queue<string>)
+                    method.Invoke(null, new object[] { new[] { "header", "one", "two" } });
+
+            // Assert
+            queue.Should().ContainInOrder("one", "two");
+        }
+
+        [TestMethod]
+        public void ReadFileToArray_WhenFileIsMissing_ThrowsFileNotFoundException()
+        {
+            // Arrange
+            var method = typeof(CtfIncidenceList).GetMethod(
+                "ReadFileToArray",
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
+
+            // Act
+            Action act = () =>
+                method.Invoke(null, new object[] { GetMissingFilePath("ctf-incidence-list") });
+
+            // Assert
+            act.Should()
+                .Throw<TargetInvocationException>()
+                .WithInnerException<FileNotFoundException>();
+        }
+
+        [TestMethod]
+        public void ReadTextFile_WhenFileIsMissing_ThrowsFileNotFoundException()
+        {
+            // Arrange
+
+            // Act
+            Action act = () =>
+                CtfIncidenceList.ReadTextFile(GetMissingFilePath("ctf-incidence-list-read"));
+
+            // Assert
+            act.Should().Throw<FileNotFoundException>();
+        }
+
+        [TestMethod]
+        public void CTF_Incidence_Text_File_WRITE_WithInvalidFolderPath_ThrowsArgumentException()
+        {
+            // Arrange
+            var list = new CtfIncidenceList
+            {
+                CreateIncidence("conv-8", folderCount: 1, firstFolder: "Inbox", firstCount: 3),
+            };
+            list.CTF_Inc_Ct = 1;
+
+            // Act
+            Action act = () =>
+                list.CTF_Incidence_Text_File_WRITE("\0invalid-folder", "ctf-incidence.txt");
+
+            // Assert
+            act.Should().Throw<ArgumentException>();
+        }
+
+        [TestMethod]
+        public void ReadFileToArray_WhenPathIsInvalid_ThrowsArgumentException()
+        {
+            // Arrange
+            var method = typeof(CtfIncidenceList).GetMethod(
+                "ReadFileToArray",
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
+
+            // Act
+            Action act = () => method.Invoke(null, new object[] { "\0invalid-path" });
+
+            // Assert
+            act.Should()
+                .Throw<TargetInvocationException>()
+                .Where(exception => exception.InnerException is ArgumentException);
+        }
+
         private static CtfIncidence CreateIncidence(
             string conversationId,
             int folderCount,
@@ -237,6 +346,11 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 },
                 emailConversationCount: new List<int> { 0, firstCount, secondCount, thirdCount }
             );
+        }
+
+        private static string GetMissingFilePath(string name)
+        {
+            return Path.Combine(Environment.CurrentDirectory, $"{name}-{Guid.NewGuid():N}.txt");
         }
 #pragma warning restore CS0618
     }

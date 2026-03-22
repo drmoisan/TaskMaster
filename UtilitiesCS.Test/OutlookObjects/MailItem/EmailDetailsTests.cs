@@ -26,7 +26,7 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             result.Should().Be("Task");
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow(102)]
         [DataRow(103)]
         [DataRow(104)]

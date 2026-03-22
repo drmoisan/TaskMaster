@@ -87,5 +87,123 @@ namespace UtilitiesCS.Test
                 LastJobName = report.JobName;
             }
         }
+
+        #region Extended Tests — P2-T17
+
+        [TestMethod]
+        public void Increment_ShouldAccumulateProgressValues()
+        {
+            var parent = new CapturingProgressTracker();
+            var tracker = new ProgressTracker(parent, allocation: 100, startingAt: 0);
+
+            tracker.Increment(30);
+            tracker.Progress.Should().Be(30);
+
+            tracker.Increment(20);
+            tracker.Progress.Should().Be(50);
+        }
+
+        [TestMethod]
+        public void Increment_ShouldClampAt100()
+        {
+            var parent = new CapturingProgressTracker();
+            var tracker = new ProgressTracker(parent, allocation: 100, startingAt: 0);
+
+            tracker.Increment(60);
+            tracker.Increment(60);
+
+            tracker.Progress.Should().Be(100);
+        }
+
+        [TestMethod]
+        public void Report_WithTupleOverload_ShouldSetValueAndJobName()
+        {
+            var parent = new CapturingProgressTracker();
+            var tracker = new ProgressTracker(parent, allocation: 50, startingAt: 0);
+
+            tracker.Report((75, "halfway"));
+
+            tracker.Progress.Should().Be(75);
+            parent.LastJobName.Should().Be("halfway");
+        }
+
+        [TestMethod]
+        public void Report_DoubleOverload_ShouldThrowForNegative()
+        {
+            var parent = new CapturingProgressTracker();
+            var tracker = new ProgressTracker(parent, allocation: 100, startingAt: 0);
+
+            Action act = () => tracker.Report(-5.0);
+
+            act.Should().Throw<ArgumentOutOfRangeException>();
+        }
+
+        [TestMethod]
+        public void Report_DoubleOverload_ShouldClampAbove100()
+        {
+            var parent = new CapturingProgressTracker();
+            var tracker = new ProgressTracker(parent, allocation: 100, startingAt: 0);
+
+            tracker.Report(200.0);
+
+            tracker.Progress.Should().Be(100);
+        }
+
+        [TestMethod]
+        public void SpawnChild_WithAllocation_ShouldCreateChildWithSpecifiedAllocation()
+        {
+            var parent = new CapturingProgressTracker();
+            var tracker = new ProgressTracker(parent, allocation: 100, startingAt: 0);
+
+            var child = tracker.SpawnChild(50);
+            child.Report(100, "child done");
+
+            parent.LastValue.Should().Be(50);
+        }
+
+        [TestMethod]
+        public void SpawnChild_WithDoubleAllocation_ShouldRoundAndCreateChild()
+        {
+            var parent = new CapturingProgressTracker();
+            var tracker = new ProgressTracker(parent, allocation: 100, startingAt: 0);
+
+            var child = tracker.SpawnChild(33.7);
+            child.Report(100, "child done");
+
+            parent.LastValue.Should().Be(34);
+        }
+
+        [TestMethod]
+        public void Report_WithDoubleAndJobName_ShouldClampAt100()
+        {
+            var parent = new CapturingProgressTracker();
+            var tracker = new ProgressTracker(parent, allocation: 100, startingAt: 0);
+
+            tracker.Report(150.0, "overshooting");
+
+            tracker.Progress.Should().Be(100);
+        }
+
+        [TestMethod]
+        public void Report_WithDoubleAndJobName_ShouldThrowForNegative()
+        {
+            var parent = new CapturingProgressTracker();
+            var tracker = new ProgressTracker(parent, allocation: 100, startingAt: 0);
+
+            Action act = () => tracker.Report(-1.0, "bad");
+
+            act.Should().Throw<ArgumentOutOfRangeException>();
+        }
+
+        [TestMethod]
+        public void Constructor_WithParent_ShouldInheritJobName()
+        {
+            var parent = new CapturingProgressTracker();
+            var tracker = new ProgressTracker(parent, allocation: 100, startingAt: 0);
+
+            tracker.Progress.Should().Be(0);
+        }
+
+        #endregion
     }
 }

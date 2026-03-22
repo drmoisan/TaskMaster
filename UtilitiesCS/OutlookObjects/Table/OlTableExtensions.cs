@@ -1206,15 +1206,29 @@ namespace UtilitiesCS
 
         public static string[] GetColumnHeaders(this Outlook.Table table)
         {
-            string[] headers = new string[table.Columns.Count];
-            int i = -1;
-            foreach (Column column in table.Columns)
+            if (table?.Columns is null)
             {
-                string name = column.Name;
-                if (MAPIFields.SchemaToField.ContainsKey(name))
-                    name = MAPIFields.SchemaToField[name];
-                headers[++i] = name;
+                return System.Array.Empty<string>();
             }
+
+            var columns = table.Columns;
+            if (columns.Count <= 0)
+            {
+                return System.Array.Empty<string>();
+            }
+
+            string[] headers = new string[columns.Count];
+            for (var i = 1; i <= columns.Count; i++)
+            {
+                string name = columns[i]?.Name ?? string.Empty;
+                if (MAPIFields.SchemaToField.ContainsKey(name))
+                {
+                    name = MAPIFields.SchemaToField[name];
+                }
+
+                headers[i - 1] = name;
+            }
+
             return headers;
         }
 

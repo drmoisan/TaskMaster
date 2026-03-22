@@ -163,6 +163,52 @@ namespace UtilitiesCS.Test.EmailIntelligence
             json.Should().NotContain("Globals");
         }
 
+        [TestMethod]
+        public void IsReadyToUndoMove_WhenOnlyMailItemSet_ReturnsFalse()
+        {
+            // Arrange
+            var info = new MovedMailInfo { MailItem = CreateComProxy<MailItem>() };
+
+            // Act / Assert
+            info.IsReadyToUndoMove.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void IsReadyToUndoMove_WhenOnlyFolderOldSet_ReturnsFalse()
+        {
+            // Arrange
+            var info = new MovedMailInfo { FolderOld = CreateComProxy<Folder>() };
+
+            // Act / Assert
+            info.IsReadyToUndoMove.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void NotNull_WhenAllParametersNonNull_ReturnsTrue()
+        {
+            // Arrange
+            var info = new MovedMailInfo();
+
+            // Act
+            var result = info.NotNull("a", 1, new object());
+
+            // Assert
+            result.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void NotNull_EmptyParams_ReturnsTrue()
+        {
+            // Arrange
+            var info = new MovedMailInfo();
+
+            // Act
+            var result = info.NotNull();
+
+            // Assert
+            result.Should().BeTrue();
+        }
+
         private static T CreateComProxy<T>()
             where T : class
         {

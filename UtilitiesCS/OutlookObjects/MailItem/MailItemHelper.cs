@@ -58,6 +58,7 @@ namespace UtilitiesCS //QuickFiler
 
         public MailItemHelper()
         {
+            InitializeSafeDefaults();
             _attachmentsInfo = new(() => AttachmentsHelper.Select(x => x.AttachmentInfo).ToArray());
         }
 
@@ -142,6 +143,43 @@ namespace UtilitiesCS //QuickFiler
                 AttachmentsHelper?.Select(x => x.AttachmentInfo)?.ToArray()
             );
             _internetCodepage = new(() => _item.InternetCodepage, true);
+        }
+
+        private void InitializeSafeDefaults()
+        {
+            _actionable = string.Empty.ToLazy();
+            _body = string.Empty.ToLazy();
+            _categories = string.Empty.ToLazy();
+            _conversationID = string.Empty.ToLazy();
+            _emailPrefixToStrip = string.Empty.ToLazy();
+            _entryId = string.Empty.ToLazy();
+            _globals = new Lazy<IApplicationGlobals>(() => null, true);
+            _storeId = string.Empty.ToLazy();
+            _folderInfo = new Lazy<IFolderWrapper>(() => null, true);
+            _folderName = string.Empty.ToLazy();
+            _sentOn = string.Empty.ToLazy();
+            _subject = string.Empty.ToLazy();
+            _senderHtml = string.Empty.ToLazy();
+            _senderName = string.Empty.ToLazy();
+            _sender = new Lazy<IRecipientInfo>(() => null, true);
+            _size = 0.ToLazyValue();
+            _olRecipients = Array.Empty<Recipient>().ToLazyTry();
+            _ccRecipientsHtml = string.Empty.ToLazy();
+            _ccRecipientsName = string.Empty.ToLazy();
+            _ccRecipients = Array.Empty<IRecipientInfo>().ToLazy();
+            _toRecipientsHtml = string.Empty.ToLazy();
+            _toRecipientsName = string.Empty.ToLazy();
+            _toRecipients = Array.Empty<IRecipientInfo>().ToLazy();
+            _triage = string.Empty.ToLazy();
+            _html = string.Empty.ToLazy();
+            _htmlBody = string.Empty.ToLazy();
+            _sentDate = DateTime.MinValue.ToLazyValue();
+            _attachmentsHelper = Array.Empty<AttachmentHelper>().ToLazy();
+            _attachmentsInfo = Array.Empty<IAttachment>().ToLazy();
+            _tokens = Array.Empty<string>().ToLazy();
+            _unread = false.ToLazyValue();
+            _internetCodepage = 0.ToLazyValue();
+            _isTaskFlagSet = false.ToLazyValue();
         }
 
         public MailItemHelper(DataFrame df, long indexRow, string emailPrefixToStrip)
@@ -438,35 +476,35 @@ namespace UtilitiesCS //QuickFiler
         private Lazy<string> _actionable;
         public string Actionable
         {
-            get => _actionable?.Value;
+            get => _actionable?.Value ?? string.Empty;
             set => _actionable = value.ToLazy();
         }
 
         private Lazy<string> _body;
         public string Body
         {
-            get => _body?.Value;
+            get => _body?.Value ?? string.Empty;
             set => _body = value.ToLazy();
         }
 
         private Lazy<string> _categories;
         public string Categories
         {
-            get => _categories?.Value;
+            get => _categories?.Value ?? string.Empty;
             set => _categories = value.ToLazy();
         }
 
         private Lazy<string> _conversationID;
         public string ConversationID
         {
-            get => _conversationID?.Value;
+            get => _conversationID?.Value ?? string.Empty;
             set => _conversationID = value.ToLazy();
         }
 
         private Lazy<string> _emailPrefixToStrip;
         public string EmailPrefixToStrip
         {
-            get => _emailPrefixToStrip?.Value;
+            get => _emailPrefixToStrip?.Value ?? string.Empty;
             internal set => _emailPrefixToStrip = value.ToLazy();
         }
 
@@ -477,7 +515,7 @@ namespace UtilitiesCS //QuickFiler
         private Lazy<string> _entryId;
         public string EntryId
         {
-            get => _entryId.Value;
+            get => _entryId?.Value ?? string.Empty;
             set => _entryId = value.ToLazy();
         }
 
@@ -493,7 +531,7 @@ namespace UtilitiesCS //QuickFiler
         private Lazy<string> _storeId;
         public string StoreId
         {
-            get => _storeId.Value;
+            get => _storeId?.Value ?? string.Empty;
             set => _storeId = value.ToLazy();
         }
 
@@ -507,7 +545,7 @@ namespace UtilitiesCS //QuickFiler
         private Lazy<string> _folderName;
         public string FolderName
         {
-            get => _folderName?.Value;
+            get => _folderName?.Value ?? string.Empty;
             set => _folderName = value.ToLazy();
         }
 
@@ -532,56 +570,56 @@ namespace UtilitiesCS //QuickFiler
         private Lazy<string> _sentOn;
         public virtual string SentOn
         {
-            get => _sentOn?.Value;
+            get => _sentOn?.Value ?? string.Empty;
             set => _sentOn = value.ToLazy();
         }
 
         private Lazy<string> _subject;
         public virtual string Subject
         {
-            get => _subject?.Value;
+            get => _subject?.Value ?? string.Empty;
             set => _subject = value.ToLazy();
         }
 
         private Lazy<string> _senderHtml;
         public virtual string SenderHtml
         {
-            get => _senderHtml?.Value;
+            get => _senderHtml?.Value ?? string.Empty;
             set => _senderHtml = value.ToLazy();
         }
 
         private Lazy<string> _senderName;
         public virtual string SenderName
         {
-            get => _senderName?.Value;
+            get => _senderName?.Value ?? string.Empty;
             set => _senderName = value.ToLazy();
         }
 
         private Lazy<IRecipientInfo> _sender;
         public virtual IRecipientInfo Sender
         {
-            get => _sender.Value;
+            get => _sender?.Value;
             set => _sender = value.ToLazy();
         }
 
         private Lazy<int> _size;
         public virtual int Size
         {
-            get => _size.Value;
+            get => _size?.Value ?? 0;
             set => _size = value.ToLazyValue();
         }
 
         private LazyTry<Recipient[]> _olRecipients;
         internal virtual Recipient[] OlRecipients
         {
-            get => _olRecipients.Value;
+            get => _olRecipients?.Value ?? Array.Empty<Recipient>();
             set => _olRecipients = value.ToLazyTry();
         }
 
         private Lazy<string> _ccRecipientsHtml;
         public virtual string CcRecipientsHtml
         {
-            get => _ccRecipientsHtml.Value;
+            get => _ccRecipientsHtml?.Value ?? string.Empty;
             set
             {
                 _ccRecipientsHtml = value.ToLazy();
@@ -592,7 +630,7 @@ namespace UtilitiesCS //QuickFiler
         private Lazy<string> _ccRecipientsName;
         public virtual string CcRecipientsName
         {
-            get => _ccRecipientsName.Value;
+            get => _ccRecipientsName?.Value ?? string.Empty;
             set
             {
                 _ccRecipientsName = value.ToLazy();
@@ -603,14 +641,14 @@ namespace UtilitiesCS //QuickFiler
         private Lazy<IRecipientInfo[]> _ccRecipients;
         public virtual IRecipientInfo[] CcRecipients
         {
-            get => _ccRecipients.Value;
+            get => _ccRecipients?.Value ?? Array.Empty<IRecipientInfo>();
             protected set => _ccRecipients = value.ToLazy();
         }
 
         private Lazy<string> _toRecipientsHtml;
         public virtual string ToRecipientsHtml
         {
-            get => _toRecipientsHtml.Value;
+            get => _toRecipientsHtml?.Value ?? string.Empty;
             set
             {
                 _toRecipientsHtml = value.ToLazy();
@@ -621,7 +659,7 @@ namespace UtilitiesCS //QuickFiler
         private Lazy<string> _toRecipientsName;
         public virtual string ToRecipientsName
         {
-            get => _toRecipientsName.Value;
+            get => _toRecipientsName?.Value ?? string.Empty;
             set
             {
                 _toRecipientsName = value.ToLazy();
@@ -632,42 +670,42 @@ namespace UtilitiesCS //QuickFiler
         private Lazy<IRecipientInfo[]> _toRecipients;
         public virtual IRecipientInfo[] ToRecipients
         {
-            get => _toRecipients.Value;
+            get => _toRecipients?.Value ?? Array.Empty<IRecipientInfo>();
             protected set => _toRecipients = value.ToLazy();
         }
 
         private Lazy<string> _triage;
         public virtual string Triage
         {
-            get => _triage.Value;
+            get => _triage?.Value ?? string.Empty;
             set => _triage = value.ToLazy();
         }
 
         private Lazy<string> _html = null;
         public virtual string Html
         {
-            get => _html.Value;
+            get => _html?.Value ?? string.Empty;
             private set => _html = value.ToLazy();
         }
 
         private Lazy<string> _htmlBody;
         public virtual string HTMLBody
         {
-            get => _htmlBody.Value;
+            get => _htmlBody?.Value ?? string.Empty;
             protected set => _htmlBody = value.ToLazy();
         }
 
         private Lazy<DateTime> _sentDate;
         public virtual DateTime SentDate
         {
-            get => _sentDate.Value;
+            get => _sentDate?.Value ?? default;
             set => _sentDate = value.ToLazyValue();
         }
 
         private Lazy<AttachmentHelper[]> _attachmentsHelper;
         public virtual AttachmentHelper[] AttachmentsHelper
         {
-            get => _attachmentsHelper.Value;
+            get => _attachmentsHelper?.Value ?? Array.Empty<AttachmentHelper>();
             protected set => _attachmentsHelper = value.ToLazy();
         }
 
@@ -703,7 +741,7 @@ namespace UtilitiesCS //QuickFiler
 
         public string[] Tokens
         {
-            get => _tokens.Value;
+            get => _tokens?.Value ?? Array.Empty<string>();
             protected set => _tokens = value.ToLazy();
         }
         private Lazy<string[]> _tokens;
@@ -725,7 +763,7 @@ namespace UtilitiesCS //QuickFiler
         private Lazy<bool> _unread;
         public bool UnRead
         {
-            get => _unread.Value;
+            get => _unread?.Value ?? false;
             set
             {
                 _unread = value.ToLazyValue();
@@ -736,7 +774,7 @@ namespace UtilitiesCS //QuickFiler
 
         public int InternetCodepage
         {
-            get => _internetCodepage.Value;
+            get => _internetCodepage?.Value ?? 0;
             set => _internetCodepage = value.ToLazyValue();
         }
         private Lazy<int> _internetCodepage;
@@ -749,7 +787,7 @@ namespace UtilitiesCS //QuickFiler
         private Lazy<bool> _isTaskFlagSet;
         public bool IsTaskFlagSet
         {
-            get => _isTaskFlagSet.Value;
+            get => _isTaskFlagSet?.Value ?? false;
             set => _isTaskFlagSet = value.ToLazyValue();
         }
 
@@ -1068,9 +1106,67 @@ img {
                 return false;
             if (source.Length != other.Length)
                 return false;
-            if (source.Intersect(other).Count() != other.Length)
-                return false;
+
+            var matched = new bool[other.Length];
+            foreach (var sourceRecipient in source)
+            {
+                var foundMatch = false;
+                for (var i = 0; i < other.Length; i++)
+                {
+                    if (matched[i])
+                    {
+                        continue;
+                    }
+
+                    if (RecipientInfosMatch(sourceRecipient, other[i]))
+                    {
+                        matched[i] = true;
+                        foundMatch = true;
+                        break;
+                    }
+                }
+
+                if (!foundMatch)
+                {
+                    return false;
+                }
+            }
+
             return true;
+        }
+
+        private static bool RecipientInfosMatch(IRecipientInfo left, IRecipientInfo right)
+        {
+            if (ReferenceEquals(left, right))
+            {
+                return true;
+            }
+
+            if (left is null || right is null)
+            {
+                return false;
+            }
+
+            if (left.Equals(right) || right.Equals(left))
+            {
+                return true;
+            }
+
+            return string.Equals(
+                    left.Name ?? string.Empty,
+                    right.Name ?? string.Empty,
+                    StringComparison.Ordinal
+                )
+                && string.Equals(
+                    left.Address ?? string.Empty,
+                    right.Address ?? string.Empty,
+                    StringComparison.Ordinal
+                )
+                && string.Equals(
+                    left.Html ?? string.Empty,
+                    right.Html ?? string.Empty,
+                    StringComparison.Ordinal
+                );
         }
 
         #endregion IEquatable<ItemInfo> Implementation

@@ -125,6 +125,56 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
+        public void IsReadOnly_ReturnsFalse()
+        {
+            // Arrange
+            var stack = new UtilitiesCS.StackObjectCS<int>();
+
+            // Act / Assert
+            stack.IsReadOnly.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void Constructor_FromEnumerable_InitializesWithItems()
+        {
+            // Arrange / Act
+            var stack = new UtilitiesCS.StackObjectCS<string>(new[] { "a", "b", "c" });
+
+            // Assert
+            stack.Count.Should().Be(3);
+            stack.Peek().Should().Be("a");
+        }
+
+        [TestMethod]
+        public void TryPeek_WhenStackHasItem_ReturnsTrueAndItem()
+        {
+            // Arrange
+            var stack = new UtilitiesCS.StackObjectCS<int>(new[] { 42 });
+
+            // Act
+            var result = stack.TryPeek(out var value);
+
+            // Assert
+            result.Should().BeTrue();
+            value.Should().Be(42);
+        }
+
+        [TestMethod]
+        public void TryPop_WhenStackHasItem_ReturnsTrueAndItem()
+        {
+            // Arrange
+            var stack = new UtilitiesCS.StackObjectCS<int>(new[] { 7 });
+
+            // Act
+            var result = stack.TryPop(out var value);
+
+            // Assert
+            result.Should().BeTrue();
+            value.Should().Be(7);
+            stack.Count.Should().Be(0);
+        }
+
+        [TestMethod]
         public void ToArrayToListAndCopyTo_SupportNormalAndReversedOrdering()
         {
             // Arrange
@@ -145,6 +195,34 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             reversedList.Should().Equal(1, 2, 3);
             destination.Should().Equal(0, 3, 2, 1, 0);
             stack.Should().Equal(3, 2, 1);
+        }
+
+        [TestMethod]
+        public void IndexedTryHelpersAndExplicitFalseReverse_CoverRemainingBranches()
+        {
+            // Arrange
+            var stack = new UtilitiesCS.StackObjectCS<int>(new[] { 3, 2, 1 });
+            var empty = new UtilitiesCS.StackObjectCS<int>();
+
+            // Act
+            var tryPeekSucceeded = stack.TryPeek(out var indexedPeekValue, 1);
+            var tryPopSucceeded = stack.TryPop(out var indexedPopValue, 2);
+            var tryPeekFailed = empty.TryPeek(out var emptyPeekValue, 0);
+            var tryPopFailed = empty.TryPop(out var emptyPopValue, 0);
+            var nonReversedArray = stack.ToArray(reverse: false);
+            var nonReversedList = stack.ToList(reverse: false);
+
+            // Assert
+            tryPeekSucceeded.Should().BeTrue();
+            indexedPeekValue.Should().Be(2);
+            tryPopSucceeded.Should().BeTrue();
+            indexedPopValue.Should().Be(1);
+            tryPeekFailed.Should().BeFalse();
+            emptyPeekValue.Should().Be(0);
+            tryPopFailed.Should().BeFalse();
+            emptyPopValue.Should().Be(0);
+            nonReversedArray.Should().Equal(3, 2);
+            nonReversedList.Should().Equal(3, 2);
         }
     }
 }

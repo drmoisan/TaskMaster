@@ -138,7 +138,7 @@ namespace UtilitiesCS.EmailIntelligence
                     ClassifierGroup = await CreateTriageClassifiersAsync(ClassNames, cancel);
                     if (
                         (await Globals.AF.Manager.Configuration).TryGetValue(
-                            $"Config{GroupName}",
+                            GroupName,
                             out var loader
                         )
                     )
@@ -166,7 +166,7 @@ namespace UtilitiesCS.EmailIntelligence
                         ClassifierGroup = await CreateTriageClassifiersAsync(ClassNames, cancel);
                         if (
                             (await Globals.AF.Manager.Configuration).TryGetValue(
-                                $"Config{GroupName}",
+                                GroupName,
                                 out loader
                             )
                         )
@@ -253,7 +253,7 @@ namespace UtilitiesCS.EmailIntelligence
             IApplicationGlobals globals
         )
         {
-            var triage = await CreateAsync(globals);
+            var triage = await CreateAsync(globals, treatment: Enums.NotFoundEnum.Create);
             return triage;
         }
 
@@ -288,10 +288,10 @@ namespace UtilitiesCS.EmailIntelligence
             await Task.Run(
                 async () =>
                 {
-                    ClassifierGroup = new BayesianClassifierGroup();
+                    ClassifierGroup = CreateClassifier();
                     if (
                         (await Globals.AF.Manager.Configuration).TryGetValue(
-                            $"Config{GroupName}",
+                            GroupName,
                             out var loader
                         )
                     )

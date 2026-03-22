@@ -35,7 +35,7 @@ namespace UtilitiesCS.Test.OutlookObjects.RecipientCoverage
             recipient.Html.Should().Be("<span>Grace</span>");
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("Ada", "ada@example.com", "Ada", "ada@example.com")]
         [DataRow(null, "ada@example.com", null, "ada@example.com")]
         [DataRow("Ada", null, "Ada", null)]

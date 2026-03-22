@@ -67,5 +67,120 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             json.Should().Contain("one");
             json.Should().Contain("two");
         }
+
+        [TestMethod]
+        public void Config_IsNotNull()
+        {
+            // Arrange
+            var dictionary = new ScoDictionaryNew<string, int>();
+
+            // Act & Assert
+            dictionary.Config.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void Name_SetAndGet_Works()
+        {
+            // Arrange
+            var dictionary = new ScoDictionaryNew<string, int>();
+
+            // Act
+            dictionary.Name = "test";
+
+            // Assert
+            dictionary.Name.Should().Be("test");
+        }
+
+        [TestMethod]
+        public void Constructor_WithCollection_InitializesFromPairs()
+        {
+            // Arrange
+            var pairs = new[]
+            {
+                new System.Collections.Generic.KeyValuePair<string, int>("a", 1),
+                new System.Collections.Generic.KeyValuePair<string, int>("b", 2),
+            };
+
+            // Act
+            var dictionary = new ScoDictionaryNew<string, int>(pairs);
+
+            // Assert
+            dictionary.Should().ContainKey("a").WhoseValue.Should().Be(1);
+            dictionary.Should().ContainKey("b").WhoseValue.Should().Be(2);
+        }
+
+        [TestMethod]
+        public void Constructor_WithComparer_UsesCustomComparer()
+        {
+            // Arrange & Act
+            var dictionary = new ScoDictionaryNew<string, int>(
+                System.StringComparer.OrdinalIgnoreCase
+            );
+            dictionary["Key"] = 1;
+
+            // Assert
+            dictionary.TryGetValue("key", out var value).Should().BeTrue();
+            value.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void Serialize_WithNoPath_IsNoOp()
+        {
+            // Arrange
+            var dictionary = new ScoDictionaryNew<string, int>();
+            dictionary["key"] = 42;
+
+            // Act
+            dictionary.Serialize();
+
+            // Assert
+            dictionary.Count.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void JsonRoundTrip_PreservesEntries()
+        {
+            // Arrange
+            var original = new ScoDictionaryNew<string, int>();
+            original["a"] = 1;
+            original["b"] = 2;
+            var settings = new Newtonsoft.Json.JsonSerializerSettings
+            {
+                Formatting = Newtonsoft.Json.Formatting.Indented,
+                TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto,
+            };
+
+            // Act
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(original, settings);
+            var restored = Newtonsoft.Json.JsonConvert.DeserializeObject<
+                ScoDictionaryNew<string, int>
+            >(json, settings);
+
+            // Assert
+            restored.Should().NotBeNull();
+            restored.Should().ContainKey("a").WhoseValue.Should().Be(1);
+            restored.Should().ContainKey("b").WhoseValue.Should().Be(2);
+        }
+
+        [TestMethod]
+        public void ContainsKey_ExistingKey_ReturnsTrue()
+        {
+            // Arrange
+            var dictionary = new ScoDictionaryNew<string, int>();
+            dictionary["key"] = 1;
+
+            // Act & Assert
+            dictionary.ContainsKey("key").Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void ContainsKey_MissingKey_ReturnsFalse()
+        {
+            // Arrange
+            var dictionary = new ScoDictionaryNew<string, int>();
+
+            // Act & Assert
+            dictionary.ContainsKey("missing").Should().BeFalse();
+        }
     }
 }

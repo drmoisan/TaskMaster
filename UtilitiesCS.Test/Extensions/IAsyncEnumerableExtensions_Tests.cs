@@ -87,6 +87,123 @@ namespace UtilitiesCS.Test.Extensions
             result.Should().ContainKey('b').WhoseValue.Should().Be(5);
         }
 
+        [TestMethod]
+        public async Task ToSortedListAsync_WithComparer_SortsInDescendingOrder()
+        {
+            // Arrange
+            var source = GetValuesAsync("alpha", "charlie", "bravo");
+            var reverseComparer = Comparer<string>.Create(
+                (a, b) => string.Compare(b, a, StringComparison.Ordinal)
+            );
+
+            // Act
+            var result = await source.ToSortedListAsync(v => v, reverseComparer);
+
+            // Assert
+            result.Keys.Should().Equal("charlie", "bravo", "alpha");
+        }
+
+        [TestMethod]
+        public async Task ToSortedListAsync_WithElementSelector_TransformsValues()
+        {
+            // Arrange
+            var source = GetValuesAsync("ab", "cde");
+
+            // Act
+            var result = await source.ToSortedListAsync(v => v, v => v.Length, comparer: null);
+
+            // Assert
+            result["ab"].Should().Be(2);
+            result["cde"].Should().Be(3);
+        }
+
+        [TestMethod]
+        public void ToSortedListAsync_WhenSourceIsNull_ThrowsArgumentNullException()
+        {
+            // Arrange
+            IAsyncEnumerable<string> source = null;
+
+            // Act
+            Func<Task> act = async () => await source.ToSortedListAsync(v => v);
+
+            // Assert
+            act.Should().ThrowAsync<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void ToSortedListAsync_WhenKeySelectorIsNull_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var source = GetValuesAsync("a");
+
+            // Act
+            Func<Task> act = async () => await source.ToSortedListAsync<string, string>(null);
+
+            // Assert
+            act.Should().ThrowAsync<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public async Task ToConcurrentDictionaryAsync_FromKeyValuePairs_CreatesDictionary()
+        {
+            // Arrange
+            var source = GetKvpAsync(
+                new KeyValuePair<string, int>("a", 1),
+                new KeyValuePair<string, int>("b", 2)
+            );
+
+            // Act
+            var result = await source.ToConcurrentDictionaryAsync();
+
+            // Assert
+            result.Should().ContainKey("a").WhoseValue.Should().Be(1);
+            result.Should().ContainKey("b").WhoseValue.Should().Be(2);
+        }
+
+        [TestMethod]
+        public async Task ToConcurrentDictionaryAsync_WithComparer_UsesCaseInsensitivity()
+        {
+            // Arrange
+            var source = GetValuesAsync("Alpha", "Beta");
+
+            // Act
+            var result = await IAsyncEnumerableExtensions.ToConcurrentDictionaryAsync(
+                source,
+                v => v,
+                v => v.Length,
+                StringComparer.OrdinalIgnoreCase,
+                default
+            );
+
+            // Assert
+            result.Should().ContainKey("alpha").WhoseValue.Should().Be(5);
+        }
+
+        [TestMethod]
+        public async Task Zip_BothEmpty_ReturnsEmptySequence()
+        {
+            // Arrange
+            var first = GetValuesAsync<int>();
+            var second = GetValuesAsync<string>();
+
+            // Act
+            var result = await IAsyncEnumerableExtensions.Zip(first, second).ToListAsync();
+
+            // Assert
+            result.Should().BeEmpty();
+        }
+
+        private static async IAsyncEnumerable<KeyValuePair<TKey, TValue>> GetKvpAsync<TKey, TValue>(
+            params KeyValuePair<TKey, TValue>[] items
+        )
+        {
+            foreach (var item in items)
+            {
+                await Task.Yield();
+                yield return item;
+            }
+        }
+
         private static async IAsyncEnumerable<T> GetValuesAsync<T>(params T[] values)
         {
             foreach (T value in values)

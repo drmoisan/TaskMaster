@@ -131,6 +131,9 @@ namespace UtilitiesCS.Test.HelperClasses
             public IContract Contract { get; set; }
         }
 
+        // These backing fields are intentionally present only so reflection-based tests can
+        // verify field discovery across inheritance boundaries.
+#pragma warning disable CS0169, CS0649
         private class BaseFieldContainer
         {
             public static readonly string StaticField = nameof(StaticField);
@@ -151,5 +154,6 @@ namespace UtilitiesCS.Test.HelperClasses
         {
             public int MostDerivedField;
         }
+#pragma warning restore CS0169, CS0649
     }
 }
