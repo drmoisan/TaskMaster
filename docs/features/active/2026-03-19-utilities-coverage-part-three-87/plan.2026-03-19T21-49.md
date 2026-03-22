@@ -138,13 +138,13 @@ Raise every production .cs file compiled by UtilitiesCS.csproj to >= 80% line co
 - [x] [P2-T12] Create tests for Bayesian performance measurement: `BayesianPerformanceMeasurement.cs` (0%), `BayesianSerializationHelper.cs` (0%)
   - Acceptance: Test classes exist; coverage report shows both files at >= 80% line rate
 
-- [ ] [P2-T13] Extend tests for OutlookItem core using Moq COM mocking: `OutlookItem.cs` (54.5%), `OutlookItemExtensions.cs` (44.9%), `OlItemPseudoInterface.cs` (55.4%)
+- [x] [P2-T13] Extend tests for OutlookItem core using Moq COM mocking: `OutlookItem.cs` (54.5%), `OutlookItemExtensions.cs` (44.9%), `OlItemPseudoInterface.cs` (55.4%)
   - Acceptance: Coverage report shows all three files at >= 80% line rate
 
-- [ ] [P2-T14] Extend tests for OutlookItem try-patterns: `OutlookItemTry.cs` (35.5%), `OutlookItemTryGet.cs` (21.6%), `OutlookItemFlaggable.cs` (58.2%), `OutlookItemFlaggableTry.cs` (51%)
+- [x] [P2-T14] Extend tests for OutlookItem try-patterns: `OutlookItemTry.cs` (35.5%), `OutlookItemTryGet.cs` (21.6%), `OutlookItemFlaggable.cs` (58.2%), `OutlookItemFlaggableTry.cs` (51%)
   - Acceptance: Coverage report shows all four files at >= 80% line rate
 
-- [ ] [P2-T15] Extend tests for OutlookObjects helpers: `AttachmentHelper.cs` (69.9%), `AttachmentSerializable.cs` (54.7%), `CreateCategory.cs` (65.5%), `RecipientStatic.cs` (46.7%), `UserDefinedFields.cs` (26%), `StoreWrapper.cs` (71.7%)
+- [x] [P2-T15] Extend tests for OutlookObjects helpers: `AttachmentHelper.cs` (69.9%), `AttachmentSerializable.cs` (54.7%), `CreateCategory.cs` (65.5%), `RecipientStatic.cs` (46.7%), `UserDefinedFields.cs` (26%), `StoreWrapper.cs` (71.7%)
   - Acceptance: Coverage report shows all six files at >= 80% line rate
 
 - [x] [P2-T16] Create or extend tests for file system wrappers with mocked I/O: `FileInfoWrapper.cs` (17.8%), `DirectoryInfoWrapper.cs` (20.3%), `FileSystemInfoWrapper.cs` (0%), `FilePathHelper.cs` (18.8%)

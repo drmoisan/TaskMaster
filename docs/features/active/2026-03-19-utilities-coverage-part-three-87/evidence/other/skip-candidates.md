@@ -149,3 +149,55 @@ A complete listing will be provided during P4-T4 execution.
 | File | Rationale |
 |---|---|
 | `WinFormsExtensions.cs` | Extension methods operating on System.Windows.Forms.Control hierarchy (ForAllControls, Clone); all methods require live WinForms Control instances |
+
+## File I/O Heavy — Cannot Reach 80% Under No-Temp-Files Policy
+
+| File | Current Coverage | Rationale |
+|---|---|---|
+| `ScBag.cs` | 24.3% | All remaining uncovered code is in file deserialization/serialization paths (`Deserialize`, `DeserializeJson`, `SerializeThreadSafe`, `RequestSerialization`, `CreateEmpty`, `AskUser`). These require actual filesystem reads/writes or WinForms `MessageBox.Show`. The testable pure-logic portions (constructors, collection operations, properties, JSON settings, disk profile switching) are already fully covered. Max achievable coverage under no-temp-files policy is ~25%. |
+| `SCODictionary.cs` | 14.3% | The `Serialize`, `SerializeAsync`, `SerializeThreadSafe`, `Deserialize` methods all require filesystem I/O. Testable constructors and property setters are covered by existing tests. Max achievable coverage under no-temp-files policy is ~20%. |
+| `CorpusInherit.cs` | 24.6% | Same structure as ScBag: testable constructors (`Id`, `Indicator`, `AddOrIncrementToken`, `AddOrIncrementTokens`, `DecrementOrRemoveToken`) are fully covered by existing tests. All remaining code is in file deserialization paths with `MessageBox`/`MyBox.ShowDialog` calls that require WinForms UI runtime. Max achievable coverage is ~30%. |
+| `AsyncSerialization.cs` | 47.7% | All primary API methods (`ReadTextAsync`, `ReadTextWithProgressAsync`, `WriteTextWithProgressAsync`, `SerializeWithProgressAsync`) operate on real `FileStream` objects. The `ToMbString` and `GetProgressMessage` helpers are covered. The file-read/write methods cannot be tested without actual disk files per policy. |
+
+## WinForms & UI Thread Dependent (P2-T17)
+
+| File | Current Coverage | Rationale |
+|---|---|---|
+| `ProgressTracker.cs` | 54.4% | `Initialize()` creates `ProgressViewer` (WinForms Form) using `UiThread.Dispatcher.Invoke`; requires live STA WinForms dispatcher. `Report(double)` closes `_progressViewer` when root progress reaches 100%; requires live WinForms handle. All remaining uncovered paths depend on WinForms UI runtime. |
+| `ProgressTrackerAsync.cs` | 35% | Same as `ProgressTracker`: async report methods dispatch to `UiThread.Dispatcher.InvokeAsync`; requires live STA WinForms dispatcher and `ProgressViewer` form. |
+| `AsyncMultiTasker.cs` | 8.5% | Main chunker methods require `IItemInfo`-implementing COM objects (Outlook mail items) to call `sw.MergeDurations(((IItemInfo)x).Sw.Durations)` on results; live COM interop required throughout. |
+| `ThreadMonitor.cs` | 0% | Uses `Thread.Suspend()`/`Thread.Resume()` (deprecated since .NET Framework 1.1; throws `PlatformNotSupportedException` under .NET 8+); requires `System.Windows.Threading.Dispatcher.FromThread` which requires WinForms STA thread. No testable paths available. |
+
+## Complex Async with Resource Loading (P2-T18, P3-T13)
+
+| File | Current Coverage | Rationale |
+|---|---|---|
+| `IntelligenceConfig.cs` | 7.3% | Constructor requires `IApplicationGlobals`; `ReadConfigurationAsync` uses `IntelligenceResources.ResourceManager` to load embedded RESX config, constructs `SmartSerializableLoader` instances, and registers `PropertyChanged` handlers. The async chain is deeply coupled to live resource loading and cannot be exercised in isolation. |
+| `SubjectMapEncoder.cs` | 0% | Constructor stores params; `Decoder` property contains `MessageBox.Show` call with `DialogResult`; `RebuildEncoding` calls file serialization. The GUI-dialog dependency makes property testing infeasible. |
+| `SubjectMapSco.cs` | 4.1% | Although constructors are testable, the primary methods (`EncodeAll`, `AddOrUpdate`, and Deedle-dependent methods) require live `SubjectMapEncoder` with file-backed storage. Methods import Deedle `Frame<>` types requiring actual data loading. |
+| `ManagerAsyncLazy.cs` | 49.8% | `Constructor` calls `ResetConfigAsyncLazy()` which initializes an `AsyncLazy<ConcurrentDictionary<...>>` backed by `ReadConfiguration()`; `ReadConfiguration()` loads from `ManagerResources.ResourceManager` and constructs `SmartSerializableLoader` instances. `Loader_PropertyChanged` and `Config_PropertyChanged` async handlers depend on `Globals.Engines` live COM objects. |
+
+## WinForms UI Controls (P2-T22)
+
+| File | Current Coverage | Rationale |
+|---|---|---|
+| `QfcTipsDetails.cs` | 0% | Primary public constructor requires a `System.Windows.Forms.Label` whose `Parent` must be a `TableLayoutPanel` or `Panel`; constructor immediately calls `SetParentProperties` which reads `TableLayoutPanel.GetColumn`, `ColumnStyles`, etc. All subsequent methods use `SynchronizationContext`/`UiThread` to update the label. Zero testable logic without live WinForms form runtime. |
+
+## COM / External Services (P2-T23, P3-T12)
+
+| File | Current Coverage | Rationale |
+|---|---|---|
+| `DfDeedle.cs` | 0% | All methods consume `Outlook.Explorer` COM objects (`GetTableInView()`, `CurrentFolder`, `StoreID`). No pure-logic paths are extractable without live Outlook session. |
+| `SpamBayes.cs` | 0% | Internal stub class: `internal class SpamBayes { }` — zero executable lines; no constructors, properties, or methods to test. |
+
+## System / Shell P/Invoke (P2-T22)
+
+| File | Current Coverage | Rationale |
+|---|---|---|
+| `ShellUtilitiesStatic.cs` | 33.3% | Methods (`Execute`, `GetFileType`, `GetFileIcon`, `GetSmallIcon`) use `ShellExecute`, `SHGetFileInfo`, `DestroyIcon` P/Invoke. `Execute` would launch real processes; `GetFileType`/`GetFileIcon` require live Windows shell for file-type queries. The already-covered paths (static field initialization and delegation chain) represent the maximum safe coverage in a unit-test environment. |
+
+## Registry-Dependent Detection (P2-T21)
+
+| File | Current Coverage | Rationale |
+|---|---|---|
+| `SystemThemeDetector.cs` | 62.5% | Methods read `Registry.CurrentUser`. Covered paths (normal successful read returning int value) are tested. Uncovered paths — `key == null` (registry key absent), `value` not an `int`, and the `catch(Exception)` block — cannot be triggered on a standard Windows 10/11 machine where the `AppsUseLightTheme` key always exists as `REG_DWORD`. Reaching 80% would require mocking `Registry` (not injectable via static API). Max achievable is ~65%. |
