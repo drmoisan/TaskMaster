@@ -277,19 +277,11 @@ verify_formatting_capability() {
   ) || fail "CSharpier is not runnable via 'dotnet tool run csharpier'."
 }
 
-verify_build_and_test_capability() {
-  log "Verifying restore/build/lint/type-check/test capability..."
+is_windows_powershell_host() {
+  pwsh -NoProfile -ExecutionPolicy Bypass -Command "& { if (\$IsWindows) { exit 0 } ; exit 1 }" >/dev/null 2>&1
+}
 
-  command -v pwsh >/dev/null 2>&1 || fail "pwsh is not available after setup."
-  command -v dotnet-coverage >/dev/null 2>&1 || fail "dotnet-coverage is not available after setup."
-  [ -f "${REPO_ROOT}/coverage.config" ] || fail "coverage.config is missing from the repository root."
-
-  pwsh -NoProfile -ExecutionPolicy Bypass -Command "& {
-    if (-not \$IsWindows) {
-      throw 'The VS Code restore/build/test tasks in this repository require Windows because the helper scripts resolve Visual Studio tooling through vswhere.exe.'
-    }
-  }" >/dev/null || fail "This environment cannot satisfy the Windows-only Visual Studio task requirements."
-
+verify_windows_visual_studio_task_capability() {
   pwsh -NoProfile -ExecutionPolicy Bypass -File "${REPO_ROOT}/scripts/vscode/Invoke-VSBuild.ps1" -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -NoExecute >/dev/null || fail "MSBuild tooling required by the restore/build/lint/type-check tasks is unavailable."
 
   pwsh -NoProfile -ExecutionPolicy Bypass -Command "& {
@@ -303,6 +295,21 @@ verify_build_and_test_capability() {
       throw 'vstest.console.exe not found via vswhere. Install Visual Studio Test Platform components.'
     }
   }" >/dev/null || fail "Visual Studio test tooling required by the MSTest tasks is unavailable."
+}
+
+verify_build_and_test_capability() {
+  log "Verifying restore/build/lint/type-check/test capability..."
+
+  command -v pwsh >/dev/null 2>&1 || fail "pwsh is not available after setup."
+  command -v dotnet-coverage >/dev/null 2>&1 || fail "dotnet-coverage is not available after setup."
+  [ -f "${REPO_ROOT}/coverage.config" ] || fail "coverage.config is missing from the repository root."
+
+  if ! is_windows_powershell_host; then
+    warn "Skipping Windows-only Visual Studio task verification because this host is not Windows. Restore/build/test parity still requires Windows plus Visual Studio tooling discoverable via vswhere.exe."
+    return
+  fi
+
+  verify_windows_visual_studio_task_capability
 }
 
 verify_required_task_tooling() {
@@ -322,8 +329,8 @@ Workspace profile detected:
 - Outlook interop and VSTO references across the main add-in and supporting libraries
 
 Codex Web caveat:
-- This script now verifies the exact tooling required by the VS Code tasks and exits non-zero if the environment cannot satisfy them.
-- In Linux-based Codex Web, that verification is expected to fail because the restore/build/test tasks require Windows plus Visual Studio 2022 or Build Tools components discoverable through vswhere.exe.
+- This script verifies general Codex Web prerequisites everywhere, and it verifies the full Visual Studio task chain only on Windows hosts.
+- In Linux-based Codex Web, the script completes with a warning after skipping the Windows-only Visual Studio checks because the restore/build/test tasks require Windows plus Visual Studio 2022 or Build Tools components discoverable through vswhere.exe.
 - Full add-in build/debug parity still requires Windows with Visual Studio 2022, Office/VSTO tooling, and Outlook desktop.
 
 Useful follow-up commands after a successful setup run:
@@ -337,7 +344,7 @@ Useful follow-up commands after a successful setup run:
 - pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug
 
 Note:
-- The repo's existing PowerShell helper scripts under scripts/vscode/ are Windows/Visual Studio oriented by design, so this setup script treats those requirements as mandatory and fails if they are not available.
+- The repo's existing PowerShell helper scripts under scripts/vscode/ are Windows/Visual Studio oriented by design, so Linux-based Codex Web setup can prepare only a partial toolchain.
 EOF
 }
 
