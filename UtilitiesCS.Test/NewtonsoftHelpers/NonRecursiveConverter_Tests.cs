@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -250,6 +251,74 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
             // Assert
             json.Should().Be("null");
+        }
+
+        [TestMethod]
+        public void ReadJson_WhenRecursiveReadOccursOnSameThread_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var converter = new TestConverter();
+            converter.OnReadAction = (reader, type, existing, serializer) =>
+            {
+                using var nestedText = new StringReader("\"nested\"");
+                using var nestedReader = new JsonTextReader(nestedText);
+
+                Action nestedRead = () =>
+                    converter.ReadJson(
+                        nestedReader,
+                        typeof(string),
+                        existingValue: null,
+                        serializer
+                    );
+
+                nestedRead
+                    .Should()
+                    .Throw<InvalidOperationException>()
+                    .WithMessage("*Concurrent read detected*");
+
+                return "outer";
+            };
+
+            var settings = new JsonSerializerSettings();
+            settings.Converters.Add(converter);
+
+            // Act
+            var result = JsonConvert.DeserializeObject<string>("\"value\"", settings);
+
+            // Assert
+            result.Should().Be("outer");
+            converter.CanRead.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void WriteJson_WhenRecursiveWriteOccursOnSameThread_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var converter = new TestConverter();
+            converter.OnWriteAction = (writer, value, serializer) =>
+            {
+                using var nestedText = new StringWriter();
+                using var nestedWriter = new JsonTextWriter(nestedText);
+
+                Action nestedWrite = () => converter.WriteJson(nestedWriter, "nested", serializer);
+
+                nestedWrite
+                    .Should()
+                    .Throw<InvalidOperationException>()
+                    .WithMessage("*Concurrent write detected*");
+
+                serializer.Serialize(writer, value);
+            };
+
+            var settings = new JsonSerializerSettings();
+            settings.Converters.Add(converter);
+
+            // Act
+            var json = JsonConvert.SerializeObject("value", settings);
+
+            // Assert
+            json.Should().Be("\"value\"");
+            converter.CanWrite.Should().BeTrue();
         }
     }
 }

@@ -26,8 +26,215 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
         #region Helper Functions and Classes
 
+        private static SubBayesianClassifier CreateSimpleClassifier(
+            int matchEmailCount = 2,
+            int totalEmailCount = 10
+        )
+        {
+            return new SubBayesianClassifier
+            {
+                Tag = "tag",
+                Match = new SubCorpus(new Dictionary<string, int>()),
+                MatchEmailCount = matchEmailCount,
+                Parent = new SubClassifierGroup
+                {
+                    SharedTokenBase = new SubCorpus(new Dictionary<string, int>()),
+                    TotalEmailCount = totalEmailCount,
+                },
+                Prob = new ConcurrentDictionary<string, double>(),
+            };
+        }
 
         #endregion Helper Functions and Classes
+
+        [TestMethod]
+        public void DefaultConstructor_CreatesInstance()
+        {
+            // Act
+            var classifier = new BayesianClassifierShared();
+
+            // Assert
+            classifier.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void Constructor_WithTag_InitializesProperties()
+        {
+            // Act
+            var classifier = new BayesianClassifierShared("test-tag");
+
+            // Assert
+            classifier.Tag.Should().Be("test-tag");
+            classifier.Match.Should().NotBeNull();
+            classifier.Prob.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void Constructor_WithTagAndParent_SetsParent()
+        {
+            // Arrange
+            var parent = new BayesianClassifierGroup();
+
+            // Act
+            var classifier = new BayesianClassifierShared("tag", parent);
+
+            // Assert
+            classifier.Tag.Should().Be("tag");
+            classifier.Parent.Should().BeSameAs(parent);
+        }
+
+        [TestMethod]
+        public void Tag_GetSet_RoundTrips()
+        {
+            // Arrange
+            var classifier = new BayesianClassifierShared();
+
+            // Act
+            classifier.Tag = "new-tag";
+
+            // Assert
+            classifier.Tag.Should().Be("new-tag");
+        }
+
+        [TestMethod]
+        public void MatchEmailCount_GetSet_RoundTrips()
+        {
+            // Arrange
+            var classifier = new BayesianClassifierShared("tag");
+
+            // Act
+            classifier.MatchEmailCount = 42;
+
+            // Assert
+            classifier.MatchEmailCount.Should().Be(42);
+        }
+
+        [TestMethod]
+        public void FromTokenBase_WithNullParent_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var matches = new Dictionary<string, int> { ["hello"] = 1 };
+
+            // Act
+            Action act = () =>
+                BayesianClassifierShared.FromTokenBase(null, "tag", matches, 1, false);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void FromTokenBase_WithNullTag_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var parent = new BayesianClassifierGroup();
+            var matches = new Dictionary<string, int> { ["hello"] = 1 };
+
+            // Act
+            Action act = () =>
+                BayesianClassifierShared.FromTokenBase(parent, null, matches, 1, false);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void FromTokenBase_WithNullMatches_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var parent = new BayesianClassifierGroup();
+
+            // Act
+            Action act = () =>
+                BayesianClassifierShared.FromTokenBase(parent, "tag", null, 1, false);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void FromTokenBase_WithZeroEmailCount_ThrowsArgumentOutOfRangeException()
+        {
+            // Arrange
+            var parent = new BayesianClassifierGroup();
+            var matches = new Dictionary<string, int> { ["hello"] = 1 };
+
+            // Act
+            Action act = () =>
+                BayesianClassifierShared.FromTokenBase(parent, "tag", matches, 0, false);
+
+            // Assert
+            act.Should().Throw<ArgumentOutOfRangeException>();
+        }
+
+        [TestMethod]
+        public void FromTokenBase_WithValidParams_CreatesClassifier()
+        {
+            // Arrange
+            var parent = new BayesianClassifierGroup();
+            parent.SharedTokenBase.TokenFrequency["hello"] = 5;
+            parent.TotalEmailCount = 6;
+            var matches = new Dictionary<string, int> { ["hello"] = 3 };
+
+            // Act
+            var classifier = BayesianClassifierShared.FromTokenBase(
+                parent,
+                "tag",
+                matches,
+                1,
+                false
+            );
+
+            // Assert
+            classifier.Tag.Should().Be("tag");
+            classifier.MatchEmailCount.Should().Be(1);
+            classifier.Parent.Should().BeSameAs(parent);
+            classifier.Match.TokenFrequency["hello"].Should().Be(3);
+        }
+
+        [TestMethod]
+        public void FromTokenBase_AddToParent_UpdatesSharedTokenBase()
+        {
+            // Arrange
+            var parent = new BayesianClassifierGroup();
+            parent.TotalEmailCount = 4;
+            var matches = new Dictionary<string, int> { ["hello"] = 3 };
+
+            // Act
+            var classifier = BayesianClassifierShared.FromTokenBase(
+                parent,
+                "tag",
+                matches,
+                1,
+                true
+            );
+
+            // Assert
+            parent
+                .SharedTokenBase.TokenFrequency.Should()
+                .Contain(new KeyValuePair<string, int>("hello", 3));
+            classifier.Prob.Should().ContainKey("hello");
+        }
+
+        [TestMethod]
+        public void Train_AddTokensToClassifier_UpdatesMatchCount()
+        {
+            // Arrange
+            var parent = new BayesianClassifierGroup();
+            var classifier = new BayesianClassifierShared("tag", parent);
+            classifier.MatchEmailCount = 1;
+            parent.TotalEmailCount = 2;
+            var tokens = new Dictionary<string, int> { ["word"] = 2 };
+
+            // Act
+            classifier.Train(tokens, 1);
+
+            // Assert
+            classifier.MatchEmailCount.Should().Be(2);
+            classifier
+                .Match.TokenFrequency.Should()
+                .Contain(new KeyValuePair<string, int>("word", 2));
+        }
 
         [TestMethod]
         public void GetMatchProbability_StateUnderTest_ExpectedBehavior()
@@ -624,6 +831,410 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Assert
             await act.Should().ThrowAsync<ArgumentOutOfRangeException>();
+        }
+
+        [TestMethod]
+        public void TrainMultiTag_UpdatesMatchCountsWithoutChangingSharedTokenBase()
+        {
+            // Arrange
+            var classifier = CreateSimpleClassifier();
+            classifier.Match.TokenFrequency["existing"] = 2;
+            classifier.Parent.SharedTokenBase.TokenFrequency["existing"] = 5;
+            classifier.Parent.SharedTokenBase.TokenFrequency["shared-only"] = 3;
+
+            // Act
+            classifier.TrainMultiTag(new Dictionary<string, int> { ["existing"] = 1 }, 2);
+
+            // Assert
+            classifier.MatchEmailCount.Should().Be(4);
+            classifier.Match.TokenFrequency["existing"].Should().Be(3);
+            classifier.Parent.SharedTokenBase.TokenFrequency["existing"].Should().Be(5);
+            classifier.Prob.Should().ContainKey("existing");
+        }
+
+        [TestMethod]
+        public void UnTrainMultiTag_RemovesCountsWithoutChangingSharedTokenBase()
+        {
+            // Arrange
+            var classifier = SampleTestSets.GetClassifier3c().Standardize();
+            var originalSharedCount = classifier.Parent.SharedTokenBase.TokenFrequency["token08"];
+
+            // Act
+            classifier.UnTrainMultiTag(
+                new Dictionary<string, int>
+                {
+                    ["token00"] = 1,
+                    ["token08"] = 4,
+                    ["token09"] = 5,
+                    ["token10"] = 11,
+                },
+                1
+            );
+
+            // Assert
+            classifier.MatchEmailCount.Should().Be(7);
+            classifier.Match.TokenFrequency.Should().NotContainKey("token08");
+            classifier
+                .Parent.SharedTokenBase.TokenFrequency["token08"]
+                .Should()
+                .Be(originalSharedCount);
+        }
+
+        [TestMethod]
+        public void UnTrain_ReversesIncrementalTrainingState()
+        {
+            // Arrange
+            var classifier = SampleTestSets.GetClassifier3c().Standardize();
+
+            // Act
+            classifier.UnTrain(
+                new Dictionary<string, int>
+                {
+                    ["token00"] = 1,
+                    ["token08"] = 4,
+                    ["token09"] = 5,
+                    ["token10"] = 11,
+                },
+                1
+            );
+
+            // Assert
+            classifier.MatchEmailCount.Should().Be(7);
+            classifier.Parent.TotalEmailCount.Should().Be(16);
+            classifier
+                .Match.TokenFrequency.Should()
+                .NotContainKeys("token08", "token09", "token10");
+            classifier
+                .Parent.SharedTokenBase.TokenFrequency.Should()
+                .NotContainKeys("token08", "token09", "token10");
+        }
+
+        [TestMethod]
+        public void UpdateProbability_RemovesToken_WhenBelowMinimumInclusion()
+        {
+            // Arrange
+            var classifier = CreateSimpleClassifier();
+            classifier.Prob["low"] = 0.2;
+
+            // Act
+            classifier.UpdateProbability("low", 1, 1);
+
+            // Assert
+            classifier.Prob.Should().NotContainKey("low");
+        }
+
+        [TestMethod]
+        public void UpdateProbability_WithNoNonMatchAndHighMatch_UsesCertainMatchScore()
+        {
+            // Arrange
+            var classifier = CreateSimpleClassifier(matchEmailCount: 20, totalEmailCount: 25);
+
+            // Act
+            classifier.UpdateProbability("certain", classifier.Knobs.CertainMatchCount + 1, 0);
+
+            // Assert
+            classifier.Prob["certain"].Should().Be(classifier.Knobs.CertainMatchScore);
+        }
+
+        [TestMethod]
+        public void UpdateProbability_WithNoNonMatchAndLowMatch_UsesLikelyMatchScore()
+        {
+            // Arrange
+            var classifier = CreateSimpleClassifier(matchEmailCount: 20, totalEmailCount: 25);
+
+            // Act
+            classifier.UpdateProbability("likely", classifier.Knobs.MinCountForInclusion, 0);
+
+            // Assert
+            classifier.Prob["likely"].Should().Be(classifier.Knobs.LikelyMatchScore);
+        }
+
+        [TestMethod]
+        public void UpdateProbability_WithBothCounts_StoresBoundedProbability()
+        {
+            // Arrange
+            var classifier = CreateSimpleClassifier(matchEmailCount: 4, totalEmailCount: 10);
+
+            // Act
+            classifier.UpdateProbability("mixed", 4, 2);
+
+            // Assert
+            classifier.Prob["mixed"].Should().BeGreaterThan(classifier.Knobs.MinScore);
+            classifier.Prob["mixed"].Should().BeLessThanOrEqualTo(classifier.Knobs.MaxScore);
+        }
+
+        [TestMethod]
+        public void UpdateProbabilitySb_RemovesToken_WhenMatchCountIsZero()
+        {
+            // Arrange
+            var classifier = CreateSimpleClassifier();
+            classifier.Prob["gone"] = 0.3;
+
+            // Act
+            classifier.UpdateProbabilitySb("gone", 0, 3);
+
+            // Assert
+            classifier.Prob.Should().NotContainKey("gone");
+        }
+
+        [TestMethod]
+        public void UpdateProbabilitySb_WithWordInfo_ReturnsProbabilityBetweenZeroAndOne()
+        {
+            // Arrange
+            var classifier = CreateSimpleClassifier(matchEmailCount: 4, totalEmailCount: 10);
+
+            // Act
+            var probability = classifier.UpdateProbabilitySb(
+                new BayesianClassifierShared.WordInfo(3, 2)
+            );
+
+            // Assert
+            probability.Should().BeGreaterThan(0);
+            probability.Should().BeLessThan(1);
+        }
+
+        [TestMethod]
+        public void UpdateProbabilitySb_WithToken_UsesStoredCounts()
+        {
+            // Arrange
+            var classifier = CreateSimpleClassifier(matchEmailCount: 4, totalEmailCount: 10);
+            classifier.Match.TokenFrequency["token"] = 3;
+            classifier.Parent.SharedTokenBase.TokenFrequency["token"] = 5;
+
+            // Act
+            classifier.UpdateProbabilitySb("token");
+
+            // Assert
+            classifier.Prob.Should().ContainKey("token");
+            classifier.Prob["token"].Should().BeGreaterThan(0);
+        }
+
+        [TestMethod]
+        public void CombineProbabilities_WithNull_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var classifier = SampleTestSets.CreateBayesianClassifier();
+
+            // Act
+            Action act = () => classifier.CombineProbabilities(null);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void GetProbabilityDrivers_ReturnsCombinedProbabilityAndDrivers()
+        {
+            // Arrange
+            var classifier = SampleTestSets.SetupClassifierScenario1A();
+            var input = new Dictionary<string, int>
+            {
+                ["shared1"] = 2,
+                ["dedicated8"] = 1,
+                ["shared4"] = 2,
+                ["shared2"] = 1,
+            };
+
+            // Act
+            var result = classifier.GetProbabilityDrivers(input);
+
+            // Assert
+            result.Probability.Should().BeGreaterThan(0);
+            result.Item2.Should().NotBeEmpty();
+            result.Item2.Select(x => x.Token).Should().Contain("dedicated8");
+        }
+
+        [TestMethod]
+        public async Task GetMatchProbabilityAsync_ReturnsSameAsSynchronousCalculation()
+        {
+            // Arrange
+            var classifier = SampleTestSets.SetupClassifierScenario1A();
+            var input = new Dictionary<string, int> { ["shared1"] = 2, ["dedicated8"] = 1 };
+            var expected = classifier.GetMatchProbability(input);
+
+            // Act
+            var actual = await classifier.GetMatchProbabilityAsync(input, CancellationToken.None);
+
+            // Assert
+            actual.Should().Be(expected);
+        }
+
+        [TestMethod]
+        public void GetMatchProbability_WithEnumerableTokens_ReturnsProbability()
+        {
+            // Arrange
+            var classifier = SampleTestSets.SetupClassifierScenario1A();
+
+            // Act
+            var probability = classifier.GetMatchProbability(
+                new[] { "shared1", "dedicated8", "shared1" }
+            );
+
+            // Assert
+            probability.Should().BeGreaterThan(0);
+            probability.Should().BeLessThan(1);
+        }
+
+        [TestMethod]
+        public void WordInfo_StoresCounts()
+        {
+            // Act
+            var info = new BayesianClassifierShared.WordInfo(3, 4);
+
+            // Assert
+            info.MatchCount.Should().Be(3);
+            info.NotMatchCount.Should().Be(4);
+        }
+
+        [TestMethod]
+        public void WordStream_StoresNameAndWords()
+        {
+            // Act
+            var stream = new BayesianClassifierShared.WordStream("mail", new[] { "a", "b" });
+
+            // Assert
+            stream.Name.Should().Be("mail");
+            stream.Words.Should().Equal("a", "b");
+        }
+
+        [TestMethod]
+        public void Chi2SpamProb_WithNoClues_ReturnsHalfProbability()
+        {
+            // Arrange
+            var classifier = CreateSimpleClassifier();
+
+            // Act
+            var result = classifier.Chi2SpamProb(Array.Empty<string>(), evidence: false);
+
+            // Assert
+            result.Item1.Should().Be(0.5);
+            result.Item2.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void Chi2SpamProb_WithEvidence_ReturnsEvidenceEntries()
+        {
+            // Arrange
+            var classifier = SampleTestSets.SetupClassifierScenario1A();
+
+            // Act
+            var result = classifier.Chi2SpamProb(new[] { "shared1", "dedicated8" }, evidence: true);
+
+            // Assert
+            result.Item1.Should().BeGreaterThan(0);
+            result.Item2.Should().NotBeNull();
+            result.Item2.Select(x => x.word).Should().Contain(new[] { "*H*", "*S*" });
+        }
+
+        [TestMethod]
+        public void Chi2SpamProb_WordStreamAndDictionaryOverloads_ReturnConsistentProbabilities()
+        {
+            // Arrange
+            var classifier = SampleTestSets.SetupClassifierScenario1A();
+            var tokens = new[] { "shared1", "dedicated8" };
+            var wordStream = new BayesianClassifierShared.WordStream("mail", tokens);
+            var tokenFrequency = new Dictionary<string, int>
+            {
+                ["shared1"] = 1,
+                ["dedicated8"] = 1,
+            };
+
+            // Act
+            var streamProbability = classifier.Chi2SpamProb(wordStream);
+            var dictionaryProbability = classifier.Chi2SpamProb(tokenFrequency);
+
+            // Assert
+            streamProbability.Should().Be(dictionaryProbability);
+        }
+
+        [TestMethod]
+        public async Task Chi2SpamProbAsync_ReturnsSameAsSynchronousCalculation()
+        {
+            // Arrange
+            var classifier = SampleTestSets.SetupClassifierScenario1A();
+            var tokens = new[] { "shared1", "dedicated8" };
+            var expected = classifier.chi2_spamprob(tokens);
+
+            // Act
+            var actual = await classifier.Chi2SpamProbAsync(tokens);
+
+            // Assert
+            actual.Should().Be(expected);
+        }
+
+        [TestMethod]
+        public void Chi2Q_ReturnsValueInExpectedRange()
+        {
+            // Arrange
+            var classifier = CreateSimpleClassifier();
+
+            // Act
+            var result = classifier.chi2Q(4, 4);
+
+            // Assert
+            result.Should().BeGreaterThan(0);
+            result.Should().BeLessThanOrEqualTo(1);
+        }
+
+        [TestMethod]
+        public void GetClues_RespectsMinDistanceAndMaximumDiscriminators()
+        {
+            // Arrange
+            var classifier = SampleTestSets.SetupClassifierScenario1A();
+            classifier.Knobs.MinDist = 0.2;
+            classifier.Knobs.MaxDiscriminators = 1;
+
+            // Act
+            var clues = classifier.GetClues(
+                new HashSet<string> { "shared1", "shared2", "dedicated8" }
+            );
+
+            // Assert
+            clues.Should().HaveCount(1);
+        }
+
+        [TestMethod]
+        public void GetWordDistance_WithUnknownWord_UsesUnknownProbability()
+        {
+            // Arrange
+            var classifier = CreateSimpleClassifier();
+
+            // Act
+            var result = classifier.GetWordDistance("unknown");
+
+            // Assert
+            result.prob.Should().Be(classifier.Knobs.UnknownWordProb);
+            result.record.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void GetWordInfo_WithNoCounts_ReturnsNull()
+        {
+            // Arrange
+            var classifier = CreateSimpleClassifier();
+
+            // Act
+            var result = classifier.GetWordInfo("missing");
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void GetWordInfo_WithCounts_ReturnsMatchAndNotMatchCounts()
+        {
+            // Arrange
+            var classifier = CreateSimpleClassifier(matchEmailCount: 4, totalEmailCount: 10);
+            classifier.Match.TokenFrequency["token"] = 3;
+            classifier.Parent.SharedTokenBase.TokenFrequency["token"] = 5;
+
+            // Act
+            var result = classifier.GetWordInfo("token");
+
+            // Assert
+            result.Should().NotBeNull();
+            result.MatchCount.Should().Be(3);
+            result.NotMatchCount.Should().Be(2);
         }
     }
 

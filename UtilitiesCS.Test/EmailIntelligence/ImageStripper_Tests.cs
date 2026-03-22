@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -251,6 +252,90 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         [TestMethod]
+        public void Analyze_WithTesseractAndValidImageAttachment_ReturnsNoTextFoundToken()
+        {
+            // Arrange
+            var stripper = new ImageStripper();
+            var attachment = CreateAttachmentFromBitmap(
+                CreateBitmap(width: 8, height: 8, color: Color.White)
+            );
+
+            // Act
+            var (text, tokens) = stripper.analyze("Tesseract", new List<object> { attachment });
+
+            // Assert
+            text.Should().NotBeNull();
+            tokens.Should().Contain("image-text:no text found");
+        }
+
+        [TestMethod]
+        public void ExtractOcrInfo_WithBitmap_WhenNoTextIsDetected_ReturnsNoTextToken()
+        {
+            // Arrange
+            var stripper = new ImageStripper();
+            using var bitmap = CreateBitmap(width: 8, height: 8, color: Color.White);
+
+            // Act
+            var (text, tokens) = stripper.extract_ocr_info(new List<Bitmap> { bitmap });
+
+            // Assert
+            text.Should().NotBeNull();
+            tokens.Should().Contain("image-text:no text found");
+        }
+
+        [TestMethod]
+        public void GetFrameWithText_WithMultiFrameImage_ReturnsSelectedFrame()
+        {
+            // Arrange
+            var stripper = new ImageStripper();
+            var bytes = CreateMultiFrameTiffBytes();
+            using var stream = new MemoryStream(bytes);
+            using var image = Image.FromStream(stream);
+
+            // Act
+            var frames = stripper.SeperateMultiFrame(image).ToList();
+            try
+            {
+                var selectedFrame = stripper.GetFrameWithText(image);
+
+                // Assert
+                stripper.IsMultiFrameImage(image).Should().BeTrue();
+                frames.Should().HaveCount(2);
+                selectedFrame.Should().NotBeNull();
+                selectedFrame.Width.Should().Be(4);
+                selectedFrame.Height.Should().Be(4);
+            }
+            finally
+            {
+                foreach (var frame in frames)
+                {
+                    frame.Dispose();
+                }
+            }
+        }
+
+        [TestMethod]
+        public void PilDecodeParts_WithMultiFrameAttachment_ReturnsSelectedImage()
+        {
+            // Arrange
+            var stripper = new ImageStripper();
+            var attachment = CreateAttachment(
+                size: 128,
+                data: CreateMultiFrameTiffBytes(),
+                attachmentType: OlAttachmentType.olByValue
+            );
+
+            // Act
+            var (images, tokens) = stripper.PIL_decode_parts(new List<object> { attachment });
+
+            // Assert
+            images.Should().ContainSingle();
+            images[0].Width.Should().Be(4);
+            images[0].Height.Should().Be(4);
+            tokens.Should().BeEmpty();
+        }
+
+        [TestMethod]
         public void PilDecodeParts_WithEmptyAttachmentData_AddsInvalidImageToken()
         {
             // Arrange
@@ -308,6 +393,43 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 bitmap.Save(stream, ImageFormat.Png);
                 return stream.ToArray();
             }
+        }
+
+        private static byte[] CreateMultiFrameTiffBytes()
+        {
+            using var first = CreateBitmap(width: 4, height: 4, color: Color.White);
+            using var firstGraphics = Graphics.FromImage(first);
+            firstGraphics.FillRectangle(Brushes.Black, 0, 0, 4, 4);
+            firstGraphics.FillRectangle(Brushes.White, 0, 0, 4, 1);
+
+            using var second = CreateBitmap(width: 4, height: 4, color: Color.White);
+            using var secondGraphics = Graphics.FromImage(second);
+            secondGraphics.FillRectangle(Brushes.Black, 0, 0, 4, 4);
+            secondGraphics.FillRectangle(Brushes.White, 0, 0, 2, 2);
+
+            var codec = ImageCodecInfo.GetImageEncoders().Single(x => x.MimeType == "image/tiff");
+            using var stream = new MemoryStream();
+            using var encoderParameters = new EncoderParameters(1);
+
+            encoderParameters.Param[0] = new EncoderParameter(
+                Encoder.SaveFlag,
+                (long)EncoderValue.MultiFrame
+            );
+            first.Save(stream, codec, encoderParameters);
+
+            encoderParameters.Param[0] = new EncoderParameter(
+                Encoder.SaveFlag,
+                (long)EncoderValue.FrameDimensionPage
+            );
+            first.SaveAdd(second, encoderParameters);
+
+            encoderParameters.Param[0] = new EncoderParameter(
+                Encoder.SaveFlag,
+                (long)EncoderValue.Flush
+            );
+            first.SaveAdd(encoderParameters);
+
+            return stream.ToArray();
         }
     }
 }

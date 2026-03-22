@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.ReusableTypeClasses;
@@ -11,6 +14,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
     [TestClass]
     public class ScoSortedDictionary_Tests
     {
+        private static readonly string RepoRoot = Path.GetFullPath(
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..")
+        );
+
         [TestMethod]
         public void DefaultConstructor_StartsEmpty()
         {
@@ -220,6 +227,225 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             // Assert
             dict.Count.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void Serialize_WithExplicitPath_UpdatesFilePathAndQueuesTimer()
+        {
+            // Arrange
+            var dictionary = new ScoSortedDictionary<string, int>();
+            var invalidPath = CreateInvalidFilePath();
+
+            // Act
+            dictionary.Serialize(invalidPath);
+
+            // Assert
+            dictionary.FilePath.Should().Be(invalidPath);
+            StopPendingTimer(dictionary);
+        }
+
+        [TestMethod]
+        public void SerializeThreadSafe_WithInvalidPath_IsSwallowedByProductionErrorHandling()
+        {
+            // Arrange
+            var dictionary = new ScoSortedDictionary<string, int>();
+            dictionary["key"] = 1;
+
+            // Act
+            Action act = () => dictionary.SerializeThreadSafe(CreateInvalidFilePath());
+
+            // Assert
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void Deserialize_WithoutConfiguredPath_DoesNothing()
+        {
+            // Arrange
+            var dictionary = new ScoSortedDictionary<string, int>();
+            dictionary["key"] = 3;
+
+            // Act
+            Action act = () =>
+            {
+                dictionary.Deserialize();
+                dictionary.Deserialize(askUserOnError: false);
+            };
+
+            // Assert
+            act.Should().NotThrow();
+            dictionary.Should().ContainKey("key").WhoseValue.Should().Be(3);
+        }
+
+        [TestMethod]
+        public void Deserialize_WithInvalidPathAndPromptDisabled_CreatesEmptyDictionary()
+        {
+            // Arrange
+            var dictionary = new ScoSortedDictionary<string, int>();
+
+            // Act
+            dictionary.Deserialize(
+                "*invalid-sorted-dictionary.json",
+                RepoRoot,
+                askUserOnError: false
+            );
+
+            // Assert
+            dictionary.Should().BeEmpty();
+            dictionary
+                .FilePath.Should()
+                .Be(Path.Combine(RepoRoot, "*invalid-sorted-dictionary.json"));
+        }
+
+        [TestMethod]
+        public void Constructor_WithInvalidPath_AndDefaultPromptBehavior_ThrowsArgumentNullException()
+        {
+            using var overridePrompt = OverrideScoSortedDictionaryField<string, int>(
+                "_showMessageBox",
+                new Func<string, string, DialogResult>((_, _) => DialogResult.No)
+            );
+
+            // Act
+            Action act = () =>
+                _ = new ScoSortedDictionary<string, int>("*invalid-constructor.json", RepoRoot);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void AskUser_WhenPromptDisabled_ReturnsYes()
+        {
+            // Arrange
+            var dictionary = new ScoSortedDictionary<string, int>();
+
+            // Act
+            var response = InvokeNonPublic<DialogResult>(dictionary, "AskUser", false, "ignored");
+
+            // Assert
+            response.Should().Be(DialogResult.Yes);
+        }
+
+        [TestMethod]
+        public void CreateEmpty_WhenResponseYes_ReturnsEmptyDictionaryAndConfiguresPath()
+        {
+            // Arrange
+            var dictionary = new ScoSortedDictionary<string, int>();
+            var disk = new FilePathHelper("*empty-sorted-dictionary.json", RepoRoot);
+
+            // Act
+            var created = InvokeNonPublic<ScoSortedDictionary<string, int>>(
+                dictionary,
+                "CreateEmpty",
+                DialogResult.Yes,
+                disk
+            );
+
+            // Assert
+            created.Should().BeEmpty();
+            created.FilePath.Should().Be(disk.FilePath);
+            StopPendingTimer(created);
+        }
+
+        [TestMethod]
+        public void CreateEmpty_WhenResponseNo_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var dictionary = new ScoSortedDictionary<string, int>();
+            var disk = new FilePathHelper("*empty-sorted-dictionary.json", RepoRoot);
+
+            // Act
+            Action act = () =>
+                InvokeNonPublic<ScoSortedDictionary<string, int>>(
+                    dictionary,
+                    "CreateEmpty",
+                    DialogResult.No,
+                    disk
+                );
+
+            // Assert
+            act.Should()
+                .Throw<TargetInvocationException>()
+                .WithInnerException<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void AskUser_WhenPromptEnabled_UsesInjectedPromptResponse()
+        {
+            // Arrange
+            var dictionary = new ScoSortedDictionary<string, int>();
+            using var overridePrompt = OverrideScoSortedDictionaryField<string, int>(
+                "_showMessageBox",
+                new Func<string, string, DialogResult>((_, _) => DialogResult.No)
+            );
+
+            // Act
+            var response = InvokeNonPublic<DialogResult>(dictionary, "AskUser", true, "ignored");
+
+            // Assert
+            response.Should().Be(DialogResult.No);
+        }
+
+        private static T InvokeNonPublic<T>(object target, string methodName, params object[] args)
+        {
+            var method = target
+                .GetType()
+                .GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
+
+            return (T)method.Invoke(target, args);
+        }
+
+        private static void StopPendingTimer(object target)
+        {
+            var timerField = target
+                .GetType()
+                .GetField("_timer", BindingFlags.Instance | BindingFlags.NonPublic);
+            var timer = timerField?.GetValue(target);
+
+            timer?.GetType().GetMethod("StopTimer")?.Invoke(timer, null);
+            timer?.GetType().GetMethod("Dispose")?.Invoke(timer, null);
+        }
+
+        private static string CreateInvalidFilePath()
+        {
+            return Path.Combine(RepoRoot, "*invalid-sorted-dictionary.json");
+        }
+
+        private static IDisposable OverrideScoSortedDictionaryField<TKey, TValue>(
+            string fieldName,
+            object replacement
+        )
+        {
+            var field = typeof(ScoSortedDictionary<TKey, TValue>).GetField(
+                fieldName,
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
+            var original = field.GetValue(null);
+            field.SetValue(
+                null,
+                replacement is Func<string, string, DialogResult> twoArgPrompt
+                    ? new Func<string, string, MessageBoxButtons, MessageBoxIcon, DialogResult>(
+                        (text, caption, _, _) => twoArgPrompt(text, caption)
+                    )
+                    : replacement
+            );
+
+            return new CallbackDisposable(() => field.SetValue(null, original));
+        }
+
+        private sealed class CallbackDisposable : IDisposable
+        {
+            private readonly Action _callback;
+
+            public CallbackDisposable(Action callback)
+            {
+                _callback = callback;
+            }
+
+            public void Dispose()
+            {
+                _callback();
+            }
         }
     }
 }

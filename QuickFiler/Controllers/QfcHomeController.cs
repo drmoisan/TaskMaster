@@ -522,15 +522,22 @@ namespace QuickFiler.Controllers
                 "Email Time",
                 Globals.Ol.App.Session
             );
-            OlAppointment = (AppointmentItem)OlEmailCalendar.Items.Add();
+            if (OlEmailCalendar is null)
             {
-                OlAppointment.Subject = $"Quick Filed {emailsLoaded} emails";
-                OlAppointment.Start = OlStartTime;
-                OlAppointment.End = OlEndTime;
-                OlAppointment.Categories = "@ Email";
-                OlAppointment.ReminderSet = false;
-                OlAppointment.Sensitivity = OlSensitivity.olPrivate;
-                OlAppointment.Save();
+                OlAppointment = null;
+            }
+            else
+            {
+                OlAppointment = (AppointmentItem)OlEmailCalendar.Items.Add();
+                {
+                    OlAppointment.Subject = $"Quick Filed {emailsLoaded} emails";
+                    OlAppointment.Start = OlStartTime;
+                    OlAppointment.End = OlEndTime;
+                    OlAppointment.Categories = "@ Email";
+                    OlAppointment.ReminderSet = false;
+                    OlAppointment.Sensitivity = OlSensitivity.olPrivate;
+                    OlAppointment.Save();
+                }
             }
         }
 

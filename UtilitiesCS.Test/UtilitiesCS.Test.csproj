@@ -333,6 +333,9 @@
     <Compile Include="Threading\TaskPriority_Tests.cs" />
     <Compile Include="Threading\ThreadSafeFunctions_Tests.cs" />
     <Compile Include="Threading\ThreadSafeSingleShotGuard_Tests.cs" />
+    <Compile Include="Threading\TimeOutTask_AdditionalTests.cs" />
+    <Compile Include="Threading\TimeOutTask_InternalCoverageTests.cs" />
+    <Compile Include="Threading\TimeOutTask_OverloadCoverageTests.cs" />
     <Compile Include="Threading\TimeOutTask_Tests.cs" />
     <Compile Include="Threading\ApplicationIdleTimer_Tests.cs" />
     <Compile Include="Threading\UiThread_Tests.cs" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -249,6 +250,53 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
 
             // Assert
             newType.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void ConvertToNewClassInstance_CopiesAdditionalStateToProjectedType()
+        {
+            // Arrange
+            var derived = new TestDerived();
+            derived.TryAdd("key", 7);
+            var converter =
+                new DerivedCompositionConverter_ConcurrentDictionary<TestDerived, string, int>();
+
+            // Act
+            var projectedInstance = converter.ConvertToNewClassInstance(derived);
+            var projectedType = projectedInstance.GetType();
+            var privateField = projectedType.GetField(
+                "AdditionalField2",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            var publicProperty = projectedType.GetProperty(
+                nameof(TestDerived.AdditionalField3),
+                BindingFlags.Instance | BindingFlags.Public
+            );
+
+            // Assert
+            projectedInstance.Should().NotBeNull();
+            privateField.Should().NotBeNull();
+            privateField!.GetValue(projectedInstance).Should().Be(42);
+            publicProperty.Should().NotBeNull();
+            publicProperty!.GetValue(projectedInstance).Should().Be("Test3");
+        }
+
+        [TestMethod]
+        public void ToComposition_CapturesRemainingObjectProjection()
+        {
+            // Arrange
+            var derived = new TestDerived();
+            derived.TryAdd("key", 11);
+            var converter =
+                new DerivedCompositionConverter_ConcurrentDictionary<TestDerived, string, int>();
+
+            // Act
+            converter.ToComposition(derived);
+
+            // Assert
+            converter.ConcurrentDictionary.Should().BeSameAs(derived);
+            converter.RemainingObject.Should().NotBeNull();
+            converter.RemainingObject!.GetType().Name.Should().Be("TestDerived_WithoutBase");
         }
 
         [TestMethod]

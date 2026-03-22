@@ -49,13 +49,21 @@ namespace UtilitiesCS.ReusableTypeClasses
         #region Serialization
 
         protected FilePathHelper _disk = new FilePathHelper();
+        private static Func<
+            string,
+            string,
+            MessageBoxButtons,
+            MessageBoxIcon,
+            DialogResult
+        > _showMessageBox = (text, caption, buttons, icon) =>
+            MessageBox.Show(text, caption, buttons, icon);
 
         protected DialogResult AskUser(bool askUserOnError, string messageText)
         {
             DialogResult response;
             if (askUserOnError)
             {
-                response = MessageBox.Show(
+                response = _showMessageBox(
                     messageText,
                     "Error",
                     MessageBoxButtons.YesNo,

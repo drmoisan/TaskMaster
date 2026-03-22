@@ -62,6 +62,16 @@ namespace UtilitiesCS
         private IList<T> _innerList;
         private IEnumerable<T> _lazyLoader;
         private string _backupFilepath = "";
+        private static Func<string, StreamWriter> _createTextWriter = File.CreateText;
+        private static Func<string, string> _readAllText = File.ReadAllText;
+        private static Func<
+            string,
+            string,
+            MessageBoxButtons,
+            MessageBoxIcon,
+            DialogResult
+        > _showMessageBox = (text, caption, buttons, icon) =>
+            MessageBox.Show(text, caption, buttons, icon);
 
         internal void ensureList()
         {
@@ -268,7 +278,7 @@ namespace UtilitiesCS
                 try
                 {
                     // Append text to the file
-                    using (StreamWriter sw = File.CreateText(filepath))
+                    using (StreamWriter sw = _createTextWriter(filepath))
                     {
                         var settings = new JsonSerializerSettings();
                         settings.TypeNameHandling = TypeNameHandling.Auto;
@@ -335,14 +345,14 @@ namespace UtilitiesCS
 
             try
             {
-                _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
+                _innerList = JsonConvert.DeserializeObject<List<T>>(_readAllText(filepath));
             }
             catch (FileNotFoundException e)
             {
                 log.Error(e.Message);
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(
+                    response = _showMessageBox(
                         $"{filepath} not found. Load from backup?",
                         "File Not Found",
                         MessageBoxButtons.YesNo,
@@ -359,7 +369,7 @@ namespace UtilitiesCS
                 log.Error(e.Message);
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(
+                    response = _showMessageBox(
                         $"{filepath} encountered a problem. {e.Message} " + " Load from backup?",
                         "Error!",
                         MessageBoxButtons.YesNo,
@@ -394,7 +404,7 @@ namespace UtilitiesCS
                 {
                     if (askUserOnError)
                     {
-                        response = MessageBox.Show(
+                        response = _showMessageBox(
                             "Need a list to continue. " + "Create a new List Or Stop Execution?",
                             "Error",
                             MessageBoxButtons.YesNo,
@@ -433,7 +443,7 @@ namespace UtilitiesCS
                 settings.TypeNameHandling = TypeNameHandling.Auto;
                 settings.Formatting = Formatting.Indented;
                 _innerList = JsonConvert.DeserializeObject<List<T>>(
-                    File.ReadAllText(filepath),
+                    _readAllText(filepath),
                     settings
                 );
                 if (_innerList is null)
@@ -447,7 +457,7 @@ namespace UtilitiesCS
                 log.Error($"File {filepath} does not exist.");
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(
+                    response = _showMessageBox(
                         $"{filepath} not found. Create a new list? Excecution will stop if answer is no.",
                         "File Not Found",
                         MessageBoxButtons.YesNo,
@@ -464,7 +474,7 @@ namespace UtilitiesCS
                 log.Error($"Error! {e.Message}");
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(
+                    response = _showMessageBox(
                         filepath
                             + " encountered a problem. "
                             + e.Message

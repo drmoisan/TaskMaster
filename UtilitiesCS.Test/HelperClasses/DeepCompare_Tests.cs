@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.HelperClasses;
@@ -105,6 +107,70 @@ namespace UtilitiesCS.Test.HelperClasses
 
             // Assert
             act.Should().Throw<InvalidCastException>();
+        }
+
+        [TestMethod]
+        public void DeepDifferences_ComDispatchObjectsWithEqualValues_ThrowsWhenComGetterIsNotImplemented()
+        {
+            // Arrange
+            var first = CreateComObject("WScript.Network");
+            var second = CreateComObject("WScript.Network");
+
+            // Act
+            Action act = () => Deep.DeepDifferences<object>(first, second);
+
+            // Assert
+            act.Should()
+                .Throw<TargetInvocationException>()
+                .WithInnerException<NotImplementedException>();
+        }
+
+        [TestMethod]
+        public void DeepDifferences_ComDispatchObjectsWithDifferentValues_ThrowsWhenComPropertyRequiresIndexParameters()
+        {
+            // Arrange
+            var originalDirectory = Environment.CurrentDirectory;
+            var first = CreateComObject("WScript.Shell");
+            var second = CreateComObject("WScript.Shell");
+
+            var firstDirectory = Path.GetPathRoot(originalDirectory);
+            var secondDirectory = originalDirectory;
+
+            try
+            {
+                SetComProperty(first, "CurrentDirectory", firstDirectory);
+                SetComProperty(second, "CurrentDirectory", secondDirectory);
+
+                // Act
+                Action act = () => Deep.DeepDifferences<object>(first, second);
+
+                // Assert
+                act.Should().Throw<TargetParameterCountException>();
+            }
+            finally
+            {
+                Environment.CurrentDirectory = originalDirectory;
+            }
+        }
+
+        private static object CreateComObject(string progId)
+        {
+            var type = Type.GetTypeFromProgID(progId);
+            type.Should().NotBeNull();
+            return Activator.CreateInstance(type);
+        }
+
+        private static void SetComProperty(object target, string propertyName, object value)
+        {
+            target
+                .GetType()
+                .InvokeMember(
+                    propertyName,
+                    BindingFlags.SetProperty,
+                    binder: null,
+                    target: target,
+                    args: new[] { value }
+                );
         }
 
         private sealed class PlainNode

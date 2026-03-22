@@ -1,3 +1,4 @@
+using System;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -45,6 +46,32 @@ namespace UtilitiesCS.Test.EmailIntelligence
             movedMailInfo.EntryId.Should().Be("entry-id");
             movedMailInfo.StoreId.Should().Be("store-id");
             movedMailInfo.OlRootPath.Should().Be("Mailbox - Root");
+        }
+
+        [TestMethod]
+        public void Constructor_WithBeforeAndAfterMove_PopulatesDerivedFields()
+        {
+            // Arrange
+            var beforeFolder = CreateFolder(@"\\Mailbox - Root\Inbox");
+            var afterFolder = CreateFolder(@"\\Mailbox - Root\Archive");
+            var beforeMove = CreateMailItem("before-id", beforeFolder.Object);
+            var afterMove = CreateMailItem("after-id", afterFolder.Object);
+
+            // Act
+            var movedMailInfo = new MovedMailInfo(
+                beforeMove.Object,
+                afterMove.Object,
+                @"\\Mailbox - Root"
+            );
+
+            // Assert
+            movedMailInfo.OlRootPath.Should().Be(@"\\Mailbox - Root");
+            movedMailInfo.MailItem.Should().BeSameAs(afterMove.Object);
+            movedMailInfo.FolderPathNew.Should().Be("Archive");
+            movedMailInfo.StoreId.Should().Be("store-id");
+            movedMailInfo.EntryId.Should().Be("after-id");
+            movedMailInfo.FolderOld.Should().BeSameAs(beforeFolder.Object);
+            movedMailInfo.FolderPathOld.Should().Be("Inbox");
         }
 
         [TestMethod]
@@ -104,6 +131,83 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         [TestMethod]
+        public void OlAppSetter_WhenAssigned_SetsApplicationAndRootPath()
+        {
+            // Arrange
+            var movedMailInfo = new MovedMailInfo();
+            var application = CreateApplication(@"\\Mailbox - Root");
+
+            // Act
+            movedMailInfo.OlApp = application.Object;
+
+            // Assert
+            movedMailInfo.OlApp.Should().BeSameAs(application.Object);
+            movedMailInfo.OlRootPath.Should().Be(@"\\Mailbox - Root");
+        }
+
+        [TestMethod]
+        public void GlobalsSetter_WhenAssigned_PreservesReference()
+        {
+            // Arrange
+            var movedMailInfo = new MovedMailInfo();
+            var globals = new Mock<IApplicationGlobals>();
+
+            // Act
+            movedMailInfo.Globals = globals.Object;
+
+            // Assert
+            movedMailInfo.Globals.Should().BeSameAs(globals.Object);
+        }
+
+        [TestMethod]
+        public void MailItemGetter_WhenOlAppCanResolveEntryId_LoadsMailItem()
+        {
+            // Arrange
+            var resolvedMail = CreateMailItem(
+                "entry-id",
+                CreateFolder(@"\\Mailbox - Root\Archive").Object
+            );
+            var application = CreateApplication(@"\\Mailbox - Root", resolvedMail.Object);
+            var movedMailInfo = new MovedMailInfo
+            {
+                EntryId = "entry-id",
+                StoreId = "store-id",
+                OlApp = application.Object,
+            };
+
+            // Act
+            var result = movedMailInfo.MailItem;
+
+            // Assert
+            result.Should().BeSameAs(resolvedMail.Object);
+            Mock.Get(application.Object.Session)
+                .Verify(x => x.GetItemFromID("entry-id", "store-id"), Times.Once);
+        }
+
+        [TestMethod]
+        public void MailItemGetter_WhenOutlookLookupThrows_ReturnsNull()
+        {
+            // Arrange
+            var application = CreateApplication(@"\\Mailbox - Root");
+            Mock.Get(application.Object.Session)
+                .Setup(x => x.GetItemFromID("entry-id", "store-id"))
+                .Throws(new InvalidOperationException("lookup failed"));
+
+            var movedMailInfo = new MovedMailInfo
+            {
+                EntryId = "entry-id",
+                StoreId = "store-id",
+                OlApp = application.Object,
+            };
+
+            // Act
+            var result = movedMailInfo.MailItem;
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
         public void IsReadyToUndoMove_WhenMailItemAndFolderOldExist_ReturnsTrue()
         {
             // Arrange
@@ -131,6 +235,80 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Assert
             result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void UndoMove_WhenMoveIsReady_MovesMailBackToOriginalFolder()
+        {
+            // Arrange
+            var folderOld = CreateFolder(@"\\Mailbox - Root\Inbox");
+            var movedMail = CreateComProxy<MailItem>();
+            var mailItem = new Mock<MailItem>();
+            mailItem.Setup(x => x.Move(folderOld.Object)).Returns(movedMail);
+
+            var movedMailInfo = new MovedMailInfo
+            {
+                MailItem = mailItem.Object,
+                FolderOld = folderOld.Object,
+            };
+
+            // Act
+            var result = movedMailInfo.UndoMove();
+
+            // Assert
+            result.Should().BeSameAs(movedMail);
+        }
+
+        [TestMethod]
+        public void UndoMoveMessage_WhenReady_ReturnsFormattedMessage()
+        {
+            // Arrange
+            var sentOn = new DateTime(2026, 3, 22);
+            var mailItem = new Mock<MailItem>();
+            mailItem.SetupGet(x => x.SentOn).Returns(sentOn);
+            mailItem.SetupGet(x => x.Subject).Returns("Quarterly Update");
+
+            var movedMailInfo = new MovedMailInfo
+            {
+                MailItem = mailItem.Object,
+                FolderOld = CreateFolder(@"\\Mailbox - Root\Inbox").Object,
+                FolderPathNew = "Archive",
+                FolderPathOld = "Inbox",
+            };
+
+            // Act
+            var message = movedMailInfo.UndoMoveMessage(null);
+
+            // Assert
+            message
+                .Should()
+                .Be(
+                    "Undo Move of email?"
+                        + Environment.NewLine
+                        + "SentOn: 03/22/2026"
+                        + Environment.NewLine
+                        + "Quarterly Update"
+                        + Environment.NewLine
+                        + "From: Archive"
+                        + Environment.NewLine
+                        + "To: Inbox"
+                );
+        }
+
+        [TestMethod]
+        public void UndoMoveMessage_WhenStillNotReadyAfterAssigningApp_ReturnsNull()
+        {
+            // Arrange
+            var movedMailInfo = new MovedMailInfo();
+            var application = CreateApplication(@"\\Mailbox - Root");
+
+            // Act
+            var message = movedMailInfo.UndoMoveMessage(application.Object);
+
+            // Assert
+            message.Should().BeNull();
+            movedMailInfo.OlApp.Should().BeSameAs(application.Object);
+            movedMailInfo.OlRootPath.Should().Be(@"\\Mailbox - Root");
         }
 
         [TestMethod]
@@ -213,6 +391,43 @@ namespace UtilitiesCS.Test.EmailIntelligence
             where T : class
         {
             return new Mock<T>(MockBehavior.Loose).Object;
+        }
+
+        private static Mock<Folder> CreateFolder(string folderPath, string storeId = "store-id")
+        {
+            var folder = new Mock<Folder>();
+            folder.SetupGet(x => x.FolderPath).Returns(folderPath);
+            folder.SetupGet(x => x.StoreID).Returns(storeId);
+            return folder;
+        }
+
+        private static Mock<MailItem> CreateMailItem(string entryId, Folder parent)
+        {
+            var mailItem = new Mock<MailItem>();
+            mailItem.SetupGet(x => x.Parent).Returns(parent);
+            mailItem.SetupGet(x => x.EntryID).Returns(entryId);
+            return mailItem;
+        }
+
+        private static Mock<Application> CreateApplication(
+            string rootFolderPath,
+            MailItem resolvedMail = null
+        )
+        {
+            var rootFolder = CreateFolder(rootFolderPath);
+            var store = new Mock<Store>();
+            store.Setup(x => x.GetRootFolder()).Returns(rootFolder.Object);
+
+            var session = new Mock<NameSpace>();
+            session.SetupGet(x => x.DefaultStore).Returns(store.Object);
+            session
+                .Setup(x => x.GetItemFromID(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(resolvedMail);
+
+            var application = new Mock<Application>();
+            application.SetupGet(x => x.Session).Returns(session.Object);
+
+            return application;
         }
     }
 }
