@@ -1,6 +1,5 @@
 {
   "permissions": {
-    "defaultMode": "bypassPermissions",
     "allow": [
       "Bash(find *)",
       "Bash(which *)",
@@ -42,13 +41,8 @@
       "Grep",
       "TodoWrite",
       "WebSearch",
-      "WebFetch",
-      "Edit(/.claude/skills/**)",
-      "Edit(/.claude/skills/atomic-executor/**)",
-      "Edit(/.claude/skills/feature-reviewer/**)",
-      "Read(//usr/bin/**)",
-      "Read(//mnt/c/Windows/**)"
+      "WebFetch"
     ],
-    "deny": []
+    "defaultMode": "bypassPermissions"
   }
 }
