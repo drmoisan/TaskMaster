@@ -15,6 +15,11 @@ log() {
   printf '[codex-web-setup] %s\n' "$*"
 }
 
+fail() {
+  printf '[codex-web-setup] error: %s\n' "$*" >&2
+  exit 1
+}
+
 warn() {
   printf '[codex-web-setup] warning: %s\n' "$*" >&2
 }
@@ -168,20 +173,42 @@ install_dotnet_sdk() {
 
 install_dotnet_tools() {
   if ! command -v dotnet >/dev/null 2>&1; then
-    warn "dotnet is unavailable; skipping dotnet tool restore."
-    return
+    fail "dotnet is unavailable; cannot restore the required dotnet tool manifest."
   fi
 
   if [ ! -f "${REPO_ROOT}/dotnet-tools.json" ]; then
-    log "No dotnet tool manifest found at ${REPO_ROOT}/dotnet-tools.json; skipping."
-    return
+    fail "Required dotnet tool manifest not found at ${REPO_ROOT}/dotnet-tools.json."
   fi
 
   log "Restoring repo-local dotnet tools from dotnet-tools.json..."
   (
     cd "${REPO_ROOT}"
-    dotnet tool restore
+    dotnet tool restore --tool-manifest "${REPO_ROOT}/dotnet-tools.json"
   )
+}
+
+install_dotnet_coverage() {
+  if ! command -v dotnet >/dev/null 2>&1; then
+    fail "dotnet is unavailable; cannot install dotnet-coverage."
+  fi
+
+  local dotnet_tools_dir="${HOME}/.dotnet/tools"
+  mkdir -p "${dotnet_tools_dir}"
+
+  export PATH="${dotnet_tools_dir}:${PATH}"
+  append_if_missing "${HOME}/.bashrc" 'export PATH="$HOME/.dotnet/tools:$PATH"'
+
+  if command -v dotnet-coverage >/dev/null 2>&1; then
+    log "dotnet-coverage is already available; skipping."
+    return
+  fi
+
+  log "Installing dotnet-coverage as a global dotnet tool..."
+  if dotnet tool list --global | grep -Eq '^dotnet-coverage\s'; then
+    dotnet tool update --global dotnet-coverage
+  else
+    dotnet tool install --global dotnet-coverage
+  fi
 }
 
 install_actionlint() {
@@ -238,6 +265,51 @@ restore_packages_if_needed() {
   nuget restore "${REPO_ROOT}/TaskMaster.sln" -PackagesDirectory "${REPO_ROOT}/packages"
 }
 
+verify_formatting_capability() {
+  log "Verifying formatting capability..."
+
+  command -v dotnet >/dev/null 2>&1 || fail "dotnet is not available after setup."
+  command -v pwsh >/dev/null 2>&1 || fail "pwsh is not available after setup."
+
+  (
+    cd "${REPO_ROOT}"
+    dotnet tool run csharpier --version >/dev/null
+  ) || fail "CSharpier is not runnable via 'dotnet tool run csharpier'."
+}
+
+verify_build_and_test_capability() {
+  log "Verifying restore/build/lint/type-check/test capability..."
+
+  command -v pwsh >/dev/null 2>&1 || fail "pwsh is not available after setup."
+  command -v dotnet-coverage >/dev/null 2>&1 || fail "dotnet-coverage is not available after setup."
+  [ -f "${REPO_ROOT}/coverage.config" ] || fail "coverage.config is missing from the repository root."
+
+  pwsh -NoProfile -ExecutionPolicy Bypass -Command "& {
+    if (-not \$IsWindows) {
+      throw 'The VS Code restore/build/test tasks in this repository require Windows because the helper scripts resolve Visual Studio tooling through vswhere.exe.'
+    }
+  }" >/dev/null || fail "This environment cannot satisfy the Windows-only Visual Studio task requirements."
+
+  pwsh -NoProfile -ExecutionPolicy Bypass -File "${REPO_ROOT}/scripts/vscode/Invoke-VSBuild.ps1" -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -NoExecute >/dev/null || fail "MSBuild tooling required by the restore/build/lint/type-check tasks is unavailable."
+
+  pwsh -NoProfile -ExecutionPolicy Bypass -Command "& {
+    \$vswherePath = Join-Path \${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+    if (-not (Test-Path \$vswherePath)) {
+      throw 'vswhere.exe was not found. Install Visual Studio 2022 (or Build Tools) with Test Platform components.'
+    }
+
+    \$vstestPath = & \$vswherePath -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
+    if (-not \$vstestPath) {
+      throw 'vstest.console.exe not found via vswhere. Install Visual Studio Test Platform components.'
+    }
+  }" >/dev/null || fail "Visual Studio test tooling required by the MSTest tasks is unavailable."
+}
+
+verify_required_task_tooling() {
+  verify_formatting_capability
+  verify_build_and_test_capability
+}
+
 write_repo_notes() {
   cat <<'EOF'
 
@@ -245,30 +317,27 @@ Workspace profile detected:
 - Legacy Visual Studio solution targeting .NET Framework 4.8.1
 - Repo-pinned .NET SDK via global.json with install path rooted at .dotnet-sdk/
 - Local dotnet tool manifest for CSharpier
+- Global dotnet-coverage installation for MSTest coverage collection
 - Windows-first build/test scripts that rely on VS tools such as vswhere, MSBuild.exe, and vstest.console.exe
 - Outlook interop and VSTO references across the main add-in and supporting libraries
 
 Codex Web caveat:
-- This script reproduces the useful Linux-side editing, restore, and check-only environment.
-- It does not make Outlook, Office PIAs, VSTO runtime, or Visual Studio test/build parity available on Codex Web.
+- This script now verifies the exact tooling required by the VS Code tasks and exits non-zero if the environment cannot satisfy them.
+- In Linux-based Codex Web, that verification is expected to fail because the restore/build/test tasks require Windows plus Visual Studio 2022 or Build Tools components discoverable through vswhere.exe.
 - Full add-in build/debug parity still requires Windows with Visual Studio 2022, Office/VSTO tooling, and Outlook desktop.
 
-Useful follow-up commands in Codex Web:
+Useful follow-up commands after a successful setup run:
 - source ~/.bashrc
 - dotnet --info
-- dotnet tool run csharpier check .
-- nuget restore TaskMaster.sln -PackagesDirectory packages
-- actionlint
-- rg "TODO|FIXME" .
-
-Windows-only commands from repo policy and CI:
+- dotnet tool run csharpier format .
 - pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-Restore.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU"
 - pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU" -EnableNETAnalyzers -EnforceCodeStyleInBuild
 - pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU" -EnableNullable -TreatWarningsAsErrors
 - pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTest.ps1 -SearchRoot . -Configuration Debug
+- pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug
 
 Note:
-- The repo's existing PowerShell helper scripts under scripts/vscode/ are Windows/Visual Studio oriented and generally are not expected to work unchanged in Codex Web.
+- The repo's existing PowerShell helper scripts under scripts/vscode/ are Windows/Visual Studio oriented by design, so this setup script treats those requirements as mandatory and fails if they are not available.
 EOF
 }
 
@@ -292,6 +361,8 @@ main() {
   install_nuget
   install_dotnet_sdk
   install_dotnet_tools
+  install_dotnet_coverage
+  verify_required_task_tooling
   install_actionlint
   restore_packages_if_needed
 
