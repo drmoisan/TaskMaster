@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Newtonsoft.Json;
 using UtilitiesCS.ReusableTypeClasses;
 
@@ -18,6 +18,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         private static readonly string RepoRoot = Path.GetFullPath(
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..")
         );
+        private const string ValidFixtureJson = "[5, 4, 6]";
+        private const string InvalidJson = "not valid json {{ broken";
 
         [TestMethod]
         public void DefaultConstructorAndCoreListOperations_WorkLikeAList()
@@ -253,8 +255,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<string>(new List<string> { "alpha" });
             var invalidPath = CreateInvalidFilePath();
+            var fileSystemMock = CreateFileSystemMock();
 
             // Act
+            using var scope = new SerializableListDependencyScope<string>(fileSystemMock.Object);
             list.Serialize(invalidPath);
 
             // Assert
@@ -266,9 +270,15 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var list = new SerializableList<string>(new List<string> { "alpha" });
+            var invalidPath = CreateInvalidFilePath();
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.CreateText(invalidPath))
+                .Throws(new IOException("simulated create failure"));
 
             // Act
-            Action act = () => list.SerializeThreadSafe(CreateInvalidFilePath());
+            using var scope = new SerializableListDependencyScope<string>(fileSystemMock.Object);
+            Action act = () => list.SerializeThreadSafe(invalidPath);
 
             // Assert
             act.Should().NotThrow();
@@ -280,17 +290,13 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>(new List<int> { 1, 2, 3 });
             using var stream = new MemoryStream();
-            using var overrideWriter = OverrideSerializableListField<int>(
-                "_createTextWriter",
-                new Func<string, StreamWriter>(_ => new StreamWriter(
-                    stream,
-                    Encoding.UTF8,
-                    1024,
-                    leaveOpen: true
-                ))
-            );
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.CreateText("ignored.json"))
+                .Returns(() => new StreamWriter(stream, Encoding.UTF8, 1024, leaveOpen: true));
 
             // Act
+            using var scope = new SerializableListDependencyScope<int>(fileSystemMock.Object);
             list.SerializeThreadSafe("ignored.json");
             stream.Position = 0;
             using var reader = new StreamReader(
@@ -327,8 +333,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<string>(new List<string> { "alpha" });
             var invalidPath = CreateInvalidFilePath();
+            var fileSystemMock = CreateFileSystemMock();
 
             // Act
+            using var scope = new SerializableListDependencyScope<string>(fileSystemMock.Object);
             await list.SerializeAsync(invalidPath);
 
             // Assert
@@ -355,8 +363,17 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>();
             list.Filepath = GetValidFixturePath();
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(GetValidFixturePath()))
+                .Returns(ValidFixtureJson);
+            var promptMock = new Mock<ISerializableListPrompt>(MockBehavior.Strict);
 
             // Act
+            using var scope = new SerializableListDependencyScope<int>(
+                fileSystemMock.Object,
+                promptMock.Object
+            );
             list.Deserialize(askUserOnError: false);
 
             // Assert
@@ -368,13 +385,19 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var list = new SerializableList<int>(new List<int> { 1, 2, 3 });
+            var invalidPath = CreateInvalidFilePath();
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(invalidPath))
+                .Throws(new FileNotFoundException("missing", invalidPath));
 
             // Act
-            list.Deserialize(CreateInvalidFilePath(), askUserOnError: false);
+            using var scope = new SerializableListDependencyScope<int>(fileSystemMock.Object);
+            list.Deserialize(invalidPath, askUserOnError: false);
 
             // Assert
             list.Should().BeEmpty();
-            list.Filepath.Should().Be(CreateInvalidFilePath());
+            list.Filepath.Should().Be(invalidPath);
         }
 
         [TestMethod]
@@ -383,8 +406,13 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>(new List<int> { 1, 2, 3 });
             var missingPath = CreateMissingFilePath();
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(missingPath))
+                .Throws(new FileNotFoundException("missing", missingPath));
 
             // Act
+            using var scope = new SerializableListDependencyScope<int>(fileSystemMock.Object);
             list.Deserialize(missingPath, askUserOnError: false);
 
             // Assert
@@ -398,24 +426,27 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>(new List<int> { 1, 2, 3 });
             var missingPath = CreateMissingFilePath();
-            using var overrideReader = OverrideSerializableListField<int>(
-                "_readAllText",
-                new Func<string, string>(_ =>
-                    throw new FileNotFoundException("missing", missingPath)
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(missingPath))
+                .Throws(new FileNotFoundException("missing", missingPath));
+            var promptMock = new Mock<ISerializableListPrompt>(MockBehavior.Strict);
+            promptMock
+                .Setup(prompt =>
+                    prompt.Show(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<System.Windows.Forms.MessageBoxButtons>(),
+                        It.IsAny<System.Windows.Forms.MessageBoxIcon>()
+                    )
                 )
-            );
-            using var overridePrompt = OverrideSerializableListField<int>(
-                "_showMessageBox",
-                new Func<
-                    string,
-                    string,
-                    System.Windows.Forms.MessageBoxButtons,
-                    System.Windows.Forms.MessageBoxIcon,
-                    System.Windows.Forms.DialogResult
-                >((_, _, _, _) => System.Windows.Forms.DialogResult.No)
-            );
+                .Returns(System.Windows.Forms.DialogResult.No);
 
             // Act
+            using var scope = new SerializableListDependencyScope<int>(
+                fileSystemMock.Object,
+                promptMock.Object
+            );
             Action act = () => list.Deserialize(missingPath, askUserOnError: true);
 
             // Assert
@@ -430,24 +461,27 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>(Enumerable.Empty<int>());
             var missingPath = CreateMissingFilePath();
-            using var overrideReader = OverrideSerializableListField<int>(
-                "_readAllText",
-                new Func<string, string>(_ =>
-                    throw new FileNotFoundException("missing", missingPath)
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(missingPath))
+                .Throws(new FileNotFoundException("missing", missingPath));
+            var promptMock = new Mock<ISerializableListPrompt>(MockBehavior.Strict);
+            promptMock
+                .Setup(prompt =>
+                    prompt.Show(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<System.Windows.Forms.MessageBoxButtons>(),
+                        It.IsAny<System.Windows.Forms.MessageBoxIcon>()
+                    )
                 )
-            );
-            using var overridePrompt = OverrideSerializableListField<int>(
-                "_showMessageBox",
-                new Func<
-                    string,
-                    string,
-                    System.Windows.Forms.MessageBoxButtons,
-                    System.Windows.Forms.MessageBoxIcon,
-                    System.Windows.Forms.DialogResult
-                >((_, _, _, _) => System.Windows.Forms.DialogResult.Yes)
-            );
+                .Returns(System.Windows.Forms.DialogResult.Yes);
 
             // Act
+            using var scope = new SerializableListDependencyScope<int>(
+                fileSystemMock.Object,
+                promptMock.Object
+            );
             Action act = () => list.Deserialize(missingPath, askUserOnError: true);
 
             // Assert
@@ -461,24 +495,27 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>(Enumerable.Empty<int>());
             var missingPath = CreateMissingFilePath();
-            using var overrideReader = OverrideSerializableListField<int>(
-                "_readAllText",
-                new Func<string, string>(_ =>
-                    throw new FileNotFoundException("missing", missingPath)
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(missingPath))
+                .Throws(new FileNotFoundException("missing", missingPath));
+            var promptMock = new Mock<ISerializableListPrompt>(MockBehavior.Strict);
+            promptMock
+                .Setup(prompt =>
+                    prompt.Show(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<System.Windows.Forms.MessageBoxButtons>(),
+                        It.IsAny<System.Windows.Forms.MessageBoxIcon>()
+                    )
                 )
-            );
-            using var overridePrompt = OverrideSerializableListField<int>(
-                "_showMessageBox",
-                new Func<
-                    string,
-                    string,
-                    System.Windows.Forms.MessageBoxButtons,
-                    System.Windows.Forms.MessageBoxIcon,
-                    System.Windows.Forms.DialogResult
-                >((_, _, _, _) => System.Windows.Forms.DialogResult.No)
-            );
+                .Returns(System.Windows.Forms.DialogResult.No);
 
             // Act
+            using var scope = new SerializableListDependencyScope<int>(
+                fileSystemMock.Object,
+                promptMock.Object
+            );
             Action act = () => list.Deserialize(missingPath, askUserOnError: true);
 
             // Assert
@@ -490,13 +527,19 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var list = new SerializableList<int>(new List<int> { 1, 2, 3 });
+            var invalidPath = GetInvalidFixturePath();
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(invalidPath))
+                .Returns(InvalidJson);
 
             // Act
-            list.Deserialize(GetInvalidFixturePath(), askUserOnError: false);
+            using var scope = new SerializableListDependencyScope<int>(fileSystemMock.Object);
+            list.Deserialize(invalidPath, askUserOnError: false);
 
             // Assert
             list.Should().BeEmpty();
-            list.Filepath.Should().Be(GetInvalidFixturePath());
+            list.Filepath.Should().Be(invalidPath);
         }
 
         [TestMethod]
@@ -504,23 +547,29 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var list = new SerializableList<int>(Enumerable.Empty<int>());
-            using var overrideReader = OverrideSerializableListField<int>(
-                "_readAllText",
-                new Func<string, string>(_ => throw new InvalidDataException("broken json"))
-            );
-            using var overridePrompt = OverrideSerializableListField<int>(
-                "_showMessageBox",
-                new Func<
-                    string,
-                    string,
-                    System.Windows.Forms.MessageBoxButtons,
-                    System.Windows.Forms.MessageBoxIcon,
-                    System.Windows.Forms.DialogResult
-                >((_, _, _, _) => System.Windows.Forms.DialogResult.Yes)
-            );
+            var invalidPath = CreateInvalidFilePath();
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(invalidPath))
+                .Throws(new InvalidDataException("broken json"));
+            var promptMock = new Mock<ISerializableListPrompt>(MockBehavior.Strict);
+            promptMock
+                .Setup(prompt =>
+                    prompt.Show(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<System.Windows.Forms.MessageBoxButtons>(),
+                        It.IsAny<System.Windows.Forms.MessageBoxIcon>()
+                    )
+                )
+                .Returns(System.Windows.Forms.DialogResult.Yes);
 
             // Act
-            Action act = () => list.Deserialize(CreateInvalidFilePath(), askUserOnError: true);
+            using var scope = new SerializableListDependencyScope<int>(
+                fileSystemMock.Object,
+                promptMock.Object
+            );
+            Action act = () => list.Deserialize(invalidPath, askUserOnError: true);
 
             // Assert
             act.Should().NotThrow();
@@ -532,8 +581,17 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var fixturePath = GetValidFixturePath();
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(fixturePath))
+                .Returns(ValidFixtureJson);
+            var promptMock = new Mock<ISerializableListPrompt>(MockBehavior.Strict);
 
             // Act
+            using var scope = new SerializableListDependencyScope<int>(
+                fileSystemMock.Object,
+                promptMock.Object
+            );
             var list = new SerializableList<int>(
                 Path.GetFileName(fixturePath),
                 Path.GetDirectoryName(fixturePath)
@@ -548,6 +606,13 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void Constructor_WithBackupLoaderAndMissingPrimary_UsesBackupLoaderContents()
         {
             // Arrange
+            var primaryPath = Path.Combine(WorkspaceRoot, "*missing-serializable-list.json");
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(primaryPath))
+                .Throws(new FileNotFoundException("missing primary", primaryPath));
+
+            using var scope = new SerializableListDependencyScope<int>(fileSystemMock.Object);
             var list = new SerializableList<int>(
                 "*missing-serializable-list.json",
                 WorkspaceRoot,
@@ -568,10 +633,16 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>();
             var observedPath = string.Empty;
+            var invalidPath = CreateInvalidFilePath();
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(invalidPath))
+                .Throws(new FileNotFoundException("missing primary", invalidPath));
 
             // Act
+            using var scope = new SerializableListDependencyScope<int>(fileSystemMock.Object);
             list.Deserialize(
-                CreateInvalidFilePath(),
+                invalidPath,
                 path =>
                 {
                     observedPath = path;
@@ -590,6 +661,19 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var backupFilepath = Path.Combine(WorkspaceRoot, "stored-backup.csv");
+            var observedPath = string.Empty;
+            var seedPath = Path.Combine(WorkspaceRoot, "*seed.json");
+            var invalidPath = CreateInvalidFilePath();
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(seedPath))
+                .Throws(new FileNotFoundException("missing seed", seedPath));
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(invalidPath))
+                .Throws(new FileNotFoundException("missing primary", invalidPath));
+
+            // Act
+            using var scope = new SerializableListDependencyScope<int>(fileSystemMock.Object);
             var list = new SerializableList<int>(
                 "*seed.json",
                 WorkspaceRoot,
@@ -597,11 +681,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
                 backupFilepath,
                 askUserOnError: false
             );
-            var observedPath = string.Empty;
-
-            // Act
             list.Deserialize(
-                CreateInvalidFilePath(),
+                invalidPath,
                 path =>
                 {
                     observedPath = path;
@@ -622,8 +703,13 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             var list = new SerializableList<int>();
             var observedPath = string.Empty;
             var missingPath = CreateMissingFilePath();
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(missingPath))
+                .Throws(new FileNotFoundException("missing", missingPath));
 
             // Act
+            using var scope = new SerializableListDependencyScope<int>(fileSystemMock.Object);
             list.Deserialize(
                 missingPath,
                 path =>
@@ -645,10 +731,16 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>();
             var observedPath = string.Empty;
+            var invalidPath = GetInvalidFixturePath();
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(invalidPath))
+                .Returns(InvalidJson);
 
             // Act
+            using var scope = new SerializableListDependencyScope<int>(fileSystemMock.Object);
             list.Deserialize(
-                GetInvalidFixturePath(),
+                invalidPath,
                 path =>
                 {
                     observedPath = path;
@@ -659,7 +751,16 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             // Assert
             list.ToList().Should().Equal(12, 13);
-            observedPath.Should().Be(Path.Combine(WorkspaceRoot, "UtilitiesCS.Test", "TestData", "serializable-list-invalid.csv"));
+            observedPath
+                .Should()
+                .Be(
+                    Path.Combine(
+                        WorkspaceRoot,
+                        "UtilitiesCS.Test",
+                        "TestData",
+                        "serializable-list-invalid.csv"
+                    )
+                );
         }
 
         [TestMethod]
@@ -668,25 +769,31 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>(Enumerable.Empty<int>());
             var observedPath = string.Empty;
-            using var overrideReader = OverrideSerializableListField<int>(
-                "_readAllText",
-                new Func<string, string>(_ => throw new InvalidDataException("broken json"))
-            );
-            using var overridePrompt = OverrideSerializableListField<int>(
-                "_showMessageBox",
-                new Func<
-                    string,
-                    string,
-                    System.Windows.Forms.MessageBoxButtons,
-                    System.Windows.Forms.MessageBoxIcon,
-                    System.Windows.Forms.DialogResult
-                >((_, _, _, _) => System.Windows.Forms.DialogResult.Yes)
-            );
+            var invalidPath = CreateInvalidFilePath();
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(invalidPath))
+                .Throws(new InvalidDataException("broken json"));
+            var promptMock = new Mock<ISerializableListPrompt>(MockBehavior.Strict);
+            promptMock
+                .Setup(prompt =>
+                    prompt.Show(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<System.Windows.Forms.MessageBoxButtons>(),
+                        It.IsAny<System.Windows.Forms.MessageBoxIcon>()
+                    )
+                )
+                .Returns(System.Windows.Forms.DialogResult.Yes);
 
             // Act
+            using var scope = new SerializableListDependencyScope<int>(
+                fileSystemMock.Object,
+                promptMock.Object
+            );
             Action act = () =>
                 list.Deserialize(
-                    CreateInvalidFilePath(),
+                    invalidPath,
                     path =>
                     {
                         observedPath = path;
@@ -707,34 +814,32 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>(Enumerable.Empty<int>());
             var loaderWasCalled = false;
-            var responses = new Queue<System.Windows.Forms.DialogResult>(
-                new[]
-                {
-                    System.Windows.Forms.DialogResult.No,
-                    System.Windows.Forms.DialogResult.Yes,
-                }
-            );
-            using var overrideReader = OverrideSerializableListField<int>(
-                "_readAllText",
-                new Func<string, string>(_ =>
-                    throw new FileNotFoundException("missing", CreateMissingFilePath())
+            var missingPath = CreateMissingFilePath();
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(missingPath))
+                .Throws(new FileNotFoundException("missing", missingPath));
+            var promptMock = new Mock<ISerializableListPrompt>(MockBehavior.Strict);
+            promptMock
+                .SetupSequence(prompt =>
+                    prompt.Show(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<System.Windows.Forms.MessageBoxButtons>(),
+                        It.IsAny<System.Windows.Forms.MessageBoxIcon>()
+                    )
                 )
-            );
-            using var overridePrompt = OverrideSerializableListField<int>(
-                "_showMessageBox",
-                new Func<
-                    string,
-                    string,
-                    System.Windows.Forms.MessageBoxButtons,
-                    System.Windows.Forms.MessageBoxIcon,
-                    System.Windows.Forms.DialogResult
-                >((_, _, _, _) => responses.Dequeue())
-            );
+                .Returns(System.Windows.Forms.DialogResult.No)
+                .Returns(System.Windows.Forms.DialogResult.Yes);
 
             // Act
+            using var scope = new SerializableListDependencyScope<int>(
+                fileSystemMock.Object,
+                promptMock.Object
+            );
             Action act = () =>
                 list.Deserialize(
-                    CreateMissingFilePath(),
+                    missingPath,
                     _ =>
                     {
                         loaderWasCalled = true;
@@ -754,33 +859,31 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var list = new SerializableList<int>(Enumerable.Empty<int>());
-            var responses = new Queue<System.Windows.Forms.DialogResult>(
-                new[] { System.Windows.Forms.DialogResult.No, System.Windows.Forms.DialogResult.No }
-            );
-            using var overrideReader = OverrideSerializableListField<int>(
-                "_readAllText",
-                new Func<string, string>(_ =>
-                    throw new FileNotFoundException("missing", CreateMissingFilePath())
+            var missingPath = CreateMissingFilePath();
+            var fileSystemMock = CreateFileSystemMock();
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(missingPath))
+                .Throws(new FileNotFoundException("missing", missingPath));
+            var promptMock = new Mock<ISerializableListPrompt>(MockBehavior.Strict);
+            promptMock
+                .SetupSequence(prompt =>
+                    prompt.Show(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<System.Windows.Forms.MessageBoxButtons>(),
+                        It.IsAny<System.Windows.Forms.MessageBoxIcon>()
+                    )
                 )
-            );
-            using var overridePrompt = OverrideSerializableListField<int>(
-                "_showMessageBox",
-                new Func<
-                    string,
-                    string,
-                    System.Windows.Forms.MessageBoxButtons,
-                    System.Windows.Forms.MessageBoxIcon,
-                    System.Windows.Forms.DialogResult
-                >((_, _, _, _) => responses.Dequeue())
-            );
+                .Returns(System.Windows.Forms.DialogResult.No)
+                .Returns(System.Windows.Forms.DialogResult.No);
 
             // Act
+            using var scope = new SerializableListDependencyScope<int>(
+                fileSystemMock.Object,
+                promptMock.Object
+            );
             Action act = () =>
-                list.Deserialize(
-                    CreateMissingFilePath(),
-                    _ => new List<int> { 99 },
-                    askUserOnError: true
-                );
+                list.Deserialize(missingPath, _ => new List<int> { 99 }, askUserOnError: true);
 
             // Assert
             act.Should().Throw<ArgumentNullException>();
@@ -818,34 +921,39 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             return Path.Combine(WorkspaceRoot, "missing-serializable-list.json");
         }
 
-        private static IDisposable OverrideSerializableListField<T>(
-            string fieldName,
-            object replacement
-        )
-            where T : IComparable<T>
+        private static Mock<ISerializableListFileSystem> CreateFileSystemMock()
         {
-            var field = typeof(SerializableList<T>).GetField(
-                fieldName,
-                BindingFlags.Static | BindingFlags.NonPublic
-            );
-            var original = field.GetValue(null);
-            field.SetValue(null, replacement);
-
-            return new CallbackDisposable(() => field.SetValue(null, original));
+            var fileSystemMock = new Mock<ISerializableListFileSystem>(MockBehavior.Strict);
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.CreateText(It.IsAny<string>()))
+                .Returns(() => new StreamWriter(Stream.Null));
+            return fileSystemMock;
         }
 
-        private sealed class CallbackDisposable : IDisposable
+        private sealed class SerializableListDependencyScope<T> : IDisposable
+            where T : IComparable<T>
         {
-            private readonly Action _callback;
+            private readonly ISerializableListFileSystem _originalFileSystem;
+            private readonly ISerializableListPrompt _originalPrompt;
 
-            public CallbackDisposable(Action callback)
+            public SerializableListDependencyScope(
+                ISerializableListFileSystem fileSystem,
+                ISerializableListPrompt prompt = null
+            )
             {
-                _callback = callback;
+                _originalFileSystem = SerializableList<T>.FileSystem;
+                _originalPrompt = SerializableList<T>.Prompt;
+                SerializableList<T>.FileSystem = fileSystem;
+                if (prompt is not null)
+                {
+                    SerializableList<T>.Prompt = prompt;
+                }
             }
 
             public void Dispose()
             {
-                _callback();
+                SerializableList<T>.FileSystem = _originalFileSystem;
+                SerializableList<T>.Prompt = _originalPrompt;
             }
         }
     }
