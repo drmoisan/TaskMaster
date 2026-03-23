@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
 {
@@ -135,21 +136,29 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void Constructor_WithBackupLoaderAndMissingPrimary_UsesBackupLoaderItems()
         {
             // Arrange
-            var fixturePath = GetValidFixturePath();
+            var primaryPath = Path.Combine(RepoRoot, "*missing-primary.json");
+            const string backupPath = @"C:\mock-backup.json";
+            var fileSystemMock = new Mock<IScoCollectionFileSystem>(MockBehavior.Strict);
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(primaryPath))
+                .Throws(new FileNotFoundException("missing primary"));
+            fileSystemMock.Setup(fileSystem => fileSystem.Exists(backupPath)).Returns(true);
 
             // Act
+            using var scope = new ScoCollectionDependencyScope<int>(fileSystemMock.Object);
             var collection = new ScoCollection<int>(
                 "*missing-primary.json",
                 RepoRoot,
                 _ => new List<int> { 9, 10 },
-                fixturePath,
+                backupPath,
                 askUserOnError: false
             );
 
             // Assert
             collection.Should().Equal(9, 10);
-            collection.FilePath.Should().Be(Path.Combine(RepoRoot, "*missing-primary.json"));
+            collection.FilePath.Should().Be(primaryPath);
             StopPendingTimer(collection);
+            fileSystemMock.VerifyAll();
         }
 
         [TestMethod]
@@ -299,7 +308,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
-        public void FromList_CurrentImplementationClearsWithoutRepopulatingItems()
+        public void FromList_RepopulatesItems()
         {
             // Arrange
             var collection = new ScoCollection<int>(new[] { 1, 2, 3 });
@@ -308,7 +317,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             collection.FromList(new List<int> { 7, 8 });
 
             // Assert
-            collection.Should().BeEmpty();
+            collection.Should().Equal(7, 8);
         }
 
         [TestMethod]
@@ -400,23 +409,33 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
-        public void Deserialize_WithBackupLoader_CurrentImplementationLeavesTargetCollectionEmpty()
+        public void Deserialize_WithBackupLoader_UsesBackupLoaderItems()
         {
             // Arrange
+            var primaryPath = Path.Combine(RepoRoot, "*invalid-primary.json");
+            const string backupPath = @"C:\mock-backup.json";
             var collection = new ScoCollection<int>();
+            var fileSystemMock = new Mock<IScoCollectionFileSystem>(MockBehavior.Strict);
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(primaryPath))
+                .Throws(new FileNotFoundException("missing primary"));
+            fileSystemMock.Setup(fileSystem => fileSystem.Exists(backupPath)).Returns(true);
 
             // Act
+            using var scope = new ScoCollectionDependencyScope<int>(fileSystemMock.Object);
             collection.Deserialize(
                 "*invalid-primary.json",
                 RepoRoot,
                 _ => new List<int> { 9, 10 },
-                GetExistingRepoFilePath(),
+                backupPath,
                 askUserOnError: false
             );
 
             // Assert
-            collection.Should().BeEmpty();
-            collection.FilePath.Should().Be(Path.Combine(RepoRoot, "*invalid-primary.json"));
+            collection.Should().Equal(9, 10);
+            collection.FilePath.Should().Be(primaryPath);
+            StopPendingTimer(collection);
+            fileSystemMock.VerifyAll();
         }
 
         [TestMethod]
@@ -446,21 +465,29 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var collection = new ScoCollection<int>(new[] { 1, 2, 3 });
-            var fixturePath = GetValidFixturePath();
+            var primaryPath = Path.Combine(RepoRoot, "*invalid-primary.json");
+            const string backupPath = @"C:\mock-backup.json";
+            var fileSystemMock = new Mock<IScoCollectionFileSystem>(MockBehavior.Strict);
+            fileSystemMock
+                .Setup(fileSystem => fileSystem.ReadAllText(primaryPath))
+                .Throws(new FileNotFoundException("missing primary"));
+            fileSystemMock.Setup(fileSystem => fileSystem.Exists(backupPath)).Returns(true);
 
             // Act
+            using var scope = new ScoCollectionDependencyScope<int>(fileSystemMock.Object);
             collection.Deserialize(
                 "*invalid-primary.json",
                 RepoRoot,
                 _ => throw new InvalidOperationException("backup failed"),
-                fixturePath,
+                backupPath,
                 askUserOnError: false
             );
 
             // Assert
             collection.Should().BeEmpty();
-            collection.FilePath.Should().Be(Path.Combine(RepoRoot, "*invalid-primary.json"));
+            collection.FilePath.Should().Be(primaryPath);
             StopPendingTimer(collection);
+            fileSystemMock.VerifyAll();
         }
 
         [TestMethod]
@@ -606,6 +633,32 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             timer?.GetType().GetMethod("StopTimer")?.Invoke(timer, null);
             timer?.GetType().GetMethod("Dispose")?.Invoke(timer, null);
+        }
+
+        private sealed class ScoCollectionDependencyScope<T> : IDisposable
+        {
+            private readonly IScoCollectionFileSystem _originalFileSystem;
+            private readonly IScoCollectionPrompt _originalPrompt;
+
+            public ScoCollectionDependencyScope(
+                IScoCollectionFileSystem fileSystem,
+                IScoCollectionPrompt prompt = null
+            )
+            {
+                _originalFileSystem = ScoCollection<T>.FileSystem;
+                _originalPrompt = ScoCollection<T>.Prompt;
+                ScoCollection<T>.FileSystem = fileSystem;
+                if (prompt is not null)
+                {
+                    ScoCollection<T>.Prompt = prompt;
+                }
+            }
+
+            public void Dispose()
+            {
+                ScoCollection<T>.FileSystem = _originalFileSystem;
+                ScoCollection<T>.Prompt = _originalPrompt;
+            }
         }
 
         private static string GetExistingRepoFilePath()

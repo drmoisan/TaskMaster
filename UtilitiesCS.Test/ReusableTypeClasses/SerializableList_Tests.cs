@@ -635,8 +635,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             );
 
             // Assert
-            list.Should().BeEmpty();
-            observedPath.Should().BeEmpty();
+            list.ToList().Should().Equal(14, 15);
+            observedPath.Should().Be(Path.Combine(WorkspaceRoot, "missing-serializable-list.csv"));
         }
 
         [TestMethod]
@@ -658,8 +658,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             );
 
             // Assert
-            list.Should().BeEmpty();
-            observedPath.Should().BeEmpty();
+            list.ToList().Should().Equal(12, 13);
+            observedPath.Should().Be(Path.Combine(WorkspaceRoot, "UtilitiesCS.Test", "TestData", "serializable-list-invalid.csv"));
         }
 
         [TestMethod]
