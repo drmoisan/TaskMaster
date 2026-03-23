@@ -17,6 +17,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         private static readonly string RepoRoot = Path.GetFullPath(
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..")
         );
+        private const string ValidFixtureJson = "[11, 22, 33]";
 
         [TestMethod]
         public void DefaultConstructor_StartsEmpty()
@@ -120,8 +121,14 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var fixturePath = GetValidFixturePath();
+            var fileSystemMock = CreateJsonFileSystem(fixturePath, ValidFixtureJson);
+            var promptMock = new Mock<IScoCollectionPrompt>(MockBehavior.Strict);
 
             // Act
+            using var scope = new ScoCollectionDependencyScope<int>(
+                fileSystemMock.Object,
+                promptMock.Object
+            );
             var collection = new ScoCollection<int>(
                 Path.GetFileName(fixturePath),
                 Path.GetDirectoryName(fixturePath)
@@ -130,6 +137,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Assert
             collection.Should().Equal(11, 22, 33);
             collection.FilePath.Should().Be(fixturePath);
+            fileSystemMock.VerifyAll();
         }
 
         [TestMethod]
@@ -386,12 +394,19 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             var fixturePath = GetValidFixturePath();
             var collection = new ScoCollection<int>();
             collection.FilePath = fixturePath;
+            var fileSystemMock = CreateJsonFileSystem(fixturePath, ValidFixtureJson);
+            var promptMock = new Mock<IScoCollectionPrompt>(MockBehavior.Strict);
 
             // Act
+            using var scope = new ScoCollectionDependencyScope<int>(
+                fileSystemMock.Object,
+                promptMock.Object
+            );
             collection.Deserialize();
 
             // Assert
             collection.Should().Equal(11, 22, 33);
+            fileSystemMock.VerifyAll();
         }
 
         [TestMethod]
@@ -596,16 +611,19 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var collection = new ScoCollection<int>();
             var fixturePath = GetValidFixturePath();
+            var fileSystemMock = CreateJsonFileSystem(fixturePath, ValidFixtureJson);
             var disk = new FilePathHelper(
                 Path.GetFileName(fixturePath),
                 Path.GetDirectoryName(fixturePath)
             );
 
             // Act
+            using var scope = new ScoCollectionDependencyScope<int>(fileSystemMock.Object);
             var restored = InvokeNonPublic<ScoCollection<int>>(collection, "DeserializeJson", disk);
 
             // Assert
             restored.Should().Equal(11, 22, 33);
+            fileSystemMock.VerifyAll();
         }
 
         private static T InvokeNonPublic<T>(object target, string methodName, params object[] args)
@@ -663,23 +681,27 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
         private static string GetExistingRepoFilePath()
         {
-            return Path.Combine(RepoRoot, "README.md");
+            return Path.Combine(RepoRoot, "virtual-backup.json");
         }
 
         private static string GetValidFixturePath()
         {
-            return Path.Combine(
-                RepoRoot,
-                "TaskMaster",
-                "UtilitiesCS.Test",
-                "TestData",
-                "sco-collection-valid.json"
-            );
+            return Path.Combine(RepoRoot, "virtual-sco-collection-valid.json");
         }
 
         private static string CreateInvalidFilePath()
         {
             return Path.Combine(RepoRoot, "*invalid-sco-collection.json");
+        }
+
+        private static Mock<IScoCollectionFileSystem> CreateJsonFileSystem(
+            string filePath,
+            string json
+        )
+        {
+            var fileSystemMock = new Mock<IScoCollectionFileSystem>(MockBehavior.Strict);
+            fileSystemMock.Setup(fileSystem => fileSystem.ReadAllText(filePath)).Returns(json);
+            return fileSystemMock;
         }
     }
 }
