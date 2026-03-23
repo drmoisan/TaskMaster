@@ -75,6 +75,7 @@
     <OutputPath>bin\x86\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Controllers\EfcHomeControllerTests.cs" />
     <Compile Include="Controllers\QfcFormControllerTests.cs" />
     <Compile Include="Controllers\QfcHomeControllerTests.cs" />
     <Compile Include="Controllers\QfcItemControllerTests.cs" />
