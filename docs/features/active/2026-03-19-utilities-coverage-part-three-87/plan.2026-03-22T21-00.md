@@ -384,4 +384,257 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 - [ ] [P25-T4] Register `UtilitiesCS.Test\ReusableTypeClasses\ConfigViewer_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="ReusableTypeClasses\ConfigViewer_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
+### Phase 26 — IdleActionQueue Coverage (`UtilitiesCS\Threading\IdleActionQueue.cs`)
+
+- [ ] [P26-T1] Add test to `UtilitiesCS.Test\Threading\IdleActionQueue_Tests.cs` verifying that the first `AddEntry` call initializes the internal queue
+  - Acceptance: `[TestMethod]` exists, resets static state via reflection, calls `AddEntry` once, and asserts the queue's internal entry count is 1
+
+- [ ] [P26-T2] Add test to `UtilitiesCS.Test\Threading\IdleActionQueue_Tests.cs` verifying that the idle callback drains queued entries in enqueue order
+  - Acceptance: `[TestMethod]` exists, enqueues multiple actions via `AddEntry`, fires the idle callback via reflection, and asserts the actions were invoked in the order they were added
+
+- [ ] [P26-T3] Add test to `UtilitiesCS.Test\Threading\IdleActionQueue_Tests.cs` verifying that the unsubscribe path clears the idle callback after inactivity
+  - Acceptance: `[TestMethod]` exists, enqueues work, drains the queue, triggers the unsubscribe timer, and asserts the idle handler is no longer registered
+
+- [ ] [P26-T4] Register `UtilitiesCS.Test\Threading\IdleActionQueue_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Threading\IdleActionQueue_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 27 — IdleAsyncQueue Coverage (`UtilitiesCS\Threading\IdleAsyncQueue.cs`)
+
+- [ ] [P27-T1] Add test to `UtilitiesCS.Test\Threading\IdleAsyncQueue_Tests.cs` verifying that a queued async task runs exactly once when the idle callback fires
+  - Acceptance: `[TestMethod]` exists, enqueues a fake async task, fires the idle callback via reflection, and asserts the task was invoked exactly once
+
+- [ ] [P27-T2] Add test to `UtilitiesCS.Test\Threading\IdleAsyncQueue_Tests.cs` verifying that the UI-thread flag routes work through the expected scheduling path
+  - Acceptance: `[TestMethod]` exists, enqueues work with the UI-thread flag set, fires the callback, and asserts the scheduling path taken matches the expected dispatcher/sync-context route
+
+- [ ] [P27-T3] Add test to `UtilitiesCS.Test\Threading\IdleAsyncQueue_Tests.cs` verifying that an exception thrown by one queued item does not prevent subsequent items from executing
+  - Acceptance: `[TestMethod]` exists, enqueues a faulting task followed by a normal task, fires the idle callback, and asserts the normal task still executes and no unhandled exception escapes the queue
+
+- [ ] [P27-T4] Register `UtilitiesCS.Test\Threading\IdleAsyncQueue_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Threading\IdleAsyncQueue_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 28 — ProgressMultiStepViewer Coverage (`UtilitiesCS\Threading\ProgressMultiStepViewer.cs`) — SKIP_EVALUATION
+
+- [ ] [P28-T1] Record skip-evaluation decision for `ProgressMultiStepViewer.cs`: constructor-only designer shell with no meaningful non-designer logic; no unit tests added
+  - Acceptance: This task is checked off and the decision is noted inline; no test file is created for this file
+
+### Phase 29 — ProgressPane Coverage (`UtilitiesCS\Threading\ProgressPane.cs`)
+
+- [ ] [P29-T1] Add test to `UtilitiesCS.Test\Threading\ProgressPane_Tests.cs` verifying that initialization captures the UI synchronization context/scheduler
+  - Acceptance: `[TestMethod]` exists, constructs `ProgressPane` under a controlled `SynchronizationContext`, and asserts the exposed scheduler/context property holds the expected value
+
+- [ ] [P29-T2] Add test to `UtilitiesCS.Test\Threading\ProgressPane_Tests.cs` verifying that the cancellation token source is honored when cancellation is requested
+  - Acceptance: `[TestMethod]` exists, calls the cancellation path on the pane, and asserts the exposed `CancellationToken` enters the cancelled state
+
+- [ ] [P29-T3] Add test to `UtilitiesCS.Test\Threading\ProgressPane_Tests.cs` verifying that visibility and progress-report state change as expected when updated
+  - Acceptance: `[TestMethod]` exists, sets the visible/report state and asserts the corresponding properties reflect the new values
+
+- [ ] [P29-T4] Register `UtilitiesCS.Test\Threading\ProgressPane_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Threading\ProgressPane_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 30 — ProgressViewer Coverage (`UtilitiesCS\Threading\ProgressViewer.cs`)
+
+- [ ] [P30-T1] Add test to `UtilitiesCS.Test\Threading\ProgressViewer_Tests.cs` verifying that activating the cancel path sets the cancellation token source to cancelled
+  - Acceptance: `[TestMethod]` exists, constructs `ProgressViewer`, programmatically invokes the cancel path, and asserts the exposed `CancellationToken` is in the cancelled state
+
+- [ ] [P30-T2] Add test to `UtilitiesCS.Test\Threading\ProgressViewer_Tests.cs` verifying that the exposed sync context and dispatcher properties are populated after initialization
+  - Acceptance: `[TestMethod]` exists, initializes `ProgressViewer` under a controlled context, and asserts the sync-context and dispatcher properties are non-null
+
+- [ ] [P30-T3] Register `UtilitiesCS.Test\Threading\ProgressViewer_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Threading\ProgressViewer_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 31 — ThreadMonitor Coverage (`UtilitiesCS\Threading\ThreadMonitor.cs`) — SKIP_EVALUATION
+
+- [ ] [P31-T1] Record skip-evaluation decision for `ThreadMonitor.cs`: relies on obsolete `Thread.Suspend`/`Thread.Resume` APIs and timing-sensitive diagnostics; deterministic unit tests are not feasible
+  - Acceptance: This task is checked off and the decision is noted inline; no test file is created for this file
+
+### Phase 32 — CSVDictUtilities Coverage (`UtilitiesCS\To Depricate\CSVDictUtilities.cs`) — SKIP_EVALUATION
+
+- [ ] [P32-T1] Record skip-evaluation decision for `CSVDictUtilities.cs`: deprecated utility with no injection seam and direct file-system dependence; tests would require real disk I/O
+  - Acceptance: This task is checked off and the decision is noted inline; no test file is created for this file
+
+### Phase 33 — FileIO2 Coverage (`UtilitiesCS\To Depricate\FileIO2.cs`) — SKIP_EVALUATION
+
+- [ ] [P33-T1] Record skip-evaluation decision for `FileIO2.cs`: deprecated file helper with no seam; main public paths are direct static file I/O making deterministic unit tests low-value without prior abstraction work
+  - Acceptance: This task is checked off and the decision is noted inline; no test file is created for this file
+
+### Phase 34 — EmailDataMiner Coverage (`UtilitiesCS\EmailIntelligence\EmailParsingSorting\EmailDataMiner.cs`)
+
+- [ ] [P34-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\EmailDataMiner_Tests.cs` verifying that an empty source returns no mined rows
+  - Acceptance: `[TestMethod]` exists, passes an empty/null folder tree to the mining orchestration path, and asserts the returned result set is empty
+
+- [ ] [P34-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\EmailDataMiner_Tests.cs` verifying that the chunking path groups inputs into the expected count/size
+  - Acceptance: `[TestMethod]` exists, passes a known-size input to the chunking method with a fixed chunk size, and asserts the number of chunks and item counts per chunk are correct
+
+- [ ] [P34-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\EmailDataMiner_Tests.cs` verifying that the staging-delete routine short-circuits when the target path is missing
+  - Acceptance: `[TestMethod]` exists, calls the staging-delete path with a non-existent path, and asserts the method returns early without error rather than proceeding
+
+- [ ] [P34-T4] Register `UtilitiesCS.Test\EmailIntelligence\EmailDataMiner_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\EmailDataMiner_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 35 — ScreenHelper Coverage (`UtilitiesCS\HelperClasses\Windows Forms\ScreenHelper.cs`) — SKIP_EVALUATION
+
+- [ ] [P35-T1] Record skip-evaluation decision for `ScreenHelper.cs`: behavior depends on actual machine monitor topology and active forms; static `Screen.AllScreens` has no injection seam
+  - Acceptance: This task is checked off and the decision is noted inline; no test file is created for this file
+
+### Phase 36 — SubjectMapSco Coverage (`UtilitiesCS\EmailIntelligence\SubjectMap\SubjectMapSco.cs`)
+
+- [ ] [P36-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\SubjectMapSco_Tests.cs` verifying that adding a token updates the lookup counts
+  - Acceptance: `[TestMethod]` exists, adds a known token to the subject map, and asserts the lookup count for that token increments as expected
+
+- [ ] [P36-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\SubjectMapSco_Tests.cs` verifying that `TryRepair` fixes a recoverable missing encoding
+  - Acceptance: `[TestMethod]` exists, introduces a missing-encoding condition via a fake map state, calls `TryRepair`, and asserts the encoding is restored to the expected value
+
+- [ ] [P36-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\SubjectMapSco_Tests.cs` verifying that query helpers return deterministic matches for known inputs
+  - Acceptance: `[TestMethod]` exists, sets up a known in-memory subject map, calls the query helper with a fixed input, and asserts the returned matches equal the expected set
+
+- [ ] [P36-T4] Register `UtilitiesCS.Test\EmailIntelligence\SubjectMapSco_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\SubjectMapSco_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 37 — Theme Coverage (`UtilitiesCS\HelperClasses\ThemeHelpers\Theme.cs`) — SKIP_EVALUATION
+
+- [ ] [P37-T1] Record skip-evaluation decision for `Theme.cs`: broad UI/control graph and large mutable surface make meaningful unit coverage low-value; narrower `ThemeControlGroup` behavior is the preferred coverage target
+  - Acceptance: This task is checked off and the decision is noted inline; no test file is created for this file
+
+### Phase 38 — IntelligenceConfig Coverage (`UtilitiesCS\EmailIntelligence\IntelligenceConfig.cs`)
+
+- [ ] [P38-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\IntelligenceConfig_Tests.cs` verifying that derived-type detection matches expected classifier types
+  - Acceptance: `[TestMethod]` exists, constructs a config with a known type discriminator value, and asserts the type-detection path returns the expected classifier enum/type
+
+- [ ] [P38-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\IntelligenceConfig_Tests.cs` verifying that property changes trigger the write path via the mocked loader
+  - Acceptance: `[TestMethod]` exists, sets a config property and asserts the mocked loader's write/save method was invoked
+
+- [ ] [P38-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\IntelligenceConfig_Tests.cs` verifying that missing config data initializes defaults
+  - Acceptance: `[TestMethod]` exists, loads a config with a synthetic empty/null payload, and asserts the resulting config properties equal expected default values
+
+- [ ] [P38-T4] Register `UtilitiesCS.Test\EmailIntelligence\IntelligenceConfig_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\IntelligenceConfig_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 39 — EmailFiler Coverage (`UtilitiesCS\EmailIntelligence\EmailParsingSorting\EmailFiler.cs`)
+
+- [ ] [P39-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\EmailFiler_Tests.cs` verifying that the open-folder helper short-circuits on an invalid path
+  - Acceptance: `[TestMethod]` exists, calls the open-folder path with a null or empty path, and asserts the method returns early without calling the folder-open side effect
+
+- [ ] [P39-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\EmailFiler_Tests.cs` verifying that tab/CRLF stripping produces deterministic clean output
+  - Acceptance: `[TestMethod]` exists, passes a string with embedded tabs and CRLF sequences to the stripping helper, and asserts the result equals the expected clean string
+
+- [ ] [P39-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\EmailFiler_Tests.cs` verifying that the undo-stack capture records move details correctly
+  - Acceptance: `[TestMethod]` exists, invokes the undo-capture path with synthetic source and destination values, and asserts the captured undo entry contains the expected source and destination
+
+- [ ] [P39-T4] Register `UtilitiesCS.Test\EmailIntelligence\EmailFiler_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\EmailFiler_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 40 — ConfigController Coverage (`UtilitiesCS\ReusableTypeClasses\NewSmartSerializable\Config\ConfigController.cs`)
+
+- [ ] [P40-T1] Add test to `UtilitiesCS.Test\ReusableTypeClasses\ConfigController_Tests.cs` verifying that activating the local disk group toggles the correct target group
+  - Acceptance: `[TestMethod]` exists, calls `ActivateDiskGroup` for the local disk option, and asserts the expected group properties enter the active/enabled state
+
+- [ ] [P40-T2] Add test to `UtilitiesCS.Test\ReusableTypeClasses\ConfigController_Tests.cs` verifying that `Cancel` restores the prior config state
+  - Acceptance: `[TestMethod]` exists, modifies config state, calls `Cancel`, and asserts the original state is restored
+
+- [ ] [P40-T3] Add test to `UtilitiesCS.Test\ReusableTypeClasses\ConfigController_Tests.cs` verifying that the unimplemented file-chooser path does not throw or performs a no-op as coded
+  - Acceptance: `[TestMethod]` exists, invokes the not-implemented file-chooser handler, and asserts no exception is thrown
+
+- [ ] [P40-T4] Register `UtilitiesCS.Test\ReusableTypeClasses\ConfigController_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="ReusableTypeClasses\ConfigController_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 41 — AsyncMultiTasker Coverage (`UtilitiesCS\Threading\AsyncMultiTasker.cs`)
+
+- [ ] [P41-T1] Add test to `UtilitiesCS.Test\Threading\AsyncMultiTasker_Tests.cs` verifying that the chunk-size helper partitions inputs into batches of the expected size
+  - Acceptance: `[TestMethod]` exists, passes a known-length input list with a fixed chunk size, and asserts the number of batches and per-batch counts are correct
+
+- [ ] [P41-T2] Add test to `UtilitiesCS.Test\Threading\AsyncMultiTasker_Tests.cs` verifying that an async overload preserves result order and count
+  - Acceptance: `[TestMethod]` exists, passes ordered inputs to the async overload and awaits completion, and asserts the returned result sequence matches the expected order and length
+
+- [ ] [P41-T3] Add test to `UtilitiesCS.Test\Threading\AsyncMultiTasker_Tests.cs` verifying that the progress callback receives a terminal completion notification
+  - Acceptance: `[TestMethod]` exists, supplies a progress callback, runs the async task to completion, and asserts the callback was invoked with a completion/100% signal
+
+- [ ] [P41-T4] Register `UtilitiesCS.Test\Threading\AsyncMultiTasker_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Threading\AsyncMultiTasker_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 42 — FolderRemapTree Coverage (`UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapTree.cs`)
+
+- [ ] [P42-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapTree_Tests.cs` verifying that building a tree from a mapping source yields the expected nodes
+  - Acceptance: `[TestMethod]` exists, passes a synthetic folder mapping to the build method, and asserts the resulting tree contains the expected node paths/labels
+
+- [ ] [P42-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapTree_Tests.cs` verifying that the filter path removes excluded nodes
+  - Acceptance: `[TestMethod]` exists, applies a filter to the built tree and asserts excluded node paths are absent from the filtered result
+
+- [ ] [P42-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapTree_Tests.cs` verifying that notification fires on a map update
+  - Acceptance: `[TestMethod]` exists, subscribes to the map-update notification, modifies the map, and asserts the notification was raised exactly once
+
+- [ ] [P42-T4] Register `UtilitiesCS.Test\EmailIntelligence\FolderRemapTree_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\FolderRemapTree_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 43 — ClassifierGroupUtilities Coverage (`UtilitiesCS\EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities.cs`)
+
+- [ ] [P43-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities_Tests.cs` verifying that an existing loader path resolves to the expected classifier group
+  - Acceptance: `[TestMethod]` exists, provides a mocked loader returning a known config, and asserts the resolved group identity matches the expected key
+
+- [ ] [P43-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities_Tests.cs` verifying that a missing config returns a fallback or new classifier
+  - Acceptance: `[TestMethod]` exists, provides a mocked loader returning null/missing config, and asserts the returned classifier is a valid fallback or newly initialized instance
+
+- [ ] [P43-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities_Tests.cs` verifying that serialize/deserialize preserves expected config fields
+  - Acceptance: `[TestMethod]` exists, serializes a known config object and deserializes back, and asserts the round-tripped fields equal the originals
+
+- [ ] [P43-T4] Register `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 44 — PeopleScoDictionaryNew Coverage (`UtilitiesCS\EmailIntelligence\People\PeopleScoDictionaryNew.cs`)
+
+- [ ] [P44-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\PeopleScoDictionaryNew_Tests.cs` verifying that matching prefers exact names/categories over partial matches
+  - Acceptance: `[TestMethod]` exists, sets up a dictionary with both exact and partial matches, calls the matching method, and asserts the exact-match result is returned
+
+- [ ] [P44-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\PeopleScoDictionaryNew_Tests.cs` verifying that the add flow applies the expected category prefix rules
+  - Acceptance: `[TestMethod]` exists, adds an entry with a known prefix rule active, and asserts the stored entry's category bears the expected prefix
+
+- [ ] [P44-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\PeopleScoDictionaryNew_Tests.cs` verifying that duplicate additions are ignored or merged as coded
+  - Acceptance: `[TestMethod]` exists, adds the same entry twice, and asserts the dictionary count reflects the expected duplicate-handling behavior
+
+- [ ] [P44-T4] Register `UtilitiesCS.Test\EmailIntelligence\PeopleScoDictionaryNew_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\PeopleScoDictionaryNew_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 45 — SCODictionary Coverage (`UtilitiesCS\ReusableTypeClasses\Serializable\Concurrent\SCO\SCODictionary.cs`)
+
+- [ ] [P45-T1] Add test to `UtilitiesCS.Test\ReusableTypeClasses\SCODictionary_Tests.cs` verifying that deserializing a missing path returns an empty or new object
+  - Acceptance: `[TestMethod]` exists, calls the deserialize path with a synthetic null/missing-path config, and asserts the resulting dictionary is empty rather than throwing
+
+- [ ] [P45-T2] Add test to `UtilitiesCS.Test\ReusableTypeClasses\SCODictionary_Tests.cs` verifying that the backup loader selection prefers the expected source
+  - Acceptance: `[TestMethod]` exists, sets up two candidate sources and calls the backup-select path, and asserts the returned source matches the expected priority order
+
+- [ ] [P45-T3] Register `UtilitiesCS.Test\ReusableTypeClasses\SCODictionary_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="ReusableTypeClasses\SCODictionary_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 46 — FileInfoWrapper Coverage (`UtilitiesCS\HelperClasses\FileSystem\FileInfoWrapper.cs`)
+
+- [ ] [P46-T1] Add test to `UtilitiesCS.Test\HelperClasses\FileInfoWrapper_Tests.cs` verifying that the wrapper forwards `Exists`, name, and path properties from the inner `FileInfo`
+  - Acceptance: `[TestMethod]` exists, constructs a `FileInfoWrapper` with a known backing path, and asserts the `Exists`, `Name`, and `FullName` properties equal the underlying `FileInfo` values
+
+- [ ] [P46-T2] Add test to `UtilitiesCS.Test\HelperClasses\FileInfoWrapper_Tests.cs` verifying that a null inner `FileInfo` is handled gracefully as coded
+  - Acceptance: `[TestMethod]` exists, constructs a `FileInfoWrapper` with a null inner value and calls the relevant property or method, and asserts no unhandled exception is thrown and the result matches the expected null/default behavior
+
+- [ ] [P46-T3] Register `UtilitiesCS.Test\HelperClasses\FileInfoWrapper_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="HelperClasses\FileInfoWrapper_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 47 — DirectoryInfoWrapper Coverage (`UtilitiesCS\HelperClasses\FileSystem\DirectoryInfoWrapper.cs`)
+
+- [ ] [P47-T1] Add test to `UtilitiesCS.Test\HelperClasses\DirectoryInfoWrapper_Tests.cs` verifying that the wrapper forwards directory `Name`, `FullName`, and `Exists` from the inner `DirectoryInfo`
+  - Acceptance: `[TestMethod]` exists, constructs a `DirectoryInfoWrapper` with a known path, and asserts the wrapper properties equal the underlying `DirectoryInfo` values
+
+- [ ] [P47-T2] Register `UtilitiesCS.Test\HelperClasses\DirectoryInfoWrapper_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="HelperClasses\DirectoryInfoWrapper_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
+### Phase 48 — DfMLNet Coverage (`UtilitiesCS\Extensions\DfMLNet.cs`)
+
+- [ ] [P48-T1] Add test to `UtilitiesCS.Test\Extensions\DfMLNet_Tests.cs` verifying that `ToDataFrame` converts an object sequence to a DataFrame with the expected columns and types
+  - Acceptance: `[TestMethod]` exists, passes a small known-type list to `ToDataFrame`, and asserts the resulting DataFrame has the correct column names and types
+
+- [ ] [P48-T2] Add test to `UtilitiesCS.Test\Extensions\DfMLNet_Tests.cs` verifying that the first-non-null column selector returns the correct column from mixed-null inputs
+  - Acceptance: `[TestMethod]` exists, provides columns where some rows are null, calls the first-non-null selector, and asserts the selected column is the expected one
+
+- [ ] [P48-T3] Add test to `UtilitiesCS.Test\Extensions\DfMLNet_Tests.cs` verifying that `ToDataTable` conversion preserves the row count
+  - Acceptance: `[TestMethod]` exists, converts a known DataFrame to a `DataTable`, and asserts the returned table row count equals the source frame row count
+
+- [ ] [P48-T4] Register `UtilitiesCS.Test\Extensions\DfMLNet_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Extensions\DfMLNet_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
+
 
