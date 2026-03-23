@@ -280,7 +280,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>(new List<int> { 1, 2, 3 });
             using var stream = new MemoryStream();
-            using var overrideWriter = OverrideSerializableListField<int>(
+            using var overrideWriter = OverrideInstanceField(
+                list,
                 "_createTextWriter",
                 new Func<string, StreamWriter>(_ => new StreamWriter(
                     stream,
@@ -355,6 +356,12 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>();
             list.Filepath = GetValidFixturePath();
+            // Return the fixture content directly so this test does not touch the real filesystem.
+            using var overrideReader = OverrideInstanceField(
+                list,
+                "_readAllText",
+                new Func<string, string>(_ => "[5, 4, 6]")
+            );
 
             // Act
             list.Deserialize(askUserOnError: false);
@@ -383,6 +390,18 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>(new List<int> { 1, 2, 3 });
             var missingPath = CreateMissingFilePath();
+            // Simulate a missing file without relying on the real filesystem.
+            // The no-op writer prevents the subsequent Serialize() call from writing to disk.
+            using var overrideReader = OverrideInstanceField(
+                list,
+                "_readAllText",
+                new Func<string, string>(p => throw new FileNotFoundException("missing", p))
+            );
+            using var overrideWriter = OverrideInstanceField(
+                list,
+                "_createTextWriter",
+                new Func<string, StreamWriter>(_ => new StreamWriter(Stream.Null))
+            );
 
             // Act
             list.Deserialize(missingPath, askUserOnError: false);
@@ -398,7 +417,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>(new List<int> { 1, 2, 3 });
             var missingPath = CreateMissingFilePath();
-            using var overrideReader = OverrideSerializableListField<int>(
+            using var overrideReader = OverrideInstanceField(
+                list,
                 "_readAllText",
                 new Func<string, string>(_ =>
                     throw new FileNotFoundException("missing", missingPath)
@@ -430,7 +450,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>(Enumerable.Empty<int>());
             var missingPath = CreateMissingFilePath();
-            using var overrideReader = OverrideSerializableListField<int>(
+            using var overrideReader = OverrideInstanceField(
+                list,
                 "_readAllText",
                 new Func<string, string>(_ =>
                     throw new FileNotFoundException("missing", missingPath)
@@ -461,7 +482,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>(Enumerable.Empty<int>());
             var missingPath = CreateMissingFilePath();
-            using var overrideReader = OverrideSerializableListField<int>(
+            using var overrideReader = OverrideInstanceField(
+                list,
                 "_readAllText",
                 new Func<string, string>(_ =>
                     throw new FileNotFoundException("missing", missingPath)
@@ -490,6 +512,18 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var list = new SerializableList<int>(new List<int> { 1, 2, 3 });
+            // Return genuinely malformed content without relying on the real fixture file.
+            // The no-op writer prevents the subsequent Serialize() call from overwriting the fixture.
+            using var overrideReader = OverrideInstanceField(
+                list,
+                "_readAllText",
+                new Func<string, string>(_ => "not valid json {{ broken")
+            );
+            using var overrideWriter = OverrideInstanceField(
+                list,
+                "_createTextWriter",
+                new Func<string, StreamWriter>(_ => new StreamWriter(Stream.Null))
+            );
 
             // Act
             list.Deserialize(GetInvalidFixturePath(), askUserOnError: false);
@@ -504,7 +538,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var list = new SerializableList<int>(Enumerable.Empty<int>());
-            using var overrideReader = OverrideSerializableListField<int>(
+            using var overrideReader = OverrideInstanceField(
+                list,
                 "_readAllText",
                 new Func<string, string>(_ => throw new InvalidDataException("broken json"))
             );
@@ -622,6 +657,18 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             var list = new SerializableList<int>();
             var observedPath = string.Empty;
             var missingPath = CreateMissingFilePath();
+            // Simulate a missing primary file without relying on the real filesystem.
+            // The no-op writer prevents the fallback Serialize() call from writing to disk.
+            using var overrideReader = OverrideInstanceField(
+                list,
+                "_readAllText",
+                new Func<string, string>(p => throw new FileNotFoundException("missing", p))
+            );
+            using var overrideWriter = OverrideInstanceField(
+                list,
+                "_createTextWriter",
+                new Func<string, StreamWriter>(_ => new StreamWriter(Stream.Null))
+            );
 
             // Act
             list.Deserialize(
@@ -645,6 +692,18 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>();
             var observedPath = string.Empty;
+            // Return genuinely malformed content without relying on the real fixture file.
+            // The no-op writer prevents the fallback Serialize() call from overwriting the fixture.
+            using var overrideReader = OverrideInstanceField(
+                list,
+                "_readAllText",
+                new Func<string, string>(_ => "not valid json {{ broken")
+            );
+            using var overrideWriter = OverrideInstanceField(
+                list,
+                "_createTextWriter",
+                new Func<string, StreamWriter>(_ => new StreamWriter(Stream.Null))
+            );
 
             // Act
             list.Deserialize(
@@ -659,7 +718,16 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             // Assert
             list.ToList().Should().Equal(12, 13);
-            observedPath.Should().Be(Path.Combine(WorkspaceRoot, "UtilitiesCS.Test", "TestData", "serializable-list-invalid.csv"));
+            observedPath
+                .Should()
+                .Be(
+                    Path.Combine(
+                        WorkspaceRoot,
+                        "UtilitiesCS.Test",
+                        "TestData",
+                        "serializable-list-invalid.csv"
+                    )
+                );
         }
 
         [TestMethod]
@@ -668,7 +736,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var list = new SerializableList<int>(Enumerable.Empty<int>());
             var observedPath = string.Empty;
-            using var overrideReader = OverrideSerializableListField<int>(
+            using var overrideReader = OverrideInstanceField(
+                list,
                 "_readAllText",
                 new Func<string, string>(_ => throw new InvalidDataException("broken json"))
             );
@@ -714,7 +783,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
                     System.Windows.Forms.DialogResult.Yes,
                 }
             );
-            using var overrideReader = OverrideSerializableListField<int>(
+            using var overrideReader = OverrideInstanceField(
+                list,
                 "_readAllText",
                 new Func<string, string>(_ =>
                     throw new FileNotFoundException("missing", CreateMissingFilePath())
@@ -757,7 +827,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             var responses = new Queue<System.Windows.Forms.DialogResult>(
                 new[] { System.Windows.Forms.DialogResult.No, System.Windows.Forms.DialogResult.No }
             );
-            using var overrideReader = OverrideSerializableListField<int>(
+            using var overrideReader = OverrideInstanceField(
+                list,
                 "_readAllText",
                 new Func<string, string>(_ =>
                     throw new FileNotFoundException("missing", CreateMissingFilePath())
@@ -818,6 +889,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             return Path.Combine(WorkspaceRoot, "missing-serializable-list.json");
         }
 
+        /// <summary>
+        /// Overrides a static field on SerializableList&lt;T&gt;. Use for static dependencies such as
+        /// <c>_showMessageBox</c> that remain shared across all instances.
+        /// </summary>
         private static IDisposable OverrideSerializableListField<T>(
             string fieldName,
             object replacement
@@ -832,6 +907,28 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             field.SetValue(null, replacement);
 
             return new CallbackDisposable(() => field.SetValue(null, original));
+        }
+
+        /// <summary>
+        /// Overrides an instance field on a specific SerializableList&lt;T&gt; instance. Use for
+        /// injectable file-system dependencies such as <c>_readAllText</c> and <c>_createTextWriter</c>
+        /// to keep each test's I/O fully isolated without touching the real filesystem.
+        /// </summary>
+        private static IDisposable OverrideInstanceField<T>(
+            SerializableList<T> instance,
+            string fieldName,
+            object replacement
+        )
+            where T : IComparable<T>
+        {
+            var field = typeof(SerializableList<T>).GetField(
+                fieldName,
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            var original = field.GetValue(instance);
+            field.SetValue(instance, replacement);
+
+            return new CallbackDisposable(() => field.SetValue(instance, original));
         }
 
         private sealed class CallbackDisposable : IDisposable

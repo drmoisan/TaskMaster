@@ -294,6 +294,7 @@
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionaryTest\SimpleObserver.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\ConcurrentObservableDictionaryTests.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollectionSenderTests.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollectionLockRecursionTests.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollection_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests_UnfinishedStubs.cs" />

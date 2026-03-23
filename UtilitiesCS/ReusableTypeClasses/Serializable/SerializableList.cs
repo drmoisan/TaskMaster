@@ -62,8 +62,8 @@ namespace UtilitiesCS
         private IList<T> _innerList;
         private IEnumerable<T> _lazyLoader;
         private string _backupFilepath = "";
-        private static Func<string, StreamWriter> _createTextWriter = File.CreateText;
-        private static Func<string, string> _readAllText = File.ReadAllText;
+        private Func<string, StreamWriter> _createTextWriter = File.CreateText;
+        private Func<string, string> _readAllText = File.ReadAllText;
         private static Func<
             string,
             string,
