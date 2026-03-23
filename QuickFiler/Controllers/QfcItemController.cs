@@ -30,7 +30,7 @@ namespace QuickFiler.Controllers
 
         #region ctor
 
-        private QfcItemController() { }
+        protected QfcItemController() { }
 
         public QfcItemController(
             IApplicationGlobals appGlobals,
@@ -597,14 +597,16 @@ namespace QuickFiler.Controllers
 
             try
             {
-                ConversationResolver = await ConversationResolver.LoadAsync(
-                    _globals,
-                    ItemHelper,
+                ConversationResolver = await DoLoadConversationResolverCoreAsync(
                     tokenSource,
                     token,
-                    loadAll,
-                    SetTopicThread
+                    loadAll
                 );
+            }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is an expected flow; propagate so callers can observe it.
+                throw;
             }
             catch (System.Exception e)
             {
@@ -613,6 +615,24 @@ namespace QuickFiler.Controllers
             }
         }
 
+        /// <summary>
+        /// Seam for the static ConversationResolver.LoadAsync call. Override in tests to
+        /// inject controlled behaviour without requiring WinForms infrastructure.
+        /// </summary>
+        protected virtual Task<ConversationResolver> DoLoadConversationResolverCoreAsync(
+            CancellationTokenSource tokenSource,
+            CancellationToken token,
+            bool loadAll
+        ) =>
+            ConversationResolver.LoadAsync(
+                _globals,
+                ItemHelper,
+                tokenSource,
+                token,
+                loadAll,
+                SetTopicThread
+            );
+
         public async Task PopulateConversationAsync(
             CancellationTokenSource tokenSource,
             CancellationToken token,
@@ -620,6 +640,9 @@ namespace QuickFiler.Controllers
         )
         {
             await LoadConversationResolverAsync(tokenSource, token, loadAll);
+            token.ThrowIfCancellationRequested();
+            if (ConversationResolver is null)
+                return;
             await RenderConversationCountAsync(
                 ConversationResolver.Count.SameFolder,
                 token,
