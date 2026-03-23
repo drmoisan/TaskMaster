@@ -1175,4 +1175,24 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 - [ ] [P89-T4] Register `UtilitiesCS.Test\HelperClasses\FilePathHelper_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="HelperClasses\FilePathHelper_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
+### Phase 90 — Final QC Pass
+
+- [ ] [P90-T1] Run `dotnet tool run csharpier .` to format all modified C# files and confirm no formatting changes remain
+  - Acceptance: Command exits with code 0 and reports no files were reformatted; evidence artifact saved to `evidence/qa-gates/final-qc-format.md` containing `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
+
+- [ ] [P90-T2] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` to confirm zero analyzer diagnostics
+  - Acceptance: Build exits with code 0 with `0 Error(s)` and `0 Warning(s)`; evidence artifact saved to `evidence/qa-gates/final-qc-analyzers.md` containing `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
+
+- [ ] [P90-T3] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true` to confirm zero nullable/type-safety warnings
+  - Acceptance: Build exits with code 0 with no warnings treated as errors; evidence artifact saved to `evidence/qa-gates/final-qc-nullable.md` containing `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
+
+- [ ] [P90-T4] Run `vstest.console.exe` against the `UtilitiesCS.Test` assembly with `/EnableCodeCoverage` and confirm all pre-existing tests still pass and no new test failures are introduced
+  - Acceptance: All previously passing tests continue to pass; zero test failures; evidence artifact saved to `evidence/qa-gates/final-qc-test-coverage.md` containing `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:` including total test count, pass count, and numeric post-change UtilitiesCS line coverage percentage
+
+- [ ] [P90-T5] Confirm that every non-skipped phase (P1–P89 excluding P6, P7, P28, P31, P32, P33, P35, P37, P58, P59, P79) has a corresponding `<Compile Include="..." />` entry present in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+  - Acceptance: `UtilitiesCS.Test.csproj` contains a `<Compile Include="..." />` line for each expected test file; the count of new entries equals the count of IMPLEMENT phases
+
+- [ ] [P90-T6] Verify that line coverage for `UtilitiesCS` in the coverage report meets or exceeds the 80% repository-wide threshold
+  - Acceptance: The coverage report produced by the `/EnableCodeCoverage` run in P90-T4 shows `UtilitiesCS` line coverage ≥ 80%; if not, identify remaining below-threshold files and record a follow-up note inline
+
 
