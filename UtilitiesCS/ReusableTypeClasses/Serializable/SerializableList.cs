@@ -62,6 +62,16 @@ namespace UtilitiesCS
         private IList<T> _innerList;
         private IEnumerable<T> _lazyLoader;
         private string _backupFilepath = "";
+        private Func<string, StreamWriter> _createTextWriter = File.CreateText;
+        private Func<string, string> _readAllText = File.ReadAllText;
+        private static Func<
+            string,
+            string,
+            MessageBoxButtons,
+            MessageBoxIcon,
+            DialogResult
+        > _showMessageBox = (text, caption, buttons, icon) =>
+            MessageBox.Show(text, caption, buttons, icon);
 
         internal void ensureList()
         {
@@ -237,7 +247,11 @@ namespace UtilitiesCS
         public void Serialize(string filepath)
         {
             this.Filepath = filepath;
-            _ = Task.Run(() => SerializeThreadSafe(filepath));
+            // Capture the writer factory at call time so fire-and-forget execution uses the
+            // delegate that was active when Serialize was called, even if the instance field is
+            // replaced (e.g. by a test mock) before the thread-pool task actually runs.
+            var capturedWriter = _createTextWriter;
+            _ = Task.Run(() => SerializeCore(filepath, capturedWriter));
         }
 
         public async Task SerializeAsync()
@@ -255,20 +269,26 @@ namespace UtilitiesCS
         public async Task SerializeAsync(string filepath)
         {
             this.Filepath = filepath;
-            await Task.Run(() => SerializeThreadSafe(filepath));
+            // Same capture-at-call-time pattern as Serialize(filepath) to avoid the race.
+            var capturedWriter = _createTextWriter;
+            await Task.Run(() => SerializeCore(filepath, capturedWriter));
         }
 
         private static ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
 
-        public void SerializeThreadSafe(string filepath)
+        /// <summary>
+        /// Serialize the list to <paramref name="filepath"/> on the calling thread, holding the
+        /// write lock for the duration. Callers that schedule this on a background thread must
+        /// pass the writer factory they captured at schedule time so the correct delegate is used
+        /// even if the instance field is swapped after the task is queued.
+        /// </summary>
+        private void SerializeCore(string filepath, Func<string, StreamWriter> createTextWriter)
         {
-            // Set Status to Locked
             if (_readWriteLock.TryEnterWriteLock(-1))
             {
                 try
                 {
-                    // Append text to the file
-                    using (StreamWriter sw = File.CreateText(filepath))
+                    using (StreamWriter sw = createTextWriter(filepath))
                     {
                         var settings = new JsonSerializerSettings();
                         settings.TypeNameHandling = TypeNameHandling.Auto;
@@ -285,10 +305,21 @@ namespace UtilitiesCS
                 }
                 finally
                 {
-                    // Release lock
                     _readWriteLock.ExitWriteLock();
                 }
             }
+        }
+
+        /// <summary>
+        /// Serialize the list to <paramref name="filepath"/> using the current
+        /// <c>_createTextWriter</c> delegate, holding the write lock for the duration.
+        /// Intended for direct synchronous calls; for fire-and-forget or async use,
+        /// prefer <see cref="Serialize(string)"/> or <see cref="SerializeAsync(string)"/>,
+        /// which capture the delegate at call time.
+        /// </summary>
+        public void SerializeThreadSafe(string filepath)
+        {
+            SerializeCore(filepath, _createTextWriter);
         }
 
         public void Sort()
@@ -335,14 +366,14 @@ namespace UtilitiesCS
 
             try
             {
-                _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
+                _innerList = JsonConvert.DeserializeObject<List<T>>(_readAllText(filepath));
             }
             catch (FileNotFoundException e)
             {
                 log.Error(e.Message);
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(
+                    response = _showMessageBox(
                         $"{filepath} not found. Load from backup?",
                         "File Not Found",
                         MessageBoxButtons.YesNo,
@@ -359,7 +390,7 @@ namespace UtilitiesCS
                 log.Error(e.Message);
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(
+                    response = _showMessageBox(
                         $"{filepath} encountered a problem. {e.Message} " + " Load from backup?",
                         "Error!",
                         MessageBoxButtons.YesNo,
@@ -394,7 +425,7 @@ namespace UtilitiesCS
                 {
                     if (askUserOnError)
                     {
-                        response = MessageBox.Show(
+                        response = _showMessageBox(
                             "Need a list to continue. " + "Create a new List Or Stop Execution?",
                             "Error",
                             MessageBoxButtons.YesNo,
@@ -433,7 +464,7 @@ namespace UtilitiesCS
                 settings.TypeNameHandling = TypeNameHandling.Auto;
                 settings.Formatting = Formatting.Indented;
                 _innerList = JsonConvert.DeserializeObject<List<T>>(
-                    File.ReadAllText(filepath),
+                    _readAllText(filepath),
                     settings
                 );
                 if (_innerList is null)
@@ -447,7 +478,7 @@ namespace UtilitiesCS
                 log.Error($"File {filepath} does not exist.");
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(
+                    response = _showMessageBox(
                         $"{filepath} not found. Create a new list? Excecution will stop if answer is no.",
                         "File Not Found",
                         MessageBoxButtons.YesNo,
@@ -464,7 +495,7 @@ namespace UtilitiesCS
                 log.Error($"Error! {e.Message}");
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(
+                    response = _showMessageBox(
                         filepath
                             + " encountered a problem. "
                             + e.Message
