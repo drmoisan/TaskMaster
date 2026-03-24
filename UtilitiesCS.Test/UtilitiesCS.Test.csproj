@@ -153,6 +153,7 @@
     <Compile Include="Extensions\ArrayExtensions_Tests.cs" />
     <Compile Include="Extensions\AsyncSerialization_Tests.cs" />
     <Compile Include="Extensions\CompilerServicesExtensions_Tests.cs" />
+    <Compile Include="Extensions\DfDeedle_Tests.cs" />
     <Compile Include="Extensions\DictionaryExtensions_Tests.cs" />
     <Compile Include="Extensions\EnumExtensions_Tests.cs" />
     <Compile Include="Extensions\ExtToChar_Tests.cs" />
@@ -173,6 +174,7 @@
     <Compile Include="Extensions\ImageExtensions_Tests.cs" />
     <Compile Include="HelperClasses\MyFileSystemInfoTests.cs" />
     <Compile Include="HelperClasses\PropertyInitializerTest.cs" />
+    <Compile Include="HelperClasses\DvgForm_Tests.cs" />
     <Compile Include="HelperClasses\Initializer_Tests.cs" />
     <Compile Include="HelperClasses\MergeSortImplementations_Tests.cs" />
     <Compile Include="HelperClasses\ObjectCopier_Tests.cs" />
@@ -196,6 +198,9 @@
     <Compile Include="HelperClasses\StringManipulation_Tests.cs" />
     <Compile Include="HelperClasses\FilePathHelper_Tests.cs" />
     <Compile Include="HelperClasses\FileSystemInfoWrapper_Tests.cs" />
+    <Compile Include="HelperClasses\QfcTipsDetails_Tests.cs" />
+    <Compile Include="HelperClasses\TipsController_Tests.cs" />
+    <Compile Include="HelperClasses\OlvExtension_Tests.cs" />
     <Compile Include="Interfaces\PropertyStore_Tests.cs" />
     <Compile Include="NewtonsoftHelpers\AllInclusiveBinder_Tests.cs" />
     <Compile Include="NewtonsoftHelpers\FilePathHelperConverterTests.cs" />
@@ -339,6 +344,8 @@
     <Compile Include="ReusableTypeClasses\SmartSerializableLoader_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializableNonTyped_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializableStatic_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\ConfigGroupBox_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\ConfigViewer_Tests.cs" />
     <Compile Include="ThemeHelpers\SystemThemeDetectorTests.cs" />
     <Compile Include="Threading\AppGlobalsConverterTests.cs" />
     <Compile Include="Threading\AppGlobalsConverterTests_Unfinished.cs" />
