@@ -39,128 +39,128 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 
 ### Phase 0 — Compliance & Baseline Capture
 
-- [ ] [P0-T1] Read all repo policy files in required order: `.github/copilot-instructions.md`, `general-code-change.instructions.md`, `general-unit-test.instructions.md`, `csharp-code-change.instructions.md`, `csharp-unit-test.instructions.md`
+- [x] [P0-T1] Read all repo policy files in required order: `.github/copilot-instructions.md`, `general-code-change.instructions.md`, `general-unit-test.instructions.md`, `csharp-code-change.instructions.md`, `csharp-unit-test.instructions.md`
   - Acceptance: Evidence artifact at `evidence/baseline/phase0-instructions-read.md` contains `Timestamp:`, `Policy Order:`, and explicit list of all five files read
 
-- [ ] [P0-T2] Capture baseline build state by running `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"`
+- [x] [P0-T2] Capture baseline build state by running `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"`
   - Acceptance: Evidence artifact at `evidence/baseline/baseline-build.md` contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
 
-- [ ] [P0-T3] Capture baseline test results with coverage by running `vstest.console.exe` with `/EnableCodeCoverage` over all `*.Test.dll` assemblies
+- [x] [P0-T3] Capture baseline test results with coverage by running `vstest.console.exe` with `/EnableCodeCoverage` over all `*.Test.dll` assemblies
   - Acceptance: Evidence artifact at `evidence/baseline/baseline-test-coverage.md` contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:` including total test count, pass count, and repo-wide UtilitiesCS line coverage percentage
 
-- [ ] [P0-T4] Record per-file baseline coverage for all UtilitiesCS production files below 80% line rate from the current `coverage/coverage.cobertura.xml`
+- [x] [P0-T4] Record per-file baseline coverage for all UtilitiesCS production files below 80% line rate from the current `coverage/coverage.cobertura.xml`
   - Acceptance: Evidence artifact at `evidence/baseline/baseline-per-file-coverage.md` lists each file with its current line-rate percentage, categorized by difficulty (Easy/Medium/Hard/Skip)
 
-- [ ] [P0-T5] Reconcile every currently sub-80 non-skip UtilitiesCS file from `evidence/qa-gates/final-coverage-verification.md` against the remaining plan and `evidence/other/skip-candidates.md`
+- [x] [P0-T5] Reconcile every currently sub-80 non-skip UtilitiesCS file from `evidence/qa-gates/final-coverage-verification.md` against the remaining plan and `evidence/other/skip-candidates.md`
   - Acceptance: Evidence artifact at `evidence/baseline/remaining-sub80-reconciliation.md` contains one row for every file listed under "Non-Skip UtilitiesCS Files Below 80%" in `evidence/qa-gates/final-coverage-verification.md`, and each row maps the file to exactly one remaining task path: `Implementation Task` or `Phase 4 Skip Task`
 
-- [ ] [P0-T6] Verify the revised checklist state matches the reconciliation matrix before additional implementation resumes
+- [x] [P0-T6] Verify the revised checklist state matches the reconciliation matrix before additional implementation resumes
   - Preconditions: P0-T5 complete
   - Acceptance: Every file mapped to `Implementation Task` in `evidence/baseline/remaining-sub80-reconciliation.md` references an unchecked P1/P2/P3 task ID, every file mapped to `Phase 4 Skip Task` references an unchecked P4 task ID, and no checked task still depends on a file that remains below 80% in `evidence/qa-gates/final-coverage-verification.md`
 
 ### Phase 1 — FolderNotFoundViewer Coverage (`UtilitiesCS\Dialogs\FolderNotFoundViewer.cs`)
 
-- [ ] [P1-T1] Add test to `UtilitiesCS.Test\Dialogs\FolderNotFoundViewer_Tests.cs` verifying that clicking the save-style action button sets `FolderAction` to the expected keep/save enum value
+- [x] [P1-T1] Add test to `UtilitiesCS.Test\Dialogs\FolderNotFoundViewer_Tests.cs` verifying that clicking the save-style action button sets `FolderAction` to the expected keep/save enum value
   - Acceptance: `[TestMethod]` exists in `FolderNotFoundViewer_Tests.cs`, creates a `FolderNotFoundViewer` instance on an STA thread, invokes the save button click handler, and asserts `FolderAction` equals the expected save enum value
 
-- [ ] [P1-T2] Add test to `UtilitiesCS.Test\Dialogs\FolderNotFoundViewer_Tests.cs` verifying that clicking the discard-style action button sets `FolderAction` to the expected discard/remove enum value
+- [x] [P1-T2] Add test to `UtilitiesCS.Test\Dialogs\FolderNotFoundViewer_Tests.cs` verifying that clicking the discard-style action button sets `FolderAction` to the expected discard/remove enum value
   - Acceptance: `[TestMethod]` exists, invokes the discard button click handler, and asserts `FolderAction` equals the expected discard enum value
 
-- [ ] [P1-T3] Add test to `UtilitiesCS.Test\Dialogs\FolderNotFoundViewer_Tests.cs` verifying that `FolderName` property returns the backing folder-name text correctly
+- [x] [P1-T3] Add test to `UtilitiesCS.Test\Dialogs\FolderNotFoundViewer_Tests.cs` verifying that `FolderName` property returns the backing folder-name text correctly
   - Acceptance: `[TestMethod]` exists, assigns a known string to the backing field or constructor, and asserts `FolderName` returns that exact string
 
-- [ ] [P1-T4] Add test to `UtilitiesCS.Test\Dialogs\FolderNotFoundViewer_Tests.cs` verifying that the viewer calls `Hide` rather than `Dispose` when an action button is activated
+- [x] [P1-T4] Add test to `UtilitiesCS.Test\Dialogs\FolderNotFoundViewer_Tests.cs` verifying that the viewer calls `Hide` rather than `Dispose` when an action button is activated
   - Acceptance: `[TestMethod]` exists, invokes the action click handler, and asserts the viewer instance is not disposed after the call
 
-- [ ] [P1-T5] Register `UtilitiesCS.Test\Dialogs\FolderNotFoundViewer_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P1-T5] Register `UtilitiesCS.Test\Dialogs\FolderNotFoundViewer_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Dialogs\FolderNotFoundViewer_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 2 — InputBox Coverage (`UtilitiesCS\Dialogs\InputBox.cs`)
 
-- [ ] [P2-T1] Add test to `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that the default response value populates the viewer's textbox state when the dialog is initialized
+- [x] [P2-T1] Add test to `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that the default response value populates the viewer's textbox state when the dialog is initialized
   - Acceptance: `[TestMethod]` exists in `InputBox_Test.cs`, creates an `InputBoxViewer` with a known default response string, and asserts the textbox text equals that default string
 
-- [ ] [P2-T2] Add test to `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that accepting the dialog (OK path) returns the text entered in the textbox
+- [x] [P2-T2] Add test to `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that accepting the dialog (OK path) returns the text entered in the textbox
   - Acceptance: `[TestMethod]` exists, sets the viewer textbox to a known string, triggers the OK path, and asserts the returned value equals the entered text
 
-- [ ] [P2-T3] Add test to `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that cancelling the dialog returns `null`
+- [x] [P2-T3] Add test to `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that cancelling the dialog returns `null`
   - Acceptance: `[TestMethod]` exists, triggers the cancel path on the viewer, and asserts the return value is `null`
 
 ### Phase 3 — InputBoxViewer Coverage (`UtilitiesCS\Dialogs\InputBoxViewer.cs`)
 
-- [ ] [P3-T1] Add test to `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that `Ok_Click` copies the textbox text to the response field and closes the viewer
+- [x] [P3-T1] Add test to `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that `Ok_Click` copies the textbox text to the response field and closes the viewer
   - Acceptance: `[TestMethod]` exists, sets the textbox text on a direct `InputBoxViewer` instance, calls `Ok_Click`, and asserts the response field equals the textbox text and the viewer is no longer visible
 
-- [ ] [P3-T2] Add test to `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that `Cancel_Click` clears the response field
+- [x] [P3-T2] Add test to `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that `Cancel_Click` clears the response field
   - Acceptance: `[TestMethod]` exists, calls `Cancel_Click` on a direct `InputBoxViewer` instance, and asserts the response field is `null` or empty
 
-- [ ] [P3-T3] Add test to `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that `DpiAware` property and `DpiCalled` static flag toggle their expected state
+- [x] [P3-T3] Add test to `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that `DpiAware` property and `DpiCalled` static flag toggle their expected state
   - Acceptance: `[TestMethod]` resets `DpiCalled` to its default, sets `DpiAware`, and asserts `DpiCalled` reflects the expected toggled value; static state is reset in `TestCleanup`
 
 ### Phase 4 — MyBox Coverage (`UtilitiesCS\Dialogs\MyBox.cs`)
 
-- [ ] [P4-T1] Add test to `UtilitiesCS.Test\Dialogs\MyBox_Tests.cs` verifying that button conversion preserves dialog result ordering when standard buttons are mapped to custom equivalents
+- [x] [P4-T1] Add test to `UtilitiesCS.Test\Dialogs\MyBox_Tests.cs` verifying that button conversion preserves dialog result ordering when standard buttons are mapped to custom equivalents
   - Acceptance: `[TestMethod]` exists in `MyBox_Tests.cs`, calls the button-conversion helper with a known set of standard buttons, and asserts the output sequence preserves expected `DialogResult` order
 
-- [ ] [P4-T2] Add test to `UtilitiesCS.Test\Dialogs\MyBox_Tests.cs` verifying that the button replacement helper swaps custom buttons into the viewer correctly
+- [x] [P4-T2] Add test to `UtilitiesCS.Test\Dialogs\MyBox_Tests.cs` verifying that the button replacement helper swaps custom buttons into the viewer correctly
   - Acceptance: `[TestMethod]` exists, supplies a custom button list to the replacement helper, and asserts the viewer's button collection contains the custom buttons
 
-- [ ] [P4-T3] Add test to `UtilitiesCS.Test\Dialogs\MyBox_Tests.cs` verifying that `FunctionButtonGroup<T>` routing returns the mapped value for each button entry
+- [x] [P4-T3] Add test to `UtilitiesCS.Test\Dialogs\MyBox_Tests.cs` verifying that `FunctionButtonGroup<T>` routing returns the mapped value for each button entry
   - Acceptance: `[TestMethod]` exists, creates a `FunctionButtonGroup<T>` binding with a known mapping, triggers the delegate, and asserts the returned value equals the expected mapped result
 
-- [ ] [P4-T4] Register `UtilitiesCS.Test\Dialogs\MyBox_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P4-T4] Register `UtilitiesCS.Test\Dialogs\MyBox_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Dialogs\MyBox_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 5 — NotImplementedDialog Coverage (`UtilitiesCS\Dialogs\NotImplementedDialog.cs`)
 
-- [ ] [P5-T1] Add test to `UtilitiesCS.Test\Dialogs\NotImplementedDialog_Tests.cs` verifying that when `StopAtNotImplemented` is `true` the not-implemented trigger path throws the expected exception
+- [x] [P5-T1] Add test to `UtilitiesCS.Test\Dialogs\NotImplementedDialog_Tests.cs` verifying that when `StopAtNotImplemented` is `true` the not-implemented trigger path throws the expected exception
   - Acceptance: `[TestMethod]` exists, sets `StopAtNotImplemented = true` via reflection or public API, invokes the trigger path, and asserts the expected exception type is thrown using FluentAssertions `.Should().Throw<>()`
 
-- [ ] [P5-T2] Add test to `UtilitiesCS.Test\Dialogs\NotImplementedDialog_Tests.cs` verifying that when `StopAtNotImplemented` is `false` the trigger path completes without throwing
+- [x] [P5-T2] Add test to `UtilitiesCS.Test\Dialogs\NotImplementedDialog_Tests.cs` verifying that when `StopAtNotImplemented` is `false` the trigger path completes without throwing
   - Acceptance: `[TestMethod]` exists, sets `StopAtNotImplemented = false`, invokes the trigger path, and asserts no exception is thrown (method returns normally)
 
-- [ ] [P5-T3] Add `[TestCleanup]` method to `NotImplementedDialog_Tests.cs` that resets `StopAtNotImplemented` to its original value after each test to prevent static state pollution
+- [x] [P5-T3] Add `[TestCleanup]` method to `NotImplementedDialog_Tests.cs` that resets `StopAtNotImplemented` to its original value after each test to prevent static state pollution
   - Acceptance: `[TestInitialize]`-annotated method captures the original flag, `[TestCleanup]`-annotated method restores it, and both methods exist in the test class
 
-- [ ] [P5-T4] Register `UtilitiesCS.Test\Dialogs\NotImplementedDialog_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P5-T4] Register `UtilitiesCS.Test\Dialogs\NotImplementedDialog_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Dialogs\NotImplementedDialog_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 6 — SKIP_EVALUATION: ConfusionViewer (`UtilitiesCS\EmailIntelligence\Bayesian\Performance\ConfusionViewer.cs`)
 
-- [ ] [P6-T1] Record skip-evaluation decision for `ConfusionViewer.cs` in plan notes
+- [x] [P6-T1] Record skip-evaluation decision for `ConfusionViewer.cs` in plan notes
   - Acceptance: This task is marked complete to document that `ConfusionViewer.cs` is a constructor-only WinForms designer shell with no meaningful non-designer logic; no test file will be created for this file
 
 ### Phase 7 — SKIP_EVALUATION: MetricChartViewer (`UtilitiesCS\EmailIntelligence\Bayesian\Performance\MetricChartViewer.cs`)
 
-- [ ] [P7-T1] Record skip-evaluation decision for `MetricChartViewer.cs` in plan notes
+- [x] [P7-T1] Record skip-evaluation decision for `MetricChartViewer.cs` in plan notes
   - Acceptance: This task is marked complete to document that `MetricChartViewer.cs` is a constructor-only WinForms designer shell with no meaningful non-designer logic; no test file will be created for this file
 
 ### Phase 8 — AutoFile Coverage (`UtilitiesCS\EmailIntelligence\EmailParsingSorting\AutoFile.cs`)
 
-- [ ] [P8-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\AutoFile_Tests.cs` verifying that `AreConversationsGrouped` returns `true` when category and state inputs indicate grouped conversations
+- [x] [P8-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\AutoFile_Tests.cs` verifying that `AreConversationsGrouped` returns `true` when category and state inputs indicate grouped conversations
   - Acceptance: `[TestMethod]` exists, constructs synthetic category/state inputs using mocked Outlook objects, calls `AreConversationsGrouped`, and asserts the return value is `true`
 
-- [ ] [P8-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\AutoFile_Tests.cs` verifying that category-selection guard does not duplicate an already-selected category
+- [x] [P8-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\AutoFile_Tests.cs` verifying that category-selection guard does not duplicate an already-selected category
   - Acceptance: `[TestMethod]` exists, builds a collection that already contains the target category, invokes category selection, and asserts the collection size is unchanged and the category appears exactly once
 
-- [ ] [P8-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\AutoFile_Tests.cs` verifying that `AutoFindPeople` selects the expected person candidate from a synthetic collection
+- [x] [P8-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\AutoFile_Tests.cs` verifying that `AutoFindPeople` selects the expected person candidate from a synthetic collection
   - Acceptance: `[TestMethod]` exists, passes a synthetic person collection with a single unambiguous match, calls `AutoFindPeople`, and asserts the returned candidate equals the expected value
 
-- [ ] [P8-T4] Register `UtilitiesCS.Test\EmailIntelligence\AutoFile_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P8-T4] Register `UtilitiesCS.Test\EmailIntelligence\AutoFile_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\AutoFile_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 9 — SortEmail Coverage (`UtilitiesCS\EmailIntelligence\EmailParsingSorting\SortEmail.cs`)
 
-- [ ] [P9-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\SortEmail_Tests.cs` verifying that `InitializeSortToExisting` throws `NotImplementedException`
+- [x] [P9-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\SortEmail_Tests.cs` verifying that `InitializeSortToExisting` throws `NotImplementedException`
   - Acceptance: `[TestMethod]` exists, invokes `InitializeSortToExisting`, and asserts a `NotImplementedException` is thrown using FluentAssertions `.Should().Throw<NotImplementedException>()`
 
-- [ ] [P9-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\SortEmail_Tests.cs` verifying that `ProcessMailItemAsync` short-circuits without proceeding to filing logic when the mail item input is null
+- [x] [P9-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\SortEmail_Tests.cs` verifying that `ProcessMailItemAsync` short-circuits without proceeding to filing logic when the mail item input is null
   - Acceptance: `[TestMethod]` exists, passes `null` as the mail item, awaits `ProcessMailItemAsync`, and asserts no filing side-effects were triggered (mocked engine manager receives no file calls)
 
-- [ ] [P9-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\SortEmail_Tests.cs` verifying that both `SortAsync` overloads delegate to the same core processing path via the engine manager
+- [x] [P9-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\SortEmail_Tests.cs` verifying that both `SortAsync` overloads delegate to the same core processing path via the engine manager
   - Acceptance: `[TestMethod]` exists, invokes each overload with mocked engine manager, and asserts the expected core processing method was called exactly once per overload
 
-- [ ] [P9-T4] Register `UtilitiesCS.Test\EmailIntelligence\SortEmail_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P9-T4] Register `UtilitiesCS.Test\EmailIntelligence\SortEmail_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\SortEmail_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 10 — FilterOlFoldersController Coverage (`UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersController.cs`)

@@ -3,31 +3,50 @@
 - **Issue:** #87
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-03-19T21-49
-- **Status:** Draft
-- **Version:** 0.1
+- **Last Updated:** 2026-03-23
+- **Status:** In Progress
+- **Version:** 0.2
 
 ## Overview
 
-The UtilitiesCS library has 292 classes tracked by coverage tooling, but 196 of them (67%) are below the repository-wide 80% line-coverage floor mandated by general-unit-test.instructions.md. Many files sit at 0% coverage — including helpers, extension methods, threading utilities, serialization infrastructure, email intelligence modules, and Newtonsoft JSON converters. This gap means regressions in core shared code go undetected and the library cannot pass the repo-wide >=80% coverage gate.
+The UtilitiesCS library has 292 classes tracked by coverage tooling. Approximately 155 files have an explicit line-rate below 80% in the Cobertura report, plus ~16 `Designer.cs` auto-generated files, ~4 commented stubs, and ~40+ pure-interface files with no executable code. This gap means regressions in core shared code go undetected and the library cannot pass the repo-wide ≥80% coverage gate mandated by `general-unit-test.instructions.md`.
 
-Previous feature work (issue #82, utilities-coverage-part-two) raised OutlookObjects/Folder to >=80%. This third part extends coverage to **every remaining file and subfolder** in UtilitiesCS.
+Previous feature work (issue #82, utilities-coverage-part-two) raised `OutlookObjects/Folder` to ≥80%. This third part extends coverage to every remaining production `.cs` file compiled by `UtilitiesCS.csproj`, preceded by a compliance and baseline-capture gate (Phase 0) and a reconciliation step that maps every sub-80 non-skip file to a specific implementation task or skip-evaluation task before any implementation resumes.
+
+Research conducted on 2026-03-22 verified the actual public surfaces, behavioral seams, and UI/runtime coupling of all 89 ordered below-threshold files and confirmed where existing test homes can be extended instead of creating new files.
 
 
 ## Behavior
 
-Add or extend MSTest unit tests in UtilitiesCS.Test so that every production .cs file compiled by UtilitiesCS.csproj reaches at least 80% line coverage. Tests must follow the repo's general and C#-specific unit test policies (MSTest + Moq + FluentAssertions, Arrange-Act-Assert, deterministic, no external dependencies, no temp files).
+Add or extend MSTest unit tests in `UtilitiesCS.Test` so that every production `.cs` file compiled by `UtilitiesCS.csproj` reaches at least 80% line coverage, or is explicitly documented as a skip candidate with rationale. Tests must follow the repo's general and C#-specific unit test policies (MSTest + Moq + FluentAssertions, Arrange-Act-Assert, deterministic, no external dependencies, no temp files).
 
-Coverage categories requiring uplift include:
-- Extensions (StringExtensions, ArrayExtensions, IEnumerableExtensions, ImageExtensions, AsyncSerialization, WinFormsExtensions, DfDeedle, DfMLNet, DrawingExtensions, etc.)
-- HelperClasses (PrettyPrint, Tokenizer, Initializer, DeepCompare, DispatchUtility, FilePathHelper, FileInfoWrapper, DirectoryInfoWrapper, ThemeHelpers, Logging, etc.)
-- ReusableTypeClasses (LockingLinkedList, SerializableList, AsyncLazy, LazyTry, Matrices, TimedActions, SmartSerializable, SCO collections, Observable collections, etc.)
-- Threading (TimeOutTask, ThreadSafeFunctions, ProgressTracker, AsyncMultiTasker, IdleActionQueue, UiThread, etc.)
-- NewtonsoftHelpers (converters, binders, wrappers, SDIL reader, MonoExtension)
-- EmailIntelligence (Bayesian, Ctf, Flags, SubjectMap, EmailParsingSorting, ClassifierGroups, OlFolderTools, People, Recents, etc.)
-- OutlookObjects (Item, MailItem, Store, Table, Recipient, Attachment, Calendar, Category, Conversation, etc.)
-- Dialogs (ActionButton, DelegateButton, MyBox, InputBox, YesNoToAll, FolderNotFound, etc.)
-- OneDriveHelpers, Interfaces with implementation, WindowsAPI
+The work is organized into 90 phases:
+
+- **Phase 0** — Compliance and baseline capture: read all policy files, capture baseline build/test/coverage state, produce a per-file coverage baseline, and run a reconciliation gate that maps every sub-80 non-skip file to an implementation or skip task before any Phase 1+ work resumes.
+
+- **Phases 1–89** — File-by-file coverage uplift, ordered by a combination of research priority and the coverage inventory. Each implementation phase targets a single production file and includes test methods (in an existing or new test class) plus a csproj registration task. Each skip-evaluation phase documents the rationale for why the file is excluded.
+
+  Implementation phases cover the following files (89 total in coverage inventory; 11 are skip-evaluation):
+  - *Dialogs*: `FolderNotFoundViewer`, `InputBox`, `InputBoxViewer`, `MyBox`, `NotImplementedDialog`, `FunctionButton`, `MyBoxViewer`, `YesNoToAll`, `DelegateButton`
+  - *EmailIntelligence*: `AutoFile`, `SortEmail`, `FilterOlFoldersController`, `FilterOlFoldersViewer`, `FolderInfoViewer`, `OSBrowser`, `FolderRemapController`, `FolderRemapViewer`, `FolderSelector`, `SubjectMapEncoder`, `SubjectMapMetrics`, `SubjectMapSco`, `EmailDataMiner`, `IntelligenceConfig`, `EmailFiler`, `FolderRemapTree`, `ClassifierGroupUtilities`, `PeopleScoDictionaryNew`, `SpamBayes`, `CorpusInherit`, `CategoryClassifierGroup`, `MulticlassEngine`, `Triage`, `OlFolderClassifierGroup`, `ActionableClassifierGroup`, `ManagerAsyncLazy`, `RecentsList`, `Triage_OlLogic`, `BayesianPerformanceMeasurement`, `ClassifierGroup (Obsolete)`
+  - *Extensions*: `DfDeedle`, `DfMLNet`, `AsyncSerialization`, `WinFormsExtensions`
+  - *HelperClasses*: `DvgForm`, `QfcTipsDetails`, `TipsController`, `OlvExtension`, `TableLayoutHelper`, `FileInfoWrapper`, `DirectoryInfoWrapper`, `FileSystemInfoWrapper`, `DispatchUtility`, `ThemeControlGroup`, `MouseDownFilter`, `FilePathHelper`
+  - *ReusableTypeClasses*: `ConfigGroupBox`, `ConfigViewer`, `ConfigController`, `SCODictionary`, `ScBag`, `LockingObservableLinkedListNode`, `LockingObservableLinkedList`
+  - *Threading*: `IdleActionQueue`, `IdleAsyncQueue`, `ProgressPane`, `ProgressViewer`, `AsyncMultiTasker`, `ProgressTrackerAsync`, `ProgressTrackerPane`, `ProgressTracker`, `ApplicationIdleTimer`, `UiThread`, `TimedDiskWriter`
+  - *OutlookObjects*: `OlTableExtensions`, `StoreWrapperController`, `OlToDoTable`
+  - *OneDriveHelpers*: `OneDriveDownloader`
+
+  Skip-evaluation phases (11 files) with rationale:
+  - **Phase 6** (`ConfusionViewer`) and **Phase 7** (`MetricChartViewer`): constructor-only WinForms designer shells with no meaningful non-designer logic.
+  - **Phase 28** (`ProgressMultiStepViewer`): constructor-only progress form shell.
+  - **Phase 31** (`ThreadMonitor`): relies on obsolete `Thread.Suspend`/`Thread.Resume` APIs and timing-sensitive diagnostics; deterministic unit tests are not feasible.
+  - **Phase 32** (`CSVDictUtilities`) and **Phase 33** (`FileIO2`): deprecated utilities with direct file-system dependence and no injection seam; tests would require real disk I/O, violating the no-temp-files policy.
+  - **Phase 35** (`ScreenHelper`): behavior depends on live machine monitor topology and active forms; static `Screen.AllScreens` has no injection seam.
+  - **Phase 37** (`Theme`): broad UI/control graph and large mutable surface; unit coverage is low-value relative to the narrower `ThemeControlGroup` covered by Phase 60.
+  - **Phase 58** (`ShellUtilities`) and **Phase 59** (`ShellUtilitiesStatic`): static Win32 shell interop and PInvoke icon extraction have no DI seam and are environment-dependent.
+  - **Phase 79** (`SystemThemeDetector`): static registry reads have no DI seam; tests would couple to machine/user theme settings.
+
+- **Phase 90** — Final QC: format (`csharpier`), analyzer build (`/p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`), nullable build (`/p:Nullable=enable /p:TreatWarningsAsErrors=true`), test run with `/EnableCodeCoverage`, csproj registration audit, and coverage gate verification.
 
 
 ## Inputs / Outputs
@@ -49,93 +68,120 @@ Coverage categories requiring uplift include:
 
 ## API / CLI Surface
 
-List commands, flags, request/response shapes, and examples.
-- Example invocations with expected outputs (concise):
-- Contracts and validation rules:
+The only relevant commands are the QA toolchain commands run at the end of every phase and for the final Phase 90 QC pass:
+
+- **Format**: `dotnet tool run csharpier .`
+- **Analyzer build**: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+- **Nullable/type-safety build**: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+- **Test with coverage**: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
+
+No new CLI commands or public APIs are introduced. This is a test-only change.
 
 ## Data & State
 
-Data flow, storage, or state changes introduced by this feature.
-- Data transformations and invariants:
-- Caching or persistence details:
-- Migration or backfill requirements (if any):
+No new data sources, transformations, or persistence are introduced. This feature adds test-only code.
+
+- Coverage state is read from `coverage/coverage.cobertura.xml` at baseline capture (Phase 0) and re-generated at the Phase 90 QC run.
+- Evidence artifacts are written to subdirectories under `evidence/` within the feature folder:
+  - `evidence/baseline/` — baseline build, test-coverage, per-file coverage, and reconciliation artifacts
+  - `evidence/qa-gates/` — final QC pass artifacts (format, analyzer, nullable, test-coverage)
 
 ## Constraints & Risks
 
-- Many classes have deep Outlook COM interop dependencies requiring extensive Moq seams
-- WinForms UI classes (Designer.cs, viewers, dialogs) may require special treatment for testability
-- Some files may be dead code or commented stubs (e.g., ObservableDictionary.cs, ConcurrentObservableBag.cs in UtilitiesCS are stubs; live implementations are in UtilitiesSwordfish)
-- Serialization classes have complex generic type constraints
-- EmailIntelligence modules depend on domain-specific types and may require significant mock scaffolding
-- The large number of files (196 below 80%) means this work should be phased carefully
+- `UtilitiesCS.Test` is an old-style explicit-include project: any new test file must be registered as a `<Compile Include="...">` entry in `UtilitiesCS.Test.csproj` or it silently fails to compile.
+- Many classes have deep Outlook COM interop dependencies. All COM calls must be mocked via `Moq` (e.g., `Mock<Outlook.MailItem>`, `Mock<Outlook.MAPIFolder>`); no live Outlook profile is permitted.
+- WinForms UI classes (dialogs, viewers, forms) must be instantiated on the test thread (STA context) and tested for state and event routing, not designer rendering.
+- Static state in several classes (`NotImplementedDialog.StopAtNotImplemented`, `InputBoxViewer.DpiCalled`, idle queues) must be isolated and reset using `[TestInitialize]`/`[TestCleanup]` to prevent test pollution.
+- File-system serialization must use `MemoryStream`/`StringWriter` injection; creation or use of temporary files is prohibited.
+- `IApplicationGlobals` and loader dependencies in EmailIntelligence classifier groups must be satisfied via `Moq` interface mocks.
+- Async tests must return `Task` (not `async void`) and must not rely on timing or `Thread.Sleep` for determinism.
+- 11 files are proposed as skip-evaluation candidates (see Behavior section). Each is documented and checked off in the plan before the final QC pass. The skip list must not grow without new justification.
+- The approximately 155 below-threshold files, 16 `Designer.cs` files, 4 stubs, and 40+ pure-interface files mean the total phase count is large; the plan sequences work by testability difficulty and existing test-home availability to minimize rework.
+- Research confirmed that many exact test homes already exist in `UtilitiesCS.Test` and should be extended rather than duplicated.
 
 
 ## Implementation Strategy
 
-### Phased Approach (Easy → Medium → Hard → Skip Evaluation)
+### Phase Structure (90 phases)
 
-**Phase 1 — Quick Wins (~45 files, Easy difficulty)**
-1. *Close-to-80% files* (small delta): ArrayExtensions (77.7%), IEnumerableExtensions (70.6%), ConcurrentObservableDictionary (77.4%), AbstractCloneable (77.8%), TreeNodeOfT (76.8%), StackGeek (72.2%), StackObjectCS (72%), WrapperScDictionary (70.7%), WrapperScoDictionary (76%), MyFileSystemInfo (71%), FilePathHelperConverter (72%), EmailTokenizer (74.8%).
-2. *Pure-logic helpers*: PrettyPrint, DeepCompare, Initializer, DebugTextWriter, TraceUtility, SmithWaterman, StringManipulation.
-3. *Data classes at 0%*: FilterEntry, BayesianMetricTypes, EmailFilerConfig, NConsoleTraceWriter, PropertyStore.
-4. *Simple extensions*: IAsyncEnumerableExtensions, AsyncSerialization.
-5. *Data structures*: LockingLinkedList/Node, TimedQueueOfActions, ThreadSafeFunctions, TimeOutTask, AsyncLazy, SimpleActionBagObserver/SimpleActionLockingLinkedListObserver.
-6. *EmailIntelligence data*: CtfIncidenceList, CtfMap, SubjectMapEntry, MovedMailInfo, ImageStripper, DedicatedToken.
+Work is organized into atomic phases aligned with the plan (`plan.2026-03-22T21-00.md`). Phases are executed in order; Phase 0 must complete before any Phase 1+ work begins.
 
-**Phase 2 — Medium Difficulty (~55 files)**
-1. *Newtonsoft converters*: ScDictionaryConverter, NonRecursiveConverter, MonoExtension, PeopleScoConverter, PeopleScoRemainingObjectConverter, WrapperPeopleScoDictionaryNew, DerivedCompositionConverter_ConcurrentDictionary.
-2. *Serializable collections* (SCO family): ScBag, ScoCollection, SCODictionary, ScoSortedDictionary, ScoStack, SerializableList, ScoDictionaryNew, SloLinkedList, ScDictionary.
-3. *SmartSerializable framework*: SmartSerializable, SmartSerializableBase, SmartSerializableLoader, SmartSerializableStatic, NewSmartSerializableConfig.
-4. *Bayesian core*: BayesianClassifierShared, BayesianClassifierGroup, Corpus, BayesianClassifierExtensions.
-5. *OutlookObjects (mocked COM)*: Extend coverage for AttachmentHelper, AttachmentSerializable, CreateCategory, StoreWrapper, OutlookItem*, RecipientStatic, UserDefinedFields.
-6. *Threading*: ProgressTracker, ProgressTrackerAsync, AsyncMultiTasker, ThreadMonitor.
-7. *EmailIntelligence domain*: FlagTranslator, IntelligenceConfig, PeopleScoDictionaryNew, SubjectMapEncoder, SubjectMapSco, RecentsList.
+**Phase 0 — Compliance & Baseline Capture**
+1. Read all repo policy files in the required order.
+2. Capture baseline build state.
+3. Capture baseline test results with coverage (`vstest.console.exe /EnableCodeCoverage`).
+4. Record per-file baseline coverage for all UtilitiesCS files below 80%.
+5. Reconcile every sub-80 non-skip file to an implementation or skip task (evidence artifact required).
+6. Verify the revised plan checklist matches the reconciliation matrix before execution resumes.
 
-**Phase 3 — Hard Files (~55 files)**
-1. *Outlook COM-heavy*: ConversationHelper, MailItemHelper, StoreWrapperController, OlTableExtensions, OlToDoTable.
-2. *ClassifierGroups* (all 0%, depend on IApplicationGlobals + COM): may need facade extraction.
-3. *WinForms dialogs*: InputBox, MyBox, YesNoToAll — extract testable logic from code-behind.
-4. *WinForms helpers*: ControlPosition, ControlResizer, ImageHelper, MouseDownFilter, Theme, ThemeControlGroup, TipsController, OlvExtension, ScreenHelper, TableLayoutHelper.
-5. *WinForms viewers*: FilterOlFoldersViewer, FolderInfoViewer, OSBrowser, FolderRemapViewer, ConfigViewer, ProgressViewer, ProgressPane, SubjectMapMetrics.
-6. *Other hard*: DispatchUtility (COM dispatch), ComStreamWrapper (WIP), OneDriveDownloader (Graph API), ShellUtilities (Shell32), IdleActionQueue/IdleAsyncQueue.
+**Phases 1–89 — File Coverage and Skip Evaluation**
 
-**Phase 4 — Evaluate Skips**
-Review whether the following should be excluded from the coverage gate, given minimal smoke tests, or removed from the project:
-- ~16 Designer.cs auto-generated files (provide no testable logic; coverage via parent form instantiation only).
-- ~4 commented-out stubs with zero executable lines (ObservableDictionary.cs, ConcurrentObservableBag.cs, StackObjectVB.cs, FlattenArray.cs).
-- ~3 "To Depricate" files (CSVDictUtilities, FileIO2, StringManipulation) — candidates for removal rather than testing.
-- ~40+ pure-interface files with no executable code.
+Each implementation phase follows this structure:
+- One or more `[TestMethod]`-annotated tests covering the declared acceptance criteria for the target file.
+- Tests extend an existing test file where one is identified; a new test file is created only when no adjacent home exists.
+- A registration task that verifies `<Compile Include="..." />` is present in `UtilitiesCS.Test.csproj`.
+
+Skip-evaluation phases check off a documented rationale item. The 11 skip-evaluation phases are P6, P7, P28, P31, P32, P33, P35, P37, P58, P59, and P79 (see Behavior section for per-file rationale).
+
+**Phase 90 — Final QC Pass**
+1. Run `dotnet tool run csharpier .` — no formatting changes.
+2. Run analyzer build — zero diagnostics.
+3. Run nullable/type-safety build — zero warnings treated as errors.
+4. Run `vstest.console.exe /EnableCodeCoverage` — all tests pass; UtilitiesCS line coverage ≥ 80%.
+5. Confirm each non-skipped phase has a `<Compile Include="..." />` present in `UtilitiesCS.Test.csproj`.
+6. Verify coverage meets or exceeds the 80% threshold; record follow-up note if any file remains below.
 
 ### Seam Patterns for COM / WinForms Mocking
 
 - **COM interop (Outlook):** Use `Moq` to mock `Microsoft.Office.Interop.Outlook` interfaces (e.g., `Mock<Outlook.MailItem>`, `Mock<Outlook.MAPIFolder>`). Follow existing patterns in `OutlookItemTests`, `FolderWrapperStateTests`.
-- **WinForms UI:** For Forms/UserControls, extract testable logic into non-UI helper classes. Where extraction is impractical, create control instances under `[STAThread]` context. Avoid cross-thread access by testing on the creating thread.
-- **File-system serialization:** Replace actual file I/O with `MemoryStream`/`StringWriter` injection; never create temp files per repo policy.
-- **IApplicationGlobals dependency:** Mock via `Moq` interface mock to isolate EmailIntelligence classifier groups from the full application context.
+- **WinForms UI (dialogs, forms, viewers):** Test state mutations and event routing. Instantiate forms/controls on the test thread. Do not test designer rendering.
+- **File-system serialization:** Use `MemoryStream`/`StringWriter` injection; never create temp files per repo policy.
+- **IApplicationGlobals and loader dependencies:** Mock via `Moq` interface mock to isolate EmailIntelligence classifier groups from the full application context.
+- **Static state:** Use `[TestInitialize]`/`[TestCleanup]` to save and restore static flags (e.g., `NotImplementedDialog.StopAtNotImplemented`, `InputBoxViewer.DpiCalled`, idle queue event handlers).
+- **Async tests:** Return `Task`; use `TaskCompletionSource`-based fakes rather than `Thread.Sleep` for async delegate verification.
 
 ### Explicit csproj Registration Requirement
 
-Every new test `.cs` file **must** be added as a `<Compile Include="...">` entry in `UtilitiesCS.Test.csproj`. This is a non-negotiable requirement due to the old-style project format — files not registered silently fail to compile.
+Every new test `.cs` file **must** be added as a `<Compile Include="...">` entry in `UtilitiesCS.Test.csproj`. The project is old-style explicit-include; files not registered silently fail to compile.
 
-- Dependency changes (new/removed packages) and rationale: None expected. All required test packages (MSTest, Moq, FluentAssertions) are already present.
+### Extending vs. Creating Test Files
+
+The research scan confirmed many exact test homes already exist. Rule:
+1. **Extend** the existing test file when an exact or adjacent test class is confirmed in `UtilitiesCS.Test`.
+2. **Create** a new test file only when no adjacent home is available.
+
+Known existing homes include (non-exhaustive):
+- `UtilitiesCS.Test\Dialogs\DelegateButton_Tests.cs`, `FunctionButton_Tests.cs`, `InputBox_Test.cs`, `YesNoToAll_Tests.cs`
+- `UtilitiesCS.Test\Extensions\AsyncSerialization_Tests.cs`, `WinFormsExtensions_Tests.cs`
+- `UtilitiesCS.Test\HelperClasses\FilePathHelper_Tests.cs`, `TimedDiskWriterTests.cs`, `WindowsForms\ScreenAndTableLayoutTests.cs`
+- `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedList_Tests.cs`, `LockingObservableLinkedListNode_Tests.cs`
+- `UtilitiesCS.Test\OutlookObjects\Table\OlToDoTable_Tests.cs`
+- `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs`
+- `UtilitiesCS.Test\Threading\UiThread_Tests.cs`, `ProgressTracker_Tests.cs`, `ApplicationIdleTimer_Tests.cs`
+
+- Dependency changes: None. All required test packages (MSTest, Moq, FluentAssertions) are already present.
 - Logging/telemetry additions: None.
-- Rollout plan: Incremental — each phase is merged independently after passing the full C# toolchain loop.
+- Rollout plan: Each phase is independently executable and verifiable. The final toolchain loop runs only at Phase 90.
 
 ## Definition of Done
 
-- [ ] Every `.cs` file compiled by `UtilitiesCS.csproj` reaches ≥80% line coverage as reported by Cobertura XML, or is explicitly documented as a skip candidate (Designer.cs, commented stub, pure interface)
+- [ ] Every `.cs` file compiled by `UtilitiesCS.csproj` reaches ≥80% line coverage as reported by the Cobertura XML, or is explicitly documented as a skip candidate (with rationale) in the plan
+- [ ] All 11 skip-evaluation phases (P6, P7, P28, P31, P32, P33, P35, P37, P58, P59, P79) are checked off in the plan with documented rationale
 - [ ] No pre-existing tests are broken or removed
 - [ ] All new tests follow MSTest + Moq + FluentAssertions conventions (AAA pattern, deterministic, isolated, no external dependencies, no temp files)
-- [ ] All new test files are registered in `UtilitiesCS.Test.csproj` via `<Compile Include>`
-- [ ] Repository-wide line coverage does not regress below the pre-work baseline
-- [ ] C# toolchain loop passes clean in a single pass: `dotnet format` → analyzer build (`/p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`) → nullable build (`/p:Nullable=enable /p:TreatWarningsAsErrors=true`) → `vstest.console.exe` test run with `/EnableCodeCoverage`
-- [ ] Coverage report reviewed: skip candidates (Designer.cs, stubs) documented with rationale
-- [ ] Docs updated (feature folder status, change-plan.md if applicable)
+- [ ] All new test files are registered in `UtilitiesCS.Test.csproj` via `<Compile Include="...">` and verified in Phase 90-T5
+- [ ] Repository-wide line coverage does not regress below the Phase 0 baseline
+- [ ] C# toolchain loop passes clean in a single Phase 90 pass: `dotnet tool run csharpier .` → analyzer build → nullable build → `vstest.console.exe /EnableCodeCoverage`
+- [ ] Phase 0 evidence artifacts exist: `evidence/baseline/phase0-instructions-read.md`, `baseline-build.md`, `baseline-test-coverage.md`, `baseline-per-file-coverage.md`, `remaining-sub80-reconciliation.md`
+- [ ] Phase 90 QA evidence artifacts exist: `evidence/qa-gates/final-qc-format.md`, `final-qc-analyzers.md`, `final-qc-nullable.md`, `final-qc-test-coverage.md`
+- [ ] Docs updated (feature folder status set to Complete; plan updated to show all tasks checked)
 
 ## Seeded Test Conditions (from potential)
-- [ ] Unit coverage for each of the 196 files currently below 80%
-- [ ] Positive and negative flows for extension methods
-- [ ] Edge cases and boundary conditions for collection/threading utilities
-- [ ] Error-handling paths in serialization helpers
-- [ ] Mocked COM interop for Outlook-dependent classes
-- [ ] Thread-safety verification for concurrent collections and threading utilities
+- [ ] Positive and negative flows for each Dialogs file (button state, action routing, null/cancel paths)
+- [ ] Encode/decode round-trips for SubjectMapEncoder and SubjectMapSco
+- [ ] Chunk-size and ordering assertions for AsyncMultiTasker and EmailDataMiner
+- [ ] COM interop mock verification for OlTableExtensions, OlToDoTable, StoreWrapperController
+- [ ] Progress and cancellation wiring for ProgressTracker, ProgressTrackerAsync, ProgressTrackerPane, ProgressPane, ProgressViewer
+- [ ] Event-routing and static-state isolation for IdleActionQueue, IdleAsyncQueue, ApplicationIdleTimer
+- [ ] File-system wrapper property forwarding and null-inner handling for FileInfoWrapper, DirectoryInfoWrapper, FileSystemInfoWrapper
+- [ ] Classifier-group creation, validation, and fallback paths for SpamBayes, CategoryClassifierGroup, OlFolderClassifierGroup, ActionableClassifierGroup, MulticlassEngine, Triage
