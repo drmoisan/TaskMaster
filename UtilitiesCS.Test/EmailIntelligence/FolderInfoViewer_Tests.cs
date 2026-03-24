@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -33,8 +34,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// </summary>
         private static FolderTree CreateEmptyFolderTree()
         {
-            var tree = (FolderTree)
-                FormatterServices.GetUninitializedObject(typeof(FolderTree));
+            var tree = (FolderTree)FormatterServices.GetUninitializedObject(typeof(FolderTree));
             typeof(FolderTree)
                 .GetField("_roots", BindingFlags.NonPublic | BindingFlags.Instance)
                 .SetValue(tree, new List<TreeNode<FolderWrapper>>());

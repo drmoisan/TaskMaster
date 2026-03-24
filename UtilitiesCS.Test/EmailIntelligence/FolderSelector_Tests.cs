@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using BrightIdeasSoftware;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

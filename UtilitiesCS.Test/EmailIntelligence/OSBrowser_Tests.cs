@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using BrightIdeasSoftware;
 using FluentAssertions;
@@ -33,10 +34,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         private static TreeListView GetTreeListView(OSBrowser browser) =>
             (TreeListView)
                 typeof(OSBrowser)
-                    .GetField(
-                        "treeListView",
-                        BindingFlags.NonPublic | BindingFlags.Instance
-                    )
+                    .GetField("treeListView", BindingFlags.NonPublic | BindingFlags.Instance)
                     .GetValue(browser);
 
         // ---------------------------------------------------------------------------

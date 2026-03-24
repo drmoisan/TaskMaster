@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -70,9 +71,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Creates a FolderRemapTree whose private _roots field contains the
         /// supplied list so the tree works without MAPIFolder objects.
         /// </summary>
-        private static FolderRemapTree CreateRemapTree(
-            IList<TreeNode<OlFolderRemap>> roots
-        )
+        private static FolderRemapTree CreateRemapTree(IList<TreeNode<OlFolderRemap>> roots)
         {
             var tree = new FolderRemapTree(); // no-arg ctor; _roots is null by default
             typeof(FolderRemapTree)
@@ -108,15 +107,18 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var mockGlobals = new Mock<IApplicationGlobals>();
             var controller = CreateController(viewer, remapTree, mockGlobals.Object);
 
-            // Build ModelDropEventArgs via reflection to set internal fields
-            // (the class inherits OlvDropEventArgs whose properties have public setters).
+            // ModelDropEventArgs.TargetModel and SourceModels use internal setters;
+            // set the backing fields directly via reflection.
             var args = new ModelDropEventArgs();
-            args.TargetModel = targetNode;
-            args.SourceModels = new List<object> { sourceNode };
+            typeof(ModelDropEventArgs)
+                .GetField("targetModel", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.SetValue(args, targetNode);
+            typeof(ModelDropEventArgs)
+                .GetField("dragModels", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.SetValue(args, new System.Collections.ArrayList { sourceNode });
 
-            // Set DropTargetLocation to Item via the parent class property
-            var dropLocProp = typeof(OlvDropEventArgs).GetProperty("DropTargetLocation");
-            dropLocProp?.SetValue(args, DropTargetLocation.Item);
+            // DropTargetLocation has a public setter, so assign it directly.
+            args.DropTargetLocation = DropTargetLocation.Item;
 
             // Act
             controller.HandleModelDropped(null, args);
@@ -139,9 +141,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             // Arrange
             var mockTD = new Mock<IToDoObjects>();
-            mockTD
-                .Setup(td => td.FolderRemap)
-                .Returns(new ScoDictionary<string, string>());
+            mockTD.Setup(td => td.FolderRemap).Returns(new ScoDictionary<string, string>());
 
             var mockGlobals = new Mock<IApplicationGlobals>();
             mockGlobals.Setup(g => g.TD).Returns(mockTD.Object);
@@ -198,9 +198,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Arrange
             var rootRemap = new OlFolderRemap();
             var rootNode = new TreeNode<OlFolderRemap>(rootRemap);
-            var remapTree = CreateRemapTree(
-                new List<TreeNode<OlFolderRemap>> { rootNode }
-            );
+            var remapTree = CreateRemapTree(new List<TreeNode<OlFolderRemap>> { rootNode });
 
             var viewer = new FolderRemapViewer();
             var mockGlobals = new Mock<IApplicationGlobals>();

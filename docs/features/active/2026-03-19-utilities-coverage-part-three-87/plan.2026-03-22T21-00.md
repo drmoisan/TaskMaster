@@ -165,112 +165,112 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 
 ### Phase 10 — FilterOlFoldersController Coverage (`UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersController.cs`)
 
-- [ ] [P10-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersController_Tests.cs` verifying that `Save` forwards the save action to the backing model
+- [x] [P10-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersController_Tests.cs` verifying that `Save` forwards the save action to the backing model
   - Acceptance: `[TestMethod]` exists, calls `Save` on the controller with a Moq-mocked backing model, and asserts the model's save method was invoked exactly once
 
-- [ ] [P10-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersController_Tests.cs` verifying that `Discard` forwards the discard action to the backing model
+- [x] [P10-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersController_Tests.cs` verifying that `Discard` forwards the discard action to the backing model
   - Acceptance: `[TestMethod]` exists, calls `Discard` on the controller with a Moq-mocked backing model, and asserts the model's discard method was invoked exactly once
 
-- [ ] [P10-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersController_Tests.cs` verifying that a tree property change propagates to the viewer-facing state
+- [x] [P10-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersController_Tests.cs` verifying that a tree property change propagates to the viewer-facing state
   - Acceptance: `[TestMethod]` exists, triggers a property-changed event on the mocked tree, and asserts the controller's viewer-facing state reflects the updated value
 
-- [ ] [P10-T4] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersController_Tests.cs` verifying that the check-state helpers round-trip the expected value
+- [x] [P10-T4] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersController_Tests.cs` verifying that the check-state helpers round-trip the expected value
   - Acceptance: `[TestMethod]` exists, sets a check-state value via the setter, reads it back via the getter, and asserts the retrieved value equals the value originally set
 
-- [ ] [P10-T5] Register `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersController_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P10-T5] Register `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersController_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\FilterOlFoldersController_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 11 — FilterOlFoldersViewer Coverage (`UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.cs`)
 
-- [ ] [P11-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersViewer_Tests.cs` verifying that `SetController` registers the expected delegates on a Moq-mocked controller
+- [x] [P11-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersViewer_Tests.cs` verifying that `SetController` registers the expected delegates on a Moq-mocked controller
   - Acceptance: `[TestMethod]` exists, calls `SetController` with a mocked controller, and asserts the expected event/delegate registrations were performed on the mock
 
-- [ ] [P11-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersViewer_Tests.cs` verifying that `FormatFileSize` returns the expected string for a byte-range input (less than 1 KB)
+- [x] [P11-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersViewer_Tests.cs` verifying that `FormatFileSize` returns the expected string for a byte-range input (less than 1 KB)
   - Acceptance: `[TestMethod]` exists, calls `FormatFileSize` with a value less than 1,024, and asserts the return value matches the expected byte-formatted string
 
-- [ ] [P11-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersViewer_Tests.cs` verifying that `FormatFileSize` returns the expected string for a KB-or-larger input
+- [x] [P11-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersViewer_Tests.cs` verifying that `FormatFileSize` returns the expected string for a KB-or-larger input
   - Acceptance: `[TestMethod]` exists, calls `FormatFileSize` with a value of 1,024 or more, and asserts the return value matches the expected KB/MB-formatted string
 
-- [ ] [P11-T4] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersViewer_Tests.cs` verifying that the viewer's save and discard buttons forward their events to the corresponding controller methods
+- [x] [P11-T4] Add test to `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersViewer_Tests.cs` verifying that the viewer's save and discard buttons forward their events to the corresponding controller methods
   - Acceptance: `[TestMethod]` exists, triggers save and discard button clicks or event handlers, and asserts the mocked controller's `Save` and `Discard` methods were each invoked exactly once
 
-- [ ] [P11-T5] Register `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersViewer_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P11-T5] Register `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersViewer_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\FilterOlFoldersViewer_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 12 — FolderInfoViewer Coverage (`UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\FolderInfoViewer.cs`)
 
-- [ ] [P12-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderInfoViewer_Tests.cs` verifying that `SetFolderTree` updates the `FolderTree` property to the assigned reference
+- [x] [P12-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderInfoViewer_Tests.cs` verifying that `SetFolderTree` updates the `FolderTree` property to the assigned reference
   - Acceptance: `[TestMethod]` exists, calls `SetFolderTree` with a non-null argument, and asserts `FolderTree` returns the same reference that was assigned
 
-- [ ] [P12-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderInfoViewer_Tests.cs` verifying that assigning a new tree reference via `SetFolderTree` replaces the prior reference
+- [x] [P12-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderInfoViewer_Tests.cs` verifying that assigning a new tree reference via `SetFolderTree` replaces the prior reference
   - Acceptance: `[TestMethod]` exists, assigns an initial tree reference, then assigns a second distinct reference, and asserts `FolderTree` returns the most recent assignment
 
-- [ ] [P12-T3] Register `UtilitiesCS.Test\EmailIntelligence\FolderInfoViewer_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P12-T3] Register `UtilitiesCS.Test\EmailIntelligence\FolderInfoViewer_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\FolderInfoViewer_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 13 — OSBrowser Coverage (`UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\OSBrowser.cs`)
 
-- [ ] [P13-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\OSBrowser_Tests.cs` verifying that the column setup method initializes the expected number and names of columns
+- [x] [P13-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\OSBrowser_Tests.cs` verifying that the column setup method initializes the expected number and names of columns
   - Acceptance: `[TestMethod]` exists, invokes the column-setup method, and asserts the column collection contains the expected count and identifiers
 
-- [ ] [P13-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\OSBrowser_Tests.cs` verifying that the tree setup method configures the expected tree options
+- [x] [P13-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\OSBrowser_Tests.cs` verifying that the tree setup method configures the expected tree options
   - Acceptance: `[TestMethod]` exists, invokes the tree-setup method on a direct form instance, and asserts the expected tree option flags are set
 
-- [ ] [P13-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\OSBrowser_Tests.cs` verifying that `FormatFileSize` returns the expected string for a bytes-range input (less than 1 KB)
+- [x] [P13-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\OSBrowser_Tests.cs` verifying that `FormatFileSize` returns the expected string for a bytes-range input (less than 1 KB)
   - Acceptance: `[TestMethod]` exists, calls `FormatFileSize` with a value below 1,024, and asserts the return value ends with the expected byte-unit label
 
-- [ ] [P13-T4] Add test to `UtilitiesCS.Test\EmailIntelligence\OSBrowser_Tests.cs` verifying that `FormatFileSize` returns the expected string for a KB-range input and for an MB-range input
+- [x] [P13-T4] Add test to `UtilitiesCS.Test\EmailIntelligence\OSBrowser_Tests.cs` verifying that `FormatFileSize` returns the expected string for a KB-range input and for an MB-range input
   - Acceptance: `[TestMethod]` exists, calls `FormatFileSize` with a value of 1,024 and a value of 1,048,576, and asserts each return value ends with the correct unit label (KB or MB respectively)
 
-- [ ] [P13-T5] Register `UtilitiesCS.Test\EmailIntelligence\OSBrowser_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P13-T5] Register `UtilitiesCS.Test\EmailIntelligence\OSBrowser_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\OSBrowser_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 14 — FolderRemapController Coverage (`UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapController.cs`)
 
-- [ ] [P14-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapController_Tests.cs` verifying that a simulated drag/drop operation updates the mapping entry in the mocked remap tree
+- [x] [P14-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapController_Tests.cs` verifying that a simulated drag/drop operation updates the mapping entry in the mocked remap tree
   - Acceptance: `[TestMethod]` exists, triggers the drag/drop handler with synthetic folder-node arguments, and asserts the expected mapping change is applied to the mocked tree/model
 
-- [ ] [P14-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapController_Tests.cs` verifying that `Save` forwards the save action to the backing model
+- [x] [P14-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapController_Tests.cs` verifying that `Save` forwards the save action to the backing model
   - Acceptance: `[TestMethod]` exists, calls `Save`, and asserts the mocked backing model's save method was invoked once
 
-- [ ] [P14-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapController_Tests.cs` verifying that `Discard` forwards the discard action to the backing model
+- [x] [P14-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapController_Tests.cs` verifying that `Discard` forwards the discard action to the backing model
   - Acceptance: `[TestMethod]` exists, calls `Discard`, and asserts the mocked backing model's discard method was invoked once
 
-- [ ] [P14-T4] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapController_Tests.cs` verifying that `ExpandTo` selects the correct folder node path in the mocked tree
+- [x] [P14-T4] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapController_Tests.cs` verifying that `ExpandTo` selects the correct folder node path in the mocked tree
   - Acceptance: `[TestMethod]` exists, calls `ExpandTo` with a synthetic node identifier, and asserts the mocked tree's selection matches the expected node path
 
-- [ ] [P14-T5] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapController_Tests.cs` verifying that `SyncGlobalMap` propagates expected mapping changes to the global state
+- [x] [P14-T5] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapController_Tests.cs` verifying that `SyncGlobalMap` propagates expected mapping changes to the global state
   - Acceptance: `[TestMethod]` exists, sets up a local mapping, calls `SyncGlobalMap`, and asserts the global mapping reflects the locally applied changes
 
-- [ ] [P14-T6] Register `UtilitiesCS.Test\EmailIntelligence\FolderRemapController_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P14-T6] Register `UtilitiesCS.Test\EmailIntelligence\FolderRemapController_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\FolderRemapController_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 15 — FolderRemapViewer Coverage (`UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapViewer.cs`)
 
-- [ ] [P15-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapViewer_Tests.cs` verifying that the viewer forwards a drag/drop event to the mocked controller
+- [x] [P15-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapViewer_Tests.cs` verifying that the viewer forwards a drag/drop event to the mocked controller
   - Acceptance: `[TestMethod]` exists, triggers the drag/drop event on the viewer, and asserts the mocked controller's corresponding handler was invoked exactly once
 
-- [ ] [P15-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapViewer_Tests.cs` verifying that the viewer's setup methods establish the expected initial renderer and tree state
+- [x] [P15-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapViewer_Tests.cs` verifying that the viewer's setup methods establish the expected initial renderer and tree state
   - Acceptance: `[TestMethod]` exists, calls the setup method, and asserts the expected renderer type is applied and the tree's initial configuration matches the expected values
 
-- [ ] [P15-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapViewer_Tests.cs` verifying that the file-size formatting helper returns the expected string for a sample input
+- [x] [P15-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderRemapViewer_Tests.cs` verifying that the file-size formatting helper returns the expected string for a sample input
   - Acceptance: `[TestMethod]` exists, calls the file-size formatting helper with a known value, and asserts the return string matches the expected formatted representation
 
-- [ ] [P15-T4] Register `UtilitiesCS.Test\EmailIntelligence\FolderRemapViewer_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P15-T4] Register `UtilitiesCS.Test\EmailIntelligence\FolderRemapViewer_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\FolderRemapViewer_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 16 — FolderSelector Coverage (`UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderSelector.cs`)
 
-- [ ] [P16-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderSelector_Tests.cs` verifying that initialization sets the expected selection source reference
+- [x] [P16-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderSelector_Tests.cs` verifying that initialization sets the expected selection source reference
   - Acceptance: `[TestMethod]` exists, instantiates `FolderSelector` with a fake folder-tree source, and asserts the stored source reference equals the provided input
 
-- [ ] [P16-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderSelector_Tests.cs` verifying that confirming a selection sets `Selection` to the chosen folder node
+- [x] [P16-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderSelector_Tests.cs` verifying that confirming a selection sets `Selection` to the chosen folder node
   - Acceptance: `[TestMethod]` exists, simulates a completed selection by setting the expected node state, and asserts the `Selection` property returns the expected node/folder reference
 
-- [ ] [P16-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderSelector_Tests.cs` verifying that passing a null/empty input leaves `Selection` as null
+- [x] [P16-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\FolderSelector_Tests.cs` verifying that passing a null/empty input leaves `Selection` as null
   - Acceptance: `[TestMethod]` exists, calls the relevant path with null or empty source, and asserts `Selection` is null after the call
 
-- [ ] [P16-T4] Register `UtilitiesCS.Test\EmailIntelligence\FolderSelector_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P16-T4] Register `UtilitiesCS.Test\EmailIntelligence\FolderSelector_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\FolderSelector_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 17 — SubjectMapEncoder Coverage (`UtilitiesCS\EmailIntelligence\SubjectMap\SubjectMapEncoder.cs`)

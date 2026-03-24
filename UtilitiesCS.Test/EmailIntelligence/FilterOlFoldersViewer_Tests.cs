@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -148,10 +149,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Act — invoke the private click handler
             typeof(FilterOlFoldersViewer)
-                .GetMethod(
-                    "BtnDiscard_Click",
-                    BindingFlags.NonPublic | BindingFlags.Instance
-                )
+                .GetMethod("BtnDiscard_Click", BindingFlags.NonPublic | BindingFlags.Instance)
                 .Invoke(viewer, new object[] { viewer, System.EventArgs.Empty });
 
             // Assert — controller.Discard() called _viewer.Close(), disposing the form
@@ -172,10 +170,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Act
             System.Action act = () =>
                 typeof(FilterOlFoldersViewer)
-                    .GetMethod(
-                        "BtnDiscard_Click",
-                        BindingFlags.NonPublic | BindingFlags.Instance
-                    )
+                    .GetMethod("BtnDiscard_Click", BindingFlags.NonPublic | BindingFlags.Instance)
                     .Invoke(viewer, new object[] { viewer, System.EventArgs.Empty });
 
             // Assert

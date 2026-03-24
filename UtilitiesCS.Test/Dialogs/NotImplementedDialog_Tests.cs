@@ -53,16 +53,19 @@ namespace UtilitiesCS.Test.Dialogs
                 typeof(NotImplementedDialog).GetMethod(
                     "ThrowException",
                     BindingFlags.NonPublic | BindingFlags.Static
-                ) ?? throw new MissingMethodException(nameof(NotImplementedDialog), "ThrowException");
+                )
+                ?? throw new MissingMethodException(nameof(NotImplementedDialog), "ThrowException");
 
             // Act
             DialogResult result = (DialogResult)method.Invoke(null, Array.Empty<object>())!;
 
             // Assert
-            result.Should().Be(
-                DialogResult.Yes,
-                "ThrowException returns Yes, which StopAtNotImplemented maps to returning true (throw)"
-            );
+            result
+                .Should()
+                .Be(
+                    DialogResult.Yes,
+                    "ThrowException returns Yes, which StopAtNotImplemented maps to returning true (throw)"
+                );
         }
 
         // ---------------------------------------------------------------------------
@@ -84,10 +87,12 @@ namespace UtilitiesCS.Test.Dialogs
             DialogResult result = (DialogResult)method.Invoke(null, Array.Empty<object>())!;
 
             // Assert
-            result.Should().Be(
-                DialogResult.No,
-                "KeepRunning returns No, which StopAtNotImplemented maps to returning false (keep running)"
-            );
+            result
+                .Should()
+                .Be(
+                    DialogResult.No,
+                    "KeepRunning returns No, which StopAtNotImplemented maps to returning false (keep running)"
+                );
         }
     }
 }
