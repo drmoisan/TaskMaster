@@ -312,85 +312,85 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 - [x] [P19-T1] Add test to `UtilitiesCS.Test\Extensions\DfDeedle_Tests.cs` verifying that a 2D email array converts to a DataFrame with the expected row count and column layout
   - Acceptance: `[TestMethod]` exists, passes a small in-memory 2D array to the conversion method, and asserts the returned frame has the expected number of rows and correctly named columns
 
-- [ ] [P19-T2] Add test to `UtilitiesCS.Test\Extensions\DfDeedle_Tests.cs` verifying that invalid triage values are filtered out from the DataFrame
+- [x] [P19-T2] Add test to `UtilitiesCS.Test\Extensions\DfDeedle_Tests.cs` verifying that invalid triage values are filtered out from the DataFrame
   - Acceptance: `[TestMethod]` exists, constructs a frame containing invalid triage entries, calls the filter method, and asserts the result excludes rows with invalid triage values
 
-- [ ] [P19-T3] Add test to `UtilitiesCS.Test\Extensions\DfDeedle_Tests.cs` verifying that date extraction handles null and invalid date slots without throwing
+- [x] [P19-T3] Add test to `UtilitiesCS.Test\Extensions\DfDeedle_Tests.cs` verifying that date extraction handles null and invalid date slots without throwing
   - Acceptance: `[TestMethod]` exists, calls the date extraction path with null and unparseable date values, and asserts the method returns null/default rather than throwing
 
-- [ ] [P19-T4] Register `UtilitiesCS.Test\Extensions\DfDeedle_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P19-T4] Register `UtilitiesCS.Test\Extensions\DfDeedle_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Extensions\DfDeedle_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 20 — DvgForm Coverage (`UtilitiesCS\HelperClasses\DvgForm.cs`)
 
-- [ ] [P20-T1] Add test to `UtilitiesCS.Test\HelperClasses\DvgForm_Tests.cs` verifying that triggering resize-end invokes expected layout behavior without throwing
+- [x] [P20-T1] Add test to `UtilitiesCS.Test\HelperClasses\DvgForm_Tests.cs` verifying that triggering resize-end invokes expected layout behavior without throwing
   - Acceptance: `[TestMethod]` exists, instantiates `DvgForm` and triggers the resize-end event path, and asserts no exception is thrown and the expected layout side effect occurs
 
-- [ ] [P20-T2] Register `UtilitiesCS.Test\HelperClasses\DvgForm_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P20-T2] Register `UtilitiesCS.Test\HelperClasses\DvgForm_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="HelperClasses\DvgForm_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 21 — QfcTipsDetails Coverage (`UtilitiesCS\HelperClasses\ToolTips\QfcTipsDetails.cs`)
 
-- [ ] [P21-T1] Add test to `UtilitiesCS.Test\HelperClasses\QfcTipsDetails_Tests.cs` verifying that parent-type resolution returns the expected enum/type value
+- [x] [P21-T1] Add test to `UtilitiesCS.Test\HelperClasses\QfcTipsDetails_Tests.cs` verifying that parent-type resolution returns the expected enum/type value
   - Acceptance: `[TestMethod]` exists, invokes the parent-type resolution path with a known parent stub, and asserts the returned type/enum value matches the expected case
 
-- [ ] [P21-T2] Add test to `UtilitiesCS.Test\HelperClasses\QfcTipsDetails_Tests.cs` verifying that `InitializeAsync` populates expected labels and toggle state
+- [x] [P21-T2] Add test to `UtilitiesCS.Test\HelperClasses\QfcTipsDetails_Tests.cs` verifying that `InitializeAsync` populates expected labels and toggle state
   - Acceptance: `[TestMethod]` exists, calls the initialization path on a direct instance, and asserts the detail labels and toggle properties hold the expected post-initialization values
 
-- [ ] [P21-T3] Add test to `UtilitiesCS.Test\HelperClasses\QfcTipsDetails_Tests.cs` verifying that visibility toggle methods update internal state consistently
+- [x] [P21-T3] Add test to `UtilitiesCS.Test\HelperClasses\QfcTipsDetails_Tests.cs` verifying that visibility toggle methods update internal state consistently
   - Acceptance: `[TestMethod]` exists, calls a visibility toggle method and asserts the relevant internal state property reflects the toggled value; calling the same toggle again restores the previous state
 
-- [ ] [P21-T4] Register `UtilitiesCS.Test\HelperClasses\QfcTipsDetails_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P21-T4] Register `UtilitiesCS.Test\HelperClasses\QfcTipsDetails_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="HelperClasses\QfcTipsDetails_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 22 — TipsController Coverage (`UtilitiesCS\HelperClasses\ToolTips\TipsController.cs`)
 
-- [ ] [P22-T1] Add test to `UtilitiesCS.Test\HelperClasses\TipsController_Tests.cs` verifying that label setup reflects the details state after initialization
+- [x] [P22-T1] Add test to `UtilitiesCS.Test\HelperClasses\TipsController_Tests.cs` verifying that label setup reflects the details state after initialization
   - Acceptance: `[TestMethod]` exists, constructs a `TipsController` with a fake details object and calls the label setup path, and asserts the resulting label values match the details' expected content
 
-- [ ] [P22-T2] Add test to `UtilitiesCS.Test\HelperClasses\TipsController_Tests.cs` verifying that toggle methods switch only the intended columns/sections
+- [x] [P22-T2] Add test to `UtilitiesCS.Test\HelperClasses\TipsController_Tests.cs` verifying that toggle methods switch only the intended columns/sections
   - Acceptance: `[TestMethod]` exists, calls a toggle method and asserts only the targeted column/section changes state while others remain unchanged
 
-- [ ] [P22-T3] Add test to `UtilitiesCS.Test\HelperClasses\TipsController_Tests.cs` verifying that repeated toggles are idempotent (calling toggle twice returns to the original state)
+- [x] [P22-T3] Add test to `UtilitiesCS.Test\HelperClasses\TipsController_Tests.cs` verifying that repeated toggles are idempotent (calling toggle twice returns to the original state)
   - Acceptance: `[TestMethod]` exists, calls a toggle method twice in succession and asserts the relevant state is identical to its value before either call
 
-- [ ] [P22-T4] Register `UtilitiesCS.Test\HelperClasses\TipsController_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P22-T4] Register `UtilitiesCS.Test\HelperClasses\TipsController_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="HelperClasses\TipsController_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 23 — OlvExtension Coverage (`UtilitiesCS\HelperClasses\Windows Forms\OlvExtension.cs`)
 
-- [ ] [P23-T1] Add test to `UtilitiesCS.Test\HelperClasses\OlvExtension_Tests.cs` verifying that `AutoScaleColumnsToContainer` expands columns proportionally to the container width
+- [x] [P23-T1] Add test to `UtilitiesCS.Test\HelperClasses\OlvExtension_Tests.cs` verifying that `AutoScaleColumnsToContainer` expands columns proportionally to the container width
   - Acceptance: `[TestMethod]` exists, constructs an `ObjectListView` with known columns and a fixed container width, calls `AutoScaleColumnsToContainer`, and asserts each column's width is proportional to its share of the total width
 
-- [ ] [P23-T2] Add test to `UtilitiesCS.Test\HelperClasses\OlvExtension_Tests.cs` verifying that calling `AutoScaleColumnsToContainer` with an empty column list is a no-op and does not throw
+- [x] [P23-T2] Add test to `UtilitiesCS.Test\HelperClasses\OlvExtension_Tests.cs` verifying that calling `AutoScaleColumnsToContainer` with an empty column list is a no-op and does not throw
   - Acceptance: `[TestMethod]` exists, calls `AutoScaleColumnsToContainer` on an `ObjectListView` with no columns, and asserts no exception is thrown and the result is a no-op
 
-- [ ] [P23-T3] Register `UtilitiesCS.Test\HelperClasses\OlvExtension_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P23-T3] Register `UtilitiesCS.Test\HelperClasses\OlvExtension_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="HelperClasses\OlvExtension_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 24 — ConfigGroupBox Coverage (`UtilitiesCS\ReusableTypeClasses\NewSmartSerializable\Config\ConfigGroupBox.cs`)
 
-- [ ] [P24-T1] Add test to `UtilitiesCS.Test\ReusableTypeClasses\ConfigGroupBox_Tests.cs` verifying that wrapper getter properties stay synchronized with child control values
+- [x] [P24-T1] Add test to `UtilitiesCS.Test\ReusableTypeClasses\ConfigGroupBox_Tests.cs` verifying that wrapper getter properties stay synchronized with child control values
   - Acceptance: `[TestMethod]` exists, sets child control values directly and reads back via the wrapper getter, and asserts the returned value equals the value set on the child control
 
-- [ ] [P24-T2] Add test to `UtilitiesCS.Test\ReusableTypeClasses\ConfigGroupBox_Tests.cs` verifying that the active-disk selection property maps correctly to the expected disk index
+- [x] [P24-T2] Add test to `UtilitiesCS.Test\ReusableTypeClasses\ConfigGroupBox_Tests.cs` verifying that the active-disk selection property maps correctly to the expected disk index
   - Acceptance: `[TestMethod]` exists, sets the disk selection state on the control, and asserts the active-disk property returns the expected index/enum value
 
-- [ ] [P24-T3] Register `UtilitiesCS.Test\ReusableTypeClasses\ConfigGroupBox_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P24-T3] Register `UtilitiesCS.Test\ReusableTypeClasses\ConfigGroupBox_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="ReusableTypeClasses\ConfigGroupBox_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 25 — ConfigViewer Coverage (`UtilitiesCS\ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.cs`)
 
-- [ ] [P25-T1] Add test to `UtilitiesCS.Test\ReusableTypeClasses\ConfigViewer_Tests.cs` verifying that the save handler routes to the mocked controller's save method
+- [x] [P25-T1] Add test to `UtilitiesCS.Test\ReusableTypeClasses\ConfigViewer_Tests.cs` verifying that the save handler routes to the mocked controller's save method
   - Acceptance: `[TestMethod]` exists, binds a mocked `ConfigController` to the viewer, invokes the save handler, and asserts the controller's save method was called exactly once
 
-- [ ] [P25-T2] Add test to `UtilitiesCS.Test\ReusableTypeClasses\ConfigViewer_Tests.cs` verifying that the cancel handler routes to the mocked controller's cancel method
+- [x] [P25-T2] Add test to `UtilitiesCS.Test\ReusableTypeClasses\ConfigViewer_Tests.cs` verifying that the cancel handler routes to the mocked controller's cancel method
   - Acceptance: `[TestMethod]` exists, binds a mocked `ConfigController` to the viewer, invokes the cancel handler, and asserts the controller's cancel method was called exactly once
 
-- [ ] [P25-T3] Add test to `UtilitiesCS.Test\ReusableTypeClasses\ConfigViewer_Tests.cs` verifying that disk group activation toggles the correct controls
+- [x] [P25-T3] Add test to `UtilitiesCS.Test\ReusableTypeClasses\ConfigViewer_Tests.cs` verifying that disk group activation toggles the correct controls
   - Acceptance: `[TestMethod]` exists, activates a specific disk group and asserts the corresponding group box controls enter the enabled/visible state while others remain unchanged
 
-- [ ] [P25-T4] Register `UtilitiesCS.Test\ReusableTypeClasses\ConfigViewer_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P25-T4] Register `UtilitiesCS.Test\ReusableTypeClasses\ConfigViewer_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="ReusableTypeClasses\ConfigViewer_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 26 — IdleActionQueue Coverage (`UtilitiesCS\Threading\IdleActionQueue.cs`)
