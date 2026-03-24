@@ -93,6 +93,7 @@
     <Compile Include="Dialogs\MyBox_Tests.cs" />
     <Compile Include="Dialogs\NotImplementedDialog_Tests.cs" />
     <Compile Include="EmailIntelligence\AutoFile_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianSerializationHelper_Tests.cs" />
     <Compile Include="EmailIntelligence\SortEmail_Tests.cs" />
     <Compile Include="EmailIntelligence\FilterOlFoldersController_Tests.cs" />
     <Compile Include="EmailIntelligence\FilterOlFoldersViewer_Tests.cs" />
@@ -133,10 +134,13 @@
     <Compile Include="EmailIntelligence\SubjectMapEncoder_Tests.cs" />
     <Compile Include="EmailIntelligence\SubjectMapEntry_Tests.cs" />
     <Compile Include="EmailIntelligence\SubjectMapMetrics_Tests.cs" />
+    <Compile Include="EmailIntelligence\SubjectMapSco_Tests.cs" />
     <Compile Include="EmailIntelligence\SmithWaterman_Tests.cs" />
     <Compile Include="EmailIntelligence\FilterEntry_Tests.cs" />
     <Compile Include="EmailIntelligence\BayesianMetricTypes_Tests.cs" />
     <Compile Include="EmailIntelligence\DedicatedToken_Tests.cs" />
+    <Compile Include="EmailIntelligence\IntelligenceConfig_Tests.cs" />
+    <Compile Include="EmailIntelligence\EmailFiler_Tests.cs" />
     <Compile Include="EmailIntelligence\EmailFilerConfig_Tests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MailItemHelperTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MinedMailInfoTests.cs" />
@@ -149,6 +153,7 @@
     <Compile Include="EmailIntelligence\IClonableBehaviorTest.cs" />
     <Compile Include="EmailIntelligence\FlagTranslator_Tests.cs" />
     <Compile Include="EmailIntelligence\PeopleScoDictionaryNew_Tests.cs" />
+    <Compile Include="EmailIntelligence\EmailDataMiner_Tests.cs" />
     <Compile Include="EmailIntelligence\RecentsList_Tests.cs" />
     <Compile Include="Extensions\ArrayExtensions_Tests.cs" />
     <Compile Include="Extensions\AsyncSerialization_Tests.cs" />
@@ -313,6 +318,7 @@
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionaryTest\SimpleObserver.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\ConcurrentObservableDictionaryTests.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollectionSenderTests.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollectionLockRecursionTests.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollection_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests_UnfinishedStubs.cs" />
@@ -344,6 +350,7 @@
     <Compile Include="ReusableTypeClasses\SmartSerializableLoader_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializableNonTyped_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializableStatic_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\ConfigController_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ConfigGroupBox_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ConfigViewer_Tests.cs" />
     <Compile Include="ThemeHelpers\SystemThemeDetectorTests.cs" />
@@ -355,8 +362,16 @@
     <Compile Include="Threading\TaskPriority_Tests.cs" />
     <Compile Include="Threading\ThreadSafeFunctions_Tests.cs" />
     <Compile Include="Threading\ThreadSafeSingleShotGuard_Tests.cs" />
+    <Compile Include="Threading\TimeOutTask_AdditionalTests.cs" />
+    <Compile Include="Threading\TimeOutTask_InternalCoverageTests.cs" />
+    <Compile Include="Threading\TimeOutTask_OverloadCoverageTests.cs" />
     <Compile Include="Threading\TimeOutTask_Tests.cs" />
     <Compile Include="Threading\ApplicationIdleTimer_Tests.cs" />
+    <Compile Include="Threading\IdleActionQueue_Tests.cs" />
+    <Compile Include="Threading\IdleAsyncQueue_Tests.cs" />
+    <Compile Include="Threading\ProgressPane_Tests.cs" />
+    <Compile Include="Threading\AsyncMultiTasker_Tests.cs" />
+    <Compile Include="Threading\ProgressViewer_Tests.cs" />
     <Compile Include="Threading\UiThread_Tests.cs" />
     <Compile Include="Dialogs\DialogTests.cs" />
     <Compile Include="Dialogs\FunctionButton_Tests.cs" />
