@@ -91,11 +91,23 @@ namespace UtilitiesCS.Test.HelperClasses
             thread.Join();
 
             // Assert
-            caughtException.Should().BeNull("AutoScaleColumnsToContainer should not throw with valid columns");
+            caughtException
+                .Should()
+                .BeNull("AutoScaleColumnsToContainer should not throw with valid columns");
 
             // Math: 100 * 400 / 200 = 200 for each column (double rounding: Math.Round(200.0) = 200)
-            colAWidthAfterScale.Should().Be(200, "column A must be scaled from 100 to 200 when container is 2× the total column width");
-            colBWidthAfterScale.Should().Be(200, "column B must be scaled from 100 to 200 when container is 2× the total column width");
+            colAWidthAfterScale
+                .Should()
+                .Be(
+                    200,
+                    "column A must be scaled from 100 to 200 when container is 2× the total column width"
+                );
+            colBWidthAfterScale
+                .Should()
+                .Be(
+                    200,
+                    "column B must be scaled from 100 to 200 when container is 2× the total column width"
+                );
         }
 
         /// <summary>
@@ -146,7 +158,11 @@ namespace UtilitiesCS.Test.HelperClasses
             thread.Join();
 
             // Assert
-            caughtException.Should().BeNull("AutoScaleColumnsToContainer must be a no-op and not throw when there are no columns");
+            caughtException
+                .Should()
+                .BeNull(
+                    "AutoScaleColumnsToContainer must be a no-op and not throw when there are no columns"
+                );
         }
     }
 }

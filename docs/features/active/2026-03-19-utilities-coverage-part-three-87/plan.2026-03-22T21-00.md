@@ -395,35 +395,35 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 
 ### Phase 26 — IdleActionQueue Coverage (`UtilitiesCS\Threading\IdleActionQueue.cs`)
 
-- [ ] [P26-T1] Add test to `UtilitiesCS.Test\Threading\IdleActionQueue_Tests.cs` verifying that the first `AddEntry` call initializes the internal queue
+- [x] [P26-T1] Add test to `UtilitiesCS.Test\Threading\IdleActionQueue_Tests.cs` verifying that the first `AddEntry` call initializes the internal queue
   - Acceptance: `[TestMethod]` exists, resets static state via reflection, calls `AddEntry` once, and asserts the queue's internal entry count is 1
 
-- [ ] [P26-T2] Add test to `UtilitiesCS.Test\Threading\IdleActionQueue_Tests.cs` verifying that the idle callback drains queued entries in enqueue order
+- [x] [P26-T2] Add test to `UtilitiesCS.Test\Threading\IdleActionQueue_Tests.cs` verifying that the idle callback drains queued entries in enqueue order
   - Acceptance: `[TestMethod]` exists, enqueues multiple actions via `AddEntry`, fires the idle callback via reflection, and asserts the actions were invoked in the order they were added
 
-- [ ] [P26-T3] Add test to `UtilitiesCS.Test\Threading\IdleActionQueue_Tests.cs` verifying that the unsubscribe path clears the idle callback after inactivity
+- [x] [P26-T3] Add test to `UtilitiesCS.Test\Threading\IdleActionQueue_Tests.cs` verifying that the unsubscribe path clears the idle callback after inactivity
   - Acceptance: `[TestMethod]` exists, enqueues work, drains the queue, triggers the unsubscribe timer, and asserts the idle handler is no longer registered
 
-- [ ] [P26-T4] Register `UtilitiesCS.Test\Threading\IdleActionQueue_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P26-T4] Register `UtilitiesCS.Test\Threading\IdleActionQueue_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Threading\IdleActionQueue_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 27 — IdleAsyncQueue Coverage (`UtilitiesCS\Threading\IdleAsyncQueue.cs`)
 
-- [ ] [P27-T1] Add test to `UtilitiesCS.Test\Threading\IdleAsyncQueue_Tests.cs` verifying that a queued async task runs exactly once when the idle callback fires
+- [x] [P27-T1] Add test to `UtilitiesCS.Test\Threading\IdleAsyncQueue_Tests.cs` verifying that a queued async task runs exactly once when the idle callback fires
   - Acceptance: `[TestMethod]` exists, enqueues a fake async task, fires the idle callback via reflection, and asserts the task was invoked exactly once
 
-- [ ] [P27-T2] Add test to `UtilitiesCS.Test\Threading\IdleAsyncQueue_Tests.cs` verifying that the UI-thread flag routes work through the expected scheduling path
+- [x] [P27-T2] Add test to `UtilitiesCS.Test\Threading\IdleAsyncQueue_Tests.cs` verifying that the UI-thread flag routes work through the expected scheduling path
   - Acceptance: `[TestMethod]` exists, enqueues work with the UI-thread flag set, fires the callback, and asserts the scheduling path taken matches the expected dispatcher/sync-context route
 
-- [ ] [P27-T3] Add test to `UtilitiesCS.Test\Threading\IdleAsyncQueue_Tests.cs` verifying that an exception thrown by one queued item does not prevent subsequent items from executing
+- [x] [P27-T3] Add test to `UtilitiesCS.Test\Threading\IdleAsyncQueue_Tests.cs` verifying that an exception thrown by one queued item does not prevent subsequent items from executing
   - Acceptance: `[TestMethod]` exists, enqueues a faulting task followed by a normal task, fires the idle callback, and asserts the normal task still executes and no unhandled exception escapes the queue
 
-- [ ] [P27-T4] Register `UtilitiesCS.Test\Threading\IdleAsyncQueue_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P27-T4] Register `UtilitiesCS.Test\Threading\IdleAsyncQueue_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Threading\IdleAsyncQueue_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 28 — ProgressMultiStepViewer Coverage (`UtilitiesCS\Threading\ProgressMultiStepViewer.cs`) — SKIP_EVALUATION
 
-- [ ] [P28-T1] Record skip-evaluation decision for `ProgressMultiStepViewer.cs`: constructor-only designer shell with no meaningful non-designer logic; no unit tests added
+- [x] [P28-T1] Record skip-evaluation decision for `ProgressMultiStepViewer.cs`: constructor-only designer shell with no meaningful non-designer logic; no unit tests added
   - Acceptance: This task is checked off and the decision is noted inline; no test file is created for this file
 
 ### Phase 29 — ProgressPane Coverage (`UtilitiesCS\Threading\ProgressPane.cs`)

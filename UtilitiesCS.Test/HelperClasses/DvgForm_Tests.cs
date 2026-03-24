@@ -41,7 +41,9 @@ namespace UtilitiesCS.Test.HelperClasses
                         "DgvForm_ResizeEnd",
                         BindingFlags.NonPublic | BindingFlags.Instance
                     );
-                    handler.Should().NotBeNull("DgvForm_ResizeEnd must exist as a private instance method");
+                    handler
+                        .Should()
+                        .NotBeNull("DgvForm_ResizeEnd must exist as a private instance method");
 
                     // Act: invoke the resize-end handler with a synthetic EventArgs.
                     // This path only calls Debug.WriteLine and must not throw.
@@ -65,7 +67,9 @@ namespace UtilitiesCS.Test.HelperClasses
             thread.Join();
 
             // Assert: no exception should have escaped the resize-end handler.
-            caughtException.Should().BeNull("the resize-end handler should complete without throwing");
+            caughtException
+                .Should()
+                .BeNull("the resize-end handler should complete without throwing");
         }
     }
 }

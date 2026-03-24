@@ -83,9 +83,18 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             thread.Join();
 
             // Assert
-            caughtException.Should().BeNull("wrapper getters must not throw when child controls are assigned");
-            capturedFileName.Should().Be("config.json", "FileName getter must return the TextBox's current text");
-            capturedRelativePath.Should().Be(@"AppData\Local\App", "RelativePath getter must return the TextBox's current text");
+            caughtException
+                .Should()
+                .BeNull("wrapper getters must not throw when child controls are assigned");
+            capturedFileName
+                .Should()
+                .Be("config.json", "FileName getter must return the TextBox's current text");
+            capturedRelativePath
+                .Should()
+                .Be(
+                    @"AppData\Local\App",
+                    "RelativePath getter must return the TextBox's current text"
+                );
         }
 
         /// <summary>
@@ -106,8 +115,12 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         [TestMethod]
         public void DiskType_SetToLocalAndNet_RoundTripsCorrectly()
         {
-            ISmartSerializableConfig.ActiveDiskEnum capturedLocal = ISmartSerializableConfig.ActiveDiskEnum.Neither;
-            ISmartSerializableConfig.ActiveDiskEnum capturedNet = ISmartSerializableConfig.ActiveDiskEnum.Neither;
+            ISmartSerializableConfig.ActiveDiskEnum capturedLocal = ISmartSerializableConfig
+                .ActiveDiskEnum
+                .Neither;
+            ISmartSerializableConfig.ActiveDiskEnum capturedNet = ISmartSerializableConfig
+                .ActiveDiskEnum
+                .Neither;
             Exception caughtException = null;
 
             var thread = new Thread(() =>
@@ -145,8 +158,18 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             // Assert
             caughtException.Should().BeNull("DiskType assignment and retrieval should not throw");
-            capturedLocal.Should().Be(ISmartSerializableConfig.ActiveDiskEnum.Local, "DiskType must round-trip the Local value");
-            capturedNet.Should().Be(ISmartSerializableConfig.ActiveDiskEnum.Net, "DiskType must round-trip the Net value");
+            capturedLocal
+                .Should()
+                .Be(
+                    ISmartSerializableConfig.ActiveDiskEnum.Local,
+                    "DiskType must round-trip the Local value"
+                );
+            capturedNet
+                .Should()
+                .Be(
+                    ISmartSerializableConfig.ActiveDiskEnum.Net,
+                    "DiskType must round-trip the Net value"
+                );
         }
     }
 }

@@ -74,10 +74,23 @@ namespace UtilitiesCS.Test.HelperClasses
             thread.Join();
 
             // Assert
-            caughtException.Should().BeNull("construction with a Panel-parented label must not throw");
-            capturedLabelControl.Should().BeSameAs(originalLabel, "LabelControl must be the exact label passed to the constructor");
-            columnNumber.Should().Be(0, "Panel path does not use a TableLayoutPanel column, so ColumnNumber defaults to 0");
-            tlp.Should().BeNull("Panel path does not assign a TableLayoutPanel, so TLP must be null");
+            caughtException
+                .Should()
+                .BeNull("construction with a Panel-parented label must not throw");
+            capturedLabelControl
+                .Should()
+                .BeSameAs(
+                    originalLabel,
+                    "LabelControl must be the exact label passed to the constructor"
+                );
+            columnNumber
+                .Should()
+                .Be(
+                    0,
+                    "Panel path does not use a TableLayoutPanel column, so ColumnNumber defaults to 0"
+                );
+            tlp.Should()
+                .BeNull("Panel path does not assign a TableLayoutPanel, so TLP must be null");
         }
 
         /// <summary>
@@ -196,11 +209,15 @@ namespace UtilitiesCS.Test.HelperClasses
 
             // Assert
             caughtException.Should().BeNull("Toggle should not throw");
-            visibleAfterFirstToggle.Should().BeFalse("first Toggle from On state must set label to not visible");
-            visibleAfterSecondToggle.Should().Be(
-                visibleAfterConstruction,
-                "second Toggle from Off state must restore label visibility to its post-construction value"
-            );
+            visibleAfterFirstToggle
+                .Should()
+                .BeFalse("first Toggle from On state must set label to not visible");
+            visibleAfterSecondToggle
+                .Should()
+                .Be(
+                    visibleAfterConstruction,
+                    "second Toggle from Off state must restore label visibility to its post-construction value"
+                );
         }
     }
 }

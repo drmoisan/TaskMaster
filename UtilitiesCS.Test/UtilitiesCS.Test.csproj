@@ -93,6 +93,7 @@
     <Compile Include="Dialogs\MyBox_Tests.cs" />
     <Compile Include="Dialogs\NotImplementedDialog_Tests.cs" />
     <Compile Include="EmailIntelligence\AutoFile_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianSerializationHelper_Tests.cs" />
     <Compile Include="EmailIntelligence\SortEmail_Tests.cs" />
     <Compile Include="EmailIntelligence\FilterOlFoldersController_Tests.cs" />
     <Compile Include="EmailIntelligence\FilterOlFoldersViewer_Tests.cs" />
@@ -361,6 +362,8 @@
     <Compile Include="Threading\TimeOutTask_OverloadCoverageTests.cs" />
     <Compile Include="Threading\TimeOutTask_Tests.cs" />
     <Compile Include="Threading\ApplicationIdleTimer_Tests.cs" />
+    <Compile Include="Threading\IdleActionQueue_Tests.cs" />
+    <Compile Include="Threading\IdleAsyncQueue_Tests.cs" />
     <Compile Include="Threading\UiThread_Tests.cs" />
     <Compile Include="Dialogs\DialogTests.cs" />
     <Compile Include="Dialogs\FunctionButton_Tests.cs" />
