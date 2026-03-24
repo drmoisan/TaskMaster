@@ -3,9 +3,9 @@
 - **Issue:** #87
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-03-22
+- **Last Updated:** 2026-03-23
 - **Status:** In Progress
-- **Version:** 1.2
+- **Version:** 1.3
 
 ## Required References
 
@@ -57,6 +57,15 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 - [x] [P0-T6] Verify the revised checklist state matches the reconciliation matrix before additional implementation resumes
   - Preconditions: P0-T5 complete
   - Acceptance: Every file mapped to `Implementation Task` in `evidence/baseline/remaining-sub80-reconciliation.md` references an unchecked P1/P2/P3 task ID, every file mapped to `Phase 4 Skip Task` references an unchecked P4 task ID, and no checked task still depends on a file that remains below 80% in `evidence/qa-gates/final-coverage-verification.md`
+
+- [x] [P0-T7] Capture baseline formatter state by running `dotnet tool run csharpier .`
+  - Acceptance: Evidence artifact at `evidence/baseline/baseline-csharpier.md` contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and `Output Summary:` indicating whether files were reformatted
+
+- [x] [P0-T8] Capture baseline analyzer-build state by running `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+  - Acceptance: Evidence artifact at `evidence/baseline/baseline-analyzer-build.md` contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and `Output Summary:` listing whether analyzer diagnostics were emitted
+
+- [x] [P0-T9] Capture baseline nullable/type-safety build state by running `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+  - Acceptance: Evidence artifact at `evidence/baseline/baseline-nullable-build.md` contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and `Output Summary:` listing whether nullable or warning-as-error diagnostics were emitted
 
 ### Phase 1 — FolderNotFoundViewer Coverage (`UtilitiesCS\Dialogs\FolderNotFoundViewer.cs`)
 
@@ -275,32 +284,32 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 
 ### Phase 17 — SubjectMapEncoder Coverage (`UtilitiesCS\EmailIntelligence\SubjectMap\SubjectMapEncoder.cs`)
 
-- [ ] [P17-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\SubjectMapEncoder_Tests.cs` verifying that `RebuildEncoding` builds symmetric encode/decode maps
+- [x] [P17-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\SubjectMapEncoder_Tests.cs` verifying that `RebuildEncoding` builds symmetric encode/decode maps
   - Acceptance: `[TestMethod]` exists, calls `RebuildEncoding` with a known token list, and asserts each token maps forward and backward correctly (encode[token] → id, decode[id] → token)
 
-- [ ] [P17-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\SubjectMapEncoder_Tests.cs` verifying that `AugmentTokenDict` appends only unseen tokens
+- [x] [P17-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\SubjectMapEncoder_Tests.cs` verifying that `AugmentTokenDict` appends only unseen tokens
   - Acceptance: `[TestMethod]` exists, calls `AugmentTokenDict` with a mix of existing and new tokens, and asserts only the new tokens are added while existing entries are unchanged
 
-- [ ] [P17-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\SubjectMapEncoder_Tests.cs` verifying that `Encode` followed by `Decode` round-trips the original terms
+- [x] [P17-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\SubjectMapEncoder_Tests.cs` verifying that `Encode` followed by `Decode` round-trips the original terms
   - Acceptance: `[TestMethod]` exists, encodes a known term sequence and then decodes the result, and asserts the decoded output matches the original input
 
-- [ ] [P17-T4] Register `UtilitiesCS.Test\EmailIntelligence\SubjectMapEncoder_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P17-T4] Register `UtilitiesCS.Test\EmailIntelligence\SubjectMapEncoder_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\SubjectMapEncoder_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 18 — SubjectMapMetrics Coverage (`UtilitiesCS\EmailIntelligence\SubjectMap\SubjectMapMetrics.cs`)
 
-- [ ] [P18-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\SubjectMapMetrics_Tests.cs` verifying that the primary constructor copies expected counts and rates into `DlvMetrics`
+- [x] [P18-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\SubjectMapMetrics_Tests.cs` verifying that the primary constructor copies expected counts and rates into `DlvMetrics`
   - Acceptance: `[TestMethod]` exists, constructs `SubjectMapMetrics` with known numeric inputs, and asserts the corresponding `DlvMetrics` properties hold the expected values
 
-- [ ] [P18-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\SubjectMapMetrics_Tests.cs` verifying that alternate constructor overloads produce equivalent state to the primary constructor
+- [x] [P18-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\SubjectMapMetrics_Tests.cs` verifying that alternate constructor overloads produce equivalent state to the primary constructor
   - Acceptance: `[TestMethod]` exists, constructs instances via two different overloads with equivalent inputs, and asserts the resulting `DlvMetrics` properties are equal across both instances
 
-- [ ] [P18-T3] Register `UtilitiesCS.Test\EmailIntelligence\SubjectMapMetrics_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P18-T3] Register `UtilitiesCS.Test\EmailIntelligence\SubjectMapMetrics_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\SubjectMapMetrics_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 19 — DfDeedle Coverage (`UtilitiesCS\Extensions\DfDeedle.cs`)
 
-- [ ] [P19-T1] Add test to `UtilitiesCS.Test\Extensions\DfDeedle_Tests.cs` verifying that a 2D email array converts to a DataFrame with the expected row count and column layout
+- [x] [P19-T1] Add test to `UtilitiesCS.Test\Extensions\DfDeedle_Tests.cs` verifying that a 2D email array converts to a DataFrame with the expected row count and column layout
   - Acceptance: `[TestMethod]` exists, passes a small in-memory 2D array to the conversion method, and asserts the returned frame has the expected number of rows and correctly named columns
 
 - [ ] [P19-T2] Add test to `UtilitiesCS.Test\Extensions\DfDeedle_Tests.cs` verifying that invalid triage values are filtered out from the DataFrame
