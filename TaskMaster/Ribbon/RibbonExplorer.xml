@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<customUI onLoad="Ribbon_Load" xmlns="http://schemas.microsoft.com/office/2006/01/customui">
+<customUI onLoad="Ribbon_Load" xmlns="http://schemas.microsoft.com/office/2009/07/customui">
   <ribbon>
     <tabs>
       <tab idMso="TabFolder">
@@ -167,7 +167,7 @@
             />
           </menu>
         </group>
-        <group id="Group2" label="Task Master">
+        <group id="Group2" label="Task Master" keytip="TM">
           <button
             id="FlagAsTask"
             imageMso="FlagMessage"
@@ -203,6 +203,7 @@
             onAction="QuickFiler_Click"
             label="Quick Filer"
             size="large"
+			keytip="QF"
           />
           <menu
             id="Settings"
