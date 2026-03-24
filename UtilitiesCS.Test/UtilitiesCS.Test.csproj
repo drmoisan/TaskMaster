@@ -130,7 +130,9 @@
     <Compile Include="EmailIntelligence\ImageStripper_Tests.cs" />
     <Compile Include="EmailIntelligence\MinedMailInfo_Tests.cs" />
     <Compile Include="EmailIntelligence\MovedMailInfo_Tests.cs" />
+    <Compile Include="EmailIntelligence\SubjectMapEncoder_Tests.cs" />
     <Compile Include="EmailIntelligence\SubjectMapEntry_Tests.cs" />
+    <Compile Include="EmailIntelligence\SubjectMapMetrics_Tests.cs" />
     <Compile Include="EmailIntelligence\SmithWaterman_Tests.cs" />
     <Compile Include="EmailIntelligence\FilterEntry_Tests.cs" />
     <Compile Include="EmailIntelligence\BayesianMetricTypes_Tests.cs" />
