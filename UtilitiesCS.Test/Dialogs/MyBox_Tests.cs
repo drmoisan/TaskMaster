@@ -132,10 +132,7 @@ namespace UtilitiesCS.Test.Dialogs
             const string expected = "the-result";
             var functions = new Dictionary<string, Func<Task<string>>>
             {
-                {
-                    "RunAction",
-                    () => Task.FromResult(expected)
-                },
+                { "RunAction", () => Task.FromResult(expected) },
             };
 
             // Act — build the FunctionButtonGroup from the dictionary

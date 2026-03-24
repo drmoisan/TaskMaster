@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Windows.Forms;
 using BrightIdeasSoftware;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -78,8 +80,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             );
             var rootNode = new TreeNode<FolderWrapper>(wrapper);
 
-            var tree = (FolderTree)
-                FormatterServices.GetUninitializedObject(typeof(FolderTree));
+            var tree = (FolderTree)FormatterServices.GetUninitializedObject(typeof(FolderTree));
             typeof(FolderTree)
                 .GetField("_roots", BindingFlags.NonPublic | BindingFlags.Instance)
                 .SetValue(tree, new List<TreeNode<FolderWrapper>> { rootNode });
@@ -103,9 +104,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             // Arrange
             var mockTD = new Mock<IToDoObjects>();
-            mockTD
-                .Setup(td => td.FilteredFolderScraping)
-                .Returns(new ScoDictionary<string, int>());
+            mockTD.Setup(td => td.FilteredFolderScraping).Returns(new ScoDictionary<string, int>());
 
             var mockGlobals = new Mock<IApplicationGlobals>();
             mockGlobals.Setup(g => g.TD).Returns(mockTD.Object);

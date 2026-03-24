@@ -43,9 +43,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             // Arrange: chain mock Explorer → CommandBars → GetPressedMso
             var mockCommandBars = new Mock<CommandBars>(MockBehavior.Loose);
-            mockCommandBars
-                .Setup(cb => cb.GetPressedMso("ShowInConversations"))
-                .Returns(true);
+            mockCommandBars.Setup(cb => cb.GetPressedMso("ShowInConversations")).Returns(true);
             var mockExplorer = new Mock<Explorer>(MockBehavior.Loose);
             mockExplorer.Setup(e => e.CommandBars).Returns(mockCommandBars.Object);
 
@@ -65,9 +63,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             // Arrange
             var mockCommandBars = new Mock<CommandBars>(MockBehavior.Loose);
-            mockCommandBars
-                .Setup(cb => cb.GetPressedMso("ShowInConversations"))
-                .Returns(false);
+            mockCommandBars.Setup(cb => cb.GetPressedMso("ShowInConversations")).Returns(false);
             var mockExplorer = new Mock<Explorer>(MockBehavior.Loose);
             mockExplorer.Setup(e => e.CommandBars).Returns(mockCommandBars.Object);
 

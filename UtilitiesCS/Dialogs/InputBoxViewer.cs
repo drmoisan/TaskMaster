@@ -20,8 +20,18 @@ namespace UtilitiesCS
         [STAThread]
         public static void DpiAware()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            try
+            {
+                Application.EnableVisualStyles();
+                // SetCompatibleTextRenderingDefault throws InvalidOperationException if any
+                // IWin32Window has already been created (e.g., during unit-test runs).
+                Application.SetCompatibleTextRenderingDefault(false);
+            }
+            catch (InvalidOperationException)
+            {
+                // Application is already initialized; visual-style configuration cannot be
+                // changed. Record the call regardless so callers can detect it.
+            }
             DpiCalled = true;
         }
 

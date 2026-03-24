@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -32,9 +33,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Creates a FolderRemapController with the minimum fields needed by
         /// SetupTree() injected via reflection so the COM constructor is avoided.
         /// </summary>
-        private static FolderRemapController CreateControllerForViewer(
-            FolderRemapTree remapTree
-        )
+        private static FolderRemapController CreateControllerForViewer(FolderRemapTree remapTree)
         {
             var controller = (FolderRemapController)
                 FormatterServices.GetUninitializedObject(typeof(FolderRemapController));
@@ -55,9 +54,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Creates a FolderRemapTree whose private _roots list contains the given
         /// roots so it works without MAPIFolder objects.
         /// </summary>
-        private static FolderRemapTree CreateRemapTree(
-            IList<TreeNode<OlFolderRemap>> roots
-        )
+        private static FolderRemapTree CreateRemapTree(IList<TreeNode<OlFolderRemap>> roots)
         {
             var tree = new FolderRemapTree();
             typeof(FolderRemapTree)
