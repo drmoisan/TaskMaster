@@ -45,9 +45,9 @@ When the `Email Time` calendar does not exist, the metrics operation should comp
 
 ## Acceptance Criteria
 
-- [ ] In `GetMoveDiagnostics`, all `olAppointment` access is guarded with `if (olAppointment is not null)`.
-- [ ] In `QuickFileMetrics_WRITE`, `olEmailCalendar` is guarded with a null check before calling `.Items.Add()`.
-- [ ] Regression test: `GetMoveDiagnostics` called with null `olAppointment` completes without throwing.
-- [ ] Regression test: `QuickFileMetrics_WRITE` completes without throwing when `GetCalendar` returns null.
-- [ ] All existing tests pass with no regressions.
-- [ ] Full C# toolchain passes: csharpier → msbuild analyzers → msbuild nullable → vstest coverage.
+- [x] In `GetMoveDiagnostics`, all `olAppointment` access is guarded with `if (olAppointment is not null)`.
+- [x] In `QuickFileMetrics_WRITE`, `olEmailCalendar` is guarded with a null check before calling `.Items.Add()`.
+- [x] Regression test: `GetMoveDiagnostics` called with null `olAppointment` completes without throwing.
+- [x] Regression test: `QuickFileMetrics_WRITE` completes without throwing when `GetCalendar` returns null.
+- [x] All existing tests pass with no regressions.
+- [x] Full C# toolchain passes: csharpier → msbuild analyzers → msbuild nullable → vstest coverage.

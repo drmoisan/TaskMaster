@@ -3,9 +3,9 @@
 - **Issue:** #97
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-03-25T00:00:00Z
+- **Last Updated:** 2026-03-25T12-00
 - **Status:** In Progress
-- **Version:** 0.1
+- **Version:** 1.0
 - **Work Mode:** minor-audit
 
 Requirements source: `docs/features/active/2026-03-25-getmovediagnostics-null-guard-97/issue.md`
