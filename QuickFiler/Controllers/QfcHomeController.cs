@@ -416,8 +416,10 @@ namespace QuickFiler.Controllers
                 "Email Time",
                 Globals.Ol.App.Session
             );
-            var olAppointment = (AppointmentItem)olEmailCalendar.Items.Add();
+            AppointmentItem olAppointment = null;
+            if (olEmailCalendar is not null)
             {
+                olAppointment = (AppointmentItem)olEmailCalendar.Items.Add();
                 olAppointment.Subject = $"Quick Filed {emailsLoaded} emails";
                 olAppointment.Start = startTime;
                 olAppointment.End = endTime;
