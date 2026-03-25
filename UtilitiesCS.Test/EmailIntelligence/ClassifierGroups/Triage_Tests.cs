@@ -9,6 +9,7 @@ using Moq;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions.Lazy;
+using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
 using TriageClass = UtilitiesCS.EmailIntelligence.Triage;
 
@@ -361,6 +362,111 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             manager.ResetConfigAsyncLazy();
 
             manager.Configuration.Should().NotBeNull();
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="ManagerAsyncLazy.ResetConfigAsyncLazy"/> replaces the
+        /// prior configuration task with a new, distinct reference.
+        ///
+        /// Purpose:
+        ///     Confirms that callers who hold a reference to the old task cannot continue
+        ///     receiving stale configuration after a reset.
+        ///
+        /// Returns:
+        ///     Passes when the Configuration reference after reset is not the same object
+        ///     as the Configuration reference captured before the reset.
+        /// </summary>
+        [TestMethod]
+        public void ManagerAsyncLazy_ResetConfigAsyncLazy_NewReferenceIsDifferentFromOriginal()
+        {
+            // Arrange
+            var mockGlobals = CreateMockGlobals();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+
+            // Act: capture the original task reference, then reset.
+            var originalConfig = manager.Configuration;
+            manager.ResetConfigAsyncLazy();
+            var newConfig = manager.Configuration;
+
+            // Assert: the reset must produce a new lazy task instance, not the same object.
+            newConfig
+                .Should()
+                .NotBeSameAs(originalConfig, "ResetConfigAsyncLazy must create a fresh lazy task");
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="ManagerAsyncLazy.ResetLoadClassifierAsyncLazy"/> removes
+        /// the dictionary entry for a loader whose ClassifierActivated flag is false.
+        ///
+        /// Purpose:
+        ///     Confirms the inactive-loader cleanup path: when a loader is deactivated,
+        ///     calling ResetLoadClassifierAsyncLazy should drop the corresponding engine
+        ///     entry so the dictionary no longer contains a stale reference.
+        ///
+        /// Returns:
+        ///     Passes when the manager dictionary does not contain the entry after the
+        ///     inactive-loader call.
+        /// </summary>
+        [TestMethod]
+        public void ManagerAsyncLazy_ResetLoadClassifierAsyncLazy_InactiveLoader_RemovesEntry()
+        {
+            // Arrange: pre-seed the manager with a live entry, then mark the loader inactive.
+            var mockGlobals = CreateMockGlobals();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+            var group = new BayesianClassifierGroup();
+            manager["InactiveKey"] = group.ToAsyncLazy();
+
+            var loader = new SmartSerializableLoader(mockGlobals.Object);
+            loader.Name = "InactiveKey";
+            // ClassifierActivated defaults to false; ensure it is false.
+            loader.Config.ClassifierActivated = false;
+
+            // Act: signal that the loader is inactive — must remove the entry.
+            manager.ResetLoadClassifierAsyncLazy("InactiveKey", loader);
+
+            // Assert: the engine entry must be absent.
+            manager
+                .ContainsKey("InactiveKey")
+                .Should()
+                .BeFalse("an inactive loader must be removed from the manager dictionary");
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="ManagerAsyncLazy.ResetLoadClassifierAsyncLazy"/> adds an
+        /// entry for a loader whose ClassifierActivated flag is true and that it is
+        /// accessible in the dictionary without throwing.
+        ///
+        /// Purpose:
+        ///     Confirms the active-loader registration path: an activated loader triggers
+        ///     the creation of an AsyncLazy entry and its insertion into the dictionary.
+        ///     This exercises GetAsyncLazyClassifierLoader via ResetLoadClassifierAsyncLazy
+        ///     without requiring a real network or filesystem call (lazy evaluation deferred).
+        ///
+        /// Returns:
+        ///     Passes when the manager dictionary contains the expected key after the
+        ///     active-loader call.
+        /// </summary>
+        [TestMethod]
+        public void ManagerAsyncLazy_ResetLoadClassifierAsyncLazy_ActiveLoader_AddsEntry()
+        {
+            // Arrange
+            var mockGlobals = CreateMockGlobals();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+
+            var loader = new SmartSerializableLoader(mockGlobals.Object);
+            loader.Name = "ActiveKey";
+            loader.Config.ClassifierActivated = true;
+
+            // Act: signal that the loader is active — must add an entry.
+            manager.ResetLoadClassifierAsyncLazy("ActiveKey", loader);
+
+            // Assert: the key is present (the lazy value itself is not yet evaluated).
+            manager
+                .ContainsKey("ActiveKey")
+                .Should()
+                .BeTrue(
+                    "an activated loader must cause GetAsyncLazyClassifierLoader to insert an entry"
+                );
         }
 
         [TestMethod]

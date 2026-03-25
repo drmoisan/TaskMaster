@@ -26,6 +26,40 @@ namespace UtilitiesCS.Test.HelperClasses
 
         #endregion
 
+        #region TryGetDispId
+
+        /// <summary>
+        /// Verifies that calling TryGetDispId with a non-dispatch managed object throws
+        /// InvalidCastException because the object cannot be cast to IDispatchInfo.
+        ///
+        /// Purpose:
+        ///     Documents the expected failure contract when a caller does not first guard
+        ///     with ImplementsIDispatch. The implementation performs a hard cast to
+        ///     IDispatchInfo, so any non-dispatch object is an illegal argument.
+        ///
+        /// Returns:
+        ///     Passes when InvalidCastException is thrown (the expected error surfacing).
+        /// </summary>
+        [TestMethod]
+        public void TryGetDispId_NonDispatchObject_ThrowsInvalidCastException()
+        {
+            // Arrange: a plain managed object that does not implement IDispatchInfo.
+            var obj = new object();
+
+            // Act
+            Action act = () => DispatchUtility.TryGetDispId(obj, "NonExistentMember", out _);
+
+            // Assert: a non-COM object cannot be cast to IDispatchInfo; the expected
+            // exception documents this boundary rather than hiding the cast failure.
+            act.Should()
+                .Throw<InvalidCastException>(
+                    "TryGetDispId requires objects that implement IDispatchInfo; "
+                        + "a plain managed object must not silently succeed"
+                );
+        }
+
+        #endregion
+
         #region Invoke
 
         [TestMethod]

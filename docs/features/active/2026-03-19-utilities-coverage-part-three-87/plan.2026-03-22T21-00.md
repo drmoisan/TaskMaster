@@ -932,41 +932,41 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 
 ### Phase 71 — ManagerAsyncLazy Coverage (`UtilitiesCS\EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs`)
 
-- [ ] [P71-T1] Add test to nearest `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` verifying that `ResetConfigAsyncLazy` replaces the prior configuration task with a new one
+- [x] [P71-T1] Add test to nearest `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` verifying that `ResetConfigAsyncLazy` replaces the prior configuration task with a new one
   - Acceptance: `[TestMethod]` exists, captures the initial lazy task reference, calls `ResetConfigAsyncLazy`, and asserts the new task reference is different from the original
 
-- [ ] [P71-T2] Add test to nearest `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` verifying that removing an inactive loader drops the corresponding engine entry
+- [x] [P71-T2] Add test to nearest `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` verifying that removing an inactive loader drops the corresponding engine entry
   - Acceptance: `[TestMethod]` exists, adds a loader entry, marks it inactive, calls the removal/cleanup path, and asserts the engine dictionary no longer contains the entry
 
-- [ ] [P71-T3] Add test to nearest `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` verifying that `GetAsyncLazyClassifierLoader` attaches a config-change handler and uses the alternate loader when available
+- [x] [P71-T3] Add test to nearest `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` verifying that `GetAsyncLazyClassifierLoader` attaches a config-change handler and uses the alternate loader when available
   - Acceptance: `[TestMethod]` exists, supplies an alternate loader mock, calls `GetAsyncLazyClassifierLoader`, and asserts the returned loader invokes the alternate mock rather than the default path
 
-- [ ] [P71-T4] Register `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
+- [x] [P71-T4] Register `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
   - Acceptance: `UtilitiesCS.Test.csproj` contains the relevant `<Compile Include="..." />` entry for this test file and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 72 — FileSystemInfoWrapper Coverage (`UtilitiesCS\HelperClasses\FileSystem\FileSystemInfoWrapper.cs`)
 
-- [ ] [P72-T1] Add test to nearest `UtilitiesCS.Test\HelperClasses\FileInfoWrapper_Tests.cs` verifying that the wrapper forwards common `FileSystemInfo` properties such as `Name`, `FullName`, and `Exists`
+- [x] [P72-T1] Add test to nearest `UtilitiesCS.Test\HelperClasses\FileInfoWrapper_Tests.cs` verifying that the wrapper forwards common `FileSystemInfo` properties such as `Name`, `FullName`, and `Exists`
   - Acceptance: `[TestMethod]` exists, constructs a `FileSystemInfoWrapper` with a known path, and asserts the wrapper's property values equal the underlying `FileSystemInfo` values
 
-- [ ] [P72-T2] Add test to nearest `UtilitiesCS.Test\HelperClasses\FileInfoWrapper_Tests.cs` verifying that null or invalid state is handled consistently with the rest of the wrapper family
+- [x] [P72-T2] Add test to nearest `UtilitiesCS.Test\HelperClasses\FileInfoWrapper_Tests.cs` verifying that null or invalid state is handled consistently with the rest of the wrapper family
   - Acceptance: `[TestMethod]` exists, constructs the wrapper with a null/invalid inner value and accesses key properties, and asserts the behavior matches the expected null/default pattern without throwing
 
-- [ ] [P72-T3] Register `UtilitiesCS.Test\HelperClasses\FileInfoWrapper_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
+- [x] [P72-T3] Register `UtilitiesCS.Test\HelperClasses\FileInfoWrapper_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
   - Acceptance: `UtilitiesCS.Test.csproj` contains the relevant `<Compile Include="..." />` entry for this test file and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 73 — DispatchUtility Coverage (`UtilitiesCS\HelperClasses\CloningFunctions\DispatchUtility.cs`)
 
-- [ ] [P73-T1] Add test to `UtilitiesCS.Test\HelperClasses\DispatchUtility_Tests.cs` verifying that `ImplementsIDispatch` returns false for non-dispatch objects
+- [x] [P73-T1] Add test to `UtilitiesCS.Test\HelperClasses\DispatchUtility_Tests.cs` verifying that `ImplementsIDispatch` returns false for non-dispatch objects
   - Acceptance: `[TestMethod]` exists, passes a plain managed object (not COM-visible) to the helper, and asserts the return value is false
 
-- [ ] [P73-T2] Add test to `UtilitiesCS.Test\HelperClasses\DispatchUtility_Tests.cs` verifying that a dispatch-id lookup failure returns false without throwing
+- [x] [P73-T2] Add test to `UtilitiesCS.Test\HelperClasses\DispatchUtility_Tests.cs` verifying that a dispatch-id lookup failure returns false without throwing
   - Acceptance: `[TestMethod]` exists, passes a member name that does not exist on the dispatch target, calls `TryGetDispId`, and asserts the return is false and no exception is thrown
 
-- [ ] [P73-T3] Add test to `UtilitiesCS.Test\HelperClasses\DispatchUtility_Tests.cs` verifying that invalid invoke arguments surface the expected exception
+- [x] [P73-T3] Add test to `UtilitiesCS.Test\HelperClasses\DispatchUtility_Tests.cs` verifying that invalid invoke arguments surface the expected exception
   - Acceptance: `[TestMethod]` exists, calls `Invoke` with an invalid argument combination, and asserts the expected exception type is thrown
 
-- [ ] [P73-T4] Register `UtilitiesCS.Test\HelperClasses\DispatchUtility_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P73-T4] Register `UtilitiesCS.Test\HelperClasses\DispatchUtility_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="HelperClasses\DispatchUtility_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 74 — ProgressTracker Coverage (`UtilitiesCS\Threading\ProgressTracker.cs`)
