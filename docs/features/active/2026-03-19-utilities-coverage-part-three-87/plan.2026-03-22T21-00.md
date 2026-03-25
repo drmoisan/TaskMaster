@@ -966,58 +966,58 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 
 ### Phase 74 — ProgressTracker Coverage (`UtilitiesCS\Threading\ProgressTracker.cs`)
 
-- [ ] [P74-T1] Add test to `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` verifying that `Report` updates the percent and message properties on the tracker
+- [x] [P74-T1] Add test to `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` verifying that `Report` updates the percent and message properties on the tracker
   - Acceptance: `[TestMethod]` exists, calls `Report` with a known percent and message string, and asserts the tracker's `Percent` and `Message` properties equal those values
 
-- [ ] [P74-T2] Add test to `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` verifying that a child tracker maps its completion percentage into the parent's allocated range
+- [x] [P74-T2] Add test to `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` verifying that a child tracker maps its completion percentage into the parent's allocated range
   - Acceptance: `[TestMethod]` exists, allocates a child for a known parent sub-range, reports 100% on the child, and asserts the parent's percent shifted by the expected range amount
 
-- [ ] [P74-T3] Add test to `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` verifying that reaching 100% on the tracker closes or finalizes the viewer state
+- [x] [P74-T3] Add test to `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` verifying that reaching 100% on the tracker closes or finalizes the viewer state
   - Acceptance: `[TestMethod]` exists, supplies a mock viewer, reports 100% on the tracker, and asserts the mock viewer's close/finalize method was invoked
 
-- [ ] [P74-T4] Register `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
+- [x] [P74-T4] Register `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
   - Acceptance: `UtilitiesCS.Test.csproj` contains the relevant `<Compile Include="..." />` entry for this test file and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 75 — ComStreamWrapper Coverage (`UtilitiesCS\HelperClasses\WipUnfinished\ComStreamWrapper.cs`)
 
-- [ ] [P75-T1] Add test to `UtilitiesCS.Test\HelperClasses\ComStreamWrapper_Tests.cs` verifying that a read with zero offset forwards the call correctly to the mocked `IStream`
+- [x] [P75-T1] Add test to `UtilitiesCS.Test\HelperClasses\ComStreamWrapper_Tests.cs` verifying that a read with zero offset forwards the call correctly to the mocked `IStream`
   - Acceptance: `[TestMethod]` exists, supplies a mocked `IStream`, calls `Read` with offset 0, and asserts the mock's `Read` equivalent received the expected buffer and count
 
-- [ ] [P75-T2] Add test to `UtilitiesCS.Test\HelperClasses\ComStreamWrapper_Tests.cs` verifying that a read or write with a nonzero offset throws the expected exception
+- [x] [P75-T2] Add test to `UtilitiesCS.Test\HelperClasses\ComStreamWrapper_Tests.cs` verifying that a read or write with a nonzero offset throws the expected exception
   - Acceptance: `[TestMethod]` exists, calls `Read` or `Write` with a nonzero offset, and asserts the expected exception type is thrown
 
-- [ ] [P75-T3] Add test to `UtilitiesCS.Test\HelperClasses\ComStreamWrapper_Tests.cs` verifying that `Seek`, `Length`, and `Position` round-trip correctly through the COM stream
+- [x] [P75-T3] Add test to `UtilitiesCS.Test\HelperClasses\ComStreamWrapper_Tests.cs` verifying that `Seek`, `Length`, and `Position` round-trip correctly through the COM stream
   - Acceptance: `[TestMethod]` exists, sets a known seek position or length via the mock, reads it back through the wrapper, and asserts the returned value matches
 
-- [ ] [P75-T4] Register `UtilitiesCS.Test\HelperClasses\ComStreamWrapper_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P75-T4] Register `UtilitiesCS.Test\HelperClasses\ComStreamWrapper_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="HelperClasses\ComStreamWrapper_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 76 — ActionableClassifierGroup Coverage (`UtilitiesCS\EmailIntelligence\ClassifierGroups\Actionable\ActionableClassifierGroup.cs`)
 
-- [ ] [P76-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that the actionable category filter returns the expected subset of categories
+- [x] [P76-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that the actionable category filter returns the expected subset of categories
   - Acceptance: `[TestMethod]` exists, provides a mix of actionable and non-actionable categories via the mocked globals, calls the filter method, and asserts only actionable categories are returned
 
-- [ ] [P76-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that the build path creates the engine when all prerequisites are met
+- [x] [P76-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that the build path creates the engine when all prerequisites are met
   - Acceptance: `[TestMethod]` exists, provides a fully configured mocked globals and manager, calls `CreateEngineAsync`, and asserts the resulting engine is non-null
 
-- [ ] [P76-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that the test path short-circuits on empty data without throwing
+- [x] [P76-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that the test path short-circuits on empty data without throwing
   - Acceptance: `[TestMethod]` exists, supplies an empty input to `TestAsync`, and asserts the method returns or completes without throwing an exception
 
-- [ ] [P76-T4] Register `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
+- [x] [P76-T4] Register `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
   - Acceptance: `UtilitiesCS.Test.csproj` contains the relevant `<Compile Include="..." />` entry for this test file and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 77 — StoreWrapperController Coverage (`UtilitiesCS\OutlookObjects\Store\StoreWrapperController.cs`)
 
-- [ ] [P77-T1] Add test to `UtilitiesCS.Test\OutlookObjects\Store\StoreWrapperController_Tests.cs` verifying that `PopulateWithCurrent` mirrors the backing store wrapper's field values
+- [x] [P77-T1] Add test to `UtilitiesCS.Test\OutlookObjects\Store\StoreWrapperController_Tests.cs` verifying that `PopulateWithCurrent` mirrors the backing store wrapper's field values
   - Acceptance: `[TestMethod]` exists, supplies a mocked store wrapper with known field values, calls `PopulateWithCurrent`, and asserts the controller properties match the mock values
 
-- [ ] [P77-T2] Add test to `UtilitiesCS.Test\OutlookObjects\Store\StoreWrapperController_Tests.cs` verifying that `AnyChanges` returns true when a field differs from the backing wrapper
+- [x] [P77-T2] Add test to `UtilitiesCS.Test\OutlookObjects\Store\StoreWrapperController_Tests.cs` verifying that `AnyChanges` returns true when a field differs from the backing wrapper
   - Acceptance: `[TestMethod]` exists, populates the controller, modifies one field, calls `AnyChanges`, and asserts the return is true
 
-- [ ] [P77-T3] Add test to `UtilitiesCS.Test\OutlookObjects\Store\StoreWrapperController_Tests.cs` verifying that selecting a folder updates the target folder properties on the controller
+- [x] [P77-T3] Add test to `UtilitiesCS.Test\OutlookObjects\Store\StoreWrapperController_Tests.cs` verifying that selecting a folder updates the target folder properties on the controller
   - Acceptance: `[TestMethod]` exists, calls the select-folder callback with a synthetic folder object, and asserts the controller's target folder properties have been updated
 
-- [ ] [P77-T4] Register `UtilitiesCS.Test\OutlookObjects\Store\StoreWrapperController_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P77-T4] Register `UtilitiesCS.Test\OutlookObjects\Store\StoreWrapperController_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 78 — Triage_OlLogic Coverage (`UtilitiesCS\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogic.cs`)
