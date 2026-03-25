@@ -256,6 +256,86 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             result.Should().BeFalse();
         }
 
+        /// <summary>
+        /// Verifies that <see cref="ActionableClassifierGroup.GetMatchingCategories"/> filters out
+        /// the "None" class from results even when a "None" classifier is present in the group.
+        ///
+        /// Purpose:
+        ///     Confirms the filter's second Where clause excludes "None", returning only
+        ///     categories with probability above the threshold and class != "None".
+        ///
+        /// Returns:
+        ///     Passes when the filtered result does not contain "None".
+        /// </summary>
+        [TestMethod]
+        public void GetMatchingCategories_NoneClassAlwaysFiltered()
+        {
+            // Arrange: provide a mix of "None" and "Task" classifiers (actionable and non-actionable).
+            var group = new ActionableClassifierGroup();
+            var classifierGroup = new BayesianClassifierGroup
+            {
+                TotalEmailCount = 10,
+                SharedTokenBase = new Corpus(),
+            };
+            classifierGroup.Classifiers["None"] = new BayesianClassifierShared(
+                "None",
+                classifierGroup
+            );
+            classifierGroup.Classifiers["Task"] = new BayesianClassifierShared(
+                "Task",
+                classifierGroup
+            );
+            group.ClassifierGroup = classifierGroup;
+
+            // Act: call the category filter with an empty-token helper.
+            var result = group.GetMatchingCategories(new MailItemHelper());
+
+            // Assert: "None" is always excluded from the returned subset of categories.
+            result.Should().NotContain("None");
+        }
+
+        /// <summary>
+        /// Verifies that the categorization path for <see cref="ActionableClassifierGroup"/>
+        /// short-circuits gracefully when supplied with empty data (no tokens, untrained classifiers),
+        /// returning no categories — analogous to the short-circuit within TestAsync that routes to "None".
+        ///
+        /// Purpose:
+        ///     Confirm classification completes without throwing and produces an empty result set
+        ///     so that TestAsync's IsNullOrEmpty branch (value = "None") executes rather than
+        ///     the unhappy path.
+        ///
+        /// Note:
+        ///     The async TestAsync/GetMatchingCategoriesAsync path requires
+        ///     Microsoft.Bcl.AsyncInterfaces v10.0.0.0 which is unavailable in headless test
+        ///     execution; the synchronous GetMatchingCategories exercises the same filtering logic.
+        ///
+        /// Returns:
+        ///     Passes when the result is empty/null and no exception is thrown.
+        /// </summary>
+        [TestMethod]
+        public void TestAsync_EmptyData_CategorizationShortCircuitsToEmpty()
+        {
+            // Arrange: untrained classifier with empty-token helper.
+            var group = new ActionableClassifierGroup();
+            var classifierGroup = new BayesianClassifierGroup
+            {
+                TotalEmailCount = 0,
+                SharedTokenBase = new Corpus(),
+            };
+            classifierGroup.Classifiers["None"] = new BayesianClassifierShared(
+                "None",
+                classifierGroup
+            );
+            group.ClassifierGroup = classifierGroup;
+
+            // Act: synchronous counterpart of TestAsync's internal categorization call.
+            var results = group.GetMatchingCategories(new MailItemHelper());
+
+            // Assert: empty data short-circuits to no results — IsNullOrEmpty would route
+            // TestAsync to value = "None" without throwing.
+            results.IsNullOrEmpty().Should().BeTrue();
+        }
+
         private static Mock<IApplicationGlobals> CreateMockGlobals()
         {
             var mockGlobals = new Mock<IApplicationGlobals>();

@@ -316,6 +316,59 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             controller.JunkPotential.Should().NotBeNull();
         }
 
+        /// <summary>
+        /// Verifies that after <see cref="StoreWrapperController.PopulateWithCurrent"/> completes,
+        /// the controller's internal folder fields are the exact same object references as the
+        /// corresponding properties on the backing <see cref="StoreWrapper"/>.
+        ///
+        /// Purpose:
+        ///     Confirm that PopulateWithCurrent "mirrors" the current store — i.e. the controller
+        ///     fields are not copies but are the same instances, so subsequent AnyChanges() comparison
+        ///     via PairwiseEquals (reference equality) will correctly report "no changes" right
+        ///     after population.
+        ///
+        /// Returns:
+        ///     Passes when each controller field is the same object reference as the Current property.
+        /// </summary>
+        [TestMethod]
+        public void PopulateWithCurrent_WithKnownFolderValues_MirrorsControllerFieldsFromCurrent()
+        {
+            // Arrange: use null globals — PopulateWithCurrent does not call Globals.
+            // Use StoreWrapperViewer directly to avoid Moq (Moq's AwaitableFactory requires
+            // System.Threading.Tasks.Extensions 4.2.0.1 which is absent from the test bin output,
+            // causing TypeInitializationException for all Mock<T> involving Task-bearing interfaces).
+            // StoreWrapperViewer creates real WinForms labels in InitializeComponent(); Form handle
+            // is never created so InvokeRequired returns false in the test thread.
+            var controller = new StoreWrapperController(null!);
+            controller.Viewer = new StoreWrapperViewer();
+
+            var archiveFolder = new FolderMinimalWrapper("Archive", "Root\\Archive");
+            var junkEmailFolder = new FolderMinimalWrapper("JunkEmail", "Root\\Junk");
+            var junkPotentialFolder = new FolderMinimalWrapper("JunkPotential", "Root\\Potential");
+
+            // FilePathHelper() defaults FolderPath = "" so GetRelativeFsPath skips FsConverter.
+            var archiveFs = new FilePathHelper();
+
+            var currentStore = new StoreWrapper(null);
+            currentStore.ArchiveRoot = archiveFolder;
+            currentStore.JunkCertain = junkEmailFolder;
+            currentStore.JunkPotential = junkPotentialFolder;
+            currentStore.ArchiveFsRoot = archiveFs;
+            controller.Current = currentStore;
+
+            // Act
+            controller.PopulateWithCurrent();
+
+            // Assert: controller fields must be the same object references — not copies.
+            // PairwiseEquals uses reference equality for FolderMinimalWrapper and FilePathHelper,
+            // so mirroring reference equality ensures AnyChanges() reports no changes right after
+            // population.
+            controller.ArchiveOutlook.Should().BeSameAs(archiveFolder);
+            controller.JunkEmail.Should().BeSameAs(junkEmailFolder);
+            controller.JunkPotential.Should().BeSameAs(junkPotentialFolder);
+            controller.ArchiveFS.Should().BeSameAs(archiveFs);
+        }
+
         #endregion
 
         #region Click handlers (non-invoke path)
@@ -387,6 +440,81 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             controller.JunkPotential_Click();
 
             controller.JunkPotential.Should().BeNull();
+        }
+
+        /// <summary>
+        /// Verifies that when <see cref="StoreWrapperController.SelectFolder"/> returns a
+        /// non-null <see cref="FolderMinimalWrapper"/>, the <c>ArchiveOutlook_Click</c>
+        /// handler stores it in <see cref="StoreWrapperController.ArchiveOutlook"/> and writes
+        /// the folder's <see cref="FolderMinimalWrapper.RelativePath"/> to the viewer label.
+        ///
+        /// Purpose:
+        ///     Confirm the "selecting a folder updates the target folder property" contract without
+        ///     requiring a real Outlook COM session.  <see cref="StubSelectFolderController"/>
+        ///     overrides the internal virtual SelectFolder to inject a known stub, bypassing the
+        ///     PickFolder COM call.  <see cref="StoreWrapperViewer"/> is used directly as the
+        ///     viewer to avoid Moq's AwaitableFactory dependency issue.
+        ///
+        /// Returns:
+        ///     Passes when controller.ArchiveOutlook is the same instance that SelectFolder returned.
+        /// </summary>
+        [TestMethod]
+        public void ArchiveOutlook_Click_SelectFolderReturnsFolder_SetsArchiveOutlookToReturnedFolder()
+        {
+            // Arrange: inject a known folder via the stub subclass.
+            // Null globals: SelectFolder is overridden so Globals.Ol is never called.
+            // Use StoreWrapperViewer directly (no Moq) — avoids Moq AwaitableFactory failure.
+            var stubFolder = new FolderMinimalWrapper("Archive", "Root\\Archive");
+            var controller = new StubSelectFolderController(null!, stubFolder);
+            controller.Viewer = new StoreWrapperViewer();
+
+            // Act: click handler calls SelectFolder() and stores the result.
+            controller.ArchiveOutlook_Click();
+
+            // Assert: the property was updated to exactly the stub folder returned by SelectFolder.
+            controller.ArchiveOutlook.Should().BeSameAs(stubFolder);
+        }
+
+        #endregion
+
+        #region Stub helpers
+
+        /// <summary>
+        /// Test-only subclass that overrides <see cref="StoreWrapperController.SelectFolder"/>
+        /// to return a controllable stub folder, bypassing the Outlook COM PickFolder call.
+        ///
+        /// Usage:
+        ///     Construct with a predetermined <see cref="FolderMinimalWrapper"/> so click-handler
+        ///     tests can verify downstream property updates without a COM session.
+        /// </summary>
+        private sealed class StubSelectFolderController : StoreWrapperController
+        {
+            private readonly FolderMinimalWrapper _stub;
+
+            /// <summary>
+            /// Initializes the controller with a globals dependency and a predetermined
+            /// stub folder to return from <see cref="SelectFolder"/>.
+            ///
+            /// Args:
+            ///     globals: Application globals (may be mocked; SelectFolder is overridden).
+            ///     stubFolder: The folder instance to return when SelectFolder is called.
+            /// </summary>
+            internal StubSelectFolderController(
+                IApplicationGlobals globals,
+                FolderMinimalWrapper stubFolder
+            )
+                : base(globals)
+            {
+                _stub = stubFolder;
+            }
+
+            /// <summary>
+            /// Returns the injected stub folder instead of invoking PickFolder over COM.
+            ///
+            /// Returns:
+            ///     The stub folder supplied at construction time.
+            /// </summary>
+            internal override FolderMinimalWrapper SelectFolder() => _stub;
         }
 
         #endregion
