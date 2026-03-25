@@ -2112,15 +2112,18 @@ namespace QuickFiler.Controllers
                     $"|{endTime:G} | Duration: {minutes:N0} minutes {seconds:N1} | Action: "
                     + $" | Subject: {helper.Subject} | From: {helper.SenderName} | To: {helper.ToRecipientsName}";
 
-                if (string.IsNullOrEmpty(olAppointment.Body))
+                if (olAppointment is not null)
                 {
-                    olAppointment.Body = infoMailString;
-                    olAppointment.Save();
-                }
-                else
-                {
-                    olAppointment.Body += $"{System.Environment.NewLine}{infoMailString}";
-                    olAppointment.Save();
+                    if (string.IsNullOrEmpty(olAppointment.Body))
+                    {
+                        olAppointment.Body = infoMailString;
+                        olAppointment.Save();
+                    }
+                    else
+                    {
+                        olAppointment.Body += $"{System.Environment.NewLine}{infoMailString}";
+                        olAppointment.Save();
+                    }
                 }
 
                 var dataLine =
