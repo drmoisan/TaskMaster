@@ -724,205 +724,205 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 
 ### Phase 55 — YesNoToAll Coverage (`UtilitiesCS\Dialogs\YesNoToAll.cs`)
 
-- [ ] [P55-T1] Add test to `UtilitiesCS.Test\Dialogs\YesNoToAll_Tests.cs` verifying that each response setter stores the expected enum value
+- [x] [P55-T1] Add test to `UtilitiesCS.Test\Dialogs\YesNoToAll_Tests.cs` verifying that each response setter stores the expected enum value
   - Acceptance: `[TestMethod]` exists, calls each response setter in turn, and asserts the `Response` property equals the corresponding expected enum member
 
-- [ ] [P55-T2] Add test to `UtilitiesCS.Test\Dialogs\YesNoToAll_Tests.cs` verifying that the dialog result property reflects the current state after a setter is called
+- [x] [P55-T2] Add test to `UtilitiesCS.Test\Dialogs\YesNoToAll_Tests.cs` verifying that the dialog result property reflects the current state after a setter is called
   - Acceptance: `[TestMethod]` exists, sets a response, and asserts the associated `DialogResult` or display state matches the expected value
 
-- [ ] [P55-T3] Register `UtilitiesCS.Test\Dialogs\YesNoToAll_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P55-T3] Register `UtilitiesCS.Test\Dialogs\YesNoToAll_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Dialogs\YesNoToAll_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 56 — CategoryClassifierGroup Coverage (`UtilitiesCS\EmailIntelligence\ClassifierGroups\Categories\CategoryClassifierGroup.cs`)
 
-- [ ] [P56-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that category expansion creates the expected classifier keys
+- [x] [P56-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that category expansion creates the expected classifier keys
   - Acceptance: `[TestMethod]` exists, provides synthetic categories, calls expand/build, and asserts the resulting classifier keys match each category name
 
-- [ ] [P56-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that the build path skips empty categories
+- [x] [P56-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that the build path skips empty categories
   - Acceptance: `[TestMethod]` exists, includes an empty category in the input, calls build, and asserts no classifier key was created for that category
 
-- [ ] [P56-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that the load path reuses existing manager entries rather than creating duplicates
+- [x] [P56-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that the load path reuses existing manager entries rather than creating duplicates
   - Acceptance: `[TestMethod]` exists, pre-populates the mocked manager with a known entry, calls load, and asserts the pre-existing entry is returned without creating a new one
 
-- [ ] [P56-T4] Register `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
+- [x] [P56-T4] Register `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
   - Acceptance: `UtilitiesCS.Test.csproj` contains the relevant `<Compile Include="..." />` entry for this test file and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 57 — MouseDownFilter Coverage (`UtilitiesCS\HelperClasses\Windows Forms\MouseDownFilter.cs`)
 
-- [ ] [P57-T1] Add test to nearest `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` verifying that a left-button WM_LBUTTONDOWN message triggers the `FormClicked` event
+- [x] [P57-T1] Add test to nearest `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` verifying that a left-button WM_LBUTTONDOWN message triggers the `FormClicked` event
   - Acceptance: `[TestMethod]` exists, subscribes to `FormClicked`, constructs a WM_LBUTTONDOWN `Message`, calls `PreFilterMessage`, and asserts the event was raised
 
-- [ ] [P57-T2] Add test to nearest `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` verifying that an unrelated message returns false without raising the event
+- [x] [P57-T2] Add test to nearest `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` verifying that an unrelated message returns false without raising the event
   - Acceptance: `[TestMethod]` exists, constructs a non-mouse `Message`, calls `PreFilterMessage`, and asserts the return value is false and no event was raised
 
-- [ ] [P57-T3] Add test to nearest `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` verifying that calling `PreFilterMessage` with no subscribers does not throw
+- [x] [P57-T3] Add test to nearest `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` verifying that calling `PreFilterMessage` with no subscribers does not throw
   - Acceptance: `[TestMethod]` exists, constructs a `MouseDownFilter` with no event subscribers, calls `PreFilterMessage`, and asserts no exception is thrown
 
-- [ ] [P57-T4] Register `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
+- [x] [P57-T4] Register `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
   - Acceptance: `UtilitiesCS.Test.csproj` contains the relevant `<Compile Include="..." />` entry for this test file and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 58 — ShellUtilities SKIP (`UtilitiesCS\HelperClasses\FileSystem\ShellUtilities.cs`)
 
-- [ ] [P58-T1] Record skip-evaluation decision for `ShellUtilities.cs`: static Win32 shell interop and PInvoke icon extraction have no DI seam and are environment-dependent; unit-test ROI is negligible without OS/shell coupling
+- [x] [P58-T1] Record skip-evaluation decision for `ShellUtilities.cs`: static Win32 shell interop and PInvoke icon extraction have no DI seam and are environment-dependent; unit-test ROI is negligible without OS/shell coupling
   - Acceptance: This task is checked off and the decision is noted inline; no test file is created for this file
 
 ### Phase 59 — ShellUtilitiesStatic SKIP (`UtilitiesCS\HelperClasses\FileSystem\ShellUtilitiesStatic.cs`)
 
-- [ ] [P59-T1] Record skip-evaluation decision for `ShellUtilitiesStatic.cs`: same static Win32 shell dependence as `ShellUtilities.cs`; no viable seam for meaningful deterministic unit tests
+- [x] [P59-T1] Record skip-evaluation decision for `ShellUtilitiesStatic.cs`: same static Win32 shell dependence as `ShellUtilities.cs`; no viable seam for meaningful deterministic unit tests
   - Acceptance: This task is checked off and the decision is noted inline; no test file is created for this file
 
 ### Phase 60 — ThemeControlGroup Coverage (`UtilitiesCS\HelperClasses\ThemeHelpers\ThemeControlGroup.cs`)
 
-- [ ] [P60-T1] Add test to nearest `UtilitiesCS.Test\HelperClasses` test file verifying that `ApplyTheme` updates supported control properties to theme values
+- [x] [P60-T1] Add test to nearest `UtilitiesCS.Test\HelperClasses` test file verifying that `ApplyTheme` updates supported control properties to theme values
   - Acceptance: `[TestMethod]` exists, creates a `ThemeControlGroup` with simple WinForms controls and a known theme, calls `ApplyTheme`, and asserts the backed controls have the expected foreground/background values
 
-- [ ] [P60-T2] Add test to nearest `UtilitiesCS.Test\HelperClasses` test file verifying that the alternate/hover setters target the intended control subset
+- [x] [P60-T2] Add test to nearest `UtilitiesCS.Test\HelperClasses` test file verifying that the alternate/hover setters target the intended control subset
   - Acceptance: `[TestMethod]` exists, calls the alternate setter with a subset of controls, and asserts only the targeted controls received the alternate styling values
 
-- [ ] [P60-T3] Add test to nearest `UtilitiesCS.Test\HelperClasses` test file verifying that unsupported control types are ignored safely without throwing
+- [x] [P60-T3] Add test to nearest `UtilitiesCS.Test\HelperClasses` test file verifying that unsupported control types are ignored safely without throwing
   - Acceptance: `[TestMethod]` exists, includes an unsupported control type in the group, calls `ApplyTheme`, and asserts no exception is thrown
 
-- [ ] [P60-T4] Register the chosen `UtilitiesCS.Test\HelperClasses` test file in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
+- [x] [P60-T4] Register the chosen `UtilitiesCS.Test\HelperClasses` test file in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
   - Acceptance: `UtilitiesCS.Test.csproj` contains the relevant `<Compile Include="..." />` entry for this test file and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 61 — OlTableExtensions Coverage (`UtilitiesCS\OutlookObjects\Table\OlTableExtensions.cs`)
 
-- [ ] [P61-T1] Add test to `UtilitiesCS.Test\OutlookObjects\Table\OlTableExtensions_Tests.cs` verifying that add-column and remove-column call the expected Outlook table members in order
+- [x] [P61-T1] Add test to `UtilitiesCS.Test\OutlookObjects\Table\OlTableExtensions_Tests.cs` verifying that add-column and remove-column call the expected Outlook table members in order
   - Acceptance: `[TestMethod]` exists, mocks the COM table/columns interface, calls the helper, and asserts the expected COM Add/Remove calls were made in the expected order via Moq verification
 
-- [ ] [P61-T2] Add test to `UtilitiesCS.Test\OutlookObjects\Table\OlTableExtensions_Tests.cs` verifying that the retry wrapper retries the specified number of times on transient failure
+- [x] [P61-T2] Add test to `UtilitiesCS.Test\OutlookObjects\Table\OlTableExtensions_Tests.cs` verifying that the retry wrapper retries the specified number of times on transient failure
   - Acceptance: `[TestMethod]` exists, supplies a mock action that throws for the first N-1 calls and succeeds on the Nth, calls the retry wrapper, and asserts the action was invoked exactly N times
 
-- [ ] [P61-T3] Add test to `UtilitiesCS.Test\OutlookObjects\Table\OlTableExtensions_Tests.cs` verifying that the extract helper maps mocked rows to the expected strongly-typed records
+- [x] [P61-T3] Add test to `UtilitiesCS.Test\OutlookObjects\Table\OlTableExtensions_Tests.cs` verifying that the extract helper maps mocked rows to the expected strongly-typed records
   - Acceptance: `[TestMethod]` exists, supplies mock rows with known column values, calls the extract helper, and asserts the resulting records have the expected field values
 
-- [ ] [P61-T4] Register `UtilitiesCS.Test\OutlookObjects\Table\OlTableExtensions_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P61-T4] Register `UtilitiesCS.Test\OutlookObjects\Table\OlTableExtensions_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="OutlookObjects\Table\OlTableExtensions_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 62 — ProgressTrackerAsync Coverage (`UtilitiesCS\Threading\ProgressTrackerAsync.cs`)
 
-- [ ] [P62-T1] Add test to `UtilitiesCS.Test\Threading\ProgressTrackerAsync_Tests.cs` verifying that `Initialize` populates root-tracker state
+- [x] [P62-T1] Add test to `UtilitiesCS.Test\Threading\ProgressTrackerAsync_Tests.cs` verifying that `Initialize` populates root-tracker state
   - Acceptance: `[TestMethod]` exists, calls `Initialize`, and asserts the root tracker's percent and message properties are in their initialized (non-null/zero) state
 
-- [ ] [P62-T2] Add test to `UtilitiesCS.Test\Threading\ProgressTrackerAsync_Tests.cs` verifying that `Report` updates the percentage and message fields
+- [x] [P62-T2] Add test to `UtilitiesCS.Test\Threading\ProgressTrackerAsync_Tests.cs` verifying that `Report` updates the percentage and message fields
   - Acceptance: `[TestMethod]` exists, calls `Report` with a known percent and message, and asserts the tracker properties reflect those values
 
-- [ ] [P62-T3] Add test to `UtilitiesCS.Test\Threading\ProgressTrackerAsync_Tests.cs` verifying that child allocation inherits the expected scheduler and token state
+- [x] [P62-T3] Add test to `UtilitiesCS.Test\Threading\ProgressTrackerAsync_Tests.cs` verifying that child allocation inherits the expected scheduler and token state
   - Acceptance: `[TestMethod]` exists, allocates a child tracker, and asserts the child references the parent scheduler/cancellation token source
 
-- [ ] [P62-T4] Register `UtilitiesCS.Test\Threading\ProgressTrackerAsync_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P62-T4] Register `UtilitiesCS.Test\Threading\ProgressTrackerAsync_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Threading\ProgressTrackerAsync_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 63 — WinFormsExtensions Coverage (`UtilitiesCS\Extensions\WinFormsExtensions.cs`)
 
-- [ ] [P63-T1] Add test to `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` verifying that control-descendant traversal returns all nested descendants in expected order
+- [x] [P63-T1] Add test to `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` verifying that control-descendant traversal returns all nested descendants in expected order
   - Acceptance: `[TestMethod]` exists, builds a two-level control tree, calls the traversal helper, and asserts the result collection contains all expected control references in the expected sequence
 
-- [ ] [P63-T2] Add test to `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` verifying that ancestor lookup handles a control with no parent without throwing
+- [x] [P63-T2] Add test to `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` verifying that ancestor lookup handles a control with no parent without throwing
   - Acceptance: `[TestMethod]` exists, calls the ancestor-lookup helper on a control with no parent, and asserts the result is null/empty and no exception is thrown
 
-- [ ] [P63-T3] Add test to `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` verifying that `RemoveEventHandlers` prevents subsequent invocation of removed handlers
+- [x] [P63-T3] Add test to `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` verifying that `RemoveEventHandlers` prevents subsequent invocation of removed handlers
   - Acceptance: `[TestMethod]` exists, wires a delegate to an event, calls `RemoveEventHandlers`, fires the event, and asserts the delegate was not invoked
 
-- [ ] [P63-T4] Register `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
+- [x] [P63-T4] Register `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
   - Acceptance: `UtilitiesCS.Test.csproj` contains the relevant `<Compile Include="..." />` entry for this test file and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 64 — MulticlassEngine Coverage (`UtilitiesCS\EmailIntelligence\ClassifierGroups\MulticlassEngine.cs`)
 
-- [ ] [P64-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\MulticlassEngine_Tests.cs` verifying that `Init` wires the manager and globals correctly
+- [x] [P64-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\MulticlassEngine_Tests.cs` verifying that `Init` wires the manager and globals correctly
   - Acceptance: `[TestMethod]` exists, calls `Init` with mocked globals and manager, and asserts the engine properties reference the provided instances
 
-- [ ] [P64-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\MulticlassEngine_Tests.cs` verifying that the build path creates the expected number of classifiers
+- [x] [P64-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\MulticlassEngine_Tests.cs` verifying that the build path creates the expected number of classifiers
   - Acceptance: `[TestMethod]` exists, provides synthetic classifier input data of known cardinality, calls build, and asserts the classifier count in the engine equals the expected value
 
-- [ ] [P64-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\MulticlassEngine_Tests.cs` verifying that the load path short-circuits when a manager entry is missing
+- [x] [P64-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\MulticlassEngine_Tests.cs` verifying that the load path short-circuits when a manager entry is missing
   - Acceptance: `[TestMethod]` exists, supplies a mocked manager returning null for the requested entry, calls load, and asserts the method returns early without creating a classifier
 
-- [ ] [P64-T4] Register `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\MulticlassEngine_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P64-T4] Register `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\MulticlassEngine_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\ClassifierGroups\MulticlassEngine_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 65 — Triage Coverage (`UtilitiesCS\EmailIntelligence\ClassifierGroups\Triage\Triage.cs`)
 
-- [ ] [P65-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` verifying that the create-new path sets the expected config file name
+- [x] [P65-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` verifying that the create-new path sets the expected config file name
   - Acceptance: `[TestMethod]` exists, calls the create path with mocked globals, and asserts the resulting classifier group config file name equals the expected value
 
-- [ ] [P65-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` verifying that validation rejects a config with a missing classifier group
+- [x] [P65-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` verifying that validation rejects a config with a missing classifier group
   - Acceptance: `[TestMethod]` exists, supplies an incomplete config with no classifier group, calls validation, and asserts the validation returns false or raises the expected error
 
-- [ ] [P65-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` verifying that the training path routes through the mocked manager as expected
+- [x] [P65-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` verifying that the training path routes through the mocked manager as expected
   - Acceptance: `[TestMethod]` exists, supplies a mock manager and training input, calls the training method, and asserts the mock manager's training method was invoked with the expected arguments
 
-- [ ] [P65-T4] Register `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
+- [x] [P65-T4] Register `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
   - Acceptance: `UtilitiesCS.Test.csproj` contains the relevant `<Compile Include="..." />` entry for this test file and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 66 — ProgressTrackerPane Coverage (`UtilitiesCS\Threading\ProgressTrackerPane.cs`)
 
-- [ ] [P66-T1] Add test to nearest `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` verifying that the root tracker reports progress to the pane
+- [x] [P66-T1] Add test to nearest `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` verifying that the root tracker reports progress to the pane
   - Acceptance: `[TestMethod]` exists, creates a `ProgressTrackerPane` with a stub pane, calls `Report`, and asserts the stub pane's update method was invoked with the expected percent/message
 
-- [ ] [P66-T2] Add test to nearest `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` verifying that a spawned child tracker inherits a scaled range from the parent
+- [x] [P66-T2] Add test to nearest `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` verifying that a spawned child tracker inherits a scaled range from the parent
   - Acceptance: `[TestMethod]` exists, spawns a child from an initialized parent tracker, reports 50% on the child, and asserts the parent's reported progress is in the expected mapped range
 
-- [ ] [P66-T3] Add test to nearest `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` verifying that completing the child at 100% properly closes or finalizes the pane state
+- [x] [P66-T3] Add test to nearest `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` verifying that completing the child at 100% properly closes or finalizes the pane state
   - Acceptance: `[TestMethod]` exists, reports 100% on the tracker, and asserts the pane's close or finalize method was called
 
-- [ ] [P66-T4] Register `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
+- [x] [P66-T4] Register `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
   - Acceptance: `UtilitiesCS.Test.csproj` contains the relevant `<Compile Include="..." />` entry for this test file and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 67 — OlFolderClassifierGroup Coverage (`UtilitiesCS\EmailIntelligence\ClassifierGroups\OlFolder\OlFolderClassifierGroup.cs`)
 
-- [ ] [P67-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that the build path creates one classifier per eligible folder in the staging source
+- [x] [P67-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that the build path creates one classifier per eligible folder in the staging source
   - Acceptance: `[TestMethod]` exists, provides N synthetic folder metadata entries, calls build, and asserts the classifier collection count equals N
 
-- [ ] [P67-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that an empty staging source yields no classifiers
+- [x] [P67-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that an empty staging source yields no classifiers
   - Acceptance: `[TestMethod]` exists, provides an empty staging source, calls build, and asserts the classifier collection is empty
 
-- [ ] [P67-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that the load path rehydrates an existing group from the manager
+- [x] [P67-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` verifying that the load path rehydrates an existing group from the manager
   - Acceptance: `[TestMethod]` exists, pre-populates the mocked manager with a known group, calls load, and asserts the returned group matches the pre-populated entry
 
-- [ ] [P67-T4] Register `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
+- [x] [P67-T4] Register `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
   - Acceptance: `UtilitiesCS.Test.csproj` contains the relevant `<Compile Include="..." />` entry for this test file and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 68 — ApplicationIdleTimer Coverage (`UtilitiesCS\Threading\ApplicationIdleTimer.cs`)
 
-- [ ] [P68-T1] Add test to `UtilitiesCS.Test\Threading\ApplicationIdleTimer_Tests.cs` verifying that subscribing and then unsubscribing reduces the listener count correctly
+- [x] [P68-T1] Add test to `UtilitiesCS.Test\Threading\ApplicationIdleTimer_Tests.cs` verifying that subscribing and then unsubscribing reduces the listener count correctly
   - Acceptance: `[TestMethod]` exists, subscribes two listeners and unsubscribes one, and asserts the listener count equals 1
 
-- [ ] [P68-T2] Add test to `UtilitiesCS.Test\Threading\ApplicationIdleTimer_Tests.cs` verifying that the heartbeat raises event args matching the expected elapsed/state fields
+- [x] [P68-T2] Add test to `UtilitiesCS.Test\Threading\ApplicationIdleTimer_Tests.cs` verifying that the heartbeat raises event args matching the expected elapsed/state fields
   - Acceptance: `[TestMethod]` exists, triggers a heartbeat, captures the event args, and asserts the elapsed time and/or activity state fields equal the expected values
 
-- [ ] [P68-T3] Add test to `UtilitiesCS.Test\Threading\ApplicationIdleTimer_Tests.cs` verifying that the singleton instance property returns the same reference on repeated access
+- [x] [P68-T3] Add test to `UtilitiesCS.Test\Threading\ApplicationIdleTimer_Tests.cs` verifying that the singleton instance property returns the same reference on repeated access
   - Acceptance: `[TestMethod]` exists, reads the singleton property twice and asserts both references are equal
 
-- [ ] [P68-T4] Register `UtilitiesCS.Test\Threading\ApplicationIdleTimer_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
+- [x] [P68-T4] Register `UtilitiesCS.Test\Threading\ApplicationIdleTimer_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
   - Acceptance: `UtilitiesCS.Test.csproj` contains the relevant `<Compile Include="..." />` entry for this test file and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 69 — RecentsList Coverage (`UtilitiesCS\EmailIntelligence\Recents\RecentsList.cs`)
 
-- [ ] [P69-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\RecentsList_Tests.cs` verifying that adding a duplicate item moves the existing entry to the front of the list
+- [x] [P69-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\RecentsList_Tests.cs` verifying that adding a duplicate item moves the existing entry to the front of the list
   - Acceptance: `[TestMethod]` exists, adds item A and item B, re-adds item A, and asserts A is now the first element
 
-- [ ] [P69-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\RecentsList_Tests.cs` verifying that exceeding the max count trims the oldest entry
+- [x] [P69-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\RecentsList_Tests.cs` verifying that exceeding the max count trims the oldest entry
   - Acceptance: `[TestMethod]` exists, fills the list to max capacity, adds one more item, and asserts the count remains at max and the oldest item is absent
 
-- [ ] [P69-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\RecentsList_Tests.cs` verifying that serialization and deserialization preserve insertion order
+- [x] [P69-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\RecentsList_Tests.cs` verifying that serialization and deserialization preserve insertion order
   - Acceptance: `[TestMethod]` exists, populates a known-order list, serializes and deserializes it, and asserts the resulting list order matches the original
 
-- [ ] [P69-T4] Register `UtilitiesCS.Test\EmailIntelligence\RecentsList_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P69-T4] Register `UtilitiesCS.Test\EmailIntelligence\RecentsList_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\RecentsList_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 70 — OneDriveDownloader Coverage (`UtilitiesCS\OneDriveHelpers\OneDriveDownloader.cs`)
 
-- [ ] [P70-T1] Add test to `UtilitiesCS.Test\OneDriveHelpers\OneDriveDownloader_Tests.cs` verifying that a successful download writes the stream contents via the injected writer
+- [x] [P70-T1] Add test to `UtilitiesCS.Test\OneDriveHelpers\OneDriveDownloader_Tests.cs` verifying that a successful download writes the stream contents via the injected writer
   - Acceptance: `[TestMethod]` exists, supplies an in-memory HTTP response stream and a mock writer delegate, calls `DownloadFileAsync`, and asserts the writer received the expected bytes
 
-- [ ] [P70-T2] Add test to `UtilitiesCS.Test\OneDriveHelpers\OneDriveDownloader_Tests.cs` verifying that a missing writer returns false without producing file output
+- [x] [P70-T2] Add test to `UtilitiesCS.Test\OneDriveHelpers\OneDriveDownloader_Tests.cs` verifying that a missing writer returns false without producing file output
   - Acceptance: `[TestMethod]` exists, supplies a null/missing writer factory, calls the download method, and asserts the return value is false and no file data was written
 
-- [ ] [P70-T3] Add test to `UtilitiesCS.Test\OneDriveHelpers\OneDriveDownloader_Tests.cs` verifying that a failed HTTP client call returns false without invoking the writer
+- [x] [P70-T3] Add test to `UtilitiesCS.Test\OneDriveHelpers\OneDriveDownloader_Tests.cs` verifying that a failed HTTP client call returns false without invoking the writer
   - Acceptance: `[TestMethod]` exists, supplies a mock client delegate that throws or returns an error, calls the download method, and asserts the return is false and the writer was not invoked
 
-- [ ] [P70-T4] Register `UtilitiesCS.Test\OneDriveHelpers\OneDriveDownloader_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P70-T4] Register `UtilitiesCS.Test\OneDriveHelpers\OneDriveDownloader_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="OneDriveHelpers\OneDriveDownloader_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 71 — ManagerAsyncLazy Coverage (`UtilitiesCS\EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs`)

@@ -473,6 +473,50 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             act.Should().Throw<NotImplementedException>();
         }
 
+        // -----------------------------------------------------------------------
+        // P65-T3 — TrainAsync routes through the TokenizeAsync and CallbackAsync
+        //           delegates, confirming the training pipeline hooks are invoked.
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        public async Task TrainAsync_ObjectOverload_InvokesTokenizeAndCallback()
+        {
+            // Arrange: set up a triage instance with a real classifier group and
+            // delegate stubs that record their invocation.
+            var mockGlobals = CreateMockGlobals();
+            var triage = new TriageClass(mockGlobals.Object);
+            triage.ClassifierGroup = TriageClass.CreateClassifier();
+
+            bool tokenizeInvoked = false;
+            bool callbackInvoked = false;
+            string callbackTriageId = null;
+
+            // Wire a tokenizer that records invocation and returns synthetic tokens.
+            triage.TokenizeAsync = (item, globals, token) =>
+            {
+                tokenizeInvoked = true;
+                return Task.FromResult(new[] { "urgent", "deadline" });
+            };
+
+            // Wire a callback that captures the triage-ID argument.
+            triage.CallbackAsync = (item, triageId) =>
+            {
+                callbackInvoked = true;
+                callbackTriageId = triageId;
+                return Task.CompletedTask;
+            };
+
+            // Act: call the object-accepting overload, which goes through the full pipeline.
+            await triage.TrainAsync((object)"emailItem", "A");
+
+            // Assert: both hooks were invoked by the training path.
+            tokenizeInvoked
+                .Should()
+                .BeTrue("tokenizer must be called to extract tokens before training");
+            callbackInvoked.Should().BeTrue("callback must be invoked after training completes");
+            callbackTriageId.Should().Be("A", "callback must receive the passed triage-ID label");
+        }
+
         #endregion
 
         #region Helpers

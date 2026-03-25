@@ -205,5 +205,60 @@ namespace UtilitiesCS.Test
         }
 
         #endregion
+
+        #region P66 — ProgressTrackerPane behaviour (headless via CapturingProgressTracker)
+
+        [TestMethod]
+        public void Report_WithJobName_RootReportsToStubPane()
+        {
+            // Arrange: CapturingProgressTracker stands in for the WinForms pane.
+            var stubPane = new CapturingProgressTracker();
+            var tracker = new ProgressTracker(stubPane, allocation: 100, startingAt: 0);
+
+            // Act
+            tracker.Report(65, "Indexing");
+
+            // Assert: stub pane received the expected percent and message.
+            stubPane.LastValue.Should().Be(65);
+            stubPane.LastJobName.Should().Be("Indexing");
+        }
+
+        [TestMethod]
+        public void SpawnChild_FromProgressedParent_MapsChildProgressIntoParentRange()
+        {
+            // Arrange: root capturing parent, parent allocated 80 % starting at 10 %.
+            var root = new CapturingProgressTracker();
+            var parent = new ProgressTracker(root, allocation: 80, startingAt: 10);
+            parent.Report(0, "start");
+
+            // Child gets an explicit 40-unit allocation within the parent range.
+            var child = parent.SpawnChild(40);
+
+            // Act: child reports 50 % complete.
+            child.Report(50, "halfway");
+
+            // Assert: child 50 % → parent 20 % (40*50/100) → root 26 % (80*20/100+10).
+            root.LastValue.Should().Be(26);
+            root.LastJobName.Should().Be("halfway");
+        }
+
+        [TestMethod]
+        public void Report_At100Percent_SetsProgressToMaxAndForwardsToParent()
+        {
+            // Arrange: tracker with a non-trivial allocation window to confirm full completion
+            // maps correctly to the parent range.
+            var stubPane = new CapturingProgressTracker();
+            var tracker = new ProgressTracker(stubPane, allocation: 50, startingAt: 30);
+
+            // Act
+            tracker.Report(100, "Complete");
+
+            // Assert: local progress capped at 100; parent receives 50*100/100+30 = 80.
+            tracker.Progress.Should().Be(100);
+            stubPane.LastValue.Should().Be(80);
+            stubPane.LastJobName.Should().Be("Complete");
+        }
+
+        #endregion
     }
 }

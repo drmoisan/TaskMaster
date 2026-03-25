@@ -756,5 +756,83 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
         }
 
         #endregion
+
+        #region P61 — Column add/remove order, retry call count, and record extraction
+
+        // -----------------------------------------------------------------------
+        // P61-T1 — AddColumns calls Add on the COM Columns interface for each
+        //           supplied name in the exact input sequence.
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        public void AddColumns_CallsAddInOrder_MatchesInputSequence()
+        {
+            // Arrange: mock the COM Table and Columns interface; capture call order.
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+            var addedOrder = new List<string>();
+            mockColumns
+                .Setup(c => c.Add(It.IsAny<string>()))
+                .Callback<string>(col => addedOrder.Add(col));
+
+            // Act: call the helper with a three-column input.
+            OlTableExtensions.AddColumns(mockTable.Object, new[] { "Col1", "Col2", "Col3" });
+
+            // Assert: Add was invoked for each column and in the declared order.
+            addedOrder.Should().ContainInConsecutiveOrder("Col1", "Col2", "Col3");
+        }
+
+        // -----------------------------------------------------------------------
+        // P61-T2 — RunTableRetry invokes the action exactly N times when it fails
+        //           N-1 times and succeeds on the Nth attempt.
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        public void RunTableRetry_FailsNMinus1Times_InvokesExactlyNTimes()
+        {
+            // Arrange: action that throws on the first 2 calls and succeeds on the 3rd.
+            int callCount = 0;
+
+            // Act: 5 max-attempt budget; action should settle after exactly 3 calls.
+            OlTableExtensions.RunTableRetry(
+                () =>
+                {
+                    callCount++;
+                    if (callCount < 3)
+                        throw new Exception("transient failure");
+                    return "done";
+                },
+                5
+            );
+
+            // Assert: exactly 3 calls — 2 failures + 1 success.
+            callCount.Should().Be(3, "the retry wrapper must stop as soon as the action succeeds");
+        }
+
+        // -----------------------------------------------------------------------
+        // P61-T3 — GetColumnDictionary maps column names to their original typed
+        //           values (i.e., strongly-typed record extraction from row data).
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        public void GetColumnDictionary_MixedTypes_PreservesTypedFieldValues()
+        {
+            // Arrange: simulate a row extraction with mixed-type column values.
+            var names = new[] { "Subject", "Size", "IsRead" };
+            var values = new object[] { "Meeting Notes", 2048, true };
+
+            // Act: extract the row into a column-keyed dictionary.
+            var result = OlTableExtensions.GetColumnDictionary(names, values);
+
+            // Assert: each field preserves its original type and value.
+            ((string)result["Subject"])
+                .Should()
+                .Be("Meeting Notes");
+            ((int)result["Size"]).Should().Be(2048);
+            ((bool)result["IsRead"]).Should().BeTrue();
+        }
+
+        #endregion
     }
 }

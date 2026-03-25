@@ -203,7 +203,7 @@
             onAction="QuickFiler_Click"
             label="Quick Filer"
             size="large"
-			keytip="QF"
+            keytip="QF"
           />
           <menu
             id="Settings"
