@@ -481,16 +481,7 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 - [x] [P4-T18] Evaluate `ReusableTypeClasses/Concurrent/Observable/Bag/ConcurrentObservableBag.cs` and confirm zero executable lines
   - Acceptance: `evidence/other/skip-candidates.md` confirms file has zero executable lines with explanation (entirely commented out; no live implementation found in solution)
 
-- [x] [P4-T19] Evaluate `To Depricate/StackObjectVB.cs` and confirm zero executable lines
-  - Acceptance: `evidence/other/skip-candidates.md` confirms file has zero executable lines with explanation (entirely commented out or dead code)
-
-- [x] [P4-T20] Evaluate `To Depricate/FlattenArray.cs` and confirm zero executable lines
-  - Acceptance: `evidence/other/skip-candidates.md` confirms file has zero executable lines with explanation (entirely commented out or dead code)
-
 #### Deprecated Files (P4-T21 through P4-T22)
-
-- [x] [P4-T21] Evaluate `CSVDictUtilities.cs` (0%) and document skip or removal decision
-  - Acceptance: `evidence/other/skip-candidates.md` records decision for `CSVDictUtilities.cs` (skip with rationale or removal deferred to separate cleanup issue)
 
 - [x] [P4-T22] Evaluate `FileIO2.cs` (0%) and document skip or removal decision
   - Acceptance: `evidence/other/skip-candidates.md` records decision for `FileIO2.cs` (skip with rationale or removal deferred to separate cleanup issue)

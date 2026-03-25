@@ -36,11 +36,11 @@ The work is organized into 90 phases:
   - *OutlookObjects*: `OlTableExtensions`, `StoreWrapperController`, `OlToDoTable`
   - *OneDriveHelpers*: `OneDriveDownloader`
 
-  Skip-evaluation phases (11 files) with rationale:
+  Skip-evaluation phases (10 files) with rationale:
   - **Phase 6** (`ConfusionViewer`) and **Phase 7** (`MetricChartViewer`): constructor-only WinForms designer shells with no meaningful non-designer logic.
   - **Phase 28** (`ProgressMultiStepViewer`): constructor-only progress form shell.
   - **Phase 31** (`ThreadMonitor`): relies on obsolete `Thread.Suspend`/`Thread.Resume` APIs and timing-sensitive diagnostics; deterministic unit tests are not feasible.
-  - **Phase 32** (`CSVDictUtilities`) and **Phase 33** (`FileIO2`): deprecated utilities with direct file-system dependence and no injection seam; tests would require real disk I/O, violating the no-temp-files policy.
+  - **Phase 33** (`FileIO2`): deprecated utility with direct file-system dependence and no injection seam; tests would require real disk I/O, violating the no-temp-files policy.
   - **Phase 35** (`ScreenHelper`): behavior depends on live machine monitor topology and active forms; static `Screen.AllScreens` has no injection seam.
   - **Phase 37** (`Theme`): broad UI/control graph and large mutable surface; unit coverage is low-value relative to the narrower `ThemeControlGroup` covered by Phase 60.
   - **Phase 58** (`ShellUtilities`) and **Phase 59** (`ShellUtilitiesStatic`): static Win32 shell interop and PInvoke icon extraction have no DI seam and are environment-dependent.

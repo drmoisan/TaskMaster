@@ -448,10 +448,7 @@ All 63 files are pure interface definitions with no implementation logic. No tes
 
 | File | Reason |
 |------|--------|
-| CSVDictUtilities.cs | Deprecated |
 | FileIO2.cs | Deprecated |
-| FlattenArray.cs | Deprecated |
-| StackObjectVB.cs | Deprecated |
 | StringManipulation.cs | Deprecated |
 
 ### WindowsAPI/ (1 file) — **Skip**

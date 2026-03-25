@@ -34,7 +34,6 @@ Categorized:
 - EmailIntelligence\Bayesian\Performance\MetricChartViewer.cs — 0% — SKIP (P7-T1: constructor-only WinForms designer shell)
 - Threading\ProgressMultiStepViewer.cs — 0% — SKIP (P28-T1: constructor-only designer shell)
 - Threading\ThreadMonitor.cs — 0% — SKIP (P31-T1: obsolete Thread.Suspend/Resume APIs, timing-sensitive)
-- To Depricate\CSVDictUtilities.cs — 0% — SKIP (P32-T1: deprecated, direct filesystem dependency)
 - To Depricate\FileIO2.cs — 0% — SKIP (P33-T1: deprecated, direct static file I/O)
 
 ### Easy — implementation tasks in P1–P3
@@ -137,5 +136,5 @@ Categorized:
 - Total sub-80% files: 105
 - Designer (.Designer.cs) — SKIP: 16
 - Constructor-only shell — SKIP: 3 (ConfusionViewer, MetricChartViewer, ProgressMultiStepViewer)
-- Untestable/deprecated — SKIP: 8 (ThreadMonitor, CSVDictUtilities, FileIO2, ScreenHelper, Theme, ShellUtilities, ShellUtilitiesStatic, SystemThemeDetector)
+- Untestable/deprecated — SKIP: 7 (ThreadMonitor, FileIO2, ScreenHelper, Theme, ShellUtilities, ShellUtilitiesStatic, SystemThemeDetector)
 - Implementation tasks assigned in P1–P89: 78 files

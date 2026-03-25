@@ -27,15 +27,12 @@
 |---|---|
 | `ReusableTypeClasses/Observable/ObservableDictionary.cs` | Entire body commented out; live implementation in UtilitiesSwordfish |
 | `ReusableTypeClasses/Concurrent/Observable/Bag/ConcurrentObservableBag.cs` | Entire body commented out; no live implementation found |
-| `To Depricate/StackObjectVB.cs` | Legacy VB-port stub; zero executable lines |
-| `To Depricate/FlattenArray.cs` | Legacy stub; zero executable lines |
 | `CaptureEmailAddressesModule2.cs` | Entire method body commented out; zero executable lines confirmed by inspection (P3-T25) |
 
 ## Deprecated Files (Skip — Cleanup Deferred)
 
 | File | Rationale |
 |---|---|
-| `CSVDictUtilities.cs` | Deprecated utility; cleanup deferred to separate issue |
 | `FileIO2.cs` | Deprecated file I/O; cleanup deferred to separate issue |
 
 ## WinForms Viewers — Zero Extractable Logic (P3-T22, P3-T23)

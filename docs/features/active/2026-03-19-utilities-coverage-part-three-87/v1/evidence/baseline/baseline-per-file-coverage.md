@@ -27,7 +27,6 @@ Source: `coverage/coverage.cobertura.xml`
 | UtilitiesCS\ReusableTypeClasses\Concurrent\Observable\Bag\SimpleActionBagObserver.cs | 0% |
 | UtilitiesCS\To Depricate\StringManipulation.cs | 0% |
 | UtilitiesCS\To Depricate\FileIO2.cs | 0% |
-| UtilitiesCS\To Depricate\CSVDictUtilities.cs | 0% |
 | UtilitiesCS\EmailIntelligence\Bayesian\Performance\BayesianMetricTypes.cs | 0% |
 | UtilitiesCS\EmailIntelligence\FilterEntry.cs | 0% |
 | UtilitiesCS\EmailIntelligence\EmailParsingSorting\SortEmail.cs | 0% |

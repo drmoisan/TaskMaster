@@ -203,7 +203,6 @@ Excluded files by category:
 - `COM-heavy` — `UtilitiesCS\OutlookObjects\Item\OutlookItemTry.cs` — 16.48% (`15/91`)
 - `COM-heavy` — `UtilitiesCS\OutlookObjects\Item\OutlookItemTryGet.cs` — 0.00% (`0/74`)
 - `COM-heavy` — `UtilitiesCS\OutlookObjects\MailItem\MailItemHelper.cs` — 32.65% (`143/438`)
-- `Deprecated` — `UtilitiesCS\To Depricate\CSVDictUtilities.cs` — 0.00% (`0/21`)
 - `Deprecated` — `UtilitiesCS\To Depricate\FileIO2.cs` — 0.00% (`0/121`)
 - `Deprecated` — `UtilitiesCS\To Depricate\StringManipulation.cs` — 0.00% (`0/4`)
 - `Designer-generated` — `UtilitiesCS\Dialogs\DelegateButtonTemplate.Designer.cs` — 92.11% (`35/38`)

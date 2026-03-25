@@ -18,6 +18,114 @@ using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
 {
+    // -----------------------------------------------------------------------
+    // P50 — SpamBayes Coverage
+    // -----------------------------------------------------------------------
+
+    [TestClass]
+    public class SpamBayes_Tests
+    {
+        // -----------------------------------------------------------------------
+        // P50-T1 — create-new path returns a configured classifier group
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that CreateNewClassifier returns a non-null BayesianClassifierGroup
+        /// configured with the expected Spam and Ham classifiers.
+        ///
+        /// Purpose:
+        ///     Confirm the static factory creates a fully populated group without
+        ///     requiring any Globals dependency.
+        ///
+        /// Returns:
+        ///     Passes when the group is non-null and contains both Spam and Ham classifiers.
+        /// </summary>
+        [TestMethod]
+        public void CreateNewClassifier_ReturnsConfiguredGroup()
+        {
+            // Act
+            var group = SpamBayes.CreateNewClassifier();
+
+            // Assert
+            group.Should().NotBeNull();
+            group.Name.Should().Be(SpamBayes.GroupName);
+            group.Classifiers.Should().ContainKey("Spam");
+            group.Classifiers.Should().ContainKey("Ham");
+            group.SharedTokenBase.Should().NotBeNull();
+        }
+
+        // -----------------------------------------------------------------------
+        // P50-T2 — missing configuration invokes the fallback handling path
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that SpamBayesMissingHandlerAsync with NotFoundEnum.Skip returns
+        /// false without throwing an exception.
+        ///
+        /// Purpose:
+        ///     Confirm the Skip treatment short-circuits the handler and returns false,
+        ///     which causes CreateAsync to return null.
+        ///
+        /// Returns:
+        ///     Passes when the handler returns false and no exception is thrown.
+        /// </summary>
+        [TestMethod]
+        public async Task SpamBayesMissingHandler_WhenSkip_ReturnsFalse()
+        {
+            // Arrange
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            var mockAf = new Mock<IAppAutoFileObjects>();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+            mockAf.Setup(a => a.Manager).Returns(manager);
+            mockGlobals.Setup(g => g.AF).Returns(mockAf.Object);
+
+            var spamBayes = new SpamBayes(mockGlobals.Object);
+
+            // Act
+            var result = await spamBayes.SpamBayesMissingHandlerAsync(
+                Enums.NotFoundEnum.Skip,
+                "test message",
+                default
+            );
+
+            // Assert: Skip treatment returns false (no UI, no throw)
+            result.Should().BeFalse();
+        }
+
+        // -----------------------------------------------------------------------
+        // P50-T3 — validation rejects an incomplete setup
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that ValidatePathsSet returns false when the required Outlook
+        /// folder references (JunkCertain, JunkPotential, Inbox) are null.
+        ///
+        /// Purpose:
+        ///     Confirm the guard clause in ValidatePathsSet prevents CreateAsync from
+        ///     proceeding when required COM folder references are not configured.
+        ///
+        /// Returns:
+        ///     Passes when ValidatePathsSet returns false for an incomplete Globals setup.
+        /// </summary>
+        [TestMethod]
+        public void ValidatePathsSet_WhenRequiredFoldersNull_ReturnsFalse()
+        {
+            // Arrange: Ol.JunkCertain is null (returns default null for MAPIFolder)
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            var mockOl = new Mock<IOlObjects>();
+            mockOl.Setup(o => o.JunkCertain).Returns((Microsoft.Office.Interop.Outlook.Folder)null);
+            mockGlobals.Setup(g => g.Ol).Returns(mockOl.Object);
+
+            var spamBayes = new SpamBayes(mockGlobals.Object);
+
+            // Act
+            var result = spamBayes.ValidatePathsSet();
+
+            // Assert: validation fails when required folders are null
+            result.Should().BeFalse();
+        }
+    }
+
     [TestClass]
     public class ActionableClassifierGroup_Tests
     {

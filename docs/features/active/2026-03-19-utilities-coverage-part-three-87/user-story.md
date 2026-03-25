@@ -64,7 +64,7 @@ Previous feature work (issue #82, utilities-coverage-part-two) raised OutlookObj
 - **No new runtime features or API changes.** This is a test-only effort; no production behavior is added or modified.
 - **No coverage of files outside UtilitiesCS.csproj.** Other projects (UtilitiesSwordfish, TaskMaster, QuickFiler, etc.) are out of scope.
 - **No testing of Designer.cs auto-generated files.** These are skip candidates; coverage may come indirectly from parent form instantiation but is not targeted.
-- **No testing of commented-out stubs** (ObservableDictionary.cs, ConcurrentObservableBag.cs, StackObjectVB.cs, FlattenArray.cs in UtilitiesCS) — these have zero executable lines.
+- **No testing of commented-out stubs** (ObservableDictionary.cs and ConcurrentObservableBag.cs in UtilitiesCS) — these have zero executable lines.
 - **No testing of pure interface files** (~40+ files in Interfaces/) with no executable code.
 - **No removal of deprecated code.** Files in "To Depricate" may be tested or flagged as skip candidates, but deletion decisions are deferred to a separate cleanup issue.
 - **No changes to coverage tooling configuration** (e.g., Cobertura excludes) unless explicitly agreed upon during Phase 4 skip evaluation.

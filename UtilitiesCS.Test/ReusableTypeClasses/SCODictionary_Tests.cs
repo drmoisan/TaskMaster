@@ -217,5 +217,80 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             dictionary.Count.Should().Be(keys.Length);
             readResults.OrderBy(value => value).Should().Equal(keys.Select(key => key * 10));
         }
+
+        // -----------------------------------------------------------------------
+        // P45-T1 — Deserializing a missing path returns an empty or new object
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that calling Deserialize() with no filepath configured leaves the
+        /// dictionary empty rather than throwing an exception.
+        ///
+        /// Purpose:
+        ///     Confirm that the guard clause in Deserialize() prevents any disk access
+        ///     when Filepath is empty, resulting in an empty dictionary.
+        ///
+        /// Returns:
+        ///     Passes when Count equals zero and no exception is thrown.
+        /// </summary>
+        [TestMethod]
+        public void Deserialize_WhenFilepathEmpty_ReturnsEmptyDictionary()
+        {
+            // Arrange: fresh dictionary with no path configured (Filepath == "")
+            var dict = new ScoDictionary<string, int>();
+
+            // Act: Deserialize is a no-op when Filepath is empty
+            dict.Deserialize();
+
+            // Assert: dictionary is empty and no exception was thrown
+            dict.Count.Should().Be(0);
+        }
+
+        // -----------------------------------------------------------------------
+        // P45-T2 — Backup loader selection prefers the expected source
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that when the primary file is missing and a backup filepath is
+        /// configured, Deserialize invokes the backup loader with the backup filepath
+        /// and populates the dictionary from the returned data.
+        ///
+        /// Purpose:
+        ///     Confirm that the backup-loader branch is taken when the primary JSON
+        ///     source does not exist and askUserOnError is false, and that the data
+        ///     returned by the loader is added to the dictionary.
+        ///
+        /// Returns:
+        ///     Passes when the dictionary contains the data supplied by the backup loader
+        ///     and the loader was called with the configured backup path.
+        /// </summary>
+        [TestMethod]
+        public void Deserialize_WhenPrimaryMissing_InvokesBackupLoaderWithBackupPath()
+        {
+            // Arrange: backup loader returns known data when called with backupPath
+            const string backupPath = "backup_source.csv";
+            var backupData = new Dictionary<string, int> { ["item1"] = 7 };
+            var loaderCalledWithPath = (string)null;
+
+            IScoDictionary<string, int>.AltLoader backupLoader = path =>
+            {
+                loaderCalledWithPath = path;
+                return backupData;
+            };
+
+            // Act: construct with a non-existent primary path; no UI dialogs (askUserOnError=false)
+            var dict = new ScoDictionary<string, int>(
+                filename: "primary_nonexistent.json",
+                folderpath: @"c:\nonexistent_dir_sco_test_p45t2",
+                backupLoader: backupLoader,
+                backupFilepath: backupPath,
+                askUserOnError: false
+            );
+
+            // Assert: backup loader was called with the configured backup path
+            loaderCalledWithPath.Should().Be(backupPath);
+            dict.Count.Should().Be(1);
+            dict["item1"].Should().Be(7);
+        }
     }
 }

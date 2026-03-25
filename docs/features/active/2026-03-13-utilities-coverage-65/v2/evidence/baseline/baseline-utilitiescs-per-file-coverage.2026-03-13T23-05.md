@@ -293,6 +293,5 @@ Per-file UtilitiesCS baseline coverage:
 - `UtilitiesCS\Threading\ThreadSafeSingleShotGuard.cs` — 100.0000% (`4/4`)
 - `UtilitiesCS\Threading\TimeOutTask.cs` — 0.0000% (`0/406`)
 - `UtilitiesCS\Threading\UiThread.cs` — 54.0000% (`27/50`)
-- `UtilitiesCS\To Depricate\CSVDictUtilities.cs` — 0.0000% (`0/21`)
 - `UtilitiesCS\To Depricate\FileIO2.cs` — 0.0000% (`0/121`)
 - `UtilitiesCS\To Depricate\StringManipulation.cs` — 0.0000% (`0/4`)
