@@ -1186,22 +1186,23 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 
 ### Phase 90 — Final QC Pass
 
-- [ ] [P90-T1] Run `dotnet tool run csharpier .` to format all modified C# files and confirm no formatting changes remain
+- [x] [P90-T1] Run `dotnet tool run csharpier .` to format all modified C# files and confirm no formatting changes remain
   - Acceptance: Command exits with code 0 and reports no files were reformatted; evidence artifact saved to `evidence/qa-gates/final-qc-format.md` containing `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
 
-- [ ] [P90-T2] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` to confirm zero analyzer diagnostics
+- [x] [P90-T2] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` to confirm zero analyzer diagnostics
   - Acceptance: Build exits with code 0 with `0 Error(s)` and `0 Warning(s)`; evidence artifact saved to `evidence/qa-gates/final-qc-analyzers.md` containing `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
 
-- [ ] [P90-T3] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true` to confirm zero nullable/type-safety warnings
+- [x] [P90-T3] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true` to confirm zero nullable/type-safety warnings
   - Acceptance: Build exits with code 0 with no warnings treated as errors; evidence artifact saved to `evidence/qa-gates/final-qc-nullable.md` containing `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
 
-- [ ] [P90-T4] Run `vstest.console.exe` against the `UtilitiesCS.Test` assembly with `/EnableCodeCoverage` and confirm all pre-existing tests still pass and no new test failures are introduced
+- [x] [P90-T4] Run `vstest.console.exe` against the `UtilitiesCS.Test` assembly with `/EnableCodeCoverage` and confirm all pre-existing tests still pass and no new test failures are introduced
   - Acceptance: All previously passing tests continue to pass; zero test failures; evidence artifact saved to `evidence/qa-gates/final-qc-test-coverage.md` containing `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:` including total test count, pass count, and numeric post-change UtilitiesCS line coverage percentage
 
-- [ ] [P90-T5] Confirm that every non-skipped phase (P1–P89 excluding P6, P7, P28, P31, P32, P33, P35, P37, P58, P59, P79) has a corresponding `<Compile Include="..." />` entry present in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P90-T5] Confirm that every non-skipped phase (P1–P89 excluding P6, P7, P28, P31, P32, P33, P35, P37, P58, P59, P79) has a corresponding `<Compile Include="..." />` entry present in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains a `<Compile Include="..." />` line for each expected test file; the count of new entries equals the count of IMPLEMENT phases
 
-- [ ] [P90-T6] Verify that line coverage for `UtilitiesCS` in the coverage report meets or exceeds the 80% repository-wide threshold
+- [x] [P90-T6] Verify that line coverage for `UtilitiesCS` in the coverage report meets or exceeds the 80% repository-wide threshold
   - Acceptance: The coverage report produced by the `/EnableCodeCoverage` run in P90-T4 shows `UtilitiesCS` line coverage ≥ 80%; if not, identify remaining below-threshold files and record a follow-up note inline
+  - FOLLOW-UP NOTE: Measured 69.81% (line-rate=0.698) — below the 80% threshold. Top files below 50% that require additional coverage work in a future feature branch: ProgressMultiStepViewer.cs (0%), MetricChartViewer.cs (0%), ThreadMonitor.cs (0%), ConfusionViewer.cs (0%), InputBox.cs (0%), SortEmail.cs (2%), ScreenHelper.cs (3%), Theme.cs (6%), EmailDataMiner.cs (6%), FileIO2.cs (7%), DfDeedle.cs (11%), EmailFiler.cs (18%), FileInfoWrapper.cs (18%), PeopleScoDictionaryNew.cs (19%), DirectoryInfoWrapper.cs (20%), ClassifierGroupUtilities.cs (22%), SubjectMapSco.cs (23%). UI Designer files (*.Designer.cs) and Windows Forms components are difficult to unit-test without a running UI host; those should be excluded from coverage thresholds in a future coverage configuration update.
 
 
