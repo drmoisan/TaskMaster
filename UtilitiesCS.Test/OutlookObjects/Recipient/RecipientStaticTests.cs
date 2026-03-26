@@ -162,6 +162,48 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
         }
 
         [TestMethod]
+        public void GetSenderInfo_WhenExchangeUserPropertiesThrowComException_FallsBackToMailValues()
+        {
+            // Arrange
+            var exchangeUser = new Mock<ExchangeUser>();
+            var sender = new Mock<AddressEntry>();
+            var mail = new Mock<InteropMailItem>();
+
+            exchangeUser
+                .SetupGet(x => x.FirstName)
+                .Throws(new System.Runtime.InteropServices.COMException("Boom"));
+            exchangeUser
+                .SetupGet(x => x.LastName)
+                .Throws(new System.Runtime.InteropServices.COMException("Boom"));
+            exchangeUser
+                .SetupGet(x => x.PrimarySmtpAddress)
+                .Throws(new System.Runtime.InteropServices.COMException("Boom"));
+
+            sender
+                .SetupGet(x => x.AddressEntryUserType)
+                .Returns(OlAddressEntryUserType.olExchangeUserAddressEntry);
+            sender.Setup(x => x.GetExchangeUser()).Returns(exchangeUser.Object);
+            sender.SetupGet(x => x.Address).Returns("mdlz@jobalerts.mdlz.com");
+            sender.SetupGet(x => x.Name).Returns("Mondelēz International, Inc.");
+
+            mail.SetupGet(x => x.Sender).Returns(sender.Object);
+            mail.SetupGet(x => x.SenderName).Returns("Mondelēz International, Inc.");
+            mail.SetupGet(x => x.SenderEmailAddress).Returns("mdlz@jobalerts.mdlz.com");
+
+            // Act
+            var result = mail.Object.GetSenderInfo();
+
+            // Assert
+            result.Name.Should().Be("Mondelēz International, Inc.");
+            result.Address.Should().Be("mdlz@jobalerts.mdlz.com");
+            result
+                .Html.Should()
+                .Be(
+                    "Mondelēz International, Inc. &lt;<a href=\"mailto:mdlz@jobalerts.mdlz.com\">mdlz@jobalerts.mdlz.com</a>&gt;"
+                );
+        }
+
+        [TestMethod]
         public void ToResolvedRecipient_WhenRecipientDoesNotResolve_ReturnsOriginalRecipientAfterResolveAttempt()
         {
             // Arrange
@@ -390,6 +432,33 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
         }
 
         [TestMethod]
+        public void GetInfo_WithStoresWrapper_WhenExchangePropertiesThrowComException_FallsBackToRecipientValues()
+        {
+            // Arrange
+            var recipient = CreateRecipientMock(
+                name: "Mondelēz International, Inc.",
+                address: "mdlz@jobalerts.mdlz.com",
+                type: (int)OlMailRecipientType.olTo,
+                userType: OlAddressEntryUserType.olExchangeUserAddressEntry,
+                hasExchangeUser: true,
+                exchangeNameThrowsComException: true,
+                exchangePrimarySmtpThrowsComException: true
+            );
+
+            // Act
+            var result = RecipientStatic.GetInfo(new[] { recipient.Object }, null).Single();
+
+            // Assert
+            result.Name.Should().Be("Mondelēz International, Inc.");
+            result.Address.Should().Be("mdlz@jobalerts.mdlz.com");
+            result
+                .Html.Should()
+                .Be(
+                    "Mondelēz International, Inc. &lt;<a href=\"mailto:mdlz@jobalerts.mdlz.com\">mdlz@jobalerts.mdlz.com</a>&gt;"
+                );
+        }
+
+        [TestMethod]
         public void GetInfo_ForRecipientSequence_ProjectsEachRecipient()
         {
             // Arrange
@@ -525,7 +594,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
             bool hasExchangeUser = false,
             string exchangeFirstName = "",
             string exchangeLastName = "",
-            string exchangePrimarySmtpAddress = ""
+            string exchangePrimarySmtpAddress = "",
+            bool exchangeNameThrowsComException = false,
+            bool exchangePrimarySmtpThrowsComException = false
         )
         {
             var propertyAccessor = new Mock<PropertyAccessor>();
@@ -562,11 +633,34 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
                 else
                 {
                     var exchangeUser = new Mock<ExchangeUser>();
-                    exchangeUser.SetupGet(x => x.FirstName).Returns(exchangeFirstName);
-                    exchangeUser.SetupGet(x => x.LastName).Returns(exchangeLastName);
-                    exchangeUser
-                        .SetupGet(x => x.PrimarySmtpAddress)
-                        .Returns(exchangePrimarySmtpAddress);
+                    if (exchangeNameThrowsComException)
+                    {
+                        exchangeUser
+                            .SetupGet(x => x.FirstName)
+                            .Throws(new System.Runtime.InteropServices.COMException("Boom"));
+                        exchangeUser
+                            .SetupGet(x => x.LastName)
+                            .Throws(new System.Runtime.InteropServices.COMException("Boom"));
+                    }
+                    else
+                    {
+                        exchangeUser.SetupGet(x => x.FirstName).Returns(exchangeFirstName);
+                        exchangeUser.SetupGet(x => x.LastName).Returns(exchangeLastName);
+                    }
+
+                    if (exchangePrimarySmtpThrowsComException)
+                    {
+                        exchangeUser
+                            .SetupGet(x => x.PrimarySmtpAddress)
+                            .Throws(new System.Runtime.InteropServices.COMException("Boom"));
+                    }
+                    else
+                    {
+                        exchangeUser
+                            .SetupGet(x => x.PrimarySmtpAddress)
+                            .Returns(exchangePrimarySmtpAddress);
+                    }
+
                     addressEntry.Setup(x => x.GetExchangeUser()).Returns(exchangeUser.Object);
                 }
             }
