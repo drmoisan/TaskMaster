@@ -54,47 +54,47 @@ This remediation file now defines a single executor-safe recovery pass for the f
 
 Completion criteria: baseline artifacts capture the current mixed-branch scope, the source commit map, and one full baseline C# toolchain pass.
 
-- [ ] [P0-T1] Read `.github/copilot-instructions.md`, `.github/instructions/general-code-change.instructions.md`, `.github/instructions/csharp-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, `.github/instructions/csharp-unit-test.instructions.md`, then read `issue.md`, `spec.md`, `user-story.md`, `remediation-inputs.2026-03-26T09-40.md`, `artifacts/research/20260326-issue87-unstacking-sequence-research.md`, and `.git/branch_analysis_issue87.txt`, then write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/phase0-instructions-read.md`.
+- [x] [P0-T1] Read `.github/copilot-instructions.md`, `.github/instructions/general-code-change.instructions.md`, `.github/instructions/csharp-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, `.github/instructions/csharp-unit-test.instructions.md`, then read `issue.md`, `spec.md`, `user-story.md`, `remediation-inputs.2026-03-26T09-40.md`, `artifacts/research/20260326-issue87-unstacking-sequence-research.md`, and `.git/branch_analysis_issue87.txt`, then write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/phase0-instructions-read.md`.
 	- Acceptance: Artifact contains `Timestamp:`, `Policy Order:`, and a `Files Read:` list naming every file in this task.
 
-- [ ] [P0-T2] Capture the current mixed-branch diff scope by running `git diff --name-status $(git merge-base HEAD origin/development) HEAD`, then write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/current-diff-scope.md`.
+- [x] [P0-T2] Capture the current mixed-branch diff scope by running `git diff --name-status $(git merge-base HEAD origin/development) HEAD`, then write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/current-diff-scope.md`.
 	- Acceptance: Artifact contains `Timestamp:`, `Command: git diff --name-status $(git merge-base HEAD origin/development) HEAD`, `EXIT_CODE: 0`, and `Output Summary:` naming `.codex`, `.github`, `QuickFiler`, `TaskMaster`, issue `#96`, and issue `#97` scope.
 
-- [ ] [P0-T3] Copy the current source-commit split map from `.git/branch_analysis_issue87.txt` into `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/branch-split-source-map.md`.
+- [x] [P0-T3] Copy the current source-commit split map from `.git/branch_analysis_issue87.txt` into `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/branch-split-source-map.md`.
 	- Acceptance: Artifact contains the exact issue `#97`, issue `#96`, residual excluded-work, and clean issue `#87` commit buckets from `.git/branch_analysis_issue87.txt`.
 
-- [ ] [P0-T4] Run `dotnet tool run csharpier format .` from the repository root and write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/baseline-format.md`.
+- [x] [P0-T4] Run `dotnet tool run csharpier format .` from the repository root and write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/baseline-format.md`.
 	- Acceptance: Artifact contains `Timestamp:`, `Command: dotnet tool run csharpier format .`, `EXIT_CODE: 0`, and `Output Summary:` describing whether the formatter changed files.
 
-- [ ] [P0-T5] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU" -EnableNETAnalyzers -EnforceCodeStyleInBuild` and write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/baseline-analyzers.md`.
+- [x] [P0-T5] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU" -EnableNETAnalyzers -EnforceCodeStyleInBuild` and write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/baseline-analyzers.md`.
 	- Acceptance: Artifact contains `Timestamp:`, the exact `Command:`, `EXIT_CODE: 0`, and `Output Summary:` with the final warnings/errors headline.
 
-- [ ] [P0-T6] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU" -EnableNullable -TreatWarningsAsErrors` and write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/baseline-nullable.md`.
+- [x] [P0-T6] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU" -EnableNullable -TreatWarningsAsErrors` and write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/baseline-nullable.md`.
 	- Acceptance: Artifact contains `Timestamp:`, the exact `Command:`, `EXIT_CODE: 0`, and `Output Summary:` with the final warnings/errors headline.
 
-- [ ] [P0-T7] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug` and write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/baseline-test-coverage.md`.
+- [x] [P0-T7] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug` and write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/baseline-test-coverage.md`.
 	- Acceptance: Artifact contains `Timestamp:`, the exact `Command:`, `EXIT_CODE: 0`, and `Output Summary:` including numeric coverage values for the touched `QuickFiler` scope and the numeric remaining below-threshold file count for that scope if reported.
 
-- [ ] [P0-T8] Capture the baseline-coverage headline by copying the current touched-scope coverage values from `baseline-test-coverage.md` into `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/current-coverage-headline.md`.
+- [x] [P0-T8] Capture the baseline-coverage headline by copying the current touched-scope coverage values from `baseline-test-coverage.md` into `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation-baseline/current-coverage-headline.md`.
 	- Acceptance: Artifact contains `Timestamp:`, `Source Artifact: baseline-test-coverage.md`, `Touched Scope: QuickFiler`, `Baseline QuickFiler Coverage:`, `Baseline Changed-File Coverage:`, and `Output Summary:`.
 
 ### Phase 1 — Recreate issue #97 in a sibling worktree
 
 Completion criteria: issue `#97` exists on a clean branch from `origin/development` inside `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean`, and its diff is limited to issue `#97` scope while the main workspace remains on `feature/utilities-coverage-part-three-87`.
 
-- [ ] [P1-T1] Create archive branch `archive/feature-util-coverage-87-mixed-20260326` from the current `feature/utilities-coverage-part-three-87` head and write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/archive-source-branch.md`.
+- [x] [P1-T1] Create archive branch `archive/feature-util-coverage-87-mixed-20260326` from the current `feature/utilities-coverage-part-three-87` head and write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/archive-source-branch.md`.
 	- Acceptance: Artifact contains `Timestamp:`, `Command: git branch archive/feature-util-coverage-87-mixed-20260326 feature/utilities-coverage-part-three-87`, `EXIT_CODE: 0`, `Source Branch: feature/utilities-coverage-part-three-87`, `Source HEAD SHA:`, `Archive Branch: archive/feature-util-coverage-87-mixed-20260326`, and `Output Summary:` confirming identical archive/source SHAs.
 
-- [ ] [P1-T2] Create sibling worktree `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` with branch `bug/getmovediagnostics-null-guard-97-clean` from `origin/development` and write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/issue97-worktree-created.md`.
+- [x] [P1-T2] Create sibling worktree `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` with branch `bug/getmovediagnostics-null-guard-97-clean` from `origin/development` and write `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/issue97-worktree-created.md`.
 	- Acceptance: Artifact contains `Timestamp:`, `Command: git worktree add c:\Users\DanMoisan\repos\TaskMaster-issue97-clean -b bug/getmovediagnostics-null-guard-97-clean origin/development`, `EXIT_CODE: 0`, `Worktree Path: c:\Users\DanMoisan\repos\TaskMaster-issue97-clean`, `Branch: bug/getmovediagnostics-null-guard-97-clean`, `Base Ref: origin/development`, `Base SHA:`, and `Output Summary:` confirming the worktree was created without changing the main workspace branch.
 
-- [ ] [P1-T3] Cherry-pick commit `a19ac86` onto `bug/getmovediagnostics-null-guard-97-clean` inside `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\other\issue97-cherry-pick-a19ac86.md`.
+- [x] [P1-T3] Cherry-pick commit `a19ac86` onto `bug/getmovediagnostics-null-guard-97-clean` inside `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\other\issue97-cherry-pick-a19ac86.md`.
 	- Acceptance: Artifact contains `Timestamp:`, `Command: git -C c:\Users\DanMoisan\repos\TaskMaster-issue97-clean cherry-pick a19ac86`, `EXIT_CODE: 0`, and `Output Summary:` naming the resulting head SHA.
 
-- [ ] [P1-T4] Cherry-pick commit `ad4ae95` onto `bug/getmovediagnostics-null-guard-97-clean` inside `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\other\issue97-cherry-pick-ad4ae95.md`.
+- [x] [P1-T4] Cherry-pick commit `ad4ae95` onto `bug/getmovediagnostics-null-guard-97-clean` inside `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\other\issue97-cherry-pick-ad4ae95.md`.
 	- Acceptance: Artifact contains `Timestamp:`, `Command: git -C c:\Users\DanMoisan\repos\TaskMaster-issue97-clean cherry-pick ad4ae95`, `EXIT_CODE: 0`, and `Output Summary:` naming the resulting head SHA.
 
-- [ ] [P1-T5] Run `git -C c:\Users\DanMoisan\repos\TaskMaster-issue97-clean diff --name-only origin/development...bug/getmovediagnostics-null-guard-97-clean`, verify the result matches the issue `#97` allowlist, and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\other\issue97-focused-diff.md`.
+- [x] [P1-T5] Run `git -C c:\Users\DanMoisan\repos\TaskMaster-issue97-clean diff --name-only origin/development...bug/getmovediagnostics-null-guard-97-clean`, verify the result matches the issue `#97` allowlist, and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\other\issue97-focused-diff.md`.
 	- Acceptance: The focused-diff artifact contains `Timestamp:`, `Command: git -C c:\Users\DanMoisan\repos\TaskMaster-issue97-clean diff --name-only origin/development...bug/getmovediagnostics-null-guard-97-clean`, `EXIT_CODE: 0`, and `Output Summary:` proving every changed path is within `QuickFiler/**`, `QuickFiler.Test/**`, or `docs/features/active/2026-03-25-getmovediagnostics-null-guard-97/**`.
 
 ### Phase 2 — Run the full C# QA loop in the sibling worktree
@@ -103,34 +103,34 @@ Completion criteria: one clean final C# QA pass succeeds on `bug/getmovediagnost
 
 If P2-T1 changes files or if P2-T2, P2-T3, or P2-T4 fails, restart Phase 2 from P2-T1 and only retain artifacts from the final uninterrupted pass with `EXIT_CODE: 0` at every step.
 
-- [ ] [P2-T1] Run `dotnet tool run csharpier format .` inside `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\qa-gates\issue97-qc-format.md`.
+- [x] [P2-T1] Run `dotnet tool run csharpier format .` inside `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\qa-gates\issue97-qc-format.md`.
 	- Acceptance: Artifact contains `Timestamp:`, `Command: pwsh -NoProfile -ExecutionPolicy Bypass -Command "Set-Location 'c:\Users\DanMoisan\repos\TaskMaster-issue97-clean'; dotnet tool run csharpier format ."`, `EXIT_CODE: 0`, and `Output Summary:` stating whether files changed and whether Phase 2 restarted.
 
-- [ ] [P2-T2] Run the analyzer build command inside `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\qa-gates\issue97-qc-analyzers.md`.
+- [x] [P2-T2] Run the analyzer build command inside `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\qa-gates\issue97-qc-analyzers.md`.
 	- Acceptance: Artifact contains `Timestamp:`, `Command: pwsh -NoProfile -ExecutionPolicy Bypass -Command "Set-Location 'c:\Users\DanMoisan\repos\TaskMaster-issue97-clean'; pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNETAnalyzers -EnforceCodeStyleInBuild"`, `EXIT_CODE: 0`, and `Output Summary:` with the final warnings/errors headline from the final clean pass.
 
-- [ ] [P2-T3] Run the nullable-as-errors build command inside `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\qa-gates\issue97-qc-nullable.md`.
+- [x] [P2-T3] Run the nullable-as-errors build command inside `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\qa-gates\issue97-qc-nullable.md`.
 	- Acceptance: Artifact contains `Timestamp:`, `Command: pwsh -NoProfile -ExecutionPolicy Bypass -Command "Set-Location 'c:\Users\DanMoisan\repos\TaskMaster-issue97-clean'; pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNullable -TreatWarningsAsErrors"`, `EXIT_CODE: 0`, and `Output Summary:` with the final warnings/errors headline from the final clean pass.
 
-- [ ] [P2-T4] Run the coverage-enabled MSTest command inside `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\qa-gates\issue97-qc-test-coverage.md`.
+- [x] [P2-T4] Run the coverage-enabled MSTest command inside `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\qa-gates\issue97-qc-test-coverage.md`.
 	- Acceptance: Artifact contains `Timestamp:`, `Command: pwsh -NoProfile -ExecutionPolicy Bypass -Command "Set-Location 'c:\Users\DanMoisan\repos\TaskMaster-issue97-clean'; pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug"`, `EXIT_CODE: 0`, and `Output Summary:` including numeric coverage values for the touched `QuickFiler` scope and the numeric remaining below-threshold file count for that scope from the final clean pass.
 
-- [ ] [P2-T5] Write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\qa-gates\issue97-coverage-delta.md` by comparing `current-coverage-headline.md` with `issue97-qc-test-coverage.md` for the touched issue `#97` production files.
+- [x] [P2-T5] Write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\qa-gates\issue97-coverage-delta.md` by comparing `current-coverage-headline.md` with `issue97-qc-test-coverage.md` for the touched issue `#97` production files.
 	- Acceptance: Artifact contains `Timestamp:`, `Touched Scope: QuickFiler`, `Baseline QuickFiler Coverage:`, `Final QuickFiler Coverage:`, `Changed Production Files:`, `Changed-Code Coverage:`, and `Output Summary:` explicitly stating whether the clean issue `#97` branch regressed, preserved, or improved coverage for the touched scope.
 
 ### Phase 3 — Push the issue #97 branch, create the PR, and record the next remediation pass handoff
 
 Completion criteria: the clean issue `#97` branch is pushed to `origin`, the issue `#97` PR is created after QA passes, and the next-pass order is recorded without introducing external wait-state tasks into this execution plan.
 
-- [ ] [P3-T1] Push `bug/getmovediagnostics-null-guard-97-clean` from `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` to `origin` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\other\issue97-push.md`.
+- [x] [P3-T1] Push `bug/getmovediagnostics-null-guard-97-clean` from `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean` to `origin` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\other\issue97-push.md`.
 	- Preconditions: P2-T5 complete.
 	- Acceptance: Artifact contains `Timestamp:`, `Command: git -C c:\Users\DanMoisan\repos\TaskMaster-issue97-clean push -u origin bug/getmovediagnostics-null-guard-97-clean`, `EXIT_CODE: 0`, `Branch: bug/getmovediagnostics-null-guard-97-clean`, `Remote: origin`, `Head SHA:`, and `Output Summary:` confirming the upstream branch was created successfully.
 
-- [ ] [P3-T2] Create a dedicated PR from `bug/getmovediagnostics-null-guard-97-clean` to `development` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\other\issue97-pr.md`.
+- [x] [P3-T2] Create a dedicated PR from `bug/getmovediagnostics-null-guard-97-clean` to `development` and write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\other\issue97-pr.md`.
 	- Preconditions: P3-T1 complete.
 	- Acceptance: Artifact contains `Timestamp:`, `Command: gh pr create --repo drmoisan/TaskMaster --base development --head bug/getmovediagnostics-null-guard-97-clean --fill`, `EXIT_CODE: 0`, `Branch: bug/getmovediagnostics-null-guard-97-clean`, `Base Branch: development`, `Head SHA:`, `PR URL:`, and `Output Summary:` confirming the PR was created successfully.
 
-- [ ] [P3-T3] Write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\other\next-pass-handoff.md` summarizing the verified follow-on sequence `#96` -> residual excluded work -> clean `#87` and the requirement that each later pass be planned and validated separately after the issue `#97` PR outcome is known.
+- [x] [P3-T3] Write `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-19-utilities-coverage-part-three-87\evidence\other\next-pass-handoff.md` summarizing the verified follow-on sequence `#96` -> residual excluded work -> clean `#87` and the requirement that each later pass be planned and validated separately after the issue `#97` PR outcome is known.
 	- Acceptance: Artifact contains `Timestamp:`, `Completed Pass: issue #97 clean branch + PR`, `Next Pass Order: #96 -> residual excluded work -> clean #87`, and `Output Summary:` explicitly stating that no later-pass execution was attempted in this plan.
 
 ## Branch Sync Protocol
