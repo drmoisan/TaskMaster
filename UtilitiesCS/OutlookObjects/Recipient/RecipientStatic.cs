@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.Extensions;
@@ -20,6 +21,165 @@ namespace UtilitiesCS
 
         private const string PR_SMTP_ADDRESS =
             "http://schemas.microsoft.com/mapi/proptag/0x39FE001E";
+
+        private static string FirstNonEmptyValue(params Func<string>[] valueFactories)
+        {
+            foreach (var valueFactory in valueFactories)
+            {
+                var value = NormalizeRecipientValue(valueFactory(), rejectLegacyExchangeDn: false);
+                if (!value.IsNullOrEmpty())
+                {
+                    return value;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        private static string FirstValidAddressValue(params Func<string>[] valueFactories)
+        {
+            foreach (var valueFactory in valueFactories)
+            {
+                var value = NormalizeRecipientValue(valueFactory(), rejectLegacyExchangeDn: true);
+                if (!value.IsNullOrEmpty())
+                {
+                    return value;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        private static string NormalizeRecipientValue(string value, bool rejectLegacyExchangeDn)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return null;
+            }
+
+            if (
+                rejectLegacyExchangeDn
+                && value.StartsWith("/o=ExchangeLabs", StringComparison.OrdinalIgnoreCase)
+            )
+            {
+                return null;
+            }
+
+            return value;
+        }
+
+        private static T TryGetComValue<T>(Func<T> valueFactory, string context)
+            where T : class
+        {
+            try
+            {
+                return valueFactory();
+            }
+            catch (COMException ex)
+            {
+                logger.Warn($"Failed to read {context}. {ex.Message}");
+                return null;
+            }
+        }
+
+        private static string TryGetPropertyValueAsString(
+            Func<PropertyAccessor> propertyAccessorFactory,
+            string propertyName,
+            string context
+        )
+        {
+            var propertyAccessor = TryGetComValue(
+                propertyAccessorFactory,
+                $"{context} property accessor"
+            );
+            if (propertyAccessor is null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return propertyAccessor.GetProperty(propertyName) as string;
+            }
+            catch (COMException ex)
+            {
+                logger.Warn($"Failed to read {context} property {propertyName}. {ex.Message}");
+                return null;
+            }
+            catch (InvalidOperationException)
+            {
+                return null;
+            }
+        }
+
+        // Outlook can report an Exchange-flavored address entry type even when
+        // GetExchangeUser or its directory-backed properties are unreadable.
+        private static ExchangeUser TryGetExchangeUser(AddressEntry addressEntry, string context)
+        {
+            if (addressEntry is null)
+            {
+                return null;
+            }
+
+            return TryGetComValue(() => addressEntry.GetExchangeUser(), $"{context} exchange user");
+        }
+
+        private static string TryGetExchangeDisplayName(AddressEntry addressEntry, string context)
+        {
+            var exchangeUser = TryGetExchangeUser(addressEntry, context);
+            if (exchangeUser is null)
+            {
+                return null;
+            }
+
+            var firstName = TryGetComValue(() => exchangeUser.FirstName, $"{context} first name");
+            var lastName = TryGetComValue(() => exchangeUser.LastName, $"{context} last name");
+            var nameParts = new[] { firstName, lastName }.Where(part =>
+                !string.IsNullOrWhiteSpace(part)
+            );
+
+            return string.Join(" ", nameParts);
+        }
+
+        private static string TryGetExchangePrimarySmtpAddress(
+            AddressEntry addressEntry,
+            string context
+        )
+        {
+            var exchangeUser = TryGetExchangeUser(addressEntry, context);
+            if (exchangeUser is null)
+            {
+                return null;
+            }
+
+            return TryGetComValue(
+                () => exchangeUser.PrimarySmtpAddress,
+                $"{context} primary SMTP address"
+            );
+        }
+
+        private static AddressEntry TryGetRecipientAddressEntry(Recipient recipient)
+        {
+            if (recipient is null)
+            {
+                return null;
+            }
+
+            try
+            {
+                if (!recipient.Resolved)
+                {
+                    recipient.Resolve();
+                }
+
+                return recipient.AddressEntry;
+            }
+            catch (COMException ex)
+            {
+                logger.Warn($"Failed to resolve recipient address entry. {ex.Message}");
+                return null;
+            }
+        }
 
         public static Outlook.AddressList GetGlobalAddressList(
             this Outlook.Store store,
@@ -60,28 +220,13 @@ namespace UtilitiesCS
 
         public static string GetSenderName(this MailItem olMail)
         {
-            var name = olMail.SenderName;
-            return name;
-            //AddressEntry sender = olMail.Sender;
-            //string senderName = "";
+            var sender = TryGetComValue(() => olMail.Sender, "mail sender");
 
-            //if (sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
-            //{
-            //    ExchangeUser exchUser = sender.GetExchangeUser();
-            //    if (exchUser != null)
-            //    {
-            //        senderName = $"{exchUser.FirstName} {exchUser.LastName}";
-            //    }
-            //    else
-            //    {
-            //        senderName = sender.Name;
-            //    }
-            //}
-            //else
-            //{
-            //    senderName = olMail.SenderName;
-            //}
-            //return senderName;
+            return FirstNonEmptyValue(
+                () => TryGetExchangeDisplayName(sender, "mail sender"),
+                () => TryGetComValue(() => olMail.SenderName, "mail sender name"),
+                () => TryGetComValue(() => sender?.Name, "mail sender display name")
+            );
         }
 
         public static string GetSenderName(this MeetingItem olMeeting)
@@ -96,51 +241,21 @@ namespace UtilitiesCS
 
         public static string GetSenderAddress(this MailItem olMail)
         {
-            return olMail.SenderEmailAddress;
-            //AddressEntry sender = olMail.Sender;
-            //string senderAddress = "";
+            var sender = TryGetComValue(() => olMail.Sender, "mail sender");
 
-            //if (sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
-            //{
-            //    ExchangeUser exchUser = sender.GetExchangeUser();
-            //    if (exchUser != null)
-            //    {
-            //        senderAddress = exchUser.PrimarySmtpAddress;
-            //    }
-            //    else
-            //    {
-            //        senderAddress = sender.Address;
-            //    }
-            //}
-            //else
-            //{
-            //    senderAddress = olMail.SenderEmailAddress;
-            //}
-            //if (senderAddress.IsNullOrEmpty())
-            //{
-            //    var olPA = sender.PropertyAccessor;
-            //    try
-            //    {
-            //        senderAddress = olPA.GetProperty(PR_SMTP_ADDRESS) as string;
-            //        if (senderAddress.IsNullOrEmpty())
-            //            throw new InvalidOperationException("Sender address is null or empty");
-            //    }
-            //    catch
-            //    {
-            //        try
-            //        {
-            //            senderAddress = olMail.SenderName;
-            //            if (senderAddress.IsNullOrEmpty() || senderAddress.StartsWith("/o=ExchangeLabs"))
-            //                throw new InvalidOperationException("Sender address and name are null or empty");
-            //        }
-            //        catch
-            //        {
-            //            senderAddress = "";
-            //        }
-            //    }
-            //}
-
-            //return senderAddress;
+            return FirstValidAddressValue(
+                () => TryGetExchangePrimarySmtpAddress(sender, "mail sender"),
+                () => TryGetComValue(() => olMail.SenderEmailAddress, "mail sender email address"),
+                () => TryGetComValue(() => sender?.Address, "mail sender address"),
+                () =>
+                    TryGetPropertyValueAsString(
+                        () => sender?.PropertyAccessor,
+                        PR_SMTP_ADDRESS,
+                        "mail sender"
+                    ),
+                () => TryGetComValue(() => olMail.SenderName, "mail sender fallback name"),
+                () => TryGetComValue(() => sender?.Name, "mail sender fallback display name")
+            );
         }
 
         public static IRecipientInfo GetSenderInfo(this MeetingItem olMeeting)
@@ -170,7 +285,6 @@ namespace UtilitiesCS
             {
                 var name = olMail.GetSenderName();
                 var address = olMail.GetSenderAddress();
-                var pa = olMail.Sender.PropertyAccessor;
                 var html = ConvertRecipientToHtml(name, address);
                 return new RecipientInfo(name, address, html);
             }
@@ -413,57 +527,19 @@ namespace UtilitiesCS
 
         private static string GetRecipientAddress(Recipient olRecipient)
         {
-            string smtpAddress;
+            var addressEntry = TryGetRecipientAddressEntry(olRecipient);
 
-            if (
-                olRecipient.AddressEntry.AddressEntryUserType
-                    == OlAddressEntryUserType.olExchangeUserAddressEntry
-                || olRecipient.AddressEntry.AddressEntryUserType
-                    == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry
-            )
-            {
-                ExchangeUser exchUser = olRecipient.AddressEntry.GetExchangeUser();
-                if (exchUser != null)
-                {
-                    smtpAddress = exchUser.PrimarySmtpAddress;
-                }
-                else
-                {
-                    smtpAddress = olRecipient.Address;
-                }
-            }
-            else
-            {
-                smtpAddress = olRecipient.Address;
-            }
-            if (smtpAddress.IsNullOrEmpty())
-            {
-                var olPA = olRecipient.PropertyAccessor;
-                try
-                {
-                    smtpAddress = (string)olPA.GetProperty(PR_SMTP_ADDRESS);
-                    if (smtpAddress.IsNullOrEmpty())
-                        throw new InvalidOperationException("SMTP address is null or empty");
-                }
-                catch
-                {
-                    try
-                    {
-                        smtpAddress = olRecipient.Name;
-                        if (
-                            smtpAddress.IsNullOrEmpty() || smtpAddress.StartsWith("/o=ExchangeLabs")
-                        )
-                            throw new InvalidOperationException(
-                                "SMTP address and name are null, empty, or malformed"
-                            );
-                    }
-                    catch (System.Exception)
-                    {
-                        smtpAddress = "";
-                    }
-                }
-            }
-            return smtpAddress;
+            return FirstValidAddressValue(
+                () => TryGetExchangePrimarySmtpAddress(addressEntry, "recipient"),
+                () => TryGetComValue(() => olRecipient?.Address, "recipient address"),
+                () =>
+                    TryGetPropertyValueAsString(
+                        () => olRecipient?.PropertyAccessor,
+                        PR_SMTP_ADDRESS,
+                        "recipient"
+                    ),
+                () => TryGetComValue(() => olRecipient?.Name, "recipient fallback name")
+            );
             //var OlPA = OlRecipient.PropertyAccessor;
             //string StrSMTPAddress;
             //try
@@ -524,68 +600,35 @@ namespace UtilitiesCS
 
         internal static (string Name, string Address) GetRecipientInfo(Recipient recipient)
         {
-            string name,
-                address;
-            name = recipient.Name;
-            address = recipient.Address;
-            //try
-            //{
-            //    if (recipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || recipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
-            //    {
-            //        ExchangeUser exchUser = recipient.AddressEntry.GetExchangeUser();
-            //        if (exchUser != null)
-            //        {
-            //            var firstNameExch = exchUser.FirstName;
-            //            address = exchUser.PrimarySmtpAddress;
-            //            var rx = new Regex(@"^(.+)@([^@]+)$");
-            //            name = $"{exchUser.FirstName} {exchUser.LastName}";
-            //        }
-            //        else
-            //        {
-            //            name = recipient.Name;
-            //            address = recipient.Address;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        name = recipient.Name;
-            //        address = recipient.Address;
-            //    }
-            //}
-            //catch (System.Exception)
-            //{
-            //    name = recipient.Name;
-            //    address = recipient.Address;
-            //}
+            if (recipient is null)
+            {
+                return (null, null);
+            }
 
-            return (name, address);
+            return (GetRecipientName(recipient), GetRecipientAddress(recipient));
+        }
+
+        internal static (string Name, string Address) GetExchangeSenderInfo(AddressEntry sender)
+        {
+            if (sender is null)
+            {
+                return (null, null);
+            }
+
+            return (
+                TryGetExchangeDisplayName(sender, "sender"),
+                TryGetExchangePrimarySmtpAddress(sender, "sender")
+            );
         }
 
         private static string GetRecipientName(Recipient olRecipient)
         {
-            string recipientName;
-            if (
-                olRecipient.AddressEntry.AddressEntryUserType
-                    == OlAddressEntryUserType.olExchangeUserAddressEntry
-                || olRecipient.AddressEntry.AddressEntryUserType
-                    == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry
-            )
-            {
-                ExchangeUser exchUser = olRecipient.AddressEntry.GetExchangeUser();
-                if (exchUser != null)
-                {
-                    recipientName = $"{exchUser.FirstName} {exchUser.LastName}";
-                }
-                else
-                {
-                    recipientName = olRecipient.Name;
-                }
-            }
-            else
-            {
-                recipientName = olRecipient.Name;
-            }
-            return recipientName;
+            var addressEntry = TryGetRecipientAddressEntry(olRecipient);
+
+            return FirstNonEmptyValue(
+                () => TryGetExchangeDisplayName(addressEntry, "recipient"),
+                () => TryGetComValue(() => olRecipient?.Name, "recipient name")
+            );
         }
 
         private static string GetRecipientHtml(Recipient olRecipient)
@@ -594,6 +637,63 @@ namespace UtilitiesCS
                 GetRecipientName(olRecipient),
                 GetRecipientAddress(olRecipient)
             );
+        }
+
+        internal static bool TryGetExchangeRecipientType(
+            Outlook.Recipient recipient,
+            out Outlook.OlAddressEntryUserType userType
+        )
+        {
+            userType = default;
+
+            if (recipient is null)
+            {
+                return false;
+            }
+
+            try
+            {
+                if (!recipient.Resolved && !recipient.Resolve())
+                {
+                    return false;
+                }
+
+                var addressEntry = recipient.AddressEntry;
+                if (addressEntry is null)
+                {
+                    return false;
+                }
+
+                userType = addressEntry.AddressEntryUserType;
+                return true;
+            }
+            catch (COMException)
+            {
+                return false;
+            }
+        }
+
+        internal static bool TryGetExchangeAddressEntryType(
+            Outlook.AddressEntry addressEntry,
+            out Outlook.OlAddressEntryUserType userType
+        )
+        {
+            userType = default;
+
+            if (addressEntry is null)
+            {
+                return false;
+            }
+
+            try
+            {
+                userType = addressEntry.AddressEntryUserType;
+                return true;
+            }
+            catch (COMException)
+            {
+                return false;
+            }
         }
     }
 }
