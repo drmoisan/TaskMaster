@@ -285,5 +285,21 @@ namespace UtilitiesCS.Test.HelperClasses
             this.mockTimedDiskWriter.Verify(x => x.StopTimer(), Times.Exactly(1));
             Assert.IsFalse(timedDiskWriter.TimerActive);
         }
+
+        [TestMethod]
+        public void Enqueue_WhenTimerIsInactive_StartsTimerOnce()
+        {
+            // Arrange: the mock writer intercepts StartTimer() so it can be verified without
+            // spinning up a real background timer
+            var timedDiskWriter = this.mockTimedDiskWriter.Object;
+            timedDiskWriter.DiskWriter = (items) => { };
+
+            // Act: Enqueue detects the timer is inactive and calls TryStartTimer() → StartTimer()
+            timedDiskWriter.Enqueue("item");
+
+            // Assert: StartTimer was invoked exactly once and TimerActive reflects the started state
+            this.mockTimedDiskWriter.Verify(x => x.StartTimer(), Times.Once);
+            timedDiskWriter.TimerActive.Should().BeTrue();
+        }
     }
 }

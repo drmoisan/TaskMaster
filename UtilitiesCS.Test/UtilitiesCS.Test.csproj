@@ -103,6 +103,7 @@
     <Compile Include="EmailIntelligence\FolderRemapViewer_Tests.cs" />
     <Compile Include="EmailIntelligence\FolderSelector_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroupTests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierTests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierTests_UnfinishedStubs.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierSharedTests.cs" />
