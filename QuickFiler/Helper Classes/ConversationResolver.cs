@@ -279,11 +279,20 @@ namespace QuickFiler.Helper_Classes
         {
             if (Count.Expanded <= 0)
             {
-                // Use nameof() to avoid accessing the still-loading ConversationInfo / Df
-                // properties here; doing so would recurse back into LoadConversationInfo()
-                // and cause a StackOverflowException.
-                throw new InvalidOperationException(
-                    $"{nameof(ConversationInfo)} cannot be loaded if {nameof(Df)} cannot be resolved"
+                // When the expanded conversation DataFrame is empty (e.g., Junk E-mail where
+                // FilterConversation removes all rows), return a single-item fallback containing
+                // the current mail item. Throwing here propagated an unhandled exception to the
+                // VSTO UI thread for a recoverable scenario.
+                //
+                // Do NOT access ConversationInfo or Df in this path: they are lazy properties
+                // backed by this same loader and would recurse back into LoadConversationInfo().
+                logger.Error(
+                    $"{nameof(ConversationInfo)} cannot be resolved: {nameof(Count)}.Expanded = {Count.Expanded}. Returning single-item fallback."
+                );
+                var fallbackList = new List<MailItemHelper> { MailHelper };
+                return new Pair<List<MailItemHelper>>(
+                    sameFolder: fallbackList,
+                    expanded: fallbackList
                 );
             }
 
@@ -380,12 +389,6 @@ namespace QuickFiler.Helper_Classes
             //    convInfoExpanded = new List<MailItemHelper>() { MailInfo };
             //}
 
-            if (UpdateUI is not null)
-            {
-                token.ThrowIfCancellationRequested();
-                await UiThread.Dispatcher.InvokeAsync(() => UpdateUI(ConversationInfo.Expanded));
-            }
-
             var convInfoSameFolder = convInfoExpanded
                 .Where(itemInfo => itemInfo.FolderName == ((Folder)_mailItem.Parent).Name)
                 .ToList();
@@ -394,7 +397,21 @@ namespace QuickFiler.Helper_Classes
                 sameFolder: convInfoSameFolder,
                 expanded: convInfoExpanded
             );
+
+            // Assign ConversationInfo before calling UpdateUI so that any subsequent read
+            // of ConversationInfo.Expanded returns the cached value rather than re-entering
+            // the synchronous LoadConversationInfo(), which throws when Count.Expanded == 0
+            // (e.g. items in Junk E-mail where FilterConversation removes all rows).
             ConversationInfo = pair;
+
+            if (UpdateUI is not null)
+            {
+                token.ThrowIfCancellationRequested();
+                // Pass pair.Expanded directly to avoid triggering the lazy property getter
+                // and the associated synchronous LoadConversationInfo() call.
+                await UiThread.Dispatcher.InvokeAsync(() => UpdateUI(pair.Expanded));
+            }
+
             return pair;
         }
 

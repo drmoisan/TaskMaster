@@ -53,19 +53,20 @@ namespace QuickFiler.Test.HelperClasses
         // ─────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Regression test for StackOverflowException caused by LoadConversationInfo()
-        /// embedding the {ConversationInfo} property reference in its error message while
-        /// ConversationInfo was still being loaded. This recursion now terminates with
-        /// InvalidOperationException.
+        /// Regression test for AC-4 (Issue #103): when Count.Expanded == 0,
+        /// LoadConversationInfo() now returns a single-item fallback containing MailHelper
+        /// instead of throwing InvalidOperationException.
         ///
-        /// Arrange: Count is set to (0,0) which makes Count.Expanded &lt;= 0 true, so the
-        /// guard clause fires. Before the fix the string interpolation called the property
-        /// getter, restarting the loading cycle. After the fix nameof() is used instead.
+        /// Historical context: an earlier fix replaced a StackOverflowException (caused by
+        /// accessing the ConversationInfo property inside the error message) with an
+        /// InvalidOperationException using nameof(). AC-2 (Issue #103) further replaced that
+        /// throw with a safe return so the VSTO UI thread is not disrupted for a recoverable
+        /// scenario such as Junk E-mail items with all DataFrame rows filtered out.
         /// </summary>
         [TestMethod]
-        public void LoadConversationInfo_WhenCountExpandedIsZero_ThrowsInvalidOperationExceptionNotStackOverflow()
+        public void LoadConversationInfo_WhenCountExpandedIsZero_ReturnsSingleItemFallbackContainingMailHelper()
         {
-            // Arrange – Count (0,0) puts Expanded <= 0, triggering the guard clause.
+            // Arrange – Count (0,0) puts Expanded <= 0, triggering the fallback path.
             var resolver = new ConversationResolver(_mockGlobals.Object, _mockMailItem.Object);
             // Use the internal setter to inject the zero-count state without loading
             // DataFrames from COM.
@@ -73,36 +74,34 @@ namespace QuickFiler.Test.HelperClasses
 
             // Act – call the internal loader directly so the test is deterministic and
             // does not go through the GetOrLoad dependency check on _mailItem.
-            System.Action act = () => resolver.LoadConversationInfo();
+            var result = resolver.LoadConversationInfo();
 
-            // Assert – must be InvalidOperationException, not StackOverflowException.
-            act.Should()
-                .Throw<InvalidOperationException>()
-                .WithMessage($"*{nameof(ConversationResolver.ConversationInfo)}*");
+            // Assert – single-item fallback containing the resolver's MailHelper is returned.
+            result.Expanded.Should().HaveCount(1);
+            result.SameFolder.Should().HaveCount(1);
+            result.Expanded[0].Should().BeSameAs(resolver.MailHelper);
         }
 
         /// <summary>
         /// Complementary case: accessing the ConversationInfo property when Count.Expanded
-        /// is zero raises InvalidOperationException via the public API path.
-        ///
-        /// Before the fix this crashed the process with StackOverflowException. After the
-        /// fix the getter returns the exception cleanly.
+        /// is zero now returns a single-item fallback via the public API path instead of
+        /// throwing. GetOrLoad stores the fallback result so subsequent reads return the
+        /// cached value without re-invoking LoadConversationInfo().
         /// </summary>
         [TestMethod]
-        public void ConversationInfoGetter_WhenCountExpandedIsZero_ThrowsInvalidOperationException()
+        public void ConversationInfoGetter_WhenCountExpandedIsZero_ReturnsSingleItemFallback()
         {
-            // Arrange – Count (0,0) forces the guard clause in LoadConversationInfo.
+            // Arrange – Count (0,0) triggers the fallback path in LoadConversationInfo.
             var resolver = new ConversationResolver(_mockGlobals.Object, _mockMailItem.Object);
             resolver.Count = new Pair<int>(0, 0);
 
-            // Act – access through the public property getter (the real crash path).
-            System.Action act = () =>
-            {
-                var _ = resolver.ConversationInfo;
-            };
+            // Act – access through the public property getter (the real consumer path).
+            var result = resolver.ConversationInfo;
 
-            // Assert – clean exception, no recursion.
-            act.Should().Throw<InvalidOperationException>();
+            // Assert – single-item fallback returned, no throw.
+            result.Expanded.Should().HaveCount(1);
+            result.SameFolder.Should().HaveCount(1);
+            result.Expanded[0].Should().BeSameAs(resolver.MailHelper);
         }
 
         // ─────────────────────────────────────────────────────────────
@@ -174,6 +173,91 @@ namespace QuickFiler.Test.HelperClasses
                 .Throw<System.Exception>(
                     "loading was attempted because the sentinel was not reached"
                 );
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        // Bug 3 regression: UpdateUI read-before-write ordering in
+        // LoadConversationInfoAsync (Issue #103)
+        //
+        // Before the fix, LoadConversationInfoAsync called:
+        //   UpdateUI(ConversationInfo.Expanded)   ← reads the lazy property
+        //   ConversationInfo = pair               ← assigns too late
+        //
+        // When Count.Expanded == 0, reading ConversationInfo.Expanded before
+        // the setter fires goes through GetOrLoad → LoadConversationInfo(),
+        // which throws InvalidOperationException because the guard sees
+        // Count.Expanded <= 0.
+        //
+        // After the fix, the order is swapped:
+        //   ConversationInfo = pair               ← assigned first
+        //   UpdateUI(pair.Expanded)               ← uses local var, not property
+        //
+        // These tests verify both sides of that contract without exercising
+        // the async execution context (which requires COM infrastructure).
+        // ─────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Regression test for the async read-before-write scenario (Issue #103 Bug 3):
+        /// reading ConversationInfo before it has been set, when Count.Expanded == 0, now
+        /// returns a single-item fallback instead of throwing InvalidOperationException.
+        ///
+        /// With AC-2 applied, even if the old async ordering bug were triggered again,
+        /// the sync path would return a safe fallback rather than crashing the UI thread.
+        /// </summary>
+        [TestMethod]
+        public void ConversationInfo_WhenNotSetAndCountIsZero_ReturnsFallbackWithoutThrowing()
+        {
+            // Arrange – Count (0,0) triggers the fallback path in LoadConversationInfo.
+            // ConversationInfo backing field is default (null), so GetOrLoad will invoke
+            // LoadConversationInfo() when the property is accessed.
+            var resolver = new ConversationResolver(_mockGlobals.Object, _mockMailItem.Object);
+            resolver.Count = new Pair<int>(0, 0);
+
+            // Act – accessing the property hits GetOrLoad → LoadConversationInfo() → fallback.
+            var result = resolver.ConversationInfo;
+
+            // Assert – fallback returned, no throw.
+            result.Expanded.Should().HaveCount(1);
+            result.SameFolder.Should().HaveCount(1);
+        }
+
+        /// <summary>
+        /// Regression test confirming the fix: after ConversationInfo is assigned directly
+        /// (as LoadConversationInfoAsync now does BEFORE calling UpdateUI), accessing
+        /// ConversationInfo.Expanded returns the assigned value and does NOT re-enter
+        /// LoadConversationInfo(), even when Count.Expanded == 0.
+        ///
+        /// This validates that the fix (assign first, pass pair.Expanded to UpdateUI) is safe:
+        /// the GetOrLoad cache hit avoids re-triggering the throwing synchronous loader.
+        /// </summary>
+        [TestMethod]
+        public void ConversationInfo_WhenSetBeforeAccessWithCountAtZero_ReturnsCachedValueWithoutThrowing()
+        {
+            // Arrange – Count (0,0) would cause LoadConversationInfo to throw if triggered.
+            var resolver = new ConversationResolver(_mockGlobals.Object, _mockMailItem.Object);
+            resolver.Count = new Pair<int>(0, 0);
+
+            // Pre-assign ConversationInfo to a non-default pair (as the fixed async code does).
+            // Non-null lists cause EqualityComparer to treat the field as non-default,
+            // so GetOrLoad returns the cached value without invoking LoadConversationInfo().
+            var expectedList = new System.Collections.Generic.List<MailItemHelper>();
+            var pair = new Pair<System.Collections.Generic.List<MailItemHelper>>(
+                sameFolder: expectedList,
+                expanded: expectedList
+            );
+            resolver.ConversationInfo = pair;
+
+            // Act – accessing the property after assignment must return the cached value.
+            System.Action act = () =>
+            {
+                var result = resolver.ConversationInfo;
+                // Verify the returned value is the one we set, confirming no reload occurred.
+                result.Expanded.Should().BeSameAs(expectedList);
+                result.SameFolder.Should().BeSameAs(expectedList);
+            };
+
+            // Assert – no exception; cached value is returned.
+            act.Should().NotThrow();
         }
     }
 }
