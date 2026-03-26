@@ -588,15 +588,20 @@ namespace TaskMaster
             NotifyCollectionChangedEventArgs e
         )
         {
-            SubjectMapSco map = (SubjectMapSco)sender;
-
-            if (e.Action == NotifyCollectionChangedAction.Add)
+            // Read the newly added entry from the event args rather than from the collection.
+            // Calling map.Last() (or any collection read) here would trigger DoBaseRead, which
+            // tries to acquire a read lock on the same ReaderWriterLockSlim that DoBaseWrite
+            // is already holding on this thread. ReaderWriterLockSlim (NoRecursion policy)
+            // throws LockRecursionException. e.NewItems[0] is safe because it does not
+            // re-enter the collection lock.
+            if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems?.Count > 0)
             {
-                var entry = map.Last();
+                var entry = (SubjectMapEntry)e.NewItems[0];
                 entry.Encode(Encoder);
             }
             else if (e.Action == NotifyCollectionChangedAction.Reset)
             {
+                var map = (SubjectMapSco)sender;
                 Encoder.RebuildEncoding(map);
             }
         }
