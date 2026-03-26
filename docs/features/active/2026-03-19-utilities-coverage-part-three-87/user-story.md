@@ -50,12 +50,12 @@ Previous feature work (issue #82, utilities-coverage-part-two) raised OutlookObj
 ## Acceptance Criteria
 
 - [ ] Every .cs file compiled by UtilitiesCS.csproj has >=80% line coverage as reported by Cobertura
-- [ ] No pre-existing tests are broken or removed
-- [ ] All new tests follow MSTest + Moq + FluentAssertions conventions
-- [ ] All new tests are deterministic, isolated, and use no external dependencies
-- [ ] All new test files are registered in UtilitiesCS.Test.csproj (explicit Compile Include)
-- [ ] The C# toolchain loop passes clean: format, analyzer build, nullable build, test run
-- [ ] Repository-wide line coverage does not regress below the pre-work baseline
+- [x] No pre-existing tests are broken or removed
+- [x] All new tests follow MSTest + Moq + FluentAssertions conventions
+- [x] All new tests are deterministic, isolated, and use no external dependencies
+- [x] All new test files are registered in UtilitiesCS.Test.csproj (explicit Compile Include)
+- [x] The C# toolchain loop passes clean: format, analyzer build, nullable build, test run
+- [x] Repository-wide line coverage does not regress below the pre-work baseline
 
 
 ## Non-Goals

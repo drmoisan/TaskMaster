@@ -166,14 +166,14 @@ Known existing homes include (non-exhaustive):
 ## Definition of Done
 
 - [ ] Every `.cs` file compiled by `UtilitiesCS.csproj` reaches ≥80% line coverage as reported by the Cobertura XML, or is explicitly documented as a skip candidate (with rationale) in the plan
-- [ ] All 11 skip-evaluation phases (P6, P7, P28, P31, P32, P33, P35, P37, P58, P59, P79) are checked off in the plan with documented rationale
-- [ ] No pre-existing tests are broken or removed
-- [ ] All new tests follow MSTest + Moq + FluentAssertions conventions (AAA pattern, deterministic, isolated, no external dependencies, no temp files)
-- [ ] All new test files are registered in `UtilitiesCS.Test.csproj` via `<Compile Include="...">` and verified in Phase 90-T5
-- [ ] Repository-wide line coverage does not regress below the Phase 0 baseline
-- [ ] C# toolchain loop passes clean in a single Phase 90 pass: `dotnet tool run csharpier .` → analyzer build → nullable build → `vstest.console.exe /EnableCodeCoverage`
-- [ ] Phase 0 evidence artifacts exist: `evidence/baseline/phase0-instructions-read.md`, `baseline-build.md`, `baseline-test-coverage.md`, `baseline-per-file-coverage.md`, `remaining-sub80-reconciliation.md`
-- [ ] Phase 90 QA evidence artifacts exist: `evidence/qa-gates/final-qc-format.md`, `final-qc-analyzers.md`, `final-qc-nullable.md`, `final-qc-test-coverage.md`
+- [x] All 11 skip-evaluation phases (P6, P7, P28, P31, P32, P33, P35, P37, P58, P59, P79) are checked off in the plan with documented rationale
+- [x] No pre-existing tests are broken or removed
+- [x] All new tests follow MSTest + Moq + FluentAssertions conventions (AAA pattern, deterministic, isolated, no external dependencies, no temp files)
+- [x] All new test files are registered in `UtilitiesCS.Test.csproj` via `<Compile Include="...">` and verified in Phase 90-T5
+- [x] Repository-wide line coverage does not regress below the Phase 0 baseline
+- [x] C# toolchain loop passes clean in a single Phase 90 pass: `dotnet tool run csharpier .` → analyzer build → nullable build → `vstest.console.exe /EnableCodeCoverage`
+- [x] Phase 0 evidence artifacts exist: `evidence/baseline/phase0-instructions-read.md`, `baseline-build.md`, `baseline-test-coverage.md`, `baseline-per-file-coverage.md`, `remaining-sub80-reconciliation.md`
+- [x] Phase 90 QA evidence artifacts exist: `evidence/qa-gates/final-qc-format.md`, `final-qc-analyzers.md`, `final-qc-nullable.md`, `final-qc-test-coverage.md`
 - [ ] Docs updated (feature folder status set to Complete; plan updated to show all tasks checked)
 
 ## Seeded Test Conditions (from potential)
