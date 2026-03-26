@@ -270,5 +270,54 @@ namespace UtilitiesCS.Test.HelperClasses
             changed.Should().Contain("FolderPath");
             changed.Should().Contain("FileName");
         }
+
+        // P89-T2: TryParseFileStem boundary combinations
+
+        [TestMethod]
+        public void TryParseFileStem_WhenSeedPresentAndSuffixEmpty_ShouldReturnTrueAndPreserveSeed()
+        {
+            // Arrange: fph knows the seed but has no suffix; fileStem starts with seed + extra chars.
+            var fph = FilePathHelper.FromSeed("report", ".json", "", @"C:\data");
+
+            // Act: parse a stem that begins with the known seed followed by extra chars.
+            var result = fph.TryParseFileStem("report_v2", out string seed, out string suffix);
+
+            // Assert: parsing succeeds and the seed output includes the original seed value.
+            result.Should().BeTrue();
+            seed.Should().StartWith("report");
+        }
+
+        [TestMethod]
+        public void TryParseFileStem_WhenSuffixPresentInStem_ShouldStripSuffixAndReturnSeed()
+        {
+            // Arrange: fph knows both seed and suffix; the fileStem is seed+suffix concatenated.
+            var fph = FilePathHelper.FromSeed("data", ".json", "_bk", @"C:\output");
+
+            // Act: parse the exact concatenation of known seed and suffix.
+            var result = fph.TryParseFileStem("data_bk", out string seed, out string suffix);
+
+            // Assert: parsing succeeds, the seed strips the suffix portion, suffix is preserved.
+            result.Should().BeTrue();
+            seed.Should().Be("data");
+            suffix.Should().Be("_bk");
+        }
+
+        // P89-T3: AdjustForMaxPath preserves extension when truncating seed
+
+        [TestMethod]
+        public void AdjustForMaxPath_Static_ShouldPreserveExtensionWhenTruncatingSeed()
+        {
+            // Arrange: construct a path that exceeds MAX_PATH; ext must survive truncation.
+            string folder = @"C:\data";
+            string longSeed = new string('x', 300);
+            string ext = ".json";
+
+            // Act: truncate to fit within MAX_PATH.
+            var result = FilePathHelper.AdjustForMaxPath(folder, longSeed, ext);
+
+            // Assert: result fits within the limit AND the extension is preserved intact.
+            result.Length.Should().BeLessThanOrEqualTo(FilePathHelper.MAX_PATH);
+            result.Should().EndWith(ext);
+        }
     }
 }

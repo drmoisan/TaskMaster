@@ -1022,161 +1022,161 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 
 ### Phase 78 — Triage_OlLogic Coverage (`UtilitiesCS\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogic.cs`)
 
-- [ ] [P78-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs` verifying that the filter builder strips unsupported filter clauses
+- [x] [P78-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs` verifying that the filter builder strips unsupported filter clauses
   - Acceptance: `[TestMethod]` exists, provides a filter string with known unsupported clauses, calls the stripping helper, and asserts the result contains only the supported clauses
 
-- [ ] [P78-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs` verifying that `TrainSelectionAsync` skips an empty selection without throwing
+- [x] [P78-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs` verifying that `TrainSelectionAsync` skips an empty selection without throwing
   - Acceptance: `[TestMethod]` exists, supplies an empty selection mock, calls `TrainSelectionAsync`, and asserts the method completes without error and the triage classifier's train method was not invoked
 
-- [ ] [P78-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs` verifying that selected rows are mapped to training examples with the expected label and content
+- [x] [P78-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs` verifying that selected rows are mapped to training examples with the expected label and content
   - Acceptance: `[TestMethod]` exists, provides a mocked selection with known row values, calls `TrainSelectionAsync`, and asserts the mocked triage classifier received training examples matching the expected label/content
 
-- [ ] [P78-T4] Register `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
+- [x] [P78-T4] Register `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
   - Acceptance: `UtilitiesCS.Test.csproj` contains the relevant `<Compile Include="..." />` entry for this test file and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 79 — SystemThemeDetector SKIP (`UtilitiesCS\HelperClasses\ThemeHelpers\SystemThemeDetector.cs`)
 
-- [ ] [P79-T1] Record skip-evaluation decision for `SystemThemeDetector.cs`: static registry reads have no DI seam; positive-path tests would couple to machine/user theme settings and are environment-dependent
+- [x] [P79-T1] Record skip-evaluation decision for `SystemThemeDetector.cs`: static registry reads have no DI seam; positive-path tests would couple to machine/user theme settings and are environment-dependent
   - Acceptance: This task is checked off and the decision is noted inline; no test file is created for this file
 
 ### Phase 80 — BayesianPerformanceMeasurement Coverage (`UtilitiesCS\EmailIntelligence\Bayesian\Performance\BayesianPerformanceMeasurement.cs`)
 
-- [ ] [P80-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianPerformanceMeasurement_Tests.cs` verifying that the split helper partitions a dataset into the expected train/test proportions
+- [x] [P80-T1] Add test to `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianPerformanceMeasurement_Tests.cs` verifying that the split helper partitions a dataset into the expected train/test proportions
   - Acceptance: `[TestMethod]` exists, passes a known-size corpus to the split helper with a specified ratio, and asserts the train and test partition sizes equal the expected values
 
-- [ ] [P80-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianPerformanceMeasurement_Tests.cs` verifying that confusion-driver extraction returns the expected row count and label fields
+- [x] [P80-T2] Add test to `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianPerformanceMeasurement_Tests.cs` verifying that confusion-driver extraction returns the expected row count and label fields
   - Acceptance: `[TestMethod]` exists, provides synthetic classification output, calls the confusion extraction helper, and asserts the resulting confusion rows are correct in count and label content
 
-- [ ] [P80-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianPerformanceMeasurement_Tests.cs` verifying that an empty or invalid corpus short-circuits without writing output
+- [x] [P80-T3] Add test to `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianPerformanceMeasurement_Tests.cs` verifying that an empty or invalid corpus short-circuits without writing output
   - Acceptance: `[TestMethod]` exists, passes an empty corpus to the performance measurement path, and asserts the method returns early and the mocked writer was not invoked
 
-- [ ] [P80-T4] Register `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianPerformanceMeasurement_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P80-T4] Register `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianPerformanceMeasurement_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\Bayesian\BayesianPerformanceMeasurement_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 81 — LockingObservableLinkedListNode Coverage (`UtilitiesCS\ReusableTypeClasses\Locking\Observable\LinkedList\LockingObservableLinkedListNode.cs`)
 
-- [ ] [P81-T1] Add test to `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedListNode_Tests.cs` verifying that `Next` and `Previous` return the expected adjacent nodes from the inner linked node
+- [x] [P81-T1] Add test to `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedListNode_Tests.cs` verifying that `Next` and `Previous` return the expected adjacent nodes from the inner linked node
   - Acceptance: `[TestMethod]` exists, constructs a node in a list with a known next/previous node, and asserts the wrapper's `Next` and `Previous` properties reference the expected nodes
 
-- [ ] [P81-T2] Add test to `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedListNode_Tests.cs` verifying that movement helpers invoke the expected callback on the owning list
+- [x] [P81-T2] Add test to `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedListNode_Tests.cs` verifying that movement helpers invoke the expected callback on the owning list
   - Acceptance: `[TestMethod]` exists, attaches a fake owning list, calls a movement helper on the node, and asserts the list's expected move/update method was invoked
 
-- [ ] [P81-T3] Add test to `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedListNode_Tests.cs` verifying that `Invalidate` clears the node's references
+- [x] [P81-T3] Add test to `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedListNode_Tests.cs` verifying that `Invalidate` clears the node's references
   - Acceptance: `[TestMethod]` exists, calls `Invalidate` on a populated node, and asserts the node's `Value`, `Next`, and `Previous` properties are null or cleared as expected
 
-- [ ] [P81-T4] Register `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedListNode_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P81-T4] Register `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedListNode_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="ReusableTypeClasses\LockingObservableLinkedListNode_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 82 — AsyncSerialization Coverage (`UtilitiesCS\Extensions\AsyncSerialization.cs`)
 
-- [ ] [P82-T1] Add test to `UtilitiesCS.Test\Extensions\AsyncSerialization_Tests.cs` verifying that `ToMbString` formats a known byte count to the expected megabyte string
+- [x] [P82-T1] Add test to `UtilitiesCS.Test\Extensions\AsyncSerialization_Tests.cs` verifying that `ToMbString` formats a known byte count to the expected megabyte string
   - Acceptance: `[TestMethod]` exists, calls `ToMbString` with a known byte count and asserts the result equals the expected formatted string (e.g., `"1.00 MB"`)
 
-- [ ] [P82-T2] Add test to `UtilitiesCS.Test\Extensions\AsyncSerialization_Tests.cs` verifying that the async copy helper reports monotonically increasing progress
+- [x] [P82-T2] Add test to `UtilitiesCS.Test\Extensions\AsyncSerialization_Tests.cs` verifying that the async copy helper reports monotonically increasing progress
   - Acceptance: `[TestMethod]` exists, copies a known in-memory stream with a progress callback, captures all reported percent values, and asserts each value is greater than or equal to the prior
 
-- [ ] [P82-T3] Add test to `UtilitiesCS.Test\Extensions\AsyncSerialization_Tests.cs` verifying that the progress message formatting handles the zero-complete case without division errors
+- [x] [P82-T3] Add test to `UtilitiesCS.Test\Extensions\AsyncSerialization_Tests.cs` verifying that the progress message formatting handles the zero-complete case without division errors
   - Acceptance: `[TestMethod]` exists, calls the progress-formatting helper with zero bytes complete and a known total, and asserts the result is a valid string without exception
 
-- [ ] [P82-T4] Register `UtilitiesCS.Test\Extensions\AsyncSerialization_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P82-T4] Register `UtilitiesCS.Test\Extensions\AsyncSerialization_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Extensions\AsyncSerialization_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 83 — DelegateButton Coverage (`UtilitiesCS\Dialogs\DelegateButton.cs`)
 
-- [ ] [P83-T1] Add test to `UtilitiesCS.Test\Dialogs\DelegateButton_Tests.cs` verifying that each constructor overload preserves the template metadata and dialog result
+- [x] [P83-T1] Add test to `UtilitiesCS.Test\Dialogs\DelegateButton_Tests.cs` verifying that each constructor overload preserves the template metadata and dialog result
   - Acceptance: `[TestMethod]` exists, constructs a `DelegateButton` via a specific overload with known parameters, and asserts `Text`, `DialogResult`, and any delegate reference are preserved
 
-- [ ] [P83-T2] Add test to `UtilitiesCS.Test\Dialogs\DelegateButton_Tests.cs` verifying that replacing the `Button` reference unwires the old click handler
+- [x] [P83-T2] Add test to `UtilitiesCS.Test\Dialogs\DelegateButton_Tests.cs` verifying that replacing the `Button` reference unwires the old click handler
   - Acceptance: `[TestMethod]` exists, wires a click handler to the original `Button`, reassigns the `Button` property, clicks the old button, and asserts the original delegate was not invoked
 
-- [ ] [P83-T3] Add test to `UtilitiesCS.Test\Dialogs\DelegateButton_Tests.cs` verifying that the image helper sets the correct image-relation and replaces any prior image
+- [x] [P83-T3] Add test to `UtilitiesCS.Test\Dialogs\DelegateButton_Tests.cs` verifying that the image helper sets the correct image-relation and replaces any prior image
   - Acceptance: `[TestMethod]` exists, sets an initial image and calls the image helper with a new image and relation, and asserts the `Button.Image` and `TextImageRelation` equals the values provided
 
-- [ ] [P83-T4] Register `UtilitiesCS.Test\Dialogs\DelegateButton_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P83-T4] Register `UtilitiesCS.Test\Dialogs\DelegateButton_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Dialogs\DelegateButton_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 84 — TimedDiskWriter Coverage (`UtilitiesCS\ReusableTypeClasses\TimedActions\TimedDiskWriter.cs`)
 
-- [ ] [P84-T1] Add test to `UtilitiesCS.Test\HelperClasses\TimedDiskWriterTests.cs` verifying that enqueuing an item starts the timer when the timer is currently inactive
+- [x] [P84-T1] Add test to `UtilitiesCS.Test\HelperClasses\TimedDiskWriterTests.cs` verifying that enqueuing an item starts the timer when the timer is currently inactive
   - Acceptance: `[TestMethod]` exists, calls `Enqueue` on an idle `TimedDiskWriter`, and asserts the mock timer's start method was invoked once
 
-- [ ] [P84-T2] Add test to `UtilitiesCS.Test\HelperClasses\TimedDiskWriterTests.cs` verifying that the timed event drains the queue and invokes the writer with all batched items
+- [x] [P84-T2] Add test to `UtilitiesCS.Test\HelperClasses\TimedDiskWriterTests.cs` verifying that the timed event drains the queue and invokes the writer with all batched items
   - Acceptance: `[TestMethod]` exists, enqueues N items, triggers the timed event, and asserts the mock writer was called with all N items in the batch
 
-- [ ] [P84-T3] Add test to `UtilitiesCS.Test\HelperClasses\TimedDiskWriterTests.cs` verifying that repeated empty-queue checks stop the timer
+- [x] [P84-T3] Add test to `UtilitiesCS.Test\HelperClasses\TimedDiskWriterTests.cs` verifying that repeated empty-queue checks stop the timer
   - Acceptance: `[TestMethod]` exists, drains the queue and triggers the timed event with an empty queue, and asserts the mock timer's stop method was invoked
 
-- [ ] [P84-T4] Register `UtilitiesCS.Test\HelperClasses\TimedDiskWriterTests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
+- [x] [P84-T4] Register `UtilitiesCS.Test\HelperClasses\TimedDiskWriterTests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
   - Acceptance: `UtilitiesCS.Test.csproj` contains the relevant `<Compile Include="..." />` entry for this test file and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 85 — UiThread Coverage (`UtilitiesCS\Threading\UiThread.cs`)
 
-- [ ] [P85-T1] Add test to `UtilitiesCS.Test\Threading\UiThread_Tests.cs` verifying that the awaiter rejects a null synchronization context with an expected exception
+- [x] [P85-T1] Add test to `UtilitiesCS.Test\Threading\UiThread_Tests.cs` verifying that the awaiter rejects a null synchronization context with an expected exception
   - Acceptance: `[TestMethod]` exists, constructs the awaiter with a null context, and asserts the expected exception type is thrown
 
-- [ ] [P85-T2] Add test to `UtilitiesCS.Test\Threading\UiThread_Tests.cs` verifying that `IsCompleted` returns the expected value based on whether the current context matches the captured UI context
+- [x] [P85-T2] Add test to `UtilitiesCS.Test\Threading\UiThread_Tests.cs` verifying that `IsCompleted` returns the expected value based on whether the current context matches the captured UI context
   - Acceptance: `[TestMethod]` exists, provides a mocked `SynchronizationContext`, reads `IsCompleted` from a matching and a non-matching context, and asserts true and false respectively
 
-- [ ] [P85-T3] Add test to `UtilitiesCS.Test\Threading\UiThread_Tests.cs` verifying that `OnCompleted` posts the supplied continuation to the target synchronization context
+- [x] [P85-T3] Add test to `UtilitiesCS.Test\Threading\UiThread_Tests.cs` verifying that `OnCompleted` posts the supplied continuation to the target synchronization context
   - Acceptance: `[TestMethod]` exists, supplies a mock `SynchronizationContext`, calls `OnCompleted` with a known action, and asserts the mock context's `Post` method received that action
 
-- [ ] [P85-T4] Register `UtilitiesCS.Test\Threading\UiThread_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P85-T4] Register `UtilitiesCS.Test\Threading\UiThread_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="Threading\UiThread_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 86 — ClassifierGroup (Obsolete) Coverage (`UtilitiesCS\EmailIntelligence\Bayesian\Obsolete\ClassifierGroup.cs`)
 
-- [ ] [P86-T1] Add test to nearest `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianClassifierGroup_Tests.cs` verifying that `Add`/`Update` creates or appends to the correct classifier based on the source key
+- [x] [P86-T1] Add test to nearest `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianClassifierGroup_Tests.cs` verifying that `Add`/`Update` creates or appends to the correct classifier based on the source key
   - Acceptance: `[TestMethod]` exists, calls `Add` or `Update` with a known source key and token sequence, and asserts the classifier for that key was created or appended
 
-- [ ] [P86-T2] Add test to nearest `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianClassifierGroup_Tests.cs` verifying that `Classify` returns ordered predictions for a known token input
+- [x] [P86-T2] Add test to nearest `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianClassifierGroup_Tests.cs` verifying that `Classify` returns ordered predictions for a known token input
   - Acceptance: `[TestMethod]` exists, trains classifiers with distinct token sets, calls `Classify` with a known input, and asserts the returned predictions are sorted by score descending
 
-- [ ] [P86-T3] Add test to nearest `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianClassifierGroup_Tests.cs` verifying that dedicated and shared token counts contribute to the metrics state
+- [x] [P86-T3] Add test to nearest `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianClassifierGroup_Tests.cs` verifying that dedicated and shared token counts contribute to the metrics state
   - Acceptance: `[TestMethod]` exists, adds tokens to both dedicated and shared classifiers, and asserts the resulting metrics state reflects counts from both paths
 
-- [ ] [P86-T4] Register `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianClassifierGroup_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
+- [x] [P86-T4] Register `UtilitiesCS.Test\EmailIntelligence\Bayesian\BayesianClassifierGroup_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if not already present
   - Acceptance: `UtilitiesCS.Test.csproj` contains the relevant `<Compile Include="..." />` entry for this test file and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 87 — LockingObservableLinkedList Coverage (`UtilitiesCS\ReusableTypeClasses\Locking\Observable\LinkedList\LockingObservableLinkedList.cs`)
 
-- [ ] [P87-T1] Add test to `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedList_Tests.cs` verifying that `Add` and `Remove` raise the expected `CollectionChanged` action with the correct node reference
+- [x] [P87-T1] Add test to `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedList_Tests.cs` verifying that `Add` and `Remove` raise the expected `CollectionChanged` action with the correct node reference
   - Acceptance: `[TestMethod]` exists, subscribes to `CollectionChanged`, adds and removes a node, and asserts the event args action type and node reference match expected values for each operation
 
-- [ ] [P87-T2] Add test to `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedList_Tests.cs` verifying that `AddOrMoveFirst` moves an existing node to first position rather than duplicating it
+- [x] [P87-T2] Add test to `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedList_Tests.cs` verifying that `AddOrMoveFirst` moves an existing node to first position rather than duplicating it
   - Acceptance: `[TestMethod]` exists, adds a node, calls `AddOrMoveFirst` for the same value, and asserts the list contains the node exactly once and it is at the first position
 
-- [ ] [P87-T3] Add test to `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedList_Tests.cs` verifying that partial observers receive only changes for their registered nodes
+- [x] [P87-T3] Add test to `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedList_Tests.cs` verifying that partial observers receive only changes for their registered nodes
   - Acceptance: `[TestMethod]` exists, registers a partial observer for one node, modifies a different node, and asserts the partial observer was not notified
 
-- [ ] [P87-T4] Register `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedList_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P87-T4] Register `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedList_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="ReusableTypeClasses\LockingObservableLinkedList_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 88 — OlToDoTable Coverage (`UtilitiesCS\OutlookObjects\Table\OlToDoTable.cs`)
 
-- [ ] [P88-T1] Add test to `UtilitiesCS.Test\OutlookObjects\Table\OlToDoTable_Tests.cs` verifying that a missing To-Do default folder returns `null` from `GetToDoTable`
+- [x] [P88-T1] Add test to `UtilitiesCS.Test\OutlookObjects\Table\OlToDoTable_Tests.cs` verifying that a missing To-Do default folder returns `null` from `GetToDoTable`
   - Acceptance: `[TestMethod]` exists, supplies a mocked `Store` returning null for the default To-Do folder, calls `GetToDoTable`, and asserts the result is null
 
-- [ ] [P88-T2] Add test to `UtilitiesCS.Test\OutlookObjects\Table\OlToDoTable_Tests.cs` verifying that the expected MAPI fields are cleared and re-added to the table columns
+- [x] [P88-T2] Add test to `UtilitiesCS.Test\OutlookObjects\Table\OlToDoTable_Tests.cs` verifying that the expected MAPI fields are cleared and re-added to the table columns
   - Acceptance: `[TestMethod]` exists, provides a mocked table with a known column set, calls the column-setup helper, and asserts the mock table's `Columns.RemoveAll` was called before the expected `Columns.Add` calls
 
-- [ ] [P88-T3] Add test to `UtilitiesCS.Test\OutlookObjects\Table\OlToDoTable_Tests.cs` verifying that unreadable items are skipped without failing the table build
+- [x] [P88-T3] Add test to `UtilitiesCS.Test\OutlookObjects\Table\OlToDoTable_Tests.cs` verifying that unreadable items are skipped without failing the table build
   - Acceptance: `[TestMethod]` exists, supplies a mocked item that throws on property access, calls the table builder, and asserts the method completes without exception and skips the failing item
 
-- [ ] [P88-T4] Register `UtilitiesCS.Test\OutlookObjects\Table\OlToDoTable_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P88-T4] Register `UtilitiesCS.Test\OutlookObjects\Table\OlToDoTable_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="OutlookObjects\Table\OlToDoTable_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 89 — FilePathHelper Coverage (`UtilitiesCS\HelperClasses\FileSystem\FilePathHelper.cs`)
 
-- [ ] [P89-T1] Add test to `UtilitiesCS.Test\HelperClasses\FilePathHelper_Tests.cs` verifying that changing the `Name` property recomputes the dependent path/stem fields
+- [x] [P89-T1] Add test to `UtilitiesCS.Test\HelperClasses\FilePathHelper_Tests.cs` verifying that changing the `Name` property recomputes the dependent path/stem fields
   - Acceptance: `[TestMethod]` exists, constructs a `FilePathHelper` with a known initial path, sets `Name` to a new value, and asserts `FullName`, `Stem`, and related path properties are updated consistently
 
-- [ ] [P89-T2] Add test to `UtilitiesCS.Test\HelperClasses\FilePathHelper_Tests.cs` verifying that `TryParseFileStem` handles empty, prefix-only, and suffix-only combinations correctly
+- [x] [P89-T2] Add test to `UtilitiesCS.Test\HelperClasses\FilePathHelper_Tests.cs` verifying that `TryParseFileStem` handles empty, prefix-only, and suffix-only combinations correctly
   - Acceptance: `[TestMethod]` exists, calls `TryParseFileStem` with each boundary combination (empty string, prefix only, suffix only), and asserts the returned stem equals the expected value in each case
 
-- [ ] [P89-T3] Add test to `UtilitiesCS.Test\HelperClasses\FilePathHelper_Tests.cs` verifying that `AdjustForMaxPath` truncates only the seed portion of the name while preserving extension and path prefix
+- [x] [P89-T3] Add test to `UtilitiesCS.Test\HelperClasses\FilePathHelper_Tests.cs` verifying that `AdjustForMaxPath` truncates only the seed portion of the name while preserving extension and path prefix
   - Acceptance: `[TestMethod]` exists, provides a path that exceeds the max-path limit, calls `AdjustForMaxPath`, and asserts the result fits within the limit and the extension is preserved
 
-- [ ] [P89-T4] Register `UtilitiesCS.Test\HelperClasses\FilePathHelper_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P89-T4] Register `UtilitiesCS.Test\HelperClasses\FilePathHelper_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains `<Compile Include="HelperClasses\FilePathHelper_Tests.cs" />` and `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` exits with code 0
 
 ### Phase 90 — Final QC Pass
