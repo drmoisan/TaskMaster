@@ -279,8 +279,11 @@ namespace QuickFiler.Helper_Classes
         {
             if (Count.Expanded <= 0)
             {
+                // Use nameof() to avoid accessing the still-loading ConversationInfo / Df
+                // properties here; doing so would recurse back into LoadConversationInfo()
+                // and cause a StackOverflowException.
                 throw new InvalidOperationException(
-                    $"{ConversationInfo} cannot be loaded if {Df} cannot be resolved"
+                    $"{nameof(ConversationInfo)} cannot be loaded if {nameof(Df)} cannot be resolved"
                 );
             }
 
@@ -492,10 +495,16 @@ namespace QuickFiler.Helper_Classes
             Df = new Pair<DataFrame>(sameFolder: dfSameFolder, expanded: dfExpanded);
         }
 
-        private Pair<int> _count;
+        // Sentinel (-1, -1) means "not yet loaded". We cannot rely on default(Pair<int>) == (0,0)
+        // as the uninitialized sentinel because a real count of (0,0) – both DataFrames empty –
+        // is indistinguishable from it, causing GetOrLoad to call LoadCount on every access.
+        private Pair<int> _count = new Pair<int>(-1, -1);
+
         public Pair<int> Count
         {
-            get => Initializer.GetOrLoad(ref _count, LoadCount);
+            // Use the isInitialized-predicate overload so that a loaded value of (0,0) is
+            // correctly treated as initialized. Expanded < 0 means LoadCount has not run yet.
+            get => Initializer.GetOrLoad(ref _count, static v => v.Expanded >= 0, LoadCount);
             internal set => _count = value;
         }
 
