@@ -285,6 +285,8 @@ namespace QuickFiler
             get => _stopWatch;
         }
 
+        private volatile bool _isExecuting;
+
         public bool Loaded => throw new NotImplementedException();
 
         internal void CreateCancellationToken()
@@ -319,35 +321,49 @@ namespace QuickFiler
 
         async public Task ExecuteMovesAsync()
         {
-            var selectedFolder = _formController.SelectedFolder;
-            var moveConversation = _formController.MoveConversation;
-            var convInfo = DataModel.ConversationResolver.ConversationInfo.SameFolder;
-            if (!moveConversation)
-            {
-                convInfo = convInfo
-                    .Where(itemInfo => itemInfo.EntryId == DataModel.Mail.EntryID)
-                    .ToList();
-            }
+            if (_isExecuting)
+                return;
 
-            var result = await _dataModel.MoveToFolderAsync(
-                selectedFolder,
-                _formController.SaveAttachments,
-                _formController.SaveEmail,
-                _formController.SavePictures,
-                moveConversation
-            );
+            _isExecuting = true;
+            try
+            {
+                var selectedFolder = _formController.SelectedFolder;
+                var moveConversation = _formController.MoveConversation;
+                var convInfo = DataModel.ConversationResolver.ConversationInfo.SameFolder;
+                if (!moveConversation)
+                {
+                    convInfo = convInfo
+                        .Where(itemInfo => itemInfo.EntryId == DataModel.Mail.EntryID)
+                        .ToList();
+                }
 
-            if (!result)
-            {
-                MessageBox.Show($"Cannot move to folderpath {selectedFolder}");
-            }
-            else
-            {
-                QuickFileMetrics_WRITE(
-                    _globals.FS.Filenames.EmailSession,
+                // Capture _globals before the await: Cleanup() may null the field while
+                // MoveToFolderAsync is in flight, causing NullReferenceException on resume.
+                var globals = _globals;
+                var result = await _dataModel.MoveToFolderAsync(
                     selectedFolder,
-                    convInfo
+                    _formController.SaveAttachments,
+                    _formController.SaveEmail,
+                    _formController.SavePictures,
+                    moveConversation
                 );
+
+                if (!result)
+                {
+                    MessageBox.Show($"Cannot move to folderpath {selectedFolder}");
+                }
+                else
+                {
+                    QuickFileMetrics_WRITE(
+                        globals.FS.Filenames.EmailSession,
+                        selectedFolder,
+                        convInfo
+                    );
+                }
+            }
+            finally
+            {
+                _isExecuting = false;
             }
         }
 
@@ -367,7 +383,7 @@ namespace QuickFiler
             List<MailItemHelper> moved
         )
         {
-            if (moved is not null && moved.Count == 0)
+            if (moved is not null && moved.Count > 0)
             {
                 var curDateText = DateTime.Now.ToString("MM/dd/yyyy");
                 var curTimeText = DateTime.Now.ToString("hh:mm");

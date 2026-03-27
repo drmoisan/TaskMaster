@@ -128,22 +128,26 @@ namespace Swordfish.NET.Collections
             _baseCollection.CollectionChanged += HandleBaseCollectionChanged;
 
             // ***DRM Comment: Doesn't appear to be firing***
-            // Bubble up the notify collection changed event from the view model
+            // Bubble up the notify collection changed event from the view model.
+            // Use 'this' as sender so subscribers receive the wrapper collection,
+            // not the internal ObservableCollectionViewModel.
             _viewModel.CollectionChanged += (sender, e) =>
             {
                 if (CollectionChanged != null)
                 {
-                    CollectionChanged(sender, e);
+                    CollectionChanged(this, e);
                 }
             };
 
             // DRM Hack -> Bubble up the notify collection changed event from the base collection.
-            // Could create duplicate events, but this is the only way I can currently get it to fire
+            // Could create duplicate events, but this is the only way I can currently get it to fire.
+            // Use 'this' as sender so subscribers receive the wrapper collection,
+            // not the internal ObservableCollection.
             _baseCollection.CollectionChanged += (sender, e) =>
             {
                 if (CollectionChanged != null)
                 {
-                    CollectionChanged(sender, e);
+                    CollectionChanged(this, e);
                 }
             };
         }

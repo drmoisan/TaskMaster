@@ -279,8 +279,20 @@ namespace QuickFiler.Helper_Classes
         {
             if (Count.Expanded <= 0)
             {
-                throw new InvalidOperationException(
-                    $"{ConversationInfo} cannot be loaded if {Df} cannot be resolved"
+                // When the expanded conversation DataFrame is empty (e.g., Junk E-mail where
+                // FilterConversation removes all rows), return a single-item fallback containing
+                // the current mail item. Throwing here propagated an unhandled exception to the
+                // VSTO UI thread for a recoverable scenario.
+                //
+                // Do NOT access ConversationInfo or Df in this path: they are lazy properties
+                // backed by this same loader and would recurse back into LoadConversationInfo().
+                logger.Error(
+                    $"{nameof(ConversationInfo)} cannot be resolved: {nameof(Count)}.Expanded = {Count.Expanded}. Returning single-item fallback."
+                );
+                var fallbackList = new List<MailItemHelper> { MailHelper };
+                return new Pair<List<MailItemHelper>>(
+                    sameFolder: fallbackList,
+                    expanded: fallbackList
                 );
             }
 
@@ -377,12 +389,6 @@ namespace QuickFiler.Helper_Classes
             //    convInfoExpanded = new List<MailItemHelper>() { MailInfo };
             //}
 
-            if (UpdateUI is not null)
-            {
-                token.ThrowIfCancellationRequested();
-                await UiThread.Dispatcher.InvokeAsync(() => UpdateUI(ConversationInfo.Expanded));
-            }
-
             var convInfoSameFolder = convInfoExpanded
                 .Where(itemInfo => itemInfo.FolderName == ((Folder)_mailItem.Parent).Name)
                 .ToList();
@@ -391,7 +397,21 @@ namespace QuickFiler.Helper_Classes
                 sameFolder: convInfoSameFolder,
                 expanded: convInfoExpanded
             );
+
+            // Assign ConversationInfo before calling UpdateUI so that any subsequent read
+            // of ConversationInfo.Expanded returns the cached value rather than re-entering
+            // the synchronous LoadConversationInfo(), which throws when Count.Expanded == 0
+            // (e.g. items in Junk E-mail where FilterConversation removes all rows).
             ConversationInfo = pair;
+
+            if (UpdateUI is not null)
+            {
+                token.ThrowIfCancellationRequested();
+                // Pass pair.Expanded directly to avoid triggering the lazy property getter
+                // and the associated synchronous LoadConversationInfo() call.
+                await UiThread.Dispatcher.InvokeAsync(() => UpdateUI(pair.Expanded));
+            }
+
             return pair;
         }
 
@@ -492,10 +512,16 @@ namespace QuickFiler.Helper_Classes
             Df = new Pair<DataFrame>(sameFolder: dfSameFolder, expanded: dfExpanded);
         }
 
-        private Pair<int> _count;
+        // Sentinel (-1, -1) means "not yet loaded". We cannot rely on default(Pair<int>) == (0,0)
+        // as the uninitialized sentinel because a real count of (0,0) – both DataFrames empty –
+        // is indistinguishable from it, causing GetOrLoad to call LoadCount on every access.
+        private Pair<int> _count = new Pair<int>(-1, -1);
+
         public Pair<int> Count
         {
-            get => Initializer.GetOrLoad(ref _count, LoadCount);
+            // Use the isInitialized-predicate overload so that a loaded value of (0,0) is
+            // correctly treated as initialized. Expanded < 0 means LoadCount has not run yet.
+            get => Initializer.GetOrLoad(ref _count, static v => v.Expanded >= 0, LoadCount);
             internal set => _count = value;
         }
 

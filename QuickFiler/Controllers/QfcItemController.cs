@@ -30,7 +30,7 @@ namespace QuickFiler.Controllers
 
         #region ctor
 
-        private QfcItemController() { }
+        protected QfcItemController() { }
 
         public QfcItemController(
             IApplicationGlobals appGlobals,
@@ -597,14 +597,16 @@ namespace QuickFiler.Controllers
 
             try
             {
-                ConversationResolver = await ConversationResolver.LoadAsync(
-                    _globals,
-                    ItemHelper,
+                ConversationResolver = await DoLoadConversationResolverCoreAsync(
                     tokenSource,
                     token,
-                    loadAll,
-                    SetTopicThread
+                    loadAll
                 );
+            }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is an expected flow; propagate so callers can observe it.
+                throw;
             }
             catch (System.Exception e)
             {
@@ -613,6 +615,24 @@ namespace QuickFiler.Controllers
             }
         }
 
+        /// <summary>
+        /// Seam for the static ConversationResolver.LoadAsync call. Override in tests to
+        /// inject controlled behaviour without requiring WinForms infrastructure.
+        /// </summary>
+        protected virtual Task<ConversationResolver> DoLoadConversationResolverCoreAsync(
+            CancellationTokenSource tokenSource,
+            CancellationToken token,
+            bool loadAll
+        ) =>
+            ConversationResolver.LoadAsync(
+                _globals,
+                ItemHelper,
+                tokenSource,
+                token,
+                loadAll,
+                SetTopicThread
+            );
+
         public async Task PopulateConversationAsync(
             CancellationTokenSource tokenSource,
             CancellationToken token,
@@ -620,6 +640,9 @@ namespace QuickFiler.Controllers
         )
         {
             await LoadConversationResolverAsync(tokenSource, token, loadAll);
+            token.ThrowIfCancellationRequested();
+            if (ConversationResolver is null)
+                return;
             await RenderConversationCountAsync(
                 ConversationResolver.Count.SameFolder,
                 token,
@@ -1316,6 +1339,12 @@ namespace QuickFiler.Controllers
             //_kbdHandler.KeyActionsAsync.Add(_itemInfo.EntryId, Keys.Right, (x) => ToggleCheckboxAsync(_itemViewer.CbxConversation, Enums.ToggleState.Off));
             //_kbdHandler.KeyActionsAsync.Add(_itemInfo.EntryId, Keys.Left, (x) => ToggleCheckboxAsync(_itemViewer.CbxConversation, Enums.ToggleState.On));
             //_kbdHandler.CharActionsAsync.Add(_itemInfo.EntryId, 'A', (x) => this.ToggleCheckboxAsync(_itemViewer.CbxAttachments));
+            // Right arrow expands the conversation thread for the focused item.
+            _kbdHandler.KeyActionsAsync.Add(
+                ItemHelper.EntryId,
+                Keys.Right,
+                (x) => this.ToggleExpansionAsync()
+            );
             _kbdHandler.CharActionsAsync.Add(
                 ItemHelper.EntryId,
                 'C',
@@ -1439,9 +1468,9 @@ namespace QuickFiler.Controllers
 
         internal void UnregisterFocusAsyncActions()
         {
-            //_kbdHandler.KeyActionsAsync.Remove(_itemInfo.EntryId, Keys.Right);
             //_kbdHandler.KeyActionsAsync.Remove(_itemInfo.EntryId, Keys.Left);
             //_kbdHandler.CharActionsAsync.Remove(_itemInfo.EntryId, 'A');
+            _kbdHandler.KeyActionsAsync.Remove(ItemHelper.EntryId, Keys.Right);
             _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'C');
             _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'O');
             _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'M');
