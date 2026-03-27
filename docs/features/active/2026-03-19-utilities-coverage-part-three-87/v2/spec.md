@@ -5,7 +5,7 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-03-23
 - **Status:** In Progress
-- **Version:** 0.2
+- **Version:** 2.0
 
 ## Overview
 
