@@ -17,6 +17,7 @@ using System.Windows;
 using System.Windows.Forms;
 using log4net.Repository.Hierarchy;
 using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualBasic.Devices;
 using Newtonsoft.Json;
 using UtilitiesCS.EmailIntelligence.Bayesian.Performance;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups;
@@ -24,7 +25,6 @@ using UtilitiesCS.Extensions;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
-using VBFunctions;
 
 namespace UtilitiesCS.EmailIntelligence.Bayesian
 {
@@ -299,7 +299,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 SerializeAndSave(folders, "StagingFolderRecords");
             }
 
-            var availableRam = Convert.ToInt64(ComputerInfo.AvailablePhysicalMemory);
+            var availableRam = GetAvailablePhysicalMemory();
             var maxChunkSize = Math.Min(availableRam, MaxObjectSize) * 95 / 100;
             //logger.Debug($"Available RAM {availableRam / (double)1000000000:N2} GB");
             //logger.Debug($"Max Obj Size  {MaxObjectSize / (double)1000000000:N2} GB");
@@ -1606,6 +1606,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         #endregion Testing Sizing and Serialization Methods
 
         #region Helper Methods
+
+        private static long GetAvailablePhysicalMemory()
+        {
+            // Read directly from the framework API so this code path does not depend on the
+            // standalone VBFunctions wrapper assembly, which can be blocked by Windows
+            // application-control policies in some environments.
+            return Convert.ToInt64(new ComputerInfo().AvailablePhysicalMemory);
+        }
 
         private string GetProgressMessage(int complete, int count, Stopwatch sw)
         {
