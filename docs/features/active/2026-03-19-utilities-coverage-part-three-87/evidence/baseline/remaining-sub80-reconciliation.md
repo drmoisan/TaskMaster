@@ -45,7 +45,6 @@ Each file below maps to exactly one task path: Implementation Task or Skip Task.
 | Threading\ProgressPane.cs | 0% | Implementation Task | P29-T1 to P29-T3 |
 | Threading\ProgressViewer.cs | 0% | Implementation Task | P30-T1 to P30-T2 |
 | Threading\ThreadMonitor.cs | 0% | Skip Task | P31-T1 |
-| To Depricate\CSVDictUtilities.cs | 0% | Skip Task | P32-T1 |
 | To Depricate\FileIO2.cs | 0% | Skip Task | P33-T1 |
 | EmailIntelligence\EmailParsingSorting\EmailDataMiner.cs | 1.4% | Implementation Task | P34-T1 to P34-T3 |
 | HelperClasses\Windows Forms\ScreenHelper.cs | 3.2% | Skip Task | P35-T1 |

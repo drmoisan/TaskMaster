@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using UtilitiesCS.HelperClasses;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
@@ -248,5 +250,72 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Assert
             bag.LocalJsonSettings.Formatting.Should().Be(Formatting.None);
         }
+
+        // -----------------------------------------------------------------------
+        // P51-T1 — Deserializing a missing path returns an empty bag
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that Deserialize with a non-existent file path and
+        /// askUserOnError=false returns a valid empty bag rather than throwing.
+        ///
+        /// Purpose:
+        ///     Confirm the FileNotFoundException guard clause creates and returns an
+        ///     empty bag without invoking any UI dialog when askUserOnError is false.
+        ///
+        /// Returns:
+        ///     Passes when the returned bag is non-null and contains zero items.
+        /// </summary>
+        [TestMethod]
+        public void Deserialize_WithMissingPath_ReturnsEmptyBag()
+        {
+            // Act: non-existent file, no dialog (askUserOnError=false defaults to Yes)
+            var bag = ScBag<int>.Deserialize(
+                "p51t1_nonexistent.json",
+                @"c:\nonexistent_scbag_p51t1_dir",
+                askUserOnError: false
+            );
+
+            // Assert: an empty bag is returned with no exception thrown
+            bag.Should().NotBeNull();
+            bag.Count.Should().Be(0);
+        }
+
+        // -----------------------------------------------------------------------
+        // P51-T3 — Ask-user branch handles a cancellation response gracefully
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that CreateEmpty propagates the expected exception when the
+        /// user-dialog response is No (i.e. the caller cancels bag creation).
+        ///
+        /// Purpose:
+        ///     Confirm that a DialogResult.No response from the ask-user branch
+        ///     results in an ArgumentNullException, which is the designed behavior
+        ///     when the caller cancels the empty-bag creation step.
+        ///
+        /// Returns:
+        ///     Passes when CreateEmpty(DialogResult.No, ...) throws ArgumentNullException.
+        /// </summary>
+        [TestMethod]
+        public void CreateEmpty_WhenResponseIsNo_ThrowsArgumentNullException()
+        {
+            // Arrange: subclass to expose the protected static CreateEmpty
+            Action act = () =>
+                TestableScBag<int>.ExposeCreateEmpty(
+                    DialogResult.No,
+                    new FilePathHelper("test.json", @"c:\test")
+                );
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>();
+        }
+    }
+
+    /// <summary>Exposes the protected static CreateEmpty method for testing.</summary>
+    internal sealed class TestableScBag<T> : ScBag<T>
+    {
+        internal static ScBag<T> ExposeCreateEmpty(DialogResult response, FilePathHelper disk) =>
+            CreateEmpty(response, disk);
     }
 }

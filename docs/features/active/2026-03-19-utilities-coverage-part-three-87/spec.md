@@ -36,11 +36,11 @@ The work is organized into 90 phases:
   - *OutlookObjects*: `OlTableExtensions`, `StoreWrapperController`, `OlToDoTable`
   - *OneDriveHelpers*: `OneDriveDownloader`
 
-  Skip-evaluation phases (11 files) with rationale:
+  Skip-evaluation phases (10 files) with rationale:
   - **Phase 6** (`ConfusionViewer`) and **Phase 7** (`MetricChartViewer`): constructor-only WinForms designer shells with no meaningful non-designer logic.
   - **Phase 28** (`ProgressMultiStepViewer`): constructor-only progress form shell.
   - **Phase 31** (`ThreadMonitor`): relies on obsolete `Thread.Suspend`/`Thread.Resume` APIs and timing-sensitive diagnostics; deterministic unit tests are not feasible.
-  - **Phase 32** (`CSVDictUtilities`) and **Phase 33** (`FileIO2`): deprecated utilities with direct file-system dependence and no injection seam; tests would require real disk I/O, violating the no-temp-files policy.
+  - **Phase 33** (`FileIO2`): deprecated utility with direct file-system dependence and no injection seam; tests would require real disk I/O, violating the no-temp-files policy.
   - **Phase 35** (`ScreenHelper`): behavior depends on live machine monitor topology and active forms; static `Screen.AllScreens` has no injection seam.
   - **Phase 37** (`Theme`): broad UI/control graph and large mutable surface; unit coverage is low-value relative to the narrower `ThemeControlGroup` covered by Phase 60.
   - **Phase 58** (`ShellUtilities`) and **Phase 59** (`ShellUtilitiesStatic`): static Win32 shell interop and PInvoke icon extraction have no DI seam and are environment-dependent.
@@ -166,14 +166,14 @@ Known existing homes include (non-exhaustive):
 ## Definition of Done
 
 - [ ] Every `.cs` file compiled by `UtilitiesCS.csproj` reaches ≥80% line coverage as reported by the Cobertura XML, or is explicitly documented as a skip candidate (with rationale) in the plan
-- [x] All 11 skip-evaluation phases (P6, P7, P28, P31, P32, P33, P35, P37, P58, P59, P79) are checked off in the plan with documented rationale
-- [x] No pre-existing tests are broken or removed
-- [x] All new tests follow MSTest + Moq + FluentAssertions conventions (AAA pattern, deterministic, isolated, no external dependencies, no temp files)
-- [x] All new test files are registered in `UtilitiesCS.Test.csproj` via `<Compile Include="...">` and verified in Phase 90-T5
-- [x] Repository-wide line coverage does not regress below the Phase 0 baseline
-- [x] C# toolchain loop passes clean in a single Phase 90 pass: `dotnet tool run csharpier .` → analyzer build → nullable build → `vstest.console.exe /EnableCodeCoverage`
-- [x] Phase 0 evidence artifacts exist: `evidence/baseline/phase0-instructions-read.md`, `baseline-build.md`, `baseline-test-coverage.md`, `baseline-per-file-coverage.md`, `remaining-sub80-reconciliation.md`
-- [x] Phase 90 QA evidence artifacts exist: `evidence/qa-gates/final-qc-format.md`, `final-qc-analyzers.md`, `final-qc-nullable.md`, `final-qc-test-coverage.md`
+- [ ] All 11 skip-evaluation phases (P6, P7, P28, P31, P32, P33, P35, P37, P58, P59, P79) are checked off in the plan with documented rationale
+- [ ] No pre-existing tests are broken or removed
+- [ ] All new tests follow MSTest + Moq + FluentAssertions conventions (AAA pattern, deterministic, isolated, no external dependencies, no temp files)
+- [ ] All new test files are registered in `UtilitiesCS.Test.csproj` via `<Compile Include="...">` and verified in Phase 90-T5
+- [ ] Repository-wide line coverage does not regress below the Phase 0 baseline
+- [ ] C# toolchain loop passes clean in a single Phase 90 pass: `dotnet tool run csharpier .` → analyzer build → nullable build → `vstest.console.exe /EnableCodeCoverage`
+- [ ] Phase 0 evidence artifacts exist: `evidence/baseline/phase0-instructions-read.md`, `baseline-build.md`, `baseline-test-coverage.md`, `baseline-per-file-coverage.md`, `remaining-sub80-reconciliation.md`
+- [ ] Phase 90 QA evidence artifacts exist: `evidence/qa-gates/final-qc-format.md`, `final-qc-analyzers.md`, `final-qc-nullable.md`, `final-qc-test-coverage.md`
 - [ ] Docs updated (feature folder status set to Complete; plan updated to show all tasks checked)
 
 ## Seeded Test Conditions (from potential)

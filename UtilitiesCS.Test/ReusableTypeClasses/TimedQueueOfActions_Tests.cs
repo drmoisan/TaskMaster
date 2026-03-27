@@ -207,5 +207,43 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Assert
             queue.BatchActions.Should().NotBeNull();
         }
+
+        [TestMethod]
+        public void Enqueue_WhenBatchActionsMissingAndTimerStartFails_StillAddsItemToQueue()
+        {
+            // Arrange
+            var queue = new ThrowingStartTimedQueue<int>();
+
+            // Act
+            queue.Enqueue(5);
+
+            // Assert
+            queue.Queue.TryTake(out var queuedValue).Should().BeTrue();
+            queuedValue.Should().Be(5);
+        }
+
+        [TestMethod]
+        public async Task EnqueueAsync_WhenBatchActionsMissingAndTimerStartFails_StillAddsItemToQueue()
+        {
+            // Arrange
+            var queue = new ThrowingStartTimedQueue<int>();
+
+            // Act
+            await queue.EnqueueAsync(7, CancellationToken.None);
+
+            // Assert
+            queue.Queue.TryTake(out var queuedValue).Should().BeTrue();
+            queuedValue.Should().Be(7);
+        }
+
+        private sealed class ThrowingStartTimedQueue<T> : TimedQueueOfActions<T>
+        {
+            public override bool TimerActive => false;
+
+            public override void StartTimer()
+            {
+                throw new InvalidOperationException("timer start failed");
+            }
+        }
     }
 }

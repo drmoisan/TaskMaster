@@ -958,10 +958,7 @@
     <Compile Include="Threading\ThreadSafeSingleShotGuard.cs" />
     <Compile Include="Threading\TimeOutTask.cs" />
     <Compile Include="Threading\UiThread.cs" />
-    <Compile Include="To Depricate\CSVDictUtilities.cs" />
     <Compile Include="To Depricate\FileIO2.cs" />
-    <Compile Include="To Depricate\FlattenArray.cs" />
-    <Compile Include="To Depricate\StackObjectVB.cs" />
     <Compile Include="To Depricate\StringManipulation.cs" />
     <Compile Include="HelperClasses\Windows Forms\ControlPosition.cs" />
     <Compile Include="HelperClasses\Windows Forms\ImageHelper.cs" />

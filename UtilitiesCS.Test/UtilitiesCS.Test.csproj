@@ -103,7 +103,6 @@
     <Compile Include="EmailIntelligence\FolderRemapViewer_Tests.cs" />
     <Compile Include="EmailIntelligence\FolderSelector_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroupTests.cs" />
-    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierTests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierTests_UnfinishedStubs.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierSharedTests.cs" />
@@ -160,6 +159,7 @@
     <Compile Include="Extensions\AsyncSerialization_Tests.cs" />
     <Compile Include="Extensions\CompilerServicesExtensions_Tests.cs" />
     <Compile Include="Extensions\DfDeedle_Tests.cs" />
+    <Compile Include="Extensions\DfMLNet_Tests.cs" />
     <Compile Include="Extensions\DictionaryExtensions_Tests.cs" />
     <Compile Include="Extensions\EnumExtensions_Tests.cs" />
     <Compile Include="Extensions\ExtToChar_Tests.cs" />

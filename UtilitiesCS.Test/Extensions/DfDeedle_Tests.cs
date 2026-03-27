@@ -44,7 +44,12 @@ namespace UtilitiesCS.Test.Extensions
             foreach (var valid in new[] { "Z", "A", "B", "C" })
             {
                 var result = (string)method!.Invoke(null, new object[] { valid });
-                result.Should().Be(valid, because: $"'{valid}' is a valid triage value and must not be altered");
+                result
+                    .Should()
+                    .Be(
+                        valid,
+                        because: $"'{valid}' is a valid triage value and must not be altered"
+                    );
             }
         }
 
@@ -61,7 +66,10 @@ namespace UtilitiesCS.Test.Extensions
             method.Should().NotBeNull("DateFrom2dPosition must exist as a private static method");
 
             // A 2-D array where the date slot is null — simulates a missing SentOn field.
-            object[,] data = { { null } };
+            object[,] data =
+            {
+                { null },
+            };
 
             // Act: extract the date from the null slot. Must not throw.
             var result = (DateTime)method!.Invoke(null, new object[] { data, 0, 0 });
@@ -81,7 +89,10 @@ namespace UtilitiesCS.Test.Extensions
             method.Should().NotBeNull();
 
             // A 2-D array with a string that cannot be parsed as a DateTime.
-            object[,] data = { { "not-a-date" } };
+            object[,] data =
+            {
+                { "not-a-date" },
+            };
 
             // Act: extract the date from the unparseable slot. Must not throw.
             var result = (DateTime)method!.Invoke(null, new object[] { data, 0, 0 });

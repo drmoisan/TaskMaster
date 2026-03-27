@@ -1,8 +1,15 @@
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Newtonsoft.Json;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
@@ -10,6 +17,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
     [TestClass]
     public class ScoDictionaryNew_Tests
     {
+        private static readonly string RepoRoot = Path.GetFullPath(
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..")
+        );
+
         [TestMethod]
         public void Add_TryGetValue_RemoveAndClear_WorkAsExpected()
         {
@@ -181,6 +192,388 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             // Act & Assert
             dictionary.ContainsKey("missing").Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void DefaultConstructor_StartsEmpty()
+        {
+            // Arrange & Act
+            var dictionary = new ScoDictionaryNew<string, int>();
+
+            // Assert
+            dictionary.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public void Constructor_WithCollectionAndComparer_UsesComparer()
+        {
+            // Arrange
+            var pairs = new[] { new KeyValuePair<string, int>("Alpha", 1) };
+
+            // Act
+            var dictionary = new ScoDictionaryNew<string, int>(
+                pairs,
+                StringComparer.OrdinalIgnoreCase
+            );
+
+            // Assert
+            dictionary.TryGetValue("alpha", out var value).Should().BeTrue();
+            value.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void Constructor_WithConcurrencyAndCapacity_StartsEmpty()
+        {
+            // Arrange & Act
+            var dictionary = new ScoDictionaryNew<string, int>(4, 16);
+
+            // Assert
+            dictionary.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public void Constructor_WithConcurrencyCollectionComparer_InitializesFromPairs()
+        {
+            // Arrange
+            var pairs = new[] { new KeyValuePair<string, int>("Alpha", 1) };
+
+            // Act
+            var dictionary = new ScoDictionaryNew<string, int>(
+                4,
+                pairs,
+                StringComparer.OrdinalIgnoreCase
+            );
+
+            // Assert
+            dictionary.TryGetValue("alpha", out var value).Should().BeTrue();
+            value.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void Constructor_WithConcurrencyCapacityComparer_UsesComparer()
+        {
+            // Arrange & Act
+            var dictionary = new ScoDictionaryNew<string, int>(
+                4,
+                16,
+                StringComparer.OrdinalIgnoreCase
+            );
+            dictionary["Key"] = 5;
+
+            // Assert
+            dictionary.TryGetValue("key", out var value).Should().BeTrue();
+            value.Should().Be(5);
+        }
+
+        [TestMethod]
+        public void CopyConstructor_CopiesEntries()
+        {
+            // Arrange
+            var original = new ScoDictionaryNew<string, int>();
+            original["alpha"] = 1;
+
+            // Act
+            var copy = new ScoDictionaryNew<string, int>(original);
+
+            // Assert
+            copy.Should().ContainKey("alpha").WhoseValue.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void Config_SetAndGet_RoundTrips()
+        {
+            // Arrange
+            var dictionary = new ScoDictionaryNew<string, int>();
+            var config = new NewSmartSerializableConfig();
+
+            // Act
+            dictionary.Config = config;
+
+            // Assert
+            dictionary.Config.Should().BeSameAs(config);
+        }
+
+        [TestMethod]
+        public void Notify_RaisesPropertyChanged()
+        {
+            // Arrange
+            var dictionary = new ScoDictionaryNew<string, int>();
+            string changedProperty = null;
+            dictionary.PropertyChanged += (_, args) => changedProperty = args.PropertyName;
+
+            // Act
+            dictionary.Notify("TrackedProperty");
+
+            // Assert
+            changedProperty.Should().Be("TrackedProperty");
+        }
+
+        [TestMethod]
+        public void SerializeThreadSafe_WithInjectedWriter_WritesJsonToProvidedStream()
+        {
+            // Arrange
+            var dictionary = new ScoDictionaryNew<string, int>();
+            dictionary["alpha"] = 1;
+            dictionary["beta"] = 2;
+            using var stream = new MemoryStream();
+            InjectStreamWriterFactory(
+                dictionary,
+                _ => new StreamWriter(stream, Encoding.UTF8, 1024, leaveOpen: true)
+            );
+
+            // Act
+            dictionary.SerializeThreadSafe("ignored.json");
+            stream.Position = 0;
+            using var reader = new StreamReader(
+                stream,
+                Encoding.UTF8,
+                detectEncodingFromByteOrderMarks: true,
+                bufferSize: 1024,
+                leaveOpen: true
+            );
+            var json = reader.ReadToEnd();
+
+            // Assert
+            json.Should().Contain("alpha");
+            json.Should().Contain("beta");
+        }
+
+        [TestMethod]
+        public void DeserializeObject_ValidJson_RestoresEntries()
+        {
+            // Arrange
+            var settings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                TypeNameHandling = TypeNameHandling.Auto,
+            };
+            var original = new ScoDictionaryNew<string, int>();
+            original["alpha"] = 1;
+            var json = JsonConvert.SerializeObject(original, settings);
+            var dictionary = new ScoDictionaryNew<string, int>();
+
+            // Act
+            var restored = dictionary.DeserializeObject(json, settings);
+
+            // Assert
+            restored.Should().ContainKey("alpha").WhoseValue.Should().Be(1);
+            restored.Config.JsonSettings.TypeNameHandling.Should().Be(TypeNameHandling.Auto);
+        }
+
+        [TestMethod]
+        public void DeserializeObject_InvalidJson_ReturnsNull()
+        {
+            // Arrange
+            var dictionary = new ScoDictionaryNew<string, int>();
+
+            // Act
+            var restored = dictionary.DeserializeObject(
+                "{ invalid json }",
+                new JsonSerializerSettings()
+            );
+
+            // Assert
+            restored.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void Deserialize_WithInvalidPath_ReturnsEmptyInstanceAndPreservesRequestedPath()
+        {
+            // Arrange
+            var dictionary = new ScoDictionaryNew<string, int>();
+
+            // Act
+            var restored = dictionary.Deserialize(
+                "*invalid-sco-dictionary-new.json",
+                RepoRoot,
+                false
+            );
+
+            // Assert
+            restored.Should().NotBeNull();
+            restored.Should().BeEmpty();
+            restored
+                .Config.Disk.FilePath.Should()
+                .Be(Path.Combine(RepoRoot, "*invalid-sco-dictionary-new.json"));
+            StopPendingTimer(restored);
+        }
+
+        [TestMethod]
+        public void Deserialize_WithCustomSettings_CopiesJsonSettingsToReturnedInstance()
+        {
+            // Arrange
+            var dictionary = new ScoDictionaryNew<string, int>();
+            var settings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                TypeNameHandling = TypeNameHandling.Auto,
+            };
+
+            // Act
+            var restored = dictionary.Deserialize(
+                "*invalid-sco-dictionary-new.json",
+                RepoRoot,
+                false,
+                settings
+            );
+
+            // Assert
+            restored.Should().NotBeNull();
+            restored.Config.JsonSettings.TypeNameHandling.Should().Be(TypeNameHandling.Auto);
+            StopPendingTimer(restored);
+        }
+
+        [TestMethod]
+        public void ExplicitInterfaceDeserialize_WithAltLoader_ReturnsFallbackInstance()
+        {
+            // Arrange
+            IScoDictionaryNew<string, int> dictionary = new ScoDictionaryNew<string, int>();
+            var loader = CreateLoader();
+
+            // Act
+            var restored = dictionary.Deserialize(
+                loader,
+                askUserOnError: false,
+                altLoader: () =>
+                {
+                    var fallback = new ScoDictionaryNew<string, int>();
+                    fallback["fallback"] = 42;
+                    return fallback;
+                }
+            );
+
+            // Assert
+            restored.Should().ContainKey("fallback").WhoseValue.Should().Be(42);
+            StopPendingTimer(restored);
+        }
+
+        [TestMethod]
+        public async Task DeserializeAsync_WithAskUserFalse_ReturnsEmptyInstance()
+        {
+            // Arrange
+            IScoDictionaryNew<string, int> dictionary = new ScoDictionaryNew<string, int>();
+            var loader = CreateLoader();
+
+            // Act
+            var restored = await dictionary.DeserializeAsync(loader, askUserOnError: false);
+
+            // Assert
+            restored.Should().NotBeNull();
+            restored.Should().BeEmpty();
+            StopPendingTimer(restored);
+        }
+
+        [TestMethod]
+        public async Task DeserializeAsync_WithAltLoader_ReturnsFallbackInstance()
+        {
+            // Arrange
+            IScoDictionaryNew<string, int> dictionary = new ScoDictionaryNew<string, int>();
+            var loader = CreateLoader();
+
+            // Act
+            var restored = await dictionary.DeserializeAsync(
+                loader,
+                askUserOnError: false,
+                altLoader: () =>
+                {
+                    var fallback = new ScoDictionaryNew<string, int>();
+                    fallback["async-fallback"] = 7;
+                    return fallback;
+                }
+            );
+
+            // Assert
+            restored.Should().ContainKey("async-fallback").WhoseValue.Should().Be(7);
+            StopPendingTimer(restored);
+        }
+
+        [TestMethod]
+        public void GetSettingsJson_IncludesExpectedConverters()
+        {
+            // Arrange
+            var fileSystem = new Mock<IFileSystemFolderPaths>();
+            var globals = new Mock<IApplicationGlobals>();
+            globals.SetupGet(x => x.FS).Returns(fileSystem.Object);
+            // Act
+            var settings = ScoDictionaryNew<string, int>.GetSettingsJson<
+                ScoDictionaryNew<string, int>
+            >(globals.Object);
+
+            // Assert
+            settings.Formatting.Should().Be(Formatting.Indented);
+            settings
+                .Converters.Should()
+                .Contain(converter => converter.GetType().Name == "AppGlobalsConverter");
+            settings
+                .Converters.Should()
+                .Contain(converter => converter.GetType().Name == "FilePathHelperConverter");
+            settings
+                .Converters.Should()
+                .Contain(converter => converter.GetType().Name.Contains("ScoDictionaryConverter"));
+        }
+
+        [TestMethod]
+        public void ConfigPropertyChanged_WhenInvoked_RaisesPropertyChanged()
+        {
+            // Arrange
+            var dictionary = new ScoDictionaryNew<string, int>();
+            string changedProperty = null;
+            dictionary.PropertyChanged += (_, args) => changedProperty = args.PropertyName;
+            var method = typeof(ScoDictionaryNew<string, int>).GetMethod(
+                "Config_PropertyChanged",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+
+            // Act
+            method.Invoke(
+                dictionary,
+                new object[] { this, new PropertyChangedEventArgs("ConfigFlag") }
+            );
+
+            // Assert
+            changedProperty.Should().Be("ConfigFlag");
+        }
+
+        private static SmartSerializable<ScoDictionaryNew<string, int>> CreateLoader()
+        {
+            var loader = new SmartSerializable<ScoDictionaryNew<string, int>>();
+            loader.Config.Disk.FilePath = Path.Combine(RepoRoot, "*invalid-loader.json");
+            loader.Config.JsonSettings = SmartSerializable<
+                ScoDictionaryNew<string, int>
+            >.GetDefaultSettings();
+            return loader;
+        }
+
+        private static void InjectStreamWriterFactory(
+            ScoDictionaryNew<string, int> dictionary,
+            Func<string, StreamWriter> createStreamWriter
+        )
+        {
+            var smartSerializableProperty = typeof(ScoDictionaryNew<string, int>).GetProperty(
+                "ism",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            var smartSerializable = smartSerializableProperty.GetValue(dictionary);
+            var createStreamWriterField = smartSerializable
+                .GetType()
+                .GetField("_createStreamWriter", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            createStreamWriterField.SetValue(smartSerializable, createStreamWriter);
+        }
+
+        private static void StopPendingTimer(object target)
+        {
+            var smartSerializableProperty = target
+                .GetType()
+                .GetProperty("ism", BindingFlags.Instance | BindingFlags.NonPublic);
+            var smartSerializable = smartSerializableProperty?.GetValue(target);
+            var timerField = smartSerializable
+                ?.GetType()
+                .GetField("_timer", BindingFlags.Instance | BindingFlags.NonPublic);
+            var timer = timerField?.GetValue(smartSerializable);
+
+            timer?.GetType().GetMethod("StopTimer")?.Invoke(timer, null);
+            timer?.GetType().GetMethod("Dispose")?.Invoke(timer, null);
         }
     }
 }

@@ -39,22 +39,11 @@ namespace UtilitiesCS
                 .Range(0, data.GetLength(0))
                 .Select(i =>
                 {
-                    DateTime sentOn = DateTime.MaxValue;
-                    var dateField = data[i, columnInfo["SentOn"]];
-                    if (dateField is not null)
-                    {
-                        DateTime.TryParse(dateField.ToString(), out sentOn);
-                    }
-                    if (dateField is null)
-                    {
-                        sentOn = DateTime.MaxValue;
-                    }
-
                     return new
                     {
                         EntryId = data[i, columnInfo["EntryID"]],
                         MessageClass = data[i, columnInfo["MessageClass"]].ToString(),
-                        SentOn = sentOn,
+                        SentOn = DateFrom2dPosition(data, columnInfo["SentOn"], i),
                         ConversationId = data[i, columnInfo["ConversationId"]],
                         Triage = (string)data[i, columnInfo["Triage"]] ?? "Z",
                         StoreId = storeID,
@@ -201,13 +190,12 @@ namespace UtilitiesCS
         {
             DateTime date = DateTime.MaxValue;
             var dateField = data[row, column];
-            if (dateField is not null)
+            if (
+                dateField is not null
+                && DateTime.TryParse(dateField.ToString(), out DateTime parsedDate)
+            )
             {
-                DateTime.TryParse(dateField.ToString(), out date);
-            }
-            if (dateField is null)
-            {
-                date = DateTime.MaxValue;
+                date = parsedDate;
             }
 
             return date;

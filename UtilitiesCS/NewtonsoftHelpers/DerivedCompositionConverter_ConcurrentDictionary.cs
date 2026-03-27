@@ -121,6 +121,11 @@ namespace UtilitiesCS.NewtonsoftHelpers
 
             foreach (var property in derivedProperties)
             {
+                var backingField = typeBuilder.DefineField(
+                    $"_{property.Name}",
+                    property.PropertyType,
+                    FieldAttributes.Private
+                );
                 var propertyBuilder = typeBuilder.DefineProperty(
                     property.Name,
                     property.Attributes,
@@ -137,19 +142,9 @@ namespace UtilitiesCS.NewtonsoftHelpers
                 );
                 var getIL = getMethodBuilder.GetILGenerator();
                 getIL.Emit(OpCodes.Ldarg_0);
-                getIL.Emit(
-                    OpCodes.Ldfld,
-                    typeBuilder.DefineField(
-                        $"_{property.Name}",
-                        property.PropertyType,
-                        FieldAttributes.Private
-                    )
-                );
+                getIL.Emit(OpCodes.Ldfld, backingField);
                 getIL.Emit(OpCodes.Ret);
-                //propertyBuilder.SetGetMethod(getMethodBuilder);
-                propertyBuilder.SetGetMethod(
-                    DefineMethodFromExisting(typeBuilder, property.GetGetMethod())
-                );
+                propertyBuilder.SetGetMethod(getMethodBuilder);
 
                 if (property.CanWrite)
                 {
@@ -164,46 +159,13 @@ namespace UtilitiesCS.NewtonsoftHelpers
                     var setIL = setMethodBuilder.GetILGenerator();
                     setIL.Emit(OpCodes.Ldarg_0);
                     setIL.Emit(OpCodes.Ldarg_1);
-                    setIL.Emit(
-                        OpCodes.Stfld,
-                        typeBuilder.DefineField(
-                            $"_{property.Name}",
-                            property.PropertyType,
-                            FieldAttributes.Private
-                        )
-                    );
+                    setIL.Emit(OpCodes.Stfld, backingField);
                     setIL.Emit(OpCodes.Ret);
                     propertyBuilder.SetSetMethod(setMethodBuilder);
                 }
             }
 
             return typeBuilder.CreateTypeInfo().AsType();
-        }
-
-        private MethodBuilder DefineMethodFromExisting(
-            TypeBuilder typeBuilder,
-            MethodInfo methodInfo
-        )
-        {
-            var methodBuilder = typeBuilder.DefineMethod(
-                methodInfo.Name,
-                methodInfo.Attributes & ~MethodAttributes.Abstract,
-                methodInfo.CallingConvention,
-                methodInfo.ReturnType,
-                methodInfo.GetParameters().Select(p => p.ParameterType).ToArray()
-            );
-
-            var ilGenerator = methodBuilder.GetILGenerator();
-            var methodBody = methodInfo.GetMethodBody();
-            if (methodBody != null)
-            {
-                var ilBytes = methodBody.GetILAsByteArray();
-                //ilGenerator.Emit(OpCodes.Ldarg_0);
-                //ilGenerator.Emit(ilBytes);
-                methodBuilder.CreateMethodBody(ilBytes, ilBytes.Length);
-            }
-
-            return methodBuilder;
         }
 
         public object ConvertToNewClassInstance(TDerived derivedInstance)

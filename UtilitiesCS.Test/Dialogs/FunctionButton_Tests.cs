@@ -123,5 +123,88 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         #endregion
+
+        #region ButtonReassignment
+
+        // -----------------------------------------------------------------------
+        // P53-T2 — Reassigning Button unwires the old click handler
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that reassigning the underlying Button property unwires the
+        /// synchronous click handler from the previous button instance.
+        ///
+        /// Purpose:
+        ///     Confirm that after <c>fb.Button = newButton</c>, firing the old
+        ///     button's Click event does not invoke <c>ButtonClicked</c> and
+        ///     therefore does not update <c>Value</c>.
+        ///
+        /// Returns:
+        ///     Passes when Value remains at its default (0) after the old button
+        ///     is clicked following reassignment.
+        /// </summary>
+        [TestMethod]
+        [STAThread]
+        public void ReassignButton_UnwiresOldClickHandler()
+        {
+            // Arrange: create a FunctionButton whose ButtonClicked wires Button_Click
+            Func<int> func = () => 42;
+            var fb = new FunctionButton<int>("btn", "Click", DialogResult.OK, func);
+            var oldButton = fb.Button;
+
+            // Act: replace the underlying button; the setter should unwire from oldButton
+            fb.Button = new Button();
+
+            // Simulate a click on the old button — handler is now detached
+            oldButton.PerformClick();
+
+            // Assert: Value was never set (handler was unwired before the click)
+            fb.Value.Should().Be(0);
+        }
+
+        #endregion
+
+        #region ButtonClickAsync
+
+        // -----------------------------------------------------------------------
+        // P53-T3 — Async callback executes exactly once when button is clicked
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that calling <c>Button_ClickAsync</c> directly executes the
+        /// async callback exactly once and stores the result in <c>Value</c>.
+        ///
+        /// Purpose:
+        ///     Confirm the async click path awaits <c>ButtonClickedAsync</c> and
+        ///     writes the returned value to the Value property exactly once.
+        ///
+        /// Returns:
+        ///     Passes when Value equals 99 and the delegate was invoked exactly once.
+        /// </summary>
+        [TestMethod]
+        [STAThread]
+        public void ButtonClickAsync_ExecutesCallbackExactlyOnce()
+        {
+            // Arrange: wire an already-complete async callback so the await resolves
+            // synchronously (no SynchronizationContext in MSTest → Task.FromResult
+            // continuation runs inline). Count invocations to assert exactly-once.
+            var fb = new FunctionButton<int>();
+            fb.Button = new Button();
+            int callCount = 0;
+            fb.ButtonClickedAsync = () =>
+            {
+                callCount++;
+                return System.Threading.Tasks.Task.FromResult(99);
+            };
+
+            // Act: invoke the internal async handler directly
+            fb.Button_ClickAsync(fb.Button, EventArgs.Empty);
+
+            // Assert: delegate invoked exactly once and Value reflects the result
+            callCount.Should().Be(1);
+            fb.Value.Should().Be(99);
+        }
+
+        #endregion
     }
 }

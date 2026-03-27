@@ -64,8 +64,12 @@ namespace UtilitiesCS.Test.HelperClasses
             thread.Join();
 
             // Assert
-            caughtException.Should().BeNull("construction and ResolveParentType should not throw for a Panel parent");
-            result.Should().Be(typeof(Panel), "a label whose parent is a Panel should resolve to Panel type");
+            caughtException
+                .Should()
+                .BeNull("construction and ResolveParentType should not throw for a Panel parent");
+            result
+                .Should()
+                .Be(typeof(Panel), "a label whose parent is a Panel should resolve to Panel type");
         }
 
         /// <summary>
@@ -118,9 +122,17 @@ namespace UtilitiesCS.Test.HelperClasses
             thread.Join();
 
             // Assert
-            caughtException.Should().BeNull("constructor should not throw for a Panel-parented label");
-            columnNumber.Should().Be(0, "Panel path sets ColumnNumber to 0 since no TableLayoutPanel column applies");
-            tlp.Should().BeNull("Panel path does not assign a TableLayoutPanel, so TLP must be null");
+            caughtException
+                .Should()
+                .BeNull("constructor should not throw for a Panel-parented label");
+            columnNumber
+                .Should()
+                .Be(
+                    0,
+                    "Panel path sets ColumnNumber to 0 since no TableLayoutPanel column applies"
+                );
+            tlp.Should()
+                .BeNull("Panel path does not assign a TableLayoutPanel, so TLP must be null");
         }
 
         /// <summary>
@@ -177,8 +189,12 @@ namespace UtilitiesCS.Test.HelperClasses
             // Assert
             caughtException.Should().BeNull("Toggle should not throw");
             initialVisible.Should().BeFalse("label is initialised with Visible = false");
-            afterFirstToggle.Should().BeTrue("first Toggle from Off state must make the label visible");
-            afterSecondToggle.Should().BeFalse("second Toggle from On state must restore the label to not visible");
+            afterFirstToggle
+                .Should()
+                .BeTrue("first Toggle from Off state must make the label visible");
+            afterSecondToggle
+                .Should()
+                .BeFalse("second Toggle from On state must restore the label to not visible");
         }
     }
 }

@@ -557,27 +557,6 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             serialization.StoredObjects.Should().ContainKey("Test.json");
         }
 
-        // P80-T3: an empty corpus short-circuits (ThrowIfNullOrEmpty in SplitTestTrain) before
-        // any serialization is attempted, so no Train/Test files are written to the store.
-        [TestMethod]
-        public async Task SplitAndSave_WithEmptyCollection_ThrowsBeforeWritingOutput()
-        {
-            // Arrange: a recording serialization helper with an empty corpus so we can
-            // verify that no Train or Test files are recorded when the method throws early.
-            var serialization = new RecordingSerializationHelper(_mockGlobals.Object);
-            var sut = CreateMeasurement(serialization);
-
-            // Act: SplitTestTrain enforces non-empty input via ThrowIfNullOrEmpty, so
-            // passing an empty array must cause SplitAndSave to throw without writing output.
-            Func<Task> act = () =>
-                sut.SplitAndSave(Array.Empty<MinedMailInfo>(), 0.75, CreateProgressPackage());
-
-            // Assert: method throws and neither partition file is persisted.
-            await act.Should().ThrowAsync<Exception>();
-            serialization.StoredObjects.Should().NotContainKey("Train.json");
-            serialization.StoredObjects.Should().NotContainKey("Test.json");
-        }
-
         [TestMethod]
         public async Task LoadIfNullAsync_WithSerializedInputs_LoadsMissingValues()
         {

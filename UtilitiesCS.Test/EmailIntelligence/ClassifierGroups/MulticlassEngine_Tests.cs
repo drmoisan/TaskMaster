@@ -14,6 +14,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
 {
     /// <summary>
     /// Concrete test implementation of MulticlassEngine for testing the abstract base class.
+    /// Returns true from the build path without creating any classifiers, keeping tests simple.
     /// </summary>
     internal class TestMulticlassEngine : MulticlassEngine<TestMulticlassEngine>
     {
@@ -38,6 +39,39 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
         {
             return Task.CompletedTask;
         }
+    }
+
+    /// <summary>
+    /// Concrete test implementation that builds one classifier per supplied mail.
+    /// Used to verify that the build path propagates input cardinality to the classifier group.
+    /// </summary>
+    internal class TestBuildingEngine : MulticlassEngine<TestBuildingEngine>
+    {
+        public TestBuildingEngine()
+            : base() { }
+
+        public TestBuildingEngine(IApplicationGlobals globals)
+            : base(globals) { }
+
+        public override Task<bool> BuildClassifiersAsync(
+            BayesianClassifierGroup classifierGroup,
+            MinedMailInfo[] collection,
+            ProgressPackage ppkg,
+            string groupName,
+            int minimumCountPerToken = 0
+        )
+        {
+            // Create one classifier entry per input mail so tests can assert classifier count.
+            foreach (var mail in collection)
+            {
+                var key = mail.GroupingKey ?? mail.EntryId ?? Guid.NewGuid().ToString();
+                classifierGroup.Classifiers[key] = new BayesianClassifierShared(key);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public override Task TestAsync(MailItemHelper helper) => Task.CompletedTask;
     }
 
     [TestClass]
@@ -287,6 +321,93 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
 
             var result = await engine.InitAsync("NonExistentGroup");
             result.Should().BeNull();
+        }
+
+        #endregion
+
+        #region P64 — Init wiring, build cardinality, and missing-group short-circuit
+
+        // -----------------------------------------------------------------------
+        // P64-T1 — InitAsync wires the classifier group, engine name, and globals
+        //           when the requested group exists in the manager.
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        public async Task InitAsync_GroupInManager_WiresClassifierGroupAndEngineName()
+        {
+            // Arrange: manager contains the target group.
+            var mockGlobals = CreateMockGlobals();
+            var mockAf = new Mock<IAppAutoFileObjects>();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+            var classifierGroup = new BayesianClassifierGroup();
+            manager["MyGroup"] = classifierGroup.ToAsyncLazy();
+            mockAf.Setup(a => a.Manager).Returns(manager);
+            mockGlobals.Setup(g => g.AF).Returns(mockAf.Object);
+
+            var engine = new TestMulticlassEngine(mockGlobals.Object);
+
+            // Act: initialize using the group name.
+            var result = await engine.InitAsync("MyGroup");
+
+            // Assert: returned engine has the expected classifier group, name, and globals.
+            result.Should().NotBeNull();
+            result!.ClassifierGroup.Should().BeSameAs(classifierGroup);
+            result.EngineName.Should().Be("MyGroup");
+            result.Globals.Should().BeSameAs(mockGlobals.Object);
+        }
+
+        // -----------------------------------------------------------------------
+        // P64-T2 — BuildClassifiersAsync creates one classifier per mail in the
+        //           input collection, confirming the build path scales with input.
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        public async Task BuildClassifiersAsync_ThreeMails_CreatesThreeClassifiers()
+        {
+            // Arrange: three mails with distinct grouping keys.
+            var mockGlobals = CreateMockGlobals();
+            var engine = new TestBuildingEngine(mockGlobals.Object);
+            var cg = new BayesianClassifierGroup();
+            var mails = new[]
+            {
+                new MinedMailInfo { GroupingKey = "Category:A" },
+                new MinedMailInfo { GroupingKey = "Category:B" },
+                new MinedMailInfo { GroupingKey = "Category:C" },
+            };
+
+            // Act: run the build path.
+            await engine.BuildClassifiersAsync(cg, mails, null, "TestGroup");
+
+            // Assert: one classifier was created per input mail.
+            cg.Classifiers.Should().HaveCount(3);
+            cg.Classifiers.Should().ContainKey("Category:A");
+            cg.Classifiers.Should().ContainKey("Category:B");
+            cg.Classifiers.Should().ContainKey("Category:C");
+        }
+
+        // -----------------------------------------------------------------------
+        // P64-T3 — InitAsync returns default (null) when the group name is absent
+        //           from the manager, short-circuiting without creating a classifier.
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        public async Task InitAsync_GroupAbsentFromManager_ReturnsNullWithoutCreatingClassifier()
+        {
+            // Arrange: completely empty manager.
+            var mockGlobals = CreateMockGlobals();
+            var mockAf = new Mock<IAppAutoFileObjects>();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+            mockAf.Setup(a => a.Manager).Returns(manager);
+            mockGlobals.Setup(g => g.AF).Returns(mockAf.Object);
+
+            var engine = new TestMulticlassEngine(mockGlobals.Object);
+
+            // Act: attempt to init with a group that is not in the manager.
+            var result = await engine.InitAsync("MissingGroup");
+
+            // Assert: returns null and engine retains no classifier group.
+            result.Should().BeNull();
+            engine.ClassifierGroup.Should().BeNull();
         }
 
         #endregion

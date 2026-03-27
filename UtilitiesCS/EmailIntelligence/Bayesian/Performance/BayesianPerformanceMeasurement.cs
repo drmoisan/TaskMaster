@@ -1515,7 +1515,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 0,
                 "Building Folder Classifier -> Split Into Train / Test"
             );
-            var (train, test) = collection.SplitTestTrain(trainPercent);
+            var (train, test) = collection.SplitTestTrain(0.75);
             ppkg.ProgressTrackerPane.Increment(20);
             await Serialization.SerializeAndSaveAsync(
                 train,

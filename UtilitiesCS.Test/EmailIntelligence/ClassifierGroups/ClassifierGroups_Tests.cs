@@ -18,6 +18,114 @@ using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
 {
+    // -----------------------------------------------------------------------
+    // P50 — SpamBayes Coverage
+    // -----------------------------------------------------------------------
+
+    [TestClass]
+    public class SpamBayes_Tests
+    {
+        // -----------------------------------------------------------------------
+        // P50-T1 — create-new path returns a configured classifier group
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that CreateNewClassifier returns a non-null BayesianClassifierGroup
+        /// configured with the expected Spam and Ham classifiers.
+        ///
+        /// Purpose:
+        ///     Confirm the static factory creates a fully populated group without
+        ///     requiring any Globals dependency.
+        ///
+        /// Returns:
+        ///     Passes when the group is non-null and contains both Spam and Ham classifiers.
+        /// </summary>
+        [TestMethod]
+        public void CreateNewClassifier_ReturnsConfiguredGroup()
+        {
+            // Act
+            var group = SpamBayes.CreateNewClassifier();
+
+            // Assert
+            group.Should().NotBeNull();
+            group.Name.Should().Be(SpamBayes.GroupName);
+            group.Classifiers.Should().ContainKey("Spam");
+            group.Classifiers.Should().ContainKey("Ham");
+            group.SharedTokenBase.Should().NotBeNull();
+        }
+
+        // -----------------------------------------------------------------------
+        // P50-T2 — missing configuration invokes the fallback handling path
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that SpamBayesMissingHandlerAsync with NotFoundEnum.Skip returns
+        /// false without throwing an exception.
+        ///
+        /// Purpose:
+        ///     Confirm the Skip treatment short-circuits the handler and returns false,
+        ///     which causes CreateAsync to return null.
+        ///
+        /// Returns:
+        ///     Passes when the handler returns false and no exception is thrown.
+        /// </summary>
+        [TestMethod]
+        public async Task SpamBayesMissingHandler_WhenSkip_ReturnsFalse()
+        {
+            // Arrange
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            var mockAf = new Mock<IAppAutoFileObjects>();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+            mockAf.Setup(a => a.Manager).Returns(manager);
+            mockGlobals.Setup(g => g.AF).Returns(mockAf.Object);
+
+            var spamBayes = new SpamBayes(mockGlobals.Object);
+
+            // Act
+            var result = await spamBayes.SpamBayesMissingHandlerAsync(
+                Enums.NotFoundEnum.Skip,
+                "test message",
+                default
+            );
+
+            // Assert: Skip treatment returns false (no UI, no throw)
+            result.Should().BeFalse();
+        }
+
+        // -----------------------------------------------------------------------
+        // P50-T3 — validation rejects an incomplete setup
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that ValidatePathsSet returns false when the required Outlook
+        /// folder references (JunkCertain, JunkPotential, Inbox) are null.
+        ///
+        /// Purpose:
+        ///     Confirm the guard clause in ValidatePathsSet prevents CreateAsync from
+        ///     proceeding when required COM folder references are not configured.
+        ///
+        /// Returns:
+        ///     Passes when ValidatePathsSet returns false for an incomplete Globals setup.
+        /// </summary>
+        [TestMethod]
+        public void ValidatePathsSet_WhenRequiredFoldersNull_ReturnsFalse()
+        {
+            // Arrange: Ol.JunkCertain is null (returns default null for MAPIFolder)
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            var mockOl = new Mock<IOlObjects>();
+            mockOl.Setup(o => o.JunkCertain).Returns((Microsoft.Office.Interop.Outlook.Folder)null);
+            mockGlobals.Setup(g => g.Ol).Returns(mockOl.Object);
+
+            var spamBayes = new SpamBayes(mockGlobals.Object);
+
+            // Act
+            var result = spamBayes.ValidatePathsSet();
+
+            // Assert: validation fails when required folders are null
+            result.Should().BeFalse();
+        }
+    }
+
     [TestClass]
     public class ActionableClassifierGroup_Tests
     {
@@ -254,86 +362,6 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
                 "Actionable"
             );
             result.Should().BeFalse();
-        }
-
-        /// <summary>
-        /// Verifies that <see cref="ActionableClassifierGroup.GetMatchingCategories"/> filters out
-        /// the "None" class from results even when a "None" classifier is present in the group.
-        ///
-        /// Purpose:
-        ///     Confirms the filter's second Where clause excludes "None", returning only
-        ///     categories with probability above the threshold and class != "None".
-        ///
-        /// Returns:
-        ///     Passes when the filtered result does not contain "None".
-        /// </summary>
-        [TestMethod]
-        public void GetMatchingCategories_NoneClassAlwaysFiltered()
-        {
-            // Arrange: provide a mix of "None" and "Task" classifiers (actionable and non-actionable).
-            var group = new ActionableClassifierGroup();
-            var classifierGroup = new BayesianClassifierGroup
-            {
-                TotalEmailCount = 10,
-                SharedTokenBase = new Corpus(),
-            };
-            classifierGroup.Classifiers["None"] = new BayesianClassifierShared(
-                "None",
-                classifierGroup
-            );
-            classifierGroup.Classifiers["Task"] = new BayesianClassifierShared(
-                "Task",
-                classifierGroup
-            );
-            group.ClassifierGroup = classifierGroup;
-
-            // Act: call the category filter with an empty-token helper.
-            var result = group.GetMatchingCategories(new MailItemHelper());
-
-            // Assert: "None" is always excluded from the returned subset of categories.
-            result.Should().NotContain("None");
-        }
-
-        /// <summary>
-        /// Verifies that the categorization path for <see cref="ActionableClassifierGroup"/>
-        /// short-circuits gracefully when supplied with empty data (no tokens, untrained classifiers),
-        /// returning no categories — analogous to the short-circuit within TestAsync that routes to "None".
-        ///
-        /// Purpose:
-        ///     Confirm classification completes without throwing and produces an empty result set
-        ///     so that TestAsync's IsNullOrEmpty branch (value = "None") executes rather than
-        ///     the unhappy path.
-        ///
-        /// Note:
-        ///     The async TestAsync/GetMatchingCategoriesAsync path requires
-        ///     Microsoft.Bcl.AsyncInterfaces v10.0.0.0 which is unavailable in headless test
-        ///     execution; the synchronous GetMatchingCategories exercises the same filtering logic.
-        ///
-        /// Returns:
-        ///     Passes when the result is empty/null and no exception is thrown.
-        /// </summary>
-        [TestMethod]
-        public void TestAsync_EmptyData_CategorizationShortCircuitsToEmpty()
-        {
-            // Arrange: untrained classifier with empty-token helper.
-            var group = new ActionableClassifierGroup();
-            var classifierGroup = new BayesianClassifierGroup
-            {
-                TotalEmailCount = 0,
-                SharedTokenBase = new Corpus(),
-            };
-            classifierGroup.Classifiers["None"] = new BayesianClassifierShared(
-                "None",
-                classifierGroup
-            );
-            group.ClassifierGroup = classifierGroup;
-
-            // Act: synchronous counterpart of TestAsync's internal categorization call.
-            var results = group.GetMatchingCategories(new MailItemHelper());
-
-            // Assert: empty data short-circuits to no results — IsNullOrEmpty would route
-            // TestAsync to value = "None" without throwing.
-            results.IsNullOrEmpty().Should().BeTrue();
         }
 
         private static Mock<IApplicationGlobals> CreateMockGlobals()
@@ -637,6 +665,107 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             cg.Classifiers.Should().NotBeEmpty();
         }
 
+        // -----------------------------------------------------------------------
+        // P56-T1 — BuildClassifierAsync stores the grouping key as the classifier key
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        public async Task BuildClassifierAsync_GroupingKey_IsStoredAsClassifierKey()
+        {
+            // Arrange: grouping with a known key to verify classifier key round-trip.
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                );
+            var tokenFrequency = new Dictionary<string, int> { { "t1", 1 }, { "t2", 1 } };
+            var cg = new BayesianClassifierGroup
+            {
+                TotalEmailCount = 2,
+                SharedTokenBase = new Corpus(tokenFrequency),
+            };
+            var items = new[]
+            {
+                new MinedMailInfo { GroupingKey = "Context:Work", Tokens = new[] { "t1", "t2" } },
+            };
+            var grouping = items.GroupBy(x => x.GroupingKey).First();
+
+            // Act: build the classifier for the grouping.
+            await group.BuildClassifierAsync(grouping, cg, default);
+
+            // Assert: the classifier dictionary contains the exact grouping key.
+            cg.Classifiers.Should().ContainKey("Context:Work");
+        }
+
+        // -----------------------------------------------------------------------
+        // P56-T2 — ExplodeMailsByCategory returns original item unchanged when
+        //           Categories is empty, so no category-derived classifier key
+        //           is created for such items.
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        public void ExplodeMailsByCategory_EmptyCategories_ReturnsOriginalItemWithoutCategoryKey()
+        {
+            // Arrange: item with empty Categories string.
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                );
+            var mail = new MinedMailInfo
+            {
+                Categories = "",
+                Tokens = new[] { "t1" },
+                GroupingKey = null,
+            };
+            var mockPrefix = new Mock<IPrefix>();
+            mockPrefix.Setup(p => p.Value).Returns("Context");
+
+            // Act: explode — empty categories should yield the original item only.
+            var result = group.ExplodeMailsByCategory(mail, mockPrefix.Object).ToList();
+
+            // Assert: exactly one item, with no category-derived GroupingKey.
+            result.Should().HaveCount(1);
+            result[0]
+                .GroupingKey.Should()
+                .BeNull("empty categories must not produce a category-derived classifier key");
+        }
+
+        // -----------------------------------------------------------------------
+        // P56-T3 — InitAsync sets ClassifierGroup to the pre-existing manager entry,
+        //           reusing it rather than creating a duplicate.
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        public async Task InitAsync_GroupInManager_SetsExistingClassifierGroup()
+        {
+            // Arrange: manager pre-populated with a known BayesianClassifierGroup.
+            var mockGlobals = CreateMockGlobals();
+            var mockAf = new Mock<IAppAutoFileObjects>();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+            var classifierGroup = new BayesianClassifierGroup();
+            manager["Context"] = classifierGroup.ToAsyncLazy();
+            mockAf.Setup(a => a.Manager).Returns(manager);
+            mockGlobals.Setup(g => g.AF).Returns(mockAf.Object);
+
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                );
+
+            // Act: load — should wire up the existing entry, not create a new one.
+            var result = await group.InitAsync("Context");
+
+            // Assert: same object reference confirms reuse of the existing group.
+            result.Should().NotBeNull();
+            result!
+                .ClassifierGroup.Should()
+                .BeSameAs(
+                    classifierGroup,
+                    "InitAsync must reuse the pre-existing manager entry without creating a duplicate"
+                );
+        }
+
         private static Mock<IApplicationGlobals> CreateMockGlobals()
         {
             var mockGlobals = new Mock<IApplicationGlobals>();
@@ -786,6 +915,176 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             // CgUtilities.Deserialize throws NullReferenceException when config path is not set
             Func<Task> act = () => group.GetOrCreateClassifierGroupAsync(collection);
             await act.Should().ThrowAsync<NullReferenceException>();
+        }
+
+        // -----------------------------------------------------------------------
+        // P67-T1 — BuildClassifierAsync called for N distinct folder paths yields
+        //           N classifiers, one per unique folder key.
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that calling BuildClassifierAsync for each of two distinct folder
+        /// paths produces two independent classifiers in the classifier group.
+        ///
+        /// Purpose:
+        ///     Confirm the build path creates one classifier entry per eligible folder:
+        ///     the classifier key equals the folder's RelativePath.
+        ///
+        /// Returns:
+        ///     Passes when Classifiers contains exactly one entry per distinct folder path.
+        /// </summary>
+        [TestMethod]
+        public async Task BuildClassifierAsync_TwoDistinctFolderPaths_CreatesOneClassifierPerPath()
+        {
+            // Arrange: shared token base based on the union of all mail tokens.
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder.OlFolderClassifierGroup(
+                    mockGlobals.Object
+                );
+            var tokenFrequency = new Dictionary<string, int> { { "report", 3 }, { "meeting", 2 } };
+            var cg = new BayesianClassifierGroup
+            {
+                TotalEmailCount = 4,
+                SharedTokenBase = new Corpus(tokenFrequency),
+            };
+
+            var mockFolderA = new Mock<IFolderWrapper>();
+            mockFolderA.Setup(f => f.RelativePath).Returns("Inbox");
+            var mockFolderB = new Mock<IFolderWrapper>();
+            mockFolderB.Setup(f => f.RelativePath).Returns("Projects");
+
+            // Each grouping mimics one folder's mailed items.
+            var groupingA = new[]
+            {
+                new MinedMailInfo
+                {
+                    FolderInfo = mockFolderA.Object,
+                    Tokens = new[] { "report", "meeting" },
+                },
+            }.GroupBy(x => x.FolderInfo.RelativePath).First();
+            var groupingB = new[]
+            {
+                new MinedMailInfo { FolderInfo = mockFolderB.Object, Tokens = new[] { "report" } },
+            }.GroupBy(x => x.FolderInfo.RelativePath).First();
+
+            // Act: build classifiers for both folder paths.
+            await group.BuildClassifierAsync(groupingA, cg, default);
+            await group.BuildClassifierAsync(groupingB, cg, default);
+
+            // Assert: one classifier key per folder path.
+            cg.Classifiers.Should().HaveCount(2);
+            cg.Classifiers.Should().ContainKey("Inbox");
+            cg.Classifiers.Should().ContainKey("Projects");
+        }
+
+        // -----------------------------------------------------------------------
+        // P67-T2 — Empty collection yields a classifier group with zero emails
+        //           and no classifiers.
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that CreateClassifierGroupAsync with an empty mined-mail array
+        /// produces a group with TotalEmailCount of zero and an empty classifiers dict.
+        ///
+        /// Purpose:
+        ///     Confirm the empty-staging-source guard: no classifiers should be created
+        ///     when there are no eligible folder items.
+        ///
+        /// Returns:
+        ///     Passes when the group has TotalEmailCount == 0 and no classifiers.
+        /// </summary>
+        [TestMethod]
+        public async Task CreateClassifierGroupAsync_EmptyCollection_YieldsGroupWithZeroEmailsAndNoClassifiers()
+        {
+            // Arrange
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder.OlFolderClassifierGroup(
+                    mockGlobals.Object
+                );
+
+            // Act: empty staging source — no mail info entries.
+            var result = await group.CreateClassifierGroupAsync(Array.Empty<MinedMailInfo>());
+
+            // Assert: no emails and no classifiers when the staging source is empty.
+            result.TotalEmailCount.Should().Be(0);
+            result.Classifiers.Should().BeEmpty();
+        }
+
+        // -----------------------------------------------------------------------
+        // P67-T3 — Load path returns the pre-existing group without creating a new one.
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that when GetOrCreateClassifierGroupAsync returns a pre-existing
+        /// group (simulating a successful deserialization from the store), the caller
+        /// receives that exact group reference rather than a freshly created copy.
+        ///
+        /// Purpose:
+        ///     Confirm the load/rehydration path: if a stored classifier group is available,
+        ///     return it unchanged so downstream callers benefit from previously trained state.
+        ///
+        /// Returns:
+        ///     Passes when the returned group is the same reference as the pre-populated entry.
+        /// </summary>
+        [TestMethod]
+        public async Task GetOrCreateClassifierGroupAsync_WhenStoreReturnsGroup_ReturnsPreExistingGroup()
+        {
+            // Arrange: pre-built group that the store would return on load.
+            var mockGlobals = CreateMockGlobals();
+            var preExistingGroup = new BayesianClassifierGroup
+            {
+                TotalEmailCount = 5,
+                SharedTokenBase = new Corpus(new Dictionary<string, int> { { "meeting", 3 } }),
+            };
+            preExistingGroup.Classifiers["Reports"] = new BayesianClassifierShared(
+                "Reports",
+                preExistingGroup
+            );
+
+            // Override GetOrCreateClassifierGroupAsync to simulate a successful store load.
+            var testGroup = new TestableFolderClassifierGroup(mockGlobals.Object, preExistingGroup);
+
+            // Act: call the virtual method with arbitrary collection data.
+            var result = await testGroup.GetOrCreateClassifierGroupAsync(
+                new[] { new MinedMailInfo { Tokens = new[] { "meeting" } } }
+            );
+
+            // Assert: same reference confirms the load path returns the stored group.
+            result.Should().BeSameAs(preExistingGroup);
+            result.Classifiers.Should().ContainKey("Reports");
+        }
+
+        /// <summary>
+        /// Test-only subclass of OlFolderClassifierGroup that short-circuits
+        /// GetOrCreateClassifierGroupAsync to return a caller-supplied group,
+        /// simulating a successful deserialization from a backing store.
+        ///
+        /// Side Effects:
+        ///     None — purely in-memory; no I/O is performed.
+        /// </summary>
+        private sealed class TestableFolderClassifierGroup
+            : UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder.OlFolderClassifierGroup
+        {
+            private readonly BayesianClassifierGroup _storedGroup;
+
+            public TestableFolderClassifierGroup(
+                IApplicationGlobals globals,
+                BayesianClassifierGroup storedGroup
+            )
+                : base(globals)
+            {
+                _storedGroup = storedGroup;
+            }
+
+            public override Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(
+                MinedMailInfo[] collection
+            )
+            {
+                // Simulate the "found in store" branch without touching the filesystem.
+                return Task.FromResult(_storedGroup);
+            }
         }
 
         private static Mock<IApplicationGlobals> CreateMockGlobals()

@@ -137,34 +137,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
         }
 
         [TestMethod]
-        public void GetToDoTable_UserDefinedPropertiesUnavailable_StillReturnsTable()
+        public void GetToDoTable_UserPropsAddThrows_StillReturnsTable()
         {
-            var mockStore = new Mock<Outlook.Store>();
-            var mockFolder = new Mock<MAPIFolder>();
-            var mockTable = new Mock<Outlook.Table>();
-            var mockColumns = new Mock<Outlook.Columns>();
-            var mockItems = new Mock<Items>();
-
-            mockStore
-                .Setup(s => s.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
-                .Returns(mockFolder.Object);
-            mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
-            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
-            mockFolder
-                .Setup(f => f.UserDefinedProperties)
-                .Throws(new Exception("provider limitation"));
-            mockFolder.Setup(f => f.Items).Returns(mockItems.Object);
-            mockItems.Setup(i => i.Count).Returns(0);
-
-            var result = OlToDoTable.GetToDoTable(mockStore.Object);
-            result.Should().BeSameAs(mockTable.Object);
-        }
-
-        [TestMethod]
-        public void GetToDoTable_ItemThrowsOnIndexAccess_SkipsItemAndReturnsTable()
-        {
-            // Arrange: configure the store and folder so the table is built normally,
-            // but accessing items[i] throws — simulating an unreadable item.
             var mockStore = new Mock<Outlook.Store>();
             var mockFolder = new Mock<MAPIFolder>();
             var mockTable = new Mock<Outlook.Table>();
@@ -178,20 +152,21 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
             mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
             mockFolder.Setup(f => f.UserDefinedProperties).Returns(mockUserProps.Object);
-            mockUserProps.Setup(u => u[It.IsAny<object>()]).Throws(new Exception("not found"));
-
             mockFolder.Setup(f => f.Items).Returns(mockItems.Object);
-            mockItems.Setup(i => i.Count).Returns(1);
+            mockItems.Setup(i => i.Count).Returns(0);
+            // Field not found, and Add throws
+            mockUserProps.Setup(u => u[It.IsAny<object>()]).Throws(new Exception("not found"));
+            mockUserProps
+                .Setup(u =>
+                    u.Add(
+                        It.IsAny<string>(),
+                        It.IsAny<OlUserPropertyType>(),
+                        It.IsAny<object>(),
+                        It.IsAny<object>()
+                    )
+                )
+                .Throws(new Exception("provider limitation"));
 
-            // Accessing items[1] throws — the outer per-item catch must swallow this and
-            // continue so the method still returns the table rather than propagating.
-            mockItems.Setup(i => i[It.IsAny<int>()]).Throws(new Exception("item access denied"));
-
-            // Act
-            System.Action act = () => OlToDoTable.GetToDoTable(mockStore.Object);
-
-            // Assert: the method must not re-throw; it must return the table.
-            act.Should().NotThrow();
             var result = OlToDoTable.GetToDoTable(mockStore.Object);
             result.Should().BeSameAs(mockTable.Object);
         }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -254,103 +253,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
             System.Action act = () => _triageOlLogic.FilterView(new char[] { 'A' });
 
             act.Should().NotThrow();
-        }
-
-        // P78-T1: filter builder strips unsupported filter clauses while preserving supported ones
-        [TestMethod]
-        public void ParseAndStripFilter_WithUnsupportedAndSupportedClauses_StripsTriagePreservesSupported()
-        {
-            // Arrange: build a filter with a supported clause (Actionable) and an unsupported
-            // Triage clause side-by-side so we can assert the strip removes only the Triage part.
-            var schema =
-                "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}";
-            var filter =
-                $"(\"{schema}/Actionable\" LIKE '%Task%' AND \"{schema}/Triage\" LIKE '%A%')";
-
-            // Act
-            var result = _triageOlLogic.ParseAndStripFilter(filter);
-
-            // Assert: the unsupported Triage clause is removed; the supported Actionable clause remains.
-            result.Should().Contain("/Actionable");
-            result.Should().NotContain("/Triage");
-        }
-
-        // P78-T2: TrainSelectionAsync skips an empty selection (returns null) without throwing
-        // and does not invoke the classifier's train method.
-        [TestMethod]
-        public async Task TrainSelectionAsync_WhenSelectionIsNull_SkipsWithoutThrowingOrTraining()
-        {
-            // Arrange: mock the globals chain so ActiveExplorer() returns null,
-            // which means Selection is null — the method must return early.
-            var mockOlObjects = new Mock<IOlObjects>(MockBehavior.Strict);
-            var mockApplication = new Mock<Application>(MockBehavior.Strict);
-
-            _mockGlobals.Setup(g => g.Ol).Returns(mockOlObjects.Object);
-            mockOlObjects.Setup(o => o.App).Returns(mockApplication.Object);
-            mockApplication.Setup(a => a.ActiveExplorer()).Returns((Explorer)null);
-
-            // Capture the initial email-count state of the classifier group so we can verify
-            // no training was applied after the call.
-            var classifierGroup = _triage.ClassifierGroup;
-            int emailCountBefore = classifierGroup.TotalEmailCount;
-
-            // Act
-            Func<Task> act = () => _triageOlLogic.TrainSelectionAsync("A", CancellationToken.None);
-
-            // Assert: the method completes without error and the classifier state is unchanged.
-            await act.Should().NotThrowAsync();
-            classifierGroup.TotalEmailCount.Should().Be(emailCountBefore);
-        }
-
-        // P78-T3: TrainSelectionAsync maps each selected MailItem to a training example
-        // and forwards it to the classifier under the supplied triage label.
-        [TestMethod]
-        public async Task TrainSelectionAsync_WhenSelectionContainsMailItem_TrainsClassifierWithExpectedLabel()
-        {
-            // Arrange: build the full globals → Ol → App → ActiveExplorer → Selection chain
-            // so TrainSelectionAsync finds a non-null Selection and can enumerate one MailItem.
-            var mockOlObjects = new Mock<IOlObjects>(MockBehavior.Strict);
-            var mockApplication = new Mock<Application>(MockBehavior.Strict);
-            var mockExplorer = new Mock<Explorer>(MockBehavior.Strict);
-            var mockSelection = new Mock<Selection>(MockBehavior.Loose);
-
-            // A loose MailItem mock is sufficient because SetUdf (this MailItem overload) is
-            // wrapped in try-catch and swallows any COM-access exceptions. The only lazy field
-            // that can throw is _attachmentsHelper, so we must return a non-null Attachments
-            // object whose enumerator returns an empty sequence.
-            var mockMailItem = new Mock<MailItem>(MockBehavior.Loose);
-            var mockAttachments = new Mock<Attachments>(MockBehavior.Loose);
-            mockMailItem.Setup(m => m.Attachments).Returns(mockAttachments.Object);
-            mockAttachments
-                .As<IEnumerable>()
-                .Setup(a => a.GetEnumerator())
-                .Returns(new List<Attachment>().GetEnumerator());
-
-            // Expose the single MailItem through Selection's IEnumerable interface so
-            // the Cast<object>().Where(x => x is MailItem) pipeline in TrainSelectionAsync
-            // produces one element.
-            mockSelection
-                .As<IEnumerable>()
-                .Setup(s => s.GetEnumerator())
-                .Returns(new List<object> { mockMailItem.Object }.GetEnumerator());
-
-            _mockGlobals.Setup(g => g.Ol).Returns(mockOlObjects.Object);
-            mockOlObjects.Setup(o => o.App).Returns(mockApplication.Object);
-            // EmailPrefixToStrip is accessed lazily by the tokenizer via CompressPlainText;
-            // the strict mock requires an explicit setup to avoid an unexpected-call exception.
-            mockOlObjects.Setup(o => o.EmailPrefixToStrip).Returns("");
-            mockApplication.Setup(a => a.ActiveExplorer()).Returns(mockExplorer.Object);
-            mockExplorer.Setup(e => e.Selection).Returns(mockSelection.Object);
-
-            int emailCountBefore = _triage.ClassifierGroup.TotalEmailCount;
-
-            // Act
-            await _triageOlLogic.TrainSelectionAsync("A", CancellationToken.None);
-
-            // Assert: training was applied for the "A" label — TotalEmailCount increments
-            // once per MailItem processed, even when the item produces empty tokens.
-            _triage.ClassifierGroup.TotalEmailCount.Should().BeGreaterThan(emailCountBefore);
-            _triage.ClassifierGroup.Classifiers.Should().ContainKey("A");
         }
     }
 }

@@ -74,11 +74,11 @@ namespace UtilitiesCS
             // *********************************
             // **********Initialize*************
             var loopTo = LenX + 3;
-            for (x = 3; x <= loopTo; x++)
+            for (x = 3; x < loopTo; x++)
                 Matrix[x, 1] = words_X[x - 3];
 
             var loopTo1 = LenY + 3;
-            for (y = 3; y <= loopTo1; y++)
+            for (y = 3; y < loopTo1; y++)
                 Matrix[1, y] = words_Y[y - 3];
 
             var loopTo2 = LenX + 3;
@@ -93,10 +93,10 @@ namespace UtilitiesCS
             // *********************************
 
             var loopTo4 = LenX + 3;
-            for (x = 3; x <= loopTo4; x++)
+            for (x = 3; x < loopTo4; x++)
             {
                 var loopTo5 = LenY + 3;
-                for (y = 3; y <= loopTo5; y++)
+                for (y = 3; y < loopTo5; y++)
                 {
                     calcA = (int)Matrix[x - 1, y - 1];
                     if (Matrix[x, 1] == Matrix[1, y])
@@ -127,8 +127,15 @@ namespace UtilitiesCS
                 flatcsv[y] = "";
                 var loopTo7 = LenX + 2;
                 for (x = 1; x <= loopTo7; x++)
-                    flatcsv[y] = string.Concat(flatcsv[y], Matrix[x, y].ToString(), ", ");
-                flatcsv[y] = string.Concat(flatcsv[y], Matrix[LenX + 3, y].ToString());
+                    flatcsv[y] = string.Concat(
+                        flatcsv[y],
+                        Matrix[x, y]?.ToString() ?? string.Empty,
+                        ", "
+                    );
+                flatcsv[y] = string.Concat(
+                    flatcsv[y],
+                    Matrix[LenX + 3, y]?.ToString() ?? string.Empty
+                );
             }
 
             // Call Printout(flatcsv)

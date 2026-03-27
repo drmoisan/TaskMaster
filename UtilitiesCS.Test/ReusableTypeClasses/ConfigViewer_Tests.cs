@@ -54,8 +54,17 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
                 ConfigViewer returned = viewer.SetController(null);
 
                 // Assert: property is assigned and fluent chaining returns same instance
-                viewer.Controller.Should().BeNull("SetController(null) must assign the null value to the Controller property");
-                returned.Should().BeSameAs(viewer, "SetController must return the same viewer to support fluent chaining");
+                viewer
+                    .Controller.Should()
+                    .BeNull(
+                        "SetController(null) must assign the null value to the Controller property"
+                    );
+                returned
+                    .Should()
+                    .BeSameAs(
+                        viewer,
+                        "SetController must return the same viewer to support fluent chaining"
+                    );
             }
             finally
             {
@@ -94,7 +103,9 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
                     "ButtonCancel_Click",
                     BindingFlags.NonPublic | BindingFlags.Instance
                 );
-                handler.Should().NotBeNull("ButtonCancel_Click must be present as a private instance method");
+                handler
+                    .Should()
+                    .NotBeNull("ButtonCancel_Click must be present as a private instance method");
 
                 // Act: invoke the handler directly; Controller is null, so Cancel is skipped
                 handler.Invoke(viewer, new object[] { viewer, EventArgs.Empty });
@@ -114,9 +125,11 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             }
 
             // Assert
-            caughtException.Should().BeNull(
-                "the cancel handler must not throw when Controller is null because the null-conditional operator guards the call"
-            );
+            caughtException
+                .Should()
+                .BeNull(
+                    "the cancel handler must not throw when Controller is null because the null-conditional operator guards the call"
+                );
         }
 
         /// <summary>
@@ -142,8 +155,14 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             {
                 // Arrange: after construction, Local is active and Net is inactive
                 viewer = new ConfigViewer();
-                viewer.Boxes[0].IsActive.Should().BeTrue("Local disk group must start active after construction");
-                viewer.Boxes[1].IsActive.Should().BeFalse("Net disk group must start inactive after construction");
+                viewer
+                    .Boxes[0]
+                    .IsActive.Should()
+                    .BeTrue("Local disk group must start active after construction");
+                viewer
+                    .Boxes[1]
+                    .IsActive.Should()
+                    .BeFalse("Net disk group must start inactive after construction");
 
                 // Act: activate Net disk group
                 viewer.ActivateUiBox(ISmartSerializableConfig.ActiveDiskEnum.Net);

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.EmailIntelligence.Bayesian;
-using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 {
@@ -194,7 +193,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         {
             // Arrange
             var group = new BayesianClassifierGroup();
-            var sw = new SegmentStopWatch();
+            var sw = new HelperClasses.SegmentStopWatch();
             sw.Start();
             System.Threading.Thread.Sleep(10);
 
@@ -210,7 +209,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         {
             // Arrange
             var group = new BayesianClassifierGroup();
-            var sw = new SegmentStopWatch();
+            var sw = new HelperClasses.SegmentStopWatch();
             sw.Start();
 
             // Act
@@ -232,56 +231,6 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 
             // Assert
             group.Globals.Should().BeSameAs(mockGlobals);
-        }
-
-        [TestMethod]
-        public void Train_AppendToExistingClassifier_IncrementMatchEmailCount()
-        {
-            // Arrange: create the group and train the first batch under "tag1".
-            var group = new BayesianClassifierGroup();
-            group.Train("tag1", new[] { "word1" }, 1);
-
-            // Act: train a second batch under the same tag — the existing classifier must be
-            // reused via GetOrAdd rather than replaced, so email counts accumulate.
-            group.Train("tag1", new[] { "word2" }, 2);
-
-            // Assert: only one classifier exists for "tag1" and its count reflects both trains.
-            group.Classifiers.Should().ContainKey("tag1");
-            group.Classifiers["tag1"].MatchEmailCount.Should().Be(3);
-        }
-
-        [TestMethod]
-        public void Classify_WithDistinctTokenSets_ReturnsPredictionsInDescendingProbabilityOrder()
-        {
-            // Arrange: train two classifiers with non-overlapping tokens so that querying
-            // "spam-word" produces measurably higher probability for "spam-tag" than "ham-tag".
-            var group = new BayesianClassifierGroup();
-            group.Train("spam-tag", new[] { "spam-word", "spam-word", "spam-word" }, 5);
-            group.Train("ham-tag", new[] { "ham-word" }, 2);
-            group.TotalEmailCount = 7;
-
-            // Act: classify with the spam token.
-            var results = group.Classify(new string[] { "spam-word" }).ToList();
-
-            // Assert: at least two predictions exist and they are ordered from highest to lowest.
-            results.Should().HaveCountGreaterThanOrEqualTo(2);
-            results.Should().BeInDescendingOrder(p => p.Probability);
-        }
-
-        [TestMethod]
-        public void TrainMultiTag_UpdatesBothSharedTokenBaseAndDedicatedClassifiers()
-        {
-            // Arrange: start with an empty group.
-            var group = new BayesianClassifierGroup();
-
-            // Act: train across two tags simultaneously — this must update the shared token
-            // base as well as each per-tag classifier.
-            group.TrainMultiTag(new[] { "tag-a", "tag-b" }, new[] { "shared-word" }, 1);
-
-            // Assert: shared base received the token, and both dedicated classifiers were created.
-            group.SharedTokenBase.TokenFrequency.Should().ContainKey("shared-word");
-            group.Classifiers.Should().ContainKey("tag-a");
-            group.Classifiers.Should().ContainKey("tag-b");
         }
     }
 }

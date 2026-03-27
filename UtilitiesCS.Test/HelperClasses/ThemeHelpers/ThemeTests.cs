@@ -159,5 +159,85 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         }
 
         #endregion
+
+        #region ApplyTheme
+
+        // -----------------------------------------------------------------------
+        // P60-T1 — ApplyTheme (TwoField) sets ForeColor and BackColor on all controls
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        [STAThread]
+        public void ApplyTheme_TwoField_SetsExpectedColors()
+        {
+            // Arrange: two controls with a known fore/back pair.
+            var label = new Label();
+            var button = new Button();
+            var controls = new List<Control> { label, button };
+            var group = new ThemeControlGroup(controls, Color.White, Color.Black);
+
+            // Act: apply the theme.
+            group.ApplyTheme();
+
+            // Assert: every control received the exact colors from the group config.
+            label.ForeColor.Should().Be(Color.White);
+            label.BackColor.Should().Be(Color.Black);
+            button.ForeColor.Should().Be(Color.White);
+            button.BackColor.Should().Be(Color.Black);
+        }
+
+        // -----------------------------------------------------------------------
+        // P60-T2 — ApplyTheme (TwoFieldAlt, isAlt = true) applies the alternate
+        //           color set to all controls in the group.
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        [STAThread]
+        public void ApplyTheme_TwoFieldAlt_IsAltTrue_SetsAltColors()
+        {
+            // Arrange: alternate-selector always returns true so alt colors apply.
+            var label = new Label();
+            var controls = new List<Control> { label };
+            var group = new ThemeControlGroup(
+                controls,
+                foreMain: Color.White,
+                backMain: Color.Black,
+                foreAlt: Color.Yellow,
+                backAlt: Color.DarkBlue,
+                isAlt: () => true
+            );
+
+            // Act: apply the theme — IsAlt=true path should route to alt colors.
+            group.ApplyTheme();
+
+            // Assert: alt colors applied, not the main colors.
+            label
+                .ForeColor.Should()
+                .Be(Color.Yellow, "IsAlt=true must use the alternate fore color");
+            label
+                .BackColor.Should()
+                .Be(Color.DarkBlue, "IsAlt=true must use the alternate back color");
+        }
+
+        // -----------------------------------------------------------------------
+        // P60-T3 — ApplyTheme with heterogeneous control types (Label, Button,
+        //           Panel) does not throw — all Control subtypes share ForeColor /
+        //           BackColor and are treated uniformly.
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        [STAThread]
+        public void ApplyTheme_HeterogeneousControls_DoesNotThrow()
+        {
+            // Arrange: mix of different WinForms control subtypes.
+            var controls = new List<Control> { new Label(), new Button(), new Panel() };
+            var group = new ThemeControlGroup(controls, Color.White, Color.Black);
+
+            // Act + Assert: ThemeControlGroup treats all Control subtypes uniformly.
+            var act = () => group.ApplyTheme();
+            act.Should().NotThrow();
+        }
+
+        #endregion
     }
 }

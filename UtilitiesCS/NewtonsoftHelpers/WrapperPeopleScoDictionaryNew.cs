@@ -545,35 +545,12 @@ namespace ToDoModel.Data_Model.People
                 throw new InvalidOperationException("Property does not have a getter.");
             }
 
-            // Try naming conventions first — these are immune to coverage-tool IL instrumentation,
-            // which can rewrite method bodies and invalidate IL-derived metadata tokens.
-            var declaringType =
-                property.DeclaringType
-                ?? throw new InvalidOperationException("Property has no declaring type.");
+            //// New Code
+            //var instructions2 = Disassembler.GetInstructions(getMethod);
+            //SDILReader.MethodBodyReader reader = new SDILReader.MethodBodyReader(getMethod);
+            //string bodyText = reader.GetBodyCode();
+            //// End New Code
 
-            var allFields = declaringType.GetFields(
-                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
-            );
-
-            // Convention 1: underscore-prefixed camelCase (_propertyName)
-            var underscoreName =
-                $"_{char.ToLowerInvariant(property.Name[0])}{property.Name.Substring(1)}";
-            var byConvention = Array.Find(allFields, f => f.Name == underscoreName);
-            if (byConvention != null)
-            {
-                return byConvention;
-            }
-
-            // Convention 2: compiler-generated auto-property backing field (<PropertyName>k__BackingField)
-            var autoName = $"<{property.Name}>k__BackingField";
-            var byAutoName = Array.Find(allFields, f => f.Name == autoName);
-            if (byAutoName != null)
-            {
-                return byAutoName;
-            }
-
-            // Fall back to IL parsing for non-standard backing field names.
-            // NOTE: This path can fail when IL has been instrumented by a code coverage tool.
             var instructions = getMethod.GetMethodBody().GetILAsByteArray();
             for (int i = 0; i < instructions.Length; i++)
             {

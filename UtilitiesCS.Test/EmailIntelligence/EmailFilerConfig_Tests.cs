@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS.EmailIntelligence.EmailParsingSorting;
@@ -162,6 +163,109 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Assert
             result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void FolderProperties_CanBeSetAndRetrieved()
+        {
+            // Arrange
+            var config = new EmailFilerConfig();
+            var originFolder = new Mock<Folder>();
+            var destinationFolder = new Mock<Folder>();
+
+            // Act
+            config.OriginFolder = originFolder.Object;
+            config.DestinationOlFolder = destinationFolder.Object;
+
+            // Assert
+            config.OriginFolder.Should().BeSameAs(originFolder.Object);
+            config.DestinationOlFolder.Should().BeSameAs(destinationFolder.Object);
+        }
+
+        [TestMethod]
+        public void GetStem_RemovesAncestorAndLeadingSlash()
+        {
+            // Arrange
+            var config = new EmailFilerConfig();
+
+            // Act
+            var stem = config.GetStem(@"\\Mailbox", @"\\Mailbox\Archive\Projects");
+
+            // Assert
+            stem.Should().Be(@"Archive\Projects");
+        }
+
+        [TestMethod]
+        public void ResolvePaths_WithCurrentFolder_SetsDerivedPropertiesAndLeavesDestinationNullWhenUnresolved()
+        {
+            // Arrange
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            var mockOl = new Mock<IOlObjects>();
+            mockOl.Setup(x => x.InboxPath).Returns(@"\\Mailbox\Inbox");
+            mockOl.Setup(x => x.App).Returns((Application)null);
+            mockGlobals.Setup(x => x.Ol).Returns(mockOl.Object);
+
+            var currentFolder = new Mock<Folder>();
+            currentFolder.Setup(x => x.FolderPath).Returns(@"\\Mailbox\Archive\Projects");
+
+            var config = new EmailFilerConfig
+            {
+                Globals = mockGlobals.Object,
+                DestinationOlStem = "Filed",
+                OlAncestor = @"\\Mailbox",
+                FsAncestorEquivalent = @"C:\Mail",
+            };
+
+            // Act
+            config.ResolvePaths(currentFolder.Object);
+
+            // Assert
+            config.DestinationOlPath.Should().Be(@"\\Mailbox\Filed");
+            config.SaveFsPath.Should().Be(@"C:\Mail\Filed");
+            config.DeleteAndUnTrain.Should().BeTrue();
+            config.DeleteFsPath.Should().Be(@"C:\Mail\Archive\Projects");
+            config.OriginFolder.Should().BeSameAs(currentFolder.Object);
+            config.OriginOlStem.Should().Be(@"Archive\Projects");
+            config.DestinationOlFolder.Should().BeNull();
+            config.CanSort.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void ResolvePaths_WithoutCurrentFolder_SetsDestinationPathAndSavePath()
+        {
+            // Arrange
+            var config = new EmailFilerConfig
+            {
+                Globals = null,
+                DestinationOlStem = "Filed",
+                OlAncestor = @"\\Mailbox",
+                FsAncestorEquivalent = @"C:\Mail",
+            };
+
+            // Act
+            config.ResolvePaths();
+
+            // Assert
+            config.DestinationOlPath.Should().Be(@"\\Mailbox\Filed");
+            config.SaveFsPath.Should().Be(@"C:\Mail\Filed");
+            config.DestinationOlFolder.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void TryResolveDestinationFolder_WhenGlobalsAreMissing_ReturnsNull()
+        {
+            // Arrange
+            var config = new EmailFilerConfig
+            {
+                Globals = null,
+                DestinationOlPath = @"\\Mailbox\Filed",
+            };
+
+            // Act
+            var result = config.TryResolveDestinationFolder();
+
+            // Assert
+            result.Should().BeNull();
         }
     }
 }
