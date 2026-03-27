@@ -1339,6 +1339,12 @@ namespace QuickFiler.Controllers
             //_kbdHandler.KeyActionsAsync.Add(_itemInfo.EntryId, Keys.Right, (x) => ToggleCheckboxAsync(_itemViewer.CbxConversation, Enums.ToggleState.Off));
             //_kbdHandler.KeyActionsAsync.Add(_itemInfo.EntryId, Keys.Left, (x) => ToggleCheckboxAsync(_itemViewer.CbxConversation, Enums.ToggleState.On));
             //_kbdHandler.CharActionsAsync.Add(_itemInfo.EntryId, 'A', (x) => this.ToggleCheckboxAsync(_itemViewer.CbxAttachments));
+            // Right arrow expands the conversation thread for the focused item.
+            _kbdHandler.KeyActionsAsync.Add(
+                ItemHelper.EntryId,
+                Keys.Right,
+                (x) => this.ToggleExpansionAsync()
+            );
             _kbdHandler.CharActionsAsync.Add(
                 ItemHelper.EntryId,
                 'C',
@@ -1462,9 +1468,9 @@ namespace QuickFiler.Controllers
 
         internal void UnregisterFocusAsyncActions()
         {
-            //_kbdHandler.KeyActionsAsync.Remove(_itemInfo.EntryId, Keys.Right);
             //_kbdHandler.KeyActionsAsync.Remove(_itemInfo.EntryId, Keys.Left);
             //_kbdHandler.CharActionsAsync.Remove(_itemInfo.EntryId, 'A');
+            _kbdHandler.KeyActionsAsync.Remove(ItemHelper.EntryId, Keys.Right);
             _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'C');
             _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'O');
             _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'M');

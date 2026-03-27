@@ -1,10 +1,15 @@
 using System;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using QuickFiler.Controllers;
 using QuickFiler.Helper_Classes;
+using QuickFiler.Interfaces;
+using UtilitiesCS;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -160,6 +165,151 @@ namespace QuickFiler.Controllers.Tests
                 );
 
             callCts.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Regression tests for Issue #96: Right arrow key does not expand conversation messages.
+    ///
+    /// Root cause: RegisterFocusAsyncActions() never registered Keys.Right in
+    /// KeyActionsAsync. The handler was commented out during the async migration and not
+    /// restored. As a result, Right-arrow key presses fell through to the focused WinForms
+    /// control and activated the sender's mailto: address instead of expanding the
+    /// conversation view.
+    ///
+    /// Fix: Add Keys.Right → ToggleExpansionAsync(On) in RegisterFocusAsyncActions() and
+    /// remove it in UnregisterFocusAsyncActions().
+    /// </summary>
+    [TestClass]
+    public class QfcItemController_KeyboardRegistrationTests
+    {
+        // ---------------------------------------------------------------------------
+        // Test double: minimal subclass that injects a stub keyboard handler and a
+        // MailItemHelper with a known EntryId. No WinForms infrastructure is required
+        // because the lambda bodies are only evaluated when invoked, not at registration.
+        // ---------------------------------------------------------------------------
+        private sealed class KeyboardRegistrationQfcItemController : QfcItemController
+        {
+            /// <param name="kbdHandler">
+            /// Stub keyboard handler whose KbdActions collections receive the Add/Remove calls
+            /// made by RegisterFocusAsyncActions and UnregisterFocusAsyncActions.
+            /// </param>
+            /// <param name="entryId">
+            /// String used as the sourceId in KbdActions registrations; must be unique
+            /// within each collection.
+            /// </param>
+            internal KeyboardRegistrationQfcItemController(
+                IQfcKeyboardHandler kbdHandler,
+                string entryId
+            )
+                : base()
+            {
+                // Inject keyboard handler via reflection (field is private in production code).
+                typeof(QfcItemController)
+                    .GetField("_kbdHandler", BindingFlags.NonPublic | BindingFlags.Instance)
+                    .SetValue(this, kbdHandler);
+
+                // Set ItemHelper with a known EntryId so sourceId assignments are predictable.
+                var helper = new MailItemHelper();
+                helper.EntryId = entryId;
+                ItemHelper = helper;
+            }
+        }
+
+        // ---------------------------------------------------------------------------
+        // Helper: build a minimal stub keyboard handler whose KbdActions properties
+        // return real (but empty) collection instances so that Add/Remove calls succeed.
+        // Only CharActionsAsync and KeyActionsAsync are needed by RegisterFocusAsyncActions.
+        // ---------------------------------------------------------------------------
+        private static (
+            Mock<IQfcKeyboardHandler> mock,
+            KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> keyActionsAsync,
+            KbdActions<char, KaCharAsync, Func<char, Task>> charActionsAsync
+        ) BuildKbdHandlerStub()
+        {
+            var mockKbd = new Mock<IQfcKeyboardHandler>();
+
+            var keyActionsAsync = new KbdActions<Keys, KaKeyAsync, Func<Keys, Task>>();
+            var charActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
+
+            // Route property accesses to the real collections so Add/Remove mutate them.
+            mockKbd.Setup(k => k.KeyActionsAsync).Returns(keyActionsAsync);
+            mockKbd.Setup(k => k.CharActionsAsync).Returns(charActionsAsync);
+
+            return (mockKbd, keyActionsAsync, charActionsAsync);
+        }
+
+        // ---------------------------------------------------------------------------
+        // Regression test — P1-T1
+        // This test MUST FAIL before the fix and PASS after.
+        // ---------------------------------------------------------------------------
+
+        [TestMethod]
+        public void RegisterFocusAsyncActions_RightArrowKey_IsRegisteredInKeyActionsAsync()
+        {
+            // Arrange
+            // Build a stub keyboard handler with real KbdActions collections.
+            // RegisterFocusAsyncActions must add Keys.Right to KeyActionsAsync so that
+            // KeyDownTaskAsync intercepts and suppresses the key press instead of letting it
+            // fall through to the focused mailto: control.
+            var (mockKbd, keyActionsAsync, _) = BuildKbdHandlerStub();
+            var controller = new KeyboardRegistrationQfcItemController(
+                mockKbd.Object,
+                "test-entry-id-right-key"
+            );
+
+            // Act
+            controller.RegisterFocusAsyncActions();
+
+            // Assert — before the fix this fails because Keys.Right was not registered
+            keyActionsAsync
+                .ContainsKey(Keys.Right)
+                .Should()
+                .BeTrue(
+                    because: "Keys.Right must be registered in KeyActionsAsync so that the keyboard "
+                        + "handler intercepts the key press and expands the conversation instead of "
+                        + "routing it to the mailto: control"
+                );
+        }
+
+        // ---------------------------------------------------------------------------
+        // Regression test — P1-T2
+        // Verifies that the Right-arrow registration is cleaned up on focus loss.
+        // ---------------------------------------------------------------------------
+
+        [TestMethod]
+        public void UnregisterFocusAsyncActions_AfterRegister_RemovesRightArrowFromKeyActionsAsync()
+        {
+            // Arrange
+            // First register, then unregister. The Right-arrow entry must be absent
+            // after unregistration so that nav outside the keyboard-active item does not
+            // capture Right-arrow presses that belong to a different item's handler.
+            var (mockKbd, keyActionsAsync, _) = BuildKbdHandlerStub();
+            var controller = new KeyboardRegistrationQfcItemController(
+                mockKbd.Object,
+                "test-entry-id-right-key-cleanup"
+            );
+
+            controller.RegisterFocusAsyncActions();
+
+            // Precondition: Right must be registered (asserted in the previous test).
+            keyActionsAsync
+                .ContainsKey(Keys.Right)
+                .Should()
+                .BeTrue(because: "precondition — right key must be registered before cleanup");
+
+            // Act
+            controller.UnregisterFocusAsyncActions();
+
+            // Assert — the entry must be removed on unregister
+            keyActionsAsync
+                .ContainsKey(Keys.Right)
+                .Should()
+                .BeFalse(
+                    because: "Keys.Right handler must be removed from KeyActionsAsync when focus "
+                        + "actions are unregistered, otherwise stale registrations accumulate "
+                        + "across focus changes"
+                );
         }
     }
 }
