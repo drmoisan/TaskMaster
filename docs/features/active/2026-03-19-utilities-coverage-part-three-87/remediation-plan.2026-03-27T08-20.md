@@ -2,7 +2,8 @@
 name: Remediation Plan: 2026-03-19-utilities-coverage-part-three-87 (2026-03-27T08-20)
 status: Planned
 work-mode: full-feature
-source-spec: docs/features/active/2026-03-19-utilities-coverage-part-three-87/remediation-inputs.2026-03-27T08-20.md
+source-issue: docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/issue.md
+source-spec: docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/spec.md
 source-user-story: docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/user-story.md
 last-updated: 2026-03-27
 ---
@@ -109,124 +110,148 @@ This remediation pass starts by reconciling the live Cobertura inventory, the cl
 
 ## Implementation Plan (Atomic Tasks)
 
-### Phase 0 — Context & Inputs
+### Phase 0 — Policy Read & Baseline Capture
 
-- [ ] [P0-T1] Re-read the remediation inputs in `remediation-inputs.2026-03-27T08-20.md`, the research note in `artifacts/research/20260327-issue87-remediation-atomic-research.md`, and the authoritative v2 phase map in `v2/plan.2026-03-22T21-00.md`
-	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation/phase0-inputs-read.md` exists and contains `Timestamp:`, `Inputs Read:`, and the three exact source paths.
+- [ ] [P0-T1] Read `.github/copilot-instructions.md`, `.github/instructions/general-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, `.github/instructions/csharp-code-change.instructions.md`, and `.github/instructions/csharp-unit-test.instructions.md` in repository policy order
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-instructions-read.md` exists and contains `Timestamp:`, `Policy Order:`, and the five exact policy file paths in the required order.
 
-- [ ] [P0-T2] Capture the live branch-diff baseline with `git diff --name-status development...HEAD`
-	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation/phase0-branch-diff.md` exists and contains `Timestamp:`, `Command: git diff --name-status development...HEAD`, `EXIT_CODE: 0`, and the full diff listing.
+- [ ] [P0-T2] Read `v2/issue.md`, `v2/spec.md`, `v2/user-story.md`, `remediation-inputs.2026-03-27T08-20.md`, and `v2/plan.2026-03-22T21-00.md` before implementation begins
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-instructions-read.md` contains `Requirements Read:` followed by the five exact source paths, including `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/issue.md`, `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/spec.md`, and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/user-story.md`.
 
-- [ ] [P0-T3] Capture the live coverage baseline with `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug`
-	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation/phase0-coverage-baseline.md` exists and contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and `UtilitiesCS Line Rate:`.
+- [ ] [P0-T3] Capture the live branch-diff baseline with `git diff --name-status development...HEAD`
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-branch-diff.md` exists and contains `Timestamp:`, `Command: git diff --name-status development...HEAD`, `EXIT_CODE: 0`, `Output Summary:`, and the full diff listing.
 
-- [ ] [P0-T4] Regenerate the remaining-file reconciliation ledger from `coverage/coverage.cobertura.xml` and classify every still-below-threshold file as either `Implementation` or `Skip Re-Validation`
-	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation/phase0-remaining-ledger.md` exists, lists every file named in the two scope sections above exactly once, and records a `Route:` of `Implementation` or `Skip Re-Validation` for each row.
+- [ ] [P0-T4] Capture the baseline C# formatter result with `dotnet tool run csharpier .`
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-csharpier.md` exists and contains `Timestamp:`, `Command: dotnet tool run csharpier .`, `EXIT_CODE:`, and `Output Summary:`.
 
-- [ ] [P0-T5] Map each `Implementation` row in `phase0-remaining-ledger.md` to its authoritative v2 phase or to a new remediation-only phase when no v2 phase exists
-	- Acceptance: `phase0-remaining-ledger.md` contains a non-empty `Phase:` column for every `Implementation` row, and `UtilitiesCS\EmailIntelligence\Bayesian\BayesianSerializationHelper.cs` is explicitly mapped to `Remediation-Only`.
+- [ ] [P0-T5] Capture the baseline analyzer-build result with `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNETAnalyzers -EnforceCodeStyleInBuild`
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-analyzers.md` exists and contains `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+
+- [ ] [P0-T6] Capture the baseline nullable-build result with `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNullable -TreatWarningsAsErrors`
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-nullable.md` exists and contains `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+
+- [ ] [P0-T7] Capture the live coverage baseline with `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug`
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-tests-with-coverage.md` exists and contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, and a numeric `UtilitiesCS Line Rate:` baseline value.
+
+- [ ] [P0-T8] Regenerate the remaining-file reconciliation ledger from `coverage/coverage.cobertura.xml` and classify every still-below-threshold file as either `Implementation` or `Skip Re-Validation`
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-remaining-ledger.md` exists, lists every file named in the two scope sections above exactly once, and records a numeric `Baseline Line Rate:` plus a `Route:` of `Implementation` or `Skip Re-Validation` for each row.
+
+- [ ] [P0-T9] Map each `Implementation` row in `phase0-remaining-ledger.md` to its authoritative v2 phase or to a new remediation-only phase when no v2 phase exists
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-remaining-ledger.md` contains a non-empty `Phase:` column for every `Implementation` row, and `UtilitiesCS\EmailIntelligence\Bayesian\BayesianSerializationHelper.cs` is explicitly mapped to `Remediation-Only`.
 
 ### Phase 1 — Branch Isolation Cleanup
 
-- [ ] [P1-T1] Re-capture the isolated branch diff after the four cleanup tasks complete
-	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation/phase1-branch-diff-clean.md` exists and contains `Timestamp:`, `Command: git diff --name-status development...HEAD`, `EXIT_CODE: 0`, and no rows for the four removed path groups.
+- [ ] [P1-T1] Remove the out-of-scope file diff entry `VBFunctions.Test/ComputerInfo_Test.cs` from the branch
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p1-vbfunctions-computerinfo-cleanup.md` exists and contains `Timestamp:`, `Target Path: VBFunctions.Test/ComputerInfo_Test.cs`, and `Resolution:` describing the exact cleanup action.
+
+- [ ] [P1-T2] Remove the out-of-scope project diff entry `VBFunctions.Test/VBFunctions.Test.csproj` from the branch
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p1-vbfunctions-csproj-cleanup.md` exists and contains `Timestamp:`, `Target Path: VBFunctions.Test/VBFunctions.Test.csproj`, and `Resolution:` describing the exact cleanup action.
+
+- [ ] [P1-T3] Remove the out-of-scope documentation diff group `docs/features/active/2026-03-25-quickfiler-gui-not-expanding-96/**` from the branch
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p1-issue96-docs-cleanup.md` exists and contains `Timestamp:`, `Target Path Group: docs/features/active/2026-03-25-quickfiler-gui-not-expanding-96/**`, and `Resolution:` describing the exact cleanup action.
+
+- [ ] [P1-T4] Remove the stale audit diff group `docs/features/active/2026-03-19-utilities-coverage-part-three-87/audit-2026-03-26T09-40/**` from the branch
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p1-stale-audit-cleanup.md` exists and contains `Timestamp:`, `Target Path Group: docs/features/active/2026-03-19-utilities-coverage-part-three-87/audit-2026-03-26T09-40/**`, and `Resolution:` describing the exact cleanup action.
+
+- [ ] [P1-T5] Re-capture the isolated branch diff after `P1-T1` through `P1-T4` complete
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/phase1-branch-diff-clean.md` exists and contains `Timestamp:`, `Command: git diff --name-status development...HEAD`, `EXIT_CODE: 0`, `Output Summary:`, and no rows whose path equals `VBFunctions.Test/ComputerInfo_Test.cs` or `VBFunctions.Test/VBFunctions.Test.csproj`, and no rows whose path starts with `docs/features/active/2026-03-25-quickfiler-gui-not-expanding-96/` or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/audit-2026-03-26T09-40/`.
 
 ### Phase 2 — High-Risk Dialog and Async Follow-up Work
 
 - [ ] [P2-T1] Introduce a deterministic dialog-invoker seam for `UtilitiesCS\Dialogs\InputBox.cs` so the wrapper can be covered without opening a real modal dialog
-	- Acceptance: `UtilitiesCS\Dialogs\InputBox.cs` exposes a replaceable dialog-invoker seam, and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation/p2-inputbox-seam.md` records the new seam member name.
+	- Acceptance: `UtilitiesCS\Dialogs\InputBox.cs` exposes a replaceable dialog-invoker seam, and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-inputbox-seam.md` records the new seam member name.
 
 - [ ] [P2-T2] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that `InputBox.cs` returns the accepted value produced by the injected dialog seam
-	- Acceptance: the updated coverage report records `UtilitiesCS\Dialogs\InputBox.cs` at `>= 0.80`, and `p2-inputbox-accepted.md` records the exact test method name added to `InputBox_Test.cs`.
+	- Acceptance: the updated coverage report records `UtilitiesCS\Dialogs\InputBox.cs` at `>= 0.80`, and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-inputbox-accepted.md` records the exact test method name added to `InputBox_Test.cs`.
 
 - [ ] [P2-T3] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that `InputBox.cs` returns `null` when the injected dialog seam reports cancel
-	- Acceptance: `p2-inputbox-cancel.md` records the exact test method name added to `InputBox_Test.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\Dialogs\InputBox.cs` at `>= 0.80`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-inputbox-cancel.md` records the exact test method name added to `InputBox_Test.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\Dialogs\InputBox.cs` at `>= 0.80`.
 
 - [ ] [P2-T4] Introduce a deterministic dialog-invoker seam for `UtilitiesCS\Dialogs\MyBox.cs` where the wrapper still depends on real modal display logic
-	- Acceptance: `UtilitiesCS\Dialogs\MyBox.cs` exposes a replaceable dialog-invoker seam, and `p2-mybox-seam.md` records the seam member name.
+	- Acceptance: `UtilitiesCS\Dialogs\MyBox.cs` exposes a replaceable dialog-invoker seam, and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-mybox-seam.md` records the seam member name.
 
 - [ ] [P2-T5] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\MyBox_Tests.cs` verifying that `MyBox.cs` returns the expected button mapping for a simulated affirmative result
-	- Acceptance: `p2-mybox-affirmative.md` records the exact test method name added to `MyBox_Tests.cs`, and the updated coverage report records `UtilitiesCS\Dialogs\MyBox.cs` at `>= 0.80`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-mybox-affirmative.md` records the exact test method name added to `MyBox_Tests.cs`, and the updated coverage report records `UtilitiesCS\Dialogs\MyBox.cs` at `>= 0.80`.
 
 - [ ] [P2-T6] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\MyBox_Tests.cs` verifying that `MyBox.cs` preserves the caller-supplied default result when the injected dialog seam returns that default path
-	- Acceptance: `p2-mybox-default.md` records the exact test method name added to `MyBox_Tests.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\Dialogs\MyBox.cs` at `>= 0.80`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-mybox-default.md` records the exact test method name added to `MyBox_Tests.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\Dialogs\MyBox.cs` at `>= 0.80`.
 
 - [ ] [P2-T7] Introduce a deterministic notification seam for `UtilitiesCS\Dialogs\NotImplementedDialog.cs` if the current tests still leave wrapper-only branches uncovered
-	- Acceptance: either `NotImplementedDialog.cs` exposes a replaceable notification seam and `p2-notimplemented-seam.md` records it, or `p2-notimplemented-seam.md` records `Seam Not Required` with the exact uncovered members closed by test-only changes.
+	- Acceptance: either `NotImplementedDialog.cs` exposes a replaceable notification seam and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-notimplemented-seam.md` records it, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-notimplemented-seam.md` records `Seam Not Required` with the exact uncovered members closed by test-only changes.
 
 - [ ] [P2-T8] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\NotImplementedDialog_Tests.cs` verifying the wrapper overload that supplies a custom message path
-	- Acceptance: `p2-notimplemented-message.md` records the exact test method name added to `NotImplementedDialog_Tests.cs`, and the updated coverage report records `UtilitiesCS\Dialogs\NotImplementedDialog.cs` at `>= 0.80`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-notimplemented-message.md` records the exact test method name added to `NotImplementedDialog_Tests.cs`, and the updated coverage report records `UtilitiesCS\Dialogs\NotImplementedDialog.cs` at `>= 0.80`.
 
 - [ ] [P2-T9] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\NotImplementedDialog_Tests.cs` verifying the wrapper overload that resolves the default not-implemented message path
-	- Acceptance: `p2-notimplemented-default.md` records the exact test method name added to `NotImplementedDialog_Tests.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\Dialogs\NotImplementedDialog.cs` at `>= 0.80`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-notimplemented-default.md` records the exact test method name added to `NotImplementedDialog_Tests.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\Dialogs\NotImplementedDialog.cs` at `>= 0.80`.
 
 - [ ] [P2-T10] Introduce a deterministic dialog-invoker seam for `UtilitiesCS\Dialogs\YesNoToAll.cs` if response-selection still depends on modal display state
-	- Acceptance: either `YesNoToAll.cs` exposes a replaceable dialog-invoker seam and `p2-yesnotoall-seam.md` records it, or `p2-yesnotoall-seam.md` records `Seam Not Required` with the exact uncovered members closed by test-only changes.
+	- Acceptance: either `YesNoToAll.cs` exposes a replaceable dialog-invoker seam and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-yesnotoall-seam.md` records it, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-yesnotoall-seam.md` records `Seam Not Required` with the exact uncovered members closed by test-only changes.
 
 - [ ] [P2-T11] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\YesNoToAll_Tests.cs` verifying that the wrapper returns the `Yes` path when the dialog seam reports yes
-	- Acceptance: `p2-yesnotoall-yes.md` records the exact test method name added to `YesNoToAll_Tests.cs`, and the updated coverage report records `UtilitiesCS\Dialogs\YesNoToAll.cs` at `>= 0.80`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-yesnotoall-yes.md` records the exact test method name added to `YesNoToAll_Tests.cs`, and the updated coverage report records `UtilitiesCS\Dialogs\YesNoToAll.cs` at `>= 0.80`.
 
 - [ ] [P2-T12] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\YesNoToAll_Tests.cs` verifying that the wrapper returns the `No` path when the dialog seam reports no
-	- Acceptance: `p2-yesnotoall-no.md` records the exact test method name added to `YesNoToAll_Tests.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\Dialogs\YesNoToAll.cs` at `>= 0.80`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-yesnotoall-no.md` records the exact test method name added to `YesNoToAll_Tests.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\Dialogs\YesNoToAll.cs` at `>= 0.80`.
 
 - [ ] [P2-T13] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\YesNoToAll_Tests.cs` verifying that the wrapper returns the `All` path when the dialog seam reports all
-	- Acceptance: `p2-yesnotoall-all.md` records the exact test method name added to `YesNoToAll_Tests.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\Dialogs\YesNoToAll.cs` at `>= 0.80`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-yesnotoall-all.md` records the exact test method name added to `YesNoToAll_Tests.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\Dialogs\YesNoToAll.cs` at `>= 0.80`.
 
 - [ ] [P2-T14] Add an MSTest scenario in `UtilitiesCS.Test\EmailIntelligence\SortEmail_Tests.cs` verifying the next uncovered non-null mail-processing branch identified in `SortEmail.cs`
-	- Acceptance: `p2-sortemail-followup.md` records the exact test method name added to `SortEmail_Tests.cs`, and the updated coverage report records `UtilitiesCS\EmailIntelligence\EmailParsingSorting\SortEmail.cs` at `>= 0.80`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-sortemail-followup.md` records the exact test method name added to `SortEmail_Tests.cs`, and the updated coverage report records `UtilitiesCS\EmailIntelligence\EmailParsingSorting\SortEmail.cs` at `>= 0.80`.
 
 - [ ] [P2-T15] Add an MSTest scenario in `UtilitiesCS.Test\EmailIntelligence\PeopleScoDictionaryNew_Tests.cs` verifying the next uncovered branch in `PeopleScoDictionaryNew.cs` after duplicate-add coverage
-	- Acceptance: `p2-peoplesco-followup.md` records the exact test method name added to `PeopleScoDictionaryNew_Tests.cs`, and the updated coverage report records `UtilitiesCS\EmailIntelligence\People\PeopleScoDictionaryNew.cs` at `>= 0.80`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-peoplesco-followup.md` records the exact test method name added to `PeopleScoDictionaryNew_Tests.cs`, and the updated coverage report records `UtilitiesCS\EmailIntelligence\People\PeopleScoDictionaryNew.cs` at `>= 0.80`.
 
 - [ ] [P2-T16] Create `UtilitiesCS.Test\EmailIntelligence\ManagerAsyncLazy_Tests.cs` for `UtilitiesCS\EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs`
-	- Acceptance: `UtilitiesCS.Test\EmailIntelligence\ManagerAsyncLazy_Tests.cs` exists and `p2-managerasynclazy-testhome.md` records the file path.
+	- Acceptance: `UtilitiesCS.Test\EmailIntelligence\ManagerAsyncLazy_Tests.cs` exists and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-managerasynclazy-testhome.md` records the file path.
 
 - [ ] [P2-T17] Register `UtilitiesCS.Test\EmailIntelligence\ManagerAsyncLazy_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
 	- Acceptance: `UtilitiesCS.Test\UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\ManagerAsyncLazy_Tests.cs" />`.
 
 - [ ] [P2-T18] Add an MSTest scenario in `UtilitiesCS.Test\EmailIntelligence\ManagerAsyncLazy_Tests.cs` verifying the lazy-success path for `ManagerAsyncLazy.cs`
-	- Acceptance: `p2-managerasynclazy-success.md` records the exact test method name added to `ManagerAsyncLazy_Tests.cs`, and the updated coverage report records `UtilitiesCS\EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs` at `>= 0.80`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-managerasynclazy-success.md` records the exact test method name added to `ManagerAsyncLazy_Tests.cs`, and the updated coverage report records `UtilitiesCS\EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs` at `>= 0.80`.
 
 - [ ] [P2-T19] Add an MSTest scenario in `UtilitiesCS.Test\EmailIntelligence\ManagerAsyncLazy_Tests.cs` verifying the cached-or-faulted follow-up path for `ManagerAsyncLazy.cs`
-	- Acceptance: `p2-managerasynclazy-followup.md` records the exact test method name added to `ManagerAsyncLazy_Tests.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs` at `>= 0.80`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-managerasynclazy-followup.md` records the exact test method name added to `ManagerAsyncLazy_Tests.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs` at `>= 0.80`.
 
 - [ ] [P2-T20] Add an MSTest scenario in `UtilitiesCS.Test\Extensions\AsyncSerialization_Tests.cs` verifying the next uncovered branch in `AsyncSerialization.cs` after the existing progress-formatting tests
-	- Acceptance: `p2-asyncserialization-followup.md` records the exact test method name added to `AsyncSerialization_Tests.cs`, and the updated coverage report records `UtilitiesCS\Extensions\AsyncSerialization.cs` at `>= 0.80`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-asyncserialization-followup.md` records the exact test method name added to `AsyncSerialization_Tests.cs`, and the updated coverage report records `UtilitiesCS\Extensions\AsyncSerialization.cs` at `>= 0.80`.
 
 - [ ] [P2-T21] Add an MSTest scenario in `UtilitiesCS.Test\HelperClasses\TipsController_Tests.cs` verifying the next uncovered branch in `TipsController.cs` after the existing toggle tests
-	- Acceptance: `p2-tipscontroller-followup.md` records the exact test method name added to `TipsController_Tests.cs`, and the updated coverage report records `UtilitiesCS\HelperClasses\ToolTips\TipsController.cs` at `>= 0.80`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-tipscontroller-followup.md` records the exact test method name added to `TipsController_Tests.cs`, and the updated coverage report records `UtilitiesCS\HelperClasses\ToolTips\TipsController.cs` at `>= 0.80`.
 
 ### Phase 3 — Skip Re-Validation
 
 - [ ] [P3-T1] Re-validate the skip rationale for `UtilitiesCS\EmailIntelligence\Bayesian\Performance\ConfusionViewer.cs`
-	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation/p3-confusionviewer-skip.md` exists and records `File: UtilitiesCS\EmailIntelligence\Bayesian\Performance\ConfusionViewer.cs` plus `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-confusionviewer-skip.md` exists and records `File: UtilitiesCS\EmailIntelligence\Bayesian\Performance\ConfusionViewer.cs` plus `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
 - [ ] [P3-T2] Re-validate the skip rationale for `UtilitiesCS\EmailIntelligence\Bayesian\Performance\MetricChartViewer.cs`
-	- Acceptance: `p3-metricchartviewer-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-metricchartviewer-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
 - [ ] [P3-T3] Re-validate the skip rationale for `UtilitiesCS\Threading\ProgressMultiStepViewer.cs`
-	- Acceptance: `p3-progressmultistepviewer-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-progressmultistepviewer-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
 - [ ] [P3-T4] Re-validate the skip rationale for `UtilitiesCS\Threading\ThreadMonitor.cs`
-	- Acceptance: `p3-threadmonitor-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-threadmonitor-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
 - [ ] [P3-T5] Re-validate the skip rationale for `UtilitiesCS\To Depricate\FileIO2.cs`
-	- Acceptance: `p3-fileio2-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-fileio2-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
 - [ ] [P3-T6] Re-validate the skip rationale for `UtilitiesCS\HelperClasses\Windows Forms\ScreenHelper.cs`
-	- Acceptance: `p3-screenhelper-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-screenhelper-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
 - [ ] [P3-T7] Re-validate the skip rationale for `UtilitiesCS\HelperClasses\ThemeHelpers\Theme.cs`
-	- Acceptance: `p3-theme-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-theme-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
 - [ ] [P3-T8] Re-validate the skip rationale for `UtilitiesCS\HelperClasses\FileSystem\ShellUtilities.cs`
-	- Acceptance: `p3-shellutilities-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-shellutilities-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
 - [ ] [P3-T9] Re-validate the skip rationale for `UtilitiesCS\HelperClasses\FileSystem\ShellUtilitiesStatic.cs`
-	- Acceptance: `p3-shellutilitiesstatic-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-shellutilitiesstatic-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
 - [ ] [P3-T10] Re-validate the skip rationale for `UtilitiesCS\HelperClasses\ThemeHelpers\SystemThemeDetector.cs`
-	- Acceptance: `p3-systemthemedetector-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-systemthemedetector-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
 ### Phase 4 — Remaining Reopened Coverage Phases
 
@@ -384,7 +409,7 @@ This remediation pass starts by reconciling the live Cobertura inventory, the cl
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\Bayesian\BayesianSerializationHelper.cs` at `>= 0.80`, and `UtilitiesCS.Test\EmailIntelligence\BayesianSerializationHelper_Tests.cs` exists.
 
 - [ ] [P4-T52] Register `UtilitiesCS.Test\EmailIntelligence\BayesianSerializationHelper_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if `P4-T51` created a new file
-	- Acceptance: either `UtilitiesCS.Test\UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\BayesianSerializationHelper_Tests.cs" />`, or `p4-bayesianserializationhelper-registration.md` records `Existing Test Home Reused`.
+	- Acceptance: either `UtilitiesCS.Test\UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\BayesianSerializationHelper_Tests.cs" />`, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-bayesianserializationhelper-registration.md` records `Existing Test Home Reused`.
 
 - [ ] [P4-T53] Reopen v2 Phase 86 for `UtilitiesCS\EmailIntelligence\Bayesian\Obsolete\ClassifierGroup.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\ClassifierGroup_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\Bayesian\Obsolete\ClassifierGroup.cs` at `>= 0.80`.
@@ -395,34 +420,64 @@ This remediation pass starts by reconciling the live Cobertura inventory, the cl
 - [ ] [P4-T55] Reopen v2 Phase 89 for `UtilitiesCS\HelperClasses\FileSystem\FilePathHelper.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\FilePathHelper_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\HelperClasses\FileSystem\FilePathHelper.cs` at `>= 0.80`.
 
+- [ ] [P4-T56] If `P3-T1` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\EmailIntelligence\Bayesian\Performance\ConfusionViewer.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-confusionviewer-return.md`
+	- Acceptance: either the updated coverage report records `UtilitiesCS\EmailIntelligence\Bayesian\Performance\ConfusionViewer.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-confusionviewer-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
+
+- [ ] [P4-T57] If `P3-T2` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\EmailIntelligence\Bayesian\Performance\MetricChartViewer.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-metricchartviewer-return.md`
+	- Acceptance: either the updated coverage report records `UtilitiesCS\EmailIntelligence\Bayesian\Performance\MetricChartViewer.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-metricchartviewer-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
+
+- [ ] [P4-T58] If `P3-T3` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\Threading\ProgressMultiStepViewer.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-progressmultistepviewer-return.md`
+	- Acceptance: either the updated coverage report records `UtilitiesCS\Threading\ProgressMultiStepViewer.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-progressmultistepviewer-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
+
+- [ ] [P4-T59] If `P3-T4` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\Threading\ThreadMonitor.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-threadmonitor-return.md`
+	- Acceptance: either the updated coverage report records `UtilitiesCS\Threading\ThreadMonitor.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-threadmonitor-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
+
+- [ ] [P4-T60] If `P3-T5` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\To Depricate\FileIO2.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-fileio2-return.md`
+	- Acceptance: either the updated coverage report records `UtilitiesCS\To Depricate\FileIO2.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-fileio2-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
+
+- [ ] [P4-T61] If `P3-T6` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\HelperClasses\Windows Forms\ScreenHelper.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-screenhelper-return.md`
+	- Acceptance: either the updated coverage report records `UtilitiesCS\HelperClasses\Windows Forms\ScreenHelper.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-screenhelper-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
+
+- [ ] [P4-T62] If `P3-T7` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\HelperClasses\ThemeHelpers\Theme.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-theme-return.md`
+	- Acceptance: either the updated coverage report records `UtilitiesCS\HelperClasses\ThemeHelpers\Theme.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-theme-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
+
+- [ ] [P4-T63] If `P3-T8` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\HelperClasses\FileSystem\ShellUtilities.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-shellutilities-return.md`
+	- Acceptance: either the updated coverage report records `UtilitiesCS\HelperClasses\FileSystem\ShellUtilities.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-shellutilities-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
+
+- [ ] [P4-T64] If `P3-T9` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\HelperClasses\FileSystem\ShellUtilitiesStatic.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-shellutilitiesstatic-return.md`
+	- Acceptance: either the updated coverage report records `UtilitiesCS\HelperClasses\FileSystem\ShellUtilitiesStatic.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-shellutilitiesstatic-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
+
+- [ ] [P4-T65] If `P3-T10` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\HelperClasses\ThemeHelpers\SystemThemeDetector.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-systemthemedetector-return.md`
+	- Acceptance: either the updated coverage report records `UtilitiesCS\HelperClasses\ThemeHelpers\SystemThemeDetector.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-systemthemedetector-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
+
 ### Phase 5 — Final QA and Documentation Loop
 
-- [ ] [P5-T1] Run `dotnet tool run csharpier format .`
-	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/remediation/phase5-csharpier.md` exists and contains `Timestamp:`, `Command: dotnet tool run csharpier format .`, and `EXIT_CODE: 0`.
+- [ ] [P5-T1] Run `dotnet tool run csharpier .`
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/qa-gates/phase5-csharpier.md` exists and contains `Timestamp:`, `Command: dotnet tool run csharpier .`, `EXIT_CODE: 0`, and `Output Summary:`.
 
 - [ ] [P5-T2] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNETAnalyzers -EnforceCodeStyleInBuild`
-	- Acceptance: `phase5-analyzers.md` exists and contains `Timestamp:`, `EXIT_CODE: 0`, and `Analyzer Diagnostics: 0`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/qa-gates/phase5-analyzers.md` exists and contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`, and `Analyzer Diagnostics: 0`.
 
 - [ ] [P5-T3] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNullable -TreatWarningsAsErrors`
-	- Acceptance: `phase5-nullable.md` exists and contains `Timestamp:`, `EXIT_CODE: 0`, and `Warnings As Errors: 0`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/qa-gates/phase5-nullable.md` exists and contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`, and `Warnings As Errors: 0`.
 
 - [ ] [P5-T4] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug`
-	- Acceptance: `phase5-tests-with-coverage.md` exists and contains `Timestamp:`, `EXIT_CODE: 0`, and `Failed Tests: 0`.
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/qa-gates/phase5-tests-with-coverage.md` exists and contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`, `Failed Tests: 0`, and a numeric post-remediation `UtilitiesCS Line Rate:` value.
 
-- [ ] [P5-T5] Verify the refreshed coverage report closes AC1 for `UtilitiesCS`
-	- Acceptance: `phase5-coverage-verification.md` exists and records `UtilitiesCS Line Rate: >= 0.80`, no `Implementation` row from `phase0-remaining-ledger.md` remains below threshold, and each `Skip Re-Validation` row has a corresponding Phase 3 evidence file.
+- [ ] [P5-T5] Verify the refreshed coverage report closes AC1 for `UtilitiesCS` and records changed/new-code coverage compliance
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/qa-gates/phase5-coverage-verification.md` exists and records `Baseline UtilitiesCS Line Rate:`, `Post-Remediation UtilitiesCS Line Rate:`, `Post-Remediation UtilitiesCS Line Rate: >= 0.80`, `Touched Production Files:`, `Per-File Baseline/Post Line Rates:` for every touched production file from `phase0-remaining-ledger.md`, `Coverage Regression Check: none`, `Changed/New-Code Coverage: <numeric value>`, `New Production Members Introduced: <count>`, and for any newly introduced production members `New Production Member Coverage: >= 0.90`; the artifact must also confirm that no `Implementation` row from `phase0-remaining-ledger.md` remains below threshold, each `Skip Re-Validation` row has a corresponding Phase 3 evidence file, and every Phase 3 row that recorded `Decision: Return To Implementation` has a corresponding completed task in `P4-T56` through `P4-T65` with matching evidence.
 
 - [ ] [P5-T6] Update `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/plan.2026-03-22T21-00.md` to reflect the remediation outcomes for every reopened phase
 	- Acceptance: each reopened phase referenced in this remediation plan is either checked off with linked evidence or annotated with a follow-up note that references the blocking evidence artifact.
 
 - [ ] [P5-T7] Update `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/spec.md` and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/user-story.md` only after `P5-T5` passes
-	- Acceptance: the acceptance-criteria checkboxes in `v2/user-story.md` and the matching DoD statements in `v2/spec.md` reflect the verified post-remediation state and do not mark AC1 complete unless `phase5-coverage-verification.md` records `UtilitiesCS Line Rate: >= 0.80`.
+	- Acceptance: the acceptance-criteria checkboxes in `v2/user-story.md` and the matching DoD statements in `v2/spec.md` reflect the verified post-remediation state and do not mark the `Every .cs file compiled by UtilitiesCS.csproj has >=80% line coverage as reported by Cobertura` acceptance criterion complete unless `P5-T5` verified that no `Implementation` row from `phase0-remaining-ledger.md` remains below `0.80`, every retained skip row is backed by its required evidence artifact, and every `Return To Implementation` decision is closed by `P4-T56` through `P4-T65`.
 
-- [ ] [P5-T8] Refresh post-remediation review artifacts only after `P5-T1` through `P5-T7` complete
-	- Acceptance: if a new review is requested, the refreshed review artifacts reference `phase1-branch-diff-clean.md`, `phase5-tests-with-coverage.md`, and `phase5-coverage-verification.md` as the evidence baseline.
+- [ ] [P5-T8] Record the post-remediation review-artifact disposition only after `P5-T1` through `P5-T7` complete
+	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/qa-gates/phase5-review-refresh.md` exists and contains `Timestamp:` plus either (a) `Review Refresh Requested: No`, or (b) `Review Refresh Requested: Yes` and references to `phase1-branch-diff-clean.md`, `phase5-tests-with-coverage.md`, and `phase5-coverage-verification.md` as the evidence baseline.
 
 ## Validation Target
 
 - The executor should treat Phase 0 as a mandatory preflight gate.
 - The executor must not start any Phase 2, Phase 3, or Phase 4 task until `P0-T1` through `P1-T5` are complete.
-- The executor must rerun the full Phase 5 QA loop from `P5-T1` whenever any earlier Phase 5 task changes files or produces a non-zero exit code.
+- The executor must rerun `P5-T1` through `P5-T4` from the top whenever any of `P5-T1` through `P5-T4` changes files or exits non-zero, and may treat Phase 5 as complete only after one clean pass across all four tasks.

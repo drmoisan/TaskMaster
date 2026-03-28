@@ -31,6 +31,9 @@ namespace QuickFiler.Controllers
 
         private ConcurrentObservableCollection<UClass> _list = new();
 
+        private static bool StoredKeyEquals(TKey left, TKey right) =>
+            EqualityComparer<TKey>.Default.Equals(left, right);
+
         public VDelegate this[TKey key]
         {
             get => this.Find(key).Delegate;
@@ -87,7 +90,7 @@ namespace QuickFiler.Controllers
 
         public void Add(string sourceId, TKey key, VDelegate @delegate)
         {
-            if (_list.Any(x => x.SourceId == sourceId && x.KeyEquals(key)))
+            if (_list.Any(x => x.SourceId == sourceId && StoredKeyEquals(x.Key, key)))
             {
                 string message =
                     $"Cannot add key because it already exists. Key {key} SourceId {sourceId}";
@@ -103,7 +106,11 @@ namespace QuickFiler.Controllers
 
         public void Add(UClass instance)
         {
-            if (_list.Any(x => x.SourceId == instance.SourceId && x.KeyEquals(instance.Key)))
+            if (
+                _list.Any(x =>
+                    x.SourceId == instance.SourceId && StoredKeyEquals(x.Key, instance.Key)
+                )
+            )
             {
                 string message =
                     $"Cannot add key because it already exists. Key {instance.Key} SourceId {instance.SourceId}";
@@ -116,7 +123,7 @@ namespace QuickFiler.Controllers
 
         public bool Remove(string sourceId, TKey key)
         {
-            var index = _list.FindIndex(x => x.SourceId == sourceId && x.KeyEquals(key));
+            var index = _list.FindIndex(x => x.SourceId == sourceId && StoredKeyEquals(x.Key, key));
             if (index == -1)
             {
                 return false;
