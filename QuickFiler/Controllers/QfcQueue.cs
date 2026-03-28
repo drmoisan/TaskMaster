@@ -166,8 +166,21 @@ namespace QuickFiler.Controllers
 
             BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> bc;
 
-            // Wait for all jobs to finish to prevent conflicts
-            await JobsToFinish(100, _token);
+            // Wait for all jobs to finish to prevent conflicts.
+            // Guard against a pre-cancelled _token: when the instance is being torn down the
+            // token may already be cancelled before the move-monitor callback fires, causing
+            // JobsToFinish to throw. In that case cleanup is moot — exit gracefully.
+            try
+            {
+                await JobsToFinish(100, _token);
+            }
+            catch (OperationCanceledException) when (_token.IsCancellationRequested)
+            {
+                logger.Debug(
+                    $"{nameof(RemoveItem)} exiting early: instance token is already cancelled"
+                );
+                return;
+            }
 
             bc = Interlocked.Exchange(ref _queue, []);
 
