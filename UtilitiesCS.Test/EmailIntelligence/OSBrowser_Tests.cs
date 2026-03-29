@@ -1,8 +1,11 @@
 using System;
+using System.IO;
 using System.Reflection;
 using BrightIdeasSoftware;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using ObjectListViewDemo;
 using UtilitiesCS.EmailIntelligence.FilterOlFolders;
 
 namespace UtilitiesCS.Test.EmailIntelligence
@@ -125,6 +128,134 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Assert
             kbResult.Should().Contain("KB");
             mbResult.Should().Contain("MB");
+        }
+
+        /// <summary>
+        /// Verifies that the constructor-wired tree and column delegates can be invoked
+        /// deterministically against mocked file-system abstractions.
+        ///
+        /// Purpose:
+        ///     Covers the SetupTree ChildrenGetter success path plus the SetupColumns
+        ///     AspectGetter and AspectToStringConverter branches for directory, file,
+        ///     missing-file, file-type, and attribute scenarios.
+        /// </summary>
+        [STAThread]
+        [TestMethod]
+        public void Constructor_WiredDelegates_HandleDirectoryFileAndMissingFileInputs()
+        {
+            // Arrange
+            var browser = new OSBrowser();
+            var tlv = GetTreeListView(browser);
+
+            var directory = new Mock<IDirectoryInfo>(MockBehavior.Strict);
+            directory.SetupGet(x => x.Name).Returns("Repo");
+            directory.SetupGet(x => x.FullName).Returns(Environment.CurrentDirectory);
+            directory.SetupGet(x => x.Extension).Returns(string.Empty);
+            directory.SetupGet(x => x.Attributes).Returns(FileAttributes.Directory);
+            directory.SetupGet(x => x.CreationTime).Returns(DateTime.Today);
+            directory.SetupGet(x => x.LastWriteTime).Returns(DateTime.Today);
+            directory.Setup(x => x.GetFileSystemInfos()).Returns(Array.Empty<IFileSystemInfo>());
+
+            var file = new Mock<IFileInfo>(MockBehavior.Strict);
+            file.SetupGet(x => x.Name).Returns("readme.txt");
+            file.SetupGet(x => x.FullName).Returns("readme.txt");
+            file.SetupGet(x => x.Extension).Returns(".txt");
+            file.SetupGet(x => x.Attributes).Returns(FileAttributes.Normal);
+            file.SetupGet(x => x.CreationTime).Returns(DateTime.Today);
+            file.SetupGet(x => x.LastWriteTime).Returns(DateTime.Today);
+            file.SetupGet(x => x.Length).Returns(2048L);
+
+            var missingFile = new Mock<IFileInfo>(MockBehavior.Strict);
+            missingFile.SetupGet(x => x.Name).Returns("missing.txt");
+            missingFile.SetupGet(x => x.FullName).Returns("missing.txt");
+            missingFile.SetupGet(x => x.Extension).Returns(".txt");
+            missingFile.SetupGet(x => x.Attributes).Returns(FileAttributes.Normal);
+            missingFile.SetupGet(x => x.CreationTime).Returns(DateTime.Today);
+            missingFile.SetupGet(x => x.LastWriteTime).Returns(DateTime.Today);
+            missingFile
+                .SetupGet(x => x.Length)
+                .Throws(new FileNotFoundException("synthetic missing file"));
+
+            var directoryInfo = new MyFileSystemInfo(directory.Object);
+            var fileInfo = new MyFileSystemInfo(file.Object);
+            var missingFileInfo = new MyFileSystemInfo(missingFile.Object);
+
+            var imageColumn = (OLVColumn)
+                typeof(OSBrowser)
+                    .GetField("olvColumnName", BindingFlags.NonPublic | BindingFlags.Instance)
+                    .GetValue(browser);
+            var sizeColumn = (OLVColumn)
+                typeof(OSBrowser)
+                    .GetField("olvColumnSize", BindingFlags.NonPublic | BindingFlags.Instance)
+                    .GetValue(browser);
+            var fileTypeColumn = (OLVColumn)
+                typeof(OSBrowser)
+                    .GetField("olvColumnFileType", BindingFlags.NonPublic | BindingFlags.Instance)
+                    .GetValue(browser);
+            var attributesColumn = (OLVColumn)
+                typeof(OSBrowser)
+                    .GetField("olvColumnAttributes", BindingFlags.NonPublic | BindingFlags.Instance)
+                    .GetValue(browser);
+
+            // Act
+            var childResults = tlv.ChildrenGetter(directoryInfo);
+            var canExpandDirectory = tlv.CanExpandGetter(directoryInfo);
+            var canExpandFile = tlv.CanExpandGetter(fileInfo);
+            var imageIndex = imageColumn.ImageGetter(directoryInfo);
+            var directorySize = sizeColumn.AspectGetter(directoryInfo);
+            var fileSize = sizeColumn.AspectGetter(fileInfo);
+            var missingFileSize = sizeColumn.AspectGetter(missingFileInfo);
+            var negativeSizeDisplay = sizeColumn.AspectToStringConverter(-1L);
+            var positiveSizeDisplay = sizeColumn.AspectToStringConverter(2048L);
+            var fileType = fileTypeColumn.AspectGetter(fileInfo);
+            var attributes = attributesColumn.AspectGetter(directoryInfo);
+
+            // Assert
+            childResults.Should().NotBeNull();
+            canExpandDirectory.Should().BeTrue();
+            canExpandFile.Should().BeFalse();
+            imageIndex.Should().NotBeNull();
+            directorySize.Should().Be(-1L);
+            fileSize.Should().Be(2048L);
+            missingFileSize.Should().Be(-2L);
+            negativeSizeDisplay.Should().Be(string.Empty);
+            positiveSizeDisplay.Should().Contain("KB");
+            fileType.Should().BeOfType<string>();
+            attributes.Should().Be(FileAttributes.Directory);
+        }
+
+        /// <summary>
+        /// Verifies that the constructor-wired ChildrenGetter returns an empty
+        /// <see cref="System.Collections.ArrayList"/> when directory enumeration raises
+        /// <see cref="UnauthorizedAccessException"/>.
+        /// </summary>
+        [STAThread]
+        [TestMethod]
+        public void Constructor_ChildrenGetter_WhenDirectoryAccessDenied_ReturnsEmptyArrayList()
+        {
+            // Arrange
+            var browser = new OSBrowser();
+            var tlv = GetTreeListView(browser);
+            _ = browser.Handle;
+
+            var deniedDirectory = new Mock<IDirectoryInfo>(MockBehavior.Strict);
+            deniedDirectory.SetupGet(x => x.Name).Returns("Denied");
+            deniedDirectory.SetupGet(x => x.FullName).Returns(Environment.CurrentDirectory);
+            deniedDirectory.SetupGet(x => x.Extension).Returns(string.Empty);
+            deniedDirectory.SetupGet(x => x.Attributes).Returns(FileAttributes.Directory);
+            deniedDirectory.SetupGet(x => x.CreationTime).Returns(DateTime.Today);
+            deniedDirectory.SetupGet(x => x.LastWriteTime).Returns(DateTime.Today);
+            deniedDirectory
+                .Setup(x => x.GetFileSystemInfos())
+                .Throws(new UnauthorizedAccessException("synthetic access denied"));
+
+            var deniedInfo = new MyFileSystemInfo(deniedDirectory.Object);
+
+            // Act
+            var result = tlv.ChildrenGetter(deniedInfo);
+
+            // Assert
+            result.Should().BeOfType<System.Collections.ArrayList>();
         }
     }
 }

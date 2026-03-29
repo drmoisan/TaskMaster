@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -237,6 +238,126 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Assert: one entry; value reflects the update
             dict.Count.Should().Be(1);
             dict[key].Should().Be("People:Alice Updated");
+        }
+
+        // -----------------------------------------------------------------------
+        // P2-T15 — Cleanup seam state between tests that inject InputBox.DialogInvoker
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Resets InputBox.DialogInvoker to its real implementation after each test
+        /// so that seam injections in this class do not bleed into other tests.
+        /// </summary>
+        [TestCleanup]
+        public void TestCleanup_ResetInputBoxSeam()
+        {
+            // Restore the real dialog so no seam injection bleeds out of this class.
+            InputBox.DialogInvoker = viewer => viewer.ShowDialog();
+        }
+
+        // -----------------------------------------------------------------------
+        // P2-T15 — SplitAddressToFirstLastName branches (COM-free)
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that SplitAddressToFirstLastName parses a standard first.last@domain.com
+        /// email into a title-cased "First Last -> Domain" string using the first-pass regex.
+        ///
+        /// Purpose:
+        ///     This is the main mail-metadata extraction path (regex 1) used when inferring
+        ///     a contact name from their email address before adding a People category.
+        /// </summary>
+        [TestMethod]
+        public void SplitAddressToFirstLastName_WithDotFormat_ReturnsTitleCasedNameAndDomain()
+        {
+            // Arrange
+            var dict = new PeopleScoDictionaryNew();
+
+            // Act
+            var result = dict.SplitAddressToFirstLastName("john.smith@example.com");
+
+            // Assert: first-pass regex produces title-cased name and domain
+            result.Should().Be("John Smith -> Example");
+        }
+
+        /// <summary>
+        /// Verifies that SplitAddressToFirstLastName appends a middle-name segment when the
+        /// first-pass regex captures a third group (the middle portion of the address).
+        /// </summary>
+        [TestMethod]
+        public void SplitAddressToFirstLastName_WithMiddleNameSegment_IncludesMiddleNameInResult()
+        {
+            // Arrange
+            var dict = new PeopleScoDictionaryNew();
+
+            // Act: address with three-part local part triggers the middle-name branch
+            var result = dict.SplitAddressToFirstLastName("john.smith.doe@example.com");
+
+            // Assert: middle name is appended between first and last segments
+            result.Should().Be("John Smith Doe -> Example");
+        }
+
+        /// <summary>
+        /// Verifies that SplitAddressToFirstLastName falls back to the second-pass regex
+        /// when the address has no dot or underscore separator in the local part.
+        /// </summary>
+        [TestMethod]
+        public void SplitAddressToFirstLastName_WithNoSeparator_UsesFallbackRegexAndReturnsTitleCasedName()
+        {
+            // Arrange
+            var dict = new PeopleScoDictionaryNew();
+
+            // Act: no dot/underscore between first and second parts — triggers regex 2 path
+            var result = dict.SplitAddressToFirstLastName("jsmith@company.com");
+
+            // Assert: fallback regex extracts first char and remainder as name segments
+            result.Should().Be("J Smith -> Company");
+        }
+
+        /// <summary>
+        /// Verifies that SplitAddressToFirstLastName returns the original string unchanged
+        /// when the address does not match either regex (no recognizable email structure).
+        /// </summary>
+        [TestMethod]
+        public void SplitAddressToFirstLastName_WithNonEmailString_ReturnsOriginalString()
+        {
+            // Arrange
+            var dict = new PeopleScoDictionaryNew();
+
+            // Act: no @ and no recognized domain — neither regex matches
+            var result = dict.SplitAddressToFirstLastName("notanemailaddress");
+
+            // Assert: original string is returned unmodified
+            result.Should().Be("notanemailaddress");
+        }
+
+        // -----------------------------------------------------------------------
+        // P2-T15 — RefineValidateCategory cancel path (InputBox seam)
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that RefineValidateCategory returns null when the InputBox dialog is
+        /// cancelled, covering the cancel branch without touching Outlook COM.
+        ///
+        /// Purpose:
+        ///     Uses the InputBox.DialogInvoker seam to simulate the user pressing Cancel,
+        ///     exercising the null-return path of RefineValidateCategory.
+        /// </summary>
+        [TestMethod]
+        public void RefineValidateCategory_WhenUserCancels_ReturnsNull()
+        {
+            // Arrange: InputBox seam returns Cancel so ShowDialog returns null
+            InputBox.DialogInvoker = viewer => DialogResult.Cancel;
+
+            var dict = new PeopleScoDictionaryNew();
+            var mockPrefix = new Mock<IPrefix>();
+            mockPrefix.SetupGet(p => p.Value).Returns("People:");
+
+            // Act
+            var result = dict.RefineValidateCategory("John Smith", mockPrefix.Object);
+
+            // Assert: cancel path returns null
+            result.Should().BeNull();
         }
     }
 }

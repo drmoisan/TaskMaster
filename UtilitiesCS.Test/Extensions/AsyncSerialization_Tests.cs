@@ -276,5 +276,52 @@ namespace UtilitiesCS.Test.Extensions
 
             void IProgress<T>.Report(T value) => _callback(value);
         }
+
+        /// <summary>
+        /// Tests the negative-sourceLength inference branch (line 208) in the
+        /// ProgressTrackerPane overload of CopyToAsync. When sourceLength &lt; 0 and
+        /// source.CanSeek is true, the method infers sourceLength from the stream.
+        /// This covers the uncovered branch in the ProgressTrackerPane overload that
+        /// was missed by the existing CopyToAsync_WithNullProgress_ThrowsNullReference
+        /// test (which used a non-negative sourceLength).
+        ///
+        /// Args:
+        ///     None — uses inline Arrange.
+        ///
+        /// Returns:
+        ///     Void; asserts via FluentAssertions.
+        ///
+        /// Side Effects:
+        ///     None; uses only in-memory MemoryStream.
+        /// </summary>
+        [TestMethod]
+        [Description(
+            "Covers the sourceLength<0 inference branch in CopyToAsync(ProgressTrackerPane) "
+                + "(line 208): when sourceLength=-1 and source.CanSeek=true, the method infers length from the stream. "
+                + "With null progress the final progress.Report(100) call throws NullReferenceException."
+        )]
+        public async Task CopyToAsync_ProgressTrackerPaneOverload_WithNegativeSourceLength_InfersLengthFromSeekableStream()
+        {
+            // Arrange: a seekable MemoryStream so source.CanSeek=true activates the length-inference branch.
+            var data = new byte[] { 1, 2, 3 };
+            using var source = new MemoryStream(data);
+            using var destination = new MemoryStream();
+
+            // Act & Assert: sourceLength=-1 triggers the inference of sourceLength from stream.
+            // When totalBytesCopied>0 the final progress.Report(100) call throws because progress is null.
+            Func<Task> act = () =>
+                source.CopyToAsync(
+                    sourceLength: -1,
+                    destination,
+                    bufferSize: 3,
+                    (ProgressTrackerPane)null,
+                    messagePrefix: "",
+                    CancellationToken.None
+                );
+            await act.Should()
+                .ThrowAsync<NullReferenceException>(
+                    "the final progress.Report(100) is not null-guarded and progress is null"
+                );
+        }
     }
 }

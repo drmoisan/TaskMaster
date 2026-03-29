@@ -41,6 +41,9 @@ namespace UtilitiesCS.Test.Dialogs
         {
             // Reset DpiCalled after each test so static state cannot contaminate others.
             InputBoxViewer.DpiCalled = false;
+
+            // Reset the seam to the real implementation so static state cannot contaminate others.
+            InputBox.DialogInvoker = viewer => viewer.ShowDialog();
         }
 
         // ---------------------------------------------------------------------------
@@ -157,6 +160,48 @@ namespace UtilitiesCS.Test.Dialogs
 
             // Assert — flag must now be true
             InputBoxViewer.DpiCalled.Should().BeTrue();
+        }
+
+        // ---------------------------------------------------------------------------
+        // P2-T2 (seam): InputBox.ShowDialog returns accepted value via injected seam
+        // ---------------------------------------------------------------------------
+
+        [TestMethod]
+        [STAThread]
+        public void ShowDialog_SeamReturnsOk_ReturnsEnteredText()
+        {
+            // Arrange — inject a seam that immediately returns OK and hard-wires the viewer's
+            // input text, avoiding any real modal dialog.
+            InputBox.DialogInvoker = viewer =>
+            {
+                // Simulate the user typing a value and clicking OK.
+                viewer.Input.Text = "injected value";
+                return DialogResult.OK;
+            };
+
+            // Act
+            string result = InputBox.ShowDialog("Prompt", "Title", "default");
+
+            // Assert — when the seam reports OK, ShowDialog returns the text in Input.Text
+            result.Should().Be("injected value");
+        }
+
+        // ---------------------------------------------------------------------------
+        // P2-T3 (seam): InputBox.ShowDialog returns null when seam reports cancel
+        // ---------------------------------------------------------------------------
+
+        [TestMethod]
+        [STAThread]
+        public void ShowDialog_SeamReturnsCancel_ReturnsNull()
+        {
+            // Arrange — inject a seam that immediately reports Cancel.
+            InputBox.DialogInvoker = _ => DialogResult.Cancel;
+
+            // Act
+            string result = InputBox.ShowDialog("Prompt", "Title", "default");
+
+            // Assert — when the seam reports Cancel, ShowDialog returns null
+            result.Should().BeNull();
         }
 
         // ---------------------------------------------------------------------------

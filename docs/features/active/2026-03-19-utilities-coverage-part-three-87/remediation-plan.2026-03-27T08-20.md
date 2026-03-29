@@ -153,118 +153,118 @@ This remediation pass starts by reconciling the live Cobertura inventory, the cl
 - [x] [P1-T4] Remove the stale audit diff group `docs/features/active/2026-03-19-utilities-coverage-part-three-87/audit-2026-03-26T09-40/**` from the branch
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p1-stale-audit-cleanup.md` exists and contains `Timestamp:`, `Target Path Group: docs/features/active/2026-03-19-utilities-coverage-part-three-87/audit-2026-03-26T09-40/**`, and `Resolution:` describing the exact cleanup action.
 
-- [ ] [P1-T5] Re-capture the isolated branch diff after `P1-T1` through `P1-T4` complete
+- [x] [P1-T5] Re-capture the isolated branch diff after `P1-T1` through `P1-T4` complete
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/phase1-branch-diff-clean.md` exists and contains `Timestamp:`, `Command: git diff --name-status development...HEAD`, `EXIT_CODE: 0`, `Output Summary:`, and no rows whose path equals `VBFunctions.Test/ComputerInfo_Test.cs` or `VBFunctions.Test/VBFunctions.Test.csproj`, and no rows whose path starts with `docs/features/active/2026-03-25-quickfiler-gui-not-expanding-96/` or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/audit-2026-03-26T09-40/`.
 
 ### Phase 2 — High-Risk Dialog and Async Follow-up Work
 
-- [ ] [P2-T1] Introduce a deterministic dialog-invoker seam for `UtilitiesCS\Dialogs\InputBox.cs` so the wrapper can be covered without opening a real modal dialog
+- [x] [P2-T1] Introduce a deterministic dialog-invoker seam for `UtilitiesCS\Dialogs\InputBox.cs` so the wrapper can be covered without opening a real modal dialog
 	- Acceptance: `UtilitiesCS\Dialogs\InputBox.cs` exposes a replaceable dialog-invoker seam, and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-inputbox-seam.md` records the new seam member name.
 
-- [ ] [P2-T2] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that `InputBox.cs` returns the accepted value produced by the injected dialog seam
+- [x] [P2-T2] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that `InputBox.cs` returns the accepted value produced by the injected dialog seam
 	- Acceptance: the updated coverage report records `UtilitiesCS\Dialogs\InputBox.cs` at `>= 0.80`, and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-inputbox-accepted.md` records the exact test method name added to `InputBox_Test.cs`.
 
-- [ ] [P2-T3] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that `InputBox.cs` returns `null` when the injected dialog seam reports cancel
+- [x] [P2-T3] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\InputBox_Test.cs` verifying that `InputBox.cs` returns `null` when the injected dialog seam reports cancel
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-inputbox-cancel.md` records the exact test method name added to `InputBox_Test.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\Dialogs\InputBox.cs` at `>= 0.80`.
 
-- [ ] [P2-T4] Introduce a deterministic dialog-invoker seam for `UtilitiesCS\Dialogs\MyBox.cs` where the wrapper still depends on real modal display logic
+- [x] [P2-T4] Introduce a deterministic dialog-invoker seam for `UtilitiesCS\Dialogs\MyBox.cs` where the wrapper still depends on real modal display logic
 	- Acceptance: `UtilitiesCS\Dialogs\MyBox.cs` exposes a replaceable dialog-invoker seam, and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-mybox-seam.md` records the seam member name.
 
-- [ ] [P2-T5] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\MyBox_Tests.cs` verifying that `MyBox.cs` returns the expected button mapping for a simulated affirmative result
+- [x] [P2-T5] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\MyBox_Tests.cs` verifying that `MyBox.cs` returns the expected button mapping for a simulated affirmative result
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-mybox-affirmative.md` records the exact test method name added to `MyBox_Tests.cs`, and the updated coverage report records `UtilitiesCS\Dialogs\MyBox.cs` at `>= 0.80`.
 
-- [ ] [P2-T6] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\MyBox_Tests.cs` verifying that `MyBox.cs` preserves the caller-supplied default result when the injected dialog seam returns that default path
+- [x] [P2-T6] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\MyBox_Tests.cs` verifying that `MyBox.cs` preserves the caller-supplied default result when the injected dialog seam returns that default path
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-mybox-default.md` records the exact test method name added to `MyBox_Tests.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\Dialogs\MyBox.cs` at `>= 0.80`.
 
-- [ ] [P2-T7] Introduce a deterministic notification seam for `UtilitiesCS\Dialogs\NotImplementedDialog.cs` if the current tests still leave wrapper-only branches uncovered
+- [x] [P2-T7] Introduce a deterministic notification seam for `UtilitiesCS\Dialogs\NotImplementedDialog.cs` if the current tests still leave wrapper-only branches uncovered
 	- Acceptance: either `NotImplementedDialog.cs` exposes a replaceable notification seam and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-notimplemented-seam.md` records it, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-notimplemented-seam.md` records `Seam Not Required` with the exact uncovered members closed by test-only changes.
 
-- [ ] [P2-T8] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\NotImplementedDialog_Tests.cs` verifying the wrapper overload that supplies a custom message path
+- [x] [P2-T8] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\NotImplementedDialog_Tests.cs` verifying the wrapper overload that supplies a custom message path
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-notimplemented-message.md` records the exact test method name added to `NotImplementedDialog_Tests.cs`, and the updated coverage report records `UtilitiesCS\Dialogs\NotImplementedDialog.cs` at `>= 0.80`.
 
-- [ ] [P2-T9] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\NotImplementedDialog_Tests.cs` verifying the wrapper overload that resolves the default not-implemented message path
+- [x] [P2-T9] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\NotImplementedDialog_Tests.cs` verifying the wrapper overload that resolves the default not-implemented message path
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-notimplemented-default.md` records the exact test method name added to `NotImplementedDialog_Tests.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\Dialogs\NotImplementedDialog.cs` at `>= 0.80`.
 
-- [ ] [P2-T10] Introduce a deterministic dialog-invoker seam for `UtilitiesCS\Dialogs\YesNoToAll.cs` if response-selection still depends on modal display state
+- [x] [P2-T10] Introduce a deterministic dialog-invoker seam for `UtilitiesCS\Dialogs\YesNoToAll.cs` if response-selection still depends on modal display state
 	- Acceptance: either `YesNoToAll.cs` exposes a replaceable dialog-invoker seam and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-yesnotoall-seam.md` records it, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-yesnotoall-seam.md` records `Seam Not Required` with the exact uncovered members closed by test-only changes.
 
-- [ ] [P2-T11] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\YesNoToAll_Tests.cs` verifying that the wrapper returns the `Yes` path when the dialog seam reports yes
+- [x] [P2-T11] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\YesNoToAll_Tests.cs` verifying that the wrapper returns the `Yes` path when the dialog seam reports yes
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-yesnotoall-yes.md` records the exact test method name added to `YesNoToAll_Tests.cs`, and the updated coverage report records `UtilitiesCS\Dialogs\YesNoToAll.cs` at `>= 0.80`.
 
-- [ ] [P2-T12] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\YesNoToAll_Tests.cs` verifying that the wrapper returns the `No` path when the dialog seam reports no
+- [x] [P2-T12] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\YesNoToAll_Tests.cs` verifying that the wrapper returns the `No` path when the dialog seam reports no
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-yesnotoall-no.md` records the exact test method name added to `YesNoToAll_Tests.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\Dialogs\YesNoToAll.cs` at `>= 0.80`.
 
-- [ ] [P2-T13] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\YesNoToAll_Tests.cs` verifying that the wrapper returns the `All` path when the dialog seam reports all
+- [x] [P2-T13] Add an MSTest scenario in `UtilitiesCS.Test\Dialogs\YesNoToAll_Tests.cs` verifying that the wrapper returns the `All` path when the dialog seam reports all
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-yesnotoall-all.md` records the exact test method name added to `YesNoToAll_Tests.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\Dialogs\YesNoToAll.cs` at `>= 0.80`.
 
-- [ ] [P2-T14] Add an MSTest scenario in `UtilitiesCS.Test\EmailIntelligence\SortEmail_Tests.cs` verifying the next uncovered non-null mail-processing branch identified in `SortEmail.cs`
+- [x] [P2-T14] Add an MSTest scenario in `UtilitiesCS.Test\EmailIntelligence\SortEmail_Tests.cs` verifying the next uncovered non-null mail-processing branch identified in `SortEmail.cs`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-sortemail-followup.md` records the exact test method name added to `SortEmail_Tests.cs`, and the updated coverage report records `UtilitiesCS\EmailIntelligence\EmailParsingSorting\SortEmail.cs` at `>= 0.80`.
 
-- [ ] [P2-T15] Add an MSTest scenario in `UtilitiesCS.Test\EmailIntelligence\PeopleScoDictionaryNew_Tests.cs` verifying the next uncovered branch in `PeopleScoDictionaryNew.cs` after duplicate-add coverage
+- [x] [P2-T15] Add an MSTest scenario in `UtilitiesCS.Test\EmailIntelligence\PeopleScoDictionaryNew_Tests.cs` verifying the next uncovered branch in `PeopleScoDictionaryNew.cs` after duplicate-add coverage
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-peoplesco-followup.md` records the exact test method name added to `PeopleScoDictionaryNew_Tests.cs`, and the updated coverage report records `UtilitiesCS\EmailIntelligence\People\PeopleScoDictionaryNew.cs` at `>= 0.80`.
 
-- [ ] [P2-T16] Create `UtilitiesCS.Test\EmailIntelligence\ManagerAsyncLazy_Tests.cs` for `UtilitiesCS\EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs`
+- [x] [P2-T16] Create `UtilitiesCS.Test\EmailIntelligence\ManagerAsyncLazy_Tests.cs` for `UtilitiesCS\EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs`
 	- Acceptance: `UtilitiesCS.Test\EmailIntelligence\ManagerAsyncLazy_Tests.cs` exists and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-managerasynclazy-testhome.md` records the file path.
 
-- [ ] [P2-T17] Register `UtilitiesCS.Test\EmailIntelligence\ManagerAsyncLazy_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
+- [x] [P2-T17] Register `UtilitiesCS.Test\EmailIntelligence\ManagerAsyncLazy_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj`
 	- Acceptance: `UtilitiesCS.Test\UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\ManagerAsyncLazy_Tests.cs" />`.
 
-- [ ] [P2-T18] Add an MSTest scenario in `UtilitiesCS.Test\EmailIntelligence\ManagerAsyncLazy_Tests.cs` verifying the lazy-success path for `ManagerAsyncLazy.cs`
+- [x] [P2-T18] Add an MSTest scenario in `UtilitiesCS.Test\EmailIntelligence\ManagerAsyncLazy_Tests.cs` verifying the lazy-success path for `ManagerAsyncLazy.cs`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-managerasynclazy-success.md` records the exact test method name added to `ManagerAsyncLazy_Tests.cs`, and the updated coverage report records `UtilitiesCS\EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs` at `>= 0.80`.
 
-- [ ] [P2-T19] Add an MSTest scenario in `UtilitiesCS.Test\EmailIntelligence\ManagerAsyncLazy_Tests.cs` verifying the cached-or-faulted follow-up path for `ManagerAsyncLazy.cs`
+- [x] [P2-T19] Add an MSTest scenario in `UtilitiesCS.Test\EmailIntelligence\ManagerAsyncLazy_Tests.cs` verifying the cached-or-faulted follow-up path for `ManagerAsyncLazy.cs`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-managerasynclazy-followup.md` records the exact test method name added to `ManagerAsyncLazy_Tests.cs`, and `coverage/coverage.cobertura.xml` still records `UtilitiesCS\EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs` at `>= 0.80`.
 
-- [ ] [P2-T20] Add an MSTest scenario in `UtilitiesCS.Test\Extensions\AsyncSerialization_Tests.cs` verifying the next uncovered branch in `AsyncSerialization.cs` after the existing progress-formatting tests
+- [x] [P2-T20] Add an MSTest scenario in `UtilitiesCS.Test\Extensions\AsyncSerialization_Tests.cs` verifying the next uncovered branch in `AsyncSerialization.cs` after the existing progress-formatting tests
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-asyncserialization-followup.md` records the exact test method name added to `AsyncSerialization_Tests.cs`, and the updated coverage report records `UtilitiesCS\Extensions\AsyncSerialization.cs` at `>= 0.80`.
 
-- [ ] [P2-T21] Add an MSTest scenario in `UtilitiesCS.Test\HelperClasses\TipsController_Tests.cs` verifying the next uncovered branch in `TipsController.cs` after the existing toggle tests
+- [x] [P2-T21] Add an MSTest scenario in `UtilitiesCS.Test\HelperClasses\TipsController_Tests.cs` verifying the next uncovered branch in `TipsController.cs` after the existing toggle tests
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p2-tipscontroller-followup.md` records the exact test method name added to `TipsController_Tests.cs`, and the updated coverage report records `UtilitiesCS\HelperClasses\ToolTips\TipsController.cs` at `>= 0.80`.
 
 ### Phase 3 — Skip Re-Validation
 
-- [ ] [P3-T1] Re-validate the skip rationale for `UtilitiesCS\EmailIntelligence\Bayesian\Performance\ConfusionViewer.cs`
+- [x] [P3-T1] Re-validate the skip rationale for `UtilitiesCS\EmailIntelligence\Bayesian\Performance\ConfusionViewer.cs`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-confusionviewer-skip.md` exists and records `File: UtilitiesCS\EmailIntelligence\Bayesian\Performance\ConfusionViewer.cs` plus `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
-- [ ] [P3-T2] Re-validate the skip rationale for `UtilitiesCS\EmailIntelligence\Bayesian\Performance\MetricChartViewer.cs`
+- [x] [P3-T2] Re-validate the skip rationale for `UtilitiesCS\EmailIntelligence\Bayesian\Performance\MetricChartViewer.cs`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-metricchartviewer-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
-- [ ] [P3-T3] Re-validate the skip rationale for `UtilitiesCS\Threading\ProgressMultiStepViewer.cs`
+- [x] [P3-T3] Re-validate the skip rationale for `UtilitiesCS\Threading\ProgressMultiStepViewer.cs`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-progressmultistepviewer-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
-- [ ] [P3-T4] Re-validate the skip rationale for `UtilitiesCS\Threading\ThreadMonitor.cs`
+- [x] [P3-T4] Re-validate the skip rationale for `UtilitiesCS\Threading\ThreadMonitor.cs`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-threadmonitor-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
-- [ ] [P3-T5] Re-validate the skip rationale for `UtilitiesCS\To Depricate\FileIO2.cs`
+- [x] [P3-T5] Re-validate the skip rationale for `UtilitiesCS\To Depricate\FileIO2.cs`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-fileio2-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
-- [ ] [P3-T6] Re-validate the skip rationale for `UtilitiesCS\HelperClasses\Windows Forms\ScreenHelper.cs`
+- [x] [P3-T6] Re-validate the skip rationale for `UtilitiesCS\HelperClasses\Windows Forms\ScreenHelper.cs`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-screenhelper-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
-- [ ] [P3-T7] Re-validate the skip rationale for `UtilitiesCS\HelperClasses\ThemeHelpers\Theme.cs`
+- [x] [P3-T7] Re-validate the skip rationale for `UtilitiesCS\HelperClasses\ThemeHelpers\Theme.cs`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-theme-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
-- [ ] [P3-T8] Re-validate the skip rationale for `UtilitiesCS\HelperClasses\FileSystem\ShellUtilities.cs`
+- [x] [P3-T8] Re-validate the skip rationale for `UtilitiesCS\HelperClasses\FileSystem\ShellUtilities.cs`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-shellutilities-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
-- [ ] [P3-T9] Re-validate the skip rationale for `UtilitiesCS\HelperClasses\FileSystem\ShellUtilitiesStatic.cs`
+- [x] [P3-T9] Re-validate the skip rationale for `UtilitiesCS\HelperClasses\FileSystem\ShellUtilitiesStatic.cs`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-shellutilitiesstatic-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
-- [ ] [P3-T10] Re-validate the skip rationale for `UtilitiesCS\HelperClasses\ThemeHelpers\SystemThemeDetector.cs`
+- [x] [P3-T10] Re-validate the skip rationale for `UtilitiesCS\HelperClasses\ThemeHelpers\SystemThemeDetector.cs`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p3-systemthemedetector-skip.md` exists and records `Decision: Skip Confirmed` or `Decision: Return To Implementation`.
 
 ### Phase 4 — Remaining Reopened Coverage Phases
 
-- [ ] [P4-T1] Reopen v2 Phase 8 for `UtilitiesCS\EmailIntelligence\EmailParsingSorting\AutoFile.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\AutoFile_Tests.cs`
+- [x] [P4-T1] Reopen v2 Phase 8 for `UtilitiesCS\EmailIntelligence\EmailParsingSorting\AutoFile.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\AutoFile_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\EmailParsingSorting\AutoFile.cs` at `>= 0.80`.
 
-- [ ] [P4-T2] Reopen v2 Phase 10 for `UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersController.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersController_Tests.cs`
+- [x] [P4-T2] Reopen v2 Phase 10 for `UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersController.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersController_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersController.cs` at `>= 0.80`.
 
-- [ ] [P4-T3] Reopen v2 Phase 11 for `UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersViewer_Tests.cs`
+- [x] [P4-T3] Reopen v2 Phase 11 for `UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\FilterOlFoldersViewer_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.cs` at `>= 0.80`.
 
-- [ ] [P4-T4] Reopen v2 Phase 13 for `UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\OSBrowser.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\OSBrowser_Tests.cs`
+- [x] [P4-T4] Reopen v2 Phase 13 for `UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\OSBrowser.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\OSBrowser_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\OSBrowser.cs` at `>= 0.80`.
 
 - [ ] [P4-T5] Reopen v2 Phase 14 for `UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapController.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\FolderRemapController_Tests.cs`

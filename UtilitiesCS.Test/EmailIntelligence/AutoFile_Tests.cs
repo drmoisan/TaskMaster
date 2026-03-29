@@ -1,6 +1,7 @@
 using System;
 using System.Dynamic;
 using System.Reflection;
+using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Outlook;
@@ -32,6 +33,16 @@ namespace UtilitiesCS.Test.EmailIntelligence
     [TestClass]
     public class AutoFile_Tests
     {
+        /// <summary>
+        /// Restores the real modal dialog invoker after each test so that any test
+        /// using the <see cref="MyBox.DialogInvoker"/> seam cannot leak state.
+        /// </summary>
+        [TestCleanup]
+        public void TestCleanup_ResetMyBoxDialogInvokerSeam()
+        {
+            MyBox.DialogInvoker = viewer => viewer.ShowDialog();
+        }
+
         #region Phase 8-T1: AreConversationsGrouped
 
         /// <summary>
@@ -212,6 +223,64 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Assert
             result.Should().BeEmpty();
+        }
+
+        /// <summary>
+        /// Verifies that AutoFindPeople reports missing recipients through the
+        /// <see cref="MyBox.DialogInvoker"/> seam when notification is enabled.
+        ///
+        /// Purpose:
+        ///     Exercises the missing-recipient aggregation branch and the final
+        ///     MyBox warning dialog path without displaying a real modal dialog.
+        ///
+        /// Side Effects:
+        ///     Temporarily replaces <see cref="MyBox.DialogInvoker"/> with a
+        ///     capturing stub; <see cref="TestCleanup_ResetMyBoxDialogInvokerSeam"/>
+        ///     restores the real implementation after the test.
+        /// </summary>
+        [TestMethod]
+        [STAThread]
+        public void AutoFindPeople_WhenMissingRecipientsAndNotifyEnabled_ShowsUnknownRecipientsDialog()
+        {
+            // Arrange: one known sender and one unknown recipient force the warning path
+            var mockRecipient = new Mock<IRecipientInfo>(MockBehavior.Strict);
+            mockRecipient.Setup(r => r.Address).Returns("unknown@example.com");
+
+            var mockSender = new Mock<IRecipientInfo>(MockBehavior.Strict);
+            mockSender.Setup(r => r.Address).Returns("sender@example.com");
+
+            var helper = new TestMailItemHelper(
+                toRecipients: new[] { mockRecipient.Object },
+                ccRecipients: Array.Empty<IRecipientInfo>(),
+                sender: mockSender.Object
+            );
+
+            var mockDict = new Mock<IScoDictionaryNew<string, string>>(MockBehavior.Loose);
+            mockDict.Setup(d => d.ContainsKey("unknown@example.com")).Returns(false);
+            mockDict.Setup(d => d.ContainsKey("sender@example.com")).Returns(true);
+            mockDict.Setup(d => d["sender@example.com"]).Returns("Sender Person");
+
+            string capturedTitle = string.Empty;
+            string capturedMessage = string.Empty;
+            MyBox.DialogInvoker = viewer =>
+            {
+                capturedTitle = viewer.Text;
+                capturedMessage = viewer.TextMessage.Text;
+                return DialogResult.OK;
+            };
+
+            // Act
+            var result = AutoFile.AutoFindPeople(
+                helper,
+                mockDict.Object,
+                blNotifyMissing: true,
+                blExcludeFlagged: false
+            );
+
+            // Assert
+            result.Should().ContainSingle().Which.Should().Be("Sender Person");
+            capturedTitle.Should().Be("Unknown Recipients");
+            capturedMessage.Should().Be("Recipients not in list of people: unknown@example.com");
         }
 
         #endregion

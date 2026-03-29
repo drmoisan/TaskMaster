@@ -116,6 +116,27 @@ namespace UtilitiesCS.Test.EmailIntelligence
             mbResult.Should().Contain("MB");
         }
 
+        /// <summary>
+        /// Verifies that the private SetupDragAndDrop helper enables simple drag/drop
+        /// behaviour on the non-filtered tree list view.
+        /// </summary>
+        [STAThread]
+        [TestMethod]
+        public void SetupDragAndDrop_WhenInvoked_EnablesSimpleDragAndDropFlags()
+        {
+            // Arrange
+            var viewer = new FilterOlFoldersViewer();
+
+            // Act
+            typeof(FilterOlFoldersViewer)
+                .GetMethod("SetupDragAndDrop", BindingFlags.NonPublic | BindingFlags.Instance)
+                .Invoke(viewer, null);
+
+            // Assert
+            viewer.TlvNotFiltered.IsSimpleDragSource.Should().BeTrue();
+            viewer.TlvNotFiltered.IsSimpleDropSink.Should().BeTrue();
+        }
+
         // ---------------------------------------------------------------------------
         // P11-T4: Save and Discard buttons forward events to the controller
         // ---------------------------------------------------------------------------
@@ -172,6 +193,88 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 typeof(FilterOlFoldersViewer)
                     .GetMethod("BtnDiscard_Click", BindingFlags.NonPublic | BindingFlags.Instance)
                     .Invoke(viewer, new object[] { viewer, System.EventArgs.Empty });
+
+            // Assert
+            act.Should().NotThrow();
+            viewer.IsDisposed.Should().BeFalse();
+        }
+
+        /// <summary>
+        /// Verifies that BtnSave_Click forwards Save() to the controller by injecting
+        /// an uninitialized controller with a synthetic FolderTree and a real viewer.
+        /// The observable side effect is that the viewer is closed.
+        /// </summary>
+        [STAThread]
+        [TestMethod]
+        public void BtnSave_Click_ForwardsSaveToController_ClosesViewer()
+        {
+            // Arrange
+            var viewer = new FilterOlFoldersViewer();
+
+            var rootNode = new TreeNode<FolderWrapper>(
+                new FolderWrapper(
+                    selected: false,
+                    itemCount: 0,
+                    folderSize: 0,
+                    name: "Root",
+                    relativePath: "Root"
+                )
+            );
+            var syntheticTree = (FolderTree)
+                FormatterServices.GetUninitializedObject(typeof(FolderTree));
+            typeof(FolderTree)
+                .GetField("_roots", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(syntheticTree, new List<TreeNode<FolderWrapper>> { rootNode });
+
+            var mockTd = new Moq.Mock<IToDoObjects>();
+            mockTd
+                .SetupGet(td => td.FilteredFolderScraping)
+                .Returns(new ScoDictionary<string, int>());
+
+            var mockGlobals = new Moq.Mock<IApplicationGlobals>();
+            mockGlobals.SetupGet(g => g.TD).Returns(mockTd.Object);
+
+            var controller = (FilterOlFoldersController)
+                FormatterServices.GetUninitializedObject(typeof(FilterOlFoldersController));
+            typeof(FilterOlFoldersController)
+                .GetField("_viewer", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(controller, viewer);
+            typeof(FilterOlFoldersController)
+                .GetField("_olFolderTree", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(controller, syntheticTree);
+            typeof(FilterOlFoldersController)
+                .GetField("_globals", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(controller, mockGlobals.Object);
+
+            typeof(FilterOlFoldersViewer)
+                .GetField("_controller", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(viewer, controller);
+
+            // Act
+            typeof(FilterOlFoldersViewer)
+                .GetMethod("BtnSave_Click", BindingFlags.NonPublic | BindingFlags.Instance)
+                .Invoke(viewer, new object[] { viewer, EventArgs.Empty });
+
+            // Assert
+            viewer.IsDisposed.Should().BeTrue();
+        }
+
+        /// <summary>
+        /// Verifies that BtnSave_Click is a no-op when the viewer has no controller,
+        /// exercising the null-conditional forwarding path.
+        /// </summary>
+        [STAThread]
+        [TestMethod]
+        public void BtnSave_Click_WithNullController_DoesNotThrow()
+        {
+            // Arrange
+            var viewer = new FilterOlFoldersViewer();
+
+            // Act
+            Action act = () =>
+                typeof(FilterOlFoldersViewer)
+                    .GetMethod("BtnSave_Click", BindingFlags.NonPublic | BindingFlags.Instance)
+                    .Invoke(viewer, new object[] { viewer, EventArgs.Empty });
 
             // Assert
             act.Should().NotThrow();

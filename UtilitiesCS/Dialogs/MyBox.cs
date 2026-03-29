@@ -20,6 +20,13 @@ namespace UtilitiesCS
 
     public static class MyBox
     {
+        /// <summary>
+        /// Replaceable dialog-invoker seam. The default implementation delegates to
+        /// <see cref="MyBoxViewer.ShowDialog()"/>; tests replace it with a non-modal stub.
+        /// </summary>
+        internal static Func<MyBoxViewer, DialogResult> DialogInvoker { get; set; } =
+            viewer => viewer.ShowDialog();
+
         public static DialogResult ShowDialog(
             string Message,
             string Title,
@@ -46,7 +53,7 @@ namespace UtilitiesCS
                 _viewer.MinimumSize = tmp;
                 _viewer.SetDialogIcon(icon);
                 _viewer.Hide();
-                DialogResult result = _viewer.ShowDialog();
+                DialogResult result = DialogInvoker(_viewer);
                 return result;
             }
         }
@@ -66,7 +73,7 @@ namespace UtilitiesCS
             viewer.SetDialogIcon(icon);
             viewer.Hide();
             viewer.TopMost = true;
-            DialogResult result = viewer.ShowDialog();
+            DialogResult result = DialogInvoker(viewer);
             return result;
         }
 
@@ -85,7 +92,7 @@ namespace UtilitiesCS
             viewer.SetDialogIcon(icon);
             viewer.Hide();
             viewer.TopMost = true;
-            DialogResult result = viewer.ShowDialog();
+            DialogResult result = DialogInvoker(viewer);
             return group.Result;
         }
 
@@ -104,7 +111,7 @@ namespace UtilitiesCS
             viewer.SetDialogIcon(icon);
             viewer.Hide();
             viewer.TopMost = true;
-            DialogResult result = viewer.ShowDialog();
+            DialogResult result = DialogInvoker(viewer);
             return result;
         }
 

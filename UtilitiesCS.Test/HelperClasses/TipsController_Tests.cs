@@ -219,5 +219,229 @@ namespace UtilitiesCS.Test.HelperClasses
                     "second Toggle from Off state must restore label visibility to its post-construction value"
                 );
         }
+
+        /// <summary>
+        /// Verifies the two-argument constructor stores the group number and that
+        /// ColumnWidth defaults to 0 for a Panel-parented label.
+        /// </summary>
+        [TestMethod]
+        public void Constructor_WithGroupNumber_StoresGroupNumberAndColumnWidthDefaultsToZero()
+        {
+            int capturedGroup = -1;
+            float capturedWidth = -1f;
+            Exception caught = null;
+
+            var t = new Thread(() =>
+            {
+                try
+                {
+                    var panel = new Panel();
+                    var label = new Label();
+                    panel.Controls.Add(label);
+                    var ctrl = new TipsController(label, 42);
+                    capturedGroup = ctrl.GroupNumber;
+                    capturedWidth = ctrl.ColumnWidth;
+                }
+                catch (Exception ex)
+                {
+                    caught = ex;
+                }
+            });
+            t.SetApartmentState(ApartmentState.STA);
+            t.Start();
+            t.Join();
+
+            caught.Should().BeNull("construction with a group number must not throw");
+            capturedGroup.Should().Be(42, "GroupNumber must match the constructor argument");
+            capturedWidth.Should().Be(0f, "ColumnWidth is 0 when parent is a Panel");
+        }
+
+        /// <summary>
+        /// Verifies the GroupNumber property setter writes through to the backing field.
+        /// </summary>
+        [TestMethod]
+        public void GroupNumber_Setter_UpdatesStoredValue()
+        {
+            int result = -1;
+            Exception caught = null;
+
+            var t = new Thread(() =>
+            {
+                try
+                {
+                    var panel = new Panel();
+                    var label = new Label();
+                    panel.Controls.Add(label);
+                    var ctrl = new TipsController(label);
+                    ctrl.GroupNumber = 7;
+                    result = ctrl.GroupNumber;
+                }
+                catch (Exception ex)
+                {
+                    caught = ex;
+                }
+            });
+            t.SetApartmentState(ApartmentState.STA);
+            t.Start();
+            t.Join();
+
+            caught.Should().BeNull();
+            result.Should().Be(7, "GroupNumber setter must store the assigned value");
+        }
+
+        /// <summary>
+        /// Verifies ResolveParentType throws ArgumentException when the label has no parent.
+        /// </summary>
+        [TestMethod]
+        public void Constructor_LabelWithNullParent_ThrowsArgumentException()
+        {
+            Exception caught = null;
+
+            var t = new Thread(() =>
+            {
+                try
+                {
+                    _ = new TipsController(new Label());
+                }
+                catch (Exception ex)
+                {
+                    caught = ex;
+                }
+            });
+            t.SetApartmentState(ApartmentState.STA);
+            t.Start();
+            t.Join();
+
+            caught
+                .Should()
+                .BeOfType<ArgumentException>(
+                    "ResolveParentType must throw when the label has no parent"
+                );
+        }
+
+        /// <summary>
+        /// Verifies ResolveParentType throws ArgumentException when the label's parent
+        /// is neither a Panel nor a TableLayoutPanel.
+        /// </summary>
+        [TestMethod]
+        public void Constructor_LabelWithInvalidParentType_ThrowsArgumentException()
+        {
+            Exception caught = null;
+
+            var t = new Thread(() =>
+            {
+                try
+                {
+                    // Control is not Panel or TableLayoutPanel — triggers the else-if throw path
+                    var container = new Control();
+                    var label = new Label();
+                    container.Controls.Add(label);
+                    _ = new TipsController(label);
+                }
+                catch (Exception ex)
+                {
+                    caught = ex;
+                }
+            });
+            t.SetApartmentState(ApartmentState.STA);
+            t.Start();
+            t.Join();
+
+            caught
+                .Should()
+                .BeOfType<ArgumentException>(
+                    "ResolveParentType must throw when the parent is not Panel or TableLayoutPanel"
+                );
+        }
+
+        /// <summary>
+        /// Verifies Toggle(bool sharedColumn) transitions state in both directions
+        /// and updates label visibility on a Panel-parented label.
+        /// </summary>
+        [TestMethod]
+        public void Toggle_WithSharedColumnParameter_BothStateTransitions_TogglesLabelCorrectly()
+        {
+            bool visibleAfterOff = true;
+            bool enabledAfterOff = true;
+            bool visibleAfterOn = false;
+            bool enabledAfterOn = false;
+            Exception caught = null;
+
+            var t = new Thread(() =>
+            {
+                try
+                {
+                    var panel = new Panel();
+                    var label = new Label();
+                    panel.Controls.Add(label);
+                    var ctrl = new TipsController(label); // initial state = On
+
+                    // State is On: exercises the else branch → Toggle(Off, false)
+                    ctrl.Toggle(sharedColumn: false);
+                    visibleAfterOff = label.Visible;
+                    enabledAfterOff = label.Enabled;
+
+                    // State is now Off: exercises the if branch → Toggle(On, true)
+                    ctrl.Toggle(sharedColumn: true);
+                    visibleAfterOn = label.Visible;
+                    enabledAfterOn = label.Enabled;
+                }
+                catch (Exception ex)
+                {
+                    caught = ex;
+                }
+            });
+            t.SetApartmentState(ApartmentState.STA);
+            t.Start();
+            t.Join();
+
+            caught.Should().BeNull();
+            visibleAfterOff
+                .Should()
+                .BeFalse("Toggle(sharedColumn: false) from On state must hide the label");
+            enabledAfterOff
+                .Should()
+                .BeFalse("Toggle(sharedColumn: false) from On state must disable the label");
+            visibleAfterOn
+                .Should()
+                .BeTrue("Toggle(sharedColumn: true) from Off state must show the label");
+            enabledAfterOn
+                .Should()
+                .BeTrue("Toggle(sharedColumn: true) from Off state must enable the label");
+        }
+
+        /// <summary>
+        /// Verifies ToggleColumnOnly completes without error for both Off and On states
+        /// when the parent is a Panel (the inner TLP column-width branch is skipped).
+        /// </summary>
+        [TestMethod]
+        public void ToggleColumnOnly_WithPanelParent_DoesNotThrowAndUpdatesState()
+        {
+            Exception caught = null;
+
+            var t = new Thread(() =>
+            {
+                try
+                {
+                    var panel = new Panel();
+                    var label = new Label();
+                    panel.Controls.Add(label);
+                    var ctrl = new TipsController(label);
+
+                    // Both calls exercise the outer Off/On branches; TLP inner condition is false
+                    ctrl.ToggleColumnOnly(Enums.ToggleState.Off);
+                    ctrl.ToggleColumnOnly(Enums.ToggleState.On);
+                }
+                catch (Exception ex)
+                {
+                    caught = ex;
+                }
+            });
+            t.SetApartmentState(ApartmentState.STA);
+            t.Start();
+            t.Join();
+
+            caught.Should().BeNull("ToggleColumnOnly on a Panel-parented label must not throw");
+        }
     }
 }

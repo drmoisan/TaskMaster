@@ -90,6 +90,7 @@
     <Compile Include="Dialogs\ActionButtonTests.cs" />
     <Compile Include="Dialogs\DelegateButton_Tests.cs" />
     <Compile Include="Dialogs\FolderNotFoundViewer_Tests.cs" />
+    <Compile Include="Dialogs\MyBox_ShowDialog_Tests.cs" />
     <Compile Include="Dialogs\MyBox_Tests.cs" />
     <Compile Include="Dialogs\NotImplementedDialog_Tests.cs" />
     <Compile Include="EmailIntelligence\AutoFile_Tests.cs" />
@@ -154,6 +155,7 @@
     <Compile Include="EmailIntelligence\IClonableBehaviorTest.cs" />
     <Compile Include="EmailIntelligence\FlagTranslator_Tests.cs" />
     <Compile Include="EmailIntelligence\PeopleScoDictionaryNew_Tests.cs" />
+    <Compile Include="EmailIntelligence\ManagerAsyncLazy_Tests.cs" />
     <Compile Include="EmailIntelligence\EmailDataMiner_Tests.cs" />
     <Compile Include="EmailIntelligence\RecentsList_Tests.cs" />
     <Compile Include="Extensions\ArrayExtensions_Tests.cs" />
@@ -207,6 +209,7 @@
     <Compile Include="HelperClasses\FileSystemInfoWrapper_Tests.cs" />
     <Compile Include="HelperClasses\QfcTipsDetails_Tests.cs" />
     <Compile Include="HelperClasses\TipsController_Tests.cs" />
+    <Compile Include="HelperClasses\TipsController_TableLayoutPanel_Tests.cs" />
     <Compile Include="HelperClasses\OlvExtension_Tests.cs" />
     <Compile Include="Interfaces\PropertyStore_Tests.cs" />
     <Compile Include="NewtonsoftHelpers\AllInclusiveBinder_Tests.cs" />

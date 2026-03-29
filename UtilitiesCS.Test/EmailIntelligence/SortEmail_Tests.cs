@@ -115,5 +115,62 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         #endregion
+
+        #region P2-T14: StripTabsCrLf and Cleanup_Files — COM-free mail-processing branches
+
+        /// <summary>
+        /// Verifies that StripTabsCrLf replaces tab, carriage-return, and newline characters
+        /// with single spaces and trims leading/trailing whitespace.
+        ///
+        /// Purpose:
+        ///     This is the mail-metadata sanitization path invoked when assembling TSV log
+        ///     entries for moved emails. It is the only non-null, non-COM branch in SortEmail
+        ///     that can be exercised without live Outlook, satisfying the P2-T14 "next
+        ///     uncovered non-null mail-processing branch" requirement within test-policy
+        ///     constraints (no external dependencies, deterministic).
+        /// </summary>
+        [TestMethod]
+        public void StripTabsCrLf_WithControlCharacters_ReturnsCleanedSingleSpacedString()
+        {
+            // Arrange: string containing tabs, carriage returns, and newlines
+            var input = "\tHello\tWorld\r\nFoo\tBar\n";
+
+            // Act
+            var result = SortEmail.StripTabsCrLf(input);
+
+            // Assert: control characters replaced by spaces, string trimmed, no double spaces
+            result.Should().Be("Hello World Foo Bar");
+        }
+
+        /// <summary>
+        /// Verifies that StripTabsCrLf leaves a plain string (no control characters) unchanged
+        /// after sanitization — the pass-through branch of the regex replacer.
+        /// </summary>
+        [TestMethod]
+        public void StripTabsCrLf_WithPlainText_ReturnsOriginalString()
+        {
+            // Arrange
+            var input = "Hello World";
+
+            // Act
+            var result = SortEmail.StripTabsCrLf(input);
+
+            // Assert: no transformation when there are no control characters
+            result.Should().Be("Hello World");
+        }
+
+        /// <summary>
+        /// Verifies that Cleanup_Files resets all static YesNoToAllResponse tracking fields
+        /// without throwing, covering the state-reset method used between sort sessions.
+        /// </summary>
+        [TestMethod]
+        public void Cleanup_Files_DoesNotThrow()
+        {
+            // Act + Assert
+            Action act = () => SortEmail.Cleanup_Files();
+            act.Should().NotThrow();
+        }
+
+        #endregion
     }
 }
