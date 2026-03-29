@@ -112,45 +112,45 @@ This remediation pass starts by reconciling the live Cobertura inventory, the cl
 
 ### Phase 0 — Policy Read & Baseline Capture
 
-- [ ] [P0-T1] Read `.github/copilot-instructions.md`, `.github/instructions/general-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, `.github/instructions/csharp-code-change.instructions.md`, and `.github/instructions/csharp-unit-test.instructions.md` in repository policy order
+- [x] [P0-T1] Read `.github/copilot-instructions.md`, `.github/instructions/general-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, `.github/instructions/csharp-code-change.instructions.md`, and `.github/instructions/csharp-unit-test.instructions.md` in repository policy order
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-instructions-read.md` exists and contains `Timestamp:`, `Policy Order:`, and the five exact policy file paths in the required order.
 
-- [ ] [P0-T2] Read `v2/issue.md`, `v2/spec.md`, `v2/user-story.md`, `remediation-inputs.2026-03-27T08-20.md`, and `v2/plan.2026-03-22T21-00.md` before implementation begins
+- [x] [P0-T2] Read `v2/issue.md`, `v2/spec.md`, `v2/user-story.md`, `remediation-inputs.2026-03-27T08-20.md`, and `v2/plan.2026-03-22T21-00.md` before implementation begins
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-instructions-read.md` contains `Requirements Read:` followed by the five exact source paths, including `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/issue.md`, `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/spec.md`, and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/user-story.md`.
 
-- [ ] [P0-T3] Capture the live branch-diff baseline with `git diff --name-status development...HEAD`
+- [x] [P0-T3] Capture the live branch-diff baseline with `git diff --name-status development...HEAD`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-branch-diff.md` exists and contains `Timestamp:`, `Command: git diff --name-status development...HEAD`, `EXIT_CODE: 0`, `Output Summary:`, and the full diff listing.
 
-- [ ] [P0-T4] Capture the baseline C# formatter result with `dotnet tool run csharpier .`
+- [x] [P0-T4] Capture the baseline C# formatter result with `dotnet tool run csharpier .`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-csharpier.md` exists and contains `Timestamp:`, `Command: dotnet tool run csharpier .`, `EXIT_CODE:`, and `Output Summary:`.
 
-- [ ] [P0-T5] Capture the baseline analyzer-build result with `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNETAnalyzers -EnforceCodeStyleInBuild`
+- [x] [P0-T5] Capture the baseline analyzer-build result with `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNETAnalyzers -EnforceCodeStyleInBuild`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-analyzers.md` exists and contains `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
 
-- [ ] [P0-T6] Capture the baseline nullable-build result with `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNullable -TreatWarningsAsErrors`
+- [x] [P0-T6] Capture the baseline nullable-build result with `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNullable -TreatWarningsAsErrors`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-nullable.md` exists and contains `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
 
-- [ ] [P0-T7] Capture the live coverage baseline with `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug`
+- [x] [P0-T7] Capture the live coverage baseline with `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-tests-with-coverage.md` exists and contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, and a numeric `UtilitiesCS Line Rate:` baseline value.
 
-- [ ] [P0-T8] Regenerate the remaining-file reconciliation ledger from `coverage/coverage.cobertura.xml` and classify every still-below-threshold file as either `Implementation` or `Skip Re-Validation`
+- [x] [P0-T8] Regenerate the remaining-file reconciliation ledger from `coverage/coverage.cobertura.xml` and classify every still-below-threshold file as either `Implementation` or `Skip Re-Validation`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-remaining-ledger.md` exists, lists every file named in the two scope sections above exactly once, and records a numeric `Baseline Line Rate:` plus a `Route:` of `Implementation` or `Skip Re-Validation` for each row.
 
-- [ ] [P0-T9] Map each `Implementation` row in `phase0-remaining-ledger.md` to its authoritative v2 phase or to a new remediation-only phase when no v2 phase exists
+- [x] [P0-T9] Map each `Implementation` row in `phase0-remaining-ledger.md` to its authoritative v2 phase or to a new remediation-only phase when no v2 phase exists
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/baseline/phase0-remaining-ledger.md` contains a non-empty `Phase:` column for every `Implementation` row, and `UtilitiesCS\EmailIntelligence\Bayesian\BayesianSerializationHelper.cs` is explicitly mapped to `Remediation-Only`.
 
 ### Phase 1 — Branch Isolation Cleanup
 
-- [ ] [P1-T1] Remove the out-of-scope file diff entry `VBFunctions.Test/ComputerInfo_Test.cs` from the branch
+- [x] [P1-T1] Remove the out-of-scope file diff entry `VBFunctions.Test/ComputerInfo_Test.cs` from the branch
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p1-vbfunctions-computerinfo-cleanup.md` exists and contains `Timestamp:`, `Target Path: VBFunctions.Test/ComputerInfo_Test.cs`, and `Resolution:` describing the exact cleanup action.
 
-- [ ] [P1-T2] Remove the out-of-scope project diff entry `VBFunctions.Test/VBFunctions.Test.csproj` from the branch
+- [x] [P1-T2] Remove the out-of-scope project diff entry `VBFunctions.Test/VBFunctions.Test.csproj` from the branch
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p1-vbfunctions-csproj-cleanup.md` exists and contains `Timestamp:`, `Target Path: VBFunctions.Test/VBFunctions.Test.csproj`, and `Resolution:` describing the exact cleanup action.
 
-- [ ] [P1-T3] Remove the out-of-scope documentation diff group `docs/features/active/2026-03-25-quickfiler-gui-not-expanding-96/**` from the branch
+- [x] [P1-T3] Remove the out-of-scope documentation diff group `docs/features/active/2026-03-25-quickfiler-gui-not-expanding-96/**` from the branch
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p1-issue96-docs-cleanup.md` exists and contains `Timestamp:`, `Target Path Group: docs/features/active/2026-03-25-quickfiler-gui-not-expanding-96/**`, and `Resolution:` describing the exact cleanup action.
 
-- [ ] [P1-T4] Remove the stale audit diff group `docs/features/active/2026-03-19-utilities-coverage-part-three-87/audit-2026-03-26T09-40/**` from the branch
+- [x] [P1-T4] Remove the stale audit diff group `docs/features/active/2026-03-19-utilities-coverage-part-three-87/audit-2026-03-26T09-40/**` from the branch
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p1-stale-audit-cleanup.md` exists and contains `Timestamp:`, `Target Path Group: docs/features/active/2026-03-19-utilities-coverage-part-three-87/audit-2026-03-26T09-40/**`, and `Resolution:` describing the exact cleanup action.
 
 - [ ] [P1-T5] Re-capture the isolated branch diff after `P1-T1` through `P1-T4` complete

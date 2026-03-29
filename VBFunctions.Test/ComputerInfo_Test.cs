@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.VisualBasic.Devices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS;
+using VBFunctions;
 
 namespace VBFunctions.Test
 {
@@ -27,11 +27,10 @@ namespace VBFunctions.Test
 
             // Act
 
-            var computerInfo = new ComputerInfo();
-            totalPhysicalMemory = computerInfo.TotalPhysicalMemory;
-            availablePhysicalMemory = computerInfo.AvailablePhysicalMemory;
-            totalVirtualMemory = computerInfo.TotalVirtualMemory;
-            availableVirtualMemory = computerInfo.AvailableVirtualMemory;
+            totalPhysicalMemory = ComputerInfo.TotalPhysicalMemory;
+            availablePhysicalMemory = ComputerInfo.AvailablePhysicalMemory;
+            totalVirtualMemory = ComputerInfo.TotalVirtualMemory;
+            availableVirtualMemory = ComputerInfo.AvailableVirtualMemory;
 
             var jagged = new List<string[]>
             {

@@ -16,6 +16,13 @@ Files Read:
 - `.github/instructions/csharp-code-change.instructions.md` — read (read_file tool, lines 1–50)
 - `.github/instructions/csharp-unit-test.instructions.md` — read (read_file tool, lines 1–50)
 
+Requirements Read:
+- `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/issue.md`
+- `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/spec.md`
+- `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/user-story.md`
+- `docs/features/active/2026-03-19-utilities-coverage-part-three-87/remediation-inputs.2026-03-27T08-20.md`
+- `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/plan.2026-03-22T21-00.md`
+
 Key constraints noted for this plan:
 - All new tests: MSTest ([TestClass]/[TestMethod]), Moq for mocking, FluentAssertions for assertions
 - Tests must be deterministic, isolated, no external deps, no temporary filesystem files
