@@ -267,10 +267,10 @@ This remediation pass starts by reconciling the live Cobertura inventory, the cl
 - [x] [P4-T4] Reopen v2 Phase 13 for `UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\OSBrowser.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\OSBrowser_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\OlFolderTools\FilterOlFolders\OSBrowser.cs` at `>= 0.80`.
 
-- [ ] [P4-T5] Reopen v2 Phase 14 for `UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapController.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\FolderRemapController_Tests.cs`
+- [x] [P4-T5] Reopen v2 Phase 14 for `UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapController.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\FolderRemapController_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapController.cs` at `>= 0.80`.
 
-- [ ] [P4-T6] Reopen v2 Phase 16 for `UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderSelector.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\FolderSelector_Tests.cs`
+- [x] [P4-T6] Reopen v2 Phase 16 for `UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderSelector.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\FolderSelector_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderSelector.cs` at `>= 0.80`.
 
 - [ ] [P4-T7] Reopen v2 Phase 17 for `UtilitiesCS\EmailIntelligence\SubjectMap\SubjectMapEncoder.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\SubjectMapEncoder_Tests.cs`

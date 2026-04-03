@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Windows.Forms;
 using BrightIdeasSoftware;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -26,7 +27,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
     ///     thread.
     /// </summary>
     [TestClass]
-    public class FolderRemapController_Tests
+    public partial class FolderRemapController_Tests
     {
         // ---------------------------------------------------------------------------
         // Factory helpers
@@ -78,6 +79,32 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 .GetField("_roots", BindingFlags.NonPublic | BindingFlags.Instance)
                 .SetValue(tree, new List<TreeNode<OlFolderRemap>>(roots));
             return tree;
+        }
+
+        /// <summary>Sets the private RelativePath backing field on an OlFolderRemap via reflection.</summary>
+        private static void SetRelativePath(OlFolderRemap remap, string path) =>
+            typeof(OlFolderRemap)
+                .GetField("_relativePath", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(remap, path);
+
+        /// <summary>
+        /// Builds a ModelDropEventArgs with the target, source list, and location set via reflection.
+        /// </summary>
+        private static ModelDropEventArgs CreateDropArgs(
+            TreeNode<OlFolderRemap> target,
+            object[] sources,
+            DropTargetLocation location
+        )
+        {
+            var args = new ModelDropEventArgs();
+            typeof(ModelDropEventArgs)
+                .GetField("targetModel", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.SetValue(args, target);
+            typeof(ModelDropEventArgs)
+                .GetField("dragModels", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.SetValue(args, new System.Collections.ArrayList(sources));
+            args.DropTargetLocation = location;
+            return args;
         }
 
         // ---------------------------------------------------------------------------
@@ -243,6 +270,225 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Assert — TD.FolderRemap was accessed and the dictionary remains empty
             mockTD.Verify(td => td.FolderRemap, Times.AtLeastOnce());
             folderRemap.Count.Should().Be(0);
+        }
+
+        // P14-T6: SyncGlobalMap removes a key that is no longer in Mappings2
+        [TestMethod]
+        public void SyncGlobalMap_WhenKeyNotInMappings_RemovesObsoleteKey()
+        {
+            // Arrange — FolderRemap has "obsolete" but Mappings2 is empty
+            var folderRemap = new ScoDictionary<string, string>(
+                new Dictionary<string, string> { { "obsolete", "dest" } }
+            );
+            var mockTD = new Mock<IToDoObjects>();
+            mockTD.Setup(td => td.FolderRemap).Returns(folderRemap);
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            mockGlobals.Setup(g => g.TD).Returns(mockTD.Object);
+            var controller = CreateController(
+                null,
+                CreateRemapTree(new List<TreeNode<OlFolderRemap>>()),
+                mockGlobals.Object
+            );
+
+            // Act
+            controller.SyncGlobalMap();
+
+            // Assert — obsolete key is removed when not present in Mappings2
+            folderRemap.ContainsKey("obsolete").Should().BeFalse();
+        }
+
+        // P14-T7: SyncGlobalMap adds a new mapping entry when TryAdd succeeds
+        [TestMethod]
+        public void SyncGlobalMap_WithNewMappingEntry_AddsEntryToFolderRemap()
+        {
+            // Arrange — empty FolderRemap, Mappings2 has one entry with RelativePath and MappedTo
+            var folderRemap = new ScoDictionary<string, string>();
+            var mockTD = new Mock<IToDoObjects>();
+            mockTD.Setup(td => td.FolderRemap).Returns(folderRemap);
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            mockGlobals.Setup(g => g.TD).Returns(mockTD.Object);
+            var controller = CreateController(
+                null,
+                CreateRemapTree(new List<TreeNode<OlFolderRemap>>()),
+                mockGlobals.Object
+            );
+            var src = new OlFolderRemap();
+            SetRelativePath(src, "src-path");
+            var dst = new OlFolderRemap();
+            SetRelativePath(dst, "dst-path");
+            src.MappedTo = dst;
+            typeof(FolderRemapController)
+                .GetField("_mappings2", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(controller, new List<OlFolderRemap> { src });
+
+            // Act
+            controller.SyncGlobalMap();
+
+            // Assert — new entry is added
+            folderRemap["src-path"].Should().Be("dst-path");
+        }
+
+        // P14-T8: SyncGlobalMap updates an existing key when TryAdd fails
+        [TestMethod]
+        public void SyncGlobalMap_WithExistingKey_UpdatesEntryToNewDestination()
+        {
+            // Arrange — FolderRemap already has "src-path" → TryAdd fails → update branch
+            var folderRemap = new ScoDictionary<string, string>(
+                new Dictionary<string, string> { { "src-path", "old-dst" } }
+            );
+            var mockTD = new Mock<IToDoObjects>();
+            mockTD.Setup(td => td.FolderRemap).Returns(folderRemap);
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            mockGlobals.Setup(g => g.TD).Returns(mockTD.Object);
+            var controller = CreateController(
+                null,
+                CreateRemapTree(new List<TreeNode<OlFolderRemap>>()),
+                mockGlobals.Object
+            );
+            var src = new OlFolderRemap();
+            SetRelativePath(src, "src-path");
+            var dst = new OlFolderRemap();
+            SetRelativePath(dst, "new-dst");
+            src.MappedTo = dst;
+            typeof(FolderRemapController)
+                .GetField("_mappings2", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(controller, new List<OlFolderRemap> { src });
+
+            // Act
+            controller.SyncGlobalMap();
+
+            // Assert — existing key is updated to new destination
+            folderRemap["src-path"].Should().Be("new-dst");
+        }
+
+        // P14-T9: ExpandTo(1, addChecked=true) expands nodes whose descendants have mappings
+        [STAThread]
+        [TestMethod]
+        public void ExpandTo_WithAddCheckedTrue_DoesNotThrowOnMappedNodes()
+        {
+            // Arrange — node with MappedTo set so the addChecked branch executes
+            var remap = new OlFolderRemap();
+            remap.MappedTo = new OlFolderRemap();
+            var node = new TreeNode<OlFolderRemap>(remap);
+            var viewer = new FolderRemapViewer();
+            var controller = CreateController(
+                viewer,
+                CreateRemapTree(new List<TreeNode<OlFolderRemap>> { node }),
+                new Mock<IApplicationGlobals>().Object
+            );
+
+            // Act + Assert — no exception thrown when traversing mapped nodes
+            Action act = () => controller.ExpandTo(1, addChecked: true);
+            act.Should().NotThrow();
+        }
+
+        // P14-T10: OlFolderTree_PropertyChanged returns early when _update is true
+        [TestMethod]
+        public void OlFolderTreePropertyChanged_WhenUpdateIsTrue_ReturnsEarlyWithoutSync()
+        {
+            // Arrange — _update = true so the early-return branch is taken
+            var controller = CreateController(
+                null,
+                CreateRemapTree(new List<TreeNode<OlFolderRemap>>()),
+                new Mock<IApplicationGlobals>().Object
+            );
+            typeof(FolderRemapController)
+                .GetField("_update", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(controller, true);
+
+            // Act + Assert — no exception and no downstream sync called
+            Action act = () => controller.OlFolderTree_PropertyChanged(null, null);
+            act.Should().NotThrow();
+        }
+
+        // P14-T11: OlFolderTree_PropertyChanged syncs and updates viewer when _update is false
+        [STAThread]
+        [TestMethod]
+        public void OlFolderTreePropertyChanged_WhenUpdateIsFalse_SyncsRemapTreeAndUpdatesViewer()
+        {
+            // Arrange — default _update=false so normal sync path is taken
+            var viewer = new FolderRemapViewer();
+            var controller = CreateController(
+                viewer,
+                CreateRemapTree(new List<TreeNode<OlFolderRemap>>()),
+                new Mock<IApplicationGlobals>().Object
+            );
+
+            // Act + Assert — SyncTreeToMappings and OlvMap.SetObjects complete without exception
+            Action act = () => controller.OlFolderTree_PropertyChanged(null, null);
+            act.Should().NotThrow();
+        }
+
+        // P14-T12: HandleModelCanDrop sets InfoMessage when source contains target (self-drop)
+        [TestMethod]
+        public void HandleModelCanDrop_WhenSourceContainsTarget_SetsCannotDropOnSelfMessage()
+        {
+            // Arrange — same node as both source and target
+            var node = new TreeNode<OlFolderRemap>(new OlFolderRemap());
+            var args = CreateDropArgs(node, new object[] { node }, DropTargetLocation.Background);
+            var controller = CreateController(
+                null,
+                CreateRemapTree(new List<TreeNode<OlFolderRemap>>()),
+                new Mock<IApplicationGlobals>().Object
+            );
+
+            // Act
+            controller.HandleModelCanDrop(null, args);
+
+            // Assert — self-drop message is set
+            args.InfoMessage.Should().Be("Cannot drop on self");
+        }
+
+        // P14-T13: HandleModelCanDrop sets InfoMessage when target is already mapped
+        [TestMethod]
+        public void HandleModelCanDrop_WhenTargetAlreadyMapped_SetsInfoMessageAboutExistingMapping()
+        {
+            // Arrange — target node has a MappedTo value already set
+            var targetRemap = new OlFolderRemap();
+            targetRemap.MappedTo = new OlFolderRemap();
+            var targetNode = new TreeNode<OlFolderRemap>(targetRemap);
+            var sourceNode = new TreeNode<OlFolderRemap>(new OlFolderRemap());
+            var args = CreateDropArgs(
+                targetNode,
+                new object[] { sourceNode },
+                DropTargetLocation.Background
+            );
+            var controller = CreateController(
+                null,
+                CreateRemapTree(new List<TreeNode<OlFolderRemap>>()),
+                new Mock<IApplicationGlobals>().Object
+            );
+
+            // Act
+            controller.HandleModelCanDrop(null, args);
+
+            // Assert — a descriptive info message is set
+            args.InfoMessage.Should().NotBeNull();
+        }
+
+        // P14-T14: HandleModelCanDrop sets Effect to Move when drop is allowed
+        [TestMethod]
+        public void HandleModelCanDrop_WhenDropAllowed_SetsEffectToMove()
+        {
+            // Arrange — different nodes, target has no existing MappedTo
+            var targetNode = new TreeNode<OlFolderRemap>(new OlFolderRemap());
+            var sourceNode = new TreeNode<OlFolderRemap>(new OlFolderRemap());
+            var args = CreateDropArgs(
+                targetNode,
+                new object[] { sourceNode },
+                DropTargetLocation.Background
+            );
+            var controller = CreateController(
+                null,
+                CreateRemapTree(new List<TreeNode<OlFolderRemap>>()),
+                new Mock<IApplicationGlobals>().Object
+            );
+
+            // Act
+            controller.HandleModelCanDrop(null, args);
+
+            // Assert — drop is permitted with Move effect
+            args.Effect.Should().Be(DragDropEffects.Move);
         }
     }
 }

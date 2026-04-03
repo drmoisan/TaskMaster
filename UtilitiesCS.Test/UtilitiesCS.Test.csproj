@@ -101,6 +101,7 @@
     <Compile Include="EmailIntelligence\FolderInfoViewer_Tests.cs" />
     <Compile Include="EmailIntelligence\OSBrowser_Tests.cs" />
     <Compile Include="EmailIntelligence\FolderRemapController_Tests.cs" />
+    <Compile Include="EmailIntelligence\FolderRemapController_Tests2.cs" />
     <Compile Include="EmailIntelligence\FolderRemapViewer_Tests.cs" />
     <Compile Include="EmailIntelligence\FolderSelector_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroupTests.cs" />
