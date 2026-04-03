@@ -1,6 +1,8 @@
 using System;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading;
+using System.Windows.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS;
@@ -28,6 +30,9 @@ namespace UtilitiesCS.Test.Threading
     [TestClass]
     public class ProgressViewer_Tests
     {
+        private static ProgressViewer CreateHeadlessViewer() =>
+            (ProgressViewer)FormatterServices.GetUninitializedObject(typeof(ProgressViewer));
+
         // ---------------------------------------------------------------------------
         // P30-T1: Cancel path transitions the CancellationToken to cancelled
         // ---------------------------------------------------------------------------
@@ -142,6 +147,120 @@ namespace UtilitiesCS.Test.Threading
             {
                 SynchronizationContext.SetSynchronizationContext(previousContext);
             }
+        }
+
+        // ---------------------------------------------------------------------------
+        // P30-T3: UiDispatcher getter and setter round-trips the assigned value
+        // ---------------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that the <see cref="ProgressViewer.UiDispatcher"/> property
+        /// getter returns the same dispatcher that was assigned via the setter.
+        ///
+        /// Purpose:
+        ///     Callers store the WPF Dispatcher on the viewer so that WPF-bound
+        ///     continuations can marshal work back to the UI thread. The getter/setter
+        ///     must faithfully store and retrieve the value.
+        ///
+        /// Side Effects:
+        ///     Retrieves <c>Dispatcher.CurrentDispatcher</c> on the STA test thread
+        ///     once; creates and disposes the viewer in the finally block.
+        /// </summary>
+        [TestMethod]
+        [STAThread]
+        public void UiDispatcher_SetterAndGetter_RoundTripAssignedValue()
+        {
+            // Arrange
+            var viewer = CreateHeadlessViewer();
+
+            // Use the STA thread's current dispatcher as a non-null sentinel value.
+            Dispatcher dispatcher = Dispatcher.CurrentDispatcher;
+
+            // Act
+            viewer.UiDispatcher = dispatcher;
+
+            // Assert
+            viewer
+                .UiDispatcher.Should()
+                .BeSameAs(
+                    dispatcher,
+                    "the setter must store and the getter must return the assigned Dispatcher"
+                );
+        }
+
+        // ---------------------------------------------------------------------------
+        // P30-T4: UiThreadNumber getter and setter round-trips the assigned value
+        // ---------------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that the <see cref="ProgressViewer.UiThreadNumber"/> property
+        /// getter returns the value assigned via the setter.
+        ///
+        /// Purpose:
+        ///     Threading utilities compare the current thread ID against
+        ///     UiThreadNumber to decide whether a marshal is required. The setter
+        ///     must overwrite the ID captured at construction time, and the getter
+        ///     must return the updated value.
+        ///
+        /// Side Effects:
+        ///     Creates and disposes a ProgressViewer in the finally block.
+        /// </summary>
+        [TestMethod]
+        [STAThread]
+        public void UiThreadNumber_SetterAndGetter_RoundTripAssignedValue()
+        {
+            // Arrange
+            var viewer = CreateHeadlessViewer();
+            const int expectedThreadId = 99;
+
+            // Act
+            viewer.UiThreadNumber = expectedThreadId;
+
+            // Assert
+            viewer
+                .UiThreadNumber.Should()
+                .Be(
+                    expectedThreadId,
+                    "the setter must store and the getter must return the assigned thread ID"
+                );
+        }
+
+        // ---------------------------------------------------------------------------
+        // P30-T5: CancelSource getter and setter round-trips the assigned value
+        // ---------------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that the <see cref="ProgressViewer.CancelSource"/> property
+        /// getter returns the same <see cref="CancellationTokenSource"/> that was
+        /// assigned via the setter.
+        ///
+        /// Purpose:
+        ///     External code may need to replace or read back the cancel source after
+        ///     initial setup. The setter must overwrite and the getter must faithfully
+        ///     return the new value.
+        ///
+        /// Side Effects:
+        ///     Creates and disposes the viewer and the CancellationTokenSource in the
+        ///     finally block.
+        /// </summary>
+        [TestMethod]
+        [STAThread]
+        public void CancelSource_SetterAndGetter_RoundTripAssignedValue()
+        {
+            // Arrange
+            var viewer = CreateHeadlessViewer();
+            using var cts = new CancellationTokenSource();
+
+            // Act: use the setter directly (not SetCancellationTokenSource)
+            viewer.CancelSource = cts;
+
+            // Assert: getter must return the same instance
+            viewer
+                .CancelSource.Should()
+                .BeSameAs(
+                    cts,
+                    "the setter must store and the getter must return the assigned CancellationTokenSource"
+                );
         }
     }
 }

@@ -5,7 +5,7 @@ work-mode: full-feature
 source-issue: docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/issue.md
 source-spec: docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/spec.md
 source-user-story: docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/user-story.md
-last-updated: 2026-03-27
+last-updated: 2026-04-03
 ---
 
 # Remediation Plan — utilities-coverage-part-three-87
@@ -273,23 +273,25 @@ This remediation pass starts by reconciling the live Cobertura inventory, the cl
 - [x] [P4-T6] Reopen v2 Phase 16 for `UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderSelector.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\FolderSelector_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderSelector.cs` at `>= 0.80`.
 
-- [ ] [P4-T7] Reopen v2 Phase 17 for `UtilitiesCS\EmailIntelligence\SubjectMap\SubjectMapEncoder.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\SubjectMapEncoder_Tests.cs`
+- [x] [P4-T7] Reopen v2 Phase 17 for `UtilitiesCS\EmailIntelligence\SubjectMap\SubjectMapEncoder.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\SubjectMapEncoder_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\SubjectMap\SubjectMapEncoder.cs` at `>= 0.80`.
 
-- [ ] [P4-T8] Reopen v2 Phase 19 for `UtilitiesCS\Extensions\DfDeedle.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Extensions\DfDeedle_Tests.cs`
+- [x] [P4-T8] Reopen v2 Phase 19 for `UtilitiesCS\Extensions\DfDeedle.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Extensions\DfDeedle_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\Extensions\DfDeedle.cs` at `>= 0.80`.
 
-- [ ] [P4-T9] Reopen v2 Phase 21 for `UtilitiesCS\HelperClasses\ToolTips\QfcTipsDetails.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\QfcTipsDetails_Tests.cs`
+- [x] [P4-T9] Reopen v2 Phase 21 for `UtilitiesCS\HelperClasses\ToolTips\QfcTipsDetails.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\QfcTipsDetails_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\HelperClasses\ToolTips\QfcTipsDetails.cs` at `>= 0.80`.
 
-- [ ] [P4-T10] Reopen v2 Phase 24 for `UtilitiesCS\ReusableTypeClasses\NewSmartSerializable\Config\ConfigGroupBox.cs` and add the next deterministic scenario in `UtilitiesCS.Test\ReusableTypeClasses\ConfigGroupBox_Tests.cs`
+- [x] [P4-T10] Reopen v2 Phase 24 for `UtilitiesCS\ReusableTypeClasses\NewSmartSerializable\Config\ConfigGroupBox.cs` and add the next deterministic scenario in `UtilitiesCS.Test\ReusableTypeClasses\ConfigGroupBox_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\ReusableTypeClasses\NewSmartSerializable\Config\ConfigGroupBox.cs` at `>= 0.80`.
 
-- [ ] [P4-T11] Reopen v2 Phase 25 for `UtilitiesCS\ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.cs` and add the next deterministic scenario in `UtilitiesCS.Test\ReusableTypeClasses\ConfigViewer_Tests.cs`
+- [x] [P4-T11] Reopen v2 Phase 25 for `UtilitiesCS\ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.cs` and add the next deterministic scenario in `UtilitiesCS.Test\ReusableTypeClasses\ConfigViewer_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\ReusableTypeClasses\NewSmartSerializable\Config\ConfigViewer.cs` at `>= 0.80`.
+	- 2026-04-03 investigation note: staged handler-only tests were hardened to use headless viewer instances so they no longer construct a real `ConfigViewer` form during execution.
 
-- [ ] [P4-T12] Reopen v2 Phase 30 for `UtilitiesCS\Threading\ProgressViewer.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Threading\ProgressViewer_Tests.cs`
+- [x] [P4-T12] Reopen v2 Phase 30 for `UtilitiesCS\Threading\ProgressViewer.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Threading\ProgressViewer_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\Threading\ProgressViewer.cs` at `>= 0.80`.
+	- 2026-04-03 investigation note: staged property-only tests were hardened to use headless viewer instances so they no longer construct a real `ProgressViewer` form during execution.
 
 - [ ] [P4-T13] Reopen v2 Phase 34 for `UtilitiesCS\EmailIntelligence\EmailParsingSorting\EmailDataMiner.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\EmailDataMiner_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\EmailParsingSorting\EmailDataMiner.cs` at `>= 0.80`.
@@ -342,7 +344,7 @@ This remediation pass starts by reconciling the live Cobertura inventory, the cl
 - [ ] [P4-T29] Reopen v2 Phase 53 for `UtilitiesCS\Dialogs\FunctionButton.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Dialogs\FunctionButton_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\Dialogs\FunctionButton.cs` at `>= 0.80`.
 
-- [ ] [P4-T30] Reopen v2 Phase 54 for `UtilitiesCS\Dialogs\MyBoxViewer.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Dialogs\MyBoxViewer_Tests.cs`
+- [x] [P4-T30] Reopen v2 Phase 54 for `UtilitiesCS\Dialogs\MyBoxViewer.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Dialogs\MyBoxViewer_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\Dialogs\MyBoxViewer.cs` at `>= 0.80`.
 
 - [ ] [P4-T31] Reopen v2 Phase 56 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\Categories\CategoryClassifierGroup.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\CategoryClassifierGroup_Tests.cs`

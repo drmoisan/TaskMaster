@@ -25,6 +25,42 @@ namespace UtilitiesCS
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
 
+        /// <summary>
+        /// Testability seam for <see cref="System.Windows.Forms.MessageBox.Show"/>.
+        /// Tests replace this delegate to avoid real modal dialogs.
+        /// </summary>
+        internal static Func<
+            string,
+            string,
+            System.Windows.Forms.MessageBoxButtons,
+            System.Windows.Forms.MessageBoxIcon,
+            System.Windows.Forms.DialogResult
+        > MessageBoxInvoker = System.Windows.Forms.MessageBox.Show;
+
+        /// <summary>
+        /// Testability seam for the <see cref="OlTableExtensions.ETL"/> extension method
+        /// that converts an Outlook Table to a 2-D data array.
+        /// Tests replace this delegate to supply pre-built data without a live COM Table.
+        /// Uses <see cref="object"/> as the parameter type to avoid CS1769 (embedded interop
+        /// types cannot be used as generic type arguments across assembly boundaries).
+        /// </summary>
+        internal static Func<
+            object,
+            (object[,] data, Dictionary<string, int> columnInfo)
+        > TableEtlInvoker = t => ((Outlook.Table)t).ETL();
+
+        /// <summary>
+        /// Testability seam for the <see cref="OlTableExtensions.ETL"/> extension method
+        /// as used inside <see cref="FromDefaultFolder(Store,OlDefaultFolders,string[],string[])"/>.
+        /// Tests replace this delegate to supply pre-built data without a live COM Table.
+        /// Uses <see cref="object"/> as the parameter type to avoid CS1769 (embedded interop
+        /// types cannot be used as generic type arguments across assembly boundaries).
+        /// </summary>
+        internal static Func<
+            object,
+            (object[,] data, Dictionary<string, int> columnInfo)
+        > StoreTableEtlInvoker = t => ((Outlook.Table)t).ETL();
+
         public static Frame<int, string> GetEmailDataInView(Explorer activeExplorer)
         {
             Outlook.Table table = activeExplorer.GetTableInView();
@@ -33,8 +69,26 @@ namespace UtilitiesCS
 
             AddQfcColumns(table, currentFolder);
 
-            (object[,] data, Dictionary<string, int> columnInfo) = table.ETL();
+            (object[,] data, Dictionary<string, int> columnInfo) = TableEtlInvoker(table);
 
+            return GetEmailDataFromTable(storeID, data, columnInfo);
+        }
+
+        /// <summary>
+        /// Converts a pre-built 2-D email data array and column-index map to a Deedle DataFrame.
+        /// Extracted from <see cref="GetEmailDataInView"/> to allow unit-testing the
+        /// pure data-transformation logic without a live Outlook Table or Explorer.
+        /// </summary>
+        /// <param name="storeID">The store identifier to stamp on every row.</param>
+        /// <param name="data">2-D array where rows are emails and columns are field values.</param>
+        /// <param name="columnInfo">Maps field name to column index in <paramref name="data"/>.</param>
+        /// <returns>A Deedle Frame with one row per email and columns for each field.</returns>
+        internal static Frame<int, string> GetEmailDataFromTable(
+            string storeID,
+            object[,] data,
+            Dictionary<string, int> columnInfo
+        )
+        {
             var records = Enumerable
                 .Range(0, data.GetLength(0))
                 .Select(i =>
@@ -49,19 +103,6 @@ namespace UtilitiesCS
                         StoreId = storeID,
                     };
                 });
-
-            //string[,] strAry = new string[records.Count(), 6];
-            //var r2 = records.ToList();
-            //Enumerable.Range(0, data.GetLength(0)).ForEach(i =>
-            //{
-            //    strAry[i,0] = r2[i].EntryId.ToString();
-            //    strAry[i, 1] = r2[i].MessageClass.ToString();
-            //    strAry[i, 2] = r2[i].SentOn.ToString();
-            //    strAry[i, 3] = r2[i].ConversationId.ToString();
-            //    strAry[i, 4] = r2[i].Triage.ToString();
-            //    strAry[i, 5] = r2[i].StoreId.ToString();
-            //});
-            //logger.Debug(strAry.ToFormattedText());
 
             var df = Frame.FromRecords(records);
 
@@ -205,7 +246,7 @@ namespace UtilitiesCS
         {
             if (!EnsureTriageColumnExists(folder))
             {
-                System.Windows.Forms.MessageBox.Show(
+                MessageBoxInvoker(
                     "Cannot proceed without the required 'Triage' column. Execution will stop.",
                     "Missing Required Column",
                     System.Windows.Forms.MessageBoxButtons.OK,
@@ -262,7 +303,7 @@ namespace UtilitiesCS
                 return true;
             }
 
-            var createResult = System.Windows.Forms.MessageBox.Show(
+            var createResult = MessageBoxInvoker(
                 "The required 'Triage' column does not exist in this folder.\nWould you like to create it now?",
                 "Create Required Column",
                 System.Windows.Forms.MessageBoxButtons.YesNo,
@@ -286,7 +327,7 @@ namespace UtilitiesCS
             }
             catch (System.Exception ex)
             {
-                System.Windows.Forms.MessageBox.Show(
+                MessageBoxInvoker(
                     $"Failed to create 'Triage' column.\n{ex.Message}",
                     "Column Creation Failed",
                     System.Windows.Forms.MessageBoxButtons.OK,
@@ -440,7 +481,7 @@ namespace UtilitiesCS
                 return null;
             }
 
-            (var data, var columnInfo) = table.ETL();
+            (var data, var columnInfo) = StoreTableEtlInvoker(table);
 
             Frame<int, string> df = FromArray2D(data: data, columnInfo);
 
