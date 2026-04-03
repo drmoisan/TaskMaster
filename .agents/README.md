@@ -38,6 +38,7 @@ Design skills in layers so behavior is authored once and reused everywhere:
    - `atomic-executor`
    - `atomic-planner`
    - `feature-review`
+   - `orchestrator-workflow`
 
 5. Specialist support skills
    - `commit-message-conventions`
@@ -54,6 +55,7 @@ Design skills in layers so behavior is authored once and reused everywhere:
 4. Canonical paths should be defined in exactly one skill; other skills should reference that skill instead of repeating the path.
 5. If Codex already ships a suitable system skill, prefer a thin repo-local compatibility wrapper instead of re-implementing the same scaffolding.
 6. If an agent persona grows reusable decision rules or formatting rules, move those rules into a shared skill and keep the agent as a thin wrapper.
+7. If a top-level workflow routes between multiple existing skills or subagents, capture that routing once in a shared workflow skill and keep the prompt or agent as a launcher.
 
 ## Migration Rules
 

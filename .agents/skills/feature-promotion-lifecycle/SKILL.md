@@ -7,10 +7,11 @@ description: 'Deterministic promotion workflow from potential item to issue, bra
 
 Canonical variable model and promotion sequence for initializing active feature delivery.
 
-## Required Shared Skill
+## Required Shared Skills
 
 Always use:
 - `repo-automation-adapter`
+- `evidence-and-timestamp-conventions`
 
 ## Canonical Variables
 
@@ -32,6 +33,22 @@ Always use:
 5. Resolve and persist the canonical `plan-path`.
 6. Delegate planning to `atomic-planner`.
 7. Require `atomic-executor` preflight before execution.
+
+## Canonical Branch Name
+
+- `${promotion-type}/${short-name}-${issue-num}`
+
+If the branch already exists, reuse it instead of inventing an alternate branch name.
+
+## Plan Path Resolution
+
+The canonical active plan path must use the timestamped form `plan.<timestamp>.md`.
+
+Resolve `${plan-path}` in this order:
+
+1. If one or more `plan*.md` files already exist under `${feature-folder}`, reuse the earliest existing timestamped `plan.<timestamp>.md`.
+2. If no timestamped plan exists but a legacy `plan.md` exists, treat that as a migration defect to be corrected; do not keep both `plan.md` and a new timestamped plan as competing active-plan candidates.
+3. If no plan file exists, create exactly one new `plan.<timestamp>.md` using the timestamp format from `evidence-and-timestamp-conventions` and persist that path as `${plan-path}`.
 
 ## Codex Execution Rule
 
