@@ -255,7 +255,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var repositoryRoot = GetRepositoryRoot().FullName;
             var mailItem = new Mock<MailItem>(MockBehavior.Strict);
             mailItem.SetupGet(x => x.Subject).Returns("bad:/subject?");
-            mailItem.Setup(x => x.SaveAs(It.IsAny<string>(), OlSaveAsType.olMSG)).Verifiable();
+            // The COM interop _MailItem.SaveAs second parameter is typed as 'object',
+            // so Moq's strict-mode dispatch requires It.IsAny<object>() to match
+            // the boxed OlSaveAsType enum value passed at runtime.
+            mailItem.Setup(x => x.SaveAs(It.IsAny<string>(), It.IsAny<object>())).Verifiable();
             var expectedPath = AttachmentHelper.AdjustForMaxPath(
                 repositoryRoot,
                 FolderConverter.SanitizeFilename(mailItem.Object.Subject),
@@ -267,7 +270,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             await SortEmail.SaveMessageAsMsgAsync(mailItem.Object, repositoryRoot);
 
             // Assert
-            mailItem.Verify(x => x.SaveAs(expectedPath, OlSaveAsType.olMSG), Times.Once);
+            mailItem.Verify(x => x.SaveAs(expectedPath, It.IsAny<object>()), Times.Once);
         }
 
         [TestMethod]
@@ -277,7 +280,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var repositoryRoot = GetRepositoryRoot().FullName;
             var mailItem = new Mock<MailItem>(MockBehavior.Strict);
             mailItem.SetupGet(x => x.Subject).Returns("sync:/subject?");
-            mailItem.Setup(x => x.SaveAs(It.IsAny<string>(), OlSaveAsType.olMSG)).Verifiable();
+            // The COM interop _MailItem.SaveAs second parameter is typed as 'object',
+            // so Moq's strict-mode dispatch requires It.IsAny<object>() to match
+            // the boxed OlSaveAsType enum value passed at runtime.
+            mailItem.Setup(x => x.SaveAs(It.IsAny<string>(), It.IsAny<object>())).Verifiable();
             var expectedPath = AttachmentHelper.AdjustForMaxPath(
                 repositoryRoot,
                 FolderConverter.SanitizeFilename(mailItem.Object.Subject),
@@ -289,7 +295,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             SortEmail.SaveMessageAsMSG(mailItem.Object, repositoryRoot);
 
             // Assert
-            mailItem.Verify(x => x.SaveAs(expectedPath, OlSaveAsType.olMSG), Times.Once);
+            mailItem.Verify(x => x.SaveAs(expectedPath, It.IsAny<object>()), Times.Once);
         }
 
         [TestMethod]
@@ -386,7 +392,13 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
         private static DirectoryInfo GetRepositoryRoot()
         {
-            var current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            // Assembly.Location gives the physical path of the test DLL, which is
+            // always inside the repository tree. AppDomain.CurrentDomain.BaseDirectory
+            // can point to the vstest host directory instead, breaking the walk-up.
+            var startPath =
+                Path.GetDirectoryName(typeof(SortEmail_Tests).Assembly.Location)
+                ?? AppDomain.CurrentDomain.BaseDirectory;
+            var current = new DirectoryInfo(startPath);
 
             while (
                 current is not null
