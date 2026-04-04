@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using UtilitiesCS.EmailIntelligence.TaskPane;
 
 namespace UtilitiesCS.Test.Extensions
 {
@@ -365,29 +364,45 @@ namespace UtilitiesCS.Test.Extensions
         [TestMethod]
         public async Task ReadTextWithProgressAsync_ProgressTrackerPaneOverload_WithLargeExistingFile_UpdatesProgress()
         {
-            // Arrange
+            // Arrange — no ProgressPane is created here because ProgressPane is a WinForms
+            // UserControl whose constructor calls TaskScheduler.FromCurrentSynchronizationContext()
+            // and installs a WindowsFormsSynchronizationContext.  On a thread-pool thread
+            // (MSTest async test threads) that has no message pump, the resulting
+            // SynchronizationContext.Post() posts to a message queue that is never drained,
+            // causing the test's await continuation to deadlock indefinitely.
+            //
+            // The headless pane sets _isRoot = false (default from GetUninitializedObject), so
+            // SafeAction / ChangeBarColor are never reached and _progressViewer is never
+            // accessed.  The job-name is read back from _jobName via reflection.
             var fixture = GetLargeTextFixture();
             var disk = new FilePathHelper(fixture.Name, fixture.Directory!.FullName);
-            using var viewer = new ProgressPane();
-            var progress = CreateHeadlessPane(viewer);
+            var progress = CreateHeadlessPane();
 
             // Act
             string contents = await disk.ReadTextWithProgressAsync(progress, "Pane read");
 
             // Assert
+            var jobName = (string?)
+                typeof(ProgressTrackerPane)
+                    .GetField("_jobName", BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .GetValue(progress);
+
             contents.Should().NotBeEmpty();
             progress.Progress.Should().BeGreaterThan(0);
-            progress.ProgressViewer.JobName.Text.Should().Contain("Pane read");
+            jobName.Should().Contain("Pane read");
         }
 
         [TestMethod]
         public async Task CopyToAsync_ProgressTrackerPaneOverload_WithProgress_CompletesAndReportsCompletion()
         {
-            // Arrange
+            // Arrange — no ProgressPane is created here for the same reason as above:
+            // creating a WinForms UserControl on an MSTest thread-pool thread installs a
+            // WindowsFormsSynchronizationContext that deadlocks the test's await continuation
+            // when no message pump is running.  _isRoot = false so _progressViewer is never
+            // accessed; the job name is verified via the _jobName field.
             using var source = new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6 });
             using var destination = new MemoryStream();
-            using var viewer = new ProgressPane();
-            var progress = CreateHeadlessPane(viewer);
+            var progress = CreateHeadlessPane();
 
             // Act
             await source.CopyToAsync(
@@ -400,9 +415,14 @@ namespace UtilitiesCS.Test.Extensions
             );
 
             // Assert
+            var jobName = (string?)
+                typeof(ProgressTrackerPane)
+                    .GetField("_jobName", BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .GetValue(progress);
+
             destination.ToArray().Should().Equal(new byte[] { 1, 2, 3, 4, 5, 6 });
             progress.Progress.Should().Be(100);
-            progress.ProgressViewer.JobName.Text.Should().Contain("Copy");
+            jobName.Should().Contain("Copy");
         }
 
         private static FileInfo GetLargeTextFixture()
@@ -432,7 +452,7 @@ namespace UtilitiesCS.Test.Extensions
             );
         }
 
-        private static ProgressTrackerPane CreateHeadlessPane(ProgressPane viewer)
+        private static ProgressTrackerPane CreateHeadlessPane()
         {
             var pane = (ProgressTrackerPane)
                 FormatterServices.GetUninitializedObject(typeof(ProgressTrackerPane));
@@ -440,17 +460,18 @@ namespace UtilitiesCS.Test.Extensions
                 "_parent",
                 BindingFlags.Instance | BindingFlags.NonPublic
             )!;
-            var parent = Activator.CreateInstance(
-                parentField.FieldType,
-                new Progress<(int Value, string JobName)>(_ => { }),
-                100,
-                0
-            );
+            // Use a no-op SynchronousProgress so Report() returns synchronously with no
+            // dependency on a SynchronizationContext or WinForms message pump.
+            // _isRoot defaults to false (GetUninitializedObject zeroes all fields), so
+            // ChangeBarColor / SafeAction are never reached and _progressViewer is never
+            // accessed — passing null for _progressViewer is safe.
+            var rootProgress = new SynchronousProgress<(int Value, string JobName)>(_ => { });
+            var parent = Activator.CreateInstance(parentField.FieldType, rootProgress, 100, 0);
 
             parentField.SetValue(pane, parent);
             typeof(ProgressTrackerPane)
                 .GetField("_progressViewer", BindingFlags.Instance | BindingFlags.NonPublic)!
-                .SetValue(pane, viewer);
+                .SetValue(pane, null);
             typeof(ProgressTrackerPane)
                 .GetField("_jobName", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .SetValue(pane, string.Empty);
