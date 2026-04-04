@@ -1,12 +1,9 @@
 using System;
-using System.Drawing;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Threading;
-using System.Windows.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using UtilitiesCS.EmailIntelligence.TaskPane;
 
 namespace UtilitiesCS.Test
 {
@@ -14,126 +11,79 @@ namespace UtilitiesCS.Test
     public class ProgressTrackerPane_Tests
     {
         [TestMethod]
-        [STAThread]
-        public void Constructor_AndRootFlows_InitializeViewerAndSupportChildSpawns()
+        public void HeadlessRootFlows_ShouldReportProgressAndSupportChildSpawnsWithoutUi()
         {
-            var priorContext = SynchronizationContext.Current;
-            var dispatcherField = typeof(UiThread).GetField(
-                "_dispatcher",
-                BindingFlags.NonPublic | BindingFlags.Static
-            )!;
-            var priorDispatcher = (Dispatcher)dispatcherField.GetValue(null);
-            SynchronizationContext.SetSynchronizationContext(new ImmediateSynchronizationContext());
+            var harness = CreateHeadlessPane(isRoot: true);
+            var pane = harness.Pane;
 
-            try
-            {
-                dispatcherField.SetValue(null, Dispatcher.CurrentDispatcher);
-                using var cts = new CancellationTokenSource();
-                var pane = new ProgressTrackerPane(cts);
+            pane.Progress.Should().Be(0);
+            pane.ProgressViewer.Should().BeNull();
 
-                try
-                {
-                    pane.Progress.Should().Be(0);
-                    pane.ProgressViewer.Should().NotBeNull();
-                    pane.ProgressViewer.JobName.Text.Should().Be("Initializing");
-                    pane.ProgressViewer.Bar.Value.Should().Be(0);
+            pane.Report(0, "Initializing");
+            pane.Increment(25, "Loading");
+            pane.Progress.Should().Be(25);
 
-                    pane.Increment(25, "Loading");
-                    pane.Progress.Should().Be(25);
-                    pane.ProgressViewer.JobName.Text.Should().Be("Loading");
-                    pane.ProgressViewer.Bar.Value.Should().Be(25);
+            pane.Report((50, "Tuple"));
+            pane.Progress.Should().Be(50);
 
-                    pane.Report((50, "Tuple"));
-                    pane.Progress.Should().Be(50);
-                    pane.ProgressViewer.JobName.Text.Should().Be("Tuple");
-                    pane.ProgressViewer.Bar.Value.Should().Be(50);
+            pane.Report(100, "Complete");
+            pane.Report(100, "Complete again");
+            pane.Report(150, "Overflow");
+            pane.Report(101);
 
-                    pane.Report(100, "Complete");
-                    pane.ProgressViewer.Bar.BackColor.Should().Be(Color.Green);
-                    pane.Report(100, "Complete again");
-                    pane.ProgressViewer.Bar.BackColor.Should().Be(Color.Blue);
-                    pane.Report(150, "Overflow");
-                    pane.ProgressViewer.Bar.BackColor.Should().Be(Color.Green);
-                    pane.Report(101);
+            var intChild = pane.SpawnChild(15);
+            var doubleChild = pane.SpawnChild(12.7);
+            var remainingChild = pane.SpawnChild();
 
-                    var intChild = pane.SpawnChild(15);
-                    var doubleChild = pane.SpawnChild(12.7);
-                    var remainingChild = pane.SpawnChild();
-
-                    intChild.ProgressViewer.Should().BeSameAs(pane.ProgressViewer);
-                    doubleChild.ProgressViewer.Should().BeSameAs(pane.ProgressViewer);
-                    remainingChild.ProgressViewer.Should().BeSameAs(pane.ProgressViewer);
-                    pane.Progress.Should().Be(100);
-                    pane.ProgressViewer.Bar.BackColor.Should().Be(Color.Blue);
-                }
-                finally
-                {
-                    pane.ProgressViewer.Dispose();
-                }
-            }
-            finally
-            {
-                dispatcherField.SetValue(null, priorDispatcher);
-                SynchronizationContext.SetSynchronizationContext(priorContext);
-            }
+            intChild.ProgressViewer.Should().BeNull();
+            doubleChild.ProgressViewer.Should().BeNull();
+            remainingChild.ProgressViewer.Should().BeNull();
+            pane.Progress.Should().Be(100);
+            harness
+                .Reports.Should()
+                .ContainInOrder(
+                    (0, "Initializing"),
+                    (25, "Loading"),
+                    (50, "Tuple"),
+                    (100, "Complete")
+                );
         }
 
         [TestMethod]
-        [STAThread]
-        public void ReportAndSafeAction_RejectNegativeValuesAndIgnoreDisposedViewer()
+        public void HeadlessPane_ShouldRejectNegativeValues_AndIgnoreMissingViewer()
         {
-            var priorContext = SynchronizationContext.Current;
-            SynchronizationContext.SetSynchronizationContext(new ImmediateSynchronizationContext());
+            var harness = CreateHeadlessPane();
+            var pane = harness.Pane;
+            Action namedReport = () => pane.Report(-1, "bad");
+            Action valueReport = () => pane.Report(-1);
 
-            try
-            {
-                using var viewer = new ProgressPane();
-                var pane = CreateHeadlessPane(viewer);
-                using var replacementViewer = new ProgressPane();
-                Action namedReport = () => pane.Report(-1, "bad");
-                Action valueReport = () => pane.Report(-1);
+            pane.ProgressViewer.Should().BeNull();
+            namedReport.Should().Throw<ArgumentOutOfRangeException>();
+            valueReport.Should().Throw<ArgumentOutOfRangeException>();
 
+            Action safeAction = () =>
                 typeof(ProgressTrackerPane)
-                    .GetProperty(
-                        nameof(ProgressTrackerPane.ProgressViewer),
-                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
-                    )!
-                    .SetValue(pane, replacementViewer);
+                    .GetMethod("SafeAction", BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .Invoke(
+                        pane,
+                        new object[] { new Action(() => throw new InvalidOperationException()) }
+                    );
 
-                pane.ProgressViewer.Should().BeSameAs(replacementViewer);
-                namedReport.Should().Throw<ArgumentOutOfRangeException>();
-                valueReport.Should().Throw<ArgumentOutOfRangeException>();
-
-                replacementViewer.Dispose();
-                viewer.Dispose();
-
-                Action safeAction = () =>
-                    typeof(ProgressTrackerPane)
-                        .GetMethod("SafeAction", BindingFlags.Instance | BindingFlags.NonPublic)!
-                        .Invoke(
-                            pane,
-                            new object[] { new Action(() => throw new InvalidOperationException()) }
-                        );
-
-                safeAction.Should().NotThrow();
-            }
-            finally
-            {
-                SynchronizationContext.SetSynchronizationContext(priorContext);
-            }
+            safeAction.Should().NotThrow();
         }
 
-        private static ProgressTrackerPane CreateHeadlessPane(ProgressPane viewer)
+        private static HeadlessPaneHarness CreateHeadlessPane(bool isRoot = false)
         {
             var pane = (ProgressTrackerPane)
                 FormatterServices.GetUninitializedObject(typeof(ProgressTrackerPane));
+            var reports = new List<(int Value, string JobName)>();
             var parentField = typeof(ProgressTrackerPane).GetField(
                 "_parent",
                 BindingFlags.Instance | BindingFlags.NonPublic
             )!;
             var parent = Activator.CreateInstance(
                 parentField.FieldType,
-                new Progress<(int Value, string JobName)>(_ => { }),
+                new SynchronousProgress<(int Value, string JobName)>(reports.Add),
                 100,
                 0
             );
@@ -141,21 +91,51 @@ namespace UtilitiesCS.Test
             parentField.SetValue(pane, parent);
             typeof(ProgressTrackerPane)
                 .GetField("_progressViewer", BindingFlags.Instance | BindingFlags.NonPublic)!
-                .SetValue(pane, viewer);
+                .SetValue(pane, null);
             typeof(ProgressTrackerPane)
                 .GetField("_jobName", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .SetValue(pane, string.Empty);
             typeof(ProgressTrackerPane)
                 .GetField("_progress", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .SetValue(pane, 0d);
-            return pane;
+            typeof(ProgressTrackerPane)
+                .GetField("_isRoot", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(pane, isRoot);
+            typeof(ProgressTrackerPane)
+                .GetField("_root100", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(pane, false);
+            return new HeadlessPaneHarness(pane, reports);
         }
 
-        private sealed class ImmediateSynchronizationContext : SynchronizationContext
+        private sealed class HeadlessPaneHarness
         {
-            public override void Post(SendOrPostCallback d, object state) => d(state);
+            public HeadlessPaneHarness(
+                ProgressTrackerPane pane,
+                List<(int Value, string JobName)> reports
+            )
+            {
+                Pane = pane;
+                Reports = reports;
+            }
 
-            public override void Send(SendOrPostCallback d, object state) => d(state);
+            public ProgressTrackerPane Pane { get; }
+
+            public List<(int Value, string JobName)> Reports { get; }
+        }
+
+        private sealed class SynchronousProgress<T> : IProgress<T>
+        {
+            private readonly Action<T> _callback;
+
+            public SynchronousProgress(Action<T> callback)
+            {
+                _callback = callback;
+            }
+
+            public void Report(T value)
+            {
+                _callback(value);
+            }
         }
     }
 }

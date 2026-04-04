@@ -129,6 +129,7 @@ namespace UtilitiesCS.Test.Threading
         {
             using var cts = new CancellationTokenSource();
             var tracker = new ProgressTrackerAsync(cts);
+            ProgressViewer? shownViewer = null;
             var previousContext = SynchronizationContext.Current;
             var dispatcherField = typeof(UiThread).GetField(
                 "_dispatcher",
@@ -139,6 +140,7 @@ namespace UtilitiesCS.Test.Threading
             var currentDispatcher = Dispatcher.CurrentDispatcher;
             var previousDispatcher = (Dispatcher)dispatcherField!.GetValue(null);
             SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            tracker.ShowProgressViewer = viewer => shownViewer = viewer;
 
             try
             {
@@ -160,10 +162,12 @@ namespace UtilitiesCS.Test.Threading
                 var initializedViewer = tracker.ProgressViewer;
 
                 initializedTracker.Should().BeSameAs(tracker);
+                shownViewer.Should().BeSameAs(initializedViewer);
                 tracker.UiDispatcher.Should().BeSameAs(currentDispatcher);
                 initializedViewer.Should().NotBeNull();
                 initializedViewer.CancelSource.Should().BeSameAs(cts);
                 initializedViewer.JobName.Text.Should().Be("Initializing...");
+                initializedViewer.Visible.Should().BeFalse();
 
                 tracker.ProgressViewer = initializedViewer;
                 tracker.ProgressViewer.Should().BeSameAs(initializedViewer);

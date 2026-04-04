@@ -409,6 +409,7 @@ namespace UtilitiesCS.Test
         {
             using var cts = new CancellationTokenSource();
             var tracker = new ProgressTracker(cts, Screen.PrimaryScreen);
+            ProgressViewer? shownViewer = null;
             var previousContext = SynchronizationContext.Current;
             var dispatcherField = typeof(UiThread).GetField(
                 "_dispatcher",
@@ -417,17 +418,20 @@ namespace UtilitiesCS.Test
             var currentDispatcher = Dispatcher.CurrentDispatcher;
             var previousDispatcher = (Dispatcher)dispatcherField.GetValue(null);
             SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            tracker.ShowProgressViewer = viewer => shownViewer = viewer;
 
             try
             {
                 dispatcherField.SetValue(null, currentDispatcher);
 
                 tracker.Initialize().Should().BeSameAs(tracker);
+                shownViewer.Should().BeSameAs(tracker.ProgressViewer);
                 tracker.UiDispatcher.Should().BeSameAs(currentDispatcher);
                 tracker.ProgressViewer.Should().NotBeNull();
                 tracker.ProgressViewer.CancelSource.Should().BeSameAs(cts);
                 tracker.ProgressViewer.StartPosition.Should().Be(FormStartPosition.Manual);
                 tracker.ProgressViewer.Bar.Value.Should().Be(0);
+                tracker.ProgressViewer.Visible.Should().BeFalse();
             }
             finally
             {
