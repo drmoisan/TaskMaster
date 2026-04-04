@@ -16,9 +16,10 @@ Canonical locations and refresh rules for PR context artifacts.
 
 If artifacts are missing or stale relative to the current branch state:
 
-1. Use `repo-automation-adapter` to attempt the repository's canonical collector.
-2. If no direct Codex-facing collector is available and the workflow only needs diff-scoped review evidence, use a deterministic git-based fallback.
-3. Record the provenance of any fallback-generated evidence in the review artifact.
+1. Use `repo-automation-adapter` and prefer MCP server `drmCopilotExtension` tool `collect_pr_context`.
+2. If the caller already resolved a base branch, pass that base explicitly to the canonical collector.
+3. If the MCP collector is unavailable and the workflow only needs diff-scoped review evidence, use a deterministic git-based fallback.
+4. Record the provenance of any fallback-generated evidence in the review artifact.
 
 ## Consumer Rule
 

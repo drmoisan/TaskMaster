@@ -2,7 +2,7 @@
 
 ## Objective
 
-Continue the Codex runtime migration by moving the GitHub Copilot `orchestrator` workflow into the layered Codex runtime surface while preserving the existing separation between shared workflow skills, thin subagents, and prompt launchers.
+Align the TaskMaster Codex runtime with the published `drm-copilot` MCP bridge so repository automation now targets the semantic MCP server surface instead of treating those operations as mostly unavailable in Codex.
 
 ## Current Migration Scope
 
@@ -13,43 +13,31 @@ Continue the Codex runtime migration by moving the GitHub Copilot `orchestrator`
 
 ## This Increment
 
-1. Migrate `.github/agents/orchestrator.agent.md` into:
-   - a reusable shared orchestration workflow skill
-   - a thin Codex-native `orchestrator` subagent that delegates to that skill
-2. Migrate `.github/prompts/orchestrate-work.prompt.md` into a Codex prompt launcher that spawns the new subagent.
-3. Preserve the original orchestration intent:
-   - estimate change budget first
-   - choose the correct small or large path
-   - persist orchestration state and resume deterministically
-   - continue through planning, execution, validation, and review until the selected path is complete
-4. Adapt the workflow to the current Codex runtime:
-   - route host-specific repo automation through `repo-automation-adapter`
-   - reuse the existing `feature-promotion-lifecycle`, `atomic-planner`, `atomic-executor`, `feature-review`, and language budget-router skills
-   - prefer currently migrated Codex subagents and keep direct-execution fallback only for steps whose specialist persona has not yet been migrated
-5. Normalize any new canonical lifecycle rules into the existing shared skills rather than duplicating them in the new orchestrator files.
+1. Update `repo-automation-adapter` so the canonical Codex path is the published MCP server name `drmCopilotExtension`.
+2. Add MCP dependency metadata for the adapter skill so the owning skill declares the external tool surface once.
+3. Replace stale guidance that treated feature promotion and feature-folder initialization as unavailable in Codex when no repo-local script existed.
+4. Update PR-context refresh guidance so it prefers the published `collect_pr_context` MCP tool before falling back to git reconstruction.
+5. Update migration and authoring docs so future migrations target semantic MCP tools on `drmCopilotExtension`, not raw VS Code command IDs.
 
 ## Design Rules
 
-1. Put reusable orchestration rules in one shared skill instead of duplicating them across agents or prompts.
-2. Keep `.codex/agents/*.toml` concise and focused on bounded role behavior.
-3. Preserve stable external names where practical:
-   - agent name `orchestrator`
-   - prompt name `orchestrate-work`
-4. Keep canonical variable and lifecycle rules in existing shared skills when those rules already have a natural owner.
-5. Do not hard-code `drmCopilotExtension.*` command execution in the new agent or prompt.
+1. Keep host-surface translation in `repo-automation-adapter`; do not restate MCP tool names across workflow skills.
+2. Prefer semantic MCP tool names on server `drmCopilotExtension` over raw `drmCopilotExtension.*` VS Code command IDs.
+3. Declare the MCP dependency once on the owning adapter skill instead of duplicating tool bindings across every caller.
+4. Keep canonical PR-context artifact paths in `pr-context-artifacts`.
+5. Preserve deterministic fallback rules only where the MCP surface is unavailable and a safe local fallback is still acceptable.
 
 ## Deliverables
 
 - `change-plan.md`
-- `.agents/skills/orchestrator-workflow/SKILL.md`
-- `.codex/agents/orchestrator.toml`
-- `.codex/prompts/orchestrate-work.md`
-- updates to shared skill docs and any existing shared lifecycle skill that now owns canonical orchestration details
+- `.agents/skills/repo-automation-adapter/SKILL.md`
+- `.agents/skills/repo-automation-adapter/agents/openai.yaml`
+- `.agents/skills/pr-context-artifacts/SKILL.md`
+- updates to `.agents/README.md` and `.agents/skills/README.md`
 
 ## Verification
 
-- Confirm the new shared skill exists with valid Codex frontmatter.
-- Confirm the new agent file exists and parses as TOML.
-- Confirm the new prompt exists with valid Codex prompt frontmatter.
-- Confirm the orchestrator skill references the existing shared lifecycle and routing skills instead of restating their rules.
-- Confirm canonical `plan-path` rules live in one shared skill only.
+- Confirm the adapter skill references server name `drmCopilotExtension` and the published semantic tool names.
+- Confirm the new `agents/openai.yaml` exists under `repo-automation-adapter`.
+- Confirm `pr-context-artifacts` now prefers the MCP collector before git fallback.
+- Confirm migration and authoring docs instruct future Codex migrations to target semantic MCP tools rather than raw VS Code command IDs.

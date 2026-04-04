@@ -42,6 +42,7 @@ Design skills in layers so behavior is authored once and reused everywhere:
 
 5. Specialist support skills
    - `commit-message-conventions`
+   - `pr-authoring`
 
 6. Subagents
    - Keep `.codex/agents/*.toml` concise.
@@ -51,7 +52,7 @@ Design skills in layers so behavior is authored once and reused everywhere:
 
 1. If multiple workflows need the same rule, extract it into one shared skill.
 2. Workflow skills should name the shared skills they depend on rather than restating those blocks.
-3. Environment-specific repo automation should live in `repo-automation-adapter`, not in each workflow skill.
+3. Environment-specific repo automation and its MCP dependency binding should live in `repo-automation-adapter`, not in each workflow skill.
 4. Canonical paths should be defined in exactly one skill; other skills should reference that skill instead of repeating the path.
 5. If Codex already ships a suitable system skill, prefer a thin repo-local compatibility wrapper instead of re-implementing the same scaffolding.
 6. If an agent persona grows reusable decision rules or formatting rules, move those rules into a shared skill and keep the agent as a thin wrapper.
@@ -65,7 +66,14 @@ When migrating a Copilot artifact:
 2. If it defines a reusable agent persona or bounded delegation role, migrate it to `.codex/agents/<name>.toml`.
 3. If it is mainly a launch prompt or an orchestration shortcut, migrate it to `.codex/prompts/<name>.md`.
 4. Preserve stable names where possible so downstream handoffs remain readable and consistent.
-5. If a Copilot workflow relied on `drmCopilotExtension.*` commands or another host-specific surface, move that translation logic into `repo-automation-adapter` and keep the business workflow skill host-agnostic.
+5. If a Copilot workflow relied on `drmCopilotExtension.*` commands or another host-specific surface, move that translation logic into `repo-automation-adapter`, target semantic MCP tools on server `drmCopilotExtension` when available, and keep the business workflow skill host-agnostic.
+
+## External Tool Bindings
+
+When a repository skill owns an external MCP dependency:
+
+- declare that dependency once in `agents/openai.yaml` beside the owning skill
+- keep downstream workflow skills dependent on the adapter skill, not on duplicated MCP binding metadata
 
 ## Future Migrations
 
