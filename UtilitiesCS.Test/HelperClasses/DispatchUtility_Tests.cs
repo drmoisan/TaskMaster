@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.HelperClasses;
@@ -22,6 +23,42 @@ namespace UtilitiesCS.Test.HelperClasses
         public void ImplementsIDispatch_String_ReturnsFalse()
         {
             DispatchUtility.ImplementsIDispatch("test").Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void ImplementsIDispatch_ComDictionary_ReturnsTrue()
+        {
+            var obj = CreateDispatchDictionary();
+
+            try
+            {
+                DispatchUtility.ImplementsIDispatch(obj).Should().BeTrue();
+            }
+            finally
+            {
+                ReleaseComObject(obj);
+            }
+        }
+
+        #endregion
+
+        #region GetType
+
+        [TestMethod]
+        public void GetType_ComDictionary_ReturnsTypeMetadata()
+        {
+            var obj = CreateDispatchDictionary();
+
+            try
+            {
+                var type = DispatchUtility.GetType(obj, false);
+
+                type.Should().NotBeNull();
+            }
+            finally
+            {
+                ReleaseComObject(obj);
+            }
         }
 
         #endregion
@@ -58,6 +95,46 @@ namespace UtilitiesCS.Test.HelperClasses
                 );
         }
 
+        [TestMethod]
+        public void TryGetDispId_ComDictionary_CountMember_ReturnsDispId()
+        {
+            var obj = CreateDispatchDictionary();
+
+            try
+            {
+                var found = DispatchUtility.TryGetDispId(obj, "Count", out var dispId);
+
+                found.Should().BeTrue();
+                dispId.Should().BeGreaterThanOrEqualTo(0);
+            }
+            finally
+            {
+                ReleaseComObject(obj);
+            }
+        }
+
+        [TestMethod]
+        public void TryGetDispId_ComDictionary_UnknownMember_ReturnsFalse()
+        {
+            var obj = CreateDispatchDictionary();
+
+            try
+            {
+                var found = DispatchUtility.TryGetDispId(
+                    obj,
+                    "NoSuchDispatchMember",
+                    out var dispId
+                );
+
+                found.Should().BeFalse();
+                dispId.Should().Be(-1);
+            }
+            finally
+            {
+                ReleaseComObject(obj);
+            }
+        }
+
         #endregion
 
         #region Invoke
@@ -89,6 +166,40 @@ namespace UtilitiesCS.Test.HelperClasses
             act.Should().Throw<Exception>();
         }
 
+        [TestMethod]
+        public void Invoke_ByDispId_OnComDictionaryCount_ReturnsCurrentCount()
+        {
+            var obj = CreateDispatchDictionary();
+
+            try
+            {
+                DispatchUtility.Invoke(obj, "Add", new object[] { "alpha", 1 });
+                var found = DispatchUtility.TryGetDispId(obj, "Count", out var dispId);
+
+                found.Should().BeTrue();
+                DispatchUtility.Invoke(obj, dispId, Array.Empty<object>()).Should().Be(1);
+            }
+            finally
+            {
+                ReleaseComObject(obj);
+            }
+        }
+
         #endregion
+
+        private static object CreateDispatchDictionary()
+        {
+            var comType = Type.GetTypeFromProgID("Scripting.Dictionary");
+            comType.Should().NotBeNull();
+            return Activator.CreateInstance(comType!);
+        }
+
+        private static void ReleaseComObject(object obj)
+        {
+            if (Marshal.IsComObject(obj))
+            {
+                Marshal.ReleaseComObject(obj);
+            }
+        }
     }
 }

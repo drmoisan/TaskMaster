@@ -1,8 +1,16 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using UtilitiesCS.EmailIntelligence;
+using UtilitiesCS.EmailIntelligence.EmailParsing;
 
 namespace UtilitiesCS.Test.EmailIntelligence
 {
@@ -34,7 +42,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void InitializeSortToExisting_AlwaysThrows_NotImplementedException()
         {
             // Act + Assert: default (no) arguments
-            Action act = () => SortEmail.InitializeSortToExisting();
+            System.Action act = () => SortEmail.InitializeSortToExisting();
 
             act.Should().Throw<NotImplementedException>();
         }
@@ -47,7 +55,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void InitializeSortToExisting_WithExplicitArgs_StillThrows_NotImplementedException()
         {
             // Act + Assert: explicit arguments
-            Action act = () =>
+            System.Action act = () =>
                 SortEmail.InitializeSortToExisting(
                     InitType: "Sort",
                     QuickLoad: true,
@@ -167,10 +175,231 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void Cleanup_Files_DoesNotThrow()
         {
             // Act + Assert
-            Action act = () => SortEmail.Cleanup_Files();
+            System.Action act = () => SortEmail.Cleanup_Files();
             act.Should().NotThrow();
         }
 
+        [TestMethod]
+        public void GetAttachmentsInfo_WhenSavingPicturesOnly_FiltersOutDocumentsAndOleAttachments()
+        {
+            // Arrange
+            var mailItem = CreateMailItemWithAttachments(
+                CreateAttachmentMock("photo.jpg", OlAttachmentType.olByValue).Object,
+                CreateAttachmentMock("report.pdf", OlAttachmentType.olByValue).Object,
+                CreateAttachmentMock("ignored.ole", OlAttachmentType.olOLE).Object
+            );
+
+            // Act
+            var attachments = SortEmail
+                .GetAttachmentsInfo(
+                    mailItem.Object,
+                    GetRepositoryRoot().FullName,
+                    null,
+                    saveAttachments: false,
+                    savePictures: true
+                )
+                .ToList();
+
+            // Assert
+            attachments.Should().ContainSingle();
+            attachments[0].AttachmentInfo.FileName.Should().Be("photo.jpg");
+            attachments[0].AttachmentInfo.IsImage.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public async Task GetAttachmentsInfoAsync_WhenSavingAttachmentsOnly_FiltersOutPicturesAndOleAttachments()
+        {
+            // Arrange
+            var mailItem = CreateMailItemWithAttachments(
+                CreateAttachmentMock("photo.jpg", OlAttachmentType.olByValue).Object,
+                CreateAttachmentMock("report.pdf", OlAttachmentType.olByValue).Object,
+                CreateAttachmentMock("ignored.ole", OlAttachmentType.olOLE).Object
+            );
+
+            // Act
+            var attachments = await CollectAsync(
+                SortEmail.GetAttachmentsInfoAsync(
+                    mailItem.Object,
+                    GetRepositoryRoot().FullName,
+                    null,
+                    saveAttachments: true,
+                    savePictures: false
+                )
+            );
+
+            // Assert
+            attachments.Should().ContainSingle();
+            attachments[0].AttachmentInfo.FileName.Should().Be("report.pdf");
+            attachments[0].AttachmentInfo.IsImage.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task TrySaveAttachmentAsync_WhenSaveSucceeds_ReturnsTrueAndCallsSaveAsFile()
+        {
+            // Arrange
+            var attachment = CreateAttachmentMock("saved.txt", OlAttachmentType.olByValue);
+            var destinationPath = Path.Combine(GetRepositoryRoot().FullName, "saved.txt");
+
+            // Act
+            bool saved = await attachment.Object.TrySaveAttachmentAsync(destinationPath);
+
+            // Assert
+            saved.Should().BeTrue();
+            attachment.Verify(x => x.SaveAsFile(destinationPath), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task SaveMessageAsMsgAsync_WhenSubjectNeedsSanitizing_UsesMsgSavePath()
+        {
+            // Arrange
+            var repositoryRoot = GetRepositoryRoot().FullName;
+            var mailItem = new Mock<MailItem>(MockBehavior.Strict);
+            mailItem.SetupGet(x => x.Subject).Returns("bad:/subject?");
+            mailItem.Setup(x => x.SaveAs(It.IsAny<string>(), OlSaveAsType.olMSG)).Verifiable();
+            var expectedPath = AttachmentHelper.AdjustForMaxPath(
+                repositoryRoot,
+                FolderConverter.SanitizeFilename(mailItem.Object.Subject),
+                "msg",
+                ""
+            );
+
+            // Act
+            await SortEmail.SaveMessageAsMsgAsync(mailItem.Object, repositoryRoot);
+
+            // Assert
+            mailItem.Verify(x => x.SaveAs(expectedPath, OlSaveAsType.olMSG), Times.Once);
+        }
+
+        [TestMethod]
+        public void SaveMessageAsMSG_WhenSubjectNeedsSanitizing_UsesMsgSavePath()
+        {
+            // Arrange
+            var repositoryRoot = GetRepositoryRoot().FullName;
+            var mailItem = new Mock<MailItem>(MockBehavior.Strict);
+            mailItem.SetupGet(x => x.Subject).Returns("sync:/subject?");
+            mailItem.Setup(x => x.SaveAs(It.IsAny<string>(), OlSaveAsType.olMSG)).Verifiable();
+            var expectedPath = AttachmentHelper.AdjustForMaxPath(
+                repositoryRoot,
+                FolderConverter.SanitizeFilename(mailItem.Object.Subject),
+                "msg",
+                ""
+            );
+
+            // Act
+            SortEmail.SaveMessageAsMSG(mailItem.Object, repositoryRoot);
+
+            // Assert
+            mailItem.Verify(x => x.SaveAs(expectedPath, OlSaveAsType.olMSG), Times.Once);
+        }
+
+        [TestMethod]
+        public void SanitizeArrayLineTSV_WhenArrayContainsNullsAndWhitespaceControlCharacters_ReturnsSanitizedLine()
+        {
+            // Arrange
+            var values = new[] { "Hello\tWorld", null, "Line1\r\nLine2" };
+            var method = typeof(SortEmail).GetMethod(
+                "SanitizeArrayLineTSV",
+                BindingFlags.NonPublic | BindingFlags.Static
+            )!;
+            object[] args = { values };
+
+            // Act
+            var line = (string)method.Invoke(null, args);
+
+            // Assert
+            line.Should().Be("Hello World\t\tLine1 Line2");
+        }
+
+        [TestMethod]
+        public void SanitizeArray_WhenOutputArrayIsInitialized_WritesSanitizedRows()
+        {
+            // Arrange
+            var method = typeof(SortEmail).GetMethod(
+                "SanitizeArray",
+                BindingFlags.NonPublic | BindingFlags.Static
+            )!;
+            var values = new string[2, 2]
+            {
+                { "A\tB", null },
+                { "Line1\r\nLine2", "Tail" },
+            };
+            var output = new string[values.GetLength(0)];
+            object[] args = { values, output };
+
+            // Act
+            method.Invoke(null, args);
+            output = (string[])args[1];
+
+            // Assert
+            output[0].Should().Be("A B");
+            output[1].Should().Be("Line1 Line2\tTail");
+        }
+
         #endregion
+
+        private static Mock<Attachment> CreateAttachmentMock(
+            string fileName,
+            OlAttachmentType type,
+            string displayName = "",
+            int size = 1
+        )
+        {
+            var attachment = new Mock<Attachment>(MockBehavior.Loose);
+            attachment.SetupGet(x => x.Type).Returns(type);
+            attachment.SetupGet(x => x.BlockLevel).Returns((OlAttachmentBlockLevel)0);
+            attachment.SetupGet(x => x.Class).Returns(OlObjectClass.olAttachment);
+            attachment
+                .SetupGet(x => x.DisplayName)
+                .Returns(string.IsNullOrEmpty(displayName) ? fileName : displayName);
+            attachment.SetupGet(x => x.FileName).Returns(fileName);
+            attachment.SetupGet(x => x.Index).Returns(1);
+            attachment.SetupGet(x => x.PathName).Returns(Path.Combine(@"C:\temp", fileName));
+            attachment.SetupGet(x => x.Position).Returns(2);
+            attachment.SetupGet(x => x.Size).Returns(size);
+            return attachment;
+        }
+
+        private static Mock<MailItem> CreateMailItemWithAttachments(params Attachment[] attachments)
+        {
+            var attachmentCollection = new Mock<Attachments>(MockBehavior.Loose);
+            attachmentCollection
+                .As<IEnumerable>()
+                .Setup(x => x.GetEnumerator())
+                .Returns(() => attachments.Cast<object>().GetEnumerator());
+
+            var mailItem = new Mock<MailItem>(MockBehavior.Loose);
+            mailItem.SetupGet(x => x.Attachments).Returns(attachmentCollection.Object);
+            mailItem.SetupGet(x => x.SentOn).Returns(new DateTime(2026, 4, 3, 9, 30, 0));
+            return mailItem;
+        }
+
+        private static async Task<List<T>> CollectAsync<T>(IAsyncEnumerable<T> items)
+        {
+            var results = new List<T>();
+            await foreach (var item in items)
+            {
+                results.Add(item);
+            }
+
+            return results;
+        }
+
+        private static DirectoryInfo GetRepositoryRoot()
+        {
+            var current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+
+            while (
+                current is not null
+                && !File.Exists(Path.Combine(current.FullName, "TaskMaster.sln"))
+            )
+            {
+                current = current.Parent;
+            }
+
+            current
+                .Should()
+                .NotBeNull("the test assembly should run inside the TaskMaster repository");
+            return current;
+        }
     }
 }

@@ -619,6 +619,8 @@
     <Compile Include="HelperClasses\CloningFunctions\DispatchUtility.cs" />
     <Compile Include="HelperClasses\FileSystem\DirectoryInfoWrapper.cs" />
     <Compile Include="HelperClasses\FileSystem\FileInfoWrapper.cs" />
+    <Compile Include="HelperClasses\FileSystem\PhysicalDirectoryInfoAdapter.cs" />
+    <Compile Include="HelperClasses\FileSystem\PhysicalFileInfoAdapter.cs" />
     <Compile Include="HelperClasses\FileSystem\FileSystemInfoWrapper.cs" />
     <Compile Include="HelperClasses\FileSystem\ShellUtilities.cs" />
     <Compile Include="HelperClasses\FileSystem\SysImageListHelper.cs" />
@@ -846,6 +848,7 @@
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEncoder.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEntry.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapSco.cs" />
+    <Compile Include="EmailIntelligence\SubjectMap\SubjectMapSco.Orchestration.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\DfDeedle.cs" />
     <Compile Include="Extensions\DfMLNet.cs" />

@@ -1,9 +1,13 @@
 using System;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Windows.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS;
+using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.Test
 {
@@ -391,6 +395,99 @@ namespace UtilitiesCS.Test
                 tracker.Report(100, "Complete");
 
                 // Assert — Close() on an un-shown Form disposes it.
+                viewer.IsDisposed.Should().BeTrue();
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(priorContext);
+            }
+        }
+
+        [TestMethod]
+        [STAThread]
+        public void Initialize_WithCurrentDispatcherAndScreen_InitializesViewerAndUpdatesUi()
+        {
+            using var cts = new CancellationTokenSource();
+            var tracker = new ProgressTracker(cts, Screen.PrimaryScreen);
+            var previousContext = SynchronizationContext.Current;
+            var dispatcherField = typeof(UiThread).GetField(
+                "_dispatcher",
+                BindingFlags.NonPublic | BindingFlags.Static
+            )!;
+            var currentDispatcher = Dispatcher.CurrentDispatcher;
+            var previousDispatcher = (Dispatcher)dispatcherField.GetValue(null);
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+
+            try
+            {
+                dispatcherField.SetValue(null, currentDispatcher);
+
+                tracker.Initialize().Should().BeSameAs(tracker);
+                tracker.UiDispatcher.Should().BeSameAs(currentDispatcher);
+                tracker.ProgressViewer.Should().NotBeNull();
+                tracker.ProgressViewer.CancelSource.Should().BeSameAs(cts);
+                tracker.ProgressViewer.StartPosition.Should().Be(FormStartPosition.Manual);
+                tracker.ProgressViewer.Bar.Value.Should().Be(0);
+            }
+            finally
+            {
+                if (tracker.ProgressViewer != null && !tracker.ProgressViewer.IsDisposed)
+                {
+                    tracker.ProgressViewer.Close();
+                }
+
+                dispatcherField.SetValue(null, previousDispatcher);
+                SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
+        }
+
+        [TestMethod]
+        public async Task ReportAsync_WithNegativeValue_ThrowsArgumentOutOfRangeException()
+        {
+            var parent = new CapturingProgressTracker();
+            var tracker = new ProgressTracker(parent, allocation: 100, startingAt: 0);
+
+            Func<Task> act = () => tracker.ReportAsync(-1);
+
+            await act.Should().ThrowAsync<ArgumentOutOfRangeException>();
+        }
+
+        [TestMethod]
+        public async Task ReportAsync_WithValueOver100_ClampsTo100()
+        {
+            var parent = new CapturingProgressTracker();
+            var tracker = new ProgressTracker(parent, allocation: 100, startingAt: 0);
+
+            await tracker.ReportAsync(125);
+
+            tracker.Progress.Should().Be(100);
+            parent.LastValue.Should().Be(100);
+        }
+
+        [TestMethod]
+        [STAThread]
+        public async Task ReportAsync_At100Percent_WhenRootTracker_ClosesProgressViewer()
+        {
+            var priorContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+
+            ProgressViewer? viewer = null;
+
+            try
+            {
+                var capture = new CapturingProgressTracker();
+                var tracker = new ProgressTracker(capture, allocation: 100, startingAt: 0);
+
+                viewer = new ProgressViewer { UiDispatcher = Dispatcher.CurrentDispatcher };
+                typeof(ProgressTracker)
+                    .GetField("_progressViewer", BindingFlags.NonPublic | BindingFlags.Instance)!
+                    .SetValue(tracker, viewer);
+                typeof(ProgressTracker)
+                    .GetField("_isRoot", BindingFlags.NonPublic | BindingFlags.Instance)!
+                    .SetValue(tracker, true);
+
+                await tracker.ReportAsync(100);
+
                 viewer.IsDisposed.Should().BeTrue();
             }
             finally

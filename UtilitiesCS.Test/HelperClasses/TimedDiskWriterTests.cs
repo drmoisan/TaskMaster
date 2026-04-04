@@ -301,5 +301,65 @@ namespace UtilitiesCS.Test.HelperClasses
             this.mockTimedDiskWriter.Verify(x => x.StartTimer(), Times.Once);
             timedDiskWriter.TimerActive.Should().BeTrue();
         }
+
+        [TestMethod]
+        public void Constructor_WithTimeSpan_SetsConfigAndDiskWriter()
+        {
+            // Arrange
+            Action<IEnumerable<string>> diskWriter = _ => { };
+
+            // Act
+            var timedDiskWriter = new TimedDiskWriter<string>(TimeSpan.FromSeconds(3), diskWriter);
+
+            // Assert
+            timedDiskWriter.Config.WriteInterval.Should().Be(TimeSpan.FromSeconds(3));
+            timedDiskWriter.DiskWriter.Should().BeSameAs(diskWriter);
+        }
+
+        [TestMethod]
+        public void Constructor_WithMilliseconds_SetsConfigAndDiskWriter()
+        {
+            // Arrange
+            Action<IEnumerable<string>> diskWriter = _ => { };
+
+            // Act
+            var timedDiskWriter = new TimedDiskWriter<string>(250, diskWriter);
+
+            // Assert
+            timedDiskWriter.Config.WriteInterval.Should().Be(TimeSpan.FromMilliseconds(250));
+            timedDiskWriter.DiskWriter.Should().BeSameAs(diskWriter);
+        }
+
+        [TestMethod]
+        public void TimerAndConfigurationProperties_AllowRoundTripState()
+        {
+            // Arrange
+            var config = new TimedDiskWriter<string>.Configuration();
+            var timedDiskWriter = this.CreateTimedDiskWriter();
+
+            // Act
+            config.TryAddTimeout = 75;
+            timedDiskWriter.Timer = this.mockTimer.Object;
+
+            // Assert
+            config.TryAddTimeout.Should().Be(75);
+            timedDiskWriter.Timer.Should().BeSameAs(this.mockTimer.Object);
+        }
+
+        [TestMethod]
+        public void Enqueue_WithoutDiskWriterAndFailedStart_StillQueuesItem()
+        {
+            // Arrange
+            this.mockTimedDiskWriter.SetupGet(x => x.TimerActive).Returns(false);
+            this.mockTimedDiskWriter.Setup(x => x.TryStartTimer()).Returns(false);
+            var timedDiskWriter = this.mockTimedDiskWriter.Object;
+
+            // Act
+            timedDiskWriter.Enqueue("queued item");
+
+            // Assert
+            timedDiskWriter.Queue.Should().ContainSingle().Which.Should().Be("queued item");
+            this.mockTimedDiskWriter.Verify(x => x.TryStartTimer(), Times.Once);
+        }
     }
 }

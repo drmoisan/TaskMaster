@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -134,16 +135,19 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             return File.Exists(filePath);
         }
 
+        [ExcludeFromCodeCoverage]
         protected virtual void DeleteFile(string filePath)
         {
             File.Delete(filePath);
         }
 
+        [ExcludeFromCodeCoverage]
         protected virtual string ReadAllText(string filePath)
         {
             return File.ReadAllText(filePath);
         }
 
+        [ExcludeFromCodeCoverage]
         protected virtual async Task<string> ReadAllTextAsync(string filePath)
         {
             using (var reader = File.OpenText(filePath))
@@ -152,6 +156,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             }
         }
 
+        [ExcludeFromCodeCoverage]
         protected virtual Task<string> ReadTextWithProgressAsync(
             FilePathHelper disk,
             ProgressTrackerPane progress,
@@ -280,6 +285,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             );
         }
 
+        [ExcludeFromCodeCoverage]
         protected virtual Task SerializeWithProgressAsync<T>(
             JsonSerializer serializer,
             T obj,
@@ -313,6 +319,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             ;
         }
 
+        [ExcludeFromCodeCoverage]
         protected virtual Stream CreateTextWriteStream(string filePath)
         {
             return new FileStream(
@@ -325,6 +332,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             );
         }
 
+        [ExcludeFromCodeCoverage]
         protected internal virtual void SerializeAndSave<T>(
             T obj,
             JsonSerializer serializer,

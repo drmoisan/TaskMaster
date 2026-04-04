@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -202,6 +203,121 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             await act.Should()
                 .ThrowAsync<NotImplementedException>(
                     "OpenFileChooserAsync is explicitly marked NotImplementedException"
+                );
+        }
+
+        /// <summary>
+        /// Verifies that the controller can initialize its viewer, remap both disk folders,
+        /// switch to the net disk, and persist the working copy back to the original config.
+        /// </summary>
+        [TestMethod]
+        public void Show_Init_ChangeFolders_ActivateNetAndSave_PersistsUpdatedConfig()
+        {
+            var specialFolders = new ConcurrentDictionary<string, string>();
+            specialFolders["Documents"] = @"C:\Special\Docs";
+            specialFolders["Archive"] = @"D:\ArchiveRoot";
+
+            var mockFileSystem = new Mock<IFileSystemFolderPaths>();
+            mockFileSystem.SetupGet(x => x.SpecialFolders).Returns(specialFolders);
+
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            mockGlobals.SetupGet(x => x.FS).Returns(mockFileSystem.Object);
+
+            var config = new NewSmartSerializableConfig
+            {
+                LocalDisk = new FilePathHelper(
+                    "local.json",
+                    System.IO.Path.Combine(specialFolders["Documents"], "ExistingLocal")
+                ),
+                NetDisk = new FilePathHelper("net.json", @"Z:\Unmapped\InitialNet"),
+            };
+            config.ActivateLocalDisk();
+
+            Exception caughtException = null;
+
+            var thread = new Thread(() =>
+            {
+                ConfigController controller = null;
+                try
+                {
+                    controller = ConfigController.Show(mockGlobals.Object, config);
+
+                    controller.SpecialFolderList[0].Should().Be("None");
+                    controller.SpecialFolderList.Should().Contain("Documents");
+                    controller.SpecialFolderList.Should().Contain("Archive");
+                    controller.Viewer.Should().NotBeNull();
+                    controller.Viewer.ComboSpecialFolderLocal.SelectedItem.Should().Be("Documents");
+                    controller.Viewer.RelativePathLocal.Text.Should().Contain("ExistingLocal");
+                    controller.Viewer.FileNameLocal.Text.Should().Be("local.json");
+                    controller.Viewer.RelativePathNet.Text.Should().Be(@"Z:\Unmapped\InitialNet");
+                    controller.Viewer.FileNameNet.Text.Should().Be("net.json");
+
+                    controller.ChangeSpecialFolder(
+                        "Documents",
+                        "UpdatedLocal",
+                        ISmartSerializableConfig.ActiveDiskEnum.Local
+                    );
+                    controller
+                        .ConfigCopy.LocalDisk.FolderPath.Should()
+                        .Be(System.IO.Path.Combine(specialFolders["Documents"], "UpdatedLocal"));
+                    controller
+                        .ConfigCopy.Disk.FolderPath.Should()
+                        .Be(System.IO.Path.Combine(specialFolders["Documents"], "UpdatedLocal"));
+
+                    controller.ActivateDiskGroup(ISmartSerializableConfig.ActiveDiskEnum.Net);
+                    controller
+                        .ConfigCopy.ActiveDisk.Should()
+                        .Be(ISmartSerializableConfig.ActiveDiskEnum.Net);
+
+                    controller.ChangeSpecialFolder(
+                        "Archive",
+                        "UpdatedNet",
+                        ISmartSerializableConfig.ActiveDiskEnum.Net
+                    );
+                    controller
+                        .ConfigCopy.NetDisk.FolderPath.Should()
+                        .Be(System.IO.Path.Combine(specialFolders["Archive"], "UpdatedNet"));
+                    controller
+                        .ConfigCopy.Disk.FolderPath.Should()
+                        .Be(System.IO.Path.Combine(specialFolders["Archive"], "UpdatedNet"));
+
+                    var saveTask = controller.SaveAsync();
+                    while (!saveTask.IsCompleted)
+                    {
+                        System.Windows.Forms.Application.DoEvents();
+                        Thread.Sleep(10);
+                    }
+                    saveTask.GetAwaiter().GetResult();
+
+                    config.ActiveDisk.Should().Be(ISmartSerializableConfig.ActiveDiskEnum.Net);
+                    config
+                        .LocalDisk.FolderPath.Should()
+                        .Be(System.IO.Path.Combine(specialFolders["Documents"], "UpdatedLocal"));
+                    config
+                        .NetDisk.FolderPath.Should()
+                        .Be(System.IO.Path.Combine(specialFolders["Archive"], "UpdatedNet"));
+                    config
+                        .Disk.FolderPath.Should()
+                        .Be(System.IO.Path.Combine(specialFolders["Archive"], "UpdatedNet"));
+                }
+                catch (Exception ex)
+                {
+                    caughtException = ex;
+                }
+                finally
+                {
+                    controller?.Viewer?.Dispose();
+                }
+            });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join();
+
+            caughtException
+                .Should()
+                .BeNull(
+                    "the config workflow should initialize, update both folders, and save cleanly"
                 );
         }
     }

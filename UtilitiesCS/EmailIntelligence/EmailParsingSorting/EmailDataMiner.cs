@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -49,6 +50,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region ETL - Extract, Transform, Load For Data Mining
 
+        [ExcludeFromCodeCoverage]
         public async Task<ScBag<MinedMailInfo>> MineEmails()
         {
             if (SynchronizationContext.Current is null)
@@ -83,25 +85,40 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 {
                     return;
                 }
-                var folderPath = Path.Combine(folderRoot, "Bayesian");
-                if (Directory.Exists(folderPath))
-                {
-                    var files = Directory.GetFiles(folderPath);
-                    foreach (var file in files)
-                    {
-                        try
-                        {
-                            File.Delete(file);
-                        }
-                        catch (System.Exception e)
-                        {
-                            logger.Error(
-                                $"Error deleting file {file}. \n{e.Message}\n{e.StackTrace}"
-                            );
-                        }
-                    }
-                }
+                DeleteStagingFiles(
+                    folderRoot,
+                    path => Directory.Exists(path),
+                    path => Directory.GetFiles(path),
+                    path => File.Delete(path)
+                );
             });
+        }
+
+        internal static void DeleteStagingFiles(
+            string folderRoot,
+            Func<string, bool> directoryExists,
+            Func<string, string[]> getFiles,
+            Action<string> deleteFile
+        )
+        {
+            var folderPath = Path.Combine(folderRoot, "Bayesian");
+            if (!directoryExists(folderPath))
+            {
+                return;
+            }
+
+            var files = getFiles(folderPath);
+            foreach (var file in files)
+            {
+                try
+                {
+                    deleteFile(file);
+                }
+                catch (System.Exception e)
+                {
+                    logger.Error($"Error deleting file {file}. \n{e.Message}\n{e.StackTrace}");
+                }
+            }
         }
 
         #region ETL - EXTRACT Folders and Emails
@@ -119,7 +136,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             public int CumulativeCount { get; set; } = cumulativeCount;
         }
 
-        internal FolderTree GetOlFolderTree()
+        [ExcludeFromCodeCoverage]
+        internal virtual FolderTree GetOlFolderTree()
         {
             var tree = new FolderTree(
                 _globals.Ol.ArchiveRoot,
@@ -128,7 +146,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return tree;
         }
 
-        internal FolderTree GetOlFolderTree(ProgressTracker progress)
+        [ExcludeFromCodeCoverage]
+        internal virtual FolderTree GetOlFolderTree(ProgressTracker progress)
         {
             var tree = new FolderTree(
                 _globals.Ol.ArchiveRoot,
@@ -138,7 +157,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return tree;
         }
 
-        internal IEnumerable<MAPIFolder> QueryOlFolders(FolderTree tree)
+        [ExcludeFromCodeCoverage]
+        internal virtual IEnumerable<MAPIFolder> QueryOlFolders(FolderTree tree)
         {
             var folders = tree
                 .Roots.SelectMany(root => root.FlattenIf(node => !node.Selected))
@@ -146,12 +166,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return folders;
         }
 
-        internal IEnumerable<FolderWrapper> QueryOlFolderInfo(FolderTree tree)
+        [ExcludeFromCodeCoverage]
+        internal virtual IEnumerable<FolderWrapper> QueryOlFolderInfo(FolderTree tree)
         {
             var folders = tree.Roots.SelectMany(root => root.FlattenIf(node => !node.Selected));
             return folders;
         }
 
+        [ExcludeFromCodeCoverage]
         internal async Task<FolderWrapper[]> GetInitializedFolderInfo()
         {
             var (tokenSource, cancel, progress, sw) = await ProgressPackage.CreateAsTupleAsync();
@@ -230,56 +252,62 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             //logger.Debug($"Total Chunk Count: {folderChunks.Count():N0}");
         }
 
-        internal async Task<bool> TryResolveMapiHandles(FolderWrapper[] folders)
+        [ExcludeFromCodeCoverage]
+        internal virtual async Task<bool> TryResolveMapiHandles(FolderWrapper[] folders)
         {
-            return await Task.Run(() =>
-            {
-                if (folders is null)
-                {
-                    return false;
-                }
-                var handles = GetOlFolderTree().Roots.SelectMany(root => root.Flatten()).ToList();
-                int last = -1;
-                FolderWrapper handle = null;
-
-                foreach (var folder in folders)
-                {
-                    if (
-                        ++last >= 0
-                        && last < handles.Count()
-                        && handles[last].RelativePath == folder.RelativePath
-                    )
-                    {
-                        handle = handles[last];
-                    }
-                    else
-                    {
-                        last = handles.FindIndex(x => x.RelativePath == folder.RelativePath);
-                        if (last == -1)
-                        {
-                            logger.Warn(
-                                $"Failed to resolve folder handle for {folder.Name}. Terminating and rebuilding."
-                            );
-                            return false;
-                        }
-                        handle = handles[last];
-                    }
-
-                    var subscriptions = folder.SubscriptionStatus;
-
-                    folder.UnSubscribeToPropertyChanged(
-                        IFolderWrapper.PropertyEnum.OlRoot | IFolderWrapper.PropertyEnum.OlFolder
-                    );
-
-                    folder.OlRoot = handle.OlRoot;
-                    folder.OlFolder = handle.OlFolder;
-
-                    folder.SubscribeToPropertyChanged(subscriptions);
-                }
-                return true;
-            });
+            return await Task.Run(() => TryResolveMapiHandles(GetOlFolderTree(), folders));
         }
 
+        internal static bool TryResolveMapiHandles(FolderTree tree, FolderWrapper[] folders)
+        {
+            if (folders is null)
+            {
+                return false;
+            }
+
+            var handles = tree.Roots.SelectMany(root => root.Flatten()).ToList();
+            int last = -1;
+            FolderWrapper handle = null;
+
+            foreach (var folder in folders)
+            {
+                if (
+                    ++last >= 0
+                    && last < handles.Count()
+                    && handles[last].RelativePath == folder.RelativePath
+                )
+                {
+                    handle = handles[last];
+                }
+                else
+                {
+                    last = handles.FindIndex(x => x.RelativePath == folder.RelativePath);
+                    if (last == -1)
+                    {
+                        logger.Warn(
+                            $"Failed to resolve folder handle for {folder.Name}. Terminating and rebuilding."
+                        );
+                        return false;
+                    }
+                    handle = handles[last];
+                }
+
+                var subscriptions = folder.SubscriptionStatus;
+
+                folder.UnSubscribeToPropertyChanged(
+                    IFolderWrapper.PropertyEnum.OlRoot | IFolderWrapper.PropertyEnum.OlFolder
+                );
+
+                folder.OlRoot = handle.OlRoot;
+                folder.OlFolder = handle.OlFolder;
+
+                folder.SubscribeToPropertyChanged(subscriptions);
+            }
+
+            return true;
+        }
+
+        [ExcludeFromCodeCoverage]
         internal async Task<FolderWrapper[][]> ExtractOlFolderChunks(bool reload = false)
         {
             // Grab selected OlFolderInfo objects from a OlFolderTree, flatten to an array, and initialize
@@ -360,6 +388,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return folderChunks;
         }
 
+        [ExcludeFromCodeCoverage]
         internal IEnumerable<(MailItem Mail, FolderWrapper FolderInfo)> QueryMailTuples(
             IEnumerable<FolderWrapper> folders
         )
@@ -376,7 +405,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return mailTuples;
         }
 
-        internal IEnumerable<MailItem> QueryMailItems(IEnumerable<MAPIFolder> folders)
+        [ExcludeFromCodeCoverage]
+        internal virtual IEnumerable<MailItem> QueryMailItems(IEnumerable<MAPIFolder> folders)
         {
             var mailItems = folders.SelectMany(folder =>
                 folder.Items.Cast<object>().Where(obj => obj is MailItem).Cast<MailItem>()
@@ -384,6 +414,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return mailItems;
         }
 
+        [ExcludeFromCodeCoverage]
         internal List<MailItem> ConsumeLinq(
             IEnumerable<MAPIFolder> folders,
             IEnumerable<MailItem> mailItems,
@@ -399,70 +430,49 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return mailList;
         }
 
+        [ExcludeFromCodeCoverage]
         internal async Task<IEnumerable<MailItem>> ScrapeEmails(CancellationTokenSource tokenSource)
         {
-            //List<MailItem> mailItems = null;
-            IEnumerable<MailItem> mailItemsQuery = null;
-
-            await Task.Run(
-                () =>
-                {
-                    // Query List of Outlook Folders if they are not on the skip list
-                    var tree = GetOlFolderTree();
-                    _sw.LogDuration(nameof(GetOlFolderTree));
-
-                    var folders = QueryOlFolders(tree);
-                    _sw.LogDuration(nameof(QueryOlFolders));
-
-                    // Query MailItems from these folders
-                    mailItemsQuery = QueryMailItems(folders);
-                    _sw.LogDuration(nameof(QueryMailItems));
-
-                    //// Load to memory
-                    //mailItems = ConsumeLinq(folders, mailItemsQuery, progress);
-                    //_sw.LogDuration(nameof(LinqToSimpleEmailList));
-                    _sw.WriteToLog(clear: false);
-                },
-                tokenSource.Token
-            );
-
-            return mailItemsQuery;
+            return await Task.Run(ScrapeEmailsCore, tokenSource.Token);
         }
 
+        [ExcludeFromCodeCoverage]
         internal async Task<IEnumerable<MailItem>> ScrapeEmails(
             CancellationTokenSource tokenSource,
             ProgressTracker progress
         )
         {
-            //List<MailItem> mailItems = null;
-            IEnumerable<MailItem> mailItemsQuery = null;
+            return await Task.Run(() => ScrapeEmailsCore(progress), tokenSource.Token);
+        }
 
-            await Task.Run(
-                () =>
-                {
-                    // Query List of Outlook Folders if they are not on the skip list
-                    progress.Report(0, "Building Outlook Folder Tree");
-                    var tree = GetOlFolderTree(progress);
-                    _sw.LogDuration(nameof(GetOlFolderTree));
+        internal IEnumerable<MailItem> ScrapeEmailsCore()
+        {
+            var tree = GetOlFolderTree();
+            _sw.LogDuration(nameof(GetOlFolderTree));
 
-                    var folders = QueryOlFolders(tree);
-                    _sw.LogDuration(nameof(QueryOlFolders));
+            var folders = QueryOlFolders(tree);
+            _sw.LogDuration(nameof(QueryOlFolders));
 
-                    // Query MailItems from these folders
-                    mailItemsQuery = QueryMailItems(folders);
-                    _sw.LogDuration(nameof(QueryMailItems));
+            var mailItemsQuery = QueryMailItems(folders);
+            _sw.LogDuration(nameof(QueryMailItems));
 
-                    //// Load to memory
-                    //mailItems = ConsumeLinq(folders, mailItemsQuery, progress);
-                    //_sw.LogDuration(nameof(LinqToSimpleEmailList));
-                    _sw.WriteToLog(clear: false);
-                },
-                tokenSource.Token
-            );
+            _sw.WriteToLog(clear: false);
+            return mailItemsQuery;
+        }
 
-            //progress.Report(100);
+        internal IEnumerable<MailItem> ScrapeEmailsCore(ProgressTracker progress)
+        {
+            progress.Report(0, "Building Outlook Folder Tree");
+            var tree = GetOlFolderTree(progress);
+            _sw.LogDuration(nameof(GetOlFolderTree));
 
-            //return mailItems;
+            var folders = QueryOlFolders(tree);
+            _sw.LogDuration(nameof(QueryOlFolders));
+
+            var mailItemsQuery = QueryMailItems(folders);
+            _sw.LogDuration(nameof(QueryMailItems));
+
+            _sw.WriteToLog(clear: false);
             return mailItemsQuery;
         }
 
@@ -478,6 +488,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             CancellationToken token
         );
 
+        [ExcludeFromCodeCoverage]
         public async Task Transform(
             FolderWrapper[][] folderChunks,
             FolderGroupTransformer<IItemInfo[]> transformer,
@@ -556,6 +567,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _globals.AF.ProgressPane.Visible = false;
         }
 
+        [ExcludeFromCodeCoverage]
         public async Task<IItemInfo[]> ToIItemInfoArray(
             FolderWrapper[] folders,
             int batch,
@@ -596,6 +608,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return cBag.ToArray();
         }
 
+        [ExcludeFromCodeCoverage]
         public async Task<IItemInfo> ToIItemInfo(
             (MailItem Mail, FolderWrapper FolderInfo) mailTuple,
             CancellationToken cancel
@@ -622,6 +635,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return serializable;
         }
 
+        [ExcludeFromCodeCoverage]
         public async Task Transform<Tin, Tout>(Func<Tin, Task<Tout>> transformer)
         {
             var (_, token, progress, _) = await ProgressPackage
@@ -730,6 +744,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return items;
         }
 
+        [ExcludeFromCodeCoverage]
         public async Task<MinedMailInfo> ToMinedMail(MailItem mailItem, CancellationToken cancel)
         {
             var mailInfo = await Task.Run(async () =>
@@ -742,6 +757,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return minedInfo;
         }
 
+        [ExcludeFromCodeCoverage]
         public async Task Transform<Tin, Tout>(Func<Tin[], Task<Tout>> transformer)
         {
             var (_, token, progress, _) = await ProgressPackage
@@ -778,6 +794,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return combined;
         }
 
+        [ExcludeFromCodeCoverage]
         public async Task ToMinedMail(
             FolderWrapper[] folders,
             int batch,
@@ -1278,12 +1295,6 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         internal virtual T Deserialize<T>(string fileNameSeed, string fileNameSuffix = "")
         {
-            var jsonSettings = new JsonSerializerSettings()
-            {
-                TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = Formatting.Indented,
-            };
-            var disk = new FilePathHelper();
             if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
             {
                 logger.Debug(
@@ -1292,24 +1303,42 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 return default(T);
             }
 
-            disk.FolderPath = Path.Combine(folderRoot, "Bayesian");
-            ;
-            var fileName = fileNameSuffix.IsNullOrEmpty()
+            return DeserializeFromFolder<T>(
+                Path.Combine(folderRoot, "Bayesian"),
+                fileNameSeed,
+                fileNameSuffix,
+                path => File.Exists(path),
+                path => File.ReadAllText(path)
+            );
+        }
+
+        internal static T DeserializeFromFolder<T>(
+            string folderPath,
+            string fileNameSeed,
+            string fileNameSuffix,
+            Func<string, bool> fileExists,
+            Func<string, string> readAllText
+        )
+        {
+            var jsonSettings = new JsonSerializerSettings()
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                Formatting = Formatting.Indented,
+            };
+            var disk = new FilePathHelper { FolderPath = folderPath };
+            disk.FileName = fileNameSuffix.IsNullOrEmpty()
                 ? $"{fileNameSeed}.json"
                 : $"{fileNameSeed}_{fileNameSuffix}.json";
-            disk.FileName = fileName;
-            if (File.Exists(disk.FilePath))
+            if (fileExists(disk.FilePath))
             {
                 var item = JsonConvert.DeserializeObject<T>(
-                    File.ReadAllText(disk.FilePath),
+                    readAllText(disk.FilePath),
                     jsonSettings
                 );
                 return item;
             }
-            else
-            {
-                return default(T);
-            }
+
+            return default(T);
         }
 
         internal static async Task<T> DeserializeAsync<T>(
@@ -1318,34 +1347,51 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             string fileNameSuffix = ""
         )
         {
+            return await DeserializeAsync<T>(
+                folderPath,
+                fileNameSeed,
+                fileNameSuffix,
+                path => File.Exists(path),
+                ReadAllTextAsync
+            );
+        }
+
+        internal static async Task<T> DeserializeAsync<T>(
+            string folderPath,
+            string fileNameSeed,
+            string fileNameSuffix,
+            Func<string, bool> fileExists,
+            Func<string, Task<string>> readAllTextAsync
+        )
+        {
             var jsonSettings = new JsonSerializerSettings()
             {
                 TypeNameHandling = TypeNameHandling.Auto,
                 Formatting = Formatting.Indented,
             };
-            var disk = new FilePathHelper();
-            disk.FolderPath = folderPath;
-            var fileName = fileNameSuffix.IsNullOrEmpty()
+            var disk = new FilePathHelper { FolderPath = folderPath };
+            disk.FileName = fileNameSuffix.IsNullOrEmpty()
                 ? $"{fileNameSeed}.json"
                 : $"{fileNameSeed}_{fileNameSuffix}.json";
-            disk.FileName = fileName;
-            if (File.Exists(disk.FilePath))
+            if (fileExists(disk.FilePath))
             {
-                string fileText = null;
-                using (var reader = File.OpenText(disk.FilePath))
-                {
-                    fileText = await reader.ReadToEndAsync();
-                }
-
+                var fileText = await readAllTextAsync(disk.FilePath);
                 var item = JsonConvert.DeserializeObject<T>(fileText, jsonSettings);
                 return item;
             }
-            else
+
+            return default(T);
+        }
+
+        private static async Task<string> ReadAllTextAsync(string filePath)
+        {
+            using (var reader = File.OpenText(filePath))
             {
-                return default(T);
+                return await reader.ReadToEndAsync();
             }
         }
 
+        [ExcludeFromCodeCoverage]
         internal virtual void SerializeAndSave<T>(
             T obj,
             string fileNameSeed,
@@ -1380,14 +1426,32 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             FilePathHelper disk
         )
         {
-            Directory.CreateDirectory(disk.FolderPath);
-            using (StreamWriter sw = File.CreateText(disk.FilePath))
+            SerializeAndSave(
+                obj,
+                serializer,
+                disk,
+                path => Directory.CreateDirectory(path),
+                path => File.CreateText(path)
+            );
+        }
+
+        internal static void SerializeAndSave<T>(
+            T obj,
+            JsonSerializer serializer,
+            FilePathHelper disk,
+            Action<string> createDirectory,
+            Func<string, TextWriter> createTextWriter
+        )
+        {
+            createDirectory(disk.FolderPath);
+            using (var writer = createTextWriter(disk.FilePath))
             {
-                serializer.Serialize(sw, obj);
+                serializer.Serialize(writer, obj);
                 disk.FileName = null;
             }
         }
 
+        [ExcludeFromCodeCoverage]
         internal virtual void SerializeFsSave<T>(
             T obj,
             string objName,
@@ -1439,6 +1503,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
         }
 
+        [ExcludeFromCodeCoverage]
         internal virtual void SerializeMailInfo(MailItem mailItem)
         {
             var jsonSettings = new JsonSerializerSettings()
@@ -1555,6 +1620,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return serializer;
         }
 
+        [ExcludeFromCodeCoverage]
         public virtual void SerializeChunk(
             MinedMailInfo[] chunk,
             JsonSerializer serializer,
@@ -1584,7 +1650,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     return false;
                 }
                 var folderPath = Path.Combine(folderRoot, "Bayesian");
-                T obj = await DeserializeAsync<T>(folderPath, fileNameSeed, fileNameSuffix);
+                T obj = await DeserializeForValidation<T>(folderPath, fileNameSeed, fileNameSuffix);
                 if (obj != null)
                     return true;
                 else
@@ -1603,10 +1669,20 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
         }
 
+        internal virtual Task<T> DeserializeForValidation<T>(
+            string folderPath,
+            string fileNameSeed,
+            string fileNameSuffix = ""
+        )
+        {
+            return DeserializeAsync<T>(folderPath, fileNameSeed, fileNameSuffix);
+        }
+
         #endregion Testing Sizing and Serialization Methods
 
         #region Helper Methods
 
+        [ExcludeFromCodeCoverage]
         private static long GetAvailablePhysicalMemory()
         {
             // Read directly from the framework API so this code path does not depend on the
@@ -1632,6 +1708,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         /// </summary>
         /// <param name="offline"></param>
         /// <returns></returns>
+        [ExcludeFromCodeCoverage]
         private async Task<bool> ToggleOfflineMode(bool offline)
         {
             if (!offline)

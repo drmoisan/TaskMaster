@@ -19,6 +19,11 @@ namespace UtilitiesCS.Test.OneDriveHelpers
         {
             ClientGetAsync = func;
         }
+
+        public void SetFileStreamWriter(Func<string, Stream> func)
+        {
+            GetFileStreamWriter = func;
+        }
     }
 
     /// <summary>
@@ -217,6 +222,39 @@ namespace UtilitiesCS.Test.OneDriveHelpers
             downloader
                 .WriterInvoked.Should()
                 .BeFalse("the writer must not be invoked when the HTTP response indicates failure");
+        }
+
+        [TestMethod]
+        public async Task TryGetFileStreamWriter_WhenWriterReturnsMemoryStream_ReturnsStream()
+        {
+            var downloader = new TestableOneDriveDownloader();
+            downloader.SetFileStreamWriter(_ => new MemoryStream());
+
+            using var stream = await downloader.TryGetFileStreamWriter("ignored", 5000, default);
+
+            stream.Should().NotBeNull();
+            stream.CanWrite.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void GetFileStreamWriter_DefaultWriterWithNulPath_ThrowsNotSupportedException()
+        {
+            var downloader = new OneDriveDownloader();
+
+            Action act = () => downloader.GetFileStreamWriter("NUL");
+
+            act.Should().Throw<NotSupportedException>();
+        }
+
+        [TestMethod]
+        public async Task TryGetFileStreamWriter_WhenWriterThrows_ReturnsNull()
+        {
+            var downloader = new TestableOneDriveDownloader();
+            downloader.SetFileStreamWriter(_ => throw new InvalidOperationException("boom"));
+
+            var stream = await downloader.TryGetFileStreamWriter("ignored", 5000, default);
+
+            stream.Should().BeNull();
         }
 
         #endregion

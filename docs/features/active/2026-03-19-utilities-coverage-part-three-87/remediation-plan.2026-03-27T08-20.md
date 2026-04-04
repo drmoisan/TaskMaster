@@ -293,177 +293,177 @@ This remediation pass starts by reconciling the live Cobertura inventory, the cl
 	- Acceptance: the updated coverage report records `UtilitiesCS\Threading\ProgressViewer.cs` at `>= 0.80`.
 	- 2026-04-03 investigation note: staged property-only tests were hardened to use headless viewer instances so they no longer construct a real `ProgressViewer` form during execution.
 
-- [ ] [P4-T13] Reopen v2 Phase 34 for `UtilitiesCS\EmailIntelligence\EmailParsingSorting\EmailDataMiner.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\EmailDataMiner_Tests.cs`
+- [x] [P4-T13] Reopen v2 Phase 34 for `UtilitiesCS\EmailIntelligence\EmailParsingSorting\EmailDataMiner.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\EmailDataMiner_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\EmailParsingSorting\EmailDataMiner.cs` at `>= 0.80`.
 
-- [ ] [P4-T14] Reopen v2 Phase 36 for `UtilitiesCS\EmailIntelligence\SubjectMap\SubjectMapSco.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\SubjectMapSco_Tests.cs`
+- [x] [P4-T14] Reopen v2 Phase 36 for `UtilitiesCS\EmailIntelligence\SubjectMap\SubjectMapSco.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\SubjectMapSco_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\SubjectMap\SubjectMapSco.cs` at `>= 0.80`.
 
-- [ ] [P4-T15] Reopen v2 Phase 38 for `UtilitiesCS\EmailIntelligence\IntelligenceConfig.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\IntelligenceConfig_Tests.cs`
+- [x] [P4-T15] Reopen v2 Phase 38 for `UtilitiesCS\EmailIntelligence\IntelligenceConfig.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\IntelligenceConfig_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\IntelligenceConfig.cs` at `>= 0.80`.
 
-- [ ] [P4-T16] Reopen v2 Phase 39 for `UtilitiesCS\EmailIntelligence\EmailParsingSorting\EmailFiler.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\EmailFiler_Tests.cs`
+- [x] [P4-T16] Reopen v2 Phase 39 for `UtilitiesCS\EmailIntelligence\EmailParsingSorting\EmailFiler.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\EmailFiler_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\EmailParsingSorting\EmailFiler.cs` at `>= 0.80`.
 
-- [ ] [P4-T17] Reopen v2 Phase 40 for `UtilitiesCS\ReusableTypeClasses\NewSmartSerializable\Config\ConfigController.cs` and add the next deterministic scenario in `UtilitiesCS.Test\ReusableTypeClasses\ConfigController_Tests.cs`
+- [x] [P4-T17] Reopen v2 Phase 40 for `UtilitiesCS\ReusableTypeClasses\NewSmartSerializable\Config\ConfigController.cs` and add the next deterministic scenario in `UtilitiesCS.Test\ReusableTypeClasses\ConfigController_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\ReusableTypeClasses\NewSmartSerializable\Config\ConfigController.cs` at `>= 0.80`.
 
-- [ ] [P4-T18] Reopen v2 Phase 41 for `UtilitiesCS\Threading\AsyncMultiTasker.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Threading\AsyncMultiTasker_Tests.cs`
+- [x] [P4-T18] Reopen v2 Phase 41 for `UtilitiesCS\Threading\AsyncMultiTasker.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Threading\AsyncMultiTasker_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\Threading\AsyncMultiTasker.cs` at `>= 0.80`.
 
-- [ ] [P4-T19] Reopen v2 Phase 42 for `UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapTree.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\FolderRemapTree_Tests.cs`
+- [x] [P4-T19] Reopen v2 Phase 42 for `UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapTree.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\FolderRemapTree_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\OlFolderTools\FolderRemap\FolderRemapTree.cs` at `>= 0.80`.
 
-- [ ] [P4-T20] Reopen v2 Phase 43 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\ClassifierGroupUtilities_Tests.cs`
+- [x] [P4-T20] Reopen v2 Phase 43 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\ClassifierGroupUtilities_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities.cs` at `>= 0.80`.
 
-- [ ] [P4-T21] Reopen v2 Phase 45 for `UtilitiesCS\ReusableTypeClasses\Serializable\Concurrent\SCO\SCODictionary.cs` and add the next deterministic scenario in `UtilitiesCS.Test\ReusableTypeClasses\SCODictionary_Tests.cs`
+- [x] [P4-T21] Reopen v2 Phase 45 for `UtilitiesCS\ReusableTypeClasses\Serializable\Concurrent\SCO\SCODictionary.cs` and add the next deterministic scenario in `UtilitiesCS.Test\ReusableTypeClasses\SCODictionary_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\ReusableTypeClasses\Serializable\Concurrent\SCO\SCODictionary.cs` at `>= 0.80`.
 
-- [ ] [P4-T22] Reopen v2 Phase 46 for `UtilitiesCS\HelperClasses\FileSystem\FileInfoWrapper.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\FileInfoWrapper_Tests.cs`
+- [x] [P4-T22] Reopen v2 Phase 46 for `UtilitiesCS\HelperClasses\FileSystem\FileInfoWrapper.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\FileInfoWrapper_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\HelperClasses\FileSystem\FileInfoWrapper.cs` at `>= 0.80`.
 
-- [ ] [P4-T23] Reopen v2 Phase 47 for `UtilitiesCS\HelperClasses\FileSystem\DirectoryInfoWrapper.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\DirectoryInfoWrapper_Tests.cs`
+- [x] [P4-T23] Reopen v2 Phase 47 for `UtilitiesCS\HelperClasses\FileSystem\DirectoryInfoWrapper.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\DirectoryInfoWrapper_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\HelperClasses\FileSystem\DirectoryInfoWrapper.cs` at `>= 0.80`.
 
-- [ ] [P4-T24] Reopen v2 Phase 48 for `UtilitiesCS\Extensions\DfMLNet.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Extensions\DfMLNet_Tests.cs`
+- [x] [P4-T24] Reopen v2 Phase 48 for `UtilitiesCS\Extensions\DfMLNet.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Extensions\DfMLNet_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\Extensions\DfMLNet.cs` at `>= 0.80`.
 
-- [ ] [P4-T25] Reopen v2 Phase 49 for `UtilitiesCS\HelperClasses\Windows Forms\TableLayoutHelper.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\TableLayoutHelper_Tests.cs`
+- [x] [P4-T25] Reopen v2 Phase 49 for `UtilitiesCS\HelperClasses\Windows Forms\TableLayoutHelper.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\TableLayoutHelper_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\HelperClasses\Windows Forms\TableLayoutHelper.cs` at `>= 0.80`.
 
-- [ ] [P4-T26] Reopen v2 Phase 50 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\SpamBayes\SpamBayes.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\SpamBayes_Tests.cs`
+- [x] [P4-T26] Reopen v2 Phase 50 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\SpamBayes\SpamBayes.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\SpamBayes_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\ClassifierGroups\SpamBayes\SpamBayes.cs` at `>= 0.80`.
 
-- [ ] [P4-T27] Reopen v2 Phase 51 for `UtilitiesCS\ReusableTypeClasses\Serializable\Concurrent\ScBag.cs` and add the next deterministic scenario in `UtilitiesCS.Test\ReusableTypeClasses\ScBag_Tests.cs`
+- [x] [P4-T27] Reopen v2 Phase 51 for `UtilitiesCS\ReusableTypeClasses\Serializable\Concurrent\ScBag.cs` and add the next deterministic scenario in `UtilitiesCS.Test\ReusableTypeClasses\ScBag_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\ReusableTypeClasses\Serializable\Concurrent\ScBag.cs` at `>= 0.80`.
 
-- [ ] [P4-T28] Reopen v2 Phase 52 for `UtilitiesCS\EmailIntelligence\Bayesian\CorpusInherit.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\CorpusInherit_Tests.cs`
+- [x] [P4-T28] Reopen v2 Phase 52 for `UtilitiesCS\EmailIntelligence\Bayesian\CorpusInherit.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\CorpusInherit_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\Bayesian\CorpusInherit.cs` at `>= 0.80`.
 
-- [ ] [P4-T29] Reopen v2 Phase 53 for `UtilitiesCS\Dialogs\FunctionButton.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Dialogs\FunctionButton_Tests.cs`
+- [x] [P4-T29] Reopen v2 Phase 53 for `UtilitiesCS\Dialogs\FunctionButton.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Dialogs\FunctionButton_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\Dialogs\FunctionButton.cs` at `>= 0.80`.
 
 - [x] [P4-T30] Reopen v2 Phase 54 for `UtilitiesCS\Dialogs\MyBoxViewer.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Dialogs\MyBoxViewer_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\Dialogs\MyBoxViewer.cs` at `>= 0.80`.
 
-- [ ] [P4-T31] Reopen v2 Phase 56 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\Categories\CategoryClassifierGroup.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\CategoryClassifierGroup_Tests.cs`
+- [x] [P4-T31] Reopen v2 Phase 56 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\Categories\CategoryClassifierGroup.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\CategoryClassifierGroup_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\ClassifierGroups\Categories\CategoryClassifierGroup.cs` at `>= 0.80`.
 
-- [ ] [P4-T32] Reopen v2 Phase 60 for `UtilitiesCS\HelperClasses\ThemeHelpers\ThemeControlGroup.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\ThemeControlGroup_Tests.cs`
+- [x] [P4-T32] Reopen v2 Phase 60 for `UtilitiesCS\HelperClasses\ThemeHelpers\ThemeControlGroup.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\ThemeControlGroup_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\HelperClasses\ThemeHelpers\ThemeControlGroup.cs` at `>= 0.80`.
 
-- [ ] [P4-T33] Reopen v2 Phase 61 for `UtilitiesCS\OutlookObjects\Table\OlTableExtensions.cs` and add the next deterministic scenario in `UtilitiesCS.Test\OutlookObjects\OlTableExtensions_Tests.cs`
+- [x] [P4-T33] Reopen v2 Phase 61 for `UtilitiesCS\OutlookObjects\Table\OlTableExtensions.cs` and add the next deterministic scenario in `UtilitiesCS.Test\OutlookObjects\OlTableExtensions_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\OutlookObjects\Table\OlTableExtensions.cs` at `>= 0.80`.
 
-- [ ] [P4-T34] Reopen v2 Phase 62 for `UtilitiesCS\Threading\ProgressTrackerAsync.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Threading\ProgressTrackerAsync_Tests.cs`
+- [x] [P4-T34] Reopen v2 Phase 62 for `UtilitiesCS\Threading\ProgressTrackerAsync.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Threading\ProgressTrackerAsync_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\Threading\ProgressTrackerAsync.cs` at `>= 0.80`.
 
-- [ ] [P4-T35] Reopen v2 Phase 63 for `UtilitiesCS\Extensions\WinFormsExtensions.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs`
+- [x] [P4-T35] Reopen v2 Phase 63 for `UtilitiesCS\Extensions\WinFormsExtensions.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Extensions\WinFormsExtensions_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\Extensions\WinFormsExtensions.cs` at `>= 0.80`.
 
-- [ ] [P4-T36] Reopen v2 Phase 64 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\MulticlassEngine.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\MulticlassEngine_Tests.cs`
+- [x] [P4-T36] Reopen v2 Phase 64 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\MulticlassEngine.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\MulticlassEngine_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\ClassifierGroups\MulticlassEngine.cs` at `>= 0.80`.
 
-- [ ] [P4-T37] Reopen v2 Phase 65 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\Triage\Triage.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\Triage_Tests.cs`
+- [x] [P4-T37] Reopen v2 Phase 65 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\Triage\Triage.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\Triage_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\ClassifierGroups\Triage\Triage.cs` at `>= 0.80`.
 
-- [ ] [P4-T38] Reopen v2 Phase 66 for `UtilitiesCS\Threading\ProgressTrackerPane.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Threading\ProgressTrackerPane_Tests.cs`
+- [x] [P4-T38] Reopen v2 Phase 66 for `UtilitiesCS\Threading\ProgressTrackerPane.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Threading\ProgressTrackerPane_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\Threading\ProgressTrackerPane.cs` at `>= 0.80`.
 
-- [ ] [P4-T39] Reopen v2 Phase 67 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\OlFolder\OlFolderClassifierGroup.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\OlFolderClassifierGroup_Tests.cs`
+- [x] [P4-T39] Reopen v2 Phase 67 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\OlFolder\OlFolderClassifierGroup.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\OlFolderClassifierGroup_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\ClassifierGroups\OlFolder\OlFolderClassifierGroup.cs` at `>= 0.80`.
 
-- [ ] [P4-T40] Reopen v2 Phase 68 for `UtilitiesCS\Threading\ApplicationIdleTimer.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Threading\ApplicationIdleTimer_Tests.cs`
+- [x] [P4-T40] Reopen v2 Phase 68 for `UtilitiesCS\Threading\ApplicationIdleTimer.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Threading\ApplicationIdleTimer_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\Threading\ApplicationIdleTimer.cs` at `>= 0.80`.
 
-- [ ] [P4-T41] Reopen v2 Phase 70 for `UtilitiesCS\OneDriveHelpers\OneDriveDownloader.cs` and add the next deterministic scenario in `UtilitiesCS.Test\OneDriveHelpers\OneDriveDownloader_Tests.cs`
+- [x] [P4-T41] Reopen v2 Phase 70 for `UtilitiesCS\OneDriveHelpers\OneDriveDownloader.cs` and add the next deterministic scenario in `UtilitiesCS.Test\OneDriveHelpers\OneDriveDownloader_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\OneDriveHelpers\OneDriveDownloader.cs` at `>= 0.80`.
 
-- [ ] [P4-T42] Reopen v2 Phase 72 for `UtilitiesCS\HelperClasses\FileSystem\FileSystemInfoWrapper.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\FileSystemInfoWrapper_Tests.cs`
+- [x] [P4-T42] Reopen v2 Phase 72 for `UtilitiesCS\HelperClasses\FileSystem\FileSystemInfoWrapper.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\FileSystemInfoWrapper_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\HelperClasses\FileSystem\FileSystemInfoWrapper.cs` at `>= 0.80`.
 
-- [ ] [P4-T43] Reopen v2 Phase 73 for `UtilitiesCS\HelperClasses\CloningFunctions\DispatchUtility.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\DispatchUtility_Tests.cs`
+- [x] [P4-T43] Reopen v2 Phase 73 for `UtilitiesCS\HelperClasses\CloningFunctions\DispatchUtility.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\DispatchUtility_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\HelperClasses\CloningFunctions\DispatchUtility.cs` at `>= 0.80`.
 
-- [ ] [P4-T44] Reopen v2 Phase 74 for `UtilitiesCS\Threading\ProgressTracker.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs`
+- [x] [P4-T44] Reopen v2 Phase 74 for `UtilitiesCS\Threading\ProgressTracker.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Threading\ProgressTracker_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\Threading\ProgressTracker.cs` at `>= 0.80`.
 
-- [ ] [P4-T45] Reopen v2 Phase 76 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\Actionable\ActionableClassifierGroup.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\ActionableClassifierGroup_Tests.cs`
+- [x] [P4-T45] Reopen v2 Phase 76 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\Actionable\ActionableClassifierGroup.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\ActionableClassifierGroup_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\ClassifierGroups\Actionable\ActionableClassifierGroup.cs` at `>= 0.80`.
 
-- [ ] [P4-T46] Reopen v2 Phase 77 for `UtilitiesCS\OutlookObjects\Store\StoreWrapperController.cs` and add the next deterministic scenario in `UtilitiesCS.Test\OutlookObjects\StoreWrapperController_Tests.cs`
+- [x] [P4-T46] Reopen v2 Phase 77 for `UtilitiesCS\OutlookObjects\Store\StoreWrapperController.cs` and add the next deterministic scenario in `UtilitiesCS.Test\OutlookObjects\StoreWrapperController_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\OutlookObjects\Store\StoreWrapperController.cs` at `>= 0.80`.
 
-- [ ] [P4-T47] Reopen v2 Phase 78 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogic.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\Triage_OlLogic_Tests.cs`
+- [x] [P4-T47] Reopen v2 Phase 78 for `UtilitiesCS\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogic.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\Triage_OlLogic_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogic.cs` at `>= 0.80`.
 
-- [ ] [P4-T48] Reopen v2 Phase 80 for `UtilitiesCS\EmailIntelligence\Bayesian\Performance\BayesianPerformanceMeasurement.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\BayesianPerformanceMeasurement_Tests.cs`
+- [x] [P4-T48] Reopen v2 Phase 80 for `UtilitiesCS\EmailIntelligence\Bayesian\Performance\BayesianPerformanceMeasurement.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\BayesianPerformanceMeasurement_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\Bayesian\Performance\BayesianPerformanceMeasurement.cs` at `>= 0.80`.
 
-- [ ] [P4-T49] Reopen v2 Phase 83 for `UtilitiesCS\Dialogs\DelegateButton.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Dialogs\DelegateButton_Tests.cs`
+- [x] [P4-T49] Reopen v2 Phase 83 for `UtilitiesCS\Dialogs\DelegateButton.cs` and add the next deterministic scenario in `UtilitiesCS.Test\Dialogs\DelegateButton_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\Dialogs\DelegateButton.cs` at `>= 0.80`.
 
-- [ ] [P4-T50] Reopen v2 Phase 84 for `UtilitiesCS\ReusableTypeClasses\TimedActions\TimedDiskWriter.cs` and add the next deterministic scenario in `UtilitiesCS.Test\ReusableTypeClasses\TimedDiskWriter_Tests.cs`
+- [x] [P4-T50] Reopen v2 Phase 84 for `UtilitiesCS\ReusableTypeClasses\TimedActions\TimedDiskWriter.cs` and add the next deterministic scenario in `UtilitiesCS.Test\ReusableTypeClasses\TimedDiskWriter_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\ReusableTypeClasses\TimedActions\TimedDiskWriter.cs` at `>= 0.80`.
 
-- [ ] [P4-T51] Add a remediation-only deterministic scenario for `UtilitiesCS\EmailIntelligence\Bayesian\BayesianSerializationHelper.cs` in `UtilitiesCS.Test\EmailIntelligence\BayesianSerializationHelper_Tests.cs`
+- [x] [P4-T51] Add a remediation-only deterministic scenario for `UtilitiesCS\EmailIntelligence\Bayesian\BayesianSerializationHelper.cs` in `UtilitiesCS.Test\EmailIntelligence\BayesianSerializationHelper_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\Bayesian\BayesianSerializationHelper.cs` at `>= 0.80`, and `UtilitiesCS.Test\EmailIntelligence\BayesianSerializationHelper_Tests.cs` exists.
 
-- [ ] [P4-T52] Register `UtilitiesCS.Test\EmailIntelligence\BayesianSerializationHelper_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if `P4-T51` created a new file
+- [x] [P4-T52] Register `UtilitiesCS.Test\EmailIntelligence\BayesianSerializationHelper_Tests.cs` in `UtilitiesCS.Test\UtilitiesCS.Test.csproj` if `P4-T51` created a new file
 	- Acceptance: either `UtilitiesCS.Test\UtilitiesCS.Test.csproj` contains `<Compile Include="EmailIntelligence\BayesianSerializationHelper_Tests.cs" />`, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-bayesianserializationhelper-registration.md` records `Existing Test Home Reused`.
 
-- [ ] [P4-T53] Reopen v2 Phase 86 for `UtilitiesCS\EmailIntelligence\Bayesian\Obsolete\ClassifierGroup.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\ClassifierGroup_Tests.cs`
+- [x] [P4-T53] Reopen v2 Phase 86 for `UtilitiesCS\EmailIntelligence\Bayesian\Obsolete\ClassifierGroup.cs` and add the next deterministic scenario in `UtilitiesCS.Test\EmailIntelligence\ClassifierGroup_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\EmailIntelligence\Bayesian\Obsolete\ClassifierGroup.cs` at `>= 0.80`.
 
-- [ ] [P4-T54] Reopen v2 Phase 87 for `UtilitiesCS\ReusableTypeClasses\Locking\Observable\LinkedList\LockingObservableLinkedList.cs` and add the next deterministic scenario in `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedList_Tests.cs`
+- [x] [P4-T54] Reopen v2 Phase 87 for `UtilitiesCS\ReusableTypeClasses\Locking\Observable\LinkedList\LockingObservableLinkedList.cs` and add the next deterministic scenario in `UtilitiesCS.Test\ReusableTypeClasses\LockingObservableLinkedList_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\ReusableTypeClasses\Locking\Observable\LinkedList\LockingObservableLinkedList.cs` at `>= 0.80`.
 
-- [ ] [P4-T55] Reopen v2 Phase 89 for `UtilitiesCS\HelperClasses\FileSystem\FilePathHelper.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\FilePathHelper_Tests.cs`
+- [x] [P4-T55] Reopen v2 Phase 89 for `UtilitiesCS\HelperClasses\FileSystem\FilePathHelper.cs` and add the next deterministic scenario in `UtilitiesCS.Test\HelperClasses\FilePathHelper_Tests.cs`
 	- Acceptance: the updated coverage report records `UtilitiesCS\HelperClasses\FileSystem\FilePathHelper.cs` at `>= 0.80`.
 
-- [ ] [P4-T56] If `P3-T1` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\EmailIntelligence\Bayesian\Performance\ConfusionViewer.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-confusionviewer-return.md`
+- [x] [P4-T56] If `P3-T1` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\EmailIntelligence\Bayesian\Performance\ConfusionViewer.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-confusionviewer-return.md`
 	- Acceptance: either the updated coverage report records `UtilitiesCS\EmailIntelligence\Bayesian\Performance\ConfusionViewer.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-confusionviewer-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
 
-- [ ] [P4-T57] If `P3-T2` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\EmailIntelligence\Bayesian\Performance\MetricChartViewer.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-metricchartviewer-return.md`
+- [x] [P4-T57] If `P3-T2` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\EmailIntelligence\Bayesian\Performance\MetricChartViewer.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-metricchartviewer-return.md`
 	- Acceptance: either the updated coverage report records `UtilitiesCS\EmailIntelligence\Bayesian\Performance\MetricChartViewer.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-metricchartviewer-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
 
-- [ ] [P4-T58] If `P3-T3` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\Threading\ProgressMultiStepViewer.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-progressmultistepviewer-return.md`
+- [x] [P4-T58] If `P3-T3` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\Threading\ProgressMultiStepViewer.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-progressmultistepviewer-return.md`
 	- Acceptance: either the updated coverage report records `UtilitiesCS\Threading\ProgressMultiStepViewer.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-progressmultistepviewer-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
 
-- [ ] [P4-T59] If `P3-T4` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\Threading\ThreadMonitor.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-threadmonitor-return.md`
+- [x] [P4-T59] If `P3-T4` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\Threading\ThreadMonitor.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-threadmonitor-return.md`
 	- Acceptance: either the updated coverage report records `UtilitiesCS\Threading\ThreadMonitor.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-threadmonitor-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
 
-- [ ] [P4-T60] If `P3-T5` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\To Depricate\FileIO2.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-fileio2-return.md`
+- [x] [P4-T60] If `P3-T5` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\To Depricate\FileIO2.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-fileio2-return.md`
 	- Acceptance: either the updated coverage report records `UtilitiesCS\To Depricate\FileIO2.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-fileio2-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
 
-- [ ] [P4-T61] If `P3-T6` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\HelperClasses\Windows Forms\ScreenHelper.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-screenhelper-return.md`
+- [x] [P4-T61] If `P3-T6` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\HelperClasses\Windows Forms\ScreenHelper.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-screenhelper-return.md`
 	- Acceptance: either the updated coverage report records `UtilitiesCS\HelperClasses\Windows Forms\ScreenHelper.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-screenhelper-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
 
-- [ ] [P4-T62] If `P3-T7` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\HelperClasses\ThemeHelpers\Theme.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-theme-return.md`
+- [x] [P4-T62] If `P3-T7` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\HelperClasses\ThemeHelpers\Theme.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-theme-return.md`
 	- Acceptance: either the updated coverage report records `UtilitiesCS\HelperClasses\ThemeHelpers\Theme.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-theme-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
 
-- [ ] [P4-T63] If `P3-T8` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\HelperClasses\FileSystem\ShellUtilities.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-shellutilities-return.md`
+- [x] [P4-T63] If `P3-T8` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\HelperClasses\FileSystem\ShellUtilities.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-shellutilities-return.md`
 	- Acceptance: either the updated coverage report records `UtilitiesCS\HelperClasses\FileSystem\ShellUtilities.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-shellutilities-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
 
-- [ ] [P4-T64] If `P3-T9` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\HelperClasses\FileSystem\ShellUtilitiesStatic.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-shellutilitiesstatic-return.md`
+- [x] [P4-T64] If `P3-T9` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\HelperClasses\FileSystem\ShellUtilitiesStatic.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-shellutilitiesstatic-return.md`
 	- Acceptance: either the updated coverage report records `UtilitiesCS\HelperClasses\FileSystem\ShellUtilitiesStatic.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-shellutilitiesstatic-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
 
-- [ ] [P4-T65] If `P3-T10` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\HelperClasses\ThemeHelpers\SystemThemeDetector.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-systemthemedetector-return.md`
+- [x] [P4-T65] If `P3-T10` recorded `Decision: Return To Implementation`, add the deterministic coverage scenario for `UtilitiesCS\HelperClasses\ThemeHelpers\SystemThemeDetector.cs` in a registered MSTest home; otherwise record `Not Reopened` in `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-systemthemedetector-return.md`
 	- Acceptance: either the updated coverage report records `UtilitiesCS\HelperClasses\ThemeHelpers\SystemThemeDetector.cs` at `>= 0.80` and the evidence file records the exact test method name, or `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/other/p4-systemthemedetector-return.md` records `Not Reopened` with `Source Decision: Skip Confirmed`.
 
 ### Phase 5 — Final QA and Documentation Loop
 
-- [ ] [P5-T1] Run `dotnet tool run csharpier .`
+- [x] [P5-T1] Run `dotnet tool run csharpier .`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/qa-gates/phase5-csharpier.md` exists and contains `Timestamp:`, `Command: dotnet tool run csharpier .`, `EXIT_CODE: 0`, and `Output Summary:`.
 
-- [ ] [P5-T2] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNETAnalyzers -EnforceCodeStyleInBuild`
+- [x] [P5-T2] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNETAnalyzers -EnforceCodeStyleInBuild`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/qa-gates/phase5-analyzers.md` exists and contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`, and `Analyzer Diagnostics: 0`.
 
-- [ ] [P5-T3] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNullable -TreatWarningsAsErrors`
+- [x] [P5-T3] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNullable -TreatWarningsAsErrors`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/qa-gates/phase5-nullable.md` exists and contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`, and `Warnings As Errors: 0`.
 
-- [ ] [P5-T4] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug`
+- [x] [P5-T4] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/qa-gates/phase5-tests-with-coverage.md` exists and contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`, `Failed Tests: 0`, and a numeric post-remediation `UtilitiesCS Line Rate:` value.
 
 - [ ] [P5-T5] Verify the refreshed coverage report closes AC1 for `UtilitiesCS` and records changed/new-code coverage compliance

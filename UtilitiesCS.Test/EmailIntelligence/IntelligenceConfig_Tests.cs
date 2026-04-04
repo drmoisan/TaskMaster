@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -140,6 +144,140 @@ namespace UtilitiesCS.Test.EmailIntelligence
             config.Config.Should().BeNull();
         }
 
+        [TestMethod]
+        public void GetSerializedConfigurations_WithEmbeddedResources_ReturnsEntries()
+        {
+            // Arrange
+            var mockGlobals = new Mock<IApplicationGlobals>(MockBehavior.Loose);
+            var config = new IntelligenceConfig(mockGlobals.Object);
+
+            // Act
+            var serializedConfigurations = config.GetSerializedConfigurations();
+
+            // Assert
+            serializedConfigurations.Should().NotBeEmpty();
+            serializedConfigurations
+                .Keys.Should()
+                .OnlyContain(key => !string.IsNullOrWhiteSpace(key));
+        }
+
+        [TestMethod]
+        public async Task InitAsync_WhenResourcesDeserializeLoaders_AddsConvertersAndWritesCurrentConfiguration()
+        {
+            // Arrange
+            var mockGlobals = new Mock<IApplicationGlobals>(MockBehavior.Loose);
+            var peopleLoader = new SmartSerializableLoader { T = typeof(PeopleScoDictionaryNew) };
+            var derivedLoader = new SmartSerializableLoader { T = typeof(DerivedScoDictionary) };
+            var config = new TestableIntelligenceConfig(mockGlobals.Object)
+            {
+                SerializedConfigurations = new Dictionary<string, string>
+                {
+                    ["People"] = "people-json",
+                    ["Derived"] = "derived-json",
+                    ["Missing"] = "missing-json",
+                },
+                LoaderMap =
+                {
+                    ["people-json"] = peopleLoader,
+                    ["derived-json"] = derivedLoader,
+                    ["missing-json"] = null,
+                },
+            };
+
+            // Act
+            var result = await config.InitAsync();
+            peopleLoader.Config.ClassifierActivated = !peopleLoader.Config.ClassifierActivated;
+
+            // Assert
+            result.Should().BeSameAs(config);
+            config.Config.Keys.Should().BeEquivalentTo("People", "Derived");
+            peopleLoader
+                .Config.JsonSettings.Converters.Should()
+                .Contain(c => c is PeopleScoConverter);
+            derivedLoader
+                .Config.JsonSettings.Converters.Should()
+                .Contain(c => c is UtilitiesCS.NewtonsoftHelpers.Sco.ScoDictionaryConverter);
+            config.CreatedWriters.Should().ContainSingle();
+            config.CreatedWriters[0].Generated.Should().BeTrue();
+            config.CreatedWriters[0].Resources.Keys.Should().BeEquivalentTo("People", "Derived");
+        }
+
+        [TestMethod]
+        public void IsDerivedFromScoDictionaryNew_WhenTypeIsNull_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var method = typeof(IntelligenceConfig).GetMethod(
+                "IsDerivedFromScoDictionaryNew",
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
+            method.Should().NotBeNull();
+
+            // Act
+            Action action = () => method.Invoke(null, new object[] { null });
+
+            // Assert
+            action
+                .Should()
+                .Throw<TargetInvocationException>()
+                .WithInnerException<ArgumentNullException>();
+        }
+
         #endregion
+
+        private sealed class DerivedScoDictionary : ScoDictionaryNew<string, int> { }
+
+        private sealed class CapturingResourceWriter : IIntelligenceConfigResourceWriter
+        {
+            public Dictionary<string, string> Resources { get; } = new();
+
+            public bool Generated { get; private set; }
+
+            public void AddResource(string name, string value)
+            {
+                Resources[name] = value;
+            }
+
+            public void Generate()
+            {
+                Generated = true;
+            }
+
+            public void Dispose() { }
+        }
+
+        private sealed class TestableIntelligenceConfig : IntelligenceConfig
+        {
+            public TestableIntelligenceConfig(IApplicationGlobals globals)
+                : base(globals) { }
+
+            public IDictionary<string, string> SerializedConfigurations { get; set; } =
+                new Dictionary<string, string>();
+
+            public Dictionary<string, SmartSerializableLoader> LoaderMap { get; } = new();
+
+            public List<CapturingResourceWriter> CreatedWriters { get; } = new();
+
+            internal override IDictionary<string, string> GetSerializedConfigurations()
+            {
+                return SerializedConfigurations;
+            }
+
+            internal override Task<SmartSerializableLoader> DeserializeLoaderAsync(
+                string serializedLoader
+            )
+            {
+                LoaderMap.TryGetValue(serializedLoader, out var loader);
+                return Task.FromResult(loader);
+            }
+
+            internal override IIntelligenceConfigResourceWriter CreateResourceWriter(
+                string resourceFilePath
+            )
+            {
+                var writer = new CapturingResourceWriter();
+                CreatedWriters.Add(writer);
+                return writer;
+            }
+        }
     }
 }

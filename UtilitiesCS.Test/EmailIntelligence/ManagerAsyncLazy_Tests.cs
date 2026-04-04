@@ -1,7 +1,10 @@
+using System;
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.Test.EmailIntelligence
@@ -111,6 +114,53 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 .ContainsKey("TestClassifier")
                 .Should()
                 .BeFalse("deactivating a classifier should remove its entry from the dictionary");
+        }
+
+        [TestMethod]
+        public void GetAltLoader_WhenLoaderTypeExposesFactory_ReturnsWorkingFactoryDelegate()
+        {
+            // Arrange
+            var manager = new ManagerAsyncLazy(new Mock<IApplicationGlobals>().Object);
+            var loader = new SmartSerializableLoader { T = typeof(TestClassifierFactory) };
+            var method = typeof(ManagerAsyncLazy).GetMethod(
+                "GetAltLoader",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+
+            // Act
+            var altLoader =
+                (Func<BayesianClassifierGroup>)method!.Invoke(manager, new object[] { loader });
+
+            // Assert
+            altLoader.Should().NotBeNull();
+            altLoader!().Should().BeOfType<TestClassifierGroup>();
+        }
+
+        [TestMethod]
+        public void GetAltLoader_WhenLoaderTypeDoesNotExposeFactory_ReturnsNull()
+        {
+            // Arrange
+            var manager = new ManagerAsyncLazy(new Mock<IApplicationGlobals>().Object);
+            var loader = new SmartSerializableLoader { T = typeof(string) };
+            var method = typeof(ManagerAsyncLazy).GetMethod(
+                "GetAltLoader",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+
+            // Act
+            var altLoader =
+                (Func<BayesianClassifierGroup>)method!.Invoke(manager, new object[] { loader });
+
+            // Assert
+            altLoader.Should().BeNull();
+        }
+
+        private sealed class TestClassifierGroup : BayesianClassifierGroup;
+
+        private static class TestClassifierFactory
+        {
+            public static BayesianClassifierGroup CreateNewClassifier() =>
+                new TestClassifierGroup();
         }
     }
 }

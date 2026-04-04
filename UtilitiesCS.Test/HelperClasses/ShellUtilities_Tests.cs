@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ObjectListViewDemo;
@@ -25,9 +26,54 @@ namespace UtilitiesCS.Test.HelperClasses
         public void GetFileType_ExeExtension_ReturnsNonEmptyString()
         {
             var su = new ShellUtilities();
-            // Use a common file extension that should always return a type
-            var type = su.GetFileType(".txt");
-            // May return empty string on some environments; test that it doesn't throw
+            var type = su.GetFileType(GetExistingFilePath());
+
+            type.Should().NotBeNullOrWhiteSpace();
+        }
+
+        [TestMethod]
+        public void GetFileIcon_WithUseFileType_ShouldReturnIconsForDirectoryAndFileExtension()
+        {
+            var su = new ShellUtilities();
+            var directoryIcon = su.GetFileIcon(
+                GetExistingDirectoryPath(),
+                isSmallImage: true,
+                useFileType: true
+            );
+            var fileTypeIcon = su.GetFileIcon(".txt", isSmallImage: false, useFileType: true);
+
+            try
+            {
+                directoryIcon.Should().NotBeNull();
+                fileTypeIcon.Should().NotBeNull();
+            }
+            finally
+            {
+                directoryIcon?.Dispose();
+                fileTypeIcon?.Dispose();
+            }
+        }
+
+        [TestMethod]
+        public void GetFileIcon_AndGetSysImageIndex_WithExistingFile_ShouldReturnShellMetadata()
+        {
+            var su = new ShellUtilities();
+            var icon = su.GetFileIcon(
+                GetExistingFilePath(),
+                isSmallImage: false,
+                useFileType: false
+            );
+            var imageIndex = su.GetSysImageIndex(GetExistingFilePath());
+
+            try
+            {
+                icon.Should().NotBeNull();
+                imageIndex.Should().BeGreaterThanOrEqualTo(0);
+            }
+            finally
+            {
+                icon?.Dispose();
+            }
         }
 
         #endregion
@@ -52,5 +98,15 @@ namespace UtilitiesCS.Test.HelperClasses
         }
 
         #endregion
+
+        private static string GetExistingDirectoryPath()
+        {
+            return AppDomain.CurrentDomain.BaseDirectory;
+        }
+
+        private static string GetExistingFilePath()
+        {
+            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UtilitiesCS.Test.dll");
+        }
     }
 }

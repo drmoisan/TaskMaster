@@ -1,11 +1,15 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS.EmailIntelligence.FolderRemap;
+using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
+using OutlookFolders = Microsoft.Office.Interop.Outlook.Folders;
 
 namespace UtilitiesCS.Test.EmailIntelligence.OlFolderTools
 {
@@ -41,6 +45,31 @@ namespace UtilitiesCS.Test.EmailIntelligence.OlFolderTools
             mockRoot.Setup(f => f.FolderPath).Returns(rootPath);
             return new OlFolderRemap(mockFolder.Object, mockRoot.Object);
         }
+
+        private static Mock<OutlookFolder> CreateFolder(
+            string folderPath,
+            params OutlookFolder[] children
+        )
+        {
+            var folder = new Mock<OutlookFolder>(MockBehavior.Strict);
+            folder.SetupGet(x => x.Name).Returns(GetLeafName(folderPath));
+            folder.SetupGet(x => x.FolderPath).Returns(folderPath);
+            folder.SetupGet(x => x.Folders).Returns(CreateFoldersCollection(children).Object);
+            return folder;
+        }
+
+        private static Mock<OutlookFolders> CreateFoldersCollection(params OutlookFolder[] children)
+        {
+            var folders = new Mock<OutlookFolders>(MockBehavior.Strict);
+            var enumerableChildren = children ?? [];
+            var collection = new ArrayList(enumerableChildren);
+            folders.SetupGet(x => x.Count).Returns(enumerableChildren.Length);
+            folders.Setup(x => x.GetEnumerator()).Returns(() => collection.GetEnumerator());
+            return folders;
+        }
+
+        private static string GetLeafName(string folderPath) =>
+            folderPath.Split(['\\'], StringSplitOptions.RemoveEmptyEntries)[^1];
 
         // -----------------------------------------------------------------------
         // P42-T1 — Building a tree from a mapping source yields expected nodes
@@ -160,6 +189,89 @@ namespace UtilitiesCS.Test.EmailIntelligence.OlFolderTools
                 .Should()
                 .BeTrue("the PropertyChanged event must fire after MappedTo is set");
         }
+
+        [TestMethod]
+        public void ConstructorWithMappings_BuildsRemapTreeAndInvertsMappedTargets()
+        {
+            var fy26 = CreateFolder(@"\\Mailbox\Projects\FY26");
+            var projects = CreateFolder(@"\\Mailbox\Projects", fy26.Object);
+            var inbox = CreateFolder(@"\\Mailbox\Inbox");
+            var archive = CreateFolder(@"\\Mailbox\Archive");
+            var root = CreateFolder(@"\\Mailbox", inbox.Object, archive.Object, projects.Object);
+
+            var tree = new FolderRemapTree(
+                root.Object,
+                new Dictionary<string, string>
+                {
+                    ["Inbox"] = "Archive",
+                    [@"Projects\FY26"] = "Archive",
+                }
+            );
+
+            tree.Roots.Should().ContainSingle();
+            tree.Roots[0].Children.Select(x => x.Value.Name).Should().Contain("Inbox");
+            tree.Roots[0].Children.Select(x => x.Value.Name).Should().Contain("Archive");
+            tree.Roots[0].Children.Select(x => x.Value.Name).Should().Contain("Projects");
+
+            var remaps = tree.GetRemapList();
+            remaps.Select(x => x.RelativePath).Should().BeEquivalentTo("Inbox", @"Projects\FY26");
+            remaps.Should().OnlyContain(x => x.MappedTo.RelativePath == "Archive");
+
+            var inverted = tree.GetInvertedMapTree();
+            inverted.Should().ContainSingle();
+            inverted[0].Value.RelativePath.Should().Be("Archive");
+            inverted[0].Children.Should().HaveCount(2);
+        }
+
+        [TestMethod]
+        public void FilterMapped_IncludeFalse_ReturnsOnlyUnmappedNodes()
+        {
+            var fy26 = CreateFolder(@"\\Mailbox\Projects\FY26");
+            var projects = CreateFolder(@"\\Mailbox\Projects", fy26.Object);
+            var inbox = CreateFolder(@"\\Mailbox\Inbox");
+            var archive = CreateFolder(@"\\Mailbox\Archive");
+            var root = CreateFolder(@"\\Mailbox", inbox.Object, archive.Object, projects.Object);
+
+            var tree = new FolderRemapTree(
+                root.Object,
+                new Dictionary<string, string> { ["Inbox"] = "Archive" }
+            );
+
+            var filtered = tree.FilterMapped(include: false);
+
+            filtered
+                .SelectMany(node => node.Flatten())
+                .Select(x => x.Name)
+                .Should()
+                .Contain("Archive");
+            filtered
+                .SelectMany(node => node.Flatten())
+                .Select(x => x.Name)
+                .Should()
+                .Contain("Projects");
+            filtered
+                .SelectMany(node => node.Flatten())
+                .Select(x => x.Name)
+                .Should()
+                .Contain("FY26");
+            filtered
+                .SelectMany(node => node.Flatten())
+                .Select(x => x.Name)
+                .Should()
+                .NotContain("Inbox");
+        }
+
+        [TestMethod]
+        public void NotifyPropertyChanged_WhenCalled_RaisesRequestedPropertyName()
+        {
+            var tree = CreateTree(new[] { new TreeNode<OlFolderRemap>(new OlFolderRemap()) });
+            string propertyName = null;
+            tree.PropertyChanged += (_, args) => propertyName = args.PropertyName;
+
+            tree.NotifyPropertyChanged(nameof(FolderRemapTree.Roots));
+
+            propertyName.Should().Be(nameof(FolderRemapTree.Roots));
+        }
     }
 
     [TestClass]
@@ -182,6 +294,30 @@ namespace UtilitiesCS.Test.EmailIntelligence.OlFolderTools
             remap.MappedTo = target;
 
             remap.MappedTo.Should().BeSameAs(target);
+        }
+
+        [TestMethod]
+        public void OlFolder_Setter_RefreshesNameAndRelativePath()
+        {
+            var mockRoot = new Mock<Microsoft.Office.Interop.Outlook.MAPIFolder>();
+            mockRoot.Setup(f => f.FolderPath).Returns(@"\\Root");
+
+            var initialFolder = new Mock<Microsoft.Office.Interop.Outlook.MAPIFolder>();
+            initialFolder.Setup(f => f.FolderPath).Returns(@"\\Root\\Original");
+            initialFolder.Setup(f => f.Name).Returns("Original");
+
+            var updatedFolder = new Mock<Microsoft.Office.Interop.Outlook.MAPIFolder>();
+            updatedFolder.Setup(f => f.FolderPath).Returns(@"\\Root\\Updated");
+            updatedFolder.Setup(f => f.Name).Returns("Updated");
+
+            var remap = new OlFolderRemap(initialFolder.Object, mockRoot.Object);
+            remap.OlRoot = mockRoot.Object;
+
+            remap.OlFolder = updatedFolder.Object;
+
+            remap.OlRoot.Should().BeSameAs(mockRoot.Object);
+            remap.Name.Should().Be("Updated");
+            remap.RelativePath.Should().Be(@"\\Updated");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -60,6 +61,7 @@ namespace ToDoModel.Data_Model.People
                 && (test.Substring(0, _prefix.Value.Length) == _prefix.Value);
         }
 
+        [ExcludeFromCodeCoverage]
         public List<string> GetPeopleCatNames()
         {
             return
@@ -72,6 +74,7 @@ namespace ToDoModel.Data_Model.People
             ];
         }
 
+        [ExcludeFromCodeCoverage]
         public bool CategoryExists(string category)
         {
             return Globals
@@ -80,6 +83,7 @@ namespace ToDoModel.Data_Model.People
                 .Any(cat => cat.Name == category);
         }
 
+        [ExcludeFromCodeCoverage]
         public IList<string> AddMissingEntries(Outlook.MailItem olMail)
         {
             Globals.ThrowIfNull();
@@ -126,6 +130,7 @@ namespace ToDoModel.Data_Model.People
             return newPeople;
         }
 
+        [ExcludeFromCodeCoverage]
         public string AddMissingEntry(string address) //internal
         {
             var newPerson = SplitAddressToFirstLastName(address);
@@ -170,6 +175,7 @@ namespace ToDoModel.Data_Model.People
             }
         }
 
+        [ExcludeFromCodeCoverage]
         public string RefineValidateCategory(string newPerson, IPrefix prefix)
         {
             bool continueAsking = true;
@@ -216,6 +222,7 @@ namespace ToDoModel.Data_Model.People
             return newPerson;
         }
 
+        [ExcludeFromCodeCoverage]
         public void AddColorCategory(string newPerson)
         {
             Globals

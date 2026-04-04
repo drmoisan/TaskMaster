@@ -10,7 +10,7 @@ using UtilitiesCS.ReusableTypeClasses;
 namespace UtilitiesCS.Test.ReusableTypeClasses
 {
     [TestClass]
-    public class SCODictionary_Tests
+    public partial class SCODictionary_Tests
     {
         [TestMethod]
         public void AddRemoveTryGetValueAndCount_WorkAsExpected()

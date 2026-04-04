@@ -2,9 +2,13 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
+using Microsoft.Office.Tools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS.EmailIntelligence;
@@ -846,6 +850,477 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
                 );
         }
 
+        [TestMethod]
+        public async Task BuildClassifiersAsync_NoAppData_CoversTopLevelWorkflowUntilNullCollectionFails()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var mockFs = new Mock<IFileSystemFolderPaths>();
+            var mockAf = new Mock<IAppAutoFileObjects>();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+            var progressPane = new Mock<CustomTaskPane>();
+            progressPane.SetupProperty(x => x.Visible, false);
+            mockFs
+                .SetupGet(x => x.SpecialFolders)
+                .Returns(new ConcurrentDictionary<string, string>());
+            mockGlobals.SetupGet(x => x.FS).Returns(mockFs.Object);
+            mockAf.SetupGet(x => x.Manager).Returns(manager);
+            mockAf.SetupGet(x => x.ProgressTracker).Returns(CreateHeadlessProgressTrackerPane());
+            mockAf.SetupGet(x => x.ProgressPane).Returns(progressPane.Object);
+            mockGlobals.SetupGet(x => x.AF).Returns(mockAf.Object);
+
+            var prefixList = new ScoCollection<IPrefix>
+            {
+                CreatePrefix("Context", "_@"),
+                CreatePrefix("Project", "Tag PROJECT"),
+            };
+            var mockTd = new Mock<IToDoObjects>();
+            mockTd.SetupGet(x => x.PrefixList).Returns(prefixList);
+            mockGlobals.SetupGet(x => x.TD).Returns(mockTd.Object);
+
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                );
+            group.CgUtilities = new StubCategoryClassifierGroupUtilities(
+                mockGlobals.Object,
+                new BayesianClassifierGroup()
+            );
+
+            Func<Task> act = async () => await group.BuildClassifiersAsync();
+
+            await act.Should().ThrowAsync<ArgumentNullException>();
+            progressPane.Object.Visible.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public async Task LoadClassifierGroup_ProgressPackageOverload_ReturnsUtilitiesResult()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var expected = new BayesianClassifierGroup();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                );
+            group.CgUtilities = new StubCategoryClassifierGroupUtilities(
+                mockGlobals.Object,
+                expected
+            );
+
+            var prefix = CreatePrefix("Project", "Tag PROJECT");
+            var package = CreateHeadlessProgressPackage();
+            var collection = new[] { new MinedMailInfo { Tokens = new[] { "alpha" } } };
+
+            var result = await InvokeNonPublicAsync<BayesianClassifierGroup>(
+                group,
+                "LoadClassifierGroup",
+                package,
+                package.StopWatch,
+                collection,
+                prefix
+            );
+
+            result.Should().BeSameAs(expected);
+            package.ProgressTrackerPane.Progress.Should().Be(20);
+        }
+
+        [TestMethod]
+        public async Task BuildClassifiersAsync_WithMatchingCategories_ReturnsTrueAndBuildsExpectedKeys()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var group = new RecordingCategoryClassifierGroup(mockGlobals.Object);
+            var classifierGroup = new BayesianClassifierGroup
+            {
+                TotalEmailCount = 3,
+                SharedTokenBase = new Corpus(
+                    new Dictionary<string, int> { { "alpha", 2 }, { "beta", 1 } }
+                ),
+            };
+            var collection = new[]
+            {
+                new MinedMailInfo
+                {
+                    Categories = "Tag PROJECT Roadmap, _@Desk",
+                    Tokens = new[] { "alpha", "beta" },
+                },
+                new MinedMailInfo
+                {
+                    Categories = "Tag PROJECT Roadmap",
+                    Tokens = new[] { "alpha" },
+                },
+                new MinedMailInfo { Categories = "_@Desk", Tokens = new[] { "beta" } },
+            };
+            var prefix = CreatePrefix("Project", "Tag PROJECT");
+            var package = CreateHeadlessProgressPackage();
+
+            var result = await group.BuildClassifiersAsync(
+                classifierGroup,
+                collection,
+                package,
+                prefix
+            );
+
+            result.Should().BeTrue();
+            group
+                .BuiltGroupingKeys.Should()
+                .ContainSingle()
+                .Which.Should()
+                .Be("Tag PROJECT Roadmap");
+            classifierGroup.Classifiers.Should().ContainKey("Tag PROJECT Roadmap");
+        }
+
+        [TestMethod]
+        public async Task BuildClassifiersAsync_WithNullProgressPane_ReturnsFalse()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                );
+            var classifierGroup = new BayesianClassifierGroup();
+            var collection = new[]
+            {
+                new MinedMailInfo
+                {
+                    Categories = "Tag PROJECT Roadmap",
+                    Tokens = new[] { "alpha" },
+                },
+            };
+            var prefix = CreatePrefix("Project", "Tag PROJECT");
+            using var cts = new CancellationTokenSource();
+            var package = new ProgressPackage
+            {
+                CancelSource = cts,
+                Cancel = cts.Token,
+                StopWatch = new SegmentStopWatch().Start(),
+                ProgressTrackerPane = null,
+            };
+
+            var result = await group.BuildClassifiersAsync(
+                classifierGroup,
+                collection,
+                package,
+                prefix
+            );
+
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task AsyncAction_WithConfiguredSetter_InvokesCategorySetter()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                )
+                {
+                    ClassifierGroup = CreateTrainedCategoryClassifierGroup(),
+                    ProbabilityThreshold = 0.5,
+                };
+            var helper = CreateMailItemHelper("alpha", "beta");
+            string[] assignedCategories = null;
+
+            group.CategorySetter = (categories, item) =>
+            {
+                assignedCategories = categories.ToArray();
+                return Task.CompletedTask;
+            };
+
+            await group.AsyncAction(helper);
+
+            assignedCategories.Should().Contain("Tag PROJECT Roadmap");
+        }
+
+        [TestMethod]
+        public void AsyncAction_WithoutCategorySetter_ReturnsNullTask()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                );
+            var helper = CreateMailItemHelper("alpha");
+
+            var task = group.AsyncAction(helper);
+
+            task.Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task GetMatchingCategoriesAsync_WithHighProbabilityMatch_ReturnsFilteredCategories()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                )
+                {
+                    ClassifierGroup = CreateTrainedCategoryClassifierGroup(),
+                    ProbabilityThreshold = 0.5,
+                };
+            var helper = CreateMailItemHelper("alpha", "beta");
+
+            var result = await group.GetMatchingCategoriesAsync(helper);
+
+            result.Should().Contain("Tag PROJECT Roadmap");
+        }
+
+        [TestMethod]
+        public void GetMatchingCategories_WithHighProbabilityMatch_ReturnsFilteredCategories()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                )
+                {
+                    ClassifierGroup = CreateTrainedCategoryClassifierGroup(),
+                    ProbabilityThreshold = 0.5,
+                };
+            var helper = CreateMailItemHelper("alpha", "beta");
+
+            var result = group.GetMatchingCategories(helper);
+
+            result.Should().Contain("Tag PROJECT Roadmap");
+        }
+
+        [TestMethod]
+        public void Condition_WithNonMailItem_ReturnsFalse()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                );
+
+            InvokeNonPublic<bool>(group, "Condition", new object()).Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void Condition_WithNonNoteMailItem_ReturnsFalse()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                );
+            var mailItem = new Mock<MailItem>();
+            mailItem.SetupGet(x => x.MessageClass).Returns("IPM.Schedule.Meeting.Request");
+
+            InvokeNonPublic<bool>(group, "Condition", mailItem.Object).Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void Condition_WithNoteMailItem_ReturnsTrue()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                );
+            var mailItem = new Mock<MailItem>();
+            mailItem.SetupGet(x => x.MessageClass).Returns("IPM.Note");
+
+            InvokeNonPublic<bool>(group, "Condition", mailItem.Object).Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void ConditionLog_WithAppointmentItem_ReturnsFalse()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                );
+            var appointment = new Mock<AppointmentItem>();
+
+            InvokeNonPublic<bool>(group, "ConditionLog", appointment.Object).Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void ConditionLog_WithMailItemUsingNonNoteMessageClass_ReturnsFalse()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                );
+            var mailItem = new Mock<MailItem>();
+            mailItem.SetupGet(x => x.MessageClass).Returns("IPM.Schedule.Meeting.Request");
+            mailItem.SetupGet(x => x.CreationTime).Returns(new DateTime(2024, 1, 2, 3, 4, 0));
+            mailItem.SetupGet(x => x.Subject).Returns("Roadmap");
+
+            InvokeNonPublic<bool>(group, "ConditionLog", mailItem.Object).Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void ConditionLog_WithNoteMailItem_ReturnsTrue()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                );
+            var mailItem = new Mock<MailItem>();
+            mailItem.SetupGet(x => x.MessageClass).Returns("IPM.Note");
+
+            InvokeNonPublic<bool>(group, "ConditionLog", mailItem.Object).Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void GetOlItemString_WithReflectionFriendlyItem_UsesFallbackTypeAndReadableFields()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var group =
+                new UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                    mockGlobals.Object
+                );
+            var item = new ReflectionFriendlyCategoryItem
+            {
+                CreationTime = new DateTime(2024, 2, 3, 4, 5, 0),
+                Subject = "Status update",
+            };
+            var outlookItem = new UtilitiesCS.OutlookItem(item);
+
+            var result = InvokeNonPublic<string>(group, "GetOlItemString", outlookItem);
+
+            result.Should().Contain(nameof(ReflectionFriendlyCategoryItem));
+            result.Should().Contain("created on");
+            result.Should().Contain("with subject Status update");
+        }
+
+        private static BayesianClassifierGroup CreateTrainedCategoryClassifierGroup()
+        {
+            var classifierGroup = new BayesianClassifierGroup();
+            classifierGroup.Train("Tag PROJECT Roadmap", new[] { "alpha", "alpha", "beta" }, 1);
+            classifierGroup.Train("Tag PROJECT Archive", new[] { "gamma", "gamma" }, 1);
+            return classifierGroup;
+        }
+
+        private static MailItemHelper CreateMailItemHelper(params string[] tokens)
+        {
+            var helper = new MailItemHelper();
+            typeof(MailItemHelper)
+                .GetProperty(
+                    "Tokens",
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                )!
+                .SetValue(helper, tokens);
+            return helper;
+        }
+
+        private static ProgressPackage CreateHeadlessProgressPackage()
+        {
+            var cts = new CancellationTokenSource();
+            return new ProgressPackage
+            {
+                CancelSource = cts,
+                Cancel = cts.Token,
+                ProgressTrackerPane = CreateHeadlessProgressTrackerPane(),
+                StopWatch = new SegmentStopWatch().Start(),
+            };
+        }
+
+        private static ProgressTrackerPane CreateHeadlessProgressTrackerPane(double progress = 0)
+        {
+            var pane = (ProgressTrackerPane)
+                FormatterServices.GetUninitializedObject(typeof(ProgressTrackerPane));
+            var parentProgressType = typeof(ProgressTrackerPane)
+                .Assembly.GetType("UtilitiesCS.ParentProgress`1")!
+                .MakeGenericType(typeof(ValueTuple<int, string>));
+            var parentProgress = Activator.CreateInstance(
+                parentProgressType,
+                new Progress<(int Value, string JobName)>(_ => { }),
+                100,
+                0
+            );
+
+            SetPrivateField(pane, "_parent", parentProgress);
+            SetPrivateField(pane, "_progress", progress);
+            SetPrivateField(pane, "_isRoot", false);
+            SetPrivateField(pane, "_jobName", "Test");
+            return pane;
+        }
+
+        private static IPrefix CreatePrefix(string key, string value)
+        {
+            var prefix = new Mock<IPrefix>();
+            prefix.SetupProperty(x => x.Key, key);
+            prefix.SetupProperty(x => x.Value, value);
+            return prefix.Object;
+        }
+
+        private static T InvokeNonPublic<T>(
+            object instance,
+            string methodName,
+            params object[] args
+        )
+        {
+            var method = instance
+                .GetType()
+                .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+                .Single(x =>
+                    x.Name == methodName
+                    && ParametersMatch(
+                        x.GetParameters().Select(parameter => parameter.ParameterType).ToArray(),
+                        args
+                    )
+                );
+            return (T)method.Invoke(instance, args);
+        }
+
+        private static async Task<T> InvokeNonPublicAsync<T>(
+            object instance,
+            string methodName,
+            params object[] args
+        )
+        {
+            var method = instance
+                .GetType()
+                .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+                .Single(x =>
+                    x.Name == methodName
+                    && ParametersMatch(
+                        x.GetParameters().Select(parameter => parameter.ParameterType).ToArray(),
+                        args
+                    )
+                );
+            var task = (Task)method.Invoke(instance, args);
+            await task;
+            return (T)task.GetType().GetProperty("Result")!.GetValue(task);
+        }
+
+        private static bool ParametersMatch(Type[] parameterTypes, object[] args)
+        {
+            if (parameterTypes.Length != args.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < parameterTypes.Length; i++)
+            {
+                if (args[i] is null)
+                {
+                    continue;
+                }
+
+                if (!parameterTypes[i].IsInstanceOfType(args[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static void SetPrivateField(object instance, string fieldName, object value)
+        {
+            instance
+                .GetType()
+                .GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(instance, value);
+        }
+
         private static Mock<IApplicationGlobals> CreateMockGlobals()
         {
             var mockGlobals = new Mock<IApplicationGlobals>();
@@ -856,6 +1331,46 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             mockGlobals.Setup(g => g.FS).Returns(mockFs.Object);
             mockGlobals.Setup(g => g.AF).Returns(mockAf.Object);
             return mockGlobals;
+        }
+
+        private sealed class RecordingCategoryClassifierGroup(IApplicationGlobals globals)
+            : UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories.CategoryClassifierGroup(
+                globals
+            )
+        {
+            public List<string> BuiltGroupingKeys { get; } = new();
+
+            public override async Task BuildClassifierAsync(
+                IGrouping<string, MinedMailInfo> group,
+                BayesianClassifierGroup classifierGroup,
+                CancellationToken cancel
+            )
+            {
+                BuiltGroupingKeys.Add(group.Key);
+                await base.BuildClassifierAsync(group, classifierGroup, cancel);
+            }
+        }
+
+        private sealed class StubCategoryClassifierGroupUtilities(
+            IApplicationGlobals globals,
+            BayesianClassifierGroup classifierGroup
+        ) : ClassifierGroupUtilities(globals)
+        {
+            public override Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(
+                MinedMailInfo[] collection,
+                string name,
+                int minimumCountPerToken = 0
+            )
+            {
+                return Task.FromResult(classifierGroup);
+            }
+        }
+
+        private sealed class ReflectionFriendlyCategoryItem
+        {
+            public DateTime CreationTime { get; set; }
+
+            public string Subject { get; set; }
         }
     }
 

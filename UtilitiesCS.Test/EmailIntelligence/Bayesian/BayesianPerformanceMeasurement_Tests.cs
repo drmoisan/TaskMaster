@@ -861,6 +861,86 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         }
 
         [TestMethod]
+        public async Task RunClassifierTestAsync_WithSingleItem_SerializesOutcomeAndRestoresProgressPane()
+        {
+            var progressPane = new Mock<Microsoft.Office.Tools.CustomTaskPane>();
+            progressPane.SetupProperty(x => x.Visible, false);
+            _mockAutoFiles.SetupGet(x => x.ProgressPane).Returns(progressPane.Object);
+            var serialization = new RecordingSerializationHelper(_mockGlobals.Object);
+            var sut = CreateMeasurement(serialization);
+
+            var outcomes = await sut.RunClassifierTestAsync(
+                [CreateMinedMailInfo("Inbox", "alpha", "shared")],
+                CreateClassifierGroup(),
+                CreateProgressPackage()
+            );
+
+            outcomes.Should().ContainSingle();
+            outcomes[0].Should().BeEquivalentTo(new { Actual = "Inbox", Predicted = "Inbox" });
+            serialization.StoredObjects.Should().ContainKey("TestOutcome[].json");
+            progressPane.Object.Visible.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task RunVerboseClassifierTestAsync_WithSingleItem_SerializesVerboseAndSimpleOutcomes()
+        {
+            var progressPane = new Mock<Microsoft.Office.Tools.CustomTaskPane>();
+            progressPane.SetupProperty(x => x.Visible, false);
+            _mockAutoFiles.SetupGet(x => x.ProgressPane).Returns(progressPane.Object);
+            var serialization = new RecordingSerializationHelper(_mockGlobals.Object);
+            var sut = CreateMeasurement(serialization);
+
+            var outcomes = await sut.RunVerboseClassifierTestAsync(
+                [CreateMinedMailInfo("Inbox", "alpha", "shared")],
+                CreateClassifierGroup(),
+                CreateProgressPackage()
+            );
+
+            outcomes.Should().ContainSingle();
+            outcomes[0].Drivers.Should().NotBeNullOrEmpty();
+            serialization.StoredObjects.Should().ContainKey("VerboseTestOutcome[].json");
+            serialization.StoredObjects.Should().ContainKey("TestOutcome[].json");
+            progressPane.Object.Visible.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task TestFolderClassifierAsync_WhenVerboseFalse_UsesSerializedStagingData()
+        {
+            var progressPane = new Mock<Microsoft.Office.Tools.CustomTaskPane>();
+            progressPane.SetupProperty(x => x.Visible, false);
+            _mockAutoFiles.SetupGet(x => x.ProgressPane).Returns(progressPane.Object);
+            var serialization = new RecordingSerializationHelper(_mockGlobals.Object);
+            serialization.StoredObjects["MinedMailInfo[].json"] =
+                CreateFolderMeasurementSourceWithMisclassification();
+            var sut = CreateMeasurement(serialization);
+
+            await sut.TestFolderClassifierAsync(verbose: false);
+
+            serialization.StoredObjects.Should().ContainKey("TestScores.json");
+            serialization.StoredCsv.Should().ContainKey("ConfusionMatrix.csv");
+            serialization.StoredTexts.Should().ContainKey("ConfusionMatrixText.txt");
+            progressPane.Object.Visible.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task TestFolderClassifierAsync_WhenVerboseTrue_SerializesVerboseArtifacts()
+        {
+            var progressPane = new Mock<Microsoft.Office.Tools.CustomTaskPane>();
+            progressPane.SetupProperty(x => x.Visible, false);
+            _mockAutoFiles.SetupGet(x => x.ProgressPane).Returns(progressPane.Object);
+            var serialization = new RecordingSerializationHelper(_mockGlobals.Object);
+            serialization.StoredObjects["MinedMailInfo[].json"] =
+                CreateFolderMeasurementSourceWithMisclassification();
+            var sut = CreateMeasurement(serialization);
+
+            await sut.TestFolderClassifierAsync(verbose: true);
+
+            serialization.StoredObjects.Should().ContainKey("VerboseTestOutcome[].json");
+            serialization.StoredObjects.Should().ContainKey("ClassificationErrors[].json");
+            progressPane.Object.Visible.Should().BeFalse();
+        }
+
+        [TestMethod]
         public void PrivateProgressHelpers_FormatExpectedMessages()
         {
             // Arrange
@@ -947,6 +1027,17 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
                 Tokens = tokens,
                 Subject = $"Subject-{relativePath}",
             };
+        }
+
+        private static MinedMailInfo[] CreateFolderMeasurementSourceWithMisclassification()
+        {
+            return
+            [
+                CreateMinedMailInfo("Inbox", "alpha", "inbox"),
+                CreateMinedMailInfo("Archive", "beta", "shared"),
+                CreateMinedMailInfo("Archive", "beta", "archive"),
+                CreateMinedMailInfo("Inbox", "beta", "archive"),
+            ];
         }
 
         private static ProgressPackage CreateProgressPackage()

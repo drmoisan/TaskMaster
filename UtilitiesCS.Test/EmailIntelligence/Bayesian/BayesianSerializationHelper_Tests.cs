@@ -87,6 +87,14 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         }
 
         [TestMethod]
+        public void Deserialize_WhenFileMissingUnderAppData_ReturnsDefault()
+        {
+            var sut = CreateHelper();
+
+            sut.Deserialize<SerializationFixture>("missingWithinAppData").Should().BeNull();
+        }
+
+        [TestMethod]
         public async Task DeserializeAsync_WithExistingFile_ReturnsDeserializedObject()
         {
             // Arrange
@@ -99,6 +107,18 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 
             // Assert
             result.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        public async Task DeserializeAsync_WhenFileMissingUnderAppData_ReturnsDefault()
+        {
+            var sut = CreateHelper();
+
+            var result = await sut.DeserializeAsync<SerializationFixture>(
+                "missingAsyncWithinAppData"
+            );
+
+            result.Should().BeNull();
         }
 
         [TestMethod]
@@ -122,6 +142,21 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         }
 
         [TestMethod]
+        public async Task DeserializeAsync_WithProgressAndInvalidJson_ReturnsDefault()
+        {
+            var sut = CreateHelper();
+            sut.StoreText("invalidProgress.json", "{ invalid json");
+
+            var result = await sut.DeserializeAsync<SerializationFixture>(
+                BayesianPerformanceMeasurement_Tests.CreateFakeProgressTrackerPane(),
+                "invalidProgress"
+            );
+
+            result.Should().BeNull();
+            sut.LastProgressReadPath.Should().Be(GetBayesianPath("invalidProgress.json"));
+        }
+
+        [TestMethod]
         public void NonPublicHelpers_ReturnExpectedDiskAndJsonSettings()
         {
             // Arrange
@@ -135,6 +170,28 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             disk.FilePath.Should().Be(GetBayesianPath("scores_daily.txt"));
             jsonSettings.Converters.Should().ContainSingle(x => x is AppGlobalsConverter);
             jsonSettings.TypeNameHandling.Should().Be(TypeNameHandling.Auto);
+        }
+
+        [TestMethod]
+        public async Task NonPublicHelpers_WithMissingAppDataAndRepoFile_ReturnExpectedFallbacks()
+        {
+            var missingGlobals = _mockRepository.Create<IApplicationGlobals>();
+            var missingFileSystem = _mockRepository.Create<IFileSystemFolderPaths>();
+            missingFileSystem
+                .SetupGet(x => x.SpecialFolders)
+                .Returns(new ConcurrentDictionary<string, string>());
+            missingGlobals.SetupGet(x => x.FS).Returns(missingFileSystem.Object);
+            var sut = new BayesianSerializationHelper(missingGlobals.Object);
+            var repoFile = Path.GetFullPath(
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "AGENTS.md")
+            );
+
+            InvokeNonPublic(sut, "GetDisk", "scores", "", ".txt").Should().BeNull();
+            ((bool)InvokeNonPublic(sut, "FileExists", repoFile)).Should().BeTrue();
+            ((string)InvokeNonPublic(sut, "ReadAllText", repoFile)).Should().Contain("AGENTS.md");
+            ((Task<string>)InvokeNonPublic(sut, "ReadAllTextAsync", repoFile))
+                .Result.Should()
+                .Contain("AGENTS.md");
         }
 
         [TestMethod]

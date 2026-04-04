@@ -1,6 +1,11 @@
+using System;
+using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UtilitiesCS;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.Test.Threading
@@ -116,6 +121,65 @@ namespace UtilitiesCS.Test.Threading
             // Assert: child's allocation parameters reflect the configured sub-range.
             child.Allocation.Should().Be(50);
             child.StartingAt.Should().Be(10);
+        }
+
+        [TestMethod]
+        [STAThread]
+        public async Task InitializeAsync_WithCurrentDispatcher_InitializesAndReturnsTracker()
+        {
+            using var cts = new CancellationTokenSource();
+            var tracker = new ProgressTrackerAsync(cts);
+            var previousContext = SynchronizationContext.Current;
+            var dispatcherField = typeof(UiThread).GetField(
+                "_dispatcher",
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
+            dispatcherField.Should().NotBeNull();
+
+            var currentDispatcher = Dispatcher.CurrentDispatcher;
+            var previousDispatcher = (Dispatcher)dispatcherField!.GetValue(null);
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+
+            try
+            {
+                dispatcherField.SetValue(null, currentDispatcher);
+
+                var initializeTask = tracker.InitializeAsync();
+                var frame = new DispatcherFrame();
+                _ = initializeTask.ContinueWith(
+                    _ =>
+                        currentDispatcher.BeginInvoke(
+                            new System.Action(() => frame.Continue = false)
+                        ),
+                    TaskScheduler.Default
+                );
+
+                Dispatcher.PushFrame(frame);
+
+                var initializedTracker = await initializeTask;
+                var initializedViewer = tracker.ProgressViewer;
+
+                initializedTracker.Should().BeSameAs(tracker);
+                tracker.UiDispatcher.Should().BeSameAs(currentDispatcher);
+                initializedViewer.Should().NotBeNull();
+                initializedViewer.CancelSource.Should().BeSameAs(cts);
+                initializedViewer.JobName.Text.Should().Be("Initializing...");
+
+                tracker.ProgressViewer = initializedViewer;
+                tracker.ProgressViewer.Should().BeSameAs(initializedViewer);
+
+                initializedViewer.Close();
+            }
+            finally
+            {
+                if (tracker.ProgressViewer != null && !tracker.ProgressViewer.IsDisposed)
+                {
+                    tracker.ProgressViewer.Close();
+                }
+
+                dispatcherField.SetValue(null, previousDispatcher);
+                SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
@@ -22,6 +23,7 @@ namespace UtilitiesCS
             return $"{mb:N1} MB";
         }
 
+        [ExcludeFromCodeCoverage]
         public static async Task<string> ReadTextAsync(
             string filePath,
             IProgress<(double current, double total)> progress
@@ -46,6 +48,7 @@ namespace UtilitiesCS
             return readTask.Result;
         }
 
+        [ExcludeFromCodeCoverage]
         public static async Task<string> ReadTextWithProgressAsync(
             this FilePathHelper disk,
             ProgressTrackerPane progress,
@@ -76,6 +79,7 @@ namespace UtilitiesCS
             return readTask.Result;
         }
 
+        [ExcludeFromCodeCoverage]
         public static async Task<string> ReadTextWithProgressAsync(
             this FilePathHelper disk,
             ProgressTracker progress,
@@ -106,6 +110,7 @@ namespace UtilitiesCS
             return readTask.Result;
         }
 
+        [ExcludeFromCodeCoverage]
         public static async Task WriteTextWithProgressAsync(
             this FilePathHelper disk,
             string texts,
@@ -136,6 +141,7 @@ namespace UtilitiesCS
             await Task.WhenAll(writeTask, progressTask);
         }
 
+        [ExcludeFromCodeCoverage]
         public static async Task SerializeWithProgressAsync<T>(
             this JsonSerializer serializer,
             T obj,

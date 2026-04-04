@@ -1,13 +1,17 @@
-using System.Collections.Concurrent;
+using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using TaskMaster;
+using Newtonsoft.Json;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.Test.EmailIntelligence
 {
@@ -15,13 +19,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
     /// Unit tests for <see cref="EmailDataMiner"/>.
     ///
     /// Purpose:
-    ///     Verify the three deterministically testable paths in EmailDataMiner without
-    ///     requiring live Outlook COM objects:
-    ///     (1) P34-T1: <c>AddRollingMeasures</c> with an empty folder array produces no rows.
-    ///     (2) P34-T2: <c>AddRollingMeasures</c> chunks a known-size input into the expected
-    ///         group count.
-    ///     (3) P34-T3: <c>DeleteStagingFilesAsync</c> returns without error when no AppData
-    ///         special folder is registered.
+    ///     Verify deterministic helper/orchestration paths in EmailDataMiner without
+    ///     requiring live Outlook COM objects, WinForms modal UI, or file-system writes.
     ///
     /// Constraints:
     ///     AddRollingMeasures is internal; the csproj InternalsVisibleTo attribute exposes it
@@ -29,7 +28,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
     ///     IApplicationGlobals is mocked with Moq so no Outlook session is required.
     /// </summary>
     [TestClass]
-    public class EmailDataMiner_Tests
+    public partial class EmailDataMiner_Tests
     {
         #region P34-T1 — Empty source produces no rows
 
@@ -156,45 +155,313 @@ namespace UtilitiesCS.Test.EmailIntelligence
             await miner.Invoking(m => m.DeleteStagingFilesAsync()).Should().NotThrowAsync();
         }
 
-        // -----------------------------------------------------------------------
-        // Private stubs used by DeleteStagingFilesAsync_WhenAppDataFolderMissing
-        // -----------------------------------------------------------------------
-
-        private sealed class StubGlobalsWithEmptySpecialFolders : IApplicationGlobals
+        [TestMethod]
+        public async Task Consolidate_WhenFolderIsFilteredAndRemapped_AppliesBothTransformations()
         {
-            public IFileSystemFolderPaths FS { get; } = new EmptySpecialFolderPaths();
+            // Arrange
+            var keptFolder = new FolderWrapper(true, 1, 10, "Keep", "root/keep");
+            var filteredFolder = new FolderWrapper(true, 1, 10, "Skip", "root/skip");
+            var remappedFolder = new FolderWrapper(true, 1, 10, "Remap", "root/remap");
+            var miner = new EmailDataMiner(
+                new StubGlobals(
+                    toDoObjects: new StubToDoObjects(
+                        filteredFolderScraping: new ScoDictionary<string, int>
+                        {
+                            ["root/skip"] = 1,
+                        },
+                        folderRemap: new ScoDictionary<string, string>
+                        {
+                            ["root/remap"] = "root/remapped",
+                        }
+                    )
+                )
+            );
 
-            public System.Threading.Tasks.Task LoadAsync(bool parallel) =>
-                throw new System.NotImplementedException();
+            var jagged = new[]
+            {
+                new[]
+                {
+                    new MinedMailInfo { FolderInfo = keptFolder, Subject = "keep" },
+                    new MinedMailInfo { FolderInfo = filteredFolder, Subject = "skip" },
+                },
+                new[]
+                {
+                    new MinedMailInfo { FolderInfo = remappedFolder, Subject = "remap" },
+                },
+            };
 
-            public IOlObjects Ol => throw new System.NotImplementedException();
+            // Act
+            var result = await miner.Consolidate(jagged);
 
-            public IToDoObjects TD => throw new System.NotImplementedException();
-
-            public IAppAutoFileObjects AF => throw new System.NotImplementedException();
-
-            public IAppEvents Events => throw new System.NotImplementedException();
-
-            public IAppQuickFilerSettings QfSettings => throw new System.NotImplementedException();
-
-            public IAppItemEngines Engines => throw new System.NotImplementedException();
-
-            public IntelligenceConfig IntelRes => throw new System.NotImplementedException();
+            // Assert
+            result.Should().HaveCount(2);
+            result.Select(x => x.Subject).Should().BeEquivalentTo(["keep", "remap"]);
+            result
+                .Single(x => x.Subject == "remap")
+                .FolderInfo.RelativePath.Should()
+                .Be("root/remapped");
         }
 
-        private sealed class EmptySpecialFolderPaths : IFileSystemFolderPaths
+        [TestMethod]
+        public async Task ToMinedMail_WhenItemsProvided_ProjectsItemFieldsIntoSerializableModels()
         {
-            public ConcurrentDictionary<string, string> SpecialFolders { get; } =
-                new ConcurrentDictionary<string, string>();
+            // Arrange
+            var folder = new FolderWrapper(true, 1, 10, "Inbox", "root/inbox");
+            var item = new Mock<IItemInfo>(MockBehavior.Strict);
+            item.SetupGet(x => x.Categories).Returns("Blue");
+            item.SetupGet(x => x.Tokens).Returns(["alpha", "beta"]);
+            item.SetupGet(x => x.FolderInfo).Returns(folder);
+            item.SetupGet(x => x.ToRecipients).Returns(Array.Empty<IRecipientInfo>());
+            item.SetupGet(x => x.CcRecipients).Returns(Array.Empty<IRecipientInfo>());
+            item.SetupGet(x => x.Sender).Returns((IRecipientInfo)null);
+            item.SetupGet(x => x.ConversationID).Returns("conversation");
+            item.SetupGet(x => x.EntryId).Returns("entry");
+            item.SetupGet(x => x.StoreId).Returns("store");
+            item.SetupGet(x => x.Subject).Returns("subject");
+            item.SetupGet(x => x.Actionable).Returns("Yes");
 
-            public void Reload() => throw new System.NotImplementedException();
+            var miner = new EmailDataMiner(new StubGlobals());
 
-            public IAppStagingFilenames Filenames => throw new System.NotImplementedException();
+            // Act
+            var result = await miner.ToMinedMail([item.Object]);
 
-            public string MatchBestSpecialFolder(string path) =>
-                throw new System.NotImplementedException();
+            // Assert
+            result.Should().ContainSingle();
+            result[0].FolderInfo.Should().BeSameAs(folder);
+            result[0].Tokens.Should().Equal("alpha", "beta");
+            result[0].Subject.Should().Be("subject");
+            result[0].Actionable.Should().Be("Yes");
         }
 
+        [TestMethod]
+        public void Deserialize_WhenAppDataFolderMissing_ReturnsDefaultValue()
+        {
+            // Arrange
+            var miner = new EmailDataMiner(new StubGlobals());
+
+            // Act
+            var result = miner.Deserialize<int>("Missing");
+
+            // Assert
+            result.Should().Be(default);
+        }
+
+        [TestMethod]
+        public void Deserialize_WhenAppDataFolderHasNoFile_ReturnsDefaultValue()
+        {
+            // Arrange
+            var missingRoot = GetGuaranteedMissingPath("deserialize");
+            var miner = new EmailDataMiner(
+                new StubGlobals(specialFolders: CreateAppDataMap(missingRoot))
+            );
+
+            // Act
+            var result = miner.Deserialize<string>("MissingSeed");
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task Load_WhenFileNameOmittedAndFileMissing_ReturnsDefaultValue()
+        {
+            // Arrange
+            var missingRoot = GetGuaranteedMissingPath("load");
+
+            // Act
+            var result = await EmailDataMiner.Load<int>(missingRoot);
+
+            // Assert
+            result.Should().Be(default);
+        }
+
+        [TestMethod]
+        public void SerializeAndSave_WhenAppDataFolderMissing_ReturnsWithoutInvokingWriter()
+        {
+            // Arrange
+            var miner = new TestableEmailDataMiner(new StubGlobals());
+
+            // Act
+            miner.SerializeAndSave(new { Name = "test" }, "Seed");
+
+            // Assert
+            miner.CapturedFolderPath.Should().BeNull();
+            miner.CapturedFileName.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void SerializeAndSave_WhenAppDataFolderExists_UsesBayesianFolderAndSuffixFileName()
+        {
+            // Arrange
+            var appDataRoot = GetGuaranteedMissingPath("serialize");
+            var miner = new TestableEmailDataMiner(
+                new StubGlobals(specialFolders: CreateAppDataMap(appDataRoot))
+            );
+
+            // Act
+            miner.SerializeAndSave(new { Name = "test" }, "Seed", "0001");
+
+            // Assert
+            miner.CapturedFolderPath.Should().Be(Path.Combine(appDataRoot, "Bayesian"));
+            miner.CapturedFileName.Should().Be("Seed_0001.json");
+        }
+
+        [TestMethod]
+        public async Task ValidateJson_WhenAppDataFolderMissing_ReturnsFalse()
+        {
+            // Arrange
+            var miner = new EmailDataMiner(new StubGlobals());
+
+            // Act
+            var result = await miner.ValidateJson<string>("Missing");
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task ValidateJson_WhenAppDataFolderHasNoFile_ReturnsFalse()
+        {
+            // Arrange
+            var appDataRoot = GetGuaranteedMissingPath("validate");
+            var miner = new EmailDataMiner(
+                new StubGlobals(specialFolders: CreateAppDataMap(appDataRoot))
+            );
+
+            // Act
+            var result = await miner.ValidateJson<string>("Missing");
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void TryLoadObjectAndGetMemorySize_WhenLoaderIsNull_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var miner = new EmailDataMiner(new StubGlobals());
+
+            // Act
+            var action = () => miner.TryLoadObjectAndGetMemorySize<string>(null);
+
+            // Assert
+            action.Should().Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void TryLoadObjectAndGetMemorySize_WhenCopiesToLoadIsLessThanOne_ThrowsArgumentOutOfRangeException()
+        {
+            // Arrange
+            var miner = new EmailDataMiner(new StubGlobals());
+
+            // Act
+            var action = () => miner.TryLoadObjectAndGetMemorySize(() => "value", 0);
+
+            // Assert
+            action.Should().Throw<ArgumentOutOfRangeException>();
+        }
+
+        [TestMethod]
+        public void TryLoadObjectAndGetMemorySize_WhenLoaderSucceedsAcrossCopies_ReturnsObjectAndSize()
+        {
+            // Arrange
+            var miner = new EmailDataMiner(new StubGlobals());
+            var callCount = 0;
+
+            // Act
+            var (result, size) = miner.TryLoadObjectAndGetMemorySize(
+                () =>
+                {
+                    callCount++;
+                    return new object();
+                },
+                copiesToLoad: 3
+            );
+
+            // Assert
+            result.Should().NotBeNull();
+            callCount.Should().Be(3);
+        }
+
+        [TestMethod]
+        public void TryLoadObjectAndGetMemorySize_WhenLoaderThrowsDuringReplicaCreation_ReturnsDefaultAndZero()
+        {
+            // Arrange
+            var miner = new EmailDataMiner(new StubGlobals());
+            var callCount = 0;
+
+            // Act
+            var (result, size) = miner.TryLoadObjectAndGetMemorySize(
+                () =>
+                {
+                    callCount++;
+                    if (callCount == 2)
+                    {
+                        throw new InvalidOperationException("boom");
+                    }
+
+                    return new object();
+                },
+                copiesToLoad: 3
+            );
+
+            // Assert
+            result.Should().BeNull();
+            size.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void GetSerializer_ReturnsIndentedSerializerWithAutoTypeNames()
+        {
+            // Arrange
+            var miner = new EmailDataMiner(new StubGlobals());
+
+            // Act
+            var serializer = miner.GetSerializer();
+
+            // Assert
+            serializer.Should().NotBeNull();
+            serializer.TypeNameHandling.Should().Be(TypeNameHandling.Auto);
+            serializer.Formatting.Should().Be(Formatting.Indented);
+        }
+
+        [TestMethod]
+        public void SerializeActiveItem_WhenLoaderReturnsNull_DoesNotSerializeMailInfo()
+        {
+            // Arrange
+            var miner = new TestableEmailDataMiner(new StubGlobals())
+            {
+                LoaderResult = null,
+                LoaderSize = 123,
+            };
+
+            // Act
+            miner.SerializeActiveItem();
+
+            // Assert
+            miner.SerializeMailInfoCalls.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void GetProgressMessage_WhenInvokedWithCompletedWork_IncludesCountsAndElapsedText()
+        {
+            // Arrange
+            var miner = new EmailDataMiner(new StubGlobals());
+            var method = typeof(EmailDataMiner).GetMethod(
+                "GetProgressMessage",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Stop();
+
+            // Act
+            var message = (string)method.Invoke(miner, [2, 4, stopwatch]);
+
+            // Assert
+            message.Should().Contain("Completed 2 of 4");
+            message.Should().Contain("elapsed");
+            message.Should().Contain("remaining");
+        }
         #endregion
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             InitializeComponent();
         }
 
+        [ExcludeFromCodeCoverage]
         public static OlFolderRemap SelectFolder(IList<TreeNode<OlFolderRemap>> roots)
         {
             var selector = new FolderSelector();

@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Office.Core;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json;
@@ -16,7 +19,7 @@ using UtilitiesCS.EmailIntelligence.ClassifierGroups;
 namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
 {
     [TestClass]
-    public class ClassifierGroupUtilities_Tests
+    public partial class ClassifierGroupUtilities_Tests
     {
         [TestMethod]
         public async Task CreateClassifierGroupAsync_WithEmptyCollection_ShouldReturnGroupWithZeroCounts()
@@ -207,6 +210,269 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             roundTripped!.TotalEmailCount.Should().Be(99);
         }
 
+        [TestMethod]
+        public void SerializeAndSave_WhenAppDataFolderExists_UsesBayesianFolderAndSuffixFileName()
+        {
+            var globals = ClassifierGroupUtilitiesTestSupport.CreateGlobalsWithAppData(
+                @"C:\AppDataRoot"
+            );
+            var utils = new RecordingClassifierGroupUtilities(globals.Object);
+
+            utils.SerializeAndSave(new { Name = "fixture" }, "Seed", "0001");
+
+            utils.CapturedFolderPath.Should().Be(Path.Combine(@"C:\AppDataRoot", "Bayesian"));
+            utils.CapturedFileName.Should().Be("Seed_0001.json");
+        }
+
+        [TestMethod]
+        public void LogSizeComparison_WhenCalled_DoesNotThrow()
+        {
+            var utils = new ClassifierGroupUtilities(CreateGlobals().Object);
+
+            var action = () => utils.LogSizeComparison("GC", 10, "Json", 20, "MailItem");
+
+            action.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void SerializeActiveItem_WhenLoaderReturnsNull_DoesNotSerializeMailInfo()
+        {
+            var utils = new RecordingClassifierGroupUtilities(CreateGlobals().Object)
+            {
+                LoaderResults = [null],
+            };
+
+            utils.SerializeActiveItem();
+
+            utils.SerializeMailInfoCalls.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void SerializeActiveItem_WhenLoaderReturnsMailItem_InvokesSerializeMailInfo()
+        {
+            var utils = new RecordingClassifierGroupUtilities(CreateGlobals().Object)
+            {
+                LoaderResults = [new Mock<Microsoft.Office.Interop.Outlook.MailItem>().Object],
+                InvokeBaseSerializeMailInfo = false,
+            };
+
+            utils.SerializeActiveItem();
+
+            utils.SerializeMailInfoCalls.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void SerializeMailInfo_WhenAppDataMissing_ReturnsWithoutSavingExamples()
+        {
+            var utils = new RecordingClassifierGroupUtilities(CreateGlobalsWithEmptyFs().Object);
+
+            utils.SerializeMailInfo(new Mock<Microsoft.Office.Interop.Outlook.MailItem>().Object);
+
+            utils.SavedExampleNames.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public void SerializeMailInfo_WhenAppDataConfigured_SavesMailAndDerivedExamples()
+        {
+            var globals = ClassifierGroupUtilitiesTestSupport.CreateGlobalsWithAppData(
+                @"C:\AppDataRoot"
+            );
+            var utils = new RecordingClassifierGroupUtilities(globals.Object)
+            {
+                LoaderResults = [null, null],
+                LoaderSizes = [11, 22],
+            };
+
+            utils.SerializeMailInfo(new Mock<Microsoft.Office.Interop.Outlook.MailItem>().Object);
+
+            utils
+                .SavedExampleNames.Should()
+                .ContainInOrder("MailItem", "MailItemInfo", "MinedMailInfo");
+            utils.CapturedFolderPath.Should().Be(Path.Combine(@"C:\AppDataRoot", "Bayesian"));
+            utils.LoggedObjectNames.Should().ContainInOrder("MailItemInfo", "MinedMailInfo");
+        }
+
+        [TestMethod]
+        public void TryLoadObjectAndGetMemorySize_WhenLoaderIsNull_ThrowsArgumentNullException()
+        {
+            var utils = new ClassifierGroupUtilities(CreateGlobals().Object);
+
+            var action = () => utils.TryLoadObjectAndGetMemorySize<string>(null);
+
+            action.Should().Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void TryLoadObjectAndGetMemorySize_WhenCopiesToLoadLessThanOne_ThrowsArgumentOutOfRangeException()
+        {
+            var utils = new ClassifierGroupUtilities(CreateGlobals().Object);
+
+            var action = () => utils.TryLoadObjectAndGetMemorySize(() => "value", 0);
+
+            action.Should().Throw<ArgumentOutOfRangeException>();
+        }
+
+        [TestMethod]
+        public void TryLoadObjectAndGetMemorySize_WhenLoaderSucceedsAcrossCopies_ReturnsResult()
+        {
+            var utils = new ClassifierGroupUtilities(CreateGlobals().Object);
+            var callCount = 0;
+
+            var (result, size) = utils.TryLoadObjectAndGetMemorySize(
+                () =>
+                {
+                    callCount++;
+                    return new object();
+                },
+                copiesToLoad: 3
+            );
+
+            result.Should().NotBeNull();
+            callCount.Should().Be(3);
+        }
+
+        [TestMethod]
+        public void TryLoadObjectAndGetMemorySize_WhenReplicaLoaderThrows_ReturnsDefaultAndZero()
+        {
+            var utils = new ClassifierGroupUtilities(CreateGlobals().Object);
+            var callCount = 0;
+
+            var (result, size) = utils.TryLoadObjectAndGetMemorySize(
+                () =>
+                {
+                    callCount++;
+                    if (callCount == 2)
+                    {
+                        throw new InvalidOperationException("boom");
+                    }
+
+                    return new object();
+                },
+                copiesToLoad: 3
+            );
+
+            result.Should().BeNull();
+            size.Should().Be(0);
+        }
+
+        [TestMethod]
+        public async Task ValidateJson_WhenDeserializeAsyncReturnsValue_ReturnsTrue()
+        {
+            var utils = new RecordingClassifierGroupUtilities(CreateGlobals().Object)
+            {
+                ValidationResult = new BayesianClassifierGroup { TotalEmailCount = 7 },
+            };
+
+            var result = await utils.ValidateJson<BayesianClassifierGroup>("group");
+
+            result.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public async Task ValidateJson_WhenDeserializeAsyncReturnsNull_ReturnsFalse()
+        {
+            var utils = new RecordingClassifierGroupUtilities(CreateGlobals().Object);
+
+            var result = await utils.ValidateJson<BayesianClassifierGroup>("group");
+
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task ValidateJson_WhenDeserializeAsyncThrowsWithSuffix_ReturnsFalse()
+        {
+            var utils = new RecordingClassifierGroupUtilities(CreateGlobals().Object)
+            {
+                ValidationException = new InvalidOperationException("bad json"),
+            };
+
+            var result = await utils.ValidateJson<BayesianClassifierGroup>("group", "backup");
+
+            result.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void GetProgressMessage_WhenCompletedWorkExists_IncludesCountsAndElapsedText()
+        {
+            var utils = new ClassifierGroupUtilities(CreateGlobals().Object);
+            var method = typeof(ClassifierGroupUtilities).GetMethod(
+                "GetProgressMessage",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
+            );
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Stop();
+
+            var message = (string)method.Invoke(utils, [2, 4, stopwatch]);
+
+            message.Should().Contain("Completed 2 of 4");
+            message.Should().Contain("elapsed");
+            message.Should().Contain("remaining");
+        }
+
+        [TestMethod]
+        public void GetProgressMessage_WhenCompleteIsZero_UsesZeroRate()
+        {
+            var utils = new ClassifierGroupUtilities(CreateGlobals().Object);
+            var method = typeof(ClassifierGroupUtilities).GetMethod(
+                "GetProgressMessage",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
+            );
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Stop();
+
+            var message = (string)method.Invoke(utils, [0, 4, stopwatch]);
+
+            message.Should().Contain("Completed 0 of 4 (0.00 spm)");
+        }
+
+        [TestMethod]
+        public async Task ToggleOfflineMode_WhenAlreadyOffline_ReturnsTrueWithoutExecutingCommand()
+        {
+            var commandBars = new Mock<CommandBars>();
+            var explorer = new Mock<Explorer>();
+            explorer.Setup(x => x.CommandBars).Returns(commandBars.Object);
+            var app = new Mock<Application>();
+            app.Setup(x => x.ActiveExplorer()).Returns(explorer.Object);
+            var ol = new Mock<IOlObjects>();
+            ol.SetupGet(x => x.App).Returns(app.Object);
+            var globals = CreateGlobals();
+            globals.SetupGet(x => x.Ol).Returns(ol.Object);
+            var method = typeof(ClassifierGroupUtilities).GetMethod(
+                "ToggleOfflineMode",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
+            );
+
+            var result = await (Task<bool>)
+                method.Invoke(new ClassifierGroupUtilities(globals.Object), [true]);
+
+            result.Should().BeTrue();
+            commandBars.Verify(x => x.ExecuteMso(It.IsAny<string>()), Times.Never);
+        }
+
+        [TestMethod]
+        public async Task ToggleOfflineMode_WhenOnline_ExecutesToggleOnlineAndReturnsFalse()
+        {
+            var commandBars = new Mock<CommandBars>();
+            var explorer = new Mock<Explorer>();
+            explorer.Setup(x => x.CommandBars).Returns(commandBars.Object);
+            var app = new Mock<Application>();
+            app.Setup(x => x.ActiveExplorer()).Returns(explorer.Object);
+            var ol = new Mock<IOlObjects>();
+            ol.SetupGet(x => x.App).Returns(app.Object);
+            var globals = CreateGlobals();
+            globals.SetupGet(x => x.Ol).Returns(ol.Object);
+            var method = typeof(ClassifierGroupUtilities).GetMethod(
+                "ToggleOfflineMode",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
+            );
+
+            var result = await (Task<bool>)
+                method.Invoke(new ClassifierGroupUtilities(globals.Object), [false]);
+
+            result.Should().BeFalse();
+            commandBars.Verify(x => x.ExecuteMso("ToggleOnline"), Times.Once);
+        }
+
         // -----------------------------------------------------------------------
         // Helpers
         // -----------------------------------------------------------------------
@@ -229,23 +495,6 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
                 .Returns(new ConcurrentDictionary<string, string>());
             globals.SetupGet(x => x.FS).Returns(mockFs.Object);
             return globals;
-        }
-
-        /// <summary>
-        /// Testable subclass that overrides the virtual Deserialize method to return a
-        /// predetermined value, keeping all file-system I/O out of unit tests.
-        /// </summary>
-        private sealed class StubClassifierGroupUtilities(
-            IApplicationGlobals globals,
-            BayesianClassifierGroup stubbedResult
-        ) : ClassifierGroupUtilities(globals)
-        {
-            internal override T Deserialize<T>(string fileNameSeed, string fileNameSuffix = "")
-            {
-                if (stubbedResult is T result)
-                    return result;
-                return default;
-            }
         }
     }
 }

@@ -409,5 +409,63 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Assert: the observer registered for nodeA must not have been invoked.
             observerCalled.Should().BeFalse();
         }
+
+        [TestMethod]
+        public void MoveOperations_AndTakeLastN_ShouldReorderAndReturnTailValues()
+        {
+            var list = new LockingObservableLinkedList<int>(new[] { 1, 2, 3, 4 });
+
+            list.MoveBefore(list.Find(4), list.Find(2));
+            list.MoveAfter(list.Find(1), list.Find(3));
+            list.MoveDown(list.Find(4));
+            list.MoveUp(list.Find(3));
+
+            var tailValues = list.TakeLast(2);
+
+            tailValues.Should().Equal(4, 1);
+            list.Count.Should().Be(2);
+            list.First.Value.Should().Be(2);
+            list.Last.Value.Should().Be(3);
+        }
+
+        [TestMethod]
+        public void AddOrMoveFirstWithMax_AndPredicateRemoval_ShouldLeaveRemainingTail()
+        {
+            var list = new LockingObservableLinkedList<int>(new[] { 1, 2, 2, 3, 4 });
+
+            list.AddOrMoveFirst(1, 5);
+            list.Remove(x => x < 3);
+
+            list.Count.Should().Be(2);
+            list.First.Value.Should().Be(3);
+            list.Last.Value.Should().Be(4);
+        }
+
+        [TestMethod]
+        public void PartialObserverRemovalApis_ShouldReturnRemovedMappingsAndClearObservers()
+        {
+            var list = new LockingObservableLinkedList<int>(new[] { 1, 2, 3 });
+            var first = list.First;
+            var second = first.Next;
+            var third = second.Next;
+            var phantom = new LockingObservableLinkedListNode<int>(99);
+            int observerCalls = 0;
+            var observer = new SimpleActionLockingLinkedListObserver<int>(_ => observerCalls++);
+
+            list.AddPartialObserver(observer, first, second);
+            list.AddPartialObserver(observer, first);
+            var removedByObserverAndKeys = list.RemovePartialObserver(observer, second, third);
+            var removedByObserver = list.RemovePartialObserver(observer);
+            list.AddPartialObserver(observer, second, third);
+            var removedByKeys = list.RemovePartialObserver(second, phantom);
+            var removedAll = list.RemoveAllObservers();
+            list.Remove(third);
+
+            removedByObserverAndKeys.Keys.Should().ContainSingle().Which.Should().BeSameAs(second);
+            removedByObserver.Keys.Should().ContainSingle().Which.Should().BeSameAs(first);
+            removedByKeys.Keys.Should().ContainSingle().Which.Should().BeSameAs(second);
+            removedAll.Keys.Should().Contain(third);
+            observerCalls.Should().Be(0);
+        }
     }
 }

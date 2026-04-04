@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.Test.Threading
@@ -53,6 +57,33 @@ namespace UtilitiesCS.Test.Threading
             public void Report((int Value, string JobName) value) => _handler(value);
         }
 
+        private static int GetChunkSafeInputCount() => Environment.ProcessorCount * 4;
+
+        private static IItemInfo CreateItemInfo(string subject)
+        {
+            var mock = new Mock<IItemInfo>();
+            mock.SetupProperty(x => x.Subject, subject);
+            mock.SetupProperty(x => x.Sw, new SegmentStopWatch());
+            return mock.Object;
+        }
+
+        private static string InvokeGetReportMessage(
+            string messagePrefix,
+            int complete,
+            int count,
+            Stopwatch stopwatch
+        )
+        {
+            var method = typeof(AsyncMultiTasker).GetMethod(
+                "GetReportMessage",
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
+            method.Should().NotBeNull();
+            var result = method.Invoke(null, [messagePrefix, complete, count, stopwatch]);
+            result.Should().NotBeNull();
+            return (string)result;
+        }
+
         /// <summary>
         /// Verifies that the <see cref="AsyncMultiTasker"/> Action overload invokes
         /// the supplied action for every element in the input list.
@@ -76,7 +107,7 @@ namespace UtilitiesCS.Test.Threading
         public async Task AsyncMultiTaskChunker_ActionOverload_ProcessesAllItems()
         {
             // Arrange — count large enough to guarantee chunkSize >= 1 on any modern machine
-            int n = Environment.ProcessorCount * 4;
+            int n = GetChunkSafeInputCount();
             var inputs = Enumerable.Range(1, n).ToList();
             int processedCount = 0;
             var progress = new SyncProgress(_ => { });
@@ -119,7 +150,7 @@ namespace UtilitiesCS.Test.Threading
         public async Task AsyncMultiTaskChunker_SyncFuncOverload_ReturnsCompleteResultBag()
         {
             // Arrange
-            int n = Environment.ProcessorCount * 4;
+            int n = GetChunkSafeInputCount();
             var inputs = Enumerable.Range(1, n).ToList();
             var progress = new SyncProgress(_ => { });
 
@@ -137,6 +168,29 @@ namespace UtilitiesCS.Test.Threading
             // Spot-check first and last expected string values
             results.Should().Contain("1", "the first input must produce a result");
             results.Should().Contain(n.ToString(), "the last input must produce a result");
+        }
+
+        [TestMethod]
+        public async Task AsyncMultiTaskChunker_SyncFuncOverload_WhenWorkSpansTimerInterval_ReportsProgress()
+        {
+            int n = GetChunkSafeInputCount();
+            var inputs = Enumerable.Range(1, n).ToList();
+            var reports = new ConcurrentBag<(int Value, string JobName)>();
+            var progress = new SyncProgress(r => reports.Add(r));
+
+            await AsyncMultiTasker.AsyncMultiTaskChunker<int, string>(
+                inputs,
+                item =>
+                {
+                    Thread.Sleep(350);
+                    return item.ToString();
+                },
+                progress,
+                "SyncFuncProgress",
+                CancellationToken.None
+            );
+
+            reports.Should().Contain(r => r.JobName.StartsWith("SyncFuncProgress Completed "));
         }
 
         /// <summary>
@@ -162,7 +216,7 @@ namespace UtilitiesCS.Test.Threading
         public async Task AsyncMultiTaskChunker_WhenComplete_ReportsTerminalProgressSignal()
         {
             // Arrange
-            int n = Environment.ProcessorCount * 4;
+            int n = GetChunkSafeInputCount();
             var inputs = Enumerable.Range(1, n).ToList();
             var reports = new ConcurrentBag<(int Value, string JobName)>();
 
@@ -186,6 +240,250 @@ namespace UtilitiesCS.Test.Threading
                     r => r.Value == 100 && r.JobName == "Operation Complete",
                     "the finally block must always report (100, 'Operation Complete')"
                 );
+        }
+
+        [TestMethod]
+        public async Task AsyncMultiTaskChunker_AsyncFuncOverload_ReturnsCompleteItemBag()
+        {
+            int n = GetChunkSafeInputCount();
+            var inputs = Enumerable.Range(1, n).ToList();
+            var progress = new SyncProgress(_ => { });
+
+            ConcurrentBag<IItemInfo> results = await AsyncMultiTasker.AsyncMultiTaskChunker<
+                int,
+                IItemInfo
+            >(
+                inputs,
+                async item =>
+                {
+                    await Task.Delay(10);
+                    return CreateItemInfo(item.ToString());
+                },
+                progress,
+                "AsyncFunc",
+                CancellationToken.None
+            );
+
+            results.Count.Should().Be(n);
+            results.Select(x => x.Subject).Should().Contain("1");
+            results.Select(x => x.Subject).Should().Contain(n.ToString());
+        }
+
+        [TestMethod]
+        public async Task AsyncMultiTaskChunker_AsyncFuncOverload_WhenWorkSpansTimerInterval_ReportsProgress()
+        {
+            int n = GetChunkSafeInputCount();
+            var inputs = Enumerable.Range(1, n).ToList();
+            var reports = new ConcurrentBag<(int Value, string JobName)>();
+            var progress = new SyncProgress(r => reports.Add(r));
+
+            await AsyncMultiTasker.AsyncMultiTaskChunker<int, IItemInfo>(
+                inputs,
+                async item =>
+                {
+                    await Task.Delay(350);
+                    return CreateItemInfo(item.ToString());
+                },
+                progress,
+                "AsyncFunc",
+                CancellationToken.None
+            );
+
+            reports.Should().Contain(r => r.JobName.StartsWith("AsyncFunc Completed "));
+        }
+
+        [TestMethod]
+        public async Task AsyncMultiTaskChunker_AsyncFuncOverload_WhenWorkerCancels_ReturnsEmptyBag()
+        {
+            int n = GetChunkSafeInputCount();
+            var inputs = Enumerable.Range(1, n).ToList();
+            var progress = new SyncProgress(_ => { });
+            Func<int, Task<IItemInfo>> func = async item =>
+            {
+                await Task.Yield();
+                throw new OperationCanceledException($"cancel {item}");
+            };
+
+            ConcurrentBag<IItemInfo> results = await AsyncMultiTasker.AsyncMultiTaskChunker<
+                int,
+                IItemInfo
+            >(inputs, func, progress, "AsyncFuncCancel", CancellationToken.None);
+
+            results.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public async Task AsyncMultiTaskChunker_AsyncFuncOverload_WhenResultsDoNotImplementIItemInfo_Throws()
+        {
+            int n = GetChunkSafeInputCount();
+            var inputs = Enumerable.Range(1, n).ToList();
+            var progress = new SyncProgress(_ => { });
+
+            Func<Task> act = async () =>
+                await AsyncMultiTasker.AsyncMultiTaskChunker<int, string>(
+                    inputs,
+                    async item =>
+                    {
+                        await Task.Delay(10);
+                        return item.ToString();
+                    },
+                    progress,
+                    "AsyncFuncBadResult",
+                    CancellationToken.None
+                );
+
+            await act.Should().ThrowAsync<InvalidCastException>();
+        }
+
+        [TestMethod]
+        public async Task AsyncMultiTaskChunker_AsyncTaskOverload_ProcessesAllItems()
+        {
+            int n = GetChunkSafeInputCount();
+            var inputs = Enumerable.Range(1, n).ToList();
+            int processedCount = 0;
+            var progress = new SyncProgress(_ => { });
+
+            await AsyncMultiTasker.AsyncMultiTaskChunker<int>(
+                inputs,
+                async item =>
+                {
+                    await Task.Delay(10);
+                    Interlocked.Increment(ref processedCount);
+                },
+                progress,
+                "AsyncTask",
+                CancellationToken.None
+            );
+
+            processedCount.Should().Be(n);
+        }
+
+        [TestMethod]
+        public async Task AsyncMultiTaskChunker_AsyncTaskOverload_WhenWorkSpansTimerInterval_ReportsProgressAndCompletion()
+        {
+            int n = GetChunkSafeInputCount();
+            var inputs = Enumerable.Range(1, n).ToList();
+            var reports = new ConcurrentBag<(int Value, string JobName)>();
+            var progress = new SyncProgress(r => reports.Add(r));
+
+            await AsyncMultiTasker.AsyncMultiTaskChunker<int>(
+                inputs,
+                async item =>
+                {
+                    await Task.Delay(350);
+                },
+                progress,
+                "AsyncTask",
+                CancellationToken.None
+            );
+
+            reports.Should().Contain(r => r.JobName.StartsWith("AsyncTask Completed "));
+            reports.Should().Contain(r => r.Value == 100 && r.JobName == "Operation Complete");
+        }
+
+        [TestMethod]
+        public async Task AsyncMultiTaskChunker_AsyncTaskOverload_WhenTokenAlreadyCanceled_CompletesGracefully()
+        {
+            int n = GetChunkSafeInputCount();
+            var inputs = Enumerable.Range(1, n).ToList();
+            var reports = new ConcurrentBag<(int Value, string JobName)>();
+            var progress = new SyncProgress(r => reports.Add(r));
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            Func<Task> act = async () =>
+                await AsyncMultiTasker.AsyncMultiTaskChunker<int>(
+                    inputs,
+                    async item =>
+                    {
+                        await Task.Delay(10);
+                    },
+                    progress,
+                    "AsyncTaskCanceled",
+                    cts.Token
+                );
+
+            await act.Should().NotThrowAsync();
+            reports.Should().Contain(r => r.Value == 100 && r.JobName == "Operation Complete");
+        }
+
+        [TestMethod]
+        public async Task AsyncMultiTaskChunker_SyncFuncOverload_WhenTokenAlreadyCanceled_ThrowsTaskCanceledException()
+        {
+            int n = GetChunkSafeInputCount();
+            var inputs = Enumerable.Range(1, n).ToList();
+            var reports = new ConcurrentBag<(int Value, string JobName)>();
+            var progress = new SyncProgress(r => reports.Add(r));
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            Func<Task> act = async () =>
+                await AsyncMultiTasker.AsyncMultiTaskChunker<int, string>(
+                    inputs,
+                    item => item.ToString(),
+                    progress,
+                    "SyncFuncCanceled",
+                    cts.Token
+                );
+
+            await act.Should().ThrowAsync<TaskCanceledException>();
+            reports.Should().Contain(r => r.Value == 100 && r.JobName == "Operation Complete");
+        }
+
+        [TestMethod]
+        public async Task AsyncMultiTaskChunker_ActionOverload_WhenTokenAlreadyCanceled_CompletesAndReportsCompletion()
+        {
+            int n = GetChunkSafeInputCount();
+            var inputs = Enumerable.Range(1, n).ToList();
+            var reports = new ConcurrentBag<(int Value, string JobName)>();
+            var progress = new SyncProgress(r => reports.Add(r));
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            Func<Task> act = async () =>
+                await AsyncMultiTasker.AsyncMultiTaskChunker<int>(
+                    inputs,
+                    _ => { },
+                    progress,
+                    "ActionCanceled",
+                    cts.Token
+                );
+
+            await act.Should().NotThrowAsync();
+            reports.Should().Contain(r => r.Value == 100 && r.JobName == "Operation Complete");
+        }
+
+        [TestMethod]
+        public async Task AsyncMultiTaskChunker_ActionOverload_WhenWorkSpansTimerInterval_ReportsProgress()
+        {
+            int n = GetChunkSafeInputCount();
+            var inputs = Enumerable.Range(1, n).ToList();
+            var reports = new ConcurrentBag<(int Value, string JobName)>();
+            var progress = new SyncProgress(r => reports.Add(r));
+
+            await AsyncMultiTasker.AsyncMultiTaskChunker<int>(
+                inputs,
+                _ => Thread.Sleep(350),
+                progress,
+                "ActionProgress",
+                CancellationToken.None
+            );
+
+            reports.Should().Contain(r => r.JobName.StartsWith("ActionProgress Completed "));
+        }
+
+        [TestMethod]
+        public void GetReportMessage_WhenInvoked_FormatsPrefixAndCounts()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            Thread.Sleep(20);
+            stopwatch.Stop();
+
+            var message = InvokeGetReportMessage("Report", 0, 5, stopwatch);
+
+            message.Should().Contain("Report Completed 0 of 5");
+            message.Should().Contain("elapsed");
+            message.Should().Contain("remaining");
         }
     }
 }

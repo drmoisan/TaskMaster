@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UtilitiesCS.EmailIntelligence.TaskPane;
 
 namespace UtilitiesCS.Test.Extensions
 {
@@ -322,6 +325,162 @@ namespace UtilitiesCS.Test.Extensions
                 .ThrowAsync<NullReferenceException>(
                     "the final progress.Report(100) is not null-guarded and progress is null"
                 );
+        }
+
+        [TestMethod]
+        public async Task ReadTextAsync_WithLargeExistingFile_ReturnsTextAndReportsProgress()
+        {
+            // Arrange
+            var fixture = GetLargeTextFixture();
+            var progress = new TupleProgressCollector();
+
+            // Act
+            string contents = await AsyncSerialization.ReadTextAsync(fixture.FullName, progress);
+
+            // Assert
+            contents.Should().NotBeEmpty();
+            progress.Reports.Should().NotBeEmpty();
+            progress.Reports.Should().Contain(report => report.total == fixture.Length);
+            progress.Reports.Should().Contain(report => report.current > 0);
+        }
+
+        [TestMethod]
+        public async Task ReadTextWithProgressAsync_ProgressTrackerOverload_WithLargeExistingFile_ReportsProgress()
+        {
+            // Arrange
+            var fixture = GetLargeTextFixture();
+            var progress = new CapturingProgressTracker();
+            var disk = new FilePathHelper(fixture.Name, fixture.Directory!.FullName);
+
+            // Act
+            string contents = await disk.ReadTextWithProgressAsync(progress, "Read fixture");
+
+            // Assert
+            contents.Should().NotBeEmpty();
+            progress.ReportedValues.Should().NotBeEmpty();
+            progress.ReportedValues.Should().Contain(value => value > 0);
+            progress.ReportedMessages.Should().Contain(message => message.Contains("Read fixture"));
+        }
+
+        [TestMethod]
+        public async Task ReadTextWithProgressAsync_ProgressTrackerPaneOverload_WithLargeExistingFile_UpdatesProgress()
+        {
+            // Arrange
+            var fixture = GetLargeTextFixture();
+            var disk = new FilePathHelper(fixture.Name, fixture.Directory!.FullName);
+            using var viewer = new ProgressPane();
+            var progress = CreateHeadlessPane(viewer);
+
+            // Act
+            string contents = await disk.ReadTextWithProgressAsync(progress, "Pane read");
+
+            // Assert
+            contents.Should().NotBeEmpty();
+            progress.Progress.Should().BeGreaterThan(0);
+            progress.ProgressViewer.JobName.Text.Should().Contain("Pane read");
+        }
+
+        [TestMethod]
+        public async Task CopyToAsync_ProgressTrackerPaneOverload_WithProgress_CompletesAndReportsCompletion()
+        {
+            // Arrange
+            using var source = new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6 });
+            using var destination = new MemoryStream();
+            using var viewer = new ProgressPane();
+            var progress = CreateHeadlessPane(viewer);
+
+            // Act
+            await source.CopyToAsync(
+                sourceLength: source.Length,
+                destination,
+                bufferSize: 2,
+                progress,
+                messagePrefix: "Copy",
+                CancellationToken.None
+            );
+
+            // Assert
+            destination.ToArray().Should().Equal(new byte[] { 1, 2, 3, 4, 5, 6 });
+            progress.Progress.Should().Be(100);
+            progress.ProgressViewer.JobName.Text.Should().Contain("Copy");
+        }
+
+        private static FileInfo GetLargeTextFixture()
+        {
+            var current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+
+            while (current is not null)
+            {
+                var candidate = Path.Combine(
+                    current.FullName,
+                    "packages",
+                    "Microsoft.Graph.5.103.0",
+                    "lib",
+                    "netstandard2.0",
+                    "Microsoft.Graph.xml"
+                );
+                if (File.Exists(candidate))
+                {
+                    return new FileInfo(candidate);
+                }
+
+                current = current.Parent;
+            }
+
+            throw new InvalidOperationException(
+                "The Microsoft.Graph.xml fixture could not be located from the test assembly path."
+            );
+        }
+
+        private static ProgressTrackerPane CreateHeadlessPane(ProgressPane viewer)
+        {
+            var pane = (ProgressTrackerPane)
+                FormatterServices.GetUninitializedObject(typeof(ProgressTrackerPane));
+            var parentField = typeof(ProgressTrackerPane).GetField(
+                "_parent",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            )!;
+            var parent = Activator.CreateInstance(
+                parentField.FieldType,
+                new Progress<(int Value, string JobName)>(_ => { }),
+                100,
+                0
+            );
+
+            parentField.SetValue(pane, parent);
+            typeof(ProgressTrackerPane)
+                .GetField("_progressViewer", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(pane, viewer);
+            typeof(ProgressTrackerPane)
+                .GetField("_jobName", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(pane, string.Empty);
+            typeof(ProgressTrackerPane)
+                .GetField("_progress", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(pane, 0d);
+            return pane;
+        }
+
+        private sealed class TupleProgressCollector : IProgress<(double current, double total)>
+        {
+            public List<(double current, double total)> Reports { get; } = new();
+
+            public void Report((double current, double total) value) => Reports.Add(value);
+        }
+
+        private sealed class CapturingProgressTracker : ProgressTracker
+        {
+            public CapturingProgressTracker()
+                : base(new CancellationTokenSource()) { }
+
+            public List<double> ReportedValues { get; } = new();
+
+            public List<string> ReportedMessages { get; } = new();
+
+            public override void Report(double value, string jobName)
+            {
+                ReportedValues.Add(value);
+                ReportedMessages.Add(jobName ?? string.Empty);
+            }
         }
     }
 }

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FluentAssertions;
@@ -251,6 +253,169 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             bag.LocalJsonSettings.Formatting.Should().Be(Formatting.None);
         }
 
+        [TestMethod]
+        public void LocalDiskAndNetDisk_GettersReturnAssignedHelpers()
+        {
+            // Arrange
+            var localDisk = new FilePathHelper("local.json", @"C:\local");
+            var netDisk = new FilePathHelper("net.json", @"C:\net");
+            var bag = new ScBag<int> { LocalDisk = localDisk, NetDisk = netDisk };
+
+            // Act
+            var observedLocalDisk = bag.LocalDisk;
+            var observedNetDisk = bag.NetDisk;
+
+            // Assert
+            observedLocalDisk.Should().BeSameAs(localDisk);
+            observedNetDisk.Should().BeSameAs(netDisk);
+        }
+
+        [TestMethod]
+        public void CreateEmpty_WhenResponseIsYes_ReturnsBagAndTracksFilePath()
+        {
+            // Arrange
+            var disk = new FilePathHelper("*created-scbag.json", @"C:\ScBag");
+
+            // Act
+            var bag = TestableScBag<int>.ExposeCreateEmpty(DialogResult.Yes, disk);
+            StopPendingSerializationTimer(bag);
+
+            // Assert
+            bag.Should().NotBeNull();
+            bag.FilePath.Should().Be(disk.FilePath);
+        }
+
+        [TestMethod]
+        public void CreateEmpty_WithSettingsWhenResponseIsYes_CopiesSettings()
+        {
+            // Arrange
+            var settings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.None,
+                TypeNameHandling = TypeNameHandling.None,
+            };
+            var disk = new FilePathHelper("*created-scbag-settings.json", @"C:\ScBag");
+
+            // Act
+            var bag = TestableScBag<int>.ExposeCreateEmpty(DialogResult.Yes, disk, settings);
+            StopPendingSerializationTimer(bag);
+
+            // Assert
+            bag.Should().NotBeNull();
+            bag.FilePath.Should().Be(disk.FilePath);
+            bag.JsonSettings.Should().BeSameAs(settings);
+        }
+
+        [TestMethod]
+        public void AskUser_WhenPromptDisabled_ReturnsYes()
+        {
+            // Arrange
+
+            // Act
+            var response = TestableScBag<int>.ExposeAskUser(false, "ignored");
+
+            // Assert
+            response.Should().Be(DialogResult.Yes);
+        }
+
+        [TestMethod]
+        public void Deserialize_DefaultOverloadWithMissingPath_ReturnsEmptyBag()
+        {
+            // Arrange
+
+            // Act
+            var bag = ScBag<int>.Deserialize(
+                "missing-default-scbag.json",
+                @"C:\MissingScBagDefault"
+            );
+            StopPendingSerializationTimer(bag);
+
+            // Assert
+            bag.Should().NotBeNull();
+            bag.Should().BeEmpty();
+            bag.JsonSettings.TypeNameHandling.Should().Be(TypeNameHandling.Auto);
+        }
+
+        [TestMethod]
+        public void Deserialize_WithCustomSettingsAndMissingPath_ReturnsEmptyBagWithCopiedSettings()
+        {
+            // Arrange
+            var settings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.None,
+                TypeNameHandling = TypeNameHandling.None,
+            };
+
+            // Act
+            var bag = ScBag<int>.Deserialize(
+                "missing-custom-scbag.json",
+                @"C:\MissingScBagCustom",
+                false,
+                settings
+            );
+            StopPendingSerializationTimer(bag);
+
+            // Assert
+            bag.Should().NotBeNull();
+            bag.Should().BeEmpty();
+            bag.FilePath.Should()
+                .Be(Path.Combine(@"C:\MissingScBagCustom", "missing-custom-scbag.json"));
+            bag.JsonSettings.Should().BeSameAs(settings);
+        }
+
+        [TestMethod]
+        public void Deserialize_WithMissingFileInExistingDirectory_UsesFileNotFoundBranch()
+        {
+            // Arrange
+            var fileName = "__missing-fileonly-scbag.json";
+            var folderPath = AppContext.BaseDirectory;
+            var expectedPath = Path.Combine(folderPath, fileName);
+            var settings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.None,
+                TypeNameHandling = TypeNameHandling.None,
+            };
+
+            File.Exists(expectedPath).Should().BeFalse();
+
+            // Act
+            var bag = ScBag<int>.Deserialize(fileName, folderPath, false, settings);
+            StopPendingSerializationTimer(bag);
+
+            // Assert
+            bag.Should().NotBeNull();
+            bag.Should().BeEmpty();
+            bag.FilePath.Should().Be(expectedPath);
+            bag.JsonSettings.Should().BeSameAs(settings);
+        }
+
+        [TestMethod]
+        public void SerializeThreadSafe_WithInvalidPath_DoesNotThrow()
+        {
+            // Arrange
+            var bag = new ScBag<int>(new[] { 1, 2, 3 });
+            var invalidPath = Path.Combine(@"C:\ScBag", "*serialize-thread-safe.json");
+
+            // Act
+            Action act = () => bag.SerializeThreadSafe(invalidPath);
+
+            // Assert
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void SerializeThreadSafe_WithNullDevice_WritesWithoutThrowing()
+        {
+            // Arrange
+            var bag = new ScBag<int>(new[] { 4, 5, 6 });
+
+            // Act
+            Action act = () => bag.SerializeThreadSafe("NUL");
+
+            // Assert
+            act.Should().NotThrow();
+        }
+
         // -----------------------------------------------------------------------
         // P51-T1 — Deserializing a missing path returns an empty bag
         // -----------------------------------------------------------------------
@@ -310,6 +475,23 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Assert
             act.Should().Throw<ArgumentNullException>();
         }
+
+        private static void StopPendingSerializationTimer<T>(ScBag<T> bag)
+        {
+            var timerField = typeof(ScBag<T>).GetField(
+                "_timer",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            var timer = timerField?.GetValue(bag) as TimerWrapper;
+
+            if (timer is null)
+            {
+                return;
+            }
+
+            timer.StopTimer();
+            timer.Dispose();
+        }
     }
 
     /// <summary>Exposes the protected static CreateEmpty method for testing.</summary>
@@ -317,5 +499,14 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
     {
         internal static ScBag<T> ExposeCreateEmpty(DialogResult response, FilePathHelper disk) =>
             CreateEmpty(response, disk);
+
+        internal static ScBag<T> ExposeCreateEmpty(
+            DialogResult response,
+            FilePathHelper disk,
+            JsonSerializerSettings settings
+        ) => CreateEmpty(response, disk, settings);
+
+        internal static DialogResult ExposeAskUser(bool askUserOnError, string messageText) =>
+            AskUser(askUserOnError, messageText);
     }
 }

@@ -1,0 +1,53 @@
+[
+  {
+    "Categories": null,
+    "Tokens": [
+      "alpha",
+      "beta"
+    ],
+    "FolderInfo": {
+      "$type": "UtilitiesCS.FolderWrapper, UtilitiesCS",
+      "Selected": true,
+      "ItemCount": 0,
+      "ItemCountSubFolders": 0,
+      "FolderSize": 0,
+      "Name": "Inbox",
+      "RelativePath": "Inbox",
+      "ItemHelpers": null,
+      "Globals": null
+    },
+    "ToRecipients": null,
+    "CcRecipients": null,
+    "Sender": null,
+    "ConversationId": null,
+    "EntryId": null,
+    "StoreId": null,
+    "Subject": null,
+    "Actionable": null
+  },
+  {
+    "Categories": null,
+    "Tokens": [
+      "alpha"
+    ],
+    "FolderInfo": {
+      "$type": "UtilitiesCS.FolderWrapper, UtilitiesCS",
+      "Selected": true,
+      "ItemCount": 0,
+      "ItemCountSubFolders": 0,
+      "FolderSize": 0,
+      "Name": "Projects",
+      "RelativePath": "Projects",
+      "ItemHelpers": null,
+      "Globals": null
+    },
+    "ToRecipients": null,
+    "CcRecipients": null,
+    "Sender": null,
+    "ConversationId": null,
+    "EntryId": null,
+    "StoreId": null,
+    "Subject": null,
+    "Actionable": null
+  }
+]

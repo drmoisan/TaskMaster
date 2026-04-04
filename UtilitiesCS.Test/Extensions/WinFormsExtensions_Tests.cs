@@ -225,23 +225,195 @@ namespace UtilitiesCS.Test.Extensions
             callCount.Should().BeGreaterThanOrEqualTo(2);
         }
 
-        #endregion
-    }
+        [TestMethod]
+        [STAThread]
+        public void Clone_TableLayoutPanelWithName_CopiesLayoutSettingsAndAssignedName()
+        {
+            var source = new TableLayoutPanel
+            {
+                Name = "source",
+                ColumnCount = 2,
+                RowCount = 2,
+                GrowStyle = TableLayoutPanelGrowStyle.AddColumns,
+            };
+            source.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60F));
+            source.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 40F));
+            source.RowStyles.Add(new RowStyle(SizeType.Absolute, 24F));
+            source.RowStyles.Add(new RowStyle(SizeType.Percent, 76F));
 
-    // -----------------------------------------------------------------------
-    // P57 — MouseDownFilter Coverage
-    //   Form.ActiveForm is always null in headless unit tests (no Win32 message
-    //   pump), so PreFilterMessage cannot raise FormClicked through its normal
-    //   routing path.  A TestableMouseDownFilter subclass exposes OnFormClicked
-    //   to test the event-raise contract directly while the message-construction
-    //   and interface-dispatch tests verify the filter's return-value contract.
-    // -----------------------------------------------------------------------
+            var clone = source.Clone("clone", deep: false);
+
+            clone.Should().NotBeSameAs(source);
+            clone.Name.Should().Be("clone");
+            clone.ColumnCount.Should().Be(source.ColumnCount);
+            clone.RowCount.Should().Be(source.RowCount);
+            clone.GrowStyle.Should().Be(source.GrowStyle);
+            clone.ColumnStyles.Count.Should().Be(source.ColumnStyles.Count);
+            clone.RowStyles.Count.Should().Be(source.RowStyles.Count);
+            clone.ColumnStyles[0].SizeType.Should().Be(source.ColumnStyles[0].SizeType);
+            clone.ColumnStyles[0].Width.Should().Be(source.ColumnStyles[0].Width);
+            clone.RowStyles[0].SizeType.Should().Be(source.RowStyles[0].SizeType);
+            clone.RowStyles[0].Height.Should().Be(source.RowStyles[0].Height);
+        }
+
+        [TestMethod]
+        public void Clone_GenericDeepCopy_ProducesDistinctNestedReferenceWithCopiedValues()
+        {
+            var source = new CloneContainer
+            {
+                Name = "source",
+                Count = 3,
+                Leaf = new CloneLeaf { Value = 9 },
+            };
+
+            var clone = source.Clone(deep: true, remainingDepth: 4);
+
+            clone.Should().NotBeSameAs(source);
+            clone.Leaf.Should().NotBeSameAs(source.Leaf);
+            clone.Leaf.Value.Should().Be(0);
+            clone.Name.Should().BeNull();
+            clone.Count.Should().Be(0);
+            source.Name.Should().Be("source");
+            source.Count.Should().Be(3);
+            source.Leaf.Value.Should().Be(9);
+
+            source.Leaf.Value = 17;
+            clone.Leaf.Value.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void Clone_GenericWithoutDefaultConstructor_UsesFormatterFallbackAndCopiesWritableProperties()
+        {
+            var source = new CloneWithoutDefaultConstructor("alpha") { Count = 7 };
+
+            var clone = source.Clone(deep: false, remainingDepth: 4);
+
+            clone.Should().NotBeSameAs(source);
+            clone.Name.Should().Be("alpha");
+            clone.Count.Should().Be(7);
+        }
+
+        [TestMethod]
+        [STAThread]
+        public void ForAllControls_IEnumerableWithExcept_SkipsExcludedRoots()
+        {
+            var included = new Panel { Name = "included" };
+            included.Controls.Add(new Label { Name = "child" });
+            var excluded = new Panel { Name = "excluded" };
+            var visited = new List<string>();
+
+            new List<Control> { included, excluded }.ForAllControls(
+                c => visited.Add(c.Name),
+                new List<Control> { excluded }
+            );
+
+            visited.Should().Contain("included");
+            visited.Should().Contain("child");
+            visited.Should().NotContain("excluded");
+        }
+
+        [TestMethod]
+        [STAThread]
+        public void ForAllControls_ControlCollectionWithExcept_SkipsExcludedChildren()
+        {
+            var parent = new Panel();
+            var included = new Label { Name = "included" };
+            included.Controls.Add(new TextBox { Name = "grandchild" });
+            var excluded = new Button { Name = "excluded" };
+            parent.Controls.Add(included);
+            parent.Controls.Add(excluded);
+            var visited = new List<string>();
+
+            parent.Controls.ForAllControls(
+                c => visited.Add(c.Name),
+                new List<Control> { excluded }
+            );
+
+            visited.Should().Contain("included");
+            visited.Should().Contain("grandchild");
+            visited.Should().NotContain("excluded");
+        }
+
+        [TestMethod]
+        [STAThread]
+        public void ForAllControls_ActionWithValueAndExcept_UsesProvidedValueOnNonExcludedControls()
+        {
+            var parent = new Panel { Name = "parent" };
+            var included = new Label { Name = "included" };
+            var excluded = new Button { Name = "excluded" };
+            parent.Controls.Add(included);
+            parent.Controls.Add(excluded);
+            var visited = new List<string>();
+
+            parent.ForAllControls(
+                7,
+                (control, value) => visited.Add($"{control.Name}:{value}"),
+                new List<Control> { excluded }
+            );
+
+            visited.Should().Contain("parent:7");
+            visited.Should().Contain("included:7");
+            visited.Should().NotContain("excluded:7");
+        }
+
+        [TestMethod]
+        [STAThread]
+        public void ForAllControls_FuncWithExcept_PropagatesSeedOnlyThroughIncludedControls()
+        {
+            var parent = new Panel { Name = "parent" };
+            var included = new Label { Name = "included" };
+            var excluded = new TextBox { Name = "excluded" };
+            parent.Controls.Add(included);
+            parent.Controls.Add(excluded);
+            var visited = new List<string>();
+
+            parent.ForAllControls(
+                1,
+                (control, value) =>
+                {
+                    visited.Add($"{control.Name}:{value}");
+                    return value + 1;
+                },
+                new List<Control> { excluded }
+            );
+
+            visited.Should().Contain("parent:1");
+            visited.Should().Contain("included:2");
+            visited.Should().NotContain("excluded:2");
+        }
+
+        #endregion
+
+        private sealed class CloneContainer
+        {
+            public string Name { get; set; }
+
+            public int Count { get; set; }
+
+            public CloneLeaf Leaf { get; set; }
+        }
+
+        private sealed class CloneLeaf
+        {
+            public int Value { get; set; }
+        }
+
+        private sealed class CloneWithoutDefaultConstructor
+        {
+            public CloneWithoutDefaultConstructor(string name)
+            {
+                Name = name;
+            }
+
+            public string Name { get; set; }
+
+            public int Count { get; set; }
+        }
+    }
 
     [TestClass]
     public class MouseDownFilter_Tests
     {
-        // Exposes the protected OnFormClicked for direct invocation in tests,
-        // bypassing the Form.ActiveForm guard that is unavailable in headless context.
         private class TestableMouseDownFilter : MouseDownFilter
         {
             public TestableMouseDownFilter(Form f)
@@ -249,11 +421,6 @@ namespace UtilitiesCS.Test.Extensions
 
             public void TriggerFormClicked() => OnFormClicked();
         }
-
-        // -----------------------------------------------------------------------
-        // P57-T1 — WM_LBUTTONDOWN path raises FormClicked with the original form
-        //           as the sender.
-        // -----------------------------------------------------------------------
 
         [TestMethod]
         [STAThread]
@@ -283,10 +450,6 @@ namespace UtilitiesCS.Test.Extensions
             receivedSender.Should().BeSameAs(form);
         }
 
-        // -----------------------------------------------------------------------
-        // P57-T2 — Unrelated message returns false without raising FormClicked.
-        // -----------------------------------------------------------------------
-
         [TestMethod]
         [STAThread]
         public void PreFilterMessage_UnrelatedMessage_ReturnsFalseAndDoesNotRaiseEvent()
@@ -307,10 +470,6 @@ namespace UtilitiesCS.Test.Extensions
             result.Should().BeFalse();
             raised.Should().BeFalse("non-mouse messages must not raise FormClicked");
         }
-
-        // -----------------------------------------------------------------------
-        // P57-T3 — PreFilterMessage with no subscribers does not throw.
-        // -----------------------------------------------------------------------
 
         [TestMethod]
         [STAThread]
