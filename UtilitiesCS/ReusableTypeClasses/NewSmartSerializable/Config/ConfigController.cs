@@ -60,11 +60,18 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
         )
         {
             var controller = new ConfigController(globals, config).Init();
-            controller.Viewer.Show();
+            controller.ShowViewer(controller.Viewer);
             return controller;
         }
 
         #endregion ctor
+
+        /// <summary>
+        /// Seam for displaying the <see cref="ConfigViewer"/>.
+        /// Defaults to <c>viewer.Show()</c>; tests override this to prevent
+        /// a visible window from appearing during unattended runs.
+        /// </summary>
+        internal Action<ConfigViewer> ShowViewer = viewer => viewer.Show();
 
         #region Properties
         internal ISmartSerializableConfig ConfigCopy { get; set; }

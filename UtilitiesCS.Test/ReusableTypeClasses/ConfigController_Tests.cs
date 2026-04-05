@@ -240,7 +240,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
                 ConfigController controller = null;
                 try
                 {
-                    controller = ConfigController.Show(mockGlobals.Object, config);
+                    controller = new ConfigController(mockGlobals.Object, config).Init();
 
                     controller.SpecialFolderList[0].Should().Be("None");
                     controller.SpecialFolderList.Should().Contain("Documents");
