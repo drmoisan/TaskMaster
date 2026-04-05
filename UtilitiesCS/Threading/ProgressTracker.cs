@@ -14,6 +14,8 @@ namespace UtilitiesCS
 {
     public class ProgressTracker : IProgress<(int Value, string JobName)>
     {
+        internal Action<ProgressViewer> ShowProgressViewer { get; set; } = viewer => viewer.Show();
+
         public ProgressTracker(CancellationTokenSource tokenSource)
         {
             _cancelSource = tokenSource;
@@ -49,7 +51,7 @@ namespace UtilitiesCS
                 });
                 _parent = new ParentProgress<(int Value, string JobName)>(rootProgress, 100, 0);
                 _isRoot = true;
-                _progressViewer.Show();
+                ShowProgressViewer(_progressViewer);
             });
             return this;
         }

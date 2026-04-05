@@ -11,8 +11,8 @@ namespace TaskMaster
     public interface IAddInUtilities
     {
         void MaximizeQuickFilerWindow();
-        Task LaunchQuickFilerAsync();
-        Task LaunchSortEmailAsync();
+        void LaunchQuickFiler();
+        void LaunchSortEmail();
         void LaunchFlagAsTask();
     }
 
@@ -39,12 +39,19 @@ namespace TaskMaster
             }
         }
 
-        public async Task LaunchQuickFilerAsync()
+        public void LaunchQuickFiler()
         {
             if (_globals is not null)
             {
-                await _ribbonController.LoadQuickFilerAsync();
-                //_ = _ribbonController.LoadQuickFilerAsync();
+                _ = _ribbonController.LoadQuickFilerAsync();
+            }
+        }
+
+        public void LaunchSortEmail()
+        {
+            if (_globals is not null)
+            {
+                _ = _ribbonController.SortEmailAsync();
             }
         }
 
@@ -53,22 +60,6 @@ namespace TaskMaster
             if (_globals is not null)
             {
                 _ribbonController.FlagAsTask();
-            }
-        }
-
-        public void LaunchSortEmail()
-        {
-            if (_globals is not null)
-            {
-                _ribbonController.SortEmail();
-            }
-        }
-
-        public async Task LaunchSortEmailAsync()
-        {
-            if (_globals is not null)
-            {
-                await _ribbonController.SortEmailAsync();
             }
         }
     }

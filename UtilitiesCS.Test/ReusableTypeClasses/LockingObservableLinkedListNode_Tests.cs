@@ -98,5 +98,41 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             first.Value.Should().Be(10);
             first.Previous.Should().BeNull();
         }
+
+        [TestMethod]
+        public void MoveUp_WhenCalledOnSecondNode_MovesNodeToFirstPosition()
+        {
+            // Arrange: list order is [1, 2]; obtain the tail node via the node's movement helper
+            var list = new LockingObservableLinkedList<int>();
+            list.AddLast(1);
+            list.AddLast(2);
+            var second = list.Last;
+
+            // Act: MoveUp delegates to list.MoveUp(this), which repositions the node toward the head
+            second.MoveUp();
+
+            // Assert: the node formerly at position 2 is now first, confirming delegation occurred
+            list.First.Value.Should().Be(2);
+            list.Last.Value.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void Invalidate_ClearsListAndAdjacentNodeReferences()
+        {
+            // Arrange: single-node list — after Invalidate the wrapper's List, Next, and Previous
+            // fields must all be null (the node is no longer associated with any collection)
+            var list = new LockingObservableLinkedList<int>();
+            list.AddLast(42);
+            var node = list.First;
+
+            // Act: internal Invalidate clears list, next, and prev fields on the wrapper
+            node.Invalidate();
+
+            // Assert: list reference cleared; Next/Previous return null because the inner node
+            // has no adjacent nodes in a single-element list
+            node.List.Should().BeNull();
+            node.Next.Should().BeNull();
+            node.Previous.Should().BeNull();
+        }
     }
 }

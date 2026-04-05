@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.Serialization;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.HelperClasses.FileSystem;
@@ -99,6 +100,73 @@ namespace UtilitiesCS.Test.HelperClasses
             Action act = () => wrapper.Refresh();
 
             act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void MetadataSetters_WithCurrentValues_DelegateWithoutChangingState()
+        {
+            var dirInfo = new DirectoryInfo(
+                Path.Combine(Environment.CurrentDirectory, "..", "..", "..", "docs")
+            );
+            var wrapper = new FileSystemInfoWrapper(dirInfo);
+
+            wrapper.Attributes = dirInfo.Attributes;
+            wrapper.CreationTime = dirInfo.CreationTime;
+            wrapper.CreationTimeUtc = dirInfo.CreationTimeUtc;
+            wrapper.LastAccessTime = dirInfo.LastAccessTime;
+            wrapper.LastAccessTimeUtc = dirInfo.LastAccessTimeUtc;
+            wrapper.LastWriteTime = dirInfo.LastWriteTime;
+            wrapper.LastWriteTimeUtc = dirInfo.LastWriteTimeUtc;
+
+            wrapper.Attributes.Should().Be(dirInfo.Attributes);
+            wrapper.CreationTimeUtc.Should().Be(dirInfo.CreationTimeUtc);
+            wrapper.LastAccessTimeUtc.Should().Be(dirInfo.LastAccessTimeUtc);
+            wrapper.LastWriteTimeUtc.Should().Be(dirInfo.LastWriteTimeUtc);
+        }
+
+        [TestMethod]
+        public void DeleteAndGetObjectData_ShouldDelegateToUnderlyingFileSystemInfo()
+        {
+            var info = new RecordingFileSystemInfo();
+            var wrapper = new FileSystemInfoWrapper(info);
+            var serializationInfo = new SerializationInfo(
+                typeof(RecordingFileSystemInfo),
+                new FormatterConverter()
+            );
+
+            wrapper.Delete();
+            wrapper.GetObjectData(
+                serializationInfo,
+                new StreamingContext(StreamingContextStates.All)
+            );
+
+            info.DeleteCalled.Should().BeTrue();
+            info.GetObjectDataCalled.Should().BeTrue();
+            serializationInfo.GetString("Marker").Should().Be("Recorded");
+        }
+
+        private sealed class RecordingFileSystemInfo : FileSystemInfo
+        {
+            public bool DeleteCalled { get; private set; }
+
+            public bool GetObjectDataCalled { get; private set; }
+
+            public override bool Exists => true;
+
+            public override string Name => "recording";
+
+            public override string FullName => @"C:\recording";
+
+            public override void Delete()
+            {
+                DeleteCalled = true;
+            }
+
+            public override void GetObjectData(SerializationInfo info, StreamingContext context)
+            {
+                GetObjectDataCalled = true;
+                info.AddValue("Marker", "Recorded");
+            }
         }
     }
 }

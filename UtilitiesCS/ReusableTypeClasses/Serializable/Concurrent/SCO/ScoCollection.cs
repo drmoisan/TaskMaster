@@ -18,11 +18,48 @@ using UtilitiesCS.Threading;
 
 namespace UtilitiesCS
 {
+    internal interface IScoCollectionFileSystem
+    {
+        bool Exists(string filePath);
+        string ReadAllText(string filePath);
+        StreamWriter CreateText(string filePath);
+    }
+
+    internal interface IScoCollectionPrompt
+    {
+        DialogResult ShowError(string messageText);
+    }
+
+    internal sealed class ScoCollectionFileSystem : IScoCollectionFileSystem
+    {
+        public bool Exists(string filePath) => File.Exists(filePath);
+
+        public string ReadAllText(string filePath) => File.ReadAllText(filePath);
+
+        public StreamWriter CreateText(string filePath) => File.CreateText(filePath);
+    }
+
+    internal sealed class ScoCollectionPrompt : IScoCollectionPrompt
+    {
+        public DialogResult ShowError(string messageText)
+        {
+            return MyBox.ShowDialog(
+                messageText,
+                "Error",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Error
+            );
+        }
+    }
+
     public class ScoCollection<T> : ConcurrentObservableCollection<T>, IList<T>, IList
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
+        internal static IScoCollectionFileSystem FileSystem { get; set; } =
+            new ScoCollectionFileSystem();
+        internal static IScoCollectionPrompt Prompt { get; set; } = new ScoCollectionPrompt();
 
         #region Constructors
 
@@ -83,7 +120,7 @@ namespace UtilitiesCS
             settings.TypeNameHandling = TypeNameHandling.Auto;
             settings.Formatting = Formatting.Indented;
             collection = JsonConvert.DeserializeObject<ScoCollection<T>>(
-                File.ReadAllText(disk.FilePath),
+                FileSystem.ReadAllText(disk.FilePath),
                 settings
             );
             return collection;
@@ -136,12 +173,7 @@ namespace UtilitiesCS
             DialogResult response;
             if (askUserOnError)
             {
-                response = MyBox.ShowDialog(
-                    messageText,
-                    "Error",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Error
-                );
+                response = Prompt.ShowError(messageText);
             }
             else
             {
@@ -158,9 +190,16 @@ namespace UtilitiesCS
 
         public void FromList(IList<T> value)
         {
-            var collection = new ScoCollection<T>(value);
-            this.Clear();
-            DoBaseWrite(() => WriteCollection = collection?.DoBaseRead(() => ReadCollection));
+            Clear();
+            if (value is null)
+            {
+                return;
+            }
+
+            foreach (var item in value)
+            {
+                Add(item);
+            }
         }
 
         #endregion
@@ -229,7 +268,7 @@ namespace UtilitiesCS
             {
                 try
                 {
-                    using (StreamWriter sw = File.CreateText(filePath))
+                    using (StreamWriter sw = FileSystem.CreateText(filePath))
                     {
                         var settings = new JsonSerializerSettings();
                         settings.TypeNameHandling = TypeNameHandling.Auto;
@@ -322,9 +361,7 @@ namespace UtilitiesCS
                 writeCollection = true;
             }
 
-            DoBaseWrite(() =>
-                WriteCollection = collection?.DoBaseRead(() => collection?.ReadCollection)
-            );
+            FromList(collection?.ToList());
             if (writeCollection)
             {
                 Serialize();
@@ -377,7 +414,7 @@ namespace UtilitiesCS
                 {
                     try
                     {
-                        if (File.Exists(backupFilepath))
+                        if (FileSystem.Exists(backupFilepath))
                         {
                             collection = LoadFromBackup(backupLoader, backupFilepath, disk);
                             writeCollection = true;
@@ -415,9 +452,7 @@ namespace UtilitiesCS
                 }
             }
 
-            DoBaseWrite(() =>
-                WriteCollection = collection?.DoBaseRead(() => collection?.ReadCollection)
-            );
+            FromList(collection?.ToList());
             if (writeCollection)
             {
                 Serialize();

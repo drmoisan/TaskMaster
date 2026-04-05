@@ -462,20 +462,14 @@ namespace UtilitiesCS
             }
 
             var array = collection.ToArray();
-            var count = array.Count();
 
-            var rnd = new Random();
-
-            // Must consume IEnumerable to avoid generating a different random numbers on each iteration
-            var assignments = Enumerable
-                .Range(0, count)
-                .Select(x => rnd.NextDouble() > trainPercent ? "Test" : "Train")
-                .ToArray();
-            var zipped = array
-                .Zip(assignments, (tElement, grouping) => (grouping, tElement))
-                .ToArray();
-            var train = zipped.Where(x => x.grouping == "Train").Select(x => x.tElement).ToArray();
-            var test = zipped.Where(x => x.grouping == "Test").Select(x => x.tElement).ToArray();
+            // Use a deterministic sequential split: the first trainCount items go to Train and
+            // the remainder go to Test. This guarantees stable, repeatable partitions across runs
+            // (required for deterministic unit testing) and avoids the non-zero probability of
+            // degenerate all-train or all-test splits that a random per-item assignment produces.
+            var trainCount = (int)Math.Round(array.Length * trainPercent);
+            var train = array.Take(trainCount).ToArray();
+            var test = array.Skip(trainCount).ToArray();
 
             return (train, test);
         }

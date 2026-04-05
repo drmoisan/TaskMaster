@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.IO;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -110,6 +111,17 @@ namespace UtilitiesCS.Test.HelperClasses
             var (stem, ext) = fph.ExtractStemAndExtension("readme");
 
             stem.Should().Be("readme");
+            ext.Should().Be("");
+        }
+
+        [TestMethod]
+        public void ExtractStemAndExtension_WhenFileNameIsOnlyExtension_ShouldTreatExtensionAsStem()
+        {
+            var fph = new FilePathHelper();
+
+            var (stem, ext) = fph.ExtractStemAndExtension(".gitignore");
+
+            stem.Should().Be(".gitignore");
             ext.Should().Be("");
         }
 
@@ -260,6 +272,23 @@ namespace UtilitiesCS.Test.HelperClasses
         }
 
         [TestMethod]
+        public void AdjustForMaxPath_Instance_WhenPathExceedsLimit_ShouldTruncateSeed()
+        {
+            var longSeed = new string('a', 300);
+            var fph = FilePathHelper.FromSeed(longSeed, ".json", "_tail", @"C:\data");
+
+            var adjusted = fph.AdjustForMaxPath();
+            var adjustedPath = Path.Combine(
+                fph.FolderPath,
+                $"{fph.FileStemSeed}{fph.FileStemSuffix}{fph.FileExtension}"
+            );
+
+            adjusted.Should().BeTrue();
+            fph.FileStemSeed.Length.Should().BeLessThan(longSeed.Length);
+            adjustedPath.Length.Should().BeLessThanOrEqualTo(FilePathHelper.MAX_PATH);
+        }
+
+        [TestMethod]
         public void CopyChanged_ShouldReturnListOfChangedProperties()
         {
             var original = new FilePathHelper("old.json", @"C:\old");
@@ -269,6 +298,73 @@ namespace UtilitiesCS.Test.HelperClasses
 
             changed.Should().Contain("FolderPath");
             changed.Should().Contain("FileName");
+        }
+
+        // P89-T2: TryParseFileStem boundary combinations
+
+        [TestMethod]
+        public void TryParseFileStem_WhenSeedPresentAndSuffixEmpty_ShouldReturnTrueAndPreserveSeed()
+        {
+            // Arrange: fph knows the seed but has no suffix; fileStem starts with seed + extra chars.
+            var fph = FilePathHelper.FromSeed("report", ".json", "", @"C:\data");
+
+            // Act: parse a stem that begins with the known seed followed by extra chars.
+            var result = fph.TryParseFileStem("report_v2", out string seed, out string suffix);
+
+            // Assert: parsing succeeds and the seed output includes the original seed value.
+            result.Should().BeTrue();
+            seed.Should().StartWith("report");
+        }
+
+        [TestMethod]
+        public void TryParseFileStem_WhenSuffixPresentInStem_ShouldStripSuffixAndReturnSeed()
+        {
+            // Arrange: fph knows both seed and suffix; the fileStem is seed+suffix concatenated.
+            var fph = FilePathHelper.FromSeed("data", ".json", "_bk", @"C:\output");
+
+            // Act: parse the exact concatenation of known seed and suffix.
+            var result = fph.TryParseFileStem("data_bk", out string seed, out string suffix);
+
+            // Assert: parsing succeeds, the seed strips the suffix portion, suffix is preserved.
+            result.Should().BeTrue();
+            seed.Should().Be("data");
+            suffix.Should().Be("_bk");
+        }
+
+        // P89-T3: AdjustForMaxPath preserves extension when truncating seed
+
+        [TestMethod]
+        public void AdjustForMaxPath_Static_ShouldPreserveExtensionWhenTruncatingSeed()
+        {
+            // Arrange: construct a path that exceeds MAX_PATH; ext must survive truncation.
+            string folder = @"C:\data";
+            string longSeed = new string('x', 300);
+            string ext = ".json";
+
+            // Act: truncate to fit within MAX_PATH.
+            var result = FilePathHelper.AdjustForMaxPath(folder, longSeed, ext);
+
+            // Assert: result fits within the limit AND the extension is preserved intact.
+            result.Length.Should().BeLessThanOrEqualTo(FilePathHelper.MAX_PATH);
+            result.Should().EndWith(ext);
+        }
+
+        [TestMethod]
+        public void PropertyChanged_FileStemParts_ShouldRecomputeFileNameAndStem()
+        {
+            var fph = FilePathHelper.FromSeed("report", ".json", "_bk", @"C:\data");
+
+            fph.FileStemSeed = "summary";
+            fph.FileStem.Should().Be("summary_bk");
+            fph.FileName.Should().Be("summary_bk.json");
+
+            fph.FileStemSuffix = "_archive";
+            fph.FileStem.Should().Be("summary_archive");
+            fph.FileName.Should().Be("summary_archive.json");
+
+            fph.FileExtension = ".txt";
+            fph.FileStem.Should().Be("summary_archive");
+            fph.FileName.Should().Be("summary_archive.txt");
         }
     }
 }

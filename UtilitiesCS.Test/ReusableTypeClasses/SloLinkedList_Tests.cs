@@ -1,7 +1,11 @@
+using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
@@ -9,6 +13,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
     [TestClass]
     public class SloLinkedList_Tests
     {
+        private static readonly string RepoRoot = Path.GetFullPath(
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..")
+        );
+
         [TestMethod]
         public void Constructor_WithEmptyList_ExposesNoEndpoints()
         {
@@ -187,6 +195,216 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             // Act & Assert
             list.Contains(99).Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void Serialize_WithExplicitPath_UpdatesConfigDiskPath()
+        {
+            // Arrange
+            var list = new SloLinkedList<int>();
+            var invalidPath = CreateInvalidFilePath();
+
+            // Act
+            list.Serialize(invalidPath);
+
+            // Assert
+            list.Config.Disk.FilePath.Should().Be(invalidPath);
+        }
+
+        [TestMethod]
+        public void SerializeThreadSafe_WithInvalidPath_IsSwallowedByProductionErrorHandling()
+        {
+            // Arrange
+            var list = new SloLinkedList<int>();
+
+            // Act
+            System.Action act = () => list.SerializeThreadSafe(CreateInvalidFilePath());
+
+            // Assert
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void Deserialize_WithInvalidPath_ReturnsEmptyInstanceAndPreservesRequestedPath()
+        {
+            // Arrange
+            var list = new SloLinkedList<int>();
+
+            // Act
+            var restored = list.Deserialize("*invalid-slo-linked-list.json", WorkspaceRoot, false);
+
+            // Assert
+            restored.Should().NotBeNull();
+            restored.Should().BeEmpty();
+            restored
+                .Config.Disk.FilePath.Should()
+                .Be(Path.Combine(WorkspaceRoot, "*invalid-slo-linked-list.json"));
+        }
+
+        [TestMethod]
+        public void Deserialize_WithCustomSettings_CopiesSettingsToReturnedInstance()
+        {
+            // Arrange
+            var list = new SloLinkedList<int>();
+            var settings = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                Formatting = Formatting.Indented,
+            };
+
+            // Act
+            var restored = list.Deserialize(
+                "*invalid-slo-linked-list.json",
+                WorkspaceRoot,
+                false,
+                settings
+            );
+
+            // Assert
+            restored.Should().NotBeNull();
+            restored.Config.JsonSettings.Should().BeSameAs(settings);
+        }
+
+        [TestMethod]
+        public async Task DeserializeAsync_WithAskUserFalse_ReturnsEmptyInstance()
+        {
+            // Arrange
+            var list = new SloLinkedList<int>();
+            var loader = CreateLoader();
+
+            // Act
+            var restored = await list.DeserializeAsync(loader, askUserOnError: false);
+
+            // Assert
+            restored.Should().NotBeNull();
+            restored.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public void ExplicitInterfaceDeserialize_ThrowsNotImplementedException()
+        {
+            // Arrange
+            ISmartSerializable<SloLinkedList<int>> list = new SloLinkedList<int>();
+            var loader = CreateLoader();
+
+            // Act
+            System.Action act = () => list.Deserialize(loader);
+
+            // Assert
+            act.Should().Throw<NotImplementedException>();
+        }
+
+        [TestMethod]
+        public void ExplicitInterfaceDeserializeWithAltLoader_ThrowsNotImplementedException()
+        {
+            // Arrange
+            ISmartSerializable<SloLinkedList<int>> list = new SloLinkedList<int>();
+            var loader = CreateLoader();
+
+            // Act
+            System.Action act = () =>
+                list.Deserialize(
+                    loader,
+                    askUserOnError: false,
+                    altLoader: () => new SloLinkedList<int>()
+                );
+
+            // Assert
+            act.Should().Throw<NotImplementedException>();
+        }
+
+        [TestMethod]
+        public async Task ExplicitInterfaceDeserializeAsyncWithAltLoader_ThrowsNotImplementedException()
+        {
+            // Arrange
+            ISmartSerializable<SloLinkedList<int>> list = new SloLinkedList<int>();
+            var loader = CreateLoader();
+
+            // Act
+            Func<Task> act = async () =>
+                await list.DeserializeAsync(
+                    loader,
+                    askUserOnError: false,
+                    altLoader: () => new SloLinkedList<int>()
+                );
+
+            // Assert
+            await act.Should().ThrowAsync<NotImplementedException>();
+        }
+
+        [TestMethod]
+        public void ConfigPropertyChanged_WhenInvoked_RaisesPropertyChanged()
+        {
+            // Arrange
+            var list = new SloLinkedList<int>();
+            string changedProperty = null;
+            list.PropertyChanged += (_, args) => changedProperty = args.PropertyName;
+
+            // Act
+            typeof(SloLinkedList<int>)
+                .GetMethod(
+                    "Config_PropertyChanged",
+                    System.Reflection.BindingFlags.Instance
+                        | System.Reflection.BindingFlags.NonPublic
+                )
+                .Invoke(
+                    list,
+                    new object[]
+                    {
+                        this,
+                        new System.ComponentModel.PropertyChangedEventArgs("ConfigFlag"),
+                    }
+                );
+
+            // Assert
+            changedProperty.Should().Be("ConfigFlag");
+        }
+
+        [TestMethod]
+        public void StaticDeserialize_WithInvalidPath_ReturnsEmptyInstance()
+        {
+            // Act
+            var restored = SloLinkedList<int>.Static.Deserialize(
+                "*invalid-static-slo-linked-list.json",
+                WorkspaceRoot,
+                false
+            );
+
+            // Assert
+            restored.Should().NotBeNull();
+            restored.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public async Task StaticDeserializeAsync_WithAskUserFalse_ReturnsEmptyInstance()
+        {
+            // Arrange
+            var loader = CreateLoader();
+
+            // Act
+            var restored = await SloLinkedList<int>.Static.DeserializeAsync(
+                loader,
+                askUserOnError: false
+            );
+
+            // Assert
+            restored.Should().NotBeNull();
+            restored.Should().BeEmpty();
+        }
+
+        private static SmartSerializable<SloLinkedList<int>> CreateLoader()
+        {
+            var loader = new SmartSerializable<SloLinkedList<int>>();
+            loader.Config.Disk.FilePath = Path.Combine(WorkspaceRoot, "*invalid-slo-loader.json");
+            loader.Config.JsonSettings = SmartSerializable<SloLinkedList<int>>.GetDefaultSettings();
+            return loader;
+        }
+
+        private static string WorkspaceRoot => Path.Combine(RepoRoot, "TaskMaster");
+
+        private static string CreateInvalidFilePath()
+        {
+            return Path.Combine(WorkspaceRoot, "*invalid-slo-linked-list.json");
         }
     }
 }

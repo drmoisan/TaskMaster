@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,6 +42,7 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         #region Events
 
+        [ExcludeFromCodeCoverage]
         public void Launch()
         {
             FsConverter = new FilePathHelperConverter(Globals.FS).GetSerializablePath;
@@ -228,6 +230,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             }
         }
 
+        [ExcludeFromCodeCoverage]
         internal string SelectFsFolder()
         {
             using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())

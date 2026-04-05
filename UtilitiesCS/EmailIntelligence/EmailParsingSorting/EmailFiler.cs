@@ -20,6 +20,19 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
     /// </summary>
     public class EmailFiler
     {
+        protected internal sealed class MoveMailResult
+        {
+            public MoveMailResult(MailItem original, MailItem moved)
+            {
+                Original = original;
+                Moved = moved;
+            }
+
+            public MailItem Original { get; }
+
+            public MailItem Moved { get; }
+        }
+
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
@@ -111,11 +124,11 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             //TraceUtility.LogMethodCall(mailHelpers);
             mailHelpers.ThrowIfNullOrEmpty(nameof(mailHelpers));
             MailHelpers = mailHelpers;
-            Config.ResolvePaths((Folder)MailHelpers.FirstOrDefault().FolderInfo.OlFolder);
+            ResolvePaths((Folder)MailHelpers.FirstOrDefault().FolderInfo.OlFolder);
             return await SortAsync();
         }
 
-        public async Task<bool> SortAsync()
+        public virtual async Task<bool> SortAsync()
         {
             //TraceUtility.LogMethodCall();
             if (!TryValidateParameters())
@@ -129,11 +142,11 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
                 await ProcessMailHelperAsync(mailHelper).ConfigureAwait(false);
             }
 
-            (await Globals.AF.Manager["Folder"]).Serialize();
+            await SerializeFolderManagerAsync().ConfigureAwait(false);
             return true;
         }
 
-        public async Task ProcessMailHelperAsync(MailItemHelper mailHelper)
+        public virtual async Task ProcessMailHelperAsync(MailItemHelper mailHelper)
         {
             // Save the message
             if (Config.SaveMsg)
@@ -144,16 +157,13 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             // Save the attachments and pictures
             await SaveAttachmentsPicturesAsync(mailHelper);
 
-            await Task.Run(async () =>
-                (await Globals.AF.Manager["Folder"]).UnTrain(
-                    Config.OriginOlStem,
-                    mailHelper.Tokens,
-                    1
-                )
-            );
+            await UnTrainFolderAsync(mailHelper).ConfigureAwait(false);
             // Move the email to the destination folder
             //var mailItemOriginal = mailHelper.Item;
-            var (mailItemOriginal, mailItemTemp) = await TryMoveMailItemHelperAsync(mailHelper);
+            var moveResult = await TryMoveMailItemForProcessingAsync(mailHelper)
+                .ConfigureAwait(false);
+            var mailItemOriginal = moveResult.Original;
+            var mailItemTemp = moveResult.Moved;
 
             // If successful, mark it as sorted, push to undo stack, and capture training metrics and move details
             if (mailItemTemp is not null)
@@ -166,20 +176,20 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             }
         }
 
-        private void PushToUndoStack(MailItem beforeMove, MailItem afterMove)
+        protected internal virtual void PushToUndoStack(MailItem beforeMove, MailItem afterMove)
         {
             var info = new MovedMailInfo(beforeMove, afterMove, Globals.Ol.Root.FolderPath);
             Globals.AF.MovedMails.Push(info);
         }
 
-        private void CaptureMoveDetails(MailItemHelper helper)
+        protected internal virtual void CaptureMoveDetails(MailItemHelper helper)
         {
             //TraceUtility.LogMethodCall(mailItem, oMailTmp, _globals);
 
-            string[] strAry = helper.Details().Skip(1).ToArray();
+            string[] strAry = GetMoveDetails(helper);
             var output = SanitizeArrayLineTSV(ref strAry);
 
-            Globals.Ol.EmailMoveWriter.Enqueue(output);
+            EnqueueMoveOutput(output);
         }
 
         //private void CaptureMoveDetails(MailItem mailItem, MailItem oMailTmp)
@@ -217,34 +227,20 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             return result;
         }
 
-        public List<Task> StartTrainingMetrics(MailItemHelper mailHelper)
+        public virtual List<Task> StartTrainingMetrics(MailItemHelper mailHelper)
         {
             var tasks = new List<Task>()
             {
-                Task.Run(async () =>
-                    (await Globals.AF.Manager["Folder"]).Train(
-                        Config.DestinationOlStem,
-                        mailHelper.Tokens,
-                        1
-                    )
-                ),
-                Task.Run(async () =>
-                    (await Globals.AF.Manager["Actionable"]).Train(
-                        mailHelper.Actionable,
-                        mailHelper.Tokens,
-                        1
-                    )
-                ),
-                Task.Run(() =>
-                    Globals.AF.SubjectMap.Add(mailHelper.Subject, Config.DestinationOlStem)
-                ),
-                Task.Run(() => Globals.AF.RecentsList.AddOrMoveFirst(Config.DestinationOlStem, 5)),
+                TrainFolderAsync(mailHelper),
+                TrainActionableAsync(mailHelper),
+                Task.Run(() => RecordSubjectMap(mailHelper)),
+                Task.Run(RecordRecentDestination),
             };
 
             return tasks;
         }
 
-        public async Task LabelAutoSortedAsync(MailItem mailItem)
+        public virtual async Task LabelAutoSortedAsync(MailItem mailItem)
         {
             await Task.Run(() =>
             {
@@ -254,11 +250,11 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             });
         }
 
-        public async Task SaveAttachmentsPicturesAsync(MailItemHelper mailHelper)
+        public virtual async Task SaveAttachmentsPicturesAsync(MailItemHelper mailHelper)
         {
             if (Config.SaveAttachments || Config.SavePictures)
             {
-                var attachments = mailHelper.AttachmentsHelper.ToAsyncEnumerable();
+                var attachments = EnumerateAttachments(mailHelper);
                 if (!Config.SavePictures)
                 {
                     attachments = attachments.Where(x => !x.AttachmentInfo.IsImage);
@@ -270,18 +266,19 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
                 await attachments.ForEachAsync(async x =>
                 {
-                    await x.SaveAttachmentAsync(Config.SaveFsPath);
+                    await SaveAttachmentAsync(x).ConfigureAwait(false);
                 });
 
                 var toDelete = attachments.Where(x => !x.FilePathDelete.IsNullOrEmpty());
                 await foreach (var attachment in toDelete)
                 {
-                    await Task.Run(() => File.Delete(attachment.FilePathDelete));
+                    await Task.Run(() => DeleteFile(attachment.FilePathDelete))
+                        .ConfigureAwait(false);
                 }
             }
         }
 
-        public async Task SaveMessageAsMsgAsync(MailItem mailItem, string fsLocation)
+        public virtual async Task SaveMessageAsMsgAsync(MailItem mailItem, string fsLocation)
         {
             //TraceUtility.LogMethodCall(mailItem, fsLocation);
 
@@ -307,7 +304,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         //    });
         //}
 
-        public async Task<(MailItem Original, MailItem Moved)> TryMoveMailItemHelperAsync(
+        public virtual async Task<(MailItem Original, MailItem Moved)> TryMoveMailItemHelperAsync(
             MailItemHelper mailHelper
         )
         {
@@ -333,7 +330,16 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             });
         }
 
-        public bool TryValidateParameters()
+        protected internal virtual async Task<MoveMailResult> TryMoveMailItemForProcessingAsync(
+            MailItemHelper mailHelper
+        )
+        {
+            var (original, moved) = await TryMoveMailItemHelperAsync(mailHelper)
+                .ConfigureAwait(false);
+            return new MoveMailResult(original, moved);
+        }
+
+        public virtual bool TryValidateParameters()
         {
             try
             {
@@ -347,12 +353,84 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             }
         }
 
-        public void ValidateParameters()
+        public virtual void ValidateParameters()
         {
             Config.ThrowIfNull(nameof(Config));
             MailHelpers.ThrowIfNullOrEmpty(nameof(MailHelpers));
             Globals ??= Config.Globals;
             Globals.ThrowIfNull(nameof(Globals));
+        }
+
+        protected internal virtual void ResolvePaths(Folder currentFolder) =>
+            Config.ResolvePaths(currentFolder);
+
+        protected internal virtual async Task SerializeFolderManagerAsync()
+        {
+            (await Globals.AF.Manager["Folder"]).Serialize();
+        }
+
+        protected internal virtual async Task UnTrainFolderAsync(MailItemHelper mailHelper)
+        {
+            (await Globals.AF.Manager["Folder"]).UnTrain(Config.OriginOlStem, mailHelper.Tokens, 1);
+        }
+
+        protected internal virtual Task TrainFolderAsync(MailItemHelper mailHelper)
+        {
+            return Task.Run(async () =>
+                (await Globals.AF.Manager["Folder"]).Train(
+                    Config.DestinationOlStem,
+                    mailHelper.Tokens,
+                    1
+                )
+            );
+        }
+
+        protected internal virtual Task TrainActionableAsync(MailItemHelper mailHelper)
+        {
+            return Task.Run(async () =>
+                (await Globals.AF.Manager["Actionable"]).Train(
+                    mailHelper.Actionable,
+                    mailHelper.Tokens,
+                    1
+                )
+            );
+        }
+
+        protected internal virtual void RecordSubjectMap(MailItemHelper mailHelper)
+        {
+            Globals.AF.SubjectMap.Add(mailHelper.Subject, Config.DestinationOlStem);
+        }
+
+        protected internal virtual void RecordRecentDestination()
+        {
+            Globals.AF.RecentsList.AddOrMoveFirst(Config.DestinationOlStem, 5);
+        }
+
+        protected internal virtual IAsyncEnumerable<AttachmentHelper> EnumerateAttachments(
+            MailItemHelper mailHelper
+        )
+        {
+            return mailHelper.AttachmentsHelper.ToAsyncEnumerable();
+        }
+
+        protected internal virtual Task SaveAttachmentAsync(AttachmentHelper attachment)
+        {
+            return attachment.SaveAttachmentAsync(Config.SaveFsPath);
+        }
+
+        protected internal virtual void DeleteFile(string filePath)
+        {
+            File.Delete(filePath);
+        }
+
+        protected internal virtual string[] GetMoveDetails(MailItemHelper helper)
+        {
+            return helper.Details().Skip(1).ToArray();
+        }
+
+        protected internal virtual void EnqueueMoveOutput(string output)
+        {
+            Globals.Ol.EmailMoveWriter.Enqueue(output);
         }
 
         #endregion Public Methods

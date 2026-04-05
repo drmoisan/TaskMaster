@@ -12,6 +12,8 @@ namespace UtilitiesCS.Threading
 {
     public class ProgressTrackerAsync
     {
+        internal Action<ProgressViewer> ShowProgressViewer { get; set; } = viewer => viewer.Show();
+
         #region Constructors and Initializers
 
         public ProgressTrackerAsync(CancellationTokenSource tokenSource)
@@ -45,7 +47,7 @@ namespace UtilitiesCS.Threading
 
                 //_isRoot = true;
                 _progressViewer.JobName.Text = "Initializing...";
-                _progressViewer.Show();
+                ShowProgressViewer(_progressViewer);
             });
 
             return this;

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -39,6 +40,7 @@ namespace UtilitiesCS
             ResetConfigAsyncLazy();
         }
 
+        [ExcludeFromCodeCoverage]
         public async Task InitAsync() => await ResetLoadManagerAsyncLazy();
 
         #endregion ctors
@@ -81,6 +83,7 @@ namespace UtilitiesCS
 
         public void ResetConfigAsyncLazy() => Configuration = new(ReadConfiguration);
 
+        [ExcludeFromCodeCoverage]
         internal async Task WriteConfigurationAsync()
         {
             string assemblyDirectory = Path.GetDirectoryName(
@@ -105,6 +108,7 @@ namespace UtilitiesCS
             }
         }
 
+        [ExcludeFromCodeCoverage]
         internal async void Loader_PropertyChanged(
             object sender,
             System.ComponentModel.PropertyChangedEventArgs e
@@ -138,6 +142,7 @@ namespace UtilitiesCS
             }
         }
 
+        [ExcludeFromCodeCoverage]
         internal async void Config_PropertyChanged(
             object sender,
             System.ComponentModel.PropertyChangedEventArgs e
@@ -169,6 +174,7 @@ namespace UtilitiesCS
             await ChangeDiskCallbackAsync(sender, e, sst, local, name, loader);
         }
 
+        [ExcludeFromCodeCoverage]
         private async Task UpdateLoaderConfigAsync(
             ISmartSerializableConfig config,
             SmartSerializableLoader loader
@@ -182,6 +188,7 @@ namespace UtilitiesCS
             await WriteConfigurationAsync();
         }
 
+        [ExcludeFromCodeCoverage]
         private async Task ChangeDiskCallbackAsync(
             object sender,
             PropertyChangedEventArgs e,
@@ -302,6 +309,7 @@ namespace UtilitiesCS
             return altLoader;
         }
 
+        [ExcludeFromCodeCoverage]
         public async Task ResetLoadManagerAsyncLazy()
         {
             if (Configuration is null)

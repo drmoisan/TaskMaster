@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -37,10 +38,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
                     ? $"{fileNameSeed}.json"
                     : $"{fileNameSeed}_{fileNameSuffix}.json";
                 disk.FileName = fileName;
-                if (File.Exists(disk.FilePath))
+                if (FileExists(disk.FilePath))
                 {
                     var item = JsonConvert.DeserializeObject<T>(
-                        File.ReadAllText(disk.FilePath),
+                        ReadAllText(disk.FilePath),
                         jsonSettings
                     );
                     return item;
@@ -77,14 +78,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
                     ? $"{fileNameSeed}.json"
                     : $"{fileNameSeed}_{fileNameSuffix}.json";
                 disk.FileName = fileName;
-                if (File.Exists(disk.FilePath))
+                if (FileExists(disk.FilePath))
                 {
-                    string fileText = null;
-                    using (var reader = File.OpenText(disk.FilePath))
-                    {
-                        fileText = await reader.ReadToEndAsync();
-                    }
-
+                    var fileText = await ReadAllTextAsync(disk.FilePath);
                     var item = JsonConvert.DeserializeObject<T>(fileText, jsonSettings);
                     return item;
                 }
@@ -111,9 +107,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 
             T item = default;
 
-            if (File.Exists(disk.FilePath))
+            if (FileExists(disk.FilePath))
             {
-                var fileText = await disk.ReadTextWithProgressAsync(
+                var fileText = await ReadTextWithProgressAsync(
+                    disk,
                     progress,
                     $"Reading {disk.FileName} Async: "
                 );
@@ -131,6 +128,42 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
                 }
             }
             return item;
+        }
+
+        protected virtual bool FileExists(string filePath)
+        {
+            return File.Exists(filePath);
+        }
+
+        [ExcludeFromCodeCoverage]
+        protected virtual void DeleteFile(string filePath)
+        {
+            File.Delete(filePath);
+        }
+
+        [ExcludeFromCodeCoverage]
+        protected virtual string ReadAllText(string filePath)
+        {
+            return File.ReadAllText(filePath);
+        }
+
+        [ExcludeFromCodeCoverage]
+        protected virtual async Task<string> ReadAllTextAsync(string filePath)
+        {
+            using (var reader = File.OpenText(filePath))
+            {
+                return await reader.ReadToEndAsync();
+            }
+        }
+
+        [ExcludeFromCodeCoverage]
+        protected virtual Task<string> ReadTextWithProgressAsync(
+            FilePathHelper disk,
+            ProgressTrackerPane progress,
+            string messagePrefix
+        )
+        {
+            return disk.ReadTextWithProgressAsync(progress, messagePrefix);
         }
 
         protected FilePathHelper GetDisk(
@@ -183,9 +216,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
                     : $"{fileNameSeed}_{fileNameSuffix}{fileExtension}";
 
                 disk.FileName = fileName;
-                if (File.Exists(disk.FilePath))
+                if (FileExists(disk.FilePath))
                 {
-                    File.Delete(disk.FilePath);
+                    DeleteFile(disk.FilePath);
                 }
                 await WriteTextsAsync(disk.FilePath, texts);
             }
@@ -242,7 +275,27 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             var serializer = JsonSerializer.Create(jsonSettings);
             var disk = GetDisk(fileNameSeed, fileNameSuffix, fileExtension);
 
-            await serializer.SerializeWithProgressAsync(
+            await SerializeWithProgressAsync(
+                serializer,
+                obj,
+                disk,
+                progress,
+                cancel,
+                progressPrefix
+            );
+        }
+
+        [ExcludeFromCodeCoverage]
+        protected virtual Task SerializeWithProgressAsync<T>(
+            JsonSerializer serializer,
+            T obj,
+            FilePathHelper disk,
+            ProgressTrackerPane progress,
+            CancellationToken cancel,
+            string progressPrefix
+        )
+        {
+            return serializer.SerializeWithProgressAsync(
                 obj,
                 disk,
                 progress,
@@ -253,16 +306,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 
         public virtual async Task WriteTextsAsync(string filePath, IEnumerable<string> texts)
         {
-            using (
-                FileStream sourceStream = new FileStream(
-                    filePath,
-                    FileMode.Append,
-                    FileAccess.Write,
-                    FileShare.None,
-                    bufferSize: 4096,
-                    useAsync: true
-                )
-            )
+            using (var sourceStream = CreateTextWriteStream(filePath))
             {
                 await texts
                     .ToAsyncEnumerable()
@@ -275,7 +319,21 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             ;
         }
 
-        internal virtual void SerializeAndSave<T>(
+        [ExcludeFromCodeCoverage]
+        protected virtual Stream CreateTextWriteStream(string filePath)
+        {
+            return new FileStream(
+                filePath,
+                FileMode.Append,
+                FileAccess.Write,
+                FileShare.None,
+                bufferSize: 4096,
+                useAsync: true
+            );
+        }
+
+        [ExcludeFromCodeCoverage]
+        protected internal virtual void SerializeAndSave<T>(
             T obj,
             JsonSerializer serializer,
             FilePathHelper disk

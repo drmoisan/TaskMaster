@@ -1,0 +1,28 @@
+# P2-T5 Evidence: MyBox.cs Affirmative-Path Tests
+
+Primary Test Method: ShowDialog_BoxIconNone_SeamReturnsOk_ReturnsOkResult
+Test File: UtilitiesCS.Test\Dialogs\MyBox_ShowDialog_Tests.cs
+Test Class: MyBox_ShowDialog_Tests
+
+## Supporting Test Methods Added
+
+- ShowDialog_BoxIconNone_SeamReturnsOk_ReturnsOkResult (primary)
+- ShowDialog_BoxIconCritical_SeamReturnsOk_ReturnsOkResult
+- ShowDialog_BoxIconWarning_SeamReturnsOk_ReturnsOkResult
+- ShowDialog_BoxIconQuestion_SeamReturnsOk_ReturnsOkResult
+- ShowDialog_MessageBoxIconError_SeamReturnsOk_ReturnsOkResult
+- ShowDialog_MessageBoxIconNone_SeamReturnsOk_ReturnsOkResult
+- ShowDialog_MessageBoxIconWarning_SeamReturnsOk_ReturnsOkResult
+- ShowDialog_MessageBoxIconQuestion_SeamReturnsOk_ReturnsOkResult
+- ShowDialog_MessageBoxIconInformation_SeamReturnsOk_ReturnsOkResult
+- ShowDialog_ConvenienceMessageBoxButtons_SeamReturnsOk_ReturnsExpectedResult
+- ShowDialog_ConvenienceActionDictionary_SeamReturnsOk_ReturnsExpectedResult
+- ShowDialog_ConvenienceGenericFunctionDict_SeamReturnsOk_ReturnsDefaultGroupResult
+- ShowDialog_DelegateButtonOverload_SeamReturnsOk_ReturnsOkResult
+
+## Coverage Result
+
+File: UtilitiesCS\Dialogs\MyBox.cs
+Line-rate: 0.922395 (92.2%)
+Threshold: >= 0.80
+Status: PASS

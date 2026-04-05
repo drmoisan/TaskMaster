@@ -8,9 +8,16 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 {
     public class FileInfoWrapper : IFileInfo
     {
-        private readonly FileInfo _fileInfo;
+        private readonly IFileInfo _fileInfo;
 
         public FileInfoWrapper(FileInfo fileInfo)
+            : this(
+                fileInfo is null
+                    ? throw new ArgumentNullException(nameof(fileInfo))
+                    : new PhysicalFileInfoAdapter(fileInfo)
+            ) { }
+
+        internal FileInfoWrapper(IFileInfo fileInfo)
         {
             _fileInfo = fileInfo ?? throw new ArgumentNullException(nameof(fileInfo));
         }
@@ -65,7 +72,7 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public string Name => _fileInfo.Name;
 
-        public IDirectoryInfo Directory => new DirectoryInfoWrapper(_fileInfo.Directory);
+        public IDirectoryInfo Directory => _fileInfo.Directory;
 
         public string DirectoryName => _fileInfo.DirectoryName;
 
@@ -84,12 +91,12 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public IFileInfo CopyTo(string destFileName)
         {
-            return new FileInfoWrapper(_fileInfo.CopyTo(destFileName));
+            return _fileInfo.CopyTo(destFileName);
         }
 
         public IFileInfo CopyTo(string destFileName, bool overwrite)
         {
-            return new FileInfoWrapper(_fileInfo.CopyTo(destFileName, overwrite));
+            return _fileInfo.CopyTo(destFileName, overwrite);
         }
 
         public FileStream Create()
@@ -159,9 +166,7 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public IFileInfo Replace(string destinationFileName, string destinationBackupFileName)
         {
-            return new FileInfoWrapper(
-                _fileInfo.Replace(destinationFileName, destinationBackupFileName)
-            );
+            return _fileInfo.Replace(destinationFileName, destinationBackupFileName);
         }
 
         public IFileInfo Replace(
@@ -170,12 +175,10 @@ namespace UtilitiesCS.HelperClasses.FileSystem
             bool ignoreMetadataErrors
         )
         {
-            return new FileInfoWrapper(
-                _fileInfo.Replace(
-                    destinationFileName,
-                    destinationBackupFileName,
-                    ignoreMetadataErrors
-                )
+            return _fileInfo.Replace(
+                destinationFileName,
+                destinationBackupFileName,
+                ignoreMetadataErrors
             );
         }
 

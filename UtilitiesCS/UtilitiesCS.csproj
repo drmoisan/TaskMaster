@@ -490,6 +490,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.ReaderWriter, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -618,6 +619,8 @@
     <Compile Include="HelperClasses\CloningFunctions\DispatchUtility.cs" />
     <Compile Include="HelperClasses\FileSystem\DirectoryInfoWrapper.cs" />
     <Compile Include="HelperClasses\FileSystem\FileInfoWrapper.cs" />
+    <Compile Include="HelperClasses\FileSystem\PhysicalDirectoryInfoAdapter.cs" />
+    <Compile Include="HelperClasses\FileSystem\PhysicalFileInfoAdapter.cs" />
     <Compile Include="HelperClasses\FileSystem\FileSystemInfoWrapper.cs" />
     <Compile Include="HelperClasses\FileSystem\ShellUtilities.cs" />
     <Compile Include="HelperClasses\FileSystem\SysImageListHelper.cs" />
@@ -845,6 +848,7 @@
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEncoder.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEntry.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapSco.cs" />
+    <Compile Include="EmailIntelligence\SubjectMap\SubjectMapSco.Orchestration.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\DfDeedle.cs" />
     <Compile Include="Extensions\DfMLNet.cs" />
@@ -958,10 +962,7 @@
     <Compile Include="Threading\ThreadSafeSingleShotGuard.cs" />
     <Compile Include="Threading\TimeOutTask.cs" />
     <Compile Include="Threading\UiThread.cs" />
-    <Compile Include="To Depricate\CSVDictUtilities.cs" />
     <Compile Include="To Depricate\FileIO2.cs" />
-    <Compile Include="To Depricate\FlattenArray.cs" />
-    <Compile Include="To Depricate\StackObjectVB.cs" />
     <Compile Include="To Depricate\StringManipulation.cs" />
     <Compile Include="HelperClasses\Windows Forms\ControlPosition.cs" />
     <Compile Include="HelperClasses\Windows Forms\ImageHelper.cs" />
@@ -978,10 +979,6 @@
     <ProjectReference Include="..\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj">
       <Project>{f2e1680e-1b15-4cf2-bab0-54b8c8f6abdf}</Project>
       <Name>UtilitiesSwordfish.NET.General</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\VBFunctions\VBFunctions.csproj">
-      <Project>{c10dbd94-a7f6-43bc-8630-43002722d130}</Project>
-      <Name>VBFunctions</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

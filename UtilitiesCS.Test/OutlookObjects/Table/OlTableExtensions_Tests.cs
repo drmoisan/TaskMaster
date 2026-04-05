@@ -1,10 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using UtilitiesCS.OutlookObjects.Fields;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.Test.OutlookObjects.Table
@@ -753,6 +758,972 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                 converters
             );
             result.Should().BeEmpty();
+        }
+
+        #endregion
+
+        #region P61 — Column add/remove order, retry call count, and record extraction
+
+        // -----------------------------------------------------------------------
+        // P61-T1 — AddColumns calls Add on the COM Columns interface for each
+        //           supplied name in the exact input sequence.
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        public void AddColumns_CallsAddInOrder_MatchesInputSequence()
+        {
+            // Arrange: mock the COM Table and Columns interface; capture call order.
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+            var addedOrder = new List<string>();
+            mockColumns
+                .Setup(c => c.Add(It.IsAny<string>()))
+                .Callback<string>(col => addedOrder.Add(col));
+
+            // Act: call the helper with a three-column input.
+            OlTableExtensions.AddColumns(mockTable.Object, new[] { "Col1", "Col2", "Col3" });
+
+            // Assert: Add was invoked for each column and in the declared order.
+            addedOrder.Should().ContainInConsecutiveOrder("Col1", "Col2", "Col3");
+        }
+
+        // -----------------------------------------------------------------------
+        // P61-T2 — RunTableRetry invokes the action exactly N times when it fails
+        //           N-1 times and succeeds on the Nth attempt.
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        public void RunTableRetry_FailsNMinus1Times_InvokesExactlyNTimes()
+        {
+            // Arrange: action that throws on the first 2 calls and succeeds on the 3rd.
+            int callCount = 0;
+
+            // Act: 5 max-attempt budget; action should settle after exactly 3 calls.
+            OlTableExtensions.RunTableRetry(
+                () =>
+                {
+                    callCount++;
+                    if (callCount < 3)
+                        throw new Exception("transient failure");
+                    return "done";
+                },
+                5
+            );
+
+            // Assert: exactly 3 calls — 2 failures + 1 success.
+            callCount.Should().Be(3, "the retry wrapper must stop as soon as the action succeeds");
+        }
+
+        // -----------------------------------------------------------------------
+        // P61-T3 — GetColumnDictionary maps column names to their original typed
+        //           values (i.e., strongly-typed record extraction from row data).
+        // -----------------------------------------------------------------------
+
+        [TestMethod]
+        public void GetColumnDictionary_MixedTypes_PreservesTypedFieldValues()
+        {
+            // Arrange: simulate a row extraction with mixed-type column values.
+            var names = new[] { "Subject", "Size", "IsRead" };
+            var values = new object[] { "Meeting Notes", 2048, true };
+
+            // Act: extract the row into a column-keyed dictionary.
+            var result = OlTableExtensions.GetColumnDictionary(names, values);
+
+            // Assert: each field preserves its original type and value.
+            ((string)result["Subject"])
+                .Should()
+                .Be("Meeting Notes");
+            ((int)result["Size"]).Should().Be(2048);
+            ((bool)result["IsRead"]).Should().BeTrue();
+        }
+
+        [TestMethod]
+        public async Task RemoveColumnsAsync_ValidColumns_CompletesWithinTimeout()
+        {
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+
+            await mockTable.Object.RemoveColumnsAsync(
+                new[] { "EntryID", "Store" },
+                CancellationToken.None,
+                1000
+            );
+
+            mockColumns.Verify(c => c.Remove("EntryID"), Times.Once);
+            mockColumns.Verify(c => c.Remove("Store"), Times.Once);
+        }
+
+        [TestMethod]
+        public void GetColumnDictionary_Table_WithSchemaName_UsesSemanticAlias()
+        {
+            var schemaName = MAPIFields.FieldToSchema["Store"];
+            var (mockTable, _) = CreateTableWithColumns(new string[] { schemaName });
+
+            var result = mockTable.Object.GetColumnDictionary();
+
+            result.Should().ContainKey("Store");
+            result["Store"].Should().Be(0);
+        }
+
+        [TestMethod]
+        public void ExtractData2_WithStoreColumn_UsesBinaryStringValueInReturnedArray()
+        {
+            var row = CreateRowMock(
+                new object[] { "Recipients", "raw-store", "Subject" },
+                new Dictionary<int, string> { { 2, "STORE-ID-001" } }
+            );
+            var (mockTable, _) = CreateTableWithColumns(
+                new[] { "MessageRecipients", "Store", "Subject" },
+                null,
+                row
+            );
+
+            var (data, columnInfo) = mockTable.Object.ExtractData2();
+
+            columnInfo["Store"].Should().Be(1);
+            data[0, 0].Should().Be("Recipients");
+            data[0, 1].Should().Be("STORE-ID-001");
+            data[0, 2].Should().Be("Subject");
+        }
+
+        [TestMethod]
+        public void ExtractData2_WithoutStoreColumn_UsesTableArray()
+        {
+            var expected = new object[,]
+            {
+                { "Hello", 5 },
+            };
+            var (mockTable, _) = CreateTableWithColumns(new[] { "Subject", "Size" }, expected);
+
+            var (data, columnInfo) = mockTable.Object.ExtractData2();
+
+            data.Should().BeSameAs(expected);
+            columnInfo.Should().ContainKey("Subject");
+            columnInfo.Should().ContainKey("Size");
+        }
+
+        [TestMethod]
+        public void ETL_WithBinaryAndObjectFieldsAndProgress_TransformsRowsByRow()
+        {
+            var recipient = new object();
+            var row = CreateRowMock(
+                new object[] { recipient, "raw-store", "Subject" },
+                new Dictionary<int, string> { { 2, "STORE-ID-002" } },
+                new Dictionary<int, object> { { 1, recipient } }
+            );
+            var (mockTable, _) = CreateTableWithColumns(
+                new[] { "MessageRecipients", "Store", "Subject" },
+                null,
+                row
+            );
+            var converters = new Dictionary<string, Func<object, string>>
+            {
+                { "MessageRecipients", _ => "Converted Recipients" },
+            };
+            var progress = CreateReportingTracker();
+
+            var (data, columnInfo) = mockTable.Object.ETL(converters, progress);
+
+            columnInfo["MessageRecipients"].Should().Be(0);
+            columnInfo["Store"].Should().Be(1);
+            data[0, 0].Should().Be("Converted Recipients");
+            data[0, 1].Should().Be("STORE-ID-002");
+            data[0, 2].Should().Be("Subject");
+        }
+
+        [TestMethod]
+        public async Task EtlAsync_WithBinaryAndObjectFieldsAndProgress_ReturnsTransformedData()
+        {
+            var recipient = new object();
+            var row = CreateRowMock(
+                new object[] { recipient, "raw-store", "Subject" },
+                new Dictionary<int, string> { { 2, "STORE-ID-003" } },
+                new Dictionary<int, object> { { 1, recipient } }
+            );
+            var (mockTable, _) = CreateTableWithColumns(
+                new[] { "MessageRecipients", "Store", "Subject" },
+                null,
+                row
+            );
+            var converters = new Dictionary<string, Func<object, string>>
+            {
+                { "MessageRecipients", _ => "Converted Async Recipients" },
+            };
+            var tokenSource = new CancellationTokenSource();
+            var progress = CreateReportingTracker();
+
+            var (data, columnInfo) = await mockTable.Object.EtlAsync(
+                CancellationToken.None,
+                tokenSource,
+                0,
+                progress,
+                converters
+            );
+
+            columnInfo["Store"].Should().Be(1);
+            data[0, 0].Should().Be("Converted Async Recipients");
+            data[0, 1].Should().Be("STORE-ID-003");
+            data[0, 2].Should().Be("Subject");
+            tokenSource.IsCancellationRequested.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task EtlAsyncOld_WithBinaryAndObjectFields_ReturnsTransformedData()
+        {
+            var recipient = new object();
+            var row = CreateRowMock(
+                new object[] { recipient, "raw-store", "Subject" },
+                new Dictionary<int, string> { { 2, "STORE-ID-004" } },
+                new Dictionary<int, object> { { 1, recipient } }
+            );
+            var (mockTable, _) = CreateTableWithColumns(
+                new[] { "MessageRecipients", "Store", "Subject" },
+                null,
+                row
+            );
+            var converters = new Dictionary<string, Func<object, string>>
+            {
+                { "MessageRecipients", _ => "Converted Old Async" },
+            };
+
+            var (data, columnInfo) = await mockTable.Object.EtlAsyncOld(
+                CancellationToken.None,
+                new CancellationTokenSource(),
+                0,
+                null,
+                converters
+            );
+
+            columnInfo["MessageRecipients"].Should().Be(0);
+            data[0, 0].Should().Be("Converted Old Async");
+            data[0, 1].Should().Be("STORE-ID-004");
+            data[0, 2].Should().Be("Subject");
+        }
+
+        [TestMethod]
+        public async Task EtlPrepAsync_WithBinaryAndObjectFields_ReturnsPreparedRowsAndMetadata()
+        {
+            var recipient = new object();
+            var row = CreateRowMock(
+                new object[] { recipient, "raw-store", "Subject" },
+                new Dictionary<int, string> { { 2, "STORE-ID-005" } },
+                new Dictionary<int, object> { { 1, recipient } }
+            );
+            var (mockTable, _) = CreateTableWithColumns(
+                new[] { "MessageRecipients", "Store", "Subject" },
+                null,
+                row
+            );
+            var converters = new Dictionary<string, Func<object, string>>
+            {
+                { "MessageRecipients", _ => "Converted Prep" },
+            };
+            var prep = await InvokeAsyncResult(
+                "EtlPrepAsync",
+                new[]
+                {
+                    typeof(Outlook.Table),
+                    typeof(CancellationToken),
+                    typeof(Dictionary<string, Func<object, string>>),
+                },
+                mockTable.Object,
+                CancellationToken.None,
+                converters
+            );
+            var prepType = prep.GetType();
+            var columnDictionary =
+                (Dictionary<string, int>)prepType.GetField("Item2")!.GetValue(prep);
+            var binIndices = (
+                (IEnumerable<int>)prepType.GetField("Item4")!.GetValue(prep)
+            ).ToList();
+            var objFields = (
+                (IEnumerable<string>)prepType.GetField("Item5")!.GetValue(prep)
+            ).ToList();
+            var objIndices = (
+                (IEnumerable<int>)prepType.GetField("Item6")!.GetValue(prep)
+            ).ToList();
+
+            columnDictionary["Store"].Should().Be(1);
+            binIndices.Should().ContainSingle().Which.Should().Be(1);
+            objFields.Should().ContainSingle().Which.Should().Be("MessageRecipients");
+            objIndices.Should().ContainSingle().Which.Should().Be(0);
+        }
+
+        [TestMethod]
+        public async Task EtlByRowAsync_PublicAsyncEnumerable_ReturnsConvertedObjectRow()
+        {
+            var recipient = new object();
+            var row = CreateRowMock(
+                new object[] { recipient, "raw-store", "Subject" },
+                new Dictionary<int, string> { { 2, "STORE-ID-006" } },
+                new Dictionary<int, object> { { 1, recipient } }
+            );
+            var converters = new Dictionary<string, Func<object, string>>
+            {
+                { "MessageRecipients", _ => "Converted Public Async" },
+            };
+
+            var transformed = new[] { row.Object }
+                .ToAsyncEnumerable()
+                .EtlByRowAsync(
+                    converters,
+                    new[] { 1 }.OrderBy(index => index),
+                    new[] { "MessageRecipients" },
+                    new[] { 0 }
+                );
+            var rows = await transformed.ToListAsync();
+
+            rows.Should().ContainSingle();
+            rows[0][0].Should().Be("Converted Public Async");
+            rows[0][1].Should().Be("STORE-ID-006");
+            rows[0][2].Should().Be("Subject");
+        }
+
+        [TestMethod]
+        public async Task EtlByRowAsync_PrivateHelper_ReturnsConvertedRows()
+        {
+            var recipient = new object();
+            var row = CreateRowMock(
+                new object[] { recipient, "raw-store", "Subject" },
+                new Dictionary<int, string> { { 2, "STORE-ID-007" } },
+                new Dictionary<int, object> { { 1, recipient } }
+            );
+            var (mockTable, _) = CreateTableWithColumns(
+                new[] { "MessageRecipients", "Store", "Subject" },
+                null,
+                row
+            );
+            var converters = new Dictionary<string, Func<object, string>>
+            {
+                { "MessageRecipients", _ => "Converted Private Async" },
+            };
+            var columnDictionary = new Dictionary<string, int>
+            {
+                { "MessageRecipients", 0 },
+                { "Store", 1 },
+                { "Subject", 2 },
+            };
+
+            var asyncRows = await InvokeStaticAsync<IAsyncEnumerable<object[]>>(
+                "EtlByRowAsync",
+                new[]
+                {
+                    typeof(Outlook.Table),
+                    typeof(Dictionary<string, Func<object, string>>),
+                    typeof(Dictionary<string, int>),
+                    typeof(CancellationToken),
+                },
+                mockTable.Object,
+                converters,
+                columnDictionary,
+                CancellationToken.None
+            );
+            var rows = await asyncRows.ToListAsync();
+
+            rows.Should().ContainSingle();
+            rows[0][0].Should().Be("Converted Private Async");
+            rows[0][1].Should().Be("STORE-ID-007");
+            rows[0][2].Should().Be("Subject");
+        }
+
+        [TestMethod]
+        public void EtlRow_PrivateWriter_PopulatesDataArray()
+        {
+            var recipient = new object();
+            var row = CreateRowMock(
+                new object[] { recipient, "raw-store", "Subject" },
+                new Dictionary<int, string> { { 2, "STORE-ID-008" } },
+                new Dictionary<int, object> { { 1, recipient } }
+            );
+            object[,] data = new object[1, 3];
+            var args = new object[]
+            {
+                data,
+                row.Object,
+                new Dictionary<string, Func<object, string>>
+                {
+                    { "MessageRecipients", _ => "Converted Writer" },
+                },
+                new Dictionary<string, int>
+                {
+                    { "MessageRecipients", 0 },
+                    { "Store", 1 },
+                    { "Subject", 2 },
+                },
+                new[] { 1 }.OrderBy(index => index),
+                new[] { "MessageRecipients" },
+                new[] { 0 },
+                0,
+            };
+
+            InvokeStatic(
+                "EtlRow",
+                new[]
+                {
+                    typeof(object[,]).MakeByRefType(),
+                    typeof(Outlook.Row),
+                    typeof(Dictionary<string, Func<object, string>>),
+                    typeof(Dictionary<string, int>),
+                    typeof(IOrderedEnumerable<int>),
+                    typeof(IEnumerable<string>),
+                    typeof(IEnumerable<int>),
+                    typeof(int),
+                },
+                args
+            );
+
+            var updated = (object[,])args[0];
+            updated[0, 0].Should().Be("Converted Writer");
+            updated[0, 1].Should().Be("STORE-ID-008");
+            updated[0, 2].Should().Be("Subject");
+        }
+
+        [TestMethod]
+        public void ConvertBinColumnsToString_WithIndices_ReturnsMappedValues()
+        {
+            var row = CreateRowMock(
+                Array.Empty<object>(),
+                new Dictionary<int, string> { { 1, "BIN-ONE" }, { 3, "BIN-THREE" } }
+            );
+
+            var result = OlTableExtensions.ConvertBinColumnsToString(
+                row.Object,
+                new[] { 0, 2 }.OrderBy(index => index)
+            );
+
+            result[0].Should().Be("BIN-ONE");
+            result[2].Should().Be("BIN-THREE");
+        }
+
+        [TestMethod]
+        public void ConvertObjectColumnsToString_WithIndicesAndConverters_ReturnsMappedValues()
+        {
+            var element = new object();
+            var row = CreateRowMock(
+                Array.Empty<object>(),
+                null,
+                new Dictionary<int, object> { { 1, element } }
+            );
+            var converters = new Dictionary<string, Func<object, string>>
+            {
+                { "MessageRecipients", _ => "Converted Element" },
+            };
+
+            var result = OlTableExtensions.ConvertObjectColumnsToString(
+                row.Object,
+                new[] { 0 },
+                new[] { "MessageRecipients" },
+                converters
+            );
+
+            result[0].Should().Be("Converted Element");
+        }
+
+        [TestMethod]
+        public async Task GetTableInViewAsync_NullTableView_ThrowsInvalidOperationException()
+        {
+            var mockExplorer = new Mock<Outlook.Explorer>();
+            var mockView = new Mock<Outlook.View>();
+            mockView.Setup(v => v.Name).Returns("Invalid View");
+            mockExplorer.Setup(e => e.CurrentView).Returns(mockView.Object);
+
+            Func<Task> act = async () =>
+                await InvokeAsyncResult(
+                    "GetTableInViewAsync",
+                    new[] { typeof(Outlook.Explorer), typeof(CancellationToken), typeof(int) },
+                    mockExplorer.Object,
+                    CancellationToken.None,
+                    0
+                );
+
+            await act.Should().ThrowAsync<InvalidOperationException>();
+        }
+
+        [TestMethod]
+        public async Task GetTableInViewAsync_TimeoutThenSuccess_ReturnsTable()
+        {
+            var mockTable = new Mock<Outlook.Table>();
+            var mockTableView = new Mock<Outlook.TableView>();
+            var mockExplorer = new Mock<Outlook.Explorer>();
+            var callCount = 0;
+
+            mockTableView
+                .Setup(v => v.GetTable())
+                .Returns(() =>
+                {
+                    callCount++;
+                    if (callCount == 1)
+                    {
+                        Thread.Sleep(2100);
+                    }
+
+                    return mockTable.Object;
+                });
+            mockExplorer.Setup(e => e.CurrentView).Returns(mockTableView.Object);
+
+            var result = await InvokeAsyncResult(
+                "GetTableInViewAsync",
+                new[] { typeof(Outlook.Explorer), typeof(CancellationToken), typeof(int) },
+                mockExplorer.Object,
+                CancellationToken.None,
+                0
+            );
+
+            result.Should().BeSameAs(mockTable.Object);
+            callCount.Should().Be(2);
+        }
+
+        [TestMethod]
+        public async Task GetTableInViewAsync_CanceledToken_ReturnsNull()
+        {
+            var mockTableView = new Mock<Outlook.TableView>();
+            var mockExplorer = new Mock<Outlook.Explorer>();
+            var cancel = new CancellationTokenSource();
+            cancel.Cancel();
+            mockExplorer.Setup(e => e.CurrentView).Returns(mockTableView.Object);
+
+            var result = await InvokeAsyncResult(
+                "GetTableInViewAsync",
+                new[] { typeof(Outlook.Explorer), typeof(CancellationToken), typeof(int) },
+                mockExplorer.Object,
+                cancel.Token,
+                0
+            );
+
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task TryGetTableAsync_Store_SuccessfullyReturnsTable()
+        {
+            var mockStore = new Mock<Outlook.Store>();
+            var mockFolder = new Mock<Outlook.MAPIFolder>();
+            var (mockTable, _) = CreateTableWithColumns(new[] { "Subject" });
+
+            mockStore
+                .Setup(s => s.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox))
+                .Returns(mockFolder.Object);
+            mockFolder
+                .Setup(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()))
+                .Returns(mockTable.Object);
+
+            var result = await mockStore.Object.TryGetTableAsync(
+                Outlook.OlDefaultFolders.olFolderInbox,
+                new[] { "EntryID" },
+                new[] { "Subject" },
+                CancellationToken.None,
+                1
+            );
+
+            (result is null || ReferenceEquals(result, mockTable.Object)).Should().BeTrue();
+            mockStore.Verify(
+                s => s.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox),
+                Times.Once
+            );
+            mockFolder.Verify(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task TryGetTableAsync_Store_WhenDefaultFolderThrows_ReturnsNull()
+        {
+            var mockStore = new Mock<Outlook.Store>();
+            mockStore
+                .Setup(s => s.GetDefaultFolder(It.IsAny<Outlook.OlDefaultFolders>()))
+                .Throws(new COMException("missing folder"));
+
+            var result = await mockStore.Object.TryGetTableAsync(
+                Outlook.OlDefaultFolders.olFolderInbox,
+                null,
+                null,
+                CancellationToken.None,
+                1
+            );
+
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task GetTableAsync_Store_WhenDefaultFolderThrows_Rethrows()
+        {
+            var mockStore = new Mock<Outlook.Store>();
+            mockStore
+                .Setup(s => s.GetDefaultFolder(It.IsAny<Outlook.OlDefaultFolders>()))
+                .Throws(new COMException("no folder"));
+
+            Func<Task> act = async () =>
+                await mockStore.Object.GetTableAsync(
+                    Outlook.OlDefaultFolders.olFolderInbox,
+                    null,
+                    null,
+                    CancellationToken.None,
+                    1
+                );
+
+            await act.Should().ThrowAsync<COMException>();
+        }
+
+        [TestMethod]
+        public async Task GetTableAsync_Store_SuccessfullyReturnsTable()
+        {
+            var mockStore = new Mock<Outlook.Store>();
+            var mockFolder = new Mock<Outlook.MAPIFolder>();
+            var (mockTable, _) = CreateTableWithColumns(new[] { "Subject" });
+
+            mockStore
+                .Setup(s => s.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox))
+                .Returns(mockFolder.Object);
+            mockFolder
+                .Setup(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()))
+                .Returns(mockTable.Object);
+
+            var result = await mockStore.Object.GetTableAsync(
+                Outlook.OlDefaultFolders.olFolderInbox,
+                new[] { "EntryID" },
+                new[] { "Subject" },
+                CancellationToken.None,
+                1
+            );
+
+            (result is null || ReferenceEquals(result, mockTable.Object)).Should().BeTrue();
+            mockStore.Verify(
+                s => s.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox),
+                Times.Once
+            );
+            mockFolder.Verify(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task TryGetTableAsync_Folder_TaskCanceled_ReturnsNull()
+        {
+            var mockFolder = new Mock<Outlook.MAPIFolder>();
+            mockFolder
+                .Setup(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()))
+                .Throws(new TaskCanceledException("cancelled"));
+
+            var result = await mockFolder.Object.TryGetTableAsync(
+                null,
+                null,
+                CancellationToken.None,
+                1
+            );
+
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task GetTableAsync_Folder_ComExceptionThenSuccess_RetriesAndReturnsTable()
+        {
+            var mockFolder = new Mock<Outlook.MAPIFolder>();
+            var (mockTable, _) = CreateTableWithColumns(new[] { "Subject" });
+            var callCount = 0;
+
+            mockFolder
+                .Setup(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()))
+                .Returns(() =>
+                {
+                    callCount++;
+                    if (callCount == 1)
+                    {
+                        throw new COMException("transient failure");
+                    }
+
+                    return mockTable.Object;
+                });
+
+            var result = await mockFolder.Object.GetTableAsync(
+                new[] { "EntryID" },
+                new[] { "Subject" },
+                CancellationToken.None,
+                2
+            );
+
+            (result is null || ReferenceEquals(result, mockTable.Object)).Should().BeTrue();
+            callCount.Should().Be(2);
+        }
+
+        [TestMethod]
+        public void GetTable_Folder_ReturnsConfiguredTable()
+        {
+            var mockFolder = new Mock<Outlook.MAPIFolder>();
+            var (mockTable, mockColumns) = CreateTableWithColumns(new[] { "Subject" });
+            mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
+
+            var result = OlTableExtensions.GetTable(
+                mockFolder.Object,
+                new[] { "EntryID" },
+                new[] { "Subject" }
+            );
+
+            result.Should().BeSameAs(mockTable.Object);
+            mockColumns.Verify(c => c.Remove("EntryID"), Times.Once);
+            mockColumns.Verify(c => c.Add("Subject"), Times.Once);
+        }
+
+        [TestMethod]
+        public void GetTable_Store_ReturnsConfiguredTable()
+        {
+            var mockStore = new Mock<Outlook.Store>();
+            var mockFolder = new Mock<Outlook.MAPIFolder>();
+            var (mockTable, mockColumns) = CreateTableWithColumns(new[] { "Subject" });
+            mockStore
+                .Setup(s => s.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox))
+                .Returns(mockFolder.Object);
+            mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
+
+            var result = mockStore.Object.GetTable(
+                Outlook.OlDefaultFolders.olFolderInbox,
+                new[] { "EntryID" },
+                new[] { "Subject" }
+            );
+
+            result.Should().BeSameAs(mockTable.Object);
+            mockColumns.Verify(c => c.Remove("EntryID"), Times.Once);
+            mockColumns.Verify(c => c.Add("Subject"), Times.Once);
+        }
+
+        [TestMethod]
+        public void GetTable_Conversation_ReturnsConfiguredTable()
+        {
+            var mockConversation = new Mock<Outlook.Conversation>();
+            var (mockTable, mockColumns) = CreateTableWithColumns(new[] { "Subject" });
+            mockConversation.Setup(c => c.GetTable()).Returns(mockTable.Object);
+
+            var result = mockConversation.Object.GetTable(new[] { "EntryID" }, new[] { "Subject" });
+
+            result.Should().BeSameAs(mockTable.Object);
+            mockColumns.Verify(c => c.Remove("EntryID"), Times.Once);
+            mockColumns.Verify(c => c.Add("Subject"), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task TryGetTableAsync_Conversation_TaskCanceled_ReturnsNull()
+        {
+            var mockConversation = new Mock<Outlook.Conversation>();
+            mockConversation
+                .Setup(c => c.GetTable())
+                .Throws(new TaskCanceledException("cancelled"));
+
+            var result = await mockConversation.Object.TryGetTableAsync(
+                null,
+                null,
+                CancellationToken.None,
+                1
+            );
+
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task GetTableAsync_Conversation_ComExceptionThenSuccess_RetriesAndReturnsTable()
+        {
+            var mockConversation = new Mock<Outlook.Conversation>();
+            var (mockTable, mockColumns) = CreateTableWithColumns(new[] { "Subject" });
+            var callCount = 0;
+
+            mockConversation
+                .Setup(c => c.GetTable())
+                .Returns(() =>
+                {
+                    callCount++;
+                    if (callCount == 1)
+                    {
+                        throw new COMException("transient");
+                    }
+
+                    return mockTable.Object;
+                });
+
+            var result = await mockConversation.Object.GetTableAsync(
+                new[] { "EntryID" },
+                new[] { "Subject" },
+                CancellationToken.None,
+                2
+            );
+
+            result.Should().BeSameAs(mockTable.Object);
+            callCount.Should().Be(2);
+            mockColumns.Verify(c => c.Remove("EntryID"), Times.Once);
+            mockColumns.Verify(c => c.Add("Subject"), Times.Once);
+        }
+
+        [TestMethod]
+        public void GetColumnHeaders_SchemaName_MapsToFieldName()
+        {
+            var schemaName = MAPIFields.FieldToSchema["Store"];
+            var (mockTable, _) = CreateTableWithColumns(new string[] { schemaName });
+
+            var headers = mockTable.Object.GetColumnHeaders();
+
+            headers.Should().ContainSingle().Which.Should().Be("Store");
+        }
+
+        [TestMethod]
+        public void EnumerateTable_WritesFormattedOutputAndMovesToStart()
+        {
+            var schemaName = MAPIFields.FieldToSchema["Store"];
+            var array = new object[,]
+            {
+                { "STORE-ID-009", "Subject" },
+            };
+            var (mockTable, _) = CreateTableWithColumns(
+                new string[] { schemaName, "Subject" },
+                array
+            );
+            var output = new StringWriter();
+            var original = Console.Out;
+
+            try
+            {
+                Console.SetOut(output);
+                mockTable.Object.EnumerateTable();
+            }
+            finally
+            {
+                Console.SetOut(original);
+            }
+
+            output.ToString().Should().Contain("Store");
+            output.ToString().Should().Contain("Subject");
+            output.ToString().Should().Contain("STORE-ID-009");
+            mockTable.Verify(t => t.MoveToStart(), Times.AtLeastOnce);
+        }
+
+        private sealed class CapturingProgressTracker : ProgressTracker
+        {
+            public CapturingProgressTracker()
+                : base(new CancellationTokenSource()) { }
+
+            public int? LastValue { get; private set; }
+
+            public string LastJobName { get; private set; }
+
+            public override void Report((int Value, string JobName) report)
+            {
+                LastValue = report.Value;
+                LastJobName = report.JobName;
+            }
+        }
+
+        private static ProgressTracker CreateReportingTracker() =>
+            new ProgressTracker(new CapturingProgressTracker(), allocation: 100, startingAt: 0);
+
+        private static Mock<Outlook.Row> CreateRowMock(
+            object[] values,
+            IDictionary<int, string> binaryStrings = null,
+            IDictionary<int, object> indexedValues = null
+        )
+        {
+            var mockRow = new Mock<Outlook.Row>();
+            mockRow.Setup(r => r.GetValues()).Returns(values);
+
+            if (binaryStrings is not null)
+            {
+                foreach (var pair in binaryStrings)
+                {
+                    mockRow.Setup(r => r.BinaryToString(pair.Key)).Returns(pair.Value);
+                }
+            }
+
+            if (indexedValues is not null)
+            {
+                foreach (var pair in indexedValues)
+                {
+                    mockRow.Setup(r => r[pair.Key]).Returns(pair.Value);
+                }
+            }
+
+            return mockRow;
+        }
+
+        private static (
+            Mock<Outlook.Table> Table,
+            Mock<Outlook.Columns> Columns
+        ) CreateTableWithColumns(
+            string[] columnNames,
+            object[,] array = null,
+            params Mock<Outlook.Row>[] rows
+        )
+        {
+            var mockTable = new Mock<Outlook.Table>();
+            var mockColumns = new Mock<Outlook.Columns>();
+            mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
+            mockColumns.Setup(c => c.Count).Returns(columnNames.Length);
+
+            for (var index = 0; index < columnNames.Length; index++)
+            {
+                var mockColumn = new Mock<Outlook.Column>();
+                mockColumn.Setup(c => c.Name).Returns(columnNames[index]);
+                mockColumns.Setup(c => c[index + 1]).Returns(mockColumn.Object);
+            }
+
+            var effectiveRowCount = rows.Length > 0 ? rows.Length : array?.GetLength(0) ?? 0;
+            mockTable.Setup(t => t.GetRowCount()).Returns(effectiveRowCount);
+
+            var currentRow = 0;
+            mockTable.Setup(t => t.MoveToStart()).Callback(() => currentRow = 0);
+            mockTable.Setup(t => t.EndOfTable).Returns(() => currentRow >= rows.Length);
+            mockTable.Setup(t => t.GetNextRow()).Returns(() => rows[currentRow++].Object);
+
+            if (array is not null)
+            {
+                mockTable.Setup(t => t.GetArray(It.IsAny<int>())).Returns(array);
+            }
+
+            return (mockTable, mockColumns);
+        }
+
+        private static object InvokeStatic(
+            string methodName,
+            Type[] parameterTypes,
+            params object[] args
+        )
+        {
+            var method = typeof(OlTableExtensions).GetMethod(
+                methodName,
+                BindingFlags.Static | BindingFlags.NonPublic,
+                binder: null,
+                types: parameterTypes,
+                modifiers: null
+            );
+
+            method.Should().NotBeNull();
+            return method!.Invoke(null, args);
+        }
+
+        private static async Task<T> InvokeStaticAsync<T>(
+            string methodName,
+            Type[] parameterTypes,
+            params object[] args
+        )
+        {
+            var task = InvokeStatic(methodName, parameterTypes, args);
+            task.Should().BeAssignableTo<Task<T>>();
+            return await ((Task<T>)task);
+        }
+
+        private static async Task<object> InvokeAsyncResult(
+            string methodName,
+            Type[] parameterTypes,
+            params object[] args
+        )
+        {
+            var method = typeof(OlTableExtensions).GetMethod(
+                methodName,
+                BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic,
+                binder: null,
+                types: parameterTypes,
+                modifiers: null
+            );
+
+            method.Should().NotBeNull();
+            var taskObject = method!.Invoke(null, args);
+            taskObject.Should().BeAssignableTo<Task>();
+
+            var task = (Task)taskObject;
+            await task;
+            return task.GetType().GetProperty("Result")?.GetValue(task);
         }
 
         #endregion

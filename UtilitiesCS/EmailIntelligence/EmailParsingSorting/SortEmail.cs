@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -35,6 +36,7 @@ namespace UtilitiesCS
             throw new NotImplementedException();
         }
 
+        [ExcludeFromCodeCoverage]
         public static async Task SortAsync(
             bool savePictures,
             string destinationFolderpath,
@@ -68,6 +70,7 @@ namespace UtilitiesCS
             }
         }
 
+        [ExcludeFromCodeCoverage]
         public static async Task SortAsync(
             IList<MailItem> mailItems,
             bool savePictures,
@@ -103,6 +106,7 @@ namespace UtilitiesCS
             }
         }
 
+        [ExcludeFromCodeCoverage]
         public static async Task SortAsync(
             IList<MailItemHelper> mailHelpers,
             bool savePictures,
@@ -171,6 +175,7 @@ namespace UtilitiesCS
                 .ConfigureAwait(false);
         }
 
+        [ExcludeFromCodeCoverage]
         public static async Task UpdatePredictiveEngineAsync(
             IList<MailItemHelper> mailHelpers,
             string destinationOlStem,
@@ -199,6 +204,7 @@ namespace UtilitiesCS
             await appGlobals.AF.Encoder.Encoder.SerializeAsync();
         }
 
+        [ExcludeFromCodeCoverage]
         public static async Task ProcessMailItemAsync(
             bool savePictures,
             string destinationOlStem,
@@ -286,6 +292,7 @@ namespace UtilitiesCS
             }
         }
 
+        [ExcludeFromCodeCoverage]
         public static async Task SortAsync(
             IList<MailItem> mailItems,
             bool savePictures,
@@ -432,6 +439,7 @@ namespace UtilitiesCS
             await appGlobals.AF.Encoder.Encoder.SerializeAsync();
         }
 
+        [ExcludeFromCodeCoverage]
         public static void Sort(
             IList<MailItem> mailItems,
             bool savePictures,
@@ -540,6 +548,7 @@ namespace UtilitiesCS
         }
 
         // Duplicative with QuickFiler but it is still mapped to main menu so I need to take it out
+        [ExcludeFromCodeCoverage]
         public static async Task UndoAsync(
             ScoStack<IMovedMailInfo> movedStack,
             IApplicationGlobals globals
@@ -613,6 +622,7 @@ namespace UtilitiesCS
 
         #region Helper Methods
 
+        [ExcludeFromCodeCoverage]
         internal static IEnumerable<AttachmentHelper> GetAttachmentsInfo(
             MailItem mailItem,
             string saveFsPath,
@@ -637,6 +647,7 @@ namespace UtilitiesCS
             return attachments;
         }
 
+        [ExcludeFromCodeCoverage]
         internal static IAsyncEnumerable<AttachmentHelper> GetAttachmentsInfoAsync(
             MailItem mailItem,
             string saveFsPath,
@@ -665,6 +676,7 @@ namespace UtilitiesCS
             return attachments;
         }
 
+        [ExcludeFromCodeCoverage]
         public static void SaveAttachment(this AttachmentHelper attachmentHelper)
         {
             if (File.Exists(attachmentHelper.FilePathSave))
@@ -725,6 +737,7 @@ namespace UtilitiesCS
             }
         }
 
+        [ExcludeFromCodeCoverage]
         public static async Task SaveAttachmentAsync(this AttachmentHelper attachmentHelper)
         {
             //TraceUtility.LogMethodCall(attachmentHelper);
@@ -787,6 +800,7 @@ namespace UtilitiesCS
             }
         }
 
+        [ExcludeFromCodeCoverage]
         public static async Task SaveAttachmentAsync(
             this AttachmentHelper attachmentHelper,
             string destinationPath
@@ -800,6 +814,7 @@ namespace UtilitiesCS
             await SaveAttachmentAsync(attachmentHelper);
         }
 
+        [ExcludeFromCodeCoverage]
         internal static async Task SaveCaseAsync(
             YesNoToAllResponse response,
             Attachment attachment,
@@ -848,6 +863,7 @@ namespace UtilitiesCS
             }
         }
 
+        [ExcludeFromCodeCoverage]
         internal static async Task<bool> TrySaveAttachmentAsync(
             this Attachment attachment,
             string filePathSave
@@ -920,6 +936,7 @@ namespace UtilitiesCS
             }
         }
 
+        [ExcludeFromCodeCoverage]
         internal static void SaveCase(
             YesNoToAllResponse response,
             Attachment attachment,
@@ -940,6 +957,7 @@ namespace UtilitiesCS
             }
         }
 
+        [ExcludeFromCodeCoverage]
         internal static bool IsPicture(this Attachment attachment)
         {
             var extension = Path.GetExtension(attachment.FileName);
@@ -956,6 +974,7 @@ namespace UtilitiesCS
         //    IApplicationGlobals appGlobals,
         //    string olAncestor,
         //    string fsAncestorEquivalent)
+        [ExcludeFromCodeCoverage]
         private static void ResolvePaths(
             IList<MailItem> mailItems,
             string destinationOlStem,
@@ -990,6 +1009,7 @@ namespace UtilitiesCS
             }
         }
 
+        [ExcludeFromCodeCoverage]
         private static void ResolvePaths(
             Folder currentFolder,
             string destinationOlStem,
@@ -1035,6 +1055,7 @@ namespace UtilitiesCS
             }
         }
 
+        [ExcludeFromCodeCoverage]
         internal static async Task SaveMessageAsMsgAsync(MailItem mailItem, string fsLocation)
         {
             //TraceUtility.LogMethodCall(mailItem, fsLocation);
@@ -1045,6 +1066,7 @@ namespace UtilitiesCS
             await Task.Run(() => mailItem.SaveAs(strPath, OlSaveAsType.olMSG));
         }
 
+        [ExcludeFromCodeCoverage]
         internal static void SaveMessageAsMSG(MailItem mailItem, string fsLocation)
         {
             var filenameSeed = FolderConverter.SanitizeFilename(mailItem.Subject);
@@ -1053,6 +1075,7 @@ namespace UtilitiesCS
             mailItem.SaveAs(strPath, OlSaveAsType.olMSG);
         }
 
+        [ExcludeFromCodeCoverage]
         internal static void SaveAttachmentsOld(
             MailItem mailItem,
             string fsLocation,
@@ -1268,6 +1291,7 @@ namespace UtilitiesCS
         #endregion
 
 
+        [ExcludeFromCodeCoverage]
         private static void PushToUndoStack(
             MailItem beforeMove,
             MailItem afterMove,
@@ -1279,6 +1303,7 @@ namespace UtilitiesCS
             _globals.AF.MovedMails.Push(info);
         }
 
+        [ExcludeFromCodeCoverage]
         private static void CaptureMoveDetails(
             MailItem mailItem,
             MailItem oMailTmp,
@@ -1293,6 +1318,7 @@ namespace UtilitiesCS
             _globals.Ol.EmailMoveWriter.Enqueue(output);
         }
 
+        [ExcludeFromCodeCoverage]
         private static string SanitizeArrayLineTSV(ref string[] strOutput)
         {
             //if (strOutput.IsInitialized())
@@ -1322,6 +1348,7 @@ namespace UtilitiesCS
             return result;
         }
 
+        [ExcludeFromCodeCoverage]
         public static void WriteCSV_StartNewFileIfDoesNotExist(
             string strFileName,
             string strFileLocation
@@ -1354,6 +1381,7 @@ namespace UtilitiesCS
             strAryOutput = null;
         }
 
+        [ExcludeFromCodeCoverage]
         private static void SanitizeArray(string[,] strAryOutput, ref string[] strOutput)
         {
             if (strAryOutput == null)

@@ -327,9 +327,9 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         [TestMethod]
-        public void CalculateScore_StringOverload_ByWords_ThrowsIndexOutOfRange()
+        public void CalculateScore_StringOverload_ByWords_ReturnsZeroAndPopulatesMatrix()
         {
-            // Arrange — production loop uses <= instead of < causing off-by-one
+            // Arrange
             var mockSettings = new Mock<IAppAutoFileObjects>();
             mockSettings.SetupGet(s => s.SmithWatterman_MatchScore).Returns(2);
             mockSettings.SetupGet(s => s.SmithWatterman_MismatchScore).Returns(-1);
@@ -337,23 +337,27 @@ namespace UtilitiesCS.Test.EmailIntelligence
             object[,] matrix = null;
 
             // Act
-            System.Action act = () =>
-                SmithWaterman.CalculateScore(
-                    "hello world",
-                    "hello world",
-                    ref matrix,
-                    mockSettings.Object,
-                    SmithWaterman.SW_Options.ByWords
-                );
+            var score = SmithWaterman.CalculateScore(
+                "hello world",
+                "hello world",
+                ref matrix,
+                mockSettings.Object,
+                SmithWaterman.SW_Options.ByWords
+            );
 
-            // Assert — documents existing off-by-one bug in matrix initialization loop
-            act.Should().Throw<IndexOutOfRangeException>();
+            // Assert
+            score.Should().Be(0);
+            matrix.Should().NotBeNull();
+            matrix[3, 1].Should().Be("hello");
+            matrix[4, 1].Should().Be("world");
+            matrix[1, 3].Should().Be("hello");
+            matrix[1, 4].Should().Be("world");
         }
 
         [TestMethod]
-        public void CalculateScore_StringOverload_ByLetters_ThrowsIndexOutOfRange()
+        public void CalculateScore_StringOverload_ByLetters_ReturnsZeroAndPopulatesMatrix()
         {
-            // Arrange — production loop uses <= instead of < causing off-by-one
+            // Arrange
             var mockSettings = new Mock<IAppAutoFileObjects>();
             mockSettings.SetupGet(s => s.SmithWatterman_MatchScore).Returns(2);
             mockSettings.SetupGet(s => s.SmithWatterman_MismatchScore).Returns(-1);
@@ -361,23 +365,25 @@ namespace UtilitiesCS.Test.EmailIntelligence
             object[,] matrix = null;
 
             // Act
-            System.Action act = () =>
-                SmithWaterman.CalculateScore(
-                    "abc",
-                    "axc",
-                    ref matrix,
-                    mockSettings.Object,
-                    SmithWaterman.SW_Options.ByLetters
-                );
+            var score = SmithWaterman.CalculateScore(
+                "abc",
+                "axc",
+                ref matrix,
+                mockSettings.Object,
+                SmithWaterman.SW_Options.ByLetters
+            );
 
-            // Assert — documents existing off-by-one bug in matrix initialization loop
-            act.Should().Throw<IndexOutOfRangeException>();
+            // Assert
+            score.Should().Be(0);
+            matrix.Should().NotBeNull();
+            matrix[3, 1].Should().Be("a");
+            matrix[5, 1].Should().Be("c");
         }
 
         [TestMethod]
-        public void CalculateScore_StringOverload_DifferentStrings_ThrowsIndexOutOfRange()
+        public void CalculateScore_StringOverload_DifferentStrings_ReturnsZero()
         {
-            // Arrange — production loop uses <= instead of < causing off-by-one
+            // Arrange
             var mockSettings = new Mock<IAppAutoFileObjects>();
             mockSettings.SetupGet(s => s.SmithWatterman_MatchScore).Returns(2);
             mockSettings.SetupGet(s => s.SmithWatterman_MismatchScore).Returns(-1);
@@ -385,17 +391,17 @@ namespace UtilitiesCS.Test.EmailIntelligence
             object[,] matrix = null;
 
             // Act
-            System.Action act = () =>
-                SmithWaterman.CalculateScore(
-                    "hello",
-                    "goodbye",
-                    ref matrix,
-                    mockSettings.Object,
-                    SmithWaterman.SW_Options.ByWords
-                );
+            var score = SmithWaterman.CalculateScore(
+                "hello",
+                "goodbye",
+                ref matrix,
+                mockSettings.Object,
+                SmithWaterman.SW_Options.ByWords
+            );
 
-            // Assert — documents existing off-by-one bug in matrix initialization loop
-            act.Should().Throw<IndexOutOfRangeException>();
+            // Assert
+            score.Should().Be(0);
+            matrix.Should().NotBeNull();
         }
 
         [TestMethod]

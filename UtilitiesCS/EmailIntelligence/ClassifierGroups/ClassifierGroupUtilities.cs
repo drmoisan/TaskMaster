@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -86,10 +87,10 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                     ? $"{fileNameSeed}.json"
                     : $"{fileNameSeed}_{fileNameSuffix}.json";
                 disk.FileName = fileName;
-                if (File.Exists(disk.FilePath))
+                if (FileExists(disk.FilePath))
                 {
                     var item = JsonConvert.DeserializeObject<T>(
-                        File.ReadAllText(disk.FilePath),
+                        ReadAllText(disk.FilePath),
                         jsonSettings
                     );
                     return item;
@@ -130,14 +131,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 ? $"{fileNameSeed}.json"
                 : $"{fileNameSeed}_{fileNameSuffix}.json";
             disk.FileName = fileName;
-            if (File.Exists(disk.FilePath))
+            if (FileExists(disk.FilePath))
             {
-                string fileText = null;
-                using (var reader = File.OpenText(disk.FilePath))
-                {
-                    fileText = await reader.ReadToEndAsync();
-                }
-
+                var fileText = await ReadAllTextAsync(disk.FilePath);
                 var item = JsonConvert.DeserializeObject<T>(fileText, jsonSettings);
                 return item;
             }
@@ -145,6 +141,39 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             {
                 return default(T);
             }
+        }
+
+        [ExcludeFromCodeCoverage]
+        internal virtual bool FileExists(string filePath)
+        {
+            return File.Exists(filePath);
+        }
+
+        [ExcludeFromCodeCoverage]
+        internal virtual string ReadAllText(string filePath)
+        {
+            return File.ReadAllText(filePath);
+        }
+
+        [ExcludeFromCodeCoverage]
+        internal virtual async Task<string> ReadAllTextAsync(string filePath)
+        {
+            using (var reader = File.OpenText(filePath))
+            {
+                return await reader.ReadToEndAsync();
+            }
+        }
+
+        [ExcludeFromCodeCoverage]
+        internal virtual void EnsureDirectoryExists(string folderPath)
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+
+        [ExcludeFromCodeCoverage]
+        internal virtual TextWriter CreateTextWriter(string filePath)
+        {
+            return File.CreateText(filePath);
         }
 
         internal virtual void SerializeAndSave<T>(
@@ -182,8 +211,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             FilePathHelper disk
         )
         {
-            Directory.CreateDirectory(disk.FolderPath);
-            using (StreamWriter sw = File.CreateText(disk.FilePath))
+            EnsureDirectoryExists(disk.FolderPath);
+            using (TextWriter sw = CreateTextWriter(disk.FilePath))
             {
                 serializer.Serialize(sw, obj);
                 disk.FileName = null;
@@ -198,8 +227,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         )
         {
             disk.FileName = $"{objName}_Example.json";
-            Directory.CreateDirectory(disk.FolderPath);
-            using (StreamWriter sw = File.CreateText(disk.FilePath))
+            EnsureDirectoryExists(disk.FolderPath);
+            using (TextWriter sw = CreateTextWriter(disk.FilePath))
             {
                 serializer.Serialize(sw, obj);
                 sw.Close();
@@ -207,6 +236,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             }
         }
 
+        [ExcludeFromCodeCoverage]
         internal virtual void LogSizeComparison(
             string m1,
             long s1,
@@ -226,6 +256,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             //logger.Debug($"Object size calculations:\n{text}");
         }
 
+        [ExcludeFromCodeCoverage]
         public virtual void SerializeActiveItem()
         {
             var (mailItem, s1) = TryLoadObjectAndGetMemorySize(() =>
@@ -241,6 +272,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             }
         }
 
+        [ExcludeFromCodeCoverage]
         internal virtual void SerializeMailInfo(MailItem mailItem)
         {
             var jsonSettings = new JsonSerializerSettings()
@@ -293,6 +325,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             SerializeFsSave(minedInfo, "MinedMailInfo", serializer, disk);
         }
 
+        [ExcludeFromCodeCoverage]
         internal virtual (T Object, long Size) TryLoadObjectAndGetMemorySize<T>(
             Func<T> loader,
             int copiesToLoad = 1
@@ -345,6 +378,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             return (obj, size);
         }
 
+        [ExcludeFromCodeCoverage]
         internal virtual JsonSerializer GetSerializer()
         {
             var jsonSettings = new JsonSerializerSettings()
@@ -364,7 +398,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         )
         {
             disk.FileName = $"MinedMailInfo_{i:000}.json";
-            using (StreamWriter sw = File.CreateText(disk.FilePath))
+            using (TextWriter sw = CreateTextWriter(disk.FilePath))
             {
                 serializer.Serialize(sw, chunk);
                 sw.Close();
@@ -420,6 +454,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         /// </summary>
         /// <param name="offline"></param>
         /// <returns></returns>
+        [ExcludeFromCodeCoverage]
         private async Task<bool> ToggleOfflineMode(bool offline)
         {
             if (!offline)

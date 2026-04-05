@@ -14,6 +14,7 @@ namespace UtilitiesCS.Test
     public class ResourceTests
     {
         [TestMethod]
+        [Ignore("Interactive form smoke test; excluded from unattended test runs.")]
         public void TestMethod1()
         {
             Form1 frm = new Form1();
@@ -21,6 +22,7 @@ namespace UtilitiesCS.Test
         }
 
         [TestMethod]
+        [Ignore("Interactive form smoke test; excluded from unattended test runs.")]
         public void TestMethod2()
         {
             Form2 frm = new Form2();
@@ -103,6 +105,7 @@ namespace UtilitiesCS.Test
         }
 
         [TestMethod]
+        [Ignore("Interactive form smoke test; excluded from unattended test runs.")]
         public void TestMethod5()
         {
             Form2 frm = new Form2();
