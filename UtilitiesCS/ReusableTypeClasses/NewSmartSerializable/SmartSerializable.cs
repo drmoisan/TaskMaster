@@ -38,6 +38,28 @@ namespace UtilitiesCS.ReusableTypeClasses
         }
 
         protected T _parent;
+        private Func<string, string> _readAllText = File.ReadAllText;
+        protected Func<string, string> ReadAllText
+        {
+            get => _readAllText;
+            set => _readAllText = value;
+        }
+
+        private Func<FilePathHelper, bool> _diskExists = disk => disk.Exists();
+        protected Func<FilePathHelper, bool> DiskExists
+        {
+            get => _diskExists;
+            set => _diskExists = value;
+        }
+
+        private Func<string, string, MessageBoxButtons, MessageBoxIcon, DialogResult> _showDialog =
+            (messageText, caption, buttons, icon) =>
+                MyBox.ShowDialog(messageText, caption, buttons, icon);
+        protected Func<string, string, MessageBoxButtons, MessageBoxIcon, DialogResult> ShowDialog
+        {
+            get => _showDialog;
+            set => _showDialog = value;
+        }
 
         #region SerializationConfig
 
@@ -136,7 +158,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             DialogResult response;
             if (askUserOnError)
             {
-                response = MyBox.ShowDialog(
+                response = ShowDialog(
                     messageText,
                     "Error",
                     MessageBoxButtons.YesNo,
@@ -353,16 +375,13 @@ namespace UtilitiesCS.ReusableTypeClasses
         protected T DeserializeJson(FilePathHelper disk, JsonSerializerSettings settings)
         {
             T instance = null;
-            if (!disk.Exists())
+            if (!DiskExists(disk))
             {
                 return instance;
             }
             try
             {
-                instance = JsonConvert.DeserializeObject<T>(
-                    File.ReadAllText(disk.FilePath),
-                    settings
-                );
+                instance = JsonConvert.DeserializeObject<T>(ReadAllText(disk.FilePath), settings);
             }
             catch (Exception e)
             {

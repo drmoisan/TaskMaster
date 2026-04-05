@@ -1,5 +1,7 @@
 using System;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -178,6 +180,76 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Assert
             result.Should().Be(5);
             awaiter.IsCompleted.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public async Task AsyncLazyPropertyCachedValues_ReturnsCachedValueFromInternalSampleAsync()
+        {
+            // Arrange
+            var type = GetUtilitiesType("UtilitiesCS.AsyncLazyPropertyCachedValues");
+            var instance = Activator.CreateInstance(type);
+            var property = type.GetProperty(
+                "MyProperty",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+
+            // Act
+            var result = await (dynamic)property.GetValue(instance);
+
+            // Assert
+            ((int)result)
+                .Should()
+                .Be(13);
+        }
+
+        [TestMethod]
+        public async Task AsyncLazyUsage_UseResource_CompletesForInternalSampleAsync()
+        {
+            // Arrange
+            var type = GetUtilitiesType("UtilitiesCS.AsyncLazyUsage");
+            var instance = Activator.CreateInstance(type);
+            var method = type.GetMethod("UseResource", BindingFlags.Instance | BindingFlags.Public);
+
+            // Act
+            var task = (Task)method.Invoke(instance, null);
+
+            // Assert
+            await task;
+        }
+
+        [TestMethod]
+        public async Task DataBoundValues_InitializeAsync_SetsPropertyAndRaisesChangeNotificationAsync()
+        {
+            // Arrange
+            var type = GetUtilitiesType("UtilitiesCS.DataBoundValues");
+            var instance = Activator.CreateInstance(type);
+            var propertyChanged = type.GetEvent("PropertyChanged");
+            var myProperty = type.GetProperty(
+                "MyProperty",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            var initializeAsync = type.GetMethod(
+                "InitializeAsync",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            string changedProperty = null;
+            PropertyChangedEventHandler handler = (sender, args) =>
+                changedProperty = args.PropertyName;
+            propertyChanged.AddEventHandler(instance, handler);
+
+            // Act
+            await (Task)initializeAsync.Invoke(instance, null);
+
+            // Assert
+            ((int?)myProperty.GetValue(instance))
+                .Should()
+                .Be(13);
+            changedProperty.Should().Be("MyProperty");
+        }
+
+        private static Type GetUtilitiesType(string fullName)
+        {
+            return typeof(AsyncLazy<int>).Assembly.GetType(fullName, throwOnError: true);
         }
 
         private sealed class SampleReferenceType

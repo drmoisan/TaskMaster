@@ -16,6 +16,39 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
+    internal interface ISerializableListFileSystem
+    {
+        string ReadAllText(string filePath);
+        StreamWriter CreateText(string filePath);
+    }
+
+    internal interface ISerializableListPrompt
+    {
+        DialogResult Show(
+            string messageText,
+            string caption,
+            MessageBoxButtons buttons,
+            MessageBoxIcon icon
+        );
+    }
+
+    internal sealed class SerializableListFileSystem : ISerializableListFileSystem
+    {
+        public string ReadAllText(string filePath) => File.ReadAllText(filePath);
+
+        public StreamWriter CreateText(string filePath) => File.CreateText(filePath);
+    }
+
+    internal sealed class SerializableListPrompt : ISerializableListPrompt
+    {
+        public DialogResult Show(
+            string messageText,
+            string caption,
+            MessageBoxButtons buttons,
+            MessageBoxIcon icon
+        ) => MessageBox.Show(messageText, caption, buttons, icon);
+    }
+
     [Serializable()]
     public class SerializableList<T> : IList<T>, ISerializableList<T>
         where T : IComparable<T>
@@ -59,6 +92,9 @@ namespace UtilitiesCS
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
+        internal static ISerializableListFileSystem FileSystem { get; set; } =
+            new SerializableListFileSystem();
+        internal static ISerializableListPrompt Prompt { get; set; } = new SerializableListPrompt();
         private IList<T> _innerList;
         private IEnumerable<T> _lazyLoader;
         private string _backupFilepath = "";
@@ -237,7 +273,8 @@ namespace UtilitiesCS
         public void Serialize(string filepath)
         {
             this.Filepath = filepath;
-            _ = Task.Run(() => SerializeThreadSafe(filepath));
+            var fileSystem = FileSystem;
+            QueueSerialize(filepath, fileSystem);
         }
 
         public async Task SerializeAsync()
@@ -255,20 +292,30 @@ namespace UtilitiesCS
         public async Task SerializeAsync(string filepath)
         {
             this.Filepath = filepath;
-            await Task.Run(() => SerializeThreadSafe(filepath));
+            var fileSystem = FileSystem;
+            await Task.Run(() => SerializeCore(filepath, fileSystem));
         }
 
         private static ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
 
-        public void SerializeThreadSafe(string filepath)
+        private void QueueSerialize(string filepath, ISerializableListFileSystem fileSystem)
         {
-            // Set Status to Locked
+            _ = Task.Run(() => SerializeCore(filepath, fileSystem));
+        }
+
+        /// <summary>
+        /// Serialize the list to <paramref name="filepath"/> on the calling thread, holding the
+        /// write lock for the duration. Callers that schedule this on a background thread must
+        /// pass the file-system dependency they captured at schedule time so the correct
+        /// implementation is used even if the seam is swapped after the task is queued.
+        /// </summary>
+        private void SerializeCore(string filepath, ISerializableListFileSystem fileSystem)
+        {
             if (_readWriteLock.TryEnterWriteLock(-1))
             {
                 try
                 {
-                    // Append text to the file
-                    using (StreamWriter sw = File.CreateText(filepath))
+                    using (StreamWriter sw = fileSystem.CreateText(filepath))
                     {
                         var settings = new JsonSerializerSettings();
                         settings.TypeNameHandling = TypeNameHandling.Auto;
@@ -285,10 +332,22 @@ namespace UtilitiesCS
                 }
                 finally
                 {
-                    // Release lock
                     _readWriteLock.ExitWriteLock();
                 }
             }
+        }
+
+        /// <summary>
+        /// Serialize the list to <paramref name="filepath"/> using the current
+        /// file-system seam, holding the write lock for the duration.
+        /// Intended for direct synchronous calls; for fire-and-forget or async use,
+        /// prefer <see cref="Serialize(string)"/> or <see cref="SerializeAsync(string)"/>,
+        /// which capture the dependency at call time.
+        /// </summary>
+        public void SerializeThreadSafe(string filepath)
+        {
+            var fileSystem = FileSystem;
+            SerializeCore(filepath, fileSystem);
         }
 
         public void Sort()
@@ -331,18 +390,22 @@ namespace UtilitiesCS
             if (_filepath != filepath)
                 this.Filepath = filepath;
 
+            var fileSystem = FileSystem;
+            var prompt = Prompt;
             DialogResult response = DialogResult.Ignore;
 
             try
             {
-                _innerList = JsonConvert.DeserializeObject<List<T>>(File.ReadAllText(filepath));
+                _innerList = JsonConvert.DeserializeObject<List<T>>(
+                    fileSystem.ReadAllText(filepath)
+                );
             }
             catch (FileNotFoundException e)
             {
                 log.Error(e.Message);
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(
+                    response = prompt.Show(
                         $"{filepath} not found. Load from backup?",
                         "File Not Found",
                         MessageBoxButtons.YesNo,
@@ -359,7 +422,7 @@ namespace UtilitiesCS
                 log.Error(e.Message);
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(
+                    response = prompt.Show(
                         $"{filepath} encountered a problem. {e.Message} " + " Load from backup?",
                         "Error!",
                         MessageBoxButtons.YesNo,
@@ -388,13 +451,13 @@ namespace UtilitiesCS
                         _innerList = backupLoader(Path.Combine(folder, filename));
                     }
                     NotifyPropertyChanged("BackupLoader");
-                    Serialize();
+                    QueueSerialize(Filepath, fileSystem);
                 }
                 else if (response == DialogResult.No)
                 {
                     if (askUserOnError)
                     {
-                        response = MessageBox.Show(
+                        response = prompt.Show(
                             "Need a list to continue. " + "Create a new List Or Stop Execution?",
                             "Error",
                             MessageBoxButtons.YesNo,
@@ -425,6 +488,8 @@ namespace UtilitiesCS
             if (_filepath != filepath)
                 this.Filepath = filepath;
 
+            var fileSystem = FileSystem;
+            var prompt = Prompt;
             DialogResult response = DialogResult.Ignore;
 
             try
@@ -433,7 +498,7 @@ namespace UtilitiesCS
                 settings.TypeNameHandling = TypeNameHandling.Auto;
                 settings.Formatting = Formatting.Indented;
                 _innerList = JsonConvert.DeserializeObject<List<T>>(
-                    File.ReadAllText(filepath),
+                    fileSystem.ReadAllText(filepath),
                     settings
                 );
                 if (_innerList is null)
@@ -447,7 +512,7 @@ namespace UtilitiesCS
                 log.Error($"File {filepath} does not exist.");
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(
+                    response = prompt.Show(
                         $"{filepath} not found. Create a new list? Excecution will stop if answer is no.",
                         "File Not Found",
                         MessageBoxButtons.YesNo,
@@ -464,7 +529,7 @@ namespace UtilitiesCS
                 log.Error($"Error! {e.Message}");
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(
+                    response = prompt.Show(
                         filepath
                             + " encountered a problem. "
                             + e.Message
@@ -484,7 +549,7 @@ namespace UtilitiesCS
                 if (response == DialogResult.Yes)
                 {
                     _innerList = new List<T> { };
-                    this.Serialize();
+                    QueueSerialize(Filepath, fileSystem);
                 }
                 else if (_innerList == null)
                 {

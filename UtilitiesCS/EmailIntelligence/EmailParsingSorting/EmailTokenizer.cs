@@ -616,7 +616,12 @@ namespace UtilitiesCS.EmailIntelligence
             // MimeKit seems like a promising library to explore later
 
             var codePage = itemInfo.InternetCodepage;
-            var charset = charsetCodebases.FirstOrDefault(x => x.Codepage == codePage).Charset;
+            // Use null-safe access: the lookup table may not contain an entry for every possible
+            // code page (e.g. 0 from a mock or an unlisted regional encoding), so guard against
+            // a missing match returning null and propagating into the yield.
+            var charset =
+                charsetCodebases.FirstOrDefault(x => x.Codepage == codePage)?.Charset
+                ?? string.Empty;
             yield return $"charset:{charset}";
 
             var attachments = itemInfo.AttachmentsInfo;

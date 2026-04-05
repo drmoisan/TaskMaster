@@ -107,7 +107,7 @@ namespace UtilitiesCS
 
         internal void SafeAction(Action action)
         {
-            if (_progressViewer.IsDisposed)
+            if (_progressViewer == null || _progressViewer.IsDisposed)
             {
                 return;
             }

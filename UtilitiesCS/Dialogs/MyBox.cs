@@ -20,6 +20,13 @@ namespace UtilitiesCS
 
     public static class MyBox
     {
+        /// <summary>
+        /// Replaceable dialog-invoker seam. The default implementation delegates to
+        /// <see cref="MyBoxViewer.ShowDialog()"/>; tests replace it with a non-modal stub.
+        /// </summary>
+        internal static Func<MyBoxViewer, DialogResult> DialogInvoker { get; set; } =
+            viewer => viewer.ShowDialog();
+
         public static DialogResult ShowDialog(
             string Message,
             string Title,
@@ -29,8 +36,9 @@ namespace UtilitiesCS
         {
             using (MyBoxViewer _viewer = new MyBoxViewer())
             {
-                _viewer.Show();
-                int columnWidth = _viewer.L2Bottom.GetColumnWidths()[1];
+                // Read the column width directly from the style: column 1 is always
+                // Absolute so its value is reliable without requiring the form to be shown.
+                int columnWidth = (int)_viewer.L2Bottom.ColumnStyles[1].Width;
                 _viewer.RemoveStandardButtons();
                 _viewer.Text = Title;
                 _viewer.TextMessage.Text = Message;
@@ -45,8 +53,7 @@ namespace UtilitiesCS
 
                 _viewer.MinimumSize = tmp;
                 _viewer.SetDialogIcon(icon);
-                _viewer.Hide();
-                DialogResult result = _viewer.ShowDialog();
+                DialogResult result = DialogInvoker(_viewer);
                 return result;
             }
         }
@@ -59,14 +66,12 @@ namespace UtilitiesCS
             IList<ActionButton> actionButtons
         )
         {
-            viewer.Show();
             ReplaceButtons(viewer, actionButtons);
             viewer.Text = Title;
             viewer.TextMessage.Text = Message;
             viewer.SetDialogIcon(icon);
-            viewer.Hide();
             viewer.TopMost = true;
-            DialogResult result = viewer.ShowDialog();
+            DialogResult result = DialogInvoker(viewer);
             return result;
         }
 
@@ -78,14 +83,12 @@ namespace UtilitiesCS
             FunctionButtonGroup<T> group
         )
         {
-            viewer.Show();
             ReplaceButtons(viewer, group.FunctionButtons);
             viewer.Text = Title;
             viewer.TextMessage.Text = Message;
             viewer.SetDialogIcon(icon);
-            viewer.Hide();
             viewer.TopMost = true;
-            DialogResult result = viewer.ShowDialog();
+            DialogResult result = DialogInvoker(viewer);
             return group.Result;
         }
 
@@ -97,14 +100,12 @@ namespace UtilitiesCS
             IList<ActionButton> actionButtons
         )
         {
-            viewer.Show();
             ReplaceButtons(viewer, actionButtons);
             viewer.Text = Title;
             viewer.TextMessage.Text = Message;
             viewer.SetDialogIcon(icon);
-            viewer.Hide();
             viewer.TopMost = true;
-            DialogResult result = viewer.ShowDialog();
+            DialogResult result = DialogInvoker(viewer);
             return result;
         }
 
@@ -146,7 +147,10 @@ namespace UtilitiesCS
 
         internal static void ReplaceButtons(MyBoxViewer viewer, IList<ActionButton> actionButtons)
         {
-            int columnWidth = viewer.L2Bottom.GetColumnWidths()[1];
+            // Read absolute column width from the style rather than from a layout-measured
+            // result; column 1 is always SizeType.Absolute and does not require the form
+            // to be visible before the value is valid.
+            int columnWidth = (int)viewer.L2Bottom.ColumnStyles[1].Width;
             viewer.RemoveStandardButtons();
 
             Size minSize = viewer.MinimumSize;
@@ -164,7 +168,8 @@ namespace UtilitiesCS
             IList<FunctionButton<T>> functionButtons
         )
         {
-            int columnWidth = viewer.L2Bottom.GetColumnWidths()[1];
+            // Same style-based read as the ActionButton overload; see comment there.
+            int columnWidth = (int)viewer.L2Bottom.ColumnStyles[1].Width;
             viewer.RemoveStandardButtons();
 
             Size minSize = viewer.MinimumSize;

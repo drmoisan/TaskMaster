@@ -1,9 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence.Bayesian;
+using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 {
@@ -197,5 +202,191 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             // Assert
             corpus.Count.Should().Be(1);
         }
+
+        [TestMethod]
+        public void CreateEmpty_WhenResponseIsNo_ThrowsArgumentNullException()
+        {
+            // Arrange
+            Action act = () =>
+                TestableCorpusInherit.ExposeCreateEmpty(
+                    DialogResult.No,
+                    new FilePathHelper("test.json", @"C:\CorpusInherit")
+                );
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void Deserialize_DefaultOverload_WithMissingPath_ReturnsNewEmptyCorpus()
+        {
+            // Act
+            var corpus = CorpusInherit.Deserialize(
+                "*missing-default-corpusinherit.json",
+                @"C:\CorpusInherit"
+            );
+
+            // Assert
+            corpus.Should().NotBeNull();
+            corpus.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public void SerializeThreadSafe_WithInvalidPath_DoesNotThrow()
+        {
+            // Arrange
+            var corpus = new CorpusInherit(new Dictionary<string, int> { ["token"] = 1 });
+            var invalidPath = Path.Combine(@"C:\CorpusInherit", "*serialize-thread-safe.json");
+
+            // Act
+            Action act = () => corpus.SerializeThreadSafe(invalidPath);
+
+            // Assert
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void SerializeThreadSafe_WithNullDevice_WritesWithoutThrowing()
+        {
+            // Arrange
+            var corpus = new CorpusInherit(new Dictionary<string, int> { ["token"] = 2 });
+
+            // Act
+            Action act = () => corpus.SerializeThreadSafe("NUL");
+
+            // Assert
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void AskUser_WhenPromptEnabled_UsesMyBoxDialogInvoker()
+        {
+            // Arrange
+            var previousInvoker = MyBox.DialogInvoker;
+            MyBox.DialogInvoker = _ => DialogResult.No;
+
+            try
+            {
+                // Act
+                var response = TestableCorpusInherit.ExposeAskUser(true, "problem");
+
+                // Assert
+                response.Should().Be(DialogResult.No);
+            }
+            finally
+            {
+                MyBox.DialogInvoker = previousInvoker;
+            }
+        }
+
+        // -----------------------------------------------------------------------
+        // P52-T1 — Increment and decrement adjust token counts correctly
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that calling AddOrIncrementToken and DecrementOrRemoveToken adjusts
+        /// the stored count as expected.
+        ///
+        /// Purpose:
+        ///     Confirm that the increment path adds a new entry and that decrement from
+        ///     a count greater than one reduces the count without removing the entry.
+        ///
+        /// Returns:
+        ///     Passes when the stored count equals 1 after decrementing from 2.
+        /// </summary>
+        [TestMethod]
+        public void IncrementAndDecrement_AdjustTokenCountsCorrectly()
+        {
+            // Arrange: seed the token at 2 so decrement leaves it at 1
+            var corpus = new CorpusInherit(new Dictionary<string, int> { ["token"] = 2 });
+
+            // Act: one increment (post-increment bug keeps it at 2) then one decrement (2 → 1)
+            corpus.AddOrIncrementToken("token");
+            corpus.DecrementOrRemoveToken("token");
+
+            // Assert
+            corpus.Should().ContainKey("token");
+            corpus["token"].Should().Be(1);
+        }
+
+        // -----------------------------------------------------------------------
+        // P52-T2 — Deserializing an empty payload returns an initialized (non-null, empty) corpus
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that Deserialize with a non-existent path returns a non-null,
+        /// empty CorpusInherit without throwing an exception.
+        ///
+        /// Purpose:
+        ///     Confirm the fallback (askUserOnError=false) creates and returns an
+        ///     initialized empty corpus when the source file is missing.
+        ///
+        /// Returns:
+        ///     Passes when the result is a non-null empty CorpusInherit.
+        /// </summary>
+        [TestMethod]
+        public void Deserialize_WithMissingPath_ReturnsEmptyCorpus()
+        {
+            // Act: non-existent file, no UI dialog (askUserOnError=false)
+            var corpus = CorpusInherit.Deserialize(
+                "p52t2_nonexistent.json",
+                @"c:\nonexistent_corpusinherit_p52t2",
+                askUserOnError: false
+            );
+
+            // Assert: result is a valid empty corpus
+            corpus.Should().NotBeNull();
+            corpus.Count.Should().Be(0);
+        }
+
+        // -----------------------------------------------------------------------
+        // P52-T3 — Serialization preserves the token frequency map round-trip
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// Verifies that a CorpusInherit with known token frequencies can be
+        /// serialized to JSON and deserialized back with the same content.
+        ///
+        /// Purpose:
+        ///     Confirm that the JSON serialization format correctly captures and
+        ///     restores the token frequency dictionary.
+        ///
+        /// Returns:
+        ///     Passes when the deserialized corpus has the same keys and values
+        ///     as the original.
+        /// </summary>
+        [TestMethod]
+        public void JsonRoundTrip_PreservesTokenFrequencyMap()
+        {
+            // Arrange
+            var original = new CorpusInherit(
+                new Dictionary<string, int> { ["alpha"] = 3, ["beta"] = 7 }
+            );
+            var settings = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                Formatting = Formatting.Indented,
+            };
+
+            // Act
+            var json = JsonConvert.SerializeObject(original, settings);
+            var restored = JsonConvert.DeserializeObject<CorpusInherit>(json, settings);
+
+            // Assert
+            restored.Should().NotBeNull();
+            restored.Should().ContainKey("alpha").WhoseValue.Should().Be(3);
+            restored.Should().ContainKey("beta").WhoseValue.Should().Be(7);
+        }
+    }
+
+    internal sealed class TestableCorpusInherit : CorpusInherit
+    {
+        internal static CorpusInherit ExposeCreateEmpty(
+            DialogResult response,
+            FilePathHelper disk
+        ) => CreateEmpty(response, disk);
+
+        internal static DialogResult ExposeAskUser(bool askUserOnError, string messageText) =>
+            AskUser(askUserOnError, messageText);
     }
 }

@@ -33,6 +33,30 @@ namespace UtilitiesCS.Test.Threading
         }
 
         [TestMethod]
+        public void IsCompleted_WhenContextMatchesCurrent_ReturnsTrue()
+        {
+            // Arrange: set the thread's synchronization context to the same instance captured
+            // by the awaiter so that the equality check (_context == Current) evaluates true
+            var context = new SynchronizationContext();
+            SynchronizationContext.SetSynchronizationContext(context);
+            try
+            {
+                var awaiter = new UiThread.SynchronizationContextAwaiter(context);
+
+                // Act
+                var result = awaiter.IsCompleted;
+
+                // Assert
+                result.Should().BeTrue();
+            }
+            finally
+            {
+                // Restore the context so this test does not influence other test-thread tests
+                SynchronizationContext.SetSynchronizationContext(null);
+            }
+        }
+
+        [TestMethod]
         public void GetResult_DoesNotThrow()
         {
             // Arrange

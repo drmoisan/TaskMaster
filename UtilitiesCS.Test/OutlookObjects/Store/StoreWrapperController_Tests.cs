@@ -316,6 +316,59 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             controller.JunkPotential.Should().NotBeNull();
         }
 
+        /// <summary>
+        /// Verifies that after <see cref="StoreWrapperController.PopulateWithCurrent"/> completes,
+        /// the controller's internal folder fields are the exact same object references as the
+        /// corresponding properties on the backing <see cref="StoreWrapper"/>.
+        ///
+        /// Purpose:
+        ///     Confirm that PopulateWithCurrent "mirrors" the current store — i.e. the controller
+        ///     fields are not copies but are the same instances, so subsequent AnyChanges() comparison
+        ///     via PairwiseEquals (reference equality) will correctly report "no changes" right
+        ///     after population.
+        ///
+        /// Returns:
+        ///     Passes when each controller field is the same object reference as the Current property.
+        /// </summary>
+        [TestMethod]
+        public void PopulateWithCurrent_WithKnownFolderValues_MirrorsControllerFieldsFromCurrent()
+        {
+            // Arrange: use null globals — PopulateWithCurrent does not call Globals.
+            // Use StoreWrapperViewer directly to avoid Moq (Moq's AwaitableFactory requires
+            // System.Threading.Tasks.Extensions 4.2.0.1 which is absent from the test bin output,
+            // causing TypeInitializationException for all Mock<T> involving Task-bearing interfaces).
+            // StoreWrapperViewer creates real WinForms labels in InitializeComponent(); Form handle
+            // is never created so InvokeRequired returns false in the test thread.
+            var controller = new StoreWrapperController(null!);
+            controller.Viewer = new StoreWrapperViewer();
+
+            var archiveFolder = new FolderMinimalWrapper("Archive", "Root\\Archive");
+            var junkEmailFolder = new FolderMinimalWrapper("JunkEmail", "Root\\Junk");
+            var junkPotentialFolder = new FolderMinimalWrapper("JunkPotential", "Root\\Potential");
+
+            // FilePathHelper() defaults FolderPath = "" so GetRelativeFsPath skips FsConverter.
+            var archiveFs = new FilePathHelper();
+
+            var currentStore = new StoreWrapper(null);
+            currentStore.ArchiveRoot = archiveFolder;
+            currentStore.JunkCertain = junkEmailFolder;
+            currentStore.JunkPotential = junkPotentialFolder;
+            currentStore.ArchiveFsRoot = archiveFs;
+            controller.Current = currentStore;
+
+            // Act
+            controller.PopulateWithCurrent();
+
+            // Assert: controller fields must be the same object references — not copies.
+            // PairwiseEquals uses reference equality for FolderMinimalWrapper and FilePathHelper,
+            // so mirroring reference equality ensures AnyChanges() reports no changes right after
+            // population.
+            controller.ArchiveOutlook.Should().BeSameAs(archiveFolder);
+            controller.JunkEmail.Should().BeSameAs(junkEmailFolder);
+            controller.JunkPotential.Should().BeSameAs(junkPotentialFolder);
+            controller.ArchiveFS.Should().BeSameAs(archiveFs);
+        }
+
         #endregion
 
         #region Click handlers (non-invoke path)
@@ -387,6 +440,141 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             controller.JunkPotential_Click();
 
             controller.JunkPotential.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void ArchiveOutlook_Click_SelectFolderReturnsFolder_SetsArchiveOutlookToReturnedFolder()
+        {
+            // Arrange: inject a known folder via the stub subclass.
+            // Null globals: SelectFolder is overridden so Globals.Ol is never called.
+            // Use StoreWrapperViewer directly (no Moq) — avoids Moq AwaitableFactory failure.
+            var stubFolder = new FolderMinimalWrapper("Archive", "Root\\Archive");
+            var controller = new StubSelectFolderController(null!, stubFolder);
+            controller.Viewer = new StoreWrapperViewer();
+
+            // Act: click handler calls SelectFolder() and stores the result.
+            controller.ArchiveOutlook_Click();
+
+            // Assert: the property was updated to exactly the stub folder returned by SelectFolder.
+            controller.ArchiveOutlook.Should().BeSameAs(stubFolder);
+        }
+
+        [TestMethod]
+        public void DisplayName_SelectedValueChanged_WithPendingChangesAndYesResponse_SavesThenLoadsSelectedStore()
+        {
+            using var viewer = new StoreWrapperViewer();
+            var controller = new StoreWrapperController(null!) { Viewer = viewer };
+            var original = new StoreWrapper(null) { DisplayName = "Original" };
+            var inbox = new Mock<Microsoft.Office.Interop.Outlook.Folder>();
+            var root = new Mock<Microsoft.Office.Interop.Outlook.Folder>();
+            inbox.SetupGet(x => x.FolderPath).Returns("Inbox");
+            root.SetupGet(x => x.FolderPath).Returns("Root");
+            var selected = new StoreWrapper(null)
+            {
+                DisplayName = "Selected",
+                Inbox = inbox.Object,
+                RootFolder = root.Object,
+                UserEmailAddress = "owner@example.com",
+            };
+            var pendingArchive = new FolderMinimalWrapper("Archive", "Root\\Archive");
+            controller.Model = new StoresWrapper
+            {
+                Stores = new List<StoreWrapper> { original, selected },
+            };
+            controller.Current = original;
+            controller.ArchiveOutlook = pendingArchive;
+            viewer.DisplayName.DataSource = new List<string> { "Original", "Selected" };
+            viewer.DisplayName.SelectedIndex = 1;
+            var originalInvoker = MyBox.DialogInvoker;
+
+            try
+            {
+                MyBox.DialogInvoker = _ => DialogResult.Yes;
+                controller.DisplayName_SelectedValueChanged(viewer.DisplayName, EventArgs.Empty);
+            }
+            finally
+            {
+                MyBox.DialogInvoker = originalInvoker;
+            }
+
+            original.ArchiveRoot.Should().BeSameAs(pendingArchive);
+            controller.Current.Should().BeSameAs(selected);
+            viewer.Inbox.Text.Should().Be("Inbox");
+            viewer.RootFolder.Text.Should().Be("Root");
+            viewer.UserEmail.Text.Should().Be("owner@example.com");
+        }
+
+        [TestMethod]
+        public void ClickHandlers_WhenInvokeRequired_DelegateToViewerInvoke()
+        {
+            var controller = CreateController();
+            var mockViewer = new Mock<IStoreWrapperViewer>();
+            mockViewer.Setup(v => v.InvokeRequired).Returns(true);
+            mockViewer.Setup(v => v.Invoke(It.IsAny<Delegate>())).Returns((object)null);
+            controller.Viewer = mockViewer.Object;
+
+            controller.ArchiveFS_Click();
+            controller.ArchiveOutlook_Click();
+            controller.JunkEmail_Click();
+            controller.JunkPotential_Click();
+
+            mockViewer.Verify(v => v.Invoke(It.IsAny<Delegate>()), Times.Exactly(4));
+        }
+
+        [TestMethod]
+        public void SelectFolder_WhenPickFolderReturnsFolder_WrapsRelativePathFromCurrentRoot()
+        {
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            var mockOl = new Mock<IOlObjects>();
+            var mockNs = new Mock<Microsoft.Office.Interop.Outlook.NameSpace>();
+            var root = new Mock<Microsoft.Office.Interop.Outlook.Folder>();
+            var picked = new Mock<Microsoft.Office.Interop.Outlook.Folder>();
+            root.SetupGet(x => x.FolderPath).Returns(@"\\Mailbox");
+            picked.SetupGet(x => x.FolderPath).Returns(@"\\Mailbox\\Archive");
+            mockNs
+                .Setup(n => n.PickFolder())
+                .Returns((Microsoft.Office.Interop.Outlook.MAPIFolder)picked.Object);
+            mockOl.SetupGet(o => o.NamespaceMAPI).Returns(mockNs.Object);
+            mockGlobals.SetupGet(g => g.Ol).Returns(mockOl.Object);
+            var controller = new StoreWrapperController(mockGlobals.Object)
+            {
+                Current = new StoreWrapper(null) { RootFolder = root.Object },
+            };
+
+            controller.SelectFolder().RelativePath.Should().Be("\\Archive");
+        }
+
+        [TestMethod]
+        public void SelectFolder_WhenPickFolderThrows_ReturnsNull()
+        {
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            var mockOl = new Mock<IOlObjects>();
+            var mockNs = new Mock<Microsoft.Office.Interop.Outlook.NameSpace>();
+            mockNs.Setup(n => n.PickFolder()).Throws(new InvalidOperationException("boom"));
+            mockOl.SetupGet(o => o.NamespaceMAPI).Returns(mockNs.Object);
+            mockGlobals.SetupGet(g => g.Ol).Returns(mockOl.Object);
+
+            new StoreWrapperController(mockGlobals.Object).SelectFolder().Should().BeNull();
+        }
+
+        #endregion
+
+        #region Stub helpers
+
+        private sealed class StubSelectFolderController : StoreWrapperController
+        {
+            private readonly FolderMinimalWrapper _stub;
+
+            internal StubSelectFolderController(
+                IApplicationGlobals globals,
+                FolderMinimalWrapper stubFolder
+            )
+                : base(globals)
+            {
+                _stub = stubFolder;
+            }
+
+            internal override FolderMinimalWrapper SelectFolder() => _stub;
         }
 
         #endregion

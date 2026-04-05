@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -9,6 +11,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
     [TestClass]
     public class ScoStack_Tests
     {
+        private static readonly string RepoRoot = Path.GetFullPath(
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..")
+        );
+
         [TestMethod]
         public void PushPeekAndCount_FollowLifoOrder()
         {
@@ -181,6 +187,165 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             // Assert
             stack.Count.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void ListConstructor_PreservesListContents()
+        {
+            // Arrange & Act
+            var stack = new ScoStack<int>(new List<int> { 5, 4, 3 });
+
+            // Assert
+            stack.Should().Equal(5, 4, 3);
+        }
+
+        [TestMethod]
+        public void Constructor_WithInvalidPathAndPromptDisabled_UsesBaseDeserializeFlow()
+        {
+            // Arrange & Act
+            var stack = new ScoStack<int>("*invalid-stack.json", RepoRoot, askUserOnError: false);
+
+            // Assert
+            stack.Should().BeEmpty();
+            stack.FilePath.Should().Be(Path.Combine(RepoRoot, "*invalid-stack.json"));
+        }
+
+        [TestMethod]
+        public void Peek_WithOutOfRangeIndex_ThrowsIndexOutOfRangeException()
+        {
+            // Arrange
+            var stack = new ScoStack<int>(new[] { 1, 2 });
+
+            // Act
+            Action act = () => stack.Peek(5);
+
+            // Assert
+            act.Should().Throw<IndexOutOfRangeException>();
+        }
+
+        [TestMethod]
+        public void Pop_WithOutOfRangeIndex_ThrowsIndexOutOfRangeException()
+        {
+            // Arrange
+            var stack = new ScoStack<int>(new[] { 1, 2 });
+
+            // Act
+            Action act = () => stack.Pop(5);
+
+            // Assert
+            act.Should().Throw<IndexOutOfRangeException>();
+        }
+
+        [TestMethod]
+        public void TryPeek_OnEmptyStack_ReturnsFalseAndDefaultValue()
+        {
+            // Arrange
+            var stack = new ScoStack<int>();
+
+            // Act
+            var result = stack.TryPeek(out var value);
+
+            // Assert
+            result.Should().BeFalse();
+            value.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void TryPeek_WithValidIndex_ReturnsValueWithoutRemovingIt()
+        {
+            // Arrange
+            var stack = new ScoStack<string>(new[] { "top", "middle", "bottom" });
+
+            // Act
+            var result = stack.TryPeek(out var value, 1);
+
+            // Assert
+            result.Should().BeTrue();
+            value.Should().Be("middle");
+            stack.Should().Equal("top", "middle", "bottom");
+        }
+
+        [TestMethod]
+        public void TryPeek_WithOutOfRangeIndex_ReturnsFalseAndDefaultValue()
+        {
+            // Arrange
+            var stack = new ScoStack<string>(new[] { "only" });
+
+            // Act
+            var result = stack.TryPeek(out var value, 4);
+
+            // Assert
+            result.Should().BeFalse();
+            value.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void TryPop_WithValidIndex_ReturnsValueAndRemovesIt()
+        {
+            // Arrange
+            var stack = new ScoStack<int>(new[] { 10, 20, 30 });
+
+            // Act
+            var result = stack.TryPop(out var value, 1);
+
+            // Assert
+            result.Should().BeTrue();
+            value.Should().Be(20);
+            stack.Should().Equal(10, 30);
+        }
+
+        [TestMethod]
+        public void TryPop_WithOutOfRangeIndex_ReturnsFalseAndLeavesStackUntouched()
+        {
+            // Arrange
+            var stack = new ScoStack<int>(new[] { 10, 20, 30 });
+
+            // Act
+            var result = stack.TryPop(out var value, 5);
+
+            // Assert
+            result.Should().BeFalse();
+            value.Should().Be(0);
+            stack.Should().Equal(10, 20, 30);
+        }
+
+        [TestMethod]
+        public void ToArray_WithReverseTrue_ReturnsBottomToTopOrder()
+        {
+            // Arrange
+            var stack = new ScoStack<int>(new[] { 3, 2, 1 });
+
+            // Act
+            var values = stack.ToArray(reverse: true);
+
+            // Assert
+            values.Should().Equal(1, 2, 3);
+        }
+
+        [TestMethod]
+        public void ToList_WithReverseFalse_ReturnsCurrentOrder()
+        {
+            // Arrange
+            var stack = new ScoStack<int>(new[] { 3, 2, 1 });
+
+            // Act
+            var values = stack.ToList(reverse: false);
+
+            // Assert
+            values.Should().Equal(3, 2, 1);
+        }
+
+        [TestMethod]
+        public void ToList_WithReverseTrue_ReturnsReversedOrder()
+        {
+            // Arrange
+            var stack = new ScoStack<int>(new[] { 3, 2, 1 });
+
+            // Act
+            var values = stack.ToList(reverse: true);
+
+            // Assert
+            values.Should().Equal(1, 2, 3);
         }
 
         // NOTE: ScoStack<T>.ToArray() contains a pre-existing infinite recursion bug

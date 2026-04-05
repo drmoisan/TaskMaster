@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -45,6 +46,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         public ScoDictionary(int capacity, IEqualityComparer<TKey> equalityComparer)
             : base(capacity, equalityComparer) { }
 
+        [ExcludeFromCodeCoverage]
         public ScoDictionary(string filename, string folderpath)
             : base()
         {
@@ -59,6 +61,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         /// <param name="dictionary">Existing dictionary</param>
         /// <param name="filename">Name of json file to house the SCODictionary</param>
         /// <param name="folderpath">Location of json file</param>
+        [ExcludeFromCodeCoverage]
         public ScoDictionary(
             IDictionary<TKey, TValue> dictionary,
             string filename,
@@ -71,6 +74,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             Serialize();
         }
 
+        [ExcludeFromCodeCoverage]
         public ScoDictionary(
             string filename,
             string folderpath,
@@ -98,6 +102,43 @@ namespace UtilitiesCS.ReusableTypeClasses
         private string _folderpath = "";
         private string _backupFilepath = "";
 
+        [ExcludeFromCodeCoverage]
+        protected virtual bool DirectoryExists(string path) => Directory.Exists(path);
+
+        [ExcludeFromCodeCoverage]
+        protected virtual string ReadAllText(string path, Encoding encoding) =>
+            File.ReadAllText(path, encoding);
+
+        [ExcludeFromCodeCoverage]
+        protected virtual TextWriter CreateText(string path) => File.CreateText(path);
+
+        [ExcludeFromCodeCoverage]
+        protected virtual Stream CreateAsyncWriteStream(string path) =>
+            new FileStream(
+                path,
+                FileMode.Create,
+                FileAccess.Write,
+                FileShare.None,
+                bufferSize: 4096,
+                useAsync: true
+            );
+
+        [ExcludeFromCodeCoverage]
+        protected virtual DialogResult ShowMessageBox(
+            string text,
+            string caption,
+            MessageBoxButtons buttons,
+            MessageBoxIcon icon
+        ) => MessageBox.Show(text, caption, buttons, icon);
+
+        [ExcludeFromCodeCoverage]
+        protected virtual DialogResult ShowMyBoxDialog(
+            string text,
+            string caption,
+            MessageBoxButtons buttons,
+            MessageBoxIcon icon
+        ) => MyBox.ShowDialog(text, caption, buttons, icon);
+
         public string Filepath
         {
             get { return _filepath; }
@@ -107,7 +148,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 var fileExtension = Path.GetExtension(value);
                 _folderpath = Path.GetDirectoryName(_filepath);
                 _filename = Path.GetFileName(_filepath);
-                if ((value != "") && (fileExtension == "") && Directory.Exists(value))
+                if ((value != "") && (fileExtension == "") && DirectoryExists(value))
                 {
                     throw new ArgumentException(
                         $"{value} is a Folder Path and was passed to the field named 'Filepath'. "
@@ -139,6 +180,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
+        [ExcludeFromCodeCoverage]
         public void Serialize()
         {
             if (Filepath != "")
@@ -180,7 +222,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 try
                 {
                     // Append text to the file
-                    using (StreamWriter sw = File.CreateText(filepath))
+                    using (TextWriter sw = CreateText(filepath))
                     {
                         var settings = new JsonSerializerSettings();
                         //settings.TypeNameHandling = TypeNameHandling.Auto;
@@ -203,32 +245,25 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-        private async Task WriteTextAsync(string filePath, string text)
+        protected virtual async Task WriteTextAsync(string filePath, string text)
         {
             byte[] encodedText = Encoding.Unicode.GetBytes(text);
 
-            using (
-                FileStream sourceStream = new FileStream(
-                    filePath,
-                    FileMode.Create,
-                    FileAccess.Write,
-                    FileShare.None,
-                    bufferSize: 4096,
-                    useAsync: true
-                )
-            )
+            using (Stream sourceStream = CreateAsyncWriteStream(filePath))
             {
                 await sourceStream.WriteAsync(encodedText, 0, encodedText.Length);
             }
             ;
         }
 
+        [ExcludeFromCodeCoverage]
         public void Deserialize()
         {
             if (Filepath != "")
                 Deserialize(Filepath, true);
         }
 
+        [ExcludeFromCodeCoverage]
         public void Deserialize(bool askUserOnError)
         {
             if (Filepath != "")
@@ -248,7 +283,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
             try
             {
-                string strObject = File.ReadAllText(filepath, Encoding.UTF8);
+                string strObject = ReadAllText(filepath, Encoding.UTF8);
                 //var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(File.ReadAllText(filepath));
                 var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(
                     strObject
@@ -263,7 +298,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 log.Error(e.Message);
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(
+                    response = ShowMessageBox(
                         $"{filepath} not found. Load from CSV?",
                         "File Not Found",
                         MessageBoxButtons.YesNo,
@@ -280,7 +315,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 log.Error(e.Message);
                 if (askUserOnError)
                 {
-                    response = MessageBox.Show(
+                    response = ShowMessageBox(
                         $"{filepath} encountered a problem. {e.Message} " + " Load from CSV?",
                         "Error!",
                         MessageBoxButtons.YesNo,
@@ -322,7 +357,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 {
                     if (askUserOnError)
                     {
-                        response = MessageBox.Show(
+                        response = ShowMessageBox(
                             "Need a list to continue. " + "Create a new List Or Stop Execution?",
                             "Error",
                             MessageBoxButtons.YesNo,
@@ -354,7 +389,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
             try
             {
-                string strObject = File.ReadAllText(filepath, Encoding.UTF8);
+                string strObject = ReadAllText(filepath, Encoding.UTF8);
                 //var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(File.ReadAllText(filepath));
                 var innerDictionary = JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(
                     strObject
@@ -369,7 +404,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 log.Error($"File {filepath} does not exist.");
                 if (askUserOnError)
                 {
-                    response = MyBox.ShowDialog(
+                    response = ShowMyBoxDialog(
                         $"{filepath} not found. Create a new list? Excecution will stop if answer is no.",
                         "File Not Found",
                         MessageBoxButtons.YesNo,
@@ -386,7 +421,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 log.Error($"Error! {e.Message}");
                 if (askUserOnError)
                 {
-                    response = MyBox.ShowDialog(
+                    response = ShowMyBoxDialog(
                         filepath
                             + " encountered a problem. "
                             + e.Message

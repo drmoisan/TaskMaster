@@ -67,6 +67,77 @@ namespace UtilitiesCS.Test
         }
 
         [TestMethod]
+        public void Constructor_WithDialogResultAndTemplate_ClonesTemplateAndSetsDialogResult()
+        {
+            // Arrange
+            var template = new Button { BackColor = Color.DarkSeaGreen };
+            var callback = new Action(() => { });
+
+            // Act
+            var delegateButton = new DelegateButton(
+                "Apply",
+                "Apply Changes",
+                DialogResult.Yes,
+                callback,
+                template
+            );
+
+            // Assert
+            delegateButton.Name.Should().Be("Apply");
+            delegateButton.Button.Should().NotBeSameAs(template);
+            delegateButton.Button.BackColor.Should().Be(Color.DarkSeaGreen);
+            delegateButton.Button.DialogResult.Should().Be(DialogResult.Yes);
+            delegateButton.Delegate.Should().BeSameAs(callback);
+        }
+
+        [TestMethod]
+        public void Constructor_WithImageAndDialogResult_CreatesButtonWithImageBeforeText()
+        {
+            // Arrange
+            using var image = new Bitmap(10, 10);
+            var callback = new Action(() => { });
+
+            // Act
+            var delegateButton = new DelegateButton(
+                "Retry",
+                image,
+                "Retry Now",
+                DialogResult.Retry,
+                callback
+            );
+
+            // Assert
+            delegateButton.Name.Should().Be("Retry");
+            delegateButton.Button.Text.Should().Be("Retry Now");
+            delegateButton.Button.Image.Should().BeSameAs(image);
+            delegateButton.Button.DialogResult.Should().Be(DialogResult.Retry);
+            delegateButton.Button.TextImageRelation.Should().Be(TextImageRelation.ImageBeforeText);
+            delegateButton.Delegate.Should().BeSameAs(callback);
+        }
+
+        [TestMethod]
+        public void ButtonTemplate_SetterClonesTemplate_AndMakeButtonReplacesExistingImage()
+        {
+            // Arrange
+            using var templateImage = new Bitmap(6, 6);
+            using var replacementImage = new Bitmap(12, 12);
+            var template = new Button { BackColor = Color.CornflowerBlue, Image = templateImage };
+            var delegateButton = new DelegateButton();
+
+            // Act
+            delegateButton.ButtonTemplate = template;
+            var storedTemplate = delegateButton.ButtonTemplate;
+            var button = delegateButton.MakeButton("Replace Image", replacementImage);
+
+            // Assert
+            storedTemplate.Should().NotBeSameAs(template);
+            storedTemplate.BackColor.Should().Be(Color.CornflowerBlue);
+            storedTemplate.Image.Should().NotBeNull();
+            button.Image.Should().BeSameAs(replacementImage);
+            button.TextImageRelation.Should().Be(TextImageRelation.ImageBeforeText);
+        }
+
+        [TestMethod]
         public void FromButton_ShouldAttachDelegateAndInvokeOnClick()
         {
             // Arrange

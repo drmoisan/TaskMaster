@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -165,6 +169,61 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
+        public void Notify_WithoutSubscribers_DoesNotThrow()
+        {
+            // Arrange
+            var dict = new ScDictionary<string, int>();
+
+            // Act
+            Action act = () => dict.Notify("NoSubscribers");
+
+            // Assert
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void Serialize_WithNoConfiguredFilePath_IsASafeNoOp()
+        {
+            // Arrange
+            var dict = new ScDictionary<string, int> { ["alpha"] = 1 };
+
+            // Act
+            Action act = () => dict.Serialize();
+
+            // Assert
+            act.Should().NotThrow();
+            dict.Should().ContainKey("alpha").WhoseValue.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void SerializeThreadSafe_WithInjectedWriter_WritesJsonToProvidedStream()
+        {
+            // Arrange
+            var dict = new ScDictionary<string, int> { ["alpha"] = 1, ["beta"] = 2 };
+            using var stream = new MemoryStream();
+            InjectStreamWriterFactory(
+                dict,
+                _ => new StreamWriter(stream, Encoding.UTF8, 1024, leaveOpen: true)
+            );
+
+            // Act
+            dict.SerializeThreadSafe("ignored.json");
+            stream.Position = 0;
+            using var reader = new StreamReader(
+                stream,
+                Encoding.UTF8,
+                detectEncodingFromByteOrderMarks: true,
+                bufferSize: 1024,
+                leaveOpen: true
+            );
+            var json = reader.ReadToEnd();
+
+            // Assert
+            json.Should().Contain("alpha");
+            json.Should().Contain("beta");
+        }
+
+        [TestMethod]
         public void DeserializeObject_ThrowsNotImplementedException()
         {
             // Arrange
@@ -209,6 +268,91 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             // Assert
             act.Should().Throw<NotImplementedException>();
+        }
+
+        [TestMethod]
+        public async Task ExplicitInterfaceDeserializeAsync_ThrowsNotImplementedException()
+        {
+            // Arrange
+            ISmartSerializable<ScDictionary<string, int>> dict = new ScDictionary<string, int>();
+
+            // Act
+            Func<Task> act = async () =>
+                await dict.DeserializeAsync(new SmartSerializable<ScDictionary<string, int>>());
+
+            // Assert
+            await act.Should().ThrowAsync<NotImplementedException>();
+        }
+
+        [TestMethod]
+        public async Task ExplicitInterfaceDeserializeAsync_WithAskUserOnError_ThrowsNotImplementedException()
+        {
+            // Arrange
+            ISmartSerializable<ScDictionary<string, int>> dict = new ScDictionary<string, int>();
+
+            // Act
+            Func<Task> act = async () =>
+                await dict.DeserializeAsync(
+                    new SmartSerializable<ScDictionary<string, int>>(),
+                    askUserOnError: false
+                );
+
+            // Assert
+            await act.Should().ThrowAsync<NotImplementedException>();
+        }
+
+        [TestMethod]
+        public async Task ExplicitInterfaceDeserializeAsync_WithAltLoader_ThrowsNotImplementedException()
+        {
+            // Arrange
+            ISmartSerializable<ScDictionary<string, int>> dict = new ScDictionary<string, int>();
+
+            // Act
+            Func<Task> act = async () =>
+                await dict.DeserializeAsync(
+                    new SmartSerializable<ScDictionary<string, int>>(),
+                    askUserOnError: false,
+                    altLoader: null
+                );
+
+            // Assert
+            await act.Should().ThrowAsync<NotImplementedException>();
+        }
+
+        [TestMethod]
+        public void ConfigPropertyChanged_WhenInvoked_RaisesPropertyChangedOnDictionary()
+        {
+            // Arrange
+            var dict = new ScDictionary<string, int>();
+            string changedProperty = null;
+            dict.PropertyChanged += (_, args) => changedProperty = args.PropertyName;
+            var method = typeof(ScDictionary<string, int>).GetMethod(
+                "Config_PropertyChanged",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+
+            // Act
+            method.Invoke(dict, new object[] { this, new PropertyChangedEventArgs("ConfigFlag") });
+
+            // Assert
+            changedProperty.Should().Be("ConfigFlag");
+        }
+
+        private static void InjectStreamWriterFactory(
+            ScDictionary<string, int> dict,
+            Func<string, StreamWriter> createStreamWriter
+        )
+        {
+            var smartSerializableField = typeof(ScDictionary<string, int>).GetField(
+                "ism",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            var smartSerializable = smartSerializableField.GetValue(dict);
+            var createStreamWriterField = smartSerializable
+                .GetType()
+                .GetField("_createStreamWriter", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            createStreamWriterField.SetValue(smartSerializable, createStreamWriter);
         }
     }
 }

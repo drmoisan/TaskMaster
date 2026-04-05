@@ -12,6 +12,13 @@ namespace UtilitiesCS
     {
         private delegate DialogResult ResponseDelegate();
 
+        /// <summary>
+        /// Replaceable dialog-invoker seam. The default implementation delegates to
+        /// <see cref="MyBoxViewer.ShowDialog()"/>; tests replace it with a non-modal stub.
+        /// </summary>
+        internal static Func<MyBoxViewer, DialogResult> DisplayInvoker { get; set; } =
+            viewer => viewer.ShowDialog();
+
         public static bool StopAtNotImplemented(string functionName)
         {
             string title = "Not Implemented Dialog";
@@ -25,7 +32,7 @@ namespace UtilitiesCS
                 { "Keep Running", new ResponseDelegate(KeepRunning) },
             };
             MyBoxViewer _box = new(title, message, map);
-            DialogResult result = _box.ShowDialog();
+            DialogResult result = DisplayInvoker(_box);
             if (result == DialogResult.Yes)
             {
                 return true;

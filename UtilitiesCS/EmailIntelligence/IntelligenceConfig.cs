@@ -15,6 +15,29 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.EmailIntelligence
 {
+    internal interface IIntelligenceConfigResourceWriter : IDisposable
+    {
+        void AddResource(string name, string value);
+
+        void Generate();
+    }
+
+    internal sealed class IntelligenceConfigResourceWriter : IIntelligenceConfigResourceWriter
+    {
+        private readonly ResXResourceWriter _writer;
+
+        public IntelligenceConfigResourceWriter(string filePath)
+        {
+            _writer = new ResXResourceWriter(filePath);
+        }
+
+        public void AddResource(string name, string value) => _writer.AddResource(name, value);
+
+        public void Generate() => _writer.Generate();
+
+        public void Dispose() => _writer.Dispose();
+    }
+
     public class IntelligenceConfig(IApplicationGlobals globals)
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
@@ -40,23 +63,15 @@ namespace UtilitiesCS.EmailIntelligence
             protected set;
         }
 
-        internal async Task<
+        internal virtual async Task<
             ConcurrentDictionary<string, SmartSerializableLoader>
         > ReadConfigurationAsync()
         {
-            var resourceManager = IntelligenceResources.ResourceManager;
-            var resourceSet = resourceManager.GetResourceSet(
-                System.Globalization.CultureInfo.CurrentCulture,
-                true,
-                true
-            );
-            var resourceDictionary = await resourceSet
-                .Cast<DictionaryEntry>()
-                .ToDictionary<string, string>()
+            var resourceDictionary = await GetSerializedConfigurations()
                 .ToAsyncEnumerable()
                 .SelectAwait(async kvp =>
                 {
-                    var loader = await SmartSerializableLoader.DeserializeAsync(Globals, kvp.Value);
+                    var loader = await DeserializeLoaderAsync(kvp.Value);
                     if (loader is null)
                     {
                         logger.Error(
@@ -87,6 +102,24 @@ namespace UtilitiesCS.EmailIntelligence
             return resourceDictionary;
         }
 
+        internal virtual IDictionary<string, string> GetSerializedConfigurations()
+        {
+            var resourceManager = IntelligenceResources.ResourceManager;
+            var resourceSet = resourceManager.GetResourceSet(
+                System.Globalization.CultureInfo.CurrentCulture,
+                true,
+                true
+            );
+            return resourceSet.Cast<DictionaryEntry>().ToDictionary<string, string>();
+        }
+
+        internal virtual Task<SmartSerializableLoader> DeserializeLoaderAsync(
+            string serializedLoader
+        )
+        {
+            return SmartSerializableLoader.DeserializeAsync(Globals, serializedLoader);
+        }
+
         internal void Loader_PropertyChanged(
             object sender,
             System.ComponentModel.PropertyChangedEventArgs e
@@ -100,7 +133,7 @@ namespace UtilitiesCS.EmailIntelligence
             }
         }
 
-        internal void WriteConfiguration()
+        internal virtual void WriteConfiguration()
         {
             string assemblyDirectory = Path.GetDirectoryName(
                 typeof(IntelligenceResources).Assembly.Location
@@ -114,7 +147,7 @@ namespace UtilitiesCS.EmailIntelligence
                 ))
                 .ToDictionary();
 
-            using (var resxWriter = new ResXResourceWriter(resxFilePath))
+            using (var resxWriter = CreateResourceWriter(resxFilePath))
             {
                 foreach (var configuration in configurations)
                 {
@@ -122,6 +155,13 @@ namespace UtilitiesCS.EmailIntelligence
                 }
                 resxWriter.Generate();
             }
+        }
+
+        internal virtual IIntelligenceConfigResourceWriter CreateResourceWriter(
+            string resourceFilePath
+        )
+        {
+            return new IntelligenceConfigResourceWriter(resourceFilePath);
         }
 
         private static bool IsDerivedFromScoDictionaryNew(Type type)

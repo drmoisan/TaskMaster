@@ -89,7 +89,26 @@
   <ItemGroup>
     <Compile Include="Dialogs\ActionButtonTests.cs" />
     <Compile Include="Dialogs\DelegateButton_Tests.cs" />
+    <Compile Include="Dialogs\FolderNotFoundViewer_Tests.cs" />
+    <Compile Include="Dialogs\MyBox_ShowDialog_Tests.cs" />
+    <Compile Include="Dialogs\MyBox_Tests.cs" />
+    <Compile Include="Dialogs\NotImplementedDialog_Tests.cs" />
+    <Compile Include="EmailIntelligence\AutoFile_Tests.cs" />
+    <Compile Include="EmailIntelligence\ActionableClassifierGroup_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroup_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianSerializationHelper_Tests.cs" />
+    <Compile Include="EmailIntelligence\Triage_OlLogic_Tests.cs" />
+    <Compile Include="EmailIntelligence\SortEmail_Tests.cs" />
+    <Compile Include="EmailIntelligence\FilterOlFoldersController_Tests.cs" />
+    <Compile Include="EmailIntelligence\FilterOlFoldersViewer_Tests.cs" />
+    <Compile Include="EmailIntelligence\FolderInfoViewer_Tests.cs" />
+    <Compile Include="EmailIntelligence\OSBrowser_Tests.cs" />
+    <Compile Include="EmailIntelligence\FolderRemapController_Tests.cs" />
+    <Compile Include="EmailIntelligence\FolderRemapController_Tests2.cs" />
+    <Compile Include="EmailIntelligence\FolderRemapViewer_Tests.cs" />
+    <Compile Include="EmailIntelligence\FolderSelector_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroupTests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierTests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierTests_UnfinishedStubs.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierSharedTests.cs" />
@@ -105,6 +124,8 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\TriageCreationTests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities_Additional_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities_TestSupport.cs" />
     <Compile Include="EmailIntelligence\CtfIncidence_Tests.cs" />
     <Compile Include="EmailIntelligence\CtfIncidenceList_Tests.cs" />
     <Compile Include="EmailIntelligence\DoNotSerializeContractResolver_Tests.cs" />
@@ -118,12 +139,20 @@
     <Compile Include="EmailIntelligence\ImageStripper_Tests.cs" />
     <Compile Include="EmailIntelligence\MinedMailInfo_Tests.cs" />
     <Compile Include="EmailIntelligence\MovedMailInfo_Tests.cs" />
+    <Compile Include="EmailIntelligence\SubjectMapEncoder_Tests.cs" />
     <Compile Include="EmailIntelligence\SubjectMapEntry_Tests.cs" />
+    <Compile Include="EmailIntelligence\SubjectMapMetrics_Tests.cs" />
+    <Compile Include="EmailIntelligence\SubjectMapSco_Orchestration_Tests.cs" />
+    <Compile Include="EmailIntelligence\SubjectMapSco_Tests.cs" />
     <Compile Include="EmailIntelligence\SmithWaterman_Tests.cs" />
     <Compile Include="EmailIntelligence\FilterEntry_Tests.cs" />
     <Compile Include="EmailIntelligence\BayesianMetricTypes_Tests.cs" />
     <Compile Include="EmailIntelligence\DedicatedToken_Tests.cs" />
+    <Compile Include="EmailIntelligence\IntelligenceConfig_Tests.cs" />
+    <Compile Include="EmailIntelligence\EmailFiler_Tests.cs" />
+    <Compile Include="EmailIntelligence\EmailFiler_TestSupport.cs" />
     <Compile Include="EmailIntelligence\EmailFilerConfig_Tests.cs" />
+    <Compile Include="EmailIntelligence\SpamBayes_Tests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MailItemHelperTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MinedMailInfoTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\AttachmentInfoTests.cs" />
@@ -135,10 +164,18 @@
     <Compile Include="EmailIntelligence\IClonableBehaviorTest.cs" />
     <Compile Include="EmailIntelligence\FlagTranslator_Tests.cs" />
     <Compile Include="EmailIntelligence\PeopleScoDictionaryNew_Tests.cs" />
+    <Compile Include="EmailIntelligence\ManagerAsyncLazy_Tests.cs" />
+    <Compile Include="EmailIntelligence\EmailDataMiner_Tests.cs" />
+    <Compile Include="EmailIntelligence\EmailDataMiner_Additional_Tests.cs" />
+    <Compile Include="EmailIntelligence\EmailDataMiner_TestSupport.cs" />
+    <Compile Include="EmailIntelligence\OlFolderClassifierGroup_Tests.cs" />
     <Compile Include="EmailIntelligence\RecentsList_Tests.cs" />
     <Compile Include="Extensions\ArrayExtensions_Tests.cs" />
     <Compile Include="Extensions\AsyncSerialization_Tests.cs" />
     <Compile Include="Extensions\CompilerServicesExtensions_Tests.cs" />
+    <Compile Include="Extensions\DfDeedle_Tests.cs" />
+    <Compile Include="Extensions\DfDeedle_COM_Tests.cs" />
+    <Compile Include="Extensions\DfMLNet_Tests.cs" />
     <Compile Include="Extensions\DictionaryExtensions_Tests.cs" />
     <Compile Include="Extensions\EnumExtensions_Tests.cs" />
     <Compile Include="Extensions\ExtToChar_Tests.cs" />
@@ -159,6 +196,7 @@
     <Compile Include="Extensions\ImageExtensions_Tests.cs" />
     <Compile Include="HelperClasses\MyFileSystemInfoTests.cs" />
     <Compile Include="HelperClasses\PropertyInitializerTest.cs" />
+    <Compile Include="HelperClasses\DvgForm_Tests.cs" />
     <Compile Include="HelperClasses\Initializer_Tests.cs" />
     <Compile Include="HelperClasses\MergeSortImplementations_Tests.cs" />
     <Compile Include="HelperClasses\ObjectCopier_Tests.cs" />
@@ -169,7 +207,9 @@
     <Compile Include="HelperClasses\GenericBitwise_Tests.cs" />
     <Compile Include="HelperClasses\DeepCompare_Tests.cs" />
     <Compile Include="HelperClasses\DirectoryInfoWrapper_Tests.cs" />
+    <Compile Include="HelperClasses\PhysicalFileSystemAdapters_Tests.cs" />
     <Compile Include="HelperClasses\FileInfoWrapper_Tests.cs" />
+    <Compile Include="HelperClasses\FileIO2_Tests.cs" />
     <Compile Include="HelperClasses\DebugTextLogger_Tests.cs" />
     <Compile Include="HelperClasses\TraceUtility_Tests.cs" />
     <Compile Include="HelperClasses\VerboseLogger_Tests.cs" />
@@ -177,11 +217,16 @@
     <Compile Include="HelperClasses\TimedDiskWriterTests.cs" />
     <Compile Include="HelperClasses\PrettyPrint_Tests.cs" />
     <Compile Include="HelperClasses\PrettyPrintTest.cs" />
+    <Compile Include="HelperClasses\TableLayoutHelper_Tests.cs" />
     <Compile Include="HelperClasses\NLogTraceWriter_Test.cs" />
     <Compile Include="HelperClasses\SysImageListHelperTests.cs" />
     <Compile Include="HelperClasses\StringManipulation_Tests.cs" />
     <Compile Include="HelperClasses\FilePathHelper_Tests.cs" />
     <Compile Include="HelperClasses\FileSystemInfoWrapper_Tests.cs" />
+    <Compile Include="HelperClasses\QfcTipsDetails_Tests.cs" />
+    <Compile Include="HelperClasses\TipsController_Tests.cs" />
+    <Compile Include="HelperClasses\TipsController_TableLayoutPanel_Tests.cs" />
+    <Compile Include="HelperClasses\OlvExtension_Tests.cs" />
     <Compile Include="Interfaces\PropertyStore_Tests.cs" />
     <Compile Include="NewtonsoftHelpers\AllInclusiveBinder_Tests.cs" />
     <Compile Include="NewtonsoftHelpers\FilePathHelperConverterTests.cs" />
@@ -284,6 +329,7 @@
     <Compile Include="ReusableTypeClasses\LazyTry_Tests.cs" />
     <Compile Include="ReusableTypeClasses\Matrix_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SCODictionary_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SCODictionary_Additional_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ScBag_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SerializableList_Tests.cs" />
     <Compile Include="ReusableTypeClasses\StackGeek_Tests.cs" />
@@ -294,6 +340,7 @@
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionaryTest\SimpleObserver.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\ConcurrentObservableDictionaryTests.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollectionSenderTests.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollectionLockRecursionTests.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollection_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests_UnfinishedStubs.cs" />
@@ -325,17 +372,29 @@
     <Compile Include="ReusableTypeClasses\SmartSerializableLoader_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializableNonTyped_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializableStatic_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\ConfigController_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\ConfigGroupBox_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\ConfigViewer_Tests.cs" />
     <Compile Include="ThemeHelpers\SystemThemeDetectorTests.cs" />
     <Compile Include="Threading\AppGlobalsConverterTests.cs" />
     <Compile Include="Threading\AppGlobalsConverterTests_Unfinished.cs" />
     <Compile Include="Threading\ProgressPackage_Tests.cs" />
     <Compile Include="Threading\ProgressTracker_Tests.cs" />
+    <Compile Include="Threading\ProgressTrackerPane_Tests.cs" />
     <Compile Include="Threading\ProgressTrackerAsync_Tests.cs" />
     <Compile Include="Threading\TaskPriority_Tests.cs" />
     <Compile Include="Threading\ThreadSafeFunctions_Tests.cs" />
     <Compile Include="Threading\ThreadSafeSingleShotGuard_Tests.cs" />
+    <Compile Include="Threading\TimeOutTask_AdditionalTests.cs" />
+    <Compile Include="Threading\TimeOutTask_InternalCoverageTests.cs" />
+    <Compile Include="Threading\TimeOutTask_OverloadCoverageTests.cs" />
     <Compile Include="Threading\TimeOutTask_Tests.cs" />
     <Compile Include="Threading\ApplicationIdleTimer_Tests.cs" />
+    <Compile Include="Threading\IdleActionQueue_Tests.cs" />
+    <Compile Include="Threading\IdleAsyncQueue_Tests.cs" />
+    <Compile Include="Threading\ProgressPane_Tests.cs" />
+    <Compile Include="Threading\AsyncMultiTasker_Tests.cs" />
+    <Compile Include="Threading\ProgressViewer_Tests.cs" />
     <Compile Include="Threading\UiThread_Tests.cs" />
     <Compile Include="Dialogs\DialogTests.cs" />
     <Compile Include="Dialogs\FunctionButton_Tests.cs" />
@@ -344,12 +403,14 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\EngineTests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\MulticlassEngine_Tests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\Triage_Tests.ManagerAndAdditional.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFiler_Tests.cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\FolderRemapTree_Tests.cs" />
     <Compile Include="Extensions\WinFormsExtensions_Tests.cs" />
     <Compile Include="HelperClasses\ComStreamWrapper_Tests.cs" />
     <Compile Include="HelperClasses\DispatchUtility_Tests.cs" />
     <Compile Include="HelperClasses\ShellUtilities_Tests.cs" />
+    <Compile Include="HelperClasses\ShellUtilitiesStatic_Tests.cs" />
     <Compile Include="HelperClasses\ThemeHelpers\ThemeTests.cs" />
     <Compile Include="HelperClasses\WindowsForms\ScreenAndTableLayoutTests.cs" />
     <Compile Include="HelperClasses\WindowsForms\WinFormsInteractionTests.cs" />
@@ -483,6 +544,25 @@
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Common, Version=0.0.22544.530, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(ProgramFiles)\Microsoft Visual Studio\18\Community\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.Common.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Common.v4.0.Utilities, Version=0.0.22544.530, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(ProgramFiles)\Microsoft Visual Studio\18\Community\Common7\IDE\ReferenceAssemblies\v4.0\Microsoft.Office.Tools.Common.v4.0.Utilities.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Office, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.3800.47, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.3800.47\lib\net462\Microsoft.Web.WebView2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.WebView2.WinForms, Version=1.0.3800.47, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.3800.47\lib\net462\Microsoft.Web.WebView2.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Testing.Extensions.MSBuild, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Testing.Platform.MSBuild.2.1.0\lib\netstandard2.0\Microsoft.Testing.Extensions.MSBuild.dll</HintPath>

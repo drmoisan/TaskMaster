@@ -1,20 +1,23 @@
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Office.Tools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups;
 using UtilitiesCS.Extensions.Lazy;
+using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
 {
-    /// <summary>
-    /// Concrete test implementation of MulticlassEngine for testing the abstract base class.
-    /// </summary>
     internal class TestMulticlassEngine : MulticlassEngine<TestMulticlassEngine>
     {
         public TestMulticlassEngine()
@@ -40,11 +43,37 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
         }
     }
 
+    internal class TestBuildingEngine : MulticlassEngine<TestBuildingEngine>
+    {
+        public TestBuildingEngine()
+            : base() { }
+
+        public TestBuildingEngine(IApplicationGlobals globals)
+            : base(globals) { }
+
+        public override Task<bool> BuildClassifiersAsync(
+            BayesianClassifierGroup classifierGroup,
+            MinedMailInfo[] collection,
+            ProgressPackage ppkg,
+            string groupName,
+            int minimumCountPerToken = 0
+        )
+        {
+            foreach (var mail in collection)
+            {
+                var key = mail.GroupingKey ?? mail.EntryId ?? Guid.NewGuid().ToString();
+                classifierGroup.Classifiers[key] = new BayesianClassifierShared(key);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public override Task TestAsync(MailItemHelper helper) => Task.CompletedTask;
+    }
+
     [TestClass]
     public class MulticlassEngine_Tests
     {
-        #region Constructor
-
         [TestMethod]
         public void Constructor_WithGlobals_SetsGlobals()
         {
@@ -54,10 +83,6 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             engine.Globals.Should().BeSameAs(mockGlobals.Object);
             engine.CgUtilities.Should().NotBeNull();
         }
-
-        #endregion
-
-        #region Properties
 
         [TestMethod]
         public void IsActivated_NoClassifierGroup_ReturnsFalse()
@@ -137,24 +162,14 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             engine.AsyncCondition.Should().BeSameAs(condition);
         }
 
-        #endregion
-
-        #region IConditionalEngine
-
         [TestMethod]
         public void Serialize_CallsClassifierGroupSerialize()
         {
             var mockGlobals = CreateMockGlobals();
             var engine = new TestMulticlassEngine(mockGlobals.Object);
             engine.ClassifierGroup = new BayesianClassifierGroup();
-
-            // Serialize should not throw
             ((IConditionalEngine<MailItemHelper>)engine).Serialize();
         }
-
-        #endregion
-
-        #region Condition
 
         [TestMethod]
         public void Condition_MailItem_WithIPMNote_ReturnsTrue()
@@ -187,10 +202,6 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             var result = engine.Condition(mockMailItem.Object);
             result.Should().BeFalse();
         }
-
-        #endregion
-
-        #region CreateEngineAsync
 
         [TestMethod]
         public async Task CreateEngineAsync_GroupNotInManager_ReturnsDefault()
@@ -228,10 +239,6 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             result.EngineName.Should().Be("TestGroup");
         }
 
-        #endregion
-
-        #region Config
-
         [TestMethod]
         public void Config_ReturnsClassifierGroupConfig()
         {
@@ -243,10 +250,6 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             engine.Config.Should().BeSameAs(group.Config);
         }
 
-        #endregion
-
-        #region TypedItem
-
         [TestMethod]
         public void TypedItem_SetAndGet()
         {
@@ -257,10 +260,6 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             engine.TypedItem.Should().BeNull();
         }
 
-        #endregion
-
-        #region EngineInitializer
-
         [TestMethod]
         public void EngineInitializer_IsNotNull()
         {
@@ -269,10 +268,6 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
 
             engine.EngineInitializer.Should().NotBeNull();
         }
-
-        #endregion
-
-        #region InitAsync
 
         [TestMethod]
         public async Task InitAsync_ClassifierGroupNotInManager_ReturnsDefault()
@@ -289,9 +284,134 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             result.Should().BeNull();
         }
 
-        #endregion
+        [TestMethod]
+        public async Task InitAsync_GroupInManager_WiresClassifierGroupAndEngineName()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var mockAf = new Mock<IAppAutoFileObjects>();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+            var classifierGroup = new BayesianClassifierGroup();
+            manager["MyGroup"] = classifierGroup.ToAsyncLazy();
+            mockAf.Setup(a => a.Manager).Returns(manager);
+            mockGlobals.Setup(g => g.AF).Returns(mockAf.Object);
 
-        #region Helpers
+            var engine = new TestMulticlassEngine(mockGlobals.Object);
+
+            var result = await engine.InitAsync("MyGroup");
+
+            result.Should().NotBeNull();
+            result!.ClassifierGroup.Should().BeSameAs(classifierGroup);
+            result.EngineName.Should().Be("MyGroup");
+            result.Globals.Should().BeSameAs(mockGlobals.Object);
+        }
+
+        [TestMethod]
+        public async Task BuildClassifiersAsync_ThreeMails_CreatesThreeClassifiers()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var engine = new TestBuildingEngine(mockGlobals.Object);
+            var cg = new BayesianClassifierGroup();
+            var mails = new[]
+            {
+                new MinedMailInfo { GroupingKey = "Category:A" },
+                new MinedMailInfo { GroupingKey = "Category:B" },
+                new MinedMailInfo { GroupingKey = "Category:C" },
+            };
+
+            await engine.BuildClassifiersAsync(cg, mails, null, "TestGroup");
+
+            cg.Classifiers.Should().HaveCount(3);
+            cg.Classifiers.Should().ContainKey("Category:A");
+            cg.Classifiers.Should().ContainKey("Category:B");
+            cg.Classifiers.Should().ContainKey("Category:C");
+        }
+
+        [TestMethod]
+        public async Task InitAsync_GroupAbsentFromManager_ReturnsNullWithoutCreatingClassifier()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var mockAf = new Mock<IAppAutoFileObjects>();
+            var manager = new ManagerAsyncLazy(mockGlobals.Object);
+            mockAf.Setup(a => a.Manager).Returns(manager);
+            mockGlobals.Setup(g => g.AF).Returns(mockAf.Object);
+
+            var engine = new TestMulticlassEngine(mockGlobals.Object);
+
+            var result = await engine.InitAsync("MissingGroup");
+
+            result.Should().BeNull();
+            engine.ClassifierGroup.Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task BuildClassifiersAsync_NoAppData_CompletesAndHidesProgressPane()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var mockFs = new Mock<IFileSystemFolderPaths>();
+            var mockAf = new Mock<IAppAutoFileObjects>();
+            var manager = new StubManagerAsyncLazy(mockGlobals.Object);
+            var progressPane = new Mock<CustomTaskPane>();
+            progressPane.SetupProperty(x => x.Visible, false);
+            mockFs
+                .SetupGet(x => x.SpecialFolders)
+                .Returns(new ConcurrentDictionary<string, string>());
+            mockGlobals.SetupGet(x => x.FS).Returns(mockFs.Object);
+            mockAf.SetupGet(x => x.Manager).Returns(manager);
+            mockAf.SetupGet(x => x.ProgressTracker).Returns(CreateHeadlessProgressTrackerPane());
+            mockAf.SetupGet(x => x.ProgressPane).Returns(progressPane.Object);
+            mockGlobals.SetupGet(x => x.AF).Returns(mockAf.Object);
+
+            var engine = new TestMulticlassEngine(mockGlobals.Object) { EngineName = "MyGroup" };
+            engine.CgUtilities = new StubMulticlassEngineUtilities(
+                mockGlobals.Object,
+                new BayesianClassifierGroup()
+            );
+
+            await engine.BuildClassifiersAsync();
+
+            progressPane.Object.Visible.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task BuildClassifierAsync_GroupingKey_RebuildsClassifierFromGroupedTokens()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var engine = new TestMulticlassEngine(mockGlobals.Object);
+            var classifierGroup = new BayesianClassifierGroup
+            {
+                TotalEmailCount = 2,
+                SharedTokenBase = new Corpus(new Dictionary<string, int> { { "keep", 3 } }),
+            };
+            var items = new[]
+            {
+                new MinedMailInfo { GroupingKey = "Team", Tokens = new[] { "keep", "keep" } },
+                new MinedMailInfo { GroupingKey = "Team", Tokens = new[] { "keep" } },
+            };
+
+            await engine.BuildClassifierAsync(
+                items.GroupBy(x => x.GroupingKey).First(),
+                classifierGroup,
+                CancellationToken.None
+            );
+
+            classifierGroup.Classifiers.Should().ContainKey("Team");
+            classifierGroup.Classifiers["Team"].MatchEmailCount.Should().Be(2);
+        }
+
+        [TestMethod]
+        public void Condition_NonMailItem_ReturnsFalse()
+        {
+            var mockGlobals = CreateMockGlobals();
+            var engine = new TestMulticlassEngine(mockGlobals.Object);
+            var mockAppointment = new Mock<Microsoft.Office.Interop.Outlook.AppointmentItem>();
+            mockAppointment
+                .Setup(m => m.Class)
+                .Returns(Microsoft.Office.Interop.Outlook.OlObjectClass.olAppointment);
+            mockAppointment.Setup(m => m.CreationTime).Returns(new DateTime(2026, 4, 3, 9, 15, 0));
+            mockAppointment.Setup(m => m.Subject).Returns("Planning");
+
+            engine.Condition(mockAppointment.Object).Should().BeFalse();
+        }
 
         private static Mock<IApplicationGlobals> CreateMockGlobals()
         {
@@ -305,6 +425,73 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             return mockGlobals;
         }
 
-        #endregion
+        private static ProgressTrackerPane CreateHeadlessProgressTrackerPane(double progress = 0)
+        {
+            var pane = (ProgressTrackerPane)
+                FormatterServices.GetUninitializedObject(typeof(ProgressTrackerPane));
+            var parentProgressType = typeof(ProgressTrackerPane)
+                .Assembly.GetType("UtilitiesCS.ParentProgress`1")!
+                .MakeGenericType(typeof(ValueTuple<int, string>));
+            var parentProgress = Activator.CreateInstance(
+                parentProgressType,
+                new Progress<(int Value, string JobName)>(_ => { }),
+                100,
+                0
+            );
+            typeof(ProgressTrackerPane)
+                .GetField(
+                    "_parent",
+                    System.Reflection.BindingFlags.Instance
+                        | System.Reflection.BindingFlags.NonPublic
+                )!
+                .SetValue(pane, parentProgress);
+            typeof(ProgressTrackerPane)
+                .GetField(
+                    "_progress",
+                    System.Reflection.BindingFlags.Instance
+                        | System.Reflection.BindingFlags.NonPublic
+                )!
+                .SetValue(pane, progress);
+            typeof(ProgressTrackerPane)
+                .GetField(
+                    "_isRoot",
+                    System.Reflection.BindingFlags.Instance
+                        | System.Reflection.BindingFlags.NonPublic
+                )!
+                .SetValue(pane, false);
+            typeof(ProgressTrackerPane)
+                .GetField(
+                    "_jobName",
+                    System.Reflection.BindingFlags.Instance
+                        | System.Reflection.BindingFlags.NonPublic
+                )!
+                .SetValue(pane, "Test");
+            return pane;
+        }
+
+        private sealed class StubManagerAsyncLazy : ManagerAsyncLazy
+        {
+            public StubManagerAsyncLazy(IApplicationGlobals globals)
+                : base(globals)
+            {
+                Configuration = new AsyncLazy<
+                    ConcurrentDictionary<string, SmartSerializableLoader>
+                >(() =>
+                    Task.FromResult(new ConcurrentDictionary<string, SmartSerializableLoader>())
+                );
+            }
+        }
+
+        private sealed class StubMulticlassEngineUtilities(
+            IApplicationGlobals globals,
+            BayesianClassifierGroup classifierGroup
+        ) : ClassifierGroupUtilities(globals)
+        {
+            public override Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(
+                MinedMailInfo[] collection,
+                string name,
+                int minimumCountPerToken = 0
+            ) => Task.FromResult(classifierGroup);
+        }
     }
 }
