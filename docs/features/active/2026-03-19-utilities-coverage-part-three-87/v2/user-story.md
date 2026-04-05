@@ -50,6 +50,7 @@ Previous feature work (issue #82, utilities-coverage-part-two) raised OutlookObj
 ## Acceptance Criteria
 
 - [ ] Every .cs file compiled by UtilitiesCS.csproj has >=80% line coverage as reported by Cobertura
+  - **Post-remediation status (v1.4):** Aggregate UtilitiesCS line rate is 87.39%. 61 of 63 implementation-routed files are above 80%. Two files remain below threshold: SortEmail.cs (66.7%, COM constraint — see `evidence/research/p2-sortemail-followup.md`) and Triage_OlLogic.cs (78.3%, Outlook COM interactions). This AC is not checked because not every implementation file meets the per-file 80% requirement.
 - [x] No pre-existing tests are broken or removed
 - [x] All new tests follow MSTest + Moq + FluentAssertions conventions
 - [x] All new tests are deterministic, isolated, and use no external dependencies

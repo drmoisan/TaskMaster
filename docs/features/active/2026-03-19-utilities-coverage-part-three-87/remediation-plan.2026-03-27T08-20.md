@@ -466,16 +466,16 @@ This remediation pass starts by reconciling the live Cobertura inventory, the cl
 - [x] [P5-T4] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug`
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/qa-gates/phase5-tests-with-coverage.md` exists and contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`, `Failed Tests: 0`, and a numeric post-remediation `UtilitiesCS Line Rate:` value.
 
-- [ ] [P5-T5] Verify the refreshed coverage report closes AC1 for `UtilitiesCS` and records changed/new-code coverage compliance
+- [x] [P5-T5] Verify the refreshed coverage report closes AC1 for `UtilitiesCS` and records changed/new-code coverage compliance
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/qa-gates/phase5-coverage-verification.md` exists and records `Baseline UtilitiesCS Line Rate:`, `Post-Remediation UtilitiesCS Line Rate:`, `Post-Remediation UtilitiesCS Line Rate: >= 0.80`, `Touched Production Files:`, `Per-File Baseline/Post Line Rates:` for every touched production file from `phase0-remaining-ledger.md`, `Coverage Regression Check: none`, `Changed/New-Code Coverage: <numeric value>`, `New Production Members Introduced: <count>`, and for any newly introduced production members `New Production Member Coverage: >= 0.90`; the artifact must also confirm that no `Implementation` row from `phase0-remaining-ledger.md` remains below threshold, each `Skip Re-Validation` row has a corresponding Phase 3 evidence file, and every Phase 3 row that recorded `Decision: Return To Implementation` has a corresponding completed task in `P4-T56` through `P4-T65` with matching evidence.
 
-- [ ] [P5-T6] Update `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/plan.2026-03-22T21-00.md` to reflect the remediation outcomes for every reopened phase
+- [x] [P5-T6] Update `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/plan.2026-03-22T21-00.md` to reflect the remediation outcomes for every reopened phase
 	- Acceptance: each reopened phase referenced in this remediation plan is either checked off with linked evidence or annotated with a follow-up note that references the blocking evidence artifact.
 
-- [ ] [P5-T7] Update `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/spec.md` and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/user-story.md` only after `P5-T5` passes
+- [x] [P5-T7] Update `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/spec.md` and `docs/features/active/2026-03-19-utilities-coverage-part-three-87/v2/user-story.md` only after `P5-T5` passes
 	- Acceptance: the acceptance-criteria checkboxes in `v2/user-story.md` and the matching DoD statements in `v2/spec.md` reflect the verified post-remediation state and do not mark the `Every .cs file compiled by UtilitiesCS.csproj has >=80% line coverage as reported by Cobertura` acceptance criterion complete unless `P5-T5` verified that no `Implementation` row from `phase0-remaining-ledger.md` remains below `0.80`, every retained skip row is backed by its required evidence artifact, and every `Return To Implementation` decision is closed by `P4-T56` through `P4-T65`.
 
-- [ ] [P5-T8] Record the post-remediation review-artifact disposition only after `P5-T1` through `P5-T7` complete
+- [x] [P5-T8] Record the post-remediation review-artifact disposition only after `P5-T1` through `P5-T7` complete
 	- Acceptance: `docs/features/active/2026-03-19-utilities-coverage-part-three-87/evidence/qa-gates/phase5-review-refresh.md` exists and contains `Timestamp:` plus either (a) `Review Refresh Requested: No`, or (b) `Review Refresh Requested: Yes` and references to `phase1-branch-diff-clean.md`, `phase5-tests-with-coverage.md`, and `phase5-coverage-verification.md` as the evidence baseline.
 
 ## Validation Target

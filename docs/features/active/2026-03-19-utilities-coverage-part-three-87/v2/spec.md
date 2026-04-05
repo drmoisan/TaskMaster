@@ -166,6 +166,7 @@ Known existing homes include (non-exhaustive):
 ## Definition of Done
 
 - [ ] Every `.cs` file compiled by `UtilitiesCS.csproj` reaches ≥80% line coverage as reported by the Cobertura XML, or is explicitly documented as a skip candidate (with rationale) in the plan
+  - **Post-remediation status (v1.4):** Aggregate UtilitiesCS line rate is 87.39%. 61 of 63 implementation-routed files are above 80%. Two files remain below threshold: SortEmail.cs (66.7%, COM constraint — see `evidence/research/p2-sortemail-followup.md`) and Triage_OlLogic.cs (78.3%, Outlook COM interactions). This DoD item is not checked because not every implementation file meets the per-file 80% requirement.
 - [x] All 11 skip-evaluation phases (P6, P7, P28, P31, P32, P33, P35, P37, P58, P59, P79) are checked off in the plan with documented rationale
 - [x] No pre-existing tests are broken or removed
 - [x] All new tests follow MSTest + Moq + FluentAssertions conventions (AAA pattern, deterministic, isolated, no external dependencies, no temp files)
@@ -177,11 +178,11 @@ Known existing homes include (non-exhaustive):
 - [ ] Docs updated (feature folder status set to Complete; plan updated to show all tasks checked)
 
 ## Seeded Test Conditions (from potential)
-- [ ] Positive and negative flows for each Dialogs file (button state, action routing, null/cancel paths)
-- [ ] Encode/decode round-trips for SubjectMapEncoder and SubjectMapSco
-- [ ] Chunk-size and ordering assertions for AsyncMultiTasker and EmailDataMiner
-- [ ] COM interop mock verification for OlTableExtensions, OlToDoTable, StoreWrapperController
-- [ ] Progress and cancellation wiring for ProgressTracker, ProgressTrackerAsync, ProgressTrackerPane, ProgressPane, ProgressViewer
-- [ ] Event-routing and static-state isolation for IdleActionQueue, IdleAsyncQueue, ApplicationIdleTimer
-- [ ] File-system wrapper property forwarding and null-inner handling for FileInfoWrapper, DirectoryInfoWrapper, FileSystemInfoWrapper
-- [ ] Classifier-group creation, validation, and fallback paths for SpamBayes, CategoryClassifierGroup, OlFolderClassifierGroup, ActionableClassifierGroup, MulticlassEngine, Triage
+- [x] Positive and negative flows for each Dialogs file (button state, action routing, null/cancel paths)
+- [x] Encode/decode round-trips for SubjectMapEncoder and SubjectMapSco
+- [x] Chunk-size and ordering assertions for AsyncMultiTasker and EmailDataMiner
+- [x] COM interop mock verification for OlTableExtensions, OlToDoTable, StoreWrapperController
+- [x] Progress and cancellation wiring for ProgressTracker, ProgressTrackerAsync, ProgressTrackerPane, ProgressPane, ProgressViewer
+- [x] Event-routing and static-state isolation for IdleActionQueue, IdleAsyncQueue, ApplicationIdleTimer
+- [x] File-system wrapper property forwarding and null-inner handling for FileInfoWrapper, DirectoryInfoWrapper, FileSystemInfoWrapper
+- [x] Classifier-group creation, validation, and fallback paths for SpamBayes, CategoryClassifierGroup, OlFolderClassifierGroup, ActionableClassifierGroup, MulticlassEngine, Triage

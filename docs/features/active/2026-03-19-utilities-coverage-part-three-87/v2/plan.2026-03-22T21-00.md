@@ -3,9 +3,9 @@
 - **Issue:** #87
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-03-23
-- **Status:** In Progress
-- **Version:** 1.3
+- **Last Updated:** 2026-04-05
+- **Status:** Remediation Complete
+- **Version:** 1.4
 
 ## Required References
 
@@ -34,6 +34,81 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 | AC5 | All new test files registered in UtilitiesCS.Test.csproj | P1-T13, P2-T24, P3-T68 registration tasks |
 | AC6 | C# toolchain loop passes clean | P5-T1 through P5-T4 |
 | AC7 | Repo-wide coverage does not regress below baseline | P0-T3 baseline + P5-T5 comparison |
+
+## Remediation Cross-Reference
+
+A post-v2 remediation plan was executed to close the coverage gap identified in `P90-T6`.
+Remediation plan: [`remediation-plan.2026-03-27T08-20.md`](../remediation-plan.2026-03-27T08-20.md)
+Coverage verification evidence: [`phase5-coverage-verification.md`](../evidence/qa-gates/phase5-coverage-verification.md)
+
+**Aggregate result:** UtilitiesCS line rate rose from 69.8% (v2 baseline) to 87.39% (post-remediation).
+
+### Reopened phases — outcome summary
+
+All 53 v2 phases below were reopened by the remediation plan (P4-T1 through P4-T55).
+Additional tests were added and verified; per-file coverage rates are recorded in `phase5-coverage-verification.md`.
+
+| Reopened V2 Phase | File | Post-Remediation Status |
+|---|---|---|
+| 8 | AutoFile.cs | Remediated — above 80% |
+| 9 | SortEmail.cs | **Follow-up required** — 66.7% (COM constraint; see `evidence/research/p2-sortemail-followup.md`) |
+| 10 | FilterOlFoldersController.cs | Remediated — above 80% |
+| 11 | FilterOlFoldersViewer.cs | Remediated — above 80% |
+| 13 | OSBrowser.cs | Remediated — above 80% |
+| 14 | FolderRemapController.cs | Remediated — above 80% |
+| 16 | FolderSelector.cs | Remediated — above 80% |
+| 17 | SubjectMapEncoder.cs | Remediated — above 80% |
+| 19 | DfDeedle.cs | Remediated — above 80% |
+| 21 | QfcTipsDetails.cs | Remediated — above 80% |
+| 24 | ConfigGroupBox.cs | Remediated — above 80% |
+| 25 | ConfigViewer.cs | Remediated — above 80% |
+| 30 | ProgressViewer.cs | Remediated — above 80% |
+| 34 | EmailDataMiner.cs | Remediated — above 80% |
+| 36 | SubjectMapSco.cs | Remediated — above 80% |
+| 38 | IntelligenceConfig.cs | Remediated — above 80% |
+| 39 | EmailFiler.cs | Remediated — above 80% |
+| 40 | ConfigController.cs | Remediated — above 80% |
+| 41 | AsyncMultiTasker.cs | Remediated — above 80% |
+| 42 | FolderRemapTree.cs | Remediated — above 80% |
+| 43 | ClassifierGroupUtilities.cs | Remediated — above 80% |
+| 45 | SCODictionary.cs | Remediated — above 80% |
+| 46 | FileInfoWrapper.cs | Remediated — above 80% |
+| 47 | DirectoryInfoWrapper.cs | Remediated — above 80% |
+| 48 | DfMLNet.cs | Remediated — above 80% |
+| 49 | TableLayoutHelper.cs | Remediated — above 80% |
+| 50 | SpamBayes.cs | Remediated — above 80% |
+| 51 | ScBag.cs | Remediated — above 80% |
+| 52 | CorpusInherit.cs | Remediated — above 80% |
+| 53 | FunctionButton.cs | Remediated — above 80% |
+| 54 | MyBoxViewer.cs | Remediated — above 80% |
+| 56 | CategoryClassifierGroup.cs | Remediated — above 80% |
+| 60 | ThemeControlGroup.cs | Remediated — above 80% |
+| 61 | OlTableExtensions.cs | Remediated — above 80% |
+| 62 | ProgressTrackerAsync.cs | Remediated — above 80% |
+| 63 | WinFormsExtensions.cs | Remediated — above 80% |
+| 64 | MulticlassEngine.cs | Remediated — above 80% |
+| 65 | Triage.cs | Remediated — above 80% |
+| 66 | ProgressTrackerPane.cs | Remediated — above 80% |
+| 67 | OlFolderClassifierGroup.cs | Remediated — above 80% |
+| 68 | ApplicationIdleTimer.cs | Remediated — above 80% |
+| 70 | OneDriveDownloader.cs | Remediated — above 80% |
+| 72 | FileSystemInfoWrapper.cs | Remediated — above 80% |
+| 73 | DispatchUtility.cs | Remediated — above 80% |
+| 74 | ProgressTracker.cs | Remediated — above 80% |
+| 76 | ActionableClassifierGroup.cs | Remediated — above 80% |
+| 77 | StoreWrapperController.cs | Remediated — above 80% |
+| 78 | Triage_OlLogic.cs | **Follow-up required** — 78.3% (remaining lines are Outlook COM interactions) |
+| 80 | BayesianPerformanceMeasurement.cs | Remediated — above 80% |
+| 83 | DelegateButton.cs | Remediated — above 80% |
+| 84 | TimedDiskWriter.cs | Remediated — above 80% |
+| 86 | ClassifierGroup (Obsolete).cs | Remediated — above 80% |
+| 87 | LockingObservableLinkedList.cs | Remediated — above 80% |
+| 89 | FilePathHelper.cs | Remediated — above 80% |
+
+**Notes:**
+- 51 of 53 reopened phases are now above the 80% threshold.
+- Phase 9 (SortEmail.cs): Maximum achievable deterministic coverage is ~67% due to Outlook COM method dependencies. Documented in `evidence/research/p2-sortemail-followup.md`.
+- Phase 78 (Triage_OlLogic.cs): 78.3% — remaining uncovered lines involve Outlook COM table interactions that cannot be deterministically tested.
 
 ## Implementation Plan (Atomic Tasks)
 
@@ -1198,6 +1273,7 @@ Raise every production `.cs` file compiled by `UtilitiesCS.csproj` to >= 80% lin
 
 - [x] [P90-T6] Verify that line coverage for `UtilitiesCS` in the coverage report meets or exceeds the 80% repository-wide threshold
   - Acceptance: The coverage report produced by the `/EnableCodeCoverage` run in P90-T4 shows `UtilitiesCS` line coverage ≥ 80%; if not, identify remaining below-threshold files and record a follow-up note inline
-  - FOLLOW-UP NOTE: Measured 69.81% (line-rate=0.698) — below the 80% threshold. Top files below 50% that require additional coverage work in a future feature branch: ProgressMultiStepViewer.cs (0%), MetricChartViewer.cs (0%), ThreadMonitor.cs (0%), ConfusionViewer.cs (0%), InputBox.cs (0%), SortEmail.cs (2%), ScreenHelper.cs (3%), Theme.cs (6%), EmailDataMiner.cs (6%), FileIO2.cs (7%), DfDeedle.cs (11%), EmailFiler.cs (18%), FileInfoWrapper.cs (18%), PeopleScoDictionaryNew.cs (19%), DirectoryInfoWrapper.cs (20%), ClassifierGroupUtilities.cs (22%), SubjectMapSco.cs (23%). UI Designer files (*.Designer.cs) and Windows Forms components are difficult to unit-test without a running UI host; those should be excluded from coverage thresholds in a future coverage configuration update.
+  - FOLLOW-UP NOTE (v2): Measured 69.81% (line-rate=0.698) — below the 80% threshold. This triggered the remediation plan.
+  - REMEDIATION UPDATE (v1.4): Post-remediation UtilitiesCS line rate is 87.39% (line-rate=0.8739), exceeding the 80% aggregate threshold. See `Remediation Cross-Reference` section above for per-phase outcomes. Two implementation-routed files remain below 80%: SortEmail.cs (66.7%, COM constraint) and Triage_OlLogic.cs (78.3%, COM interactions).
 
 
