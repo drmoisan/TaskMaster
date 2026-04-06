@@ -22,12 +22,12 @@ Saving should persist both values, refresh any cached junk-folder references, an
 
 ## Acceptance Criteria (early draft)
 
-- [ ] The add-in exposes a clear UI entry point where the user can review the current `Junk Email` and `Junk Potential` folder selections without waiting for a folder-resolution failure.
-- [ ] The user can change the confirmed junk folder and the potential junk folder independently, using the standard Outlook folder picker for each field.
-- [ ] Choosing `Save` persists the selected folders to the existing settings keys used by `AppOlObjects` (`OlJunkCertain` and `JunkPotential`) in the relative-path format expected by the current folder-loading logic.
-- [ ] After saving, subsequent junk or potential-junk operations use the updated folder selections without requiring the user to trigger the existing "folder not found" recovery path first.
-- [ ] Choosing `Cancel` leaves both stored settings and active folder selections unchanged.
-- [ ] If a previously saved folder no longer exists or cannot be resolved, the UI shows a clear re-selection path and does not overwrite the stored value with an invalid selection.
+- [x] The add-in exposes a clear UI entry point where the user can review the current `Junk Email` and `Junk Potential` folder selections without waiting for a folder-resolution failure.
+- [x] The user can change the confirmed junk folder and the potential junk folder independently, using the standard Outlook folder picker for each field.
+- [x] Choosing `Save` persists the selected folders to the existing settings keys used by `AppOlObjects` (`OlJunkCertain` and `JunkPotential`) in the relative-path format expected by the current folder-loading logic.
+- [x] After saving, subsequent junk or potential-junk operations use the updated folder selections without requiring the user to trigger the existing "folder not found" recovery path first.
+- [x] Choosing `Cancel` leaves both stored settings and active folder selections unchanged.
+- [x] If a previously saved folder no longer exists or cannot be resolved, the UI shows a clear re-selection path and does not overwrite the stored value with an invalid selection.
 
 ## Constraints & Risks
 
@@ -39,7 +39,7 @@ Saving should persist both values, refresh any cached junk-folder references, an
 
 ## Test Conditions to Consider
 
-- [ ] Unit coverage areas: reading existing settings into the UI model, saving updated `OlJunkCertain` and `JunkPotential` values, cancel behavior, cache refresh/reset behavior, and invalid or empty selection guards.
+- [x] Unit coverage areas: reading existing settings into the UI model, saving updated `OlJunkCertain` and `JunkPotential` values, cancel behavior, cache refresh/reset behavior, and invalid or empty selection guards.
 - [ ] Integration scenarios: open the entry point with valid existing folders, change only one folder, change both folders, save and reopen to confirm persistence, and recover after one of the saved folders is deleted, renamed, or moved.
 - [ ] CLI/API examples: none expected for this feature unless a diagnostic or developer-only command is added later; the primary surface is an in-add-in UI flow.
 

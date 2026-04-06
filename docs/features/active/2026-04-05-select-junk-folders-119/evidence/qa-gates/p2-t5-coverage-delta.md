@@ -1,0 +1,11 @@
+## [P2-T5] Coverage Delta
+
+- Timestamp: `2026-04-06T12:00:05-04:00`
+- Command: `pwsh -NoProfile -Command "$scope = Get-Content 'docs/features/active/2026-04-05-select-junk-folders-119/evidence/other/p1-t1-scope.md' -Raw; $csv = ([regex]::Match($scope, 'Production Files CSV:\s*(.+)')).Groups[1].Value; if ([string]::IsNullOrWhiteSpace($csv)) { exit 1 }; $files = $csv.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }; [xml]$baseline = Get-Content 'coverage/select-junk-folders-baseline.cobertura.xml'; [xml]$final = Get-Content 'coverage/select-junk-folders-final.cobertura.xml'; $baselineRepo = [math]::Round([double]$baseline.coverage.'line-rate' * 100, 2); $finalRepo = [math]::Round([double]$final.coverage.'line-rate' * 100, 2); Write-Output \"Baseline Repo Line Coverage: $baselineRepo%\"; Write-Output \"Final Repo Line Coverage: $finalRepo%\"; foreach ($file in $files) { $baselineClass = $baseline.SelectNodes('//class') | Where-Object { $_.filename -eq $file } | Select-Object -First 1; $finalClass = $final.SelectNodes('//class') | Where-Object { $_.filename -eq $file } | Select-Object -First 1; if (-not $finalClass) { exit 1 }; $baselineRate = if ($baselineClass) { [math]::Round([double]$baselineClass.'line-rate' * 100, 2) } else { -1 }; $finalRate = [math]::Round([double]$finalClass.'line-rate' * 100, 2); if ($baselineRate -lt 0) { $threshold = if ($finalRate -ge 90) { 'PASS' } else { 'FAIL' }; Write-Output \"FILE $file | BASELINE NEW | FINAL $finalRate% | New File Coverage Threshold: $threshold\" } else { $threshold = if ($finalRate -ge $baselineRate) { 'PASS' } else { 'FAIL' }; Write-Output \"FILE $file | BASELINE $baselineRate% | FINAL $finalRate% | Existing File No-Regression: $threshold\" } }; Write-Output \"Repo Coverage Threshold: $(if ($finalRepo -ge 80) { 'PASS' } else { 'FAIL' })\""`
+- EXIT_CODE: `0`
+- Output Summary:
+  - Baseline Repo Line Coverage: `78.05%`
+  - Final Repo Line Coverage: `78.11%`
+  - FILE `UtilitiesCS\OutlookObjects\Store\StoreWrapperController.cs` | BASELINE `90.34%` | FINAL `93.41%` | Existing File No-Regression: `PASS`
+  - FILE `TaskMaster\AppGlobals\AppOlObjects.cs` | BASELINE `13.2%` | FINAL `25%` | Existing File No-Regression: `PASS`
+  - Repo Coverage Threshold: `FAIL`
