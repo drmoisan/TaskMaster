@@ -1,8 +1,14 @@
+using System;
+using System.Collections;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using UtilitiesCS;
+using UtilitiesCS.Dialogs;
+using OutlookApplication = Microsoft.Office.Interop.Outlook.Application;
 
 namespace TaskMaster.Test.AppGlobals
 {
@@ -125,6 +131,68 @@ namespace TaskMaster.Test.AppGlobals
             {
                 Properties.Settings.Default.JunkPotential = original;
             }
+        }
+
+        [TestMethod]
+        public void LoadJunkCertain_KeepsStoredValue_WhenReplacementSelectionIsCancelled()
+        {
+            var originalSetting = Properties.Settings.Default.OlJunkCertain;
+            var dialogInvokerProperty = typeof(MyBox).GetProperty(
+                "DialogInvoker",
+                BindingFlags.Static | BindingFlags.NonPublic
+            )!;
+            var originalDialogInvoker = dialogInvokerProperty.GetValue(null);
+            var expected = "Missing\\Junk Email";
+            var namespaceMapi = mockRepository.Create<NameSpace>();
+            namespaceMapi.Setup(x => x.PickFolder()).Returns((MAPIFolder)null);
+            var application = mockRepository.Create<OutlookApplication>();
+            application.SetupGet(x => x.Application).Returns(application.Object);
+            application.Setup(x => x.GetNamespace("MAPI")).Returns(namespaceMapi.Object);
+            var root = CreateRootFolder();
+            var sut = new AppOlObjects(application.Object, Mock.Of<IApplicationGlobals>());
+            SetPrivateField(sut, "_root", root.Object);
+
+            try
+            {
+                Properties.Settings.Default.OlJunkCertain = expected;
+                dialogInvokerProperty.SetValue(
+                    null,
+                    new Func<MyBoxViewer, System.Windows.Forms.DialogResult>(_ =>
+                        System.Windows.Forms.DialogResult.OK
+                    )
+                );
+
+                sut.LoadJunkCertain().Should().BeNull();
+                AppOlObjects.ReadJunkCertainSetting().Should().Be(expected);
+            }
+            finally
+            {
+                Properties.Settings.Default.OlJunkCertain = originalSetting;
+                dialogInvokerProperty.SetValue(null, originalDialogInvoker);
+            }
+        }
+
+        private Mock<Folder> CreateRootFolder()
+        {
+            var folders = mockRepository.Create<Folders>();
+            folders.SetupGet(x => x.Count).Returns(0);
+            folders
+                .As<IEnumerable>()
+                .Setup(x => x.GetEnumerator())
+                .Returns(Array.Empty<MAPIFolder>().GetEnumerator());
+
+            var root = mockRepository.Create<Folder>();
+            root.SetupGet(x => x.Name).Returns("Mailbox");
+            root.SetupGet(x => x.FolderPath).Returns(@"\\Mailbox");
+            root.SetupGet(x => x.Folders).Returns(folders.Object);
+            return root;
+        }
+
+        private static void SetPrivateField(object target, string fieldName, object value)
+        {
+            typeof(AppOlObjects)
+                .GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(target, value);
         }
     }
 }

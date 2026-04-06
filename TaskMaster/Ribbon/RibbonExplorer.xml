@@ -129,6 +129,12 @@
                 label="Current Location"
               />
             </menu>
+            <button
+              id="SpamFolderSettings"
+              imageMso="Folder"
+              onAction="SpamFolderSettings_Click"
+              label="Junk Folder Settings"
+            />
             <checkBox
               id="SpamBayesEnabledToggle"
               getPressed="SpamBayesEnabled_GetPressed"

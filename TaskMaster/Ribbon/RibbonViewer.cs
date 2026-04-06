@@ -251,6 +251,9 @@ namespace TaskMaster
         public void GetSaveLocation_Click(Office.IRibbonControl control) =>
             Controller.Engines.ShowSaveInfo(SpamBayes.GroupName);
 
+        public void SpamFolderSettings_Click(Office.IRibbonControl control) =>
+            Controller.FolderStoresSettings();
+
         #endregion Spam Config
 
         #endregion Spam Manager
