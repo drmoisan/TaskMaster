@@ -262,7 +262,7 @@ namespace TaskMaster
             if (folder is null)
             {
                 MyBox.ShowDialog(
-                    "Junk Potential Folder not found. Please select it manually.",
+                    "Junk Folder not found. Please select it manually.",
                     "Error",
                     System.Windows.Forms.MessageBoxButtons.OK,
                     System.Windows.Forms.MessageBoxIcon.Error
