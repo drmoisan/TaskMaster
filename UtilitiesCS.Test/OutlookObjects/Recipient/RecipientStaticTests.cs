@@ -121,6 +121,14 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
             resolvedRecipient.SetupGet(x => x.Name).Returns("Ada Lovelace");
             resolvedRecipient.SetupGet(x => x.Address).Returns("ada@example.com");
 
+            // GetRecipientInfo now delegates to GetRecipientName/GetRecipientAddress, which
+            // access AddressEntry; use an SMTP entry type so the Exchange path is not taken.
+            var resolvedAddressEntry = new Mock<AddressEntry>();
+            resolvedAddressEntry
+                .SetupGet(x => x.AddressEntryUserType)
+                .Returns(OlAddressEntryUserType.olSmtpAddressEntry);
+            resolvedRecipient.SetupGet(x => x.AddressEntry).Returns(resolvedAddressEntry.Object);
+
             // Act
             var result = mail.Object.GetSenderInfo(nameSpace.Object);
 
