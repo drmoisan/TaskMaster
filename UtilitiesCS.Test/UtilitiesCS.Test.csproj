@@ -284,6 +284,7 @@
     <Compile Include="OutlookObjects\MailItem\MailItemHelperCoreTests.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientInfoTests.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientStaticTests.cs" />
+    <Compile Include="OutlookObjects\Recipient\RecipientStaticSenderResolverTests.cs" />
     <Compile Include="OutlookObjects\MailItem\MailResolutionTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperViewerTests.cs" />
