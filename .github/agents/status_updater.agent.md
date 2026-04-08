@@ -3,7 +3,7 @@ name: status_updater_agent
 description: Synchronize status across epic docs, feature docs, atomic plans, and (optionally) GitHub Issues. Check off delivered but unchecked plan items, reconcile issue/doc status, and document acceptance-criteria evidence in the authoritative requirement source files when fully delivered. Derive all paths from EpicRootFolder using the same epic directory rules. No user questions.
 argument-hint: "Provide EpicRootFolder (absolute or workspace-relative path, e.g., docs/features/active/2026-02-02-some-epic-47). Optional: AllowGitHubMutations=true|false (default false) to permit using gh CLI to update remote issues; otherwise generate recommended gh commands only. This agent will: (1) read initiative.md/issue.md/orchestration.md (if present), (2) enumerate feature subfolders, (3) select current version (highest vN) and latest plan.<timestamp>.md, (4) update plan checkboxes when evidence exists, (5) sync local issue.md/spec/user-story with issue status and content, (6) add acceptance evidence when all AC are delivered, and (7) write <EPIC_FOLDER>/status-sync.<timestamp>.md. Timestamp format: yyyy-MM-ddTHH-mm."
 tools:
-  ['execute/testFailure', 'execute/getTerminalOutput', 'execute/runTask', 'execute/runInTerminal', 'execute/runTests', 'read/problems', 'read/readFile', 'read/terminalSelection', 'read/terminalLastCommand', 'read/getTaskOutput', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'todo']
+  [execute/testFailure, execute/getTerminalOutput, execute/runTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, read/getTaskOutput, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
 handoffs:
   - label: Create status remediation plan (atomic_planner)
     agent: atomic_planner
@@ -100,7 +100,7 @@ Within the selected current version scope:
    - `- Work Mode: full-bug`
 - Legacy compatibility: if `issue.md` still contains `- Work Mode: full`, interpret it as `full-feature`.
 - Branch `Delivered` computation and evidence targets by marker value:
-   - For `Work Mode: minor-audit`, evaluate acceptance completion from `issue.md` criteria and write acceptance evidence to `issue.md`.
+   - For `Work Mode: minor-audit`, evaluate acceptance completion only from the explicit `## Acceptance Criteria` section in `issue.md` and write acceptance evidence to `issue.md`.
    - For `Work Mode: full-feature`, evaluate acceptance completion from `spec.md` and `user-story.md` and write acceptance evidence to `spec.md` and `user-story.md`.
    - For `Work Mode: full-bug`, evaluate acceptance completion from `spec.md` and write acceptance evidence to `spec.md`.
 - Fail closed: if marker is missing or malformed, fallback to `full-feature` behavior (`spec.md` + `user-story.md`) for Delivered computation and evidence writing.
@@ -195,7 +195,8 @@ Goal: if ALL acceptance criteria in the authoritative AC source file(s) have bee
 Process per feature:
 1) Resolve authoritative AC source file(s) per the work-mode marker contract and `acceptance-criteria-tracking`.
 2) Extract acceptance criteria from those source file(s):
-   - Prefer sections titled: “Acceptance Criteria”, “AC”, “Done when”
+   - For `minor-audit`, require the exact section title `## Acceptance Criteria` in `issue.md`
+   - For other modes, prefer sections titled: “Acceptance Criteria”, “AC”, “Done when”
    - Parse checklists and bullet lists as criteria items
 3) For each criterion:
    - Find best evidence:

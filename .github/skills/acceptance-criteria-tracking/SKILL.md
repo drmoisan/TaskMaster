@@ -29,20 +29,23 @@ Resolve the authoritative acceptance-criteria source file(s) using the work-mode
 
 Deterministic mode rule: use the persisted `- Work Mode: ...` marker from `issue.md` as the single source of truth. `full-feature` always means `spec.md` **and** `user-story.md`; `full-bug` always means `spec.md` **only**; legacy `full` always normalizes to `full-feature`.
 
+For `minor-audit`, require an explicit `## Acceptance Criteria` section in `issue.md`. Do not treat other `issue.md` checkbox sections as acceptance criteria for `minor-audit`.
+
 When multiple AC source files exist, track checkboxes in **each** applicable file independently.
 
 ## AC Identification
 
-Acceptance criteria are markdown checkbox items within AC source files, typically under headings such as:
-- `## Acceptance Criteria`
-- `### Acceptance Criteria`
-- `## Done When` or similar
+Acceptance criteria are markdown checkbox items within AC source files.
+
+Deterministic heading rule:
+- For `minor-audit`, acceptance criteria MUST live under the exact heading `## Acceptance Criteria` in `issue.md`.
+- For other work modes, headings such as `## Acceptance Criteria`, `### Acceptance Criteria`, or `## Done When` may still be used when they are the authoritative AC source file.
 
 AC items use the standard markdown checkbox format:
 - `- [ ] <criterion text>` (not yet delivered)
 - `- [x] <criterion text>` (delivered and verified)
 
-If AC items are not in checkbox format (e.g., numbered lists or prose), do NOT reformat them. Instead, note their status in the agent's own tracking artifacts (plan checklist, feature-audit, etc.) and document that the source file uses a non-checkbox format.
+If the explicit `minor-audit` section is missing, fail closed instead of guessing from other issue sections. If AC items are not in checkbox format (e.g., numbered lists or prose), do NOT reformat them. Instead, note their status in the agent's own tracking artifacts (plan checklist, feature-audit, etc.) and document that the source file uses a non-checkbox format.
 
 ## Check-Off Protocol
 

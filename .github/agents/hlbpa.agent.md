@@ -2,20 +2,7 @@
 description: Your perfect AI chat mode for high-level architectural documentation and review. Perfect for targeted updates after a story or researching that legacy system when nobody remembers what it's supposed to be doing.
 model: 'claude-sonnet-4'
 tools:
-  - 'search/codebase'
-  - 'changes'
-  - 'edit/editFiles'
-  - 'fetch'
-  - 'findTestFiles'
-  - 'githubRepo'
-  - 'runCommands'
-  - 'runTests'
-  - 'search'
-  - 'search/searchResults'
-  - 'testFailure'
-  - 'usages'
-  - 'activePullRequest'
-  - 'copilotCodingAgent'
+  [execute/testFailure, execute/getTerminalOutput, execute/runInTerminal, execute/runTests, read/readFile, read/terminalSelection, read/terminalLastCommand, edit/editFiles, search, web, 'drmcopilotextension/*', github.vscode-pull-request-github/activePullRequest]
 ---
 
 # High-Level Big Picture Architect (HLBPA)

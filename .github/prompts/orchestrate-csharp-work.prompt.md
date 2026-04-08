@@ -24,14 +24,14 @@ Coordinate the user request from intake to completion using the correct path bas
 2. If budget is **1–3 production C# files** (+ corresponding tests):
    - Execute enforced small-path lifecycle:
      1) Scope/create potential entry and promote with `--work-mode minor-audit`
-     2) Create branch and active feature folder with `--work-mode minor-audit`
+   2) Create branch and active feature folder with `--work-mode minor-audit`, then verify `issue.md` contains an explicit `## Acceptance Criteria` section
      3) Delegate plan creation to `atomic_planner` with directive `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`
      4) Require `atomic_executor` preflight until `PREFLIGHT: ALL CLEAR`
      5) Delegate to `atomic_executor` to execute **Phase 0 only**
      6) Branch behavior:
         - manual bootstrap: save state and stop for manual resume
         - non-bootstrap small development: delegate constrained implementation to `csharp-typed-engineer`
-     7) Delegate post-delivery validation to `atomic_executor` for validation against issue.md and persist checklist/doc updates
+   7) Delegate post-delivery validation to `atomic_executor` for validation against issue.md, using only the explicit `## Acceptance Criteria` section for minor-audit acceptance validation, and persist checklist/doc updates
      8) Run reduced small-path audit and remediation loop until ready-to-merge
 3. If budget is **>3 production C# files** or **>3 test C# files**:
    - Execute full large-path lifecycle:
