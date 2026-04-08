@@ -323,7 +323,7 @@ namespace UtilitiesCS //QuickFiler
             }
         }
 
-        public static async Task<MailItemHelper> FromMailItemAsync(
+        public static Task<MailItemHelper> FromMailItemAsync(
             MailItem item,
             IApplicationGlobals appGlobals,
             CancellationToken token,
@@ -335,15 +335,12 @@ namespace UtilitiesCS //QuickFiler
             token.ThrowIfCancellationRequested();
             item.ThrowIfNull();
 
-            return await Task.Run(
-                () =>
-                {
-                    var info = new MailItemHelper(item, appGlobals);
-                    info.Sw = new SegmentStopWatch().Start();
-                    return info;
-                },
-                token
-            );
+            var info = new MailItemHelper(item, appGlobals);
+            info.Sw = new SegmentStopWatch().Start();
+            info.MaterializeTokenizationDependencies();
+
+            token.ThrowIfCancellationRequested();
+            return Task.FromResult(info);
         }
 
         public MailItem ResolveMail(Outlook.NameSpace olNs, bool strict = false)
@@ -389,6 +386,22 @@ namespace UtilitiesCS //QuickFiler
                 FolderName,
                 Globals,
                 ConversationID,
+            };
+        }
+
+        internal void MaterializeTokenizationDependencies()
+        {
+            // Force the COM-backed values that EmailTokenizer reads while we are
+            // still on the caller's Outlook thread instead of a later Task.Run path.
+            _ = new object[]
+            {
+                Subject,
+                Body,
+                HTMLBody,
+                Sender,
+                ToRecipients,
+                CcRecipients,
+                AttachmentsInfo,
             };
         }
 
@@ -748,6 +761,7 @@ namespace UtilitiesCS //QuickFiler
 
         public async Task<IEnumerable<string>> TokenizeAsync()
         {
+            MaterializeTokenizationDependencies();
             Tokens = await Task.Run(() => Tokenizer.Tokenize(this).ToArray());
             Sw?.LogDuration("TokenizeAsync");
             return Tokens;

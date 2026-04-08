@@ -1,0 +1,4 @@
+Timestamp: 2026-04-08T12-02
+Command: $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\\Installer\\vswhere.exe'; $vstest = & $vswhere -latest -products * -find 'Common7\\IDE\\Extensions\\TestPlatform\\vstest.console.exe' | Select-Object -First 1; & $vstest 'c:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll' /InIsolation /Tests:'UtilitiesCS.Test.OutlookObjects.Recipient.RecipientStaticTests.GetInfo_WhenExchangeDirectoryAccessThrows_FallsBackToRecipientDisplayData,UtilitiesCS.Test.OutlookObjects.MailItem.MailItemHelperCoreTests.FromMailItemAsync_MaterializesTokenizationDependenciesBeforeBackgroundTokenAccess'
+EXIT_CODE: 0
+Output Summary: Focused MSTest regression run passed both scoped bug tests: RecipientStaticTests.GetInfo_WhenExchangeDirectoryAccessThrows_FallsBackToRecipientDisplayData and MailItemHelperCoreTests.FromMailItemAsync_MaterializesTokenizationDependenciesBeforeBackgroundTokenAccess.

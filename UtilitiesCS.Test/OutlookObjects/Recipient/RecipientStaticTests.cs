@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -398,6 +399,31 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
         }
 
         [TestMethod]
+        public void GetInfo_WhenExchangeDirectoryAccessThrows_FallsBackToRecipientDisplayData()
+        {
+            // Arrange
+            var recipient = CreateRecipientMock(
+                name: "Ada Display",
+                address: "ada@example.com",
+                type: (int)OlMailRecipientType.olTo,
+                userType: OlAddressEntryUserType.olExchangeUserAddressEntry,
+                hasExchangeUser: true,
+                exchangeFirstNameThrows: true,
+                exchangePrimarySmtpAddressThrows: true
+            );
+
+            // Act
+            var result = recipient.Object.GetInfo();
+
+            // Assert
+            result.Name.Should().Be("Ada Display");
+            result.Address.Should().Be("ada@example.com");
+            result
+                .Html.Should()
+                .Be("Ada Display &lt;<a href=\"mailto:ada@example.com\">ada@example.com</a>&gt;");
+        }
+
+        [TestMethod]
         public void GetInfo_ForRecipientSequence_ProjectsEachRecipient()
         {
             // Arrange
@@ -533,7 +559,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
             bool hasExchangeUser = false,
             string exchangeFirstName = "",
             string exchangeLastName = "",
-            string exchangePrimarySmtpAddress = ""
+            string exchangePrimarySmtpAddress = "",
+            bool exchangeFirstNameThrows = false,
+            bool exchangeLastNameThrows = false,
+            bool exchangePrimarySmtpAddressThrows = false
         )
         {
             var propertyAccessor = new Mock<PropertyAccessor>();
@@ -570,11 +599,42 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
                 else
                 {
                     var exchangeUser = new Mock<ExchangeUser>();
-                    exchangeUser.SetupGet(x => x.FirstName).Returns(exchangeFirstName);
-                    exchangeUser.SetupGet(x => x.LastName).Returns(exchangeLastName);
-                    exchangeUser
-                        .SetupGet(x => x.PrimarySmtpAddress)
-                        .Returns(exchangePrimarySmtpAddress);
+
+                    if (exchangeFirstNameThrows)
+                    {
+                        exchangeUser
+                            .SetupGet(x => x.FirstName)
+                            .Throws(new COMException("Exchange first-name lookup failed."));
+                    }
+                    else
+                    {
+                        exchangeUser.SetupGet(x => x.FirstName).Returns(exchangeFirstName);
+                    }
+
+                    if (exchangeLastNameThrows)
+                    {
+                        exchangeUser
+                            .SetupGet(x => x.LastName)
+                            .Throws(new COMException("Exchange last-name lookup failed."));
+                    }
+                    else
+                    {
+                        exchangeUser.SetupGet(x => x.LastName).Returns(exchangeLastName);
+                    }
+
+                    if (exchangePrimarySmtpAddressThrows)
+                    {
+                        exchangeUser
+                            .SetupGet(x => x.PrimarySmtpAddress)
+                            .Throws(new COMException("Exchange SMTP lookup failed."));
+                    }
+                    else
+                    {
+                        exchangeUser
+                            .SetupGet(x => x.PrimarySmtpAddress)
+                            .Returns(exchangePrimarySmtpAddress);
+                    }
+
                     addressEntry.Setup(x => x.GetExchangeUser()).Returns(exchangeUser.Object);
                 }
             }
