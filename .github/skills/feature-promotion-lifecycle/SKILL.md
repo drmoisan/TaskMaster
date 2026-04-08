@@ -71,6 +71,7 @@ When orchestrator routing selects short path, promotion/folder initialization st
 
 3a) Verify minor-audit folder integrity before proceeding:
 - `${feature-folder}/issue.md` exists and contains `- Work Mode: minor-audit`
+- `${feature-folder}/issue.md` contains an explicit `## Acceptance Criteria` section
 - `${feature-folder}/spec.md` does not exist
 - `${feature-folder}/user-story.md` does not exist
 - if any check fails, stop and remediate before planning
@@ -103,7 +104,8 @@ Before delegating research/spec/planning, provide:
 - constraints/APIs/invariants to preserve
 
 Mode-aware expectations:
-- For `minor-audit`, `issue.md` is the primary acceptance-criteria source and `spec.md`/`user-story.md` may be intentionally absent by design.
+- For `minor-audit`, the explicit `## Acceptance Criteria` section in `issue.md` is the primary acceptance-criteria source and `spec.md`/`user-story.md` may be intentionally absent by design.
+- For `minor-audit`, do not infer acceptance criteria from other `issue.md` sections such as verification notes, next steps, or severity checklists.
 - For `minor-audit`, `spec.md`/`user-story.md` must be treated as integrity failures when they appear unexpectedly in the active folder.
 - For `full-feature`, `spec.md` and `user-story.md` are expected alongside `issue.md`.
 - For `full-bug`, `spec.md` is expected alongside `issue.md`; `user-story.md` should be absent unless the requirements explicitly justify it.

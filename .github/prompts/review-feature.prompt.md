@@ -46,6 +46,7 @@ All filenames must include a timestamp in ISO-8601 format `yyyy-MM-ddTHH-mm` (e.
 For short-path/minor-audit reviews, the reviewer MUST verify all of the following before issuing any PASS-style outcome:
 
 - `${feature-folder}/issue.md` exists and is the sole requirements source used for acceptance validation.
+- `${feature-folder}/issue.md` contains an explicit `## Acceptance Criteria` section, and only that section is used for minor-audit acceptance validation.
 - `${feature-folder}/spec.md` does not exist.
 - `${feature-folder}/user-story.md` does not exist.
 - `phase0-instructions-read.md` exists in the canonical baseline location with the required metadata fields.

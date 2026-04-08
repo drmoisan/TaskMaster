@@ -19,6 +19,7 @@ Use this skill when:
 - Phase headings must be: `### Phase N — <Title>`
 - Tasks must start with: `- [ ] [P#-T#]` (or `[x]` for completed)
 - Task IDs must match their phase and be sequential per phase.
+- Plans must pass the `validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>` before they can be reported as approved.
 
 ## Short-Path Minimal Plan Contract
 
@@ -56,6 +57,7 @@ For short-path planning handoffs, orchestrators MUST include:
 
 Required planner outputs for this directive:
 - plan MUST use `${feature-folder}/issue.md` as sole requirements source,
+- plan MUST require `${feature-folder}/issue.md` to contain an explicit `## Acceptance Criteria` section and MUST treat only that section as the minor-audit AC source,
 - plan MUST NOT require `spec.md`/`user-story.md`/`research.md`,
 - plan MUST include exactly 3 phases:
 	- Phase 0 baseline capture,
@@ -130,6 +132,15 @@ When validating or handing off plans for execution:
 	- `PREFLIGHT: ALL CLEAR`
 	- `PREFLIGHT: REVISIONS REQUIRED`
 - If revisions are required, provide a precise plan delta and repeat validation until all clear.
+- If the required planner ↔ executor handoff cannot be started or completed, stop and report blocked state; do not self-approve the plan.
+
+## Validator Gate (Mandatory)
+
+Before a plan can be treated as approved:
+
+- run the `validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>`,
+- reject the plan if that validator exits non-zero,
+- do not treat human-readable summaries as a substitute for validator success.
 
 ## Plan-Path Continuity Contract (Mandatory)
 
@@ -156,7 +167,8 @@ When a plan is generated or validated from a feature folder, resolve selected mo
 ## Mode-Specific Mandatory Plan Gates
 
 - `minor-audit` plans MUST include baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks.
+- `minor-audit` plans MUST require `${feature-folder}/issue.md` to contain an explicit `## Acceptance Criteria` section; do not infer acceptance criteria from other `issue.md` sections.
 - `minor-audit` plans MUST NOT treat missing `spec.md` or `user-story.md` as automatic blockers.
-- `minor-audit` execution/validation/audit MUST fail closed when `spec.md` or `user-story.md` exists unexpectedly in the active folder, when required Phase 0 artifacts are missing, or when checklist state contradicts evidence on disk.
+- `minor-audit` execution/validation/audit MUST fail closed when `spec.md` or `user-story.md` exists unexpectedly in the active folder, when the explicit `## Acceptance Criteria` section is missing from `issue.md`, when required Phase 0 artifacts are missing, or when checklist state contradicts evidence on disk.
 - `full-feature` plans MUST enforce full-document expectations (`spec.md` + `user-story.md`) and full QA loop obligations.
 - `full-bug` plans MUST enforce spec-driven expectations (`spec.md` required, `user-story.md` optional/absent by default) and full QA loop obligations.
