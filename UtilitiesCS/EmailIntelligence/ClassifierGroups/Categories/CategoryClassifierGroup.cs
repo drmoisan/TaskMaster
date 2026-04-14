@@ -76,77 +76,93 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
 
         public async Task BuildClassifiersAsync()
         {
-            var miner = new EmailDataMiner(Globals);
-
             // Set up Progress Tracking
             var (ppkg, sw) = await SetupProgressTracking();
-
-            // Load the staging data
-            MinedMailInfo[] collection = await LoadStagingData(ppkg, sw);
-            var allocation =
-                Globals.TD.PrefixList.Count > 1
-                    ? (100 - ppkg.ProgressTrackerPane.Progress) / Globals.TD.PrefixList.Count
-                    : 100 - ppkg.ProgressTrackerPane.Progress;
-
-            List<string> prefixList = ["Context", "Project"];
-            foreach (var prefixLu in prefixList)
+            try
             {
-                var prefix = Globals.TD.PrefixList.Find(x => x.Key == prefixLu);
-                // Remove the existing Category Classifier
-                Globals.AF.Manager.TryRemove(prefix.Key, out _);
-
-                var childPpkg = await new ProgressPackage()
-                    .InitializeAsync(
-                        ppkg.CancelSource,
-                        ppkg.Cancel,
-                        ppkg.ProgressTrackerPane.SpawnChild(allocation),
-                        ppkg.StopWatch
-                    )
-                    .ConfigureAwait(false);
-
-                // Get or Create the Classifier Group
-                BayesianClassifierGroup classifierGroup = await LoadClassifierGroup(
-                    childPpkg,
-                    sw,
-                    collection,
-                    prefix
-                );
-
-                var childPpkg2 = await new ProgressPackage()
-                    .InitializeAsync(
-                        childPpkg.CancelSource,
-                        childPpkg.Cancel,
-                        childPpkg.ProgressTrackerPane.SpawnChild(),
-                        childPpkg.StopWatch
-                    )
-                    .ConfigureAwait(false);
-
-                if (await BuildClassifiersAsync(classifierGroup, collection, childPpkg2, prefix))
+                MinedMailInfo[] collection;
+                try
                 {
-                    // set the configuration of classifierGroup
-                    if (
-                        (await Globals.AF.Manager.Configuration).TryGetValue(
-                            prefix.Key,
-                            out var loader
+                    // Load the staging data
+                    collection = await LoadStagingData(ppkg, sw);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    logger.Warn(ex.Message, ex);
+                    ShowMissingStagingDataDialog(ex.Message);
+                    return;
+                }
+
+                var allocation =
+                    Globals.TD.PrefixList.Count > 1
+                        ? (100 - ppkg.ProgressTrackerPane.Progress) / Globals.TD.PrefixList.Count
+                        : 100 - ppkg.ProgressTrackerPane.Progress;
+
+                List<string> prefixList = ["Context", "Project"];
+                foreach (var prefixLu in prefixList)
+                {
+                    var prefix = Globals.TD.PrefixList.Find(x => x.Key == prefixLu);
+                    // Remove the existing Category Classifier
+                    Globals.AF.Manager.TryRemove(prefix.Key, out _);
+
+                    var childPpkg = await new ProgressPackage()
+                        .InitializeAsync(
+                            ppkg.CancelSource,
+                            ppkg.Cancel,
+                            ppkg.ProgressTrackerPane.SpawnChild(allocation),
+                            ppkg.StopWatch
                         )
+                        .ConfigureAwait(false);
+
+                    // Get or Create the Classifier Group
+                    BayesianClassifierGroup classifierGroup = await LoadClassifierGroup(
+                        childPpkg,
+                        sw,
+                        collection,
+                        prefix
+                    );
+
+                    var childPpkg2 = await new ProgressPackage()
+                        .InitializeAsync(
+                            childPpkg.CancelSource,
+                            childPpkg.Cancel,
+                            childPpkg.ProgressTrackerPane.SpawnChild(),
+                            childPpkg.StopWatch
+                        )
+                        .ConfigureAwait(false);
+
+                    if (
+                        await BuildClassifiersAsync(classifierGroup, collection, childPpkg2, prefix)
                     )
                     {
-                        classifierGroup.Config =
-                            loader.Config.DeepCopy() as NewSmartSerializableConfig;
-                        classifierGroup.Serialize();
+                        // set the configuration of classifierGroup
+                        if (
+                            (await Globals.AF.Manager.Configuration).TryGetValue(
+                                prefix.Key,
+                                out var loader
+                            )
+                        )
+                        {
+                            classifierGroup.Config =
+                                loader.Config.DeepCopy() as NewSmartSerializableConfig;
+                            classifierGroup.Serialize();
 
-                        Globals.AF.Manager[prefix.Key] = classifierGroup.ToAsyncLazy();
-                        //Globals.AF.Manager.Serialize();
-                        MyBox.ShowDialog(
-                            $"{prefix.Key} Classifier Built Successfully",
-                            "Success",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Information
-                        );
+                            Globals.AF.Manager[prefix.Key] = classifierGroup.ToAsyncLazy();
+                            //Globals.AF.Manager.Serialize();
+                            MyBox.ShowDialog(
+                                $"{prefix.Key} Classifier Built Successfully",
+                                "Success",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information
+                            );
+                        }
                     }
                 }
             }
-            Globals.AF.ProgressPane.Visible = false;
+            finally
+            {
+                Globals.AF.ProgressPane.Visible = false;
+            }
         }
 
         private async Task<(
@@ -232,17 +248,57 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             );
             if (!Globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
             {
-                return default;
+                throw CreateMissingStagingDataException();
             }
+
             var folderPath = Path.Combine(folderRoot, "Bayesian");
             var collection = await EmailDataMiner.Load<MinedMailInfo[]>(folderPath);
-            collection.ThrowIfNullOrEmpty();
+            if (collection is null || collection.Length == 0)
+            {
+                throw CreateMissingStagingDataException(folderPath);
+            }
+
             sw?.LogDuration("Load Staging");
             ppkg.ProgressTrackerPane.Report(
                 10,
                 "Building Category Classifiers -> Loaded Mined Mail Info"
             );
             return collection;
+        }
+
+        private static InvalidOperationException CreateMissingStagingDataException(
+            string folderPath = null
+        )
+        {
+            var builder = new StringBuilder(
+                "TaskMaster could not load the staged Bayesian mining data required to build category classifiers."
+            );
+            builder.Append(
+                " Run Continue Mining or Scrape and Mine before building the category classifier."
+            );
+
+            if (!folderPath.IsNullOrEmpty())
+            {
+                builder.Append($" Expected staging folder: {folderPath}.");
+            }
+            else
+            {
+                builder.Append(
+                    " AppData was not available, so the Bayesian staging folder could not be resolved."
+                );
+            }
+
+            return new InvalidOperationException(builder.ToString());
+        }
+
+        private static void ShowMissingStagingDataDialog(string message)
+        {
+            MyBox.ShowDialog(
+                message,
+                "Category classifier data unavailable",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning
+            );
         }
 
         public async Task<bool> BuildClassifiersAsync(

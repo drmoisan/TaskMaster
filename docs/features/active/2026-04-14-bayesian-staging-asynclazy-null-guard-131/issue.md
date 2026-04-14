@@ -2,7 +2,7 @@
 
 - Date captured: 2026-04-14
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/bayesian-staging-asynclazy-null-guard/ (Issue #131)
+- Status: Validated locally in `docs/features/active/2026-04-14-bayesian-staging-asynclazy-null-guard-131/`
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
@@ -13,58 +13,60 @@
 
 ## Summary
 
-One or two sentences on what is broken.
+Building the category classifier crashes when Bayesian staging data is missing because `CategoryClassifierGroup.LoadStagingData` forwards a null or empty `MinedMailInfo[]` into `ThrowIfNullOrEmpty()` instead of surfacing the missing mining prerequisite.
 
 ## Environment
 
-- OS/version:
-- Python version:
-- Command/flags used:
-- Data source or fixture:
+- OS/version: Windows workstation, local development environment
+- Python version: not applicable
+- Command/flags used: ribbon action `Build Category Classifier`
+- Data source or fixture: missing `<AppData>\Bayesian` staging data
 
 ## Steps to Reproduce
 
-1. ...
-2. ...
-3. ...
+1. Open TaskMaster without existing Bayesian staging files under `%LocalAppData%\TaskMaster\Bayesian`.
+2. Trigger the `Build Category Classifier` ribbon action without first running `Continue Mining` or `Scrape and Mine`.
+3. Observe the category-classifier build path.
 
 ## Expected Behavior
 
-What you expected to happen.
+The build should stop cleanly and explain that Bayesian mining must be run before category classifiers can be built.
 
 ## Actual Behavior
 
-What actually happened (include key error text).
+The build throws an unhandled `ArgumentNullException` from `LoadStagingData` after `EmailDataMiner.Load<MinedMailInfo[]>(folderPath)` returns null or an empty collection.
 
 ## Acceptance Criteria
 
-- [x] Bayesian staging JSON no longer attempts to deserialize `FolderWrapper.ItemHelpers` or other non-deserializable runtime-only members.
-- [x] The null-or-empty guard used by the staging load path throws a deterministic argument exception without dereferencing a null reflected caller method.
-- [x] Regression tests cover both the staging deserialization boundary and the safe null-or-empty guard behavior.
+- [x] `Build Category Classifier` no longer crashes when staged Bayesian data is missing.
+- [x] The user sees an actionable warning that tells them to run `Continue Mining` or `Scrape and Mine` before building category classifiers.
+- [x] The dead `EmailDataMiner` local in `CategoryClassifierGroup.BuildClassifiersAsync` is removed or otherwise accounted for.
+- [x] MSTest regression coverage verifies the missing-staging-data path in `UtilitiesCS.Test`.
 
 ## Logs / Screenshots
 
 - [ ] Attached minimal logs or screenshot
 - Snippet:
+  `System.ArgumentNullException: collection cannot be null or empty. Called from LoadStagingData`
 
 ## Impact / Severity
 
 - [ ] Blocker
-- [ ] High
+- [x] High
 - [ ] Medium
 - [ ] Low
 
 ## Suspected Cause / Notes
 
-Optional early hunches, related changes, or files to inspect.
+`ContinueMiningAsync` and `ScrapeAndMineAsync` are already separate ribbon actions that populate the Bayesian staging folder. `BuildCategoryClassifierAsync` expects that staging data to exist but previously handled the missing-data case as an unhandled exception instead of a user-facing prerequisite failure.
 
 ## Proposed Fix / Validation Ideas
 
-- [ ] Unit coverage areas
-- [ ] Integration scenario to retest
-- [ ] Manual verification notes
+- [x] Unit coverage areas
+- [x] Integration scenario to retest
+- [x] Manual verification notes
 
 ## Next Step
 
-- [ ] Promote to GitHub issue (bug-report template)
-- [ ] Move to active fix folder / branch
+- [x] Promote to GitHub issue (bug-report template)
+- [x] Move to active fix folder / branch
