@@ -3,14 +3,17 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
+using UtilitiesCS.HelperClasses;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.Test.EmailIntelligence
@@ -461,6 +464,145 @@ namespace UtilitiesCS.Test.EmailIntelligence
             message.Should().Contain("Completed 2 of 4");
             message.Should().Contain("elapsed");
             message.Should().Contain("remaining");
+        }
+
+        [TestMethod]
+        public async Task ToIItemInfo_WhenCreatingMailHelper_UsesCallingThreadForMaterialization()
+        {
+            // Arrange: the override records the thread ID where helper materialization occurs,
+            // which lets this test detect any reintroduction of Task.Run around the helper seam.
+            var folder = new FolderWrapper(true, 1, 10, "Inbox", "root/inbox");
+            var miner = new ThreadRecordingEmailDataMiner(new StubGlobals());
+            var callingThreadId = Environment.CurrentManagedThreadId;
+
+            // Act
+            var result = await miner.ToIItemInfo(
+                new Mock<MailItem>().Object,
+                folder,
+                CancellationToken.None
+            );
+
+            // Assert
+            miner.HelperFactoryThreadId.Should().Be(callingThreadId);
+            result.Should().NotBeNull();
+            result.FolderInfo.Should().BeSameAs(folder);
+        }
+
+        [TestMethod]
+        public async Task ToMinedMail_WhenCreatingMailHelper_UsesCallingThreadForMaterialization()
+        {
+            // Arrange: this covers the second mining helper path so the STA-thread guarantee
+            // remains intact across both EmailDataMiner helper entry points.
+            var miner = new ThreadRecordingEmailDataMiner(new StubGlobals());
+            var callingThreadId = Environment.CurrentManagedThreadId;
+
+            // Act
+            var result = await miner.ToMinedMail(
+                new Mock<MailItem>().Object,
+                CancellationToken.None
+            );
+
+            // Assert
+            miner.HelperFactoryThreadId.Should().Be(callingThreadId);
+            result.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public async Task CreateMailItemHelperAsync_WithMockMailItem_UsesBaseHelperFactory()
+        {
+            // Arrange: execute the new base seam directly so touched-file coverage includes the
+            // non-overridden helper factory path used by the production miner.
+            var archiveRoot = new Mock<Folder>();
+            archiveRoot.SetupGet(x => x.FolderPath).Returns("\\Archive");
+            var inbox = new Mock<Folder>();
+            inbox.SetupGet(x => x.FolderPath).Returns("\\Inbox");
+
+            var olObjects = new Mock<IOlObjects>();
+            olObjects.SetupGet(x => x.EmailPrefixToStrip).Returns(string.Empty);
+            olObjects.SetupGet(x => x.ArchiveRootPath).Returns("\\Archive");
+            olObjects.SetupGet(x => x.ArchiveRoot).Returns(archiveRoot.Object);
+            olObjects.SetupGet(x => x.Inbox).Returns(inbox.Object);
+
+            var globals = new Mock<IApplicationGlobals>();
+            globals.SetupGet(x => x.Ol).Returns(olObjects.Object);
+
+            var sender = new Mock<AddressEntry>();
+            sender
+                .SetupGet(x => x.AddressEntryUserType)
+                .Returns(OlAddressEntryUserType.olSmtpAddressEntry);
+            sender.SetupGet(x => x.Name).Returns("Ada Lovelace");
+            sender.SetupGet(x => x.Address).Returns("ada@example.com");
+            sender.SetupGet(x => x.PropertyAccessor).Returns(new Mock<PropertyAccessor>().Object);
+
+            var parentFolder = new Mock<Folder>();
+            parentFolder.SetupGet(x => x.Name).Returns("Inbox");
+            parentFolder.SetupGet(x => x.StoreID).Returns("store-id");
+            parentFolder.SetupGet(x => x.FolderPath).Returns("\\Inbox\\Ada");
+
+            var recipients = new Mock<Recipients>();
+            recipients.SetupGet(x => x.Count).Returns(0);
+            recipients
+                .Setup(x => x.GetEnumerator())
+                .Returns(new System.Collections.Generic.List<Recipient>().GetEnumerator());
+
+            var attachments = new Mock<Attachments>();
+            attachments.SetupGet(x => x.Count).Returns(0);
+            attachments
+                .Setup(x => x.GetEnumerator())
+                .Returns(new System.Collections.Generic.List<Attachment>().GetEnumerator());
+
+            var mailItem = new Mock<MailItem>();
+            mailItem.SetupGet(x => x.EntryID).Returns("entry-id");
+            mailItem.SetupGet(x => x.Subject).Returns("Subject");
+            mailItem.SetupGet(x => x.Body).Returns("Body");
+            mailItem.SetupGet(x => x.HTMLBody).Returns("<html><body>Body</body></html>");
+            mailItem.SetupGet(x => x.Sender).Returns(sender.Object);
+            mailItem.SetupGet(x => x.SenderName).Returns("Ada Lovelace");
+            mailItem.SetupGet(x => x.SenderEmailAddress).Returns("ada@example.com");
+            mailItem.SetupGet(x => x.Recipients).Returns(recipients.Object);
+            mailItem.SetupGet(x => x.Attachments).Returns(attachments.Object);
+            mailItem.SetupGet(x => x.InternetCodepage).Returns(65001);
+            mailItem.SetupGet(x => x.Parent).Returns(parentFolder.Object);
+
+            var miner = new EmailDataMiner(globals.Object);
+
+            // Act
+            var helper = await miner.CreateMailItemHelperAsync(
+                mailItem.Object,
+                CancellationToken.None
+            );
+
+            // Assert
+            helper.Should().NotBeNull();
+            helper.Subject.Should().Be("Subject");
+            helper.SenderName.Should().Be("Ada Lovelace");
+            helper.InternetCodepage.Should().Be(65001);
+        }
+
+        private sealed class ThreadRecordingEmailDataMiner : EmailDataMiner
+        {
+            public ThreadRecordingEmailDataMiner(IApplicationGlobals appGlobals)
+                : base(appGlobals) { }
+
+            public int? HelperFactoryThreadId { get; private set; }
+
+            internal override Task<MailItemHelper> CreateMailItemHelperAsync(
+                MailItem mailItem,
+                CancellationToken cancel
+            )
+            {
+                HelperFactoryThreadId = Environment.CurrentManagedThreadId;
+                var helper = new MailItemHelper
+                {
+                    Subject = "Subject",
+                    Body = "Body",
+                    Sender = new RecipientInfo("Ada Lovelace", "ada@example.com", "Ada Lovelace"),
+                    SentOn = "2026-04-13 00:00",
+                    InternetCodepage = 65001,
+                };
+                helper.Sw = new SegmentStopWatch().Start();
+                return Task.FromResult(helper);
+            }
         }
         #endregion
     }
