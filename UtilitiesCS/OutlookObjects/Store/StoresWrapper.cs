@@ -37,12 +37,13 @@ namespace UtilitiesCS.OutlookObjects.Store
             return this;
         }
 
-        public static async Task<StoresWrapper> CreateAsync(
+        public static Task<StoresWrapper> CreateAsync(
             IApplicationGlobals globals,
             CancellationToken cancel
         )
         {
-            return await Task.Run(() => new StoresWrapper(globals).Init(), cancel);
+            cancel.ThrowIfCancellationRequested();
+            return Task.FromResult(new StoresWrapper(globals).Init());
         }
 
         [OnDeserialized]
@@ -58,7 +59,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             }
         }
 
-        internal async Task RewireOlObjectsAsync(StreamingContext context)
+        internal Task RewireOlObjectsAsync(StreamingContext context)
         {
             this.Stores ??= [];
             var stores = GetFilteredStores();
@@ -68,15 +69,15 @@ namespace UtilitiesCS.OutlookObjects.Store
                 var storeWrapper = Stores.Find(x => x.DisplayName == store.DisplayName);
                 if (storeWrapper is null)
                 {
-                    storeWrapper = await Task.Run(() => new StoreWrapper(store).Init());
+                    storeWrapper = new StoreWrapper(store).Init();
                     Stores.Add(storeWrapper);
                 }
                 else
                 {
-                    await Task.Run(() => storeWrapper.Restore(store));
-                    //await Task.Run(() => storeWrapper.RestoreGlobalAddresses(Globals.Ol.App));
+                    storeWrapper.Restore(store);
                 }
             }
+            return Task.CompletedTask;
         }
 
         private IEnumerable<Outlook.Store> GetFilteredStores()

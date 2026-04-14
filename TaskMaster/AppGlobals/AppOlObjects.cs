@@ -96,25 +96,28 @@ namespace TaskMaster
 
         internal IEnumerable<Folder> LoadInboxes()
         {
-            // TODO: Test with gmail to see if I need to add a filter for non-exchange
             var storesWrapper = StoresWrapper ?? new StoresWrapper() { };
-            var stores = NamespaceMAPI.Stores.Cast<Store>().Where(storesWrapper.ShouldIncludeStore);
+            var stores = NamespaceMAPI.Stores.Cast<Store>();
 
             var inboxes = new List<Folder>();
             foreach (var store in stores)
             {
-                MAPIFolder inbox = null;
                 try
                 {
-                    inbox = store.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+                    if (!storesWrapper.ShouldIncludeStore(store))
+                    {
+                        continue;
+                    }
+
+                    var inbox = store.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+                    if (inbox is not null)
+                    {
+                        inboxes.Add((Folder)inbox);
+                    }
                 }
                 catch (COMException e)
                 {
                     logger.Error($"Error loading inbox from store. {e.Message}", e);
-                }
-                if (inbox is not null)
-                {
-                    inboxes.Add((Folder)inbox);
                 }
             }
             return inboxes;
@@ -124,25 +127,21 @@ namespace TaskMaster
 
         public StoresWrapper StoresWrapper { get; set; }
 
-        internal async Task LoadStoresAsync() =>
-            await Task.Run(
-                async () =>
-                {
-                    if (_globals.IntelRes.Config.TryGetValue("StoresWrapper", out var config))
-                    {
-                        StoresWrapper = await SmartSerializable.DeserializeAsync(
-                            config,
-                            true,
-                            () => new StoresWrapper(_globals).Init()
-                        );
-                    }
-                    else
-                    {
-                        logger.Error("StoresWrapper config not found.");
-                    }
-                },
-                _globals.AF.CancelToken
-            );
+        internal Task LoadStoresAsync()
+        {
+            if (_globals.IntelRes.Config.TryGetValue("StoresWrapper", out var config))
+            {
+                StoresWrapper = SmartSerializable.Deserialize<
+                    StoresWrapper,
+                    SmartSerializableLoader
+                >(config);
+            }
+            else
+            {
+                logger.Error("StoresWrapper config not found.");
+            }
+            return Task.CompletedTask;
+        }
 
         private Reminders _olReminders;
         public Reminders OlReminders
