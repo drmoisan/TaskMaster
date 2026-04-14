@@ -81,13 +81,23 @@ namespace UtilitiesCS.Extensions
         public static T ThrowIfNullOrEmpty<T>(
             this T? argument,
             string? message = default,
-            [CallerMemberName] string callerName = ""
+            [CallerMemberName] string callerName = "",
+            [CallerArgumentExpression(nameof(argument))] string argumentExpression = ""
         )
             where T : System.Collections.ICollection
         {
             if (argument is null || argument.Count == 0)
             {
-                var paramName = new StackTrace().GetCallerByName(callerName).GetParameterName(0);
+                var traceString = new StackTrace().TryGetMyTraceString(
+                    "[unable to get trace info]"
+                );
+                var paramName = argumentExpression;
+                if (string.IsNullOrEmpty(message))
+                {
+                    message =
+                        $"{paramName} cannot be null or empty. Called from {callerName}. Trace: {traceString}";
+                }
+
                 throw new ArgumentNullException(paramName, message);
             }
             else
@@ -99,12 +109,22 @@ namespace UtilitiesCS.Extensions
         public static string ThrowIfNullOrEmpty(
             this string argument,
             string? message = default,
-            [CallerMemberName] string callerName = ""
+            [CallerMemberName] string callerName = "",
+            [CallerArgumentExpression(nameof(argument))] string argumentExpression = ""
         )
         {
             if (string.IsNullOrEmpty(argument))
             {
-                var paramName = new StackTrace().GetCallerByName(callerName).GetParameterName(0);
+                var traceString = new StackTrace().TryGetMyTraceString(
+                    "[unable to get trace info]"
+                );
+                var paramName = argumentExpression;
+                if (string.IsNullOrEmpty(message))
+                {
+                    message =
+                        $"{paramName} cannot be null or empty. Called from {callerName}. Trace: {traceString}";
+                }
+
                 throw new ArgumentNullException(paramName, message);
             }
             else

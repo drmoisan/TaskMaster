@@ -237,6 +237,67 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         }
 
         [TestMethod]
+        public void FolderWrapperStagingJson_ExcludesRuntimeOnlyMembersDuringSerialization()
+        {
+            // Arrange
+            var sut = CreateHelper();
+            var settings = (JsonSerializerSettings)InvokeNonPublic(sut, "GetJsonSettings");
+            var folder = new FolderWrapper(true, 2, 128L, "Inbox", @"Archive\Inbox")
+            {
+                Globals = _mockGlobals.Object,
+                ItemHelpers = new AsyncLazy<IItemInfo[]>(() => Array.Empty<IItemInfo>()),
+            };
+
+            // Act
+            Func<string> action = () => JsonConvert.SerializeObject(folder, settings);
+
+            // Assert
+            action.Should().NotThrow();
+            var json = action();
+            json.Should().NotContain(nameof(FolderWrapper.ItemCountSubFolders));
+            json.Should().NotContain(nameof(FolderWrapper.ItemHelpers));
+            json.Should().NotContain(nameof(FolderWrapper.Globals));
+        }
+
+        [TestMethod]
+        public void FolderWrapperStagingJson_IgnoresLegacyRuntimeOnlyMembersDuringDeserialization()
+        {
+            // Arrange
+            var sut = CreateHelper();
+            var settings = (JsonSerializerSettings)InvokeNonPublic(sut, "GetJsonSettings");
+            var legacyJson = string.Join(
+                Environment.NewLine,
+                "{",
+                "  \"Selected\": true,",
+                "  \"ItemCount\": 2,",
+                "  \"FolderSize\": 128,",
+                "  \"Name\": \"Inbox\",",
+                "  \"RelativePath\": \"Archive\\\\Inbox\",",
+                "  \"ItemHelpers\": {",
+                "    \"instance\": null",
+                "  },",
+                "  \"Globals\": {",
+                "    \"FS\": null",
+                "  }",
+                "}"
+            );
+
+            // Act
+            Func<FolderWrapper> action = () =>
+                JsonConvert.DeserializeObject<FolderWrapper>(legacyJson, settings);
+
+            // Assert
+            action.Should().NotThrow();
+            var folder = action();
+            folder.Should().NotBeNull();
+            folder.Selected.Should().BeTrue();
+            folder.ItemCount.Should().Be(2);
+            folder.FolderSize.Should().Be(128L);
+            folder.Name.Should().Be("Inbox");
+            folder.RelativePath.Should().Be(@"Archive\Inbox");
+        }
+
+        [TestMethod]
         public async Task SerializeAndSaveAsync_WritesJsonUsingProgressPath()
         {
             // Arrange

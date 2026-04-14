@@ -93,6 +93,19 @@ namespace UtilitiesCS.Test.Extensions
         }
 
         [TestMethod]
+        public void GetParameterName_WhenMethodIsNull_ThrowsArgumentNullException()
+        {
+            // Arrange
+            MethodBase method = null;
+
+            // Act
+            Action action = () => method.GetParameterName(0);
+
+            // Assert
+            action.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("method");
+        }
+
+        [TestMethod]
         public void TryGetParameterName_ReturnsEmptyStringForInvalidIndexOrNullMethod()
         {
             // Arrange
