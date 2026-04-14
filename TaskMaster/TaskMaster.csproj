@@ -33,15 +33,38 @@
     <NoStandardLibraries>false</NoStandardLibraries>
     <RootNamespace>TaskMaster</RootNamespace>
     <AssemblyName>TaskMaster</AssemblyName>
-    <LoadBehavior>3</LoadBehavior>
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <LangVersion>preview</LangVersion>
     <DefineConstants>VSTO40</DefineConstants>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <BootstrapperComponentsLocation>HomeSite</BootstrapperComponentsLocation>
     <NuGetPackageImportStamp></NuGetPackageImportStamp>
+    <IsWebBootstrapper>False</IsWebBootstrapper>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <PublishUrl>C:\Users\DanMoisan\OneDrive - The Real Good Food Company\TM\</PublishUrl>
+    <InstallUrl />
+    <TargetCulture>en</TargetCulture>
+    <ApplicationVersion>1.0.0.1</ApplicationVersion>
+    <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>days</UpdateIntervalUnits>
+    <ProductName>TaskMaster</ProductName>
+    <PublisherName />
+    <SupportUrl />
+    <FriendlyName>TaskMaster</FriendlyName>
+    <OfficeApplicationDescription />
+    <LoadBehavior>3</LoadBehavior>
   </PropertyGroup>
   <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.8.1">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.8.1 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.VSTORuntime.4.0">
       <Visible>False</Visible>
       <ProductName>Microsoft Visual Studio 2010 Tools for Office Runtime %28x86 and x64%29</ProductName>
@@ -509,7 +532,12 @@
           DebugInfoExeName="#Software\Microsoft\Office\16.0\Outlook\InstallRoot\Path#outlook.exe"
           AddItemTemplatesGuid="{A58A78EB-1C92-4DDD-80CF-E8BD872ABFC4}"
         />
-        <Host Name="Outlook" GeneratedCodeNamespace="TaskMaster" IconIndex="0">
+        <Host
+          Name="Outlook"
+          GeneratedCodeNamespace="TaskMaster"
+          PublishedHash="69C324AB27932AA2FBF2B7EA72250886FF164DE6"
+          IconIndex="0"
+        >
           <HostItem
             Name="ThisAddIn"
             Code="ThisAddIn.cs"
@@ -518,6 +546,7 @@
             IconIndex="1"
             Blueprint="ThisAddIn.Designer.xml"
             GeneratedCode="ThisAddIn.Designer.cs"
+            PublishedHash="4B6729ACD39D816806E3F20BE1C4B47068ED34C0"
           />
         </Host>
       </FlavorProperties>
