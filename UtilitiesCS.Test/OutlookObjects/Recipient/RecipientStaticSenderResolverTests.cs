@@ -128,10 +128,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
         }
 
         [TestMethod]
-        public void GetSenderName_ForMailItemWhenGetExchangeUserReturnsNull_FallsBackToAddressEntryName()
+        public void GetSenderName_ForMailItemWhenGetExchangeUserReturnsNull_FallsBackToMailSenderName()
         {
-            // Arrange: Exchange user type but GetExchangeUser returns null; fall back to
-            // AddressEntry.Name which is more reliable than the mail-item SenderName field.
+            // Arrange: Exchange user type but GetExchangeUser returns null; the method should
+            // prefer the mail-item SenderName fallback instead of touching AddressEntry.Name.
             var sender = new Mock<AddressEntry>();
             sender
                 .SetupGet(x => x.AddressEntryUserType)
@@ -146,15 +146,15 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
             // Act
             var result = mail.Object.GetSenderName();
 
-            // Assert: AddressEntry.Name preferred over SenderName when ExchangeUser is unavailable.
-            result.Should().Be("Ada from AddressEntry");
+            // Assert: mail-item sender data is the primary safe fallback.
+            result.Should().Be("Ada from SenderName");
         }
 
         [TestMethod]
-        public void GetSenderName_ForMailItemWhenExchangeLookupThrows_FallsBackToAddressEntryName()
+        public void GetSenderName_ForMailItemWhenExchangeLookupThrowsAndAddressEntryNameThrows_FallsBackToSenderName()
         {
-            // Arrange: Exchange directory lookup throws a COM exception; the method must not
-            // propagate the exception and must return AddressEntry.Name instead.
+            // Arrange: Exchange directory lookup and AddressEntry.Name both fail; the method
+            // must not propagate the exception and must still return SenderName.
             var sender = new Mock<AddressEntry>();
             sender
                 .SetupGet(x => x.AddressEntryUserType)
@@ -162,7 +162,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
             sender
                 .Setup(x => x.GetExchangeUser())
                 .Throws(new InvalidOperationException("COM call failed"));
-            sender.SetupGet(x => x.Name).Returns("Ada Lovelace");
+            sender
+                .SetupGet(x => x.Name)
+                .Throws(new InvalidOperationException("Name lookup failed"));
 
             var mail = new Mock<InteropMailItem>();
             mail.SetupGet(x => x.Sender).Returns(sender.Object);
@@ -173,6 +175,72 @@ namespace UtilitiesCS.Test.OutlookObjects.Recipient
 
             // Assert
             result.Should().Be("Ada Lovelace");
+        }
+
+        [TestMethod]
+        public void GetSenderAddress_ForMailItemWhenSenderAddressThrows_UsesPropertyAccessorFallback()
+        {
+            // Arrange: the Exchange lookup fails and AddressEntry.Address also fails, so the
+            // method must continue to the property-accessor SMTP fallback instead of crashing.
+            var propertyAccessor = new Mock<PropertyAccessor>();
+            propertyAccessor
+                .Setup(x => x.GetProperty(SmtpAddressProperty))
+                .Returns((object)"ada@example.com");
+
+            var sender = new Mock<AddressEntry>();
+            sender
+                .SetupGet(x => x.AddressEntryUserType)
+                .Returns(OlAddressEntryUserType.olExchangeUserAddressEntry);
+            sender
+                .Setup(x => x.GetExchangeUser())
+                .Throws(new InvalidOperationException("Exchange lookup failed"));
+            sender.SetupGet(x => x.Address).Throws(new InvalidOperationException("Address failed"));
+            sender.SetupGet(x => x.PropertyAccessor).Returns(propertyAccessor.Object);
+
+            var mail = new Mock<InteropMailItem>();
+            mail.SetupGet(x => x.Sender).Returns(sender.Object);
+            mail.SetupGet(x => x.SenderEmailAddress).Returns(string.Empty);
+            mail.SetupGet(x => x.SenderName).Returns("Ada Lovelace");
+
+            // Act
+            var result = mail.Object.GetSenderAddress();
+
+            // Assert
+            result.Should().Be("ada@example.com");
+        }
+
+        [TestMethod]
+        public void GetRecipientInfo_WhenExchangeLookupFails_UsesSafeRecipientFallbacks()
+        {
+            // Arrange: recipient Exchange lookup fails, Name/Address getters both fail, and the
+            // helper must still degrade safely to the PR_SMTP_ADDRESS property accessor value.
+            var propertyAccessor = new Mock<PropertyAccessor>();
+            propertyAccessor
+                .Setup(x => x.GetProperty(SmtpAddressProperty))
+                .Returns((object)"ada.recipient@example.com");
+
+            var addressEntry = new Mock<AddressEntry>();
+            addressEntry
+                .SetupGet(x => x.AddressEntryUserType)
+                .Returns(OlAddressEntryUserType.olExchangeUserAddressEntry);
+            addressEntry
+                .Setup(x => x.GetExchangeUser())
+                .Throws(new InvalidOperationException("Exchange lookup failed"));
+
+            var recipient = new Mock<Microsoft.Office.Interop.Outlook.Recipient>();
+            recipient.SetupGet(x => x.AddressEntry).Returns(addressEntry.Object);
+            recipient.SetupGet(x => x.Name).Throws(new InvalidOperationException("Name failed"));
+            recipient
+                .SetupGet(x => x.Address)
+                .Throws(new InvalidOperationException("Address failed"));
+            recipient.SetupGet(x => x.PropertyAccessor).Returns(propertyAccessor.Object);
+
+            // Act
+            var (name, address) = RecipientStatic.GetRecipientInfo(recipient.Object);
+
+            // Assert
+            name.Should().Be("ada.recipient@example.com");
+            address.Should().Be("ada.recipient@example.com");
         }
 
         // ── GetSenderAddress (MailItem) ────────────────────────────────────────────────

@@ -614,9 +614,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             CancellationToken cancel
         )
         {
-            var mailInfo = await Task.Run(async () =>
-                await MailItemHelper.FromMailItemAsync(mailTuple.Mail, _globals, cancel, true)
-            );
+            var mailInfo = await CreateMailItemHelperAsync(mailTuple.Mail, cancel);
 
             mailInfo.FolderInfo = mailTuple.FolderInfo;
 
@@ -633,6 +631,23 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 }
             }
             return serializable;
+        }
+
+        internal Task<IItemInfo> ToIItemInfo(
+            MailItem mail,
+            FolderWrapper folderInfo,
+            CancellationToken cancel
+        )
+        {
+            return ToIItemInfo((mail, folderInfo), cancel);
+        }
+
+        internal virtual Task<MailItemHelper> CreateMailItemHelperAsync(
+            MailItem mailItem,
+            CancellationToken cancel
+        )
+        {
+            return MailItemHelper.FromMailItemAsync(mailItem, _globals, cancel, true);
         }
 
         [ExcludeFromCodeCoverage]
@@ -747,9 +762,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         [ExcludeFromCodeCoverage]
         public async Task<MinedMailInfo> ToMinedMail(MailItem mailItem, CancellationToken cancel)
         {
-            var mailInfo = await Task.Run(async () =>
-                await MailItemHelper.FromMailItemAsync(mailItem, _globals, cancel, true)
-            );
+            var mailInfo = await CreateMailItemHelperAsync(mailItem, cancel);
 
             await mailInfo.TokenizeAsync();
 

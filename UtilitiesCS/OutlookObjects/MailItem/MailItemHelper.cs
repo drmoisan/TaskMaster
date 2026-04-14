@@ -395,6 +395,7 @@ namespace UtilitiesCS //QuickFiler
             // still on the caller's Outlook thread instead of a later Task.Run path.
             _ = new object[]
             {
+                InternetCodepage,
                 Subject,
                 Body,
                 HTMLBody,

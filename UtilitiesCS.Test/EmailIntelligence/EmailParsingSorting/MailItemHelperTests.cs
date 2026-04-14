@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
@@ -1574,6 +1576,103 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Assert
             result.Should().NotBeNull();
             helper.Tokens.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public async Task FromMailItemAsync_MaterializesTokenizationDependenciesBeforeBackgroundTokenAccess()
+        {
+            // Arrange: count each COM-backed property read so the test can verify the helper
+            // forces tokenization inputs on the caller thread before later background access.
+            var subjectReads = 0;
+            var bodyReads = 0;
+            var htmlBodyReads = 0;
+            var senderReads = 0;
+            var recipientsReads = 0;
+            var attachmentsReads = 0;
+            var internetCodepageReads = 0;
+
+            mockMailItem.SetupGet(x => x.Subject).Callback(() => subjectReads++).Returns("Subject");
+            mockMailItem.SetupGet(x => x.Body).Callback(() => bodyReads++).Returns("Body");
+            mockMailItem
+                .SetupGet(x => x.HTMLBody)
+                .Callback(() => htmlBodyReads++)
+                .Returns("<html><body>Body</body></html>");
+            mockMailItem.SetupGet(x => x.SenderName).Returns("SenderName");
+            mockMailItem.SetupGet(x => x.SenderEmailAddress).Returns("sendername@domain.com");
+            mockMailItem.SetupGet(x => x.EntryID).Returns("EntryID");
+            mockMailItem
+                .SetupGet(x => x.Sender)
+                .Callback(() => senderReads++)
+                .Returns(mockSender.Object);
+            mockMailItem
+                .SetupGet(x => x.Recipients)
+                .Callback(() => recipientsReads++)
+                .Returns(mockRecipients.Object);
+            mockMailItem
+                .SetupGet(x => x.Attachments)
+                .Callback(() => attachmentsReads++)
+                .Returns(mockAttachments.Object);
+            mockMailItem
+                .SetupGet(x => x.InternetCodepage)
+                .Callback(() => internetCodepageReads++)
+                .Returns(65001);
+
+            var helper = await MailItemHelper.FromMailItemAsync(
+                mockMailItem.Object,
+                mockGlobals.Object,
+                CancellationToken.None,
+                loadAll: false
+            );
+
+            subjectReads.Should().BeGreaterThan(0);
+            bodyReads.Should().BeGreaterThan(0);
+            htmlBodyReads.Should().BeGreaterThan(0);
+            senderReads.Should().BeGreaterThan(0);
+            recipientsReads.Should().BeGreaterThan(0);
+            attachmentsReads.Should().BeGreaterThan(0);
+            internetCodepageReads.Should().BeGreaterThan(0);
+
+            var subjectReadsAfterMaterialization = subjectReads;
+            var bodyReadsAfterMaterialization = bodyReads;
+            var htmlBodyReadsAfterMaterialization = htmlBodyReads;
+            var senderReadsAfterMaterialization = senderReads;
+            var recipientsReadsAfterMaterialization = recipientsReads;
+            var attachmentsReadsAfterMaterialization = attachmentsReads;
+            var internetCodepageReadsAfterMaterialization = internetCodepageReads;
+
+            var tokenizer = mockRepository.Create<IEmailTokenizer>();
+            tokenizer
+                .Setup(x => x.Tokenize(It.IsAny<IItemInfo>()))
+                .Returns(
+                    (IItemInfo info) =>
+                    {
+                        _ = info.Subject;
+                        _ = info.Body;
+                        _ = info.HTMLBody;
+                        _ = info.Sender;
+                        _ = info.ToRecipients;
+                        _ = info.CcRecipients;
+                        _ = info.AttachmentsInfo;
+                        _ = info.InternetCodepage;
+                        return new[] { "token" };
+                    }
+                );
+            typeof(MailItemHelper)
+                .GetField("_tokenizer", BindingFlags.Instance | BindingFlags.NonPublic)
+                .SetValue(helper, tokenizer.Object);
+
+            // Act
+            var tokens = await Task.Run(() => helper.Tokens);
+
+            // Assert
+            tokens.Should().Equal("token");
+            subjectReads.Should().Be(subjectReadsAfterMaterialization);
+            bodyReads.Should().Be(bodyReadsAfterMaterialization);
+            htmlBodyReads.Should().Be(htmlBodyReadsAfterMaterialization);
+            senderReads.Should().Be(senderReadsAfterMaterialization);
+            recipientsReads.Should().Be(recipientsReadsAfterMaterialization);
+            attachmentsReads.Should().Be(attachmentsReadsAfterMaterialization);
+            internetCodepageReads.Should().Be(internetCodepageReadsAfterMaterialization);
         }
 
         #endregion
