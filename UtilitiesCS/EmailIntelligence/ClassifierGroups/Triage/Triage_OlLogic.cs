@@ -249,8 +249,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 .ForEachAwaitWithCancellationAsync(
                     async (helper, token) =>
                     {
-                        helper.Item.DeleteUdf("Triage");
+                        var triageId = helper.Triage;
                         await Parent.UnTrainAsync(helper.Tokens, triageId, token);
+                        helper.Item.DeleteUdf("Triage");
                     },
                     token
                 );
