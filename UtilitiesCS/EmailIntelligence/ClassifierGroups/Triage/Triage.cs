@@ -325,6 +325,7 @@ namespace UtilitiesCS.EmailIntelligence
                 );
         }
 
+                
         public async Task TrainAsync(
             Selection selection,
             string triageId,
@@ -371,6 +372,16 @@ namespace UtilitiesCS.EmailIntelligence
             var classifierName = triageId;
             //Manager["Triage"].Classifiers[classifierName].Train(await tokens.GroupAndCountAsync(), 1);
             await Task.Run(() => ClassifierGroup.Train(classifierName, tokens, 1), cancel);
+        }
+
+        public async Task UnTrainAsync(
+            string[] tokens,
+            string triageId,
+            CancellationToken cancel = default
+        )
+        {
+            var classifierName = triageId;
+            await Task.Run(() => ClassifierGroup.UnTrain(classifierName, tokens, 1), cancel);
         }
 
         public async Task TestAsync(Selection selection, CancellationToken token = default)

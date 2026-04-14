@@ -585,7 +585,7 @@ namespace TaskMaster
             }
         }
 
-        internal async Task ClearTriageAync()
+        internal async Task ResetTriageClassifierAync()
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
