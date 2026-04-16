@@ -1,16 +1,17 @@
-﻿using System;
+﻿using Fizzler;
+using Microsoft.Graph.Models;
+using Microsoft.Office.Interop.Outlook;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Fizzler;
-using Microsoft.Graph.Models;
-using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;
+using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.OutlookObjects.Fields;
 
 namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
@@ -221,5 +222,42 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
 
             Parent.ClassifierGroup.Serialize();
         }
+
+        public async Task UnTrainSelectionAsync(CancellationToken token = default)
+        {
+            var selection = Parent?.Globals?.Ol?.App?.ActiveExplorer()?.Selection;
+            if (selection is null)
+            {
+                logger.Debug("Could not grab handle on Selection");
+                return;
+            }
+            await selection
+                .Cast<object>()
+                .Where(x => x is MailItem)
+                .Cast<MailItem>()
+                .ToAsyncEnumerable()
+                .SelectAwaitWithCancellation(
+                    async (mailItem, token) =>
+                        await MailItemHelper.FromMailItemAsync(
+                            mailItem,
+                            Parent.Globals,
+                            token,
+                            false
+                        )
+                )
+                //.SelectAwaitWithCancellation(async (helper, token) => await Task.Run(() => helper.Tokens, token))
+                .ForEachAwaitWithCancellationAsync(
+                    async (helper, token) =>
+                    {
+                        var triageId = helper.Triage;
+                        await Parent.UnTrainAsync(helper.Tokens, triageId, token);
+                        helper.Item.DeleteUdf("Triage");
+                    },
+                    token
+                );
+
+            Parent.ClassifierGroup.Serialize();
+        }
+
     }
 }

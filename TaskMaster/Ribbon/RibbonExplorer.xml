@@ -434,10 +434,15 @@
               label="Filter"
             />
             <button
-              id="ClearTriage"
+              id="ClearTriage" 
               imageMso="Clear"
-              onAction="ClearTriage_Click"
-              label="Clear Triage"
+              onAction="ClearTriage"
+              label="ClearTriage_Click"/>
+            <button
+              id="ResetTriage"
+              imageMso="Clear"
+              onAction="ResetTriage_Click"
+              label="Reset Triage Classifier"
             />
             <button
               id="TriageSelection"

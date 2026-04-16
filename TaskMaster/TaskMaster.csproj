@@ -1,12 +1,5 @@
-<Project
-  ToolsVersion="17.0"
-  DefaultTargets="Build"
-  xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
->
-  <Import
-    Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"
-    Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"
-  />
+<Project ToolsVersion="17.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--
     This section defines project-level properties.
 
@@ -36,13 +29,14 @@
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <LangVersion>preview</LangVersion>
     <DefineConstants>VSTO40</DefineConstants>
-    <NuGetPackageImportStamp></NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <IsWebBootstrapper>False</IsWebBootstrapper>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <PublishUrl>C:\Users\DanMoisan\OneDrive - The Real Good Food Company\TM\</PublishUrl>
     <InstallUrl />
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.1</ApplicationVersion>
+    <ApplicationVersion>1.0.0.2</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>7</UpdateInterval>
@@ -490,15 +484,14 @@
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''"
-      >$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath
-    >
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile></ManifestKeyFile>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>88E95FCC6F066C07776218A398BF7046A447D802</ManifestCertificateThumbprint>
@@ -513,64 +506,25 @@
        Skip these targets outside full Visual Studio builds because command-line builds
        only need the compiled add-in assembly and the VSTO packaging targets (notably
        FindRibbons) are environment-sensitive in this repo. -->
-  <Import
-    Project="$(VSToolsPath)\OfficeTools\Microsoft.VisualStudio.Tools.Office.targets"
-    Condition="'$(VSToolsPath)' != '' and '$(CI)' != 'true' and '$(BuildingInsideVisualStudio)' == 'true'"
-  />
+  <Import Project="$(VSToolsPath)\OfficeTools\Microsoft.VisualStudio.Tools.Office.targets" Condition="'$(VSToolsPath)' != '' and '$(CI)' != 'true' and '$(BuildingInsideVisualStudio)' == 'true'" />
   <!-- This section defines VSTO properties that describe the host-changeable project properties. -->
   <ProjectExtensions>
     <VisualStudio>
       <FlavorProperties GUID="{BAA0C2D2-18E2-41B9-852F-F413020CAA33}">
-        <ProjectProperties
-          HostName="Outlook"
-          HostPackage="{29A7B9D7-A7F1-4328-8EF0-6B2D1A56B2C1}"
-          OfficeVersion="15.0"
-          VstxVersion="4.0"
-          ApplicationType="Outlook"
-          Language="cs"
-          TemplatesPath=""
-          DebugInfoExeName="#Software\Microsoft\Office\16.0\Outlook\InstallRoot\Path#outlook.exe"
-          AddItemTemplatesGuid="{A58A78EB-1C92-4DDD-80CF-E8BD872ABFC4}"
-        />
-        <Host
-          Name="Outlook"
-          GeneratedCodeNamespace="TaskMaster"
-          PublishedHash="69C324AB27932AA2FBF2B7EA72250886FF164DE6"
-          IconIndex="0"
-        >
-          <HostItem
-            Name="ThisAddIn"
-            Code="ThisAddIn.cs"
-            CanonicalName="AddIn"
-            CanActivate="false"
-            IconIndex="1"
-            Blueprint="ThisAddIn.Designer.xml"
-            GeneratedCode="ThisAddIn.Designer.cs"
-            PublishedHash="4B6729ACD39D816806E3F20BE1C4B47068ED34C0"
-          />
+        <ProjectProperties HostName="Outlook" HostPackage="{29A7B9D7-A7F1-4328-8EF0-6B2D1A56B2C1}" OfficeVersion="15.0" VstxVersion="4.0" ApplicationType="Outlook" Language="cs" TemplatesPath="" DebugInfoExeName="#Software\Microsoft\Office\16.0\Outlook\InstallRoot\Path#outlook.exe" AddItemTemplatesGuid="{A58A78EB-1C92-4DDD-80CF-E8BD872ABFC4}" />
+        <Host Name="Outlook" GeneratedCodeNamespace="TaskMaster" PublishedHash="69C324AB27932AA2FBF2B7EA72250886FF164DE6" IconIndex="0">
+          <HostItem Name="ThisAddIn" Code="ThisAddIn.cs" CanonicalName="AddIn" PublishedHash="4B6729ACD39D816806E3F20BE1C4B47068ED34C0" CanActivate="false" IconIndex="1" Blueprint="ThisAddIn.Designer.xml" GeneratedCode="ThisAddIn.Designer.cs" />
         </Host>
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <Import
-    Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets"
-    Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')"
-  />
+  <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error
-      Condition="!Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')"
-      Text="$([System.String]::Format('$(ErrorText)', '..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets'))"
-    />
-    <Error
-      Condition="!Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')"
-      Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets'))"
-    />
+    <Error Condition="!Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets'))" />
+    <Error Condition="!Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets'))" />
   </Target>
-  <Import
-    Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets"
-    Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')"
-  />
+  <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
 </Project>
