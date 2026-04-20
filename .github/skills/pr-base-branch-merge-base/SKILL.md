@@ -10,7 +10,7 @@ Deterministic branch-selection rules for PR context collection.
 ## When to Use This Skill
 
 Use this skill when:
-- running `VS Code command: `drm-copilot: Collect PR Context` (command ID: `drmCopilotExtension.collectPrContext`)`,
+- running via MCP server `drmCopilotExtension` tool `collect_pr_context`,
 - delegating post-implementation review that depends on `PRBaseBranch`,
 - constructing PR context artifacts where the base must not be hard-coded.
 
@@ -44,7 +44,7 @@ Definition of correct base:
 
 When invoking PR context collection, pass the resolved base explicitly:
 
-- `VS Code command: `drm-copilot: Collect PR Context` (command ID: `drmCopilotExtension.collectPrContext`) --base <resolved-PRBaseBranch>`
+- per `pr-context-artifacts` via MCP server `drmCopilotExtension` tool `collect_pr_context` with `base: ${resolved-PRBaseBranch}`
 
 ## Evidence Recommendation
 
