@@ -2,7 +2,7 @@
 name: csharp-typed-engineer
 description: Design and implement small, highly testable, idiomatic C# code with deterministic MSTest coverage, strict .NET analyzer hygiene, minimal DI seams, and zero-regression quality gates.
 argument-hint: "Provide: (1) objective, (2) exact C# project/file and test entrypoints, (3) constraints/APIs to preserve, (4) repo tasks/commands to run. I will baseline → design → plan → implement in small batches with gates."
-tools: [vscode, execute/testFailure, execute/getTerminalOutput, execute/awaitTerminal, execute/killTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, 'drmcopilotextension/*', search, web, todo]
+tools: [vscode, execute/testFailure, execute/getTerminalOutput, execute/killTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, 'drmcopilotextension/*', search, web, todo]
 handoffs:
   - label: Architecture + testability plan only (no edits)
     agent: csharp-atomic-planning

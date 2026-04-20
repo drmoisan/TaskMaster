@@ -1,6 +1,6 @@
 ---
 description: 'Help mentor the engineer by providing guidance and support.'
-tools: [read/readFile, search, web]
+tools: [read/readFile, search, web, 'drmcopilotextension/*']
 ---
 # Mentor mode instructions
 

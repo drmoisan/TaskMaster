@@ -3,7 +3,7 @@ name: atomic_planner
 description: Generate phased implementation plans with atomic checkbox tasks that have binary completion and clear acceptance criteria.
 argument-hint: "Describe the goal or change you want a phased atomic plan for."
 tools:
-   [read/readFile, agent/runSubagent, edit/createDirectory, edit/createFile, edit/editFiles, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/textSearch, search/usages, web/fetch, drmcopilotextension/collect_commit_context, drmcopilotextension/collect_pr_context, drmcopilotextension/new_active_feature_folder, drmcopilotextension/new_potential_bug_entry, drmcopilotextension/new_potential_entry, drmcopilotextension/potential_to_issue, drmcopilotextension/push_down_copilot_customizations, drmcopilotextension/resolve_execute_hard_lock_prompt, todo]
+   [read/readFile, agent/runSubagent, edit/createDirectory, edit/createFile, edit/editFiles, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/textSearch, search/usages, web/fetch, drmcopilotextension/collect_commit_context, 'drmcopilotextension/*', todo]
 handoffs:
    - label: Preflight validate plan (atomic_executor)
      agent: atomic_executor

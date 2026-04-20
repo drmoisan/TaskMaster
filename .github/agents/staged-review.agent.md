@@ -48,7 +48,11 @@ You MUST read and follow, in priority order:
 
 Policy Audit templates:
 - If and only if the user asked for a Policy Audit (this agent invocation counts), you MUST also follow:
-  - `docs/features/templates/policy_audit/AGENTS.md`
+   - MCP server `drmCopilotExtension` tool `resolve_policy_audit_template_asset` with the selector appropriate to the needed artifact:
+      - `asset: template` for `policy-audit.yyyy-MM-ddTHH-mm.md`
+      - `asset: code-review-template` for `code-review.yyyy-MM-ddTHH-mm.md`
+      - `asset: feature-audit-template` for `feature-audit.yyyy-MM-ddTHH-mm.md`
+      - `asset: agents` for `AGENTS.md`
   - `docs/features/templates/policy_audit/PolicyAudit.template.md`
   - `docs/features/templates/policy_audit/README.md` (if present)
 
