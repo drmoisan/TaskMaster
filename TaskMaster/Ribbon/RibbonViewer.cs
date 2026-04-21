@@ -275,10 +275,10 @@ namespace TaskMaster
         //public async void TriageSetA_Click(Office.IRibbonControl control) => await _controller.TriageSetAAsync();
         //public async void TriageSetB_Click(Office.IRibbonControl control) => await _controller.TriageSetBAsync();
         //public async void TriageSetC_Click(Office.IRibbonControl control) => await _controller.TriageSetCAsync();
-        
+
         public async void ClearTriage_Click(Office.IRibbonControl control) =>
             await _controller.Triage.OlLogic.UnTrainSelectionAsync();
-        
+
         public async void ResetTriage_Click(Office.IRibbonControl control) =>
             await _controller.ResetTriageClassifierAync();
 

@@ -1,13 +1,13 @@
-﻿using Fizzler;
-using Microsoft.Graph.Models;
-using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Fizzler;
+using Microsoft.Graph.Models;
+using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;
@@ -200,6 +200,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 .Cast<object>()
                 .Where(x => x is MailItem)
                 .Cast<MailItem>()
+                .Take(1) // Outlook conversation view may expand Selection to include the entire thread; process only the focused item.
                 .ToAsyncEnumerable()
                 .SelectAwaitWithCancellation(
                     async (mailItem, token) =>
@@ -258,6 +259,5 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
 
             Parent.ClassifierGroup.Serialize();
         }
-
     }
 }
