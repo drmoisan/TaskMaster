@@ -325,7 +325,6 @@ namespace UtilitiesCS.EmailIntelligence
                 );
         }
 
-                
         public async Task TrainAsync(
             Selection selection,
             string triageId,

@@ -352,5 +352,118 @@ namespace UtilitiesCS.Test.EmailIntelligence
             _triage.ClassifierGroup.TotalEmailCount.Should().BeGreaterThan(emailCountBefore);
             _triage.ClassifierGroup.Classifiers.Should().ContainKey("A");
         }
+
+        // #137 regression: in Outlook conversation view, Selection may contain the entire thread.
+        // The fix (Take(1)) must ensure only the first/focused item is trained per invocation,
+        // so TotalEmailCount increments by exactly 1 even when Selection has 2 items.
+        [TestMethod]
+        public async Task TrainSelectionAsync_WhenSelectionContainsTwoMailItems_TrainsOnlyFirstItem_TotalEmailCountIncrementsOnce()
+        {
+            // Arrange: two items in mock Selection simulating a conversation-view thread click.
+            // Only the first item must be processed after the fix.
+            var mockOlObjects = new Mock<IOlObjects>(MockBehavior.Strict);
+            var mockApplication = new Mock<Application>(MockBehavior.Strict);
+            var mockExplorer = new Mock<Explorer>(MockBehavior.Strict);
+            var mockSelection = new Mock<Selection>(MockBehavior.Loose);
+
+            var mockMailItem1 = new Mock<MailItem>(MockBehavior.Loose);
+            var mockAttachments1 = new Mock<Attachments>(MockBehavior.Loose);
+            mockMailItem1.Setup(m => m.Attachments).Returns(mockAttachments1.Object);
+            mockAttachments1
+                .As<IEnumerable>()
+                .Setup(a => a.GetEnumerator())
+                .Returns(new List<Attachment>().GetEnumerator());
+
+            var mockMailItem2 = new Mock<MailItem>(MockBehavior.Loose);
+            var mockAttachments2 = new Mock<Attachments>(MockBehavior.Loose);
+            mockMailItem2.Setup(m => m.Attachments).Returns(mockAttachments2.Object);
+            mockAttachments2
+                .As<IEnumerable>()
+                .Setup(a => a.GetEnumerator())
+                .Returns(new List<Attachment>().GetEnumerator());
+
+            // Two items in Selection — simulates conversation view auto-selection of thread items.
+            mockSelection
+                .As<IEnumerable>()
+                .Setup(s => s.GetEnumerator())
+                .Returns(
+                    new List<object> { mockMailItem1.Object, mockMailItem2.Object }.GetEnumerator()
+                );
+
+            _mockGlobals.Setup(g => g.Ol).Returns(mockOlObjects.Object);
+            mockOlObjects.Setup(o => o.App).Returns(mockApplication.Object);
+            mockOlObjects.Setup(o => o.EmailPrefixToStrip).Returns("");
+            mockApplication.Setup(a => a.ActiveExplorer()).Returns(mockExplorer.Object);
+            mockExplorer.Setup(e => e.Selection).Returns(mockSelection.Object);
+
+            int emailCountBefore = _triage.ClassifierGroup.TotalEmailCount;
+
+            // Act
+            await _triageOlLogic.TrainSelectionAsync("A", CancellationToken.None);
+
+            // Assert: only the first item in the selection must be trained; the second item
+            // (added by Outlook conversation view) must not be processed.
+            _triage.ClassifierGroup.TotalEmailCount.Should().Be(emailCountBefore + 1);
+        }
+
+        // #137 regression: in Outlook conversation view, Selection may contain the entire thread.
+        // The fix (Take(1)) must ensure only the first/focused item contributes to MatchEmailCount;
+        // the conversation thread items must not be counted.
+        [TestMethod]
+        public async Task TrainSelectionAsync_WhenSelectionContainsTwoMailItems_TrainsOnlyFirstItem_MatchEmailCountIncrementsOnce()
+        {
+            // Arrange: two items in mock Selection simulating a conversation-view thread click.
+            var mockOlObjects = new Mock<IOlObjects>(MockBehavior.Strict);
+            var mockApplication = new Mock<Application>(MockBehavior.Strict);
+            var mockExplorer = new Mock<Explorer>(MockBehavior.Strict);
+            var mockSelection = new Mock<Selection>(MockBehavior.Loose);
+
+            var mockMailItem1 = new Mock<MailItem>(MockBehavior.Loose);
+            var mockAttachments1 = new Mock<Attachments>(MockBehavior.Loose);
+            mockMailItem1.Setup(m => m.Attachments).Returns(mockAttachments1.Object);
+            mockAttachments1
+                .As<IEnumerable>()
+                .Setup(a => a.GetEnumerator())
+                .Returns(new List<Attachment>().GetEnumerator());
+
+            var mockMailItem2 = new Mock<MailItem>(MockBehavior.Loose);
+            var mockAttachments2 = new Mock<Attachments>(MockBehavior.Loose);
+            mockMailItem2.Setup(m => m.Attachments).Returns(mockAttachments2.Object);
+            mockAttachments2
+                .As<IEnumerable>()
+                .Setup(a => a.GetEnumerator())
+                .Returns(new List<Attachment>().GetEnumerator());
+
+            mockSelection
+                .As<IEnumerable>()
+                .Setup(s => s.GetEnumerator())
+                .Returns(
+                    new List<object> { mockMailItem1.Object, mockMailItem2.Object }.GetEnumerator()
+                );
+
+            _mockGlobals.Setup(g => g.Ol).Returns(mockOlObjects.Object);
+            mockOlObjects.Setup(o => o.App).Returns(mockApplication.Object);
+            mockOlObjects.Setup(o => o.EmailPrefixToStrip).Returns("");
+            mockApplication.Setup(a => a.ActiveExplorer()).Returns(mockExplorer.Object);
+            mockExplorer.Setup(e => e.Selection).Returns(mockSelection.Object);
+
+            // Default to 0 if the "A" classifier does not yet exist on a fresh ClassifierGroup.
+            int matchCountBefore = _triage.ClassifierGroup.Classifiers.TryGetValue(
+                "A",
+                out var classifierBefore
+            )
+                ? classifierBefore.MatchEmailCount
+                : 0;
+
+            // Act
+            await _triageOlLogic.TrainSelectionAsync("A", CancellationToken.None);
+
+            // Assert: only the first item's label must be counted; MatchEmailCount increments by 1
+            // (not 2), because the second conversation-thread item must not be trained.
+            _triage
+                .ClassifierGroup.Classifiers["A"]
+                .MatchEmailCount.Should()
+                .Be(matchCountBefore + 1);
+        }
     }
 }
