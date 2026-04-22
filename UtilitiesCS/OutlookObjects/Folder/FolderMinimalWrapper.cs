@@ -128,8 +128,14 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 logger.Error($"Error loading the relative path '{RelativePath}'. {e.Message}", e);
             }
 
+            var restoreStopwatch = Stopwatch.StartNew();
+
             try
             {
+                logger.Debug(
+                    $"[Startup timing] RestoreFromRelativePath '{Name ?? "<null>"}' path='{RelativePath}' starting"
+                );
+
                 OlRoot = olRoot;
 
                 Outlook.Folder currentFolder = olRoot;
@@ -158,6 +164,12 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 logger.Error(
                     $"Error loading folder from relative path '{RelativePath}'. {e.Message}",
                     e
+                );
+            }
+            finally
+            {
+                logger.Debug(
+                    $"[Startup timing] RestoreFromRelativePath '{Name ?? "<null>"}' completed: {restoreStopwatch.ElapsedMilliseconds} ms, resolved={OlFolder?.FolderPath ?? "<null>"}"
                 );
             }
         }
