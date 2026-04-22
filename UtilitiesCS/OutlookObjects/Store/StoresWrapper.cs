@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -62,21 +63,40 @@ namespace UtilitiesCS.OutlookObjects.Store
         internal Task RewireOlObjectsAsync(StreamingContext context)
         {
             this.Stores ??= [];
-            var stores = GetFilteredStores();
+            var totalStopwatch = Stopwatch.StartNew();
+            var filteredStoresStopwatch = Stopwatch.StartNew();
+            var stores = GetFilteredStores().ToList();
+            logger.Debug(
+                $"[Startup timing] GetFilteredStores completed: {stores.Count} stores in {filteredStoresStopwatch.ElapsedMilliseconds} ms"
+            );
 
             foreach (var store in stores)
             {
-                var storeWrapper = Stores.Find(x => x.DisplayName == store.DisplayName);
+                var perStoreStopwatch = Stopwatch.StartNew();
+                var storeDisplayName = store.DisplayName;
+                var storeWrapper = Stores.Find(x => x.DisplayName == storeDisplayName);
+                var wasCreated = false;
+
                 if (storeWrapper is null)
                 {
                     storeWrapper = new StoreWrapper(store).Init();
                     Stores.Add(storeWrapper);
+                    wasCreated = true;
                 }
                 else
                 {
                     storeWrapper.Restore(store);
                 }
+
+                logger.Debug(
+                    $"[Startup timing] Store '{storeDisplayName}' iteration completed in {perStoreStopwatch.ElapsedMilliseconds} ms (operation={(wasCreated ? "Init" : "Restore")})"
+                );
             }
+
+            logger.Debug(
+                $"[Startup timing] RewireOlObjectsAsync total: {totalStopwatch.ElapsedMilliseconds} ms"
+            );
+
             return Task.CompletedTask;
         }
 
