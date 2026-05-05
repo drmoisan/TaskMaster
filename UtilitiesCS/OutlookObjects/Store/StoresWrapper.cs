@@ -60,7 +60,12 @@ namespace UtilitiesCS.OutlookObjects.Store
             }
         }
 
-        internal Task RewireOlObjectsAsync(StreamingContext context)
+        public virtual Task RewireAfterDeserializeAsync()
+        {
+            return RewireOlObjectsAsync(default);
+        }
+
+        internal async Task RewireOlObjectsAsync(StreamingContext context)
         {
             this.Stores ??= [];
             var totalStopwatch = Stopwatch.StartNew();
@@ -70,8 +75,14 @@ namespace UtilitiesCS.OutlookObjects.Store
                 $"[Startup timing] GetFilteredStores completed: {stores.Count} stores in {filteredStoresStopwatch.ElapsedMilliseconds} ms"
             );
 
+            var processedStoreCount = 0;
             foreach (var store in stores)
             {
+                if (processedStoreCount > 0)
+                {
+                    await Task.Yield();
+                }
+
                 var perStoreStopwatch = Stopwatch.StartNew();
                 var storeDisplayName = store.DisplayName;
                 var storeWrapper = Stores.Find(x => x.DisplayName == storeDisplayName);
@@ -91,13 +102,13 @@ namespace UtilitiesCS.OutlookObjects.Store
                 logger.Debug(
                     $"[Startup timing] Store '{storeDisplayName}' iteration completed in {perStoreStopwatch.ElapsedMilliseconds} ms (operation={(wasCreated ? "Init" : "Restore")})"
                 );
+
+                processedStoreCount++;
             }
 
             logger.Debug(
                 $"[Startup timing] RewireOlObjectsAsync total: {totalStopwatch.ElapsedMilliseconds} ms"
             );
-
-            return Task.CompletedTask;
         }
 
         private IEnumerable<Outlook.Store> GetFilteredStores()

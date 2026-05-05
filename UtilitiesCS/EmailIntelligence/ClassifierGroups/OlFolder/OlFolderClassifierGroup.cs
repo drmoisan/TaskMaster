@@ -109,13 +109,29 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             );
         }
 
+        private static string ResolveFolderGroupingKey(MinedMailInfo minedMail)
+        {
+            var folderInfo = minedMail?.FolderInfo;
+            if (folderInfo is null)
+            {
+                return null;
+            }
+
+            if (!folderInfo.RelativePath.IsNullOrEmpty())
+            {
+                return folderInfo.RelativePath;
+            }
+
+            return folderInfo.Name;
+        }
+
         public async Task<bool> BuildFolderClassifiersAsync(
             BayesianClassifierGroup classifierGroup,
             MinedMailInfo[] collection,
             ProgressPackage ppkg
         )
         {
-            var groups = collection.GroupBy(x => x.FolderInfo.RelativePath);
+            var groups = collection.GroupBy(ResolveFolderGroupingKey);
             var sw = ppkg.StopWatch;
 
             bool success = false;
