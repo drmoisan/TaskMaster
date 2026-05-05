@@ -127,7 +127,12 @@ namespace TaskMaster
 
         public StoresWrapper StoresWrapper { get; set; }
 
-        internal Task LoadStoresAsync()
+        protected internal virtual Task AwaitStoreRewireAsync(StoresWrapper storesWrapper) =>
+            storesWrapper is null
+                ? Task.CompletedTask
+                : storesWrapper.RewireAfterDeserializeAsync();
+
+        internal async Task LoadStoresAsync()
         {
             if (_globals.IntelRes.Config.TryGetValue("StoresWrapper", out var config))
             {
@@ -135,12 +140,12 @@ namespace TaskMaster
                     StoresWrapper,
                     SmartSerializableLoader
                 >(config);
+                await AwaitStoreRewireAsync(StoresWrapper);
             }
             else
             {
                 logger.Error("StoresWrapper config not found.");
             }
-            return Task.CompletedTask;
         }
 
         private Reminders _olReminders;

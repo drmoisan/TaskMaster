@@ -90,10 +90,15 @@ namespace TaskMaster
         public async Task LoadSequentialAsync()
         {
             await LoadIntelConfigAsync();
+            await Task.Yield();
             await _olObjects.LoadAsync();
+            await Task.Yield();
             await _toDoObjects.LoadAsync(false);
+            await Task.Yield();
             await _autoFileObjects.LoadAsync(false);
-            await Engines.InitAsync();
+            await Task.Yield();
+            await Task.Run(() => Engines.InitAsync());
+            await Task.Yield();
             await _events.LoadAsync();
         }
 

@@ -1,0 +1,30 @@
+# Targeted Regression Evidence
+
+Timestamp: 2026-05-05T14:26:32-04:00
+Source Artifact: docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/qa-gates/csharp-mstest-coverage.2026-05-05T14-26-32.md
+Verified Test Files:
+- TaskMaster.Test/AppGlobals/AppToDoObjectsTests.cs
+- TaskMaster.Test/AppGlobals/AppOlObjectsTests.cs
+- TaskMaster.Test/AppGlobals/ApplicationGlobalsTests.cs
+- TaskMaster.Test/OutlookObjects/Store/StoresWrapperTests.cs
+Verified Test Names:
+- LoadIdListAsync_DoesNotReadOutlookApplicationFromWorkerThread
+- LoadProjInfoAsync_DoesNotReadOutlookApplicationFromWorkerThread
+- LoadStoresAsync_DoesNotCompleteBeforeStoreRewireTaskFinishes
+- LoadSequentialAsync_KeepsComPhasesOnCallerThreadAndYieldsBetweenHeavyPhases
+- RewireOlObjectsAsync_PreservesStoreOrderAcrossYieldedIterations
+- LoadIdListAsync_ReturnsEmptyWhenAppDataDirectoryMissing
+- LoadIdListFromDisk_ReturnsEmptyWhenJsonDeserializationFails
+- LoadIdListFromDisk_ReturnsEmptyWhenReadThrowsIOException
+- LoadIdListAsync_RefreshesFromOutlookOnlyWhenDiskListIsEmpty
+- LoadIdListAsync_SkipsOutlookRefreshWhenParentAppIsNull
+- LoadProjInfoAsync_SkipsRebuildWhenOutlookApplicationIsNull
+- LoadProjInfoAsync_SkipsRebuildWhenProjectCountIsNonZero
+- LoadSequentialAsync_YieldsBeforeAutoFilePhase
+- LoadSequentialAsync_OffloadsEnginesInitAsyncWithTaskRun
+- LoadSequentialAsync_RunsAutoFileLoadOnCallerThread
+- AwaitStoreRewireAsync_ReturnsCompletedTaskWhenStoresWrapperIsNull
+- AwaitStoreRewireAsync_AwaitsStoresWrapperInvocation
+- RewireAfterDeserializeAsync_UsesStoreAdapterForWrappedStores
+- RewireAfterDeserializeAsync_SingleStoreCompletesWithoutExtraYield
+- RewireAfterDeserializeAsync_MultiStoreYieldsBetweenStores

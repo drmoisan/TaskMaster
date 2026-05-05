@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -166,6 +168,40 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             wrapper.Stores[0].Should().BeSameAs(existingWrapper);
             existingWrapper.InnerStore.Should().BeSameAs(updatedStore.Object);
             existingWrapper.UserEmailAddress.Should().Be("new@example.com");
+        }
+
+        [TestMethod]
+        public void RewireOlObjectsAsync_PreservesStoreOrderAcrossYieldedIterations()
+        {
+            // This regression inspects the store-rewire coordinator source directly because
+            // the production method currently performs the entire restore loop synchronously.
+            // The fix contract is explicit: keep the single-store iteration order intact while
+            // inserting cooperative yield boundaries between iterations.
+            var source = File.ReadAllText(
+                Path.Combine(
+                    GetRepositoryRoot(),
+                    "UtilitiesCS",
+                    "OutlookObjects",
+                    "Store",
+                    "StoresWrapper.cs"
+                )
+            );
+            var methodBody = ExtractMethodBody(
+                source,
+                "RewireOlObjectsAsync(StreamingContext context)"
+            );
+
+            methodBody.Should().Contain("foreach (var store in stores)");
+            Regex
+                .IsMatch(methodBody, @"Task\.(WhenAll|Run)\s*\(")
+                .Should()
+                .BeFalse("store rewire should remain ordered instead of parallelizing iterations.");
+            Regex
+                .IsMatch(methodBody, @"await\s+Task\.Yield\s*\(\s*\)\s*;")
+                .Should()
+                .BeTrue(
+                    "the store rewire loop should yield between expensive store iterations without reordering them."
+                );
         }
 
         [TestMethod]
@@ -335,6 +371,47 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             var globals = new Mock<IApplicationGlobals>();
             globals.SetupGet(x => x.Ol).Returns(olObjects.Object);
             return globals;
+        }
+
+        private static string GetRepositoryRoot()
+        {
+            var assemblyDirectory = new DirectoryInfo(
+                Path.GetDirectoryName(typeof(StoresWrapper).Assembly.Location)!
+            );
+            var repositoryRoot = assemblyDirectory.Parent?.Parent?.Parent?.FullName;
+
+            repositoryRoot.Should().NotBeNullOrEmpty();
+            File.Exists(Path.Combine(repositoryRoot!, "README.md")).Should().BeTrue();
+
+            return repositoryRoot!;
+        }
+
+        private static string ExtractMethodBody(string source, string methodName)
+        {
+            var methodIndex = source.IndexOf(methodName, StringComparison.Ordinal);
+            methodIndex.Should().BeGreaterThanOrEqualTo(0, $"source should contain '{methodName}'");
+
+            var bodyStart = source.IndexOf('{', methodIndex);
+            bodyStart.Should().BeGreaterThanOrEqualTo(0, "the target method should have a body");
+
+            var braceDepth = 0;
+            for (var index = bodyStart; index < source.Length; index++)
+            {
+                if (source[index] == '{')
+                {
+                    braceDepth++;
+                }
+                else if (source[index] == '}')
+                {
+                    braceDepth--;
+                    if (braceDepth == 0)
+                    {
+                        return source.Substring(bodyStart + 1, index - bodyStart - 1);
+                    }
+                }
+            }
+
+            throw new AssertFailedException($"Unable to extract body for '{methodName}'.");
         }
 
         private static Mock<OutlookStore> CreateStore(

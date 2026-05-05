@@ -94,6 +94,8 @@ namespace TaskMaster
 
         private async Task LoadProjInfoAsync()
         {
+            var outlookApplication = Parent.Ol.App;
+
             _projInfo = await Task.Run(() =>
             {
                 if (Parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
@@ -111,9 +113,9 @@ namespace TaskMaster
                 }
             });
 
-            if (_projInfo?.Count == 0)
+            if (_projInfo?.Count == 0 && outlookApplication is not null)
             {
-                await Task.Run(() => _projInfo.Rebuild(Parent.Ol.App));
+                _projInfo.Rebuild(outlookApplication);
             }
         }
 
@@ -225,7 +227,47 @@ namespace TaskMaster
         //TODO: Convert IDList to ScoCollection
         public IIDList IDList => Initialized(_idList, () => LoadIDList());
 
-        private async Task LoadIdListAsync() => _idList = await Task.Run(() => LoadIDList());
+        private async Task LoadIdListAsync()
+        {
+            if (Parent.FS.SpecialFolders.TryGetValue("AppData", out var appData))
+            {
+                var outlookApplication = Parent.Ol.App;
+                _idList = await Task.Run(() => (IIDList)LoadIdListFromDisk(appData));
+
+                if (_idList.Count == 0 && outlookApplication is not null)
+                {
+                    _idList.RefreshIDList(outlookApplication);
+                }
+            }
+            else
+            {
+                _idList = null;
+            }
+        }
+
+        private IDList LoadIdListFromDisk(string appData)
+        {
+            var filePath = Path.Combine(appData, FnameIDList);
+            List<string> ids;
+
+            try
+            {
+                ids = File.Exists(filePath)
+                    ? JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(filePath)) ?? []
+                    : [];
+            }
+            catch (JsonException)
+            {
+                ids = [];
+            }
+            catch (IOException)
+            {
+                ids = [];
+            }
+
+            var idList = new IDList(ids) { Filename = FnameIDList, Folderpath = appData };
+            return idList;
+        }
 
         private IIDList LoadIDList()
         {
