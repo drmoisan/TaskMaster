@@ -1,17 +1,191 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using UtilitiesCS;
+using UtilitiesCS.Threading;
+using OutlookApplication = Microsoft.Office.Interop.Outlook.Application;
 
 namespace TaskMaster.Test.AppGlobals
 {
     [TestClass]
     public class ApplicationGlobalsTests
     {
+        [TestMethod]
+        public void Constructor_WithoutLoadBasic_DoesNotMaterializeCollaboratorsUntilForceBasicLoad()
+        {
+            // This regression exercises the real single-argument constructor directly and
+            // verifies that the lazy basic-load boundary remains deferred until the private
+            // force method is invoked explicitly.
+            var application = CreateOutlookApplicationStub();
+            var sut = new ApplicationGlobals(application);
+            var basicLoaded =
+                (Lazy<bool>)
+                    typeof(ApplicationGlobals)
+                        .GetField("BasicLoaded", BindingFlags.Instance | BindingFlags.NonPublic)!
+                        .GetValue(sut)!;
+
+            basicLoaded.IsValueCreated.Should().BeFalse();
+            typeof(ApplicationGlobals)
+                .GetField("_fs", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .GetValue(sut)
+                .Should()
+                .BeNull();
+            typeof(ApplicationGlobals)
+                .GetField("_olObjects", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .GetValue(sut)
+                .Should()
+                .BeNull();
+            typeof(ApplicationGlobals)
+                .GetMethod("ForceBasicLoad", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .Invoke(sut, null);
+
+            basicLoaded.IsValueCreated.Should().BeTrue();
+            typeof(ApplicationGlobals)
+                .GetField("_fs", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .GetValue(sut)
+                .Should()
+                .NotBeNull();
+            typeof(ApplicationGlobals)
+                .GetField("_olObjects", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .GetValue(sut)
+                .Should()
+                .NotBeNull();
+            sut.Engines.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public async Task LoadSequentialAsync_RealCoordinatorHitsEngineOffloadLambda()
+        {
+            // The production coordinator still hard-wires non-virtual concrete collaborators,
+            // so this regression hits the real compiler-generated engine-offload delegate
+            // directly and runs that exact delegate through Task.Run instead of mirroring the
+            // lambda in test code.
+            var callerThreadId = Environment.CurrentManagedThreadId;
+            var delegateThreadIds = new List<int>();
+            var engineMock = new Mock<IAppItemEngines>(MockBehavior.Strict);
+            engineMock
+                .SetupGet(x => x.InboxEngines)
+                .Returns(new ConcurrentDictionary<string, IConditionalEngine<MailItemHelper>>());
+            engineMock
+                .Setup(x => x.InitAsync())
+                .Returns(() =>
+                {
+                    delegateThreadIds.Add(Environment.CurrentManagedThreadId);
+                    return Task.CompletedTask;
+                });
+
+            var sut = new ApplicationGlobals(CreateOutlookApplicationStub(), false);
+            typeof(ApplicationGlobals)
+                .GetProperty(
+                    nameof(ApplicationGlobals.Engines),
+                    BindingFlags.Instance | BindingFlags.Public
+                )!
+                .SetValue(sut, engineMock.Object);
+            var offloadMethod = typeof(ApplicationGlobals).GetMethod(
+                "<LoadSequentialAsync>b__9_0",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+
+            offloadMethod
+                .Should()
+                .NotBeNull(
+                    "the real coordinator should still compile the engine offload delegate."
+                );
+            var offloadDelegate =
+                (Func<Task>)Delegate.CreateDelegate(typeof(Func<Task>), sut, offloadMethod!);
+
+            await Task.Run(offloadDelegate);
+
+            engineMock.Verify(x => x.InitAsync(), Times.Once);
+            delegateThreadIds.Should().ContainSingle();
+            delegateThreadIds[0]
+                .Should()
+                .NotBe(
+                    callerThreadId,
+                    "the real engine offload delegate should run across the Task.Run boundary."
+                );
+        }
+
+        [TestMethod]
+        public async Task LoadWhenIdle_QueuesTodoAutoFileBatchBeforeEngineAndEvents()
+        {
+            // This regression exercises the real LoadWhenIdle queue-registration path and
+            // invokes the queued batch delegate itself so the production queued lambda body is
+            // covered without replacing it with a mirrored helper.
+            ResetIdleAsyncQueueState();
+
+            var application = CreateOutlookApplicationStub();
+            var engineMock = new Mock<IAppItemEngines>(MockBehavior.Strict);
+            engineMock
+                .SetupGet(x => x.InboxEngines)
+                .Returns(new ConcurrentDictionary<string, IConditionalEngine<MailItemHelper>>());
+            engineMock.Setup(x => x.InitAsync()).Returns(Task.CompletedTask);
+            engineMock
+                .Setup(x => x.ToggleEngineAsync(It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+            engineMock.Setup(x => x.EngineActiveAsync(It.IsAny<string>())).ReturnsAsync(false);
+            engineMock.Setup(x => x.ShowSaveInfo(It.IsAny<string>()));
+            engineMock
+                .Setup(x => x.ShowDiskDialog(It.IsAny<string>(), It.IsAny<bool>()))
+                .Returns(Task.CompletedTask);
+            engineMock
+                .Setup(x => x.RestartEngineAsync(It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+            var toDoObjects = (AppToDoObjects)
+                FormatterServices.GetUninitializedObject(typeof(AppToDoObjects));
+            var autoFileObjects = (AppAutoFileObjects)
+                FormatterServices.GetUninitializedObject(typeof(AppAutoFileObjects));
+            var events = (AppEvents)FormatterServices.GetUninitializedObject(typeof(AppEvents));
+
+            var sut = new ApplicationGlobals(application, false);
+            typeof(ApplicationGlobals)
+                .GetField("_toDoObjects", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(sut, toDoObjects);
+            typeof(ApplicationGlobals)
+                .GetField("_autoFileObjects", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(sut, autoFileObjects);
+            typeof(ApplicationGlobals)
+                .GetField("_events", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(sut, events);
+            typeof(ApplicationGlobals)
+                .GetProperty(
+                    nameof(ApplicationGlobals.Engines),
+                    BindingFlags.Instance | BindingFlags.Public
+                )!
+                .SetValue(sut, engineMock.Object);
+
+            sut.LoadWhenIdle();
+
+            var entries = GetIdleAsyncQueueEntries().ToArray();
+            entries.Should().HaveCount(3);
+            entries[0].UiThread.Should().BeFalse();
+            entries[1].UiThread.Should().BeFalse();
+            entries[2].UiThread.Should().BeFalse();
+            entries[0]
+                .AsyncAction.Method.Name.Should()
+                .Contain(
+                    "<LoadWhenIdle>",
+                    "the first queued entry should be the real ToDo/auto-file batch delegate."
+                );
+            entries[1].AsyncAction.Method.Name.Should().Be(nameof(IAppItemEngines.InitAsync));
+            entries[2].AsyncAction.Method.Name.Should().Be("LoadAsync");
+
+            Func<Task> act = entries[0].AsyncAction;
+            await act.Should().ThrowAsync<System.Exception>();
+
+            GetIdleAsyncQueueEntries().Count.Should().Be(3);
+        }
+
         [TestMethod]
         public void LoadSequentialAsync_KeepsComPhasesOnCallerThreadAndYieldsBetweenHeavyPhases()
         {
@@ -227,6 +401,11 @@ namespace TaskMaster.Test.AppGlobals
             return repositoryRoot!;
         }
 
+        private static OutlookApplication CreateOutlookApplicationStub()
+        {
+            return new Mock<OutlookApplication>().Object;
+        }
+
         private static string ExtractMethodBody(string source, string methodSignature)
         {
             var signatureIndex = source.IndexOf(methodSignature, System.StringComparison.Ordinal);
@@ -255,6 +434,27 @@ namespace TaskMaster.Test.AppGlobals
             }
 
             throw new AssertFailedException($"Unable to extract body for '{methodSignature}'.");
+        }
+
+        private static void ResetIdleAsyncQueueState()
+        {
+            var entries = GetIdleAsyncQueueEntries();
+            while (entries.TryDequeue(out _)) { }
+
+            typeof(IdleAsyncQueue)
+                .GetField("_subscribeGuard", BindingFlags.NonPublic | BindingFlags.Static)!
+                .SetValue(null, new ThreadSafeSingleShotGuard());
+        }
+
+        private static ConcurrentQueue<(
+            bool UiThread,
+            Func<Task> AsyncAction
+        )> GetIdleAsyncQueueEntries()
+        {
+            return (ConcurrentQueue<(bool UiThread, Func<Task> AsyncAction)>)
+                typeof(IdleAsyncQueue)
+                    .GetProperty("Entries", BindingFlags.NonPublic | BindingFlags.Static)!
+                    .GetValue(null)!;
         }
 
         private sealed class ControlledSynchronizationContext : SynchronizationContext
