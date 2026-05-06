@@ -44,6 +44,29 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         }
 
         [TestMethod]
+        public async Task CreateAsync_WhenInputsValid_ReturnsInitializedStoresWrapper()
+        {
+            var includedStore = CreateStore("Mailbox", @"C:\Data\mailbox.ost", "user@example.com");
+            var secondStore = CreateStore(
+                "Archive Mailbox",
+                @"C:\Data\archive.ost",
+                "archive@example.com"
+            );
+            var globals = CreateGlobalsWithStores(includedStore.Object, secondStore.Object);
+
+            var result = await StoresWrapper.CreateAsync(globals.Object, CancellationToken.None);
+
+            result.Should().NotBeNull();
+            result.Globals.Should().BeSameAs(globals.Object);
+            result.Stores.Should().HaveCount(2);
+            result.Stores.Select(x => x.DisplayName).Should().Equal("Mailbox", "Archive Mailbox");
+            result
+                .Stores.Select(x => x.UserEmailAddress)
+                .Should()
+                .Equal("user@example.com", "archive@example.com");
+        }
+
+        [TestMethod]
         public void Constructor_WithoutGlobals_SetsDefaultFlagsAndCollections()
         {
             var wrapper = new StoresWrapper();
@@ -163,6 +186,30 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             };
 
             await wrapper.RewireOlObjectsAsync(new StreamingContext());
+
+            wrapper.Stores.Should().ContainSingle();
+            wrapper.Stores[0].Should().BeSameAs(existingWrapper);
+            existingWrapper.InnerStore.Should().BeSameAs(updatedStore.Object);
+            existingWrapper.UserEmailAddress.Should().Be("new@example.com");
+        }
+
+        [TestMethod]
+        public async Task RewireAfterDeserializeAsync_PublicEntryHitsRealMethodBody()
+        {
+            var originalStore = CreateStore("Mailbox", @"C:\Data\old.ost", "old@example.com");
+            var updatedStore = CreateStore("Mailbox", @"C:\Data\new.ost", "new@example.com");
+            var existingWrapper = new StoreWrapper(originalStore.Object).Init();
+            var wrapper = new StoresWrapper(CreateGlobalsWithStores(updatedStore.Object).Object)
+            {
+                Stores = new List<StoreWrapper> { existingWrapper },
+                ExcludedStoreNameContains = new List<string>(),
+                ExcludedStoreFilePathContains = new List<string>(),
+                GwsoFilePathContains = new List<string>(),
+                ExcludeGwsoStores = false,
+                ExcludePublicFolderStores = false,
+            };
+
+            await wrapper.RewireAfterDeserializeAsync();
 
             wrapper.Stores.Should().ContainSingle();
             wrapper.Stores[0].Should().BeSameAs(existingWrapper);
