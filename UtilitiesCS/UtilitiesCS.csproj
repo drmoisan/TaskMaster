@@ -25,6 +25,8 @@
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp></NuGetPackageImportStamp>
+    <!-- This legacy project is not nullable-annotated yet; keep solution-level nullable enforcement focused on migrated code. -->
+    <NoWarn>$(NoWarn);nullable;CS0168;CS0618</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

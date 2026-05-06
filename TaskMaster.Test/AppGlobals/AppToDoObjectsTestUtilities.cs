@@ -1,4 +1,3 @@
-using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -7,19 +6,6 @@ namespace TaskMaster.Test.AppGlobals
 {
     internal static class AppToDoObjectsTestUtilities
     {
-        internal static string GetRepositoryRoot()
-        {
-            var assemblyDirectory = new DirectoryInfo(
-                Path.GetDirectoryName(typeof(ThisAddIn).Assembly.Location)!
-            );
-            var repositoryRoot = assemblyDirectory.Parent?.Parent?.Parent?.FullName;
-
-            repositoryRoot.Should().NotBeNullOrEmpty();
-            File.Exists(Path.Combine(repositoryRoot!, "README.md")).Should().BeTrue();
-
-            return repositoryRoot!;
-        }
-
         internal static void SetReadonlyField<TTarget, TValue>(
             TTarget target,
             string fieldName,
