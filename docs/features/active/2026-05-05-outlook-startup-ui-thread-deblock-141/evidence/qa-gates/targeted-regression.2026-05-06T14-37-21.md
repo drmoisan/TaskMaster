@@ -5,10 +5,12 @@ Source Artifact: docs/features/active/2026-05-05-outlook-startup-ui-thread-deblo
 Fix Applied: Removed `ControlledSynchronizationContext` deadlock from `LoadSequentialAsync_RealAsyncFlowHitsYieldAndEngineOffloadLines`. Replaced manual sync-context pump with direct `await ExecuteMirroredCoordinatorAsync()`.
 Verified Test Files:
 - TaskMaster.Test/AppGlobals/AppToDoObjectsTests.cs
+- TaskMaster.Test/AppGlobals/AppToDoObjectsCoverageTests.cs
 - TaskMaster.Test/AppGlobals/AppOlObjectsCoverageTests.cs
 - TaskMaster.Test/AppGlobals/AppOlObjectsTests.cs
 - TaskMaster.Test/AppGlobals/ApplicationGlobalsTests.cs
 - TaskMaster.Test/OutlookObjects/Store/StoresWrapperTests.cs
+- UtilitiesCS.Test/OutlookObjects/Store/StoresWrapperTests.cs
 Verified Test Names:
 - LoadIdListAsync_DoesNotReadOutlookApplicationFromWorkerThread
 - LoadProjInfoAsync_DoesNotReadOutlookApplicationFromWorkerThread
@@ -39,4 +41,10 @@ Verified Test Names:
 - LoadWhenIdle_QueuesTodoAutoFileBatchBeforeEngineAndEvents
 - LoadAsync_AssignsStoresWrapperFromConfigAndCompletes
 - LoadStoresAsync_LeavesStoresWrapperNullWhenConfigMissing
+- CreateAsync_WhenInputsValid_ReturnsInitializedStoresWrapper
+- RewireAfterDeserializeAsync_PublicEntryHitsRealMethodBody
+- LoadProgramInfo_ReturnsNullWhenPythonStagingMissing
+- People_CollectionChanged_SerializesPeopleDictionary
+- LoadIDList_ReturnsNullWhenAppDataMissing
+- LoadProjInfo_ReturnsNullWhenAppDataMissing
 Solution-Wide Result: Total: 3989, Passed: 3987, Skipped: 2 (pre-existing [Ignore]), Failed: 0
