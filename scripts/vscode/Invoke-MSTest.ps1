@@ -9,8 +9,6 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-. (Join-Path $PSScriptRoot 'TestProcessCleanup.ps1')
-
 if ([string]::IsNullOrWhiteSpace($SearchRoot)) {
     $SearchRoot = '.'
 }
@@ -36,15 +34,13 @@ if (-not $vstestPath) {
     throw 'vstest.console.exe not found via vswhere. Install Visual Studio Test Platform components.'
 }
 
-$testAssemblies = @(
-    Get-ChildItem -Path $resolvedSearchRoot -Recurse -Filter '*.Test.dll' |
-        Where-Object {
-            $_.FullName -match "\\bin\\$Configuration\\" -and
-            $_.FullName -notmatch '\\obj\\' -and
-            $_.FullName -notmatch '\\ref\\'
-        } |
-        Select-Object -ExpandProperty FullName
-)
+$testAssemblies = Get-ChildItem -Path $resolvedSearchRoot -Recurse -Filter '*.Test.dll' |
+    Where-Object {
+        $_.FullName -match "\\bin\\$Configuration\\" -and
+        $_.FullName -notmatch '\\obj\\' -and
+        $_.FullName -notmatch '\\ref\\'
+    } |
+    Select-Object -ExpandProperty FullName
 
 if (-not $testAssemblies -or $testAssemblies.Count -eq 0) {
     throw "No test assemblies found under '$resolvedSearchRoot' for configuration '$Configuration'. Build first."
@@ -53,18 +49,7 @@ if (-not $testAssemblies -or $testAssemblies.Count -eq 0) {
 Write-Host "Using vstest.console: $vstestPath"
 Write-Host "Discovered $($testAssemblies.Count) test assemblies."
 
-Stop-RepoOwnedVSTestProcesses -RepoRoot $repoRoot
-
-$testArgumentList = @($testAssemblies)
-$testArgumentList += '/InIsolation'
-
-try {
-    $testProcess = Start-Process -FilePath $vstestPath -ArgumentList $testArgumentList -PassThru -Wait -NoNewWindow
-}
-finally {
-    Stop-RepoOwnedVSTestProcesses -RepoRoot $repoRoot
-}
-
-if ($testProcess.ExitCode -ne 0) {
-    throw "MSTest execution failed with exit code $($testProcess.ExitCode)"
+& $vstestPath $testAssemblies /InIsolation
+if ($LASTEXITCODE -ne 0) {
+    throw "MSTest execution failed with exit code $LASTEXITCODE"
 }
