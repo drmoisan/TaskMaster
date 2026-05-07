@@ -351,7 +351,8 @@ namespace UtilitiesCS.ReusableTypeClasses
                             base.Add(kvp.Key, kvp.Value);
                         }
                     }
-                    Serialize();
+                    if (Filepath != "")
+                        SerializeThreadSafe(Filepath);
                 }
                 else if (response == DialogResult.No)
                 {
@@ -440,7 +441,8 @@ namespace UtilitiesCS.ReusableTypeClasses
             {
                 if (response == DialogResult.Yes)
                 {
-                    this.Serialize();
+                    if (Filepath != "")
+                        SerializeThreadSafe(Filepath);
                 }
                 else if (response == DialogResult.No)
                 {
