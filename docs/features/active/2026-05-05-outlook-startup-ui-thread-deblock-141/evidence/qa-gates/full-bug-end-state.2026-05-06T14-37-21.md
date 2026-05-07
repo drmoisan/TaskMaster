@@ -24,6 +24,8 @@ Test:
 
 Baseline Artifacts:
 - docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/baseline/phase0-instructions-read.2026-05-05T09-05-00.md
+- docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/other/change-plan-review.2026-05-05T09-07-00.md
+- docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/other/full-bug-inputs.2026-05-05T09-08-00.md
 - docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/baseline/csharp-format.2026-05-05T09-10-00.md
 - docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/baseline/csharp-analyzers-build.2026-05-05T09-12-00.md
 - docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/baseline/csharp-nullable-build.2026-05-05T09-18-00.md
@@ -67,7 +69,7 @@ Acceptance Criteria Coverage:
   → PARTIAL. Regression tests are present and green (see Final QC Artifacts above). Manual validation sign-off is blocked by coverage FAIL.
 - `[ ]` "Startup timing/logging remains sufficient to compare before/after behavior"
   → Blocked: manual Outlook validation deferred. Implementation preserves existing log4net startup timing patterns unchanged.
-- `[ ]` "No configuration schema, persisted data format, or user-facing startup control changes are introduced outside the defined scope"
-  → SATISFIED by implementation (no schema, data format, or control changes made), but manual sign-off deferred pending coverage PASS.
+- `[x]` "No configuration schema, persisted data format, or user-facing startup control changes are introduced outside the defined scope"
+  → SATISFIED. No schema, persisted-data, or user-facing startup-control changes were introduced; the implementation stays within the approved production scope recorded by the implementation-scope and thread-affinity inspection artifacts.
 
 Ready For Validator: false
