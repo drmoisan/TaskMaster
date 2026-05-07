@@ -129,10 +129,7 @@ namespace UtilitiesCS.Test.Extensions
             using var source = new MemoryStream(new byte[] { 1, 2, 3, 4, 5 });
             using var destination = new MemoryStream();
             var reports = new List<KeyValuePair<long, long>>();
-
-            // Use a synchronous IProgress<T> to avoid the thread-pool delivery race
-            // inherent in Progress<T>, which posts callbacks via SynchronizationContext.
-            var progress = new SynchronousProgress<KeyValuePair<long, long>>(reports.Add);
+            var progress = new Progress<KeyValuePair<long, long>>(reports.Add);
 
             // Act
             await source.CopyToAsync(
@@ -142,6 +139,9 @@ namespace UtilitiesCS.Test.Extensions
                 progress,
                 CancellationToken.None
             );
+
+            // Progress<T> posts callbacks via the thread pool; allow time for delivery
+            await Task.Delay(200);
 
             // Assert
             destination.ToArray().Should().Equal(new byte[] { 1, 2, 3, 4, 5 });
