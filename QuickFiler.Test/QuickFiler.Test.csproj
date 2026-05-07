@@ -76,6 +76,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Controllers\KbdActionsTests.cs" />
+    <Compile Include="Controllers\EfcFormControllerTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerTests.cs" />
     <Compile Include="Controllers\QfcFormControllerTests.cs" />
