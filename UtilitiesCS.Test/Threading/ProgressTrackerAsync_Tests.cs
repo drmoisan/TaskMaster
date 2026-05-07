@@ -124,97 +124,65 @@ namespace UtilitiesCS.Test.Threading
         }
 
         [TestMethod]
-        public void InitializeAsync_WithCurrentDispatcher_InitializesAndReturnsTracker()
+        [STAThread]
+        public async Task InitializeAsync_WithCurrentDispatcher_InitializesAndReturnsTracker()
         {
-            // MSTest does not honour [STAThread] on test methods, and async Task tests
-            // lose apartment state after the first await. The only reliable way to host
-            // a WPF Dispatcher in a .NET Framework MSTest is to own a dedicated STA
-            // thread and drive it with Dispatcher.Run() / BeginInvokeShutdown().
-            Exception? testException = null;
+            using var cts = new CancellationTokenSource();
+            var tracker = new ProgressTrackerAsync(cts);
+            ProgressViewer? shownViewer = null;
+            var previousContext = SynchronizationContext.Current;
+            var dispatcherField = typeof(UiThread).GetField(
+                "_dispatcher",
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
+            dispatcherField.Should().NotBeNull();
 
-            var staThread = new Thread(() =>
+            var currentDispatcher = Dispatcher.CurrentDispatcher;
+            var previousDispatcher = (Dispatcher)dispatcherField!.GetValue(null);
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            tracker.ShowProgressViewer = viewer => shownViewer = viewer;
+
+            try
             {
-                using var cts = new CancellationTokenSource();
-                var tracker = new ProgressTrackerAsync(cts);
-                ProgressViewer? shownViewer = null;
+                dispatcherField.SetValue(null, currentDispatcher);
 
-                var dispatcherField = typeof(UiThread).GetField(
-                    "_dispatcher",
-                    BindingFlags.NonPublic | BindingFlags.Static
+                var initializeTask = tracker.InitializeAsync();
+                var frame = new DispatcherFrame();
+                _ = initializeTask.ContinueWith(
+                    _ =>
+                        currentDispatcher.BeginInvoke(
+                            new System.Action(() => frame.Continue = false)
+                        ),
+                    TaskScheduler.Default
                 );
-                dispatcherField.Should().NotBeNull();
 
-                var currentDispatcher = Dispatcher.CurrentDispatcher;
-                var previousDispatcher = (Dispatcher)dispatcherField!.GetValue(null);
-                tracker.ShowProgressViewer = viewer => shownViewer = viewer;
+                Dispatcher.PushFrame(frame);
 
-                try
-                {
-                    dispatcherField.SetValue(null, currentDispatcher);
+                var initializedTracker = await initializeTask;
+                var initializedViewer = tracker.ProgressViewer;
 
-                    var initializeTask = tracker.InitializeAsync();
+                initializedTracker.Should().BeSameAs(tracker);
+                shownViewer.Should().BeSameAs(initializedViewer);
+                tracker.UiDispatcher.Should().BeSameAs(currentDispatcher);
+                initializedViewer.Should().NotBeNull();
+                initializedViewer.CancelSource.Should().BeSameAs(cts);
+                initializedViewer.JobName.Text.Should().Be("Initializing...");
+                initializedViewer.Visible.Should().BeFalse();
 
-                    // When initializeTask completes its InvokeAsync work on the
-                    // dispatcher, shut the loop down so Dispatcher.Run() returns.
-                    _ = initializeTask.ContinueWith(
-                        _ => currentDispatcher.BeginInvokeShutdown(DispatcherPriority.Normal),
-                        TaskScheduler.Default
-                    );
+                tracker.ProgressViewer = initializedViewer;
+                tracker.ProgressViewer.Should().BeSameAs(initializedViewer);
 
-                    // Run the full STA dispatcher message loop. This pumps Win32
-                    // messages and processes all queued InvokeAsync work items.
-                    Dispatcher.Run();
-
-                    // Dispatcher.Run() returned: initializeTask is guaranteed complete.
-                    var initializedTracker = initializeTask.Result;
-                    var initializedViewer = tracker.ProgressViewer;
-
-                    try
-                    {
-                        initializedTracker.Should().BeSameAs(tracker);
-                        shownViewer.Should().BeSameAs(initializedViewer);
-                        tracker.UiDispatcher.Should().BeSameAs(currentDispatcher);
-                        initializedViewer.Should().NotBeNull();
-                        initializedViewer!.CancelSource.Should().BeSameAs(cts);
-                        initializedViewer.JobName.Text.Should().Be("Initializing...");
-                        initializedViewer.Visible.Should().BeFalse();
-
-                        tracker.ProgressViewer = initializedViewer;
-                        tracker.ProgressViewer.Should().BeSameAs(initializedViewer);
-                    }
-                    finally
-                    {
-                        initializedViewer?.Close();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    testException = ex;
-                    // Ensure the dispatcher loop exits even when assertions fail.
-                    currentDispatcher.BeginInvokeShutdown(DispatcherPriority.Normal);
-                }
-                finally
-                {
-                    dispatcherField.SetValue(null, previousDispatcher);
-
-                    if (tracker.ProgressViewer != null && !tracker.ProgressViewer.IsDisposed)
-                    {
-                        tracker.ProgressViewer.Close();
-                    }
-                }
-            });
-
-            staThread.SetApartmentState(ApartmentState.STA);
-            staThread.Start();
-            staThread.Join();
-
-            // Re-throw any assertion or unexpected exception on the MSTest thread
-            // so Test Explorer reports the correct failure.
-            if (testException != null)
+                initializedViewer.Close();
+            }
+            finally
             {
-                System
-                    .Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(testException)
-                    .Throw();
+                if (tracker.ProgressViewer != null && !tracker.ProgressViewer.IsDisposed)
+                {
+                    tracker.ProgressViewer.Close();
+                }
+
+                dispatcherField.SetValue(null, previousDispatcher);
+                SynchronizationContext.SetSynchronizationContext(previousContext);
             }
         }
     }
