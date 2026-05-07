@@ -2,55 +2,6 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "dotnet: restore",
-      "type": "shell",
-      "command": "pwsh",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "scripts/vscode/Invoke-Restore.ps1",
-        "-SolutionPath",
-        "TaskMaster.sln",
-        "-Configuration",
-        "Debug",
-        "-Platform",
-        "Any CPU"
-      ],
-      "group": "build",
-      "problemMatcher": [
-        "$msCompile"
-      ],
-      "detail": "Workspace override for legacy VSTO/WPF restore using Visual Studio MSBuild."
-    },
-    {
-      "label": "dotnet: build",
-      "type": "shell",
-      "command": "pwsh",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "scripts/vscode/Invoke-VSBuild.ps1",
-        "-SolutionPath",
-        "TaskMaster.sln",
-        "-Configuration",
-        "Debug",
-        "-Platform",
-        "Any CPU"
-      ],
-      "dependsOn": [
-        "dotnet: restore"
-      ],
-      "group": "build",
-      "problemMatcher": [
-        "$msCompile"
-      ],
-      "detail": "Workspace override for legacy VSTO/WPF build using Visual Studio MSBuild."
-    },
-    {
       "label": "format: csharpier",
       "type": "shell",
       "command": "dotnet",
@@ -101,7 +52,7 @@
         "Any CPU"
       ],
       "dependsOn": [
-        "dotnet: restore"
+        "restore: TaskMaster.sln"
       ],
       "group": {
         "kind": "build",
@@ -131,7 +82,7 @@
         "-EnforceCodeStyleInBuild"
       ],
       "dependsOn": [
-        "dotnet: restore"
+        "restore: TaskMaster.sln"
       ],
       "group": "build",
       "problemMatcher": [
@@ -158,7 +109,7 @@
         "-TreatWarningsAsErrors"
       ],
       "dependsOn": [
-        "dotnet: restore"
+        "restore: TaskMaster.sln"
       ],
       "group": "build",
       "problemMatcher": [
