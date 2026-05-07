@@ -35,6 +35,8 @@
     <AssemblyName>TaskMaster</AssemblyName>
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <LangVersion>preview</LangVersion>
+    <!-- This legacy project is not nullable-annotated yet; keep solution-level nullable enforcement focused on migrated code. -->
+    <NoWarn>$(NoWarn);nullable;CS0618</NoWarn>
     <DefineConstants>VSTO40</DefineConstants>
     <NuGetPackageImportStamp></NuGetPackageImportStamp>
     <IsWebBootstrapper>False</IsWebBootstrapper>

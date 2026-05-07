@@ -41,6 +41,39 @@ namespace TaskMaster.Test.AppGlobals
         private Mock<IntelligenceConfig> mockIntelligenceConfig = null!;
         private Mock<ISmartSerializableNonTyped> mockSmartSerializable = null!;
 
+        private static void ConfigureIdListLoader(
+            AppToDoObjects appToDoObjects,
+            string fileName,
+            Func<string, bool>? fileExists = null,
+            Func<string, string>? readAllText = null
+        )
+        {
+            var settings = new TaskMaster.Properties.Settings();
+            var propertyValue = settings.PropertyValues["FileName_IDList"];
+            if (propertyValue is null)
+            {
+                var property = settings.Properties["FileName_IDList"]!;
+                propertyValue = new SettingsPropertyValue(property) { PropertyValue = fileName };
+                settings.PropertyValues.Add(propertyValue);
+            }
+            else
+            {
+                propertyValue.PropertyValue = fileName;
+            }
+
+            AppToDoObjectsTestUtilities.SetReadonlyField(appToDoObjects, "_defaults", settings);
+
+            if (fileExists is not null)
+            {
+                appToDoObjects.FileExists = fileExists;
+            }
+
+            if (readAllText is not null)
+            {
+                appToDoObjects.ReadAllText = readAllText;
+            }
+        }
+
         private Mock<ISmartSerializableNonTyped> GetMockSS()
         {
             var mockSS = this.mockRepository.Create<ISmartSerializableNonTyped>();
@@ -124,11 +157,9 @@ namespace TaskMaster.Test.AppGlobals
             // Arrange
             var callerThreadId = Environment.CurrentManagedThreadId;
             var accessedThreadIds = new ConcurrentQueue<int>();
-            var repositoryRoot = AppToDoObjectsTestUtilities.GetRepositoryRoot();
-            File.Exists(Path.Combine(repositoryRoot, "README.md")).Should().BeTrue();
 
             var fileSystem = new StubFileSystemFolderPaths();
-            fileSystem.SpecialFolders["AppData"] = repositoryRoot;
+            fileSystem.SpecialFolders["AppData"] = "virtual-app-data";
 
             var olObjects = OlObjectsProxy.Create(() =>
             {
@@ -148,19 +179,12 @@ namespace TaskMaster.Test.AppGlobals
             var appToDoObjects = new AppToDoObjects(
                 new StubApplicationGlobals(fileSystem, olObjects)
             );
-            var settings = TaskMaster.Properties.Settings.Default;
-            var propertyValue = settings.PropertyValues["FileName_IDList"];
-            if (propertyValue is null)
-            {
-                var property = settings.Properties["FileName_IDList"]!;
-                propertyValue = new SettingsPropertyValue(property) { PropertyValue = "README.md" };
-                settings.PropertyValues.Add(propertyValue);
-            }
-            else
-            {
-                propertyValue.PropertyValue = "README.md";
-            }
-            AppToDoObjectsTestUtilities.SetReadonlyField(appToDoObjects, "_defaults", settings);
+            ConfigureIdListLoader(
+                appToDoObjects,
+                "ids.json",
+                fileExists: _ => true,
+                readAllText: _ => "[]"
+            );
 
             // Act
             await AppToDoObjectsTestUtilities.InvokePrivateAsync(appToDoObjects, "LoadIdListAsync");
@@ -195,31 +219,23 @@ namespace TaskMaster.Test.AppGlobals
         public void LoadIdListFromDisk_ReturnsEmptyWhenJsonDeserializationFails()
         {
             // Arrange
-            var repositoryRoot = AppToDoObjectsTestUtilities.GetRepositoryRoot();
             var fileSystem = new StubFileSystemFolderPaths();
             var appToDoObjects = new AppToDoObjects(
                 new StubApplicationGlobals(fileSystem, OlObjectsProxy.Create(() => null!))
             );
-            var settings = TaskMaster.Properties.Settings.Default;
-            var propertyValue = settings.PropertyValues["FileName_IDList"];
-            if (propertyValue is null)
-            {
-                var property = settings.Properties["FileName_IDList"]!;
-                propertyValue = new SettingsPropertyValue(property) { PropertyValue = "README.md" };
-                settings.PropertyValues.Add(propertyValue);
-            }
-            else
-            {
-                propertyValue.PropertyValue = "README.md";
-            }
-            AppToDoObjectsTestUtilities.SetReadonlyField(appToDoObjects, "_defaults", settings);
+            ConfigureIdListLoader(
+                appToDoObjects,
+                "ids.json",
+                fileExists: _ => true,
+                readAllText: _ => "not-json"
+            );
             var method = typeof(AppToDoObjects).GetMethod(
                 "LoadIdListFromDisk",
                 BindingFlags.Instance | BindingFlags.NonPublic
             );
 
             // Act
-            var idList = method!.Invoke(appToDoObjects, [repositoryRoot]) as IIDList;
+            var idList = method!.Invoke(appToDoObjects, ["virtual-app-data"]) as IIDList;
 
             // Assert
             idList.Should().NotBeNull();
@@ -230,44 +246,23 @@ namespace TaskMaster.Test.AppGlobals
         public void LoadIdListFromDisk_ReturnsEmptyWhenPersistedJsonIsCorrupted()
         {
             // Arrange
-            var repositoryRoot = AppToDoObjectsTestUtilities.GetRepositoryRoot();
             var fileSystem = new StubFileSystemFolderPaths();
             var appToDoObjects = new AppToDoObjects(
                 new StubApplicationGlobals(fileSystem, OlObjectsProxy.Create(() => null!))
             );
-            var settings = new TaskMaster.Properties.Settings();
-            var propertyValue = settings.PropertyValues["FileName_IDList"];
-            if (propertyValue is null)
-            {
-                var property = settings.Properties["FileName_IDList"]!;
-                propertyValue = new SettingsPropertyValue(property)
-                {
-                    PropertyValue = Path.Combine(
-                        "TaskMaster.Test",
-                        "AppGlobals",
-                        "Fixtures",
-                        "id-list-corrupted.json"
-                    ),
-                };
-                settings.PropertyValues.Add(propertyValue);
-            }
-            else
-            {
-                propertyValue.PropertyValue = Path.Combine(
-                    "TaskMaster.Test",
-                    "AppGlobals",
-                    "Fixtures",
-                    "id-list-corrupted.json"
-                );
-            }
-            AppToDoObjectsTestUtilities.SetReadonlyField(appToDoObjects, "_defaults", settings);
+            ConfigureIdListLoader(
+                appToDoObjects,
+                "ids.json",
+                fileExists: _ => true,
+                readAllText: _ => "{"
+            );
             var method = typeof(AppToDoObjects).GetMethod(
                 "LoadIdListFromDisk",
                 BindingFlags.Instance | BindingFlags.NonPublic
             );
 
             // Act
-            var idList = method!.Invoke(appToDoObjects, [repositoryRoot]) as IIDList;
+            var idList = method!.Invoke(appToDoObjects, ["virtual-app-data"]) as IIDList;
 
             // Assert
             idList.Should().NotBeNull();
@@ -278,37 +273,23 @@ namespace TaskMaster.Test.AppGlobals
         public void LoadIdListFromDisk_ReturnsEmptyWhenReadThrowsIOException()
         {
             // Arrange
-            var repositoryRoot = AppToDoObjectsTestUtilities.GetRepositoryRoot();
             var fileSystem = new StubFileSystemFolderPaths();
             var appToDoObjects = new AppToDoObjects(
                 new StubApplicationGlobals(fileSystem, OlObjectsProxy.Create(() => null!))
             );
-            var settings = TaskMaster.Properties.Settings.Default;
-            var propertyValue = settings.PropertyValues["FileName_IDList"];
-            if (propertyValue is null)
-            {
-                var property = settings.Properties["FileName_IDList"]!;
-                propertyValue = new SettingsPropertyValue(property) { PropertyValue = "README.md" };
-                settings.PropertyValues.Add(propertyValue);
-            }
-            else
-            {
-                propertyValue.PropertyValue = "README.md";
-            }
-            AppToDoObjectsTestUtilities.SetReadonlyField(appToDoObjects, "_defaults", settings);
+            ConfigureIdListLoader(
+                appToDoObjects,
+                "ids.json",
+                fileExists: _ => true,
+                readAllText: _ => throw new IOException("Simulated read failure.")
+            );
             var method = typeof(AppToDoObjects).GetMethod(
                 "LoadIdListFromDisk",
                 BindingFlags.Instance | BindingFlags.NonPublic
             );
-            using var readmeLock = new FileStream(
-                Path.Combine(repositoryRoot, "README.md"),
-                FileMode.Open,
-                FileAccess.Read,
-                FileShare.None
-            );
 
             // Act
-            var idList = method!.Invoke(appToDoObjects, [repositoryRoot]) as IIDList;
+            var idList = method!.Invoke(appToDoObjects, ["virtual-app-data"]) as IIDList;
 
             // Assert
             idList.Should().NotBeNull();
@@ -319,34 +300,18 @@ namespace TaskMaster.Test.AppGlobals
         public void LoadIdListFromDisk_ReturnsEmptyWhenIdListFileIsMissing()
         {
             // Arrange
-            var repositoryRoot = AppToDoObjectsTestUtilities.GetRepositoryRoot();
             var fileSystem = new StubFileSystemFolderPaths();
             var appToDoObjects = new AppToDoObjects(
                 new StubApplicationGlobals(fileSystem, OlObjectsProxy.Create(() => null!))
             );
-            var settings = new TaskMaster.Properties.Settings();
-            var propertyValue = settings.PropertyValues["FileName_IDList"];
-            if (propertyValue is null)
-            {
-                var property = settings.Properties["FileName_IDList"]!;
-                propertyValue = new SettingsPropertyValue(property)
-                {
-                    PropertyValue = "missing-id-list.json",
-                };
-                settings.PropertyValues.Add(propertyValue);
-            }
-            else
-            {
-                propertyValue.PropertyValue = "missing-id-list.json";
-            }
-            AppToDoObjectsTestUtilities.SetReadonlyField(appToDoObjects, "_defaults", settings);
+            ConfigureIdListLoader(appToDoObjects, "missing-id-list.json", fileExists: _ => false);
             var method = typeof(AppToDoObjects).GetMethod(
                 "LoadIdListFromDisk",
                 BindingFlags.Instance | BindingFlags.NonPublic
             );
 
             // Act
-            var idList = method!.Invoke(appToDoObjects, [repositoryRoot]) as IIDList;
+            var idList = method!.Invoke(appToDoObjects, ["virtual-app-data"]) as IIDList;
 
             // Assert
             idList.Should().NotBeNull();
@@ -357,44 +322,23 @@ namespace TaskMaster.Test.AppGlobals
         public void LoadIdListFromDisk_ReturnsPersistedIdsWhenJsonIsValid()
         {
             // Arrange
-            var repositoryRoot = AppToDoObjectsTestUtilities.GetRepositoryRoot();
             var fileSystem = new StubFileSystemFolderPaths();
             var appToDoObjects = new AppToDoObjects(
                 new StubApplicationGlobals(fileSystem, OlObjectsProxy.Create(() => null!))
             );
-            var settings = new TaskMaster.Properties.Settings();
-            var propertyValue = settings.PropertyValues["FileName_IDList"];
-            if (propertyValue is null)
-            {
-                var property = settings.Properties["FileName_IDList"]!;
-                propertyValue = new SettingsPropertyValue(property)
-                {
-                    PropertyValue = Path.Combine(
-                        "TaskMaster.Test",
-                        "AppGlobals",
-                        "Fixtures",
-                        "id-list-non-empty.json"
-                    ),
-                };
-                settings.PropertyValues.Add(propertyValue);
-            }
-            else
-            {
-                propertyValue.PropertyValue = Path.Combine(
-                    "TaskMaster.Test",
-                    "AppGlobals",
-                    "Fixtures",
-                    "id-list-non-empty.json"
-                );
-            }
-            AppToDoObjectsTestUtilities.SetReadonlyField(appToDoObjects, "_defaults", settings);
+            ConfigureIdListLoader(
+                appToDoObjects,
+                "ids.json",
+                fileExists: _ => true,
+                readAllText: _ => "[\"TD-1\"]"
+            );
             var method = typeof(AppToDoObjects).GetMethod(
                 "LoadIdListFromDisk",
                 BindingFlags.Instance | BindingFlags.NonPublic
             );
 
             // Act
-            var idList = method!.Invoke(appToDoObjects, [repositoryRoot]) as IIDList;
+            var idList = method!.Invoke(appToDoObjects, ["virtual-app-data"]) as IIDList;
 
             // Assert
             idList.Should().NotBeNull();
@@ -405,7 +349,6 @@ namespace TaskMaster.Test.AppGlobals
         public async Task LoadIdListAsync_RefreshesFromOutlookOnlyWhenDiskListIsEmpty()
         {
             // Arrange
-            var repositoryRoot = AppToDoObjectsTestUtilities.GetRepositoryRoot();
             var throwingApplication = (Application)
                 new ReflectionRealProxy(
                     typeof(Application),
@@ -420,72 +363,29 @@ namespace TaskMaster.Test.AppGlobals
                 ).GetTransparentProxy();
 
             var nonEmptyFileSystem = new StubFileSystemFolderPaths();
-            nonEmptyFileSystem.SpecialFolders["AppData"] = repositoryRoot;
+            nonEmptyFileSystem.SpecialFolders["AppData"] = "virtual-app-data";
             var nonEmptyAppToDoObjects = new AppToDoObjects(
                 new StubApplicationGlobals(
                     nonEmptyFileSystem,
                     OlObjectsProxy.Create(() => throwingApplication)
                 )
             );
-            var nonEmptySettings = new TaskMaster.Properties.Settings();
-            var nonEmptyPropertyValue = nonEmptySettings.PropertyValues["FileName_IDList"];
-            if (nonEmptyPropertyValue is null)
-            {
-                var property = nonEmptySettings.Properties["FileName_IDList"]!;
-                nonEmptyPropertyValue = new SettingsPropertyValue(property)
-                {
-                    PropertyValue = Path.Combine(
-                        "TaskMaster.Test",
-                        "AppGlobals",
-                        "Fixtures",
-                        "id-list-non-empty.json"
-                    ),
-                };
-                nonEmptySettings.PropertyValues.Add(nonEmptyPropertyValue);
-            }
-            else
-            {
-                nonEmptyPropertyValue.PropertyValue = Path.Combine(
-                    "TaskMaster.Test",
-                    "AppGlobals",
-                    "Fixtures",
-                    "id-list-non-empty.json"
-                );
-            }
-            AppToDoObjectsTestUtilities.SetReadonlyField(
+            ConfigureIdListLoader(
                 nonEmptyAppToDoObjects,
-                "_defaults",
-                nonEmptySettings
+                "ids.json",
+                fileExists: _ => true,
+                readAllText: _ => "[\"TD-1\"]"
             );
 
             var emptyFileSystem = new StubFileSystemFolderPaths();
-            emptyFileSystem.SpecialFolders["AppData"] = repositoryRoot;
+            emptyFileSystem.SpecialFolders["AppData"] = "virtual-app-data";
             var emptyAppToDoObjects = new AppToDoObjects(
                 new StubApplicationGlobals(
                     emptyFileSystem,
                     OlObjectsProxy.Create(() => throwingApplication)
                 )
             );
-            var emptySettings = new TaskMaster.Properties.Settings();
-            var emptyPropertyValue = emptySettings.PropertyValues["FileName_IDList"];
-            if (emptyPropertyValue is null)
-            {
-                var property = emptySettings.Properties["FileName_IDList"]!;
-                emptyPropertyValue = new SettingsPropertyValue(property)
-                {
-                    PropertyValue = "missing-serializable-list.json",
-                };
-                emptySettings.PropertyValues.Add(emptyPropertyValue);
-            }
-            else
-            {
-                emptyPropertyValue.PropertyValue = "missing-serializable-list.json";
-            }
-            AppToDoObjectsTestUtilities.SetReadonlyField(
-                emptyAppToDoObjects,
-                "_defaults",
-                emptySettings
-            );
+            ConfigureIdListLoader(emptyAppToDoObjects, "missing-serializable-list.json");
 
             // Act
             Func<Task> nonEmptyAct = () =>
@@ -514,7 +414,6 @@ namespace TaskMaster.Test.AppGlobals
         public async Task LoadIdListAsync_SkipsOutlookRefreshWhenDiskListAlreadyContainsEntries()
         {
             // Arrange
-            var repositoryRoot = AppToDoObjectsTestUtilities.GetRepositoryRoot();
             var throwingApplication = (Application)
                 new ReflectionRealProxy(
                     typeof(Application),
@@ -529,39 +428,19 @@ namespace TaskMaster.Test.AppGlobals
                 ).GetTransparentProxy();
 
             var fileSystem = new StubFileSystemFolderPaths();
-            fileSystem.SpecialFolders["AppData"] = repositoryRoot;
+            fileSystem.SpecialFolders["AppData"] = "virtual-app-data";
             var appToDoObjects = new AppToDoObjects(
                 new StubApplicationGlobals(
                     fileSystem,
                     OlObjectsProxy.Create(() => throwingApplication)
                 )
             );
-            var settings = new TaskMaster.Properties.Settings();
-            var propertyValue = settings.PropertyValues["FileName_IDList"];
-            if (propertyValue is null)
-            {
-                var property = settings.Properties["FileName_IDList"]!;
-                propertyValue = new SettingsPropertyValue(property)
-                {
-                    PropertyValue = Path.Combine(
-                        "TaskMaster.Test",
-                        "AppGlobals",
-                        "Fixtures",
-                        "id-list-non-empty.json"
-                    ),
-                };
-                settings.PropertyValues.Add(propertyValue);
-            }
-            else
-            {
-                propertyValue.PropertyValue = Path.Combine(
-                    "TaskMaster.Test",
-                    "AppGlobals",
-                    "Fixtures",
-                    "id-list-non-empty.json"
-                );
-            }
-            AppToDoObjectsTestUtilities.SetReadonlyField(appToDoObjects, "_defaults", settings);
+            ConfigureIdListLoader(
+                appToDoObjects,
+                "ids.json",
+                fileExists: _ => true,
+                readAllText: _ => "[\"TD-1\"]"
+            );
 
             // Act
             await AppToDoObjectsTestUtilities.InvokePrivateAsync(appToDoObjects, "LoadIdListAsync");
@@ -575,28 +454,12 @@ namespace TaskMaster.Test.AppGlobals
         public async Task LoadIdListAsync_SkipsOutlookRefreshWhenParentAppIsNull()
         {
             // Arrange
-            var repositoryRoot = AppToDoObjectsTestUtilities.GetRepositoryRoot();
             var fileSystem = new StubFileSystemFolderPaths();
-            fileSystem.SpecialFolders["AppData"] = repositoryRoot;
+            fileSystem.SpecialFolders["AppData"] = "virtual-app-data";
             var appToDoObjects = new AppToDoObjects(
                 new StubApplicationGlobals(fileSystem, OlObjectsProxy.Create(() => null!))
             );
-            var settings = new TaskMaster.Properties.Settings();
-            var propertyValue = settings.PropertyValues["FileName_IDList"];
-            if (propertyValue is null)
-            {
-                var property = settings.Properties["FileName_IDList"]!;
-                propertyValue = new SettingsPropertyValue(property)
-                {
-                    PropertyValue = "missing-serializable-list.json",
-                };
-                settings.PropertyValues.Add(propertyValue);
-            }
-            else
-            {
-                propertyValue.PropertyValue = "missing-serializable-list.json";
-            }
-            AppToDoObjectsTestUtilities.SetReadonlyField(appToDoObjects, "_defaults", settings);
+            ConfigureIdListLoader(appToDoObjects, "missing-serializable-list.json");
 
             // Act
             await AppToDoObjectsTestUtilities.InvokePrivateAsync(appToDoObjects, "LoadIdListAsync");

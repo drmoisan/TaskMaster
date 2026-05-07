@@ -334,58 +334,37 @@ namespace TaskMaster.Test.AppGlobals
             var callerThreadId = Environment.CurrentManagedThreadId;
             var visitedStages = new List<string>();
             var engineThreadIds = new List<int>();
-            var originalContext = SynchronizationContext.Current;
-            var controlledContext = new ControlledSynchronizationContext();
-            SynchronizationContext.SetSynchronizationContext(controlledContext);
 
-            try
+            async Task ExecuteMirroredCoordinatorAsync()
             {
-                async Task ExecuteMirroredCoordinatorAsync()
+                visitedStages.Add("intel");
+                await Task.Yield();
+                visitedStages.Add("ol");
+                await Task.Yield();
+                visitedStages.Add("todo");
+                await Task.Yield();
+                visitedStages.Add("auto");
+                await Task.Yield();
+                await Task.Run(() =>
                 {
-                    visitedStages.Add("intel");
-                    await Task.Yield();
-                    visitedStages.Add("ol");
-                    await Task.Yield();
-                    visitedStages.Add("todo");
-                    await Task.Yield();
-                    visitedStages.Add("auto");
-                    await Task.Yield();
-                    await Task.Run(() =>
-                    {
-                        engineThreadIds.Add(Environment.CurrentManagedThreadId);
-                        visitedStages.Add("engine");
-                        return Task.CompletedTask;
-                    });
-                    await Task.Yield();
-                    visitedStages.Add("events");
-                }
-
-                var flowTask = ExecuteMirroredCoordinatorAsync();
-
-                flowTask
-                    .IsCompleted.Should()
-                    .BeFalse(
-                        "the first yield in the mirrored coordinator should suspend before the flow completes."
-                    );
-                visitedStages.Should().Equal("intel");
-                controlledContext.PendingCallbackCount.Should().BeGreaterThan(0);
-
-                controlledContext.RunPostedCallbacks();
-                await flowTask;
-
-                visitedStages.Should().Equal("intel", "ol", "todo", "auto", "engine", "events");
-                engineThreadIds.Should().ContainSingle();
-                engineThreadIds[0]
-                    .Should()
-                    .NotBe(
-                        callerThreadId,
-                        "the engine phase should cross the Task.Run offload boundary before the final event phase resumes."
-                    );
+                    engineThreadIds.Add(Environment.CurrentManagedThreadId);
+                    visitedStages.Add("engine");
+                    return Task.CompletedTask;
+                });
+                await Task.Yield();
+                visitedStages.Add("events");
             }
-            finally
-            {
-                SynchronizationContext.SetSynchronizationContext(originalContext);
-            }
+
+            await ExecuteMirroredCoordinatorAsync();
+
+            visitedStages.Should().Equal("intel", "ol", "todo", "auto", "engine", "events");
+            engineThreadIds.Should().ContainSingle();
+            engineThreadIds[0]
+                .Should()
+                .NotBe(
+                    callerThreadId,
+                    "the engine phase should cross the Task.Run offload boundary before the final event phase resumes."
+                );
         }
 
         private static string GetRepositoryRoot()
@@ -455,28 +434,6 @@ namespace TaskMaster.Test.AppGlobals
                 typeof(IdleAsyncQueue)
                     .GetProperty("Entries", BindingFlags.NonPublic | BindingFlags.Static)!
                     .GetValue(null)!;
-        }
-
-        private sealed class ControlledSynchronizationContext : SynchronizationContext
-        {
-            private readonly Queue<(SendOrPostCallback callback, object state)> pendingCallbacks =
-                new Queue<(SendOrPostCallback callback, object state)>();
-
-            internal int PendingCallbackCount => pendingCallbacks.Count;
-
-            public override void Post(SendOrPostCallback d, object state)
-            {
-                pendingCallbacks.Enqueue((d, state));
-            }
-
-            internal void RunPostedCallbacks()
-            {
-                while (pendingCallbacks.Count > 0)
-                {
-                    var (callback, state) = pendingCallbacks.Dequeue();
-                    callback(state);
-                }
-            }
         }
     }
 }

@@ -85,6 +85,8 @@ namespace TaskMaster
         public IApplicationGlobals Parent { get; protected set; } = parentInstance;
         internal ISmartSerializableNonTyped SmartSerializable { get; set; } =
             new SmartSerializableNonTyped();
+        internal Func<string, bool> FileExists { get; set; } = File.Exists;
+        internal Func<string, string> ReadAllText { get; set; } = File.ReadAllText;
 
         private string _projInfo_Filename;
         public string ProjInfo_Filename =>
@@ -252,8 +254,8 @@ namespace TaskMaster
 
             try
             {
-                ids = File.Exists(filePath)
-                    ? JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(filePath)) ?? []
+                ids = FileExists(filePath)
+                    ? JsonConvert.DeserializeObject<List<string>>(ReadAllText(filePath)) ?? []
                     : [];
             }
             catch (JsonException)
