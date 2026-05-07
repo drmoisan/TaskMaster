@@ -48,21 +48,26 @@ namespace UtilitiesCS.OutlookObjects.Store
         }
 
         [OnDeserialized]
-        public async void RewireOlObjects(System.Runtime.Serialization.StreamingContext context)
+        public void RewireOlObjects(System.Runtime.Serialization.StreamingContext context)
         {
-            try
-            {
-                await RewireOlObjectsAsync(context);
-            }
-            catch (System.Exception e)
-            {
-                logger.Error($"Error in {nameof(RewireOlObjects)}: {e.Message}");
-            }
+            _ = RewireAfterDeserializeWithLoggingAsync();
         }
 
         public virtual Task RewireAfterDeserializeAsync()
         {
             return RewireOlObjectsAsync(default);
+        }
+
+        private async Task RewireAfterDeserializeWithLoggingAsync()
+        {
+            try
+            {
+                await RewireAfterDeserializeAsync();
+            }
+            catch (System.Exception e)
+            {
+                logger.Error($"Error in {nameof(RewireOlObjects)}: {e.Message}");
+            }
         }
 
         internal async Task RewireOlObjectsAsync(StreamingContext context)

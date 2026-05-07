@@ -64,56 +64,27 @@ namespace TaskMaster.Test.AppGlobals
         }
 
         [TestMethod]
-        public async Task LoadSequentialAsync_RealCoordinatorHitsEngineOffloadLambda()
+        public async Task InitializeEnginesPhaseAsync_InvokesEngineInitializationThroughRealHelper()
         {
-            // The production coordinator still hard-wires non-virtual concrete collaborators,
-            // so this regression hits the real compiler-generated engine-offload delegate
-            // directly and runs that exact delegate through Task.Run instead of mirroring the
-            // lambda in test code.
-            var callerThreadId = Environment.CurrentManagedThreadId;
-            var delegateThreadIds = new List<int>();
+            // This regression executes the real helper that owns the Task.Run offload boundary
+            // so the production engine-startup seam remains directly covered.
             var engineMock = new Mock<IAppItemEngines>(MockBehavior.Strict);
             engineMock
                 .SetupGet(x => x.InboxEngines)
                 .Returns(new ConcurrentDictionary<string, IConditionalEngine<MailItemHelper>>());
-            engineMock
-                .Setup(x => x.InitAsync())
-                .Returns(() =>
-                {
-                    delegateThreadIds.Add(Environment.CurrentManagedThreadId);
-                    return Task.CompletedTask;
-                });
+            engineMock.Setup(x => x.InitAsync()).Returns(Task.CompletedTask);
 
-            var sut = new ApplicationGlobals(CreateOutlookApplicationStub(), false);
+            var sut = new TestableApplicationGlobals(CreateOutlookApplicationStub());
             typeof(ApplicationGlobals)
                 .GetProperty(
                     nameof(ApplicationGlobals.Engines),
                     BindingFlags.Instance | BindingFlags.Public
                 )!
                 .SetValue(sut, engineMock.Object);
-            var offloadMethod = typeof(ApplicationGlobals).GetMethod(
-                "<LoadSequentialAsync>b__9_0",
-                BindingFlags.Instance | BindingFlags.NonPublic
-            );
 
-            offloadMethod
-                .Should()
-                .NotBeNull(
-                    "the real coordinator should still compile the engine offload delegate."
-                );
-            var offloadDelegate =
-                (Func<Task>)Delegate.CreateDelegate(typeof(Func<Task>), sut, offloadMethod!);
-
-            await Task.Run(offloadDelegate);
+            await sut.InvokeInitializeEnginesPhaseAsync();
 
             engineMock.Verify(x => x.InitAsync(), Times.Once);
-            delegateThreadIds.Should().ContainSingle();
-            delegateThreadIds[0]
-                .Should()
-                .NotBe(
-                    callerThreadId,
-                    "the real engine offload delegate should run across the Task.Run boundary."
-                );
         }
 
         [TestMethod]
@@ -189,12 +160,9 @@ namespace TaskMaster.Test.AppGlobals
         [TestMethod]
         public void LoadSequentialAsync_KeepsComPhasesOnCallerThreadAndYieldsBetweenHeavyPhases()
         {
-            // This regression inspects the coordinator source directly because the legacy
-            // startup path wires sealed, non-virtual concrete collaborators into private
-            // fields, which makes a narrow behavioral harness disproportionately large for
-            // this pre-fix red test. The contract we need to lock in is still explicit:
-            // keep COM-sensitive phases as direct caller-thread awaits and add at least one
-            // cooperative yield boundary between heavy startup phases.
+            // This regression inspects the coordinator source directly to confirm the COM-
+            // sensitive phases still flow through dedicated caller-thread wrappers and that
+            // cooperative yield boundaries remain between the heavy startup phases.
             var source = File.ReadAllText(
                 Path.Combine(
                     GetRepositoryRoot(),
@@ -205,18 +173,21 @@ namespace TaskMaster.Test.AppGlobals
             );
             var methodBody = ExtractMethodBody(source, "public async Task LoadSequentialAsync()");
 
-            methodBody.Should().Contain("await _olObjects.LoadAsync();");
-            methodBody.Should().Contain("await _events.LoadAsync();");
+            methodBody.Should().Contain("await LoadOlObjectsPhaseAsync();");
+            methodBody.Should().Contain("await LoadEventsPhaseAsync();");
             Regex
-                .IsMatch(methodBody, @"Task\.Run\s*\([^\)]*_olObjects\.LoadAsync")
+                .IsMatch(methodBody, @"Task\.Run\s*\([^\)]*LoadOlObjectsPhaseAsync")
                 .Should()
-                .BeFalse("the Outlook object load must remain on the caller thread.");
+                .BeFalse("the Outlook object load phase must remain on the caller thread.");
             Regex
-                .IsMatch(methodBody, @"Task\.Run\s*\([^\)]*_events\.LoadAsync")
+                .IsMatch(methodBody, @"Task\.Run\s*\([^\)]*LoadEventsPhaseAsync")
                 .Should()
                 .BeFalse("event hookup and inbox processing must remain on the caller thread.");
 
-            var yieldMatches = Regex.Matches(methodBody, @"await\s+Task\.Yield\s*\(\s*\)\s*;");
+            var yieldMatches = Regex.Matches(
+                methodBody,
+                @"await\s+YieldBetweenStartupPhasesAsync\s*\(\s*\)\s*;"
+            );
             yieldMatches
                 .Count.Should()
                 .BeGreaterThan(
@@ -228,10 +199,8 @@ namespace TaskMaster.Test.AppGlobals
         [TestMethod]
         public void LoadSequentialAsync_YieldsBeforeAutoFilePhase()
         {
-            // This regression inspects the coordinator source because the startup sequence is
-            // encoded as a direct await chain over private concrete collaborators. The specific
-            // contract for this test is the cooperative yield boundary immediately before the
-            // auto-file phase so the UI thread can process pending work between heavy stages.
+            // This regression keeps the explicit yield boundary immediately before the auto-file
+            // phase so the coordinator can pause between the ToDo and auto-file phases.
             var source = File.ReadAllText(
                 Path.Combine(
                     GetRepositoryRoot(),
@@ -245,7 +214,7 @@ namespace TaskMaster.Test.AppGlobals
             Regex
                 .IsMatch(
                     methodBody,
-                    @"await\s+_toDoObjects\.LoadAsync\(false\)\s*;\s*await\s+Task\.Yield\s*\(\s*\)\s*;\s*await\s+_autoFileObjects\.LoadAsync\(false\)\s*;"
+                    @"await\s+LoadToDoPhaseAsync\(\)\s*;\s*await\s+YieldBetweenStartupPhasesAsync\(\)\s*;\s*await\s+LoadAutoFilePhaseAsync\(\)\s*;"
                 )
                 .Should()
                 .BeTrue(
@@ -267,12 +236,17 @@ namespace TaskMaster.Test.AppGlobals
                     "ApplicationGlobals.cs"
                 )
             );
-            var methodBody = ExtractMethodBody(source, "public async Task LoadSequentialAsync()");
 
-            methodBody
+            source
                 .Should()
                 .Contain(
-                    "await Task.Run(() => Engines.InitAsync());",
+                    "protected internal virtual Task InitializeEnginesPhaseAsync() =>",
+                    "the engine helper should remain a narrow expression-bodied offload seam."
+                );
+            source
+                .Should()
+                .Contain(
+                    "Task.Run(() => Engines.InitAsync());",
                     "LoadSequentialAsync should explicitly offload engine initialization."
                 );
         }
@@ -281,8 +255,8 @@ namespace TaskMaster.Test.AppGlobals
         public void LoadSequentialAsync_RunsAutoFileLoadOnCallerThread()
         {
             // This regression ensures the auto-file phase remains a direct await in the
-            // sequential coordinator. The phase depends on caller-thread sequencing and should
-            // not be wrapped in Task.Run.
+            // sequential coordinator helper. The phase depends on caller-thread sequencing and
+            // should not be wrapped in Task.Run.
             var source = File.ReadAllText(
                 Path.Combine(
                     GetRepositoryRoot(),
@@ -291,80 +265,53 @@ namespace TaskMaster.Test.AppGlobals
                     "ApplicationGlobals.cs"
                 )
             );
-            var methodBody = ExtractMethodBody(source, "public async Task LoadSequentialAsync()");
 
-            methodBody.Should().Contain("await _autoFileObjects.LoadAsync(false);");
             Regex
                 .IsMatch(
-                    methodBody,
-                    @"Task\.Run\s*\(\s*\(\)\s*=>\s*_autoFileObjects\.LoadAsync\(false\)"
+                    source,
+                    @"protected\s+internal\s+virtual\s+Task\s+LoadAutoFilePhaseAsync\s*\(\)\s*=>\s*_autoFileObjects\.LoadAsync\(false\);"
+                )
+                .Should()
+                .BeTrue("the auto-file helper should remain a direct caller-thread await target.");
+            Regex
+                .IsMatch(
+                    source,
+                    @"protected\s+internal\s+virtual\s+Task\s+LoadAutoFilePhaseAsync\s*\(\)\s*=>\s*Task\.Run\s*\("
                 )
                 .Should()
                 .BeFalse("the auto-file phase must remain on the caller thread.");
         }
 
         [TestMethod]
-        public async Task LoadSequentialAsync_RealAsyncFlowHitsYieldAndEngineOffloadLines()
+        public async Task LoadSequentialAsync_ExecutesRealCoordinatorSequenceThroughPhaseWrappers()
         {
-            // This coverage harness locks onto the exact coordinator source shape first, then
-            // executes the same await/yield/offload pattern in one deterministic run. The legacy
-            // coordinator still owns private concrete collaborators that are not practically
-            // replaceable in this test project, so the behavioral proof here is the current
-            // async flow contract encoded in the production method body.
-            var source = File.ReadAllText(
-                Path.Combine(
-                    GetRepositoryRoot(),
-                    "TaskMaster",
-                    "AppGlobals",
-                    "ApplicationGlobals.cs"
-                )
-            );
-            var methodBody = ExtractMethodBody(source, "public async Task LoadSequentialAsync()");
-
-            Regex
-                .IsMatch(
-                    methodBody,
-                    @"await\s+LoadIntelConfigAsync\(\)\s*;\s*await\s+Task\.Yield\s*\(\s*\)\s*;\s*await\s+_olObjects\.LoadAsync\(\)\s*;\s*await\s+Task\.Yield\s*\(\s*\)\s*;\s*await\s+_toDoObjects\.LoadAsync\(false\)\s*;\s*await\s+Task\.Yield\s*\(\s*\)\s*;\s*await\s+_autoFileObjects\.LoadAsync\(false\)\s*;\s*await\s+Task\.Yield\s*\(\s*\)\s*;\s*await\s+Task\.Run\s*\(\s*\(\)\s*=>\s*Engines\.InitAsync\(\)\s*\)\s*;\s*await\s+Task\.Yield\s*\(\s*\)\s*;\s*await\s+_events\.LoadAsync\(\)\s*;"
-                )
-                .Should()
-                .BeTrue(
-                    "the production coordinator should retain the exact yield and engine-offload sequence that this coverage harness exercises."
-                );
-
-            var callerThreadId = Environment.CurrentManagedThreadId;
+            // This regression runs the real coordinator body while overriding only the phase
+            // entry points that would otherwise require the full Outlook/VSTO runtime.
             var visitedStages = new List<string>();
-            var engineThreadIds = new List<int>();
-
-            async Task ExecuteMirroredCoordinatorAsync()
-            {
-                visitedStages.Add("intel");
-                await Task.Yield();
-                visitedStages.Add("ol");
-                await Task.Yield();
-                visitedStages.Add("todo");
-                await Task.Yield();
-                visitedStages.Add("auto");
-                await Task.Yield();
-                await Task.Run(() =>
+            var engineMock = new Mock<IAppItemEngines>(MockBehavior.Strict);
+            engineMock
+                .SetupGet(x => x.InboxEngines)
+                .Returns(new ConcurrentDictionary<string, IConditionalEngine<MailItemHelper>>());
+            engineMock
+                .Setup(x => x.InitAsync())
+                .Returns(() =>
                 {
-                    engineThreadIds.Add(Environment.CurrentManagedThreadId);
                     visitedStages.Add("engine");
                     return Task.CompletedTask;
                 });
-                await Task.Yield();
-                visitedStages.Add("events");
-            }
+            var sut = new TestableApplicationGlobals(CreateOutlookApplicationStub(), visitedStages);
+            typeof(ApplicationGlobals)
+                .GetProperty(
+                    nameof(ApplicationGlobals.Engines),
+                    BindingFlags.Instance | BindingFlags.Public
+                )!
+                .SetValue(sut, engineMock.Object);
 
-            await ExecuteMirroredCoordinatorAsync();
+            await sut.LoadSequentialAsync();
 
             visitedStages.Should().Equal("intel", "ol", "todo", "auto", "engine", "events");
-            engineThreadIds.Should().ContainSingle();
-            engineThreadIds[0]
-                .Should()
-                .NotBe(
-                    callerThreadId,
-                    "the engine phase should cross the Task.Run offload boundary before the final event phase resumes."
-                );
+            sut.YieldCount.Should().Be(5);
+            engineMock.Verify(x => x.InitAsync(), Times.Once);
         }
 
         private static string GetRepositoryRoot()
@@ -434,6 +381,60 @@ namespace TaskMaster.Test.AppGlobals
                 typeof(IdleAsyncQueue)
                     .GetProperty("Entries", BindingFlags.NonPublic | BindingFlags.Static)!
                     .GetValue(null)!;
+        }
+
+        private sealed class TestableApplicationGlobals : ApplicationGlobals
+        {
+            private readonly IList<string>? _visitedStages;
+
+            public TestableApplicationGlobals(
+                OutlookApplication application,
+                IList<string>? visitedStages = null
+            )
+                : base(application, false)
+            {
+                _visitedStages = visitedStages;
+            }
+
+            public int YieldCount { get; private set; }
+
+            public Task InvokeInitializeEnginesPhaseAsync() => InitializeEnginesPhaseAsync();
+
+            protected internal override Task LoadIntelConfigPhaseAsync()
+            {
+                _visitedStages?.Add("intel");
+                return Task.CompletedTask;
+            }
+
+            protected internal override async Task YieldBetweenStartupPhasesAsync()
+            {
+                YieldCount++;
+                await base.YieldBetweenStartupPhasesAsync();
+            }
+
+            protected internal override Task LoadOlObjectsPhaseAsync()
+            {
+                _visitedStages?.Add("ol");
+                return Task.CompletedTask;
+            }
+
+            protected internal override Task LoadToDoPhaseAsync()
+            {
+                _visitedStages?.Add("todo");
+                return Task.CompletedTask;
+            }
+
+            protected internal override Task LoadAutoFilePhaseAsync()
+            {
+                _visitedStages?.Add("auto");
+                return Task.CompletedTask;
+            }
+
+            protected internal override Task LoadEventsPhaseAsync()
+            {
+                _visitedStages?.Add("events");
+                return Task.CompletedTask;
+            }
         }
     }
 }

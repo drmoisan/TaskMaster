@@ -4,7 +4,7 @@ $elapsed = 0
 $pollInterval = 30
 Write-Host "Polling run $runId every $pollInterval seconds (max 20 min)..."
 while ($elapsed -lt $maxWait) {
-    $data = gh run view $runId --json status,conclusion,jobs | ConvertFrom-Json
+    $data = gh run view $runId --json status, conclusion, jobs | ConvertFrom-Json
     $status = $data.status
     $conclusion = $data.conclusion
     Write-Host "[$(Get-Date -Format 'HH:mm:ss')] Status: $status | Conclusion: $conclusion"
@@ -29,3 +29,4 @@ while ($elapsed -lt $maxWait) {
 }
 Write-Host "TIMEOUT after 20 min. Last status: $status"
 exit 1
+

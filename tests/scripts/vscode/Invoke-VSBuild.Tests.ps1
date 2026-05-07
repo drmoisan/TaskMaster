@@ -27,9 +27,9 @@ Describe 'Get-MSBuildBuildArguments' {
             -Configuration 'Debug' `
             -Platform 'Any CPU' `
             -MSBuildProperty @(
-                'EnableNETAnalyzers=true',
-                'EnforceCodeStyleInBuild=true'
-            )
+            'EnableNETAnalyzers=true',
+            'EnforceCodeStyleInBuild=true'
+        )
 
         $arguments | Should -Be @(
             'C:\repo\TaskMaster.sln',
@@ -62,3 +62,4 @@ Describe 'Get-RequestedMSBuildProperties' {
         )
     }
 }
+

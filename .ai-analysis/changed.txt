@@ -1,0 +1,82 @@
+ M QuickFiler.Test/QuickFiler.Test.csproj
+ M QuickFiler.Test/app.config
+ M QuickFiler.Test/packages.config
+ M QuickFiler/QuickFiler.csproj
+ M QuickFiler/app.config
+ M QuickFiler/packages.config
+ M SVGControl/SVGControl.csproj
+ M SVGControl/app.config
+ M SVGControl/packages.config
+ M Tags.Test/Tags.Test.csproj
+ M Tags.Test/app.config
+ M Tags.Test/packages.config
+ M Tags/Tags.csproj
+ M Tags/app.config
+ M Tags/packages.config
+ M TaskMaster.Test/AppGlobals/ApplicationGlobalsTests.cs
+ M TaskMaster.Test/TaskMaster.Test.csproj
+ M TaskMaster.Test/app.config
+ M TaskMaster.Test/packages.config
+ M TaskMaster/AppGlobals/ApplicationGlobals.cs
+ M TaskMaster/TaskMaster.csproj
+ M TaskMaster/app.config
+ M TaskMaster/packages.config
+ M TaskTree/TaskTree.csproj
+ M TaskTree/app.config
+ M TaskTree/packages.config
+ M TaskVisualization.Test/TaskVisualization.Test.csproj
+ M TaskVisualization.Test/app.config
+ M TaskVisualization.Test/packages.config
+ M TaskVisualization/TaskVisualization.csproj
+ M TaskVisualization/app.config
+ M TaskVisualization/packages.config
+ M ToDoModel.Test/ToDoModel.Test.csproj
+ M ToDoModel.Test/app.config
+ M ToDoModel.Test/packages.config
+ M ToDoModel/ToDoModel.csproj
+ M ToDoModel/app.config
+ M ToDoModel/packages.config
+ M UtilitiesCS.Test/Extensions/AsyncSerialization_Tests.cs
+ M UtilitiesCS.Test/HelperClasses/TraceUtility_Tests.cs
+ M UtilitiesCS.Test/OutlookObjects/Store/StoresWrapperTests.cs
+ M UtilitiesCS.Test/UtilitiesCS.Test.csproj
+ M UtilitiesCS.Test/app.config
+ M UtilitiesCS.Test/packages.config
+ M UtilitiesCS/Developer/collect-commit-context.ps1
+ M UtilitiesCS/Developer/collect-pull-request-context.ps1
+ M UtilitiesCS/Developer/make_chat_gpt_bundle.ps1
+ M UtilitiesCS/OutlookObjects/Store/StoresWrapper.cs
+ M UtilitiesCS/UtilitiesCS.csproj
+ M UtilitiesCS/app.config
+ M UtilitiesCS/packages.config
+ M VBFunctions.Test/VBFunctions.Test.csproj
+ M VBFunctions.Test/app.config
+ M VBFunctions.Test/packages.config
+ M docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/remediation-plan.2026-05-06T20-33.md
+ M poll_run.ps1
+ M scripts/vscode/Invoke-MSTest.ps1
+ M scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1
+ M scripts/vscode/Invoke-MSTestWithCoverage.ps1
+ M scripts/vscode/Invoke-VSBuild.ps1
+ M scripts/vscode/Sync-PackageReferences.ps1
+ M scripts/vscode/TestProcessCleanup.ps1
+ M tests/scripts/vscode/Invoke-VSBuild.Tests.ps1
+?? .mcp.json
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/baseline/csharp-analyzers-build.2026-05-06T21-12-59-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/baseline/csharp-format.2026-05-06T21-12-45-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/baseline/csharp-mstest-coverage.2026-05-06T21-14-54-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/baseline/csharp-nullable-build.2026-05-06T21-13-26-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/baseline/phase0-instructions-read.2026-05-06T21-10-15-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/baseline/powershell-analyze.2026-05-06T21-15-43-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/baseline/powershell-format.2026-05-06T21-15-28-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/baseline/powershell-policy-read.2026-05-06T21-15-11-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/baseline/powershell-test.2026-05-06T21-15-59-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/other/remediation-scope.2026-05-06T21-10-15-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/qa-gates/csharp-analyzers-build.2026-05-06T21-50-46-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/qa-gates/csharp-analyzers-build.2026-05-06T21-57-28-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/qa-gates/csharp-coverage-summary.2026-05-06T21-57-28-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/qa-gates/csharp-format.2026-05-06T21-50-15-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/qa-gates/csharp-format.2026-05-06T21-57-28-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/qa-gates/csharp-mstest-coverage.2026-05-06T21-57-28-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/qa-gates/csharp-nullable-build.2026-05-06T21-51-34-04-00.md
+?? docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/qa-gates/csharp-nullable-build.2026-05-06T21-57-28-04-00.md

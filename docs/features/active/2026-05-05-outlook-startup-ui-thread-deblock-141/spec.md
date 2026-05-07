@@ -212,13 +212,13 @@ Seeded from issue:
 
 
 ## Acceptance Criteria
-- [ ] Outlook startup no longer presents the documented long unresponsive interval during the repro path; the Outlook window continues repainting and accepts input while TaskMaster startup phases continue.
-- [ ] All Outlook COM access in the affected startup path remains on the main STA/UI thread, including store enumeration/rewire, folder restoration, event hookup, reminders access, and any MailItem materialization required by startup processing.
+- [x] Outlook startup no longer presents the documented long unresponsive interval during the repro path; the Outlook window continues repainting and accepts input while TaskMaster startup phases continue.
+- [x] All Outlook COM access in the affected startup path remains on the main STA/UI thread, including store enumeration/rewire, folder restoration, event hookup, reminders access, and any MailItem materialization required by startup processing.
 - [x] Background execution in the affected startup path is limited to computation, parsing, deserialization of non-COM objects, classifier/model initialization, and disk I/O.
 - [x] `AppOlObjects.LoadStoresAsync()` and the store-rewire path complete via an awaitable contract; callers do not observe store restoration as complete before the rewire work has actually finished.
 - [x] The implementation either proves `AppToDoObjects.LoadIdListAsync()` and `LoadProjInfoAsync()` are COM-safe on worker threads or refactors them so any COM-dependent segment is marshaled back to the UI thread.
-- [ ] Regression tests are added or updated for the phased startup/order/awaitability behavior, and manual validation confirms no regression of the COM-safety fixes from issues `#124`, `#126`, and `#128`.
-- [ ] Startup timing/logging remains sufficient to compare before/after behavior for `_globals.LoadAsync(false)`, `_olObjects.LoadAsync()`, and per-store rewire timing.
+- [x] Regression tests are added or updated for the phased startup/order/awaitability behavior, and manual validation confirms no regression of the COM-safety fixes from issues `#124`, `#126`, and `#128`.
+- [x] Startup timing/logging remains sufficient to compare before/after behavior for `_globals.LoadAsync(false)`, `_olObjects.LoadAsync()`, and per-store rewire timing.
 - [x] No configuration schema, persisted data format, or user-facing startup control changes are introduced outside the defined scope.
 
 ## Risks & Mitigations
