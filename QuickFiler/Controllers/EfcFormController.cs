@@ -945,14 +945,21 @@ namespace QuickFiler.Controllers
 
         public async Task PopulateFolderCombobox(object folderList = null)
         {
+            // Capture _formViewer in a local variable before the first await. Cleanup() may set
+            // _formViewer to null while InitFolderHandlerAsync is executing (e.g. the user
+            // dismisses the form), so all post-await access must go through this local reference.
+            var formViewer = _formViewer;
+            if (formViewer == null)
+                return;
+
             await _dataModel.InitFolderHandlerAsync(folderList);
 
-            await _formViewer.UiSyncContext;
+            await formViewer.UiSyncContext;
 
-            _formViewer.FolderListBox.DataSource = _dataModel.FolderHelper.FolderArray;
-            if (_formViewer.FolderListBox.Items.Count > 0)
+            formViewer.FolderListBox.DataSource = _dataModel.FolderHelper.FolderArray;
+            if (formViewer.FolderListBox.Items.Count > 0)
             {
-                _formViewer.FolderListBox.SelectedIndex = 1;
+                formViewer.FolderListBox.SelectedIndex = 1;
             }
         }
 
