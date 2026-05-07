@@ -199,9 +199,9 @@ function Merge-CoberturaClassesByFilename {
 
                     if (-not $lineMap.Contains($lineNumber)) {
                         $lineMap[$lineNumber] = [pscustomobject]@{
-                            Node     = $lineNode.CloneNode($true)
-                            Covered  = $candidateCoverage.Covered
-                            Total    = $candidateCoverage.Total
+                            Node    = $lineNode.CloneNode($true)
+                            Covered = $candidateCoverage.Covered
+                            Total   = $candidateCoverage.Total
                         }
                         continue
                     }
@@ -252,10 +252,10 @@ function Merge-CoberturaClassesByFilename {
             $mergedClassNode.SetAttribute('line-rate', $classSummary.LineRate)
             $mergedClassNode.SetAttribute('branch-rate', $classSummary.BranchRate)
             $mergedClassNode.SetAttribute('complexity', [string](
-                ($group | ForEach-Object {
-                    if ($_.complexity) { [double]$_.complexity } else { 0d }
-                } | Measure-Object -Sum).Sum
-            ))
+                    ($group | ForEach-Object {
+                        if ($_.complexity) { [double]$_.complexity } else { 0d }
+                    } | Measure-Object -Sum).Sum
+                ))
 
             [void]$classesNode.ReplaceChild($mergedClassNode, $primaryNode)
 

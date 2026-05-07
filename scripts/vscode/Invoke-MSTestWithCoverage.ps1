@@ -49,7 +49,7 @@ $testAssemblies = Get-ChildItem -Path $resolvedSearchRoot -Recurse -Filter '*.Te
         $_.FullName -notmatch '\\obj\\' -and
         $_.FullName -notmatch '\\ref\\'
     } |
-    Select-Object -ExpandProperty FullName
+        Select-Object -ExpandProperty FullName
 
 if (-not $testAssemblies -or $testAssemblies.Count -eq 0) {
     throw "No test assemblies found under '$resolvedSearchRoot' for configuration '$Configuration'. Build first."
@@ -87,3 +87,4 @@ $processedXmlContent = ConvertTo-KoverageCoberturaXml -XmlContent $xmlContent -R
 
 Set-Content -Path $resolvedOutputPath -Value $processedXmlContent -Encoding UTF8 -NoNewline
 Write-Output "Done. Coverage artifact: $resolvedOutputPath"
+
