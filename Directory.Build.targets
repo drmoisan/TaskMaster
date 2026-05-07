@@ -13,17 +13,6 @@
   </PropertyGroup>
 
   <!--
-    Solution-wide strict nullable verification currently applies newer compiler
-    settings to legacy C# projects that are not fully migrated. Keep that
-    command buildable by aligning the language version and suppressing the
-    existing legacy warning buckets only for that forced verification path.
-  -->
-  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.csproj' and '$(Nullable)' == 'enable' and '$(TreatWarningsAsErrors)' == 'true'">
-    <LangVersion>latest</LangVersion>
-    <NoWarn>$(NoWarn);nullable;CS0067;CS0168;CS0169;CS0618;CS0649;CS8632;MSTEST0032</NoWarn>
-  </PropertyGroup>
-
-  <!--
     Developer builds only: override the VSTO manifest certificate
     thumbprint so the local developer certificate is used.
   -->

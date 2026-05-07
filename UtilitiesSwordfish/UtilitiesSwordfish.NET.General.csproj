@@ -18,8 +18,6 @@
     <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
-    <!-- This legacy project is not nullable-annotated yet; keep solution-level nullable enforcement focused on migrated code. -->
-    <NoWarn>$(NoWarn);nullable</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
