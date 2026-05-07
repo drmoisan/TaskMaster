@@ -117,6 +117,8 @@ function Get-RequestedMSBuildProperties {
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+. (Join-Path $PSScriptRoot 'TestProcessCleanup.ps1')
+
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $resolvedSolutionPath = Join-Path $repoRoot $SolutionPath
 
@@ -143,6 +145,8 @@ $syncScript = Join-Path $PSScriptRoot 'Sync-PackageReferences.ps1'
 if (Test-Path $syncScript) {
     & $syncScript -SolutionRoot $repoRoot
 }
+
+Stop-RepoOwnedVSTestProcesses -RepoRoot $repoRoot
 
 $requestedMSBuildProperties = Get-RequestedMSBuildProperties -MSBuildProperty $MSBuildProperty -EnableNETAnalyzers:$EnableNETAnalyzers -EnforceCodeStyleInBuild:$EnforceCodeStyleInBuild -EnableNullable:$EnableNullable -TreatWarningsAsErrors:$TreatWarningsAsErrors
 $msbuildArguments = Get-MSBuildBuildArguments -ResolvedSolutionPath $resolvedSolutionPath -Configuration $Configuration -Platform $Platform -MSBuildProperty $requestedMSBuildProperties
