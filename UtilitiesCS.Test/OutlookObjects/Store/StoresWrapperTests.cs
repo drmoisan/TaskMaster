@@ -218,6 +218,24 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         }
 
         [TestMethod]
+        public async Task RewireOlObjects_OnDeserializedAdapterUsesExplicitCompletionContract()
+        {
+            var wrapper = new AdapterObservingStoresWrapper();
+
+            wrapper.RewireOlObjects(new StreamingContext());
+
+            var completedTask = await Task.WhenAny(wrapper.RewireInvoked.Task, Task.Delay(5000));
+
+            completedTask
+                .Should()
+                .BeSameAs(
+                    wrapper.RewireInvoked.Task,
+                    "the retained deserialization hook should delegate to the explicit awaitable rewire contract."
+                );
+            wrapper.InvocationCount.Should().Be(1);
+        }
+
+        [TestMethod]
         public void RewireOlObjectsAsync_PreservesStoreOrderAcrossYieldedIterations()
         {
             // This regression inspects the store-rewire coordinator source directly because
@@ -524,6 +542,21 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             public new Task RewireOlObjectsAsync(StreamingContext context)
             {
                 return base.RewireOlObjectsAsync(context);
+            }
+        }
+
+        private sealed class AdapterObservingStoresWrapper : StoresWrapper
+        {
+            public TaskCompletionSource<bool> RewireInvoked { get; } =
+                new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+            public int InvocationCount { get; private set; }
+
+            public override Task RewireAfterDeserializeAsync()
+            {
+                InvocationCount++;
+                RewireInvoked.TrySetResult(true);
+                return Task.CompletedTask;
             }
         }
     }

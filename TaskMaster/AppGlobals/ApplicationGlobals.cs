@@ -89,18 +89,39 @@ namespace TaskMaster
 
         public async Task LoadSequentialAsync()
         {
-            await LoadIntelConfigAsync();
-            await Task.Yield();
-            await _olObjects.LoadAsync();
-            await Task.Yield();
-            await _toDoObjects.LoadAsync(false);
-            await Task.Yield();
-            await _autoFileObjects.LoadAsync(false);
-            await Task.Yield();
-            await Task.Run(() => Engines.InitAsync());
-            await Task.Yield();
-            await _events.LoadAsync();
+            await LoadIntelConfigPhaseAsync();
+            await YieldBetweenStartupPhasesAsync();
+            await LoadOlObjectsPhaseAsync();
+            await YieldBetweenStartupPhasesAsync();
+            await LoadToDoPhaseAsync();
+            await YieldBetweenStartupPhasesAsync();
+            await LoadAutoFilePhaseAsync();
+            await YieldBetweenStartupPhasesAsync();
+            await InitializeEnginesPhaseAsync();
+            await YieldBetweenStartupPhasesAsync();
+            await LoadEventsPhaseAsync();
         }
+
+        // These narrow wrappers keep production behavior unchanged while letting focused MSTests
+        // drive the real coordinator sequence without constructing the full Outlook/VSTO runtime.
+        protected internal virtual Task LoadIntelConfigPhaseAsync() => LoadIntelConfigAsync();
+
+        protected internal virtual async Task YieldBetweenStartupPhasesAsync()
+        {
+            await Task.Yield();
+        }
+
+        protected internal virtual Task LoadOlObjectsPhaseAsync() => _olObjects.LoadAsync();
+
+        protected internal virtual Task LoadToDoPhaseAsync() => _toDoObjects.LoadAsync(false);
+
+        protected internal virtual Task LoadAutoFilePhaseAsync() =>
+            _autoFileObjects.LoadAsync(false);
+
+        protected internal virtual Task InitializeEnginesPhaseAsync() =>
+            Task.Run(() => Engines.InitAsync());
+
+        protected internal virtual Task LoadEventsPhaseAsync() => _events.LoadAsync();
 
         public void LoadWhenIdle()
         {
