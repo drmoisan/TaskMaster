@@ -1,0 +1,50 @@
+# Targeted Regression Evidence
+
+Timestamp: 2026-05-06T14:37:21-04:00
+Source Artifact: docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/qa-gates/csharp-mstest-coverage.2026-05-06T14-37-21.md
+Fix Applied: Removed `ControlledSynchronizationContext` deadlock from `LoadSequentialAsync_RealAsyncFlowHitsYieldAndEngineOffloadLines`. Replaced manual sync-context pump with direct `await ExecuteMirroredCoordinatorAsync()`.
+Verified Test Files:
+- TaskMaster.Test/AppGlobals/AppToDoObjectsTests.cs
+- TaskMaster.Test/AppGlobals/AppToDoObjectsCoverageTests.cs
+- TaskMaster.Test/AppGlobals/AppOlObjectsCoverageTests.cs
+- TaskMaster.Test/AppGlobals/AppOlObjectsTests.cs
+- TaskMaster.Test/AppGlobals/ApplicationGlobalsTests.cs
+- TaskMaster.Test/OutlookObjects/Store/StoresWrapperTests.cs
+- UtilitiesCS.Test/OutlookObjects/Store/StoresWrapperTests.cs
+Verified Test Names:
+- LoadIdListAsync_DoesNotReadOutlookApplicationFromWorkerThread
+- LoadProjInfoAsync_DoesNotReadOutlookApplicationFromWorkerThread
+- LoadStoresAsync_DoesNotCompleteBeforeStoreRewireTaskFinishes
+- LoadSequentialAsync_KeepsComPhasesOnCallerThreadAndYieldsBetweenHeavyPhases
+- RewireOlObjectsAsync_PreservesStoreOrderAcrossYieldedIterations
+- LoadIdListAsync_ReturnsEmptyWhenAppDataDirectoryMissing
+- LoadIdListFromDisk_ReturnsEmptyWhenJsonDeserializationFails
+- LoadIdListFromDisk_ReturnsEmptyWhenReadThrowsIOException
+- LoadIdListAsync_RefreshesFromOutlookOnlyWhenDiskListIsEmpty
+- LoadIdListAsync_SkipsOutlookRefreshWhenParentAppIsNull
+- LoadProjInfoAsync_SkipsRebuildWhenOutlookApplicationIsNull
+- LoadProjInfoAsync_SkipsRebuildWhenProjectCountIsNonZero
+- LoadSequentialAsync_YieldsBeforeAutoFilePhase
+- LoadSequentialAsync_OffloadsEnginesInitAsyncWithTaskRun
+- LoadSequentialAsync_RunsAutoFileLoadOnCallerThread
+- AwaitStoreRewireAsync_ReturnsCompletedTaskWhenStoresWrapperIsNull
+- AwaitStoreRewireAsync_AwaitsStoresWrapperInvocation
+- RewireAfterDeserializeAsync_UsesStoreAdapterForWrappedStores
+- RewireAfterDeserializeAsync_SingleStoreCompletesWithoutExtraYield
+- RewireAfterDeserializeAsync_MultiStoreYieldsBetweenStores
+- LoadIdListFromDisk_ReturnsEmptyWhenPersistedJsonIsCorrupted
+- RewireAfterDeserializeAsync_PublicEntryRewiresWrappedStores
+- RewireAfterDeserializeAsync_PublicEntryMultiStoreHitsInnerYieldBranch
+- LoadSequentialAsync_RealAsyncFlowHitsYieldAndEngineOffloadLines
+- Constructor_WithoutLoadBasic_DoesNotMaterializeCollaboratorsUntilForceBasicLoad
+- LoadSequentialAsync_RealCoordinatorHitsEngineOffloadLambda
+- LoadWhenIdle_QueuesTodoAutoFileBatchBeforeEngineAndEvents
+- LoadAsync_AssignsStoresWrapperFromConfigAndCompletes
+- LoadStoresAsync_LeavesStoresWrapperNullWhenConfigMissing
+- CreateAsync_WhenInputsValid_ReturnsInitializedStoresWrapper
+- RewireAfterDeserializeAsync_PublicEntryHitsRealMethodBody
+- LoadProgramInfo_ReturnsNullWhenPythonStagingMissing
+- People_CollectionChanged_SerializesPeopleDictionary
+- LoadIDList_ReturnsNullWhenAppDataMissing
+- LoadProjInfo_ReturnsNullWhenAppDataMissing
+Solution-Wide Result: Total: 3989, Passed: 3987, Skipped: 2 (pre-existing [Ignore]), Failed: 0

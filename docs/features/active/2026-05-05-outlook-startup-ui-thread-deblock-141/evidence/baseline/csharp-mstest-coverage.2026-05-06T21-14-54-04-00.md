@@ -1,0 +1,4 @@
+Timestamp: 2026-05-06T21:14:54.7994424-04:00
+Command: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput coverage\outlook-startup-ui-thread-deblock-141-remediation-baseline.cobertura.xml
+EXIT_CODE: 1
+Output Summary: Baseline MSTest coverage run completed with failures. Total tests: 3989, Passed: 3984, Failed: 3, Skipped: 2. Repo Line Coverage: 67.2498% (91987 / 136784 executable lines) from `coverage\outlook-startup-ui-thread-deblock-141-remediation-baseline.cobertura.xml`. The failing tests were `ReadTextAsync_WithLargeExistingFile_ReturnsTextAndReportsProgress`, `ReadTextWithProgressAsync_ProgressTrackerOverload_WithLargeExistingFile_ReportsProgress`, and `ReadTextWithProgressAsync_ProgressTrackerPaneOverload_WithLargeExistingFile_UpdatesProgress`. Coverage XML Path: coverage\outlook-startup-ui-thread-deblock-141-remediation-baseline.cobertura.xml

@@ -1,12 +1,19 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Messaging;
+using System.Runtime.Remoting.Proxies;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TaskMaster;
@@ -25,18 +32,47 @@ namespace TaskMaster.Test.AppGlobals
         public void TestInitialize()
         {
             Console.SetOut(new DebugTextWriter());
-            this.mockRepository = new MockRepository(MockBehavior.Strict);
-            this.mockApplicationGlobals = this.mockRepository.Create<IApplicationGlobals>();
-            this.mockApplicationGlobals.SetupGet(x => x.AF.CancelToken)
-                .Returns(CancellationToken.None);
         }
 
         #region Helper Classes and Variables
 
-        private MockRepository mockRepository;
-        private Mock<IApplicationGlobals> mockApplicationGlobals;
-        private Mock<IntelligenceConfig> mockIntelligenceConfig;
-        private Mock<ISmartSerializableNonTyped> mockSmartSerializable;
+        private MockRepository mockRepository = null!;
+        private Mock<IApplicationGlobals> mockApplicationGlobals = null!;
+        private Mock<IntelligenceConfig> mockIntelligenceConfig = null!;
+        private Mock<ISmartSerializableNonTyped> mockSmartSerializable = null!;
+
+        private static void ConfigureIdListLoader(
+            AppToDoObjects appToDoObjects,
+            string fileName,
+            Func<string, bool>? fileExists = null,
+            Func<string, string>? readAllText = null
+        )
+        {
+            var settings = new TaskMaster.Properties.Settings();
+            var propertyValue = settings.PropertyValues["FileName_IDList"];
+            if (propertyValue is null)
+            {
+                var property = settings.Properties["FileName_IDList"]!;
+                propertyValue = new SettingsPropertyValue(property) { PropertyValue = fileName };
+                settings.PropertyValues.Add(propertyValue);
+            }
+            else
+            {
+                propertyValue.PropertyValue = fileName;
+            }
+
+            AppToDoObjectsTestUtilities.SetReadonlyField(appToDoObjects, "_defaults", settings);
+
+            if (fileExists is not null)
+            {
+                appToDoObjects.FileExists = fileExists;
+            }
+
+            if (readAllText is not null)
+            {
+                appToDoObjects.ReadAllText = readAllText;
+            }
+        }
 
         private Mock<ISmartSerializableNonTyped> GetMockSS()
         {
@@ -67,87 +103,16 @@ namespace TaskMaster.Test.AppGlobals
             return intel;
         }
 
-        public static class EventHelper
-        {
-            public static Delegate[] GetEventInvocationList(object target, string eventName)
-            {
-                if (target == null)
-                    throw new ArgumentNullException(nameof(target));
-                if (string.IsNullOrEmpty(eventName))
-                    throw new ArgumentNullException(nameof(eventName));
-
-                Type targetType = target.GetType();
-                EventInfo eventInfo =
-                    targetType.GetEvent(
-                        eventName,
-                        BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
-                    )
-                    ?? throw new ArgumentException(
-                        $"Event '{eventName}' not found on type '{targetType}'."
-                    );
-
-                // Get the method that adds the event handler
-                //MethodInfo addMethod = eventInfo.GetAddMethod(true) ?? throw new ArgumentException($"Event '{eventName}' does not have an accessible add method.");
-
-                // Get the declaring type of the event
-                Type declaringType =
-                    eventInfo.DeclaringType
-                    ?? throw new ArgumentException(
-                        $"Event '{eventName}' does not have a declaring type."
-                    );
-
-                // Get the field that stores the event handlers
-                FieldInfo eventField =
-                    (
-                        declaringType.GetField(
-                            eventName,
-                            BindingFlags.Instance
-                                | BindingFlags.NonPublic
-                                | BindingFlags.Public
-                                | BindingFlags.Static
-                                | BindingFlags.FlattenHierarchy
-                        ) ?? FindEventFieldInBaseClasses(declaringType, eventName)
-                    )
-                    ?? throw new ArgumentException(
-                        $"Event field '{eventName}' not found on type '{declaringType}'."
-                    );
-                object eventFieldValue = eventField.GetValue(target);
-                if (eventFieldValue is Delegate eventDelegate)
-                {
-                    return eventDelegate.GetInvocationList();
-                }
-
-                return [];
-            }
-
-            private static FieldInfo FindEventFieldInBaseClasses(Type type, string eventName)
-            {
-                while (type != null)
-                {
-                    FieldInfo field = type.GetField(
-                        eventName,
-                        BindingFlags.Instance
-                            | BindingFlags.NonPublic
-                            | BindingFlags.Public
-                            | BindingFlags.Static
-                            | BindingFlags.FlattenHierarchy
-                    );
-                    if (field != null)
-                    {
-                        return field;
-                    }
-                    type = type.BaseType;
-                }
-                return null;
-            }
-        }
-
         #endregion Helper Classes and Variables
 
         [TestMethod]
         public async Task LoadPeopleAsync_CanLoadProperly()
         {
             // Arrange
+            this.mockRepository = new MockRepository(MockBehavior.Strict);
+            this.mockApplicationGlobals = this.mockRepository.Create<IApplicationGlobals>();
+            this.mockApplicationGlobals.SetupGet(x => x.AF.CancelToken)
+                .Returns(CancellationToken.None);
             this.mockIntelligenceConfig = SetUpMockIntelRes(mockApplicationGlobals);
             var appToDoObjects = new AppToDoObjects(mockApplicationGlobals.Object);
             this.mockSmartSerializable = GetMockSS();
@@ -186,133 +151,525 @@ namespace TaskMaster.Test.AppGlobals
             );
         }
 
-        //[TestMethod]
-        //public async Task IntegrationTest_LoadPeopleAsync_CanLoadProperly()
-        //{
-        //    // Arrange
-        //    mockApplicationGlobals.SetupGet(x => x.FS).Returns(new AppFileSystemFolderPaths());
-        //    var intelRes = await IntelligenceConfig.LoadAsync(mockApplicationGlobals.Object);
-        //    mockApplicationGlobals.SetupGet(x => x.IntelRes).Returns(intelRes);
-        //    var appToDoObjects = new AppToDoObjects(mockApplicationGlobals.Object);
+        [TestMethod]
+        public async Task LoadIdListAsync_DoesNotReadOutlookApplicationFromWorkerThread()
+        {
+            // Arrange
+            var callerThreadId = Environment.CurrentManagedThreadId;
+            var accessedThreadIds = new ConcurrentQueue<int>();
 
-        //    // Act
-        //    await appToDoObjects.LoadPeopleAsync();
+            var fileSystem = new StubFileSystemFolderPaths();
+            fileSystem.SpecialFolders["AppData"] = "virtual-app-data";
 
-        //    // Assert
+            var olObjects = OlObjectsProxy.Create(() =>
+            {
+                var currentThreadId = Environment.CurrentManagedThreadId;
+                accessedThreadIds.Enqueue(currentThreadId);
 
-        //    // the return value was properly assigned to the People property,
-        //    // and the CollectionChanged event was properly assigned
+                if (currentThreadId != callerThreadId)
+                {
+                    throw new InvalidOperationException(
+                        "Outlook Application getter ran off the caller thread."
+                    );
+                }
 
-        //    Assert.IsNotNull(appToDoObjects.People);
+                return null!;
+            });
 
-        //}
+            var appToDoObjects = new AppToDoObjects(
+                new StubApplicationGlobals(fileSystem, olObjects)
+            );
+            ConfigureIdListLoader(
+                appToDoObjects,
+                "ids.json",
+                fileExists: _ => true,
+                readAllText: _ => "[]"
+            );
 
-        #region Commented Tests
+            // Act
+            await AppToDoObjectsTestUtilities.InvokePrivateAsync(appToDoObjects, "LoadIdListAsync");
 
-        //[TestMethod]
-        //public async Task LoadAsync_StateUnderTest_ExpectedBehavior()
-        //{
-        //    // Arrange
-        //    var appToDoObjects = this.CreateAppToDoObjects();
-        //    bool parallel = false;
+            // Assert
+            accessedThreadIds.Should().NotBeEmpty();
+            accessedThreadIds.Should().OnlyContain(threadId => threadId == callerThreadId);
+        }
 
-        //    // Act
-        //    await appToDoObjects.LoadAsync(
-        //        parallel);
+        [TestMethod]
+        public async Task LoadIdListAsync_ReturnsEmptyWhenAppDataDirectoryMissing()
+        {
+            // Arrange
+            var olObjects = OlObjectsProxy.Create(() =>
+            {
+                throw new InvalidOperationException(
+                    "The Outlook application should not be accessed when AppData is unavailable."
+                );
+            });
+            var appToDoObjects = new AppToDoObjects(
+                new StubApplicationGlobals(new StubFileSystemFolderPaths(), olObjects)
+            );
 
-        //    // Assert
-        //    Assert.Fail();
-        //    this.mockRepository.VerifyAll();
-        //}
+            // Act
+            await AppToDoObjectsTestUtilities.InvokePrivateAsync(appToDoObjects, "LoadIdListAsync");
 
-        //[TestMethod]
-        //public async Task LoadParallelAsync_StateUnderTest_ExpectedBehavior()
-        //{
-        //    // Arrange
-        //    var appToDoObjects = this.CreateAppToDoObjects();
+            // Assert
+            appToDoObjects.IDList.Should().BeNull();
+        }
 
-        //    // Act
-        //    await appToDoObjects.LoadParallelAsync();
+        [TestMethod]
+        public void LoadIdListFromDisk_ReturnsEmptyWhenJsonDeserializationFails()
+        {
+            // Arrange
+            var fileSystem = new StubFileSystemFolderPaths();
+            var appToDoObjects = new AppToDoObjects(
+                new StubApplicationGlobals(fileSystem, OlObjectsProxy.Create(() => null!))
+            );
+            ConfigureIdListLoader(
+                appToDoObjects,
+                "ids.json",
+                fileExists: _ => true,
+                readAllText: _ => "not-json"
+            );
+            var method = typeof(AppToDoObjects).GetMethod(
+                "LoadIdListFromDisk",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
 
-        //    // Assert
-        //    Assert.Fail();
-        //    this.mockRepository.VerifyAll();
-        //}
+            // Act
+            var idList = method!.Invoke(appToDoObjects, ["virtual-app-data"]) as IIDList;
 
-        //[TestMethod]
-        //public async Task LoadSequentialAsync_StateUnderTest_ExpectedBehavior()
-        //{
-        //    // Arrange
-        //    var appToDoObjects = this.CreateAppToDoObjects();
+            // Assert
+            idList.Should().NotBeNull();
+            idList!.Count.Should().Be(0);
+        }
 
-        //    // Act
-        //    await appToDoObjects.LoadSequentialAsync();
+        [TestMethod]
+        public void LoadIdListFromDisk_ReturnsEmptyWhenPersistedJsonIsCorrupted()
+        {
+            // Arrange
+            var fileSystem = new StubFileSystemFolderPaths();
+            var appToDoObjects = new AppToDoObjects(
+                new StubApplicationGlobals(fileSystem, OlObjectsProxy.Create(() => null!))
+            );
+            ConfigureIdListLoader(
+                appToDoObjects,
+                "ids.json",
+                fileExists: _ => true,
+                readAllText: _ => "{"
+            );
+            var method = typeof(AppToDoObjects).GetMethod(
+                "LoadIdListFromDisk",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
 
-        //    // Assert
-        //    Assert.Fail();
-        //    this.mockRepository.VerifyAll();
-        //}
+            // Act
+            var idList = method!.Invoke(appToDoObjects, ["virtual-app-data"]) as IIDList;
 
-        //[TestMethod]
-        //public void People_CollectionChanged_StateUnderTest_ExpectedBehavior()
-        //{
-        //    // Arrange
-        //    var appToDoObjects = this.CreateAppToDoObjects();
-        //    object Sender = null;
-        //    DictionaryChangedEventArgs args = null;
+            // Assert
+            idList.Should().NotBeNull();
+            idList!.Count.Should().Be(0);
+        }
 
-        //    // Act
-        //    appToDoObjects.People_CollectionChanged(
-        //        Sender,
-        //        args);
+        [TestMethod]
+        public void LoadIdListFromDisk_ReturnsEmptyWhenReadThrowsIOException()
+        {
+            // Arrange
+            var fileSystem = new StubFileSystemFolderPaths();
+            var appToDoObjects = new AppToDoObjects(
+                new StubApplicationGlobals(fileSystem, OlObjectsProxy.Create(() => null!))
+            );
+            ConfigureIdListLoader(
+                appToDoObjects,
+                "ids.json",
+                fileExists: _ => true,
+                readAllText: _ => throw new IOException("Simulated read failure.")
+            );
+            var method = typeof(AppToDoObjects).GetMethod(
+                "LoadIdListFromDisk",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
 
-        //    // Assert
-        //    Assert.Fail();
-        //    this.mockRepository.VerifyAll();
-        //}
+            // Act
+            var idList = method!.Invoke(appToDoObjects, ["virtual-app-data"]) as IIDList;
 
-        //[TestMethod]
-        //public void LoadPrefixList_StateUnderTest_ExpectedBehavior()
-        //{
-        //    // Arrange
-        //    var appToDoObjects = this.CreateAppToDoObjects();
+            // Assert
+            idList.Should().NotBeNull();
+            idList!.Count.Should().Be(0);
+        }
 
-        //    // Act
-        //    var result = appToDoObjects.LoadPrefixList();
+        [TestMethod]
+        public void LoadIdListFromDisk_ReturnsEmptyWhenIdListFileIsMissing()
+        {
+            // Arrange
+            var fileSystem = new StubFileSystemFolderPaths();
+            var appToDoObjects = new AppToDoObjects(
+                new StubApplicationGlobals(fileSystem, OlObjectsProxy.Create(() => null!))
+            );
+            ConfigureIdListLoader(appToDoObjects, "missing-id-list.json", fileExists: _ => false);
+            var method = typeof(AppToDoObjects).GetMethod(
+                "LoadIdListFromDisk",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
 
-        //    // Assert
-        //    Assert.Fail();
-        //    this.mockRepository.VerifyAll();
-        //}
+            // Act
+            var idList = method!.Invoke(appToDoObjects, ["virtual-app-data"]) as IIDList;
 
-        //[TestMethod]
-        //public void LoadFilteredFolderScraping_StateUnderTest_ExpectedBehavior()
-        //{
-        //    // Arrange
-        //    var appToDoObjects = this.CreateAppToDoObjects();
+            // Assert
+            idList.Should().NotBeNull();
+            idList!.Count.Should().Be(0);
+        }
 
-        //    // Act
-        //    var result = appToDoObjects.LoadFilteredFolderScraping();
+        [TestMethod]
+        public void LoadIdListFromDisk_ReturnsPersistedIdsWhenJsonIsValid()
+        {
+            // Arrange
+            var fileSystem = new StubFileSystemFolderPaths();
+            var appToDoObjects = new AppToDoObjects(
+                new StubApplicationGlobals(fileSystem, OlObjectsProxy.Create(() => null!))
+            );
+            ConfigureIdListLoader(
+                appToDoObjects,
+                "ids.json",
+                fileExists: _ => true,
+                readAllText: _ => "[\"TD-1\"]"
+            );
+            var method = typeof(AppToDoObjects).GetMethod(
+                "LoadIdListFromDisk",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
 
-        //    // Assert
-        //    Assert.Fail();
-        //    this.mockRepository.VerifyAll();
-        //}
+            // Act
+            var idList = method!.Invoke(appToDoObjects, ["virtual-app-data"]) as IIDList;
 
-        //[TestMethod]
-        //public void LoadFolderRemap_StateUnderTest_ExpectedBehavior()
-        //{
-        //    // Arrange
-        //    var appToDoObjects = this.CreateAppToDoObjects();
+            // Assert
+            idList.Should().NotBeNull();
+            idList.Should().ContainSingle().Which.Should().Be("TD-1");
+        }
 
-        //    // Act
-        //    var result = appToDoObjects.LoadFolderRemap();
+        [TestMethod]
+        public async Task LoadIdListAsync_RefreshesFromOutlookOnlyWhenDiskListIsEmpty()
+        {
+            // Arrange
+            var throwingApplication = (Application)
+                new ReflectionRealProxy(
+                    typeof(Application),
+                    (method, _) =>
+                        method.Name switch
+                        {
+                            "get_Session" => throw new InvalidOperationException(
+                                "RefreshIDList attempted to access the Outlook session."
+                            ),
+                            _ => throw new NotSupportedException(method.Name),
+                        }
+                ).GetTransparentProxy();
 
-        //    // Assert
-        //    Assert.Fail();
-        //    this.mockRepository.VerifyAll();
-        //}
+            var nonEmptyFileSystem = new StubFileSystemFolderPaths();
+            nonEmptyFileSystem.SpecialFolders["AppData"] = "virtual-app-data";
+            var nonEmptyAppToDoObjects = new AppToDoObjects(
+                new StubApplicationGlobals(
+                    nonEmptyFileSystem,
+                    OlObjectsProxy.Create(() => throwingApplication)
+                )
+            );
+            ConfigureIdListLoader(
+                nonEmptyAppToDoObjects,
+                "ids.json",
+                fileExists: _ => true,
+                readAllText: _ => "[\"TD-1\"]"
+            );
 
-        #endregion Commented Tests
+            var emptyFileSystem = new StubFileSystemFolderPaths();
+            emptyFileSystem.SpecialFolders["AppData"] = "virtual-app-data";
+            var emptyAppToDoObjects = new AppToDoObjects(
+                new StubApplicationGlobals(
+                    emptyFileSystem,
+                    OlObjectsProxy.Create(() => throwingApplication)
+                )
+            );
+            ConfigureIdListLoader(emptyAppToDoObjects, "missing-serializable-list.json");
+
+            // Act
+            Func<Task> nonEmptyAct = () =>
+                AppToDoObjectsTestUtilities.InvokePrivateAsync(
+                    nonEmptyAppToDoObjects,
+                    "LoadIdListAsync"
+                );
+            Func<Task> emptyAct = () =>
+                AppToDoObjectsTestUtilities.InvokePrivateAsync(
+                    emptyAppToDoObjects,
+                    "LoadIdListAsync"
+                );
+
+            // Assert
+            await nonEmptyAct.Should().NotThrowAsync();
+            nonEmptyAppToDoObjects.IDList.Should().NotBeNull();
+            nonEmptyAppToDoObjects.IDList!.Count.Should().Be(1);
+
+            await emptyAct
+                .Should()
+                .ThrowAsync<InvalidOperationException>()
+                .WithMessage("RefreshIDList attempted to access the Outlook session.");
+        }
+
+        [TestMethod]
+        public async Task LoadIdListAsync_SkipsOutlookRefreshWhenDiskListAlreadyContainsEntries()
+        {
+            // Arrange
+            var throwingApplication = (Application)
+                new ReflectionRealProxy(
+                    typeof(Application),
+                    (method, _) =>
+                        method.Name switch
+                        {
+                            "get_Session" => throw new InvalidOperationException(
+                                "RefreshIDList attempted to access the Outlook session."
+                            ),
+                            _ => throw new NotSupportedException(method.Name),
+                        }
+                ).GetTransparentProxy();
+
+            var fileSystem = new StubFileSystemFolderPaths();
+            fileSystem.SpecialFolders["AppData"] = "virtual-app-data";
+            var appToDoObjects = new AppToDoObjects(
+                new StubApplicationGlobals(
+                    fileSystem,
+                    OlObjectsProxy.Create(() => throwingApplication)
+                )
+            );
+            ConfigureIdListLoader(
+                appToDoObjects,
+                "ids.json",
+                fileExists: _ => true,
+                readAllText: _ => "[\"TD-1\"]"
+            );
+
+            // Act
+            await AppToDoObjectsTestUtilities.InvokePrivateAsync(appToDoObjects, "LoadIdListAsync");
+
+            // Assert
+            appToDoObjects.IDList.Should().NotBeNull();
+            appToDoObjects.IDList!.Count.Should().Be(1);
+        }
+
+        [TestMethod]
+        public async Task LoadIdListAsync_SkipsOutlookRefreshWhenParentAppIsNull()
+        {
+            // Arrange
+            var fileSystem = new StubFileSystemFolderPaths();
+            fileSystem.SpecialFolders["AppData"] = "virtual-app-data";
+            var appToDoObjects = new AppToDoObjects(
+                new StubApplicationGlobals(fileSystem, OlObjectsProxy.Create(() => null!))
+            );
+            ConfigureIdListLoader(appToDoObjects, "missing-serializable-list.json");
+
+            // Act
+            await AppToDoObjectsTestUtilities.InvokePrivateAsync(appToDoObjects, "LoadIdListAsync");
+
+            // Assert
+            appToDoObjects.IDList.Should().NotBeNull();
+            appToDoObjects.IDList!.Count.Should().Be(0);
+        }
+
+        [TestMethod]
+        public async Task LoadProjInfoAsync_SkipsRebuildWhenOutlookApplicationIsNull()
+        {
+            // Arrange
+            var fileSystem = new StubFileSystemFolderPaths();
+            fileSystem.SpecialFolders["AppData"] = "virtual-app-data";
+            using var serializableListScope = new ProjectDataSerializableListScope();
+            var appToDoObjects = new AppToDoObjects(
+                new StubApplicationGlobals(fileSystem, OlObjectsProxy.Create(() => null!))
+            );
+            var settings = new TaskMaster.Properties.Settings();
+            var propertyValue = settings.PropertyValues["FileName_ProjInfo"];
+            if (propertyValue is null)
+            {
+                var property = settings.Properties["FileName_ProjInfo"]!;
+                propertyValue = new SettingsPropertyValue(property)
+                {
+                    PropertyValue = "ProjInfo.json",
+                };
+                settings.PropertyValues.Add(propertyValue);
+            }
+            else
+            {
+                propertyValue.PropertyValue = "ProjInfo.json";
+            }
+            AppToDoObjectsTestUtilities.SetReadonlyField(appToDoObjects, "_defaults", settings);
+
+            // Act
+            await AppToDoObjectsTestUtilities.InvokePrivateAsync(
+                appToDoObjects,
+                "LoadProjInfoAsync"
+            );
+
+            // Assert
+            appToDoObjects.ProjInfo.Should().NotBeNull();
+            appToDoObjects.ProjInfo.Count.Should().Be(0);
+        }
+
+        [TestMethod]
+        public async Task LoadProjInfoAsync_SkipsRebuildWhenProjectCountIsNonZero()
+        {
+            // Arrange
+            var fileSystem = new StubFileSystemFolderPaths();
+            fileSystem.SpecialFolders["AppData"] = "virtual-app-data";
+            var throwingApplication = (Application)
+                new ReflectionRealProxy(
+                    typeof(Application),
+                    (method, _) =>
+                        method.Name switch
+                        {
+                            "get_Session" => throw new InvalidOperationException(
+                                "ProjectData.Rebuild attempted to access the Outlook session."
+                            ),
+                            _ => throw new NotSupportedException(method.Name),
+                        }
+                ).GetTransparentProxy();
+            using var serializableListScope = new ProjectDataSerializableListScope(
+                new ToDoModel.ProjectEntry("Project A", "1234", "Program A", "PRG1")
+            );
+            var appToDoObjects = new AppToDoObjects(
+                new StubApplicationGlobals(
+                    fileSystem,
+                    OlObjectsProxy.Create(() => throwingApplication)
+                )
+            );
+            var settings = new TaskMaster.Properties.Settings();
+            var propertyValue = settings.PropertyValues["FileName_ProjInfo"];
+            if (propertyValue is null)
+            {
+                var property = settings.Properties["FileName_ProjInfo"]!;
+                propertyValue = new SettingsPropertyValue(property)
+                {
+                    PropertyValue = "ProjInfo.json",
+                };
+                settings.PropertyValues.Add(propertyValue);
+            }
+            else
+            {
+                propertyValue.PropertyValue = "ProjInfo.json";
+            }
+            AppToDoObjectsTestUtilities.SetReadonlyField(appToDoObjects, "_defaults", settings);
+
+            // Act
+            await AppToDoObjectsTestUtilities.InvokePrivateAsync(
+                appToDoObjects,
+                "LoadProjInfoAsync"
+            );
+
+            // Assert
+            appToDoObjects.ProjInfo.Should().NotBeNull();
+            appToDoObjects.ProjInfo.Count.Should().Be(1);
+            appToDoObjects.ProjInfo[0].ProjectID.Should().Be("1234");
+        }
+
+        [TestMethod]
+        public async Task LoadProjInfoAsync_RebuildsWhenProjectCountIsZeroAndOutlookApplicationIsAvailable()
+        {
+            // Arrange
+            var fileSystem = new StubFileSystemFolderPaths();
+            fileSystem.SpecialFolders["AppData"] = "virtual-app-data";
+            var throwingApplication = (Application)
+                new ReflectionRealProxy(
+                    typeof(Application),
+                    (method, _) =>
+                        method.Name switch
+                        {
+                            "get_Session" => throw new InvalidOperationException(
+                                "ProjectData.Rebuild attempted to access the Outlook session."
+                            ),
+                            _ => throw new NotSupportedException(method.Name),
+                        }
+                ).GetTransparentProxy();
+            using var serializableListScope = new ProjectDataSerializableListScope();
+            var appToDoObjects = new AppToDoObjects(
+                new StubApplicationGlobals(
+                    fileSystem,
+                    OlObjectsProxy.Create(() => throwingApplication)
+                )
+            );
+            var settings = new TaskMaster.Properties.Settings();
+            var propertyValue = settings.PropertyValues["FileName_ProjInfo"];
+            if (propertyValue is null)
+            {
+                var property = settings.Properties["FileName_ProjInfo"]!;
+                propertyValue = new SettingsPropertyValue(property)
+                {
+                    PropertyValue = "ProjInfo.json",
+                };
+                settings.PropertyValues.Add(propertyValue);
+            }
+            else
+            {
+                propertyValue.PropertyValue = "ProjInfo.json";
+            }
+            AppToDoObjectsTestUtilities.SetReadonlyField(appToDoObjects, "_defaults", settings);
+
+            // Act
+            Func<Task> act = () =>
+                AppToDoObjectsTestUtilities.InvokePrivateAsync(appToDoObjects, "LoadProjInfoAsync");
+
+            // Assert
+            await act.Should()
+                .ThrowAsync<InvalidOperationException>()
+                .WithMessage("ProjectData.Rebuild attempted to access the Outlook session.");
+        }
+
+        [TestMethod]
+        public async Task LoadProjInfoAsync_DoesNotReadOutlookApplicationFromWorkerThread()
+        {
+            // Arrange
+            var callerThreadId = Environment.CurrentManagedThreadId;
+            var accessedThreadIds = new ConcurrentQueue<int>();
+
+            var fileSystem = new StubFileSystemFolderPaths();
+            fileSystem.SpecialFolders["AppData"] = "virtual-app-data";
+
+            var olObjects = OlObjectsProxy.Create(() =>
+            {
+                var currentThreadId = Environment.CurrentManagedThreadId;
+                accessedThreadIds.Enqueue(currentThreadId);
+
+                if (currentThreadId != callerThreadId)
+                {
+                    throw new InvalidOperationException(
+                        "Outlook Application getter ran off the caller thread."
+                    );
+                }
+
+                return null!;
+            });
+
+            using var serializableListScope = new ProjectDataSerializableListScope();
+            var appToDoObjects = new AppToDoObjects(
+                new StubApplicationGlobals(fileSystem, olObjects)
+            );
+            var settings = TaskMaster.Properties.Settings.Default;
+            var propertyValue = settings.PropertyValues["FileName_ProjInfo"];
+            if (propertyValue is null)
+            {
+                var property = settings.Properties["FileName_ProjInfo"]!;
+                propertyValue = new SettingsPropertyValue(property)
+                {
+                    PropertyValue = "ProjInfo.json",
+                };
+                settings.PropertyValues.Add(propertyValue);
+            }
+            else
+            {
+                propertyValue.PropertyValue = "ProjInfo.json";
+            }
+            AppToDoObjectsTestUtilities.SetReadonlyField(appToDoObjects, "_defaults", settings);
+
+            // Act
+            await AppToDoObjectsTestUtilities.InvokePrivateAsync(
+                appToDoObjects,
+                "LoadProjInfoAsync"
+            );
+
+            // Assert
+            accessedThreadIds.Should().NotBeEmpty();
+            accessedThreadIds.Should().OnlyContain(threadId => threadId == callerThreadId);
+        }
     }
 }
