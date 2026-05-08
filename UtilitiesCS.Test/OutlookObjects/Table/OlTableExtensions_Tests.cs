@@ -560,7 +560,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
         public void GetColumnHeaders_NullColumns_ReturnsEmptyArray()
         {
             var mockTable = new Mock<Outlook.Table>();
-            mockTable.Setup(t => t.Columns).Returns((Outlook.Columns)null);
+            mockTable.Setup(t => t.Columns).Returns((Outlook.Columns)null!);
 
             var result = OlTableExtensions.GetColumnHeaders(mockTable.Object);
             result.Should().BeEmpty();
@@ -608,7 +608,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             mockColumns.Setup(c => c.Count).Returns(1);
 
             var mockCol = new Mock<Outlook.Column>();
-            mockCol.Setup(c => c.Name).Returns((string)null);
+            mockCol.Setup(c => c.Name).Returns((string)null!);
             mockColumns.Setup(c => c[1]).Returns(mockCol.Object);
 
             var result = OlTableExtensions.GetColumnHeaders(mockTable.Object);
@@ -662,7 +662,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
         {
             System.Action act = () =>
                 OlTableExtensions.GetTable(
-                    (Outlook.Store)null,
+                    (Outlook.Store?)null,
                     Outlook.OlDefaultFolders.olFolderInbox,
                     new[] { "col" },
                     new[] { "col2" }
@@ -730,7 +730,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             var mockRow = new Mock<Outlook.Row>();
             var converters = new Dictionary<string, Func<object, string>>
             {
-                { "Col1", o => o?.ToString() },
+                { "Col1", o => o?.ToString() ?? string.Empty },
             };
 
             var result = OlTableExtensions.ConvertObjectColumnsToString(
@@ -748,7 +748,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             var mockRow = new Mock<Outlook.Row>();
             var converters = new Dictionary<string, Func<object, string>>
             {
-                { "Col1", o => o?.ToString() },
+                { "Col1", o => o?.ToString() ?? string.Empty },
             };
 
             var result = OlTableExtensions.ConvertObjectColumnsToString(
@@ -1032,7 +1032,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                 CancellationToken.None,
                 converters
             );
-            var prepType = prep.GetType();
+            prep.Should().NotBeNull();
+            var prepType = prep!.GetType();
             var columnDictionary =
                 (Dictionary<string, int>)prepType.GetField("Item2")!.GetValue(prep);
             var binIndices = (
@@ -1242,7 +1243,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
         }
 
         [TestMethod]
-        public async Task GetTableInViewAsync_TimeoutThenSuccess_ReturnsTable()
+        public async Task GetTableInViewAsync_SlowSynchronousGetTable_ReturnsTableWithoutSyntheticRetry()
         {
             var mockTable = new Mock<Outlook.Table>();
             var mockTableView = new Mock<Outlook.TableView>();
@@ -1272,11 +1273,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             );
 
             result.Should().BeSameAs(mockTable.Object);
-            callCount.Should().Be(2);
+            callCount.Should().Be(1);
         }
 
         [TestMethod]
-        public async Task GetTableInViewAsync_CanceledToken_ReturnsNull()
+        public async Task GetTableInViewAsync_CanceledToken_PropagatesOperationCanceledException()
         {
             var mockTableView = new Mock<Outlook.TableView>();
             var mockExplorer = new Mock<Outlook.Explorer>();
@@ -1284,15 +1285,16 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             cancel.Cancel();
             mockExplorer.Setup(e => e.CurrentView).Returns(mockTableView.Object);
 
-            var result = await InvokeAsyncResult(
-                "GetTableInViewAsync",
-                new[] { typeof(Outlook.Explorer), typeof(CancellationToken), typeof(int) },
-                mockExplorer.Object,
-                cancel.Token,
-                0
-            );
+            Func<Task> act = async () =>
+                await InvokeAsyncResult(
+                    "GetTableInViewAsync",
+                    new[] { typeof(Outlook.Explorer), typeof(CancellationToken), typeof(int) },
+                    mockExplorer.Object,
+                    cancel.Token,
+                    0
+                );
 
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<OperationCanceledException>();
         }
 
         [TestMethod]
@@ -1590,6 +1592,35 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             mockTable.Verify(t => t.MoveToStart(), Times.AtLeastOnce);
         }
 
+        [TestMethod]
+        public async Task GetTableInViewAsync_ImmediateSuccess_CallsGetTableOnceAndReturnsSnapshot()
+        {
+            var mockTable = new Mock<Outlook.Table>(MockBehavior.Strict);
+            var mockTableView = new Mock<Outlook.TableView>(MockBehavior.Strict);
+            var mockExplorer = new Mock<Outlook.Explorer>(MockBehavior.Strict);
+            var callCount = 0;
+
+            mockTableView
+                .Setup(x => x.GetTable())
+                .Returns(() =>
+                {
+                    callCount++;
+                    return mockTable.Object;
+                });
+            mockExplorer.SetupGet(x => x.CurrentView).Returns(mockTableView.Object);
+
+            var result = await InvokeAsyncResult(
+                "GetTableInViewAsync",
+                new[] { typeof(Outlook.Explorer), typeof(CancellationToken), typeof(int) },
+                mockExplorer.Object,
+                CancellationToken.None,
+                0
+            );
+
+            result.Should().BeSameAs(mockTable.Object);
+            callCount.Should().Be(1);
+        }
+
         private sealed class CapturingProgressTracker : ProgressTracker
         {
             public CapturingProgressTracker()
@@ -1597,7 +1628,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
 
             public int? LastValue { get; private set; }
 
-            public string LastJobName { get; private set; }
+            public string? LastJobName { get; private set; }
 
             public override void Report((int Value, string JobName) report)
             {
@@ -1611,8 +1642,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
 
         private static Mock<Outlook.Row> CreateRowMock(
             object[] values,
-            IDictionary<int, string> binaryStrings = null,
-            IDictionary<int, object> indexedValues = null
+            IDictionary<int, string>? binaryStrings = null,
+            IDictionary<int, object>? indexedValues = null
         )
         {
             var mockRow = new Mock<Outlook.Row>();
@@ -1642,7 +1673,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             Mock<Outlook.Columns> Columns
         ) CreateTableWithColumns(
             string[] columnNames,
-            object[,] array = null,
+            object[,]? array = null,
             params Mock<Outlook.Row>[] rows
         )
         {
@@ -1703,7 +1734,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             return await ((Task<T>)task);
         }
 
-        private static async Task<object> InvokeAsyncResult(
+        private static async Task<object?> InvokeAsyncResult(
             string methodName,
             Type[] parameterTypes,
             params object[] args

@@ -732,6 +732,10 @@
     <Compile Include="EmailIntelligence\Flags\FlagParser.cs" />
     <Compile Include="EmailIntelligence\Flags\FlagTranslator.cs" />
     <Compile Include="EmailIntelligence\IntelligenceFilters.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemHelper.Html.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemHelper.Loading.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemHelper.Properties.cs" />
+    <Compile Include="OutlookObjects\MailItem\MailItemHelper.Serialization.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemHelper.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapMetrics.cs">
       <SubType>Form</SubType>
@@ -851,6 +855,7 @@
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapSco.Orchestration.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\DfDeedle.cs" />
+    <Compile Include="Extensions\DfDeedle.FrameUtilities.cs" />
     <Compile Include="Extensions\DfMLNet.cs" />
     <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\DrawingExtensions.cs" />
@@ -863,6 +868,7 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\WinFormsExtensions.cs" />
     <Compile Include="OutlookObjects\Conversation\ConversationHelper.cs" />
+    <Compile Include="OutlookObjects\Conversation\ConversationHelper.Formatting.cs" />
     <Compile Include="HelperClasses\BinaryFlags\GenericBitwise.cs" />
     <Compile Include="HelperClasses\Initializer.cs" />
     <Compile Include="OutlookObjects\MailItem\MailResolution.cs" />
@@ -915,7 +921,10 @@
     <Compile Include="OutlookObjects\Folder\MsgToMime\MAPIMethods.cs" />
     <Compile Include="OutlookObjects\Folder\FolderNavigator.cs" />
     <Compile Include="OutlookObjects\Item\OlItemPseudoInterface.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensions.Etl.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensions.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensions.RowTransforms.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensions.TableAccess.cs" />
     <Compile Include="OutlookObjects\Table\OlToDoTable.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItem.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItemExtensions.cs" />

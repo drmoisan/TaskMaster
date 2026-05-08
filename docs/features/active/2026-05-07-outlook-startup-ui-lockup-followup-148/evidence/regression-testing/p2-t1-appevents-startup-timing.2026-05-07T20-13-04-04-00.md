@@ -1,0 +1,7 @@
+# P2-T1 Red Regression Evidence
+
+Timestamp: 2026-05-07T20:13:04.2925058-04:00
+Command: pwsh -NoProfile -ExecutionPolicy Bypass -Command "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNullable -TreatWarningsAsErrors; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; vstest.console.exe TaskMaster.Test\bin\Debug\TaskMaster.Test.dll /Tests:LoadAsync_EmitsStartupInboxTimingEnvelopeBeforeDeferredProcessingWindow; exit $LASTEXITCODE"
+EXIT_CODE: 1
+Failure: The exact plan command failed during the solution-wide nullable build before `vstest.console.exe` ran the new AppEvents regression. Representative diagnostics were pre-existing solution-level failures outside the approved scope, including `SVGControl` nullable warnings elevated to errors (`CS8618`, `CS8625`, `CS8600`, `CS8602`, `CS8603`, `CS0649`) and unresolved test dependency warnings for `SVGControl.Test`. As a result, this artifact records the exact blocked execution attempt but does not yet prove the new regression test itself fails before the production fix.
+Output Summary: `Invoke-VSBuild.ps1` exited with code `1`, reported `Build FAILED.`, and stopped before targeted test execution. The newly added test file compiled cleanly in editor diagnostics, but the solution gate remains blocked by unrelated existing build issues.

@@ -2,10 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Data.Analysis;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using UtilitiesCS.OutlookObjects.Fields;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.Test.OutlookObjects.Conversation
@@ -104,6 +107,24 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         }
 
         [TestMethod]
+        public async Task GetConversationDfAsync_CapturesConversationTableSnapshotBeforeBackgroundTransform()
+        {
+            var mailItem = new Mock<Outlook.MailItem>(MockBehavior.Loose);
+            var conversation = new Mock<Outlook.Conversation>(MockBehavior.Loose);
+            var table = CreateConversationTable();
+
+            mailItem.Setup(x => x.GetConversation()).Returns(conversation.Object);
+            conversation.Setup(x => x.GetTable()).Returns(table.Object);
+
+            var result = ConvHelper.GetConversationDf(conversation.Object);
+
+            await Task.CompletedTask;
+
+            result.Should().NotBeNull();
+            result.Columns["SentOn"].Should().NotBeNull();
+            conversation.Verify(x => x.GetTable(), Times.Once);
+        }
+
         public void PadOrTrunc_CenterJustify_LongString_TruncatesWithDots()
         {
             string result = PadOrTruncHelper(
@@ -142,6 +163,42 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         }
 
         #endregion
+
+        private static Mock<Outlook.Table> CreateConversationTable()
+        {
+            var table = new Mock<Outlook.Table>(MockBehavior.Strict);
+            var columns = new Mock<Outlook.Columns>(MockBehavior.Strict);
+            var data = new object[,]
+            {
+                { "2024-01-01", "Inbox", "Sender", "entry-1" },
+            };
+            var columnNames = new[]
+            {
+                "SentOn",
+                MAPIFields.Schemas.FolderName,
+                MAPIFields.Schemas.SenderName,
+                "EntryID",
+            };
+
+            table.SetupGet(x => x.Columns).Returns(columns.Object);
+            table.Setup(x => x.MoveToStart());
+            table.Setup(x => x.GetRowCount()).Returns(1);
+            table.Setup(x => x.GetArray(1)).Returns(data);
+            columns.Setup(x => x.Count).Returns(columnNames.Length);
+            columns.Setup(x => x.Remove(It.IsAny<object>()));
+            columns
+                .Setup(x => x.Add(It.IsAny<string>()))
+                .Returns(() => new Mock<Outlook.Column>(MockBehavior.Loose).Object);
+
+            for (var index = 0; index < columnNames.Length; index++)
+            {
+                var column = new Mock<Outlook.Column>(MockBehavior.Strict);
+                column.SetupGet(x => x.Name).Returns(columnNames[index]);
+                columns.Setup(x => x[index + 1]).Returns(column.Object);
+            }
+
+            return table;
+        }
 
         #region JoinFixedWidth
 
@@ -245,7 +302,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         public void GetMailItemList_NoBoolOverload_NullDf_ReturnsEmptyList()
         {
             var mockApp = new Mock<Outlook.Application>();
-            IList result = ConvHelper.GetMailItemList((DataFrame)null, "storeId", mockApp.Object);
+            IList result = ConvHelper.GetMailItemList((DataFrame?)null, "storeId", mockApp.Object);
             result.Count.Should().Be(0);
         }
 
@@ -345,7 +402,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         [TestMethod]
         public void GetConversation_NullObject_ReturnsNull()
         {
-            object obj = null;
+            object? obj = null;
             Outlook.Conversation result = ConvHelper.GetConversation(obj);
             result.Should().BeNull();
         }
@@ -495,7 +552,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         [TestMethod]
         public void ConversationCt_NullObject_ReturnsMinusOne()
         {
-            object item = null;
+            object? item = null;
             int result = ConvHelper.ConversationCt(item, true, true);
             result.Should().Be(-1);
         }
@@ -515,7 +572,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         [TestMethod]
         public void GetConversationDf_NullObject_ReturnsNull()
         {
-            object item = null;
+            object? item = null;
             DataFrame result = ConvHelper.GetConversationDf(item);
             result.Should().BeNull();
         }
@@ -527,7 +584,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         [TestMethod]
         public void GetConversationDf_NullConversation_ReturnsNull()
         {
-            Outlook.Conversation conv = null;
+            Outlook.Conversation? conv = null;
             DataFrame result = ConvHelper.GetConversationDf(conv);
             result.Should().BeNull();
         }
@@ -539,7 +596,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         [TestMethod]
         public void GetTable_NullConversation_ReturnsNull()
         {
-            Outlook.Conversation conv = null;
+            Outlook.Conversation? conv = null;
             Outlook.Table result = ConvHelper.GetTable(conv, true, true);
             result.Should().BeNull();
         }
@@ -547,7 +604,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         [TestMethod]
         public void GetTable_NullConversation_NoFlags_ReturnsNull()
         {
-            Outlook.Conversation conv = null;
+            Outlook.Conversation? conv = null;
             Outlook.Table result = ConvHelper.GetTable(conv, false, false);
             result.Should().BeNull();
         }
@@ -671,7 +728,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         public void ConversationCt_MailItem_NullConversation_ReturnsZero()
         {
             var mockMail = new Mock<Outlook.MailItem>();
-            mockMail.Setup(m => m.GetConversation()).Returns((Outlook.Conversation)null);
+            mockMail.Setup(m => m.GetConversation()).Returns((Outlook.Conversation)null!);
 
             int result = ConvHelper.ConversationCt((object)mockMail.Object, true, true);
             result.Should().Be(0);
@@ -746,7 +803,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         public void GetConversationDf_MailItem_NullConversation_ReturnsNull()
         {
             var mockMail = new Mock<Outlook.MailItem>();
-            mockMail.Setup(m => m.GetConversation()).Returns((Outlook.Conversation)null);
+            mockMail.Setup(m => m.GetConversation()).Returns((Outlook.Conversation)null!);
 
             DataFrame result = ConvHelper.GetConversationDf((object)mockMail.Object);
             result.Should().BeNull();
@@ -884,7 +941,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
             // test by dispatching through TimeOutTask which is complex.
             // Instead verify the cancellation path of the simpler async overload.
             var mockMail = new Mock<Outlook.MailItem>();
-            mockMail.Setup(m => m.GetConversation()).Returns((Outlook.Conversation)null);
+            mockMail.Setup(m => m.GetConversation()).Returns((Outlook.Conversation)null!);
 
             // The simple GetConversationDfAsync calls TimeOutTask.RunWithTimeout
             // which will try mailItem.GetConversation() returning null

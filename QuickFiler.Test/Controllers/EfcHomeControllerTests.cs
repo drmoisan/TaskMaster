@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Interfaces;
@@ -87,7 +88,7 @@ namespace QuickFiler.Controllers.Tests
             var emptyMoved = new List<MailItemHelper>();
 
             // Act & Assert
-            Action act = () =>
+            System.Action act = () =>
                 controller.QuickFileMetrics_WRITE("session.csv", @"Inbox\Projects", emptyMoved);
             act.Should()
                 .NotThrow(
@@ -102,9 +103,91 @@ namespace QuickFiler.Controllers.Tests
             var controller = CreateMinimalController();
 
             // Act & Assert
-            Action act = () =>
+            System.Action act = () =>
                 controller.QuickFileMetrics_WRITE("session.csv", @"Inbox\Projects", null);
             act.Should().NotThrow("a null moved list must be handled by the null guard");
         }
+
+        [TestMethod]
+        public void CaptureSelectionSnapshot_ReturnsIndependentCopyBeforeBackgroundModelLoad()
+        {
+            var originalFirstMail = new Mock<MailItem>(MockBehavior.Loose).Object;
+            var originalSecondMail = new Mock<MailItem>(MockBehavior.Loose).Object;
+            var replacementMail = new Mock<MailItem>(MockBehavior.Loose).Object;
+            var liveSelection = new List<MailItem> { originalFirstMail, originalSecondMail };
+            var method = typeof(EfcHomeController).GetMethod(
+                "CaptureSelectionSnapshot",
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
+
+            method.Should().NotBeNull("selection snapshot helper should remain available");
+            if (method == null)
+            {
+                Assert.Fail("CaptureSelectionSnapshot must be available for the regression test.");
+            }
+
+            var snapshot = (List<MailItem>)method.Invoke(null, new object[] { liveSelection });
+            liveSelection.Clear();
+            liveSelection.Add(replacementMail);
+
+            snapshot.Should().Equal(originalFirstMail, originalSecondMail);
+            snapshot.Should().NotBeSameAs(liveSelection);
+        }
+
+        [TestMethod]
+        public void BuildFirstSelectionTimingContext_WhenEventsUnavailable_ReportsUnknownOverlapState()
+        {
+            var method = typeof(EfcHomeController).GetMethod(
+                "BuildFirstSelectionTimingContext",
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
+
+            method
+                .Should()
+                .NotBeNull("first-selection timing context builder must remain available");
+            if (method == null)
+            {
+                Assert.Fail(
+                    "BuildFirstSelectionTimingContext must be available for the regression test."
+                );
+            }
+
+            var context = (string)method.Invoke(null, new object[] { _mockGlobals.Object, 2 });
+
+            context.Should().Contain("selectedItemCount=2");
+            context.Should().Contain("startupOverlapState=unknown");
+            context.Should().Contain("threadId=");
+        }
+
+        [TestMethod]
+        public void LogFirstSelectionTiming_AcceptsUnprefixedPhaseWithoutThrowing()
+        {
+            var method = typeof(EfcHomeController).GetMethod(
+                "LogFirstSelectionTiming",
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
+
+            method.Should().NotBeNull("first-selection timing logger must remain available");
+            if (method == null)
+            {
+                Assert.Fail("LogFirstSelectionTiming must be available for the regression test.");
+            }
+
+            System.Action act = () =>
+                method.Invoke(
+                    null,
+                    new object[]
+                    {
+                        "HandleSelectionChangedAsync selection snapshot",
+                        _mockGlobals.Object,
+                        3,
+                        "selection snapshot captured before background model load",
+                    }
+                );
+
+            act.Should().NotThrow();
+        }
+
+        public TestContext TestContext { get; set; }
     }
 }

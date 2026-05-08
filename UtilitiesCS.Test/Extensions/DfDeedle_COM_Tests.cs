@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Deedle;
@@ -412,6 +414,80 @@ namespace UtilitiesCS.Test.Extensions
             }
         }
 
+        /// <summary>
+        /// Locks in the follow-up async-boundary contract for dataframe loading from the
+        /// current Outlook table view. `GetEmailDataInViewAsync` should capture the table
+        /// snapshot before it starts the background dataframe transform.
+        /// </summary>
+        [TestMethod]
+        public async Task GetEmailDataInViewAsync_SeparatesTableSnapshotFromDataFrameTransform()
+        {
+            var data = new object[,]
+            {
+                { "entry-1", "IPM.Note", "2024-01-01", "conv-1", "A" },
+            };
+            var row = new Mock<Row>(MockBehavior.Strict);
+            row.Setup(x => x.GetValues())
+                .Returns(new object[] { "entry-1", "IPM.Note", "2024-01-01", "conv-raw", "A" });
+            row.Setup(x => x.BinaryToString(4)).Returns("conv-1");
+
+            var folder = BuildFolderWithUdp("Triage");
+            folder.SetupGet(x => x.StoreID).Returns("store-1");
+            folder.SetupGet(x => x.Name).Returns("Inbox");
+
+            var mockColumns = new Mock<Columns>(MockBehavior.Loose);
+            var mockTable = new Mock<Table>(MockBehavior.Strict);
+            mockTable.SetupGet(x => x.Columns).Returns(mockColumns.Object);
+            mockTable.Setup(x => x.MoveToStart());
+            mockTable.Setup(x => x.GetRowCount()).Returns(1);
+            var currentRow = 0;
+            mockTable.Setup(x => x.EndOfTable).Returns(() => currentRow >= 1);
+            mockTable
+                .Setup(x => x.GetNextRow())
+                .Returns(() =>
+                {
+                    currentRow++;
+                    return row.Object;
+                });
+
+            var columnNames = new[]
+            {
+                "EntryID",
+                "MessageClass",
+                "SentOn",
+                "ConversationId",
+                "Triage",
+            };
+            mockColumns.Setup(x => x.Count).Returns(columnNames.Length);
+            for (var index = 0; index < columnNames.Length; index++)
+            {
+                var column = new Mock<Column>(MockBehavior.Strict);
+                column.SetupGet(x => x.Name).Returns(columnNames[index]);
+                mockColumns.Setup(x => x[index + 1]).Returns(column.Object);
+            }
+
+            var tableView = new Mock<TableView>(MockBehavior.Strict);
+            tableView.Setup(x => x.GetTable()).Returns(mockTable.Object);
+
+            var explorer = new Mock<Outlook.Explorer>(MockBehavior.Strict);
+            explorer.SetupGet(x => x.CurrentView).Returns(tableView.Object);
+            explorer.SetupGet(x => x.CurrentFolder).Returns(folder.Object);
+
+            var progress = CreateProgressTracker();
+            var result = await DfDeedle.GetEmailDataInViewAsync(
+                explorer.Object,
+                CancellationToken.None,
+                new CancellationTokenSource(),
+                progress
+            );
+
+            result.RowCount.Should().Be(1);
+            result
+                .ColumnKeys.Should()
+                .Contain(new[] { "EntryId", "MessageClass", "ConversationId" });
+            mockTable.Verify(x => x.GetNextRow(), Times.Once);
+        }
+
         // ----------------------------------------------------------------
         // AddQfcColumnsAsync (private via reflection)
         // ----------------------------------------------------------------
@@ -778,6 +854,25 @@ namespace UtilitiesCS.Test.Extensions
             {
                 DfDeedle.StoreTableEtlInvoker = originalSeam;
             }
+        }
+
+        private static ProgressTracker CreateProgressTracker()
+        {
+            return new ProgressTracker(new SilentProgressTracker(), allocation: 100, startingAt: 0);
+        }
+
+        public TestContext TestContext { get; set; } = null!;
+
+        private sealed class SilentProgressTracker : ProgressTracker
+        {
+            public SilentProgressTracker()
+                : base(new CancellationTokenSource()) { }
+
+            public override void Report((int Value, string JobName) report) { }
+
+            public override void Report(double value) { }
+
+            public override void Report(double value, string jobName) { }
         }
     }
 }

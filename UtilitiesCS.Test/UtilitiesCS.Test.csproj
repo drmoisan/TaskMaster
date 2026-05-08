@@ -294,6 +294,7 @@
     <Compile Include="OutlookObjects\Fields\MAPIFieldsTests.cs" />
     <Compile Include="OutlookObjects\Conversation\ConversationHelperTests.cs" />
     <Compile Include="OutlookObjects\Conversation\ConversationHelper_ExtendedTests.cs" />
+    <Compile Include="OutlookObjects\Conversation\ConversationHelperAsyncTests.cs" />
     <Compile Include="OutlookObjects\Table\OlToDoTableTests.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensionsTransformTests.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensionsRetryTests.cs" />
