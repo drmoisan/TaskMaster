@@ -154,7 +154,8 @@ Required behavior:
 6. Spawn `atomic-executor` to execute Phase 0 only.
    - Record a delegation receipt and set `step6_status` to `verified` before branching
    - If the handoff cannot be started or does not return a receipt, set `step6_status` to `blocked`, set `blocked_reason`, and stop
-7. If the request is manual bootstrap, persist the resume checkpoint and stop after Phase 0.
+7. If and only if the initial user request explicitly opted into manual orchestration from the beginning, persist the resume checkpoint and stop after Phase 0.
+   - Otherwise manual bootstrap is prohibited; continue automated execution.
 8. Otherwise continue with constrained implementation:
    - steps that are not modeled as required delegated handoffs may execute directly while staying within the approved plan and applicable repo policy
 9. Validate the delivered work against `${feature-folder}/issue.md` and persist plan or acceptance-criteria checkoffs before review.

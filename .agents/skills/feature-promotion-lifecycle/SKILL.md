@@ -89,8 +89,12 @@ When orchestrator routing selects short path, promotion/folder initialization st
 6) Execute plan Phase 0 only via executor and checkpoint evidence.
 
 7) Branch:
-- manual bootstrap: save state and stop,
+- manual bootstrap: save state and stop ONLY when the initial user request explicitly opted into manual orchestration from the beginning,
 - non-bootstrap: continue with constrained small-path development.
+
+Automation rule:
+- do not introduce manual bootstrap, human-operator validation, or any other manual handoff later in orchestration unless that initial explicit opt-in exists
+- if automation cannot proceed, record blocked automated state instead of asking for manual intervention
 
 8) Validate delivery via executor against `issue.md`, then run reduced audit/remediation loop until ready-to-merge.
 
