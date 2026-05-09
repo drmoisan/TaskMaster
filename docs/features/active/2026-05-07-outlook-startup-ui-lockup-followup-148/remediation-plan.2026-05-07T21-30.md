@@ -12,7 +12,7 @@
 
 ## Objective
 
-Finish issue `#148` remediation without widening scope beyond the declared startup and first-selection follow-up area by reconciling the actual branch diff to the declared feature scope, replacing brittle source-text regressions with behavioral seam tests, raising changed/new-code coverage to policy threshold, restoring structural compliance for the oversized changed production files, and only then rerunning the final QA loop and manual Outlook validation.
+Finish issue `#148` remediation without widening scope beyond the declared startup and first-selection follow-up area by reconciling the actual branch diff to the declared feature scope, replacing brittle source-text regressions with behavioral seam tests, raising changed/new-code coverage to policy threshold, restoring structural compliance for the oversized changed production files, rerunning the final QA loop, and then recording a policy-compliant automated end state that fails closed if live Outlook responsiveness cannot be verified without a manual step.
 
 ### Phase 0 — Context, Scope, and Baseline Refresh
 
@@ -56,11 +56,11 @@ Execute [P3-T1] through [P3-T5] in order. If any step changes files or exits non
 - [x] [P3-T5] Compare the Phase 0 remediation baseline coverage artifact with the final remediation coverage artifact and write `docs/features/active/2026-05-07-outlook-startup-ui-lockup-followup-148/evidence/qa-gates/remediation-csharp-coverage-summary.*.md`.
   - Acceptance: The artifact exists and contains numeric baseline coverage, numeric final coverage, numeric changed/new-code coverage, explicit threshold evaluation, and `Coverage Conclusion: PASS` only when all required coverage gates pass.
 
-### Phase 4 — Manual Outlook Validation and Review Refresh
+### Phase 4 — Automated End-State Recording and Review Refresh
 
-- [ ] [P4-T1] Perform the manual Outlook startup and first-selection validation documented in `spec.md` after [P3-T5] records `Coverage Conclusion: PASS`, then write `docs/features/active/2026-05-07-outlook-startup-ui-lockup-followup-148/evidence/qa-gates/remediation-outlook-manual-validation.*.md`.
-  - Acceptance: The artifact exists and contains `Timestamp:`, `Operator:`, `Environment:`, `Repro Path:`, `Responsiveness Result: PASS`, `Timing Evidence:`, and `Evidence Source:`.
-- [ ] [P4-T2] Refresh the end-state artifact at `docs/features/active/2026-05-07-outlook-startup-ui-lockup-followup-148/evidence/qa-gates/remediation-full-bug-end-state.*.md`.
-  - Acceptance: The artifact exists and maps all eight acceptance criteria, records the refreshed final QA artifacts, and sets `Ready For Validator: true` only when [P4-T1] passes.
-- [ ] [P4-T3] Refresh the review set by generating updated `policy-audit`, `code-review`, and `feature-audit` artifacts for the remediated branch state.
-  - Acceptance: The refreshed review set post-dates the remediation QA artifacts and records a non-blocked conclusion only if coverage, scope, structural compliance, and manual validation all pass.
+- [x] [P4-T1] After [P3-T5] records `Coverage Conclusion: PASS`, write `docs/features/active/2026-05-07-outlook-startup-ui-lockup-followup-148/evidence/qa-gates/remediation-outlook-automation-blocked.*.md` to record that live Outlook startup/first-selection responsiveness still lacks a fully automated verifier and therefore cannot advance through a manual step under the no-manual-steps contract.
+  - Acceptance: The artifact exists and contains `Timestamp:`, `Blocking Policy: No-Manual-Step Contract`, `Blocked Requirement: Acceptance Criteria 4`, `Blocking Reason: No fully automated Outlook responsiveness verifier is available in this remediation cycle`, `Available Automated Evidence:`, `Outcome: BLOCKED`, and `Next Required Automated Work:`.
+- [x] [P4-T2] Refresh the end-state artifact at `docs/features/active/2026-05-07-outlook-startup-ui-lockup-followup-148/evidence/qa-gates/remediation-full-bug-end-state.*.md` so the remediation concludes in a policy-compliant automated blocked state instead of requesting operator validation.
+  - Acceptance: The artifact exists, maps all eight acceptance criteria, records the refreshed final QA artifacts plus the [P4-T1] blocker artifact, sets `Ready For Validator: false`, and contains both `End-State: REMEDIATION-REQUIRED` and `Blocked Requirement: Acceptance Criteria 4`.
+- [x] [P4-T3] Refresh the review set by generating updated `policy-audit`, `code-review`, and `feature-audit` artifacts for the remediated branch state after [P4-T2].
+  - Acceptance: The refreshed review set exists, each artifact post-dates the [P4-T2] end-state artifact, and each records that coverage, scope, and structural compliance passed while live Outlook responsiveness remains `BLOCKED` pending a future fully automated validation path.
