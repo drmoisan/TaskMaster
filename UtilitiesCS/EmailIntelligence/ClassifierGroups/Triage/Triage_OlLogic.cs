@@ -188,6 +188,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             return strippedFilter;
         }
 
+        
         public async Task TrainSelectionAsync(string triageId, CancellationToken token = default)
         {
             var selection = Parent?.Globals?.Ol?.App?.ActiveExplorer()?.Selection;
@@ -196,30 +197,23 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 logger.Debug("Could not grab handle on Selection");
                 return;
             }
-            await selection
+            var mailItems = selection
                 .Cast<object>()
                 .Where(x => x is MailItem)
                 .Cast<MailItem>()
-                .Take(1) // Outlook conversation view may expand Selection to include the entire thread; process only the focused item.
-                .ToAsyncEnumerable()
-                .SelectAwaitWithCancellation(
-                    async (mailItem, token) =>
-                        await MailItemHelper.FromMailItemAsync(
-                            mailItem,
-                            Parent.Globals,
-                            token,
-                            false
-                        )
-                )
-                //.SelectAwaitWithCancellation(async (helper, token) => await Task.Run(() => helper.Tokens, token))
-                .ForEachAwaitWithCancellationAsync(
-                    async (helper, token) =>
-                    {
-                        await Parent.TestActionAsync(helper, triageId, token);
-                        await Parent.TrainAsync(helper.Tokens, triageId, token);
-                    },
-                    token
+                .ToAsyncEnumerable();
+
+            await foreach (var mailItem in mailItems.WithCancellation(token))
+            {
+                var helper = await MailItemHelper.FromMailItemAsync(
+                    mailItem,
+                    Parent.Globals,
+                    token,
+                    false
                 );
+                await Parent.TestActionAsync(helper, triageId, token);
+                await Parent.TrainAsync(helper.Tokens, triageId, token);
+            }
 
             Parent.ClassifierGroup.Serialize();
         }
@@ -232,30 +226,24 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 logger.Debug("Could not grab handle on Selection");
                 return;
             }
-            await selection
+            var mailItems = selection
                 .Cast<object>()
                 .Where(x => x is MailItem)
                 .Cast<MailItem>()
-                .ToAsyncEnumerable()
-                .SelectAwaitWithCancellation(
-                    async (mailItem, token) =>
-                        await MailItemHelper.FromMailItemAsync(
-                            mailItem,
-                            Parent.Globals,
-                            token,
-                            false
-                        )
-                )
-                //.SelectAwaitWithCancellation(async (helper, token) => await Task.Run(() => helper.Tokens, token))
-                .ForEachAwaitWithCancellationAsync(
-                    async (helper, token) =>
-                    {
-                        var triageId = helper.Triage;
-                        await Parent.UnTrainAsync(helper.Tokens, triageId, token);
-                        helper.Item.DeleteUdf("Triage");
-                    },
-                    token
+                .ToAsyncEnumerable();
+
+            await foreach (var mailItem in mailItems.WithCancellation(token))
+            {
+                var helper = await MailItemHelper.FromMailItemAsync(
+                    mailItem,
+                    Parent.Globals,
+                    token,
+                    false
                 );
+                var triageId = helper.Triage;
+                await Parent.UnTrainAsync(helper.Tokens, triageId, token);
+                helper.Item.DeleteUdf("Triage");
+            }
 
             Parent.ClassifierGroup.Serialize();
         }
