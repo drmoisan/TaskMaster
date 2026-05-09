@@ -111,6 +111,10 @@ Use these reusable skills to avoid duplicating shared operations:
   - `${feature-folder}`: created active feature folder path
   - `${plan-path}`: workspace-relative path to the single plan file that must be updated in-place across all planning/preflight iterations
 
+5) **No manual steps by default**
+- Do not introduce manual bootstrap, human-operator validation, user-performed repro steps, or any other manual handoff unless the initial user request explicitly asked for manual orchestration from the beginning.
+- If a delegated plan, review, or remediation flow proposes a new manual step without that explicit initial opt-in, reject it, request a revision, or record blocked automated state instead of asking the user to perform the step.
+
 # Workflow router
 
 ## Phase 0 — Intake and budget estimate (mandatory)
@@ -198,11 +202,11 @@ Hard enforcement for S4:
 
 ### Step S5 — Branch by bootstrap mode
 
-S5.1 If request is `manual bootstrap`:
+S5.1 Only if the initial user request explicitly requested `manual bootstrap` from the beginning:
 - Save checkpoint with `next_step` at Phase 1 resume point.
 - Stop execution and return resume instructions.
 
-S5.2 If request is small development (not manual bootstrap):
+S5.2 Otherwise continue automated small development:
 - Continue to Step S6.
 
 ### Step S6 — Delegate constrained small-path development

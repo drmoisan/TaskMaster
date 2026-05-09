@@ -73,8 +73,21 @@ After preflight all-clear on the minimal-audit plan:
 - orchestrator MUST checkpoint Phase 0 evidence before branching.
 
 Branching after Phase 0:
-- `manual bootstrap` → save state and stop for manual resume,
+- `manual bootstrap` → save state and stop for manual resume ONLY when the initial user request explicitly opted into manual orchestration from the beginning,
 - otherwise continue with constrained small-path development, then executor validation, then reduced audit/remediation loop.
+
+## No-Manual-Step Contract (Mandatory)
+
+Unless the user's initial request explicitly opts into manual orchestration from the beginning, approved plans and remediation plans MUST remain fully automated.
+
+This prohibition includes:
+
+- manual bootstrap pauses,
+- human-operator validation tasks,
+- user-performed repro or QA steps,
+- requests for screenshots, notes, or runtime evidence that the agent cannot collect itself.
+
+When a fully automated equivalent is unavailable, the plan MUST fail closed by recording blocked or remediation-required automated state. It MUST NOT introduce a new manual step later in the workflow.
 
 ## Phase 0 Requirements
 
