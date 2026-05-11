@@ -431,7 +431,7 @@ namespace UtilitiesCS.Test.Extensions
                 var candidate = Path.Combine(
                     current.FullName,
                     "packages",
-                    "Microsoft.Graph.5.103.0",
+                    "Microsoft.Graph.5.105.0",
                     "lib",
                     "netstandard2.0",
                     "Microsoft.Graph.xml"
