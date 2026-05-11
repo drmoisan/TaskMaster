@@ -250,6 +250,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppGlobals\ApplicationGlobalsTests.cs" />
+    <Compile Include="AppGlobals\AppEventsTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsCoverageTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsTests.cs" />
     <Compile Include="AppGlobals\AppToDoObjectsCoverageTests.cs" />

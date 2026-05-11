@@ -188,7 +188,6 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             return strippedFilter;
         }
 
-        
         public async Task TrainSelectionAsync(string triageId, CancellationToken token = default)
         {
             var selection = Parent?.Globals?.Ol?.App?.ActiveExplorer()?.Selection;
@@ -201,6 +200,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 .Cast<object>()
                 .Where(x => x is MailItem)
                 .Cast<MailItem>()
+                .Take(1) // Outlook conversation view may expand Selection to include the entire thread; process only the focused item.
                 .ToAsyncEnumerable();
 
             await foreach (var mailItem in mailItems.WithCancellation(token))

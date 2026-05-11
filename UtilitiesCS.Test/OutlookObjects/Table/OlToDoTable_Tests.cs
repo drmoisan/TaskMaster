@@ -39,7 +39,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             mockStore
                 .Setup(s => s.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
                 .Returns(mockFolder.Object);
-            mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
+            mockFolder
+                .Setup(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()))
+                .Returns(mockTable.Object);
             mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
             mockFolder.Setup(f => f.UserDefinedProperties).Returns(mockUserProps.Object);
             mockFolder.Setup(f => f.Items).Returns(mockItems.Object);
@@ -68,7 +70,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             mockStore
                 .Setup(s => s.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
                 .Returns(mockFolder.Object);
-            mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
+            mockFolder
+                .Setup(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()))
+                .Returns(mockTable.Object);
             mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
             mockFolder.Setup(f => f.UserDefinedProperties).Returns(mockUserProps.Object);
             mockFolder.Setup(f => f.Items).Returns(mockItems.Object);
@@ -92,7 +96,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             mockStore
                 .Setup(s => s.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
                 .Returns(mockFolder.Object);
-            mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
+            mockFolder
+                .Setup(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()))
+                .Returns(mockTable.Object);
             mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
             mockFolder.Setup(f => f.UserDefinedProperties).Returns(mockUserProps.Object);
             mockUserProps.Setup(u => u[It.IsAny<object>()]).Throws(new Exception("not found"));
@@ -123,7 +129,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             mockStore
                 .Setup(s => s.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
                 .Returns(mockFolder.Object);
-            mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
+            mockFolder
+                .Setup(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()))
+                .Returns(mockTable.Object);
             mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
             mockFolder.Setup(f => f.UserDefinedProperties).Returns(mockUserProps.Object);
             mockUserProps.Setup(u => u[It.IsAny<object>()]).Throws(new Exception("not found"));
@@ -149,7 +157,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             mockStore
                 .Setup(s => s.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
                 .Returns(mockFolder.Object);
-            mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
+            mockFolder
+                .Setup(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()))
+                .Returns(mockTable.Object);
             mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
             mockFolder.Setup(f => f.UserDefinedProperties).Returns(mockUserProps.Object);
             mockFolder.Setup(f => f.Items).Returns(mockItems.Object);
@@ -186,7 +196,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             mockStore
                 .Setup(s => s.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
                 .Returns(mockFolder.Object);
-            mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
+            mockFolder
+                .Setup(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()))
+                .Returns(mockTable.Object);
             mockTable.Setup(t => t.Columns).Returns(mockColumns.Object);
             mockFolder.Setup(f => f.UserDefinedProperties).Returns(mockUserProps.Object);
             mockUserProps.Setup(u => u[It.IsAny<object>()]).Throws(new Exception("not found"));

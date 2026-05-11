@@ -211,6 +211,76 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItem
             attachmentsReads.Should().Be(attachmentsReadsAfterMaterialization);
         }
 
+        [TestMethod]
+        public void TryProjectMailItemMembers_UsesMaterializedProjectionValues()
+        {
+            var projection = MailItemHelper.TryProjectMailItemMembers(
+                new { Subject = "Subject", EntryID = "entry-1" }
+            );
+
+            projection.Subject.Should().Be("Subject");
+            projection.EntryId.Should().Be("entry-1");
+        }
+
+        [TestMethod]
+        public async Task FromDfAfterResolved_LoadsPriorityProjectionAndRecipientStrings()
+        {
+            var mailItem = new Mock<InteropMailItem>();
+            var archiveRoot = new Mock<OutlookFolder>();
+            archiveRoot.SetupGet(x => x.FolderPath).Returns("\\Archive");
+            var inboxRoot = new Mock<OutlookFolder>();
+            inboxRoot.SetupGet(x => x.FolderPath).Returns("\\Inbox");
+            var currentFolder = new Mock<OutlookFolder>();
+            currentFolder.SetupGet(x => x.FolderPath).Returns("\\Archive\\Projects");
+
+            var globals = CreateGlobals(archiveRoot.Object, inboxRoot.Object, "\\Archive");
+            var sender = CreateSenderMock("Ada Sender", "ada@example.com");
+            var toRecipient = CreateRecipientMock(
+                "To User",
+                "to@example.com",
+                (int)OlMailRecipientType.olTo
+            );
+            var ccRecipient = CreateRecipientMock(
+                "Cc User",
+                "cc@example.com",
+                (int)OlMailRecipientType.olCC
+            );
+            var recipients = CreateRecipientsMock(toRecipient.Object, ccRecipient.Object);
+            var attachments = CreateAttachmentsMock();
+
+            mailItem.SetupGet(x => x.Subject).Returns("Subject");
+            mailItem.SetupGet(x => x.Body).Returns("Body");
+            mailItem.SetupGet(x => x.HTMLBody).Returns("<html><body>Body</body></html>");
+            mailItem.SetupGet(x => x.SenderName).Returns("Ada Sender");
+            mailItem.SetupGet(x => x.SenderEmailAddress).Returns("ada@example.com");
+            mailItem.SetupGet(x => x.EntryID).Returns("entry-1");
+            mailItem.SetupGet(x => x.Sender).Returns(sender.Object);
+            mailItem.SetupGet(x => x.Recipients).Returns(recipients.Object);
+            mailItem.SetupGet(x => x.Attachments).Returns(attachments.Object);
+            mailItem.SetupGet(x => x.Parent).Returns(currentFolder.Object);
+
+            var helper = await MailItemHelper.FromMailItemAsync(
+                mailItem.Object,
+                globals.Object,
+                CancellationToken.None,
+                loadAll: false
+            );
+
+            SetLazyField(helper, "_triage", string.Empty);
+            SetLazyField(helper, "_categories", string.Empty);
+            SetLazyField(helper, "_sentOn", "5/2/2026 12:00 AM");
+            SetLazyField(helper, "_actionable", string.Empty);
+            SetLazyField(helper, "_conversationID", "conv-1");
+
+            var result = await helper.FromDfAfterResolved();
+
+            result.Should().BeSameAs(helper);
+            helper.FolderInfo.OlRoot.Should().BeSameAs(archiveRoot.Object);
+            helper.ToRecipientsName.Should().Contain("To User");
+            helper.CcRecipientsName.Should().Contain("Cc User");
+            helper.Html.Should().NotBeNull();
+        }
+
         private static Mock<IApplicationGlobals> CreateGlobals(
             OutlookFolder archiveRoot,
             OutlookFolder inbox,

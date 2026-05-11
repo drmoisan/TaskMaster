@@ -1,4 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -258,6 +263,316 @@ namespace QuickFiler.Test.HelperClasses
 
             // Assert – no exception; cached value is returned.
             act.Should().NotThrow();
+        }
+
+        /// <summary>
+        /// Locks in the follow-up async-boundary contract for conversation dataframe loading.
+        /// `LoadDfAsync` should explicitly consume conversation snapshots and avoid repeated UI
+        /// publication churn while background work is running.
+        /// </summary>
+        [TestMethod]
+        public async Task LoadDfAsync_ConsumesConversationSnapshotsWithoutRepeatedUiPublishes()
+        {
+            var folder = new Mock<Folder>(MockBehavior.Strict);
+            folder.SetupGet(x => x.Name).Returns("Inbox");
+            _mockMailItem.SetupGet(x => x.Parent).Returns(folder.Object);
+
+            var table = CreateConversationTable();
+            var conversation = new Mock<Conversation>(MockBehavior.Loose);
+            conversation.Setup(x => x.GetTable()).Returns(table.Object);
+            _mockMailItem.Setup(x => x.GetConversation()).Returns(conversation.Object);
+
+            var resolver = new ConversationResolver(
+                _mockGlobals.Object,
+                _mockMailItem.Object,
+                new CancellationTokenSource(),
+                CancellationToken.None
+            );
+
+            await resolver.LoadDfAsync(CancellationToken.None, backgroundLoad: false);
+
+            var dataframePair = GetPropertyValue(resolver, "Df");
+            var expanded = GetPropertyValue(dataframePair, "Expanded");
+            var sameFolder = GetPropertyValue(dataframePair, "SameFolder");
+
+            expanded
+                .Should()
+                .NotBeNull(
+                    "expanded conversation snapshots should be materialized through the async loader"
+                );
+            sameFolder
+                .Should()
+                .NotBeNull(
+                    "same-folder conversation snapshots should be materialized through the async loader"
+                );
+            GetDataFrameRowCount(expanded).Should().Be(1);
+            GetDataFrameRowCount(sameFolder).Should().Be(1);
+            GetPrivateField<int>(resolver, "_uiPublishCount").Should().Be(0);
+            conversation.Verify(x => x.GetTable(), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task LoadAsync_WithPreloadedHelperAndLoadAllTrue_ReusesHelperForSingleItemConversation()
+        {
+            var globals = CreateResolverGlobals();
+            var folder = new Mock<Folder>(MockBehavior.Strict);
+            var conversation = new Mock<Conversation>(MockBehavior.Loose);
+            var table = CreateConversationTable();
+            var mailItem = CreateMailItem("entry-1", "Subject 1");
+            var tokenSource = new CancellationTokenSource();
+
+            folder.SetupGet(x => x.Name).Returns("Inbox");
+            folder.SetupGet(x => x.FolderPath).Returns("\\Archive\\Inbox");
+            mailItem.SetupGet(x => x.Parent).Returns(folder.Object);
+            mailItem.Setup(x => x.GetConversation()).Returns(conversation.Object);
+            conversation.Setup(x => x.GetTable()).Returns(table.Object);
+
+            var helper = await MailItemHelper.FromMailItemAsync(
+                mailItem.Object,
+                globals.Object,
+                CancellationToken.None,
+                loadAll: false
+            );
+
+            var resolver = await ConversationResolver.LoadAsync(
+                globals.Object,
+                helper,
+                tokenSource,
+                CancellationToken.None,
+                loadAll: true
+            );
+
+            resolver.ConversationInfo.Expanded.Should().ContainSingle();
+            resolver.ConversationInfo.Expanded[0].Should().BeSameAs(helper);
+            resolver.ConversationItems.Expanded.Should().ContainSingle();
+            resolver.ConversationItems.Expanded[0].Should().BeSameAs(mailItem.Object);
+        }
+
+        [TestMethod]
+        public async Task LoadAsync_WithMailItemAndLoadAllTrue_LoadsConversationInfoAndItems()
+        {
+            var globals = CreateResolverGlobals();
+            var folder = new Mock<Folder>(MockBehavior.Strict);
+            var conversation = new Mock<Conversation>(MockBehavior.Loose);
+            var table = CreateConversationTable();
+            var mailItem = CreateMailItem("entry-1", "Subject 1");
+            var tokenSource = new CancellationTokenSource();
+
+            folder.SetupGet(x => x.Name).Returns("Inbox");
+            folder.SetupGet(x => x.FolderPath).Returns("\\Archive\\Inbox");
+            mailItem.SetupGet(x => x.Parent).Returns(folder.Object);
+            mailItem.Setup(x => x.GetConversation()).Returns(conversation.Object);
+            conversation.Setup(x => x.GetTable()).Returns(table.Object);
+
+            var resolver = await ConversationResolver.LoadAsync(
+                globals.Object,
+                mailItem.Object,
+                tokenSource,
+                CancellationToken.None,
+                loadAll: true
+            );
+
+            resolver.ConversationInfo.Expanded.Should().ContainSingle();
+            resolver.ConversationItems.Expanded.Should().ContainSingle();
+        }
+
+        [TestMethod]
+        public async Task LoadAsync_WithPreloadedHelperAndLoadAllFalse_ReturnsResolverWithStagedDataFrame()
+        {
+            var globals = CreateResolverGlobals();
+            var folder = new Mock<Folder>(MockBehavior.Strict);
+            var conversation = new Mock<Conversation>(MockBehavior.Loose);
+            var table = CreateConversationTable();
+            var mailItem = CreateMailItem("entry-1", "Subject 1");
+            var tokenSource = new CancellationTokenSource();
+
+            folder.SetupGet(x => x.Name).Returns("Inbox");
+            folder.SetupGet(x => x.FolderPath).Returns("\\Archive\\Inbox");
+            mailItem.SetupGet(x => x.Parent).Returns(folder.Object);
+            mailItem.Setup(x => x.GetConversation()).Returns(conversation.Object);
+            conversation.Setup(x => x.GetTable()).Returns(table.Object);
+
+            var helper = await MailItemHelper.FromMailItemAsync(
+                mailItem.Object,
+                globals.Object,
+                CancellationToken.None,
+                loadAll: false
+            );
+
+            var resolver = await ConversationResolver.LoadAsync(
+                globals.Object,
+                helper,
+                tokenSource,
+                CancellationToken.None,
+                loadAll: false
+            );
+
+            resolver.Should().NotBeNull();
+            GetPropertyValue(GetPropertyValue(resolver, "Df"), "Expanded").Should().NotBeNull();
+        }
+
+        private static object GetPropertyValue(object target, string propertyName)
+        {
+            var property = target
+                .GetType()
+                .GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+            property.Should().NotBeNull($"property '{propertyName}' must exist");
+            return property.GetValue(target);
+        }
+
+        private static long GetDataFrameRowCount(object dataFrame)
+        {
+            var rows = GetPropertyValue(dataFrame, "Rows");
+            var countProperty = rows.GetType().GetProperty("Count");
+            if (countProperty != null)
+            {
+                return System.Convert.ToInt64(countProperty.GetValue(rows));
+            }
+
+            var countMethod = rows.GetType().GetMethod("Count", System.Type.EmptyTypes);
+            countMethod.Should().NotBeNull("dataframe rows should expose Count semantics");
+            if (countMethod == null)
+            {
+                Assert.Fail("Dataframe rows should expose Count semantics.");
+            }
+
+            return System.Convert.ToInt64(countMethod.Invoke(rows, null));
+        }
+
+        private static Mock<Table> CreateConversationTable()
+        {
+            var table = new Mock<Table>(MockBehavior.Strict);
+            var columns = new Mock<Columns>(MockBehavior.Strict);
+            var row = new Mock<Row>(MockBehavior.Strict);
+            var data = new object[,]
+            {
+                { "2024-01-01", "Inbox", "IPM.Note", "entry-1" },
+            };
+            var rawValues = new object[] { "2024-01-01", "Inbox", "IPM.Note", "entry-1" };
+            var columnNames = new[] { "SentOn", "Folder Name", "MessageClass", "EntryID" };
+
+            table.SetupGet(x => x.Columns).Returns(columns.Object);
+            var currentRow = 0;
+            table.Setup(x => x.MoveToStart()).Callback(() => currentRow = 0);
+            table.Setup(x => x.GetRowCount()).Returns(1);
+            table.Setup(x => x.GetArray(1)).Returns(data);
+            table.Setup(x => x.EndOfTable).Returns(() => currentRow >= 1);
+            table
+                .Setup(x => x.GetNextRow())
+                .Returns(() =>
+                {
+                    currentRow++;
+                    return row.Object;
+                });
+            columns.Setup(x => x.Count).Returns(columnNames.Length);
+            columns.Setup(x => x.Remove(It.IsAny<object>()));
+            columns
+                .Setup(x => x.Add(It.IsAny<string>()))
+                .Returns(() => new Mock<Column>(MockBehavior.Loose).Object);
+            row.Setup(x => x.GetValues()).Returns(rawValues);
+
+            for (var index = 0; index < columnNames.Length; index++)
+            {
+                var column = new Mock<Column>(MockBehavior.Strict);
+                column.SetupGet(x => x.Name).Returns(columnNames[index]);
+                columns.Setup(x => x[index + 1]).Returns(column.Object);
+            }
+
+            return table;
+        }
+
+        private static Mock<IApplicationGlobals> CreateResolverGlobals()
+        {
+            var session = new Mock<NameSpace>(MockBehavior.Loose);
+            var outlookApp = new Mock<Application>(MockBehavior.Strict);
+            var archiveRoot = new Mock<Folder>(MockBehavior.Strict);
+            var inboxRoot = new Mock<Folder>(MockBehavior.Strict);
+            var olObjects = new Mock<IOlObjects>(MockBehavior.Strict);
+            var globals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
+
+            archiveRoot.SetupGet(x => x.FolderPath).Returns("\\Archive");
+            inboxRoot.SetupGet(x => x.FolderPath).Returns("\\Inbox");
+            outlookApp.Setup(x => x.GetNamespace("MAPI")).Returns(session.Object);
+            olObjects.SetupGet(x => x.App).Returns(outlookApp.Object);
+            olObjects.SetupGet(x => x.ArchiveRoot).Returns(archiveRoot.Object);
+            olObjects.SetupGet(x => x.Inbox).Returns(inboxRoot.Object);
+            olObjects.SetupGet(x => x.ArchiveRootPath).Returns("\\Archive");
+            olObjects.SetupGet(x => x.EmailPrefixToStrip).Returns(string.Empty);
+            globals.SetupGet(x => x.Ol).Returns(olObjects.Object);
+
+            return globals;
+        }
+
+        private static Mock<MailItem> CreateMailItem(string entryId, string subject)
+        {
+            var senderAccessor = new Mock<PropertyAccessor>(MockBehavior.Loose);
+            var sender = new Mock<AddressEntry>(MockBehavior.Strict);
+            sender
+                .SetupGet(x => x.AddressEntryUserType)
+                .Returns(OlAddressEntryUserType.olSmtpAddressEntry);
+            sender.SetupGet(x => x.Name).Returns("Ada Sender");
+            sender.SetupGet(x => x.Address).Returns("ada@example.com");
+            sender.SetupGet(x => x.PropertyAccessor).Returns(senderAccessor.Object);
+
+            var recipientAccessor = new Mock<PropertyAccessor>(MockBehavior.Loose);
+            var recipientAddress = new Mock<AddressEntry>(MockBehavior.Strict);
+            recipientAddress
+                .SetupGet(x => x.AddressEntryUserType)
+                .Returns(OlAddressEntryUserType.olSmtpAddressEntry);
+            recipientAddress.SetupGet(x => x.Name).Returns("To User");
+            recipientAddress.SetupGet(x => x.Address).Returns("to@example.com");
+            recipientAddress.SetupGet(x => x.PropertyAccessor).Returns(recipientAccessor.Object);
+
+            var recipient = new Mock<Recipient>(MockBehavior.Strict);
+            recipient.SetupGet(x => x.Name).Returns("To User");
+            recipient.SetupGet(x => x.Address).Returns("to@example.com");
+            recipient.SetupGet(x => x.Type).Returns((int)OlMailRecipientType.olTo);
+            recipient.SetupGet(x => x.AddressEntry).Returns(recipientAddress.Object);
+            recipient.SetupGet(x => x.PropertyAccessor).Returns(recipientAccessor.Object);
+
+            var recipients = new Mock<Recipients>(MockBehavior.Strict);
+            recipients.SetupGet(x => x.Count).Returns(1);
+            recipients
+                .Setup(x => x.GetEnumerator())
+                .Returns(() =>
+                    new object[] { recipient.Object }
+                        .Cast<object>()
+                        .GetEnumerator()
+                );
+
+            var attachments = new Mock<Attachments>(MockBehavior.Strict);
+            attachments.SetupGet(x => x.Count).Returns(0);
+            attachments
+                .Setup(x => x.GetEnumerator())
+                .Returns(() => System.Array.Empty<object>().Cast<object>().GetEnumerator());
+
+            var mailItem = new Mock<MailItem>(MockBehavior.Strict);
+            mailItem.SetupGet(x => x.EntryID).Returns(entryId);
+            mailItem.SetupGet(x => x.ConversationID).Returns("conversation-1");
+            mailItem.SetupGet(x => x.Subject).Returns(subject);
+            mailItem.SetupGet(x => x.Body).Returns("Body");
+            mailItem.SetupGet(x => x.HTMLBody).Returns("<html><body>Body</body></html>");
+            mailItem.SetupGet(x => x.SenderName).Returns("Ada Sender");
+            mailItem.SetupGet(x => x.SenderEmailAddress).Returns("ada@example.com");
+            mailItem.SetupGet(x => x.Sender).Returns(sender.Object);
+            mailItem.SetupGet(x => x.Recipients).Returns(recipients.Object);
+            mailItem.SetupGet(x => x.Attachments).Returns(attachments.Object);
+            mailItem.SetupGet(x => x.InternetCodepage).Returns(65001);
+            return mailItem;
+        }
+
+        private static T GetPrivateField<T>(object target, string fieldName)
+        {
+            var field = target
+                .GetType()
+                .GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+            field.Should().NotBeNull($"field '{fieldName}' should exist");
+            if (field == null)
+            {
+                Assert.Fail($"Field '{fieldName}' should exist.");
+            }
+
+            return (T)field.GetValue(target);
         }
     }
 }

@@ -21,11 +21,30 @@ namespace UtilitiesCS
 {
     //public enum
 
-    public static class ConvHelper
+    public static partial class ConvHelper
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
+
+        private static string DescribeSynchronizationContext(SynchronizationContext syncContext)
+        {
+            return syncContext?.GetType().FullName ?? "null";
+        }
+
+        private static string BuildConversationTimingContext()
+        {
+            return $"threadId={Thread.CurrentThread.ManagedThreadId}; syncContext={DescribeSynchronizationContext(SynchronizationContext.Current)}";
+        }
+
+        private static void LogConversationTiming(string phase, string details = null)
+        {
+            var detailSegment = string.IsNullOrWhiteSpace(details) ? string.Empty : $" | {details}";
+            var phaseLabel = phase.StartsWith("[Conversation timing]", StringComparison.Ordinal)
+                ? phase
+                : $"[Conversation timing] {phase}";
+            logger.Debug($"{phaseLabel} | {BuildConversationTimingContext()}{detailSegment}");
+        }
 
         internal static object SafeResolveConversationItem(
             object namespaceRef,
@@ -224,6 +243,11 @@ namespace UtilitiesCS
             CancellationToken token
         )
         {
+            var conversationStopwatch = Stopwatch.StartNew();
+            LogConversationTiming(
+                "[Conversation timing] GetConversationDfAsync conversation acquisition start | conversation acquisition",
+                "timeoutMs=1000; retryCount=3"
+            );
             var conv = await TimeOutTask.RunWithTimeout(
                 () => mailItem.GetConversation(),
                 token,
@@ -231,7 +255,22 @@ namespace UtilitiesCS
                 3,
                 false
             );
+
+            LogConversationTiming(
+                "GetConversationDfAsync conversation acquisition complete | conversation acquisition",
+                $"timeoutMs=1000; retryCount=3; elapsedMs={conversationStopwatch.ElapsedMilliseconds}"
+            );
+
+            // Capture the GetConversationTable snapshot before background transform handoff.
+            LogConversationTiming(
+                "GetConversationDfAsync snapshot handoff start | snapshot handoff",
+                $"source={nameof(GetConversationTable)}"
+            );
             var df = await conv.GetDataFrameAsync(token);
+            LogConversationTiming(
+                "GetConversationDfAsync snapshot handoff complete | snapshot handoff",
+                $"source={nameof(GetConversationTable)}; elapsedMs={conversationStopwatch.ElapsedMilliseconds}"
+            );
             return df;
         }
 
@@ -246,6 +285,12 @@ namespace UtilitiesCS
         {
             token.ThrowIfCancellationRequested();
 
+            var retryStopwatch = Stopwatch.StartNew();
+            LogConversationTiming(
+                "GetConversationDfAsync retryable conversation acquisition start | conversation acquisition",
+                $"timeoutMs={timeout}; retryCount={retryCount}"
+            );
+
             var timeoutCancellation = new CancellationTokenSource(timeout);
             var combinedCancellation = CancellationTokenSource.CreateLinkedTokenSource(
                 token,
@@ -256,23 +301,21 @@ namespace UtilitiesCS
 
             try
             {
-                await Task.Run(
+                df = await TimeOutTask.RunWithTimeout(
                     () =>
                     {
                         Outlook.Conversation conv = mailItem.GetConversation();
-                        df = conv.GetDataFrame();
+                        return conv.GetDataFrame();
                     },
-                    combinedCancellation.Token
+                    combinedCancellation.Token,
+                    timeout,
+                    retryCount + 1,
+                    false
                 );
-                //await Task.Factory.StartNew(
-                //    () =>
-                //    {
-                //        Outlook.Conversation conv = mailItem.GetConversation();
-                //        df = conv.GetDataFrame();
-                //    },
-                //    combinedCancellation.Token,
-                //    options,
-                //    scheduler);
+                LogConversationTiming(
+                    "GetConversationDfAsync retryable conversation acquisition complete | conversation acquisition",
+                    $"timeoutMs={timeout}; retryCount={retryCount}; elapsedMs={retryStopwatch.ElapsedMilliseconds}"
+                );
             }
             catch (OperationCanceledException e)
             {
@@ -345,279 +388,5 @@ namespace UtilitiesCS
         }
 
         //WAITING: If GetInfoMethod can get all the data, map this method to MailItemInfo class
-        public static DataFrame GetInfoDf(this Conversation conversation)
-        {
-            Outlook.Table table = conversation.GetInfoTable();
-            (object[,] data, Dictionary<string, int> columnInfo) = table.ETL();
-            var df = data.ToDataFrame(columnInfo.Keys.ToArray());
-            df.Display();
-            return df;
-        }
-
-        //QUESTION: Can we get all the info we need from the GetInfoTable method?
-        public static Table GetInfoTable(this Conversation conversation)
-        {
-            Outlook.Table table = conversation.GetTable();
-            if (table != null)
-            {
-                // add From
-                string[] columnsToAdd = new string[]
-                {
-                    "SentOn",
-                    MAPIFields.Schemas.FolderName,
-                    //OlTableExtensions.SchemaMessageStore,
-                    MAPIFields.Schemas.ConversationDepth,
-                    MAPIFields.Schemas.ConversationIndex,
-                    MAPIFields.Schemas.ConversationTopic,
-                    MAPIFields.Schemas.ConversationId,
-                    MAPIFields.Schemas.ReceivedByName,
-                };
-                foreach (string columnName in columnsToAdd)
-                {
-                    table.Columns.Add(columnName);
-                }
-            }
-            return table;
-        }
-
-        internal static string[] ConversationColumnSchemas =>
-            new string[]
-            {
-                "SentOn",
-                MAPIFields.Schemas.FolderName,
-                MAPIFields.Schemas.SenderName,
-                MAPIFields.Schemas.SenderSmtpAddress,
-                MAPIFields.Schemas.SenderAddrType,
-                "EntryID",
-                MAPIFields.Schemas.MessageStore,
-                MAPIFields.Schemas.ConversationDepth,
-                MAPIFields.Schemas.ConversationIndex,
-            };
-
-        public static DataFrame GetDataFrame(this Outlook.Conversation conversation)
-        {
-            Table table = conversation.GetConversationTable();
-
-            (object[,] data, Dictionary<string, int> columnInfo) = table.ETL();
-
-            return data.ToDataFrame(columnInfo.Keys.ToArray());
-        }
-
-        public static async Task<DataFrame> GetDataFrameAsync(
-            this Outlook.Conversation conversation,
-            CancellationToken token
-        )
-        {
-            Table table = await TimeOutTask.RunWithTimeout(
-                GetConversationTable,
-                conversation,
-                token,
-                1000,
-                3,
-                false
-            );
-            if (table is null)
-            {
-                return null;
-            }
-            else
-            {
-                (object[,] data, Dictionary<string, int> columnInfo) =
-                    await TimeOutTask.RunWithTimeout(() => table.ETL(), token, 1000, 3, false);
-                return data.ToDataFrame(columnInfo.Keys.ToArray());
-            }
-        }
-
-        public static Table GetConversationTable(this Conversation conversation)
-        {
-            Outlook.Table table = conversation.GetTable();
-            table.RemoveColumns(["EntryID"]);
-            ConversationColumnSchemas.ForEach(schema => table.Columns.Add(schema));
-            return table;
-        }
-
-        public static Outlook.Table GetTable(
-            this Outlook.Conversation conversation,
-            bool WithFolder,
-            bool WithStore
-        )
-        {
-            if (conversation != null)
-            {
-                Outlook.Table table = conversation.GetTable();
-                table.Columns.Add("SentOn");
-                if (WithFolder)
-                {
-                    table.Columns.Add(MAPIFields.Schemas.FolderName);
-                }
-                if (WithStore)
-                {
-                    table.Columns.Add(MAPIFields.Schemas.MessageStore);
-                }
-                return table;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public static string EnumerateColumnHeaders(
-            this Outlook.Table table,
-            (int FieldWidth, Justify Justification)[] styleParams,
-            string columnDivider,
-            string rowBookends
-        )
-        {
-            string[] headers = table.GetColumnHeaders();
-            //for (int j = 0; j < headers.Length; j++)
-            //{
-            //    var style = styleParams[j];
-            //    string header = headers[j];
-            //    header = header.PadOrTrunc(style.FieldWidth, style.Justification, ' ');
-            //}
-            //string headerString = rowBookends + string.Join(columnDivider, headers) + rowBookends;
-            string headerString = headers.JoinFixedWidth(styleParams, columnDivider, rowBookends);
-
-            Debug.WriteLine(headerString);
-
-            return headerString;
-        }
-
-        internal static string PadOrTrunc(
-            this string fieldName,
-            int fieldWidth,
-            Justify justification,
-            char paddingChar
-        )
-        {
-            switch (justification)
-            {
-                case Justify.Right:
-                    if (fieldName.Length > fieldWidth)
-                    {
-                        fieldName = ".." + fieldName.Substring(fieldName.Length - fieldWidth - 2);
-                    }
-                    else
-                    {
-                        fieldName = fieldName.PadLeft(fieldWidth, paddingChar);
-                    }
-                    break;
-                case Justify.Left:
-                    if (fieldName.Length > fieldWidth)
-                    {
-                        fieldName = fieldName.Substring(0, fieldWidth - 2) + "..";
-                    }
-                    else
-                    {
-                        fieldName = fieldName.PadRight(fieldWidth, paddingChar);
-                    }
-                    break;
-                case Justify.Center:
-                    if (fieldName.Length > fieldWidth)
-                    {
-                        fieldName = fieldName.Substring(0, fieldWidth - 2) + "..";
-                    }
-                    else
-                    {
-                        int paddingLength = fieldWidth - fieldName.Length;
-                        int lenWithPadLeft =
-                            (int)Math.Round(paddingLength / 2.0, 0) + fieldName.Length;
-                        fieldName = fieldName.PadLeft(lenWithPadLeft, paddingChar);
-                        fieldName = fieldName.PadRight(fieldWidth, paddingChar);
-                    }
-                    break;
-            }
-            return fieldName;
-        }
-
-        public static string JoinFixedWidth(
-            this string[] rowCells,
-            (int FieldWidth, Justify Justification)[] styleParams,
-            string columnDivider,
-            string rowBookends
-        )
-        {
-            for (int j = 0; j < rowCells.Length; j++)
-            {
-                rowCells[j] = rowCells[j]
-                    .PadOrTrunc(styleParams[j].FieldWidth, styleParams[j].Justification, ' ');
-            }
-            string rowString = rowBookends + string.Join(columnDivider, rowCells) + rowBookends;
-
-            Debug.WriteLine(rowString);
-            return rowString;
-        }
-
-        public static Outlook.Conversation GetConversation(this object ObjItem)
-        {
-            if (ObjItem == null)
-            {
-                return null;
-            }
-            else if (ObjItem is MailItem)
-            {
-                return ((MailItem)ObjItem).GetConversation();
-            }
-            else if (ObjItem is MeetingItem)
-            {
-                return ((MeetingItem)ObjItem).GetConversation();
-            }
-            else if (ObjItem is PostItem)
-            {
-                return ((PostItem)ObjItem).GetConversation();
-            }
-            return null;
-        }
-
-        // dynamic type version of GetConversation
-        //public static Conversation GetConversation(object ObjItem)
-        //{
-        //    if (ObjItem.IsSupportedType())
-        //    {
-        //        dynamic Item = ObjItem;
-        //        Folder folder = Item.Parent;
-        //        Store store = folder.Store;
-        //        if (store.IsConversationEnabled == true)
-        //        {
-        //            return Item.GetConversation();
-        //        }
-        //    }
-        //    return null;
-        //}
-
-        public static bool IsSupportedType(this object ObjItem)
-        {
-            return ((ObjItem is MailItem) || (ObjItem is MeetingItem) || (ObjItem is PostItem));
-        }
-
-        internal static Type ResolveType(object Item)
-        {
-            string errMessage =
-                $"{Item.GetType()} is not a member of Outlook.Conversation. "
-                + "Item must belong to one of the following \n"
-                + typeof(MailItem)
-                + "\n"
-                + typeof(PostItem)
-                + " or\n"
-                + typeof(MeetingItem);
-
-            if (Item is MailItem)
-            {
-                return typeof(MailItem);
-            }
-            else if (Item is MeetingItem)
-            {
-                return typeof(MeetingItem);
-            }
-            else if (Item is PostItem)
-            {
-                return typeof(PostItem);
-            }
-            else
-            {
-                throw new ArgumentException(errMessage);
-            }
-        }
     }
 }

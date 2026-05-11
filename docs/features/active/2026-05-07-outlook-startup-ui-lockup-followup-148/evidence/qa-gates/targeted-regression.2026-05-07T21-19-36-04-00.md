@@ -1,0 +1,24 @@
+# Phase 6 Targeted Regression Verification
+
+Timestamp: 2026-05-07T21:19:36.1464734-04:00
+Source Artifact: evidence/qa-gates/csharp-mstest-coverage.2026-05-07T21-19-13-04-00.md
+Verified Test Files:
+- TaskMaster.Test/AppGlobals/AppEventsTests.cs
+- QuickFiler.Test/Controllers/EfcHomeControllerTests.cs
+- QuickFiler.Test/Controllers/EfcDataModelTests.cs
+- QuickFiler.Test/Helper Classes/ConversationResolverTests.cs
+- UtilitiesCS.Test/Extensions/DfDeedle_COM_Tests.cs
+- UtilitiesCS.Test/OutlookObjects/Conversation/ConversationHelper_ExtendedTests.cs
+- UtilitiesCS.Test/OutlookObjects/MailItem/MailItemHelperCoreTests.cs
+- UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensions_Tests.cs
+Verified Test Names:
+- LoadAsync_EmitsStartupInboxTimingEnvelopeBeforeDeferredProcessingWindow
+- ProcessNewInboxItemsAsync_BatchesMailboxProcessingAfterInteractiveCheckpoint
+- HandleSelectionChangedAsync_CapturesSelectionSnapshotBeforeBackgroundModelLoad
+- CreateAsync_StagesSnapshotLoadBeforeBackgroundInitialization
+- LoadDfAsync_ConsumesConversationSnapshotsWithoutRepeatedUiPublishes
+- GetEmailDataInViewAsync_SeparatesTableSnapshotFromDataFrameTransform
+- GetConversationDfAsync_CapturesConversationTableSnapshotBeforeBackgroundTransform
+- FromMailItemAsync_MaterializesComDataBeforeAsyncProjection
+- GetTableInViewAsync_ReturnsSnapshotWithoutTaskRunWrappedComAccess
+Contingent Regression Included: false

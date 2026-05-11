@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
@@ -22,6 +23,25 @@ namespace QuickFiler.Controllers
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
 
+        private static string DescribeSynchronizationContext(SynchronizationContext syncContext)
+        {
+            return syncContext?.GetType().FullName ?? "null";
+        }
+
+        private static string BuildDataModelTimingContext()
+        {
+            return $"threadId={Thread.CurrentThread.ManagedThreadId}; syncContext={DescribeSynchronizationContext(SynchronizationContext.Current)}";
+        }
+
+        private static void LogDataModelTiming(string phase, string details = null)
+        {
+            var detailSegment = string.IsNullOrWhiteSpace(details) ? string.Empty : $" | {details}";
+            var phaseLabel = phase.StartsWith("[Data model timing]", StringComparison.Ordinal)
+                ? phase
+                : $"[Data model timing] {phase}";
+            logger.Debug($"{phaseLabel} | {BuildDataModelTimingContext()}{detailSegment}");
+        }
+
         #region Constructors and Initializers
 
         public EfcDataModel(
@@ -31,15 +51,30 @@ namespace QuickFiler.Controllers
             CancellationToken token
         )
         {
+            var constructorStopwatch = Stopwatch.StartNew();
+            LogDataModelTiming("EfcDataModel constructor load start | constructor load");
             Globals = globals;
             Token = token;
             TokenSource = tokenSource;
             Mail = mail ?? TryGetFirstInSelection();
             if (Mail is not null)
             {
+                LogDataModelTiming(
+                    "EfcDataModel constructor snapshot load start | constructor load",
+                    "constructor snapshot load"
+                );
                 ConversationResolver = new ConversationResolver(Globals, Mail, TokenSource, Token);
                 _conversationResolver.Df = _conversationResolver.LoadDf(); // Load Synchronously
+                LogDataModelTiming(
+                    "EfcDataModel constructor snapshot load complete | constructor load",
+                    $"constructor snapshot load elapsedMs={constructorStopwatch.ElapsedMilliseconds}"
+                );
             }
+
+            LogDataModelTiming(
+                "EfcDataModel constructor load complete | constructor load",
+                $"mailLoaded={Mail is not null}; elapsedMs={constructorStopwatch.ElapsedMilliseconds}"
+            );
         }
 
         private EfcDataModel(IApplicationGlobals globals, MailItem mail)
@@ -58,13 +93,26 @@ namespace QuickFiler.Controllers
         {
             globals.ThrowIfNull(nameof(globals));
             mailItems.ThrowIfNullOrEmpty(nameof(mailItems));
+            var mailSelectionSnapshot = mailItems.ToArray();
 
-            var dataModel = new EfcDataModel(globals, mailItems[0]);
-            if (mailItems.Count() > 1)
+            var createStopwatch = Stopwatch.StartNew();
+            LogDataModelTiming(
+                "[Data model timing] CreateAsync snapshot load stage | snapshot load",
+                $"mailItemCount={mailSelectionSnapshot.Length}"
+            );
+
+            var dataModel = new EfcDataModel(globals, mailSelectionSnapshot[0]);
+            LogDataModelTiming(
+                "[Data model timing] CreateAsync background initialization stage | background initialization",
+                $"mailItemCount={mailSelectionSnapshot.Length}; loadAll={loadAll}"
+            );
+            // Freeze the selection membership during the snapshot load stage so the later
+            // background initialization stage does not have to re-enumerate the live selection.
+            if (mailSelectionSnapshot.Length > 1)
             {
                 dataModel.ConversationResolver = await ConversationResolver.LoadAsync(
                     globals,
-                    mailItems,
+                    mailSelectionSnapshot,
                     tokenSource,
                     token
                 );
@@ -74,13 +122,18 @@ namespace QuickFiler.Controllers
             {
                 dataModel.ConversationResolver = await ConversationResolver.LoadAsync(
                     globals,
-                    mailItems[0],
+                    mailSelectionSnapshot[0],
                     tokenSource,
                     token,
                     loadAll
                 );
                 dataModel.ConversationResolver.Parent = dataModel;
             }
+
+            LogDataModelTiming(
+                "CreateAsync model-ready publication | model-ready publication",
+                $"mailItemCount={mailSelectionSnapshot.Length}; elapsedMs={createStopwatch.ElapsedMilliseconds}"
+            );
 
             return dataModel;
         }

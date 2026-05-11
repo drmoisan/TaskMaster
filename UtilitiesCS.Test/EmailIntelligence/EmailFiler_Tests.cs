@@ -312,9 +312,18 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var property = new Mock<UserProperty>();
             property.SetupProperty(x => x.Value);
             var userProperties = new Mock<UserProperties>();
-            userProperties.Setup(x => x.Find("AutoSorted")).Returns((UserProperty)null);
             userProperties
-                .Setup(x => x.Add("AutoSorted", OlUserPropertyType.olText))
+                .Setup(x => x.Find("AutoSorted", It.IsAny<object>()))
+                .Returns((UserProperty)null);
+            userProperties
+                .Setup(x =>
+                    x.Add(
+                        "AutoSorted",
+                        OlUserPropertyType.olText,
+                        It.IsAny<object>(),
+                        It.IsAny<object>()
+                    )
+                )
                 .Returns(property.Object);
             var mailItem = new Mock<MailItem>();
             mailItem.SetupGet(x => x.UserProperties).Returns(userProperties.Object);
