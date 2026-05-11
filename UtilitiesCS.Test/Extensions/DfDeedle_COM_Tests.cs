@@ -750,7 +750,9 @@ namespace UtilitiesCS.Test.Extensions
             var mockTable = new Mock<Outlook.Table>(MockBehavior.Loose);
             mockTable.SetupGet(t => t.Columns).Returns(mockColumns.Object);
             var mockFolder = new Mock<Outlook.MAPIFolder>(MockBehavior.Loose);
-            mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
+            mockFolder
+                .Setup(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()))
+                .Returns(mockTable.Object);
             var mockStore = new Mock<Outlook.Store>(MockBehavior.Loose);
             mockStore
                 .Setup(s => s.GetDefaultFolder(It.IsAny<OlDefaultFolders>()))
@@ -810,7 +812,9 @@ namespace UtilitiesCS.Test.Extensions
             var mockTable = new Mock<Outlook.Table>(MockBehavior.Loose);
             mockTable.SetupGet(t => t.Columns).Returns(mockColumns.Object);
             var mockFolder = new Mock<Outlook.MAPIFolder>(MockBehavior.Loose);
-            mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
+            mockFolder
+                .Setup(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()))
+                .Returns(mockTable.Object);
             var mockStore = new Mock<Outlook.Store>(MockBehavior.Loose);
             mockStore
                 .Setup(s => s.GetDefaultFolder(It.IsAny<OlDefaultFolders>()))

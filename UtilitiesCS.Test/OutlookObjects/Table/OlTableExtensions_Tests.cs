@@ -1450,7 +1450,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
         {
             var mockFolder = new Mock<Outlook.MAPIFolder>();
             var (mockTable, mockColumns) = CreateTableWithColumns(new[] { "Subject" });
-            mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
+            mockFolder
+                .Setup(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()))
+                .Returns(mockTable.Object);
 
             var result = OlTableExtensions.GetTable(
                 mockFolder.Object,
@@ -1472,7 +1474,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             mockStore
                 .Setup(s => s.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox))
                 .Returns(mockFolder.Object);
-            mockFolder.Setup(f => f.GetTable()).Returns(mockTable.Object);
+            mockFolder
+                .Setup(f => f.GetTable(It.IsAny<object>(), It.IsAny<object>()))
+                .Returns(mockTable.Object);
 
             var result = mockStore.Object.GetTable(
                 Outlook.OlDefaultFolders.olFolderInbox,

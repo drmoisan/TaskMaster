@@ -363,7 +363,9 @@ namespace TaskMaster.Test.AppGlobals
         private static MailItem CreateMailItem()
         {
             var userProperties = new Mock<UserProperties>(MockBehavior.Strict);
-            userProperties.Setup(x => x.Find("AutoProcessed")).Returns((UserProperty)null!);
+            userProperties
+                .Setup(x => x.Find("AutoProcessed", It.IsAny<object>()))
+                .Returns((UserProperty)null!);
 
             var mailItem = new Mock<MailItem>(MockBehavior.Strict);
             mailItem.SetupGet(x => x.UserProperties).Returns(userProperties.Object);
@@ -419,7 +421,9 @@ namespace TaskMaster.Test.AppGlobals
             var autoProcessed = new Mock<UserProperty>(MockBehavior.Strict);
             autoProcessed.SetupProperty(x => x.Value, false);
             var userProperties = new Mock<UserProperties>(MockBehavior.Strict);
-            userProperties.Setup(x => x.Find("AutoProcessed")).Returns((UserProperty)null!);
+            userProperties
+                .Setup(x => x.Find("AutoProcessed", It.IsAny<object>()))
+                .Returns((UserProperty)null!);
             userProperties
                 .Setup(x =>
                     x.Find(It.Is<string>(name => name == "AutoProcessed"), It.IsAny<object>())
