@@ -590,6 +590,8 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\ConditionalItemEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogic.cs" />
     <Compile Include="EmailIntelligence\Flags\IFlagTranslator.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\IFilterOlFoldersViewer.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FolderRemap\IFolderRemapViewer.cs" />
     <Compile Include="Interfaces\IReusableTypeClasses\IPercentageMatchable.cs" />
     <Compile Include="OutlookObjects\AppointmentItem\MeetingItemHelper.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperNameComparer.cs" />

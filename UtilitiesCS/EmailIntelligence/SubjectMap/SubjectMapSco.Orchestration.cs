@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -69,6 +70,25 @@ namespace UtilitiesCS
 
         public void ShowSummaryMetrics()
         {
+            ShowSummaryMetrics(metrics =>
+            {
+                var smm = new SubjectMapMetrics(metrics);
+                smm.Show();
+            });
+        }
+
+        /// <summary>
+        /// Populates <see cref="summaryMetrics"/> from the current entries and passes the
+        /// result to <paramref name="showViewer"/>. The overload exists to allow unit tests
+        /// to inject a no-op action so that no real window is opened.
+        /// </summary>
+        /// <param name="showViewer">
+        /// Action invoked with the computed metrics. Production code passes a lambda that
+        /// creates and shows <see cref="SubjectMapMetrics"/>; tests pass a no-op or a
+        /// capturing lambda.
+        /// </param>
+        internal void ShowSummaryMetrics(Action<IEnumerable<SummaryMetric>> showViewer)
+        {
             summaryMetrics = this.GroupBy(x => x.Folderpath)
                 .Select(grp => new SummaryMetric
                 {
@@ -78,8 +98,7 @@ namespace UtilitiesCS
                     EmailCount = grp.Sum(x => x.EmailSubjectCount),
                 })
                 .ToList();
-            var smm = new SubjectMapMetrics(summaryMetrics);
-            smm.Show();
+            showViewer(summaryMetrics);
         }
 
         internal void RepopulateSubjectMapEntries(

@@ -301,7 +301,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
             encoder.Verify(x => x.RebuildEncoding(map), Times.Once);
         }
 
-        [STAThread]
         [TestMethod]
         public void ShowSummaryMetrics_WhenEntriesExist_PopulatesSummaryMetricsAndShowsViewer()
         {
@@ -310,7 +309,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             map.Add("status", "Inbox");
             map.Add("receipt", "Sent");
 
-            map.ShowSummaryMetrics();
+            // Use the internal overload so no real WinForms window is opened.
+            map.ShowSummaryMetrics(_ => { });
 
             map.summaryMetrics.Should().HaveCount(2);
             map.summaryMetrics.Should()
@@ -325,12 +325,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
                     && metric.SubjectCount == 1
                     && metric.EmailCount == 1
                 );
-
-            var viewer = System
-                .Windows.Forms.Application.OpenForms.OfType<SubjectMapMetrics>()
-                .Single();
-            viewer.Close();
-            viewer.Dispose();
         }
 
         private static System.Action CreateRebuildAsyncCallback(
@@ -340,7 +334,16 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             var displayClassType = typeof(SubjectMapSco)
                 .GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Instance)
-                .Single(type => type.Name.Contains("DisplayClass21_0"));
+                .Single(type =>
+                    type.GetMethod(
+                        "<RebuildAsync>b__0",
+                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+                    ) != null
+                    && type.GetField(
+                        "appGlobals",
+                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+                    ) != null
+                );
             var closure = Activator.CreateInstance(displayClassType);
 
             displayClassType

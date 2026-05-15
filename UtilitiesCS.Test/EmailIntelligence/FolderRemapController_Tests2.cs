@@ -397,8 +397,20 @@ namespace UtilitiesCS.Test.EmailIntelligence
             mockGlobals.SetupGet(x => x.Ol).Returns(mockOl.Object);
             mockGlobals.SetupGet(x => x.TD).Returns(mockTd.Object);
 
-            // Act: invoke the real constructor, which wires up the viewer and delegates
-            var controller = new FolderRemapController(mockGlobals.Object);
+            // Real controls are needed so that delegate assignments can be verified.
+            using var tlvOriginal = new TreeListView();
+            using var olvMap = new FastObjectListView();
+
+            var mockViewer = new Mock<IFolderRemapViewer>(MockBehavior.Strict);
+            mockViewer.SetupGet(v => v.TlvOriginal).Returns(tlvOriginal);
+            mockViewer.SetupGet(v => v.OlvMap).Returns(olvMap);
+            mockViewer.Setup(v => v.SetController(It.IsAny<FolderRemapController>()));
+            mockViewer.Setup(v => v.Refresh());
+            mockViewer.Setup(v => v.Close());
+            mockViewer.Setup(v => v.Dispose());
+
+            // Act: invoke the internal constructor with the mock viewer — no real window opens
+            var controller = new FolderRemapController(mockGlobals.Object, mockViewer.Object);
 
             // Assert: all delegate fields and tree properties are initialized
             controller.RemapTree.Should().NotBeNull();
@@ -407,7 +419,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
             controller.PutMappedCheckedState.Should().NotBeNull();
             controller.GetCheckedState.Should().NotBeNull();
 
-            // Teardown: close the modeless WinForms viewer to release resources
+            // Show() is never called on the mock — verified by MockBehavior.Strict.
+            mockViewer.Verify(v => v.Show(), Times.Never);
+
+            // Teardown
             controller.Discard();
         }
     }
