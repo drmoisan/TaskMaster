@@ -404,19 +404,25 @@ namespace UtilitiesCS.Test.HelperClasses
             return new StackTrace(1).GetMethodTraceString(value);
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(
+            System.Runtime.CompilerServices.MethodImplOptions.NoInlining
+        )]
         private string CaptureMethodCallLogString(int count, string name)
         {
             return TraceUtility.GetMethodCallLogString(count, name);
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(
+            System.Runtime.CompilerServices.MethodImplOptions.NoInlining
+        )]
         private string CaptureMethodTraceString(string value)
         {
             return FinishMethodTraceStringCapture(value);
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        [System.Runtime.CompilerServices.MethodImpl(
+            System.Runtime.CompilerServices.MethodImplOptions.NoInlining
+        )]
         private string FinishMethodTraceStringCapture(string value)
         {
             return TraceUtility.GetMethodTraceString(value);

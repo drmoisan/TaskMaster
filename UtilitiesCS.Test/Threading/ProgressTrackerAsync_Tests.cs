@@ -197,9 +197,9 @@ namespace UtilitiesCS.Test.Threading
             staThread.Start();
             staThread.Join();
 
-            threadException.Should().BeNull(
-                $"the STA thread must not throw, but it threw: {threadException}"
-            );
+            threadException
+                .Should()
+                .BeNull($"the STA thread must not throw, but it threw: {threadException}");
         }
     }
 }

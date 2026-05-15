@@ -22,7 +22,10 @@ namespace UtilitiesCS
         /// </summary>
         /// <param name="appGlobals">Application globals.</param>
         /// <param name="viewer">Viewer to use. Must not be null.</param>
-        internal FilterOlFoldersController(IApplicationGlobals appGlobals, IFilterOlFoldersViewer viewer)
+        internal FilterOlFoldersController(
+            IApplicationGlobals appGlobals,
+            IFilterOlFoldersViewer viewer
+        )
         {
             _globals = appGlobals;
             _olFolderTree = new FolderTree(
