@@ -30,7 +30,9 @@ namespace UtilitiesCS.Extensions
                     }
                     else
                     {
-                        var m = sf.GetFrame(i).GetMethod();
+                        var m = sf.GetFrame(i)?.GetMethod();
+                        if (m == null)
+                            continue;
                         if (m.Name == methodName)
                         {
                             caller = m;

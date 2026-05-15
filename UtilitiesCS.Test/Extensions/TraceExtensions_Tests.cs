@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.Extensions;
@@ -120,6 +121,7 @@ namespace UtilitiesCS.Test.Extensions
             nullMethod.TryGetParameterName(0).Should().BeEmpty();
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private static MethodBase ResolveCaller(string methodName)
         {
             var trace = new StackTrace();

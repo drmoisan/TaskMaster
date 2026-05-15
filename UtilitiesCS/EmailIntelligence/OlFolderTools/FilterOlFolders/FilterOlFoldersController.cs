@@ -13,6 +13,16 @@ namespace UtilitiesCS
     public class FilterOlFoldersController
     {
         public FilterOlFoldersController(IApplicationGlobals appGlobals)
+            : this(appGlobals, CreateAndShowViewer()) { }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="FilterOlFoldersController"/> with an
+        /// injected viewer. Intended for unit testing: pass a
+        /// <see cref="IFilterOlFoldersViewer"/> mock so that no real window is opened.
+        /// </summary>
+        /// <param name="appGlobals">Application globals.</param>
+        /// <param name="viewer">Viewer to use. Must not be null.</param>
+        internal FilterOlFoldersController(IApplicationGlobals appGlobals, IFilterOlFoldersViewer viewer)
         {
             _globals = appGlobals;
             _olFolderTree = new FolderTree(
@@ -20,19 +30,24 @@ namespace UtilitiesCS
                 _globals.TD.FilteredFolderScraping.Keys.ToList()
             );
             _olFolderTree.PropertyChanged += OlFolderTree_PropertyChanged;
-            _viewer = new FilterOlFoldersViewer();
+            _viewer = viewer;
             _viewer.SetController(this);
             //PutCheckedState = PutCheckedStateMethod;
             _viewer.TlvNotFiltered.CheckStateGetter = GetCheckedState;
             _viewer.TlvNotFiltered.CheckStatePutter = PutCheckedStateMethodNotFiltered;
             _viewer.TlvFiltered.CheckStateGetter = GetCheckedState;
             _viewer.TlvFiltered.CheckStatePutter = PutCheckedStateMethodFiltered;
+        }
 
-            _viewer.Show();
+        private static IFilterOlFoldersViewer CreateAndShowViewer()
+        {
+            var viewer = new FilterOlFoldersViewer();
+            viewer.Show();
+            return viewer;
         }
 
         private IApplicationGlobals _globals;
-        private FilterOlFoldersViewer _viewer;
+        private IFilterOlFoldersViewer _viewer;
 
         private FolderTree _olFolderTree;
         public FolderTree OlFolderTree

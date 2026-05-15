@@ -12,12 +12,17 @@ using ObjectListViewDemo;
 
 namespace UtilitiesCS
 {
-    public partial class FilterOlFoldersViewer : Form
+    public partial class FilterOlFoldersViewer : Form, IFilterOlFoldersViewer
     {
         public FilterOlFoldersViewer()
         {
             InitializeComponent();
         }
+
+        // Explicit interface properties expose the designer-generated internal fields
+        // through the IFilterOlFoldersViewer contract.
+        TreeListView IFilterOlFoldersViewer.TlvNotFiltered => TlvNotFiltered;
+        TreeListView IFilterOlFoldersViewer.TlvFiltered => TlvFiltered;
 
         private FilterOlFoldersController _controller;
 

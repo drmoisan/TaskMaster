@@ -124,66 +124,82 @@ namespace UtilitiesCS.Test.Threading
         }
 
         [TestMethod]
-        [STAThread]
-        public async Task InitializeAsync_WithCurrentDispatcher_InitializesAndReturnsTracker()
+        public void InitializeAsync_WithCurrentDispatcher_InitializesAndReturnsTracker()
         {
-            using var cts = new CancellationTokenSource();
-            var tracker = new ProgressTrackerAsync(cts);
-            ProgressViewer? shownViewer = null;
-            var previousContext = SynchronizationContext.Current;
-            var dispatcherField = typeof(UiThread).GetField(
-                "_dispatcher",
-                BindingFlags.NonPublic | BindingFlags.Static
-            );
-            dispatcherField.Should().NotBeNull();
+            Exception threadException = null;
 
-            var currentDispatcher = Dispatcher.CurrentDispatcher;
-            var previousDispatcher = (Dispatcher)dispatcherField!.GetValue(null);
-            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-            tracker.ShowProgressViewer = viewer => shownViewer = viewer;
-
-            try
+            var staThread = new Thread(() =>
             {
-                dispatcherField.SetValue(null, currentDispatcher);
-
-                var initializeTask = tracker.InitializeAsync();
-                var frame = new DispatcherFrame();
-                _ = initializeTask.ContinueWith(
-                    _ =>
-                        currentDispatcher.BeginInvoke(
-                            new System.Action(() => frame.Continue = false)
-                        ),
-                    TaskScheduler.Default
+                using var cts = new CancellationTokenSource();
+                var tracker = new ProgressTrackerAsync(cts);
+                ProgressViewer shownViewer = null;
+                var previousContext = SynchronizationContext.Current;
+                var dispatcherField = typeof(UiThread).GetField(
+                    "_dispatcher",
+                    BindingFlags.NonPublic | BindingFlags.Static
                 );
+                dispatcherField.Should().NotBeNull();
 
-                Dispatcher.PushFrame(frame);
+                var currentDispatcher = Dispatcher.CurrentDispatcher;
+                var previousDispatcher = (Dispatcher)dispatcherField!.GetValue(null);
+                SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+                tracker.ShowProgressViewer = viewer => shownViewer = viewer;
 
-                var initializedTracker = await initializeTask;
-                var initializedViewer = tracker.ProgressViewer;
-
-                initializedTracker.Should().BeSameAs(tracker);
-                shownViewer.Should().BeSameAs(initializedViewer);
-                tracker.UiDispatcher.Should().BeSameAs(currentDispatcher);
-                initializedViewer.Should().NotBeNull();
-                initializedViewer.CancelSource.Should().BeSameAs(cts);
-                initializedViewer.JobName.Text.Should().Be("Initializing...");
-                initializedViewer.Visible.Should().BeFalse();
-
-                tracker.ProgressViewer = initializedViewer;
-                tracker.ProgressViewer.Should().BeSameAs(initializedViewer);
-
-                initializedViewer.Close();
-            }
-            finally
-            {
-                if (tracker.ProgressViewer != null && !tracker.ProgressViewer.IsDisposed)
+                try
                 {
-                    tracker.ProgressViewer.Close();
-                }
+                    dispatcherField.SetValue(null, currentDispatcher);
 
-                dispatcherField.SetValue(null, previousDispatcher);
-                SynchronizationContext.SetSynchronizationContext(previousContext);
-            }
+                    var initializeTask = tracker.InitializeAsync();
+                    var frame = new DispatcherFrame();
+                    _ = initializeTask.ContinueWith(
+                        _ =>
+                            currentDispatcher.BeginInvoke(
+                                new System.Action(() => frame.Continue = false)
+                            ),
+                        TaskScheduler.Default
+                    );
+
+                    Dispatcher.PushFrame(frame);
+
+                    var initializedTracker = initializeTask.GetAwaiter().GetResult();
+                    var initializedViewer = tracker.ProgressViewer;
+
+                    initializedTracker.Should().BeSameAs(tracker);
+                    shownViewer.Should().BeSameAs(initializedViewer);
+                    tracker.UiDispatcher.Should().BeSameAs(currentDispatcher);
+                    initializedViewer.Should().NotBeNull();
+                    initializedViewer.CancelSource.Should().BeSameAs(cts);
+                    initializedViewer.JobName.Text.Should().Be("Initializing...");
+                    initializedViewer.Visible.Should().BeFalse();
+
+                    tracker.ProgressViewer = initializedViewer;
+                    tracker.ProgressViewer.Should().BeSameAs(initializedViewer);
+
+                    initializedViewer.Close();
+                }
+                catch (Exception ex)
+                {
+                    threadException = ex;
+                }
+                finally
+                {
+                    if (tracker.ProgressViewer != null && !tracker.ProgressViewer.IsDisposed)
+                    {
+                        tracker.ProgressViewer.Close();
+                    }
+
+                    dispatcherField.SetValue(null, previousDispatcher);
+                    SynchronizationContext.SetSynchronizationContext(previousContext);
+                }
+            });
+
+            staThread.SetApartmentState(ApartmentState.STA);
+            staThread.Start();
+            staThread.Join();
+
+            threadException.Should().BeNull(
+                $"the STA thread must not throw, but it threw: {threadException}"
+            );
         }
     }
 }

@@ -14,6 +14,16 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
     public class FolderRemapController
     {
         public FolderRemapController(IApplicationGlobals appGlobals)
+            : this(appGlobals, CreateAndShowViewer()) { }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="FolderRemapController"/> with an
+        /// injected viewer. Intended for unit testing: pass an
+        /// <see cref="IFolderRemapViewer"/> mock so that no real window is opened.
+        /// </summary>
+        /// <param name="appGlobals">Application globals.</param>
+        /// <param name="viewer">Viewer to use. Must not be null.</param>
+        internal FolderRemapController(IApplicationGlobals appGlobals, IFolderRemapViewer viewer)
         {
             _globals = appGlobals;
             _folderRemapTree = new FolderRemapTree(
@@ -22,20 +32,26 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             );
             Mappings2 = _folderRemapTree.GetRemapList();
             _folderRemapTree.PropertyChanged += OlFolderTree_PropertyChanged;
-            _viewer = new FolderRemapViewer();
+            _viewer = viewer;
             _viewer.SetController(this);
             _viewer.TlvOriginal.CheckStateGetter = GetCheckedState;
             _viewer.TlvOriginal.CheckStatePutter = MakeCheckedStatePutter();
             _viewer.OlvMap.CheckStateGetter = GetMappedCheckedState;
             _viewer.OlvMap.CheckStatePutter = PutMappedCheckedState;
-            _viewer.Show();
             ExpandTo(1, true);
             _viewer.TlvOriginal.Refresh();
             _viewer.Refresh();
         }
 
+        private static IFolderRemapViewer CreateAndShowViewer()
+        {
+            var viewer = new FolderRemapViewer();
+            viewer.Show();
+            return viewer;
+        }
+
         private IApplicationGlobals _globals;
-        private FolderRemapViewer _viewer;
+        private IFolderRemapViewer _viewer;
 
         private FolderRemapTree _folderRemapTree;
         public FolderRemapTree RemapTree
