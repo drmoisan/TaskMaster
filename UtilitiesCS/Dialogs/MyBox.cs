@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS.Dialogs;
@@ -20,12 +21,26 @@ namespace UtilitiesCS
 
     public static class MyBox
     {
+        // Per-flow storage so parallel test classes (ClassLevel parallelization) do not race
+        // on a single shared static seam. AsyncLocal flows the value with the logical call
+        // context, so a [TestCleanup] reset in one test class cannot clobber an injected
+        // stub used by another test class running concurrently.
+        private static readonly AsyncLocal<Func<MyBoxViewer, DialogResult>> _dialogInvoker =
+            new AsyncLocal<Func<MyBoxViewer, DialogResult>>();
+
+        private static readonly Func<MyBoxViewer, DialogResult> RealDialogInvoker = viewer =>
+            viewer.ShowDialog();
+
         /// <summary>
         /// Replaceable dialog-invoker seam. The default implementation delegates to
         /// <see cref="MyBoxViewer.ShowDialog()"/>; tests replace it with a non-modal stub.
+        /// Storage is per-async-flow so parallel test classes do not contaminate each other.
         /// </summary>
-        internal static Func<MyBoxViewer, DialogResult> DialogInvoker { get; set; } =
-            viewer => viewer.ShowDialog();
+        internal static Func<MyBoxViewer, DialogResult> DialogInvoker
+        {
+            get => _dialogInvoker.Value ?? RealDialogInvoker;
+            set => _dialogInvoker.Value = value;
+        }
 
         public static DialogResult ShowDialog(
             string Message,

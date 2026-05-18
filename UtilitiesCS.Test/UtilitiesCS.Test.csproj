@@ -87,6 +87,7 @@
     <OutputPath>bin\x86\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="TestAssemblyInitializer.cs" />
     <Compile Include="Dialogs\ActionButtonTests.cs" />
     <Compile Include="Dialogs\DelegateButton_Tests.cs" />
     <Compile Include="Dialogs\FolderNotFoundViewer_Tests.cs" />

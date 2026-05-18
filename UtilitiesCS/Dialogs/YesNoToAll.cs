@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -46,16 +47,22 @@ namespace UtilitiesCS
             Response = YesNoToAllResponse.Empty;
         }
 
-        private static YesNoToAllResponse _response = YesNoToAllResponse.Empty;
+        // Per-flow response storage so concurrent test classes (ClassLevel parallelization)
+        // and concurrent production callers cannot corrupt each other's button-click state.
+        // AsyncLocal<TEnum>.Value defaults to default(TEnum), which is
+        // YesNoToAllResponse.Empty (0), matching the previous initializer.
+        private static readonly AsyncLocal<YesNoToAllResponse> _response =
+            new AsyncLocal<YesNoToAllResponse>();
+
         public static YesNoToAllResponse Response
         {
-            get => _response;
-            set => _response = value;
+            get => _response.Value;
+            set => _response.Value = value;
         }
 
         public static YesNoToAllResponse ShowDialog(string message)
         {
-            _response = YesNoToAllResponse.Empty;
+            _response.Value = YesNoToAllResponse.Empty;
 
             List<DelegateButton> delegateButtons = new List<DelegateButton>()
             {

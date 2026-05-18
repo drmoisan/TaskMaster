@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace UtilitiesCS
@@ -31,8 +32,20 @@ namespace UtilitiesCS
         /// Returns:
         ///     The <see cref="DialogResult"/> reported by the actual or injected dialog.
         /// </summary>
-        internal static Func<InputBoxViewer, DialogResult> DialogInvoker { get; set; } =
-            viewer => viewer.ShowDialog();
+        // Per-flow storage so parallel test classes (ClassLevel parallelization) do not race
+        // on a single shared static seam. AsyncLocal flows the value with the logical call
+        // context, isolating injected stubs across concurrently executing test classes.
+        private static readonly AsyncLocal<Func<InputBoxViewer, DialogResult>> _dialogInvoker =
+            new AsyncLocal<Func<InputBoxViewer, DialogResult>>();
+
+        private static readonly Func<InputBoxViewer, DialogResult> RealDialogInvoker = viewer =>
+            viewer.ShowDialog();
+
+        internal static Func<InputBoxViewer, DialogResult> DialogInvoker
+        {
+            get => _dialogInvoker.Value ?? RealDialogInvoker;
+            set => _dialogInvoker.Value = value;
+        }
 
         /// <summary>
         /// Presents an input-box dialog and returns the entered text, or null if cancelled.
