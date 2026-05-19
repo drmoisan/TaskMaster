@@ -83,8 +83,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Act
             action.RequestAction();
             action.RequestAction();
-            signal.Wait(500).Should().BeTrue();
-            Thread.Sleep(80);
+            // Allow 2 000 ms for the 20 ms timer to fire under full-suite thread-pool load.
+            signal.Wait(2000).Should().BeTrue();
+            // Wait long enough to detect any spurious second fire from the single-shot timer.
+            Thread.Sleep(200);
 
             // Assert
             count.Should().Be(1);

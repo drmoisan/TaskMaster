@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,7 +70,7 @@ namespace UtilitiesCS.Test.Extensions
                     sourceLength: source.Length,
                     destination,
                     bufferSize: 0,
-                    (ProgressTrackerPane)null,
+                    (ProgressTrackerPane)null!,
                     messagePrefix: "",
                     CancellationToken.None
                 );
@@ -177,7 +178,7 @@ namespace UtilitiesCS.Test.Extensions
             using var source = new MemoryStream(Array.Empty<byte>());
             using var destination = new MemoryStream();
             var reports = new List<KeyValuePair<long, long>>();
-            var progress = new Progress<KeyValuePair<long, long>>(reports.Add);
+            var progress = new SynchronousProgress<KeyValuePair<long, long>>(reports.Add);
 
             // Act
             await source.CopyToAsync(
@@ -313,7 +314,7 @@ namespace UtilitiesCS.Test.Extensions
                     sourceLength: -1,
                     destination,
                     bufferSize: 3,
-                    (ProgressTrackerPane)null,
+                    (ProgressTrackerPane)null!,
                     messagePrefix: "",
                     CancellationToken.None
                 );

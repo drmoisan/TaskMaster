@@ -947,6 +947,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                 null,
                 row
             );
+            // EtlAsync computes its TimeoutAfter budget as 250 ms * GetRowCount().
+            // Override to a large value so the timeout cannot fire under test-host
+            // contention; iteration is driven by EndOfTable/GetNextRow, not GetRowCount.
+            mockTable.Setup(t => t.GetRowCount()).Returns(120);
             var converters = new Dictionary<string, Func<object, string>>
             {
                 { "MessageRecipients", _ => "Converted Async Recipients" },

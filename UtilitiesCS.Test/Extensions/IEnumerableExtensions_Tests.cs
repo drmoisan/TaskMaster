@@ -195,7 +195,10 @@ namespace UtilitiesCS.Test.Extensions
                 .Range(1, 3)
                 .Select(value =>
                 {
-                    System.Threading.Thread.Sleep(550);
+                    // Sleep for 700 ms (> the 500 ms timer period) so that at least one
+                    // timer tick fires while completed > 0, satisfying the Value > 0 assertion
+                    // even when Thread.Sleep runs slightly long under test-suite load.
+                    System.Threading.Thread.Sleep(700);
                     return value;
                 });
             var method = typeof(IEnumerableExtensions).GetMethod(

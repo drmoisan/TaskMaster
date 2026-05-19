@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using log4net;
 using log4net.Repository.Hierarchy;
@@ -14,10 +14,12 @@ namespace UtilitiesCS.Test.HelperClasses
         private MockRepository mockRepository;
         private Mock<ILog> mockLogger;
         private Mock<NLogTraceWriter> mockTraceWriter;
+        private System.IO.TextWriter originalOut;
 
         [TestInitialize]
         public void TestInitialize()
         {
+            this.originalOut = Console.Out;
             Console.SetOut(new DebugTextWriter());
             this.mockRepository = new MockRepository(MockBehavior.Loose);
             this.mockLogger = SetupLogger();
@@ -46,6 +48,12 @@ namespace UtilitiesCS.Test.HelperClasses
             Console.WriteLine($"Logger:    {loggerName}");
             Console.WriteLine($"Message:   {message}");
             Console.WriteLine($"Exception: {ex}");
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            Console.SetOut(this.originalOut);
         }
 
         [TestMethod]

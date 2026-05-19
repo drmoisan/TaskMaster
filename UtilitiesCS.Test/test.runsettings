@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Forces all MSTest test methods to execute on an STA thread.
+     Required for any test that creates WinForms controls (Forms, UserControls,
+     ObjectListView / TreeListView) which mandate STA apartment state.
+     The [STAThread] attribute on individual methods is silently ignored by
+     vstest/MSTest because tests run on thread-pool (MTA) threads; this
+     RunSettings entry is the supported mechanism for the full test assembly. -->
+<RunSettings>
+  <RunConfiguration>
+    <ExecutionThread>STA</ExecutionThread>
+  </RunConfiguration>
+</RunSettings>
