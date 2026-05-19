@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Svg;
@@ -19,6 +20,108 @@ namespace SVGControl
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
+
+        // Svg 3.4.7 was compiled against ExCSS 4.2.3.0 but the repo deploys ExCSS 4.3.1.0
+        // (same publicKeyToken). Production resolves this via TaskMaster.exe.config binding
+        // redirects, but vstest's testhost ignores the test DLL's .config in some modes, so
+        // SvgDocument.Open throws FileNotFoundException for ExCSS 4.2.3. The exception is
+        // swallowed by GetSvgDocument and surfaces downstream as an NRE in the SvgRenderer
+        // ctor. Register an AssemblyResolve fallback that satisfies any version request
+        // for an already-loaded assembly with a matching simple name + public key token.
+        private static int _resolverInstalled;
+
+        [ThreadStatic]
+        private static HashSet<string> _resolving;
+
+        static SvgRenderer()
+        {
+            if (Interlocked.Exchange(ref _resolverInstalled, 1) == 0)
+            {
+                AppDomain.CurrentDomain.AssemblyResolve += ResolveByNameAndKey;
+            }
+        }
+
+        private static System.Reflection.Assembly ResolveByNameAndKey(
+            object sender,
+            ResolveEventArgs args
+        )
+        {
+            var requested = new System.Reflection.AssemblyName(args.Name);
+            byte[] requestedKey = requested.GetPublicKeyToken();
+            foreach (var loaded in System.AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var loadedName = loaded.GetName();
+                if (
+                    !string.Equals(
+                        loadedName.Name,
+                        requested.Name,
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
+                {
+                    continue;
+                }
+                byte[] loadedKey = loadedName.GetPublicKeyToken();
+                if (PublicKeyTokensEqual(loadedKey, requestedKey))
+                {
+                    return loaded;
+                }
+            }
+
+            // No loaded match — fall back to loading by simple name from the probing path.
+            // This recovers cases where a versioned reference (e.g., ExCSS 4.2.3) is being
+            // requested but only a newer same-key version is deployed alongside the test DLL.
+            // Re-entrance guard prevents infinite recursion when Assembly.Load itself fails
+            // and re-raises AssemblyResolve on this thread.
+            _resolving ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (!_resolving.Add(requested.Name))
+            {
+                return null;
+            }
+            try
+            {
+                var byName = System.Reflection.Assembly.Load(
+                    new System.Reflection.AssemblyName(requested.Name)
+                );
+                if (
+                    byName != null
+                    && PublicKeyTokensEqual(byName.GetName().GetPublicKeyToken(), requestedKey)
+                )
+                {
+                    return byName;
+                }
+            }
+            catch
+            {
+                // Swallow — return null so other resolvers (or default resolution) can run.
+            }
+            finally
+            {
+                _resolving.Remove(requested.Name);
+            }
+
+            return null;
+        }
+
+        private static bool PublicKeyTokensEqual(byte[] a, byte[] b)
+        {
+            if (a == null || b == null)
+            {
+                return a == b || (a != null && a.Length == 0) || (b != null && b.Length == 0);
+            }
+            if (a.Length != b.Length)
+            {
+                return false;
+            }
+            for (int i = 0; i < a.Length; i++)
+            {
+                if (a[i] != b[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
 
         public SvgRenderer(byte[] doc, Size size, AutoSize autoSize)
         {

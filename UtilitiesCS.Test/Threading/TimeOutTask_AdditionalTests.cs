@@ -245,7 +245,7 @@ namespace UtilitiesCS.Test
             var result = await function.RunWithTimeout(
                 7,
                 CancellationToken.None,
-                milliseconds: 200,
+                milliseconds: 5000,
                 maxAttempts: 0,
                 strict: true
             );

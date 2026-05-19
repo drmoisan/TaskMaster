@@ -39,8 +39,8 @@ namespace UtilitiesCS
         {
             token.ThrowIfCancellationRequested();
 
-            var timeoutSource = new CancellationTokenSource(milliseconds);
-            var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
+            using var timeoutSource = new CancellationTokenSource(milliseconds);
+            using var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
                 token,
                 timeoutSource.Token
             );
@@ -74,7 +74,7 @@ namespace UtilitiesCS
                 logger.Error(e);
                 if (strict)
                 {
-                    throw e;
+                    throw;
                 }
             }
 
@@ -103,8 +103,8 @@ namespace UtilitiesCS
         {
             token.ThrowIfCancellationRequested();
 
-            var timeoutSource = new CancellationTokenSource(milliseconds);
-            var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
+            using var timeoutSource = new CancellationTokenSource(milliseconds);
+            using var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
                 token,
                 timeoutSource.Token
             );
@@ -138,7 +138,7 @@ namespace UtilitiesCS
                 logger.Error(e);
                 if (strict)
                 {
-                    throw e;
+                    throw;
                 }
             }
 
@@ -173,8 +173,8 @@ namespace UtilitiesCS
         {
             token.ThrowIfCancellationRequested();
 
-            var timeoutSource = new CancellationTokenSource(milliseconds);
-            var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
+            using var timeoutSource = new CancellationTokenSource(milliseconds);
+            using var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
                 token,
                 timeoutSource.Token
             );
@@ -209,7 +209,7 @@ namespace UtilitiesCS
                 logger.Error(e);
                 if (strict)
                 {
-                    throw e;
+                    throw;
                 }
             }
 
@@ -240,8 +240,8 @@ namespace UtilitiesCS
         {
             cancel.ThrowIfCancellationRequested();
 
-            var timeoutSource = new CancellationTokenSource(milliseconds);
-            var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
+            using var timeoutSource = new CancellationTokenSource(milliseconds);
+            using var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
                 cancel,
                 timeoutSource.Token
             );
@@ -324,8 +324,8 @@ namespace UtilitiesCS
         {
             token.ThrowIfCancellationRequested();
 
-            var timeoutSource = new CancellationTokenSource(milliseconds);
-            var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
+            using var timeoutSource = new CancellationTokenSource(milliseconds);
+            using var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
                 token,
                 timeoutSource.Token
             );
@@ -361,7 +361,7 @@ namespace UtilitiesCS
                 logger.Error(e);
                 if (strict)
                 {
-                    throw e;
+                    throw;
                 }
             }
 
@@ -402,8 +402,8 @@ namespace UtilitiesCS
         {
             cancel.ThrowIfCancellationRequested();
 
-            var timeoutSource = new CancellationTokenSource(milliseconds);
-            var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
+            using var timeoutSource = new CancellationTokenSource(milliseconds);
+            using var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
                 cancel,
                 timeoutSource.Token
             );
@@ -439,7 +439,7 @@ namespace UtilitiesCS
                 logger.Error(e);
                 if (strict)
                 {
-                    throw e;
+                    throw;
                 }
             }
 
@@ -472,8 +472,8 @@ namespace UtilitiesCS
         {
             cancel.ThrowIfCancellationRequested();
 
-            var timeoutSource = new CancellationTokenSource(milliseconds);
-            var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
+            using var timeoutSource = new CancellationTokenSource(milliseconds);
+            using var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
                 cancel,
                 timeoutSource.Token
             );
@@ -508,7 +508,7 @@ namespace UtilitiesCS
                 logger.Error(e);
                 if (strict)
                 {
-                    throw e;
+                    throw;
                 }
             }
         }
@@ -554,8 +554,8 @@ namespace UtilitiesCS
         {
             token.ThrowIfCancellationRequested();
 
-            var timeoutSource = new CancellationTokenSource(milliseconds);
-            var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
+            using var timeoutSource = new CancellationTokenSource(milliseconds);
+            using var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
                 token,
                 timeoutSource.Token
             );
@@ -592,7 +592,7 @@ namespace UtilitiesCS
                 logger.Error(e);
                 if (strict)
                 {
-                    throw e;
+                    throw;
                 }
             }
 
@@ -636,8 +636,8 @@ namespace UtilitiesCS
         {
             cancel.ThrowIfCancellationRequested();
 
-            var timeoutSource = new CancellationTokenSource(milliseconds);
-            var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
+            using var timeoutSource = new CancellationTokenSource(milliseconds);
+            using var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
                 cancel,
                 timeoutSource.Token
             );
@@ -674,7 +674,7 @@ namespace UtilitiesCS
                 logger.Error(e);
                 if (strict)
                 {
-                    throw e;
+                    throw;
                 }
             }
 
@@ -718,8 +718,8 @@ namespace UtilitiesCS
         {
             cancel.ThrowIfCancellationRequested();
 
-            var timeoutSource = new CancellationTokenSource(milliseconds);
-            var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
+            using var timeoutSource = new CancellationTokenSource(milliseconds);
+            using var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
                 cancel,
                 timeoutSource.Token
             );
@@ -755,7 +755,7 @@ namespace UtilitiesCS
                 logger.Error(e);
                 if (strict)
                 {
-                    throw e;
+                    throw;
                 }
             }
         }

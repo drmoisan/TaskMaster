@@ -11,6 +11,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test.HelperClasses
 {
+    // [DoNotParallelize] — DataFramePrettyHelpers_RenderRowsMarkdownAndConsoleOutput
+    // captures and restores Console.Out, which is process-wide state. Under the
+    // class-level parallel scope set in TaskMaster.runsettings, a sibling test
+    // class's Console.SetOut overrides this class's redirect mid-test, causing
+    // PrettyPrint's Console.WriteLine output to land in the wrong writer.
+    [DoNotParallelize]
     [TestClass]
     public class PrettyPrint_Tests
     {
