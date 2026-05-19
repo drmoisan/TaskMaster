@@ -94,9 +94,9 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Returns the private viewer instance injected into the controller.
         /// Used by constructor tests that need to inspect the real viewer state.
         /// </summary>
-        private static FilterOlFoldersViewer GetViewer(FilterOlFoldersController controller)
+        private static IFilterOlFoldersViewer GetViewer(FilterOlFoldersController controller)
         {
-            return (FilterOlFoldersViewer)
+            return (IFilterOlFoldersViewer)
                 typeof(FilterOlFoldersController)
                     .GetField("_viewer", BindingFlags.NonPublic | BindingFlags.Instance)
                     .GetValue(controller);
@@ -151,6 +151,9 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// <summary>
         /// Verifies that the real constructor wires the viewer, folder tree, and
         /// check-state delegates when supplied with a mocked Outlook archive root.
+        /// A <see cref="Mock{IFilterOlFoldersViewer}"/> is injected so that no real
+        /// window is opened. Real <see cref="TreeListView"/> instances are returned by
+        /// the mock so that delegate assignment can be verified.
         /// The test also exercises the three GetCheckedState outcomes: Checked,
         /// Indeterminate, and Unchecked.
         /// </summary>
@@ -171,9 +174,19 @@ namespace UtilitiesCS.Test.EmailIntelligence
             mockGlobals.SetupGet(x => x.Ol).Returns(mockOl.Object);
             mockGlobals.SetupGet(x => x.TD).Returns(mockTd.Object);
 
+            // Real TreeListView instances are needed so that delegate assignments
+            // (CheckStateGetter / CheckStatePutter) can be verified.
+            using var tlvNotFiltered = new TreeListView();
+            using var tlvFiltered = new TreeListView();
+
+            var mockViewer = new Mock<IFilterOlFoldersViewer>(MockBehavior.Strict);
+            mockViewer.SetupGet(v => v.TlvNotFiltered).Returns(tlvNotFiltered);
+            mockViewer.SetupGet(v => v.TlvFiltered).Returns(tlvFiltered);
+            mockViewer.Setup(v => v.SetController(It.IsAny<FilterOlFoldersController>()));
+            mockViewer.Setup(v => v.Dispose());
+
             // Act
-            var controller = new FilterOlFoldersController(mockGlobals.Object);
-            var viewer = GetViewer(controller);
+            var controller = new FilterOlFoldersController(mockGlobals.Object, mockViewer.Object);
 
             var checkedNode = new TreeNode<FolderWrapper>(
                 new FolderWrapper(
@@ -216,16 +229,16 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Assert
             controller.OlFolderTree.Should().NotBeNull();
-            viewer.TlvNotFiltered.CheckStateGetter.Should().NotBeNull();
-            viewer.TlvFiltered.CheckStateGetter.Should().NotBeNull();
-            viewer.TlvNotFiltered.CheckStatePutter.Should().NotBeNull();
-            viewer.TlvFiltered.CheckStatePutter.Should().NotBeNull();
+            tlvNotFiltered.CheckStateGetter.Should().NotBeNull();
+            tlvFiltered.CheckStateGetter.Should().NotBeNull();
+            tlvNotFiltered.CheckStatePutter.Should().NotBeNull();
+            tlvFiltered.CheckStatePutter.Should().NotBeNull();
             controller.GetCheckedState(checkedNode).Should().Be(CheckState.Checked);
             controller.GetCheckedState(indeterminateParent).Should().Be(CheckState.Indeterminate);
             controller.GetCheckedState(uncheckedNode).Should().Be(CheckState.Unchecked);
 
-            viewer.Close();
-            viewer.Dispose();
+            // Show() is never called on the mock — verified by MockBehavior.Strict.
+            mockViewer.Verify(v => v.Show(), Times.Never);
         }
 
         // ---------------------------------------------------------------------------

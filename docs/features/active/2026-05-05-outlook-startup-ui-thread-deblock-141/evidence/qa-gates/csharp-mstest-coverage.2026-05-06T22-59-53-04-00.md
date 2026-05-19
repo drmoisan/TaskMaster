@@ -1,0 +1,4 @@
+Timestamp: 2026-05-06T22:59:53.5003838-04:00
+Command: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput coverage\outlook-startup-ui-thread-deblock-141-remediation-final.cobertura.xml
+EXIT_CODE: 0
+Output Summary: Final MSTest coverage run completed successfully after a clean-and-rebuild restart. Total tests: 3990, Passed: 3988, Failed: 0, Skipped: 2. Repo Line Coverage: 76.1473% (161529 / 212127 executable lines). Changed/New-Code Coverage: 94.8276% (55 / 58 executable changed lines across `TaskMaster\AppGlobals\ApplicationGlobals.cs`, `TaskMaster\AppGlobals\AppOlObjects.cs`, `TaskMaster\AppGlobals\AppToDoObjects.cs`, and `UtilitiesCS\OutlookObjects\Store\StoresWrapper.cs`). Coverage XML Path: coverage\outlook-startup-ui-thread-deblock-141-remediation-final.cobertura.xml

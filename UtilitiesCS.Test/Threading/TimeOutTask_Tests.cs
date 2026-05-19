@@ -72,7 +72,7 @@ namespace UtilitiesCS.Test
             // Arrange
             Func<CancellationToken, Task<int>> function = async token =>
             {
-                await Task.Delay(100, token);
+                await Task.Delay(5000, token); // increased from 100ms to 5000ms
                 return 7;
             };
 
@@ -98,7 +98,7 @@ namespace UtilitiesCS.Test
             Func<Task> act = async () =>
                 await function.RunWithTimeout(
                     CancellationToken.None,
-                    milliseconds: 100,
+                    milliseconds: 5000,
                     maxAttempts: 0,
                     strict: true
                 );

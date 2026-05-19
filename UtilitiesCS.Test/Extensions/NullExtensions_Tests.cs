@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.Extensions;
@@ -132,13 +133,58 @@ namespace UtilitiesCS.Test.Extensions
                 .Be("text");
         }
 
+        [TestMethod]
+        public async Task ThrowIfNullOrEmpty_ForCollectionsInAsyncMethod_UsesArgumentExpression()
+        {
+            // Act
+            Func<Task> nullCollectionAction = async () => await PassThroughCollectionAsync(null);
+            Func<Task> emptyCollectionAction = async () =>
+                await PassThroughCollectionAsync(new List<int>());
+
+            // Assert
+            (await nullCollectionAction.Should().ThrowAsync<ArgumentNullException>())
+                .Which.ParamName.Should()
+                .Be("values");
+            (await emptyCollectionAction.Should().ThrowAsync<ArgumentNullException>())
+                .Which.ParamName.Should()
+                .Be("values");
+        }
+
+        [TestMethod]
+        public async Task ThrowIfNullOrEmpty_ForStringsInAsyncMethod_UsesArgumentExpression()
+        {
+            // Act
+            Func<Task> nullStringAction = async () => await PassThroughStringAsync(null);
+            Func<Task> emptyStringAction = async () => await PassThroughStringAsync(string.Empty);
+
+            // Assert
+            (await nullStringAction.Should().ThrowAsync<ArgumentNullException>())
+                .Which.ParamName.Should()
+                .Be("text");
+            (await emptyStringAction.Should().ThrowAsync<ArgumentNullException>())
+                .Which.ParamName.Should()
+                .Be("text");
+        }
+
         private static List<int> PassThroughCollection(List<int> values)
         {
             return values.ThrowIfNullOrEmpty();
         }
 
+        private static async Task<List<int>> PassThroughCollectionAsync(List<int> values)
+        {
+            await Task.Yield();
+            return values.ThrowIfNullOrEmpty();
+        }
+
         private static string PassThroughString(string text)
         {
+            return text.ThrowIfNullOrEmpty();
+        }
+
+        private static async Task<string> PassThroughStringAsync(string text)
+        {
+            await Task.Yield();
             return text.ThrowIfNullOrEmpty();
         }
     }

@@ -453,11 +453,18 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             sw?.LogDuration("Create new Prob Dict");
 
             var processors = Math.Max(Environment.ProcessorCount - 2, 1);
-            var chunkSize = (int)
-                Math.Round(
-                    (double)Parent.SharedTokenBase.TokenFrequency.Keys.Count() / (double)processors,
-                    0
-                );
+            // Ensure chunkSize is at least 1.  Math.Round can produce 0 when the token
+            // count is smaller than half the processor count, which causes Chunk(0) to
+            // throw ArgumentOutOfRangeException.
+            var chunkSize = Math.Max(
+                1,
+                (int)
+                    Math.Round(
+                        (double)Parent.SharedTokenBase.TokenFrequency.Keys.Count()
+                            / (double)processors,
+                        0
+                    )
+            );
             sw?.LogDuration("Calculate Chunk Size");
 
             var chunks = Parent.SharedTokenBase.TokenFrequency.Keys.Chunk(chunkSize);

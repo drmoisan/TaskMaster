@@ -19,10 +19,8 @@ If there is any conflict between these documents, halt and notify the user.
 ## 1. Framework and Scope
 
 - **Testing framework:** All PowerShell tests must use **Pester** (v5.x).
-- Use the repo config at `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`. Run via PoshQC:
-  - `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root ."`
-- VS Code task: `PoshQC: 4 test (Pester)`
-- Agent execution requirement: invoke `Invoke-PoshQCTest` directly via `pwsh -Command ...`; do **not** use task wrappers as a substitute.
+- Use the repo config at `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`.
+- **Agent execution requirement:** use the MCP server function `mcp_drmcopilotext_run_poshqc_test`. Do **not** use VS Code task wrappers as a substitute.
 - Keep tests compatible with PowerShell 7+.
 
 ---
@@ -64,8 +62,8 @@ If there is any conflict between these documents, halt and notify the user.
 ## 4. Running the Toolchain (PowerShell Tests)
 
 - When running the "After Making Changes" toolchain, the **testing step** for PowerShell must use:
-  - `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root ."`
-- For agents, run the command above directly; VS Code tasks are convenience wrappers for humans and are not an approved substitute.
+  - MCP server function: `mcp_drmcopilotext_run_poshqc_test`
+- Agents must use the MCP server function. VS Code task wrappers are not an approved substitute.
 - Do **not** substitute other test runners for PowerShell work without explicit approval.
 
 This file defines **how** PowerShell tests are written and executed; the general code change policy defines **when** to run the toolchain and how strictly to enforce it.

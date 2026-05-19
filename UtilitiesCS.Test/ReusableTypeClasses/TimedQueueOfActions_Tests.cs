@@ -67,7 +67,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             queue.StartTimer();
 
             // Assert
-            SpinWait.SpinUntil(() => !queue.TimerActive, 1000).Should().BeTrue();
+            // The timer fires every 20 ms; after 5 consecutive empty-queue ticks the
+            // implementation stops it.  Allow 5 000 ms to absorb thread-pool delays
+            // that occur when the full test suite runs in parallel.
+            SpinWait.SpinUntil(() => !queue.TimerActive, 5000).Should().BeTrue();
             queue.TimerActive.Should().BeFalse();
         }
 

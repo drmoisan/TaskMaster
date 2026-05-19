@@ -1,16 +1,19 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.Office.Tools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups;
@@ -851,7 +854,8 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
         }
 
         [TestMethod]
-        public async Task BuildClassifiersAsync_NoAppData_CoversTopLevelWorkflowUntilNullCollectionFails()
+        [STAThread]
+        public async Task BuildClassifiersAsync_MissingStagingData_ShowsActionableWarningInsteadOfThrowing()
         {
             var mockGlobals = CreateMockGlobals();
             var mockFs = new Mock<IFileSystemFolderPaths>();
@@ -859,9 +863,18 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             var manager = new ManagerAsyncLazy(mockGlobals.Object);
             var progressPane = new Mock<CustomTaskPane>();
             progressPane.SetupProperty(x => x.Visible, false);
+            var appDataRoot = Path.Combine(
+                Path.GetPathRoot(Environment.SystemDirectory) ?? "C:\\",
+                "TaskMaster-Tests",
+                Guid.NewGuid().ToString("N")
+            );
             mockFs
                 .SetupGet(x => x.SpecialFolders)
-                .Returns(new ConcurrentDictionary<string, string>());
+                .Returns(
+                    new ConcurrentDictionary<string, string>(
+                        new[] { new KeyValuePair<string, string>("AppData", appDataRoot) }
+                    )
+                );
             mockGlobals.SetupGet(x => x.FS).Returns(mockFs.Object);
             mockAf.SetupGet(x => x.Manager).Returns(manager);
             mockAf.SetupGet(x => x.ProgressTracker).Returns(CreateHeadlessProgressTrackerPane());
@@ -886,10 +899,32 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
                 new BayesianClassifierGroup()
             );
 
-            Func<Task> act = async () => await group.BuildClassifiersAsync();
+            var dialogCalls = 0;
+            string dialogTitle = null;
+            string dialogMessage = null;
+            MyBox.DialogInvoker = viewer =>
+            {
+                dialogCalls++;
+                dialogTitle = viewer.Text;
+                dialogMessage = viewer.TextMessage.Text;
+                return DialogResult.OK;
+            };
 
-            await act.Should().ThrowAsync<ArgumentNullException>();
-            progressPane.Object.Visible.Should().BeTrue();
+            try
+            {
+                await group.BuildClassifiersAsync();
+            }
+            finally
+            {
+                MyBox.DialogInvoker = viewer => viewer.ShowDialog();
+            }
+
+            dialogCalls.Should().Be(1);
+            dialogTitle.Should().Be("Category classifier data unavailable");
+            dialogMessage.Should().Contain("Continue Mining");
+            dialogMessage.Should().Contain("Scrape and Mine");
+            dialogMessage.Should().Contain(Path.Combine(appDataRoot, "Bayesian"));
+            progressPane.Object.Visible.Should().BeFalse();
         }
 
         [TestMethod]

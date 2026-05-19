@@ -1,0 +1,4 @@
+Timestamp: 2026-05-05T14:26:32-04:00
+Command: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput coverage\outlook-startup-ui-thread-deblock-141-final.cobertura.xml
+EXIT_CODE: 0
+Output Summary: Test Run Successful. Total tests: 3974; Passed: 3972; Failed: 0; Skipped: 2. Repo line coverage from `coverage\outlook-startup-ui-thread-deblock-141-final.cobertura.xml`: 78.4021%. Coverage artifact path: `coverage\outlook-startup-ui-thread-deblock-141-final.cobertura.xml`. Supporting console capture: `artifacts/qa-temp/phase6-coverage-rerun-2026-05-05T14-26-32.log`.

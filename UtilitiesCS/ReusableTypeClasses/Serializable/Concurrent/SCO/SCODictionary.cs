@@ -187,11 +187,10 @@ namespace UtilitiesCS.ReusableTypeClasses
                 Serialize(Filepath);
         }
 
-        public async void Serialize(string filepath)
+        public void Serialize(string filepath)
         {
             this.Filepath = filepath;
-            _ = Task.Run(() => SerializeThreadSafe(filepath));
-            await Task.Delay(1);
+            SerializeThreadSafe(filepath);
         }
 
         public async Task SerializeAsync()

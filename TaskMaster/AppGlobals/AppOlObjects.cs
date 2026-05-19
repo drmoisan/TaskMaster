@@ -96,25 +96,28 @@ namespace TaskMaster
 
         internal IEnumerable<Folder> LoadInboxes()
         {
-            // TODO: Test with gmail to see if I need to add a filter for non-exchange
             var storesWrapper = StoresWrapper ?? new StoresWrapper() { };
-            var stores = NamespaceMAPI.Stores.Cast<Store>().Where(storesWrapper.ShouldIncludeStore);
+            var stores = NamespaceMAPI.Stores.Cast<Store>();
 
             var inboxes = new List<Folder>();
             foreach (var store in stores)
             {
-                MAPIFolder inbox = null;
                 try
                 {
-                    inbox = store.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+                    if (!storesWrapper.ShouldIncludeStore(store))
+                    {
+                        continue;
+                    }
+
+                    var inbox = store.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
+                    if (inbox is not null)
+                    {
+                        inboxes.Add((Folder)inbox);
+                    }
                 }
                 catch (COMException e)
                 {
                     logger.Error($"Error loading inbox from store. {e.Message}", e);
-                }
-                if (inbox is not null)
-                {
-                    inboxes.Add((Folder)inbox);
                 }
             }
             return inboxes;
@@ -124,25 +127,26 @@ namespace TaskMaster
 
         public StoresWrapper StoresWrapper { get; set; }
 
-        internal async Task LoadStoresAsync() =>
-            await Task.Run(
-                async () =>
-                {
-                    if (_globals.IntelRes.Config.TryGetValue("StoresWrapper", out var config))
-                    {
-                        StoresWrapper = await SmartSerializable.DeserializeAsync(
-                            config,
-                            true,
-                            () => new StoresWrapper(_globals).Init()
-                        );
-                    }
-                    else
-                    {
-                        logger.Error("StoresWrapper config not found.");
-                    }
-                },
-                _globals.AF.CancelToken
-            );
+        protected internal virtual Task AwaitStoreRewireAsync(StoresWrapper storesWrapper) =>
+            storesWrapper is null
+                ? Task.CompletedTask
+                : storesWrapper.RewireAfterDeserializeAsync();
+
+        internal async Task LoadStoresAsync()
+        {
+            if (_globals.IntelRes.Config.TryGetValue("StoresWrapper", out var config))
+            {
+                StoresWrapper = SmartSerializable.Deserialize<
+                    StoresWrapper,
+                    SmartSerializableLoader
+                >(config);
+                await AwaitStoreRewireAsync(StoresWrapper);
+            }
+            else
+            {
+                logger.Error("StoresWrapper config not found.");
+            }
+        }
 
         private Reminders _olReminders;
         public Reminders OlReminders
@@ -194,11 +198,36 @@ namespace TaskMaster
         private Folder _junkPotential;
         public Folder JunkPotential => Initializer.GetOrLoad(ref _junkPotential, LoadJunkPotential);
 
+        internal static string ReadJunkCertainSetting() =>
+            Properties.Settings.Default.OlJunkCertain;
+
+        internal static void WriteJunkCertainSetting(string relativePath) =>
+            Properties.Settings.Default.OlJunkCertain = relativePath;
+
         internal static string ReadJunkPotentialSetting() =>
             Properties.Settings.Default.JunkPotential;
 
         internal static void WriteJunkPotentialSetting(string relativePath) =>
             Properties.Settings.Default.JunkPotential = relativePath;
+
+        internal void ApplyJunkFolderSelections(
+            string junkCertainRelativePath,
+            string junkPotentialRelativePath
+        )
+        {
+            WriteJunkCertainSetting(junkCertainRelativePath);
+            WriteJunkPotentialSetting(junkPotentialRelativePath);
+            Properties.Settings.Default.Save();
+            RefreshJunkFolderSelections();
+        }
+
+        internal void RefreshJunkFolderSelections()
+        {
+            _junkCertain = null;
+            _junkPotential = null;
+            _ = JunkCertain;
+            _ = JunkPotential;
+        }
 
         internal Folder LoadJunkPotential()
         {
@@ -250,7 +279,7 @@ namespace TaskMaster
         internal Folder LoadJunkCertain()
         {
             var root = new FolderTree(Root).Roots.FirstOrDefault();
-            var folderPath = Properties.Settings.Default.OlJunkCertain;
+            var folderPath = ReadJunkCertainSetting();
             if (folderPath.IsNullOrEmpty())
             {
                 return null;
@@ -262,7 +291,7 @@ namespace TaskMaster
             if (folder is null)
             {
                 MyBox.ShowDialog(
-                    "Junk Potential Folder not found. Please select it manually.",
+                    "Junk Folder not found. Please select it manually.",
                     "Error",
                     System.Windows.Forms.MessageBoxButtons.OK,
                     System.Windows.Forms.MessageBoxIcon.Error
@@ -273,7 +302,7 @@ namespace TaskMaster
                     return null;
                 }
                 var wrapper = new FolderWrapper(folder, Root);
-                Properties.Settings.Default.OlJunkCertain = wrapper.RelativePath;
+                WriteJunkCertainSetting(wrapper.RelativePath);
                 Properties.Settings.Default.Save();
             }
             return folder;

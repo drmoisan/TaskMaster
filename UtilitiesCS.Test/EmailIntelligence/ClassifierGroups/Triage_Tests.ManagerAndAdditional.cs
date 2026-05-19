@@ -101,7 +101,14 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
                 .Setup(x => x.Find(It.IsAny<string>(), It.IsAny<object>()))
                 .Returns(triageProperty);
             userProperties
-                .Setup(x => x.Add(It.IsAny<string>(), It.IsAny<OlUserPropertyType>()))
+                .Setup(x =>
+                    x.Add(
+                        It.IsAny<string>(),
+                        It.IsAny<OlUserPropertyType>(),
+                        It.IsAny<object>(),
+                        It.IsAny<object>()
+                    )
+                )
                 .Returns(addedProperty);
             userProperties
                 .Setup(x =>

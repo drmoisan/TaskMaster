@@ -103,6 +103,8 @@ namespace UtilitiesCS
         }
 
         private Lazy<int> _lazyItemCountSubFolders;
+
+        [JsonIgnore]
         public int ItemCountSubFolders
         {
             get => _lazyItemCountSubFolders.Value;
@@ -374,7 +376,10 @@ namespace UtilitiesCS
 
         //private Lazy<IItemInfo[]> _lazyItemHelpers;
         //public IItemInfo[] ItemHelpers { get => _lazyItemHelpers.Value; set => _lazyItemHelpers = value?.ToLazy(); }
+        [JsonIgnore]
         public AsyncLazy<IItemInfo[]> ItemHelpers { get; set; }
+
+        [JsonIgnore]
         public IApplicationGlobals Globals { get; set; }
 
         internal IItemInfo[] LoadItemHelpers()

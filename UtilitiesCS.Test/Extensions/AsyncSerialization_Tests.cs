@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,7 +70,7 @@ namespace UtilitiesCS.Test.Extensions
                     sourceLength: source.Length,
                     destination,
                     bufferSize: 0,
-                    (ProgressTrackerPane)null,
+                    (ProgressTrackerPane)null!,
                     messagePrefix: "",
                     CancellationToken.None
                 );
@@ -129,7 +130,7 @@ namespace UtilitiesCS.Test.Extensions
             using var source = new MemoryStream(new byte[] { 1, 2, 3, 4, 5 });
             using var destination = new MemoryStream();
             var reports = new List<KeyValuePair<long, long>>();
-            var progress = new Progress<KeyValuePair<long, long>>(reports.Add);
+            var progress = new SynchronousProgress<KeyValuePair<long, long>>(reports.Add);
 
             // Act
             await source.CopyToAsync(
@@ -139,9 +140,6 @@ namespace UtilitiesCS.Test.Extensions
                 progress,
                 CancellationToken.None
             );
-
-            // Progress<T> posts callbacks via the thread pool; allow time for delivery
-            await Task.Delay(200);
 
             // Assert
             destination.ToArray().Should().Equal(new byte[] { 1, 2, 3, 4, 5 });
@@ -180,7 +178,7 @@ namespace UtilitiesCS.Test.Extensions
             using var source = new MemoryStream(Array.Empty<byte>());
             using var destination = new MemoryStream();
             var reports = new List<KeyValuePair<long, long>>();
-            var progress = new Progress<KeyValuePair<long, long>>(reports.Add);
+            var progress = new SynchronousProgress<KeyValuePair<long, long>>(reports.Add);
 
             // Act
             await source.CopyToAsync(
@@ -316,7 +314,7 @@ namespace UtilitiesCS.Test.Extensions
                     sourceLength: -1,
                     destination,
                     bufferSize: 3,
-                    (ProgressTrackerPane)null,
+                    (ProgressTrackerPane)null!,
                     messagePrefix: "",
                     CancellationToken.None
                 );
@@ -434,7 +432,7 @@ namespace UtilitiesCS.Test.Extensions
                 var candidate = Path.Combine(
                     current.FullName,
                     "packages",
-                    "Microsoft.Graph.5.103.0",
+                    "Microsoft.Graph.5.105.0",
                     "lib",
                     "netstandard2.0",
                     "Microsoft.Graph.xml"

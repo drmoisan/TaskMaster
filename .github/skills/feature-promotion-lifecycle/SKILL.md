@@ -71,6 +71,7 @@ When orchestrator routing selects short path, promotion/folder initialization st
 
 3a) Verify minor-audit folder integrity before proceeding:
 - `${feature-folder}/issue.md` exists and contains `- Work Mode: minor-audit`
+- `${feature-folder}/issue.md` contains an explicit `## Acceptance Criteria` section
 - `${feature-folder}/spec.md` does not exist
 - `${feature-folder}/user-story.md` does not exist
 - if any check fails, stop and remediate before planning
@@ -88,8 +89,12 @@ When orchestrator routing selects short path, promotion/folder initialization st
 6) Execute plan Phase 0 only via executor and checkpoint evidence.
 
 7) Branch:
-- manual bootstrap: save state and stop,
+- manual bootstrap: save state and stop ONLY when the initial user request explicitly opted into manual orchestration from the beginning,
 - non-bootstrap: continue with constrained small-path development.
+
+Automation rule:
+- do not introduce manual bootstrap, human-operator validation, or any other manual handoff later in orchestration unless that initial explicit opt-in exists
+- if automation cannot proceed, record blocked automated state instead of asking for manual intervention
 
 8) Validate delivery via executor against `issue.md`, then run reduced audit/remediation loop until ready-to-merge.
 
@@ -103,7 +108,8 @@ Before delegating research/spec/planning, provide:
 - constraints/APIs/invariants to preserve
 
 Mode-aware expectations:
-- For `minor-audit`, `issue.md` is the primary acceptance-criteria source and `spec.md`/`user-story.md` may be intentionally absent by design.
+- For `minor-audit`, the explicit `## Acceptance Criteria` section in `issue.md` is the primary acceptance-criteria source and `spec.md`/`user-story.md` may be intentionally absent by design.
+- For `minor-audit`, do not infer acceptance criteria from other `issue.md` sections such as verification notes, next steps, or severity checklists.
 - For `minor-audit`, `spec.md`/`user-story.md` must be treated as integrity failures when they appear unexpectedly in the active folder.
 - For `full-feature`, `spec.md` and `user-story.md` are expected alongside `issue.md`.
 - For `full-bug`, `spec.md` is expected alongside `issue.md`; `user-story.md` should be absent unless the requirements explicitly justify it.

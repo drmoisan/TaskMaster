@@ -373,6 +373,16 @@ namespace UtilitiesCS.EmailIntelligence
             await Task.Run(() => ClassifierGroup.Train(classifierName, tokens, 1), cancel);
         }
 
+        public async Task UnTrainAsync(
+            string[] tokens,
+            string triageId,
+            CancellationToken cancel = default
+        )
+        {
+            var classifierName = triageId;
+            await Task.Run(() => ClassifierGroup.UnTrain(classifierName, tokens, 1), cancel);
+        }
+
         public async Task TestAsync(Selection selection, CancellationToken token = default)
         {
             if (selection is null)

@@ -17,6 +17,7 @@ Coordinate the user request from intake to completion using the correct path bas
 - **Likely affected files (optional):** any known production/test files
 - **Initial classification hint (optional):** `feature` or `bug`
 - **Constraints (optional):** APIs/paths/behavior that must remain unchanged
+- **Manual orchestration opt-in (optional):** allowed only when the initial user request explicitly asked from the beginning for a manual bootstrap pause
 
 ## Required orchestration behavior
 
@@ -24,14 +25,14 @@ Coordinate the user request from intake to completion using the correct path bas
 2. If budget is **1–3 production files** (+ corresponding tests):
    - Execute enforced small-path lifecycle:
      1) Scope/create potential entry and promote with `--work-mode minor-audit`
-     2) Create branch and active feature folder with `--work-mode minor-audit`
+   2) Create branch and active feature folder with `--work-mode minor-audit`, then verify `issue.md` contains an explicit `## Acceptance Criteria` section
      3) Delegate plan creation to `atomic_planner` with directive `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`
      4) Require `atomic_executor` preflight until `PREFLIGHT: ALL CLEAR`
      5) Delegate to `atomic_executor` to execute **Phase 0 only**
      6) Branch behavior:
-        - manual bootstrap: save state and stop for manual resume
-        - non-bootstrap small development: delegate constrained implementation to the small-path engineer
-     7) Delegate post-delivery validation to `atomic_executor` against `issue.md` and persist checklist/doc updates
+        - explicit initial manual bootstrap opt-in: save state and stop for manual resume
+        - otherwise continue automated small development and delegate constrained implementation to the small-path engineer
+   7) Delegate post-delivery validation to `atomic_executor` against `issue.md`, using only the explicit `## Acceptance Criteria` section for minor-audit acceptance validation, and persist checklist/doc updates
      8) Run reduced small-path audit and remediation loop until ready-to-merge
 3. If budget is **>3 production files** or **>3 test files**:
    - Execute full large-path lifecycle:
@@ -48,6 +49,7 @@ Coordinate the user request from intake to completion using the correct path bas
 - Maintain orchestration state in `artifacts/orchestration/orchestrator-state.json`.
 - Resume from the next incomplete step if interrupted.
 - Do not end early while required downstream steps remain.
+- Do not introduce manual validation or other human-operator steps later in the workflow unless the initial user request explicitly opted in from the beginning.
 
 ## Output expectations
 
@@ -62,5 +64,5 @@ On completion, report:
 For small path also report:
 - approved `plan-path`
 - preflight result (`PREFLIGHT: ALL CLEAR`)
-- whether `manual bootstrap` branch was taken
+- whether an explicit initial manual-bootstrap opt-in was present and used
 - Phase 0 execution evidence and stored `next_step` for resume

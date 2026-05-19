@@ -126,7 +126,7 @@ namespace UtilitiesCS
                 {
                     Init();
                 }
-                return (System.Drawing.SizeF)_autoScaleFactor;
+                return _autoScaleFactor ?? new System.Drawing.SizeF(1f, 1f);
             }
             private set => _autoScaleFactor = value;
         }

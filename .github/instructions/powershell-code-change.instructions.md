@@ -21,23 +21,20 @@ If you encounter any conflicting instructions, **halt and notify the user.**
 
 **Agent execution requirement (explicit):**
 
-- Agents must invoke the underlying PoshQC commands directly via `pwsh -Command ...`.
-- Agents must **not** use VS Code task wrappers (for example, `PoshQC: 1 format`, `PoshQC: 2 analyze`, `PoshQC: 2b autofix (PSSA -Fix)`, `PoshQC: 4 test (Pester)`) as a substitute for direct command execution.
-- VS Code tasks are convenience wrappers for interactive human use only.
+- Agents must use the MCP server functions: `mcp__drmCopilotExtension__run_poshqc_format`, `mcp__drmCopilotExtension__run_poshqc_analyze`, `mcp_drmcopilotext_run_poshqc_test`, and `mcp__drmCopilotExtension__run_poshqc_analyze_autofix`.
+- Agents must **not** use VS Code task wrappers as a substitute.
 
 1) **Formatting - Invoke-Formatter**
 
-- Format all PowerShell files using the PoshQC formatter (Invoke-Formatter). Example:
-  - `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCFormat -Root ."`
-- VS Code task: `PoshQC: 1 format`
+- Format all PowerShell files using the PoshQC formatter (Invoke-Formatter).
+- **Agent execution:** `mcp__drmCopilotExtension__run_poshqc_format`
 - Do not hand-format; re-run the formatter whenever PSScriptAnalyzer would change whitespace/indentation.
 
 2) **Linting - PSScriptAnalyzer**
 
-- Run the PoshQC analyzer (PSScriptAnalyzer) with repo settings. Example:
-  - `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCAnalyze -Root ."`
-- VS Code task: `PoshQC: 2 analyze`
-- An optional autofix task is available: `PoshQC: 2b autofix (PSSA -Fix)`; review diffs after running.
+- Run the PoshQC analyzer (PSScriptAnalyzer) with repo settings.
+- **Agent execution:** `mcp__drmCopilotExtension__run_poshqc_analyze`
+- Optional autofix: `mcp__drmCopilotExtension__run_poshqc_analyze_autofix`; review diffs after running.
 - Fix **all** findings (Error/Warning/Information). No rule suppressions unless strictly necessary and localized with a comment.
 
 3) **Compatibility**
@@ -72,12 +69,12 @@ If you encounter any conflicting instructions, **halt and notify the user.**
 
 When PowerShell code changes, your toolchain loop must include:
 
-1. `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCFormat -Root ."`
-2. `pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCAnalyze -Root ."`
+1. Format: `mcp__drmCopilotExtension__run_poshqc_format`
+2. Analyze: `mcp__drmCopilotExtension__run_poshqc_analyze`
 3. (Type checking is not applicable for PowerShell; skip to testing.)
-4. Run Pester per the unit test policy.
+4. Test: `mcp_drmcopilotext_run_poshqc_test`
 
-The commands above are the approved toolchain contract for agents and must be executed directly (no task wrappers).
+The MCP server functions above are the approved toolchain contract for agents.
 
 Rerun the loop from step 1 if any step changes code or fails.
 

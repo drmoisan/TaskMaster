@@ -129,6 +129,12 @@
                 label="Current Location"
               />
             </menu>
+            <button
+              id="SpamFolderSettings"
+              imageMso="Folder"
+              onAction="SpamFolderSettings_Click"
+              label="Junk Folder Settings"
+            />
             <checkBox
               id="SpamBayesEnabledToggle"
               getPressed="SpamBayesEnabled_GetPressed"
@@ -430,8 +436,14 @@
             <button
               id="ClearTriage"
               imageMso="Clear"
-              onAction="ClearTriage_Click"
-              label="Clear Triage"
+              onAction="ClearTriage"
+              label="ClearTriage_Click"
+            />
+            <button
+              id="ResetTriage"
+              imageMso="Clear"
+              onAction="ResetTriage_Click"
+              label="Reset Triage Classifier"
             />
             <button
               id="TriageSelection"

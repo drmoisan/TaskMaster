@@ -12,12 +12,17 @@ using BrightIdeasSoftware;
 
 namespace UtilitiesCS.EmailIntelligence.FolderRemap
 {
-    public partial class FolderRemapViewer : Form
+    public partial class FolderRemapViewer : Form, IFolderRemapViewer
     {
         public FolderRemapViewer()
         {
             InitializeComponent();
         }
+
+        // Explicit interface properties expose the designer-generated internal fields
+        // through the IFolderRemapViewer contract.
+        TreeListView IFolderRemapViewer.TlvOriginal => TlvOriginal;
+        FastObjectListView IFolderRemapViewer.OlvMap => OlvMap;
 
         private FolderRemapController _controller;
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Deedle.Internal;
@@ -25,15 +26,36 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         public StoreWrapper Init()
         {
+            var storeDisplayNameStopwatch = Stopwatch.StartNew();
             DisplayName = InnerStore.DisplayName;
+            logger.Debug(
+                $"[Startup timing] Init '{DisplayName ?? "<null>"}' DisplayName: {storeDisplayNameStopwatch.ElapsedMilliseconds} ms"
+            );
+
+            var rootFolderStopwatch = Stopwatch.StartNew();
             RootFolder = InnerStore.GetRootFolder() as Outlook.Folder;
-            if (InnerStore.ExchangeStoreType != Outlook.OlExchangeStoreType.olExchangePublicFolder)
+            logger.Debug(
+                $"[Startup timing] Init '{DisplayName ?? "<null>"}' GetRootFolder: {rootFolderStopwatch.ElapsedMilliseconds} ms"
+            );
+
+            var exchangeStoreType = InnerStore.ExchangeStoreType;
+            if (exchangeStoreType != Outlook.OlExchangeStoreType.olExchangePublicFolder)
             {
+                var inboxStopwatch = Stopwatch.StartNew();
                 Inbox =
                     InnerStore.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox)
                     as Outlook.Folder;
+                logger.Debug(
+                    $"[Startup timing] Init '{DisplayName ?? "<null>"}' GetDefaultFolder(Inbox): {inboxStopwatch.ElapsedMilliseconds} ms"
+                );
             }
+
+            var smtpLookupStopwatch = Stopwatch.StartNew();
             UserEmailAddress = GetSmtpAddressFromStore();
+            logger.Debug(
+                $"[Startup timing] Init '{DisplayName ?? "<null>"}' GetSmtpAddressFromStore: {smtpLookupStopwatch.ElapsedMilliseconds} ms"
+            );
+
             return this;
         }
 
@@ -57,9 +79,24 @@ namespace UtilitiesCS.OutlookObjects.Store
         {
             InnerStore = store;
             Init();
+
+            var archiveRestoreStopwatch = Stopwatch.StartNew();
             ArchiveRoot?.RestoreFromRelativePath(RootFolder);
+            logger.Debug(
+                $"[Startup timing] Restore '{DisplayName ?? "<null>"}' ArchiveRoot.RestoreFromRelativePath: {archiveRestoreStopwatch.ElapsedMilliseconds} ms"
+            );
+
+            var junkPotentialRestoreStopwatch = Stopwatch.StartNew();
             JunkPotential?.RestoreFromRelativePath(RootFolder);
+            logger.Debug(
+                $"[Startup timing] Restore '{DisplayName ?? "<null>"}' JunkPotential.RestoreFromRelativePath: {junkPotentialRestoreStopwatch.ElapsedMilliseconds} ms"
+            );
+
+            var junkCertainRestoreStopwatch = Stopwatch.StartNew();
             JunkCertain?.RestoreFromRelativePath(RootFolder);
+            logger.Debug(
+                $"[Startup timing] Restore '{DisplayName ?? "<null>"}' JunkCertain.RestoreFromRelativePath: {junkCertainRestoreStopwatch.ElapsedMilliseconds} ms"
+            );
         }
 
         public void RestoreGlobalAddresses(Application olApp)
@@ -95,9 +132,31 @@ namespace UtilitiesCS.OutlookObjects.Store
         {
             try
             {
-                var addressEntry = RootFolder?.Session?.CurrentUser?.AddressEntry;
+                var currentUserStopwatch = Stopwatch.StartNew();
+                var currentUser = RootFolder?.Session?.CurrentUser;
+                logger.Debug(
+                    $"[Startup timing] GetSmtpAddressFromStore '{DisplayName ?? "<null>"}' CurrentUser: {currentUserStopwatch.ElapsedMilliseconds} ms"
+                );
+
+                var addressEntryStopwatch = Stopwatch.StartNew();
+                var addressEntry = currentUser?.AddressEntry;
+                logger.Debug(
+                    $"[Startup timing] GetSmtpAddressFromStore '{DisplayName ?? "<null>"}' AddressEntry: {addressEntryStopwatch.ElapsedMilliseconds} ms"
+                );
+
+                var exchangeUserStopwatch = Stopwatch.StartNew();
                 var exchangeUser = addressEntry?.GetExchangeUser();
-                return exchangeUser?.PrimarySmtpAddress;
+                logger.Debug(
+                    $"[Startup timing] GetSmtpAddressFromStore '{DisplayName ?? "<null>"}' GetExchangeUser: {exchangeUserStopwatch.ElapsedMilliseconds} ms"
+                );
+
+                var primarySmtpAddressStopwatch = Stopwatch.StartNew();
+                var primarySmtpAddress = exchangeUser?.PrimarySmtpAddress;
+                logger.Debug(
+                    $"[Startup timing] GetSmtpAddressFromStore '{DisplayName ?? "<null>"}' PrimarySmtpAddress: {primarySmtpAddressStopwatch.ElapsedMilliseconds} ms (result={primarySmtpAddress ?? "<null>"})"
+                );
+
+                return primarySmtpAddress;
             }
             catch (COMException e)
             {

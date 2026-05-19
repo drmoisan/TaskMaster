@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -174,12 +175,17 @@ namespace UtilitiesCS.OutlookObjects.Store
                 return;
             }
 
+            // Mirror the current store into the controller before rendering labels.
+            ArchiveOutlook = Current.ArchiveRoot;
+            ArchiveFS = Current.ArchiveFsRoot;
+            JunkEmail = Current.JunkCertain;
+            JunkPotential = Current.JunkPotential;
+
             // Populate Form
             Viewer.Inbox.Text = Current?.Inbox?.FolderPath ?? "Error Loading";
             Viewer.RootFolder.Text = Current?.RootFolder?.FolderPath ?? "Error Loading";
             Viewer.UserEmail.Text = Current?.UserEmailAddress ?? "Error Loading";
-            Viewer.ArchiveOutlook.Text =
-                Current?.ArchiveRoot?.RelativePath ?? "Please select an archive";
+            Viewer.ArchiveOutlook.Text = ArchiveOutlook?.RelativePath ?? "Please select an archive";
             Viewer.ArchiveFS.Text = GetRelativeFsPath();
             //if (Current.ArchiveFsRoot is not null && !Current.ArchiveFsRoot.FolderPath.IsNullOrEmpty())
             //{
@@ -195,12 +201,6 @@ namespace UtilitiesCS.OutlookObjects.Store
             //}
             Viewer.JunkEmail.Text = JunkEmail?.RelativePath ?? "Please select a folder";
             Viewer.JunkPotential.Text = JunkPotential?.RelativePath ?? "Please select a folder";
-
-            // Populate Controller
-            ArchiveOutlook = Current.ArchiveRoot;
-            ArchiveFS = Current.ArchiveFsRoot;
-            JunkEmail = Current.JunkCertain;
-            JunkPotential = Current.JunkPotential;
         }
 
         internal void SaveChanges()
@@ -209,7 +209,37 @@ namespace UtilitiesCS.OutlookObjects.Store
             Current.JunkCertain = JunkEmail;
             Current.JunkPotential = JunkPotential;
             Current.ArchiveFsRoot = ArchiveFS;
+            PersistJunkFolderSelections();
             Model.Serialize();
+        }
+
+        internal void PersistJunkFolderSelections()
+        {
+            var olObjects = Globals?.Ol;
+            if (olObjects is null)
+            {
+                return;
+            }
+
+            var applyMethod = olObjects
+                .GetType()
+                .GetMethod(
+                    "ApplyJunkFolderSelections",
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                    null,
+                    [typeof(string), typeof(string)],
+                    null
+                );
+
+            if (applyMethod is null)
+            {
+                logger.Warn(
+                    "Unable to persist junk-folder selections because the Outlook globals implementation does not expose ApplyJunkFolderSelections."
+                );
+                return;
+            }
+
+            applyMethod.Invoke(olObjects, [JunkEmail?.RelativePath, JunkPotential?.RelativePath]);
         }
 
         internal virtual FolderMinimalWrapper SelectFolder()

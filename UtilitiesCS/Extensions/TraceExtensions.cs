@@ -30,7 +30,9 @@ namespace UtilitiesCS.Extensions
                     }
                     else
                     {
-                        var m = sf.GetFrame(i).GetMethod();
+                        var m = sf.GetFrame(i)?.GetMethod();
+                        if (m == null)
+                            continue;
                         if (m.Name == methodName)
                         {
                             caller = m;
@@ -68,6 +70,14 @@ namespace UtilitiesCS.Extensions
 
         public static string GetParameterName(this MethodBase method, int index)
         {
+            if (method is null)
+            {
+                throw new ArgumentNullException(
+                    nameof(method),
+                    $"Cannot call {nameof(GetParameterName)}({index}) because {nameof(method)} is null"
+                );
+            }
+
             var parameters = method.GetParameters();
             if (parameters is null || parameters.Count() == 0)
             {

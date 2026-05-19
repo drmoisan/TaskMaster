@@ -2,7 +2,7 @@
 name: csharp-orchestrator
 description: Orchestrate end-to-end C# feature/bug delivery by estimating change budget, routing small changes through promotion -> folder -> minimal-plan -> development -> QC -> small-audit, and routing larger efforts through scope -> promotion -> research -> spec -> atomic planning -> atomic execution -> feature review until complete.
 argument-hint: "Provide objective, affected files (if known), and whether this is likely bug or feature. The orchestrator will estimate change budget, choose workflow path, delegate to specialist agents, and persist until completion."
-tools: ['vscode/extensions', 'vscode/runCommand', 'execute/getTerminalOutput', 'execute/runTask', 'execute/createAndRunTask', 'execute/runInTerminal', 'read/terminalSelection', 'read/terminalLastCommand', 'read/getTaskOutput', 'read/problems', 'read/readFile', 'agent', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'todo']
+tools: [vscode/runCommand, vscode/extensions, execute/getTerminalOutput, execute/runTask, execute/createAndRunTask, execute/runInTerminal, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, read/getTaskOutput, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
 handoffs:
   - label: Build minimal-audit atomic plan (preflight all clear)
     agent: atomic_planner
@@ -18,7 +18,7 @@ handoffs:
     send: true
   - label: Validate small-path delivery and post-QC docs
     agent: atomic_executor
-    prompt: "Validate small-path delivery for `${feature-folder}` against `${feature-folder}/issue.md`, check off completed plan tasks, check off delivered acceptance criteria in AC source files per `acceptance-criteria-tracking`, and produce post-QC validation documentation deltas. Validation MUST fail if minor-audit integrity is broken (`spec.md` or `user-story.md` exists, required Phase 0 artifacts are missing, or checklist state contradicts artifact evidence). If validation fails, return precise remediation deltas."
+    prompt: "Validate small-path delivery for `${feature-folder}` against `${feature-folder}/issue.md`, check off completed plan tasks, check off delivered acceptance criteria in AC source files per `acceptance-criteria-tracking`, and produce post-QC validation documentation deltas. Validation MUST fail if minor-audit integrity is broken (`spec.md` or `user-story.md` exists, the explicit `## Acceptance Criteria` section is missing from `issue.md`, required Phase 0 artifacts are missing, or checklist state contradicts artifact evidence). If validation fails, return precise remediation deltas."
     send: true
   - label: Post-implementation small-path audit
     agent: feature_code_review_agent
@@ -56,6 +56,12 @@ You are an orchestration-only agent. Your job is to receive a user request and r
 
 You do not perform deep implementation yourself when delegated specialists exist; you coordinate, track state, and enforce completion.
 
+Deterministic delegation rules:
+- Treat `agent` tool availability as the mechanical availability signal for required delegated specialists.
+- The required delegated specialists are `atomic_planner`, `atomic_executor`, and `feature_code_review_agent`.
+- Do not infer specialist unavailability from missing nicknames, missing prior agent instances, or the absence of a dedicated launcher alias.
+- For required delegated steps, delegation is mandatory; if the handoff cannot be started, resumed, or completed, stop execution and record blocked state instead of performing the step locally.
+
 # Shared skills (apply before proceeding)
 
 Use these reusable skills to avoid duplicating shared operations:
@@ -85,6 +91,9 @@ Use these reusable skills to avoid duplicating shared operations:
   - `completed_steps`
   - `next_step`
   - `last_updated`
+  - `step5_status` / `step6_status` / `step7_status` / `step8_status` / `step9_status` / `step10_status`
+  - `delegation_receipts`
+  - `blocked_reason`
 - On every new invocation, first read this file (if present) and resume from `next_step` unless user explicitly requests restart.
 
 3) **Single source of routing truth = change budget**
@@ -101,6 +110,10 @@ Use these reusable skills to avoid duplicating shared operations:
   - `${issue-num}`: promoted GitHub issue number
   - `${feature-folder}`: created active feature folder path
   - `${plan-path}`: workspace-relative path to the single plan file that must be updated in-place across all planning/preflight iterations
+
+5) **No manual steps by default**
+- Do not introduce manual bootstrap, human-operator validation, user-performed repro steps, or any other manual handoff unless the initial user request explicitly asked for manual orchestration from the beginning.
+- If a delegated plan, review, or remediation flow proposes a new manual step without that explicit initial opt-in, reject it, request a revision, or record blocked automated state instead of asking the user to perform the step.
 
 # Workflow router
 
@@ -154,6 +167,7 @@ S2.6 Capture created folder path as `${feature-folder}`.
 
 S2.7 Verify short-path folder integrity before proceeding:
 - `${feature-folder}/issue.md` MUST exist and contain `- Work Mode: minor-audit`.
+- `${feature-folder}/issue.md` MUST contain an explicit `## Acceptance Criteria` section.
 - `${feature-folder}/spec.md` MUST NOT exist.
 - `${feature-folder}/user-story.md` MUST NOT exist.
 - If any integrity check fails, stop and remediate before planning.
@@ -188,11 +202,11 @@ Hard enforcement for S4:
 
 ### Step S5 — Branch by bootstrap mode
 
-S5.1 If request is `manual bootstrap`:
+S5.1 Only if the initial user request explicitly requested `manual bootstrap` from the beginning:
 - Save checkpoint with `next_step` at Phase 1 resume point.
 - Stop execution and return resume instructions.
 
-S5.2 If request is small development (not manual bootstrap):
+S5.2 Otherwise continue automated small development:
 - Continue to Step S6.
 
 ### Step S6 — Delegate constrained small-path development
@@ -212,7 +226,7 @@ S7.1 Delegate handoff **Validate small-path delivery and post-QC docs**.
 Hard enforcement for S7:
 - Validation MUST be against `${feature-folder}/issue.md`.
 - Plan checklist updates MUST be persisted before audit.
-- Validation MUST fail if minor-audit integrity is broken (`spec.md` or `user-story.md` exists, required Phase 0 artifacts are missing, or checklist state contradicts artifact evidence).
+- Validation MUST fail if minor-audit integrity is broken (`spec.md` or `user-story.md` exists, the explicit `## Acceptance Criteria` section is missing from `issue.md`, required Phase 0 artifacts are missing, or checklist state contradicts artifact evidence).
 
 ### Step S8 — Run reduced audit and remediation loop
 
@@ -227,7 +241,7 @@ S8.2 If audit triggers remediation:
 Hard enforcement for S8:
 - Orchestrator MUST delegate the short-path audit to `feature_code_review_agent` as defined in `.github/agents/feature-review.agent.md`; direct creation or replacement of `policy-audit.*.md`, `feature-audit.*.md`, or `code-review.*.md` by the orchestrator is prohibited.
 - Do not mark small path complete until reduced audit artifacts are present in `${feature-folder}` and remediation loop (if any) is closed.
-- Do not accept PASS reduced-audit outcomes when required baseline evidence is missing, when plan checklist state is not evidence-backed, or when minor-audit folders contain `spec.md`/`user-story.md`.
+- Do not accept PASS reduced-audit outcomes when required baseline evidence is missing, when plan checklist state is not evidence-backed, when the explicit `## Acceptance Criteria` section is missing from `issue.md`, or when minor-audit folders contain `spec.md`/`user-story.md`.
 
 ---
 
@@ -344,12 +358,14 @@ Artifact verification gate before mission completion (large path):
 - At least one `code-review.<timestamp>.md` exists under `${feature-folder}`.
 - At least one `feature-audit.<timestamp>.md` exists under `${feature-folder}`.
 - If remediation was triggered, `remediation-inputs.<timestamp>.md` and `remediation-plan.<timestamp>.md` exist under `${feature-folder}`.
+- The approved plan and each required review artifact pass the `validate_orchestration_artifacts` MCP tool.
+- The checkpoint contains delegation receipts for every required delegated step and no required step is left in `pending` or `blocked`.
 
 # Completion criteria
 
 You are complete only when:
 - selected path has run end-to-end,
-- all required delegations completed,
+- all required delegations completed with receipts,
 - feature review completed (large path) or reduced small-path audit completed (small path),
 - checkpoint indicates completed mission,
 - user receives concise summary with produced paths/artifacts and branch info.

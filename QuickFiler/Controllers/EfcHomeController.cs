@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +20,44 @@ namespace QuickFiler
 {
     public class EfcHomeController : IFilerHomeController
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            MethodBase.GetCurrentMethod().DeclaringType
+        );
+
+        private static string DescribeSynchronizationContext(SynchronizationContext syncContext)
+        {
+            return syncContext?.GetType().FullName ?? "null";
+        }
+
+        private static string DescribeStartupOverlapState(IApplicationGlobals globals)
+        {
+            return globals?.Events is null ? "unknown" : "correlated";
+        }
+
+        private static string BuildFirstSelectionTimingContext(
+            IApplicationGlobals globals,
+            int selectedItemCount
+        )
+        {
+            return $"threadId={Thread.CurrentThread.ManagedThreadId}; syncContext={DescribeSynchronizationContext(SynchronizationContext.Current)}; selectedItemCount={selectedItemCount}; startupOverlapState={DescribeStartupOverlapState(globals)}";
+        }
+
+        private static void LogFirstSelectionTiming(
+            string phase,
+            IApplicationGlobals globals,
+            int selectedItemCount,
+            string details = null
+        )
+        {
+            var detailSegment = string.IsNullOrWhiteSpace(details) ? string.Empty : $" | {details}";
+            var phaseLabel = phase.StartsWith("[First-selection timing]", StringComparison.Ordinal)
+                ? phase
+                : $"[First-selection timing] {phase}";
+            logger.Debug(
+                $"{phaseLabel} | {BuildFirstSelectionTimingContext(globals, selectedItemCount)}{detailSegment}"
+            );
+        }
+
         #region Constructors, Initializers, and Destructors
 
         public EfcHomeController(
@@ -77,7 +116,7 @@ namespace QuickFiler
 
             if (mailItems.Count() > 0)
             {
-                await home.InitAsync(
+                await home.HandleSelectionChangedAsync(
                     globals,
                     mailItems,
                     QfEnums.InitTypeEnum.Sort | QfEnums.InitTypeEnum.SortConv
@@ -99,9 +138,42 @@ namespace QuickFiler
             home.CreateCancellationToken();
             var mailItems = LoadToList(globals, mail);
 
-            await home.InitAsync(globals, mailItems, QfEnums.InitTypeEnum.Find);
+            await home.HandleSelectionChangedAsync(globals, mailItems, QfEnums.InitTypeEnum.Find);
 
             return home;
+        }
+
+        protected internal async Task HandleSelectionChangedAsync(
+            IApplicationGlobals globals,
+            List<MailItem> mailItems,
+            QfEnums.InitTypeEnum initType
+        )
+        {
+            var selectionStopwatch = Stopwatch.StartNew();
+            var selectionSnapshot = CaptureSelectionSnapshot(mailItems);
+            var selectedItemCount = selectionSnapshot.Count;
+            LogFirstSelectionTiming(
+                "[First-selection timing] HandleSelectionChangedAsync selection snapshot | selection snapshot",
+                globals,
+                selectedItemCount,
+                "selection snapshot captured before background model load"
+            );
+
+            await InitAsync(globals, selectionSnapshot, initType);
+
+            LogFirstSelectionTiming(
+                "[First-selection timing] HandleSelectionChangedAsync final UI publish | final UI publish",
+                globals,
+                selectedItemCount,
+                $"final UI publish after model initialization; elapsedMs={selectionStopwatch.ElapsedMilliseconds}"
+            );
+        }
+
+        private static List<MailItem> CaptureSelectionSnapshot(List<MailItem> mailItems)
+        {
+            // Freeze the caller-visible selection membership before any asynchronous model staging
+            // begins so controller orchestration no longer depends on a live, mutable selection list.
+            return mailItems is null ? [] : [.. mailItems];
         }
 
         protected async Task InitAsync(
@@ -110,13 +182,12 @@ namespace QuickFiler
             QfEnums.InitTypeEnum initType
         )
         {
-            // Start initializing data model
+            // The controller publishes only two coarse UI stages: shell initialization without data,
+            // then a single data-field publication after the staged model load completes.
             Task<EfcDataModel> modelTask = null;
             if (mailItems.Count() > 0)
             {
-                modelTask = Task.Run(() =>
-                    EfcDataModel.CreateAsync(globals, mailItems, TokenSource, Token, false)
-                );
+                modelTask = EfcDataModel.CreateAsync(globals, mailItems, TokenSource, Token, false);
             }
 
             // Initialize the rest of the home controller

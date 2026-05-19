@@ -7,7 +7,15 @@
     "dotnet restore": true,
     "git checkout": true,
     "Test-Path": true,
-    "git rev-parse": true
+    "git rev-parse": true,
+    "/^pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild\\.ps1 -SolutionPath TaskMaster\\.sln -Configuration Debug -Platform 'Any CPU' -EnableNETAnalyzers -EnforceCodeStyleInBuild$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/^pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild\\.ps1 -SolutionPath TaskMaster\\.sln -Configuration Debug -Platform 'Any CPU' -EnableNullable -TreatWarningsAsErrors$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
   },
   "koverage.coverageFileNames": [
     "coverage.cobertura.xml"

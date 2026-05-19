@@ -60,87 +60,119 @@ namespace UtilitiesCS
 
         public static string GetSenderName(this MailItem olMail)
         {
-            var name = olMail.SenderName;
-            return name;
-            //AddressEntry sender = olMail.Sender;
-            //string senderName = "";
+            AddressEntry sender = olMail.Sender;
+            if (sender is null)
+            {
+                return TryGetMailSenderName(olMail);
+            }
 
-            //if (sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
-            //{
-            //    ExchangeUser exchUser = sender.GetExchangeUser();
-            //    if (exchUser != null)
-            //    {
-            //        senderName = $"{exchUser.FirstName} {exchUser.LastName}";
-            //    }
-            //    else
-            //    {
-            //        senderName = sender.Name;
-            //    }
-            //}
-            //else
-            //{
-            //    senderName = olMail.SenderName;
-            //}
-            //return senderName;
+            // Prefer the Exchange directory name when it is available, but fall back to the
+            // mail-item sender fields if the Exchange directory call fails.
+            try
+            {
+                if (IsExchangeAddressEntry(sender))
+                {
+                    ExchangeUser exchUser = sender.GetExchangeUser();
+                    if (exchUser != null)
+                    {
+                        return $"{exchUser.FirstName} {exchUser.LastName}";
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                logger.Warn(
+                    "GetSenderName (MailItem): Exchange directory lookup failed; falling back to display name.",
+                    ex
+                );
+            }
+
+            var senderName = TryGetMailSenderName(olMail);
+            if (!senderName.IsNullOrEmpty())
+            {
+                return senderName;
+            }
+
+            return TryGetAddressEntryName(sender, "GetSenderName (MailItem)");
         }
 
         public static string GetSenderName(this MeetingItem olMeeting)
         {
-            return olMeeting.SenderName;
+            return olMeeting.SenderName ?? string.Empty;
         }
 
         public static string GetSenderAddress(this MeetingItem olMeeting)
         {
-            return olMeeting.SenderEmailAddress;
+            var address = olMeeting.SenderEmailAddress ?? string.Empty;
+
+            // Exchange DN addresses (X500 format) cannot be resolved to a usable SMTP address
+            // without a session reference; fall back to the display name in those cases.
+            if (address.IsNullOrEmpty() || address.StartsWith("/o=ExchangeLabs"))
+            {
+                var name = olMeeting.SenderName ?? string.Empty;
+                return name.StartsWith("/o=ExchangeLabs") ? string.Empty : name;
+            }
+
+            return address;
         }
 
         public static string GetSenderAddress(this MailItem olMail)
         {
-            return olMail.SenderEmailAddress;
-            //AddressEntry sender = olMail.Sender;
-            //string senderAddress = "";
+            AddressEntry sender = olMail.Sender;
+            if (sender is null)
+            {
+                return TryGetMailSenderAddress(olMail);
+            }
 
-            //if (sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || sender?.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
-            //{
-            //    ExchangeUser exchUser = sender.GetExchangeUser();
-            //    if (exchUser != null)
-            //    {
-            //        senderAddress = exchUser.PrimarySmtpAddress;
-            //    }
-            //    else
-            //    {
-            //        senderAddress = sender.Address;
-            //    }
-            //}
-            //else
-            //{
-            //    senderAddress = olMail.SenderEmailAddress;
-            //}
-            //if (senderAddress.IsNullOrEmpty())
-            //{
-            //    var olPA = sender.PropertyAccessor;
-            //    try
-            //    {
-            //        senderAddress = olPA.GetProperty(PR_SMTP_ADDRESS) as string;
-            //        if (senderAddress.IsNullOrEmpty())
-            //            throw new InvalidOperationException("Sender address is null or empty");
-            //    }
-            //    catch
-            //    {
-            //        try
-            //        {
-            //            senderAddress = olMail.SenderName;
-            //            if (senderAddress.IsNullOrEmpty() || senderAddress.StartsWith("/o=ExchangeLabs"))
-            //                throw new InvalidOperationException("Sender address and name are null or empty");
-            //        }
-            //        catch
-            //        {
-            //            senderAddress = "";
-            //        }
-            //    }
-            //}
+            // Prefer the Exchange directory primary SMTP over the mail-item field, which
+            // may contain a stale or X500 Exchange DN address.
+            string address = null;
+            try
+            {
+                if (IsExchangeAddressEntry(sender))
+                {
+                    ExchangeUser exchUser = sender.GetExchangeUser();
+                    if (exchUser != null)
+                    {
+                        address = exchUser.PrimarySmtpAddress;
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                logger.Warn(
+                    "GetSenderAddress (MailItem): Exchange directory lookup failed; falling back.",
+                    ex
+                );
+            }
 
-            //return senderAddress;
+            // Fall back to the mail-item address fields when Exchange lookup yields nothing.
+            if (address.IsNullOrEmpty())
+            {
+                address = TryGetMailSenderAddress(olMail);
+            }
+
+            if (address.IsNullOrEmpty())
+            {
+                address = TryGetAddressEntryAddress(sender, "GetSenderAddress (MailItem)");
+            }
+
+            // Last resort: query the MAPI property accessor, then use SenderName if still empty.
+            if (address.IsNullOrEmpty())
+            {
+                address = TryGetAddressEntrySmtpAddress(sender, "GetSenderAddress (MailItem)");
+            }
+
+            if (address.IsNullOrEmpty())
+            {
+                address = TryGetMailSenderName(olMail);
+                if (address.IsNullOrEmpty() || address.StartsWith("/o=ExchangeLabs"))
+                {
+                    address = string.Empty;
+                }
+            }
+
+            return address ?? string.Empty;
         }
 
         public static IRecipientInfo GetSenderInfo(this MeetingItem olMeeting)
@@ -170,7 +202,6 @@ namespace UtilitiesCS
             {
                 var name = olMail.GetSenderName();
                 var address = olMail.GetSenderAddress();
-                var pa = olMail.Sender.PropertyAccessor;
                 var html = ConvertRecipientToHtml(name, address);
                 return new RecipientInfo(name, address, html);
             }
@@ -413,57 +444,35 @@ namespace UtilitiesCS
 
         private static string GetRecipientAddress(Recipient olRecipient)
         {
-            string smtpAddress;
+            string smtpAddress = string.Empty;
 
-            if (
-                olRecipient.AddressEntry.AddressEntryUserType
-                    == OlAddressEntryUserType.olExchangeUserAddressEntry
-                || olRecipient.AddressEntry.AddressEntryUserType
-                    == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry
-            )
+            try
             {
-                ExchangeUser exchUser = olRecipient.AddressEntry.GetExchangeUser();
-                if (exchUser != null)
+                var addressEntry = olRecipient.AddressEntry;
+                if (IsExchangeAddressEntry(addressEntry))
                 {
-                    smtpAddress = exchUser.PrimarySmtpAddress;
+                    ExchangeUser exchUser = addressEntry.GetExchangeUser();
+                    if (exchUser != null)
+                    {
+                        smtpAddress = exchUser.PrimarySmtpAddress;
+                    }
                 }
                 else
                 {
                     smtpAddress = olRecipient.Address;
                 }
             }
-            else
+            catch (System.Exception ex)
             {
-                smtpAddress = olRecipient.Address;
+                logger.Warn(
+                    "GetRecipientAddress: Exchange directory lookup failed; falling back to recipient data.",
+                    ex
+                );
             }
-            if (smtpAddress.IsNullOrEmpty())
-            {
-                var olPA = olRecipient.PropertyAccessor;
-                try
-                {
-                    smtpAddress = (string)olPA.GetProperty(PR_SMTP_ADDRESS);
-                    if (smtpAddress.IsNullOrEmpty())
-                        throw new InvalidOperationException("SMTP address is null or empty");
-                }
-                catch
-                {
-                    try
-                    {
-                        smtpAddress = olRecipient.Name;
-                        if (
-                            smtpAddress.IsNullOrEmpty() || smtpAddress.StartsWith("/o=ExchangeLabs")
-                        )
-                            throw new InvalidOperationException(
-                                "SMTP address and name are null, empty, or malformed"
-                            );
-                    }
-                    catch (System.Exception)
-                    {
-                        smtpAddress = "";
-                    }
-                }
-            }
-            return smtpAddress;
+
+            return smtpAddress.IsNullOrEmpty()
+                ? GetRecipientFallbackAddress(olRecipient)
+                : smtpAddress;
             //var OlPA = OlRecipient.PropertyAccessor;
             //string StrSMTPAddress;
             //try
@@ -524,68 +533,35 @@ namespace UtilitiesCS
 
         internal static (string Name, string Address) GetRecipientInfo(Recipient recipient)
         {
-            string name,
-                address;
-            name = recipient.Name;
-            address = recipient.Address;
-            //try
-            //{
-            //    if (recipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeUserAddressEntry || recipient.AddressEntry.AddressEntryUserType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry)
-            //    {
-            //        ExchangeUser exchUser = recipient.AddressEntry.GetExchangeUser();
-            //        if (exchUser != null)
-            //        {
-            //            var firstNameExch = exchUser.FirstName;
-            //            address = exchUser.PrimarySmtpAddress;
-            //            var rx = new Regex(@"^(.+)@([^@]+)$");
-            //            name = $"{exchUser.FirstName} {exchUser.LastName}";
-            //        }
-            //        else
-            //        {
-            //            name = recipient.Name;
-            //            address = recipient.Address;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        name = recipient.Name;
-            //        address = recipient.Address;
-            //    }
-            //}
-            //catch (System.Exception)
-            //{
-            //    name = recipient.Name;
-            //    address = recipient.Address;
-            //}
-
-            return (name, address);
+            // Delegate to the robust helpers so Exchange directory lookup and PropertyAccessor
+            // fallbacks are applied consistently — matching the GetInfo / GetRecipients paths.
+            return (GetRecipientName(recipient), GetRecipientAddress(recipient));
         }
 
         private static string GetRecipientName(Recipient olRecipient)
         {
-            string recipientName;
-            if (
-                olRecipient.AddressEntry.AddressEntryUserType
-                    == OlAddressEntryUserType.olExchangeUserAddressEntry
-                || olRecipient.AddressEntry.AddressEntryUserType
-                    == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry
-            )
+            try
             {
-                ExchangeUser exchUser = olRecipient.AddressEntry.GetExchangeUser();
-                if (exchUser != null)
+                var addressEntry = olRecipient.AddressEntry;
+                if (IsExchangeAddressEntry(addressEntry))
                 {
-                    recipientName = $"{exchUser.FirstName} {exchUser.LastName}";
-                }
-                else
-                {
-                    recipientName = olRecipient.Name;
+                    ExchangeUser exchUser = addressEntry.GetExchangeUser();
+                    var exchangeDisplayName = GetExchangeUserDisplayName(exchUser);
+                    if (!exchangeDisplayName.IsNullOrEmpty())
+                    {
+                        return exchangeDisplayName;
+                    }
                 }
             }
-            else
+            catch (System.Exception ex)
             {
-                recipientName = olRecipient.Name;
+                logger.Warn(
+                    "GetRecipientName: Exchange directory lookup failed; falling back to recipient data.",
+                    ex
+                );
             }
-            return recipientName;
+
+            return GetRecipientFallbackName(olRecipient);
         }
 
         private static string GetRecipientHtml(Recipient olRecipient)
@@ -594,6 +570,204 @@ namespace UtilitiesCS
                 GetRecipientName(olRecipient),
                 GetRecipientAddress(olRecipient)
             );
+        }
+
+        private static bool IsExchangeAddressEntry(AddressEntry addressEntry)
+        {
+            if (addressEntry is null)
+            {
+                return false;
+            }
+
+            try
+            {
+                var userType = addressEntry.AddressEntryUserType;
+                return userType == OlAddressEntryUserType.olExchangeUserAddressEntry
+                    || userType == OlAddressEntryUserType.olExchangeRemoteUserAddressEntry;
+            }
+            catch (System.Exception ex)
+            {
+                logger.Warn(
+                    "IsExchangeAddressEntry: address entry type lookup failed; treating the entry as non-Exchange.",
+                    ex
+                );
+                return false;
+            }
+        }
+
+        private static string TryGetMailSenderName(MailItem olMail)
+        {
+            try
+            {
+                return olMail.SenderName ?? string.Empty;
+            }
+            catch (System.Exception ex)
+            {
+                logger.Warn("GetSenderName (MailItem): mail-item sender-name lookup failed.", ex);
+                return string.Empty;
+            }
+        }
+
+        private static string TryGetMailSenderAddress(MailItem olMail)
+        {
+            try
+            {
+                var address = olMail.SenderEmailAddress ?? string.Empty;
+                return address.StartsWith("/o=ExchangeLabs") ? string.Empty : address;
+            }
+            catch (System.Exception ex)
+            {
+                logger.Warn(
+                    "GetSenderAddress (MailItem): mail-item sender-address lookup failed.",
+                    ex
+                );
+                return string.Empty;
+            }
+        }
+
+        private static string TryGetAddressEntryName(AddressEntry addressEntry, string context)
+        {
+            if (addressEntry is null)
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                return addressEntry.Name ?? string.Empty;
+            }
+            catch (System.Exception ex)
+            {
+                logger.Warn($"{context}: address-entry name lookup failed.", ex);
+                return string.Empty;
+            }
+        }
+
+        private static string TryGetAddressEntryAddress(AddressEntry addressEntry, string context)
+        {
+            if (addressEntry is null)
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                return addressEntry.Address ?? string.Empty;
+            }
+            catch (System.Exception ex)
+            {
+                logger.Warn($"{context}: address-entry address lookup failed.", ex);
+                return string.Empty;
+            }
+        }
+
+        private static string TryGetAddressEntrySmtpAddress(
+            AddressEntry addressEntry,
+            string context
+        )
+        {
+            if (addressEntry is null)
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                var address = (string)addressEntry.PropertyAccessor.GetProperty(PR_SMTP_ADDRESS);
+                return address ?? string.Empty;
+            }
+            catch (System.Exception ex)
+            {
+                logger.Warn($"{context}: property accessor lookup failed.", ex);
+                return string.Empty;
+            }
+        }
+
+        private static string GetExchangeUserDisplayName(ExchangeUser exchUser)
+        {
+            if (exchUser is null)
+            {
+                return string.Empty;
+            }
+
+            return $"{exchUser.FirstName} {exchUser.LastName}".Trim();
+        }
+
+        private static string GetRecipientFallbackName(Recipient olRecipient)
+        {
+            try
+            {
+                if (!olRecipient.Name.IsNullOrEmpty())
+                {
+                    return olRecipient.Name;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                logger.Warn(
+                    "GetRecipientName: recipient display-name lookup failed; falling back to address data.",
+                    ex
+                );
+            }
+
+            return GetRecipientFallbackAddress(olRecipient);
+        }
+
+        private static string GetRecipientFallbackAddress(Recipient olRecipient)
+        {
+            string smtpAddress = string.Empty;
+
+            try
+            {
+                smtpAddress = olRecipient.Address;
+            }
+            catch (System.Exception ex)
+            {
+                logger.Warn(
+                    "GetRecipientAddress: recipient address lookup failed; falling back to property accessor.",
+                    ex
+                );
+            }
+
+            if (smtpAddress.IsNullOrEmpty())
+            {
+                try
+                {
+                    smtpAddress = (string)olRecipient.PropertyAccessor.GetProperty(PR_SMTP_ADDRESS);
+                    if (smtpAddress.IsNullOrEmpty())
+                    {
+                        throw new InvalidOperationException("SMTP address is null or empty");
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger.Warn(
+                        "GetRecipientAddress: property accessor lookup failed; falling back to recipient name.",
+                        ex
+                    );
+                    smtpAddress = string.Empty;
+                }
+            }
+
+            if (smtpAddress.IsNullOrEmpty())
+            {
+                try
+                {
+                    smtpAddress = olRecipient.Name;
+                    if (smtpAddress.IsNullOrEmpty() || smtpAddress.StartsWith("/o=ExchangeLabs"))
+                    {
+                        throw new InvalidOperationException(
+                            "SMTP address and name are null, empty, or malformed"
+                        );
+                    }
+                }
+                catch (System.Exception)
+                {
+                    smtpAddress = string.Empty;
+                }
+            }
+
+            return smtpAddress;
         }
     }
 }

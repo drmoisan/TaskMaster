@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -37,20 +38,31 @@ namespace UtilitiesCS.OutlookObjects.Store
             return this;
         }
 
-        public static async Task<StoresWrapper> CreateAsync(
+        public static Task<StoresWrapper> CreateAsync(
             IApplicationGlobals globals,
             CancellationToken cancel
         )
         {
-            return await Task.Run(() => new StoresWrapper(globals).Init(), cancel);
+            cancel.ThrowIfCancellationRequested();
+            return Task.FromResult(new StoresWrapper(globals).Init());
         }
 
         [OnDeserialized]
-        public async void RewireOlObjects(System.Runtime.Serialization.StreamingContext context)
+        public void RewireOlObjects(System.Runtime.Serialization.StreamingContext context)
+        {
+            _ = RewireAfterDeserializeWithLoggingAsync();
+        }
+
+        public virtual Task RewireAfterDeserializeAsync()
+        {
+            return RewireOlObjectsAsync(default);
+        }
+
+        private async Task RewireAfterDeserializeWithLoggingAsync()
         {
             try
             {
-                await RewireOlObjectsAsync(context);
+                await RewireAfterDeserializeAsync();
             }
             catch (System.Exception e)
             {
@@ -61,22 +73,47 @@ namespace UtilitiesCS.OutlookObjects.Store
         internal async Task RewireOlObjectsAsync(StreamingContext context)
         {
             this.Stores ??= [];
-            var stores = GetFilteredStores();
+            var totalStopwatch = Stopwatch.StartNew();
+            var filteredStoresStopwatch = Stopwatch.StartNew();
+            var stores = GetFilteredStores().ToList();
+            logger.Debug(
+                $"[Startup timing] GetFilteredStores completed: {stores.Count} stores in {filteredStoresStopwatch.ElapsedMilliseconds} ms"
+            );
 
+            var processedStoreCount = 0;
             foreach (var store in stores)
             {
-                var storeWrapper = Stores.Find(x => x.DisplayName == store.DisplayName);
+                if (processedStoreCount > 0)
+                {
+                    await Task.Yield();
+                }
+
+                var perStoreStopwatch = Stopwatch.StartNew();
+                var storeDisplayName = store.DisplayName;
+                var storeWrapper = Stores.Find(x => x.DisplayName == storeDisplayName);
+                var wasCreated = false;
+
                 if (storeWrapper is null)
                 {
-                    storeWrapper = await Task.Run(() => new StoreWrapper(store).Init());
+                    storeWrapper = new StoreWrapper(store).Init();
                     Stores.Add(storeWrapper);
+                    wasCreated = true;
                 }
                 else
                 {
-                    await Task.Run(() => storeWrapper.Restore(store));
-                    //await Task.Run(() => storeWrapper.RestoreGlobalAddresses(Globals.Ol.App));
+                    storeWrapper.Restore(store);
                 }
+
+                logger.Debug(
+                    $"[Startup timing] Store '{storeDisplayName}' iteration completed in {perStoreStopwatch.ElapsedMilliseconds} ms (operation={(wasCreated ? "Init" : "Restore")})"
+                );
+
+                processedStoreCount++;
             }
+
+            logger.Debug(
+                $"[Startup timing] RewireOlObjectsAsync total: {totalStopwatch.ElapsedMilliseconds} ms"
+            );
         }
 
         private IEnumerable<Outlook.Store> GetFilteredStores()
