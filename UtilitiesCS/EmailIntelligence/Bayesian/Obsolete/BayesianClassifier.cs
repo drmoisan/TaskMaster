@@ -458,10 +458,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             // throw ArgumentOutOfRangeException.
             var chunkSize = Math.Max(
                 1,
-                (int)Math.Round(
-                    (double)Parent.SharedTokenBase.TokenFrequency.Keys.Count() / (double)processors,
-                    0
-                )
+                (int)
+                    Math.Round(
+                        (double)Parent.SharedTokenBase.TokenFrequency.Keys.Count()
+                            / (double)processors,
+                        0
+                    )
             );
             sw?.LogDuration("Calculate Chunk Size");
 
