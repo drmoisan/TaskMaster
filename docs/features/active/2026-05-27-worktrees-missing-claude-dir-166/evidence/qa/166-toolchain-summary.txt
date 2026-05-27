@@ -1,0 +1,39 @@
+[P4-T4] QA Toolchain Determination — Issue #166
+Captured: 2026-05-27T11:32 (local)
+
+Change set: single edit to c:\Users\DanMoisan\repos\TaskMaster\.gitignore
+(remove bare `.claude` entry; add targeted ignores for .claude/settings.local.json
+and .claude/agent-memory/). No source files changed.
+
+Toolchain step determinations (each is a documented N/A or documented adaptation,
+not a skipped requirement):
+
+(a) Formatter — N/A.
+    No source files. `.gitignore` is not a CSharpier- or Prettier-formatted file.
+    CSharpier formats only *.cs; no *.cs files changed.
+
+(b) Linter — N/A.
+    No analyzer-bearing source changes. .NET Roslyn analyzers operate on compiled
+    C# code; no such code changed.
+
+(c) Type check — N/A.
+    No C# build. No *.cs/*.csproj/*.props/*.targets in scope (see
+    166-csharp-toolchain-na.txt, P0-T3). msbuild nullable/analyzer builds not applicable.
+
+(d) Tests — Adapted (documented unit-test-policy exception).
+    `.gitignore` behavior is a git-process property. The repository General Unit Test
+    Policy (UT4) and C# Unit Test Policy prohibit external processes and temporary files
+    in unit tests, so no MSTest test is written. The regression is verified
+    deterministically via `git check-ignore`:
+      - Pre-fix (defect proof): docs/.../evidence/regression/166-pre-fix-check-ignore.txt
+      - Post-fix (allowed):    docs/.../evidence/qa/166-post-fix-check-ignore-allowed.txt
+      - Post-fix (invariant):  docs/.../evidence/qa/166-post-fix-check-ignore-still-ignored.txt
+      - Dry-run staging:       docs/.../evidence/qa/166-git-add-dryrun.txt
+    All post-fix verifications passed.
+
+(e) Coverage — N/A.
+    No production C# code changed; repository-wide coverage is unaffected.
+
+Overall: CSharpier, msbuild (analyzer + nullable), and vstest were NOT run because
+they are not applicable to a `.gitignore`-only change. They are recorded here as
+documented N/A. The adapted test step passed.

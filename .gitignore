@@ -348,4 +348,6 @@ healthchecksdb
 logs/
 
 .dotnet*/
-.claude
+# .claude/ agentic environment is tracked so it materializes in git worktrees (Issue #166).
+# Keep per-developer and per-agent state out of version control (Issue #149).
+.claude/settings.local.json

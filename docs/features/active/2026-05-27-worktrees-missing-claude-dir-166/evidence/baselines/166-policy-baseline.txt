@@ -1,0 +1,35 @@
+[P0-T2] Policy Baseline — Issue #166
+Captured: 2026-05-27T11:32 (local)
+
+Governing policy files read for this change:
+
+1. c:\Users\DanMoisan\repos\TaskMaster\CLAUDE.md
+   Governing clauses:
+   - General Code Change Policy: design principles (simplicity first, separation of
+     concerns); mandatory toolchain loop (format -> lint -> type-check -> test);
+     file size limit (<= 500 lines); minimal, targeted change scope.
+   - Bugfix Workflow: failing regression first, minimal targeted fix, verify locally.
+     Adapted here to a command-based git check-ignore verification (see UT4 exception).
+   - General Unit Test Policy section UT4 (External Dependencies and Environment):
+     "Unit tests must not depend on external services ... or external processes."
+     "Creation and use of temporary files on the local filesystem is expressly
+     prohibited." A git-process-based test is therefore not written as an MSTest unit
+     test; the regression is adapted to deterministic git check-ignore commands.
+
+2. c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\general-code-change.md
+   Governing clauses:
+   - Design Principles (simplicity first, separation of concerns).
+   - Mandatory Toolchain Loop (format, lint, type-check, test) — documented N/A per
+     phase QA where no source files change.
+   - File Size Limit (<= 500 lines). Markdown documentation files are exempt.
+   - I/O Boundaries: core logic testable without filesystem/network; no temp files.
+
+3. c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\general-unit-test.md
+   Governing clauses:
+   - Core Principles (independence, isolation, fast, deterministic, readable).
+   - External Dependencies: no external services/processes; no temporary files.
+     This clause is the basis for the documented exception adapting the regression
+     to git check-ignore commands rather than an MSTest unit test.
+
+Conclusion: The change is a single .gitignore edit. The above policies apply.
+No conflicting instructions were encountered.
