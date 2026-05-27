@@ -1,0 +1,2 @@
+- [gitignore-tracking-expands-diff-scope](project_gitignore-tracking-diff-scope.md) — un-ignoring `.claude/` makes the whole subtree show as added in the branch diff; audit scope must cover those files, not the plan's "single file" claim
+- [powershell-coverage-mandatory-when-ps1-in-diff](feedback_powershell-coverage-gate.md) — validate-feature-review-coverage hook blocks termination without an explicit PASS/FAIL PowerShell coverage verdict when .ps1 files changed
