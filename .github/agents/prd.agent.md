@@ -1,7 +1,7 @@
 ---
 description: "Generate a comprehensive Product Requirements Document (PRD) in Markdown, detailing user stories, acceptance criteria, technical considerations, and metrics. Optionally create GitHub issues upon user confirmation."
 name: "prd_creator"
-tools: [read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/editFiles, search, web, 'drmcopilotextension/*', github.vscode-pull-request-github/issue_fetch, github.vscode-pull-request-github/doSearch]
+tools: [read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/editFiles, search, web, 'drm-copilot/*', github.vscode-pull-request-github/issue_fetch, github.vscode-pull-request-github/doSearch]
 ---
 
 # Create PRD Chat Mode

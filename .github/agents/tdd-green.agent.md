@@ -1,7 +1,7 @@
 ---
 description: 'Implement minimal code to satisfy GitHub issue requirements and make failing tests pass without over-engineering.'
 name: 'TDD Green Phase - Make Tests Pass Quickly'
-tools: [execute/testFailure, execute/getTerminalOutput, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, edit/editFiles, search, 'github/*', 'drmcopilotextension/*']
+tools: [execute/testFailure, execute/getTerminalOutput, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, edit/editFiles, search, 'github/*', 'drm-copilot/*']
 ---
 # TDD Green Phase - Make Tests Pass Quickly
 

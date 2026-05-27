@@ -3,7 +3,7 @@ name: comment_remediator
 model: GPT-5.4 (copilot)
 description: Autonomous agent that remediates code to comply with intent-first docstring and comment policies across specified Python scopes (file, folder, or full repo) while enforcing repo coding standards.
 tools:
-  [execute/testFailure, execute/getTerminalOutput, execute/runTask, execute/createAndRunTask, execute/runInTerminal, read/problems, read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/usages, 'drmcopilotextension/*', todo]
+  [execute/testFailure, execute/getTerminalOutput, execute/runTask, execute/createAndRunTask, execute/runInTerminal, read/problems, read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/usages, 'drm-copilot/*', todo]
 ---
 # Comment Remediation Agent
 

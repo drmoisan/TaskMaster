@@ -20,10 +20,10 @@ Use this skill when:
 When the agent has access to the VS Code extension tool surface (in particular `vscode/runCommand` plus extension access), execute the lifecycle through the contributed extension commands first.
 
 Canonical extension command invocations:
-- feature potential entry: `drmCopilotExtension.newPotentialEntry` with `[`"-ShortName"`, `"${short-name}"`]`
-- bug potential entry: `drmCopilotExtension.newPotentialBugEntry` with `[`"--short-name"`, `"${short-name}"`]`
-- potential-to-issue promotion: `drmCopilotExtension.potentialToIssue` with `[`"--potential-path"`, `"${relativeFile}"`, `"--promotion-type"`, `"${promotion-type}"`, `"--work-mode"`, `"${work-mode}"`]`
-- active feature folder creation: `drmCopilotExtension.newActiveFeatureFolder` with `[`"--feature-name"`, `"${long-name}"`, `"--type"`, `"${promotion-type}"`, `"--issue-number"`, `"${issue-num}"`, `"--work-mode"`, `"${work-mode}"`]`
+- feature potential entry: `drm-copilot.newPotentialEntry` with `[`"-ShortName"`, `"${short-name}"`]`
+- bug potential entry: `drm-copilot.newPotentialBugEntry` with `[`"--short-name"`, `"${short-name}"`]`
+- potential-to-issue promotion: `drm-copilot.potentialToIssue` with `[`"--potential-path"`, `"${relativeFile}"`, `"--promotion-type"`, `"${promotion-type}"`, `"--work-mode"`, `"${work-mode}"`]`
+- active feature folder creation: `drm-copilot.newActiveFeatureFolder` with `[`"--feature-name"`, `"${long-name}"`, `"--type"`, `"${promotion-type}"`, `"--issue-number"`, `"${issue-num}"`, `"--work-mode"`, `"${work-mode}"`]`
 
 Fallback rule:
 - Use the direct script/CLI commands below only when the agent host cannot invoke VS Code extension commands directly.
@@ -44,30 +44,30 @@ Fallback rule:
 ## Canonical Fallback Command Sequence
 
 1) Create potential entry by type:
-- feature: `VS Code command: `drm-copilot: New Potential Entry` (command ID: `drmCopilotExtension.newPotentialEntry`) -ShortName ${short-name}`
-- bug: `VS Code command: `drm-copilot: New Potential Bug Entry` (command ID: `drmCopilotExtension.newPotentialBugEntry`) --short-name ${short-name}`
+- feature: `VS Code command: `drm-copilot: New Potential Entry` (command ID: `drm-copilot.newPotentialEntry`) -ShortName ${short-name}`
+- bug: `VS Code command: `drm-copilot: New Potential Bug Entry` (command ID: `drm-copilot.newPotentialBugEntry`) --short-name ${short-name}`
 
 2) Promote potential doc:
-- `VS Code command: `drm-copilot: Potential To Issue` (command ID: `drmCopilotExtension.potentialToIssue`) --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode ${work-mode}`
+- `VS Code command: `drm-copilot: Potential To Issue` (command ID: `drm-copilot.potentialToIssue`) --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode ${work-mode}`
 
 3) Create branch:
 - `${promotion-type}/${short-name}-${issue-num}`
 
 4) Create active feature folder:
-- `VS Code command: `drm-copilot: New Active Feature Folder` (command ID: `drmCopilotExtension.newActiveFeatureFolder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode ${work-mode}`
+- `VS Code command: `drm-copilot: New Active Feature Folder` (command ID: `drm-copilot.newActiveFeatureFolder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode ${work-mode}`
 
 ## Canonical Fallback Short-Path Sequence (Minor Audit Mode)
 
 When orchestrator routing selects short path, promotion/folder initialization still occurs and MUST use `minor-audit` mode.
 
 1) Promote potential doc with short-path flag:
-- `VS Code command: `drm-copilot: Potential To Issue` (command ID: `drmCopilotExtension.potentialToIssue`) --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode minor-audit`
+- `VS Code command: `drm-copilot: Potential To Issue` (command ID: `drm-copilot.potentialToIssue`) --potential-path ${relativeFile} --promotion-type ${promotion-type} --work-mode minor-audit`
 
 2) Create branch:
 - `${promotion-type}/${short-name}-${issue-num}`
 
 3) Create active feature folder with short-path flag:
-- `VS Code command: `drm-copilot: New Active Feature Folder` (command ID: `drmCopilotExtension.newActiveFeatureFolder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode minor-audit`
+- `VS Code command: `drm-copilot: New Active Feature Folder` (command ID: `drm-copilot.newActiveFeatureFolder`) --feature-name ${long-name} --type ${promotion-type} --issue-number ${issue-num} --work-mode minor-audit`
 
 3a) Verify minor-audit folder integrity before proceeding:
 - `${feature-folder}/issue.md` exists and contains `- Work Mode: minor-audit`

@@ -1,7 +1,7 @@
 ---
 description: 'Beast Mode 2.0: A powerful autonomous agent tuned specifically for GPT-5.4 that can solve complex problems by using tools, conducting research, and iterating until the problem is fully resolved.'
 model: GPT-5.4 (copilot)
-tools: [vscode, execute, read, agent, edit, search, 'drmcopilotextension/*', web, todo]
+tools: [vscode, execute, read, agent, edit, search, 'drm-copilot/*', web, todo]
 name: 'GPT 5.4 Beast Mode'
 ---
 
