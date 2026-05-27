@@ -18,8 +18,8 @@ namespace UtilitiesCS.Test.Threading
     ///     correctly transitions the supplied CancellationTokenSource into the
     ///     cancelled state.
     ///
-    /// Constraints:
-    ///     All tests run on an STA thread (required by WinForms).
+        /// Constraints:
+        ///     This class runs under MSTest's STA class execution mode (required by WinForms).
     ///     Construction requires a non-null SynchronizationContext.Current so that
     ///     TaskScheduler.FromCurrentSynchronizationContext() succeeds; each test
     ///     installs and then restores the SynchronizationContext around the viewer.
@@ -27,7 +27,7 @@ namespace UtilitiesCS.Test.Threading
     ///     tests that invoke the cancel path must not use 'using' on the viewer,
     ///     and must capture the CancellationToken before invoking the handler.
     /// </summary>
-    [TestClass]
+    [STATestClass]
     public class ProgressViewer_Tests
     {
         private static ProgressViewer CreateHeadlessViewer() =>
@@ -58,7 +58,6 @@ namespace UtilitiesCS.Test.Threading
         ///     because it was created outside the viewer.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void CancelPath_WhenInvoked_CancelsTokenSource()
         {
             // Arrange — install a SynchronizationContext so the constructor does not throw.
@@ -124,7 +123,6 @@ namespace UtilitiesCS.Test.Threading
         ///     restores the prior context in the finally block.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void Constructor_PopulatesSyncContextAndScheduler()
         {
             // Arrange — install a known SynchronizationContext so that
@@ -167,7 +165,6 @@ namespace UtilitiesCS.Test.Threading
         ///     once; creates and disposes the viewer in the finally block.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void UiDispatcher_SetterAndGetter_RoundTripAssignedValue()
         {
             // Arrange
@@ -206,7 +203,6 @@ namespace UtilitiesCS.Test.Threading
         ///     Creates and disposes a ProgressViewer in the finally block.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void UiThreadNumber_SetterAndGetter_RoundTripAssignedValue()
         {
             // Arrange
@@ -244,7 +240,6 @@ namespace UtilitiesCS.Test.Threading
         ///     finally block.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void CancelSource_SetterAndGetter_RoundTripAssignedValue()
         {
             // Arrange

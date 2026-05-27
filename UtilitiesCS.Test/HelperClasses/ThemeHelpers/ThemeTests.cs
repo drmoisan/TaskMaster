@@ -59,13 +59,12 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         #endregion
     }
 
-    [TestClass]
+    [STATestClass]
     public class ThemeControlGroup_Tests
     {
         #region OneField Constructor
 
         [TestMethod]
-        [STAThread]
         public void Constructor_OneField_CreatesInstance()
         {
             var controls = new List<Control> { new Label() };
@@ -93,7 +92,6 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         #region TwoField Constructor
 
         [TestMethod]
-        [STAThread]
         public void Constructor_TwoField_CreatesInstance()
         {
             var controls = new List<Control> { new Label() };
@@ -121,7 +119,6 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         #region TwoFieldAlt Constructor
 
         [TestMethod]
-        [STAThread]
         public void Constructor_TwoFieldAlt_CreatesInstance()
         {
             var controls = new List<Control> { new Label() };
@@ -142,7 +139,6 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         #region TwoFieldAltHover Constructor
 
         [TestMethod]
-        [STAThread]
         public void Constructor_TwoFieldAltHover_CreatesInstance()
         {
             var controls = new List<Control> { new Label() };
@@ -168,7 +164,6 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         // -----------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void ApplyTheme_TwoField_SetsExpectedColors()
         {
             // Arrange: two controls with a known fore/back pair.
@@ -193,7 +188,6 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         // -----------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void ApplyTheme_TwoFieldAlt_IsAltTrue_SetsAltColors()
         {
             // Arrange: alternate-selector always returns true so alt colors apply.
@@ -227,7 +221,6 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         // -----------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void ApplyTheme_HeterogeneousControls_DoesNotThrow()
         {
             // Arrange: mix of different WinForms control subtypes.
@@ -250,7 +243,6 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         }
 
         [TestMethod]
-        [STAThread]
         public void ApplyTheme_OneField_SetsBackColorOnAllControls()
         {
             var label = new Label();
@@ -264,7 +256,6 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         }
 
         [TestMethod]
-        [STAThread]
         public void ApplyTheme_TwoFieldAlt_IsAltFalse_SetsMainColors()
         {
             var label = new Label();
@@ -321,7 +312,6 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         }
 
         [TestMethod]
-        [STAThread]
         public void ApplyTheme_TwoFieldAltHover_SetsEventColorsForAltAndMainControls()
         {
             var mainControl = new Label();
@@ -345,7 +335,6 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         }
 
         [TestMethod]
-        [STAThread]
         public void HoverHandlers_UpdateBackColorForMouseEnterAndLeave()
         {
             var mainControl = new Label();
@@ -373,7 +362,6 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         }
 
         [TestMethod]
-        [STAThread]
         public void DeactivateEvents_TwoFieldAltHover_DoesNotThrowAfterWiringHandlers()
         {
             var group = new ThemeControlGroup(
@@ -393,7 +381,6 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
         }
 
         [TestMethod]
-        [STAThread]
         public void DeactivateEvents_NonHoverGroup_DefaultBranchDoesNothing()
         {
             var group = new ThemeControlGroup(new List<Control> { new Label() }, Color.Red);

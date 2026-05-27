@@ -14,10 +14,10 @@ namespace UtilitiesCS.Test.Dialogs
     ///     hide rather than dispose the viewer.
     ///
     /// Constraints:
-    ///     All tests run on an STA thread (required by WinForms).
+    ///     This class runs under MSTest's STA class execution mode (required by WinForms).
     ///     Click handlers are invoked via reflection because they are private.
     /// </summary>
-    [TestClass]
+    [STATestClass]
     public class FolderNotFoundViewer_Tests
     {
         // ---------------------------------------------------------------------------
@@ -45,7 +45,6 @@ namespace UtilitiesCS.Test.Dialogs
         // ---------------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void CreateFolder_Click_SetsFolderActionToCreate()
         {
             // Arrange — create viewer and confirm FolderAction starts null
@@ -64,7 +63,6 @@ namespace UtilitiesCS.Test.Dialogs
         // ---------------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void Cancel_Click_SetsFolderActionToCancel()
         {
             // Arrange
@@ -82,7 +80,6 @@ namespace UtilitiesCS.Test.Dialogs
         // ---------------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void OpenFolder_Click_SetsFolderActionToFind()
         {
             // Arrange
@@ -96,7 +93,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void NoToAll_Click_SetsFolderActionToNoToAll()
         {
             // Arrange
@@ -114,7 +110,6 @@ namespace UtilitiesCS.Test.Dialogs
         // ---------------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void FolderName_ReturnsAssignedText()
         {
             // Arrange
@@ -133,7 +128,6 @@ namespace UtilitiesCS.Test.Dialogs
         // ---------------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void CreateFolder_Click_DoesNotDisposeViewer()
         {
             // Arrange

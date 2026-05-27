@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [assembly: AssemblyTitle("UtilitiesCS.Test")]
 [assembly: AssemblyDescription("")]
@@ -14,6 +15,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 [assembly: Guid("5db8647f-4479-451f-b19a-10a4a0d62675")]
+[assembly: Parallelize(Workers = 0, Scope = Microsoft.VisualStudio.TestTools.UnitTesting.ExecutionScope.ClassLevel)]
 
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]

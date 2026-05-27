@@ -113,8 +113,7 @@ namespace UtilitiesCS.Test
         /// Returns:
         ///     YesNoToAllResponse.Yes after the seam invokes RespondYes().
         /// </summary>
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void ShowDialog_SeamInvokesRespondYes_ReturnsYesResponse()
         {
             // Arrange: inject seam that simulates the Yes delegate button being clicked
@@ -146,8 +145,7 @@ namespace UtilitiesCS.Test
         /// Returns:
         ///     YesNoToAllResponse.No after the seam invokes RespondNo().
         /// </summary>
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void ShowDialog_SeamInvokesRespondNo_ReturnsNoResponse()
         {
             // Arrange: simulate No button click
@@ -178,8 +176,7 @@ namespace UtilitiesCS.Test
         /// Returns:
         ///     YesNoToAllResponse.YesToAll after the seam invokes RespondYesToAll().
         /// </summary>
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void ShowDialog_SeamInvokesRespondYesToAll_ReturnsYesToAllResponse()
         {
             // Arrange: simulate YesToAll button click

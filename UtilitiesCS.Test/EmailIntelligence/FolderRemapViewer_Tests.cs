@@ -18,11 +18,12 @@ namespace UtilitiesCS.Test.EmailIntelligence
     ///     SetController, and the FormatFileSize helper.
     ///
     /// Usage:
-    ///     All tests instantiate FolderRemapViewer on an STA thread.
+    ///     This class runs under MSTest's STA class execution mode because every
+    ///     test instantiates FolderRemapViewer.
     ///     SetController tests inject an uninitialized controller whose _folderRemapTree
     ///     and _mappings2 are set via reflection to avoid COM access.
     /// </summary>
-    [TestClass]
+    [STATestClass]
     public class FolderRemapViewer_Tests
     {
         // ---------------------------------------------------------------------------
@@ -73,7 +74,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// reflection. Uses DropTargetLocation.Background so HandleModelDropped is
         /// a no-op and no additional dependencies are required.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void TlvOriginal_ModelDropped_ForwardsEventToController_DoesNotThrow()
         {
@@ -114,7 +114,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that SetController runs to completion and configures the
         /// CanExpandGetter on TlvOriginal (confirming SetupTree executed).
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void SetController_WithSyntheticController_ConfiguresTreeDelegates()
         {
@@ -139,7 +138,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that FormatFileSize returns a "KB" string for a 1 KB input and a
         /// "bytes" string for a sub-KB input.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void FormatFileSize_ReturnsExpectedStringForSampleInputs()
         {

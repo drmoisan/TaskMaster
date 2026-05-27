@@ -10,7 +10,7 @@ using UtilitiesCS.EmailIntelligence.SubjectMap;
 
 namespace UtilitiesCS.Test.EmailIntelligence
 {
-    [TestClass]
+    [STATestClass]
     public class SubjectMapMetrics_Tests
     {
         private static DataListView GetMetricsListView(SubjectMapMetrics viewer) =>
@@ -19,7 +19,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
                     .GetField("DlvMetrics", BindingFlags.NonPublic | BindingFlags.Instance)
                     .GetValue(viewer);
 
-        [STAThread]
         [TestMethod]
         public void Constructor_WithMetrics_PopulatesDlvMetricsWithExpectedNumericValues()
         {
@@ -47,7 +46,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 .Contain(column => column.AspectName == "EmailCount");
         }
 
-        [STAThread]
         [TestMethod]
         public void Constructors_WithEquivalentEmptyInputs_ProduceEquivalentDlvMetricsState()
         {

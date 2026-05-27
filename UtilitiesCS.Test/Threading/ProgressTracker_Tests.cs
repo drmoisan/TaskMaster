@@ -363,8 +363,7 @@ namespace UtilitiesCS.Test
         ///     Temporarily installs a SynchronizationContext on the calling STA thread.
         ///     ProgressViewer.Close() disposes the un-shown Form.
         /// </summary>
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void Report_At100Percent_WhenRootTracker_ClosesProgressViewer()
         {
             // Arrange — SynchronizationContext is required for ProgressViewer construction.
@@ -403,8 +402,7 @@ namespace UtilitiesCS.Test
             }
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void Initialize_WithCurrentDispatcherAndScreen_InitializesViewerAndUpdatesUi()
         {
             using var cts = new CancellationTokenSource();
@@ -468,8 +466,7 @@ namespace UtilitiesCS.Test
             parent.LastValue.Should().Be(100);
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public async Task ReportAsync_At100Percent_WhenRootTracker_ClosesProgressViewer()
         {
             var priorContext = SynchronizationContext.Current;

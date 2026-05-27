@@ -7,11 +7,10 @@ using UtilitiesCS;
 
 namespace UtilitiesCS.Test.HelperClasses
 {
-    [TestClass]
+    [STATestClass]
     public class TableLayoutHelper_Additional_Tests
     {
         [TestMethod]
-        [STAThread]
         public void InsertSpecificRow_WithExistingControls_ShiftsRowsAndClonesStyles()
         {
             var panel = CreatePanel(rowCount: 2, columnCount: 1);
@@ -34,7 +33,6 @@ namespace UtilitiesCS.Test.HelperClasses
         }
 
         [TestMethod]
-        [STAThread]
         public void RemoveSpecificRow_WhenIndexIsOutOfRange_LeavesPanelUnchanged()
         {
             var panel = CreatePanel(rowCount: 2, columnCount: 1);
@@ -46,7 +44,6 @@ namespace UtilitiesCS.Test.HelperClasses
         }
 
         [TestMethod]
-        [STAThread]
         public void RemoveSpecificRow_RemovesTargetedControlsAndShiftsRemainingRows()
         {
             var panel = CreatePanel(rowCount: 3, columnCount: 2);
@@ -67,7 +64,6 @@ namespace UtilitiesCS.Test.HelperClasses
         }
 
         [TestMethod]
-        [STAThread]
         public void RemoveSpecificColumn_WhenIndexIsOutOfRange_LeavesPanelUnchanged()
         {
             var panel = CreatePanel(rowCount: 1, columnCount: 2);
@@ -79,7 +75,6 @@ namespace UtilitiesCS.Test.HelperClasses
         }
 
         [TestMethod]
-        [STAThread]
         public void RemoveSpecificColumn_RemovesTargetedControlsAndShiftsRemainingColumns()
         {
             var panel = CreatePanel(rowCount: 2, columnCount: 3);

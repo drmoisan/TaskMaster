@@ -18,11 +18,11 @@ namespace UtilitiesCS.Test.EmailIntelligence
     ///     invoked.
     ///
     /// Usage:
-    ///     All tests instantiate FolderSelector on an STA thread. OlFolderRemap is
+    ///     This class runs under MSTest's STA class execution mode. OlFolderRemap is
     ///     constructed with the default no-arg constructor; RelativePath and Name
     ///     remain null but are not required by the tested paths.
     /// </summary>
-    [TestClass]
+    [STATestClass]
     public class FolderSelector_Tests
     {
         // ---------------------------------------------------------------------------
@@ -34,7 +34,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// TlvOriginal.Roots to the supplied collection and assigns a non-null
         /// CheckStatePutter delegate.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void Initialize_WithNonEmptyRoots_ConfiguresTreeRootsAndCheckStatePutter()
         {
@@ -60,7 +59,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// assigns the corresponding OlFolderRemap to the Selection property and
         /// returns CheckState.Checked.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void CheckStatePutter_WhenInvoked_SetsSelectionToNodeValue()
         {
@@ -88,7 +86,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that calling Initialize with an empty roots list does not throw
         /// and leaves the Selection property as null (no selection was made).
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void Initialize_WithEmptyRootsList_LeavesSelectionNull()
         {

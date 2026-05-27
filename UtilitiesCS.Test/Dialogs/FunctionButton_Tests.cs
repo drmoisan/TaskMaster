@@ -8,13 +8,12 @@ using UtilitiesCS.Dialogs;
 
 namespace UtilitiesCS.Test.Dialogs
 {
-    [TestClass]
+    [STATestClass]
     public class FunctionButton_Tests
     {
         #region Constructors
 
         [TestMethod]
-        [STAThread]
         public void DefaultConstructor_CreatesInstance()
         {
             var fb = new FunctionButton<int>();
@@ -22,7 +21,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void Constructor_WithNameAndText_CreatesButton()
         {
             Func<int> func = () => 42;
@@ -34,7 +32,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void Constructor_WithDialogResult_SetsResult()
         {
             Func<int> func = () => 42;
@@ -44,7 +41,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void SyncConstructorOverloads_InitializeButtonsTemplatesAndImages()
         {
             // Arrange
@@ -99,7 +95,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void AsyncConstructorOverloads_InitializeButtonsTemplatesAndImages()
         {
             // Arrange
@@ -177,7 +172,6 @@ namespace UtilitiesCS.Test.Dialogs
         #region MakeButton
 
         [TestMethod]
-        [STAThread]
         public void MakeButton_SetsText()
         {
             Func<int> func = () => 1;
@@ -189,7 +183,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void MakeButton_WithDialogResult_SetsDialogResult()
         {
             Func<int> func = () => 1;
@@ -204,7 +197,6 @@ namespace UtilitiesCS.Test.Dialogs
         #region Button_Click
 
         [TestMethod]
-        [STAThread]
         public void Button_Click_InvokesFunction()
         {
             Func<int> func = () => 42;
@@ -219,7 +211,6 @@ namespace UtilitiesCS.Test.Dialogs
         #region FromButton
 
         [TestMethod]
-        [STAThread]
         public void FromButton_CreatesFromExistingButton()
         {
             var button = new Button { Text = "Existing" };
@@ -235,7 +226,6 @@ namespace UtilitiesCS.Test.Dialogs
         #region Properties
 
         [TestMethod]
-        [STAThread]
         public void Name_SetAndGet()
         {
             var fb = new FunctionButton<int>();
@@ -244,7 +234,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void Delegate_SetAndGet()
         {
             var fb = new FunctionButton<int>();
@@ -254,7 +243,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void ButtonTemplate_SetAndGet_ClonesAssignedTemplate()
         {
             // Arrange
@@ -291,7 +279,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     is clicked following reassignment.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ReassignButton_UnwiresOldClickHandler()
         {
             // Arrange: create a FunctionButton whose ButtonClicked wires Button_Click
@@ -329,7 +316,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     Passes when Value equals 99 and the delegate was invoked exactly once.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ButtonClickAsync_ExecutesCallbackExactlyOnce()
         {
             // Arrange: wire an already-complete async callback so the await resolves
@@ -353,7 +339,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void ButtonClicked_Setter_ReplacesOldHandler()
         {
             // Arrange
@@ -369,7 +354,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void ButtonClickedAsync_Setter_ReplacesOldHandler()
         {
             // Arrange

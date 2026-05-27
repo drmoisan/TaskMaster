@@ -23,8 +23,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
     /// Usage:
     ///     All tests bypass the COM-dependent constructor via
     ///     FormatterServices.GetUninitializedObject and inject dependencies through
-    ///     reflection. Every test that touches WinForms controls must run on an STA
-    ///     thread.
+    ///     reflection. Tests that touch WinForms controls opt into MSTest's scoped
+    ///     STA execution explicitly.
     /// </summary>
     [TestClass]
     public partial class FolderRemapController_Tests
@@ -115,8 +115,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that HandleModelDropped with DropTargetLocation.Item causes the
         /// source node's MappedTo to be set to the target node's OlFolderRemap value.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void HandleModelDropped_ItemDrop_SetsMappedToOnSourceNode()
         {
             // Arrange
@@ -162,8 +161,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that Save() closes the viewer and accesses TD.FolderRemap on the
         /// backing model. Uses an empty ScoDictionary so Serialize() is a no-op.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void Save_ClosesViewer_AndAccessesFolderRemap()
         {
             // Arrange
@@ -192,8 +190,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// <summary>
         /// Verifies that Discard() closes the viewer form.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void Discard_ClosesViewer()
         {
             // Arrange
@@ -218,8 +215,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// expand nodes at depth 0 (all root-level nodes). The assertion confirms
         /// no exception is raised regardless of OLV expand behavior on a hidden form.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void ExpandTo_WithDepthLevelOne_DoesNotThrow()
         {
             // Arrange
@@ -247,8 +243,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// dictionary's Keys property when Mappings2 is empty (resulting in no
         /// removals and no additions). Serialize() is a no-op for an unfiled dict.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void SyncGlobalMap_WithEmptyMappings_PropagatesEmptyStateToGlobals()
         {
             // Arrange
@@ -362,8 +357,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         // P14-T9: ExpandTo(1, addChecked=true) expands nodes whose descendants have mappings
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void ExpandTo_WithAddCheckedTrue_DoesNotThrowOnMappedNodes()
         {
             // Arrange — node with MappedTo set so the addChecked branch executes
@@ -402,8 +396,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         // P14-T11: OlFolderTree_PropertyChanged syncs and updates viewer when _update is false
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void OlFolderTreePropertyChanged_WhenUpdateIsFalse_SyncsRemapTreeAndUpdatesViewer()
         {
             // Arrange — default _update=false so normal sync path is taken
