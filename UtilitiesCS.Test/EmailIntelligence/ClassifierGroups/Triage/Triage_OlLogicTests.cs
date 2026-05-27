@@ -354,10 +354,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         // #137 regression: in Outlook conversation view, Selection may contain the entire thread.
-        // The fix (Take(1)) must ensure only the first/focused item is trained per invocation,
-        // so TotalEmailCount increments by exactly 1 even when Selection has 2 items.
+        // The fix deduplicates by ConversationID so that only one item per conversation is trained,
+        // so TotalEmailCount increments by exactly 1 even when Selection has 2 items with the same ConversationID.
         [TestMethod]
-        public async Task TrainSelectionAsync_WhenSelectionContainsTwoMailItems_TrainsOnlyFirstItem_TotalEmailCountIncrementsOnce()
+        public async Task TrainSelectionAsync_WhenSelectionContainsTwoMailItemsWithSameConversationId_TrainsOnlyOneItem_TotalEmailCountIncrementsOnce()
         {
             // Arrange: two items in mock Selection simulating a conversation-view thread click.
             // Only the first item must be processed after the fix.
@@ -401,16 +401,16 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Act
             await _triageOlLogic.TrainSelectionAsync("A", CancellationToken.None);
 
-            // Assert: only the first item in the selection must be trained; the second item
+            // Assert: only one item per ConversationID must be trained; the duplicate thread item
             // (added by Outlook conversation view) must not be processed.
             _triage.ClassifierGroup.TotalEmailCount.Should().Be(emailCountBefore + 1);
         }
 
         // #137 regression: in Outlook conversation view, Selection may contain the entire thread.
-        // The fix (Take(1)) must ensure only the first/focused item contributes to MatchEmailCount;
-        // the conversation thread items must not be counted.
+        // The fix deduplicates by ConversationID so that only one item per conversation contributes
+        // to MatchEmailCount; conversation thread duplicates must not be counted.
         [TestMethod]
-        public async Task TrainSelectionAsync_WhenSelectionContainsTwoMailItems_TrainsOnlyFirstItem_MatchEmailCountIncrementsOnce()
+        public async Task TrainSelectionAsync_WhenSelectionContainsTwoMailItemsWithSameConversationId_TrainsOnlyOneItem_MatchEmailCountIncrementsOnce()
         {
             // Arrange: two items in mock Selection simulating a conversation-view thread click.
             var mockOlObjects = new Mock<IOlObjects>(MockBehavior.Strict);
@@ -458,8 +458,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Act
             await _triageOlLogic.TrainSelectionAsync("A", CancellationToken.None);
 
-            // Assert: only the first item's label must be counted; MatchEmailCount increments by 1
-            // (not 2), because the second conversation-thread item must not be trained.
+            // Assert: only one item per ConversationID must be counted; MatchEmailCount increments
+            // by 1 (not 2), because the duplicate conversation-thread item must not be trained.
             _triage
                 .ClassifierGroup.Classifiers["A"]
                 .MatchEmailCount.Should()

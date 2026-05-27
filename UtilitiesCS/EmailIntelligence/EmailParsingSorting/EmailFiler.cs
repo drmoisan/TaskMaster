@@ -367,6 +367,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         protected internal virtual async Task SerializeFolderManagerAsync()
         {
             (await Globals.AF.Manager["Folder"]).Serialize();
+            (await Globals.AF.Manager["Actionable"]).Serialize();
         }
 
         protected internal virtual async Task UnTrainFolderAsync(MailItemHelper mailHelper)
@@ -387,6 +388,13 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
         protected internal virtual Task TrainActionableAsync(MailItemHelper mailHelper)
         {
+            // Only train on confirmed actionable signals; skip "None" to avoid diluting the classifier
+            // with the majority class and producing a model that always predicts "None".
+            if (mailHelper.Actionable == "None")
+            {
+                return Task.CompletedTask;
+            }
+
             return Task.Run(async () =>
                 (await Globals.AF.Manager["Actionable"]).Train(
                     mailHelper.Actionable,

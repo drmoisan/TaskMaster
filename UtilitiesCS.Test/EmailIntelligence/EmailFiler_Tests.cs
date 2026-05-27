@@ -380,6 +380,24 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         [TestMethod]
+        public async Task TrainActionableAsync_WhenActionableIsNone_DoesNotTrainClassifier()
+        {
+            var actionableGroup = new BayesianClassifierGroup();
+            var manager = CreateManager(new BayesianClassifierGroup(), actionableGroup);
+            var filer = new ExposedEmailFiler
+            {
+                Globals = CreateGlobals(manager, null, null, null, null),
+            };
+            var helper = new TestMailItemHelper();
+            helper.SetTokens("alpha", "beta");
+            helper.Actionable = "None";
+
+            await filer.CallTrainActionableAsync(helper);
+
+            actionableGroup.Classifiers.Should().BeEmpty();
+        }
+
+        [TestMethod]
         public async Task EnumerateAttachments_WhenHelperContainsAttachments_ReturnsAllConfiguredAttachments()
         {
             var first = CreateAttachmentHelper("report.pdf", isImage: false);

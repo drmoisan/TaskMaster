@@ -200,6 +200,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 .Cast<object>()
                 .Where(x => x is MailItem)
                 .Cast<MailItem>()
+                .GroupBy(m => m.ConversationID)
+                .Select(g => g.First())
                 .ToAsyncEnumerable();
 
             await foreach (var mailItem in mailItems.WithCancellation(token))
