@@ -1210,20 +1210,20 @@ You must:
 
 **Agent execution requirement (explicit):**
 
-- Agents must use the MCP server functions: `mcp__drmCopilotExtension__run_poshqc_format`, `mcp__drmCopilotExtension__run_poshqc_analyze`, `mcp_drmcopilotext_run_poshqc_test`, and `mcp__drmCopilotExtension__run_poshqc_analyze_autofix`.
+- Agents must use the MCP server functions: `mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp_drmcopilotext_run_poshqc_test`, and `mcp__drm-copilot__run_poshqc_analyze_autofix`.
 - Agents must **not** use VS Code task wrappers as a substitute.
 
 1) **Formatting - Invoke-Formatter**
 
 - Format all PowerShell files using the PoshQC formatter (Invoke-Formatter).
-- **Agent execution:** `mcp__drmCopilotExtension__run_poshqc_format`
+- **Agent execution:** `mcp__drm-copilot__run_poshqc_format`
 - Do not hand-format; re-run the formatter whenever PSScriptAnalyzer would change whitespace/indentation.
 
 2) **Linting - PSScriptAnalyzer**
 
 - Run the PoshQC analyzer (PSScriptAnalyzer) with repo settings.
-- **Agent execution:** `mcp__drmCopilotExtension__run_poshqc_analyze`
-- Optional autofix: `mcp__drmCopilotExtension__run_poshqc_analyze_autofix`; review diffs after running.
+- **Agent execution:** `mcp__drm-copilot__run_poshqc_analyze`
+- Optional autofix: `mcp__drm-copilot__run_poshqc_analyze_autofix`; review diffs after running.
 - Fix **all** findings (Error/Warning/Information). No rule suppressions unless strictly necessary and localized with a comment.
 
 3) **Compatibility**
@@ -1258,8 +1258,8 @@ You must:
 
 When PowerShell code changes, your toolchain loop must include:
 
-1. Format: `mcp__drmCopilotExtension__run_poshqc_format`
-2. Analyze: `mcp__drmCopilotExtension__run_poshqc_analyze`
+1. Format: `mcp__drm-copilot__run_poshqc_format`
+2. Analyze: `mcp__drm-copilot__run_poshqc_analyze`
 3. (Type checking is not applicable for PowerShell; skip to testing.)
 4. Test: `mcp_drmcopilotext_run_poshqc_test`
 

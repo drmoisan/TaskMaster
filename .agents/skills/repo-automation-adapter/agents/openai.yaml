@@ -1,5 +1,5 @@
 dependencies:
   tools:
     - type: "mcp"
-      value: "drmCopilotExtension"
+      value: "drm-copilot"
       description: "Published drm-copilot stdio MCP bridge for repository automation"

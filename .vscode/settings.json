@@ -22,5 +22,8 @@
   ],
   "koverage.coverageFilePaths": [
     "coverage"
+  ],
+  "powerquery.client.additionalSymbolsDirectories": [
+    "c:/Users/DanMoisan/repos/TaskMaster/.vscode/excel-pq-symbols"
   ]
 }

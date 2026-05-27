@@ -1,7 +1,7 @@
 ---
 description: "Fill partially completed feature docs (user-story.md + spec.md) using supplied templates without re-embedding the templates themselves."
 name: "prd_feature"
-tools: [read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, edit/editFiles, search, web, 'drmcopilotextension/*', github.vscode-pull-request-github/issue_fetch, github.vscode-pull-request-github/doSearch]
+tools: [read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, edit/editFiles, search, web, 'drm-copilot/*', github.vscode-pull-request-github/issue_fetch, github.vscode-pull-request-github/doSearch]
 handoffs:
   - label: Research Implementation
     agent: Task Researcher Instructions

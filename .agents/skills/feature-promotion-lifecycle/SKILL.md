@@ -20,10 +20,10 @@ Use this skill when:
 When the agent has access to the VS Code extension tool surface (in particular `vscode/runCommand` plus extension access), execute the lifecycle through the contributed extension commands first.
 
 Canonical extension command invocations:
-- feature potential entry: `drmCopilotExtension.newPotentialEntry` with `[`"-ShortName"`, `"${short-name}"`]`
-- bug potential entry: `drmCopilotExtension.newPotentialBugEntry` with `[`"--short-name"`, `"${short-name}"`]`
-- potential-to-issue promotion: `drmCopilotExtension.potentialToIssue` with `[`"--potential-path"`, `"${relativeFile}"`, `"--promotion-type"`, `"${promotion-type}"`, `"--work-mode"`, `"${work-mode}"`]`
-- active feature folder creation: `drmCopilotExtension.newActiveFeatureFolder` with `[`"--feature-name"`, `"${long-name}"`, `"--type"`, `"${promotion-type}"`, `"--issue-number"`, `"${issue-num}"`, `"--work-mode"`, `"${work-mode}"`]`
+- feature potential entry: `drm-copilot.newPotentialEntry` with `[`"-ShortName"`, `"${short-name}"`]`
+- bug potential entry: `drm-copilot.newPotentialBugEntry` with `[`"--short-name"`, `"${short-name}"`]`
+- potential-to-issue promotion: `drm-copilot.potentialToIssue` with `[`"--potential-path"`, `"${relativeFile}"`, `"--promotion-type"`, `"${promotion-type}"`, `"--work-mode"`, `"${work-mode}"`]`
+- active feature folder creation: `drm-copilot.newActiveFeatureFolder` with `[`"--feature-name"`, `"${long-name}"`, `"--type"`, `"${promotion-type}"`, `"--issue-number"`, `"${issue-num}"`, `"--work-mode"`, `"${work-mode}"`]`
 
 Fallback rule:
 - Use the direct script/CLI commands below only when the agent host cannot invoke VS Code extension commands directly.
