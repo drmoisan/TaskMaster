@@ -1,0 +1,3 @@
+Warning The csproj at C:\Users\DanMoisan\repos\TaskMaster\TaskMaster\TaskMaster_BACKUP_1250.csproj failed to load with the following exception Name cannot begin with the '<' character, hexadecimal value 0x3C. Line 471, position 2.
+Warning .\TaskMaster\TaskMaster_BACKUP_1250.csproj - Appeared to be invalid xml so was not formatted.
+Checked 1057 files in 9708ms.
