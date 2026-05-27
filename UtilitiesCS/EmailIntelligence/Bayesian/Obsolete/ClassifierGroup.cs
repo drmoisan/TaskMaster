@@ -306,7 +306,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             int completed = 0;
 
             var processors = Math.Max(Environment.ProcessorCount - 2, 1);
-            var chunkSize = (int)Math.Round((double)count / (double)processors, 0);
+            // Ensure chunkSize is at least 1.  Math.Round can produce 0 when the classifier
+            // count is smaller than half the processor count, which causes Chunk(0) to
+            // throw ArgumentOutOfRangeException.
+            var chunkSize = Math.Max(1, (int)Math.Round((double)count / (double)processors, 0));
             var chunks = Classifiers.Values.Chunk(chunkSize);
 
             var sw = new SegmentStopWatch();

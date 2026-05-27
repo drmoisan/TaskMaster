@@ -63,6 +63,38 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             }
         }
 
+        [TestMethod]
+        public async Task HeavyParallelizationAsync_WithFewerClassifiersThanProcessors_DoesNotThrow()
+        {
+            // Regression: InferNegative computed chunkSize via Math.Round(count / processors),
+            // which rounds to 0 when the classifier count is smaller than half the processor
+            // count. Chunk(0) then throws ArgumentOutOfRangeException. A single classifier
+            // forces the chunkSize == 0 path on any multi-core host. The sibling RecalcProbsAsync
+            // was already clamped; this guards the matching InferNegative path.
+            var progressPane = new Mock<Microsoft.Office.Tools.CustomTaskPane>();
+            progressPane.SetupProperty(x => x.Visible, false);
+            var group = CreateConfiguredGroup(
+                CreateGlobals(progressPane.Object, CancellationToken.None),
+                classifierCount: 1,
+                clearProbabilities: true
+            );
+            var stopwatch = new SegmentStopWatch().Start();
+
+            Func<Task> act = () =>
+                group.AfterDeserialized_HeavyParallelizationAsync(
+                    CancellationToken.None,
+                    stopwatch
+                );
+
+            // The fix's contract: the chunk pipeline runs end-to-end without the
+            // ArgumentOutOfRangeException that Chunk(0) previously raised. Probability
+            // rebuild content is covered by the sibling test with a realistic classifier
+            // count; asserting Prob is non-null here confirms the rebuild path executed
+            // while keeping this test deterministic under parallel load.
+            await act.Should().NotThrowAsync();
+            group.Classifiers.Values.Should().OnlyContain(classifier => classifier.Prob != null);
+        }
+
         private static IApplicationGlobals CreateGlobals(
             Microsoft.Office.Tools.CustomTaskPane progressPane,
             CancellationToken cancelToken
