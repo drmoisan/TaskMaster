@@ -1,0 +1,14 @@
+[P0-T1] Branch and Commit Baseline — Issue #166
+Captured: 2026-05-27T11:32 (local)
+
+Command: git rev-parse --abbrev-ref HEAD
+Branch name: bug/worktrees-missing-claude-dir-166
+
+Command: git rev-parse HEAD
+Current HEAD commit SHA: b7bd81626a512c70c264a8badad5fa5691ca1c16
+
+Command: git merge-base HEAD development
+Merge-base SHA: b7bd81626a512c70c264a8badad5fa5691ca1c16
+
+Base branch: development
+Verified: active branch matches the planned branch (bug/worktrees-missing-claude-dir-166).

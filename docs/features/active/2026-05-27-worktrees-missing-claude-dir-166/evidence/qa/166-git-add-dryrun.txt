@@ -1,0 +1,84 @@
+[P4-T3] Post-Fix Verification — git add Dry Run — Issue #166
+Captured: 2026-05-27T11:32 (local)
+.gitignore state: FIXED (bare `.claude` replaced with targeted ignores)
+
+Command: git add -n .claude
+EXIT_CODE=0
+
+Output:
+add '.claude/agents/atomic-executor.md'
+add '.claude/agents/atomic-planner.md'
+add '.claude/agents/csharp-typed-engineer.md'
+add '.claude/agents/epic-review.md'
+add '.claude/agents/feature-review.md'
+add '.claude/agents/orchestrator.md'
+add '.claude/agents/powershell-typed-engineer.md'
+add '.claude/agents/prd-feature.md'
+add '.claude/agents/python-typed-engineer.md'
+add '.claude/agents/staged-review.md'
+add '.claude/agents/status-updater.md'
+add '.claude/agents/task-researcher.md'
+add '.claude/agents/typescript-engineer.md'
+add '.claude/hooks/check-powershell-test-purity.ps1'
+add '.claude/hooks/check-python-test-purity.ps1'
+add '.claude/hooks/enforce-checkpoint-monotonic.ps1'
+add '.claude/hooks/enforce-evidence-locations.ps1'
+add '.claude/hooks/enforce-feature-folder-order.ps1'
+add '.claude/hooks/enforce-powershell-batch-budget.ps1'
+add '.claude/hooks/enforce-pr-author-skill.ps1'
+add '.claude/hooks/enforce-prd-feature-before-planner.ps1'
+add '.claude/hooks/enforce-promotion-mcp-only.ps1'
+add '.claude/hooks/enforce-python-batch-budget.ps1'
+add '.claude/hooks/validate-bash.ps1'
+add '.claude/hooks/validate-executor-output.ps1'
+add '.claude/hooks/validate-feature-review-coverage.ps1'
+add '.claude/hooks/validate-orchestrator-output.ps1'
+add '.claude/hooks/validate-planner-output.ps1'
+add '.claude/hooks/validate-required-artifact-output.ps1'
+add '.claude/hooks/validate-task-researcher-output.ps1'
+add '.claude/rules/csharp.md'
+add '.claude/rules/general-code-change.md'
+add '.claude/rules/general-unit-test.md'
+add '.claude/rules/powershell.md'
+add '.claude/rules/python-suppressions.md'
+add '.claude/rules/python.md'
+add '.claude/rules/self-explanatory-code-commenting.md'
+add '.claude/rules/tonality.md'
+add '.claude/rules/typescript-suppressions.md'
+add '.claude/rules/typescript.md'
+add '.claude/settings.json'
+add '.claude/skills/commit-message/SKILL.md'
+add '.claude/skills/csharp-qa-gate/SKILL.md'
+add '.claude/skills/execute-hard-lock/SKILL.md'
+add '.claude/skills/feature-review-workflow/SKILL.md'
+add '.claude/skills/fill-feature-docs/SKILL.md'
+add '.claude/skills/invoke-csharp-engineer/SKILL.md'
+add '.claude/skills/invoke-powershell-engineer/SKILL.md'
+add '.claude/skills/invoke-python-engineer/SKILL.md'
+add '.claude/skills/orchestrate/SKILL.md'
+add '.claude/skills/powershell-change-budget-router/SKILL.md'
+add '.claude/skills/powershell-orchestration-state-machine/SKILL.md'
+add '.claude/skills/powershell-qa-gate/SKILL.md'
+add '.claude/skills/python-change-budget-router/SKILL.md'
+add '.claude/skills/python-qa-gate/SKILL.md'
+add '.claude/skills/research-issue/SKILL.md'
+add '.claude/skills/review-epic/SKILL.md'
+add '.claude/skills/review-feature/SKILL.md'
+add '.claude/skills/review-staged/SKILL.md'
+add '.claude/skills/translate-copilot-to-claude/SKILL.md'
+add '.claude/skills/update-status/SKILL.md'
+
+Confirmation of expected presence:
+- .claude/agents/      : present (13 files staged)
+- .claude/hooks/       : present (17 files staged)
+- .claude/rules/       : present (10 files staged)
+- .claude/skills/      : present (21 SKILL.md files staged)
+- .claude/settings.json: present (staged)
+
+Confirmation of expected absence (Issue #149 invariant):
+- .claude/settings.local.json : 0 matches in dry-run output (NOT staged)
+- .claude/agent-memory/       : 0 matches in dry-run output (NOT staged)
+(Verified via: grep -c on the dry-run output for each token; both returned 0.)
+
+Result: The now-tracked .claude/ tooling content is visible to git, while the two
+Issue #149 excluded items remain absent from the staging set.

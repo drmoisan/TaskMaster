@@ -1,0 +1,36 @@
+[P2-T1 / P2-T2] Pre-Fix Defect Verification (expect-fail) — Issue #166
+Captured: 2026-05-27T11:32 (local)
+.gitignore state: UNMODIFIED (bare `.claude` entry still present on final line)
+
+Documented exception: This is a deterministic command-based repro using
+`git check-ignore`, adapted from an MSTest regression test because the repository
+General Unit Test Policy (UT4) prohibits external processes and temporary files in
+unit tests. See 166-policy-baseline.txt.
+
+git check-ignore semantics: prints a path and exits 0 when the path IS ignored;
+prints nothing and exits 1 when the path is NOT ignored.
+
+=== [P2-T1] Tooling subtrees (expected: all printed => currently ignored => DEFECT) ===
+Command: git check-ignore .claude/skills .claude/agents .claude/hooks .claude/rules .claude/settings.json
+Output:
+.claude/skills
+.claude/agents
+.claude/hooks
+.claude/rules
+.claude/settings.json
+EXIT_CODE=0
+
+Result: All five tooling paths are ignored under the unmodified .gitignore.
+This is the defect: the agentic tooling environment is excluded from version
+control and therefore does not materialize in git worktrees (Issue #166).
+[expect-fail] outcome satisfied — the paths that SHOULD be tracked are currently ignored.
+
+=== [P2-T2] Issue #149 invariant paths (expected: both printed => already ignored) ===
+Command: git check-ignore .claude/settings.local.json .claude/agent-memory/orchestrator/MEMORY.md
+Output:
+.claude/settings.local.json
+.claude/agent-memory/orchestrator/MEMORY.md
+EXIT_CODE=0
+
+Result: Both Issue #149 invariant paths are already ignored. This establishes the
+pre-state for the invariant that the fix must preserve.

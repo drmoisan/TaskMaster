@@ -1,0 +1,20 @@
+[P1-T1 / P1-T2] Scope Lock — Issue #166
+Captured: 2026-05-27T11:32 (local)
+
+[P1-T1] Locked scope statement:
+- The only production/config file edited by this plan is:
+    c:\Users\DanMoisan\repos\TaskMaster\.gitignore
+- No .claude/ files are edited by this plan. Committing the now-tracked .claude/
+  content is performed later by the orchestrator pre-review `git add -A` step,
+  not by this plan.
+
+[P1-T2] Current .gitignore final-line confirmation:
+- File line endings: CRLF (verified via `tail -c 30 .gitignore | od -c`).
+- `wc -l` reports 350 newline-terminated lines; the bare `.claude` entry is the
+  final (351st) line and has no trailing newline.
+- Verbatim trailing bytes (od -c):
+    s \r \n l o g s / \r \n \r \n . d o t n e t * / \r \n . c l a u d e
+- Exact current final-line text to be replaced:
+    .claude
+
+This confirms line 351 is the bare `.claude` entry to be replaced (per P3-T1).

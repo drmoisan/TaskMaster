@@ -1,0 +1,23 @@
+[P4-T2] Post-Fix Verification — Issue #149 Invariant Preserved — Issue #166
+Captured: 2026-05-27T11:32 (local)
+.gitignore state: FIXED (bare `.claude` replaced with targeted ignores)
+
+git check-ignore semantics: prints a path and exits 0 when IGNORED;
+prints nothing and exits 1 when NOT ignored.
+
+=== settings.local.json (must remain ignored) ===
+Command: git check-ignore .claude/settings.local.json
+Output:
+.claude/settings.local.json
+EXIT_CODE=0
+
+=== agent-memory subtree (must remain ignored) ===
+Command: git check-ignore .claude/agent-memory/orchestrator/MEMORY.md
+Output:
+.claude/agent-memory/orchestrator/MEMORY.md
+EXIT_CODE=0
+
+Result: Both Issue #149 invariant paths remain ignored after the fix.
+Per-developer local settings (.claude/settings.local.json) and per-agent learned
+state (.claude/agent-memory/) are still excluded from version control.
+The Issue #149 invariant is preserved.

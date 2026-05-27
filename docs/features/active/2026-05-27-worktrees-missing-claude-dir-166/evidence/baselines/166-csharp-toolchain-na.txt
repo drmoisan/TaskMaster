@@ -1,0 +1,23 @@
+[P0-T3] C# Toolchain N/A Determination — Issue #166
+Captured: 2026-05-27T11:32 (local)
+
+Command: git diff --name-only development...HEAD
+Output: (empty — no committed changes; HEAD == merge-base development)
+
+Command: git status --porcelain
+Output:
+?? docs/features/active/2026-05-27-worktrees-missing-claude-dir-166/
+
+In-scope change set for this plan (per Scope and Constraints):
+- c:\Users\DanMoisan\repos\TaskMaster\.gitignore  (single production/config file)
+- docs/features/active/2026-05-27-worktrees-missing-claude-dir-166/  (feature folder + evidence)
+
+File-type analysis:
+- *.cs      : none in scope
+- *.csproj  : none in scope
+- *.props   : none in scope
+- *.targets : none in scope
+
+Determination: C# toolchain N/A — no C# build/test artifacts change.
+CSharpier, msbuild analyzer/nullable builds, and vstest coverage are not applicable.
+Repository-wide C# coverage is unaffected because no production C# code changes.
