@@ -7,6 +7,7 @@ using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using QuickFiler.Helper_Classes;
 using UtilitiesCS;
 
 namespace QuickFiler.Controllers.Tests
@@ -79,6 +80,103 @@ namespace QuickFiler.Controllers.Tests
             dataModel.ConversationResolver.Mail.Should().BeSameAs(onlyMail.Object);
         }
 
+        [TestMethod]
+        public async Task LoadConversationInfoAsync_WhenGlobalsDoNotExposeOutlookApp_DoesNotRequireApp()
+        {
+            var globals = CreateGlobals();
+            var folder = new Mock<Folder>(MockBehavior.Strict);
+            var conversation = new Mock<Conversation>(MockBehavior.Loose);
+            var table = CreateConversationTable();
+            var mailItem = CreateMailItem("entry-1", "Subject 1");
+
+            folder.SetupGet(x => x.Name).Returns("Inbox");
+            folder.SetupGet(x => x.FolderPath).Returns("\\Archive\\Inbox");
+            mailItem.SetupGet(x => x.Parent).Returns(folder.Object);
+            mailItem.Setup(x => x.GetConversation()).Returns(conversation.Object);
+            conversation.Setup(x => x.GetTable()).Returns(table.Object);
+
+            var helper = await MailItemHelper.FromMailItemAsync(
+                mailItem.Object,
+                globals.Object,
+                CancellationToken.None,
+                loadAll: false
+            );
+            var resolver = new ConversationResolver(globals.Object, mailItem.Object)
+            {
+                MailHelper = helper,
+            };
+
+            await resolver.LoadDfAsync(CancellationToken.None, backgroundLoad: false);
+
+            var info = await resolver.LoadConversationInfoAsync(
+                CancellationToken.None,
+                backgroundLoad: false
+            );
+
+            info.Expanded.Should().ContainSingle();
+            info.Expanded[0].Should().BeSameAs(helper);
+        }
+
+        [TestMethod]
+        public async Task CreateAsync_WithSingleSelectedMail_LeavesBackgroundInitializationStaged()
+        {
+            var globals = CreateGlobals();
+            var onlyMail = CreateMailItem("entry-1", "Subject 1");
+            var folder = new Mock<Folder>(MockBehavior.Strict);
+            var conversation = new Mock<Conversation>(MockBehavior.Loose);
+            var table = CreateConversationTable();
+            var selection = new List<MailItem> { onlyMail.Object };
+
+            folder.SetupGet(x => x.Name).Returns("Inbox");
+            folder.SetupGet(x => x.FolderPath).Returns("\\Archive\\Inbox");
+            onlyMail.SetupGet(x => x.Parent).Returns(folder.Object);
+            onlyMail.Setup(x => x.GetConversation()).Returns(conversation.Object);
+            conversation.Setup(x => x.GetTable()).Returns(table.Object);
+
+            var dataModel = await EfcDataModel.CreateAsync(
+                globals.Object,
+                selection,
+                new CancellationTokenSource(),
+                CancellationToken.None,
+                loadAll: false
+            );
+
+            SpinWait
+                .SpinUntil(() => dataModel.ConversationResolver.FullyLoaded, 250)
+                .Should()
+                .BeFalse();
+            dataModel.ConversationResolver.FullyLoaded.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void Constructor_WhenMailProvided_LeavesBackgroundInitializationStaged()
+        {
+            var globals = CreateGlobals();
+            var folder = new Mock<Folder>(MockBehavior.Strict);
+            var conversation = new Mock<Conversation>(MockBehavior.Loose);
+            var table = CreateConversationTable();
+            var mailItem = CreateMailItem("entry-1", "Subject 1");
+
+            folder.SetupGet(x => x.Name).Returns("Inbox");
+            folder.SetupGet(x => x.FolderPath).Returns("\\Archive\\Inbox");
+            mailItem.SetupGet(x => x.Parent).Returns(folder.Object);
+            mailItem.Setup(x => x.GetConversation()).Returns(conversation.Object);
+            conversation.Setup(x => x.GetTable()).Returns(table.Object);
+
+            var dataModel = new EfcDataModel(
+                globals.Object,
+                mailItem.Object,
+                new CancellationTokenSource(),
+                CancellationToken.None
+            );
+
+            SpinWait
+                .SpinUntil(() => dataModel.ConversationResolver.FullyLoaded, 250)
+                .Should()
+                .BeFalse();
+            dataModel.ConversationResolver.FullyLoaded.Should().BeFalse();
+        }
+
         /// <summary>
         /// Locks in the synchronous constructor snapshot contract used by the first-selection
         /// controller path. Supplying a mail item should eagerly build a resolver and snapshot
@@ -142,6 +240,7 @@ namespace QuickFiler.Controllers.Tests
 
             var mailItem = new Mock<MailItem>(MockBehavior.Strict);
             mailItem.SetupGet(x => x.EntryID).Returns(entryId);
+            mailItem.SetupGet(x => x.ConversationID).Returns("conversation-1");
             mailItem.SetupGet(x => x.Subject).Returns(subject);
             mailItem.SetupGet(x => x.Body).Returns("Body");
             mailItem.SetupGet(x => x.HTMLBody).Returns("<html><body>Body</body></html>");
