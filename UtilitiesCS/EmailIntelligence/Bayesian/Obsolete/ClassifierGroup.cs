@@ -270,31 +270,25 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         internal async Task RecalcNullProbs(CancellationToken token)
         {
-            if (Classifiers.Values.Any(x => x.Prob is null))
+            var classifiersToRecalc = Classifiers.Values.Where(x => x.Prob is null).ToArray();
+
+            if (classifiersToRecalc.Any())
             {
                 AppGlobals.AF.ProgressTracker.Report(0, "Starting to Recalculate Probabilities");
-                var count = Classifiers.Count;
+                var count = classifiersToRecalc.Length;
                 int completed = 0;
                 var sw = new SegmentStopWatch().Start();
 
-                await Classifiers
-                    .Values.ToAsyncEnumerable()
-                    .ForEachAsync(
-                        async (classifier) =>
-                        {
-                            await classifier.RecalcProbsAsync(token);
-                            Interlocked.Increment(ref completed);
-                            AppGlobals.AF.ProgressTracker.Report(
-                                (int)((double)completed / (double)count * 100),
-                                GetReportMessage(
-                                    completed,
-                                    count,
-                                    sw,
-                                    "Recalc Probabilities: Completed"
-                                )
-                            );
-                        }
+                foreach (var classifier in classifiersToRecalc)
+                {
+                    token.ThrowIfCancellationRequested();
+                    await classifier.RecalcProbsAsync(token);
+                    var current = Interlocked.Increment(ref completed);
+                    AppGlobals.AF.ProgressTracker.Report(
+                        (int)((double)current / (double)count * 100),
+                        GetReportMessage(current, count, sw, "Recalc Probabilities: Completed")
                     );
+                }
             }
         }
 
@@ -315,25 +309,26 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var sw = new SegmentStopWatch();
             // Start the chunked tasks to multiprocess async
             var tasks = chunks.Select(chunk =>
-                Task.Run(async () =>
-                    await chunk
-                        .ToAsyncEnumerable()
-                        .ForEachAsync(
-                            async (classifier) =>
-                            {
-                                await classifier.InferNegativeTokensAsync(token);
-                                Interlocked.Increment(ref completed);
-                                AppGlobals.AF.ProgressTracker.Report(
-                                    (int)((double)completed / (double)count * 100),
-                                    GetReportMessage(
-                                        completed,
-                                        count,
-                                        sw,
-                                        "Infer Negative Tokens: Completed"
-                                    )
-                                );
-                            }
-                        )
+                Task.Run(
+                    async () =>
+                    {
+                        foreach (var classifier in chunk)
+                        {
+                            token.ThrowIfCancellationRequested();
+                            await classifier.InferNegativeTokensAsync(token);
+                            var current = Interlocked.Increment(ref completed);
+                            AppGlobals.AF.ProgressTracker.Report(
+                                (int)((double)current / (double)count * 100),
+                                GetReportMessage(
+                                    current,
+                                    count,
+                                    sw,
+                                    "Infer Negative Tokens: Completed"
+                                )
+                            );
+                        }
+                    },
+                    token
                 )
             );
 

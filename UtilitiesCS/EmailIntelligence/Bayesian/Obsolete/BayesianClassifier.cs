@@ -435,7 +435,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             token.ThrowIfCancellationRequested();
 
-            Match ??= await Corpus.SubtractAsync(Parent.SharedTokenBase, NotMatch, token, sw);
+            if (_prob is null || Match is null)
+            {
+                Match = await Corpus.SubtractAsync(Parent.SharedTokenBase, NotMatch, token, sw);
+            }
             sw?.LogDuration("Infer Negative Tokens");
 
             token.ThrowIfCancellationRequested();

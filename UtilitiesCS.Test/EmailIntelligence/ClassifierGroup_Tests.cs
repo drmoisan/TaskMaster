@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -9,11 +9,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.Threading;
 
 #pragma warning disable CS0618
 
 namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 {
+    [DoNotParallelize]
     [TestClass]
     public class ClassifierGroup_Remediation_Tests
     {
@@ -103,13 +105,48 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             var autoFiles = new Mock<IAppAutoFileObjects>(MockBehavior.Loose);
             autoFiles
                 .SetupGet(x => x.ProgressTracker)
-                .Returns(BayesianPerformanceMeasurement_Tests.CreateFakeProgressTrackerPane());
+                .Returns(CreateFakeProgressTrackerPane());
             autoFiles.SetupGet(x => x.ProgressPane).Returns(progressPane);
             autoFiles.SetupGet(x => x.CancelToken).Returns(cancelToken);
 
             var globals = new Mock<IApplicationGlobals>(MockBehavior.Loose);
             globals.SetupGet(x => x.AF).Returns(autoFiles.Object);
             return globals.Object;
+        }
+
+        private static ProgressTrackerPane CreateFakeProgressTrackerPane()
+        {
+            var pane = (ProgressTrackerPane)
+                FormatterServices.GetUninitializedObject(typeof(ProgressTrackerPane));
+            var parentField = typeof(ProgressTrackerPane).GetField(
+                "_parent",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            var parent = Activator.CreateInstance(
+                parentField.FieldType,
+                new SynchronousProgress<(int Value, string JobName)>(_ => { }),
+                100,
+                0
+            );
+
+            parentField.SetValue(pane, parent);
+            typeof(ProgressTrackerPane)
+                .GetField("_progressViewer", BindingFlags.Instance | BindingFlags.NonPublic)
+                .SetValue(pane, null);
+            typeof(ProgressTrackerPane)
+                .GetField("_isRoot", BindingFlags.Instance | BindingFlags.NonPublic)
+                .SetValue(pane, false);
+            typeof(ProgressTrackerPane)
+                .GetField("_root100", BindingFlags.Instance | BindingFlags.NonPublic)
+                .SetValue(pane, false);
+            typeof(ProgressTrackerPane)
+                .GetField("_progress", BindingFlags.Instance | BindingFlags.NonPublic)
+                .SetValue(pane, 0d);
+            typeof(ProgressTrackerPane)
+                .GetField("_jobName", BindingFlags.Instance | BindingFlags.NonPublic)
+                .SetValue(pane, string.Empty);
+
+            return pane;
         }
 
         private static ClassifierGroup CreateConfiguredGroup(
@@ -138,6 +175,21 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             }
 
             return group;
+        }
+
+        private sealed class SynchronousProgress<T> : IProgress<T>
+        {
+            private readonly Action<T> _callback;
+
+            public SynchronousProgress(Action<T> callback)
+            {
+                _callback = callback;
+            }
+
+            public void Report(T value)
+            {
+                _callback(value);
+            }
         }
     }
 }

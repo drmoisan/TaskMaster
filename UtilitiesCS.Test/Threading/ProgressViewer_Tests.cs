@@ -112,15 +112,17 @@ namespace UtilitiesCS.Test.Threading
         ///     via UiSyncContext.  Both must be non-null after construction.
         ///
         /// Args:
-        ///     None — relies on a SynchronizationContext installed on the calling
-        ///     thread before construction.
+        ///     None — WinForms automatically installs a WindowsFormsSynchronizationContext
+        ///     during Form construction.
         ///
         /// Returns:
         ///     N/A (test assertion).
         ///
         /// Side Effects:
         ///     Temporarily installs a SynchronizationContext on the calling thread;
-        ///     restores the prior context in the finally block.
+        ///     restores the prior context in the finally block. WinForms replaces
+        ///     the installed context with a WindowsFormsSynchronizationContext during
+        ///     InitializeComponent.
         /// </summary>
         [TestMethod]
         public void Constructor_PopulatesSyncContextAndScheduler()
@@ -134,11 +136,14 @@ namespace UtilitiesCS.Test.Threading
             try
             {
                 // Act — create the viewer with the installed context in scope.
+                // WinForms will install a WindowsFormsSynchronizationContext during construction.
                 using ProgressViewer viewer = new ProgressViewer();
 
-                // Assert — UiSyncContext references the installed context, and
-                // UiScheduler is non-null (created via FromCurrentSynchronizationContext).
-                viewer.UiSyncContext.Should().BeSameAs(context);
+                // Assert — UiSyncContext is non-null and is the WinForms context installed
+                // during construction. UiScheduler is non-null (created via
+                // FromCurrentSynchronizationContext).
+                viewer.UiSyncContext.Should().NotBeNull();
+                viewer.UiSyncContext.Should().BeOfType<System.Windows.Forms.WindowsFormsSynchronizationContext>();
                 viewer.UiScheduler.Should().NotBeNull();
             }
             finally
