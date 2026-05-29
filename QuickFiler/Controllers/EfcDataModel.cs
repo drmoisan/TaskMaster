@@ -65,6 +65,8 @@ namespace QuickFiler.Controllers
                 );
                 ConversationResolver = new ConversationResolver(Globals, Mail, TokenSource, Token);
                 _conversationResolver.Df = _conversationResolver.LoadDf(); // Load Synchronously
+                _conversationResolver.PropertyChanged +=
+                    _conversationResolver.Handler_PropertyChanged;
                 LogDataModelTiming(
                     "EfcDataModel constructor snapshot load complete | constructor load",
                     $"constructor snapshot load elapsedMs={constructorStopwatch.ElapsedMilliseconds}"

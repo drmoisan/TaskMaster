@@ -56,7 +56,6 @@ namespace QuickFiler.Helper_Classes
             }
 
             var df = Df.Expanded;
-            var olNs = _globals.Ol.App.GetNamespace("MAPI");
             var convInfoExpanded = Enumerable
                 .Range(0, Count.Expanded)
                 .Select(indexRow => MailItemHelper.FromDf(df, indexRow, _globals, Token))
@@ -84,8 +83,6 @@ namespace QuickFiler.Helper_Classes
             TaskCreationOptions options = backgroundLoad
                 ? TaskCreationOptions.LongRunning
                 : TaskCreationOptions.None;
-
-            var olNs = _globals.Ol.App.GetNamespace("MAPI");
 
             var tasksConvInfoExp = Enumerable
                 .Range(0, Count.Expanded)

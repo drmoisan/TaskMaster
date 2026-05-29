@@ -19,7 +19,7 @@ namespace UtilitiesCS.Test.Threading
     ///     cancelled state.
     ///
     /// Constraints:
-    ///     All tests run on an STA thread (required by WinForms).
+    ///     This class runs under MSTest's STA class execution mode (required by WinForms).
     ///     Construction requires a non-null SynchronizationContext.Current so that
     ///     TaskScheduler.FromCurrentSynchronizationContext() succeeds; each test
     ///     installs and then restores the SynchronizationContext around the viewer.
@@ -27,7 +27,7 @@ namespace UtilitiesCS.Test.Threading
     ///     tests that invoke the cancel path must not use 'using' on the viewer,
     ///     and must capture the CancellationToken before invoking the handler.
     /// </summary>
-    [TestClass]
+    [STATestClass]
     public class ProgressViewer_Tests
     {
         private static ProgressViewer CreateHeadlessViewer() =>
@@ -58,7 +58,6 @@ namespace UtilitiesCS.Test.Threading
         ///     because it was created outside the viewer.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void CancelPath_WhenInvoked_CancelsTokenSource()
         {
             // Arrange — install a SynchronizationContext so the constructor does not throw.
@@ -113,18 +112,19 @@ namespace UtilitiesCS.Test.Threading
         ///     via UiSyncContext.  Both must be non-null after construction.
         ///
         /// Args:
-        ///     None — relies on a SynchronizationContext installed on the calling
-        ///     thread before construction.
+        ///     None — WinForms automatically installs a WindowsFormsSynchronizationContext
+        ///     during Form construction.
         ///
         /// Returns:
         ///     N/A (test assertion).
         ///
         /// Side Effects:
         ///     Temporarily installs a SynchronizationContext on the calling thread;
-        ///     restores the prior context in the finally block.
+        ///     restores the prior context in the finally block. WinForms replaces
+        ///     the installed context with a WindowsFormsSynchronizationContext during
+        ///     InitializeComponent.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void Constructor_PopulatesSyncContextAndScheduler()
         {
             // Arrange — install a known SynchronizationContext so that
@@ -136,11 +136,16 @@ namespace UtilitiesCS.Test.Threading
             try
             {
                 // Act — create the viewer with the installed context in scope.
+                // WinForms will install a WindowsFormsSynchronizationContext during construction.
                 using ProgressViewer viewer = new ProgressViewer();
 
-                // Assert — UiSyncContext references the installed context, and
-                // UiScheduler is non-null (created via FromCurrentSynchronizationContext).
-                viewer.UiSyncContext.Should().BeSameAs(context);
+                // Assert — UiSyncContext is non-null and is the WinForms context installed
+                // during construction. UiScheduler is non-null (created via
+                // FromCurrentSynchronizationContext).
+                viewer.UiSyncContext.Should().NotBeNull();
+                viewer
+                    .UiSyncContext.Should()
+                    .BeOfType<System.Windows.Forms.WindowsFormsSynchronizationContext>();
                 viewer.UiScheduler.Should().NotBeNull();
             }
             finally
@@ -167,7 +172,6 @@ namespace UtilitiesCS.Test.Threading
         ///     once; creates and disposes the viewer in the finally block.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void UiDispatcher_SetterAndGetter_RoundTripAssignedValue()
         {
             // Arrange
@@ -206,7 +210,6 @@ namespace UtilitiesCS.Test.Threading
         ///     Creates and disposes a ProgressViewer in the finally block.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void UiThreadNumber_SetterAndGetter_RoundTripAssignedValue()
         {
             // Arrange
@@ -244,7 +247,6 @@ namespace UtilitiesCS.Test.Threading
         ///     finally block.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void CancelSource_SetterAndGetter_RoundTripAssignedValue()
         {
             // Arrange

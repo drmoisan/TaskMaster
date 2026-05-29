@@ -238,8 +238,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         ///     capturing stub; <see cref="TestCleanup_ResetMyBoxDialogInvokerSeam"/>
         ///     restores the real implementation after the test.
         /// </summary>
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void AutoFindPeople_WhenMissingRecipientsAndNotifyEnabled_ShowsUnknownRecipientsDialog()
         {
             // Arrange: one known sender and one unknown recipient force the warning path

@@ -12,8 +12,7 @@ namespace UtilitiesCS.Test.Extensions
     {
         #region ForAllControls (Action)
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void ForAllControls_Action_VisitsAllControls()
         {
             var parent = new Panel { Name = "parent" };
@@ -33,8 +32,7 @@ namespace UtilitiesCS.Test.Extensions
             visited.Should().Contain("grandchild");
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void ForAllControls_IEnumerable_VisitsAll()
         {
             var parent1 = new Panel { Name = "p1" };
@@ -52,8 +50,7 @@ namespace UtilitiesCS.Test.Extensions
 
         #region ForAllControls (with except)
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void ForAllControls_WithExcept_SkipsExcludedControls()
         {
             var parent = new Panel { Name = "parent" };
@@ -75,8 +72,7 @@ namespace UtilitiesCS.Test.Extensions
 
         #region GetAllChildren
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void GetAllChildren_ReturnsAllDescendants()
         {
             var root = new Panel { Name = "root" };
@@ -92,8 +88,7 @@ namespace UtilitiesCS.Test.Extensions
             all.Select(c => c.Name).Should().Contain("grandchild");
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void GetAllChildren_WithExcept_SkipsExcluded()
         {
             var root = new Panel { Name = "root" };
@@ -111,8 +106,7 @@ namespace UtilitiesCS.Test.Extensions
 
         #region GetAncestor
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void GetAncestor_FormParent_ReturnsForm()
         {
             var form = new Form { Name = "myForm" };
@@ -125,8 +119,7 @@ namespace UtilitiesCS.Test.Extensions
             ancestor.Should().BeSameAs(form);
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void GetAncestor_NoMatchingParent_ReturnsNull()
         {
             var panel = new Panel { Name = "panel" };
@@ -137,8 +130,7 @@ namespace UtilitiesCS.Test.Extensions
             ancestor.Should().BeNull();
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void GetAncestor_Strict_NoMatch_ThrowsArgumentOutOfRange()
         {
             var panel = new Panel { Name = "panel" };
@@ -154,8 +146,7 @@ namespace UtilitiesCS.Test.Extensions
         //           ancestor chain contains no match for the requested type.
         // -----------------------------------------------------------------------
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void GetAncestor_ChainWithNoMatchingType_ReturnsNullWithoutThrowing()
         {
             // Arrange: three-level Panel chain — no Form ancestor exists.
@@ -183,8 +174,7 @@ namespace UtilitiesCS.Test.Extensions
         //           being invoked when the event fires after removal.
         // -----------------------------------------------------------------------
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void RemoveEventHandlers_Click_HandlerNotInvokedAfterRemoval()
         {
             // Arrange: wire a click handler that increments a counter.
@@ -204,8 +194,7 @@ namespace UtilitiesCS.Test.Extensions
 
         #region ForAllControls (Func transform)
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void ForAllControls_FuncTransform_PropagatesValue()
         {
             var parent = new Panel { Name = "parent" };
@@ -225,8 +214,7 @@ namespace UtilitiesCS.Test.Extensions
             callCount.Should().BeGreaterThanOrEqualTo(2);
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void Clone_TableLayoutPanelWithName_CopiesLayoutSettingsAndAssignedName()
         {
             var source = new TableLayoutPanel
@@ -293,8 +281,7 @@ namespace UtilitiesCS.Test.Extensions
             clone.Count.Should().Be(7);
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void ForAllControls_IEnumerableWithExcept_SkipsExcludedRoots()
         {
             var included = new Panel { Name = "included" };
@@ -312,8 +299,7 @@ namespace UtilitiesCS.Test.Extensions
             visited.Should().NotContain("excluded");
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void ForAllControls_ControlCollectionWithExcept_SkipsExcludedChildren()
         {
             var parent = new Panel();
@@ -334,8 +320,7 @@ namespace UtilitiesCS.Test.Extensions
             visited.Should().NotContain("excluded");
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void ForAllControls_ActionWithValueAndExcept_UsesProvidedValueOnNonExcludedControls()
         {
             var parent = new Panel { Name = "parent" };
@@ -356,8 +341,7 @@ namespace UtilitiesCS.Test.Extensions
             visited.Should().NotContain("excluded:7");
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void ForAllControls_FuncWithExcept_PropagatesSeedOnlyThroughIncludedControls()
         {
             var parent = new Panel { Name = "parent" };
@@ -422,8 +406,7 @@ namespace UtilitiesCS.Test.Extensions
             public void TriggerFormClicked() => OnFormClicked();
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void PreFilterMessage_WM_LBUTTONDOWN_RaisesFormClickedWithFormAsSender()
         {
             // Arrange: subscribe to FormClicked to capture sender and args.
@@ -450,8 +433,7 @@ namespace UtilitiesCS.Test.Extensions
             receivedSender.Should().BeSameAs(form);
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void PreFilterMessage_UnrelatedMessage_ReturnsFalseAndDoesNotRaiseEvent()
         {
             // Arrange: subscribe to detect any unexpected FormClicked raise.
@@ -471,8 +453,7 @@ namespace UtilitiesCS.Test.Extensions
             raised.Should().BeFalse("non-mouse messages must not raise FormClicked");
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void PreFilterMessage_NoSubscribers_DoesNotThrow()
         {
             // Arrange: plain MouseDownFilter with no FormClicked subscribers.

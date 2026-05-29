@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test
 {
-    [TestClass]
+    [STATestClass]
     public class ActionButtonTests
     {
         [TestMethod]

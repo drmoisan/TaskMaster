@@ -7,11 +7,10 @@ using UtilitiesCS.Windows_Forms;
 
 namespace UtilitiesCS.Test.HelperClasses.WindowsForms
 {
-    [TestClass]
+    [STATestClass]
     public class MouseDownFilter_Tests
     {
         [TestMethod]
-        [STAThread]
         public void Constructor_WithForm_CreatesInstance()
         {
             var form = new Form();
@@ -20,7 +19,6 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
         }
 
         [TestMethod]
-        [STAThread]
         public void FormClicked_EventCanBeSubscribed()
         {
             var form = new Form();

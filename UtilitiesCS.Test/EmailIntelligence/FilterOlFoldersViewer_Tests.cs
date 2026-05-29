@@ -17,11 +17,12 @@ namespace UtilitiesCS.Test.EmailIntelligence
     ///     (BtnDiscard_Click and BtnSave_Click) without requiring a live COM controller.
     ///
     /// Usage:
-    ///     All tests instantiate FilterOlFoldersViewer on an STA thread.
+    ///     This class runs under MSTest's STA class execution mode because every
+    ///     test instantiates FilterOlFoldersViewer.
     ///     SetController tests inject an uninitialized controller whose _olFolderTree
     ///     is set to a synthetic FolderTree so that SetupTree() does not hit COM.
     /// </summary>
-    [TestClass]
+    [STATestClass]
     public class FilterOlFoldersViewer_Tests
     {
         // ---------------------------------------------------------------------------
@@ -33,7 +34,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// and ChildrenGetter on both tree list views) when the controller has a
         /// synthetic, COM-free FolderTree.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void SetController_WithSyntheticController_ConfiguresBothTreeDelegates()
         {
@@ -78,7 +78,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that FormatFileSize returns a "bytes" string for inputs below
         /// the 1 KB threshold (less than 1024 bytes).
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void FormatFileSize_WithBytesInput_ReturnsBytesString()
         {
@@ -100,7 +99,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that FormatFileSize returns a "KB" string for a 1-KB input and
         /// an "MB" string for a 1-MB input.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void FormatFileSize_WithKbInput_ReturnsKbString()
         {
@@ -120,7 +118,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that the private SetupDragAndDrop helper enables simple drag/drop
         /// behaviour on the non-filtered tree list view.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void SetupDragAndDrop_WhenInvoked_EnablesSimpleDragAndDropFlags()
         {
@@ -147,7 +144,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// then invoking the private click handler via reflection.
         /// The expected observable side effect is that the viewer is closed.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void BtnDiscard_Click_ForwardsDiscardToController_ClosesViewer()
         {
@@ -181,7 +177,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that BtnDiscard_Click is a no-op (does not throw) when the
         /// controller field is null, exercising the ?. null-coalescing guard.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void BtnDiscard_Click_WithNullController_DoesNotThrow()
         {
@@ -204,7 +199,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// an uninitialized controller with a synthetic FolderTree and a real viewer.
         /// The observable side effect is that the viewer is closed.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void BtnSave_Click_ForwardsSaveToController_ClosesViewer()
         {
@@ -263,7 +257,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that BtnSave_Click is a no-op when the viewer has no controller,
         /// exercising the null-conditional forwarding path.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void BtnSave_Click_WithNullController_DoesNotThrow()
         {

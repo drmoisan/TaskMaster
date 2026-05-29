@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
+using UtilitiesCS.Interfaces;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.HelperClasses
@@ -13,14 +14,20 @@ namespace UtilitiesCS.HelperClasses
     public class TimedBatchAction
     {
         public TimedBatchAction(TimeSpan frequency)
-        {
-            _frequency = frequency;
-        }
+            : this(frequency, null, CreateTimer) { }
 
         public TimedBatchAction(TimeSpan frequency, System.Action action)
+            : this(frequency, action, CreateTimer) { }
+
+        internal TimedBatchAction(
+            TimeSpan frequency,
+            System.Action action,
+            Func<TimeSpan, ITimerWrapper> timerFactory
+        )
         {
             _frequency = frequency;
             _action = action;
+            _timerFactory = timerFactory ?? throw new ArgumentNullException(nameof(timerFactory));
         }
 
         public void SetAction(System.Action action)
@@ -31,8 +38,9 @@ namespace UtilitiesCS.HelperClasses
         private System.Action _action;
 
         private TimeSpan _frequency;
+        private readonly Func<TimeSpan, ITimerWrapper> _timerFactory;
         private ThreadSafeSingleShotGuard _actionRequested = new();
-        private TimerWrapper _timer;
+        private ITimerWrapper _timer;
 
         public void ResetTimer()
         {
@@ -53,11 +61,8 @@ namespace UtilitiesCS.HelperClasses
                 {
                     throw new NullReferenceException("Action is null");
                 }
-                var action2 = ResetAfterAction(_action);
-                _timer = new TimerWrapper(_frequency);
-                _timer.Elapsed += (sender, e) => action2();
-                _timer.AutoReset = false;
-                _timer.StartTimer();
+
+                ScheduleAction(_action);
             }
         }
 
@@ -69,12 +74,18 @@ namespace UtilitiesCS.HelperClasses
                 {
                     throw new NullReferenceException("Action is null");
                 }
-                var action2 = ResetAfterAction(action);
-                _timer = new TimerWrapper(_frequency);
-                _timer.Elapsed += (sender, e) => action2();
-                _timer.AutoReset = false;
-                _timer.StartTimer();
+
+                ScheduleAction(action);
             }
+        }
+
+        private void ScheduleAction(System.Action action)
+        {
+            var actionToRun = ResetAfterAction(action);
+            _timer = _timerFactory(_frequency);
+            _timer.AutoReset = false;
+            _timer.Elapsed += (sender, e) => actionToRun();
+            _timer.StartTimer();
         }
 
         private System.Action ResetAfterAction(System.Action action)
@@ -85,5 +96,7 @@ namespace UtilitiesCS.HelperClasses
                 _actionRequested = new();
             };
         }
+
+        private static ITimerWrapper CreateTimer(TimeSpan frequency) => new TimerWrapper(frequency);
     }
 }
