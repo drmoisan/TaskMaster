@@ -103,9 +103,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         )
         {
             var autoFiles = new Mock<IAppAutoFileObjects>(MockBehavior.Loose);
-            autoFiles
-                .SetupGet(x => x.ProgressTracker)
-                .Returns(CreateFakeProgressTrackerPane());
+            autoFiles.SetupGet(x => x.ProgressTracker).Returns(CreateFakeProgressTrackerPane());
             autoFiles.SetupGet(x => x.ProgressPane).Returns(progressPane);
             autoFiles.SetupGet(x => x.CancelToken).Returns(cancelToken);
 

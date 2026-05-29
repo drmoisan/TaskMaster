@@ -17,8 +17,8 @@ namespace UtilitiesCS.Test.Threading
     ///     cancel path is invoked, and that its exposed state (Bar value, JobName
     ///     text) can be updated and read back.
     ///
-        /// Constraints:
-        ///     This class runs under MSTest's STA class execution mode (required by WinForms).
+    /// Constraints:
+    ///     This class runs under MSTest's STA class execution mode (required by WinForms).
     ///     Construction requires a non-null SynchronizationContext.Current so that
     ///     TaskScheduler.FromCurrentSynchronizationContext() can succeed; each test
     ///     installs and then restores the SynchronizationContext around the pane.

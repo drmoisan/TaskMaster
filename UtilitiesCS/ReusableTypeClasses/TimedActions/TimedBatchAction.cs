@@ -14,16 +14,16 @@ namespace UtilitiesCS.HelperClasses
     public class TimedBatchAction
     {
         public TimedBatchAction(TimeSpan frequency)
-            : this(frequency, null, CreateTimer)
-        {
-        }
+            : this(frequency, null, CreateTimer) { }
 
         public TimedBatchAction(TimeSpan frequency, System.Action action)
-            : this(frequency, action, CreateTimer)
-        {
-        }
+            : this(frequency, action, CreateTimer) { }
 
-        internal TimedBatchAction(TimeSpan frequency, System.Action action, Func<TimeSpan, ITimerWrapper> timerFactory)
+        internal TimedBatchAction(
+            TimeSpan frequency,
+            System.Action action,
+            Func<TimeSpan, ITimerWrapper> timerFactory
+        )
         {
             _frequency = frequency;
             _action = action;

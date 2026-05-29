@@ -17,9 +17,9 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
     ///     null-safety contract, and the disk-group activation toggle on
     ///     <see cref="ConfigViewer"/>.
     ///
-        /// Constraints:
-        ///     ConfigViewer is a WinForms Form; this class uses MSTest's STA class
-        ///     execution mode to satisfy WinForms initialization requirements.
+    /// Constraints:
+    ///     ConfigViewer is a WinForms Form; this class uses MSTest's STA class
+    ///     execution mode to satisfy WinForms initialization requirements.
     /// </summary>
     [STATestClass]
     public class ConfigViewer_Tests

@@ -36,7 +36,11 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var timerFactory = new FakeTimerFactory();
             var wasCalled = false;
-            var action = new TimedBatchAction(TimeSpan.FromMilliseconds(20), null, timerFactory.Create);
+            var action = new TimedBatchAction(
+                TimeSpan.FromMilliseconds(20),
+                null,
+                timerFactory.Create
+            );
 
             // Act
             action.RequestAction(() => wasCalled = true);
@@ -160,9 +164,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             public double IntervalInMilliseconds { get; set; }
 
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
 
             public void Fire()
             {

@@ -18,8 +18,8 @@ namespace UtilitiesCS.Test.Threading
     ///     correctly transitions the supplied CancellationTokenSource into the
     ///     cancelled state.
     ///
-        /// Constraints:
-        ///     This class runs under MSTest's STA class execution mode (required by WinForms).
+    /// Constraints:
+    ///     This class runs under MSTest's STA class execution mode (required by WinForms).
     ///     Construction requires a non-null SynchronizationContext.Current so that
     ///     TaskScheduler.FromCurrentSynchronizationContext() succeeds; each test
     ///     installs and then restores the SynchronizationContext around the viewer.
@@ -143,7 +143,9 @@ namespace UtilitiesCS.Test.Threading
                 // during construction. UiScheduler is non-null (created via
                 // FromCurrentSynchronizationContext).
                 viewer.UiSyncContext.Should().NotBeNull();
-                viewer.UiSyncContext.Should().BeOfType<System.Windows.Forms.WindowsFormsSynchronizationContext>();
+                viewer
+                    .UiSyncContext.Should()
+                    .BeOfType<System.Windows.Forms.WindowsFormsSynchronizationContext>();
                 viewer.UiScheduler.Should().NotBeNull();
             }
             finally
