@@ -16,6 +16,65 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
     public class FolderScorerTests
     {
         [TestMethod]
+        public void TopScore_WhenScorerIsEmpty_ReturnsZero()
+        {
+            // Arrange: a freshly constructed scorer holds no suggestions.
+            var scorer = new FolderScorer();
+
+            // Act
+            var result = scorer.TopScore();
+
+            // Assert
+            result.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void TopScore_WithSingleSuggestion_ReturnsThatScore()
+        {
+            // Arrange
+            var scorer = new FolderScorer();
+            scorer.AddSuggestion("Archive\\Finance", 850);
+
+            // Act
+            var result = scorer.TopScore();
+
+            // Assert
+            result.Should().Be(850);
+        }
+
+        [TestMethod]
+        public void TopScore_WithMultipleSuggestions_ReturnsHighestScore()
+        {
+            // Arrange
+            var scorer = new FolderScorer();
+            scorer.AddSuggestion("Inbox\\Low", 120);
+            scorer.AddSuggestion("Inbox\\High", 940);
+            scorer.AddSuggestion("Inbox\\Mid", 500);
+
+            // Act
+            var result = scorer.TopScore();
+
+            // Assert
+            result.Should().Be(940);
+        }
+
+        [TestMethod]
+        public void TopScore_WithTiedHighestScores_ReturnsTheTiedValue()
+        {
+            // Arrange: two distinct folders share the highest score.
+            var scorer = new FolderScorer();
+            scorer.AddSuggestion("Inbox\\Alpha", 700);
+            scorer.AddSuggestion("Inbox\\Beta", 700);
+            scorer.AddSuggestion("Inbox\\Gamma", 300);
+
+            // Act
+            var result = scorer.TopScore();
+
+            // Assert
+            result.Should().Be(700);
+        }
+
+        [TestMethod]
         public void AddSuggestion_ShouldAggregateScoresForExistingFolder()
         {
             var scorer = new FolderScorer();

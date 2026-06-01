@@ -950,6 +950,45 @@ namespace QuickFiler.Controllers
         }
 
         /// <summary>
+        /// Seam used by <see cref="RemoveBelowThresholdAsync(double)"/> to remove a single group
+        /// by EntryID. Defaults to the existing UI-thread removal path
+        /// (<see cref="RemoveSpecificControlGroup(string)"/>), which unhooks the move monitor and
+        /// renumbers remaining groups. Tests inject a recording delegate so the below-threshold
+        /// selection logic can be verified without WinForms/COM state.
+        /// </summary>
+        private Func<string, Task> _removeGroupByEntryId;
+
+        private Func<string, Task> RemoveGroupByEntryId =>
+            _removeGroupByEntryId ??= entryID =>
+            {
+                RemoveSpecificControlGroup(entryID);
+                return Task.CompletedTask;
+            };
+
+        /// <inheritdoc/>
+        public async Task RemoveBelowThresholdAsync(double threshold)
+        {
+            if (_itemGroups is null)
+            {
+                return;
+            }
+
+            long cutoff = (long)Math.Round(threshold * 1000, 0);
+
+            // Capture EntryIDs of below-threshold groups before removing any, so renumbering and
+            // list mutation during removal cannot cause index drift mid-iteration.
+            var entryIdsToRemove = _itemGroups
+                .Where(group => group.ItemController.TopFolderScore < cutoff)
+                .Select(group => group.MailItem.EntryID)
+                .ToList();
+
+            foreach (var entryID in entryIdsToRemove)
+            {
+                await RemoveGroupByEntryId(entryID);
+            }
+        }
+
+        /// <summary>
         /// Remove a specific control group from the form,
         /// remove the group from the list of groups,
         /// and renumber the remaining groups

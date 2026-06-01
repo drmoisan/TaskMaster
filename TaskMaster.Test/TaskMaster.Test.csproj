@@ -280,11 +280,13 @@
     <Compile Include="AppGlobals\AppEventsTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsCoverageTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsTests.cs" />
+    <Compile Include="AppGlobals\AppQuickFilerSettingsTests.cs" />
     <Compile Include="AppGlobals\AppToDoObjectsCoverageTests.cs" />
     <Compile Include="AppGlobals\AppToDoObjectsTestDoubles.cs" />
     <Compile Include="AppGlobals\AppToDoObjectsTestUtilities.cs" />
     <Compile Include="AppGlobals\AppToDoObjectsTests.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperTests.cs" />
+    <Compile Include="Ribbon\RibbonControllerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -211,6 +211,14 @@
             size="large"
             keytip="QF"
           />
+          <button
+            id="QuickFilerHighConfidence"
+            imageMso="UpdateFolder"
+            onAction="QuickFilerHighConfidence_Click"
+            label="Quick Filer — High Confidence"
+            size="large"
+            keytip="QH"
+          />
           <menu
             id="Settings"
             imageMso="ContentTypeSettings"
@@ -259,6 +267,12 @@
                   label="Save Pictures"
                   getPressed="SavePictures_GetPressed"
                   onAction="SavePictures_Clicked"
+                />
+                <editBox
+                  id="HighConfidenceThreshold"
+                  label="High Confidence %"
+                  getText="HighConfidenceThreshold_GetText"
+                  onChange="HighConfidenceThreshold_OnChange"
                 />
               </menu>
             </menu>

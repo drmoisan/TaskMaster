@@ -1085,6 +1085,12 @@ namespace QuickFiler.Controllers
             get => _selectedFolder;
         }
 
+        /// <summary>
+        /// Gets the top folder suggestion score for this item, in 0-1000 score units, or 0 when
+        /// the folder handler has not produced suggestions. Read-only seam over the folder handler.
+        /// </summary>
+        public long TopFolderScore => _folderHandler?.Suggestions?.TopScore() ?? 0;
+
         public bool SuppressEvents
         {
             get => _suppressEvents;

@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -126,6 +129,162 @@ namespace QuickFiler.Controllers.Tests
 
             // Assert
             result.Should().NotBeNull();
+        }
+
+        // ---- RemoveBelowThresholdAsync (Issue #169) ----
+
+        /// <summary>
+        /// Builds an uninitialized QfcCollectionController whose <c>_itemGroups</c> field holds the
+        /// supplied (entryId, topFolderScore) groups, and injects the removal seam
+        /// (<c>_removeGroupByEntryId</c>) with a delegate that records the EntryIDs it is asked to
+        /// remove. This isolates the below-threshold selection logic from all WinForms/COM state.
+        /// </summary>
+        private static QfcCollectionController CreateControllerWithGroups(
+            IEnumerable<(string EntryId, long TopFolderScore)> groups,
+            out List<string> removedEntryIds
+        )
+        {
+            var controller = (QfcCollectionController)
+                FormatterServices.GetUninitializedObject(typeof(QfcCollectionController));
+
+            var itemGroups = new List<QfcItemGroup>();
+            foreach (var (entryId, score) in groups)
+            {
+                var mail = new Mock<MailItem>(MockBehavior.Loose);
+                mail.SetupGet(x => x.EntryID).Returns(entryId);
+
+                var itemController = new Mock<IQfcItemController>(MockBehavior.Loose);
+                itemController.SetupGet(x => x.TopFolderScore).Returns(score);
+
+                var group = new QfcItemGroup { MailItem = mail.Object };
+                typeof(QfcItemGroup)
+                    .GetField("_itemController", BindingFlags.NonPublic | BindingFlags.Instance)
+                    ?.SetValue(group, itemController.Object);
+
+                itemGroups.Add(group);
+            }
+
+            typeof(QfcCollectionController)
+                .GetField("_itemGroups", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.SetValue(controller, itemGroups);
+
+            var recorded = new List<string>();
+            removedEntryIds = recorded;
+            Func<string, Task> recordingRemoval = entryId =>
+            {
+                recorded.Add(entryId);
+                return Task.CompletedTask;
+            };
+            typeof(QfcCollectionController)
+                .GetField("_removeGroupByEntryId", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.SetValue(controller, recordingRemoval);
+
+            return controller;
+        }
+
+        [TestMethod]
+        public async Task RemoveBelowThresholdAsync_WhenAllGroupsAboveThreshold_RemovesNone()
+        {
+            // Arrange: threshold 0.9 -> cutoff 900; all groups score above 900.
+            var controller = CreateControllerWithGroups(
+                new[] { ("a", 950L), ("b", 1000L), ("c", 920L) },
+                out var removed
+            );
+
+            // Act
+            await controller.RemoveBelowThresholdAsync(0.9);
+
+            // Assert
+            removed.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public async Task RemoveBelowThresholdAsync_WhenAllGroupsBelowThreshold_RemovesAll()
+        {
+            // Arrange: threshold 0.9 -> cutoff 900; all groups score below 900.
+            var controller = CreateControllerWithGroups(
+                new[] { ("a", 100L), ("b", 500L), ("c", 899L) },
+                out var removed
+            );
+
+            // Act
+            await controller.RemoveBelowThresholdAsync(0.9);
+
+            // Assert
+            removed.Should().BeEquivalentTo(new[] { "a", "b", "c" });
+        }
+
+        [TestMethod]
+        public async Task RemoveBelowThresholdAsync_WhenMixed_RemovesOnlyBelowThresholdGroups()
+        {
+            // Arrange: threshold 0.9 -> cutoff 900.
+            var controller = CreateControllerWithGroups(
+                new[] { ("keepHigh", 950L), ("dropLow", 200L), ("keepEqualish", 901L) },
+                out var removed
+            );
+
+            // Act
+            await controller.RemoveBelowThresholdAsync(0.9);
+
+            // Assert
+            removed.Should().Equal("dropLow");
+        }
+
+        [TestMethod]
+        public async Task RemoveBelowThresholdAsync_WhenScoreEqualsCutoff_RetainsGroup()
+        {
+            // Arrange: threshold 0.9 -> cutoff 900; one group scores exactly 900 (inclusive).
+            var controller = CreateControllerWithGroups(
+                new[] { ("boundary", 900L), ("below", 899L) },
+                out var removed
+            );
+
+            // Act
+            await controller.RemoveBelowThresholdAsync(0.9);
+
+            // Assert
+            removed.Should().Equal("below");
+            removed.Should().NotContain("boundary");
+        }
+
+        [TestMethod]
+        public async Task RemoveBelowThresholdAsync_WhenItemGroupsIsNull_DoesNothing()
+        {
+            // Arrange: uninitialized controller with a null _itemGroups field.
+            var controller = (QfcCollectionController)
+                FormatterServices.GetUninitializedObject(typeof(QfcCollectionController));
+            var recorded = new List<string>();
+            Func<string, Task> recordingRemoval = entryId =>
+            {
+                recorded.Add(entryId);
+                return Task.CompletedTask;
+            };
+            typeof(QfcCollectionController)
+                .GetField("_removeGroupByEntryId", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.SetValue(controller, recordingRemoval);
+
+            // Act & Assert: the null guard returns early without throwing or removing anything.
+            Func<Task> act = () => controller.RemoveBelowThresholdAsync(0.9);
+
+            await act.Should().NotThrowAsync();
+            recorded.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public async Task RemoveBelowThresholdAsync_WhenScoreIsZeroAndThresholdPositive_RemovesGroup()
+        {
+            // Arrange: a group with no qualifying suggestion (score 0) must be removed when the
+            // cutoff is greater than 0.
+            var controller = CreateControllerWithGroups(
+                new[] { ("noSuggestion", 0L), ("strong", 980L) },
+                out var removed
+            );
+
+            // Act
+            await controller.RemoveBelowThresholdAsync(0.9);
+
+            // Assert
+            removed.Should().Equal("noSuggestion");
         }
     }
 }

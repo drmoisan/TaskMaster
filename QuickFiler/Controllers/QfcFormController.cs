@@ -933,6 +933,32 @@ namespace QuickFiler.Controllers
             _formViewer.Refresh();
 
             await _groups.LoadSecondaryAsync();
+
+            // High-confidence filter (Issue #169): once secondary loading has fully completed and
+            // folder scores are populated, drop the groups whose top suggestion is below the
+            // configured threshold. Runs only when the mode is enabled, so default behavior is
+            // unchanged when disabled.
+            await ApplyHighConfidenceFilterAsync(_groups);
+        }
+
+        /// <summary>
+        /// Removes below-threshold item groups when high-confidence mode is enabled. Seam extracted
+        /// from <see cref="LoadItemsAsync(IList{MailItem}, ProgressTracker)"/> so the conditional
+        /// can be unit-tested with a mocked <see cref="IQfcCollectionController"/> without running
+        /// the WinForms/COM-bound load path. Must be called only after secondary loading has fully
+        /// completed so folder scores are populated.
+        /// </summary>
+        internal async Task ApplyHighConfidenceFilterAsync(IQfcCollectionController groups)
+        {
+            if (groups is null || _globals?.QfSettings is null)
+            {
+                return;
+            }
+
+            if (_globals.QfSettings.HighConfidenceModeEnabled)
+            {
+                await groups.RemoveBelowThresholdAsync(_globals.QfSettings.HighConfidenceThreshold);
+            }
         }
 
         /// <summary>
