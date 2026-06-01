@@ -89,6 +89,35 @@ namespace TaskMaster.Test.Ribbon
         }
 
         [TestMethod]
+        public void SetHighConfidenceModeForLaunch_True_EnablesMode()
+        {
+            // Arrange: start from the disabled state.
+            Settings.Default.HighConfidenceModeEnabled = false;
+            var controller = CreateController();
+
+            // Act
+            controller.SetHighConfidenceModeForLaunch(true);
+
+            // Assert: the high-confidence launch path enables the mode.
+            controller.IsHighConfidenceModeActive().Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void StandardLaunchAfterHighConfidenceLaunch_DoesNotEnableMode()
+        {
+            // Arrange: simulate a prior high-confidence launch having enabled the mode.
+            var controller = CreateController();
+            controller.SetHighConfidenceModeForLaunch(true);
+
+            // Act: a subsequent standard launch (or release) resets the launch-scoped flag.
+            controller.SetHighConfidenceModeForLaunch(false);
+
+            // Assert: the standard entry point does not inherit high-confidence mode, so it
+            // never filters (AC6).
+            controller.IsHighConfidenceModeActive().Should().BeFalse();
+        }
+
+        [TestMethod]
         public void GetHighConfidenceThresholdText_ReturnsPercentageForm()
         {
             // Arrange: stored probability 0.9 should render as "90".

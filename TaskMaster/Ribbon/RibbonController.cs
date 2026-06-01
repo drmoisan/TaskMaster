@@ -108,6 +108,7 @@ namespace TaskMaster
         {
             if (!_quickFilerLoaded)
             {
+                SetHighConfidenceModeForLaunch(false);
                 _quickFilerLoaded = true;
                 _quickFiler = await QuickFiler.Controllers.QfcHomeController.LaunchAsync(
                     Globals,
@@ -129,7 +130,7 @@ namespace TaskMaster
             if (!_quickFilerLoaded)
             {
                 _quickFilerLoaded = true;
-                Globals.InternalQfSettings.HighConfidenceModeEnabled = true;
+                SetHighConfidenceModeForLaunch(true);
                 _quickFiler = await QuickFiler.Controllers.QfcHomeController.LaunchAsync(
                     Globals,
                     ReleaseQuickFiler
@@ -143,6 +144,7 @@ namespace TaskMaster
         {
             _quickFiler = null;
             _quickFilerLoaded = false;
+            SetHighConfidenceModeForLaunch(false);
         }
 
         internal void ReviseProjectData()
@@ -255,6 +257,16 @@ namespace TaskMaster
             Globals.InternalQfSettings.HighConfidenceModeEnabled = !Globals
                 .InternalQfSettings
                 .HighConfidenceModeEnabled;
+
+        /// <summary>
+        /// Sets the persisted high-confidence mode flag for the upcoming QuickFiler launch only.
+        /// The standard launch path always sets this to <c>false</c> so it never filters, while
+        /// the high-confidence launch path sets it to <c>true</c>; the flag is also reset to
+        /// <c>false</c> on release. The flag is therefore launch-scoped, not a cross-session
+        /// toggle.
+        /// </summary>
+        internal void SetHighConfidenceModeForLaunch(bool enabled) =>
+            Globals.InternalQfSettings.HighConfidenceModeEnabled = enabled;
 
         /// <summary>
         /// Returns the stored high-confidence threshold formatted as a whole-number percentage

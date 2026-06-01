@@ -1,0 +1,57 @@
+Command: vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll QuickFiler.Test\bin\Debug\QuickFiler.Test.dll TaskMaster.Test\bin\Debug\TaskMaster.Test.dll /EnableCodeCoverage
+vstest.console.exe path: C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe
+Working directory: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-01-08-21
+Timestamp (UTC): 2026-06-01T17-35-23Z
+
+== Test results (PRE-REMEDIATION baseline) ==
+Run 1 (with /EnableCodeCoverage): Total 3989, Passed 3976, Failed 13.
+Run 2 (re-run, with /EnableCodeCoverage): produced a different, smaller failure set
+  (timer/dispatcher/deferred-write/stream-writer/concurrent-dictionary/tesseract-language tests).
+Run 3 (re-run, WITHOUT coverage instrumentation): Total 3989, Passed 3989, Failed 0.
+
+Failed test names observed across instrumented runs (all in UtilitiesCS.Test):
+- AddEntry_UseUiThreadTrue_DequeuesEntryAndSuppressesDispatcherException
+- StartNew_ConfiguresAutoResetAndInvokesCallback
+- Serialize_WithConfiguredPath_TriggersDeferredThreadSafeWrite
+- EmptyQueue_AfterSeveralIntervals_StopsTimer
+- TryGetFileStreamWriter_WhenWriterReturnsMemoryStream_ReturnsStream
+- TryAddValuesAsync_UpdatesExistingValue
+- "loading language 'eng'" (Tesseract OCR language-load, IO/timing-sensitive)
+- plus additional timer/serialization variants depending on the run
+
+PRE-EXISTING-CONDITION note: These are non-deterministic (flaky) timing/concurrency/IO
+tests in UtilitiesCS.Test that are aggravated by coverage instrumentation. They do NOT
+reproduce on a non-instrumented re-run (3989/3989 passing) and are unrelated to issue #169.
+This matches the repository's documented test-isolation flakiness (commits 384858b8,
+b160037a) and the prior baseline tests-coverage.2026-06-01T16-37-55Z.txt. The stable,
+deterministic baseline outcome is 3989 passing tests. No sleeps/retries/assertion
+weakening are applied to mask them.
+
+The test count increased from 3965 (prior 16-37-55Z baseline) to 3989; the prior baseline
+was captured before the test assemblies were last rebuilt at 13:01-13:12.
+
+== Coverage baseline (from instrumented .coverage, converted via dotnet-coverage merge -f cobertura) ==
+Coverage file: TestResults/d5737379-0b0a-45be-a6fa-d3235fa25bd8/DanMoisan_MEGALODON4_2026-06-01.13_39_21.coverage
+Cobertura output: artifacts/csharp/baseline-coverage.xml
+
+Per in-scope production module (cobertura line-rate):
+- UtilitiesCS.dll: 87.39% (line-rate 0.8738695732887792)
+- QuickFiler.dll:  25.02% (line-rate 0.2501923480450444)
+- TaskMaster.dll:  25.77% (line-rate 0.257679180887372)
+
+Overall across all measured modules (includes test assemblies and third-party deps):
+58.44% line-rate (0.5844292785800065).
+
+Note on metric difference vs prior 16-37-55Z baseline (UtilitiesCS 85.39 / QuickFiler
+23.28 / TaskMaster 24.32): the prior baseline used "dotnet-coverage merge -f xml" (native
+XML) whereas this uses "-f cobertura". The cobertura line-rate is computed over a slightly
+different denominator (and the test assemblies were rebuilt since), so absolute numbers
+differ modestly. The post-remediation comparison (Phase 3) uses the SAME cobertura method
+against this baseline to ensure an apples-to-apples no-regression check on changed lines.
+
+== Coverage tooling availability (required gate for P3-T1) ==
+dotnet-coverage --version: 18.5.2+6e39b75eaf98f2691cf62dbf259669cc13851fd3
+  (dotnet-coverage v18.5.2.0 [win-x64 - .NET 10.0.8])
+Cobertura emission confirmed working: "dotnet-coverage merge <*.coverage> -f cobertura -o <out>"
+produced artifacts/csharp/baseline-coverage.xml successfully (EXIT 0).
+No install/restore remediation is required before P3-T1.

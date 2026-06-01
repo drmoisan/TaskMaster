@@ -33,13 +33,13 @@ When QuickFiler loads a batch, every email is shown regardless of how confident 
 
 ## Acceptance Criteria
 
-1. [x] A new ribbon entry point launches QuickFiler in high-confidence mode. (P6-T1/P6-T3/P6-T4; tested P6-T5)
+1. [ ] A new ribbon entry point launches QuickFiler in high-confidence mode. (P6-T1/P6-T3/P6-T4; tested P6-T5)
 2. [x] When the mode is enabled, emails whose top suggested folder probability is below the configured threshold are not shown in the view. (P1-T1, P3-T1/P3-T2, P4-T1/P4-T2, P5-T1; tested P1-T2, P4-T3, P5-T2)
 3. [x] Emails with no folder suggestion at or above the threshold (including none at all) are excluded. (P1-T1 empty->0, P4-T2; tested P1-T2(a), P4-T3 zero-score case)
 4. [x] The default threshold is 90% (0.90) and is persisted as a user setting. (P2-T1/P2-T2/P2-T4; tested P2-T5)
 5. [x] The threshold percentage is changeable at runtime via a ribbon input control, with validation; the value persists across sessions. (P6-T2/P6-T3/P6-T4; tested P2-T5, P6-T5 valid/non-numeric/out-of-range)
-6. [x] With high-confidence mode disabled, QuickFiler behaves exactly as today (no filtering). (P5-T1 guard; tested P5-T2 disabled case; standard LoadQuickFilerAsync unchanged)
-7. [x] New and changed logic is covered by MSTest + Moq + FluentAssertions tests; the full C# toolchain (CSharpier, .NET analyzers, nullable analysis, MSTest) passes with zero regressions. (all test tasks + P7-T1/P7-T2; the only failing tests are pre-existing flaky timing tests, not regressions)
+6. [ ] With high-confidence mode disabled, QuickFiler behaves exactly as today (no filtering). (P5-T1 guard; tested P5-T2 disabled case; standard LoadQuickFilerAsync unchanged)
+7. [ ] New and changed logic is covered by MSTest + Moq + FluentAssertions tests; the full C# toolchain (CSharpier, .NET analyzers, nullable analysis, MSTest) passes with zero regressions. (all test tasks + P7-T1/P7-T2; the only failing tests are pre-existing flaky timing tests, not regressions)
 
 ## Non-Goals
 
