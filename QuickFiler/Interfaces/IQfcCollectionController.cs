@@ -44,6 +44,18 @@ namespace QuickFiler.Interfaces
         Task MoveEmailsAsync(ScoStack<IMovedMailInfo> StackMovedItems);
         void AddItemGroup(MailItem mailItem);
 
+        /// <summary>
+        /// Removes item groups whose <c>ItemController.TopFolderScore</c> is below the score
+        /// cutoff derived from <paramref name="threshold"/> as
+        /// <c>(long)Math.Round(threshold * 1000, 0)</c>. The comparison is inclusive of the
+        /// boundary: a group whose score equals the cutoff is retained. Groups with no qualifying
+        /// suggestion (score 0) are removed whenever the cutoff is greater than 0. Removal reuses
+        /// the existing control-group removal path so the move monitor is unhooked and remaining
+        /// groups are renumbered on the UI thread.
+        /// </summary>
+        /// <param name="threshold">A probability in the range [0.0, 1.0].</param>
+        Task RemoveBelowThresholdAsync(double threshold);
+
         // UI Select QfcItems
         int ActivateBySelection(int intNewSelection, bool blExpanded);
         void ChangeByIndex(int idx);

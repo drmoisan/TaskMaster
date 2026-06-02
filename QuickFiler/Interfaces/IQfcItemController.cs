@@ -96,5 +96,12 @@ namespace QuickFiler.Interfaces
 
         public Dictionary<string, System.Action> RightKeyActions { get; }
         Task InitializeGraphicsAsync();
+
+        /// <summary>
+        /// Gets the top folder suggestion score for this item, in 0-1000 score units, or 0 when
+        /// no suggestion has been computed yet. This is a read-only seam over the folder handler's
+        /// suggestions and performs no I/O.
+        /// </summary>
+        long TopFolderScore { get; }
     }
 }

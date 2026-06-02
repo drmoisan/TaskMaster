@@ -705,5 +705,77 @@ namespace QuickFiler.Controllers.Tests
             // Act & Assert
             Assert.ThrowsExactly<NotImplementedException>(() => _controller.Viewer_Activate());
         }
+
+        #region High-confidence filter (Issue #169)
+
+        [TestMethod]
+        public async Task ApplyHighConfidenceFilterAsync_WhenModeEnabled_RemovesBelowThresholdOnce()
+        {
+            // Arrange: high-confidence mode on, threshold 0.9.
+            var settings = new Mock<IAppQuickFilerSettings>();
+            settings.SetupGet(s => s.HighConfidenceModeEnabled).Returns(true);
+            settings.SetupGet(s => s.HighConfidenceThreshold).Returns(0.9);
+            _mockGlobals.SetupGet(g => g.QfSettings).Returns(settings.Object);
+
+            _controller = CreateQfcFormController();
+            var mockGroups = new Mock<IQfcCollectionController>();
+
+            // Act
+            await _controller.ApplyHighConfidenceFilterAsync(mockGroups.Object);
+
+            // Assert: removal is invoked exactly once with the configured threshold.
+            mockGroups.Verify(g => g.RemoveBelowThresholdAsync(0.9), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task ApplyHighConfidenceFilterAsync_WhenGroupsIsNull_DoesNothing()
+        {
+            // Arrange: the null-groups guard should short-circuit without touching settings.
+            var settings = new Mock<IAppQuickFilerSettings>();
+            settings.SetupGet(s => s.HighConfidenceModeEnabled).Returns(true);
+            _mockGlobals.SetupGet(g => g.QfSettings).Returns(settings.Object);
+            _controller = CreateQfcFormController();
+
+            // Act & Assert
+            Func<Task> act = () => _controller.ApplyHighConfidenceFilterAsync(null);
+
+            await act.Should().NotThrowAsync();
+        }
+
+        [TestMethod]
+        public async Task ApplyHighConfidenceFilterAsync_WhenQfSettingsIsNull_DoesNotRemove()
+        {
+            // Arrange: the null-QfSettings guard should short-circuit without removing.
+            _mockGlobals.SetupGet(g => g.QfSettings).Returns((IAppQuickFilerSettings)null);
+            _controller = CreateQfcFormController();
+            var mockGroups = new Mock<IQfcCollectionController>();
+
+            // Act
+            await _controller.ApplyHighConfidenceFilterAsync(mockGroups.Object);
+
+            // Assert
+            mockGroups.Verify(g => g.RemoveBelowThresholdAsync(It.IsAny<double>()), Times.Never);
+        }
+
+        [TestMethod]
+        public async Task ApplyHighConfidenceFilterAsync_WhenModeDisabled_NeverRemoves()
+        {
+            // Arrange: high-confidence mode off.
+            var settings = new Mock<IAppQuickFilerSettings>();
+            settings.SetupGet(s => s.HighConfidenceModeEnabled).Returns(false);
+            settings.SetupGet(s => s.HighConfidenceThreshold).Returns(0.9);
+            _mockGlobals.SetupGet(g => g.QfSettings).Returns(settings.Object);
+
+            _controller = CreateQfcFormController();
+            var mockGroups = new Mock<IQfcCollectionController>();
+
+            // Act
+            await _controller.ApplyHighConfidenceFilterAsync(mockGroups.Object);
+
+            // Assert: removal is never invoked.
+            mockGroups.Verify(g => g.RemoveBelowThresholdAsync(It.IsAny<double>()), Times.Never);
+        }
+
+        #endregion High-confidence filter (Issue #169)
     }
 }

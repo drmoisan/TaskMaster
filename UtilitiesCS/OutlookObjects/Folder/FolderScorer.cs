@@ -226,6 +226,14 @@ namespace UtilitiesCS
             AddArray(folderPaths, -1);
         }
 
+        /// <summary>
+        /// Returns the highest folder suggestion score currently held, in 0-1000 score units,
+        /// or 0 when no suggestions are present. This is a pure in-memory read with no I/O and is
+        /// safe to call on any thread once the scores have been populated.
+        /// </summary>
+        public long TopScore() =>
+            _folderNameScores.Count == 0 ? 0 : _folderNameScores.Max(x => x.Value);
+
         public string[] ToArray() =>
             _folderNameScores.OrderByDescending(x => x.Value).Select(x => x.Key).ToArray();
 

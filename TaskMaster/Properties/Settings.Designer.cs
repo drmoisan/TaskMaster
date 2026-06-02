@@ -550,7 +550,31 @@ namespace TaskMaster.Properties {
                 this["SaveEmailCopy"] = value;
             }
         }
-        
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HighConfidenceModeEnabled {
+            get {
+                return ((bool)(this["HighConfidenceModeEnabled"]));
+            }
+            set {
+                this["HighConfidenceModeEnabled"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.9")]
+        public double HighConfidenceThreshold {
+            get {
+                return ((double)(this["HighConfidenceThreshold"]));
+            }
+            set {
+                this["HighConfidenceThreshold"] = value;
+            }
+        }
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("999999FilteredFolderScraping.json")]

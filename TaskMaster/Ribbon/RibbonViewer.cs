@@ -127,6 +127,11 @@ namespace TaskMaster
             await _controller.LoadQuickFilerAsync();
         }
 
+        public async void QuickFilerHighConfidence_Click(Office.IRibbonControl control)
+        {
+            await _controller.LoadQuickFilerHighConfidenceAsync();
+        }
+
         public async void SortEmail_Click(Office.IRibbonControl control) =>
             await _controller.SortEmailAsync();
 
@@ -172,6 +177,12 @@ namespace TaskMaster
 
         public void FolderSettings_Click(Office.IRibbonControl control) =>
             _controller.FolderStoresSettings();
+
+        public string HighConfidenceThreshold_GetText(Office.IRibbonControl control) =>
+            _controller.GetHighConfidenceThresholdText();
+
+        public void HighConfidenceThreshold_OnChange(Office.IRibbonControl control, string text) =>
+            _controller.SetHighConfidenceThresholdText(text);
 
         #endregion SettingsMenu
 
