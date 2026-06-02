@@ -1,0 +1,20 @@
+Final coverage — Issue #171
+Task: [P7-T3]
+Timestamp: 2026-06-02T10-26
+
+Source: vstest.console.exe QuickFiler.Test.dll UtilitiesCS.Test.dll /EnableCodeCoverage
+Merged via Microsoft.CodeCoverage.Console.exe (line_coverage + per-range data).
+
+=== Per-file coverage (range-line basis) ===
+File                          Covered  NotCovered  Total  Pct
+QfcHighConfidencePreFilter.cs 34       0           34     100.00%   (NEW FILE, gate >= 90% MET)
+QfcHomeController.cs           271      248         519    52.22%
+QfcFormController.cs           321      487         808    39.73%
+QfcCollectionController.cs     66       1741        1807   3.65%
+QfcItemController.cs           139      1769        1908   7.29%
+QfcItemGroup.cs               11       2           13     84.62%
+FolderScorer.cs              542      39          581    93.29%   (untouched by #171)
+
+=== Per-module line_coverage (in-scope test assemblies) ===
+QuickFiler.dll   covered=3782   not=11772  total=15554  24.32%
+UtilitiesCS.dll  covered=35826  not=5080   total=40906  87.58%

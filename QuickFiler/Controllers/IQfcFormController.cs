@@ -29,6 +29,8 @@ namespace QuickFiler.Controllers
         void LoadItems(TableLayoutPanel tlp, List<QfcItemGroup> itemGroups);
         Task LoadItemsAsync(IList<MailItem> listObjects);
         Task LoadItemsAsync(IList<MailItem> listObjects, ProgressTracker progress);
+        Task LoadItemsAsync(IList<QfcPreScoredItem> preScored);
+        Task LoadItemsAsync(IList<QfcPreScoredItem> preScored, ProgressTracker progress);
         int LoadItemsPerIteration();
         void RegisterFormEventHandlers();
         void RemoveTemplatesAndSetupTlp();

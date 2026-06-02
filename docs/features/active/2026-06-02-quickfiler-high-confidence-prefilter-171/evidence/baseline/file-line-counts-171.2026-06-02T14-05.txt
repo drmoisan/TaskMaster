@@ -1,0 +1,15 @@
+Baseline line counts of oversized controllers — Issue #171
+Task: [P0-T7]
+Timestamp: 2026-06-02T14-05
+
+File                                              Lines (baseline)
+QuickFiler/Controllers/QfcCollectionController.cs  2206
+QuickFiler/Controllers/QfcItemController.cs        2431
+QuickFiler/Controllers/QfcFormController.cs        1082
+QuickFiler/Controllers/QfcHomeController.cs        724
+
+Notes:
+- All four already exceed the 500-line policy limit (pre-existing violations, not introduced by #171).
+- The final P7-T5 check recomputes these counts and confirms net additions are limited to minimal
+  interface/overload/property glue, with the bulk of new logic placed in the new file
+  QuickFiler/Controllers/QfcHighConfidencePreFilter.cs.

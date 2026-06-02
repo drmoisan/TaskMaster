@@ -411,6 +411,95 @@ namespace QuickFiler.Controllers
             //var conversationTasks = _itemGroups.Select(grp => grp.ItemController.LoadConversationResolverAsync(TokenSource, Token, false)).ToList();
         }
 
+        /// <summary>
+        /// High-confidence (Issue #171) carrier-list overload. Builds UI item controllers for the
+        /// pre-filtered survivors in <paramref name="preScored"/>, mirroring the standard
+        /// <see cref="LoadControlsAndHandlers_01Async(IList{MailItem}, RowStyle, RowStyle)"/> path but
+        /// threading each survivor's predetermined folder into its <see cref="QfcItemGroup"/> and item
+        /// controller so the folder is preselected instead of selected by index.
+        /// </summary>
+        public async Task LoadControlsAndHandlers_01Async(
+            IList<QfcPreScoredItem> preScored,
+            RowStyle template,
+            RowStyle templateExpanded
+        )
+        {
+            var items = preScored.Select(x => x.MailItem).ToList();
+            ValidateParams(items, template, templateExpanded);
+
+            // Start loading mail item helpers
+            var helpers = items.Select(GetPartiallyInitializedHelperAsync).ToList();
+
+            // Freeze the form while loading controls
+            _formViewer.SuspendLayout();
+            var tlpLayoutState = SafeSetTlpLayout(false);
+
+            // Save the QfcItem template styles
+            _template = template;
+            _templateExpanded = templateExpanded;
+
+            // Hook the move monitor to the mail items
+            BackgroundLoadingTasks.Add(
+                Task.Run(() =>
+                    items.ForEach(mailItem =>
+                        _moveMonitor.HookItem(mailItem, (x) => RemovedItemMonitor(x.EntryID))
+                    )
+                )
+            );
+
+            // Create empty keyboard handler actions
+            BackgroundLoadingTasks.Add(Task.Run(CreateEmptyKbdHandlerCharActions, Token));
+
+            // Create the item groups, carrying each survivor's predetermined folder
+            var digits = preScored.Count >= 10 ? 2 : 1;
+            _itemGroups =
+            [
+                .. preScored.Select(
+                    (scored, i) =>
+                        EncapsulateItemGroup(
+                            template,
+                            scored.MailItem,
+                            i,
+                            digits,
+                            _tlpStates,
+                            scored.PredeterminedFolder
+                        )
+                ),
+            ];
+
+            // Initialize graphics
+            foreach (var group in _itemGroups)
+            {
+                await group.ItemController.InitializeGraphicsAsync();
+            }
+
+            while (helpers.Count > 0)
+            {
+                var helperTask = await Task.WhenAny(helpers);
+                var helper = await helperTask;
+                helpers.Remove(helperTask);
+                var grp = _itemGroups.FirstOrDefault(x => x.MailItem.EntryID == helper.EntryId);
+                grp.ItemController.PopulateControls(helper, grp.ItemController.ItemNumber);
+            }
+
+            // Wait until Background Loading Tasks finish and then clear the collection
+            await Task.WhenAll(BackgroundLoadingTasks);
+            BackgroundLoadingTasks = [];
+
+            WireUpAsyncKeyboardHandler();
+
+            // Restore state of window
+            TlpLayout = tlpLayoutState;
+            if (_formViewer.InvokeRequired)
+            {
+                _formViewer.Invoke(() => _formViewer.ResumeLayout());
+            }
+            else
+            {
+                _formViewer.ResumeLayout();
+            }
+        }
+
         //public async Task LoadSecondaryAsync()
         //{
         //    // Ensure the token is not canceled before starting
@@ -514,10 +603,11 @@ namespace QuickFiler.Controllers
             MailItem mailItem,
             int i,
             int digits,
-            TlpCellStates tlpStates
+            TlpCellStates tlpStates,
+            string predeterminedFolder = null
         )
         {
-            var grp = new QfcItemGroup(mailItem);
+            var grp = new QfcItemGroup(mailItem) { PredeterminedFolder = predeterminedFolder };
             var itemViewer = ItemViewerQueue.Dequeue(_homeController.Token);
             LoadItemToTlp(itemViewer, i, template, true, 0);
             grp.ItemViewer = itemViewer;
@@ -529,7 +619,8 @@ namespace QuickFiler.Controllers
                 i + 1,
                 digits,
                 grp.MailItem,
-                tlpStates
+                tlpStates,
+                predeterminedFolder
             );
             grp.ItemController.Token = Token;
             return grp;

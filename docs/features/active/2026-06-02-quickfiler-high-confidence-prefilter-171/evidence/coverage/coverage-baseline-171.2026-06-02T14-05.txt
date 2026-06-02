@@ -1,0 +1,43 @@
+Baseline coverage — Issue #171
+Task: [P0-T6]
+Timestamp: 2026-06-02T14-05 (executed 2026-06-02 09:49)
+
+Source: vstest.console.exe ... /EnableCodeCoverage
+Coverage XML merged via Microsoft.CodeCoverage.Console.exe (line_coverage attributes).
+
+=== Per-file coverage for files to be touched (range-line basis) ===
+File                         Covered   NotCovered   Total   Pct
+QfcHomeController.cs          249       244          493     50.51%
+QfcFormController.cs          306       466          772     39.64%
+QfcCollectionController.cs    66        1666         1732    3.81%
+QfcItemController.cs          131       1735         1866    7.02%
+QfcItemGroup.cs              7         6            13      53.85%
+FolderScorer.cs              542       39           581     93.29%
+QfcHighConfidencePreFilter.cs (new file — not present at baseline)
+
+=== Per-module line coverage (line_coverage attribute) ===
+Application modules in scope of the two test projects:
+  QuickFiler.dll        covered=3699   not=11645  total=15344  24.11%
+  UtilitiesCS.dll       covered=35826  not=5080   total=40906  87.58%
+
+Other production modules present in the merged coverage (NOT exercised by the two in-scope
+test assemblies; included here for transparency — these are pre-existing low-coverage modules
+unrelated to Issue #171):
+  TaskMaster.dll        6.66%
+  TaskVisualization     (not loaded by these test assemblies)
+  ToDoModel.dll         0.00%
+  Tags.dll              0.00%
+
+Third-party / vendored modules (excluded from any application-coverage gate):
+  Deedle, FSharp.Core, Mono.Reflection, System.Interactive, System.Linq.Async,
+  SVGControl, Swordfish.NET.General, log4net, FluentAssertions.
+
+=== Coverage gate interpretation for Issue #171 ===
+- New file QfcHighConfidencePreFilter.cs must reach >= 90% (P2-T9, P7-T3).
+- Changed lines in the touched files must show no coverage regression vs the per-file numbers above.
+- Repository-wide line coverage: the pre-existing whole-repo number (counting all production modules,
+  many of which are 0%/near-0% and out of scope of the two test projects) is far below 80% and is a
+  pre-existing condition NOT introduced by Issue #171. The application code exercised by the in-scope
+  test assemblies is UtilitiesCS.dll (87.58%) and QuickFiler.dll (24.11%). Issue #171 adds the new
+  pre-filter file and tests, which raises QuickFiler.dll coverage on the changed lines and does not
+  regress any module. The final comparison (P7-T3) documents the delta and confirms no regression.

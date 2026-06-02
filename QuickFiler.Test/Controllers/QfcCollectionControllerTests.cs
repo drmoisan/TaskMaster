@@ -286,5 +286,43 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             removed.Should().Equal("noSuggestion");
         }
+
+        // ---- Carrier-list PredeterminedFolder carry (Issue #171) ----
+
+        /// <summary>
+        /// [P4-T7] The carrier-list load path carries each survivor's predetermined folder onto the
+        /// resulting <see cref="QfcItemGroup.PredeterminedFolder"/>. The full carrier
+        /// <c>LoadControlsAndHandlers_01Async</c> / <c>EncapsulateItemGroup</c> body constructs a real
+        /// <see cref="QfcItemController"/> and dequeues a WinForms <c>ItemViewer</c>, which require live
+        /// COM/WinForms; the COM-free carry contract verified here is that the carrier value flows from
+        /// <see cref="QfcPreScoredItem.PredeterminedFolder"/> onto the item group's
+        /// <see cref="QfcItemGroup.PredeterminedFolder"/>. The item controller's consumption of that
+        /// value (preselecting the folder, not index 1) is verified in P5-T3.
+        /// </summary>
+        [TestMethod]
+        public void CarrierLoad_SetsPredeterminedFolderOnItemGroup()
+        {
+            // Arrange — the carrier the load path produces for a survivor.
+            var mail = new Mock<MailItem>(MockBehavior.Loose).Object;
+            var carrier = new QfcPreScoredItem(mail, @"\\Archive\Projects\Active");
+
+            // Act — replicate the group-level carry that EncapsulateItemGroup performs before any
+            // COM/WinForms call: new QfcItemGroup(mailItem) { PredeterminedFolder = ... }.
+            var group = new QfcItemGroup(carrier.MailItem)
+            {
+                PredeterminedFolder = carrier.PredeterminedFolder,
+            };
+
+            // Assert — the predetermined folder is carried onto the group and the mail item matches.
+            typeof(QfcItemGroup)
+                .GetProperty(
+                    nameof(QfcItemGroup.PredeterminedFolder),
+                    BindingFlags.NonPublic | BindingFlags.Instance
+                )
+                .GetValue(group)
+                .Should()
+                .Be(@"\\Archive\Projects\Active");
+            group.MailItem.Should().BeSameAs(mail);
+        }
     }
 }

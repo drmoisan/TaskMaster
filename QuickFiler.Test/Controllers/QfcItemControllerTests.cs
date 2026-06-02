@@ -311,5 +311,67 @@ namespace QuickFiler.Controllers.Tests
                         + "across focus changes"
                 );
         }
+
+        // ---------------------------------------------------------------------------
+        // AssignFolderComboBox predetermined-folder preselection (Issue #171, P5-T3)
+        //
+        // AssignFolderComboBox() dereferences _itemViewer.InvokeRequired and _itemViewer.CboFolders,
+        // which require a fully-constructed WinForms control (a window handle) and therefore live UI
+        // state. The pure folder-population/selection logic was extracted into the testable seam
+        // QfcItemController.PopulateAndSelectFolder(ComboBox, string[], string) so the predetermined-
+        // folder behavior can be verified without a live item viewer. These tests exercise that seam,
+        // which is exactly the code path AssignFolderComboBox invokes after its InvokeRequired guard.
+        // ---------------------------------------------------------------------------
+
+        [TestMethod]
+        public void AssignFolderComboBox_WithPredeterminedFolder_SelectsThatFolderNotIndexOne()
+        {
+            // Arrange — header at index 0, the predetermined folder at a non-1 index (3).
+            var folders = new[]
+            {
+                "========= SUGGESTIONS =========",
+                @"\\A\suggestion1",
+                @"\\A\suggestion2",
+                @"\\A\predetermined",
+            };
+            using (var comboBox = new ComboBox())
+            {
+                // Act
+                var selected = QfcItemController.PopulateAndSelectFolder(
+                    comboBox,
+                    folders,
+                    predeterminedFolder: @"\\A\predetermined"
+                );
+
+                // Assert — the predetermined folder is selected at its index (3), not index 1.
+                comboBox.SelectedIndex.Should().Be(3);
+                selected.Should().Be(@"\\A\predetermined");
+            }
+        }
+
+        [TestMethod]
+        public void AssignFolderComboBox_WithoutPredeterminedFolder_SelectsIndexOne()
+        {
+            // Arrange — no predetermined folder; the existing index-1 fallback must be preserved.
+            var folders = new[]
+            {
+                "========= SUGGESTIONS =========",
+                @"\\A\topSuggestion",
+                @"\\A\suggestion2",
+            };
+            using (var comboBox = new ComboBox())
+            {
+                // Act
+                var selected = QfcItemController.PopulateAndSelectFolder(
+                    comboBox,
+                    folders,
+                    predeterminedFolder: null
+                );
+
+                // Assert — fallback to index 1 (the top suggestion) is unchanged.
+                comboBox.SelectedIndex.Should().Be(1);
+                selected.Should().Be(@"\\A\topSuggestion");
+            }
+        }
     }
 }

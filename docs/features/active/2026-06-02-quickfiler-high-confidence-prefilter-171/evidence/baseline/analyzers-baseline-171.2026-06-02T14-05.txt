@@ -1,0 +1,18 @@
+Baseline analyzer build — Issue #171
+Task: [P0-T4]
+Timestamp: 2026-06-02T14-05
+
+Command:
+  msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true
+
+Result: Build succeeded
+  30 Warning(s)
+  0 Error(s)
+
+Notes:
+- All 30 warnings are pre-existing and located in test projects (TaskMaster.Test, UtilitiesCS.Test):
+  - CS8632 (nullable annotation outside #nullable context) in test files.
+  - CS0067 (event never used) in test stub classes.
+- Zero errors. None of the warnings are in Issue #171 production or test files.
+- This is the analyzer baseline for the final P7 comparison: touched files must introduce zero new
+  analyzer warnings/errors.
