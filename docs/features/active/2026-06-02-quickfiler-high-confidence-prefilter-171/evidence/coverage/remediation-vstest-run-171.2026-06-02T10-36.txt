@@ -1,0 +1,44 @@
+Remediation vstest run — Issue #171
+Task: [P1-T1]
+Timestamp: 2026-06-02T10-36 (executed 2026-06-02 10:52)
+Finding: R1
+
+=== Pre-step builds (toolchain steps 2 and 3) ===
+Analyzer build (EnableNETAnalyzers=true, EnforceCodeStyleInBuild=true): SUCCEEDED (exit 0)
+Nullable build (Nullable=enable, TreatWarningsAsErrors=true): SUCCEEDED (exit 0)
+Both in-scope test assemblies rebuilt:
+  QuickFiler.Test\bin\Debug\QuickFiler.Test.dll
+  UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll
+
+=== vstest command ===
+vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage
+(resolved vstest.console.exe:
+ C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe)
+
+=== Result ===
+Total tests: 3943
+     Passed: 3934
+     Failed: 9
+Total time: 50.8229 Seconds
+
+=== .coverage results file (absolute path) ===
+C:\Users\DanMoisan\repos\TaskMaster\TestResults\e4602ebf-d5a7-4a35-b20a-a6b0fc46467d\DanMoisan_MEGALODON4_2026-06-02.10_52_07.coverage
+
+=== Failure analysis ===
+The 9 failures match the documented pre-existing regression baseline
+(evidence/baseline/tests-baseline-171.2026-06-02T14-05.txt: 9 failed, 8 unique methods,
+one method logged twice). All are timer/timing/threading/serialization flaky tests in
+UtilitiesCS.Test; none are QuickFiler controller / #171 tests:
+  - AddEntry_UseUiThreadTrue_DequeuesEntryAndSuppressesDispatcherException
+  - StartTimer_RaisesElapsedEvent
+  - Enqueue_InvokesBatchActionsOnTimerInterval
+  - StartNew_ConfiguresAutoResetAndInvokesCallback
+  - EmptyQueue_AfterSeveralIntervals_StopsTimer
+  - AsyncMultiTaskChunker_SyncFuncOverload_WhenWorkSpansTimerInterval_ReportsProgress
+  - Serialize_WithConfiguredPath_TriggersDeferredThreadSafeWrite (logged twice)
+  - ConcurrentEnqueue_BatchesAllItems
+  - RequestTask_WithConfiguredTask_InvokesTaskAfterInterval
+
+No existing Issue #171 test was modified, skipped, or weakened. The total test count rose from
+the baseline 3925 to 3943 (additional tests present in the rebuilt assemblies); the failing set is
+the same documented pre-existing flaky set. No new regression introduced.

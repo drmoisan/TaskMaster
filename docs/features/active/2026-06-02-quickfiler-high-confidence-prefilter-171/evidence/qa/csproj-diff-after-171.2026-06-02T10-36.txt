@@ -1,0 +1,29 @@
+TaskMaster.csproj diff after restoration — Issue #171
+Task: [P3-T2]
+Timestamp: 2026-06-02T10-36
+Finding: R3
+
+=== Command ===
+git diff development -- TaskMaster/TaskMaster.csproj
+
+=== Result ===
+(no diff — 0 lines of diff output)
+
+Note: git emitted the informational warning
+  "in the working copy of 'TaskMaster/TaskMaster.csproj', LF will be replaced by CRLF the
+   next time Git touches it"
+This is an autocrlf normalization notice only; it does not represent a content diff. The
+tracked content matches development byte-for-byte.
+
+=== Trailing newline check ===
+Last bytes of TaskMaster/TaskMaster.csproj:
+  ... 2f50 726f 6a65 6374 3e0a   ->  "</Project>\n"
+Trailing single newline (0x0a) is present. The R3 trailing-newline regression is resolved.
+
+=== Restoration source ===
+Restored via: git show development:TaskMaster/TaskMaster.csproj > TaskMaster/TaskMaster.csproj
+No Issue #171-required change is needed in this file (none expected); the file matches the
+base-branch (development) content exactly.
+
+Conclusion: R3 restoration complete. The diff vs development is empty; trailing newline
+restored; original multi-line attribute formatting restored.

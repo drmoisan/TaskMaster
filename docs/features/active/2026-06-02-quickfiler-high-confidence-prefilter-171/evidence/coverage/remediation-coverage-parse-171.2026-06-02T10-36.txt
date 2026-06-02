@@ -1,0 +1,30 @@
+Coverage artifact parse verification — Issue #171
+Task: [P1-T3]
+Timestamp: 2026-06-02T10-36
+Finding: R1
+
+Method: loaded artifacts/csharp/coverage.xml as [xml] via PowerShell (Get-Content -Raw).
+
+=== Results ===
+- XML parsed without error (well-formed).
+- Document root element: <coverage>  (Cobertura root).
+- Structure confirmed: //packages/package/classes/class/lines/line with per-line
+  'number' and 'hits' attributes.
+- <class> element count: 8858
+- Per-line 'hits' counters present (confirmed).
+
+=== Example line elements for QfcHighConfidencePreFilter.cs ===
+Production file:
+  C:\Users\DanMoisan\repos\TaskMaster\QuickFiler\Controllers\QfcHighConfidencePreFilter.cs
+  example <line number="50" hits="1" />
+  example <line number="65" hits="1" />
+  example <line number="75" hits="1" />
+  example <line number="76" hits="1" />
+  example <line number="100" hits="1" />
+
+(Note: the filename substring also matches the test file
+ QuickFiler.Test\Controllers\QfcHighConfidencePreFilterTests.cs; P2-T1 filters to the
+ production file path \QuickFiler\Controllers\QfcHighConfidencePreFilter.cs only.)
+
+Conclusion: artifacts/csharp/coverage.xml is well-formed Cobertura XML with per-line hit
+counters. R1 artifact requirement satisfied.

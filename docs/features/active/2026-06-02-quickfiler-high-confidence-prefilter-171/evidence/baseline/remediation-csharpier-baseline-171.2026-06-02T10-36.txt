@@ -1,0 +1,27 @@
+CSharpier baseline (remediation) — Issue #171
+Task: [P0-T4]
+Timestamp: 2026-06-02T10-36
+Finding: R3
+
+Command: dotnet tool run csharpier check .
+Exit code: 1
+
+Relevant output:
+  Warning The csproj at ...\TaskMaster\TaskMaster_BACKUP_1250.csproj failed to load
+    with the following exception Name cannot begin with the '<' character ... (pre-existing
+    invalid backup file, unrelated to Issue #171; not formatted).
+  Warning .\TaskMaster\TaskMaster_BACKUP_1250.csproj - Appeared to be invalid xml so was
+    not formatted.
+  Error .\TaskMaster\TaskMaster.csproj - Was not formatted.
+    The file did not end with a single newline.
+  Checked 1062 files in 8840ms.
+
+Findings recorded for R3:
+- This CSharpier version (file-based formatter) DOES inspect the trailing newline of
+  `TaskMaster/TaskMaster.csproj` and reports "Was not formatted. The file did not end with a
+  single newline." This is exactly the R3 trailing-newline regression introduced on this branch.
+- The `TaskMaster_BACKUP_1250.csproj` warning is a pre-existing invalid backup file unrelated
+  to Issue #171 and is not affected by this remediation.
+- After R3 restoration (restoring the trailing newline), the `TaskMaster.csproj` "did not end
+  with a single newline" Error must be cleared. The pre-existing BACKUP warning will remain
+  (out of scope; not introduced by this branch).
