@@ -942,6 +942,66 @@ namespace QuickFiler.Controllers
         }
 
         /// <summary>
+        /// High-confidence (Issue #171) carrier-list load path. Constructs UI item controllers only
+        /// for the already-filtered survivors carried in <paramref name="preScored"/>, each with its
+        /// predetermined folder. This path does NOT invoke the post-UI removal pass
+        /// (<see cref="ApplyHighConfidenceFilterAsync"/>) because the below-threshold items were
+        /// removed before UI construction.
+        /// </summary>
+        public async Task LoadItemsAsync(IList<QfcPreScoredItem> preScored)
+        {
+            await LoadItemsAsync(preScored, null);
+        }
+
+        /// <inheritdoc cref="LoadItemsAsync(IList{QfcPreScoredItem})"/>
+        public async Task LoadItemsAsync(
+            IList<QfcPreScoredItem> preScored,
+            ProgressTracker progress
+        )
+        {
+            if (
+                preScored is null
+                || _globals is null
+                || _formViewer is null
+                || _parent is null
+                || _tokenSource is null
+                || _states is null
+            )
+            {
+                return;
+            }
+
+            Token.ThrowIfCancellationRequested();
+
+            _groups = new QfcCollectionController(
+                AppGlobals: _globals,
+                viewerInstance: _formViewer,
+                InitType: QfEnums.InitTypeEnum.Sort,
+                homeController: _parent,
+                parent: this,
+                tokenSource: TokenSource,
+                token: Token,
+                _states
+            );
+            await _groups.LoadControlsAndHandlers_01Async(
+                preScored,
+                _rowStyleTemplate,
+                _rowStyleExpanded
+            );
+            progress?.Report(100);
+
+            _formViewer.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            _formViewer.Show();
+            _formViewer.Refresh();
+
+            await _groups.LoadSecondaryAsync();
+
+            // Intentionally NOT calling ApplyHighConfidenceFilterAsync here: in high-confidence mode
+            // the pre-filter already removed below-threshold items before UI construction, so there
+            // is no post-UI removal pass (Issue #171).
+        }
+
+        /// <summary>
         /// Removes below-threshold item groups when high-confidence mode is enabled. Seam extracted
         /// from <see cref="LoadItemsAsync(IList{MailItem}, ProgressTracker)"/> so the conditional
         /// can be unit-tested with a mocked <see cref="IQfcCollectionController"/> without running

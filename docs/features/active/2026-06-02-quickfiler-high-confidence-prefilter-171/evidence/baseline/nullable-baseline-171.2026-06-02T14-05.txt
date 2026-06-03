@@ -1,0 +1,27 @@
+Baseline nullable build — Issue #171
+Task: [P0-T5]
+Timestamp: 2026-06-02T14-05
+
+Command:
+  msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true
+
+Result: Build FAILED — 84 Error(s), 0 Warning(s) (ALL PRE-EXISTING, vendored projects only)
+
+Error distribution by project (error-bearing csproj):
+  SVGControl\SVGControl.csproj                              (vendored)
+  UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj (vendored)
+
+Error code breakdown (full-solution forced-nullable rebuild):
+  CS0649, CS8600, CS8601, CS8602, CS8603, CS8604, CS8618, CS8619, CS8625
+
+Notes:
+- This matches the documented repo reality: ~84 pre-existing nullable errors confined to the
+  vendored UtilitiesSwordfish / SVGControl projects when nullable is forced solution-wide.
+- ZERO nullable errors originate from QuickFiler, UtilitiesCS, QuickFiler.Test, UtilitiesCS.Test,
+  or any Issue #171 file.
+- Per the execution rules, the vendored projects are NOT to be fixed. The Issue #171 acceptance is:
+  touched files introduce ZERO new nullable errors. The final P7 nullable check confirms only these
+  same pre-existing vendored errors remain and no new error appears in Issue #171 files.
+- An incremental (-t:Build) nullable run reports 0 errors because the vendored assemblies are not
+  recompiled; the -t:Rebuild run above forces the vendored projects to recompile and surfaces the
+  pre-existing baseline.

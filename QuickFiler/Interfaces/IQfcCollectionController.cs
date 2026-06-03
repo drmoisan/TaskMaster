@@ -28,6 +28,11 @@ namespace QuickFiler.Interfaces
             RowStyle template,
             RowStyle templateExpanded
         );
+        Task LoadControlsAndHandlers_01Async(
+            IList<QfcPreScoredItem> preScored,
+            RowStyle template,
+            RowStyle templateExpanded
+        );
         ItemViewer LoadItemViewer_03(
             int intItemNumber,
             RowStyle template,

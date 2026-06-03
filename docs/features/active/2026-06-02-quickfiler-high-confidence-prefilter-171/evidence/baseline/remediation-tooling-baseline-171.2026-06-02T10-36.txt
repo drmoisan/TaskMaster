@@ -1,0 +1,17 @@
+Coverage conversion tooling baseline — Issue #171
+Task: [P0-T5]
+Timestamp: 2026-06-02T10-36
+Finding: R1
+
+=== Coverage-to-Cobertura conversion tool ===
+Tool: dotnet-coverage (global .NET tool)
+Version: 18.5.2+6e39b75eaf98f2691cf62dbf259669cc13851fd3
+Resolved path: C:\Users\DanMoisan\.dotnet\tools\dotnet-coverage.exe
+Conversion command form: dotnet-coverage merge <path-to-.coverage> -f cobertura -o artifacts/csharp/coverage.xml
+
+=== Test runner ===
+Tool: vstest.console.exe
+Resolved path: C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe
+
+Conclusion: A coverage-to-Cobertura conversion path (dotnet-coverage) and vstest.console.exe are
+both available. R1 conversion will use dotnet-coverage merge -f cobertura.

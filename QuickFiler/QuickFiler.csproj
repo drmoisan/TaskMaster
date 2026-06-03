@@ -299,6 +299,7 @@
     <Compile Include="Controllers\QfcDatamodel.cs" />
     <Compile Include="Controllers\QfcExplorerController.cs" />
     <Compile Include="Controllers\QfcFormController.cs" />
+    <Compile Include="Controllers\QfcHighConfidencePreFilter.cs" />
     <Compile Include="Controllers\QfcHomeController.cs" />
     <Compile Include="Controllers\QfcItemController.cs" />
     <Compile Include="Controllers\QfcItemGroup.cs" />

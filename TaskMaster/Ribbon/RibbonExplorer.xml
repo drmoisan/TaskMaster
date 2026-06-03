@@ -219,6 +219,12 @@
             size="large"
             keytip="QH"
           />
+          <editBox
+            id="HighConfidenceThreshold"
+            label="High Confidence %"
+            getText="HighConfidenceThreshold_GetText"
+            onChange="HighConfidenceThreshold_OnChange"
+          />
           <menu
             id="Settings"
             imageMso="ContentTypeSettings"
@@ -267,12 +273,6 @@
                   label="Save Pictures"
                   getPressed="SavePictures_GetPressed"
                   onAction="SavePictures_Clicked"
-                />
-                <editBox
-                  id="HighConfidenceThreshold"
-                  label="High Confidence %"
-                  getText="HighConfidenceThreshold_GetText"
-                  onChange="HighConfidenceThreshold_OnChange"
                 />
               </menu>
             </menu>

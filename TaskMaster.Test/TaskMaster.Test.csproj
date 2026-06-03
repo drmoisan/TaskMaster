@@ -287,6 +287,7 @@
     <Compile Include="AppGlobals\AppToDoObjectsTests.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperTests.cs" />
     <Compile Include="Ribbon\RibbonControllerTests.cs" />
+    <Compile Include="Ribbon\RibbonExplorerXmlTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

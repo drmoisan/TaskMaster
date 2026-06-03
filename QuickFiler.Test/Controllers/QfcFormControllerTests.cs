@@ -777,5 +777,47 @@ namespace QuickFiler.Controllers.Tests
         }
 
         #endregion High-confidence filter (Issue #169)
+
+        #region High-confidence pre-filter carrier path (Issue #171)
+
+        /// <summary>
+        /// [P4-T6] The carrier-list <see cref="QfcFormController.LoadItemsAsync(IList{QfcPreScoredItem})"/>
+        /// path never invokes the post-UI removal pass
+        /// (<see cref="QfcCollectionController.RemoveBelowThresholdAsync"/> via
+        /// <see cref="QfcFormController.ApplyHighConfidenceFilterAsync"/>). Because the carrier
+        /// overload constructs a real <see cref="QfcCollectionController"/> internally (no DI seam at
+        /// that point) which would require live WinForms/COM, this test exercises the overload via the
+        /// guard short-circuit (`_states` is null because Init() is not called) with an injected
+        /// collection-controller mock, and verifies no removal interaction occurs on the carrier path.
+        /// The positive carrier-overload behavior (LoadControlsAndHandlers_01Async and the carried
+        /// PredeterminedFolder) is verified at the collection-controller level in P4-T7 / P6-T2.
+        /// </summary>
+        [TestMethod]
+        public async Task LoadItemsAsync_PreScored_DoesNotInvokePostUiRemoval()
+        {
+            // Arrange — high-confidence mode on so the disabled-path branch is not the reason.
+            var settings = new Mock<IAppQuickFilerSettings>();
+            settings.SetupGet(s => s.HighConfidenceModeEnabled).Returns(true);
+            settings.SetupGet(s => s.HighConfidenceThreshold).Returns(0.9);
+            _mockGlobals.SetupGet(g => g.QfSettings).Returns(settings.Object);
+
+            _controller = CreateQfcFormController();
+            var mockGroups = new Mock<IQfcCollectionController>(MockBehavior.Strict);
+            SetPrivateField(_controller, "_groups", mockGroups.Object);
+
+            var preScored = new List<QfcPreScoredItem>
+            {
+                new QfcPreScoredItem(new Mock<MailItem>().Object, @"\\A\folder"),
+            };
+
+            // Act
+            Func<Task> act = () => _controller.LoadItemsAsync(preScored);
+
+            // Assert — no exception, and the post-UI removal pass is never invoked on the carrier path.
+            await act.Should().NotThrowAsync();
+            mockGroups.Verify(g => g.RemoveBelowThresholdAsync(It.IsAny<double>()), Times.Never);
+        }
+
+        #endregion High-confidence pre-filter carrier path (Issue #171)
     }
 }

@@ -1,0 +1,20 @@
+---
+name: project-build-test-env
+description: TaskMaster C#/VSTO build & test environment quirks for running the toolchain via the Bash tool
+metadata:
+  type: project
+---
+
+TaskMaster is a .NET Framework 4.8 C#/VSTO solution. Running the repo toolchain through the Bash tool (MSYS/git-bash) has several quirks worth knowing.
+
+**Why:** The toolchain commands in CLAUDE.md assume PowerShell, but the Bash tool uses git-bash which mangles MSBuild `/switches` and vstest `/flags` into paths.
+
+**How to apply:**
+- MSBuild is at `C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/MSBuild.exe`. Use dash switches (`-t:Build -p:Configuration=Debug -p:Platform="Any CPU"`), NOT slash switches — git-bash turns `/t:Build` into a path and MSBuild errors `MSB1008: Only one project can be specified`.
+- vstest.console.exe is at `C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/Extensions/TestPlatform/vstest.console.exe`. Prefix the command with `MSYS_NO_PATHCONV=1` so `/EnableCodeCoverage`, `/Tests:`, `/TestCaseFilter:` are not converted to git paths. Pass test DLL paths as Windows-style backslash paths (mixed forward/back slashes can make vstest report "test source file not found").
+- Coverage: `/EnableCodeCoverage` produces a binary `.coverage`. Convert with `Microsoft.CodeCoverage.Console.exe merge <file> -f xml -o out.xml` (the deprecated `CodeCoverage.exe analyze` subcommand fails). The XML schema is `results/modules/module[@line_coverage,@lines_covered,...]` with per-`function`/`range` data; `source_files` appear AFTER `functions` within each `module`, so resolve `source_id`->path at module-end when stream-parsing.
+- CSharpier is v1.x: use `dotnet tool run csharpier format <path>` (write) and `... check <path>` (verify). The old `csharpier .` syntax prints help. `csharpier check .` repo-wide returns exit 1 only because of pre-existing `TaskMaster.csproj` (a project file, not .cs).
+- A forced-nullable build (`-p:Nullable=enable -p:TreatWarningsAsErrors=true`) must use `-t:Rebuild` to surface the ~84 pre-existing vendored errors (confined to `SVGControl` and `UtilitiesSwordfish`); an incremental `-t:Build` reports 0 because those assemblies are not recompiled. The forced-nullable Rebuild leaves Debug test DLLs absent (TreatWarningsAsErrors aborts downstream output) — always run a plain `-t:Build -p:Configuration=Debug` afterward to restore `QuickFiler.Test.dll` / `UtilitiesCS.Test.dll` before running vstest.
+- Legacy (non-SDK) csproj: new `.cs` files must be added as explicit `<Compile Include="..."/>` entries; there is no globbing.
+- `IList<T>` of an `internal` type in a `public` interface signature causes CS0051 — the carried type must be `public`. To mock an `internal` interface with Moq, the assembly needs `[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]` in a COMPILED file (QuickFiler's existing one is in `Legacy/IAcceleratorCallbacks.cs`, which is NOT in the csproj, so it is not compiled).
+- QuickFiler.Test compiles as C# 7.3: `using var` and other C# 8+ features fail (CS8370). Use classic `using (...) {}` blocks in that project.

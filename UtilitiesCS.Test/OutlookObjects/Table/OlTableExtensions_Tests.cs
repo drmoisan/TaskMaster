@@ -14,6 +14,10 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.Test.OutlookObjects.Table
 {
+    // EnumerateTable_WritesFormattedOutputAndMovesToStart redirects Console.Out,
+    // which is process-wide state. Under class-level parallel execution another
+    // test class can replace the writer mid-test and make the captured output empty.
+    [DoNotParallelize]
     [TestClass]
     public class OlTableExtensions_Tests
     {

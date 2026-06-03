@@ -98,6 +98,22 @@ namespace QuickFiler.Controllers.Tests
             return intel;
         }
 
+        /// <summary>
+        /// Sets up <c>Globals.QfSettings</c> on the strict globals mock so the high-confidence branch
+        /// in <see cref="QfcHomeController.RunAsync"/> can read the mode flag and threshold.
+        /// </summary>
+        private Mock<IAppQuickFilerSettings> SetupQfSettings(
+            bool highConfidenceEnabled,
+            double threshold
+        )
+        {
+            var qfSettings = this._mockRepository.Create<IAppQuickFilerSettings>();
+            qfSettings.SetupGet(x => x.HighConfidenceModeEnabled).Returns(highConfidenceEnabled);
+            qfSettings.SetupGet(x => x.HighConfidenceThreshold).Returns(threshold);
+            this._mockApplicationGlobals.SetupGet(x => x.QfSettings).Returns(qfSettings.Object);
+            return qfSettings;
+        }
+
         [TestMethod]
         public void Constructor_InitializesCorrectly()
         {
@@ -340,6 +356,9 @@ namespace QuickFiler.Controllers.Tests
             mockDataModel.Setup(x => x.Complete).Returns(true);
             _controller.DataModel = mockDataModel.Object;
 
+            // High-confidence mode disabled => the standard IList<MailItem> path is used unchanged.
+            SetupQfSettings(highConfidenceEnabled: false, threshold: 0.90);
+
             // Mock the QfcFormController
             var mockFormController = new Mock<IQfcFormController>();
             mockFormController
@@ -402,6 +421,259 @@ namespace QuickFiler.Controllers.Tests
                 Times.Exactly(2)
             );
             _mockProgressTracker.Verify(m => m.Report(It.IsAny<double>()), Times.Exactly(1));
+        }
+
+        // -------------------------------------------------------------------------
+        // Issue #171 high-confidence pre-filter tests (P3-T3..T5, P6-T1, P6-T3).
+        // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// Arranges the controller for a <see cref="QfcHomeController.RunAsync"/> high-confidence
+        /// test: a data model returning an empty batch, a mocked form controller, a mocked form
+        /// viewer, and QfSettings wired to the supplied mode/threshold. Returns the form controller
+        /// mock so each test can assert which overload was invoked.
+        /// </summary>
+        private Mock<IQfcFormController> ArrangeRunAsyncController(
+            bool highConfidenceEnabled,
+            ProgressTracker progress
+        )
+        {
+            var mockDataModel = new Mock<IQfcDatamodel>();
+            mockDataModel
+                .Setup(x =>
+                    x.InitEmailQueueAsync(
+                        It.IsAny<int>(),
+                        It.IsAny<BackgroundWorker>(),
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<CancellationTokenSource>()
+                    )
+                )
+                .ReturnsAsync(new List<MailItem>());
+            mockDataModel.Setup(x => x.Complete).Returns(true);
+            _controller.DataModel = mockDataModel.Object;
+
+            SetupQfSettings(highConfidenceEnabled, threshold: 0.90);
+
+            var mockFormController = new Mock<IQfcFormController>();
+            mockFormController
+                .Setup(x => x.LoadItemsAsync(It.IsAny<IList<MailItem>>()))
+                .Returns(Task.CompletedTask);
+            mockFormController
+                .Setup(x => x.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()))
+                .Returns(Task.CompletedTask);
+            SetPrivateField(_controller, "_formController", mockFormController.Object);
+
+            var mockFormViewer = new Mock<IQfcFormViewer>();
+            mockFormViewer.Setup(x => x.Show());
+            var windowState = FormWindowState.Normal;
+            mockFormViewer
+                .SetupSet(x => x.WindowState = It.IsAny<FormWindowState>())
+                .Callback<FormWindowState>(state => windowState = state);
+            mockFormViewer.SetupGet(x => x.WindowState).Returns(() => windowState);
+            mockFormViewer.Setup(x => x.Refresh());
+            SetPrivateField(_controller, "_formViewer", mockFormViewer.Object);
+
+            return mockFormController;
+        }
+
+        /// <summary>
+        /// [P3-T3] Setup test: the controller can be constructed with the pre-filter delegate
+        /// overridden and the form controller mocked, without live COM.
+        /// </summary>
+        [TestMethod]
+        public void HighConfidencePreFilterLoader_CanBeOverridden_ForTesting()
+        {
+            // Arrange
+            var invoked = false;
+            _controller.HighConfidencePreFilterLoader = (items, globals, threshold, token) =>
+            {
+                invoked = true;
+                return Task.FromResult<IList<QfcPreScoredItem>>(new List<QfcPreScoredItem>());
+            };
+
+            // Act
+            var result = _controller.HighConfidencePreFilterLoader(
+                new List<MailItem>(),
+                _mockApplicationGlobals.Object,
+                0.90,
+                CancellationToken.None
+            );
+
+            // Assert
+            invoked.Should().BeTrue("the overridden delegate must be the one invoked");
+            result.Should().NotBeNull();
+        }
+
+        /// <summary>
+        /// [P3-T4] With high-confidence mode enabled, RunAsync invokes the pre-filter delegate and
+        /// calls the carrier-list LoadItemsAsync overload, not the plain IList&lt;MailItem&gt; one.
+        /// </summary>
+        [TestMethod]
+        public async Task RunAsync_HighConfidenceEnabled_InvokesPreFilterBeforeCarrierLoad()
+        {
+            // Arrange
+            var tokenSource = new CancellationTokenSource();
+            _mockProgressTracker = SetupMockProgressTracker(tokenSource);
+            var progress = _mockProgressTracker.Object;
+            var mockFormController = ArrangeRunAsyncController(
+                highConfidenceEnabled: true,
+                progress
+            );
+
+            var preFilterInvoked = false;
+            _controller.HighConfidencePreFilterLoader = (items, globals, threshold, token) =>
+            {
+                preFilterInvoked = true;
+                return Task.FromResult<IList<QfcPreScoredItem>>(new List<QfcPreScoredItem>());
+            };
+
+            // Act
+            await _controller.RunAsync(progress);
+
+            // Assert
+            preFilterInvoked
+                .Should()
+                .BeTrue("the pre-filter delegate runs in high-confidence mode");
+            mockFormController.Verify(
+                m => m.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()),
+                Times.Once,
+                "the carrier-list overload must be used in high-confidence mode"
+            );
+            mockFormController.Verify(
+                m => m.LoadItemsAsync(It.IsAny<IList<MailItem>>()),
+                Times.Never,
+                "the plain IList<MailItem> overload must NOT be used in high-confidence mode"
+            );
+        }
+
+        /// <summary>
+        /// [P3-T5] With high-confidence mode disabled, RunAsync does NOT invoke the pre-filter and
+        /// uses the plain IList&lt;MailItem&gt; LoadItemsAsync overload unchanged.
+        /// </summary>
+        [TestMethod]
+        public async Task RunAsync_HighConfidenceDisabled_DoesNotPreFilterUsesPlainOverload()
+        {
+            // Arrange
+            var tokenSource = new CancellationTokenSource();
+            _mockProgressTracker = SetupMockProgressTracker(tokenSource);
+            var progress = _mockProgressTracker.Object;
+            var mockFormController = ArrangeRunAsyncController(
+                highConfidenceEnabled: false,
+                progress
+            );
+
+            var preFilterInvoked = false;
+            _controller.HighConfidencePreFilterLoader = (items, globals, threshold, token) =>
+            {
+                preFilterInvoked = true;
+                return Task.FromResult<IList<QfcPreScoredItem>>(new List<QfcPreScoredItem>());
+            };
+
+            // Act
+            await _controller.RunAsync(progress);
+
+            // Assert
+            preFilterInvoked.Should().BeFalse("disabled mode must not run the pre-filter");
+            mockFormController.Verify(
+                m => m.LoadItemsAsync(It.IsAny<IList<MailItem>>()),
+                Times.Once,
+                "disabled mode must use the plain IList<MailItem> overload"
+            );
+            mockFormController.Verify(
+                m => m.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()),
+                Times.Never,
+                "disabled mode must NOT use the carrier-list overload"
+            );
+        }
+
+        /// <summary>
+        /// [P6-T1] Ordering: the pre-filter delegate completes before the carrier-list
+        /// LoadItemsAsync is invoked, proving pre-filtering precedes UI construction (AC1).
+        /// </summary>
+        [TestMethod]
+        public async Task RunAsync_HighConfidence_PreFilterPrecedesUiConstruction()
+        {
+            // Arrange
+            var tokenSource = new CancellationTokenSource();
+            _mockProgressTracker = SetupMockProgressTracker(tokenSource);
+            var progress = _mockProgressTracker.Object;
+
+            var sequence = new List<string>();
+
+            var mockDataModel = new Mock<IQfcDatamodel>();
+            mockDataModel
+                .Setup(x =>
+                    x.InitEmailQueueAsync(
+                        It.IsAny<int>(),
+                        It.IsAny<BackgroundWorker>(),
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<CancellationTokenSource>()
+                    )
+                )
+                .ReturnsAsync(new List<MailItem>());
+            mockDataModel.Setup(x => x.Complete).Returns(true);
+            _controller.DataModel = mockDataModel.Object;
+
+            SetupQfSettings(highConfidenceEnabled: true, threshold: 0.90);
+
+            var mockFormController = new Mock<IQfcFormController>();
+            mockFormController
+                .Setup(x => x.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()))
+                .Returns(Task.CompletedTask)
+                .Callback(() => sequence.Add("LoadItemsAsync"));
+            SetPrivateField(_controller, "_formController", mockFormController.Object);
+
+            var mockFormViewer = new Mock<IQfcFormViewer>();
+            mockFormViewer.Setup(x => x.Show());
+            var windowState = FormWindowState.Normal;
+            mockFormViewer
+                .SetupSet(x => x.WindowState = It.IsAny<FormWindowState>())
+                .Callback<FormWindowState>(state => windowState = state);
+            mockFormViewer.SetupGet(x => x.WindowState).Returns(() => windowState);
+            mockFormViewer.Setup(x => x.Refresh());
+            SetPrivateField(_controller, "_formViewer", mockFormViewer.Object);
+
+            _controller.HighConfidencePreFilterLoader = (items, globals, threshold, token) =>
+            {
+                sequence.Add("PreFilter");
+                return Task.FromResult<IList<QfcPreScoredItem>>(new List<QfcPreScoredItem>());
+            };
+
+            // Act
+            await _controller.RunAsync(progress);
+
+            // Assert
+            sequence.Should().Equal("PreFilter", "LoadItemsAsync");
+        }
+
+        /// <summary>
+        /// [P6-T3] Disabled-mode path constructs item groups via the plain IList&lt;MailItem&gt;
+        /// overload only; no carrier type is involved (standard flow unchanged).
+        /// </summary>
+        [TestMethod]
+        public async Task RunAsync_HighConfidenceDisabled_UsesPlainOverloadOnly()
+        {
+            // Arrange
+            var tokenSource = new CancellationTokenSource();
+            _mockProgressTracker = SetupMockProgressTracker(tokenSource);
+            var progress = _mockProgressTracker.Object;
+            var mockFormController = ArrangeRunAsyncController(
+                highConfidenceEnabled: false,
+                progress
+            );
+
+            // Act
+            await _controller.RunAsync(progress);
+
+            // Assert
+            mockFormController.Verify(
+                m => m.LoadItemsAsync(It.IsAny<IList<MailItem>>()),
+                Times.Once
+            );
+            mockFormController.Verify(
+                m => m.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()),
+                Times.Never
+            );
         }
 
         [TestMethod]

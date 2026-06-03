@@ -6,6 +6,12 @@ using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
 {
+    // These tests assert that a System.Timers.Timer-backed wrapper raises (or suppresses)
+    // its Elapsed callback within a bounded wait. That callback runs on a ThreadPool thread,
+    // so under class-level parallel execution a saturated ThreadPool can delay it past the
+    // wait window and make the test fail intermittently. Running this class in the
+    // non-parallel phase removes the contention, matching ApplicationIdleTimer_Tests.
+    [DoNotParallelize]
     [TestClass]
     public class TimerWrapper_Tests
     {

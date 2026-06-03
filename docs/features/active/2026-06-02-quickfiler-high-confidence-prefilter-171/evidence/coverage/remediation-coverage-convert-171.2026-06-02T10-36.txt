@@ -1,0 +1,16 @@
+Coverage conversion to Cobertura — Issue #171
+Task: [P1-T2]
+Timestamp: 2026-06-02T10-36
+Finding: R1
+
+=== Conversion command ===
+dotnet-coverage merge "C:\Users\DanMoisan\repos\TaskMaster\TestResults\e4602ebf-d5a7-4a35-b20a-a6b0fc46467d\DanMoisan_MEGALODON4_2026-06-02.10_52_07.coverage" -f cobertura -o artifacts\csharp\coverage.xml
+Tool: dotnet-coverage v18.5.2.0 [win-x64 - .NET 10.0.8]
+Exit code: 0
+
+=== Output verification ===
+Test-Path artifacts/csharp/coverage.xml: True
+File size: 29,814,359 bytes
+Absolute path: C:\Users\DanMoisan\repos\TaskMaster\artifacts\csharp\coverage.xml
+
+The canonical machine-readable coverage artifact now exists at the canonical path.

@@ -1,0 +1,10 @@
+Coverage artifact presence baseline — Issue #171
+Task: [P0-T3]
+Timestamp: 2026-06-02T10-36
+Finding: R1
+
+Command: Test-Path artifacts/csharp/coverage.xml
+Result: False
+
+Interpretation: At remediation start the canonical coverage artifact does not exist,
+confirming the blocking absence (R1) flagged by the re-audit. Phase 1 produces it.
