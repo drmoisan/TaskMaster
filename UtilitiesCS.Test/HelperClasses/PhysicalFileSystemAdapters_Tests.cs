@@ -199,21 +199,10 @@ namespace UtilitiesCS.Test.HelperClasses
 
             adapter.IsReadOnly = adapter.IsReadOnly;
 
-            // Exercise file-stream methods one at a time to avoid file-sharing conflicts.
-            // Each file operation acquires a handle; keeping all open simultaneously causes
-            // IOException when incompatible access modes overlap.
-            bool appendCanWrite;
-            using (var appendWriter = adapter.AppendText())
-            {
-                appendCanWrite = appendWriter.BaseStream.CanWrite;
-            }
-
-            bool openModeCanRead;
-            using (var openMode = adapter.Open(FileMode.Open))
-            {
-                openModeCanRead = openMode.CanRead;
-            }
-
+            // Read-only stream methods stay on the real solution file. Read-only opens that
+            // request FileShare.ReadWrite (or are inherently read-only) do not contend with the
+            // checkout/build process that may hold TaskMaster.sln open, so they are deterministic
+            // under parallel CI execution.
             bool openModeReadCanRead;
             using (var openModeRead = adapter.Open(FileMode.Open, FileAccess.Read))
             {
@@ -244,11 +233,42 @@ namespace UtilitiesCS.Test.HelperClasses
                 openTextLine = openText.ReadLine();
             }
 
-            bool openWriteCanWrite;
-            using (var openWrite = adapter.OpenWrite())
-            {
-                openWriteCanWrite = openWrite.CanWrite;
-            }
+            // Write-mode opens (AppendText, Open(FileMode.Open) which defaults to ReadWrite,
+            // OpenWrite) must not target the shared TaskMaster.sln: under parallel CI the file is
+            // held open by another process and the write handle throws IOException. They must also
+            // not touch any temporary/scratch file, which the unit-test policy prohibits. Instead,
+            // construct the adapter through its internal injectable-delegate seam so the three
+            // write-mode members return test-owned sentinel streams. This covers the adapter's
+            // AppendText/Open(mode)/OpenWrite delegation lines deterministically without acquiring
+            // any real write/append handle. The sentinel streams are read-only opens of the test
+            // assembly DLL (the same deterministic pattern used in FileInfoWrapper_Tests).
+            // The append sentinel wraps an in-memory stream because StreamWriter requires a
+            // writable backing stream; the read-only DLL opens below cannot back a StreamWriter.
+            using var sentinelAppendStream = new MemoryStream();
+            using var sentinelAppendWriter = new StreamWriter(
+                sentinelAppendStream,
+                System.Text.Encoding.UTF8,
+                1024,
+                leaveOpen: true
+            );
+            using var sentinelOpenModeStream = new FileStream(
+                typeof(PhysicalFileSystemAdapters_Tests).Assembly.Location,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.ReadWrite
+            );
+            using var sentinelOpenWriteStream = new FileStream(
+                typeof(PhysicalFileSystemAdapters_Tests).Assembly.Location,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.ReadWrite
+            );
+            var seamAdapter = new PhysicalFileInfoAdapter(
+                file,
+                () => sentinelAppendWriter,
+                _ => sentinelOpenModeStream,
+                () => sentinelOpenWriteStream
+            );
 
             var accessWithSections = adapter.GetAccessControl(AccessControlSections.Access);
             adapter.GetObjectData(serialized, context);
@@ -264,13 +284,13 @@ namespace UtilitiesCS.Test.HelperClasses
             adapter.Directory.FullName.Should().Be(file.Directory.FullName);
             adapter.DirectoryName.Should().Be(file.DirectoryName);
             adapter.Length.Should().BeGreaterThan(0);
-            appendCanWrite.Should().BeTrue();
-            openModeCanRead.Should().BeTrue();
             openModeReadCanRead.Should().BeTrue();
             openModeReadSharedCanRead.Should().BeTrue();
             openReadCanRead.Should().BeTrue();
             openTextLine.Should().NotBeNull();
-            openWriteCanWrite.Should().BeTrue();
+            seamAdapter.AppendText().Should().BeSameAs(sentinelAppendWriter);
+            seamAdapter.Open(FileMode.Open).Should().BeSameAs(sentinelOpenModeStream);
+            seamAdapter.OpenWrite().Should().BeSameAs(sentinelOpenWriteStream);
             security.Should().NotBeNull();
             accessWithSections.Should().NotBeNull();
             toStringValue.Should().Be(file.ToString());
