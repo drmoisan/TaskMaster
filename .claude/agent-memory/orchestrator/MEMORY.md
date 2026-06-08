@@ -1,3 +1,11 @@
 - [VS Code extension location](project_extension_location.md) — the extension lives at `extensions/drm-copilot/`, not at the repo root.
 - [Verify package.json before vsce work](feedback_vsce_verify_package_location.md) — in multi-package repos, never assume the repo root is the publishable extension; locate it first.
 - [Repo root is source of truth for codex bundle](feedback_repo_root_is_source_of_truth.md) — when repo `.codex/`, `.agents/`, `AGENTS.md` differ from bundled copies, update the bundle to match.
+- [Evidence + lifecycle for every change](evidence-and-lifecycle-for-every-change.md) — evidence only under a feature folder; promote to issue + active folder before ANY implementation, even 1-file tooling fixes
+- [Small-path = minor-audit selection](small-path-minor-audit-selection.md) — 1-3 production-file bug = small path + minor-audit, no spec.md, AC lives in issue.md
+- [MCP tools available to orchestrator](mcp-tools-available-to-orchestrator.md) — if a worker reports MCP gate/lifecycle tools unavailable, run them from the orchestrator yourself, don't accept the block
+- [potential_to_issue creates the GitHub issue](potential-to-issue-creates-github-issue.md) — the promotion tool opens the GitHub issue itself; do not also gh issue create
+- [Remediation loop strict handoff](remediation-loop-strict-handoff.md) — remediation cycles run atomic-planner -> atomic-executor -> feature-review only; no direct typed-engineer worker calls; five required artifacts per cycle
+- [Remediation-plan em-dash required](remediation-plan-em-dash-required.md) — the plan validator rejects `### Phase N (continued) — <Title>`; only canonical `### Phase N — <Title>` passes
+- [new_active_feature_folder date prefix](new-active-feature-folder-date-prefix.md) — standalone feature folders get the YYYY-MM-DD- prefix automatically; epic-child folders don't (git mv those)
+- [orchestrator-state validator divergence](orchestrator-state-validator-divergence.md) — MCP orchestrator-state check is stricter than the real SubagentStop hook; conform to the canonical schema's remediation_loop shape
