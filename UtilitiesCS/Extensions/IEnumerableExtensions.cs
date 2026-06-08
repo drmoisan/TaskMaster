@@ -132,10 +132,10 @@ namespace UtilitiesCS
                     _ =>
                         progress.Report(
                             completed,
-                            $"Consuming {(int)((double)completed * (double)count / 100):N0} of {count:N0}"
+                            $"Consuming {completed:N0} of {count:N0}"
                         ),
                     null,
-                    0,
+                    500,
                     500
                 )
             )
