@@ -1,0 +1,2177 @@
+<!-- trimmed to affected classes for issue #176 -->
+<coverage>
+  <class
+    line-rate="0.3888888888888889"
+    branch-rate="1"
+    complexity="1"
+    name="UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder.OlFolderClassifierGroup"
+    filename="C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS\EmailIntelligence\ClassifierGroups\OlFolder\OlFolderClassifierGroup.cs"
+  >
+    <methods>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="OlFolderClassifierGroup"
+        signature="(UtilitiesCS.IApplicationGlobals)"
+      >
+        <lines>
+          <line number="22" hits="1" branch="False" />
+          <line number="28" hits="1" branch="False" />
+          <line number="31" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Globals" signature="()">
+        <lines>
+          <line number="29" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="OlFolderClassifierGroup"
+        signature="()"
+      >
+        <lines>
+          <line number="24" hits="1" branch="False" />
+          <line number="25" hits="1" branch="False" />
+          <line number="26" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="&lt;LoadStaging&gt;b__6_0"
+        signature="()"
+      >
+        <lines>
+          <line number="38" hits="0" branch="False" />
+          <line number="39" hits="0" branch="False" />
+          <line number="40" hits="0" branch="False" />
+          <line number="41" hits="0" branch="False" />
+          <line number="42" hits="0" branch="False" />
+          <line number="43" hits="0" branch="False" />
+          <line number="44" hits="0" branch="False" />
+          <line number="47" hits="0" branch="False" />
+          <line number="48" hits="0" branch="False" />
+          <line number="50" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="&lt;GetOrCreateClassifierGroupAsync&gt;b__8_0"
+        signature="()"
+      >
+        <lines>
+          <line number="64" hits="0" branch="False" />
+        </lines>
+      </method>
+    </methods>
+    <lines>
+      <line number="22" hits="1" branch="False" />
+      <line number="24" hits="1" branch="False" />
+      <line number="25" hits="1" branch="False" />
+      <line number="26" hits="1" branch="False" />
+      <line number="28" hits="1" branch="False" />
+      <line number="29" hits="1" branch="False" />
+      <line number="31" hits="1" branch="False" />
+      <line number="38" hits="0" branch="False" />
+      <line number="39" hits="0" branch="False" />
+      <line number="40" hits="0" branch="False" />
+      <line number="41" hits="0" branch="False" />
+      <line number="42" hits="0" branch="False" />
+      <line number="43" hits="0" branch="False" />
+      <line number="44" hits="0" branch="False" />
+      <line number="47" hits="0" branch="False" />
+      <line number="48" hits="0" branch="False" />
+      <line number="50" hits="0" branch="False" />
+      <line number="64" hits="0" branch="False" />
+    </lines>
+  </class>
+  <class
+    line-rate="0.17829457364341086"
+    branch-rate="1"
+    complexity="1"
+    name="UtilitiesCS.EmailIntelligence.Bayesian.BayesianClassifierGroup"
+    filename="C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS\EmailIntelligence\Bayesian\BayesianClassifierGroup.cs"
+  >
+    <methods>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="BayesianClassifierGroup"
+        signature="()"
+      >
+        <lines>
+          <line number="23" hits="1" branch="False" />
+          <line number="24" hits="1" branch="False" />
+          <line number="25" hits="1" branch="False" />
+          <line number="26" hits="1" branch="False" />
+          <line number="27" hits="1" branch="False" />
+          <line number="46" hits="1" branch="False" />
+          <line number="64" hits="1" branch="False" />
+          <line number="65" hits="1" branch="False" />
+          <line number="73" hits="1" branch="False" />
+          <line number="74" hits="1" branch="False" />
+          <line number="75" hits="1" branch="False" />
+          <line number="76" hits="1" branch="False" />
+          <line number="77" hits="1" branch="False" />
+          <line number="78" hits="1" branch="False" />
+          <line number="85" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="BayesianClassifierGroup"
+        signature="()"
+      >
+        <lines>
+          <line number="17" hits="1" branch="False" />
+          <line number="18" hits="1" branch="False" />
+          <line number="19" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Classifiers" signature="()">
+        <lines>
+          <line number="35" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="set_Classifiers"
+        signature="(System.Collections.Concurrent.ConcurrentDictionary&lt;string, UtilitiesCS.EmailIntelligence.Bayesian.BayesianClassifierShared&gt;)"
+      >
+        <lines>
+          <line number="36" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="get_SharedTokenBase"
+        signature="()"
+      >
+        <lines>
+          <line number="43" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_SharedTokenBase"
+        signature="(UtilitiesCS.EmailIntelligence.Bayesian.Corpus)"
+      >
+        <lines>
+          <line number="44" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="get_TotalEmailCount"
+        signature="()"
+      >
+        <lines>
+          <line number="51" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_TotalEmailCount"
+        signature="(int)"
+      >
+        <lines>
+          <line number="52" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="0" branch-rate="1" complexity="1" name="get_Tokenize" signature="()">
+        <lines>
+          <line number="61" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="set_Tokenize"
+        signature="(System.Func&lt;object, UtilitiesCS.IApplicationGlobals, System.Collections.Generic.IEnumerable&lt;string&gt;&gt;)"
+      >
+        <lines>
+          <line number="62" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="0" branch-rate="1" complexity="1" name="get_TokenizeAsync" signature="()">
+        <lines>
+          <line number="70" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="set_TokenizeAsync"
+        signature="(System.Func&lt;object, UtilitiesCS.IApplicationGlobals, System.Threading.CancellationToken, System.Threading.Tasks.Task&lt;string[]&gt;&gt;)"
+      >
+        <lines>
+          <line number="71" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="get_MinimumProbability"
+        signature="()"
+      >
+        <lines>
+          <line number="82" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="set_MinimumProbability"
+        signature="(double)"
+      >
+        <lines>
+          <line number="83" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="UnTrain"
+        signature="(string, System.Collections.Generic.IEnumerable&lt;string&gt;, int)"
+      >
+        <lines>
+          <line number="92" hits="0" branch="False" />
+          <line number="93" hits="0" branch="False" />
+          <line number="94" hits="0" branch="False" />
+          <line number="95" hits="0" branch="False" />
+          <line number="96" hits="0" branch="False" />
+          <line number="97" hits="0" branch="False" />
+          <line number="98" hits="0" branch="False" />
+          <line number="99" hits="0" branch="False" />
+          <line number="100" hits="0" branch="False" />
+          <line number="101" hits="0" branch="False" />
+          <line number="102" hits="0" branch="False" />
+          <line number="103" hits="0" branch="False" />
+          <line number="104" hits="0" branch="False" />
+          <line number="105" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="UnTrainMultiTag"
+        signature="(System.Collections.Generic.IEnumerable&lt;string&gt;, System.Collections.Generic.IEnumerable&lt;string&gt;, int)"
+      >
+        <lines>
+          <line number="123" hits="0" branch="False" />
+          <line number="124" hits="0" branch="False" />
+          <line number="126" hits="0" branch="False" />
+          <line number="128" hits="0" branch="False" />
+          <line number="135" hits="0" branch="False" />
+          <line number="137" hits="0" branch="False" />
+          <line number="138" hits="0" branch="False" />
+          <line number="139" hits="0" branch="False" />
+          <line number="140" hits="0" branch="False" />
+          <line number="141" hits="0" branch="False" />
+          <line number="142" hits="0" branch="False" />
+          <line number="143" hits="0" branch="False" />
+          <line number="144" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="Train"
+        signature="(string, System.Collections.Generic.IEnumerable&lt;string&gt;, int)"
+      >
+        <lines>
+          <line number="147" hits="0" branch="False" />
+          <line number="148" hits="0" branch="False" />
+          <line number="149" hits="0" branch="False" />
+          <line number="150" hits="0" branch="False" />
+          <line number="151" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="TrainMultiTag"
+        signature="(System.Collections.Generic.IEnumerable&lt;string&gt;, System.Collections.Generic.IEnumerable&lt;string&gt;, int)"
+      >
+        <lines>
+          <line number="169" hits="0" branch="False" />
+          <line number="170" hits="0" branch="False" />
+          <line number="172" hits="0" branch="False" />
+          <line number="174" hits="0" branch="False" />
+          <line number="180" hits="0" branch="False" />
+          <line number="182" hits="0" branch="False" />
+          <line number="183" hits="0" branch="False" />
+          <line number="184" hits="0" branch="False" />
+          <line number="185" hits="0" branch="False" />
+          <line number="186" hits="0" branch="False" />
+          <line number="187" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="CreateNewClassifier"
+        signature="(string, UtilitiesCS.EmailIntelligence.Bayesian.BayesianClassifierGroup)"
+      >
+        <lines>
+          <line number="192" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="0" branch-rate="1" complexity="1" name="AddToEmailCount" signature="(int)">
+        <lines>
+          <line number="195" hits="0" branch="False" />
+          <line number="196" hits="0" branch="False" />
+          <line number="197" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="0" branch-rate="1" complexity="1" name="Classify" signature="(object)">
+        <lines>
+          <line number="221" hits="0" branch="False" />
+          <line number="222" hits="0" branch="False" />
+          <line number="223" hits="0" branch="False" />
+          <line number="224" hits="0" branch="False" />
+          <line number="225" hits="0" branch="False" />
+          <line number="226" hits="0" branch="False" />
+          <line number="227" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="0" branch-rate="1" complexity="1" name="Classify" signature="(string[])">
+        <lines>
+          <line number="230" hits="0" branch="False" />
+          <line number="231" hits="0" branch="False" />
+          <line number="232" hits="0" branch="False" />
+          <line number="233" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="Classify"
+        signature="(System.Collections.Generic.IDictionary&lt;string, int&gt;)"
+      >
+        <lines>
+          <line number="238" hits="0" branch="False" />
+          <line number="239" hits="0" branch="False" />
+          <line number="240" hits="0" branch="False" />
+          <line number="248" hits="0" branch="False" />
+          <line number="249" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="ClassifyAsync"
+        signature="(System.Collections.Generic.IDictionary&lt;string, int&gt;, System.Threading.CancellationToken)"
+      >
+        <lines>
+          <line number="275" hits="0" branch="False" />
+          <line number="276" hits="0" branch="False" />
+          <line number="277" hits="0" branch="False" />
+          <line number="278" hits="0" branch="False" />
+          <line number="279" hits="0" branch="False" />
+          <line number="284" hits="0" branch="False" />
+          <line number="285" hits="0" branch="False" />
+          <line number="288" hits="0" branch="False" />
+          <line number="289" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="GetReportMessage"
+        signature="(int, int, UtilitiesCS.HelperClasses.SegmentStopWatch, string)"
+      >
+        <lines>
+          <line number="380" hits="0" branch="False" />
+          <line number="382" hits="0" branch="False" />
+          <line number="383" hits="0" branch="False" />
+          <line number="384" hits="0" branch="False" />
+          <line number="385" hits="0" branch="False" />
+          <line number="386" hits="0" branch="False" />
+          <line number="387" hits="0" branch="False" />
+          <line number="388" hits="0" branch="False" />
+          <line number="390" hits="0" branch="False" />
+          <line number="391" hits="0" branch="False" />
+          <line number="392" hits="0" branch="False" />
+          <line number="394" hits="0" branch="False" />
+          <line number="395" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="AddOrUpdateClassifier_2"
+        signature="(string, System.Collections.Generic.IEnumerable&lt;string&gt;)"
+      >
+        <lines>
+          <line number="403" hits="0" branch="False" />
+          <line number="429" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="UpdateSharedDictionaries2"
+        signature="(string, int, string)"
+      >
+        <lines>
+          <line number="433" hits="0" branch="False" />
+          <line number="482" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="UpdateSharedDictionaries"
+        signature="(string, int, string)"
+      >
+        <lines>
+          <line number="486" hits="0" branch="False" />
+          <line number="509" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="&lt;UnTrainMultiTag&gt;b__32_0"
+        signature="(System.Collections.Generic.KeyValuePair&lt;string, int&gt;)"
+      >
+        <lines>
+          <line number="129" hits="0" branch="False" />
+          <line number="130" hits="0" branch="False" />
+          <line number="133" hits="0" branch="False" />
+          <line number="134" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="&lt;TrainMultiTag&gt;b__35_0"
+        signature="(System.Collections.Generic.KeyValuePair&lt;string, int&gt;)"
+      >
+        <lines>
+          <line number="175" hits="0" branch="False" />
+          <line number="176" hits="0" branch="False" />
+          <line number="177" hits="0" branch="False" />
+          <line number="179" hits="0" branch="False" />
+        </lines>
+      </method>
+    </methods>
+    <lines>
+      <line number="17" hits="1" branch="False" />
+      <line number="18" hits="1" branch="False" />
+      <line number="19" hits="1" branch="False" />
+      <line number="23" hits="1" branch="False" />
+      <line number="24" hits="1" branch="False" />
+      <line number="25" hits="1" branch="False" />
+      <line number="26" hits="1" branch="False" />
+      <line number="27" hits="1" branch="False" />
+      <line number="35" hits="1" branch="False" />
+      <line number="36" hits="0" branch="False" />
+      <line number="43" hits="1" branch="False" />
+      <line number="44" hits="1" branch="False" />
+      <line number="46" hits="1" branch="False" />
+      <line number="51" hits="1" branch="False" />
+      <line number="52" hits="1" branch="False" />
+      <line number="61" hits="0" branch="False" />
+      <line number="62" hits="0" branch="False" />
+      <line number="64" hits="1" branch="False" />
+      <line number="65" hits="1" branch="False" />
+      <line number="70" hits="0" branch="False" />
+      <line number="71" hits="0" branch="False" />
+      <line number="73" hits="1" branch="False" />
+      <line number="74" hits="1" branch="False" />
+      <line number="75" hits="1" branch="False" />
+      <line number="76" hits="1" branch="False" />
+      <line number="77" hits="1" branch="False" />
+      <line number="78" hits="1" branch="False" />
+      <line number="82" hits="0" branch="False" />
+      <line number="83" hits="0" branch="False" />
+      <line number="85" hits="1" branch="False" />
+      <line number="92" hits="0" branch="False" />
+      <line number="93" hits="0" branch="False" />
+      <line number="94" hits="0" branch="False" />
+      <line number="95" hits="0" branch="False" />
+      <line number="96" hits="0" branch="False" />
+      <line number="97" hits="0" branch="False" />
+      <line number="98" hits="0" branch="False" />
+      <line number="99" hits="0" branch="False" />
+      <line number="100" hits="0" branch="False" />
+      <line number="101" hits="0" branch="False" />
+      <line number="102" hits="0" branch="False" />
+      <line number="103" hits="0" branch="False" />
+      <line number="104" hits="0" branch="False" />
+      <line number="105" hits="0" branch="False" />
+      <line number="123" hits="0" branch="False" />
+      <line number="124" hits="0" branch="False" />
+      <line number="126" hits="0" branch="False" />
+      <line number="128" hits="0" branch="False" />
+      <line number="129" hits="0" branch="False" />
+      <line number="130" hits="0" branch="False" />
+      <line number="133" hits="0" branch="False" />
+      <line number="134" hits="0" branch="False" />
+      <line number="135" hits="0" branch="False" />
+      <line number="137" hits="0" branch="False" />
+      <line number="138" hits="0" branch="False" />
+      <line number="139" hits="0" branch="False" />
+      <line number="140" hits="0" branch="False" />
+      <line number="141" hits="0" branch="False" />
+      <line number="142" hits="0" branch="False" />
+      <line number="143" hits="0" branch="False" />
+      <line number="144" hits="0" branch="False" />
+      <line number="147" hits="0" branch="False" />
+      <line number="148" hits="0" branch="False" />
+      <line number="149" hits="0" branch="False" />
+      <line number="150" hits="0" branch="False" />
+      <line number="151" hits="0" branch="False" />
+      <line number="169" hits="0" branch="False" />
+      <line number="170" hits="0" branch="False" />
+      <line number="172" hits="0" branch="False" />
+      <line number="174" hits="0" branch="False" />
+      <line number="175" hits="0" branch="False" />
+      <line number="176" hits="0" branch="False" />
+      <line number="177" hits="0" branch="False" />
+      <line number="179" hits="0" branch="False" />
+      <line number="180" hits="0" branch="False" />
+      <line number="182" hits="0" branch="False" />
+      <line number="183" hits="0" branch="False" />
+      <line number="184" hits="0" branch="False" />
+      <line number="185" hits="0" branch="False" />
+      <line number="186" hits="0" branch="False" />
+      <line number="187" hits="0" branch="False" />
+      <line number="192" hits="0" branch="False" />
+      <line number="195" hits="0" branch="False" />
+      <line number="196" hits="0" branch="False" />
+      <line number="197" hits="0" branch="False" />
+      <line number="221" hits="0" branch="False" />
+      <line number="222" hits="0" branch="False" />
+      <line number="223" hits="0" branch="False" />
+      <line number="224" hits="0" branch="False" />
+      <line number="225" hits="0" branch="False" />
+      <line number="226" hits="0" branch="False" />
+      <line number="227" hits="0" branch="False" />
+      <line number="230" hits="0" branch="False" />
+      <line number="231" hits="0" branch="False" />
+      <line number="232" hits="0" branch="False" />
+      <line number="233" hits="0" branch="False" />
+      <line number="238" hits="0" branch="False" />
+      <line number="239" hits="0" branch="False" />
+      <line number="240" hits="0" branch="False" />
+      <line number="248" hits="0" branch="False" />
+      <line number="249" hits="0" branch="False" />
+      <line number="275" hits="0" branch="False" />
+      <line number="276" hits="0" branch="False" />
+      <line number="277" hits="0" branch="False" />
+      <line number="278" hits="0" branch="False" />
+      <line number="279" hits="0" branch="False" />
+      <line number="284" hits="0" branch="False" />
+      <line number="285" hits="0" branch="False" />
+      <line number="288" hits="0" branch="False" />
+      <line number="289" hits="0" branch="False" />
+      <line number="380" hits="0" branch="False" />
+      <line number="382" hits="0" branch="False" />
+      <line number="383" hits="0" branch="False" />
+      <line number="384" hits="0" branch="False" />
+      <line number="385" hits="0" branch="False" />
+      <line number="386" hits="0" branch="False" />
+      <line number="387" hits="0" branch="False" />
+      <line number="388" hits="0" branch="False" />
+      <line number="390" hits="0" branch="False" />
+      <line number="391" hits="0" branch="False" />
+      <line number="392" hits="0" branch="False" />
+      <line number="394" hits="0" branch="False" />
+      <line number="395" hits="0" branch="False" />
+      <line number="403" hits="0" branch="False" />
+      <line number="429" hits="0" branch="False" />
+      <line number="433" hits="0" branch="False" />
+      <line number="482" hits="0" branch="False" />
+      <line number="486" hits="0" branch="False" />
+      <line number="509" hits="0" branch="False" />
+    </lines>
+  </class>
+  <class
+    line-rate="0.8909090909090909"
+    branch-rate="1"
+    complexity="1"
+    name="UtilitiesCS.HelperClasses.FileSystem.PhysicalFileInfoAdapter"
+    filename="C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS\HelperClasses\FileSystem\PhysicalFileInfoAdapter.cs"
+  >
+    <methods>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="PhysicalFileInfoAdapter"
+        signature="(System.IO.FileInfo)"
+      >
+        <lines>
+          <line number="8" hits="1" branch="False" />
+          <line number="10" hits="1" branch="False" />
+          <line number="11" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="0" branch-rate="1" complexity="1" name="get_Attributes" signature="()">
+        <lines>
+          <line number="15" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="set_Attributes"
+        signature="(System.IO.FileAttributes)"
+      >
+        <lines>
+          <line number="16" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_CreationTime" signature="()">
+        <lines>
+          <line number="21" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_CreationTime"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="22" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="get_CreationTimeUtc"
+        signature="()"
+      >
+        <lines>
+          <line number="27" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_CreationTimeUtc"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="28" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Exists" signature="()">
+        <lines>
+          <line number="31" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Extension" signature="()">
+        <lines>
+          <line number="33" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_FullName" signature="()">
+        <lines>
+          <line number="35" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_LastAccessTime" signature="()">
+        <lines>
+          <line number="39" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_LastAccessTime"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="40" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="get_LastAccessTimeUtc"
+        signature="()"
+      >
+        <lines>
+          <line number="45" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_LastAccessTimeUtc"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="46" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_LastWriteTime" signature="()">
+        <lines>
+          <line number="51" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_LastWriteTime"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="52" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="get_LastWriteTimeUtc"
+        signature="()"
+      >
+        <lines>
+          <line number="57" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_LastWriteTimeUtc"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="58" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Name" signature="()">
+        <lines>
+          <line number="61" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Directory" signature="()">
+        <lines>
+          <line number="63" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_DirectoryName" signature="()">
+        <lines>
+          <line number="65" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_IsReadOnly" signature="()">
+        <lines>
+          <line number="69" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="set_IsReadOnly" signature="(bool)">
+        <lines>
+          <line number="70" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Length" signature="()">
+        <lines>
+          <line number="73" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="AppendText" signature="()">
+        <lines>
+          <line number="75" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="CopyTo" signature="(string)">
+        <lines>
+          <line number="78" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="CopyTo" signature="(string, bool)">
+        <lines>
+          <line number="81" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="0" branch-rate="1" complexity="1" name="Create" signature="()">
+        <lines>
+          <line number="83" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="0" branch-rate="1" complexity="1" name="CreateText" signature="()">
+        <lines>
+          <line number="85" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="0" branch-rate="1" complexity="1" name="Decrypt" signature="()">
+        <lines>
+          <line number="87" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="Delete" signature="()">
+        <lines>
+          <line number="89" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="0" branch-rate="1" complexity="1" name="Encrypt" signature="()">
+        <lines>
+          <line number="91" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="GetAccessControl" signature="()">
+        <lines>
+          <line number="93" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="GetAccessControl"
+        signature="(System.Security.AccessControl.AccessControlSections)"
+      >
+        <lines>
+          <line number="96" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="GetObjectData"
+        signature="(System.Runtime.Serialization.SerializationInfo, System.Runtime.Serialization.StreamingContext)"
+      >
+        <lines>
+          <line number="99" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="MoveTo" signature="(string)">
+        <lines>
+          <line number="101" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="Open"
+        signature="(System.IO.FileMode)"
+      >
+        <lines>
+          <line number="103" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="Open"
+        signature="(System.IO.FileMode, System.IO.FileAccess)"
+      >
+        <lines>
+          <line number="105" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="Open"
+        signature="(System.IO.FileMode, System.IO.FileAccess, System.IO.FileShare)"
+      >
+        <lines>
+          <line number="108" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="OpenRead" signature="()">
+        <lines>
+          <line number="110" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="OpenText" signature="()">
+        <lines>
+          <line number="112" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="OpenWrite" signature="()">
+        <lines>
+          <line number="114" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="Refresh" signature="()">
+        <lines>
+          <line number="116" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="Replace"
+        signature="(string, string)"
+      >
+        <lines>
+          <line number="119" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="Replace"
+        signature="(string, string, bool)"
+      >
+        <lines>
+          <line number="126" hits="1" branch="False" />
+          <line number="127" hits="1" branch="False" />
+          <line number="128" hits="1" branch="False" />
+          <line number="129" hits="1" branch="False" />
+          <line number="130" hits="1" branch="False" />
+          <line number="131" hits="1" branch="False" />
+          <line number="132" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="SetAccessControl"
+        signature="(System.Security.AccessControl.FileSecurity)"
+      >
+        <lines>
+          <line number="135" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="ToString" signature="()">
+        <lines>
+          <line number="137" hits="1" branch="False" />
+        </lines>
+      </method>
+    </methods>
+    <lines>
+      <line number="8" hits="1" branch="False" />
+      <line number="10" hits="1" branch="False" />
+      <line number="11" hits="1" branch="False" />
+      <line number="15" hits="0" branch="False" />
+      <line number="16" hits="0" branch="False" />
+      <line number="21" hits="1" branch="False" />
+      <line number="22" hits="1" branch="False" />
+      <line number="27" hits="1" branch="False" />
+      <line number="28" hits="1" branch="False" />
+      <line number="31" hits="1" branch="False" />
+      <line number="33" hits="1" branch="False" />
+      <line number="35" hits="1" branch="False" />
+      <line number="39" hits="1" branch="False" />
+      <line number="40" hits="1" branch="False" />
+      <line number="45" hits="1" branch="False" />
+      <line number="46" hits="1" branch="False" />
+      <line number="51" hits="1" branch="False" />
+      <line number="52" hits="1" branch="False" />
+      <line number="57" hits="1" branch="False" />
+      <line number="58" hits="1" branch="False" />
+      <line number="61" hits="1" branch="False" />
+      <line number="63" hits="1" branch="False" />
+      <line number="65" hits="1" branch="False" />
+      <line number="69" hits="1" branch="False" />
+      <line number="70" hits="1" branch="False" />
+      <line number="73" hits="1" branch="False" />
+      <line number="75" hits="1" branch="False" />
+      <line number="78" hits="1" branch="False" />
+      <line number="81" hits="1" branch="False" />
+      <line number="83" hits="0" branch="False" />
+      <line number="85" hits="0" branch="False" />
+      <line number="87" hits="0" branch="False" />
+      <line number="89" hits="1" branch="False" />
+      <line number="91" hits="0" branch="False" />
+      <line number="93" hits="1" branch="False" />
+      <line number="96" hits="1" branch="False" />
+      <line number="99" hits="1" branch="False" />
+      <line number="101" hits="1" branch="False" />
+      <line number="103" hits="1" branch="False" />
+      <line number="105" hits="1" branch="False" />
+      <line number="108" hits="1" branch="False" />
+      <line number="110" hits="1" branch="False" />
+      <line number="112" hits="1" branch="False" />
+      <line number="114" hits="1" branch="False" />
+      <line number="116" hits="1" branch="False" />
+      <line number="119" hits="1" branch="False" />
+      <line number="126" hits="1" branch="False" />
+      <line number="127" hits="1" branch="False" />
+      <line number="128" hits="1" branch="False" />
+      <line number="129" hits="1" branch="False" />
+      <line number="130" hits="1" branch="False" />
+      <line number="131" hits="1" branch="False" />
+      <line number="132" hits="1" branch="False" />
+      <line number="135" hits="1" branch="False" />
+      <line number="137" hits="1" branch="False" />
+    </lines>
+  </class>
+  <class
+    line-rate="0.8658536585365854"
+    branch-rate="1"
+    complexity="1"
+    name="UtilitiesCS.HelperClasses.FileSystem.PhysicalDirectoryInfoAdapter"
+    filename="C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS\HelperClasses\FileSystem\PhysicalDirectoryInfoAdapter.cs"
+  >
+    <methods>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="PhysicalDirectoryInfoAdapter"
+        signature="(System.IO.DirectoryInfo)"
+      >
+        <lines>
+          <line number="10" hits="1" branch="False" />
+          <line number="12" hits="1" branch="False" />
+          <line number="13" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Attributes" signature="()">
+        <lines>
+          <line number="17" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_Attributes"
+        signature="(System.IO.FileAttributes)"
+      >
+        <lines>
+          <line number="18" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_CreationTime" signature="()">
+        <lines>
+          <line number="23" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_CreationTime"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="24" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="get_CreationTimeUtc"
+        signature="()"
+      >
+        <lines>
+          <line number="29" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="set_CreationTimeUtc"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="30" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Exists" signature="()">
+        <lines>
+          <line number="33" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="0" branch-rate="1" complexity="1" name="get_Extension" signature="()">
+        <lines>
+          <line number="35" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_FullName" signature="()">
+        <lines>
+          <line number="37" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="0" branch-rate="1" complexity="1" name="get_LastAccessTime" signature="()">
+        <lines>
+          <line number="41" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="set_LastAccessTime"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="42" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="get_LastAccessTimeUtc"
+        signature="()"
+      >
+        <lines>
+          <line number="47" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="set_LastAccessTimeUtc"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="48" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="0" branch-rate="1" complexity="1" name="get_LastWriteTime" signature="()">
+        <lines>
+          <line number="53" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="set_LastWriteTime"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="54" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="get_LastWriteTimeUtc"
+        signature="()"
+      >
+        <lines>
+          <line number="59" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="0"
+        branch-rate="1"
+        complexity="1"
+        name="set_LastWriteTimeUtc"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="60" hits="0" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Name" signature="()">
+        <lines>
+          <line number="63" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Parent" signature="()">
+        <lines>
+          <line number="65" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Root" signature="()">
+        <lines>
+          <line number="67" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="Create" signature="()">
+        <lines>
+          <line number="69" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="Create"
+        signature="(System.Security.AccessControl.DirectorySecurity)"
+      >
+        <lines>
+          <line number="72" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="CreateSubdirectory"
+        signature="(string)"
+      >
+        <lines>
+          <line number="75" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="CreateSubdirectory"
+        signature="(string, System.Security.AccessControl.DirectorySecurity)"
+      >
+        <lines>
+          <line number="80" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="Delete" signature="()">
+        <lines>
+          <line number="82" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="Delete" signature="(bool)">
+        <lines>
+          <line number="84" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="EnumerateDirectories"
+        signature="()"
+      >
+        <lines>
+          <line number="87" hits="1" branch="False" />
+          <line number="88" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="EnumerateDirectories"
+        signature="(string)"
+      >
+        <lines>
+          <line number="92" hits="1" branch="False" />
+          <line number="93" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="EnumerateDirectories"
+        signature="(string, System.IO.SearchOption)"
+      >
+        <lines>
+          <line number="100" hits="1" branch="False" />
+          <line number="101" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="EnumerateFiles" signature="()">
+        <lines>
+          <line number="105" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="EnumerateFiles"
+        signature="(string)"
+      >
+        <lines>
+          <line number="108" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="EnumerateFiles"
+        signature="(string, System.IO.SearchOption)"
+      >
+        <lines>
+          <line number="114" hits="1" branch="False" />
+          <line number="115" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="EnumerateFileSystemInfos"
+        signature="()"
+      >
+        <lines>
+          <line number="119" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="EnumerateFileSystemInfos"
+        signature="(string)"
+      >
+        <lines>
+          <line number="122" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="EnumerateFileSystemInfos"
+        signature="(string, System.IO.SearchOption)"
+      >
+        <lines>
+          <line number="128" hits="1" branch="False" />
+          <line number="129" hits="1" branch="False" />
+          <line number="130" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="GetAccessControl" signature="()">
+        <lines>
+          <line number="132" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="GetAccessControl"
+        signature="(System.Security.AccessControl.AccessControlSections)"
+      >
+        <lines>
+          <line number="135" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="GetDirectories" signature="()">
+        <lines>
+          <line number="138" hits="1" branch="False" />
+          <line number="139" hits="1" branch="False" />
+          <line number="141" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="GetDirectories"
+        signature="(string)"
+      >
+        <lines>
+          <line number="144" hits="1" branch="False" />
+          <line number="145" hits="1" branch="False" />
+          <line number="147" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="GetDirectories"
+        signature="(string, System.IO.SearchOption)"
+      >
+        <lines>
+          <line number="150" hits="1" branch="False" />
+          <line number="151" hits="1" branch="False" />
+          <line number="153" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="GetFiles" signature="()">
+        <lines>
+          <line number="156" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="GetFiles" signature="(string)">
+        <lines>
+          <line number="159" hits="1" branch="False" />
+          <line number="160" hits="1" branch="False" />
+          <line number="162" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="GetFiles"
+        signature="(string, System.IO.SearchOption)"
+      >
+        <lines>
+          <line number="165" hits="1" branch="False" />
+          <line number="166" hits="1" branch="False" />
+          <line number="168" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="GetFileSystemInfos" signature="()">
+        <lines>
+          <line number="171" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="GetFileSystemInfos"
+        signature="(string)"
+      >
+        <lines>
+          <line number="174" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="GetFileSystemInfos"
+        signature="(string, System.IO.SearchOption)"
+      >
+        <lines>
+          <line number="180" hits="1" branch="False" />
+          <line number="181" hits="1" branch="False" />
+          <line number="182" hits="1" branch="False" />
+          <line number="183" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="GetObjectData"
+        signature="(System.Runtime.Serialization.SerializationInfo, System.Runtime.Serialization.StreamingContext)"
+      >
+        <lines>
+          <line number="186" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="MoveTo" signature="(string)">
+        <lines>
+          <line number="188" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="Refresh" signature="()">
+        <lines>
+          <line number="190" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="SetAccessControl"
+        signature="(System.Security.AccessControl.DirectorySecurity)"
+      >
+        <lines>
+          <line number="193" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="ToString" signature="()">
+        <lines>
+          <line number="195" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="WrapFileSystemInfo"
+        signature="(System.IO.FileSystemInfo)"
+      >
+        <lines>
+          <line number="198" hits="1" branch="False" />
+          <line number="199" hits="1" branch="False" />
+          <line number="200" hits="1" branch="False" />
+          <line number="201" hits="1" branch="False" />
+          <line number="204" hits="1" branch="False" />
+          <line number="205" hits="1" branch="False" />
+          <line number="206" hits="1" branch="False" />
+          <line number="209" hits="1" branch="False" />
+          <line number="210" hits="1" branch="False" />
+        </lines>
+      </method>
+    </methods>
+    <lines>
+      <line number="10" hits="1" branch="False" />
+      <line number="12" hits="1" branch="False" />
+      <line number="13" hits="1" branch="False" />
+      <line number="17" hits="1" branch="False" />
+      <line number="18" hits="1" branch="False" />
+      <line number="23" hits="1" branch="False" />
+      <line number="24" hits="1" branch="False" />
+      <line number="29" hits="0" branch="False" />
+      <line number="30" hits="0" branch="False" />
+      <line number="33" hits="1" branch="False" />
+      <line number="35" hits="0" branch="False" />
+      <line number="37" hits="1" branch="False" />
+      <line number="41" hits="0" branch="False" />
+      <line number="42" hits="0" branch="False" />
+      <line number="47" hits="0" branch="False" />
+      <line number="48" hits="0" branch="False" />
+      <line number="53" hits="0" branch="False" />
+      <line number="54" hits="0" branch="False" />
+      <line number="59" hits="0" branch="False" />
+      <line number="60" hits="0" branch="False" />
+      <line number="63" hits="1" branch="False" />
+      <line number="65" hits="1" branch="False" />
+      <line number="67" hits="1" branch="False" />
+      <line number="69" hits="1" branch="False" />
+      <line number="72" hits="1" branch="False" />
+      <line number="75" hits="1" branch="False" />
+      <line number="80" hits="1" branch="False" />
+      <line number="82" hits="1" branch="False" />
+      <line number="84" hits="1" branch="False" />
+      <line number="87" hits="1" branch="False" />
+      <line number="88" hits="1" branch="False" />
+      <line number="92" hits="1" branch="False" />
+      <line number="93" hits="1" branch="False" />
+      <line number="100" hits="1" branch="False" />
+      <line number="101" hits="1" branch="False" />
+      <line number="105" hits="1" branch="False" />
+      <line number="108" hits="1" branch="False" />
+      <line number="114" hits="1" branch="False" />
+      <line number="115" hits="1" branch="False" />
+      <line number="119" hits="1" branch="False" />
+      <line number="122" hits="1" branch="False" />
+      <line number="128" hits="1" branch="False" />
+      <line number="129" hits="1" branch="False" />
+      <line number="130" hits="1" branch="False" />
+      <line number="132" hits="1" branch="False" />
+      <line number="135" hits="1" branch="False" />
+      <line number="138" hits="1" branch="False" />
+      <line number="139" hits="1" branch="False" />
+      <line number="141" hits="1" branch="False" />
+      <line number="144" hits="1" branch="False" />
+      <line number="145" hits="1" branch="False" />
+      <line number="147" hits="1" branch="False" />
+      <line number="150" hits="1" branch="False" />
+      <line number="151" hits="1" branch="False" />
+      <line number="153" hits="1" branch="False" />
+      <line number="156" hits="1" branch="False" />
+      <line number="159" hits="1" branch="False" />
+      <line number="160" hits="1" branch="False" />
+      <line number="162" hits="1" branch="False" />
+      <line number="165" hits="1" branch="False" />
+      <line number="166" hits="1" branch="False" />
+      <line number="168" hits="1" branch="False" />
+      <line number="171" hits="1" branch="False" />
+      <line number="174" hits="1" branch="False" />
+      <line number="180" hits="1" branch="False" />
+      <line number="181" hits="1" branch="False" />
+      <line number="182" hits="1" branch="False" />
+      <line number="183" hits="1" branch="False" />
+      <line number="186" hits="1" branch="False" />
+      <line number="188" hits="1" branch="False" />
+      <line number="190" hits="1" branch="False" />
+      <line number="193" hits="1" branch="False" />
+      <line number="195" hits="1" branch="False" />
+      <line number="198" hits="1" branch="False" />
+      <line number="199" hits="1" branch="False" />
+      <line number="200" hits="1" branch="False" />
+      <line number="201" hits="1" branch="False" />
+      <line number="204" hits="1" branch="False" />
+      <line number="205" hits="1" branch="False" />
+      <line number="206" hits="1" branch="False" />
+      <line number="209" hits="1" branch="False" />
+      <line number="210" hits="1" branch="False" />
+    </lines>
+  </class>
+  <class
+    line-rate="1"
+    branch-rate="1"
+    complexity="1"
+    name="UtilitiesCS.HelperClasses.FileSystem.FileInfoWrapper"
+    filename="C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS\HelperClasses\FileSystem\FileInfoWrapper.cs"
+  >
+    <methods>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="FileInfoWrapper"
+        signature="(System.IO.FileInfo)"
+      >
+        <lines>
+          <line number="14" hits="1" branch="False" />
+          <line number="15" hits="1" branch="False" />
+          <line number="16" hits="1" branch="False" />
+          <line number="17" hits="1" branch="False" />
+          <line number="18" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="FileInfoWrapper"
+        signature="(UtilitiesCS.IFileInfo)"
+      >
+        <lines>
+          <line number="20" hits="1" branch="False" />
+          <line number="21" hits="1" branch="False" />
+          <line number="22" hits="1" branch="False" />
+          <line number="23" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Attributes" signature="()">
+        <lines>
+          <line number="27" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_Attributes"
+        signature="(System.IO.FileAttributes)"
+      >
+        <lines>
+          <line number="28" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_CreationTime" signature="()">
+        <lines>
+          <line number="33" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_CreationTime"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="34" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="get_CreationTimeUtc"
+        signature="()"
+      >
+        <lines>
+          <line number="39" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_CreationTimeUtc"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="40" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Exists" signature="()">
+        <lines>
+          <line number="43" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Extension" signature="()">
+        <lines>
+          <line number="45" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_FullName" signature="()">
+        <lines>
+          <line number="47" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_LastAccessTime" signature="()">
+        <lines>
+          <line number="51" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_LastAccessTime"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="52" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="get_LastAccessTimeUtc"
+        signature="()"
+      >
+        <lines>
+          <line number="57" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_LastAccessTimeUtc"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="58" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_LastWriteTime" signature="()">
+        <lines>
+          <line number="63" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_LastWriteTime"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="64" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="get_LastWriteTimeUtc"
+        signature="()"
+      >
+        <lines>
+          <line number="69" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="set_LastWriteTimeUtc"
+        signature="(System.DateTime)"
+      >
+        <lines>
+          <line number="70" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Name" signature="()">
+        <lines>
+          <line number="73" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Directory" signature="()">
+        <lines>
+          <line number="75" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_DirectoryName" signature="()">
+        <lines>
+          <line number="77" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_IsReadOnly" signature="()">
+        <lines>
+          <line number="81" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="set_IsReadOnly" signature="(bool)">
+        <lines>
+          <line number="82" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="get_Length" signature="()">
+        <lines>
+          <line number="85" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="AppendText" signature="()">
+        <lines>
+          <line number="88" hits="1" branch="False" />
+          <line number="89" hits="1" branch="False" />
+          <line number="90" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="CopyTo" signature="(string)">
+        <lines>
+          <line number="93" hits="1" branch="False" />
+          <line number="94" hits="1" branch="False" />
+          <line number="95" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="CopyTo" signature="(string, bool)">
+        <lines>
+          <line number="98" hits="1" branch="False" />
+          <line number="99" hits="1" branch="False" />
+          <line number="100" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="Create" signature="()">
+        <lines>
+          <line number="103" hits="1" branch="False" />
+          <line number="104" hits="1" branch="False" />
+          <line number="105" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="CreateText" signature="()">
+        <lines>
+          <line number="108" hits="1" branch="False" />
+          <line number="109" hits="1" branch="False" />
+          <line number="110" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="Decrypt" signature="()">
+        <lines>
+          <line number="113" hits="1" branch="False" />
+          <line number="114" hits="1" branch="False" />
+          <line number="115" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="Encrypt" signature="()">
+        <lines>
+          <line number="118" hits="1" branch="False" />
+          <line number="119" hits="1" branch="False" />
+          <line number="120" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="GetAccessControl" signature="()">
+        <lines>
+          <line number="123" hits="1" branch="False" />
+          <line number="124" hits="1" branch="False" />
+          <line number="125" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="GetAccessControl"
+        signature="(System.Security.AccessControl.AccessControlSections)"
+      >
+        <lines>
+          <line number="128" hits="1" branch="False" />
+          <line number="129" hits="1" branch="False" />
+          <line number="130" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="MoveTo" signature="(string)">
+        <lines>
+          <line number="133" hits="1" branch="False" />
+          <line number="134" hits="1" branch="False" />
+          <line number="135" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="Open"
+        signature="(System.IO.FileMode)"
+      >
+        <lines>
+          <line number="138" hits="1" branch="False" />
+          <line number="139" hits="1" branch="False" />
+          <line number="140" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="Open"
+        signature="(System.IO.FileMode, System.IO.FileAccess)"
+      >
+        <lines>
+          <line number="143" hits="1" branch="False" />
+          <line number="144" hits="1" branch="False" />
+          <line number="145" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="Open"
+        signature="(System.IO.FileMode, System.IO.FileAccess, System.IO.FileShare)"
+      >
+        <lines>
+          <line number="148" hits="1" branch="False" />
+          <line number="149" hits="1" branch="False" />
+          <line number="150" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="OpenRead" signature="()">
+        <lines>
+          <line number="153" hits="1" branch="False" />
+          <line number="154" hits="1" branch="False" />
+          <line number="155" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="OpenText" signature="()">
+        <lines>
+          <line number="158" hits="1" branch="False" />
+          <line number="159" hits="1" branch="False" />
+          <line number="160" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="OpenWrite" signature="()">
+        <lines>
+          <line number="163" hits="1" branch="False" />
+          <line number="164" hits="1" branch="False" />
+          <line number="165" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="Replace"
+        signature="(string, string)"
+      >
+        <lines>
+          <line number="168" hits="1" branch="False" />
+          <line number="169" hits="1" branch="False" />
+          <line number="170" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="Replace"
+        signature="(string, string, bool)"
+      >
+        <lines>
+          <line number="177" hits="1" branch="False" />
+          <line number="178" hits="1" branch="False" />
+          <line number="179" hits="1" branch="False" />
+          <line number="180" hits="1" branch="False" />
+          <line number="181" hits="1" branch="False" />
+          <line number="182" hits="1" branch="False" />
+          <line number="183" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="SetAccessControl"
+        signature="(System.Security.AccessControl.FileSecurity)"
+      >
+        <lines>
+          <line number="186" hits="1" branch="False" />
+          <line number="187" hits="1" branch="False" />
+          <line number="188" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="ToString" signature="()">
+        <lines>
+          <line number="191" hits="1" branch="False" />
+          <line number="192" hits="1" branch="False" />
+          <line number="193" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="Delete" signature="()">
+        <lines>
+          <line number="196" hits="1" branch="False" />
+          <line number="197" hits="1" branch="False" />
+          <line number="198" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="GetObjectData"
+        signature="(System.Runtime.Serialization.SerializationInfo, System.Runtime.Serialization.StreamingContext)"
+      >
+        <lines>
+          <line number="201" hits="1" branch="False" />
+          <line number="202" hits="1" branch="False" />
+          <line number="203" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method line-rate="1" branch-rate="1" complexity="1" name="Refresh" signature="()">
+        <lines>
+          <line number="206" hits="1" branch="False" />
+          <line number="207" hits="1" branch="False" />
+          <line number="208" hits="1" branch="False" />
+        </lines>
+      </method>
+      <method
+        line-rate="1"
+        branch-rate="1"
+        complexity="1"
+        name="op_Explicit"
+        signature="(UtilitiesCS.HelperClasses.FileSystem.FileInfoWrapper)"
+      >
+        <lines>
+          <line number="211" hits="1" branch="False" />
+          <line number="212" hits="1" branch="False" />
+          <line number="213" hits="1" branch="False" />
+        </lines>
+      </method>
+    </methods>
+    <lines>
+      <line number="14" hits="1" branch="False" />
+      <line number="15" hits="1" branch="False" />
+      <line number="16" hits="1" branch="False" />
+      <line number="17" hits="1" branch="False" />
+      <line number="18" hits="1" branch="False" />
+      <line number="20" hits="1" branch="False" />
+      <line number="21" hits="1" branch="False" />
+      <line number="22" hits="1" branch="False" />
+      <line number="23" hits="1" branch="False" />
+      <line number="27" hits="1" branch="False" />
+      <line number="28" hits="1" branch="False" />
+      <line number="33" hits="1" branch="False" />
+      <line number="34" hits="1" branch="False" />
+      <line number="39" hits="1" branch="False" />
+      <line number="40" hits="1" branch="False" />
+      <line number="43" hits="1" branch="False" />
+      <line number="45" hits="1" branch="False" />
+      <line number="47" hits="1" branch="False" />
+      <line number="51" hits="1" branch="False" />
+      <line number="52" hits="1" branch="False" />
+      <line number="57" hits="1" branch="False" />
+      <line number="58" hits="1" branch="False" />
+      <line number="63" hits="1" branch="False" />
+      <line number="64" hits="1" branch="False" />
+      <line number="69" hits="1" branch="False" />
+      <line number="70" hits="1" branch="False" />
+      <line number="73" hits="1" branch="False" />
+      <line number="75" hits="1" branch="False" />
+      <line number="77" hits="1" branch="False" />
+      <line number="81" hits="1" branch="False" />
+      <line number="82" hits="1" branch="False" />
+      <line number="85" hits="1" branch="False" />
+      <line number="88" hits="1" branch="False" />
+      <line number="89" hits="1" branch="False" />
+      <line number="90" hits="1" branch="False" />
+      <line number="93" hits="1" branch="False" />
+      <line number="94" hits="1" branch="False" />
+      <line number="95" hits="1" branch="False" />
+      <line number="98" hits="1" branch="False" />
+      <line number="99" hits="1" branch="False" />
+      <line number="100" hits="1" branch="False" />
+      <line number="103" hits="1" branch="False" />
+      <line number="104" hits="1" branch="False" />
+      <line number="105" hits="1" branch="False" />
+      <line number="108" hits="1" branch="False" />
+      <line number="109" hits="1" branch="False" />
+      <line number="110" hits="1" branch="False" />
+      <line number="113" hits="1" branch="False" />
+      <line number="114" hits="1" branch="False" />
+      <line number="115" hits="1" branch="False" />
+      <line number="118" hits="1" branch="False" />
+      <line number="119" hits="1" branch="False" />
+      <line number="120" hits="1" branch="False" />
+      <line number="123" hits="1" branch="False" />
+      <line number="124" hits="1" branch="False" />
+      <line number="125" hits="1" branch="False" />
+      <line number="128" hits="1" branch="False" />
+      <line number="129" hits="1" branch="False" />
+      <line number="130" hits="1" branch="False" />
+      <line number="133" hits="1" branch="False" />
+      <line number="134" hits="1" branch="False" />
+      <line number="135" hits="1" branch="False" />
+      <line number="138" hits="1" branch="False" />
+      <line number="139" hits="1" branch="False" />
+      <line number="140" hits="1" branch="False" />
+      <line number="143" hits="1" branch="False" />
+      <line number="144" hits="1" branch="False" />
+      <line number="145" hits="1" branch="False" />
+      <line number="148" hits="1" branch="False" />
+      <line number="149" hits="1" branch="False" />
+      <line number="150" hits="1" branch="False" />
+      <line number="153" hits="1" branch="False" />
+      <line number="154" hits="1" branch="False" />
+      <line number="155" hits="1" branch="False" />
+      <line number="158" hits="1" branch="False" />
+      <line number="159" hits="1" branch="False" />
+      <line number="160" hits="1" branch="False" />
+      <line number="163" hits="1" branch="False" />
+      <line number="164" hits="1" branch="False" />
+      <line number="165" hits="1" branch="False" />
+      <line number="168" hits="1" branch="False" />
+      <line number="169" hits="1" branch="False" />
+      <line number="170" hits="1" branch="False" />
+      <line number="177" hits="1" branch="False" />
+      <line number="178" hits="1" branch="False" />
+      <line number="179" hits="1" branch="False" />
+      <line number="180" hits="1" branch="False" />
+      <line number="181" hits="1" branch="False" />
+      <line number="182" hits="1" branch="False" />
+      <line number="183" hits="1" branch="False" />
+      <line number="186" hits="1" branch="False" />
+      <line number="187" hits="1" branch="False" />
+      <line number="188" hits="1" branch="False" />
+      <line number="191" hits="1" branch="False" />
+      <line number="192" hits="1" branch="False" />
+      <line number="193" hits="1" branch="False" />
+      <line number="196" hits="1" branch="False" />
+      <line number="197" hits="1" branch="False" />
+      <line number="198" hits="1" branch="False" />
+      <line number="201" hits="1" branch="False" />
+      <line number="202" hits="1" branch="False" />
+      <line number="203" hits="1" branch="False" />
+      <line number="206" hits="1" branch="False" />
+      <line number="207" hits="1" branch="False" />
+      <line number="208" hits="1" branch="False" />
+      <line number="211" hits="1" branch="False" />
+      <line number="212" hits="1" branch="False" />
+      <line number="213" hits="1" branch="False" />
+    </lines>
+  </class>
+</coverage>

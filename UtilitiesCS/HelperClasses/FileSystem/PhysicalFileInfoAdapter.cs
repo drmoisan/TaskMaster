@@ -5,10 +5,39 @@ using System.Security.AccessControl;
 
 namespace UtilitiesCS.HelperClasses.FileSystem
 {
-    internal sealed class PhysicalFileInfoAdapter(FileInfo fileInfo) : IFileInfo
+    internal sealed class PhysicalFileInfoAdapter : IFileInfo
     {
-        private readonly FileInfo _fileInfo =
-            fileInfo ?? throw new ArgumentNullException(nameof(fileInfo));
+        private readonly FileInfo _fileInfo;
+
+        // The write-mode members delegate through these fields rather than calling the wrapped
+        // FileInfo directly. Why: this narrow injectable-delegate seam lets unit tests cover the
+        // AppendText/Open(mode)/OpenWrite delegation deterministically without acquiring a real
+        // write/append handle on any shared file. The public constructor binds the defaults to the
+        // real FileInfo, so production behavior is unchanged.
+        private readonly Func<StreamWriter> _appendText;
+        private readonly Func<FileMode, FileStream> _openByMode;
+        private readonly Func<FileStream> _openWrite;
+
+        public PhysicalFileInfoAdapter(FileInfo fileInfo)
+        {
+            _fileInfo = fileInfo ?? throw new ArgumentNullException(nameof(fileInfo));
+            _appendText = _fileInfo.AppendText;
+            _openByMode = _fileInfo.Open;
+            _openWrite = _fileInfo.OpenWrite;
+        }
+
+        internal PhysicalFileInfoAdapter(
+            FileInfo fileInfo,
+            Func<StreamWriter> appendText,
+            Func<FileMode, FileStream> openByMode,
+            Func<FileStream> openWrite
+        )
+        {
+            _fileInfo = fileInfo ?? throw new ArgumentNullException(nameof(fileInfo));
+            _appendText = appendText ?? throw new ArgumentNullException(nameof(appendText));
+            _openByMode = openByMode ?? throw new ArgumentNullException(nameof(openByMode));
+            _openWrite = openWrite ?? throw new ArgumentNullException(nameof(openWrite));
+        }
 
         public FileAttributes Attributes
         {
@@ -72,7 +101,7 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public long Length => _fileInfo.Length;
 
-        public StreamWriter AppendText() => _fileInfo.AppendText();
+        public StreamWriter AppendText() => _appendText();
 
         public IFileInfo CopyTo(string destFileName) =>
             new FileInfoWrapper(_fileInfo.CopyTo(destFileName));
@@ -100,7 +129,7 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public void MoveTo(string destFileName) => _fileInfo.MoveTo(destFileName);
 
-        public FileStream Open(FileMode mode) => _fileInfo.Open(mode);
+        public FileStream Open(FileMode mode) => _openByMode(mode);
 
         public FileStream Open(FileMode mode, FileAccess access) => _fileInfo.Open(mode, access);
 
@@ -111,7 +140,7 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public StreamReader OpenText() => _fileInfo.OpenText();
 
-        public FileStream OpenWrite() => _fileInfo.OpenWrite();
+        public FileStream OpenWrite() => _openWrite();
 
         public void Refresh() => _fileInfo.Refresh();
 

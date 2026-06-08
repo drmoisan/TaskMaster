@@ -226,7 +226,13 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             private readonly BayesianClassifierGroup _classifierGroup = classifierGroup;
 
-            public List<string> BuiltGroupingKeys { get; } = new();
+            // BuildClassifierAsync runs concurrently via AsyncMultiTasker.AsyncMultiTaskChunker,
+            // so the key-tracking store must be thread-safe. A plain List<T>.Add from multiple
+            // threads corrupts the backing array (observed as a null slot and a dropped element).
+            // ConcurrentBag<string> serves the FluentAssertions Contain assertion as IEnumerable.
+            private readonly ConcurrentBag<string> _builtGroupingKeys = new();
+
+            public IEnumerable<string> BuiltGroupingKeys => _builtGroupingKeys;
 
             public override Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(
                 MinedMailInfo[] collection
@@ -238,7 +244,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 CancellationToken cancel
             )
             {
-                BuiltGroupingKeys.Add(group.Key);
+                _builtGroupingKeys.Add(group.Key);
+
+                // classifierGroup.Classifiers is a ConcurrentDictionary, so the indexer
+                // assignment below is already thread-safe and needs no additional guard.
                 classifierGroup.Classifiers[group.Key] = new BayesianClassifierShared(
                     group.Key,
                     classifierGroup
