@@ -432,4 +432,4 @@ If any step fails, fix and restart from step 1.
 - `/orchestrate-csharp-work` — run end-to-end C# workflow via csharp-orchestrator
 - `/generate-atomic-plan` — generate and validate an atomic implementation plan
 - `/review-feature` — review a feature branch and produce audit artifacts
-- `/generate-pr` — write a GitHub PR description from PR context artifacts
+- `pr-author` — write a GitHub PR body file plus a SHA-256 provenance receipt from PR context artifacts (required before `gh pr create`/`gh pr edit --body-file`; enforced by `enforce-pr-author-skill.ps1`) → `.claude/skills/pr-author/SKILL.md`
