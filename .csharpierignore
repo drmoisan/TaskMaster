@@ -1,0 +1,8 @@
+# CSharpier formats C# source only. Generated coverage and test-result
+# artifacts are committed as audit-trail evidence (not source) and must not
+# be subject to formatting checks (e.g. trailing-newline rules on tool output).
+**/evidence/**
+*.cobertura.xml
+*.coverage
+*.coveragexml
+*.trx
