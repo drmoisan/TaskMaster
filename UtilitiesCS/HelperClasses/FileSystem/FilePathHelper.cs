@@ -25,10 +25,10 @@ namespace UtilitiesCS
 
         public FilePathHelper(string fileName, string folderPath)
         {
+            PropertyChanged += FilePathHelper_PropertyChanged;
             FileName = fileName;
             FolderPath = folderPath;
             FilePath = Path.Combine(_folderPath, _fileName);
-            PropertyChanged += FilePathHelper_PropertyChanged;
         }
 
         private FilePathHelper(
@@ -38,12 +38,12 @@ namespace UtilitiesCS
             string folderPath
         )
         {
+            PropertyChanged += FilePathHelper_PropertyChanged;
             FileStemSeed = fileNameSeed;
             FileStemSuffix = fileNameSuffix;
             FileExtension = fileExtension;
             FolderPath = folderPath;
             FilePath = Path.Combine(_folderPath, _fileName);
-            PropertyChanged += FilePathHelper_PropertyChanged;
         }
 
         public static FilePathHelper FromSeed(

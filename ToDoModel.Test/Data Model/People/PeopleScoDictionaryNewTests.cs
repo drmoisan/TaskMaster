@@ -230,8 +230,8 @@ namespace ToDoModel.Tests.Data_Model.People
         //}
 
         [TestMethod]
-        [TestCategory("ProductionBugSuspected")]
-        [Ignore("ProductionBugSuspected")]
+        //[TestCategory("ProductionBugSuspected")]
+        //[Ignore("ProductionBugSuspected")]
         public void People_Deserialize_CanDeserializePatternCorrectly()
         {
             // Arrange

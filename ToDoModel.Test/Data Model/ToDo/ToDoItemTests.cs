@@ -108,8 +108,8 @@ namespace ToDoModel.Test
         /// Verifies that the constructors initialize the properties correctly.
         /// </summary>
         [TestMethod]
-        [TestCategory("ProductionBugSuspected")]
-        [Ignore("ProductionBugSuspected")]
+       //[TestCategory("ProductionBugSuspected")]
+        //[Ignore("ProductionBugSuspected")]
         public void Constructor_WithOutlookItem_ShouldInitializeProperties()
         {
             // Arrange
