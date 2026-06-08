@@ -20,6 +20,573 @@ csharp_style_expression_bodied_accessors = true:silent
 csharp_style_expression_bodied_lambdas = true:silent
 csharp_style_expression_bodied_local_functions = false:silent
 
+# === Issue #181: third-party analyzer rule severities (all suggestion) ===
+# All new analyzer diagnostics default to suggestion so they cannot be promoted
+# to errors under the nullable /p:TreatWarningsAsErrors=true build (the protected CI gate).
+# Global analyzer default (catch-all for any new-package rule, incl. the full SonarAnalyzer set):
+dotnet_analyzer_diagnostic.severity = suggestion
+# Preserve the one pre-existing meaningful analyzer warning observed at baseline:
+dotnet_diagnostic.MSTEST0032.severity = warning
+
+# --- Meziantou.Analyzer 3.0.101 (MA####) ---
+dotnet_diagnostic.MA0001.severity = suggestion
+dotnet_diagnostic.MA0002.severity = suggestion
+dotnet_diagnostic.MA0003.severity = suggestion
+dotnet_diagnostic.MA0004.severity = suggestion
+dotnet_diagnostic.MA0005.severity = suggestion
+dotnet_diagnostic.MA0006.severity = suggestion
+dotnet_diagnostic.MA0007.severity = suggestion
+dotnet_diagnostic.MA0008.severity = suggestion
+dotnet_diagnostic.MA0009.severity = suggestion
+dotnet_diagnostic.MA0010.severity = suggestion
+dotnet_diagnostic.MA0011.severity = suggestion
+dotnet_diagnostic.MA0012.severity = suggestion
+dotnet_diagnostic.MA0013.severity = suggestion
+dotnet_diagnostic.MA0014.severity = suggestion
+dotnet_diagnostic.MA0015.severity = suggestion
+dotnet_diagnostic.MA0016.severity = suggestion
+dotnet_diagnostic.MA0017.severity = suggestion
+dotnet_diagnostic.MA0018.severity = suggestion
+dotnet_diagnostic.MA0019.severity = suggestion
+dotnet_diagnostic.MA0020.severity = suggestion
+dotnet_diagnostic.MA0021.severity = suggestion
+dotnet_diagnostic.MA0022.severity = suggestion
+dotnet_diagnostic.MA0023.severity = suggestion
+dotnet_diagnostic.MA0024.severity = suggestion
+dotnet_diagnostic.MA0025.severity = suggestion
+dotnet_diagnostic.MA0026.severity = suggestion
+dotnet_diagnostic.MA0027.severity = suggestion
+dotnet_diagnostic.MA0028.severity = suggestion
+dotnet_diagnostic.MA0029.severity = suggestion
+dotnet_diagnostic.MA0030.severity = suggestion
+dotnet_diagnostic.MA0031.severity = suggestion
+dotnet_diagnostic.MA0032.severity = suggestion
+dotnet_diagnostic.MA0033.severity = suggestion
+dotnet_diagnostic.MA0035.severity = suggestion
+dotnet_diagnostic.MA0036.severity = suggestion
+dotnet_diagnostic.MA0037.severity = suggestion
+dotnet_diagnostic.MA0038.severity = suggestion
+dotnet_diagnostic.MA0039.severity = suggestion
+dotnet_diagnostic.MA0040.severity = suggestion
+dotnet_diagnostic.MA0041.severity = suggestion
+dotnet_diagnostic.MA0042.severity = suggestion
+dotnet_diagnostic.MA0043.severity = suggestion
+dotnet_diagnostic.MA0044.severity = suggestion
+dotnet_diagnostic.MA0045.severity = suggestion
+dotnet_diagnostic.MA0046.severity = suggestion
+dotnet_diagnostic.MA0047.severity = suggestion
+dotnet_diagnostic.MA0048.severity = suggestion
+dotnet_diagnostic.MA0049.severity = suggestion
+dotnet_diagnostic.MA0050.severity = suggestion
+dotnet_diagnostic.MA0051.severity = suggestion
+dotnet_diagnostic.MA0052.severity = suggestion
+dotnet_diagnostic.MA0053.severity = suggestion
+dotnet_diagnostic.MA0054.severity = suggestion
+dotnet_diagnostic.MA0055.severity = suggestion
+dotnet_diagnostic.MA0056.severity = suggestion
+dotnet_diagnostic.MA0057.severity = suggestion
+dotnet_diagnostic.MA0058.severity = suggestion
+dotnet_diagnostic.MA0059.severity = suggestion
+dotnet_diagnostic.MA0060.severity = suggestion
+dotnet_diagnostic.MA0061.severity = suggestion
+dotnet_diagnostic.MA0062.severity = suggestion
+dotnet_diagnostic.MA0063.severity = suggestion
+dotnet_diagnostic.MA0064.severity = suggestion
+dotnet_diagnostic.MA0065.severity = suggestion
+dotnet_diagnostic.MA0066.severity = suggestion
+dotnet_diagnostic.MA0067.severity = suggestion
+dotnet_diagnostic.MA0068.severity = suggestion
+dotnet_diagnostic.MA0069.severity = suggestion
+dotnet_diagnostic.MA0070.severity = suggestion
+dotnet_diagnostic.MA0071.severity = suggestion
+dotnet_diagnostic.MA0072.severity = suggestion
+dotnet_diagnostic.MA0073.severity = suggestion
+dotnet_diagnostic.MA0074.severity = suggestion
+dotnet_diagnostic.MA0075.severity = suggestion
+dotnet_diagnostic.MA0076.severity = suggestion
+dotnet_diagnostic.MA0077.severity = suggestion
+dotnet_diagnostic.MA0078.severity = suggestion
+dotnet_diagnostic.MA0079.severity = suggestion
+dotnet_diagnostic.MA0080.severity = suggestion
+dotnet_diagnostic.MA0081.severity = suggestion
+dotnet_diagnostic.MA0082.severity = suggestion
+dotnet_diagnostic.MA0083.severity = suggestion
+dotnet_diagnostic.MA0084.severity = suggestion
+dotnet_diagnostic.MA0085.severity = suggestion
+dotnet_diagnostic.MA0086.severity = suggestion
+dotnet_diagnostic.MA0087.severity = suggestion
+dotnet_diagnostic.MA0088.severity = suggestion
+dotnet_diagnostic.MA0089.severity = suggestion
+dotnet_diagnostic.MA0090.severity = suggestion
+dotnet_diagnostic.MA0091.severity = suggestion
+dotnet_diagnostic.MA0092.severity = suggestion
+dotnet_diagnostic.MA0093.severity = suggestion
+dotnet_diagnostic.MA0094.severity = suggestion
+dotnet_diagnostic.MA0095.severity = suggestion
+dotnet_diagnostic.MA0096.severity = suggestion
+dotnet_diagnostic.MA0097.severity = suggestion
+dotnet_diagnostic.MA0098.severity = suggestion
+dotnet_diagnostic.MA0099.severity = suggestion
+dotnet_diagnostic.MA0100.severity = suggestion
+dotnet_diagnostic.MA0101.severity = suggestion
+dotnet_diagnostic.MA0102.severity = suggestion
+dotnet_diagnostic.MA0103.severity = suggestion
+dotnet_diagnostic.MA0104.severity = suggestion
+dotnet_diagnostic.MA0105.severity = suggestion
+dotnet_diagnostic.MA0106.severity = suggestion
+dotnet_diagnostic.MA0107.severity = suggestion
+dotnet_diagnostic.MA0108.severity = suggestion
+dotnet_diagnostic.MA0109.severity = suggestion
+dotnet_diagnostic.MA0110.severity = suggestion
+dotnet_diagnostic.MA0111.severity = suggestion
+dotnet_diagnostic.MA0112.severity = suggestion
+dotnet_diagnostic.MA0113.severity = suggestion
+dotnet_diagnostic.MA0114.severity = suggestion
+dotnet_diagnostic.MA0115.severity = suggestion
+dotnet_diagnostic.MA0116.severity = suggestion
+dotnet_diagnostic.MA0117.severity = suggestion
+dotnet_diagnostic.MA0118.severity = suggestion
+dotnet_diagnostic.MA0119.severity = suggestion
+dotnet_diagnostic.MA0120.severity = suggestion
+dotnet_diagnostic.MA0121.severity = suggestion
+dotnet_diagnostic.MA0122.severity = suggestion
+dotnet_diagnostic.MA0123.severity = suggestion
+dotnet_diagnostic.MA0124.severity = suggestion
+dotnet_diagnostic.MA0125.severity = suggestion
+dotnet_diagnostic.MA0126.severity = suggestion
+dotnet_diagnostic.MA0127.severity = suggestion
+dotnet_diagnostic.MA0128.severity = suggestion
+dotnet_diagnostic.MA0129.severity = suggestion
+dotnet_diagnostic.MA0130.severity = suggestion
+dotnet_diagnostic.MA0131.severity = suggestion
+dotnet_diagnostic.MA0132.severity = suggestion
+dotnet_diagnostic.MA0133.severity = suggestion
+dotnet_diagnostic.MA0134.severity = suggestion
+dotnet_diagnostic.MA0135.severity = suggestion
+dotnet_diagnostic.MA0136.severity = suggestion
+dotnet_diagnostic.MA0137.severity = suggestion
+dotnet_diagnostic.MA0138.severity = suggestion
+dotnet_diagnostic.MA0139.severity = suggestion
+dotnet_diagnostic.MA0140.severity = suggestion
+dotnet_diagnostic.MA0141.severity = suggestion
+dotnet_diagnostic.MA0142.severity = suggestion
+dotnet_diagnostic.MA0143.severity = suggestion
+dotnet_diagnostic.MA0144.severity = suggestion
+dotnet_diagnostic.MA0145.severity = suggestion
+dotnet_diagnostic.MA0146.severity = suggestion
+dotnet_diagnostic.MA0147.severity = suggestion
+dotnet_diagnostic.MA0148.severity = suggestion
+dotnet_diagnostic.MA0149.severity = suggestion
+dotnet_diagnostic.MA0150.severity = suggestion
+dotnet_diagnostic.MA0151.severity = suggestion
+dotnet_diagnostic.MA0152.severity = suggestion
+dotnet_diagnostic.MA0153.severity = suggestion
+dotnet_diagnostic.MA0154.severity = suggestion
+dotnet_diagnostic.MA0155.severity = suggestion
+dotnet_diagnostic.MA0156.severity = suggestion
+dotnet_diagnostic.MA0157.severity = suggestion
+dotnet_diagnostic.MA0158.severity = suggestion
+dotnet_diagnostic.MA0159.severity = suggestion
+dotnet_diagnostic.MA0160.severity = suggestion
+dotnet_diagnostic.MA0161.severity = suggestion
+dotnet_diagnostic.MA0162.severity = suggestion
+dotnet_diagnostic.MA0163.severity = suggestion
+dotnet_diagnostic.MA0164.severity = suggestion
+dotnet_diagnostic.MA0166.severity = suggestion
+dotnet_diagnostic.MA0167.severity = suggestion
+dotnet_diagnostic.MA0168.severity = suggestion
+dotnet_diagnostic.MA0169.severity = suggestion
+dotnet_diagnostic.MA0170.severity = suggestion
+dotnet_diagnostic.MA0171.severity = suggestion
+dotnet_diagnostic.MA0172.severity = suggestion
+dotnet_diagnostic.MA0173.severity = suggestion
+dotnet_diagnostic.MA0174.severity = suggestion
+dotnet_diagnostic.MA0175.severity = suggestion
+dotnet_diagnostic.MA0176.severity = suggestion
+dotnet_diagnostic.MA0177.severity = suggestion
+dotnet_diagnostic.MA0178.severity = suggestion
+dotnet_diagnostic.MA0179.severity = suggestion
+dotnet_diagnostic.MA0180.severity = suggestion
+dotnet_diagnostic.MA0181.severity = suggestion
+dotnet_diagnostic.MA0182.severity = suggestion
+dotnet_diagnostic.MA0183.severity = suggestion
+dotnet_diagnostic.MA0184.severity = suggestion
+dotnet_diagnostic.MA0185.severity = suggestion
+dotnet_diagnostic.MA0186.severity = suggestion
+dotnet_diagnostic.MA0187.severity = suggestion
+dotnet_diagnostic.MA0188.severity = suggestion
+dotnet_diagnostic.MA0189.severity = suggestion
+dotnet_diagnostic.MA0190.severity = suggestion
+dotnet_diagnostic.MA0191.severity = suggestion
+dotnet_diagnostic.MA0192.severity = suggestion
+dotnet_diagnostic.MA0193.severity = suggestion
+dotnet_diagnostic.MA0194.severity = suggestion
+dotnet_diagnostic.MA0195.severity = suggestion
+dotnet_diagnostic.MA0196.severity = suggestion
+dotnet_diagnostic.MA0197.severity = suggestion
+dotnet_diagnostic.MA0198.severity = suggestion
+dotnet_diagnostic.MA0199.severity = suggestion
+dotnet_diagnostic.MA0200.severity = suggestion
+dotnet_diagnostic.MA0201.severity = suggestion
+dotnet_diagnostic.MA0202.severity = suggestion
+
+# --- SonarAnalyzer.CSharp 10.27.0.140913 (S####) ---
+# Full Sonar rule set (~450) is guaranteed at suggestion by the global
+# dotnet_analyzer_diagnostic.severity default above. The statically-detectable
+# Sonar IDs are listed explicitly for auditability:
+dotnet_diagnostic.S1109.severity = suggestion
+dotnet_diagnostic.S1123.severity = suggestion
+dotnet_diagnostic.S1155.severity = suggestion
+dotnet_diagnostic.S1163.severity = suggestion
+dotnet_diagnostic.S1186.severity = suggestion
+dotnet_diagnostic.S1210.severity = suggestion
+dotnet_diagnostic.S1451.severity = suggestion
+dotnet_diagnostic.S1659.severity = suggestion
+dotnet_diagnostic.S1905.severity = suggestion
+dotnet_diagnostic.S1944.severity = suggestion
+dotnet_diagnostic.S2275.severity = suggestion
+dotnet_diagnostic.S2291.severity = suggestion
+dotnet_diagnostic.S2302.severity = suggestion
+dotnet_diagnostic.S2306.severity = suggestion
+dotnet_diagnostic.S2325.severity = suggestion
+dotnet_diagnostic.S2327.severity = suggestion
+dotnet_diagnostic.S2345.severity = suggestion
+dotnet_diagnostic.S2934.severity = suggestion
+dotnet_diagnostic.S3217.severity = suggestion
+dotnet_diagnostic.S3234.severity = suggestion
+dotnet_diagnostic.S3240.severity = suggestion
+dotnet_diagnostic.S3254.severity = suggestion
+dotnet_diagnostic.S3416.severity = suggestion
+dotnet_diagnostic.S3427.severity = suggestion
+dotnet_diagnostic.S3451.severity = suggestion
+dotnet_diagnostic.S3456.severity = suggestion
+dotnet_diagnostic.S3464.severity = suggestion
+dotnet_diagnostic.S3649.severity = suggestion
+dotnet_diagnostic.S3871.severity = suggestion
+dotnet_diagnostic.S3923.severity = suggestion
+dotnet_diagnostic.S3971.severity = suggestion
+dotnet_diagnostic.S3981.severity = suggestion
+dotnet_diagnostic.S4016.severity = suggestion
+dotnet_diagnostic.S4027.severity = suggestion
+dotnet_diagnostic.S4058.severity = suggestion
+dotnet_diagnostic.S4136.severity = suggestion
+dotnet_diagnostic.S4143.severity = suggestion
+dotnet_diagnostic.S4200.severity = suggestion
+dotnet_diagnostic.S4225.severity = suggestion
+dotnet_diagnostic.S4586.severity = suggestion
+dotnet_diagnostic.S4663.severity = suggestion
+dotnet_diagnostic.S6507.severity = suggestion
+dotnet_diagnostic.S6561.severity = suggestion
+dotnet_diagnostic.S6563.severity = suggestion
+dotnet_diagnostic.S6607.severity = suggestion
+dotnet_diagnostic.S6609.severity = suggestion
+dotnet_diagnostic.S6610.severity = suggestion
+dotnet_diagnostic.S6664.severity = suggestion
+dotnet_diagnostic.S6673.severity = suggestion
+dotnet_diagnostic.S6677.severity = suggestion
+dotnet_diagnostic.S6678.severity = suggestion
+dotnet_diagnostic.S6966.severity = suggestion
+dotnet_diagnostic.S6968.severity = suggestion
+dotnet_diagnostic.S9999.severity = suggestion
+
+# --- Roslynator.Analyzers 4.15.0 (RCS####, ROS####) ---
+dotnet_diagnostic.RCS1001.severity = suggestion
+dotnet_diagnostic.RCS1002.severity = suggestion
+dotnet_diagnostic.RCS1002FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1003.severity = suggestion
+dotnet_diagnostic.RCS1004.severity = suggestion
+dotnet_diagnostic.RCS1004FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1005.severity = suggestion
+dotnet_diagnostic.RCS1005FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1006.severity = suggestion
+dotnet_diagnostic.RCS1006FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1007.severity = suggestion
+dotnet_diagnostic.RCS1008.severity = suggestion
+dotnet_diagnostic.RCS1009.severity = suggestion
+dotnet_diagnostic.RCS1010.severity = suggestion
+dotnet_diagnostic.RCS1012.severity = suggestion
+dotnet_diagnostic.RCS1013.severity = suggestion
+dotnet_diagnostic.RCS1014.severity = suggestion
+dotnet_diagnostic.RCS1015.severity = suggestion
+dotnet_diagnostic.RCS1015FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1016.severity = suggestion
+dotnet_diagnostic.RCS1018.severity = suggestion
+dotnet_diagnostic.RCS1019.severity = suggestion
+dotnet_diagnostic.RCS1020.severity = suggestion
+dotnet_diagnostic.RCS1021.severity = suggestion
+dotnet_diagnostic.RCS1021FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1031.severity = suggestion
+dotnet_diagnostic.RCS1031FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1032.severity = suggestion
+dotnet_diagnostic.RCS1032FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1033.severity = suggestion
+dotnet_diagnostic.RCS1034.severity = suggestion
+dotnet_diagnostic.RCS1035.severity = suggestion
+dotnet_diagnostic.RCS1036.severity = suggestion
+dotnet_diagnostic.RCS1037.severity = suggestion
+dotnet_diagnostic.RCS1038.severity = suggestion
+dotnet_diagnostic.RCS1039.severity = suggestion
+dotnet_diagnostic.RCS1040.severity = suggestion
+dotnet_diagnostic.RCS1041.severity = suggestion
+dotnet_diagnostic.RCS1042.severity = suggestion
+dotnet_diagnostic.RCS1043.severity = suggestion
+dotnet_diagnostic.RCS1044.severity = suggestion
+dotnet_diagnostic.RCS1046.severity = suggestion
+dotnet_diagnostic.RCS1047.severity = suggestion
+dotnet_diagnostic.RCS1047FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1048.severity = suggestion
+dotnet_diagnostic.RCS1048FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1049.severity = suggestion
+dotnet_diagnostic.RCS1049FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1050.severity = suggestion
+dotnet_diagnostic.RCS1051.severity = suggestion
+dotnet_diagnostic.RCS1052.severity = suggestion
+dotnet_diagnostic.RCS1055.severity = suggestion
+dotnet_diagnostic.RCS1056.severity = suggestion
+dotnet_diagnostic.RCS1058.severity = suggestion
+dotnet_diagnostic.RCS1058FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1059.severity = suggestion
+dotnet_diagnostic.RCS1060.severity = suggestion
+dotnet_diagnostic.RCS1061.severity = suggestion
+dotnet_diagnostic.RCS1061FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1063.severity = suggestion
+dotnet_diagnostic.RCS1064.severity = suggestion
+dotnet_diagnostic.RCS1065.severity = suggestion
+dotnet_diagnostic.RCS1066.severity = suggestion
+dotnet_diagnostic.RCS1066FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1068.severity = suggestion
+dotnet_diagnostic.RCS1069.severity = suggestion
+dotnet_diagnostic.RCS1070.severity = suggestion
+dotnet_diagnostic.RCS1071.severity = suggestion
+dotnet_diagnostic.RCS1072.severity = suggestion
+dotnet_diagnostic.RCS1073.severity = suggestion
+dotnet_diagnostic.RCS1073FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1074.severity = suggestion
+dotnet_diagnostic.RCS1075.severity = suggestion
+dotnet_diagnostic.RCS1077.severity = suggestion
+dotnet_diagnostic.RCS1078.severity = suggestion
+dotnet_diagnostic.RCS1079.severity = suggestion
+dotnet_diagnostic.RCS1080.severity = suggestion
+dotnet_diagnostic.RCS1081.severity = suggestion
+dotnet_diagnostic.RCS1084.severity = suggestion
+dotnet_diagnostic.RCS1085.severity = suggestion
+dotnet_diagnostic.RCS1085FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1089.severity = suggestion
+dotnet_diagnostic.RCS1089FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1090.severity = suggestion
+dotnet_diagnostic.RCS1091.severity = suggestion
+dotnet_diagnostic.RCS1091FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1093.severity = suggestion
+dotnet_diagnostic.RCS1094.severity = suggestion
+dotnet_diagnostic.RCS1096.severity = suggestion
+dotnet_diagnostic.RCS1097.severity = suggestion
+dotnet_diagnostic.RCS1098.severity = suggestion
+dotnet_diagnostic.RCS1099.severity = suggestion
+dotnet_diagnostic.RCS1100.severity = suggestion
+dotnet_diagnostic.RCS1101.severity = suggestion
+dotnet_diagnostic.RCS1102.severity = suggestion
+dotnet_diagnostic.RCS1103.severity = suggestion
+dotnet_diagnostic.RCS1104.severity = suggestion
+dotnet_diagnostic.RCS1105.severity = suggestion
+dotnet_diagnostic.RCS1106.severity = suggestion
+dotnet_diagnostic.RCS1107.severity = suggestion
+dotnet_diagnostic.RCS1108.severity = suggestion
+dotnet_diagnostic.RCS1110.severity = suggestion
+dotnet_diagnostic.RCS1111.severity = suggestion
+dotnet_diagnostic.RCS1112.severity = suggestion
+dotnet_diagnostic.RCS1112FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1113.severity = suggestion
+dotnet_diagnostic.RCS1114.severity = suggestion
+dotnet_diagnostic.RCS1114FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1118.severity = suggestion
+dotnet_diagnostic.RCS1123.severity = suggestion
+dotnet_diagnostic.RCS1124.severity = suggestion
+dotnet_diagnostic.RCS1124FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1126.severity = suggestion
+dotnet_diagnostic.RCS1128.severity = suggestion
+dotnet_diagnostic.RCS1129.severity = suggestion
+dotnet_diagnostic.RCS1130.severity = suggestion
+dotnet_diagnostic.RCS1132.severity = suggestion
+dotnet_diagnostic.RCS1133.severity = suggestion
+dotnet_diagnostic.RCS1134.severity = suggestion
+dotnet_diagnostic.RCS1135.severity = suggestion
+dotnet_diagnostic.RCS1136.severity = suggestion
+dotnet_diagnostic.RCS1138.severity = suggestion
+dotnet_diagnostic.RCS1139.severity = suggestion
+dotnet_diagnostic.RCS1140.severity = suggestion
+dotnet_diagnostic.RCS1141.severity = suggestion
+dotnet_diagnostic.RCS1142.severity = suggestion
+dotnet_diagnostic.RCS1143.severity = suggestion
+dotnet_diagnostic.RCS1145.severity = suggestion
+dotnet_diagnostic.RCS1146.severity = suggestion
+dotnet_diagnostic.RCS1151.severity = suggestion
+dotnet_diagnostic.RCS1154.severity = suggestion
+dotnet_diagnostic.RCS1155.severity = suggestion
+dotnet_diagnostic.RCS1156.severity = suggestion
+dotnet_diagnostic.RCS1157.severity = suggestion
+dotnet_diagnostic.RCS1158.severity = suggestion
+dotnet_diagnostic.RCS1159.severity = suggestion
+dotnet_diagnostic.RCS1160.severity = suggestion
+dotnet_diagnostic.RCS1161.severity = suggestion
+dotnet_diagnostic.RCS1162.severity = suggestion
+dotnet_diagnostic.RCS1163.severity = suggestion
+dotnet_diagnostic.RCS1164.severity = suggestion
+dotnet_diagnostic.RCS1165.severity = suggestion
+dotnet_diagnostic.RCS1166.severity = suggestion
+dotnet_diagnostic.RCS1168.severity = suggestion
+dotnet_diagnostic.RCS1169.severity = suggestion
+dotnet_diagnostic.RCS1170.severity = suggestion
+dotnet_diagnostic.RCS1171.severity = suggestion
+dotnet_diagnostic.RCS1172.severity = suggestion
+dotnet_diagnostic.RCS1173.severity = suggestion
+dotnet_diagnostic.RCS1174.severity = suggestion
+dotnet_diagnostic.RCS1174FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1175.severity = suggestion
+dotnet_diagnostic.RCS1176.severity = suggestion
+dotnet_diagnostic.RCS1177.severity = suggestion
+dotnet_diagnostic.RCS1179.severity = suggestion
+dotnet_diagnostic.RCS1180.severity = suggestion
+dotnet_diagnostic.RCS1181.severity = suggestion
+dotnet_diagnostic.RCS1182.severity = suggestion
+dotnet_diagnostic.RCS1186.severity = suggestion
+dotnet_diagnostic.RCS1187.severity = suggestion
+dotnet_diagnostic.RCS1188.severity = suggestion
+dotnet_diagnostic.RCS1189.severity = suggestion
+dotnet_diagnostic.RCS1190.severity = suggestion
+dotnet_diagnostic.RCS1191.severity = suggestion
+dotnet_diagnostic.RCS1192.severity = suggestion
+dotnet_diagnostic.RCS1193.severity = suggestion
+dotnet_diagnostic.RCS1194.severity = suggestion
+dotnet_diagnostic.RCS1195.severity = suggestion
+dotnet_diagnostic.RCS1196.severity = suggestion
+dotnet_diagnostic.RCS1197.severity = suggestion
+dotnet_diagnostic.RCS1198.severity = suggestion
+dotnet_diagnostic.RCS1199.severity = suggestion
+dotnet_diagnostic.RCS1200.severity = suggestion
+dotnet_diagnostic.RCS1201.severity = suggestion
+dotnet_diagnostic.RCS1202.severity = suggestion
+dotnet_diagnostic.RCS1203.severity = suggestion
+dotnet_diagnostic.RCS1204.severity = suggestion
+dotnet_diagnostic.RCS1205.severity = suggestion
+dotnet_diagnostic.RCS1206.severity = suggestion
+dotnet_diagnostic.RCS1207.severity = suggestion
+dotnet_diagnostic.RCS1208.severity = suggestion
+dotnet_diagnostic.RCS1209.severity = suggestion
+dotnet_diagnostic.RCS1210.severity = suggestion
+dotnet_diagnostic.RCS1211.severity = suggestion
+dotnet_diagnostic.RCS1212.severity = suggestion
+dotnet_diagnostic.RCS1212FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1213.severity = suggestion
+dotnet_diagnostic.RCS1214.severity = suggestion
+dotnet_diagnostic.RCS1214FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1215.severity = suggestion
+dotnet_diagnostic.RCS1216.severity = suggestion
+dotnet_diagnostic.RCS1217.severity = suggestion
+dotnet_diagnostic.RCS1217FadeOut.severity = suggestion
+dotnet_diagnostic.RCS1218.severity = suggestion
+dotnet_diagnostic.RCS1220.severity = suggestion
+dotnet_diagnostic.RCS1221.severity = suggestion
+dotnet_diagnostic.RCS1222.severity = suggestion
+dotnet_diagnostic.RCS1223.severity = suggestion
+dotnet_diagnostic.RCS1224.severity = suggestion
+dotnet_diagnostic.RCS1225.severity = suggestion
+dotnet_diagnostic.RCS1226.severity = suggestion
+dotnet_diagnostic.RCS1227.severity = suggestion
+dotnet_diagnostic.RCS1228.severity = suggestion
+dotnet_diagnostic.RCS1229.severity = suggestion
+dotnet_diagnostic.RCS1230.severity = suggestion
+dotnet_diagnostic.RCS1231.severity = suggestion
+dotnet_diagnostic.RCS1232.severity = suggestion
+dotnet_diagnostic.RCS1233.severity = suggestion
+dotnet_diagnostic.RCS1234.severity = suggestion
+dotnet_diagnostic.RCS1235.severity = suggestion
+dotnet_diagnostic.RCS1236.severity = suggestion
+dotnet_diagnostic.RCS1237.severity = suggestion
+dotnet_diagnostic.RCS1238.severity = suggestion
+dotnet_diagnostic.RCS1239.severity = suggestion
+dotnet_diagnostic.RCS1240.severity = suggestion
+dotnet_diagnostic.RCS1241.severity = suggestion
+dotnet_diagnostic.RCS1242.severity = suggestion
+dotnet_diagnostic.RCS1243.severity = suggestion
+dotnet_diagnostic.RCS1244.severity = suggestion
+dotnet_diagnostic.RCS1246.severity = suggestion
+dotnet_diagnostic.RCS1247.severity = suggestion
+dotnet_diagnostic.RCS1248.severity = suggestion
+dotnet_diagnostic.RCS1249.severity = suggestion
+dotnet_diagnostic.RCS1250.severity = suggestion
+dotnet_diagnostic.RCS1251.severity = suggestion
+dotnet_diagnostic.RCS1252.severity = suggestion
+dotnet_diagnostic.RCS1253.severity = suggestion
+dotnet_diagnostic.RCS1254.severity = suggestion
+dotnet_diagnostic.RCS1255.severity = suggestion
+dotnet_diagnostic.RCS1256.severity = suggestion
+dotnet_diagnostic.RCS1257.severity = suggestion
+dotnet_diagnostic.RCS1258.severity = suggestion
+dotnet_diagnostic.RCS1259.severity = suggestion
+dotnet_diagnostic.RCS1260.severity = suggestion
+dotnet_diagnostic.RCS1261.severity = suggestion
+dotnet_diagnostic.RCS1262.severity = suggestion
+dotnet_diagnostic.RCS1263.severity = suggestion
+dotnet_diagnostic.RCS1264.severity = suggestion
+dotnet_diagnostic.RCS1265.severity = suggestion
+dotnet_diagnostic.RCS1266.severity = suggestion
+dotnet_diagnostic.RCS1267.severity = suggestion
+dotnet_diagnostic.RCS1268.severity = suggestion
+dotnet_diagnostic.ROS0003.severity = suggestion
+
+# --- AsyncFixer 2.1.0 (AsyncFixer01..06) ---
+dotnet_diagnostic.AsyncFixer01.severity = suggestion
+dotnet_diagnostic.AsyncFixer02.severity = suggestion
+dotnet_diagnostic.AsyncFixer03.severity = suggestion
+dotnet_diagnostic.AsyncFixer04.severity = suggestion
+dotnet_diagnostic.AsyncFixer05.severity = suggestion
+dotnet_diagnostic.AsyncFixer06.severity = suggestion
+
+# --- Microsoft.CodeAnalysis.BannedApiAnalyzers 3.3.4 (RS003x) ---
+# RS0030 held at suggestion for initial rollout. Promotion to warning is a
+# post-cleanup follow-up (143 existing banned-symbol usages, see issue #181 evidence).
+dotnet_diagnostic.RS0030.severity = suggestion
+dotnet_diagnostic.RS0031.severity = suggestion
+dotnet_diagnostic.RS0035.severity = suggestion
+
+# --- Issue #181: naming preferences (non-error) ---
+# Async-suffix preference for async methods (suggestion).
+dotnet_naming_rule.async_methods_end_in_async.severity = suggestion
+dotnet_naming_rule.async_methods_end_in_async.symbols = any_async_methods
+dotnet_naming_rule.async_methods_end_in_async.style = end_in_async
+dotnet_naming_symbols.any_async_methods.applicable_kinds = method
+dotnet_naming_symbols.any_async_methods.applicable_accessibilities = *
+dotnet_naming_symbols.any_async_methods.required_modifiers = async
+dotnet_naming_style.end_in_async.required_prefix =
+dotnet_naming_style.end_in_async.required_suffix = Async
+dotnet_naming_style.end_in_async.word_separator =
+dotnet_naming_style.end_in_async.capitalization = pascal_case
+
+# Private/internal field _camelCase preference for C# (suggestion).
+dotnet_naming_rule.cs_private_field_camelcase.severity = suggestion
+dotnet_naming_rule.cs_private_field_camelcase.symbols = cs_private_internal_field
+dotnet_naming_rule.cs_private_field_camelcase.style = underscore_camelcase
+dotnet_naming_symbols.cs_private_internal_field.applicable_kinds = field
+dotnet_naming_symbols.cs_private_internal_field.applicable_accessibilities = internal, private, private_protected
+dotnet_naming_symbols.cs_private_internal_field.required_modifiers =
+dotnet_naming_style.underscore_camelcase.required_prefix = _
+dotnet_naming_style.underscore_camelcase.required_suffix =
+dotnet_naming_style.underscore_camelcase.word_separator =
+dotnet_naming_style.underscore_camelcase.capitalization = camel_case
+# Interface names begin with I (suggestion). Already applied via [*.{cs,vb}] section;
+# restated here for C# explicitness with a distinct rule key.
+dotnet_naming_rule.cs_interface_begins_with_i.severity = suggestion
+dotnet_naming_rule.cs_interface_begins_with_i.symbols = cs_interface
+dotnet_naming_rule.cs_interface_begins_with_i.style = cs_begins_with_i
+dotnet_naming_symbols.cs_interface.applicable_kinds = interface
+dotnet_naming_symbols.cs_interface.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+dotnet_naming_symbols.cs_interface.required_modifiers =
+dotnet_naming_style.cs_begins_with_i.required_prefix = I
+dotnet_naming_style.cs_begins_with_i.required_suffix =
+dotnet_naming_style.cs_begins_with_i.word_separator =
+dotnet_naming_style.cs_begins_with_i.capitalization = pascal_case
+
+
 [*.vb]
 #### Naming styles ####
 

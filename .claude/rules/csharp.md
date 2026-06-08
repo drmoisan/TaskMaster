@@ -52,6 +52,40 @@ Introduce the smallest seam that enables reliable unit testing. Apply in this or
 2. **Injectable delegate seam** — use a narrow `Func<>`/`Action<>` delegate for a single call path when a full interface is excessive. Default behavior must remain safe and deterministic.
 3. **Adapter seam for static or third-party APIs** — wrap the static or third-party call behind a small adapter so tests can mock the adapter with Moq.
 
+### Time seam (TimeProvider) — guidance only
+
+For new or touched time-dependent code, inject `System.TimeProvider` through the constructor instead of calling the clock directly:
+
+- Production supplies `TimeProvider.System`.
+- Tests supply `FakeTimeProvider` from `Microsoft.Extensions.TimeProvider.Testing` to make time deterministic.
+- Do not call `DateTime.Now`, `DateTime.UtcNow`, or `DateTimeOffset.Now` directly in new/touched code; obtain time via the injected `TimeProvider` (for example `GetUtcNow()` / `GetLocalNow()`).
+
+This is guidance only: it introduces no runtime behavior change and does not require rewriting existing call sites. `Microsoft.Bcl.TimeProvider` (the .NET Framework backport of `System.TimeProvider`) is already present in UtilitiesCS, so the seam is available without adding a new production dependency. Legacy call-site migration is follow-up work, not a requirement of adopting this guidance.
+
+## Analyzer Stack (Issue #181)
+
+This repository adopts a fixed set of FIVE static-analysis packages, wired first-party only (the 15 first-party projects; the 4 vendored projects — SVGControl, SVGControl.Test, UtilitiesSwordfish.NET.General, UtilitiesSwordfish.Test — are excluded):
+
+1. **Meziantou.Analyzer**
+2. **SonarAnalyzer.CSharp**
+3. **Roslynator.Analyzers**
+4. **AsyncFixer**
+5. **Microsoft.CodeAnalysis.BannedApiAnalyzers**
+
+### Mechanism
+
+- Each first-party project references its analyzers via a `packages.config` `<package ... developmentDependency="true" />` entry plus an explicit `<Analyzer Include="..\packages\<id>.<version>\analyzers\dotnet\cs\<dll>" />` item in the project's analyzer `<ItemGroup>`. This file-based wiring is used because the projects are legacy (non-SDK, `packages.config`) VSTO/.NET Framework projects; no PackageReference, no Central Package Management, and no `dotnet restore` are introduced.
+- For this repo's Roslyn 5.6 (VS18) toolchain, use the analyzer DLLs from the Meziantou `roslyn5.0` and Roslynator `roslyn4.7` subfolders.
+- **Banned symbols** are enforced by BannedApiAnalyzers using a repo-root `BannedSymbols.txt` referenced by each first-party project as `<AdditionalFiles Include="$(MSBuildThisFileDirectory)..\BannedSymbols.txt" />`. The banned targets are `DateTime.Now`, `DateTime.UtcNow`, `Random.Shared`, `Thread.Sleep`, and `Task.Delay`. RS0030 is held at `severity = suggestion` for initial rollout (existing call sites are not build-broken); promotion to `warning` after legacy cleanup is documented follow-up work.
+
+### Severity-first ordering invariant
+
+All new analyzer rule severities are configured in `.editorconfig` at `severity = suggestion` (never `warning`/`error`) BEFORE any `<Analyzer Include>` item is wired into a project. This is required because the type-check toolchain step runs `msbuild ... /p:Nullable=enable /p:TreatWarningsAsErrors=true`, which promotes any `warning`-severity analyzer diagnostic to a build error. Keeping new analyzer diagnostics at `suggestion` (message level) prevents the analyzer adoption from breaking the protected nullable gate.
+
+### Deferred analyzer — SecurityCodeScan.VS2019
+
+SecurityCodeScan.VS2019 was evaluated and **deferred** (not silently omitted) from this rollout. Version 5.6.7 is incompatible with this repository's Roslyn 5.6 (VS18) analyzer loader: its types fail to initialize (`TypeInitializationException` → `FileNotFoundException` for `YamlDotNet, Version=11.0.0.0`), which the compiler reports as warning **CS8032**. CS8032 is a compiler warning, not an analyzer rule ID, so it cannot be set to `suggestion` via `.editorconfig`; under `/p:TreatWarningsAsErrors=true` it is promoted to an error and breaks the protected nullable build. SecurityCodeScan.VS2019 is therefore dropped from the analyzer set entirely. **No CS8032 suppression** (no `dotnet_diagnostic.CS8032` entry and no `<WarningsNotAsErrors>` containing CS8032) is introduced, and no substitute security analyzer is added. Re-evaluation is follow-up work pending a Roslyn-5.x-compatible security analyzer.
+
 ## Prohibited Behaviors
 
 - Broad refactors across unrelated projects or files.
