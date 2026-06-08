@@ -45,7 +45,7 @@ coverage, msbuild + vstest).
 - [x] AC3: TimeProvider/FakeTimeProvider seam + guidance added to rules/csharp.md; no runtime behavior changed.
 - [x] AC4: .editorconfig/.globalconfig carries new severities, file-scoped-namespace pref, naming rules, scoped to avoid build-breaking errors.
 - [x] AC5: All four toolchain stages pass locally to the extent the environment allows; nullable TreatWarningsAsErrors step does NOT regress.
-- [ ] AC6: PR CI is GREEN, including nullable-as-errors and MSTest-with-coverage steps.
+- [x] AC6: PR CI is GREEN, including nullable-as-errors and MSTest-with-coverage steps.
 - [x] AC7: No do_not_change invariant violated; rules/csharp.md updated retaining MSTest/Moq, 80/90 coverage, msbuild+vstest.
 - [x] AC8: Change scoped to C# build-config + rules/csharp.md (+ .editorconfig/.globalconfig + Directory.Build.props if used + per-project analyzer refs). No application logic changes except seam introductions required to compile.
 
