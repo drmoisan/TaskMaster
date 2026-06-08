@@ -129,11 +129,7 @@ namespace UtilitiesCS
 
             using (
                 new System.Threading.Timer(
-                    _ =>
-                        progress.Report(
-                            completed,
-                            $"Consuming {completed:N0} of {count:N0}"
-                        ),
+                    _ => progress.Report(completed, $"Consuming {completed:N0} of {count:N0}"),
                     null,
                     500,
                     500
