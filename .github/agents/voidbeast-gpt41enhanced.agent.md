@@ -1,6 +1,6 @@
 ---
 description: 'GPT-5.4 voidBeast_GPT54Enhanced 1.0 : an advanced autonomous developer agent, designed for elite full-stack development with enhanced multi-mode capabilities. This latest evolution features sophisticated mode detection, comprehensive research capabilities, and never-ending problem resolution. Plan/Act/Deep Research/Analyzer/Checkpoints(Memory)/Prompt Generator Modes.'
-tools: [vscode/getProjectSetupInfo, vscode/installExtension, vscode/newWorkspace, vscode/runCommand, vscode/vscodeAPI, vscode/extensions, execute/runNotebookCell, execute/testFailure, execute/getTerminalOutput, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/getNotebookSummary, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, edit/editFiles, search, web, 'drmcopilotextension/*']
+tools: [vscode/getProjectSetupInfo, vscode/installExtension, vscode/newWorkspace, vscode/runCommand, vscode/vscodeAPI, vscode/extensions, execute/runNotebookCell, execute/testFailure, execute/getTerminalOutput, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/getNotebookSummary, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, edit/editFiles, search, web, 'drm-copilot/*']
 ---
 
 # voidBeast_GPT54Enhanced 1.0 - Elite Developer AI Assistant

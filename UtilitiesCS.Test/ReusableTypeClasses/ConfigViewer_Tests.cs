@@ -18,11 +18,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
     ///     <see cref="ConfigViewer"/>.
     ///
     /// Constraints:
-    ///     ConfigViewer is a WinForms Form; tests are decorated with [STAThread] so
-    ///     the MSTest runner invokes them on an STA thread to satisfy WinForms
-    ///     initialization requirements.
+    ///     ConfigViewer is a WinForms Form; this class uses MSTest's STA class
+    ///     execution mode to satisfy WinForms initialization requirements.
     /// </summary>
-    [TestClass]
+    [STATestClass]
     public class ConfigViewer_Tests
     {
         private static ConfigViewer CreateHeadlessViewer() =>
@@ -45,7 +44,6 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         ///     and <c>SetController</c> returns the same viewer reference.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void SetController_SetsControllerPropertyAndReturnsViewer()
         {
             ConfigViewer viewer = null;
@@ -93,7 +91,6 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         ///     constructed viewer; the viewer is disposed in the finally block.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ButtonCancelClick_WithNullController_IsNoOpWithoutThrowing()
         {
             ConfigViewer viewer = null;
@@ -152,7 +149,6 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         ///     active after the call.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ActivateUiBox_NetDiskType_ActivatesNetBoxAndDeactivatesLocalBox()
         {
             ConfigViewer viewer = null;
@@ -204,7 +200,6 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         ///     viewer's control tree.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void GroupBoxEnterHandler_WithInactiveBox_SetsHighlightColors()
         {
             ConfigViewer viewer = null;
@@ -259,7 +254,6 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         ///     controller.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void GroupBoxClickHandler_WithNullControllerAndInactiveBox_IsNoOp()
         {
             ConfigViewer viewer = null;
@@ -318,7 +312,6 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         ///     transient <see cref="ConfigGroupBox"/>.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void GroupBoxLeaveHandler_WithInactiveBox_RestoresControlColors()
         {
             ConfigViewer viewer = null;
@@ -375,7 +368,6 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         ///     viewer with a null controller.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void SpecialFolderSelectedValueChangedHandler_WithNullController_IsNoOp()
         {
             ConfigViewer viewer = null;

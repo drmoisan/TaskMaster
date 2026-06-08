@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -107,7 +108,29 @@ namespace TaskMaster
         {
             if (!_quickFilerLoaded)
             {
+                SetHighConfidenceModeForLaunch(false);
                 _quickFilerLoaded = true;
+                _quickFiler = await QuickFiler.Controllers.QfcHomeController.LaunchAsync(
+                    Globals,
+                    ReleaseQuickFiler
+                );
+                if (_quickFiler is null)
+                    _quickFilerLoaded = false;
+            }
+        }
+
+        /// <summary>
+        /// Launches Quick Filer with high-confidence mode active. Mirrors
+        /// <see cref="LoadQuickFilerAsync"/> but first enables high-confidence mode so the loaded
+        /// session filters below-threshold suggestions. Uses the same <c>_quickFilerLoaded</c>
+        /// guard so the standard launch path is unaffected.
+        /// </summary>
+        internal async Task LoadQuickFilerHighConfidenceAsync()
+        {
+            if (!_quickFilerLoaded)
+            {
+                _quickFilerLoaded = true;
+                SetHighConfidenceModeForLaunch(true);
                 _quickFiler = await QuickFiler.Controllers.QfcHomeController.LaunchAsync(
                     Globals,
                     ReleaseQuickFiler
@@ -121,6 +144,7 @@ namespace TaskMaster
         {
             _quickFiler = null;
             _quickFilerLoaded = false;
+            SetHighConfidenceModeForLaunch(false);
         }
 
         internal void ReviseProjectData()
@@ -226,6 +250,54 @@ namespace TaskMaster
 
         internal void ToggleSaveEmailCopy() =>
             Globals.InternalQfSettings.SaveEmailCopy = !Globals.InternalQfSettings.SaveEmailCopy;
+
+        internal bool IsHighConfidenceModeActive() => Globals.QfSettings.HighConfidenceModeEnabled;
+
+        internal void ToggleHighConfidenceMode() =>
+            Globals.InternalQfSettings.HighConfidenceModeEnabled = !Globals
+                .InternalQfSettings
+                .HighConfidenceModeEnabled;
+
+        /// <summary>
+        /// Sets the persisted high-confidence mode flag for the upcoming QuickFiler launch only.
+        /// The standard launch path always sets this to <c>false</c> so it never filters, while
+        /// the high-confidence launch path sets it to <c>true</c>; the flag is also reset to
+        /// <c>false</c> on release. The flag is therefore launch-scoped, not a cross-session
+        /// toggle.
+        /// </summary>
+        internal void SetHighConfidenceModeForLaunch(bool enabled) =>
+            Globals.InternalQfSettings.HighConfidenceModeEnabled = enabled;
+
+        /// <summary>
+        /// Returns the stored high-confidence threshold formatted as a whole-number percentage
+        /// (for example, a stored 0.9 returns "90"). Uses the invariant culture so the ribbon
+        /// edit box is locale-independent.
+        /// </summary>
+        internal string GetHighConfidenceThresholdText() =>
+            Math.Round(Globals.QfSettings.HighConfidenceThreshold * 100, 0)
+                .ToString(CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Parses a percentage entered in the ribbon edit box and, when valid, persists it as a
+        /// probability in [0.0, 1.0]. Valid input is a number in the inclusive range [0, 100].
+        /// Non-numeric or out-of-range input leaves the persisted value unchanged.
+        /// </summary>
+        internal void SetHighConfidenceThresholdText(string text)
+        {
+            if (
+                double.TryParse(
+                    text,
+                    NumberStyles.Float,
+                    CultureInfo.InvariantCulture,
+                    out double percent
+                )
+                && percent >= 0
+                && percent <= 100
+            )
+            {
+                Globals.InternalQfSettings.HighConfidenceThreshold = percent / 100.0;
+            }
+        }
 
         #endregion SettingsMenu
 

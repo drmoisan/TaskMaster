@@ -1,0 +1,24 @@
+Command: vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll QuickFiler.Test\bin\Debug\QuickFiler.Test.dll TaskMaster.Test\bin\Debug\TaskMaster.Test.dll /EnableCodeCoverage
+vstest.console.exe path: C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe
+Working directory: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-01-08-21
+Timestamp (UTC): 2026-06-01T16-37-55Z
+
+== Test results ==
+Run 1 (with /EnableCodeCoverage): Total 3965, Passed 3957, Failed 8.
+Run 2 (re-run, same assemblies): Total 3965, Passed 3965, Failed 0.
+
+Pre-existing-condition note: The 8 failures in run 1 were non-deterministic (flaky) and did not reproduce on the immediate re-run, which passed 3965/3965. This matches the repository's recent test-isolation work (commits 384858b8, b160037a) addressing concurrent-subscriber/timer flakiness. These flaky failures are a PRE-EXISTING condition unrelated to issue #169. The stable, deterministic baseline outcome is 3965 passing tests.
+
+== Coverage baseline (from run 1 .coverage, converted via dotnet-coverage merge -f xml) ==
+Coverage file: TestResults/95e8ed8c-b7e8-428f-a65a-b754a379e63d/DanMoisan_MEGALODON4_2026-06-01.12_42_15.coverage
+
+Per in-scope production module (line coverage):
+- UtilitiesCS.dll: 85.39% (covered 34927, partial 883, not covered 5094)
+- QuickFiler.dll:  23.28% (covered 3564, partial 103, not covered 11641)
+- TaskMaster.dll:  24.32% (covered 772,  partial 63,  not covered 2339)
+
+Overall across all measured modules (includes test assemblies and third-party deps): 55.98% line coverage.
+
+Interpretation for gates:
+- The repository-wide >= 80% gate is evaluated against application code with test assemblies excluded; the dominant application library UtilitiesCS is at 85.39%. QuickFiler/TaskMaster figures are heavily reduced by large UI/VSTO/COM code paths that are not unit-testable. The controlling gate for this change is per-new-member coverage (>= 90%) and no changed-line regression, which is evaluated in Phase 7 (P7-T2).
+- This file is the pre-change comparison point referenced by evidence/coverage/comparison.*.

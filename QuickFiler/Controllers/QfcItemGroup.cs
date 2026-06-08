@@ -42,5 +42,11 @@ namespace QuickFiler.Controllers
             set => _itemController = value;
         }
         private IQfcItemController _itemController;
+
+        /// <summary>
+        /// The predetermined high-confidence folder path (Issue #171) carried from the pre-filter
+        /// through the carrier-list load path. Null on the standard (non-high-confidence) load path.
+        /// </summary>
+        internal string PredeterminedFolder { get; set; }
     }
 }

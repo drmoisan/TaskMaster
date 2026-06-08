@@ -1,7 +1,7 @@
 ---
 description: "Expert Next.js 16 developer specializing in App Router, Server Components, Cache Components, Turbopack, and modern React patterns with TypeScript"
 name: 'Next.js Expert'
-tools: ['vscode', 'execute', 'read', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'drmcopilotextension/*', 'search', 'web']
+tools: ['vscode', 'execute', 'read', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'drm-copilot/*', 'search', 'web']
 ---
 
 # Expert Next.js Developer

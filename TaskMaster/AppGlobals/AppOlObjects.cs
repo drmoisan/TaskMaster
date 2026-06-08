@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
@@ -387,6 +388,16 @@ namespace TaskMaster
 
         internal string ResolveCurrentUserEmailAddress()
         {
+            // Outlook COM objects must be accessed from the STA thread on which they were
+            // created. If this method is called from a background (MTA/ThreadPool) thread,
+            // marshal synchronously to the UI thread to avoid COMException 0xEF640201.
+            if (Thread.CurrentThread.ManagedThreadId != UiThread.UiThreadId)
+            {
+                string result = string.Empty;
+                UiThread.UiSyncContext.Send(_ => result = ResolveCurrentUserEmailAddress(), null);
+                return result;
+            }
+
             try
             {
                 var session = App?.Session ?? NamespaceMAPI;

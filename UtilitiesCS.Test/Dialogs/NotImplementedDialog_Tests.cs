@@ -112,8 +112,7 @@ namespace UtilitiesCS.Test.Dialogs
         /// Returns:
         ///     true when seam returns DialogResult.Yes.
         /// </summary>
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void StopAtNotImplemented_SeamReturnsYes_ReturnsTrueThrowPath()
         {
             // Arrange: inject seam that returns Yes (throw-exception decision)
@@ -141,8 +140,7 @@ namespace UtilitiesCS.Test.Dialogs
         /// Returns:
         ///     false when seam returns DialogResult.No.
         /// </summary>
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void StopAtNotImplemented_SeamReturnsNo_ReturnsFalseKeepRunningPath()
         {
             // Arrange: inject seam that returns No (keep-running decision)

@@ -231,7 +231,7 @@ Do not claim mission completion until all of the following are true:
 
 - Do not stop after one delegation when required downstream steps remain.
 - Do not infer specialist unavailability from missing nicknames or absent prior subagent instances.
-- Do not call `drmCopilotExtension.*` directly from this workflow.
+- Do not call `drm-copilot.*` directly from this workflow.
 - Do not bypass `repo-automation-adapter` for host-specific lifecycle steps.
 - Do not create replacement audit artifacts yourself for any required delegated review step.
 - Do not execute required delegated steps locally as a fallback.

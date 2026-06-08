@@ -211,6 +211,20 @@
             size="large"
             keytip="QF"
           />
+          <button
+            id="QuickFilerHighConfidence"
+            imageMso="UpdateFolder"
+            onAction="QuickFilerHighConfidence_Click"
+            label="Quick Filer — High Confidence"
+            size="large"
+            keytip="QH"
+          />
+          <editBox
+            id="HighConfidenceThreshold"
+            label="High Confidence %"
+            getText="HighConfidenceThreshold_GetText"
+            onChange="HighConfidenceThreshold_OnChange"
+          />
           <menu
             id="Settings"
             imageMso="ContentTypeSettings"
@@ -436,8 +450,8 @@
             <button
               id="ClearTriage"
               imageMso="Clear"
-              onAction="ClearTriage"
-              label="ClearTriage_Click"
+              onAction="ClearTriage_Click"
+              label="Clear Triage Field"
             />
             <button
               id="ResetTriage"

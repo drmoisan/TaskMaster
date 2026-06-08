@@ -3,7 +3,7 @@ name: atomic_planner
 description: Generate phased implementation plans with atomic checkbox tasks that have binary completion and clear acceptance criteria.
 argument-hint: "Describe the goal or change you want a phased atomic plan for."
 tools:
-   [read/readFile, agent/runSubagent, edit/createDirectory, edit/createFile, edit/editFiles, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/textSearch, search/usages, web/fetch, drmcopilotextension/collect_commit_context, 'drmcopilotextension/*', todo]
+   [read/readFile, agent/runSubagent, edit/createDirectory, edit/createFile, edit/editFiles, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/textSearch, search/usages, web/fetch, drm-copilot/collect_commit_context, 'drm-copilot/*', todo]
 handoffs:
    - label: Preflight validate plan (atomic_executor)
      agent: atomic_executor
@@ -361,13 +361,13 @@ When the work involves tests:
 
    **Bad:**
 
-   * [ ] [P3-T1] Implement tests for `mcp__drmCopilotExtension__run_poshqc_format`
-   * [ ] [P3-T2] Write unit tests for `mcp__drmCopilotExtension__run_poshqc_analyze`
+   * [ ] [P3-T1] Implement tests for `mcp__drm-copilot__run_poshqc_format`
+   * [ ] [P3-T2] Write unit tests for `mcp__drm-copilot__run_poshqc_analyze`
 
    **Good:**
 
-   * [ ] [P3-T1] Add regression test for `mcp__drmCopilotExtension__run_poshqc_format` forwarding selected `scan_folders`
-   * [ ] [P3-T2] Add regression test for `mcp__drmCopilotExtension__run_poshqc_analyze` rejecting invalid scan-folder input
+   * [ ] [P3-T1] Add regression test for `mcp__drm-copilot__run_poshqc_format` forwarding selected `scan_folders`
+   * [ ] [P3-T2] Add regression test for `mcp__drm-copilot__run_poshqc_analyze` rejecting invalid scan-folder input
    * [ ] [P3-T3] Add regression test for `mcp_drmcopilotext_run_poshqc_test` preserving the selected workspace scope
 
 ### 5.4.1 TDD Red regression tests must be tagged (MANDATORY)
@@ -422,15 +422,15 @@ When refactoring is required (e.g., to enable dependency injection, improve test
 
    **Bad:**
 
-   * [ ] [P1-T1] Refactor `mcp__drmCopilotExtension__run_poshqc_analyze_autofix` integration for testability
+   * [ ] [P1-T1] Refactor `mcp__drm-copilot__run_poshqc_analyze_autofix` integration for testability
 
    **Good:**
 
-   * [ ] [P1-T1] Identify external dependencies used by `mcp__drmCopilotExtension__run_poshqc_analyze_autofix` and list them in an internal note
-   * [ ] [P1-T2] Extract the autofix invocation seam behind `mcp__drmCopilotExtension__run_poshqc_analyze_autofix` into helper functions
-   * [ ] [P1-T3] Add an injectable execution seam for `mcp__drmCopilotExtension__run_poshqc_analyze_autofix` with a production default
-   * [ ] [P1-T4] Update all call sites of `mcp__drmCopilotExtension__run_poshqc_analyze_autofix` to use the default seam
-   * [ ] [P1-T5] Verify that `mcp__drmCopilotExtension__run_poshqc_analyze_autofix` is mockable via the new helper functions in tests
+   * [ ] [P1-T1] Identify external dependencies used by `mcp__drm-copilot__run_poshqc_analyze_autofix` and list them in an internal note
+   * [ ] [P1-T2] Extract the autofix invocation seam behind `mcp__drm-copilot__run_poshqc_analyze_autofix` into helper functions
+   * [ ] [P1-T3] Add an injectable execution seam for `mcp__drm-copilot__run_poshqc_analyze_autofix` with a production default
+   * [ ] [P1-T4] Update all call sites of `mcp__drm-copilot__run_poshqc_analyze_autofix` to use the default seam
+   * [ ] [P1-T5] Verify that `mcp__drm-copilot__run_poshqc_analyze_autofix` is mockable via the new helper functions in tests
 
 3. **No umbrella refactor tasks**
    You MUST NOT use a single task that says “Refactor X for testability.” Always decompose into multiple atomic slices as above.

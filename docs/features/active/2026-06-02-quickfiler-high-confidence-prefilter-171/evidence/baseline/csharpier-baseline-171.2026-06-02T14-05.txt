@@ -1,0 +1,23 @@
+Baseline CSharpier format state — Issue #171
+Task: [P0-T3]
+Timestamp: 2026-06-02T14-05
+
+Command:
+  dotnet tool run csharpier check .
+
+Result: EXIT CODE 1 (pre-existing, not introduced by Issue #171)
+
+Relevant output:
+  Warning The csproj at ...\TaskMaster\TaskMaster_BACKUP_1250.csproj failed to load ... invalid xml so was not formatted.
+  Error .\TaskMaster\TaskMaster.csproj - Was not formatted.
+    The file did not end with a single newline.
+  Checked 1060 files in ~9s.
+
+Notes:
+- The only "Error" is in TaskMaster\TaskMaster.csproj, a project (.csproj) file that is
+  already modified in the working tree per git status at session start (pre-existing, unrelated
+  to Issue #171). It is not a .cs source file and is not in the Issue #171 change set.
+- TaskMaster_BACKUP_1250.csproj is an invalid-XML backup file (pre-existing).
+- No .cs source file failed the format check at baseline.
+- The canonical formatting toolchain step is `dotnet tool run csharpier .` (write mode), which
+  formats only .cs files. The final QA gate (P7) verifies all touched .cs files are formatted.

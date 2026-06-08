@@ -118,8 +118,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies MoveObjectsToChildren redirects source to target's existing MappedTo
         /// when target.Value.MappedTo is already populated.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void HandleModelDropped_WhenTargetHasMappedTo_SetsSourceMappedToTargetsMappedTo()
         {
             var finalDest = new OlFolderRemap();
@@ -157,8 +156,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         // ---------------------------------------------------------------------------
 
         /// <summary>Verifies MakeCheckedStatePutter() returns a callable CheckStatePutterDelegate.</summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void MakeCheckedStatePutter_ReturnsDelegateInstance()
         {
             var viewer = new FolderRemapViewer();
@@ -178,8 +176,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         // ---------------------------------------------------------------------------
 
         /// <summary>Verifies the Unchecked branch of the returned delegate sets MappedTo to null.</summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void MakeCheckedStatePutter_Delegate_WhenUnchecked_ClearsMappedToAndReturnsUnchecked()
         {
             var viewer = new FolderRemapViewer();
@@ -381,8 +378,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         ///     3. Assert delegate properties are non-null and tree/mappings are populated.
         ///     4. Discard (close) the modeless viewer form.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void Constructor_WithMockedOutlookFolder_InitializesAllFieldsAndDelegates()
         {
             // Arrange: build a mock Outlook root folder with no children

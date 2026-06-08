@@ -81,7 +81,6 @@ namespace QuickFiler.Helper_Classes
             _mailItem = mailItem;
             MailHelper = new MailItemHelper(mailItem, _globals); //.LoadPriority(appGlobals, token);
             _updateUI = updateUI;
-            PropertyChanged += Handler_PropertyChanged;
         }
 
         public static async Task<ConversationResolver> LoadAsync(
@@ -116,8 +115,9 @@ namespace QuickFiler.Helper_Classes
             }
             else
             {
-                resolver.PropertyChanged += resolver.Handler_PropertyChanged;
+                // Subscribe after LoadDfAsync so initial dataframe assignment does not trigger background initialization.
                 await resolver.LoadDfAsync(token, loadAll);
+                resolver.PropertyChanged += resolver.Handler_PropertyChanged;
             }
 
             return resolver;
@@ -151,8 +151,9 @@ namespace QuickFiler.Helper_Classes
             }
             else
             {
-                resolver.PropertyChanged += resolver.Handler_PropertyChanged;
+                // Subscribe after LoadDfAsync so initial dataframe assignment does not trigger background initialization.
                 await resolver.LoadDfAsync(token, loadAll);
+                resolver.PropertyChanged += resolver.Handler_PropertyChanged;
             }
 
             return resolver;

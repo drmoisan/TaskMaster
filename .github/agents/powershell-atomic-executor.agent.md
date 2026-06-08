@@ -1,8 +1,8 @@
 ---
 name: powershell_atomic_executor
-description: Execute atomic_planner plans verbatim with atomic_executor rigor and PowerShell-specialized MCP quality gates (`mcp__drmCopilotExtension__run_poshqc_format`, `mcp__drmCopilotExtension__run_poshqc_analyze`, `mcp_drmcopilotext_run_poshqc_test`, `mcp__drmCopilotExtension__run_poshqc_analyze_autofix`), Pester, DI/mocking rules, and zero-regression deltas.
+description: Execute atomic_planner plans verbatim with atomic_executor rigor and PowerShell-specialized MCP quality gates (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp_drmcopilotext_run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), Pester, DI/mocking rules, and zero-regression deltas.
 argument-hint: "Provide the approved atomic plan text or path. I will run preflight validation, then execute tasks in order with strict acceptance checks and PowerShell-specific QA gates."
-tools: [vscode, execute/testFailure, execute/getTerminalOutput, execute/killTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
+tools: [vscode, execute/testFailure, execute/getTerminalOutput, execute/killTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drm-copilot/*', todo]
 ---
 
 # PowerShell Atomic Execution Agent (Plan-Following + Domain-Specialized)
@@ -239,7 +239,7 @@ If the user says "resume", "continue", or "try again":
 - Be concise but exact.
 - Do not paste large code blocks unless the user asks.
 - Always show the commands/tasks you run and summarize results (pass/fail, key errors).
-- When completing a task or a plan, report the toolchain status explicitly: `mcp__drmCopilotExtension__run_poshqc_format`, `mcp__drmCopilotExtension__run_poshqc_analyze`, and `mcp_drmcopilotext_run_poshqc_test`.
+- When completing a task or a plan, report the toolchain status explicitly: `mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, and `mcp_drmcopilotext_run_poshqc_test`.
 - Always end with the updated checklist so the user can see progress.
 
 ---
@@ -255,8 +255,8 @@ Always enforce repo policy order:
 5) `.github/instructions/powershell-unit-test.instructions.md`
 
 Required toolchain for PowerShell tasks:
-1) Format (`mcp__drmCopilotExtension__run_poshqc_format`)
-2) Analyze (`mcp__drmCopilotExtension__run_poshqc_analyze`)
+1) Format (`mcp__drm-copilot__run_poshqc_format`)
+2) Analyze (`mcp__drm-copilot__run_poshqc_analyze`)
 3) Test (`mcp_drmcopilotext_run_poshqc_test`)
 4) Coverage (when enforced)
 

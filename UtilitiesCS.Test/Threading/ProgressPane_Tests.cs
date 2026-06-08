@@ -18,14 +18,14 @@ namespace UtilitiesCS.Test.Threading
     ///     text) can be updated and read back.
     ///
     /// Constraints:
-    ///     All tests run on an STA thread (required by WinForms).
+    ///     This class runs under MSTest's STA class execution mode (required by WinForms).
     ///     Construction requires a non-null SynchronizationContext.Current so that
     ///     TaskScheduler.FromCurrentSynchronizationContext() can succeed; each test
     ///     installs and then restores the SynchronizationContext around the pane.
     ///     The CancelButton_Click handler disposes the pane — tests that invoke that
     ///     path must not use 'using' on the pane variable.
     /// </summary>
-    [TestClass]
+    [STATestClass]
     public class ProgressPane_Tests
     {
         // ---------------------------------------------------------------------------
@@ -54,7 +54,6 @@ namespace UtilitiesCS.Test.Threading
         ///     restores the prior context in the finally block.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void Constructor_CapturesCurrentSynchronizationContextAndScheduler()
         {
             // Arrange — install a known SynchronizationContext so the constructor
@@ -106,7 +105,6 @@ namespace UtilitiesCS.Test.Threading
         ///     must not be inside a using block.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void CancelButtonClick_WhenInvoked_CancelsTokenSource()
         {
             // Arrange — install a SynchronizationContext so the constructor succeeds.
@@ -166,7 +164,6 @@ namespace UtilitiesCS.Test.Threading
         ///     Pane is disposed via using block.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void BarValueAndJobNameText_WhenSet_ReflectAssignedValues()
         {
             // Arrange — install SynchronizationContext so the constructor succeeds.

@@ -23,10 +23,9 @@ namespace UtilitiesCS.Test.EmailIntelligence
     ///     PutCheckedStateMethod without requiring a live COM Outlook session.
     ///
     /// Usage:
-    ///     All tests bypass the COM-dependent constructor via
-    ///     FormatterServices.GetUninitializedObject and inject dependencies
-    ///     through reflection. Every test that touches WinForms controls must
-    ///     run on an STA thread.
+    ///     Tests bypass the COM-dependent constructor via FormatterServices.GetUninitializedObject
+    ///     and inject dependencies through reflection. WinForms-affine tests opt into MSTest's
+    ///     scoped STA execution explicitly.
     /// </summary>
     [TestClass]
     public class FilterOlFoldersController_Tests
@@ -157,8 +156,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// The test also exercises the three GetCheckedState outcomes: Checked,
         /// Indeterminate, and Unchecked.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void Constructor_WithMockedArchiveRoot_InitializesViewerAndGetCheckedStatePaths()
         {
             // Arrange
@@ -251,8 +249,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// The test uses an empty ScoDictionary so Serialize() is a no-op
         /// (Filepath is "").
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void Save_ClosesViewer_AndAccessesFilteredFolderScraping()
         {
             // Arrange
@@ -278,8 +275,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that Save removes keys that are no longer selected and adds new
         /// selected keys before serializing the backing dictionary.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void Save_WhenSelectionChanges_RemovesDeselectedKeysAndAddsSelectedKeys()
         {
             // Arrange
@@ -332,8 +328,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that Discard() closes the viewer form without requiring
         /// COM globals.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void Discard_ClosesViewer()
         {
             // Arrange
@@ -358,8 +353,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// (setting empty roots on both tree list views) given a synthetic tree
         /// and pre-initialized ExpandedObjects collections.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void OlFolderTree_PropertyChangedInternal_WithSyntheticTree_SetsEmptyRootsOnViewer()
         {
             // Arrange
@@ -390,8 +384,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that OlFolderTree_PropertyChanged follows the same-thread path when
         /// InvokeRequired is false and delegates to the internal refresh logic.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void OlFolderTree_PropertyChanged_OnSameThread_RefreshesViewerWithoutInvoke()
         {
             // Arrange
@@ -425,8 +418,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// all descendants when the tree is collapsed (IsExpanded returns false for
         /// a fresh TreeListView), returning CheckState.Checked.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void PutCheckedStateMethod_Collapsed_ChecksNodeAndDescendants()
         {
             // Arrange — bypass COM constructor; _viewer/_globals not needed
@@ -456,8 +448,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// all descendants when unchecking while the tree is collapsed, returning
         /// CheckState.Unchecked.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void PutCheckedStateMethod_Collapsed_UnchecksNodeAndDescendants()
         {
             // Arrange
@@ -486,8 +477,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that PutCheckedStateMethod updates only the current node when the
         /// tree reports the node as expanded.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void PutCheckedStateMethod_Expanded_UpdatesOnlyCurrentNode()
         {
             // Arrange
@@ -529,8 +519,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that the filtered and not-filtered forwarding helpers delegate to
         /// the correct viewer tree list view instance.
         /// </summary>
-        [STAThread]
-        [TestMethod]
+        [STATestMethod]
         public void PutCheckedStateMethodForwarders_UseTheirAssignedViewerTrees()
         {
             // Arrange

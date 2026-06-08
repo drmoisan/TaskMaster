@@ -30,10 +30,10 @@ namespace UtilitiesCS.Test.Dialogs
     ///     ShowDialog(), so tests remain non-blocking and deterministic.
     ///
     /// Constraints:
-    ///     All tests run on an STA thread (required by WinForms).
+    ///     This class runs under MSTest's STA class execution mode (required by WinForms).
     ///     Click handlers and private fields are accessed via reflection.
     /// </summary>
-    [TestClass]
+    [STATestClass]
     public class InputBoxViewer_Tests
     {
         [TestCleanup]
@@ -51,7 +51,6 @@ namespace UtilitiesCS.Test.Dialogs
         // ---------------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void Input_Text_ReflectsValueSetByDefaultResponse()
         {
             // Arrange — simulate what InputBox.ShowDialog does when setting DefaultResponse
@@ -70,7 +69,6 @@ namespace UtilitiesCS.Test.Dialogs
         // ---------------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void OkClick_WithNonEmptyText_SetsDialogResultToOk()
         {
             // Arrange — set a non-empty value so Ok_Click does not show a MessageBox
@@ -90,7 +88,6 @@ namespace UtilitiesCS.Test.Dialogs
         // ---------------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void CancelClick_SetsDialogResultToCancel()
         {
             // Arrange — InputBox.ShowDialog returns null when viewer.ShowDialog() == Cancel
@@ -108,7 +105,6 @@ namespace UtilitiesCS.Test.Dialogs
         // ---------------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void OkClick_CopiesTextboxTextAndHidesViewer()
         {
             // Arrange
@@ -129,7 +125,6 @@ namespace UtilitiesCS.Test.Dialogs
         // ---------------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void CancelClick_LeavesViewerInCancelState()
         {
             // Arrange — pre-populate the textbox
@@ -149,7 +144,6 @@ namespace UtilitiesCS.Test.Dialogs
         // ---------------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void DpiAware_SetsDpiCalledToTrue()
         {
             // Arrange — DpiCalled is reset in TestCleanup; confirm starting state
@@ -167,7 +161,6 @@ namespace UtilitiesCS.Test.Dialogs
         // ---------------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void ShowDialog_SeamReturnsOk_ReturnsEnteredText()
         {
             // Arrange — inject a seam that immediately returns OK and hard-wires the viewer's
@@ -191,7 +184,6 @@ namespace UtilitiesCS.Test.Dialogs
         // ---------------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void ShowDialog_SeamReturnsCancel_ReturnsNull()
         {
             // Arrange — inject a seam that immediately reports Cancel.

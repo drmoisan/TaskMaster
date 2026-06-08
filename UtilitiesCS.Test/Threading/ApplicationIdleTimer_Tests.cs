@@ -7,11 +7,29 @@ using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.Test.Threading
 {
+    // ApplicationIdleTimer exposes a static event whose backing field is shared
+    // with IdleAsyncQueue / IdleActionQueue, both of which Subscribe to the same
+    // event from their production paths. Running this class in parallel with
+    // those classes lets a concurrent Subscribe leave the event non-null when
+    // Unsubscribe runs here, which prevents Stop() from decrementing
+    // subscriptionCount and produces a deterministic-looking false failure.
     [TestClass]
+    [DoNotParallelize]
     public class ApplicationIdleTimer_Tests
     {
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            ResetSingletonState();
+        }
+
         [TestCleanup]
         public void TestCleanup()
+        {
+            ResetSingletonState();
+        }
+
+        private static void ResetSingletonState()
         {
             ClearApplicationIdleHandlers();
             ApplicationIdleTimer.Stop();

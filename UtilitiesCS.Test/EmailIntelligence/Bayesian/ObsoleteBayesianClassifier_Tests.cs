@@ -395,6 +395,35 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         }
 
         [TestMethod]
+        public async Task InferNegativeTokensAsync_WithLegacyNullProbabilities_RebuildsMatchFromSharedTokenBase()
+        {
+            // Arrange
+            var sharedTokens = Enumerable
+                .Repeat("shared-strong", 6)
+                .Concat(Enumerable.Repeat("shared-peer", 6))
+                .Concat(Enumerable.Repeat("negative-only", 6))
+                .ToArray();
+            var parent = CreateLegacyClassifierGroup(sharedTokens);
+            var classifier = new BayesianClassifierProbe
+            {
+                ParentGroup = parent,
+                MatchCorpus = new Corpus(Enumerable.Repeat("stale-match", 6)),
+                NotMatchCorpus = new Corpus(Enumerable.Repeat("negative-only", 6)),
+                ProbabilityMap = null,
+            };
+
+            // Act
+            await classifier.InferNegativeTokensAsync(CancellationToken.None);
+            await classifier.RecalcProbsAsync(CancellationToken.None);
+
+            // Assert
+            classifier.Match.TokenFrequency.Should().ContainKey("shared-strong");
+            classifier.Match.TokenFrequency.Should().ContainKey("shared-peer");
+            classifier.Match.TokenFrequency.Should().NotContainKey("stale-match");
+            classifier.Prob.Should().NotBeNullOrEmpty();
+        }
+
+        [TestMethod]
         public async Task FromTokenBaseAsync_WithValidInputs_ReturnsClassifierWithProbabilities()
         {
             // Arrange

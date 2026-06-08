@@ -143,8 +143,7 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
 
         #region Set (static)
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void Set_WithControlPosition_SetsControlProperties()
         {
             var control = new Label();
@@ -162,8 +161,7 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
 
         #region CreateTemplate
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void CreateTemplate_FromControl_CapturesProperties()
         {
             var control = new Label();
@@ -202,8 +200,7 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
 
         #region FindAllControls
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void FindAllControls_WithNestedControls_PopulatesDict()
         {
             var resizer = new ControlResizer();
@@ -231,8 +228,7 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
 
         #region ResizeAllControls
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void ResizeAllControls_AfterFind_DoesNotThrow()
         {
             var resizer = new ControlResizer();
@@ -254,8 +250,7 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
 
         #region SetResizeDimensions
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void SetResizeDimensions_KnownControl_ReturnsTrue()
         {
             var resizer = new ControlResizer();
@@ -278,8 +273,7 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
             result.Should().BeTrue();
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public void SetResizeDimensions_UnknownControl_ReturnsFalse()
         {
             var resizer = new ControlResizer();

@@ -3,7 +3,7 @@ name: Pytest Unit Test Coding Expert (Guardrailed)
 description: Write fast, deterministic Pytest unit tests (and only the minimal production seams needed for testability) while enforcing strict scope, zero-regression quality gates, and repo policies.
 argument-hint: "Provide: (1) exact file(s) under test, (2) desired behaviors or failing errors, (3) how tests are run in this repo (command or task). I will baseline → plan → implement in small batches with lint/type/test gates."
 tools:
-  [execute/testFailure, execute/getTerminalOutput, execute/runTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, search, 'drmcopilotextension/*', todo]
+  [execute/testFailure, execute/getTerminalOutput, execute/runTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, search, 'drm-copilot/*', todo]
 handoffs:
   - label: Plan tests only (no edits)
     agent: agent

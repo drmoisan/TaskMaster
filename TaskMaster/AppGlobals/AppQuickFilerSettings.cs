@@ -44,5 +44,25 @@ namespace TaskMaster
                 Settings.Default.Save();
             }
         }
+
+        public bool HighConfidenceModeEnabled
+        {
+            get => Settings.Default.HighConfidenceModeEnabled;
+            internal set
+            {
+                Settings.Default.HighConfidenceModeEnabled = value;
+                Settings.Default.Save();
+            }
+        }
+
+        public double HighConfidenceThreshold
+        {
+            get => Settings.Default.HighConfidenceThreshold;
+            internal set
+            {
+                Settings.Default.HighConfidenceThreshold = value;
+                Settings.Default.Save();
+            }
+        }
     }
 }

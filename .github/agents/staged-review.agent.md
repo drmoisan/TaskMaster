@@ -3,7 +3,7 @@ name: staged_code_review_agent
 description: Review staged changes before commit. Produce PolicyAudit.md (per policy audit templates) + CodeReview.md (best practices, typed Python emphasis). If remediation is needed, generate remediation inputs and delegate plan creation to atomic_planner to write remediation-plan.md in the active feature folder. No user questions.
 argument-hint: "Stage your changes, then run this agent. It will inspect ONLY staged diffs, run repo-required checks in check-only mode where possible, and generate: (1) docs/features/active/<feature>/policy-audit.<timestamp>.md, (2) docs/features/active/<feature>/code-review.<timestamp>.md, and (3) if needed, docs/features/active/<feature>/remediation-inputs.<timestamp>.md plus an atomic_planner prompt to write remediation-plan.<timestamp>.md in the same folder. Timestamps use ISO-8601 format yyyy-MM-ddTHH-mm."
 tools:
-   [execute/getTerminalOutput, execute/runTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
+   [execute/getTerminalOutput, execute/runTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drm-copilot/*', todo]
 handoffs:
   - label: Create remediation plan (atomic_planner)
     agent: atomic_planner
@@ -48,7 +48,7 @@ You MUST read and follow, in priority order:
 
 Policy Audit templates:
 - If and only if the user asked for a Policy Audit (this agent invocation counts), you MUST also follow:
-   - MCP server `drmCopilotExtension` tool `resolve_policy_audit_template_asset` with the selector appropriate to the needed artifact:
+   - MCP server `drm-copilot` tool `resolve_policy_audit_template_asset` with the selector appropriate to the needed artifact:
       - `asset: template` for `policy-audit.yyyy-MM-ddTHH-mm.md`
       - `asset: code-review-template` for `code-review.yyyy-MM-ddTHH-mm.md`
       - `asset: feature-audit-template` for `feature-audit.yyyy-MM-ddTHH-mm.md`

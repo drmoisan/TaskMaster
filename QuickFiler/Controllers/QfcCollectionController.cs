@@ -411,6 +411,95 @@ namespace QuickFiler.Controllers
             //var conversationTasks = _itemGroups.Select(grp => grp.ItemController.LoadConversationResolverAsync(TokenSource, Token, false)).ToList();
         }
 
+        /// <summary>
+        /// High-confidence (Issue #171) carrier-list overload. Builds UI item controllers for the
+        /// pre-filtered survivors in <paramref name="preScored"/>, mirroring the standard
+        /// <see cref="LoadControlsAndHandlers_01Async(IList{MailItem}, RowStyle, RowStyle)"/> path but
+        /// threading each survivor's predetermined folder into its <see cref="QfcItemGroup"/> and item
+        /// controller so the folder is preselected instead of selected by index.
+        /// </summary>
+        public async Task LoadControlsAndHandlers_01Async(
+            IList<QfcPreScoredItem> preScored,
+            RowStyle template,
+            RowStyle templateExpanded
+        )
+        {
+            var items = preScored.Select(x => x.MailItem).ToList();
+            ValidateParams(items, template, templateExpanded);
+
+            // Start loading mail item helpers
+            var helpers = items.Select(GetPartiallyInitializedHelperAsync).ToList();
+
+            // Freeze the form while loading controls
+            _formViewer.SuspendLayout();
+            var tlpLayoutState = SafeSetTlpLayout(false);
+
+            // Save the QfcItem template styles
+            _template = template;
+            _templateExpanded = templateExpanded;
+
+            // Hook the move monitor to the mail items
+            BackgroundLoadingTasks.Add(
+                Task.Run(() =>
+                    items.ForEach(mailItem =>
+                        _moveMonitor.HookItem(mailItem, (x) => RemovedItemMonitor(x.EntryID))
+                    )
+                )
+            );
+
+            // Create empty keyboard handler actions
+            BackgroundLoadingTasks.Add(Task.Run(CreateEmptyKbdHandlerCharActions, Token));
+
+            // Create the item groups, carrying each survivor's predetermined folder
+            var digits = preScored.Count >= 10 ? 2 : 1;
+            _itemGroups =
+            [
+                .. preScored.Select(
+                    (scored, i) =>
+                        EncapsulateItemGroup(
+                            template,
+                            scored.MailItem,
+                            i,
+                            digits,
+                            _tlpStates,
+                            scored.PredeterminedFolder
+                        )
+                ),
+            ];
+
+            // Initialize graphics
+            foreach (var group in _itemGroups)
+            {
+                await group.ItemController.InitializeGraphicsAsync();
+            }
+
+            while (helpers.Count > 0)
+            {
+                var helperTask = await Task.WhenAny(helpers);
+                var helper = await helperTask;
+                helpers.Remove(helperTask);
+                var grp = _itemGroups.FirstOrDefault(x => x.MailItem.EntryID == helper.EntryId);
+                grp.ItemController.PopulateControls(helper, grp.ItemController.ItemNumber);
+            }
+
+            // Wait until Background Loading Tasks finish and then clear the collection
+            await Task.WhenAll(BackgroundLoadingTasks);
+            BackgroundLoadingTasks = [];
+
+            WireUpAsyncKeyboardHandler();
+
+            // Restore state of window
+            TlpLayout = tlpLayoutState;
+            if (_formViewer.InvokeRequired)
+            {
+                _formViewer.Invoke(() => _formViewer.ResumeLayout());
+            }
+            else
+            {
+                _formViewer.ResumeLayout();
+            }
+        }
+
         //public async Task LoadSecondaryAsync()
         //{
         //    // Ensure the token is not canceled before starting
@@ -514,10 +603,11 @@ namespace QuickFiler.Controllers
             MailItem mailItem,
             int i,
             int digits,
-            TlpCellStates tlpStates
+            TlpCellStates tlpStates,
+            string predeterminedFolder = null
         )
         {
-            var grp = new QfcItemGroup(mailItem);
+            var grp = new QfcItemGroup(mailItem) { PredeterminedFolder = predeterminedFolder };
             var itemViewer = ItemViewerQueue.Dequeue(_homeController.Token);
             LoadItemToTlp(itemViewer, i, template, true, 0);
             grp.ItemViewer = itemViewer;
@@ -529,7 +619,8 @@ namespace QuickFiler.Controllers
                 i + 1,
                 digits,
                 grp.MailItem,
-                tlpStates
+                tlpStates,
+                predeterminedFolder
             );
             grp.ItemController.Token = Token;
             return grp;
@@ -947,6 +1038,45 @@ namespace QuickFiler.Controllers
             var group = _itemGroups.Where(x => x.MailItem.EntryID == entryID).FirstOrDefault();
             if (group is not null)
                 RemoveSpecificControlGroup(group.ItemController.ItemNumber);
+        }
+
+        /// <summary>
+        /// Seam used by <see cref="RemoveBelowThresholdAsync(double)"/> to remove a single group
+        /// by EntryID. Defaults to the existing UI-thread removal path
+        /// (<see cref="RemoveSpecificControlGroup(string)"/>), which unhooks the move monitor and
+        /// renumbers remaining groups. Tests inject a recording delegate so the below-threshold
+        /// selection logic can be verified without WinForms/COM state.
+        /// </summary>
+        private Func<string, Task> _removeGroupByEntryId;
+
+        private Func<string, Task> RemoveGroupByEntryId =>
+            _removeGroupByEntryId ??= entryID =>
+            {
+                RemoveSpecificControlGroup(entryID);
+                return Task.CompletedTask;
+            };
+
+        /// <inheritdoc/>
+        public async Task RemoveBelowThresholdAsync(double threshold)
+        {
+            if (_itemGroups is null)
+            {
+                return;
+            }
+
+            long cutoff = (long)Math.Round(threshold * 1000, 0);
+
+            // Capture EntryIDs of below-threshold groups before removing any, so renumbering and
+            // list mutation during removal cannot cause index drift mid-iteration.
+            var entryIdsToRemove = _itemGroups
+                .Where(group => group.ItemController.TopFolderScore < cutoff)
+                .Select(group => group.MailItem.EntryID)
+                .ToList();
+
+            foreach (var entryID in entryIdsToRemove)
+            {
+                await RemoveGroupByEntryId(entryID);
+            }
         }
 
         /// <summary>

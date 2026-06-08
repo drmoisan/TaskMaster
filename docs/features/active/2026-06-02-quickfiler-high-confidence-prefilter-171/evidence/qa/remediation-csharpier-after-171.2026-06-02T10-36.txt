@@ -1,0 +1,27 @@
+CSharpier check after csproj restoration — Issue #171
+Task: [P3-T3]
+Timestamp: 2026-06-02T10-36
+Finding: R3
+
+=== Command ===
+dotnet tool run csharpier check .
+Exit code: 0
+
+=== Output ===
+  Warning The csproj at ...\TaskMaster\TaskMaster_BACKUP_1250.csproj failed to load ...
+    (pre-existing invalid backup file; not formatted)
+  Warning .\TaskMaster\TaskMaster_BACKUP_1250.csproj - Appeared to be invalid xml so was
+    not formatted.
+  Checked 1062 files in 8744ms.
+
+=== Comparison to P0-T4 baseline ===
+P0-T4 baseline (exit 1) reported:
+  Error .\TaskMaster\TaskMaster.csproj - Was not formatted.
+    The file did not end with a single newline.
+After restoration (exit 0): that Error is GONE. The TaskMaster.csproj newline finding is
+resolved. The only remaining message is the pre-existing TaskMaster_BACKUP_1250.csproj
+warning, which is unrelated to Issue #171 and was present before this branch.
+
+Conclusion: the R3 restoration introduces no new CSharpier error and clears the
+trailing-newline error that this branch had introduced. CSharpier now reports clean
+(exit 0) for the in-scope files.

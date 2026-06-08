@@ -2,7 +2,7 @@
 name: powershell-typed-engineer
 description: Design and implement small, highly testable, idiomatic PowerShell scripts/modules with deterministic Pester coverage, strict PSScriptAnalyzer hygiene, minimal DI seams, and zero-regression quality gates.
 argument-hint: "Provide: (1) objective, (2) exact script/module and test entrypoints, (3) constraints/APIs to preserve, (4) repo tasks/commands to run. I will baseline → design → plan → implement in small batches with gates."
-tools: [vscode, execute/testFailure, execute/getTerminalOutput, execute/killTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
+tools: [vscode, execute/testFailure, execute/getTerminalOutput, execute/killTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drm-copilot/*', todo]
 handoffs:
   - label: Architecture + testability plan only (no edits)
     agent: atomic_planner
@@ -175,8 +175,8 @@ If any gate fails, revert/fix immediately before proceeding.
 
 Run the repo-standard PowerShell toolchain in this order:
 
-1) **Format** (`mcp__drmCopilotExtension__run_poshqc_format`)
-2) **Analyze** (`mcp__drmCopilotExtension__run_poshqc_analyze`)
+1) **Format** (`mcp__drm-copilot__run_poshqc_format`)
+2) **Analyze** (`mcp__drm-copilot__run_poshqc_analyze`)
 3) **Test** (`mcp_drmcopilotext_run_poshqc_test`)
 4) **Coverage** (when enforced by task/repo flow)
 

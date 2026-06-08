@@ -6,13 +6,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test.Dialogs
 {
-    [TestClass]
+    [STATestClass]
     public class DelegateButton_Tests
     {
         #region Constructors
 
         [TestMethod]
-        [STAThread]
         public void DefaultConstructor_CreatesInstance()
         {
             var db = new DelegateButton();
@@ -20,7 +19,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void Constructor_WithNameAndText_CreatesButton()
         {
             Action del = () => { };
@@ -33,7 +31,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void Constructor_WithDialogResult_SetsDialogResult()
         {
             Action del = () => { };
@@ -43,7 +40,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void Constructor_WithButtonAndDialogResult_SetsProperties()
         {
             var button = new Button();
@@ -59,7 +55,6 @@ namespace UtilitiesCS.Test.Dialogs
         #region Properties
 
         [TestMethod]
-        [STAThread]
         public void Name_SetAndGet()
         {
             var db = new DelegateButton();
@@ -68,7 +63,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void Delegate_SetAndGet()
         {
             var db = new DelegateButton();
@@ -82,7 +76,6 @@ namespace UtilitiesCS.Test.Dialogs
         #region MakeButton
 
         [TestMethod]
-        [STAThread]
         public void MakeButton_WithText_CreatesButton()
         {
             Action del = () => { };
@@ -96,7 +89,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void MakeButton_WithDialogResult_SetsResult()
         {
             Action del = () => { };
@@ -111,7 +103,6 @@ namespace UtilitiesCS.Test.Dialogs
         #region Button_Click
 
         [TestMethod]
-        [STAThread]
         public void Button_Click_InvokesDelegate()
         {
             bool delegateCalled = false;
@@ -127,7 +118,6 @@ namespace UtilitiesCS.Test.Dialogs
         #region FromButton
 
         [TestMethod]
-        [STAThread]
         public void FromButton_CreatesFromExistingButton()
         {
             var button = new Button { Text = "Existing" };

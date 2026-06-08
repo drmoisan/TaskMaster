@@ -56,6 +56,40 @@ namespace QuickFiler.Controllers
             );
         }
 
+        /// <summary>
+        /// High-confidence (Issue #171) constructor overload. Behaves identically to the primary
+        /// constructor but records the predetermined high-confidence folder so
+        /// <see cref="AssignFolderComboBox"/> preselects that folder instead of selecting by index.
+        /// </summary>
+        /// <param name="predeterminedFolder">
+        /// The predetermined top-suggestion folder path, or null for the standard (non-high-confidence)
+        /// path in which the index-based selection is used.
+        /// </param>
+        public QfcItemController(
+            IApplicationGlobals appGlobals,
+            IFilerHomeController homeController,
+            IQfcCollectionController parent,
+            ItemViewer itemViewer,
+            int viewerPosition,
+            int itemNumberDigits,
+            MailItem mailItem,
+            TlpCellStates tlpStates,
+            string predeterminedFolder
+        )
+        {
+            SaveParameters(
+                appGlobals,
+                homeController,
+                parent,
+                itemViewer,
+                viewerPosition,
+                itemNumberDigits,
+                mailItem,
+                tlpStates
+            );
+            _predeterminedFolder = predeterminedFolder;
+        }
+
         public QfcItemController(
             IApplicationGlobals AppGlobals,
             IFilerHomeController homeController,
@@ -871,10 +905,36 @@ namespace QuickFiler.Controllers
 
             if (_folderHandler?.FolderArray?.Length > 0)
             {
-                _itemViewer.CboFolders.Items.AddRange(_folderHandler.FolderArray);
-                _itemViewer.CboFolders.SelectedIndex = 1;
-                _selectedFolder = _itemViewer.CboFolders.SelectedItem as string;
+                _selectedFolder = PopulateAndSelectFolder(
+                    _itemViewer.CboFolders,
+                    _folderHandler.FolderArray,
+                    _predeterminedFolder
+                );
             }
+        }
+
+        /// <summary>
+        /// Populates <paramref name="comboBox"/> with <paramref name="folderArray"/> and selects the
+        /// folder to display. High-confidence mode (Issue #171): when
+        /// <paramref name="predeterminedFolder"/> is non-empty and present in the combo box, that
+        /// folder is preselected; otherwise the existing index-1 behavior (the top suggestion) is
+        /// used. Pure WinForms-only logic with no <c>InvokeRequired</c> marshaling, so it is unit
+        /// testable without a fully-constructed item viewer.
+        /// </summary>
+        /// <returns>The selected folder text, or null when nothing is selected.</returns>
+        internal static string PopulateAndSelectFolder(
+            System.Windows.Forms.ComboBox comboBox,
+            string[] folderArray,
+            string predeterminedFolder
+        )
+        {
+            comboBox.Items.AddRange(folderArray);
+
+            int predeterminedIndex = string.IsNullOrEmpty(predeterminedFolder)
+                ? -1
+                : comboBox.Items.IndexOf(predeterminedFolder);
+            comboBox.SelectedIndex = predeterminedIndex >= 0 ? predeterminedIndex : 1;
+            return comboBox.SelectedItem as string;
         }
 
         public void Cleanup()
@@ -1084,6 +1144,19 @@ namespace QuickFiler.Controllers
         {
             get => _selectedFolder;
         }
+
+        /// <summary>
+        /// The predetermined high-confidence folder path (Issue #171), set via the constructor when
+        /// the item arrives through the high-confidence carrier-list load path. Null on the standard
+        /// path, in which <see cref="AssignFolderComboBox"/> keeps its index-1 selection behavior.
+        /// </summary>
+        private readonly string _predeterminedFolder;
+
+        /// <summary>
+        /// Gets the top folder suggestion score for this item, in 0-1000 score units, or 0 when
+        /// the folder handler has not produced suggestions. Read-only seam over the folder handler.
+        /// </summary>
+        public long TopFolderScore => _folderHandler?.Suggestions?.TopScore() ?? 0;
 
         public bool SuppressEvents
         {

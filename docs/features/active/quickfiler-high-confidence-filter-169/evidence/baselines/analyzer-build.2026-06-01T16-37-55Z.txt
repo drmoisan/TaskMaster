@@ -1,0 +1,19 @@
+Command: msbuild TaskMaster.sln /t:Build /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true
+Working directory: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-01-08-21
+Timestamp (UTC): 2026-06-01T16-37-55Z
+MSBuild: 18.6.3+84d3e95b4 for .NET Framework
+
+Environment prerequisite performed before build:
+- NuGet package restore was required (no `packages` folder present). Ran: nuget.exe restore TaskMaster.sln
+  Result: Installed 163 package(s) to packages.config projects. This is environment setup, not a code change.
+
+Result: PASS (exit code 0)
+Warning count: 61 (all pre-existing; CS8632 nullable-annotation-context, CS0067 unused event, MSTEST0032 — none in files touched by issue #169)
+Error count: 0
+
+Resolved Debug output directory for the three in-scope test assemblies (Platform = Any CPU):
+- UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll  (confirmed present)
+- QuickFiler.Test\bin\Debug\QuickFiler.Test.dll    (confirmed present)
+- TaskMaster.Test\bin\Debug\TaskMaster.Test.dll    (confirmed present)
+
+The output platform is "Any CPU" -> bin\Debug (not x86). These paths match the plan's stated assembly paths.

@@ -18,10 +18,11 @@ namespace UtilitiesCS.Test.Dialogs
     ///     FunctionButtonGroup&lt;T&gt; routes results through the delegate correctly.
     ///
     /// Constraints:
-    ///     Tests that instantiate WinForms controls require STA threads.
+    ///     This class runs under MSTest's STA class execution mode because its
+    ///     tests create WinForms controls directly or through MyBox helpers.
     ///     Internal members are accessible via InternalsVisibleTo("UtilitiesCS.Test").
     /// </summary>
-    [TestClass]
+    [STATestClass]
     public class MyBox_Tests
     {
         // ---------------------------------------------------------------------------
@@ -81,7 +82,6 @@ namespace UtilitiesCS.Test.Dialogs
         // ---------------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void ToActionButtons_KeyContainingCancel_AssignsCancelDialogResult()
         {
             // Arrange — create actions where one key contains "Cancel" and one does not
@@ -101,7 +101,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void ToActionButtons_NoKeyContainingCancel_AllGetOkDialogResult()
         {
             // Arrange
@@ -125,7 +124,6 @@ namespace UtilitiesCS.Test.Dialogs
         // ---------------------------------------------------------------------------
 
         [TestMethod]
-        [STAThread]
         public void ToFunctionButtonsAsync_WhenFunctionInvoked_SetsGroupResult()
         {
             // Arrange — create a single-entry dictionary mapping a label to an async function
@@ -147,7 +145,6 @@ namespace UtilitiesCS.Test.Dialogs
         }
 
         [TestMethod]
-        [STAThread]
         public void ToFunctionButtonsAsync_MultipleFunctions_EachButtonHasOkDialogResult()
         {
             // Arrange
@@ -183,7 +180,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     Passes when <c>wasCalled</c> is true after Button1.PerformClick().
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void MappedDelegate_IsInvokedWhenButton1IsClicked()
         {
             // Arrange: build a map whose first delegate records a call
@@ -233,7 +229,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     Passes when L2Bottom.Controls contains zero Button instances.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void RemoveStandardButtons_LeavesNoButtonControlsInBottomPanel()
         {
             // Arrange
@@ -271,7 +266,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     sum of ColumnStyles[1] and ColumnStyles[2] widths.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void CalcMinSize_AfterInit_ReturnsExpectedReducedWidth()
         {
             // Arrange: read the actual (DPI-scaled) values to avoid hardcoding

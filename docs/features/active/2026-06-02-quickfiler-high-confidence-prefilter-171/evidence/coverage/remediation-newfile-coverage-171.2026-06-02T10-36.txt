@@ -1,0 +1,22 @@
+New-file coverage verification — Issue #171
+Task: [P2-T1]
+Timestamp: 2026-06-02T10-36
+Finding: R2
+
+Source: artifacts/csharp/coverage.xml (Cobertura)
+Method: aggregated all <class> nodes whose filename ends with
+  \QuickFiler\Controllers\QfcHighConfidencePreFilter.cs (production file only; the
+  test file QfcHighConfidencePreFilterTests.cs is excluded), deduplicating line numbers
+  across partial-class entries (max hits per line number).
+
+=== Result for QfcHighConfidencePreFilter.cs (production) ===
+Total distinct covered-instrumented lines: 27
+Covered lines (hits > 0): 27
+Uncovered lines: (none)
+Line coverage: 100.00%
+
+Gate (>= 90%): PASS (100.00% >= 90%).
+
+Note: [ExcludeFromCodeCoverage] on FolderScoringService was NOT relaxed; the COM-bound
+adapter remains excluded. The 100% figure reflects the testable surface of the new
+pre-filter file exercised by QfcHighConfidencePreFilterTests.cs.

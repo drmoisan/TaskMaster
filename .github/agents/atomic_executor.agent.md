@@ -242,7 +242,7 @@ If the user says “resume”, “continue”, or “try again”:
 - When completing a task or a plan, report the toolchain status explicitly: 
   - For python, this is Black, Ruff, Pyright, Pytest, and coverage.
   - For bash, this is shell QC and bats testing.
-  - For powershell, this is `mcp__drmCopilotExtension__run_poshqc_format`, `mcp__drmCopilotExtension__run_poshqc_analyze`, and `mcp_drmcopilotext_run_poshqc_test`.
+  - For powershell, this is `mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, and `mcp_drmcopilotext_run_poshqc_test`.
   - For json, this is json formatting and json linting.
 - Always end with the updated checklist so the user can see progress.
 

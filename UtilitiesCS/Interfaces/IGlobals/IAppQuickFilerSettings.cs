@@ -6,5 +6,7 @@
         bool SaveAttachments { get; }
         bool SaveEmailCopy { get; }
         bool SavePictures { get; }
+        bool HighConfidenceModeEnabled { get; }
+        double HighConfidenceThreshold { get; }
     }
 }

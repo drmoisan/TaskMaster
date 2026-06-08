@@ -1,7 +1,7 @@
 ---
 name: typescript-engineer
 description: TypeScript engineer agent aligned to repo toolchain and suppression policies.
-tools: [vscode, execute, read, agent, edit, search, web, 'drmcopilotextension/*', todo]
+tools: [vscode, execute, read, agent, edit, search, web, 'drm-copilot/*', todo]
 handoffs:
   - label: TDD Red Phase (write failing tests first)
     agent: "TDD Red Phase - Write Failing Tests First"

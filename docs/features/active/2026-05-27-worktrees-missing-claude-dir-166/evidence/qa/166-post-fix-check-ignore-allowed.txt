@@ -1,0 +1,15 @@
+[P4-T1] Post-Fix Verification — Tooling Subtrees No Longer Ignored — Issue #166
+Captured: 2026-05-27T11:32 (local)
+.gitignore state: FIXED (bare `.claude` replaced with targeted ignores)
+
+git check-ignore semantics: prints a path and exits 0 when IGNORED;
+prints nothing and exits 1 when NOT ignored.
+
+Command: git check-ignore .claude/skills .claude/agents .claude/hooks .claude/rules .claude/settings.json
+Output:
+(nothing printed)
+EXIT_CODE=1
+
+Result: None of the five tooling paths are ignored after the fix. The agentic
+tooling environment (agents/, hooks/, rules/, skills/, settings.json) is now
+trackable and will materialize in git worktrees (Issue #166 resolved).

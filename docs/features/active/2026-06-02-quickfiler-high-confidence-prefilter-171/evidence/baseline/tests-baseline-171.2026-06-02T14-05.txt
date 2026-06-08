@@ -1,0 +1,26 @@
+Baseline test run — Issue #171
+Task: [P0-T6]
+Timestamp: 2026-06-02T14-05 (executed 2026-06-02 09:49)
+
+Command:
+  vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage
+
+Result:
+  Total tests: 3925
+       Passed: 3916
+       Failed: 9   (8 unique test methods; one method logged twice)
+  Total time: ~52.7s
+
+Pre-existing failing tests (NOT in Issue #171 scope; all timer/timing/threading/serialization
+flaky tests in UtilitiesCS.Test, none in the QuickFiler controller suites being modified):
+  - AddEntry_UseUiThreadTrue_DequeuesEntryAndSuppressesDispatcherException
+  - AsyncMultiTaskChunker_SyncFuncOverload_WhenWorkSpansTimerInterval_ReportsProgress
+  - EmptyQueue_AfterSeveralIntervals_StopsTimer
+  - Enqueue_InvokesBatchActionsOnTimerInterval
+  - RequestTask_WithConfiguredTask_InvokesTaskAfterInterval
+  - Serialize_WithConfiguredPath_TriggersDeferredThreadSafeWrite
+  - StartNew_ConfiguresAutoResetAndInvokesCallback
+  - StartTimer_RaisesElapsedEvent
+
+These 8 are the regression baseline. The final P7 regression check confirms no previously-passing
+test fails after Issue #171 changes, and that the QuickFiler controller suites remain green.

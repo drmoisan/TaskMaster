@@ -19,11 +19,11 @@ namespace UtilitiesCS.Test.EmailIntelligence
     ///     constructor are asserted via reflection on the private treeListView field).
     ///
     /// Usage:
-    ///     All tests instantiate OSBrowser on an STA thread. The constructor calls
+    ///     This class runs under MSTest's STA class execution mode. The constructor calls
     ///     SetupColumns(), SetupDragAndDrop(), and SetupTree() which enumerate real
     ///     drives; tests only assert on delegate assignment and format output.
     /// </summary>
-    [TestClass]
+    [STATestClass]
     public class OSBrowser_Tests
     {
         // ---------------------------------------------------------------------------
@@ -49,7 +49,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// AspectGetters to the size and file-type columns (confirming columns were
         /// initialised with custom configuration, not left at designer defaults only).
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void Constructor_SetupColumns_AttachesAspectGetterToSizeColumn()
         {
@@ -71,7 +70,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that the OSBrowser constructor's SetupTree() call assigns both
         /// CanExpandGetter and ChildrenGetter on the TreeListView.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void Constructor_SetupTree_AssignsBothDelegates()
         {
@@ -92,7 +90,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that FormatFileSize returns a "bytes" string when the input is
         /// below the 1 KB threshold.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void FormatFileSize_WithBytesInput_ReturnsBytesString()
         {
@@ -114,7 +111,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that FormatFileSize returns a "KB" string for a 1 KB input and
         /// an "MB" string for a 1 MB input.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void FormatFileSize_WithKbAndMbInputs_ReturnsCorrectUnits()
         {
@@ -139,7 +135,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         ///     AspectGetter and AspectToStringConverter branches for directory, file,
         ///     missing-file, file-type, and attribute scenarios.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void Constructor_WiredDelegates_HandleDirectoryFileAndMissingFileInputs()
         {
@@ -229,7 +224,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// <see cref="System.Collections.ArrayList"/> when directory enumeration raises
         /// <see cref="UnauthorizedAccessException"/>.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void Constructor_ChildrenGetter_WhenDirectoryAccessDenied_ReturnsEmptyArrayList()
         {

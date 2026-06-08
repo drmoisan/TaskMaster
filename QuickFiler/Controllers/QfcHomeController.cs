@@ -226,6 +226,21 @@ namespace QuickFiler.Controllers
                     token
                 ).Init();
 
+        /// <summary>
+        /// Injectable seam for the high-confidence pre-UI scoring/filter pass. Defaults to
+        /// <see cref="QfcHighConfidencePreFilter.FilterAsync"/>; tests override it to assert the
+        /// pre-filter is invoked (and ordered) without running live Outlook scoring.
+        /// </summary>
+        internal Func<
+            IList<MailItem>,
+            IApplicationGlobals,
+            double,
+            CancellationToken,
+            Task<IList<QfcPreScoredItem>>
+        > HighConfidencePreFilterLoader { get; set; } =
+            (items, globals, threshold, token) =>
+                QfcHighConfidencePreFilter.FilterAsync(items, globals, threshold, token);
+
         #endregion Constructors, Initializers, and Destructors
 
         public void Run()
@@ -259,7 +274,27 @@ namespace QuickFiler.Controllers
             progress.Report(30, "Initializing Qfc Items");
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(QfcFormController.LoadItemsAsync)} ...");
-            await _formController.LoadItemsAsync(listEmail);
+            // High-confidence mode (Issue #171): score and filter the candidate batch off the UI
+            // thread BEFORE any UI item controller is constructed, then load only the surviving
+            // above-threshold items (each carrying its predetermined folder). When the mode is
+            // disabled (default and standard entry point), the existing IList<MailItem> path is used
+            // unchanged with no pre-pass.
+            if (Globals.QfSettings.HighConfidenceModeEnabled)
+            {
+                IList<QfcPreScoredItem> preScored = await Task.Run(async () =>
+                    await HighConfidencePreFilterLoader(
+                        listEmail,
+                        Globals,
+                        Globals.QfSettings.HighConfidenceThreshold,
+                        Token
+                    )
+                );
+                await _formController.LoadItemsAsync(preScored);
+            }
+            else
+            {
+                await _formController.LoadItemsAsync(listEmail);
+            }
 
             progress?.Report(100);
 

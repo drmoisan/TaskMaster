@@ -853,8 +853,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
                 );
         }
 
-        [TestMethod]
-        [STAThread]
+        [STATestMethod]
         public async Task BuildClassifiersAsync_MissingStagingData_ShowsActionableWarningInsteadOfThrowing()
         {
             var mockGlobals = CreateMockGlobals();

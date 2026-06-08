@@ -200,7 +200,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 .Cast<object>()
                 .Where(x => x is MailItem)
                 .Cast<MailItem>()
-                .Take(1) // Outlook conversation view may expand Selection to include the entire thread; process only the focused item.
+                .GroupBy(m => m.ConversationID)
+                .Select(g => g.First())
                 .ToAsyncEnumerable();
 
             await foreach (var mailItem in mailItems.WithCancellation(token))

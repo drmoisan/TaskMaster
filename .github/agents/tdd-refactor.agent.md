@@ -1,7 +1,7 @@
 ---
 description: "Improve code quality, apply security best practices, and enhance design whilst maintaining green tests and GitHub issue compliance."
 name: "TDD Refactor Phase - Improve Quality & Security"
-tools: [execute/testFailure, execute/getTerminalOutput, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, edit/editFiles, search, 'github/*', 'drmcopilotextension/*']
+tools: [execute/testFailure, execute/getTerminalOutput, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, edit/editFiles, search, 'github/*', 'drm-copilot/*']
 ---
 
 # TDD Refactor Phase - Improve Quality & Security

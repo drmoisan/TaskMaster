@@ -17,11 +17,12 @@ namespace UtilitiesCS.Test.EmailIntelligence
     ///     FolderTree property mirrors the most-recently supplied reference.
     ///
     /// Usage:
-    ///     All tests instantiate FolderInfoViewer and FolderTree on an STA thread.
+    ///     This class runs under MSTest's STA class execution mode because every
+    ///     test instantiates FolderInfoViewer and FolderTree.
     ///     A synthetic FolderTree with an empty _roots list is used to avoid
     ///     accessing COM MAPIFolder objects; TreeListView.Roots accepts null/empty.
     /// </summary>
-    [TestClass]
+    [STATestClass]
     public class FolderInfoViewer_Tests
     {
         // ---------------------------------------------------------------------------
@@ -49,7 +50,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that after calling SetFolderTree the internal FolderTree property
         /// returns the same instance that was passed in.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void SetFolderTree_AssignedOnce_PropertyReturnsSuppliedReference()
         {
@@ -72,7 +72,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that calling SetFolderTree a second time replaces the previously
         /// stored reference with the most-recently supplied instance.
         /// </summary>
-        [STAThread]
         [TestMethod]
         public void SetFolderTree_ReassignedWithNewInstance_PropertyReturnsMostRecentReference()
         {

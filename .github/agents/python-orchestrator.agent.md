@@ -2,7 +2,7 @@
 name: python-orchestrator
 description: Orchestrate end-to-end Python feature/bug delivery by estimating change budget, routing small changes through promotion -> folder -> minimal-plan -> development -> QC -> small-audit, and routing larger efforts through scope -> promotion -> research -> spec -> atomic planning -> atomic execution -> feature review until complete.
 argument-hint: "Provide objective, affected files (if known), and whether this is likely bug or feature. The orchestrator will estimate change budget, choose the workflow path, delegate to specialist agents, and persist until completion."
-tools: [vscode/runCommand, vscode/extensions, execute/getTerminalOutput, execute/runTask, execute/createAndRunTask, execute/runInTerminal, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, read/getTaskOutput, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
+tools: [vscode/runCommand, vscode/extensions, execute/getTerminalOutput, execute/runTask, execute/createAndRunTask, execute/runInTerminal, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, read/getTaskOutput, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drm-copilot/*', todo]
 handoffs:
   - label: Build minimal-audit atomic plan (preflight all clear)
     agent: atomic_planner
@@ -140,16 +140,16 @@ S1.2 Generate `${short-name}`:
 
 S1.3 Ensure potential entry exists using exact command by type when missing:
 - If `${promotion-type}` is `feature`:
-  - `drmCopilotExtension.newPotentialEntry` with `["-ShortName", "${short-name}"]`
+  - `drm-copilot.newPotentialEntry` with `["-ShortName", "${short-name}"]`
 - If `${promotion-type}` is `bug`:
-  - `drmCopilotExtension.newPotentialBugEntry` with `["--short-name", "${short-name}"]`
+  - `drm-copilot.newPotentialBugEntry` with `["--short-name", "${short-name}"]`
 
 S1.4 Detect created/existing potential markdown file path and save as `${relativeFile}`.
 
 ### Step S2 — Promote with short-path flag
 
 S2.1 Promote to issue using existing tooling with short-path flag set:
-- `drmCopilotExtension.potentialToIssue` with `["--potential-path", "${relativeFile}", "--promotion-type", "${promotion-type}", "--work-mode", "minor-audit"]`
+- `drm-copilot.potentialToIssue` with `["--potential-path", "${relativeFile}", "--promotion-type", "${promotion-type}", "--work-mode", "minor-audit"]`
 
 S2.2 Set `${long-name}` from `${relativeFile}` filename without `.md`.
 
@@ -159,7 +159,7 @@ S2.4 Create branch with exact name:
 - `${promotion-type}/${short-name}-${issue-num}`
 
 S2.5 Create active feature folder with short-path flag set:
-- `drmCopilotExtension.newActiveFeatureFolder` with `["--feature-name", "${long-name}", "--type", "${promotion-type}", "--issue-number", "${issue-num}", "--work-mode", "minor-audit"]`
+- `drm-copilot.newActiveFeatureFolder` with `["--feature-name", "${long-name}", "--type", "${promotion-type}", "--issue-number", "${issue-num}", "--work-mode", "minor-audit"]`
 
 S2.6 Capture created folder path as `${feature-folder}`.
 
@@ -257,9 +257,9 @@ Follow this exact sequence.
 
 1.3 Create potential entry using exact command by type:
 - If `${promotion-type}` is `feature`:
-  - `drmCopilotExtension.newPotentialEntry` with `["-ShortName", "${short-name}"]`
+  - `drm-copilot.newPotentialEntry` with `["-ShortName", "${short-name}"]`
 - If `${promotion-type}` is `bug`:
-  - `drmCopilotExtension.newPotentialBugEntry` with `["--short-name", "${short-name}"]`
+  - `drm-copilot.newPotentialBugEntry` with `["--short-name", "${short-name}"]`
 
 1.4 Detect created potential markdown file path and save as `${relativeFile}`.
 
@@ -271,9 +271,9 @@ Follow this exact sequence.
 
 2.1 Promote to issue with exact command:
 - If `${promotion-type}` is `bug`:
-  - `drmCopilotExtension.potentialToIssue` with `["--potential-path", "${relativeFile}", "--promotion-type", "${promotion-type}", "--work-mode", "full-bug"]`
+  - `drm-copilot.potentialToIssue` with `["--potential-path", "${relativeFile}", "--promotion-type", "${promotion-type}", "--work-mode", "full-bug"]`
 - If `${promotion-type}` is `feature`:
-  - `drmCopilotExtension.potentialToIssue` with `["--potential-path", "${relativeFile}", "--promotion-type", "${promotion-type}", "--work-mode", "full-feature"]`
+  - `drm-copilot.potentialToIssue` with `["--potential-path", "${relativeFile}", "--promotion-type", "${promotion-type}", "--work-mode", "full-feature"]`
 
 2.2 Set `${long-name}` from `${relativeFile}` filename without `.md`.
 
@@ -284,9 +284,9 @@ Follow this exact sequence.
 
 2.5 Create active feature folder with exact command:
 - If `${promotion-type}` is `bug`:
-  - `drmCopilotExtension.newActiveFeatureFolder` with `["--feature-name", "${long-name}", "--type", "${promotion-type}", "--issue-number", "${issue-num}", "--work-mode", "full-bug"]`
+  - `drm-copilot.newActiveFeatureFolder` with `["--feature-name", "${long-name}", "--type", "${promotion-type}", "--issue-number", "${issue-num}", "--work-mode", "full-bug"]`
 - If `${promotion-type}` is `feature`:
-  - `drmCopilotExtension.newActiveFeatureFolder` with `["--feature-name", "${long-name}", "--type", "${promotion-type}", "--issue-number", "${issue-num}", "--work-mode", "full-feature"]`
+  - `drm-copilot.newActiveFeatureFolder` with `["--feature-name", "${long-name}", "--type", "${promotion-type}", "--issue-number", "${issue-num}", "--work-mode", "full-feature"]`
 
 2.6 Capture created folder path as `${feature-folder}`.
 

@@ -23,10 +23,11 @@ namespace UtilitiesCS.Test.Dialogs
     ///     after every test to prevent cross-test contamination.
     ///
     /// Invariants / Constraints:
-    ///     Tests that create WinForms controls must run on an STA thread.
+    ///     This class runs under MSTest's STA class execution mode because every
+    ///     test creates WinForms controls.
     ///     Internal members are accessible via InternalsVisibleTo("UtilitiesCS.Test").
     /// </summary>
-    [TestClass]
+    [STATestClass]
     public class MyBox_ShowDialog_Tests
     {
         // ---------------------------------------------------------------------------
@@ -61,7 +62,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     DialogResult.OK from the injected seam.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ShowDialog_BoxIconNone_SeamReturnsOk_ReturnsOkResult()
         {
             // Arrange: inject non-modal stub so no real dialog is displayed
@@ -96,7 +96,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     DialogResult.OK from the injected seam.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ShowDialog_BoxIconCritical_SeamReturnsOk_ReturnsOkResult()
         {
             // Arrange
@@ -128,7 +127,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     DialogResult.OK from the injected seam.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ShowDialog_BoxIconWarning_SeamReturnsOk_ReturnsOkResult()
         {
             // Arrange
@@ -160,7 +158,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     DialogResult.OK from the injected seam.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ShowDialog_BoxIconQuestion_SeamReturnsOk_ReturnsOkResult()
         {
             // Arrange
@@ -192,7 +189,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     DialogResult.OK from the injected seam.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ShowDialog_MessageBoxIconError_SeamReturnsOk_ReturnsOkResult()
         {
             // Arrange
@@ -223,7 +219,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     DialogResult.OK from the injected seam.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ShowDialog_MessageBoxIconNone_SeamReturnsOk_ReturnsOkResult()
         {
             // Arrange
@@ -254,7 +249,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     DialogResult.OK from the injected seam.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ShowDialog_MessageBoxIconWarning_SeamReturnsOk_ReturnsOkResult()
         {
             // Arrange
@@ -285,7 +279,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     DialogResult.OK from the injected seam.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ShowDialog_MessageBoxIconQuestion_SeamReturnsOk_ReturnsOkResult()
         {
             // Arrange
@@ -316,7 +309,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     DialogResult.OK from the injected seam.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ShowDialog_MessageBoxIconInformation_SeamReturnsOk_ReturnsOkResult()
         {
             // Arrange
@@ -353,7 +345,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     DialogResult.OK from the injected seam.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ShowDialog_ConvenienceMessageBoxButtons_SeamReturnsOk_ReturnsExpectedResult()
         {
             // Arrange: inject seam; overload 5 creates its own viewer internally
@@ -384,7 +375,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     DialogResult.OK from the injected seam.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ShowDialog_ConvenienceActionDictionary_SeamReturnsOk_ReturnsExpectedResult()
         {
             // Arrange
@@ -421,7 +411,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     ShowDialog itself; group.Result stays at its default value.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ShowDialog_ConvenienceGenericFunctionDict_SeamReturnsOk_ReturnsDefaultGroupResult()
         {
             // Arrange: seam returns immediately; function is never invoked, so group.Result = default(int).
@@ -456,7 +445,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     DialogResult.OK from the injected seam.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ShowDialog_DelegateButtonOverload_SeamReturnsOk_ReturnsOkResult()
         {
             // Arrange: overload 1 creates its own viewer internally using a using block
@@ -494,7 +482,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     DialogResult.Cancel from the injected seam.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ShowDialog_BoxIconOverload_SeamReturnsCancel_ReturnsDefaultCancelResult()
         {
             // Arrange: inject seam that returns Cancel to simulate the user dismissing
@@ -530,7 +517,6 @@ namespace UtilitiesCS.Test.Dialogs
         ///     DialogResult.No from the injected seam.
         /// </summary>
         [TestMethod]
-        [STAThread]
         public void ShowDialog_MessageBoxIconOverload_SeamReturnsNo_ReturnsNoResult()
         {
             // Arrange

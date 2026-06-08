@@ -1,0 +1,26 @@
+Pre-filter new-file coverage — Issue #171
+Task: [P2-T9]
+Timestamp: 2026-06-02T10-04
+
+Command:
+  vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Tests:QfcHighConfidencePreFilter /EnableCodeCoverage
+  (merged to XML via Microsoft.CodeCoverage.Console.exe)
+
+Test result: 9 passed, 0 failed (QfcHighConfidencePreFilterTests).
+
+New file QuickFiler/Controllers/QfcHighConfidencePreFilter.cs coverage:
+  covered range-lines = 34
+  not covered         = 0
+  total (measured)    = 34
+  line coverage       = 100.00%   (>= 90% gate satisfied)
+
+Notes:
+- The measured surface is the testable logic: the QfcPreScoredItem carrier, the IFolderScoringService
+  seam, and QfcHighConfidencePreFilter.FilterAsync (cutoff, inclusive boundary, zero-score exclusion,
+  order preservation, predetermined-folder carry, null/empty/all-below edge cases, cancellation).
+- The concrete I/O-boundary adapter FolderScoringService.ScoreAsync is annotated
+  [ExcludeFromCodeCoverage]. Its body is COM-bound (MailItemHelper.FromMailItemAsync + live Outlook
+  Bayesian classification via FolderPredictor) and cannot be exercised by a unit test without live
+  Outlook COM, which repo policy (General Code Change Policy 6.2; General Unit Test Policy UT4)
+  prohibits. The adapter reuses the existing item-controller scoring path and is verified through the
+  seam mock; isolating it keeps the new file's testable logic measured at 100%.

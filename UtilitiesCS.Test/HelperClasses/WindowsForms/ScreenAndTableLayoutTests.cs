@@ -38,11 +38,10 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
         }
     }
 
-    [TestClass]
+    [STATestClass]
     public class TableLayoutHelper_Tests
     {
         [TestMethod]
-        [STAThread]
         public void InsertSpecificRow_NegativeIndex_ThrowsArgumentOutOfRange()
         {
             var tlp = new System.Windows.Forms.TableLayoutPanel();
@@ -57,7 +56,6 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
         }
 
         [TestMethod]
-        [STAThread]
         public void InsertSpecificRow_ZeroInsertCount_ThrowsArgumentOutOfRange()
         {
             var tlp = new System.Windows.Forms.TableLayoutPanel();
@@ -72,7 +70,6 @@ namespace UtilitiesCS.Test.HelperClasses.WindowsForms
         }
 
         [TestMethod]
-        [STAThread]
         public void InsertSpecificRow_ValidIndex_IncreasesRowCount()
         {
             var tlp = new System.Windows.Forms.TableLayoutPanel();

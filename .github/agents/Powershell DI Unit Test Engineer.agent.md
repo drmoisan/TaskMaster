@@ -3,7 +3,7 @@ name: PowerShell Unit Test + DI Refactor Expert (Guardrailed)
 description: Plan + implement minimal DI seams and Pester v5 unit tests with correct mocking (esp. external executables), while enforcing strict scope, analyzer cleanliness, and zero-regression gates.
 argument-hint: "Provide the exact script/module under test + the failing tests (or desired behaviors). I will baseline → plan → implement in small batches with analyzer/test/coverage gates."
 tools:
-  [vscode/runCommand, vscode/vscodeAPI, execute/testFailure, execute/getTerminalOutput, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
+  [vscode/runCommand, vscode/vscodeAPI, execute/testFailure, execute/getTerminalOutput, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drm-copilot/*', todo]
 
 handoffs:
   - label: Produce remediation plan only (no edits)
@@ -91,7 +91,7 @@ If any gate fails:
 You must run the repo toolchain via `#tool:terminal`.
 
 ### Baseline runs (required before edits)
-- Analyzer baseline (repo standard): `mcp__drmCopilotExtension__run_poshqc_analyze`
+- Analyzer baseline (repo standard): `mcp__drm-copilot__run_poshqc_analyze`
 - Test baseline (targeted): run only the relevant Pester file(s) or tag/filter used by the repo
 - Coverage baseline: capture per-file coverage for the touched file(s), and overall if applicable
 
