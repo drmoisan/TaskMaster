@@ -2,3 +2,4 @@
 - [powershell-coverage-mandatory-when-ps1-in-diff](feedback_powershell-coverage-gate.md) — validate-feature-review-coverage hook blocks termination without an explicit PASS/FAIL PowerShell coverage verdict when .ps1 files changed
 - [pr-context-summary-misclassifies-cs](project_pr-context-summary-misclassifies-cs.md) — PR-context summary overview can mislabel C# changes as docs ("0 core logic files"); always verify scope against git diff
 - [csharp-coverage-artifact-is-cobertura](project_csharp-coverage-artifact-is-cobertura.md) — `artifacts/csharp/coverage.xml` is Cobertura; the hook parses it as JaCoCo and gets $null repo-wide, so the reviewer must parse it manually
+- [csharp-local-fullsuite-coverage-blocked](project_csharp-local-fullsuite-coverage-blocked.md) — local full-assembly C# coverage fails on a Moq binding redirect; per-feature Cobertura is trimmed to affected classes (no repo-wide root), so repo-wide gate is the PR CI run
