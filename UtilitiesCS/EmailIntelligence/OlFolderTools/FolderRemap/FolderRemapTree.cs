@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.Interfaces;
 
 namespace UtilitiesCS.EmailIntelligence.FolderRemap
 {
@@ -24,6 +25,40 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
 
         public FolderRemapTree(MAPIFolder olRoot, IDictionary<string, string> mappings)
         {
+            var root = RootFromFolder(olRoot);
+
+            foreach (var mapping in mappings)
+            {
+                var fromNode = root.FindAll(x => x.Value.RelativePath == mapping.Key)
+                    .FirstOrDefault();
+                var toNode = root.FindAll(x => x.Value.RelativePath == mapping.Value)
+                    .FirstOrDefault();
+                if (fromNode is not null && toNode is not null)
+                    fromNode.Value.MappedTo = toNode.Value;
+            }
+            _roots = new List<TreeNode<OlFolderRemap>>() { root };
+            WireNotifications();
+        }
+
+        /// <summary>
+        /// Test seam (S6): constructs the tree exactly like
+        /// <see cref="FolderRemapTree(MAPIFolder, IDictionary{string, string})"/> but creates the
+        /// batch-notifier with an injected timer factory so notifications can be driven
+        /// deterministically. Production code uses the public constructors, which default to a real
+        /// <see cref="TimerWrapper"/>; behavior is unchanged.
+        /// </summary>
+        internal FolderRemapTree(
+            MAPIFolder olRoot,
+            IDictionary<string, string> mappings,
+            Func<TimeSpan, ITimerWrapper> batchNotifierTimerFactory
+        )
+        {
+            _batchNotifier = new TimedBatchAction(
+                TimeSpan.FromMilliseconds(50),
+                null,
+                batchNotifierTimerFactory
+            );
+
             var root = RootFromFolder(olRoot);
 
             foreach (var mapping in mappings)

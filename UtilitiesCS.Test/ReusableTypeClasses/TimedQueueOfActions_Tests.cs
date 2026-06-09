@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.HelperClasses.TimedActions;
+using UtilitiesCS.Test.TestHelpers;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
 {
@@ -18,29 +19,27 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var received = new List<int>();
-            using var signal = new ManualResetEventSlim(false);
+            using var timerStub = new ManualFireTimerWrapper();
             var queue = new TimedQueueOfActions<int>(
                 TimeSpan.FromMilliseconds(20),
                 items =>
                 {
-                    lock (received)
-                    {
-                        received.AddRange(items);
-                    }
-                    signal.Set();
+                    received.AddRange(items);
                 }
-            );
+            )
+            {
+                TimerFactory = _ => timerStub,
+            };
 
             // Act
             queue.Enqueue(1);
             queue.Enqueue(2);
 
+            // Enqueue started the timer via the injected factory; fire it once to dispatch the batch.
+            timerStub.FireElapsed();
+
             // Assert
-            signal.Wait(1000).Should().BeTrue();
-            lock (received)
-            {
-                received.OrderBy(value => value).Should().Equal(1, 2);
-            }
+            received.OrderBy(value => value).Should().Equal(1, 2);
             queue.StopTimer();
         }
 
@@ -61,16 +60,24 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void EmptyQueue_AfterSeveralIntervals_StopsTimer()
         {
             // Arrange
-            var queue = new TimedQueueOfActions<int>(TimeSpan.FromMilliseconds(20), _ => { });
+            using var timerStub = new ManualFireTimerWrapper();
+            var queue = new TimedQueueOfActions<int>(TimeSpan.FromMilliseconds(20), _ => { })
+            {
+                TimerFactory = _ => timerStub,
+            };
 
             // Act
             queue.StartTimer();
 
-            // Assert
-            // The timer fires every 20 ms; after 5 consecutive empty-queue ticks the
-            // implementation stops it.  Allow 5 000 ms to absorb thread-pool delays
-            // that occur when the full test suite runs in parallel.
-            SpinWait.SpinUntil(() => !queue.TimerActive, 5000).Should().BeTrue();
+            // The implementation stops the timer after 5 consecutive empty-queue ticks
+            // (_emptyQueueChecks > 4). Fire deterministically until it auto-stops, bounded by a
+            // small safety cap so a regression that never stops cannot loop forever.
+            for (var tick = 0; tick < 10 && queue.TimerActive; tick++)
+            {
+                timerStub.FireElapsed();
+            }
+
+            // Assert – the timer auto-stops after the empty-tick threshold.
             queue.TimerActive.Should().BeFalse();
         }
 
@@ -80,7 +87,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var values = Enumerable.Range(1, 25).ToArray();
             var received = new List<int>();
-            using var signal = new ManualResetEventSlim(false);
+            using var timerStub = new ManualFireTimerWrapper();
             var queue = new TimedQueueOfActions<int>(
                 TimeSpan.FromMilliseconds(20),
                 items =>
@@ -88,19 +95,18 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
                     lock (received)
                     {
                         received.AddRange(items);
-                        if (received.Count >= values.Length)
-                        {
-                            signal.Set();
-                        }
                     }
                 }
-            );
+            )
+            {
+                TimerFactory = _ => timerStub,
+            };
 
-            // Act
+            // Act – enqueue all 25 items concurrently, then dispatch deterministically.
             await Task.WhenAll(values.Select(value => Task.Run(() => queue.Enqueue(value))));
+            timerStub.FireElapsed();
 
-            // Assert
-            signal.Wait(1000).Should().BeTrue();
+            // Assert – every concurrently enqueued item appears in the dispatched batch.
             lock (received)
             {
                 received.OrderBy(value => value).Should().Equal(values);
@@ -152,17 +158,19 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void Configuration_PropertyChanged_RestartsTimerOnWriteIntervalChange()
         {
             // Arrange
-            var queue = new TimedQueueOfActions<int>(TimeSpan.FromMilliseconds(50), _ => { });
+            using var timerStub = new ManualFireTimerWrapper();
+            var queue = new TimedQueueOfActions<int>(TimeSpan.FromMilliseconds(50), _ => { })
+            {
+                TimerFactory = _ => timerStub,
+            };
             queue.StartTimer();
             queue.TimerActive.Should().BeTrue();
 
-            // Act – change WriteInterval triggers PropertyChanged
+            // Act – change WriteInterval triggers PropertyChanged, which stops and restarts the
+            // timer synchronously (StopTimer + TryStartTimer) via the injected factory.
             queue.Config.WriteInterval = TimeSpan.FromMilliseconds(100);
 
-            // Allow time for restart
-            Thread.Sleep(50);
-
-            // Assert – timer should still be active after restart
+            // Assert – timer is still active after the synchronous restart.
             queue.TimerActive.Should().BeTrue();
             queue.StopTimer();
         }

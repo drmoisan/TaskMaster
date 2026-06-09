@@ -18,7 +18,9 @@ namespace UtilitiesCS.Test.HelperClasses
 
             // Act
             var started = sut.Start();
-            Thread.Sleep(20);
+            // Wait deterministically for the Stopwatch to advance past zero (microseconds) instead
+            // of a wall-clock sleep; the timeout is only a safety bound (Risk R7).
+            SpinWait.SpinUntil(() => sut.Elapsed > TimeSpan.Zero, 200);
             var stopped = sut.Stop();
             var elapsedBeforeReset = sut.Elapsed;
             sut.Reset();
@@ -38,9 +40,13 @@ namespace UtilitiesCS.Test.HelperClasses
             var sut = new SegmentStopWatch().Start();
 
             // Act
-            Thread.Sleep(20);
+            // Each segment's logged duration is (Elapsed - previousElapsed). Spin deterministically
+            // until the Stopwatch advances past the previously-captured elapsed so each segment is
+            // strictly greater than zero, without a wall-clock sleep (Risk R7 — structural assertion).
+            SpinWait.SpinUntil(() => sut.Elapsed > TimeSpan.Zero, 200);
             sut.LogDuration("first");
-            Thread.Sleep(20);
+            var afterFirst = sut.Elapsed;
+            SpinWait.SpinUntil(() => sut.Elapsed > afterFirst, 200);
             sut.LogDuration("second", logImmediately: true);
             sut.Stop();
 

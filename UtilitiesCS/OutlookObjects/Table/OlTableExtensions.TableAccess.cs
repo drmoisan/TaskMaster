@@ -30,7 +30,8 @@ namespace UtilitiesCS
         public static async Task<Outlook.Table> GetTableInViewAsync(
             this Explorer activeExplorer,
             CancellationToken token,
-            int counter
+            int counter,
+            int timeoutMs = 2000
         )
         {
             var acquisitionStopwatch = Stopwatch.StartNew();
@@ -50,7 +51,7 @@ namespace UtilitiesCS
 
             try
             {
-                table = await TimeOutTask.RunWithTimeout(view.GetTable, token, 2000, 1, false);
+                table = await TimeOutTask.RunWithTimeout(view.GetTable, token, timeoutMs, 1, false);
 
                 LogTableTiming(
                     "GetTableInViewAsync table acquisition complete | table acquisition",
@@ -68,7 +69,11 @@ namespace UtilitiesCS
                     Console.WriteLine($"Task timed out on try {counter}");
                     if (counter < 2)
                     {
-                        table = await activeExplorer.GetTableInViewAsync(token, counter + 1);
+                        table = await activeExplorer.GetTableInViewAsync(
+                            token,
+                            counter + 1,
+                            timeoutMs
+                        );
                     }
                     else
                     {

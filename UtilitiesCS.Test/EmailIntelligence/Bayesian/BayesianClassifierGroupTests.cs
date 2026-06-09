@@ -309,7 +309,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Arrange
             var group = new BayesianClassifierGroup();
             var sw = new SegmentStopWatch().Start();
-            System.Threading.Thread.Sleep(10);
+            // Guarantee a non-zero measured elapsed without a wall-clock sleep so the per-second
+            // speed string is produced. SpinUntil returns as soon as the Stopwatch advances past
+            // zero (microseconds); the timeout is only a safety bound (Risk R7).
+            System.Threading.SpinWait.SpinUntil(() => sw.Elapsed > TimeSpan.Zero, 100);
 
             // Act
             var message = group.GetReportMessage(5, 10, sw);

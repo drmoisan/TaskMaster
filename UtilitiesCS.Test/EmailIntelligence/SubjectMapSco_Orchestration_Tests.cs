@@ -144,21 +144,15 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void Consume_WhenSequenceProvided_ReturnsItemsAndReportsProgress()
         {
             var tracker = new RecordingProgressTracker();
-            var sequence = Enumerable
-                .Range(1, 3)
-                .Select(value =>
-                {
-                    Thread.Sleep(20);
-                    return value;
-                });
+            var sequence = Enumerable.Range(1, 3);
 
+            // Consume reports progress synchronously per consumed item (the #181 per-item hook in
+            // WithProgressReporting) plus an initial report, so at least two reports accumulate
+            // deterministically during enumeration without a wall-clock sleep or spin-wait.
             var consumed = BuildEmptyMap().Consume(sequence, 3, tracker);
 
             consumed.Should().Equal(1, 2, 3);
-            SpinWait
-                .SpinUntil(() => tracker.Reports.Count >= 2, TimeSpan.FromSeconds(1))
-                .Should()
-                .BeTrue();
+            tracker.Reports.Count.Should().BeGreaterThanOrEqualTo(2);
             tracker.Reports.Should().Contain(report => report.JobName.StartsWith("Consuming "));
         }
 

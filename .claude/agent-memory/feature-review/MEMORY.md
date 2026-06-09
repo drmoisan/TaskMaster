@@ -12,3 +12,4 @@
 - [policy-audit validator uses full template](policy-audit-validator-uses-full-template.md) — THIS repo's validator needs the full bundled template headings (`## Executive Summary` + `## 1`..`## 7`); resolve the MCP template asset and fill it in
 - [PowerShell line-count undercount](powershell-measure-object-line-undercount.md) — `(Get-Content | Measure-Object -Line).Lines` undercounts vs `awk NR`/`wc -l`
 - [policy-audit section-7 row-label parser](policy-audit-section7-row-label-parser.md) — validator misreads non-standard section-7 Code-Quality row labels as coverage rows; reuse cycle-1 wording, no comma qualifiers in label cell
+- [numeric new/changed-code coverage + Scope-and-Baseline](policy-audit-numeric-new-code-coverage.md) — policy-audit new-code-coverage field must be a literal percent (prose fails); feature-audit needs a `## Scope and Baseline` heading

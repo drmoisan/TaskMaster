@@ -1241,10 +1241,17 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             Func<Task> act = async () =>
                 await InvokeAsyncResult(
                     "GetTableInViewAsync",
-                    new[] { typeof(Outlook.Explorer), typeof(CancellationToken), typeof(int) },
+                    new[]
+                    {
+                        typeof(Outlook.Explorer),
+                        typeof(CancellationToken),
+                        typeof(int),
+                        typeof(int),
+                    },
                     mockExplorer.Object,
                     CancellationToken.None,
-                    0
+                    0,
+                    2000
                 );
 
             await act.Should().ThrowAsync<InvalidOperationException>();
@@ -1265,7 +1272,19 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                     callCount++;
                     if (callCount == 1)
                     {
-                        Thread.Sleep(2100);
+                        // The test verifies that a slow SYNCHRONOUS GetTable that outlasts the
+                        // timeout still returns its result with callCount == 1, because a
+                        // CancellationTokenSource(timeoutMs) cannot abort an already-running
+                        // non-cancelable synchronous delegate inside TimeOutTask.RunWithTimeout's
+                        // Task.Run. With timeoutMs reduced to 5 (seam S5), the mock only needs to
+                        // block long enough to exceed 5 ms — a 20 ms block (down from 2100 ms).
+                        // This is a documented PARTIAL improvement (research Risk R5): full
+                        // determinism would require making TimeOutTask.RunWithTimeout's timeout
+                        // injectable, an out-of-scope shared-threading-utility refactor
+                        // (TimeOutTask.cs is explicitly do-not-modify this cycle). The residual
+                        // 20 ms is genuinely-required synchronization to exceed the timeout, not a
+                        // flakiness mask. See evidence/regression-testing/scope-change-J1.
+                        Thread.Sleep(20);
                     }
 
                     return mockTable.Object;
@@ -1274,10 +1293,17 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
 
             var result = await InvokeAsyncResult(
                 "GetTableInViewAsync",
-                new[] { typeof(Outlook.Explorer), typeof(CancellationToken), typeof(int) },
+                new[]
+                {
+                    typeof(Outlook.Explorer),
+                    typeof(CancellationToken),
+                    typeof(int),
+                    typeof(int),
+                },
                 mockExplorer.Object,
                 CancellationToken.None,
-                0
+                0,
+                5
             );
 
             result.Should().BeSameAs(mockTable.Object);
@@ -1296,10 +1322,17 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             Func<Task> act = async () =>
                 await InvokeAsyncResult(
                     "GetTableInViewAsync",
-                    new[] { typeof(Outlook.Explorer), typeof(CancellationToken), typeof(int) },
+                    new[]
+                    {
+                        typeof(Outlook.Explorer),
+                        typeof(CancellationToken),
+                        typeof(int),
+                        typeof(int),
+                    },
                     mockExplorer.Object,
                     cancel.Token,
-                    0
+                    0,
+                    2000
                 );
 
             await act.Should().ThrowAsync<OperationCanceledException>();
@@ -1623,10 +1656,17 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
 
             var result = await InvokeAsyncResult(
                 "GetTableInViewAsync",
-                new[] { typeof(Outlook.Explorer), typeof(CancellationToken), typeof(int) },
+                new[]
+                {
+                    typeof(Outlook.Explorer),
+                    typeof(CancellationToken),
+                    typeof(int),
+                    typeof(int),
+                },
                 mockExplorer.Object,
                 CancellationToken.None,
-                0
+                0,
+                2000
             );
 
             result.Should().BeSameAs(mockTable.Object);

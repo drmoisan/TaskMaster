@@ -120,7 +120,8 @@ namespace UtilitiesCS
         internal static List<T> ToList<T>(
             this IEnumerable<T> enumerable,
             int count,
-            ProgressTracker progress
+            ProgressTracker progress,
+            Action<int> onItemCompleted = null
         )
         {
             int completed = 0;
@@ -136,7 +137,18 @@ namespace UtilitiesCS
                 )
             )
             {
-                list = enumerable.WithProgressReporting(count, (x) => completed = x).ToList();
+                list = enumerable
+                    .WithProgressReporting(
+                        count,
+                        (x) =>
+                        {
+                            completed = x;
+                            // Optional deterministic per-item hook (null in production). Lets a test
+                            // observe progress without relying on the wall-clock timer to tick.
+                            onItemCompleted?.Invoke(x);
+                        }
+                    )
+                    .ToList();
             }
             return list;
         }

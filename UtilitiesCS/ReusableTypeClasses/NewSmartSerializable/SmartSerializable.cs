@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.Interfaces;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.ReusableTypeClasses
@@ -518,13 +519,22 @@ namespace UtilitiesCS.ReusableTypeClasses
         }
 
         private ThreadSafeSingleShotGuard _serializationRequested = new();
-        private TimerWrapper _timer;
+        private ITimerWrapper _timer;
+
+        /// <summary>
+        /// Factory used to create the deferred-serialization timer. Defaults to a real
+        /// <see cref="TimerWrapper"/>, preserving production behavior. Tests override this to
+        /// inject a deterministic, manually-fired timer so the deferred write can be triggered
+        /// without a wall-clock wait.
+        /// </summary>
+        protected Func<TimeSpan, ITimerWrapper> TimerFactory { get; set; } =
+            interval => new TimerWrapper(interval);
 
         protected void RequestSerialization(string filePath)
         {
             if (_serializationRequested.CheckAndSetFirstCall)
             {
-                _timer = new TimerWrapper(TimeSpan.FromSeconds(3));
+                _timer = TimerFactory(TimeSpan.FromSeconds(3));
                 _timer.Elapsed += (sender, e) => SerializeThreadSafe(filePath);
                 _timer.AutoReset = false;
                 _timer.StartTimer();

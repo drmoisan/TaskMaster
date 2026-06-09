@@ -175,7 +175,10 @@ namespace UtilitiesCS.Test.Extensions
             );
             method.Should().NotBeNull();
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-            System.Threading.Thread.Sleep(25);
+            // Guarantee a non-zero measured elapsed without a wall-clock sleep so the rate is
+            // computed from real elapsed time. SpinUntil returns as soon as the Stopwatch advances
+            // past zero (microseconds); the timeout is only a safety bound (Risk R7).
+            System.Threading.SpinWait.SpinUntil(() => stopwatch.Elapsed > TimeSpan.Zero, 100);
 
             // Act
             var result = (string)method.Invoke(null, new object[] { 2, 5, stopwatch });
@@ -191,28 +194,25 @@ namespace UtilitiesCS.Test.Extensions
         {
             // Arrange
             var tracker = new CapturingProgressTracker();
-            IEnumerable<int> source = Enumerable
-                .Range(1, 3)
-                .Select(value =>
-                {
-                    // Sleep for 700 ms (> the 500 ms timer period) so that at least one
-                    // timer tick fires while completed > 0, satisfying the Value > 0 assertion
-                    // even when Thread.Sleep runs slightly long under test-suite load.
-                    System.Threading.Thread.Sleep(700);
-                    return value;
-                });
+            IEnumerable<int> source = Enumerable.Range(1, 3);
             var method = typeof(IEnumerableExtensions).GetMethod(
                 "ToList",
                 BindingFlags.NonPublic | BindingFlags.Static
             );
             method.Should().NotBeNull();
 
+            // Drive the per-item onItemCompleted hook (4th parameter) deterministically: it reports
+            // each item's completion percentage through the tracker, producing a Value > 0 report
+            // without relying on the 500 ms wall-clock timer firing during enumeration.
+            Action<int> onItemCompleted = percent =>
+                tracker.Report(percent, $"Consuming {percent:N0} of 3");
+
             // Act
             var result =
                 (List<int>)
                     method
                         .MakeGenericMethod(typeof(int))
-                        .Invoke(null, new object[] { source, 3, tracker });
+                        .Invoke(null, new object[] { source, 3, tracker, onItemCompleted });
 
             // Assert
             result.Should().Equal(1, 2, 3);

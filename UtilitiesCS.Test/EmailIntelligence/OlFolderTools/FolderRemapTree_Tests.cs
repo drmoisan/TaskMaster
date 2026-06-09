@@ -8,6 +8,8 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS.EmailIntelligence.FolderRemap;
+using UtilitiesCS.HelperClasses;
+using UtilitiesCS.Test.TestHelpers;
 using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
 using OutlookFolders = Microsoft.Office.Interop.Outlook.Folders;
 
@@ -175,18 +177,29 @@ namespace UtilitiesCS.Test.EmailIntelligence.OlFolderTools
             var rootNode = new TreeNode<OlFolderRemap>(nodeRemap);
 
             var tree = CreateTree(new[] { rootNode });
+
+            // Inject a deterministic timer into the batch notifier (seam S6) so the notification
+            // chain (OlFolderRemap -> TimedBatchAction -> FolderRemapTree.PropertyChanged) can be
+            // driven synchronously instead of waiting on the real 50 ms TimedBatchAction timer.
+            using var timerStub = new ManualFireTimerWrapper();
+            typeof(FolderRemapTree)
+                .GetField("_batchNotifier", BindingFlags.NonPublic | BindingFlags.Instance)!
+                .SetValue(
+                    tree,
+                    new TimedBatchAction(TimeSpan.FromMilliseconds(50), null, _ => timerStub)
+                );
             tree.WireNotifications();
 
-            var eventFired = new ManualResetEventSlim(false);
+            using var eventFired = new ManualResetEventSlim(false);
             tree.PropertyChanged += (_, _) => eventFired.Set();
 
-            // Act: modify MappedTo to trigger the notification chain
+            // Act: modify MappedTo to trigger the notification chain, then fire the batch timer.
             nodeRemap.MappedTo = targetRemap;
+            timerStub.FireElapsed();
 
-            // Assert: notification arrives within 500 ms (TimedBatchAction delay is 50 ms)
+            // Assert: the PropertyChanged event fired deterministically once the batch timer ticked.
             eventFired
-                .Wait(TimeSpan.FromMilliseconds(500))
-                .Should()
+                .IsSet.Should()
                 .BeTrue("the PropertyChanged event must fire after MappedTo is set");
         }
 
