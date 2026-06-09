@@ -43,7 +43,11 @@ namespace UtilitiesCS
             FileStemSuffix = fileNameSuffix;
             FileExtension = fileExtension;
             FolderPath = folderPath;
-            FilePath = Path.Combine(_folderPath, _fileName);
+            // The FileStemSeed/FileStemSuffix/FileExtension/FolderPath setters above already
+            // recompute _fileName and _filePath through FilePathHelper_PropertyChanged. A terminal
+            // FilePath = Path.Combine(_folderPath, _fileName) here would re-enter the FilePath
+            // handler while _fileName is still being derived, splitting the combined value back
+            // and corrupting FolderPath (e.g. C:\data -> C:\). It is therefore omitted.
         }
 
         public static FilePathHelper FromSeed(

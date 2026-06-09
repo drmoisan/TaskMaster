@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Mono.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.NewtonsoftHelpers.MonoExtension;
 using UtilitiesCS.ReusableTypeClasses;
@@ -70,6 +71,23 @@ namespace UtilitiesCS.NewtonsoftHelpers
                 );
                 configValue =
                     configProperty?.GetValue(RemainingObject) as NewSmartSerializableConfig;
+            }
+
+            // When deserialization runs under TypeNameHandling.None there is no $type discriminator,
+            // so Newtonsoft binds the untyped RemainingObject to a JObject. A JObject exposes no
+            // <Config>k__BackingField / _Config field and no CLR Config property, so the reflective
+            // lookups above return null and Config would otherwise be left at its empty default.
+            // Read the Config token directly out of the JObject and materialize a typed
+            // NewSmartSerializableConfig. The typed-RemainingObject reflective path above is
+            // preserved: this branch only runs as a fallback when configValue is still null.
+            if (configValue is null && RemainingObject is JObject remainingObjectJson)
+            {
+                var configToken = remainingObjectJson["Config"];
+                if (configToken is not null && configToken.Type != JTokenType.Null)
+                {
+                    configValue = configToken.ToObject<NewSmartSerializableConfig>();
+                    NormalizeEmptyDiskFilePaths(configValue);
+                }
             }
 
             if (configValue is not null)
@@ -139,6 +157,33 @@ namespace UtilitiesCS.NewtonsoftHelpers
             //}
 
             return derivedInstance;
+        }
+
+        // A default-constructed FilePathHelper reports FilePath == "" (empty string), but when a
+        // FilePathHelper carrying no FileName is materialized from JSON its FilePath setter routes
+        // through the PropertyChanged handler, which leaves the backing field at null. That null vs
+        // empty-string divergence is invisible to callers that only read FileName (e.g. the People
+        // pplkey deserialization) but breaks full-graph equivalence checks against a default Config.
+        // For each empty disk (no FileName) on a freshly reconstructed Config, restore the
+        // default empty-string FilePath so reconstructed-but-empty disks match default disks.
+        private static void NormalizeEmptyDiskFilePaths(NewSmartSerializableConfig config)
+        {
+            if (config is null)
+            {
+                return;
+            }
+
+            NormalizeEmptyDiskFilePath(config.Disk);
+            NormalizeEmptyDiskFilePath(config.LocalDisk);
+            NormalizeEmptyDiskFilePath(config.NetDisk);
+        }
+
+        private static void NormalizeEmptyDiskFilePath(FilePathHelper disk)
+        {
+            if (disk is not null && disk.FileName.IsNullOrEmpty() && disk.FilePath is null)
+            {
+                disk.FilePath = "";
+            }
         }
 
         public WrapperScoDictionary<TDerived, TKey, TValue> ToComposition(TDerived derivedInstance)

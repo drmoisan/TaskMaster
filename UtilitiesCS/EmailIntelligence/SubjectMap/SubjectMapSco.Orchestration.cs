@@ -63,7 +63,25 @@ namespace UtilitiesCS
                 )
             )
             {
-                list = enumerable.WithProgressReporting(count, (x) => completed = x).ToList();
+                // Report progress deterministically per consumed item through the injected
+                // tracker. The per-item callback receives the completion percentage; it updates
+                // `completed` (preserving the timer's reading) AND reports each step so that
+                // progress is observed at least once per item independent of the wall-clock
+                // timer's scheduling. This makes the "reports at least twice" contract
+                // deterministic rather than dependent on the 500ms timer firing under load.
+                list = enumerable
+                    .WithProgressReporting(
+                        count,
+                        (x) =>
+                        {
+                            completed = x;
+                            progress.Report(
+                                x,
+                                $"Consuming {(int)((double)x * (double)count / 100):N0} of {count:N0}"
+                            );
+                        }
+                    )
+                    .ToList();
             }
             return list;
         }
