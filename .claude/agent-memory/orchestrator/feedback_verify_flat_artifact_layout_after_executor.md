@@ -1,27 +1,34 @@
 ---
 name: feedback-verify-flat-artifact-layout-after-executor
-description: After an atomic-executor run, verify the feature folder kept its canonical flat artifact layout; executors have relocated committed cycle artifacts into subfolders.
+description: Honor the user's per-cycle folder layout for issue-#181 cycle artifacts; only revert artifact relocations that are UNDIRECTED agent side effects, not the user's own committed reorganization.
 metadata:
   type: feedback
 ---
 
-After an `atomic-executor` execution returns, run `git status` and confirm no
-previously-committed feature-folder artifacts were moved or deleted. In issue #181
-cycle 4, the executor relocated already-committed cycle-1/cycle-2 reaudit artifacts
-(`code-review.<ts>.md`, `feature-audit.<ts>.md`, `policy-audit.<ts>.md`,
-`remediation-inputs/plan.<ts>.md`) into per-cycle subdirectories
-(`<ts>-audit/`, `<ts>-remediation/`), showing as `D` (deleted) + untracked dirs —
-an undirected, unreported side effect. The orchestrator reverted with
-`git restore <deleted paths>` + `mv` for untracked files + `rm -rf` of the subdirs.
+After an `atomic-executor` run, run `git status` and confirm no previously-committed
+feature-folder artifacts were moved/deleted WITHOUT direction. In issue #181 cycle 4 an
+executor relocated committed cycle artifacts into `<ts>-audit/`/`<ts>-remediation/`
+subdirs as an undirected, unreported side effect; the orchestrator correctly reverted
+that to the then-flat layout.
 
-**Why:** The canonical convention (Remediation Loop Protocol "Required Artifacts Per
-Cycle" and the schema's `audit_paths`) is FLAT files directly under the active feature
-folder: `docs/features/active/<feature>/<artifact>.<ts>.md`. Subfolder grouping breaks
-the documented paths and the checkpoint's recorded `audit_paths`, and scrambles the PR
-diff.
+**UPDATE (2026-06-09, supersedes the original flat-only rule):** On the #181 branch the
+USER deliberately adopted and committed (commit `a5fcb3fb`, "organized remediation cycles
+into folders") a per-cycle FOLDER layout:
+- each cycle's inputs + plan -> `<entry-ts>-remediation/`
+- each cycle's three reaudit artifacts -> `<exit-ts>-audit/`
+- the `evidence/` tree stays as-is (not foldered per cycle).
+The user also committed their StackGeek WIP (`642c2851`), so it is no longer
+"modified-but-unstaged" to preserve.
 
-**How to apply:** Add a "do not relocate/reorganize existing committed feature-folder
-artifacts; keep the flat layout" guardrail to every remediation-inputs file (done for
-cycle 5), and independently re-check `git status` for stray `*-audit/`/`*-remediation/`
-directories before committing the cycle. Restore flat layout before the pre-push commit.
-Related: [[remediation-loop-strict-handoff]].
+**Why:** The distinction is DIRECTION, not the layout itself. An agent reorganizing
+committed artifacts on its own is a defect to revert. The user choosing a layout and
+committing it is the convention to follow. Fighting the user's committed reorg would be
+churn and would scramble their history.
+
+**How to apply:** For #181 (and any branch where the user has committed a folder layout),
+place new cycle artifacts in `<entry-ts>-remediation/` and `<exit-ts>-audit/`, set the
+checkpoint `inputs_path`/`plan_path`/`audit_paths` to those foldered paths, and instruct
+feature-review to write into `<exit-ts>-audit/`. Do NOT restore a flat layout or relocate
+the user's existing cycle folders. Still verify (via `git status`) that no committed
+artifacts were moved by an agent WITHOUT direction, and never `git add -A` when unrelated
+user WIP is uncommitted. Related: [[remediation-loop-strict-handoff]].
