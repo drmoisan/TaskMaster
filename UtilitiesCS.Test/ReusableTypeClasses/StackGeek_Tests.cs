@@ -119,6 +119,24 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
+        public void DeleteMiddle_WithSingleElement_ShouldNotThrow()
+        {
+            // Arrange
+            var helper = new StackGeekReflectionHelper();
+            var stack = helper.CreateStack();
+            helper.Push(stack, 11);
+
+            // Act
+            Action act = () => helper.DeleteMiddle(stack);
+
+            // Assert
+            act.Should().NotThrow();
+            helper.GetCount(stack).Should().Be(0);
+            helper.GetHead(stack).Should().BeNull();
+            helper.GetMiddle(stack).Should().BeNull();
+        }
+
+        [TestMethod]
         public void Main_RunsSampleScenarioWithoutThrowing()
         {
             // Arrange
