@@ -1247,11 +1247,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                         typeof(CancellationToken),
                         typeof(int),
                         typeof(int),
+                        typeof(Func<int, CancellationTokenSource>),
                     },
                     mockExplorer.Object,
                     CancellationToken.None,
                     0,
-                    2000
+                    2000,
+                    null
                 );
 
             await act.Should().ThrowAsync<InvalidOperationException>();
@@ -1265,6 +1267,18 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             var mockExplorer = new Mock<Outlook.Explorer>();
             var callCount = 0;
 
+            // Deterministic cancellation seam (S7): the test injects a timeout-source factory
+            // returning a CancellationTokenSource it holds. On the first GetTable call the
+            // delegate cancels that source synchronously and THEN returns mockTable.Object.
+            // Because the synchronous, non-cancelable delegate has already started running on
+            // the Task.Run thread and runs to completion, cancelling the linked timeout token
+            // mid-flight does NOT retroactively cancel the already-produced result: Task.Run
+            // completes RanToCompletion, so there is no synthetic retry. This reproduces the
+            // original "slow synchronous GetTable outlasts the timeout" scenario WITHOUT any
+            // wall-clock wait or sleep. The injected source is NOT pre-cancelled, so the
+            // delegate still runs on the first call; result is mockTable.Object, callCount == 1.
+            using var injectedSource = new CancellationTokenSource();
+
             mockTableView
                 .Setup(v => v.GetTable())
                 .Returns(() =>
@@ -1272,24 +1286,14 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                     callCount++;
                     if (callCount == 1)
                     {
-                        // The test verifies that a slow SYNCHRONOUS GetTable that outlasts the
-                        // timeout still returns its result with callCount == 1, because a
-                        // CancellationTokenSource(timeoutMs) cannot abort an already-running
-                        // non-cancelable synchronous delegate inside TimeOutTask.RunWithTimeout's
-                        // Task.Run. With timeoutMs reduced to 5 (seam S5), the mock only needs to
-                        // block long enough to exceed 5 ms — a 20 ms block (down from 2100 ms).
-                        // This is a documented PARTIAL improvement (research Risk R5): full
-                        // determinism would require making TimeOutTask.RunWithTimeout's timeout
-                        // injectable, an out-of-scope shared-threading-utility refactor
-                        // (TimeOutTask.cs is explicitly do-not-modify this cycle). The residual
-                        // 20 ms is genuinely-required synchronization to exceed the timeout, not a
-                        // flakiness mask. See evidence/regression-testing/scope-change-J1.
-                        Thread.Sleep(20);
+                        injectedSource.Cancel();
                     }
 
                     return mockTable.Object;
                 });
             mockExplorer.Setup(e => e.CurrentView).Returns(mockTableView.Object);
+
+            Func<int, CancellationTokenSource> timeoutSourceFactory = _ => injectedSource;
 
             var result = await InvokeAsyncResult(
                 "GetTableInViewAsync",
@@ -1299,11 +1303,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                     typeof(CancellationToken),
                     typeof(int),
                     typeof(int),
+                    typeof(Func<int, CancellationTokenSource>),
                 },
                 mockExplorer.Object,
                 CancellationToken.None,
                 0,
-                5
+                5,
+                timeoutSourceFactory
             );
 
             result.Should().BeSameAs(mockTable.Object);
@@ -1328,11 +1334,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                         typeof(CancellationToken),
                         typeof(int),
                         typeof(int),
+                        typeof(Func<int, CancellationTokenSource>),
                     },
                     mockExplorer.Object,
                     cancel.Token,
                     0,
-                    2000
+                    2000,
+                    null
                 );
 
             await act.Should().ThrowAsync<OperationCanceledException>();
@@ -1662,11 +1670,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                     typeof(CancellationToken),
                     typeof(int),
                     typeof(int),
+                    typeof(Func<int, CancellationTokenSource>),
                 },
                 mockExplorer.Object,
                 CancellationToken.None,
                 0,
-                2000
+                2000,
+                null
             );
 
             result.Should().BeSameAs(mockTable.Object);
