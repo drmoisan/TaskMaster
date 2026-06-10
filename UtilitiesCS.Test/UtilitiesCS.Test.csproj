@@ -127,6 +127,7 @@
     <Compile Include="EmailIntelligence\Bayesian\ObsoleteBayesianClassifier_Tests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\TriageCreationTests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.TrainSelection.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities_Tests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities_Additional_Tests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities_TestSupport.cs" />
