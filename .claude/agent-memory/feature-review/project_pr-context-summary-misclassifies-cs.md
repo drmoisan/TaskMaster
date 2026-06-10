@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-The automated `artifacts/pr_context.summary.txt` "Changed files overview" classifier has, at least once (Issue #171, 2026-06-02), reported `Core logic changes: 0 files` and labeled all C# production/test changes as "Docs/templates/agents/tooling" while the actual branch diff contained 9 C# production files, 7 test files, and 4 `.csproj` files.
+The automated `artifacts/pr_context.summary.txt` "Changed files overview" classifier has recurred at least twice: Issue #171 (2026-06-02) reported `Core logic changes: 0 files` while the diff had 9 C# production + 7 test + 4 `.csproj` files; Issue #181 (2026-06-08) reported `Core logic changes: 0 files` / "Docs/templates/agents/tooling: 26 files" while the diff had 31 C# build-config files (15 `.csproj`, 15 `packages.config`), a new `BannedSymbols.txt`, and a +567-line `.editorconfig`. The misclassification is especially likely for C# build-config-only changes (csproj/packages.config/editorconfig); record it under `## Rejected Scope Narrowing` in the policy audit and proceed with the full diff scope regardless.
 
 **Why:** The feature-review coverage validator (`validate-feature-review-coverage.ps1`) derives changed languages by parsing `- <path> (+N/-N)` lines in the summary. If `.cs` lines are missing/misclassified, the hook detects zero changed languages and trivially passes coverage validation — masking missing coverage for a language that actually changed.
 

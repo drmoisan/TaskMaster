@@ -1,16 +1,17 @@
 using System;
-using System.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.Test.TestHelpers;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
 {
-    // These tests assert that a System.Timers.Timer-backed wrapper raises (or suppresses)
-    // its Elapsed callback within a bounded wait. That callback runs on a ThreadPool thread,
-    // so under class-level parallel execution a saturated ThreadPool can delay it past the
-    // wait window and make the test fail intermittently. Running this class in the
-    // non-parallel phase removes the contention, matching ApplicationIdleTimer_Tests.
+    // B1-B3 assert that the TimerWrapper raises, suppresses, and configures its outer Elapsed
+    // event correctly. They drive a deterministic manual-fire inner-timer fake (no real
+    // System.Timers.Timer, no wall-clock wait) so the assertions are exact and stable. The
+    // remaining tests still construct a real System.Timers.Timer-backed wrapper but only inspect
+    // synchronous state (interval, enabled, dispose) without waiting on the OS timer.
+    // [DoNotParallelize] is retained: the constructor tests touch a real System.Timers.Timer.
     [DoNotParallelize]
     [TestClass]
     public class TimerWrapper_Tests
@@ -32,52 +33,75 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         [TestMethod]
         public void StartTimer_RaisesElapsedEvent()
         {
-            // Arrange
-            using var signal = new ManualResetEventSlim(false);
-            using var timer = new TimerWrapper(TimeSpan.FromMilliseconds(20));
+            // Arrange: inject a deterministic inner-timer fake so the underlying tick can be fired
+            // synchronously instead of waiting on a real System.Timers.Timer.
+            var fake = new ManualFireInnerTimer();
+            using var timer = new TimerWrapper(fake);
             timer.AutoReset = false;
-            timer.Elapsed += (_, _) => signal.Set();
+            var raisedCount = 0;
+            object raisedSender = null;
+            timer.Elapsed += (sender, _) =>
+            {
+                raisedCount++;
+                raisedSender = sender;
+            };
 
-            // Act
+            // Act: start the wrapper, then deterministically fire the inner timer once.
             timer.StartTimer();
+            fake.FireElapsed();
 
-            // Assert
-            signal.Wait(500).Should().BeTrue();
+            // Assert: the wrapper forwarded the inner tick to its outer Elapsed event exactly once,
+            // raising it with itself as the sender.
+            raisedCount.Should().Be(1);
+            raisedSender.Should().BeSameAs(timer);
+            fake.Started.Should().BeTrue();
         }
 
         [TestMethod]
         public void StopTimer_PreventsPendingElapsedEvent()
         {
-            // Arrange
-            using var signal = new ManualResetEventSlim(false);
-            using var timer = new TimerWrapper(TimeSpan.FromMilliseconds(150));
+            // Arrange: inject the deterministic inner-timer fake.
+            var fake = new ManualFireInnerTimer();
+            using var timer = new TimerWrapper(fake);
             timer.AutoReset = false;
-            timer.Elapsed += (_, _) => signal.Set();
+            var raisedCount = 0;
+            timer.Elapsed += (_, _) => raisedCount++;
 
-            // Act
+            // Act: start then stop the wrapper. StopTimer must propagate to the inner timer so the
+            // underlying timer is disabled and cannot raise a pending tick.
             timer.StartTimer();
             timer.StopTimer();
 
-            // Assert
-            signal.Wait(250).Should().BeFalse();
+            // Assert: stop is forwarded to the inner timer (Stopped, not Enabled), so no pending
+            // outer Elapsed can fire after stop. The outer event was never raised.
+            fake.Stopped.Should().BeTrue();
+            fake.Enabled.Should().BeFalse();
+            raisedCount.Should().Be(0);
         }
 
         [TestMethod]
         public void StartNew_ConfiguresAutoResetAndInvokesCallback()
         {
-            // Arrange
-            using var signal = new ManualResetEventSlim(false);
+            // Arrange: drive StartNew through the inner-timer seam so AutoReset configuration and
+            // callback invocation are observed deterministically (no wall-clock wait).
+            var fake = new ManualFireInnerTimer();
+            var callbackCount = 0;
 
             // Act
             using var timer = TimerWrapper.StartNew(
-                TimeSpan.FromMilliseconds(20),
+                fake,
                 autoReset: false,
-                callback: signal.Set
+                callback: () => callbackCount++
             );
 
-            // Assert
+            // Assert: AutoReset is configured (false) on both the wrapper and the inner fake, the
+            // inner timer was started, and firing the inner tick invokes the callback exactly once.
             timer.AutoReset.Should().BeFalse();
-            signal.Wait(500).Should().BeTrue();
+            fake.AutoReset.Should().BeFalse();
+            fake.Started.Should().BeTrue();
+
+            fake.FireElapsed();
+            callbackCount.Should().Be(1);
         }
 
         [TestMethod]

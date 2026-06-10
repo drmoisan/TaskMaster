@@ -10,7 +10,9 @@ using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using UtilitiesCS.Interfaces;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.Test.TestHelpers;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
 {
@@ -590,6 +592,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             var parent = new TestSmartItem { Name = "queued", Value = 10 };
             var harness = new SmartSerializableHarness(parent);
             using var signal = new ManualResetEventSlim(false);
+            using var timerStub = new ManualFireTimerWrapper();
+            harness.SetTimerFactory(_ => timerStub);
             harness.Config.Disk.FilePath = Path.Combine(@"C:\Smart", "queued-timer.json");
             harness.SetCreateStreamWriter(_ =>
             {
@@ -599,11 +603,14 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             // Act
             harness.Serialize();
-            AcceleratePrivateTimer(harness, typeof(SmartSerializable<TestSmartItem>));
+
+            // The deferred-serialization timer was created via the injected factory and started.
+            // Fire it deterministically to trigger the deferred write — no wall-clock wait.
+            timerStub.Started.Should().BeTrue();
+            timerStub.FireElapsed();
 
             // Assert
-            signal.Wait(1000).Should().BeTrue();
-            StopPrivateTimer(harness, typeof(SmartSerializable<TestSmartItem>));
+            signal.IsSet.Should().BeTrue();
         }
 
         [TestMethod]
@@ -761,18 +768,6 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             timer?.GetType().GetMethod("Dispose")?.Invoke(timer, null);
         }
 
-        private static void AcceleratePrivateTimer(object target, Type declaringType)
-        {
-            var timerField = declaringType.GetField(
-                "_timer",
-                BindingFlags.Instance | BindingFlags.NonPublic
-            );
-            var timer = timerField?.GetValue(target);
-
-            timer?.GetType().GetProperty("IntervalInMilliseconds")?.SetValue(timer, 1d);
-            timer?.GetType().GetMethod("ResetTimer")?.Invoke(timer, null);
-        }
-
         private sealed class SmartSerializableHarness : SmartSerializable<TestSmartItem>
         {
             public SmartSerializableHarness(TestSmartItem parent)
@@ -806,6 +801,9 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             public void SetCreateStreamWriter(Func<string, StreamWriter> createStreamWriter) =>
                 CreateStreamWriter = createStreamWriter;
+
+            public void SetTimerFactory(Func<TimeSpan, ITimerWrapper> timerFactory) =>
+                TimerFactory = timerFactory;
         }
 
         private sealed class TestSmartItem : ISmartSerializable<TestSmartItem>

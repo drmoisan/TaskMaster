@@ -4,6 +4,7 @@
 - [csharp-coverage-artifact-is-cobertura](project_csharp-coverage-artifact-is-cobertura.md) — `artifacts/csharp/coverage.xml` is Cobertura; the hook parses it as JaCoCo and gets $null repo-wide, so the reviewer must parse it manually
 - [csharp-local-fullsuite-coverage-blocked](project_csharp-local-fullsuite-coverage-blocked.md) — local full-assembly C# coverage fails on a Moq binding redirect; per-feature Cobertura is trimmed to affected classes (no repo-wide root), so repo-wide gate is the PR CI run
 - [feature-audit check-off heading case](feature-audit-checkoff-heading-case.md) — validator needs `## Acceptance Criteria Check-off` (lowercase off); template ships `Check-Off` and fails
+- [feature-audit requires Summary heading](feature-audit-requires-summary-heading.md) — validator also needs a literal `## Summary`; `## Verdict` alone fails
 - [policy-audit required structure](policy-audit-required-structure.md) — validator needs Appendix A heading, all 4 TS/PS coverage checklist lines, and a numeric Baseline/Post-change/Disposition comparison line
 - [code-review findings table header](code-review-findings-table-header.md) — code-review validator requires the exact 7-column `| Severity | File | Location | Finding | Recommendation | Rationale | Evidence |` header
 - [code-review/feature-audit required headings](code-review-required-headings.md) — code-review needs `## Executive Summary` + `## Findings Table`; feature-audit needs `## Acceptance Criteria Inventory` + `## Acceptance Criteria Evaluation` (exact text)
@@ -11,3 +12,4 @@
 - [policy-audit validator uses full template](policy-audit-validator-uses-full-template.md) — THIS repo's validator needs the full bundled template headings (`## Executive Summary` + `## 1`..`## 7`); resolve the MCP template asset and fill it in
 - [PowerShell line-count undercount](powershell-measure-object-line-undercount.md) — `(Get-Content | Measure-Object -Line).Lines` undercounts vs `awk NR`/`wc -l`
 - [policy-audit section-7 row-label parser](policy-audit-section7-row-label-parser.md) — validator misreads non-standard section-7 Code-Quality row labels as coverage rows; reuse cycle-1 wording, no comma qualifiers in label cell
+- [numeric new/changed-code coverage + Scope-and-Baseline](policy-audit-numeric-new-code-coverage.md) — policy-audit new-code-coverage field must be a literal percent (prose fails); feature-audit needs a `## Scope and Baseline` heading

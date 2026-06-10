@@ -1241,10 +1241,19 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             Func<Task> act = async () =>
                 await InvokeAsyncResult(
                     "GetTableInViewAsync",
-                    new[] { typeof(Outlook.Explorer), typeof(CancellationToken), typeof(int) },
+                    new[]
+                    {
+                        typeof(Outlook.Explorer),
+                        typeof(CancellationToken),
+                        typeof(int),
+                        typeof(int),
+                        typeof(Func<int, CancellationTokenSource>),
+                    },
                     mockExplorer.Object,
                     CancellationToken.None,
-                    0
+                    0,
+                    2000,
+                    null
                 );
 
             await act.Should().ThrowAsync<InvalidOperationException>();
@@ -1258,6 +1267,18 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             var mockExplorer = new Mock<Outlook.Explorer>();
             var callCount = 0;
 
+            // Deterministic cancellation seam (S7): the test injects a timeout-source factory
+            // returning a CancellationTokenSource it holds. On the first GetTable call the
+            // delegate cancels that source synchronously and THEN returns mockTable.Object.
+            // Because the synchronous, non-cancelable delegate has already started running on
+            // the Task.Run thread and runs to completion, cancelling the linked timeout token
+            // mid-flight does NOT retroactively cancel the already-produced result: Task.Run
+            // completes RanToCompletion, so there is no synthetic retry. This reproduces the
+            // original "slow synchronous GetTable outlasts the timeout" scenario WITHOUT any
+            // wall-clock wait or sleep. The injected source is NOT pre-cancelled, so the
+            // delegate still runs on the first call; result is mockTable.Object, callCount == 1.
+            using var injectedSource = new CancellationTokenSource();
+
             mockTableView
                 .Setup(v => v.GetTable())
                 .Returns(() =>
@@ -1265,19 +1286,30 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                     callCount++;
                     if (callCount == 1)
                     {
-                        Thread.Sleep(2100);
+                        injectedSource.Cancel();
                     }
 
                     return mockTable.Object;
                 });
             mockExplorer.Setup(e => e.CurrentView).Returns(mockTableView.Object);
 
+            Func<int, CancellationTokenSource> timeoutSourceFactory = _ => injectedSource;
+
             var result = await InvokeAsyncResult(
                 "GetTableInViewAsync",
-                new[] { typeof(Outlook.Explorer), typeof(CancellationToken), typeof(int) },
+                new[]
+                {
+                    typeof(Outlook.Explorer),
+                    typeof(CancellationToken),
+                    typeof(int),
+                    typeof(int),
+                    typeof(Func<int, CancellationTokenSource>),
+                },
                 mockExplorer.Object,
                 CancellationToken.None,
-                0
+                0,
+                5,
+                timeoutSourceFactory
             );
 
             result.Should().BeSameAs(mockTable.Object);
@@ -1296,10 +1328,19 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             Func<Task> act = async () =>
                 await InvokeAsyncResult(
                     "GetTableInViewAsync",
-                    new[] { typeof(Outlook.Explorer), typeof(CancellationToken), typeof(int) },
+                    new[]
+                    {
+                        typeof(Outlook.Explorer),
+                        typeof(CancellationToken),
+                        typeof(int),
+                        typeof(int),
+                        typeof(Func<int, CancellationTokenSource>),
+                    },
                     mockExplorer.Object,
                     cancel.Token,
-                    0
+                    0,
+                    2000,
+                    null
                 );
 
             await act.Should().ThrowAsync<OperationCanceledException>();
@@ -1623,10 +1664,19 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
 
             var result = await InvokeAsyncResult(
                 "GetTableInViewAsync",
-                new[] { typeof(Outlook.Explorer), typeof(CancellationToken), typeof(int) },
+                new[]
+                {
+                    typeof(Outlook.Explorer),
+                    typeof(CancellationToken),
+                    typeof(int),
+                    typeof(int),
+                    typeof(Func<int, CancellationTokenSource>),
+                },
                 mockExplorer.Object,
                 CancellationToken.None,
-                0
+                0,
+                2000,
+                null
             );
 
             result.Should().BeSameAs(mockTable.Object);

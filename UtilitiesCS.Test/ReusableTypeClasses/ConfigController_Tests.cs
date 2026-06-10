@@ -282,10 +282,16 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
                         .Be(System.IO.Path.Combine(specialFolders["Archive"], "UpdatedNet"));
 
                     var saveTask = controller.SaveAsync();
+                    // SaveAsync installs a WindowsFormsSynchronizationContext and awaits Task.Run,
+                    // so its continuation is posted back to the STA message queue. Blocking the STA
+                    // thread (e.g. GetAwaiter().GetResult()) would deadlock because the queue would
+                    // never pump. Pump the message queue until the task completes, yielding the
+                    // thread between iterations with Thread.Yield() (a scheduler yield, not a
+                    // wall-clock sleep) so the continuation can run deterministically.
                     while (!saveTask.IsCompleted)
                     {
                         System.Windows.Forms.Application.DoEvents();
-                        Thread.Sleep(10);
+                        Thread.Yield();
                     }
                     saveTask.GetAwaiter().GetResult();
 

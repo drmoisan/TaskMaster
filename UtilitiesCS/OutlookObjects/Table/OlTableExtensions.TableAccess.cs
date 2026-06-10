@@ -30,7 +30,9 @@ namespace UtilitiesCS
         public static async Task<Outlook.Table> GetTableInViewAsync(
             this Explorer activeExplorer,
             CancellationToken token,
-            int counter
+            int counter,
+            int timeoutMs = 2000,
+            Func<int, CancellationTokenSource> timeoutSourceFactory = null
         )
         {
             var acquisitionStopwatch = Stopwatch.StartNew();
@@ -50,7 +52,14 @@ namespace UtilitiesCS
 
             try
             {
-                table = await TimeOutTask.RunWithTimeout(view.GetTable, token, 2000, 1, false);
+                table = await TimeOutTask.RunWithTimeout(
+                    view.GetTable,
+                    token,
+                    timeoutMs,
+                    1,
+                    false,
+                    timeoutSourceFactory
+                );
 
                 LogTableTiming(
                     "GetTableInViewAsync table acquisition complete | table acquisition",
@@ -68,7 +77,12 @@ namespace UtilitiesCS
                     Console.WriteLine($"Task timed out on try {counter}");
                     if (counter < 2)
                     {
-                        table = await activeExplorer.GetTableInViewAsync(token, counter + 1);
+                        table = await activeExplorer.GetTableInViewAsync(
+                            token,
+                            counter + 1,
+                            timeoutMs,
+                            timeoutSourceFactory
+                        );
                     }
                     else
                     {
@@ -81,7 +95,15 @@ namespace UtilitiesCS
                 Console.WriteLine($"Task timed out on try {counter}");
                 if (counter < 2)
                 {
-                    table = await activeExplorer.GetTableInViewAsync(token, counter + 1);
+                    // Preserve the original behavior of this retry path, which used the default
+                    // 2000 ms timeout (it omitted the timeoutMs argument); only the new factory
+                    // is propagated so test injection threads through this branch too.
+                    table = await activeExplorer.GetTableInViewAsync(
+                        token,
+                        counter + 1,
+                        2000,
+                        timeoutSourceFactory
+                    );
                 }
                 else
                 {

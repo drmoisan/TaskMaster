@@ -25,10 +25,10 @@ namespace UtilitiesCS
 
         public FilePathHelper(string fileName, string folderPath)
         {
+            PropertyChanged += FilePathHelper_PropertyChanged;
             FileName = fileName;
             FolderPath = folderPath;
             FilePath = Path.Combine(_folderPath, _fileName);
-            PropertyChanged += FilePathHelper_PropertyChanged;
         }
 
         private FilePathHelper(
@@ -38,12 +38,16 @@ namespace UtilitiesCS
             string folderPath
         )
         {
+            PropertyChanged += FilePathHelper_PropertyChanged;
             FileStemSeed = fileNameSeed;
             FileStemSuffix = fileNameSuffix;
             FileExtension = fileExtension;
             FolderPath = folderPath;
-            FilePath = Path.Combine(_folderPath, _fileName);
-            PropertyChanged += FilePathHelper_PropertyChanged;
+            // The FileStemSeed/FileStemSuffix/FileExtension/FolderPath setters above already
+            // recompute _fileName and _filePath through FilePathHelper_PropertyChanged. A terminal
+            // FilePath = Path.Combine(_folderPath, _fileName) here would re-enter the FilePath
+            // handler while _fileName is still being derived, splitting the combined value back
+            // and corrupting FolderPath (e.g. C:\data -> C:\). It is therefore omitted.
         }
 
         public static FilePathHelper FromSeed(

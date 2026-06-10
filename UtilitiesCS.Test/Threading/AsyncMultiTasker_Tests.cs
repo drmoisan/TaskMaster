@@ -9,6 +9,8 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.Interfaces;
+using UtilitiesCS.Test.TestHelpers;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.Test.Threading
@@ -178,16 +180,18 @@ namespace UtilitiesCS.Test.Threading
             var reports = new ConcurrentBag<(int Value, string JobName)>();
             var progress = new SyncProgress(r => reports.Add(r));
 
+            // Inject a deterministic timer that fires its Elapsed event synchronously when the
+            // production code starts it, producing a non-final progress report without a wall-clock
+            // sleep simulating slow work.
+            using var timerStub = new ManualFireTimerWrapper { FireOnStart = true };
+
             await AsyncMultiTasker.AsyncMultiTaskChunker<int, string>(
                 inputs,
-                item =>
-                {
-                    Thread.Sleep(350);
-                    return item.ToString();
-                },
+                item => item.ToString(),
                 progress,
                 "SyncFuncProgress",
-                CancellationToken.None
+                CancellationToken.None,
+                timerFactory: _ => timerStub
             );
 
             reports.Should().Contain(r => r.JobName.StartsWith("SyncFuncProgress Completed "));
@@ -461,12 +465,18 @@ namespace UtilitiesCS.Test.Threading
             var reports = new ConcurrentBag<(int Value, string JobName)>();
             var progress = new SyncProgress(r => reports.Add(r));
 
+            // Inject a deterministic timer that fires its Elapsed event synchronously when the
+            // production code starts it, producing a non-final progress report without a wall-clock
+            // sleep simulating slow work.
+            using var timerStub = new ManualFireTimerWrapper { FireOnStart = true };
+
             await AsyncMultiTasker.AsyncMultiTaskChunker<int>(
                 inputs,
-                _ => Thread.Sleep(350),
+                _ => { },
                 progress,
                 "ActionProgress",
-                CancellationToken.None
+                CancellationToken.None,
+                timerFactory: _ => timerStub
             );
 
             reports.Should().Contain(r => r.JobName.StartsWith("ActionProgress Completed "));
@@ -475,8 +485,10 @@ namespace UtilitiesCS.Test.Threading
         [TestMethod]
         public void GetReportMessage_WhenInvoked_FormatsPrefixAndCounts()
         {
+            // A started-then-stopped Stopwatch provides a real (tiny, non-zero) elapsed for message
+            // formatting without a wall-clock sleep. SpinUntil bounds the advance deterministically.
             var stopwatch = Stopwatch.StartNew();
-            Thread.Sleep(20);
+            SpinWait.SpinUntil(() => stopwatch.Elapsed > TimeSpan.Zero, 100);
             stopwatch.Stop();
 
             var message = InvokeGetReportMessage("Report", 0, 5, stopwatch);

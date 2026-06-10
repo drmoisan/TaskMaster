@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.Interfaces;
 
 namespace UtilitiesCS.Threading
 {
@@ -23,9 +24,11 @@ namespace UtilitiesCS.Threading
             Func<T, Task<TOut>> func,
             IProgress<(int Value, string JobName)> progress,
             string messagePrefix,
-            CancellationToken cancel
+            CancellationToken cancel,
+            Func<TimeSpan, ITimerWrapper> timerFactory = null
         )
         {
+            timerFactory ??= interval => new TimerWrapper(interval);
             int count = obj.Count();
             int complete = 0;
 
@@ -69,7 +72,7 @@ namespace UtilitiesCS.Threading
                 );
             }
 
-            var timer = new TimerWrapper(TimeSpan.FromSeconds(1));
+            var timer = timerFactory(TimeSpan.FromSeconds(1));
             timer.Elapsed += (sender, e) =>
             {
                 if (count > 0)
@@ -127,9 +130,11 @@ namespace UtilitiesCS.Threading
             Func<T, Task> func,
             IProgress<(int Value, string JobName)> progress,
             string messagePrefix,
-            CancellationToken cancel
+            CancellationToken cancel,
+            Func<TimeSpan, ITimerWrapper> timerFactory = null
         )
         {
+            timerFactory ??= interval => new TimerWrapper(interval);
             int count = obj.Count();
             int complete = 0;
 
@@ -174,10 +179,10 @@ namespace UtilitiesCS.Threading
                 );
             }
 
-            TimerWrapper timer = null;
+            ITimerWrapper timer = null;
             await Task.Run(() =>
             {
-                timer = new TimerWrapper(TimeSpan.FromSeconds(1));
+                timer = timerFactory(TimeSpan.FromSeconds(1));
                 timer.Elapsed += (sender, e) =>
                 {
                     if (count > 0)
@@ -222,9 +227,11 @@ namespace UtilitiesCS.Threading
             Func<T, TOut> func,
             IProgress<(int Value, string JobName)> progress,
             string messagePrefix,
-            CancellationToken cancel
+            CancellationToken cancel,
+            Func<TimeSpan, ITimerWrapper> timerFactory = null
         )
         {
+            timerFactory ??= interval => new TimerWrapper(interval);
             int count = obj.Count();
             int complete = 0;
 
@@ -267,7 +274,7 @@ namespace UtilitiesCS.Threading
                 );
             }
 
-            var timer = new TimerWrapper(TimeSpan.FromSeconds(1));
+            var timer = timerFactory(TimeSpan.FromSeconds(1));
             timer.Elapsed += (sender, e) =>
             {
                 if (count > 0)
@@ -315,9 +322,11 @@ namespace UtilitiesCS.Threading
             Action<T> action,
             IProgress<(int Value, string JobName)> progress,
             string messagePrefix,
-            CancellationToken cancel
+            CancellationToken cancel,
+            Func<TimeSpan, ITimerWrapper> timerFactory = null
         )
         {
+            timerFactory ??= interval => new TimerWrapper(interval);
             int count = obj.Count();
             int complete = 0;
 
@@ -360,7 +369,7 @@ namespace UtilitiesCS.Threading
                 );
             }
 
-            var timer = new TimerWrapper(TimeSpan.FromSeconds(1));
+            var timer = timerFactory(TimeSpan.FromSeconds(1));
             timer.Elapsed += (sender, e) =>
             {
                 if (count > 0)

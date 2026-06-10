@@ -88,6 +88,16 @@ namespace UtilitiesCS.HelperClasses.TimedActions
             set => _timer = value;
         }
 
+        /// <summary>
+        /// Factory used to create the dispatch timer in <see cref="StartTimer"/>. Defaults to a
+        /// real <see cref="TimerWrapper"/>, preserving production behavior. Tests override this to
+        /// inject a deterministic, manually-fired timer so batch dispatch can be triggered without
+        /// a wall-clock wait. The factory is invoked on each <see cref="StartTimer"/> call,
+        /// preserving the stop/dispose-then-recreate lifecycle.
+        /// </summary>
+        internal Func<TimeSpan, ITimerWrapper> TimerFactory { get; set; } =
+            interval => new TimerWrapper(interval);
+
         #endregion
 
         #region Public Producer / Consumer Methods
@@ -226,7 +236,7 @@ namespace UtilitiesCS.HelperClasses.TimedActions
             else
             {
                 //_timer = new System.Timers.Timer(Config.WriteInterval.TotalMilliseconds);
-                _timer = new TimerWrapper(Config.WriteInterval);
+                _timer = TimerFactory(Config.WriteInterval);
                 _timer.Elapsed += OnTimedEvent;
                 _timer.AutoReset = true;
                 _timer.Enabled = true;

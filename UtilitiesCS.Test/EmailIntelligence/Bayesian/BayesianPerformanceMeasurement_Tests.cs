@@ -947,7 +947,10 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             var sut = CreateMeasurement();
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            Thread.Sleep(20);
+            // Guarantee a non-zero measured elapsed without a wall-clock sleep so the progress
+            // message formatting has real elapsed time. SpinUntil returns as soon as the Stopwatch
+            // advances past zero (microseconds); the timeout is only a safety bound (Risk R7).
+            SpinWait.SpinUntil(() => stopwatch.Elapsed > TimeSpan.Zero, 100);
             double secondsPerItem = 0;
             double remainingSeconds = 10;
             double elapsedSeconds = 0;

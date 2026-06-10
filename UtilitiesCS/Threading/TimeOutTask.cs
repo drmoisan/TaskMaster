@@ -22,10 +22,18 @@ namespace UtilitiesCS
             CancellationToken token,
             int milliseconds,
             int maxAttempts,
-            bool strict
+            bool strict,
+            Func<int, CancellationTokenSource> timeoutSourceFactory = null
         )
         {
-            return await function.RunWithTimeout(token, milliseconds, maxAttempts, strict, 0);
+            return await function.RunWithTimeout(
+                token,
+                milliseconds,
+                maxAttempts,
+                strict,
+                0,
+                timeoutSourceFactory
+            );
         }
 
         private static async Task<TResult> RunWithTimeout<TResult>(
@@ -34,12 +42,15 @@ namespace UtilitiesCS
             int milliseconds,
             int maxAttempts,
             bool strict,
-            int attempt
+            int attempt,
+            Func<int, CancellationTokenSource> timeoutSourceFactory = null
         )
         {
             token.ThrowIfCancellationRequested();
 
-            using var timeoutSource = new CancellationTokenSource(milliseconds);
+            using var timeoutSource = (
+                timeoutSourceFactory ?? (ms => new CancellationTokenSource(ms))
+            )(milliseconds);
             using var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
                 token,
                 timeoutSource.Token
@@ -61,7 +72,8 @@ namespace UtilitiesCS
                         milliseconds,
                         maxAttempts,
                         strict,
-                        attempt + 1
+                        attempt + 1,
+                        timeoutSourceFactory
                     );
                 }
                 else

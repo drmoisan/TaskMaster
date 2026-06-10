@@ -196,7 +196,10 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             var group = new BayesianClassifierGroup();
             var sw = new SegmentStopWatch();
             sw.Start();
-            System.Threading.Thread.Sleep(10);
+            // Guarantee a non-zero measured elapsed without a wall-clock sleep. SpinUntil returns
+            // as soon as the Stopwatch advances past zero (microseconds); the timeout is only a
+            // safety bound, not an expected wait (Risk R7 — structural non-zero assertion).
+            System.Threading.SpinWait.SpinUntil(() => sw.Elapsed > TimeSpan.Zero, 100);
 
             // Act
             var message = group.GetReportMessage(1, 10, sw);

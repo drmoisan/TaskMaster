@@ -135,9 +135,25 @@ namespace UtilitiesCS
                 return;
             }
 
+            if (ms.count == 1)
+            {
+                ms.head = null;
+                ms.mid = null;
+                ms.count = 0;
+                return;
+            }
+
             ms.count -= 1;
-            ms.mid.next.prev = ms.mid.prev;
-            ms.mid.prev.next = ms.mid.next;
+
+            if (ms.mid.next != null)
+            {
+                ms.mid.next.prev = ms.mid.prev;
+            }
+
+            if (ms.mid.prev != null)
+            {
+                ms.mid.prev.next = ms.mid.next;
+            }
 
             if (ms.count % 2 != 0)
             {

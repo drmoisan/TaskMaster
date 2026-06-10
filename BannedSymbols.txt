@@ -1,0 +1,7 @@
+P:System.DateTime.Now;Do not use DateTime.Now. Inject System.TimeProvider and call GetLocalNow() for testable, deterministic time.
+P:System.DateTime.UtcNow;Do not use DateTime.UtcNow. Inject System.TimeProvider and call GetUtcNow() for testable, deterministic time.
+P:System.Random.Shared;Do not use Random.Shared. Inject a seeded or deterministic random source for testability.
+M:System.Threading.Thread.Sleep(System.Int32);Do not call Thread.Sleep. Use async/await with an injected time abstraction or a cancellation token.
+M:System.Threading.Thread.Sleep(System.TimeSpan);Do not call Thread.Sleep. Use async/await with an injected time abstraction or a cancellation token.
+M:System.Threading.Tasks.Task.Delay(System.Int32);Do not call Task.Delay directly in production code. Inject a time abstraction (System.TimeProvider).
+M:System.Threading.Tasks.Task.Delay(System.TimeSpan);Do not call Task.Delay directly in production code. Inject a time abstraction (System.TimeProvider).
