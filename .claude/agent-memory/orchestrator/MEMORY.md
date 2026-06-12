@@ -12,3 +12,4 @@
 - [C# analyzer packages.config quirks](csharp-analyzer-packages-config-quirks.md) — non-SDK analyzer wiring needs manual roslyn subfolder selection; SecurityCodeScan.VS2019 breaks Roslyn 5.6 via CS8032 (can't be silenced by editorconfig)
 - [Whole-repo CI gate is not out-of-scope](whole-repo-ci-gate-not-out-of-scope.md) — a pre-existing repo-wide csharpier/lint failure blocks the PR's required check (AC6); fix it, don't defer it
 - [Honor user's per-cycle folder layout](feedback_verify_flat_artifact_layout_after_executor.md) — #181 user committed a per-cycle folder layout (<ts>-remediation/, <ts>-audit/); follow it. Only revert UNDIRECTED agent relocations, not the user's own reorg
+- [Repo-wide coverage authority exception](feedback_repowide_coverage_authority_exception.md) — sole blocking finding = pre-existing repo-wide coverage shortfall + change-scope gates pass → surface authority-scoped exception, don't auto-cycle

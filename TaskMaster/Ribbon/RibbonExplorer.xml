@@ -94,7 +94,7 @@
           </menu>
         </group>
       </tab>
-      <tab idMso="TabMail">
+      <tab id="TabTaskMaster" label="Taskmaster" insertAfterMso="TabMail">
         <group id="SpamBayesGroup" imageMso="RecycleBin" label="Spam Bayes">
           <button
             id="TrainSpam"

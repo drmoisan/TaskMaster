@@ -93,5 +93,69 @@ namespace TaskMaster.Test.Ribbon
                     string.Join(", ", illegalChildren)
                 );
         }
+
+        /// <summary>
+        /// The four TaskMaster custom groups (<c>SpamBayesGroup</c>, <c>Group2</c>,
+        /// <c>TriageGroup</c>, <c>UtilitiesGroup</c>) must live under the dedicated custom tab
+        /// labeled "Taskmaster" rather than on the built-in Mail tab. This asserts each group
+        /// resolves as a descendant <c>group</c> of a <c>tab</c> whose <c>label</c> is "Taskmaster".
+        /// </summary>
+        [TestMethod]
+        public void RibbonExplorerXml_TaskMasterGroupsLiveUnderTaskmasterTab()
+        {
+            // Arrange
+            var document = LoadRibbonDocument();
+            var expectedGroupIds = new[]
+            {
+                "SpamBayesGroup",
+                "Group2",
+                "TriageGroup",
+                "UtilitiesGroup",
+            };
+
+            // Act: collect the ids of every <group> that descends from a <tab label="Taskmaster">.
+            var taskmasterGroupIds = document
+                .Descendants(CustomUiNs + "tab")
+                .Where(tab => tab.Attribute("label")?.Value == "Taskmaster")
+                .Descendants(CustomUiNs + "group")
+                .Select(group => group.Attribute("id")?.Value)
+                .ToList();
+
+            // Assert: all four custom groups are children of the Taskmaster tab.
+            taskmasterGroupIds
+                .Should()
+                .Contain(
+                    expectedGroupIds,
+                    "the four custom groups must be moved under the dedicated Taskmaster tab"
+                );
+        }
+
+        /// <summary>
+        /// After the move, the built-in Mail tab (<c>idMso="TabMail"</c>) must carry no custom
+        /// <c>group</c>. This asserts <c>TabMail</c> is either absent from the document or, if
+        /// present, has zero <c>group</c> children, so no TaskMaster control remains on the
+        /// native Mail tab.
+        /// </summary>
+        [TestMethod]
+        public void RibbonExplorerXml_TabMailCarriesNoCustomGroup()
+        {
+            // Arrange
+            var document = LoadRibbonDocument();
+
+            // Act: find the built-in Mail tab and count its <group> descendants.
+            var tabMail = document
+                .Descendants(CustomUiNs + "tab")
+                .SingleOrDefault(tab => tab.Attribute("idMso")?.Value == "TabMail");
+
+            var tabMailGroupCount = tabMail?.Descendants(CustomUiNs + "group").Count() ?? 0;
+
+            // Assert: TabMail is absent, or present with no custom group.
+            tabMailGroupCount
+                .Should()
+                .Be(
+                    0,
+                    "the built-in Mail tab must not host any custom TaskMaster group after the move"
+                );
+        }
     }
 }
