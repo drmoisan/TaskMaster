@@ -6,8 +6,89 @@ param(
     [string]$Configuration,
 
     [Parameter(Mandatory = $false)]
-    [string]$CoverageOutput = "coverage\coverage.cobertura.xml"
+    [string]$CoverageOutput = "coverage\coverage.cobertura.xml",
+
+    [Parameter(Mandatory = $false)]
+    [switch]$NoExecute
 )
+
+function Resolve-RunSettingsPath {
+    <#
+    .SYNOPSIS
+        Resolves the repo-root TaskMaster.runsettings path and fails fast if absent.
+    .DESCRIPTION
+        The runsettings path is resolved deterministically from the repository root so
+        VS Code coverage runs apply the same MSTest parallelization that Visual Studio
+        auto-detects. A clear, specific error is thrown when the file is missing.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RepoRoot
+    )
+
+    $runSettingsPath = Join-Path $RepoRoot 'TaskMaster.runsettings'
+    if (-not (Test-Path $runSettingsPath)) {
+        throw "Runsettings file not found: $runSettingsPath"
+    }
+
+    return $runSettingsPath
+}
+
+function Get-DotnetCoverageArgumentList {
+    <#
+    .SYNOPSIS
+        Builds the dotnet-coverage argument list, including the inner vstest /Settings:.
+    .DESCRIPTION
+        Returns the full argument array for dotnet-coverage collect. The outer
+        --settings <coverage.config> (instrumentation excludes) is preserved and remains
+        distinct from the inner vstest /Settings:<TaskMaster.runsettings> applied after
+        the -- separator and the vstest executable path. Pure function; no I/O or execution.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$OutputPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$CoverageConfig,
+
+        [Parameter(Mandatory = $true)]
+        [string]$VsTestPath,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$TestAssembly,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RunSettingsPath
+    )
+
+    # The outer dotnet-coverage --settings is the instrumentation-exclude file
+    # (coverage.config); the inner vstest /Settings: is the MSTest runsettings.
+    return @(
+        'collect',
+        '--output', $OutputPath,
+        '--output-format', 'cobertura',
+        '--settings', $CoverageConfig,
+        '--', $VsTestPath
+    ) + @($TestAssembly) + @("/Settings:$RunSettingsPath", '/InIsolation')
+}
+
+function Invoke-DotnetCoverageExe {
+    <#
+    .SYNOPSIS
+        Wrapper seam that splats the argument list into dotnet-coverage.
+    .DESCRIPTION
+        Single array parameter (DotnetCoverageArgs, not Args) splatted into the
+        dotnet-coverage executable. This is the mockable seam used by Pester tests so
+        the constructed argument list can be asserted without launching the executable
+        or the inner vstest.console.exe.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$DotnetCoverageArgs
+    )
+
+    & dotnet-coverage @DotnetCoverageArgs
+}
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -28,6 +109,8 @@ $resolvedSearchRoot = Join-Path $repoRoot $SearchRoot
 if (-not (Test-Path $resolvedSearchRoot)) {
     throw "Search root not found: $resolvedSearchRoot"
 }
+
+$runSettingsPath = Resolve-RunSettingsPath -RepoRoot $repoRoot
 
 $vswherePath = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
 if (-not (Test-Path $vswherePath)) {
@@ -70,8 +153,18 @@ Write-Output "Coverage output: $resolvedOutputPath"
 $coverageConfig = Join-Path $repoRoot 'coverage.config'
 
 # Pass -- to dotnet-coverage to signal the start of the test runner command and its arguments.
-$dotnetCoverageArgs = @('collect', '--output', $resolvedOutputPath, '--output-format', 'cobertura', '--settings', $coverageConfig, '--', $vstestPath) + $testAssemblies + @('/InIsolation')
-& dotnet-coverage @dotnetCoverageArgs
+$dotnetCoverageArgs = Get-DotnetCoverageArgumentList `
+    -OutputPath $resolvedOutputPath `
+    -CoverageConfig $coverageConfig `
+    -VsTestPath $vstestPath `
+    -TestAssembly $testAssemblies `
+    -RunSettingsPath $runSettingsPath
+
+if ($NoExecute) {
+    return
+}
+
+Invoke-DotnetCoverageExe -DotnetCoverageArgs $dotnetCoverageArgs
 if ($LASTEXITCODE -ne 0) {
     throw "MSTest with coverage failed with exit code $LASTEXITCODE"
 }
@@ -87,4 +180,3 @@ $processedXmlContent = ConvertTo-KoverageCoberturaXml -XmlContent $xmlContent -R
 
 Set-Content -Path $resolvedOutputPath -Value $processedXmlContent -Encoding UTF8 -NoNewline
 Write-Output "Done. Coverage artifact: $resolvedOutputPath"
-
