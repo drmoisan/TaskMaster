@@ -1,0 +1,11 @@
+# MSBuild / VSTO project files are owned by the Visual Studio project system,
+# not by a generic formatter. Prettier treats them as plain XML and reflows
+# attributes purely on print-width; it cannot maintain MSBuild/VSTO semantics
+# (ProjectTypeGuids, import ordering, RunSettingsFilePath, NuGet-restore targets).
+# Visual Studio rewrites these files to its own single-line shape on every save,
+# so letting Prettier format them produces perpetual churn as the two tools
+# undo each other. Per CLAUDE.md, formatters must not touch project files
+# (csharpier is .cs-only by design). Leave *.csproj / *.props / *.targets to VS.
+*.csproj
+*.props
+*.targets
