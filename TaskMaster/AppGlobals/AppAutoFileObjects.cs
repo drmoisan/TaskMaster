@@ -608,6 +608,14 @@ namespace TaskMaster
 
         public ManagerAsyncLazy Manager { get; internal set; }
 
+        /// <summary>
+        /// Folder-only holder for the flag-on LCPPN predictor. Defaults to null; populated at the
+        /// classifier-build registration site when <c>UseLcppnPredictor</c> is true, so every fresh
+        /// per-call <c>OlFolderClassifierGroup</c> instance resolves the same built predictor. Null
+        /// means the flat <c>Manager["Folder"]</c> path is active.
+        /// </summary>
+        public IFolderPredictor FolderPredictor { get; set; }
+
         private ProgressTrackerPane _progressTracker;
         public ProgressTrackerPane ProgressTracker => _progressTracker;
         private Microsoft.Office.Tools.CustomTaskPane _progressPane;

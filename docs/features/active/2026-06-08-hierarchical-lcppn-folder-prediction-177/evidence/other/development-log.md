@@ -441,3 +441,92 @@ Executor: atomic-executor
 - All 20 acceptance criteria (AC1-AC20) are checked off in `user-story.md`, each mapped to a passing
   task/test per the plan's AC Traceability table. No required baseline, QA, or coverage-comparison
   artifact is missing. AC17, AC18, AC19, AC20 checked off in this phase.
+
+## Remediation Cycle 1 — F1 (flag-on reachability) and F2 (>= 90% strict coverage)
+
+Plan: `remediation-plan.2026-06-12T15-54.md`. Scope: F1 (Major) + F2 (Minor) only.
+
+### Phase 0 — Compliance read and remediation baseline
+
+- [P0-T1] Timestamp 2026-06-12T16-02 (UTC). Read CLAUDE.md, general-code-change.md,
+  general-unit-test.md, csharp.md in policy order. Evidence:
+  `evidence/baseline/phase0-instructions-read.2026-06-12T15-54.md`.
+- [P0-T2] Timestamp 2026-06-12T16-08 (UTC). Read remediation-inputs, code-review, OlFolderClassifierGroup,
+  the three callers (EmailFiler/SortEmail/FolderScorer), ManagerAsyncLazy, IAppAutoFileObjects,
+  AppAutoFileObjects, FolderHierarchyTree, LcppnFolderPredictor. Confirmed F1/F2 scope and the F1 holder
+  location (`IAppAutoFileObjects.FolderPredictor`). Evidence:
+  `evidence/baseline/phase0-context-read.2026-06-12T15-54.md`.
+- [P0-T3] CSharpier `check .` EXIT 0; 1076 files, all formatted. (CSharpier v1 subcommand syntax used.)
+- [P0-T4] Analyzer msbuild EXIT 0; 0 Warning, 0 Error.
+- [P0-T5] Nullable/TWAE msbuild EXIT 0; 0 Warning, 0 Error (no pre-existing CS8625 in this config).
+- [P0-T6] vstest /EnableCodeCoverage /InIsolation EXIT 0; 3890/3890 passed. Baseline strict per-type:
+  FolderHierarchyTree 86.42%, LcppnFolderPredictor 89.14% (matching reviewer baseline). Repo-wide
+  first-party strict 85.40% (reviewer-reported gate scope).
+- [P0-T7] All six Phase 0 baseline artifacts present and field-complete; numeric coverage present in P0-T6.
+
+### Phase 1 — F1: shared Folder predictor holder seam
+
+- Timestamp: 2026-06-12T16-50 (UTC). Mechanism: Folder-only nullable `IFolderPredictor FolderPredictor`
+  holder on `IAppAutoFileObjects` (declared in IAppAutoFileObjects.cs, implemented as a public
+  auto-property on AppAutoFileObjects.cs near `Manager`). The shared `Manager` value type is unchanged
+  and `ManagerAsyncLazy.cs` has zero diff.
+- [P1-T1] Declared `IFolderPredictor FolderPredictor { get; set; }` on `IAppAutoFileObjects` with XML doc.
+- [P1-T2] Implemented `public IFolderPredictor FolderPredictor { get; set; }` (default null) on `AppAutoFileObjects`.
+- [P1-T3] `GetFolderPredictorAsync` now returns `Globals.AF.FolderPredictor` when flag-on and holder non-null;
+  else awaits `Globals.AF.Manager["Folder"]`. No longer reads any per-instance field.
+- [P1-T4] `BuildClassifiersAsync` flag-on block now assigns `Globals.AF.FolderPredictor = await BuildLcppnPredictorAsync(collection)`.
+- [P1-T5] `SetLcppnPredictor` now writes `Globals.AF.FolderPredictor`; the `_lcppnPredictor` field and its
+  comment were removed (all 5 references resolved; grep confirms none remain).
+- [P1-T6] `CreateMockGlobalsWithFolder` now sets `mockAf.SetupProperty(x => x.FolderPredictor)` so the
+  shared holder has a real backing store on the mock; the four existing AC13/AC14 seam tests still pass.
+- [P1-T7] Added `GetFolderPredictorAsync_FlagOn_ReachableThroughFreshPerCallInstance` (PASS): two fresh
+  per-call `OlFolderClassifierGroup` instances over the same globals both return the same held LCPPN predictor.
+- [P1-T8] Added `GetFolderPredictorAsync_FlagOff_FreshPerCallInstance_ReturnsFlat` (PASS): flag-off fresh
+  per-call returns the flat `Manager["Folder"]` group (AC13 preserved).
+- [P1-T9] Full toolchain single clean pass: CSharpier check EXIT 0 (no changes); analyzers EXIT 0
+  (0W/0E); nullable/TWAE EXIT 0 (0W/0E); vstest /EnableCodeCoverage /InIsolation EXIT 0, 3892/3892
+  passed; seam suite 8/8. Artifacts: `evidence/qa-gates/2026-06-12T15-54/p1-{csharpier,analyzers,nullable,tests}.md`.
+  Note: one pre-existing flaky UI-Dispatcher test (`IdleAsyncQueue_Tests.AddEntry_UseUiThreadTrue_...`,
+  unrelated Threading subsystem) failed once under parallelization but passed in isolation and on the
+  green re-run; recorded, not masked.
+- AC: AC13 and AC14 remain satisfied (already checked off in user-story.md); the F1 reachability fix
+  strengthens AC14 to fresh per-call instances.
+
+### Phase 2 — F2: strict new-code coverage to >= 90%
+
+- Timestamp: 2026-06-12T17-06 (UTC).
+- [P2-T1] Added targeted tests to `FolderHierarchyTree_Tests.cs` for the uncovered members/branches:
+  `GetChildren` null-key/unknown-node empty-array returns, `NodeKeys` accessor, `GetNode` null-key
+  return, `IsLeaf` false branches (missing node, null, node-with-children), `ContainsNode` null/false,
+  `AddPath` separators-only (zero-segment) skip, and `AddLeaf` null-parent fail-fast.
+- [P2-T2] Added targeted tests to `LcppnFolderPredictor_Tests.cs` for: `Build` null-config fail-fast,
+  `DescendBeam` terminal-leaf emission when a frontier node has no classifier (`partial.NodeKey.Length > 0`),
+  the `scores.Count == 0` terminal branch, the beam-trim branch (`next.Count > BeamWidth`), and `UnTrain`
+  with an absent intermediate parent (TryGetValue miss).
+- [P2-T3] No new test file created; both F2 test files are pre-registered (csproj lines 116 and 118). N/A.
+- [P2-T4] Full toolchain: CSharpier format reformatted the two test files, restarted, check stable (EXIT 0);
+  analyzers EXIT 0 (0 Error; no warnings in F2 files); nullable/TWAE EXIT 0 (0W/0E); tests: targeted F2
+  46/46, full suite (excluding pre-existing flaky IdleAsyncQueue test) 3903/3903 EXIT 0, flaky test passes
+  in isolation. **Post-change strict coverage: FolderHierarchyTree 100.00% (was 86.42%), LcppnFolderPredictor
+  97.71% (was 89.14%)** — both exceed the >= 90% gate. Artifacts:
+  `evidence/qa-gates/2026-06-12T15-54/p2-{csharpier,analyzers,nullable,tests}.md`, `p2-coverage.xml`.
+- Pre-existing flaky `IdleAsyncQueue_Tests.AddEntry_UseUiThreadTrue_...` (static-state test-isolation
+  defect, Threading subsystem, out of scope) surfaced more reliably after the new test classes shifted
+  parallel scheduling; recorded in p2-tests.md, not masked, excluded only from the deterministic coverage run.
+
+### Phase 3 — Final QA loop and coverage verification
+
+- Timestamp: 2026-06-12T17-22 (UTC).
+- [P3-T1] Final full toolchain pass: CSharpier check EXIT 0 (no changes); analyzers EXIT 0 (0W/0E);
+  nullable/TWAE EXIT 0 (0W/0E); tests full unfiltered run 3904/3904 EXIT 0 (flake did not reproduce);
+  deterministic excl-flake run 3903/3903. Artifacts: `final-{csharpier,analyzers,nullable,tests}.md`.
+- [P3-T2] Post-change coverage merged to `p2-coverage.xml` and mirrored to canonical
+  `artifacts/csharp/coverage.xml`. `coverage-comparison.md`: FolderHierarchyTree 86.42% -> 100.00% strict;
+  LcppnFolderPredictor 89.14% -> 97.71% strict (both >= 90%); UtilitiesCS.dll 85.45% strict (no regression
+  vs 85.31-85.40% baseline, >= 80% floor).
+- [P3-T3] `evidence/regression-testing/f1-flag-on-reachability.2026-06-12T15-54.md`: flag-on reachability
+  (P1-T7) PASS; AC13 flag-off unchanged (P1-T8) PASS; full seam suite 8/8.
+- [P3-T4] `evidence/other/f1-containment-check.2026-06-12T15-54.md`: prohibited files (ManagerAsyncLazy,
+  Triage, SpamBayes, CategoryClassifierGroup, MulticlassEngine) have ZERO diff; Manager value type
+  unchanged; only the four production/interface files and three test files changed; no .csproj changes.
+- Cycle 1 complete: F1 resolved (flag-on path reachable, AC13 preserved); F2 both target types >= 90% strict.

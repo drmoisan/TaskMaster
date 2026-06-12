@@ -35,6 +35,15 @@ namespace UtilitiesCS
         //ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> Manager { get; }
         ManagerAsyncLazy Manager { get; }
 
+        /// <summary>
+        /// Holds the flag-on hierarchy-aware LCPPN folder predictor so it is reachable by the
+        /// fresh per-call <c>OlFolderClassifierGroup</c> instances that production callers
+        /// construct. This Folder-only holder is set at the classifier-build registration site when
+        /// <c>UseLcppnPredictor</c> is true and is null when the flat <c>Manager["Folder"]</c> path
+        /// is active. It does not alter the shared <see cref="Manager"/> dictionary value type.
+        /// </summary>
+        IFolderPredictor FolderPredictor { get; set; }
+
         //[Obsolete]
         //ScDictionary<string, BayesianClassifierGroup> Manager { get; }
         ProgressTrackerPane ProgressTracker { get; }

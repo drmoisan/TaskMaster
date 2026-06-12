@@ -407,6 +407,142 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             predictor.Nodes.Count.Should().Be(nodeCountBefore);
         }
 
+        // F2 coverage: Build with a null config fails fast (the config-null guard branch).
+        [TestMethod]
+        public void Build_NullConfig_Throws()
+        {
+            // Arrange
+            var corpus = new[] { MinedMail(@"Projects\Alpha", new[] { "alpha" }) };
+
+            // Act
+            var act = () => LcppnFolderPredictor.Build(corpus, null);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>().WithParameterName("config");
+        }
+
+        // F2 coverage: when descent reaches a frontier node whose tree edge marks it as a non-leaf
+        // (so it is enqueued onto the next frontier) but the node has no classifier in Nodes, it is
+        // emitted as a terminal leaf candidate (the partial.NodeKey.Length > 0 / no-classifier branch
+        // in DescendBeam). This is constructed directly to isolate the branch: the tree gives the
+        // root a child "Orphan" that itself has a child (so Orphan is non-leaf and is enqueued), but
+        // Nodes contains only the root classifier, so descent finds no classifier for "Orphan".
+        [TestMethod]
+        public void Classify_FrontierNodeWithoutClassifier_EmitsTerminalLeaf()
+        {
+            // Arrange: train a normal root->Orphan->Child path so the root classifier can score
+            // "Orphan", then remove the intermediate Orphan classifier to leave the tree edge in
+            // place (Orphan remains a non-leaf in the tree) while Nodes no longer has it.
+            var predictor = new LcppnFolderPredictor
+            {
+                BeamWidth = 3,
+                MinimumPathProbability = 0.001,
+                ShrinkageLambda = 0.7,
+                MinColdStartExamples = 0,
+            };
+            predictor.Train(@"Orphan\Child", new[] { "tok", "tok" }, 1);
+
+            // Remove the intermediate node's classifier; the Tree still has Orphan as a non-leaf
+            // (it has the Child edge), so descent enqueues Orphan and then finds no classifier for it.
+            predictor
+                .Nodes.Remove("Orphan")
+                .Should()
+                .BeTrue("the intermediate classifier existed");
+
+            // Act
+            var results = predictor.Classify(new[] { "tok" }).ToArray();
+
+            // Assert: descent emits the intermediate Orphan node as a terminal leaf candidate.
+            results.Select(r => r.Class).Should().Contain("Orphan");
+        }
+
+        // F2 coverage: a frontier node whose classifier produces no child scores (empty parent) is
+        // emitted as a terminal leaf when reached by descent (the scores.Count == 0 branch).
+        [TestMethod]
+        public void Classify_FrontierNodeWithNoChildScores_EmitsTerminalLeaf()
+        {
+            // Arrange: root -> Branch is a real edge with a classifier, but Branch's own classifier
+            // has no children (an empty intermediate node), so ScoreChildren returns empty when
+            // descent reaches it.
+            var predictor = new LcppnFolderPredictor
+            {
+                BeamWidth = 3,
+                MinimumPathProbability = 0.001,
+                ShrinkageLambda = 0.7,
+                MinColdStartExamples = 0,
+            };
+            predictor.Train(@"Branch\Leaf", new[] { "tok" }, 1);
+
+            // Give Branch an extra tree child so it is treated as a non-leaf and enqueued, then
+            // clear Branch's classifier children so ScoreChildren yields no scores for it.
+            predictor.Tree.AddLeaf("Branch", "Ghost");
+            predictor.Nodes["Branch"].UnTrain("Leaf", new[] { "tok" }, 1);
+
+            // Act
+            var results = predictor.Classify(new[] { "tok" }).ToArray();
+
+            // Assert: Branch is emitted as a terminal leaf because it produced no child scores.
+            results.Select(r => r.Class).Should().Contain("Branch");
+        }
+
+        // F2 coverage: the beam-trim branch retains only the top BeamWidth partial paths when the
+        // next frontier exceeds the beam width (next.Count > BeamWidth).
+        [TestMethod]
+        public void Classify_FrontierExceedsBeamWidth_TrimsToBeamWidth()
+        {
+            // Arrange: a root with four non-leaf first-level branches (each has a deeper child), so
+            // the first descent step produces four partials that must be trimmed to BeamWidth = 2.
+            var predictor = new LcppnFolderPredictor
+            {
+                BeamWidth = 2,
+                MinimumPathProbability = 0.001,
+                ShrinkageLambda = 0.7,
+                MinColdStartExamples = 0,
+            };
+            predictor.Train(@"A\A1", new[] { "a" }, 1);
+            predictor.Train(@"B\B1", new[] { "b" }, 1);
+            predictor.Train(@"C\C1", new[] { "c" }, 1);
+            predictor.Train(@"D\D1", new[] { "d" }, 1);
+
+            // Act: querying tokens shared by all branches yields four root partials, trimmed to 2.
+            var results = predictor.Classify(new[] { "a" }).ToArray();
+
+            // Assert: descent completes and returns at most BeamWidth leaf candidates from the
+            // trimmed frontier, with the matching leaf present.
+            results.Should().NotBeEmpty();
+            results.Length.Should().BeLessThanOrEqualTo(2, "the frontier is trimmed to BeamWidth");
+            results[0].Class.Should().Be(@"A\A1");
+        }
+
+        // F2 coverage: UnTrain on a tag whose intermediate parent key is absent from Nodes skips that
+        // segment without throwing (the TryGetValue miss branch in UnTrain). The deep path
+        // "Solo\Deep\Leaf" has no node for the intermediate parent "Solo" (only the root exists),
+        // so the second iteration's TryGetValue("Solo") miss is exercised.
+        [TestMethod]
+        public void UnTrain_IntermediateParentMissing_SkipsMissingSegment()
+        {
+            // Arrange: a predictor whose only registered nodes are the root and "Solo" is absent.
+            var predictor = new LcppnFolderPredictor
+            {
+                BeamWidth = 3,
+                MinimumPathProbability = 0.001,
+                ShrinkageLambda = 0.7,
+                MinColdStartExamples = 0,
+            };
+            predictor.Train("Top", new[] { "tok" }, 1);
+            predictor.Nodes.Keys.Should().NotContain("Solo", "the intermediate parent is absent");
+
+            // Act: untrain a deep path whose intermediate parent "Solo" has no classifier in Nodes,
+            // so the loop iteration for the "Deep" segment (parentKey == "Solo") hits the miss branch.
+            var act = () => predictor.UnTrain(@"Solo\Deep\Leaf", new[] { "tok" }, 1);
+
+            // Assert: no throw; the absent intermediate segment is skipped rather than created.
+            act.Should().NotThrow();
+            predictor
+                .Nodes.Keys.Should()
+                .NotContain("Solo", "UnTrain never registers a missing node");
+        }
+
         // Builds a MinedMailInfo with a Moq IFolderWrapper exposing only RelativePath (no COM).
         private static MinedMailInfo MinedMail(string relativePath, string[] tokens)
         {

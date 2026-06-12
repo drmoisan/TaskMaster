@@ -32,11 +32,6 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
 
         #region Folder predictor seam (LCPPN, flag-gated)
 
-        // Folder-only LCPPN holder. Populated by BuildLcppnPredictorAsync at the registration site
-        // when UseLcppnPredictor is true; otherwise the accessor falls through to the unchanged
-        // flat Manager["Folder"] entry. The shared Manager dictionary value type is not altered.
-        private LcppnFolderPredictor _lcppnPredictor;
-
         /// <summary>
         /// Configuration that controls the Folder predictor seam. Defaults to the flat predictor
         /// (<see cref="LcppnFolderPredictorConfig.UseLcppnPredictor"/> = false), so the existing
@@ -62,14 +57,16 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
         }
 
         /// <summary>
-        /// Stores the built LCPPN predictor in the Folder-only holder. Used by the registration
-        /// site after a flag-on build and exposed as an internal seam so the holder can be set in
-        /// isolation without running the full Outlook-backed build pipeline.
+        /// Stores the built LCPPN predictor in the shared Folder-only holder on
+        /// <c>Globals.AF.FolderPredictor</c>. Used by the registration site after a flag-on build
+        /// and exposed as an internal seam so the holder can be set in isolation without running the
+        /// full Outlook-backed build pipeline. Routing through the shared holder ensures fresh
+        /// per-call <c>OlFolderClassifierGroup</c> instances resolve the same predictor.
         /// </summary>
         /// <param name="predictor">The predictor to hold; may be null to clear the holder.</param>
         internal void SetLcppnPredictor(LcppnFolderPredictor predictor)
         {
-            _lcppnPredictor = predictor;
+            Globals.AF.FolderPredictor = predictor;
         }
 
         /// <summary>
@@ -82,9 +79,12 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
         /// <returns>The active Folder predictor typed as <see cref="IFolderPredictor"/>.</returns>
         public virtual async Task<IFolderPredictor> GetFolderPredictorAsync()
         {
-            if (FolderPredictorConfig?.UseLcppnPredictor == true && _lcppnPredictor is not null)
+            if (
+                FolderPredictorConfig?.UseLcppnPredictor == true
+                && Globals.AF.FolderPredictor is not null
+            )
             {
-                return _lcppnPredictor;
+                return Globals.AF.FolderPredictor;
             }
 
             return await Globals.AF.Manager["Folder"];
@@ -278,7 +278,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
                     // Manager["Folder"] registration above is left unchanged in either case.
                     if (FolderPredictorConfig?.UseLcppnPredictor == true)
                     {
-                        _lcppnPredictor = await BuildLcppnPredictorAsync(collection);
+                        Globals.AF.FolderPredictor = await BuildLcppnPredictorAsync(collection);
                     }
 
                     MyBox.ShowDialog(

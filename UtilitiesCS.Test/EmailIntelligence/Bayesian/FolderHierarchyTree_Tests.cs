@@ -218,5 +218,117 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             // Assert
             act.Should().Throw<ArgumentException>();
         }
+
+        // F2 coverage: AddLeaf with a null parent key fails fast (the null-parent guard branch).
+        [TestMethod]
+        public void AddLeaf_NullParentKey_Throws()
+        {
+            // Arrange
+            var tree = new FolderHierarchyTree();
+
+            // Act
+            var act = () => tree.AddLeaf(null, "Child");
+
+            // Assert
+            act.Should()
+                .Throw<ArgumentNullException>()
+                .WithParameterName("parentKey", "a null parent key is rejected");
+        }
+
+        // F2 coverage: a path consisting only of separators splits to zero non-empty segments and is
+        // ignored, leaving the tree with only the synthetic root (the segments.Length == 0 branch).
+        [TestMethod]
+        public void AddPath_SeparatorsOnly_IsIgnored()
+        {
+            // Arrange
+            var tree = new FolderHierarchyTree();
+
+            // Act
+            tree.AddPath(@"\\\");
+
+            // Assert
+            tree.NodeCount.Should()
+                .Be(1, "a separators-only path yields no segments and no edges");
+            tree.GetChildren(FolderHierarchyTree.RootKey).Should().BeEmpty();
+        }
+
+        // F2 coverage: GetChildren returns an empty array for a null key and for an unknown node
+        // (the null-or-missing early return branch), and the direct children for a known parent.
+        [TestMethod]
+        public void GetChildren_NullAndUnknownKeys_ReturnEmptyArray()
+        {
+            // Arrange
+            var tree = FolderHierarchyTree.Build(new[] { @"Projects\Alpha" });
+
+            // Act
+            var nullResult = tree.GetChildren(null);
+            var unknownResult = tree.GetChildren("DoesNotExist");
+            var knownResult = tree.GetChildren("Projects");
+
+            // Assert
+            nullResult.Should().BeEmpty("a null key has no children");
+            unknownResult.Should().BeEmpty("an unknown node has no children");
+            knownResult.Should().Equal("Alpha");
+        }
+
+        // F2 coverage: NodeKeys returns every node key including the synthetic root.
+        [TestMethod]
+        public void NodeKeys_PopulatedTree_ReturnsAllNodeKeysIncludingRoot()
+        {
+            // Arrange
+            var tree = FolderHierarchyTree.Build(new[] { @"Projects\Alpha", "Clients" });
+
+            // Act
+            var keys = tree.NodeKeys;
+
+            // Assert
+            keys.Should()
+                .BeEquivalentTo(
+                    new[] { FolderHierarchyTree.RootKey, "Projects", @"Projects\Alpha", "Clients" },
+                    "every node, including the synthetic root, is enumerated"
+                );
+        }
+
+        // F2 coverage: GetNode returns null for a null key (the null branch of the guard).
+        [TestMethod]
+        public void GetNode_NullKey_ReturnsNull()
+        {
+            // Arrange
+            var tree = FolderHierarchyTree.Build(new[] { @"Projects\Alpha" });
+
+            // Act
+            var node = tree.GetNode(null);
+
+            // Assert
+            node.Should().BeNull("a null key resolves to no node");
+        }
+
+        // F2 coverage: IsLeaf is false for a non-existent node and for a node that has children
+        // (the two false branches), and true for an existing childless node.
+        [TestMethod]
+        public void IsLeaf_NonExistentAndParentNodes_ReturnFalse()
+        {
+            // Arrange
+            var tree = FolderHierarchyTree.Build(new[] { @"Projects\Alpha" });
+
+            // Act & Assert
+            tree.IsLeaf("DoesNotExist").Should().BeFalse("a missing node is not a leaf");
+            tree.IsLeaf(null).Should().BeFalse("a null key is not a leaf");
+            tree.IsLeaf("Projects").Should().BeFalse("a node with children is not a leaf");
+            tree.IsLeaf(@"Projects\Alpha").Should().BeTrue("a childless existing node is a leaf");
+        }
+
+        // F2 coverage: ContainsNode is false for a null key and an unknown key, true for a known key.
+        [TestMethod]
+        public void ContainsNode_NullUnknownAndKnownKeys_BehaveAsContracted()
+        {
+            // Arrange
+            var tree = FolderHierarchyTree.Build(new[] { @"Projects\Alpha" });
+
+            // Act & Assert
+            tree.ContainsNode(null).Should().BeFalse("a null key is not present");
+            tree.ContainsNode("DoesNotExist").Should().BeFalse("an unknown key is not present");
+            tree.ContainsNode("Projects").Should().BeTrue("a known key is present");
+        }
     }
 }

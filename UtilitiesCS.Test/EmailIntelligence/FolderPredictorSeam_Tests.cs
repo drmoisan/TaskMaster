@@ -78,6 +78,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
             };
             var mockAf = new Mock<IAppAutoFileObjects>();
             mockAf.SetupGet(x => x.Manager).Returns(manager);
+            // Real backing store for the shared Folder-only holder so SetLcppnPredictor (which now
+            // writes Globals.AF.FolderPredictor) and the accessor observe the same value, matching
+            // the production AppAutoFileObjects.FolderPredictor auto-property semantics.
+            mockAf.SetupProperty(x => x.FolderPredictor);
             mockGlobals.SetupGet(x => x.AF).Returns(mockAf.Object);
             return mockGlobals;
         }
@@ -216,6 +220,65 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var predictor = await group.GetFolderPredictorAsync();
 
             // Assert
+            predictor.Should().BeSameAs(flat);
+        }
+
+        // F1 regression: the flag-on LCPPN predictor is held on the shared Globals.AF.FolderPredictor
+        // holder, so it is reachable by the fresh per-call OlFolderClassifierGroup instances that
+        // production callers (EmailFiler, SortEmail, FolderScorer) construct - not only by the
+        // build-time instance. Two separate instances over the same shared globals must both return
+        // the same held LCPPN predictor.
+        [TestMethod]
+        public async Task GetFolderPredictorAsync_FlagOn_ReachableThroughFreshPerCallInstance()
+        {
+            // Arrange: a single shared globals (the production pattern: one globals, many fresh
+            // OlFolderClassifierGroup instances). The predictor is held on Globals.AF.FolderPredictor.
+            var flat = CreateFlatGroup();
+            var mockGlobals = CreateMockGlobalsWithFolder(flat);
+            var lcppn = CreateLcppnPredictor();
+            mockGlobals.Object.AF.FolderPredictor = lcppn;
+
+            var flagOnConfig = LcppnFolderPredictorConfig.Create(useLcppnPredictor: true);
+
+            // Act: two independent per-call instances, mirroring the production per-call construction.
+            var firstInstance = new OlFolderClassifierGroup(mockGlobals.Object)
+            {
+                FolderPredictorConfig = flagOnConfig,
+            };
+            var secondInstance = new OlFolderClassifierGroup(mockGlobals.Object)
+            {
+                FolderPredictorConfig = flagOnConfig,
+            };
+            var firstPredictor = await firstInstance.GetFolderPredictorAsync();
+            var secondPredictor = await secondInstance.GetFolderPredictorAsync();
+
+            // Assert: both fresh instances resolve the same shared LCPPN predictor.
+            firstPredictor.Should().BeOfType<LcppnFolderPredictor>();
+            firstPredictor.Should().BeSameAs(lcppn, "the held predictor is reachable per-call");
+            secondPredictor.Should().BeSameAs(lcppn, "every fresh per-call instance resolves it");
+            firstPredictor.Should().BeSameAs(secondPredictor);
+        }
+
+        // AC13 regression: with the flag off and no held predictor, a fresh per-call instance returns
+        // the flat Manager["Folder"] group byte-for-byte (the same instance), confirming flag-off
+        // behavior is unchanged across the per-call construction pattern.
+        [TestMethod]
+        public async Task GetFolderPredictorAsync_FlagOff_FreshPerCallInstance_ReturnsFlat()
+        {
+            // Arrange: shared globals with no held predictor (Globals.AF.FolderPredictor is null).
+            var flat = CreateFlatGroup();
+            var mockGlobals = CreateMockGlobalsWithFolder(flat);
+            mockGlobals.Object.AF.FolderPredictor.Should().BeNull("no predictor has been built");
+
+            // Act: a fresh per-call instance with the flag off (default).
+            var freshInstance = new OlFolderClassifierGroup(mockGlobals.Object);
+            var predictor = await freshInstance.GetFolderPredictorAsync();
+
+            // Assert: returns the exact flat Manager["Folder"] instance, unchanged.
+            freshInstance
+                .FolderPredictorConfig.UseLcppnPredictor.Should()
+                .BeFalse("flag defaults to off");
+            predictor.Should().BeOfType<BayesianClassifierGroup>();
             predictor.Should().BeSameAs(flat);
         }
     }
