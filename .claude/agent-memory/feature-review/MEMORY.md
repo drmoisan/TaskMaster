@@ -3,6 +3,7 @@
 - [pr-context-summary-misclassifies-cs](project_pr-context-summary-misclassifies-cs.md) — PR-context summary overview can mislabel C# changes as docs ("0 core logic files"); always verify scope against git diff
 - [csharp-coverage-artifact-is-cobertura](project_csharp-coverage-artifact-is-cobertura.md) — `artifacts/csharp/coverage.xml` is Cobertura; the hook parses it as JaCoCo and gets $null repo-wide, so the reviewer must parse it manually
 - [csharp-local-fullsuite-coverage-blocked](project_csharp-local-fullsuite-coverage-blocked.md) — local full-assembly C# coverage fails on a Moq binding redirect; per-feature Cobertura is trimmed to affected classes (no repo-wide root), so repo-wide gate is the PR CI run
+- [csharp-repowide-coverage-below-80](project_csharp-repowide-coverage-below-80.md) — a real 7-assembly Cobertura run yields ~59% repo-wide C# coverage (FAIL vs 80% gate), distinct from the misleading ~8% single-assembly aggregate
 - [feature-audit check-off heading case](feature-audit-checkoff-heading-case.md) — validator needs `## Acceptance Criteria Check-off` (lowercase off); template ships `Check-Off` and fails
 - [feature-audit requires Summary heading](feature-audit-requires-summary-heading.md) — validator also needs a literal `## Summary`; `## Verdict` alone fails
 - [policy-audit required structure](policy-audit-required-structure.md) — validator needs Appendix A heading, all 4 TS/PS coverage checklist lines, and a numeric Baseline/Post-change/Disposition comparison line
