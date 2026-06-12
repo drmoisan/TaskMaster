@@ -93,6 +93,8 @@
     <Compile Include="EmailIntelligence\FolderRemapController_Tests2.cs" />
     <Compile Include="EmailIntelligence\FolderRemapViewer_Tests.cs" />
     <Compile Include="EmailIntelligence\FolderSelector_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\IFolderPredictor_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup_FlatPathUnchanged_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroupTests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierTests.cs" />

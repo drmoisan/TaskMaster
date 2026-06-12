@@ -3,18 +3,18 @@
 - **Issue:** #177
 - **Parent (optional):** none
 - **Owner:** TBD
-- **Last Updated:** 2026-06-08T12-06
-- **Status:** Planned
-- **Version:** 1.3
+- **Last Updated:** 2026-06-10T12-31
+- **Status:** In Progress
+- **Version:** 1.4
 
 ## Introduction
 
-![Status: Planned](https://img.shields.io/badge/status-Planned-blue)
+![Status: In Progress](https://img.shields.io/badge/status-In%20Progress-yellow)
 
 This plan delivers the hierarchy-aware LCPPN folder predictor described in `spec.md` and
 `user-story.md` (Issue #177). It is C#/.NET work targeting `UtilitiesCS` and
-`UtilitiesCS.Test`. Status is **Planned**: the plan is authored and pending preflight
-clearance; no implementation has begun.
+`UtilitiesCS.Test`. Status is **In Progress**: preflight returned ALL CLEAR and
+execution has begun at Phase 0.
 
 ## Required References
 
@@ -74,17 +74,17 @@ If a caller instruction specifies a non-canonical evidence path (for example `ar
 
 ### Phase 0 — Compliance & Context
 
-- [ ] [P0-T1] Read the General Code Change Policy and General Unit Test Policy sections of `CLAUDE.md`, plus `.claude/rules/general-code-change.md` and `.claude/rules/general-unit-test.md`, before any code change
+- [x] [P0-T1] Read the General Code Change Policy and General Unit Test Policy sections of `CLAUDE.md`, plus `.claude/rules/general-code-change.md` and `.claude/rules/general-unit-test.md`, before any code change
   - Acceptance: Development log records the read with an ISO-8601 UTC timestamp prior to any Phase 1 edit
-- [ ] [P0-T2] Read the C# Code Change Policy and C# Unit Test Policy sections of `CLAUDE.md`, plus `.claude/rules/csharp.md` and `.claude/skills/csharp-qa-gate/SKILL.md`
+- [x] [P0-T2] Read the C# Code Change Policy and C# Unit Test Policy sections of `CLAUDE.md`, plus `.claude/rules/csharp.md` and `.claude/skills/csharp-qa-gate/SKILL.md`
   - Acceptance: Development log records the read with an ISO-8601 UTC timestamp; the four toolchain commands are restated in the log exactly as written in policy
-- [ ] [P0-T3] Read the Tonality Policy (`.claude/rules/tonality.md`) and confirm all plan-execution output uses neutral professional tone
+- [x] [P0-T3] Read the Tonality Policy (`.claude/rules/tonality.md`) and confirm all plan-execution output uses neutral professional tone
   - Acceptance: Development log records the read with an ISO-8601 UTC timestamp
-- [ ] [P0-T4] Verify the build and test environment by running `dotnet tool run csharpier .`, both `msbuild` commands, and `vstest.console.exe` against the current `UtilitiesCS.Test` assemblies on a clean tree
+- [x] [P0-T4] Verify the build and test environment by running `dotnet tool run csharpier .`, both `msbuild` commands, and `vstest.console.exe` against the current `UtilitiesCS.Test` assemblies on a clean tree
   - Acceptance: All four toolchain steps complete on the unchanged tree; the pass/fail status, analyzer findings, nullable diagnostics, and MSTest results are captured under `docs/features/active/2026-06-08-hierarchical-lcppn-folder-prediction-177/evidence/baseline/<ISO-8601-UTC>/`
-- [ ] [P0-T5] Generate the canonical pre-change C# coverage baseline by running `vstest.console.exe <UtilitiesCS.Test assemblies> /EnableCodeCoverage` and exporting the result to Cobertura/XML
+- [x] [P0-T5] Generate the canonical pre-change C# coverage baseline by running `vstest.console.exe <UtilitiesCS.Test assemblies> /EnableCodeCoverage` and exporting the result to Cobertura/XML
   - Acceptance: The baseline coverage XML exists at `artifacts/csharp/coverage.xml` and a copy plus the run log are stored under `docs/features/active/2026-06-08-hierarchical-lcppn-folder-prediction-177/evidence/baseline/<ISO-8601-UTC>/`; the overall repository line-coverage percentage is recorded for later comparison
-- [ ] [P0-T6] Record the baseline behavior of the flat folder path: capture the current `BayesianClassifierGroup` `Train` / `UnTrain` / `Classify` / `Serialize` behavior and the `Manager["Folder"]` type and caller cast sites in `EmailFiler.cs` and `SortEmail.cs`
+- [x] [P0-T6] Record the baseline behavior of the flat folder path: capture the current `BayesianClassifierGroup` `Train` / `UnTrain` / `Classify` / `Serialize` behavior and the `Manager["Folder"]` type and caller cast sites in `EmailFiler.cs` and `SortEmail.cs`
   - Acceptance: Development log lists the verified file:line seam points (`OlFolderClassifierGroup.cs`, `EmailFiler.cs`, `SortEmail.cs`, `ManagerAsyncLazy.cs`) that Phase 6 will modify
 
 ### Phase 1 — IFolderPredictor seam (additive, no flat behavior change)

@@ -560,6 +560,7 @@
     <Compile Include="EmailIntelligence\Bayesian\Obsolete\BayesianClassifier.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierExtensions.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\IFolderPredictor.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Performance\BayesianPerformanceMeasurement.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Obsolete\BayesianFilter.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Obsolete\CorpusVectorized_badidea.cs" />
