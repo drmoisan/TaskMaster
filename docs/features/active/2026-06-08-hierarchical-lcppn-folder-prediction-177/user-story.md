@@ -74,7 +74,7 @@ while preserving the current incremental-update and abstention behavior.
 - [x] **AC7 — Abstention semantics.** When the top leaf's path-product probability is below
       `MinimumPathProbability`, `Classify` returns an empty result (no prediction). Root abstention is
       allowed: if no root-level child clears the threshold, the result is empty.
-- [ ] **AC8 — F1 accounting for abstention.** In `FolderPredictorEvaluator`, an abstained test
+- [x] **AC8 — F1 accounting for abstention.** In `FolderPredictorEvaluator`, an abstained test
       example is counted as a false negative for its true class and a true negative for all other
       classes (it does not increment any false-positive count).
 - [x] **AC9 — Shrinkage smoothing with configurable lambda.** Per-child scoring blends the leaf and
@@ -89,10 +89,10 @@ while preserving the current incremental-update and abstention behavior.
       leaf, `UnTrain` is applied along the prior path only.
 - [x] **AC12 — New-leaf addition is local.** Registering a new leaf under an existing parent modifies
       only that parent's `PerParentClassifier`; all other per-parent classifiers are unchanged.
-- [ ] **AC13 — Backward compatibility (flat predictor).** When `UseLcppnPredictor = false`, the
+- [x] **AC13 — Backward compatibility (flat predictor).** When `UseLcppnPredictor = false`, the
       existing flat `BayesianClassifierGroup` is used, its `Train` / `UnTrain` / `Classify` / `Serialize`
       behavior is unchanged, and `Folder.json` is loaded and written exactly as before.
-- [ ] **AC14 — Shared `IFolderPredictor` seam.** Both `BayesianClassifierGroup` and
+- [x] **AC14 — Shared `IFolderPredictor` seam.** Both `BayesianClassifierGroup` and
       `LcppnFolderPredictor` implement `IFolderPredictor`, and `Manager["Folder"]` callers
       (`EmailFiler`, `SortEmail`) operate through that interface; the flat implementation requires no
       change to its existing method behavior.
@@ -101,19 +101,19 @@ while preserving the current incremental-update and abstention behavior.
       and round-trips losslessly, preserving the `Version` field, the per-parent tree, and counts; an
       empty tree serializes and deserializes cleanly. Per-parent shared token base uses `Corpus`
       serialized inline (not `CorpusInherit`).
-- [ ] **AC16 — Deterministic evaluation harness.** `FolderPredictorEvaluator` performs a time-sliced
+- [x] **AC16 — Deterministic evaluation harness.** `FolderPredictorEvaluator` performs a time-sliced
       (index-proxy) split into train/test, builds the predictor from the train slice, evaluates the
       test slice, and produces per-leaf precision/recall/F1, macro F1, and abstention rate. The split
       and result are deterministic for the same input, with no Outlook COM, no external services, and
       no temporary files.
-- [ ] **AC17 — Test stack and isolation.** All new tests use MSTest with Moq and FluentAssertions,
+- [x] **AC17 — Test stack and isolation.** All new tests use MSTest with Moq and FluentAssertions,
       are independent and deterministic, create no temporary files, and depend on no external services.
-- [ ] **AC18 — Coverage.** New modules/classes reach >= 90% line coverage, and repository-wide line
+- [x] **AC18 — Coverage.** New modules/classes reach >= 90% line coverage, and repository-wide line
       coverage remains >= 80%; coverage for changed lines does not regress.
-- [ ] **AC19 — Toolchain.** The full C# toolchain passes in order — CSharpier formatting, .NET
+- [x] **AC19 — Toolchain.** The full C# toolchain passes in order — CSharpier formatting, .NET
       analyzers, nullable analysis (TreatWarningsAsErrors), and MSTest via vstest with code coverage —
       restarting from the start on any failure or auto-fix.
-- [ ] **AC20 — File-size and separation constraints.** No new production, test, or reusable script
+- [x] **AC20 — File-size and separation constraints.** No new production, test, or reusable script
       file exceeds 500 lines, and all new prediction and evaluation logic is pure and testable without
       Outlook COM.
 

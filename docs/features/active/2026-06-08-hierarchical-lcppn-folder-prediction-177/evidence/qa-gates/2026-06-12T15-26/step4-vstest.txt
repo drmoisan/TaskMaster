@@ -1,0 +1,25 @@
+  Passed EnumerateTable_WritesFormattedOutputAndMovesToStart [7 ms]
+  Passed GetTableInViewAsync_ImmediateSuccess_CallsGetTableOnceAndReturnsSnapshot [2 ms]
+  Passed AfterDeserialize_WithConfiguredGlobals_LoadsClassifiersAndReportsCompletion [7 ms]
+  Passed HeavyParallelizationAsync_WithNullProbabilities_RebuildsLegacyClassifierState [10 ms]
+  Passed HeavyParallelizationAsync_WithFewerClassifiersThanProcessors_DoesNotThrow [2 ms]
+  Passed ToJustifiedText_NullOrWhitespaceInput_ReturnsPaddedText [< 1 ms]
+  Passed ToJustifiedText_WithNonPositiveWidth_ThrowsArgumentOutOfRangeException [1 ms]
+  Passed ToFormattedText_WithEmptyJaggedArrayAndNoHeadersOrTitle_ReturnsEmptyObjectMessage [< 1 ms]
+  Passed ToFormattedText_WithHeadersAndAggregatorRow_FormatsTitleHeadersAndDivider [< 1 ms]
+  Passed ToFormattedText_ForGenericDictionary_UsesConvertersAndTitle [5 ms]
+  Passed ToFormattedText_ForNumericDictionaries_FormatsExpectedDecimalPlaces [4 ms]
+  Passed ArrayToDatatable_WithHeadersAndNestedValues_BuildsExpectedTable [1 ms]
+  Passed ArrayToDatatable_WithHeaderLengthMismatch_ThrowsArgumentException [1 ms]
+  Passed ToFormattedTextAndMarkdown_ForTwoDimensionalArray_RenderAllPrimitiveCells [< 1 ms]
+  Passed DataFramePrettyHelpers_RenderRowsMarkdownAndConsoleOutput [2 ms]
+  Passed ArrayToDatatable_WithoutHeaders_BuildsDefaultColumns [1 ms]
+  Passed ToFormattedText_WithTitleOnlyAndLongTitle_WrapsInsertedEmptyMessageRow [< 1 ms]
+  Passed ToFormattedText_WithHeadersOnly_UsesWideEmptyMessageAndHeaderDivider [< 1 ms]
+  Passed ToFormattedText_WithNullCellsAndImplicitJustifications_CoversWidthNormalization [< 1 ms]
+  Passed ReflectionHelpers_CoverInternalFormattingBranches [14 ms]
+
+Test Run Successful.
+Total tests: 3887
+     Passed: 3887
+ Total time: 45.4878 Seconds

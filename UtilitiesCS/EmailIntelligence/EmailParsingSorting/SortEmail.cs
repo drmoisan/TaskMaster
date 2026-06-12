@@ -12,6 +12,7 @@ using Microsoft.Office.Interop.Outlook;
 using SDILReader;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
 using UtilitiesCS.OutlookExtensions;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
@@ -247,7 +248,7 @@ namespace UtilitiesCS
             });
 
             var bayesianTask = Task.Run(async () =>
-                (await appGlobals.AF.Manager["Folder"]).Train(
+                (await new OlFolderClassifierGroup(appGlobals).GetFolderPredictorAsync()).Train(
                     destinationOlStem,
                     mailHelper.Tokens,
                     1
@@ -579,11 +580,9 @@ namespace UtilitiesCS
                             default,
                             true
                         );
-                        (await globals.AF.Manager["Folder"]).UnTrain(
-                            helper.FolderInfo.RelativePath,
-                            helper.Tokens,
-                            1
-                        );
+                        (
+                            await new OlFolderClassifierGroup(globals).GetFolderPredictorAsync()
+                        ).UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
                         movedStack[i].UndoMove();
                         movedStack.Pop(i);
                     }

@@ -212,7 +212,98 @@ Executor: atomic-executor
   4. `vstest.console.exe ... /EnableCodeCoverage /InIsolation` — serialization 6/6 passed; full Phase 1-5 feature suite 60/60 passed (no regression from the serialization adjustments).
 - Result: all four steps pass in a single final pass. AC15 checked off in `user-story.md`.
 
-## Phase 6 — BLOCKED (scope-change finding; reported to orchestrator)
+## Phase 6 — Wiring and backward compatibility (flag-gated Folder-only seam) — COMPLETE (Option B)
+
+### Resolution context
+
+- Timestamp: 2026-06-12T11-45 (UTC)
+- The earlier BLOCKED finding (below) was resolved by the version-1.5 plan revision adopting Option B
+  (Folder-only `IFolderPredictor` accessor). The revised P6-T1..P6-T10 were executed. The shared
+  `ManagerAsyncLazy : ConcurrentObservableDictionary<string, AsyncLazy<BayesianClassifierGroup>>`
+  value type was NOT changed; `ManagerAsyncLazy.cs` has zero diff. No out-of-scope subsystem
+  (`Triage.cs`, `SpamBayes.cs`, `CategoryClassifierGroup.cs`, `MulticlassEngine.cs`) was touched.
+
+### [P6-T1] Compile registration
+
+- Added `<Compile Include="EmailIntelligence\FolderPredictorSeam_Tests.cs" />` to
+  `UtilitiesCS.Test/UtilitiesCS.Test.csproj`. Verified by compilation at P6-T10.
+
+### [P6-T2] BuildLcppnPredictorAsync
+
+- Added `public virtual Task<LcppnFolderPredictor> BuildLcppnPredictorAsync(MinedMailInfo[])` to
+  `OlFolderClassifierGroup.cs`, delegating to `LcppnFolderPredictor.Build(collection, FolderPredictorConfig)`.
+  `BuildFolderClassifiersAsync` and `BuildClassifiersAsync` bodies are otherwise unchanged.
+
+### [P6-T3] Folder-only LCPPN holder + flag-gated accessor
+
+- Added private `LcppnFolderPredictor _lcppnPredictor` field, a public virtual
+  `LcppnFolderPredictorConfig FolderPredictorConfig` (defaults to flag off), and
+  `public virtual async Task<IFolderPredictor> GetFolderPredictorAsync()` that returns the held
+  LCPPN predictor when `UseLcppnPredictor` is true and the holder is populated, otherwise
+  `await Globals.AF.Manager["Folder"]` (the flat `BayesianClassifierGroup`). An internal
+  `SetLcppnPredictor` seam supports unit testing the holder without the Outlook build pipeline.
+  `ManagerAsyncLazy.cs` was not edited; the shared dictionary value type is unchanged.
+
+### [P6-T4] Flag read at registration site (~line 211)
+
+- The existing `Globals.AF.Manager["Folder"] = classifierGroup.ToAsyncLazy();` statement is
+  byte-for-byte unchanged. A flag-gated block was added immediately after it: when
+  `FolderPredictorConfig?.UseLcppnPredictor == true`, `_lcppnPredictor` is set via
+  `BuildLcppnPredictorAsync(collection)`. No other `Manager[...]` registration was touched.
+
+### [P6-T5] EmailFiler routing
+
+- Added a `using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;` and a private
+  `GetFolderPredictorAsync()` helper that calls `new OlFolderClassifierGroup(Globals).GetFolderPredictorAsync()`.
+  `SerializeFolderManagerAsync` (line 369), `UnTrainFolderAsync` (line 375), and `TrainFolderAsync`
+  (line 381) now obtain the predictor from the accessor. `Manager["Actionable"]` (line 370) is
+  unchanged; `Train`/`UnTrain`/`Serialize` arguments are unchanged.
+
+### [P6-T6] SortEmail routing
+
+- Added the OlFolder `using`. Line 250 `Train` (uses `appGlobals`) and line 582 `UnTrain` (uses
+  `globals`) now obtain the predictor via `new OlFolderClassifierGroup(<globals>).GetFolderPredictorAsync()`.
+  Arguments unchanged.
+
+### [P6-T7] FolderScorer routing
+
+- Added the OlFolder `using`. Both `Classify(mailInfo.Tokens)` sites (lines 161, 168) now obtain the
+  predictor from the accessor. `.Take(topNfolderKeys)`/`.ToArray()` chaining and the `Tokens`
+  argument are unchanged (the accessor returns `IFolderPredictor.Classify` ->
+  `OrderedParallelQuery<Prediction<string>>`).
+
+### [P6-T8] Folder.json verification (AC13)
+
+- Grep confirms the only `Folder.json` reference in `LcppnFolderPredictor.cs` is a doc comment; the
+  LCPPN predictor serializes via `SmartSerializable<LcppnFolderPredictor>` to its own distinct file.
+  With `UseLcppnPredictor = false` the unchanged `Manager["Folder"]` registration and accessor
+  fallthrough preserve `Folder.json` load/write exactly as before.
+
+### [P6-T9] FolderPredictorSeam_Tests
+
+- `FolderPredictorSeam_Tests.cs` (MSTest + Moq + FluentAssertions, 6 tests, no Outlook COM, no temp
+  files): flag-off returns the same flat `BayesianClassifierGroup` from `Manager["Folder"]`;
+  flag-off Classify/Train/UnTrain are observationally identical to direct flat calls (AC13); flag-on
+  with a held predictor returns the `LcppnFolderPredictor`; both predictors are reachable as
+  `IFolderPredictor` through the accessor (AC14); flag-on-but-unbuilt falls back to flat. A real
+  `ManagerAsyncLazy(mockGlobals)` seeded via the `["Folder"]` indexer provides the manager seam.
+
+### [P6-T10] Full C# toolchain gate
+
+- Timestamp: 2026-06-12T11-45 (UTC). Single clean final pass:
+  1. `dotnet tool run csharpier format .` — restarted twice during development (missing
+     `System.Threading.Tasks` using, then wrong `ToAsyncLazy` namespace in the new test); stable
+     thereafter ("Formatted 1073 files", no changes beyond the intended edits).
+  2. `msbuild ... /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` — 0 Error(s), 20
+     Warning(s) (all pre-existing CS0618/CS8632 in unrelated files; none in changed files).
+  3. `msbuild ... /p:Nullable=enable /p:TreatWarningsAsErrors=true` — 0 Warning(s), 0 Error(s)
+     (incremental gate, the established prior-phase behavior).
+  4. `vstest.console.exe ... /InIsolation` — seam suite 6/6; full feature suite (Phases 1-6) +
+     `OlFolderClassifierGroup_AdditionalTests` 68/68 passed; no regression.
+- `git status` confirms `ManagerAsyncLazy.cs` has zero diff. AC13 and AC14 satisfied (checked off in
+  `user-story.md`).
+
+### Historical note: prior BLOCKED finding (superseded by Option B)
 
 - Timestamp: 2026-06-12T11-00 (UTC)
 - P6-T1 (register `FolderPredictorSeam_Tests.cs`) was prepared then reverted to keep the test project compiling, because the phase cannot complete: P6-T3's required change is not localizable to the plan's named scope.
@@ -238,3 +329,115 @@ Executor: atomic-executor
 ### Suggested plan delta for atomic-planner (not applied)
 
 - Expand P6 scope explicitly to include the cascading `ToAsyncLazy()`/await-read sites in `Triage.cs`, `SpamBayes.cs`, `CategoryClassifierGroup.cs`, `MulticlassEngine.cs`, OR adopt a narrower seam that avoids changing the shared dictionary value type — for example: keep `Manager` typed as `AsyncLazy<BayesianClassifierGroup>` and introduce a separate `Manager["Folder"]`-specific `IFolderPredictor` accessor/holder, so the LCPPN predictor is stored and retrieved through a Folder-only seam without altering the shared multiclass manager. The planner should choose and specify one approach with the full file list before P6 resumes.
+
+## Phase 7 — Evaluation harness (deterministic time-sliced F1) — COMPLETE
+
+### [P7-T1] Compile registration
+
+- Timestamp: 2026-06-12T12-10 (UTC)
+- Added `<Compile Include="EmailIntelligence\Evaluation\EvaluationResult.cs" />` and
+  `<Compile Include="EmailIntelligence\Evaluation\FolderPredictorEvaluator.cs" />` to
+  `UtilitiesCS/UtilitiesCS.csproj`; added
+  `<Compile Include="EmailIntelligence\Evaluation\FolderPredictorEvaluator_Tests.cs" />` to
+  `UtilitiesCS.Test/UtilitiesCS.Test.csproj`. Verified by compilation at P7-T8.
+
+### [P7-T2] EvaluationResult
+
+- `EvaluationResult.cs` (new namespace `UtilitiesCS.EmailIntelligence.Evaluation`) — immutable
+  `EvaluationResult` exposing per-leaf metrics (`PerLeaf` keyed by leaf path), `MacroF1`,
+  `AbstentionRate`, and `TestCount`, plus an immutable `LeafMetrics` (Leaf, Precision, Recall, F1).
+
+### [P7-T3..T6] FolderPredictorEvaluator
+
+- `FolderPredictorEvaluator.cs` — 200 lines, under the 500 limit; pure logic, no Outlook COM or
+  filesystem dependency (P7-T3). Accepts a predictor-builder seam
+  `Func<IReadOnlyList<MinedMailInfo>, IFolderPredictor>` (so any `IFolderPredictor` under test is
+  built from the train slice), the `MinedMailInfo[]` corpus, and an `EvaluationConfig`.
+- Deterministic index-proxy split (P7-T4): `ComputeTrainBoundary` = `floor(count * TrainFraction)`
+  clamped to keep both slices non-empty for count >= 2. `MinedMailInfo` has no timestamp field, so
+  the stable array index is the time proxy; the same input yields the same split/result.
+- Per-leaf precision/recall/F1, macro F1 over observed leaves, and abstention rate (P7-T5).
+- Abstention accounting (P7-T6): an abstained test example increments only the true class's false
+  negatives (lowering its recall) and never any false positive; a wrong non-abstaining prediction
+  is a false positive for the predicted class and a false negative for the true class.
+- `EvaluationConfig(trainFraction)` validates `0 < TrainFraction < 1`, failing fast.
+
+### [P7-T7] Tests
+
+- `FolderPredictorEvaluator_Tests.cs` (MSTest + Moq + FluentAssertions, 6 tests): deterministic
+  split + reproducible result (AC16, boundary `floor(10*0.7)=7`); separable two-class corpus yields
+  perfect per-leaf precision/recall and macro F1; abstained example counts as false negative, not
+  false positive (AC8); wrong prediction counts as false positive for the predicted class;
+  null-argument and invalid-`TrainFraction` fail-fast. `IFolderWrapper` is mocked with only
+  `RelativePath` configured, so no Outlook `MAPIFolder` is touched. Deterministic, in-memory, no
+  temp files.
+
+### [P7-T8] Full C# toolchain gate
+
+- Timestamp: 2026-06-12T12-10 (UTC). Single clean final pass:
+  1. `dotnet tool run csharpier format .` — restarted once after CSharpier rewrapped assertions in
+     the new test; stable thereafter.
+  2. `msbuild ... /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` — 0 Error(s); no
+     diagnostics in the new Evaluation files (warnings are the pre-existing CS0618/CS8632 set in
+     unrelated files).
+  3. `msbuild ... /p:Nullable=enable /p:TreatWarningsAsErrors=true` — 0/0 incremental (established
+     gate). A targeted `UtilitiesCS.csproj` nullable Rebuild confirmed zero nullable diagnostics in
+     the new/changed files; the only errors that surface in a from-scratch nullable rebuild are
+     pre-existing CS86xx in the vendored `SVGControl` project (one of the 4 vendored projects
+     excluded from the analyzer/nullable policy per `csharp.md`), not in feature code.
+  4. `vstest.console.exe ... /InIsolation` — evaluation suite 6/6; full feature suite (Phases 1-7) +
+     `OlFolderClassifierGroup_AdditionalTests` 74/74 passed; no regression.
+- AC8 and AC16 satisfied (checked off in `user-story.md`).
+
+## Phase 8 — Final QA, coverage comparison, and acceptance check-off — COMPLETE
+
+- Timestamp: 2026-06-12T15-26 (UTC)
+- QA-gate evidence folder: `evidence/qa-gates/2026-06-12T15-26/`
+  (`QA-GATE.md`, `coverage.xml`, `coverage-comparison.md`, `test-stack-audit.md`,
+  `step2-analyzers.txt`, `step3-nullable.txt`, `step4-vstest.txt`).
+
+### [P8-T1] Final full toolchain pass
+
+- CSharpier: "Formatted 1076 files"; stable, no changes on the final pass.
+- Analyzers msbuild: 0 Error(s), 20 Warning(s) (all pre-existing; none in feature files).
+- Nullable/TreatWarningsAsErrors msbuild: 0 Warning(s), 0 Error(s) (incremental gate). Targeted
+  `UtilitiesCS.csproj` nullable Rebuild confirmed zero nullable diagnostics in feature files; the
+  only from-scratch nullable errors are pre-existing CS86xx in the vendored `SVGControl` project,
+  excluded from the analyzer/nullable policy per `csharp.md`.
+- vstest `/EnableCodeCoverage /InIsolation`: this feature's 77 tests (Phases 1-7) pass
+  deterministically across repeated full-suite runs. A single pre-existing flaky test,
+  `AddEntry_UseUiThreadTrue_DequeuesEntryAndSuppressesDispatcherException` (a UI-thread/dispatcher
+  test outside this feature), intermittently fails under full-suite parallel load and passes in
+  isolation (verified). It is unrelated to this feature (active `ci-flaky-test-isolation-176`) and
+  does not affect coverage collection. Recorded as a non-blocking observation, not a feature defect.
+
+### [P8-T2] Post-change coverage export
+
+- `evidence/qa-gates/2026-06-12T15-26/coverage.xml` produced via
+  `Microsoft.CodeCoverage.Console.exe merge <coverage> -f xml` from the full-suite run.
+
+### [P8-T3] Coverage comparison
+
+- `coverage-comparison.md`. UtilitiesCS.dll line coverage: baseline 85.31% strict / 87.49% inclusive
+  -> post-change 85.40% strict / 87.57% inclusive. Above the 80% floor; no regression on changed
+  lines. Each new module/class reaches >= 90% inclusive line coverage. To raise `LcppnFolderPredictor`
+  from 84.0%/86.9% to 89.1%/91.4%, three targeted tests were added to `LcppnFolderPredictor_Tests.cs`
+  (Build skips empty-path/null-token entries; deep/wide hierarchy beam truncation; empty-tag
+  Train/UnTrain no-ops); the toolchain was re-run from CSharpier and remained green.
+
+### [P8-T4] File-size and separation
+
+- All new production files <= 363 lines, all new test files <= 230 lines; all under the 500 limit.
+  No `Microsoft.Office.Interop.Outlook` / `MAPIFolder` / `MailItem` reference in any new
+  prediction/evaluation production file (AC20).
+
+### [P8-T5] Test-stack and isolation audit
+
+- `test-stack-audit.md`. All new/touched test files use MSTest + Moq + FluentAssertions; no temp
+  files; no filesystem/network/process usage; deterministic; no Outlook COM (AC17).
+
+### [P8-T6] AC traceability
+
+- All 20 acceptance criteria (AC1-AC20) are checked off in `user-story.md`, each mapped to a passing
+  task/test per the plan's AC Traceability table. No required baseline, QA, or coverage-comparison
+  artifact is missing. AC17, AC18, AC19, AC20 checked off in this phase.

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 
 namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
@@ -333,6 +334,85 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
 
             // Assert
             act.Should().Throw<ArgumentNullException>();
+        }
+
+        // Build skips entries whose relative path is null or empty, and tolerates null tokens,
+        // exercising the continue/empty-token branches of Build.
+        [TestMethod]
+        public void Build_SkipsEntriesWithEmptyRelativePathAndNullTokens()
+        {
+            // Arrange: one valid entry, one empty-path entry, one null-FolderInfo entry.
+            var corpus = new[]
+            {
+                MinedMail(@"Projects\Alpha", new[] { "alpha", "spec" }),
+                MinedMail("", new[] { "ignored" }),
+                MinedMail(@"Clients\Acme", null),
+                new MinedMailInfo { FolderInfo = null, Tokens = new[] { "x" } },
+            };
+
+            // Act
+            var predictor = LcppnFolderPredictor.Build(
+                corpus,
+                Config(minimumPathProbability: 0.01)
+            );
+
+            // Assert: only the two valid leaves are represented; empty/null entries are skipped.
+            predictor.Nodes.Should().ContainKey("");
+            predictor.Nodes[""].ChildSegments.Should().Contain(new[] { "Projects", "Clients" });
+            predictor.Tree.IsLeaf(@"Clients\Acme").Should().BeTrue("null tokens are tolerated");
+        }
+
+        // A deep, wide hierarchy forces the beam to truncate the frontier to BeamWidth and to emit
+        // terminal leaves, exercising the descent truncation and terminal-leaf branches.
+        [TestMethod]
+        public void Classify_DeepWideHierarchy_TruncatesFrontierToBeamWidth()
+        {
+            // Arrange: a root with several first-level branches, each two levels deep.
+            var predictor = new LcppnFolderPredictor
+            {
+                BeamWidth = 2,
+                MinimumPathProbability = 0.001,
+                ShrinkageLambda = 0.7,
+                MinColdStartExamples = 0,
+            };
+            predictor.Train(@"A\A1\X", new[] { "a", "one", "x" }, 1);
+            predictor.Train(@"B\B1\Y", new[] { "b", "one", "y" }, 1);
+            predictor.Train(@"C\C1\Z", new[] { "c", "one", "z" }, 1);
+            predictor.Train(@"D\D1\W", new[] { "d", "one", "w" }, 1);
+
+            // Act
+            var results = predictor.Classify(new[] { "a", "one", "x" }).ToArray();
+
+            // Assert: descent terminates at a full leaf path and respects the beam width.
+            results.Should().NotBeEmpty();
+            results[0].Class.Should().Be(@"A\A1\X");
+        }
+
+        // Train and UnTrain on an empty/whitespace tag are no-ops (SplitPath empty branch), and
+        // UnTrain on an unknown leaf path touches no node.
+        [TestMethod]
+        public void TrainAndUnTrain_EmptyTag_AreNoOps()
+        {
+            // Arrange
+            var predictor = CreateTrainedPredictor(Config(minimumPathProbability: 0.01));
+            var nodeCountBefore = predictor.Nodes.Count;
+
+            // Act: empty/whitespace and null tags are ignored; UnTrain on unknown path is a no-op.
+            predictor.Train("", new[] { "x" }, 1);
+            predictor.Train(@"\\", new[] { "y" }, 1);
+            predictor.UnTrain("", new[] { "x" }, 1);
+            predictor.UnTrain(@"Unknown\Path", new[] { "z" }, 1);
+
+            // Assert: no nodes were added or removed.
+            predictor.Nodes.Count.Should().Be(nodeCountBefore);
+        }
+
+        // Builds a MinedMailInfo with a Moq IFolderWrapper exposing only RelativePath (no COM).
+        private static MinedMailInfo MinedMail(string relativePath, string[] tokens)
+        {
+            var folder = new Mock<IFolderWrapper>();
+            folder.SetupGet(x => x.RelativePath).Returns(relativePath);
+            return new MinedMailInfo { FolderInfo = folder.Object, Tokens = tokens };
         }
     }
 }

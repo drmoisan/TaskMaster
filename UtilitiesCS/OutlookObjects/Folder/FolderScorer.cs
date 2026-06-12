@@ -9,6 +9,7 @@ using log4net.Repository.Hierarchy;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualBasic;
 using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
@@ -158,14 +159,14 @@ namespace UtilitiesCS
 
             if (topNfolderKeys > 0)
             {
-                predictions = (await globals.AF.Manager["Folder"])
+                predictions = (await new OlFolderClassifierGroup(globals).GetFolderPredictorAsync())
                     .Classify(mailInfo.Tokens)
                     .Take(topNfolderKeys)
                     .ToArray();
             }
             else
             {
-                predictions = (await globals.AF.Manager["Folder"])
+                predictions = (await new OlFolderClassifierGroup(globals).GetFolderPredictorAsync())
                     .Classify(mailInfo.Tokens)
                     .ToArray();
             }

@@ -3,18 +3,22 @@
 - **Issue:** #177
 - **Parent (optional):** none
 - **Owner:** TBD
-- **Last Updated:** 2026-06-10T12-31
-- **Status:** In Progress
-- **Version:** 1.4
+- **Last Updated:** 2026-06-12T15-26
+- **Status:** Complete (Phases 0-8 done; all tasks and AC1-AC20 checked off)
+- **Version:** 1.6
 
 ## Introduction
 
-![Status: In Progress](https://img.shields.io/badge/status-In%20Progress-yellow)
+![Status: Complete](https://img.shields.io/badge/status-Complete-brightgreen)
 
 This plan delivers the hierarchy-aware LCPPN folder predictor described in `spec.md` and
 `user-story.md` (Issue #177). It is C#/.NET work targeting `UtilitiesCS` and
-`UtilitiesCS.Test`. Status is **In Progress**: preflight returned ALL CLEAR and
-execution has begun at Phase 0.
+`UtilitiesCS.Test`. Status is **In Progress (Phase 6 revised)**: Phases 0-5 are complete
+and committed (60/60 feature tests pass). Phase 6 was revised at version 1.5 after the
+executor reported a blocking scope-change finding at the original P6-T3; the revised phase
+adopts a Folder-only `IFolderPredictor` accessor (Option B) instead of retyping the shared
+`Globals.AF.Manager` dictionary value parameter. See the Phase 6 revision note for the
+decision and rationale.
 
 ## Required References
 
@@ -41,8 +45,8 @@ Tests use **MSTest** + **Moq** + **FluentAssertions**. New modules/classes must 
 - Production namespace `UtilitiesCS.EmailIntelligence.Bayesian` under `UtilitiesCS/EmailIntelligence/Bayesian/`.
 - Production namespace `UtilitiesCS.EmailIntelligence.Evaluation` under `UtilitiesCS/EmailIntelligence/Evaluation/` (new folder).
 - Build wiring in `UtilitiesCS/EmailIntelligence/ClassifierGroups/OlFolder/OlFolderClassifierGroup.cs`.
-- Caller seam in `UtilitiesCS/EmailIntelligence/EmailParsingSorting/EmailFiler.cs` and `UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.cs`.
-- Manager type in `UtilitiesCS/EmailIntelligence/ClassifierGroups/ManagerAsyncLazy.cs`.
+- Caller seam in `UtilitiesCS/EmailIntelligence/EmailParsingSorting/EmailFiler.cs`, `UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.cs`, and `UtilitiesCS/OutlookObjects/Folder/FolderScorer.cs` (routed through the Folder-only `IFolderPredictor` accessor on `OlFolderClassifierGroup` per the Phase 6 revision).
+- Manager type in `UtilitiesCS/EmailIntelligence/ClassifierGroups/ManagerAsyncLazy.cs` is **not modified** by the revised Phase 6 (Option B keeps the shared dictionary value type as `AsyncLazy<BayesianClassifierGroup>`); it remains listed only as a verified seam-context reference.
 - Tests under `UtilitiesCS.Test/EmailIntelligence/Bayesian/` and `UtilitiesCS.Test/EmailIntelligence/Evaluation/` (new folder); test project `UtilitiesCS.Test/UtilitiesCS.Test.csproj`.
 
 ### Non-SDK project compile registration (HARD constraint)
@@ -190,59 +194,76 @@ If a caller instruction specifies a non-canonical evidence path (for example `ar
 - [x] [P5-T6] Run the full C# toolchain for Phase 5 and restart from CSharpier on any failure or auto-fix
   - Acceptance: All four steps pass in a single final pass; serialization paths in `LcppnFolderPredictor.cs` reach >= 90% coverage
 
-### Phase 6 — Wiring and backward compatibility (flag-gated seam)
+### Phase 6 — Wiring and backward compatibility (flag-gated Folder-only seam)
 
-- [ ] [P6-T1] Register this phase's new test file in the non-SDK test project: add `<Compile Include="EmailIntelligence\FolderPredictorSeam_Tests.cs"/>` to `UtilitiesCS.Test/UtilitiesCS.Test.csproj` (the production files modified in this phase — `OlFolderClassifierGroup.cs`, `ManagerAsyncLazy.cs`, `EmailFiler.cs`, `SortEmail.cs` — already exist and are already registered)
+> **Phase 6 revision note (2026-06-12; Status -> Revised, Version 1.5).** The original P6-T3 directed retyping the shared `Globals.AF.Manager` dictionary value parameter from `AsyncLazy<BayesianClassifierGroup>` to `IFolderPredictor`. Investigation against the current tree confirmed this is infeasible within the Folder subsystem scope:
+> - `Globals.AF.Manager` is a single `ConcurrentObservableDictionary<string, AsyncLazy<BayesianClassifierGroup>>` (`ManagerAsyncLazy.cs:27-28`) shared by ALL classifier subsystems keyed by string — `"Folder"`, `"Spam"`, `"Actionable"`, Triage `GroupName`, Category prefixes, and multiclass `EngineName` — not just `"Folder"`.
+> - `AsyncLazy<T>` is `sealed` and invariant, so `AsyncLazy<BayesianClassifierGroup>` is not assignable to `AsyncLazy<IFolderPredictor>`; the value type cannot be widened for one key only.
+> - Retyping the shared dictionary breaks verified out-of-scope writers/readers: `Triage.cs:149,177,302` (writes) and `Triage.cs:45` (reads into a `BayesianClassifierGroup` field); `SpamBayes.cs:222`; `CategoryClassifierGroup.cs:150`; `MulticlassEngine.cs:173`; `OlFolderClassifierGroup.cs:234` (`Manager["Spam"]`); `EmailFiler.cs:370,389` (`Manager["Actionable"]`); and the `ManagerAsyncLazy` loader (`GetAsyncLazyClassifierLoader` line 242 / `GetAltLoader` line 293), which return concrete `BayesianClassifierGroup`, call `BayesianClassifierGroup.Static.DeserializeAsync` (line 283), and subscribe `classifier.PropertyChanged += Config_PropertyChanged` (line 288) — `IFolderPredictor` exposes none of `PropertyChanged`, `Config`, `Static.DeserializeAsync`, or `ToAsyncLazy()`.
+> - That change is a broad refactor across four unrelated classifier subsystems, which `.claude/rules/csharp.md` Prohibited Behaviors forbids ("Broad refactors across unrelated projects or files").
+>
+> **Decision: Option B — narrower Folder-only seam (selected).** Provide a Folder-only `IFolderPredictor` accessor on `OlFolderClassifierGroup` that resolves the flag-gated predictor (the flat `BayesianClassifierGroup` awaited from the unchanged `Manager["Folder"]` entry when `UseLcppnPredictor = false`, or the `LcppnFolderPredictor` when `true`) and route the five verified Folder read sites — `EmailFiler.cs:369/375/381`, `SortEmail.cs:250/582`, `FolderScorer.cs:161/168` — through it. The shared `ConcurrentObservableDictionary<string, AsyncLazy<BayesianClassifierGroup>>` value type is unchanged, so zero out-of-scope subsystems are touched. Every Folder read site uses only members already on `IFolderPredictor` (`Train`, `UnTrain`, `Classify`, `Serialize`), so the accessor type is sufficient. **Option A (retype the shared dictionary) is rejected** because it conflicts with the `csharp.md` prohibition on broad unrelated refactors and the General Code Change Policy priorities (Simplicity first, minimal blast radius, do not break public APIs). This revision keeps the change localized to the Folder subsystem and preserves AC14 (the shared `IFolderPredictor` seam is delivered by the accessor's return type, reachable by both predictors).
+
+- [x] [P6-T1] Register this phase's new test file in the non-SDK test project: add `<Compile Include="EmailIntelligence\FolderPredictorSeam_Tests.cs"/>` to `UtilitiesCS.Test/UtilitiesCS.Test.csproj` (the production files modified in this phase — `OlFolderClassifierGroup.cs`, `EmailFiler.cs`, `SortEmail.cs`, `FolderScorer.cs` — already exist and are already registered; `ManagerAsyncLazy.cs` is NOT modified by this revised phase)
   - Acceptance: `UtilitiesCS.Test.csproj` contains an explicit `<Compile Include>` entry for the seam test file; the file compiles into the test assembly
-- [ ] [P6-T2] Add `BuildLcppnPredictorAsync` to `UtilitiesCS/EmailIntelligence/ClassifierGroups/OlFolder/OlFolderClassifierGroup.cs` that builds an `LcppnFolderPredictor` from the mined corpus, leaving `BuildFolderClassifiersAsync` unchanged
-  - Acceptance: New method compiles; existing `BuildFolderClassifiersAsync` body is unmodified
-- [ ] [P6-T3] Change the `Manager["Folder"]` registration type parameter to `IFolderPredictor`. The registration occurs in `OlFolderClassifierGroup.BuildClassifiersAsync` (around line 211), not in `BuildFolderClassifiersAsync`; update that registration site to select `LcppnFolderPredictor` when `UseLcppnPredictor = true` and the flat `BayesianClassifierGroup` otherwise. In `ManagerAsyncLazy.cs`, the manager is `ConcurrentObservableDictionary<string, AsyncLazy<BayesianClassifierGroup>>`; the `BayesianClassifierGroup` type parameter surface spans multiple members (return types, the `DeserializeAsync` path, and the `GetAltLoader`/loader members), all of which must change to `IFolderPredictor`
+- [x] [P6-T2] Add `BuildLcppnPredictorAsync` to `UtilitiesCS/EmailIntelligence/ClassifierGroups/OlFolder/OlFolderClassifierGroup.cs` that builds an `LcppnFolderPredictor` from the mined `MinedMailInfo[]` corpus via `LcppnFolderPredictor.Build`, leaving `BuildFolderClassifiersAsync` and `BuildClassifiersAsync` bodies unchanged
+  - Preconditions: Phase 4 complete
+  - Acceptance: New method compiles and returns an `LcppnFolderPredictor`; existing `BuildFolderClassifiersAsync` and `BuildClassifiersAsync` bodies are unmodified
+- [x] [P6-T3] Add a Folder-only LCPPN holder + flag-gated `IFolderPredictor` accessor to `OlFolderClassifierGroup` WITHOUT changing the shared manager value type: add a private `LcppnFolderPredictor` field (set by `BuildLcppnPredictorAsync` when `UseLcppnPredictor = true`) and a `public virtual async Task<IFolderPredictor> GetFolderPredictorAsync()` that returns the held `LcppnFolderPredictor` when `UseLcppnPredictor = true`, otherwise `await Globals.AF.Manager["Folder"]` (the flat `BayesianClassifierGroup`). `Globals.AF.Manager` remains `ConcurrentObservableDictionary<string, AsyncLazy<BayesianClassifierGroup>>`; `ManagerAsyncLazy.cs` is NOT edited
   - Preconditions: P6-T2, Phase 1 complete
-  - Acceptance: The `ManagerAsyncLazy` type parameter is `IFolderPredictor` across all affected members (return types, `DeserializeAsync` path, loader members); the registration in `OlFolderClassifierGroup.BuildClassifiersAsync` registers the flat predictor when `UseLcppnPredictor = false` and the LCPPN predictor when `true`; both satisfy `IFolderPredictor`
-- [ ] [P6-T4] Confirm and adjust the `(await Manager["Folder"]).Train` / `.UnTrain` / `.Serialize` call sites in `EmailFiler.cs` (`TrainFolderAsync`, `UnTrainFolderAsync`, `Serialize`) so they resolve through `IFolderPredictor` once the manager type parameter changes in P6-T3. There is no literal `(BayesianClassifierGroup)` cast at these sites; the type flows from awaiting `Manager["Folder"]`. Adjust only if a member is referenced that is not on `IFolderPredictor`
-  - Acceptance: `EmailFiler` compiles with `Manager["Folder"]` typed as `IFolderPredictor`; the `Train` / `UnTrain` / `Serialize` calls are unchanged in arguments and resolve through `IFolderPredictor`
-- [ ] [P6-T5] Confirm and adjust both `(await Manager["Folder"])` call sites in `SortEmail.cs` — the `.Train` call at `SortEmail.cs:250` and the `.UnTrain` call at `SortEmail.cs:582` — so each resolves through `IFolderPredictor` once the manager type parameter changes in P6-T3. There is no literal `(BayesianClassifierGroup)` cast at either site; the type flows from awaiting `Manager["Folder"]`
-  - Acceptance: `SortEmail` compiles with `Manager["Folder"]` typed as `IFolderPredictor`; both the `Train` (line 250) and `UnTrain` (line 582) calls are unchanged in arguments and resolve through `IFolderPredictor`
-- [ ] [P6-T6] Verify `Folder.json` is neither read nor written by the LCPPN path: confirm `LcppnFolderPredictor` serializes to a distinct file and that `UseLcppnPredictor = false` loads and writes `Folder.json` exactly as before
-  - Acceptance: Flat path I/O targets `Folder.json`; LCPPN path targets its own file (AC13)
-- [ ] [P6-T7] Create `FolderPredictorSeam_Tests.cs` in `UtilitiesCS.Test/EmailIntelligence/` (Moq for COM/manager boundaries) asserting: with flag off the flat `BayesianClassifierGroup` is selected and its behavior is unchanged (AC13), and both predictors are reachable through `IFolderPredictor` by `EmailFiler`/`SortEmail` (AC14)
-  - Acceptance: Tests use Moq + FluentAssertions; deterministic; no Outlook COM instances; no temp files
-- [ ] [P6-T8] Run the full C# toolchain for Phase 6 and restart from CSharpier on any failure or auto-fix
-  - Acceptance: All four steps pass in a single final pass; changed lines in `OlFolderClassifierGroup.cs`, `EmailFiler.cs`, `SortEmail.cs`, and `ManagerAsyncLazy.cs` do not regress coverage
+  - Acceptance: `GetFolderPredictorAsync` returns `IFolderPredictor`; with the flag off it returns the awaited `Manager["Folder"]` `BayesianClassifierGroup`, with the flag on it returns the held `LcppnFolderPredictor`; `ManagerAsyncLazy.cs` has zero diff; the shared dictionary value type is unchanged
+- [x] [P6-T4] Read the `UseLcppnPredictor` flag from `LcppnFolderPredictorConfig` at the Folder registration site in `OlFolderClassifierGroup.BuildClassifiersAsync` (around line 211): when the flag is off, keep the existing `Globals.AF.Manager["Folder"] = classifierGroup.ToAsyncLazy();` registration unchanged; when on, also build and store the LCPPN predictor via `BuildLcppnPredictorAsync` for the accessor to return. Do not alter the flat registration statement when the flag is off
+  - Preconditions: P6-T2, P6-T3 complete
+  - Acceptance: With `UseLcppnPredictor = false` the `Manager["Folder"]` registration statement at line ~211 is byte-for-byte unchanged; with the flag on the LCPPN holder is populated; no other `Manager[...]` registration is touched
+- [x] [P6-T5] Route the three `EmailFiler.cs` Folder call sites through the accessor: replace `(await Globals.AF.Manager["Folder"]).Serialize()` (`SerializeFolderManagerAsync`, line 369), `(await Globals.AF.Manager["Folder"]).UnTrain(...)` (`UnTrainFolderAsync`, line 375), and `(await Globals.AF.Manager["Folder"]).Train(...)` (`TrainFolderAsync`, line 381) with calls on the `IFolderPredictor` returned by the Folder accessor. The `Manager["Actionable"]` calls at lines 370/389 are left unchanged. Arguments to `Train`/`UnTrain`/`Serialize` are unchanged
+  - Preconditions: P6-T3 complete
+  - Acceptance: `EmailFiler` compiles; the three Folder sites obtain their predictor from the `IFolderPredictor` accessor; `Manager["Actionable"]` sites are unchanged; `Train`/`UnTrain`/`Serialize` arguments are unchanged
+- [x] [P6-T6] Route both `SortEmail.cs` Folder call sites through the accessor: replace `(await appGlobals.AF.Manager["Folder"]).Train(...)` (line 250) and `(await globals.AF.Manager["Folder"]).UnTrain(...)` (line 582) with calls on the `IFolderPredictor` returned by the Folder accessor. Arguments to `Train`/`UnTrain` are unchanged
+  - Preconditions: P6-T3 complete
+  - Acceptance: `SortEmail` compiles; both Folder sites obtain their predictor from the `IFolderPredictor` accessor; the `Train` (line 250) and `UnTrain` (line 582) arguments are unchanged
+- [x] [P6-T7] Route both `FolderScorer.cs` Folder call sites through the accessor: replace `(await globals.AF.Manager["Folder"]).Classify(mailInfo.Tokens)` at lines 161 and 168 with `Classify` on the `IFolderPredictor` returned by the Folder accessor. The `.Take(topNfolderKeys)`/`.ToArray()` chaining is unchanged because `Classify` returns `OrderedParallelQuery<Prediction<string>>` on `IFolderPredictor`
+  - Preconditions: P6-T3 complete
+  - Acceptance: `FolderScorer` compiles; both `Classify` sites obtain their predictor from the `IFolderPredictor` accessor; the LINQ chaining and `Tokens` argument are unchanged
+- [x] [P6-T8] Verify `Folder.json` is neither read nor written by the LCPPN path: confirm `LcppnFolderPredictor` serializes to a distinct file and that `UseLcppnPredictor = false` loads and writes `Folder.json` exactly as before via the unchanged flat registration and accessor fallthrough
+  - Acceptance: Flat-path I/O targets `Folder.json`; LCPPN path targets its own file; the flag-off path uses the unchanged `Manager["Folder"]` entry (AC13)
+- [x] [P6-T9] Create `FolderPredictorSeam_Tests.cs` in `UtilitiesCS.Test/EmailIntelligence/` (Moq for the manager/globals boundary, no Outlook COM) asserting: with `UseLcppnPredictor = false` the accessor returns the flat `BayesianClassifierGroup` (awaited from `Manager["Folder"]`) and its `Classify`/`Train`/`UnTrain` behavior is unchanged (AC13); with the flag on the accessor returns the `LcppnFolderPredictor`; and both predictors are reachable as `IFolderPredictor` through the accessor used by `EmailFiler`/`SortEmail`/`FolderScorer` (AC14)
+  - Acceptance: Tests use MSTest + Moq + FluentAssertions; deterministic; no Outlook COM instances; no temp files; assert flag-off returns the flat predictor unchanged and flag-on returns the LCPPN predictor, both typed as `IFolderPredictor`
+- [x] [P6-T10] Run the full C# toolchain for Phase 6 and restart from CSharpier on any failure or auto-fix
+  - Acceptance: All four steps pass in a single final pass; changed lines in `OlFolderClassifierGroup.cs`, `EmailFiler.cs`, `SortEmail.cs`, and `FolderScorer.cs` do not regress coverage; `ManagerAsyncLazy.cs` has no diff (shared dictionary value type unchanged)
 
 ### Phase 7 — Evaluation harness (deterministic time-sliced F1)
 
-- [ ] [P7-T1] Register this phase's new files in the non-SDK projects: add `<Compile Include="EmailIntelligence\Evaluation\EvaluationResult.cs"/>` and `<Compile Include="EmailIntelligence\Evaluation\FolderPredictorEvaluator.cs"/>` to `UtilitiesCS/UtilitiesCS.csproj`, and `<Compile Include="EmailIntelligence\Evaluation\FolderPredictorEvaluator_Tests.cs"/>` to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
+- [x] [P7-T1] Register this phase's new files in the non-SDK projects: add `<Compile Include="EmailIntelligence\Evaluation\EvaluationResult.cs"/>` and `<Compile Include="EmailIntelligence\Evaluation\FolderPredictorEvaluator.cs"/>` to `UtilitiesCS/UtilitiesCS.csproj`, and `<Compile Include="EmailIntelligence\Evaluation\FolderPredictorEvaluator_Tests.cs"/>` to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.csproj` and `UtilitiesCS.Test.csproj` each contain explicit `<Compile Include>` entries for the listed files; the files compile into their respective assemblies
-- [ ] [P7-T2] Create `EvaluationResult` value record in `UtilitiesCS/EmailIntelligence/Evaluation/EvaluationResult.cs` carrying per-leaf precision/recall/F1, macro F1, and abstention rate
+- [x] [P7-T2] Create `EvaluationResult` value record in `UtilitiesCS/EmailIntelligence/Evaluation/EvaluationResult.cs` carrying per-leaf precision/recall/F1, macro F1, and abstention rate
   - Acceptance: Record compiles; all four metric groups are exposed
-- [ ] [P7-T3] Create `FolderPredictorEvaluator` in `UtilitiesCS/EmailIntelligence/Evaluation/FolderPredictorEvaluator.cs` accepting `IFolderPredictor`, `MinedMailInfo[]`, and an evaluation config; pure logic, no Outlook COM
+- [x] [P7-T3] Create `FolderPredictorEvaluator` in `UtilitiesCS/EmailIntelligence/Evaluation/FolderPredictorEvaluator.cs` accepting `IFolderPredictor`, `MinedMailInfo[]`, and an evaluation config; pure logic, no Outlook COM
   - Acceptance: File under 500 lines (estimated 150-200); no Outlook COM or filesystem dependency
-- [ ] [P7-T4] Implement the deterministic time-sliced split in `FolderPredictorEvaluator` using the corpus-index proxy. `MinedMailInfo` has no timestamp/received-date field (verified members: Categories, Tokens, FolderInfo, ToRecipients, CcRecipients, Sender, ConversationId, EntryId, StoreId, Subject, Actionable, GroupingKey), so the split must use the input array's stable corpus index as the deterministic time proxy: take the first `TrainFraction` of the array (by index order) as train and the remainder as test, build the predictor from the train slice, evaluate the test slice
+- [x] [P7-T4] Implement the deterministic time-sliced split in `FolderPredictorEvaluator` using the corpus-index proxy. `MinedMailInfo` has no timestamp/received-date field (verified members: Categories, Tokens, FolderInfo, ToRecipients, CcRecipients, Sender, ConversationId, EntryId, StoreId, Subject, Actionable, GroupingKey), so the split must use the input array's stable corpus index as the deterministic time proxy: take the first `TrainFraction` of the array (by index order) as train and the remainder as test, build the predictor from the train slice, evaluate the test slice
   - Preconditions: P7-T3 complete
   - Acceptance: The split is computed from the array's corpus index (no timestamp dependency); the same input yields the same split and result across runs (AC16)
-- [ ] [P7-T5] Implement per-leaf precision/recall/F1, macro F1, and abstention-rate computation in `FolderPredictorEvaluator`, returning an `EvaluationResult`
+- [x] [P7-T5] Implement per-leaf precision/recall/F1, macro F1, and abstention-rate computation in `FolderPredictorEvaluator`, returning an `EvaluationResult`
   - Acceptance: Metrics match hand-computed values on a fixed small corpus
-- [ ] [P7-T6] Implement abstention accounting so an abstained test example counts as a false negative for its true class and a true negative for all other classes, never incrementing a false positive
+- [x] [P7-T6] Implement abstention accounting so an abstained test example counts as a false negative for its true class and a true negative for all other classes, never incrementing a false positive
   - Acceptance: A constructed abstained example lowers recall for its true class without inflating any class's false positives (AC8)
-- [ ] [P7-T7] Create `FolderPredictorEvaluator_Tests.cs` in `UtilitiesCS.Test/EmailIntelligence/Evaluation/` covering: deterministic split reproducibility (AC16), precision/recall/macro-F1 correctness, and abstention-as-false-negative accounting (AC8); no Outlook COM, no external services, no temp files
+- [x] [P7-T7] Create `FolderPredictorEvaluator_Tests.cs` in `UtilitiesCS.Test/EmailIntelligence/Evaluation/` covering: deterministic split reproducibility (AC16), precision/recall/macro-F1 correctness, and abstention-as-false-negative accounting (AC8); no Outlook COM, no external services, no temp files
   - Acceptance: All scenarios asserted with FluentAssertions; deterministic
-- [ ] [P7-T8] Run the full C# toolchain for Phase 7 and restart from CSharpier on any failure or auto-fix
+- [x] [P7-T8] Run the full C# toolchain for Phase 7 and restart from CSharpier on any failure or auto-fix
   - Acceptance: All four steps pass in a single final pass; `EvaluationResult.cs` and `FolderPredictorEvaluator.cs` each reach >= 90% coverage
 
 ### Phase 8 — Final QA, coverage comparison, and acceptance check-off
 
-- [ ] [P8-T1] Run the full C# toolchain end to end on the complete change set (CSharpier -> .NET analyzers -> nullable -> MSTest with coverage), restarting from step 1 on any failure or auto-fix, per `.claude/skills/csharp-qa-gate/SKILL.md`
+- [x] [P8-T1] Run the full C# toolchain end to end on the complete change set (CSharpier -> .NET analyzers -> nullable -> MSTest with coverage), restarting from step 1 on any failure or auto-fix, per `.claude/skills/csharp-qa-gate/SKILL.md`
   - Acceptance: All four steps complete in a single final pass with zero new analyzer findings, zero new nullable diagnostics, and zero failing tests; outputs stored under `docs/features/active/2026-06-08-hierarchical-lcppn-folder-prediction-177/evidence/qa-gates/<ISO-8601-UTC>/`
-- [ ] [P8-T2] Export the post-change coverage report and store it as the final-QA coverage artifact
+- [x] [P8-T2] Export the post-change coverage report and store it as the final-QA coverage artifact
   - Acceptance: Post-change coverage XML is stored at `docs/features/active/2026-06-08-hierarchical-lcppn-folder-prediction-177/evidence/qa-gates/<ISO-8601-UTC>/coverage.xml`
-- [ ] [P8-T3] Generate a coverage-comparison artifact comparing the post-change coverage to the Phase 0 baseline (`artifacts/csharp/coverage.xml`)
+- [x] [P8-T3] Generate a coverage-comparison artifact comparing the post-change coverage to the Phase 0 baseline (`artifacts/csharp/coverage.xml`)
   - Acceptance: Comparison artifact at `docs/features/active/2026-06-08-hierarchical-lcppn-folder-prediction-177/evidence/qa-gates/<ISO-8601-UTC>/coverage-comparison.md` shows repository-wide line coverage >= 80%, each new module/class >= 90%, and no coverage regression on changed lines (AC18)
-- [ ] [P8-T4] Verify the file-size and separation constraints: confirm no new production, test, or reusable script file exceeds 500 lines, and that all new prediction/evaluation logic compiles and tests without any Outlook COM reference
+- [x] [P8-T4] Verify the file-size and separation constraints: confirm no new production, test, or reusable script file exceeds 500 lines, and that all new prediction/evaluation logic compiles and tests without any Outlook COM reference
   - Acceptance: Line counts for all new files are recorded and all are <= 500; new prediction/evaluation namespaces contain no Outlook COM types (AC20)
-- [ ] [P8-T5] Verify the test-stack and isolation constraint: confirm all new tests use MSTest + Moq + FluentAssertions, are independent and deterministic, create no temp files, and depend on no external services
+- [x] [P8-T5] Verify the test-stack and isolation constraint: confirm all new tests use MSTest + Moq + FluentAssertions, are independent and deterministic, create no temp files, and depend on no external services
   - Acceptance: New test files are audited against the General Unit Test Policy; the audit result is recorded in the QA-gate evidence folder (AC17)
-- [ ] [P8-T6] Complete the AC traceability check-off: mark each of AC1-AC20 against its verifying task/test and confirm every AC maps to at least one passing test or verification task
+- [x] [P8-T6] Complete the AC traceability check-off: mark each of AC1-AC20 against its verifying task/test and confirm every AC maps to at least one passing test or verification task
   - Acceptance: The AC Traceability table below is filled with passing references; if any required baseline, QA, or coverage-comparison artifact is missing, the verdict is recorded as BLOCKED or INCOMPLETE, never PASS
 
 ## Test Plan
@@ -255,7 +276,7 @@ If a caller instruction specifies a non-canonical evidence path (for example `ar
   - `LcppnFolderPredictor_Serialization_Tests` (Phase 5)
   - `FolderPredictorSeam_Tests` (Phase 6)
   - `FolderPredictorEvaluator_Tests` (Phase 7)
-- **Integration / seam:** `FolderPredictorSeam_Tests` exercises the `Manager["Folder"]` -> `IFolderPredictor` selection through Moq seams (no Outlook COM).
+- **Integration / seam:** `FolderPredictorSeam_Tests` exercises the Folder-only `IFolderPredictor` accessor (`OlFolderClassifierGroup.GetFolderPredictorAsync`) flag-gated selection — flat `BayesianClassifierGroup` (flag off) vs `LcppnFolderPredictor` (flag on) — through Moq seams on the manager/globals boundary (no Outlook COM). The shared `Manager` dictionary value type is unchanged.
 - **Manual/CLI:** None. All behavior is verified by automated tests; no temporary files; deterministic.
 - **Coverage evidence:**
   - Baseline coverage artifact (canonical, required before first feature-review): `artifacts/csharp/coverage.xml` (Phase 0, P0-T5), copy under `docs/features/active/2026-06-08-hierarchical-lcppn-folder-prediction-177/evidence/baseline/<ISO-8601-UTC>/`
@@ -279,13 +300,13 @@ If a caller instruction specifies a non-canonical evidence path (for example `ar
 | AC10 | Cold-start fallback | P3-T4, P3-T7 (cold-start boundary) |
 | AC11 | Localized incremental update | P4-T9, P4-T10, P4-T12 (Train/UnTrain locality) |
 | AC12 | New-leaf addition is local | P4-T11, P4-T12 (new-leaf locality) |
-| AC13 | Backward compatibility (flat predictor, `Folder.json`) | P1-T5, P6-T6, P6-T7 (flat-path unchanged) |
-| AC14 | Shared `IFolderPredictor` seam | P1-T2, P1-T3, P1-T4, P6-T7 (seam reachability) |
+| AC13 | Backward compatibility (flat predictor, `Folder.json`) | P1-T5, P6-T8, P6-T9 (flat-path unchanged via accessor flag-off path) |
+| AC14 | Shared `IFolderPredictor` seam | P1-T2, P1-T3, P1-T4, P6-T3, P6-T9 (Folder-only `IFolderPredictor` accessor reachability) |
 | AC15 | Serialization round-trip | P5-T2, P5-T3, P5-T4, P5-T5 (`LcppnFolderPredictor_Serialization_Tests`) |
 | AC16 | Deterministic evaluation harness | P7-T4, P7-T5, P7-T7 (deterministic split) |
 | AC17 | Test stack and isolation | P8-T5 (test-stack audit) plus all per-phase test tasks |
 | AC18 | Coverage (>= 90% new, >= 80% repo, no regression) | P0-T5, P8-T2, P8-T3 (coverage comparison) |
-| AC19 | Full C# toolchain passes in order | P1-T6, P2-T8, P3-T8, P4-T13, P5-T6, P6-T8, P7-T8, P8-T1 |
+| AC19 | Full C# toolchain passes in order | P1-T6, P2-T8, P3-T8, P4-T13, P5-T6, P6-T10, P7-T8, P8-T1 |
 | AC20 | File-size and separation constraints | P8-T4 (file-size + COM-free audit) |
 
 ## Open Questions / Notes
@@ -294,5 +315,5 @@ If a caller instruction specifies a non-canonical evidence path (for example `ar
 - Root abstention is allowed (research §9): if no root-level child clears `MinimumPathProbability`, `Classify` returns an empty result.
 - Per-parent shared token base uses `Corpus` serialized inline (research §9), not `CorpusInherit`, to avoid O(nodes) separate JSON files.
 - The evaluation harness split is resolved: `MinedMailInfo` exposes no timestamp/received-date field (verified members: Categories, Tokens, FolderInfo, ToRecipients, CcRecipients, Sender, ConversationId, EntryId, StoreId, Subject, Actionable, GroupingKey), so P7-T4 mandates the deterministic corpus-index proxy for the time-sliced split. The timestamp option is removed; it is not available.
-- The `Manager["Folder"]` type parameter change (research §9 open question 5) affects multiple `ManagerAsyncLazy` members. The manager is `ConcurrentObservableDictionary<string, AsyncLazy<BayesianClassifierGroup>>`; the `BayesianClassifierGroup` type parameter surface spans return types, the `DeserializeAsync` path, and the `GetAltLoader`/loader members, all changed to `IFolderPredictor` in P6-T3. The registration itself occurs in `OlFolderClassifierGroup.BuildClassifiersAsync` (around line 211), not `BuildFolderClassifiersAsync`.
+- The `Manager["Folder"]` type parameter question (research §9 open question 5) is resolved by the Phase 6 revision (version 1.5) in favor of Option B. Retyping the shared `ConcurrentObservableDictionary<string, AsyncLazy<BayesianClassifierGroup>>` value parameter to `IFolderPredictor` is infeasible: `AsyncLazy<T>` is sealed/invariant and the dictionary is shared by all classifier subsystems (Folder, Spam, Actionable, Triage, Category, multiclass), so the change would cascade to `Triage.cs`, `SpamBayes.cs`, `CategoryClassifierGroup.cs`, `MulticlassEngine.cs`, and the `ManagerAsyncLazy` loader — a broad cross-subsystem refactor prohibited by `.claude/rules/csharp.md`. The revised Phase 6 instead introduces a Folder-only `IFolderPredictor` accessor on `OlFolderClassifierGroup` (`GetFolderPredictorAsync`) that resolves over the unchanged `Manager["Folder"]` entry (flag off) or the held `LcppnFolderPredictor` (flag on); the five Folder read sites (`EmailFiler`, `SortEmail`, `FolderScorer`) route through it. `ManagerAsyncLazy.cs` is not modified. The registration itself occurs in `OlFolderClassifierGroup.BuildClassifiersAsync` (around line 211), not `BuildFolderClassifiersAsync`.
 - Reparenting is handled by full rebuild, not incremental update (spec Constraints & Risks); no task implements incremental reparenting.
