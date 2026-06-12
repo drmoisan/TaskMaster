@@ -89,105 +89,105 @@ If a caller instruction specifies a non-canonical evidence path (for example `ar
 
 ### Phase 1 — IFolderPredictor seam (additive, no flat behavior change)
 
-- [ ] [P1-T1] Register this phase's new files in the non-SDK projects: add `<Compile Include="EmailIntelligence\Bayesian\IFolderPredictor.cs"/>` to `UtilitiesCS/UtilitiesCS.csproj`, and `<Compile Include="EmailIntelligence\Bayesian\IFolderPredictor_Tests.cs"/>` plus `<Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup_FlatPathUnchanged_Tests.cs"/>` to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
+- [x] [P1-T1] Register this phase's new files in the non-SDK projects: add `<Compile Include="EmailIntelligence\Bayesian\IFolderPredictor.cs"/>` to `UtilitiesCS/UtilitiesCS.csproj`, and `<Compile Include="EmailIntelligence\Bayesian\IFolderPredictor_Tests.cs"/>` plus `<Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup_FlatPathUnchanged_Tests.cs"/>` to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.csproj` and `UtilitiesCS.Test.csproj` each contain explicit `<Compile Include>` entries for the listed files; the files compile into their respective assemblies (verified once the files exist in this phase)
-- [ ] [P1-T2] Create `IFolderPredictor` interface in `UtilitiesCS/EmailIntelligence/Bayesian/IFolderPredictor.cs` declaring the members the callers use, with signatures matching `BayesianClassifierGroup` exactly: `void Train(string tag, IEnumerable<string> matchTokens, int emailCount)` (matches `BayesianClassifierGroup.cs:146`), `void UnTrain(string tag, IEnumerable<string> matchTokens, int emailCount)` (matches `BayesianClassifierGroup.cs:91`), the caller-used `Classify` overload `OrderedParallelQuery<Prediction<string>> Classify(string[] tokens)` (matches `BayesianClassifierGroup.cs:229`), and `void Serialize()` (inherited from `SmartSerializable<T>` at `SmartSerializable.cs:425`; both `BayesianClassifierGroup` and `LcppnFolderPredictor` satisfy it through that base, so the interface member is satisfied without adding a new method body)
+- [x] [P1-T2] Create `IFolderPredictor` interface in `UtilitiesCS/EmailIntelligence/Bayesian/IFolderPredictor.cs` declaring the members the callers use, with signatures matching `BayesianClassifierGroup` exactly: `void Train(string tag, IEnumerable<string> matchTokens, int emailCount)` (matches `BayesianClassifierGroup.cs:146`), `void UnTrain(string tag, IEnumerable<string> matchTokens, int emailCount)` (matches `BayesianClassifierGroup.cs:91`), the caller-used `Classify` overload `OrderedParallelQuery<Prediction<string>> Classify(string[] tokens)` (matches `BayesianClassifierGroup.cs:229`), and `void Serialize()` (inherited from `SmartSerializable<T>` at `SmartSerializable.cs:425`; both `BayesianClassifierGroup` and `LcppnFolderPredictor` satisfy it through that base, so the interface member is satisfied without adding a new method body)
   - Acceptance: Interface compiles; `Train`, `UnTrain`, the `string[]`-overload `Classify`, and `Serialize()` member signatures are identical to the `BayesianClassifierGroup` members used by callers (verified against `BayesianClassifierGroup.cs:91,146,229` and `SmartSerializable.cs:425`)
-- [ ] [P1-T3] Update `BayesianClassifierGroup` (`UtilitiesCS/EmailIntelligence/Bayesian/BayesianClassifierGroup.cs`) to declare `: IFolderPredictor` additively, with no change to existing method bodies
+- [x] [P1-T3] Update `BayesianClassifierGroup` (`UtilitiesCS/EmailIntelligence/Bayesian/BayesianClassifierGroup.cs`) to declare `: IFolderPredictor` additively, with no change to existing method bodies
   - Preconditions: P1-T2 complete
   - Acceptance: `BayesianClassifierGroup` compiles as an `IFolderPredictor`; no existing method body is modified
-- [ ] [P1-T4] Add `IFolderPredictor` interface-conformance tests in `UtilitiesCS.Test/EmailIntelligence/Bayesian/IFolderPredictor_Tests.cs` asserting that a `BayesianClassifierGroup` instance is assignable to `IFolderPredictor` and that calls through the interface dispatch to the flat methods
+- [x] [P1-T4] Add `IFolderPredictor` interface-conformance tests in `UtilitiesCS.Test/EmailIntelligence/Bayesian/IFolderPredictor_Tests.cs` asserting that a `BayesianClassifierGroup` instance is assignable to `IFolderPredictor` and that calls through the interface dispatch to the flat methods
   - Acceptance: Tests use MSTest + FluentAssertions and pass; assignability and dispatch are asserted
-- [ ] [P1-T5] Add a flat-path regression test in `UtilitiesCS.Test/EmailIntelligence/Bayesian/BayesianClassifierGroup_FlatPathUnchanged_Tests.cs` that trains a small fixed corpus and asserts `Classify` output ordering and probabilities are identical before and after the `IFolderPredictor` declaration (proving AC13 behavior is preserved)
+- [x] [P1-T5] Add a flat-path regression test in `UtilitiesCS.Test/EmailIntelligence/Bayesian/BayesianClassifierGroup_FlatPathUnchanged_Tests.cs` that trains a small fixed corpus and asserts `Classify` output ordering and probabilities are identical before and after the `IFolderPredictor` declaration (proving AC13 behavior is preserved)
   - Acceptance: Test passes deterministically with no temp files and no external services
-- [ ] [P1-T6] Run the full C# toolchain for Phase 1 and resolve any failure or auto-fix by restarting from CSharpier
+- [x] [P1-T6] Run the full C# toolchain for Phase 1 and resolve any failure or auto-fix by restarting from CSharpier
   - Acceptance: CSharpier, both `msbuild` runs, and `vstest.console.exe /EnableCodeCoverage` all pass in a single final pass; new `IFolderPredictor.cs` reaches >= 90% coverage via P1-T4/P1-T5
 
 ### Phase 2 — Folder hierarchy model (pure path parsing)
 
-- [ ] [P2-T1] Register this phase's new files in the non-SDK projects: add `<Compile Include="EmailIntelligence\Bayesian\FolderHierarchyNode.cs"/>` and `<Compile Include="EmailIntelligence\Bayesian\FolderHierarchyTree.cs"/>` to `UtilitiesCS/UtilitiesCS.csproj`, and `<Compile Include="EmailIntelligence\Bayesian\FolderHierarchyTree_Tests.cs"/>` to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
+- [x] [P2-T1] Register this phase's new files in the non-SDK projects: add `<Compile Include="EmailIntelligence\Bayesian\FolderHierarchyNode.cs"/>` and `<Compile Include="EmailIntelligence\Bayesian\FolderHierarchyTree.cs"/>` to `UtilitiesCS/UtilitiesCS.csproj`, and `<Compile Include="EmailIntelligence\Bayesian\FolderHierarchyTree_Tests.cs"/>` to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.csproj` and `UtilitiesCS.Test.csproj` each contain explicit `<Compile Include>` entries for the listed files; the files compile into their respective assemblies
-- [ ] [P2-T2] Create `FolderHierarchyNode` immutable record in `UtilitiesCS/EmailIntelligence/Bayesian/FolderHierarchyNode.cs` with `string NodeKey` and `string[] Children`, serializable, with XML doc on the contract
+- [x] [P2-T2] Create `FolderHierarchyNode` immutable record in `UtilitiesCS/EmailIntelligence/Bayesian/FolderHierarchyNode.cs` with `string NodeKey` and `string[] Children`, serializable, with XML doc on the contract
   - Acceptance: Record compiles; `NodeKey` and `Children` are exposed; type is serializable by Newtonsoft.Json
-- [ ] [P2-T3] Create `FolderHierarchyTree` in `UtilitiesCS/EmailIntelligence/Bayesian/FolderHierarchyTree.cs` that builds and holds `Dictionary<string, FolderHierarchyNode>` from a `RelativePath[]`, parsing each path on backslash and recording each adjacent segment pair as a parent->child edge with empty-string root key (pure logic, no I/O), with a configurable ordinal vs `OrdinalIgnoreCase` comparer option
+- [x] [P2-T3] Create `FolderHierarchyTree` in `UtilitiesCS/EmailIntelligence/Bayesian/FolderHierarchyTree.cs` that builds and holds `Dictionary<string, FolderHierarchyNode>` from a `RelativePath[]`, parsing each path on backslash and recording each adjacent segment pair as a parent->child edge with empty-string root key (pure logic, no I/O), with a configurable ordinal vs `OrdinalIgnoreCase` comparer option
   - Preconditions: P2-T2 complete
   - Acceptance: File is under 500 lines; class has no Outlook COM or filesystem dependency; comparer option defaults to ordinal
-- [ ] [P2-T4] Implement single-segment handling in `FolderHierarchyTree` so a one-segment path (e.g., `"Inbox"`) yields exactly one edge `root -> "Inbox"` and registers that node as both a root child and a zero-child leaf
+- [x] [P2-T4] Implement single-segment handling in `FolderHierarchyTree` so a one-segment path (e.g., `"Inbox"`) yields exactly one edge `root -> "Inbox"` and registers that node as both a root child and a zero-child leaf
   - Acceptance: A leaf-detection accessor reports zero children for the single-segment node
-- [ ] [P2-T5] Implement idempotent/deduplicated child registration in `FolderHierarchyTree` using a per-parent child set so duplicate paths produce no duplicate children
+- [x] [P2-T5] Implement idempotent/deduplicated child registration in `FolderHierarchyTree` using a per-parent child set so duplicate paths produce no duplicate children
   - Acceptance: Building from a list with duplicates yields the same node/children sets as the distinct list
-- [ ] [P2-T6] Implement incremental `AddLeaf(parentKey, childSegment)` (or equivalent) in `FolderHierarchyTree` that adds the child to one parent's child set only, leaving all other parents unchanged
+- [x] [P2-T6] Implement incremental `AddLeaf(parentKey, childSegment)` (or equivalent) in `FolderHierarchyTree` that adds the child to one parent's child set only, leaving all other parents unchanged
   - Acceptance: After adding `parent\NewLeaf`, only `parent`'s child set changes (verified by comparing all other nodes' child sets to the pre-add state)
-- [ ] [P2-T7] Create `FolderHierarchyTree_Tests.cs` in `UtilitiesCS.Test/EmailIntelligence/Bayesian/` covering: multi-depth construction (AC1), single-segment edge case (AC2), duplicate-path idempotence (AC3), new-leaf locality (AC4), empty collection, and case-variant comparison
+- [x] [P2-T7] Create `FolderHierarchyTree_Tests.cs` in `UtilitiesCS.Test/EmailIntelligence/Bayesian/` covering: multi-depth construction (AC1), single-segment edge case (AC2), duplicate-path idempotence (AC3), new-leaf locality (AC4), empty collection, and case-variant comparison
   - Acceptance: All listed scenarios are asserted with FluentAssertions; tests are deterministic with no temp files
-- [ ] [P2-T8] Run the full C# toolchain for Phase 2 and restart from CSharpier on any failure or auto-fix
+- [x] [P2-T8] Run the full C# toolchain for Phase 2 and restart from CSharpier on any failure or auto-fix
   - Acceptance: All four steps pass in a single final pass; `FolderHierarchyNode.cs` and `FolderHierarchyTree.cs` each reach >= 90% coverage
 
 ### Phase 3 — PerParentClassifier (shrinkage blend + cold-start fallback)
 
-- [ ] [P3-T1] Register this phase's new files in the non-SDK projects: add `<Compile Include="EmailIntelligence\Bayesian\PerParentClassifier.cs"/>` to `UtilitiesCS/UtilitiesCS.csproj`, and `<Compile Include="EmailIntelligence\Bayesian\PerParentClassifier_Tests.cs"/>` to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
+- [x] [P3-T1] Register this phase's new files in the non-SDK projects: add `<Compile Include="EmailIntelligence\Bayesian\PerParentClassifier.cs"/>` to `UtilitiesCS/UtilitiesCS.csproj`, and `<Compile Include="EmailIntelligence\Bayesian\PerParentClassifier_Tests.cs"/>` to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.csproj` and `UtilitiesCS.Test.csproj` each contain explicit `<Compile Include>` entries for the listed files; the files compile into their respective assemblies
-- [ ] [P3-T2] Create `PerParentClassifier` in `UtilitiesCS/EmailIntelligence/Bayesian/PerParentClassifier.cs` wrapping one `BayesianClassifierGroup` whose `Classifiers` are keyed by direct child segment and whose `SharedTokenBase` is the parent-scoped `Corpus`
+- [x] [P3-T2] Create `PerParentClassifier` in `UtilitiesCS/EmailIntelligence/Bayesian/PerParentClassifier.cs` wrapping one `BayesianClassifierGroup` whose `Classifiers` are keyed by direct child segment and whose `SharedTokenBase` is the parent-scoped `Corpus`
   - Acceptance: File is under 500 lines; reuses `BayesianClassifierGroup` / `BayesianClassifierShared` / `Corpus` without modifying them
-- [ ] [P3-T3] Implement per-child scoring in `PerParentClassifier` that returns `P(child | parent, tokens)` using the shrinkage blend `λ·P_leaf(t|c) + (1-λ)·P_parent(t|p)` with `ShrinkageLambda` supplied from config
+- [x] [P3-T3] Implement per-child scoring in `PerParentClassifier` that returns `P(child | parent, tokens)` using the shrinkage blend `λ·P_leaf(t|c) + (1-λ)·P_parent(t|p)` with `ShrinkageLambda` supplied from config
   - Preconditions: P3-T2 complete
   - Acceptance: Blend uses the configured lambda; a fixed numeric example reproduces the documented blend value (AC9)
-- [ ] [P3-T4] Implement the cold-start fallback in `PerParentClassifier`: when total examples under the parent are fewer than `MinColdStartExamples`, per-child scoring uses unsmoothed Naive Bayes (existing `BayesianClassifierShared` behavior) instead of the blend
+- [x] [P3-T4] Implement the cold-start fallback in `PerParentClassifier`: when total examples under the parent are fewer than `MinColdStartExamples`, per-child scoring uses unsmoothed Naive Bayes (existing `BayesianClassifierShared` behavior) instead of the blend
   - Acceptance: A parent under the threshold scores via unsmoothed NB; at/above the threshold it scores via the blend (AC10)
-- [ ] [P3-T5] Implement count-based `Train(childSegment, tokens, count)` and `UnTrain(childSegment, tokens, count)` on `PerParentClassifier` delegating to the wrapped group's per-tag match counts and shared corpus, with new-child registration via `GetOrAdd`
+- [x] [P3-T5] Implement count-based `Train(childSegment, tokens, count)` and `UnTrain(childSegment, tokens, count)` on `PerParentClassifier` delegating to the wrapped group's per-tag match counts and shared corpus, with new-child registration via `GetOrAdd`
   - Acceptance: Training a new child registers it without affecting sibling counts; untraining decrements the same counts
-- [ ] [P3-T6] Validate construction invariant `0 <= ShrinkageLambda <= 1` and `MinColdStartExamples >= 0` in `PerParentClassifier` (or its config), failing fast with an explicit exception
+- [x] [P3-T6] Validate construction invariant `0 <= ShrinkageLambda <= 1` and `MinColdStartExamples >= 0` in `PerParentClassifier` (or its config), failing fast with an explicit exception
   - Acceptance: Out-of-range lambda or negative cold-start count throws at construction with a clear message
-- [ ] [P3-T7] Create `PerParentClassifier_Tests.cs` covering: blend correctness at a fixed lambda (AC9), cold-start fallback boundary at `MinColdStartExamples` (AC10), incremental train/untrain count changes, sibling isolation, probability sanity bounds, and invalid-lambda fail-fast
+- [x] [P3-T7] Create `PerParentClassifier_Tests.cs` covering: blend correctness at a fixed lambda (AC9), cold-start fallback boundary at `MinColdStartExamples` (AC10), incremental train/untrain count changes, sibling isolation, probability sanity bounds, and invalid-lambda fail-fast
   - Acceptance: All scenarios asserted with FluentAssertions; deterministic; no temp files
-- [ ] [P3-T8] Run the full C# toolchain for Phase 3 and restart from CSharpier on any failure or auto-fix
+- [x] [P3-T8] Run the full C# toolchain for Phase 3 and restart from CSharpier on any failure or auto-fix
   - Acceptance: All four steps pass in a single final pass; `PerParentClassifier.cs` reaches >= 90% coverage
 
 ### Phase 4 — LcppnFolderPredictor (config, beam search, abstention, incremental dispatch)
 
-- [ ] [P4-T1] Register this phase's new files in the non-SDK projects: add `<Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictorConfig.cs"/>` and `<Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictor.cs"/>` to `UtilitiesCS/UtilitiesCS.csproj`, and `<Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictor_Tests.cs"/>` to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
+- [x] [P4-T1] Register this phase's new files in the non-SDK projects: add `<Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictorConfig.cs"/>` and `<Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictor.cs"/>` to `UtilitiesCS/UtilitiesCS.csproj`, and `<Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictor_Tests.cs"/>` to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.csproj` and `UtilitiesCS.Test.csproj` each contain explicit `<Compile Include>` entries for the listed files; the files compile into their respective assemblies
-- [ ] [P4-T2] Create `LcppnFolderPredictorConfig` in `UtilitiesCS/EmailIntelligence/Bayesian/LcppnFolderPredictorConfig.cs` with `UseLcppnPredictor` (default false), `BeamWidth` (default 3), `MinimumPathProbability` (default 0.5), `ShrinkageLambda` (default 0.7), `MinColdStartExamples` (default 5), serializable
+- [x] [P4-T2] Create `LcppnFolderPredictorConfig` in `UtilitiesCS/EmailIntelligence/Bayesian/LcppnFolderPredictorConfig.cs` with `UseLcppnPredictor` (default false), `BeamWidth` (default 3), `MinimumPathProbability` (default 0.5), `ShrinkageLambda` (default 0.7), `MinColdStartExamples` (default 5), serializable
   - Acceptance: All five keys present with the documented defaults; type is serializable
-- [ ] [P4-T3] Implement construction-time validation in `LcppnFolderPredictorConfig`: `BeamWidth >= 1`, `0 < MinimumPathProbability < 1`, `0 <= ShrinkageLambda <= 1`, `MinColdStartExamples >= 0`, failing fast on violation
+- [x] [P4-T3] Implement construction-time validation in `LcppnFolderPredictorConfig`: `BeamWidth >= 1`, `0 < MinimumPathProbability < 1`, `0 <= ShrinkageLambda <= 1`, `MinColdStartExamples >= 0`, failing fast on violation
   - Preconditions: P4-T2 complete
   - Acceptance: Each invalid value throws an explicit exception with a clear message (AC6 validation, AC9 validation)
-- [ ] [P4-T4] Create `LcppnFolderPredictor` in `UtilitiesCS/EmailIntelligence/Bayesian/LcppnFolderPredictor.cs` extending `SmartSerializable<LcppnFolderPredictor>`, implementing `IFolderPredictor`, holding `Dictionary<string, PerParentClassifier>` keyed by full parent path and a `FolderHierarchyTree`
+- [x] [P4-T4] Create `LcppnFolderPredictor` in `UtilitiesCS/EmailIntelligence/Bayesian/LcppnFolderPredictor.cs` extending `SmartSerializable<LcppnFolderPredictor>`, implementing `IFolderPredictor`, holding `Dictionary<string, PerParentClassifier>` keyed by full parent path and a `FolderHierarchyTree`
   - Acceptance: File estimated 350-450 lines and under the 500-line limit; compiles as an `IFolderPredictor`
-- [ ] [P4-T5] Implement a builder on `LcppnFolderPredictor` (or `OlFolderClassifierGroup` helper invoked here) that constructs the tree and per-parent classifiers from a `MinedMailInfo[]` corpus using `FolderInfo.RelativePath`
+- [x] [P4-T5] Implement a builder on `LcppnFolderPredictor` (or `OlFolderClassifierGroup` helper invoked here) that constructs the tree and per-parent classifiers from a `MinedMailInfo[]` corpus using `FolderInfo.RelativePath`
   - Preconditions: P4-T4, Phase 2, Phase 3 complete
   - Acceptance: Building from a fixed corpus produces one `PerParentClassifier` per internal node with child-keyed classifiers
-- [ ] [P4-T6] Implement beam-search descent in `LcppnFolderPredictor.Classify` that descends from the root, scores each frontier node's children, and retains the top `BeamWidth` partial paths by cumulative path log-probability until frontier entries reach leaves
+- [x] [P4-T6] Implement beam-search descent in `LcppnFolderPredictor.Classify` that descends from the root, scores each frontier node's children, and retains the top `BeamWidth` partial paths by cumulative path log-probability until frontier entries reach leaves
   - Acceptance: Descent terminates at leaves; retained-path count never exceeds `BeamWidth` (AC5)
-- [ ] [P4-T7] Implement path-product probability and result assembly so `Classify` returns the top leaf with `Probability` equal to the product of per-step conditional probabilities along its root-to-leaf path, plus an ordered list of alternative `Prediction<string>` entries
+- [x] [P4-T7] Implement path-product probability and result assembly so `Classify` returns the top leaf with `Probability` equal to the product of per-step conditional probabilities along its root-to-leaf path, plus an ordered list of alternative `Prediction<string>` entries
   - Acceptance: For a constructed corpus with path `Projects\Alpha\2024`, top `Class` is the full path and `Probability` equals `P(Projects|root)·P(Alpha|Projects)·P(2024|Alpha)` within numeric tolerance (AC5)
-- [ ] [P4-T8] Implement abstention in `Classify`: if the top leaf's path-product probability is below `MinimumPathProbability`, return an empty result; if no root-level child clears the threshold, return an empty result (root abstention allowed)
+- [x] [P4-T8] Implement abstention in `Classify`: if the top leaf's path-product probability is below `MinimumPathProbability`, return an empty result; if no root-level child clears the threshold, return an empty result (root abstention allowed)
   - Acceptance: An input whose best path product is below the threshold returns empty; a root-level all-below case returns empty (AC7)
-- [ ] [P4-T9] Implement localized incremental `Train(tag, tokens, count)` on `LcppnFolderPredictor` that parses the leaf tag into its root-to-leaf path and calls `Train(childSegment, tokens, count)` on each per-parent classifier on that path only
+- [x] [P4-T9] Implement localized incremental `Train(tag, tokens, count)` on `LcppnFolderPredictor` that parses the leaf tag into its root-to-leaf path and calls `Train(childSegment, tokens, count)` on each per-parent classifier on that path only
   - Acceptance: Training leaf `L` updates only path classifiers; nodes off the path have unchanged counts and probabilities (AC11)
-- [ ] [P4-T10] Implement localized incremental `UnTrain(tag, tokens, count)` on `LcppnFolderPredictor` that applies `UnTrain` along the prior leaf path only
+- [x] [P4-T10] Implement localized incremental `UnTrain(tag, tokens, count)` on `LcppnFolderPredictor` that applies `UnTrain` along the prior leaf path only
   - Acceptance: Untraining a prior leaf decrements only that path's classifiers; other nodes unchanged (AC11)
-- [ ] [P4-T11] Implement new-leaf handling so a previously unseen `parent\NewLeaf` registers the child on `parent`'s `PerParentClassifier` only (via `FolderHierarchyTree.AddLeaf` and child registration), leaving all other per-parent classifiers unchanged
+- [x] [P4-T11] Implement new-leaf handling so a previously unseen `parent\NewLeaf` registers the child on `parent`'s `PerParentClassifier` only (via `FolderHierarchyTree.AddLeaf` and child registration), leaving all other per-parent classifiers unchanged
   - Acceptance: Registering a new leaf modifies only the target parent's classifier; all other classifiers are byte-for-byte unchanged in counts (AC12)
-- [ ] [P4-T12] Create `LcppnFolderPredictor_Tests.cs` covering: beam-search returns correct leaf and path-product probability (AC5), configurable beam width recovers a branch width-1 would discard and `BeamWidth >= 1` validation (AC6), abstention and root abstention (AC7), localized Train/UnTrain (AC11), and local new-leaf addition (AC12)
+- [x] [P4-T12] Create `LcppnFolderPredictor_Tests.cs` covering: beam-search returns correct leaf and path-product probability (AC5), configurable beam width recovers a branch width-1 would discard and `BeamWidth >= 1` validation (AC6), abstention and root abstention (AC7), localized Train/UnTrain (AC11), and local new-leaf addition (AC12)
   - Acceptance: All scenarios asserted with FluentAssertions; deterministic; no temp files; no Outlook COM
-- [ ] [P4-T13] Run the full C# toolchain for Phase 4 and restart from CSharpier on any failure or auto-fix
+- [x] [P4-T13] Run the full C# toolchain for Phase 4 and restart from CSharpier on any failure or auto-fix
   - Acceptance: All four steps pass in a single final pass; `LcppnFolderPredictorConfig.cs` and `LcppnFolderPredictor.cs` each reach >= 90% coverage
 
 ### Phase 5 — Serialization (separate file, inline Corpus, round-trip)
 
-- [ ] [P5-T1] Register this phase's new test file in the non-SDK test project: add `<Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictor_Serialization_Tests.cs"/>` to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
+- [x] [P5-T1] Register this phase's new test file in the non-SDK test project: add `<Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictor_Serialization_Tests.cs"/>` to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
   - Acceptance: `UtilitiesCS.Test.csproj` contains an explicit `<Compile Include>` entry for the serialization test file; the file compiles into the test assembly
-- [ ] [P5-T2] Configure `LcppnFolderPredictor` serialization via `SmartSerializable<LcppnFolderPredictor>` (Newtonsoft.Json, `TypeNameHandling.Auto`) to emit a `Nodes` dictionary keyed by full parent path (empty string for root), each holding the node's children and its `BayesianClassifierGroup` subtree, plus top-level `Version`, `BeamWidth`, and `MinimumPathProbability`
+- [x] [P5-T2] Configure `LcppnFolderPredictor` serialization via `SmartSerializable<LcppnFolderPredictor>` (Newtonsoft.Json, `TypeNameHandling.Auto`) to emit a `Nodes` dictionary keyed by full parent path (empty string for root), each holding the node's children and its `BayesianClassifierGroup` subtree, plus top-level `Version`, `BeamWidth`, and `MinimumPathProbability`
   - Acceptance: Serialized JSON contains `Version`, `BeamWidth`, `MinimumPathProbability`, and a `Nodes` map; the file is distinct from `Folder.json`
-- [ ] [P5-T3] Ensure each `PerParentClassifier` shared token base uses `Corpus` serialized inline within the predictor JSON (not `CorpusInherit`), so no per-node separate JSON files are produced
+- [x] [P5-T3] Ensure each `PerParentClassifier` shared token base uses `Corpus` serialized inline within the predictor JSON (not `CorpusInherit`), so no per-node separate JSON files are produced
   - Preconditions: P5-T2 complete
   - Acceptance: Serialization produces a single predictor JSON document with inline `Corpus`; no `CorpusInherit` side files are written
-- [ ] [P5-T4] Add a `Version` field (default 1) to `LcppnFolderPredictor` for forward migration and include it in the serialized shape
+- [x] [P5-T4] Add a `Version` field (default 1) to `LcppnFolderPredictor` for forward migration and include it in the serialized shape
   - Acceptance: `Version` is present and preserved through round-trip
-- [ ] [P5-T5] Create `LcppnFolderPredictor_Serialization_Tests.cs` asserting in-memory JSON round-trip losslessly preserves `Version`, the per-parent tree, and counts, and that an empty tree serializes and deserializes cleanly
+- [x] [P5-T5] Create `LcppnFolderPredictor_Serialization_Tests.cs` asserting in-memory JSON round-trip losslessly preserves `Version`, the per-parent tree, and counts, and that an empty tree serializes and deserializes cleanly
   - Acceptance: Round-trip equality on tree, counts, and `Version`; empty-tree case passes; all in-memory, no temp files (AC15)
-- [ ] [P5-T6] Run the full C# toolchain for Phase 5 and restart from CSharpier on any failure or auto-fix
+- [x] [P5-T6] Run the full C# toolchain for Phase 5 and restart from CSharpier on any failure or auto-fix
   - Acceptance: All four steps pass in a single final pass; serialization paths in `LcppnFolderPredictor.cs` reach >= 90% coverage
 
 ### Phase 6 — Wiring and backward compatibility (flag-gated seam)

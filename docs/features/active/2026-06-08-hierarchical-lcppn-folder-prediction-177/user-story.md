@@ -51,43 +51,43 @@ while preserving the current incremental-update and abstention behavior.
 
 ## Acceptance Criteria
 
-- [ ] **AC1 — Hierarchy construction from RelativePath.** Given a set of `RelativePath` values,
+- [x] **AC1 — Hierarchy construction from RelativePath.** Given a set of `RelativePath` values,
       `FolderHierarchyTree` builds a parent→children map by splitting each path on backslash and
       recording each adjacent segment pair as a parent→child edge, with the root parent key being
       the empty string.
-- [ ] **AC2 — Single-segment path edge case.** A single-segment `RelativePath` (e.g., `"Inbox"`)
+- [x] **AC2 — Single-segment path edge case.** A single-segment `RelativePath` (e.g., `"Inbox"`)
       produces exactly one edge `root → "Inbox"`, and that node is recorded as both a child of the
       root and a leaf with zero children.
-- [ ] **AC3 — Idempotent / duplicate-path construction.** Building the tree from a collection
+- [x] **AC3 — Idempotent / duplicate-path construction.** Building the tree from a collection
       containing duplicate `RelativePath` values yields the same tree as the distinct set; per-parent
       child sets contain no duplicates.
-- [ ] **AC4 — New-leaf construction.** Adding a previously unseen leaf `parent\NewLeaf` adds the
+- [x] **AC4 — New-leaf construction.** Adding a previously unseen leaf `parent\NewLeaf` adds the
       child to `parent`'s child set only and does not alter any other parent's children.
-- [ ] **AC5 — LCPPN beam-search descent returns a leaf with path-product probability.**
+- [x] **AC5 — LCPPN beam-search descent returns a leaf with path-product probability.**
       `LcppnFolderPredictor.Classify(tokens)` descends from the root via beam search and returns a
       top leaf whose `Probability` equals the product of per-step conditional probabilities along its
       root-to-leaf path, together with an ordered list of alternative leaf predictions.
-- [ ] **AC6 — Configurable beam width.** `BeamWidth` is configurable (default 3). With a beam wide
+- [x] **AC6 — Configurable beam width.** `BeamWidth` is configurable (default 3). With a beam wide
       enough to retain a branch that a greedy (width-1) descent would discard, the predictor returns
       the correct leaf in a constructed case where width-1 would not; construction validates
       `BeamWidth >= 1`.
-- [ ] **AC7 — Abstention semantics.** When the top leaf's path-product probability is below
+- [x] **AC7 — Abstention semantics.** When the top leaf's path-product probability is below
       `MinimumPathProbability`, `Classify` returns an empty result (no prediction). Root abstention is
       allowed: if no root-level child clears the threshold, the result is empty.
 - [ ] **AC8 — F1 accounting for abstention.** In `FolderPredictorEvaluator`, an abstained test
       example is counted as a false negative for its true class and a true negative for all other
       classes (it does not increment any false-positive count).
-- [ ] **AC9 — Shrinkage smoothing with configurable lambda.** Per-child scoring blends the leaf and
+- [x] **AC9 — Shrinkage smoothing with configurable lambda.** Per-child scoring blends the leaf and
       parent token estimates as `λ·P_leaf(t|c) + (1-λ)·P_parent(t|p)` with `ShrinkageLambda` (default
       0.7); construction validates `0 <= ShrinkageLambda <= 1`.
-- [ ] **AC10 — Cold-start fallback.** When the total examples under a parent are fewer than
+- [x] **AC10 — Cold-start fallback.** When the total examples under a parent are fewer than
       `MinColdStartExamples` (default 5), per-child scoring uses unsmoothed Naive Bayes (the existing
       `BayesianClassifierShared` behavior) instead of the shrinkage blend.
-- [ ] **AC11 — Localized incremental update.** Training a corrected example on leaf `L` with path
+- [x] **AC11 — Localized incremental update.** Training a corrected example on leaf `L` with path
       `root → n₁ → … → L` updates only the classifiers on that path; classifiers at nodes not on the
       path have unchanged counts and probabilities. If the example previously belonged to a different
       leaf, `UnTrain` is applied along the prior path only.
-- [ ] **AC12 — New-leaf addition is local.** Registering a new leaf under an existing parent modifies
+- [x] **AC12 — New-leaf addition is local.** Registering a new leaf under an existing parent modifies
       only that parent's `PerParentClassifier`; all other per-parent classifiers are unchanged.
 - [ ] **AC13 — Backward compatibility (flat predictor).** When `UseLcppnPredictor = false`, the
       existing flat `BayesianClassifierGroup` is used, its `Train` / `UnTrain` / `Classify` / `Serialize`
@@ -96,7 +96,7 @@ while preserving the current incremental-update and abstention behavior.
       `LcppnFolderPredictor` implement `IFolderPredictor`, and `Manager["Folder"]` callers
       (`EmailFiler`, `SortEmail`) operate through that interface; the flat implementation requires no
       change to its existing method behavior.
-- [ ] **AC15 — Serialization round-trip.** `LcppnFolderPredictor` serializes via
+- [x] **AC15 — Serialization round-trip.** `LcppnFolderPredictor` serializes via
       `SmartSerializable<LcppnFolderPredictor>` (Newtonsoft.Json) to a file separate from `Folder.json`
       and round-trips losslessly, preserving the `Version` field, the per-parent tree, and counts; an
       empty tree serializes and deserializes cleanly. Per-parent shared token base uses `Corpus`

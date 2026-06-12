@@ -561,6 +561,11 @@
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierExtensions.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\Bayesian\IFolderPredictor.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\FolderHierarchyNode.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\FolderHierarchyTree.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\PerParentClassifier.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictorConfig.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictor.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Performance\BayesianPerformanceMeasurement.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Obsolete\BayesianFilter.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Obsolete\CorpusVectorized_badidea.cs" />

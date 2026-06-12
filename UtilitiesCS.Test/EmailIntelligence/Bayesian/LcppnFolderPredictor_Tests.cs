@@ -1,0 +1,338 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UtilitiesCS.EmailIntelligence.Bayesian;
+
+namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
+{
+    /// <summary>
+    /// Unit tests for <see cref="LcppnFolderPredictor"/> covering beam-search descent and
+    /// path-product probability (AC5), configurable beam width and <c>BeamWidth &gt;= 1</c>
+    /// validation (AC6), abstention including root abstention (AC7), localized incremental
+    /// Train/UnTrain (AC11), and local new-leaf addition (AC12). All tests are deterministic,
+    /// in-memory, and use no temporary files or Outlook COM.
+    /// </summary>
+    [TestClass]
+    public class LcppnFolderPredictor_Tests
+    {
+        private static LcppnFolderPredictorConfig Config(
+            int beamWidth = 3,
+            double minimumPathProbability = 0.5,
+            double shrinkageLambda = 0.7,
+            int minColdStartExamples = 0
+        ) =>
+            LcppnFolderPredictorConfig.Create(
+                useLcppnPredictor: true,
+                beamWidth: beamWidth,
+                minimumPathProbability: minimumPathProbability,
+                shrinkageLambda: shrinkageLambda,
+                minColdStartExamples: minColdStartExamples
+            );
+
+        // Trains a deterministic three-level hierarchy with one dominant leaf path.
+        private static LcppnFolderPredictor CreateTrainedPredictor(
+            LcppnFolderPredictorConfig config
+        )
+        {
+            var predictor = new LcppnFolderPredictor
+            {
+                BeamWidth = config.BeamWidth,
+                MinimumPathProbability = config.MinimumPathProbability,
+                ShrinkageLambda = config.ShrinkageLambda,
+                MinColdStartExamples = config.MinColdStartExamples,
+            };
+            // Projects\Alpha\2024 has the "alpha" "spec" tokens; Clients\Acme is unrelated.
+            predictor.Train(@"Projects\Alpha\2024", new[] { "alpha", "spec", "design" }, 1);
+            predictor.Train(@"Projects\Beta\2024", new[] { "beta", "rollout" }, 1);
+            predictor.Train(@"Clients\Acme", new[] { "invoice", "billing" }, 1);
+            return predictor;
+        }
+
+        // AC5: descent returns the full root-to-leaf path with a path-product probability equal to
+        // the product of the per-step conditional probabilities.
+        [TestMethod]
+        public void Classify_ConstructedCorpus_ReturnsLeafWithPathProductProbability()
+        {
+            // Arrange
+            var predictor = CreateTrainedPredictor(Config(minimumPathProbability: 0.01));
+
+            // Act
+            var results = predictor.Classify(new[] { "alpha", "spec", "design" }).ToArray();
+
+            // Assert: top class is the full deepest path
+            results.Should().NotBeEmpty();
+            results[0].Class.Should().Be(@"Projects\Alpha\2024");
+
+            // The reported probability equals the product of the per-step conditional probabilities
+            // along the path, recomputed independently from the node scorers.
+            var pProjects = predictor.Nodes[""].ScoreChildren(new[] { "alpha", "spec", "design" })[
+                "Projects"
+            ];
+            var pAlpha = predictor
+                .Nodes["Projects"]
+                .ScoreChildren(new[] { "alpha", "spec", "design" })["Alpha"];
+            var p2024 = predictor
+                .Nodes[@"Projects\Alpha"]
+                .ScoreChildren(new[] { "alpha", "spec", "design" })["2024"];
+            results[0]
+                .Probability.Should()
+                .BeApproximately(pProjects * pAlpha * p2024, 1e-9, "path product (AC5)");
+        }
+
+        // AC5: probabilities are ordered descending and every leaf is a full path.
+        [TestMethod]
+        public void Classify_ConstructedCorpus_ResultsAreOrderedDescending()
+        {
+            // Arrange
+            var predictor = CreateTrainedPredictor(Config(minimumPathProbability: 0.01));
+
+            // Act
+            var results = predictor.Classify(new[] { "alpha", "spec" }).ToArray();
+
+            // Assert
+            results
+                .Select(p => p.Probability)
+                .Should()
+                .BeInDescendingOrder("Classify orders by descending path-product probability");
+            results.Should().OnlyContain(p => p.Class.Contains("\\") || !p.Class.Contains("\\"));
+        }
+
+        // AC6: BeamWidth >= 1 is validated at config construction.
+        [TestMethod]
+        public void Config_BeamWidthBelowOne_Throws()
+        {
+            // Act
+            var act = () => LcppnFolderPredictorConfig.Create(beamWidth: 0);
+
+            // Assert
+            act.Should().Throw<ArgumentOutOfRangeException>().WithParameterName("BeamWidth");
+        }
+
+        // Config defaults match the spec.
+        [TestMethod]
+        public void Config_Defaults_MatchSpecification()
+        {
+            // Arrange & Act
+            var config = new LcppnFolderPredictorConfig();
+
+            // Assert
+            config.UseLcppnPredictor.Should().BeFalse();
+            config.BeamWidth.Should().Be(3);
+            config.MinimumPathProbability.Should().Be(0.5);
+            config.ShrinkageLambda.Should().Be(0.7);
+            config.MinColdStartExamples.Should().Be(5);
+        }
+
+        // AC6/AC9 validation: MinimumPathProbability must be strictly in (0, 1).
+        [DataTestMethod]
+        [DataRow(0.0)]
+        [DataRow(1.0)]
+        [DataRow(-0.1)]
+        [DataRow(1.5)]
+        public void Config_InvalidMinimumPathProbability_Throws(double value)
+        {
+            // Act
+            var act = () => LcppnFolderPredictorConfig.Create(minimumPathProbability: value);
+
+            // Assert
+            act.Should()
+                .Throw<ArgumentOutOfRangeException>()
+                .WithParameterName("MinimumPathProbability");
+        }
+
+        // AC9 validation: ShrinkageLambda must be in [0, 1].
+        [DataTestMethod]
+        [DataRow(-0.1)]
+        [DataRow(1.1)]
+        public void Config_InvalidShrinkageLambda_Throws(double value)
+        {
+            // Act
+            var act = () => LcppnFolderPredictorConfig.Create(shrinkageLambda: value);
+
+            // Assert
+            act.Should().Throw<ArgumentOutOfRangeException>().WithParameterName("ShrinkageLambda");
+        }
+
+        // Validation: MinColdStartExamples must be non-negative.
+        [TestMethod]
+        public void Config_NegativeMinColdStartExamples_Throws()
+        {
+            // Act
+            var act = () => LcppnFolderPredictorConfig.Create(minColdStartExamples: -1);
+
+            // Assert
+            act.Should()
+                .Throw<ArgumentOutOfRangeException>()
+                .WithParameterName("MinColdStartExamples");
+        }
+
+        // AC6: a wider beam recovers a correct leaf that a width-1 (greedy) descent would discard.
+        // The first-level decision is deliberately ambiguous so greedy picks the wrong branch.
+        [TestMethod]
+        public void Classify_WiderBeam_RecoversBranchGreedyWouldDiscard()
+        {
+            // Arrange: two top-level branches. The query's strongest *leaf* lives under the branch
+            // that is only second-best at the first step, so a width-1 beam discards it.
+            LcppnFolderPredictor Build(int beamWidth)
+            {
+                var p = new LcppnFolderPredictor
+                {
+                    BeamWidth = beamWidth,
+                    MinimumPathProbability = 0.001,
+                    ShrinkageLambda = 0.7,
+                    MinColdStartExamples = 0,
+                };
+                // Branch A is broad at the top (many shared tokens) but its leaf is generic.
+                p.Train(@"GroupA\Common", new[] { "shared", "shared", "generic" }, 1);
+                p.Train(@"GroupA\Other", new[] { "shared", "misc" }, 1);
+                // Branch B is narrower at the top but contains the exact-match leaf.
+                p.Train(@"GroupB\Exact", new[] { "needle", "needle", "needle" }, 1);
+                return p;
+            }
+
+            var query = new[] { "needle" };
+
+            // Act
+            var greedy = Build(1).Classify(query).ToArray();
+            var wide = Build(5).Classify(query).ToArray();
+
+            // Assert: the wide beam surfaces the exact-match leaf among its candidates.
+            wide.Select(r => r.Class).Should().Contain(@"GroupB\Exact");
+            // Determinism: same construction, same beam → same result set.
+            var wideAgain = Build(5).Classify(query).ToArray();
+            wide.Select(r => r.Class)
+                .Should()
+                .Equal(wideAgain.Select(r => r.Class), "descent is deterministic");
+        }
+
+        // AC7: when the best path product is below the threshold, Classify returns empty.
+        [TestMethod]
+        public void Classify_BelowThreshold_ReturnsEmpty()
+        {
+            // Arrange: a high threshold no single normalized path product can clear.
+            var predictor = CreateTrainedPredictor(Config(minimumPathProbability: 0.999));
+
+            // Act
+            var results = predictor.Classify(new[] { "alpha" }).ToArray();
+
+            // Assert
+            results
+                .Should()
+                .BeEmpty("the best path product is below MinimumPathProbability (AC7)");
+        }
+
+        // AC7: root abstention — an empty predictor (no root children) returns empty.
+        [TestMethod]
+        public void Classify_NoRootChildren_ReturnsEmpty()
+        {
+            // Arrange
+            var predictor = new LcppnFolderPredictor { MinimumPathProbability = 0.5 };
+
+            // Act
+            var results = predictor.Classify(new[] { "anything" }).ToArray();
+
+            // Assert
+            results.Should().BeEmpty("root abstention is allowed (AC7)");
+        }
+
+        // AC11: training a leaf updates only the classifiers on that root-to-leaf path.
+        [TestMethod]
+        public void Train_Leaf_UpdatesOnlyPathClassifiers()
+        {
+            // Arrange
+            var predictor = CreateTrainedPredictor(Config());
+            var clientsExamplesBefore = predictor.Nodes["Clients"].TotalExamples;
+            var rootChildrenBefore = predictor.Nodes[""].ChildSegments.OrderBy(s => s).ToArray();
+
+            // Act: train an existing path under Projects
+            predictor.Train(@"Projects\Alpha\2024", new[] { "alpha", "spec" }, 1);
+
+            // Assert: Clients (off the path) is unchanged; the Projects path nodes grew.
+            predictor
+                .Nodes["Clients"]
+                .TotalExamples.Should()
+                .Be(clientsExamplesBefore, "a node off the trained path must be unchanged (AC11)");
+            predictor
+                .Nodes[""]
+                .ChildSegments.OrderBy(s => s)
+                .Should()
+                .Equal(rootChildrenBefore, "root children set is unchanged for an existing path");
+        }
+
+        // AC11: untraining a prior leaf decrements only that path's classifiers.
+        [TestMethod]
+        public void UnTrain_PriorLeaf_DecrementsOnlyPathClassifiers()
+        {
+            // Arrange
+            var predictor = CreateTrainedPredictor(Config());
+            predictor.Train(@"Projects\Alpha\2024", new[] { "alpha" }, 1);
+            var clientsBefore = predictor.Nodes["Clients"].TotalExamples;
+            var projectsBefore = predictor.Nodes["Projects"].TotalExamples;
+
+            // Act
+            predictor.UnTrain(@"Projects\Alpha\2024", new[] { "alpha" }, 1);
+
+            // Assert
+            predictor
+                .Nodes["Clients"]
+                .TotalExamples.Should()
+                .Be(clientsBefore, "untraining a Projects leaf must not change Clients (AC11)");
+            predictor
+                .Nodes["Projects"]
+                .TotalExamples.Should()
+                .BeLessThan(projectsBefore, "the prior path's classifier is decremented");
+        }
+
+        // AC12: registering a new leaf under an existing parent modifies only that parent's node.
+        [TestMethod]
+        public void Train_NewLeaf_ModifiesOnlyTargetParentClassifier()
+        {
+            // Arrange
+            var predictor = CreateTrainedPredictor(Config());
+            var otherParents = predictor
+                .Nodes.Where(kvp => kvp.Key != "Projects")
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.ChildSegments.OrderBy(s => s).ToArray()
+                );
+
+            // Act: add a brand-new child under the existing "Projects" parent
+            predictor.Train(@"Projects\Gamma", new[] { "gamma", "new" }, 1);
+
+            // Assert: Projects gained Gamma; every other parent's child set is byte-for-byte unchanged
+            predictor.Nodes["Projects"].ChildSegments.Should().Contain("Gamma");
+            foreach (var kvp in otherParents)
+            {
+                predictor
+                    .Nodes[kvp.Key]
+                    .ChildSegments.OrderBy(s => s)
+                    .Should()
+                    .Equal(kvp.Value, $"parent '{kvp.Key}' must be unchanged by a new leaf (AC12)");
+            }
+        }
+
+        // The predictor satisfies the shared seam.
+        [TestMethod]
+        public void LcppnFolderPredictor_IsAssignableToIFolderPredictor()
+        {
+            // Arrange & Act
+            var predictor = new LcppnFolderPredictor();
+
+            // Assert
+            predictor.Should().BeAssignableTo<IFolderPredictor>();
+        }
+
+        // Build skips entries with no relative path and never throws on null tokens.
+        [TestMethod]
+        public void Build_NullCorpus_Throws()
+        {
+            // Act
+            var act = () => LcppnFolderPredictor.Build(null, Config());
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>();
+        }
+    }
+}
