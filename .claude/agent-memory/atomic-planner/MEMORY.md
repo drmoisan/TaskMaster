@@ -1,1 +1,5 @@
+# Atomic Planner Memory Index
+
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
+- [Manager AsyncLazy shared seam](project_manager_asynclazy_shared_seam.md) — Globals.AF.Manager is shared across all classifier subsystems; use a key-specific accessor, never retype the dictionary value for one key
+- [Folder predictor AF holder seam](project_folder_predictor_af_holder_seam.md) — #177 F1: route flag-on LCPPN predictor through a Folder-only holder on IAppAutoFileObjects (globals.AF), not per-instance OlFolderClassifierGroup state
