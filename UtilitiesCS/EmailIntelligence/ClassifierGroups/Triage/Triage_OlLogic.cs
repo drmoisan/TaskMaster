@@ -196,13 +196,20 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 logger.Debug("Could not grab handle on Selection");
                 return;
             }
+            // Writing the Triage UDF and training the Bayesian classifier are two separate
+            // concerns (issue #183). The UDF write is the user-visible action and must apply to
+            // EVERY selected MailItem. Training, however, must dedup by ConversationID so the
+            // classifier is trained at most once per conversation (preserving issue #137 behavior
+            // for Outlook conversation view, which auto-selects an entire thread). We therefore
+            // iterate the full, non-deduplicated selection for the UDF write, and gate TrainAsync
+            // on the first item seen for each distinct ConversationID.
             var mailItems = selection
                 .Cast<object>()
                 .Where(x => x is MailItem)
                 .Cast<MailItem>()
-                .GroupBy(m => m.ConversationID)
-                .Select(g => g.First())
                 .ToAsyncEnumerable();
+
+            var trainedConversationIds = new HashSet<string>();
 
             await foreach (var mailItem in mailItems.WithCancellation(token))
             {
@@ -212,8 +219,18 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                     token,
                     false
                 );
+
+                // Per-item Triage UDF write for every selected item.
                 await Parent.TestActionAsync(helper, triageId, token);
-                await Parent.TrainAsync(helper.Tokens, triageId, token);
+
+                // Train at most once per distinct ConversationID. A null ConversationID is
+                // treated as its own bucket via the empty-string key so such items are still
+                // trained exactly once.
+                var conversationId = mailItem.ConversationID ?? string.Empty;
+                if (trainedConversationIds.Add(conversationId))
+                {
+                    await Parent.TrainAsync(helper.Tokens, triageId, token);
+                }
             }
 
             Parent.ClassifierGroup.Serialize();

@@ -13,3 +13,4 @@
 - [PowerShell line-count undercount](powershell-measure-object-line-undercount.md) — `(Get-Content | Measure-Object -Line).Lines` undercounts vs `awk NR`/`wc -l`
 - [policy-audit section-7 row-label parser](policy-audit-section7-row-label-parser.md) — validator misreads non-standard section-7 Code-Quality row labels as coverage rows; reuse cycle-1 wording, no comma qualifiers in label cell
 - [numeric new/changed-code coverage + Scope-and-Baseline](policy-audit-numeric-new-code-coverage.md) — policy-audit new-code-coverage field must be a literal percent (prose fails); feature-audit needs a `## Scope and Baseline` heading
+- [test files count toward 500-line limit](feedback_test-file-500-line-limit.md) — compare changed test files' baseline vs head line count; a regression-test addition crossing 500 lines is a FAIL-level policy finding even when ACs pass
