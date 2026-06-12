@@ -33,7 +33,7 @@ change, the `TabMail` built-in tab carries none of these custom groups. The pre-
 scope). All control ids, callbacks, images, labels, and nesting are preserved exactly during
 the move so existing callback wiring continues to function unchanged.
 
-## Acceptance Criteria (early draft)
+## Acceptance Criteria
 
 - [x] AC1: A new custom tab declared with an `id` attribute and `label="Taskmaster"` exists in `RibbonExplorer.xml`.
 - [x] AC2: The four groups `SpamBayesGroup`, `Group2`, `TriageGroup`, and `UtilitiesGroup` are children of the new Taskmaster tab.
