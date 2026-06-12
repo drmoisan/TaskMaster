@@ -530,3 +530,66 @@ Plan: `remediation-plan.2026-06-12T15-54.md`. Scope: F1 (Major) + F2 (Minor) onl
   Triage, SpamBayes, CategoryClassifierGroup, MulticlassEngine) have ZERO diff; Manager value type
   unchanged; only the four production/interface files and three test files changed; no .csproj changes.
 - Cycle 1 complete: F1 resolved (flag-on path reachable, AC13 preserved); F2 both target types >= 90% strict.
+
+## Cycle 2 — Split over-cap test file (F3 / AC20)
+
+Plan: `remediation-plan.2026-06-12T16-45.md`
+Executor: atomic-executor
+
+### Phase 0 — Compliance read and baseline capture
+
+- Timestamp: 2026-06-12T16-58 (UTC).
+- [P0-T1] Read CLAUDE.md, general-code-change.md, general-unit-test.md, csharp.md, and
+  remediation-inputs.2026-06-12T16-45.md in required order. Artifact:
+  `evidence/baseline/phase0-instructions-read.2026-06-12T16-45.md`.
+- [P0-T2] Baseline line count: `LcppnFolderPredictor_Tests.cs = 554 lines` (over 500 cap).
+- [P0-T3] CSharpier baseline (`csharpier check .`, v1.2.6): EXIT 0, 1076 files clean.
+- [P0-T4] Analyzer build baseline: EXIT 0, 0W/0E.
+- [P0-T5] Nullable/TWAE build baseline: EXIT 0, 0W/0E (incremental, CoreCompile up-to-date).
+- [P0-T6] Test baseline (vstest /InIsolation /EnableCodeCoverage): 3904/3904 passed.
+  LcppnFolderPredictor strict line coverage = 97.71% (block 97.58%). Canonical XML at
+  `artifacts/csharp/coverage.xml` via dotnet-coverage merge -f xml.
+- [P0-T7] Phase 0 gate: all six baseline artifacts present and schema-complete.
+
+### Phase 1 — Split the over-cap test file
+
+- Timestamp: 2026-06-12T17-08 (UTC).
+- [P1-T1] Added `<Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictor_Classify_Tests.cs" />`
+  to UtilitiesCS.Test.csproj adjacent to the existing entries; original entry unchanged.
+- [P1-T2] Created LcppnFolderPredictor_Classify_Tests.cs: `[TestClass]
+  LcppnFolderPredictor_Classify_Tests`, duplicated Config + CreateTrainedPredictor helpers
+  (no MinedMail), nine Classify_* methods moved verbatim.
+- [P1-T3] Trimmed LcppnFolderPredictor_Tests.cs to the 14 config/validation/training/untrain/build
+  methods; zero Classify_* remain; helpers Config/CreateTrainedPredictor/MinedMail retained.
+  Updated the class XML-doc summary to point at the new sibling class.
+- [P1-T4] Removed unused `using System.Collections.Generic;` from File A and `using System;`
+  from File B; both retain MSTest, FluentAssertions, UtilitiesCS.EmailIntelligence.Bayesian.
+- [P1-T5] split-verification.md: File A = 316 lines, File B = 287 lines (both <= 500); union
+  of method names = original 21-case set (14 + 9 declarations, two [DataTestMethod]s in File A);
+  clean concern partition (0 Classify_* in A, 0 non-Classify_* in B).
+- [P1-T6] CSharpier format EXIT 0 (1077 files); check confirms no reformatting on final pass.
+- [P1-T7] Analyzer build EXIT 0, Build succeeded. 27 pre-existing warnings (24 CS8632 +
+  3 CS0067) in untouched files surfaced by full recompile; zero diagnostics in the two split
+  files; no new analyzer error.
+- [P1-T8] Nullable/TWAE build EXIT 0, 0W/0E; no new nullable warning in the split files.
+- [P1-T9] Test run /InIsolation /EnableCodeCoverage: 3903/3904 passed. The single failure is
+  the documented out-of-scope flake AddEntry_UseUiThreadTrue... (passes 1/1 in isolation).
+  LcppnFolderPredictor scoped run 33/33 passed. Post-split LcppnFolderPredictor strict
+  coverage = 97.71% line / 97.58% block (identical to baseline, >= 90%). UtilitiesCS.dll
+  module line = 85.46% (>= 80%). Canonical XML at artifacts/csharp/coverage.xml.
+
+### Phase 2 — Final QA loop and coverage/containment verification
+
+- Timestamp: 2026-06-12T17-14 (UTC).
+- [P2-T1] Final single-pass toolchain: CSharpier check EXIT 0; analyzers EXIT 0 (build
+  succeeded); nullable/TWAE EXIT 0 (0W/0E); vstest 3903/3904 (the single failure is the
+  out-of-scope IdleAsyncQueue flake, re-verified passing 1/1 in isolation). No SKIPPED.
+- [P2-T2] coverage-delta.md: LcppnFolderPredictor strict 97.71% line / 97.58% block,
+  unchanged vs baseline (>= 90%, no regression on changed lines); UtilitiesCS.dll 85.46%
+  (>= 80%).
+- [P2-T3] containment.md: zero diff to ManagerAsyncLazy.cs, the Manager value type,
+  Triage.cs, SpamBayes.cs, CategoryClassifierGroup.cs, MulticlassEngine.cs; only the two
+  test files + UtilitiesCS.Test.csproj changed; no production .cs modified.
+- [P2-T4] cycle2-endstate.md: both files <= 500 (316 / 287); 21 cases preserved; coverage
+  >= 90%; containment held; toolchain green except the excluded pre-existing flake.
+- Cycle 2 complete: F3 (AC20) resolved.

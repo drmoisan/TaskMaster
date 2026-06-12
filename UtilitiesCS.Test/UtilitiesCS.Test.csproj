@@ -98,6 +98,7 @@
     <Compile Include="EmailIntelligence\Bayesian\FolderHierarchyTree_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\PerParentClassifier_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictor_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictor_Classify_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictor_Serialization_Tests.cs" />
     <Compile Include="EmailIntelligence\FolderPredictorSeam_Tests.cs" />
     <Compile Include="EmailIntelligence\Evaluation\FolderPredictorEvaluator_Tests.cs" />
