@@ -6,3 +6,9 @@
 *.coverage
 *.coveragexml
 *.trx
+# Project files (*.csproj/*.props/*.targets) are owned by Visual Studio and are
+# not C# source. CSharpier formats C# source only (per CLAUDE.md C#1), so exclude
+# project files from the formatting check.
+*.csproj
+*.props
+*.targets
