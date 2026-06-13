@@ -17,6 +17,10 @@ function Get-KoverageProjectAllowlist {
 
     $projectNames = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 
+    # Test projects must be excluded from the coverage allowlist so that
+    # ConvertTo-KoverageCoberturaXml strips their packages from both the
+    # numerator (lines-covered) and denominator (lines-valid). All test
+    # projects in this repo use the '.Test' assembly-name suffix.
     foreach ($projectFile in $projectFiles) {
         $projectContent = Get-Content -Path $projectFile.FullName -Raw -Encoding UTF8
         $assemblyNameMatch = [regex]::Match(
@@ -26,11 +30,17 @@ function Get-KoverageProjectAllowlist {
         )
 
         if ($assemblyNameMatch.Success) {
-            $null = $projectNames.Add($assemblyNameMatch.Groups['name'].Value.Trim())
+            $resolvedName = $assemblyNameMatch.Groups['name'].Value.Trim()
+        }
+        else {
+            $resolvedName = [System.IO.Path]::GetFileNameWithoutExtension($projectFile.Name)
+        }
+
+        if ($resolvedName.EndsWith('.Test', [System.StringComparison]::OrdinalIgnoreCase)) {
             continue
         }
 
-        $null = $projectNames.Add([System.IO.Path]::GetFileNameWithoutExtension($projectFile.Name))
+        $null = $projectNames.Add($resolvedName)
     }
 
     $projectNames | Sort-Object

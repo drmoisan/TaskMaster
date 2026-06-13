@@ -26,7 +26,9 @@ Describe 'ConvertTo-KoverageCoberturaXml' {
 </coverage>
 '@
 
-        [xml]$resultXml = ConvertTo-KoverageCoberturaXml -XmlContent $inputXml -RepoRoot 'C:\repo' -PathSeparator '\'
+        # Supply ProjectNames explicitly so this path-normalization test does not
+        # depend on the production allowlist, which now excludes '.Test' packages.
+        [xml]$resultXml = ConvertTo-KoverageCoberturaXml -XmlContent $inputXml -RepoRoot 'C:\repo' -PathSeparator '\' -ProjectNames @('QuickFiler.Test')
         $classNode = $resultXml.SelectSingleNode('//class')
         $sourceNode = $resultXml.SelectSingleNode('//sources/source')
 
@@ -77,5 +79,93 @@ Describe 'ConvertTo-KoverageCoberturaXml' {
         $line11.hits | Should -Be '1'
         $line12.branch | Should -Be 'True'
         $line12.'condition-coverage' | Should -Be '50% (1/2)'
+    }
+
+    It 'excludes .Test packages from the report and from the aggregate covered/valid line totals' {
+        # Regression for Issue #193: test assemblies must not be counted in the
+        # numerator (lines-covered) or denominator (lines-valid). The production
+        # package (UtilitiesCS) must be retained unchanged.
+        $inputXml = @'
+<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="0" branch-rate="0" lines-covered="0" lines-valid="0" branches-covered="0" branches-valid="0">
+  <packages>
+    <package name="UtilitiesCS" line-rate="0" branch-rate="0" complexity="1">
+      <classes>
+        <class name="UtilitiesCS.Sample" filename="C:\repo\UtilitiesCS\Sample.cs" line-rate="0.5" branch-rate="0" complexity="1">
+          <methods />
+          <lines>
+            <line number="10" hits="1" branch="False" />
+            <line number="11" hits="0" branch="False" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+    <package name="UtilitiesCS.Test" line-rate="0" branch-rate="0" complexity="1">
+      <classes>
+        <class name="UtilitiesCS.Test.SampleTests" filename="C:\repo\UtilitiesCS.Test\SampleTests.cs" line-rate="1" branch-rate="0" complexity="1">
+          <methods />
+          <lines>
+            <line number="20" hits="1" branch="False" />
+            <line number="21" hits="1" branch="False" />
+            <line number="22" hits="1" branch="False" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+  </packages>
+</coverage>
+'@
+
+        # ProjectNames resolved from the real repo via Get-KoverageProjectAllowlist
+        # (default). UtilitiesCS is retained; UtilitiesCS.Test is excluded.
+        [xml]$resultXml = ConvertTo-KoverageCoberturaXml -XmlContent $inputXml -RepoRoot 'C:\repo' -PathSeparator '\'
+
+        $packageNames = @($resultXml.SelectNodes('//package')) | ForEach-Object { $_.name }
+        $packageNames | Should -Contain 'UtilitiesCS'
+        $packageNames | Should -Not -Contain 'UtilitiesCS.Test'
+
+        # Only the production package's two lines (one covered) remain. The three
+        # covered lines from the test package are excluded from both totals.
+        $resultXml.coverage.'lines-covered' | Should -Be '1'
+        $resultXml.coverage.'lines-valid' | Should -Be '2'
+    }
+}
+
+Describe 'Get-KoverageProjectAllowlist' {
+    It 'excludes projects that resolve to a .Test assembly name' {
+        # Regression for Issue #193: no allowlist entry may match a '.Test' suffix.
+        $allowlist = @(Get-KoverageProjectAllowlist)
+
+        $allowlist | Should -Not -BeNullOrEmpty
+        ($allowlist | Where-Object { $_ -match '\.Test$' }) | Should -BeNullOrEmpty
+    }
+
+    It 'retains non-test production projects in the allowlist' {
+        # AC4: production packages must remain available for retention.
+        $allowlist = @(Get-KoverageProjectAllowlist)
+
+        $allowlist | Should -Contain 'UtilitiesCS'
+    }
+
+    It 'applies the .Test exclusion to the project-file base-name fallback' {
+        # Exercises the fallback branch (no <AssemblyName> element): the resolved
+        # name comes from the project file base name, and the '.Test' suffix
+        # exclusion must still apply. Get-ChildItem / Get-Content are mocked so
+        # the test is deterministic and touches no disk.
+        Mock -CommandName Get-ChildItem -MockWith {
+            @(
+                [pscustomobject]@{ FullName = 'C:\fake\Sample\Sample.csproj'; Name = 'Sample.csproj' }
+                [pscustomobject]@{ FullName = 'C:\fake\Sample.Test\Sample.Test.csproj'; Name = 'Sample.Test.csproj' }
+            )
+        }
+        Mock -CommandName Get-Content -MockWith {
+            # No <AssemblyName> element forces the base-name fallback path.
+            '<Project Sdk="Microsoft.NET.Sdk"></Project>'
+        }
+
+        $allowlist = @(Get-KoverageProjectAllowlist -RepoRoot 'C:\fake')
+
+        $allowlist | Should -Contain 'Sample'
+        $allowlist | Should -Not -Contain 'Sample.Test'
     }
 }
