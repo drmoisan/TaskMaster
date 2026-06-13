@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,7 @@ using QuickFiler.Interfaces;
 
 namespace QuickFiler
 {
+    [ExcludeFromCodeCoverage]
     public partial class QfcItemViewerExpanded : UserControl
     {
         public QfcItemViewerExpanded()

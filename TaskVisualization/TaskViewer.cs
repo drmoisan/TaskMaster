@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -14,6 +15,7 @@ using UtilitiesCS;
 
 namespace TaskVisualization
 {
+    [ExcludeFromCodeCoverage]
     public partial class TaskViewer : Form
     {
         public TaskViewer()

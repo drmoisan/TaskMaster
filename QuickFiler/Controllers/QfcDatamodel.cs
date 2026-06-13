@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -20,6 +21,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace QuickFiler.Controllers
 {
+    [ExcludeFromCodeCoverage]
     public class QfcDatamodel : IQfcDatamodel
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(

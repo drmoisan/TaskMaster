@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace QuickFiler.Controllers
 {
+    [ExcludeFromCodeCoverage]
     internal class QfcExplorerController : IQfcExplorerController
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(

@@ -21,6 +21,7 @@ Every unit test must satisfy all five of these properties:
 ## Coverage Requirements
 
 - **Repository-wide line coverage must remain >= 80%.**
+- **COM-host-bound code exemption.** Where production code is architecturally bound to an external COM host (e.g., Outlook VSTO add-in lifecycle, WinForms Designer code, Outlook Interop event handler classes) and cannot be unit-tested without violating the external-dependency prohibition, those classes may be formally exempted from the floor via `[ExcludeFromCodeCoverage]` or an assembly-level instrumentation exclude. The exemption scope, rationale, and boundary between exempt and non-exempt code must be documented in `CLAUDE.md`. Exemptions require maintainer ratification.
 - **Any new module, class, or method must target >= 90% coverage.**
 - Code changes or refactors must not reduce coverage for the lines that were changed.
 - Coverage is a supporting metric, not the sole quality gate. Untested critical behavior is not acceptable even if the overall percentage looks good.

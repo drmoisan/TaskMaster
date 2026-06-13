@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +32,7 @@ namespace ToDoModel
         public IDList(string filename, string folderpath)
             : base(filename, folderpath) { }
 
+        [ExcludeFromCodeCoverage]
         public IDList(string filename, string folderpath, Outlook.Application olApp)
             : base(filename, folderpath)
         {
@@ -46,6 +48,7 @@ namespace ToDoModel
         )
             : base(filename, folderpath, backupLoader, backupFilepath, askUserOnError) { }
 
+        [ExcludeFromCodeCoverage]
         public IDList(
             string filename,
             string folderpath,
@@ -114,12 +117,14 @@ namespace ToDoModel
             return GetNextToDoID(strSeed);
         }
 
+        [ExcludeFromCodeCoverage]
         public void RefreshIDList(Outlook.Application olApp)
         {
             _olApp = olApp;
             RefreshIDList();
         }
 
+        [ExcludeFromCodeCoverage]
         public void RefreshIDList()
         {
             var df = DfDeedle.FromDefaultFolder(

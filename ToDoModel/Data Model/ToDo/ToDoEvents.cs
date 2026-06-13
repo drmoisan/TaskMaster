@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.OleDb;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -19,6 +20,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace ToDoModel
 {
+    [ExcludeFromCodeCoverage]
     public static class ToDoEvents
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(

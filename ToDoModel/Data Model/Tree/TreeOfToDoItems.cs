@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms.VisualStyles;
@@ -12,6 +13,7 @@ using UtilitiesCS.OutlookExtensions;
 
 namespace ToDoModel
 {
+    [ExcludeFromCodeCoverage]
     public class TreeOfToDoItems
     {
         #region constructors

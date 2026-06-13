@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Office.Core;
@@ -11,6 +12,7 @@ using UtilitiesCS.Threading;
 
 namespace TaskMaster
 {
+    [ExcludeFromCodeCoverage]
     public partial class ThisAddIn
     {
         private void ThisAddIn_Startup(object sender, System.EventArgs e)

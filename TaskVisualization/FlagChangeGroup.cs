@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -21,6 +22,8 @@ namespace TaskVisualization
 
         #region ctor
 
+        // Outlook-bound: takes a live MailItem; not unit-testable without a running Outlook process.
+        [ExcludeFromCodeCoverage]
         public FlagChangeGroup(IApplicationGlobals globals, MailItem item)
         {
             Globals = globals.ThrowIfNull();
@@ -67,6 +70,9 @@ namespace TaskVisualization
             }
         }
 
+        // Outlook-bound: drives MailItemHelper.FromMailItemAsync on a live MailItem and
+        // classifier serialization I/O; not unit-testable without a running Outlook process.
+        [ExcludeFromCodeCoverage]
         public virtual async Task ProcessGroupAsync(CancellationToken cancel = default)
         {
             MailItemHelper helper = null;
@@ -94,6 +100,9 @@ namespace TaskVisualization
             }
         }
 
+        // Outlook-bound: operates on a MailItemHelper backed by a live MailItem; not
+        // unit-testable without a running Outlook process.
+        [ExcludeFromCodeCoverage]
         internal virtual async Task<bool> TryProcessFlagItemAsync(
             IFlagChangeItem item,
             MailItemHelper helper,
@@ -115,6 +124,9 @@ namespace TaskVisualization
             }
         }
 
+        // Outlook-bound: invokes classifier train/untrain and serialization against the
+        // live classifier manager; not unit-testable without a running Outlook process.
+        [ExcludeFromCodeCoverage]
         internal virtual async Task ProcessFlagItemAsync(
             IFlagChangeItem item,
             MailItemHelper helper,

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 
 namespace Tags
 {
+    [ExcludeFromCodeCoverage]
     public class CheckBoxController
     {
         public bool TrigByKeyChg;

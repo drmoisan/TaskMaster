@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
@@ -10,6 +11,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace ToDoModel
 {
+    [ExcludeFromCodeCoverage]
     public partial class ProjectViewer
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
