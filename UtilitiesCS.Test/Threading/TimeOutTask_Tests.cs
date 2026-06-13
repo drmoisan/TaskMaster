@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UtilitiesCS.Test
 {
     [TestClass]
+    [DoNotParallelize]
     public partial class TimeOutTask_Tests
     {
         [TestMethod]
