@@ -17,27 +17,28 @@ BeforeAll {
     try { . $script:mstestScript -NoExecute } catch { Write-Verbose "Invoke-MSTest body skipped: $_" }
     try { . $script:coverageScript -NoExecute } catch { Write-Verbose "Invoke-MSTestWithCoverage body skipped: $_" }
 
-    $script:expectedRunSettings = Join-Path $script:repoRoot 'TaskMaster.runsettings'
+    $script:scriptDir = Join-Path $script:repoRoot 'scripts\vscode'
+    $script:expectedRunSettings = Join-Path $script:scriptDir 'TaskMaster.cli.runsettings'
 }
 
 Describe 'Resolve-RunSettingsPath' {
-    It 'resolves the repo-root TaskMaster.runsettings path when present' {
-        $resolved = Resolve-RunSettingsPath -RepoRoot $script:repoRoot
+    It 'resolves the off-root CLI TaskMaster.cli.runsettings path when present' {
+        $resolved = Resolve-RunSettingsPath -ScriptRoot $script:scriptDir
 
         $resolved | Should -Be $script:expectedRunSettings
     }
 
     It 'fails fast with a specific error naming the missing path when absent' {
         $missingRoot = Join-Path $script:repoRoot 'does-not-exist-runsettings-root'
-        $expectedMissing = Join-Path $missingRoot 'TaskMaster.runsettings'
+        $expectedMissing = Join-Path $missingRoot 'TaskMaster.cli.runsettings'
 
-        { Resolve-RunSettingsPath -RepoRoot $missingRoot } |
+        { Resolve-RunSettingsPath -ScriptRoot $missingRoot } |
             Should -Throw -ExpectedMessage "Runsettings file not found: $expectedMissing"
     }
 }
 
 Describe 'Get-VsTestArgumentList (Invoke-MSTest.ps1)' {
-    It 'includes /Settings: pointing at the repo-root TaskMaster.runsettings' {
+    It 'includes /Settings: pointing at the off-root CLI TaskMaster.cli.runsettings' {
         $arguments = Get-VsTestArgumentList `
             -TestAssembly @('C:\repo\A.Test.dll', 'C:\repo\B.Test.dll') `
             -RunSettingsPath $script:expectedRunSettings
@@ -83,7 +84,7 @@ Describe 'Invoke-VsTestExe wrapper seam (Invoke-MSTest.ps1)' {
 }
 
 Describe 'Get-DotnetCoverageArgumentList (Invoke-MSTestWithCoverage.ps1)' {
-    It 'includes the inner vstest /Settings: pointing at the repo-root TaskMaster.runsettings' {
+    It 'includes the inner vstest /Settings: pointing at the off-root CLI TaskMaster.cli.runsettings' {
         $arguments = Get-DotnetCoverageArgumentList `
             -OutputPath 'C:\repo\coverage\coverage.cobertura.xml' `
             -CoverageConfig 'C:\repo\coverage.config' `

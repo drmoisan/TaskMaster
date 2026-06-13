@@ -6,4 +6,25 @@
       <Scope>ClassLevel</Scope>
     </Parallelize>
   </MSTest>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="Code Coverage">
+        <Configuration>
+          <CodeCoverage>
+            <ModulePaths>
+              <Exclude>
+                <ModulePath>.*Deedle.*</ModulePath>
+                <ModulePath>.*FSharp.*</ModulePath>
+                <ModulePath>.*Castle\.Core.*</ModulePath>
+                <ModulePath>.*FluentAssertions.*</ModulePath>
+                <ModulePath>.*Moq.*</ModulePath>
+                <ModulePath>.*Microsoft\.Testing.*</ModulePath>
+                <ModulePath>.*MSTest.*</ModulePath>
+              </Exclude>
+            </ModulePaths>
+          </CodeCoverage>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
 </RunSettings>

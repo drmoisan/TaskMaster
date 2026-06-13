@@ -12,18 +12,21 @@ param(
 function Resolve-RunSettingsPath {
     <#
     .SYNOPSIS
-        Resolves the repo-root TaskMaster.runsettings path and fails fast if absent.
+        Resolves the off-root CLI runsettings path and fails fast if absent.
     .DESCRIPTION
-        The runsettings path is resolved deterministically from the repository root so
-        VS Code test runs apply the same MSTest parallelization that Visual Studio
-        auto-detects. A clear, specific error is thrown when the file is missing.
+        The CLI runsettings (TaskMaster.cli.runsettings) lives alongside this script in
+        scripts/vscode and is resolved deterministically from the script directory. It
+        carries the MSTest parallelization only and no coverage data collector, so a plain
+        CLI run never activates coverage. Visual Studio continues to auto-detect the
+        separate repo-root TaskMaster.runsettings (which carries the coverage exclusions).
+        A clear, specific error is thrown when the file is missing.
     #>
     param(
         [Parameter(Mandatory = $true)]
-        [string]$RepoRoot
+        [string]$ScriptRoot
     )
 
-    $runSettingsPath = Join-Path $RepoRoot 'TaskMaster.runsettings'
+    $runSettingsPath = Join-Path $ScriptRoot 'TaskMaster.cli.runsettings'
     if (-not (Test-Path $runSettingsPath)) {
         throw "Runsettings file not found: $runSettingsPath"
     }
@@ -89,7 +92,7 @@ if (-not (Test-Path $resolvedSearchRoot)) {
     throw "Search root not found: $resolvedSearchRoot"
 }
 
-$runSettingsPath = Resolve-RunSettingsPath -RepoRoot $repoRoot
+$runSettingsPath = Resolve-RunSettingsPath -ScriptRoot $PSScriptRoot
 
 $vswherePath = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
 if (-not (Test-Path $vswherePath)) {
