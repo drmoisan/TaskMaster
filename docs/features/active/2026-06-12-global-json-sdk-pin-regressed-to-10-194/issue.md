@@ -9,6 +9,8 @@
 - Issue: #194
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/194
 - Last Updated: 2026-06-13
+- Work Mode: minor-audit
+
 ## Summary
 
 The committed `global.json` SDK pin was changed from `8.0.205` to `10.0.200`, regressing the repo-local .NET 8 SDK workaround and breaking the `Install-RepoDotNetSdk` Pester test. Investigation concluded the pin should be reverted to `8.0.205`.
@@ -57,7 +59,15 @@ Commit `32bd99e2` overwrote the deliberate `8.0.205` pin (added in `b3c3c8f1`) w
 - [ ] Optionally update the stale "retry dotnet format" message to reference `csharpier .` (cosmetic).
 - [x] Validation: re-run `tests/scripts/vscode/Install-RepoDotNetSdk.Tests.ps1`; the SDK-pin assertions pass. Confirm no CI step regresses.
 
+## Acceptance Criteria
+
+- [x] AC1: `global.json` `sdk.version` is `8.0.205` (reverted from `10.0.200`); `rollForward`, `allowPrerelease`, and `paths` are unchanged.
+- [x] AC2: `tests/scripts/vscode/Install-RepoDotNetSdk.Tests.ps1` passes, including the `global.json SDK selection` assertions (version `8.0.205`, `rollForward` `latestFeature`, `allowPrerelease` false, `paths` contains `.dotnet-sdk` and `$host$`).
+- [x] AC3: No other `global.json` keys or unrelated files are modified (scope limited to the one-field revert).
+- [x] AC4: The PowerShell toolchain (PoshQC format, PSScriptAnalyzer, Pester) passes with no new findings on changed/related files.
+
 ## Next Step
 
 - [x] Promote to GitHub issue (bug-report template)
 - [x] Move to active fix folder / branch
+- [ ] Implement revert; verify; minor-audit review; PR
