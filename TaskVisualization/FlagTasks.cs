@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ using UtilitiesCS;
 
 namespace TaskVisualization
 {
+    [ExcludeFromCodeCoverage]
     public class FlagTasks
     {
         private readonly List<ToDoItem> _todoSelection;

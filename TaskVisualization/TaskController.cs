@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -16,6 +17,7 @@ using UtilitiesCS.OutlookExtensions;
 
 namespace TaskVisualization
 {
+    [ExcludeFromCodeCoverage]
     public class TaskController
     {
         #region Constructors and Initializers

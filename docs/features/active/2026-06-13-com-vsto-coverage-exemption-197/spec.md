@@ -59,12 +59,23 @@ exemption only — it does not add tests that raise covered code.
 
 ### In scope
 
-1. **Assembly-level exclude for `TaskVisualization`** via `coverage.config`
-   `ModulePaths/Exclude` (and the matching entry in `TaskMaster.runsettings` for VS
-   in-IDE runs). Removes the full assembly (~3,501 lines-valid, 0.37% covered) from the
-   denominator. Mechanism rationale: the assembly is 90–95% COM/WinForms-bound with no
-   mockable class-boundary seams, so annotating ~50 files yields near-zero benefit
-   (design memo §2.1).
+1. **Class-level (and where noted, method-level) `[ExcludeFromCodeCoverage]` for
+   `TaskVisualization`** (revision 1.1, maintainer-directed 2026-06-13). The assembly is
+   NO LONGER excluded at the `coverage.config`/`TaskMaster.runsettings` `ModulePaths` level;
+   instead it is treated consistently with the other four assemblies. The
+   COM/VSTO/WinForms-bound classes carry class-level `[ExcludeFromCodeCoverage]`:
+   `TaskController`, `TaskViewer` (+ `TaskViewer.Designer`), `FlagTasks`,
+   `AutoAssignContext`, `AutoAssignPeople`, `AutoCreateProject`, `EditFilterViewer`
+   (+ Designer), `ManageFilters` (+ Designer), and `EditFilterController` (fully
+   WinForms/Outlook-bound). `FlagChangeGroup` is treated at **method** granularity:
+   its Outlook/WinForms-bound members (`ProcessGroupAsync`, `TryProcessFlagItemAsync`,
+   `ProcessFlagItemAsync`, and the `MailItem`-bound constructor) are exempt, while the
+   pure-logic `TryEnqueue` seam remains measured. The genuinely-testable seams
+   `FlagChangeItem` (a pure POCO with no Outlook dependency) and the testable paths of
+   `FlagChangeTrainingQueue` (`Enqueue`, `ConsumeAsync`, `Init`, queue state) remain in
+   the measured denominator and receive NO class-level exemption. TaskVisualization
+   therefore returns to the first-party denominator with only its architecturally-untestable
+   members removed.
 
 2. **Class-level (and where noted, method-level) `[ExcludeFromCodeCoverage]`** on the
    COM/VSTO/WinForms-bound classes enumerated in the design memo for the four mixed
@@ -108,6 +119,10 @@ following testable seams must remain measured and must not receive the attribute
   (not annotated wholesale; addressed by later increments).
 - Tags (memo §2.5): `TagController` pure-logic methods (`GetSelections`, `FilterArchive`,
   `ResolvePrefix`, `ToggleChoice`, `LoadSelections`, `LoadControls`), `PrefixItem`.
+- TaskVisualization (revision 1.1): `FlagChangeItem` (pure POCO; no exemption), the
+  testable paths of `FlagChangeTrainingQueue` (`Enqueue`, `ConsumeAsync`, `Init`, queue
+  state; no class-level exemption), and the pure-logic `FlagChangeGroup.TryEnqueue` seam
+  (the class is method-level exempt only on its Outlook-bound members).
 
 ## Non-Goals
 
@@ -158,12 +173,15 @@ following testable seams must remain measured and must not receive the attribute
 ## Technical Specifications
 
 - **Files/modules expected to change:**
-  - `coverage.config` — add `<ModulePath>.*TaskVisualization.*</ModulePath>` to
-    `ModulePaths/Exclude`.
-  - `TaskMaster.runsettings` — add the matching exclude if absent.
+  - `coverage.config` — revision 1.1 REMOVES the prior
+    `<ModulePath>.*TaskVisualization.*</ModulePath>` exclude; TaskVisualization is no
+    longer assembly-excluded.
+  - `TaskMaster.runsettings` — revision 1.1 REMOVES the matching TaskVisualization
+    exclude.
   - `CLAUDE.md`, `.claude/rules/general-unit-test.md` — policy text per memo §4.1/§4.2.
-  - Enumerated `.cs` files in QuickFiler, TaskMaster, ToDoModel, Tags — attribute
-    additions only (and `using System.Diagnostics.CodeAnalysis;` where missing).
+  - Enumerated `.cs` files in QuickFiler, TaskMaster, ToDoModel, Tags, and
+    TaskVisualization (revision 1.1) — attribute additions only (and
+    `using System.Diagnostics.CodeAnalysis;` where missing).
 - **Public interfaces/contracts affected:** none. `[ExcludeFromCodeCoverage]` is a
   non-behavioral attribute.
 - **Data flow or validation adjustments:** none.
@@ -205,24 +223,40 @@ toolchain pass.
 
 ## Acceptance Criteria
 
-- [x] `coverage.config` excludes the `TaskVisualization` module from instrumentation via
-  a `ModulePaths/Exclude` `ModulePath` entry, and `TaskMaster.runsettings` contains the
-  matching exclude.
+- [x] `coverage.config` and `TaskMaster.runsettings` no longer exclude the
+  `TaskVisualization` module via a `ModulePaths/Exclude` `ModulePath` entry (revision 1.1
+  reversed the assembly-level exclude in favor of class-level `[ExcludeFromCodeCoverage]`);
+  TaskVisualization is present in the first-party denominator.
+  <!-- Verified: P8-T1/P8-T2 removed the excludes; P10-T6 confirms 0 TaskVisualization
+  matches in both configs and the TaskVisualization package present in the R2 denominator. -->;
 - [x] `[ExcludeFromCodeCoverage]` (class- or method-level per the design memo §2 tables)
   is applied to all enumerated COM/VSTO/WinForms-bound classes/members in QuickFiler,
-  TaskMaster, ToDoModel, and Tags, and to none of the enumerated testable seams.
-- [x] Post-exemption coverage re-measurement confirms the `TaskVisualization` package and
-  all annotated classes are removed from the denominator, and the enumerated testable
+  TaskMaster, ToDoModel, Tags, and (revision 1.1) TaskVisualization, and to none of the
+  enumerated testable seams.
+  <!-- Verified: Phases 2-6 for the four assemblies (P7-T7); revision 1.1 Phase 9 for
+  TaskVisualization (P10-T7) — class-level on TaskController/TaskViewer/FlagTasks/
+  AutoAssignContext/AutoAssignPeople/AutoCreateProject/EditFilterViewer/ManageFilters/
+  EditFilterController, method-level on FlagChangeGroup's 4 Outlook-bound members;
+  FlagChangeItem and FlagChangeTrainingQueue testable paths left unexempted. -->;
+- [x] Post-exemption coverage re-measurement confirms the annotated classes are removed
+  from the denominator (and, revision 1.1, that the `TaskVisualization` package is back in
+  the denominator carrying only its preserved testable seams), and the enumerated testable
   seams (`ToDoLoader`, `IDList.GetNextToDoID`, `KbdActions<>`, `TagController`
-  pure-logic methods, settings/path helpers, etc.) remain in the denominator.
+  pure-logic methods, settings/path helpers, `FlagChangeItem`,
+  `FlagChangeTrainingQueue` testable paths, etc.) remain in the denominator.
+  <!-- Verified: P10-T6 (coverage-r2-classlevel-checks.md) and P10-T7
+  (exemption-boundary-verification-r2.md). -->;
 - [ ] The recorded post-exemption rate is consistent with the design memo §3 estimate
   (~75.2%, range 73.2%–77.6%), and the figures are written to the feature evidence
   folder.
-  <!-- Figures written (evidence/qa-gates/coverage-delta.md). DEVIATION: measured rate is
-  71.73%, 1.47 pp below the §3 range lower bound (73.2%). Scope is correct per §2 (P7-T7);
-  more covered lines left the denominator than the §3 midpoint estimate assumed. Left
-  unchecked because the rate is outside the stated range; deviation note + remediation flag
-  recorded in coverage-delta.md per P7-T8. -->;
+  <!-- Figures written (evidence/qa-gates/coverage-delta.md, and revision 1.1
+  evidence/qa-gates/coverage-delta-r2.md). DEVIATION: the assembly-exclude variant measured
+  71.73% (1.47 pp below the §3 lower bound 73.2%); the revision 1.1 class-level variant
+  measures 71.65% (1.55 pp below). Scope is correct per §2 (P7-T7, P10-T7); more covered
+  lines left the denominator than the §3 midpoint estimate assumed, and the class-level
+  treatment re-includes lightly-covered TaskVisualization seams. Left unchecked because the
+  rate is outside the stated range; AC4 remains a separate open maintainer-acknowledgement
+  item; deviation note + remediation flag recorded in coverage-delta-r2.md per P10-T8. -->;
 - [x] `CLAUDE.md` (UT2 coverage section) and `.claude/rules/general-unit-test.md`
   (Coverage Requirements section) record the COM/VSTO exemption policy, rationale, and
   the testable-denominator definition per the design memo §4.
@@ -237,7 +271,8 @@ toolchain pass.
 
 - [x] Exemption scope matches the design memo §2 tables; no testable seam is exempted
 - [x] Behavior unchanged; full MSTest suite green before and after (identical pre/post failing set: the same 2 pre-existing flaky timing tests)
-- [x] `coverage.config` and `TaskMaster.runsettings` exclude `TaskVisualization`
+- [x] `coverage.config` and `TaskMaster.runsettings` no longer exclude `TaskVisualization`
+  (revision 1.1); TaskVisualization is treated at class level via `[ExcludeFromCodeCoverage]`
 - [x] Enumerated classes/members annotated; required `using` directives present
 - [x] `CLAUDE.md` and `.claude/rules/general-unit-test.md` updated per memo §4
 - [x] Post-exemption coverage re-measured and recorded to the feature evidence folder

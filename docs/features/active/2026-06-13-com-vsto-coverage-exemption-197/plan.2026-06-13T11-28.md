@@ -3,10 +3,11 @@
 - **Issue:** #197
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-06-13T11-28
-- **Status:** Executed (all tasks complete; preflight ALL CLEAR; see evidence/qa-gates and evidence/baseline). AC4 deviation recorded (post-exemption rate 71.73%, below §3 range; scope correct per P7-T7).
-- **Version:** 1.0
+- **Last Updated:** 2026-06-13T16-05
+- **Status:** Revised for maintainer-directed scope change (2026-06-13T16-05). Phases 0-6 (other four assemblies: TaskMaster, ToDoModel, QuickFiler, Tags) and the original Phase 7 final QA remain complete and are NOT re-opened. New revision Phases 8-10 switch TaskVisualization from assembly-level exclude to class-level `[ExcludeFromCodeCoverage]` and re-measure. AC4 deviation (prior post-exemption rate 71.73%) remains a separate open maintainer-acknowledgement item; this scope change is expected to lower the measured rate slightly and does not by itself resolve AC4.
+- **Version:** 1.1
 - **Work Mode:** full-feature
+- **Revision (1.1, 2026-06-13T16-05):** Maintainer-directed scope change per `remediation-inputs.2026-06-13T16-05.md`. Switch `TaskVisualization` from the assembly-level `coverage.config`/`TaskMaster.runsettings` ModulePath exclude (original P1-T1/P1-T2) to class-level `[ExcludeFromCodeCoverage]`, consistent with the other four assemblies, preserving the testable seams (`FlagChangeItem`, the testable paths of `FlagChangeTrainingQueue`) in the coverage denominator. This is a maintainer-directed scope change, not a review-blocking finding (prior feature-review 2026-06-13T15-45 returned PASS with 0 blocking findings).
 
 ## Inputs (authoritative)
 
@@ -19,11 +20,22 @@
 
 ## Strategy
 
-This is a test-tooling and policy refactor: it adds `[ExcludeFromCodeCoverage]` attributes,
-a `coverage.config`/`TaskMaster.runsettings` module-path exclude for `TaskVisualization`, and
+This is a test-tooling and policy refactor: it adds `[ExcludeFromCodeCoverage]` attributes and
 two policy-doc additions. It adds no production logic and no new tests. The full MSTest suite is
 the behavior regression guard and must remain green with identical pass/fail results before and
 after the change.
+
+**Revision 1.1 strategy (TaskVisualization scope change):** The original Phase 1 excluded
+`TaskVisualization` at the assembly level via a `coverage.config`/`TaskMaster.runsettings`
+ModulePath entry. Per the maintainer directive (`remediation-inputs.2026-06-13T16-05.md`), this
+treatment is reversed and replaced with class-level `[ExcludeFromCodeCoverage]` on only the
+COM/VSTO/WinForms-bound classes of TaskVisualization, mirroring the discipline already applied to
+the other four assemblies. The genuinely-testable seams (`FlagChangeItem` and the testable paths
+of `FlagChangeTrainingQueue`) MUST remain measured (in the denominator) and MUST NOT receive a
+class-level attribute that would exempt their testable half. `FlagChangeGroup` and
+`EditFilterController` are assessed by inspection: exempt only if every member is genuinely
+Outlook/WinForms-bound with no testable pure-logic seam; otherwise leave measured. The other four
+assemblies' annotation phases (Phases 2-6) are unchanged by this directive and are NOT re-opened.
 
 The annotation work touches many production `.cs` files across four assemblies. Per the C#
 small-path budget (csharp-typed-engineer handles 1-3 production files per batch), annotation is
@@ -52,14 +64,21 @@ and `evidence/qa-gates/` (post-change coverage) sub-paths used by this plan.
 
 ## Acceptance-Criteria Map (spec §Acceptance Criteria -> task IDs)
 
-- AC1 (`coverage.config` + `TaskMaster.runsettings` exclude `TaskVisualization`): P1-T1, P1-T2, P7-T6
+> **Revision 1.1 update:** AC1 originally mapped to the assembly-level TaskVisualization exclude
+> (P1-T1/P1-T2). Per the maintainer directive that exclude is reversed (P8-T1/P8-T2) and
+> TaskVisualization is now treated at class level (Phase 9). AC1 is re-scoped accordingly: the
+> assembly exclude must be ABSENT for TaskVisualization, and the original P1-T1/P1-T2 are
+> superseded for TaskVisualization only.
+
+- AC1 (revised — `coverage.config` + `TaskMaster.runsettings` no longer exclude `TaskVisualization`): P8-T1, P8-T2, P10-T6
 - AC2 (`[ExcludeFromCodeCoverage]` on all enumerated COM/VSTO/WinForms classes, none on testable seams):
-  P2-T1, P2-T2, P3-T1, P3-T2, P3-T3, P4-T1, P4-T2, P4-T3, P5-T1, P5-T2, P5-T3, P6-T1; non-exemption verified by P7-T7
-- AC3 (re-measurement confirms exempt classes removed and testable seams remain): P7-T6, P7-T7
-- AC4 (recorded post-exemption rate consistent with §3 estimate ~75.2% / 73.2%-77.6%, figures in evidence folder): P7-T8
+  P2-T1, P2-T2, P3-T1, P3-T2, P3-T3, P4-T1, P4-T2, P4-T3, P5-T1, P5-T2, P5-T3, P6-T1, P9-T1, P9-T2, P9-T3; non-exemption verified by P7-T7 and P10-T7
+- AC3 (re-measurement confirms exempt classes removed and testable seams remain): P10-T6, P10-T7
+- AC4 (recorded post-exemption rate; the class-level TaskVisualization treatment raises the denominator vs the assembly-exclude variant — AC4 remains a separate open maintainer-acknowledgement item): P10-T8
 - AC5 (`CLAUDE.md` UT2 + `.claude/rules/general-unit-test.md` record exemption policy/rationale/denominator): P1-T3, P1-T4
-- AC6 (full C# toolchain passes in a single final pass): P7-T1, P7-T2, P7-T3, P7-T4
-- AC7 (no production behavior change; only attributes/usings/config/docs): enforced by every annotation phase toolchain loop and P7-T5 (test result parity)
+- AC6 (full C# toolchain passes in a single final pass): P10-T1, P10-T2, P10-T3, P10-T4
+- AC7 (no production behavior change; only attributes/usings/config/docs): enforced by every annotation phase toolchain loop and P10-T5 (test result parity)
+- AC8 (revision 1.1 — `spec.md` exempt-scope section reflects class-level TaskVisualization treatment with preserved seams enumerated): P8-T3
 
 ---
 
@@ -138,6 +157,51 @@ and `evidence/qa-gates/` (post-change coverage) sub-paths used by this plan.
 
 ---
 
+> **Revision 1.1 — Maintainer-directed scope change (2026-06-13T16-05).** Phases 0-7 above are
+> complete and are NOT re-opened. The phases below reverse the assembly-level TaskVisualization
+> exclude and replace it with class-level `[ExcludeFromCodeCoverage]`, then re-measure. Source:
+> `docs/features/active/2026-06-13-com-vsto-coverage-exemption-197/remediation-inputs.2026-06-13T16-05.md`.
+
+### Phase 8 — Revision: Remove TaskVisualization Assembly Exclude & Update Spec
+
+- [x] [P8-T1] In `coverage.config`, REMOVE the `<ModulePath>.*TaskVisualization.*</ModulePath>` entry that was added by the original P1-T1 (inside the `ModulePaths/Exclude` block). Leave all pre-existing third-party excludes unchanged (Deedle, FSharp, Castle.Core, FluentAssertions, Moq, Microsoft.Testing, MSTest). Acceptance: the `TaskVisualization` ModulePath exclude is absent from `coverage.config`; the file remains valid XML; no pre-existing entry is changed or removed. Reference: directive Required-changes item 1.
+- [x] [P8-T2] In `TaskMaster.runsettings`, REMOVE the `<ModulePath>.*TaskVisualization.*</ModulePath>` entry that was added by the original P1-T2 (inside the `DataCollectionRunSettings`/`CodeCoverage`/`ModulePaths/Exclude` block). Leave all pre-existing excludes unchanged. Acceptance: the `TaskVisualization` ModulePath exclude is absent from `TaskMaster.runsettings`; the file remains valid XML; no pre-existing entry is changed or removed. Reference: directive Required-changes item 2.
+- [x] [P8-T3] In `docs/features/active/2026-06-13-com-vsto-coverage-exemption-197/spec.md`, update the exempt-scope section that references `TaskVisualization` to describe the class-level `[ExcludeFromCodeCoverage]` treatment (replacing the prior assembly-exclude description), and enumerate the explicitly-preserved testable seams (`FlagChangeItem` and the testable paths of `FlagChangeTrainingQueue`). Keep AC wording consistent. Acceptance: spec.md no longer describes TaskVisualization as assembly-excluded; the class-level treatment and preserved seams are documented; AC text remains consistent. Reference: directive Required-changes item 4.
+- [x] [P8-T4] Run the full C# toolchain loop for the Phase 8 config/spec changes and record each step artifact under `docs/features/active/2026-06-13-com-vsto-coverage-exemption-197/evidence/qa-gates/`: csharpier (`phase8-csharpier.md`), analyzer build (`phase8-analyzer.md`), nullable build (`phase8-nullable.md`), MSTest with coverage (`phase8-mstest.md`). Each artifact requires `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; the MSTest artifact `Output Summary:` must include test pass/fail counts and the coverage headline, and must confirm the `TaskVisualization` package has RETURNED to the regenerated first-party `coverage-firstparty.cobertura.xml` denominator (it is no longer assembly-excluded). Restart the loop from csharpier if any step changes files or fails. Acceptance: all four step artifacts exist with all four fields; final pass is clean; `TaskVisualization` confirmed present in the first-party denominator. Reference: directive Required-changes item 5.
+
+---
+
+### Phase 9 — Revision: Class-Level Annotation Pass for TaskVisualization
+
+> Batch sized to the C# small-path budget (1-3 production files per batch). Each code-behind plus
+> its `.Designer.cs` counts as one logical type. The exempt set is the COM/VSTO/WinForms-bound
+> classes; `FlagChangeItem` and the testable paths of `FlagChangeTrainingQueue` MUST NOT be
+> annotated at class level. `FlagChangeGroup` and `EditFilterController` are assess-by-inspection.
+> Apply the scope-change rule: if inspection shows a class listed exempt is actually a testable
+> seam (or vice versa), record the finding and adjust rather than blindly annotating.
+
+- [x] [P9-T1] Add `[ExcludeFromCodeCoverage]` (class-level) and the `using System.Diagnostics.CodeAnalysis;` directive where missing to the Outlook/WinForms-bound classes: `TaskVisualization\TaskController.cs`, `TaskVisualization\TaskViewer.cs` (+ `TaskVisualization\TaskViewer.Designer.cs`), `TaskVisualization\FlagTasks.cs`. Acceptance: each named type carries the attribute; required `using` present; no method body, signature, or public API changed. Reference: directive Required-changes item 3 (exempt list).
+- [x] [P9-T2] Add `[ExcludeFromCodeCoverage]` (class-level) and `using System.Diagnostics.CodeAnalysis;` where missing to: `TaskVisualization\AutoAssignContext.cs`, `TaskVisualization\AutoAssignPeople.cs`, `TaskVisualization\AutoCreateProject.cs`. Acceptance: each named type carries the attribute; required `using` present; no logic change. Reference: directive Required-changes item 3 (exempt list).
+- [x] [P9-T3] Add `[ExcludeFromCodeCoverage]` (class-level) and `using System.Diagnostics.CodeAnalysis;` where missing to the WinForms editor/filter classes: `TaskVisualization\EditFilterViewer.cs` (+ `TaskVisualization\EditFilterViewer.designer.cs`), `TaskVisualization\ManageFilters.cs` (+ `TaskVisualization\ManageFilters.Designer.cs`). Acceptance: each named type carries the attribute; required `using` present; no logic change. Reference: directive Required-changes item 3 (exempt list).
+- [x] [P9-T4] Assess `TaskVisualization\FlagChangeGroup.cs` and `TaskVisualization\EditFilterController.cs` by inspection and record the determination at `docs/features/active/2026-06-13-com-vsto-coverage-exemption-197/evidence/other/taskvis-inspection-assessment.md` with `Timestamp:`. For each class, record whether every member is genuinely Outlook/WinForms-bound with no testable pure-logic seam. If genuinely fully bound: apply class-level `[ExcludeFromCodeCoverage]` (+ `using` if missing). If a testable pure-logic seam exists: leave the class unannotated (or annotate only the genuinely Outlook-bound methods at method level, mirroring the `IDList` method-level approach), and record which members were annotated. Acceptance: the assessment artifact records the per-class determination and the applied treatment; any annotation applied carries no logic change. Reference: directive Required-changes item 3 (assess-by-inspection).
+- [x] [P9-T5] Confirm the preserved testable seams are NOT exempted: `TaskVisualization\FlagChangeItem.cs` carries no `[ExcludeFromCodeCoverage]`, and the testable paths of `TaskVisualization\FlagChangeTrainingQueue.cs` carry no class-level exemption (only genuinely Outlook-bound methods, if any, may carry a method-level attribute). Record the confirmation at `docs/features/active/2026-06-13-com-vsto-coverage-exemption-197/evidence/other/taskvis-preserved-seams.md` with `Timestamp:` listing each preserved seam and its annotation state. Acceptance: artifact confirms `FlagChangeItem` and `FlagChangeTrainingQueue` testable paths remain unexempted; any exemption found on a preserved seam is a BLOCKED outcome requiring remediation. Reference: directive Required-changes item 3 (preserve list), Acceptance-for-this-cycle bullet 2.
+- [x] [P9-T6] Run the full C# toolchain loop for Phase 9 and record step artifacts under `docs/features/active/2026-06-13-com-vsto-coverage-exemption-197/evidence/qa-gates/`: `phase9-csharpier.md`, `phase9-analyzer.md`, `phase9-nullable.md`, `phase9-mstest.md`. Each requires `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; the MSTest artifact records pass/fail counts and the coverage headline. Restart from csharpier on any file change or failure. Acceptance: all four artifacts exist with all four fields; final pass clean; the annotated TaskVisualization COM/WinForms classes are confirmed absent from the post-change denominator while `FlagChangeItem` and the `FlagChangeTrainingQueue` testable paths remain present in it.
+
+---
+
+### Phase 10 — Revision: Final QA Loop & Coverage Re-measurement (post class-level TaskVisualization)
+
+- [x] [P10-T1] Run `dotnet tool run csharpier --check .` as the final-QC formatting gate and record `docs/features/active/2026-06-13-com-vsto-coverage-exemption-197/evidence/qa-gates/final-r2-csharpier.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: EXIT_CODE 0 (no formatting diff). If csharpier reformats any file, restart the final loop at P10-T1.
+- [x] [P10-T2] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` as the final-QC analyzer/code-style gate and record `docs/features/active/2026-06-13-com-vsto-coverage-exemption-197/evidence/qa-gates/final-r2-analyzer.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: EXIT_CODE 0, no analyzer/code-style errors.
+- [x] [P10-T3] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true` as the final-QC nullable/type-check gate and record `docs/features/active/2026-06-13-com-vsto-coverage-exemption-197/evidence/qa-gates/final-r2-nullable.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: EXIT_CODE 0, no nullable or warnings-as-errors failures.
+- [x] [P10-T4] Run the MSTest suite with coverage as the final-QC test gate (`vstest.console.exe <test-assembly-paths> /EnableCodeCoverage /Settings:TaskMaster.runsettings`, or the `scripts/vscode/Invoke-MSTestWithCoverage.ps1` pipeline producing the deduped first-party Cobertura) and record `docs/features/active/2026-06-13-com-vsto-coverage-exemption-197/evidence/qa-gates/final-r2-mstest-coverage.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` including numeric test pass/fail counts and the post-change production-only coverage headline (numeric, no placeholders). Acceptance: artifact exists with numeric coverage values; test results recorded. If any of P10-T1..P10-T4 fails or changes files, restart the loop from P10-T1.
+- [x] [P10-T5] Verify behavior parity by comparing the Phase 10 final-QC MSTest pass/fail set (P10-T4) against the Phase 0 baseline (P0-T6) and record `docs/features/active/2026-06-13-com-vsto-coverage-exemption-197/evidence/qa-gates/test-result-parity-r2.md` with `Timestamp:` and an explicit before/after pass/fail comparison. Acceptance: the post-change pass/fail set is identical to baseline (allowing for the 2 pre-existing failures noted in roadmap §0.1); any new failure is a BLOCKED outcome. Reference: spec §Invariants "No production behavior change", AC7.
+- [x] [P10-T6] Save the post-change first-party Cobertura to `docs/features/active/2026-06-13-com-vsto-coverage-exemption-197/evidence/qa-gates/coverage-firstparty.r2-classlevel.cobertura.xml` and confirm in a companion note `coverage-r2-classlevel-checks.md` (with `Timestamp:`) that: (a) the `TaskVisualization` package is PRESENT in the first-party denominator (no longer assembly-excluded); (b) `coverage.config` and `TaskMaster.runsettings` no longer contain the `TaskVisualization` ModulePath exclude; (c) the annotated COM/WinForms TaskVisualization classes are absent from the denominator while `FlagChangeItem` and the `FlagChangeTrainingQueue` testable paths are present. Acceptance: post-change Cobertura saved; all three checks recorded as confirmed; any failure is a BLOCKED outcome. Reference: AC1, AC3, directive Acceptance-for-this-cycle bullets 1-2.
+- [x] [P10-T7] Verify the revised TaskVisualization exempt/non-exempt boundary and record `docs/features/active/2026-06-13-com-vsto-coverage-exemption-197/evidence/qa-gates/exemption-boundary-verification-r2.md` with `Timestamp:`, confirming (a) every TaskVisualization COM/VSTO/WinForms class annotated in Phase 9 (`TaskController`, `TaskViewer`, `FlagTasks`, `AutoAssignContext`, `AutoAssignPeople`, `AutoCreateProject`, `EditFilterViewer`, `ManageFilters`, plus any `FlagChangeGroup`/`EditFilterController` determination from P9-T4) carries `[ExcludeFromCodeCoverage]` and is absent from the post-change denominator; (b) `FlagChangeItem` and the testable paths of `FlagChangeTrainingQueue` are NOT class-level annotated and remain present in the post-change denominator; (c) the other four assemblies' annotations (Phases 2-6) are unchanged. Acceptance: all three checks verified; any mismatch is a BLOCKED outcome requiring remediation. Reference: AC2, AC3, directive Required-changes item 3.
+- [x] [P10-T8] Compute and record the coverage delta at `docs/features/active/2026-06-13-com-vsto-coverage-exemption-197/evidence/qa-gates/coverage-delta-r2.md` with `Timestamp:` reporting: the prior assembly-exclude post-change coverage (original P7-T8 / `coverage-delta.md`, 71.73%), the new class-level post-change coverage (P10-T4/P10-T6), the change in lines-valid and lines-covered (the denominator is expected to RISE as the preserved TaskVisualization testable lines return), and the resulting production-only rate. Acceptance: the artifact records the prior rate, the new rate, and the denominator/numerator deltas; note that AC4 (measured rate vs the design §3 estimate) remains a separate open maintainer-acknowledgement item and that the class-level treatment is expected to lower the measured rate slightly relative to the assembly-exclude variant. Reference: AC4, directive Required-changes item 5, Constraints bullet 4.
+
+---
+
 ## Test Plan
 
 - Behavior regression guard: full MSTest suite, identical pass/fail set before (P0-T6) and after (P7-T4), verified by P7-T5.
@@ -147,6 +211,12 @@ and `evidence/qa-gates/` (post-change coverage) sub-paths used by this plan.
   - Delta/threshold comparison: P7-T8 (`evidence/qa-gates/coverage-delta.md`).
 - Exemption boundary verification: P7-T7 (`evidence/qa-gates/exemption-boundary-verification.md`).
 - Toolchain gates: per-phase loops (P1-T5, P2-T3, P3-T4, P4-T3, P5-T3, P6-T2) and final loop (P7-T1..P7-T4).
+- Revision 1.1 (TaskVisualization class-level treatment):
+  - Config reversal verification: P8-T1, P8-T2, P10-T6.
+  - Preserved-seam confirmation: P9-T5 (`evidence/other/taskvis-preserved-seams.md`), re-verified by P10-T7.
+  - Assess-by-inspection determination: P9-T4 (`evidence/other/taskvis-inspection-assessment.md`).
+  - Revision coverage artifacts: P10-T4 (`evidence/qa-gates/final-r2-mstest-coverage.md`), P10-T6 (`evidence/qa-gates/coverage-firstparty.r2-classlevel.cobertura.xml`), delta in P10-T8 (`evidence/qa-gates/coverage-delta-r2.md`).
+  - Revision toolchain gates: per-phase loops (P8-T4, P9-T6) and final loop (P10-T1..P10-T4).
 
 ## Out of Scope (per spec §Non-Goals)
 
@@ -164,3 +234,6 @@ All changes are non-behavioral (attributes, `using` directives, two XML config e
 - `Tags` contains two `CheckBoxController.cs` files; P6-T1 instructs the executor to annotate only the WinForms CheckBox event-handler class per memo §2.5's description.
 - The spec's `evidence/coverage/` reference is normalized to canonical `evidence/baseline/` and `evidence/qa-gates/` per the evidence-location invariant.
 - `RibbonController`/`AppItemEngines` are annotated whole-class per memo §2.2 (helper-extraction is optional and out of scope for this feature).
+- Revision 1.1: the original P1-T1/P1-T2 added an assembly-level `TaskVisualization` exclude; the maintainer directive reverses this (P8-T1/P8-T2) in favor of class-level `[ExcludeFromCodeCoverage]` (Phase 9). The completed P1-T1/P1-T2 checkboxes record the original execution history and are NOT mutated; their effect on TaskVisualization is superseded by Phase 8.
+- Revision 1.1: `TaskVisualization\FlagChangeGroup.cs` and `TaskVisualization\EditFilterController.cs` both `using Microsoft.Office.Interop.Outlook` (and `EditFilterController` also `using System.Windows.Forms`), but a `using` directive alone is not determinative of full COM/WinForms binding; P9-T4 requires per-member inspection before annotating, and any testable pure-logic seam must remain measured.
+- Revision 1.1: `spec.md` must be updated to reflect the class-level treatment of TaskVisualization; this is task P8-T3 in the revised plan.

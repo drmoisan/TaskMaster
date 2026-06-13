@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories;
 
 namespace TaskVisualization
 {
+    [ExcludeFromCodeCoverage]
     public class AutoAssignContext : IAutoAssign
     {
         private readonly IApplicationGlobals _globals;

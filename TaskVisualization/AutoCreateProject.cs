@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using UtilitiesCS.Extensions;
 
 namespace TaskVisualization
 {
+    [ExcludeFromCodeCoverage]
     public class AutoCreateProject(IApplicationGlobals globals) : IAutoAssign
     {
         private readonly IApplicationGlobals _globals = globals;

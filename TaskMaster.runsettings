@@ -20,7 +20,6 @@
                 <ModulePath>.*Moq.*</ModulePath>
                 <ModulePath>.*Microsoft\.Testing.*</ModulePath>
                 <ModulePath>.*MSTest.*</ModulePath>
-                <ModulePath>.*TaskVisualization.*</ModulePath>
               </Exclude>
             </ModulePaths>
           </CodeCoverage>

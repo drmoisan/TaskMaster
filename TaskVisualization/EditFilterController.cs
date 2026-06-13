@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
@@ -12,6 +13,7 @@ using UtilitiesCS;
 
 namespace TaskVisualization
 {
+    [ExcludeFromCodeCoverage]
     internal class EditFilterController
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
