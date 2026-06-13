@@ -246,17 +246,18 @@ toolchain pass.
   `FlagChangeTrainingQueue` testable paths, etc.) remain in the denominator.
   <!-- Verified: P10-T6 (coverage-r2-classlevel-checks.md) and P10-T7
   (exemption-boundary-verification-r2.md). -->;
-- [ ] The recorded post-exemption rate is consistent with the design memo §3 estimate
+- [x] The recorded post-exemption rate is consistent with the design memo §3 estimate
   (~75.2%, range 73.2%–77.6%), and the figures are written to the feature evidence
-  folder.
+  folder. **ACCEPTED WITH AUTHORITY-SCOPED EXCEPTION 197-COV-001 (maintainer, 2026-06-13).**
   <!-- Figures written (evidence/qa-gates/coverage-delta.md, and revision 1.1
-  evidence/qa-gates/coverage-delta-r2.md). DEVIATION: the assembly-exclude variant measured
-  71.73% (1.47 pp below the §3 lower bound 73.2%); the revision 1.1 class-level variant
-  measures 71.65% (1.55 pp below). Scope is correct per §2 (P7-T7, P10-T7); more covered
-  lines left the denominator than the §3 midpoint estimate assumed, and the class-level
-  treatment re-includes lightly-covered TaskVisualization seams. Left unchecked because the
-  rate is outside the stated range; AC4 remains a separate open maintainer-acknowledgement
-  item; deviation note + remediation flag recorded in coverage-delta-r2.md per P10-T8. -->;
+  evidence/qa-gates/coverage-delta-r2.md). DEVIATION from the §3 estimate: the class-level
+  variant measures 71.65% (1.55 pp below the §3 lower bound 73.2%). The exemption scope is
+  verified correct per §2 (P7-T7, P10-T7); the gap is an optimistic design estimate, not an
+  implementation defect — more incidentally-covered lines left the denominator than the §3
+  midpoint assumed. The remedy (roadmap increment tests) is explicitly out of scope for #197.
+  The maintainer acknowledged this on 2026-06-13 and accepted the deviation as authority-scoped
+  exception 197-COV-001 (analogous to 185-COV-001), electing not to block #197 on the estimate.
+  See evidence/qa-gates/coverage-exception-197-COV-001.md. -->;
 - [x] `CLAUDE.md` (UT2 coverage section) and `.claude/rules/general-unit-test.md`
   (Coverage Requirements section) record the COM/VSTO exemption policy, rationale, and
   the testable-denominator definition per the design memo §4.
