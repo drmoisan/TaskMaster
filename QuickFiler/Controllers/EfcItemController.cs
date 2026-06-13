@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -21,6 +22,7 @@ using static Deedle.FrameBuilder;
 
 namespace QuickFiler.Controllers
 {
+    [ExcludeFromCodeCoverage]
     internal class EfcItemController : IItemControler
     {
         #region Constructors and Initializers

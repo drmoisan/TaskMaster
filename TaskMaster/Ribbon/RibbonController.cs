@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -32,6 +33,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace TaskMaster
 {
+    [ExcludeFromCodeCoverage]
     public class RibbonController
     {
         private RibbonViewer _viewer;

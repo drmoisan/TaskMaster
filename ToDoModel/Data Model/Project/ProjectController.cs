@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace ToDoModel.Data_Model.Project
 {
+    [ExcludeFromCodeCoverage]
     public class ProjectController
     {
         public ProjectController(IProjectData projectData, ScDictionary<string, string> programData)

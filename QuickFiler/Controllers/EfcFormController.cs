@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -22,6 +23,7 @@ using UtilitiesCS.Threading;
 
 namespace QuickFiler.Controllers
 {
+    [ExcludeFromCodeCoverage]
     internal class EfcFormController : IFilerFormController
     {
         #region Constructors

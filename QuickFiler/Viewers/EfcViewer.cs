@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.Remoting.Contexts;
@@ -16,6 +17,7 @@ using UtilitiesCS;
 
 namespace QuickFiler
 {
+    [ExcludeFromCodeCoverage]
     public partial class EfcViewer : Form
     {
         public EfcViewer()

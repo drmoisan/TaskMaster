@@ -295,6 +295,12 @@ Every new or modified unit test must adhere to these guidelines.
   - Aim to exercise critical paths and important edge conditions.
   - Configure coverage tooling to exclude test files (e.g., `tests/`), so metrics reflect the application code, not the tests themselves.
   - Repository-wide line coverage must remain `>= 80%`.
+  - **COM/VSTO/WinForms coverage exemption (testable denominator).** The 80% floor applies to the **testable denominator** — production-only first-party code, after excluding:
+    - (a) VSTO add-in lifecycle classes (entry points, ribbon event handlers, COM utility registration) that cannot be unit-tested without a live Outlook process;
+    - (b) WinForms form-derived classes and Designer-generated code;
+    - (c) Outlook Interop event handler classes in `TaskVisualization`, `QuickFiler`, `TaskMaster`, `ToDoModel`, and `Tags` that directly depend on `Microsoft.Office.Interop.Outlook.Application`, `MailItem`, `Store`, or `MAPIFolder` without an injectable seam.
+
+    These classes are formally exempted from the 80% floor. Exemption is applied via `[ExcludeFromCodeCoverage]` attributes in source code (reviewable in PRs) or via `coverage.config` assembly-level excludes for near-wholly-untestable assemblies. **Authority**: This exemption must be ratified by the project maintainer and is tracked in `feature/csharp-coverage-uplift`. Testable seams within otherwise-COM-bound assemblies (e.g., `ToDoLoader`, `IDList` arithmetic, `KbdActions<>`, path/settings helpers) are explicitly NOT exempt and must meet the `>= 80%` floor.
   - Any new modules, classes, or methods added must target `>= 90%` coverage.
   - Code changes or refactors must not reduce coverage for the lines that were changed.
   - Coverage is a supporting metric, not the sole quality gate; untested critical behavior is not acceptable even if the overall percentage looks good.

@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using TaskVisualization;
@@ -18,6 +19,7 @@ namespace TaskMaster
 
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.None)]
+    [ExcludeFromCodeCoverage]
     public class AddInUtilities : IAddInUtilities
     {
         public AddInUtilities() { }

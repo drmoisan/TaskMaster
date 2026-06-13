@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -12,6 +13,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace ToDoModel
 {
+    [ExcludeFromCodeCoverage]
     public class FileOperationsPST
     {
         private readonly IApplicationGlobals _globals;

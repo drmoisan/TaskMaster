@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -19,6 +20,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace QuickFiler.Controllers
 {
+    [ExcludeFromCodeCoverage]
     internal class KeyboardHandler : IQfcKeyboardHandler
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(

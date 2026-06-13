@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
@@ -16,6 +17,7 @@ using UtilitiesCS.Extensions;
 
 namespace QuickFiler.Controllers
 {
+    [ExcludeFromCodeCoverage]
     public class QfcCollectionController : IQfcCollectionController
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(

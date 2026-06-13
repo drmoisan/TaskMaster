@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace TaskMaster.Ribbon
 {
+    [ExcludeFromCodeCoverage]
     public class TryFunctionalityInConstruction(IApplicationGlobals globals)
     {
         public IApplicationGlobals AppGlobals { get; protected internal set; } = globals;

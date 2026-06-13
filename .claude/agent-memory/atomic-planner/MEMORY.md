@@ -1,0 +1,1 @@
+- [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/

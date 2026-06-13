@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -28,6 +29,7 @@ namespace TaskMaster
     // For more information, see the Ribbon XML documentation in the Visual Studio Tools for Office Help.
 
     [System.Runtime.InteropServices.ComVisible(true)]
+    [ExcludeFromCodeCoverage]
     public class RibbonViewer : Office.IRibbonExtensibility
     {
         public RibbonViewer(RibbonController Controller)
