@@ -35,7 +35,14 @@ this feature is the post-#197 71.65% figure.
 ## Invariants (must not change)
 
 - **No production behavior change.** Production method bodies, signatures, public APIs, and
-  runtime behavior remain identical. The feature adds test code only.
+  runtime behavior remain identical. The feature adds test code only, with a single
+  maintainer-authorized exception in Phase 5 (option B): two narrow test seams are permitted
+  — (1) the UtilitiesCS assembly attribute `[assembly: InternalsVisibleTo("ToDoModel.Test")]`
+  (which exposes the existing internal `MyBox.DialogInvoker` seam to the test project; no
+  `MyBox` member behavior changes and the seam still defaults to the real dialog in
+  production), and (2) the `TaskMaster.AppFileSystemFolderPaths.MatchBestSpecialFolder`
+  pure-helper extraction (the instance method delegates to a new `internal static` helper with
+  byte-for-byte identical matching semantics). Neither seam changes any runtime behavior.
 - **No change to the #197 exemption boundary.** No `[ExcludeFromCodeCoverage]` attribute is
   added or removed. No COM/VSTO/WinForms code that #197 exempted is un-exempted or tested.
 - **Coverage pipeline structure unchanged.** No edits to `coverage.config`,
@@ -169,8 +176,11 @@ application settings store, the filesystem, or Outlook.
 - Increments 4+ of the roadmap (Tags `TagController` pure-logic methods; QuickFiler
   `EfcDataModel`/`QfcFormController` mockable branches; QuickFiler `QfcItemController` scoring
   logic). These are follow-up work.
-- Any change to production code. Introducing a new production seam (interface, injection point,
-  wrapper) is a flag-and-stop, not a silent change (see Constraints).
+- Any change to production code, EXCEPT the two maintainer-authorized Phase 5 seams (option B):
+  the UtilitiesCS `[assembly: InternalsVisibleTo("ToDoModel.Test")]` attribute and the
+  `TaskMaster.AppFileSystemFolderPaths.MatchBestSpecialFolder` pure-helper extraction. Both
+  preserve runtime behavior exactly. Any production change beyond these two narrow seams remains
+  a flag-and-stop, not a silent change (see Constraints).
 - Re-measuring or changing the #197 exemption boundary, `coverage.config`, or the coverage
   pipeline.
 - Reaching the 80% floor in this feature. The roadmap projects Increments 1–3 yield a partial
@@ -245,7 +255,7 @@ application settings store, the filesystem, or Outlook.
   4. `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
 - **Coverage re-measurement:** re-run the coverage pipeline; record post-feature production-only
   rate and the net change versus 71.65% to the feature evidence folder
-  `docs/features/active/2026-06-14-coverage-increments-1-3-testable-seams-199/evidence/coverage/`.
+  `docs/features/active/2026-06-14-coverage-increments-1-3-testable-seams-199/evidence/qa-gates/`.
 - **Manual validation:** none required beyond the recorded coverage figures.
 
 ## Acceptance Criteria
@@ -255,7 +265,9 @@ application settings store, the filesystem, or Outlook.
   `objectSaver`), `IDList.GetNextToDoID(string)` (base case, ID-present loop, length boundary),
   `ProjectEntry` (`SetProjectId` happy/null/malformed, `CompareTo` equal/different/null/prefix),
   and the remaining uncovered `BaseChanger` branches; the covered-line count for these seams
-  increases.
+  increases. The previously-deferred `ProjectEntry` dialog branches (malformed-ID,
+  change-confirmation Yes/No, and the `CompareTo` length tie-break) are now fully covered by
+  Phase 5 (P5-T2 UtilitiesCS seam, P5-T3 tests, P5-T10 pass, P5-T11 covered-line increase).
 - [x] **Increment 2 (QuickFiler):** MSTest tests are added and passing for `KaChar`,
   `KaCharAsync`, `KaKey`, `KaKeyAsync`, `KaStringAsync`, the remaining `KbdActions<>` branches,
   and the pure paths of `FilerQueue` and `QfcQueue`; the covered-line count for these seams
@@ -263,7 +275,9 @@ application settings store, the filesystem, or Outlook.
 - [x] **Increment 3 (TaskMaster):** MSTest tests are added and passing for `AppStagingFilenames`
   (injected settings stub), `AppFileSystemFolderPaths.MatchBestSpecialFolder` (pure LINQ
   positive/edge/negative), and the remaining pure properties of `AppQuickFilerSettings`; the
-  covered-line count for these seams increases.
+  covered-line count for these seams increases. The previously-deferred
+  `AppFileSystemFolderPaths.MatchBestSpecialFolder` coverage is now fully delivered by Phase 5
+  (P5-T4 pure-helper extraction seam, P5-T5 tests, P5-T10 pass, P5-T11 covered-line increase).
 - [x] All tests comply with the General + C# Unit Test Policy: MSTest, Moq, FluentAssertions,
   Arrange–Act–Assert, independent, isolated, deterministic, no temp files, no external
   dependencies, no live Outlook/WinForms, no timing/sleep hacks. Each test covers the applicable
@@ -286,9 +300,15 @@ application settings store, the filesystem, or Outlook.
 
 - [x] Increment 1, 2, and 3 tests added and passing in their respective `.Test` projects.
 - [ ] All target seams enumerated in Scope are covered with positive/negative/edge/error scenarios.
-  (Two Flag-and-Stop gaps: ProjectEntry malformed-id/change-confirmation dialog branches and
-  AppFileSystemFolderPaths.MatchBestSpecialFolder — both unreachable without a prohibited production
-  seam/filesystem mutation; recorded in evidence/other; all other enumerated seams covered.)
+  (Phase 5 closed AppFileSystemFolderPaths.MatchBestSpecialFolder fully (P5-T4/P5-T5) and the
+  ProjectEntry malformed-ID dialog branch plus the CompareTo length tie-break (P5-T2/P5-T3 via the
+  UtilitiesCS `InternalsVisibleTo` seam). One residual gap remains: the ProjectEntry
+  change-confirmation branch (SetProjectId -> ChangeId) cannot be covered without a THIRD production
+  seam, because ChangeId commits via the ProjectID property setter whose RAW un-seamed
+  MessageBox.Show is outside the two authorized Phase 5 seams. This is an authorized-scope
+  flag-and-stop recorded in evidence/other/p5-projectentry-changeconfirm-gap.2026-06-14T15-10.md;
+  it requires separate maintainer direction (route the property setter through MyBox). Left
+  unchecked because not all enumerated dialog scenarios are covered.)
 - [x] New/changed code >= 90% coverage; no regression on changed lines.
 - [x] No production code, config, or pipeline change (or any required seam flagged and resolved
   with maintainer direction).

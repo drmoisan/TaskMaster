@@ -152,15 +152,75 @@ MUST include numeric coverage headline values.
 
 ---
 
+### Phase 5 — Authorized Seams to Close AC1/AC3 Gaps
+
+Scope-change phase. The maintainer chose option B (remediation-inputs.2026-06-14T15-10.md)
+and AUTHORIZED minimal production seams to close the two previously-deferred Flag-and-Stop
+coverage gaps. Phases 0-4 remain complete and are not re-opened. The spec "zero
+production change" Non-Goal is lifted ONLY for the two narrow seams in this phase.
+
+Phase-5 hard constraints (in addition to the plan-wide Hard Constraints above):
+- Production changes are limited to the two authorized seams: (a) `UtilitiesCS` assembly
+  attribute `[assembly: InternalsVisibleTo("ToDoModel.Test")]` (plus a settable internal
+  `MyBox` seam only if verification shows the existing `MyBox.DialogInvoker` is not test-
+  settable); (b) the `TaskMaster` `MatchBestSpecialFolder` pure-helper extraction (or, as a
+  fallback, an `internal` settable `SpecialFolders` seam / test-only constructor that skips
+  `LoadFolders` plus `[assembly: InternalsVisibleTo("TaskMaster.Test")]`). `TaskMaster.Test`
+  visibility is already present (`TaskMaster/ThisAddIn.cs`, `TaskMaster/Properties/AssemblyInfo.cs`).
+- Any production change beyond these two seams is a flag-and-stop: halt the task, record the
+  proposed change in `evidence/other/`, and stop for maintainer direction. Do not silently
+  widen scope.
+- No production behavior change. The `MyBox` dialog seam defaults to the real dialog in
+  production (`MyBox.DialogInvoker` get returns `RealDialogInvoker` when unset). The
+  `MatchBestSpecialFolder` matching semantics (substring `path.Contains`, longest-`Value`
+  wins, returns `Key`, null on empty/no-match) must be byte-for-byte preserved.
+- C# per-batch budget honored: Batch A and Batch B each touch at most 3 production files and
+  at most 3 test files.
+- Deterministic tests; MSTest + Moq + FluentAssertions; AAA; no temp files; no external
+  deps; no live Outlook; no WinForms message loop. Tests inject the dialog stub via
+  `MyBox.DialogInvoker` and never show a modal dialog.
+- All evidence under `docs/features/active/2026-06-14-coverage-increments-1-3-testable-seams-199/evidence/<kind>/`
+  with ISO-8601 timestamps `2026-06-14T15-10`; each command-step artifact records
+  `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; coverage artifacts record
+  numeric headline values.
+
+#### Phase 5 — Batch A: Gap 1 (AC1) — ProjectEntry dialog branches (UtilitiesCS seam + ToDoModel.Test)
+
+- [x] [P5-T1] Verify the `MyBox.DialogInvoker` seam is a settable injection point usable from a test by reading `UtilitiesCS/Dialogs/MyBox.cs` and confirming the property `internal static Func<MyBoxViewer, DialogResult> DialogInvoker { get; set; }` exists, is settable, and defaults to the real dialog when unset. Record the finding in `evidence/baseline/p5-seam-verification-mybox.2026-06-14T15-10.md` with `Timestamp:`, `Command:` (the read/verification step), `EXIT_CODE:`, and `Output Summary:`. Acceptance: artifact confirms the settable internal `DialogInvoker` seam exists with file/line and that no new `MyBox` seam is required; if the seam is NOT test-settable, the artifact records that a minimal settable internal property is required and flags whether the change exceeds an assembly attribute + a single settable internal property (flag-and-stop if larger).
+- [x] [P5-T2] Add `[assembly: InternalsVisibleTo("ToDoModel.Test")]` to `UtilitiesCS/Properties/AssemblyInfo.cs` immediately after the existing `[assembly: InternalsVisibleTo("UtilitiesCS.Test")]` line. This is the sole authorized `UtilitiesCS` production change (assembly attribute only). Acceptance: the attribute is present exactly once, `UtilitiesCS` still compiles, and no `MyBox` member visibility or behavior is otherwise changed; any need for a new `MyBox` seam beyond this attribute is flagged per P5-T1 and stopped.
+- [x] [P5-T3] Add MSTest tests for the `ProjectEntry` dialog-dependent branches in `ToDoModel.Test/Data Model/Project/ProjectEntryDialogBranchesTests.cs` (new file), injecting a deterministic `MyBox.DialogInvoker` stub in `[TestInitialize]` and restoring it in `[TestCleanup]` so no WinForms message loop runs. Cover: the `SetProjectId` malformed-ID validation branch (`newID.Length != 4` shows the error dialog and returns false; stub returns `DialogResult.OK`); the change-confirmation branch (`newID != ProjectID` routes through `ChangeId`; stub returns `DialogResult.Yes` confirming the change and `DialogResult.No` cancelling, asserting `ProjectID` updated vs unchanged); and the `CompareTo` length tie-break (equal ordinal prefix, shorter `ProjectID` returns -1, longer returns 1) using plain `ProjectEntry` instances with no dialog. Use Moq/lambda for the dialog stub and the `_idUpdate` action; FluentAssertions for assertions. Acceptance: malformed-ID, change-confirmation (Yes and No), and CompareTo length-tie-break methods present and passing; no real dialog shown; file builds.
+
+#### Phase 5 — Batch B: Gap 2 (AC3) — MatchBestSpecialFolder seam (TaskMaster) + TaskMaster.Test
+
+- [x] [P5-T4] Introduce the smallest seam for `AppFileSystemFolderPaths.MatchBestSpecialFolder` in `TaskMaster/AppGlobals/AppFileSystemFolderPaths.cs` by extracting the pure matching logic into a static helper that takes the folder collection as a parameter (e.g. `internal static string MatchBestSpecialFolder(IReadOnlyDictionary<string, string> specialFolders, string path)`), and have the existing instance method `MatchBestSpecialFolder(string path)` delegate to it passing `SpecialFolders`. Preserve exact semantics: null/empty collection returns null; select entries where `path.Contains(value)`, order by descending `value.Length`, return the matched `Key` (or null when none). Do NOT add filesystem access. If the pure-helper extraction is not feasible without altering behavior, fall back to an `internal` settable `SpecialFolders` setter (or `internal` test-only constructor that skips `LoadFolders`) — `[assembly: InternalsVisibleTo("TaskMaster.Test")]` is already present in `TaskMaster/Properties/AssemblyInfo.cs` and `TaskMaster/ThisAddIn.cs`. Any change beyond one of these two options is flag-and-stop, recorded in `evidence/other/p5-matchbest-seam-deviation.2026-06-14T15-10.md`. Acceptance: the chosen seam compiles, the instance method still returns identical results for the same inputs, and the diff is limited to the single extraction/setter; the no-behavior-change invariant is documented in-code with a brief comment.
+- [x] [P5-T5] Add MSTest tests for `AppFileSystemFolderPaths.MatchBestSpecialFolder` in `TaskMaster.Test/AppGlobals/AppFileSystemFolderPathsMatchBestSpecialFolderTests.cs` (new file), driving the seam from P5-T4 with an in-memory folder collection (no filesystem access, no `LoadFolders`, no temp files): positive (a path containing a known special-folder value returns that folder's key); best-match/longest-prefix (two candidate values both contained in the path, the longer value's key wins); case sensitivity and trailing-separator behavior exactly as the method body defines (`string.Contains` is ordinal/case-sensitive; assert observed semantics, do not assume normalization); negative (no-match path returns null; null/empty collection returns null; null/empty input path per the method contract). Use FluentAssertions. Acceptance: positive, best-match, case/separator, and no-match/null methods present and passing; no filesystem access; file builds.
+
+#### Phase 5 — Spec and AC re-pointing
+
+- [x] [P5-T6] Update `docs/features/active/2026-06-14-coverage-increments-1-3-testable-seams-199/spec.md` to lift the zero-production-change Non-Goal for ONLY the two authorized narrow seams: amend the "Any change to production code" Non-Goal (lines ~172-173) and the "No production behavior change" Invariant (lines ~37-38) with an explicit carve-out naming the two seams (UtilitiesCS `InternalsVisibleTo("ToDoModel.Test")` + optional `MyBox` settable seam; TaskMaster `MatchBestSpecialFolder` pure-helper extraction or `SpecialFolders` test seam), noting no runtime behavior change. Re-point AC1 (Increment 1 `ProjectEntry`) and AC3 (Increment 3 `MatchBestSpecialFolder`) and the Definition of Done line about the two Flag-and-Stop gaps (lines ~288-291) so they reference the Phase 5 task IDs and are marked fully delivered. Also correct the stale non-canonical evidence path `evidence/coverage/` (lines ~248, 302 context) to the canonical `evidence/qa-gates/`. Acceptance: spec carve-out names exactly the two seams, states no behavior change, AC1/AC3 and the DoD gap line reference Phase 5 tasks, and no `evidence/coverage/` path remains.
+
+#### Phase 5 — QA Loop and Coverage (per-batch and final)
+
+- [x] [P5-T7] After Batch A and Batch B, run csharpier formatting `dotnet tool run csharpier .`; if it changes files, fix and restart this QA loop from this task. Write `evidence/qa-gates/p5-csharpier.2026-06-14T15-10.md` with the four required fields. Acceptance: final pass reports no formatting changes (exit 0).
+- [x] [P5-T8] Run analyzers `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`. Write `evidence/qa-gates/p5-analyzers.2026-06-14T15-10.md` with the four required fields. Acceptance: build succeeds with no analyzer errors.
+- [x] [P5-T9] Run nullable/TWAE `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`. Write `evidence/qa-gates/p5-nullable.2026-06-14T15-10.md` with the four required fields. Acceptance: build succeeds with no warnings-as-errors.
+- [x] [P5-T10] Run the `ToDoModel.Test` and `TaskMaster.Test` suites with coverage via `vstest.console.exe <ToDoModel.Test assembly path> <TaskMaster.Test assembly path> /EnableCodeCoverage` (or `scripts/vscode/Invoke-MSTestWithCoverage.ps1` scoped to those two projects). Write `evidence/qa-gates/p5-mstest-coverage.2026-06-14T15-10.md` with the four required fields and numeric coverage headline. Acceptance: all new Phase 5 tests pass; artifact records pass count and the ToDoModel and TaskMaster coverage percents.
+- [x] [P5-T11] Compute and record the Phase 5 coverage delta in `evidence/qa-gates/p5-coverage-delta.2026-06-14T15-10.md` reporting the prior #199 production-only coverage (from `evidence/qa-gates/final-coverage-comparison.2026-06-14T08-22.md`), the post-Phase-5 production-only coverage, the covered-line increase on `ProjectEntry` (malformed-ID, ChangeId, CompareTo tie-break) and `AppFileSystemFolderPaths.MatchBestSpecialFolder` (plus the extracted helper), and the new/changed-code coverage percentage (target >= 90%) for the seams added in P5-T2/P5-T4. Acceptance: artifact shows coverage strictly increased vs the prior #199 state, new/changed-code coverage >= 90%, and no regression on changed lines; if new-code coverage < 90% or any value is unavailable, mark remediation-required (not PASS).
+- [x] [P5-T12] Verify the production-change boundary by running `git diff --name-only` against the merge base and confirming the only production files changed are `UtilitiesCS/Properties/AssemblyInfo.cs` (assembly attribute) and `TaskMaster/AppGlobals/AppFileSystemFolderPaths.cs` (seam), plus optionally `UtilitiesCS/Dialogs/MyBox.cs` only if P5-T1 required a settable seam; all other changes are confined to `ToDoModel.Test/`, `TaskMaster.Test/`, `spec.md`, the plan, and the feature `evidence/` folder. Confirm no `[ExcludeFromCodeCoverage]` add/remove and no edit to `coverage.config`, `TaskMaster.runsettings`, or pipeline scripts. Write `evidence/qa-gates/p5-invariant-check.2026-06-14T15-10.md` with the four required fields and the changed-file list. Acceptance: artifact confirms production changes are limited to the two authorized seams; any other production change is a flag-and-stop.
+- [x] [P5-T13] Check off AC1 and AC3 (and the two-gap Definition of Done line) in `spec.md` as fully delivered and record an issue-update mirror at `evidence/issue-updates/issue-199.2026-06-14T15-10.md` with `Timestamp:`, the exact text, and `PostedAs:`. Acceptance: AC1 and AC3 map to Phase 5 evidence (see AC-to-task map below), the two Flag-and-Stop DoD items are resolved, and the mirror artifact exists.
+
+---
+
 ## Acceptance Criteria to Task Map
 
-- Spec AC "Increment 1 (ToDoModel)" → P1-T1, P1-T2, P1-T3, P1-T4 (tests); P1-T8 (pass); P1-T9 (covered-line increase).
+- Spec AC "Increment 1 (ToDoModel)" / AC1 → P1-T1, P1-T2, P1-T3, P1-T4 (tests); P1-T8 (pass); P1-T9 (covered-line increase). Previously-deferred `ProjectEntry` dialog branches (malformed-ID, change-confirmation, CompareTo tie-break) now fully covered by Phase 5: P5-T2 (UtilitiesCS seam), P5-T3 (tests), P5-T10 (pass), P5-T11 (covered-line increase). AC1 fully PASS.
 - Spec AC "Increment 2 (QuickFiler)" → P2-T1, P2-T2, P2-T3, P2-T4, P2-T5, P2-T6 (tests); P2-T10 (pass); P2-T11 (covered-line increase).
-- Spec AC "Increment 3 (TaskMaster)" → P3-T1, P3-T2, P3-T3 (tests); P3-T7 (pass); P3-T8 (covered-line increase).
+- Spec AC "Increment 3 (TaskMaster)" / AC3 → P3-T1, P3-T2, P3-T3 (tests); P3-T7 (pass); P3-T8 (covered-line increase). Previously-deferred `AppFileSystemFolderPaths.MatchBestSpecialFolder` now fully covered by Phase 5: P5-T4 (seam), P5-T5 (tests), P5-T10 (pass), P5-T11 (covered-line increase). AC3 fully PASS.
 - Spec AC "All tests comply with General + C# Unit Test Policy (MSTest/Moq/FluentAssertions, AAA, deterministic, no temp files, no external deps, no live Outlook/WinForms, no timing/sleep; positive/negative/edge/error scenarios)" → Hard Constraints section + every test task P1-T1..P3-T3.
 - Spec AC "New/changed code achieves >= 90% line coverage; no regression on changed lines" → P1-T9, P2-T11, P3-T8, P4-T5.
 - Spec AC "No exempted COM/VSTO/WinForms code un-exempted or tested; no `[ExcludeFromCodeCoverage]` change; coverage.config/runsettings/pipeline unchanged" → P0-T6, P0-T7, P0-T8 (seam verification), P4-T6 (invariant check).
-- Spec AC "No production behavior change; required new seam is flagged-and-stopped" → Flag-and-Stop Rule, P1-T3, P4-T6.
+- Spec AC "No production behavior change; required new seam is flagged-and-stopped" → Flag-and-Stop Rule, P1-T3, P4-T6. Phase 5 supersedes the test-only constraint for ONLY the two maintainer-authorized seams (option B): no runtime behavior change is preserved (P5-T4 semantics preservation, P5-T12 boundary check); any change beyond the two seams remains flag-and-stop.
+- Spec AC "Authorized seams close AC1/AC3 gaps; coverage strictly increases vs prior #199 state; no production behavior change" (Phase 5 cycle) → P5-T1, P5-T2, P5-T3 (Gap 1 / AC1); P5-T4, P5-T5 (Gap 2 / AC3); P5-T6 (spec re-point); P5-T7..P5-T9 (toolchain); P5-T10 (pass); P5-T11 (coverage delta, strict increase + >= 90% new code); P5-T12 (production-change boundary); P5-T13 (AC check-off + issue mirror).
 - Spec AC "Full C# toolchain passes in a single final pass" → P4-T1, P4-T2, P4-T3, P4-T4.
 - Spec AC "Production-only coverage re-measured and recorded showing net increase vs 71.65%" → P0-T5 (baseline), P4-T4, P4-T5.
 
@@ -168,7 +228,17 @@ MUST include numeric coverage headline values.
 
 - Per-batch budget honored: Phase 1 splits into Batch A (2 files) and Batch B (2 files);
   Phase 2 into Batch A (3 files) and Batch B (3 files); Phase 3 is a single Batch A (3
-  files). No batch exceeds 3 test files.
+  files). No batch exceeds 3 test files. Phase 5 Batch A touches 2 production files
+  (`UtilitiesCS/Properties/AssemblyInfo.cs`; optional `UtilitiesCS/Dialogs/MyBox.cs`) and 1
+  test file (`ProjectEntryDialogBranchesTests.cs`); Phase 5 Batch B touches 1 production file
+  (`TaskMaster/AppGlobals/AppFileSystemFolderPaths.cs`) and 1 test file
+  (`AppFileSystemFolderPathsMatchBestSpecialFolderTests.cs`). Each batch is within the
+  <=3 production + <=3 test file budget.
+- Phase 5 is a maintainer-authorized scope change (option B per
+  `remediation-inputs.2026-06-14T15-10.md`). Phases 0-4 remain complete and are not
+  re-opened. The "Zero production change" plan-wide Hard Constraint is overridden ONLY for
+  the two narrow seams enumerated in Phase 5; all other production/config/pipeline files
+  remain unchanged.
 - Each phase that adds tests runs the full C# toolchain loop (csharpier -> analyzers ->
   nullable/TWAE -> MSTest with coverage) and includes fail-closed baseline/final/
   coverage-comparison evidence tasks.
