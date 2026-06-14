@@ -266,8 +266,12 @@ application settings store, the filesystem, or Outlook.
   `ProjectEntry` (`SetProjectId` happy/null/malformed, `CompareTo` equal/different/null/prefix),
   and the remaining uncovered `BaseChanger` branches; the covered-line count for these seams
   increases. The previously-deferred `ProjectEntry` dialog branches (malformed-ID,
-  change-confirmation Yes/No, and the `CompareTo` length tie-break) are now fully covered by
-  Phase 5 (P5-T2 UtilitiesCS seam, P5-T3 tests, P5-T10 pass, P5-T11 covered-line increase).
+  and the `CompareTo` length tie-break) are covered by Phase 5 (P5-T2 UtilitiesCS seam, P5-T3
+  tests, P5-T10 pass, P5-T11 covered-line increase). The change-confirmation Yes/No sub-branch
+  remains uncovered: it routes through the `ProjectID` property setter's raw `MessageBox.Show`
+  (not the `MyBox` seam) and would require a third production seam beyond those authorized for
+  Phase 5; documented as an authorized-scope Flag-and-Stop in
+  `evidence/other/p5-projectentry-changeconfirm-gap.2026-06-14T15-10.md`.
 - [x] **Increment 2 (QuickFiler):** MSTest tests are added and passing for `KaChar`,
   `KaCharAsync`, `KaKey`, `KaKeyAsync`, `KaStringAsync`, the remaining `KbdActions<>` branches,
   and the pure paths of `FilerQueue` and `QfcQueue`; the covered-line count for these seams
