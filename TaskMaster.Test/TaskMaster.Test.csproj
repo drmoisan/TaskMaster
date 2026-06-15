@@ -259,6 +259,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppGlobals\ApplicationGlobalsTests.cs" />
+    <Compile Include="AppGlobals\ApplicationGlobalsStartupTimingTests.cs" />
     <Compile Include="AppGlobals\StartupTimingRecorderTests.cs" />
     <Compile Include="AppGlobals\AppEventsTests.cs" />
     <Compile Include="AppGlobals\AppFileSystemFolderPathsMatchBestSpecialFolderTests.cs" />
