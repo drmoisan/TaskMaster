@@ -78,24 +78,109 @@ namespace ToDoModel.Test
             invocationCount.Should().Be(1, "the error dialog seam is invoked exactly once");
         }
 
-        // ---- SetProjectId / ChangeId: change-confirmation branch (FLAG-AND-STOP, not covered) ----
-        //
-        // The change-confirmation branch (a valid existing id replaced by a different valid id)
-        // routes SetProjectId -> ChangeId, and ChangeId completes by assigning `ProjectID = newID`
-        // (ProjectEntry.cs line ~166). That assignment runs the ProjectID *property setter*
-        // (ProjectEntry.cs lines 49-76), whose `_projectID != value` arm calls a RAW, un-seamed
-        // System.Windows.Forms.MessageBox.Show — NOT the MyBox.DialogInvoker seam. Injecting the
-        // MyBox stub therefore cannot prevent a real modal dialog from being shown when the id is
-        // committed, which blocks the STA test thread (verified: the change-confirmation tests hang
-        // under vstest while the seam-only malformed and CompareTo tests pass).
-        //
-        // Covering this branch would require adding the MyBox seam to the ProjectID property setter
-        // (a THIRD production change beyond the two seams authorized for Phase 5). Per the plan
-        // Flag-and-Stop Rule and the Phase 5 hard constraint limiting production changes to the two
-        // authorized seams, this branch is intentionally NOT exercised. The gap is recorded in
-        // evidence/other/p5-projectentry-changeconfirm-gap.2026-06-14T15-10.md. The malformed-ID
-        // dialog branch (below) and the CompareTo length tie-break ARE reachable via the authorized
-        // MyBox.DialogInvoker seam and are covered here.
+        // ---- ProjectID setter: change-confirmation branch ----
+
+        /// <summary>
+        /// Asserts that assigning a different valid 4-char ID to an entry that already has a valid
+        /// 4-char ID updates <see cref="ProjectEntry.ProjectID"/> to the new value when the
+        /// change-confirmation dialog seam returns <see cref="DialogResult.Yes"/>.
+        /// </summary>
+        [TestMethod]
+        public void SetProjectId_ChangeConfirmedYes_UpdatesProjectId()
+        {
+            // Arrange
+            var entry = NewEntry("AAAA");
+            MyBox.DialogInvoker = _ => DialogResult.Yes;
+
+            // Act
+            entry.ProjectID = "BBBB";
+
+            // Assert
+            entry.ProjectID.Should().Be("BBBB", "the id is updated when the user confirms Yes");
+        }
+
+        /// <summary>
+        /// Asserts that assigning a different valid 4-char ID leaves <see cref="ProjectEntry.ProjectID"/>
+        /// unchanged when the change-confirmation dialog seam returns <see cref="DialogResult.No"/>.
+        /// </summary>
+        [TestMethod]
+        public void SetProjectId_ChangeConfirmedNo_LeavesProjectIdUnchanged()
+        {
+            // Arrange
+            var entry = NewEntry("AAAA");
+            MyBox.DialogInvoker = _ => DialogResult.No;
+
+            // Act
+            entry.ProjectID = "BBBB";
+
+            // Assert
+            entry
+                .ProjectID.Should()
+                .Be("AAAA", "the id is not changed when the user declines the confirmation");
+        }
+
+        /// <summary>
+        /// Asserts that when both the change-confirmation and the update-action secondary dialogs
+        /// return <see cref="DialogResult.Yes"/>, the registered <see cref="ProjectEntry.SetIdUpdateAction"/>
+        /// delegate is invoked exactly once with the old and new ID values.
+        /// </summary>
+        [TestMethod]
+        public void SetProjectId_ChangeConfirmedYes_WithUpdateAction_InvokesAction()
+        {
+            // Arrange
+            var entry = NewEntry("AAAA");
+            string capturedOld = null;
+            string capturedNew = null;
+            entry.SetIdUpdateAction(
+                (o, n) =>
+                {
+                    capturedOld = o;
+                    capturedNew = n;
+                }
+            );
+            MyBox.DialogInvoker = _ => DialogResult.Yes;
+
+            // Act
+            entry.ProjectID = "CCCC";
+
+            // Assert
+            entry.ProjectID.Should().Be("CCCC", "the id is updated when the user confirms Yes");
+            capturedOld.Should().Be("AAAA", "the action receives the old id as the first argument");
+            capturedNew
+                .Should()
+                .Be("CCCC", "the action receives the new id as the second argument");
+        }
+
+        /// <summary>
+        /// Asserts that when the change-confirmation dialog returns <see cref="DialogResult.No"/>,
+        /// the registered <see cref="ProjectEntry.SetIdUpdateAction"/> delegate is not invoked.
+        /// </summary>
+        [TestMethod]
+        public void SetProjectId_ChangeConfirmedNo_WithUpdateAction_DoesNotInvokeAction()
+        {
+            // Arrange
+            var entry = NewEntry("AAAA");
+            string capturedOld = null;
+            string capturedNew = null;
+            entry.SetIdUpdateAction(
+                (o, n) =>
+                {
+                    capturedOld = o;
+                    capturedNew = n;
+                }
+            );
+            MyBox.DialogInvoker = _ => DialogResult.No;
+
+            // Act
+            entry.ProjectID = "CCCC";
+
+            // Assert
+            entry
+                .ProjectID.Should()
+                .Be("AAAA", "the id is not changed when the user declines the confirmation");
+            capturedOld.Should().BeNull("the action is not invoked when the user declines");
+            capturedNew.Should().BeNull("the action is not invoked when the user declines");
+        }
 
         // ---- CompareTo(IProjectEntry): length tie-break branch ----
         //

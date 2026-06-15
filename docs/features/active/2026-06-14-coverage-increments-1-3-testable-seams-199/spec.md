@@ -42,7 +42,14 @@ this feature is the post-#197 71.65% figure.
   `MyBox` member behavior changes and the seam still defaults to the real dialog in
   production), and (2) the `TaskMaster.AppFileSystemFolderPaths.MatchBestSpecialFolder`
   pure-helper extraction (the instance method delegates to a new `internal static` helper with
-  byte-for-byte identical matching semantics). Neither seam changes any runtime behavior.
+  byte-for-byte identical matching semantics). Neither seam changes any runtime behavior. A
+  third production seam was authorized by the maintainer in the Phase 6 remediation directive
+  (`remediation-inputs.2026-06-14T17-00.md`): the `ProjectEntry.ProjectID` property setter's
+  three `MessageBox.Show(...)` calls were replaced with equivalent `MyBox.ShowDialog(...)`
+  calls, routing the malformed-ID warning and the two change-confirmation dialogs through the
+  injectable `MyBox.DialogInvoker` seam. Runtime behavior is preserved exactly — dialog text,
+  button styles, icons, and `DialogResult.Yes` return-value comparisons are identical; only the
+  call routing changes.
 - **No change to the #197 exemption boundary.** No `[ExcludeFromCodeCoverage]` attribute is
   added or removed. No COM/VSTO/WinForms code that #197 exempted is un-exempted or tested.
 - **Coverage pipeline structure unchanged.** No edits to `coverage.config`,
@@ -260,7 +267,7 @@ application settings store, the filesystem, or Outlook.
 
 ## Acceptance Criteria
 
-- [x] **Increment 1 (ToDoModel):** MSTest tests are added and passing for
+- [x] **Increment 1 (ToDoModel) — FULLY PASS:** MSTest tests are added and passing for
   `ToDoLoader.SetAndSave<T>` (all four overloads, read-only guard, null `objectSetter`, null
   `objectSaver`), `IDList.GetNextToDoID(string)` (base case, ID-present loop, length boundary),
   `ProjectEntry` (`SetProjectId` happy/null/malformed, `CompareTo` equal/different/null/prefix),
@@ -268,10 +275,12 @@ application settings store, the filesystem, or Outlook.
   increases. The previously-deferred `ProjectEntry` dialog branches (malformed-ID,
   and the `CompareTo` length tie-break) are covered by Phase 5 (P5-T2 UtilitiesCS seam, P5-T3
   tests, P5-T10 pass, P5-T11 covered-line increase). The change-confirmation Yes/No sub-branch
-  remains uncovered: it routes through the `ProjectID` property setter's raw `MessageBox.Show`
-  (not the `MyBox` seam) and would require a third production seam beyond those authorized for
-  Phase 5; documented as an authorized-scope Flag-and-Stop in
-  `evidence/other/p5-projectentry-changeconfirm-gap.2026-06-14T15-10.md`.
+  is now fully covered by Phase 6: the third authorized production seam replaces the raw
+  `MessageBox.Show` calls in the `ProjectID` property setter with `MyBox.ShowDialog` (routing
+  through the injectable `MyBox.DialogInvoker` seam), and four new tests in
+  `ProjectEntryDialogBranchesTests.cs` exercise the Yes/No confirmation and the
+  update-action branches. The Flag-and-Stop residual recorded in
+  `evidence/other/p5-projectentry-changeconfirm-gap.2026-06-14T15-10.md` is closed.
 - [x] **Increment 2 (QuickFiler):** MSTest tests are added and passing for `KaChar`,
   `KaCharAsync`, `KaKey`, `KaKeyAsync`, `KaStringAsync`, the remaining `KbdActions<>` branches,
   and the pure paths of `FilerQueue` and `QfcQueue`; the covered-line count for these seams
@@ -303,16 +312,16 @@ application settings store, the filesystem, or Outlook.
 ## Definition of Done
 
 - [x] Increment 1, 2, and 3 tests added and passing in their respective `.Test` projects.
-- [ ] All target seams enumerated in Scope are covered with positive/negative/edge/error scenarios.
+- [x] All target seams enumerated in Scope are covered with positive/negative/edge/error scenarios.
   (Phase 5 closed AppFileSystemFolderPaths.MatchBestSpecialFolder fully (P5-T4/P5-T5) and the
   ProjectEntry malformed-ID dialog branch plus the CompareTo length tie-break (P5-T2/P5-T3 via the
-  UtilitiesCS `InternalsVisibleTo` seam). One residual gap remains: the ProjectEntry
-  change-confirmation branch (SetProjectId -> ChangeId) cannot be covered without a THIRD production
-  seam, because ChangeId commits via the ProjectID property setter whose RAW un-seamed
-  MessageBox.Show is outside the two authorized Phase 5 seams. This is an authorized-scope
-  flag-and-stop recorded in evidence/other/p5-projectentry-changeconfirm-gap.2026-06-14T15-10.md;
-  it requires separate maintainer direction (route the property setter through MyBox). Left
-  unchecked because not all enumerated dialog scenarios are covered.)
+  UtilitiesCS `InternalsVisibleTo` seam). Phase 6 closed the final residual gap: the ProjectEntry
+  change-confirmation branch (ProjectID setter) is now fully covered via the third authorized
+  production seam (MessageBox.Show -> MyBox.ShowDialog replacement, authorized by the maintainer
+  in remediation-inputs.2026-06-14T17-00.md) and four new tests in
+  ProjectEntryDialogBranchesTests.cs (Yes/No confirmation, with/without update-action). The
+  flag-and-stop recorded in evidence/other/p5-projectentry-changeconfirm-gap.2026-06-14T15-10.md
+  is now closed. All enumerated seam dialog scenarios are covered.)
 - [x] New/changed code >= 90% coverage; no regression on changed lines.
 - [x] No production code, config, or pipeline change (or any required seam flagged and resolved
   with maintainer direction).

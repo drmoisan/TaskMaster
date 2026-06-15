@@ -37,9 +37,12 @@ namespace ToDoModel
             {
                 if ((value is not null) && (value.Length != 4))
                 {
-                    MessageBox.Show(
+                    MyBox.ShowDialog(
                         $"{nameof(ProjectID)} cannot be set with malformed value {value}."
-                            + "Value should be 4 digits or characters"
+                            + "Value should be 4 digits or characters",
+                        "Dialog",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
                     );
                 }
                 else if (_projectID is null)
@@ -48,7 +51,7 @@ namespace ToDoModel
                 }
                 else if (_projectID != value)
                 {
-                    var response = MessageBox.Show(
+                    var response = MyBox.ShowDialog(
                         $"Are you sure you want to change {nameof(ProjectID)} from"
                             + $"{_projectID} to {value}",
                         "Dialog",
@@ -59,7 +62,7 @@ namespace ToDoModel
                     {
                         if (_idUpdate is not null)
                         {
-                            var response2 = MessageBox.Show(
+                            var response2 = MyBox.ShowDialog(
                                 "Would you like to change underlying outlook objects, "
                                     + "child objects, and update ID List?",
                                 "Dialog",
