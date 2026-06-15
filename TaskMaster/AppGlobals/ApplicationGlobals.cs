@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
+using TaskMaster.Properties;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.HelperClasses;
@@ -19,6 +20,14 @@ namespace TaskMaster
         );
 
         private Application _outlookApp;
+
+        // Diagnostic startup-timing instrumentation (issue #202). The recorder is selected in
+        // LoadAsync from Settings.Default.StartupTimingEnabled: the concrete recorder when
+        // enabled, the no-op recorder when disabled, so the coordinator records and emits
+        // unconditionally. _loadBasicElapsed holds the LoadBasicMethod() measurement, which is
+        // taken at construction time (via the BasicLoaded Lazy) before LoadAsync runs.
+        private IStartupTimingRecorder _timingRecorder = new NullStartupTimingRecorder();
+        private TimeSpan _loadBasicElapsed;
 
         public ApplicationGlobals(Application olApp)
         {
@@ -47,6 +56,22 @@ namespace TaskMaster
         public async Task LoadAsync(bool parallel = true)
         {
             ForceBasicLoad();
+
+            // Read the diagnostic timing flag exactly once (mirrors the Settings.Default
+            // consumption pattern used for EventsHooked). When enabled, record the
+            // construction-time LoadBasic measurement as the first phase; when disabled, the
+            // no-op recorder absorbs all recording and emission.
+            var timingEnabled = Settings.Default.StartupTimingEnabled;
+            if (timingEnabled)
+            {
+                _timingRecorder = new StartupTimingRecorder();
+                _timingRecorder.RecordPhase("LoadBasic", _loadBasicElapsed);
+            }
+            else
+            {
+                _timingRecorder = new NullStartupTimingRecorder();
+            }
+
             if (parallel)
             {
                 await LoadParallelAsync();
@@ -55,6 +80,10 @@ namespace TaskMaster
             {
                 await LoadSequentialAsync();
             }
+
+            // Emit the single [Startup timing] table at the end of startup. On the flag-off
+            // path the no-op recorder emits nothing.
+            _timingRecorder.EmitTable(logger);
         }
 
         internal Lazy<bool> BasicLoaded;
@@ -64,8 +93,18 @@ namespace TaskMaster
             _ = BasicLoaded.Value;
         }
 
-        private void LoadBasicMethod()
+        // protected internal virtual to provide a test seam: focused MSTests override this to
+        // set _loadBasicElapsed deterministically and skip live COM collaborator construction
+        // while still driving LoadAsync end-to-end. Production behavior is unchanged.
+        protected internal virtual void LoadBasicMethod()
         {
+            // The LoadBasic measurement is UNCONDITIONAL: ForceBasicLoad() runs inside the
+            // ApplicationGlobals(Application, loadBasic: true) constructor, materializing the
+            // BasicLoaded Lazy BEFORE LoadAsync runs, so measuring around ForceBasicLoad() in
+            // LoadAsync would record ~0. A single Stopwatch start/stop with no allocation is
+            // negligible overhead, satisfying the "negligible overhead when flag off" constraint.
+            // Stopwatch (hardware-counter based) is used instead of DateTime.Now/UtcNow.
+            var stopwatch = Stopwatch.StartNew();
             _fs = new AppFileSystemFolderPaths();
             _olObjects = new AppOlObjects(_outlookApp, this);
             _toDoObjects = new AppToDoObjects(this);
@@ -73,6 +112,8 @@ namespace TaskMaster
             _events = new AppEvents(this);
             _quickFilerSettings = new AppQuickFilerSettings();
             Engines = new AppItemEngines(this);
+            stopwatch.Stop();
+            _loadBasicElapsed = stopwatch.Elapsed;
         }
 
         public async Task LoadParallelAsync()
@@ -89,17 +130,39 @@ namespace TaskMaster
 
         public async Task LoadSequentialAsync()
         {
+            // Each phase keeps its existing direct await (COM-sensitive phases stay on the
+            // caller thread) and is wrapped with a Stopwatch so its elapsed time is recorded
+            // once, in startup order. The recorder is the no-op recorder unless the timing flag
+            // is on, so nothing is recorded when disabled. Yield calls are not recorded.
+            var stopwatch = Stopwatch.StartNew();
             await LoadIntelConfigPhaseAsync();
+            _timingRecorder.RecordPhase("IntelConfig", StopAndRestart(stopwatch));
             await YieldBetweenStartupPhasesAsync();
             await LoadOlObjectsPhaseAsync();
+            _timingRecorder.RecordPhase("OlObjects", StopAndRestart(stopwatch));
             await YieldBetweenStartupPhasesAsync();
             await LoadToDoPhaseAsync();
+            _timingRecorder.RecordPhase("ToDo", StopAndRestart(stopwatch));
             await YieldBetweenStartupPhasesAsync();
             await LoadAutoFilePhaseAsync();
+            _timingRecorder.RecordPhase("AutoFile", StopAndRestart(stopwatch));
             await YieldBetweenStartupPhasesAsync();
             await InitializeEnginesPhaseAsync();
+            _timingRecorder.RecordPhase("Engines", StopAndRestart(stopwatch));
             await YieldBetweenStartupPhasesAsync();
             await LoadEventsPhaseAsync();
+            _timingRecorder.RecordPhase("Events", StopAndRestart(stopwatch));
+        }
+
+        // Captures the elapsed time of the just-completed phase and resets the shared stopwatch
+        // for the next phase. The yield between phases is excluded because the stopwatch is read
+        // and restarted immediately after each phase's await completes.
+        private static TimeSpan StopAndRestart(Stopwatch stopwatch)
+        {
+            stopwatch.Stop();
+            var elapsed = stopwatch.Elapsed;
+            stopwatch.Restart();
+            return elapsed;
         }
 
         // These narrow wrappers keep production behavior unchanged while letting focused MSTests
