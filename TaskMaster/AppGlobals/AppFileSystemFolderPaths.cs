@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -55,11 +56,34 @@ namespace TaskMaster
 
         public string MatchBestSpecialFolder(string path)
         {
-            if (SpecialFolders.IsNullOrEmpty())
+            // Delegate to the pure static helper so the matching logic can be unit-tested with an
+            // in-memory folder collection (no filesystem access / no LoadFolders). The instance
+            // SpecialFolders dictionary is passed unchanged; behavior is identical.
+            return MatchBestSpecialFolder(SpecialFolders, path);
+        }
+
+        /// <summary>
+        /// Pure special-folder matching helper. Given a folder collection and a path, returns the
+        /// key of the entry whose value is contained in <paramref name="path"/> and is the longest
+        /// such value, or null when the collection is null/empty or no value is contained.
+        /// </summary>
+        /// <remarks>
+        /// Behavior is byte-for-byte identical to the original instance method body: a
+        /// null/empty collection returns null; matching uses ordinal <c>string.Contains</c>;
+        /// candidates are ordered by descending value length and the first key is returned
+        /// (null when no candidate matches). No filesystem access. Introduced as a pure seam to
+        /// enable deterministic unit testing without changing runtime behavior.
+        /// </remarks>
+        internal static string MatchBestSpecialFolder(
+            IReadOnlyDictionary<string, string> specialFolders,
+            string path
+        )
+        {
+            if (specialFolders.IsNullOrEmpty())
             {
                 return null;
             }
-            var bestMatch = SpecialFolders
+            var bestMatch = specialFolders
                 .Where(x => path.Contains(x.Value))
                 .OrderByDescending(x => x.Value.Length)
                 .FirstOrDefault();

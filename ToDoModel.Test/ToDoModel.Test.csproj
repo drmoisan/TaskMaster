@@ -55,6 +55,11 @@
   <ItemGroup>
     <Compile Include="AssertAll.cs" />
     <Compile Include="Data Model\ID\BaseChangerTests.cs" />
+    <Compile Include="Data Model\ID\BaseChangerRemainingBranchesTests.cs" />
+    <Compile Include="Data Model\ID\IDListGetNextToDoIDTests.cs" />
+    <Compile Include="Data Model\Project\ProjectEntryTests.cs" />
+    <Compile Include="Data Model\Project\ProjectEntryDialogBranchesTests.cs" />
+    <Compile Include="Data Model\ToDo\ToDoLoaderSetAndSaveTests.cs" />
     <Compile Include="Data Model\People\PeopleScoDictionaryNewTests.cs" />
     <Compile Include="Data Model\ToDo\SpecialMockMail.cs" />
     <Compile Include="Data Model\ToDo\SpecialMockOutlookItem.cs" />

@@ -131,6 +131,60 @@ namespace UtilitiesCS.Test.Threading
                 .Invoke(null, new object[] { CreateEventArgs(DateTime.Now.AddSeconds(-1)) });
         }
 
+        /// <summary>
+        /// Returns the private static <c>UiThread._dispatcher</c> backing field via reflection.
+        ///
+        /// Purpose:
+        ///     Centralises access to the process-global Dispatcher backing field so the
+        ///     Dispatcher-null reset/restore helpers share one FieldInfo lookup.
+        /// </summary>
+        private static FieldInfo DispatcherField()
+        {
+            return typeof(UiThread).GetField(
+                "_dispatcher",
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
+        }
+
+        /// <summary>
+        /// Forces the process-global <c>UiThread.Dispatcher</c> to null via reflection and
+        /// returns the captured prior value so the caller can restore it afterward.
+        ///
+        /// Purpose:
+        ///     UiThread.Dispatcher is process-global, set-once static state. If any earlier
+        ///     test in this assembly triggers UiThread.Initialize(), Dispatcher becomes
+        ///     non-null for the remainder of the run, which silently changes the routing
+        ///     branch under test. Resetting it to null here guarantees the documented
+        ///     "Dispatcher unavailable" precondition deterministically, independent of test
+        ///     ordering or parallelism. This is a determinism fix, not an assertion change.
+        ///
+        /// Returns:
+        ///     The prior value of UiThread.Dispatcher (may be null), for later restoration.
+        /// </summary>
+        private static object ForceDispatcherNull()
+        {
+            var field = DispatcherField();
+            var prior = field.GetValue(null);
+            field.SetValue(null, null);
+            return prior;
+        }
+
+        /// <summary>
+        /// Restores a previously captured <c>UiThread.Dispatcher</c> value via reflection.
+        ///
+        /// Purpose:
+        ///     Reverses <see cref="ForceDispatcherNull"/> so this test does not contaminate
+        ///     other tests in the assembly that may observe UiThread.Dispatcher. Restoration
+        ///     must run whether the test passes or fails.
+        ///
+        /// Args:
+        ///     priorValue (object): The value previously returned by ForceDispatcherNull().
+        /// </summary>
+        private static void RestoreDispatcher(object priorValue)
+        {
+            DispatcherField().SetValue(null, priorValue);
+        }
+
         #endregion Helpers
 
         #region P27-T1 — task runs exactly once
@@ -193,32 +247,46 @@ namespace UtilitiesCS.Test.Threading
         {
             // Arrange: one entry routed through the Dispatcher path.
             ResetStaticState();
-            int callCount = 0;
-            Func<Task> asyncAction = () =>
+
+            // Force the process-global UiThread.Dispatcher to null so the documented
+            // "Dispatcher unavailable" precondition holds regardless of whether an earlier
+            // test in this assembly initialized it. Capture the prior value for restoration.
+            var priorDispatcher = ForceDispatcherNull();
+            try
             {
-                callCount++;
-                return Task.CompletedTask;
-            };
-            IdleAsyncQueue.AddEntry(true, asyncAction);
+                int callCount = 0;
+                Func<Task> asyncAction = () =>
+                {
+                    callCount++;
+                    return Task.CompletedTask;
+                };
+                IdleAsyncQueue.AddEntry(true, asyncAction);
 
-            // Act: InvokeOnIdle triggers the Dispatcher-routing branch; null Dispatcher
-            // causes NullReferenceException that is caught internally.
-            Action actDelegate = () => InvokeOnIdle();
-            actDelegate
-                .Should()
-                .NotThrow(
-                    "exceptions after the await in the Dispatcher path are caught by the internal try/catch"
-                );
+                // Act: InvokeOnIdle triggers the Dispatcher-routing branch; null Dispatcher
+                // causes NullReferenceException that is caught internally.
+                Action actDelegate = () => InvokeOnIdle();
+                actDelegate
+                    .Should()
+                    .NotThrow(
+                        "exceptions after the await in the Dispatcher path are caught by the internal try/catch"
+                    );
 
-            // Assert: entry was dequeued regardless of dispatch failure.
-            GetEntries()
-                .Count.Should()
-                .Be(0, "the entry must be dequeued even when dispatch to UiThread fails");
+                // Assert: entry was dequeued regardless of dispatch failure.
+                GetEntries()
+                    .Count.Should()
+                    .Be(0, "the entry must be dequeued even when dispatch to UiThread fails");
 
-            // Action did not execute because the null Dispatcher prevented InvokeAsync.
-            callCount
-                .Should()
-                .Be(0, "action must not run when the UiThread Dispatcher is unavailable");
+                // Action did not execute because the null Dispatcher prevented InvokeAsync.
+                callCount
+                    .Should()
+                    .Be(0, "action must not run when the UiThread Dispatcher is unavailable");
+            }
+            finally
+            {
+                // Restore the prior Dispatcher so this test does not contaminate other
+                // tests in the assembly. Runs whether the test passes or fails.
+                RestoreDispatcher(priorDispatcher);
+            }
         }
 
         #endregion P27-T2 — UI-thread routing
