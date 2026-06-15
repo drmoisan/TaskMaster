@@ -118,23 +118,23 @@ replaced with the canonical path, recorded as
 
 ### Phase 2 — Final QA Loop and CI Verification
 
-- [ ] [P2-T1] Run formatting: `dotnet tool run csharpier .`. Record the result in
+- [x] [P2-T1] Run formatting: `dotnet tool run csharpier .`. Record the result in
   `docs/features/active/2026-06-14-coverage-increments-1-3-testable-seams-199/evidence/qa-gates/remediation-final-csharpier.2026-06-15T14-00.md`.
   Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and `Output Summary:`. If
   formatting changes any file, restart the loop at P2-T1.
-- [ ] [P2-T2] Run linting/analyzers:
+- [x] [P2-T2] Run linting/analyzers:
   `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`.
   Record the result in
   `docs/features/active/2026-06-14-coverage-increments-1-3-testable-seams-199/evidence/qa-gates/remediation-final-analyzers.2026-06-15T14-00.md`.
   Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and `Output Summary:` with a
   clean analyzer result. If the build fails or files change, restart at P2-T1.
-- [ ] [P2-T3] Run type-check/nullable:
+- [x] [P2-T3] Run type-check/nullable:
   `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`.
   Record the result in
   `docs/features/active/2026-06-14-coverage-increments-1-3-testable-seams-199/evidence/qa-gates/remediation-final-nullable.2026-06-15T14-00.md`.
   Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and `Output Summary:` with no
   nullable warnings-as-errors. If the build fails or files change, restart at P2-T1.
-- [ ] [P2-T4] Run the FULL `UtilitiesCS.Test` assembly with coverage (not the single test in
+- [x] [P2-T4] Run the FULL `UtilitiesCS.Test` assembly with coverage (not the single test in
   isolation): `vstest.console.exe <UtilitiesCS.Test assembly path> /EnableCodeCoverage`, directing the
   raw Cobertura XML to `artifacts/csharp/` only. Record the coverage-bearing result summary in
   `docs/features/active/2026-06-14-coverage-increments-1-3-testable-seams-199/evidence/qa-gates/remediation-final-mstest-coverage.2026-06-15T14-00.md`.
@@ -142,19 +142,19 @@ replaced with the canonical path, recorded as
   total/passed/failed counts (0 failed), the post-change coverage headline percent for the testable
   denominator, and explicit confirmation that the full assembly passed. The raw Cobertura XML path is
   recorded as `artifacts/csharp/...`. If any step changed files, restart at P2-T1.
-- [ ] [P2-T5] Verify order-independence of the fixed test by confirming
+- [x] [P2-T5] Verify order-independence of the fixed test by confirming
   `AddEntry_UseUiThreadTrue_DequeuesEntryAndSuppressesDispatcherException` passes within the full
   `UtilitiesCS.Test` assembly run from P2-T4 (the run that exercises the same execution-ordering that
   surfaced the failure). Record the determinism confirmation in
   `docs/features/active/2026-06-14-coverage-increments-1-3-testable-seams-199/evidence/qa-gates/remediation-determinism-check.2026-06-15T14-00.md`.
   Acceptance: artifact contains `Timestamp:`, the test's pass result within the full-assembly run, and
   a statement that the deterministic `_dispatcher`-null Arrange/restore removes the order dependence.
-- [ ] [P2-T6] Confirm and record coverage no-regression versus the Phase 0 baseline in
+- [x] [P2-T6] Confirm and record coverage no-regression versus the Phase 0 baseline in
   `docs/features/active/2026-06-14-coverage-increments-1-3-testable-seams-199/evidence/qa-gates/remediation-coverage-delta.2026-06-15T14-00.md`.
   Acceptance: artifact reports baseline coverage (from P0-T5), post-change coverage (from P2-T4), and a
   statement that changed-line coverage did not regress. Because the change is test-only, production
   coverage must not decrease.
-- [ ] [P2-T7] Confirm PR #201 required check `Format, build, analyze, and test` reports green against
+- [x] [P2-T7] Confirm PR #201 required check `Format, build, analyze, and test` reports green against
   the branch head after the fix is pushed, and mirror the result in
   `docs/features/active/2026-06-14-coverage-increments-1-3-testable-seams-199/evidence/qa-gates/remediation-ci-check.2026-06-15T14-00.md`.
   Acceptance: artifact contains `Timestamp:`, the CI run/job reference, and the check conclusion. If
