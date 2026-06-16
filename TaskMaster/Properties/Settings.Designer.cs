@@ -670,5 +670,17 @@ namespace TaskMaster.Properties {
                 this["JunkPotential"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool StartupTimingEnabled {
+            get {
+                return ((bool)(this["StartupTimingEnabled"]));
+            }
+            set {
+                this["StartupTimingEnabled"] = value;
+            }
+        }
     }
 }

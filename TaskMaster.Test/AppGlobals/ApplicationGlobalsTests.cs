@@ -2,13 +2,12 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS;
@@ -20,6 +19,28 @@ namespace TaskMaster.Test.AppGlobals
     [TestClass]
     public class ApplicationGlobalsTests
     {
+        private bool _originalStartupTimingEnabled;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            // Save and force the diagnostic timing flag off by default so flag-dependent tests
+            // start from a known state; each test sets the value it needs explicitly.
+            _originalStartupTimingEnabled = TaskMaster
+                .Properties
+                .Settings
+                .Default
+                .StartupTimingEnabled;
+            TaskMaster.Properties.Settings.Default.StartupTimingEnabled = false;
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            TaskMaster.Properties.Settings.Default.StartupTimingEnabled =
+                _originalStartupTimingEnabled;
+        }
+
         [TestMethod]
         public void Constructor_WithoutLoadBasic_DoesNotMaterializeCollaboratorsUntilForceBasicLoad()
         {
@@ -211,14 +232,36 @@ namespace TaskMaster.Test.AppGlobals
             );
             var methodBody = ExtractMethodBody(source, "public async Task LoadSequentialAsync()");
 
+            // The startup-timing instrumentation (issue #202) inserts a single per-phase
+            // RecordPhase call after each phase await, so the ToDo/yield/AutoFile awaits are no
+            // longer textually adjacent. The ordering guarantee is preserved: the ToDo phase is
+            // awaited, then the yield boundary, then the auto-file phase, with only the timing
+            // RecordPhase statement(s) interleaved. The pattern below asserts that ordering while
+            // tolerating the interleaved instrumentation.
             Regex
                 .IsMatch(
                     methodBody,
-                    @"await\s+LoadToDoPhaseAsync\(\)\s*;\s*await\s+YieldBetweenStartupPhasesAsync\(\)\s*;\s*await\s+LoadAutoFilePhaseAsync\(\)\s*;"
+                    @"await\s+LoadToDoPhaseAsync\(\)\s*;[\s\S]*?await\s+YieldBetweenStartupPhasesAsync\(\)\s*;[\s\S]*?await\s+LoadAutoFilePhaseAsync\(\)\s*;"
                 )
                 .Should()
                 .BeTrue(
                     "LoadSequentialAsync should yield after the ToDo phase and before the auto-file phase."
+                );
+            // Guard that nothing other than timing instrumentation was interleaved between the
+            // ToDo await and the yield: only a _timingRecorder.RecordPhase(...) call is allowed.
+            var toDoToYield = Regex.Match(
+                methodBody,
+                @"await\s+LoadToDoPhaseAsync\(\)\s*;(?<between>[\s\S]*?)await\s+YieldBetweenStartupPhasesAsync\(\)\s*;"
+            );
+            toDoToYield.Success.Should().BeTrue();
+            Regex
+                .IsMatch(
+                    toDoToYield.Groups["between"].Value,
+                    @"^\s*(_timingRecorder\.RecordPhase\([^;]*\);\s*)?$"
+                )
+                .Should()
+                .BeTrue(
+                    "only the startup-timing RecordPhase call may sit between the ToDo phase and the yield boundary."
                 );
         }
 
