@@ -117,6 +117,29 @@ while preserving the current incremental-update and abstention behavior.
       file exceeds 500 lines, and all new prediction and evaluation logic is pure and testable without
       Outlook COM.
 
+### Cycle 3 — production migration (added 2026-06-16; option B, default-ON)
+
+- [ ] **AC21 — Production enablement, default ON via reachable config.** The `UseLcppnPredictor`
+      setting is sourced from the application's persistent settings/config rather than a hard-coded
+      per-instance default, defaults to ON (`true`), and is honored by the production callers
+      (`EmailFiler`, `SortEmail`, `FolderScorer`) so the LCPPN predictor is selected at runtime in
+      production. The setting remains toggleable to OFF, which restores flat-only behavior (AC13
+      preserved). No per-call site is required to hand-set the flag.
+- [ ] **AC22 — Safe fallback to flat.** When the setting is ON but `Globals.AF.FolderPredictor` is
+      null or not yet built (first run before build, or load failure), `GetFolderPredictorAsync`
+      returns the flat `BayesianClassifierGroup` without throwing. Covered by a regression test.
+- [ ] **AC23 — Persistence and load-on-startup.** `LcppnFolderPredictor` is serialized to its own
+      file (distinct from `Folder.json`) and is rehydrated into `Globals.AF.FolderPredictor` at
+      application startup (via the `AppAutoFileObjects` load path / `Manager.Configuration`
+      registration), so it survives an application restart without requiring a manual
+      `BuildClassifiersAsync` rerun. If the persisted file is absent or unreadable, the holder stays
+      null and the accessor falls back to flat (AC22). Covered by serialization round-trip and
+      load-path tests.
+- [ ] **AC24 — Containment and non-regression.** Spam/triage/category/actionable subsystems and the
+      `ManagerAsyncLazy` value typing remain unchanged (zero diff); AC1–AC20 remain satisfied; new and
+      changed lines meet coverage policy (new code >= 90% strict, repository-wide >= 80%); the full C#
+      toolchain passes in order in a single final pass.
+
 ## Non-Goals
 
 Call out what is explicitly excluded from this feature.
@@ -127,5 +150,11 @@ Call out what is explicitly excluded from this feature.
   iteration; only hierarchical-shrinkage Naive Bayes with a cold-start NB fallback.
 - No incremental reparenting; a moved folder subtree is handled by a full rebuild.
 - No embedding-based or learned feature representations; only the existing token-count features.
-- No removal of or breaking change to the flat predictor or its serialized `Folder.json`; the flat
-  path remains the default.
+- No removal of or breaking change to the flat predictor or its serialized `Folder.json`. As of the
+  cycle-3 migration (option B), the flat predictor is retained as the runtime fallback path rather
+  than the default selection; LCPPN becomes the default-ON selection per AC21, and flat-only behavior
+  is still reachable by toggling the setting OFF (AC13).
+- Extending LCPPN to non-folder classifiers (spam, triage, category/multiclass, actionable) remains
+  out of scope.
+- Retiring the always-on flat rebuild in `BuildClassifiersAsync` is out of scope; the flat group is
+  intentionally still built and serialized to serve as the fallback.
