@@ -14,3 +14,4 @@
 - [Honor user's per-cycle folder layout](feedback_verify_flat_artifact_layout_after_executor.md) — #181 user committed a per-cycle folder layout (<ts>-remediation/, <ts>-audit/); follow it. Only revert UNDIRECTED agent relocations, not the user's own reorg
 - [Repo-wide coverage authority exception](feedback_repowide_coverage_authority_exception.md) — sole blocking finding = pre-existing repo-wide coverage shortfall + change-scope gates pass → surface authority-scoped exception, don't auto-cycle
 - [Migration posture before PR gate](feedback_migration_not_just_patch.md) — before step 10, report integration/migration posture (reachable in prod? persisted? old path retired?), not just a clean audit
+- [Verify repro before bugfix cycle](feedback_verify_repro_before_bugfix_cycle.md) — for a latent/worked-around defect, ground-truth its reachability on HEAD before a red-before-green cycle; a correct workaround can make it unreproducible

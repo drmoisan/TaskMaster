@@ -140,6 +140,24 @@ while preserving the current incremental-update and abstention behavior.
       changed lines meet coverage policy (new code >= 90% strict, repository-wide >= 80%); the full C#
       toolchain passes in order in a single final pass.
 
+### Cycle 4 — root-cause hardening (added 2026-06-16; closed no-fix-required)
+
+- [x] **AC25 — FilePathHelper deserialize-safe.** SATISFIED ON HEAD WITH NO CODE CHANGE REQUIRED.
+      Investigation (two independent confirmations — an empirical executor probe across five document
+      orderings and a code-path trace, recorded in
+      `artifacts/research/2026-06-16-lcppn-deserialize-nre-research.md`) established that the
+      previously-reported `FilePathHelper` deserialize `NullReferenceException` is **not reproducible on
+      HEAD**: (a) `StemInitialized()` never returns true while `_fileExtension` is null because
+      `TryParseFileName()` self-heals the stem backing fields before the `AdjustForMaxPath()`
+      dereference; and (b) the production LCPPN load path excludes `Config` entirely via the cycle-3
+      `DoNotSerializeContractResolver("Config")` in `LcppnFolderPredictorStore`, so `FilePathHelper` is
+      never instantiated by Newtonsoft on that path. The cycle-3 throw was a stale-document/transient
+      already neutralized by that (contract-correct) exclusion, which is retained. A proposed
+      `AdjustForMaxPath()` null-guard would be unfalsifiable defensive hardening (no honest
+      red-before-green test is achievable), so per the repository bugfix discipline no production change
+      was made. Deserialize-safety is therefore met on HEAD. Cycle 4 closed as no-fix-required; AC1–AC24
+      unchanged and not regressed.
+
 ## Non-Goals
 
 Call out what is explicitly excluded from this feature.
