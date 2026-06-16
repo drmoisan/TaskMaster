@@ -1,4 +1,6 @@
 using System.IO;
+using Newtonsoft.Json;
+using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.ReusableTypeClasses;
 
@@ -27,7 +29,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
 
         /// <summary>
         /// Builds a <see cref="NewSmartSerializableConfig"/> whose <c>Disk</c> targets the dedicated
-        /// LCPPN file inside the Bayesian folder under <paramref name="appDataFolder"/>.
+        /// LCPPN file inside the Bayesian folder under <paramref name="appDataFolder"/>, with the
+        /// JSON settings the predictor serializes and rehydrates with (see <see cref="BuildSettings"/>).
         /// </summary>
         /// <param name="appDataFolder">The resolved AppData special folder; must not be null/empty.</param>
         /// <returns>A serialization config pointing at the dedicated LCPPN file.</returns>
@@ -39,7 +42,26 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             {
                 Disk = new FilePathHelper(FileName, bayesianFolder),
             };
+            config.JsonSettings = BuildSettings();
             return config;
+        }
+
+        /// <summary>
+        /// Builds the JSON settings used for both the serialize (build) and deserialize (startup
+        /// load) paths so they agree. <c>PreserveReferencesHandling.Objects</c> is required because
+        /// the per-parent shared token base holds a back-reference to its owner. The runtime-only
+        /// <c>Config</c> property is excluded from the document: it carries a populated
+        /// <see cref="FilePathHelper"/> whose property-change re-entrancy is not deserialization-safe,
+        /// and per the <see cref="SmartSerializable{T}"/> contract the loader supplies the Config
+        /// (file name/path) on load, so it never needs to live in the file.
+        /// </summary>
+        /// <returns>The shared serialize/deserialize settings.</returns>
+        public static JsonSerializerSettings BuildSettings()
+        {
+            var settings = SmartSerializable<LcppnFolderPredictor>.GetDefaultSettings();
+            settings.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
+            settings.ContractResolver = new DoNotSerializeContractResolver("Config");
+            return settings;
         }
     }
 }

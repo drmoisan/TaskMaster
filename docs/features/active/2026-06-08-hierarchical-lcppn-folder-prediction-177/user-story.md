@@ -119,16 +119,16 @@ while preserving the current incremental-update and abstention behavior.
 
 ### Cycle 3 — production migration (added 2026-06-16; option B, default-ON)
 
-- [ ] **AC21 — Production enablement, default ON via reachable config.** The `UseLcppnPredictor`
+- [x] **AC21 — Production enablement, default ON via reachable config.** The `UseLcppnPredictor`
       setting is sourced from the application's persistent settings/config rather than a hard-coded
       per-instance default, defaults to ON (`true`), and is honored by the production callers
       (`EmailFiler`, `SortEmail`, `FolderScorer`) so the LCPPN predictor is selected at runtime in
       production. The setting remains toggleable to OFF, which restores flat-only behavior (AC13
       preserved). No per-call site is required to hand-set the flag.
-- [ ] **AC22 — Safe fallback to flat.** When the setting is ON but `Globals.AF.FolderPredictor` is
+- [x] **AC22 — Safe fallback to flat.** When the setting is ON but `Globals.AF.FolderPredictor` is
       null or not yet built (first run before build, or load failure), `GetFolderPredictorAsync`
       returns the flat `BayesianClassifierGroup` without throwing. Covered by a regression test.
-- [ ] **AC23 — Persistence and load-on-startup.** `LcppnFolderPredictor` is serialized to its own
+- [x] **AC23 — Persistence and load-on-startup.** `LcppnFolderPredictor` is serialized to its own
       file (distinct from `Folder.json`) and is rehydrated into `Globals.AF.FolderPredictor` at
       application startup (via the `AppAutoFileObjects` load path / `Manager.Configuration`
       registration), so it survives an application restart without requiring a manual

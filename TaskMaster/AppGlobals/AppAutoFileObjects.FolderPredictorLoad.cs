@@ -16,10 +16,9 @@ namespace TaskMaster
     /// </summary>
     public partial class AppAutoFileObjects
     {
-        private static readonly log4net.ILog _folderPredictorLogger =
-            log4net.LogManager.GetLogger(
-                System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
-            );
+        private static readonly log4net.ILog _folderPredictorLogger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
 
         /// <summary>
         /// The persisted production default that selects the LCPPN folder predictor. Sourced from
@@ -28,6 +27,19 @@ namespace TaskMaster
         /// <c>Manager["Folder"]</c> path (AC13 parity).
         /// </summary>
         public bool UseLcppnPredictor => _defaults.UseLcppnPredictor;
+
+        /// <summary>
+        /// Deserialization seam for the LCPPN load path. Defaults to the production
+        /// <see cref="SmartSerializable{T}"/> static deserialize (reads the dedicated file via the
+        /// loader's <c>Config.Disk</c>), preserving runtime behavior. Tests override it with a
+        /// deterministic, in-memory delegate so the rehydration path is verifiable without touching
+        /// the filesystem or creating temporary files.
+        /// </summary>
+        internal Func<
+            LcppnFolderPredictor,
+            Task<LcppnFolderPredictor>
+        > FolderPredictorDeserializer { get; set; } =
+            loader => LcppnFolderPredictor.Static.DeserializeAsync(loader);
 
         /// <summary>
         /// Rehydrates <see cref="FolderPredictor"/> from the dedicated LCPPN file on startup when the
@@ -62,7 +74,7 @@ namespace TaskMaster
                 // DeserializeAsync returns null when the dedicated file is absent (fail-soft); the
                 // holder then stays null and the accessor falls back to flat. A genuine read/parse
                 // failure is caught below and surfaced through logging without throwing on startup.
-                var predictor = await LcppnFolderPredictor.Static.DeserializeAsync(loader);
+                var predictor = await FolderPredictorDeserializer(loader);
                 if (predictor is null)
                 {
                     _folderPredictorLogger.Warn(

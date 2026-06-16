@@ -271,7 +271,7 @@ Touches: test files under `UtilitiesCS.Test/EmailIntelligence/` and any TaskMast
 assembly covering `AppAutoFileObjects`. All tests MSTest + Moq + FluentAssertions, Arrange-Act-Assert,
 no temporary files, in-memory/seam serialization. Split any test file that would exceed 500 lines.
 
-- [ ] [P4-T1] AC21 default-ON selection test (no explicit flag). Add a test asserting that a
+- [x] [P4-T1] AC21 default-ON selection test (no explicit flag). Add a test asserting that a
   production-style `OlFolderClassifierGroup` constructed over mocked globals whose persisted
   `UseLcppnPredictor` accessor returns `true` (the default) yields `FolderPredictorConfig.UseLcppnPredictor == true`
   and, with a held LCPPN predictor, `GetFolderPredictorAsync()` returns the `LcppnFolderPredictor` —
@@ -279,17 +279,17 @@ no temporary files, in-memory/seam serialization. Split any test file that would
   `UtilitiesCS.Test/EmailIntelligence/FolderPredictorSeam_Tests.cs` (or a new sibling file if the
   500-line cap would be exceeded). Acceptance: test fails against pre-Phase-1 code and passes after
   Phase 1; named clearly for AC21.
-- [ ] [P4-T2] AC21 toggle-OFF parity test. Add a test asserting that when the mocked persisted
+- [x] [P4-T2] AC21 toggle-OFF parity test. Add a test asserting that when the mocked persisted
   setting returns `false`, the production-style construction yields
   `FolderPredictorConfig.UseLcppnPredictor == false` and `GetFolderPredictorAsync()` returns the
   flat `BayesianClassifierGroup` (same instance), preserving AC13 flag-off behavior. Acceptance:
   test passes and demonstrates OFF restores flat-only selection.
-- [ ] [P4-T3] AC22 fallback regression test under default-ON. Add a test asserting that with the
+- [x] [P4-T3] AC22 fallback regression test under default-ON. Add a test asserting that with the
   setting ON (default) but `Globals.AF.FolderPredictor` null, `GetFolderPredictorAsync()` returns
   the flat group and does not throw. Acceptance: test passes; clearly named for AC22. (This may
   extend the existing `GetFolderPredictorAsync_FlagOnButNoHeldPredictor_FallsBackToFlat` to the
   default-ON config path.)
-- [ ] [P4-T4] AC23 serialize-to-own-file round-trip test. Add a test that configures an
+- [x] [P4-T4] AC23 serialize-to-own-file round-trip test. Add a test that configures an
   `LcppnFolderPredictor` with the dedicated file name/path (P3-T1), serializes it via the
   `SmartSerializable` in-memory/seam pattern (`SerializeToString()` / `DeserializeObject()`), and
   round-trips losslessly; assert the configured file name is the dedicated LCPPN name and is NOT
@@ -297,20 +297,20 @@ no temporary files, in-memory/seam serialization. Split any test file that would
   `UtilitiesCS.Test/EmailIntelligence/Bayesian/` (extend or split
   `LcppnFolderPredictor_Serialization_Tests.cs`, keeping each file <= 500 lines). Acceptance: test
   passes and asserts the distinct file name.
-- [ ] [P4-T5] AC23 load-path rehydration test. Add a test (TaskMaster-side test assembly covering
+- [x] [P4-T5] AC23 load-path rehydration test. Add a test (TaskMaster-side test assembly covering
   `AppAutoFileObjects`, or a seam-based test of `LoadFolderPredictorAsync`) asserting that given a
   persisted dedicated LCPPN file and the setting ON, the load path populates
   `Globals.AF.FolderPredictor` with an `LcppnFolderPredictor`. Use mocked filesystem/serialization
   seams; no temporary files. Acceptance: test passes; clearly named for AC23.
-- [ ] [P4-T6] AC23 missing-file fail-soft test. Add a negative test asserting that when the
+- [x] [P4-T6] AC23 missing-file fail-soft test. Add a negative test asserting that when the
   dedicated LCPPN file is absent or unreadable, the load path completes without throwing and leaves
   `Globals.AF.FolderPredictor` null, and that a subsequent `GetFolderPredictorAsync()` falls back to
   flat. Acceptance: test passes; clearly named for AC23/AC22 fail-soft.
-- [ ] [P4-T7] AC13 regression re-verification test presence. Confirm the existing AC13 flag-off
+- [x] [P4-T7] AC13 regression re-verification test presence. Confirm the existing AC13 flag-off
   parity tests in `FolderPredictorSeam_Tests.cs` remain present and unmodified in intent; if Phase 1
   changed construction, update only the arrangement (mocked OFF setting) without weakening
   assertions. Acceptance: AC13 tests still assert byte-for-byte flat behavior and pass.
-- [ ] [P4-T8] Verify test-file size cap. Confirm every new or modified test file is <= 500 lines;
+- [x] [P4-T8] Verify test-file size cap. Confirm every new or modified test file is <= 500 lines;
   split as needed. Write
   `<FEATURE>/evidence/qa-gates/phase4-test-filesize.2026-06-16T01-04.md` with `Timestamp:`,
   `Command:`, `EXIT_CODE:`, `Output Summary:` (per-file counts). Acceptance: all test files
