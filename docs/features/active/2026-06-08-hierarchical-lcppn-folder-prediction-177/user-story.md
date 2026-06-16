@@ -135,7 +135,7 @@ while preserving the current incremental-update and abstention behavior.
       `BuildClassifiersAsync` rerun. If the persisted file is absent or unreadable, the holder stays
       null and the accessor falls back to flat (AC22). Covered by serialization round-trip and
       load-path tests.
-- [ ] **AC24 — Containment and non-regression.** Spam/triage/category/actionable subsystems and the
+- [x] **AC24 — Containment and non-regression.** Spam/triage/category/actionable subsystems and the
       `ManagerAsyncLazy` value typing remain unchanged (zero diff); AC1–AC20 remain satisfied; new and
       changed lines meet coverage policy (new code >= 90% strict, repository-wide >= 80%); the full C#
       toolchain passes in order in a single final pass.

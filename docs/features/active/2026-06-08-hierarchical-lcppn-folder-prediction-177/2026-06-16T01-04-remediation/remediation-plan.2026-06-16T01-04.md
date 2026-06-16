@@ -323,7 +323,7 @@ no temporary files, in-memory/seam serialization. Split any test file that would
 Run the full C# toolchain in order until it passes in a single pass. Restart from the first step on
 any failure or auto-fix.
 
-- [ ] [P5-T1] Containment diff verification (INV-1, INV-2). Produce a diff of the branch against the
+- [x] [P5-T1] Containment diff verification (INV-1, INV-2). Produce a diff of the branch against the
   cycle-3 entry point and confirm ZERO diff in `SpamBayes.cs`, `Triage.cs`,
   `CategoryClassifierGroup.cs`, `MulticlassEngine.cs`, and `Manager["Actionable"]` usage, and that
   `ManagerAsyncLazy` dictionary value typing (`AsyncLazy<BayesianClassifierGroup>`) is unchanged.
@@ -331,19 +331,19 @@ any failure or auto-fix.
   `Command:`, `EXIT_CODE:`, `Output Summary:` (list of files with any diff vs. the contained set).
   Acceptance: artifact shows zero diff for the contained files and unchanged `ManagerAsyncLazy`
   typing.
-- [ ] [P5-T2] Final-QC formatting. Run `dotnet tool run csharpier .` (or `csharpier .`). Write
+- [x] [P5-T2] Final-QC formatting. Run `dotnet tool run csharpier .` (or `csharpier .`). Write
   `<FEATURE>/evidence/qa-gates/final-csharpier.2026-06-16T01-04.md` with `Timestamp:`, `Command:`,
   `EXIT_CODE:`, `Output Summary:`. Acceptance: formatting clean (no files changed on the final pass);
   if files changed, restart the loop from this task.
-- [ ] [P5-T3] Final-QC analyzers. Run
+- [x] [P5-T3] Final-QC analyzers. Run
   `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`.
   Write `<FEATURE>/evidence/qa-gates/final-analyzers.2026-06-16T01-04.md` with `Timestamp:`,
   `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: build passes with no analyzer errors.
-- [ ] [P5-T4] Final-QC nullable / TreatWarningsAsErrors. Run
+- [x] [P5-T4] Final-QC nullable / TreatWarningsAsErrors. Run
   `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`.
   Write `<FEATURE>/evidence/qa-gates/final-nullable.2026-06-16T01-04.md` with `Timestamp:`,
   `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: build passes with warnings-as-errors.
-- [ ] [P5-T5] Final-QC tests with coverage (numeric). Run
+- [x] [P5-T5] Final-QC tests with coverage (numeric). Run
   `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` for the affected test assemblies.
   Write `<FEATURE>/evidence/qa-gates/final-test-coverage.2026-06-16T01-04.md` with `Timestamp:`,
   `Command:`, `EXIT_CODE:`, and an `Output Summary:` recording the numeric post-change repo-wide line
@@ -352,17 +352,17 @@ any failure or auto-fix.
   `TaskMaster/AppGlobals/AppAutoFileObjects.FolderPredictorLoad.cs` for the new
   `LoadFolderPredictorAsync`). Acceptance: all tests pass; numeric coverage recorded (no
   placeholders).
-- [ ] [P5-T6] Coverage delta / threshold verification. Compare baseline (P0-T6) to final (P5-T5) and
+- [x] [P5-T6] Coverage delta / threshold verification. Compare baseline (P0-T6) to final (P5-T5) and
   report: baseline repo coverage, post-change repo coverage, and new/changed-code coverage. Write
   `<FEATURE>/evidence/qa-gates/coverage-delta.2026-06-16T01-04.md` with `Timestamp:`,
   `Output Summary:`. Acceptance: repo-wide >= 80%; new/changed lines >= 90% strict; changed-line
   coverage does not regress. If any threshold is unmet, the cycle outcome is remediation-required
   (NOT PASS).
-- [ ] [P5-T7] AC13 final regression re-verification. Re-run the AC13 flag-off parity tests and
+- [x] [P5-T7] AC13 final regression re-verification. Re-run the AC13 flag-off parity tests and
   confirm green. Write `<FEATURE>/evidence/regression-testing/ac13-final.2026-06-16T01-04.md` with
   `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (named tests + pass). Acceptance: AC13
   tests pass.
-- [ ] [P5-T8] Final file-size sweep. Confirm no production, test, or reusable script file added or
+- [x] [P5-T8] Final file-size sweep. Confirm no production, test, or reusable script file added or
   modified in this cycle exceeds 500 lines, and that `UtilitiesCS/OutlookObjects/Folder/FolderScorer.cs`
   and `SortEmail.cs` line counts are unchanged from P0-T2. Confirm the new
   `TaskMaster/AppGlobals/AppAutoFileObjects.FolderPredictorLoad.cs` is <= 500 lines, and that
@@ -374,7 +374,7 @@ any failure or auto-fix.
   <= 500 lines; `AppAutoFileObjects.cs` grows only by the wiring lines + `partial` keyword relative to
   the P0-T2 baseline; all other touched/new files <= 500; over-cap callers (`FolderScorer.cs`,
   `SortEmail.cs`) unchanged.
-- [ ] [P5-T9] Acceptance-criteria check-off summary. Record the status of AC21, AC22, AC23, AC24 and
+- [x] [P5-T9] Acceptance-criteria check-off summary. Record the status of AC21, AC22, AC23, AC24 and
   the AC13 re-verification, each with a pointer to its proving evidence artifact. Write
   `<FEATURE>/evidence/issue-updates/ac-status.2026-06-16T01-04.md` with `Timestamp:` and the AC →
   evidence mapping. Acceptance: every cycle-3 AC maps to a passing evidence artifact, or the cycle is
