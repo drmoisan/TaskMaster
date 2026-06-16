@@ -32,13 +32,36 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
 
         #region Folder predictor seam (LCPPN, flag-gated)
 
+        private LcppnFolderPredictorConfig _folderPredictorConfig;
+
         /// <summary>
-        /// Configuration that controls the Folder predictor seam. Defaults to the flat predictor
-        /// (<see cref="LcppnFolderPredictorConfig.UseLcppnPredictor"/> = false), so the existing
-        /// <c>Manager["Folder"]</c> path is the default behavior and is byte-for-byte unchanged.
+        /// Configuration that controls the Folder predictor seam. When not explicitly set, it is
+        /// resolved once from the persisted production default exposed by
+        /// <see cref="IAppAutoFileObjects.UseLcppnPredictor"/> (reached through
+        /// <c>Globals.AF</c>), which defaults to ON. Production callers therefore honor the persisted
+        /// setting without hand-setting the flag; toggling the setting OFF restores the flat
+        /// <c>Manager["Folder"]</c> path (AC13 parity). The property remains settable so tests can
+        /// inject a config without a live settings store.
         /// </summary>
-        public virtual LcppnFolderPredictorConfig FolderPredictorConfig { get; set; } =
-            new LcppnFolderPredictorConfig();
+        public virtual LcppnFolderPredictorConfig FolderPredictorConfig
+        {
+            get => _folderPredictorConfig ??= ResolveFolderPredictorConfigFromSettings();
+            set => _folderPredictorConfig = value;
+        }
+
+        /// <summary>
+        /// Builds the default <see cref="LcppnFolderPredictorConfig"/> from the persisted production
+        /// setting (<see cref="IAppAutoFileObjects.UseLcppnPredictor"/>). The bool flows across the
+        /// globals boundary so this assembly never references the host's settings store directly.
+        /// </summary>
+        /// <returns>A config whose <c>UseLcppnPredictor</c> mirrors the persisted default.</returns>
+        private LcppnFolderPredictorConfig ResolveFolderPredictorConfigFromSettings()
+        {
+            return new LcppnFolderPredictorConfig
+            {
+                UseLcppnPredictor = Globals.AF.UseLcppnPredictor,
+            };
+        }
 
         /// <summary>
         /// Builds an <see cref="LcppnFolderPredictor"/> from the mined corpus using
@@ -275,10 +298,15 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
 
                     // Flag-gated LCPPN seam: when UseLcppnPredictor is set, also build and hold the
                     // hierarchy-aware predictor for GetFolderPredictorAsync to return. The flat
-                    // Manager["Folder"] registration above is left unchanged in either case.
+                    // Manager["Folder"] registration above is left unchanged in either case. The
+                    // predictor is serialized to its OWN dedicated file (LcppnFolder.json), distinct
+                    // from Folder.json, so it can be rehydrated on the next startup.
                     if (FolderPredictorConfig?.UseLcppnPredictor == true)
                     {
-                        Globals.AF.FolderPredictor = await BuildLcppnPredictorAsync(collection);
+                        LcppnFolderPredictor predictor = await BuildLcppnPredictorAsync(collection);
+                        predictor.Config = LcppnFolderPredictorStore.BuildConfig(folderRoot);
+                        predictor.Serialize();
+                        Globals.AF.FolderPredictor = predictor;
                     }
 
                     MyBox.ShowDialog(

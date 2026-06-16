@@ -13,8 +13,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
     public sealed class LcppnFolderPredictorConfig
     {
         /// <summary>
-        /// Selects the LCPPN predictor when true. Defaults to false so the flat predictor remains
-        /// the default path.
+        /// Selects the LCPPN predictor when true. This class-level default stays false so configs
+        /// constructed directly (including AC13 flag-off tests) keep flat behavior. The production
+        /// default is NOT sourced here: it is resolved at <c>OlFolderClassifierGroup</c>
+        /// construction from the persisted <see cref="IAppAutoFileObjects.UseLcppnPredictor"/>
+        /// setting (default ON), so flipping this class default would mask OFF in tests that
+        /// construct the config directly.
         /// </summary>
         [JsonProperty]
         public bool UseLcppnPredictor { get; set; }

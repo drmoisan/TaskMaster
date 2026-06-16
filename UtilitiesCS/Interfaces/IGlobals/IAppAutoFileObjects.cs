@@ -44,6 +44,15 @@ namespace UtilitiesCS
         /// </summary>
         IFolderPredictor FolderPredictor { get; set; }
 
+        /// <summary>
+        /// The persisted production default that selects the hierarchy-aware LCPPN folder predictor
+        /// when true. Sourced from the application's persistent settings in the TaskMaster
+        /// implementation and exposed across this interface boundary so production callers honor it
+        /// without hand-setting a per-call flag, and so it remains mockable in unit tests. Defaults
+        /// to ON; toggling it OFF restores the flat <c>Manager["Folder"]</c> path (AC13 parity).
+        /// </summary>
+        bool UseLcppnPredictor { get; }
+
         //[Obsolete]
         //ScDictionary<string, BayesianClassifierGroup> Manager { get; }
         ProgressTrackerPane ProgressTracker { get; }

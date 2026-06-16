@@ -28,7 +28,7 @@ using UtilitiesCS.Threading;
 
 namespace TaskMaster
 {
-    public class AppAutoFileObjects : IAppAutoFileObjects
+    public partial class AppAutoFileObjects : IAppAutoFileObjects
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -75,6 +75,7 @@ namespace TaskMaster
                 LoadMovedMailsAsync(),
                 LoadFiltersAsync(),
                 Manager.InitAsync(),
+                LoadFolderPredictorAsync(),
             };
             await Task.WhenAll(tasks);
         }
@@ -91,6 +92,7 @@ namespace TaskMaster
             await LoadMovedMailsAsync();
             await LoadFiltersAsync();
             await Manager.InitAsync();
+            await LoadFolderPredictorAsync();
         }
 
         private bool _sugFilesLoaded = false;
