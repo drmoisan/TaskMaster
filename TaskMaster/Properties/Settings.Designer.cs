@@ -682,5 +682,17 @@ namespace TaskMaster.Properties {
                 this["StartupTimingEnabled"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UseLcppnPredictor {
+            get {
+                return ((bool)(this["UseLcppnPredictor"]));
+            }
+            set {
+                this["UseLcppnPredictor"] = value;
+            }
+        }
     }
 }

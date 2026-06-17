@@ -93,6 +93,17 @@
     <Compile Include="EmailIntelligence\FolderRemapController_Tests2.cs" />
     <Compile Include="EmailIntelligence\FolderRemapViewer_Tests.cs" />
     <Compile Include="EmailIntelligence\FolderSelector_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\IFolderPredictor_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup_FlatPathUnchanged_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\FolderHierarchyTree_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\PerParentClassifier_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictor_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictor_Classify_Tests.cs" />
+    <Compile Include="EmailIntelligence\Bayesian\LcppnFolderPredictor_Serialization_Tests.cs" />
+    <Compile Include="EmailIntelligence\FolderPredictorSeam_Tests.cs" />
+    <Compile Include="EmailIntelligence\FolderPredictorSeam_DefaultOn_Tests.cs" />
+    <Compile Include="EmailIntelligence\LcppnFolderPredictorStore_Tests.cs" />
+    <Compile Include="EmailIntelligence\Evaluation\FolderPredictorEvaluator_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroupTests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierTests.cs" />

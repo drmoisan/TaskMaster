@@ -28,7 +28,7 @@ using UtilitiesCS.Threading;
 
 namespace TaskMaster
 {
-    public class AppAutoFileObjects : IAppAutoFileObjects
+    public partial class AppAutoFileObjects : IAppAutoFileObjects
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -75,6 +75,7 @@ namespace TaskMaster
                 LoadMovedMailsAsync(),
                 LoadFiltersAsync(),
                 Manager.InitAsync(),
+                LoadFolderPredictorAsync(),
             };
             await Task.WhenAll(tasks);
         }
@@ -91,6 +92,7 @@ namespace TaskMaster
             await LoadMovedMailsAsync();
             await LoadFiltersAsync();
             await Manager.InitAsync();
+            await LoadFolderPredictorAsync();
         }
 
         private bool _sugFilesLoaded = false;
@@ -607,6 +609,14 @@ namespace TaskMaster
         }
 
         public ManagerAsyncLazy Manager { get; internal set; }
+
+        /// <summary>
+        /// Folder-only holder for the flag-on LCPPN predictor. Defaults to null; populated at the
+        /// classifier-build registration site when <c>UseLcppnPredictor</c> is true, so every fresh
+        /// per-call <c>OlFolderClassifierGroup</c> instance resolves the same built predictor. Null
+        /// means the flat <c>Manager["Folder"]</c> path is active.
+        /// </summary>
+        public IFolderPredictor FolderPredictor { get; set; }
 
         private ProgressTrackerPane _progressTracker;
         public ProgressTrackerPane ProgressTracker => _progressTracker;

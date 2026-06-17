@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence.Bayesian;
+using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.OutlookExtensions;
 
@@ -364,21 +365,27 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         protected internal virtual void ResolvePaths(Folder currentFolder) =>
             Config.ResolvePaths(currentFolder);
 
+        // Resolves the active Folder predictor through the Folder-only IFolderPredictor seam on
+        // OlFolderClassifierGroup. With UseLcppnPredictor off (default) this returns the unchanged
+        // flat Manager["Folder"] BayesianClassifierGroup, preserving prior behavior.
+        protected internal virtual Task<IFolderPredictor> GetFolderPredictorAsync() =>
+            new OlFolderClassifierGroup(Globals).GetFolderPredictorAsync();
+
         protected internal virtual async Task SerializeFolderManagerAsync()
         {
-            (await Globals.AF.Manager["Folder"]).Serialize();
+            (await GetFolderPredictorAsync()).Serialize();
             (await Globals.AF.Manager["Actionable"]).Serialize();
         }
 
         protected internal virtual async Task UnTrainFolderAsync(MailItemHelper mailHelper)
         {
-            (await Globals.AF.Manager["Folder"]).UnTrain(Config.OriginOlStem, mailHelper.Tokens, 1);
+            (await GetFolderPredictorAsync()).UnTrain(Config.OriginOlStem, mailHelper.Tokens, 1);
         }
 
         protected internal virtual Task TrainFolderAsync(MailItemHelper mailHelper)
         {
             return Task.Run(async () =>
-                (await Globals.AF.Manager["Folder"]).Train(
+                (await GetFolderPredictorAsync()).Train(
                     Config.DestinationOlStem,
                     mailHelper.Tokens,
                     1
