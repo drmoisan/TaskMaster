@@ -206,6 +206,20 @@
       ],
       "group": "test",
       "problemMatcher": []
+    },
+    {
+      "label": "clean other worktrees",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$root = git rev-parse --show-toplevel; git worktree list --porcelain | Select-String '^worktree (.+)' | ForEach-Object { $_.Matches[0].Groups[1].Value } | Where-Object { $_ -ne $root } | ForEach-Object { git worktree remove --force $_ }"
+      ],
+      "problemMatcher": [],
+      "detail": "Removes every git worktree except the one currently open. --force discards uncommitted changes in the removed worktrees."
     }
   ]
 }
