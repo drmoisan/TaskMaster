@@ -224,6 +224,164 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
         #endregion
 
+        #region Issue #207 — Per-resource deserialization timing breakdown
+
+        /// <summary>
+        /// Verifies that ReadConfigurationAsync produces a per-resource timing breakdown that
+        /// records a row for every enumerated resource entry, including the entry whose loader
+        /// deserializes to null. Exercises the existing internal seams
+        /// (GetSerializedConfigurations, DeserializeLoaderAsync) via TestableIntelligenceConfig
+        /// with deterministic in-memory fixtures — no live COM, network, filesystem, or temp files.
+        ///
+        /// Purpose (AC1, AC2, AC4):
+        ///     Confirm the diagnostic instrumentation emits a single consolidated breakdown that
+        ///     contains one measurement row per resource key, each with the key, a payload size,
+        ///     and a Stopwatch-measured duration column.
+        ///
+        /// Args:
+        ///     Three fixtures: a People loader, a derived-Sco loader, and a null loader. All three
+        ///     keys must appear in the breakdown even though the null-loader entry is filtered out
+        ///     of the returned Config dictionary.
+        ///
+        /// Returns:
+        ///     Passes when the breakdown text is non-empty, carries the expected column headers,
+        ///     and contains a row for each of the three resource keys.
+        /// </summary>
+        [TestMethod]
+        public async Task ReadConfigurationAsync_WithFixtureResources_ProducesBreakdownRowPerEntry()
+        {
+            // Arrange
+            var mockGlobals = new Mock<IApplicationGlobals>(MockBehavior.Loose);
+            var peopleLoader = new SmartSerializableLoader { T = typeof(PeopleScoDictionaryNew) };
+            var derivedLoader = new SmartSerializableLoader { T = typeof(DerivedScoDictionary) };
+            var config = new TestableIntelligenceConfig(mockGlobals.Object)
+            {
+                SerializedConfigurations = new Dictionary<string, string>
+                {
+                    ["People"] = "people-json",
+                    ["Derived"] = "derived-json",
+                    ["Missing"] = "missing-json",
+                },
+                LoaderMap =
+                {
+                    ["people-json"] = peopleLoader,
+                    ["derived-json"] = derivedLoader,
+                    ["missing-json"] = null,
+                },
+            };
+
+            // Act
+            await config.InitAsync();
+            var breakdown = config.LastResourceTimingBreakdown;
+
+            // Assert
+            breakdown.Should().NotBeNullOrWhiteSpace("the breakdown must be rendered after a run");
+            breakdown.Should().Contain("Duration");
+            breakdown.Should().Contain("SizeBytes");
+            breakdown.Should().Contain("ResourceKey");
+            breakdown.Should().Contain("People");
+            breakdown.Should().Contain("Derived");
+            breakdown
+                .Should()
+                .Contain(
+                    "Missing",
+                    "every enumerated entry contributes one timing row, including null-loader entries"
+                );
+        }
+
+        /// <summary>
+        /// Verifies that the per-resource payload-size column reflects the UTF-8 byte length of
+        /// each serialized loader string, confirming AC1's payload-size requirement is recorded
+        /// per entry rather than a constant placeholder.
+        ///
+        /// Purpose (AC1):
+        ///     Confirm the size column carries the distinct UTF-8 byte count for each fixture's
+        ///     serialized payload.
+        ///
+        /// Args:
+        ///     A single fixture whose serialized payload is "people-json" (11 ASCII bytes).
+        ///
+        /// Returns:
+        ///     Passes when the breakdown contains the byte count of the serialized payload.
+        /// </summary>
+        [TestMethod]
+        public async Task ReadConfigurationAsync_RecordsUtf8PayloadSizePerEntry()
+        {
+            // Arrange
+            var mockGlobals = new Mock<IApplicationGlobals>(MockBehavior.Loose);
+            var peopleLoader = new SmartSerializableLoader { T = typeof(PeopleScoDictionaryNew) };
+            const string payload = "people-json";
+            var expectedBytes = System.Text.Encoding.UTF8.GetByteCount(payload);
+            var config = new TestableIntelligenceConfig(mockGlobals.Object)
+            {
+                SerializedConfigurations = new Dictionary<string, string> { ["People"] = payload },
+                LoaderMap = { [payload] = peopleLoader },
+            };
+
+            // Act
+            await config.InitAsync();
+            var breakdown = config.LastResourceTimingBreakdown;
+
+            // Assert
+            breakdown.Should().NotBeNullOrWhiteSpace();
+            breakdown
+                .Should()
+                .Contain(
+                    expectedBytes.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                    "the size column records the UTF-8 byte count of the serialized payload"
+                );
+        }
+
+        /// <summary>
+        /// Verifies that the diagnostic instrumentation is behavior-preserving: the returned
+        /// Config dictionary contains exactly the non-null-loader fixture keys, unchanged by the
+        /// timing capture. Null-loader entries are filtered out exactly as before instrumentation.
+        ///
+        /// Purpose (AC3):
+        ///     Pin the Config dictionary contents so the instrumentation cannot silently alter the
+        ///     key set or the null-loader filtering semantics.
+        ///
+        /// Args:
+        ///     Three fixtures (two non-null loaders, one null loader) in enumeration order.
+        ///
+        /// Returns:
+        ///     Passes when Config keys equal exactly the two non-null fixture keys.
+        /// </summary>
+        [TestMethod]
+        public async Task ReadConfigurationAsync_IsBehaviorPreserving_ConfigKeysMatchNonNullFixtures()
+        {
+            // Arrange
+            var mockGlobals = new Mock<IApplicationGlobals>(MockBehavior.Loose);
+            var peopleLoader = new SmartSerializableLoader { T = typeof(PeopleScoDictionaryNew) };
+            var derivedLoader = new SmartSerializableLoader { T = typeof(DerivedScoDictionary) };
+            var config = new TestableIntelligenceConfig(mockGlobals.Object)
+            {
+                SerializedConfigurations = new Dictionary<string, string>
+                {
+                    ["People"] = "people-json",
+                    ["Derived"] = "derived-json",
+                    ["Missing"] = "missing-json",
+                },
+                LoaderMap =
+                {
+                    ["people-json"] = peopleLoader,
+                    ["derived-json"] = derivedLoader,
+                    ["missing-json"] = null,
+                },
+            };
+
+            // Act
+            var result = await config.ReadConfigurationAsync();
+
+            // Assert
+            result.Keys.Should().BeEquivalentTo("People", "Derived");
+            result.Should().NotContainKey("Missing", "null-loader entries are filtered out");
+            result["People"].Should().BeSameAs(peopleLoader);
+            result["Derived"].Should().BeSameAs(derivedLoader);
+        }
+
+        #endregion
+
         private sealed class DerivedScoDictionary : ScoDictionaryNew<string, int> { }
 
         private sealed class CapturingResourceWriter : IIntelligenceConfigResourceWriter

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Resources;
@@ -63,15 +64,43 @@ namespace UtilitiesCS.EmailIntelligence
             protected set;
         }
 
+        /// <summary>
+        /// The most recent per-resource timing breakdown rendered by
+        /// <see cref="ReadConfigurationAsync"/>, exposed for test observability of the diagnostic
+        /// instrumentation (Issue #207). Equals the table text emitted to the log4net logger.
+        /// <see langword="null"/> until <see cref="ReadConfigurationAsync"/> has run once.
+        /// Consumed only within the assembly and its test assembly via InternalsVisibleTo.
+        /// </summary>
+        internal string LastResourceTimingBreakdown { get; private set; }
+
         internal virtual async Task<
             ConcurrentDictionary<string, SmartSerializableLoader>
         > ReadConfigurationAsync()
         {
+            // Diagnostic instrumentation (Issue #207): record per-resource deserialization timing
+            // to localize the dominant IntelConfig startup cost. This list collects one row per
+            // enumerated resource entry. It does not alter deserialization control flow.
+            var timingRows = new List<ResourceTimingRow>();
+
             var resourceDictionary = await GetSerializedConfigurations()
                 .ToAsyncEnumerable()
                 .SelectAwait(async kvp =>
                 {
+                    // Measure only the DeserializeLoaderAsync call per resource entry using
+                    // Stopwatch (no DateTime/clock APIs). Payload size is the UTF-8 byte count
+                    // of the serialized loader string.
+                    var sizeBytes = kvp.Value is null ? 0 : Encoding.UTF8.GetByteCount(kvp.Value);
+                    var stopwatch = System.Diagnostics.Stopwatch.StartNew();
                     var loader = await DeserializeLoaderAsync(kvp.Value);
+                    stopwatch.Stop();
+                    timingRows.Add(
+                        new ResourceTimingRow(
+                            kvp.Key,
+                            sizeBytes,
+                            stopwatch.Elapsed.TotalMilliseconds
+                        )
+                    );
+
                     if (loader is null)
                     {
                         logger.Error(
@@ -99,7 +128,68 @@ namespace UtilitiesCS.EmailIntelligence
                 .Where(kvp => kvp.Value is not null)
                 .ToConcurrentDictionaryAsync();
 
+            // Emit the per-resource breakdown exactly once as a single consolidated block,
+            // consistent in style with the existing [Startup timing] table. The same rendered
+            // text is retained on LastResourceTimingBreakdown for test observability.
+            LastResourceTimingBreakdown = FormatResourceTimingBreakdown(timingRows);
+            logger.Info($"[IntelConfig timing]\n{LastResourceTimingBreakdown}");
+
             return resourceDictionary;
+        }
+
+        /// <summary>
+        /// One per-resource deserialization measurement captured by
+        /// <see cref="ReadConfigurationAsync"/>: the resource key, the serialized payload size in
+        /// UTF-8 bytes, and the <see cref="System.Diagnostics.Stopwatch"/>-measured elapsed
+        /// milliseconds of the <c>DeserializeLoaderAsync</c> call for that resource.
+        /// </summary>
+        /// <remarks>
+        /// Declared as a plain <c>readonly struct</c> rather than a positional <c>record struct</c>
+        /// because the positional record's compiler-generated <c>init</c> accessors require
+        /// <c>System.Runtime.CompilerServices.IsExternalInit</c>, which is not available on this
+        /// .NET Framework target (CS0518). A constructor-initialized struct avoids that dependency.
+        /// </remarks>
+        private readonly struct ResourceTimingRow
+        {
+            public ResourceTimingRow(string resourceKey, int sizeBytes, double elapsedMs)
+            {
+                ResourceKey = resourceKey;
+                SizeBytes = sizeBytes;
+                ElapsedMs = elapsedMs;
+            }
+
+            public string ResourceKey { get; }
+
+            public int SizeBytes { get; }
+
+            public double ElapsedMs { get; }
+        }
+
+        /// <summary>
+        /// Renders the per-resource timing rows as a single formatted table using the same
+        /// <see cref="UtilitiesCS.PrettyPrinters.ToFormattedText(string[][], string[], Enums.Justification[], string)"/>
+        /// column-alignment helper that <c>StartupTimingRecorder.FormatTable</c> uses, so the
+        /// breakdown matches the existing <c>[Startup timing]</c> table style. Pure: builds and
+        /// returns a string with no logging or I/O.
+        /// </summary>
+        /// <param name="rows">The per-resource measurements to render, in capture order.</param>
+        /// <returns>A formatted table string with columns Duration (ms), SizeBytes, and ResourceKey.</returns>
+        private static string FormatResourceTimingBreakdown(IReadOnlyList<ResourceTimingRow> rows)
+        {
+            var jagged = rows.Select(r =>
+                    new[]
+                    {
+                        r.ElapsedMs.ToString("F2", CultureInfo.InvariantCulture),
+                        r.SizeBytes.ToString(CultureInfo.InvariantCulture),
+                        r.ResourceKey,
+                    }
+                )
+                .ToArray();
+
+            return jagged.ToFormattedText(
+                ["Duration", "SizeBytes", "ResourceKey"],
+                [Enums.Justification.Right, Enums.Justification.Right, Enums.Justification.Left]
+            );
         }
 
         internal virtual IDictionary<string, string> GetSerializedConfigurations()
