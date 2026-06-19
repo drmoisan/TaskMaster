@@ -82,7 +82,19 @@ namespace UtilitiesCS.EmailIntelligence
             // enumerated resource entry. It does not alter deserialization control flow.
             var timingRows = new List<ResourceTimingRow>();
 
-            var resourceDictionary = await GetSerializedConfigurations()
+            // Diagnostic instrumentation (Issue #207, increment 2): measure the serialized-payload
+            // read (GetSerializedConfigurations) separately from the per-resource deserialize timing
+            // so the read-versus-deserialize split is visible in the emitted breakdown. Uses
+            // Stopwatch only (no DateTime/clock APIs). The read result is materialized to a list so
+            // the read cost is fully captured before deserialization begins; this does not change
+            // the enumeration, the entries, or the deserialize control flow below.
+            var readStopwatch = System.Diagnostics.Stopwatch.StartNew();
+            var serializedConfigurations = GetSerializedConfigurations().ToList();
+            readStopwatch.Stop();
+            var readElapsedMs = readStopwatch.Elapsed.TotalMilliseconds;
+            var readEntryCount = serializedConfigurations.Count;
+
+            var resourceDictionary = await serializedConfigurations
                 .ToAsyncEnumerable()
                 .SelectAwait(async kvp =>
                 {
@@ -128,10 +140,16 @@ namespace UtilitiesCS.EmailIntelligence
                 .Where(kvp => kvp.Value is not null)
                 .ToConcurrentDictionaryAsync();
 
-            // Emit the per-resource breakdown exactly once as a single consolidated block,
-            // consistent in style with the existing [Startup timing] table. The same rendered
-            // text is retained on LastResourceTimingBreakdown for test observability.
-            LastResourceTimingBreakdown = FormatResourceTimingBreakdown(timingRows);
+            // Emit the read-versus-deserialize breakdown exactly once as a single consolidated
+            // block, consistent in style with the existing [Startup timing] table. The labeled
+            // GetSerializedConfigurations read line precedes the per-resource deserialize rows so
+            // the split is visible. The same rendered text is retained on
+            // LastResourceTimingBreakdown for test observability.
+            LastResourceTimingBreakdown = FormatResourceTimingBreakdown(
+                readElapsedMs,
+                readEntryCount,
+                timingRows
+            );
             logger.Info($"[IntelConfig timing]\n{LastResourceTimingBreakdown}");
 
             return resourceDictionary;
@@ -166,16 +184,31 @@ namespace UtilitiesCS.EmailIntelligence
         }
 
         /// <summary>
-        /// Renders the per-resource timing rows as a single formatted table using the same
+        /// Renders the read-versus-deserialize timing breakdown (Issue #207, increment 2) as a
+        /// single formatted block. A labeled <c>GetSerializedConfigurations</c> read line precedes
+        /// the per-resource deserialize table, which is rendered through the same
         /// <see cref="UtilitiesCS.PrettyPrinters.ToFormattedText(string[][], string[], Enums.Justification[], string)"/>
         /// column-alignment helper that <c>StartupTimingRecorder.FormatTable</c> uses, so the
         /// breakdown matches the existing <c>[Startup timing]</c> table style. Pure: builds and
         /// returns a string with no logging or I/O.
         /// </summary>
-        /// <param name="rows">The per-resource measurements to render, in capture order.</param>
-        /// <returns>A formatted table string with columns Duration (ms), SizeBytes, and ResourceKey.</returns>
-        private static string FormatResourceTimingBreakdown(IReadOnlyList<ResourceTimingRow> rows)
+        /// <param name="readElapsedMs">The Stopwatch-measured elapsed milliseconds of the <c>GetSerializedConfigurations()</c> serialized-payload read.</param>
+        /// <param name="readEntryCount">The number of serialized resource entries returned by the read.</param>
+        /// <param name="rows">The per-resource deserialize measurements to render, in capture order.</param>
+        /// <returns>A block whose first line reports the read measurement, followed by a formatted table with columns Duration (ms), SizeBytes, and ResourceKey.</returns>
+        private static string FormatResourceTimingBreakdown(
+            double readElapsedMs,
+            int readEntryCount,
+            IReadOnlyList<ResourceTimingRow> rows
+        )
         {
+            var readLine = string.Format(
+                CultureInfo.InvariantCulture,
+                "GetSerializedConfigurations read: durationMs={0}; entries={1}",
+                readElapsedMs.ToString("F2", CultureInfo.InvariantCulture),
+                readEntryCount.ToString(CultureInfo.InvariantCulture)
+            );
+
             var jagged = rows.Select(r =>
                     new[]
                     {
@@ -186,10 +219,12 @@ namespace UtilitiesCS.EmailIntelligence
                 )
                 .ToArray();
 
-            return jagged.ToFormattedText(
+            var deserializeTable = jagged.ToFormattedText(
                 ["Duration", "SizeBytes", "ResourceKey"],
                 [Enums.Justification.Right, Enums.Justification.Right, Enums.Justification.Left]
             );
+
+            return $"{readLine}\n{deserializeTable}";
         }
 
         internal virtual IDictionary<string, string> GetSerializedConfigurations()

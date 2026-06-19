@@ -165,19 +165,35 @@ namespace TaskMaster
             var hookStopwatch = Stopwatch.StartNew();
             LogStartupTiming("Hook start | startup hook", true);
 
+            // Diagnostic instrumentation (Issue #207, increment 2): time each of the three
+            // synchronous COM operations individually so the dominant STA-thread blocking call can
+            // be localized across cold starts. Each operation is wrapped by its own Stopwatch
+            // (Stopwatch only, no DateTime/clock APIs). The assignments, the per-inbox subscription
+            // behavior, and their ordering are unchanged.
             {
+                var toDoItemsStopwatch = Stopwatch.StartNew();
                 OlToDoItems = Globals.Ol.ToDoFolder.Items;
+                toDoItemsStopwatch.Stop();
+
+                var remindersStopwatch = Stopwatch.StartNew();
                 OlReminders = Globals.Ol.OlReminders;
+                remindersStopwatch.Stop();
+
+                var inboxSubscribeStopwatch = Stopwatch.StartNew();
                 Globals.Ol.Inboxes.ForEach(x =>
                     OlInboxes.AddLast(x.Items, items => items.ItemAdd += OlInboxItems_ItemAdd)
                 );
-            }
+                inboxSubscribeStopwatch.Stop();
 
-            LogStartupTiming(
-                "Hook complete | startup hook",
-                true,
-                $"elapsedMs={hookStopwatch.ElapsedMilliseconds}; inboxSubscriptions={OlInboxes.Count()}"
-            );
+                LogStartupTiming(
+                    "Hook complete | startup hook",
+                    true,
+                    $"elapsedMs={hookStopwatch.ElapsedMilliseconds}; inboxSubscriptions={OlInboxes.Count()}; "
+                        + $"toDoItemsMs={toDoItemsStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}; "
+                        + $"remindersMs={remindersStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}; "
+                        + $"inboxSubscribeMs={inboxSubscribeStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}"
+                );
+            }
         }
 
         public void Unhook()

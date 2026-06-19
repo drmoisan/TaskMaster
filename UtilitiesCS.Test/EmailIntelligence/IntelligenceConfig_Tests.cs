@@ -373,11 +373,68 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Act
             var result = await config.ReadConfigurationAsync();
 
-            // Assert
+            // Assert. Pins the Config contents against any silent change from the increment-2
+            // read-timing instrumentation: exactly the two non-null fixture keys are retained,
+            // the null-loader entry is filtered out, and each key maps to its original loader.
             result.Keys.Should().BeEquivalentTo("People", "Derived");
+            result.Count.Should().Be(2, "exactly the two non-null-loader entries are retained");
             result.Should().NotContainKey("Missing", "null-loader entries are filtered out");
             result["People"].Should().BeSameAs(peopleLoader);
             result["Derived"].Should().BeSameAs(derivedLoader);
+        }
+
+        #endregion
+
+        #region Issue #207 increment 2 — Read-versus-deserialize split
+
+        /// <summary>
+        /// Verifies that ReadConfigurationAsync records the GetSerializedConfigurations() read
+        /// measurement separately from the per-resource DeserializeLoaderAsync timing, so the
+        /// read-versus-deserialize split is visible in the emitted breakdown (AC2). Exercises the
+        /// internal seams via TestableIntelligenceConfig with deterministic in-memory fixtures —
+        /// no live COM, network, filesystem, or temp files (AC4). Passes when the breakdown carries
+        /// the labeled read line (durationMs + entry count) and a deserialize row per resource key.
+        /// </summary>
+        [TestMethod]
+        public async Task ReadConfigurationAsync_RecordsReadSeparatelyFromDeserialize_SplitIsVisible()
+        {
+            // Arrange
+            var mockGlobals = new Mock<IApplicationGlobals>(MockBehavior.Loose);
+            var peopleLoader = new SmartSerializableLoader { T = typeof(PeopleScoDictionaryNew) };
+            var derivedLoader = new SmartSerializableLoader { T = typeof(DerivedScoDictionary) };
+            var config = new TestableIntelligenceConfig(mockGlobals.Object)
+            {
+                SerializedConfigurations = new Dictionary<string, string>
+                {
+                    ["People"] = "people-json",
+                    ["Derived"] = "derived-json",
+                },
+                LoaderMap = { ["people-json"] = peopleLoader, ["derived-json"] = derivedLoader },
+            };
+
+            // Act
+            await config.InitAsync();
+            var breakdown = config.LastResourceTimingBreakdown;
+
+            // Assert: labeled read line (read side) and per-resource deserialize rows (deserialize side).
+            breakdown.Should().NotBeNullOrWhiteSpace("the breakdown must be rendered after a run");
+            breakdown
+                .Should()
+                .Contain(
+                    "GetSerializedConfigurations read:",
+                    "the read measurement must be labeled and visible separately from deserialize"
+                );
+            breakdown.Should().Contain("durationMs=", "the read line carries a Stopwatch duration");
+            breakdown.Should().Contain("entries=2", "the read line reports the read entry count");
+            breakdown
+                .Should()
+                .Contain("Duration")
+                .And.Contain("SizeBytes")
+                .And.Contain("ResourceKey");
+            breakdown
+                .Should()
+                .Contain("People")
+                .And.Contain("Derived", "each fixture key contributes one deserialize row");
         }
 
         #endregion
