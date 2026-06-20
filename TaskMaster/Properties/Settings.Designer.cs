@@ -682,7 +682,19 @@ namespace TaskMaster.Properties {
                 this["StartupTimingEnabled"] = value;
             }
         }
-        
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int RemindersProbeDelaySeconds {
+            get {
+                return ((int)(this["RemindersProbeDelaySeconds"]));
+            }
+            set {
+                this["RemindersProbeDelaySeconds"] = value;
+            }
+        }
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]

@@ -175,8 +175,27 @@ namespace TaskMaster
                 OlToDoItems = Globals.Ol.ToDoFolder.Items;
                 toDoItemsStopwatch.Stop();
 
+                // Diagnostic instrumentation (Issue #207, increment 3): the OlReminders latency
+                // probe. The pure decision/scheduling logic lives in the unit-tested
+                // RemindersProbeSchedule seam. At the default RemindersProbeDelaySeconds = 0,
+                // ShouldDefer is false and the first OlReminders access remains exactly the current
+                // synchronous assignment wrapped by remindersStopwatch (behavior-preserving). When
+                // RemindersProbeDelaySeconds > 0, the first access is deferred by that many seconds
+                // via a message-pumping DispatcherTimer (no Thread.Sleep/Task.Delay) and performed
+                // exactly once. The ToDoFolder.Items read above and the inbox subscription loop
+                // below remain synchronous and unchanged in both paths.
                 var remindersStopwatch = Stopwatch.StartNew();
-                OlReminders = Globals.Ol.OlReminders;
+                var probeSchedule = new RemindersProbeSchedule(
+                    Settings.Default.RemindersProbeDelaySeconds
+                );
+                if (!probeSchedule.ShouldDefer)
+                {
+                    OlReminders = Globals.Ol.OlReminders;
+                }
+                else
+                {
+                    ScheduleDeferredRemindersProbe(probeSchedule.Delay, hookStopwatch);
+                }
                 remindersStopwatch.Stop();
 
                 var inboxSubscribeStopwatch = Stopwatch.StartNew();
@@ -194,6 +213,43 @@ namespace TaskMaster
                         + $"inboxSubscribeMs={inboxSubscribeStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}"
                 );
             }
+        }
+
+        /// <summary>
+        /// Defers the first <c>OlReminders</c> access (Issue #207, increment 3 probe). Schedules a
+        /// message-pumping <see cref="System.Windows.Threading.DispatcherTimer"/> on the STA that,
+        /// on its first <c>Tick</c>, stops itself (single execution), performs the same
+        /// <c>OlReminders = Globals.Ol.OlReminders;</c> assignment as the synchronous path, and
+        /// logs the access latency and the elapsed-since-Hook-entry on one readable line. Uses
+        /// <see cref="Stopwatch"/> for timing only (no wall-clock APIs) and never
+        /// <c>Thread.Sleep</c>/<c>Task.Delay</c>.
+        /// </summary>
+        /// <param name="delay">The resolved deferral interval from the probe schedule.</param>
+        /// <param name="hookStopwatch">
+        /// The <see cref="Stopwatch"/> started at <c>Hook()</c> entry, used to report the
+        /// elapsed-since-startup at the deferred access point.
+        /// </param>
+        private void ScheduleDeferredRemindersProbe(TimeSpan delay, Stopwatch hookStopwatch)
+        {
+            var probeTimer = new System.Windows.Threading.DispatcherTimer { Interval = delay };
+            probeTimer.Tick += (sender, e) =>
+            {
+                // Stop first so the access executes exactly once even if a second Tick is queued.
+                probeTimer.Stop();
+
+                var accessStopwatch = Stopwatch.StartNew();
+                OlReminders = Globals.Ol.OlReminders;
+                accessStopwatch.Stop();
+
+                LogStartupTiming(
+                    "Hook reminders probe | startup hook",
+                    true,
+                    $"probeDelayMs={delay.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}; "
+                        + $"accessLatencyMs={accessStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}; "
+                        + $"elapsedSinceHookMs={hookStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}"
+                );
+            };
+            probeTimer.Start();
         }
 
         public void Unhook()

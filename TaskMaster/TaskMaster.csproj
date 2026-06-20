@@ -399,6 +399,7 @@
     <Compile Include="AppGlobals\AppItemEngines.cs" />
     <Compile Include="AppGlobals\ApplicationGlobals.cs" />
     <Compile Include="AppGlobals\IStartupTimingRecorder.cs" />
+    <Compile Include="AppGlobals\RemindersProbeSchedule.cs" />
     <Compile Include="AppGlobals\StartupTimingRecorder.cs" />
     <Compile Include="AppGlobals\AppOlObjects.cs" />
     <Compile Include="AppGlobals\AppQuickFilerSettings.cs" />

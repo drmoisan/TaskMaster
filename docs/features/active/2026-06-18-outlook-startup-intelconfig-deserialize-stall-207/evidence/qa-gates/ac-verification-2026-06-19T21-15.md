@@ -1,0 +1,16 @@
+# Phase 2 — Acceptance Criteria Verification (Issue #207, increment 3)
+
+Timestamp: 2026-06-19T21-15
+
+AC source: docs/features/active/2026-06-18-outlook-startup-intelconfig-deserialize-stall-207/issue.md -> ## Acceptance Criteria — Increment 3 (OlReminders latency probe) (I3-AC1..I3-AC6)
+
+| AC | Verdict | Evidence / citation |
+|---|---|---|
+| I3-AC1 | PASS | RemindersProbeDelaySeconds Int32 user-scoped setting, default 0, added across all three settings files following the StartupTimingEnabled pattern: Settings.settings (P1-T1), Settings.Designer.cs generated accessor (P1-T2), app.config (P1-T3). Default-0 Hook() behavior is byte-for-byte the prior synchronous OlReminders assignment (RemindersProbeSchedule(0).ShouldDefer == false selects the synchronous branch), verified by inspection (P1-T8) and confirmed by the unit test Constructor_WithDefaultZero_DoesNotDeferAndResolvesToZeroDelay (P2-T4). |
+| I3-AC2 | PASS | When RemindersProbeDelaySeconds > 0, AppEvents.Hook() schedules a System.Windows.Threading.DispatcherTimer with Interval = schedule.Delay that stops itself on first Tick (single execution) and then performs OlReminders = Globals.Ol.OlReminders once; it emits exactly one log line ("Hook reminders probe") carrying accessLatencyMs (per-access Stopwatch) and elapsedSinceHookMs (hookStopwatch from Hook entry) (P1-T5, P1-T6). Verified by inspection per the COM/VSTO exemption (P1-T10). |
+| I3-AC3 | PASS | The deferred Tick handler performs the same OlReminders = Globals.Ol.OlReminders assignment through the same synchronized OlReminders property as the synchronous path, so OlReminders holds the same value and the reminders subscription/behavior matches. ToDoFolder.Items read and the inbox subscription loop are untouched by the probe in both branches (P1-T5, P1-T8). |
+| I3-AC4 | PASS | Deterministic MSTest over the pure RemindersProbeSchedule seam with FluentAssertions (no Moq needed; no collaborator): 4 tests covering default 0, positive 30, boundary 1, negative -5; no live COM, no live timer, no network, no filesystem, no temp files (P1-T9, P2-T4: 4/4 passed, type at 100% coverage). The Hook() DispatcherTimer/COM wiring is COM/VSTO logging-only exempt, recorded in the UT5 dossier (P1-T10). |
+| I3-AC5 | PASS | No banned API introduced: RS0030 count = 0 across the analyzer build; no DateTime.Now/DateTime.UtcNow/Random.Shared/Thread.Sleep/Task.Delay in the diff (only in comments/XML docs). Latency uses System.Diagnostics.Stopwatch; the delay uses System.Windows.Threading.DispatcherTimer (P2-T2 analyzer artifact, P1-T4, P1-T6). |
+| I3-AC6 | PASS | Full C# toolchain green in order: CSharpier format+check clean (P2-T1), analyzer build 0 errors (P2-T2), nullable/TreatWarningsAsErrors build 0 errors with no CS0518 (P2-T3), MSTest 111/111 passed with coverage (P2-T4). Coverage policy met: repo-wide no-regression (12.83% -> 12.90%), new type 100% >= 90% (P2-T5). All touched files <= 500 lines: AppEvents.cs 493, RemindersProbeSchedule.cs 57, RemindersProbeScheduleTests.cs 64 (P1-T7). Settings.Designer.cs and app.config are generated/config and not subject to the code-file cap. |
+
+All six increment-3 acceptance criteria are PASS with cited artifact paths. Verdict: PASS.

@@ -116,8 +116,9 @@ Files to inspect:
 ## Proposed Fix / Validation Ideas
 
 - [x] Increment 1 (delivered, committed `2bc71fd5`): per-resource `DeserializeLoaderAsync` timing in `ReadConfigurationAsync`. Result: deserialize exonerated (~133 ms).
-- [ ] Increment 2 (this deliverable): timing around the individual COM accesses in `AppEvents.Hook()` and around `IntelligenceConfig.GetSerializedConfigurations()`, to pin the exact blocking call across 2–3 cold starts.
-- [ ] Corrective fix (deferred until increment-2 evidence): move the blocking COM/RPC and I/O off the synchronous STA startup path (defer/await Outlook readiness, off-thread the read), scoped from the confirmed blocking call site.
+- [x] Increment 2 (delivered, committed `f5f0042b`): per-COM-operation timing in `AppEvents.Hook()` and `GetSerializedConfigurations()` read timing. Result: the blocking call is `Globals.Ol.OlReminders` (`remindersMs=113642`, 113.6 s, Run A); read and deserialize exonerated. See `evidence/diagnostics/startup-timing-increment2-2026-06-19.md`.
+- [ ] Increment 3 (this deliverable): an `OlReminders` first-access latency probe that varies *when* the first access occurs, to determine whether the 113 s is a relocatable readiness wait (Possibility 1) or an intrinsic first-access build cost (Possibility 2). This decides whether a deferral-based corrective fix can work. Evidence: Run A accessed `OlReminders` ~7 s after startup (113.6 s); Run B accessed it ~64 s after startup (20 ms), which is suggestive of Possibility 1 but uncontrolled.
+- [ ] Corrective fix (deferred until increment-3 evidence): if Possibility 1, gate the reminders/ToDo/inbox hookups on true store readiness while keeping the STA pumping; if Possibility 2, avoid materializing reminders on the STA during the unattended startup window. Note: startup work already runs deferred on the `IdleAsyncQueue`/`Application.Idle` event and still blocked, so a naive "defer to first idle" gate is proven insufficient.
 
 ## Acceptance Criteria
 
@@ -130,9 +131,22 @@ Increment 1 (per-resource deserialize timing) is delivered. The acceptance crite
 - [x] AC5: No banned API is introduced; timing uses `Stopwatch` rather than `DateTime.Now`/`DateTime.UtcNow`.
 - [x] AC6: The full C# toolchain passes in order (CSharpier → .NET analyzers → nullable/`TreatWarningsAsErrors` → MSTest with coverage). New and changed lines meet the repository coverage policy and introduce no repository-wide coverage regression.
 
+## Acceptance Criteria — Increment 3 (OlReminders latency probe)
+
+Increments 1 and 2 are delivered. The acceptance criteria below govern **increment 3** — a controlled probe that measures `OlReminders` first-access latency as a function of when the access occurs, to discriminate Possibility 1 (relocatable readiness wait) from Possibility 2 (intrinsic first-access build) before the corrective fix is scoped.
+
+- [x] I3-AC1: A user-scoped setting `RemindersProbeDelaySeconds` (integer, default `0`) is introduced following the existing `StartupTimingEnabled` settings pattern. At the default value `0`, `AppEvents.Hook()` behaves exactly as the pre-increment-3 implementation (synchronous `OlReminders` access); this is behavior-preserving by default.
+- [x] I3-AC2: When `RemindersProbeDelaySeconds > 0`, the first `Globals.Ol.OlReminders` access is deferred by that many seconds using a message-pumping mechanism that does not block the STA (a `System.Windows.Threading.DispatcherTimer` or the existing idle infrastructure — never `Thread.Sleep`/`Task.Delay`), then performed exactly once. The access latency (`System.Diagnostics.Stopwatch`) and the elapsed-since-startup at the access point are logged via the existing `log4net` logger in a single readable line.
+- [x] I3-AC3: The deferred path is state-equivalent to the synchronous path: after the probe access, `OlReminders` holds the same value and the reminders subscription/behavior matches the synchronous path; the `ToDoFolder.Items` and inbox subscriptions are unchanged.
+- [x] I3-AC4: A deterministic MSTest (Moq + FluentAssertions) covers the pure decision/scheduling logic — whether to defer and the resolved delay `TimeSpan` from the setting value — with no live COM, no live timer, no network/filesystem, and no temporary files. The COM access and `DispatcherTimer` wiring in `AppEvents.Hook()` are COM/VSTO-exempt (scheduling/logging only) and verified by inspection per the `CLAUDE.md` exemption.
+- [x] I3-AC5: No banned API is introduced (`DateTime.Now`/`DateTime.UtcNow`, `Random.Shared`, `Thread.Sleep`, `Task.Delay`); timing uses `Stopwatch` and the delay uses a `DispatcherTimer`.
+- [x] I3-AC6: The full C# toolchain passes in order (CSharpier → .NET analyzers → nullable/`TreatWarningsAsErrors` → MSTest with coverage). New/changed testable lines meet the repository coverage policy with no repository-wide regression, and all touched files remain ≤ 500 lines (extract a small helper if needed).
+
 ## Next Step
 
 - [x] Promote to GitHub issue (bug-report template)
 - [x] Move to active fix folder / branch
 - [x] Increment 1 instrumentation delivered (deserialize timing)
 - [x] Increment 2 instrumentation: `Hook()` and `GetSerializedConfigurations()` timing
+- [x] Increment 3 instrumentation: `OlReminders` first-access latency probe (Possibility 1 vs 2)
+- [ ] Capture latency-vs-delay curve; scope corrective fix from the result

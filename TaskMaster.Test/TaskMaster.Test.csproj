@@ -262,6 +262,7 @@
     <Compile Include="AppGlobals\AppAutoFileObjectsFolderPredictorTests.cs" />
     <Compile Include="AppGlobals\ApplicationGlobalsStartupTimingTests.cs" />
     <Compile Include="AppGlobals\StartupTimingRecorderTests.cs" />
+    <Compile Include="AppGlobals\RemindersProbeScheduleTests.cs" />
     <Compile Include="AppGlobals\AppEventsTests.cs" />
     <Compile Include="AppGlobals\AppFileSystemFolderPathsMatchBestSpecialFolderTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsCoverageTests.cs" />
