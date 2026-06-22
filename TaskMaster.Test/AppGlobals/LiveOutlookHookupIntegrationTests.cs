@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using FluentAssertions;
@@ -24,6 +25,16 @@ namespace TaskMaster.Test.AppGlobals
     /// marked <c>[TestCategory("LiveOutlook")]</c>; the standard QC/CI run excludes it via
     /// <c>/TestCaseFilter:"TestCategory!=LiveOutlook"</c>, and it is excluded from the coverage
     /// denominator.
+    /// </para>
+    /// <para>
+    /// When the harness is run in an environment where Outlook is not registered/available (for
+    /// example a headless agent that runs the whole suite without the category exclusion), creating
+    /// the Outlook COM <see cref="Outlook.Application"/> throws a class-not-available
+    /// <see cref="COMException"/> (e.g. <c>0x80040154</c> REGDB_E_CLASSNOTREG). In that case the
+    /// harness reports <see cref="Assert.Inconclusive(string)"/> (skipped) rather than failing,
+    /// because it has no Outlook to exercise. Any other exception — including a COMException with an
+    /// HRESULT that does not indicate class unavailability — still fails the test. When Outlook IS
+    /// available the harness runs the real assertion path unchanged.
     /// </para>
     /// <para>
     /// Developer run command:
@@ -53,11 +64,32 @@ namespace TaskMaster.Test.AppGlobals
         // Poll cadence (ms) for the developer harness loop.
         private const int PollIntervalMs = 250;
 
+        // Class-not-registered / class-not-available HRESULTs that mean "no Outlook here" (a
+        // headless agent or a machine without Outlook installed). When the Outlook COM
+        // Application cannot be created for one of these reasons, the harness is not exercising a
+        // defect: it simply has nothing to test against, so it skips (Assert.Inconclusive) instead
+        // of failing. The set is intentionally narrow — only the class-availability HRESULTs — so
+        // that any other COMException (a real interop fault on a machine that DOES have Outlook)
+        // still surfaces as a failure.
+        private const int RegdbEClassNotReg = unchecked((int)0x80040154); // REGDB_E_CLASSNOTREG
+        private const int ClassENotLicensed = unchecked((int)0x80040112); // CLASS_E_NOTLICENSED
+        private const int CoEServerExecFailure = unchecked((int)0x80080005); // CO_E_SERVER_EXEC_FAILURE
+
+        /// <summary>
+        /// Returns <c>true</c> only when the supplied HRESULT indicates that the Outlook COM class
+        /// is not registered or not available on this machine (so the live harness has no Outlook to
+        /// exercise and must skip rather than fail). Returns <c>false</c> for every other HRESULT,
+        /// including real interop faults on a machine where Outlook IS present.
+        /// </summary>
+        private static bool IsOutlookUnavailableHResult(int hr) =>
+            hr == RegdbEClassNotReg || hr == ClassENotLicensed || hr == CoEServerExecFailure;
+
         [TestMethod]
         [TestCategory("LiveOutlook")]
         public void LiveHookup_OnSta_CompletesAndDoesNotBlockStaBeyondThreshold()
         {
             Exception captured = null;
+            string skipReason = null;
             bool completed = false;
             long maxTickBlockMs = 0;
             long readinessWaitMs = 0;
@@ -118,6 +150,15 @@ namespace TaskMaster.Test.AppGlobals
                     readinessWaitMs = waitStopwatch.ElapsedMilliseconds;
                     hookupLatencyMs = hookupStopwatch.ElapsedMilliseconds;
                 }
+                catch (COMException comEx) when (IsOutlookUnavailableHResult(comEx.ErrorCode))
+                {
+                    // Outlook is not registered/available on this machine (e.g. a headless CI
+                    // agent). This is not a hookup defect; record a skip signal so the test body
+                    // reports Inconclusive instead of failing. Deliberately do NOT set `captured`.
+                    skipReason =
+                        $"Outlook is not registered/available in this environment "
+                        + $"(HRESULT 0x{comEx.ErrorCode:X8}: {comEx.Message}).";
+                }
                 catch (Exception ex)
                 {
                     captured = ex;
@@ -127,6 +168,14 @@ namespace TaskMaster.Test.AppGlobals
             thread.IsBackground = true;
             thread.Start();
             thread.Join();
+
+            // Skip (do not fail) when Outlook is unavailable in this environment. A developer
+            // machine with Outlook registered leaves skipReason null and runs the real assertions
+            // below; a headless agent (no Outlook) reports Inconclusive and stops here.
+            if (skipReason != null)
+            {
+                Assert.Inconclusive($"[LiveOutlook] Skipped: {skipReason}");
+            }
 
             // Assert: surface any STA-thread exception, then verify completion + responsiveness.
             captured.Should().BeNull("the live hookup must not throw on the STA");
