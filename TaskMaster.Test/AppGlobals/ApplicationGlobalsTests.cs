@@ -207,7 +207,7 @@ namespace TaskMaster.Test.AppGlobals
 
             var yieldMatches = Regex.Matches(
                 methodBody,
-                @"await\s+YieldBetweenStartupPhasesAsync\s*\(\s*\)\s*;"
+                @"await\s+YieldWithContinuationProbeAsync\s*\([^\)]*\)\s*;"
             );
             yieldMatches
                 .Count.Should()
@@ -241,7 +241,7 @@ namespace TaskMaster.Test.AppGlobals
             Regex
                 .IsMatch(
                     methodBody,
-                    @"await\s+LoadToDoPhaseAsync\(\)\s*;[\s\S]*?await\s+YieldBetweenStartupPhasesAsync\(\)\s*;[\s\S]*?await\s+LoadAutoFilePhaseAsync\(\)\s*;"
+                    @"await\s+LoadToDoPhaseAsync\(\)\s*;[\s\S]*?await\s+YieldWithContinuationProbeAsync\([^\)]*\)\s*;[\s\S]*?await\s+LoadAutoFilePhaseAsync\(\)\s*;"
                 )
                 .Should()
                 .BeTrue(
@@ -251,7 +251,7 @@ namespace TaskMaster.Test.AppGlobals
             // ToDo await and the yield: only a _timingRecorder.RecordPhase(...) call is allowed.
             var toDoToYield = Regex.Match(
                 methodBody,
-                @"await\s+LoadToDoPhaseAsync\(\)\s*;(?<between>[\s\S]*?)await\s+YieldBetweenStartupPhasesAsync\(\)\s*;"
+                @"await\s+LoadToDoPhaseAsync\(\)\s*;(?<between>[\s\S]*?)await\s+YieldWithContinuationProbeAsync\([^\)]*\)\s*;"
             );
             toDoToYield.Success.Should().BeTrue();
             Regex
@@ -449,10 +449,12 @@ namespace TaskMaster.Test.AppGlobals
                 return Task.CompletedTask;
             }
 
-            protected internal override async Task YieldBetweenStartupPhasesAsync()
+            protected internal override async Task YieldWithContinuationProbeAsync(
+                string priorPhaseName
+            )
             {
                 YieldCount++;
-                await base.YieldBetweenStartupPhasesAsync();
+                await base.YieldWithContinuationProbeAsync(priorPhaseName);
             }
 
             protected internal override Task LoadOlObjectsPhaseAsync()

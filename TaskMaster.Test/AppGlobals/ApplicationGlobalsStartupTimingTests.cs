@@ -265,10 +265,12 @@ namespace TaskMaster.Test.AppGlobals
                 return Task.CompletedTask;
             }
 
-            protected internal override async Task YieldBetweenStartupPhasesAsync()
+            protected internal override async Task YieldWithContinuationProbeAsync(
+                string priorPhaseName
+            )
             {
                 YieldCount++;
-                await base.YieldBetweenStartupPhasesAsync();
+                await base.YieldWithContinuationProbeAsync(priorPhaseName);
             }
 
             protected internal override Task LoadOlObjectsPhaseAsync()

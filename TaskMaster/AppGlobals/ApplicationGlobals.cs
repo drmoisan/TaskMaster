@@ -137,19 +137,19 @@ namespace TaskMaster
             var stopwatch = Stopwatch.StartNew();
             await LoadIntelConfigPhaseAsync();
             _timingRecorder.RecordPhase("IntelConfig", StopAndRestart(stopwatch));
-            await YieldBetweenStartupPhasesAsync();
+            await YieldWithContinuationProbeAsync("IntelConfig");
             await LoadOlObjectsPhaseAsync();
             _timingRecorder.RecordPhase("OlObjects", StopAndRestart(stopwatch));
-            await YieldBetweenStartupPhasesAsync();
+            await YieldWithContinuationProbeAsync("OlObjects");
             await LoadToDoPhaseAsync();
             _timingRecorder.RecordPhase("ToDo", StopAndRestart(stopwatch));
-            await YieldBetweenStartupPhasesAsync();
+            await YieldWithContinuationProbeAsync("ToDo");
             await LoadAutoFilePhaseAsync();
             _timingRecorder.RecordPhase("AutoFile", StopAndRestart(stopwatch));
-            await YieldBetweenStartupPhasesAsync();
+            await YieldWithContinuationProbeAsync("AutoFile");
             await InitializeEnginesPhaseAsync();
             _timingRecorder.RecordPhase("Engines", StopAndRestart(stopwatch));
-            await YieldBetweenStartupPhasesAsync();
+            await YieldWithContinuationProbeAsync("Engines");
             await LoadEventsPhaseAsync();
             _timingRecorder.RecordPhase("Events", StopAndRestart(stopwatch));
         }
@@ -169,9 +169,25 @@ namespace TaskMaster
         // drive the real coordinator sequence without constructing the full Outlook/VSTO runtime.
         protected internal virtual Task LoadIntelConfigPhaseAsync() => LoadIntelConfigAsync();
 
-        protected internal virtual async Task YieldBetweenStartupPhasesAsync()
+        // Continuation-latency attribution probe (issue #211). Measures how long the inter-phase
+        // continuation waits to resume on the STA after the single Task.Yield (waitMs is the
+        // attribution number), and captures cheap STA-occupancy signals at the moment the
+        // continuation resumes. Behavior is preserved: this still performs exactly one Task.Yield
+        // back to the Dispatcher. Stopwatch only; no banned timing APIs.
+        protected internal virtual async Task YieldWithContinuationProbeAsync(string priorPhaseName)
         {
+            var sw = Stopwatch.StartNew();
             await Task.Yield();
+            sw.Stop();
+            logger.Debug(
+                $"[continuation-resume] priorPhase={priorPhaseName} "
+                    + $"waitMs={sw.Elapsed.TotalMilliseconds:F1} "
+                    + $"resumeThreadId={System.Threading.Thread.CurrentThread.ManagedThreadId} "
+                    + $"resumeSyncContext={System.Threading.SynchronizationContext.Current?.GetType().FullName ?? "null"} "
+                    + $"staIsIdle={UtilitiesCS.Threading.ApplicationIdleTimer.IsIdle} "
+                    + $"staCpuUsage={UtilitiesCS.Threading.ApplicationIdleTimer.CurrentCPUUsage:F3} "
+                    + $"staGuiActivity={UtilitiesCS.Threading.ApplicationIdleTimer.CurrentGUIActivity:F1}"
+            );
         }
 
         protected internal virtual Task LoadOlObjectsPhaseAsync() => _olObjects.LoadAsync();
