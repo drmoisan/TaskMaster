@@ -44,8 +44,13 @@ Logs / Screenshots:
 
 ## Scope & Non-Goals
 - In scope:
+  - Phase 1 (immediate): a behavior-preserving continuation-latency attribution probe in `ApplicationGlobals.LoadSequentialAsync` that measures and logs how long each inter-phase continuation waits to resume on the STA, plus cheap STA-occupancy signals, to attribute the stall (TaskMaster vs external Teams/Outlook vs debugger overhead).
+  - Phase 2 (evidence-gated): if the non-debugger capture confirms a large real continuation wait, move the IntelConfig post-`Task.Run` continuation off the STA (`ConfigureAwait(false)`) and explicitly re-marshal to the STA before the next COM-bound phase, so a momentarily-busy STA does not serialize startup.
 - Out of scope / non-goals:
-- Explicitly excluded systems, integrations, or datasets:
+  - The Microsoft Teams Meeting Add-in (cannot be modified or removed; its shared-STA occupation is external — any remedy is TaskMaster-side scheduling).
+  - Moving COM-bound phase bodies/continuations (OlObjects, ToDo, AutoFile, Engines, Events) off the STA.
+  - Issues #208 (log4net) and #209 (Tesseract); the #207 hookup-path fix (already merged).
+- Explicitly excluded systems, integrations, or datasets: none beyond the above.
 
 ## Root Cause Analysis
 The dominant cost is the STA being unavailable to resume the `LoadIntelConfigAsync` `Task.Run` continuation in `ApplicationGlobals.LoadSequentialAsync`, not TaskMaster deserialization (proven fast). Attribution is open and must be settled by instrumentation, per the maintainer rule "in scope iff this add-in causes it." Candidate occupants of the shared STA during the window:
@@ -62,11 +67,18 @@ Files to inspect:
 
 ## Proposed Fix
 
+Source: `artifacts/research/2026-06-22-intelconfig-continuation-stall-211-research.md`.
+
 ### Design summary (what changes where):
+- **Phase 1 — attribution probe (this deliverable).** Replace `ApplicationGlobals.YieldBetweenStartupPhasesAsync()` with `YieldWithContinuationProbeAsync(string priorPhaseName)` (`protected internal virtual`). It does `Stopwatch.StartNew()` -> `await Task.Yield()` -> `sw.Stop()` -> emits one `[continuation-resume]` log line with: `priorPhase`, `waitMs` (F1, Stopwatch — the attribution number), `resumeThreadId` (vs `UiThread.UiThreadId`), `resumeSyncContext`, `staIsIdle` (`ApplicationIdleTimer.IsIdle`), `staCpuUsage` (`CurrentCPUUsage`), `staGuiActivity` (`CurrentGUIActivity`). The five inter-phase call sites pass their preceding phase name. Stopwatch only; no banned APIs. Behavior is preserved (still a single `Task.Yield` back to the Dispatcher).
+- **Phase 2 — off-STA IntelConfig continuation (evidence-gated).** Only if a non-debugger capture shows the IntelConfig continuation `waitMs` is materially large (> 5000 ms): add `.ConfigureAwait(false)` to the `Task.Run` await in `LoadIntelConfigAsync`, and in `LoadSequentialAsync` insert `await UiThread.UiSyncContext;` (existing `SynchronizationContextAwaiter`, UiThread.cs:82-85) after the IntelConfig phase and before `LoadOlObjectsPhaseAsync`, so the IntelConfig continuation completes on the thread pool and re-marshals to the STA only when OlObjects needs it. The intervening `StopAndRestart`/`RecordPhase` calls are pure and thread-safe.
 
 ### Boundaries and invariants to preserve:
+- Phase order and outcomes unchanged; all COM-bound phase bodies run on the STA; `OlObjects` and later phases resume on the STA (verified by the re-marshal in Phase 2).
+- No banned APIs (`DateTime.Now`/`UtcNow`, `Random.Shared`, `Thread.Sleep`, `Task.Delay`); `Stopwatch` for timing. net48 (no positional `record struct`). All touched files <= 500 lines.
 
 ### Dependencies or blocked work:
+- Phase 2 is blocked on the maintainer's non-debugger (and, if needed, Teams-disabled) runtime capture from the Phase 1 instrumentation; if that capture shows the stall is debugger-only/not reproduced, Phase 2 is not implemented and the issue closes with that finding.
 
 ### Implementation strategy (what changes, not sequencing):
 	
@@ -119,14 +131,15 @@ Seeded from issue:
 
 
 ## Acceptance Criteria
-- [ ] Repro steps now produce the expected behavior in all documented environments.
-- [ ] Regression test(s) added and passing (list file path and test name).
-- [ ] Edge cases and invalid inputs are handled with correct errors or fallbacks.
-- [ ] No unintended behavior changes outside the defined scope.
-- [ ] Required logs/telemetry updated and validated (if applicable).
-- [ ] Performance constraints met or explicitly waived with rationale.
-- [ ] Full toolchain pass completed (format → lint → type-check → test).
-- [ ] Docs/config references updated to match the new behavior.
+
+Phase 1 (attribution instrumentation) is the immediate deliverable; Phase 2 is evidence-gated.
+
+- [ ] AC1: `LoadSequentialAsync` emits one `[continuation-resume]` log line per inter-phase boundary via the existing `log4net` logger, each with `priorPhase`, `waitMs` (Stopwatch, F1), `resumeThreadId`, `resumeSyncContext`, `staIsIdle`, `staCpuUsage`, `staGuiActivity`.
+- [ ] AC2: behavior-preserving — the probe replaces the existing `Task.Yield()` inter-phase yields without changing phase order, count, or outcomes; `Stopwatch` only; no banned API introduced; net48 (no positional `record struct`).
+- [ ] AC3: a deterministic MSTest (Moq + FluentAssertions) using a `TestApplicationGlobals` subclass overriding the `protected internal virtual` probe verifies it is invoked once per phase boundary in the correct order with the correct phase names; no live COM, no live timer, no network/filesystem, no temporary files.
+- [ ] AC4: full C# toolchain passes in order (CSharpier -> analyzers -> nullable/TWAE -> MSTest with coverage, gated `/TestCaseFilter:"TestCategory!=LiveOutlook"`); the new testable seam meets the coverage policy; no repository-wide regression; all touched files <= 500 lines.
+- [ ] AC5 (runtime, maintainer): a non-debugger cold-start capture (DebugView / OutputDebugString) produces the `[continuation-resume]` fields; this is the gating evidence for Phase 2 and is recorded under `evidence/`. (Not CI-automatable.)
+- [ ] AC6 (Phase 2, evidence-gated): IF the non-debugger capture shows the IntelConfig continuation `waitMs` > 5000 ms with the STA externally occupied, apply the off-STA IntelConfig continuation (`ConfigureAwait(false)` + `await UiThread.UiSyncContext` before `OlObjects`), with a unit test asserting phase ordering is preserved and the `OlObjects` phase resumes on the STA, and a re-capture confirming the reduction. IF the capture shows the stall is debugger-only / not reproduced outside the debugger, Phase 2 is not implemented and the issue closes documenting that finding.
 
 ## Risks & Mitigations
 - Technical or operational risks:
