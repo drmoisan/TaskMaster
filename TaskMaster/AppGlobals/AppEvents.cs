@@ -162,94 +162,82 @@ namespace TaskMaster
 
         public void Hook()
         {
-            var hookStopwatch = Stopwatch.StartNew();
             LogStartupTiming("Hook start | startup hook", true);
 
-            // Diagnostic instrumentation (Issue #207, increment 2): time each of the three
-            // synchronous COM operations individually so the dominant STA-thread blocking call can
-            // be localized across cold starts. Each operation is wrapped by its own Stopwatch
-            // (Stopwatch only, no DateTime/clock APIs). The assignments, the per-inbox subscription
-            // behavior, and their ordering are unchanged.
+            // Issue #207 corrective fix: the three readiness-dependent COM hookups are no longer
+            // run synchronously/unconditionally at Hook() entry (which could block the STA for a
+            // prolonged period during a cold start before the store is ready). Instead they are run
+            // by PerformReadinessHookup() exactly once, driven by a DispatcherTimer poll through the
+            // pure HookReadinessCoordinator once the OutlookReadinessGate reports the store ready.
+            // The Dispatcher keeps pumping between ticks, so the STA is never blocked.
+            var gate = new OutlookReadinessGate(Globals.Ol.App);
+            var coordinator = new HookReadinessCoordinator(gate, PerformReadinessHookup);
+
+            const int initialIntervalSeconds = 1;
+            const int backoffIntervalSeconds = 5;
+            const int backoffAfterTicks = 10;
+
+            var pollTimer = new System.Windows.Threading.DispatcherTimer
             {
-                var toDoItemsStopwatch = Stopwatch.StartNew();
-                OlToDoItems = Globals.Ol.ToDoFolder.Items;
-                toDoItemsStopwatch.Stop();
-
-                // Diagnostic instrumentation (Issue #207, increment 3): the OlReminders latency
-                // probe. The pure decision/scheduling logic lives in the unit-tested
-                // RemindersProbeSchedule seam. At the default RemindersProbeDelaySeconds = 0,
-                // ShouldDefer is false and the first OlReminders access remains exactly the current
-                // synchronous assignment wrapped by remindersStopwatch (behavior-preserving). When
-                // RemindersProbeDelaySeconds > 0, the first access is deferred by that many seconds
-                // via a message-pumping DispatcherTimer (no Thread.Sleep/Task.Delay) and performed
-                // exactly once. The ToDoFolder.Items read above and the inbox subscription loop
-                // below remain synchronous and unchanged in both paths.
-                var remindersStopwatch = Stopwatch.StartNew();
-                var probeSchedule = new RemindersProbeSchedule(
-                    Settings.Default.RemindersProbeDelaySeconds
-                );
-                if (!probeSchedule.ShouldDefer)
+                Interval = TimeSpan.FromSeconds(initialIntervalSeconds),
+            };
+            int tickCount = 0;
+            pollTimer.Tick += (sender, e) =>
+            {
+                tickCount++;
+                if (coordinator.Tick() == HookReadinessTickResult.Completed)
                 {
-                    OlReminders = Globals.Ol.OlReminders;
+                    pollTimer.Stop();
+                    return;
                 }
-                else
+
+                // Cadence backoff: after a threshold of not-ready ticks, slow the poll so an
+                // extended not-ready startup does not poll aggressively. Polling never gives up.
+                if (tickCount == backoffAfterTicks)
                 {
-                    ScheduleDeferredRemindersProbe(probeSchedule.Delay, hookStopwatch);
+                    pollTimer.Interval = TimeSpan.FromSeconds(backoffIntervalSeconds);
                 }
-                remindersStopwatch.Stop();
-
-                var inboxSubscribeStopwatch = Stopwatch.StartNew();
-                Globals.Ol.Inboxes.ForEach(x =>
-                    OlInboxes.AddLast(x.Items, items => items.ItemAdd += OlInboxItems_ItemAdd)
-                );
-                inboxSubscribeStopwatch.Stop();
-
-                LogStartupTiming(
-                    "Hook complete | startup hook",
-                    true,
-                    $"elapsedMs={hookStopwatch.ElapsedMilliseconds}; inboxSubscriptions={OlInboxes.Count()}; "
-                        + $"toDoItemsMs={toDoItemsStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}; "
-                        + $"remindersMs={remindersStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}; "
-                        + $"inboxSubscribeMs={inboxSubscribeStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}"
-                );
-            }
+            };
+            pollTimer.Start();
         }
 
         /// <summary>
-        /// Defers the first <c>OlReminders</c> access (Issue #207, increment 3 probe). Schedules a
-        /// message-pumping <see cref="System.Windows.Threading.DispatcherTimer"/> on the STA that,
-        /// on its first <c>Tick</c>, stops itself (single execution), performs the same
-        /// <c>OlReminders = Globals.Ol.OlReminders;</c> assignment as the synchronous path, and
-        /// logs the access latency and the elapsed-since-Hook-entry on one readable line. Uses
-        /// <see cref="Stopwatch"/> for timing only (no wall-clock APIs) and never
-        /// <c>Thread.Sleep</c>/<c>Task.Delay</c>.
+        /// Performs the three readiness-dependent COM hookups synchronously on the STA in their
+        /// original order: subscribe to the ToDo folder items, capture the reminders collection,
+        /// and subscribe each inbox's <c>ItemAdd</c>. Invoked exactly once by
+        /// <see cref="HookReadinessCoordinator"/> when the <see cref="OutlookReadinessGate"/>
+        /// reports the store ready. Retains the increment-1/2 per-operation
+        /// <see cref="Stopwatch"/> timing and the consolidated <c>Hook complete</c>
+        /// <c>[Startup timing]</c> log line. A transient not-ready <see cref="System.Runtime.InteropServices.COMException"/>
+        /// raised here is routed back to the coordinator as a retry; the subscription is never
+        /// silently dropped.
         /// </summary>
-        /// <param name="delay">The resolved deferral interval from the probe schedule.</param>
-        /// <param name="hookStopwatch">
-        /// The <see cref="Stopwatch"/> started at <c>Hook()</c> entry, used to report the
-        /// elapsed-since-startup at the deferred access point.
-        /// </param>
-        private void ScheduleDeferredRemindersProbe(TimeSpan delay, Stopwatch hookStopwatch)
+        private void PerformReadinessHookup()
         {
-            var probeTimer = new System.Windows.Threading.DispatcherTimer { Interval = delay };
-            probeTimer.Tick += (sender, e) =>
-            {
-                // Stop first so the access executes exactly once even if a second Tick is queued.
-                probeTimer.Stop();
+            var hookStopwatch = Stopwatch.StartNew();
 
-                var accessStopwatch = Stopwatch.StartNew();
-                OlReminders = Globals.Ol.OlReminders;
-                accessStopwatch.Stop();
+            var toDoItemsStopwatch = Stopwatch.StartNew();
+            OlToDoItems = Globals.Ol.ToDoFolder.Items;
+            toDoItemsStopwatch.Stop();
 
-                LogStartupTiming(
-                    "Hook reminders probe | startup hook",
-                    true,
-                    $"probeDelayMs={delay.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}; "
-                        + $"accessLatencyMs={accessStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}; "
-                        + $"elapsedSinceHookMs={hookStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}"
-                );
-            };
-            probeTimer.Start();
+            var remindersStopwatch = Stopwatch.StartNew();
+            OlReminders = Globals.Ol.OlReminders;
+            remindersStopwatch.Stop();
+
+            var inboxSubscribeStopwatch = Stopwatch.StartNew();
+            Globals.Ol.Inboxes.ForEach(x =>
+                OlInboxes.AddLast(x.Items, items => items.ItemAdd += OlInboxItems_ItemAdd)
+            );
+            inboxSubscribeStopwatch.Stop();
+
+            LogStartupTiming(
+                "Hook complete | startup hook",
+                true,
+                $"elapsedMs={hookStopwatch.ElapsedMilliseconds}; inboxSubscriptions={OlInboxes.Count()}; "
+                    + $"toDoItemsMs={toDoItemsStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}; "
+                    + $"remindersMs={remindersStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}; "
+                    + $"inboxSubscribeMs={inboxSubscribeStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}"
+            );
         }
 
         public void Unhook()
@@ -314,6 +302,11 @@ namespace TaskMaster
                 }
                 else if (enginesApplicable.Length > 0)
                 {
+                    // STA primitive extraction (Issue #207, AC5): materialize the COM-backed helper
+                    // and its tokenized projection on the STA before any pure-compute offload. The
+                    // FromMailItemAsync materialization touches live COM and must stay on the STA;
+                    // the tokenization compute over the already-extracted values is offloaded to a
+                    // worker via Task.Run.
                     var helper = await MailItemHelper.FromMailItemAsync(
                         mailItem,
                         Globals,
@@ -321,9 +314,17 @@ namespace TaskMaster
                         false
                     );
                     await Task.Run(() => _ = helper.Tokens);
+
+                    // Release the STA so the message pump keeps running while the engine
+                    // condition/action compute proceeds; only pure compute on already-extracted
+                    // primitives runs off the STA. Engine AsyncCondition/AsyncAction calls that
+                    // touch live COM members on mailItem/helper.Item marshal back to the STA.
+                    await Task.Yield();
                     await enginesApplicable
                         .ToAsyncEnumerable()
                         .ForEachAwaitAsync(async e => await e.Value.AsyncAction(helper));
+
+                    // Marshal back to the STA for the COM write that marks the item processed.
                     helper.Item.SetUdf("AutoProcessed", true, OlUserPropertyType.olYesNo);
                     return true;
                 }
@@ -453,7 +454,12 @@ namespace TaskMaster
                             logger.Debug(
                                 $"Error processing item {success + errors} of {unprocessedCount} in the unprocessed Queue"
                             );
-                            await Task.Delay(100);
+                            // Issue #207 (AC10): non-blocking, pump-independent replacement for the
+                            // banned Task.Delay. NonBlockingDelay completes on a one-shot
+                            // System.Threading.Timer callback, so the STA keeps pumping during the
+                            // retry pause and the wait completes even without a running Dispatcher
+                            // (required so the gated MSTest host does not hang).
+                            await NonBlockingDelay.WaitAsync(TimeSpan.FromMilliseconds(100));
                         }
                     }
 

@@ -609,6 +609,8 @@
     <Compile Include="OutlookObjects\Folder\FolderWrapperNodeComparer.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperNodeContentsComparer.cs" />
     <Compile Include="OutlookObjects\Item\ItemComparer.cs" />
+    <Compile Include="OutlookObjects\IOutlookReadinessGate.cs" />
+    <Compile Include="OutlookObjects\OutlookReadinessGate.cs" />
     <Compile Include="OutlookObjects\MailItem\EmailDetailsWrapper.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFiler.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailFilerConfig.cs" />

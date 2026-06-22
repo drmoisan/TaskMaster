@@ -396,12 +396,14 @@
     <Compile Include="AppGlobals\AppAutoFileObjects.FolderPredictorLoad.cs" />
     <Compile Include="AppGlobals\AppEvents.cs" />
     <Compile Include="AppGlobals\AppFileSystemFolderPaths.cs" />
+    <Compile Include="AppGlobals\HookReadinessCoordinator.cs" />
+    <Compile Include="AppGlobals\NonBlockingDelay.cs" />
     <Compile Include="AppGlobals\AppItemEngines.cs" />
     <Compile Include="AppGlobals\ApplicationGlobals.cs" />
     <Compile Include="AppGlobals\IStartupTimingRecorder.cs" />
-    <Compile Include="AppGlobals\RemindersProbeSchedule.cs" />
     <Compile Include="AppGlobals\StartupTimingRecorder.cs" />
     <Compile Include="AppGlobals\AppOlObjects.cs" />
+    <Compile Include="AppGlobals\AppOlObjects.JunkFolders.cs" />
     <Compile Include="AppGlobals\AppQuickFilerSettings.cs" />
     <Compile Include="AppGlobals\AppStagingFilenames.cs" />
     <Compile Include="AppGlobals\AppToDoObjects.cs" />

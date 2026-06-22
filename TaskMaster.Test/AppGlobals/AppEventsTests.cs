@@ -165,6 +165,15 @@ namespace TaskMaster.Test.AppGlobals
         [TestMethod]
         public async Task LoadAsync_WhenEventsHooked_EmitsStartupHookLifecycleLogs()
         {
+            // Issue #207 corrective fix: under the new deferred, coordinator-driven Hook()
+            // contract (P2-T2), Hook() emits its SYNCHRONOUS lifecycle log ("Hook start") and
+            // then arms the readiness coordinator + DispatcherTimer poll. The "Hook complete"
+            // line is now emitted from PerformReadinessHookup(), which the coordinator invokes
+            // only when the DispatcherTimer poll observes the gate ready. That poll does not
+            // fire on the pump-less MSTest host, so "Hook complete" is intentionally NOT asserted
+            // here; the run-once deferred-completion timeline is covered deterministically by
+            // HookReadinessCoordinatorTests. This test asserts the full set of logs that remain
+            // SYNCHRONOUS under the new design and their ordering.
             Settings.Default.EventsHooked = true;
             var globals = CreateGlobalsWithHookableOutlookObjects();
             var sut = new AppEvents(globals.Object);
@@ -179,16 +188,27 @@ namespace TaskMaster.Test.AppGlobals
                     .Select(loggingEvent => loggingEvent.RenderedMessage)
                     .ToArray();
 
+                // The synchronous startup-hook lifecycle ordering preserved by the new design:
+                // LoadAsync dispatch -> Hook start (coordinator armed) -> LoadAsync complete.
                 FindMessageIndex(messages, "LoadAsync startup hook dispatch | startup hook")
                     .Should()
                     .BeLessThan(FindMessageIndex(messages, "Hook start | startup hook"));
                 FindMessageIndex(messages, "Hook start | startup hook")
                     .Should()
-                    .BeLessThan(FindMessageIndex(messages, "Hook complete | startup hook"));
-                FindMessageIndex(messages, "Hook complete | startup hook")
-                    .Should()
                     .BeLessThan(
                         FindMessageIndex(messages, "LoadAsync startup hook complete | startup hook")
+                    );
+
+                // The deferred "Hook complete" line is emitted by the coordinator-driven
+                // DispatcherTimer poll, which does not run on the pump-less test host. It must
+                // not appear in this synchronous dispatch path.
+                messages
+                    .Should()
+                    .NotContain(
+                        message => message.Contains("Hook complete | startup hook"),
+                        "completion is deferred to the coordinator's DispatcherTimer poll, which "
+                            + "does not fire on the pump-less MSTest host (covered by "
+                            + "HookReadinessCoordinatorTests)"
                     );
             }
             finally
@@ -291,30 +311,21 @@ namespace TaskMaster.Test.AppGlobals
 
         private static Mock<IApplicationGlobals> CreateGlobalsWithHookableOutlookObjects()
         {
+            // Issue #207 corrective fix: under the new deferred Hook() contract (P2-T2), the only
+            // member Hook() reads SYNCHRONOUSLY is Globals.Ol.App, which it passes to the
+            // OutlookReadinessGate constructor (the constructor only null-checks the application
+            // and retains it; it reads no further members synchronously). The three
+            // readiness-dependent COM hookups (ToDoFolder.Items, OlReminders, inbox ItemAdd) are
+            // now performed by PerformReadinessHookup(), invoked only by the coordinator-driven
+            // DispatcherTimer poll, which does not fire on the pump-less MSTest host. The strict
+            // IOlObjects mock therefore needs only the App setup so gate construction does not
+            // throw MockException at AppEvents.Hook(); the deferred-hookup members are exercised
+            // deterministically by HookReadinessCoordinatorTests instead.
             var globals = CreateGlobalsWithNoEngines();
             var olObjects = new Mock<IOlObjects>(MockBehavior.Strict);
-            var todoFolder = new Mock<Folder>(MockBehavior.Strict);
-            var todoItems = new Mock<Items>(MockBehavior.Loose);
-            var reminders = new Mock<Reminders>(MockBehavior.Loose);
-            var inboxFolder = new Mock<Folder>(MockBehavior.Strict);
-            var inboxItems = new Mock<Items>(MockBehavior.Strict);
-            var restrictedItems = new Mock<Items>(MockBehavior.Strict);
+            var application = new Mock<Application>(MockBehavior.Loose);
 
-            todoFolder.SetupGet(x => x.Items).Returns(todoItems.Object);
-            inboxFolder.SetupGet(x => x.Items).Returns(inboxItems.Object);
-            inboxItems
-                .Setup(x => x.Restrict("[MessageClass] = 'IPM.Note'"))
-                .Returns(restrictedItems.Object);
-            restrictedItems
-                .Setup(x => x.Restrict(It.Is<string>(filter => filter.Contains("AutoProcessed"))))
-                .Returns(restrictedItems.Object);
-            restrictedItems
-                .Setup(x => x.GetEnumerator())
-                .Returns(() => Enumerable.Empty<object>().GetEnumerator());
-
-            olObjects.SetupGet(x => x.ToDoFolder).Returns(todoFolder.Object);
-            olObjects.SetupGet(x => x.OlReminders).Returns(reminders.Object);
-            olObjects.SetupGet(x => x.Inboxes).Returns(new[] { inboxFolder.Object });
+            olObjects.SetupGet(x => x.App).Returns(application.Object);
 
             globals.SetupGet(x => x.Ol).Returns(olObjects.Object);
             return globals;

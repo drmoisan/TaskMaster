@@ -70,14 +70,54 @@ The ~115 s IntelConfig-phase `Task.Run` continuation stall attributed to Teams a
   preserved.
 - AC6 (behavior preservation): after startup, ToDo item, reminder, and inbox `ItemAdd` events are
   hooked; `Unhook` cleanly reverses; inbox catch-up processing is unchanged in outcome.
-- AC7 (testable seam): a pure readiness/coordinator seam is unit-tested (MSTest + Moq +
-  FluentAssertions): not-ready→no hookup; ready→hookup once; transient COMException→retry;
-  not-ready-then-ready→eventual single hookup. No live COM, no live timer, no filesystem, no temp files.
-- AC8 (cleanup + file size): increment-3 deferral scaffolding removed; increment-1/2 timing retained;
-  `AppOlObjects.cs` and all touched files ≤500 lines.
-- AC9 (toolchain/coverage): full C# toolchain passes in order (CSharpier → analyzers → nullable/TWAE →
-  MSTest with coverage); new/changed testable lines meet coverage policy; no repo-wide regression; no
-  banned API; net48 constraints honored (no positional `record struct`).
-- AC10 (validation): because this is a COM/STA timing defect not reproducible in MSTest, end-to-end
-  validation is a fresh runtime startup capture showing the hookups complete without a prolonged STA
-  block and without a `ContextSwitchDeadlock` MDA; the capture is recorded under `evidence/`.
+- AC7 (end-to-end seam test): a pure readiness/coordinator seam is tested end-to-end through a
+  simulated readiness timeline (MSTest + Moq + FluentAssertions): not-ready×N → transient COMException
+  → ready → exactly-once hookup; never-give-up (continues past an extended not-ready run);
+  `Unhook` interaction. This is the deterministic, CI-runnable end-to-end coverage of the managed
+  orchestration. No live COM, no live timer, no filesystem, no temp files.
+- AC8 (file-size remediation — explicit deliverable): `AppOlObjects.cs` (currently 523 lines) is
+  brought ≤500 by extracting a cohesive partial (e.g., junk-folder code), as an explicit objective of
+  this fix; all touched files end ≤500 lines.
+- AC9 (cleanup): increment-3 deferral scaffolding removed (`RemindersProbeSchedule`,
+  `RemindersProbeDelaySeconds` setting, `ScheduleDeferredRemindersProbe`); increment-1/2 timing logs
+  retained for observability.
+- AC10 (banned-API remediation — in scope): any banned API in a production file modified by this fix
+  is remediated, not deferred — including the pre-existing `Task.Delay(100)` in
+  `ProcessNewInboxItemsAsync`, replaced by a non-blocking, STA-pumping delay (a `DispatcherTimer`-based
+  awaitable helper) consistent with the never-block-the-STA design. No `DateTime.Now`/`UtcNow`,
+  `Random.Shared`, `Thread.Sleep`, or `Task.Delay` remains in any file this fix touches.
+- AC11 (toolchain/coverage): full C# toolchain passes in order (CSharpier → analyzers → nullable/TWAE →
+  MSTest with coverage); new/changed testable lines meet coverage policy; no repo-wide regression;
+  net48 constraints honored (no positional `record struct`).
+- AC12 (runtime validation): the irreducible COM/STA cold-start timing behavior is confirmed by a
+  fresh runtime startup capture showing the hookups complete without a prolonged STA block and without
+  a `ContextSwitchDeadlock` MDA; recorded under `evidence/`. See the testability note below for why
+  this part is not CI-automatable.
+
+- AC13 (developer-only integration harness): an opt-in integration test exercises the readiness
+  gate + coordinator hookup against a live `Microsoft.Office.Interop.Outlook.Application` on an STA
+  thread, logging the readiness wait and per-hookup latency and asserting the hookup completes and the
+  STA was not blocked beyond a threshold. It is marked with a distinct category (e.g.,
+  `[TestCategory("LiveOutlook")]`), EXCLUDED from the standard QC/CI test run and from the coverage
+  denominator (CI agents have no Outlook; the run filters the category out), and documented with the
+  explicit developer run command. It is a smoke/integration check, not a deadlock reproduction (a warm
+  Outlook returns fast), and must never gate the build.
+
+## Testability note (end-to-end automation boundary)
+
+The fix splits cleanly into an automatable layer and an irreducible manual layer:
+
+- **Automatable (AC7, in CI):** the managed orchestration — the readiness gate decision, the
+  coordinator's never-give-up polling, exactly-once hookup, transient-COMException-as-retry — is fully
+  exercised end-to-end at the seam by injecting a fake `IOutlookReadinessGate` that scripts a readiness
+  timeline (not-ready×N → transient COMException → ready). This is deterministic and runs in CI with no
+  Outlook.
+- **Not reliably automatable (AC12, manual capture):** the real COM/STA cold-start behavior. Three
+  reasons: (1) it requires a live Outlook profile, which CI agents do not have; (2) the failure only
+  manifests under a non-deterministic cold/unready Exchange state — on a warm machine the call returns
+  in milliseconds and the bug does not reproduce, so even a real-Outlook automated test would pass
+  trivially without proving the fix; (3) `ContextSwitchDeadlock` is a debugger-only Managed Debugging
+  Assistant, not a catchable runtime exception, so "the MDA did not fire" is not a programmatic assert.
+  An optional developer-only integration harness against live Outlook could log the timing on demand,
+  but it cannot assert the failure condition deterministically and adds little beyond the existing
+  increment-1/2 instrumentation plus the manual capture.

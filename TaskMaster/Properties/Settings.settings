@@ -170,9 +170,6 @@
     <Setting Name="StartupTimingEnabled" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="RemindersProbeDelaySeconds" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">120</Value>
-    </Setting>
     <Setting Name="UseLcppnPredictor" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>

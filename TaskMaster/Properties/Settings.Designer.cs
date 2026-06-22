@@ -685,18 +685,6 @@ namespace TaskMaster.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("120")]
-        public int RemindersProbeDelaySeconds {
-            get {
-                return ((int)(this["RemindersProbeDelaySeconds"]));
-            }
-            set {
-                this["RemindersProbeDelaySeconds"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool UseLcppnPredictor {
             get {
