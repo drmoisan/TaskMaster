@@ -18,6 +18,8 @@ Use this skill when:
 
 - `artifacts/orchestration/csharp-orchestrator-state.json`
 
+Never create sidecar checkpoint files, suffixed variants, or backup files as active state. If checkpoint state is conflicted, stale, or belongs to another mission, stop and report the conflict instead of renaming or backing up the active checkpoint.
+
 ## Required Checkpoint Fields
 
 - `objective`

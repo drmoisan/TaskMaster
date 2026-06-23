@@ -1,6 +1,6 @@
 ---
 name: pr-base-branch-merge-base
-description: 'Resolve PRBaseBranch for scripts.dev_tools.pr_context.collector using merge-base ancestry. Use when orchestrators or review workflows need the correct comparison base branch and must select the branch with the most recent common ancestor commit with HEAD.'
+description: 'Resolve PRBaseBranch for mcp__drm-copilot__collect_pr_context using merge-base ancestry. Use when orchestrators or review workflows need the correct comparison base branch and must select the branch with the most recent common ancestor commit with HEAD.'
 ---
 
 # PR Base Branch (Merge-Base)
@@ -10,7 +10,7 @@ Deterministic branch-selection rules for PR context collection.
 ## When to Use This Skill
 
 Use this skill when:
-- running `scripts.dev_tools.pr_context.collector`,
+- running `mcp__drm-copilot__collect_pr_context`,
 - delegating post-implementation review that depends on `PRBaseBranch`,
 - constructing PR context artifacts where the base must not be hard-coded.
 
@@ -37,14 +37,14 @@ Definition of correct base:
 ## Guardrails
 
 - Do not default to `main` unless merge-base resolution fails for all candidates.
-- If all candidates fail, surface explicit error context and use repository default branch only as last-resort fallback.
+- If all candidates fail, surface explicit error context and stop unless repository metadata directly identifies the default branch.
 - Persist chosen `PRBaseBranch` in orchestration state and reuse it within the same run.
 
 ## Collector Invocation Rule
 
 When invoking PR context collection, pass the resolved base explicitly:
 
-- `poetry run python -m scripts.dev_tools.pr_context.collector --base <resolved-PRBaseBranch>`
+- `mcp__drm-copilot__collect_pr_context` with `base=<resolved-PRBaseBranch>`
 
 ## Evidence Recommendation
 

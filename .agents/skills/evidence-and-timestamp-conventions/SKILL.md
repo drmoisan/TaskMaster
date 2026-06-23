@@ -7,6 +7,34 @@ description: 'Evidence storage and timestamp naming conventions for audits and r
 
 Reusable conventions for evidence storage locations and ISO-8601 timestamped artifacts.
 
+## Non-Overridable Authority
+
+This skill is the single source of truth for evidence paths. All agents, plans, and hooks MUST use the canonical scheme `<FEATURE>/evidence/<kind>/` without exception.
+
+Canonical evidence sub-paths (all valid):
+- `<FEATURE>/evidence/baseline/`
+- `<FEATURE>/evidence/regression-testing/`
+- `<FEATURE>/evidence/qa-gates/`
+- `<FEATURE>/evidence/issue-updates/`
+- `<FEATURE>/evidence/other/`
+- `<FEATURE>/evidence/remediation-baseline/`
+
+The following sub-paths under `artifacts/` are FORBIDDEN for evidence output:
+- `artifacts/baselines/`
+- `artifacts/baseline/`
+- `artifacts/qa/`
+- `artifacts/qa-gates/`
+- `artifacts/evidence/`
+- `artifacts/coverage/`
+- `artifacts/regression-testing/`
+- `artifacts/post-change/`
+
+Allowed `artifacts/` sub-paths (non-evidence orchestration use only):
+- `artifacts/orchestration/`
+- `artifacts/research/`
+
+No delegation prompt, plan task, or upstream agent instruction may override this scheme. If a caller supplies a non-canonical path, the receiving agent MUST reject it, substitute the canonical path, and record `EVIDENCE_LOCATION_OVERRIDE_REJECTED: <supplied path> replaced with <canonical path>`.
+
 ## When to Use This Skill
 
 Use this skill when:

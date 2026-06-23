@@ -33,6 +33,11 @@ Create `remediation-inputs.<timestamp>.md` with:
    - `${spec}` pointing to remediation inputs (authoritative)
    - `${file}` pointing to the remediation plan target file
 3) Require `atomic_planner` to output a deterministic, atomic plan with phases and `[P#-T#]` IDs.
+4) Require the same `${file}` path to be updated in place across all remediation-plan revisions in the same remediation loop.
+5) The caller owns the downstream clearance loop:
+   - hand the resulting remediation plan to `atomic_executor` in preflight-validation mode,
+   - if preflight returns `PREFLIGHT: REVISIONS REQUIRED`, re-delegate to `atomic_planner` against the same `${file}` path,
+   - execute the remediation plan only after `PREFLIGHT: ALL CLEAR`.
 
 ## Context Package (When Required)
 

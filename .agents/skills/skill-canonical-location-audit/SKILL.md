@@ -16,7 +16,7 @@ Use this skill when:
 
 ## Scope
 
-- Applies to all skills under `.github/skills/**/SKILL.md`.
+- Applies to all skills under `.agents/skills/**/SKILL.md`.
 - Focuses on canonical locations (paths, folders, or file names) for a given item (e.g., PR context artifacts, evidence locations, issue mirrors).
 
 ## Audit Workflow
@@ -45,4 +45,3 @@ Use this skill when:
 
 - If a skill references a canonical location indirectly (e.g., “see evidence-and-timestamp-conventions”), do NOT treat that as a duplication.
 - Only treat explicit canonical paths or filenames as definitions.
-
