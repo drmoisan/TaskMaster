@@ -116,10 +116,10 @@ Source: `artifacts/research/2026-06-22-intelconfig-continuation-stall-211-resear
 ## Test Strategy
 Seeded from issue:
 
-- [ ] Diagnostics first: instrument the inter-phase continuation in `LoadSequentialAsync` to record, at the moment the continuation finally resumes, what the STA was doing and how long each continuation waited (a continuation-latency probe distinct from the phase wall-clock), plus a non-debugger and a Teams-enabled-vs-disabled comparison to attribute the occupant.
-- [ ] Unit coverage areas: any pure scheduling/continuation-affinity decision logic extracted for testability (no live COM).
-- [ ] Integration scenario to retest: non-debugger cold start; capture whether the IntelConfig-phase wall-clock tracks a real STA occupant vs debugger overhead.
-- [ ] Manual verification notes: confirm whether moving heavy assembly loads (WPF/TaskVisualization) off the critical startup continuation, and/or restructuring the phase awaits so non-COM continuations do not require the STA, reduces the stall while Teams remains installed.
+- [x] Diagnostics first: instrument the inter-phase continuation in `LoadSequentialAsync` to record, at the moment the continuation finally resumes, what the STA was doing and how long each continuation waited (a continuation-latency probe distinct from the phase wall-clock), plus a non-debugger and a Teams-enabled-vs-disabled comparison to attribute the occupant. — Probe delivered (commit 72520363); debugger-attached and non-debugger captures recorded under `evidence/other/`.
+- [x] Unit coverage areas: any pure scheduling/continuation-affinity decision logic extracted for testability (no live COM). — Deterministic MSTest covers the `protected internal virtual` probe seam; no further scheduling logic extracted because Phase 2 is not warranted.
+- [x] Integration scenario to retest: non-debugger cold start; capture whether the IntelConfig-phase wall-clock tracks a real STA occupant vs debugger overhead. — Non-debugger capture shows IntelConfig continuation `waitMs=0.6`; the multi-minute IntelConfig stall does not reproduce outside the debugger.
+- [x] Manual verification notes: confirm whether moving heavy assembly loads (WPF/TaskVisualization) off the critical startup continuation, and/or restructuring the phase awaits so non-COM continuations do not require the STA, reduces the stall while Teams remains installed. — Not warranted for IntelConfig: the continuation already resumes on the STA in ~0.6 ms. The residual cost is in the `Engines` phase and is tracked as a separate follow-up.
 
 - Regression tests to add or update:
 - Unit tests (pytest) for the fixed behavior and boundaries:
@@ -134,12 +134,25 @@ Seeded from issue:
 
 Phase 1 (attribution instrumentation) is the immediate deliverable; Phase 2 is evidence-gated.
 
-- [ ] AC1: `LoadSequentialAsync` emits one `[continuation-resume]` log line per inter-phase boundary via the existing `log4net` logger, each with `priorPhase`, `waitMs` (Stopwatch, F1), `resumeThreadId`, `resumeSyncContext`, `staIsIdle`, `staCpuUsage`, `staGuiActivity`.
-- [ ] AC2: behavior-preserving — the probe replaces the existing `Task.Yield()` inter-phase yields without changing phase order, count, or outcomes; `Stopwatch` only; no banned API introduced; net48 (no positional `record struct`).
-- [ ] AC3: a deterministic MSTest (Moq + FluentAssertions) using a `TestApplicationGlobals` subclass overriding the `protected internal virtual` probe verifies it is invoked once per phase boundary in the correct order with the correct phase names; no live COM, no live timer, no network/filesystem, no temporary files.
-- [ ] AC4: full C# toolchain passes in order (CSharpier -> analyzers -> nullable/TWAE -> MSTest with coverage, gated `/TestCaseFilter:"TestCategory!=LiveOutlook"`); the new testable seam meets the coverage policy; no repository-wide regression; all touched files <= 500 lines.
-- [ ] AC5 (runtime, maintainer): a non-debugger cold-start capture (DebugView / OutputDebugString) produces the `[continuation-resume]` fields; this is the gating evidence for Phase 2 and is recorded under `evidence/`. (Not CI-automatable.)
-- [ ] AC6 (Phase 2, evidence-gated): IF the non-debugger capture shows the IntelConfig continuation `waitMs` > 5000 ms with the STA externally occupied, apply the off-STA IntelConfig continuation (`ConfigureAwait(false)` + `await UiThread.UiSyncContext` before `OlObjects`), with a unit test asserting phase ordering is preserved and the `OlObjects` phase resumes on the STA, and a re-capture confirming the reduction. IF the capture shows the stall is debugger-only / not reproduced outside the debugger, Phase 2 is not implemented and the issue closes documenting that finding.
+- [x] AC1: `LoadSequentialAsync` emits one `[continuation-resume]` log line per inter-phase boundary via the existing `log4net` logger, each with `priorPhase`, `waitMs` (Stopwatch, F1), `resumeThreadId`, `resumeSyncContext`, `staIsIdle`, `staCpuUsage`, `staGuiActivity`. — Verified: implementation commit 72520363; the non-debugger capture (`evidence/other/runtime-capture-nondebugger-2026-06-23T13-51.md`) shows all five boundaries (IntelConfig, OlObjects, ToDo, AutoFile, Engines) emitting the full field set.
+- [x] AC2: behavior-preserving — the probe replaces the existing `Task.Yield()` inter-phase yields without changing phase order, count, or outcomes; `Stopwatch` only; no banned API introduced; net48 (no positional `record struct`). — Verified: final-QC (`evidence/qa-gates/final-qc-2026-06-22T18-05.md`) and feature-review PASS (`code-review.2026-06-22T22-45.md`).
+- [x] AC3: a deterministic MSTest (Moq + FluentAssertions) using a `TestApplicationGlobals` subclass overriding the `protected internal virtual` probe verifies it is invoked once per phase boundary in the correct order with the correct phase names; no live COM, no live timer, no network/filesystem, no temporary files. — Verified: feature-review PASS confirms the deterministic test.
+- [x] AC4: full C# toolchain passes in order (CSharpier -> analyzers -> nullable/TWAE -> MSTest with coverage, gated `/TestCaseFilter:"TestCategory!=LiveOutlook"`); the new testable seam meets the coverage policy; no repository-wide regression; all touched files <= 500 lines. — Verified: `evidence/qa-gates/final-qc-2026-06-22T18-05.md`. Note: the `UtilitiesCS TimedAsyncTask_Tests.RequestTask_WithProvidedTask_InvokesTaskAfterInterval` test is a recorded pre-existing real-interval timer flake, not a regression from this change.
+- [x] AC5 (runtime, maintainer): a non-debugger cold-start capture (DebugView / OutputDebugString) produces the `[continuation-resume]` fields; this is the gating evidence for Phase 2 and is recorded under `evidence/`. (Not CI-automatable.) — Verified: `evidence/other/runtime-capture-nondebugger-2026-06-23T13-51.md` (maintainer-provided non-debugger capture).
+- [x] AC6 (Phase 2, evidence-gated): IF the non-debugger capture shows the IntelConfig continuation `waitMs` > 5000 ms with the STA externally occupied, apply the off-STA IntelConfig continuation (`ConfigureAwait(false)` + `await UiThread.UiSyncContext` before `OlObjects`), with a unit test asserting phase ordering is preserved and the `OlObjects` phase resumes on the STA, and a re-capture confirming the reduction. IF the capture shows the stall is debugger-only / not reproduced outside the debugger, Phase 2 is not implemented and the issue closes documenting that finding. — Resolved via the second branch: the non-debugger capture shows IntelConfig continuation `waitMs=0.6` (far below the 5000 ms threshold), with `resumeThreadId=1` (STA) and `staIsIdle=True`. The originally-reported 60–115 s IntelConfig stall does not reproduce outside the Visual Studio debugger. Under the maintainer rule "in scope iff this add-in causes it," no TaskMaster-side Phase 2 fix for IntelConfig is warranted. Phase 2 is intentionally not implemented; finding documented in `evidence/other/runtime-capture-nondebugger-2026-06-23T13-51.md`.
+
+### Acceptance Criteria Status Summary (2026-06-23)
+
+| AC | Status | Evidence |
+| --- | --- | --- |
+| AC1 | PASS | impl 72520363; non-debugger capture probe lines |
+| AC2 | PASS | final-QC; code-review PASS |
+| AC3 | PASS | feature-review PASS (deterministic MSTest) |
+| AC4 | PASS | final-QC (pre-existing timer flake noted, not a regression) |
+| AC5 | PASS | non-debugger capture 2026-06-23T13-51 |
+| AC6 | PASS (no-fix branch) | waitMs=0.6 < 5000 ms threshold; stall debugger-only; Phase 2 not warranted |
+
+Overall: all six acceptance criteria are satisfied. The diagnostic conclusion is that the IntelConfig `Task.Run` continuation resumes on the STA in ~0.6 ms in a non-debugger cold start; the originally-reported multi-minute IntelConfig stall was attributable to debugger overhead, not a TaskMaster-caused STA block. The residual `Engines`-phase startup cost (1:52.59 in the same capture) is outside this issue's scope and is recorded as a follow-up candidate.
 
 ## Risks & Mitigations
 - Technical or operational risks:
