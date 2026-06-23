@@ -262,6 +262,7 @@
     <Compile Include="AppGlobals\AppAutoFileObjectsFolderPredictorTests.cs" />
     <Compile Include="AppGlobals\ApplicationGlobalsStartupTimingTests.cs" />
     <Compile Include="AppGlobals\ContinuationProbeSequenceTests.cs" />
+    <Compile Include="AppGlobals\EngineInitTimingProbeTests.cs" />
     <Compile Include="AppGlobals\StartupTimingRecorderTests.cs" />
     <Compile Include="AppGlobals\HookReadinessCoordinatorTests.cs" />
     <Compile Include="AppGlobals\NonBlockingDelayTests.cs" />

@@ -1,6 +1,6 @@
 # Phase 0 — Instructions Read Evidence
 
-Timestamp: 2026-06-22T22-10
+Timestamp: 2026-06-23T14-30
 
 Policy Order:
 1. CLAUDE.md (standing instructions)

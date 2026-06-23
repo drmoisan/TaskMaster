@@ -39,7 +39,20 @@ namespace TaskMaster
 
         public async Task InitAsync()
         {
+            // Diagnosis-only per-engine attribution probe (issue #211). Behavior-preserving:
+            // the probe only wraps the existing awaits with a Stopwatch and emits structured
+            // log lines through the existing log4net logger. Phase order, the engine set, the
+            // config.Value.Engine filter, the EngineInitializer lookup, the null filters, and the
+            // ToConcurrentDictionaryAsync semantics are unchanged.
+            var probe = new EngineInitTimingProbe(s => logger.Debug(s));
+
+            var configStopwatch = System.Diagnostics.Stopwatch.StartNew();
             var configs = await Globals.AF.Manager.Configuration;
+            configStopwatch.Stop();
+            probe.EmitConfigTiming(
+                configStopwatch.Elapsed.TotalMilliseconds,
+                System.Threading.Thread.CurrentThread.ManagedThreadId
+            );
 
             InboxEngines = await configs
                 .Where(config => config.Value.Engine)
@@ -55,7 +68,10 @@ namespace TaskMaster
                 .ToAsyncEnumerable()
                 .SelectAwait(async tup =>
                 {
-                    var engine = await tup.EngineFunc(Globals);
+                    var engine = await probe.TimeEngineAsync(
+                        tup.Key,
+                        () => tup.EngineFunc(Globals)
+                    );
                     return (tup.Key, Engine: engine);
                 })
                 .Where(tup => tup.Engine is not null)
