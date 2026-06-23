@@ -1,46 +1,11 @@
-# AC9 Runtime Capture — Engines-Phase Attribution (NON-DEBUGGER) — PLACEHOLDER (PENDING)
+# AC9 Runtime Capture — Engines-Phase Attribution (NON-DEBUGGER) — SUPERSEDED
 
-STATUS: PENDING MAINTAINER EXECUTION. This file is a placeholder. It asserts NO timing
-values. The capture must be produced by a maintainer following the instructions in
-`ac9-nondebugger-recapture-instructions-2026-06-23T14-30.md`. The capture requires a live
-Outlook cold start outside the Visual Studio debugger and is not CI-automatable.
+STATUS: SUPERSEDED. The AC9 maintainer non-debugger capture has been recorded at
+`runtime-capture-engines-nondebugger-2026-06-23T17-33.md` (same directory).
 
-When the capture is performed, copy this file to
-`runtime-capture-engines-nondebugger-<ISO-8601-timestamp>.md` and fill in the schema below.
-
-## Required schema (to be filled in on capture)
-
-Timestamp: <ISO-8601 of the capture, e.g. 2026-06-24T09-15>
-
-Environment:
-- Branch / build: <branch + build configuration; must include EngineInitTimingProbe>
-- Outlook version: <version>
-- Launch mode: NON-DEBUGGER (launched from Start menu / taskbar; NOT F5 / not attached)
-- Teams installed/running: <yes/no>
-- StartupTimingEnabled: <true — required>
-- log4net Debug sink: <DebugView OutputDebugString | file appender path>
-
-Captured lines (paste verbatim, in emission order):
-
-[engine-init-config] configMs=<F1> threadId=<id>
-
-[engine-init] engineName=Spam engineMs=<F1> engineNull=<bool> threadId=<id> costHint=<Deserialization|Skip>
-[engine-init] engineName=Triage engineMs=<F1> engineNull=<bool> threadId=<id> costHint=<Deserialization|Skip>
-[engine-init] engineName=Project engineMs=<F1> engineNull=<bool> threadId=<id> costHint=<Deserialization|Skip>
-[engine-init] engineName=Context engineMs=<F1> engineNull=<bool> threadId=<id> costHint=<Deserialization|Skip>
-[engine-init] engineName=Actionable engineMs=<F1> engineNull=<bool> threadId=<id> costHint=<Deserialization|Skip>
-(include only engines that were active in this run)
-
-[Startup timing] table (paste the full issue #202 table, including the Engines-phase total):
-<paste table>
-
-## Attribution (to be filled in on capture)
-
-- Engines-phase total (from [Startup timing]): <ms>
-- Sum of configMs + per-engine engineMs: <ms>
-- Dominant contributor: <Configuration | engine name> with <ms>
-- Phase 4 fix target implied: <Fix A/B/C/D per the instructions> (NOT implemented by this plan)
-
-NOTE: No timing values are asserted by this placeholder. AC9 is satisfied for Phase 3 by the
-instrumentation + instructions + this pending placeholder; the runtime numbers are recorded by
-the maintainer on capture and gate Phase 4 (AC10).
+Result summary: the per-engine instrumentation is validated; in that run the
+multi-minute stall did NOT reproduce (TOTAL 0:02.59, Engines 0:01.42), with the
+Spam classifier deserialization the dominant TaskMaster engine cost (~1.33 s).
+The slow-path (multi-minute) root cause is not yet attributed; a cold/slow-start
+capture with this build is needed to attribute it. See the recorded capture file
+for the full analysis.
