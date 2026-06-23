@@ -66,7 +66,7 @@ When migrating a Copilot artifact:
 2. If it defines a reusable agent persona or bounded delegation role, migrate it to `.codex/agents/<name>.toml`.
 3. If it is mainly a launch prompt or an orchestration shortcut, migrate it to `.codex/prompts/<name>.md`.
 4. Preserve stable names where possible so downstream handoffs remain readable and consistent.
-5. If a Copilot workflow relied on `drm-copilot.*` commands or another host-specific surface, move that translation logic into `repo-automation-adapter`, target semantic MCP tools on server `drm-copilot` when available, and keep the business workflow skill host-agnostic.
+5. If a Copilot workflow relied on `drmCopilotExtension.*` commands or another host-specific surface, move that translation logic into `repo-automation-adapter`, target semantic MCP tools on server `drm-copilot` when available, and keep the business workflow skill host-agnostic.
 
 ## External Tool Bindings
 

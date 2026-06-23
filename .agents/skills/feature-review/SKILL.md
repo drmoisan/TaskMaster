@@ -37,23 +37,37 @@ Write timestamped artifacts into the active feature folder:
 - `remediation-inputs.<timestamp>.md` when remediation is required
 - `remediation-plan.<timestamp>.md` when remediation is required
 
-Each required review artifact MUST pass the matching `validate_orchestration_artifacts` MCP tool call before review can be reported as complete:
-- `artifact_type: "policy-audit"` with `artifact_path: <path>`
-- `artifact_type: "code-review"` with `artifact_path: <path>`
-- `artifact_type: "feature-audit"` with `artifact_path: <path>`
+The final review report MUST end with these exact single-line fields:
+- `REVIEW_STATUS: PASS` or `REVIEW_STATUS: REMEDIATION_REQUIRED`
+- `FEATURE_FOLDER: <path>`
+- `POLICY_AUDIT: <path>`
+- `CODE_REVIEW: <path>`
+- `FEATURE_AUDIT: <path>`
+- `REMEDIATION_INPUTS: <path-or-NONE>`
+- `REMEDIATION_PLAN: <path-or-NONE>`
+
+Each required review artifact MUST pass the matching validator command before review can be reported as complete:
+- the `validate_orchestration_artifacts` MCP tool with `artifact_type: "policy-audit"` and `artifact_path: <path>`
+- the `validate_orchestration_artifacts` MCP tool with `artifact_type: "code-review"` and `artifact_path: <path>`
+- the `validate_orchestration_artifacts` MCP tool with `artifact_type: "feature-audit"` and `artifact_path: <path>`
 
 ## Review Flow
 
 1. Resolve the base branch.
    - Use the supplied base when present.
-   - If ambiguous, use `pr-base-branch-merge-base`.
+  - If the supplied base is missing or ambiguous, use `pr-base-branch-merge-base`.
+  - Do not default to the repository default branch unless merge-base resolution fails for all candidates.
 2. Load PR context from the canonical artifacts defined by `pr-context-artifacts`.
-3. If PR context is missing or stale, refresh it through `repo-automation-adapter`.
+3. If PR context is missing or stale, refresh it through `repo-automation-adapter` using the resolved base branch.
 4. Determine the active feature folder deterministically from the scoping docs and PR context.
 5. Create the policy audit, code review, and feature audit.
    - validate each artifact immediately after writing it
 6. Check off passing acceptance criteria in the authoritative requirement sources per `acceptance-criteria-tracking`.
 7. If remediation is required, create remediation inputs first and then hand off plan creation using `remediation-handoff-atomic-planner`.
+8. In the final report:
+   - set `REVIEW_STATUS: PASS` only when no remediation artifact is required,
+   - set `REVIEW_STATUS: REMEDIATION_REQUIRED` when remediation inputs or a remediation plan were required,
+   - include every required artifact-path field exactly once.
 
 ### Enforced Remediation Handoff Contract
 
@@ -89,3 +103,4 @@ When remediation is required:
 - Prefer check-only commands.
 - If a tool cannot be run, mark the related section as unverified or partial with a concrete reason.
 - Do not claim completion until every required artifact exists on disk and its validator passes.
+- Do not omit any required final result field from the review report.

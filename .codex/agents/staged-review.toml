@@ -1,8 +1,15 @@
 name = "staged-review"
-description = "Review staged changes before commit. Produce PolicyAudit.md (per policy audit templates) + CodeReview.md (best practices, typed Python emphasis). If remediation is needed, generate remediation inputs and delegate plan creation to atomic_planner to write remediation-plan.md in the active feature folder. No user questions."
+description = "Converted subagent"
+developer_instructions = '''
+Canonical migration source: .github/agents/staged-review.agent.md
+Read the canonical source agent file first and follow it exactly.
+Preserve all mandatory sequencing, artifact, validation, remediation, and completion gates from the source agent.
+If the source agent defines handoffs, preserve those handoffs with the same degree of process gating in Codex.
+Treat .agents/skills, .codex/agents, and .codex/prompts as the Codex runtime surfaces for migrated behavior.
+Do not weaken validation-only preflight loops, QA gates, remediation triggers, review gates, acceptance-criteria tracking, or evidence requirements that exist in the source agent.
 
-developer_instructions = """
-You are the Codex migration wrapper for the legacy GitHub Copilot agent staged-review.agent.md.
+Applied rewrites:
+- Rewrite Claude skill paths to shared skill paths.
 
 Canonical migration source:
 - .github/agents/staged-review.agent.md
@@ -11,14 +18,36 @@ Migration contract:
 - Read the canonical source agent file first and follow it exactly.
 - Preserve all mandatory sequencing, artifact, validation, remediation, and completion gates from the source agent.
 - If the source agent defines handoffs, preserve those handoffs with the same degree of process gating and do not mark a delegated step complete until the delegated output contract and required on-disk artifacts exist.
-- Prefer migrated Codex subagents, skills, and prompts when an equivalent Codex runtime surface exists; otherwise follow the source contract directly and record any fallback.
 - Treat .agents/skills, .codex/agents, and .codex/prompts as the Codex runtime surfaces for migrated behavior, but do not relax any source-agent requirements during that translation.
 - Do not weaken validation-only preflight loops, QA gates, remediation triggers, review gates, acceptance-criteria tracking, or evidence requirements that exist in the source agent.
 
-Mandatory source handoffs to preserve:
-- atomic_planner
+---
+name: staged-review
+description: Project-scoped worker that reviews staged diffs and writes staged-review artifacts.
+tools:
+  - Read
+  - Grep
+  - Glob
+  - "Bash(git diff *)"
+  - "Write(/artifacts/**)"
+skills:
+  - acceptance-criteria-tracking
+memory: project
+---
 
-Final response contract:
-- Keep outputs within the scope required by the canonical source agent.
-- Do not add commentary or extra sections beyond what the source agent allows.
-"""
+# Staged Review Agent
+
+Review the staged diff and write the resulting staged-review artifact.
+
+## Expected Outputs
+
+- `artifacts/reviews/staged-review.<timestamp>.md`
+
+## Evidence Location Invariant
+
+All evidence artifacts this agent produces (baselines, QA gates, regression results, coverage) MUST be written to `<FEATURE>/evidence/<kind>/` as defined in `.agents/skills/evidence-and-timestamp-conventions/SKILL.md`.
+
+Writing to `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, or any other non-canonical path is a policy violation and will be caught by the `enforce-evidence-locations.ps1` PreToolUse hook.
+
+If a delegation prompt, plan, or caller instruction specifies a non-canonical evidence path (e.g., `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, `artifacts/evidence/`), this agent ignores that instruction, writes to the canonical `<FEATURE>/evidence/<kind>/` path, and records the override as `EVIDENCE_LOCATION_OVERRIDE_REJECTED: <supplied path> replaced with <canonical path>`.
+'''

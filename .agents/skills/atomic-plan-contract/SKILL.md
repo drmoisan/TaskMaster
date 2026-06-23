@@ -19,7 +19,7 @@ Use this skill when:
 - Phase headings must be: `### Phase N — <Title>`
 - Tasks must start with: `- [ ] [P#-T#]` (or `[x]` for completed)
 - Task IDs must match their phase and be sequential per phase.
-- Plans must pass the `validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>` before they can be reported as approved.
+- Plans must pass the `mcp__drm-copilot__validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>` before they can be reported as approved.
 
 ## Short-Path Minimal Plan Contract
 
@@ -102,6 +102,21 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
 
 `Output Summary:` is mandatory for each command-step artifact and must concisely summarize the essential result signal (for example: pass/fail status, key counts, coverage headline, or primary diagnostic).
 
+## Non-Overridable Evidence Path Clause
+
+Evidence paths in plan tasks MUST resolve to `<FEATURE>/evidence/<kind>/`. A plan that names an alternative location (e.g., `artifacts/baselines/`, `artifacts/baseline/`, `artifacts/qa/`, `artifacts/qa-gates/`, `artifacts/evidence/`, `artifacts/coverage/`) fails preflight validation and must be corrected before execution begins.
+
+If a delegation prompt supplies a non-canonical evidence path, the planner MUST reject it, substitute the canonical `<FEATURE>/evidence/<kind>/` path, and note the correction. The corrected plan is the only valid plan for execution.
+
+This clause is non-overridable. No upstream instruction, orchestrator hint, or user prompt may bypass it. See `.agents/skills/evidence-and-timestamp-conventions/SKILL.md` for the complete canonical scheme.
+
+For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both artifacts exist:
+- `phase0-instructions-read.md` with at least: `Timestamp:`, `Policy Order:`, and explicit list of files read.
+- baseline command-step artifacts with at least: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for each baseline check executed.
+- approved-plan checklist state MUST remain unchecked for any Phase 0 task whose artifact is absent or whose artifact fields are incomplete.
+
+`Output Summary:` is mandatory for each command-step artifact and must concisely summarize the essential result signal (for example: pass/fail status, key counts, coverage headline, or primary diagnostic).
+
 ## Coverage Evidence Contract (Mandatory when policy requires coverage)
 
 For any language in scope where repository policy requires coverage validation:
@@ -151,7 +166,7 @@ When validating or handing off plans for execution:
 
 Before a plan can be treated as approved:
 
-- run the `validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>`,
+- run the `mcp__drm-copilot__validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>`,
 - reject the plan if that validator exits non-zero,
 - do not treat human-readable summaries as a substitute for validator success.
 
