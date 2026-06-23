@@ -152,7 +152,34 @@ Phase 1 (attribution instrumentation) is the immediate deliverable; Phase 2 is e
 | AC5 | PASS | non-debugger capture 2026-06-23T13-51 |
 | AC6 | PASS (no-fix branch) | waitMs=0.6 < 5000 ms threshold; stall debugger-only; Phase 2 not warranted |
 
-Overall: all six acceptance criteria are satisfied. The diagnostic conclusion is that the IntelConfig `Task.Run` continuation resumes on the STA in ~0.6 ms in a non-debugger cold start; the originally-reported multi-minute IntelConfig stall was attributable to debugger overhead, not a TaskMaster-caused STA block. The residual `Engines`-phase startup cost (1:52.59 in the same capture) is outside this issue's scope and is recorded as a follow-up candidate.
+Phase-1/IntelConfig sub-result: AC1–AC6 verify the Phase 1 attribution instrumentation and disprove the *IntelConfig continuation* sub-hypothesis (the IntelConfig `Task.Run` continuation resumes on the STA in ~0.6 ms in a non-debugger cold start; the earlier multi-minute IntelConfig attribution was debugger-induced).
+
+**Issue #211 is NOT resolved.** The non-debugger capture shows the startup latency is real and now attributed to the `Engines` phase (`1:52.59` of a `1:58.79` total). The original issue title named one suspected sub-cause (IntelConfig); the actual goal of #211 is to eliminate the multi-minute startup latency. That goal is unmet. Scope is expanded below to localize and fix the `Engines`-phase cost. See `## Scope Expansion (2026-06-23)` and AC7–AC10.
+
+## Scope Expansion (2026-06-23)
+
+### Why
+The Phase 1 instrumentation succeeded as a diagnostic but disproved only the narrow IntelConfig-continuation sub-hypothesis. The same non-debugger capture relocated essentially all of the startup latency to the `Engines` phase (`InitializeEnginesPhaseAsync` -> `Task.Run(() => Engines.InitAsync())` in `ApplicationGlobals.LoadSequentialAsync`). Closing #211 on the IntelConfig sub-result would misrepresent an unsolved multi-minute startup regression as resolved. Per maintainer direction, #211 remains open with expanded scope covering the full startup latency, with `Engines` as the now-primary suspect.
+
+### Restated objective
+Eliminate the multi-minute Outlook startup latency. The current evidence localizes the dominant cost to the `Engines` phase; confirm and attribute that cost with targeted instrumentation, then apply the minimal TaskMaster-side fix (subject to the same "in scope iff this add-in causes it" rule).
+
+### Newly in-scope (Phase 3 — Engines attribution)
+- Per-engine attribution instrumentation inside `AppItemEngines.InitAsync` (and the per-engine `CreateEngineAsync` paths: `SpamBayes`, `Triage`, `CategoryClassifierGroup` project/context, `ActionableClassifierGroup`) to record per-engine construction/model-load wall-clock, the thread/apartment each runs on, and whether the cost is CPU, I/O (model deserialization), or STA-marshaling.
+- A non-debugger re-capture that attributes the `Engines` phase cost to specific engines/resources.
+- The `AF.Manager.Configuration` await at the top of `InitAsync` (a candidate large-deserialize / lazy-config dependency shared with the AutoFile path).
+
+### Out of scope / non-goals (unchanged + clarified)
+- The Microsoft Teams Meeting Add-in (external; any remedy is TaskMaster-side scheduling).
+- Moving genuinely COM-bound work off the STA where correctness depends on the STA.
+- A speculative fix before Phase 3 attribution identifies the dominant engine/resource cost. Phase 4 (fix) is evidence-gated on Phase 3.
+
+### Phase 3 / Phase 4 acceptance criteria
+
+- [ ] AC7: `AppItemEngines.InitAsync` emits per-engine attribution instrumentation (one structured log line per engine init) capturing engine name, wall-clock duration (`Stopwatch`, F1 ms), the resolving thread id / apartment, and a coarse cost classification signal, using the existing `log4net` logger. Behavior-preserving; `Stopwatch` only; no banned API (`DateTime.Now`/`UtcNow`, `Random.Shared`, `Thread.Sleep`, `Task.Delay`); net48; all touched files <= 500 lines.
+- [ ] AC8: a deterministic MSTest (MSTest + Moq + FluentAssertions) covering any extracted pure attribution/aggregation logic and the per-engine emission seam, with no live COM, no live timer, no network/filesystem, no temporary files; the new seam meets the coverage policy and there is no repository-wide coverage regression.
+- [ ] AC9 (runtime, maintainer): a non-debugger cold-start capture produces the per-engine attribution lines and identifies which engine(s)/resource(s) dominate the `Engines`-phase wall-clock; recorded under `evidence/`.
+- [ ] AC10 (Phase 4, evidence-gated): apply the minimal TaskMaster-side fix indicated by AC9 (for example deferring non-critical engine init off the startup critical path via the existing `IdleAsyncQueue`, parallelizing independent model loads, or caching deserialized models), with a unit test asserting the behavior/ordering invariant the fix relies on and a re-capture confirming the startup-latency reduction. If AC9 attributes the cost to a non-TaskMaster external cause, document that finding and the attribution evidence instead of forcing a change.
 
 ## Risks & Mitigations
 - Technical or operational risks:

@@ -72,5 +72,26 @@ Files to inspect:
 
 ## Next Step
 
-- [ ] Promote to GitHub issue (bug-report template)
-- [ ] Move to active fix folder / branch
+- [x] Promote to GitHub issue (bug-report template)
+- [x] Move to active fix folder / branch
+
+## Status Update — Scope Expansion (2026-06-23)
+
+Issue #211 remains **OPEN and unresolved**. The Phase 1 attribution instrumentation
+succeeded as a diagnostic and disproved the narrow *IntelConfig continuation*
+sub-hypothesis: in a non-debugger cold start the IntelConfig `Task.Run`
+continuation resumes on the STA in ~0.6 ms, and the earlier 60–115 s IntelConfig
+attribution was Visual Studio debugger overhead.
+
+However, the multi-minute startup latency that motivated this issue is real and
+persists. The same non-debugger capture relocates the dominant cost to the
+`Engines` phase (`1:52.59` of a `1:58.79` total). The actual goal of #211 —
+eliminate the startup latency — is unmet.
+
+Scope is therefore expanded (see `spec.md` -> `## Scope Expansion (2026-06-23)`
+and AC7–AC10): instrument `AppItemEngines.InitAsync` for per-engine attribution,
+re-capture to localize the dominant engine/resource, then apply the minimal
+TaskMaster-side fix. Work continues on branch `bug/outlook-startup-latency-211`.
+
+The IntelConfig-phase Phase 1 work was relocated off `main` (which had been
+advanced without a PR) onto this branch; `main` was reset to the pre-#211 state.
