@@ -406,6 +406,7 @@
     <Compile Include="AppGlobals\StartupTimingRecorder.cs" />
     <Compile Include="AppGlobals\AppOlObjects.cs" />
     <Compile Include="AppGlobals\AppOlObjects.JunkFolders.cs" />
+    <Compile Include="AppGlobals\JunkFolderPathNavigator.cs" />
     <Compile Include="AppGlobals\AppQuickFilerSettings.cs" />
     <Compile Include="AppGlobals\AppStagingFilenames.cs" />
     <Compile Include="AppGlobals\AppToDoObjects.cs" />
