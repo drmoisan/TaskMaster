@@ -700,6 +700,8 @@
     <Compile Include="OutlookObjects\Store\StoreFilterAttribution.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapper.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapper.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperInitClock.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperInitProbe.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperController.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperViewer.cs">
       <SubType>Form</SubType>

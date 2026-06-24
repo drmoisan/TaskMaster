@@ -200,6 +200,62 @@ namespace TaskMaster
                     + $"latencyMode={latencyMode}"
             );
         }
+
+        /// <summary>
+        /// Computes the per-phase NET milliseconds, i.e. the phase's gross wall-clock minus the
+        /// StoreWrapper-init time attributed to the phase window (issue #211, Phase 3.6). The result
+        /// is clamped at <c>0.0</c> when <paramref name="storeWrapperInitMs"/> exceeds
+        /// <paramref name="grossMs"/>. That over-subtraction is possible because the StoreWrapper-init
+        /// clock is a process-global shared accumulator: a concurrent store init on another thread can
+        /// add to the clock during this phase's window, so the sampled delta may exceed the phase's own
+        /// gross wall-clock. The clamp is the defined rule (a phase cannot have negative net time).
+        /// </summary>
+        /// <param name="grossMs">The phase's gross wall-clock elapsed, in milliseconds.</param>
+        /// <param name="storeWrapperInitMs">
+        /// The StoreWrapper-init delta attributed to the phase window, in milliseconds.
+        /// </param>
+        /// <returns><c>grossMs - storeWrapperInitMs</c>, clamped at <c>0.0</c> when negative.</returns>
+        public static double ComputeNetMs(double grossMs, double storeWrapperInitMs)
+        {
+            var netMs = grossMs - storeWrapperInitMs;
+            return netMs < 0.0 ? 0.0 : netMs;
+        }
+
+        /// <summary>
+        /// Emits exactly one <c>[phase-net]</c> line attributing a startup phase's gross wall-clock to
+        /// StoreWrapper-init time versus net (non-store-init) time (issue #211, Phase 3.6). Additive
+        /// only: the existing <c>[Startup timing]</c> gross table is unchanged. All three ms fields are
+        /// formatted with "F1" and <see cref="CultureInfo.InvariantCulture"/>, consistent with the other
+        /// emitters. Callers supply <paramref name="netMs"/> from <see cref="ComputeNetMs"/> so the
+        /// clamp rule is applied uniformly.
+        /// </summary>
+        /// <param name="phase">
+        /// The startup phase name (for example <c>IntelConfig</c>, <c>OlObjects</c>, <c>ToDo</c>,
+        /// <c>AutoFile</c>, <c>Engines</c>, <c>Events</c>). Emitted verbatim.
+        /// </param>
+        /// <param name="grossMs">The phase's gross wall-clock elapsed, in milliseconds.</param>
+        /// <param name="storeWrapperInitMs">
+        /// The StoreWrapper-init delta attributed to the phase window, in milliseconds.
+        /// </param>
+        /// <param name="netMs">
+        /// The net (non-store-init) milliseconds, normally <see cref="ComputeNetMs"/> of the two values
+        /// above (clamped at <c>0.0</c>).
+        /// </param>
+        public void EmitPhaseNet(
+            string phase,
+            double grossMs,
+            double storeWrapperInitMs,
+            double netMs
+        )
+        {
+            _emit(
+                "[phase-net] "
+                    + $"phase={phase} "
+                    + $"grossMs={grossMs.ToString("F1", CultureInfo.InvariantCulture)} "
+                    + $"storeWrapperInitMs={storeWrapperInitMs.ToString("F1", CultureInfo.InvariantCulture)} "
+                    + $"netMs={netMs.ToString("F1", CultureInfo.InvariantCulture)}"
+            );
+        }
     }
 
     /// <summary>

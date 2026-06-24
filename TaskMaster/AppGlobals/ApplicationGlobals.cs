@@ -154,40 +154,68 @@ namespace TaskMaster
             StartStartupUiHeartbeat(diagnosticsProbe);
             try
             {
+                // Per-phase NET attribution (issue #211, Phase 3.6): sample the process-global
+                // StoreWrapperInitClock immediately before each phase await; the gross elapsed is
+                // captured inline by the existing RecordPhase(StopAndRestart(...)) statement (kept as
+                // the sole statement between each phase await and its yield); the resulting
+                // [phase-net] line is emitted alongside the per-phase [gc-delta] after the yield. The
+                // store-init delta is computed at emit time (no StoreWrapperInitClock.Add occurs
+                // during a Task.Yield, so the post-yield after-sample equals the pre-yield value).
+                // The RecordPhase gross-table call, the YieldWithContinuationProbeAsync call, and the
+                // EmitPhaseGcDelta call are unchanged and keep their existing order. The only live
+                // clock read is SampleStoreWrapperInitTotalMs (a seam).
+                double storeInitBefore;
+                TimeSpan phaseElapsed;
+
                 BeginPhase("IntelConfig");
+                storeInitBefore = SampleStoreWrapperInitTotalMs();
                 await LoadIntelConfigPhaseAsync();
-                _timingRecorder.RecordPhase("IntelConfig", StopAndRestart(stopwatch));
+                _timingRecorder.RecordPhase(
+                    "IntelConfig",
+                    phaseElapsed = StopAndRestart(stopwatch)
+                );
                 await YieldWithContinuationProbeAsync("IntelConfig");
                 EmitPhaseGcDelta(diagnosticsProbe, "IntelConfig");
+                EmitPhaseNet(diagnosticsProbe, "IntelConfig", phaseElapsed, storeInitBefore);
 
                 BeginPhase("OlObjects");
+                storeInitBefore = SampleStoreWrapperInitTotalMs();
                 await LoadOlObjectsPhaseAsync();
-                _timingRecorder.RecordPhase("OlObjects", StopAndRestart(stopwatch));
+                _timingRecorder.RecordPhase("OlObjects", phaseElapsed = StopAndRestart(stopwatch));
                 await YieldWithContinuationProbeAsync("OlObjects");
                 EmitPhaseGcDelta(diagnosticsProbe, "OlObjects");
+                EmitPhaseNet(diagnosticsProbe, "OlObjects", phaseElapsed, storeInitBefore);
 
                 BeginPhase("ToDo");
+                storeInitBefore = SampleStoreWrapperInitTotalMs();
                 await LoadToDoPhaseAsync();
-                _timingRecorder.RecordPhase("ToDo", StopAndRestart(stopwatch));
+                _timingRecorder.RecordPhase("ToDo", phaseElapsed = StopAndRestart(stopwatch));
                 await YieldWithContinuationProbeAsync("ToDo");
                 EmitPhaseGcDelta(diagnosticsProbe, "ToDo");
+                EmitPhaseNet(diagnosticsProbe, "ToDo", phaseElapsed, storeInitBefore);
 
                 BeginPhase("AutoFile");
+                storeInitBefore = SampleStoreWrapperInitTotalMs();
                 await LoadAutoFilePhaseAsync();
-                _timingRecorder.RecordPhase("AutoFile", StopAndRestart(stopwatch));
+                _timingRecorder.RecordPhase("AutoFile", phaseElapsed = StopAndRestart(stopwatch));
                 await YieldWithContinuationProbeAsync("AutoFile");
                 EmitPhaseGcDelta(diagnosticsProbe, "AutoFile");
+                EmitPhaseNet(diagnosticsProbe, "AutoFile", phaseElapsed, storeInitBefore);
 
                 BeginPhase("Engines");
+                storeInitBefore = SampleStoreWrapperInitTotalMs();
                 await InitializeEnginesPhaseAsync();
-                _timingRecorder.RecordPhase("Engines", StopAndRestart(stopwatch));
+                _timingRecorder.RecordPhase("Engines", phaseElapsed = StopAndRestart(stopwatch));
                 await YieldWithContinuationProbeAsync("Engines");
                 EmitPhaseGcDelta(diagnosticsProbe, "Engines");
+                EmitPhaseNet(diagnosticsProbe, "Engines", phaseElapsed, storeInitBefore);
 
                 BeginPhase("Events");
+                storeInitBefore = SampleStoreWrapperInitTotalMs();
                 await LoadEventsPhaseAsync();
-                _timingRecorder.RecordPhase("Events", StopAndRestart(stopwatch));
+                _timingRecorder.RecordPhase("Events", phaseElapsed = StopAndRestart(stopwatch));
                 EmitPhaseGcDelta(diagnosticsProbe, "Events");
+                EmitPhaseNet(diagnosticsProbe, "Events", phaseElapsed, storeInitBefore);
             }
             finally
             {
@@ -286,6 +314,44 @@ namespace TaskMaster
                 GC.GetTotalMemory(false) - _phaseGcBytesBefore,
                 System.Runtime.GCSettings.IsServerGC,
                 System.Runtime.GCSettings.LatencyMode.ToString()
+            );
+        }
+
+        // Diagnosis-only (issue #211, Phase 3.6) seam: reads the live process-global
+        // StoreWrapperInitClock snapshot. This is the ONLY live clock read for the [phase-net]
+        // probe; it stays here in the thin call site (mirroring the live GC reads above) so the
+        // per-phase NET arithmetic and formatting in the coverable StartupDiagnosticsProbe stay
+        // testable. protected internal virtual so focused MSTests override it to a deterministic
+        // value without touching the process-global accumulator.
+        protected internal virtual double SampleStoreWrapperInitTotalMs() =>
+            UtilitiesCS.OutlookObjects.Store.StoreWrapperInitClock.TotalMs;
+
+        // Diagnosis-only (issue #211, Phase 3.6) bracket: samples the StoreWrapperInitClock again
+        // after the named phase, computes the StoreWrapper-init delta attributed to the phase window
+        // (afterSample - beforeSample), and emits one additive [phase-net] line via the coverable
+        // probe. The net arithmetic (gross - storeWrapperInitMs, clamped at 0.0) and the formatting
+        // both live in StartupDiagnosticsProbe; only the live after-sample read goes through the
+        // SampleStoreWrapperInitTotalMs seam. Behavior-preserving: emits one line, changes no phase
+        // order, await, or recorded gross value.
+        private void EmitPhaseNet(
+            StartupDiagnosticsProbe probe,
+            string phase,
+            TimeSpan phaseElapsed,
+            double storeInitBeforeMs
+        )
+        {
+            var grossMs = phaseElapsed.TotalMilliseconds;
+            var storeInitDeltaMs = SampleStoreWrapperInitTotalMs() - storeInitBeforeMs;
+            if (storeInitDeltaMs < 0.0)
+            {
+                storeInitDeltaMs = 0.0;
+            }
+
+            probe.EmitPhaseNet(
+                phase,
+                grossMs,
+                storeInitDeltaMs,
+                StartupDiagnosticsProbe.ComputeNetMs(grossMs, storeInitDeltaMs)
             );
         }
 

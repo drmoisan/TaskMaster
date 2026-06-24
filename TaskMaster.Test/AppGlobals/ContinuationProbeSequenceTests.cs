@@ -118,6 +118,10 @@ namespace TaskMaster.Test.AppGlobals
                 TaskMaster.StartupDiagnosticsProbe probe,
                 string phase
             ) { }
+
+            // No-op the issue #211 Phase 3.6 live StoreWrapperInitClock read so LoadSequentialAsync
+            // never touches the process-global accumulator under the unit-test seam (P4-T5).
+            protected internal override double SampleStoreWrapperInitTotalMs() => 0.0;
         }
     }
 }

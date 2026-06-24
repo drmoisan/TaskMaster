@@ -318,6 +318,8 @@
     <Compile Include="OutlookObjects\Store\StoreWrapperTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperViewerTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreFilterAttributionTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperInitClockTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperInitProbeTests.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperTests.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemHelperProjectionTests.cs" />
     <Compile Include="OutlookObjects\Fields\UserDefinedFieldsTests.cs" />
