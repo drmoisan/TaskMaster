@@ -134,67 +134,102 @@ namespace TaskMaster
             // caller thread) and is wrapped with a Stopwatch so its elapsed time is recorded
             // once, in startup order. The recorder is the no-op recorder unless the timing flag
             // is on, so nothing is recorded when disabled. Yield calls are not recorded.
+            //
+            // Diagnosis-only instrumentation (issue #211, Phase 3.2): the UI/STA-responsiveness
+            // heartbeat and the per-phase GC delta probe now span the ENTIRE sequential startup,
+            // not only the Engines phase, so the next capture shows whether the STA is actually
+            // frozen during the slow phase (heartbeat gaps approximately equal to phase duration)
+            // or whether an async continuation merely waits while the STA stays responsive.
+            // Behavior-preserving: the only inserted statements are the current-phase marker
+            // assignments, the heartbeat start/stop, and the before/after GC reads bracketing each
+            // existing phase await; the phase awaits, RecordPhase calls, and the inter-phase yields
+            // are unchanged. The host-bound scheduling (DispatcherTimer on UiThread.Dispatcher) and
+            // the live GC.*/GCSettings.* reads stay behind the protected internal virtual seams
+            // below so focused MSTests can no-op them without a live UI host; only the gap/GC-delta
+            // formatting goes through the coverable StartupDiagnosticsProbe helper. The heartbeat is
+            // started before the first phase and stopped in a finally so it always stops even if a
+            // phase throws.
             var stopwatch = Stopwatch.StartNew();
-            await LoadIntelConfigPhaseAsync();
-            _timingRecorder.RecordPhase("IntelConfig", StopAndRestart(stopwatch));
-            await YieldWithContinuationProbeAsync("IntelConfig");
-            await LoadOlObjectsPhaseAsync();
-            _timingRecorder.RecordPhase("OlObjects", StopAndRestart(stopwatch));
-            await YieldWithContinuationProbeAsync("OlObjects");
-            await LoadToDoPhaseAsync();
-            _timingRecorder.RecordPhase("ToDo", StopAndRestart(stopwatch));
-            await YieldWithContinuationProbeAsync("ToDo");
-            await LoadAutoFilePhaseAsync();
-            _timingRecorder.RecordPhase("AutoFile", StopAndRestart(stopwatch));
-            await YieldWithContinuationProbeAsync("AutoFile");
-
-            // Diagnosis-only instrumentation (issue #211, Phase 3.1): measure whether the UI/STA
-            // thread is starved or suspended during the Engines-phase SpamBayes deserialization,
-            // and attribute any stall to GC. Behavior-preserving: the only inserted statements are
-            // the heartbeat start/stop and the before/after GC reads; the Engines phase await,
-            // RecordPhase call, and the following yield are unchanged. The host-bound scheduling
-            // (DispatcherTimer on UiThread.Dispatcher) and the live GC.* reads stay behind the
-            // protected internal virtual seams below so focused MSTests can no-op them without a
-            // live UI host; only the gap/GC-delta formatting goes through the coverable
-            // StartupDiagnosticsProbe helper.
             var diagnosticsProbe = new StartupDiagnosticsProbe(s => logger.Debug(s));
-            StartEnginesUiHeartbeat(diagnosticsProbe);
-            BeginEnginesGcCapture();
+            StartStartupUiHeartbeat(diagnosticsProbe);
             try
             {
+                BeginPhase("IntelConfig");
+                await LoadIntelConfigPhaseAsync();
+                _timingRecorder.RecordPhase("IntelConfig", StopAndRestart(stopwatch));
+                await YieldWithContinuationProbeAsync("IntelConfig");
+                EmitPhaseGcDelta(diagnosticsProbe, "IntelConfig");
+
+                BeginPhase("OlObjects");
+                await LoadOlObjectsPhaseAsync();
+                _timingRecorder.RecordPhase("OlObjects", StopAndRestart(stopwatch));
+                await YieldWithContinuationProbeAsync("OlObjects");
+                EmitPhaseGcDelta(diagnosticsProbe, "OlObjects");
+
+                BeginPhase("ToDo");
+                await LoadToDoPhaseAsync();
+                _timingRecorder.RecordPhase("ToDo", StopAndRestart(stopwatch));
+                await YieldWithContinuationProbeAsync("ToDo");
+                EmitPhaseGcDelta(diagnosticsProbe, "ToDo");
+
+                BeginPhase("AutoFile");
+                await LoadAutoFilePhaseAsync();
+                _timingRecorder.RecordPhase("AutoFile", StopAndRestart(stopwatch));
+                await YieldWithContinuationProbeAsync("AutoFile");
+                EmitPhaseGcDelta(diagnosticsProbe, "AutoFile");
+
+                BeginPhase("Engines");
                 await InitializeEnginesPhaseAsync();
                 _timingRecorder.RecordPhase("Engines", StopAndRestart(stopwatch));
+                await YieldWithContinuationProbeAsync("Engines");
+                EmitPhaseGcDelta(diagnosticsProbe, "Engines");
+
+                BeginPhase("Events");
+                await LoadEventsPhaseAsync();
+                _timingRecorder.RecordPhase("Events", StopAndRestart(stopwatch));
+                EmitPhaseGcDelta(diagnosticsProbe, "Events");
             }
             finally
             {
-                StopEnginesUiHeartbeat();
+                StopStartupUiHeartbeat();
             }
-            EmitEnginesGcDelta(diagnosticsProbe);
+        }
 
-            await YieldWithContinuationProbeAsync("Engines");
-            await LoadEventsPhaseAsync();
-            _timingRecorder.RecordPhase("Events", StopAndRestart(stopwatch));
+        // Marks the upcoming startup phase as in-flight (issue #211, Phase 3.2): records the
+        // current-phase name so each heartbeat tick is attributed to this phase, and takes the
+        // before-GC snapshot for the per-phase [gc-delta]. This is a thin marker + GC-snapshot
+        // bracket immediately before the phase await; it adds no awaits and does not change phase
+        // order, the phase set, or load semantics. The live GC reads stay inside BeginPhaseGcCapture.
+        private void BeginPhase(string phase)
+        {
+            _currentStartupPhase = phase;
+            BeginPhaseGcCapture(phase);
         }
 
         // Host-bound heartbeat scheduling held in a per-load field so the start/stop seams share
-        // the before-phase GC snapshot and the running timer without exposing them on the public
-        // surface. Null in the flag-off/test seams (the seams below are overridden to no-op).
-        private System.Windows.Threading.DispatcherTimer? _enginesHeartbeat;
-        private int _enginesGcGen0Before;
-        private int _enginesGcGen1Before;
-        private int _enginesGcGen2Before;
-        private long _enginesGcBytesBefore;
+        // the running timer without exposing it on the public surface. Null in the flag-off/test
+        // seams (the seams below are overridden to no-op). The per-phase GC before-snapshot fields
+        // are overwritten at each phase boundary by BeginPhaseGcCapture. The current-phase marker
+        // is read by each heartbeat tick so each [ui-heartbeat] line is attributed to the phase
+        // whose body/await is in flight (issue #211, Phase 3.2).
+        private System.Windows.Threading.DispatcherTimer? _startupHeartbeat;
+        private string _currentStartupPhase = string.Empty;
+        private int _phaseGcGen0Before;
+        private int _phaseGcGen1Before;
+        private int _phaseGcGen2Before;
+        private long _phaseGcBytesBefore;
 
-        // Diagnosis-only (issue #211, Phase 3.1) seam: starts a recurring UI-thread responsiveness
-        // heartbeat on UiThread.Dispatcher at a 250 ms nominal interval. Each tick reads the actual
-        // elapsed interval since the previous tick from a restart-per-tick Stopwatch and emits one
-        // [ui-heartbeat] line via the coverable probe. The DispatcherTimer scheduling and the
-        // per-tick Stopwatch are host-bound and live here in the thin call site; only the gap
+        // Diagnosis-only (issue #211, Phase 3.2) seam: starts a recurring UI-thread responsiveness
+        // heartbeat on UiThread.Dispatcher at a 250 ms nominal interval spanning the entire
+        // sequential startup. Each tick reads the actual elapsed interval since the previous tick
+        // from a restart-per-tick Stopwatch and the current-phase marker, and emits one phase-
+        // annotated [ui-heartbeat] line via the coverable probe. The DispatcherTimer scheduling and
+        // the per-tick Stopwatch are host-bound and live here in the thin call site; only the gap
         // formatting is coverable. The started timer is held in a private field so the seam
         // signature does not leak the WindowsBase DispatcherTimer type onto the (overridable)
         // surface. protected internal virtual so focused MSTests override it to a no-op without
         // constructing a live Dispatcher.
-        protected internal virtual void StartEnginesUiHeartbeat(StartupDiagnosticsProbe probe)
+        protected internal virtual void StartStartupUiHeartbeat(StartupDiagnosticsProbe probe)
         {
             const double nominalMs = 250d;
             var tickStopwatch = Stopwatch.StartNew();
@@ -205,46 +240,50 @@ namespace TaskMaster
                 {
                     var actualMs = tickStopwatch.Elapsed.TotalMilliseconds;
                     tickStopwatch.Restart();
-                    probe.EmitHeartbeat(nominalMs, actualMs);
+                    probe.EmitHeartbeat(_currentStartupPhase, nominalMs, actualMs);
                 },
                 UiThread.Dispatcher
             );
             heartbeat.Start();
-            _enginesHeartbeat = heartbeat;
+            _startupHeartbeat = heartbeat;
         }
 
-        // Diagnosis-only (issue #211, Phase 3.1) seam: stops/disposes the heartbeat after the
-        // Engines phase. protected internal virtual so focused MSTests override it to a no-op.
-        protected internal virtual void StopEnginesUiHeartbeat()
+        // Diagnosis-only (issue #211, Phase 3.2) seam: stops/disposes the heartbeat after the last
+        // phase. protected internal virtual so focused MSTests override it to a no-op.
+        protected internal virtual void StopStartupUiHeartbeat()
         {
-            _enginesHeartbeat?.Stop();
-            _enginesHeartbeat = null;
+            _startupHeartbeat?.Stop();
+            _startupHeartbeat = null;
         }
 
-        // Diagnosis-only (issue #211, Phase 3.1) seam: captures the live GC collection counts and
-        // allocated bytes immediately before the Engines phase. The GC.* reads are host-state reads
+        // Diagnosis-only (issue #211, Phase 3.2) seam: captures the live GC collection counts and
+        // allocated bytes immediately before the named phase. The GC.* reads are host-state reads
         // and stay here in the thin call site. protected internal virtual so focused MSTests
         // override it to a no-op.
-        protected internal virtual void BeginEnginesGcCapture()
+        protected internal virtual void BeginPhaseGcCapture(string phase)
         {
-            _enginesGcGen0Before = GC.CollectionCount(0);
-            _enginesGcGen1Before = GC.CollectionCount(1);
-            _enginesGcGen2Before = GC.CollectionCount(2);
-            _enginesGcBytesBefore = GC.GetTotalMemory(false);
+            _phaseGcGen0Before = GC.CollectionCount(0);
+            _phaseGcGen1Before = GC.CollectionCount(1);
+            _phaseGcGen2Before = GC.CollectionCount(2);
+            _phaseGcBytesBefore = GC.GetTotalMemory(false);
         }
 
-        // Diagnosis-only (issue #211, Phase 3.1) seam: reads the live GC counts/bytes and GCSettings
-        // again after the Engines phase, computes the deltas, and emits one [gc-delta] line via the
-        // coverable probe. The GC.*/GCSettings.* reads stay here in the thin call site; only the
-        // delta formatting is coverable. protected internal virtual so focused MSTests override it
-        // to a no-op.
-        protected internal virtual void EmitEnginesGcDelta(StartupDiagnosticsProbe probe)
+        // Diagnosis-only (issue #211, Phase 3.2) seam: reads the live GC counts/bytes and GCSettings
+        // again after the named phase, computes the deltas, and emits one phase-annotated [gc-delta]
+        // line via the coverable probe. The GC.*/GCSettings.* reads stay here in the thin call site;
+        // only the delta formatting is coverable. protected internal virtual so focused MSTests
+        // override it to a no-op.
+        protected internal virtual void EmitPhaseGcDelta(
+            StartupDiagnosticsProbe probe,
+            string phase
+        )
         {
             probe.EmitGcDelta(
-                GC.CollectionCount(0) - _enginesGcGen0Before,
-                GC.CollectionCount(1) - _enginesGcGen1Before,
-                GC.CollectionCount(2) - _enginesGcGen2Before,
-                GC.GetTotalMemory(false) - _enginesGcBytesBefore,
+                phase,
+                GC.CollectionCount(0) - _phaseGcGen0Before,
+                GC.CollectionCount(1) - _phaseGcGen1Before,
+                GC.CollectionCount(2) - _phaseGcGen2Before,
+                GC.GetTotalMemory(false) - _phaseGcBytesBefore,
                 System.Runtime.GCSettings.IsServerGC,
                 System.Runtime.GCSettings.LatencyMode.ToString()
             );
