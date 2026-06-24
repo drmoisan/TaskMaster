@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
+using UtilitiesCS.OutlookObjects.Folder;
 using UtilitiesCS.OutlookObjects.Store;
 
 namespace UtilitiesCS
@@ -17,6 +18,7 @@ namespace UtilitiesCS
         string EmailPrefixToStrip { get; }
         Folder Inbox { get; }
         IEnumerable<Folder> Inboxes { get; }
+        IOutlookFolderTreeService FolderTreeService { get; }
         NameSpace NamespaceMAPI { get; }
         Folder Root { get; }
         public StoresWrapper StoresWrapper { get; set; }

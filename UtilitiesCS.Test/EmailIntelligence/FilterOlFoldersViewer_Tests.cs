@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS;
+using UtilitiesCS.OutlookObjects.Folder;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.Test.EmailIntelligence
@@ -19,8 +20,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
     /// Usage:
     ///     This class runs under MSTest's STA class execution mode because every
     ///     test instantiates FilterOlFoldersViewer.
-    ///     SetController tests inject an uninitialized controller whose _olFolderTree
-    ///     is set to a synthetic FolderTree so that SetupTree() does not hit COM.
+    ///     SetController tests inject an uninitialized controller whose folder view
+    ///     is set to a synthetic snapshot so that SetupTree() does not hit COM.
     /// </summary>
     [STATestClass]
     public class FilterOlFoldersViewer_Tests
@@ -32,36 +33,21 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// <summary>
         /// Verifies that SetController runs to completion (configuring CanExpandGetter
         /// and ChildrenGetter on both tree list views) when the controller has a
-        /// synthetic, COM-free FolderTree.
+        /// synthetic, COM-free snapshot view.
         /// </summary>
         [TestMethod]
         public void SetController_WithSyntheticController_ConfiguresBothTreeDelegates()
         {
-            // Arrange — build a controller whose _olFolderTree has one synthetic root
-            var wrapper = new FolderWrapper(
-                selected: false,
-                itemCount: 0,
-                folderSize: 0,
-                name: "Root",
-                relativePath: "Root"
-            );
-            var rootNode = new TreeNode<FolderWrapper>(wrapper);
-
-            var syntheticTree = (FolderTree)
-                FormatterServices.GetUninitializedObject(typeof(FolderTree));
-            typeof(FolderTree)
-                .GetField("_roots", BindingFlags.NonPublic | BindingFlags.Instance)
-                .SetValue(syntheticTree, new List<TreeNode<FolderWrapper>> { rootNode });
-
+            // Arrange
             var controller = (FilterOlFoldersController)
                 FormatterServices.GetUninitializedObject(typeof(FilterOlFoldersController));
             typeof(FilterOlFoldersController)
-                .GetField("_olFolderTree", BindingFlags.NonPublic | BindingFlags.Instance)
-                .SetValue(controller, syntheticTree);
+                .GetField("_folderTreeView", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(controller, CreateCompatibilityView());
 
             var viewer = new FilterOlFoldersViewer();
 
-            // Act — should not throw; SetupTree accesses _controller.OlFolderTree
+            // Act
             System.Action act = () => viewer.SetController(controller);
 
             // Assert
@@ -196,7 +182,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
         /// <summary>
         /// Verifies that BtnSave_Click forwards Save() to the controller by injecting
-        /// an uninitialized controller with a synthetic FolderTree and a real viewer.
+        /// an uninitialized controller with a synthetic folder view and a real viewer.
         /// The observable side effect is that the viewer is closed.
         /// </summary>
         [TestMethod]
@@ -204,21 +190,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             // Arrange
             var viewer = new FilterOlFoldersViewer();
-
-            var rootNode = new TreeNode<FolderWrapper>(
-                new FolderWrapper(
-                    selected: false,
-                    itemCount: 0,
-                    folderSize: 0,
-                    name: "Root",
-                    relativePath: "Root"
-                )
-            );
-            var syntheticTree = (FolderTree)
-                FormatterServices.GetUninitializedObject(typeof(FolderTree));
-            typeof(FolderTree)
-                .GetField("_roots", BindingFlags.NonPublic | BindingFlags.Instance)
-                .SetValue(syntheticTree, new List<TreeNode<FolderWrapper>> { rootNode });
 
             var mockTd = new Moq.Mock<IToDoObjects>();
             mockTd
@@ -234,8 +205,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 .GetField("_viewer", BindingFlags.NonPublic | BindingFlags.Instance)
                 .SetValue(controller, viewer);
             typeof(FilterOlFoldersController)
-                .GetField("_olFolderTree", BindingFlags.NonPublic | BindingFlags.Instance)
-                .SetValue(controller, syntheticTree);
+                .GetField("_folderTreeView", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(controller, CreateCompatibilityView());
             typeof(FilterOlFoldersController)
                 .GetField("_globals", BindingFlags.NonPublic | BindingFlags.Instance)
                 .SetValue(controller, mockGlobals.Object);
@@ -251,6 +222,30 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Assert
             viewer.IsDisposed.Should().BeTrue();
+        }
+
+        private static FolderTreeCompatibilityView CreateCompatibilityView()
+        {
+            var key = new FolderTreeNodeKey("store", "root", "\\Root");
+            var snapshot = new FolderTreeSnapshot(
+                new[] { key },
+                new[]
+                {
+                    new FolderTreeSnapshotNode(
+                        key,
+                        "Root",
+                        "store",
+                        "root",
+                        null,
+                        "\\Root",
+                        "Root",
+                        Array.Empty<FolderTreeNodeKey>(),
+                        false,
+                        string.Empty
+                    ),
+                }
+            );
+            return new(snapshot, new FolderTreeSelectionOverlay(Array.Empty<string>()));
         }
 
         /// <summary>

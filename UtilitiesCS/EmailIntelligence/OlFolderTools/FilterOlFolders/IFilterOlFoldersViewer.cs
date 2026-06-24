@@ -10,6 +10,9 @@ namespace UtilitiesCS
     /// </summary>
     public interface IFilterOlFoldersViewer : IDisposable
     {
+        /// <summary>Raised after the viewer window has closed.</summary>
+        event FormClosedEventHandler FormClosed;
+
         /// <summary>Tree list view that shows folders not currently filtered.</summary>
         TreeListView TlvNotFiltered { get; }
 

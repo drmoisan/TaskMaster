@@ -16,6 +16,7 @@ using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Interfaces;
+using UtilitiesCS.OutlookObjects.Folder;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.Test.EmailIntelligence
@@ -227,6 +228,12 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             public FolderTree FolderTree { get; set; }
 
+            public FolderTreeSnapshot Snapshot { get; set; }
+
+            public IFolderHandleResolver FolderHandleResolver { get; set; }
+
+            public MAPIFolder ArchiveRoot { get; set; }
+
             public object DeserializedValue { get; set; }
 
             public IEnumerable<FolderWrapper> FolderInfos { get; set; }
@@ -248,6 +255,22 @@ namespace UtilitiesCS.Test.EmailIntelligence
             internal override IEnumerable<FolderWrapper> QueryOlFolderInfo(FolderTree tree) =>
                 FolderInfos ?? base.QueryOlFolderInfo(tree);
 
+            internal override Task<FolderTreeSnapshot> GetOlFolderSnapshotAsync(
+                ProgressTracker progress = null
+            )
+            {
+                return Task.FromResult(
+                    Snapshot ?? CreateFolderSnapshot(FolderTree?.Flatten().ToArray())
+                );
+            }
+
+            internal override IFolderHandleResolver CreateFolderHandleResolver() =>
+                FolderHandleResolver ?? new FakeFolderHandleResolver();
+
+            internal override IEnumerable<FolderWrapper> QueryOlFolderInfo(
+                FolderTreeSnapshot snapshot
+            ) => FolderInfos ?? base.QueryOlFolderInfo(snapshot);
+
             internal override IEnumerable<Microsoft.Office.Interop.Outlook.MAPIFolder> QueryOlFolders(
                 FolderTree tree
             ) => OutlookFolders ?? base.QueryOlFolders(tree);
@@ -263,7 +286,14 @@ namespace UtilitiesCS.Test.EmailIntelligence
             {
                 if (UseBaseTryResolveMapiHandles)
                 {
-                    return await base.TryResolveMapiHandles(folders);
+                    return await Task.FromResult(
+                        TryResolveMapiHandles(
+                            Snapshot ?? CreateFolderSnapshot(FolderTree?.Flatten().ToArray()),
+                            folders,
+                            CreateFolderHandleResolver(),
+                            ArchiveRoot
+                        )
+                    );
                 }
 
                 return await Task.FromResult(TryResolveMapiHandlesResult);
@@ -291,6 +321,59 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 .GetField("_roots", BindingFlags.Instance | BindingFlags.NonPublic)
                 .SetValue(tree, roots);
             return tree;
+        }
+
+        private static FolderTreeSnapshot CreateFolderSnapshot(params FolderWrapper[] folders)
+        {
+            var nodes = (folders ?? Array.Empty<FolderWrapper>())
+                .Select(folder =>
+                {
+                    var key = new FolderTreeNodeKey(
+                        "store-id",
+                        folder.RelativePath,
+                        folder.RelativePath
+                    );
+                    return new FolderTreeSnapshotNode(
+                        key,
+                        folder.Name,
+                        "store-id",
+                        folder.RelativePath,
+                        null,
+                        folder.RelativePath,
+                        folder.RelativePath,
+                        Array.Empty<FolderTreeNodeKey>(),
+                        false,
+                        string.Empty
+                    );
+                })
+                .ToArray();
+            return new FolderTreeSnapshot(nodes.Select(node => node.Key), nodes);
+        }
+
+        private sealed class FakeFolderHandleResolver : IFolderHandleResolver
+        {
+            public Dictionary<string, object> HandlesByRelativePath { get; } = new();
+
+            public object Resolve(FolderTreeSnapshotNode node)
+            {
+                if (!TryResolve(node, out var folder))
+                {
+                    throw new InvalidOperationException("The folder handle could not be resolved.");
+                }
+
+                return folder;
+            }
+
+            public bool TryResolve(FolderTreeSnapshotNode node, out object folder)
+            {
+                if (node is null)
+                {
+                    folder = null;
+                    return false;
+                }
+
+                return HandlesByRelativePath.TryGetValue(node.RelativePath, out folder);
+            }
         }
 
         private static Mock<Items> CreateOutlookItems(int count, params object[] items)

@@ -88,7 +88,7 @@ namespace UtilitiesCS
             this.TlvNotFiltered.ChildrenGetter = x => ((TreeNode<FolderWrapper>)x).Children;
             this.TlvNotFiltered.ParentGetter = x => ((TreeNode<FolderWrapper>)x).Parent;
             this.OlvNameNotFiltered.ImageGetter = x => 0;
-            this.TlvNotFiltered.Roots = _controller.OlFolderTree.FilterSelected(false);
+            this.TlvNotFiltered.Roots = _controller.FilterSelected(false);
             //this.TlvNotFiltered.Roots = _controller.OlFolderTree.Roots;
             //this.TlvNotFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == false);
 
@@ -96,7 +96,7 @@ namespace UtilitiesCS
             this.TlvFiltered.ChildrenGetter = x => ((TreeNode<FolderWrapper>)x).Children;
             this.TlvFiltered.ParentGetter = x => ((TreeNode<FolderWrapper>)x).Parent;
             this.OlvNameFiltered.ImageGetter = x => 0;
-            this.TlvFiltered.Roots = _controller.OlFolderTree.FilterSelected(true);
+            this.TlvFiltered.Roots = _controller.FilterSelected(true);
             //this.TlvFiltered.Roots = _controller.OlFolderTree.Roots;
             //this.TlvFiltered.ModelFilter = new ModelFilter(x => ((TreeNode<OlFolderInfo>)x).Value.Selected == true);
         }

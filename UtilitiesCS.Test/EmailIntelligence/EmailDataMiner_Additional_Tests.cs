@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.OutlookObjects.Folder;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.Test.EmailIntelligence
 {
@@ -19,7 +21,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestMethod]
         public void QueryOlFolders_WhenTreeContainsUnselectedNodes_ReturnsMappedOutlookFolders()
         {
-            // Arrange
             var folderOne = new FolderWrapper(false, 1, 10, "One", "root/one");
             var folderTwo = new FolderWrapper(false, 1, 10, "Two", "root/two");
             folderOne.OlFolder = new Mock<MAPIFolder>().Object;
@@ -27,10 +28,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var tree = CreateFolderTree(folderOne, folderTwo);
             var miner = new FolderTreeBackedEmailDataMiner(new StubGlobals()) { FolderTree = tree };
 
-            // Act
             var folders = miner.QueryOlFolders(tree).ToArray();
 
-            // Assert
             folders.Should().HaveCount(2);
             folders.Should().Contain(folderOne.OlFolder);
             folders.Should().Contain(folderTwo.OlFolder);
@@ -39,47 +38,102 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestMethod]
         public void QueryOlFolderInfo_WhenTreeContainsUnselectedNodes_ReturnsFolderWrappers()
         {
-            // Arrange
             var folderOne = new FolderWrapper(false, 1, 10, "One", "root/one");
             var folderTwo = new FolderWrapper(false, 1, 10, "Two", "root/two");
             var tree = CreateFolderTree(folderOne, folderTwo);
             var miner = new FolderTreeBackedEmailDataMiner(new StubGlobals()) { FolderTree = tree };
 
-            // Act
             var folders = miner.QueryOlFolderInfo(tree).ToArray();
 
-            // Assert
             folders.Should().ContainInOrder(folderOne, folderTwo);
         }
 
         [TestMethod]
         public async Task TryResolveMapiHandles_WhenRelativePathsMatch_ReassignsFolderHandles()
         {
-            // Arrange
             var treeFolder = new FolderWrapper(false, 1, 10, "One", "root/one");
             var resolvedRoot = new Mock<MAPIFolder>().Object;
             var resolvedFolder = new Mock<MAPIFolder>().Object;
-            treeFolder.OlRoot = resolvedRoot;
-            treeFolder.OlFolder = resolvedFolder;
+            var resolver = new FakeFolderHandleResolver();
+            resolver.HandlesByRelativePath["root/one"] = resolvedFolder;
 
             var miner = new FolderTreeBackedEmailDataMiner(new StubGlobals())
             {
-                FolderTree = CreateFolderTree(treeFolder),
+                Snapshot = CreateFolderSnapshot(treeFolder),
+                FolderHandleResolver = resolver,
+                ArchiveRoot = resolvedRoot,
             };
 
-            // Act
             var result = await miner.TryResolveMapiHandles([treeFolder]);
 
-            // Assert
             result.Should().BeTrue();
             treeFolder.OlRoot.Should().BeSameAs(resolvedRoot);
             treeFolder.OlFolder.Should().BeSameAs(resolvedFolder);
         }
 
         [TestMethod]
+        public async Task GetOlFolderSnapshotAsync_UsesCachedStoreRequestAndFallsBackToFullSnapshot()
+        {
+            var folder = new FolderWrapper(false, 1, 10, "One", "root/one");
+            var snapshot = CreateFolderSnapshot(folder);
+            FolderTreeRequest captured = null;
+            var service = new Mock<IOutlookFolderTreeService>();
+            service
+                .Setup(x =>
+                    x.GetSnapshotAsync(It.IsAny<FolderTreeRequest>(), It.IsAny<CancellationToken>())
+                )
+                .Callback<FolderTreeRequest, CancellationToken>((request, _) => captured = request)
+                .ReturnsAsync(snapshot);
+            var archiveRoot = new Mock<Folder>();
+            archiveRoot.SetupGet(x => x.StoreID).Returns("store-a");
+            archiveRoot.SetupGet(x => x.FolderPath).Returns("\\Missing");
+            var ol = new Mock<IOlObjects>();
+            ol.SetupGet(x => x.ArchiveRoot).Returns(archiveRoot.Object);
+            ol.SetupGet(x => x.FolderTreeService).Returns(service.Object);
+            var globals = new Mock<IApplicationGlobals>();
+            globals.SetupGet(x => x.Ol).Returns(ol.Object);
+            var miner = new EmailDataMiner(globals.Object);
+
+            var result = await miner.GetOlFolderSnapshotAsync();
+
+            result.Should().BeSameAs(snapshot);
+            captured.AllowStaleSnapshot.Should().BeTrue();
+            captured.StoreIds.Should().ContainSingle().Which.Should().Be("store-a");
+        }
+
+        [TestMethod]
+        public void QueryOlFolderInfo_WithSnapshot_ExcludesConfiguredRelativePaths()
+        {
+            var included = new FolderWrapper(false, 1, 10, "Included", "root/included");
+            var excluded = new FolderWrapper(false, 1, 10, "Excluded", "root/excluded");
+            var scraping = new ScoDictionary<string, int> { ["root/excluded"] = 1 };
+            var td = new Mock<IToDoObjects>();
+            td.SetupGet(x => x.FilteredFolderScraping).Returns(scraping);
+            var archiveRoot = new Mock<Folder>().Object;
+            var ol = new Mock<IOlObjects>();
+            ol.SetupGet(x => x.ArchiveRoot).Returns(archiveRoot);
+            var globals = new Mock<IApplicationGlobals>();
+            globals.SetupGet(x => x.TD).Returns(td.Object);
+            globals.SetupGet(x => x.Ol).Returns(ol.Object);
+            var resolver = new FakeFolderHandleResolver();
+            var miner = new FolderTreeBackedEmailDataMiner(globals.Object)
+            {
+                FolderHandleResolver = resolver,
+            };
+
+            var folders = miner.QueryOlFolderInfo(CreateFolderSnapshot(included, excluded));
+
+            folders
+                .Select(folder => folder.RelativePath)
+                .Should()
+                .ContainSingle()
+                .Which.Should()
+                .Be("root/included");
+        }
+
+        [TestMethod]
         public async Task ExtractOlFolderChunks_WhenCachedFoldersResolve_ReturnsChunkedGroups()
         {
-            // Arrange
             var cachedFolders = new[]
             {
                 new FolderWrapper(false, 2, 300, "One", "root/one"),
@@ -92,10 +146,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 TryResolveMapiHandlesResult = true,
             };
 
-            // Act
             var chunks = await miner.ExtractOlFolderChunks();
 
-            // Assert
             chunks.Should().NotBeEmpty();
             chunks.SelectMany(group => group).Should().HaveCount(2);
             miner.SavedSeeds.Should().Contain("StagingFolderRecordsWithTotals");
@@ -105,7 +157,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestMethod]
         public void SerializeActiveItem_WhenLoaderReturnsMailItem_InvokesSerializeMailInfo()
         {
-            // Arrange
             var mailItem = new Mock<MailItem>().Object;
             var miner = new TestableEmailDataMiner(new StubGlobals())
             {
@@ -113,34 +164,27 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 LoaderSize = 123,
             };
 
-            // Act
             miner.SerializeActiveItem();
 
-            // Assert
             miner.SerializeMailInfoCalls.Should().Be(1);
         }
 
         [TestMethod]
         public void LogSizeComparison_WhenCalled_CompletesWithoutThrowing()
         {
-            // Arrange
             var miner = new EmailDataMiner(new StubGlobals());
 
-            // Act
             var action = () => miner.LogSizeComparison("GC", 10, "Serialize", 20, "MailItem");
 
-            // Assert
             action.Should().NotThrow();
         }
 
         [TestMethod]
         public void DeleteStagingFiles_WhenBayesianFolderMissing_SkipsEnumeration()
         {
-            // Arrange
             var getFilesCalled = false;
             var deleteFileCalled = false;
 
-            // Act
             EmailDataMiner.DeleteStagingFiles(
                 @"C:\AppData",
                 _ => false,
@@ -152,7 +196,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 _ => deleteFileCalled = true
             );
 
-            // Assert
             getFilesCalled.Should().BeFalse();
             deleteFileCalled.Should().BeFalse();
         }
@@ -160,10 +203,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestMethod]
         public void DeleteStagingFiles_WhenDeleteThrows_ContinuesRemainingFiles()
         {
-            // Arrange
             var deleted = new List<string>();
 
-            // Act
             var action = () =>
                 EmailDataMiner.DeleteStagingFiles(
                     @"C:\AppData",
@@ -179,7 +220,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
                     }
                 );
 
-            // Assert
             action.Should().NotThrow();
             deleted.Should().ContainInOrder("one.json", "two.json");
         }
@@ -187,34 +227,32 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestMethod]
         public async Task TryResolveMapiHandles_WhenFoldersNull_ReturnsFalse()
         {
-            // Arrange
             var miner = new FolderTreeBackedEmailDataMiner(new StubGlobals())
             {
-                FolderTree = CreateFolderTree(new FolderWrapper(false, 1, 10, "One", "root/one")),
+                Snapshot = CreateFolderSnapshot(new FolderWrapper(false, 1, 10, "One", "root/one")),
+                FolderHandleResolver = new FakeFolderHandleResolver(),
+                ArchiveRoot = new Mock<MAPIFolder>().Object,
             };
 
-            // Act
             var result = await miner.TryResolveMapiHandles(null);
 
-            // Assert
             result.Should().BeFalse();
         }
 
         [TestMethod]
         public async Task TryResolveMapiHandles_WhenRelativePathMissing_ReturnsFalse()
         {
-            // Arrange
             var treeFolder = new FolderWrapper(false, 1, 10, "One", "root/one");
             var unresolvedFolder = new FolderWrapper(false, 1, 10, "Two", "root/two");
             var miner = new FolderTreeBackedEmailDataMiner(new StubGlobals())
             {
-                FolderTree = CreateFolderTree(treeFolder),
+                Snapshot = CreateFolderSnapshot(treeFolder),
+                FolderHandleResolver = new FakeFolderHandleResolver(),
+                ArchiveRoot = new Mock<MAPIFolder>().Object,
             };
 
-            // Act
             var result = await miner.TryResolveMapiHandles([unresolvedFolder]);
 
-            // Assert
             result.Should().BeFalse();
         }
 

@@ -268,6 +268,7 @@
     <Compile Include="AppGlobals\AppEventsTests.cs" />
     <Compile Include="AppGlobals\AppFileSystemFolderPathsMatchBestSpecialFolderTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsCoverageTests.cs" />
+    <Compile Include="AppGlobals\AppOlObjectsFolderTreeServiceTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsTests.cs" />
     <Compile Include="AppGlobals\AppQuickFilerSettingsTests.cs" />
     <Compile Include="AppGlobals\AppQuickFilerSettingsRemainingPropertiesTests.cs" />
