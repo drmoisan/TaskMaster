@@ -1,8 +1,14 @@
-# PENDING MAINTAINER CAPTURE — All-Phase UI-Heartbeat + Per-Phase GC (#211 Phase 3.2)
+# PARTIALLY SATISFIED — All-Phase UI-Heartbeat + Per-Phase GC (#211 Phase 3.2)
 
-Timestamp: PENDING (replace with ISO-8601 yyyy-MM-ddTHH-mm at capture time)
-Command: PENDING (how Outlook was launched for the non-debugger cold start)
-EXIT_CODE: PENDING (or N/A for a GUI launch)
+A capture was performed: `runtime-capture-allphase-uiheartbeat-gc-2026-06-24T10-24.md`
+(same directory). It validated the all-phase heartbeat + per-phase GC end-to-end,
+but that run was FAST (TOTAL 0:03.16) and did NOT reproduce the multi-minute stall.
+A SLOW-run capture with this build is still needed to observe heartbeat behavior
+during a 60 s+ phase. This placeholder remains open for that slow-run capture.
+
+Timestamp: PENDING (slow-run capture)
+Command: PENDING (non-debugger cold start during a slow startup occurrence)
+EXIT_CODE: PENDING
 
 ## Status
 
