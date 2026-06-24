@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
@@ -30,6 +32,17 @@ namespace TaskMaster
 
         private void Application_Startup()
         {
+            // why: Diagnosis-only (issue #211, Phase 3.3). Start the full add-in-startup-lifetime UI
+            // heartbeat as the FIRST action so it measures the ENTIRE add-in startup, independent of
+            // ApplicationGlobals.LoadSequentialAsync (which only spans ~3 s of a ~108 s freeze). Each
+            // 250 ms DispatcherTimer tick emits one cheap [startup-lifetime-heartbeat] line whose
+            // gapMs reveals exactly when and for how long the STA/UI thread was blocked. The
+            // heartbeat self-stops on a max cap (~180 s) or sustained post-load responsiveness, and
+            // is to be removed or gated after the latency is diagnosed. This does NOT change startup
+            // order, the IdleAsyncQueue enqueue, or load semantics; the stage-label assignments below
+            // are thin field writes only.
+            StartStartupLifetimeHeartbeat();
+
             logger.Debug("Application_Startup() fired");
             //IdleAsyncQueue.AddEntry(false, async () => await Task.Run(() =>
             //{
@@ -37,16 +50,21 @@ namespace TaskMaster
             SetUpDeedle();
             //}));
 
+            _currentStartupStageLabel = StartupStageLabels.GlobalsCtor;
             _globals = new ApplicationGlobals(Application, true);
             _ribbonController.SetGlobals(_globals);
             _externalUtilities.SetGlobals(_globals, _ribbonController);
 
+            _currentStartupStageLabel = StartupStageLabels.AwaitingIdleQueue;
             IdleAsyncQueue.AddEntry(
                 true,
                 async () =>
                 {
+                    _currentStartupStageLabel = StartupStageLabels.Loading;
                     await _globals.LoadAsync(false);
                     logger.Debug("Finished loading globals");
+                    _currentStartupStageLabel = StartupStageLabels.PostLoad;
+                    _startupPostLoadReached = true;
                 }
             );
 
@@ -84,6 +102,76 @@ namespace TaskMaster
         private ApplicationGlobals _globals;
         private AddInUtilities _externalUtilities;
         private RibbonController _ribbonController;
+
+        // Diagnosis-only full add-in-startup-lifetime UI-heartbeat seam (issue #211, Phase 3.3).
+        // The DispatcherTimer/Stopwatch are host-bound and live here in the lifecycle-exempt class;
+        // all formatting/stop decisions delegate to the coverable StartupDiagnosticsProbe and
+        // StartupLifetimeStopDecider. Stopwatch only; no banned timing APIs.
+        private const double StartupHeartbeatNominalMs = 250d;
+        private DispatcherTimer _startupLifetimeHeartbeat;
+        private Stopwatch _startupLifetimeTickStopwatch;
+        private Stopwatch _startupLifetimeOverallStopwatch;
+        private StartupDiagnosticsProbe _startupLifetimeProbe;
+        private StartupLifetimeStopDecider _startupLifetimeStopDecider;
+        private string _currentStartupStageLabel = StartupStageLabels.PreGlobalsCtor;
+        private bool _startupPostLoadReached;
+
+        // Diagnosis-only (issue #211, Phase 3.3): constructs the 250 ms DispatcherTimer on
+        // UiThread.Dispatcher, starts both Stopwatches, and wires the per-tick handler. Each tick
+        // measures the actual interval since the previous tick, emits one
+        // [startup-lifetime-heartbeat] line via the probe, then feeds the overall-elapsed ms, the
+        // current gap, and whether PostLoad was reached into the stop decider; when the decider
+        // returns stop, the heartbeat self-stops. All formatting/decisions are delegated to the
+        // coverable helpers; only the live timer/Stopwatch are host-bound and live here.
+        private void StartStartupLifetimeHeartbeat()
+        {
+            _startupLifetimeProbe = new StartupDiagnosticsProbe(s => logger.Debug(s));
+            _startupLifetimeStopDecider = new StartupLifetimeStopDecider();
+            _startupLifetimeTickStopwatch = Stopwatch.StartNew();
+            _startupLifetimeOverallStopwatch = Stopwatch.StartNew();
+            var heartbeat = new DispatcherTimer(
+                TimeSpan.FromMilliseconds(StartupHeartbeatNominalMs),
+                DispatcherPriority.Background,
+                (sender, e) =>
+                {
+                    var actualMs = _startupLifetimeTickStopwatch.Elapsed.TotalMilliseconds;
+                    _startupLifetimeTickStopwatch.Restart();
+                    _startupLifetimeProbe.EmitLifetimeHeartbeat(
+                        _currentStartupStageLabel,
+                        StartupHeartbeatNominalMs,
+                        actualMs
+                    );
+                    var gapMs = actualMs - StartupHeartbeatNominalMs;
+                    var elapsedMs = _startupLifetimeOverallStopwatch.Elapsed.TotalMilliseconds;
+                    if (
+                        _startupLifetimeStopDecider.ShouldStop(
+                            elapsedMs,
+                            gapMs,
+                            _startupPostLoadReached
+                        )
+                    )
+                    {
+                        StopStartupLifetimeHeartbeat();
+                    }
+                },
+                UiThread.Dispatcher
+            );
+            heartbeat.Start();
+            _startupLifetimeHeartbeat = heartbeat;
+        }
+
+        // Diagnosis-only (issue #211, Phase 3.3): stops the heartbeat timer, detaches it, and
+        // releases the reference so no permanent timer leaks. Idempotent: a second call is a no-op.
+        private void StopStartupLifetimeHeartbeat()
+        {
+            if (_startupLifetimeHeartbeat is null)
+            {
+                return;
+            }
+
+            _startupLifetimeHeartbeat.Stop();
+            _startupLifetimeHeartbeat = null;
+        }
 
         /// <summary>
         /// Overrides the default behavior of the COM add-in to create an XML ribbon
