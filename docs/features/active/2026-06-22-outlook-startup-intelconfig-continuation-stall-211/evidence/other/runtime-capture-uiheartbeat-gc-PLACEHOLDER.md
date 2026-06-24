@@ -1,11 +1,15 @@
-# Runtime Capture — UI-Heartbeat + GC Probe (#211 Phase 3.1) — PENDING MAINTAINER EXECUTION
+# Runtime Capture — UI-Heartbeat + GC Probe (#211 Phase 3.1) — SUPERSEDED
 
-STATUS: PENDING. This capture has not been performed. It awaits a maintainer non-debugger
-cold-start run per `coldstart-uiheartbeat-gc-capture-instructions-2026-06-23T18-40.md`
-(same directory). This file asserts NO timing or GC values; it is a schema placeholder only.
+STATUS: SUPERSEDED. The capture was performed and is recorded at
+`runtime-capture-uiheartbeat-gc-2026-06-23T21-55.md` (same directory).
 
-The instrumentation that produces these markers is diagnosis-only and behavior-preserving
-(issue #211 Phase 3.1, AC11/AC12/AC13). No latency fix is implemented.
+Result: GC disproven as the cause (1 Gen0, 0 Gen2 during Engines); SpamBayes was a
+single-run artifact (Spam 2.5 s this run). The latency moved to IntelConfig (60 s)
+and ToDo (55.7 s); it is a cross-cutting intermittent STA stall correlated with
+external Outlook MAPI/Gmail-sync/address-book provider churn. The heartbeat was
+scoped to the Engines phase only, so it did not cover the slow phases; the next
+increment widens the probe to the entire LoadSequentialAsync. See the recorded
+capture for full analysis.
 
 ## Required Schema (to be filled in on capture)
 
