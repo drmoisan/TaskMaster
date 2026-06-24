@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
@@ -21,7 +22,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace UtilitiesCS.EmailIntelligence
 {
-    public class SpamBayes : TristateEngine, IConditionalEngine<MailItemHelper>
+    public partial class SpamBayes : TristateEngine, IConditionalEngine<MailItemHelper>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -49,24 +50,44 @@ namespace UtilitiesCS.EmailIntelligence
             var sb = new SpamBayes();
             sb.Globals = globals;
 
-            if (!sb.ValidatePathsSet())
+            // Diagnosis-only sub-step attribution (issue #211, Phase 3.5): time each CreateAsync
+            // sub-step with a local Stopwatch and emit one [spam-init] line per sub-step through the
+            // existing log4net logger. Behavior-preserving: the validation results, early returns,
+            // and the returned engine are unchanged; only timing lines are added. Stopwatch only;
+            // no banned timing APIs.
+            var probe = new SpamInitTimingProbe(s => logger.Debug(s));
+
+            var validatePathsWatch = Stopwatch.StartNew();
+            var pathsAreSet = sb.ValidatePathsSet();
+            validatePathsWatch.Stop();
+            probe.EmitStep("ValidatePathsSet", validatePathsWatch.Elapsed.TotalMilliseconds);
+            if (!pathsAreSet)
             {
                 return null;
             }
 
-            if (
-                !await sb.ValidateSpamClassifierAsync(
-                    sb.HasValidSpamClassifierAsync,
-                    sb.SpamBayesMissingHandlerAsync,
-                    treatment,
-                    token
-                )
-            )
+            var validateClassifierWatch = Stopwatch.StartNew();
+            var classifierIsValid = await sb.ValidateSpamClassifierAsync(
+                sb.HasValidSpamClassifierAsync,
+                sb.SpamBayesMissingHandlerAsync,
+                treatment,
+                token
+            );
+            validateClassifierWatch.Stop();
+            probe.EmitStep(
+                "ValidateSpamClassifier",
+                validateClassifierWatch.Elapsed.TotalMilliseconds
+            );
+            if (!classifierIsValid)
             {
                 return null;
             }
 
-            return await Task.Run(sb.InitAsync, token);
+            var initWatch = Stopwatch.StartNew();
+            var engine = await Task.Run(sb.InitAsync, token);
+            initWatch.Stop();
+            probe.EmitStep("InitAsync(modelLoad)", initWatch.Elapsed.TotalMilliseconds);
+            return engine;
         }
 
         public async Task<SpamBayes> InitAsync()
@@ -119,11 +140,35 @@ namespace UtilitiesCS.EmailIntelligence
 
         internal bool ValidatePathsSet()
         {
+            // Diagnosis-only per-folder attribution (issue #211, Phase 3.5): time each COM folder
+            // resolution individually with a local Stopwatch and emit one [spam-init] line per
+            // folder access through the existing log4net logger. Behavior-preserving: the
+            // ThrowIfNull chain, the ArgumentNullException catch/logging, and the bool return
+            // semantics (which folder causes false vs true) are unchanged; only timing lines are
+            // added. Stopwatch only; no banned timing APIs.
+            var probe = new SpamInitTimingProbe(s => logger.Debug(s));
             try
             {
+                var junkCertainWatch = Stopwatch.StartNew();
                 Globals.ThrowIfNull().Ol.ThrowIfNull().JunkCertain.ThrowIfNull();
+                junkCertainWatch.Stop();
+                probe.EmitStep(
+                    "ValidatePathsSet.JunkCertain",
+                    junkCertainWatch.Elapsed.TotalMilliseconds
+                );
+
+                var junkPotentialWatch = Stopwatch.StartNew();
                 Globals.Ol.JunkPotential.ThrowIfNull();
+                junkPotentialWatch.Stop();
+                probe.EmitStep(
+                    "ValidatePathsSet.JunkPotential",
+                    junkPotentialWatch.Elapsed.TotalMilliseconds
+                );
+
+                var inboxWatch = Stopwatch.StartNew();
                 Globals.Ol.Inbox.ThrowIfNull();
+                inboxWatch.Stop();
+                probe.EmitStep("ValidatePathsSet.Inbox", inboxWatch.Elapsed.TotalMilliseconds);
             }
             catch (ArgumentNullException e)
             {
@@ -283,222 +328,6 @@ namespace UtilitiesCS.EmailIntelligence
 
         #region Public Classifier Methods
 
-        public async Task TestAsync(Selection selection)
-        {
-            if (ClassifierGroup is null)
-            {
-                return;
-            }
-            foreach (object item in selection)
-            {
-                if (item is MailItem mailItem)
-                {
-                    var tokens = await TokenizeAsync(mailItem);
-                    var probability = await CalculateProbabilityAsync(tokens);
-                    await TestActionAsync(mailItem, probability);
-                }
-            }
-        }
-
-        public async Task TestAsync(IItemInfo helper)
-        {
-            var probability = await CalculateProbabilityAsync(helper.Tokens);
-            await TestActionAsync(helper, probability);
-        }
-
-        public async Task TestAsync(object item)
-        {
-            if (item is MailItem mailItem)
-            {
-                var tokens = await TokenizeAsync(mailItem);
-                var probability = await CalculateProbabilityAsync(tokens);
-                await TestActionAsync(mailItem, probability);
-            }
-            else
-            {
-                logger.Warn("Skipping SpamBayes for unknown item type");
-            }
-        }
-
-        public async Task TrainAsync(Selection selection, bool isSpam)
-        {
-            if (ClassifierGroup is null)
-            {
-                return;
-            }
-            foreach (object item in selection)
-            {
-                if (item is MailItem mailItem)
-                {
-                    await TrainAsync(mailItem, isSpam);
-                }
-            }
-
-            ClassifierGroup.Serialize();
-        }
-
-        public override async Task TrainAsync(string[] tokens, bool isSpam)
-        {
-            var spamOrHam = isSpam ? "Spam" : "Ham";
-            await ClassifierGroup
-                .Classifiers[spamOrHam]
-                .TrainAsync(await tokens.GroupAndCountAsync(), 1, default);
-        }
-
-        public string[] TokenizeEmail(object email)
-        {
-            return email as MailItem is null
-                ? []
-                : new MailItemHelper(email as MailItem, Globals)
-                    .LoadAll(Globals, Globals.Ol.Inbox, true)
-                    .Tokens;
-        }
-
-        public async Task<string[]> TokenizeEmailAsync(object email)
-        {
-            return email as MailItem is null
-                ? []
-                : (
-                    await MailItemHelper.FromMailItemAsync(
-                        email as MailItem,
-                        Globals,
-                        default,
-                        true
-                    )
-                ).Tokens;
-        }
-
-        public async Task TrainCallbackAsync(object item, bool isSpam)
-        {
-            MailItem mailItem = item as MailItem;
-            await Task.Run(async () =>
-            {
-                if (isSpam)
-                {
-                    mailItem.SetUdf("Spam", 1.0, OlUserPropertyType.olPercent);
-                    if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.JunkCertain.FolderPath)
-                    {
-                        await mailItem.TryMoveAsync(Globals.Ol.JunkCertain);
-                    }
-                }
-                else
-                {
-                    mailItem.SetUdf("Spam", 0.0, OlUserPropertyType.olPercent);
-                    if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.Inbox.FolderPath)
-                    {
-                        await mailItem.TryMoveAsync(Globals.Ol.Inbox);
-                    }
-                }
-            });
-        }
-
-        internal void MoveSpamOrHam(object item, double probability)
-        {
-            var isSpam = GetTristate(probability);
-            if (item is MailItemHelper helper && helper.Item is not null)
-            {
-                helper.Item.SetUdf("Spam", probability, OlUserPropertyType.olPercent);
-                MoveSpamOrHam(helper, isSpam);
-            }
-            else if (item is MailItem mailItem)
-            {
-                mailItem.SetUdf("Spam", probability, OlUserPropertyType.olPercent);
-                MoveSpamOrHam(mailItem, isSpam);
-            }
-        }
-
-        internal void MoveSpamOrHam(MailItemHelper helper, bool? isSpam)
-        {
-            lock (helper.Item)
-            {
-                Folder destination = GetDestinationFolder(helper.Item, isSpam);
-                if (destination is not null)
-                {
-                    var moved = helper.Item.Move(destination);
-                    if (moved is not null)
-                    {
-                        helper.Item = moved;
-                    }
-                }
-            }
-        }
-
-        internal void MoveSpamOrHam(MailItem mailItem, bool? isSpam)
-        {
-            Folder destination = GetDestinationFolder(mailItem, isSpam);
-            if (destination is not null)
-                mailItem.Move(destination);
-        }
-
-        internal Folder GetDestinationFolder(MailItem mailItem, bool? isSpam)
-        {
-            if (mailItem is null)
-            {
-                return null;
-            }
-            if (isSpam == true)
-            {
-                if (
-                    ((mailItem.Parent as Folder)?.FolderPath ?? "")
-                    != Globals.Ol.JunkCertain.FolderPath
-                ) { }
-                return Globals.Ol.JunkCertain;
-            }
-            else if (isSpam == false)
-            {
-                //if (((mailItem.Parent as Folder)?.FolderPath ?? "") != Globals.Ol.Inbox.FolderPath)
-                //    return Globals.Ol.Inbox;
-                return null;
-            }
-            else
-            {
-                if (
-                    ((mailItem.Parent as Folder)?.FolderPath ?? "")
-                    != Globals.Ol.JunkPotential.FolderPath
-                )
-                    return Globals.Ol.JunkPotential;
-            }
-            return null;
-        }
-
-        public async Task TestActionAsync(object item, double probability)
-        {
-            await Task.Run(() => MoveSpamOrHam(item, probability));
-        }
-
-        //public async Task TestActionAsync(object item, double probability)
-        //{
-        //    await Task.Run(async () =>
-        //    {
-        //        var mailItem = item as MailItem;
-        //        if (mailItem is not null)
-        //        {
-        //            mailItem.SetUdf("Spam", probability, OlUserPropertyType.olPercent);
-        //            var isSpam = GetTristate(probability);
-        //            if (isSpam == true)
-        //            {
-        //                if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.JunkCertain.FolderPath)
-        //                    await mailItem.TryMoveAsync(Globals.Ol.JunkCertain, 3);
-        //                //mailItem.Move(Globals.Ol.JunkCertain);
-        //            }
-        //            else if (isSpam == false)
-        //            {
-        //                if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.Inbox.FolderPath)
-        //                    await mailItem.TryMoveAsync(Globals.Ol.Inbox, 3);
-        //                //mailItem.Move(Globals.Ol.Inbox);
-        //            }
-        //            else
-        //            {
-        //                if (((Folder)mailItem.Parent).FolderPath != Globals.Ol.JunkPossible.FolderPath)
-        //                    await mailItem.TryMoveAsync(Globals.Ol.JunkPossible, 3);
-        //                //mailItem.Move(Globals.Ol.JunkPossible);
-        //            }
-        //        }
-
-        //    });
-
-        //}
-
         #endregion Public Classifier Methods
 
         //#region Activation and Configuration
@@ -599,94 +428,6 @@ namespace UtilitiesCS.EmailIntelligence
         void IConditionalEngine<MailItemHelper>.Serialize()
         {
             this.ClassifierGroup.Serialize();
-        }
-
-        public Func<MailItemHelper, Task> AsyncAction =>
-            (item) => Engine is not null ? ((SpamBayes)Engine).TestAsync(item) : null;
-
-        public Func<object, Task<bool>> AsyncCondition =>
-            (item) => Task.Run(() => ConditionLog(item));
-
-        private bool Condition(object item)
-        {
-            if (item is not MailItem mailItem)
-            {
-                return false;
-            }
-            if (mailItem.MessageClass != "IPM.Note")
-            {
-                return false;
-            }
-            if (mailItem.UserProperties.Find("Spam") is not null)
-            {
-                var autoCodeProp = mailItem.UserProperties.Find("AutoProcessed");
-                if (autoCodeProp is not null)
-                {
-                    autoCodeProp.Value = true;
-                    mailItem.Save();
-                }
-                return false;
-            }
-
-            return true;
-        }
-
-        private bool ConditionLog(object item)
-        {
-            var olItem = new OutlookItem(item);
-            if (olItem.TryGet().OlItemType(out var result) && result != OlItemType.olMailItem)
-            {
-                logger.Debug($"Skipping: Not MailItem -> {GetOlItemString(olItem)}");
-                return false;
-            }
-
-            if (olItem.Try().MessageClass != "IPM.Note")
-            {
-                logger.Debug($"Skipping: Message class -> {GetOlItemString(olItem)}");
-                return false;
-            }
-
-            var spamProp = olItem.UserProperties.Find("Spam");
-            if (spamProp is not null)
-            {
-                var autoCodeProp = olItem.UserProperties.Find("AutoProcessed");
-                if (autoCodeProp is not null)
-                {
-                    autoCodeProp.Value = true;
-                    olItem.Save();
-                }
-                else
-                {
-                    autoCodeProp = olItem.UserProperties.Add(
-                        "AutoProcessed",
-                        OlUserPropertyType.olYesNo,
-                        true
-                    );
-                    autoCodeProp.Value = true;
-                    olItem.Save();
-                }
-                logger.Debug(
-                    $"Skipping: Has Spam property with value of {spamProp.Value} -> {GetOlItemString(olItem)}"
-                );
-                return false;
-            }
-
-            return true;
-        }
-
-        private string GetOlItemString(OutlookItem olItem)
-        {
-            var type = olItem.TryGet().OlItemType(out var typeVal)
-                ? $"{typeVal}"
-                : $"{olItem.InnerObject.GetType()}";
-            var created = olItem.TryGet().CreationTime(out var result)
-                ? $" created on {result:g}"
-                : "";
-            var subject = olItem.Try().Subject;
-            subject = subject.IsNullOrEmpty() ? "" : $" with subject {subject}";
-            var sender = olItem.Try().SenderName;
-            sender = sender.IsNullOrEmpty() ? "" : $" from {sender}";
-            return $"{type}{created}{sender}{subject}";
         }
 
         public object Engine => this;

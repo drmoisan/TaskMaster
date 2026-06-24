@@ -80,6 +80,7 @@
     <Compile Include="Dialogs\MyBox_Tests.cs" />
     <Compile Include="Dialogs\NotImplementedDialog_Tests.cs" />
     <Compile Include="EmailIntelligence\AutoFile_Tests.cs" />
+    <Compile Include="EmailIntelligence\SpamInitTimingProbeTests.cs" />
     <Compile Include="EmailIntelligence\ActionableClassifierGroup_Tests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroup_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianSerializationHelper_Tests.cs" />
