@@ -693,6 +693,7 @@
     <Compile Include="OutlookObjects\Folder\FolderMinimalWrapper.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientStatic.cs" />
     <Compile Include="OutlookObjects\Store\IStoreWrapperViewer.cs" />
+    <Compile Include="OutlookObjects\Store\StoreFilterAttribution.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapper.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapper.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperController.cs" />
