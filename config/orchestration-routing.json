@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": 1,
+  "routes": {
+    "small": {
+      "description": "Minor-audit path for work inside the applicable language budget.",
+      "required_agents": [
+        "atomic-planner",
+        "atomic-executor",
+        "feature-reviewer",
+        "commit-steward"
+      ],
+      "required_skills": [
+        "orchestrate",
+        "orchestrator-workflow",
+        "feature-promotion-lifecycle",
+        "repo-automation-adapter",
+        "atomic-plan-contract",
+        "acceptance-criteria-tracking",
+        "pr-context-artifacts",
+        "pr-base-branch-merge-base"
+      ],
+      "required_mcp_tools": [
+        "new_potential_entry",
+        "potential_to_issue",
+        "new_active_feature_folder",
+        "collect_commit_context",
+        "collect_pr_context",
+        "validate_orchestration_artifacts"
+      ]
+    },
+    "large": {
+      "description": "Full feature or bug path for work outside small-path budget.",
+      "required_agents": [
+        "task-researcher",
+        "prd-feature",
+        "atomic-planner",
+        "atomic-executor",
+        "feature-reviewer",
+        "commit-steward"
+      ],
+      "required_skills": [
+        "orchestrate",
+        "orchestrator-workflow",
+        "feature-promotion-lifecycle",
+        "repo-automation-adapter",
+        "atomic-plan-contract",
+        "acceptance-criteria-tracking",
+        "pr-context-artifacts",
+        "pr-base-branch-merge-base"
+      ],
+      "required_mcp_tools": [
+        "new_potential_entry",
+        "potential_to_issue",
+        "new_active_feature_folder",
+        "collect_commit_context",
+        "collect_pr_context",
+        "validate_orchestration_artifacts"
+      ]
+    },
+    "remediation": {
+      "description": "Review-triggered remediation loop.",
+      "required_agents": [
+        "atomic-planner",
+        "atomic-executor",
+        "feature-reviewer",
+        "commit-steward"
+      ],
+      "required_skills": [
+        "orchestrate",
+        "orchestrator-workflow",
+        "repo-automation-adapter",
+        "atomic-plan-contract",
+        "acceptance-criteria-tracking",
+        "pr-context-artifacts"
+      ],
+      "required_mcp_tools": [
+        "collect_commit_context",
+        "collect_pr_context",
+        "validate_orchestration_artifacts"
+      ]
+    }
+  }
+}
