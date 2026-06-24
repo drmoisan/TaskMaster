@@ -296,6 +296,21 @@ namespace TaskMaster.Test.AppGlobals
                 _visitedStages?.Add("events");
                 return Task.CompletedTask;
             }
+
+            // No-op the issue #211 Phase 3.1 host-bound diagnostics seams so the heartbeat
+            // DispatcherTimer (which needs a live UiThread.Dispatcher) and the live GC.* reads never
+            // execute under the unit-test seam. Mirrors the phase-wrapper override pattern above.
+            protected internal override void StartEnginesUiHeartbeat(
+                TaskMaster.StartupDiagnosticsProbe probe
+            ) { }
+
+            protected internal override void StopEnginesUiHeartbeat() { }
+
+            protected internal override void BeginEnginesGcCapture() { }
+
+            protected internal override void EmitEnginesGcDelta(
+                TaskMaster.StartupDiagnosticsProbe probe
+            ) { }
         }
     }
 }

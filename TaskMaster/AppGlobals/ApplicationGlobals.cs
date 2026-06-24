@@ -147,11 +147,107 @@ namespace TaskMaster
             await LoadAutoFilePhaseAsync();
             _timingRecorder.RecordPhase("AutoFile", StopAndRestart(stopwatch));
             await YieldWithContinuationProbeAsync("AutoFile");
-            await InitializeEnginesPhaseAsync();
-            _timingRecorder.RecordPhase("Engines", StopAndRestart(stopwatch));
+
+            // Diagnosis-only instrumentation (issue #211, Phase 3.1): measure whether the UI/STA
+            // thread is starved or suspended during the Engines-phase SpamBayes deserialization,
+            // and attribute any stall to GC. Behavior-preserving: the only inserted statements are
+            // the heartbeat start/stop and the before/after GC reads; the Engines phase await,
+            // RecordPhase call, and the following yield are unchanged. The host-bound scheduling
+            // (DispatcherTimer on UiThread.Dispatcher) and the live GC.* reads stay behind the
+            // protected internal virtual seams below so focused MSTests can no-op them without a
+            // live UI host; only the gap/GC-delta formatting goes through the coverable
+            // StartupDiagnosticsProbe helper.
+            var diagnosticsProbe = new StartupDiagnosticsProbe(s => logger.Debug(s));
+            StartEnginesUiHeartbeat(diagnosticsProbe);
+            BeginEnginesGcCapture();
+            try
+            {
+                await InitializeEnginesPhaseAsync();
+                _timingRecorder.RecordPhase("Engines", StopAndRestart(stopwatch));
+            }
+            finally
+            {
+                StopEnginesUiHeartbeat();
+            }
+            EmitEnginesGcDelta(diagnosticsProbe);
+
             await YieldWithContinuationProbeAsync("Engines");
             await LoadEventsPhaseAsync();
             _timingRecorder.RecordPhase("Events", StopAndRestart(stopwatch));
+        }
+
+        // Host-bound heartbeat scheduling held in a per-load field so the start/stop seams share
+        // the before-phase GC snapshot and the running timer without exposing them on the public
+        // surface. Null in the flag-off/test seams (the seams below are overridden to no-op).
+        private System.Windows.Threading.DispatcherTimer? _enginesHeartbeat;
+        private int _enginesGcGen0Before;
+        private int _enginesGcGen1Before;
+        private int _enginesGcGen2Before;
+        private long _enginesGcBytesBefore;
+
+        // Diagnosis-only (issue #211, Phase 3.1) seam: starts a recurring UI-thread responsiveness
+        // heartbeat on UiThread.Dispatcher at a 250 ms nominal interval. Each tick reads the actual
+        // elapsed interval since the previous tick from a restart-per-tick Stopwatch and emits one
+        // [ui-heartbeat] line via the coverable probe. The DispatcherTimer scheduling and the
+        // per-tick Stopwatch are host-bound and live here in the thin call site; only the gap
+        // formatting is coverable. The started timer is held in a private field so the seam
+        // signature does not leak the WindowsBase DispatcherTimer type onto the (overridable)
+        // surface. protected internal virtual so focused MSTests override it to a no-op without
+        // constructing a live Dispatcher.
+        protected internal virtual void StartEnginesUiHeartbeat(StartupDiagnosticsProbe probe)
+        {
+            const double nominalMs = 250d;
+            var tickStopwatch = Stopwatch.StartNew();
+            var heartbeat = new System.Windows.Threading.DispatcherTimer(
+                TimeSpan.FromMilliseconds(nominalMs),
+                System.Windows.Threading.DispatcherPriority.Background,
+                (sender, e) =>
+                {
+                    var actualMs = tickStopwatch.Elapsed.TotalMilliseconds;
+                    tickStopwatch.Restart();
+                    probe.EmitHeartbeat(nominalMs, actualMs);
+                },
+                UiThread.Dispatcher
+            );
+            heartbeat.Start();
+            _enginesHeartbeat = heartbeat;
+        }
+
+        // Diagnosis-only (issue #211, Phase 3.1) seam: stops/disposes the heartbeat after the
+        // Engines phase. protected internal virtual so focused MSTests override it to a no-op.
+        protected internal virtual void StopEnginesUiHeartbeat()
+        {
+            _enginesHeartbeat?.Stop();
+            _enginesHeartbeat = null;
+        }
+
+        // Diagnosis-only (issue #211, Phase 3.1) seam: captures the live GC collection counts and
+        // allocated bytes immediately before the Engines phase. The GC.* reads are host-state reads
+        // and stay here in the thin call site. protected internal virtual so focused MSTests
+        // override it to a no-op.
+        protected internal virtual void BeginEnginesGcCapture()
+        {
+            _enginesGcGen0Before = GC.CollectionCount(0);
+            _enginesGcGen1Before = GC.CollectionCount(1);
+            _enginesGcGen2Before = GC.CollectionCount(2);
+            _enginesGcBytesBefore = GC.GetTotalMemory(false);
+        }
+
+        // Diagnosis-only (issue #211, Phase 3.1) seam: reads the live GC counts/bytes and GCSettings
+        // again after the Engines phase, computes the deltas, and emits one [gc-delta] line via the
+        // coverable probe. The GC.*/GCSettings.* reads stay here in the thin call site; only the
+        // delta formatting is coverable. protected internal virtual so focused MSTests override it
+        // to a no-op.
+        protected internal virtual void EmitEnginesGcDelta(StartupDiagnosticsProbe probe)
+        {
+            probe.EmitGcDelta(
+                GC.CollectionCount(0) - _enginesGcGen0Before,
+                GC.CollectionCount(1) - _enginesGcGen1Before,
+                GC.CollectionCount(2) - _enginesGcGen2Before,
+                GC.GetTotalMemory(false) - _enginesGcBytesBefore,
+                System.Runtime.GCSettings.IsServerGC,
+                System.Runtime.GCSettings.LatencyMode.ToString()
+            );
         }
 
         // Captures the elapsed time of the just-completed phase and resets the shared stopwatch

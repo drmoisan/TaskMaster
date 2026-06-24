@@ -72,12 +72,18 @@ namespace TaskMaster
 
             var engineNull = engine is null;
             var costHint = engineNull ? "Skip" : "Deserialization";
+            // Worker-thread context (issue #211, Phase 3.1): the engine-init thread's priority and
+            // whether it is a thread-pool thread, added so a maintainer can confirm the SpamBayes
+            // deserialize ran on a background thread-pool thread (off the UI/STA thread). All prior
+            // fields and the timing/return/exception behavior are unchanged.
             _emit(
                 $"[engine-init] engineName={engineName} "
                     + $"engineMs={stopwatch.Elapsed.TotalMilliseconds:F1} "
                     + $"engineNull={engineNull} "
                     + $"threadId={Thread.CurrentThread.ManagedThreadId} "
-                    + $"costHint={costHint}"
+                    + $"costHint={costHint} "
+                    + $"threadPriority={Thread.CurrentThread.Priority} "
+                    + $"isThreadPoolThread={Thread.CurrentThread.IsThreadPoolThread}"
             );
 
             return engine;

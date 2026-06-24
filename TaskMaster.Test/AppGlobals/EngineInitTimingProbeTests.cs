@@ -44,10 +44,38 @@ namespace TaskMaster.Test.AppGlobals
                 line.Should().StartWith("[engine-init] ");
                 line.Should().Contain($"engineName={names[i]} ");
                 line.Should().Contain("engineNull=False ");
-                line.Should().Contain("costHint=Deserialization");
+                line.Should().Contain("costHint=Deserialization ");
                 line.Should().MatchRegex(@"engineMs=\d+\.\d ");
                 line.Should().MatchRegex(@"threadId=\d+ ");
+                // Issue #211 Phase 3.1 worker-thread context fields.
+                line.Should().Contain("threadPriority=");
+                line.Should().Contain("isThreadPoolThread=");
             }
+        }
+
+        [TestMethod]
+        public async Task TimeEngineAsync_Always_EmitsWorkerThreadContextFieldsAlongsidePriorFields()
+        {
+            // Arrange: capture the single [engine-init] line for one engine.
+            var emitted = new List<string>();
+            var probe = new TaskMaster.EngineInitTimingProbe(s => emitted.Add(s));
+
+            // Act
+            await probe.TimeEngineAsync("Spam", () => Task.FromResult(StubEngine()));
+
+            // Assert: the worker-thread context fields (issue #211 Phase 3.1) are present in
+            // addition to the unchanged prior fields. threadPriority is a ThreadPriority enum name;
+            // isThreadPoolThread is a bool rendered as True/False.
+            emitted.Should().ContainSingle();
+            var line = emitted[0];
+            line.Should().StartWith("[engine-init] ");
+            line.Should().Contain("engineName=Spam ");
+            line.Should().MatchRegex(@"engineMs=\d+\.\d ");
+            line.Should().Contain("engineNull=False ");
+            line.Should().MatchRegex(@"threadId=\d+ ");
+            line.Should().Contain("costHint=Deserialization ");
+            line.Should().MatchRegex(@"threadPriority=\w+ ");
+            line.Should().MatchRegex(@"isThreadPoolThread=(True|False)");
         }
 
         [TestMethod]

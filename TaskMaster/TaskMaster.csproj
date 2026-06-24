@@ -400,6 +400,7 @@
     <Compile Include="AppGlobals\NonBlockingDelay.cs" />
     <Compile Include="AppGlobals\AppItemEngines.cs" />
     <Compile Include="AppGlobals\EngineInitTimingProbe.cs" />
+    <Compile Include="AppGlobals\StartupDiagnosticsProbe.cs" />
     <Compile Include="AppGlobals\ApplicationGlobals.cs" />
     <Compile Include="AppGlobals\IStartupTimingRecorder.cs" />
     <Compile Include="AppGlobals\StartupTimingRecorder.cs" />
