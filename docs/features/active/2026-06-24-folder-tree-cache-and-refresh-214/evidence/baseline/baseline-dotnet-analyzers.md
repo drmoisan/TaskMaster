@@ -392,7 +392,7 @@ Build FAILED.
 
 "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\TaskMaster.sln" (Build target) (1) ->
 "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\SVGControl\SVGControl.csproj" (default target) (17) ->
-(ResolveAssemblyReferences target) -> 
+(ResolveAssemblyReferences target) ->
   C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\Microsoft.Common.CurrentVersion.targets(2453,5): warning MSB3245: Could not resolve this reference. Could not locate the assembly "ExCSS, Version=4.3.1.0, Culture=neutral, PublicKeyToken=bdbe16be9b936b9a, processorArchitecture=MSIL". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. [C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\SVGControl\SVGControl.csproj]
   C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\Microsoft.Common.CurrentVersion.targets(2453,5): warning MSB3245: Could not resolve this reference. Could not locate the assembly "Fizzler, Version=1.3.1.0, Culture=neutral, PublicKeyToken=4ebff4844e382110, processorArchitecture=MSIL". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. [C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\SVGControl\SVGControl.csproj]
   C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\Microsoft.Common.CurrentVersion.targets(2453,5): warning MSB3245: Could not resolve this reference. Could not locate the assembly "log4net, Version=3.3.1.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. [C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\SVGControl\SVGControl.csproj]
@@ -402,7 +402,7 @@ Build FAILED.
 "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\TaskMaster.sln" (Build target) (1) ->
 "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\Tags\Tags.csproj" (default target) (2) ->
 "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\UtilitiesCS\UtilitiesCS.csproj" (default target) (3:2) ->
-(EnsureNuGetPackageBuildImports target) -> 
+(EnsureNuGetPackageBuildImports target) ->
   C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\UtilitiesCS\UtilitiesCS.csproj(1189,5): error : This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is ..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets.
 
 
@@ -443,7 +443,7 @@ Build FAILED.
 
 "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\TaskMaster.sln" (Build target) (1) ->
 "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\SVGControl\SVGControl.csproj" (default target) (17) ->
-(CoreCompile target) -> 
+(CoreCompile target) ->
   C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\SVGControl\PictureBoxSVG.cs(14,7): error CS0246: The type or namespace name 'Fizzler' could not be found (are you missing a using directive or an assembly reference?) [C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\SVGControl\SVGControl.csproj]
   C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\SVGControl\PictureBoxSVG.cs(15,7): error CS0246: The type or namespace name 'Svg' could not be found (are you missing a using directive or an assembly reference?) [C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\SVGControl\SVGControl.csproj]
   C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\SVGControl\SvgRenderer.cs(14,7): error CS0246: The type or namespace name 'Svg' could not be found (are you missing a using directive or an assembly reference?) [C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\SVGControl\SVGControl.csproj]
@@ -477,7 +477,7 @@ Build FAILED.
 
 "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\TaskMaster.sln" (Build target) (1) ->
 "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\VBFunctions.Test\VBFunctions.Test.csproj" (default target) (19) ->
-(EnsureNuGetPackageBuildImports target) -> 
+(EnsureNuGetPackageBuildImports target) ->
   C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\VBFunctions.Test\VBFunctions.Test.csproj(263,5): error : This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is ..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets.
 
 
@@ -489,4 +489,3 @@ Build FAILED.
     35 Error(s)
 
 Time Elapsed 00:00:01.04
-

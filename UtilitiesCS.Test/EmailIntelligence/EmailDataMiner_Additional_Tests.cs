@@ -259,44 +259,49 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestMethod]
         public async Task ScrapeEmails_WhenQuerySeamsReturnMailItems_ReturnsEnumeration()
         {
-            // Arrange
             var folder = new FolderWrapper(false, 1, 10, "Inbox", "root/inbox");
-            folder.OlFolder = CreateOutlookFolder(0).Object;
+            var olFolder = CreateOutlookFolder(0);
+            olFolder.SetupGet(folderMock => folderMock.Name).Returns("Inbox");
+            folder.OlFolder = olFolder.Object;
+            folder.RelativePath = "root/inbox";
             var mailOne = new Mock<MailItem>().Object;
             var mailTwo = new Mock<MailItem>().Object;
+            var resolver = new FakeFolderHandleResolver();
+            resolver.HandlesByRelativePath["root/inbox"] = folder.OlFolder;
             var miner = new FolderTreeBackedEmailDataMiner(new StubGlobals())
             {
-                FolderTree = CreateFolderTree(folder),
-                OutlookFolders = [folder.OlFolder],
+                Snapshot = CreateFolderSnapshot(folder),
+                FolderHandleResolver = resolver,
                 MailItems = [mailOne, mailTwo],
             };
 
-            // Act
             var result = await InvokeEnumerableTask(
                 miner,
                 nameof(EmailDataMiner.ScrapeEmails),
                 new CancellationTokenSource()
             );
 
-            // Assert
             result.Should().ContainInOrder(mailOne, mailTwo);
         }
 
         [TestMethod]
         public async Task ScrapeEmails_WithProgress_WhenQuerySeamsReturnMailItems_ReturnsEnumeration()
         {
-            // Arrange
             var folder = new FolderWrapper(false, 1, 10, "Inbox", "root/inbox");
-            folder.OlFolder = CreateOutlookFolder(0).Object;
+            var olFolder = CreateOutlookFolder(0);
+            olFolder.SetupGet(folderMock => folderMock.Name).Returns("Inbox");
+            folder.OlFolder = olFolder.Object;
+            folder.RelativePath = "root/inbox";
             var mail = new Mock<MailItem>().Object;
+            var resolver = new FakeFolderHandleResolver();
+            resolver.HandlesByRelativePath["root/inbox"] = folder.OlFolder;
             var miner = new FolderTreeBackedEmailDataMiner(new StubGlobals())
             {
-                FolderTree = CreateFolderTree(folder),
-                OutlookFolders = [folder.OlFolder],
+                Snapshot = CreateFolderSnapshot(folder),
+                FolderHandleResolver = resolver,
                 MailItems = [mail],
             };
 
-            // Act
             var result = await InvokeEnumerableTask(
                 miner,
                 nameof(EmailDataMiner.ScrapeEmails),
@@ -304,7 +309,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 new NoOpProgressTracker()
             );
 
-            // Assert
             result.Should().ContainSingle().Which.Should().BeSameAs(mail);
         }
 

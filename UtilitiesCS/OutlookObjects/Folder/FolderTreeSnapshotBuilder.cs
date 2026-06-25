@@ -35,7 +35,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
         )
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var nodes = _reader.ReadFolders(request, cancellationToken);
+            var nodes = await _reader
+                .ReadFoldersAsync(request, _deadlineClock, _dispatcherYield, cancellationToken)
+                .ConfigureAwait(false);
             var lookup = nodes.ToDictionary(node => node.Key);
             var roots = nodes
                 .Where(node => node.ParentKey == null)
@@ -61,7 +63,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 }
             }
 
-            return new FolderTreeSnapshot(roots, ordered);
+            return new FolderTreeSnapshot(roots, ordered, request);
         }
 
         private async Task YieldIfNeededAsync(CancellationToken cancellationToken)

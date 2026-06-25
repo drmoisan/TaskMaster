@@ -287,6 +287,7 @@
     <Compile Include="OutlookObjects\Folder\OutlookFolderTreeServiceConcurrencyTests.cs" />
     <Compile Include="OutlookObjects\Folder\OutlookFolderTreeServiceDisposalTests.cs" />
     <Compile Include="OutlookObjects\Folder\OutlookFolderTreeServiceInvalidationTests.cs" />
+    <Compile Include="OutlookObjects\Folder\OutlookFolderTreeServiceScopeTests.cs" />
     <Compile Include="OutlookObjects\Folder\OutlookFolderTreeServiceStateTests.cs" />
     <Compile Include="OutlookObjects\Folder\WpfDispatcherYieldTests.cs" />
     <Compile Include="OutlookObjects\ItemComparer_Tests.cs" />

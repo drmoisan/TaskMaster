@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using UtilitiesCS.OutlookObjects.Store;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
@@ -41,12 +42,20 @@ namespace UtilitiesCS.OutlookObjects.Folder
         }
 
         [ExcludeFromCodeCoverage]
-        public IReadOnlyList<FolderTreeSnapshotNode> ReadFolders(
+        public async Task<IReadOnlyList<FolderTreeSnapshotNode>> ReadFoldersAsync(
             FolderTreeRequest request,
+            IDeadlineClock deadlineClock,
+            IDispatcherYield dispatcherYield,
             CancellationToken cancellationToken
         )
         {
-            var records = ReadRecords(request, cancellationToken);
+            var records = await ReadRecordsAsync(
+                    request,
+                    deadlineClock,
+                    dispatcherYield,
+                    cancellationToken
+                )
+                .ConfigureAwait(false);
             return records.Select(record => ToNode(record, records)).ToArray();
         }
 
@@ -56,10 +65,25 @@ namespace UtilitiesCS.OutlookObjects.Folder
             CancellationToken cancellationToken
         )
         {
+            return ReadRecordsAsync(request, null, null, cancellationToken)
+                .GetAwaiter()
+                .GetResult();
+        }
+
+        [ExcludeFromCodeCoverage]
+        public async Task<IReadOnlyList<OutlookFolderHierarchyRecord>> ReadRecordsAsync(
+            FolderTreeRequest request,
+            IDeadlineClock deadlineClock,
+            IDispatcherYield dispatcherYield,
+            CancellationToken cancellationToken
+        )
+        {
             var records = new List<OutlookFolderHierarchyRecord>();
             foreach (var store in _storeProvider())
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                await YieldIfNeededAsync(deadlineClock, dispatcherYield, cancellationToken)
+                    .ConfigureAwait(false);
                 if (!store.ShouldInclude(_storesWrapper))
                 {
                     continue;
@@ -77,17 +101,27 @@ namespace UtilitiesCS.OutlookObjects.Folder
                     continue;
                 }
 
-                ReadStore(root, storeId, records, cancellationToken);
+                await ReadStoreAsync(
+                        root,
+                        storeId,
+                        records,
+                        deadlineClock,
+                        dispatcherYield,
+                        cancellationToken
+                    )
+                    .ConfigureAwait(false);
             }
 
             return records;
         }
 
         [ExcludeFromCodeCoverage]
-        private static void ReadStore(
+        private static async Task ReadStoreAsync(
             IOutlookFolderAdapter root,
             string storeId,
             ICollection<OutlookFolderHierarchyRecord> records,
+            IDeadlineClock deadlineClock,
+            IDispatcherYield dispatcherYield,
             CancellationToken cancellationToken
         )
         {
@@ -97,6 +131,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
             while (stack.Count > 0)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                await YieldIfNeededAsync(deadlineClock, dispatcherYield, cancellationToken)
+                    .ConfigureAwait(false);
                 var current = stack.Pop();
                 var folder = current.Item1;
                 var parentEntryId = current.Item2;
@@ -120,9 +156,25 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
                 foreach (var child in children.Reverse())
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     stack.Push(Tuple.Create(child, folder.EntryID, rootPath));
                 }
             }
+        }
+
+        private static async Task YieldIfNeededAsync(
+            IDeadlineClock deadlineClock,
+            IDispatcherYield dispatcherYield,
+            CancellationToken cancellationToken
+        )
+        {
+            if (deadlineClock == null || dispatcherYield == null || !deadlineClock.ShouldYield())
+            {
+                return;
+            }
+
+            await dispatcherYield.YieldAsync(cancellationToken).ConfigureAwait(false);
+            deadlineClock.Reset();
         }
 
         [ExcludeFromCodeCoverage]

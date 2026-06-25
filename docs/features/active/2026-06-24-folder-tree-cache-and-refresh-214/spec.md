@@ -282,25 +282,25 @@ Concurrency behavior:
 
 ## Definition of Done
 
-- [ ] Acceptance criteria in this spec and `docs/features/active/2026-06-24-folder-tree-cache-and-refresh-214/user-story.md` are mapped to implementation tasks and verification evidence.
-- [ ] Shared Outlook folder hierarchy service is exposed through the appropriate application lifetime boundary and consumed by all in-scope callers.
-- [ ] Recursive full-hierarchy build paths are retired or redirected for issue #214 callers.
-- [ ] STA, dispatcher-yield, cancellation, deadline, and stale-state behavior are validated by deterministic tests.
-- [ ] Folder add, remove, move, rename, store add, and store remove behavior is validated with fake notification sources.
-- [ ] Notification sink and node `PropertyChanged` disposal behavior is validated with handler-count or equivalent lifecycle tests.
-- [ ] Caller-specific selection state is validated as isolated from shared cache state.
-- [ ] Issue #214 excludes startup-specific junk-folder paths, and `TaskMaster/AppGlobals/AppOlObjects.JunkFolders.cs` remains unchanged unless separate coordination is recorded.
-- [ ] Docs updated under `docs/features/active/2026-06-24-folder-tree-cache-and-refresh-214/`.
-- [ ] Full C# toolchain pass completed in order: CSharpier -> .NET analyzers -> nullable/TreatWarningsAsErrors -> MSTest with coverage.
+- [x] Acceptance criteria in this spec and `docs/features/active/2026-06-24-folder-tree-cache-and-refresh-214/user-story.md` are mapped to implementation tasks and verification evidence.
+- [x] Shared Outlook folder hierarchy service is exposed through the appropriate application lifetime boundary and consumed by all in-scope callers.
+- [x] Recursive full-hierarchy build paths are retired or redirected for issue #214 callers.
+- [x] STA, dispatcher-yield, cancellation, deadline, and stale-state behavior are validated by deterministic tests.
+- [x] Folder add, remove, move, rename, store add, and store remove behavior is validated with fake notification sources.
+- [x] Notification sink and node `PropertyChanged` disposal behavior is validated with handler-count or equivalent lifecycle tests.
+- [x] Caller-specific selection state is validated as isolated from shared cache state.
+- [x] Issue #214 excludes startup-specific junk-folder paths, and `TaskMaster/AppGlobals/AppOlObjects.JunkFolders.cs` remains unchanged unless separate coordination is recorded.
+- [x] Docs updated under `docs/features/active/2026-06-24-folder-tree-cache-and-refresh-214/`.
+- [x] Full C# toolchain pass completed in order: CSharpier -> .NET analyzers -> nullable/TreatWarningsAsErrors -> MSTest with coverage.
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Cache-hit behavior after the first hierarchy build.
-- [ ] Deterministic yield cadence using an injected clock.
-- [ ] Cancellation or deadline abandonment during traversal.
-- [ ] Folder add, remove, move, and rename event handling against a fake folder hierarchy.
-- [ ] Multi-store cache keying and invalidation.
-- [ ] In-flight rebuild coalescing and stale-cache behavior.
-- [ ] Dispose unsubscribes Outlook notification sinks and node property handlers.
-- [ ] Caller migration assertions using the hierarchy seam rather than live COM.
-- [ ] Final C# toolchain and coverage execution.
+- [x] Cache-hit behavior after the first hierarchy build.
+- [x] Deterministic yield cadence using an injected clock.
+- [x] Cancellation or deadline abandonment during traversal.
+- [x] Folder add, remove, move, and rename event handling against a fake folder hierarchy.
+- [x] Multi-store cache keying and invalidation.
+- [x] In-flight rebuild coalescing and stale-cache behavior.
+- [x] Dispose unsubscribes Outlook notification sinks and node property handlers.
+- [x] Caller migration assertions using the hierarchy seam rather than live COM.
+- [x] Final C# toolchain and coverage execution.

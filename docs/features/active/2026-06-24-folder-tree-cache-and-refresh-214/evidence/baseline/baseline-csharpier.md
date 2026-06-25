@@ -9,4 +9,3 @@ The command could not be loaded, possibly because:
       The application 'tool' does not exist or is not a managed .dll or .exe.
   * You intended to execute a .NET SDK command:
       The repo-local .NET SDK is missing. Run ./scripts/vscode/Install-RepoDotNetSdk.ps1 from the repository root, then retry dotnet format TaskMaster.sln.
-

@@ -14,24 +14,24 @@ Output Summary: PASS. Repository coverage 82.91% (99030/119447); folder tree sco
 
 ## Denominator
 
-- Baseline denominator: 
+- Baseline denominator:
 116403
- lines; covered-or-partial: 
+ lines; covered-or-partial:
 96077
-; modules: 
+; modules:
 10
 .
-- Final denominator: 
+- Final denominator:
 119447
- lines; covered-or-partial: 
+ lines; covered-or-partial:
 99030
-; modules: 
+; modules:
 10
 .
-- Baseline modules: 
+- Baseline modules:
 Swordfish.NET.General.dll, SVGControl.dll, QuickFiler.dll, TaskMaster.Test.dll, Tags.dll, ToDoModel.dll, TaskMaster.dll, TaskVisualization.dll, UtilitiesCS.dll, UtilitiesCS.Test.dll
 .
-- Final modules: 
+- Final modules:
 Swordfish.NET.General.dll, Tags.dll, TaskVisualization.dll, SVGControl.dll, TaskMaster.dll, QuickFiler.dll, TaskMaster.Test.dll, ToDoModel.dll, UtilitiesCS.dll, UtilitiesCS.Test.dll
 .
 - DENOMINATOR_COMPARABLE: yes

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace UtilitiesCS.OutlookObjects.Folder
 {
@@ -9,8 +10,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
     /// </summary>
     public interface IOutlookFolderHierarchyReader
     {
-        IReadOnlyList<FolderTreeSnapshotNode> ReadFolders(
+        Task<IReadOnlyList<FolderTreeSnapshotNode>> ReadFoldersAsync(
             FolderTreeRequest request,
+            IDeadlineClock deadlineClock,
+            IDispatcherYield dispatcherYield,
             CancellationToken cancellationToken
         );
     }

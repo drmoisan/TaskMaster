@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.OutlookObjects.Folder
@@ -17,10 +18,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         [ExcludeFromCodeCoverage]
         public OutlookFolderNotificationSink(Outlook.NameSpace namespaceMapi)
-            : this(Array.Empty<IOutlookFolderNotificationSubscription>())
-        {
-            _ = namespaceMapi ?? throw new ArgumentNullException(nameof(namespaceMapi));
-        }
+            : this(CreateProductionSubscriptions(namespaceMapi)) { }
 
         [ExcludeFromCodeCoverage]
         internal OutlookFolderNotificationSink(
@@ -31,6 +29,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 subscriptions ?? Enumerable.Empty<IOutlookFolderNotificationSubscription>()
             ).ToArray();
         }
+
+        internal int SubscriptionCount => _subscriptions.Count;
 
         public event EventHandler<FolderTreeSnapshotChangedEventArgs> FolderAdded;
         public event EventHandler<FolderTreeSnapshotChangedEventArgs> FolderRemoved;
@@ -132,6 +132,186 @@ namespace UtilitiesCS.OutlookObjects.Folder
             public FolderTreeRefreshReason Reason { get; }
 
             public string StoreId { get; }
+        }
+
+        [ExcludeFromCodeCoverage]
+        private static IReadOnlyList<IOutlookFolderNotificationSubscription> CreateProductionSubscriptions(
+            Outlook.NameSpace namespaceMapi
+        )
+        {
+            if (namespaceMapi == null)
+            {
+                throw new ArgumentNullException(nameof(namespaceMapi));
+            }
+
+            var subscriptions = new List<IOutlookFolderNotificationSubscription>();
+            var stores = namespaceMapi.Stores;
+            if (stores == null)
+            {
+                return subscriptions;
+            }
+
+            subscriptions.Add(new StoresNotificationSubscription(stores));
+            AddFolderSubscriptions(stores, subscriptions);
+            return subscriptions;
+        }
+
+        [ExcludeFromCodeCoverage]
+        private static void AddFolderSubscriptions(
+            Outlook.Stores stores,
+            ICollection<IOutlookFolderNotificationSubscription> subscriptions
+        )
+        {
+            try
+            {
+                foreach (Outlook.Store store in stores)
+                {
+                    AddFolderSubscriptions(store, subscriptions);
+                }
+            }
+            catch (COMException)
+            {
+                return;
+            }
+            catch (InvalidCastException)
+            {
+                return;
+            }
+        }
+
+        [ExcludeFromCodeCoverage]
+        private static void AddFolderSubscriptions(
+            Outlook.Store store,
+            ICollection<IOutlookFolderNotificationSubscription> subscriptions
+        )
+        {
+            if (store == null)
+            {
+                return;
+            }
+
+            var root = store.GetRootFolder() as Outlook.MAPIFolder;
+            if (root == null)
+            {
+                return;
+            }
+
+            var stack = new Stack<Outlook.MAPIFolder>();
+            stack.Push(root);
+            while (stack.Count > 0)
+            {
+                var folder = stack.Pop();
+                var children = folder.Folders;
+                if (children == null)
+                {
+                    continue;
+                }
+
+                subscriptions.Add(
+                    new FoldersNotificationSubscription(children, store.StoreID ?? string.Empty)
+                );
+                foreach (Outlook.MAPIFolder child in children)
+                {
+                    stack.Push(child);
+                }
+            }
+        }
+
+        [ExcludeFromCodeCoverage]
+        private sealed class StoresNotificationSubscription : IOutlookFolderNotificationSubscription
+        {
+            private readonly Outlook.Stores _stores;
+            private EventHandler<FolderTreeNotification> _handler;
+
+            public StoresNotificationSubscription(Outlook.Stores stores)
+            {
+                _stores = stores ?? throw new ArgumentNullException(nameof(stores));
+            }
+
+            public void Subscribe(EventHandler<FolderTreeNotification> handler)
+            {
+                _handler += handler;
+                _stores.StoreAdd += OnStoreAdd;
+                _stores.BeforeStoreRemove += OnBeforeStoreRemove;
+            }
+
+            public void Unsubscribe(EventHandler<FolderTreeNotification> handler)
+            {
+                _stores.StoreAdd -= OnStoreAdd;
+                _stores.BeforeStoreRemove -= OnBeforeStoreRemove;
+                _handler -= handler;
+            }
+
+            private void OnStoreAdd(Outlook.Store store)
+            {
+                _handler?.Invoke(
+                    this,
+                    new FolderTreeNotification(FolderTreeRefreshReason.StoreAdded, store?.StoreID)
+                );
+            }
+
+            private void OnBeforeStoreRemove(Outlook.Store store, ref bool cancel)
+            {
+                _handler?.Invoke(
+                    this,
+                    new FolderTreeNotification(FolderTreeRefreshReason.StoreRemoved, store?.StoreID)
+                );
+            }
+        }
+
+        [ExcludeFromCodeCoverage]
+        private sealed class FoldersNotificationSubscription
+            : IOutlookFolderNotificationSubscription
+        {
+            private readonly Outlook.Folders _folders;
+            private readonly string _storeId;
+            private EventHandler<FolderTreeNotification> _handler;
+
+            public FoldersNotificationSubscription(Outlook.Folders folders, string storeId)
+            {
+                _folders = folders ?? throw new ArgumentNullException(nameof(folders));
+                _storeId = storeId ?? string.Empty;
+            }
+
+            public void Subscribe(EventHandler<FolderTreeNotification> handler)
+            {
+                _handler += handler;
+                _folders.FolderAdd += OnFolderAdd;
+                _folders.FolderChange += OnFolderChange;
+                _folders.FolderRemove += OnFolderRemove;
+            }
+
+            public void Unsubscribe(EventHandler<FolderTreeNotification> handler)
+            {
+                _folders.FolderAdd -= OnFolderAdd;
+                _folders.FolderChange -= OnFolderChange;
+                _folders.FolderRemove -= OnFolderRemove;
+                _handler -= handler;
+            }
+
+            private void OnFolderAdd(Outlook.MAPIFolder folder)
+            {
+                _handler?.Invoke(
+                    this,
+                    new FolderTreeNotification(FolderTreeRefreshReason.FolderAdded, _storeId)
+                );
+            }
+
+            private void OnFolderChange(Outlook.MAPIFolder folder)
+            {
+                _handler?.Invoke(
+                    this,
+                    new FolderTreeNotification(FolderTreeRefreshReason.FolderChanged, _storeId)
+                );
+            }
+
+            private void OnFolderRemove()
+            {
+                _handler?.Invoke(
+                    this,
+                    new FolderTreeNotification(FolderTreeRefreshReason.FolderRemoved, _storeId)
+                );
+            }
         }
     }
 }

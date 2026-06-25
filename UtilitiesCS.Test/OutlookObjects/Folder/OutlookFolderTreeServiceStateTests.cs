@@ -222,6 +222,32 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         [TestMethod]
+        public async Task GetSnapshotAsync_WhenBuildIsCanceled_DoesNotPublishPartialSnapshot()
+        {
+            var reader = new FakeOutlookFolderHierarchyReader().AddDeepHierarchy(
+                "store-a",
+                depth: 3
+            );
+            var clock = new SwitchableClock { ShouldYieldNow = true };
+            var service = new OutlookFolderTreeService(
+                new FolderTreeSnapshotBuilder(reader, clock, new CancelingDispatcherYield()),
+                new FakeOutlookFolderNotificationSink()
+            );
+            var publicationCount = 0;
+            service.SnapshotChanged += (_, _) => publicationCount++;
+
+            Func<Task> act = () =>
+                service.GetSnapshotAsync(
+                    FolderTreeRequest.AllStores(false),
+                    CancellationToken.None
+                );
+
+            await act.Should().ThrowAsync<OperationCanceledException>();
+            publicationCount.Should().Be(0);
+            service.State.Should().Be(OutlookFolderTreeServiceState.Empty);
+        }
+
+        [TestMethod]
         public async Task GetSnapshotAsync_WhenRefreshBuildFails_PreservesStaleSnapshot()
         {
             var reader = new ThrowAfterFirstReader();
@@ -330,10 +356,20 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             }
         }
 
+        private sealed class CancelingDispatcherYield : IDispatcherYield
+        {
+            public Task YieldAsync(CancellationToken cancellationToken)
+            {
+                throw new OperationCanceledException();
+            }
+        }
+
         private sealed class ThrowingReader : IOutlookFolderHierarchyReader
         {
-            public IReadOnlyList<FolderTreeSnapshotNode> ReadFolders(
+            public Task<IReadOnlyList<FolderTreeSnapshotNode>> ReadFoldersAsync(
                 FolderTreeRequest request,
+                IDeadlineClock deadlineClock,
+                IDispatcherYield dispatcherYield,
                 CancellationToken cancellationToken
             )
             {
@@ -346,8 +382,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             private readonly FakeOutlookFolderHierarchyReader _inner = CreateReader();
             private int _calls;
 
-            public IReadOnlyList<FolderTreeSnapshotNode> ReadFolders(
+            public Task<IReadOnlyList<FolderTreeSnapshotNode>> ReadFoldersAsync(
                 FolderTreeRequest request,
+                IDeadlineClock deadlineClock,
+                IDispatcherYield dispatcherYield,
                 CancellationToken cancellationToken
             )
             {
@@ -357,7 +395,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                     throw new InvalidOperationException("refresh failed");
                 }
 
-                return _inner.ReadFolders(request, cancellationToken);
+                return _inner.ReadFoldersAsync(
+                    request,
+                    deadlineClock,
+                    dispatcherYield,
+                    cancellationToken
+                );
             }
         }
     }

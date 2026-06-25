@@ -61,7 +61,7 @@ Build succeeded.
 
 "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\TaskMaster.sln" (Build target) (1) ->
 "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\UtilitiesCS.Test\UtilitiesCS.Test.csproj" (default target) (9) ->
-(CoreCompile target) -> 
+(CoreCompile target) ->
   C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\UtilitiesCS.Test\TestHelpers\ManualFireTimerWrapper.cs(24,56): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context. [C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\UtilitiesCS.Test\UtilitiesCS.Test.csproj]
   C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\UtilitiesCS.Test\OutlookObjects\Table\OlTableExtensions_Tests.cs(1707,37): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context. [C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\UtilitiesCS.Test\UtilitiesCS.Test.csproj]
   C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\UtilitiesCS.Test\OutlookObjects\Table\OlTableExtensions_Tests.cs(1708,37): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context. [C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\UtilitiesCS.Test\UtilitiesCS.Test.csproj]

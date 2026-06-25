@@ -52,6 +52,73 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             reader.EnumerationCount.Should().Be(2);
         }
 
+        [TestMethod]
+        public async Task FolderChanged_DuringInFlightBuild_SchedulesOneFollowUpRefresh()
+        {
+            var reader = CreateMultiStoreReader();
+            var clock = new SwitchableClock { ShouldYieldNow = true };
+            var yield = new ManualDispatcherYield();
+            var sink = new FakeOutlookFolderNotificationSink();
+            var service = new OutlookFolderTreeService(
+                new FolderTreeSnapshotBuilder(reader, clock, yield),
+                sink
+            );
+
+            var initialBuild = service.GetSnapshotAsync(
+                FolderTreeRequest.AllStores(false),
+                CancellationToken.None
+            );
+            sink.RaiseFolderChanged(
+                FakeOutlookFolderNotificationSink.CreateArgs(
+                    FolderTreeRefreshReason.FolderChanged,
+                    "store-a"
+                )
+            );
+            sink.RaiseFolderChanged(
+                FakeOutlookFolderNotificationSink.CreateArgs(
+                    FolderTreeRefreshReason.FolderChanged,
+                    "store-a"
+                )
+            );
+
+            yield.Release();
+            await initialBuild;
+            var finalSnapshot = await service.GetSnapshotAsync(
+                FolderTreeRequest.ForStore("store-a", false),
+                CancellationToken.None
+            );
+
+            reader.EnumerationCount.Should().Be(2);
+            finalSnapshot.CoversAllStores.Should().BeTrue();
+            finalSnapshot.GetNodesForStore("store-a").Should().ContainSingle();
+            finalSnapshot.GetNodesForStore("store-b").Should().ContainSingle();
+        }
+
+        private static FakeOutlookFolderHierarchyReader CreateMultiStoreReader()
+        {
+            return new FakeOutlookFolderHierarchyReader()
+                .AddRecord(
+                    new FakeFolderHierarchyRecord(
+                        "store-a",
+                        "entry-a",
+                        "",
+                        "Inbox",
+                        "\\Inbox",
+                        "Inbox"
+                    )
+                )
+                .AddRecord(
+                    new FakeFolderHierarchyRecord(
+                        "store-b",
+                        "entry-b",
+                        "",
+                        "Archive",
+                        "\\Archive",
+                        "Archive"
+                    )
+                );
+        }
+
         private sealed class SwitchableClock : IDeadlineClock
         {
             public bool ShouldYieldNow { get; set; }

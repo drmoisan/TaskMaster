@@ -30,22 +30,18 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         [ExcludeFromCodeCoverage]
         internal virtual FolderTree GetOlFolderTree()
         {
-            FolderTree tree = new(
-                _globals.Ol.ArchiveRoot,
-                _globals.TD.FilteredFolderScraping.Keys.ToList()
-            );
-            return tree;
+            return GetOlFolderTree(null);
         }
 
         [ExcludeFromCodeCoverage]
         internal virtual FolderTree GetOlFolderTree(ProgressTracker progress)
         {
-            FolderTree tree = new(
-                _globals.Ol.ArchiveRoot,
-                _globals.TD.FilteredFolderScraping.Keys.ToList(),
-                progress
+            var snapshot = GetOlFolderSnapshotAsync(progress).GetAwaiter().GetResult();
+            var selectionOverlay = new FolderTreeSelectionOverlay(
+                _globals.TD.FilteredFolderScraping.Keys
             );
-            return tree;
+            using var view = new FolderTreeCompatibilityView(snapshot, selectionOverlay);
+            return FolderTree.FromRoots(view.Roots);
         }
 
         [ExcludeFromCodeCoverage]
@@ -55,6 +51,18 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 .Roots.SelectMany(root => root.FlattenIf(node => !node.Selected))
                 .Select(x => x.OlFolder);
             return folders;
+        }
+
+        internal virtual IEnumerable<MAPIFolder> QueryOlFolders(FolderTreeSnapshot snapshot)
+        {
+            var selectionOverlay = new FolderTreeSelectionOverlay(
+                _globals.TD.FilteredFolderScraping.Keys
+            );
+            var resolver = CreateFolderHandleResolver();
+            return snapshot
+                .NodesByKey.Values.Where(node => !selectionOverlay.IsSelected(node))
+                .Select(node => resolver.TryResolve(node, out var folder) ? folder : null)
+                .OfType<MAPIFolder>();
         }
 
         [ExcludeFromCodeCoverage]
@@ -437,10 +445,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         internal IEnumerable<MailItem> ScrapeEmailsCore()
         {
-            var tree = GetOlFolderTree();
-            _sw.LogDuration(nameof(GetOlFolderTree));
+            var snapshot = GetOlFolderSnapshotAsync().GetAwaiter().GetResult();
+            _sw.LogDuration(nameof(GetOlFolderSnapshotAsync));
 
-            var folders = QueryOlFolders(tree);
+            var folders = QueryOlFolders(snapshot);
             _sw.LogDuration(nameof(QueryOlFolders));
 
             var mailItemsQuery = QueryMailItems(folders);
@@ -453,10 +461,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         internal IEnumerable<MailItem> ScrapeEmailsCore(ProgressTracker progress)
         {
             progress.Report(0, "Building Outlook Folder Tree");
-            var tree = GetOlFolderTree(progress);
-            _sw.LogDuration(nameof(GetOlFolderTree));
+            var snapshot = GetOlFolderSnapshotAsync(progress).GetAwaiter().GetResult();
+            _sw.LogDuration(nameof(GetOlFolderSnapshotAsync));
 
-            var folders = QueryOlFolders(tree);
+            var folders = QueryOlFolders(snapshot);
             _sw.LogDuration(nameof(QueryOlFolders));
 
             var mailItemsQuery = QueryMailItems(folders);

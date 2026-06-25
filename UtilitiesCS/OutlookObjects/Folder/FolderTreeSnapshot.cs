@@ -20,9 +20,25 @@ namespace UtilitiesCS.OutlookObjects.Folder
             IEnumerable<FolderTreeNodeKey> rootKeys,
             IEnumerable<FolderTreeSnapshotNode> nodes
         )
+            : this(rootKeys, nodes, null) { }
+
+        public FolderTreeSnapshot(
+            IEnumerable<FolderTreeNodeKey> rootKeys,
+            IEnumerable<FolderTreeSnapshotNode> nodes,
+            FolderTreeRequest request
+        )
         {
             RootKeys = new ReadOnlyCollection<FolderTreeNodeKey>(
                 (rootKeys ?? Enumerable.Empty<FolderTreeNodeKey>()).ToArray()
+            );
+            CoversAllStores = request == null || request.IsAllStores;
+            CoveredStoreIds = new ReadOnlyCollection<string>(
+                CoversAllStores
+                    ? Array.Empty<string>()
+                    : request
+                        .StoreIds.Where(id => !string.IsNullOrWhiteSpace(id))
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .ToArray()
             );
 
             var nodeArray = (nodes ?? Enumerable.Empty<FolderTreeSnapshotNode>()).ToArray();
@@ -44,8 +60,25 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         public IReadOnlyList<FolderTreeNodeKey> RootKeys { get; }
 
+        public bool CoversAllStores { get; }
+
+        public IReadOnlyList<string> CoveredStoreIds { get; }
+
         public IReadOnlyDictionary<FolderTreeNodeKey, FolderTreeSnapshotNode> NodesByKey =>
             _nodesByKey;
+
+        public bool Covers(FolderTreeRequest request)
+        {
+            if (request == null || request.IsAllStores)
+            {
+                return CoversAllStores;
+            }
+
+            return CoversAllStores
+                || request.StoreIds.All(storeId =>
+                    CoveredStoreIds.Contains(storeId, StringComparer.OrdinalIgnoreCase)
+                );
+        }
 
         public bool TryGetNode(FolderTreeNodeKey key, out FolderTreeSnapshotNode node)
         {

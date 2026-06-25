@@ -83,12 +83,14 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                 _nodes = nodes;
             }
 
-            public IReadOnlyList<FolderTreeSnapshotNode> ReadFolders(
+            public Task<IReadOnlyList<FolderTreeSnapshotNode>> ReadFoldersAsync(
                 FolderTreeRequest request,
+                IDeadlineClock deadlineClock,
+                IDispatcherYield dispatcherYield,
                 CancellationToken cancellationToken
             )
             {
-                return _nodes;
+                return Task.FromResult<IReadOnlyList<FolderTreeSnapshotNode>>(_nodes);
             }
         }
     }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using UtilitiesCS.OutlookObjects.Folder;
 
 namespace UtilitiesCS.Test.OutlookObjects.Folder.Fakes
@@ -83,8 +84,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder.Fakes
             return this;
         }
 
-        public IReadOnlyList<FolderTreeSnapshotNode> ReadFolders(
+        public Task<IReadOnlyList<FolderTreeSnapshotNode>> ReadFoldersAsync(
             FolderTreeRequest request,
+            IDeadlineClock deadlineClock,
+            IDispatcherYield dispatcherYield,
             CancellationToken cancellationToken
         )
         {
@@ -93,7 +96,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder.Fakes
                 .Where(record => request == null || request.IncludesStore(record.StoreId))
                 .ToArray();
 
-            return records
+            IReadOnlyList<FolderTreeSnapshotNode> nodes = records
                 .Select(record =>
                 {
                     cancellationToken.ThrowIfCancellationRequested();
@@ -138,6 +141,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder.Fakes
                     );
                 })
                 .ToArray();
+            return Task.FromResult(nodes);
         }
     }
 }
