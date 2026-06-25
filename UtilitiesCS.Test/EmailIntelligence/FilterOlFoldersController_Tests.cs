@@ -1,567 +1,481 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS;
+using UtilitiesCS.OutlookObjects.Folder;
 using UtilitiesCS.ReusableTypeClasses;
-using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
-using OutlookFolders = Microsoft.Office.Interop.Outlook.Folders;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.Test.EmailIntelligence
 {
-    /// <summary>
-    /// Unit tests for FilterOlFoldersController internal methods.
-    ///
-    /// Purpose:
-    ///     Covers Save, Discard, OlFolderTree_PropertyChangedInternal, and
-    ///     PutCheckedStateMethod without requiring a live COM Outlook session.
-    ///
-    /// Usage:
-    ///     Tests bypass the COM-dependent constructor via FormatterServices.GetUninitializedObject
-    ///     and inject dependencies through reflection. WinForms-affine tests opt into MSTest's
-    ///     scoped STA execution explicitly.
-    /// </summary>
     [TestClass]
     public class FilterOlFoldersController_Tests
     {
-        // ---------------------------------------------------------------------------
-        // Factory helpers
-        // ---------------------------------------------------------------------------
-
-        /// <summary>
-        /// Creates an uninitialized FilterOlFoldersController (bypasses COM constructor)
-        /// and injects the three dependencies needed by the majority of tests.
-        /// </summary>
-        /// <param name="viewer">Viewer form to inject as _viewer.</param>
-        /// <param name="tree">FolderTree to inject as _olFolderTree.</param>
-        /// <param name="globals">IApplicationGlobals mock to inject as _globals.</param>
-        /// <returns>Controller with the three fields set via reflection.</returns>
-        private static FilterOlFoldersController CreateController(
-            FilterOlFoldersViewer viewer,
-            FolderTree tree,
-            IApplicationGlobals globals
-        )
-        {
-            var controller = (FilterOlFoldersController)
-                FormatterServices.GetUninitializedObject(typeof(FilterOlFoldersController));
-
-            typeof(FilterOlFoldersController)
-                .GetField("_viewer", BindingFlags.NonPublic | BindingFlags.Instance)
-                .SetValue(controller, viewer);
-
-            typeof(FilterOlFoldersController)
-                .GetField("_olFolderTree", BindingFlags.NonPublic | BindingFlags.Instance)
-                .SetValue(controller, tree);
-
-            typeof(FilterOlFoldersController)
-                .GetField("_globals", BindingFlags.NonPublic | BindingFlags.Instance)
-                .SetValue(controller, globals);
-
-            return controller;
-        }
-
-        /// <summary>
-        /// Creates a FolderTree with a single synthetic root node so that
-        /// FilterSelected() can run without a live MAPIFolder.
-        /// </summary>
-        private static FolderTree CreateSyntheticFolderTree()
-        {
-            var wrapper = new FolderWrapper(
-                selected: false,
-                itemCount: 0,
-                folderSize: 0,
-                name: "Root",
-                relativePath: "Root"
-            );
-            var rootNode = new TreeNode<FolderWrapper>(wrapper);
-
-            var tree = (FolderTree)FormatterServices.GetUninitializedObject(typeof(FolderTree));
-            typeof(FolderTree)
-                .GetField("_roots", BindingFlags.NonPublic | BindingFlags.Instance)
-                .SetValue(tree, new List<TreeNode<FolderWrapper>> { rootNode });
-
-            return tree;
-        }
-
-        /// <summary>
-        /// Returns the private viewer instance injected into the controller.
-        /// Used by constructor tests that need to inspect the real viewer state.
-        /// </summary>
-        private static IFilterOlFoldersViewer GetViewer(FilterOlFoldersController controller)
-        {
-            return (IFilterOlFoldersViewer)
-                typeof(FilterOlFoldersController)
-                    .GetField("_viewer", BindingFlags.NonPublic | BindingFlags.Instance)
-                    .GetValue(controller);
-        }
-
-        /// <summary>
-        /// Creates a strict mock Outlook folder with deterministic path and child collection.
-        /// </summary>
-        private static Mock<OutlookFolder> CreateOutlookFolder(
-            string folderPath,
-            params OutlookFolder[] children
-        )
-        {
-            var folder = new Mock<OutlookFolder>(MockBehavior.Strict);
-            folder.SetupGet(x => x.Name).Returns(folderPath.Split('\\')[^1]);
-            folder.SetupGet(x => x.FolderPath).Returns(folderPath);
-            folder.SetupGet(x => x.Folders).Returns(CreateFoldersCollection(children).Object);
-            return folder;
-        }
-
-        /// <summary>
-        /// Creates a mock Outlook Folders collection that supports Count and enumeration.
-        /// </summary>
-        private static Mock<OutlookFolders> CreateFoldersCollection(params OutlookFolder[] children)
-        {
-            var folders = new Mock<OutlookFolders>(MockBehavior.Strict);
-            var collection = new System.Collections.ArrayList(
-                children ?? Array.Empty<OutlookFolder>()
-            );
-            folders.SetupGet(x => x.Count).Returns(collection.Count);
-            folders.Setup(x => x.GetEnumerator()).Returns(() => collection.GetEnumerator());
-            return folders;
-        }
-
-        /// <summary>
-        /// Creates a FolderTree with caller-supplied roots so Save() can exercise both
-        /// add and remove delta paths without Outlook COM.
-        /// </summary>
-        private static FolderTree CreateSyntheticFolderTree(params TreeNode<FolderWrapper>[] roots)
-        {
-            var tree = (FolderTree)FormatterServices.GetUninitializedObject(typeof(FolderTree));
-            typeof(FolderTree)
-                .GetField("_roots", BindingFlags.NonPublic | BindingFlags.Instance)
-                .SetValue(tree, new List<TreeNode<FolderWrapper>>(roots));
-            return tree;
-        }
-
-        // ---------------------------------------------------------------------------
-        // P10-T0: Constructor wiring and GetCheckedState delegate coverage
-        // ---------------------------------------------------------------------------
-
-        /// <summary>
-        /// Verifies that the real constructor wires the viewer, folder tree, and
-        /// check-state delegates when supplied with a mocked Outlook archive root.
-        /// A <see cref="Mock{IFilterOlFoldersViewer}"/> is injected so that no real
-        /// window is opened. Real <see cref="TreeListView"/> instances are returned by
-        /// the mock so that delegate assignment can be verified.
-        /// The test also exercises the three GetCheckedState outcomes: Checked,
-        /// Indeterminate, and Unchecked.
-        /// </summary>
         [STATestMethod]
-        public void Constructor_WithMockedArchiveRoot_InitializesViewerAndGetCheckedStatePaths()
+        public void Constructor_WithFakeSnapshot_UsesCallerLocalSelectionAndWiresViewer()
         {
-            // Arrange
-            var archiveRoot = CreateOutlookFolder("\\Archive");
-            var mockOl = new Mock<IOlObjects>(MockBehavior.Strict);
-            mockOl.SetupGet(x => x.ArchiveRoot).Returns(archiveRoot.Object);
+            var service = new FakeFolderTreeService(CreateSnapshot());
+            var scraping = new ScoDictionary<string, int>();
+            scraping.TryAdd("Archive\\Filtered", 1);
+            var viewer = new FakeFilterViewer();
+            var globals = CreateGlobals(service, scraping);
 
-            var selectedPaths = new ScoDictionary<string, int>();
-            var mockTd = new Mock<IToDoObjects>(MockBehavior.Strict);
-            mockTd.SetupGet(x => x.FilteredFolderScraping).Returns(selectedPaths);
+            var controller = new FilterOlFoldersController(globals.Object, viewer);
 
-            var mockGlobals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
-            mockGlobals.SetupGet(x => x.Ol).Returns(mockOl.Object);
-            mockGlobals.SetupGet(x => x.TD).Returns(mockTd.Object);
-
-            // Real TreeListView instances are needed so that delegate assignments
-            // (CheckStateGetter / CheckStatePutter) can be verified.
-            using var tlvNotFiltered = new TreeListView();
-            using var tlvFiltered = new TreeListView();
-
-            var mockViewer = new Mock<IFilterOlFoldersViewer>(MockBehavior.Strict);
-            mockViewer.SetupGet(v => v.TlvNotFiltered).Returns(tlvNotFiltered);
-            mockViewer.SetupGet(v => v.TlvFiltered).Returns(tlvFiltered);
-            mockViewer.Setup(v => v.SetController(It.IsAny<FilterOlFoldersController>()));
-            mockViewer.Setup(v => v.Dispose());
-
-            // Act
-            var controller = new FilterOlFoldersController(mockGlobals.Object, mockViewer.Object);
-
-            var checkedNode = new TreeNode<FolderWrapper>(
-                new FolderWrapper(
-                    selected: true,
-                    itemCount: 0,
-                    folderSize: 0,
-                    name: "Checked",
-                    relativePath: "Checked"
-                )
-            );
-
-            var indeterminateParent = new TreeNode<FolderWrapper>(
-                new FolderWrapper(
-                    selected: false,
-                    itemCount: 0,
-                    folderSize: 0,
-                    name: "Parent",
-                    relativePath: "Parent"
-                )
-            );
-            indeterminateParent.AddChild(
-                new FolderWrapper(
-                    selected: true,
-                    itemCount: 0,
-                    folderSize: 0,
-                    name: "Child",
-                    relativePath: "Parent\\Child"
-                )
-            );
-
-            var uncheckedNode = new TreeNode<FolderWrapper>(
-                new FolderWrapper(
-                    selected: false,
-                    itemCount: 0,
-                    folderSize: 0,
-                    name: "Unchecked",
-                    relativePath: "Unchecked"
-                )
-            );
-
-            // Assert
-            controller.OlFolderTree.Should().NotBeNull();
-            tlvNotFiltered.CheckStateGetter.Should().NotBeNull();
-            tlvFiltered.CheckStateGetter.Should().NotBeNull();
-            tlvNotFiltered.CheckStatePutter.Should().NotBeNull();
-            tlvFiltered.CheckStatePutter.Should().NotBeNull();
-            controller.GetCheckedState(checkedNode).Should().Be(CheckState.Checked);
-            controller.GetCheckedState(indeterminateParent).Should().Be(CheckState.Indeterminate);
-            controller.GetCheckedState(uncheckedNode).Should().Be(CheckState.Unchecked);
-
-            // Show() is never called on the mock — verified by MockBehavior.Strict.
-            mockViewer.Verify(v => v.Show(), Times.Never);
+            controller.FilterSelected(true).Should().ContainSingle();
+            controller.FilterSelected(true)[0].Value.RelativePath.Should().Be("Archive\\Filtered");
+            Flatten(controller.FilterSelected(false))
+                .Should()
+                .Contain(wrapper => wrapper.RelativePath == "Archive\\Visible");
+            viewer.Controller.Should().BeSameAs(controller);
+            viewer.TlvNotFiltered.CheckStateGetter.Should().NotBeNull();
+            viewer.TlvFiltered.CheckStatePutter.Should().NotBeNull();
+            service.SnapshotChangedSubscriberCount.Should().Be(1);
         }
 
-        // ---------------------------------------------------------------------------
-        // P10-T1: Save forwards the save action to the backing model
-        // ---------------------------------------------------------------------------
-
-        /// <summary>
-        /// Verifies that Save() closes the viewer and accesses
-        /// TD.FilteredFolderScraping on the backing model (IToDoObjects).
-        /// The test uses an empty ScoDictionary so Serialize() is a no-op
-        /// (Filepath is "").
-        /// </summary>
         [STATestMethod]
-        public void Save_ClosesViewer_AndAccessesFilteredFolderScraping()
+        public void FilterSelected_WithSameSnapshot_KeepsSelectionCallerLocal()
         {
-            // Arrange
-            var mockTD = new Mock<IToDoObjects>();
-            mockTD.Setup(td => td.FilteredFolderScraping).Returns(new ScoDictionary<string, int>());
+            var first = CreateControllerWithView(
+                CreateCompatibilityView(CreateSnapshot(), "Archive\\Filtered")
+            );
+            var second = CreateControllerWithView(CreateCompatibilityView(CreateSnapshot()));
 
-            var mockGlobals = new Mock<IApplicationGlobals>();
-            mockGlobals.Setup(g => g.TD).Returns(mockTD.Object);
+            first.FilterSelected(true).Should().ContainSingle();
+            second.FilterSelected(true).Should().BeEmpty();
 
-            var viewer = new FilterOlFoldersViewer();
-            var tree = CreateSyntheticFolderTree();
-            var controller = CreateController(viewer, tree, mockGlobals.Object);
+            first.FolderTreeView.Roots[0].Children[0].Value.Selected = false;
 
-            // Act
-            controller.Save();
-
-            // Assert — viewer was closed and the mock TD was accessed for scraping keys
-            viewer.IsDisposed.Should().BeTrue();
-            mockTD.Verify(td => td.FilteredFolderScraping, Times.AtLeastOnce());
+            first.FilterSelected(true).Should().BeEmpty();
+            Flatten(second.FilterSelected(false))
+                .Should()
+                .Contain(wrapper => wrapper.RelativePath == "Archive\\Filtered");
         }
 
-        /// <summary>
-        /// Verifies that Save removes keys that are no longer selected and adds new
-        /// selected keys before serializing the backing dictionary.
-        /// </summary>
+        [STATestMethod]
+        public void ViewerClose_DisposesViewAndRemovesServiceHandler()
+        {
+            var service = new FakeFolderTreeService(CreateSnapshot());
+            var viewer = new FakeFilterViewer();
+            var controller = new FilterOlFoldersController(
+                CreateGlobals(service, new ScoDictionary<string, int>()).Object,
+                viewer
+            );
+            var view = controller.FolderTreeView;
+
+            viewer.Close();
+
+            service.SnapshotChangedSubscriberCount.Should().Be(0);
+            view.SubscriptionCount.Should().Be(0);
+        }
+
+        [STATestMethod]
+        public void ConstructorAndRefresh_UseCachedArchiveSnapshotAndReplaceView()
+        {
+            var archivePath = "\\Missing";
+            var archiveRoot = new Mock<Outlook.Folder>();
+            archiveRoot.SetupGet(x => x.StoreID).Returns("store");
+            archiveRoot.SetupGet(x => x.FolderPath).Returns(() => archivePath);
+            var service = new FakeFolderTreeService(CreateSnapshot());
+            var scraping = new ScoDictionary<string, int>();
+            scraping.TryAdd("Archive\\Visible", 1);
+
+            var controller = new FilterOlFoldersController(
+                CreateGlobals(service, scraping, archiveRoot.Object).Object,
+                new FakeFilterViewer()
+            );
+
+            service.LastRequest.AllowStaleSnapshot.Should().BeTrue();
+            service.LastRequest.StoreIds.Should().ContainSingle().Which.Should().Be("store");
+            controller.FolderTreeView.Snapshot.Should().BeSameAs(service.Snapshot);
+
+            archivePath = "\\Archive";
+            service.PublishSnapshotChanged();
+
+            controller.FolderTreeView.Roots.Should().ContainSingle();
+            controller.FolderTreeView.Roots[0].Value.RelativePath.Should().Be("Archive");
+            controller.FilterSelected(true).Should().ContainSingle();
+            controller.FilterSelected(true)[0].Value.RelativePath.Should().Be("Archive\\Visible");
+        }
+
         [STATestMethod]
         public void Save_WhenSelectionChanges_RemovesDeselectedKeysAndAddsSelectedKeys()
         {
-            // Arrange
             var scraping = new ScoDictionary<string, int>();
             scraping.TryAdd("RemoveMe", 1);
+            var view = CreateCompatibilityView(CreateSnapshot(), "Archive\\Visible");
+            var viewer = new FakeFilterViewer();
+            var controller = CreateControllerWithView(view, viewer, CreateGlobals(scraping).Object);
 
-            var mockTd = new Mock<IToDoObjects>(MockBehavior.Strict);
-            mockTd.SetupGet(td => td.FilteredFolderScraping).Returns(scraping);
-
-            var mockGlobals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
-            mockGlobals.SetupGet(g => g.TD).Returns(mockTd.Object);
-
-            var selectedRoot = new TreeNode<FolderWrapper>(
-                new FolderWrapper(
-                    selected: true,
-                    itemCount: 0,
-                    folderSize: 0,
-                    name: "AddMe",
-                    relativePath: "AddMe"
-                )
-            );
-            var unselectedRoot = new TreeNode<FolderWrapper>(
-                new FolderWrapper(
-                    selected: false,
-                    itemCount: 0,
-                    folderSize: 0,
-                    name: "KeepOut",
-                    relativePath: "KeepOut"
-                )
-            );
-
-            var viewer = new FilterOlFoldersViewer();
-            var tree = CreateSyntheticFolderTree(selectedRoot, unselectedRoot);
-            var controller = CreateController(viewer, tree, mockGlobals.Object);
-
-            // Act
             controller.Save();
 
-            // Assert
             scraping.ContainsKey("RemoveMe").Should().BeFalse();
-            scraping.ContainsKey("AddMe").Should().BeTrue();
-            viewer.IsDisposed.Should().BeTrue();
+            scraping.ContainsKey("Archive\\Visible").Should().BeTrue();
+            viewer.CloseCount.Should().Be(1);
         }
 
-        // ---------------------------------------------------------------------------
-        // P10-T2: Discard forwards the discard action to the backing model
-        // ---------------------------------------------------------------------------
-
-        /// <summary>
-        /// Verifies that Discard() closes the viewer form without requiring
-        /// COM globals.
-        /// </summary>
         [STATestMethod]
         public void Discard_ClosesViewer()
         {
-            // Arrange
-            var mockGlobals = new Mock<IApplicationGlobals>();
-            var viewer = new FilterOlFoldersViewer();
-            var tree = CreateSyntheticFolderTree();
-            var controller = CreateController(viewer, tree, mockGlobals.Object);
+            var viewer = new FakeFilterViewer();
+            var controller = CreateControllerWithView(
+                CreateCompatibilityView(CreateSnapshot()),
+                viewer,
+                CreateGlobals(new ScoDictionary<string, int>()).Object
+            );
 
-            // Act
             controller.Discard();
 
-            // Assert
-            viewer.IsDisposed.Should().BeTrue();
+            viewer.CloseCount.Should().Be(1);
         }
 
-        // ---------------------------------------------------------------------------
-        // P10-T3: Tree property change propagates to viewer-facing state
-        // ---------------------------------------------------------------------------
-
-        /// <summary>
-        /// Verifies that OlFolderTree_PropertyChangedInternal runs to completion
-        /// (setting empty roots on both tree list views) given a synthetic tree
-        /// and pre-initialized ExpandedObjects collections.
-        /// </summary>
         [STATestMethod]
-        public void OlFolderTree_PropertyChangedInternal_WithSyntheticTree_SetsEmptyRootsOnViewer()
+        public void OlFolderTree_PropertyChangedInternal_RefreshesFilteredAndUnfilteredRoots()
         {
-            // Arrange
-            var mockGlobals = new Mock<IApplicationGlobals>();
-            var viewer = new FilterOlFoldersViewer();
-
-            // ExpandedObjects must be a non-null IEnumerable before the method
-            // calls .Cast<>() on them; a freshly created TreeListView leaves the
-            // field null, which would throw ArgumentNullException.
+            var viewer = new FakeFilterViewer();
             viewer.TlvNotFiltered.ExpandedObjects = new List<object>();
             viewer.TlvFiltered.ExpandedObjects = new List<object>();
+            var controller = CreateControllerWithView(
+                CreateCompatibilityView(CreateSnapshot(), "Archive\\Filtered"),
+                viewer,
+                CreateGlobals(new ScoDictionary<string, int>()).Object
+            );
 
-            var tree = CreateSyntheticFolderTree();
-            var controller = CreateController(viewer, tree, mockGlobals.Object);
+            controller.OlFolderTree_PropertyChangedInternal(
+                controller,
+                new PropertyChangedEventArgs(nameof(controller.FolderTreeView))
+            );
 
-            // Act — should not throw
-            System.Action act = () =>
-                controller.OlFolderTree_PropertyChangedInternal(
-                    null,
-                    new PropertyChangedEventArgs("Roots")
-                );
-
-            // Assert
-            act.Should().NotThrow();
+            viewer.TlvFiltered.Roots.Should().NotBeNull();
+            viewer.TlvNotFiltered.Roots.Should().NotBeNull();
         }
 
-        /// <summary>
-        /// Verifies that OlFolderTree_PropertyChanged follows the same-thread path when
-        /// InvokeRequired is false and delegates to the internal refresh logic.
-        /// </summary>
         [STATestMethod]
         public void OlFolderTree_PropertyChanged_OnSameThread_RefreshesViewerWithoutInvoke()
         {
-            // Arrange
-            var mockGlobals = new Mock<IApplicationGlobals>();
-            var viewer = new FilterOlFoldersViewer();
+            var viewer = new FakeFilterViewer();
             viewer.TlvNotFiltered.ExpandedObjects = new List<object>();
             viewer.TlvFiltered.ExpandedObjects = new List<object>();
+            var controller = CreateControllerWithView(
+                CreateCompatibilityView(CreateSnapshot()),
+                viewer,
+                CreateGlobals(new ScoDictionary<string, int>()).Object
+            );
 
-            var tree = CreateSyntheticFolderTree();
-            var controller = CreateController(viewer, tree, mockGlobals.Object);
-
-            // Act
             Action act = () =>
                 controller.OlFolderTree_PropertyChanged(
-                    null,
-                    new PropertyChangedEventArgs("Roots")
+                    controller,
+                    new PropertyChangedEventArgs(nameof(controller.FolderTreeView))
                 );
 
-            // Assert
             act.Should().NotThrow();
-            viewer.TlvNotFiltered.Roots.Should().NotBeNull();
-            viewer.TlvFiltered.Roots.Should().NotBeNull();
+            viewer.InvokeCount.Should().Be(0);
         }
 
-        // ---------------------------------------------------------------------------
-        // P10-T4: Check-state helpers round-trip the expected value
-        // ---------------------------------------------------------------------------
-
-        /// <summary>
-        /// Verifies that PutCheckedStateMethod sets Selected=true on the node and
-        /// all descendants when the tree is collapsed (IsExpanded returns false for
-        /// a fresh TreeListView), returning CheckState.Checked.
-        /// </summary>
         [STATestMethod]
         public void PutCheckedStateMethod_Collapsed_ChecksNodeAndDescendants()
         {
-            // Arrange — bypass COM constructor; _viewer/_globals not needed
-            var controller = (FilterOlFoldersController)
-                FormatterServices.GetUninitializedObject(typeof(FilterOlFoldersController));
+            var controller = CreateUninitializedController();
+            var parent = CreateNode("Parent", "Parent", selected: false);
+            var child = parent.AddChild(new FolderWrapper(false, 0, 0, "Child", "Parent\\Child"));
 
-            var wrapper = new FolderWrapper(
-                selected: false,
-                itemCount: 0,
-                folderSize: 0,
-                name: "TestFolder",
-                relativePath: "TestFolder"
+            var result = controller.PutCheckedStateMethod(
+                parent,
+                CheckState.Checked,
+                new TreeListView()
             );
-            var node = new TreeNode<FolderWrapper>(wrapper);
-            var tlv = new TreeListView(); // IsExpanded returns false for all nodes
 
-            // Act
-            var result = controller.PutCheckedStateMethod(node, CheckState.Checked, tlv);
-
-            // Assert
             result.Should().Be(CheckState.Checked);
-            wrapper.Selected.Should().BeTrue();
+            parent.Value.Selected.Should().BeTrue();
+            child.Value.Selected.Should().BeTrue();
         }
 
-        /// <summary>
-        /// Verifies that PutCheckedStateMethod sets Selected=false on the node and
-        /// all descendants when unchecking while the tree is collapsed, returning
-        /// CheckState.Unchecked.
-        /// </summary>
-        [STATestMethod]
-        public void PutCheckedStateMethod_Collapsed_UnchecksNodeAndDescendants()
-        {
-            // Arrange
-            var controller = (FilterOlFoldersController)
-                FormatterServices.GetUninitializedObject(typeof(FilterOlFoldersController));
-
-            var wrapper = new FolderWrapper(
-                selected: true,
-                itemCount: 0,
-                folderSize: 0,
-                name: "TestFolder",
-                relativePath: "TestFolder"
-            );
-            var node = new TreeNode<FolderWrapper>(wrapper);
-            var tlv = new TreeListView();
-
-            // Act
-            var result = controller.PutCheckedStateMethod(node, CheckState.Unchecked, tlv);
-
-            // Assert
-            result.Should().Be(CheckState.Unchecked);
-            wrapper.Selected.Should().BeFalse();
-        }
-
-        /// <summary>
-        /// Verifies that PutCheckedStateMethod updates only the current node when the
-        /// tree reports the node as expanded.
-        /// </summary>
         [STATestMethod]
         public void PutCheckedStateMethod_Expanded_UpdatesOnlyCurrentNode()
         {
-            // Arrange
-            var controller = (FilterOlFoldersController)
-                FormatterServices.GetUninitializedObject(typeof(FilterOlFoldersController));
+            var controller = CreateUninitializedController();
+            var parent = CreateNode("Parent", "Parent", selected: false);
+            var child = parent.AddChild(new FolderWrapper(false, 0, 0, "Child", "Parent\\Child"));
+            var tree = new TreeListView { Roots = new List<TreeNode<FolderWrapper>> { parent } };
+            tree.ExpandedObjects = new List<object> { parent };
 
-            var parent = new TreeNode<FolderWrapper>(
-                new FolderWrapper(
-                    selected: false,
-                    itemCount: 0,
-                    folderSize: 0,
-                    name: "Parent",
-                    relativePath: "Parent"
-                )
-            );
-            var child = parent.AddChild(
-                new FolderWrapper(
-                    selected: false,
-                    itemCount: 0,
-                    folderSize: 0,
-                    name: "Child",
-                    relativePath: "Parent\\Child"
-                )
-            );
+            var result = controller.PutCheckedStateMethod(parent, CheckState.Checked, tree);
 
-            var tlv = new TreeListView { Roots = new List<TreeNode<FolderWrapper>> { parent } };
-            tlv.ExpandedObjects = new List<object> { parent };
-
-            // Act
-            var result = controller.PutCheckedStateMethod(parent, CheckState.Checked, tlv);
-
-            // Assert
             result.Should().Be(CheckState.Checked);
             parent.Value.Selected.Should().BeTrue();
             child.Value.Selected.Should().BeFalse();
         }
 
-        /// <summary>
-        /// Verifies that the filtered and not-filtered forwarding helpers delegate to
-        /// the correct viewer tree list view instance.
-        /// </summary>
         [STATestMethod]
-        public void PutCheckedStateMethodForwarders_UseTheirAssignedViewerTrees()
+        public void PutCheckedStateMethodForwarders_UseAssignedViewerTrees()
         {
-            // Arrange
-            var mockGlobals = new Mock<IApplicationGlobals>();
-            var viewer = new FilterOlFoldersViewer();
-            var tree = CreateSyntheticFolderTree();
-            var controller = CreateController(viewer, tree, mockGlobals.Object);
-
-            var filteredNode = new TreeNode<FolderWrapper>(
-                new FolderWrapper(
-                    selected: false,
-                    itemCount: 0,
-                    folderSize: 0,
-                    name: "Filtered",
-                    relativePath: "Filtered"
-                )
+            var viewer = new FakeFilterViewer();
+            var controller = CreateControllerWithView(
+                CreateCompatibilityView(CreateSnapshot()),
+                viewer,
+                CreateGlobals(new ScoDictionary<string, int>()).Object
             );
-            var notFilteredNode = new TreeNode<FolderWrapper>(
-                new FolderWrapper(
-                    selected: true,
-                    itemCount: 0,
-                    folderSize: 0,
-                    name: "NotFiltered",
-                    relativePath: "NotFiltered"
-                )
-            );
+            var filtered = CreateNode("Filtered", "Filtered", selected: false);
+            var notFiltered = CreateNode("NotFiltered", "NotFiltered", selected: true);
 
-            // Act
             var filteredResult = controller.PutCheckedStateMethodFiltered(
-                filteredNode,
+                filtered,
                 CheckState.Checked
             );
             var notFilteredResult = controller.PutCheckedStateMethodNotFiltered(
-                notFilteredNode,
+                notFiltered,
                 CheckState.Unchecked
             );
 
-            // Assert
             filteredResult.Should().Be(CheckState.Checked);
-            filteredNode.Value.Selected.Should().BeTrue();
+            filtered.Value.Selected.Should().BeTrue();
             notFilteredResult.Should().Be(CheckState.Unchecked);
-            notFilteredNode.Value.Selected.Should().BeFalse();
+            notFiltered.Value.Selected.Should().BeFalse();
+        }
+
+        private static FilterOlFoldersController CreateControllerWithView(
+            FolderTreeCompatibilityView view,
+            IFilterOlFoldersViewer viewer = null,
+            IApplicationGlobals globals = null
+        )
+        {
+            var controller = CreateUninitializedController();
+            SetField(controller, "_folderTreeView", view);
+            SetField(controller, "_viewer", viewer ?? new FakeFilterViewer());
+            SetField(
+                controller,
+                "_globals",
+                globals ?? CreateGlobals(new ScoDictionary<string, int>()).Object
+            );
+            return controller;
+        }
+
+        private static FilterOlFoldersController CreateUninitializedController()
+        {
+            return (FilterOlFoldersController)
+                FormatterServices.GetUninitializedObject(typeof(FilterOlFoldersController));
+        }
+
+        private static void SetField(object instance, string name, object value)
+        {
+            instance
+                .GetType()
+                .GetField(name, BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(instance, value);
+        }
+
+        private static Mock<IApplicationGlobals> CreateGlobals(ScoDictionary<string, int> scraping)
+        {
+            return CreateGlobals(new FakeFolderTreeService(CreateSnapshot()), scraping);
+        }
+
+        private static Mock<IApplicationGlobals> CreateGlobals(
+            IOutlookFolderTreeService service,
+            ScoDictionary<string, int> scraping,
+            Outlook.Folder archiveRoot = null
+        )
+        {
+            var ol = new Mock<IOlObjects>(MockBehavior.Strict);
+            ol.SetupGet(x => x.ArchiveRoot).Returns(() => archiveRoot);
+            ol.SetupGet(x => x.FolderTreeService).Returns(service);
+
+            var td = new Mock<IToDoObjects>(MockBehavior.Strict);
+            td.SetupGet(x => x.FilteredFolderScraping).Returns(scraping);
+
+            var globals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
+            globals.SetupGet(x => x.Ol).Returns(ol.Object);
+            globals.SetupGet(x => x.TD).Returns(td.Object);
+            return globals;
+        }
+
+        private static FolderTreeCompatibilityView CreateCompatibilityView(
+            FolderTreeSnapshot snapshot,
+            params string[] selectedPaths
+        )
+        {
+            return new(snapshot, new FolderTreeSelectionOverlay(selectedPaths));
+        }
+
+        private static FolderTreeSnapshot CreateSnapshot()
+        {
+            var rootKey = new FolderTreeNodeKey("store", "archive", "\\Archive");
+            var filteredKey = new FolderTreeNodeKey("store", "filtered", "\\Archive\\Filtered");
+            var visibleKey = new FolderTreeNodeKey("store", "visible", "\\Archive\\Visible");
+            return new(
+                new[] { rootKey },
+                new[]
+                {
+                    new FolderTreeSnapshotNode(
+                        rootKey,
+                        "Archive",
+                        "store",
+                        "archive",
+                        null,
+                        "\\Archive",
+                        "Archive",
+                        new[] { filteredKey, visibleKey },
+                        false,
+                        string.Empty
+                    ),
+                    new FolderTreeSnapshotNode(
+                        filteredKey,
+                        "Filtered",
+                        "store",
+                        "filtered",
+                        rootKey,
+                        "\\Archive\\Filtered",
+                        "Archive\\Filtered",
+                        Array.Empty<FolderTreeNodeKey>(),
+                        false,
+                        string.Empty
+                    ),
+                    new FolderTreeSnapshotNode(
+                        visibleKey,
+                        "Visible",
+                        "store",
+                        "visible",
+                        rootKey,
+                        "\\Archive\\Visible",
+                        "Archive\\Visible",
+                        Array.Empty<FolderTreeNodeKey>(),
+                        false,
+                        string.Empty
+                    ),
+                }
+            );
+        }
+
+        private static TreeNode<FolderWrapper> CreateNode(
+            string name,
+            string relativePath,
+            bool selected
+        )
+        {
+            return new(new FolderWrapper(selected, 0, 0, name, relativePath));
+        }
+
+        private static IEnumerable<FolderWrapper> Flatten(
+            IEnumerable<TreeNode<FolderWrapper>> roots
+        )
+        {
+            foreach (var root in roots)
+            {
+                foreach (var wrapper in root.Flatten())
+                {
+                    yield return wrapper;
+                }
+            }
+        }
+
+        private sealed class FakeFolderTreeService : IOutlookFolderTreeService
+        {
+            private EventHandler<FolderTreeSnapshotChangedEventArgs> _snapshotChanged;
+
+            public FakeFolderTreeService(FolderTreeSnapshot snapshot)
+            {
+                Snapshot = snapshot;
+            }
+
+            public int SnapshotChangedSubscriberCount { get; private set; }
+
+            public FolderTreeRequest LastRequest { get; private set; }
+
+            public FolderTreeSnapshot Snapshot { get; set; }
+
+            public event EventHandler<FolderTreeSnapshotChangedEventArgs> SnapshotChanged
+            {
+                add
+                {
+                    _snapshotChanged += value;
+                    SnapshotChangedSubscriberCount++;
+                }
+                remove
+                {
+                    _snapshotChanged -= value;
+                    SnapshotChangedSubscriberCount--;
+                }
+            }
+
+            public Task<FolderTreeSnapshot> GetSnapshotAsync(
+                FolderTreeRequest request,
+                CancellationToken cancellationToken
+            )
+            {
+                LastRequest = request;
+                return Task.FromResult(Snapshot);
+            }
+
+            public void PublishSnapshotChanged()
+            {
+                _snapshotChanged?.Invoke(
+                    this,
+                    new FolderTreeSnapshotChangedEventArgs(
+                        Snapshot,
+                        FolderTreeRefreshReason.ManualRefresh,
+                        new[] { "store" }
+                    )
+                );
+            }
+
+            public void MarkStale(string storeId, FolderTreeRefreshReason reason) { }
+
+            public void Dispose()
+            {
+                _snapshotChanged = null;
+                SnapshotChangedSubscriberCount = 0;
+            }
+        }
+
+        private sealed class FakeFilterViewer : IFilterOlFoldersViewer
+        {
+            public event FormClosedEventHandler FormClosed;
+
+            public TreeListView TlvNotFiltered { get; } = new();
+
+            public TreeListView TlvFiltered { get; } = new();
+
+            public bool InvokeRequired { get; set; }
+
+            public int CloseCount { get; private set; }
+
+            public int InvokeCount { get; private set; }
+
+            public FilterOlFoldersController Controller { get; private set; }
+
+            public void SetController(FilterOlFoldersController controller)
+            {
+                Controller = controller;
+            }
+
+            public void Show() { }
+
+            public void Close()
+            {
+                CloseCount++;
+                FormClosed?.Invoke(this, new FormClosedEventArgs(CloseReason.UserClosing));
+            }
+
+            public object Invoke(Delegate method)
+            {
+                InvokeCount++;
+                return method.DynamicInvoke();
+            }
+
+            public void Dispose()
+            {
+                TlvNotFiltered.Dispose();
+                TlvFiltered.Dispose();
+            }
         }
     }
 }

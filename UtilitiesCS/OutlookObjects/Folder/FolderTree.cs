@@ -23,6 +23,16 @@ namespace UtilitiesCS
 
         public FolderTree() { }
 
+        internal static FolderTree FromRoots(IEnumerable<TreeNode<FolderWrapper>> roots)
+        {
+            var tree = new FolderTree
+            {
+                _roots = (roots ?? Enumerable.Empty<TreeNode<FolderWrapper>>()).ToList(),
+            };
+            tree.WireNotifications();
+            return tree;
+        }
+
         public FolderTree(IEnumerable<MAPIFolder> olRoots)
         {
             _roots = olRoots.Select(RootFromFolder).ToList();

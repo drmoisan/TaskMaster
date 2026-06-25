@@ -141,6 +141,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             public string InboxPath => string.Empty;
             public string ArchiveRootPath => string.Empty;
             public OutlookFolder ArchiveRoot => null!;
+            public IOutlookFolderTreeService FolderTreeService => null!;
             public string UserEmailAddress => string.Empty;
             public string EmailPrefixToStrip => string.Empty;
             public OutlookFolder Inbox => null!;

@@ -4,15 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence.SubjectMap;
+using UtilitiesCS.OutlookObjects.Folder;
 using UtilitiesCS.ReusableTypeClasses;
-using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
-using OutlookFolders = Microsoft.Office.Interop.Outlook.Folders;
 using OutlookItems = Microsoft.Office.Interop.Outlook.Items;
 using OutlookMailItem = Microsoft.Office.Interop.Outlook.MailItem;
 
@@ -21,77 +20,98 @@ namespace UtilitiesCS.Test.EmailIntelligence
     [TestClass]
     public class SubjectMapSco_Orchestration_Tests
     {
-        private static SubjectMapSco BuildEmptyMap() =>
-            new SubjectMapSco(new SerializableList<string>());
-
-        private static Mock<OutlookItems> CreateOutlookItems(int count, params object[] items)
-        {
-            var outlookItems = new Mock<OutlookItems>(MockBehavior.Strict);
-            var collection = new ArrayList(items ?? Array.Empty<object>());
-            outlookItems.SetupGet(x => x.Count).Returns(count);
-            outlookItems.Setup(x => x.GetEnumerator()).Returns(() => collection.GetEnumerator());
-            return outlookItems;
-        }
-
-        private static Mock<OutlookFolder> CreateFolder(
-            string folderPath,
-            int itemCount = 0,
-            object[] items = null,
-            params OutlookFolder[] children
-        )
-        {
-            var folder = new Mock<OutlookFolder>(MockBehavior.Strict);
-            folder.SetupGet(x => x.Name).Returns(GetLeafName(folderPath));
-            folder.SetupGet(x => x.FolderPath).Returns(folderPath);
-            folder.SetupGet(x => x.Folders).Returns(CreateFoldersCollection(children).Object);
-            folder
-                .SetupGet(x => x.Items)
-                .Returns(CreateOutlookItems(itemCount, items ?? []).Object);
-            return folder;
-        }
-
-        private static Mock<OutlookFolders> CreateFoldersCollection(params OutlookFolder[] children)
-        {
-            var folders = new Mock<OutlookFolders>(MockBehavior.Strict);
-            var enumerableChildren = children ?? [];
-            var collection = new ArrayList(enumerableChildren);
-            folders.SetupGet(x => x.Count).Returns(enumerableChildren.Length);
-            folders.Setup(x => x.GetEnumerator()).Returns(() => collection.GetEnumerator());
-            return folders;
-        }
-
-        private static string GetLeafName(string folderPath) =>
-            folderPath.Split(['\\'], StringSplitOptions.RemoveEmptyEntries)[^1];
-
         [TestMethod]
-        public void QueryOlFolders_WhenSelectedRelativePathIsConfigured_ExcludesSelectedNode()
+        public void QueryOlFolders_WithFakeSnapshot_ExcludesFilteredPathAndUsesResolver()
         {
-            var inbox = CreateFolder(@"\\Archive\Inbox");
-            var sent = CreateFolder(@"\\Archive\Sent");
-            var root = CreateFolder(@"\\Archive", children: [inbox.Object, sent.Object]);
-            var filteredFolderScraping = new ScoDictionary<string, int> { ["Inbox"] = 1 };
-
-            var ol = new Mock<IOlObjects>(MockBehavior.Strict);
-            ol.SetupGet(x => x.ArchiveRoot).Returns(root.Object);
-
-            var td = new Mock<IToDoObjects>(MockBehavior.Strict);
-            td.SetupGet(x => x.FilteredFolderScraping).Returns(filteredFolderScraping);
-
-            var appGlobals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
-            appGlobals.SetupGet(x => x.Ol).Returns(ol.Object);
-            appGlobals.SetupGet(x => x.TD).Returns(td.Object);
+            var inbox = CreateFolder(itemCount: 0);
+            var sent = CreateFolder(itemCount: 0);
+            var resolver = new FakeFolderHandleResolver
+            {
+                HandlesByRelativePath =
+                {
+                    ["Archive\\Inbox"] = inbox.Object,
+                    ["Archive\\Sent"] = sent.Object,
+                },
+            };
+            var map = BuildMap(CreateSnapshot(), resolver);
+            var globals = CreateGlobals(filtered: ["Archive\\Inbox"]);
 
             var folders = InvokeEnumerable(
-                BuildEmptyMap(),
+                map,
                 nameof(SubjectMapSco.QueryOlFolders),
-                appGlobals.Object
+                globals.Object
             );
 
-            folders.Select(tuple => (string)GetTupleField(tuple, "Item2")).Should().Contain("Sent");
             folders
                 .Select(tuple => (string)GetTupleField(tuple, "Item2"))
                 .Should()
-                .NotContain("Inbox");
+                .Equal("Archive\\Sent");
+            folders.Select(tuple => GetTupleField(tuple, "Item1")).Should().Contain(sent.Object);
+            folders
+                .Select(tuple => GetTupleField(tuple, "Item1"))
+                .Should()
+                .NotContain(inbox.Object);
+            resolver.TryResolveCalls.Should().Be(2);
+        }
+
+        [TestMethod]
+        public void QueryOlFolders_WhenResolverCannotResolveHandle_SkipsFolder()
+        {
+            var resolver = new FakeFolderHandleResolver();
+            var map = BuildMap(CreateSnapshot(), resolver);
+
+            var folders = InvokeEnumerable(
+                map,
+                nameof(SubjectMapSco.QueryOlFolders),
+                CreateGlobals().Object
+            );
+
+            folders.Should().BeEmpty();
+            resolver.TryResolveCalls.Should().Be(3);
+        }
+
+        [TestMethod]
+        public void GetFolderTreeSnapshot_WithArchiveRoot_UsesCachedRequestAndSubtreeFallback()
+        {
+            var archivePath = "\\Missing";
+            var archiveRoot = new Mock<Folder>(MockBehavior.Strict);
+            archiveRoot.SetupGet(x => x.StoreID).Returns("store");
+            archiveRoot.SetupGet(x => x.FolderPath).Returns(() => archivePath);
+            var snapshot = CreateSnapshot();
+            FolderTreeRequest request = null;
+            var service = new Mock<IOutlookFolderTreeService>(MockBehavior.Strict);
+            service
+                .Setup(x =>
+                    x.GetSnapshotAsync(It.IsAny<FolderTreeRequest>(), It.IsAny<CancellationToken>())
+                )
+                .Callback<FolderTreeRequest, CancellationToken>((value, _) => request = value)
+                .ReturnsAsync(snapshot);
+            var globals = CreateGlobals(service: service.Object, archiveRoot: archiveRoot.Object);
+            var map = new SubjectMapSco(new SerializableList<string>());
+
+            var fallback = (FolderTreeSnapshot)InvokeSequence(
+                map,
+                nameof(SubjectMapSco.GetFolderTreeSnapshot),
+                globals.Object
+            );
+
+            request.AllowStaleSnapshot.Should().BeTrue();
+            request.StoreIds.Should().ContainSingle().Which.Should().Be("store");
+            fallback.Should().BeSameAs(snapshot);
+
+            archivePath = "\\Archive";
+            var subtree = (FolderTreeSnapshot)InvokeSequence(
+                map,
+                nameof(SubjectMapSco.GetFolderTreeSnapshot),
+                globals.Object
+            );
+
+            subtree.Should().NotBeSameAs(snapshot);
+            subtree.RootKeys.Should().ContainSingle();
+            subtree
+                .NodesByKey.Values.Select(node => node.RelativePath)
+                .Should()
+                .BeEquivalentTo("Archive", "Archive\\Inbox", "Archive\\Sent");
         }
 
         [TestMethod]
@@ -99,40 +119,25 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             var mailA = new Mock<OutlookMailItem>(MockBehavior.Strict);
             var mailB = new Mock<OutlookMailItem>(MockBehavior.Strict);
-            var folder = CreateFolder(
-                @"\\Archive\Inbox",
-                itemCount: 3,
-                items: [mailA.Object, new object(), mailB.Object]
-            );
-            var root = CreateFolder(@"\\Archive", children: [folder.Object]);
-
-            var ol = new Mock<IOlObjects>(MockBehavior.Strict);
-            ol.SetupGet(x => x.ArchiveRoot).Returns(root.Object);
-
-            var td = new Mock<IToDoObjects>(MockBehavior.Strict);
-            td.SetupGet(x => x.FilteredFolderScraping).Returns(new ScoDictionary<string, int>());
-
-            var appGlobals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
-            appGlobals.SetupGet(x => x.Ol).Returns(ol.Object);
-            appGlobals.SetupGet(x => x.TD).Returns(td.Object);
+            var folder = CreateFolder(3, mailA.Object, new object(), mailB.Object);
+            var resolver = new FakeFolderHandleResolver
+            {
+                HandlesByRelativePath = { ["Archive\\Inbox"] = folder.Object },
+            };
+            var map = BuildMap(CreateSnapshot(includeSent: false), resolver);
 
             var folders = InvokeSequence(
-                BuildEmptyMap(),
+                map,
                 nameof(SubjectMapSco.QueryOlFolders),
-                appGlobals.Object
+                CreateGlobals().Object
             );
-
-            var tuples = InvokeEnumerable(
-                BuildEmptyMap(),
-                nameof(SubjectMapSco.QueryMailTuples),
-                folders
-            );
+            var tuples = InvokeEnumerable(map, nameof(SubjectMapSco.QueryMailTuples), folders);
 
             tuples.Should().HaveCount(2);
             tuples
                 .Select(tuple => (string)GetTupleField(tuple, "Item2"))
                 .Should()
-                .OnlyContain(path => path == "Inbox");
+                .OnlyContain(path => path == "Archive\\Inbox");
             tuples
                 .Select(tuple => GetTupleField(tuple, "Item1"))
                 .Should()
@@ -144,12 +149,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void Consume_WhenSequenceProvided_ReturnsItemsAndReportsProgress()
         {
             var tracker = new RecordingProgressTracker();
-            var sequence = Enumerable.Range(1, 3);
 
-            // Consume reports progress synchronously per consumed item (the #181 per-item hook in
-            // WithProgressReporting) plus an initial report, so at least two reports accumulate
-            // deterministically during enumeration without a wall-clock sleep or spin-wait.
-            var consumed = BuildEmptyMap().Consume(sequence, 3, tracker);
+            var consumed = BuildMap().Consume(Enumerable.Range(1, 3), 3, tracker);
 
             consumed.Should().Equal(1, 2, 3);
             tracker.Reports.Count.Should().BeGreaterThanOrEqualTo(2);
@@ -161,78 +162,55 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             var mailItem = new Mock<OutlookMailItem>(MockBehavior.Strict);
             mailItem.SetupGet(x => x.Subject).Returns("meeting");
-            var folder = CreateFolder(@"\\Archive\Inbox", itemCount: 1, items: [mailItem.Object]);
-            var root = CreateFolder(@"\\Archive", children: [folder.Object]);
-
-            var folderRemap = new ScoDictionary<string, string> { ["Inbox"] = "Archive" };
-            var td = new Mock<IToDoObjects>(MockBehavior.Strict);
-            td.SetupGet(x => x.FilteredFolderScraping).Returns(new ScoDictionary<string, int>());
-            td.SetupGet(x => x.FolderRemap).Returns(folderRemap);
-
-            var ol = new Mock<IOlObjects>(MockBehavior.Strict);
-            ol.SetupGet(x => x.ArchiveRoot).Returns(root.Object);
-
-            var appGlobals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
-            appGlobals.SetupGet(x => x.Ol).Returns(ol.Object);
-            appGlobals.SetupGet(x => x.TD).Returns(td.Object);
-
-            var tracker = new RecordingProgressTracker();
-            var map = BuildEmptyMap();
-            var folders = InvokeSequence(
-                map,
-                nameof(SubjectMapSco.QueryOlFolders),
-                appGlobals.Object
-            );
+            var folder = CreateFolder(1, mailItem.Object);
+            var globals = CreateGlobals(remap: new() { ["Archive\\Inbox"] = "Archive" });
+            var resolver = new FakeFolderHandleResolver
+            {
+                HandlesByRelativePath = { ["Archive\\Inbox"] = folder.Object },
+            };
+            var map = BuildMap(CreateSnapshot(includeSent: false), resolver);
+            var folders = InvokeSequence(map, nameof(SubjectMapSco.QueryOlFolders), globals.Object);
             var mailTuples = InvokeSequence(map, nameof(SubjectMapSco.QueryMailTuples), folders);
 
             InvokeVoid(
                 map,
                 nameof(SubjectMapSco.RebuildEntries),
-                appGlobals.Object,
+                globals.Object,
                 mailTuples,
                 1,
-                tracker
+                new RecordingProgressTracker()
             );
 
             map.Find("meeting", "Archive").Should().NotBeNull();
-            map.Find("meeting", "Inbox").Should().BeNull();
-            tracker.Reports.Should().Contain(report => report.Value == 100);
+            map.Find("meeting", "Archive\\Inbox").Should().BeNull();
         }
 
         [TestMethod]
         public void RepopulateSubjectMapEntries_WhenMailSequenceProvided_RebuildsAndEncodesMap()
         {
-            var mailA = new Mock<OutlookMailItem>(MockBehavior.Strict);
-            var mailB = new Mock<OutlookMailItem>(MockBehavior.Strict);
-            mailA.SetupGet(x => x.Subject).Returns("meeting");
-            mailB.SetupGet(x => x.Subject).Returns("status");
-            var folderA = CreateFolder(@"\\Archive\Inbox", itemCount: 1, items: [mailA.Object]);
-            var folderB = CreateFolder(@"\\Archive\Sent", itemCount: 1, items: [mailB.Object]);
-            var root = CreateFolder(@"\\Archive", children: [folderA.Object, folderB.Object]);
-
-            var folderRemap = new ScoDictionary<string, string> { ["Inbox"] = "Archive" };
-            var td = new Mock<IToDoObjects>(MockBehavior.Strict);
-            td.SetupGet(x => x.FilteredFolderScraping).Returns(new ScoDictionary<string, int>());
-            td.SetupGet(x => x.FolderRemap).Returns(folderRemap);
-
+            var mailA = CreateMail("meeting");
+            var mailB = CreateMail("status");
+            var inbox = CreateFolder(1, mailA.Object);
+            var sent = CreateFolder(1, mailB.Object);
+            var resolver = new FakeFolderHandleResolver
+            {
+                HandlesByRelativePath =
+                {
+                    ["Archive\\Inbox"] = inbox.Object,
+                    ["Archive\\Sent"] = sent.Object,
+                },
+            };
+            var map = BuildMap(CreateSnapshot(), resolver);
             var encoder = new Mock<ISubjectMapEncoder>(MockBehavior.Strict);
-            var map = BuildEmptyMap();
             encoder.Setup(x => x.RebuildEncoding(map));
-
-            var af = new Mock<IAppAutoFileObjects>(MockBehavior.Strict);
-            af.SetupGet(x => x.Encoder).Returns(encoder.Object);
-
-            var ol = new Mock<IOlObjects>(MockBehavior.Strict);
-            ol.SetupGet(x => x.ArchiveRoot).Returns(root.Object);
-
-            var appGlobals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
-            appGlobals.SetupGet(x => x.Ol).Returns(ol.Object);
-            appGlobals.SetupGet(x => x.TD).Returns(td.Object);
-            appGlobals.SetupGet(x => x.AF).Returns(af.Object);
+            var globals = CreateGlobals(
+                remap: new() { ["Archive\\Inbox"] = "Archive" },
+                encoder: encoder.Object
+            );
             var folderTuples = InvokeSequence(
                 map,
                 nameof(SubjectMapSco.QueryOlFolders),
-                appGlobals.Object
+                globals.Object
             );
             var mailTuples = InvokeSequence(
                 map,
@@ -244,7 +222,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             InvokeVoid(
                 map,
                 nameof(SubjectMapSco.RepopulateSubjectMapEntries),
-                appGlobals.Object,
+                globals.Object,
                 new RecordingProgressTracker(),
                 folderTuples,
                 mailTuples
@@ -252,58 +230,18 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             map.Find("stale", "Old").Should().BeNull();
             map.Find("meeting", "Archive").Should().NotBeNull();
-            map.Find("status", "Sent").Should().NotBeNull();
-            encoder.Verify(x => x.RebuildEncoding(map), Times.Once);
-        }
-
-        [TestMethod]
-        public void RebuildAsync_CallbackBody_WhenArchiveContainsMailItems_PopulatesMap()
-        {
-            var mailA = new Mock<OutlookMailItem>(MockBehavior.Strict);
-            var mailB = new Mock<OutlookMailItem>(MockBehavior.Strict);
-            mailA.SetupGet(x => x.Subject).Returns("meeting");
-            mailB.SetupGet(x => x.Subject).Returns("status");
-
-            var folderA = CreateFolder(@"\\Archive\Inbox", itemCount: 1, items: [mailA.Object]);
-            var folderB = CreateFolder(@"\\Archive\Sent", itemCount: 1, items: [mailB.Object]);
-            var root = CreateFolder(@"\\Archive", children: [folderA.Object, folderB.Object]);
-
-            var folderRemap = new ScoDictionary<string, string> { ["Inbox"] = "Archive" };
-            var td = new Mock<IToDoObjects>(MockBehavior.Strict);
-            td.SetupGet(x => x.FilteredFolderScraping).Returns(new ScoDictionary<string, int>());
-            td.SetupGet(x => x.FolderRemap).Returns(folderRemap);
-
-            var encoder = new Mock<ISubjectMapEncoder>(MockBehavior.Strict);
-            var map = BuildEmptyMap();
-            encoder.Setup(x => x.RebuildEncoding(map));
-
-            var af = new Mock<IAppAutoFileObjects>(MockBehavior.Strict);
-            af.SetupGet(x => x.Encoder).Returns(encoder.Object);
-
-            var ol = new Mock<IOlObjects>(MockBehavior.Strict);
-            ol.SetupGet(x => x.ArchiveRoot).Returns(root.Object);
-
-            var appGlobals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
-            appGlobals.SetupGet(x => x.Ol).Returns(ol.Object);
-            appGlobals.SetupGet(x => x.TD).Returns(td.Object);
-            appGlobals.SetupGet(x => x.AF).Returns(af.Object);
-
-            CreateRebuildAsyncCallback(map, appGlobals.Object).Invoke();
-
-            map.Find("meeting", "Archive").Should().NotBeNull();
-            map.Find("status", "Sent").Should().NotBeNull();
+            map.Find("status", "Archive\\Sent").Should().NotBeNull();
             encoder.Verify(x => x.RebuildEncoding(map), Times.Once);
         }
 
         [TestMethod]
         public void ShowSummaryMetrics_WhenEntriesExist_PopulatesSummaryMetricsAndShowsViewer()
         {
-            var map = BuildEmptyMap();
+            var map = BuildMap();
             map.Add("meeting", "Inbox");
             map.Add("status", "Inbox");
             map.Add("receipt", "Sent");
 
-            // Use the internal overload so no real WinForms window is opened.
             map.ShowSummaryMetrics(_ => { });
 
             map.summaryMetrics.Should().HaveCount(2);
@@ -321,51 +259,133 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 );
         }
 
-        private static System.Action CreateRebuildAsyncCallback(
-            SubjectMapSco map,
-            IApplicationGlobals appGlobals
+        private static TestSubjectMapSco BuildMap(
+            FolderTreeSnapshot snapshot = null,
+            IFolderHandleResolver resolver = null
         )
         {
-            var displayClassType = typeof(SubjectMapSco)
-                .GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Instance)
-                .Single(type =>
-                    type.GetMethod(
-                        "<RebuildAsync>b__0",
-                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
-                    ) != null
-                    && type.GetField(
-                        "appGlobals",
-                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
-                    ) != null
-                );
-            var closure = Activator.CreateInstance(displayClassType);
+            return new(snapshot ?? CreateSnapshot(), resolver ?? new FakeFolderHandleResolver());
+        }
 
-            displayClassType
-                .GetField(
-                    "progress",
-                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
-                )
-                .SetValue(closure, new RecordingProgressTracker());
-            displayClassType
-                .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                .Single(field => field.Name.EndsWith("__this"))
-                .SetValue(closure, map);
-            displayClassType
-                .GetField(
-                    "appGlobals",
-                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
-                )
-                .SetValue(closure, appGlobals);
+        private static Mock<IApplicationGlobals> CreateGlobals(
+            IEnumerable<string> filtered = null,
+            ScoDictionary<string, string> remap = null,
+            ISubjectMapEncoder encoder = null,
+            IOutlookFolderTreeService service = null,
+            Folder archiveRoot = null
+        )
+        {
+            var td = new Mock<IToDoObjects>(MockBehavior.Strict);
+            var filteredFolders = new ScoDictionary<string, int>();
+            foreach (var path in filtered ?? [])
+            {
+                filteredFolders.TryAdd(path, 1);
+            }
+            td.SetupGet(x => x.FilteredFolderScraping).Returns(filteredFolders);
+            td.SetupGet(x => x.FolderRemap).Returns(remap ?? new ScoDictionary<string, string>());
 
-            return (System.Action)
-                Delegate.CreateDelegate(
-                    typeof(System.Action),
-                    closure,
-                    displayClassType.GetMethod(
-                        "<RebuildAsync>b__0",
-                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
-                    )
-                );
+            var globals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
+            globals.SetupGet(x => x.TD).Returns(td.Object);
+            if (service != null || archiveRoot != null)
+            {
+                var ol = new Mock<IOlObjects>(MockBehavior.Strict);
+                ol.SetupGet(x => x.FolderTreeService).Returns(service);
+                ol.SetupGet(x => x.ArchiveRoot).Returns(archiveRoot);
+                globals.SetupGet(x => x.Ol).Returns(ol.Object);
+            }
+            if (encoder != null)
+            {
+                var af = new Mock<IAppAutoFileObjects>(MockBehavior.Strict);
+                af.SetupGet(x => x.Encoder).Returns(encoder);
+                globals.SetupGet(x => x.AF).Returns(af.Object);
+            }
+
+            return globals;
+        }
+
+        private static Mock<MAPIFolder> CreateFolder(int itemCount, params object[] items)
+        {
+            var folder = new Mock<MAPIFolder>(MockBehavior.Strict);
+            folder.SetupGet(x => x.Items).Returns(CreateOutlookItems(itemCount, items).Object);
+            return folder;
+        }
+
+        private static Mock<OutlookItems> CreateOutlookItems(int count, params object[] items)
+        {
+            var outlookItems = new Mock<OutlookItems>(MockBehavior.Strict);
+            var collection = new ArrayList(items ?? Array.Empty<object>());
+            outlookItems.SetupGet(x => x.Count).Returns(count);
+            outlookItems.Setup(x => x.GetEnumerator()).Returns(() => collection.GetEnumerator());
+            return outlookItems;
+        }
+
+        private static Mock<OutlookMailItem> CreateMail(string subject)
+        {
+            var mail = new Mock<OutlookMailItem>(MockBehavior.Strict);
+            mail.SetupGet(x => x.Subject).Returns(subject);
+            return mail;
+        }
+
+        private static FolderTreeSnapshot CreateSnapshot(bool includeSent = true)
+        {
+            var rootKey = new FolderTreeNodeKey("store", "archive", "\\Archive");
+            var inboxKey = new FolderTreeNodeKey("store", "inbox", "\\Archive\\Inbox");
+            var sentKey = new FolderTreeNodeKey("store", "sent", "\\Archive\\Sent");
+            var childKeys = includeSent ? new[] { inboxKey, sentKey } : new[] { inboxKey };
+            var nodes = new List<FolderTreeSnapshotNode>
+            {
+                CreateNode(rootKey, "Archive", null, "Archive", childKeys),
+                CreateNode(inboxKey, "Inbox", rootKey, "Archive\\Inbox"),
+            };
+            if (includeSent)
+            {
+                nodes.Add(CreateNode(sentKey, "Sent", rootKey, "Archive\\Sent"));
+            }
+
+            return new(new[] { rootKey }, nodes);
+        }
+
+        private static FolderTreeSnapshotNode CreateNode(
+            FolderTreeNodeKey key,
+            string name,
+            FolderTreeNodeKey parent,
+            string relativePath,
+            params FolderTreeNodeKey[] children
+        )
+        {
+            return new(
+                key,
+                name,
+                key.StoreId,
+                key.EntryId,
+                parent,
+                key.FolderPath,
+                relativePath,
+                children,
+                false,
+                string.Empty
+            );
+        }
+
+        private sealed class TestSubjectMapSco : SubjectMapSco
+        {
+            private readonly FolderTreeSnapshot _snapshot;
+            private readonly IFolderHandleResolver _resolver;
+
+            public TestSubjectMapSco(FolderTreeSnapshot snapshot, IFolderHandleResolver resolver)
+                : base(new SerializableList<string>())
+            {
+                _snapshot = snapshot;
+                _resolver = resolver;
+            }
+
+            internal override FolderTreeSnapshot GetFolderTreeSnapshot(
+                IApplicationGlobals appGlobals
+            ) => _snapshot;
+
+            internal override IFolderHandleResolver CreateFolderHandleResolver(
+                IApplicationGlobals appGlobals
+            ) => _resolver;
         }
 
         private static object InvokeSequence(
@@ -414,6 +434,25 @@ namespace UtilitiesCS.Test.EmailIntelligence
             }
 
             throw new InvalidOperationException($"No overload found for {methodName}.");
+        }
+
+        private sealed class FakeFolderHandleResolver : IFolderHandleResolver
+        {
+            public Dictionary<string, object> HandlesByRelativePath { get; } =
+                new(StringComparer.OrdinalIgnoreCase);
+
+            public int TryResolveCalls { get; private set; }
+
+            public object Resolve(FolderTreeSnapshotNode node)
+            {
+                return HandlesByRelativePath[node.RelativePath];
+            }
+
+            public bool TryResolve(FolderTreeSnapshotNode node, out object folder)
+            {
+                TryResolveCalls++;
+                return HandlesByRelativePath.TryGetValue(node.RelativePath, out folder);
+            }
         }
 
         private sealed class RecordingProgressTracker : ProgressTracker

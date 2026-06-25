@@ -10,13 +10,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
+using UtilitiesCS.OutlookObjects.Folder;
 using UtilitiesCS.OutlookObjects.Store;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Windows_Forms;
 
 namespace TaskMaster
 {
-    public partial class AppOlObjects : IOlObjects
+    public partial class AppOlObjects : IOlObjects, IDisposable
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -94,6 +95,30 @@ namespace TaskMaster
 
         private Lazy<IEnumerable<Folder>> _inboxes;
         public IEnumerable<Folder> Inboxes => _inboxes.Value;
+
+        private IOutlookFolderTreeService _folderTreeService;
+        public IOutlookFolderTreeService FolderTreeService =>
+            Initializer.GetOrLoad(ref _folderTreeService, LoadFolderTreeService);
+
+        protected internal virtual IOutlookFolderTreeService LoadFolderTreeService()
+        {
+            var reader = new OutlookFolderHierarchyReader(NamespaceMAPI, StoresWrapper);
+            var builder = new FolderTreeSnapshotBuilder(
+                reader,
+                new DeadlineClock(TimeSpan.FromMilliseconds(15)),
+                new WpfDispatcherYield()
+            );
+            return new OutlookFolderTreeService(
+                builder,
+                new OutlookFolderNotificationSink(NamespaceMAPI)
+            );
+        }
+
+        public void Dispose()
+        {
+            _folderTreeService?.Dispose();
+            _folderTreeService = null;
+        }
 
         internal IEnumerable<Folder> LoadInboxes()
         {

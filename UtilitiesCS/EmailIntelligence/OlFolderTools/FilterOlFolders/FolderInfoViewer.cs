@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using UtilitiesCS.OutlookObjects.Folder;
 using UtilitiesCS.Properties;
 
 namespace UtilitiesCS.EmailIntelligence.OlFolderTools.FilterOlFolders
@@ -24,6 +25,7 @@ namespace UtilitiesCS.EmailIntelligence.OlFolderTools.FilterOlFolders
         }
 
         internal FolderTree FolderTree { get; set; }
+        private FolderTreeCompatibilityView _folderTreeView;
 
         public void SetFolderTree(FolderTree folderTree)
         {
@@ -40,6 +42,25 @@ namespace UtilitiesCS.EmailIntelligence.OlFolderTools.FilterOlFolders
             Tlv.ChildrenGetter = x => ((TreeNode<FolderWrapper>)x).Children;
             Tlv.ParentGetter = x => ((TreeNode<FolderWrapper>)x).Parent;
             Tlv.Roots = FolderTree.Roots;
+        }
+
+        public void SetFolderTreeView(FolderTreeCompatibilityView folderTreeView)
+        {
+            _folderTreeView?.Dispose();
+            _folderTreeView =
+                folderTreeView ?? throw new ArgumentNullException(nameof(folderTreeView));
+            Tlv.CanExpandGetter = x => ((TreeNode<FolderWrapper>)x).Children.Count > 0;
+            Tlv.ChildrenGetter = x => ((TreeNode<FolderWrapper>)x).Children;
+            Tlv.ParentGetter = x => ((TreeNode<FolderWrapper>)x).Parent;
+            Tlv.Roots = _folderTreeView.Roots;
+            FormClosed += FolderInfoViewer_FormClosed;
+        }
+
+        private void FolderInfoViewer_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            _folderTreeView?.Dispose();
+            _folderTreeView = null;
+            FormClosed -= FolderInfoViewer_FormClosed;
         }
     }
 }

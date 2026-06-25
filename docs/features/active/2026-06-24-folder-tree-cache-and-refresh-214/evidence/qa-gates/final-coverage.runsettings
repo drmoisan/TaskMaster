@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="Code Coverage">
+        <Configuration>
+          <IncludeTestAssembly>False</IncludeTestAssembly>
+          <CodeCoverage>
+            <ModulePaths>
+              <Include>
+                <ModulePath>.*\\TaskMaster\.dll$</ModulePath>
+                <ModulePath>.*\\UtilitiesCS\.dll$</ModulePath>
+                <ModulePath>.*\\QuickFiler\.dll$</ModulePath>
+                <ModulePath>.*\\ToDoModel\.dll$</ModulePath>
+                <ModulePath>.*\\TaskTree\.dll$</ModulePath>
+                <ModulePath>.*\\TaskVisualization\.dll$</ModulePath>
+                <ModulePath>.*\\Tags\.dll$</ModulePath>
+                <ModulePath>.*\\VBFunctions\.dll$</ModulePath>
+                <ModulePath>.*\\Swordfish\.NET\.General\.dll$</ModulePath>
+              </Include>
+              <Exclude>
+                <ModulePath>.*\.Test\.dll$</ModulePath>
+                <ModulePath>.*\\Deedle\.dll$</ModulePath>
+                <ModulePath>.*\\FSharp\.Core\.dll$</ModulePath>
+              </Exclude>
+            </ModulePaths>
+            <Attributes>
+              <Exclude>
+                <Attribute>^System\.Diagnostics\.CodeAnalysis\.ExcludeFromCodeCoverageAttribute$</Attribute>
+                <Attribute>^System\.CodeDom\.Compiler\.GeneratedCodeAttribute$</Attribute>
+              </Exclude>
+            </Attributes>
+          </CodeCoverage>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

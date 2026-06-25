@@ -15,6 +15,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
+using UtilitiesCS.OutlookObjects.Folder;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
 using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
@@ -77,6 +78,13 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var mockRoot = CreateOutlookFolder("Archive", 0);
             var mockOl = new Mock<IOlObjects>();
             mockOl.SetupGet(x => x.ArchiveRoot).Returns(mockRoot.Object);
+            var folderTreeService = new Mock<IOutlookFolderTreeService>(MockBehavior.Strict);
+            folderTreeService
+                .Setup(x =>
+                    x.GetSnapshotAsync(It.IsAny<FolderTreeRequest>(), It.IsAny<CancellationToken>())
+                )
+                .ReturnsAsync(CreateFolderSnapshot("Inbox", "Projects"));
+            mockOl.SetupGet(x => x.FolderTreeService).Returns(folderTreeService.Object);
             mockGlobals.SetupGet(x => x.Ol).Returns(mockOl.Object);
 
             var mockTd = new Mock<IToDoObjects>();
@@ -192,6 +200,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var folder = new Mock<OutlookFolder>(MockBehavior.Strict);
             folder.SetupGet(x => x.Name).Returns(GetLeafName(folderPath));
             folder.SetupGet(x => x.FolderPath).Returns(folderPath);
+            folder.SetupGet(x => x.StoreID).Returns("store-id");
             folder.SetupGet(x => x.Folders).Returns(CreateFoldersCollection(children).Object);
             folder.SetupGet(x => x.Items).Returns(CreateItems(itemCount).Object);
             return folder;
@@ -218,6 +227,29 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
         private static string GetLeafName(string folderPath) =>
             folderPath.Split('\\').Last(segment => !string.IsNullOrWhiteSpace(segment));
+
+        private static FolderTreeSnapshot CreateFolderSnapshot(params string[] relativePaths)
+        {
+            var nodes = relativePaths.Select(CreateSnapshotNode).ToArray();
+            return new FolderTreeSnapshot(nodes.Select(node => node.Key), nodes);
+        }
+
+        private static FolderTreeSnapshotNode CreateSnapshotNode(string relativePath)
+        {
+            var key = new FolderTreeNodeKey("store-id", relativePath, relativePath);
+            return new FolderTreeSnapshotNode(
+                key,
+                GetLeafName(relativePath),
+                "store-id",
+                relativePath,
+                null,
+                relativePath,
+                relativePath,
+                Array.Empty<FolderTreeNodeKey>(),
+                false,
+                string.Empty
+            );
+        }
 
         private sealed class TrackingOlFolderClassifierGroup(
             IApplicationGlobals globals,

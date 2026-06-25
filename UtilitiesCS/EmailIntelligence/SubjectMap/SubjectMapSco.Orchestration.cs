@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.EmailIntelligence.SubjectMap;
 using UtilitiesCS.Extensions;
+using UtilitiesCS.OutlookObjects.Folder;
 
 namespace UtilitiesCS
 {
@@ -18,14 +19,53 @@ namespace UtilitiesCS
             IApplicationGlobals appGlobals
         )
         {
-            var tree = new FolderTree(
-                appGlobals.Ol.ArchiveRoot,
-                appGlobals.TD.FilteredFolderScraping.Keys.ToList()
+            var snapshot = GetFolderTreeSnapshot(appGlobals);
+            var excluded = new HashSet<string>(
+                appGlobals.TD.FilteredFolderScraping.Keys ?? Enumerable.Empty<string>(),
+                StringComparer.OrdinalIgnoreCase
             );
-            var folders = tree
-                .Roots.SelectMany(root => root.FlattenIf(node => !node.Selected))
-                .Select(x => (x.OlFolder, x.RelativePath));
-            return folders;
+            var resolver = CreateFolderHandleResolver(appGlobals);
+            return snapshot
+                .NodesByKey.Values.Where(node => !excluded.Contains(node.RelativePath))
+                .Select(node => (Node: node, Folder: ResolveFolder(resolver, node)))
+                .Where(tuple => tuple.Folder != null)
+                .Select(tuple => (tuple.Folder, tuple.Node.RelativePath));
+        }
+
+        internal virtual FolderTreeSnapshot GetFolderTreeSnapshot(IApplicationGlobals appGlobals)
+        {
+            var archiveRoot = appGlobals.Ol.ArchiveRoot;
+            var request = string.IsNullOrWhiteSpace(archiveRoot?.StoreID)
+                ? FolderTreeRequest.AllStores(allowStaleSnapshot: true)
+                : FolderTreeRequest.ForStore(archiveRoot.StoreID, allowStaleSnapshot: true);
+            var snapshot = appGlobals
+                .Ol.FolderTreeService.GetSnapshotAsync(request, CancellationToken.None)
+                .GetAwaiter()
+                .GetResult();
+            var archiveNode = archiveRoot is null
+                ? null
+                : snapshot.FindByPath(archiveRoot.StoreID, archiveRoot.FolderPath);
+            return archiveNode is null
+                ? snapshot
+                : FolderTreeSnapshotQueries.CreateSubtreeSnapshot(snapshot, archiveNode);
+        }
+
+        [ExcludeFromCodeCoverage]
+        internal virtual IFolderHandleResolver CreateFolderHandleResolver(
+            IApplicationGlobals appGlobals
+        )
+        {
+            return new OutlookFolderHandleResolver(appGlobals.Ol.NamespaceMAPI);
+        }
+
+        private static MAPIFolder ResolveFolder(
+            IFolderHandleResolver resolver,
+            FolderTreeSnapshotNode node
+        )
+        {
+            return resolver.TryResolve(node, out var folder) && folder is MAPIFolder mapiFolder
+                ? mapiFolder
+                : null;
         }
 
         internal IEnumerable<(MailItem Item, string RelativePath)> QueryMailTuples(
@@ -86,6 +126,7 @@ namespace UtilitiesCS
             return list;
         }
 
+        [ExcludeFromCodeCoverage]
         public void ShowSummaryMetrics()
         {
             ShowSummaryMetrics(metrics =>
@@ -188,28 +229,35 @@ namespace UtilitiesCS
             var progress = new ProgressTracker(tokenSource).Initialize();
 
             await Task.Factory.StartNew(
-                () =>
-                {
-                    var stopwatch = new Stopwatch();
-                    stopwatch.Start();
-
-                    progress.Report(0, "Building Outlook Folder Tree");
-                    var folders = QueryOlFolders(appGlobals);
-                    progress.Increment(2);
-
-                    var timeFolders = stopwatch.ElapsedMilliseconds;
-
-                    var mailItems = QueryMailTuples(folders);
-                    var timeItems = stopwatch.ElapsedMilliseconds - timeFolders;
-
-                    RepopulateSubjectMapEntries(appGlobals, progress, folders, mailItems);
-                },
+                RebuildCore,
+                Tuple.Create(appGlobals, progress),
                 token,
                 TaskCreationOptions.LongRunning,
                 TaskScheduler.Default
             );
 
             progress.Report(100);
+        }
+
+        [ExcludeFromCodeCoverage]
+        private void RebuildCore(object state)
+        {
+            var rebuildState = (Tuple<IApplicationGlobals, ProgressTracker>)state;
+            var appGlobals = rebuildState.Item1;
+            var progress = rebuildState.Item2;
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            progress.Report(0, "Building Outlook Folder Tree");
+            var folders = QueryOlFolders(appGlobals);
+            progress.Increment(2);
+
+            var timeFolders = stopwatch.ElapsedMilliseconds;
+
+            var mailItems = QueryMailTuples(folders);
+            var timeItems = stopwatch.ElapsedMilliseconds - timeFolders;
+
+            RepopulateSubjectMapEntries(appGlobals, progress, folders, mailItems);
         }
 
         internal List<SummaryMetric> summaryMetrics;
