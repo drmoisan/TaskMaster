@@ -266,6 +266,7 @@
     <Compile Include="AppGlobals\PhaseNetProbeTests.cs" />
     <Compile Include="AppGlobals\EngineInitTimingProbeTests.cs" />
     <Compile Include="AppGlobals\StartupDiagnosticsProbeTests.cs" />
+    <Compile Include="AppGlobals\StartupInboxAttributionProbeTests.cs" />
     <Compile Include="AppGlobals\StartupTimingRecorderTests.cs" />
     <Compile Include="AppGlobals\HookReadinessCoordinatorTests.cs" />
     <Compile Include="AppGlobals\NonBlockingDelayTests.cs" />

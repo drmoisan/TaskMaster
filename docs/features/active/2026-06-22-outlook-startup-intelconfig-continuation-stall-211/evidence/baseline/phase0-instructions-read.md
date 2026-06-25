@@ -1,16 +1,16 @@
-# Phase 0 — Instructions Read Evidence
+# Phase 0 — Instructions Read (Issue #211 PostLoad/LoadInboxes attribution probe)
 
-Timestamp: 2026-06-23T14-30
+Timestamp: 2026-06-24T18-30
 
 Policy Order:
-1. CLAUDE.md (standing instructions)
+1. CLAUDE.md (standing instructions; always loaded)
 2. .claude/rules/general-code-change.md (cross-language code change policy)
 3. .claude/rules/general-unit-test.md (cross-language unit test policy)
-4. .claude/rules/csharp.md (C#-specific standards)
-5. .claude/skills/atomic-plan-contract/SKILL.md (atomic plan contract)
-6. .claude/skills/evidence-and-timestamp-conventions/SKILL.md (evidence locations)
+4. .claude/rules/csharp.md (C#-specific code + unit test standards)
+5. .claude/skills/atomic-plan-contract/SKILL.md (atomic plan format, Phase 0, final QA loop)
+6. .claude/skills/evidence-and-timestamp-conventions/SKILL.md (ISO-8601 timestamps, canonical evidence locations)
 
-Files read (explicit list):
+Files Read (explicit list, in order):
 - CLAUDE.md
 - .claude/rules/general-code-change.md
 - .claude/rules/general-unit-test.md
@@ -19,4 +19,8 @@ Files read (explicit list):
 - .claude/skills/evidence-and-timestamp-conventions/SKILL.md
 
 Notes:
-- All six files were loaded into session context (CLAUDE.md and the four `.claude/rules/*.md` files are auto-loaded; the two SKILL.md files were provided in the session prompt). Applied in the order above.
+- Work Mode: full-bug. Diagnosis-only, behavior-preserving instrumentation. No behavior fix.
+- C# toolchain order (mandatory): CSharpier -> .NET analyzers -> nullable/TreatWarningsAsErrors -> MSTest with coverage (`/TestCaseFilter:"TestCategory!=LiveOutlook"`). Restart from CSharpier on any change.
+- Banned timing APIs: DateTime.Now, DateTime.UtcNow, Random.Shared, Thread.Sleep, Task.Delay. Stopwatch only. Target net48.
+- All touched files (production and test) must remain <= 500 lines.
+- Evidence under canonical `docs/features/active/2026-06-22-outlook-startup-intelconfig-continuation-stall-211/evidence/<kind>/`.

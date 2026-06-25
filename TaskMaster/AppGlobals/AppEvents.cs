@@ -21,7 +21,7 @@ using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 
 namespace TaskMaster
 {
-    public class AppEvents : IAppEvents
+    public partial class AppEvents : IAppEvents
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -216,19 +216,39 @@ namespace TaskMaster
         {
             var hookStopwatch = Stopwatch.StartNew();
 
+            // Issue #211 diagnosis-only probe: emit a START/END marker (F2 ms) for each of the three
+            // readiness COM operations. The last START with no matching END before the PostLoad
+            // freeze names the blocking operation. Pure formatting lives in the coverable helper.
+            var attributionProbe = new StartupInboxAttributionProbe(s => logger.Debug(s));
+
+            attributionProbe.EmitReadinessHookupStart("ToDoFolder.Items");
             var toDoItemsStopwatch = Stopwatch.StartNew();
             OlToDoItems = Globals.Ol.ToDoFolder.Items;
             toDoItemsStopwatch.Stop();
+            attributionProbe.EmitReadinessHookupEnd(
+                "ToDoFolder.Items",
+                toDoItemsStopwatch.Elapsed.TotalMilliseconds
+            );
 
+            attributionProbe.EmitReadinessHookupStart("OlReminders");
             var remindersStopwatch = Stopwatch.StartNew();
             OlReminders = Globals.Ol.OlReminders;
             remindersStopwatch.Stop();
+            attributionProbe.EmitReadinessHookupEnd(
+                "OlReminders",
+                remindersStopwatch.Elapsed.TotalMilliseconds
+            );
 
+            attributionProbe.EmitReadinessHookupStart("Inboxes");
             var inboxSubscribeStopwatch = Stopwatch.StartNew();
             Globals.Ol.Inboxes.ForEach(x =>
                 OlInboxes.AddLast(x.Items, items => items.ItemAdd += OlInboxItems_ItemAdd)
             );
             inboxSubscribeStopwatch.Stop();
+            attributionProbe.EmitReadinessHookupEnd(
+                "Inboxes",
+                inboxSubscribeStopwatch.Elapsed.TotalMilliseconds
+            );
 
             LogStartupTiming(
                 "Hook complete | startup hook",
@@ -238,47 +258,6 @@ namespace TaskMaster
                     + $"remindersMs={remindersStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}; "
                     + $"inboxSubscribeMs={inboxSubscribeStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}"
             );
-        }
-
-        public void Unhook()
-        {
-            OlToDoItems = null;
-            OlReminders = null;
-            OlInboxes.Clear(items => items.ItemAdd -= OlInboxItems_ItemAdd);
-        }
-
-        internal async Task LogAsync(string message)
-        {
-            await Task.Run(() => logger.Debug(message));
-        }
-
-        private void OlToDoItems_ItemAdd(object item)
-        {
-            ToDoEvents.OlToDoItems_ItemAdd(item, Globals);
-        }
-
-        private async void OlToDoItems_ItemChange(object item)
-        {
-            try
-            {
-                await ToDoEvents.OlToDoItems_ItemChange(item, OlToDoItems, Globals);
-            }
-            catch (System.Exception)
-            {
-                throw;
-            }
-        }
-
-        internal async void OlInboxItems_ItemAdd(object item)
-        {
-            try
-            {
-                await ProcessMailItemAsync(item);
-            }
-            catch (System.Exception)
-            {
-                throw;
-            }
         }
 
         public async Task<bool> ProcessMailItemAsync(object item)
