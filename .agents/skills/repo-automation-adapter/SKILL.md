@@ -111,13 +111,18 @@ Required tools:
 
 Execute these lifecycle operations as one ordered chain:
 
-1. Create the potential entry.
-2. Promote with `potential_to_issue`.
-3. Capture numeric issue number from promotion output.
-4. Create or check out `${promotion-type}/${short-name}-${issue-num}`.
-5. Create the active feature folder with `new_active_feature_folder`.
+1. Verify route metadata and selected `${work-mode}` are persisted in the
+   canonical checkpoint.
+2. Create or verify pre-issue branch `${promotion-type}/${short-name}` before
+   `new_potential_entry` or `new_potential_bug_entry`.
+3. Create the potential entry with `new_potential_entry` or
+   `new_potential_bug_entry`.
+4. Promote with `potential_to_issue`.
+5. Capture numeric issue number from promotion output.
+6. Rename the branch to `${promotion-type}/${short-name}-${issue-num}`.
+7. Create the active feature folder with `new_active_feature_folder`.
 
-`new_active_feature_folder` is not an allowed bootstrap substitute for missing promotion state. If `${issue-num}` is missing, non-numeric, or placeholder text, stop. Do not synthesize GitHub issue state, active-folder scaffolding, or placeholder lifecycle variables.
+`new_active_feature_folder` is not an allowed bootstrap substitute for missing promotion state. If `${issue-num}` is missing, non-numeric, or placeholder text, stop before final branch rename or active folder creation. Do not synthesize GitHub issue state, active-folder scaffolding, or placeholder lifecycle variables.
 
 ### Customization publishing and hard-lock resolution
 

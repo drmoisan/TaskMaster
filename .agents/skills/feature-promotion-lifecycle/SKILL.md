@@ -29,7 +29,10 @@ If the required MCP tools are unavailable, stop before potential-entry creation,
 
 ## Agent-Session Promotion Execution Rule
 
-Execute the lifecycle only through the MCP tool forms listed above. The MCP path is the sole authoritative execution path for agent sessions.
+Execute MCP-backed lifecycle operations only through the MCP tool forms listed
+above. The MCP path is the sole authoritative execution path for potential
+entry creation, issue promotion, and active feature folder creation in agent
+sessions.
 
 After each successful promotion operation, persist the raw MCP receipt payload under the matching checkpoint key in `artifacts/orchestration/orchestrator-state.json`:
 - `delegation_receipts.promotion.potential_entry`
@@ -37,6 +40,11 @@ After each successful promotion operation, persist the raw MCP receipt payload u
 - `delegation_receipts.promotion.feature_folder`
 
 Each `delegation_receipts.promotion.*` field stores the raw MCP receipt payload returned by the corresponding promotion operation without lossy normalization.
+
+Branch creation and branch rename are required lifecycle sequencing evidence,
+but they are not `surface: "mcp"` lifecycle operations unless a future MCP tool
+exists for those branch operations. Record branch creation and branch rename as
+branch/checkpoint evidence in `artifacts/orchestration/orchestrator-state.json`.
 
 Note: VS Code command-palette commands may exist for interactive extension use, but this note is non-authoritative for agent sessions.
 
@@ -51,6 +59,8 @@ Note: VS Code command-palette commands may exist for interactive extension use, 
 - `${plan-path}`: single canonical plan file path reused across planning and preflight revisions
 - `${work-mode}`: `minor-audit`, `full-feature`, or `full-bug` (legacy `full` is accepted only as an alias for `full-feature`)
 - `${short-path-flag}`: `--work-mode minor-audit` (mandatory for short-path promotion/folder creation)
+- `${pre-issue-branch}`: `${promotion-type}/${short-name}`, created or verified before issue creation
+- `${final-branch}`: `${promotion-type}/${short-name}-${issue-num}`, created by branch rename after promotion returns a numeric issue number
 
 `${relativeFile}` MUST resolve to a real potential markdown path before promotion begins. If the path is missing, invalid, or non-markdown, stop. Do not infer or synthesize the missing value.
 
@@ -62,37 +72,44 @@ Lifecycle guardrails:
 - `${relativeFile}` MUST resolve to a real potential markdown path before promotion.
 - `${issue-num}` MUST be numeric after promotion and before branch or folder creation.
 - Do not infer or synthesize the missing value.
-- If `${relativeFile}` or `${issue-num}` is missing, placeholder text, or unverified, stop before branch creation, active-folder creation, or active-folder authoring.
+- If `${relativeFile}` or `${issue-num}` is missing, placeholder text, or unverified, stop before final branch rename, active-folder creation, or active-folder authoring.
 
 1) Use the same MCP tool-availability preflight described above and continue only when the required promotion tools are available.
 
-2) Promote the potential document through `mcp__drm-copilot__potential_to_issue` with `work_mode=minor-audit`.
+2) Verify route metadata readiness in `artifacts/orchestration/orchestrator-state.json`, including selected `route_id`, required route metadata, and `${work-mode}`.
 
-3) Create branch:
-- `${promotion-type}/${short-name}-${issue-num}`
+3) Create or verify the pre-issue branch:
+- `${pre-issue-branch}`
 
-4) Create the active feature folder through `mcp__drm-copilot__new_active_feature_folder` with `work_mode=minor-audit`.
+4) Create the potential entry through `mcp__drm-copilot__new_potential_entry` or `mcp__drm-copilot__new_potential_bug_entry`.
 
-4a) Verify minor-audit folder integrity before proceeding:
+5) Promote the potential document through `mcp__drm-copilot__potential_to_issue` with the selected `${work-mode}` and capture the numeric `${issue-num}`.
+
+6) Rename the branch to the final branch:
+- `${final-branch}`
+
+7) Create the active feature folder through `mcp__drm-copilot__new_active_feature_folder` with the selected `${work-mode}`.
+
+7a) Verify minor-audit folder integrity before proceeding:
 - `${feature-folder}/issue.md` exists and contains `- Work Mode: minor-audit`
 - `${feature-folder}/issue.md` contains an explicit `## Acceptance Criteria` section
 - `${feature-folder}/spec.md` does not exist
 - `${feature-folder}/user-story.md` does not exist
 - if any check fails, stop and remediate before planning
 
-5) Delegate minimal-audit plan creation to `atomic_planner` with directive:
+8) Delegate minimal-audit plan creation to `atomic_planner` with directive:
 - `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`
 
-5a) Resolve and persist `${plan-path}` before delegation:
+8a) Resolve and persist `${plan-path}` before delegation:
 - reuse the earliest existing `plan*.md` in `${feature-folder}` when present
 - otherwise create exactly one canonical plan file path and reuse it for all revisions
 
-6) Require preflight validation via `atomic_executor` until:
+9) Require preflight validation via `atomic_executor` until:
 - `PREFLIGHT: ALL CLEAR`
 
-7) Execute plan Phase 0 only via executor and checkpoint evidence.
+10) Execute plan Phase 0 only via executor and checkpoint evidence.
 
-8) Branch:
+11) Branch:
 - manual bootstrap: save state and stop ONLY when the initial user request explicitly opted into manual orchestration from the beginning,
 - non-bootstrap: continue with constrained small-path development.
 
@@ -100,7 +117,7 @@ Automation rule:
 - do not introduce manual bootstrap, human-operator validation, or any other manual handoff later in orchestration unless that initial explicit opt-in exists
 - if automation cannot proceed, record blocked automated state instead of asking for manual intervention
 
-9) Validate delivery via executor against `issue.md`, then run reduced audit/remediation loop until ready-to-merge.
+12) Validate delivery via executor against `issue.md`, then run reduced audit/remediation loop until ready-to-merge.
 
 ## Required Outputs for Downstream Handoffs
 
