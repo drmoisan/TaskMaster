@@ -265,10 +265,12 @@ namespace TaskMaster.Test.AppGlobals
                 return Task.CompletedTask;
             }
 
-            protected internal override async Task YieldBetweenStartupPhasesAsync()
+            protected internal override async Task YieldWithContinuationProbeAsync(
+                string priorPhaseName
+            )
             {
                 YieldCount++;
-                await base.YieldBetweenStartupPhasesAsync();
+                await base.YieldWithContinuationProbeAsync(priorPhaseName);
             }
 
             protected internal override Task LoadOlObjectsPhaseAsync()
@@ -294,6 +296,26 @@ namespace TaskMaster.Test.AppGlobals
                 _visitedStages?.Add("events");
                 return Task.CompletedTask;
             }
+
+            // No-op the issue #211 Phase 3.2 host-bound diagnostics seams so the heartbeat
+            // DispatcherTimer (which needs a live UiThread.Dispatcher) and the live GC.* reads never
+            // execute under the unit-test seam. Mirrors the phase-wrapper override pattern above.
+            protected internal override void StartStartupUiHeartbeat(
+                TaskMaster.StartupDiagnosticsProbe probe
+            ) { }
+
+            protected internal override void StopStartupUiHeartbeat() { }
+
+            protected internal override void BeginPhaseGcCapture(string phase) { }
+
+            protected internal override void EmitPhaseGcDelta(
+                TaskMaster.StartupDiagnosticsProbe probe,
+                string phase
+            ) { }
+
+            // No-op the issue #211 Phase 3.6 live StoreWrapperInitClock read so LoadSequentialAsync
+            // never touches the process-global accumulator under the unit-test seam (P4-T5).
+            protected internal override double SampleStoreWrapperInitTotalMs() => 0.0;
         }
     }
 }

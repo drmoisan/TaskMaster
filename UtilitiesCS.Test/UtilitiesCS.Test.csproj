@@ -80,6 +80,7 @@
     <Compile Include="Dialogs\MyBox_Tests.cs" />
     <Compile Include="Dialogs\NotImplementedDialog_Tests.cs" />
     <Compile Include="EmailIntelligence\AutoFile_Tests.cs" />
+    <Compile Include="EmailIntelligence\SpamInitTimingProbeTests.cs" />
     <Compile Include="EmailIntelligence\ActionableClassifierGroup_Tests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroup_Tests.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianSerializationHelper_Tests.cs" />
@@ -316,6 +317,9 @@
     <Compile Include="OutlookObjects\MailItem\MailResolutionTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperViewerTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreFilterAttributionTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperInitClockTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperInitProbeTests.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperTests.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemHelperProjectionTests.cs" />
     <Compile Include="OutlookObjects\Fields\UserDefinedFieldsTests.cs" />

@@ -28,3 +28,24 @@ object form for `audit_paths`). Do not contort the checkpoint to the MCP tool's
 extra undocumented enum demands; treat that tool's orchestrator-state mode as
 advisory/legacy. The plan/policy-audit/code-review/feature-audit artifact_types
 of the MCP validator are reliable and should still be used.
+
+**Confirmed MCP enum demands (2026-06-23, cost two iterations to discover):**
+- Non-complete MCP validation enforces enums: `step5..step10_status` ∈
+  {not-applicable, pending, delegated, verified, blocked}; `blocked_reason` ∈
+  {none, checkpoint_conflict, lifecycle_preconditions_missing,
+  spawn_agent_unavailable, delegation_launch_failed, delegate_no_receipt,
+  delegate_contract_incomplete, validator_failed, user_requested_stop,
+  review_status_missing, commit_context_missing, no_staged_changes}. There is no
+  "awaiting-human" blocked_reason — model human stop points via
+  `human_interaction.requirements`, not a custom blocked_reason string.
+- `human_interaction.requirements[]` each need `response` ∈ {scope_change,
+  exception, halt}. `response: "exception"` additionally REQUIRES a non-empty
+  `runbook_path`; `halt` and `scope_change` do not. For a plain stop-and-ask
+  with no runbook, use `halt`.
+- `--require-complete` additionally fails unless `step10_status != pending`,
+  `blocked_reason == none`, AND `route_id` resolves to an entry in
+  `config/orchestration-routing.json`. That routing file has never existed in
+  this repo, so require-complete cannot pass; the real SubagentStop hook does not
+  check route_id, step10, or blocked_reason. Enum source of truth:
+  `.agents/skills/orchestrator-workflow/SKILL.md` (Status/Blocked-reason enums)
+  and `.agents/skills/orchestrator-state/SKILL.md` (human_interaction invariants).

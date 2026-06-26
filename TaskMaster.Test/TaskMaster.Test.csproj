@@ -261,6 +261,12 @@
     <Compile Include="AppGlobals\ApplicationGlobalsTests.cs" />
     <Compile Include="AppGlobals\AppAutoFileObjectsFolderPredictorTests.cs" />
     <Compile Include="AppGlobals\ApplicationGlobalsStartupTimingTests.cs" />
+    <Compile Include="AppGlobals\ContinuationProbeSequenceTests.cs" />
+    <Compile Include="AppGlobals\TestableApplicationGlobals.cs" />
+    <Compile Include="AppGlobals\PhaseNetProbeTests.cs" />
+    <Compile Include="AppGlobals\EngineInitTimingProbeTests.cs" />
+    <Compile Include="AppGlobals\StartupDiagnosticsProbeTests.cs" />
+    <Compile Include="AppGlobals\StartupInboxAttributionProbeTests.cs" />
     <Compile Include="AppGlobals\StartupTimingRecorderTests.cs" />
     <Compile Include="AppGlobals\HookReadinessCoordinatorTests.cs" />
     <Compile Include="AppGlobals\NonBlockingDelayTests.cs" />
@@ -270,6 +276,7 @@
     <Compile Include="AppGlobals\AppOlObjectsCoverageTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsFolderTreeServiceTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsTests.cs" />
+    <Compile Include="AppGlobals\JunkFolderPathNavigatorTests.cs" />
     <Compile Include="AppGlobals\AppQuickFilerSettingsTests.cs" />
     <Compile Include="AppGlobals\AppQuickFilerSettingsRemainingPropertiesTests.cs" />
     <Compile Include="AppGlobals\AppStagingFilenamesTests.cs" />

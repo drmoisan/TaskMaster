@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
@@ -53,16 +54,20 @@ namespace TaskMaster
 
         internal Folder LoadJunkPotential()
         {
-            var root = new FolderTree(Root).Roots.FirstOrDefault();
             var folderPath = ReadJunkPotentialSetting();
             if (folderPath.IsNullOrEmpty())
             {
                 return null;
             }
-            var sequence = new Queue<string>(folderPath.Split('\\'));
 
-            var node = root.FindSequentialNode((current, other) => current.Name == other, sequence);
-            var folder = node?.Value?.OlFolder as Folder;
+            // Issue #211 (AC10): resolve the configured path by DIRECT navigation over the live
+            // store root instead of `new FolderTree(Root)`, which recursively enumerated the entire
+            // default-store hierarchy on the STA before searching (~50s cold-start stall). The
+            // adapter exposes only one folder level at a time, so resolution touches only the
+            // folders along the path plus the first-segment breadth-first frontier. The matching
+            // semantics are identical to the prior FindSequentialNode comparator.
+            var node = JunkFolderPathNavigator.ResolvePath(new OutlookFolderNode(Root), folderPath);
+            var folder = (node as OutlookFolderNode)?.OlFolder as Folder;
             if (folder is null)
             {
                 MyBox.ShowDialog(
@@ -100,16 +105,20 @@ namespace TaskMaster
 
         internal Folder LoadJunkCertain()
         {
-            var root = new FolderTree(Root).Roots.FirstOrDefault();
             var folderPath = ReadJunkCertainSetting();
             if (folderPath.IsNullOrEmpty())
             {
                 return null;
             }
-            var sequence = new Queue<string>(folderPath.Split('\\'));
 
-            var node = root.FindSequentialNode((current, other) => current.Name == other, sequence);
-            var folder = node?.Value?.OlFolder as Folder;
+            // Issue #211 (AC10): resolve the configured path by DIRECT navigation over the live
+            // store root instead of `new FolderTree(Root)`, which recursively enumerated the entire
+            // default-store hierarchy on the STA before searching (~50s cold-start stall). The
+            // adapter exposes only one folder level at a time, so resolution touches only the
+            // folders along the path plus the first-segment breadth-first frontier. The matching
+            // semantics are identical to the prior FindSequentialNode comparator.
+            var node = JunkFolderPathNavigator.ResolvePath(new OutlookFolderNode(Root), folderPath);
+            var folder = (node as OutlookFolderNode)?.OlFolder as Folder;
             if (folder is null)
             {
                 MyBox.ShowDialog(
@@ -128,6 +137,50 @@ namespace TaskMaster
                 Properties.Settings.Default.Save();
             }
             return folder;
+        }
+
+        /// <summary>
+        /// Thin COM adapter wrapping a live <see cref="MAPIFolder"/> as an <see cref="IFolderNode"/>
+        /// for <see cref="JunkFolderPathNavigator"/> (issue #211, AC10). <see cref="Name"/> reads
+        /// <c>MAPIFolder.Name</c>; <see cref="ChildFolders"/> lazily enumerates ONLY this folder's
+        /// direct <c>Folders</c> on first access — no recursion and no eager full-tree walk — so the
+        /// navigator touches only the folders along the resolution path plus the first-segment
+        /// breadth-first frontier. Decorated <see cref="ExcludeFromCodeCoverageAttribute"/> because
+        /// it is a direct COM wrapper with no testable logic; the navigation logic it feeds is fully
+        /// covered by JunkFolderPathNavigatorTests against the pure helper.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private sealed class OutlookFolderNode : IFolderNode
+        {
+            private readonly MAPIFolder _olFolder;
+            private IReadOnlyList<IFolderNode> _childFolders;
+
+            public OutlookFolderNode(MAPIFolder olFolder) => _olFolder = olFolder;
+
+            public MAPIFolder OlFolder => _olFolder;
+
+            public string Name => _olFolder?.Name;
+
+            public IReadOnlyList<IFolderNode> ChildFolders
+            {
+                get
+                {
+                    if (_childFolders is null)
+                    {
+                        var children = new List<IFolderNode>();
+                        var subFolders = _olFolder?.Folders;
+                        if (subFolders is not null)
+                        {
+                            foreach (MAPIFolder child in subFolders)
+                            {
+                                children.Add(new OutlookFolderNode(child));
+                            }
+                        }
+                        _childFolders = children;
+                    }
+                    return _childFolders;
+                }
+            }
         }
     }
 }

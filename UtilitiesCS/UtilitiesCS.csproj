@@ -654,6 +654,10 @@
     <Compile Include="EmailIntelligence\EmailParsingSorting\ImageStripper.cs" />
     <Compile Include="OutlookObjects\Attachment\AttachmentSerializable.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\SpamBayes\SpamBayes.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\SpamBayes\SpamBayes.Conditions.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\SpamBayes\SpamBayes.Actions.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\SpamBayes\SpamBayes.Classify.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\SpamBayes\SpamInitTimingProbe.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\TristateEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs" />
@@ -693,8 +697,11 @@
     <Compile Include="OutlookObjects\Folder\FolderMinimalWrapper.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientStatic.cs" />
     <Compile Include="OutlookObjects\Store\IStoreWrapperViewer.cs" />
+    <Compile Include="OutlookObjects\Store\StoreFilterAttribution.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapper.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapper.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperInitClock.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperInitProbe.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperController.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperViewer.cs">
       <SubType>Form</SubType>

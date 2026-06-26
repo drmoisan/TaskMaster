@@ -207,7 +207,7 @@ namespace TaskMaster.Test.AppGlobals
 
             var yieldMatches = Regex.Matches(
                 methodBody,
-                @"await\s+YieldBetweenStartupPhasesAsync\s*\(\s*\)\s*;"
+                @"await\s+YieldWithContinuationProbeAsync\s*\([^\)]*\)\s*;"
             );
             yieldMatches
                 .Count.Should()
@@ -241,7 +241,7 @@ namespace TaskMaster.Test.AppGlobals
             Regex
                 .IsMatch(
                     methodBody,
-                    @"await\s+LoadToDoPhaseAsync\(\)\s*;[\s\S]*?await\s+YieldBetweenStartupPhasesAsync\(\)\s*;[\s\S]*?await\s+LoadAutoFilePhaseAsync\(\)\s*;"
+                    @"await\s+LoadToDoPhaseAsync\(\)\s*;[\s\S]*?await\s+YieldWithContinuationProbeAsync\([^\)]*\)\s*;[\s\S]*?await\s+LoadAutoFilePhaseAsync\(\)\s*;"
                 )
                 .Should()
                 .BeTrue(
@@ -251,7 +251,7 @@ namespace TaskMaster.Test.AppGlobals
             // ToDo await and the yield: only a _timingRecorder.RecordPhase(...) call is allowed.
             var toDoToYield = Regex.Match(
                 methodBody,
-                @"await\s+LoadToDoPhaseAsync\(\)\s*;(?<between>[\s\S]*?)await\s+YieldBetweenStartupPhasesAsync\(\)\s*;"
+                @"await\s+LoadToDoPhaseAsync\(\)\s*;(?<between>[\s\S]*?)await\s+YieldWithContinuationProbeAsync\([^\)]*\)\s*;"
             );
             toDoToYield.Success.Should().BeTrue();
             Regex
@@ -424,60 +424,6 @@ namespace TaskMaster.Test.AppGlobals
                 typeof(IdleAsyncQueue)
                     .GetProperty("Entries", BindingFlags.NonPublic | BindingFlags.Static)!
                     .GetValue(null)!;
-        }
-
-        private sealed class TestableApplicationGlobals : ApplicationGlobals
-        {
-            private readonly IList<string>? _visitedStages;
-
-            public TestableApplicationGlobals(
-                OutlookApplication application,
-                IList<string>? visitedStages = null
-            )
-                : base(application, false)
-            {
-                _visitedStages = visitedStages;
-            }
-
-            public int YieldCount { get; private set; }
-
-            public Task InvokeInitializeEnginesPhaseAsync() => InitializeEnginesPhaseAsync();
-
-            protected internal override Task LoadIntelConfigPhaseAsync()
-            {
-                _visitedStages?.Add("intel");
-                return Task.CompletedTask;
-            }
-
-            protected internal override async Task YieldBetweenStartupPhasesAsync()
-            {
-                YieldCount++;
-                await base.YieldBetweenStartupPhasesAsync();
-            }
-
-            protected internal override Task LoadOlObjectsPhaseAsync()
-            {
-                _visitedStages?.Add("ol");
-                return Task.CompletedTask;
-            }
-
-            protected internal override Task LoadToDoPhaseAsync()
-            {
-                _visitedStages?.Add("todo");
-                return Task.CompletedTask;
-            }
-
-            protected internal override Task LoadAutoFilePhaseAsync()
-            {
-                _visitedStages?.Add("auto");
-                return Task.CompletedTask;
-            }
-
-            protected internal override Task LoadEventsPhaseAsync()
-            {
-                _visitedStages?.Add("events");
-                return Task.CompletedTask;
-            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -125,17 +126,33 @@ namespace TaskMaster
             var storesWrapper = StoresWrapper ?? new StoresWrapper() { };
             var stores = NamespaceMAPI.Stores.Cast<Store>();
 
+            // Issue #211 diagnosis-only per-store attribution probe. The included-store set, the
+            // inbox-list result, the (Folder)inbox cast, and the COMException rethrow below are all
+            // unchanged; the extracted method only adds Stopwatch timing + one emitted line per store.
+            var attributionProbe = new StartupInboxAttributionProbe(s => logger.Debug(s));
+
             var inboxes = new List<Folder>();
             foreach (var store in stores)
             {
                 try
                 {
-                    if (!storesWrapper.ShouldIncludeStore(store))
-                    {
-                        continue;
-                    }
+                    var inbox = EmitPerStoreInboxAttribution(
+                        () => storesWrapper.ShouldIncludeStore(store),
+                        () => store.GetDefaultFolder(OlDefaultFolders.olFolderInbox),
+                        () =>
+                        {
+                            try
+                            {
+                                return store.DisplayName;
+                            }
+                            catch (COMException)
+                            {
+                                return "<unavailable>";
+                            }
+                        },
+                        attributionProbe
+                    );
 
-                    var inbox = store.GetDefaultFolder(OlDefaultFolders.olFolderInbox);
                     if (inbox is not null)
                     {
                         inboxes.Add((Folder)inbox);
@@ -161,6 +178,65 @@ namespace TaskMaster
                 }
             }
             return inboxes;
+        }
+
+        /// <summary>
+        /// Issue #211 diagnosis-only per-store attribution for <see cref="LoadInboxes"/>. Computes the
+        /// <c>ShouldIncludeStore</c> timing, the include/exclude result, and (only when included) the
+        /// <c>GetDefaultFolder(olFolderInbox)</c> timing, emits one <c>[loadinboxes]</c> line via the
+        /// supplied <paramref name="probe"/>, and returns the default-inbox folder to add (or
+        /// <see langword="null"/> when the store is excluded or has no inbox folder). The COM and store
+        /// boundary is fully expressed through injectable delegates so a fake store can drive this
+        /// method without live COM; <see cref="LoadInboxes"/> supplies the real delegates. Behavior is
+        /// preserved: an excluded store returns <see langword="null"/> (the caller skips the add, the
+        /// byte-equivalent of the original <c>continue</c>), and any exception thrown by a delegate
+        /// (for example a transient COMException from <paramref name="getDefaultFolder"/>) propagates
+        /// unchanged so the caller's existing <c>catch (COMException)</c> rethrow logic still applies.
+        /// </summary>
+        /// <param name="shouldInclude">Evaluates <c>StoresWrapper.ShouldIncludeStore(store)</c> for this store.</param>
+        /// <param name="getDefaultFolder">
+        /// Returns <c>store.GetDefaultFolder(olFolderInbox)</c> (a <see cref="MAPIFolder"/>). Invoked only
+        /// when <paramref name="shouldInclude"/> returns <see langword="true"/>.
+        /// </param>
+        /// <param name="readDisplayName">Guarded read of the store's <c>DisplayName</c> (returns a sentinel when the read throws).</param>
+        /// <param name="probe">The coverable attribution formatter/sink.</param>
+        /// <returns>The default-inbox <see cref="MAPIFolder"/> to add, or <see langword="null"/> when excluded or absent.</returns>
+        internal static MAPIFolder EmitPerStoreInboxAttribution(
+            Func<bool> shouldInclude,
+            Func<MAPIFolder> getDefaultFolder,
+            Func<string> readDisplayName,
+            StartupInboxAttributionProbe probe
+        )
+        {
+            var displayName = readDisplayName();
+
+            var shouldIncludeStopwatch = Stopwatch.StartNew();
+            var included = shouldInclude();
+            shouldIncludeStopwatch.Stop();
+
+            if (!included)
+            {
+                probe.EmitLoadInboxesStore(
+                    displayName,
+                    shouldIncludeStopwatch.Elapsed.TotalMilliseconds,
+                    included: false,
+                    getDefaultFolderMs: null
+                );
+                return null;
+            }
+
+            var getDefaultFolderStopwatch = Stopwatch.StartNew();
+            var inbox = getDefaultFolder();
+            getDefaultFolderStopwatch.Stop();
+
+            probe.EmitLoadInboxesStore(
+                displayName,
+                shouldIncludeStopwatch.Elapsed.TotalMilliseconds,
+                included: true,
+                getDefaultFolderMs: getDefaultFolderStopwatch.Elapsed.TotalMilliseconds
+            );
+
+            return inbox;
         }
 
         internal void ResetLazyInboxes() => _inboxes = new Lazy<IEnumerable<Folder>>(LoadInboxes);

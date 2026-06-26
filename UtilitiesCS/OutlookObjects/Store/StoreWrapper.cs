@@ -26,6 +26,12 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         public StoreWrapper Init()
         {
+            // Issue #211 Phase 3.6: measure the total wall-clock spent in Init (the failing-store
+            // logon is a SHARED blocking cost) so a process-global accumulator can attribute it NET
+            // of whichever startup phase timer is running. The per-COM [Startup timing] lines below
+            // are unchanged; this single method-scope Stopwatch is additive.
+            var initStopwatch = Stopwatch.StartNew();
+
             var storeDisplayNameStopwatch = Stopwatch.StartNew();
             DisplayName = InnerStore.DisplayName;
             logger.Debug(
@@ -54,6 +60,15 @@ namespace UtilitiesCS.OutlookObjects.Store
             UserEmailAddress = GetSmtpAddressFromStore();
             logger.Debug(
                 $"[Startup timing] Init '{DisplayName ?? "<null>"}' GetSmtpAddressFromStore: {smtpLookupStopwatch.ElapsedMilliseconds} ms"
+            );
+
+            initStopwatch.Stop();
+            var initTotalMs = initStopwatch.Elapsed.TotalMilliseconds;
+            StoreWrapperInitClock.Add(initTotalMs);
+            new StoreWrapperInitProbe(s => logger.Debug(s)).EmitLine(
+                DisplayName,
+                initTotalMs,
+                System.Threading.Thread.CurrentThread.ManagedThreadId
             );
 
             return this;

@@ -34,7 +34,17 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         public virtual StoresWrapper Init()
         {
-            Stores = GetFilteredStores().Select(store => new StoreWrapper(store).Init()).ToList();
+            // why: issue #211 Phase 3.4 diagnosis-only. The synchronous Init() filter path
+            // previously logged no GetFilteredStores summary (only RewireOlObjectsAsync did).
+            // Materialize the filtered set once, emit one [store-filter] summary line, then
+            // build Stores from that same list. Behavior-preserving: identical included set
+            // and order to the prior GetFilteredStores().Select(...). Stopwatch only.
+            var filteredStoresStopwatch = Stopwatch.StartNew();
+            var filteredStores = GetFilteredStores().ToList();
+            logger.Debug(
+                $"[store-filter] GetFilteredStores completed: {filteredStores.Count} stores in {filteredStoresStopwatch.ElapsedMilliseconds} ms"
+            );
+            Stores = filteredStores.Select(store => new StoreWrapper(store).Init()).ToList();
             return this;
         }
 
@@ -118,7 +128,65 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         private IEnumerable<Outlook.Store> GetFilteredStores()
         {
-            return Globals.Ol.NamespaceMAPI.Stores.Cast<Outlook.Store>().Where(ShouldIncludeStore);
+            return Globals
+                .Ol.NamespaceMAPI.Stores.Cast<Outlook.Store>()
+                .Where(ShouldIncludeStoreInstrumented);
+        }
+
+        // why: issue #211 Phase 3.4 diagnosis-only attribution of the previously-untimed
+        // store FILTER path. Wraps each per-store COM property read (ExchangeStoreType,
+        // FilePath) in its own Stopwatch and emits one [store-filter] line per enumerated
+        // store via the existing log4net logger, so a slow cold-start capture can identify
+        // the largest FilePath/ExchangeStoreType read time and the Gmail/GWSO store's
+        // include/exclude decision. The pure decision lives in StoreFilterAttribution.Decide,
+        // which mirrors ShouldIncludeStore's exact short-circuit order, so the included set
+        // and enumeration order are unchanged. Stopwatch only; no banned APIs. To be removed
+        // or gated after diagnosis.
+        private bool ShouldIncludeStoreInstrumented(Outlook.Store store)
+        {
+            string displayName = null;
+            try
+            {
+                displayName = store.DisplayName;
+            }
+            catch { }
+
+            var exchangeStoreTypeStopwatch = Stopwatch.StartNew();
+            bool isPublicFolder =
+                store.ExchangeStoreType == OlExchangeStoreType.olExchangePublicFolder;
+            exchangeStoreTypeStopwatch.Stop();
+
+            string filePath = null;
+            var filePathStopwatch = Stopwatch.StartNew();
+            try
+            {
+                filePath = store.FilePath;
+            }
+            catch { }
+            filePathStopwatch.Stop();
+
+            var (included, rule) = StoreFilterAttribution.Decide(
+                isPublicFolder,
+                displayName,
+                filePath,
+                ExcludedStoreNameContains,
+                ExcludedStoreFilePathContains,
+                GwsoFilePathContains,
+                ExcludePublicFolderStores,
+                ExcludeGwsoStores
+            );
+
+            logger.Debug(
+                StoreFilterAttribution.FormatLine(
+                    displayName,
+                    exchangeStoreTypeStopwatch.Elapsed.TotalMilliseconds,
+                    filePathStopwatch.Elapsed.TotalMilliseconds,
+                    included,
+                    rule
+                )
+            );
+
+            return included;
         }
 
         public static bool StoreIsIncluded(
