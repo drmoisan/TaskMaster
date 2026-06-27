@@ -505,11 +505,10 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// [P3-T4] With high-confidence mode enabled, RunAsync invokes the pre-filter delegate and
-        /// calls the carrier-list LoadItemsAsync overload, not the plain IList&lt;MailItem&gt; one.
+        /// Issue #218: high-confidence mode no longer pre-filters only the initial GUI batch.
         /// </summary>
         [TestMethod]
-        public async Task RunAsync_HighConfidenceEnabled_InvokesPreFilterBeforeCarrierLoad()
+        public async Task RunAsync_HighConfidenceEnabled_DoesNotPreFilterInitialGuiBatch()
         {
             // Arrange
             var tokenSource = new CancellationTokenSource();
@@ -533,16 +532,16 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             preFilterInvoked
                 .Should()
-                .BeTrue("the pre-filter delegate runs in high-confidence mode");
-            mockFormController.Verify(
-                m => m.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()),
-                Times.Once,
-                "the carrier-list overload must be used in high-confidence mode"
-            );
+                .BeFalse("remaining-queue admission now owns high-confidence filtering");
             mockFormController.Verify(
                 m => m.LoadItemsAsync(It.IsAny<IList<MailItem>>()),
+                Times.Once,
+                "the initial GUI batch must use the plain MailItem load path"
+            );
+            mockFormController.Verify(
+                m => m.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()),
                 Times.Never,
-                "the plain IList<MailItem> overload must NOT be used in high-confidence mode"
+                "RunAsync must not use the carrier-list overload for the initial batch"
             );
         }
 
@@ -587,11 +586,11 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// [P6-T1] Ordering: the pre-filter delegate completes before the carrier-list
-        /// LoadItemsAsync is invoked, proving pre-filtering precedes UI construction (AC1).
+        /// Issue #218: the initial GUI batch is loaded without invoking the high-confidence
+        /// pre-filter path.
         /// </summary>
         [TestMethod]
-        public async Task RunAsync_HighConfidence_PreFilterPrecedesUiConstruction()
+        public async Task RunAsync_HighConfidence_LoadsInitialBatchWithoutPreFilter()
         {
             // Arrange
             var tokenSource = new CancellationTokenSource();
@@ -618,7 +617,7 @@ namespace QuickFiler.Controllers.Tests
 
             var mockFormController = new Mock<IQfcFormController>();
             mockFormController
-                .Setup(x => x.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()))
+                .Setup(x => x.LoadItemsAsync(It.IsAny<IList<MailItem>>()))
                 .Returns(Task.CompletedTask)
                 .Callback(() => sequence.Add("LoadItemsAsync"));
             SetPrivateField(_controller, "_formController", mockFormController.Object);
@@ -643,7 +642,11 @@ namespace QuickFiler.Controllers.Tests
             await _controller.RunAsync(progress);
 
             // Assert
-            sequence.Should().Equal("PreFilter", "LoadItemsAsync");
+            sequence.Should().Equal("LoadItemsAsync");
+            mockFormController.Verify(
+                m => m.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()),
+                Times.Never
+            );
         }
 
         /// <summary>

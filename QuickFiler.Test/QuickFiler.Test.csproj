@@ -65,6 +65,7 @@
     <Compile Include="Controllers\EfcFormControllerTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerTests.cs" />
+    <Compile Include="Controllers\QfcDatamodelTests.cs" />
     <Compile Include="Controllers\QfcFormControllerTests.cs" />
     <Compile Include="Controllers\QfcHighConfidencePreFilterTests.cs" />
     <Compile Include="Controllers\QfcHomeControllerTests.cs" />

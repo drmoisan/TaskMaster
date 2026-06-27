@@ -274,27 +274,7 @@ namespace QuickFiler.Controllers
             progress.Report(30, "Initializing Qfc Items");
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(QfcFormController.LoadItemsAsync)} ...");
-            // High-confidence mode (Issue #171): score and filter the candidate batch off the UI
-            // thread BEFORE any UI item controller is constructed, then load only the surviving
-            // above-threshold items (each carrying its predetermined folder). When the mode is
-            // disabled (default and standard entry point), the existing IList<MailItem> path is used
-            // unchanged with no pre-pass.
-            if (Globals.QfSettings.HighConfidenceModeEnabled)
-            {
-                IList<QfcPreScoredItem> preScored = await Task.Run(async () =>
-                    await HighConfidencePreFilterLoader(
-                        listEmail,
-                        Globals,
-                        Globals.QfSettings.HighConfidenceThreshold,
-                        Token
-                    )
-                );
-                await _formController.LoadItemsAsync(preScored);
-            }
-            else
-            {
-                await _formController.LoadItemsAsync(listEmail);
-            }
+            await _formController.LoadItemsAsync(listEmail);
 
             progress?.Report(100);
 

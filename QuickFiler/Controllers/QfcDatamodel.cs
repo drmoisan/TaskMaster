@@ -104,6 +104,20 @@ namespace QuickFiler.Controllers
 
         #endregion Private Variables
 
+        #region Internal Test Seams
+
+        internal Func<
+            MailItem,
+            CancellationToken,
+            Task<long>
+        > RemainingQueueScoreLoader { get; set; }
+
+        internal Action<MailItem> MasterQueueAddLastLoader { get; set; }
+
+        internal Action<MailItem, Action<MailItem>> MoveMonitorHookLoader { get; set; }
+
+        #endregion Internal Test Seams
+
         #region Public Properties
 
         private bool _complete = false;
@@ -272,8 +286,7 @@ namespace QuickFiler.Controllers
                     );
                     if (item is not null && item is MailItem mailItem)
                     {
-                        _masterQueue.AddLast(mailItem);
-                        _moveMonitor.HookItem(mailItem, (x) => _masterQueue.Remove(x));
+                        await TryQueueRemainingMailItemAsync(mailItem, cancel);
                     }
                 }
                 catch (OperationCanceledException)
@@ -291,6 +304,72 @@ namespace QuickFiler.Controllers
                 await Task.Yield();
             }
             return true;
+        }
+
+        internal async Task<bool> TryQueueRemainingMailItemAsync(
+            MailItem mailItem,
+            CancellationToken cancel
+        )
+        {
+            cancel.ThrowIfCancellationRequested();
+
+            if (mailItem is null)
+            {
+                return false;
+            }
+
+            if (_globals?.QfSettings?.HighConfidenceModeEnabled == true)
+            {
+                long cutoff = (long)
+                    Math.Round(_globals.QfSettings.HighConfidenceThreshold * 1000, 0);
+                long score = await ScoreRemainingQueueMailItemAsync(mailItem, cancel)
+                    .ConfigureAwait(false);
+                if (score < cutoff)
+                {
+                    return false;
+                }
+            }
+
+            AddRemainingMailItemToQueue(mailItem);
+            return true;
+        }
+
+        private async Task<long> ScoreRemainingQueueMailItemAsync(
+            MailItem mailItem,
+            CancellationToken cancel
+        )
+        {
+            if (RemainingQueueScoreLoader is not null)
+            {
+                return await RemainingQueueScoreLoader(mailItem, cancel).ConfigureAwait(false);
+            }
+
+            var scoringService = new FolderScoringService();
+            var score = await scoringService
+                .ScoreAsync(mailItem, _globals, cancel)
+                .ConfigureAwait(false);
+            return score.Score;
+        }
+
+        private void AddRemainingMailItemToQueue(MailItem mailItem)
+        {
+            if (MasterQueueAddLastLoader is not null)
+            {
+                MasterQueueAddLastLoader(mailItem);
+            }
+            else
+            {
+                _masterQueue.AddLast(mailItem);
+            }
+
+            if (MoveMonitorHookLoader is not null)
+            {
+                MoveMonitorHookLoader(mailItem, x => _masterQueue.Remove(x));
+            }
+            else
+            {
+                _moveMonitor.HookItem(mailItem, x => _masterQueue.Remove(x));
+            }
         }
 
         private bool LoadRemainingEmailsToQueue(BackgroundWorker bw, CancellationToken token)
