@@ -1,4 +1,4 @@
-default_permissions = "orchestrator-workspace"
+default_permissions = ":danger-full-access"
 
 [mcp_servers.drm-copilot]
 command = "npx"
@@ -7,17 +7,24 @@ required = true
 enabled_tools = [
     "collect_commit_context",
     "collect_pr_context",
-    "new_potential_entry",
+    "run_codex_native_converter",
+    "push_down_copilot_customizations",
+    "push_down_codex_and_agents_customizations",
+    "push_down_claude_customizations",
     "new_potential_bug_entry",
+    "new_potential_entry",
+    "link_parent_child",
     "potential_to_issue",
     "new_active_feature_folder",
-    "validate_orchestration_artifacts",
-    "resolve_atomic_plan_prompt",
-    "resolve_execute_hard_lock_prompt",
     "run_poshqc_format",
     "run_poshqc_analyze",
-    "run_poshqc_analyze_autofix",
     "run_poshqc_test",
+    "run_poshqc_analyze_autofix",
+    "run_poshqc_suite",
+    "resolve_policy_audit_template_asset",
+    "resolve_execute_hard_lock_prompt",
+    "resolve_atomic_plan_prompt",
+    "validate_orchestration_artifacts",
 ]
 default_tools_approval_mode = "prompt"
 
@@ -26,6 +33,58 @@ approval_mode = "approve"
 
 [features]
 multi_agent = true
+
+[[hooks.PreToolUse]]
+matcher = "Bash"
+command = "pwsh -NoProfile -File .codex/hooks/validate-bash.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Bash"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-promotion-mcp-only.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Bash"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-orchestration-preimplementation-gate.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/check-python-test-purity.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-python-batch-budget.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/check-powershell-test-purity.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-powershell-batch-budget.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-evidence-locations.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-orchestration-preimplementation-gate.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-checkpoint-monotonic.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Write|Edit"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-completion-consistency.ps1"
+
+[[hooks.PreToolUse]]
+matcher = "Agent"
+command = "pwsh -NoProfile -File .codex/hooks/enforce-orchestration-preimplementation-gate.ps1"
+
+[[hooks.SubagentStop]]
+matcher = "feature-review|feature-reviewer"
+command = "pwsh -NoProfile -File .codex/hooks/validate-feature-review-coverage.ps1"
 
 [permissions.orchestrator-workspace]
 description = "Workspace editing for deterministic orchestration with secret-path deny rules."

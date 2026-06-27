@@ -64,6 +64,9 @@ Persist and reuse these fields exactly:
 - `path_selected`
 - `promotion-type`
 - `short-name`
+- `pre-issue-branch`
+- `final-branch`
+- `branch-rename-status`
 - `relativeFile`
 - `long-name`
 - `issue-num`
@@ -96,6 +99,7 @@ Persist and reuse these fields exactly:
 - `local_execution_overrides`
 - `delegation_bypasses`
 - `lifecycle_operations`
+- `pre-implementation-violation`
 
 For small-path runs, also persist:
 - `bootstrap_mode`
@@ -126,6 +130,15 @@ Blocked-reason enum:
   - `review_status_missing`
   - `commit_context_missing`
   - `no_staged_changes`
+  - `pre_implementation_gate_violation`
+
+Pre-implementation violation schema:
+- `pre-implementation-violation` MUST be either `null` or an object with:
+  - `violated_gate`
+  - `attempted_action`
+  - `known_mutated_files`
+  - `corrective_next_step`
+  - `recorded_at`
 
 Delegation receipt schema:
 - `delegation_receipts` MUST be a list of objects with:
@@ -233,10 +246,12 @@ Required behavior:
 2. Use `feature-promotion-lifecycle` as the source of truth for lifecycle variables, branch naming, and `${plan-path}` resolution.
 3. Route all promotion, issue, and feature-folder automation through `repo-automation-adapter`.
 4. Enforce lifecycle preconditions before any active-folder authoring:
+   - route metadata persistence must be complete in the canonical checkpoint before potential-entry creation
+   - `${pre-issue-branch}` must be created or verified before potential-entry creation
    - `${relativeFile}` must resolve to a real potential markdown path and must not be `NONE`, `TBD`, or empty
-   - issue promotion must complete before branch or folder creation
-   - `${issue-num}` must be numeric before `new_active_feature_folder` runs
-   - do not create or edit `${feature-folder}/issue.md`, `${feature-folder}/spec.md`, `${feature-folder}/user-story.md`, or `plan*.md` until promotion and folder creation both succeed
+   - `${issue-num}` must be numeric before final branch rename or `new_active_feature_folder` runs
+   - final branch rename must complete before `new_active_feature_folder` runs
+   - do not create or edit `${feature-folder}/issue.md`, `${feature-folder}/spec.md`, `${feature-folder}/user-story.md`, or `plan*.md` until potential-entry creation, promotion, final branch rename, and folder creation all succeed
    - if any lifecycle precondition fails, set the relevant step status to `blocked`, set `blocked_reason` to `lifecycle_preconditions_missing`, and stop
 5. Enforce minor-audit folder integrity:
    - `${feature-folder}/issue.md` must exist
@@ -280,10 +295,12 @@ Required behavior:
 2. Use `feature-promotion-lifecycle` as the source of truth for lifecycle variables, branch naming, and `${plan-path}` resolution.
 3. Route all promotion, issue, and feature-folder automation through `repo-automation-adapter`.
 4. Enforce lifecycle preconditions before any active-folder authoring:
+   - route metadata persistence must be complete in the canonical checkpoint before potential-entry creation
+   - `${pre-issue-branch}` must be created or verified before potential-entry creation
    - `${relativeFile}` must resolve to a real potential markdown path and must not be `NONE`, `TBD`, or empty
-   - issue promotion must complete before branch or folder creation
-   - `${issue-num}` must be numeric before `new_active_feature_folder` runs
-   - do not create or edit `${feature-folder}/issue.md`, `${feature-folder}/spec.md`, `${feature-folder}/user-story.md`, or `plan*.md` until promotion and folder creation both succeed
+   - `${issue-num}` must be numeric before final branch rename or `new_active_feature_folder` runs
+   - final branch rename must complete before `new_active_feature_folder` runs
+   - do not create or edit `${feature-folder}/issue.md`, `${feature-folder}/spec.md`, `${feature-folder}/user-story.md`, or `plan*.md` until potential-entry creation, promotion, final branch rename, and folder creation all succeed
    - if any lifecycle precondition fails, set the relevant step status to `blocked`, set `blocked_reason` to `lifecycle_preconditions_missing`, and stop
 5. Complete the requirements-authoring steps before planning:
    - fill the potential entry details
@@ -347,6 +364,8 @@ Do not claim mission completion until all of the following are true:
 - the canonical checkpoint path was used without sidecar replacement or backup substitution
 - `${relativeFile}` is a real promoted-input path and `${issue-num}` is numeric when lifecycle setup was required
 - `${feature-folder}` and `${plan-path}` are known when lifecycle setup was required
+- route metadata, selected work mode, branch state, lifecycle receipts, and
+  folder readiness are present before implementation begins
 - the approved plan is executor-compliant and references the required baseline and final-QA evidence tasks
 - required review artifacts exist on disk
 - small path has Phase 0 evidence plus reduced audit artifacts
@@ -366,8 +385,14 @@ Do not claim mission completion until all of the following are true:
 - Do not bypass `repo-automation-adapter` for host-specific lifecycle steps.
 - Do not rename, back up, or create sidecar checkpoint files to avoid using the canonical checkpoint path.
 - Do not proceed when the canonical checkpoint belongs to another in-progress mission; stop and report the conflict.
-- Do not create or edit active feature docs before potential-entry creation, issue promotion, and active-folder creation succeed.
-- Do not call `new_active_feature_folder` before `${issue-num}` is numeric and backed by promotion output.
+- Do not create or edit active feature docs before route metadata persistence,
+  pre-issue branch setup, potential-entry creation, issue promotion, final branch
+  rename, and active-folder creation succeed.
+- Do not call `new_active_feature_folder` before `${issue-num}` is numeric,
+  backed by promotion output, and the final branch rename is complete.
+- Do not begin implementation edits, formatters, tests, staging, commits, or
+  implementation delegation when route metadata, branch state, lifecycle
+  receipts, or folder readiness are missing.
 - Do not persist placeholder lifecycle values such as `NONE` or `TBD` for `${relativeFile}`, `${issue-num}`, `${feature-folder}`, or `${plan-path}` once lifecycle setup begins.
 - Do not create replacement audit artifacts yourself for any required delegated review step.
 - Do not execute required delegated steps locally as a fallback.
