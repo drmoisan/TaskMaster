@@ -505,47 +505,6 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Issue #218: high-confidence mode no longer pre-filters only the initial GUI batch.
-        /// </summary>
-        [TestMethod]
-        public async Task RunAsync_HighConfidenceEnabled_DoesNotPreFilterInitialGuiBatch()
-        {
-            // Arrange
-            var tokenSource = new CancellationTokenSource();
-            _mockProgressTracker = SetupMockProgressTracker(tokenSource);
-            var progress = _mockProgressTracker.Object;
-            var mockFormController = ArrangeRunAsyncController(
-                highConfidenceEnabled: true,
-                progress
-            );
-
-            var preFilterInvoked = false;
-            _controller.HighConfidencePreFilterLoader = (items, globals, threshold, token) =>
-            {
-                preFilterInvoked = true;
-                return Task.FromResult<IList<QfcPreScoredItem>>(new List<QfcPreScoredItem>());
-            };
-
-            // Act
-            await _controller.RunAsync(progress);
-
-            // Assert
-            preFilterInvoked
-                .Should()
-                .BeFalse("remaining-queue admission now owns high-confidence filtering");
-            mockFormController.Verify(
-                m => m.LoadItemsAsync(It.IsAny<IList<MailItem>>()),
-                Times.Once,
-                "the initial GUI batch must use the plain MailItem load path"
-            );
-            mockFormController.Verify(
-                m => m.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()),
-                Times.Never,
-                "RunAsync must not use the carrier-list overload for the initial batch"
-            );
-        }
-
-        /// <summary>
         /// [P3-T5] With high-confidence mode disabled, RunAsync does NOT invoke the pre-filter and
         /// uses the plain IList&lt;MailItem&gt; LoadItemsAsync overload unchanged.
         /// </summary>
@@ -582,70 +541,6 @@ namespace QuickFiler.Controllers.Tests
                 m => m.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()),
                 Times.Never,
                 "disabled mode must NOT use the carrier-list overload"
-            );
-        }
-
-        /// <summary>
-        /// Issue #218: the initial GUI batch is loaded without invoking the high-confidence
-        /// pre-filter path.
-        /// </summary>
-        [TestMethod]
-        public async Task RunAsync_HighConfidence_LoadsInitialBatchWithoutPreFilter()
-        {
-            // Arrange
-            var tokenSource = new CancellationTokenSource();
-            _mockProgressTracker = SetupMockProgressTracker(tokenSource);
-            var progress = _mockProgressTracker.Object;
-
-            var sequence = new List<string>();
-
-            var mockDataModel = new Mock<IQfcDatamodel>();
-            mockDataModel
-                .Setup(x =>
-                    x.InitEmailQueueAsync(
-                        It.IsAny<int>(),
-                        It.IsAny<BackgroundWorker>(),
-                        It.IsAny<CancellationToken>(),
-                        It.IsAny<CancellationTokenSource>()
-                    )
-                )
-                .ReturnsAsync(new List<MailItem>());
-            mockDataModel.Setup(x => x.Complete).Returns(true);
-            _controller.DataModel = mockDataModel.Object;
-
-            SetupQfSettings(highConfidenceEnabled: true, threshold: 0.90);
-
-            var mockFormController = new Mock<IQfcFormController>();
-            mockFormController
-                .Setup(x => x.LoadItemsAsync(It.IsAny<IList<MailItem>>()))
-                .Returns(Task.CompletedTask)
-                .Callback(() => sequence.Add("LoadItemsAsync"));
-            SetPrivateField(_controller, "_formController", mockFormController.Object);
-
-            var mockFormViewer = new Mock<IQfcFormViewer>();
-            mockFormViewer.Setup(x => x.Show());
-            var windowState = FormWindowState.Normal;
-            mockFormViewer
-                .SetupSet(x => x.WindowState = It.IsAny<FormWindowState>())
-                .Callback<FormWindowState>(state => windowState = state);
-            mockFormViewer.SetupGet(x => x.WindowState).Returns(() => windowState);
-            mockFormViewer.Setup(x => x.Refresh());
-            SetPrivateField(_controller, "_formViewer", mockFormViewer.Object);
-
-            _controller.HighConfidencePreFilterLoader = (items, globals, threshold, token) =>
-            {
-                sequence.Add("PreFilter");
-                return Task.FromResult<IList<QfcPreScoredItem>>(new List<QfcPreScoredItem>());
-            };
-
-            // Act
-            await _controller.RunAsync(progress);
-
-            // Assert
-            sequence.Should().Equal("LoadItemsAsync");
-            mockFormController.Verify(
-                m => m.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()),
-                Times.Never
             );
         }
 

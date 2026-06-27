@@ -68,6 +68,7 @@
     <Compile Include="Controllers\QfcDatamodelTests.cs" />
     <Compile Include="Controllers\QfcFormControllerTests.cs" />
     <Compile Include="Controllers\QfcHighConfidencePreFilterTests.cs" />
+    <Compile Include="Controllers\QfcHomeControllerIssue218Tests.cs" />
     <Compile Include="Controllers\QfcHomeControllerTests.cs" />
     <Compile Include="Controllers\QfcItemControllerTests.cs" />
     <Compile Include="Controllers\QfcQueueTests.cs" />

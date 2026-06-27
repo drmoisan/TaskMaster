@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -14,7 +13,7 @@ namespace QuickFiler.Controllers.Tests
     [TestClass]
     public class QfcDatamodelTests
     {
-        private static QfcDatamodel CreateQueueAdmissionModel(
+        private static QfcRemainingQueueAdmission CreateQueueAdmission(
             bool highConfidenceEnabled,
             double threshold,
             IList<MailItem> added,
@@ -32,20 +31,13 @@ namespace QuickFiler.Controllers.Tests
             var globals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
             globals.SetupGet(x => x.QfSettings).Returns(settings.Object);
 
-            var model = (QfcDatamodel)
-                FormatterServices.GetUninitializedObject(typeof(QfcDatamodel));
-            model
-                .GetType()
-                .GetField(
-                    "_globals",
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                )
-                .SetValue(model, globals.Object);
-            model.RemainingQueueScoreLoader = scoreLoader;
-            model.MasterQueueAddLastLoader = added.Add;
-            model.MoveMonitorHookLoader = (mail, _) => hooked.Add(mail);
-            return model;
+            return new QfcRemainingQueueAdmission(
+                globals.Object,
+                scoreLoader,
+                added.Add,
+                (mail, _) => hooked.Add(mail),
+                _ => { }
+            );
         }
 
         [TestMethod]
@@ -56,7 +48,7 @@ namespace QuickFiler.Controllers.Tests
             var hooked = new List<MailItem>();
             var mailItem = new Mock<MailItem>().Object;
             var scoreCallCount = 0;
-            var model = CreateQueueAdmissionModel(
+            var admission = CreateQueueAdmission(
                 highConfidenceEnabled: true,
                 threshold: 0.90,
                 added,
@@ -71,10 +63,7 @@ namespace QuickFiler.Controllers.Tests
             );
 
             // Act
-            var queued = await model.TryQueueRemainingMailItemAsync(
-                mailItem,
-                CancellationToken.None
-            );
+            var queued = await admission.TryQueueAsync(mailItem, CancellationToken.None);
 
             // Assert
             queued.Should().BeTrue();
@@ -90,7 +79,7 @@ namespace QuickFiler.Controllers.Tests
             var added = new List<MailItem>();
             var hooked = new List<MailItem>();
             var mailItem = new Mock<MailItem>().Object;
-            var model = CreateQueueAdmissionModel(
+            var admission = CreateQueueAdmission(
                 highConfidenceEnabled: true,
                 threshold: 0.90,
                 added,
@@ -99,10 +88,7 @@ namespace QuickFiler.Controllers.Tests
             );
 
             // Act
-            var queued = await model.TryQueueRemainingMailItemAsync(
-                mailItem,
-                CancellationToken.None
-            );
+            var queued = await admission.TryQueueAsync(mailItem, CancellationToken.None);
 
             // Assert
             queued.Should().BeTrue();
@@ -117,7 +103,7 @@ namespace QuickFiler.Controllers.Tests
             var added = new List<MailItem>();
             var hooked = new List<MailItem>();
             var mailItem = new Mock<MailItem>().Object;
-            var model = CreateQueueAdmissionModel(
+            var admission = CreateQueueAdmission(
                 highConfidenceEnabled: true,
                 threshold: 0.90,
                 added,
@@ -126,10 +112,7 @@ namespace QuickFiler.Controllers.Tests
             );
 
             // Act
-            var queued = await model.TryQueueRemainingMailItemAsync(
-                mailItem,
-                CancellationToken.None
-            );
+            var queued = await admission.TryQueueAsync(mailItem, CancellationToken.None);
 
             // Assert
             queued.Should().BeFalse();
@@ -144,7 +127,7 @@ namespace QuickFiler.Controllers.Tests
             var added = new List<MailItem>();
             var hooked = new List<MailItem>();
             var mailItem = new Mock<MailItem>().Object;
-            var model = CreateQueueAdmissionModel(
+            var admission = CreateQueueAdmission(
                 highConfidenceEnabled: false,
                 threshold: 0.90,
                 added,
@@ -154,10 +137,7 @@ namespace QuickFiler.Controllers.Tests
             );
 
             // Act
-            var queued = await model.TryQueueRemainingMailItemAsync(
-                mailItem,
-                CancellationToken.None
-            );
+            var queued = await admission.TryQueueAsync(mailItem, CancellationToken.None);
 
             // Assert
             queued.Should().BeTrue();

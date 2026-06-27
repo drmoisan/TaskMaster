@@ -304,6 +304,7 @@
     <Compile Include="Controllers\QfcItemController.cs" />
     <Compile Include="Controllers\QfcItemGroup.cs" />
     <Compile Include="Controllers\KeyboardHandler.cs" />
+    <Compile Include="Controllers\QfcRemainingQueueAdmission.cs" />
     <Compile Include="Controllers\QfcQueue.cs" />
     <Compile Include="Helper Classes\cInfoMail.cs" />
     <Compile Include="Helper Classes\ConversationResolver.cs" />
