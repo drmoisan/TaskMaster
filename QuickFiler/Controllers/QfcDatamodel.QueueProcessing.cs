@@ -139,7 +139,7 @@ namespace QuickFiler.Controllers
             while (_worker.IsBusy && (_masterQueue?.Count < quantity))
             {
                 token.ThrowIfCancellationRequested();
-                await Task.Delay(200);
+                await TimeProvider.Delay(TimeSpan.FromMilliseconds(200), token);
             }
         }
     }

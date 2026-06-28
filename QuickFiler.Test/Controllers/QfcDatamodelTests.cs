@@ -1,12 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -173,5 +178,99 @@ namespace QuickFiler.Controllers.Tests
             added.Should().BeEmpty();
             hooked.Should().BeEmpty();
         }
+
+        #region Issue #222 — Injectable time/delay seam (correctness-only; class is [ExcludeFromCodeCoverage])
+
+        private const BindingFlags NonPublicInstance =
+            BindingFlags.NonPublic | BindingFlags.Instance;
+
+        /// <summary>
+        /// Builds a <see cref="QfcDatamodel"/> without running its COM-bound constructors so a
+        /// single private delay method can be exercised in isolation. Fields the method under test
+        /// reads are assigned explicitly by each test via <see cref="SetPrivateField"/>.
+        /// </summary>
+        private static QfcDatamodel CreateUninitializedDatamodel() =>
+            (QfcDatamodel)FormatterServices.GetUninitializedObject(typeof(QfcDatamodel));
+
+        private static void SetPrivateField(object target, string name, object value)
+        {
+            var field = target.GetType().GetField(name, NonPublicInstance);
+            field
+                .Should()
+                .NotBeNull($"private field '{name}' should exist on {target.GetType().Name}");
+            field.SetValue(target, value);
+        }
+
+        /// <summary>
+        /// Issue #222 site 1: <c>ToggleOfflineMode(false)</c> must await the 5 ms delay through the
+        /// injected <see cref="TimeProvider"/> seam, not wall-clock <c>Task.Delay</c>. With a
+        /// <see cref="FakeTimeProvider"/> the returned task must stay incomplete until the clock is
+        /// advanced by exactly 5 ms.
+        /// </summary>
+        [TestMethod]
+        public async Task ToggleOfflineMode_WhenOnline_AwaitsInjectedFiveMillisecondDelay()
+        {
+            // Arrange
+            var model = CreateUninitializedDatamodel();
+            var fake = new FakeTimeProvider();
+            model.TimeProvider = fake;
+
+            var commandBars = new Mock<Microsoft.Office.Core.CommandBars>(MockBehavior.Loose);
+            commandBars.Setup(x => x.ExecuteMso("ToggleOnline"));
+            var explorer = new Mock<Explorer>(MockBehavior.Loose);
+            explorer.SetupGet(x => x.CommandBars).Returns(commandBars.Object);
+            SetPrivateField(model, "_activeExplorer", explorer.Object);
+
+            var method = typeof(QfcDatamodel).GetMethod("ToggleOfflineMode", NonPublicInstance);
+
+            // Act
+            var task = (Task<bool>)method.Invoke(model, new object[] { false });
+
+            // Assert — the delay is sourced from the injected seam, so it cannot complete yet.
+            task.IsCompleted.Should()
+                .BeFalse("the 5 ms delay must come from the injected TimeProvider, not wall-clock");
+            fake.Advance(TimeSpan.FromMilliseconds(5));
+            var result = await task;
+            result.Should().BeFalse();
+            commandBars.Verify(x => x.ExecuteMso("ToggleOnline"), Times.Once);
+        }
+
+        /// <summary>
+        /// Issue #222 site 2: <c>WaitForQueue</c> must await the 200 ms poll delay through the
+        /// injected <see cref="TimeProvider"/> seam. With a <see cref="FakeTimeProvider"/> the loop
+        /// must remain pending until the clock advances by 200 ms, after which it re-evaluates its
+        /// condition and exits (worker no longer busy).
+        /// </summary>
+        [TestMethod]
+        public async Task WaitForQueue_WhenWorkerBusyAndQueueShort_AwaitsInjectedTwoHundredMsDelay()
+        {
+            // Arrange
+            var model = CreateUninitializedDatamodel();
+            var fake = new FakeTimeProvider();
+            model.TimeProvider = fake;
+
+            var worker = new BackgroundWorker();
+            SetPrivateField(worker, "isRunning", true); // BackgroundWorker.IsBusy => true
+            SetPrivateField(model, "_worker", worker);
+            SetPrivateField(model, "_masterQueue", new LockingLinkedList<MailItem>()); // Count == 0
+
+            var method = typeof(QfcDatamodel).GetMethod("WaitForQueue", NonPublicInstance);
+
+            // Act
+            var task = (Task)method.Invoke(model, new object[] { 1, CancellationToken.None });
+
+            // Assert — loop is parked on the injected delay until advanced.
+            task.IsCompleted.Should()
+                .BeFalse("WaitForQueue must await the injected 200 ms delay, not wall-clock");
+
+            // Release the loop: worker becomes idle, then advancing the clock completes the delay
+            // so the loop re-checks its condition and exits.
+            SetPrivateField(worker, "isRunning", false);
+            fake.Advance(TimeSpan.FromMilliseconds(200));
+            await task;
+            task.IsCompleted.Should().BeTrue();
+        }
+
+        #endregion Issue #222 — Injectable time/delay seam
     }
 }
