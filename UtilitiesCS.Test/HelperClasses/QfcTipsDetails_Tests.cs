@@ -651,11 +651,11 @@ namespace UtilitiesCS.Test.HelperClasses
         ///     STA thread via GetAwaiter().GetResult() on .NET Framework 4.8.
         /// </summary>
         [TestMethod]
-        public void CreateAsync_HiddenLabel_WithMatchingSyncContext_ReturnsInitializedDetails()
+        public async Task CreateAsync_HiddenLabel_WithMatchingSyncContext_ReturnsInitializedDetails()
         {
             // Run inside Task.Run so that "await" does not block an STA message pump.
             // Controls created without a visible HWND are safe on non-STA threads.
-            var task = Task.Run(async () =>
+            var details = await Task.Run(async () =>
             {
                 var panel = new Panel();
                 var label = new Label { Visible = false };
@@ -676,10 +676,7 @@ namespace UtilitiesCS.Test.HelperClasses
                 }
             });
 
-            bool completed = task.Wait(TimeSpan.FromSeconds(10));
-            completed.Should().BeTrue("CreateAsync should complete within 10 seconds");
-            task.Exception.Should().BeNull("CreateAsync should not throw");
-            task.Result.Should().NotBeNull("CreateAsync must return an initialised details object");
+            details.Should().NotBeNull("CreateAsync must return an initialised details object");
         }
 
         /// <summary>
@@ -696,10 +693,10 @@ namespace UtilitiesCS.Test.HelperClasses
         ///     STA thread via GetAwaiter().GetResult() on .NET Framework 4.8.
         /// </summary>
         [TestMethod]
-        public void CreateAsync_VisibleLabel_WithMatchingSyncContext_ReturnsOnState()
+        public async Task CreateAsync_VisibleLabel_WithMatchingSyncContext_ReturnsOnState()
         {
             // Run inside Task.Run so that "await" does not block an STA message pump.
-            var task = Task.Run(async () =>
+            var details = await Task.Run(async () =>
             {
                 var panel = new Panel();
                 // Visible=true exercises the if (LabelControl.Visible) On-branch in
@@ -719,12 +716,8 @@ namespace UtilitiesCS.Test.HelperClasses
                 }
             });
 
-            bool completed = task.Wait(TimeSpan.FromSeconds(10));
-            completed
+            details
                 .Should()
-                .BeTrue("CreateAsync with a visible label should complete within 10 seconds");
-            task.Exception.Should().BeNull("CreateAsync with a visible label should not throw");
-            task.Result.Should()
                 .NotBeNull("CreateAsync must return a details object for a visible label");
         }
     }
