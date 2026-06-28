@@ -296,11 +296,16 @@
     <Compile Include="Controllers\KaStringAsync.cs" />
     <Compile Include="Controllers\KbdActions.cs" />
     <Compile Include="Controllers\QfcCollectionController.cs" />
+    <Compile Include="Controllers\EmailSorter.cs" />
     <Compile Include="Controllers\QfcDatamodel.cs" />
+    <Compile Include="Controllers\QfcDatamodel.FrameBuilding.cs" />
+    <Compile Include="Controllers\QfcDatamodel.QueueProcessing.cs" />
     <Compile Include="Controllers\QfcExplorerController.cs" />
     <Compile Include="Controllers\QfcFormController.cs" />
     <Compile Include="Controllers\QfcHighConfidencePreFilter.cs" />
     <Compile Include="Controllers\QfcHomeController.cs" />
+    <Compile Include="Controllers\QfcHomeController.Metrics.cs" />
+    <Compile Include="Controllers\QfcHomeController.Iteration.cs" />
     <Compile Include="Controllers\QfcItemController.cs" />
     <Compile Include="Controllers\QfcItemGroup.cs" />
     <Compile Include="Controllers\KeyboardHandler.cs" />
