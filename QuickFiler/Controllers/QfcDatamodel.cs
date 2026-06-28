@@ -22,7 +22,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 namespace QuickFiler.Controllers
 {
     [ExcludeFromCodeCoverage]
-    public class QfcDatamodel : IQfcDatamodel
+    public partial class QfcDatamodel : IQfcDatamodel
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -272,8 +272,7 @@ namespace QuickFiler.Controllers
                     );
                     if (item is not null && item is MailItem mailItem)
                     {
-                        _masterQueue.AddLast(mailItem);
-                        _moveMonitor.HookItem(mailItem, (x) => _masterQueue.Remove(x));
+                        await TryQueueRemainingMailItemAsync(mailItem, cancel);
                     }
                 }
                 catch (OperationCanceledException)
@@ -291,6 +290,33 @@ namespace QuickFiler.Controllers
                 await Task.Yield();
             }
             return true;
+        }
+
+        internal async Task<bool> TryQueueRemainingMailItemAsync(
+            MailItem mailItem,
+            CancellationToken cancel
+        )
+        {
+            var admission = new QfcRemainingQueueAdmission(
+                _globals,
+                ScoreRemainingQueueMailItemAsync,
+                _masterQueue.AddLast,
+                _moveMonitor.HookItem,
+                x => _masterQueue.Remove(x)
+            );
+            return await admission.TryQueueAsync(mailItem, cancel).ConfigureAwait(false);
+        }
+
+        private async Task<long> ScoreRemainingQueueMailItemAsync(
+            MailItem mailItem,
+            CancellationToken cancel
+        )
+        {
+            var scoringService = new FolderScoringService();
+            var score = await scoringService
+                .ScoreAsync(mailItem, _globals, cancel)
+                .ConfigureAwait(false);
+            return score.Score;
         }
 
         private bool LoadRemainingEmailsToQueue(BackgroundWorker bw, CancellationToken token)
@@ -375,286 +401,7 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public Frame<int, string> InitDf(Explorer activeExplorer)
-        {
-            var df = DfDeedle.GetEmailDataInView(activeExplorer);
-
-            // Filter out non-email items
-            df = df.FilterRowsBy("MessageClass", "IPM.Note");
-            //df.Display(new List<string> { "RowKey" });
-            // Filter to the latest email in each conversation
-            var dfFiltered = MostRecentByConversation(df);
-
-            // Sort by triage classification and then date
-            var dfSorted = SortTriageDate(dfFiltered);
-
-            return dfSorted;
-        }
-
-        /// <summary>
-        /// If Outlook is not in offline mode, save the state and toggle it to offline mode
-        /// </summary>
-        /// <param name="offline"></param>
-        /// <returns></returns>
-        private async Task<bool> ToggleOfflineMode(bool offline)
-        {
-            if (!offline)
-            {
-                var commandBars = _activeExplorer.CommandBars;
-                if (!offline)
-                {
-                    commandBars.ExecuteMso("ToggleOnline");
-                }
-                await Task.Delay(5);
-            }
-            return offline;
-        }
-
-        public async Task InitDfAsync(Explorer activeExplorer, ProgressTracker progress)
-        {
-            var df = await GetEmailsInViewDfAsync(activeExplorer, progress).ConfigureAwait(false);
-
-            if (df is not null)
-            {
-                //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Filtering df ... ");
-                // Filter out non-email items
-                df = df.FilterRowsBy("MessageClass", "IPM.Note");
-
-                // Filter to the latest email in each conversation
-                var dfFiltered = MostRecentByConversation(df);
-
-                //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Sorting df ... ");
-                // Sort by triage classification and then date
-                _frame = SortTriageDate(dfFiltered);
-
-                progress.Report(100);
-            }
-        }
-
-        private async Task<Frame<int, string>> GetEmailsInViewDfAsync(
-            Explorer activeExplorer,
-            ProgressTracker progress
-        )
-        {
-            Frame<int, string> df = null;
-
-            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Toggle offline mode");
-            var offline = await ToggleOfflineMode(_globals.Ol.NamespaceMAPI.Offline);
-
-            //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(DfDeedle.GetEmailDataInViewAsync)} ... ");
-            try
-            {
-                df = await DfDeedle
-                    .GetEmailDataInViewAsync(
-                        activeExplorer,
-                        Token,
-                        TokenSource,
-                        progress.Increment(3).SpawnChild(78)
-                    )
-                    .ConfigureAwait(false);
-                await ToggleOfflineMode(offline);
-
-                //df.DisplayDialog();
-
-                return df;
-            }
-            catch (TaskCanceledException)
-            {
-                //logger.Debug($"{nameof(DfDeedle.GetEmailDataInViewAsync)} Task cancelled");
-                await ToggleOfflineMode(offline);
-                return null;
-            }
-            catch (System.Exception e)
-            {
-                await ToggleOfflineMode(offline);
-                logger.Error(
-                    $"{nameof(DfDeedle.GetEmailDataInViewAsync)} Error. \n {e.Message}\n{e.StackTrace}"
-                );
-                throw e;
-            }
-        }
-
-        public Frame<int, string> SortTriageDate(Frame<int, string> df)
-        {
-            var sorter = new EmailSorter(SortOptionsEnum.Default);
-
-            var dfClone = df.Clone();
-
-            var s1 = dfClone.GetColumn<DateTime>("SentOn");
-            var s2 = dfClone.GetColumn<string>("Triage");
-            var added = s1.ZipInner(s2)
-                .Select(t => sorter.GetSortKey(triage: t.Value.Item2, dateTime: t.Value.Item1));
-            dfClone.AddColumn("NewKey", added);
-
-            dfClone = dfClone.SortRows("NewKey");
-
-            var dfSorted = dfClone.IndexRowsWith(Enumerable.Range(0, dfClone.RowCount).Reverse());
-
-            dfSorted = dfSorted.SortRowsByKey();
-
-            dfSorted.DropColumn("NewKey");
-            return dfSorted;
-        }
-
-        public Frame<int, string> MostRecentByConversation(Frame<int, string> df)
-        {
-            var topics = df.GetColumn<string>("ConversationId").Values.Distinct().ToArray();
-
-            var rows = topics.Select(topic =>
-            {
-                var dfConversation = df.FilterRowsBy("ConversationId", topic);
-                var maxSentOn = dfConversation.GetColumn<DateTime>("SentOn").Values.Max();
-                var row = dfConversation.FilterRowsBy("SentOn", maxSentOn).Rows.FirstValue();
-                //var dfDateIdx = dfConversation.IndexRows<DateTime>("SentOn", keepColumn: true);
-                //var addr = dfDateIdx.RowIndex.Locate(maxSentOn);
-                //var idx = (int)dfDateIdx.RowIndex.AddressOperations.OffsetOf(addr);
-                //var row = dfConversation.Rows.GetAt(idx);
-                return row;
-            });
-
-            var dfFiltered = Frame.FromRows(rows);
-            return dfFiltered;
-        }
-
         #endregion Email Queue Initial Setup
-
-        #region Email Queue Processing
-
-        //TODO: Implement UndoMove()
-        public void UndoMove()
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void TryUnhookOrReplace(ref List<MailItem> nodes, int i)
-        {
-            if (nodes is null || nodes.Count == 0 || nodes.Count < i + 1)
-            {
-                logger.Error(
-                    $"Error unhooking item from move monitor. No items in array or index out of range. nodes.Length = {nodes?.Count ?? 0} but index i = {i}"
-                );
-                return;
-            }
-            var node = nodes[i];
-            bool processing = true;
-            while (processing)
-            {
-                try
-                {
-                    _moveMonitor.UnhookItem(node);
-                    processing = false;
-                }
-                catch (System.Exception e)
-                {
-                    logger.Error(
-                        $"Error unhooking item from move monitor. Getting next item from Queue {e.Message}"
-                    );
-                    nodes.Remove(node);
-                    node = _masterQueue.TryTakeFirst();
-                    if (node is null)
-                    {
-                        processing = false;
-                    }
-                    else
-                    {
-                        nodes.Insert(i, node);
-                    }
-                }
-            }
-        }
-
-        public async Task<IList<MailItem>> DequeueNextItemGroupAsync(int quantity, int timeOut)
-        {
-            _token.ThrowIfCancellationRequested();
-
-            if (_masterQueue.Count < quantity)
-                await WaitForQueue(quantity, _token);
-
-            var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
-            if (nodes is null)
-            {
-                return null;
-            }
-
-            try
-            {
-                await Task.Run(
-                    () =>
-                    {
-                        var max = nodes.Count;
-                        for (int i = 0; i < max; i++)
-                        {
-                            TryUnhookOrReplace(ref nodes, i);
-                            //var node = nodes[i];
-                            //_token.ThrowIfCancellationRequested();
-                            //bool processing = true;
-                            //while (processing)
-                            //{
-                            //    try
-                            //    {
-                            //        await _moveMonitor.UnhookItemAsync(node, _token);
-                            //        processing = false;
-                            //    }
-                            //    catch (System.Exception e)
-                            //    {
-                            //        logger.Error($"Error unhooking item from move monitor. Getting next item from Queue {e.Message}");
-                            //        nodes.Remove(node);
-                            //        node = _masterQueue.TryTakeFirst();
-                            //        if (node is null)
-                            //        {
-                            //            processing = false;
-                            //        }
-                            //        else
-                            //        {
-                            //            nodes.Insert(i, node);
-                            //        }
-                            //    }
-                            //}
-                        }
-                    },
-                    _token
-                );
-            }
-            catch (System.Exception e)
-            {
-                logger.Error("Error unhooking items from move monitor", e);
-                throw;
-            }
-
-            return nodes;
-        }
-
-        public IList<MailItem> DequeueNextItemGroup(int quantity)
-        {
-            _token.ThrowIfCancellationRequested();
-
-            var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
-            try
-            {
-                var max = nodes.Count;
-                for (int i = 0; i < max; i++)
-                {
-                    TryUnhookOrReplace(ref nodes, i);
-                }
-            }
-            catch (System.Exception e)
-            {
-                logger.Error("Error unhooking items from move monitor", e);
-                throw;
-            }
-            return nodes;
-        }
-
-        internal async Task WaitForQueue(int quantity, CancellationToken token)
-        {
-            while (_worker.IsBusy && (_masterQueue?.Count < quantity))
-            {
-                token.ThrowIfCancellationRequested();
-                await Task.Delay(200);
-            }
-        }
-
-        #endregion Email Queue Processing
 
         #region Linked List Locking
 
@@ -681,84 +428,5 @@ namespace QuickFiler.Controllers
         }
 
         #endregion Event Handlers
-    }
-
-    internal class EmailSorter
-    {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
-        );
-
-        public EmailSorter() { }
-
-        public EmailSorter(SortOptionsEnum options)
-        {
-            _options = options;
-        }
-
-        private SortOptionsEnum _options = SortOptionsEnum.Default;
-        private Dictionary<string, int> _triageImportantFirst = new Dictionary<string, int>
-        {
-            { "A", 1 },
-            { "B", 2 },
-            { "C", 3 },
-            { "Z", 4 },
-        };
-
-        private Dictionary<string, int> _triageImportantLast = new Dictionary<string, int>
-        {
-            { "A", 4 },
-            { "B", 3 },
-            { "C", 2 },
-            { "Z", 1 },
-        };
-
-        public SortOptionsEnum Options
-        {
-            get => _options;
-            set => _options = value;
-        }
-
-        public long GetSortKey(string triage, DateTime dateTime)
-        {
-            if (
-                _options.HasFlag(SortOptionsEnum.TriageImportantFirst)
-                && _options.HasFlag(SortOptionsEnum.DateRecentFirst)
-            )
-            {
-                try
-                {
-                    var triageKey =
-                        (long)(100000000000000 * _triageImportantLast[triage])
-                        + GetDateKey(dateTime);
-                    return triageKey;
-                }
-                catch (KeyNotFoundException e)
-                {
-                    logger.Error(
-                        $"Triage value {triage} not found in "
-                            + $"dictionary from date {GetDateKey(dateTime)} "
-                            + $"\n {e.Message} \n {e.StackTrace}"
-                    );
-                    throw;
-                }
-            }
-            return -1;
-        }
-
-        public long GetDateKey(DateTime dateTime)
-        {
-            return long.Parse(dateTime.ToString("yyyyMMddHHmmss"));
-        }
-    }
-
-    public interface IEmailSortInfo
-    {
-        string EntryId { get; }
-        string MessageClass { get; }
-        DateTime SentOn { get; }
-        string ConversationId { get; }
-        string Triage { get; }
-        string StoreId { get; }
     }
 }
