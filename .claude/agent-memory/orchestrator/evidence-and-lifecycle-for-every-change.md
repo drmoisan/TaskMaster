@@ -30,3 +30,12 @@ the issue number and feature folder. Pass that folder's `evidence/<kind>/` path
 to the engineer as the only permitted evidence sink, and reject any evidence
 written elsewhere during review. This applies to `.claude/` tooling changes too.
 Related: [[ci-required-checks-enforceable]].
+
+**Reinforced 2026-06-28:** A direct, surgical user request ("rewrite this one
+test method to remove the forbidden `task.Wait(TimeSpan)` pattern") is STILL a
+full orchestration, not a direct worker delegation. I fixed it by delegating
+straight to `csharp-typed-engineer` with no issue/branch/folder; the user
+corrected me and asked for the full small-path lifecycle (issue → promote →
+canonical branch → minimal plan → execute → review → PR → green CI → merge).
+The narrowness of the ask and the fact that it is test-only (no production code)
+do not exempt it. When in doubt, open the issue and orchestrate.
