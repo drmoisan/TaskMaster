@@ -1,6 +1,6 @@
-# Nullable-Build Baseline (Cycle 2) — Issue #218
+# Nullable Build Baseline — Cycle 2 (Rebased Tree), Issue #218
 
-Timestamp: 2026-06-28T15-34
+Timestamp: 2026-06-28T17-31
 
 Command: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:Nullable=enable /p:TreatWarningsAsErrors=true`
 
@@ -8,6 +8,4 @@ Note: invoked via the resolved full path `C:\Program Files\Microsoft Visual Stud
 
 EXIT_CODE: 0
 
-Output Summary:
-- Build succeeded with 0 Warning(s) and 0 Error(s).
-- Nullable analysis with TreatWarningsAsErrors is clean at cycle-2 entry. This is the baseline for post-extraction comparison in Phase 1/2 build-after checks and Phase 5.
+Output Summary: Solution-wide nullable build with TreatWarningsAsErrors succeeded. All projects compiled. Build exited 0 with zero warnings-as-errors on the rebased tree (HEAD 2637e4c1). Baseline for post-trim build-after checks (P1-T3, P2-T5) and Phase 5.

@@ -144,5 +144,34 @@ namespace QuickFiler.Controllers.Tests
             added.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
             hooked.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
         }
+
+        /// <summary>
+        /// Issue #218 admission guard: a null remaining <see cref="MailItem"/> must not be
+        /// scored, added to the queue, or hooked. Covers the null-guard return path in
+        /// <c>QfcRemainingQueueAdmission.TryQueueAsync</c>.
+        /// </summary>
+        [TestMethod]
+        public async Task TryQueueRemainingMailItemAsync_NullMailItem_DoesNotScoreAddOrHook()
+        {
+            // Arrange
+            var added = new List<MailItem>();
+            var hooked = new List<MailItem>();
+            var admission = CreateQueueAdmission(
+                highConfidenceEnabled: true,
+                threshold: 0.90,
+                added,
+                hooked,
+                (mail, token) =>
+                    throw new AssertFailedException("Scoring must not run for a null mail item.")
+            );
+
+            // Act
+            var queued = await admission.TryQueueAsync(null, CancellationToken.None);
+
+            // Assert
+            queued.Should().BeFalse();
+            added.Should().BeEmpty();
+            hooked.Should().BeEmpty();
+        }
     }
 }

@@ -1,45 +1,29 @@
-# Banned-API Baseline (Cycle 2) — Issue #218
+# Banned-API Baseline — Cycle 2 (Rebased Tree), Issue #218
 
-Timestamp: 2026-06-28T15-34
+Timestamp: 2026-06-28T17-31
 
-Command: `Select-String -Path 'QuickFiler/Controllers/QfcDatamodel.cs','QuickFiler/Controllers/QfcHomeController.cs' -Pattern 'DateTime\.Now','DateTime\.UtcNow','Random\.Shared','Thread\.Sleep','Task\.Delay'`
+Command: `Select-String -Path <8 touched production files> -Pattern 'DateTime\.Now','DateTime\.UtcNow','Random\.Shared','Thread\.Sleep','Task\.Delay'`
 
 EXIT_CODE: 0
 
-Output Summary:
-- Banned set scanned: `DateTime.Now`, `DateTime.UtcNow`, `Random.Shared`, `Thread.Sleep`, `Task.Delay`.
-- No matches for `DateTime.UtcNow`, `Random.Shared`, or `Thread.Sleep`.
-- `Task.Delay` and `DateTime.Now` matches found (some active, some inside `//`-commented logger lines). These are pre-existing; RS0030 (BannedApiAnalyzers) is held at `suggestion` severity per `.claude/rules/csharp.md`, so they do not break the analyzer/nullable builds. Phase 4 (P4-T1) determines per-match disposition (removed-with-seam or deferred-finding).
+Banned set scanned: `DateTime.Now`, `DateTime.UtcNow`, `Random.Shared`, `Thread.Sleep`, `Task.Delay`. No matches for `DateTime.UtcNow`, `Random.Shared`, or `Thread.Sleep`. RS0030 (Microsoft.CodeAnalysis.BannedApiAnalyzers) is held at `suggestion` severity per `.claude/rules/csharp.md`, so these pre-existing call sites do not break the analyzer or nullable builds.
 
-## All matches (file:line)
+Matches (file:line on rebased tree):
 
-### QuickFiler/Controllers/QfcDatamodel.cs
-| Line | Text | Active/Commented | Banned token |
-|---:|---|---|---|
-| 58 | `//logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Creating new ...` | Commented | DateTime.Now |
-| 65 | `//logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling InitDfAsync ...` | Commented | DateTime.Now |
-| 434 | `await Task.Delay(5);` | Active | Task.Delay |
-| 445 | `//logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Filtering df ...` | Commented | DateTime.Now |
-| 452 | `//logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Sorting df ...` | Commented | DateTime.Now |
-| 467 | `//logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Toggle offline mode")` | Commented | DateTime.Now |
-| 470 | `//logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling ...GetEmailDataInViewAsync ...` | Commented | DateTime.Now |
-| 679 | `await Task.Delay(200);` | Active | Task.Delay |
+Active (non-comment) code:
+- QfcDatamodel.FrameBuilding.cs:43 — `await Task.Delay(5);`
+- QfcDatamodel.QueueProcessing.cs:142 — `await Task.Delay(200);`
+- QfcHomeController.cs:75 — `$"{DateTime.Now.ToString("mm:ss.fff")} "` (string-interpolation operand in active code)
+- QfcHomeController.Metrics.cs:20 — `var now = DateTime.Now;`
+- QfcHomeController.Metrics.cs:100 — `curDateText = DateTime.Now.ToString("MM/dd/yyyy");`
+- QfcHomeController.Metrics.cs:102 — `curTimeText = DateTime.Now.ToString("hh:mm");`
+- QfcHomeController.Metrics.cs:114 — `OlEndTime = DateTime.Now;`
+- QfcHomeController.Metrics.cs:214 — `await Task.Delay(20);`
 
-### QuickFiler/Controllers/QfcHomeController.cs
-| Line | Text | Active/Commented | Banned token |
-|---:|---|---|---|
-| 43 | `//logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} ...LaunchAsync is beginning")` | Commented | DateTime.Now |
-| 75 | `$"{DateTime.Now.ToString("mm:ss.fff")} "` | Active | DateTime.Now |
-| 262 | `//logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling ...InitEmailQueueAsync ...` | Commented | DateTime.Now |
-| 276 | `//logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling ...LoadItemsAsync ...` | Commented | DateTime.Now |
-| 281 | `//logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Showing and Refreshing ...` | Commented | DateTime.Now |
-| 287 | `//logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} ...RunAsync is complete")` | Commented | DateTime.Now |
-| 399 | `var now = DateTime.Now;` | Active | DateTime.Now |
-| 400 | `//var curDateText = DateTime.Now.ToString("MM/dd/yyyy");` | Commented | DateTime.Now |
-| 401 | `//var curTimeText = DateTime.Now.ToString("hh:mm");` | Commented | DateTime.Now |
-| 479 | `curDateText = DateTime.Now.ToString("MM/dd/yyyy");` | Active | DateTime.Now |
-| 481 | `curTimeText = DateTime.Now.ToString("hh:mm");` | Active | DateTime.Now |
-| 493 | `OlEndTime = DateTime.Now;` | Active | DateTime.Now |
-| 602 | `await Task.Delay(20);` | Active | Task.Delay |
+Commented-out code (no runtime effect):
+- QfcDatamodel.cs:58, 65 — commented `logger.Debug($"{DateTime.Now...`
+- QfcDatamodel.FrameBuilding.cs:54, 61, 76, 79 — commented logger lines
+- QfcHomeController.cs:43, 262, 276, 281, 287 — commented logger lines
+- QfcHomeController.Metrics.cs:21, 22 — commented lines
 
-Active banned-API call sites (pre-existing): QfcDatamodel.cs lines 434, 679 (`Task.Delay`); QfcHomeController.cs lines 75, 399, 479, 481, 493 (`DateTime.Now`), 602 (`Task.Delay`). Disposition is determined in Phase 4 (P4-T1).
+Output Summary: 8 active-code matches (DateTime.Now and Task.Delay), all pre-existing — carried verbatim from the original controllers by maintainer split 2637e4c1, not introduced by this remediation. RS0030 at suggestion severity means the build is not broken by them. Per-match disposition (removed-with-seam or precise deferred-finding) is performed in Phase 3 (P3-T1). Commented occurrences are not runtime code.

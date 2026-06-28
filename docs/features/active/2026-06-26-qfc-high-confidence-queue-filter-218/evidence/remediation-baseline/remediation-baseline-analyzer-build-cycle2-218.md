@@ -1,6 +1,6 @@
-# Analyzer-Build Baseline (Cycle 2) — Issue #218
+# Analyzer Build Baseline — Cycle 2 (Rebased Tree), Issue #218
 
-Timestamp: 2026-06-28T15-34
+Timestamp: 2026-06-28T17-31
 
 Command: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
 
@@ -8,6 +8,4 @@ Note: invoked via the resolved full path `C:\Program Files\Microsoft Visual Stud
 
 EXIT_CODE: 0
 
-Output Summary:
-- Build succeeded with 0 Warning(s) and 0 Error(s).
-- Analyzer/code-style enforcement build is clean at cycle-2 entry. This is the baseline for post-extraction comparison in Phase 5.
+Output Summary: Solution-wide analyzer/code-style enforcement build succeeded. All projects compiled (QuickFiler, QuickFiler.Test, UtilitiesCS, TaskMaster, and the rest). Build exited 0 with no build-breaking analyzer diagnostics on the rebased tree (HEAD 2637e4c1). Baseline for post-trim comparison in Phase 5.

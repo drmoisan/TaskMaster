@@ -125,6 +125,70 @@ clean reaudit.
   build, MSTest coverage, and the coverage comparison in order.
 - Do not introduce temporary files in tests.
 
+## Ground-Truth Update (2026-06-28T19-34) — Baseline shifted by maintainer commit
+
+Before cycle-2 execution started, the maintainer rebased the branch onto current `main`
+(merge-base now `1b8536b6`, which includes the #219 deterministic-test fix) and committed
+`2637e4c1 refactor(qfc): split oversized controllers to meet 500-line limit`. That commit
+performed most of Finding 1 directly. The cycle-2 plan must be re-planned against this new
+baseline rather than executed against the original 790/739/1370 line counts.
+
+**Completed by the maintainer commit (verify, do not redo):**
+
+- `QuickFiler/Controllers/QfcDatamodel.cs` is now 432 lines, split into
+  `QfcDatamodel.FrameBuilding.cs` (154) and `QfcDatamodel.QueueProcessing.cs` (146)
+  partials; all wired into `QuickFiler/QuickFiler.csproj`.
+- `QuickFiler/Controllers/QfcHomeController.cs` is now 454 lines, split into
+  `QfcHomeController.Iteration.cs` (82) and `QfcHomeController.Metrics.cs` (226) partials;
+  wired into `QuickFiler/QuickFiler.csproj`.
+- `QuickFiler/Controllers/EmailSorter.cs` (85) was extracted.
+- Four split test files were created: `QfcHomeControllerRunAsyncTests.cs` (448, 6 tests),
+  `QfcHomeControllerIterationTests.cs` (352, 6 tests), `QfcHomeControllerMetricsTests.cs`
+  (241, 2 tests), `QfcHomeControllerPropertyTests.cs` (345, 13 tests).
+
+**Remaining open work for cycle 2 (the plan must address exactly these):**
+
+1. **Test split is incomplete — 500-line violation persists and tests are duplicated on disk.**
+   - `QuickFiler.Test/Controllers/QfcHomeControllerTests.cs` is still 1370 lines with all
+     30 active `[TestMethod]`s; it was NOT trimmed.
+   - The four split files are NOT wired into `QuickFiler.Test/QuickFiler.Test.csproj`
+     (csproj currently includes only `QfcHomeControllerTests.cs` and
+     `QfcHomeControllerIssue218Tests.cs`). The split files are therefore not compiled.
+   - Required completion: wire the four split files into `QuickFiler.Test.csproj`; remove
+     the 27 moved tests from `QfcHomeControllerTests.cs`, leaving the residual tests
+     (`Constructor_InitializesCorrectly`, `Init_InitializesCorrectly`,
+     `InitAsync_InitializesCorrectly`), the commented-out tests, and the
+     `QfcFormViewerDerived` helper if still required by the residual file. Verify the four
+     split files faithfully reproduce the moved tests (names AND assertions) before
+     trimming; the split copies may have diverged from the originals and must be confirmed
+     equivalent. After completion: zero duplicate `[TestMethod]` definitions across the
+     compiled suite, the total compiled `[TestMethod]` count is preserved, and every
+     `QfcHomeController*Tests.cs` file is <=500 lines.
+   - Note: `QfcFormViewerDerived` is currently defined only in the original file and is not
+     referenced by the split files; confirm where it must live after the trim.
+
+2. **Banned-API sweep over the touched production files (now including the new partials):**
+   `QfcDatamodel.cs`, `QfcDatamodel.FrameBuilding.cs`, `QfcDatamodel.QueueProcessing.cs`,
+   `QfcHomeController.cs`, `QfcHomeController.Iteration.cs`, `QfcHomeController.Metrics.cs`,
+   `EmailSorter.cs`, `QfcRemainingQueueAdmission.cs`. Remediate any in-scope banned API
+   (`DateTime.Now`/`UtcNow`, `Random.Shared`, `Thread.Sleep`, `Task.Delay`) or record a
+   precise deferred-finding disposition.
+
+3. **Changed-production-line coverage** must be regenerated against the NEW merge-base
+   (`main` = `1b8536b6`) and the final Cobertura, expressed as an explicit numeric
+   percentage with PASS/FAIL.
+
+4. **Repo-wide coverage authority-scoped exception** (Finding 3) is unchanged; re-derive the
+   repo-wide figure from the final Cobertura and document the exception per `CLAUDE.md`
+   without weakening any policy file.
+
+5. **Full C# QA loop** (csharpier -> analyzer -> nullable -> MSTest coverage -> Cobertura ->
+   comparison -> focused #218 rerun), each with evidence, against the rebased tree.
+
+The plan's original Phase 1 / Phase 2 production-extraction tasks are now satisfied by the
+maintainer commit and must be converted to verification-only (confirm partial splits compile
+and are wired, files <=500), not re-executed.
+
 ## Required Context Package
 
 Any remediation planner or executor must read:
