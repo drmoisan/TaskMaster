@@ -17,3 +17,4 @@
 - [Verify repro before bugfix cycle](feedback_verify_repro_before_bugfix_cycle.md) — for a latent/worked-around defect, ground-truth its reachability on HEAD before a red-before-green cycle; a correct workaround can make it unreproducible
 - [VSTO startup STA threading directive](feedback_vsto_startup_sta_threading_directive.md) — minimize STA reliance, always pump, gate COM hookups on Outlook readiness, offload only non-COM compute; residual in scope only if the add-in causes it
 - [Banned API in touched file is in scope](feedback_banned_api_in_touched_file_in_scope.md) — when a fix modifies a production file, remediate any banned API (DateTime.Now/UtcNow, Random.Shared, Thread.Sleep, Task.Delay) found in it; don't defer
+- [Re-verify ground truth after user mid-cycle commit](feedback_reverify_ground_truth_after_user_midcycle_commit.md) — if the user rebases/commits mid-cycle, re-probe line counts/merge-base/csproj and re-plan before executing a preflighted plan
