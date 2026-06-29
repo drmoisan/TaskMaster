@@ -68,7 +68,7 @@ satisfy the 500-line file cap before adding code.
   `GetKeyEventExclusionControls()`, and `ItemViewerTemplateMargin`;
   `QfcItemViewerTemplate` and `QfcItemViewerExpandedTemplate` are removed from the
   interface; `CaptureItemSettings` and `RegisterFormEventHandlers` consume the new members.
-- [x] AC5: New MSTest coverage verifies, via Moq event raising / `VerifySet` / `Verify`,
+- [ ] AC5: New MSTest coverage verifies, via Moq event raising / `VerifySet` / `Verify`,
   that command events route to the correct controller methods, that the skip flow toggles
   `SkipButtonText`/`SkipButtonEnabled`, and that `CaptureItemSettings` handles both the
   populated and null `CaptureTlpCellStates()` results. New non-exempt code meets the
