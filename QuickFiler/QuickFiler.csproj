@@ -314,6 +314,15 @@
     <Compile Include="Controllers\QfcHomeController.Metrics.cs" />
     <Compile Include="Controllers\QfcHomeController.Iteration.cs" />
     <Compile Include="Controllers\QfcItemController.cs" />
+    <Compile Include="Controllers\QfcItemController.Initialization.cs" />
+    <Compile Include="Controllers\QfcItemController.ViewerSetup.cs" />
+    <Compile Include="Controllers\QfcItemController.Conversation.cs" />
+    <Compile Include="Controllers\QfcItemController.FolderHandling.cs" />
+    <Compile Include="Controllers\QfcItemController.EventWiring.cs" />
+    <Compile Include="Controllers\QfcItemController.EventHandlers.cs" />
+    <Compile Include="Controllers\QfcItemController.Navigation.cs" />
+    <Compile Include="Controllers\QfcItemController.FocusAndTheme.cs" />
+    <Compile Include="Controllers\QfcItemController.MailActions.cs" />
     <Compile Include="Controllers\QfcItemGroup.cs" />
     <Compile Include="Controllers\KeyboardHandler.cs" />
     <Compile Include="Controllers\QfcRemainingQueueAdmission.cs" />
@@ -367,6 +376,18 @@
     <Compile Include="Viewers\IItemViewer.cs" />
     <Compile Include="Viewers\ItemViewer.cs">
       <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Viewers\ItemViewer.DisplayState.cs">
+      <DependentUpon>ItemViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Viewers\ItemViewer.Commands.cs">
+      <DependentUpon>ItemViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Viewers\ItemViewer.FolderSearch.cs">
+      <DependentUpon>ItemViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Viewers\ItemViewer.WebViewThread.cs">
+      <DependentUpon>ItemViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Viewers\ItemViewer.Designer.cs">
       <DependentUpon>ItemViewer.cs</DependentUpon>
