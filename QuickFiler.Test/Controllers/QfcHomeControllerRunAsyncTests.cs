@@ -415,10 +415,8 @@ namespace QuickFiler.Controllers.Tests
             UiThread.Init(false);
             var mockFormViewer = new Mock<IQfcFormViewer>();
             mockFormViewer.SetupAllProperties();
-            var spinner = new NumericUpDown() { Enabled = false };
-            var button = new Button() { Enabled = false };
-            mockFormViewer.SetupGet(m => m.L1v1L2h5_SpnEmailPerLoad).Returns(spinner).Verifiable();
-            mockFormViewer.SetupGet(m => m.L1v1L2h5_BtnSkip).Returns(button).Verifiable();
+            mockFormViewer.SetupProperty(m => m.ItemsPerLoadEnabled, false);
+            mockFormViewer.SetupProperty(m => m.SkipButtonEnabled, false);
             _controller
                 .GetType()
                 .GetField(
@@ -441,8 +439,8 @@ namespace QuickFiler.Controllers.Tests
                 .Invoke(_controller, new object[] { null, eventArgs });
 
             // Assert
-            Assert.IsTrue(spinner.Enabled);
-            Assert.IsTrue(button.Enabled);
+            Assert.IsTrue(mockFormViewer.Object.ItemsPerLoadEnabled);
+            Assert.IsTrue(mockFormViewer.Object.SkipButtonEnabled);
         }
     }
 }

@@ -55,7 +55,10 @@ namespace QuickFiler
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if ((_keyboardHandler is not null) && (keyData.HasFlag(Keys.Alt)))
+            if (
+                (_keyboardHandler is not null)
+                && Controllers.QfcFormKeyHandler.IsAltKeyCommand(keyData)
+            )
             {
                 SynchronizationContext.SetSynchronizationContext(UiSyncContext);
                 object sender = FromHandle(msg.HWnd);
@@ -103,21 +106,157 @@ namespace QuickFiler
         #region IQfcFormViewer
 
         public BackgroundWorker Worker => WorkerInternal;
-        public TableLayoutPanel L1v0L2L3v_TableLayout
-        {
-            get => _l1v0L2L3v_TableLayout;
-            set => _l1v0L2L3v_TableLayout = value;
-        }
-        public ItemViewer QfcItemViewerTemplate => _QfcItemViewerTemplate;
-        public ItemViewerExpanded QfcItemViewerExpandedTemplate => _qfcItemViewerExpandedTemplate;
+
+        // Seam C — get-only TLP property over the private backing field; swap goes through SwapItemTableLayout
+        public TableLayoutPanel L1v0L2L3v_TableLayout => _l1v0L2L3v_TableLayout;
         public TableLayoutPanel L1v_TableLayout => _l1v_TableLayout;
-        public System.Windows.Forms.NumericUpDown L1v1L2h5_SpnEmailPerLoad =>
-            _l1v1L2h5_SpnEmailPerLoad;
-        public System.Windows.Forms.Button L1v1L2h2_ButtonOK => _l1v1L2h2_ButtonOK;
-        public System.Windows.Forms.Button L1v1L2h3_ButtonCancel => _l1v1L2h3_ButtonCancel;
-        public System.Windows.Forms.Button L1v1L2h4_ButtonUndo => _l1v1L2h4_ButtonUndo;
-        public System.Windows.Forms.Button L1v1L2h5_BtnSkip => _l1v1L2h5_BtnSkip;
         public Panel L1v0L2_PanelMain => _l1v0L2_PanelMain;
+
+        /// <summary>
+        /// Replaces the active item TableLayoutPanel displayed in the main panel: removes the
+        /// current TLP from the panel controls, re-parents the new TLP, and makes it visible.
+        /// </summary>
+        public void SwapItemTableLayout(TableLayoutPanel newTlp)
+        {
+            _l1v0L2_PanelMain.Controls.Remove(_l1v0L2L3v_TableLayout);
+            _l1v0L2L3v_TableLayout = newTlp;
+            _l1v0L2L3v_TableLayout.Parent = _l1v0L2_PanelMain;
+            _l1v0L2L3v_TableLayout.Visible = true;
+        }
+
+        // Seam B — intent command events forwarded to the backing Designer controls
+        public event EventHandler OkClicked
+        {
+            add => _l1v1L2h2_ButtonOK.Click += value;
+            remove => _l1v1L2h2_ButtonOK.Click -= value;
+        }
+        public event EventHandler CancelClicked
+        {
+            add => _l1v1L2h3_ButtonCancel.Click += value;
+            remove => _l1v1L2h3_ButtonCancel.Click -= value;
+        }
+        public event EventHandler UndoClicked
+        {
+            add => _l1v1L2h4_ButtonUndo.Click += value;
+            remove => _l1v1L2h4_ButtonUndo.Click -= value;
+        }
+        public event EventHandler SkipClicked
+        {
+            add => _l1v1L2h5_BtnSkip.Click += value;
+            remove => _l1v1L2h5_BtnSkip.Click -= value;
+        }
+
+        // Seam B — skip button state
+        public string SkipButtonText
+        {
+            get => _l1v1L2h5_BtnSkip.Text;
+            set => _l1v1L2h5_BtnSkip.Text = value;
+        }
+        public bool SkipButtonEnabled
+        {
+            get => _l1v1L2h5_BtnSkip.Enabled;
+            set => _l1v1L2h5_BtnSkip.Enabled = value;
+        }
+
+        // Seam B — items-per-load spinner state/event
+        public decimal ItemsPerLoadValue
+        {
+            get => _l1v1L2h5_SpnEmailPerLoad.Value;
+            set => _l1v1L2h5_SpnEmailPerLoad.Value = value;
+        }
+        public event EventHandler ItemsPerLoadValueChanged
+        {
+            add => _l1v1L2h5_SpnEmailPerLoad.ValueChanged += value;
+            remove => _l1v1L2h5_SpnEmailPerLoad.ValueChanged -= value;
+        }
+        public bool ItemsPerLoadEnabled
+        {
+            get => _l1v1L2h5_SpnEmailPerLoad.Enabled;
+            set => _l1v1L2h5_SpnEmailPerLoad.Enabled = value;
+        }
+
+        // Seam D — collapsed item-viewer template margin
+        public Padding ItemViewerTemplateMargin => _QfcItemViewerTemplate?.Margin ?? default;
+
+        // Seam D — controls excluded from keyboard-event wiring (the collapsed item-viewer template)
+        public IReadOnlyList<Control> GetKeyEventExclusionControls() =>
+            new List<Control> { _QfcItemViewerTemplate };
+
+        // Seam D — snapshots the item-viewer template cell states for both display states.
+        // Returns null if either template is not yet initialized (form not yet shown).
+        public TlpCellStates CaptureTlpCellStates()
+        {
+            if (_qfcItemViewerExpandedTemplate is null || _QfcItemViewerTemplate is null)
+            {
+                return null;
+            }
+
+            return new TlpCellStates(
+                new List<KeyValuePair<string, List<TlpCellSnapShot>>>()
+                {
+                    new KeyValuePair<string, List<TlpCellSnapShot>>(
+                        "Expanded",
+                        new List<TlpCellSnapShot>()
+                        {
+                            new TlpCellSnapShot(
+                                _qfcItemViewerExpandedTemplate.L0vh_Tlp,
+                                _qfcItemViewerExpandedTemplate.L1h0L2hv3h_TlpBodyToggle
+                            ),
+                            new TlpCellSnapShot(
+                                _qfcItemViewerExpandedTemplate.L1h0L2hv3h_TlpBodyToggle,
+                                _qfcItemViewerExpandedTemplate.TxtboxBody
+                            ),
+                            new TlpCellSnapShot(
+                                _qfcItemViewerExpandedTemplate.L1h0L2hv3h_TlpBodyToggle,
+                                _qfcItemViewerExpandedTemplate.TopicThread
+                            ),
+                            new TlpCellSnapShot(
+                                _qfcItemViewerExpandedTemplate.L0vh_Tlp,
+                                _qfcItemViewerExpandedTemplate.L0v2h2_WebView2
+                            ),
+                            new TlpCellSnapShot(
+                                _qfcItemViewerExpandedTemplate.L0vh_Tlp,
+                                _qfcItemViewerExpandedTemplate.LblAcOpen
+                            ),
+                            new TlpCellSnapShot(
+                                _qfcItemViewerExpandedTemplate.L0vh_Tlp,
+                                _qfcItemViewerExpandedTemplate.LblAcBody
+                            ),
+                        }
+                    ),
+                    new KeyValuePair<string, List<TlpCellSnapShot>>(
+                        "Compressed",
+                        new List<TlpCellSnapShot>()
+                        {
+                            new TlpCellSnapShot(
+                                _QfcItemViewerTemplate.L0vh_Tlp,
+                                _QfcItemViewerTemplate.L1h0L2hv3h_TlpBodyToggle
+                            ),
+                            new TlpCellSnapShot(
+                                _QfcItemViewerTemplate.L1h0L2hv3h_TlpBodyToggle,
+                                _QfcItemViewerTemplate.TxtboxBody
+                            ),
+                            new TlpCellSnapShot(
+                                _QfcItemViewerTemplate.L1h0L2hv3h_TlpBodyToggle,
+                                _QfcItemViewerTemplate.TopicThread
+                            ),
+                            new TlpCellSnapShot(
+                                _QfcItemViewerTemplate.L0vh_Tlp,
+                                _QfcItemViewerTemplate.L0v2h2_WebView2
+                            ),
+                            new TlpCellSnapShot(
+                                _QfcItemViewerTemplate.L0vh_Tlp,
+                                _QfcItemViewerTemplate.LblAcOpen
+                            ),
+                            new TlpCellSnapShot(
+                                _QfcItemViewerTemplate.L0vh_Tlp,
+                                _QfcItemViewerTemplate.LblAcBody
+                            ),
+                        }
+                    ),
+                }
+            );
+        }
         #endregion IQfcFormViewer
     }
 }

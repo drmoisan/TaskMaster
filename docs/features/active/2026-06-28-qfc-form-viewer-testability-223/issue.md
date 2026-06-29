@@ -54,30 +54,30 @@ satisfy the 500-line file cap before adding code.
 
 ## Acceptance Criteria (early draft)
 
-- [ ] AC1: `QfcFormKeyHandler.IsAltKeyCommand(Keys)` exists as a pure, non-Form unit and is
+- [x] AC1: `QfcFormKeyHandler.IsAltKeyCommand(Keys)` exists as a pure, non-Form unit and is
   called by `QfcFormViewer`, `QfcFormViewerDark`, and `QfcFormViewerExpanded`
   `ProcessCmdKey` overrides; `QfcFormViewerDark` and `QfcFormViewerExpanded` carry
   `[ExcludeFromCodeCoverage]`.
-- [ ] AC2: `IQfcFormViewer` exposes intent-level command events and state properties in
+- [x] AC2: `IQfcFormViewer` exposes intent-level command events and state properties in
   place of the four `Button` properties and the `NumericUpDown` property; no raw clickable
   control type remains on the interface.
-- [ ] AC3: `IQfcFormViewer` exposes `SwapItemTableLayout(TableLayoutPanel)`;
+- [x] AC3: `IQfcFormViewer` exposes `SwapItemTableLayout(TableLayoutPanel)`;
   `L1v0L2L3v_TableLayout` is get-only on the interface; `ActivateQueuedTlp` performs the
   swap through the new method.
-- [ ] AC4: `IQfcFormViewer` exposes `CaptureTlpCellStates()`,
+- [x] AC4: `IQfcFormViewer` exposes `CaptureTlpCellStates()`,
   `GetKeyEventExclusionControls()`, and `ItemViewerTemplateMargin`;
   `QfcItemViewerTemplate` and `QfcItemViewerExpandedTemplate` are removed from the
   interface; `CaptureItemSettings` and `RegisterFormEventHandlers` consume the new members.
-- [ ] AC5: New MSTest coverage verifies, via Moq event raising / `VerifySet` / `Verify`,
+- [x] AC5: New MSTest coverage verifies, via Moq event raising / `VerifySet` / `Verify`,
   that command events route to the correct controller methods, that the skip flow toggles
   `SkipButtonText`/`SkipButtonEnabled`, and that `CaptureItemSettings` handles both the
   populated and null `CaptureTlpCellStates()` results. New non-exempt code meets the
   >= 90% coverage floor; changed lines do not regress coverage; repo-wide coverage stays
   >= 80%.
-- [ ] AC6: No production file modified in this cycle exceeds 500 lines after the change
+- [x] AC6: No production file modified in this cycle exceeds 500 lines after the change
   (`QfcFormController.cs` split into partial classes). `QfcCollectionController.cs` is a
   pre-existing cap violation touched only with a net-negative edit; disposition recorded.
-- [ ] AC7: Full C# toolchain passes in order — csharpier, .NET analyzers,
+- [x] AC7: Full C# toolchain passes in order — csharpier, .NET analyzers,
   nullable/TreatWarningsAsErrors, MSTest with coverage — with no regressions.
 
 ## Constraints & Risks

@@ -305,6 +305,10 @@
     <Compile Include="Controllers\QfcDatamodel.QueueProcessing.cs" />
     <Compile Include="Controllers\QfcExplorerController.cs" />
     <Compile Include="Controllers\QfcFormController.cs" />
+    <Compile Include="Controllers\QfcFormController.SetupDisposal.cs" />
+    <Compile Include="Controllers\QfcFormController.EventHandlers.cs" />
+    <Compile Include="Controllers\QfcFormController.Actions.cs" />
+    <Compile Include="Controllers\QfcFormKeyHandler.cs" />
     <Compile Include="Controllers\QfcHighConfidencePreFilter.cs" />
     <Compile Include="Controllers\QfcHomeController.cs" />
     <Compile Include="Controllers\QfcHomeController.Metrics.cs" />

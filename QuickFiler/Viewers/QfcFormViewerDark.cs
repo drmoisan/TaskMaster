@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using QuickFiler.Controllers;
 using QuickFiler.Interfaces;
 
 namespace QuickFiler
 {
+    [ExcludeFromCodeCoverage]
     internal partial class QfcFormViewerDark : Form
     {
         public QfcFormViewerDark()
@@ -37,7 +40,7 @@ namespace QuickFiler
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (keyData.HasFlag(Keys.Alt))
+            if (QfcFormKeyHandler.IsAltKeyCommand(keyData))
             {
                 // If keyData = Keys.Up OrElse keyData = Keys.Down OrElse keyData = Keys.Left OrElse keyData = Keys.Right OrElse keyData = Keys.Alt Then
                 object sender = FromHandle(msg.HWnd);
