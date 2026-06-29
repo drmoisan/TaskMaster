@@ -102,6 +102,12 @@ namespace QuickFiler.Controllers
         private Frame<int, string> _frame;
         private BackgroundWorker _worker;
 
+        /// <summary>
+        /// Injectable time/delay seam. Defaults to <see cref="TimeProvider.System"/> so production
+        /// timing is unchanged; tests assign a fake provider to make async delays deterministic.
+        /// </summary>
+        internal TimeProvider TimeProvider { get; set; } = TimeProvider.System;
+
         #endregion Private Variables
 
         #region Public Properties

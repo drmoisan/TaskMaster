@@ -37,7 +37,8 @@ namespace QuickFiler.Controllers
 
         public static async Task<QfcHomeController> LaunchAsync(
             IApplicationGlobals appGlobals,
-            System.Action parentCleanup
+            System.Action parentCleanup,
+            TimeProvider timeProvider = null
         )
         {
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} {nameof(QfcHomeController)}.{nameof(LaunchAsync)} is beginning");
@@ -50,6 +51,7 @@ namespace QuickFiler.Controllers
 
             // Create uninitialized instance of QfcHomeController
             var controller = new QfcHomeController();
+            controller.TimeProvider = timeProvider ?? TimeProvider.System;
 
             // Create cancellation token and progress tracker
             var tokenSource = new CancellationTokenSource();
@@ -72,7 +74,7 @@ namespace QuickFiler.Controllers
             catch (OperationCanceledException)
             {
                 logger.Info(
-                    $"{DateTime.Now.ToString("mm:ss.fff")} "
+                    $"{controller.TimeProvider.GetLocalNow().LocalDateTime.ToString("mm:ss.fff")} "
                         + $"{nameof(QfcHomeController)}.{nameof(LaunchAsync)} was cancelled"
                 );
                 if (progress is not null)

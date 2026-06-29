@@ -40,7 +40,7 @@ namespace QuickFiler.Controllers
                 {
                     commandBars.ExecuteMso("ToggleOnline");
                 }
-                await Task.Delay(5);
+                await TimeProvider.Delay(TimeSpan.FromMilliseconds(5));
             }
             return offline;
         }

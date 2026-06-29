@@ -9,6 +9,13 @@ namespace QuickFiler.Controllers
 {
     public partial class QfcHomeController
     {
+        /// <summary>
+        /// Injectable time/delay seam. Defaults to <see cref="TimeProvider.System"/> so production
+        /// timestamps and delays are unchanged; tests assign a mock/fake provider to make
+        /// time-dependent output and async delays deterministic.
+        /// </summary>
+        internal TimeProvider TimeProvider { get; set; } = TimeProvider.System;
+
         public void QuickFileMetrics_WRITE(string filename)
         {
             string durationText,
@@ -17,7 +24,7 @@ namespace QuickFiler.Controllers
             string dataLineBeg;
 
             // Create a line of comma seperated valued to store data
-            var now = DateTime.Now;
+            var now = TimeProvider.GetLocalNow().LocalDateTime;
             //var curDateText = DateTime.Now.ToString("MM/dd/yyyy");
             //var curTimeText = DateTime.Now.ToString("hh:mm");
             //dataLineBeg = curDateText + "," + curTimeText + ",";
@@ -97,9 +104,10 @@ namespace QuickFiler.Controllers
             Folder OlEmailCalendar;
 
             // Create a line of comma seperated valued to store data
-            curDateText = DateTime.Now.ToString("MM/dd/yyyy");
+            var now = TimeProvider.GetLocalNow().LocalDateTime;
+            curDateText = now.ToString("MM/dd/yyyy");
 
-            curTimeText = DateTime.Now.ToString("hh:mm");
+            curTimeText = now.ToString("hh:mm");
 
             dataLineBeg = curDateText + "," + curTimeText + ",";
 
@@ -111,7 +119,7 @@ namespace QuickFiler.Controllers
 
             //Duration = _stopWatchMoved.Elapsed.Seconds;
             Duration = StopWatch.Elapsed.Seconds;
-            OlEndTime = DateTime.Now;
+            OlEndTime = now;
             OlStartTime = OlEndTime.Subtract(new TimeSpan(0, 0, 0, (int)Duration));
 
             var emailsLoaded = _formController.Groups.EmailsToMove;
@@ -211,7 +219,7 @@ namespace QuickFiler.Controllers
                     else
                     {
                         //logger.Debug($"Timeout adding {line}");
-                        await Task.Delay(20);
+                        await TimeProvider.Delay(TimeSpan.FromMilliseconds(20));
                     }
                 }
             } while (!success);
