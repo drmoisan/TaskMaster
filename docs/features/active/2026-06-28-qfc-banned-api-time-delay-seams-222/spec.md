@@ -38,7 +38,7 @@ Exact active (non-commented) sites verified on HEAD:
 - [x] Seams injected through `QfcHomeController` and `QfcDatamodel` construction paths without breaking public `IQfcDatamodel` / home-controller surfaces.
 - [x] Every touched file remains <= 500 lines.
 - [x] Focused MSTest+Moq+FluentAssertions tests prove time-dependent output uses the injected clock and delayed paths await the injected delay (Moq-verifiable), with no live Outlook COM and no temp files.
-- [x] New/changed code targets >= 90% coverage; coverage on changed lines not reduced; repo-wide floor (>= 80%) maintained.
+- [ ] New/changed code targets >= 90% coverage; coverage on changed lines not reduced; repo-wide floor (>= 80%) maintained.
 - [x] C# toolchain passes in order: csharpier -> analyzer build -> nullable build (TreatWarningsAsErrors) -> vstest with coverage.
 
 ## Invariants (must not change)
