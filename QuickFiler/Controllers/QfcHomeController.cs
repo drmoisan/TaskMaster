@@ -311,8 +311,8 @@ namespace QuickFiler.Controllers
                 //logger.Debug("Background load of email database complete.");
                 UiThread.Dispatcher.Invoke(() =>
                 {
-                    _formViewer.L1v1L2h5_SpnEmailPerLoad.Enabled = true;
-                    _formViewer.L1v1L2h5_BtnSkip.Enabled = true;
+                    _formViewer.ItemsPerLoadEnabled = true;
+                    _formViewer.SkipButtonEnabled = true;
                 });
                 //_ = IterateQueueAsync();
                 WorkerComplete = true;

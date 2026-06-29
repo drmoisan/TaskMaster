@@ -472,9 +472,8 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange
             _mockParent.Setup(x => x.WorkerComplete).Returns(true);
-            var spn = new NumericUpDown();
-            spn.Value = 8;
-            _mockFormViewer.SetupGet(x => x.L1v1L2h5_SpnEmailPerLoad).Returns(spn);
+            _mockFormViewer.SetupProperty(x => x.ItemsPerLoadValue);
+            _mockFormViewer.Object.ItemsPerLoadValue = 8m;
             _controller = CreateQfcFormController();
             SetPrivateField(_controller, "_itemsPerIteration", 8);
 
@@ -490,9 +489,8 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange
             _mockParent.Setup(x => x.WorkerComplete).Returns(true);
-            var spn = new NumericUpDown();
-            spn.Value = 9;
-            _mockFormViewer.SetupGet(x => x.L1v1L2h5_SpnEmailPerLoad).Returns(spn);
+            _mockFormViewer.SetupProperty(x => x.ItemsPerLoadValue);
+            _mockFormViewer.Object.ItemsPerLoadValue = 9m;
 
             _mockQfcQueue
                 .Setup(q =>
@@ -519,7 +517,7 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             Assert.AreEqual(
                 GetPrivateField<int>(_controller, "_itemsPerIteration"),
-                (int)spn.Value
+                (int)_mockFormViewer.Object.ItemsPerLoadValue
             );
             mockQfcCollectionController.Verify(x => x.UnregisterNavigation(), Times.Once);
             mockQfcCollectionController.Verify(x => x.RegisterNavigation(), Times.Once);

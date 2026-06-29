@@ -840,10 +840,7 @@ namespace QuickFiler.Controllers
 
         internal void ActivateQueuedTlp(TableLayoutPanel tlp)
         {
-            _formViewer.L1v0L2_PanelMain.Controls.Remove(_formViewer.L1v0L2L3v_TableLayout);
-            _formViewer.L1v0L2L3v_TableLayout = tlp;
-            _formViewer.L1v0L2L3v_TableLayout.Parent = _formViewer.L1v0L2_PanelMain;
-            _formViewer.L1v0L2L3v_TableLayout.Visible = true;
+            _formViewer.SwapItemTableLayout(tlp);
             _itemTlp = _formViewer.L1v0L2L3v_TableLayout;
         }
 

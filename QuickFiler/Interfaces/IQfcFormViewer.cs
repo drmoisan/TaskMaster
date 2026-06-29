@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using QuickFiler.Interfaces;
+using UtilitiesCS;
 using UtilitiesCS.Interfaces.IWinForm;
 
 namespace QuickFiler
@@ -18,15 +20,32 @@ namespace QuickFiler
         void SetController(IFilerFormController controller);
         void SetKeyboardHandler(IQfcKeyboardHandler keyboardHandler);
 
-        TableLayoutPanel L1v0L2L3v_TableLayout { get; set; }
-        ItemViewer QfcItemViewerTemplate { get; }
-        ItemViewerExpanded QfcItemViewerExpandedTemplate { get; }
+        // Item layout — setter removed by Seam C (swap performed via SwapItemTableLayout)
+        TableLayoutPanel L1v0L2L3v_TableLayout { get; }
         TableLayoutPanel L1v_TableLayout { get; }
-        System.Windows.Forms.NumericUpDown L1v1L2h5_SpnEmailPerLoad { get; }
-        System.Windows.Forms.Button L1v1L2h2_ButtonOK { get; }
-        System.Windows.Forms.Button L1v1L2h3_ButtonCancel { get; }
-        System.Windows.Forms.Button L1v1L2h4_ButtonUndo { get; }
-        System.Windows.Forms.Button L1v1L2h5_BtnSkip { get; }
         Panel L1v0L2_PanelMain { get; }
+
+        // Seam C — TLP swap intent method
+        void SwapItemTableLayout(TableLayoutPanel newTlp);
+
+        // Seam D — item-viewer template snapshot intents (replaces the raw template properties)
+        TlpCellStates CaptureTlpCellStates();
+        IReadOnlyList<Control> GetKeyEventExclusionControls();
+        Padding ItemViewerTemplateMargin { get; }
+
+        // Seam B — intent command events (replaces the four raw Button properties)
+        event EventHandler OkClicked;
+        event EventHandler CancelClicked;
+        event EventHandler UndoClicked;
+        event EventHandler SkipClicked;
+
+        // Seam B — skip button state
+        string SkipButtonText { get; set; }
+        bool SkipButtonEnabled { get; set; }
+
+        // Seam B — items-per-load spinner state/event (replaces the NumericUpDown property)
+        decimal ItemsPerLoadValue { get; set; }
+        event EventHandler ItemsPerLoadValueChanged;
+        bool ItemsPerLoadEnabled { get; set; }
     }
 }
