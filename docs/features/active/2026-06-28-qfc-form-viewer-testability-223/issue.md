@@ -68,12 +68,16 @@ satisfy the 500-line file cap before adding code.
   `GetKeyEventExclusionControls()`, and `ItemViewerTemplateMargin`;
   `QfcItemViewerTemplate` and `QfcItemViewerExpandedTemplate` are removed from the
   interface; `CaptureItemSettings` and `RegisterFormEventHandlers` consume the new members.
-- [ ] AC5: New MSTest coverage verifies, via Moq event raising / `VerifySet` / `Verify`,
+- [x] AC5: New MSTest coverage verifies, via Moq event raising / `VerifySet` / `Verify`,
   that command events route to the correct controller methods, that the skip flow toggles
   `SkipButtonText`/`SkipButtonEnabled`, and that `CaptureItemSettings` handles both the
   populated and null `CaptureTlpCellStates()` results. New non-exempt code meets the
-  >= 90% coverage floor; changed lines do not regress coverage; repo-wide coverage stays
-  >= 80%.
+  >= 90% coverage floor (QfcFormKeyHandler 100%); changed lines do not regress coverage
+  (QfcFormController +12.62pp). The "repo-wide coverage stays >= 80%" sub-claim is
+  satisfied-with-documented-exception: measured repo-wide first-party coverage is
+  73.35%–74.11% (pre-existing shortfall, not introduced by this change), accepted under
+  the maintainer-ratified authority-scoped exception in
+  `maintainer-decision.2026-06-29.md`; residual uplift tracked under #197.
 - [x] AC6: No production file modified in this cycle exceeds 500 lines after the change
   (`QfcFormController.cs` split into partial classes). `QfcCollectionController.cs` is a
   pre-existing cap violation touched only with a net-negative edit; disposition recorded.
