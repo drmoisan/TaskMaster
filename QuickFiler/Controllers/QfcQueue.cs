@@ -37,7 +37,7 @@ namespace QuickFiler.Controllers
         private int _jobsRunning = 0;
         private BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> _queue =
         [];
-        private EmailMoveMonitor _moveMonitor = new EmailMoveMonitor();
+        private IEmailMoveMonitor _moveMonitor = new EmailMoveMonitor();
 
         #endregion Constructors and Private Members
 

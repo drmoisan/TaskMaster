@@ -97,7 +97,7 @@ namespace QuickFiler.Controllers
         private IApplicationGlobals _globals;
         private Explorer _activeExplorer;
         private LockingLinkedList<MailItem> _masterQueue = [];
-        private EmailMoveMonitor _moveMonitor = new();
+        private IEmailMoveMonitor _moveMonitor = new EmailMoveMonitor();
         private Outlook.Application _olApp;
         private Frame<int, string> _frame;
         private BackgroundWorker _worker;

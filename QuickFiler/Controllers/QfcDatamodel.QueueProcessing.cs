@@ -67,42 +67,38 @@ namespace QuickFiler.Controllers
 
             try
             {
-                await Task.Run(
-                    () =>
-                    {
-                        var max = nodes.Count;
-                        for (int i = 0; i < max; i++)
-                        {
-                            TryUnhookOrReplace(ref nodes, i);
-                            //var node = nodes[i];
-                            //_token.ThrowIfCancellationRequested();
-                            //bool processing = true;
-                            //while (processing)
-                            //{
-                            //    try
-                            //    {
-                            //        await _moveMonitor.UnhookItemAsync(node, _token);
-                            //        processing = false;
-                            //    }
-                            //    catch (System.Exception e)
-                            //    {
-                            //        logger.Error($"Error unhooking item from move monitor. Getting next item from Queue {e.Message}");
-                            //        nodes.Remove(node);
-                            //        node = _masterQueue.TryTakeFirst();
-                            //        if (node is null)
-                            //        {
-                            //            processing = false;
-                            //        }
-                            //        else
-                            //        {
-                            //            nodes.Insert(i, node);
-                            //        }
-                            //    }
-                            //}
-                        }
-                    },
-                    _token
-                );
+                // The unhook path now self-marshals its Outlook COM access onto the STA thread
+                // (EmailMoveMonitor.UnhookItem), so the redundant Task.Run wrapper is removed.
+                var max = nodes.Count;
+                for (int i = 0; i < max; i++)
+                {
+                    TryUnhookOrReplace(ref nodes, i);
+                    //var node = nodes[i];
+                    //_token.ThrowIfCancellationRequested();
+                    //bool processing = true;
+                    //while (processing)
+                    //{
+                    //    try
+                    //    {
+                    //        await _moveMonitor.UnhookItemAsync(node, _token);
+                    //        processing = false;
+                    //    }
+                    //    catch (System.Exception e)
+                    //    {
+                    //        logger.Error($"Error unhooking item from move monitor. Getting next item from Queue {e.Message}");
+                    //        nodes.Remove(node);
+                    //        node = _masterQueue.TryTakeFirst();
+                    //        if (node is null)
+                    //        {
+                    //            processing = false;
+                    //        }
+                    //        else
+                    //        {
+                    //            nodes.Insert(i, node);
+                    //        }
+                    //    }
+                    //}
+                }
             }
             catch (System.Exception e)
             {
