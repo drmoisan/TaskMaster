@@ -74,7 +74,7 @@ namespace QuickFiler.Controllers
         private IQfcKeyboardHandler _kbdHandler;
         private delegate int ActionDelegate(int intNewSelection, bool blExpanded);
         private TlpCellStates _tlpStates;
-        private EmailMoveMonitor _moveMonitor = new();
+        private IEmailMoveMonitor _moveMonitor = new EmailMoveMonitor();
 
         internal ConcurrentBag<Task> BackgroundLoadingTasks = [];
 
