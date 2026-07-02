@@ -61,5 +61,5 @@ artifact and re-submitted for ratification; a broad category-level exemption is 
 ## References
 
 - `evidence/other/exemption-boundary.2026-06-29T12-40.md` (denied boundary)
-- `remediation-inputs.2026-06-29T13-15.md`, `remediation-inputs.2026-06-29T13-20.md` (R2 escalation)
+- `2026-06-29T13-15-audit/remediation-inputs.2026-06-29T13-15.md`, `2026-06-29T13-20-remediation/remediation-inputs.2026-06-29T13-20.md` (R2 escalation)
 - `UtilitiesCS/Interfaces/IWinForm/` (existing control-interface layer to extend)

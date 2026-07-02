@@ -4,7 +4,7 @@
 **Feature Folder:** `docs/features/active/2026-06-29-qfc-item-controller-testability-227/`
 **Base Branch:** `main` (`4611fd60b7d1a782a8024f54cbfd4d28f6d4c264`)
 **Head:** `TaskMaster-wt-2026-06-29-09-38` (`bcc7d7e32a12693b732d5c5e133a681890bec412`)
-**Source review (cycle 0):** `remediation-inputs.2026-06-29T13-15.md`, `policy-audit.2026-06-29T13-15.md`, `code-review.2026-06-29T13-15.md`, `feature-audit.2026-06-29T13-15.md`
+**Source review (cycle 0):** `../2026-06-29T13-15-audit/remediation-inputs.2026-06-29T13-15.md`, `../2026-06-29T13-15-audit/policy-audit.2026-06-29T13-15.md`, `../2026-06-29T13-15-audit/code-review.2026-06-29T13-15.md`, `../2026-06-29T13-15-audit/feature-audit.2026-06-29T13-15.md`
 
 ## Cycle scope
 

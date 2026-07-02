@@ -6,7 +6,7 @@
 - **Head:** `TaskMaster-wt-2026-06-29-09-38` (`bcc7d7e32a12693b732d5c5e133a681890bec412`)
 - **Work Mode:** `full-feature` (resolved from `issue.md` metadata block: `- Work Mode: full-feature`)
 - **Plan author:** atomic-planner
-- **Remediation inputs (authoritative):** `remediation-inputs.2026-06-29T13-20.md` (cycle entry), `remediation-inputs.2026-06-29T13-15.md`, `policy-audit.2026-06-29T13-15.md`
+- **Remediation inputs (authoritative):** `remediation-inputs.2026-06-29T13-20.md` (cycle entry), `../2026-06-29T13-15-audit/remediation-inputs.2026-06-29T13-15.md`, `../2026-06-29T13-15-audit/policy-audit.2026-06-29T13-15.md`
 - **Reference procedure precedent:** `docs/features/active/2026-06-28-qfc-form-viewer-testability-223/remediation-plan.2026-06-28T21-30.md` (#223 cycle-1 canonical-coverage generation)
 
 ## Scope Statement (single root cause, R1 only)
