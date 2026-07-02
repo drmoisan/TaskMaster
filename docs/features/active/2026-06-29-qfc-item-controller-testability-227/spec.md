@@ -315,8 +315,14 @@ code that cannot be unit-tested without a live Outlook process. For this work:
   8 via the new `FolderPredictor` factory-delegate and `Theme`+`IUiDispatcher` seams, Tier 2) are now
   de-exempted and covered — 41->24. See `evidence/other/exemption-boundary.2026-07-02T15-05.md` (the
   re-submitted boundary) and `evidence/qa-gates/final-residual-verification.2026-07-02T15-16.md` (the
-  itemized 24-member re-verification). The checkbox remains unchecked pending maintainer ratification
-  of the reduced 24-member boundary, consistent with the cycle-2 precedent.
+  itemized 24-member re-verification). CYCLE-4 (delivered 2026-07-02, test-only): the cycle-3 exit
+  reaudit found 2 of the 17 de-exemptions (`ToggleFocus()`/`ToggleFocus(Enums.ToggleState)`) were
+  tested for `Invoke` marshaling only, not genuine behavior; cycle 4 replaced the assertion with the
+  already-proven `BuildExecutingViewer()` technique and real `_activeUI`/`_activeTheme` state
+  assertions, with no change to the exemption count. Cycle-4 exit reaudit
+  (`2026-07-02T16-45-audit/`) recorded 0 blocking findings, independently re-verified. The checkbox
+  remains unchecked pending maintainer ratification of the reduced 24-member boundary, consistent
+  with the cycle-2 precedent.
 - [x] AC9: The four behavioral seams (`IUiDispatcher`, `IWebViewCoreInitializer`, `IMailItemActions`
   + collaborator factory delegates, and thin-delegator `async void` handlers) are introduced per the
   DI-seam rule ordering, are covered to >= 90%, and preserve runtime behavior. No leaf-control
@@ -333,8 +339,11 @@ code that cannot be unit-tested without a live Outlook process. For this work:
   those 17 members are de-exempted (41->24); the reduced 24-member boundary is individually justified
   by category and per-member in `evidence/other/exemption-boundary.2026-07-02T15-05.md` and
   re-verified against source in `evidence/qa-gates/final-residual-verification.2026-07-02T15-16.md`.
-  The checkbox remains unchecked pending maintainer ratification of this boundary at review, per the
-  authority-scoped coverage-exception precedent already cited above.
+  CYCLE-4: the cycle-3 test-honesty gap on 2 of the 24 boundary members (`ToggleFocus` overloads) is
+  resolved; the boundary composition (24 members, unchanged this cycle) is now backed by genuinely
+  behavior-verified tests for all de-exempted siblings. The checkbox remains unchecked pending
+  maintainer ratification of this boundary at review, per the authority-scoped coverage-exception
+  precedent already cited above.
 - [x] AC6: No production file modified exceeds 500 lines after the change (re-verified after the
   redesign, including the new seam files).
 - [x] AC7: Full C# toolchain passes in order — csharpier, .NET analyzers,
