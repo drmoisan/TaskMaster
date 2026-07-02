@@ -114,40 +114,158 @@ namespace QuickFiler.Controllers.Tests
             return viewer;
         }
 
+        /// <summary>
+        /// Cycle-4 remediation (R1): reflection-injects handle-less doubles for every private field
+        /// touched by <see cref="Theme.SetQfcTheme(bool)"/> (<c>Theme.cs:414-432</c>) and the recursive
+        /// <c>SetQfcTheme()</c> it falls through to (<c>Theme.Rendering.cs:8-103</c>), on every
+        /// <see cref="Theme"/> in <paramref name="controller"/>'s <c>_themes</c> dictionary. A
+        /// handle-less <see cref="Label"/> avoids the first NRE (<c>_lblItemNumber.InvokeRequired</c>
+        /// on a null field); the other 14 fields avoid the second NRE thrown by the recursive
+        /// <c>SetQfcTheme()</c> body. Doubles mirror the shape proven in
+        /// <c>Theme_DispatcherTests.Constructor_BigOverload_WithNullUiDispatcher_DefaultsToWpfUiDispatcher</c>
+        /// (<c>Theme.DispatcherTests.cs:91-134</c>); none require a live handle or STA thread.
+        /// <c>BuildFocusController</c>/<c>BuildAllThemes</c>/<c>BuildColorTheme</c> stay unmodified.
+        /// <c>_topicThread</c>/<c>_webView2</c> use <see cref="Activator.CreateInstance(Type)"/> against
+        /// the field's runtime <see cref="Type"/> (not a source-level <c>new</c>) because this test
+        /// project has no direct compile-time reference to <c>ObjectListView.dll</c>/
+        /// <c>Microsoft.Web.WebView2.WinForms.dll</c> — only <c>QuickFiler.csproj</c>/
+        /// <c>UtilitiesCS.csproj</c> do, and legacy <c>ProjectReference</c>s do not flow transitive
+        /// compile-time references. Both assemblies still load at run time via those project
+        /// references, so this produces the identical concrete instance without a project-file edit.
+        /// </summary>
+        private static void EnableHandlelessThemeInvoke(FocusController controller)
+        {
+            var themes = (Dictionary<string, Theme>)GetField(controller, "_themes");
+            foreach (var theme in themes.Values)
+            {
+                SetThemeField(theme, "_lblItemNumber", new Label());
+                SetThemeField(theme, "_lblSender", new Label());
+                SetThemeField(theme, "_lblSubject", new Label());
+                SetThemeField(theme, "_tableLayoutPanels", new List<TableLayoutPanel>());
+                SetThemeField(theme, "_buttons", new List<Button>());
+                SetThemeField(theme, "_menuItems", new List<System.ComponentModel.Component>());
+                SetThemeField(theme, "_menuStrip", new MenuStrip());
+                SetThemeField(theme, "_tipsDetailsLabels", new List<IQfcTipsDetails>());
+                SetThemeField(theme, "_tipsExpanded", new List<IQfcTipsDetails>());
+                SetThemeField(theme, "_textboxSearch", new TextBox());
+                SetThemeField(theme, "_textboxBody", new TextBox());
+                SetThemeField(theme, "_comboFolders", new ComboBox());
+                SetThemeFieldViaActivator(theme, "_topicThread");
+                SetThemeFieldViaActivator(theme, "_webView2");
+                SetThemeField(theme, "_viewer", (Control)new Panel());
+                SetThemeField(theme, "MailRead", (Func<bool>)(() => true));
+            }
+        }
+
+        private static void SetThemeField(Theme theme, string name, object value)
+        {
+            FieldInfo field = typeof(Theme).GetField(
+                name,
+                BindingFlags.NonPublic | BindingFlags.Instance
+            );
+            field.Should().NotBeNull(because: "field '" + name + "' must exist on Theme");
+            field.SetValue(theme, value);
+        }
+
+        private static void SetThemeFieldViaActivator(Theme theme, string name)
+        {
+            FieldInfo field = typeof(Theme).GetField(
+                name,
+                BindingFlags.NonPublic | BindingFlags.Instance
+            );
+            field.Should().NotBeNull(because: "field '" + name + "' must exist on Theme");
+            field.SetValue(theme, Activator.CreateInstance(field.FieldType));
+        }
+
         // ------------------------- ToggleFocus / ToggleFocus(ToggleState) -------------------------
-        // Cycle-3 P9-T5/P9-T6 (members #33/#35, de-exempted): the entire body runs inside a single
-        // _itemViewer.Invoke(...) delegate; verifying the delegate was marshaled through Invoke exactly
-        // once (without executing it) requires no Theme construction, mirroring
-        // AssignControls_WhenInvokeRequired_MarshalsViaInvoke (QfcItemController.ViewerSetupTests.cs).
+        // Cycle-3 P9-T5/P9-T6 (members #33/#35, de-exempted); cycle-4 remediation R1: the entire body
+        // runs inside a single _itemViewer.Invoke(...) delegate. BuildExecutingViewer() executes the
+        // delegate synchronously and EnableHandlelessThemeInvoke() populates the terminal
+        // _themes[_activeTheme].SetQfcTheme(async: false) call's dependencies with handle-less doubles,
+        // so these tests exercise the full method body (the _activeUI/_activeTheme state machine) and
+        // assert the resulting state transitions, not merely the Invoke marshal.
 
         [TestMethod]
         public void ToggleFocus_StateOverload_MarshalsThroughItemViewerInvoke()
         {
-            // Arrange
-            var viewer = new Mock<IItemViewer>();
+            // Arrange — _tableLayoutPanels (QfcItemController's own field, distinct from Theme's field
+            // of the same name) is dereferenced by ToggleTips inside the executed delegate body.
+            var viewer = BuildExecutingViewer();
             var controller = BuildFocusController();
             SetField(controller, "_itemViewer", viewer.Object);
+            SetField(controller, "_tableLayoutPanels", new List<TableLayoutPanel>());
+            EnableHandlelessThemeInvoke(controller);
 
             // Act
             controller.ToggleFocus(Enums.ToggleState.On);
 
-            // Assert — the write is marshaled through Invoke; its delegate body is never executed.
-            viewer.Verify(v => v.Invoke(It.IsAny<Delegate>()), Times.Once());
+            // Assert — the delegate body actually runs, transitioning inactive->active. Invoke fires
+            // twice: the outer wrapper plus the nested dispatch inside ToggleTips(async: false).
+            viewer.Verify(v => v.Invoke(It.IsAny<Delegate>()), Times.Exactly(2));
+            GetField(controller, "_activeUI").Should().Be(true);
+            GetField(controller, "_activeTheme").Should().Be("LightActive");
+        }
+
+        [TestMethod]
+        public void ToggleFocus_StateOverload_Off_FromActive_DeactivatesUiAndSwitchesToNormalTheme()
+        {
+            // Arrange
+            var viewer = BuildExecutingViewer();
+            var controller = BuildFocusController();
+            SetField(controller, "_itemViewer", viewer.Object);
+            SetField(controller, "_activeUI", true);
+            SetField(controller, "_activeTheme", "LightActive");
+            SetField(controller, "_tableLayoutPanels", new List<TableLayoutPanel>());
+            EnableHandlelessThemeInvoke(controller);
+
+            // Act
+            controller.ToggleFocus(Enums.ToggleState.Off);
+
+            // Assert — deactivates the UI and switches to the normal theme; Invoke fires twice (see above).
+            GetField(controller, "_activeUI").Should().Be(false);
+            GetField(controller, "_activeTheme").Should().Be("LightNormal");
+            viewer.Verify(v => v.Invoke(It.IsAny<Delegate>()), Times.Exactly(2));
         }
 
         [TestMethod]
         public void ToggleFocus_ParameterlessOverload_MarshalsThroughItemViewerInvoke()
         {
-            // Arrange
-            var viewer = new Mock<IItemViewer>();
+            // Arrange — BuildFocusController() leaves _activeUI at its default false, so this reaches
+            // the inactive->active branch.
+            var viewer = BuildExecutingViewer();
             var controller = BuildFocusController();
             SetField(controller, "_itemViewer", viewer.Object);
+            SetField(controller, "_tableLayoutPanels", new List<TableLayoutPanel>());
+            EnableHandlelessThemeInvoke(controller);
 
             // Act
             controller.ToggleFocus();
 
-            // Assert
-            viewer.Verify(v => v.Invoke(It.IsAny<Delegate>()), Times.Once());
+            // Assert — Invoke fires twice (see StateOverload test above for why).
+            viewer.Verify(v => v.Invoke(It.IsAny<Delegate>()), Times.Exactly(2));
+            GetField(controller, "_activeUI").Should().Be(true);
+            GetField(controller, "_activeTheme").Should().Be("LightActive");
+        }
+
+        [TestMethod]
+        public void ToggleFocus_ParameterlessOverload_FromActive_DeactivatesUiAndSwitchesToNormalTheme()
+        {
+            // Arrange
+            var viewer = BuildExecutingViewer();
+            var controller = BuildFocusController();
+            SetField(controller, "_itemViewer", viewer.Object);
+            SetField(controller, "_activeUI", true);
+            SetField(controller, "_activeTheme", "LightActive");
+            SetField(controller, "_tableLayoutPanels", new List<TableLayoutPanel>());
+            EnableHandlelessThemeInvoke(controller);
+
+            // Act
+            controller.ToggleFocus();
+
+            // Assert — deactivates the UI and switches to the normal theme; Invoke fires twice (see above).
+            GetField(controller, "_activeUI").Should().Be(false);
+            GetField(controller, "_activeTheme").Should().Be("LightNormal");
+            viewer.Verify(v => v.Invoke(It.IsAny<Delegate>()), Times.Exactly(2));
         }
 
         // ------------------------- ToggleFocusOnAsync / OffAsync (private) -------------------------

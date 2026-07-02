@@ -1,0 +1,22 @@
+# Phase 1 — ToggleFocus Verification (Cycle 4, Issue #227)
+
+Timestamp: 2026-07-02T16-20
+Command: `vstest.console.exe QuickFiler.Test.dll /Tests:ToggleFocus_StateOverload_MarshalsThroughItemViewerInvoke,ToggleFocus_StateOverload_Off_FromActive_DeactivatesUiAndSwitchesToNormalTheme,ToggleFocus_ParameterlessOverload_MarshalsThroughItemViewerInvoke,ToggleFocus_ParameterlessOverload_FromActive_DeactivatesUiAndSwitchesToNormalTheme /InIsolation`
+EXIT_CODE: 0
+Output Summary: All 4 named tests pass. `Passed: 4, Total: 4`.
+
+Also verified:
+- `grep -rnE "ExcludeFromCodeCoverage\]" QuickFiler/Controllers/QfcItemController*.cs UtilitiesCS/Threading/WpfUiDispatcher.cs QuickFiler/Viewers/WebView2CoreInitializer.cs QuickFiler/Interfaces/MailItemActionsAdapter.cs` → 24 matches (unchanged from P0-T6 baseline).
+- `wc -l QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs` → 497 lines (<= 500).
+
+## Scope-change findings surfaced during this task (reported per remediation-plan design decision §3 and the executor's scope-change rule)
+
+Two findings distinct from the plan's anticipated two `Theme`-related NREs were discovered while making the 4 tests genuinely pass. Both were resolved as mechanical micro-actions confined to `QfcItemController.FocusAndThemeTests.cs` (no production file, no `BuildFocusController`/`BuildAllThemes`/`BuildColorTheme`/csproj change):
+
+1. **Missing compile-time assembly references for two `Theme` doubles.** `QuickFiler.Test.csproj` has no direct `<Reference>` to `ObjectListView.dll` (`BrightIdeasSoftware.FastObjectListView`) or `Microsoft.Web.WebView2.WinForms.dll` — only `QuickFiler.csproj`/`UtilitiesCS.csproj` do, and legacy non-SDK `ProjectReference`s do not flow transitive compile-time references to the referencing project. A literal `new BrightIdeasSoftware.FastObjectListView()` / `new Microsoft.Web.WebView2.WinForms.WebView2()` in the test file fails with CS0246/CS0234. Resolved by constructing these two fields via `Activator.CreateInstance(field.FieldType)` against the field's own runtime `Type` (obtained through the same reflection already used to set the field) instead of a source-level `new` expression — both assemblies still load at test-run time via the transitive `QuickFiler`/`UtilitiesCS` project references, so the runtime instance is identical; only the C# construction syntax differs. No project-file edit was made.
+2. **`QfcItemController`'s own `_tableLayoutPanels` field (distinct from `Theme`'s field of the same name) is null.** `ToggleTips` (called from inside `ToggleFocus`'s genuinely-executed delegate body, `QfcItemController.FocusAndTheme.cs:208`) dereferences `QfcItemController._tableLayoutPanels` (declared `QfcItemController.cs:43`), which `BuildFocusController()` never populates, throwing `ArgumentNullException` inside `EnumerableEx.ForEach`. The sibling test `ToggleTips_Synchronous_DispatchesAndExecutesDelegate` (pre-existing, in the same file) already handles this by setting the field directly in its own Arrange section rather than via the shared builder. The same established pattern (`SetField(controller, "_tableLayoutPanels", new List<TableLayoutPanel>());`) was applied to the 4 `ToggleFocus` tests' own Arrange sections, without modifying `BuildFocusController`.
+3. **`Invoke` call count is genuinely 2, not 1, once the delegate actually executes.** `ToggleFocus`'s outer body wraps everything in one `_itemViewer.Invoke(...)` call; inside that delegate it calls `ToggleTips(async: false, ...)`, which itself calls `_itemViewer.Invoke(...)` a second time via `InvokeBeginInvoke`'s synchronous branch. The old tests never observed this because their non-executing `Mock<IItemViewer>()` never ran the outer delegate, so the nested call never fired. With `BuildExecutingViewer()` genuinely running the delegate, both calls occur. The assertion was corrected from `Times.Once()` to `Times.Exactly(2)` in all 4 `ToggleFocus` tests to match the true, now-observed behavior — this strengthens rather than weakens the assertion, since it reflects the method's actual dispatch behavior instead of an assumption inherited from the non-executing test style this cycle is removing.
+
+None of these three findings required a production-code change or a change to any file other than `QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs`. All three are documented here for audit transparency per the scope-change rule.
+
+Acceptance: all 4 named tests pass; exemption count equals 24; file line count <= 500.
