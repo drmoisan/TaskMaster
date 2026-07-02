@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Controllers;
@@ -166,6 +169,116 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             mock.Verify(v => v.Invoke(It.IsAny<Delegate>()), Times.Once());
             mock.VerifySet(v => v.ConversationCountText = It.IsAny<string>(), Times.Never());
+        }
+
+        // ---------------------------------------------------------------------------
+        // Cycle-2 Phase 5 (AC8) de-exemption coverage: PopulateConversation(ConversationResolver),
+        // RenderConversationCount() (parameterless), SetTopicThread.
+        // ---------------------------------------------------------------------------
+
+        private static ConversationResolver BuildResolverWithCount(int sameFolder)
+        {
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            var mockMail = new Mock<MailItem>();
+            var resolver = new ConversationResolver(mockGlobals.Object, mockMail.Object);
+            resolver.Count = new Pair<int>(sameFolder: sameFolder, expanded: sameFolder);
+            return resolver;
+        }
+
+        [TestMethod]
+        public void PopulateConversation_WithResolver_StoresResolver()
+        {
+            // Arrange — the resolver-taking overload stores the resolver and delegates the count
+            // render to the int overload, which (cycle-2 Phase 6, P6-T3) now routes its fire-and-forget
+            // dispatch through the injectable IUiDispatcher seam. The sync-dispatcher mock executes the
+            // BeginInvoke delegate against a mocked viewer.
+            var dispatcher = QfcItemControllerTestSupport.BuildSyncDispatcher();
+            var viewer = new Mock<IItemViewer>();
+            var controller = new HarnessController();
+            QfcItemControllerTestSupport.SetField(controller, "_uiDispatcher", dispatcher.Object);
+            QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer.Object);
+            var resolver = BuildResolverWithCount(2);
+
+            // Act
+            controller.PopulateConversation(resolver);
+
+            // Assert
+            controller.ConversationResolver.Should().BeSameAs(resolver);
+            dispatcher.Verify(d => d.BeginInvoke(It.IsAny<System.Action>()), Times.Once());
+            viewer.VerifySet(v => v.ConversationCountText = "2", Times.Once());
+        }
+
+        [TestMethod]
+        public void RenderConversationCountParameterless_WhenResolverNull_RendersZeroWithRedBackColor()
+        {
+            // Arrange — no resolver set: the null-coalescing default yields count 0.
+            var mock = new Mock<IItemViewer>();
+            mock.SetupGet(v => v.InvokeRequired).Returns(false);
+            var controller = new ViewerController(mock.Object);
+
+            // Act
+            controller.RenderConversationCount();
+
+            // Assert
+            mock.VerifySet(v => v.ConversationCountText = "0", Times.Once());
+            mock.VerifySet(v => v.ConversationCountBackColor = Color.Red, Times.Once());
+        }
+
+        [TestMethod]
+        public void RenderConversationCountParameterless_WhenResolverSet_RendersSameFolderCount()
+        {
+            // Arrange — resolver with SameFolder == 5 injected via the backing field.
+            var mock = new Mock<IItemViewer>();
+            mock.SetupGet(v => v.InvokeRequired).Returns(false);
+            var controller = new ViewerController(mock.Object);
+            QfcItemControllerTestSupport.SetField(
+                controller,
+                "_conversationResolver",
+                BuildResolverWithCount(5)
+            );
+
+            // Act
+            controller.RenderConversationCount();
+
+            // Assert
+            mock.VerifySet(v => v.ConversationCountText = "5", Times.Once());
+            mock.VerifySet(v => v.ConversationCountBackColor = It.IsAny<Color>(), Times.Never());
+        }
+
+        [TestMethod]
+        public void SetTopicThread_WhenNotInvokeRequired_SetsItemsAndSortsDescending()
+        {
+            // Arrange
+            var mock = new Mock<IItemViewer>();
+            mock.SetupGet(v => v.InvokeRequired).Returns(false);
+            var controller = new ViewerController(mock.Object);
+            var conversation = new List<MailItemHelper> { new MailItemHelper() };
+
+            // Act
+            controller.SetTopicThread(conversation);
+
+            // Assert
+            mock.Verify(v => v.SetConversationItems(conversation), Times.Once());
+            mock.Verify(v => v.SortConversationByDate(SortOrder.Descending), Times.Once());
+        }
+
+        [TestMethod]
+        public void SetTopicThread_WhenInvokeRequired_MarshalsViaInvoke()
+        {
+            // Arrange
+            var mock = new Mock<IItemViewer>();
+            mock.SetupGet(v => v.InvokeRequired).Returns(true);
+            var controller = new ViewerController(mock.Object);
+
+            // Act
+            controller.SetTopicThread(new List<MailItemHelper>());
+
+            // Assert
+            mock.Verify(v => v.Invoke(It.IsAny<Delegate>()), Times.Once());
+            mock.Verify(
+                v => v.SetConversationItems(It.IsAny<System.Collections.IList>()),
+                Times.Never()
+            );
         }
     }
 }

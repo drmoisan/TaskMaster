@@ -24,6 +24,8 @@ namespace QuickFiler.Controllers
 {
     internal partial class QfcItemController
     {
+        // Residual (bucket-iii): constructs a FolderPredictor (COM/Outlook-bound folder analysis, an
+        // out-of-scope collaborator with no seam this cycle). Not unit-reachable.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void LoadFolderHandler(object varList = null)
         {
@@ -45,6 +47,8 @@ namespace QuickFiler.Controllers
             }
         }
 
+        // Residual (bucket-iii): async counterpart of LoadFolderHandler; constructs the COM-bound
+        // FolderPredictor (out-of-scope collaborator, no seam this cycle). Not unit-reachable.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task LoadFolderHandlerAsync(CancellationToken cancel, object varList = null)
         {
@@ -112,6 +116,8 @@ namespace QuickFiler.Controllers
             }
         }
 
+        // Residual (bucket-iii): calls LoadFolderHandler (COM-bound FolderPredictor) before the
+        // mockable IItemViewer combo population; barrier inherited from LoadFolderHandler.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void PopulateFolderComboBox(object varList = null)
         {
@@ -129,6 +135,8 @@ namespace QuickFiler.Controllers
             }
         }
 
+        // Residual (bucket-iii): calls LoadFolderHandlerAsync (COM-bound FolderPredictor); barrier
+        // inherited from the folder-prediction step. Not unit-reachable.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task PopulateFolderComboBoxAsync(
             CancellationToken token,

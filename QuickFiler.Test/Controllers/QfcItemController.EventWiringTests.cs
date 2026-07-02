@@ -113,5 +113,82 @@ namespace QuickFiler.Controllers.Tests
             charActionsAsync.ContainsKey('B').Should().BeFalse();
             charActionsAsync.ContainsKey('D').Should().BeFalse();
         }
+
+        // ---------------------------------------------------------------------------
+        // Cycle-2 Phase 5 (AC8) de-exemption coverage: the SYNCHRONOUS registration-membership
+        // members RegisterFocusActions / UnregisterFocusActions / UnregisterExpandedActions, mirroring
+        // the async membership tests above. Lambda bodies are evaluated only when invoked, so
+        // registration runs without a live view.
+        // ---------------------------------------------------------------------------
+
+        private static (
+            Mock<IQfcKeyboardHandler> mock,
+            KbdActions<Keys, KaKey, Action<Keys>> keyActions,
+            KbdActions<char, KaChar, Action<char>> charActions
+        ) BuildSyncKbdHandlerStub()
+        {
+            var mockKbd = new Mock<IQfcKeyboardHandler>();
+            var keyActions = new KbdActions<Keys, KaKey, Action<Keys>>();
+            var charActions = new KbdActions<char, KaChar, Action<char>>();
+            mockKbd.Setup(k => k.KeyActions).Returns(keyActions);
+            mockKbd.Setup(k => k.CharActions).Returns(charActions);
+            return (mockKbd, keyActions, charActions);
+        }
+
+        [TestMethod]
+        public void RegisterFocusActions_RegistersExpectedSyncKeyAndCharActions()
+        {
+            // Arrange
+            var (mockKbd, keyActions, charActions) = BuildSyncKbdHandlerStub();
+            var controller = new KbdController(mockKbd.Object, "entry-sync-focus");
+
+            // Act
+            controller.RegisterFocusActions();
+
+            // Assert — representative subset of the sync focus registrations.
+            keyActions.ContainsKey(Keys.Right).Should().BeTrue();
+            keyActions.ContainsKey(Keys.Left).Should().BeTrue();
+            charActions.ContainsKey('C').Should().BeTrue();
+            charActions.ContainsKey('O').Should().BeTrue();
+            charActions.ContainsKey('F').Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void UnregisterFocusActions_AfterRegister_RemovesSyncKeyAndCharActions()
+        {
+            // Arrange
+            var (mockKbd, keyActions, charActions) = BuildSyncKbdHandlerStub();
+            var controller = new KbdController(mockKbd.Object, "entry-sync-focus-cleanup");
+            controller.RegisterFocusActions();
+            keyActions.ContainsKey(Keys.Right).Should().BeTrue(because: "precondition");
+            charActions.ContainsKey('C').Should().BeTrue(because: "precondition");
+
+            // Act
+            controller.UnregisterFocusActions();
+
+            // Assert
+            keyActions.ContainsKey(Keys.Right).Should().BeFalse();
+            keyActions.ContainsKey(Keys.Left).Should().BeFalse();
+            charActions.ContainsKey('C').Should().BeFalse();
+            charActions.ContainsKey('F').Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void UnregisterExpandedActions_AfterRegister_RemovesSyncBAndD()
+        {
+            // Arrange — RegisterExpandedActions populates the sync 'B'/'D' entries (its lambda bodies
+            // are not invoked at registration), then UnregisterExpandedActions must remove them.
+            var (mockKbd, _, charActions) = BuildSyncKbdHandlerStub();
+            var controller = new KbdController(mockKbd.Object, "entry-sync-expanded-cleanup");
+            controller.RegisterExpandedActions();
+            charActions.ContainsKey('B').Should().BeTrue(because: "precondition");
+
+            // Act
+            controller.UnregisterExpandedActions();
+
+            // Assert
+            charActions.ContainsKey('B').Should().BeFalse();
+            charActions.ContainsKey('D').Should().BeFalse();
+        }
     }
 }

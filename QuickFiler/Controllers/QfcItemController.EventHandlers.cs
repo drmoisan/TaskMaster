@@ -24,7 +24,6 @@ namespace QuickFiler.Controllers
 {
     internal partial class QfcItemController
     {
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void CbxConversation_CheckedChanged(object sender, EventArgs e)
         {
             if (SynchronizationContext.Current is null)
@@ -47,6 +46,8 @@ namespace QuickFiler.Controllers
             }
         }
 
+        // Residual (bucket-iii): thin WinForms-event shell (SynchronizationContext guard + delegation
+        // to the de-exempted FlagAsTask). Shell has no substantive logic of its own.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void BtnFlagTask_Click(object sender, EventArgs e)
         {
@@ -57,6 +58,8 @@ namespace QuickFiler.Controllers
             FlagAsTask();
         }
 
+        // Thin async-void shell (research §3.5): WinForms-event-signature boilerplate with the
+        // SynchronizationContext guard; the substantive routing lives in the testable core below.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal async void BtnPopOut_Click(object sender, EventArgs e)
         {
@@ -64,10 +67,11 @@ namespace QuickFiler.Controllers
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext()
                 );
-            await _parent.PopOutControlGroupAsync(ItemNumber);
+            await BtnPopOutCore();
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        internal Task BtnPopOutCore() => _parent.PopOutControlGroupAsync(ItemNumber);
+
         internal void BtnDelItem_Click(object sender, EventArgs e)
         {
             if (SynchronizationContext.Current is null)
@@ -77,6 +81,8 @@ namespace QuickFiler.Controllers
             MarkItemForDeletion();
         }
 
+        // Residual (bucket-iii): thin async-void WinForms-event shell (guard + await BtnReplyCore());
+        // the substantive routing is tested via BtnReplyCore.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal async void BtnReply_Click(object sender, EventArgs e)
         {
@@ -84,9 +90,13 @@ namespace QuickFiler.Controllers
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext()
                 );
-            await Reply();
+            await BtnReplyCore();
         }
 
+        internal Task BtnReplyCore() => Reply();
+
+        // Residual (bucket-iii): thin async-void shell (guard + await BtnReplyAllCore()); routing tested
+        // via BtnReplyAllCore.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal async void BtnReplyAll_Click(object sender, EventArgs e)
         {
@@ -94,9 +104,13 @@ namespace QuickFiler.Controllers
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext()
                 );
-            await ReplyAll();
+            await BtnReplyAllCore();
         }
 
+        internal Task BtnReplyAllCore() => ReplyAll();
+
+        // Residual (bucket-iii): thin async-void shell (guard + await BtnForwardCore()); routing tested
+        // via BtnForwardCore.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal async void BtnForward_Click(object sender, EventArgs e)
         {
@@ -104,9 +118,13 @@ namespace QuickFiler.Controllers
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext()
                 );
-            await Forward();
+            await BtnForwardCore();
         }
 
+        internal Task BtnForwardCore() => Forward();
+
+        // Residual (bucket-iii): thin async-void shell (guard + await TxtboxBodyDoubleClickCore());
+        // routing tested via TxtboxBodyDoubleClickCore.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal async void TxtboxBody_DoubleClick(object sender, EventArgs e)
         {
@@ -114,22 +132,21 @@ namespace QuickFiler.Controllers
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext()
                 );
-            await Task.Run(() => Mail.Display());
+            await TxtboxBodyDoubleClickCore();
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        internal Task TxtboxBodyDoubleClickCore() => Task.Run(() => _mailActions.Display());
+
         private void Button_MouseEnter(object sender, EventArgs e)
         {
             ((Button)sender).BackColor = _themes[_activeTheme].ButtonMouseOverColor;
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private void MenuItem_MouseEnter(object sender, EventArgs e)
         {
             ((ToolStripMenuItem)sender).BackColor = _themes[_activeTheme].ButtonMouseOverColor;
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private void Button_MouseLeave(object sender, EventArgs e)
         {
             if (((Button)sender).DialogResult == DialogResult.OK)
@@ -142,12 +159,14 @@ namespace QuickFiler.Controllers
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private void MenuItem_MouseLeave(object sender, EventArgs e)
         {
             ((ToolStripMenuItem)sender).BackColor = _themes[_activeTheme].ButtonBackColor;
         }
 
+        // Residual (bucket-iii): calls _folderHandler.FindFolder(objItem: Mail) — the COM-bound
+        // FolderPredictor plus a live Mail item (out-of-scope collaborators, no seam this cycle). The
+        // surrounding IItemViewer folder writes are mockable but the FindFolder call is not.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void TextBoxSearch_TextChanged(object sender, EventArgs e)
         {
@@ -165,7 +184,6 @@ namespace QuickFiler.Controllers
             _itemViewer.SetFolderDroppedDown(true);
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void TextBoxSearch_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Down)
@@ -177,7 +195,6 @@ namespace QuickFiler.Controllers
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private void TopicThread_ItemSelectionChanged(
             object sender,
             ListViewItemSelectionChangedEventArgs e
@@ -191,19 +208,16 @@ namespace QuickFiler.Controllers
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private void CbxEmailCopy_CheckedChanged(object sender, EventArgs e)
         {
             _optionEmailCopy = _itemViewer.EmailCopyChecked;
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private void CboFolders_SelectedIndexChanged(object sender, EventArgs e)
         {
             _selectedFolder = _itemViewer.GetSelectedFolder();
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private void CbxAttachments_CheckedChanged(object sender, EventArgs e)
         {
             _optionAttachments = _itemViewer.AttachmentsChecked;

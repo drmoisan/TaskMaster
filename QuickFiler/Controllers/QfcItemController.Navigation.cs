@@ -24,7 +24,6 @@ namespace QuickFiler.Controllers
 {
     internal partial class QfcItemController
     {
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void JumpToFolderDropDown()
         {
             _kbdHandler.ToggleKeyboardDialog();
@@ -38,11 +37,10 @@ namespace QuickFiler.Controllers
             );
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task JumpToFolderDropDownAsync()
         {
             await _kbdHandler.ToggleKeyboardDialogAsync();
-            await UiThread.Dispatcher.InvokeAsync(() =>
+            await _uiDispatcher.InvokeAsync(() =>
             {
                 _itemViewer.FocusFolderDropDown();
                 _itemViewer.SetFolderDroppedDown(true);
@@ -50,17 +48,19 @@ namespace QuickFiler.Controllers
             });
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void JumpToSearchTextbox()
         {
             _kbdHandler.ToggleKeyboardDialog();
             _itemViewer.FocusSearch();
         }
 
+        // Residual (bucket-iii): takes a raw WinForms Control parameter and focuses it; called only
+        // with the concrete L0v2h2_WebView2 / TopicThread expanded-action targets, for which the
+        // narrowed IItemViewer exposes no focus intent by design (P2-T4). Not unit-reachable.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal async Task JumpToAsync(Control control)
         {
-            await UiThread.Dispatcher.InvokeAsync(() => control.Focus());
+            await _uiDispatcher.InvokeAsync(() => control.Focus());
             await _kbdHandler.ToggleKeyboardDialogAsync();
         }
 
@@ -82,84 +82,42 @@ namespace QuickFiler.Controllers
             await action(parameter);
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task MenuDropDown()
         {
-            await UiThread.Dispatcher.InvokeAsync(() => _itemViewer.ShowMoveOptionsMenu());
+            await _uiDispatcher.InvokeAsync(() => _itemViewer.ShowMoveOptionsMenu());
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task Reply()
         {
-            var reply = await UiThread.Dispatcher.InvokeAsync(() => this.Mail.Reply());
+            // reply.Display() stays OUTSIDE the dispatched delegate to preserve the original
+            // thread-affinity behavior (research §3.4.3 / plan P6-T2).
+            var reply = await _uiDispatcher.InvokeAsync<MailItem>(() => _mailActions.Reply());
             reply.Display();
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task ReplyAll()
         {
-            var reply = await UiThread.Dispatcher.InvokeAsync(() => this.Mail.ReplyAll());
+            var reply = await _uiDispatcher.InvokeAsync<MailItem>(() => _mailActions.ReplyAll());
             reply.Display();
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task Forward()
         {
-            var forward = await UiThread.Dispatcher.InvokeAsync(() => this.Mail.Forward());
+            var forward = await _uiDispatcher.InvokeAsync<MailItem>(() => _mailActions.Forward());
             forward.Display();
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public async Task ToggleCbMenuItemAsync(ToolStripMenuItemCb menuItem)
-        {
-            await UiThread.Dispatcher.InvokeAsync(() => menuItem.Checked = !menuItem.Checked);
-        }
-
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public async Task ToggleCbMenuItemAsync(
-            ToolStripMenuItemCb menuItem,
-            Enums.ToggleState desiredState
-        )
-        {
-            var booleanState = desiredState.HasFlag(Enums.ToggleState.On);
-
-            await UiThread.Dispatcher.InvokeAsync(() =>
-            {
-                if (menuItem.Checked != booleanState)
-                {
-                    menuItem.Checked = booleanState;
-                }
-            });
-        }
-
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public async Task ToggleCheckboxAsync(CheckBox checkBox)
-        {
-            await UiThread.Dispatcher.InvokeAsync(() => checkBox.Checked = !checkBox.Checked);
-        }
-
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public async Task ToggleCheckboxAsync(CheckBox checkBox, Enums.ToggleState desiredState)
-        {
-            var booleanState = desiredState.HasFlag(Enums.ToggleState.On);
-
-            await UiThread.Dispatcher.InvokeAsync(() =>
-            {
-                if (checkBox.Checked != booleanState)
-                {
-                    checkBox.Checked = booleanState;
-                }
-            });
-            //await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
-        }
+        // ToggleCbMenuItemAsync(ToolStripMenuItemCb)[,ToggleState] and
+        // ToggleCheckboxAsync(CheckBox)[,ToggleState] were removed in Phase 7 (P7-T1): they took raw
+        // WinForms parameter types replaced by the cycle-1 Seam B intent members and had zero live call
+        // sites across the solution (all references were commented out), i.e. dead after the narrowing.
 
         /// <summary>
         /// Function programmatically clicks the "Conversation" checkbox
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void ToggleConversationCheckbox()
         {
-            UiThread.Dispatcher.Invoke(() =>
+            _uiDispatcher.Invoke(() =>
                 _itemViewer.ConversationModeChecked = !_itemViewer.ConversationModeChecked
             );
         }
@@ -169,10 +127,9 @@ namespace QuickFiler.Controllers
         /// if it is not already in that state
         /// </summary>
         /// <param name="desiredState">State of checkbox desired</param>
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void ToggleConversationCheckbox(Enums.ToggleState desiredState)
         {
-            UiThread.Dispatcher.Invoke(() =>
+            _uiDispatcher.Invoke(() =>
             {
                 switch (desiredState)
                 {
@@ -191,7 +148,6 @@ namespace QuickFiler.Controllers
             });
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void ToggleExpansion()
         {
             if (_expanded)
@@ -204,7 +160,6 @@ namespace QuickFiler.Controllers
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task ToggleExpansionAsync()
         {
             if (_expanded)
@@ -217,8 +172,10 @@ namespace QuickFiler.Controllers
             }
         }
 
+        // Made virtual so tests can override the (TlpCellSnapShot-bound, out-of-scope) state-taking
+        // body and verify the parameterless-overload routing without the control-tree collaborator.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public void ToggleExpansion(Enums.ToggleState desiredState)
+        public virtual void ToggleExpansion(Enums.ToggleState desiredState)
         {
             _parent.ToggleExpansionStyle(ItemIndex, desiredState);
             if (desiredState == Enums.ToggleState.On)
@@ -233,22 +190,27 @@ namespace QuickFiler.Controllers
             }
         }
 
+        // Made virtual so tests can override the (TlpCellSnapShot-bound, out-of-scope) state-taking
+        // body and verify the parameterless-overload routing without the control-tree collaborator.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public async Task ToggleExpansionAsync(Enums.ToggleState desiredState)
+        public virtual async Task ToggleExpansionAsync(Enums.ToggleState desiredState)
         {
             await _parent.ToggleExpansionStyleAsync(ItemIndex, desiredState);
             if (desiredState == Enums.ToggleState.On)
             {
-                await UiThread.Dispatcher.InvokeAsync(() => ToggleExpansionOn());
+                await _uiDispatcher.InvokeAsync(() => ToggleExpansionOn());
                 RegisterExpandedAsyncActions();
             }
             else
             {
-                await UiThread.Dispatcher.InvokeAsync(() => ToggleExpansionOff());
+                await _uiDispatcher.InvokeAsync(() => ToggleExpansionOff());
                 UnregisterExpandedAsyncActions();
             }
         }
 
+        // Residual (bucket-iii): calls _tlpStates["Compressed"].ApplyState((ItemViewer)_itemViewer),
+        // which walks the live control tree via TlpCellSnapShot.ApplyState(Control) — an out-of-scope
+        // collaborator with no seam this cycle (see P7-T5 deferred follow-up). Not unit-reachable.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private void ToggleExpansionOff()
         {
@@ -260,6 +222,9 @@ namespace QuickFiler.Controllers
             }
         }
 
+        // Residual (bucket-iii): calls _tlpStates["Expanded"].ApplyState((ItemViewer)_itemViewer),
+        // which walks the live control tree via TlpCellSnapShot.ApplyState(Control) — an out-of-scope
+        // collaborator with no seam this cycle (see P7-T5 deferred follow-up). Not unit-reachable.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private void ToggleExpansionOn()
         {

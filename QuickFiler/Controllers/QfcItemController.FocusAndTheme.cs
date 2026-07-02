@@ -24,6 +24,11 @@ namespace QuickFiler.Controllers
 {
     internal partial class QfcItemController
     {
+        // Residual (bucket-iii): the entire body runs inside a single _itemViewer.Invoke(...) delegate
+        // that terminates in _themes[_activeTheme].SetQfcTheme(async: false), a non-virtual method on
+        // the out-of-scope Theme collaborator that dispatches to live WinForms controls (LblItemNumber,
+        // buttons, tips labels). Executing the delegate against a handle-less injected Theme faults; no
+        // Theme seam is introduced this cycle (Option A), so the delegate body is not unit-reachable.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void ToggleFocus(Enums.ToggleState desiredState)
         {
@@ -67,6 +72,10 @@ namespace QuickFiler.Controllers
             );
         }
 
+        // Residual (bucket-iii): unconditionally awaits Theme.SetQfcThemeAsync(), which internally
+        // awaits the static UiThread.Dispatcher. Theme is an out-of-scope collaborator (UtilitiesCS)
+        // not covered by this cycle's QfcItemController seams; awaiting its non-virtual
+        // SetQfcThemeAsync cannot complete deterministically in a pump-less unit-test host.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task ToggleFocusAsync(Enums.ToggleState desiredState)
         {
@@ -82,6 +91,9 @@ namespace QuickFiler.Controllers
             await _themes[_activeTheme].SetQfcThemeAsync();
         }
 
+        // Residual (bucket-iii): same terminal Theme.SetQfcTheme(async: false) barrier as the
+        // state-taking overload above; the whole body is inside one _itemViewer.Invoke(...) delegate
+        // that cannot execute against a handle-less Theme, and no Theme seam is introduced this cycle.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void ToggleFocus()
         {
@@ -125,6 +137,8 @@ namespace QuickFiler.Controllers
             );
         }
 
+        // Residual (bucket-iii): same Theme.SetQfcThemeAsync() / static-UiThread.Dispatcher barrier as
+        // the state-taking overload above.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task ToggleFocusAsync()
         {
@@ -139,7 +153,6 @@ namespace QuickFiler.Controllers
             await _themes[_activeTheme].SetQfcThemeAsync();
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private async Task ToggleFocusOnAsync()
         {
             _activeUI = true;
@@ -155,7 +168,6 @@ namespace QuickFiler.Controllers
             RegisterFocusAsyncActions();
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private async Task ToggleFocusOffAsync()
         {
             _activeUI = false;
@@ -171,7 +183,6 @@ namespace QuickFiler.Controllers
             UnregisterFocusAsyncActions();
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void ToggleNavigation(bool async)
         {
             _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(false)));
@@ -185,7 +196,6 @@ namespace QuickFiler.Controllers
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void ToggleNavigation(bool async, Enums.ToggleState desiredState)
         {
             if (async)
@@ -202,13 +212,11 @@ namespace QuickFiler.Controllers
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task ToggleNavigationAsync(Enums.ToggleState desiredState)
         {
             await _itemPositionTips.ToggleAsync(desiredState, false);
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void ToggleTips(bool async, Enums.ToggleState desiredState)
         {
             InvokeBeginInvoke(
@@ -226,7 +234,6 @@ namespace QuickFiler.Controllers
             );
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task ToggleTipsAsync(Enums.ToggleState desiredState)
         {
             //TraceUtility.LogMethodCall(desiredState);
@@ -256,7 +263,6 @@ namespace QuickFiler.Controllers
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void InvokeBeginInvoke(bool async, System.Action action)
         {
             if (async)
@@ -269,7 +275,6 @@ namespace QuickFiler.Controllers
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void ToggleSaveAttachments()
         {
             // Connect method to new menu
@@ -278,15 +283,13 @@ namespace QuickFiler.Controllers
             //    !_itemViewer.CbxAttachments.Checked));
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void ToggleSaveCopyOfMail()
         {
-            UiThread.Dispatcher.Invoke(() =>
+            _uiDispatcher.Invoke(() =>
                 _itemViewer.EmailCopyChecked = !_itemViewer.EmailCopyChecked
             );
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void SetThemeDark(bool async)
         {
             if ((_activeTheme is null) || _activeTheme.Contains("Normal"))
@@ -301,7 +304,6 @@ namespace QuickFiler.Controllers
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void HtmlDarkConverter(Enums.ToggleState desiredState)
         {
             if (_isWebViewerInitialized)
@@ -316,7 +318,6 @@ namespace QuickFiler.Controllers
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void SetThemeLight(bool async)
         {
             if ((_activeTheme is null) || _activeTheme.Contains("Normal"))
@@ -332,13 +333,19 @@ namespace QuickFiler.Controllers
             //_isDarkMode = false;
         }
 
+        // Residual (bucket-iii, reclassified in Phase 6): the direct Mail.* COM writes are now isolated
+        // behind the injected IMailItemActions seam (P6-T7), but this method also calls
+        // _themes[_activeTheme].SetMailRead(async: true), which unconditionally invokes
+        // _lblSender.BeginInvoke on a live WinForms control (Theme throws InvalidOperationException
+        // when the control lacks a window handle). Theme is an out-of-scope collaborator with no seam
+        // this cycle (Option A), so the method is not unit-reachable — same barrier as ToggleFocus.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void ApplyReadEmailFormat(object state)
         {
             ItemHelper.UnRead = false;
             _themes[_activeTheme].SetMailRead(async: true);
-            Mail.UnRead = false;
-            Mail.Save();
+            _mailActions.UnRead = false;
+            _mailActions.Save();
         }
     }
 }

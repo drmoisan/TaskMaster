@@ -24,8 +24,23 @@ namespace QuickFiler.Controllers
 {
     internal partial class QfcItemController
     {
+        // WireEvents is split (P6-T10) into the concrete-control-tree wiring (retains exemption; the
+        // ForAllControls traversal and the Buttons/MenuItems concrete-control loops require a live
+        // ItemViewer) and the interface-event intent wiring (testable via Mock<IItemViewer>). The two
+        // are called in sequence; no single event receives handlers from both groups, so the net
+        // subscription set and each event's handler order are preserved verbatim.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void WireEvents()
+        {
+            WireControlTreeEvents();
+            WireIntentEvents();
+        }
+
+        // Residual (bucket-iii): concrete control-tree wiring — ((ItemViewer)_itemViewer).ForAllControls
+        // traversal plus the Buttons/MenuItems concrete-control subscription loops. Requires a live
+        // ItemViewer; not unit-reachable (the testable intent subscriptions live in WireIntentEvents).
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        internal void WireControlTreeEvents()
         {
             ((ItemViewer)_itemViewer).ForAllControls( // concrete-bound seam (P2-T4): control-host path, runs on real ItemViewer during init
                 x =>
@@ -42,15 +57,6 @@ namespace QuickFiler.Controllers
                 new List<Control> { ((ItemViewer)_itemViewer).CboFolders } // concrete-bound seam (P2-T4): control-host path, runs on real ItemViewer during init
             );
 
-            _itemViewer.ConversationModeChanged += this.CbxConversation_CheckedChanged;
-            _itemViewer.FlagTaskClicked += this.BtnFlagTask_Click;
-            _itemViewer.PopOutClicked += this.BtnPopOut_Click;
-            _itemViewer.DeleteItemClicked += this.BtnDelItem_Click;
-            _itemViewer.ReplyClicked += this.BtnReply_Click;
-            _itemViewer.ReplyAllClicked += this.BtnReplyAll_Click;
-            _itemViewer.ForwardClicked += this.BtnForward_Click;
-            _itemViewer.BodyDoubleClick += this.TxtboxBody_DoubleClick;
-
             foreach (var btn in Buttons)
             {
                 btn.MouseEnter += this.Button_MouseEnter;
@@ -62,6 +68,18 @@ namespace QuickFiler.Controllers
                 menuItem.MouseEnter += this.MenuItem_MouseEnter;
                 menuItem.MouseLeave += this.MenuItem_MouseLeave;
             }
+        }
+
+        internal void WireIntentEvents()
+        {
+            _itemViewer.ConversationModeChanged += this.CbxConversation_CheckedChanged;
+            _itemViewer.FlagTaskClicked += this.BtnFlagTask_Click;
+            _itemViewer.PopOutClicked += this.BtnPopOut_Click;
+            _itemViewer.DeleteItemClicked += this.BtnDelItem_Click;
+            _itemViewer.ReplyClicked += this.BtnReply_Click;
+            _itemViewer.ReplyAllClicked += this.BtnReplyAll_Click;
+            _itemViewer.ForwardClicked += this.BtnForward_Click;
+            _itemViewer.BodyDoubleClick += this.TxtboxBody_DoubleClick;
 
             _itemViewer.SearchTextChanged += new System.EventHandler(
                 this.TextBoxSearch_TextChanged
@@ -81,17 +99,28 @@ namespace QuickFiler.Controllers
             _itemViewer.AttachmentsChanged += this.CbxAttachments_CheckedChanged;
         }
 
+        // Thin async-void shell (research §3.5): WinForms-event-signature boilerplate forwarding to the
+        // testable core with the event args destructured, so no CoreWebView2InitializationCompletedEventArgs
+        // needs to be constructed in tests.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal async void WebView2Control_CoreWebView2InitializationCompleted(
             object sender,
             CoreWebView2InitializationCompletedEventArgs e
         )
         {
+            await HandleWebViewInitializedAsync(e.IsSuccess, e.InitializationException);
+        }
+
+        internal async Task HandleWebViewInitializedAsync(
+            bool isSuccess,
+            System.Exception initException
+        )
+        {
             try
             {
-                if (!e.IsSuccess)
+                if (!isSuccess)
                 {
-                    throw (e.InitializationException);
+                    throw (initException);
                 }
                 _isWebViewerInitialized = true;
 
@@ -131,7 +160,6 @@ namespace QuickFiler.Controllers
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void RegisterFocusActions()
         {
             _kbdHandler.KeyActions.Add(
@@ -281,6 +309,9 @@ namespace QuickFiler.Controllers
             }
         }
 
+        // Residual (bucket-iii): the 'B'/'D' expanded-action lambda bodies call JumpToAsync with the
+        // concrete ((ItemViewer)_itemViewer).L0v2h2_WebView2 / TopicThread controls; the narrowed
+        // IItemViewer exposes no focus intent for these two targets by design (P2-T4). Not unit-reachable.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void RegisterExpandedActions()
         {
@@ -310,7 +341,6 @@ namespace QuickFiler.Controllers
             );
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void UnregisterFocusActions()
         {
             _kbdHandler.KeyActions.Remove(ItemHelper.EntryId, Keys.Right);
@@ -356,7 +386,6 @@ namespace QuickFiler.Controllers
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void UnregisterExpandedActions()
         {
             _kbdHandler.CharActions.Remove(ItemHelper.EntryId, 'B');

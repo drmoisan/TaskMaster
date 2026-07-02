@@ -24,10 +24,8 @@ namespace QuickFiler.Controllers
 {
     internal partial class QfcItemController
     {
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         protected QfcItemController() { }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public QfcItemController(
             IApplicationGlobals appGlobals,
             IFilerHomeController homeController,
@@ -36,10 +34,25 @@ namespace QuickFiler.Controllers
             int viewerPosition,
             int itemNumberDigits,
             MailItem mailItem,
-            TlpCellStates tlpStates
+            TlpCellStates tlpStates,
+            UtilitiesCS.Threading.IUiDispatcher uiDispatcher = null,
+            QuickFiler.Viewers.IWebViewCoreInitializer webViewInitializer = null,
+            QuickFiler.Interfaces.IMailItemActions mailActions = null,
+            Func<MailItem, ConversationResolver> conversationResolverFactory = null,
+            Func<IApplicationGlobals, List<MailItem>, bool, IntPtr, FlagTasks> flagTasksFactory =
+                null,
+            Func<EmailFilerConfig, EmailFiler> emailFilerFactory = null
         )
         {
             //TraceUtility.LogMethodCall(appGlobals, homeController, parent, itemViewer, viewerPosition, itemNumberDigits, mailItem, tlpStates);
+            // Store any injected seams before SaveParameters applies the production defaults for the
+            // ones left null (see SaveParameters). Non-breaking: all seam parameters are optional.
+            _uiDispatcher = uiDispatcher;
+            _webViewInitializer = webViewInitializer;
+            _mailActions = mailActions;
+            _conversationResolverFactory = conversationResolverFactory;
+            _flagTasksFactory = flagTasksFactory;
+            _emailFilerFactory = emailFilerFactory;
             SaveParameters(
                 appGlobals,
                 homeController,
@@ -61,7 +74,6 @@ namespace QuickFiler.Controllers
         /// The predetermined top-suggestion folder path, or null for the standard (non-high-confidence)
         /// path in which the index-based selection is used.
         /// </param>
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public QfcItemController(
             IApplicationGlobals appGlobals,
             IFilerHomeController homeController,
@@ -87,7 +99,6 @@ namespace QuickFiler.Controllers
             _predeterminedFolder = predeterminedFolder;
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public QfcItemController(
             IApplicationGlobals AppGlobals,
             IFilerHomeController homeController,
@@ -112,6 +123,9 @@ namespace QuickFiler.Controllers
             );
         }
 
+        // Residual (bucket-iii): orchestration overload that funnels into Initialize(bool), whose body
+        // drives concrete control-tree construction (ResolveControlGroups/SetupThemes/WireEvents against
+        // the live ItemViewer). Not unit-reachable without a real ItemViewer under Option A.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private void Initialize(
             IApplicationGlobals AppGlobals,
@@ -139,6 +153,9 @@ namespace QuickFiler.Controllers
             Initialize(async);
         }
 
+        // Residual (bucket-iii): orchestrates concrete control-tree construction — calls
+        // ResolveControlGroups((ItemViewer)_itemViewer), QfcThemeHelper.SetupThemes((ItemViewer)...),
+        // and WireEvents (ForAllControls) — all requiring a live ItemViewer. Not unit-reachable.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void Initialize(bool async)
         {
@@ -167,6 +184,9 @@ namespace QuickFiler.Controllers
             //Task.Run(() => InitializeWebViewAsync());
         }
 
+        // Residual (bucket-iii): async orchestration of concrete control-tree construction
+        // (ResolveControlGroupsAsync((ItemViewer)...), SetupThemes((ItemViewer)...),
+        // InitializeWebViewAsync, WireEvents). Not unit-reachable without a live ItemViewer.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task InitializeAsync()
         {
@@ -224,6 +244,8 @@ namespace QuickFiler.Controllers
             await InitializeWebViewAsync();
         }
 
+        // Residual (bucket-iii): same concrete control-tree orchestration as InitializeAsync
+        // (ResolveControlGroups/SetupThemes against the live ItemViewer). Not unit-reachable.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task InitializeGraphicsAsync()
         {
@@ -248,6 +270,8 @@ namespace QuickFiler.Controllers
             _ = InitializeWebViewAsync();
         }
 
+        // Residual (bucket-iii): same concrete control-tree orchestration as InitializeAsync
+        // (ResolveControlGroups/SetupThemes against the live ItemViewer). Not unit-reachable.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task InitializeSequentialAsync()
         {
@@ -302,7 +326,6 @@ namespace QuickFiler.Controllers
 
         //}
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void SaveParameters(
             IApplicationGlobals appGlobals,
             IFilerHomeController homeController,
@@ -333,8 +356,30 @@ namespace QuickFiler.Controllers
             _explorerController = _homeController.ExplorerController;
             Token = _homeController.Token;
             _tokenSource = _homeController.TokenSource;
+
+            // Apply production defaults for the Phase 6 behavioral seams on the single construction
+            // path every route hits (all public ctors + the CreateAsync/CreateSequentialAsync factory
+            // path funnel through here). Any seam already supplied via the constructor is preserved.
+            _uiDispatcher ??= new UtilitiesCS.Threading.WpfUiDispatcher();
+            _webViewInitializer ??= new QuickFiler.Viewers.WebView2CoreInitializer();
+            _conversationResolverFactory ??= mail => new ConversationResolver(
+                _globals,
+                mail,
+                _tokenSource,
+                Token,
+                SetTopicThread
+            );
+            _flagTasksFactory ??= (globals, itemList, blFile, hWndCaller) =>
+                new FlagTasks(globals, itemList, blFile, hWndCaller);
+            _emailFilerFactory ??= config => new EmailFiler(config);
+            _mailActions ??= mailItem is null
+                ? null
+                : new QuickFiler.Interfaces.MailItemActionsAdapter(mailItem);
         }
 
+        // Residual (bucket-iii): static factory that constructs the controller and awaits
+        // InitializeAsync (concrete control-tree orchestration). Barrier is inherited from the async
+        // init it drives; not unit-reachable without a live ItemViewer.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public static async Task<QfcItemController> CreateAsync(
             IApplicationGlobals AppGlobals,
@@ -365,6 +410,9 @@ namespace QuickFiler.Controllers
             return controller;
         }
 
+        // Residual (bucket-iii): static factory that constructs the controller and awaits
+        // InitializeSequentialAsync (concrete control-tree orchestration). Barrier inherited from the
+        // async init it drives; not unit-reachable without a live ItemViewer.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public static async Task<QfcItemController> CreateSequentialAsync(
             IApplicationGlobals AppGlobals,

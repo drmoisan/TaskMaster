@@ -24,6 +24,14 @@ namespace QuickFiler.Controllers
 {
     internal partial class QfcItemController
     {
+        // Residual (bucket-iii, reclassified in Phase 6): the WebView2 SDK calls are now isolated behind
+        // the injected IWebViewCoreInitializer seam (P6-T4), but this method still performs the
+        // concrete-bound control access ((ItemViewer)_itemViewer).L0v2h2_WebView2 and awaits
+        // _itemViewer.UiSyncContext on the live UI thread. IItemViewer intentionally exposes no
+        // WebView-core-init intent member (cycle-1 narrowing retained the raw control here, per
+        // IItemViewer.cs), so the concrete cast cannot execute against a Mock<IItemViewer>; the method
+        // is not unit-reachable under Option A. The SDK dependency itself lives only in the exempt
+        // WebView2CoreInitializer adapter.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal async Task InitializeWebViewAsync()
         {
@@ -46,15 +54,15 @@ namespace QuickFiler.Controllers
             // Do this so the task is continued on the UI Thread
             TaskScheduler ui = TaskScheduler.FromCurrentSynchronizationContext();
 
-            // Create the environment manually
-            _webViewEnvironment = await CoreWebView2Environment.CreateAsync(
-                null,
+            // Create the environment manually (WebView2 SDK call isolated behind the injected seam)
+            _webViewEnvironment = await _webViewInitializer.CreateEnvironmentAsync(
                 cacheFolder,
                 options
             );
-            await ((ItemViewer)_itemViewer).L0v2h2_WebView2.EnsureCoreWebView2Async(
+            await _webViewInitializer.EnsureCoreWebView2Async(
+                ((ItemViewer)_itemViewer).L0v2h2_WebView2, // concrete-bound seam (P2-T4): control-host path, runs on real ItemViewer during init
                 _webViewEnvironment
-            ); // concrete-bound seam (P2-T4): control-host path, runs on real ItemViewer during init
+            );
             //var task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
 
             //await task.ContinueWith(t =>
@@ -64,6 +72,9 @@ namespace QuickFiler.Controllers
             //}, Token, TaskContinuationOptions.OnlyOnRanToCompletion, ui);
         }
 
+        // Residual (bucket-iii): the method's entire purpose is concrete control-tree traversal — it
+        // takes a concrete ItemViewer and calls GetAllChildren()/reads Designer controls (P2-T4 seam).
+        // Not unit-reachable without a live ItemViewer.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void ResolveControlGroups(ItemViewer itemViewer)
         {
@@ -111,6 +122,8 @@ namespace QuickFiler.Controllers
             Buttons = controls.Where(x => x is Button).Select(x => (Button)x).ToList();
         }
 
+        // Residual (bucket-iii): async control-tree traversal counterpart of ResolveControlGroups;
+        // takes a concrete ItemViewer and walks its Designer controls. Not unit-reachable.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal async Task ResolveControlGroupsAsync(ItemViewer itemViewer)
         {
@@ -160,6 +173,9 @@ namespace QuickFiler.Controllers
             Buttons = controls.Where(x => x is Button).Select(x => (Button)x).ToList();
         }
 
+        // Residual (bucket-iii): constructs a MailItemHelper from a live COM MailItem
+        // (new MailItemHelper(mailItem, _globals)); the MailItemHelper-taking overload below is the
+        // seam used by tests. Not unit-reachable without a live MailItem.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void PopulateControls(MailItem mailItem, int viewerPosition)
         {
@@ -168,13 +184,14 @@ namespace QuickFiler.Controllers
             AssignControls(ItemHelper, viewerPosition);
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void PopulateControls(MailItemHelper helper, int viewerPosition)
         {
             ItemHelper = helper;
             AssignControls(ItemHelper, viewerPosition);
         }
 
+        // Residual (bucket-iii): builds a MailItemHelper from a live COM MailItem via
+        // MailItemHelper.FromMailItemAsync(mailItem, ...). Not unit-reachable without a live MailItem.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal async Task PopulateControlsAsync(
             MailItem mailItem,
@@ -192,7 +209,6 @@ namespace QuickFiler.Controllers
             await AssignControlsAsync(ItemHelper, viewerPosition);
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal async Task AssignControlsAsync(MailItemHelper itemInfo, int viewerPosition)
         {
             //if (_itemViewer.InvokeRequired)
@@ -209,7 +225,6 @@ namespace QuickFiler.Controllers
             );
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void AssignControls(MailItemHelper itemInfo, int viewerPosition)
         {
             //TraceUtility.LogMethodCall(itemInfo, viewerPosition);
@@ -248,7 +263,6 @@ namespace QuickFiler.Controllers
             _itemViewer.PicturesChecked = _optionsPictures;
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void Cleanup()
         {
             _globals = null;

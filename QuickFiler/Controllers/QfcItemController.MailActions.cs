@@ -24,17 +24,15 @@ namespace QuickFiler.Controllers
 {
     internal partial class QfcItemController
     {
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void CollapseConversation()
         {
             //TraceUtility.LogMethodCall();
 
             var folderList = _itemViewer.GetFolderItems();
-            var entryID = _convOriginID != "" ? _convOriginID : Mail.EntryID;
+            var entryID = _convOriginID != "" ? _convOriginID : _mailActions.EntryID;
             _parent.ToggleGroupConv(entryID);
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void EnumerateConversation()
         {
             //TraceUtility.LogMethodCall();
@@ -42,19 +40,17 @@ namespace QuickFiler.Controllers
             var folderList = _itemViewer.GetFolderItems();
             _parent.ToggleUnGroupConv(
                 ConversationResolver,
-                Mail.EntryID,
+                _mailActions.EntryID,
                 ConversationResolver.Count.SameFolder,
                 folderList
             );
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal async Task EnumerateConversationAsync()
         {
-            await UiThread.Dispatcher.InvokeAsync(EnumerateConversation);
+            await _uiDispatcher.InvokeAsync(EnumerateConversation);
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public Dictionary<string, System.Action> RightKeyActions
         {
             get =>
@@ -73,7 +69,6 @@ namespace QuickFiler.Controllers
                 };
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public Dictionary<string, Func<Task>> RightKeyActionsAsync
         {
             get =>
@@ -85,7 +80,6 @@ namespace QuickFiler.Controllers
                 };
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task MoveMailAsync()
         {
             //TraceUtility.LogMethodCall();
@@ -113,7 +107,7 @@ namespace QuickFiler.Controllers
                         OlAncestor = _globals.Ol.ArchiveRootPath,
                         FsAncestorEquivalent = oneDrive,
                     };
-                    var filer = new EmailFiler(config);
+                    var filer = _emailFilerFactory(config);
                     _homeController.FilerQueue.Enqueue(filer, helpers);
                     await Task.CompletedTask;
                     //await filer.SortAsync(helpers);
@@ -170,15 +164,14 @@ namespace QuickFiler.Controllers
                 : new List<MailItemHelper> { ItemHelper };
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void FlagAsTask()
         {
             List<MailItem> itemList = [Mail];
-            var flagTask = new FlagTasks(
-                globals: _globals,
-                itemList: itemList,
-                blFile: false,
-                hWndCaller: _homeController.FormController.FormHandle
+            var flagTask = _flagTasksFactory(
+                _globals,
+                itemList,
+                false,
+                _homeController.FormController.FormHandle
             );
             _itemViewer.FlagTaskDialogResult = flagTask.Run(modal: true);
             if (_itemViewer.FlagTaskDialogResult == DialogResult.OK)
@@ -187,17 +180,16 @@ namespace QuickFiler.Controllers
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task FlagAsTaskAsync()
         {
             List<MailItem> itemList = [Mail];
-            await UiThread.Dispatcher.InvokeAsync(() =>
+            await _uiDispatcher.InvokeAsync(() =>
             {
-                var flagTask = new FlagTasks(
-                    globals: _globals,
-                    itemList: itemList,
-                    blFile: false,
-                    hWndCaller: _homeController.FormController.FormHandle
+                var flagTask = _flagTasksFactory(
+                    _globals,
+                    itemList,
+                    false,
+                    _homeController.FormController.FormHandle
                 );
                 _itemViewer.FlagTaskDialogResult = flagTask.Run(modal: true);
                 if (_itemViewer.FlagTaskDialogResult == DialogResult.OK)
@@ -216,11 +208,10 @@ namespace QuickFiler.Controllers
             _itemViewer.SetFolderSelectedItem("Trash to Delete");
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task MarkItemForDeletionAsync()
         {
             Token.ThrowIfCancellationRequested();
-            await UiThread.Dispatcher.InvokeAsync(() =>
+            await _uiDispatcher.InvokeAsync(() =>
             {
                 if (!_itemViewer.FolderContains("Trash to Delete"))
                 {

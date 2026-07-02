@@ -869,6 +869,8 @@
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\ScDictionary.cs" />
     <Compile Include="ReusableTypeClasses\Serializable\Concurrent\ScBag.cs" />
     <Compile Include="Threading\AsyncMultiTasker.cs" />
+    <Compile Include="Threading\IUiDispatcher.cs" />
+    <Compile Include="Threading\WpfUiDispatcher.cs" />
     <Compile Include="Threading\IdleAsyncQueue.cs" />
     <Compile Include="Threading\IProgressViewer.cs" />
     <Compile Include="Threading\ProgressPackage.cs" />

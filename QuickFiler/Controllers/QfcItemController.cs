@@ -59,6 +59,23 @@ namespace QuickFiler.Controllers
         private CancellationTokenSource _tokenSource;
         private TlpCellStates _tlpStates;
 
+        // Behavioral seams (cycle-2 Phase 6, research §3.2-§3.4). All are optional constructor
+        // parameters with production defaults applied in SaveParameters (the construction path every
+        // route hits, including the CreateAsync/CreateSequentialAsync factory path), so no path leaves
+        // a seam null. Tests inject mocks/factories via the reflection field-injection harness.
+        private UtilitiesCS.Threading.IUiDispatcher _uiDispatcher;
+        private QuickFiler.Viewers.IWebViewCoreInitializer _webViewInitializer;
+        private QuickFiler.Interfaces.IMailItemActions _mailActions;
+        private Func<MailItem, ConversationResolver> _conversationResolverFactory;
+        private Func<
+            IApplicationGlobals,
+            List<MailItem>,
+            bool,
+            IntPtr,
+            FlagTasks
+        > _flagTasksFactory;
+        private Func<EmailFilerConfig, EmailFiler> _emailFilerFactory;
+
         #endregion
 
         #region Exposed properties

@@ -29,22 +29,14 @@ namespace QuickFiler.Controllers
         /// embedded in the class. Conversation details are loaded to
         /// a Dataframe. Count is inferred from the df row count
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void PopulateConversation()
         {
-            ConversationResolver = new ConversationResolver(
-                _globals,
-                Mail,
-                _tokenSource,
-                Token,
-                SetTopicThread
-            );
+            ConversationResolver = _conversationResolverFactory(Mail);
 
             PopulateConversation(ConversationResolver.Count.SameFolder);
             //PopulateConversation(_mailItem.GetConversationDf());
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void PopulateConversation(ConversationResolver resolver)
         {
             ConversationResolver = resolver;
@@ -151,11 +143,10 @@ namespace QuickFiler.Controllers
         /// conversation to show how many items will be moved
         /// </summary>
         /// <param name="count"></param>
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void PopulateConversation(int count)
         {
             //_itemViewer.LblConvCt.BeginInvoke(new System.Action(() =>
-            UiThread.Dispatcher.BeginInvoke(() =>
+            _uiDispatcher.BeginInvoke(() =>
             {
                 _itemViewer.ConversationCountText = count.ToString();
                 if (count == 0)
@@ -165,7 +156,6 @@ namespace QuickFiler.Controllers
             });
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void RenderConversationCount()
         {
             int count = ConversationResolver?.Count.SameFolder ?? 0;
@@ -187,7 +177,6 @@ namespace QuickFiler.Controllers
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task RenderConversationCountAsync(
             int count,
             CancellationToken token,
@@ -201,7 +190,7 @@ namespace QuickFiler.Controllers
                 ? DispatcherPriority.Background
                 : DispatcherPriority.Normal;
 
-            await UiThread.Dispatcher.InvokeAsync(
+            await _uiDispatcher.InvokeAsync(
                 () =>
                 {
                     _itemViewer.ConversationCountText = count.ToString();
@@ -215,7 +204,6 @@ namespace QuickFiler.Controllers
             );
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void SetTopicThread(List<MailItemHelper> conversationInfo)
         {
             // Run on the UI Thread if necessary

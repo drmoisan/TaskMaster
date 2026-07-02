@@ -4,8 +4,10 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using QuickFiler;
 using QuickFiler.Controllers;
 using QuickFiler.Interfaces;
+using UtilitiesCS;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -124,6 +126,130 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             captured.Should().Be("payload");
             mockKbd.Verify(k => k.ToggleKeyboardDialog(), Times.Never());
+        }
+
+        // ---------------------------------------------------------------------------
+        // Cycle-2 Phase 5 (AC8) de-exemption coverage: JumpToFolderDropDown, JumpToSearchTextbox,
+        // and the two parameterless ToggleExpansion overloads (routing verified via a spy subclass
+        // that overrides the TlpCellSnapShot-bound, out-of-scope state-taking overloads).
+        // ---------------------------------------------------------------------------
+
+        private sealed class ExpansionSpyController : QfcItemController
+        {
+            internal Enums.ToggleState? LastSyncState;
+            internal Enums.ToggleState? LastAsyncState;
+
+            internal ExpansionSpyController()
+                : base() { }
+
+            public override void ToggleExpansion(Enums.ToggleState desiredState)
+            {
+                LastSyncState = desiredState;
+            }
+
+            public override async Task ToggleExpansionAsync(Enums.ToggleState desiredState)
+            {
+                LastAsyncState = desiredState;
+                await Task.CompletedTask;
+            }
+        }
+
+        [TestMethod]
+        public void JumpToFolderDropDown_TogglesKeyboardAndFocusesFolderDropDown()
+        {
+            // Arrange — the Invoke callback runs the marshaled action so the folder-focus intent
+            // members are exercised.
+            Mock<IQfcKeyboardHandler> mockKbd = new Mock<IQfcKeyboardHandler>();
+            Mock<IItemViewer> viewer = new Mock<IItemViewer>();
+            viewer
+                .Setup(v => v.Invoke(It.IsAny<Delegate>()))
+                .Callback<Delegate>(d => d.DynamicInvoke())
+                .Returns((object)null);
+            HarnessController controller = new HarnessController();
+            QfcItemControllerTestSupport.SetField(controller, "_kbdHandler", mockKbd.Object);
+            QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer.Object);
+
+            // Act
+            controller.JumpToFolderDropDown();
+
+            // Assert
+            mockKbd.Verify(k => k.ToggleKeyboardDialog(), Times.Once());
+            viewer.Verify(v => v.FocusFolderDropDown(), Times.Once());
+            viewer.Verify(v => v.SetFolderDroppedDown(true), Times.Once());
+        }
+
+        [TestMethod]
+        public void JumpToSearchTextbox_TogglesKeyboardAndFocusesSearch()
+        {
+            // Arrange
+            Mock<IQfcKeyboardHandler> mockKbd = new Mock<IQfcKeyboardHandler>();
+            Mock<IItemViewer> viewer = new Mock<IItemViewer>();
+            HarnessController controller = new HarnessController();
+            QfcItemControllerTestSupport.SetField(controller, "_kbdHandler", mockKbd.Object);
+            QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer.Object);
+
+            // Act
+            controller.JumpToSearchTextbox();
+
+            // Assert
+            mockKbd.Verify(k => k.ToggleKeyboardDialog(), Times.Once());
+            viewer.Verify(v => v.FocusSearch(), Times.Once());
+        }
+
+        [TestMethod]
+        public void ToggleExpansion_WhenCollapsed_RoutesToOnState()
+        {
+            // Arrange — _expanded false: parameterless overload must request the On state.
+            ExpansionSpyController controller = new ExpansionSpyController();
+            QfcItemControllerTestSupport.SetField(controller, "_expanded", false);
+
+            // Act
+            controller.ToggleExpansion();
+
+            // Assert
+            controller.LastSyncState.Should().Be(Enums.ToggleState.On);
+        }
+
+        [TestMethod]
+        public void ToggleExpansion_WhenExpanded_RoutesToOffState()
+        {
+            // Arrange — _expanded true: parameterless overload must request the Off state.
+            ExpansionSpyController controller = new ExpansionSpyController();
+            QfcItemControllerTestSupport.SetField(controller, "_expanded", true);
+
+            // Act
+            controller.ToggleExpansion();
+
+            // Assert
+            controller.LastSyncState.Should().Be(Enums.ToggleState.Off);
+        }
+
+        [TestMethod]
+        public async Task ToggleExpansionAsync_WhenCollapsed_RoutesToOnState()
+        {
+            // Arrange
+            ExpansionSpyController controller = new ExpansionSpyController();
+            QfcItemControllerTestSupport.SetField(controller, "_expanded", false);
+
+            // Act
+            await controller.ToggleExpansionAsync();
+
+            // Assert
+            controller.LastAsyncState.Should().Be(Enums.ToggleState.On);
+        }
+
+        [TestMethod]
+        public async Task ToggleExpansionAsync_WhenExpanded_RoutesToOffState()
+        {
+            // Arrange
+            ExpansionSpyController controller = new ExpansionSpyController();
+            QfcItemControllerTestSupport.SetField(controller, "_expanded", true);
+
+            // Act
+            await controller.ToggleExpansionAsync();
+
+            // Assert
+            controller.LastAsyncState.Should().Be(Enums.ToggleState.Off);
         }
     }
 }
