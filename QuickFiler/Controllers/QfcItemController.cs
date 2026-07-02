@@ -38,7 +38,7 @@ namespace QuickFiler.Controllers
         private bool _suppressEvents = false;
         private CoreWebView2Environment _webViewEnvironment;
         private Dictionary<string, Theme> _themes;
-        private FolderPredictor _folderHandler;
+        private IFolderSearchHandler _folderHandler;
         private IApplicationGlobals _globals;
         private IList<TableLayoutPanel> _tableLayoutPanels;
         private IQfcCollectionController _parent;
@@ -75,6 +75,18 @@ namespace QuickFiler.Controllers
             FlagTasks
         > _flagTasksFactory;
         private Func<EmailFilerConfig, EmailFiler> _emailFilerFactory;
+
+        // Cycle-3 (P10-T7): FolderPredictor factory-delegate seam, mirroring the EmailFiler/FlagTasks/
+        // ConversationResolver pattern above. Concrete FolderPredictor return type is required because
+        // LoadFolderHandlerAsync also calls FolderPredictor.InitAsync, which is not part of the narrow
+        // IFolderSearchHandler consuming surface.
+        private Func<
+            IApplicationGlobals,
+            object,
+            FolderPredictor.InitOptions,
+            FolderPredictor
+        > _folderPredictorFactory;
+        private Func<IApplicationGlobals, FolderPredictor> _folderPredictorEmptyFactory;
 
         #endregion
 

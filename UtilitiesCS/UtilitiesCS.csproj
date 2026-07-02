@@ -757,6 +757,8 @@
     <Compile Include="EmailIntelligence\EmailParsingSorting\MovedMailInfo.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictor.cs" />
+    <Compile Include="OutlookObjects\Folder\IFolderSearchHandler.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderPredictor.IFolderSearchHandler.cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\OlFolderHelper\SmithWaterman.cs" />
     <Compile Include="OutlookObjects\Folder\FolderScorer.cs" />
     <Compile Include="OutlookObjects\MailItem\ItemInfo.cs" />
@@ -951,6 +953,7 @@
     <Compile Include="HelperClasses\SimpleRegex.cs" />
     <Compile Include="HelperClasses\Windows Forms\TableLayoutHelper.cs" />
     <Compile Include="HelperClasses\ThemeHelpers\Theme.cs" />
+    <Compile Include="HelperClasses\ThemeHelpers\Theme.Rendering.cs" />
     <Compile Include="HelperClasses\ThemeHelpers\ThemeControlGroup.cs" />
     <Compile Include="HelperClasses\ThemeHelpers\SystemThemeDetector.cs" />
     <Compile Include="HelperClasses\ToolTips\TipsController.cs" />

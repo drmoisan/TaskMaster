@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -111,6 +113,261 @@ namespace QuickFiler.Controllers.Tests
             typeof(QfcItemController)
                 .GetField(field, BindingFlags.NonPublic | BindingFlags.Instance)
                 .SetValue(controller, value);
+
+        // ------------------------- LoadFolderHandler (P10-T11: FolderPredictor factory seam) -------------------------
+
+        [TestMethod]
+        public void LoadFolderHandler_WhenVarListNull_InvokesFactoryWithItemHelperAndFromFieldOptions()
+        {
+            // Arrange
+            var controller = new FolderController();
+            var globals = new Mock<IApplicationGlobals>().Object;
+            var helper = new MailItemHelper();
+            controller.ItemHelper = helper;
+            SetPrivate(controller, "_globals", globals);
+            var returned = BuildFolderHandlerWithArray(@"\\A\one");
+            IApplicationGlobals capturedGlobals = null;
+            object capturedObjItem = null;
+            FolderPredictor.InitOptions capturedOptions = default;
+            Func<
+                IApplicationGlobals,
+                object,
+                FolderPredictor.InitOptions,
+                FolderPredictor
+            > factory = (g, o, opt) =>
+            {
+                capturedGlobals = g;
+                capturedObjItem = o;
+                capturedOptions = opt;
+                return returned;
+            };
+            SetPrivate(controller, "_folderPredictorFactory", factory);
+
+            // Act
+            controller.LoadFolderHandler();
+
+            // Assert
+            capturedGlobals.Should().BeSameAs(globals);
+            capturedObjItem.Should().BeSameAs(helper);
+            capturedOptions.Should().Be(FolderPredictor.InitOptions.FromField);
+            QfcItemControllerTestSupport
+                .GetField(controller, "_folderHandler")
+                .Should()
+                .BeSameAs(returned);
+        }
+
+        [TestMethod]
+        public void LoadFolderHandler_WhenVarListProvided_InvokesFactoryWithArrayOrStringOptions()
+        {
+            // Arrange
+            var controller = new FolderController();
+            var globals = new Mock<IApplicationGlobals>().Object;
+            SetPrivate(controller, "_globals", globals);
+            object varList = new[] { "a", "b" };
+            var returned = BuildFolderHandlerWithArray(@"\\A\two");
+            IApplicationGlobals capturedGlobals = null;
+            object capturedObjItem = null;
+            FolderPredictor.InitOptions capturedOptions = default;
+            Func<
+                IApplicationGlobals,
+                object,
+                FolderPredictor.InitOptions,
+                FolderPredictor
+            > factory = (g, o, opt) =>
+            {
+                capturedGlobals = g;
+                capturedObjItem = o;
+                capturedOptions = opt;
+                return returned;
+            };
+            SetPrivate(controller, "_folderPredictorFactory", factory);
+
+            // Act
+            controller.LoadFolderHandler(varList);
+
+            // Assert
+            capturedGlobals.Should().BeSameAs(globals);
+            capturedObjItem.Should().BeSameAs(varList);
+            capturedOptions.Should().Be(FolderPredictor.InitOptions.FromArrayOrString);
+            QfcItemControllerTestSupport
+                .GetField(controller, "_folderHandler")
+                .Should()
+                .BeSameAs(returned);
+        }
+
+        // ------------------------- LoadFolderHandlerAsync (P10-T13: FolderPredictor factory seam) -------------------------
+
+        [TestMethod]
+        public async Task LoadFolderHandlerAsync_WhenVarListNull_InvokesFactoryWithExpectedArgs()
+        {
+            // Arrange
+            var controller = new FolderController();
+            var globals = new Mock<IApplicationGlobals>().Object;
+            var helper = new MailItemHelper();
+            controller.ItemHelper = helper;
+            SetPrivate(controller, "_globals", globals);
+            IApplicationGlobals capturedGlobals = null;
+            object capturedObjItem = null;
+            FolderPredictor.InitOptions capturedOptions = default;
+            Func<
+                IApplicationGlobals,
+                object,
+                FolderPredictor.InitOptions,
+                FolderPredictor
+            > factory = (g, o, opt) =>
+            {
+                capturedGlobals = g;
+                capturedObjItem = o;
+                capturedOptions = opt;
+                throw new InvalidOperationException("sentinel");
+            };
+            SetPrivate(controller, "_folderPredictorFactory", factory);
+
+            // Act
+            Func<Task> act = () => controller.LoadFolderHandlerAsync(CancellationToken.None);
+
+            // Assert
+            await act.Should().ThrowAsync<InvalidOperationException>();
+            capturedGlobals.Should().BeSameAs(globals);
+            capturedObjItem.Should().BeSameAs(helper);
+            capturedOptions.Should().Be(FolderPredictor.InitOptions.FromField);
+        }
+
+        [TestMethod]
+        public async Task LoadFolderHandlerAsync_WhenVarListProvided_InvokesFactoryWithArrayOrStringArgs()
+        {
+            // Arrange
+            var controller = new FolderController();
+            var globals = new Mock<IApplicationGlobals>().Object;
+            SetPrivate(controller, "_globals", globals);
+            object varList = new[] { "x" };
+            IApplicationGlobals capturedGlobals = null;
+            object capturedObjItem = null;
+            FolderPredictor.InitOptions capturedOptions = default;
+            Func<
+                IApplicationGlobals,
+                object,
+                FolderPredictor.InitOptions,
+                FolderPredictor
+            > factory = (g, o, opt) =>
+            {
+                capturedGlobals = g;
+                capturedObjItem = o;
+                capturedOptions = opt;
+                throw new InvalidOperationException("sentinel");
+            };
+            SetPrivate(controller, "_folderPredictorFactory", factory);
+
+            // Act
+            Func<Task> act = () =>
+                controller.LoadFolderHandlerAsync(CancellationToken.None, varList);
+
+            // Assert
+            await act.Should().ThrowAsync<InvalidOperationException>();
+            capturedGlobals.Should().BeSameAs(globals);
+            capturedObjItem.Should().BeSameAs(varList);
+            capturedOptions.Should().Be(FolderPredictor.InitOptions.FromArrayOrString);
+        }
+
+        [TestMethod]
+        public async Task LoadFolderHandlerAsync_WhenPrimaryFactoryThrowsArgumentNull_InvokesEmptyFactoryFallback()
+        {
+            // Arrange
+            var controller = new FolderController();
+            var globals = new Mock<IApplicationGlobals>().Object;
+            var helper = new MailItemHelper();
+            controller.ItemHelper = helper;
+            SetPrivate(controller, "_globals", globals);
+            Func<
+                IApplicationGlobals,
+                object,
+                FolderPredictor.InitOptions,
+                FolderPredictor
+            > primaryFactory = (g, o, opt) => throw new ArgumentNullException("objItem");
+            var fallback = BuildFolderHandlerWithArray(@"\\A\empty");
+            Func<IApplicationGlobals, FolderPredictor> emptyFactory = g => fallback;
+            SetPrivate(controller, "_folderPredictorFactory", primaryFactory);
+            SetPrivate(controller, "_folderPredictorEmptyFactory", emptyFactory);
+
+            // Act
+            Func<Task> act = () => controller.LoadFolderHandlerAsync(CancellationToken.None);
+
+            // Assert
+            await act.Should().NotThrowAsync();
+            QfcItemControllerTestSupport
+                .GetField(controller, "_folderHandler")
+                .Should()
+                .BeSameAs(fallback);
+        }
+
+        // ------------------------- PopulateFolderComboBox / Async (P10-T14/P10-T15) -------------------------
+
+        [TestMethod]
+        public void PopulateFolderComboBox_WhenFactorySucceeds_LoadsHandlerAndAssignsComboFromViewer()
+        {
+            // Arrange
+            var viewer = new Mock<IItemViewer>();
+            viewer.SetupGet(v => v.InvokeRequired).Returns(false);
+            var controller = new FolderController();
+            SetPrivate(controller, "_itemViewer", viewer.Object);
+            SetPrivate(controller, "_globals", new Mock<IApplicationGlobals>().Object);
+            controller.ItemHelper = new MailItemHelper();
+            var returned = BuildFolderHandlerWithArray(@"\\A\one", @"\\A\two", @"\\A\three");
+            Func<
+                IApplicationGlobals,
+                object,
+                FolderPredictor.InitOptions,
+                FolderPredictor
+            > factory = (g, o, opt) => returned;
+            SetPrivate(controller, "_folderPredictorFactory", factory);
+
+            // Act
+            controller.PopulateFolderComboBox();
+
+            // Assert
+            viewer.Verify(v => v.SetFolderItems(It.IsAny<string[]>()), Times.Once());
+        }
+
+        [TestMethod]
+        public async Task PopulateFolderComboBoxAsync_WhenFactorySucceeds_DispatchesAssignFolderComboBoxThroughViewerDispatcher()
+        {
+            // Arrange — a dedicated running WPF Dispatcher exercises the real UiDispatcher.InvokeAsync
+            // marshal, mirroring AssignControlsAsync_DispatchesAssignThroughViewerDispatcher. A non-null
+            // varList routes LoadFolderHandlerAsync through FolderPredictor.InitAsync's
+            // FromArrayOrString branch (FromArrayOrString(obj) only sets the in-memory _folderList — no
+            // COM/Suggestions access), so the real double's InitAsync call completes deterministically.
+            System.Windows.Threading.Dispatcher dispatcher =
+                QfcItemControllerTestSupport.StartRunningDispatcher();
+            try
+            {
+                var viewer = new Mock<IItemViewer>();
+                viewer.SetupGet(v => v.InvokeRequired).Returns(false);
+                viewer.SetupGet(v => v.UiDispatcher).Returns(dispatcher);
+                var controller = new FolderController();
+                SetPrivate(controller, "_itemViewer", viewer.Object);
+                SetPrivate(controller, "_globals", new Mock<IApplicationGlobals>().Object);
+                controller.ItemHelper = new MailItemHelper();
+                object varList = new[] { @"\\A\one", @"\\A\two" };
+                var returned = BuildFolderHandlerWithArray(@"\\A\one", @"\\A\two");
+                Func<
+                    IApplicationGlobals,
+                    object,
+                    FolderPredictor.InitOptions,
+                    FolderPredictor
+                > factory = (g, o, opt) => returned;
+                SetPrivate(controller, "_folderPredictorFactory", factory);
+
+                // Act
+                await controller.PopulateFolderComboBoxAsync(CancellationToken.None, varList);
+
+                // Assert
+                viewer.Verify(v => v.SetFolderItems(It.IsAny<string[]>()), Times.Once());
+            }
+            finally
+            {
+                QfcItemControllerTestSupport.ShutdownDispatcher(dispatcher);
+            }
+        }
 
         [TestMethod]
         public void AssignFolderComboBox_WhenNoPredeterminedFolder_SelectsTopSuggestionViaViewer()

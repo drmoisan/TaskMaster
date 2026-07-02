@@ -114,9 +114,41 @@ namespace QuickFiler.Controllers.Tests
             return viewer;
         }
 
-        // Note: the two synchronous ToggleFocus overloads are bucket-(iii) residuals (their whole body
-        // runs inside one _itemViewer.Invoke delegate terminating in Theme.SetQfcTheme, unreachable
-        // without a Theme seam), so they are not covered here.
+        // ------------------------- ToggleFocus / ToggleFocus(ToggleState) -------------------------
+        // Cycle-3 P9-T5/P9-T6 (members #33/#35, de-exempted): the entire body runs inside a single
+        // _itemViewer.Invoke(...) delegate; verifying the delegate was marshaled through Invoke exactly
+        // once (without executing it) requires no Theme construction, mirroring
+        // AssignControls_WhenInvokeRequired_MarshalsViaInvoke (QfcItemController.ViewerSetupTests.cs).
+
+        [TestMethod]
+        public void ToggleFocus_StateOverload_MarshalsThroughItemViewerInvoke()
+        {
+            // Arrange
+            var viewer = new Mock<IItemViewer>();
+            var controller = BuildFocusController();
+            SetField(controller, "_itemViewer", viewer.Object);
+
+            // Act
+            controller.ToggleFocus(Enums.ToggleState.On);
+
+            // Assert — the write is marshaled through Invoke; its delegate body is never executed.
+            viewer.Verify(v => v.Invoke(It.IsAny<Delegate>()), Times.Once());
+        }
+
+        [TestMethod]
+        public void ToggleFocus_ParameterlessOverload_MarshalsThroughItemViewerInvoke()
+        {
+            // Arrange
+            var viewer = new Mock<IItemViewer>();
+            var controller = BuildFocusController();
+            SetField(controller, "_itemViewer", viewer.Object);
+
+            // Act
+            controller.ToggleFocus();
+
+            // Assert
+            viewer.Verify(v => v.Invoke(It.IsAny<Delegate>()), Times.Once());
+        }
 
         // ------------------------- ToggleFocusOnAsync / OffAsync (private) -------------------------
 

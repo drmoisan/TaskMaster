@@ -3,13 +3,19 @@
 - **Issue:** #227
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-07-01T00-30
-- **Status:** Redesign (post cycle-1; maintainer denied exemption-boundary ratification)
-- **Version:** 0.3
+- **Last Updated:** 2026-07-02T11-15
+- **Status:** Redesign (post cycle-2; maintainer directed a further residual-boundary reduction)
+- **Version:** 0.4
 - **Research:** `artifacts/research/2026-06-29T10-00-qfc-item-controller-testability-research.md`;
-  seam-redesign research `artifacts/research/2026-07-01T00-00-qfc-item-controller-seam-redesign-research.md`
+  seam-redesign research `artifacts/research/2026-07-01T00-00-qfc-item-controller-seam-redesign-research.md`;
+  cycle-2 residual re-audit `artifacts/research/2026-07-02T11-00-qfc-item-controller-residual-reaudit-research.md`
 - **Maintainer decision:** `maintainer-decision.2026-07-01.md` — R2 exemption ratification DENIED;
-  Option A (behavioral seams + remove over-broad exemptions) approved 2026-07-01.
+  Option A (behavioral seams + remove over-broad exemptions) approved 2026-07-01. Cycle-2 delivered
+  a 103->41 reduction; the maintainer directed (2026-07-02, in-session) a rigorous re-check against
+  the seam-redesign research's original ~6-8 irreducible estimate and authorized a third
+  remediation cycle if the re-check found further actionable reduction. The re-audit found 17 of
+  the 41 residuals actionable (9 test-only, 8 via two new/extended seams) and a revised, honestly
+  reconciled irreducible floor of 24 — see cycle-3 scope below.
 
 ## Intent & Outcomes
 
@@ -132,6 +138,49 @@ Leaf-control interfaces (`IButton`/`ILabel`/`ICheckBox`/`IComboBox`/`ITextBox`) 
 retyping are explicitly NOT pursued (Option B, declined): the seam-redesign research found no
 exempted member is blocked by concrete-control typing, so that abstraction adds surface without
 coverage gain.
+
+### Redesign scope — cycle 3 (targeted residual reduction, approved 2026-07-02)
+
+Cycle 2 reduced the exemption set 103 -> 41, but a rigorous per-member re-audit
+(`artifacts/research/2026-07-02T11-00-qfc-item-controller-residual-reaudit-research.md`) found 17 of
+the 41 are actionable without violating any retained invariant (no leaf-control interfaces; no
+`ItemViewer`/Designer change). Cycle 3 closes that gap:
+
+9. **Phase 9 — test-only reductions (Tier 1, 9 members, zero new production seams).** Remove
+   `[ExcludeFromCodeCoverage]` and add tests for: `RegisterExpandedActions` (dictionary-membership,
+   mirrors `RegisterFocusActions`); `JumpToAsync(Control)` (bare handle-less `Control`, mirrors the
+   `Button_MouseEnter` technique); `PopulateControls(MailItem,int)` and `PopulateControlsAsync`
+   (`Mock<MailItem>`, mirrors `UtilitiesCS.Test/OutlookObjects/MailItem/MailItemHelperCoreTests.cs`);
+   `ToggleFocus()` and `ToggleFocus(Enums.ToggleState)` (handle-less `_themes` reflection injection,
+   mirrors the 14 sibling members already de-exempted in Phase 5 via `InvokeRequired`-guarded
+   `SetQfcTheme(async:false)`); `WpfUiDispatcher`'s forwarding body (the existing
+   `StartRunningDispatcher()` live-dispatcher test technique used for `AssignControlsAsync`, applied
+   to the adapter itself); `MailItemActionsAdapter` (already fully covered by
+   `MailItemActionsAdapterTests.cs` — remove the redundant attribute); `BtnFlagTask_Click` (mirrors
+   its already-non-exempt, structurally identical sibling `BtnDelItem_Click`).
+
+10. **Phase 10 — two new/extended seams (Tier 2, 8 members).**
+    - **`FolderPredictor` factory-delegate**, mirroring the `EmailFiler`/`FlagTasks`/`ConversationResolver`
+      factory-delegate pattern already built in Phase 6 (P6-T8): an injectable `Func<...,FolderPredictor>`
+      with a production default matching the current inline `new FolderPredictor(...)` calls. Unblocks
+      `LoadFolderHandler`, `LoadFolderHandlerAsync`, `PopulateFolderComboBox`, `PopulateFolderComboBoxAsync`,
+      `TextBoxSearch_TextChanged`.
+    - **`Theme` + `IUiDispatcher` retrofit**: add an optional `IUiDispatcher` constructor parameter to
+      `UtilitiesCS/HelperClasses/ThemeHelpers/Theme.cs` (production default `WpfUiDispatcher`), replacing
+      the direct `UiThread.Dispatcher` call in `SetQfcThemeAsync`/`SetQfcTheme(async:true)` and the
+      `_lblSender.BeginInvoke` call in `SetMailRead(async:true)`. Unblocks `ToggleFocusAsync(ToggleState)`,
+      `ToggleFocusAsync()`, `ApplyReadEmailFormat`. This is the one cycle-3 change that touches a file
+      outside `QfcItemController*.cs` (`Theme.cs`); it extends an already-built seam type into a second
+      class rather than introducing new seam design.
+
+11. **Remaining 24 residuals are NOT touched this cycle** and are re-submitted as the boundary for
+    ratification: 12 tied to the retained no-leaf-interface/`(ItemViewer)`-cast invariant
+    (`Initialize*`/`Create*`, `InitializeWebViewAsync`, `ResolveControlGroups(Async)`, `WireEvents`,
+    `WireControlTreeEvents`); 2 already-named `TlpCellSnapShot` follow-up members (`ToggleExpansionOn`/
+    `Off`, P7-T5); 3 deliberate virtual test seams (`DoLoadConversationResolverCoreAsync`,
+    `ToggleExpansion(ToggleState)`, `ToggleExpansionAsync(ToggleState)`); 6 structural `async void`
+    WinForms-event-signature shells whose extracted cores are already tested; 1 genuine
+    external-runtime dependency (`WebView2CoreInitializer`, barred by the External Dependencies rule).
 
 ## Non-Goals
 
@@ -258,17 +307,34 @@ code that cannot be unit-tested without a live Outlook process. For this work:
   cycle-1 attempt satisfied the denominator via 103 blanket `[ExcludeFromCodeCoverage]` attributes;
   the maintainer denied ratification (`maintainer-decision.2026-07-01.md`). AC5 is now met by making
   the members testable (Phases 5–7), not by exempting them.
-- [x] AC8: The cycle-1 exemption set is reduced by removing `[ExcludeFromCodeCoverage]` from the
-  members that have no genuine testability barrier (~38 per research) and covering them with tests;
-  no member that can be exercised through the narrowed `IItemViewer` or a mockable collaborator
-  retains an exemption.
+- [ ] AC8: The cycle-1 exemption set is reduced by removing `[ExcludeFromCodeCoverage]` from the
+  members that have no genuine testability barrier and covering them with tests; no member that can
+  be exercised through the narrowed `IItemViewer` or a mockable collaborator retains an exemption.
+  CYCLE-2 PARTIAL: 103->41 (~38 no-barrier members removed). CYCLE-3 (Phases 9-10, delivered
+  2026-07-02): the 17 members the cycle-2 residual re-audit found actionable (9 test-only, Tier 1;
+  8 via the new `FolderPredictor` factory-delegate and `Theme`+`IUiDispatcher` seams, Tier 2) are now
+  de-exempted and covered — 41->24. See `evidence/other/exemption-boundary.2026-07-02T15-05.md` (the
+  re-submitted boundary) and `evidence/qa-gates/final-residual-verification.2026-07-02T15-16.md` (the
+  itemized 24-member re-verification). The checkbox remains unchecked pending maintainer ratification
+  of the reduced 24-member boundary, consistent with the cycle-2 precedent.
 - [x] AC9: The four behavioral seams (`IUiDispatcher`, `IWebViewCoreInitializer`, `IMailItemActions`
   + collaborator factory delegates, and thin-delegator `async void` handlers) are introduced per the
   DI-seam rule ordering, are covered to >= 90%, and preserve runtime behavior. No leaf-control
-  interface layer is introduced.
-- [x] AC10: Any residual `[ExcludeFromCodeCoverage]` after Phases 5–7 is individually justified with
-  a specific per-member technical reason (no blanket/category exemption), and the reduced boundary is
-  documented for maintainer ratification at review.
+  interface layer is introduced. Cycle 3 extends (does not replace) this seam set: the `FolderPredictor`
+  factory-delegate mirrors the existing pattern; the `Theme` + `IUiDispatcher` retrofit extends
+  `IUiDispatcher` into a second class.
+- [ ] AC10: Every residual `[ExcludeFromCodeCoverage]` is individually justified with a specific
+  per-member technical reason (no blanket/category exemption), the boundary is minimized (no member
+  reducible via an already-established seam/technique in this codebase retains an exemption), and the
+  boundary is documented for maintainer ratification at review. CYCLE-2 PARTIAL: the 41-member
+  boundary was individually justified in writing, but the 2026-07-02 re-audit found 17 members
+  labeled irreducible were in fact reducible via patterns cycle-2 itself already proved (factory
+  delegates, the `_themes`/`StartRunningDispatcher` test techniques). CYCLE-3 (delivered 2026-07-02):
+  those 17 members are de-exempted (41->24); the reduced 24-member boundary is individually justified
+  by category and per-member in `evidence/other/exemption-boundary.2026-07-02T15-05.md` and
+  re-verified against source in `evidence/qa-gates/final-residual-verification.2026-07-02T15-16.md`.
+  The checkbox remains unchecked pending maintainer ratification of this boundary at review, per the
+  authority-scoped coverage-exception precedent already cited above.
 - [x] AC6: No production file modified exceeds 500 lines after the change (re-verified after the
   redesign, including the new seam files).
 - [x] AC7: Full C# toolchain passes in order — csharpier, .NET analyzers,

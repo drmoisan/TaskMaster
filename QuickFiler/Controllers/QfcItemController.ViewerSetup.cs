@@ -173,10 +173,6 @@ namespace QuickFiler.Controllers
             Buttons = controls.Where(x => x is Button).Select(x => (Button)x).ToList();
         }
 
-        // Residual (bucket-iii): constructs a MailItemHelper from a live COM MailItem
-        // (new MailItemHelper(mailItem, _globals)); the MailItemHelper-taking overload below is the
-        // seam used by tests. Not unit-reachable without a live MailItem.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void PopulateControls(MailItem mailItem, int viewerPosition)
         {
             ItemHelper = new MailItemHelper(mailItem, _globals);
@@ -190,9 +186,6 @@ namespace QuickFiler.Controllers
             AssignControls(ItemHelper, viewerPosition);
         }
 
-        // Residual (bucket-iii): builds a MailItemHelper from a live COM MailItem via
-        // MailItemHelper.FromMailItemAsync(mailItem, ...). Not unit-reachable without a live MailItem.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal async Task PopulateControlsAsync(
             MailItem mailItem,
             int viewerPosition,

@@ -24,12 +24,6 @@ namespace QuickFiler.Controllers
 {
     internal partial class QfcItemController
     {
-        // Residual (bucket-iii): the entire body runs inside a single _itemViewer.Invoke(...) delegate
-        // that terminates in _themes[_activeTheme].SetQfcTheme(async: false), a non-virtual method on
-        // the out-of-scope Theme collaborator that dispatches to live WinForms controls (LblItemNumber,
-        // buttons, tips labels). Executing the delegate against a handle-less injected Theme faults; no
-        // Theme seam is introduced this cycle (Option A), so the delegate body is not unit-reachable.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void ToggleFocus(Enums.ToggleState desiredState)
         {
             _itemViewer.Invoke(
@@ -72,11 +66,6 @@ namespace QuickFiler.Controllers
             );
         }
 
-        // Residual (bucket-iii): unconditionally awaits Theme.SetQfcThemeAsync(), which internally
-        // awaits the static UiThread.Dispatcher. Theme is an out-of-scope collaborator (UtilitiesCS)
-        // not covered by this cycle's QfcItemController seams; awaiting its non-virtual
-        // SetQfcThemeAsync cannot complete deterministically in a pump-less unit-test host.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task ToggleFocusAsync(Enums.ToggleState desiredState)
         {
             var boolDesiredState = desiredState.HasFlag(Enums.ToggleState.On);
@@ -91,10 +80,6 @@ namespace QuickFiler.Controllers
             await _themes[_activeTheme].SetQfcThemeAsync();
         }
 
-        // Residual (bucket-iii): same terminal Theme.SetQfcTheme(async: false) barrier as the
-        // state-taking overload above; the whole body is inside one _itemViewer.Invoke(...) delegate
-        // that cannot execute against a handle-less Theme, and no Theme seam is introduced this cycle.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void ToggleFocus()
         {
             _itemViewer.Invoke(
@@ -137,9 +122,6 @@ namespace QuickFiler.Controllers
             );
         }
 
-        // Residual (bucket-iii): same Theme.SetQfcThemeAsync() / static-UiThread.Dispatcher barrier as
-        // the state-taking overload above.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public async Task ToggleFocusAsync()
         {
             if (_activeUI)
@@ -333,13 +315,6 @@ namespace QuickFiler.Controllers
             //_isDarkMode = false;
         }
 
-        // Residual (bucket-iii, reclassified in Phase 6): the direct Mail.* COM writes are now isolated
-        // behind the injected IMailItemActions seam (P6-T7), but this method also calls
-        // _themes[_activeTheme].SetMailRead(async: true), which unconditionally invokes
-        // _lblSender.BeginInvoke on a live WinForms control (Theme throws InvalidOperationException
-        // when the control lacks a window handle). Theme is an out-of-scope collaborator with no seam
-        // this cycle (Option A), so the method is not unit-reachable — same barrier as ToggleFocus.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public void ApplyReadEmailFormat(object state)
         {
             ItemHelper.UnRead = false;

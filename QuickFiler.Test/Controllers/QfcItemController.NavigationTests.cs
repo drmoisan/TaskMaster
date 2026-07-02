@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -194,6 +195,34 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             mockKbd.Verify(k => k.ToggleKeyboardDialog(), Times.Once());
             viewer.Verify(v => v.FocusSearch(), Times.Once());
+        }
+
+        /// <summary>
+        /// Cycle-3 P9-T4 (member #28, de-exempted): <c>Control.Focus()</c> on a handle-less
+        /// <c>new Control()</c> returns <c>false</c> silently — no live handle is required, mirroring the
+        /// bare handle-less <c>Button</c>/<c>ToolStripMenuItem</c> sender technique already used for
+        /// <c>Button_MouseEnter</c>/<c>MenuItem_MouseEnter</c>.
+        /// </summary>
+        [TestMethod]
+        public async Task JumpToAsync_FocusesHandlelessControlAndTogglesKeyboardDialog()
+        {
+            // Arrange
+            HarnessController controller = new HarnessController();
+            QfcItemControllerTestSupport.SetField(
+                controller,
+                "_uiDispatcher",
+                QfcItemControllerTestSupport.BuildSyncDispatcher().Object
+            );
+            Mock<IQfcKeyboardHandler> mockKbd = new Mock<IQfcKeyboardHandler>();
+            QfcItemControllerTestSupport.SetField(controller, "_kbdHandler", mockKbd.Object);
+            Control control = new Control();
+
+            // Act
+            await (Task)
+                QfcItemControllerTestSupport.InvokeNonPublic(controller, "JumpToAsync", control);
+
+            // Assert
+            mockKbd.Verify(k => k.ToggleKeyboardDialogAsync(), Times.Once());
         }
 
         [TestMethod]

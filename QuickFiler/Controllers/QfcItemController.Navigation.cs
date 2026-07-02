@@ -54,10 +54,6 @@ namespace QuickFiler.Controllers
             _itemViewer.FocusSearch();
         }
 
-        // Residual (bucket-iii): takes a raw WinForms Control parameter and focuses it; called only
-        // with the concrete L0v2h2_WebView2 / TopicThread expanded-action targets, for which the
-        // narrowed IItemViewer exposes no focus intent by design (P2-T4). Not unit-reachable.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal async Task JumpToAsync(Control control)
         {
             await _uiDispatcher.InvokeAsync(() => control.Focus());

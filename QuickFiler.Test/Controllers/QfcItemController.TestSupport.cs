@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -154,12 +155,25 @@ namespace QuickFiler.Controllers.Tests
         /// mouse-enter/leave handlers. The parameterless <see cref="Theme"/> constructor requires no
         /// live window handle, so the instance is safe to construct in a unit test.
         /// </summary>
+        /// <remarks>
+        /// Cycle-3: the parameterless <see cref="Theme"/> constructor leaves <c>_uiDispatcher</c> null
+        /// (P10-T21 deliberately does not default it there). <see cref="QfcItemController.SetThemeDark"/>
+        /// / <c>SetThemeLight</c> route through <c>Theme.SetQfcTheme(async: true)</c>, which now reads
+        /// <c>_uiDispatcher</c>, so a non-executing dispatcher mock (queues the delegate without running
+        /// it, preserving the pre-cycle-3 "queued but never pumped" behavior these callers rely on) is
+        /// injected here so every caller of this shared builder keeps working without a live handle.
+        /// </remarks>
         internal static Theme BuildColorTheme(Color mouseOver, Color clicked, Color back)
         {
             Theme theme = new Theme();
             theme.ButtonMouseOverColor = mouseOver;
             theme.ButtonClickedColor = clicked;
             theme.ButtonBackColor = back;
+            Mock<IUiDispatcher> dispatcher = new Mock<IUiDispatcher>();
+            dispatcher.Setup(d => d.InvokeAsync(It.IsAny<Action>())).Returns(Task.CompletedTask);
+            typeof(Theme)
+                .GetField("_uiDispatcher", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(theme, dispatcher.Object);
             return theme;
         }
 
@@ -175,6 +189,25 @@ namespace QuickFiler.Controllers.Tests
             Dictionary<string, Theme> themes = new Dictionary<string, Theme>();
             themes[activeTheme] = theme;
             return themes;
+        }
+
+        /// <summary>
+        /// Cycle-3 (P10-T31): builds a handle-less <see cref="Theme"/> whose <c>_uiDispatcher</c> and
+        /// <c>_lblSender</c> private fields are reflection-injected, mirroring
+        /// <c>Theme_DispatcherTests.SetField</c> in <c>UtilitiesCS.Test</c>. <c>_lblSender</c> is set to
+        /// a handle-less <see cref="Label"/> so <see cref="Theme.SetMailRead(bool)"/>'s null guard is
+        /// satisfied.
+        /// </summary>
+        internal static Theme BuildDispatchableTheme(IUiDispatcher dispatcher)
+        {
+            Theme theme = new Theme();
+            typeof(Theme)
+                .GetField("_uiDispatcher", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(theme, dispatcher);
+            typeof(Theme)
+                .GetField("_lblSender", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(theme, new Label());
+            return theme;
         }
 
         /// <summary>

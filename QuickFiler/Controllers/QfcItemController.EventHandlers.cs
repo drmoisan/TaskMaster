@@ -46,9 +46,6 @@ namespace QuickFiler.Controllers
             }
         }
 
-        // Residual (bucket-iii): thin WinForms-event shell (SynchronizationContext guard + delegation
-        // to the de-exempted FlagAsTask). Shell has no substantive logic of its own.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void BtnFlagTask_Click(object sender, EventArgs e)
         {
             if (SynchronizationContext.Current is null)
@@ -164,10 +161,6 @@ namespace QuickFiler.Controllers
             ((ToolStripMenuItem)sender).BackColor = _themes[_activeTheme].ButtonBackColor;
         }
 
-        // Residual (bucket-iii): calls _folderHandler.FindFolder(objItem: Mail) — the COM-bound
-        // FolderPredictor plus a live Mail item (out-of-scope collaborators, no seam this cycle). The
-        // surrounding IItemViewer folder writes are mockable but the FindFolder call is not.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void TextBoxSearch_TextChanged(object sender, EventArgs e)
         {
             var folders = _folderHandler.FindFolder(

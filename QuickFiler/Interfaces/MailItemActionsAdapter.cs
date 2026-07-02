@@ -1,16 +1,14 @@
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.Office.Interop.Outlook;
 
 namespace QuickFiler.Interfaces
 {
     /// <summary>
     /// Production adapter (DI-seam "adapter" tier, research §3.4.3) that forwards every
-    /// <see cref="IMailItemActions"/> member 1:1 to a live <see cref="MailItem"/>. The body is a thin
-    /// forwarding shim over an Outlook COM object, so it legitimately carries
-    /// <see cref="ExcludeFromCodeCoverage"/>; the isolated forwards exist precisely so that the
-    /// controller methods that previously called <c>Mail.*</c> directly become unit-testable.
+    /// <see cref="IMailItemActions"/> member 1:1 to a live <see cref="MailItem"/>. The isolated
+    /// forwards exist precisely so that the controller methods that previously called <c>Mail.*</c>
+    /// directly become unit-testable; because <c>MailItem</c> is itself a mockable COM interface, every
+    /// forward is fully exercised by <see cref="QuickFiler.Controllers.Tests.MailItemActionsAdapterTests"/>.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public sealed class MailItemActionsAdapter : IMailItemActions
     {
         private readonly MailItem _mail;

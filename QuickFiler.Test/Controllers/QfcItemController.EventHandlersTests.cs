@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Controllers;
+using QuickFiler.Helper_Classes;
+using QuickFiler.Interfaces;
+using TaskVisualization;
 using UtilitiesCS;
 
 namespace QuickFiler.Controllers.Tests
@@ -248,6 +252,101 @@ namespace QuickFiler.Controllers.Tests
 
             // Assert
             viewer.Verify(v => v.SetFolderSelectedItem("Trash to Delete"), Times.Once());
+        }
+
+        // ------------------------- Flag-task click -------------------------
+
+        /// <summary>
+        /// Marker exception used to prove <c>_flagTasksFactory</c> was invoked without letting
+        /// <c>FlagAsTask()</c> reach <c>flagTask.Run(modal: true)</c> (which would show a live modal
+        /// dialog). Mirrors <c>QfcItemController_SeamFactoryTests.SentinelException</c>.
+        /// </summary>
+        private sealed class FlagFactorySentinelException : System.Exception { }
+
+        /// <summary>
+        /// Cycle-3 P9-T9 (member #21, de-exempted): <c>BtnFlagTask_Click</c> is a thin shell
+        /// (SynchronizationContext guard + delegation to the already-tested <c>FlagAsTask()</c>) —
+        /// structurally identical to its non-exempt sibling <see cref="BtnDelItem_Click_MarksItemForDeletion"/>.
+        /// </summary>
+        [TestMethod]
+        public void BtnFlagTask_Click_InvokesFlagAsTask()
+        {
+            // Arrange
+            QfcItemControllerTestSupport.EnsureSynchronizationContext();
+            bool factoryInvoked = false;
+            Func<IApplicationGlobals, List<MailItem>, bool, IntPtr, FlagTasks> factory = (
+                g,
+                list,
+                bl,
+                h
+            ) =>
+            {
+                factoryInvoked = true;
+                throw new FlagFactorySentinelException();
+            };
+            Mock<IApplicationGlobals> globals = new Mock<IApplicationGlobals>();
+            Mock<IFilerHomeController> home = new Mock<IFilerHomeController>();
+            Mock<IFilerFormController> formCtrl = new Mock<IFilerFormController>();
+            formCtrl.SetupGet(f => f.FormHandle).Returns(new IntPtr(7));
+            home.SetupGet(h => h.FormController).Returns(formCtrl.Object);
+            HarnessController controller = new HarnessController();
+            QfcItemControllerTestSupport.SetField(controller, "_globals", globals.Object);
+            QfcItemControllerTestSupport.SetField(controller, "_homeController", home.Object);
+            QfcItemControllerTestSupport.SetField(controller, "_flagTasksFactory", factory);
+            controller.Mail = new Mock<MailItem>().Object;
+
+            // Act
+            System.Action act = () => controller.BtnFlagTask_Click(null, EventArgs.Empty);
+
+            // Assert — the shell delegates into FlagAsTask(), which invokes the injected factory.
+            act.Should().Throw<FlagFactorySentinelException>();
+            factoryInvoked.Should().BeTrue();
+        }
+
+        // ------------------------- Search text-changed (P10-T16: FolderPredictor factory seam) -------------------------
+
+        /// <summary>
+        /// Cycle-3 P10-T16 (member #27, de-exempted): the call site already reads
+        /// <c>_folderHandler.FindFolder(...)</c>, which now targets the narrow
+        /// <see cref="IFolderSearchHandler"/> interface — directly mockable, no live Outlook/COM host.
+        /// </summary>
+        [TestMethod]
+        public void TextBoxSearch_TextChanged_UsesInjectedFolderSearchHandler_PopulatesAndSelectsFolder()
+        {
+            // Arrange
+            Mock<IFolderSearchHandler> folderHandler = new Mock<IFolderSearchHandler>();
+            folderHandler
+                .Setup(f =>
+                    f.FindFolder(
+                        It.IsAny<string>(),
+                        It.IsAny<object>(),
+                        It.IsAny<bool>(),
+                        It.IsAny<List<string>>(),
+                        It.IsAny<bool>(),
+                        It.IsAny<
+                            IEnumerable<(string root, string excludedFolder, bool excludeChildren)>
+                        >()
+                    )
+                )
+                .Returns(new[] { @"\\A\one", @"\\A\two" });
+            Mock<IItemViewer> viewer = new Mock<IItemViewer>();
+            viewer.SetupGet(v => v.SearchText).Returns("query");
+            HarnessController controller = new HarnessController();
+            QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer.Object);
+            QfcItemControllerTestSupport.SetField(
+                controller,
+                "_folderHandler",
+                folderHandler.Object
+            );
+
+            // Act
+            controller.TextBoxSearch_TextChanged(null, EventArgs.Empty);
+
+            // Assert
+            viewer.Verify(v => v.ClearFolderItems(), Times.Once());
+            viewer.Verify(v => v.SetFolderItems(It.IsAny<string[]>()), Times.Once());
+            viewer.Verify(v => v.SetFolderSelectedIndex(1), Times.Once());
+            viewer.Verify(v => v.SetFolderDroppedDown(true), Times.Once());
         }
 
         // ------------------------- Search key-down -------------------------

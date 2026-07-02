@@ -173,6 +173,26 @@ namespace QuickFiler.Controllers.Tests
             charActions.ContainsKey('F').Should().BeFalse();
         }
 
+        /// <summary>
+        /// Cycle-3 P9-T3 (member #20, de-exempted): the registration act itself has no barrier — only
+        /// invoking the 'B'/'D' lambda bodies touches the concrete-bound WebView2/TopicThread controls.
+        /// Mirrors <see cref="RegisterFocusActions_RegistersExpectedSyncKeyAndCharActions"/>.
+        /// </summary>
+        [TestMethod]
+        public void RegisterExpandedActions_RegistersBAndDWithoutInvokingLambdaBodies()
+        {
+            // Arrange
+            var (mockKbd, _, charActions) = BuildSyncKbdHandlerStub();
+            var controller = new KbdController(mockKbd.Object, "entry-sync-expanded");
+
+            // Act
+            controller.RegisterExpandedActions();
+
+            // Assert — registration populates both entries without invoking their lambda bodies.
+            charActions.ContainsKey('B').Should().BeTrue();
+            charActions.ContainsKey('D').Should().BeTrue();
+        }
+
         [TestMethod]
         public void UnregisterExpandedActions_AfterRegister_RemovesSyncBAndD()
         {

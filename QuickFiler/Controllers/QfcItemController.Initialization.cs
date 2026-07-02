@@ -41,7 +41,14 @@ namespace QuickFiler.Controllers
             Func<MailItem, ConversationResolver> conversationResolverFactory = null,
             Func<IApplicationGlobals, List<MailItem>, bool, IntPtr, FlagTasks> flagTasksFactory =
                 null,
-            Func<EmailFilerConfig, EmailFiler> emailFilerFactory = null
+            Func<EmailFilerConfig, EmailFiler> emailFilerFactory = null,
+            Func<
+                IApplicationGlobals,
+                object,
+                FolderPredictor.InitOptions,
+                FolderPredictor
+            > folderPredictorFactory = null,
+            Func<IApplicationGlobals, FolderPredictor> folderPredictorEmptyFactory = null
         )
         {
             //TraceUtility.LogMethodCall(appGlobals, homeController, parent, itemViewer, viewerPosition, itemNumberDigits, mailItem, tlpStates);
@@ -53,6 +60,8 @@ namespace QuickFiler.Controllers
             _conversationResolverFactory = conversationResolverFactory;
             _flagTasksFactory = flagTasksFactory;
             _emailFilerFactory = emailFilerFactory;
+            _folderPredictorFactory = folderPredictorFactory;
+            _folderPredictorEmptyFactory = folderPredictorEmptyFactory;
             SaveParameters(
                 appGlobals,
                 homeController,
@@ -166,7 +175,8 @@ namespace QuickFiler.Controllers
             _themes = QfcThemeHelper.SetupThemes(
                 this,
                 (ItemViewer)_itemViewer,
-                this.HtmlDarkConverter
+                this.HtmlDarkConverter,
+                _uiDispatcher
             ); // concrete-bound seam (P2-T5): SetupThemes requires concrete control objects
 
             // Populate placeholder controls with values
@@ -199,7 +209,8 @@ namespace QuickFiler.Controllers
             _themes = QfcThemeHelper.SetupThemes(
                 this,
                 (ItemViewer)_itemViewer,
-                this.HtmlDarkConverter
+                this.HtmlDarkConverter,
+                _uiDispatcher
             ); // concrete-bound seam (P2-T5): SetupThemes requires concrete control objects
             if (_globals.Ol.DarkMode)
             {
@@ -253,7 +264,12 @@ namespace QuickFiler.Controllers
             await Task.Run(() => ResolveControlGroups((ItemViewer)_itemViewer)); // concrete-bound seam (P2-T4): control-host path, runs on real ItemViewer during init
 
             _themes = await Task.Run(() =>
-                QfcThemeHelper.SetupThemes(this, (ItemViewer)_itemViewer, this.HtmlDarkConverter) // concrete-bound seam (P2-T5): SetupThemes requires concrete control objects
+                QfcThemeHelper.SetupThemes(
+                    this,
+                    (ItemViewer)_itemViewer,
+                    this.HtmlDarkConverter,
+                    _uiDispatcher
+                ) // concrete-bound seam (P2-T5): SetupThemes requires concrete control objects
             );
 
             if (_globals.Ol.DarkMode)
@@ -283,7 +299,8 @@ namespace QuickFiler.Controllers
             _themes = QfcThemeHelper.SetupThemes(
                 this,
                 (ItemViewer)_itemViewer,
-                this.HtmlDarkConverter
+                this.HtmlDarkConverter,
+                _uiDispatcher
             ); // concrete-bound seam (P2-T5): SetupThemes requires concrete control objects
             if (_globals.Ol.DarkMode)
             {
@@ -375,6 +392,9 @@ namespace QuickFiler.Controllers
             _mailActions ??= mailItem is null
                 ? null
                 : new QuickFiler.Interfaces.MailItemActionsAdapter(mailItem);
+            _folderPredictorFactory ??= (globals, objItem, options) =>
+                new FolderPredictor(globals, objItem, options);
+            _folderPredictorEmptyFactory ??= globals => new FolderPredictor(globals);
         }
 
         // Residual (bucket-iii): static factory that constructs the controller and awaits

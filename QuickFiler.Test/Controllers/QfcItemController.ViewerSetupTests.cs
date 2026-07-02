@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Controllers;
@@ -45,6 +47,89 @@ namespace QuickFiler.Controllers.Tests
             return helper;
         }
 
+        /// <summary>
+        /// Cycle-3 (P9-T1/P9-T2): builds a globals mock that satisfies both
+        /// <c>MailItemHelper</c>'s lazily-materialized <c>Globals.Ol.EmailPrefixToStrip</c> read and
+        /// the controller's own <c>_globals.QfSettings</c> reads in <c>AssignControls</c>.
+        /// </summary>
+        private static Mock<IApplicationGlobals> BuildGlobalsWithOl(
+            bool moveConversation,
+            bool saveEmailCopy,
+            bool saveAttachments,
+            bool savePictures
+        )
+        {
+            Mock<IAppQuickFilerSettings> settings = new Mock<IAppQuickFilerSettings>();
+            settings.SetupGet(s => s.MoveEntireConversation).Returns(moveConversation);
+            settings.SetupGet(s => s.SaveEmailCopy).Returns(saveEmailCopy);
+            settings.SetupGet(s => s.SaveAttachments).Returns(saveAttachments);
+            settings.SetupGet(s => s.SavePictures).Returns(savePictures);
+
+            Mock<IOlObjects> olObjects = new Mock<IOlObjects>();
+            olObjects.SetupGet(o => o.EmailPrefixToStrip).Returns(string.Empty);
+
+            Mock<IApplicationGlobals> globals = new Mock<IApplicationGlobals>();
+            globals.SetupGet(g => g.QfSettings).Returns(settings.Object);
+            globals.SetupGet(g => g.Ol).Returns(olObjects.Object);
+            return globals;
+        }
+
+        /// <summary>
+        /// Cycle-3 (P9-T1/P9-T2): a <see cref="Mock{MailItem}"/> with every property read by
+        /// <c>MailItemHelper</c>'s lazy fields exercised by <c>AssignControls</c> (sync path) and by
+        /// <c>MaterializeTokenizationDependencies</c> (async path via <c>FromMailItemAsync</c>), mirroring
+        /// the <c>Mock&lt;InteropMailItem&gt;</c> setup pattern in
+        /// <c>UtilitiesCS.Test/OutlookObjects/MailItem/MailItemHelperCoreTests.cs</c>. <c>UserProperties</c>
+        /// is additionally mocked (returning no "Triage" property) since <c>AssignControls</c> reads
+        /// <c>Triage</c>, which the shared core test does not need.
+        /// </summary>
+        private static Mock<MailItem> BuildMailItemMock()
+        {
+            Mock<MailItem> mailItem = new Mock<MailItem>();
+
+            Mock<PropertyAccessor> propertyAccessor = new Mock<PropertyAccessor>();
+            Mock<AddressEntry> sender = new Mock<AddressEntry>();
+            sender
+                .SetupGet(x => x.AddressEntryUserType)
+                .Returns(OlAddressEntryUserType.olSmtpAddressEntry);
+            sender.SetupGet(x => x.Name).Returns("Ada Sender");
+            sender.SetupGet(x => x.Address).Returns("ada@example.com");
+            sender.SetupGet(x => x.PropertyAccessor).Returns(propertyAccessor.Object);
+
+            Mock<Recipients> recipients = new Mock<Recipients>();
+            recipients.SetupGet(x => x.Count).Returns(0);
+            recipients
+                .Setup(x => x.GetEnumerator())
+                .Returns(() => ((IEnumerable)Array.Empty<Recipient>()).GetEnumerator());
+
+            Mock<Attachments> attachments = new Mock<Attachments>();
+            attachments.SetupGet(x => x.Count).Returns(0);
+            attachments
+                .Setup(x => x.GetEnumerator())
+                .Returns(() => ((IEnumerable)Array.Empty<Attachment>()).GetEnumerator());
+
+            Mock<UserProperties> userProperties = new Mock<UserProperties>();
+            userProperties
+                .Setup(x => x.Find(It.IsAny<string>(), It.IsAny<object>()))
+                .Returns((UserProperty)null);
+
+            mailItem.SetupGet(x => x.Subject).Returns("Subject");
+            mailItem.SetupGet(x => x.Body).Returns("Body");
+            mailItem.SetupGet(x => x.HTMLBody).Returns("<html><body>Body</body></html>");
+            mailItem.SetupGet(x => x.SenderName).Returns("Ada Sender");
+            mailItem.SetupGet(x => x.SenderEmailAddress).Returns("ada@example.com");
+            mailItem.SetupGet(x => x.EntryID).Returns("entry-1");
+            mailItem.SetupGet(x => x.Sender).Returns(sender.Object);
+            mailItem.SetupGet(x => x.Recipients).Returns(recipients.Object);
+            mailItem.SetupGet(x => x.Attachments).Returns(attachments.Object);
+            mailItem.SetupGet(x => x.FlagStatus).Returns(OlFlagStatus.olNoFlag);
+            mailItem.SetupGet(x => x.SentOn).Returns(new DateTime(2026, 1, 1));
+            mailItem.SetupGet(x => x.Categories).Returns(string.Empty);
+            mailItem.SetupGet(x => x.UserProperties).Returns(userProperties.Object);
+
+            return mailItem;
+        }
+
         [TestMethod]
         public void PopulateControls_WithHelper_StoresHelperAndAssignsViewerFields()
         {
@@ -67,6 +152,75 @@ namespace QuickFiler.Controllers.Tests
             controller.ItemHelper.Should().BeSameAs(helper);
             viewer.VerifySet(v => v.BodyText = "populated-body", Times.Once());
             viewer.VerifySet(v => v.ItemNumberText = "4", Times.Once());
+        }
+
+        /// <summary>
+        /// Cycle-3 P9-T1 (member #11, de-exempted): <c>PopulateControls(MailItem,int)</c> constructs a
+        /// <c>MailItemHelper</c> from a live-typed COM <c>MailItem</c>. Since <c>MailItem</c> is a
+        /// mockable COM interface, no live Outlook host is required — mirrors
+        /// <c>MailItemHelperCoreTests.FromMailItemAsync_...</c>.
+        /// </summary>
+        [TestMethod]
+        public void PopulateControls_WithMailItem_ConstructsHelperAndAssignsControls()
+        {
+            // Arrange
+            Mock<MailItem> mailItem = BuildMailItemMock();
+            Mock<IItemViewer> viewer = new Mock<IItemViewer>();
+            viewer.SetupGet(v => v.InvokeRequired).Returns(false);
+            HarnessController controller = new HarnessController();
+            QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer.Object);
+            QfcItemControllerTestSupport.SetField(
+                controller,
+                "_globals",
+                BuildGlobalsWithOl(false, false, false, false).Object
+            );
+
+            // Act
+            controller.PopulateControls(mailItem.Object, 3);
+
+            // Assert — the helper is constructed from the mocked MailItem and pushed to the viewer.
+            controller.ItemHelper.Should().NotBeNull();
+            viewer.VerifySet(v => v.SubjectText = "Subject", Times.Once());
+            viewer.VerifySet(v => v.ItemNumberText = "3", Times.Once());
+        }
+
+        /// <summary>
+        /// Cycle-3 P9-T2 (member #12, de-exempted): <c>PopulateControlsAsync</c> loads the helper via
+        /// <c>MailItemHelper.FromMailItemAsync</c> (the same call signature already exercised against a
+        /// mocked <c>MailItem</c> in <c>MailItemHelperCoreTests</c>) and dispatches the assignment through
+        /// the viewer's <c>UiDispatcher</c>, mirroring <c>AssignControlsAsync_DispatchesAssignThroughViewerDispatcher</c>.
+        /// </summary>
+        [TestMethod]
+        public async Task PopulateControlsAsync_WithMailItem_LoadsHelperViaFromMailItemAsyncAndAssignsControls()
+        {
+            // Arrange
+            Dispatcher dispatcher = QfcItemControllerTestSupport.StartRunningDispatcher();
+            try
+            {
+                Mock<MailItem> mailItem = BuildMailItemMock();
+                Mock<IItemViewer> viewer = new Mock<IItemViewer>();
+                viewer.SetupGet(v => v.InvokeRequired).Returns(false);
+                viewer.SetupGet(v => v.UiDispatcher).Returns(dispatcher);
+                HarnessController controller = new HarnessController();
+                QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer.Object);
+                QfcItemControllerTestSupport.SetField(
+                    controller,
+                    "_globals",
+                    BuildGlobalsWithOl(false, false, false, false).Object
+                );
+
+                // Act — block deterministically on the dispatched task's completion (no polling).
+                await controller.PopulateControlsAsync(mailItem.Object, 5, loadAll: false);
+
+                // Assert
+                controller.ItemHelper.Should().NotBeNull();
+                viewer.VerifySet(v => v.SubjectText = "Subject", Times.Once());
+                viewer.VerifySet(v => v.ItemNumberText = "5", Times.Once());
+            }
+            finally
+            {
+                QfcItemControllerTestSupport.ShutdownDispatcher(dispatcher);
+            }
         }
 
         [TestMethod]

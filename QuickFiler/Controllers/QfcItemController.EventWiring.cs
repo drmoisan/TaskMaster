@@ -309,10 +309,6 @@ namespace QuickFiler.Controllers
             }
         }
 
-        // Residual (bucket-iii): the 'B'/'D' expanded-action lambda bodies call JumpToAsync with the
-        // concrete ((ItemViewer)_itemViewer).L0v2h2_WebView2 / TopicThread controls; the narrowed
-        // IItemViewer exposes no focus intent for these two targets by design (P2-T4). Not unit-reachable.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void RegisterExpandedActions()
         {
             _kbdHandler.CharActions.Add(
