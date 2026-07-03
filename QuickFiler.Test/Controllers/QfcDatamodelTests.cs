@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -18,6 +19,33 @@ namespace QuickFiler.Controllers.Tests
     [TestClass]
     public class QfcDatamodelTests
     {
+        private static string ReadControllerSource(string fileName)
+        {
+            string path = Path.GetFullPath(
+                Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    @"..\..\..\QuickFiler\Controllers",
+                    fileName
+                )
+            );
+            return File.ReadAllText(path);
+        }
+
+        [TestMethod]
+        public void ScoreRemainingQueueMailItemAsync_ProbabilityDebugLog_IncludesCallerSubjectEntryIdAndScore()
+        {
+            string source = ReadControllerSource("QfcDatamodel.cs");
+
+            source
+                .Should()
+                .Contain(
+                    "Probability debug [QfcDatamodel.LoadRemainingEmailsToQueueAsync (master-queue admission)]"
+                );
+            source.Should().Contain("Subject='{mailItem.Subject}'");
+            source.Should().Contain("EntryID='{mailItem.EntryID}'");
+            source.Should().Contain("Score={score.Score}");
+        }
+
         private static QfcRemainingQueueAdmission CreateQueueAdmission(
             bool highConfidenceEnabled,
             double threshold,
@@ -46,50 +74,21 @@ namespace QuickFiler.Controllers.Tests
         }
 
         [TestMethod]
-        public async Task TryQueueRemainingMailItemAsync_HighConfidenceEnabled_ScoresBeforeQueueAdmission()
+        public async Task TryQueueRemainingMailItemAsync_HighConfidenceEnabled_AddsAndHooksWithoutScoring()
         {
             // Arrange
             var added = new List<MailItem>();
             var hooked = new List<MailItem>();
             var mailItem = new Mock<MailItem>().Object;
-            var scoreCallCount = 0;
             var admission = CreateQueueAdmission(
                 highConfidenceEnabled: true,
                 threshold: 0.90,
                 added,
                 hooked,
                 (mail, _) =>
-                {
-                    scoreCallCount++;
-                    added.Should().BeEmpty("admission must wait until scoring completes");
-                    mail.Should().BeSameAs(mailItem);
-                    return Task.FromResult(950L);
-                }
-            );
-
-            // Act
-            var queued = await admission.TryQueueAsync(mailItem, CancellationToken.None);
-
-            // Assert
-            queued.Should().BeTrue();
-            scoreCallCount.Should().Be(1);
-            added.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
-            hooked.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
-        }
-
-        [TestMethod]
-        public async Task TryQueueRemainingMailItemAsync_ScoreEqualsThreshold_AddsAndHooksMailItem()
-        {
-            // Arrange
-            var added = new List<MailItem>();
-            var hooked = new List<MailItem>();
-            var mailItem = new Mock<MailItem>().Object;
-            var admission = CreateQueueAdmission(
-                highConfidenceEnabled: true,
-                threshold: 0.90,
-                added,
-                hooked,
-                (mail, token) => Task.FromResult(900L)
+                    throw new AssertFailedException(
+                        "Remaining-mail admission must not score before queue insertion."
+                    )
             );
 
             // Act
@@ -102,7 +101,7 @@ namespace QuickFiler.Controllers.Tests
         }
 
         [TestMethod]
-        public async Task TryQueueRemainingMailItemAsync_ScoreBelowThreshold_DoesNotAddOrHookMailItem()
+        public async Task TryQueueRemainingMailItemAsync_HighConfidenceEnabled_IgnoresThresholdAtAdmission()
         {
             // Arrange
             var added = new List<MailItem>();
@@ -113,16 +112,56 @@ namespace QuickFiler.Controllers.Tests
                 threshold: 0.90,
                 added,
                 hooked,
-                (mail, token) => Task.FromResult(899L)
+                (mail, token) =>
+                    throw new AssertFailedException(
+                        "Threshold scoring belongs to dequeue-time enforcement."
+                    )
             );
 
             // Act
             var queued = await admission.TryQueueAsync(mailItem, CancellationToken.None);
 
             // Assert
-            queued.Should().BeFalse();
-            added.Should().BeEmpty();
-            hooked.Should().BeEmpty();
+            queued.Should().BeTrue();
+            added.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
+            hooked.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
+        }
+
+        [TestMethod]
+        public void DequeueNextItemGroupAsync_HighConfidenceMode_UsesStreamingGate()
+        {
+            string source = ReadControllerSource("QfcDatamodel.QueueProcessing.cs");
+
+            source.Should().Contain("HighConfidenceModeEnabled");
+            source.Should().Contain("QfcStreamingDequeueConfidenceGate");
+            source.Should().Contain("DequeueAsync(quantity, timeOut, _token)");
+        }
+
+        [TestMethod]
+        public async Task TryQueueRemainingMailItemAsync_HighConfidenceEnabled_AddsBelowThresholdCandidate()
+        {
+            // Arrange
+            var added = new List<MailItem>();
+            var hooked = new List<MailItem>();
+            var mailItem = new Mock<MailItem>().Object;
+            var admission = CreateQueueAdmission(
+                highConfidenceEnabled: true,
+                threshold: 0.90,
+                added,
+                hooked,
+                (mail, token) =>
+                    throw new AssertFailedException(
+                        "Below-threshold candidates must reach the queue for dequeue-time filtering."
+                    )
+            );
+
+            // Act
+            var queued = await admission.TryQueueAsync(mailItem, CancellationToken.None);
+
+            // Assert
+            queued.Should().BeTrue();
+            added.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
+            hooked.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
         }
 
         [TestMethod]

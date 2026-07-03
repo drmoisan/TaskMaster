@@ -1,0 +1,4 @@
+Timestamp: 2026-07-03T17:38:57-04:00
+Command: & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe' 'QuickFiler.Test\bin\Debug\QuickFiler.Test.dll' /Tests:TryQueueRemainingMailItemAsync_HighConfidenceEnabled_AddsAndHooksWithoutScoring,TryQueueRemainingMailItemAsync_HighConfidenceEnabled_IgnoresThresholdAtAdmission,TryQueueRemainingMailItemAsync_HighConfidenceEnabled_AddsBelowThresholdCandidate,DequeueNextItemGroupAsync_HighConfidenceMode_UsesStreamingGate,IterateQueueAsync_WhenDequeueReturnsFullQualifiedPage_EnqueuesAllItems,DequeueNextItemGroupAsync_HighConfidenceDisabled_PreservesDirectBatchDequeue
+EXIT_CODE: 0
+Output Summary: VSTest discovered one test assembly and ran 6 targeted queue/datamodel regression tests. All 6 passed.

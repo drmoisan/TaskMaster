@@ -310,6 +310,7 @@
     <Compile Include="Controllers\QfcFormController.Actions.cs" />
     <Compile Include="Controllers\QfcFormKeyHandler.cs" />
     <Compile Include="Controllers\QfcHighConfidencePreFilter.cs" />
+    <Compile Include="Controllers\QfcStreamingDequeueConfidenceGate.cs" />
     <Compile Include="Controllers\QfcHomeController.cs" />
     <Compile Include="Controllers\QfcHomeController.Metrics.cs" />
     <Compile Include="Controllers\QfcHomeController.Iteration.cs" />

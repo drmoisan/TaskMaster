@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -53,6 +54,33 @@ namespace QuickFiler.Controllers.Tests
                         | System.Reflection.BindingFlags.Instance
                 );
             field.SetValue(obj, value);
+        }
+
+        private static string ReadControllerSource(string fileName)
+        {
+            return File.ReadAllText(ResolveRepositoryPath("QuickFiler", "Controllers", fileName));
+        }
+
+        private static string ResolveRepositoryPath(params string[] pathParts)
+        {
+            var directory = new DirectoryInfo(AppContext.BaseDirectory);
+            while (
+                directory != null
+                && !Directory.Exists(Path.Combine(directory.FullName, "QuickFiler"))
+            )
+            {
+                directory = directory.Parent;
+            }
+
+            directory.Should().NotBeNull("source-inspection tests must run under the repository");
+
+            var resolvedPath = directory.FullName;
+            foreach (var pathPart in pathParts)
+            {
+                resolvedPath = Path.Combine(resolvedPath, pathPart);
+            }
+
+            return resolvedPath;
         }
 
         private QfcFormController CreateQfcFormController()
@@ -319,6 +347,30 @@ namespace QuickFiler.Controllers.Tests
             // Assert: the early return means neither the snapshot nor Show is invoked.
             _mockFormViewer.Verify(x => x.CaptureTlpCellStates(), Times.Never);
             _mockFormViewer.Verify(x => x.Show(), Times.Never);
+        }
+
+        [TestMethod]
+        public void LoadItemsAsync_MailItemPath_DoesNotApplyPostDisplayHighConfidenceRemoval()
+        {
+            string source = ReadControllerSource("QfcFormController.Actions.cs");
+            int mailItemOverload = source.IndexOf(
+                "public async Task LoadItemsAsync(IList<MailItem> listObjects, ProgressTracker progress)",
+                StringComparison.Ordinal
+            );
+            int preScoredOverload = source.IndexOf(
+                "public async Task LoadItemsAsync(IList<QfcPreScoredItem> preScored)",
+                StringComparison.Ordinal
+            );
+
+            mailItemOverload.Should().BeGreaterThanOrEqualTo(0);
+            preScoredOverload.Should().BeGreaterThan(mailItemOverload);
+            string mailItemPath = source.Substring(
+                mailItemOverload,
+                preScoredOverload - mailItemOverload
+            );
+
+            mailItemPath.Should().NotContain("ApplyHighConfidenceFilterAsync");
+            mailItemPath.Should().NotContain("RemoveBelowThresholdAsync");
         }
 
         #endregion Seam D — CaptureItemSettings via CaptureTlpCellStates

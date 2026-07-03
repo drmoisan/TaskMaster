@@ -97,6 +97,9 @@ namespace QuickFiler.Controllers.Tests
                     )
                 )
                 .ReturnsAsync(new List<MailItem>());
+            mockDataModel
+                .Setup(x => x.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(new List<MailItem>());
             mockDataModel.Setup(x => x.Complete).Returns(true);
             _controller.DataModel = mockDataModel.Object;
 
@@ -152,6 +155,12 @@ namespace QuickFiler.Controllers.Tests
                 Times.Once,
                 "the initial GUI batch must use the plain MailItem load path"
             );
+            Mock.Get(_controller.DataModel)
+                .Verify(
+                    m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()),
+                    Times.Once,
+                    "the first displayed page must come from the dequeue-layer gate"
+                );
             mockFormController.Verify(
                 m => m.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()),
                 Times.Never,
@@ -178,6 +187,9 @@ namespace QuickFiler.Controllers.Tests
                         It.IsAny<CancellationTokenSource>()
                     )
                 )
+                .ReturnsAsync(new List<MailItem>());
+            mockDataModel
+                .Setup(x => x.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(new List<MailItem>());
             mockDataModel.Setup(x => x.Complete).Returns(true);
             _controller.DataModel = mockDataModel.Object;
@@ -210,6 +222,10 @@ namespace QuickFiler.Controllers.Tests
             await _controller.RunAsync(progress);
 
             sequence.Should().Equal("LoadItemsAsync");
+            mockDataModel.Verify(
+                m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()),
+                Times.Once
+            );
             mockFormController.Verify(
                 m => m.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()),
                 Times.Never

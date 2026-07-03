@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -185,8 +186,18 @@ namespace QuickFiler.Controllers.Tests
             // Mock the QfcDataModel
             var mockDataModel = new Mock<IQfcDatamodel>();
             mockDataModel
-                .Setup(x => x.InitEmailQueue(It.IsAny<int>(), It.IsAny<BackgroundWorker>()))
-                .Returns(new List<MailItem>());
+                .Setup(x =>
+                    x.InitEmailQueueAsync(
+                        It.IsAny<int>(),
+                        It.IsAny<BackgroundWorker>(),
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<CancellationTokenSource>()
+                    )
+                )
+                .ReturnsAsync(new List<MailItem>());
+            mockDataModel
+                .Setup(x => x.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(new List<MailItem>());
             mockDataModel.Setup(x => x.Complete).Returns(true);
             _controller.DataModel = mockDataModel.Object;
 
@@ -283,6 +294,9 @@ namespace QuickFiler.Controllers.Tests
                     )
                 )
                 .ReturnsAsync(new List<MailItem>());
+            mockDataModel
+                .Setup(x => x.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(new List<MailItem>());
             mockDataModel.Setup(x => x.Complete).Returns(true);
             _controller.DataModel = mockDataModel.Object;
 
@@ -336,6 +350,41 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             invoked.Should().BeTrue("the overridden delegate must be the one invoked");
             result.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void RunAsync_SourceUsesDequeueLayerForFirstDisplayedPage()
+        {
+            string source = File.ReadAllText(
+                ResolveRepositoryPath("QuickFiler", "Controllers", "QfcHomeController.cs")
+            );
+
+            source.Should().Contain("InitEmailQueueAsync");
+            source.Should().Contain("HighConfidenceModeEnabled");
+            source.Should().Contain("DequeueNextItemGroupAsync");
+            source.Should().Contain("LoadItemsAsync(listEmail)");
+        }
+
+        private static string ResolveRepositoryPath(params string[] pathParts)
+        {
+            var directory = new DirectoryInfo(AppContext.BaseDirectory);
+            while (
+                directory != null
+                && !Directory.Exists(Path.Combine(directory.FullName, "QuickFiler"))
+            )
+            {
+                directory = directory.Parent;
+            }
+
+            directory.Should().NotBeNull("source-inspection tests must run under the repository");
+
+            var resolvedPath = directory.FullName;
+            foreach (var pathPart in pathParts)
+            {
+                resolvedPath = Path.Combine(resolvedPath, pathPart);
+            }
+
+            return resolvedPath;
         }
 
         /// <summary>

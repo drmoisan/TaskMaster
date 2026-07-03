@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -243,6 +244,60 @@ namespace QuickFiler.Controllers.Tests
                         It.IsAny<IQfcCollectionController>()
                     ),
                 Times.Once
+            );
+        }
+
+        [TestMethod]
+        public async Task IterateQueueAsync_WhenDequeueReturnsFullQualifiedPage_EnqueuesAllItems()
+        {
+            var mockDataModel = new Mock<IQfcDatamodel>();
+            mockDataModel.Setup(m => m.Complete).Returns(false);
+            var mailItems = Enumerable
+                .Range(0, 8)
+                .Select(_ => new Mock<MailItem>().Object)
+                .ToList();
+            mockDataModel
+                .Setup(m => m.DequeueNextItemGroupAsync(8, 2000))
+                .Returns(Task.FromResult((IList<MailItem>)mailItems));
+            _controller.DataModel = mockDataModel.Object;
+
+            var mockQfcQueue = new Mock<IQfcQueue>();
+            mockQfcQueue
+                .Setup(m =>
+                    m.EnqueueAsync(
+                        It.Is<IList<MailItem>>(items => items.SequenceEqual(mailItems)),
+                        It.IsAny<IQfcCollectionController>()
+                    )
+                )
+                .Returns(Task.CompletedTask);
+            _controller.QfcQueue = mockQfcQueue.Object;
+
+            var mockFormController = new Mock<IQfcFormController>();
+            mockFormController.Setup(m => m.ItemsPerIteration).Returns(8);
+            var mockQfcCollectionController = new Mock<IQfcCollectionController>();
+            mockFormController.Setup(m => m.Groups).Returns(mockQfcCollectionController.Object);
+            _controller
+                .GetType()
+                .GetField(
+                    "_formController",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .SetValue(_controller, mockFormController.Object);
+
+            await _controller.IterateQueueAsync();
+
+            mockQfcQueue.Verify(
+                m =>
+                    m.EnqueueAsync(
+                        It.Is<IList<MailItem>>(items => items.SequenceEqual(mailItems)),
+                        mockQfcCollectionController.Object
+                    ),
+                Times.Once
+            );
+            mockQfcQueue.Verify(
+                m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()),
+                Times.Never
             );
         }
 

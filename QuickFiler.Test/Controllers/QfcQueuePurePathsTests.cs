@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -20,6 +22,18 @@ namespace QuickFiler.Controllers.Tests
     [TestClass]
     public class QfcQueuePurePathsTests
     {
+        private static string ReadControllerSource(string fileName)
+        {
+            string path = Path.GetFullPath(
+                Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    @"..\..\..\QuickFiler\Controllers",
+                    fileName
+                )
+            );
+            return File.ReadAllText(path);
+        }
+
         private static QfcQueue NewQueue(CancellationToken token)
         {
             var globals = new Mock<IApplicationGlobals>().Object;
@@ -76,6 +90,16 @@ namespace QuickFiler.Controllers.Tests
                 .Awaiting(q => q.JobsToFinish(100, CancellationToken.None))
                 .Should()
                 .NotThrowAsync("with no jobs running the polling loop exits immediately");
+        }
+
+        [TestMethod]
+        public void DequeueNextItemGroupAsync_HighConfidenceDisabled_PreservesDirectBatchDequeue()
+        {
+            string source = ReadControllerSource("QfcDatamodel.QueueProcessing.cs");
+
+            source.Should().Contain("HighConfidenceModeEnabled");
+            source.Should().Contain("_masterQueue.TryTakeFirst(quantity)?.ToList()");
+            source.Should().Contain("return await DequeueWithHighConfidenceGateAsync");
         }
     }
 }

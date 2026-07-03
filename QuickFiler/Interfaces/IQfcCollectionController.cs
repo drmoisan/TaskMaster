@@ -57,6 +57,9 @@ namespace QuickFiler.Interfaces
         /// suggestion (score 0) are removed whenever the cutoff is greater than 0. Removal reuses
         /// the existing control-group removal path so the move monitor is unhooked and remaining
         /// groups are renumbered on the UI thread.
+        ///
+        /// This method is not the live issue #233 high-confidence enforcement gate. Issue #233
+        /// applies threshold filtering in the datamodel dequeue layer before items are surfaced.
         /// </summary>
         /// <param name="threshold">A probability in the range [0.0, 1.0].</param>
         Task RemoveBelowThresholdAsync(double threshold);
