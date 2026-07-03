@@ -313,7 +313,7 @@ code that cannot be unit-tested without a live Outlook process. For this work:
   cycle-1 attempt satisfied the denominator via 103 blanket `[ExcludeFromCodeCoverage]` attributes;
   the maintainer denied ratification (`maintainer-decision.2026-07-01.md`). AC5 is now met by making
   the members testable (Phases 5–7), not by exempting them.
-- [ ] AC8: The cycle-1 exemption set is reduced by removing `[ExcludeFromCodeCoverage]` from the
+- [x] AC8: The cycle-1 exemption set is reduced by removing `[ExcludeFromCodeCoverage]` from the
   members that have no genuine testability barrier and covering them with tests; no member that can
   be exercised through the narrowed `IItemViewer` or a mockable collaborator retains an exemption.
   CYCLE-2 PARTIAL: 103->41 (~38 no-barrier members removed). CYCLE-3 (Phases 9-10, delivered
@@ -336,14 +336,15 @@ code that cannot be unit-tested without a live Outlook process. For this work:
   `evidence/other/exemption-boundary.2026-07-02T17-00.md` (the re-submitted boundary) and
   `evidence/qa-gates/final-residual-and-file-size-verification.2026-07-02T17-00.md` (the itemized
   19-member re-verification). The checkbox remains unchecked pending maintainer ratification of the
-  reduced 19-member boundary, consistent with prior-cycle precedent.
+  reduced 19-member boundary, consistent with prior-cycle precedent. RATIFIED 2026-07-02: see
+  `maintainer-decision.2026-07-02.md`.
 - [x] AC9: The four behavioral seams (`IUiDispatcher`, `IWebViewCoreInitializer`, `IMailItemActions`
   + collaborator factory delegates, and thin-delegator `async void` handlers) are introduced per the
   DI-seam rule ordering, are covered to >= 90%, and preserve runtime behavior. No leaf-control
   interface layer is introduced. Cycle 3 extends (does not replace) this seam set: the `FolderPredictor`
   factory-delegate mirrors the existing pattern; the `Theme` + `IUiDispatcher` retrofit extends
   `IUiDispatcher` into a second class.
-- [ ] AC10: Every residual `[ExcludeFromCodeCoverage]` is individually justified with a specific
+- [x] AC10: Every residual `[ExcludeFromCodeCoverage]` is individually justified with a specific
   per-member technical reason (no blanket/category exemption), the boundary is minimized (no member
   reducible via an already-established seam/technique in this codebase retains an exemption), and the
   boundary is documented for maintainer ratification at review. CYCLE-2 PARTIAL: the 41-member
@@ -360,8 +361,9 @@ code that cannot be unit-tested without a live Outlook process. For this work:
   precedent already cited above. CYCLE-5: the boundary is reduced again (24->19) per AC8's
   cycle-5 note; the reduced 19-member boundary is individually justified by category and per-member
   in `evidence/other/exemption-boundary.2026-07-02T17-00.md` and re-verified against source in
-  `evidence/qa-gates/final-residual-and-file-size-verification.2026-07-02T17-00.md`. The checkbox
-  remains unchecked pending maintainer ratification of this boundary at review.
+  `evidence/qa-gates/final-residual-and-file-size-verification.2026-07-02T17-00.md`. RATIFIED
+  2026-07-02: see `maintainer-decision.2026-07-02.md`. Issue #230 tracks the 9-member WinForms
+  message-pump test-infrastructure gap; it is explicitly not a condition of merging this issue.
 - [x] AC6: No production file modified exceeds 500 lines after the change (re-verified after the
   redesign, including the new seam files).
 - [x] AC7: Full C# toolchain passes in order — csharpier, .NET analyzers,
