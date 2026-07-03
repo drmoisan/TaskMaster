@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS;
+using UtilitiesCS.Interfaces.IWinForm;
 
 namespace QuickFiler
 {
@@ -58,7 +59,7 @@ namespace QuickFiler
         public TlpCellSnapShotList(IEnumerable<TlpCellSnapShot> collection)
             : base(collection) { }
 
-        public void ApplyState(Control root)
+        public void ApplyState(IContainerControlLocal root)
         {
             this.ForEach(s => s.ApplyState(root));
         }
@@ -178,7 +179,7 @@ namespace QuickFiler
             set => _visible = value;
         }
 
-        public void ApplyState(Control root)
+        public void ApplyState(IContainerControlLocal root)
         {
             var tlp = root.Controls.Find(TlpName, true).FirstOrDefault() as TableLayoutPanel;
             for (int i = Cell.Row; i < Cell.Row + RowSpan; i++)

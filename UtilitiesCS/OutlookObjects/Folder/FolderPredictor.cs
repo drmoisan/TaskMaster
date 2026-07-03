@@ -12,7 +12,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
-    public class FolderPredictor
+    public partial class FolderPredictor
     {
         internal static string NormalizePredictionPath(string input)
         {

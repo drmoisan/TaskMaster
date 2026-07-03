@@ -40,7 +40,8 @@ namespace QuickFiler
         public static Dictionary<string, Theme> SetupThemes(
             IQfcItemController controller,
             ItemViewer viewer,
-            Action<Enums.ToggleState> htmlConverter
+            Action<Enums.ToggleState> htmlConverter,
+            UtilitiesCS.Threading.IUiDispatcher uiDispatcher
         )
         {
             var themes = new Dictionary<string, Theme>
@@ -94,7 +95,8 @@ namespace QuickFiler
                         cboFoldersBackColor: SystemColors.Window,
                         cboFoldersForeColor: SystemColors.WindowText,
                         defaultBackColor: SystemColors.Control,
-                        defaultForeColor: SystemColors.ControlText
+                        defaultForeColor: SystemColors.ControlText,
+                        uiDispatcher: uiDispatcher
                     )
                 },
                 {
@@ -146,7 +148,8 @@ namespace QuickFiler
                         cboFoldersBackColor: SystemColors.Window,
                         cboFoldersForeColor: SystemColors.WindowText,
                         defaultBackColor: Color.LightCyan,
-                        defaultForeColor: SystemColors.ControlText
+                        defaultForeColor: SystemColors.ControlText,
+                        uiDispatcher: uiDispatcher
                     )
                 },
                 {
@@ -202,7 +205,8 @@ namespace QuickFiler
                         cboFoldersBackColor: Color.DimGray,
                         cboFoldersForeColor: Color.WhiteSmoke,
                         defaultBackColor: Color.Black,
-                        defaultForeColor: Color.WhiteSmoke
+                        defaultForeColor: Color.WhiteSmoke,
+                        uiDispatcher: uiDispatcher
                     )
                 },
                 {
@@ -258,7 +262,8 @@ namespace QuickFiler
                         cboFoldersBackColor: Color.DimGray,
                         cboFoldersForeColor: Color.WhiteSmoke,
                         defaultBackColor: Color.FromArgb(64, 64, 64),
-                        defaultForeColor: Color.WhiteSmoke
+                        defaultForeColor: Color.WhiteSmoke,
+                        uiDispatcher: uiDispatcher
                     )
                 },
             };
