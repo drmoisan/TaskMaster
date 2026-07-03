@@ -33,6 +33,11 @@ namespace QuickFiler.Controllers
                     ItemHelper,
                     FolderPredictor.InitOptions.FromField
                 );
+                logger.Debug(
+                    $"Probability debug [QfcItemController.LoadFolderHandler (FromField)] "
+                        + $"Subject='{ItemHelper?.Subject}' EntryID='{ItemHelper?.EntryId}' "
+                        + $"TopScore={_folderHandler?.Suggestions?.TopScore() ?? 0}"
+                );
             }
             else
             {
@@ -40,6 +45,11 @@ namespace QuickFiler.Controllers
                     _globals,
                     varList,
                     FolderPredictor.InitOptions.FromArrayOrString
+                );
+                logger.Debug(
+                    $"Probability debug [QfcItemController.LoadFolderHandler (FromArrayOrString)] "
+                        + $"Subject='{ItemHelper?.Subject}' EntryID='{ItemHelper?.EntryId}' "
+                        + $"TopScore={_folderHandler?.Suggestions?.TopScore() ?? 0}"
                 );
             }
         }
@@ -68,6 +78,11 @@ namespace QuickFiler.Controllers
                             cancel
                         )
                         .ConfigureAwait(false);
+                    logger.Debug(
+                        $"Probability debug [QfcItemController.LoadFolderHandlerAsync (FromField)] "
+                            + $"Subject='{ItemHelper?.Subject}' EntryID='{ItemHelper?.EntryId}' "
+                            + $"TopScore={_folderHandler?.Suggestions?.TopScore() ?? 0}"
+                    );
                 }
                 catch (ArgumentNullException e)
                 {
@@ -107,6 +122,11 @@ namespace QuickFiler.Controllers
                         cancel
                     )
                     .ConfigureAwait(false);
+                logger.Debug(
+                    $"Probability debug [QfcItemController.LoadFolderHandlerAsync (FromArrayOrString)] "
+                        + $"Subject='{ItemHelper?.Subject}' EntryID='{ItemHelper?.EntryId}' "
+                        + $"TopScore={_folderHandler?.Suggestions?.TopScore() ?? 0}"
+                );
             }
         }
 

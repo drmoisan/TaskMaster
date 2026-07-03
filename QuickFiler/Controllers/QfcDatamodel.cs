@@ -322,6 +322,10 @@ namespace QuickFiler.Controllers
             var score = await scoringService
                 .ScoreAsync(mailItem, _globals, cancel)
                 .ConfigureAwait(false);
+            logger.Debug(
+                $"Probability debug [QfcDatamodel.LoadRemainingEmailsToQueueAsync (master-queue admission)] "
+                    + $"Subject='{mailItem.Subject}' EntryID='{mailItem.EntryID}' Score={score.Score}"
+            );
             return score.Score;
         }
 
