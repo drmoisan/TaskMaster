@@ -1,10 +1,39 @@
 # Coverage Delta — Baseline vs Final (Issue #232)
 
 Timestamp: 2026-07-03T13-40
+Updated (remediation cycle 1): 2026-07-03T16-58
 
 Sources:
 - Baseline: `evidence/baseline/vstest-baseline.md`
 - Final: `evidence/qa-gates/vstest-final.md`
+
+## Remediation cycle 1 update — persisted machine-readable coverage artifact (AC10)
+
+The blocking finding for this branch was an evidence-verifiability gap: coverage existed only as
+transcribed prose, with no persisted machine-readable Cobertura XML. That gap is now closed. The
+authoritative Cobertura `coverage.xml` from the Final QA vstest run (`evidence/qa-gates/vstest-final.2026-07-03T16-58.md`,
+run `results-final\18b07c6a-cedc-4703-bd54-b708d8fbe057`) is persisted, byte-identical
+(SHA-256 `a80f5ae3d3d4f9de59d886be445c2dd4df3789aca35c8a14e3b7181eb10f19d7`), to BOTH:
+
+- Canonical: `artifacts/csharp/coverage.xml`
+- Committable feature evidence: `evidence/coverage/2026-07-03T16-58/coverage.xml`
+
+Figures below verified directly from the persisted XML (see
+`evidence/qa-gates/coverage-verification.2026-07-03T16-58.md`):
+
+| Metric (from persisted XML) | Value |
+|---|---|
+| Repository-wide line-rate | 0.76574952561669829 (76.5750%) |
+| lines-covered / lines-valid | 40355 / 52700 |
+| `QfcHighConfidencePreFilter.cs` mapped classes | 6, all `line-rate="1"` (100%) |
+
+Repository-wide vs. recorded ~76.5758% prior-cycle baseline: delta -0.00084 pp (within measurement
+variance; both ~76.57%). No changed production line is uncovered. **No regression.**
+
+Changed-line coverage of the non-exempt touched file `QfcHighConfidencePreFilter.cs`: 100% (>= 90%).
+
+**AC10 (coverage): PASS**, verified from the persisted machine-readable Cobertura artifact at the paths
+cited above.
 
 ## Repository-wide line coverage (first-party + Swordfish module set)
 
