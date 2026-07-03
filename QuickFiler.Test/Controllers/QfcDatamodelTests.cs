@@ -39,7 +39,7 @@ namespace QuickFiler.Controllers.Tests
             source
                 .Should()
                 .Contain(
-                    "Probability debug [QfcDatamodel.LoadRemainingEmailsToQueueAsync (master-queue admission)]"
+                    "Probability debug [QfcDatamodel.ScoreRemainingQueueMailItemAsync (master-queue admission)]"
                 );
             source.Should().Contain("Subject='{mailItem.Subject}'");
             source.Should().Contain("EntryID='{mailItem.EntryID}'");
@@ -135,6 +135,42 @@ namespace QuickFiler.Controllers.Tests
             source.Should().Contain("HighConfidenceModeEnabled");
             source.Should().Contain("QfcStreamingDequeueConfidenceGate");
             source.Should().Contain("DequeueAsync(quantity, timeOut, _token)");
+        }
+
+        [TestMethod]
+        public async Task DequeueNextItemGroupAsync_HighConfidenceMode_WaitsWhileSourceWorkerActive()
+        {
+            var model = CreateUninitializedDatamodel();
+            var fake = new FakeTimeProvider();
+            model.TimeProvider = fake;
+
+            var settings = new Mock<IAppQuickFilerSettings>(MockBehavior.Strict);
+            settings.SetupGet(x => x.HighConfidenceModeEnabled).Returns(true);
+            settings.SetupGet(x => x.HighConfidenceThreshold).Returns(0.90);
+            var globals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
+            globals.SetupGet(x => x.QfSettings).Returns(settings.Object);
+
+            var worker = new BackgroundWorker();
+            SetPrivateField(worker, "isRunning", true);
+            SetPrivateField(model, "_globals", globals.Object);
+            SetPrivateField(model, "_worker", worker);
+            SetPrivateField(model, "_masterQueue", new LockingLinkedList<MailItem>());
+
+            Task<IList<MailItem>> pending = model.DequeueNextItemGroupAsync(1, 200);
+
+            fake.Advance(TimeSpan.FromMilliseconds(200));
+            await Task.Yield();
+            pending
+                .IsCompleted.Should()
+                .BeFalse(
+                    "the datamodel source-active signal must keep polling while the worker can still add candidates"
+                );
+
+            SetPrivateField(worker, "isRunning", false);
+            fake.Advance(TimeSpan.FromMilliseconds(200));
+            IList<MailItem> result = await pending;
+
+            result.Should().BeEmpty();
         }
 
         [TestMethod]

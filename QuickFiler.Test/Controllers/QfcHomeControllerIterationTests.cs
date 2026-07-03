@@ -66,6 +66,14 @@ namespace QuickFiler.Controllers.Tests
             return intel;
         }
 
+        private void SetupQfSettings(bool highConfidenceEnabled, double threshold)
+        {
+            var qfSettings = this._mockRepository.Create<IAppQuickFilerSettings>();
+            qfSettings.SetupGet(x => x.HighConfidenceModeEnabled).Returns(highConfidenceEnabled);
+            qfSettings.SetupGet(x => x.HighConfidenceThreshold).Returns(threshold);
+            this._mockApplicationGlobals.SetupGet(x => x.QfSettings).Returns(qfSettings.Object);
+        }
+
         [TestMethod]
         public async Task IterateQueueAsync_DataModelComplete()
         {
@@ -316,6 +324,7 @@ namespace QuickFiler.Controllers.Tests
             };
             mockDataModel.Setup(m => m.DequeueNextItemGroup(It.IsAny<int>())).Returns(mailItems);
             _controller.DataModel = mockDataModel.Object;
+            SetupQfSettings(highConfidenceEnabled: false, threshold: 0.90);
 
             var mockFormController = new Mock<IQfcFormController>();
             _controller
@@ -341,6 +350,54 @@ namespace QuickFiler.Controllers.Tests
                         )
                     ),
                 Times.Once
+            );
+        }
+
+        [TestMethod]
+        public void Iterate_HighConfidenceEnabled_DoesNotLoadDirectSynchronousBatch()
+        {
+            // Arrange
+            var itemsPerIteration = 8;
+            var directBatch = new List<MailItem>
+            {
+                new Mock<MailItem>().Object,
+                new Mock<MailItem>().Object,
+            };
+
+            SetupQfSettings(highConfidenceEnabled: true, threshold: 0.90);
+
+            var mockDataModel = new Mock<IQfcDatamodel>();
+            mockDataModel.Setup(m => m.DequeueNextItemGroup(It.IsAny<int>())).Returns(directBatch);
+            mockDataModel
+                .Setup(m => m.DequeueNextItemGroupAsync(itemsPerIteration, It.IsAny<int>()))
+                .ReturnsAsync(new List<MailItem>());
+            _controller.DataModel = mockDataModel.Object;
+
+            var mockFormController = new Mock<IQfcFormController>();
+            mockFormController.SetupGet(m => m.ItemsPerIteration).Returns(itemsPerIteration);
+            mockFormController.Setup(m => m.LoadItems(It.IsAny<IList<MailItem>>()));
+            _controller
+                .GetType()
+                .GetField(
+                    "_formController",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .SetValue(_controller, mockFormController.Object);
+
+            // Act
+            _controller.Iterate();
+
+            // Assert
+            mockDataModel.Verify(
+                m => m.DequeueNextItemGroup(itemsPerIteration),
+                Times.Never,
+                "high-confidence synchronous iteration must not use the direct dequeue bypass"
+            );
+            mockFormController.Verify(
+                m => m.LoadItems(directBatch),
+                Times.Never,
+                "high-confidence synchronous iteration must not load an ungated direct batch"
             );
         }
 

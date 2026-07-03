@@ -247,10 +247,22 @@ namespace QuickFiler.Controllers
 
         public void Run()
         {
+            bool highConfidenceModeEnabled = Globals?.QfSettings?.HighConfidenceModeEnabled == true;
+            int itemsPerIteration = _formController.ItemsPerIteration;
+            int initializationBatchSize = highConfidenceModeEnabled ? 0 : itemsPerIteration;
+
             IList<MailItem> listEmail = _datamodel.InitEmailQueue(
-                _formController.ItemsPerIteration,
+                initializationBatchSize,
                 _formViewer.Worker
             );
+            if (highConfidenceModeEnabled)
+            {
+                listEmail = _datamodel
+                    .DequeueNextItemGroupAsync(itemsPerIteration, 1000)
+                    .GetAwaiter()
+                    .GetResult();
+            }
+
             _formController.LoadItems(listEmail);
             _stopWatch = new Stopwatch();
             _stopWatch.Start();

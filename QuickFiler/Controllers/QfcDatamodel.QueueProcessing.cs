@@ -82,7 +82,9 @@ namespace QuickFiler.Controllers
                 () => _masterQueue.TryTakeFirst(),
                 ScoreRemainingQueueMailItemAsync,
                 _globals.QfSettings.HighConfidenceThreshold,
-                TimeProvider
+                TimeProvider,
+                null,
+                () => _worker?.IsBusy == true
             );
 
             var nodes = (await gate.DequeueAsync(quantity, timeOut, _token)).ToList();
@@ -92,6 +94,11 @@ namespace QuickFiler.Controllers
         public IList<MailItem> DequeueNextItemGroup(int quantity)
         {
             _token.ThrowIfCancellationRequested();
+
+            if (_globals?.QfSettings?.HighConfidenceModeEnabled == true)
+            {
+                return DequeueWithHighConfidenceGateAsync(quantity, 0).GetAwaiter().GetResult();
+            }
 
             var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
             return UnhookDequeuedNodes(nodes);

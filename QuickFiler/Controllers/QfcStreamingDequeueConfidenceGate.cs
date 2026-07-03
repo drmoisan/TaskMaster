@@ -17,6 +17,7 @@ namespace QuickFiler.Controllers
         private readonly long _cutoff;
         private readonly TimeProvider _timeProvider;
         private readonly Action<string> _debugLog;
+        private readonly Func<bool> _sourceActive;
 
         internal QfcStreamingDequeueConfidenceGate(
             Func<MailItem> tryTakeNext,
@@ -25,12 +26,23 @@ namespace QuickFiler.Controllers
             TimeProvider timeProvider = null,
             Action<string> debugLog = null
         )
+            : this(tryTakeNext, scoreLoader, threshold, timeProvider, debugLog, null) { }
+
+        internal QfcStreamingDequeueConfidenceGate(
+            Func<MailItem> tryTakeNext,
+            Func<MailItem, CancellationToken, Task<long>> scoreLoader,
+            double threshold,
+            TimeProvider timeProvider,
+            Action<string> debugLog,
+            Func<bool> sourceActive
+        )
         {
             _tryTakeNext = tryTakeNext ?? throw new ArgumentNullException(nameof(tryTakeNext));
             _scoreLoader = scoreLoader ?? throw new ArgumentNullException(nameof(scoreLoader));
             _cutoff = (long)Math.Round(threshold * 1000, 0);
             _timeProvider = timeProvider ?? TimeProvider.System;
             _debugLog = debugLog;
+            _sourceActive = sourceActive;
         }
 
         internal async Task<IList<MailItem>> DequeueAsync(
@@ -54,7 +66,8 @@ namespace QuickFiler.Controllers
                 MailItem mailItem = _tryTakeNext();
                 if (mailItem == null)
                 {
-                    if (timeOut <= 0 || alreadyWaitedForEmptySource)
+                    bool sourceCanStillProduce = _sourceActive?.Invoke() == true;
+                    if (timeOut <= 0 || (alreadyWaitedForEmptySource && !sourceCanStillProduce))
                     {
                         return accepted;
                     }

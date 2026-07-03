@@ -125,6 +125,7 @@ namespace QuickFiler.Controllers.Tests
                 .Returns(new List<MailItem>());
 
             _controller.DataModel = mockDataModel.Object;
+            SetupQfSettings(highConfidenceEnabled: false, threshold: 0.90);
 
             // Mock the QfcFormController
             var mockFormController = new Mock<IQfcFormController>();
@@ -171,6 +172,59 @@ namespace QuickFiler.Controllers.Tests
             mockFormViewer.VerifySet(m => m.WindowState = FormWindowState.Maximized);
             mockFormViewer.Verify(m => m.Show(), Times.Once);
             mockFormViewer.Verify(m => m.Refresh(), Times.Once);
+        }
+
+        [TestMethod]
+        public void Run_HighConfidenceEnabled_DoesNotLoadUnfilteredInitialBatch()
+        {
+            // Arrange
+            var itemsPerIteration = 7;
+            var unfilteredInitialBatch = new List<MailItem>
+            {
+                new Mock<MailItem>().Object,
+                new Mock<MailItem>().Object,
+            };
+
+            SetupQfSettings(highConfidenceEnabled: true, threshold: 0.90);
+
+            var mockDataModel = new Mock<IQfcDatamodel>();
+            mockDataModel
+                .Setup(x => x.InitEmailQueue(It.IsAny<int>(), It.IsAny<BackgroundWorker>()))
+                .Returns(unfilteredInitialBatch);
+            mockDataModel
+                .Setup(x => x.DequeueNextItemGroupAsync(itemsPerIteration, It.IsAny<int>()))
+                .ReturnsAsync(new List<MailItem>());
+            _controller.DataModel = mockDataModel.Object;
+
+            var mockFormController = new Mock<IQfcFormController>();
+            mockFormController.SetupGet(x => x.ItemsPerIteration).Returns(itemsPerIteration);
+            mockFormController.Setup(x => x.LoadItems(It.IsAny<IList<MailItem>>()));
+            SetPrivateField(_controller, "_formController", mockFormController.Object);
+
+            var mockFormViewer = new Mock<IQfcFormViewer>();
+            var windowState = FormWindowState.Normal;
+            mockFormViewer
+                .SetupSet(x => x.WindowState = It.IsAny<FormWindowState>())
+                .Callback<FormWindowState>(state => windowState = state);
+            mockFormViewer.SetupGet(x => x.WindowState).Returns(() => windowState);
+            mockFormViewer.Setup(x => x.Show());
+            mockFormViewer.Setup(x => x.Refresh());
+            SetPrivateField(_controller, "_formViewer", mockFormViewer.Object);
+
+            // Act
+            _controller.Run();
+
+            // Assert
+            mockDataModel.Verify(
+                m => m.InitEmailQueue(itemsPerIteration, It.IsAny<BackgroundWorker>()),
+                Times.Never,
+                "high-confidence synchronous startup must not request a fixed unfiltered first batch"
+            );
+            mockFormController.Verify(
+                m => m.LoadItems(unfilteredInitialBatch),
+                Times.Never,
+                "high-confidence synchronous startup must not load the unfiltered initial batch"
+            );
         }
 
         [TestMethod]
@@ -353,16 +407,88 @@ namespace QuickFiler.Controllers.Tests
         }
 
         [TestMethod]
-        public void RunAsync_SourceUsesDequeueLayerForFirstDisplayedPage()
+        public async Task RunAsync_HighConfidenceEnabled_LoadsFirstPageFromStreamingDequeue()
         {
-            string source = File.ReadAllText(
-                ResolveRepositoryPath("QuickFiler", "Controllers", "QfcHomeController.cs")
-            );
+            var tokenSource = new CancellationTokenSource();
+            _mockProgressTracker = SetupMockProgressTracker(tokenSource);
+            ProgressTracker progress = _mockProgressTracker.Object;
+            var unfilteredInitialBatch = new List<MailItem> { new Mock<MailItem>().Object };
+            var streamedCandidate = new Mock<MailItem>().Object;
+            var streamedBatch = new List<MailItem> { streamedCandidate };
+            const int itemsPerIteration = 7;
 
-            source.Should().Contain("InitEmailQueueAsync");
-            source.Should().Contain("HighConfidenceModeEnabled");
-            source.Should().Contain("DequeueNextItemGroupAsync");
-            source.Should().Contain("LoadItemsAsync(listEmail)");
+            SetupQfSettings(highConfidenceEnabled: true, threshold: 0.90);
+
+            var mockDataModel = new Mock<IQfcDatamodel>();
+            mockDataModel
+                .Setup(x =>
+                    x.InitEmailQueueAsync(
+                        0,
+                        It.IsAny<BackgroundWorker>(),
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<CancellationTokenSource>()
+                    )
+                )
+                .ReturnsAsync(unfilteredInitialBatch);
+            mockDataModel
+                .Setup(x => x.DequeueNextItemGroupAsync(itemsPerIteration, 1000))
+                .ReturnsAsync(streamedBatch);
+            mockDataModel.Setup(x => x.Complete).Returns(true);
+            _controller.DataModel = mockDataModel.Object;
+
+            var mockFormController = new Mock<IQfcFormController>();
+            mockFormController.SetupGet(x => x.ItemsPerIteration).Returns(itemsPerIteration);
+            mockFormController
+                .Setup(x =>
+                    x.LoadItemsAsync(
+                        It.Is<IList<MailItem>>(items =>
+                            items.Count == 1 && ReferenceEquals(items[0], streamedCandidate)
+                        )
+                    )
+                )
+                .Returns(Task.CompletedTask);
+            SetPrivateField(_controller, "_formController", mockFormController.Object);
+
+            var mockFormViewer = new Mock<IQfcFormViewer>();
+            mockFormViewer.SetupGet(x => x.Worker).Returns(new BackgroundWorker());
+            SetPrivateField(_controller, "_formViewer", mockFormViewer.Object);
+
+            await _controller.RunAsync(progress);
+
+            mockDataModel.Verify(
+                m =>
+                    m.InitEmailQueueAsync(
+                        0,
+                        It.IsAny<BackgroundWorker>(),
+                        It.IsAny<CancellationToken>(),
+                        It.IsAny<CancellationTokenSource>()
+                    ),
+                Times.Once,
+                "high-confidence RunAsync initialization must not request an unfiltered first page"
+            );
+            mockDataModel.Verify(
+                m => m.DequeueNextItemGroupAsync(itemsPerIteration, 1000),
+                Times.Once,
+                "the first displayed high-confidence page must come from dequeue-time filtering"
+            );
+            mockFormController.Verify(
+                m =>
+                    m.LoadItemsAsync(
+                        It.Is<IList<MailItem>>(items =>
+                            items.Count == 1 && ReferenceEquals(items[0], streamedCandidate)
+                        )
+                    ),
+                Times.Once,
+                "RunAsync must load the streamed high-confidence candidate batch"
+            );
+            mockFormController.Verify(
+                m =>
+                    m.LoadItemsAsync(
+                        It.Is<IList<MailItem>>(items => items == unfilteredInitialBatch)
+                    ),
+                Times.Never,
+                "RunAsync must not load the unfiltered initialization batch"
+            );
         }
 
         private static string ResolveRepositoryPath(params string[] pathParts)

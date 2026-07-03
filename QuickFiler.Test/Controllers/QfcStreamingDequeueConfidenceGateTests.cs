@@ -28,13 +28,43 @@ namespace QuickFiler.Controllers.Tests
             Func<MailItem, CancellationToken, Task<long>> scoreLoader,
             double threshold,
             TimeProvider timeProvider = null,
-            Action<string> debugLog = null
+            Action<string> debugLog = null,
+            Func<bool> sourceActive = null
         )
         {
             Type gateType = typeof(QfcDatamodel).Assembly.GetType(
                 "QuickFiler.Controllers.QfcStreamingDequeueConfidenceGate"
             );
             gateType.Should().NotBeNull("the dequeue-layer confidence gate must exist");
+
+            ConstructorInfo constructorWithSourceState = gateType.GetConstructor(
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                binder: null,
+                types: new[]
+                {
+                    typeof(Func<MailItem>),
+                    typeof(Func<MailItem, CancellationToken, Task<long>>),
+                    typeof(double),
+                    typeof(TimeProvider),
+                    typeof(Action<string>),
+                    typeof(Func<bool>),
+                },
+                modifiers: null
+            );
+            if (constructorWithSourceState != null)
+            {
+                return constructorWithSourceState.Invoke(
+                    new object[]
+                    {
+                        tryTakeNext,
+                        scoreLoader,
+                        threshold,
+                        timeProvider,
+                        debugLog,
+                        sourceActive,
+                    }
+                );
+            }
 
             ConstructorInfo constructor = gateType.GetConstructor(
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
@@ -61,7 +91,8 @@ namespace QuickFiler.Controllers.Tests
             IDictionary<MailItem, long> scores,
             double threshold = 0.90,
             TimeProvider timeProvider = null,
-            Action<string> debugLog = null
+            Action<string> debugLog = null,
+            Func<bool> sourceActive = null
         )
         {
             return CreateGate(
@@ -73,7 +104,8 @@ namespace QuickFiler.Controllers.Tests
                 },
                 threshold,
                 timeProvider,
-                debugLog
+                debugLog,
+                sourceActive
             );
         }
 
@@ -223,6 +255,41 @@ namespace QuickFiler.Controllers.Tests
 
             Task<IList<MailItem>> pending = DequeueAsync(gate, 1, 200, CancellationToken.None);
             pending.IsCompleted.Should().BeFalse();
+
+            fakeTime.Advance(TimeSpan.FromMilliseconds(200));
+            IList<MailItem> result = await pending;
+
+            result.Should().ContainSingle().Which.Should().BeSameAs(item);
+        }
+
+        [TestMethod]
+        public async Task DequeueAsync_SourceActiveAfterRepeatedEmptyReads_ContinuesPollingUntilCandidateArrives()
+        {
+            var item = CreateMailItem("late-qualifier", "entry-late-qualifier");
+            var fakeTime = new FakeTimeProvider();
+            var takeCount = 0;
+            object gate = CreateGate(
+                () =>
+                {
+                    takeCount++;
+                    return takeCount < 3 ? null : item;
+                },
+                (mail, token) => Task.FromResult(950L),
+                threshold: 0.90,
+                timeProvider: fakeTime,
+                sourceActive: () => takeCount < 3
+            );
+
+            Task<IList<MailItem>> pending = DequeueAsync(gate, 1, 200, CancellationToken.None);
+            pending.IsCompleted.Should().BeFalse();
+
+            fakeTime.Advance(TimeSpan.FromMilliseconds(200));
+            await Task.Yield();
+            pending
+                .IsCompleted.Should()
+                .BeFalse(
+                    "the source is still active, so an empty poll must not be treated as exhaustion"
+                );
 
             fakeTime.Advance(TimeSpan.FromMilliseconds(200));
             IList<MailItem> result = await pending;
