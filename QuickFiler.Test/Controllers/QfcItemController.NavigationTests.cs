@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -279,6 +280,112 @@ namespace QuickFiler.Controllers.Tests
 
             // Assert
             controller.LastAsyncState.Should().Be(Enums.ToggleState.Off);
+        }
+
+        /// <summary>
+        /// Cycle-5 (R2, de-exempted): <c>ToggleExpansionOff</c> now calls
+        /// <c>_tlpStates["Compressed"].ApplyState(_itemViewer)</c> against the narrowed
+        /// <c>IItemViewer</c> (no concrete <c>(ItemViewer)</c> cast). A bare <see cref="Control"/> host
+        /// stands in for the control tree, proving the real snapshot-restore/flag-clear behavior runs.
+        /// </summary>
+        [TestMethod]
+        public void ToggleExpansionOff_AppliesCompressedSnapshotAndClearsExpandedFlag()
+        {
+            // Arrange — snapshot the label while enabled/visible, then mutate it to disabled/hidden.
+            var host = new Control();
+            var tlp = new TableLayoutPanel
+            {
+                Name = "Compressed",
+                ColumnCount = 1,
+                RowCount = 1,
+            };
+            tlp.RowStyles.Add(new RowStyle());
+            tlp.ColumnStyles.Add(new ColumnStyle());
+            var label = new Label
+            {
+                Name = "LblAcOpen",
+                Enabled = true,
+                Visible = true,
+            };
+            tlp.Controls.Add(label, 0, 0);
+            host.Controls.Add(tlp);
+
+            var snapshot = new TlpCellSnapShot();
+            snapshot.SnapCell(tlp, label);
+
+            label.Enabled = false;
+            label.Visible = false;
+
+            var mockViewer = new Mock<IItemViewer>();
+            mockViewer.Setup(v => v.Controls).Returns(host.Controls);
+
+            var controller = new HarnessController();
+            QfcItemControllerTestSupport.SetField(controller, "_itemViewer", mockViewer.Object);
+            QfcItemControllerTestSupport.SetField(controller, "_expanded", true);
+            var tlpStates = new TlpCellStates();
+            tlpStates.TryAddState("Compressed", new List<TlpCellSnapShot> { snapshot });
+            QfcItemControllerTestSupport.SetField(controller, "_tlpStates", tlpStates);
+
+            // Act
+            QfcItemControllerTestSupport.InvokeNonPublic(controller, "ToggleExpansionOff");
+
+            // Assert — the snapshotted state is restored and the expanded flag is cleared.
+            label.Enabled.Should().BeTrue();
+            label.Visible.Should().BeTrue();
+            QfcItemControllerTestSupport.GetField(controller, "_expanded").Should().Be(false);
+        }
+
+        /// <summary>
+        /// Cycle-5 (R2, de-exempted): <c>ToggleExpansionOn</c> now calls
+        /// <c>_tlpStates["Expanded"].ApplyState(_itemViewer)</c> against the narrowed
+        /// <c>IItemViewer</c>. <c>ItemHelper</c> is left <c>null</c> so the read-timer branch is
+        /// skipped.
+        /// </summary>
+        [TestMethod]
+        public void ToggleExpansionOn_AppliesExpandedSnapshotAndSetsExpandedFlag()
+        {
+            // Arrange — snapshot the label while disabled/hidden, then mutate it to enabled/visible.
+            var host = new Control();
+            var tlp = new TableLayoutPanel
+            {
+                Name = "Expanded",
+                ColumnCount = 1,
+                RowCount = 1,
+            };
+            tlp.RowStyles.Add(new RowStyle());
+            tlp.ColumnStyles.Add(new ColumnStyle());
+            var label = new Label
+            {
+                Name = "LblAcOpen",
+                Enabled = false,
+                Visible = false,
+            };
+            tlp.Controls.Add(label, 0, 0);
+            host.Controls.Add(tlp);
+
+            var snapshot = new TlpCellSnapShot();
+            snapshot.SnapCell(tlp, label);
+
+            label.Enabled = true;
+            label.Visible = true;
+
+            var mockViewer = new Mock<IItemViewer>();
+            mockViewer.Setup(v => v.Controls).Returns(host.Controls);
+
+            var controller = new HarnessController();
+            QfcItemControllerTestSupport.SetField(controller, "_itemViewer", mockViewer.Object);
+            QfcItemControllerTestSupport.SetField(controller, "_expanded", false);
+            var tlpStates = new TlpCellStates();
+            tlpStates.TryAddState("Expanded", new List<TlpCellSnapShot> { snapshot });
+            QfcItemControllerTestSupport.SetField(controller, "_tlpStates", tlpStates);
+
+            // Act
+            QfcItemControllerTestSupport.InvokeNonPublic(controller, "ToggleExpansionOn");
+
+            // Assert — the snapshotted state is restored and the expanded flag is set.
+            label.Enabled.Should().BeFalse();
+            label.Visible.Should().BeFalse();
+            QfcItemControllerTestSupport.GetField(controller, "_expanded").Should().Be(true);
         }
     }
 }

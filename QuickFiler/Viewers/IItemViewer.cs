@@ -12,7 +12,7 @@ using UtilitiesCS.Interfaces.IWinForm;
 
 namespace QuickFiler
 {
-    public interface IItemViewer : IUserControl
+    public interface IItemViewer : IUserControl, IContainerControlLocal
     {
         IItemControler Controller { get; set; }
         IList<Label> ExpandedTipsLabels { get; }

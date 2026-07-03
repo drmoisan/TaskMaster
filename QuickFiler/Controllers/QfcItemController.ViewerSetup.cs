@@ -72,10 +72,7 @@ namespace QuickFiler.Controllers
             //}, Token, TaskContinuationOptions.OnlyOnRanToCompletion, ui);
         }
 
-        // Residual (bucket-iii): the method's entire purpose is concrete control-tree traversal — it
-        // takes a concrete ItemViewer and calls GetAllChildren()/reads Designer controls (P2-T4 seam).
-        // Not unit-reachable without a live ItemViewer.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        // De-exempted cycle-5 (R1): covered by a headless real-ItemViewer test, QfcItemController.ViewerSetupTests.cs.
         internal void ResolveControlGroups(ItemViewer itemViewer)
         {
             //if (itemViewer.InvokeRequired)

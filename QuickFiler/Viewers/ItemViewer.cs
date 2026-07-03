@@ -13,11 +13,12 @@ using System.Windows.Forms;
 using System.Windows.Threading;
 using SVGControl;
 using UtilitiesCS;
+using UtilitiesCS.Interfaces.IWinForm;
 
 namespace QuickFiler
 {
     [ExcludeFromCodeCoverage]
-    public partial class ItemViewer : UserControl, IItemViewer
+    public partial class ItemViewer : UserControl, IItemViewer, IContainerControlLocal
     {
         public ItemViewer()
         {

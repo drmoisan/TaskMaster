@@ -24,22 +24,14 @@ namespace QuickFiler.Controllers
 {
     internal partial class QfcItemController
     {
-        // WireEvents is split (P6-T10) into the concrete-control-tree wiring (retains exemption; the
-        // ForAllControls traversal and the Buttons/MenuItems concrete-control loops require a live
-        // ItemViewer) and the interface-event intent wiring (testable via Mock<IItemViewer>). The two
-        // are called in sequence; no single event receives handlers from both groups, so the net
-        // subscription set and each event's handler order are preserved verbatim.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        // De-exempted cycle-5 (R3): both WireControlTreeEvents() and WireIntentEvents() are now non-exempt; covered by a headless real-ItemViewer test, QfcItemController.EventWiringTests.cs.
         internal void WireEvents()
         {
             WireControlTreeEvents();
             WireIntentEvents();
         }
 
-        // Residual (bucket-iii): concrete control-tree wiring — ((ItemViewer)_itemViewer).ForAllControls
-        // traversal plus the Buttons/MenuItems concrete-control subscription loops. Requires a live
-        // ItemViewer; not unit-reachable (the testable intent subscriptions live in WireIntentEvents).
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        // De-exempted cycle-5 (R1): covered by a headless real-ItemViewer test, QfcItemController.EventWiringTests.cs.
         internal void WireControlTreeEvents()
         {
             ((ItemViewer)_itemViewer).ForAllControls( // concrete-bound seam (P2-T4): control-host path, runs on real ItemViewer during init

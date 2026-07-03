@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Threading;
@@ -7,6 +8,7 @@ using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using QuickFiler;
 using QuickFiler.Controllers;
 using UtilitiesCS;
 
@@ -362,6 +364,44 @@ namespace QuickFiler.Controllers.Tests
             QfcItemControllerTestSupport.GetField(controller, "_itemViewer").Should().BeNull();
             QfcItemControllerTestSupport.GetField(controller, "_homeController").Should().BeNull();
             controller.ItemHelper.Should().BeNull();
+        }
+
+        /// <summary>
+        /// Cycle-5 (R1, de-exempted): <c>ResolveControlGroups(ItemViewer)</c> walks a real, headless
+        /// <see cref="QuickFiler.ItemViewer"/>'s Designer-constructed control tree and classifies its
+        /// children by concrete type. Constructing <c>ItemViewer</c> requires a non-null ambient
+        /// <see cref="SynchronizationContext"/> on the calling thread (for
+        /// <c>TaskScheduler.FromCurrentSynchronizationContext()</c>); the context is installed and
+        /// restored exactly (mirroring <c>ProgressPane_Tests.cs</c>'s try/finally pattern) so no context
+        /// leaks across tests.
+        /// </summary>
+        [TestMethod]
+        public void ResolveControlGroups_WithHeadlessItemViewer_PopulatesConcreteControlCollections()
+        {
+            // Arrange
+            var previousContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            try
+            {
+                var viewer = new QuickFiler.ItemViewer();
+                var controller = new HarnessController();
+                QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer);
+
+                // Act
+                QfcItemControllerTestSupport.InvokeNonPublic(
+                    controller,
+                    "ResolveControlGroups",
+                    viewer
+                );
+
+                // Assert — both concrete control collections are populated from the real control tree.
+                controller.TableLayoutPanels.Should().NotBeNullOrEmpty();
+                controller.Buttons.Should().NotBeNullOrEmpty();
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
         }
     }
 }

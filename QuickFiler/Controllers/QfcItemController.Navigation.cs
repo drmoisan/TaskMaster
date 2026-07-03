@@ -204,13 +204,9 @@ namespace QuickFiler.Controllers
             }
         }
 
-        // Residual (bucket-iii): calls _tlpStates["Compressed"].ApplyState((ItemViewer)_itemViewer),
-        // which walks the live control tree via TlpCellSnapShot.ApplyState(Control) — an out-of-scope
-        // collaborator with no seam this cycle (see P7-T5 deferred follow-up). Not unit-reachable.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private void ToggleExpansionOff()
         {
-            _tlpStates["Compressed"].ApplyState((ItemViewer)_itemViewer); // concrete-bound seam (P2-T4): control-host path, runs on real ItemViewer during init
+            _tlpStates["Compressed"].ApplyState(_itemViewer);
             _expanded = false;
             if (_emailIsReadTimer is not null)
             {
@@ -218,13 +214,9 @@ namespace QuickFiler.Controllers
             }
         }
 
-        // Residual (bucket-iii): calls _tlpStates["Expanded"].ApplyState((ItemViewer)_itemViewer),
-        // which walks the live control tree via TlpCellSnapShot.ApplyState(Control) — an out-of-scope
-        // collaborator with no seam this cycle (see P7-T5 deferred follow-up). Not unit-reachable.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private void ToggleExpansionOn()
         {
-            _tlpStates["Expanded"].ApplyState((ItemViewer)_itemViewer); // concrete-bound seam (P2-T4): control-host path, runs on real ItemViewer during init
+            _tlpStates["Expanded"].ApplyState(_itemViewer);
             _expanded = true;
             if ((ItemHelper is not null) && ItemHelper.UnRead == true)
             {

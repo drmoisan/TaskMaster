@@ -1,10 +1,13 @@
 using System;
+using System.Drawing;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using QuickFiler;
 using QuickFiler.Controllers;
 using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
@@ -209,6 +212,163 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             charActions.ContainsKey('B').Should().BeFalse();
             charActions.ContainsKey('D').Should().BeFalse();
+        }
+
+        /// <summary>
+        /// Cycle-5 (R1, de-exempted): <c>WireControlTreeEvents()</c> walks a real, headless
+        /// <see cref="QuickFiler.ItemViewer"/>'s control tree via <c>ForAllControls</c>, wiring keyboard
+        /// handlers to every non-except-listed control and mouse handlers to every populated button.
+        /// <c>ResolveControlGroups</c> is invoked first (Arrange prerequisite: <c>Buttons</c> is null
+        /// until it runs). Outcomes are verified by raising the real protected
+        /// <see cref="Control.OnPreviewKeyDown(PreviewKeyDownEventArgs)"/>,
+        /// <see cref="Control.OnKeyDown(KeyEventArgs)"/>, and
+        /// <see cref="Control.OnMouseEnter(EventArgs)"/> methods via reflection — not by inspecting
+        /// framework-internal event-key fields.
+        /// </summary>
+        [TestMethod]
+        public void WireControlTreeEvents_WithHeadlessItemViewer_WiresKeyboardAndMouseHandlers()
+        {
+            // Arrange
+            var previousContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            try
+            {
+                var viewer = new QuickFiler.ItemViewer();
+                var controller = new HarnessController();
+                var mockKbd = new Mock<IQfcKeyboardHandler>();
+                QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer);
+                QfcItemControllerTestSupport.SetField(controller, "_kbdHandler", mockKbd.Object);
+                QfcItemControllerTestSupport.InjectThemes(
+                    controller,
+                    QfcItemControllerTestSupport.BuildThemeDictionary(
+                        "LightNormal",
+                        QfcItemControllerTestSupport.BuildColorTheme(
+                            Color.Yellow,
+                            Color.Green,
+                            Color.Gray
+                        )
+                    ),
+                    "LightNormal"
+                );
+                QfcItemControllerTestSupport.InvokeNonPublic(
+                    controller,
+                    "ResolveControlGroups",
+                    viewer
+                );
+
+                // Act
+                QfcItemControllerTestSupport.InvokeNonPublic(controller, "WireControlTreeEvents");
+
+                MethodInfo onPreviewKeyDown = typeof(Control).GetMethod(
+                    "OnPreviewKeyDown",
+                    BindingFlags.NonPublic | BindingFlags.Instance
+                );
+                MethodInfo onKeyDown = typeof(Control).GetMethod(
+                    "OnKeyDown",
+                    BindingFlags.NonPublic | BindingFlags.Instance
+                );
+                MethodInfo onMouseEnter = typeof(Control).GetMethod(
+                    "OnMouseEnter",
+                    BindingFlags.NonPublic | BindingFlags.Instance
+                );
+
+                onPreviewKeyDown.Invoke(
+                    viewer.LblAcOpen,
+                    new object[] { new PreviewKeyDownEventArgs(Keys.A) }
+                );
+                onKeyDown.Invoke(viewer.LblAcOpen, new object[] { new KeyEventArgs(Keys.A) });
+
+                // BtnDelItem is a ButtonSVG (QuickFiler.Test has no compile-time reference to
+                // SVGControl), so it is retrieved via reflection and handled purely as its Control
+                // base type to avoid CS0012.
+                Control btnDelItem = (Control)
+                    typeof(ItemViewer).GetProperty("BtnDelItem").GetValue(viewer);
+                onMouseEnter.Invoke(btnDelItem, new object[] { EventArgs.Empty });
+
+                // Assert — (a) preview-key-down and (b) key-down handlers were wired to LblAcOpen.
+                mockKbd.Verify(
+                    k =>
+                        k.KeyboardHandler_PreviewKeyDownAsync(
+                            viewer.LblAcOpen,
+                            It.IsAny<PreviewKeyDownEventArgs>()
+                        ),
+                    Times.Once()
+                );
+                mockKbd.Verify(
+                    k => k.KeyboardHandler_KeyDownAsync(viewer.LblAcOpen, It.IsAny<KeyEventArgs>()),
+                    Times.Once()
+                );
+
+                // Assert — (c) the mouse-enter handler was wired to a populated button.
+                btnDelItem.BackColor.Should().Be(Color.Yellow);
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
+        }
+
+        /// <summary>
+        /// Cycle-5 (R3, de-exempted): <c>WireEvents()</c> calls both <c>WireControlTreeEvents()</c>
+        /// (now testable per R1) and <c>WireIntentEvents()</c> in sequence. Outcome (a) reuses the
+        /// preview-key-down signal to prove the control-tree wiring ran; outcome (b) toggles the real
+        /// <c>ConversationMenuItem.Checked</c> to prove the intent-event wiring ran, with
+        /// <c>SuppressEvents = true</c> to avoid the heavier <c>CollapseConversation()</c> branch inside
+        /// <c>CbxConversation_CheckedChanged</c>.
+        /// </summary>
+        [TestMethod]
+        public void WireEvents_WithHeadlessItemViewer_WiresBothControlTreeAndIntentEvents()
+        {
+            // Arrange
+            var previousContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            try
+            {
+                var viewer = new QuickFiler.ItemViewer();
+                var controller = new HarnessController();
+                var mockKbd = new Mock<IQfcKeyboardHandler>();
+                QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer);
+                QfcItemControllerTestSupport.SetField(controller, "_kbdHandler", mockKbd.Object);
+                QfcItemControllerTestSupport.InvokeNonPublic(
+                    controller,
+                    "ResolveControlGroups",
+                    viewer
+                );
+                controller.SuppressEvents = true;
+
+                // Act
+                QfcItemControllerTestSupport.InvokeNonPublic(controller, "WireEvents");
+
+                MethodInfo onPreviewKeyDown = typeof(Control).GetMethod(
+                    "OnPreviewKeyDown",
+                    BindingFlags.NonPublic | BindingFlags.Instance
+                );
+                onPreviewKeyDown.Invoke(
+                    viewer.LblAcOpen,
+                    new object[] { new PreviewKeyDownEventArgs(Keys.A) }
+                );
+                viewer.ConversationMenuItem.Checked = true;
+
+                // Assert — (a) proves WireControlTreeEvents() ran.
+                mockKbd.Verify(
+                    k =>
+                        k.KeyboardHandler_PreviewKeyDownAsync(
+                            viewer.LblAcOpen,
+                            It.IsAny<PreviewKeyDownEventArgs>()
+                        ),
+                    Times.Once()
+                );
+
+                // Assert — (b) proves WireIntentEvents() ran.
+                QfcItemControllerTestSupport
+                    .GetField(controller, "_optionConversationChecked")
+                    .Should()
+                    .Be(true);
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
         }
     }
 }

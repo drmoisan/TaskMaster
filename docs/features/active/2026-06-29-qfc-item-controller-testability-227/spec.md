@@ -3,19 +3,25 @@
 - **Issue:** #227
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-07-02T11-15
-- **Status:** Redesign (post cycle-2; maintainer directed a further residual-boundary reduction)
-- **Version:** 0.4
+- **Last Updated:** 2026-07-02T17-00
+- **Status:** Redesign (post cycle-4; maintainer directed a fifth further residual-boundary reduction)
+- **Version:** 0.5
 - **Research:** `artifacts/research/2026-06-29T10-00-qfc-item-controller-testability-research.md`;
   seam-redesign research `artifacts/research/2026-07-01T00-00-qfc-item-controller-seam-redesign-research.md`;
-  cycle-2 residual re-audit `artifacts/research/2026-07-02T11-00-qfc-item-controller-residual-reaudit-research.md`
+  cycle-2 residual re-audit `artifacts/research/2026-07-02T11-00-qfc-item-controller-residual-reaudit-research.md`;
+  headless-`ItemViewer`/`TlpCellSnapShot` research `artifacts/research/2026-07-02T16-15-qfc-item-controller-headless-itemviewer-research.md`
 - **Maintainer decision:** `maintainer-decision.2026-07-01.md` — R2 exemption ratification DENIED;
   Option A (behavioral seams + remove over-broad exemptions) approved 2026-07-01. Cycle-2 delivered
-  a 103->41 reduction; the maintainer directed (2026-07-02, in-session) a rigorous re-check against
-  the seam-redesign research's original ~6-8 irreducible estimate and authorized a third
-  remediation cycle if the re-check found further actionable reduction. The re-audit found 17 of
-  the 41 residuals actionable (9 test-only, 8 via two new/extended seams) and a revised, honestly
-  reconciled irreducible floor of 24 — see cycle-3 scope below.
+  103->41; cycle-3 (after a directed re-check) delivered 41->24; cycle-4 fixed a test-honesty gap on
+  2 of the 24 (no count change). The maintainer then asked directly whether the 24 are genuinely
+  untestable; research (`2026-07-02T16-15`) found a proven, no-open-risk path to reduce 24->19 via
+  (a) headless `ItemViewer` construction (a pattern already proven safe in this repo for
+  `ProgressPane`/`ProgressViewer`) unlocking `ResolveControlGroups`/`WireControlTreeEvents`, and
+  (b) a small `TlpCellSnapShot`/`IContainerControlLocal` retrofit unlocking `ToggleExpansionOn`/`Off`,
+  plus a free `WireEvents` follow-on. Cycle 5 (approved 2026-07-02) delivers this reduction. The
+  remaining 19 (after cycle 5) require either a materially larger, distinct WinForms message-pump
+  test-infrastructure investment (9 members) or are design choices / framework constraints (10
+  members) — tracked as a separate follow-up, not folded into this remediation.
 
 ## Intent & Outcomes
 
@@ -322,7 +328,15 @@ code that cannot be unit-tested without a live Outlook process. For this work:
   assertions, with no change to the exemption count. Cycle-4 exit reaudit
   (`2026-07-02T16-45-audit/`) recorded 0 blocking findings, independently re-verified. The checkbox
   remains unchecked pending maintainer ratification of the reduced 24-member boundary, consistent
-  with the cycle-2 precedent.
+  with the cycle-2 precedent. CYCLE-5 (delivered 2026-07-02): 5 more no-barrier members
+  (`ResolveControlGroups(ItemViewer)`, `WireControlTreeEvents()`, `WireEvents()` via headless
+  real-`ItemViewer` construction; `ToggleExpansionOff`/`ToggleExpansionOn` via the
+  `TlpCellSnapShot`/`IContainerControlLocal` retrofit) are de-exempted and covered by tests
+  exercising genuine behavior — 24->19. See
+  `evidence/other/exemption-boundary.2026-07-02T17-00.md` (the re-submitted boundary) and
+  `evidence/qa-gates/final-residual-and-file-size-verification.2026-07-02T17-00.md` (the itemized
+  19-member re-verification). The checkbox remains unchecked pending maintainer ratification of the
+  reduced 19-member boundary, consistent with prior-cycle precedent.
 - [x] AC9: The four behavioral seams (`IUiDispatcher`, `IWebViewCoreInitializer`, `IMailItemActions`
   + collaborator factory delegates, and thin-delegator `async void` handlers) are introduced per the
   DI-seam rule ordering, are covered to >= 90%, and preserve runtime behavior. No leaf-control
@@ -343,7 +357,11 @@ code that cannot be unit-tested without a live Outlook process. For this work:
   resolved; the boundary composition (24 members, unchanged this cycle) is now backed by genuinely
   behavior-verified tests for all de-exempted siblings. The checkbox remains unchecked pending
   maintainer ratification of this boundary at review, per the authority-scoped coverage-exception
-  precedent already cited above.
+  precedent already cited above. CYCLE-5: the boundary is reduced again (24->19) per AC8's
+  cycle-5 note; the reduced 19-member boundary is individually justified by category and per-member
+  in `evidence/other/exemption-boundary.2026-07-02T17-00.md` and re-verified against source in
+  `evidence/qa-gates/final-residual-and-file-size-verification.2026-07-02T17-00.md`. The checkbox
+  remains unchecked pending maintainer ratification of this boundary at review.
 - [x] AC6: No production file modified exceeds 500 lines after the change (re-verified after the
   redesign, including the new seam files).
 - [x] AC7: Full C# toolchain passes in order — csharpier, .NET analyzers,
