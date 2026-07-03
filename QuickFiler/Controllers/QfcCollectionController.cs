@@ -256,7 +256,10 @@ namespace QuickFiler.Controllers
             );
             _formViewer.SuspendLayout();
             ActivateQueuedTlp(tlp);
-            ActivateQueuedItemGroups(itemGroups);
+            // Route the item-groups swap through SwapItemGroups so the outgoing page's "Collection"
+            // navigation keys are unregistered and the incoming page's keys are registered as part of
+            // the swap (Issue #232). Calling ActivateQueuedItemGroups directly left stale keys behind.
+            SwapItemGroups(itemGroups);
             _formViewer.ResumeLayout();
             ActiveIndex = -1;
         }
@@ -1200,6 +1203,11 @@ namespace QuickFiler.Controllers
                 await _kbdHandler.ToggleKeyboardDialogAsync();
             }
 
+            // Guards against double-registration: when the zero-item branch skips to the next page,
+            // SkipGroupAsync -> LoadControlsAndHandlers_01 -> SwapItemGroups already registers the
+            // incoming page's navigation keys. Registering again below would re-add the same keys and
+            // throw ArgumentException from KbdActions.Add (Issue #232).
+            bool swapAlreadyRegistered = false;
             await UiThread.Dispatcher.InvokeAsync(async () =>
             {
                 TlpLayout = tlpState;
@@ -1207,6 +1215,7 @@ namespace QuickFiler.Controllers
                 if (_itemGroups.Count == 0)
                 {
                     await ((QfcFormController)_parent).SkipGroupAsync();
+                    swapAlreadyRegistered = true;
                     //_parent.ActionOkAsync();
                 }
             });
@@ -1216,7 +1225,10 @@ namespace QuickFiler.Controllers
                     "RemoveSpecificControlGroupAsync: Counter is greater than 1. Race Condition Exists"
                 );
             }
-            RegisterNavigation();
+            if (!swapAlreadyRegistered)
+            {
+                RegisterNavigation();
+            }
             Interlocked.Decrement(ref removespecificcontrolgroupcounter);
         }
 

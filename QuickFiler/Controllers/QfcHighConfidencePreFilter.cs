@@ -22,6 +22,10 @@ namespace QuickFiler.Controllers
     /// </summary>
     internal static class QfcHighConfidencePreFilter
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
+
         /// <summary>
         /// Scores all items in <paramref name="items"/> in parallel and returns the survivors whose
         /// top folder score is at or above the cutoff derived from <paramref name="threshold"/> and
@@ -64,6 +68,11 @@ namespace QuickFiler.Controllers
                     async (item, index) =>
                     {
                         var (score, topFolder) = await service.ScoreAsync(item, globals, token);
+                        logger.Debug(
+                            $"Probability debug [QfcHighConfidencePreFilter.FilterAsync] "
+                                + $"Subject='{item.Subject}' EntryID='{item.EntryID}' "
+                                + $"Score={score} TopFolder='{topFolder}'"
+                        );
                         return (index, item, score, topFolder);
                     }
                 )
