@@ -12,10 +12,10 @@ Output Summary:
 Output:
 ```text
 ## feature/quickfiler-high-confidence-dequeue-streaming-233
-?? docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/code-review.2026-07-03T22-18.md
+?? docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-18-00-audit/code-review.2026-07-03T22-18.md
 ?? docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/evidence/remediation-baseline/phase0-22-18-instructions-read.md
-?? docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/feature-audit.2026-07-03T22-18.md
-?? docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/policy-audit.2026-07-03T22-18.md
-?? docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-inputs.2026-07-03T22-18.md
-?? docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-plan.2026-07-03T22-18.md
+?? docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-18-00-audit/feature-audit.2026-07-03T22-18.md
+?? docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-18-00-audit/policy-audit.2026-07-03T22-18.md
+?? docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-18-00-remediation/remediation-inputs.2026-07-03T22-18.md
+?? docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-18-00-remediation/remediation-plan.2026-07-03T22-18.md
 ```

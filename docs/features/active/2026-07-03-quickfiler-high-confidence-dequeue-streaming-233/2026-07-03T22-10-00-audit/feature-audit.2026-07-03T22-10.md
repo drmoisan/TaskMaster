@@ -111,4 +111,4 @@ Validator status: PASS under `[P5-T7]`.
 - Command: `mcp__drm_copilot.validate_orchestration_artifacts`
 - Artifact type: `feature-audit`
 - Result: `ok: true`
-- Summary: Validated feature-audit artifact at `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/feature-audit.2026-07-03T22-10.md`.
+- Summary: Validated feature-audit artifact at `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-10-00-audit/feature-audit.2026-07-03T22-10.md`.

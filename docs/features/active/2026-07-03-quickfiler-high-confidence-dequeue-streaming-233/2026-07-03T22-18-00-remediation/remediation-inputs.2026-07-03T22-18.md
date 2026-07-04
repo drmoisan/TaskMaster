@@ -22,14 +22,14 @@ Remediation is required by the feature-review workflow because:
 
 **Affected paths from live review command output:**
 
-- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/code-review.2026-07-03T19-16.md`
-- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/code-review.2026-07-03T22-10.md`
+- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-audit/code-review.2026-07-03T19-16.md`
+- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-10-00-audit/code-review.2026-07-03T22-10.md`
 - `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/evidence/remediation-baseline/r4-git-diff-check-baseline.md`
-- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/feature-audit.2026-07-03T19-16.md`
-- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/feature-audit.2026-07-03T22-10.md`
-- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/policy-audit.2026-07-03T19-16.md`
-- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/policy-audit.2026-07-03T22-10.md`
-- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-inputs.2026-07-03T19-16.md`
+- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-audit/feature-audit.2026-07-03T19-16.md`
+- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-10-00-audit/feature-audit.2026-07-03T22-10.md`
+- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-audit/policy-audit.2026-07-03T19-16.md`
+- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-10-00-audit/policy-audit.2026-07-03T22-10.md`
+- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-remediation/remediation-inputs.2026-07-03T19-16.md`
 
 **Expected behavior:** Base-to-head whitespace validation exits 0.
 
@@ -91,10 +91,10 @@ mcp__drm_copilot.validate_orchestration_artifacts for policy-audit, code-review,
 
 ## Required Context Package for Planning
 
-- Remediation inputs: `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-inputs.2026-07-03T22-18.md`
-- Policy audit: `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/policy-audit.2026-07-03T22-18.md`
-- Code review: `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/code-review.2026-07-03T22-18.md`
-- Feature audit: `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/feature-audit.2026-07-03T22-18.md`
+- Remediation inputs: `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-18-00-remediation/remediation-inputs.2026-07-03T22-18.md`
+- Policy audit: `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-18-00-audit/policy-audit.2026-07-03T22-18.md`
+- Code review: `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-18-00-audit/code-review.2026-07-03T22-18.md`
+- Feature audit: `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-18-00-audit/feature-audit.2026-07-03T22-18.md`
 - PR context summary: `artifacts/pr_context.summary.txt`
 - PR context appendix: `artifacts/pr_context.appendix.txt`
 - Original feature plan: `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/plan.2026-07-03T16-57.md`

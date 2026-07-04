@@ -6,8 +6,8 @@
 - **Status:** Draft
 - **Version:** 0.1
 - **Work Mode:** full-feature remediation
-- **Primary Requirements Source:** `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-inputs.2026-07-03T19-16.md`
-- **Target File:** `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-plan.2026-07-03T19-16.md`
+- **Primary Requirements Source:** `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-remediation/remediation-inputs.2026-07-03T19-16.md`
+- **Target File:** `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-remediation/remediation-plan.2026-07-03T19-16.md`
 
 ## Context Package
 
@@ -17,11 +17,11 @@
 - `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/spec.md`
 - `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/user-story.md`
 - `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/plan.2026-07-03T16-57.md`
-- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-plan.2026-07-03T18-23.md`
-- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-inputs.2026-07-03T19-16.md`
-- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/policy-audit.2026-07-03T19-16.md`
-- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/code-review.2026-07-03T19-16.md`
-- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/feature-audit.2026-07-03T19-16.md`
+- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T18-23-00-remediation/remediation-plan.2026-07-03T18-23.md`
+- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-remediation/remediation-inputs.2026-07-03T19-16.md`
+- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-audit/policy-audit.2026-07-03T19-16.md`
+- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-audit/code-review.2026-07-03T19-16.md`
+- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-audit/feature-audit.2026-07-03T19-16.md`
 
 ## Evidence Contract
 
@@ -39,7 +39,7 @@ Command-bearing evidence artifacts must include:
 ### Phase 0 — Compliance and Baseline
 
 - [x] [P0-T1] Read required policies and remediation inputs
-  - Read `AGENTS.md`, `.agents/skills/csharp/SKILL.md`, `.agents/skills/evidence-and-timestamp-conventions/SKILL.md`, `.agents/skills/acceptance-criteria-tracking/SKILL.md`, and `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-inputs.2026-07-03T19-16.md`.
+  - Read `AGENTS.md`, `.agents/skills/csharp/SKILL.md`, `.agents/skills/evidence-and-timestamp-conventions/SKILL.md`, `.agents/skills/acceptance-criteria-tracking/SKILL.md`, and `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-remediation/remediation-inputs.2026-07-03T19-16.md`.
   - Write `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/evidence/remediation-baseline/phase0-r4-remediation-instructions-read.md`.
 - [x] [P0-T2] Capture git status baseline
   - Run `git status --short --branch --untracked-files=all`.

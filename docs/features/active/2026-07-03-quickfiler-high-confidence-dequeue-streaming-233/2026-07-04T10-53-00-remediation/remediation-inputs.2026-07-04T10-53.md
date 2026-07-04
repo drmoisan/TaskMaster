@@ -12,9 +12,9 @@
 
 - `artifacts/pr_context.summary.txt`
 - `artifacts/pr_context.appendix.txt`
-- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/policy-audit.2026-07-04T10-53.md`
-- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/code-review.2026-07-04T10-53.md`
-- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/feature-audit.2026-07-04T10-53.md`
+- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-04T10-53-00-audit/policy-audit.2026-07-04T10-53.md`
+- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-04T10-53-00-audit/code-review.2026-07-04T10-53.md`
+- `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-04T10-53-00-audit/feature-audit.2026-07-04T10-53.md`
 - `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/plan.2026-07-03T16-57.md`
 - `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/spec.md`
 - `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/user-story.md`

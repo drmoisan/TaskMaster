@@ -13,12 +13,12 @@ Output Summary:
 
 Representative Output:
 ```text
-docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/code-review.2026-07-03T19-16.md:3: trailing whitespace.
-docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/code-review.2026-07-03T22-10.md:3: trailing whitespace.
+docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-audit/code-review.2026-07-03T19-16.md:3: trailing whitespace.
+docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-10-00-audit/code-review.2026-07-03T22-10.md:3: trailing whitespace.
 docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/evidence/remediation-baseline/r4-git-diff-check-baseline.md:9: trailing whitespace.
-docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/feature-audit.2026-07-03T19-16.md:3: trailing whitespace.
-docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/feature-audit.2026-07-03T22-10.md:3: trailing whitespace.
-docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/policy-audit.2026-07-03T19-16.md:3: trailing whitespace.
-docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/policy-audit.2026-07-03T22-10.md:3: trailing whitespace.
-docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-inputs.2026-07-03T19-16.md:3: trailing whitespace.
+docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-audit/feature-audit.2026-07-03T19-16.md:3: trailing whitespace.
+docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-10-00-audit/feature-audit.2026-07-03T22-10.md:3: trailing whitespace.
+docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-audit/policy-audit.2026-07-03T19-16.md:3: trailing whitespace.
+docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-10-00-audit/policy-audit.2026-07-03T22-10.md:3: trailing whitespace.
+docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-remediation/remediation-inputs.2026-07-03T19-16.md:3: trailing whitespace.
 ```

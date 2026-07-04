@@ -1,7 +1,7 @@
 Timestamp: 2026-07-04T11-07-04:00
 Sources:
 - docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/evidence/qa-gates/remediation-22-18-coverage-comparison.md
-- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/policy-audit.2026-07-04T10-53.md
+- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-04T10-53-00-audit/policy-audit.2026-07-04T10-53.md
 
 Repository-Path Coverage:
 - Baseline repository-path coverage: 13120/57396 = 22.86%.

@@ -16,7 +16,7 @@ Files Read:
 - .agents/skills/csharp/SKILL.md
 - .agents/skills/evidence-and-timestamp-conventions/SKILL.md
 - .agents/skills/acceptance-criteria-tracking/SKILL.md
-- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-inputs.2026-07-03T19-16.md
+- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-remediation/remediation-inputs.2026-07-03T19-16.md
 
 Validation Notes:
 - Evidence output will remain under docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/evidence/<kind>/.

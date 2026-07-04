@@ -14,11 +14,11 @@ Files Read:
 - .agents/skills/acceptance-criteria-tracking/SKILL.md
 - .agents/skills/evidence-and-timestamp-conventions/SKILL.md
 - .agents/skills/csharp/SKILL.md
-- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-plan.2026-07-04T10-53.md
-- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-inputs.2026-07-04T10-53.md
-- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/policy-audit.2026-07-04T10-53.md
-- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/code-review.2026-07-04T10-53.md
-- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/feature-audit.2026-07-04T10-53.md
+- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-04T10-53-00-remediation/remediation-plan.2026-07-04T10-53.md
+- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-04T10-53-00-remediation/remediation-inputs.2026-07-04T10-53.md
+- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-04T10-53-00-audit/policy-audit.2026-07-04T10-53.md
+- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-04T10-53-00-audit/code-review.2026-07-04T10-53.md
+- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-04T10-53-00-audit/feature-audit.2026-07-04T10-53.md
 - docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/spec.md
 - docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/user-story.md
 

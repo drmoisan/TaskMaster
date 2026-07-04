@@ -14,10 +14,10 @@ Policy Order:
 - .agents/skills/csharp/SKILL.md
 
 Review and remediation inputs read:
-- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-inputs.2026-07-03T18-23.md
-- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/code-review.2026-07-03T18-23.md
-- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/feature-audit.2026-07-03T18-23.md
-- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/policy-audit.2026-07-03T18-23.md
+- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T18-23-00-remediation/remediation-inputs.2026-07-03T18-23.md
+- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T18-23-00-audit/code-review.2026-07-03T18-23.md
+- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T18-23-00-audit/feature-audit.2026-07-03T18-23.md
+- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T18-23-00-audit/policy-audit.2026-07-03T18-23.md
 
 Validator:
-- validate_orchestration_artifacts passed for docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-plan.2026-07-03T18-23.md with artifact_type plan.
+- validate_orchestration_artifacts passed for docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T18-23-00-remediation/remediation-plan.2026-07-03T18-23.md with artifact_type plan.

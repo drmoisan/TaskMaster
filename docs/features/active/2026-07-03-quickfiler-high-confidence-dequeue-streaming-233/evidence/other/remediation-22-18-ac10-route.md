@@ -13,7 +13,7 @@ ROUTE: FAIL_CLOSED
 EvidenceRead:
 - docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/evidence/qa-gates/r4-final-coverage-comparison.md
 - docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/evidence/other/r4-ac10-blocker.md
-- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-inputs.2026-07-03T22-18.md
+- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-18-00-remediation/remediation-inputs.2026-07-03T22-18.md
 
 ExceptionSearch:
 - SearchScope: docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/evidence/other

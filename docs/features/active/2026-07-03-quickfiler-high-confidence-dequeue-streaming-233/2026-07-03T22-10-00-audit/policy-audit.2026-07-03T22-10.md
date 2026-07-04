@@ -294,7 +294,7 @@ Validator status: PASS under `[P5-T3]`.
 - Command: `mcp__drm_copilot.validate_orchestration_artifacts`
 - Artifact type: `policy-audit`
 - Result: `ok: true`
-- Summary: Validated policy-audit artifact at `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/policy-audit.2026-07-03T22-10.md`.
+- Summary: Validated policy-audit artifact at `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-10-00-audit/policy-audit.2026-07-03T22-10.md`.
 
 **Audit Completed By:** Codex
 **Audit Date:** 2026-07-03T22-10

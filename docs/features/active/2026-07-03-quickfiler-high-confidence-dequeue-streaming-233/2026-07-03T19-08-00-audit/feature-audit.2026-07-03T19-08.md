@@ -17,7 +17,7 @@
 - **Head branch/commit:** `feature/quickfiler-high-confidence-dequeue-streaming-233` working tree
 - **Merge base:** `00507b595297c3e6970634a1855f1144c987dbdf`
 - **Evidence sources:**
-  - Primary: `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-plan.2026-07-03T18-23.md`
+  - Primary: `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T18-23-00-remediation/remediation-plan.2026-07-03T18-23.md`
   - Secondary baseline diff: `artifacts/pr_context.summary.txt`
   - Feature evidence: `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/evidence/**`
   - Additional evidence: final Phase 6 QA evidence under `evidence/qa-gates/`

@@ -18,7 +18,7 @@
   - `artifacts/pr_context.summary.txt`
   - `artifacts/pr_context.appendix.txt`
   - `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/evidence/**`
-  - `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-plan.2026-07-04T10-53.md`
+  - `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-04T10-53-00-remediation/remediation-plan.2026-07-04T10-53.md`
 - **Requirements source:** `spec.md` and `user-story.md`
 
 ## Acceptance Criteria Inventory

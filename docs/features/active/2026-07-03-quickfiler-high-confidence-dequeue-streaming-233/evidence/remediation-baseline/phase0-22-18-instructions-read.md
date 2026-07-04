@@ -13,6 +13,6 @@ Files Read:
 - .agents/skills/feature-review/SKILL.md
 - .agents/skills/atomic-plan-contract/SKILL.md
 - .agents/skills/csharp/SKILL.md
-- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-inputs.2026-07-03T22-18.md
+- docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-18-00-remediation/remediation-inputs.2026-07-03T22-18.md
 - docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/spec.md
 - docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/user-story.md

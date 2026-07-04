@@ -85,4 +85,4 @@ Validator status: PASS under `[P5-T5]`.
 - Command: `mcp__drm_copilot.validate_orchestration_artifacts`
 - Artifact type: `code-review`
 - Result: `ok: true`
-- Summary: Validated code-review artifact at `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/code-review.2026-07-03T22-10.md`.
+- Summary: Validated code-review artifact at `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-10-00-audit/code-review.2026-07-03T22-10.md`.

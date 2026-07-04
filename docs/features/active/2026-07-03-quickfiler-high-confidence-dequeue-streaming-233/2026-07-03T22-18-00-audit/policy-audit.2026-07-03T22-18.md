@@ -240,10 +240,10 @@ No tests were identified as removed. GitHub PR/CI verification is UNVERIFIED bec
 
 The branch changes 122 files according to PR context, including 20 C# or C# project diff entries and issue #233 feature evidence/review artifacts. Current post-2ac150fa changes are limited to:
 
-1. `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/code-review.2026-07-03T22-10.md`
-2. `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/feature-audit.2026-07-03T22-10.md`
-3. `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/policy-audit.2026-07-03T22-10.md`
-4. `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/remediation-plan.2026-07-03T19-16.md`
+1. `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-10-00-audit/code-review.2026-07-03T22-10.md`
+2. `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-10-00-audit/feature-audit.2026-07-03T22-10.md`
+3. `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T22-10-00-audit/policy-audit.2026-07-03T22-10.md`
+4. `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/2026-07-03T19-16-00-remediation/remediation-plan.2026-07-03T19-16.md`
 
 ## 10. Compliance Verdict
 
