@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -340,6 +341,54 @@ namespace QuickFiler.Controllers.Tests
             dataFieldsInitialized.Should().BeTrue();
         }
 
+        [TestMethod]
+        public void ResetProductionFactories_ConstructorDelegatesCreateConcreteInstances()
+        {
+            EfcHomeControllerDependencies.ResetProductionFactoriesForTesting();
+            var values = CreateValues();
+            var viewer = CreateConfiguredViewer();
+
+            using (var tokenSource = new CancellationTokenSource())
+            {
+                EfcHomeControllerDependencies
+                    .ProductionDataModelConstructor(
+                        values.Globals,
+                        null,
+                        tokenSource,
+                        tokenSource.Token
+                    )
+                    .Should()
+                    .NotBeNull();
+                EfcHomeControllerDependencies
+                    .ProductionKeyboardHandlerConstructor(viewer, values.HomeController)
+                    .Should()
+                    .BeOfType<KeyboardHandler>();
+                EfcHomeControllerDependencies
+                    .ProductionFormControllerWithDataConstructor(
+                        values.Globals,
+                        values.DataModel,
+                        viewer,
+                        values.HomeController,
+                        values.Cleanup,
+                        QfEnums.InitTypeEnum.Sort,
+                        tokenSource.Token
+                    )
+                    .Should()
+                    .NotBeNull();
+                EfcHomeControllerDependencies
+                    .ProductionFormControllerWithoutDataConstructor(
+                        values.Globals,
+                        viewer,
+                        values.HomeController,
+                        values.Cleanup,
+                        QfEnums.InitTypeEnum.Find,
+                        tokenSource.Token
+                    )
+                    .Should()
+                    .NotBeNull();
+            }
+        }
+
         private static DependencyValues CreateValues()
         {
             return new DependencyValues(
@@ -367,6 +416,14 @@ namespace QuickFiler.Controllers.Tests
             where T : class
         {
             return (T)FormatterServices.GetUninitializedObject(typeof(T));
+        }
+
+        private static EfcViewer CreateConfiguredViewer()
+        {
+            var viewer = CreateUninitialized<EfcViewer>();
+            viewer.ItemViewer = CreateUninitialized<ItemViewer>();
+            viewer.L0vh_TLP = new TableLayoutPanel();
+            return viewer;
         }
 
         private sealed class DependencyValues
