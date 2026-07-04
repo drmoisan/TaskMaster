@@ -8,6 +8,24 @@ namespace QuickFiler
 {
     public static class ItemViewerQueue
     {
+        internal static Func<ItemViewer> ProductionViewerFactory { get; set; } =
+            CreateProductionViewer;
+
+        internal static Action<Action> ProductionSynchronousScheduler { get; set; } =
+            action => action();
+
+        internal static Action<
+            Action,
+            DispatcherPriority
+        > ProductionPriorityScheduler { get; set; } =
+            (action, priority) => _ = UiThread.Dispatcher.InvokeAsync(action, priority);
+
+        internal static Action<
+            Action,
+            DispatcherPriority
+        > ProductionBlockingPriorityScheduler { get; set; } =
+            (action, priority) => UiThread.Dispatcher.Invoke(action, priority);
+
         private static ViewerQueueCore<ItemViewer> _core = CreateProductionCore();
 
         public static void BuildQueueWhenIdle(int count)
@@ -62,14 +80,29 @@ namespace QuickFiler
             _core = CreateProductionCore();
         }
 
+        internal static void ResetProductionCoreDefaultsForTesting()
+        {
+            ProductionViewerFactory = CreateProductionViewer;
+            ProductionSynchronousScheduler = action => action();
+            ProductionPriorityScheduler = (action, priority) =>
+                _ = UiThread.Dispatcher.InvokeAsync(action, priority);
+            ProductionBlockingPriorityScheduler = (action, priority) =>
+                UiThread.Dispatcher.Invoke(action, priority);
+        }
+
         private static ViewerQueueCore<ItemViewer> CreateProductionCore()
         {
             return CreateProductionCore(
-                () => new ItemViewer(),
-                action => action(),
-                (action, priority) => _ = UiThread.Dispatcher.InvokeAsync(action, priority),
-                (action, priority) => UiThread.Dispatcher.Invoke(action, priority)
+                ProductionViewerFactory,
+                ProductionSynchronousScheduler,
+                ProductionPriorityScheduler,
+                ProductionBlockingPriorityScheduler
             );
+        }
+
+        private static ItemViewer CreateProductionViewer()
+        {
+            return new ItemViewer();
         }
 
         internal static ViewerQueueCore<ItemViewer> CreateProductionCore(

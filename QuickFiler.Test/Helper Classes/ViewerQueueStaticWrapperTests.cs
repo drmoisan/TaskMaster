@@ -15,7 +15,9 @@ namespace QuickFiler.Test.HelperClasses
         [TestCleanup]
         public void Cleanup()
         {
+            EfcViewerQueue.ResetProductionCoreDefaultsForTesting();
             EfcViewerQueue.ResetCoreForTesting();
+            ItemViewerQueue.ResetProductionCoreDefaultsForTesting();
             ItemViewerQueue.ResetCoreForTesting();
         }
 
@@ -229,6 +231,70 @@ namespace QuickFiler.Test.HelperClasses
             viewer.Should().NotBeNull();
             created.Should().Be(2);
             core.Count.Should().Be(1);
+            blockingPriorities.Should().Equal(DispatcherPriority.Render);
+            scheduledPriorities.Should().Equal(DispatcherPriority.ContextIdle);
+        }
+
+        [TestMethod]
+        public void EfcViewerQueue_ResetCoreForTesting_UsesResettableProductionDefaults()
+        {
+            var created = 0;
+            var scheduledPriorities = new List<DispatcherPriority>();
+            var blockingPriorities = new List<DispatcherPriority>();
+            EfcViewerQueue.ProductionViewerFactory = () =>
+            {
+                created++;
+                return CreateUninitialized<EfcViewer>();
+            };
+            EfcViewerQueue.ProductionPriorityScheduler = (action, priority) =>
+            {
+                scheduledPriorities.Add(priority);
+                action();
+            };
+            EfcViewerQueue.ProductionBlockingPriorityScheduler = (action, priority) =>
+            {
+                blockingPriorities.Add(priority);
+                action();
+            };
+
+            EfcViewerQueue.ResetCoreForTesting();
+            EfcViewer viewer = EfcViewerQueue.Dequeue();
+
+            viewer.Should().NotBeNull();
+            created.Should().Be(3);
+            blockingPriorities.Should().Equal(DispatcherPriority.Render);
+            scheduledPriorities
+                .Should()
+                .Equal(DispatcherPriority.Background, DispatcherPriority.Background);
+        }
+
+        [TestMethod]
+        public void ItemViewerQueue_ResetCoreForTesting_UsesResettableProductionDefaults()
+        {
+            var created = 0;
+            var scheduledPriorities = new List<DispatcherPriority>();
+            var blockingPriorities = new List<DispatcherPriority>();
+            ItemViewerQueue.ProductionViewerFactory = () =>
+            {
+                created++;
+                return CreateUninitialized<ItemViewer>();
+            };
+            ItemViewerQueue.ProductionPriorityScheduler = (action, priority) =>
+            {
+                scheduledPriorities.Add(priority);
+                action();
+            };
+            ItemViewerQueue.ProductionBlockingPriorityScheduler = (action, priority) =>
+            {
+                blockingPriorities.Add(priority);
+                action();
+            };
+
+            ItemViewerQueue.ResetCoreForTesting();
+            ItemViewer viewer = ItemViewerQueue.Dequeue(CancellationToken.None);
+
+            viewer.Should().NotBeNull();
+            created.Should().Be(2);
             blockingPriorities.Should().Equal(DispatcherPriority.Render);
             scheduledPriorities.Should().Equal(DispatcherPriority.ContextIdle);
         }

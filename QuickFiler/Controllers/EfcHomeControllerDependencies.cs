@@ -10,7 +10,7 @@ using UtilitiesCS;
 
 namespace QuickFiler
 {
-    internal sealed class EfcHomeControllerDependencies
+    internal sealed partial class EfcHomeControllerDependencies
     {
         internal delegate EfcFormController FormControllerWithDataFactoryDelegate(
             IApplicationGlobals globals,
@@ -64,8 +64,8 @@ namespace QuickFiler
         )
         {
             DataModelFactory = dataModelFactory ?? CreateDataModel;
-            AsyncDataModelFactory = asyncDataModelFactory ?? EfcDataModel.CreateAsync;
-            ViewerFactory = viewerFactory ?? EfcViewerQueue.Dequeue;
+            AsyncDataModelFactory = asyncDataModelFactory ?? ProductionAsyncDataModelFactory;
+            ViewerFactory = viewerFactory ?? ProductionViewerFactory;
             KeyboardHandlerFactory = keyboardHandlerFactory ?? CreateKeyboardHandler;
             ExplorerControllerFactory = explorerControllerFactory ?? CreateExplorerController;
             FormControllerWithDataFactory =
@@ -138,8 +138,7 @@ namespace QuickFiler
                 mail,
                 tokenSource,
                 token,
-                (factoryGlobals, factoryMail, factoryTokenSource, factoryToken) =>
-                    new EfcDataModel(factoryGlobals, factoryMail, factoryTokenSource, factoryToken)
+                ProductionDataModelFactory
             );
         }
 
@@ -181,8 +180,7 @@ namespace QuickFiler
             return CreateKeyboardHandlerWithFactory(
                 viewer,
                 homeController,
-                (factoryViewer, factoryHomeController) =>
-                    new KeyboardHandler(factoryViewer, factoryHomeController)
+                ProductionKeyboardHandlerFactory
             );
         }
 
@@ -218,12 +216,7 @@ namespace QuickFiler
                 initType,
                 globals,
                 homeController,
-                (factoryInitType, factoryGlobals, factoryHomeController) =>
-                    new QfcExplorerController(
-                        factoryInitType,
-                        factoryGlobals,
-                        factoryHomeController
-                    )
+                ProductionExplorerControllerFactory
             );
         }
 
@@ -273,24 +266,7 @@ namespace QuickFiler
                 cleanup,
                 initType,
                 token,
-                (
-                    factoryGlobals,
-                    factoryDataModel,
-                    factoryViewer,
-                    factoryHomeController,
-                    factoryCleanup,
-                    factoryInitType,
-                    factoryToken
-                ) =>
-                    new EfcFormController(
-                        factoryGlobals,
-                        factoryDataModel,
-                        factoryViewer,
-                        factoryHomeController,
-                        factoryCleanup,
-                        factoryInitType,
-                        factoryToken
-                    ).Initialize()
+                ProductionFormControllerWithDataFactory
             );
         }
 
@@ -349,22 +325,7 @@ namespace QuickFiler
                 cleanup,
                 initType,
                 token,
-                (
-                    factoryGlobals,
-                    factoryViewer,
-                    factoryHomeController,
-                    factoryCleanup,
-                    factoryInitType,
-                    factoryToken
-                ) =>
-                    new EfcFormController(
-                        factoryGlobals,
-                        factoryViewer,
-                        factoryHomeController,
-                        factoryCleanup,
-                        factoryInitType,
-                        factoryToken
-                    ).InitializeWithoutData()
+                ProductionFormControllerWithoutDataFactory
             );
         }
 
@@ -410,8 +371,7 @@ namespace QuickFiler
             return InitializeFormControllerDataFieldsWithFactory(
                 controller,
                 dataModel,
-                (factoryController, factoryDataModel) =>
-                    factoryController.InitializeDataFields(factoryDataModel)
+                ProductionInitializeDataFields
             );
         }
 

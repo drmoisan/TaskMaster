@@ -7,6 +7,23 @@ namespace QuickFiler
 {
     public static class EfcViewerQueue
     {
+        internal static Func<EfcViewer> ProductionViewerFactory { get; set; } =
+            CreateProductionViewer;
+
+        internal static Action<Action> ProductionSynchronousScheduler { get; set; } =
+            action => action();
+
+        internal static Action<
+            Action,
+            DispatcherPriority
+        > ProductionPriorityScheduler { get; set; } =
+            (action, priority) => _ = UiThread.Dispatcher.InvokeAsync(action, priority);
+
+        internal static Action<
+            Action,
+            DispatcherPriority
+        > ProductionBlockingPriorityScheduler { get; set; } = (action, priority) => action();
+
         private static ViewerQueueCore<EfcViewer> _core = CreateProductionCore();
 
         public static void BuildQueue(int count)
@@ -42,14 +59,28 @@ namespace QuickFiler
             _core = CreateProductionCore();
         }
 
+        internal static void ResetProductionCoreDefaultsForTesting()
+        {
+            ProductionViewerFactory = CreateProductionViewer;
+            ProductionSynchronousScheduler = action => action();
+            ProductionPriorityScheduler = (action, priority) =>
+                _ = UiThread.Dispatcher.InvokeAsync(action, priority);
+            ProductionBlockingPriorityScheduler = (action, priority) => action();
+        }
+
         private static ViewerQueueCore<EfcViewer> CreateProductionCore()
         {
             return CreateProductionCore(
-                () => new EfcViewer(),
-                action => action(),
-                (action, priority) => _ = UiThread.Dispatcher.InvokeAsync(action, priority),
-                (action, priority) => action()
+                ProductionViewerFactory,
+                ProductionSynchronousScheduler,
+                ProductionPriorityScheduler,
+                ProductionBlockingPriorityScheduler
             );
+        }
+
+        private static EfcViewer CreateProductionViewer()
+        {
+            return new EfcViewer();
         }
 
         internal static ViewerQueueCore<EfcViewer> CreateProductionCore(

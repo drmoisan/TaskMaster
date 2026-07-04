@@ -5,6 +5,7 @@ Task: P10-T7
 Command: Parse remediation-final-coverage-targets.2026-07-04T13-15.md and enforce repository, issue changed/new, per-file changed/new, and target coverage thresholds
 EXIT_CODE: 1
 ThresholdStatus: FAIL
+RemediationStatus: REMEDIATION_REQUIRED
 BaselineRepositoryLineCoverage: 44.60%
 RepositoryLineCoverage: 45.33%
 RepositoryLineCoverageThreshold: 80.00%
