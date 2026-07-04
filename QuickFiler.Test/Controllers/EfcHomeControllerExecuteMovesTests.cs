@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using QuickFiler.Helper_Classes;
 using UtilitiesCS;
 
 namespace QuickFiler.Controllers.Tests
@@ -97,6 +101,63 @@ namespace QuickFiler.Controllers.Tests
         }
 
         [TestMethod]
+        public async Task ExecuteMovesCoreAsync_UsesFormOptionsAndRoutesSuccessfulMetrics()
+        {
+            var controller = CreateController();
+            var globals = new Mock<IApplicationGlobals>(MockBehavior.Strict).Object;
+            var mail = new Mock<MailItem>(MockBehavior.Strict);
+            mail.SetupGet(item => item.EntryID).Returns("current");
+            var current = CreateMailItemHelper("current");
+            var other = CreateMailItemHelper("other");
+            var dataModel = CreateControllerDataModel(
+                mail.Object,
+                new List<MailItemHelper> { current, other }
+            );
+            var formController = CreateFormController(
+                selectedFolder: "Archive/Target",
+                saveAttachments: true,
+                saveEmail: false,
+                savePictures: true,
+                moveConversation: false
+            );
+            var capturedMove = default(MoveRequest);
+            var metricsCall = default(MetricsCall);
+            controller.MoveToFolderAsyncAction = (
+                selectedFolder,
+                saveAttachments,
+                saveEmail,
+                savePictures,
+                moveConversation
+            ) =>
+            {
+                capturedMove = new MoveRequest(
+                    selectedFolder,
+                    saveAttachments,
+                    saveEmail,
+                    savePictures,
+                    moveConversation
+                );
+                return Task.FromResult(true);
+            };
+            controller.MoveMetricsAction = (callGlobals, selectedFolder, callMovedItems) =>
+                metricsCall = new MetricsCall(callGlobals, selectedFolder, callMovedItems);
+            SetPrivateField(controller, "_globals", globals);
+            SetPrivateField(controller, "_dataModel", dataModel);
+            SetPrivateField(controller, "_formController", formController);
+
+            await controller.ExecuteMovesCoreAsync();
+
+            capturedMove.SelectedFolder.Should().Be("Archive/Target");
+            capturedMove.SaveAttachments.Should().BeTrue();
+            capturedMove.SaveEmail.Should().BeFalse();
+            capturedMove.SavePictures.Should().BeTrue();
+            capturedMove.MoveConversation.Should().BeFalse();
+            metricsCall.Globals.Should().BeSameAs(globals);
+            metricsCall.SelectedFolder.Should().Be("Archive/Target");
+            metricsCall.MovedItems.Should().ContainSingle().Which.Should().BeSameAs(current);
+        }
+
+        [TestMethod]
         public void HandleMoveResult_WhenMoveFails_RoutesMessageThroughInjectedAction()
         {
             var controller = CreateController();
@@ -139,6 +200,59 @@ namespace QuickFiler.Controllers.Tests
         {
             return (EfcHomeController)
                 FormatterServices.GetUninitializedObject(typeof(EfcHomeController));
+        }
+
+        private static EfcDataModel CreateControllerDataModel(
+            MailItem mail,
+            List<MailItemHelper> sameFolder
+        )
+        {
+            var dataModel = (EfcDataModel)
+                FormatterServices.GetUninitializedObject(typeof(EfcDataModel));
+            var resolver = new ConversationResolver(
+                new Mock<IApplicationGlobals>(MockBehavior.Strict).Object,
+                mail
+            )
+            {
+                ConversationInfo = new Pair<List<MailItemHelper>>(
+                    sameFolder: sameFolder,
+                    expanded: sameFolder
+                ),
+            };
+            dataModel.Mail = mail;
+            SetPrivateField(dataModel, "_conversationResolver", resolver);
+            return dataModel;
+        }
+
+        private static EfcFormController CreateFormController(
+            string selectedFolder,
+            bool saveAttachments,
+            bool saveEmail,
+            bool savePictures,
+            bool moveConversation
+        )
+        {
+            var viewer = (EfcViewer)FormatterServices.GetUninitializedObject(typeof(EfcViewer));
+            viewer.FolderListBox = new ListBox();
+            viewer.FolderListBox.Items.Add(selectedFolder);
+            viewer.FolderListBox.SelectedIndex = 0;
+            var formController = (EfcFormController)
+                FormatterServices.GetUninitializedObject(typeof(EfcFormController));
+            SetPrivateField(formController, "_formViewer", viewer);
+            formController.SaveAttachments = saveAttachments;
+            formController.SaveEmail = saveEmail;
+            formController.SavePictures = savePictures;
+            formController.MoveConversation = moveConversation;
+            return formController;
+        }
+
+        private static void SetPrivateField(object target, string name, object value)
+        {
+            var field = target
+                .GetType()
+                .GetField(name, BindingFlags.NonPublic | BindingFlags.Instance);
+            field.Should().NotBeNull($"field '{name}' must exist");
+            field.SetValue(target, value);
         }
 
         private static MailItemHelper CreateMailItemHelper(string entryId)

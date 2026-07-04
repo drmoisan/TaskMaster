@@ -226,6 +226,120 @@ namespace QuickFiler.Controllers.Tests
             result.Should().Equal(mail);
         }
 
+        [TestMethod]
+        public void ConstructorDefaults_InvokeProductionConstructionAdapters()
+        {
+            var values = CreateValues();
+            var withDataInitialized = false;
+            var withoutDataInitialized = false;
+            var dataFieldsInitialized = false;
+            EfcHomeControllerDependencies.ProductionDataModelConstructor = (
+                globals,
+                mail,
+                tokenSource,
+                token
+            ) => values.DataModel;
+            EfcHomeControllerDependencies.ProductionKeyboardHandlerConstructor = (
+                viewer,
+                homeController
+            ) => values.KeyboardHandler;
+            EfcHomeControllerDependencies.ProductionExplorerControllerConstructor = (
+                initType,
+                globals,
+                homeController
+            ) => values.ExplorerController;
+            EfcHomeControllerDependencies.ProductionFormControllerWithDataConstructor = (
+                globals,
+                dataModel,
+                viewer,
+                homeController,
+                cleanup,
+                initType,
+                token
+            ) => values.FormController;
+            EfcHomeControllerDependencies.ProductionFormControllerWithDataInitializer =
+                controller =>
+                {
+                    withDataInitialized = true;
+                    return controller;
+                };
+            EfcHomeControllerDependencies.ProductionFormControllerWithoutDataConstructor = (
+                globals,
+                viewer,
+                homeController,
+                cleanup,
+                initType,
+                token
+            ) => values.FormController;
+            EfcHomeControllerDependencies.ProductionFormControllerWithoutDataInitializer =
+                controller =>
+                {
+                    withoutDataInitialized = true;
+                    return controller;
+                };
+            EfcHomeControllerDependencies.ProductionDataFieldsInitializer = (
+                controller,
+                dataModel
+            ) =>
+            {
+                dataFieldsInitialized = true;
+                return controller;
+            };
+
+            var dependencies = new EfcHomeControllerDependencies();
+
+            using (var tokenSource = new CancellationTokenSource())
+            {
+                dependencies
+                    .DataModelFactory(values.Globals, values.Mail, tokenSource, tokenSource.Token)
+                    .Should()
+                    .BeSameAs(values.DataModel);
+                dependencies
+                    .KeyboardHandlerFactory(values.Viewer, values.HomeController)
+                    .Should()
+                    .BeSameAs(values.KeyboardHandler);
+                dependencies
+                    .ExplorerControllerFactory(
+                        QfEnums.InitTypeEnum.Sort,
+                        values.Globals,
+                        values.HomeController
+                    )
+                    .Should()
+                    .BeSameAs(values.ExplorerController);
+                dependencies
+                    .FormControllerWithDataFactory(
+                        values.Globals,
+                        values.DataModel,
+                        values.Viewer,
+                        values.HomeController,
+                        values.Cleanup,
+                        QfEnums.InitTypeEnum.Sort,
+                        tokenSource.Token
+                    )
+                    .Should()
+                    .BeSameAs(values.FormController);
+                dependencies
+                    .FormControllerWithoutDataFactory(
+                        values.Globals,
+                        values.Viewer,
+                        values.HomeController,
+                        values.Cleanup,
+                        QfEnums.InitTypeEnum.Find,
+                        tokenSource.Token
+                    )
+                    .Should()
+                    .BeSameAs(values.FormController);
+                dependencies
+                    .InitializeDataFields(values.FormController, values.DataModel)
+                    .Should()
+                    .BeSameAs(values.FormController);
+            }
+
+            withDataInitialized.Should().BeTrue();
+            withoutDataInitialized.Should().BeTrue();
+            dataFieldsInitialized.Should().BeTrue();
+        }
+
         private static DependencyValues CreateValues()
         {
             return new DependencyValues(
