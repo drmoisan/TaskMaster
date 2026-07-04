@@ -70,7 +70,7 @@ The five issue #236 targets contain logic that is not currently covered because 
 | AC5 | PASS | `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/regression-testing/tlp-cell-states-tests.2026-07-04T13-15.md`; `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/final-coverage-targets.2026-07-04T13-15.md` |
 | AC6 | PASS | `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/final-analyzer-build.2026-07-04T13-15.md`; `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/final-nullable-build.2026-07-04T13-15.md` |
 | AC7 | PASS | `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/final-no-coverage-exemptions.2026-07-04T13-15.md` |
-| AC8 | FAIL | `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/final-coverage-thresholds.2026-07-04T13-15.md` reports repository coverage 45.12% against the 80.00% threshold and changed/new-code coverage 71.19% against the 90.00% threshold. |
+| AC8 | FAIL | `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/remediation-cycle3-coverage-thresholds.2026-07-04T13-15.md` reports repository coverage 43.84% against the 80.00% threshold; issue #236 changed/new, per-file changed/new, and target coverage gates pass. |
 | AC9 | PASS | `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/final-evidence-location-audit.2026-07-04T13-15.md` |
 | AC10 | PASS | `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/final-toolchain-loop.2026-07-04T13-15.md` |
 

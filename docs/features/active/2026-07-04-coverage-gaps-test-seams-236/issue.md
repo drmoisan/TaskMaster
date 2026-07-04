@@ -37,42 +37,42 @@ small collaborators so minimal code remains untestable.
 
 ## Acceptance Criteria
 
-- [ ] AC1 - `EfcViewerQueue` queue creation, cached dequeue, empty dequeue,
+- [x] AC1 - `EfcViewerQueue` queue creation, cached dequeue, empty dequeue,
       replacement scheduling, cancellation boundaries, and disposal/reset
       behavior are covered by deterministic MSTest tests through a narrow
       factory/dispatcher seam without constructing a live `EfcViewer` in unit
       tests.
-- [ ] AC2 - `ItemViewerQueue` queue creation, synchronous and dispatched build
+- [x] AC2 - `ItemViewerQueue` queue creation, synchronous and dispatched build
       paths, cached dequeue, empty dequeue, chunk dequeue, cancellation
       boundaries, and disposal/reset behavior are covered by deterministic
       MSTest tests through a narrow factory/dispatcher seam without constructing
       a live `ItemViewer` in unit tests.
-- [ ] AC3 - `QfcThemeHelper` theme construction, theme key selection,
+- [x] AC3 - `QfcThemeHelper` theme construction, theme key selection,
       representative color/control-group mapping, `SetupFormThemes`, and direct
       `SetTheme` extension behavior are covered without requiring live
       QuickFiler form instances beyond test-controlled controls or adapters.
-- [ ] AC4 - `EfcHomeController` construction and initialization decision logic
+- [x] AC4 - `EfcHomeController` construction and initialization decision logic
       is covered through explicit seams for Outlook selection traversal, data
       model creation, viewer dequeue/construction, keyboard handler creation,
       explorer-controller creation, and form-controller creation.
-- [ ] AC5 - `TlpCellStates` constructors, raw-list conversion behavior,
+- [x] AC5 - `TlpCellStates` constructors, raw-list conversion behavior,
       duplicate-key behavior, `TryAddState` outcomes, empty input handling, and
       null-input behavior are covered directly. If production behavior changes,
       null inputs fail fast with a specific exception.
-- [ ] AC6 - Existing public/static production entry points remain
+- [x] AC6 - Existing public/static production entry points remain
       source-compatible for current callers, including queue APIs,
       `QfcThemeHelper` production overloads, `EfcHomeController` public
       constructor and factory methods, and `TlpCellStates` constructors.
-- [ ] AC7 - No coverage exemptions are added for `EfcViewerQueue`,
+- [x] AC7 - No coverage exemptions are added for `EfcViewerQueue`,
       `ItemViewerQueue`, `QfcThemeHelper`, `EfcHomeController`, or
       `TlpCellStates`, and no coverage configuration is weakened.
 - [ ] AC8 - Repository-wide line coverage remains at or above 80%, and changed
       or newly introduced non-exempt code for issue #236 meets the repository
       policy target of at least 90% coverage.
-- [ ] AC9 - All implementation evidence, including baselines, QA gates,
+- [x] AC9 - All implementation evidence, including baselines, QA gates,
       regression results, and coverage artifacts, is stored under
       `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/<kind>/`.
-- [ ] AC10 - The final C# toolchain passes in order: CSharpier, .NET analyzers,
+- [x] AC10 - The final C# toolchain passes in order: CSharpier, .NET analyzers,
       nullable analysis with warnings as errors, and MSTest with code coverage.
 
 ## Constraints & Risks
