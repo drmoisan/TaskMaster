@@ -75,6 +75,7 @@
     <Compile Include="Controllers\QfcHomeControllerIterationTests.cs" />
     <Compile Include="Controllers\QfcHomeControllerMetricsTests.cs" />
     <Compile Include="Controllers\QfcHomeControllerPropertyTests.cs" />
+    <Compile Include="Controllers\QfcHomeControllerRunAsyncHighConfidenceTests.cs" />
     <Compile Include="Controllers\QfcHomeControllerRunAsyncTests.cs" />
     <Compile Include="Controllers\QfcHomeControllerTests.cs" />
     <Compile Include="Controllers\QfcItemControllerTests.cs" />
