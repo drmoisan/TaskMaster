@@ -148,25 +148,25 @@ Execute P4-T1 through P4-T6 in order. If any command fails or modifies files, pe
 
 ### Phase 5 — Re-review Readiness
 
-- [ ] [P5-T1] Refresh PR context for issue #233
+- [x] [P5-T1] Refresh PR context for issue #233
   - Run `mcp__drm_copilot.collect_pr_context` with `base: main`.
   - Confirm `artifacts/pr_context.summary.txt` and `artifacts/pr_context.appendix.txt` reference issue #233 and the current head.
-- [ ] [P5-T2] Produce post-remediation policy audit
+- [x] [P5-T2] Produce post-remediation policy audit
   - Produce a new timestamped policy audit under `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/`.
   - The audit must reference issue #233 and the current remediation evidence.
-- [ ] [P5-T3] Validate post-remediation policy audit
+- [x] [P5-T3] Validate post-remediation policy audit
   - Run `mcp__drm_copilot.validate_orchestration_artifacts` with `artifact_type: "policy-audit"` and the P5-T2 policy-audit path.
   - Record the validation result in the policy-audit artifact or adjacent review evidence required by the repository workflow.
-- [ ] [P5-T4] Produce post-remediation code review
+- [x] [P5-T4] Produce post-remediation code review
   - Produce a new timestamped code review under `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/`.
   - The review must reference issue #233 and the current remediation evidence.
-- [ ] [P5-T5] Validate post-remediation code review
+- [x] [P5-T5] Validate post-remediation code review
   - Run `mcp__drm_copilot.validate_orchestration_artifacts` with `artifact_type: "code-review"` and the P5-T4 code-review path.
   - Record the validation result in the code-review artifact or adjacent review evidence required by the repository workflow.
-- [ ] [P5-T6] Produce post-remediation feature audit
+- [x] [P5-T6] Produce post-remediation feature audit
   - Produce a new timestamped feature audit under `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/`.
   - The audit must reference issue #233 and the current remediation evidence.
-- [ ] [P5-T7] Validate post-remediation feature audit
+- [x] [P5-T7] Validate post-remediation feature audit
   - Run `mcp__drm_copilot.validate_orchestration_artifacts` with `artifact_type: "feature-audit"` and the P5-T6 feature-audit path.
   - Record the validation result in the feature-audit artifact or adjacent review evidence required by the repository workflow.
 
