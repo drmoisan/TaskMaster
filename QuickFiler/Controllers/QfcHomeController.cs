@@ -247,10 +247,22 @@ namespace QuickFiler.Controllers
 
         public void Run()
         {
+            bool highConfidenceModeEnabled = Globals?.QfSettings?.HighConfidenceModeEnabled == true;
+            int itemsPerIteration = _formController.ItemsPerIteration;
+            int initializationBatchSize = highConfidenceModeEnabled ? 0 : itemsPerIteration;
+
             IList<MailItem> listEmail = _datamodel.InitEmailQueue(
-                _formController.ItemsPerIteration,
+                initializationBatchSize,
                 _formViewer.Worker
             );
+            if (highConfidenceModeEnabled)
+            {
+                listEmail = _datamodel
+                    .DequeueNextItemGroupAsync(itemsPerIteration, 1000)
+                    .GetAwaiter()
+                    .GetResult();
+            }
+
             _formController.LoadItems(listEmail);
             _stopWatch = new Stopwatch();
             _stopWatch.Start();
@@ -264,14 +276,23 @@ namespace QuickFiler.Controllers
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(QfcDatamodel.InitEmailQueueAsync)} ...");
             progress.Report(0, "Initializing Email Queue");
 
+            bool highConfidenceModeEnabled = Globals?.QfSettings?.HighConfidenceModeEnabled == true;
+            int itemsPerIteration = _formController.ItemsPerIteration;
+            int initializationBatchSize = highConfidenceModeEnabled ? 0 : itemsPerIteration;
+
             IList<MailItem> listEmail = await Task.Run(async () =>
                 await _datamodel.InitEmailQueueAsync(
-                    _formController.ItemsPerIteration,
+                    initializationBatchSize,
                     _formViewer.Worker,
                     Token,
                     TokenSource
                 )
             );
+
+            if (highConfidenceModeEnabled)
+            {
+                listEmail = await _datamodel.DequeueNextItemGroupAsync(itemsPerIteration, 1000);
+            }
 
             progress.Report(30, "Initializing Qfc Items");
 

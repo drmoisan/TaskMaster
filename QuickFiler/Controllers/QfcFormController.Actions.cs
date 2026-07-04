@@ -102,20 +102,14 @@ namespace QuickFiler.Controllers
             _formViewer.Refresh();
 
             await _groups.LoadSecondaryAsync();
-
-            // High-confidence filter (Issue #169): once secondary loading has fully completed and
-            // folder scores are populated, drop the groups whose top suggestion is below the
-            // configured threshold. Runs only when the mode is enabled, so default behavior is
-            // unchanged when disabled.
-            await ApplyHighConfidenceFilterAsync(_groups);
         }
 
         /// <summary>
-        /// High-confidence (Issue #171) carrier-list load path. Constructs UI item controllers only
+        /// Dormant high-confidence (Issue #171) carrier-list load path. Constructs UI item controllers only
         /// for the already-filtered survivors carried in <paramref name="preScored"/>, each with its
-        /// predetermined folder. This path does NOT invoke the post-UI removal pass
-        /// (<see cref="ApplyHighConfidenceFilterAsync"/>) because the below-threshold items were
-        /// removed before UI construction.
+        /// predetermined folder. This path does not invoke a post-UI removal pass because the
+        /// below-threshold items were removed before UI construction. Issue #233 enforces
+        /// confidence at dequeue time instead.
         /// </summary>
         public async Task LoadItemsAsync(IList<QfcPreScoredItem> preScored)
         {
@@ -165,17 +159,14 @@ namespace QuickFiler.Controllers
 
             await _groups.LoadSecondaryAsync();
 
-            // Intentionally NOT calling ApplyHighConfidenceFilterAsync here: in high-confidence mode
-            // the pre-filter already removed below-threshold items before UI construction, so there
-            // is no post-UI removal pass (Issue #171).
+            // The issue #171 carrier-list path remains dormant; issue #233 uses dequeue-time
+            // enforcement before items reach the UI.
         }
 
         /// <summary>
-        /// Removes below-threshold item groups when high-confidence mode is enabled. Seam extracted
-        /// from <see cref="LoadItemsAsync(IList{MailItem}, ProgressTracker)"/> so the conditional
-        /// can be unit-tested with a mocked <see cref="IQfcCollectionController"/> without running
-        /// the WinForms/COM-bound load path. Must be called only after secondary loading has fully
-        /// completed so folder scores are populated.
+        /// Dormant issue #171 post-display threshold helper. Issue #233 does not call this method
+        /// for live high-confidence enforcement; live filtering occurs in the datamodel dequeue
+        /// layer before items are surfaced.
         /// </summary>
         internal async Task ApplyHighConfidenceFilterAsync(IQfcCollectionController groups)
         {

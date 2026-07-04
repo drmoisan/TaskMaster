@@ -19,6 +19,7 @@ namespace QuickFiler.Helper_Classes.Tests
     /// work flows through the marshal delegate.
     /// </summary>
     [TestClass]
+    [DoNotParallelize]
     public class EmailMoveMonitorTests
     {
         // UiThread.Dispatcher is process-global, set-once static state. These tests never invoke
@@ -26,7 +27,8 @@ namespace QuickFiler.Helper_Classes.Tests
         // initialized. To guarantee order-independence even if a future change touches the static
         // path, the setup/teardown below snapshots the static dispatcher field via reflection
         // (avoiding a compile-time WindowsBase dependency on System.Windows.Threading.Dispatcher)
-        // and asserts it is unchanged after each test.
+        // and asserts it is unchanged after each test. The class is not parallelized because other
+        // QuickFiler tests intentionally replace UiThread.Dispatcher with dedicated WPF dispatchers.
         private object _capturedDispatcher;
         private static readonly System.Reflection.PropertyInfo DispatcherProperty =
             typeof(UiThread).GetProperty(

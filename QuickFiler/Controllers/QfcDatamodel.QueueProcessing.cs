@@ -56,64 +56,61 @@ namespace QuickFiler.Controllers
         {
             _token.ThrowIfCancellationRequested();
 
+            if (_globals?.QfSettings?.HighConfidenceModeEnabled == true)
+            {
+                return await DequeueWithHighConfidenceGateAsync(quantity, timeOut);
+            }
+
+            return await DequeueDirectAsync(quantity);
+        }
+
+        private async Task<IList<MailItem>> DequeueDirectAsync(int quantity)
+        {
             if (_masterQueue.Count < quantity)
                 await WaitForQueue(quantity, _token);
 
             var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
-            if (nodes is null)
-            {
-                return null;
-            }
+            return UnhookDequeuedNodes(nodes);
+        }
 
-            try
-            {
-                // The unhook path now self-marshals its Outlook COM access onto the STA thread
-                // (EmailMoveMonitor.UnhookItem), so the redundant Task.Run wrapper is removed.
-                var max = nodes.Count;
-                for (int i = 0; i < max; i++)
-                {
-                    TryUnhookOrReplace(ref nodes, i);
-                    //var node = nodes[i];
-                    //_token.ThrowIfCancellationRequested();
-                    //bool processing = true;
-                    //while (processing)
-                    //{
-                    //    try
-                    //    {
-                    //        await _moveMonitor.UnhookItemAsync(node, _token);
-                    //        processing = false;
-                    //    }
-                    //    catch (System.Exception e)
-                    //    {
-                    //        logger.Error($"Error unhooking item from move monitor. Getting next item from Queue {e.Message}");
-                    //        nodes.Remove(node);
-                    //        node = _masterQueue.TryTakeFirst();
-                    //        if (node is null)
-                    //        {
-                    //            processing = false;
-                    //        }
-                    //        else
-                    //        {
-                    //            nodes.Insert(i, node);
-                    //        }
-                    //    }
-                    //}
-                }
-            }
-            catch (System.Exception e)
-            {
-                logger.Error("Error unhooking items from move monitor", e);
-                throw;
-            }
+        private async Task<IList<MailItem>> DequeueWithHighConfidenceGateAsync(
+            int quantity,
+            int timeOut
+        )
+        {
+            var gate = new QfcStreamingDequeueConfidenceGate(
+                () => _masterQueue.TryTakeFirst(),
+                ScoreRemainingQueueMailItemAsync,
+                _globals.QfSettings.HighConfidenceThreshold,
+                TimeProvider,
+                null,
+                () => _worker?.IsBusy == true
+            );
 
-            return nodes;
+            var nodes = (await gate.DequeueAsync(quantity, timeOut, _token)).ToList();
+            return UnhookDequeuedNodes(nodes);
         }
 
         public IList<MailItem> DequeueNextItemGroup(int quantity)
         {
             _token.ThrowIfCancellationRequested();
 
+            if (_globals?.QfSettings?.HighConfidenceModeEnabled == true)
+            {
+                return DequeueWithHighConfidenceGateAsync(quantity, 0).GetAwaiter().GetResult();
+            }
+
             var nodes = _masterQueue.TryTakeFirst(quantity)?.ToList();
+            return UnhookDequeuedNodes(nodes);
+        }
+
+        private IList<MailItem> UnhookDequeuedNodes(List<MailItem> nodes)
+        {
+            if (nodes is null)
+            {
+                return null;
+            }
+
             try
             {
                 var max = nodes.Count;

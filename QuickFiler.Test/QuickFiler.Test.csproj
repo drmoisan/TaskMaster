@@ -70,10 +70,12 @@
     <Compile Include="Controllers\QfcFormControllerSeamTests.cs" />
     <Compile Include="Controllers\QfcFormKeyHandlerTests.cs" />
     <Compile Include="Controllers\QfcHighConfidencePreFilterTests.cs" />
+    <Compile Include="Controllers\QfcStreamingDequeueConfidenceGateTests.cs" />
     <Compile Include="Controllers\QfcHomeControllerIssue218Tests.cs" />
     <Compile Include="Controllers\QfcHomeControllerIterationTests.cs" />
     <Compile Include="Controllers\QfcHomeControllerMetricsTests.cs" />
     <Compile Include="Controllers\QfcHomeControllerPropertyTests.cs" />
+    <Compile Include="Controllers\QfcHomeControllerRunAsyncHighConfidenceTests.cs" />
     <Compile Include="Controllers\QfcHomeControllerRunAsyncTests.cs" />
     <Compile Include="Controllers\QfcHomeControllerTests.cs" />
     <Compile Include="Controllers\QfcItemControllerTests.cs" />

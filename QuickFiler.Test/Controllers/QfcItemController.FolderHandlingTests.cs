@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -113,6 +114,36 @@ namespace QuickFiler.Controllers.Tests
             typeof(QfcItemController)
                 .GetField(field, BindingFlags.NonPublic | BindingFlags.Instance)
                 .SetValue(controller, value);
+
+        private static string ReadControllerSource(string fileName)
+        {
+            string path = Path.GetFullPath(
+                Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    @"..\..\..\QuickFiler\Controllers",
+                    fileName
+                )
+            );
+            return File.ReadAllText(path);
+        }
+
+        [TestMethod]
+        public void LoadFolderHandler_ProbabilityDebugLog_IncludesCallerSubjectEntryIdAndTopScore()
+        {
+            string source = ReadControllerSource("QfcItemController.FolderHandling.cs");
+
+            source
+                .Should()
+                .Contain("Probability debug [QfcItemController.LoadFolderHandler (FromField)]");
+            source
+                .Should()
+                .Contain(
+                    "Probability debug [QfcItemController.LoadFolderHandlerAsync (FromArrayOrString)]"
+                );
+            source.Should().Contain("Subject='{ItemHelper?.Subject}'");
+            source.Should().Contain("EntryID='{ItemHelper?.EntryId}'");
+            source.Should().Contain("TopScore={_folderHandler?.Suggestions?.TopScore() ?? 0}");
+        }
 
         // ------------------------- LoadFolderHandler (P10-T11: FolderPredictor factory seam) -------------------------
 

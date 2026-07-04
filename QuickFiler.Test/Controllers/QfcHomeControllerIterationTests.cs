@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -63,6 +64,14 @@ namespace QuickFiler.Controllers.Tests
             mockGlobals.SetupGet(x => x.IntelRes).Returns(intel.Object);
 
             return intel;
+        }
+
+        private void SetupQfSettings(bool highConfidenceEnabled, double threshold)
+        {
+            var qfSettings = this._mockRepository.Create<IAppQuickFilerSettings>();
+            qfSettings.SetupGet(x => x.HighConfidenceModeEnabled).Returns(highConfidenceEnabled);
+            qfSettings.SetupGet(x => x.HighConfidenceThreshold).Returns(threshold);
+            this._mockApplicationGlobals.SetupGet(x => x.QfSettings).Returns(qfSettings.Object);
         }
 
         [TestMethod]
@@ -247,6 +256,60 @@ namespace QuickFiler.Controllers.Tests
         }
 
         [TestMethod]
+        public async Task IterateQueueAsync_WhenDequeueReturnsFullQualifiedPage_EnqueuesAllItems()
+        {
+            var mockDataModel = new Mock<IQfcDatamodel>();
+            mockDataModel.Setup(m => m.Complete).Returns(false);
+            var mailItems = Enumerable
+                .Range(0, 8)
+                .Select(_ => new Mock<MailItem>().Object)
+                .ToList();
+            mockDataModel
+                .Setup(m => m.DequeueNextItemGroupAsync(8, 2000))
+                .Returns(Task.FromResult((IList<MailItem>)mailItems));
+            _controller.DataModel = mockDataModel.Object;
+
+            var mockQfcQueue = new Mock<IQfcQueue>();
+            mockQfcQueue
+                .Setup(m =>
+                    m.EnqueueAsync(
+                        It.Is<IList<MailItem>>(items => items.SequenceEqual(mailItems)),
+                        It.IsAny<IQfcCollectionController>()
+                    )
+                )
+                .Returns(Task.CompletedTask);
+            _controller.QfcQueue = mockQfcQueue.Object;
+
+            var mockFormController = new Mock<IQfcFormController>();
+            mockFormController.Setup(m => m.ItemsPerIteration).Returns(8);
+            var mockQfcCollectionController = new Mock<IQfcCollectionController>();
+            mockFormController.Setup(m => m.Groups).Returns(mockQfcCollectionController.Object);
+            _controller
+                .GetType()
+                .GetField(
+                    "_formController",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .SetValue(_controller, mockFormController.Object);
+
+            await _controller.IterateQueueAsync();
+
+            mockQfcQueue.Verify(
+                m =>
+                    m.EnqueueAsync(
+                        It.Is<IList<MailItem>>(items => items.SequenceEqual(mailItems)),
+                        mockQfcCollectionController.Object
+                    ),
+                Times.Once
+            );
+            mockQfcQueue.Verify(
+                m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()),
+                Times.Never
+            );
+        }
+
+        [TestMethod]
         public void Iterate_ExecutesCorrectly()
         {
             // Arrange
@@ -261,6 +324,7 @@ namespace QuickFiler.Controllers.Tests
             };
             mockDataModel.Setup(m => m.DequeueNextItemGroup(It.IsAny<int>())).Returns(mailItems);
             _controller.DataModel = mockDataModel.Object;
+            SetupQfSettings(highConfidenceEnabled: false, threshold: 0.90);
 
             var mockFormController = new Mock<IQfcFormController>();
             _controller
@@ -286,6 +350,54 @@ namespace QuickFiler.Controllers.Tests
                         )
                     ),
                 Times.Once
+            );
+        }
+
+        [TestMethod]
+        public void Iterate_HighConfidenceEnabled_DoesNotLoadDirectSynchronousBatch()
+        {
+            // Arrange
+            var itemsPerIteration = 8;
+            var directBatch = new List<MailItem>
+            {
+                new Mock<MailItem>().Object,
+                new Mock<MailItem>().Object,
+            };
+
+            SetupQfSettings(highConfidenceEnabled: true, threshold: 0.90);
+
+            var mockDataModel = new Mock<IQfcDatamodel>();
+            mockDataModel.Setup(m => m.DequeueNextItemGroup(It.IsAny<int>())).Returns(directBatch);
+            mockDataModel
+                .Setup(m => m.DequeueNextItemGroupAsync(itemsPerIteration, It.IsAny<int>()))
+                .ReturnsAsync(new List<MailItem>());
+            _controller.DataModel = mockDataModel.Object;
+
+            var mockFormController = new Mock<IQfcFormController>();
+            mockFormController.SetupGet(m => m.ItemsPerIteration).Returns(itemsPerIteration);
+            mockFormController.Setup(m => m.LoadItems(It.IsAny<IList<MailItem>>()));
+            _controller
+                .GetType()
+                .GetField(
+                    "_formController",
+                    System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance
+                )
+                .SetValue(_controller, mockFormController.Object);
+
+            // Act
+            _controller.Iterate();
+
+            // Assert
+            mockDataModel.Verify(
+                m => m.DequeueNextItemGroup(itemsPerIteration),
+                Times.Never,
+                "high-confidence synchronous iteration must not use the direct dequeue bypass"
+            );
+            mockFormController.Verify(
+                m => m.LoadItems(directBatch),
+                Times.Never,
+                "high-confidence synchronous iteration must not load an ungated direct batch"
             );
         }
 

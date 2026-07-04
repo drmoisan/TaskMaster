@@ -46,50 +46,21 @@ namespace QuickFiler.Controllers.Tests
         }
 
         [TestMethod]
-        public async Task TryQueueRemainingMailItemAsync_HighConfidenceEnabled_ScoresBeforeQueueAdmission()
+        public async Task TryQueueRemainingMailItemAsync_HighConfidenceEnabled_AddsAndHooksWithoutScoring()
         {
             // Arrange
             var added = new List<MailItem>();
             var hooked = new List<MailItem>();
             var mailItem = new Mock<MailItem>().Object;
-            var scoreCallCount = 0;
             var admission = CreateQueueAdmission(
                 highConfidenceEnabled: true,
                 threshold: 0.90,
                 added,
                 hooked,
                 (mail, _) =>
-                {
-                    scoreCallCount++;
-                    added.Should().BeEmpty("admission must wait until scoring completes");
-                    mail.Should().BeSameAs(mailItem);
-                    return Task.FromResult(950L);
-                }
-            );
-
-            // Act
-            var queued = await admission.TryQueueAsync(mailItem, CancellationToken.None);
-
-            // Assert
-            queued.Should().BeTrue();
-            scoreCallCount.Should().Be(1);
-            added.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
-            hooked.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
-        }
-
-        [TestMethod]
-        public async Task TryQueueRemainingMailItemAsync_ScoreEqualsThreshold_AddsAndHooksMailItem()
-        {
-            // Arrange
-            var added = new List<MailItem>();
-            var hooked = new List<MailItem>();
-            var mailItem = new Mock<MailItem>().Object;
-            var admission = CreateQueueAdmission(
-                highConfidenceEnabled: true,
-                threshold: 0.90,
-                added,
-                hooked,
-                (mail, token) => Task.FromResult(900L)
+                    throw new AssertFailedException(
+                        "Remaining-mail admission must not score before queue insertion."
+                    )
             );
 
             // Act
@@ -102,7 +73,7 @@ namespace QuickFiler.Controllers.Tests
         }
 
         [TestMethod]
-        public async Task TryQueueRemainingMailItemAsync_ScoreBelowThreshold_DoesNotAddOrHookMailItem()
+        public async Task TryQueueRemainingMailItemAsync_HighConfidenceEnabled_IgnoresThresholdAtAdmission()
         {
             // Arrange
             var added = new List<MailItem>();
@@ -113,16 +84,82 @@ namespace QuickFiler.Controllers.Tests
                 threshold: 0.90,
                 added,
                 hooked,
-                (mail, token) => Task.FromResult(899L)
+                (mail, token) =>
+                    throw new AssertFailedException(
+                        "Threshold scoring belongs to dequeue-time enforcement."
+                    )
             );
 
             // Act
             var queued = await admission.TryQueueAsync(mailItem, CancellationToken.None);
 
             // Assert
-            queued.Should().BeFalse();
-            added.Should().BeEmpty();
-            hooked.Should().BeEmpty();
+            queued.Should().BeTrue();
+            added.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
+            hooked.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
+        }
+
+        [TestMethod]
+        public async Task DequeueNextItemGroupAsync_HighConfidenceMode_WaitsWhileSourceWorkerActive()
+        {
+            var model = CreateUninitializedDatamodel();
+            var fake = new FakeTimeProvider();
+            model.TimeProvider = fake;
+
+            var settings = new Mock<IAppQuickFilerSettings>(MockBehavior.Strict);
+            settings.SetupGet(x => x.HighConfidenceModeEnabled).Returns(true);
+            settings.SetupGet(x => x.HighConfidenceThreshold).Returns(0.90);
+            var globals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
+            globals.SetupGet(x => x.QfSettings).Returns(settings.Object);
+
+            var worker = new BackgroundWorker();
+            SetPrivateField(worker, "isRunning", true);
+            SetPrivateField(model, "_globals", globals.Object);
+            SetPrivateField(model, "_worker", worker);
+            SetPrivateField(model, "_masterQueue", new LockingLinkedList<MailItem>());
+
+            Task<IList<MailItem>> pending = model.DequeueNextItemGroupAsync(1, 200);
+
+            fake.Advance(TimeSpan.FromMilliseconds(200));
+            await Task.Yield();
+            pending
+                .IsCompleted.Should()
+                .BeFalse(
+                    "the datamodel source-active signal must keep polling while the worker can still add candidates"
+                );
+
+            SetPrivateField(worker, "isRunning", false);
+            fake.Advance(TimeSpan.FromMilliseconds(200));
+            IList<MailItem> result = await pending;
+
+            result.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public async Task TryQueueRemainingMailItemAsync_HighConfidenceEnabled_AddsBelowThresholdCandidate()
+        {
+            // Arrange
+            var added = new List<MailItem>();
+            var hooked = new List<MailItem>();
+            var mailItem = new Mock<MailItem>().Object;
+            var admission = CreateQueueAdmission(
+                highConfidenceEnabled: true,
+                threshold: 0.90,
+                added,
+                hooked,
+                (mail, token) =>
+                    throw new AssertFailedException(
+                        "Below-threshold candidates must reach the queue for dequeue-time filtering."
+                    )
+            );
+
+            // Act
+            var queued = await admission.TryQueueAsync(mailItem, CancellationToken.None);
+
+            // Assert
+            queued.Should().BeTrue();
+            added.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
+            hooked.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
         }
 
         [TestMethod]

@@ -57,9 +57,13 @@ namespace QuickFiler.Controllers
             _stopWatch = new Stopwatch();
             _stopWatch.Start();
 
-            IList<MailItem> listObjects = _datamodel.DequeueNextItemGroup(
-                _formController.ItemsPerIteration
-            );
+            bool highConfidenceModeEnabled = Globals?.QfSettings?.HighConfidenceModeEnabled == true;
+            IList<MailItem> listObjects = highConfidenceModeEnabled
+                ? _datamodel
+                    .DequeueNextItemGroupAsync(_formController.ItemsPerIteration, 2000)
+                    .GetAwaiter()
+                    .GetResult()
+                : _datamodel.DequeueNextItemGroup(_formController.ItemsPerIteration);
             _formController.LoadItems(listObjects);
         }
 

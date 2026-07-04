@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,30 @@ namespace QuickFiler.Controllers.Tests
         public void Setup()
         {
             _globals = new Mock<IApplicationGlobals>(MockBehavior.Loose);
+        }
+
+        private static string ReadControllerSource(string fileName)
+        {
+            string path = Path.GetFullPath(
+                Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    @"..\..\..\QuickFiler\Controllers",
+                    fileName
+                )
+            );
+            return File.ReadAllText(path);
+        }
+
+        [TestMethod]
+        public void FilterAsync_ProbabilityDebugLog_IncludesCallerSubjectEntryIdScoreAndTopFolder()
+        {
+            string source = ReadControllerSource("QfcHighConfidencePreFilter.cs");
+
+            source.Should().Contain("Probability debug [QfcHighConfidencePreFilter.FilterAsync]");
+            source.Should().Contain("Subject='{item.Subject}'");
+            source.Should().Contain("EntryID='{item.EntryID}'");
+            source.Should().Contain("Score={score}");
+            source.Should().Contain("TopFolder='{topFolder}'");
         }
 
         /// <summary>
