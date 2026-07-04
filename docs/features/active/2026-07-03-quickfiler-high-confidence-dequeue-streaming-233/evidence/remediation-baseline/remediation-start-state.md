@@ -31,5 +31,5 @@ EXIT_CODE: 1
 Output:
 ```text
 docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/evidence/qa-gates/coverage-conversion-remediation-final.md:10: trailing whitespace.
-+  
++
 ```
