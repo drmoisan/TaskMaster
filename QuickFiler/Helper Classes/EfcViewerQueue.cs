@@ -1,58 +1,70 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
+using System.Threading;
+using System.Windows.Threading;
 using UtilitiesCS;
-using UtilitiesCS.Threading;
 
 namespace QuickFiler
 {
     public static class EfcViewerQueue
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
-        );
-        private static Queue<EfcViewer> _queue = new Queue<EfcViewer>();
+        private static ViewerQueueCore<EfcViewer> _core = CreateProductionCore();
 
         public static void BuildQueue(int count)
         {
-            for (int i = 0; i < count; i++)
-            {
-                _ = UiThread.Dispatcher.InvokeAsync(
-                    () =>
-                    {
-                        _queue.Enqueue(new EfcViewer());
-                        //logger.Debug($"Enqueued {_queue.Count}");
-                    },
-                    System.Windows.Threading.DispatcherPriority.Background
-                );
-
-                //IdleActionQueue.AddEntry(()=>
-                //{
-                //    _queue.Enqueue(new EfcViewer());
-                //    //logger.Debug($"Enqueued {_queue.Count}");
-                //});
-            }
+            _core.BuildQueue(count, DispatcherPriority.Background);
         }
 
         public static EfcViewer Dequeue()
         {
-            EfcViewer viewer = null;
-            if (_queue.Count > 0)
-            {
-                viewer = _queue.Dequeue();
-                //logger.Debug($"Dequeued 1, {_queue.Count} remaining");
-                BuildQueue(1);
-            }
-            else
-            {
-                viewer = new EfcViewer();
-                BuildQueue(2);
-                //_ = BuildQueueAsync(2);
-            }
-            return viewer;
+            return _core.Dequeue(
+                CancellationToken.None,
+                DispatcherPriority.Render,
+                1,
+                2,
+                DispatcherPriority.Background
+            );
+        }
+
+        /// <summary>
+        /// Replaces the production queue core for deterministic unit tests.
+        /// </summary>
+        internal static void SetCoreForTesting(ViewerQueueCore<EfcViewer> core)
+        {
+            _core = core ?? throw new System.ArgumentNullException(nameof(core));
+        }
+
+        /// <summary>
+        /// Restores the production queue core after deterministic unit tests.
+        /// </summary>
+        internal static void ResetCoreForTesting()
+        {
+            _core.Reset();
+            _core = CreateProductionCore();
+        }
+
+        private static ViewerQueueCore<EfcViewer> CreateProductionCore()
+        {
+            return CreateProductionCore(
+                () => new EfcViewer(),
+                action => action(),
+                (action, priority) => _ = UiThread.Dispatcher.InvokeAsync(action, priority),
+                (action, priority) => action()
+            );
+        }
+
+        internal static ViewerQueueCore<EfcViewer> CreateProductionCore(
+            Func<EfcViewer> viewerFactory,
+            Action<Action> synchronousScheduler,
+            Action<Action, DispatcherPriority> priorityScheduler,
+            Action<Action, DispatcherPriority> blockingPriorityScheduler
+        )
+        {
+            return new ViewerQueueCore<EfcViewer>(
+                viewerFactory,
+                synchronousScheduler,
+                priorityScheduler,
+                blockingPriorityScheduler
+            );
         }
     }
 }

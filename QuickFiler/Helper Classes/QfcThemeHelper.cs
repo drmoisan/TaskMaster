@@ -1,11 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Web.WebView2.Core;
 using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
 using UtilitiesCS;
@@ -28,7 +25,6 @@ namespace QuickFiler
         public static void SetTheme(this Button btn, Color backColor)
         {
             btn.BackColor = backColor;
-            //btn.ForeColor = forecolor;
         }
 
         public static void SetTheme(this Control control, Color backColor, Color forecolor)
@@ -44,230 +40,192 @@ namespace QuickFiler
             UtilitiesCS.Threading.IUiDispatcher uiDispatcher
         )
         {
-            var themes = new Dictionary<string, Theme>
+            if (controller is null)
+            {
+                throw new ArgumentNullException(nameof(controller));
+            }
+            if (viewer is null)
+            {
+                throw new ArgumentNullException(nameof(viewer));
+            }
+
+            return SetupThemes(
+                BuildProductionControlSet(controller, viewer, htmlConverter, uiDispatcher)
+            );
+        }
+
+        internal static QfcThemeControlSet BuildProductionControlSet(
+            IQfcItemController controller,
+            ItemViewer viewer,
+            Action<Enums.ToggleState> htmlConverter,
+            UtilitiesCS.Threading.IUiDispatcher uiDispatcher
+        )
+        {
+            if (controller is null)
+            {
+                throw new ArgumentNullException(nameof(controller));
+            }
+            if (viewer is null)
+            {
+                throw new ArgumentNullException(nameof(viewer));
+            }
+
+            return new QfcThemeControlSet(
+                viewer.LblItemNumber,
+                viewer.LblSender,
+                viewer.LblSubject,
+                controller.TableLayoutPanels,
+                controller.Buttons,
+                viewer.MenuItems,
+                viewer.MoveOptionsStrip,
+                controller.ListTipsDetails,
+                controller.ListTipsExpanded,
+                viewer.TxtboxSearch,
+                viewer.TxtboxBody,
+                viewer.CboFolders,
+                viewer.TopicThread,
+                viewer.L0v2h2_WebView2,
+                viewer,
+                () => !controller.Mail.UnRead,
+                htmlConverter,
+                uiDispatcher
+            );
+        }
+
+        internal static Dictionary<string, Theme> SetupThemes(QfcThemeControlSet controlSet)
+        {
+            if (controlSet is null)
+            {
+                throw new ArgumentNullException(nameof(controlSet));
+            }
+
+            return new Dictionary<string, Theme>
             {
                 {
                     "LightNormal",
-                    new Theme(
-                        name: "LightNormal",
-                        lblItemNumber: viewer.LblItemNumber,
-                        lblSender: viewer.LblSender,
-                        lblSubject: viewer.LblSubject,
-                        tableLayoutPanels: controller.TableLayoutPanels,
-                        buttons: controller.Buttons,
-                        menuItems: viewer.MenuItems,
-                        menuStrip: viewer.MoveOptionsStrip,
-                        tipsDetailsLabels: controller.ListTipsDetails,
-                        tipsExpanded: controller.ListTipsExpanded,
-                        textboxSearch: viewer.TxtboxSearch,
-                        textboxBody: viewer.TxtboxBody,
-                        comboFolders: viewer.CboFolders,
-                        topicThread: viewer.TopicThread,
-                        webView2: viewer.L0v2h2_WebView2,
-                        viewer: (Control)viewer,
-                        mailRead: new Func<bool>(() => !controller.Mail.UnRead),
-                        web2ViewScheme: Microsoft
-                            .Web
-                            .WebView2
-                            .Core
-                            .CoreWebView2PreferredColorScheme
-                            .Light,
-                        htmlConverter: htmlConverter,
-                        htmlDark: Enums.ToggleState.Off,
-                        navBackgColor: SystemColors.HotTrack,
-                        navForeColor: SystemColors.Control,
-                        tlpBackColor: SystemColors.Control,
-                        tipsForeColor: Color.Black,
-                        tipsBackColor: Color.White,
-                        mailReadBackColor: SystemColors.Control,
-                        mailReadForeColor: SystemColors.ControlText,
-                        mailUnreadBackColor: SystemColors.Control,
-                        mailUnreadForeColor: Color.MediumBlue,
-                        tipsDetailsBackColor: Color.Black,
-                        tipsDetailsForeColor: Color.White,
-                        buttonBackColor: SystemColors.Control,
-                        buttonMouseOverColor: SystemColors.ControlDark,
-                        buttonClickedColor: Color.LightSkyBlue,
-                        txtboxSearchBackColor: SystemColors.Window,
-                        txtboxSearchForeColor: SystemColors.WindowText,
-                        txtboxBodyBackColor: SystemColors.Control,
-                        txtboxBodyForeColor: SystemColors.ControlText,
-                        cboFoldersBackColor: SystemColors.Window,
-                        cboFoldersForeColor: SystemColors.WindowText,
-                        defaultBackColor: SystemColors.Control,
-                        defaultForeColor: SystemColors.ControlText,
-                        uiDispatcher: uiDispatcher
+                    CreateTheme(
+                        controlSet,
+                        "LightNormal",
+                        CoreWebView2PreferredColorScheme.Light,
+                        Enums.ToggleState.Off,
+                        SystemColors.HotTrack,
+                        SystemColors.Control,
+                        SystemColors.Control,
+                        Color.Black,
+                        Color.White,
+                        SystemColors.Control,
+                        SystemColors.ControlText,
+                        SystemColors.Control,
+                        Color.MediumBlue,
+                        Color.Black,
+                        Color.White,
+                        SystemColors.Control,
+                        SystemColors.ControlDark,
+                        Color.LightSkyBlue,
+                        SystemColors.Window,
+                        SystemColors.WindowText,
+                        SystemColors.Control,
+                        SystemColors.ControlText,
+                        SystemColors.Window,
+                        SystemColors.WindowText,
+                        SystemColors.Control,
+                        SystemColors.ControlText
                     )
                 },
                 {
                     "LightActive",
-                    new Theme(
-                        name: "LightActive",
-                        lblItemNumber: viewer.LblItemNumber,
-                        lblSender: viewer.LblSender,
-                        lblSubject: viewer.LblSubject,
-                        tableLayoutPanels: controller.TableLayoutPanels,
-                        buttons: controller.Buttons,
-                        menuItems: viewer.MenuItems,
-                        menuStrip: viewer.MoveOptionsStrip,
-                        tipsDetailsLabels: controller.ListTipsDetails,
-                        tipsExpanded: controller.ListTipsExpanded,
-                        textboxSearch: viewer.TxtboxSearch,
-                        textboxBody: viewer.TxtboxBody,
-                        comboFolders: viewer.CboFolders,
-                        topicThread: viewer.TopicThread,
-                        webView2: viewer.L0v2h2_WebView2,
-                        viewer: (Control)viewer,
-                        mailRead: new Func<bool>(() => !controller.Mail.UnRead),
-                        web2ViewScheme: Microsoft
-                            .Web
-                            .WebView2
-                            .Core
-                            .CoreWebView2PreferredColorScheme
-                            .Light,
-                        htmlConverter: htmlConverter,
-                        htmlDark: Enums.ToggleState.Off,
-                        navBackgColor: Color.Green,
-                        navForeColor: SystemColors.Control,
-                        tlpBackColor: Color.LightCyan,
-                        tipsForeColor: Color.Black,
-                        tipsBackColor: Color.White,
-                        mailReadBackColor: Color.LightCyan,
-                        mailReadForeColor: SystemColors.ControlText,
-                        mailUnreadBackColor: Color.LightCyan,
-                        mailUnreadForeColor: Color.MediumBlue,
-                        tipsDetailsBackColor: Color.Black,
-                        tipsDetailsForeColor: Color.White,
-                        buttonBackColor: Color.LightCyan,
-                        buttonMouseOverColor: Color.DarkCyan,
-                        buttonClickedColor: Color.LightSkyBlue,
-                        txtboxSearchBackColor: SystemColors.Window,
-                        txtboxSearchForeColor: SystemColors.WindowText,
-                        txtboxBodyBackColor: Color.LightCyan,
-                        txtboxBodyForeColor: SystemColors.ControlText,
-                        cboFoldersBackColor: SystemColors.Window,
-                        cboFoldersForeColor: SystemColors.WindowText,
-                        defaultBackColor: Color.LightCyan,
-                        defaultForeColor: SystemColors.ControlText,
-                        uiDispatcher: uiDispatcher
+                    CreateTheme(
+                        controlSet,
+                        "LightActive",
+                        CoreWebView2PreferredColorScheme.Light,
+                        Enums.ToggleState.Off,
+                        Color.Green,
+                        SystemColors.Control,
+                        Color.LightCyan,
+                        Color.Black,
+                        Color.White,
+                        Color.LightCyan,
+                        SystemColors.ControlText,
+                        Color.LightCyan,
+                        Color.MediumBlue,
+                        Color.Black,
+                        Color.White,
+                        Color.LightCyan,
+                        Color.DarkCyan,
+                        Color.LightSkyBlue,
+                        SystemColors.Window,
+                        SystemColors.WindowText,
+                        Color.LightCyan,
+                        SystemColors.ControlText,
+                        SystemColors.Window,
+                        SystemColors.WindowText,
+                        Color.LightCyan,
+                        SystemColors.ControlText
                     )
                 },
                 {
                     "DarkNormal",
-                    new Theme(
-                        name: "DarkNormal",
-                        lblItemNumber: viewer.LblItemNumber,
-                        lblSender: viewer.LblSender,
-                        lblSubject: viewer.LblSubject,
-                        tableLayoutPanels: controller.TableLayoutPanels,
-                        buttons: controller.Buttons,
-                        menuItems: viewer.MenuItems,
-                        menuStrip: viewer.MoveOptionsStrip,
-                        tipsDetailsLabels: controller.ListTipsDetails,
-                        tipsExpanded: controller.ListTipsExpanded,
-                        textboxSearch: viewer.TxtboxSearch,
-                        textboxBody: viewer.TxtboxBody,
-                        comboFolders: viewer.CboFolders,
-                        topicThread: viewer.TopicThread,
-                        webView2: viewer.L0v2h2_WebView2,
-                        viewer: (Control)viewer,
-                        mailRead: new Func<bool>(() => !controller.Mail.UnRead),
-                        web2ViewScheme: Microsoft
-                            .Web
-                            .WebView2
-                            .Core
-                            .CoreWebView2PreferredColorScheme
-                            .Dark,
-                        htmlConverter: htmlConverter,
-                        htmlDark: Enums.ToggleState.On,
-                        navBackgColor: Color.FromArgb(64, 64, 64),
-                        navForeColor: SystemColors.Control,
-                        tlpBackColor: Color.Black,
-                        tipsForeColor: Color.LightSkyBlue,
-                        tipsBackColor: SystemColors.ActiveCaptionText,
-                        mailReadForeColor: Color.WhiteSmoke,
-                        mailReadBackColor: Color.Black,
-                        mailUnreadForeColor: Color.Goldenrod,
-                        mailUnreadBackColor: Color.Black,
-                        tipsDetailsBackColor: Color.LightSkyBlue,
-                        tipsDetailsForeColor: SystemColors.ActiveCaptionText,
-                        buttonBackColor: Color.DimGray,
-                        buttonMouseOverColor: Color.DarkGray,
-                        buttonClickedColor: Color.LightSkyBlue,
-                        txtboxSearchBackColor: Color.FromArgb(
-                            ((int)(((byte)(30)))),
-                            ((int)(((byte)(30)))),
-                            ((int)(((byte)(30))))
-                        ),
-                        txtboxSearchForeColor: Color.WhiteSmoke,
-                        txtboxBodyBackColor: Color.Black,
-                        txtboxBodyForeColor: Color.WhiteSmoke,
-                        cboFoldersBackColor: Color.DimGray,
-                        cboFoldersForeColor: Color.WhiteSmoke,
-                        defaultBackColor: Color.Black,
-                        defaultForeColor: Color.WhiteSmoke,
-                        uiDispatcher: uiDispatcher
+                    CreateTheme(
+                        controlSet,
+                        "DarkNormal",
+                        CoreWebView2PreferredColorScheme.Dark,
+                        Enums.ToggleState.On,
+                        Color.FromArgb(64, 64, 64),
+                        SystemColors.Control,
+                        Color.Black,
+                        Color.LightSkyBlue,
+                        SystemColors.ActiveCaptionText,
+                        Color.WhiteSmoke,
+                        Color.Black,
+                        Color.Goldenrod,
+                        Color.Black,
+                        Color.LightSkyBlue,
+                        SystemColors.ActiveCaptionText,
+                        Color.DimGray,
+                        Color.DarkGray,
+                        Color.LightSkyBlue,
+                        Color.FromArgb(30, 30, 30),
+                        Color.WhiteSmoke,
+                        Color.Black,
+                        Color.WhiteSmoke,
+                        Color.DimGray,
+                        Color.WhiteSmoke,
+                        Color.Black,
+                        Color.WhiteSmoke
                     )
                 },
                 {
                     "DarkActive",
-                    new Theme(
-                        name: "DarkActive",
-                        lblItemNumber: viewer.LblItemNumber,
-                        lblSender: viewer.LblSender,
-                        lblSubject: viewer.LblSubject,
-                        tableLayoutPanels: controller.TableLayoutPanels,
-                        buttons: controller.Buttons,
-                        menuItems: viewer.MenuItems,
-                        menuStrip: viewer.MoveOptionsStrip,
-                        tipsDetailsLabels: controller.ListTipsDetails,
-                        tipsExpanded: controller.ListTipsExpanded,
-                        textboxSearch: viewer.TxtboxSearch,
-                        textboxBody: viewer.TxtboxBody,
-                        comboFolders: viewer.CboFolders,
-                        topicThread: viewer.TopicThread,
-                        webView2: viewer.L0v2h2_WebView2,
-                        viewer: (Control)viewer,
-                        mailRead: new Func<bool>(() => !controller.Mail.UnRead),
-                        web2ViewScheme: Microsoft
-                            .Web
-                            .WebView2
-                            .Core
-                            .CoreWebView2PreferredColorScheme
-                            .Dark,
-                        htmlConverter: htmlConverter,
-                        htmlDark: Enums.ToggleState.On,
-                        navBackgColor: SystemColors.HotTrack,
-                        navForeColor: SystemColors.Control,
-                        tlpBackColor: Color.FromArgb(64, 64, 64),
-                        tipsForeColor: Color.LightSkyBlue,
-                        tipsBackColor: SystemColors.ActiveCaptionText,
-                        mailReadForeColor: Color.WhiteSmoke,
-                        mailReadBackColor: Color.FromArgb(64, 64, 64),
-                        mailUnreadForeColor: Color.Goldenrod,
-                        mailUnreadBackColor: Color.FromArgb(64, 64, 64),
-                        tipsDetailsBackColor: Color.LightSkyBlue,
-                        tipsDetailsForeColor: SystemColors.ActiveCaptionText,
-                        buttonBackColor: Color.DimGray,
-                        buttonMouseOverColor: Color.DarkGray,
-                        buttonClickedColor: Color.LightSkyBlue,
-                        txtboxSearchBackColor: Color.FromArgb(
-                            ((int)(((byte)(30)))),
-                            ((int)(((byte)(30)))),
-                            ((int)(((byte)(30))))
-                        ),
-                        txtboxSearchForeColor: Color.WhiteSmoke,
-                        txtboxBodyBackColor: Color.FromArgb(64, 64, 64),
-                        txtboxBodyForeColor: Color.WhiteSmoke,
-                        cboFoldersBackColor: Color.DimGray,
-                        cboFoldersForeColor: Color.WhiteSmoke,
-                        defaultBackColor: Color.FromArgb(64, 64, 64),
-                        defaultForeColor: Color.WhiteSmoke,
-                        uiDispatcher: uiDispatcher
+                    CreateTheme(
+                        controlSet,
+                        "DarkActive",
+                        CoreWebView2PreferredColorScheme.Dark,
+                        Enums.ToggleState.On,
+                        SystemColors.HotTrack,
+                        SystemColors.Control,
+                        Color.FromArgb(64, 64, 64),
+                        Color.LightSkyBlue,
+                        SystemColors.ActiveCaptionText,
+                        Color.WhiteSmoke,
+                        Color.FromArgb(64, 64, 64),
+                        Color.Goldenrod,
+                        Color.FromArgb(64, 64, 64),
+                        Color.LightSkyBlue,
+                        SystemColors.ActiveCaptionText,
+                        Color.DimGray,
+                        Color.DarkGray,
+                        Color.LightSkyBlue,
+                        Color.FromArgb(30, 30, 30),
+                        Color.WhiteSmoke,
+                        Color.FromArgb(64, 64, 64),
+                        Color.WhiteSmoke,
+                        Color.DimGray,
+                        Color.WhiteSmoke,
+                        Color.FromArgb(64, 64, 64),
+                        Color.WhiteSmoke
                     )
                 },
             };
-            return themes;
         }
 
         public static Dictionary<string, Theme> SetupFormThemes(
@@ -275,16 +233,8 @@ namespace QuickFiler
             IList<Control> buttons
         )
         {
-            var darkDarkGrey = Color.FromArgb(
-                ((int)(((byte)(30)))),
-                ((int)(((byte)(30)))),
-                ((int)(((byte)(30))))
-            ); //30,30,30
             var lightNormal = new Dictionary<string, ThemeControlGroup>
             {
-                //{ "Nav", new ThemeControlGroup(controls: nav, back: SystemColors.HotTrack, fore: SystemColors.Control) },
-                //{ "Tips", new ThemeControlGroup(controls: tips, back: SystemColors.ControlText, fore: SystemColors.Control) },
-                //{ "highlighted", new ThemeControlGroup(controls: highlighted, back: SystemColors.Window, fore: SystemColors.ControlText) },
                 {
                     "Default2Color",
                     new ThemeControlGroup(
@@ -305,13 +255,9 @@ namespace QuickFiler
                         isAltHover: (x) => false
                     )
                 },
-                //{ "CheckBoxes", new ThemeControlGroup(controls: checkboxes, backMain: SystemColors.Control, foreMain: SystemColors.ControlText, backAlt: SystemColors.Control, foreAlt: SystemColors.ControlText, hover: Color.LightCyan, isAltHover: (x) => ((CheckBox)x).Checked ) },
             };
             var darkNormal = new Dictionary<string, ThemeControlGroup>
             {
-                //{ "Nav", new ThemeControlGroup(controls: nav, back: Color.FromArgb(64,64,64), fore: SystemColors.Control) },
-                //{ "Tips", new ThemeControlGroup(controls: tips, back: Color.LightSkyBlue, fore: SystemColors.ControlText) },
-                //{ "highlighted", new ThemeControlGroup(controls: highlighted, back: darkDarkGrey, fore: Color.WhiteSmoke) },
                 {
                     "Default2Color",
                     new ThemeControlGroup(
@@ -332,16 +278,88 @@ namespace QuickFiler
                         isAltHover: (x) => false
                     )
                 },
-                //{ "CheckBoxes", new ThemeControlGroup(controls: checkboxes, backMain: Color.Black, foreMain: Color.WhiteSmoke, backAlt: Color.Black, foreAlt: Color.WhiteSmoke, hover: Color.DarkGray, isAltHover: (x) => ((CheckBox)x).Checked ) },
             };
-            var themes = new Dictionary<string, Theme>
+            return new Dictionary<string, Theme>
             {
                 { "LightNormal", new Theme("LightNormal", lightNormal) },
-                //{ "LightActive", new Theme("LightActive", lightActive) },
                 { "DarkNormal", new Theme("DarkNormal", darkNormal) },
-                //{ "DarkActive", new Theme("DarkActive", darkActive) }
             };
-            return themes;
+        }
+
+        private static Theme CreateTheme(
+            QfcThemeControlSet controlSet,
+            string name,
+            CoreWebView2PreferredColorScheme web2ViewScheme,
+            Enums.ToggleState htmlDark,
+            Color navBackgColor,
+            Color navForeColor,
+            Color tlpBackColor,
+            Color tipsForeColor,
+            Color tipsBackColor,
+            Color mailReadForeColor,
+            Color mailReadBackColor,
+            Color mailUnreadForeColor,
+            Color mailUnreadBackColor,
+            Color tipsDetailsBackColor,
+            Color tipsDetailsForeColor,
+            Color buttonBackColor,
+            Color buttonMouseOverColor,
+            Color buttonClickedColor,
+            Color txtboxSearchBackColor,
+            Color txtboxSearchForeColor,
+            Color txtboxBodyBackColor,
+            Color txtboxBodyForeColor,
+            Color cboFoldersBackColor,
+            Color cboFoldersForeColor,
+            Color defaultBackColor,
+            Color defaultForeColor
+        )
+        {
+            return new Theme(
+                name: name,
+                lblItemNumber: controlSet.LblItemNumber,
+                lblSender: controlSet.LblSender,
+                lblSubject: controlSet.LblSubject,
+                tableLayoutPanels: controlSet.TableLayoutPanels,
+                buttons: controlSet.Buttons,
+                menuItems: controlSet.MenuItems,
+                menuStrip: controlSet.MenuStrip,
+                tipsDetailsLabels: controlSet.TipsDetailsLabels,
+                tipsExpanded: controlSet.TipsExpanded,
+                textboxSearch: controlSet.TextboxSearch,
+                textboxBody: controlSet.TextboxBody,
+                comboFolders: controlSet.ComboFolders,
+                topicThread: controlSet.TopicThread,
+                webView2: controlSet.WebView2,
+                viewer: controlSet.Viewer,
+                mailRead: controlSet.MailRead,
+                web2ViewScheme: web2ViewScheme,
+                htmlConverter: controlSet.HtmlConverter,
+                htmlDark: htmlDark,
+                navBackgColor: navBackgColor,
+                navForeColor: navForeColor,
+                tlpBackColor: tlpBackColor,
+                tipsForeColor: tipsForeColor,
+                tipsBackColor: tipsBackColor,
+                mailReadBackColor: mailReadBackColor,
+                mailReadForeColor: mailReadForeColor,
+                mailUnreadBackColor: mailUnreadBackColor,
+                mailUnreadForeColor: mailUnreadForeColor,
+                tipsDetailsBackColor: tipsDetailsBackColor,
+                tipsDetailsForeColor: tipsDetailsForeColor,
+                buttonBackColor: buttonBackColor,
+                buttonMouseOverColor: buttonMouseOverColor,
+                buttonClickedColor: buttonClickedColor,
+                txtboxSearchBackColor: txtboxSearchBackColor,
+                txtboxSearchForeColor: txtboxSearchForeColor,
+                txtboxBodyBackColor: txtboxBodyBackColor,
+                txtboxBodyForeColor: txtboxBodyForeColor,
+                cboFoldersBackColor: cboFoldersBackColor,
+                cboFoldersForeColor: cboFoldersForeColor,
+                defaultBackColor: defaultBackColor,
+                defaultForeColor: defaultForeColor,
+                uiDispatcher: controlSet.UiDispatcher
+            );
         }
     }
 }

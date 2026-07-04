@@ -14,13 +14,13 @@ namespace QuickFiler.Controllers.Tests
     [TestClass]
     public class EfcHomeControllerTests
     {
-        private Mock<IApplicationGlobals> _mockGlobals;
+        private IApplicationGlobals _globals;
         private Mock<System.Action> _mockParentCleanup;
 
         [TestInitialize]
         public void Setup()
         {
-            _mockGlobals = new Mock<IApplicationGlobals>(MockBehavior.Loose);
+            _globals = new FakeApplicationGlobals();
             _mockParentCleanup = new Mock<System.Action>();
         }
 
@@ -38,7 +38,7 @@ namespace QuickFiler.Controllers.Tests
             );
             ctor.Should().NotBeNull("private (globals, parentCleanup) constructor must exist");
             return (EfcHomeController)
-                ctor.Invoke(new object[] { _mockGlobals.Object, _mockParentCleanup.Object });
+                ctor.Invoke(new object[] { _globals, _mockParentCleanup.Object });
         }
 
         private static void SetField(object target, string fieldName, object value)
@@ -152,7 +152,7 @@ namespace QuickFiler.Controllers.Tests
                 );
             }
 
-            var context = (string)method.Invoke(null, new object[] { _mockGlobals.Object, 2 });
+            var context = (string)method.Invoke(null, new object[] { _globals, 2 });
 
             context.Should().Contain("selectedItemCount=2");
             context.Should().Contain("startupOverlapState=unknown");
@@ -179,7 +179,7 @@ namespace QuickFiler.Controllers.Tests
                     new object[]
                     {
                         "HandleSelectionChangedAsync selection snapshot",
-                        _mockGlobals.Object,
+                        _globals,
                         3,
                         "selection snapshot captured before background model load",
                     }
@@ -189,5 +189,29 @@ namespace QuickFiler.Controllers.Tests
         }
 
         public TestContext TestContext { get; set; }
+
+        private sealed class FakeApplicationGlobals : IApplicationGlobals
+        {
+            public Task LoadAsync(bool parallel)
+            {
+                return Task.CompletedTask;
+            }
+
+            public IFileSystemFolderPaths FS => null;
+
+            public IOlObjects Ol => null;
+
+            public IToDoObjects TD => null;
+
+            public IAppAutoFileObjects AF => null;
+
+            public global::TaskMaster.IAppEvents Events => null;
+
+            public IAppQuickFilerSettings QfSettings => null;
+
+            public IAppItemEngines Engines => null;
+
+            public global::UtilitiesCS.EmailIntelligence.IntelligenceConfig IntelRes => null;
+        }
     }
 }
