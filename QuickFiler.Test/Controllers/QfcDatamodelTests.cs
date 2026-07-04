@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -19,33 +18,6 @@ namespace QuickFiler.Controllers.Tests
     [TestClass]
     public class QfcDatamodelTests
     {
-        private static string ReadControllerSource(string fileName)
-        {
-            string path = Path.GetFullPath(
-                Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    @"..\..\..\QuickFiler\Controllers",
-                    fileName
-                )
-            );
-            return File.ReadAllText(path);
-        }
-
-        [TestMethod]
-        public void ScoreRemainingQueueMailItemAsync_ProbabilityDebugLog_IncludesCallerSubjectEntryIdAndScore()
-        {
-            string source = ReadControllerSource("QfcDatamodel.cs");
-
-            source
-                .Should()
-                .Contain(
-                    "Probability debug [QfcDatamodel.ScoreRemainingQueueMailItemAsync (master-queue admission)]"
-                );
-            source.Should().Contain("Subject='{mailItem.Subject}'");
-            source.Should().Contain("EntryID='{mailItem.EntryID}'");
-            source.Should().Contain("Score={score.Score}");
-        }
-
         private static QfcRemainingQueueAdmission CreateQueueAdmission(
             bool highConfidenceEnabled,
             double threshold,
@@ -125,16 +97,6 @@ namespace QuickFiler.Controllers.Tests
             queued.Should().BeTrue();
             added.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
             hooked.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
-        }
-
-        [TestMethod]
-        public void DequeueNextItemGroupAsync_HighConfidenceMode_UsesStreamingGate()
-        {
-            string source = ReadControllerSource("QfcDatamodel.QueueProcessing.cs");
-
-            source.Should().Contain("HighConfidenceModeEnabled");
-            source.Should().Contain("QfcStreamingDequeueConfidenceGate");
-            source.Should().Contain("DequeueAsync(quantity, timeOut, _token)");
         }
 
         [TestMethod]

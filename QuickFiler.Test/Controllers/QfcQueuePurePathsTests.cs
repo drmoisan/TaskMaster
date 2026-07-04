@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -31,18 +30,6 @@ namespace QuickFiler.Controllers.Tests
     {
         private const BindingFlags NonPublicInstance =
             BindingFlags.NonPublic | BindingFlags.Instance;
-
-        private static string ReadControllerSource(string fileName)
-        {
-            string path = Path.GetFullPath(
-                Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    @"..\..\..\QuickFiler\Controllers",
-                    fileName
-                )
-            );
-            return File.ReadAllText(path);
-        }
 
         private static QfcQueue NewQueue(CancellationToken token)
         {
