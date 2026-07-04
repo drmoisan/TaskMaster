@@ -1,8 +1,8 @@
 # Remediation Inputs: QuickFiler High-Confidence Dequeue Streaming (#233)
 
-**Timestamp:** 2026-07-03T19-16  
-**Issue:** #233  
-**Feature Folder:** `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233`  
+**Timestamp:** 2026-07-03T19-16
+**Issue:** #233
+**Feature Folder:** `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233`
 **Primary Review Artifacts:**
 - `policy-audit.2026-07-03T19-16.md`
 - `code-review.2026-07-03T19-16.md`

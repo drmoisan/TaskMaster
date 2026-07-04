@@ -1,11 +1,11 @@
 # Feature Audit: QuickFiler High-Confidence Dequeue Streaming (#233)
 
-**Audit Date:** 2026-07-03T22-10  
-**Feature Folder:** `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233`  
-**Base Branch:** `main`  
-**Merge Base:** `ec4af1f0924b175a725fe50a5d2a61f7d27a3318`  
-**Head SHA:** `2ac150faca16c3f943322b4503bf8461a0d9ac33`  
-**Work Mode:** full-feature  
+**Audit Date:** 2026-07-03T22-10
+**Feature Folder:** `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233`
+**Base Branch:** `main`
+**Merge Base:** `ec4af1f0924b175a725fe50a5d2a61f7d27a3318`
+**Head SHA:** `2ac150faca16c3f943322b4503bf8461a0d9ac33`
+**Work Mode:** full-feature
 **Requirements Sources:** `spec.md` and `user-story.md`
 
 ## Scope and Baseline

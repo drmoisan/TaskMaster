@@ -1,12 +1,12 @@
 # Policy Compliance Audit: QuickFiler High-Confidence Dequeue Streaming (#233)
 
-**Audit Date:** 2026-07-03T22-10  
-**Issue:** #233  
-**Feature Folder:** `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233`  
-**Base Branch:** `main`  
-**Merge Base:** `ec4af1f0924b175a725fe50a5d2a61f7d27a3318`  
-**Head SHA:** `2ac150faca16c3f943322b4503bf8461a0d9ac33`  
-**Review Mode:** R4 post-remediation re-audit  
+**Audit Date:** 2026-07-03T22-10
+**Issue:** #233
+**Feature Folder:** `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233`
+**Base Branch:** `main`
+**Merge Base:** `ec4af1f0924b175a725fe50a5d2a61f7d27a3318`
+**Head SHA:** `2ac150faca16c3f943322b4503bf8461a0d9ac33`
+**Review Mode:** R4 post-remediation re-audit
 **PR Context:** `artifacts/pr_context.summary.txt` and `artifacts/pr_context.appendix.txt`
 
 **Coverage Metrics by Language:**
@@ -296,5 +296,5 @@ Validator status: PASS under `[P5-T3]`.
 - Result: `ok: true`
 - Summary: Validated policy-audit artifact at `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/policy-audit.2026-07-03T22-10.md`.
 
-**Audit Completed By:** Codex  
+**Audit Completed By:** Codex
 **Audit Date:** 2026-07-03T22-10

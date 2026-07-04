@@ -6,5 +6,5 @@ Output Summary: Baseline whitespace check failed as expected for the planned rem
 Output:
 ```text
 docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/evidence/remediation-baseline/remediation-start-state.md:34: trailing whitespace.
-++  
+++
 ```

@@ -1,11 +1,11 @@
 # Policy Compliance Audit: QuickFiler High-Confidence Dequeue Streaming (#233)
 
-**Audit Date:** 2026-07-03T19-16  
-**Issue:** #233  
-**Feature Folder:** `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233`  
-**Base Branch:** `main`  
-**Merge Base:** `ec4af1f0924b175a725fe50a5d2a61f7d27a3318`  
-**Head SHA:** `46bc5c719546ad3cf7ae26a101bac9d8b314e8af`  
+**Audit Date:** 2026-07-03T19-16
+**Issue:** #233
+**Feature Folder:** `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233`
+**Base Branch:** `main`
+**Merge Base:** `ec4af1f0924b175a725fe50a5d2a61f7d27a3318`
+**Head SHA:** `46bc5c719546ad3cf7ae26a101bac9d8b314e8af`
 **Review Mode:** R4 re-audit after remediation
 
 **Coverage Metrics by Language:**
@@ -298,5 +298,5 @@ git diff --check ec4af1f0924b175a725fe50a5d2a61f7d27a3318...HEAD
 vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage /ResultsDirectory:docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\vstest-remediation-rerun-results
 ```
 
-**Audit Completed By:** Codex  
+**Audit Completed By:** Codex
 **Audit Date:** 2026-07-03T19-16

@@ -1,11 +1,11 @@
 # Code Review: QuickFiler High-Confidence Dequeue Streaming (#233)
 
-**Review Date:** 2026-07-03T19-16  
-**Reviewer:** Codex  
-**Feature Folder:** `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233`  
-**Base Branch:** `main`  
-**Merge Base:** `ec4af1f0924b175a725fe50a5d2a61f7d27a3318`  
-**Head SHA:** `46bc5c719546ad3cf7ae26a101bac9d8b314e8af`  
+**Review Date:** 2026-07-03T19-16
+**Reviewer:** Codex
+**Feature Folder:** `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233`
+**Base Branch:** `main`
+**Merge Base:** `ec4af1f0924b175a725fe50a5d2a61f7d27a3318`
+**Head SHA:** `46bc5c719546ad3cf7ae26a101bac9d8b314e8af`
 **Review Type:** R4 re-audit after remediation
 
 ## Executive Summary
