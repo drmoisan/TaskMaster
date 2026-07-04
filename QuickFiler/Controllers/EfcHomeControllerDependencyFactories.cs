@@ -25,9 +25,7 @@ namespace QuickFiler
             CancellationTokenSource,
             CancellationToken,
             EfcDataModel
-        > ProductionDataModelConstructor { get; set; } =
-            (globals, mail, tokenSource, token) =>
-                new EfcDataModel(globals, mail, tokenSource, token);
+        > ProductionDataModelConstructor { get; set; } = CreateProductionDataModelInstance;
 
         internal static Func<
             IApplicationGlobals,
@@ -52,7 +50,7 @@ namespace QuickFiler
             EfcHomeController,
             IQfcKeyboardHandler
         > ProductionKeyboardHandlerConstructor { get; set; } =
-            (viewer, homeController) => new KeyboardHandler(viewer, homeController);
+            CreateProductionKeyboardHandlerInstance;
 
         internal static Func<
             QfEnums.InitTypeEnum,
@@ -67,23 +65,13 @@ namespace QuickFiler
             EfcHomeController,
             IQfcExplorerController
         > ProductionExplorerControllerConstructor { get; set; } =
-            (initType, globals, homeController) =>
-                new QfcExplorerController(initType, globals, homeController);
+            CreateProductionExplorerControllerInstance;
 
         internal static FormControllerWithDataFactoryDelegate ProductionFormControllerWithDataFactory { get; set; } =
             CreateProductionFormControllerWithData;
 
         internal static FormControllerWithDataFactoryDelegate ProductionFormControllerWithDataConstructor { get; set; } =
-            (globals, dataModel, viewer, homeController, cleanup, initType, token) =>
-                new EfcFormController(
-                    globals,
-                    dataModel,
-                    viewer,
-                    homeController,
-                    cleanup,
-                    initType,
-                    token
-                );
+            CreateProductionFormControllerWithDataInstance;
 
         internal static Func<
             EfcFormController,
@@ -95,8 +83,7 @@ namespace QuickFiler
             CreateProductionFormControllerWithoutData;
 
         internal static FormControllerWithoutDataFactoryDelegate ProductionFormControllerWithoutDataConstructor { get; set; } =
-            (globals, viewer, homeController, cleanup, initType, token) =>
-                new EfcFormController(globals, viewer, homeController, cleanup, initType, token);
+            CreateProductionFormControllerWithoutDataInstance;
 
         internal static Func<
             EfcFormController,
@@ -120,18 +107,65 @@ namespace QuickFiler
         internal static void ResetProductionFactoriesForTesting()
         {
             ProductionDataModelFactory = CreateProductionDataModel;
-            ProductionDataModelConstructor = (globals, mail, tokenSource, token) =>
-                new EfcDataModel(globals, mail, tokenSource, token);
+            ProductionDataModelConstructor = CreateProductionDataModelInstance;
             ProductionAsyncDataModelFactory = EfcDataModel.CreateAsync;
             ProductionViewerFactory = EfcViewerQueue.Dequeue;
             ProductionKeyboardHandlerFactory = CreateProductionKeyboardHandler;
-            ProductionKeyboardHandlerConstructor = (viewer, homeController) =>
-                new KeyboardHandler(viewer, homeController);
+            ProductionKeyboardHandlerConstructor = CreateProductionKeyboardHandlerInstance;
             ProductionExplorerControllerFactory = CreateProductionExplorerController;
-            ProductionExplorerControllerConstructor = (initType, globals, homeController) =>
-                new QfcExplorerController(initType, globals, homeController);
+            ProductionExplorerControllerConstructor = CreateProductionExplorerControllerInstance;
             ProductionFormControllerWithDataFactory = CreateProductionFormControllerWithData;
-            ProductionFormControllerWithDataConstructor = (
+            ProductionFormControllerWithDataConstructor =
+                CreateProductionFormControllerWithDataInstance;
+            ProductionFormControllerWithDataInitializer = controller => controller.Initialize();
+            ProductionFormControllerWithoutDataFactory = CreateProductionFormControllerWithoutData;
+            ProductionFormControllerWithoutDataConstructor =
+                CreateProductionFormControllerWithoutDataInstance;
+            ProductionFormControllerWithoutDataInitializer = controller =>
+                controller.InitializeWithoutData();
+            ProductionInitializeDataFields = CreateProductionDataFields;
+            ProductionDataFieldsInitializer = (controller, dataModel) =>
+                controller.InitializeDataFields(dataModel);
+        }
+
+        private static EfcDataModel CreateProductionDataModelInstance(
+            IApplicationGlobals globals,
+            MailItem mail,
+            CancellationTokenSource tokenSource,
+            CancellationToken token
+        )
+        {
+            return new EfcDataModel(globals, mail, tokenSource, token);
+        }
+
+        private static IQfcKeyboardHandler CreateProductionKeyboardHandlerInstance(
+            EfcViewer viewer,
+            EfcHomeController homeController
+        )
+        {
+            return new KeyboardHandler(viewer, homeController);
+        }
+
+        private static IQfcExplorerController CreateProductionExplorerControllerInstance(
+            QfEnums.InitTypeEnum initType,
+            IApplicationGlobals globals,
+            EfcHomeController homeController
+        )
+        {
+            return new QfcExplorerController(initType, globals, homeController);
+        }
+
+        private static EfcFormController CreateProductionFormControllerWithDataInstance(
+            IApplicationGlobals globals,
+            EfcDataModel dataModel,
+            EfcViewer viewer,
+            EfcHomeController homeController,
+            System.Action cleanup,
+            QfEnums.InitTypeEnum initType,
+            CancellationToken token
+        )
+        {
+            return new EfcFormController(
                 globals,
                 dataModel,
                 viewer,
@@ -139,31 +173,19 @@ namespace QuickFiler
                 cleanup,
                 initType,
                 token
-            ) =>
-                new EfcFormController(
-                    globals,
-                    dataModel,
-                    viewer,
-                    homeController,
-                    cleanup,
-                    initType,
-                    token
-                );
-            ProductionFormControllerWithDataInitializer = controller => controller.Initialize();
-            ProductionFormControllerWithoutDataFactory = CreateProductionFormControllerWithoutData;
-            ProductionFormControllerWithoutDataConstructor = (
-                globals,
-                viewer,
-                homeController,
-                cleanup,
-                initType,
-                token
-            ) => new EfcFormController(globals, viewer, homeController, cleanup, initType, token);
-            ProductionFormControllerWithoutDataInitializer = controller =>
-                controller.InitializeWithoutData();
-            ProductionInitializeDataFields = CreateProductionDataFields;
-            ProductionDataFieldsInitializer = (controller, dataModel) =>
-                controller.InitializeDataFields(dataModel);
+            );
+        }
+
+        private static EfcFormController CreateProductionFormControllerWithoutDataInstance(
+            IApplicationGlobals globals,
+            EfcViewer viewer,
+            EfcHomeController homeController,
+            System.Action cleanup,
+            QfEnums.InitTypeEnum initType,
+            CancellationToken token
+        )
+        {
+            return new EfcFormController(globals, viewer, homeController, cleanup, initType, token);
         }
 
         private static EfcDataModel CreateProductionDataModel(
