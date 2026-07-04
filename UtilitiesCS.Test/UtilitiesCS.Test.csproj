@@ -79,6 +79,7 @@
     <Compile Include="Dialogs\MyBox_ShowDialog_Tests.cs" />
     <Compile Include="Dialogs\MyBox_Tests.cs" />
     <Compile Include="Dialogs\NotImplementedDialog_Tests.cs" />
+    <Compile Include="Interfaces\IWinForm\PropertyStoreCoverageExpansionTests.cs" />
     <Compile Include="EmailIntelligence\AutoFile_Tests.cs" />
     <Compile Include="EmailIntelligence\SpamInitTimingProbeTests.cs" />
     <Compile Include="EmailIntelligence\ActionableClassifierGroup_Tests.cs" />
@@ -171,6 +172,7 @@
     <Compile Include="EmailIntelligence\OlFolderClassifierGroup_Tests.cs" />
     <Compile Include="EmailIntelligence\RecentsList_Tests.cs" />
     <Compile Include="Extensions\ArrayExtensions_Tests.cs" />
+    <Compile Include="Extensions\ArrayExtensionsCoverageTests.cs" />
     <Compile Include="Extensions\AsyncSerialization_Tests.cs" />
     <Compile Include="Extensions\CompilerServicesExtensions_Tests.cs" />
     <Compile Include="Extensions\DfDeedle_Tests.cs" />
@@ -182,6 +184,7 @@
     <Compile Include="Extensions\ExceptionExtensions_Tests.cs" />
     <Compile Include="Extensions\Frexp_Test.cs" />
     <Compile Include="Extensions\IAsyncEnumerableExtensions_Tests.cs" />
+    <Compile Include="Extensions\IEnumerableExtensionsCoverageTests.cs" />
     <Compile Include="Extensions\IEnumerableExtensions_Tests.cs" />
     <Compile Include="Extensions\IListExtensions_Tests.cs" />
     <Compile Include="Extensions\JsonExtensions_Tests.cs" />
@@ -215,6 +218,7 @@
     <Compile Include="HelperClasses\VerboseLogger_Tests.cs" />
     <Compile Include="HelperClasses\ShellUtilitiesTests.cs" />
     <Compile Include="HelperClasses\TimedDiskWriterTests.cs" />
+    <Compile Include="HelperClasses\PrettyPrintCoverageTests.cs" />
     <Compile Include="HelperClasses\PrettyPrint_Tests.cs" />
     <Compile Include="HelperClasses\PrettyPrintTest.cs" />
     <Compile Include="HelperClasses\TableLayoutHelper_Tests.cs" />
@@ -305,6 +309,7 @@
     <Compile Include="OutlookObjects\Folder\FolderConverterTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderMinimalWrapperTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderNavigatorTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderScorerCoverageExpansionTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderScorerTests.cs" />
     <Compile Include="OutlookObjects\MailItem\EmailDetailsTests.cs" />
     <Compile Include="OutlookObjects\MailItem\EmailDetailsWrapperTests.cs" />
@@ -335,7 +340,9 @@
     <Compile Include="OutlookObjects\Folder\FolderWrapperStateTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperTraversalTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderPredictorCoverageExpansionTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictorTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderWrapperCoverageExpansionTests.cs" />
     <Compile Include="OutlookObjects\Folder\MAPIMethodsTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -365,6 +372,7 @@
     <Compile Include="ReusableTypeClasses\SCODictionary_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SCODictionary_Additional_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ScBag_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\Serializable\SerializableListCoverageTests.cs" />
     <Compile Include="ReusableTypeClasses\SerializableList_Tests.cs" />
     <Compile Include="ReusableTypeClasses\StackGeek_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ScoStack_Tests.cs" />
@@ -419,6 +427,7 @@
     <Compile Include="Threading\TaskPriority_Tests.cs" />
     <Compile Include="Threading\ThreadSafeFunctions_Tests.cs" />
     <Compile Include="Threading\ThreadSafeSingleShotGuard_Tests.cs" />
+    <Compile Include="Threading\TimeOutTaskCoverageTests.cs" />
     <Compile Include="Threading\TimeOutTask_AdditionalTests.cs" />
     <Compile Include="Threading\TimeOutTask_InternalCoverageTests.cs" />
     <Compile Include="Threading\TimeOutTask_OverloadCoverageTests.cs" />

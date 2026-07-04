@@ -259,6 +259,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppGlobals\ApplicationGlobalsTests.cs" />
+    <Compile Include="AppGlobals\AppAutoFileObjectsCoverageExpansionTests.cs" />
     <Compile Include="AppGlobals\AppAutoFileObjectsFolderPredictorTests.cs" />
     <Compile Include="AppGlobals\ApplicationGlobalsStartupTimingTests.cs" />
     <Compile Include="AppGlobals\ContinuationProbeSequenceTests.cs" />
@@ -271,6 +272,7 @@
     <Compile Include="AppGlobals\HookReadinessCoordinatorTests.cs" />
     <Compile Include="AppGlobals\NonBlockingDelayTests.cs" />
     <Compile Include="AppGlobals\LiveOutlookHookupIntegrationTests.cs" />
+    <Compile Include="AppGlobals\AppEventsCoverageExpansionTests.cs" />
     <Compile Include="AppGlobals\AppEventsTests.cs" />
     <Compile Include="AppGlobals\AppFileSystemFolderPathsMatchBestSpecialFolderTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsCoverageTests.cs" />
@@ -280,6 +282,7 @@
     <Compile Include="AppGlobals\AppQuickFilerSettingsTests.cs" />
     <Compile Include="AppGlobals\AppQuickFilerSettingsRemainingPropertiesTests.cs" />
     <Compile Include="AppGlobals\AppStagingFilenamesTests.cs" />
+    <Compile Include="AppGlobals\AppToDoObjectsCoverageExpansionTests.cs" />
     <Compile Include="AppGlobals\AppToDoObjectsCoverageTests.cs" />
     <Compile Include="AppGlobals\AppToDoObjectsTestDoubles.cs" />
     <Compile Include="AppGlobals\AppToDoObjectsTestUtilities.cs" />
@@ -308,6 +311,10 @@
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
       <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
       <Name>UtilitiesCS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj">
+      <Project>{f2e1680e-1b15-4cf2-bab0-54b8c8f6abdf}</Project>
+      <Name>UtilitiesSwordfish.NET.General</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

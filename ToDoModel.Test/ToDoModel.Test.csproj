@@ -63,6 +63,7 @@
     <Compile Include="Data Model\People\PeopleScoDictionaryNewTests.cs" />
     <Compile Include="Data Model\ToDo\SpecialMockMail.cs" />
     <Compile Include="Data Model\ToDo\SpecialMockOutlookItem.cs" />
+    <Compile Include="Data Model\ToDo\ToDoItemCoverageExpansionTests.cs" />
     <Compile Include="Data Model\ToDo\ToDoItemTests.cs" />
     <Compile Include="Data Model\Tree\TreeNodeTests.cs" />
     <Compile Include="Data Model\Tree\TreeNodeTests_UnfinishedStubs.cs" />
