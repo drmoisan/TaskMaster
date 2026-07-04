@@ -68,10 +68,10 @@ Each command-bearing evidence artifact must include `Timestamp:`, `Command:`, `E
 
 ### Phase 5 — Final Validation
 
-- [ ] [P5-T1] After the orchestrator creates the pre-R4 remediation commit, run `git diff --check ec4af1f0924b175a725fe50a5d2a61f7d27a3318...HEAD`; write `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/evidence/qa-gates/remediation-22-18-post-commit-git-diff-check.md` with `Timestamp:`, `Command: git diff --check ec4af1f0924b175a725fe50a5d2a61f7d27a3318...HEAD`, `EXIT_CODE: 0`, and `Output Summary:` confirming the committed base-to-head delta has no whitespace diagnostics.
-- [ ] [P5-T2] Validate this remediation plan with `mcp__drm_copilot.validate_orchestration_artifacts` using `artifact_type: "plan"` and this exact file path.
-- [ ] [P5-T3] Confirm all command-bearing evidence artifacts contain `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
-- [ ] [P5-T4] Report whether remediation leaves `REVIEW_STATUS: PASS` or `REVIEW_STATUS: REMEDIATION_REQUIRED`, using the feature-review final status fields.
+- [x] [P5-T1] After the orchestrator creates the pre-R4 remediation commit, run `git diff --check ec4af1f0924b175a725fe50a5d2a61f7d27a3318...HEAD`; write `docs/features/active/2026-07-03-quickfiler-high-confidence-dequeue-streaming-233/evidence/qa-gates/remediation-22-18-post-commit-git-diff-check.md` with `Timestamp:`, `Command: git diff --check ec4af1f0924b175a725fe50a5d2a61f7d27a3318...HEAD`, `EXIT_CODE: 0`, and `Output Summary:` confirming the committed base-to-head delta has no whitespace diagnostics.
+- [x] [P5-T2] Validate this remediation plan with `mcp__drm_copilot.validate_orchestration_artifacts` using `artifact_type: "plan"` and this exact file path.
+- [x] [P5-T3] Confirm all command-bearing evidence artifacts contain `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+- [x] [P5-T4] Report whether remediation leaves `REVIEW_STATUS: PASS` or `REVIEW_STATUS: REMEDIATION_REQUIRED`, using the feature-review final status fields.
 
 ## Do Not Do
 
