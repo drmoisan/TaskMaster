@@ -65,6 +65,7 @@
     <Compile Include="Controllers\EfcFormControllerTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerDependenciesTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerDependenciesProductionFactoryTests.cs" />
+    <Compile Include="Controllers\EfcHomeControllerExecuteMovesTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerLifecycleTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerMetricsTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerTests.cs" />

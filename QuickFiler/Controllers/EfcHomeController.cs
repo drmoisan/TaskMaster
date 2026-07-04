@@ -420,54 +420,6 @@ namespace QuickFiler
 
         #region Major Actions
 
-        async public Task ExecuteMovesAsync()
-        {
-            if (_isExecuting)
-                return;
-
-            _isExecuting = true;
-            try
-            {
-                var selectedFolder = _formController.SelectedFolder;
-                var moveConversation = _formController.MoveConversation;
-                var convInfo = DataModel.ConversationResolver.ConversationInfo.SameFolder;
-                if (!moveConversation)
-                {
-                    convInfo = convInfo
-                        .Where(itemInfo => itemInfo.EntryId == DataModel.Mail.EntryID)
-                        .ToList();
-                }
-
-                // Capture _globals before the await: Cleanup() may null the field while
-                // MoveToFolderAsync is in flight, causing NullReferenceException on resume.
-                var globals = _globals;
-                var result = await _dataModel.MoveToFolderAsync(
-                    selectedFolder,
-                    _formController.SaveAttachments,
-                    _formController.SaveEmail,
-                    _formController.SavePictures,
-                    moveConversation
-                );
-
-                if (!result)
-                {
-                    MessageBox.Show($"Cannot move to folderpath {selectedFolder}");
-                }
-                else
-                {
-                    QuickFileMetrics_WRITE(
-                        globals.FS.Filenames.EmailSession,
-                        selectedFolder,
-                        convInfo
-                    );
-                }
-            }
-            finally
-            {
-                _isExecuting = false;
-            }
-        }
-
         internal async Task OpenOlFolderAsync(string selectedFolder)
         {
             await DataModel.OpenOlFolderAsync(selectedFolder);

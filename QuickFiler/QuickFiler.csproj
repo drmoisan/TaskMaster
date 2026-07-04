@@ -287,6 +287,7 @@
     <Compile Include="Controllers\EfcFormController.cs" />
     <Compile Include="Controllers\EfcHomeController.cs" />
     <Compile Include="Controllers\EfcHomeController.Metrics.cs" />
+    <Compile Include="Controllers\EfcHomeController.ExecuteMoves.cs" />
     <Compile Include="Controllers\EfcHomeController.Timing.cs" />
     <Compile Include="Controllers\EfcHomeControllerDependencyFactories.cs" />
     <Compile Include="Controllers\EfcHomeControllerDependencies.cs" />

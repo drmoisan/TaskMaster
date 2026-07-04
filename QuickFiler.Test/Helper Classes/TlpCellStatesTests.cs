@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using QuickFiler;
 
 namespace QuickFiler.Test.HelperClasses
@@ -135,9 +137,111 @@ namespace QuickFiler.Test.HelperClasses
             act.Should().Throw<ArgumentNullException>().WithParameterName("collection");
         }
 
+        [TestMethod]
+        public void SnapshotConstructor_CapturesControlCellState()
+        {
+            var tlp = CreateTableLayoutPanel(rowCount: 2, columnCount: 2);
+            var label = new Label
+            {
+                Name = "LblAcOpen",
+                Text = "Open",
+                Enabled = true,
+                Visible = true,
+            };
+            tlp.Controls.Add(label, 1, 1);
+            tlp.SetRowSpan(label, 1);
+            tlp.SetColumnSpan(label, 1);
+
+            var snapshot = new TlpCellSnapShot(tlp, label);
+
+            snapshot.TlpName.Should().Be("StatePanel");
+            snapshot.ControlName.Should().Be("LblAcOpen");
+            snapshot.Row.Should().Be(1);
+            snapshot.Column.Should().Be(1);
+            snapshot.AcceleratorText.Should().Be("Open");
+        }
+
+        [TestMethod]
+        public void RowAndColumnAccessors_UpdateCellPosition()
+        {
+            var snapshot = new TlpCellSnapShot();
+
+            snapshot.Row = 2;
+            snapshot.Column = 3;
+
+            snapshot.Cell.Row.Should().Be(2);
+            snapshot.Cell.Column.Should().Be(3);
+        }
+
+        [TestMethod]
+        public void ApplyState_WhenControlHasDifferentParent_ReparentsAndRestoresCell()
+        {
+            var host = new Control();
+            var tlp = CreateTableLayoutPanel(rowCount: 2, columnCount: 2);
+            var originalParent = new Panel();
+            var label = new Label
+            {
+                Name = "LblAcOpen",
+                Text = "Changed",
+                Enabled = false,
+                Visible = false,
+            };
+            originalParent.Controls.Add(label);
+            host.Controls.Add(tlp);
+            host.Controls.Add(originalParent);
+
+            var snapshot = new TlpCellSnapShot
+            {
+                TlpName = tlp.Name,
+                ControlName = label.Name,
+                AcceleratorText = "Open",
+                Cell = new TableLayoutPanelCellPosition(1, 1),
+                RowSpan = 1,
+                ColumnSpan = 1,
+                RowStyles = new List<RowStyle> { new RowStyle(SizeType.Absolute, 33) },
+                ColumnStyles = new List<ColumnStyle> { new ColumnStyle(SizeType.Absolute, 44) },
+                Enabled = true,
+                Visible = true,
+            };
+            var viewer = new Mock<IItemViewer>();
+            viewer.Setup(v => v.Controls).Returns(host.Controls);
+
+            snapshot.ApplyState(viewer.Object);
+
+            label.Parent.Should().BeSameAs(tlp);
+            tlp.GetCellPosition(label).Should().Be(new TableLayoutPanelCellPosition(1, 1));
+            label.Enabled.Should().BeTrue();
+            label.Visible.Should().BeTrue();
+            label.Text.Should().Be("Open");
+            tlp.RowStyles[1].Height.Should().Be(33);
+            tlp.ColumnStyles[1].Width.Should().Be(44);
+        }
+
         private static TlpCellSnapShot CreateSnapshot(string controlName)
         {
             return new TlpCellSnapShot { ControlName = controlName };
+        }
+
+        private static TableLayoutPanel CreateTableLayoutPanel(int rowCount, int columnCount)
+        {
+            var tlp = new TableLayoutPanel
+            {
+                Name = "StatePanel",
+                RowCount = rowCount,
+                ColumnCount = columnCount,
+            };
+
+            for (var row = 0; row < rowCount; row++)
+            {
+                tlp.RowStyles.Add(new RowStyle(SizeType.Percent, 50));
+            }
+
+            for (var column = 0; column < columnCount; column++)
+            {
+                tlp.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+            }
+
+            return tlp;
         }
     }
 }
