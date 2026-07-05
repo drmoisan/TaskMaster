@@ -1,5 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -159,6 +163,179 @@ namespace Tags.Test
             }
         }
 
+        [TestMethod]
+        [STAThread]
+        public void LoadSelections_WhenExistingSelectionsUseBothForms_TogglesMatchingOptions()
+        {
+            var unprefixedOptions = new SortedDictionary<string, bool>
+            {
+                ["TagProgram Alpha"] = false,
+            };
+            using (var fixture = CreateFixture(unprefixedOptions, new List<string> { "Alpha" }))
+            {
+                fixture.Controller.GetSelections().Should().Equal("TagProgram Alpha");
+            }
+
+            var prefixedOptions = new SortedDictionary<string, bool>
+            {
+                ["TagProgram Alpha"] = true,
+            };
+            using (
+                var fixture = CreateFixture(
+                    prefixedOptions,
+                    new List<string> { "TagProgram Alpha" }
+                )
+            )
+            {
+                fixture.Controller.GetSelections().Should().BeEmpty();
+            }
+        }
+
+        [TestMethod]
+        [STAThread]
+        public void SearchAndReload_WhenFilterChanges_ReplacesVisibleCheckboxes()
+        {
+            var options = new SortedDictionary<string, bool>
+            {
+                ["TagProgram Alpha"] = true,
+                ["TagProgram Beta"] = false,
+                ["Topic Gamma"] = true,
+            };
+
+            using (var fixture = CreateFixture(options))
+            {
+                FindNamedControl<TextBox>(fixture.Viewer, "SearchText").Text = "Beta";
+                fixture.Controller.SearchAndReload();
+
+                GetVisibleOptionCheckBoxes(fixture.Viewer)
+                    .Select(control => control.Tag as string)
+                    .Should()
+                    .Equal("TagProgram Beta");
+            }
+        }
+
+        [TestMethod]
+        [STAThread]
+        public void UpdateSelections_AfterFiltering_SynchronizesPrivateSelectionLists()
+        {
+            var options = new SortedDictionary<string, bool>
+            {
+                ["TagProgram Alpha"] = true,
+                ["TagProgram Beta"] = false,
+                ["TagProgram Gamma"] = true,
+            };
+
+            using (var fixture = CreateFixture(options))
+            {
+                fixture.Controller.FilterToSelected();
+                fixture.Controller.UpdateSelections();
+
+                GetPrivateField<IList<string>>(fixture.Controller, "_selections")
+                    .Should()
+                    .Equal("TagProgram Alpha", "TagProgram Gamma");
+                GetPrivateField<IList<string>>(fixture.Controller, "_filteredSelections")
+                    .Should()
+                    .Equal("TagProgram Alpha", "TagProgram Gamma");
+            }
+        }
+
+        [TestMethod]
+        [STAThread]
+        public void SelectControlMethods_WhenPositionsChange_UpdateFocusIndexOrThrow()
+        {
+            var options = new SortedDictionary<string, bool>
+            {
+                ["TagProgram Alpha"] = false,
+                ["TagProgram Beta"] = false,
+            };
+
+            using (var fixture = CreateFixture(options))
+            {
+                fixture.Controller.Select_First_Control();
+                GetPrivateField<int>(fixture.Controller, "intFocus").Should().Be(0);
+
+                fixture.Controller.Select_Last_Control();
+                GetPrivateField<int>(fixture.Controller, "intFocus").Should().Be(1);
+
+                fixture.Controller.Select_Ctrl_By_Position(-1);
+                GetPrivateField<int>(fixture.Controller, "intFocus").Should().Be(-1);
+
+                System.Action act = () => fixture.Controller.Select_Ctrl_By_Position(2);
+                act.Should().Throw<ArgumentOutOfRangeException>();
+            }
+        }
+
+        [TestMethod]
+        [STAThread]
+        public void HideArchive_WhenToggled_ReloadsFilteredAndOriginalOptions()
+        {
+            var options = new SortedDictionary<string, bool>
+            {
+                ["Archive Choice"] = true,
+                ["Current Choice"] = true,
+            };
+            var autoAssigner = NewAutoAssigner(new List<string> { "Archive Choice" });
+
+            using (
+                var fixture = CreateAutoAssignFixture(
+                    options,
+                    autoAssigner.Object,
+                    NewMailItem("mail")
+                )
+            )
+            {
+                GetVisibleOptionCheckBoxes(fixture.Viewer)
+                    .Select(control => control.Tag as string)
+                    .Should()
+                    .Equal("Current Choice");
+
+                FindNamedControl<CheckBox>(fixture.Viewer, "HideArchive").Checked = false;
+                GetVisibleOptionCheckBoxes(fixture.Viewer)
+                    .Select(control => control.Tag as string)
+                    .Should()
+                    .Equal("Archive Choice", "Current Choice");
+
+                FindNamedControl<CheckBox>(fixture.Viewer, "HideArchive").Checked = true;
+                GetVisibleOptionCheckBoxes(fixture.Viewer)
+                    .Select(control => control.Tag as string)
+                    .Should()
+                    .Equal("Current Choice");
+            }
+        }
+
+        [TestMethod]
+        [STAThread]
+        public void AutoAssignClick_WhenExistingAndNewAssignmentsReturned_UpdatesSelections()
+        {
+            var options = new SortedDictionary<string, bool> { ["TagProgram Existing"] = false };
+            var autoAssigner = NewAutoAssigner(new List<string>());
+            autoAssigner
+                .Setup(x => x.AutoFindAsync(It.IsAny<object>()))
+                .Returns(
+                    Task.FromResult<IList<string>>(
+                        new List<string> { "TagProgram Existing", "TagProgram New" }
+                    )
+                );
+
+            using (
+                var fixture = CreateAutoAssignFixture(
+                    options,
+                    autoAssigner.Object,
+                    NewMailItem("auto")
+                )
+            )
+            {
+                RaiseClick(FindNamedControl<Button>(fixture.Viewer, "ButtonAutoAssign"));
+                Task.Delay(50).GetAwaiter().GetResult();
+
+                fixture
+                    .Controller.GetSelections()
+                    .Should()
+                    .Equal("TagProgram Existing", "TagProgram New");
+                autoAssigner.Verify(x => x.AutoFindAsync(It.IsAny<object>()), Times.Once);
+            }
+        }
+
         private static ControllerFixture CreateFixture(
             SortedDictionary<string, bool> options = null,
             IList<string> selections = null
@@ -175,6 +352,28 @@ namespace Tags.Test
             return new ControllerFixture(viewer, controller);
         }
 
+        private static ControllerFixture CreateAutoAssignFixture(
+            SortedDictionary<string, bool> options,
+            IAutoAssign autoAssigner,
+            MailItem mailItem
+        )
+        {
+            var viewer = new TagViewer();
+            var controller = new TagController(
+                viewer,
+                options,
+                autoAssigner,
+                new List<IPrefix> { CreatePrefix() },
+                "current@example.test",
+                prefixKey: "Program",
+                objItemObject: mailItem
+            );
+            SetPrivateField(controller, "_isMail", true);
+            controller.SetAutoAssignState(autoAssigner);
+
+            return new ControllerFixture(viewer, controller);
+        }
+
         private static IPrefix CreatePrefix() =>
             new TestPrefix
             {
@@ -184,6 +383,83 @@ namespace Tags.Test
                 PrefixType = PrefixTypeEnum.Program,
                 OlUserFieldName = "TagProgram",
             };
+
+        private static Mock<IAutoAssign> NewAutoAssigner(IList<string> filterList)
+        {
+            var autoAssigner = new Mock<IAutoAssign>(MockBehavior.Loose);
+            autoAssigner.SetupGet(x => x.FilterList).Returns(filterList);
+            return autoAssigner;
+        }
+
+        private static MailItem NewMailItem(string entryId)
+        {
+            var mailItem = new Mock<MailItem>();
+            mailItem.Setup(x => x.EntryID).Returns(entryId);
+            return mailItem.Object;
+        }
+
+        private static IReadOnlyList<CheckBox> GetVisibleOptionCheckBoxes(TagViewer viewer) =>
+            FindNamedControl<Panel>(viewer, "L1v2L2_OptionsPanel")
+                .Controls.OfType<CheckBox>()
+                .ToList();
+
+        private static TControl FindNamedControl<TControl>(Control root, string name)
+            where TControl : Control
+        {
+            if (
+                root is TControl matched
+                && string.Equals(root.Name, name, StringComparison.Ordinal)
+            )
+            {
+                return matched;
+            }
+
+            foreach (Control child in root.Controls)
+            {
+                var result = FindNamedControl<TControl>(child, name);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        private static T GetPrivateField<T>(object target, string fieldName)
+        {
+            var field = target
+                .GetType()
+                .GetField(
+                    fieldName,
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+                );
+            field.Should().NotBeNull();
+            return (T)field.GetValue(target);
+        }
+
+        private static void SetPrivateField(object target, string fieldName, object value)
+        {
+            var field = target
+                .GetType()
+                .GetField(
+                    fieldName,
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+                );
+            field.Should().NotBeNull();
+            field.SetValue(target, value);
+        }
+
+        private static void RaiseClick(Control control)
+        {
+            var invokeOnClick = typeof(Control).GetMethod(
+                "InvokeOnClick",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+
+            invokeOnClick.Should().NotBeNull();
+            invokeOnClick.Invoke(control, new object[] { control, EventArgs.Empty });
+        }
 
         private sealed class ControllerFixture : IDisposable
         {

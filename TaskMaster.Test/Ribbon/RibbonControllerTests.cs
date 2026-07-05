@@ -28,6 +28,7 @@ namespace TaskMaster.Test.Ribbon
     /// restored in <see cref="TestCleanup"/> so the tests are independent and leave no machine
     /// state mutated.
     /// </summary>
+    [DoNotParallelize]
     [TestClass]
     public class RibbonControllerTests
     {

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.Test.TestHelpers;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
 {
@@ -15,22 +16,23 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var completion = new TaskCompletionSource<bool>();
+            var timer = new ManualFireTimerWrapper();
             var timedTask = new TimedAsyncTask(
                 TimeSpan.FromMilliseconds(20),
                 () =>
                 {
                     completion.TrySetResult(true);
                     return Task.CompletedTask;
-                }
+                },
+                _ => timer
             );
 
             // Act
             timedTask.RequestTask();
+            timer.FireElapsed();
 
             // Assert
-            (await Task.WhenAny(completion.Task, Task.Delay(1000)))
-                .Should()
-                .BeSameAs(completion.Task);
+            completion.Task.IsCompleted.Should().BeTrue();
             (await completion.Task).Should().BeTrue();
         }
 
@@ -39,7 +41,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var completion = new TaskCompletionSource<bool>();
-            var timedTask = new TimedAsyncTask(TimeSpan.FromMilliseconds(20));
+            var timer = new ManualFireTimerWrapper();
+            var timedTask = new TimedAsyncTask(TimeSpan.FromMilliseconds(20), null, _ => timer);
 
             // Act
             timedTask.RequestTask(() =>
@@ -47,11 +50,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
                 completion.TrySetResult(true);
                 return Task.CompletedTask;
             });
+            timer.FireElapsed();
 
             // Assert
-            (await Task.WhenAny(completion.Task, Task.Delay(1000)))
-                .Should()
-                .BeSameAs(completion.Task);
+            completion.Task.IsCompleted.Should().BeTrue();
             (await completion.Task).Should().BeTrue();
         }
 

@@ -12,6 +12,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
 {
+    [DoNotParallelize]
     [TestClass]
     public class SerializableList_Tests
     {

@@ -60,6 +60,7 @@
     <Compile Include="Controllers\KaKeyTests.cs" />
     <Compile Include="Controllers\KaStringAsyncTests.cs" />
     <Compile Include="Controllers\FilerQueueTests.cs" />
+    <Compile Include="Controllers\QfcQueueCoverageExpansionTests.cs" />
     <Compile Include="Controllers\QfcQueuePurePathsTests.cs" />
     <Compile Include="Controllers\EfcDataModelTests.cs" />
     <Compile Include="Controllers\EfcFormControllerTests.cs" />

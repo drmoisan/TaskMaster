@@ -57,6 +57,7 @@
     <Compile Include="Data Model\ID\BaseChangerTests.cs" />
     <Compile Include="Data Model\ID\BaseChangerRemainingBranchesTests.cs" />
     <Compile Include="Data Model\ID\IDListGetNextToDoIDTests.cs" />
+    <Compile Include="Data Model\Project\ProjectDataCoverageExpansionTests.cs" />
     <Compile Include="Data Model\Project\ProjectEntryTests.cs" />
     <Compile Include="Data Model\Project\ProjectEntryDialogBranchesTests.cs" />
     <Compile Include="Data Model\ToDo\ToDoLoaderSetAndSaveTests.cs" />
@@ -82,6 +83,12 @@
   <ItemGroup>
     <Reference Include="Azure.Core, Version=1.55.0.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
       <HintPath>..\packages\Azure.Core.1.55.0\lib\net472\Azure.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Deedle, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Deedle.3.0.0\lib\netstandard2.0\Deedle.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Core, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FSharp.Core.11.0.100\lib\netstandard2.0\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="Azure.Monitor.OpenTelemetry.Exporter, Version=1.8.0.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
       <HintPath>..\packages\Azure.Monitor.OpenTelemetry.Exporter.1.8.0\lib\netstandard2.0\Azure.Monitor.OpenTelemetry.Exporter.dll</HintPath>

@@ -11,6 +11,7 @@ using Moq;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
 {
+    [DoNotParallelize]
     [TestClass]
     public class ScoCollection_Tests
     {

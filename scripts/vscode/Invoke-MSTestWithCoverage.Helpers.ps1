@@ -63,10 +63,23 @@ function ConvertTo-KoverageRelativePath {
 
     $trimmedRepoRoot = $RepoRoot.TrimEnd('\', '/')
     $relativePath = $Path
-    $prefixes = @(
-        "$trimmedRepoRoot\",
-        "$trimmedRepoRoot/"
-    )
+    $rootCandidates = [System.Collections.Generic.List[string]]::new()
+    $rootCandidates.Add($trimmedRepoRoot)
+
+    $repoRootLeaf = Split-Path -Path $trimmedRepoRoot -Leaf
+    $repoRootParent = Split-Path -Path $trimmedRepoRoot -Parent
+    # Coverage produced from sibling worktrees can retain the canonical
+    # TaskMaster repo root. Strip that equivalent root before filename merging.
+    if ($repoRootParent -and -not $repoRootLeaf.Equals('TaskMaster', [System.StringComparison]::OrdinalIgnoreCase)) {
+        $rootCandidates.Add((Join-Path -Path $repoRootParent -ChildPath 'TaskMaster').TrimEnd('\', '/'))
+    }
+
+    $prefixes = [System.Collections.Generic.List[string]]::new()
+    # Try every equivalent root with both Windows and Cobertura-style separators.
+    foreach ($rootCandidate in $rootCandidates) {
+        $prefixes.Add("$rootCandidate\")
+        $prefixes.Add("$rootCandidate/")
+    }
 
     foreach ($prefix in $prefixes) {
         if ($relativePath.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) {

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SVGControl;
@@ -122,6 +123,100 @@ namespace SVGControl.Test
             );
 
             absolutePath.Should().Be("C:\\Root\\Sibling\\Icon.svg");
+        }
+
+        [DataTestMethod]
+        [DataRow("C:Child\\Icon.svg", "C:\\Root\\Parent\\", "C:\\Root\\Parent\\Child\\Icon.svg")]
+        [DataRow("D:Child\\Icon.svg", "C:\\Root\\Parent\\", "D:\\Child\\Icon.svg")]
+        [DataRow(
+            "Child\\..\\Sibling\\.\\Icon.svg",
+            "C:\\Root\\Parent\\",
+            "C:\\Root\\Parent\\Sibling\\Icon.svg"
+        )]
+        public void GetFullPath_WithRelativeForms_NormalizesExpectedPath(
+            string path,
+            string basePath,
+            string expected
+        )
+        {
+            string absolutePath = RelativePath.GetFullPath(path, basePath);
+
+            absolutePath.Should().Be(expected);
+        }
+
+        [TestMethod]
+        public void GetFullPath_WhenInputsContainNullCharacter_ThrowsArgumentException()
+        {
+            Action pathAct = () => RelativePath.GetFullPath("Child\0Icon.svg", "C:\\Root\\");
+            Action baseAct = () => RelativePath.GetFullPath("Child\\Icon.svg", "C:\\Root\0\\");
+
+            pathAct.Should().Throw<ArgumentException>().WithMessage("*Argument_InvalidPathChars*");
+            baseAct.Should().Throw<ArgumentException>().WithMessage("*Argument_InvalidPathChars*");
+        }
+
+        [DataTestMethod]
+        [DataRow("C:\\Root\\Child\\..\\Sibling\\.\\Icon.svg", 3, "C:\\Root\\Sibling\\Icon.svg")]
+        [DataRow("C:\\Root\\\\Child//Icon.svg", 3, "C:\\Root\\Child\\\\Icon.svg")]
+        [DataRow("C:\\Root\\Child\\Icon.svg", 3, "C:\\Root\\Child\\Icon.svg")]
+        public void RemoveRelativeSegments_NormalizesTraversalAndSeparators(
+            string path,
+            int rootLength,
+            string expected
+        )
+        {
+            string normalized = RelativePath.RemoveRelativeSegments(path, rootLength);
+
+            normalized.Should().Be(expected);
+        }
+
+        [DataTestMethod]
+        [DataRow("C:\\Root\\Child", 3)]
+        [DataRow("C:Root\\Child", 2)]
+        [DataRow("\\\\Server\\Share\\Folder", 14)]
+        [DataRow("\\\\?\\UNC\\Server\\Share\\Folder", 20)]
+        [DataRow("\\\\?\\C:\\Root", 7)]
+        public void GetRootLength_DetectsDosUncAndDeviceRoots(string path, int expected)
+        {
+            RelativePath.GetRootLength(path).Should().Be(expected);
+        }
+
+        [DataTestMethod]
+        [DataRow(RelativePath.ERROR_FILE_NOT_FOUND, "missing.svg", typeof(FileNotFoundException))]
+        [DataRow(
+            RelativePath.ERROR_PATH_NOT_FOUND,
+            "C:\\Missing",
+            typeof(DirectoryNotFoundException)
+        )]
+        [DataRow(
+            RelativePath.ERROR_ACCESS_DENIED,
+            "C:\\Denied",
+            typeof(UnauthorizedAccessException)
+        )]
+        [DataRow(RelativePath.ERROR_OPERATION_ABORTED, "", typeof(OperationCanceledException))]
+        [DataRow(RelativePath.ERROR_FILENAME_EXCED_RANGE, "", typeof(PathTooLongException))]
+        public void GetExceptionForWin32Error_ReturnsSpecificExceptionTypes(
+            int errorCode,
+            string path,
+            Type expectedType
+        )
+        {
+            Exception exception = RelativePath.GetExceptionForWin32Error(errorCode, path);
+
+            exception.Should().BeOfType(expectedType);
+        }
+
+        [TestMethod]
+        public void ErrorCodeHelpers_ConvertBetweenWin32AndHResultForms()
+        {
+            int hr = RelativePath.MakeHRFromErrorCode(RelativePath.ERROR_ACCESS_DENIED);
+
+            hr.Should().Be(unchecked((int)0x80070005));
+            RelativePath.MakeHRFromErrorCode(hr).Should().Be(hr);
+            RelativePath
+                .TryMakeWin32ErrorCodeFromHR(hr)
+                .Should()
+                .Be(RelativePath.ERROR_ACCESS_DENIED);
+            RelativePath.TryMakeWin32ErrorCodeFromHR(1234).Should().Be(1234);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace TaskMaster.Test.AppGlobals
     /// <see cref="TestInitialize"/> and restored in <see cref="TestCleanup"/> so the tests are
     /// independent and do not leave machine state mutated.
     /// </summary>
+    [DoNotParallelize]
     [TestClass]
     public class AppQuickFilerSettingsTests
     {

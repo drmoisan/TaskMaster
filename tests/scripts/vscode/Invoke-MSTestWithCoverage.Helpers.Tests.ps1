@@ -37,6 +37,19 @@ Describe 'ConvertTo-KoverageCoberturaXml' {
         $sourceNode.InnerText | Should -Be '.'
     }
 
+    It 'strips active and stale TaskMaster roots while preserving already relative paths' {
+        $worktreeRoot = 'C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57'
+        $canonicalRoot = 'C:\Users\DanMoisan\repos\TaskMaster'
+        $relativeSource = 'ToDoModel\Data Model\ToDo\ToDoItem.cs'
+
+        ConvertTo-KoverageRelativePath -Path "$canonicalRoot\$relativeSource" -RepoRoot $worktreeRoot -PathSeparator '\' |
+            Should -Be $relativeSource
+        ConvertTo-KoverageRelativePath -Path "$canonicalRoot\$relativeSource" -RepoRoot $canonicalRoot -PathSeparator '\' |
+            Should -Be $relativeSource
+        ConvertTo-KoverageRelativePath -Path $relativeSource -RepoRoot $worktreeRoot -PathSeparator '\' |
+            Should -Be $relativeSource
+    }
+
     It 'merges duplicate class entries that point to the same source file' {
         $inputXml = @'
 <?xml version="1.0" encoding="utf-8"?>
@@ -79,6 +92,44 @@ Describe 'ConvertTo-KoverageCoberturaXml' {
         $line11.hits | Should -Be '1'
         $line12.branch | Should -Be 'True'
         $line12.'condition-coverage' | Should -Be '50% (1/2)'
+    }
+
+    It 'normalizes stale TaskMaster roots before merging duplicate production class entries' {
+        $inputXml = @'
+<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="0" branch-rate="0" lines-covered="0" lines-valid="0" branches-covered="0" branches-valid="0">
+  <packages>
+    <package name="ToDoModel" line-rate="0" branch-rate="0" complexity="1">
+      <classes>
+        <class name="ToDoModel.ToDoItem" filename="C:\Users\DanMoisan\repos\TaskMaster\ToDoModel\Data Model\ToDo\ToDoItem.cs" line-rate="0.5" branch-rate="0" complexity="2">
+          <methods />
+          <lines>
+            <line number="10" hits="1" branch="False" />
+            <line number="11" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="ToDoModel.ToDoItem.&lt;&gt;c" filename="ToDoModel\Data Model\ToDo\ToDoItem.cs" line-rate="1" branch-rate="0" complexity="3">
+          <methods />
+          <lines>
+            <line number="11" hits="1" branch="False" />
+            <line number="12" hits="1" branch="False" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+  </packages>
+</coverage>
+'@
+
+        [xml]$resultXml = ConvertTo-KoverageCoberturaXml -XmlContent $inputXml -RepoRoot 'C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57' -PathSeparator '\'
+        $classNodes = @($resultXml.SelectNodes('//class[@filename="ToDoModel\Data Model\ToDo\ToDoItem.cs"]'))
+        $line11 = $resultXml.SelectSingleNode('//class[@filename="ToDoModel\Data Model\ToDo\ToDoItem.cs"]/lines/line[@number="11"]')
+
+        $classNodes.Count | Should -Be 1
+        $line11.hits | Should -Be '1'
+        $resultXml.coverage.'lines-covered' | Should -Be '3'
+        $resultXml.coverage.'lines-valid' | Should -Be '3'
+        $resultXml.coverage.'line-rate' | Should -Be '1'
     }
 
     It 'excludes .Test packages from the report and from the aggregate covered/valid line totals' {
