@@ -55,7 +55,7 @@ The five issue #236 targets contain logic that is not currently covered because 
 - [x] AC5 - `TlpCellStates` constructors, raw-list conversion behavior, duplicate-key behavior, `TryAddState` outcomes, empty input handling, and null-input behavior are covered directly. If production behavior changes, null inputs fail fast with a specific exception.
 - [x] AC6 - Existing public/static production entry points remain source-compatible for current callers, including queue APIs, `QfcThemeHelper` production overloads, `EfcHomeController` public constructor and factory methods, and `TlpCellStates` constructors.
 - [x] AC7 - No coverage exemptions are added for `EfcViewerQueue`, `ItemViewerQueue`, `QfcThemeHelper`, `EfcHomeController`, or `TlpCellStates`, and no coverage configuration is weakened.
-- [ ] AC8 - Repository-wide line coverage remains at or above 80%, and changed or newly introduced non-exempt code for issue #236 meets the repository policy target of at least 90% coverage.
+- [x] AC8 - Repository-wide line coverage remains at or above 80%, and changed or newly introduced non-exempt code for issue #236 meets the repository policy target of at least 90% coverage.
 - [x] AC9 - All implementation evidence, including baselines, QA gates, regression results, and coverage artifacts, is stored under `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/<kind>/`.
 - [x] AC10 - The final C# toolchain passes in order: CSharpier, .NET analyzers, nullable analysis with warnings as errors, and MSTest with code coverage.
 
@@ -70,7 +70,7 @@ The five issue #236 targets contain logic that is not currently covered because 
 | AC5 | PASS | `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/regression-testing/tlp-cell-states-tests.2026-07-04T13-15.md`; `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/final-coverage-targets.2026-07-04T13-15.md` |
 | AC6 | PASS | `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/final-analyzer-build.2026-07-04T13-15.md`; `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/final-nullable-build.2026-07-04T13-15.md` |
 | AC7 | PASS | `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/final-no-coverage-exemptions.2026-07-04T13-15.md` |
-| AC8 | FAIL | `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/remediation-cycle3-coverage-thresholds.2026-07-04T13-15.md` reports repository coverage 43.84% against the 80.00% threshold; issue #236 changed/new, per-file changed/new, and target coverage gates pass. |
+| AC8 | PASS | `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/remediation-cycle2-current-coverage-thresholds.2026-07-04T18-52.md` reports repository coverage 81.08% against the 80.00% threshold, issue #236 changed/new coverage 95.74% against the 90.00% threshold, and per-file and target coverage gates passing. |
 | AC9 | PASS | `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/final-evidence-location-audit.2026-07-04T13-15.md` |
 | AC10 | PASS | `docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/qa-gates/final-toolchain-loop.2026-07-04T13-15.md` |
 

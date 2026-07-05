@@ -66,7 +66,7 @@ small collaborators so minimal code remains untestable.
 - [x] AC7 - No coverage exemptions are added for `EfcViewerQueue`,
       `ItemViewerQueue`, `QfcThemeHelper`, `EfcHomeController`, or
       `TlpCellStates`, and no coverage configuration is weakened.
-- [ ] AC8 - Repository-wide line coverage remains at or above 80%, and changed
+- [x] AC8 - Repository-wide line coverage remains at or above 80%, and changed
       or newly introduced non-exempt code for issue #236 meets the repository
       policy target of at least 90% coverage.
 - [x] AC9 - All implementation evidence, including baselines, QA gates,
