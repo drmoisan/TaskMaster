@@ -60,10 +60,17 @@
     <Compile Include="Controllers\KaKeyTests.cs" />
     <Compile Include="Controllers\KaStringAsyncTests.cs" />
     <Compile Include="Controllers\FilerQueueTests.cs" />
+    <Compile Include="Controllers\QfcQueueCoverageExpansionTests.cs" />
     <Compile Include="Controllers\QfcQueuePurePathsTests.cs" />
     <Compile Include="Controllers\EfcDataModelTests.cs" />
     <Compile Include="Controllers\EfcFormControllerTests.cs" />
+    <Compile Include="Controllers\EfcHomeControllerDependenciesTests.cs" />
+    <Compile Include="Controllers\EfcHomeControllerDependenciesProductionFactoryTests.cs" />
+    <Compile Include="Controllers\EfcHomeControllerExecuteMovesTests.cs" />
+    <Compile Include="Controllers\EfcHomeControllerLifecycleTests.cs" />
+    <Compile Include="Controllers\EfcHomeControllerMetricsTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerTests.cs" />
+    <Compile Include="Controllers\EfcHomeControllerSeamTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerTests.cs" />
     <Compile Include="Controllers\QfcDatamodelTests.cs" />
     <Compile Include="Controllers\QfcFormControllerTests.cs" />
@@ -106,7 +113,11 @@
     <Compile Include="Helper Classes\ConversationResolverTests.cs" />
     <Compile Include="Helper Classes\EmailMoveMonitorTests.cs" />
     <Compile Include="Helper Classes\MailItemInfoTests.cs" />
+    <Compile Include="Helper Classes\QfcThemeHelperTests.cs" />
+    <Compile Include="Helper Classes\TlpCellStatesTests.cs" />
     <Compile Include="Helper Classes\TlpCellSnapShotTests.cs" />
+    <Compile Include="Helper Classes\ViewerQueueCoreTests.cs" />
+    <Compile Include="Helper Classes\ViewerQueueStaticWrapperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QfcViewer_Test.cs" />
     <Compile Include="SetupAssemblyInitializer.cs" />
@@ -205,6 +216,15 @@
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.3912.50, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.3912.50\lib\net462\Microsoft.Web.WebView2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.WebView2.WinForms, Version=1.0.3912.50, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.3912.50\lib\net462\Microsoft.Web.WebView2.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="ObjectListView, Version=2.9.1.1072, Culture=neutral, PublicKeyToken=b1c5bf581481bcd4, processorArchitecture=MSIL">
+      <HintPath>..\packages\ObjectListView.Official.2.9.1\lib\net20\ObjectListView.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Testing.Extensions.MSBuild, Version=2.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Testing.Platform.MSBuild.2.2.2\lib\netstandard2.0\Microsoft.Testing.Extensions.MSBuild.dll</HintPath>

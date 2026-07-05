@@ -133,17 +133,16 @@ The MCP validator and required CI checks are the hard completion boundary. There
 Do not claim mission completion unless all required delegations completed with receipts and the required orchestration artifacts exist on disk.
 '''
 
-[mcp_servers.drm-copilot]
-enabled = true
-
-[skills.config]
-policy-compliance-order = true
-orchestrate = true
-orchestrator-workflow = true
-feature-promotion-lifecycle = true
-repo-automation-adapter = true
-atomic-plan-contract = true
-acceptance-criteria-tracking = true
-evidence-and-timestamp-conventions = true
-pr-context-artifacts = true
-pr-base-branch-merge-base = true
+[skills]
+config = [
+    { name = "policy-compliance-order", enabled = true },
+    { name = "orchestrate", enabled = true },
+    { name = "orchestrator-workflow", enabled = true },
+    { name = "feature-promotion-lifecycle", enabled = true },
+    { name = "repo-automation-adapter", enabled = true },
+    { name = "atomic-plan-contract", enabled = true },
+    { name = "acceptance-criteria-tracking", enabled = true },
+    { name = "evidence-and-timestamp-conventions", enabled = true },
+    { name = "pr-context-artifacts", enabled = true },
+    { name = "pr-base-branch-merge-base", enabled = true },
+]

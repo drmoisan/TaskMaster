@@ -17,6 +17,11 @@ namespace QuickFiler
         public TlpCellStates(IEnumerable<KeyValuePair<string, TlpCellSnapShotList>> collection)
             : base()
         {
+            if (collection is null)
+            {
+                throw new ArgumentNullException(nameof(collection));
+            }
+
             foreach (var kvp in collection)
                 this.Add(kvp.Key, kvp.Value);
         }
@@ -24,6 +29,11 @@ namespace QuickFiler
         public TlpCellStates(IEnumerable<KeyValuePair<string, List<TlpCellSnapShot>>> collection)
             : base()
         {
+            if (collection is null)
+            {
+                throw new ArgumentNullException(nameof(collection));
+            }
+
             foreach (var kvp in collection)
                 this.Add(kvp.Key, new TlpCellSnapShotList(kvp.Value));
         }

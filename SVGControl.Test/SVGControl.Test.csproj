@@ -72,12 +72,19 @@
       <DependentUpon>Form2.cs</DependentUpon>
     </Compile>
     <Compile Include="GetRelativePath_Test.cs" />
+    <Compile Include="RelativePathCoverageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SVGControl\SVGControl.csproj">
+      <Project>{D0FEE0D9-901A-4FB8-97D1-96A8F634B83C}</Project>
+      <Name>SVGControl</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Form1.resx">

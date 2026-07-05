@@ -1,93 +1,123 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Threading;
 using UtilitiesCS;
-using UtilitiesCS.Threading;
 
 namespace QuickFiler
 {
     public static class ItemViewerQueue
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
-        );
-        private static Queue<ItemViewer> _queue = new Queue<ItemViewer>();
+        internal static Func<ItemViewer> ProductionViewerFactory { get; set; } =
+            CreateProductionViewer;
+
+        internal static Action<Action> ProductionSynchronousScheduler { get; set; } =
+            action => action();
+
+        internal static Action<
+            Action,
+            DispatcherPriority
+        > ProductionPriorityScheduler { get; set; } =
+            (action, priority) => _ = UiThread.Dispatcher.InvokeAsync(action, priority);
+
+        internal static Action<
+            Action,
+            DispatcherPriority
+        > ProductionBlockingPriorityScheduler { get; set; } =
+            (action, priority) => UiThread.Dispatcher.Invoke(action, priority);
+
+        private static ViewerQueueCore<ItemViewer> _core = CreateProductionCore();
 
         public static void BuildQueueWhenIdle(int count)
         {
-            for (int i = 0; i < count; i++)
-            {
-                _ = UiThread.Dispatcher.InvokeAsync(
-                    () =>
-                    {
-                        _queue.Enqueue(new ItemViewer());
-                    },
-                    System.Windows.Threading.DispatcherPriority.ContextIdle
-                );
-            }
+            _core.BuildQueue(count, DispatcherPriority.ContextIdle);
         }
 
         public static void BuildQueueBackground(int count)
         {
-            for (int i = 0; i < count; i++)
-            {
-                _ = UiThread.Dispatcher.InvokeAsync(
-                    () =>
-                    {
-                        _queue.Enqueue(new ItemViewer());
-                        //logger.Debug($"Enqueued {_queue.Count}");
-                    },
-                    System.Windows.Threading.DispatcherPriority.Background
-                );
-            }
+            _core.BuildQueue(count, DispatcherPriority.Background);
         }
 
         public static void BuildQueue(int count)
         {
-            for (int i = 0; i < count; i++)
-            {
-                _queue.Enqueue(new ItemViewer());
-                //logger.Debug($"Enqueued {_queue.Count}");
-            }
+            _core.BuildQueue(count);
         }
 
         public static ItemViewer Dequeue(CancellationToken token)
         {
-            ItemViewer viewer = null;
-            if (_queue.Count > 0)
-            {
-                viewer = _queue.Dequeue();
-                //logger.Debug($"Dequeued 1, {_queue.Count} remaining");
-                BuildQueueWhenIdle(1);
-            }
-            else
-            {
-                viewer = UiThread.Dispatcher.Invoke(
-                    () => new ItemViewer(),
-                    DispatcherPriority.Render
-                );
-                BuildQueueWhenIdle(1);
-            }
-            return viewer;
+            return _core.Dequeue(
+                token,
+                DispatcherPriority.Render,
+                1,
+                1,
+                DispatcherPriority.ContextIdle
+            );
         }
 
         public static IEnumerable<ItemViewer> DequeueChunk(int count)
         {
-            var countOriginal = _queue.Count;
-            if (countOriginal < count)
-            {
-                UiThread.Dispatcher.Invoke(
-                    () => BuildQueue(count - countOriginal),
-                    DispatcherPriority.Render
-                );
-            }
-            BuildQueueWhenIdle(countOriginal);
-            return _queue.DequeueChunk(count);
+            return _core.DequeueChunk(
+                count,
+                DispatcherPriority.Render,
+                DispatcherPriority.ContextIdle
+            );
+        }
+
+        /// <summary>
+        /// Replaces the production queue core for deterministic unit tests.
+        /// </summary>
+        internal static void SetCoreForTesting(ViewerQueueCore<ItemViewer> core)
+        {
+            _core = core ?? throw new System.ArgumentNullException(nameof(core));
+        }
+
+        /// <summary>
+        /// Restores the production queue core after deterministic unit tests.
+        /// </summary>
+        internal static void ResetCoreForTesting()
+        {
+            _core.Reset();
+            _core = CreateProductionCore();
+        }
+
+        internal static void ResetProductionCoreDefaultsForTesting()
+        {
+            ProductionViewerFactory = CreateProductionViewer;
+            ProductionSynchronousScheduler = action => action();
+            ProductionPriorityScheduler = (action, priority) =>
+                _ = UiThread.Dispatcher.InvokeAsync(action, priority);
+            ProductionBlockingPriorityScheduler = (action, priority) =>
+                UiThread.Dispatcher.Invoke(action, priority);
+        }
+
+        private static ViewerQueueCore<ItemViewer> CreateProductionCore()
+        {
+            return CreateProductionCore(
+                ProductionViewerFactory,
+                ProductionSynchronousScheduler,
+                ProductionPriorityScheduler,
+                ProductionBlockingPriorityScheduler
+            );
+        }
+
+        private static ItemViewer CreateProductionViewer()
+        {
+            return new ItemViewer();
+        }
+
+        internal static ViewerQueueCore<ItemViewer> CreateProductionCore(
+            Func<ItemViewer> viewerFactory,
+            Action<Action> synchronousScheduler,
+            Action<Action, DispatcherPriority> priorityScheduler,
+            Action<Action, DispatcherPriority> blockingPriorityScheduler
+        )
+        {
+            return new ViewerQueueCore<ItemViewer>(
+                viewerFactory,
+                synchronousScheduler,
+                priorityScheduler,
+                blockingPriorityScheduler
+            );
         }
     }
 }

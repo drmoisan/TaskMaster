@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
+using UtilitiesCS.Interfaces;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.HelperClasses
@@ -13,14 +14,20 @@ namespace UtilitiesCS.HelperClasses
     public class TimedAsyncTask
     {
         public TimedAsyncTask(TimeSpan frequency)
-        {
-            _frequency = frequency;
-        }
+            : this(frequency, null, CreateTimer) { }
 
         public TimedAsyncTask(TimeSpan frequency, Func<Task> action)
+            : this(frequency, action, CreateTimer) { }
+
+        internal TimedAsyncTask(
+            TimeSpan frequency,
+            Func<Task> action,
+            Func<TimeSpan, ITimerWrapper> createTimer
+        )
         {
             _frequency = frequency;
             _action = action;
+            _createTimer = createTimer ?? throw new ArgumentNullException(nameof(createTimer));
         }
 
         public void SetAction(Func<Task> action)
@@ -29,10 +36,11 @@ namespace UtilitiesCS.HelperClasses
         }
 
         private Func<Task> _action;
+        private readonly Func<TimeSpan, ITimerWrapper> _createTimer = CreateTimer;
 
         private TimeSpan _frequency;
         private ThreadSafeSingleShotGuard _taskRequested = new();
-        private TimerWrapper _timer;
+        private ITimerWrapper _timer = null;
 
         public void ResetTimer()
         {
@@ -54,7 +62,7 @@ namespace UtilitiesCS.HelperClasses
                     throw new NullReferenceException("Task is null");
                 }
                 var action2 = ResetAfterTask(_action);
-                _timer = new TimerWrapper(_frequency);
+                _timer = _createTimer(_frequency);
                 _timer.Elapsed += (sender, e) => action2();
                 _timer.AutoReset = false;
                 _timer.StartTimer();
@@ -74,7 +82,7 @@ namespace UtilitiesCS.HelperClasses
                     throw new NullReferenceException("Task is null");
                 }
                 var action2 = ResetAfterTask(_action);
-                _timer = new TimerWrapper(_frequency);
+                _timer = _createTimer(_frequency);
                 _timer.Elapsed += (sender, e) => action2();
                 _timer.AutoReset = false;
                 _timer.StartTimer();
@@ -90,11 +98,16 @@ namespace UtilitiesCS.HelperClasses
                     throw new NullReferenceException("Task is null");
                 }
                 var task2 = ResetAfterTask(task);
-                _timer = new TimerWrapper(_frequency);
+                _timer = _createTimer(_frequency);
                 _timer.Elapsed += async (sender, e) => await task2();
                 _timer.AutoReset = false;
                 _timer.StartTimer();
             }
+        }
+
+        private static ITimerWrapper CreateTimer(TimeSpan frequency)
+        {
+            return new TimerWrapper(frequency);
         }
 
         private Func<Task> ResetAfterTask(Func<Task> task)
