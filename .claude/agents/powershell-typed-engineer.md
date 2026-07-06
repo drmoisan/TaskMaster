@@ -1,5 +1,6 @@
 ---
 name: powershell-typed-engineer
+model: sonnet
 description: Project-scoped worker that implements and verifies PowerShell changes within typed repository boundaries. Applies PoshQC format -> PSScriptAnalyzer -> Pester toolchain, the 1-2 production-file direct-mode budget, the 3-production + 3-test per-batch cap, and zero-regression quality gates.
 tools:
   - Read
@@ -20,12 +21,6 @@ skills:
   - remediation-handoff-atomic-planner
   - evidence-and-timestamp-conventions
 memory: project
-hooks:
-  PreToolUse:
-    - matcher: "Write|Edit"
-      hooks:
-        - type: command
-          command: pwsh -NoProfile -File .claude/hooks/enforce-powershell-batch-budget.ps1
 ---
 
 # PowerShell Typed Engineer Agent

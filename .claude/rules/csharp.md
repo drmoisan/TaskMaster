@@ -12,8 +12,8 @@ This rule file summarizes the C#-specific policies for this repository.
 ## Toolchain
 
 1. **Formatting — CSharpier**: All C# source files must be formatted with CSharpier. Do not use `dotnet format`. Command: `dotnet tool run csharpier .` or `csharpier .`
-2. **Linting — .NET Analyzers**: C# code must pass Roslyn/.NET analyzer diagnostics. Command: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
-3. **Type Checking — Nullable Analysis**: Enable nullable reference types and fail on warnings. Command: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+2. **Linting — .NET Analyzers**: C# code must pass Roslyn/.NET analyzer diagnostics. Command: `msbuild <solution>.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+3. **Type Checking — Nullable Analysis**: Enable nullable reference types and fail on warnings. Command: `msbuild <solution>.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
 4. **Testing — MSTest + Moq + FluentAssertions**: Run tests with: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
 
 Run the toolchain in order: format → lint → type-check → test. Restart from step 1 if any step fails or changes files.
@@ -60,11 +60,11 @@ For new or touched time-dependent code, inject `System.TimeProvider` through the
 - Tests supply `FakeTimeProvider` from `Microsoft.Extensions.TimeProvider.Testing` to make time deterministic.
 - Do not call `DateTime.Now`, `DateTime.UtcNow`, or `DateTimeOffset.Now` directly in new/touched code; obtain time via the injected `TimeProvider` (for example `GetUtcNow()` / `GetLocalNow()`).
 
-This is guidance only: it introduces no runtime behavior change and does not require rewriting existing call sites. `Microsoft.Bcl.TimeProvider` (the .NET Framework backport of `System.TimeProvider`) is already present in UtilitiesCS, so the seam is available without adding a new production dependency. Legacy call-site migration is follow-up work, not a requirement of adopting this guidance.
+This is guidance only: it introduces no runtime behavior change and does not require rewriting existing call sites. Where `Microsoft.Bcl.TimeProvider` (the .NET Framework backport of `System.TimeProvider`) is already present in the repository, the seam is available without adding a new production dependency. Legacy call-site migration is follow-up work, not a requirement of adopting this guidance.
 
-## Analyzer Stack (Issue #181)
+## Analyzer Stack
 
-This repository adopts a fixed set of FIVE static-analysis packages, wired first-party only (the 15 first-party projects; the 4 vendored projects — SVGControl, SVGControl.Test, UtilitiesSwordfish.NET.General, UtilitiesSwordfish.Test — are excluded):
+This repository adopts a fixed set of FIVE static-analysis packages, wired into first-party projects only (vendored or third-party projects are excluded):
 
 1. **Meziantou.Analyzer**
 2. **SonarAnalyzer.CSharp**

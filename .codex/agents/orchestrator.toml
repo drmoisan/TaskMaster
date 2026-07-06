@@ -76,6 +76,8 @@ Every agent named above must exist as a native Codex agent under `.codex/agents/
 - Do not rename, back up, or create sidecar checkpoint files.
 - Do not create or edit `${feature-folder}/issue.md`, `${feature-folder}/spec.md`, `${feature-folder}/user-story.md`, or `plan*.md` until lifecycle setup succeeds.
 - Do not persist placeholder lifecycle values such as `NONE`, `TBD`, or empty strings once lifecycle setup begins.
+- After active folder creation and before planner delegation, resolve `${plan-path}` by enumerating existing `${feature-folder}/plan*.md` files in deterministic filename order. If a scaffolded timestamped plan exists, persist and delegate against that exact file. Do not default to `${feature-folder}/plan.md` and do not create a second plan artifact when a plan already exists.
+- For issue #306, the canonical existing plan path is `docs/features/active/2026-07-04-codex-agent-role-config-306/plan.2026-07-04T13-47.md`; reuse that exact file and do not create `docs/features/active/2026-07-04-codex-agent-role-config-306/plan.md`.
 
 ## Checkpoint Persistence
 

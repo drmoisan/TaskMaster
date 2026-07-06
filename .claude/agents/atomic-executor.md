@@ -1,5 +1,6 @@
 ---
 name: atomic-executor
+model: opus
 description: Plan execution agent that runs approved atomic plans task-by-task with explicit toolchain commands for Python, TypeScript, PowerShell, and C# quality gates.
 tools:
   - Read
@@ -14,7 +15,7 @@ tools:
   - "Bash(npx prettier *)"
   - "Bash(npx eslint *)"
   - "Bash(npx tsc *)"
-  - "Bash(npx jest *)"
+  - "Bash(npx vitest *)"
   - "Bash(pwsh *)"
   - "Bash(git *)"
   - "mcp__drm-copilot__run_poshqc_format"
@@ -75,7 +76,7 @@ For each task:
 Use the scoped tool patterns for quality gates:
 
 - **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-- **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+- **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx vitest`
 - **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 - **Git**: `git diff`, `git status`, `git log`
 

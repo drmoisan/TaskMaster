@@ -85,27 +85,3 @@ command = "pwsh -NoProfile -File .codex/hooks/enforce-orchestration-preimplement
 [[hooks.SubagentStop]]
 matcher = "feature-review|feature-reviewer"
 command = "pwsh -NoProfile -File .codex/hooks/validate-feature-review-coverage.ps1"
-
-[permissions.orchestrator-workspace]
-description = "Workspace editing for deterministic orchestration with secret-path deny rules."
-extends = ":workspace"
-
-[permissions.orchestrator-workspace.filesystem]
-glob_scan_max_depth = 4
-
-[permissions.orchestrator-workspace.filesystem.":workspace_roots"]
-"**/.env" = "deny"
-"**/.env.*" = "deny"
-"secrets" = "deny"
-"secrets/**" = "deny"
-
-[permissions.orchestrator-workspace.network]
-enabled = true
-
-[permissions.orchestrator-workspace.network.domains]
-"github.com" = "allow"
-"api.github.com" = "allow"
-"objects.githubusercontent.com" = "allow"
-"registry.npmjs.org" = "allow"
-"pypi.org" = "allow"
-"files.pythonhosted.org" = "allow"

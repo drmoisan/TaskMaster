@@ -5,6 +5,8 @@ description: Final QA gate for C# changes. Executes the full CSharpier -> .NET A
 
 # C# QA Gate
 
+Legacy C# variant resource for Codex push-down.
+
 Canonical procedure for the Phase D final quality gate that every C# change must pass before completion is reported.
 
 ## When to Use This Skill

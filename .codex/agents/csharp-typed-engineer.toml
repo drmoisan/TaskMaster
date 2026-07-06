@@ -1,5 +1,6 @@
 name = "csharp-typed-engineer"
 description = "Converted subagent"
+variant = "legacy"
 developer_instructions = '''
 Canonical migration source: .github/agents/csharp-typed-engineer.agent.md
 Read the canonical source agent file first and follow it exactly.
