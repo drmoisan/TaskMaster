@@ -7,7 +7,7 @@ namespace UtilitiesCS
     /// <summary>
     /// COM-bound production implementation of <see cref="IOutlookReadinessGate"/> (Issue #207).
     /// Probes Outlook store readiness with a cheap, non-throwing default-folder access and
-    /// discriminates the two known transient "not-ready" COM HRESULTs so the readiness
+    /// discriminates the known transient "not-ready" COM HRESULTs so the readiness
     /// coordinator routes them to retry instead of failing the startup action.
     /// </summary>
     /// <remarks>
@@ -33,6 +33,12 @@ namespace UtilitiesCS
         /// Outlook cold start (<c>0x8E640111</c>). Treated as not-ready (retry).
         /// </summary>
         public const uint TransientOperationFailedHResult = 0x8E640111;
+
+        /// <summary>
+        /// Transient Outlook readiness HRESULT observed during startup hook polling
+        /// (<c>0x90740111</c>). Treated as not-ready (retry).
+        /// </summary>
+        public const uint TransientStartupReadinessHResult = 0x90740111;
 
         private readonly Application _app;
 
@@ -66,8 +72,9 @@ namespace UtilitiesCS
         }
 
         /// <summary>
-        /// Returns <c>true</c> only for the two known transient "not-ready" COM HRESULTs
-        /// (<see cref="TransientStoreNotReadyHResult"/> / <see cref="TransientOperationFailedHResult"/>),
+        /// Returns <c>true</c> only for the known transient "not-ready" COM HRESULTs
+        /// (<see cref="TransientStoreNotReadyHResult"/> / <see cref="TransientOperationFailedHResult"/> /
+        /// <see cref="TransientStartupReadinessHResult"/>),
         /// which should be retried; returns <c>false</c> for any other <see cref="COMException"/>.
         /// </summary>
         public bool IsTransientError(COMException e)
@@ -79,7 +86,8 @@ namespace UtilitiesCS
 
             uint hresult = unchecked((uint)e.ErrorCode);
             return hresult == TransientStoreNotReadyHResult
-                || hresult == TransientOperationFailedHResult;
+                || hresult == TransientOperationFailedHResult
+                || hresult == TransientStartupReadinessHResult;
         }
     }
 }
