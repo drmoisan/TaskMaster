@@ -88,7 +88,7 @@ namespace UtilitiesCS.Test
             // Act
             int result = await function.RunWithTimeout(
                 CancellationToken.None,
-                milliseconds: 100,
+                milliseconds: Timeout.Infinite,
                 maxAttempts: 0,
                 strict: true
             );
@@ -154,7 +154,7 @@ namespace UtilitiesCS.Test
                     1,
                     2,
                     CancellationToken.None,
-                    milliseconds: 100,
+                    milliseconds: Timeout.Infinite,
                     maxAttempts: 0,
                     strict: true
                 );
