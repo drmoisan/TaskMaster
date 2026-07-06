@@ -36,6 +36,7 @@ namespace QuickFiler.Controllers
             _olApp = _globals.Ol.App;
             _activeExplorer = _olApp.ActiveExplorer();
             _globals.Ol.App.NewMailEx += Application_NewMailEx;
+            RemainingEmailLoader = LoadRemainingEmailsToQueueAsync;
         }
 
         public QfcDatamodel(IApplicationGlobals appGlobals, CancellationToken token)
@@ -46,6 +47,7 @@ namespace QuickFiler.Controllers
             _activeExplorer = _olApp.ActiveExplorer();
             _frame = InitDf(_activeExplorer);
             _globals.Ol.App.NewMailEx += Application_NewMailEx;
+            RemainingEmailLoader = LoadRemainingEmailsToQueueAsync;
         }
 
         public static async Task<QfcDatamodel> LoadAsync(
@@ -108,6 +110,22 @@ namespace QuickFiler.Controllers
         /// </summary>
         internal TimeProvider TimeProvider { get; set; } = TimeProvider.System;
 
+        /// <summary>
+        /// Injectable worker-body seam for <see cref="Worker_DoWork"/>. Defaulted (in the instance
+        /// constructors, below) to the single-argument <see cref="LoadRemainingEmailsToQueueAsync(CancellationToken)"/>
+        /// overload so production behavior is unchanged; tests assign an inert delegate so a started
+        /// <see cref="BackgroundWorker"/> never reaches <see cref="MessageBox.Show(string)"/> or live
+        /// Outlook COM. A property initializer cannot be used here: a method-group conversion that
+        /// captures the instance method target is a "this" reference and C# forbids referencing
+        /// instance members (including from within a nested lambda) in an instance field/property
+        /// initializer (CS0236); the default is therefore assigned in each constructor instead. Test
+        /// instances built via <see cref="System.Runtime.Serialization.FormatterServices.GetUninitializedObject"/>
+        /// bypass constructors entirely, so this property remains <see langword="null"/> on such
+        /// instances until a test assigns it explicitly, exactly as a property initializer would have
+        /// behaved.
+        /// </summary>
+        internal Func<CancellationToken, Task<bool>> RemainingEmailLoader { get; set; }
+
         #endregion Private Variables
 
         #region Public Properties
@@ -165,7 +183,7 @@ namespace QuickFiler.Controllers
                 // Start the time-consuming operation.
                 //e.Result = await LoadRemainingEmailsToQueueAsync(bw, _token);
                 //e.Result = LoadRemainingEmailsToQueue(bw, _token);
-                e.Result = await LoadRemainingEmailsToQueueAsync(_token);
+                e.Result = await RemainingEmailLoader(_token);
 
                 // If the operation was canceled by the user,
                 // set the DoWorkEventArgs.Cancel property to true.
@@ -211,6 +229,17 @@ namespace QuickFiler.Controllers
         public IList<MailItem> InitEmailQueue(int batchSize, BackgroundWorker worker)
         {
             _worker = worker;
+
+            // Issue #244: a zero (or negative) batch size must not attempt to slice-and-project an
+            // empty range through GetRowsAs<IEmailSortInfo>(), which throws once the sliced frame's
+            // column index is empty. Skip straight to the empty result while still starting the
+            // background worker so remaining emails continue to stream into the master queue.
+            if (batchSize <= 0)
+            {
+                SetupWorker(worker);
+                worker.RunWorkerAsync();
+                return new List<MailItem>();
+            }
 
             // Extract first batch
             batchSize = batchSize < _frame.RowCount ? batchSize : _frame.RowCount;
