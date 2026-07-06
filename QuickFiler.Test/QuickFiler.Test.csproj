@@ -70,6 +70,9 @@
     <Compile Include="Controllers\EfcHomeControllerLifecycleTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerMetricsTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerTests.cs" />
+    <Compile Include="Controllers\EmailSorterTests.cs" />
+    <Compile Include="Controllers\BayesianPerformanceControllerTests.cs" />
+    <Compile Include="Controllers\BayesianPerformanceController.TestSupport.cs" />
     <Compile Include="Controllers\EfcHomeControllerSeamTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerTests.cs" />
     <Compile Include="Controllers\QfcDatamodelTests.cs" />
