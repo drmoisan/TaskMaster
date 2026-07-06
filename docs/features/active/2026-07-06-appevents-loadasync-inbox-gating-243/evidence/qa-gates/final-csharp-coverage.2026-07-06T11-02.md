@@ -1,0 +1,5 @@
+Timestamp: 2026-07-06T11:58:05-04:00
+Issue: #243
+Command: pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot TaskMaster.Test -Configuration Debug -CoverageOutput docs/features/active/2026-07-06-appevents-loadasync-inbox-gating-243/evidence/qa-gates/final-csharp-coverage.2026-07-06T11-02.cobertura.xml
+EXIT_CODE: 0
+Output Summary: PASS with tooling workaround recorded. The coverage script has a known scalar `.Count` failure when exactly one test assembly is discovered under `TaskMaster.Test`; a no-test build-output assembly was created before the command and removed after the command so the planned command could execute without editing source or scripts. VSTest reported `Test Run Successful`, `Total tests: 197`, `Passed: 197`, and wrote `final-csharp-coverage.2026-07-06T11-02.cobertura.xml`. Parsed final repository line coverage: 8.9566% (`line-rate=0.089566`, `lines-covered=7658`, `lines-valid=85501`). Parsed final `TaskMaster/AppGlobals/AppEvents.cs` line coverage: 90.7960% (`line-rate=0.90796`).

@@ -82,14 +82,14 @@ namespace TaskMaster
                     true,
                     "EventsHooked=false"
                 );
-            }
 
-            LogStartupTiming(
-                "[Startup timing] LoadAsync entering deferred processing window before await ProcessNewInboxItemsAsync()",
-                true,
-                "deferred processing window"
-            );
-            await ProcessNewInboxItemsAsync();
+                LogStartupTiming(
+                    "[Startup timing] LoadAsync entering deferred processing window before await ProcessNewInboxItemsAsync()",
+                    true,
+                    "deferred processing window"
+                );
+                await ProcessNewInboxItemsAsync();
+            }
             LogStartupTiming(
                 "LoadAsync complete | startup-active status",
                 false,
@@ -258,6 +258,7 @@ namespace TaskMaster
                     + $"remindersMs={remindersStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}; "
                     + $"inboxSubscribeMs={inboxSubscribeStopwatch.Elapsed.TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}"
             );
+            ProcessStartupInboxItemsAfterReadinessHookup();
         }
 
         public async Task<bool> ProcessMailItemAsync(object item)
