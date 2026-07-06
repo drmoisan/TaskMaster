@@ -463,6 +463,8 @@
     <Compile Include="OneDriveHelpers\OneDriveDownloader_Tests.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemHelper_ExtendedTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.ButtonAndPopulate.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.Launch.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensions_Tests.cs" />
     <Compile Include="OutlookObjects\Table\OlToDoTable_Tests.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\ConfigController_Tests.cs" />
