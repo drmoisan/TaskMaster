@@ -96,6 +96,38 @@ namespace TaskMaster.Test.AppGlobals
         }
 
         [TestMethod]
+        public void Tick_WhenHookupThrowsHResult90740111_ReturnsContinuePollingAndLeavesIncomplete()
+        {
+            // Arrange: gate ready; hookup throws the Issue #242 startup-readiness HRESULT.
+            var gate = new Mock<IOutlookReadinessGate>(MockBehavior.Strict);
+            gate.Setup(g => g.IsReady()).Returns(true);
+            var transient = MakeComException(0x90740111);
+            gate.Setup(g => g.IsTransientError(transient)).Returns(true);
+            var coordinator = new HookReadinessCoordinator(gate.Object, () => throw transient);
+
+            // Act.
+            HookReadinessTickResult result = coordinator.Tick();
+
+            // Assert.
+            result.Should().Be(HookReadinessTickResult.ContinuePolling);
+            coordinator
+                .IsCompleted.Should()
+                .BeFalse("the coordinator must retry this startup readiness HRESULT");
+        }
+
+        [TestMethod]
+        public void IsTransientError_WhenHResult90740111_ReturnsTrueAndEFailReturnsFalse()
+        {
+            // Arrange: classifier logic does not touch the Outlook Application dependency.
+            var app = new Mock<Microsoft.Office.Interop.Outlook.Application>(MockBehavior.Strict);
+            var gate = new OutlookReadinessGate(app.Object);
+
+            // Act / Assert.
+            gate.IsTransientError(MakeComException(0x90740111)).Should().BeTrue();
+            gate.IsTransientError(MakeComException(0x80004005)).Should().BeFalse();
+        }
+
+        [TestMethod]
         public void Tick_AfterCompleted_DoesNotInvokeHookupAgainAndStaysCompleted()
         {
             // Arrange: gate ready immediately.
