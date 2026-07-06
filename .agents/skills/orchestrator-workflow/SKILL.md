@@ -101,6 +101,16 @@ Persist and reuse these fields exactly:
 - `lifecycle_operations`
 - `pre-implementation-violation`
 
+Plan-path invariant:
+- `${plan-path}` is resolved only after `${feature-folder}` exists.
+- The orchestrator MUST enumerate existing `${feature-folder}/plan*.md` files
+  in deterministic filename order before planner delegation.
+- If any existing plan file is present, `${plan-path}` MUST be that first
+  existing file. Do not persist or delegate against `${feature-folder}/plan.md`
+  when a timestamped scaffolded plan already exists.
+- If checkpoint state conflicts with the resolved existing plan file, correct
+  checkpoint state before delegation and do not create a duplicate plan.
+
 For small-path runs, also persist:
 - `bootstrap_mode`
 - `phase0_execution_summary`
@@ -310,6 +320,9 @@ Required behavior:
 7. When those specialists are not yet migrated, perform the authoring steps directly without changing template headings.
 8. Spawn `atomic-planner` to finalize `${plan-path}` and require `PREFLIGHT: ALL CLEAR`.
     Hard enforcement for Step 7:
+    - Before spawning `atomic-planner`, resolve `${plan-path}` by enumerating
+      existing `${feature-folder}/plan*.md` files. Reuse the first existing file
+      in deterministic filename order, including timestamped scaffolded plans.
     - The planning route MUST be `atomic-planner -> atomic-executor` for preflight validation.
     - The planner MUST update `${plan-path}` in place and MUST NOT create additional `plan.*.md` files for revisions.
     - The approved plan MUST include explicit Phase 0 baseline evidence tasks and explicit final-QA evidence or coverage tasks for each language in scope where policy requires them.

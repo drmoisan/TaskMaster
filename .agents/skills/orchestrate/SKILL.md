@@ -109,6 +109,24 @@ staging, commits, or implementation delegation. This gate covers edits, formatte
 If any required item is missing, implementation is blocked until the checkpoint
 and lifecycle state are corrected.
 
+## Plan-Path Resolution Gate
+
+After active feature folder creation and before any planning delegation, the
+main session must resolve `${plan-path}` from the active feature folder:
+
+1. Enumerate existing `${feature-folder}/plan*.md` files in deterministic
+   filename order.
+2. If one or more files exist, persist `${plan-path}` as the first existing
+   file and require every planner and executor handoff to use that exact path.
+3. If no `plan*.md` file exists, create exactly one canonical target path using
+   the repository's feature-folder plan naming convention, persist that path,
+   and reuse it for all revisions.
+4. Do not default to `${feature-folder}/plan.md` when a timestamped scaffolded
+   plan already exists.
+5. If checkpoint state names a different plan path than the resolved existing
+   plan file, correct the checkpoint before planner delegation. Do not create a
+   second plan artifact to satisfy an incorrect checkpoint value.
+
 ## Pre-Implementation Violation Handling
 
 If an implementation action is attempted before a required orchestration gate
@@ -141,9 +159,12 @@ There is no fallback. If the MCP server or validation tool is unavailable, or
 if validation fails, the orchestrator must update blocked state and stop rather
 than reporting completion.
 
-The repository CI gate `Orchestrator State Gate` runs the same validator when a
-checkpoint is present. Branch protection should require this check for branches
-that use orchestrated completion.
+No CI workflow performs this validation. The `artifacts/` directory is gitignored,
+so the orchestrator-state checkpoint is never present in a CI checkout; a prior
+CI gate (`validate-orchestrator-state.yml`) that attempted this check was a
+structural no-op for that reason and has been removed. The MCP-server-based
+validation described above is this ecosystem's enforcement mechanism for the
+orchestrator-state checkpoint.
 
 Completion validation requires the checkpoint to prove mandatory handoffs and
 skill use. The checkpoint must include:

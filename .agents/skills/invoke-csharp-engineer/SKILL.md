@@ -5,6 +5,8 @@ description: Invoke the csharp-typed-engineer worker to design, implement, and v
 
 # Implement C# Skill
 
+Legacy C# variant resource for Codex push-down.
+
 This direct-use wrapper delegates C# implementation work to the `csharp-typed-engineer` worker. Use this entry point when a prompt needs a scoped C# change that must stay inside the typed engineer's guardrails.
 
 ## When to Use This Skill

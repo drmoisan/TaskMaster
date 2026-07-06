@@ -8,6 +8,8 @@ description: C#-specific toolchain and coding standards.
 
 # C# Code Standards
 
+Legacy C# variant resource for Codex push-down.
+
 This rule file summarizes the C#-specific policies for this repository.
 
 ## Toolchain
