@@ -62,7 +62,7 @@ Stop immediately and report `BLOCKED: execute-hard-lock <cause>` in any of these
 The three entry points below all produce the same resolved hard-lock prompt for a given plan path. This skill always uses the MCP form:
 
 - MCP (used by this skill): `mcp__drm-copilot__resolve_execute_hard_lock_prompt` with `target=<plan-path>`. The extension passes `--output artifacts/hard_lock_prompt.txt` and `--quiet` to the bundled Python resolver.
-- VS Code command: `@command:drm-copilot.resolveExecuteHardLockPrompt` (interactive; writes to stdout + clipboard, no file artifact).
+- VS Code command: `@command:drmCopilotExtension.resolveExecuteHardLockPrompt` (interactive; writes to stdout + clipboard, no file artifact).
 
 ## Delegation Contract
 

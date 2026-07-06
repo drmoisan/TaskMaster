@@ -1,16 +1,16 @@
 ---
 name: make-skill-template
-description: 'Create new Claude Agent Skills from prompts or by duplicating this template. Use when asked to "create a skill", "make a new skill", "scaffold a skill", or when building specialized AI capabilities with bundled resources. Generates SKILL.md files under .claude/skills/ with proper frontmatter, directory structure, and optional scripts/references/assets folders.'
+description: 'Create new Agent Skills for GitHub Copilot from prompts or by duplicating this template. Use when asked to "create a skill", "make a new skill", "scaffold a skill", or when building specialized AI capabilities with bundled resources. Generates SKILL.md files with proper frontmatter, directory structure, and optional scripts/references/assets folders.'
 ---
 
 # Make Skill Template
 
-A meta-skill for creating new Claude Agent Skills. Use this skill when you need to scaffold a new skill folder under `.claude/skills/`, generate a SKILL.md file, or help users understand the skill structure.
+A meta-skill for creating new Agent Skills. Use this skill when you need to scaffold a new skill folder, generate a SKILL.md file, or help users understand the Agent Skills specification.
 
 ## When to Use This Skill
 
 - User asks to "create a skill", "make a new skill", or "scaffold a skill"
-- User wants to add a specialized capability to their Claude Code setup
+- User wants to add a specialized capability to their GitHub Copilot setup
 - User needs help structuring a skill with bundled resources
 - User wants to duplicate this template as a starting point
 
@@ -27,7 +27,7 @@ A meta-skill for creating new Claude Agent Skills. Use this skill when you need 
 Create a new folder with a lowercase, hyphenated name:
 
 ```
-.claude/skills/<skill-name>/
+skills/<skill-name>/
 └── SKILL.md          # Required
 ```
 
@@ -114,14 +114,14 @@ my-awesome-skill/
 
 ## Quick Start: Duplicate This Template
 
-1. Copy the `.claude/skills/make-skill-template/` folder
+1. Copy the `make-skill-template/` folder
 2. Rename to your skill name (lowercase, hyphens)
 3. Update `SKILL.md`:
    - Change `name:` to match folder name
    - Write a keyword-rich `description:`
    - Replace body content with your instructions
 4. Add bundled resources as needed
-5. Confirm the new skill appears in the session skill list (Claude Code discovers skills under `.claude/skills/` automatically)
+5. Validate with `npm run skill:validate`
 
 ## Validation Checklist
 
@@ -144,4 +144,4 @@ my-awesome-skill/
 
 ## References
 
-- Claude Code skills live under `.claude/skills/<name>/SKILL.md` and are discovered automatically by the session.
+- Agent Skills official spec: <https://agentskills.io/specification>

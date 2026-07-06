@@ -1,5 +1,6 @@
 ---
 name: feature-review
+model: opus
 description: Feature branch review specialist that produces policy-audit, code-review, and feature-audit artifacts restricted to docs/features/active/ write path.
 tools:
   - Read
@@ -8,11 +9,6 @@ tools:
   - "Bash(git diff *)"
   - "Bash(git log *)"
   - "Write(/docs/features/active/**)"
-  - mcp__drm-copilot__resolve_policy_audit_template_asset
-  - mcp__drm-copilot__run_poshqc_format
-  - mcp__drm-copilot__run_poshqc_analyze
-  - mcp__drm-copilot__run_poshqc_test
-  - mcp__drm-copilot__validate_orchestration_artifacts
 skills:
   - policy-compliance-order
   - acceptance-criteria-tracking
@@ -111,9 +107,13 @@ Coverage metrics are mandatory for every language that has changed files in the 
 
 ### Coverage Thresholds
 
-- **New code files** (files added in this feature, not previously existing): line coverage must be >= 90%.
-- **Modified files** (files that existed before and were changed): line coverage must show no regression relative to the baseline and must remain >= 80%.
-- **Repo-wide**: line coverage must remain >= 80% for each language.
+Coverage thresholds follow the uniform tier rule (Authoritative Decision #2) defined in `.claude/rules/quality-tiers.md`:
+
+- **New code files** (files added in this feature, not previously existing): line coverage >= 85%, branch coverage >= 75%.
+- **Modified files** (files that existed before and were changed): line coverage >= 85%, branch coverage >= 75%, and no regression on changed lines relative to baseline.
+- **Repo-wide per language**: line coverage >= 85%, branch coverage >= 75%.
+
+Tier-specific lower thresholds are not used.
 
 ### Verification Procedure
 
