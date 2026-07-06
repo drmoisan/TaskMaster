@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using ToDoModel;
 
@@ -24,6 +25,34 @@ namespace TaskMaster
         internal async Task LogAsync(string message)
         {
             await Task.Run(() => logger.Debug(message));
+        }
+
+        private void ProcessStartupInboxItemsAfterReadinessHookup()
+        {
+            var processingTask = ProcessNewInboxItemsAsync();
+            if (processingTask.IsCompleted)
+            {
+                if (processingTask.IsFaulted)
+                {
+                    logger.Error(
+                        "Startup inbox processing failed after readiness hookup.",
+                        processingTask.Exception
+                    );
+                }
+
+                return;
+            }
+
+            _ = processingTask.ContinueWith(
+                task =>
+                    logger.Error(
+                        "Startup inbox processing failed after readiness hookup.",
+                        task.Exception
+                    ),
+                CancellationToken.None,
+                TaskContinuationOptions.OnlyOnFaulted,
+                TaskScheduler.Default
+            );
         }
 
         private void OlToDoItems_ItemAdd(object item)

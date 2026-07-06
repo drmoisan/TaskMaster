@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -125,6 +126,39 @@ namespace TaskMaster.Test.AppGlobals
             // Act / Assert.
             gate.IsTransientError(MakeComException(0x90740111)).Should().BeTrue();
             gate.IsTransientError(MakeComException(0x80004005)).Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void Tick_WhenGateBecomesReady_RunsStartupProcessingAfterHookupPopulatesInboxes()
+        {
+            var gate = new Mock<IOutlookReadinessGate>(MockBehavior.Strict);
+            gate.SetupSequence(g => g.IsReady()).Returns(false).Returns(true);
+            var operations = new List<string>();
+            bool inboxesPopulated = false;
+            var coordinator = new HookReadinessCoordinator(
+                gate.Object,
+                () =>
+                {
+                    operations.Add("populate-inboxes");
+                    inboxesPopulated = true;
+                    if (inboxesPopulated)
+                    {
+                        operations.Add("process-startup-inboxes");
+                    }
+                }
+            );
+
+            coordinator.Tick().Should().Be(HookReadinessTickResult.ContinuePolling);
+            operations.Should().BeEmpty("startup processing must wait for the readiness gate");
+
+            coordinator.Tick().Should().Be(HookReadinessTickResult.Completed);
+
+            operations
+                .Should()
+                .Equal(
+                    new[] { "populate-inboxes", "process-startup-inboxes" },
+                    "startup processing must run after readiness hookup populates inboxes"
+                );
         }
 
         [TestMethod]
