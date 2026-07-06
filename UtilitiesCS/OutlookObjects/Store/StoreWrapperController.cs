@@ -11,6 +11,58 @@ using UtilitiesCS.OutlookObjects.Folder;
 
 namespace UtilitiesCS.OutlookObjects.Store
 {
+    /// <summary>
+    /// Describes whether the store-wrapper model is ready for
+    /// <see cref="StoreWrapperController.Launch"/> to open the settings dialog.
+    /// </summary>
+    internal enum StoreLaunchReadinessState
+    {
+        Ready,
+        ModelUnavailable,
+        StoresUnavailable,
+    }
+
+    /// <summary>
+    /// Result of <see cref="StoreWrapperController.EvaluateLaunchReadiness"/>: the readiness
+    /// state plus, when ready, the model and store display names needed to populate the
+    /// settings dialog.
+    /// </summary>
+    internal readonly struct StoreLaunchReadiness
+    {
+        private StoreLaunchReadiness(
+            StoreLaunchReadinessState state,
+            StoresWrapper model,
+            IList<string> displayNames
+        )
+        {
+            State = state;
+            Model = model;
+            DisplayNames = displayNames;
+        }
+
+        internal StoreLaunchReadinessState State { get; }
+
+        internal StoresWrapper Model { get; }
+
+        internal IList<string> DisplayNames { get; }
+
+        internal static StoreLaunchReadiness NotReady(StoreLaunchReadinessState state)
+        {
+            // why: this project has no #nullable annotation context, so Model/DisplayNames
+            // are declared non-nullable; the "not ready" sentinel legitimately has neither.
+            // Suppress narrowly rather than adding '?' annotations, which would produce new
+            // CS8632 warnings on this file during normal (non-forced-nullable) builds.
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+            return new(state, null, null);
+#pragma warning restore CS8625
+        }
+
+        internal static StoreLaunchReadiness Ready(
+            StoresWrapper model,
+            IList<string> displayNames
+        ) => new(StoreLaunchReadinessState.Ready, model, displayNames);
+    }
+
     public class StoreWrapperController
     {
         internal static bool RunFolderSelectionDialog(Func<bool> selector)
@@ -41,17 +93,58 @@ namespace UtilitiesCS.OutlookObjects.Store
         internal FolderMinimalWrapper JunkPotential { get; set; }
         internal Func<string, (string, string)> FsConverter { get; set; }
 
+        /// <summary>
+        /// Determines whether the store-wrapper model has finished loading and is safe to
+        /// bind into the settings dialog. Addresses issue #240: <c>Globals.Ol.StoresWrapper</c>
+        /// is populated asynchronously during startup and can be null (load not yet complete),
+        /// or non-null with a transiently null <c>Stores</c> list (post-deserialize, before the
+        /// async rewire populates it). Callers must not dereference the model until this
+        /// reports <see cref="StoreLaunchReadinessState.Ready"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="StoreLaunchReadiness"/> describing the readiness state and, when ready,
+        /// the model and the display names of every store it contains.
+        /// </returns>
+        internal StoreLaunchReadiness EvaluateLaunchReadiness()
+        {
+            var model = Globals?.Ol?.StoresWrapper;
+            if (model is null)
+            {
+                return StoreLaunchReadiness.NotReady(StoreLaunchReadinessState.ModelUnavailable);
+            }
+
+            if (model.Stores is null)
+            {
+                return StoreLaunchReadiness.NotReady(StoreLaunchReadinessState.StoresUnavailable);
+            }
+
+            return StoreLaunchReadiness.Ready(
+                model,
+                model.Stores.Select(store => store.DisplayName).ToList()
+            );
+        }
+
         #region Events
 
         [ExcludeFromCodeCoverage]
         public void Launch()
         {
+            var readiness = EvaluateLaunchReadiness();
+            if (readiness.State != StoreLaunchReadinessState.Ready)
+            {
+                MyBox.ShowDialog(
+                    "Store settings are not available yet. Please try again after startup completes.",
+                    "Store Settings Unavailable",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+                return;
+            }
+
             FsConverter = new FilePathHelperConverter(Globals.FS).GetSerializablePath;
-            Model = Globals.Ol.StoresWrapper;
+            Model = readiness.Model;
             Viewer = new StoreWrapperViewer(this);
-            Viewer.DisplayName.DataSource = Model
-                .Stores.Select(store => store.DisplayName)
-                .ToList();
+            Viewer.DisplayName.DataSource = readiness.DisplayNames;
 
             Viewer.ShowDialog();
         }
