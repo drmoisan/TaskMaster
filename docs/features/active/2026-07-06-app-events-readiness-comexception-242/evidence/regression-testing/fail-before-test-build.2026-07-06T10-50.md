@@ -19,7 +19,7 @@ Done Building Project "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-10-36\T
 Build succeeded.
 
 "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-10-36\TaskMaster.Test\TaskMaster.Test.csproj" (Build target) (1) ->
-(CoreCompile target) -> 
+(CoreCompile target) ->
   C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-10-36\TaskMaster.Test\AppGlobals\TestableApplicationGlobals.cs(21,39): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context. [C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-10-36\TaskMaster.Test\TaskMaster.Test.csproj]
   C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-10-36\TaskMaster.Test\AppGlobals\ApplicationGlobalsStartupTimingTests.cs(227,43): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context. [C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-10-36\TaskMaster.Test\TaskMaster.Test.csproj]
   C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-10-36\TaskMaster.Test\AppGlobals\ApplicationGlobalsStartupTimingTests.cs(231,30): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context. [C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-10-36\TaskMaster.Test\TaskMaster.Test.csproj]

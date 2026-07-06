@@ -26,9 +26,9 @@ Output Summary:
     TaskMaster.Test -> C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-10-36\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll
   Done Building Project "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-10-36\TaskMaster.Test\TaskMaster.Test.csproj" (default targets).
   Done Building Project "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-10-36\TaskMaster.sln" (Build target(s)).
-  
+
   Build succeeded.
       0 Warning(s)
       0 Error(s)
-  
+
   Time Elapsed 00:00:01.32

@@ -11,13 +11,13 @@ Output Summary:
 - Command output tail:
                https://api.nuget.org/v3/index.json
                C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\
-           
+
            Installed:
                169 package(s) to packages.config projects
        1>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-10-36\TaskMaster.sln" (Restore target(s)).
-  
+
   Build succeeded.
       0 Warning(s)
       0 Error(s)
-  
+
   Time Elapsed 00:00:02.66
