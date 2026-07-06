@@ -3,7 +3,7 @@
 - **Issue:** #242
 - **Owner:** remediation executor
 - **Last Updated:** 2026-07-06T11-43
-- **Status:** Draft for execution
+- **Status:** Blocked - coverage floor unmet
 - **Work Mode:** minor-audit remediation
 - **Requirements Source:** `docs/features/active/2026-07-06-app-events-readiness-comexception-242/remediation-inputs.2026-07-06T11-43.md`
 - **Context Package:** `artifacts/pr_context.summary.txt`; `artifacts/pr_context.appendix.txt`; `docs/features/active/2026-07-06-app-events-readiness-comexception-242/policy-audit.2026-07-06T11-43.md`; `docs/features/active/2026-07-06-app-events-readiness-comexception-242/code-review.2026-07-06T11-43.md`; `docs/features/active/2026-07-06-app-events-readiness-comexception-242/feature-audit.2026-07-06T11-43.md`; `docs/features/active/2026-07-06-app-events-readiness-comexception-242/plan.2026-07-06T10-42.md`; `docs/features/active/2026-07-06-app-events-readiness-comexception-242/issue.md`
@@ -31,4 +31,4 @@ This remediation plan addresses the review findings for issue #242. It does not 
 
 - [x] [P3-T1] Update the existing review artifacts in place or create new timestamped post-remediation review artifacts in `docs/features/active/2026-07-06-app-events-readiness-comexception-242/` so they reflect the remediation evidence; do not delete the original review artifacts.
 - [x] [P3-T2] Validate each review artifact with `validate_orchestration_artifacts` using artifact types `policy-audit`, `code-review`, and `feature-audit`; write `docs/features/active/2026-07-06-app-events-readiness-comexception-242/evidence/qa-gates/remediation-review-validator.2026-07-06T11-43.md` with `Timestamp:`, `Command: validate_orchestration_artifacts for policy-audit/code-review/feature-audit`, `EXIT_CODE:`, and `Output Summary:`.
-- [ ] [P3-T3] Mark remediation complete only if, after the remediation commit is created, the branch comparison command `git diff --check origin/main..HEAD` exits 0, the approved C# verification sequence passes, the review artifacts validate, and the coverage floor is either met or an approved exception is recorded without modifying policy documents; otherwise record remediation as blocked with the exact unmet gate.
+- [x] [P3-T3] Mark remediation complete only if, after the remediation commit is created, the branch comparison command `git diff --check origin/main..HEAD` exits 0, the approved C# verification sequence passes, the review artifacts validate, and the coverage floor is either met or an approved exception is recorded without modifying policy documents; otherwise record remediation as blocked with the exact unmet gate.
