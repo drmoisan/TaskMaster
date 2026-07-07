@@ -280,5 +280,73 @@ namespace QuickFiler.Controllers.Tests
                 Times.Never()
             );
         }
+
+        // ---------------------------------------------------------------------------
+        // Issue #255 regression: in the deferred (loadAll == false) item-initialization
+        // path, ConversationResolver.LoadAsync never runs LoadConversationInfoAsync, so the
+        // resolver never publishes the conversation to the fast list (TopicThread). The count
+        // badge populates from Count.SameFolder independently, producing the reported divergence
+        // (non-zero count, empty list). PopulateConversationAsync(loadAll: false) must publish
+        // the resolved multi-item conversation to the fast list.
+        // ---------------------------------------------------------------------------
+
+        /// <summary>
+        /// Builds a resolver whose ConversationInfo is pre-populated with a multi-item conversation
+        /// and whose Count is set, without invoking the COM-bound async loaders. Because _mailItem is
+        /// non-null and the ConversationInfo backing field is set to a non-default value, the lazy
+        /// getter returns the cached pair rather than re-entering the synchronous LoadConversationInfo.
+        /// </summary>
+        private static ConversationResolver BuildResolverWithConversation(int itemCount)
+        {
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            var mockMail = new Mock<MailItem>();
+            var resolver = new ConversationResolver(mockGlobals.Object, mockMail.Object);
+            var expanded = new List<MailItemHelper>();
+            for (int i = 0; i < itemCount; i++)
+            {
+                expanded.Add(new MailItemHelper());
+            }
+            resolver.Count = new Pair<int>(sameFolder: itemCount, expanded: itemCount);
+            resolver.ConversationInfo = new Pair<List<MailItemHelper>>(
+                sameFolder: expanded,
+                expanded: expanded
+            );
+            return resolver;
+        }
+
+        [TestMethod]
+        public async Task PopulateConversationAsync_DeferredLoad_PublishesConversationToFastList()
+        {
+            // Arrange — the seam yields an already-resolved multi-item conversation, mirroring the
+            // deferred (loadAll == false) init path where the resolver itself does not publish. The
+            // controller must publish the conversation to the fast list so it is not left empty.
+            var cts = new CancellationTokenSource();
+            var token = cts.Token;
+
+            var resolver = BuildResolverWithConversation(3);
+            var dispatcher = QfcItemControllerTestSupport.BuildSyncDispatcher();
+            var viewer = new Mock<IItemViewer>();
+            viewer.SetupGet(v => v.InvokeRequired).Returns(false);
+
+            var controller = new SeamController(() => Task.FromResult(resolver));
+            QfcItemControllerTestSupport.SetField(controller, "_uiDispatcher", dispatcher.Object);
+            QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer.Object);
+
+            // Act
+            await controller.PopulateConversationAsync(cts, token, false);
+
+            // Assert — the fast list is populated with the resolved multi-item conversation.
+            viewer.Verify(
+                v =>
+                    v.SetConversationItems(
+                        It.Is<System.Collections.IList>(l => l != null && l.Count == 3)
+                    ),
+                Times.Once(),
+                "the deferred load path must publish the resolved conversation to the fast list "
+                    + "instead of leaving it empty"
+            );
+
+            cts.Dispose();
+        }
     }
 }
