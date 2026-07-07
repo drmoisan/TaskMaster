@@ -38,6 +38,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force
+
 function Get-CheckpointFileContent {
     <#
     .SYNOPSIS
@@ -179,11 +181,30 @@ function Invoke-RoutingContractValidation {
         [Parameter(Mandatory = $false)]
         [scriptblock] $Invoker = {
             param($Path, $Type)
-            $output = & python -m scripts.dev_tools.validate_orchestration_artifacts `
-                $Type $Path --require-complete --require-model-routing 2>&1
-            [pscustomobject]@{
-                ExitCode = $LASTEXITCODE
-                Output   = ($output | Out-String)
+            # Capability detection: use the authoritative Python CLI when
+            # scripts.dev_tools is importable (drm-copilot); otherwise fall back to
+            # the portable PowerShell completion module that travels with the
+            # pushed-down pack. The portable path performs the presence-level
+            # required-once-delegated existence gate and still fails closed.
+            if (Test-PythonOrchestratorValidatorAvailable) {
+                $output = & python -m scripts.dev_tools.validate_orchestration_artifacts `
+                    $Type $Path --require-complete --require-model-routing 2>&1
+                [pscustomobject]@{
+                    ExitCode = $LASTEXITCODE
+                    Output   = ($output | Out-String)
+                }
+            } else {
+                # Import the portable completion module only when its function is not
+                # already available, so a repeated call (or a test that pre-imports and
+                # mocks the function) does not reload the module and reset the seam.
+                if (-not (Get-Command -Name Test-OrchestratorStateCompletionReadiness -ErrorAction SilentlyContinue)) {
+                    Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateCompletion.psm1') -Force
+                }
+                $portable = Test-OrchestratorStateCompletionReadiness -CheckpointPath $Path
+                [pscustomobject]@{
+                    ExitCode = $portable.ExitCode
+                    Output   = $portable.Output
+                }
             }
         }
     )

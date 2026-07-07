@@ -119,6 +119,13 @@ reference implementations are `.claude/lib/model-routing/ModelRouting.psm1`
 (`Get-ComplexityFloor`) and `.claude/lib/model-routing/ModelRouting.psm1`
 (`Resolve-DelegationModel`). Default `fable_policy` is `disabled` when the marker is absent.
 
+When `epic-orchestrator` itself spawns `Agent(orchestrator)` or `Agent(pr-author)`, it applies
+the same per-delegation resolution and passes `model` equal to the routing receipt's `model` on
+the spawn call. It MUST NOT omit `model` (an omitted `model` falls back to the delegate's
+frontmatter default — `opus` for these workers — which suppresses a `fable` resolution) and
+MUST NOT hard-code `model=opus` in a way that overrides the resolved routing model, mirroring
+step 5 of `## Model Selection` in `.claude/skills/orchestrate/SKILL.md`.
+
 `route` is never an input to model selection; `route` remains file-count driven and governs only
 agents, skills, and MCP tools. A skill whose frontmatter `context` field holds the value `fork`
 inherits the parent model and ignores a model override, so model selection applies to agent
