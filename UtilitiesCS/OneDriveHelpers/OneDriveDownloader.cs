@@ -87,12 +87,11 @@ namespace UtilitiesCS.OneDriveHelpers
         {
             try
             {
-                var stream = await GetFileStreamWriter.RunWithTimeout(
+                var stream = await WriterTimeoutRunner(
+                    GetFileStreamWriter,
                     destinationPath,
                     cancel,
-                    timeoutMs,
-                    3,
-                    false
+                    timeoutMs
                 );
                 return stream;
             }
@@ -116,5 +115,25 @@ namespace UtilitiesCS.OneDriveHelpers
                 8192,
                 true
             );
+
+        public virtual Func<
+            Func<string, Stream>,
+            string,
+            CancellationToken,
+            int,
+            Task<Stream>
+        > WriterTimeoutRunner
+        {
+            get => _writerTimeoutRunner;
+            protected set => _writerTimeoutRunner = value;
+        }
+        protected Func<
+            Func<string, Stream>,
+            string,
+            CancellationToken,
+            int,
+            Task<Stream>
+        > _writerTimeoutRunner = (factory, destinationPath, cancel, timeoutMs) =>
+            factory.RunWithTimeout(destinationPath, cancel, timeoutMs, 3, false);
     }
 }
