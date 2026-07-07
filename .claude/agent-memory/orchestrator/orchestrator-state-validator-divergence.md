@@ -29,6 +29,10 @@ extra undocumented enum demands; treat that tool's orchestrator-state mode as
 advisory/legacy. The plan/policy-audit/code-review/feature-audit artifact_types
 of the MCP validator are reliable and should still be used.
 
+**Confirmed 2026-07-07 (issue #253): rich `delegation_receipts[]` schema.** The MCP orchestrator-state validator requires every `delegation_receipts[]` entry to carry `step`, `agent_id`, `skill_source`, `started_at`, `completed_at`, `result_signal`, and `artifact_paths` (in addition to `agent_name`). The portable completion gate (`OrchestratorStateCompletion.psm1`) only needs `agent_name` + a matching `model_routing_receipts[].agent`; provide the rich shape to satisfy BOTH. Keep promotion MCP receipts under a separate key (e.g. `delegation_receipts_promotion`) so `delegation_receipts` can be the agent array the gates read. `config/orchestration-routing.json` DOES now exist (contra the stale note below), and `validate_orchestration_artifacts ... --require-model-routing` passes when each delegated agent has a matching `model_routing_receipts[]` + `complexity_assessments[]` entry.
+
+**Confirmed 2026-07-07: portable step-status enum is wider.** `VALID_STEP_STATUS` in `.claude/lib/orchestrator-state/OrchestratorState.psm1` = {not-applicable, pending, delegated, verified, blocked, not_started, in_progress, completed}. `complete` and `passed` are NOT members (base-presence fails on them). For a passed S9 CI gate use `step9_status: verified` and record the real result in `ci_gate.conclusion: success`.
+
 **Confirmed MCP enum demands (2026-06-23, cost two iterations to discover):**
 - Non-complete MCP validation enforces enums: `step5..step10_status` ∈
   {not-applicable, pending, delegated, verified, blocked}; `blocked_reason` ∈
