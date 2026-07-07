@@ -150,7 +150,7 @@ namespace ToDoModel.Data_Model.People
             else
             {
                 this.AddOrUpdate(address, matchResult);
-                //this.Add(address, matchResult);
+                this.Serialize();
                 return matchResult;
             }
         }
