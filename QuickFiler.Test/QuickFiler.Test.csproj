@@ -75,6 +75,7 @@
     <Compile Include="Controllers\BayesianPerformanceController.TestSupport.cs" />
     <Compile Include="Controllers\EfcHomeControllerSeamTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerTests.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerDarkModeTests.cs" />
     <Compile Include="Controllers\QfcDatamodelTests.cs" />
     <Compile Include="Controllers\QfcInitEmailQueueZeroBatchTests.cs" />
     <Compile Include="Controllers\QfcFormControllerTests.cs" />
