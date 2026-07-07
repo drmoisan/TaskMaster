@@ -31,7 +31,25 @@ namespace UtilitiesCS
             }
 
             // Mail item colors
-            if (!MailRead())
+            // why (issue #254): the read-state probe MailRead() reads MailItem.UnRead on a
+            // COM object that can be stale/moved/deleted in the High-Confidence view, which
+            // throws a COMException. That throw previously aborted this renderer before the
+            // sender/subject labels were recolored, leaving them at the prior theme's colors
+            // after a dark/light toggle. Evaluate the probe defensively at this UI boundary so
+            // a probe fault cannot skip re-theming; default to unread coloring (still within
+            // the current theme family) when the read state cannot be determined. The catch is
+            // deliberately narrow to COMException — unrelated exceptions must still propagate.
+            bool isRead;
+            try
+            {
+                isRead = MailRead();
+            }
+            catch (System.Runtime.InteropServices.COMException)
+            {
+                isRead = false;
+            }
+
+            if (!isRead)
             {
                 SetMailUnread();
             }

@@ -456,6 +456,7 @@
     <Compile Include="HelperClasses\ShellUtilitiesStatic_Tests.cs" />
     <Compile Include="HelperClasses\ThemeHelpers\ThemeTests.cs" />
     <Compile Include="HelperClasses\ThemeHelpers\Theme.DispatcherTests.cs" />
+    <Compile Include="HelperClasses\ThemeHelpers\Theme.MailLabelThemingTests.cs" />
     <Compile Include="HelperClasses\WindowsForms\ScreenAndTableLayoutTests.cs" />
     <Compile Include="HelperClasses\WindowsForms\WinFormsInteractionTests.cs" />
     <Compile Include="HelperClasses\WindowsForms\WinFormsLayoutTests.cs" />
