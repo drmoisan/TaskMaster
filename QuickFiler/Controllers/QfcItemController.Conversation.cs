@@ -106,6 +106,20 @@ namespace QuickFiler.Controllers
                 token,
                 loadAll
             );
+
+            if (!loadAll)
+            {
+                // Issue #255: in the deferred (loadAll == false) path, ConversationResolver.LoadAsync
+                // does not run LoadConversationInfoAsync, and the deferred Df-change handler cannot
+                // fire (Df is assigned inside LoadDfAsync before the PropertyChanged handler is
+                // subscribed), so the resolver never publishes the conversation to the fast list.
+                // Publish it here so the TopicThread is populated instead of rendering
+                // "The fast list is empty". The genuinely-empty case is preserved:
+                // ConversationResolver.LoadConversationInfo returns a single-item fallback (the
+                // current mail item) when Count.Expanded <= 0 (e.g. the Junk E-mail path).
+                token.ThrowIfCancellationRequested();
+                SetTopicThread(ConversationResolver.ConversationInfo.Expanded);
+            }
         }
 
         public async Task PopulateConversationAsync(
