@@ -2117,8 +2117,32 @@ namespace QuickFiler.Controllers
 
         public void DarkMode_CheckedChanged(object sender, EventArgs e)
         {
-            //if (_formViewer.DarkMode.Checked==true)
-            if (_globals.Ol.DarkMode)
+            // Defensive guard (Issue #251): a cleaned-up controller nulls _formViewer in
+            // Cleanup()/CleanupAsync(). If a stale subscription still fires (e.g. unsubscribe raced
+            // with an in-flight event), bail out instead of dereferencing cleaned-up state.
+            if (_formViewer is null)
+            {
+                return;
+            }
+
+            // Prefer the dark-mode state carried by the event's sender (the IOlObjects that raised
+            // PropertyChanged) over _globals.Ol, so the handler does not depend on _globals staying
+            // alive for the lifetime of the subscription.
+            bool darkMode;
+            if (sender is IOlObjects senderOl)
+            {
+                darkMode = senderOl.DarkMode;
+            }
+            else if (_globals is not null)
+            {
+                darkMode = _globals.Ol.DarkMode;
+            }
+            else
+            {
+                return;
+            }
+
+            if (darkMode)
             {
                 SetDarkMode(async: true);
             }
@@ -2126,7 +2150,7 @@ namespace QuickFiler.Controllers
             {
                 SetLightMode(async: true);
             }
-            _darkMode = _globals.Ol.DarkMode;
+            _darkMode = darkMode;
         }
 
         public void SetDarkMode(bool async)
@@ -2153,6 +2177,10 @@ namespace QuickFiler.Controllers
         {
             await RemoveControlsAsync();
             _formViewer = null;
+            if (_globals?.Ol is not null)
+            {
+                _globals.Ol.PropertyChanged -= DarkMode_CheckedChanged;
+            }
             _globals = null;
             _parent = null;
             _itemTlp = null;
@@ -2163,6 +2191,10 @@ namespace QuickFiler.Controllers
         {
             RemoveControls();
             _formViewer = null;
+            if (_globals?.Ol is not null)
+            {
+                _globals.Ol.PropertyChanged -= DarkMode_CheckedChanged;
+            }
             _globals = null;
             _parent = null;
             _itemTlp = null;
