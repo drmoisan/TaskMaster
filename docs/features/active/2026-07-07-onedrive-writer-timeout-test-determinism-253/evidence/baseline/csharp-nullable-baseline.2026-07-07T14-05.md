@@ -1,0 +1,11 @@
+# Baseline C# Nullable Build (Issue #253)
+
+Timestamp: 2026-07-07T16-40
+
+Command: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+
+Environment note: executed via the full MSBuild.exe path with `//`-doubled switches for the git-bash shell (see P0-T5 evidence for the identical rationale). An initial attempt at this baseline (first invocation, and a subsequent `/t:Rebuild` variant) produced 84 `error CS86xx` diagnostics, all inside the vendored `SVGControl` and `UtilitiesSwordfish.NET.General` projects (neither project is nullable-annotated; forcing `/p:Nullable=enable` as a solution-wide global property compiles them under a nullable context they were never designed for). This is a known, pre-existing, environment-level condition unrelated to `UtilitiesCS/OneDriveHelpers/OneDriveDownloader.cs` or the test file — both in-scope files were never reached because the build fails upstream in `Tags.csproj`'s dependency chain before `UtilitiesCS.csproj` compiles. The corrective recipe (matching the repository's documented `/t:Build`-as-no-op nullable gate behavior) is: (1) restore all project outputs with a plain, non-nullable `/t:Build` (rebuilds the vendored projects back to their normal 0-error state); (2) re-run the nullable/`TreatWarningsAsErrors` command with `/t:Build` (not `/t:Rebuild`) so MSBuild's up-to-date check skips recompiling any project whose sources have not changed, including the vendored projects. Since no source file has been modified yet at baseline time, this second run is a legitimate up-to-date no-op that reflects the actual per-commit toolchain gate used in this repository.
+
+EXIT_CODE: 0
+
+Output Summary: After restoring vendored project outputs, the nullable/`TreatWarningsAsErrors` build succeeded with 0 Warning(s), 0 Error(s), in 1.36s (all `CoreCompile` targets skipped as up-to-date, confirming no source recompilation occurred). This is the pre-change nullable baseline for comparison against the Phase 2 final nullable run, which is expected to show incremental recompilation of only `UtilitiesCS.csproj` and `UtilitiesCS.Test.csproj` once the two in-scope files are touched in Phase 1.

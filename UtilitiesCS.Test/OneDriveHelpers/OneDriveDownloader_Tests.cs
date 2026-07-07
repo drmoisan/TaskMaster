@@ -24,6 +24,13 @@ namespace UtilitiesCS.Test.OneDriveHelpers
         {
             GetFileStreamWriter = func;
         }
+
+        public void SetWriterTimeoutRunner(
+            Func<Func<string, Stream>, string, CancellationToken, int, Task<Stream>> func
+        )
+        {
+            WriterTimeoutRunner = func;
+        }
     }
 
     /// <summary>
@@ -229,6 +236,9 @@ namespace UtilitiesCS.Test.OneDriveHelpers
         {
             var downloader = new TestableOneDriveDownloader();
             downloader.SetFileStreamWriter(_ => new MemoryStream());
+            downloader.SetWriterTimeoutRunner(
+                (factory, path, token, ms) => Task.FromResult(factory(path))
+            );
 
             using var stream = await downloader.TryGetFileStreamWriter("ignored", 5000, default);
 
@@ -251,6 +261,9 @@ namespace UtilitiesCS.Test.OneDriveHelpers
         {
             var downloader = new TestableOneDriveDownloader();
             downloader.SetFileStreamWriter(_ => throw new InvalidOperationException("boom"));
+            downloader.SetWriterTimeoutRunner(
+                (factory, path, token, ms) => Task.FromResult(factory(path))
+            );
 
             var stream = await downloader.TryGetFileStreamWriter("ignored", 5000, default);
 
