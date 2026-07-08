@@ -98,25 +98,7 @@ namespace UtilitiesCS.OutlookObjects.Store
                     await Task.Yield();
                 }
 
-                var perStoreStopwatch = Stopwatch.StartNew();
-                var storeDisplayName = store.DisplayName;
-                var storeWrapper = Stores.Find(x => x.DisplayName == storeDisplayName);
-                var wasCreated = false;
-
-                if (storeWrapper is null)
-                {
-                    storeWrapper = new StoreWrapper(store).Init();
-                    Stores.Add(storeWrapper);
-                    wasCreated = true;
-                }
-                else
-                {
-                    storeWrapper.Restore(store);
-                }
-
-                logger.Debug(
-                    $"[Startup timing] Store '{storeDisplayName}' iteration completed in {perStoreStopwatch.ElapsedMilliseconds} ms (operation={(wasCreated ? "Init" : "Restore")})"
-                );
+                AddOrRestoreStore(store);
 
                 processedStoreCount++;
             }
@@ -124,6 +106,54 @@ namespace UtilitiesCS.OutlookObjects.Store
             logger.Debug(
                 $"[Startup timing] RewireOlObjectsAsync total: {totalStopwatch.ElapsedMilliseconds} ms"
             );
+        }
+
+        /// <summary>
+        /// Adds a new <see cref="StoreWrapper"/> for <paramref name="store"/> or restores an
+        /// existing one, keyed by DisplayName. This is the single per-store hookup implementation
+        /// for <see cref="Stores"/>, reused by the bulk <see cref="RewireOlObjectsAsync"/> loop and
+        /// by the runtime rehook coordinator (issue #263, epic #260). Idempotency is implicit in
+        /// the DisplayName lookup: a found wrapper is <see cref="StoreWrapper.Restore"/>d, not
+        /// duplicated, so no new guard is needed here.
+        /// </summary>
+        /// <remarks>
+        /// The expensive COM reads inside <see cref="StoreWrapper.Init"/>
+        /// (<c>GetRootFolder</c>/<c>GetDefaultFolder</c>/the SMTP chain) implicated in the epic's
+        /// lockup scenario run inside this method; the rehook coordinator therefore calls it only
+        /// after its store-scoped readiness gate reports ready, never eagerly.
+        /// </remarks>
+        /// <param name="store">The live store to add or restore. Must not be null.</param>
+        /// <returns>The added or restored <see cref="StoreWrapper"/>.</returns>
+        /// <remarks>
+        /// Public because the runtime rehook coordinator lives in the <c>TaskMaster</c> assembly and
+        /// <c>UtilitiesCS</c> does not grant it <c>InternalsVisibleTo</c>; this method is the shared
+        /// per-store primitive both the bulk loop and the coordinator invoke.
+        /// </remarks>
+        public StoreWrapper AddOrRestoreStore(Outlook.Store store)
+        {
+            Stores ??= [];
+
+            var perStoreStopwatch = Stopwatch.StartNew();
+            var storeDisplayName = store.DisplayName;
+            var storeWrapper = Stores.Find(x => x.DisplayName == storeDisplayName);
+            var wasCreated = false;
+
+            if (storeWrapper is null)
+            {
+                storeWrapper = new StoreWrapper(store).Init();
+                Stores.Add(storeWrapper);
+                wasCreated = true;
+            }
+            else
+            {
+                storeWrapper.Restore(store);
+            }
+
+            logger.Debug(
+                $"[Startup timing] Store '{storeDisplayName}' iteration completed in {perStoreStopwatch.ElapsedMilliseconds} ms (operation={(wasCreated ? "Init" : "Restore")})"
+            );
+
+            return storeWrapper;
         }
 
         private IEnumerable<Outlook.Store> GetFilteredStores()

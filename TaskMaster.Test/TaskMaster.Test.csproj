@@ -274,6 +274,8 @@
     <Compile Include="AppGlobals\LiveOutlookHookupIntegrationTests.cs" />
     <Compile Include="AppGlobals\AppEventsCoverageExpansionTests.cs" />
     <Compile Include="AppGlobals\AppEventsTests.cs" />
+    <Compile Include="AppGlobals\AppEventsStoreRehookTests.cs" />
+    <Compile Include="AppGlobals\StoreRehookCoordinatorTests.cs" />
     <Compile Include="AppGlobals\AppFileSystemFolderPathsMatchBestSpecialFolderTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsCoverageTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsFolderTreeServiceTests.cs" />

@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
@@ -27,6 +28,17 @@ namespace UtilitiesCS
         /// <see cref="COMException"/>.
         /// </summary>
         bool IsReady();
+
+        /// <summary>
+        /// Cheap, non-throwing store-scoped readiness probe. Returns <c>true</c> when the supplied
+        /// <paramref name="store"/>'s default inbox folder is reachable; returns <c>false</c> (never
+        /// throws) when the store is not yet ready, including when the probe raises a
+        /// <see cref="COMException"/>. Additive to the parameterless <see cref="IsReady()"/>, which
+        /// probes only the session default store and cannot express "is store X ready"; reuses the
+        /// same transient-HRESULT classification (<see cref="IsTransientError"/>).
+        /// </summary>
+        /// <param name="store">The store to probe. A null store returns <c>false</c>.</param>
+        bool IsReady(Outlook.Store store);
 
         /// <summary>
         /// Returns <c>true</c> only for the known transient "not-ready" COM HRESULTs that
