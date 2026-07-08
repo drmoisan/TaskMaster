@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Legacy non-SDK / packages.config C# projects in this repo (confirmed: `UtilitiesCS/UtilitiesCS.csproj`, `TaskMaster.Test/TaskMaster.Test.csproj`) enumerate every source file via explicit `<Compile Include="..." />` items with NO wildcard glob. A new `.cs` file added to such a project will NOT compile into the assembly unless a matching `<Compile Include>` item is added.
+Legacy non-SDK / packages.config C# projects in this repo enumerate every source file via explicit `<Compile Include="..." />` items with NO wildcard glob. A new `.cs` file added to such a project will NOT compile into the assembly unless a matching `<Compile Include>` item is added. Confirmed legacy (as of #263 planning, 2026-07-07): `UtilitiesCS/UtilitiesCS.csproj` (436 Compile Include items), `TaskMaster/TaskMaster.csproj` (35), `TaskMaster.Test/TaskMaster.Test.csproj` (33), `UtilitiesCS.Test/UtilitiesCS.Test.csproj` (396). Treat all four TaskMaster-solution first-party projects as explicit-include.
 
 **Why:** Caught during #207 planning. Executor passed preflight and completed Phase 0, then correctly STOPPED at P1-T1 because the plan created two new `UtilitiesCS/OutlookObjects/*.cs` files but `UtilitiesCS.csproj` was not in the scope-lock list and no `<Compile Include>` wiring was specified — the files could not build into `UtilitiesCS.dll`. The plan already did the equivalent for `TaskMaster.Test.csproj`, so it was a consistency gap.
 
