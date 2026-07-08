@@ -351,57 +351,77 @@ Because `Disabled` is checked only after all existing rules:
 Each item is independently testable. Unless stated otherwise, verification uses MSTest + Moq +
 FluentAssertions, no live Outlook, and no temporary files.
 
-- [ ] **AC1 — Persisted future-sessions list.** `StoresWrapper` exposes a `[JsonProperty]
+- [x] **AC1 — Persisted future-sessions list.** `StoresWrapper` exposes a `[JsonProperty]
       List<string> DisabledStoreIdentities` keyed by resolved identity, defaulting to an empty list.
       A serialize/deserialize round-trip via `SerializeToString()`/`DeserializeObject` preserves its
       contents.
-- [ ] **AC2 — Session-only set is in-memory and not persisted.** `StoresWrapper` exposes a
+- [x] **AC2 — Session-only set is in-memory and not persisted.** `StoresWrapper` exposes a
       `[JsonIgnore] HashSet<string> SessionDisabledStoreIdentities` (OrdinalIgnoreCase). After a
       round-trip, the emitted JSON contains no session-set field, and the deserialized set is empty
       (not null).
-- [ ] **AC3 — `StoreIdentity.Resolve` (pure).** Returns `displayName` when non-null/non-whitespace;
+- [x] **AC3 — `StoreIdentity.Resolve` (pure).** Returns `displayName` when non-null/non-whitespace;
       returns `filePathFallback` when `displayName` is null/whitespace and the fallback is present;
       returns the documented sentinel when both are absent. Casing of a resolved value is preserved.
       No COM access; callable without Outlook.
-- [ ] **AC4 — Service contract on `IApplicationGlobals`.** `IApplicationGlobals.StoreDisable` returns
+- [x] **AC4 — Service contract on `IApplicationGlobals`.** `IApplicationGlobals.StoreDisable` returns
       an `IStoreDisableService` exposing `DisableSessionOnly`, `DisableForFutureSessions`,
       `ReenableAsync`, `IsDisabled`, and `GetDisabledStores` with the signatures in §4.2, constructed
       in `LoadBasicMethod()` and reading the store model lazily.
-- [ ] **AC5 — Disable positive flows.** `DisableSessionOnly(identity)` adds to the session set only;
+- [x] **AC5 — Disable positive flows.** `DisableSessionOnly(identity)` adds to the session set only;
       `DisableForFutureSessions(identity)` adds to the persisted list and (via the union) also
       renders the store disabled for the current session. After each, `IsDisabled(identity)` is true.
-- [ ] **AC6 — Persistence trigger.** `DisableForFutureSessions` invokes `Model.Serialize()` (verified
+- [x] **AC6 — Persistence trigger.** `DisableForFutureSessions` invokes `Model.Serialize()` (verified
       through the injectable-timer seam); `DisableSessionOnly` does not.
-- [ ] **AC7 — Idempotency.** A second `DisableSessionOnly` for the same identity is a no-op (no
+- [x] **AC7 — Idempotency.** A second `DisableSessionOnly` for the same identity is a no-op (no
       duplicate, no throw). A second `DisableForFutureSessions` for an already-persisted identity does
       not append a duplicate and does not call `Serialize()` again.
-- [ ] **AC8 — `ReenableAsync` clears both scopes and persists conditionally.** Reenabling an identity
+- [x] **AC8 — `ReenableAsync` clears both scopes and persists conditionally.** Reenabling an identity
       present in both scopes removes it from both and calls `Serialize()` exactly once. Reenabling a
       non-disabled identity changes no collection and calls neither `Serialize()` nor a mutation.
-- [ ] **AC9 — Staged rehook seam.** `ReenableAsync` awaits the injected `IStoreRehookService` after
+- [x] **AC9 — Staged rehook seam.** `ReenableAsync` awaits the injected `IStoreRehookService` after
       clearing state; the wave-0 default (`NoOpStoreRehookService`) completes without rehooking and
       leaves state cleared. A `Mock<IStoreRehookService>` confirms invocation ordering (state cleared
       before `RehookAsync` is awaited).
-- [ ] **AC10 — `GetDisabledStores` scope and de-duplication.** Returns identity+scope entries; an
+- [x] **AC10 — `GetDisabledStores` scope and de-duplication.** Returns identity+scope entries; an
       identity in both scopes is reported once as `FutureSessions`. Returns an empty collection when
       the store model is null.
-- [ ] **AC11 — Identity validation.** `DisableSessionOnly`, `DisableForFutureSessions`, and
+- [x] **AC11 — Identity validation.** `DisableSessionOnly`, `DisableForFutureSessions`, and
       `ReenableAsync` throw `ArgumentException` for an unresolved/empty identity (including the
       sentinel). Read methods do not throw.
-- [ ] **AC12 — Filter attribution: `Disabled` checked last.** `StoreFilterAttribution.Decide` with
+- [x] **AC12 — Filter attribution: `Disabled` checked last.** `StoreFilterAttribution.Decide` with
       `isDisabled: true` returns `Disabled` only when no earlier exclusion rule matched; a store that
       an existing rule already excludes keeps its original rule even when `isDisabled` is also true
       (existing attribution byte-for-byte unchanged; enum order `..., FilePathContains, Disabled,
       Included`).
-- [ ] **AC13 — Filter integration across all three surfaces.** `ShouldIncludeStore`, `StoreIsIncluded`,
+- [x] **AC13 — Filter integration across all three surfaces.** `ShouldIncludeStore`, `StoreIsIncluded`,
       and `ShouldIncludeStoreInstrumented` each exclude a session-disabled store and a
       future-disabled store, using the effective (union) disabled set. Non-disabled stores are
       unaffected.
-- [ ] **AC14 — Null-model safety.** With `Globals.Ol.StoresWrapper` null, `IsDisabled` returns false
+- [x] **AC14 — Null-model safety.** With `Globals.Ol.StoresWrapper` null, `IsDisabled` returns false
       and `GetDisabledStores` returns an empty (non-null) collection.
-- [ ] **AC15 — Toolchain and coverage.** The full C# toolchain passes in order (csharpier →
+- [x] **AC15 — Toolchain and coverage.** The full C# toolchain passes in order (csharpier →
       analyzers → nullable/TreatWarningsAsErrors → MSTest with coverage); new-code coverage meets repo
       policy; no repo-wide regression; all touched files remain under 500 lines.
+
+### Delivery annotations (P8-T8; checked off 2026-07-07T23-35)
+
+Each AC above is checked off with its satisfying plan tasks and evidence:
+
+- AC1 — P2-T1, P7-T4 (`Serialization_RoundTrip_PreservesDisabledListAndOmitsSessionSet`).
+- AC2 — P2-T2, P7-T4 (same round-trip test; JSON omits session set, empty-not-null after deserialize).
+- AC3 — P1-T1, P1-T2, P7-T1 (`StoreIdentityTests`, pure + COM overload; 100% coverage).
+- AC4 — P1-T3, P5-T1, P6-T1, P6-T2 (`IApplicationGlobals.StoreDisable`, constructed in `LoadBasicMethod()`).
+- AC5 — P5-T2, P5-T3, P5-T5, P7-T2 (positive flows both scopes).
+- AC6 — P5-T2, P5-T3, P7-T2 (timer-seam: future serializes once, session does not).
+- AC7 — P5-T2, P5-T3, P7-T2 (idempotent double-disable, no dup, no second serialize).
+- AC8 — P5-T4, P7-T2 (`ReenableAsync` clears both, serializes once; non-disabled serializes zero).
+- AC9 — P1-T4, P5-T4, P7-T2 (no-op default; `Mock<IStoreRehookService>` confirms clear-before-rehook).
+- AC10 — P5-T6, P7-T2 (scope + de-dup both-scopes as `FutureSessions`; empty on null model).
+- AC11 — P5-T2/T3/T4, P7-T2 (`ArgumentException` on sentinel/default identity; reads do not throw).
+- AC12 — P3-T1, P3-T2, P7-T3 (`Disabled` checked last; existing rules unchanged; enum order verified).
+- AC13 — P2-T3, P4-T1, P4-T2, P4-T3, P7-T4 (all three surfaces exclude session- and future-disabled).
+- AC14 — P5-T5, P5-T6, P7-T2 (null-model: `IsDisabled` false, `GetDisabledStores` empty non-null).
+- AC15 — P8-T1..P8-T6 (toolchain green; new-code 97.9%-100%; repo 81.08%; new files < 500 lines).
 
 ## 10. Cross-Feature Contracts (fixed here, consumed later)
 

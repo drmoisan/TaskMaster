@@ -25,6 +25,9 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// <summary>Excluded because the FilePath contained a configured excluded-path token.</summary>
         FilePathContains,
 
+        /// <summary>Excluded because the store is in a disabled scope.</summary>
+        Disabled,
+
         /// <summary>No exclusion rule matched; the store is included.</summary>
         Included,
     }
@@ -51,6 +54,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// <param name="gwsoFilePathContains">Configured GWSO/Gmail-sync FilePath tokens.</param>
         /// <param name="excludePublicFolderStores">Whether public-folder stores are excluded.</param>
         /// <param name="excludeGwsoStores">Whether GWSO/Gmail-sync stores are excluded.</param>
+        /// <param name="isDisabled">Whether the store is in a disabled scope (issue #261). Checked last, after the four existing exclusion rules and immediately before the included result.</param>
         /// <returns>A tuple of the include decision and the matched rule.</returns>
         public static (bool Included, StoreFilterRule Rule) Decide(
             bool isPublicFolder,
@@ -60,7 +64,8 @@ namespace UtilitiesCS.OutlookObjects.Store
             IList<string> excludedStoreFilePathContains,
             IList<string> gwsoFilePathContains,
             bool excludePublicFolderStores,
-            bool excludeGwsoStores
+            bool excludeGwsoStores,
+            bool isDisabled
         )
         {
             if (excludePublicFolderStores && isPublicFolder)
@@ -102,6 +107,11 @@ namespace UtilitiesCS.OutlookObjects.Store
             )
             {
                 return (false, StoreFilterRule.FilePathContains);
+            }
+
+            if (isDisabled)
+            {
+                return (false, StoreFilterRule.Disabled);
             }
 
             return (true, StoreFilterRule.Included);

@@ -384,6 +384,130 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             );
         }
 
+        // --- Disabled-store filter integration + persistence (P7-T4, issue #261) ---
+
+        [TestMethod]
+        public void ShouldIncludeStore_ExcludesSessionDisabledStore_KeepsNonDisabled()
+        {
+            var disabled = CreateStore("Disabled Mailbox", @"C:\Data\d.ost", "d@example.com");
+            var kept = CreateStore("Kept Mailbox", @"C:\Data\k.ost", "k@example.com");
+            var wrapper = new StoresWrapper
+            {
+                ExcludePublicFolderStores = false,
+                ExcludeGwsoStores = false,
+            };
+            wrapper.SessionDisabledStoreIdentities.Add("Disabled Mailbox");
+
+            wrapper.ShouldIncludeStore(disabled.Object).Should().BeFalse();
+            wrapper.ShouldIncludeStore(kept.Object).Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void ShouldIncludeStore_ExcludesFutureDisabledStore_KeepsNonDisabled()
+        {
+            var disabled = CreateStore("Disabled Mailbox", @"C:\Data\d.ost", "d@example.com");
+            var kept = CreateStore("Kept Mailbox", @"C:\Data\k.ost", "k@example.com");
+            var wrapper = new StoresWrapper
+            {
+                ExcludePublicFolderStores = false,
+                ExcludeGwsoStores = false,
+                DisabledStoreIdentities = new List<string> { "Disabled Mailbox" },
+            };
+
+            wrapper.ShouldIncludeStore(disabled.Object).Should().BeFalse();
+            wrapper.ShouldIncludeStore(kept.Object).Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void StoreIsIncluded_WhenIsDisabledTrue_ReturnsFalse()
+        {
+            var store = CreateStore("Mailbox", @"C:\Data\m.ost", "m@example.com");
+
+            StoresWrapper
+                .StoreIsIncluded(
+                    store.Object,
+                    new List<string>(),
+                    new List<string>(),
+                    new List<string>(),
+                    excludePublicFolderStores: false,
+                    excludeGwsoStores: false,
+                    isDisabled: true
+                )
+                .Should()
+                .BeFalse();
+
+            StoresWrapper
+                .StoreIsIncluded(
+                    store.Object,
+                    new List<string>(),
+                    new List<string>(),
+                    new List<string>(),
+                    excludePublicFolderStores: false,
+                    excludeGwsoStores: false,
+                    isDisabled: false
+                )
+                .Should()
+                .BeTrue();
+        }
+
+        [TestMethod]
+        public void Init_ExcludesSessionAndFutureDisabledStores_ViaInstrumentedPath()
+        {
+            var included = CreateStore("Mailbox", @"C:\Data\mailbox.ost", "o@example.com");
+            var sessionDisabled = CreateStore("SessionStore", @"C:\Data\s.ost", "s@example.com");
+            var futureDisabled = CreateStore("FutureStore", @"C:\Data\f.ost", "f@example.com");
+
+            var wrapper = new StoresWrapper(
+                CreateGlobalsWithStores(
+                    included.Object,
+                    sessionDisabled.Object,
+                    futureDisabled.Object
+                ).Object
+            )
+            {
+                ExcludePublicFolderStores = false,
+                ExcludeGwsoStores = false,
+                DisabledStoreIdentities = new List<string> { "FutureStore" },
+            };
+            wrapper.SessionDisabledStoreIdentities.Add("SessionStore");
+
+            wrapper.Init();
+
+            // The instrumented filter path (the only path that populates Stores) excludes both the
+            // session-disabled and future-disabled stores, leaving only the non-disabled store.
+            wrapper.Stores.Should().ContainSingle();
+            wrapper.Stores[0].DisplayName.Should().Be("Mailbox");
+        }
+
+        [TestMethod]
+        public void Serialization_RoundTrip_PreservesDisabledListAndOmitsSessionSet()
+        {
+            var wrapper = new StoresWrapper
+            {
+                DisabledStoreIdentities = new List<string> { "PersistedStore" },
+            };
+            wrapper.SessionDisabledStoreIdentities.Add("SessionStore");
+
+            var json = wrapper.SerializeToString();
+
+            json.Should().Contain("DisabledStoreIdentities");
+            json.Should().Contain("PersistedStore");
+            json.Should()
+                .NotContain(
+                    "SessionDisabledStoreIdentities",
+                    "the session-only set is [JsonIgnore] and must not be emitted"
+                );
+            json.Should().NotContain("SessionStore");
+
+            var restored = wrapper.DeserializeObject(json, wrapper.Config.JsonSettings);
+
+            restored.DisabledStoreIdentities.Should().Contain("PersistedStore");
+            restored
+                .SessionDisabledStoreIdentities.Should()
+                .NotBeNull("Newtonsoft re-runs the field initializer on deserialize")
+                .And.BeEmpty();
+        }
+
         private static void AssertInclusionDecision(
             OutlookStore store,
             IList<string> excludedNames,
@@ -411,7 +535,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
                     excludedPaths,
                     gwsoPaths ?? new List<string>(),
                     excludePublicFolders,
-                    excludeGwso
+                    excludeGwso,
+                    false
                 )
                 .Should()
                 .Be(expected);

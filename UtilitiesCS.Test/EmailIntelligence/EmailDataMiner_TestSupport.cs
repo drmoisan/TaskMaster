@@ -70,6 +70,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             public IAppItemEngines Engines => throw new NotImplementedException();
 
             public IntelligenceConfig IntelRes => throw new NotImplementedException();
+
+            public IStoreDisableService StoreDisable => throw new NotImplementedException();
         }
 
         private sealed class StubFileSystemFolderPaths : IFileSystemFolderPaths

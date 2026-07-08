@@ -697,7 +697,9 @@
     <Compile Include="OutlookObjects\Folder\FolderMinimalWrapper.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientStatic.cs" />
     <Compile Include="OutlookObjects\Store\IStoreWrapperViewer.cs" />
+    <Compile Include="OutlookObjects\Store\StoreDisableService.cs" />
     <Compile Include="OutlookObjects\Store\StoreFilterAttribution.cs" />
+    <Compile Include="OutlookObjects\Store\StoreIdentity.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapper.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapper.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperInitClock.cs" />
@@ -965,6 +967,8 @@
     <Compile Include="Interfaces\IGenericTimer.cs" />
     <Compile Include="Interfaces\IGlobals\IAppAutoFileObjects.cs" />
     <Compile Include="Interfaces\IGlobals\IApplicationGlobals.cs" />
+    <Compile Include="Interfaces\IGlobals\IStoreDisableService.cs" />
+    <Compile Include="Interfaces\IGlobals\IStoreRehookService.cs" />
     <Compile Include="Interfaces\IGlobals\IAppStagingFilenames.cs" />
     <Compile Include="Interfaces\IGlobals\IFileSystemFolderPaths.cs" />
     <Compile Include="Interfaces\IGlobals\IOlObjects.cs" />

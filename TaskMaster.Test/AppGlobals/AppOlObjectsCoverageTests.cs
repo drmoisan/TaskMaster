@@ -127,6 +127,8 @@ namespace TaskMaster.Test.AppGlobals
             public IAppItemEngines Engines => throw new NotSupportedException();
 
             public IntelligenceConfig IntelRes => IntelResInstance;
+
+            public IStoreDisableService StoreDisable => throw new NotSupportedException();
         }
 
         private sealed class StubIntelligenceConfig : IntelligenceConfig
