@@ -261,5 +261,10 @@ namespace TaskMaster
             var wrapper = new StoreWrapperController(Globals);
             wrapper.Launch();
         }
+
+        internal void DisabledStoresSettings()
+        {
+            new DisabledStoresController(Globals).Launch();
+        }
     }
 }
