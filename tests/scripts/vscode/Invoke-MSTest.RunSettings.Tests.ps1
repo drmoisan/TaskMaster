@@ -54,8 +54,17 @@ Describe 'Get-VsTestArgumentList (Invoke-MSTest.ps1)' {
         $arguments | Should -Be @(
             'C:\repo\A.Test.dll',
             "/Settings:$($script:expectedRunSettings)",
-            '/InIsolation'
+            '/InIsolation',
+            '/TestCaseFilter:TestCategory!=LiveOutlook'
         )
+    }
+
+    It 'appends the /TestCaseFilter excluding the LiveOutlook category' {
+        $arguments = Get-VsTestArgumentList `
+            -TestAssembly @('C:\repo\A.Test.dll') `
+            -RunSettingsPath $script:expectedRunSettings
+
+        $arguments | Should -Contain '/TestCaseFilter:TestCategory!=LiveOutlook'
     }
 }
 
@@ -121,6 +130,17 @@ Describe 'Get-DotnetCoverageArgumentList (Invoke-MSTestWithCoverage.ps1)' {
 
         $separatorIndex | Should -BeGreaterThan -1
         $vsTestSettingsIndex | Should -BeGreaterThan $separatorIndex
+    }
+
+    It 'appends the /TestCaseFilter excluding the LiveOutlook category to the inner vstest args' {
+        $arguments = Get-DotnetCoverageArgumentList `
+            -OutputPath 'C:\repo\coverage\coverage.cobertura.xml' `
+            -CoverageConfig 'C:\repo\coverage.config' `
+            -VsTestPath 'C:\vstest.console.exe' `
+            -TestAssembly @('C:\repo\A.Test.dll') `
+            -RunSettingsPath $script:expectedRunSettings
+
+        $arguments | Should -Contain '/TestCaseFilter:TestCategory!=LiveOutlook'
     }
 }
 

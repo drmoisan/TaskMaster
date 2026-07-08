@@ -73,7 +73,7 @@ function Get-DotnetCoverageArgumentList {
         '--output-format', 'cobertura',
         '--settings', $CoverageConfig,
         '--', $VsTestPath
-    ) + @($TestAssembly) + @("/Settings:$RunSettingsPath", '/InIsolation')
+    ) + @($TestAssembly) + @("/Settings:$RunSettingsPath", '/InIsolation', '/TestCaseFilter:TestCategory!=LiveOutlook')
 }
 
 function Invoke-DotnetCoverageExe {
