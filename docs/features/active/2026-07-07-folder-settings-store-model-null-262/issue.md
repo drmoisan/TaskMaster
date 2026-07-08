@@ -83,19 +83,24 @@ Files to inspect: `TaskMaster/AppGlobals/AppOlObjects.cs`, `UtilitiesCS/EmailInt
 
 ## Acceptance Criteria
 
-- [ ] AC1: When the persisted `StoresWrapper` config is missing, `LoadStoresAsync` builds a fresh
+- [x] AC1: When the persisted `StoresWrapper` config is missing, `LoadStoresAsync` builds a fresh
       model from the live Outlook stores (via the existing `Init`/filter path) instead of leaving
-      `StoresWrapper` null.
-- [ ] AC2: When the persisted config deserializes to null, the same fresh-build fallback applies
-      rather than being silently tolerated.
-- [ ] AC3: A genuine, unrecoverable load failure is surfaced (logged at an actionable level and/or
-      a clear user-facing message), not swallowed as a bare `logger.Error`.
-- [ ] AC4: After startup completes on a recoverable path, `StoreWrapperController.Launch()` opens
-      the dialog with a populated model and no longer shows "not available yet".
-- [ ] AC5: A deterministic MSTest regression test reproduces the null-model paths (fails before,
+      `StoresWrapper` null. (Maps to spec AC1; evidence: fail-before-262.md, pass-after-262.md.)
+- [x] AC2: When the persisted config deserializes to null, the same fresh-build fallback applies
+      rather than being silently tolerated. (Maps to spec AC2; evidence: pass-after-262.md.)
+- [x] AC3: A genuine, unrecoverable load failure is surfaced (logged at an actionable level and/or
+      a clear user-facing message), not swallowed as a bare `logger.Error`. (Maps to spec AC3;
+      evidence: pass-after-262.md.)
+- [x] AC4: After startup completes on a recoverable path, `StoreWrapperController.Launch()` opens
+      the dialog with a populated model and no longer shows "not available yet". (Maps to spec AC4;
+      evidence: other/ac4-controller-unchanged.md.)
+- [x] AC5: A deterministic MSTest regression test reproduces the null-model paths (fails before,
       passes after) using Moq for `IApplicationGlobals`/`IOlObjects`/config; no live Outlook, no temp files.
-- [ ] AC6: Full C# toolchain passes in order (csharpier -> analyzers -> nullable/TreatWarningsAsErrors
-      -> MSTest with coverage); new/changed lines meet coverage targets.
+      (Maps to spec AC5; evidence: fail-before-262.md, pass-after-262.md.)
+- [x] AC6: Full C# toolchain passes in order (csharpier -> analyzers -> nullable/TreatWarningsAsErrors
+      -> MSTest with coverage); new/changed lines meet coverage targets. (Maps to spec AC7; evidence:
+      qa-gates/qa-01..05. Note: spec AC6 (file-size <= 500) is a spec-only criterion tracked in spec.md
+      and has no issue.md counterpart.)
 
 ## Next Step
 

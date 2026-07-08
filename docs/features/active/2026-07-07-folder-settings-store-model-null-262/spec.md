@@ -294,32 +294,48 @@ seams (MSTest + Moq + FluentAssertions); no live Outlook, no temp files.
 
 
 ## Acceptance Criteria
-- [ ] AC1: When the persisted `StoresWrapper` config is missing, `LoadStoresAsync` builds a fresh
+- [x] AC1: When the persisted `StoresWrapper` config is missing, `LoadStoresAsync` builds a fresh
       model from the live Outlook stores (via `BuildFreshStoresWrapper()` ->
       `new StoresWrapper(_globals).Init()`) instead of leaving `StoresWrapper` null. Verified by the
       Path 1 regression test.
-- [ ] AC2: When the persisted config deserializes to null, the same fresh-build fallback applies
+      (Evidence: P3-T1 fix in AppOlObjects.StoreLoading.cs; P2-T1 regression test; P2-T4
+      fail-before evidence/regression-testing/fail-before-262.md; P3-T3 pass-after
+      evidence/regression-testing/pass-after-262.md.)
+- [x] AC2: When the persisted config deserializes to null, the same fresh-build fallback applies
       rather than being silently tolerated. Verified by the Path 2 regression test, which also asserts
       `AwaitStoreRewireAsync` is not invoked on the fresh-build path.
-- [ ] AC3: A genuine, unrecoverable load failure is surfaced — logged at `Error` with the exception
+      (Evidence: P3-T1 fix; P2-T2 regression test; P2-T4 fail-before
+      evidence/regression-testing/fail-before-262.md; P3-T3 pass-after
+      evidence/regression-testing/pass-after-262.md.)
+- [x] AC3: A genuine, unrecoverable load failure is surfaced — logged at `Error` with the exception
       attached and `StoresWrapper`-specific context — not swallowed as a bare `logger.Error` string
       and not escaping as the generic `IdleAsyncQueue` catch. No retry and no new dialog are added; the
       existing readiness-guard dialog remains the only user-facing surface. Verified by the Path 3
       regression test (completes without throwing; `StoresWrapper` stays null).
-- [ ] AC4: After startup completes on a recoverable path, `StoreWrapperController.Launch()` opens the
+      (Evidence: P3-T1 bounded try/catch logging Error with exception attached; P2-T3 regression test;
+      P2-T4 fail-before; P3-T3 pass-after evidence/regression-testing/pass-after-262.md.)
+- [x] AC4: After startup completes on a recoverable path, `StoreWrapperController.Launch()` opens the
       dialog with a populated model and no longer shows "not available yet". `StoreWrapperController.cs`
       is unmodified; the guard reports `Ready` because `StoresWrapper` is non-null with populated
       `Stores`.
-- [ ] AC5: A deterministic MSTest regression suite reproduces the null-model paths (fails before the
+      (Evidence: P5-T3 evidence/other/ac4-controller-unchanged.md; P3-T3 populated-model outcome.)
+- [x] AC5: A deterministic MSTest regression suite reproduces the null-model paths (fails before the
       fix, passes after) using the existing `StubApplicationGlobals`/`StubIntelligenceConfig`/
       `TestableAppOlObjects` seams and Moq; no live Outlook, no temp files. Includes inverting the
       previously mis-specified `LoadStoresAsync_LeavesStoresWrapperNullWhenConfigMissing`.
-- [ ] AC6: `AppOlObjects.cs` is brought to 500 lines or fewer by extracting the store-loading concern
+      (Evidence: P2-T4 fail-before evidence/regression-testing/fail-before-262.md; P3-T3 pass-after
+      evidence/regression-testing/pass-after-262.md.)
+- [x] AC6: `AppOlObjects.cs` is brought to 500 lines or fewer by extracting the store-loading concern
       into the new partial `AppOlObjects.StoreLoading.cs` (precedent: `AppOlObjects.JunkFolders.cs`);
       both files end at 500 lines or fewer.
-- [ ] AC7: Full C# toolchain passes in order (csharpier -> analyzers -> nullable/TreatWarningsAsErrors
+      (Evidence: P1-T3 evidence/other/file-size-after-extraction.md; P5-T1
+      evidence/other/file-size-final.md — AppOlObjects.cs 495, AppOlObjects.StoreLoading.cs 75.)
+- [x] AC7: Full C# toolchain passes in order (csharpier -> analyzers -> nullable/TreatWarningsAsErrors
       -> MSTest with coverage); new/changed lines meet coverage targets; no repo-wide regression; net48
       constraints honored.
+      (Evidence: P4-T1..P4-T5 evidence/qa-gates/qa-01-format.md, qa-02-analyzers.md, qa-03-nullable.md,
+      qa-04-test-coverage.md, qa-05-coverage-delta.md — format clean, 0 errors/72 baseline warnings,
+      nullable 0/0, new-code 100%, no regression.)
 
 ## Risks & Mitigations
 - Technical or operational risks:
