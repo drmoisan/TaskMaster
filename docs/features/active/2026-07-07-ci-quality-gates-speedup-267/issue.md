@@ -36,7 +36,7 @@ The original item 4 proposed consolidating the two build passes into one. Local 
 - [x] AC3: The msbuild invocation(s) pass `/m` for parallel project builds.
 - [x] AC4: The analyzer/code-style enforcement and the nullable `TreatWarningsAsErrors` enforcement are both preserved (consolidated into one build pass or retained as two), with no reduction in enforced diagnostics.
 - [x] AC5: `actionlint` passes on the modified workflow.
-- [ ] AC6: A green CI run against the branch head is produced (the `modified-workflow-needs-green-run` gate) before merge.
+- [x] AC6: A green CI run against the branch head is produced (the `modified-workflow-needs-green-run` gate) before merge. Satisfied by PR #271 CI run 28912404849 against head `aaa2ae4e` — required checks `Format, build, analyze, and test` and `actionlint` both SUCCESS. Note: this checkoff commit advances the branch head; a follow-up CI run against the new head confirms the green state for the merge commit.
 
 ## Constraints & Risks
 
