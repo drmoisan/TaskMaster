@@ -10,15 +10,15 @@
   docs already landed on `main` via PR #268; no deviation recorded).
 - **Model budget:** `fable_policy: disabled`
 - **Current wave:** 0
-- **Phase:** implementation — wave 0 launching
-- **Last updated:** 2026-07-08T02:47:27Z
+- **Phase:** implementation — wave 0 in progress (F1, F2 delegated)
+- **Last updated:** 2026-07-08T02:52:25Z
 
 ## Feature Status
 
 | Feature | Issue | Folder | Wave | Depends on | merge_status | PR | Merge SHA |
 |---|---|---|---|---|---|---|---|
-| F1 store-disable-service | #261 | `2026-07-07-store-disable-service-261` | 0 | — | not_started | — | — |
-| F2 folder-settings-store-model-null | #262 | `2026-07-07-folder-settings-store-model-null-262` | 0 | — | not_started | — | — |
+| F1 store-disable-service | #261 | `2026-07-07-store-disable-service-261` | 0 | — | worktree_created | — | — |
+| F2 folder-settings-store-model-null | #262 | `2026-07-07-folder-settings-store-model-null-262` | 0 | — | worktree_created | — | — |
 | F3 store-runtime-reenable | #263 | `2026-07-07-store-runtime-reenable-263` | 1 | F1, F2 | not_started | — | — |
 | F4 store-lockup-detect-notify | #264 | `2026-07-07-store-lockup-detect-notify-264` | 2 | F1, F3 | not_started | — | — |
 | F5 disabled-stores-settings-ui | #265 | `2026-07-07-disabled-stores-settings-ui-265` | 2 | F1, F2, F3 | not_started | — | — |
@@ -32,3 +32,12 @@
 ## Integration → main
 
 - **epic_merge_pr:** not opened.
+
+## Operational Notes
+
+- The epic-orchestrator session operates from its native worktree branch and never checks out the
+  integration branch in that worktree (doing so collides with child worktree/branch creation).
+  Integration-branch `epic-status.md` commits are made from a dedicated integration worktree at
+  `TaskMaster-epic-int`.
+- The machine-authoritative checkpoint (`artifacts/orchestration/epic-orchestrator-state.json`) is
+  gitignored and lives in the session worktree, where the wave-barrier PreToolUse hook reads it.
