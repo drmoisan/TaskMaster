@@ -1,0 +1,16 @@
+---
+name: modified-workflow-green-run-manual-check
+description: Test-ModifiedWorkflowNeedsGreenRun.ps1 (referenced by feature-review-workflow SKILL.md) does not exist in TaskMaster; the modified-workflow-needs-green-run gate must be checked manually, and pr_context.summary.txt's changed-files overview truncates to ~top-10-by-size so it can omit a small workflow diff entirely
+metadata:
+  type: project
+---
+
+On the issue #267 review (2026-07-08), `.claude/skills/feature-review-workflow/SKILL.md` names a supporting validator `scripts/feature-review/Test-ModifiedWorkflowNeedsGreenRun.ps1` for the `modified-workflow-needs-green-run` rule. `Glob` for `**/*ModifiedWorkflow*` and `**/Test-ModifiedWorkflowNeedsGreenRun*` returned no files — the script does not exist in this checkout. Consistent with [[taskmaster-validator-memories-are-cross-repo]], treat this as another cross-repo-only reference: the rule text in the SKILL/rule files is authoritative, but enforcement is manual.
+
+Manual check performed: searched for any GitHub Actions run/workflow-run artifact, `gh` CLI availability, or local receipt recording a green run against the branch head SHA. `gh` was unavailable (`artifacts/pr_context.summary.txt` reports "GitHub CLI unavailable"), and no run evidence existed anywhere in the repo/working tree, so the gate was recorded FAIL/Blocking with a `remediation-inputs.*.md` describing the procedural (non-code) fix: open/update the PR or trigger `workflow_dispatch`, capture the run's head SHA + conclusion, then check off the AC.
+
+Separately observed: `artifacts/pr_context.summary.txt`'s "Changed files overview" section lists only ~10 bullets (apparently ranked by insertion count) under a bucket like "Docs/templates/agents/tooling: N files" and does not individually list every file in that bucket. A 22-file change whose only production file was `.github/workflows/ci.yml` (+18/-2) did not appear in the shown bullets at all, because 10+ markdown evidence files had larger insertion counts. This did not cause a missed finding here because the full `git diff`/appendix name-status section was read directly, but it means the summary's overview list is not a reliable inventory of "which non-doc file changed" for small workflow/config diffs — always cross-check against `git diff --name-only <merge-base>..HEAD` or the appendix's full name-status list rather than trusting the summary's truncated bullet list. Related to but distinct from [[project_pr-context-summary-misclassifies-cs]] (that note is about mislabeling C# as docs; this is about truncation/omission from the shown bullets, not mislabeling).
+
+**Why:** Avoids concluding "no workflow file changed" or "gate doesn't apply" purely from the summary's overview section when a workflow file is present but small relative to other diff lines.
+
+**How to apply:** For any feature review, always run `git diff --name-only <merge-base>..<head>` directly to check for `.github/workflows/**`, `.github/actions/**`, or `scripts/benchmarks/**` matches — do not rely solely on the PR-context summary's truncated overview bullets to decide whether `modified-workflow-needs-green-run` applies. When it does apply, check for green-run evidence manually (no local validator script backs this rule in TaskMaster).
