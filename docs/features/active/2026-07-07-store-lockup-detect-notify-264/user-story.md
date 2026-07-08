@@ -91,16 +91,16 @@ The authoritative, testable acceptance criteria for this feature are the numbere
 `spec.md`. The user-facing statements below summarize the outcomes a user should be able to
 confirm; each maps to the corresponding numbered criterion in `spec.md`.
 
-- [ ] An extended UI-thread freeze caused by one mailbox is detected and attributed to that
+- [x] An extended UI-thread freeze caused by one mailbox is detected and attributed to that
       mailbox using its cached display name, with a configurable threshold (spec AC1, AC3, AC4).
-- [ ] The offending mailbox is automatically disabled for the session before any message is shown,
+- [x] The offending mailbox is automatically disabled for the session before any message is shown,
       restoring responsiveness on the next pass (spec AC2, AC5).
-- [ ] A modeless message identifies the mailbox and offers "Disable This Session Only", "Disable
+- [x] A modeless message identifies the mailbox and offers "Disable This Session Only", "Disable
       for Future Sessions", and "Reenable", each wired to the correct behavior; the message never
       blocks the UI thread (spec AC6).
-- [ ] No message and no disable occur when the freeze cannot be attributed to a mailbox, when the
+- [x] No message and no disable occur when the freeze cannot be attributed to a mailbox, when the
       identity is unavailable, or when the mailbox is already disabled (spec AC7, AC8).
-- [ ] The event is recorded at WARN with the mailbox identity and stall duration so it appears in
+- [x] The event is recorded at WARN with the mailbox identity and stall duration so it appears in
       the important-logs file for later review (spec AC9).
 
 ## Non-Goals
