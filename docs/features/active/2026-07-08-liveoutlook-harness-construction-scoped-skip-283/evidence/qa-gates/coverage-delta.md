@@ -17,6 +17,10 @@ Timestamp: 2026-07-08T17-56
 - Delta: 0.00 pp. No regression. The changed lines (return-array `/TestCaseFilter` append in each arg builder) are on already-covered lines exercised by the arg-builder tests; changed-line coverage did not regress.
 - The 77.06% figure is a pre-existing baseline level for these two scripts under this single test file; uplifting it is out of scope for this minor-audit defect fix. Changed-line no-regression is satisfied.
 
+## Machine-Verifiable Source (R2 remediation, 2026-07-08T18-52)
+- Canonical Cobertura artifact: `artifacts/csharp/coverage.xml` (regen evidence: `qa-gates/csharp-coverage-regen.2026-07-08T18-45.md`).
+- Machine-read seam `LiveOutlookHarnessRunner.cs` = 100.0% (60/60 across `LiveOutlookHarnessRunner` 52/52 + nested `HarnessOutcome` 8/8). Overall root `line-rate=0.16913` = 16.91% (11768 / 69579), no regression vs 16.75% baseline. These figures are read directly from the canonical XML and equal the seam figure reported above (100.0%).
+
 ## Verdict
 - C# new-code coverage >= 90%: MET (100.0%).
 - C# no-regression on changed lines: MET (overall +0.15pp; first-party changed lines not regressed; COM harness exempt).
