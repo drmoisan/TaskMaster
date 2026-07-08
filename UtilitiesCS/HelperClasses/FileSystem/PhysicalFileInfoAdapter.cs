@@ -12,10 +12,13 @@ namespace UtilitiesCS.HelperClasses.FileSystem
         // The write-mode members delegate through these fields rather than calling the wrapped
         // FileInfo directly. Why: this narrow injectable-delegate seam lets unit tests cover the
         // AppendText/Open(mode)/OpenWrite delegation deterministically without acquiring a real
-        // write/append handle on any shared file. The public constructor binds the defaults to the
-        // real FileInfo, so production behavior is unchanged.
+        // write/append handle on any shared file. Open(FileMode, FileAccess) is also included in
+        // this seam because its default FileShare.None behavior can contend with a shared/real
+        // file (not because it is a write-mode member). The public constructor binds the defaults
+        // to the real FileInfo, so production behavior is unchanged.
         private readonly Func<StreamWriter> _appendText;
         private readonly Func<FileMode, FileStream> _openByMode;
+        private readonly Func<FileMode, FileAccess, FileStream> _openByModeAndAccess;
         private readonly Func<FileStream> _openWrite;
 
         public PhysicalFileInfoAdapter(FileInfo fileInfo)
@@ -23,6 +26,7 @@ namespace UtilitiesCS.HelperClasses.FileSystem
             _fileInfo = fileInfo ?? throw new ArgumentNullException(nameof(fileInfo));
             _appendText = _fileInfo.AppendText;
             _openByMode = _fileInfo.Open;
+            _openByModeAndAccess = _fileInfo.Open;
             _openWrite = _fileInfo.OpenWrite;
         }
 
@@ -30,12 +34,15 @@ namespace UtilitiesCS.HelperClasses.FileSystem
             FileInfo fileInfo,
             Func<StreamWriter> appendText,
             Func<FileMode, FileStream> openByMode,
+            Func<FileMode, FileAccess, FileStream> openByModeAndAccess,
             Func<FileStream> openWrite
         )
         {
             _fileInfo = fileInfo ?? throw new ArgumentNullException(nameof(fileInfo));
             _appendText = appendText ?? throw new ArgumentNullException(nameof(appendText));
             _openByMode = openByMode ?? throw new ArgumentNullException(nameof(openByMode));
+            _openByModeAndAccess =
+                openByModeAndAccess ?? throw new ArgumentNullException(nameof(openByModeAndAccess));
             _openWrite = openWrite ?? throw new ArgumentNullException(nameof(openWrite));
         }
 
@@ -131,7 +138,8 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public FileStream Open(FileMode mode) => _openByMode(mode);
 
-        public FileStream Open(FileMode mode, FileAccess access) => _fileInfo.Open(mode, access);
+        public FileStream Open(FileMode mode, FileAccess access) =>
+            _openByModeAndAccess(mode, access);
 
         public FileStream Open(FileMode mode, FileAccess access, FileShare share) =>
             _fileInfo.Open(mode, access, share);

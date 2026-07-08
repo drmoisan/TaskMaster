@@ -1,0 +1,14 @@
+---
+name: changed-line-coverage-cobertura-vs-mscoverage-partial
+description: null-guard/throw-expression lines show as "partially covered" in Microsoft.CodeCoverage.Console XML (per-branch) but hits=1/"covered" in dotnet-coverage Cobertura output (per-hit) — use Cobertura for changed-line >=90% proofs
+metadata:
+  type: project
+---
+
+When proving a specific new/changed line meets the CLAUDE.md/csharp.md >= 90% new-code coverage threshold (issue #278, PhysicalFileInfoAdapter seam extension), a null-coalescing throw-guard line like `_openByModeAndAccess = openByModeAndAccess ?? throw new ArgumentNullException(...);` shows as "partially covered" (not fully covered) in `Microsoft.CodeCoverage.Console.exe merge -f xml` output, because that format reports per-branch/per-block coverage and the `throw` branch is never exercised by a passing test. This is the SAME pattern already exhibited by every pre-existing null-guard in the file (`_appendText`, `_openByMode`, `_openWrite`), so it is not a regression — it is the established convention for this constructor-validation style throughout the class.
+
+**Why this matters:** Judging "changed-line coverage" purely from the MS-coverage-XML function-level `line_coverage` percentage would make a brand-new null-guard line look uncertain/incomplete even though the assignment path is fully exercised.
+
+**How to apply:** For a precise per-line changed-line coverage proof, convert the same `.coverage` file with `dotnet-coverage merge -f cobertura` (global tool, not `dotnet tool run`) instead of (or in addition to) `Microsoft.CodeCoverage.Console.exe`. Cobertura's `<line number="N" hits="H">` reports `hits=1` (covered) for a line executed at least once, regardless of whether all its branches were taken — so the null-guard assignment line correctly shows as covered. Locate the exact `<class filename="...">` block for the changed production file (grep for the class-open/`</class>` line-number bracket, since large solutions produce a huge single XML with duplicate line numbers across many classes/modules), then check hits for the specific line numbers touched by the diff. Report BOTH figures when writing coverage-delta evidence: the MS-coverage-XML aggregate (for the class-level baseline-vs-post-change comparison) and the Cobertura per-line hit data (for the changed-line-specific >= 90% claim), explaining the partial-vs-hit distinction so a reviewer does not mistake "partially covered" for "under-tested."
+
+See also [[project_coverage_firstparty_denominator_method]] and [[project_qfc227_coverage_tooling]] for other coverage-tooling conventions in this repo.
