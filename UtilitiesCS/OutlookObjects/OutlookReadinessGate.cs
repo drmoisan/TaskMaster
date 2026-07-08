@@ -72,6 +72,26 @@ namespace UtilitiesCS
         }
 
         /// <summary>
+        /// Cheap, non-throwing store-scoped probe of readiness. Returns <c>true</c> when the
+        /// supplied <paramref name="store"/>'s default inbox folder is reachable; returns
+        /// <c>false</c> (never throws) when the store is not yet ready, including when the probe
+        /// raises a <see cref="COMException"/>, and when <paramref name="store"/> is null. Mirrors
+        /// the parameterless <see cref="IsReady()"/> pattern exactly, scoped to a specific store;
+        /// the folder reference is never retained, so no extra COM object lifetime is created.
+        /// </summary>
+        public bool IsReady(Store store)
+        {
+            try
+            {
+                return store?.GetDefaultFolder(OlDefaultFolders.olFolderInbox) != null;
+            }
+            catch (COMException)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Returns <c>true</c> only for the known transient "not-ready" COM HRESULTs
         /// (<see cref="TransientStoreNotReadyHResult"/> / <see cref="TransientOperationFailedHResult"/> /
         /// <see cref="TransientStartupReadinessHResult"/>),

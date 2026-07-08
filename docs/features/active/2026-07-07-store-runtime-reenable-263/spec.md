@@ -344,48 +344,74 @@ all touched and new files remain <= 500 lines.
 These criteria refine the early-draft ACs in `issue.md`. Each is testable via the two test tiers
 above unless marked as a code-review/inspection check.
 
-- [ ] AC1: A new per-store primitive is extracted from each of the three startup hookup subsystems
+- [x] AC1: A new per-store primitive is extracted from each of the three startup hookup subsystems
       (`AppEvents.PerformReadinessHookup` inbox-item subscribe, `AppOlObjects.LoadInboxes` inbox
       resolution, `OutlookFolderNotificationSink` folder/store subscriptions) plus a
       `StoresWrapper.AddOrRestoreStore` primitive, such that each existing startup loop body and the
       runtime rehook path call the same per-store implementation for that subsystem.
-- [ ] AC2: `IStoreRehookService.RehookStoreAsync(storeIdentity)` re-adds the resolved live store to
+- [x] AC2: `IStoreRehookService.RehookStoreAsync(storeIdentity)` re-adds the resolved live store to
       `StoresWrapper.Stores` and re-registers both item-level (`AppEvents`) and folder/store-level
       (`OutlookFolderNotificationSink`) handlers for that store, and invalidates the cached
       folder-tree snapshot via `IOutlookFolderTreeService.MarkStale`.
-- [ ] AC3: The operation is idempotent, keyed by `StoreID`: a second `RehookStoreAsync` for a store
+- [x] AC3: The operation is idempotent, keyed by `StoreID`: a second `RehookStoreAsync` for a store
       already hooked in all three subsystems returns `AlreadyHooked` and makes zero additional
       subscribe/`AddStore`/`AddLast` calls (verified by Moq `Verify(..., Times.Never())` on the
       second invocation).
-- [ ] AC4: The operation reuses the readiness-gate/transient-retry shape by constructing a new
+- [x] AC4: The operation reuses the readiness-gate/transient-retry shape by constructing a new
       `HookReadinessCoordinator` instance per call (the run-once singleton is not made reentrant)
       and uses the store-scoped `IOutlookReadinessGate.IsReady(Outlook.Store)` overload; it
       introduces no synchronous expensive COM read on the UI thread before the gate reports ready.
-- [ ] AC5: The store-scoped `bool IsReady(Outlook.Store store)` overload is added to
+- [x] AC5: The store-scoped `bool IsReady(Outlook.Store store)` overload is added to
       `IOutlookReadinessGate`/`OutlookReadinessGate`, reusing `IsTransientError(COMException)`
       unchanged, and does not alter the behavior of the existing parameterless `IsReady()`.
-- [ ] AC6: A transient-not-ready store is retried within a bounded window and, if never ready,
+- [x] AC6: A transient-not-ready store is retried within a bounded window and, if never ready,
       returns `TransientTimeout` without blocking the STA; a store whose identity does not resolve
       to a live store returns `StoreNotFound`; a non-transient exception during hookup returns
       `PermanentError`. `TransientTimeout` and `PermanentError` are logged via log4net with
       identity, failing subsystem, and HRESULT (when COM-derived).
-- [ ] AC7: `RehookStoreAsync` never lets an exception escape uncaught; all outcomes are reported
+- [x] AC7: `RehookStoreAsync` never lets an exception escape uncaught; all outcomes are reported
       through the `StoreRehookResult`/`StoreRehookOutcome` contract.
-- [ ] AC8: F1's `ReenableAsync` is edited to inject the real `IStoreRehookService` (replacing the
-      wave-0 no-op collaborator) and to call `RehookStoreAsync` before its disabled-scope-clearing
-      logic, clearing the disabled scope only on `Success` or `AlreadyHooked`. (Code-review /
-      integration check.)
-- [ ] AC9: F3 takes no compile-time dependency on `IStoreDisableService`; the only coupling to F1
-      is the store-identity convention. (Code-review check.)
-- [ ] AC10: Deterministic MSTest coverage exists in two tiers — a COM-free orchestrator tier
+- [x] AC8 (reconciled to F1's merged contract): The real `StoreRehookCoordinator` is injected as
+      F1's `IStoreRehookService` collaborator at the DI construction site
+      (`ApplicationGlobals.cs`, `new StoreDisableService(this, <coordinator>)`), replacing the wave-0
+      no-op default. On reenable, F1's shipped `ReenableAsync` clears the disabled scope (session then
+      persisted) and then awaits the real rehook collaborator **unconditionally**; the coordinator's
+      outcome is logged (log4net), not used to gate scope-clearing. F1's `StoreDisableService` body is
+      not modified. Reconciliation note: the original "clear the disabled scope only on
+      `Success`/`AlreadyHooked`" wording was based on a pre-merge assumption about F1's seam; F1
+      shipped a void-returning `Task` collaborator and clear-first-then-rehook-unconditionally
+      ordering, which the epic directive forbids redesigning. (Code-review / integration check.)
+- [x] AC9 (reconciled to F1's merged contract): F3 takes no compile-time dependency on
+      `IStoreDisableService`. F3 does depend on `StoreIdentity` via F1's collaborator seam
+      (`StoreRehookCoordinator` implements `RehookAsync(StoreIdentity)`); this dependency is
+      unavoidable and intended. Reconciliation note: the pre-merge draft prohibited a `StoreIdentity`
+      dependency, but F1's shipped `IStoreRehookService.RehookAsync(StoreIdentity)` makes it a
+      required, intended coupling. (Code-review check.)
+- [x] AC10: Deterministic MSTest coverage exists in two tiers — a COM-free orchestrator tier
       (`StoreRehookCoordinatorTests`) exercising all five `StoreRehookOutcome` branches and
       idempotency via Moq, and a COM-mocked primitive tier extending
       `OutlookFolderNotificationSinkTests`, `AppEventsTests`, a `StoresWrapper` test, and a
       readiness-gate test — with no live Outlook, no temporary files, no real timers.
-- [ ] AC11: Existing startup-path tests continue to pass (normal startup hookup unaffected by the
+- [x] AC11: Existing startup-path tests continue to pass (normal startup hookup unaffected by the
       extraction), and the full C# toolchain passes in order (CSharpier -> analyzers ->
       nullable/TWAE -> MSTest with coverage, `TestCategory!=LiveOutlook`) with no repository-wide
       coverage regression; all touched and new files remain <= 500 lines.
+
+### Acceptance Criteria — Delivery Evidence (F3 #263, verified 2026-07-08)
+
+All AC1–AC11 are checked above. Each is satisfied by the following implementation tasks and/or evidence artifacts:
+
+- AC1 — P3-T1 (`StoresWrapper.AddOrRestoreStore`), P3-T3 (`AppEvents.SubscribeInboxForStore`), P3-T5 (`OutlookFolderNotificationSink.AddStore`/`AddStoreSubscriptions`), P3-T7 (`AppOlObjects.ResolveInboxForStore`); regression `evidence/regression-testing/startup-regression.md`.
+- AC2 — P4-T2 (`RehookStoreCoreAsync` drives AddOrRestoreStore → SubscribeInboxForStore → sink.AddStore → MarkStale; public `RehookAsync(StoreIdentity)` adapter), P5-T1/P5-T2 (DI); tested P4-T3 (`StoreRehookCoordinatorTests`).
+- AC3 — P3-T3/P3-T5/P4-T2 (StoreID-keyed idempotency); tested P3-T4, P3-T6, P4-T3 (second call zero additional subscribes via Times/no-op assertions).
+- AC4 — P4-T2 (new `HookReadinessCoordinator` per call via `StoreScopedReadinessGate`, bounded 20-attempt window, `IsReady(Store)`, no eager COM read); tested P4-T3 (`...WhenGateNeverReady...NoEagerComRead`).
+- AC5 — P1-T3/P2-T1 (`IsReady(Outlook.Store)` overload reusing `IsTransientError`, parameterless `IsReady()` unchanged); tested P2-T2 (`OutlookReadinessGateTests`).
+- AC6 — P1-T1 (`StoreRehookOutcome`/`StoreRehookResult`), P4-T2 (`TransientTimeout`/`StoreNotFound`/`PermanentError` + log4net `LogOutcome`/`DescribeHResult`); tested P4-T3.
+- AC7 — P4-T2 (broad catch at the AC7 boundary → `PermanentError`, no exception escapes); tested P4-T3 (`...PermanentError...WithoutThrowing`, adapter `NotThrowAsync`).
+- AC8 — P5-T1/P5-T2 (real `StoreRehookCoordinator` injected at `ApplicationGlobals.cs` line 118; F1's `StoreDisableService.cs` byte-for-byte unchanged, clear-first-then-rehook-unconditionally preserved).
+- AC9 — P5-T3 inspection; `evidence/other/no-f1-compile-dependency.md` (zero `IStoreDisableService` references in F3 production files; F1 files unchanged).
+- AC10 — P2-T2, P3-T2, P3-T4, P3-T6, P4-T3 (two-tier deterministic MSTest: COM-free orchestrator tier + COM-mocked primitive tier; no live Outlook/temp files/real timers).
+- AC11 — P5-T4 (`evidence/regression-testing/startup-regression.md`), P6-T1..T4 (`evidence/qa-gates/qa-01..04`), P6-T5 (`qa-05-coverage-delta.md`, no regression, new-code 99.6% >= 90%, testable denominator 83.23% >= 80%), P6-T6 (`evidence/other/file-size-check.md`, all files <= 500).
 
 ## Assumptions, Constraints, Dependencies
 

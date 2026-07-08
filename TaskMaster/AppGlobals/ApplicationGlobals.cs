@@ -14,7 +14,7 @@ using UtilitiesCS.Threading;
 
 namespace TaskMaster
 {
-    public class ApplicationGlobals : IApplicationGlobals
+    public partial class ApplicationGlobals : IApplicationGlobals
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -113,9 +113,13 @@ namespace TaskMaster
             _events = new AppEvents(this);
             _quickFilerSettings = new AppQuickFilerSettings();
             Engines = new AppItemEngines(this);
-            // why: issue #261. Constructed here (before the async store-load phase) because the
-            // service reads Globals.Ol.StoresWrapper lazily per call and never caches the model.
-            _storeDisableService = new StoreDisableService(this);
+            // why: issue #261/#263. Constructed here (before the async store-load phase) because
+            // the service reads Globals.Ol.StoresWrapper lazily per call and never caches the model.
+            // F3 (#263) supplies the real rehook collaborator, replacing F1's wave-0 no-op default.
+            // Building the coordinator is cheap (no COM); its expensive sink/tree-service
+            // dependencies are resolved lazily only at reenable time, never eagerly here.
+            _storeRehookCoordinator = BuildStoreRehookCoordinator();
+            _storeDisableService = new StoreDisableService(this, _storeRehookCoordinator);
             stopwatch.Stop();
             _loadBasicElapsed = stopwatch.Elapsed;
         }

@@ -1,10 +1,14 @@
 using System;
+using System.Collections.Generic;
 using UtilitiesCS.OutlookObjects.Folder;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.Test.OutlookObjects.Folder.Fakes
 {
     public sealed class FakeOutlookFolderNotificationSink : IOutlookFolderNotificationSink
     {
+        public List<Outlook.Store> AddedStores { get; } = new List<Outlook.Store>();
+        public List<string> RemovedStoreIds { get; } = new List<string>();
         private EventHandler<FolderTreeSnapshotChangedEventArgs> _folderAdded;
         private EventHandler<FolderTreeSnapshotChangedEventArgs> _folderRemoved;
         private EventHandler<FolderTreeSnapshotChangedEventArgs> _folderChanged;
@@ -108,6 +112,16 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder.Fakes
         public void Start()
         {
             StartCount++;
+        }
+
+        public void AddStore(Outlook.Store store)
+        {
+            AddedStores.Add(store);
+        }
+
+        public void RemoveStore(string storeId)
+        {
+            RemovedStoreIds.Add(storeId);
         }
 
         public void Dispose()

@@ -700,6 +700,7 @@
     <Compile Include="OutlookObjects\Store\StoreDisableService.cs" />
     <Compile Include="OutlookObjects\Store\StoreFilterAttribution.cs" />
     <Compile Include="OutlookObjects\Store\StoreIdentity.cs" />
+    <Compile Include="OutlookObjects\Store\StoreRehookResult.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapper.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapper.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperInitClock.cs" />
