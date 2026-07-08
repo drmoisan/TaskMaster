@@ -8,7 +8,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.OutlookObjects.Folder;
@@ -29,12 +28,6 @@ namespace TaskMaster
             _globals = appGlobals;
             _olApplication = olApplication;
             ResetLazyInboxes();
-        }
-
-        public async Task LoadAsync()
-        {
-            await LoadStoresAsync();
-            await Task.CompletedTask;
         }
 
         private IApplicationGlobals _globals;
@@ -240,29 +233,6 @@ namespace TaskMaster
         }
 
         internal void ResetLazyInboxes() => _inboxes = new Lazy<IEnumerable<Folder>>(LoadInboxes);
-
-        public StoresWrapper StoresWrapper { get; set; }
-
-        protected internal virtual Task AwaitStoreRewireAsync(StoresWrapper storesWrapper) =>
-            storesWrapper is null
-                ? Task.CompletedTask
-                : storesWrapper.RewireAfterDeserializeAsync();
-
-        internal async Task LoadStoresAsync()
-        {
-            if (_globals.IntelRes.Config.TryGetValue("StoresWrapper", out var config))
-            {
-                StoresWrapper = SmartSerializable.Deserialize<
-                    StoresWrapper,
-                    SmartSerializableLoader
-                >(config);
-                await AwaitStoreRewireAsync(StoresWrapper);
-            }
-            else
-            {
-                logger.Error("StoresWrapper config not found.");
-            }
-        }
 
         private Reminders _olReminders;
         public Reminders OlReminders
