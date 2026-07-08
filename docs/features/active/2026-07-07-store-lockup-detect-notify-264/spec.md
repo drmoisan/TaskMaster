@@ -266,53 +266,76 @@ repository's coverable-decision / thin-host split:
 
 These refine the early-draft criteria in `issue.md` into numbered, testable statements.
 
-- [ ] **AC1 — Detection on an injected clock and threshold.** `ThreadMonitor` computes elapsed
+- [x] **AC1 — Detection on an injected clock and threshold.** `ThreadMonitor` computes elapsed
       stall time through an injected `TimeProvider` and raises an injected
       `Action<LockupAttribution> onLockupDetected` callback exactly when the injected, configurable
       `lockupAttributionThresholdMs` is exceeded and not before, verified by a deterministic MSTest
       advancing a `FakeTimeProvider`. The existing diagnostic stack-capture path remains gated
       behind the unchanged `delayThreshold` and is not on the attribution path.
-- [ ] **AC2 — Watchdog enabled in production.** `TaskMaster/ThisAddIn.cs` calls
+- [x] **AC2 — Watchdog enabled in production.** `TaskMaster/ThisAddIn.cs` calls
       `UiThread.Init(monitorUiThread: true)`, and `StoreLockupResponder`'s dependencies (F1's
       `StoreDisable` from `IApplicationGlobals`, an `IUiDispatcher`, the notify composition) are
       wired at startup.
-- [ ] **AC3 — Attribution via static volatile context.** `CurrentStoreContext` is a
+- [x] **AC3 — Attribution via static volatile context.** `CurrentStoreContext` is a
       single-writer/single-reader static holder; `Begin(identity)` sets the value inside an
       `IDisposable` scope and restores the previous value on `Dispose`. The three set/clear points
       (`StoreWrapper.Init`, `StoresWrapper.RewireOlObjectsAsync`, `AppOlObjects` per-store
       attribution) wrap only the post-`DisplayName` blocking calls using the already-cached
       `DisplayName`. Verified by a deterministic MSTest on `CurrentStoreContext` (no COM, no
       threads).
-- [ ] **AC4 — No new expensive/blocking COM calls.** Attribution and identification introduce no
+- [x] **AC4 — No new expensive/blocking COM calls.** Attribution and identification introduce no
       new COM property reads on the UI thread; `CurrentStoreContext` receives only strings already
       computed by existing #211 diagnostics. The existing `[Startup timing]` / `[store-filter]` /
       `[loadinboxes]` lines are unchanged (additive, behavior-preserving wraps).
-- [ ] **AC5 — Auto-disable immediately, then notify.** On attribution with a valid identity for a
+- [x] **AC5 — Auto-disable immediately, then notify.** On attribution with a valid identity for a
       not-already-disabled store, `StoreLockupResponder` calls F1's `DisableSessionOnly(identity)`
       once and then shows the modeless notification once, in that order, verified by a deterministic
       MSTest asserting call order.
-- [ ] **AC6 — Modeless three-button notification.** The notification is composed without a `using`
+- [x] **AC6 — Modeless three-button notification.** The notification is composed without a `using`
       block, owns its viewer lifetime via `FormClosed`, is shown through an injectable
       `showAction` seam defaulting to `viewer => viewer.Show()`, and is dispatched via
       `IUiDispatcher.BeginInvoke` (never `Invoke`, never modal `ShowDialog`). Its three buttons
       invoke F1's `DisableSessionOnly`, `DisableForFutureSessions`, and `ReenableAsync`
       respectively, verified by invoking each button `Action` against Moq without a real `Show()`.
       F4 makes no direct F3 call.
-- [ ] **AC7 — Guard: no context.** A stall with `CurrentStoreContext.Current` null/empty (including
+- [x] **AC7 — Guard: no context.** A stall with `CurrentStoreContext.Current` null/empty (including
       a normalized identity-unavailable value) triggers no disable and no notification, verified by
       a deterministic MSTest.
-- [ ] **AC8 — Guard: already disabled.** A stall attributed to a store for which F1's `IsDisabled`
+- [x] **AC8 — Guard: already disabled.** A stall attributed to a store for which F1's `IsDisabled`
       returns true triggers no second disable and no duplicate notification, verified by a
       deterministic MSTest.
-- [ ] **AC9 — WARN logging.** One `[store-lockup]` line is emitted at WARN with store identity,
+- [x] **AC9 — WARN logging.** One `[store-lockup]` line is emitted at WARN with store identity,
       stall duration, and auto-disable outcome through the injected sink, so it lands in the
       existing JSON `important_logs_file` appender with no config change. The line format is
       produced by the pure `StoreLockupAttribution` formatter and asserted by a deterministic
       MSTest with no log4net dependency.
-- [ ] **AC10 — Determinism and toolchain.** All new/extended code is covered by deterministic
+- [x] **AC10 — Determinism and toolchain.** All new/extended code is covered by deterministic
       MSTest (Moq + FluentAssertions) with injected clock/threshold and mocked
       watchdog/service/dispatcher/notify seams; no live Outlook, no temporary files, no real
       waits/timers. The full C# toolchain passes in order (CSharpier → analyzers →
       nullable/TreatWarningsAsErrors → MSTest with coverage, `TestCategory!=LiveOutlook`); new code
       meets the coverage policy with no repository-wide regression; all touched/new files are
       <= 500 lines (the `AppOlObjects.cs` over-cap constraint handled per the partial-file split).
+
+## Acceptance Criteria — Evidence Traceability
+
+All AC1–AC10 verified and checked off 2026-07-08 (delivered on branch
+`feature/store-lockup-detect-notify-264`). Satisfying tasks and evidence:
+
+| AC | Delivered by | Evidence |
+|----|--------------|----------|
+| AC1 | P2 (`LockupStallDecider`), P3 (`ThreadMonitor` clock/threshold/callback + `FakeTimeProvider` tests) | `LockupStallDeciderTests`, `ThreadMonitorTests` (27 tests) |
+| AC2 | P8-T1 (`monitorUiThread: true`), P8-T2 (startup wiring) | `evidence/other/watchdog-enable-risk.md`, `startup-wiring-filesize.md` |
+| AC3 | P1 (`CurrentStoreContext`), P7-T1/T2/T3 set/clear sites, P7-T5 | `CurrentStoreContextTests`, `AppOlObjectsAttributionContextTests` |
+| AC4 | P7 additive wraps (existing `[Startup timing]`/`[loadinboxes]` lines unchanged), P8-T3 | `AppOlObjectsAttributionContextTests`, `startup-wiring-filesize.md` |
+| AC5 | P5-T2 disable-then-notify order | `StoreLockupResponderTests` scenario 1 |
+| AC6 | P6 modeless composition (`showAction`, `BeginInvoke`, three F1 buttons) | `MyBoxModelessTests`, `StoreLockupResponderTests` (dispatch) |
+| AC7 | P5-T2 no-context guard | `StoreLockupResponderTests` scenario 2, `CurrentStoreContextTests` |
+| AC8 | P5-T2 already-disabled guard | `StoreLockupResponderTests` scenario 3 |
+| AC9 | P4 (`StoreLockupAttribution` formatter), P5-T2 WARN sink | `StoreLockupAttributionTests`, `StoreLockupResponderTests` scenario 5 |
+| AC10 | P9-T1..T6 full toolchain + coverage + file-size | `evidence/qa-gates/qa-01..06`, `qa-05-coverage-delta.md` |
+
+Toolchain final pass (P9): csharpier check EXIT 0 (1306 files clean); analyzer Rebuild EXIT 0
+(75 warnings = baseline, 0 new); nullable gate EXIT 0 (no-op, no regression); vstest EXIT 0
+(4481 passed). New-code coverage: all six F4 files 92.3–100% (aggregate 97.7%). Testable
+denominator (UtilitiesCS) 90.5% >= 80%; no coverage regression (all first-party packages up).

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.Threading;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.OutlookObjects.Store
@@ -138,15 +139,22 @@ namespace UtilitiesCS.OutlookObjects.Store
             var storeWrapper = Stores.Find(x => x.DisplayName == storeDisplayName);
             var wasCreated = false;
 
-            if (storeWrapper is null)
+            // why: issue #264. Attribute any UI-thread lockup inside the per-store Init/Restore COM
+            // work to this store, using the already-read storeDisplayName (no new COM read). The
+            // scope opens and closes entirely within this synchronous method, which the bulk loop
+            // enters only after its await Task.Yield(), so no ambient value leaks across the yield.
+            using (CurrentStoreContext.Begin(storeDisplayName))
             {
-                storeWrapper = new StoreWrapper(store).Init();
-                Stores.Add(storeWrapper);
-                wasCreated = true;
-            }
-            else
-            {
-                storeWrapper.Restore(store);
+                if (storeWrapper is null)
+                {
+                    storeWrapper = new StoreWrapper(store).Init();
+                    Stores.Add(storeWrapper);
+                    wasCreated = true;
+                }
+                else
+                {
+                    storeWrapper.Restore(store);
+                }
             }
 
             logger.Debug(

@@ -13,6 +13,7 @@ using UtilitiesCS;
 using UtilitiesCS.OutlookObjects.Folder;
 using UtilitiesCS.OutlookObjects.Store;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.Threading;
 using UtilitiesCS.Windows_Forms;
 
 namespace TaskMaster
@@ -186,8 +187,16 @@ namespace TaskMaster
                 return null;
             }
 
+            // why: issue #264. Attribute any UI-thread lockup inside the blocking
+            // GetDefaultFolder(Inbox) COM call to this store, using the already-computed displayName
+            // (no new COM read). Additive: the [loadinboxes] attribution line and the exclusion path
+            // below are unchanged.
             var getDefaultFolderStopwatch = Stopwatch.StartNew();
-            var inbox = getDefaultFolder();
+            MAPIFolder inbox;
+            using (CurrentStoreContext.Begin(displayName))
+            {
+                inbox = getDefaultFolder();
+            }
             getDefaultFolderStopwatch.Stop();
 
             probe.EmitLoadInboxesStore(
