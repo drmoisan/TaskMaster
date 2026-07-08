@@ -68,6 +68,43 @@ namespace QuickFiler.Test.HelperClasses
             themes["DarkActive"].HtmlDark.Should().Be(Enums.ToggleState.On);
         }
 
+        /// <summary>
+        /// Regression for issue #269. The issue #236 "coverage seams" refactor converted the theme
+        /// definitions to positional <c>CreateTheme(...)</c> calls but carried the Light-theme mail
+        /// colors over in the old (back-before-fore) order, swapping foreground and background so the
+        /// Sender/Subject labels rendered as light text on a black/blue background in Light mode.
+        /// The correct Light appearance is dark text on a light background, with blue text as the
+        /// unread accent. Dark themes were unaffected (their argument order already matched) and are
+        /// asserted here to confirm they remain correct.
+        /// </summary>
+        [TestMethod]
+        public void SetupThemes_LightThemes_MailLabelColorsAreDarkTextOnLightBackground()
+        {
+            // Arrange
+            QfcThemeControlSet controlSet = CreateControlSet();
+
+            // Act
+            Dictionary<string, Theme> themes = QfcThemeHelper.SetupThemes(controlSet);
+
+            // Assert — LightNormal: read = dark text on light bg; unread = blue text on light bg.
+            themes["LightNormal"].MailReadForeColor.Should().Be(SystemColors.ControlText);
+            themes["LightNormal"].MailReadBackColor.Should().Be(SystemColors.Control);
+            themes["LightNormal"].MailUnreadForeColor.Should().Be(Color.MediumBlue);
+            themes["LightNormal"].MailUnreadBackColor.Should().Be(SystemColors.Control);
+
+            // Assert — LightActive: read = dark text on light-cyan bg; unread = blue text on light-cyan bg.
+            themes["LightActive"].MailReadForeColor.Should().Be(SystemColors.ControlText);
+            themes["LightActive"].MailReadBackColor.Should().Be(Color.LightCyan);
+            themes["LightActive"].MailUnreadForeColor.Should().Be(Color.MediumBlue);
+            themes["LightActive"].MailUnreadBackColor.Should().Be(Color.LightCyan);
+
+            // Assert — DarkNormal remains correct: light text on a black bg (goldenrod unread accent).
+            themes["DarkNormal"].MailReadForeColor.Should().Be(Color.WhiteSmoke);
+            themes["DarkNormal"].MailReadBackColor.Should().Be(Color.Black);
+            themes["DarkNormal"].MailUnreadForeColor.Should().Be(Color.Goldenrod);
+            themes["DarkNormal"].MailUnreadBackColor.Should().Be(Color.Black);
+        }
+
         [TestMethod]
         public void SetupThemes_WithNullController_ThrowsArgumentNullException()
         {
