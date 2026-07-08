@@ -268,12 +268,15 @@
     <Compile Include="AppGlobals\EngineInitTimingProbeTests.cs" />
     <Compile Include="AppGlobals\StartupDiagnosticsProbeTests.cs" />
     <Compile Include="AppGlobals\StartupInboxAttributionProbeTests.cs" />
+    <Compile Include="AppGlobals\AppOlObjectsAttributionContextTests.cs" />
     <Compile Include="AppGlobals\StartupTimingRecorderTests.cs" />
     <Compile Include="AppGlobals\HookReadinessCoordinatorTests.cs" />
     <Compile Include="AppGlobals\NonBlockingDelayTests.cs" />
     <Compile Include="AppGlobals\LiveOutlookHookupIntegrationTests.cs" />
     <Compile Include="AppGlobals\AppEventsCoverageExpansionTests.cs" />
     <Compile Include="AppGlobals\AppEventsTests.cs" />
+    <Compile Include="AppGlobals\AppEventsStoreRehookTests.cs" />
+    <Compile Include="AppGlobals\StoreRehookCoordinatorTests.cs" />
     <Compile Include="AppGlobals\AppEventsTests.Helpers.cs" />
     <Compile Include="AppGlobals\AppFileSystemFolderPathsMatchBestSpecialFolderTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsCoverageTests.cs" />

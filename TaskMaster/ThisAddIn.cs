@@ -24,8 +24,19 @@ namespace TaskMaster
             // Ensure that forms are ready for high resolution
             InitializeDPI();
 
-            // Grab the sync context for the UI thread
-            UiThread.Init(monitorUiThread: false);
+            // Grab the sync context for the UI thread and enable the store-lockup watchdog (issue
+            // #264). The lockup callback lazily resolves the StoreLockupResponder from globals (which
+            // are constructed later in Application_Startup), so a multi-second per-store lockup is
+            // attributed and auto-disabled once F1's disable service is available. RISK: this enables
+            // one additional background polling loop for the add-in's lifetime; rollback is reverting
+            // monitorUiThread to false (all F4 code then stays dormant). See
+            // docs/.../evidence/other/watchdog-enable-risk.md.
+            UiThread.Init(
+                monitorUiThread: true,
+                onLockupDetected: attribution =>
+                    GetStoreLockupResponder()?.OnLockupDetected(attribution),
+                timeProvider: TimeProvider.System
+            );
 
             Application.Startup += Application_Startup;
         }
@@ -102,6 +113,27 @@ namespace TaskMaster
         private ApplicationGlobals _globals;
         private AddInUtilities _externalUtilities;
         private RibbonController _ribbonController;
+
+        // Store-lockup responder (issue #264). Constructed lazily on first lockup because F1's disable
+        // service is not available until globals are constructed in Application_Startup. The
+        // WpfUiDispatcher marshals the modeless notification onto the STA via BeginInvoke.
+        private StoreLockupResponder _storeLockupResponder;
+
+        private StoreLockupResponder GetStoreLockupResponder()
+        {
+            if (_storeLockupResponder is null)
+            {
+                var disable = _globals?.StoreDisable;
+                if (disable is null)
+                {
+                    return null;
+                }
+
+                _storeLockupResponder = new StoreLockupResponder(disable, new WpfUiDispatcher());
+            }
+
+            return _storeLockupResponder;
+        }
 
         // Diagnosis-only full add-in-startup-lifetime UI-heartbeat seam (issue #211, Phase 3.3).
         // The DispatcherTimer/Stopwatch are host-bound and live here in the lifecycle-exempt class;

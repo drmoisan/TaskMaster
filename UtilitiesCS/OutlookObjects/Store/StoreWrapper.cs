@@ -7,6 +7,7 @@ using Microsoft.Graph.Models.TermStore;
 using Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json;
 using UtilitiesCS.OutlookObjects.Folder;
+using UtilitiesCS.Threading;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.OutlookObjects.Store
@@ -38,29 +39,37 @@ namespace UtilitiesCS.OutlookObjects.Store
                 $"[Startup timing] Init '{DisplayName ?? "<null>"}' DisplayName: {storeDisplayNameStopwatch.ElapsedMilliseconds} ms"
             );
 
-            var rootFolderStopwatch = Stopwatch.StartNew();
-            RootFolder = InnerStore.GetRootFolder() as Outlook.Folder;
-            logger.Debug(
-                $"[Startup timing] Init '{DisplayName ?? "<null>"}' GetRootFolder: {rootFolderStopwatch.ElapsedMilliseconds} ms"
-            );
-
-            var exchangeStoreType = InnerStore.ExchangeStoreType;
-            if (exchangeStoreType != Outlook.OlExchangeStoreType.olExchangePublicFolder)
+            // why: issue #264. Attribute any UI-thread lockup inside the post-DisplayName blocking
+            // COM chain (GetRootFolder / GetDefaultFolder(Inbox) / the SMTP chain) to this store,
+            // using the already-cached DisplayName (no new COM read). The scope wraps around the
+            // existing #211 [Startup timing] lines without altering them; it is disposed before the
+            // method-scope initStopwatch total is recorded.
+            using (CurrentStoreContext.Begin(DisplayName))
             {
-                var inboxStopwatch = Stopwatch.StartNew();
-                Inbox =
-                    InnerStore.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox)
-                    as Outlook.Folder;
+                var rootFolderStopwatch = Stopwatch.StartNew();
+                RootFolder = InnerStore.GetRootFolder() as Outlook.Folder;
                 logger.Debug(
-                    $"[Startup timing] Init '{DisplayName ?? "<null>"}' GetDefaultFolder(Inbox): {inboxStopwatch.ElapsedMilliseconds} ms"
+                    $"[Startup timing] Init '{DisplayName ?? "<null>"}' GetRootFolder: {rootFolderStopwatch.ElapsedMilliseconds} ms"
+                );
+
+                var exchangeStoreType = InnerStore.ExchangeStoreType;
+                if (exchangeStoreType != Outlook.OlExchangeStoreType.olExchangePublicFolder)
+                {
+                    var inboxStopwatch = Stopwatch.StartNew();
+                    Inbox =
+                        InnerStore.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox)
+                        as Outlook.Folder;
+                    logger.Debug(
+                        $"[Startup timing] Init '{DisplayName ?? "<null>"}' GetDefaultFolder(Inbox): {inboxStopwatch.ElapsedMilliseconds} ms"
+                    );
+                }
+
+                var smtpLookupStopwatch = Stopwatch.StartNew();
+                UserEmailAddress = GetSmtpAddressFromStore();
+                logger.Debug(
+                    $"[Startup timing] Init '{DisplayName ?? "<null>"}' GetSmtpAddressFromStore: {smtpLookupStopwatch.ElapsedMilliseconds} ms"
                 );
             }
-
-            var smtpLookupStopwatch = Stopwatch.StartNew();
-            UserEmailAddress = GetSmtpAddressFromStore();
-            logger.Debug(
-                $"[Startup timing] Init '{DisplayName ?? "<null>"}' GetSmtpAddressFromStore: {smtpLookupStopwatch.ElapsedMilliseconds} ms"
-            );
 
             initStopwatch.Stop();
             var initTotalMs = initStopwatch.Elapsed.TotalMilliseconds;

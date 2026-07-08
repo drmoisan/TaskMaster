@@ -1,31 +1,52 @@
 # Epic Status: store-lockup-resilience (Issue #260)
 
-- Phase: Planning (documentation only) — implementation on hold pending user approval
-- Integration branch: `epic/store-lockup-resilience-integration` (not yet created; created at wave-0 launch)
-- Last updated: 2026-07-07
+> This document is a human-readable projection of the epic checkpoint
+> (`artifacts/orchestration/epic-orchestrator-state.json`). It is regenerated from the
+> checkpoint at each lifecycle boundary and must not be hand-edited. The checkpoint JSON is the
+> durable, machine-authoritative source.
 
-This file is a human-readable projection of the planned epic state. During implementation it is
-regenerated from the epic checkpoint (`artifacts/orchestration/epic-orchestrator-state.json`),
-which is created at wave-0 launch after approval.
+- **Integration branch:** `epic/store-lockup-resilience-integration`
+- **Integration base provenance:** created off `origin/main` at `954c7840` (preferred path — planning
+  docs already landed on `main` via PR #268; no deviation recorded).
+- **Model budget:** `fable_policy: disabled`
+- **Current wave:** 2 (complete)
+- **Phase:** all 5 features merged into integration; `origin/main` merged into integration; driving the integration→main PR
+- **Last updated:** 2026-07-08T13:36:26Z
 
 ## Feature Status
 
-| Feature | Issue | Wave | Depends on | Planning status | Merge status |
-|---|---|---|---|---|---|
-| F1 store-disable-service | #261 | 0 | — | preflight clear (docs ready) | not_started |
-| F2 folder-settings-store-model-null (bug) | #262 | 0 | — | preflight clear (docs ready) | not_started |
-| F3 store-runtime-reenable | #263 | 1 | F1, F2 | preflight clear (docs ready) | not_started |
-| F4 store-lockup-detect-notify | #264 | 2 | F1, F3 | preflight clear (docs ready) | not_started |
-| F5 disabled-stores-settings-ui | #265 | 2 | F1, F2, F3 | preflight clear (docs ready) | not_started |
+| Feature | Issue | Folder | Wave | Depends on | merge_status | PR | Merge SHA |
+|---|---|---|---|---|---|---|---|
+| F1 store-disable-service | #261 | `2026-07-07-store-disable-service-261` | 0 | — | merged | [#275](https://github.com/drmoisan/TaskMaster/pull/275) | `62626315` |
+| F2 folder-settings-store-model-null | #262 | `2026-07-07-folder-settings-store-model-null-262` | 0 | — | merged | [#274](https://github.com/drmoisan/TaskMaster/pull/274) | `6e0d7305` |
+| F3 store-runtime-reenable | #263 | `2026-07-07-store-runtime-reenable-263` | 1 | F1, F2 | merged | [#276](https://github.com/drmoisan/TaskMaster/pull/276) | `b6fbbc0b` |
+| F4 store-lockup-detect-notify | #264 | `2026-07-07-store-lockup-detect-notify-264` | 2 | F1, F3 | merged | [#280](https://github.com/drmoisan/TaskMaster/pull/280) | `e17ffa08` |
+| F5 disabled-stores-settings-ui | #265 | `2026-07-07-disabled-stores-settings-ui-265` | 2 | F1, F2, F3 | merged | [#277](https://github.com/drmoisan/TaskMaster/pull/277) | `8e7e85b3` |
 
-Planning status advances per feature: folder created → research → spec/user-story → atomic plan
-→ preflight clear → docs committed.
+## Wave Plan
 
-## Milestones
+- **Wave 0 (parallel):** F1 #261, F2 #262
+- **Wave 1:** F3 #263 (after F1, F2 durably merged)
+- **Wave 2 (parallel):** F4 #264, F5 #265 (after F3 durably merged; F1/F2 already merged)
 
-- M1 Epic promoted (#260) and 5 child issues promoted + linked — Done
-- M2 epic-plan.md manifest authored — Done
-- M3 Per-feature research complete — Done (all 5 research docs written; cross-feature reconciliation applied to epic-plan.md)
-- M4 Per-feature spec/user-story authored — Done (F1/F3/F4/F5 spec+user-story; F2 spec only per full-bug)
-- M5 Per-feature atomic plans authored + preflight clear + docs committed — Done (all 5 plans MCP-validated and PREFLIGHT: ALL CLEAR; F1/F2/F3/F4 required one revision each)
-- M6 User approval to begin implementation — Not started (awaiting review)
+## Integration → main
+
+- **epic_merge_pr:** opening. Integration is current with `origin/main` (`92f65bea`, merged as `4995d4fd`),
+  which includes the flaky `PhysicalFileInfoAdapter` fix (PR #279) so the final CI gate is green-eligible.
+- **F4 recovery note:** the first F4 agent was interrupted mid-run; its committed work (`e0b58302`) was
+  preserved, pushed, and a resume orchestrator carried it to merge (PR #280).
+- **CI gate note:** `ci.yml` triggers only on `pull_request`/`push` to `main`/`development`, so
+  child→integration PRs run zero required checks (CI-green is vacuous for children). The
+  integration→main PR is the first and only real CI gate for this epic. The vstest step runs all
+  `*.Test.dll` with no `LiveOutlook` `TestCaseFilter`; confirm the runner passes (or filters) the
+  `LiveOutlook`-categorized tests before merging integration→main. The epic's own new tests are all
+  non-live (MSTest/Moq, no live Outlook).
+
+## Operational Notes
+
+- The epic-orchestrator session operates from its native worktree branch and never checks out the
+  integration branch in that worktree (doing so collides with child worktree/branch creation).
+  Integration-branch `epic-status.md` commits are made from a dedicated integration worktree at
+  `TaskMaster-epic-int`.
+- The machine-authoritative checkpoint (`artifacts/orchestration/epic-orchestrator-state.json`) is
+  gitignored and lives in the session worktree, where the wave-barrier PreToolUse hook reads it.

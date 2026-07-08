@@ -15,9 +15,23 @@ namespace UtilitiesCS
 {
     public static class UiThread
     {
-        public static void Init(bool monitorUiThread = false)
+        public static void Init(
+            bool monitorUiThread = false,
+            Action<LockupAttribution> onLockupDetected = null,
+            TimeProvider timeProvider = null,
+            int lockupAttributionThresholdMs = 5000
+        )
         {
             _monitorUiThread = monitorUiThread;
+            if (onLockupDetected is not null)
+            {
+                _onLockupDetected = onLockupDetected;
+            }
+            if (timeProvider is not null)
+            {
+                _monitorTimeProvider = timeProvider;
+            }
+            _lockupAttributionThresholdMs = lockupAttributionThresholdMs;
             if (_loaded.CheckAndSetFirstCall)
             {
                 Initialize();
@@ -25,6 +39,9 @@ namespace UtilitiesCS
         }
 
         private static bool _monitorUiThread;
+        private static Action<LockupAttribution> _onLockupDetected;
+        private static TimeProvider _monitorTimeProvider;
+        private static int _lockupAttributionThresholdMs = 5000;
         private static ThreadSafeSingleShotGuard _loaded = new ThreadSafeSingleShotGuard();
 
         private static void Initialize()
@@ -42,10 +59,18 @@ namespace UtilitiesCS
             UiThreadId = _syncContextForm.UiThreadId;
             Dispatcher = _syncContextForm.UiDispatcher;
 
-            // Optionally monitor the UI thread
+            // Optionally monitor the UI thread. When enabled (issue #264), the monitor is driven by
+            // the injected clock (production TimeProvider.System) and raises the F4 lockup callback
+            // when the attribution threshold is crossed.
             if (_monitorUiThread)
             {
-                _threadMonitor = new ThreadMonitor(Thread.CurrentThread, delayThreshold: 300);
+                _threadMonitor = new ThreadMonitor(
+                    Thread.CurrentThread,
+                    delayThreshold: 300,
+                    timeProvider: _monitorTimeProvider ?? TimeProvider.System,
+                    lockupAttributionThresholdMs: _lockupAttributionThresholdMs,
+                    onLockupDetected: _onLockupDetected
+                );
                 _threadMonitor.Run();
             }
 

@@ -70,10 +70,10 @@ namespace TaskMaster.Test.OutlookObjects.Store
                     "StoresWrapper.cs"
                 )
             );
-            var methodBody = ExtractMethodBody(
-                source,
-                "RewireOlObjectsAsync(StreamingContext context)"
-            );
+            // Issue #263: the per-store create/restore branch was extracted from the rewire loop
+            // into the shared AddOrRestoreStore primitive (reused by the runtime rehook coordinator).
+            // The restore-vs-create contract is now inspected on that extracted method.
+            var methodBody = ExtractMethodBody(source, "AddOrRestoreStore(Outlook.Store store)");
 
             Regex
                 .IsMatch(
@@ -165,10 +165,12 @@ namespace TaskMaster.Test.OutlookObjects.Store
                 "RewireOlObjectsAsync(StreamingContext context)"
             );
 
+            // Issue #263: the loop body now delegates the per-store create/restore work to the
+            // extracted AddOrRestoreStore primitive, then advances the counter exactly once.
             Regex
                 .IsMatch(
                     methodBody,
-                    @"foreach \(var store in stores\)[\s\S]*?(storeWrapper\.Restore\(store\)|Stores\.Add\(storeWrapper\);)[\s\S]*?processedStoreCount\+\+;"
+                    @"foreach \(var store in stores\)[\s\S]*?AddOrRestoreStore\(store\);[\s\S]*?processedStoreCount\+\+;"
                 )
                 .Should()
                 .BeTrue(
@@ -191,19 +193,33 @@ namespace TaskMaster.Test.OutlookObjects.Store
                     "StoresWrapper.cs"
                 )
             );
-            var methodBody = ExtractMethodBody(
+            var loopBody = ExtractMethodBody(
                 source,
                 "RewireOlObjectsAsync(StreamingContext context)"
             );
 
+            // Issue #263: the loop yields between stores and then delegates to AddOrRestoreStore,
+            // which owns the extracted Find/Restore branch. Assert the yield-then-delegate ordering
+            // in the loop and the reuse-existing-wrapper branch in the extracted primitive.
             Regex
                 .IsMatch(
-                    methodBody,
-                    @"processedStoreCount\s*=\s*0;[\s\S]*?foreach \(var store in stores\)[\s\S]*?if \(processedStoreCount > 0\)\s*\{\s*await\s+Task\.Yield\s*\(\s*\)\s*;\s*\}[\s\S]*?storeWrapper = Stores\.Find\(x => x\.DisplayName == storeDisplayName\);[\s\S]*?else\s*\{[\s\S]*?storeWrapper\.Restore\(store\);"
+                    loopBody,
+                    @"processedStoreCount\s*=\s*0;[\s\S]*?foreach \(var store in stores\)[\s\S]*?if \(processedStoreCount > 0\)\s*\{\s*await\s+Task\.Yield\s*\(\s*\)\s*;\s*\}[\s\S]*?AddOrRestoreStore\(store\);"
                 )
                 .Should()
                 .BeTrue(
-                    "multi-store restore iterations should yield before reusing an existing wrapped store."
+                    "multi-store restore iterations should yield before delegating to the per-store primitive."
+                );
+
+            var primitiveBody = ExtractMethodBody(source, "AddOrRestoreStore(Outlook.Store store)");
+            Regex
+                .IsMatch(
+                    primitiveBody,
+                    @"storeWrapper = Stores\.Find\(x => x\.DisplayName == storeDisplayName\);[\s\S]*?else\s*\{[\s\S]*?storeWrapper\.Restore\(store\);"
+                )
+                .Should()
+                .BeTrue(
+                    "the extracted primitive should reuse an existing wrapped store instead of recreating it."
                 );
         }
 

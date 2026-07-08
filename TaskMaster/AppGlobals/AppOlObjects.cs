@@ -8,12 +8,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.OutlookObjects.Folder;
 using UtilitiesCS.OutlookObjects.Store;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.Threading;
 using UtilitiesCS.Windows_Forms;
 
 namespace TaskMaster
@@ -29,12 +29,6 @@ namespace TaskMaster
             _globals = appGlobals;
             _olApplication = olApplication;
             ResetLazyInboxes();
-        }
-
-        public async Task LoadAsync()
-        {
-            await LoadStoresAsync();
-            await Task.CompletedTask;
         }
 
         private IApplicationGlobals _globals;
@@ -109,10 +103,11 @@ namespace TaskMaster
                 new DeadlineClock(TimeSpan.FromMilliseconds(15)),
                 new WpfDispatcherYield()
             );
-            return new OutlookFolderTreeService(
-                builder,
-                new OutlookFolderNotificationSink(NamespaceMAPI)
-            );
+            // why: issue #263. Hold the sink instance so the runtime rehook coordinator can reach
+            // the SAME live sink (via FolderNotificationSink) to call AddStore; a separate instance
+            // would subscribe COM events not wired to this tree service's cache-invalidation.
+            _folderNotificationSink = new OutlookFolderNotificationSink(NamespaceMAPI);
+            return new OutlookFolderTreeService(builder, _folderNotificationSink);
         }
 
         public void Dispose()
@@ -134,47 +129,14 @@ namespace TaskMaster
             var inboxes = new List<Folder>();
             foreach (var store in stores)
             {
-                try
+                // Per-store body extracted to ResolveInboxForStore (AppOlObjects.StoreRehook.cs) so
+                // the bulk startup load and the runtime rehook path share one implementation. The
+                // transient-HRESULT rethrow / log-and-skip policy is unchanged and lives inside the
+                // primitive, so a transient COMException still propagates out of LoadInboxes.
+                var inbox = ResolveInboxForStore(store, storesWrapper, attributionProbe);
+                if (inbox is not null)
                 {
-                    var inbox = EmitPerStoreInboxAttribution(
-                        () => storesWrapper.ShouldIncludeStore(store),
-                        () => store.GetDefaultFolder(OlDefaultFolders.olFolderInbox),
-                        () =>
-                        {
-                            try
-                            {
-                                return store.DisplayName;
-                            }
-                            catch (COMException)
-                            {
-                                return "<unavailable>";
-                            }
-                        },
-                        attributionProbe
-                    );
-
-                    if (inbox is not null)
-                    {
-                        inboxes.Add((Folder)inbox);
-                    }
-                }
-                catch (COMException e)
-                {
-                    // Issue #207: a transient "store not ready" HRESULT during cold start must NOT
-                    // silently drop this store's inbox subscription. Rethrow so the readiness
-                    // coordinator/gate routes it to retry; only genuinely permanent errors are
-                    // logged and skipped. The transient HRESULTs are shared as public constants on
-                    // OutlookReadinessGate to avoid duplicating literals.
-                    uint hresult = unchecked((uint)e.ErrorCode);
-                    if (
-                        hresult == OutlookReadinessGate.TransientStoreNotReadyHResult
-                        || hresult == OutlookReadinessGate.TransientOperationFailedHResult
-                    )
-                    {
-                        throw;
-                    }
-
-                    logger.Error($"Error loading inbox from store. {e.Message}", e);
+                    inboxes.Add(inbox);
                 }
             }
             return inboxes;
@@ -225,8 +187,16 @@ namespace TaskMaster
                 return null;
             }
 
+            // why: issue #264. Attribute any UI-thread lockup inside the blocking
+            // GetDefaultFolder(Inbox) COM call to this store, using the already-computed displayName
+            // (no new COM read). Additive: the [loadinboxes] attribution line and the exclusion path
+            // below are unchanged.
             var getDefaultFolderStopwatch = Stopwatch.StartNew();
-            var inbox = getDefaultFolder();
+            MAPIFolder inbox;
+            using (CurrentStoreContext.Begin(displayName))
+            {
+                inbox = getDefaultFolder();
+            }
             getDefaultFolderStopwatch.Stop();
 
             probe.EmitLoadInboxesStore(
@@ -240,29 +210,6 @@ namespace TaskMaster
         }
 
         internal void ResetLazyInboxes() => _inboxes = new Lazy<IEnumerable<Folder>>(LoadInboxes);
-
-        public StoresWrapper StoresWrapper { get; set; }
-
-        protected internal virtual Task AwaitStoreRewireAsync(StoresWrapper storesWrapper) =>
-            storesWrapper is null
-                ? Task.CompletedTask
-                : storesWrapper.RewireAfterDeserializeAsync();
-
-        internal async Task LoadStoresAsync()
-        {
-            if (_globals.IntelRes.Config.TryGetValue("StoresWrapper", out var config))
-            {
-                StoresWrapper = SmartSerializable.Deserialize<
-                    StoresWrapper,
-                    SmartSerializableLoader
-                >(config);
-                await AwaitStoreRewireAsync(StoresWrapper);
-            }
-            else
-            {
-                logger.Error("StoresWrapper config not found.");
-            }
-        }
 
         private Reminders _olReminders;
         public Reminders OlReminders

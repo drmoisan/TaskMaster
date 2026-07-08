@@ -399,6 +399,7 @@
     <Compile Include="AppGlobals\AppAutoFileObjects.FolderPredictorLoad.cs" />
     <Compile Include="AppGlobals\AppEvents.cs" />
     <Compile Include="AppGlobals\AppEvents.ReadinessHookup.cs" />
+    <Compile Include="AppGlobals\AppEvents.StoreRehook.cs" />
     <Compile Include="AppGlobals\AppFileSystemFolderPaths.cs" />
     <Compile Include="AppGlobals\HookReadinessCoordinator.cs" />
     <Compile Include="AppGlobals\NonBlockingDelay.cs" />
@@ -407,10 +408,14 @@
     <Compile Include="AppGlobals\StartupDiagnosticsProbe.cs" />
     <Compile Include="AppGlobals\StartupInboxAttributionProbe.cs" />
     <Compile Include="AppGlobals\ApplicationGlobals.cs" />
+    <Compile Include="AppGlobals\ApplicationGlobals.StoreRehook.cs" />
+    <Compile Include="AppGlobals\StoreRehookCoordinator.cs" />
     <Compile Include="AppGlobals\IStartupTimingRecorder.cs" />
     <Compile Include="AppGlobals\StartupTimingRecorder.cs" />
     <Compile Include="AppGlobals\AppOlObjects.cs" />
     <Compile Include="AppGlobals\AppOlObjects.JunkFolders.cs" />
+    <Compile Include="AppGlobals\AppOlObjects.StoreLoading.cs" />
+    <Compile Include="AppGlobals\AppOlObjects.StoreRehook.cs" />
     <Compile Include="AppGlobals\JunkFolderPathNavigator.cs" />
     <Compile Include="AppGlobals\AppQuickFilerSettings.cs" />
     <Compile Include="AppGlobals\AppStagingFilenames.cs" />

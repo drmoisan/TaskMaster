@@ -218,6 +218,8 @@ namespace QuickFiler.Controllers.Tests
             public IAppItemEngines Engines => null;
 
             public IntelligenceConfig IntelRes => null;
+
+            public IStoreDisableService StoreDisable => null;
         }
 
         private sealed class FakeFileSystemFolderPaths : IFileSystemFolderPaths

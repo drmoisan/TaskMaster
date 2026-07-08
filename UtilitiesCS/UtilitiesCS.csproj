@@ -549,6 +549,7 @@
     </Compile>
     <Compile Include="Dialogs\InputBoxViewer.Designer.cs" />
     <Compile Include="Dialogs\MyBox.cs" />
+    <Compile Include="Dialogs\MyBoxModeless.cs" />
     <Compile Include="Dialogs\MyBoxViewer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -696,8 +697,22 @@
     <Compile Include="OutlookObjects\Fields\MAPIFields.cs" />
     <Compile Include="OutlookObjects\Folder\FolderMinimalWrapper.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientStatic.cs" />
+    <Compile Include="OutlookObjects\Store\DisabledStoresController.cs" />
+    <Compile Include="OutlookObjects\Store\DisabledStoreRow.cs" />
+    <Compile Include="OutlookObjects\Store\DisabledStoresViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OutlookObjects\Store\DisabledStoresViewer.Designer.cs">
+      <DependentUpon>DisabledStoresViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OutlookObjects\Store\IDisabledStoresViewer.cs" />
     <Compile Include="OutlookObjects\Store\IStoreWrapperViewer.cs" />
+    <Compile Include="OutlookObjects\Store\StoreDisableService.cs" />
     <Compile Include="OutlookObjects\Store\StoreFilterAttribution.cs" />
+    <Compile Include="OutlookObjects\Store\StoreLockupAttribution.cs" />
+    <Compile Include="OutlookObjects\Store\StoreIdentity.cs" />
+    <Compile Include="OutlookObjects\Store\StoreLaunchReadinessEvaluator.cs" />
+    <Compile Include="OutlookObjects\Store\StoreRehookResult.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapper.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapper.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperInitClock.cs" />
@@ -965,6 +980,8 @@
     <Compile Include="Interfaces\IGenericTimer.cs" />
     <Compile Include="Interfaces\IGlobals\IAppAutoFileObjects.cs" />
     <Compile Include="Interfaces\IGlobals\IApplicationGlobals.cs" />
+    <Compile Include="Interfaces\IGlobals\IStoreDisableService.cs" />
+    <Compile Include="Interfaces\IGlobals\IStoreRehookService.cs" />
     <Compile Include="Interfaces\IGlobals\IAppStagingFilenames.cs" />
     <Compile Include="Interfaces\IGlobals\IFileSystemFolderPaths.cs" />
     <Compile Include="Interfaces\IGlobals\IOlObjects.cs" />
@@ -1041,6 +1058,9 @@
     </Compile>
     <Compile Include="Threading\SyncContextForm.Designer.cs" />
     <Compile Include="Threading\TaskPriority.cs" />
+    <Compile Include="Threading\CurrentStoreContext.cs" />
+    <Compile Include="Threading\LockupStallDecider.cs" />
+    <Compile Include="Threading\StoreLockupResponder.cs" />
     <Compile Include="Threading\ThreadMonitor.cs" />
     <Compile Include="Threading\ThreadSafeFunctions.cs" />
     <Compile Include="Threading\ThreadSafeSingleShotGuard.cs" />
@@ -1122,6 +1142,9 @@
     <EmbeddedResource Include="ManagerResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ManagerResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OutlookObjects\Store\DisabledStoresViewer.resx">
+      <DependentUpon>DisabledStoresViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OutlookObjects\Store\StoreWrapperViewer.resx">
       <DependentUpon>StoreWrapperViewer.cs</DependentUpon>

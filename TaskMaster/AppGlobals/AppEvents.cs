@@ -241,9 +241,7 @@ namespace TaskMaster
 
             attributionProbe.EmitReadinessHookupStart("Inboxes");
             var inboxSubscribeStopwatch = Stopwatch.StartNew();
-            Globals.Ol.Inboxes.ForEach(x =>
-                OlInboxes.AddLast(x.Items, items => items.ItemAdd += OlInboxItems_ItemAdd)
-            );
+            Globals.Ol.Inboxes.ForEach(inbox => SubscribeInboxForStore(inbox.Store, inbox));
             inboxSubscribeStopwatch.Stop();
             attributionProbe.EmitReadinessHookupEnd(
                 "Inboxes",

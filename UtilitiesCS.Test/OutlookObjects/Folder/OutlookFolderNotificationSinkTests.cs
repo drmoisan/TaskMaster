@@ -131,6 +131,173 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             source.UnsubscribeCount.Should().Be(1);
         }
 
+        [TestMethod]
+        public void AddStore_NewStoreId_SubscribesItsSubscriptions()
+        {
+            // Arrange: a started sink with no store subscriptions yet.
+            var sink = new OutlookFolderNotificationSink(
+                Array.Empty<OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription>()
+            );
+            sink.Start();
+            var storeSub = new FakeSubscription();
+
+            // Act: register a new store's subscriptions via the COM-free registration seam that
+            // AddStore(Outlook.Store) delegates to.
+            sink.AddStoreSubscriptions(
+                "store-x",
+                new OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription[]
+                {
+                    storeSub,
+                }
+            );
+
+            // Assert
+            storeSub.SubscribeCount.Should().Be(1, "a new store's subscriptions are wired live");
+            sink.SubscriptionCount.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void AddStore_AlreadyPresentStoreId_IsNoOpWithZeroAdditionalSubscribes()
+        {
+            // Arrange
+            var sink = new OutlookFolderNotificationSink(
+                Array.Empty<OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription>()
+            );
+            sink.Start();
+            var first = new FakeSubscription();
+            var second = new FakeSubscription();
+
+            // Act: second registration for the same StoreID must be a no-op success.
+            sink.AddStoreSubscriptions(
+                "store-x",
+                new OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription[] { first }
+            );
+            sink.AddStoreSubscriptions(
+                "store-x",
+                new OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription[]
+                {
+                    second,
+                }
+            );
+
+            // Assert
+            first.SubscribeCount.Should().Be(1);
+            second
+                .SubscribeCount.Should()
+                .Be(0, "an already-present StoreID performs zero additional subscribes");
+            sink.SubscriptionCount.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void RemoveStore_UnsubscribesThatStoreAndDoesNotAffectOthers()
+        {
+            // Arrange
+            var sink = new OutlookFolderNotificationSink(
+                Array.Empty<OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription>()
+            );
+            sink.Start();
+            var storeX = new FakeSubscription();
+            var storeY = new FakeSubscription();
+            sink.AddStoreSubscriptions(
+                "store-x",
+                new OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription[]
+                {
+                    storeX,
+                }
+            );
+            sink.AddStoreSubscriptions(
+                "store-y",
+                new OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription[]
+                {
+                    storeY,
+                }
+            );
+
+            // Act
+            sink.RemoveStore("store-x");
+
+            // Assert
+            storeX
+                .UnsubscribeCount.Should()
+                .Be(1, "the removed store's subscriptions are unsubscribed");
+            storeY.UnsubscribeCount.Should().Be(0, "other stores are unaffected");
+            sink.SubscriptionCount.Should().Be(1, "only store-y's subscription remains");
+        }
+
+        [TestMethod]
+        public void IsStoreHooked_ReflectsRegistrationState()
+        {
+            var sink = new OutlookFolderNotificationSink(
+                Array.Empty<OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription>()
+            );
+            sink.Start();
+
+            sink.IsStoreHooked("store-x").Should().BeFalse("not registered yet");
+            sink.IsStoreHooked(null).Should().BeFalse("a null StoreID is never hooked");
+
+            sink.AddStoreSubscriptions(
+                "store-x",
+                new OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription[]
+                {
+                    new FakeSubscription(),
+                }
+            );
+
+            sink.IsStoreHooked("store-x").Should().BeTrue("registered via AddStoreSubscriptions");
+            sink.RemoveStore("store-x");
+            sink.IsStoreHooked("store-x").Should().BeFalse("removed via RemoveStore");
+        }
+
+        [TestMethod]
+        public void AddStoreSubscriptions_NullArguments_Throw()
+        {
+            var sink = new OutlookFolderNotificationSink(
+                Array.Empty<OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription>()
+            );
+
+            var subs = new OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription[0];
+            ((Action)(() => sink.AddStoreSubscriptions(null, subs)))
+                .Should()
+                .Throw<ArgumentNullException>();
+            ((Action)(() => sink.AddStoreSubscriptions("store-x", null)))
+                .Should()
+                .Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void AddStoreSubscriptions_AfterDispose_IsNoOp()
+        {
+            var sink = new OutlookFolderNotificationSink(
+                Array.Empty<OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription>()
+            );
+            sink.Start();
+            sink.Dispose();
+            var sub = new FakeSubscription();
+
+            sink.AddStoreSubscriptions(
+                "store-x",
+                new OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription[] { sub }
+            );
+
+            sub.SubscribeCount.Should().Be(0, "a disposed sink registers nothing");
+            sink.IsStoreHooked("store-x").Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void RemoveStore_NullOrAbsentStoreId_IsNoOp()
+        {
+            var sink = new OutlookFolderNotificationSink(
+                Array.Empty<OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription>()
+            );
+            sink.Start();
+
+            // No throw for null or an absent StoreID.
+            ((Action)(() => sink.RemoveStore(null)))
+                .Should()
+                .NotThrow();
+            ((Action)(() => sink.RemoveStore("never-added"))).Should().NotThrow();
+        }
+
         private sealed class FakeSubscription
             : OutlookFolderNotificationSink.IOutlookFolderNotificationSubscription
         {

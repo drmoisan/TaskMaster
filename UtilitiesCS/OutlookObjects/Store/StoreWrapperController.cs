@@ -107,21 +107,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// </returns>
         internal StoreLaunchReadiness EvaluateLaunchReadiness()
         {
-            var model = Globals?.Ol?.StoresWrapper;
-            if (model is null)
-            {
-                return StoreLaunchReadiness.NotReady(StoreLaunchReadinessState.ModelUnavailable);
-            }
-
-            if (model.Stores is null)
-            {
-                return StoreLaunchReadiness.NotReady(StoreLaunchReadinessState.StoresUnavailable);
-            }
-
-            return StoreLaunchReadiness.Ready(
-                model,
-                model.Stores.Select(store => store.DisplayName).ToList()
-            );
+            return StoreLaunchReadinessEvaluator.Evaluate(Globals);
         }
 
         #region Events

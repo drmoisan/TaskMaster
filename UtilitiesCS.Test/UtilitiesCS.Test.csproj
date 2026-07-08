@@ -74,6 +74,7 @@
     <Compile Include="TestHelpers\ManualFireTimerWrapper.cs" />
     <Compile Include="TestAssemblyInitializer.cs" />
     <Compile Include="Dialogs\ActionButtonTests.cs" />
+    <Compile Include="Dialogs\MyBoxModelessTests.cs" />
     <Compile Include="Dialogs\DelegateButton_Tests.cs" />
     <Compile Include="Dialogs\FolderNotFoundViewer_Tests.cs" />
     <Compile Include="Dialogs\MyBox_ShowDialog_Tests.cs" />
@@ -296,6 +297,7 @@
     <Compile Include="OutlookObjects\Folder\OutlookFolderTreeServiceStateTests.cs" />
     <Compile Include="OutlookObjects\Folder\WpfDispatcherYieldTests.cs" />
     <Compile Include="OutlookObjects\ItemComparer_Tests.cs" />
+    <Compile Include="OutlookObjects\OutlookReadinessGateTests.cs" />
     <Compile Include="OutlookObjects\MailItem\ItemInfoTests.cs" />
     <Compile Include="OutlookObjects\Item\OlItemSummaryTests.cs" />
     <Compile Include="OutlookObjects\Item\OlItemPseudoInterfaceTests.cs" />
@@ -320,12 +322,18 @@
     <Compile Include="OutlookObjects\Recipient\RecipientStaticTests.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientStaticSenderResolverTests.cs" />
     <Compile Include="OutlookObjects\MailItem\MailResolutionTests.cs" />
+    <Compile Include="OutlookObjects\Store\DisabledStoresControllerTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperViewerTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreDisableServiceTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreFilterAttributionTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreLockupAttributionTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoreIdentityTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperInitClockTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperInitProbeTests.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoresWrapperDisableTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoresWrapperRehookTests.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemHelperProjectionTests.cs" />
     <Compile Include="OutlookObjects\Fields\UserDefinedFieldsTests.cs" />
     <Compile Include="OutlookObjects\Fields\MAPIFieldsTests.cs" />
@@ -439,6 +447,10 @@
     <Compile Include="Threading\AsyncMultiTasker_Tests.cs" />
     <Compile Include="Threading\ProgressViewer_Tests.cs" />
     <Compile Include="Threading\UiThread_Tests.cs" />
+    <Compile Include="Threading\CurrentStoreContextTests.cs" />
+    <Compile Include="Threading\LockupStallDeciderTests.cs" />
+    <Compile Include="Threading\ThreadMonitorTests.cs" />
+    <Compile Include="Threading\StoreLockupResponderTests.cs" />
     <Compile Include="Dialogs\DialogTests.cs" />
     <Compile Include="Dialogs\FunctionButton_Tests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs" />
@@ -528,6 +540,9 @@
     </Reference>
     <Reference Include="Microsoft.Bcl.TimeProvider, Version=10.0.0.7, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.TimeProvider.10.0.7\lib\net462\Microsoft.Bcl.TimeProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.TimeProvider.Testing, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.TimeProvider.Testing.9.0.0\lib\net462\Microsoft.Extensions.TimeProvider.Testing.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Data.Analysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">

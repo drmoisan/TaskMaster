@@ -69,18 +69,18 @@ durable way to see disabled stores or to turn them back on after the notificatio
 
 ## Acceptance Criteria
 
-- [ ] The Settings menu offers a "Disabled Stores" action that opens a dialog listing the currently
-      disabled stores.
-- [ ] Each row shows the store and its disablement scope, distinguishing session-only from
-      future-sessions disablement.
-- [ ] Each row offers a Reenable action that reenables the store through the disable service; the
-      list updates to reflect the resulting state after the action.
-- [ ] The list reflects the current disable-service state when the dialog opens and after every
-      reenable.
-- [ ] If a reenable attempt fails, the failure is shown to the user without crashing, and the list
-      still reflects the current state afterward.
-- [ ] When no store is disabled, the dialog opens with an empty list and no error.
-- [ ] The existing single-store Folder Settings and Junk Folder Settings editor is unchanged.
+- [x] The Settings menu offers a "Disabled Stores" action that opens a dialog listing the currently
+      disabled stores. _(Evidence: evidence/other/non-interference-confirmation.md; ribbon wiring P6.)_
+- [x] Each row shows the store and its disablement scope, distinguishing session-only from
+      future-sessions disablement. _(Evidence: evidence/regression-testing/controller-tests-pass.md — PopulateRows_ProjectsServiceEntriesIntoRows; Designer CellFormatting.)_
+- [x] Each row offers a Reenable action that reenables the store through the disable service; the
+      list updates to reflect the resulting state after the action. _(Evidence: controller-tests-pass.md — Dgv_CellContentClick_OnReenableColumn... + ReenableAsync_OnSuccess...)_
+- [x] The list reflects the current disable-service state when the dialog opens and after every
+      reenable. _(Evidence: controller-tests-pass.md — PopulateRows + ReenableAsync_OnSuccess refetch.)_
+- [x] If a reenable attempt fails, the failure is shown to the user without crashing, and the list
+      still reflects the current state afterward. _(Evidence: controller-tests-pass.md — ReenableAsync_WhenServiceThrows_SurfacesViaMyBox...)_
+- [x] When no store is disabled, the dialog opens with an empty list and no error. _(Evidence: controller-tests-pass.md — PopulateRows_WhenServiceReturnsEmpty...)_
+- [x] The existing single-store Folder Settings and Junk Folder Settings editor is unchanged. _(Evidence: evidence/other/non-interference-confirmation.md; readiness-extraction-behavior-preserving.md.)_
 
 ## Non-Goals
 
