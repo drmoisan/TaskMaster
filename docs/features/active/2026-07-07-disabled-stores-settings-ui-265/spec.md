@@ -273,56 +273,72 @@ public class DisabledStoresController
 
 ## Acceptance Criteria
 
-- [ ] **AC1 — Dedicated surface via additive ribbon button.** A new "Disabled Stores" button in the
+- [x] **AC1 — Dedicated surface via additive ribbon button.** A new "Disabled Stores" button in the
       existing Settings menu opens a new dialog backed by `DisabledStoresController` +
       `IDisabledStoresViewer`. The existing Folder Settings and Junk Folder Settings buttons and the
       single-store `StoreWrapperController`/`StoreWrapperViewer` editor are unchanged.
-- [ ] **AC2 — List reflects service state on open.** On open, the dialog shows one row per entry
+- [x] **AC2 — List reflects service state on open.** On open, the dialog shows one row per entry
       returned by `StoreDisable.GetDisabledStores()`, populated by `DisabledStoresController` from
       that call.
-- [ ] **AC3 — Scope is visually distinguished.** Session-only rows and future-sessions rows are
+- [x] **AC3 — Scope is visually distinguished.** Session-only rows and future-sessions rows are
       distinguishable: the controller sets `ScopeLabel` and `IsFutureSession` per row, and the
       Designer/cell-formatting layer renders a distinct style for future-sessions rows. Both scopes
       may be present at once, each resolved independently.
-- [ ] **AC4 — Per-row Reenable routes through F1.** A Reenable action on a row invokes
+- [x] **AC4 — Per-row Reenable routes through F1.** A Reenable action on a row invokes
       `StoreDisable.ReenableAsync(identity)` exactly once with that row's identity, resolved from the
       controller's own list by `DataGridViewCellEventArgs.RowIndex`. F5 does not call F3 directly and
       does not persist state itself.
-- [ ] **AC5 — Refresh after reenable.** After a Reenable action, the controller unconditionally
+- [x] **AC5 — Refresh after reenable.** After a Reenable action, the controller unconditionally
       re-fetches `GetDisabledStores()` and rebinds the list, so the displayed rows match the current
       service state after every action.
-- [ ] **AC6 — Empty list.** When `GetDisabledStores()` returns an empty collection, the dialog opens
+- [x] **AC6 — Empty list.** When `GetDisabledStores()` returns an empty collection, the dialog opens
       with no rows and no exception.
-- [ ] **AC7 — Reenable failure is surfaced without crashing.** When `ReenableAsync` throws or
+- [x] **AC7 — Reenable failure is surfaced without crashing.** When `ReenableAsync` throws or
       returns a faulted `Task`, the exception is caught, logged, and surfaced through the `MyBox`
       dialog seam; it does not escape the click handler, and the list is still refreshed from
       `GetDisabledStores()` afterward.
-- [ ] **AC8 — Controller + IViewer seam, Moq-testable, no live Outlook, no temp files.** All logic
+- [x] **AC8 — Controller + IViewer seam, Moq-testable, no live Outlook, no temp files.** All logic
       is unit-tested through `IDisabledStoresViewer` with Moq and a mocked `StoreDisable` service,
       driving clicks via a directly-constructed `DataGridViewCellEventArgs` with no live
       `DataGridView`, no live Outlook, and no temporary files.
-- [ ] **AC9 — Dialog-open readiness reuse (F2 dependency).** The dialog applies the same readiness
+- [x] **AC9 — Dialog-open readiness reuse (F2 dependency).** The dialog applies the same readiness
       gate as the single-store editor via a shared readiness helper; the extraction leaves
       `StoreWrapperController.EvaluateLaunchReadiness` behavior unchanged, and existing
       `StoreWrapperController_Tests.*` continue to pass unmodified.
-- [ ] **AC10 — Toolchain and coverage.** The full C# toolchain passes in order (CSharpier, .NET
+- [x] **AC10 — Toolchain and coverage.** The full C# toolchain passes in order (CSharpier, .NET
       analyzers, nullable analysis with `TreatWarningsAsErrors`, MSTest with coverage);
       `DisabledStoresController.cs` and `DisabledStoreRow.cs` meet the new-code coverage target, and
       WinForms form-derived / Designer-generated files are handled under the repository
       COM/VSTO/WinForms coverage exemption.
 
+## Acceptance Criteria — Evidence Mapping
+
+All AC1-AC10 verified locally on branch `feature/disabled-stores-settings-ui-265`. Backing
+evidence artifacts under `docs/features/active/2026-07-07-disabled-stores-settings-ui-265/evidence/`:
+
+- AC1 — `evidence/other/non-interference-confirmation.md` (additive ribbon button; existing editor unchanged) + `evidence/regression-testing/controller-tests-pass.md`.
+- AC2 — `evidence/regression-testing/controller-tests-pass.md` (PopulateRows_ProjectsServiceEntriesIntoRows).
+- AC3 — `evidence/regression-testing/controller-tests-pass.md` (ScopeLabel/IsFutureSession per-row asserts) + Designer CellFormatting styling.
+- AC4 — `evidence/regression-testing/controller-tests-pass.md` (Dgv_CellContentClick_OnReenableColumn_InvokesReenableWithRowIdentityOnce).
+- AC5 — `evidence/regression-testing/controller-tests-pass.md` (ReenableAsync_OnSuccess_...RefetchesDisabledStores).
+- AC6 — `evidence/regression-testing/controller-tests-pass.md` (PopulateRows_WhenServiceReturnsEmpty_...).
+- AC7 — `evidence/regression-testing/controller-tests-pass.md` (ReenableAsync_WhenServiceThrows_SurfacesViaMyBox...).
+- AC8 — `evidence/regression-testing/controller-tests-pass.md` (Moq/IViewer seam, DataGridViewCellEventArgs, no live grid/Outlook/temp files).
+- AC9 — `evidence/regression-testing/readiness-extraction-behavior-preserving.md` (51/51 StoreWrapper tests pass) + `evidence/other/non-interference-confirmation.md`.
+- AC10 — `evidence/qa-gates/qa-01-format.md`, `qa-02-analyzers.md`, `qa-03-nullable.md`, `qa-04-test-coverage.md`, `qa-05-coverage-delta.md`.
+
 ## Definition of Done
 
-- [ ] Acceptance criteria in this spec and in `user-story.md` are mapped to implementation tasks and
+- [x] Acceptance criteria in this spec and in `user-story.md` are mapped to implementation tasks and
       verification evidence.
-- [ ] The new Controller + `IViewer` + Form trio and `DisabledStoreRow` exist and follow the
+- [x] The new Controller + `IViewer` + Form trio and `DisabledStoreRow` exist and follow the
       existing single-store editor's structural conventions.
-- [ ] The list populates from `StoreDisable.GetDisabledStores()` on open and after every reenable.
-- [ ] Reenable routes only through `StoreDisable.ReenableAsync(identity)`; F3 is not called directly.
-- [ ] Empty-list, both-scopes, and reenable-failure behaviors are validated by deterministic tests
+- [x] The list populates from `StoreDisable.GetDisabledStores()` on open and after every reenable.
+- [x] Reenable routes only through `StoreDisable.ReenableAsync(identity)`; F3 is not called directly.
+- [x] Empty-list, both-scopes, and reenable-failure behaviors are validated by deterministic tests
       with no live Outlook and no temporary files.
-- [ ] The behavior-preserving readiness-helper extraction leaves existing single-store editor tests
+- [x] The behavior-preserving readiness-helper extraction leaves existing single-store editor tests
       passing unmodified.
-- [ ] Docs updated under `docs/features/active/2026-07-07-disabled-stores-settings-ui-265/`.
-- [ ] Full C# toolchain pass completed in order: CSharpier -> .NET analyzers ->
+- [x] Docs updated under `docs/features/active/2026-07-07-disabled-stores-settings-ui-265/`.
+- [x] Full C# toolchain pass completed in order: CSharpier -> .NET analyzers ->
       nullable/`TreatWarningsAsErrors` -> MSTest with coverage.

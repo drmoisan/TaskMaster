@@ -180,6 +180,9 @@ namespace TaskMaster
         public void FolderSettings_Click(Office.IRibbonControl control) =>
             _controller.FolderStoresSettings();
 
+        public void DisabledStoresSettings_Click(Office.IRibbonControl control) =>
+            _controller.DisabledStoresSettings();
+
         public string HighConfidenceThreshold_GetText(Office.IRibbonControl control) =>
             _controller.GetHighConfidenceThresholdText();
 

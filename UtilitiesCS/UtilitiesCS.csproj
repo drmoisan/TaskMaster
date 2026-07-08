@@ -697,11 +697,21 @@
     <Compile Include="OutlookObjects\Fields\MAPIFields.cs" />
     <Compile Include="OutlookObjects\Folder\FolderMinimalWrapper.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientStatic.cs" />
+    <Compile Include="OutlookObjects\Store\DisabledStoresController.cs" />
+    <Compile Include="OutlookObjects\Store\DisabledStoreRow.cs" />
+    <Compile Include="OutlookObjects\Store\DisabledStoresViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OutlookObjects\Store\DisabledStoresViewer.Designer.cs">
+      <DependentUpon>DisabledStoresViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OutlookObjects\Store\IDisabledStoresViewer.cs" />
     <Compile Include="OutlookObjects\Store\IStoreWrapperViewer.cs" />
     <Compile Include="OutlookObjects\Store\StoreDisableService.cs" />
     <Compile Include="OutlookObjects\Store\StoreFilterAttribution.cs" />
     <Compile Include="OutlookObjects\Store\StoreLockupAttribution.cs" />
     <Compile Include="OutlookObjects\Store\StoreIdentity.cs" />
+    <Compile Include="OutlookObjects\Store\StoreLaunchReadinessEvaluator.cs" />
     <Compile Include="OutlookObjects\Store\StoreRehookResult.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapper.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapper.cs" />
@@ -1132,6 +1142,9 @@
     <EmbeddedResource Include="ManagerResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ManagerResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OutlookObjects\Store\DisabledStoresViewer.resx">
+      <DependentUpon>DisabledStoresViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OutlookObjects\Store\StoreWrapperViewer.resx">
       <DependentUpon>StoreWrapperViewer.cs</DependentUpon>

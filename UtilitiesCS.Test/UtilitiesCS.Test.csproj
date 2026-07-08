@@ -322,6 +322,7 @@
     <Compile Include="OutlookObjects\Recipient\RecipientStaticTests.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientStaticSenderResolverTests.cs" />
     <Compile Include="OutlookObjects\MailItem\MailResolutionTests.cs" />
+    <Compile Include="OutlookObjects\Store\DisabledStoresControllerTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperViewerTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreDisableServiceTests.cs" />

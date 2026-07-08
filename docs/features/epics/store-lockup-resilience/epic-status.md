@@ -10,8 +10,8 @@
   docs already landed on `main` via PR #268; no deviation recorded).
 - **Model budget:** `fable_policy: disabled`
 - **Current wave:** 2
-- **Phase:** implementation — waves 0–1 complete (F1, F2, F3 merged); wave 2 (F4, F5) launching
-- **Last updated:** 2026-07-08T07:40:31Z
+- **Phase:** implementation — F5 merged; F4 running (last wave-2 feature)
+- **Last updated:** 2026-07-08T08:39:37Z
 
 ## Feature Status
 
@@ -21,7 +21,7 @@
 | F2 folder-settings-store-model-null | #262 | `2026-07-07-folder-settings-store-model-null-262` | 0 | — | merged | [#274](https://github.com/drmoisan/TaskMaster/pull/274) | `6e0d7305` |
 | F3 store-runtime-reenable | #263 | `2026-07-07-store-runtime-reenable-263` | 1 | F1, F2 | merged | [#276](https://github.com/drmoisan/TaskMaster/pull/276) | `b6fbbc0b` |
 | F4 store-lockup-detect-notify | #264 | `2026-07-07-store-lockup-detect-notify-264` | 2 | F1, F3 | worktree_created | — | — |
-| F5 disabled-stores-settings-ui | #265 | `2026-07-07-disabled-stores-settings-ui-265` | 2 | F1, F2, F3 | worktree_created | — | — |
+| F5 disabled-stores-settings-ui | #265 | `2026-07-07-disabled-stores-settings-ui-265` | 2 | F1, F2, F3 | merged | [#277](https://github.com/drmoisan/TaskMaster/pull/277) | `8e7e85b3` |
 
 ## Wave Plan
 

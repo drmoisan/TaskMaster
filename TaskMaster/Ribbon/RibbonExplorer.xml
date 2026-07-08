@@ -238,6 +238,11 @@
               onAction="FolderSettings_Click"
               label="Folder Settings"
             />
+            <button
+              id="DisabledStoresSettings"
+              onAction="DisabledStoresSettings_Click"
+              label="Disabled Stores"
+            />
             <menu
               id="QuickFilerSettings"
               imageMso="ContentTypeSettings"
