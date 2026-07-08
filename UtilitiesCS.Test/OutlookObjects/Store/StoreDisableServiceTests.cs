@@ -209,7 +209,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         // ---- Identity validation ------------------------------------------------------------
 
         [TestMethod]
-        public void Writes_ThrowArgumentException_ForSentinelIdentity()
+        public async Task Writes_ThrowArgumentException_ForSentinelIdentity()
         {
             var (model, _) = CreateModel();
             var service = CreateService(model);
@@ -223,7 +223,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
                 .Invoking(s => s.DisableForFutureSessions(sentinel))
                 .Should()
                 .Throw<ArgumentException>();
-            service
+            await service
                 .Invoking(s => s.ReenableAsync(sentinel))
                 .Should()
                 .ThrowAsync<ArgumentException>();
@@ -245,7 +245,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         // ---- Null-model safety --------------------------------------------------------------
 
         [TestMethod]
-        public void Writes_ThrowInvalidOperation_WhenModelIsNull()
+        public async Task Writes_ThrowInvalidOperation_WhenModelIsNull()
         {
             var service = CreateService(model: null);
 
@@ -257,7 +257,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
                 .Invoking(s => s.DisableForFutureSessions(StoreIdentity.Resolve(StoreName)))
                 .Should()
                 .Throw<InvalidOperationException>();
-            service
+            await service
                 .Invoking(s => s.ReenableAsync(StoreIdentity.Resolve(StoreName)))
                 .Should()
                 .ThrowAsync<InvalidOperationException>();
