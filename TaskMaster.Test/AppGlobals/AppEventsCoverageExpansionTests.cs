@@ -77,7 +77,7 @@ namespace TaskMaster.Test.AppGlobals
         }
 
         [TestMethod]
-        public void OlInboxItemsItemAdd_WhenProcessingThrows_RethrowsThroughSynchronizationContext()
+        public void OlInboxItemsItemAdd_WhenProcessingThrows_ContainsAndDoesNotRethrow()
         {
             // Arrange
             var expected = new InvalidOperationException("engines unavailable");
@@ -95,8 +95,9 @@ namespace TaskMaster.Test.AppGlobals
                 // Act
                 sut.OlInboxItems_ItemAdd(mailItem.Object);
 
-                // Assert
-                context.CapturedException.Should().BeSameAs(expected);
+                // Assert: the fault is now contained in HandleInboxItemAddAsync (issue #270), so
+                // nothing is rescheduled onto the SynchronizationContext (no rethrow).
+                context.CapturedException.Should().BeNull();
             }
             finally
             {
