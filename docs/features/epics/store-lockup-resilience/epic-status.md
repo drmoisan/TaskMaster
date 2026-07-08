@@ -9,17 +9,17 @@
 - **Integration base provenance:** created off `origin/main` at `954c7840` (preferred path — planning
   docs already landed on `main` via PR #268; no deviation recorded).
 - **Model budget:** `fable_policy: disabled`
-- **Current wave:** 0
-- **Phase:** implementation — wave 0 in progress (F2 merged; F1 running)
-- **Last updated:** 2026-07-08T04:13:48Z
+- **Current wave:** 1
+- **Phase:** implementation — wave 0 complete (F1, F2 merged); wave 1 (F3) launching
+- **Last updated:** 2026-07-08T04:58:20Z
 
 ## Feature Status
 
 | Feature | Issue | Folder | Wave | Depends on | merge_status | PR | Merge SHA |
 |---|---|---|---|---|---|---|---|
-| F1 store-disable-service | #261 | `2026-07-07-store-disable-service-261` | 0 | — | worktree_created | — | — |
+| F1 store-disable-service | #261 | `2026-07-07-store-disable-service-261` | 0 | — | merged | [#275](https://github.com/drmoisan/TaskMaster/pull/275) | `62626315` |
 | F2 folder-settings-store-model-null | #262 | `2026-07-07-folder-settings-store-model-null-262` | 0 | — | merged | [#274](https://github.com/drmoisan/TaskMaster/pull/274) | `6e0d7305` |
-| F3 store-runtime-reenable | #263 | `2026-07-07-store-runtime-reenable-263` | 1 | F1, F2 | not_started | — | — |
+| F3 store-runtime-reenable | #263 | `2026-07-07-store-runtime-reenable-263` | 1 | F1, F2 | worktree_created | — | — |
 | F4 store-lockup-detect-notify | #264 | `2026-07-07-store-lockup-detect-notify-264` | 2 | F1, F3 | not_started | — | — |
 | F5 disabled-stores-settings-ui | #265 | `2026-07-07-disabled-stores-settings-ui-265` | 2 | F1, F2, F3 | not_started | — | — |
 
