@@ -162,6 +162,8 @@ namespace TaskMaster.Test.AppGlobals
         public IAppItemEngines Engines => throw new NotSupportedException();
 
         public IntelligenceConfig IntelRes => throw new NotSupportedException();
+
+        public IStoreDisableService StoreDisable => throw new NotSupportedException();
     }
 
     internal sealed class ReflectionRealProxy : RealProxy

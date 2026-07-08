@@ -212,6 +212,8 @@ namespace QuickFiler.Controllers.Tests
             public IAppItemEngines Engines => null;
 
             public global::UtilitiesCS.EmailIntelligence.IntelligenceConfig IntelRes => null;
+
+            public global::UtilitiesCS.IStoreDisableService StoreDisable => null;
         }
     }
 }

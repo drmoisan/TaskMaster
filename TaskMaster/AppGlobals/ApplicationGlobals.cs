@@ -9,6 +9,7 @@ using TaskMaster.Properties;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.OutlookObjects.Store;
 using UtilitiesCS.Threading;
 
 namespace TaskMaster
@@ -112,6 +113,9 @@ namespace TaskMaster
             _events = new AppEvents(this);
             _quickFilerSettings = new AppQuickFilerSettings();
             Engines = new AppItemEngines(this);
+            // why: issue #261. Constructed here (before the async store-load phase) because the
+            // service reads Globals.Ol.StoresWrapper lazily per call and never caches the model.
+            _storeDisableService = new StoreDisableService(this);
             stopwatch.Stop();
             _loadBasicElapsed = stopwatch.Elapsed;
         }
@@ -418,6 +422,9 @@ namespace TaskMaster
 
         private AppOlObjects _olObjects;
         public IOlObjects Ol => _olObjects;
+
+        private IStoreDisableService _storeDisableService;
+        public IStoreDisableService StoreDisable => _storeDisableService;
 
         private AppToDoObjects _toDoObjects;
         public IToDoObjects TD => _toDoObjects;

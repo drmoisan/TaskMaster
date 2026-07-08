@@ -165,6 +165,12 @@ namespace UtilitiesCS.OutlookObjects.Store
             catch { }
             filePathStopwatch.Stop();
 
+            // why: issue #261. Resolve the identity from the DisplayName/FilePath already read above
+            // (no additional COM cost) and test it against the effective disabled set. Passed to
+            // Decide as the trailing argument so the Disabled reason is attributed last, after the
+            // four existing exclusion checks.
+            bool isDisabled = IsEffectivelyDisabled(StoreIdentity.Resolve(displayName, filePath));
+
             var (included, rule) = StoreFilterAttribution.Decide(
                 isPublicFolder,
                 displayName,
@@ -173,7 +179,8 @@ namespace UtilitiesCS.OutlookObjects.Store
                 ExcludedStoreFilePathContains,
                 GwsoFilePathContains,
                 ExcludePublicFolderStores,
-                ExcludeGwsoStores
+                ExcludeGwsoStores,
+                isDisabled
             );
 
             logger.Debug(
@@ -195,7 +202,8 @@ namespace UtilitiesCS.OutlookObjects.Store
             IList<string> excludedStoreFilePathContains,
             IList<string> gwsoFilePathContains,
             bool excludePublicFolderStores,
-            bool excludeGwsoStores
+            bool excludeGwsoStores,
+            bool isDisabled
         )
         {
             if (
@@ -245,6 +253,14 @@ namespace UtilitiesCS.OutlookObjects.Store
                     && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
                 )
             )
+            {
+                return false;
+            }
+
+            // why: issue #261. Checked last, after the four existing exclusion rules. The caller
+            // supplies the precomputed effective-disabled result because this static overload has no
+            // instance state to consult.
+            if (isDisabled)
             {
                 return false;
             }
@@ -305,6 +321,14 @@ namespace UtilitiesCS.OutlookObjects.Store
                 return false;
             }
 
+            // why: issue #261. Checked last, after the four existing exclusion rules. Resolves the
+            // identity from the DisplayName and the FilePath already read above (no extra COM read of
+            // the blocking FilePath property) and excludes the store when it is effectively disabled.
+            if (IsEffectivelyDisabled(StoreIdentity.Resolve(store.DisplayName, filePath)))
+            {
+                return false;
+            }
+
             return true;
         }
 
@@ -331,5 +355,57 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         [JsonProperty]
         public List<string> ExcludedStoreFilePathContains { get; set; } = [];
+
+        /// <summary>
+        /// Identities of stores disabled for the current and all future sessions (issue #261). Keyed
+        /// by resolved <see cref="StoreIdentity.Value"/>, compared case-insensitively by
+        /// <see cref="IsEffectivelyDisabled"/>. Persisted (round-trips through the existing
+        /// "StoresWrapper" serialization key); no new file or config key is added.
+        /// </summary>
+        [JsonProperty]
+        public List<string> DisabledStoreIdentities { get; set; } = [];
+
+        /// <summary>
+        /// Identities of stores disabled for the current session only (issue #261). Not persisted:
+        /// Newtonsoft invokes the parameterless constructor before populating properties, so this
+        /// field re-initializes to an empty, case-insensitive set on every deserialize and is absent
+        /// from emitted JSON.
+        /// </summary>
+        [JsonIgnore]
+        public HashSet<string> SessionDisabledStoreIdentities { get; set; } =
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Single source of truth for the effective-disabled test used by the filter surfaces and the
+        /// store-disable service. Returns true only when the identity resolves to a real (non-sentinel,
+        /// non-null/whitespace) value that is present, case-insensitively, in the union of the session
+        /// and persisted disabled sets. Performs no COM access.
+        /// </summary>
+        /// <param name="identity">The resolved store identity to test.</param>
+        /// <returns>True when the identity is effectively disabled in either scope; otherwise false.</returns>
+        internal bool IsEffectivelyDisabled(StoreIdentity identity)
+        {
+            var value = identity.Value;
+            if (
+                string.IsNullOrWhiteSpace(value)
+                || string.Equals(value, StoreIdentity.UnresolvedSentinel, StringComparison.Ordinal)
+            )
+            {
+                return false;
+            }
+
+            if (
+                SessionDisabledStoreIdentities is not null
+                && SessionDisabledStoreIdentities.Contains(value)
+            )
+            {
+                return true;
+            }
+
+            return DisabledStoreIdentities is not null
+                && DisabledStoreIdentities.Any(x =>
+                    string.Equals(x, value, StringComparison.OrdinalIgnoreCase)
+                );
+        }
     }
 }

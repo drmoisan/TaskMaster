@@ -1,5 +1,8 @@
 # Atomic Executor Memory Index
 
+- [dotnet-coverage denominator nondeterminism](project_dotnet_coverage_denominator_nondeterminism.md) — Invoke-MSTestWithCoverage repo line-rate swings (47% vs 81%) from double-counted denominator; re-baseline via git-stash, trust per-class rates
+- [IApplicationGlobals member forces implementers](project_iapplicationglobals_member_forces_implementers.md) — adding an IApplicationGlobals member breaks 7 hand-written test-double stubs (QuickFiler/TaskMaster/UtilitiesCS .Test) beyond scope lock; Moq mocks auto-implement
+
 - [Project Build/Test Env](project_build_test_env.md) — git-bash toolchain quirks: MSBuild dash-switches, MSYS_NO_PATHCONV for vstest, csharpier v1 syntax, forced-nullable Rebuild + Debug-restore, legacy csproj Compile includes, IVT for Moq, C# 7.3 in QuickFiler.Test
 - [Outlook `Action` ambiguity](project_outlook_action_ambiguity.md) — bare non-generic `Action` is CS0104-ambiguous in Outlook-interop files; use `System.Action` (Action<MailItem> is fine)
 - [init/record struct fails CS0518 on net48](project_record_struct_isexternalinit_netfx.md) — ANY init accessor (positional record, record struct, or explicit { get; init; }) needs IsExternalInit (absent on this net48 target, no polyfill); use constructor-initialized readonly struct with get-only props
