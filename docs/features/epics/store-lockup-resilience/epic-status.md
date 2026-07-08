@@ -9,9 +9,9 @@
 - **Integration base provenance:** created off `origin/main` at `954c7840` (preferred path — planning
   docs already landed on `main` via PR #268; no deviation recorded).
 - **Model budget:** `fable_policy: disabled`
-- **Current wave:** 2
-- **Phase:** implementation — F5 merged; F4 running (last wave-2 feature)
-- **Last updated:** 2026-07-08T08:39:37Z
+- **Current wave:** 2 (complete)
+- **Phase:** all 5 features merged into integration; `origin/main` merged into integration; driving the integration→main PR
+- **Last updated:** 2026-07-08T13:36:26Z
 
 ## Feature Status
 
@@ -20,7 +20,7 @@
 | F1 store-disable-service | #261 | `2026-07-07-store-disable-service-261` | 0 | — | merged | [#275](https://github.com/drmoisan/TaskMaster/pull/275) | `62626315` |
 | F2 folder-settings-store-model-null | #262 | `2026-07-07-folder-settings-store-model-null-262` | 0 | — | merged | [#274](https://github.com/drmoisan/TaskMaster/pull/274) | `6e0d7305` |
 | F3 store-runtime-reenable | #263 | `2026-07-07-store-runtime-reenable-263` | 1 | F1, F2 | merged | [#276](https://github.com/drmoisan/TaskMaster/pull/276) | `b6fbbc0b` |
-| F4 store-lockup-detect-notify | #264 | `2026-07-07-store-lockup-detect-notify-264` | 2 | F1, F3 | worktree_created | — | — |
+| F4 store-lockup-detect-notify | #264 | `2026-07-07-store-lockup-detect-notify-264` | 2 | F1, F3 | merged | [#280](https://github.com/drmoisan/TaskMaster/pull/280) | `e17ffa08` |
 | F5 disabled-stores-settings-ui | #265 | `2026-07-07-disabled-stores-settings-ui-265` | 2 | F1, F2, F3 | merged | [#277](https://github.com/drmoisan/TaskMaster/pull/277) | `8e7e85b3` |
 
 ## Wave Plan
@@ -31,7 +31,10 @@
 
 ## Integration → main
 
-- **epic_merge_pr:** not opened.
+- **epic_merge_pr:** opening. Integration is current with `origin/main` (`92f65bea`, merged as `4995d4fd`),
+  which includes the flaky `PhysicalFileInfoAdapter` fix (PR #279) so the final CI gate is green-eligible.
+- **F4 recovery note:** the first F4 agent was interrupted mid-run; its committed work (`e0b58302`) was
+  preserved, pushed, and a resume orchestrator carried it to merge (PR #280).
 - **CI gate note:** `ci.yml` triggers only on `pull_request`/`push` to `main`/`development`, so
   child→integration PRs run zero required checks (CI-green is vacuous for children). The
   integration→main PR is the first and only real CI gate for this epic. The vstest step runs all
