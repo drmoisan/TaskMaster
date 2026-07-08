@@ -1,0 +1,30 @@
+# Code Review — Issue #267 (ci-quality-gates-speedup)
+
+- Review timestamp: 2026-07-08T01-41
+- Branch: `refactor/ci-quality-gates-speedup-267` @ `7ffc96cc67e85983d6034632d4fd1fd466deda5c`
+- Base: `main` @ `5c4bf31e25210eb850827f2668c74cd72d5fa231`
+- Scope: full branch-vs-base diff (22 files: `.github/workflows/ci.yml` + 21 markdown feature/evidence docs)
+
+## Executive Summary
+
+The workflow change is small, targeted, and additive: two `actions/cache@v4` steps and a `/m` flag added to each of two pre-existing `msbuild` steps. No `.cs`, `.ts`, `.py`, or `.ps1` production or test files are touched, so this review focuses on the modified workflow YAML and the quality of the accompanying evidence/documentation. `actionlint` was re-run independently against `.github/workflows/ci.yml` and returned zero findings. No blocking code-quality defects were found in the workflow content itself. The primary outstanding item — a missing green CI run against the branch head — is a process/evidence gap tracked in the policy audit and remediation inputs, not a code-quality finding, and is not repeated in the table below.
+
+## Findings Table
+
+| Severity | File | Location | Finding | Recommendation | Rationale | Evidence |
+|---|---|---|---|---|---|---|
+| Low | `.github/workflows/ci.yml` | `Cache dotnet tools` step (line 79-85) | The cache path `~/.nuget/packages` is the global NuGet package cache, not a path scoped to CSharpier/dotnet-tool packages specifically. The cache will therefore also warm ordinary NuGet package restores that happen to land in the same global cache directory, beyond just the tool restore AC2 targets. | Consider scoping to a narrower path (e.g. the dotnet tool store, or accept the current broader cache as a reasonable trade-off) and note the intentional breadth in a workflow comment if kept as-is. | Not incorrect — `hashFiles('dotnet-tools.json')` still gates invalidation correctly — but the path is broader than the step's stated intent ("CSharpier tool restore"), which could surprise a future maintainer sizing or scoping the cache. | `.github/workflows/ci.yml` lines 79-85 (independently read in full during this review). |
+| Informational | `docs/features/active/2026-07-07-ci-quality-gates-speedup-267/issue.md` | `## Acceptance Criteria`, AC2 wording | `dotnet-tools.json` lives at the repository root rather than the conventional `.config/dotnet-tools.json` local-tool-manifest location. This is pre-existing repository structure, not introduced by this change, and `hashFiles('dotnet-tools.json')` correctly targets the actual file location. | No action required for this feature; flagged only for awareness in case a future change relocates the manifest to the conventional path, which would require updating the `hashFiles()` argument in lockstep. | Confirms the cache key will not silently go stale if the manifest is later moved without the workflow being updated to match. | `git log --all -- "**/dotnet-tools.json"`; `find` confirms the file exists only at repo root (verified during this review). |
+| Informational | N/A (process, not code) | N/A | The `modified-workflow-needs-green-run` gate (AC6) has not yet been satisfied — no green CI run exists against the branch head. This is not a code-quality defect; it is tracked as a Blocking finding in `policy-audit.2026-07-08T01-41.md` § 5.3 and in `remediation-inputs.2026-07-08T01-41.md`, not repeated here as a code-review finding. | Open the PR / trigger a `workflow_dispatch` run against this branch head and capture the green-run evidence before merge. | Listed here only for cross-reference; the substantive finding and remediation guidance live in the policy audit and remediation-inputs artifacts. | `policy-audit.2026-07-08T01-41.md` § 5.3. |
+
+No Medium, High, or Critical findings were identified in the workflow content itself.
+
+## Additional Observations (Non-Blocking)
+
+- **Diagnostic-parity evidence quality**: `evidence/qa-gates/build-diagnostic-parity.2026-07-07T22-00.md` provides a thorough, honest accounting of a non-trivial discrepancy (pass-1 warning count 33 → 72 between baseline and final capture) and correctly attributes it to differing incremental-build state at capture time rather than glossing over it. This is a strong evidence-authoring practice worth continuing on future CI-focused changes.
+- **Scope Decision (2026-07-07) in `issue.md`**: the decision to retain two build passes rather than consolidate them is well-justified — local verification showed consolidation surfaces 84 pre-existing nullable defects in vendored `SVGControl`/`UtilitiesSwordfish.NET.General`, which would have silently expanded this feature's blast radius into unrelated vendored-code remediation. Tracking the discovered CI-nullable-check gap separately (`docs/features/potential/2026-07-07-ci-nullable-check-skipped-vendored-projects.md`) rather than folding it into this feature is the correct scoping decision.
+- **Restore-step unconditionality**: both cache-adjacent restore steps (`nuget restore`, `dotnet tool restore`) were confirmed to carry no `if:` guard, so a cache miss still produces a correct, buildable restore rather than silently skipping restoration. This was independently confirmed by reading the full modified file, not merely accepted from the executor's evidence.
+
+## PR-Context Summary Note
+
+`artifacts/pr_context.summary.txt`'s "Changed files overview" section buckets `.github/workflows/ci.yml` into the generic "Docs/templates/agents/tooling: 22 files" category and does not list it individually among the top-10-by-size bullets shown (it is a small, +18/-2 diff relative to the markdown evidence files, several of which exceed 50 insertions). This did not cause any missed review coverage in this pass — the full diff and the appendix's name-status/diff-stat sections correctly identify and quantify the workflow change — but it is noted here because prior reviews of this repository have found the PR-context summary tool prone to under-representing non-`.md` changes in its "Changed files overview" bullets. No action is required for this feature.
