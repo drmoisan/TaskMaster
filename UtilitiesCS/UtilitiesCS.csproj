@@ -549,6 +549,7 @@
     </Compile>
     <Compile Include="Dialogs\InputBoxViewer.Designer.cs" />
     <Compile Include="Dialogs\MyBox.cs" />
+    <Compile Include="Dialogs\MyBoxModeless.cs" />
     <Compile Include="Dialogs\MyBoxViewer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -699,6 +700,7 @@
     <Compile Include="OutlookObjects\Store\IStoreWrapperViewer.cs" />
     <Compile Include="OutlookObjects\Store\StoreDisableService.cs" />
     <Compile Include="OutlookObjects\Store\StoreFilterAttribution.cs" />
+    <Compile Include="OutlookObjects\Store\StoreLockupAttribution.cs" />
     <Compile Include="OutlookObjects\Store\StoreIdentity.cs" />
     <Compile Include="OutlookObjects\Store\StoreRehookResult.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapper.cs" />
@@ -1046,6 +1048,9 @@
     </Compile>
     <Compile Include="Threading\SyncContextForm.Designer.cs" />
     <Compile Include="Threading\TaskPriority.cs" />
+    <Compile Include="Threading\CurrentStoreContext.cs" />
+    <Compile Include="Threading\LockupStallDecider.cs" />
+    <Compile Include="Threading\StoreLockupResponder.cs" />
     <Compile Include="Threading\ThreadMonitor.cs" />
     <Compile Include="Threading\ThreadSafeFunctions.cs" />
     <Compile Include="Threading\ThreadSafeSingleShotGuard.cs" />
