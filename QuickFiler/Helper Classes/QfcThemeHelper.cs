@@ -113,10 +113,14 @@ namespace QuickFiler
                         SystemColors.Control,
                         Color.Black,
                         Color.White,
-                        SystemColors.Control,
+                        // issue #269: CreateTheme positional order is (mailReadForeColor,
+                        // mailReadBackColor, mailUnreadForeColor, mailUnreadBackColor). In Light
+                        // themes the Sender/Subject labels are dark text on a light background;
+                        // unread uses blue text as the accent (not a blue/black background).
                         SystemColors.ControlText,
                         SystemColors.Control,
                         Color.MediumBlue,
+                        SystemColors.Control,
                         Color.Black,
                         Color.White,
                         SystemColors.Control,
@@ -144,10 +148,14 @@ namespace QuickFiler
                         Color.LightCyan,
                         Color.Black,
                         Color.White,
-                        Color.LightCyan,
+                        // issue #269: CreateTheme positional order is (mailReadForeColor,
+                        // mailReadBackColor, mailUnreadForeColor, mailUnreadBackColor). In Light
+                        // themes the Sender/Subject labels are dark text on a light background;
+                        // unread uses blue text as the accent (not a blue/light-cyan background).
                         SystemColors.ControlText,
                         Color.LightCyan,
                         Color.MediumBlue,
+                        Color.LightCyan,
                         Color.Black,
                         Color.White,
                         Color.LightCyan,
