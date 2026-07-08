@@ -10,8 +10,8 @@
   docs already landed on `main` via PR #268; no deviation recorded).
 - **Model budget:** `fable_policy: disabled`
 - **Current wave:** 2 (complete)
-- **Phase:** all 5 features merged into integration; `origin/main` merged into integration; driving the integration→main PR
-- **Last updated:** 2026-07-08T13:36:26Z
+- **Phase:** COMPLETE — all 5 features merged; integration→main PR #281 merged into `main` (`2396b392`); issues #260–#265 closed
+- **Last updated:** 2026-07-08T13:53:40Z
 
 ## Feature Status
 
@@ -31,8 +31,12 @@
 
 ## Integration → main
 
-- **epic_merge_pr:** opening. Integration is current with `origin/main` (`92f65bea`, merged as `4995d4fd`),
-  which includes the flaky `PhysicalFileInfoAdapter` fix (PR #279) so the final CI gate is green-eligible.
+- **epic_merge_pr:** [#281](https://github.com/drmoisan/TaskMaster/pull/281) — **MERGED into `main`** at
+  `2396b3920881a7c558760de1ed086090d875d322` (2026-07-08T13:53:40Z). CI (`ci.yml` run 28947668822):
+  actionlint pass, Format/build/analyze/test pass, mergeStateStatus CLEAN.
+- **Issues closed by the merge:** #260 (epic), #261, #262, #263, #264, #265.
+- Integration was brought current with `origin/main` (`92f65bea`, merged as `4995d4fd`), which includes the
+  flaky `PhysicalFileInfoAdapter` fix (PR #279); the final CI gate was green.
 - **F4 recovery note:** the first F4 agent was interrupted mid-run; its committed work (`e0b58302`) was
   preserved, pushed, and a resume orchestrator carried it to merge (PR #280).
 - **CI gate note:** `ci.yml` triggers only on `pull_request`/`push` to `main`/`development`, so
