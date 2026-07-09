@@ -63,7 +63,7 @@ On every invocation:
    `git branch`, and `gh pr view --json state,mergedAt,headRefOid` per the `epic-orchestrate`
    skill's resume procedure, not from in-memory notifications alone).
 5. If no checkpoint exists or the objective is new, begin from manifest parsing
-   (`docs/features/epics/<epic-slug>/epic-plan.md`).
+   (`docs/features/epics/<epic-slug>/epic.md`).
 
 ## Delegation Model
 
@@ -112,8 +112,9 @@ route's required names from `config/orchestration-routing.json`.
 Maintain `docs/features/epics/<epic-slug>/epic-status.md` as a human-readable projection of the
 epic checkpoint's `features[]` array, regenerated (not hand-edited) at epic kickoff, at every
 `merge_status` transition, at every wave transition, and at final integration-PR completion, per
-the `epic-orchestrate` skill's documentation-maintenance procedure. `epic-plan.md` itself (the
-manifest) is treated as static, human-authored input and is not rewritten by you.
+the `epic-orchestrate` skill's documentation-maintenance procedure. `epic.md` itself (the merged
+manifest + narrative source of truth) is treated as static, human-authored input and is not
+rewritten by you; `epic-status.md` is a generated projection only and is never hand-authored.
 
 ## Completion Requirements
 
