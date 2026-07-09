@@ -20,6 +20,15 @@ namespace UtilitiesCS.Threading
     /// </remarks>
     public static class CurrentStoreContext
     {
+        /// <summary>
+        /// Ambient identity used to attribute a UI-thread stall that occurs while the raw
+        /// <c>Namespace.Stores</c> collection is being enumerated/materialized (issue #292), before
+        /// any per-store scope has opened. Distinct from the special <c>"&lt;unavailable&gt;"</c>
+        /// value (which <see cref="Normalize"/> collapses to <see langword="null"/>), so this phase
+        /// identity flows through unchanged and yields a non-blank attribution for the watchdog.
+        /// </summary>
+        public const string StoresEnumerationPhaseIdentity = "<Stores-enumeration>";
+
         private static volatile string _current;
 
         /// <summary>

@@ -100,6 +100,32 @@ namespace UtilitiesCS.Threading
                 return;
             }
 
+            // Guard — enumeration phase (issue #292): a stall attributed to the raw Namespace.Stores
+            // enumeration carries a non-null, non-store phase identity. Emit one attributed WARN with
+            // autoDisabled: false and return WITHOUT any IStoreDisableService call. This must precede
+            // the already-disabled guard and every disable-service call: during the fresh-build window
+            // the disabled-store model does not yet exist, so DisableSessionOnly ->
+            // GetModelForWriteOrThrow would throw InvalidOperationException and crash the watchdog
+            // thread; and a phase identity is not a real store to disable (which would also pollute the
+            // #265 disabled-store UI).
+            if (
+                string.Equals(
+                    displayName,
+                    CurrentStoreContext.StoresEnumerationPhaseIdentity,
+                    StringComparison.Ordinal
+                )
+            )
+            {
+                _logSink(
+                    StoreLockupAttribution.FormatLine(
+                        displayName,
+                        attribution.StallDuration,
+                        autoDisabled: false
+                    )
+                );
+                return;
+            }
+
             // Guard — already disabled: no second disable and no duplicate notification.
             if (_disableService.IsDisabled(identity))
             {
