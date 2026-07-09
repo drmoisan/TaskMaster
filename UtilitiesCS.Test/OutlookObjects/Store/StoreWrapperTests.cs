@@ -10,6 +10,7 @@ using OutlookStore = Microsoft.Office.Interop.Outlook.Store;
 namespace UtilitiesCS.Test.OutlookObjects.Store
 {
     [TestClass]
+    [DoNotParallelize]
     public class StoreWrapperTests
     {
         [TestMethod]

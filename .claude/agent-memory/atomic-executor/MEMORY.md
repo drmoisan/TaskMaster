@@ -1,5 +1,7 @@
 # Atomic Executor Memory Index
 
+- [MSTest [DoNotParallelize] overlaps the parallel bucket](project_mstest_donotparallelize_overlaps_parallel_bucket.md) — #292: a [DoNotParallelize] null-baseline reader still sees writes from parallel-bucket writers; fix = mark every writer too so zero writers remain parallel
+
 - [FluentAssertions Equal(params) has no because](project_fluentassertions_equal_params_no_because.md) — a trailing reason string on .Equal(...) becomes an extra expected element and fails a GREEN-on-HEAD test; use .Equal(new[]{...}) or move reason to .HaveCount(n, reason)
 - [dotnet-coverage denominator nondeterminism](project_dotnet_coverage_denominator_nondeterminism.md) — Invoke-MSTestWithCoverage repo line-rate swings (47% vs 81%) from double-counted denominator; re-baseline via git-stash, trust per-class rates
 - [IApplicationGlobals member forces implementers](project_iapplicationglobals_member_forces_implementers.md) — adding an IApplicationGlobals member breaks 7 hand-written test-double stubs (QuickFiler/TaskMaster/UtilitiesCS .Test) beyond scope lock; Moq mocks auto-implement
