@@ -273,6 +273,8 @@
     <Compile Include="AppGlobals\StartupTimingRecorderTests.cs" />
     <Compile Include="AppGlobals\HookReadinessCoordinatorTests.cs" />
     <Compile Include="AppGlobals\NonBlockingDelayTests.cs" />
+    <Compile Include="AppGlobals\LiveOutlookHarnessRunner.cs" />
+    <Compile Include="AppGlobals\LiveOutlookHarnessRunnerTests.cs" />
     <Compile Include="AppGlobals\LiveOutlookHookupIntegrationTests.cs" />
     <Compile Include="AppGlobals\AppEventsCoverageExpansionTests.cs" />
     <Compile Include="AppGlobals\AppEventsTests.cs" />

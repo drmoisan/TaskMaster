@@ -137,7 +137,7 @@ jobs:
           }
 
           New-Item -ItemType Directory -Path 'TestResults' -Force | Out-Null
-          & $vstestPath $testAssemblies /EnableCodeCoverage /InIsolation /Logger:trx
+          & $vstestPath $testAssemblies /EnableCodeCoverage /InIsolation /Logger:trx /TestCaseFilter:"TestCategory!=LiveOutlook"
           if ($LASTEXITCODE -ne 0) {
               throw "MSTest execution failed with exit code $LASTEXITCODE"
           }
