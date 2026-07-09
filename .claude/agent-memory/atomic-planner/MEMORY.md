@@ -6,3 +6,4 @@
 - [Plan validator phase-heading constraint](plan-validator-phase-heading-constraint.md) — MCP plan validator requires exact `### Phase N — <Title>`; no tokens between Phase N and em-dash; H1 title line is exempt
 - [Legacy csproj explicit Compile Include](project_legacy_csproj_explicit_compile_include.md) — new .cs in UtilitiesCS/TaskMaster.Test (packages.config, no glob) needs <Compile Include> wiring in scope-lock + task AC
 - [#211 startup-lifetime heartbeat seam](project_211_startup_lifetime_heartbeat_seam.md) — Phase 3.3 [startup-lifetime-heartbeat] DispatcherTimer in ThisAddIn.cs (exempt), pure logic in StartupDiagnosticsProbe; AC15
+- [#292 CurrentStoreContext parallel seam](project_292_currentstorecontext_parallel_seam.md) — process-global static; scope-opening store test classes must be [DoNotParallelize] or they pollute reader-baseline tests under UtilitiesCS.Test ClassLevel parallelization

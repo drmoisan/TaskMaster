@@ -17,6 +17,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
     /// Outlook, no temp files, no timers.
     /// </summary>
     [TestClass]
+    [DoNotParallelize]
     public sealed class StoresWrapperRehookTests
     {
         private static Mock<OutlookStore> CreateStore(string displayName)

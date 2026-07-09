@@ -294,6 +294,7 @@
     <Compile Include="AppGlobals\AppToDoObjectsTestDoubles.cs" />
     <Compile Include="AppGlobals\AppToDoObjectsTestUtilities.cs" />
     <Compile Include="AppGlobals\AppToDoObjectsTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoresWrapperEnumerationScopeTests.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperTests.cs" />
     <Compile Include="Ribbon\RibbonControllerTests.cs" />
     <Compile Include="Ribbon\RibbonExplorerXmlTests.cs" />

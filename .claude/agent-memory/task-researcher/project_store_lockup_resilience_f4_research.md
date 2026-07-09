@@ -34,13 +34,11 @@ Key non-obvious findings that will matter when F4 is actually implemented:
    `ActionButton.Button_Click` invokes its delegate independent of modality, so button wiring
    itself is reusable — only the show/dispose mechanics need to change.
 
-3. **`ThreadMonitor` (`UtilitiesCS\Threading\ThreadMonitor.cs`) is currently dormant and
-   untested.** `UiThread.Init(monitorUiThread: false)` at `TaskMaster\ThisAddIn.cs:28` is the only
-   call site and it's off. Zero test files exist for it. It polls via `Thread.Sleep` directly (no
-   injected clock) — any touch for F4 must introduce a `TimeProvider` seam (package
-   `Microsoft.Bcl.TimeProvider` already referenced by `UtilitiesCS.Test.csproj`, not yet used
-   anywhere in production) to make it testable and compliant with the repo's time-seam guidance
-   for touched code.
+3. **STALE (superseded 2026-07-09):** `ThreadMonitor` was dormant/untested at research time, but
+   F4 shipped: it is now ENABLED in production (`ThisAddIn.cs:36`, `monitorUiThread: true`, callback
+   wired to `StoreLockupResponder` via lazy `GetStoreLockupResponder()`), has a `TimeProvider` seam
+   (`EvaluatePoll`), and is covered by `UtilitiesCS.Test\Threading\ThreadMonitorTests.cs`. Verify
+   current state in code before relying on this point.
 
 4. Cheap-`DisplayName`-before-expensive-COM-read is already an established pattern at three call
    sites (`StoreWrapper.Init():36`, `StoresWrapper.RewireOlObjectsAsync:102`,
