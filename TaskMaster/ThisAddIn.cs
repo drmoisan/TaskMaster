@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Threading;
 using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Outlook;
+using TaskMaster.Logging;
 using UtilitiesCS;
 using UtilitiesCS.Threading;
 
@@ -107,9 +108,39 @@ namespace TaskMaster
             BrightIdeasSoftware.TreeListView.TreeRenderer.PIXELS_PER_LEVEL = tlvIndent;
         }
 
+        // Issue #208: ensure the configured log directory exists BEFORE the first
+        // log4net.LogManager.GetLogger call (below) triggers the assembly-level XmlConfigurator
+        // attribute, which activates the file appenders and opens their files. Static field
+        // initializers run in textual order as part of the type initializer, so declaring this
+        // field before `logger` guarantees the directory is created before configuration runs;
+        // otherwise the appenders fault with DirectoryNotFoundException/LockStateException on the
+        // relative `logs\` path. The directory-resolve/ensure decision logic lives in the coverable
+        // LogDirectoryInitializer; only this thin, host-bound wiring is here.
+        private static readonly bool _logDirectoryEnsured = EnsureLogDirectoryBeforeConfiguration();
+
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
+
+        // Issue #208: resolves and ensures the log directory used by the log4net file appenders
+        // (relative `logs\` against the runtime working directory, matching how FileAppender
+        // resolves a relative path). A failure to create the directory must not crash add-in
+        // startup, so the boundary catch reports to the debugger (log4net is not yet configured)
+        // and returns false rather than propagating; the pure initializer itself fails fast.
+        private static bool EnsureLogDirectoryBeforeConfiguration()
+        {
+            try
+            {
+                var initializer = new LogDirectoryInitializer(new LogDirectoryFileSystem());
+                return initializer.EnsureLogDirectoryForPath(Environment.CurrentDirectory, "logs");
+            }
+            catch (System.Exception ex)
+            {
+                Debug.WriteLine($"[TaskMaster] Failed to ensure log directory (issue #208): {ex}");
+                return false;
+            }
+        }
+
         private ApplicationGlobals _globals;
         private AddInUtilities _externalUtilities;
         private RibbonController _ribbonController;

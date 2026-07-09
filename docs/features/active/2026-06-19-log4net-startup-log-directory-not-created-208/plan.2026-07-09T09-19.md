@@ -1,0 +1,52 @@
+# log4net-startup-log-directory-not-created — Minor-Audit Plan (Issue #208)
+
+- **Issue:** #208
+- **Issue URL:** https://github.com/drmoisan/TaskMaster/issues/208
+- **Parent (optional):** none
+- **Owner:** drmoisan
+- **Last Updated:** 2026-07-09T09-19
+- **Status:** Draft
+- **Version:** 1.0
+- **Work Mode:** minor-audit
+- **Language/Toolchain:** C# (.NET Framework VSTO add-in, `TaskMaster.sln`)
+- **Requirements source (sole):** `docs/features/active/2026-06-19-log4net-startup-log-directory-not-created-208/issue.md` (`## Acceptance Criteria` is the only AC source)
+
+**Evidence path clause (non-overridable):** All evidence artifacts resolve to `docs/features/active/2026-06-19-log4net-startup-log-directory-not-created-208/evidence/<kind>/` using only canonical sub-paths (`baseline/`, `qa-gates/`, `regression-testing/`, `issue-updates/`, `other/`, `remediation-baseline/`). Paths under `artifacts/baselines/`, `artifacts/baseline/`, `artifacts/qa/`, `artifacts/qa-gates/`, `artifacts/evidence/`, or `artifacts/coverage/` are forbidden. The delegation prompt named `evidence/<kind>/` under the feature folder, which is canonical; no override was required.
+
+**Fail-closed evidence rule:** Baseline artifacts (Phase 0), final-QC artifacts (Phase 2), and the coverage-comparison artifact (Phase 2) are mandatory. If any required artifact is missing or has incomplete fields (`Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`), or if numeric coverage is absent where required, the verdict is BLOCKED/INCOMPLETE, never PASS. `EXIT_CODE: SKIPPED` is not a passing outcome for any command-bearing task in this plan.
+
+**Mode fail-closed conditions:** This plan fails closed if `spec.md` or `user-story.md` appears in the active feature folder, if the `## Acceptance Criteria` section is removed from `issue.md`, if any required Phase 0 artifact is missing, or if checklist state contradicts on-disk evidence.
+
+---
+
+### Phase 0 — Baseline Capture
+
+- [x] [P0-T1] Read policy documents in the order defined by `policy-compliance-order` (1: `CLAUDE.md`; 2: `.claude/rules/general-code-change.md`; 3: `.claude/rules/general-unit-test.md`; 4: `.claude/rules/csharp.md`) and read the two in-scope source files (`TaskMaster/log4net.config`, `TaskMaster/ThisAddIn.cs`). Write evidence artifact `docs/features/active/2026-06-19-log4net-startup-log-directory-not-created-208/evidence/baseline/phase0-instructions-read.md` containing `Timestamp:`, `Policy Order:` (the ordered list above), and an explicit list of every file read. Acceptance: artifact exists with all three fields populated and lists all policy files plus both source files.
+- [x] [P0-T2] Capture baseline CSharpier formatting state. Command: `dotnet tool run csharpier --check .`. Write evidence artifact `docs/features/active/2026-06-19-log4net-startup-log-directory-not-created-208/evidence/baseline/baseline-csharpier.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (pass/fail and count of any unformatted files). Acceptance: artifact exists with all four fields populated.
+- [x] [P0-T3] Capture baseline .NET analyzer build. Command: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`. Write evidence artifact `docs/features/active/2026-06-19-log4net-startup-log-directory-not-created-208/evidence/baseline/baseline-analyzers.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (build result and analyzer warning/error counts). Acceptance: artifact exists with all four fields populated.
+- [x] [P0-T4] Capture baseline nullable / type-check build. Command: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`. Write evidence artifact `docs/features/active/2026-06-19-log4net-startup-log-directory-not-created-208/evidence/baseline/baseline-nullable.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (build result and nullable warning count). Acceptance: artifact exists with all four fields populated.
+- [x] [P0-T5] Capture baseline MSTest run with coverage. Command: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` (resolve the built test assemblies for `TaskMaster.Test`). Write evidence artifact `docs/features/active/2026-06-19-log4net-startup-log-directory-not-created-208/evidence/baseline/baseline-tests.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` including passed/failed test counts and the numeric baseline line-coverage headline percent (and targeted-module percent if computable). Acceptance: artifact exists with all four fields populated and a numeric baseline coverage percent recorded (no placeholder).
+
+---
+
+### Phase 1 — Constrained Small-Path Implementation
+
+- [x] [P1-T1] Hand off implementation to the C# typed engineer (`/csharp-typed-engineer`). The engineer applies the smallest change that ensures the configured log directory exists before the first `log4net.LogManager.GetLogger`/`GetRepository` call triggers attribute-based `XmlConfigurator` configuration for the assembly, extracting the directory-ensure / path-resolution logic into a pure, testable unit isolated from the live log4net appender and from Outlook/COM (per the General Code Change Policy I/O-boundary rule), and adds MSTest/Moq/FluentAssertions unit tests. In-scope files: `TaskMaster/log4net.config`, `TaskMaster/ThisAddIn.cs`, plus the new extracted unit and its test file. No opportunistic refactors outside this fix. Acceptance: implementation completion is defined solely by the verbatim acceptance criteria below; all four must be satisfied before Phase 2 begins.
+
+  Acceptance Criteria (verbatim text from `issue.md` `## Acceptance Criteria`; checkbox glyphs rendered as plain bullets to avoid task-parser ambiguity, criterion text unchanged):
+
+  - When the configured log directory does not exist at add-in startup, the directory is created before any log4net appender attempts to open a file, and no `System.IO.DirectoryNotFoundException` or `log4net.Appender.FileAppender.LockingStream.LockStateException` is raised on any log call during startup or subsequent item processing.
+  - The directory-ensure / path-resolution logic is extracted into a small, pure, testable unit (no live log4net appender, no live Outlook/COM dependency) and is covered by MSTest unit tests per repository policy, including: missing-directory (positive), directory-already-exists (edge case), and invalid/unwritable-path error handling.
+  - All three existing configured appenders (`all_logs_file`, `important_logs_file`, `method_calls_log_file`) continue to write log output without regression once the directory exists.
+  - No test added for this fix creates or depends on temporary files on the local filesystem; filesystem interaction is isolated behind a seam that can be exercised without a live appender or real Outlook process.
+
+---
+
+### Phase 2 — Final QC Loop
+
+- [x] [P2-T1] Run CSharpier formatting. Command: `dotnet tool run csharpier .`. Write evidence artifact `docs/features/active/2026-06-19-log4net-startup-log-directory-not-created-208/evidence/qa-gates/qc-csharpier.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. If this step changes any files, restart the loop from P2-T1. Acceptance: formatting completes with no remaining changes; artifact populated. `SKIPPED` is invalid.
+- [x] [P2-T2] Run .NET analyzer build. Command: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`. Write evidence artifact `docs/features/active/2026-06-19-log4net-startup-log-directory-not-created-208/evidence/qa-gates/qc-analyzers.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (build result, 0 analyzer errors expected). Acceptance: build succeeds with no analyzer errors; artifact populated. `SKIPPED` is invalid.
+- [x] [P2-T3] Run nullable / type-check build. Command: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`. Write evidence artifact `docs/features/active/2026-06-19-log4net-startup-log-directory-not-created-208/evidence/qa-gates/qc-nullable.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (build result, 0 nullable warnings expected). Acceptance: build succeeds with warnings-as-errors clean; artifact populated. `SKIPPED` is invalid.
+- [x] [P2-T4] Run MSTest with coverage. Command: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`. Write evidence artifact `docs/features/active/2026-06-19-log4net-startup-log-directory-not-created-208/evidence/qa-gates/qc-tests.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` including passed/failed counts and the numeric post-change line-coverage headline percent plus new/changed-code coverage percent for the extracted unit. Acceptance: all tests pass; artifact records numeric post-change coverage (no placeholder). `SKIPPED` is invalid.
+- [x] [P2-T5] Verify coverage no-regression and new-code threshold. Compare the Phase 0 baseline coverage (`evidence/baseline/baseline-tests.md`) against the Phase 2 post-change coverage (`evidence/qa-gates/qc-tests.md`). Write evidence artifact `docs/features/active/2026-06-19-log4net-startup-log-directory-not-created-208/evidence/qa-gates/qc-coverage-comparison.md` with `Timestamp:`, `Command:` (or comparison method), `EXIT_CODE:`, and `Output Summary:` reporting baseline coverage, post-change coverage, and new/changed-code coverage. Acceptance: changed lines show no coverage regression and the newly added extracted unit meets the repository new-code coverage threshold; if any value is unavailable, mark the outcome remediation-required (not PASS).
+- [x] [P2-T6] Confirm the full toolchain loop (P2-T1 → P2-T2 → P2-T3 → P2-T4) completed in a single clean pass with no step failing or auto-fixing files. If any step failed or changed files, the loop was restarted from P2-T1 and this task records the final clean pass. Write evidence artifact `docs/features/active/2026-06-19-log4net-startup-log-directory-not-created-208/evidence/qa-gates/qc-final-loop.md` with `Timestamp:`, `Command:` (summary of the ordered loop), `EXIT_CODE:`, and `Output Summary:` stating that all four stages passed in the final pass. Acceptance: artifact confirms a single clean toolchain pass.

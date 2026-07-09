@@ -9,6 +9,8 @@
 - Issue: #208
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/208
 - Last Updated: 2026-06-19
+- Work Mode: minor-audit
+
 ## Summary
 
 The log4net file appender cannot create or open its target log file because the configured relative `logs\` directory does not exist at the add-in's runtime working directory. Every log write throws `System.IO.DirectoryNotFoundException` followed by `log4net.Appender.FileAppender.LockingStream.LockStateException`, so file logging is silently non-functional and each log call pays a failed file-append round-trip.
@@ -68,6 +70,13 @@ Files to inspect:
 - [ ] Unit coverage areas: any extracted path-resolution/directory-ensure helper (pure logic, no live appender).
 - [ ] Integration scenario to retest: launch with no pre-existing `logs\` directory and confirm a log file is created and no `DirectoryNotFoundException`/`LockStateException` is thrown.
 - [ ] Manual verification notes: confirm the chosen log path is writable under the deployed VSTO working directory.
+
+## Acceptance Criteria
+
+- [x] When the configured log directory does not exist at add-in startup, the directory is created before any log4net appender attempts to open a file, and no `System.IO.DirectoryNotFoundException` or `log4net.Appender.FileAppender.LockingStream.LockStateException` is raised on any log call during startup or subsequent item processing.
+- [x] The directory-ensure / path-resolution logic is extracted into a small, pure, testable unit (no live log4net appender, no live Outlook/COM dependency) and is covered by MSTest unit tests per repository policy, including: missing-directory (positive), directory-already-exists (edge case), and invalid/unwritable-path error handling.
+- [x] All three existing configured appenders (`all_logs_file`, `important_logs_file`, `method_calls_log_file`) continue to write log output without regression once the directory exists.
+- [x] No test added for this fix creates or depends on temporary files on the local filesystem; filesystem interaction is isolated behind a seam that can be exercised without a live appender or real Outlook process.
 
 ## Next Step
 

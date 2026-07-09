@@ -258,6 +258,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Logging\LogDirectoryInitializerTests.cs" />
     <Compile Include="AppGlobals\ApplicationGlobalsTests.cs" />
     <Compile Include="AppGlobals\AppAutoFileObjectsCoverageExpansionTests.cs" />
     <Compile Include="AppGlobals\AppAutoFileObjectsFolderPredictorTests.cs" />
