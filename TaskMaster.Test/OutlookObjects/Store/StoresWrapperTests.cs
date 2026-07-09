@@ -17,6 +17,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 namespace TaskMaster.Test.OutlookObjects.Store
 {
     [TestClass]
+    [DoNotParallelize]
     public class StoresWrapperTests
     {
         [TestMethod]

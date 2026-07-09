@@ -22,6 +22,7 @@ namespace TaskMaster.Test.OutlookObjects.Store
     /// existing <see cref="ReflectionRealProxy"/> seams; no live Outlook, no temp files, no waits.
     /// </summary>
     [TestClass]
+    [DoNotParallelize]
     public class StoresWrapperEnumerationScopeTests
     {
         // ---- T1 -------------------------------------------------------------------------------
