@@ -4,7 +4,7 @@
 - [IApplicationGlobals member forces implementers](project_iapplicationglobals_member_forces_implementers.md) — adding an IApplicationGlobals member breaks 7 hand-written test-double stubs (QuickFiler/TaskMaster/UtilitiesCS .Test) beyond scope lock; Moq mocks auto-implement
 
 - [Project Build/Test Env](project_build_test_env.md) — git-bash toolchain quirks: MSBuild dash-switches, MSYS_NO_PATHCONV for vstest, csharpier v1 syntax, forced-nullable Rebuild + Debug-restore, legacy csproj Compile includes, IVT for Moq, C# 7.3 in QuickFiler.Test
-- [Outlook `Action` ambiguity](project_outlook_action_ambiguity.md) — bare non-generic `Action` is CS0104-ambiguous in Outlook-interop files; use `System.Action` (Action<MailItem> is fine)
+- [Outlook `Action`/`Exception` ambiguity](project_outlook_action_ambiguity.md) — bare non-generic `Action` AND bare `Exception` are CS0104-ambiguous in Outlook-interop files; use `System.Action`/`System.Exception` (surfaces only at analyzer/type-check build)
 - [init/record struct fails CS0518 on net48](project_record_struct_isexternalinit_netfx.md) — ANY init accessor (positional record, record struct, or explicit { get; init; }) needs IsExternalInit (absent on this net48 target, no polyfill); use constructor-initialized readonly struct with get-only props
 - [Nullable annotation CS8632 scoping](project_nullable_annotation_cs8632_scoping.md) — `Type?` annotation in nullable-disabled TaskMaster projects emits new CS8632 warning; wrap in `#nullable enable annotations`/`#nullable restore annotations` (not whole-file) to stay warning-clean in both gates
 - [PowerShell new files need UTF-8 BOM](powershell-bom-required.md) — PSScriptAnalyzer enforces PSUseBOMForUnicodeEncodedFile; prepend BOM after Write or restart the format loop
