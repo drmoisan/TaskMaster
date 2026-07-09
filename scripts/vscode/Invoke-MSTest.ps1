@@ -51,7 +51,7 @@ function Get-VsTestArgumentList {
         [string]$RunSettingsPath
     )
 
-    return @($TestAssembly) + @("/Settings:$RunSettingsPath", '/InIsolation')
+    return @($TestAssembly) + @("/Settings:$RunSettingsPath", '/InIsolation', '/TestCaseFilter:TestCategory!=LiveOutlook')
 }
 
 function Invoke-VsTestExe {
