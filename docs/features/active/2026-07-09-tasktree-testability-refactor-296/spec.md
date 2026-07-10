@@ -386,23 +386,23 @@ If any step fails or auto-fixes files, restart from step 1.
 
 ## Definition of Done
 
-- [ ] Structure matches this spec; legacy paths retired or redirected
-- [ ] Invariants validated with tests or comparisons
-- [ ] Imports/tooling/entry points updated
-- [ ] Edge cases and error handling verified
-- [ ] Tests, linting, and type checks clean
-- [ ] Docs updated (initiative/README/tasks as needed)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
-- [ ] `ITaskTreeForm` exists, derives from `IForm`, and `TaskTreeForm` implements it
-- [ ] `TaskTreeController` depends on `ITaskTreeForm`, not the concrete form
-- [ ] Host-neutral logic separated from COM/WinForms interaction
-- [ ] No production file in `TaskTree` exceeds 500 lines
-- [ ] `TaskTree.Test` project exists, follows the repo MSTest pattern, and is in the solution
-- [ ] No unit test constructs a live form/window or triggers a popup
-- [ ] `TaskTree` project reaches >= 80% line coverage
-- [ ] Full C# toolchain (csharpier → analyzers → nullable → MSTest) passes with no regression
+- [x] Structure matches this spec; legacy paths retired or redirected
+- [x] Invariants validated with tests or comparisons
+- [x] Imports/tooling/entry points updated
+- [x] Edge cases and error handling verified
+- [x] Tests, linting, and type checks clean
+- [x] Docs updated (initiative/README/tasks as needed)
+- [x] Toolchain pass completed (format → lint → type-check → test)
+- [x] `ITaskTreeForm` exists, derives from `IForm`, and `TaskTreeForm` implements it
+- [x] `TaskTreeController` depends on `ITaskTreeForm`, not the concrete form
+- [x] Host-neutral logic separated from COM/WinForms interaction
+- [x] No production file in `TaskTree` exceeds 500 lines
+- [x] `TaskTree.Test` project exists, follows the repo MSTest pattern, and is in the solution
+- [x] No unit test constructs a live form/window or triggers a popup
+- [x] `TaskTree` project reaches >= 80% line coverage
+- [x] Full C# toolchain (csharpier → analyzers → nullable → MSTest) passes with no regression
 
 ## Seeded Test Conditions (from potential)
-- [ ] Tree/business-logic units covered with pure inputs.
-- [ ] Dialog-driven or UI-bound paths covered via seams (no popups).
-- [ ] Event handler logic covered via a mocked `ITaskTreeForm`.
+- [x] Tree/business-logic units covered with pure inputs.
+- [x] Dialog-driven or UI-bound paths covered via seams (no popups).
+- [x] Event handler logic covered via a mocked `ITaskTreeForm`.
