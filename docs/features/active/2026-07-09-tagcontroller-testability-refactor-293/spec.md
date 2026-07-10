@@ -5,7 +5,7 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-07-09
 - **Status:** Ready for Planning
-- **Version:** 1.0
+- **Version:** 1.1 (records the maintainer-ratified STA-refinement: `DrawFocus` default-body exemption removed and `CheckBoxController` exemption narrowed; `WinFormsUserPrompt`/`TagViewer`/`TagLauncher` exemptions unchanged)
 
 > **user-story.md is intentionally absent.** This is a testability refactor child of
 > epic #295. Per the epic manifest (`## Design-Phase Deliverables`), `user-story.md`
@@ -136,9 +136,13 @@ caller is `AddColorCategory`.
 Extract the two-line `ControlPaint.DrawFocusRectangle(Graphics.FromHwnd(cbx.Handle),
 cbx.ClientRectangle)` into a private `DrawFocus(CheckBox)` routed through an injectable
 `Action<CheckBox> _drawFocus` defaulting to the real `ControlPaint` call. Tests inject
-a no-op. This makes `Select_Ctrl_By_Offset`/`Select_Ctrl_By_Position` (index
-arithmetic + focus routing) testable without an HWND. `.Focus()` itself is a safe
-no-op when the handle is not created and needs no seam.
+a no-op for the navigation arithmetic. This makes `Select_Ctrl_By_Offset`/
+`Select_Ctrl_By_Position` (index arithmetic + focus routing) testable without an HWND.
+`.Focus()` itself is a safe no-op when the handle is not created and needs no seam. The
+production default body is NOT `[ExcludeFromCodeCoverage]`: under the maintainer-ratified
+STA refinement it is exercised directly in a dedicated STA test against an unshown
+`CheckBox` whose `.Handle` is forced (see Test Strategy), so the default draw path is
+covered rather than exempted.
 
 ### `TagSelectionModel` extraction
 
@@ -261,23 +265,74 @@ over-broad exemption. The remaining live-form launcher and globals/COM wiring st
 - **Logging/telemetry:** none added or changed.
 - **Migration/backfill:** none.
 - **Coverage exemption policy.** `[ExcludeFromCodeCoverage]` is applied only to
-  irreducible WinForms/COM wiring: the `DrawFocus` seam default body
-  (`Graphics.FromHwnd`/`ControlPaint`), `WinFormsUserPrompt` adapter bodies, `TagViewer`
-  intent-member bodies, the remaining `TagLauncher` live-form/globals members, and the
-  `CheckBoxController` event-wiring members. Each exemption is individually justified
-  and maintainer-ratified. Testable seams — `TagSelectionModel`, controller
-  orchestration, rendering arithmetic against the panel abstraction, and
-  `LauncherAutoAssign` — are NEVER exempt and must meet the coverage floor. If
-  extracting the `CheckBoxController` decision logic is judged out of scope for #293,
-  its exemption must be re-ratified explicitly rather than inherited silently.
+  irreducible WinForms/COM wiring. Each exemption is individually justified and
+  maintainer-ratified. Testable seams — `TagSelectionModel`, controller orchestration,
+  rendering arithmetic against the panel abstraction, and `LauncherAutoAssign` — are
+  NEVER exempt and must meet the coverage floor.
+
+  **Maintainer-ratified STA-refinement (2026-07-09).** Authority:
+  `docs/features/epics/winforms-testability-refactor/epic.md`, Shared Design Pattern
+  item 4, "Maintainer-ratified refinement (2026-07-09, last-resort STA controls)". As a
+  last resort where no seam can isolate the covered logic, in-memory never-shown WinForms
+  **controls** (never `Form`-derived types) MAY be constructed on an STA thread in
+  dedicated `*.StaTests.cs` files (`[STATestClass]`/`[STATestMethod]`), with no
+  `Show()`/`ShowDialog()`, no message-pump reliance, controls disposed per test, and no
+  popups. Applying this refinement to the exemption register:
+  - The **`DrawFocus` seam default body** (`Graphics.FromHwnd(cbx.Handle)` +
+    `ControlPaint.DrawFocusRectangle`) is **no longer exempt**: a `CheckBox` is a control,
+    not a `Form`; constructed unshown on STA, reading `.Handle` forces invisible handle
+    creation, `Graphics.FromHwnd` succeeds, and `DrawFocusRectangle` draws to that DC with
+    no message pump. The seam already covers all navigation arithmetic via the injected
+    no-op; the STA test exercises only the production default body, which no seam can cover.
+    Coverage of that body comes from `Tags.Test/TagControllerRendering.StaTests.cs`.
+  - The **`CheckBoxController` `CtrlCB` setter subscribe/unsubscribe wiring and the
+    `ctrlCB_Click` wrapper** are **no longer exempt**: they are exercised via the
+    `Control.InvokeOnClick` reflection raiser (protected `Control.InvokeOnClick` via
+    reflection, no pump, no `CanSelect` gate) on an unshown STA
+    `CheckBox` in `Tags.Test/CheckBoxControllerWiring.StaTests.cs`. The exemption is
+    narrowed to the four members that genuinely need a shown window / message pump /
+    protected-method access: `ctrlCB_GotFocus`, `ctrlCB_LostFocus` (require real focus
+    traversal on a shown window) and `ctrlCB_KeyDown`, `ctrlCB_PreviewKeyDown` (raised only
+    through the protected `OnKeyDown`/`OnPreviewKeyDown`).
+  - **Unchanged (STA refinement does not apply):** `WinFormsUserPrompt` adapter bodies
+    (`MessageBox.Show`/`InputBox.ShowDialog` realize shown dialog UI and a popup — never
+    permitted); `TagViewer` intent-member bodies and `TagViewer.Designer.cs` (`Form`-derived,
+    prohibited even unshown); and the remaining `TagLauncher` live-form launcher and
+    globals/COM wiring (launches a live `Form` and depends on Outlook globals/COM).
+
+  Resulting register state: the `DrawFocus` default-body exemption is removed; the
+  `CheckBoxController` exemption is narrowed to the four focus/key handlers above; the
+  `WinFormsUserPrompt`, `TagViewer`, `TagViewer.Designer.cs`, and `TagLauncher` exemptions
+  are unchanged. If extracting the `CheckBoxController` decision logic is judged out of
+  scope for #293, its exemption must be re-ratified explicitly rather than inherited
+  silently.
 
 ## Test Strategy
 
 - **Framework and seams.** MSTest + Moq + FluentAssertions. Mock `ITagViewer` via Moq
   (or a small in-memory fake with a backing `List<CheckBox>`); inject a Moq
   `IUserPrompt` and a no-op `DrawFocus` delegate; mock `IAutoAssign` and `MailItem`
-  via Moq. No live `Form`/`Control` is constructed; no popup is shown; no `Thread.Sleep`
-  or `Task.Delay`; no temporary files; no wall-clock or RNG.
+  via Moq. No live `Form` is constructed; no popup is shown; no `Show()`/`ShowDialog()`;
+  no `Thread.Sleep` or `Task.Delay`; no temporary files; no wall-clock or RNG. Seams are
+  the required first approach and cover all but two irreducible production bodies.
+- **STA-refinement usage (last resort, dedicated files only).** Per the epic manifest's
+  maintainer-ratified refinement
+  (`docs/features/epics/winforms-testability-refactor/epic.md`, Shared Design Pattern item
+  4), two production bodies that no seam can cover are exercised by constructing unshown
+  WinForms **controls** (a `CheckBox`, never a `Form`) on an STA thread, confined to
+  dedicated `*.StaTests.cs` files marked `[STATestClass]`/`[STATestMethod]`:
+  `Tags.Test/TagControllerRendering.StaTests.cs` covers the `DrawFocus` default body
+  (force `.Handle`, invoke the default draw action, assert no throw + handle created), and
+  `Tags.Test/CheckBoxControllerWiring.StaTests.cs` covers the `CtrlCB` subscribe/unsubscribe
+  wiring and `ctrlCB_Click` wrapper via the `Control.InvokeOnClick` reflection raiser
+  (protected `Control.InvokeOnClick` via reflection, no pump, no `CanSelect` gate). These files never call
+  `Show()`/`ShowDialog()`, rely on no message pump (`DoEvents`, timers, `PostMessage`), and
+  dispose every control per test. All non-STA test files remain free of `[STAThread]` and
+  live-control construction; the existing migration away from `[STAThread]` + live
+  `TagViewer` stands. MSTest 4.2.2 supplies `[STATestClass]`/`[STATestMethod]`; if a
+  verification finds them unavailable, the fallback is a `.runsettings`
+  `ExecutionThreadApartmentState=STA`, with the tradeoff that it applies STA to the whole
+  `Tags.Test` run rather than confining it to the two dedicated files.
 - **Per-method test mapping** (from research section H): `ParseSearchStrings`,
   `Search`, `FilterArchive`, `IsPrefixMissing`, `SelectionAsList`/`AsString`/
   `GetSelections`, `ToggleChoice`/`AddOption`/`UpdateSelections`, `ResolvePrefix`/

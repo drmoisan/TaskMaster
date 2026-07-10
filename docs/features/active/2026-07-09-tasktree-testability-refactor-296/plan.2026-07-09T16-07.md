@@ -85,11 +85,41 @@ COM/VSTO/WinForms coverage exemption (CLAUDE.md General Unit Test Policy §UT2, 
 WinForms form-derived + Designer code). Each site is individually justified. Testable seams are
 NEVER exempt.
 
+**Maintainer-ratified STA-refinement application (epic manifest authority).** Per
+`docs/features/epics/winforms-testability-refactor/epic.md` Shared Design Pattern item 4,
+"Maintainer-ratified refinement (2026-07-09, last-resort STA controls)", each exemption site
+below was re-assessed against the STA option (in-memory, never-shown WinForms controls MAY be
+constructed on an STA thread strictly as a last resort where no seam isolates the logic, subject
+to conditions (a) seams first + documented infeasibility, (b) dedicated `*.StaTests.cs`
+`[STATestClass]`/`[STATestMethod]` files, (c) no `Show()`/`ShowDialog()`, no message-pump
+reliance, controls disposed per test, no popups, and (d) `Form`-derived types remain prohibited
+even unshown). Assessment outcomes for this feature:
+
+- **E1** — remains exempt; STA is not attempted. `TaskTreeForm` is `Form`-derived, which
+  refinement condition (d) prohibits in tests even when unshown.
+- **E2** — assessed for STA coverage of `AddObject`/`RemoveObject` and RETAINED as exempt. The
+  STA test mechanism itself IS available (MSTest 4.2.2 provides `[STATestClass]`/
+  `[STATestMethod]`, introduced in MSTest 3.6), so the blocker is not tooling; it is the
+  ObjectListView 2.9.1 control contract documented in the E2 row below (a virtual-mode
+  `TreeListView` cannot execute these members deterministically on an unshown, handle-less
+  control without reintroducing the live-control/message-pump reliance condition (c) prohibits).
+- **E3** — unaffected. Its obstacle is type constructibility
+  (`FormatRowEventArgs.Model` get-only, `FormatRowEventArgs.Item` internal setter), not the
+  live-control prohibition; constructing a control on STA does not change constructibility.
+
+No exemption is removed by this refinement; the resulting register state is E1/E2/E3 all
+retained. The MSTest STA mechanics available for any future STA test in this project are:
+`[STATestClass]`/`[STATestMethod]` (per-class/per-method apartment scoping, preferred, available
+in the pinned MSTest 4.2.2); the runsettings alternative is
+`<RunConfiguration><ExecutionThreadApartmentState>STA</ExecutionThreadApartmentState></RunConfiguration>`,
+whose tradeoff is that it forces STA on the entire `TaskTree.Test` run rather than the single
+class that needs it, unnecessarily broadening the apartment scope.
+
 | # | Site (file + type) | Attribute placement | Justification |
 |---|---|---|---|
 | E1 | `TaskTree/TaskTreeForm.cs` — `partial class TaskTreeForm : Form, ITaskTreeForm` | class-level `[ExcludeFromCodeCoverage]` on the `TaskTreeForm.cs` partial declaration | Form-derived WinForms class (category b). All facade members are thin delegations to `TreeLv`/`ControlResizer` that require a live `TreeListView`/window handle; the private event handlers forward to the controller. The class-level attribute on this partial declaration also covers the `TaskTree/TaskTreeForm.Designer.cs` designer-generated partial (category b). |
-| E2 | `TaskTree/TreeListViewVisual.cs` — `class TreeListViewVisual : ITreeVisual` | class-level `[ExcludeFromCodeCoverage]` | Host adapter wrapping the concrete non-virtual `BrightIdeasSoftware.TreeListView`; `AddObject`/`RemoveObject` cannot execute without a live control (category b/c analog). Two-line delegations only; no branching logic. |
-| E3 | `TaskTree/TaskTreeController.cs` — residual `internal void FormatRow(object, FormatRowEventArgs)` event-handler wrapper (post-extraction) | method-level `[ExcludeFromCodeCoverage]` on the `FormatRow` wrapper only | Narrowly scoped. The strikeout DECISION is extracted (P6-T1 production change) into the host-neutral `internal static FontStyle ResolveRowStyle(FontStyle, bool)`, which is directly unit-tested on both `Complete` branches and is NOT exempt. The residual `FormatRow` wrapper contains only event-arg marshalling: it reads `e.Model` (get-only) and assigns `e.Item.Font`, and `FormatRowEventArgs`/`OLVListItem` are not constructible from `TaskTree.Test` in ObjectListView 2.9.1 (`.Model` get-only, `.Item` internal setter) and require a live `TreeListView` row item (category b/c analog). Exemption covers only those few unavoidable wrapper lines; the >= 90% file target is achievable with the wrapper exempted and `ResolveRowStyle` covered. |
+| E2 | `TaskTree/TreeListViewVisual.cs` — `class TreeListViewVisual : ITreeVisual` | class-level `[ExcludeFromCodeCoverage]` | Host adapter over `BrightIdeasSoftware.TreeListView` (ObjectListView 2.9.1.1072); `AddObject`/`RemoveObject` are pure two-line delegations to the wrapped control with no branching. **STA-refinement assessment (epic manifest Shared Design Pattern item 4, maintainer-ratified 2026-07-09) — RETAINED on API grounds, not tooling grounds:** The STA mechanism exists (MSTest 4.2.2 provides `[STATestClass]`/`[STATestMethod]`), so tooling is not the blocker. The obstacle is the ObjectListView 2.9.1 control contract: `TreeListView` is a Win32 virtual-mode list view (`VirtualMode = true`) backed by a `Tree`/`IVirtualListDataSource`, and its members are non-virtual (unmockable). `AddObject`/`RemoveObject` route through `AddObjects`/`RemoveObjects` → tree-model mutation + `UpdateVirtualListSize()` + redraw, which synchronize with the native `SysListView32` and are only well-defined once the native handle exists. On an unshown, handle-less control the 2.9.1 public contract does not guarantee that `AddObject`/`RemoveObject` deterministically reflect in `Roots`/`Objects` enumeration. Forcing handle creation (`.Handle`/`CreateControl()`) to make the mutation observable instantiates a real native window and drives message-based virtual-list synchronization — reintroducing exactly the live-control/message-pump reliance refinement condition (c) prohibits. The refinement's enumerated last-resort controls (`TableLayoutPanel`, `Label`, `Panel`, `CheckBox`) expose managed state readable without a handle; a virtual `TreeListView` does not share that property for list mutation. Condition (a) is satisfied trivially because the adapter already IS the thinnest possible seam boundary (its body is exactly the concrete-control delegation), so an STA test would exercise ObjectListView's own behavior, not adapter logic, and its marginal coverage (two delegating lines) does not justify handle-dependent nondeterminism. Retained under the ratified WinForms exemption (category b/c analog). |
+| E3 | `TaskTree/TaskTreeController.cs` — residual `internal void FormatRow(object, FormatRowEventArgs)` event-handler wrapper (post-extraction) | method-level `[ExcludeFromCodeCoverage]` on the `FormatRow` wrapper only | Narrowly scoped. The strikeout DECISION is extracted (P6-T1 production change) into the host-neutral `internal static FontStyle ResolveRowStyle(FontStyle, bool)`, which is directly unit-tested on both `Complete` branches and is NOT exempt. The residual `FormatRow` wrapper contains only event-arg marshalling: it reads `e.Model` (get-only) and assigns `e.Item.Font`, and `FormatRowEventArgs`/`OLVListItem` are not constructible from `TaskTree.Test` in ObjectListView 2.9.1 (`.Model` get-only, `.Item` internal setter) and require a live `TreeListView` row item (category b/c analog). Exemption covers only those few unavoidable wrapper lines; the >= 90% file target is achievable with the wrapper exempted and `ResolveRowStyle` covered. STA-refinement assessment (epic manifest Shared Design Pattern item 4): the STA refinement was assessed and does not alter this obstacle — the blocker is type constructibility (`FormatRowEventArgs.Model` get-only, `FormatRowEventArgs.Item` internal setter), not the live-control prohibition, and constructing a `TreeListView`/row item on STA does not make `FormatRowEventArgs`/`OLVListItem` constructible from `TaskTree.Test`; E3 is unchanged. |
 
 NOT exempt (must meet coverage floor): `TaskTree/TaskTreeController.cs` (except the E3 residual
 `FormatRow` event-handler wrapper method-level exemption above) — this explicitly INCLUDES the

@@ -58,6 +58,20 @@ bring each project to at least 80% line coverage.
    live forms or windows and never show popups (a popup requiring human interaction
    is a unit-test-policy violation). Running COM elements on the UI thread is a
    production-only last resort where no seam alternative exists — never in tests.
+
+   **Maintainer-ratified refinement (2026-07-09, last-resort STA controls):**
+   In-memory, never-shown WinForms **controls** (e.g., `TableLayoutPanel`, `Label`,
+   `Panel`, `CheckBox`) MAY be constructed in unit tests on an STA thread, strictly
+   as a LAST RESORT where no seam can isolate the logic. Conditions:
+   - (a) Seams remain the required first approach; each STA-bound test documents
+     why no seam is feasible for the covered logic.
+   - (b) All STA-bound tests live in separate, dedicated test files (suffix
+     `*.StaTests.cs`, marked `[STATestClass]`/`[STATestMethod]` or equivalent
+     runsettings scoping) so the STA surface is limited to the essential.
+   - (c) Never `Show()`/`ShowDialog()`; no message-pump reliance (no `PostMessage`
+     round-trip assertions, no `DoEvents`, no timers); all controls disposed per
+     test; popups remain a policy violation.
+   - (d) `Form`-derived types remain prohibited in tests even when unshown.
 5. **Coverage.** MSTest + Moq + FluentAssertions tests bring each project to
    >= 80% line coverage. `TaskTree.Test` must be created (it does not exist).
 

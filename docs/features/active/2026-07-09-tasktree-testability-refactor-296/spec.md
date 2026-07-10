@@ -283,6 +283,26 @@ selects one of these two dispositions.
 - Testable seams — the `ITaskTreeForm` facade consumers in the controller, the `ITreeVisual`
   move logic, the message seam, and the line-sink traversal — are NEVER exempt and must
   meet the coverage floor.
+- **Maintainer-ratified last-resort STA-controls refinement.** Per the epic manifest
+  (`docs/features/epics/winforms-testability-refactor/epic.md`, Shared Design Pattern item 4,
+  "Maintainer-ratified refinement (2026-07-09, last-resort STA controls)"), in-memory,
+  never-shown WinForms controls MAY be constructed in unit tests on an STA thread strictly as a
+  last resort where no seam can isolate the logic, subject to conditions: (a) seams remain the
+  required first approach and each STA test documents why no seam is feasible; (b) all STA-bound
+  tests live in dedicated `*.StaTests.cs` files marked `[STATestClass]`/`[STATestMethod]` (or an
+  equivalent runsettings apartment scope); (c) never `Show()`/`ShowDialog()`, no message-pump
+  reliance, controls disposed per test, popups prohibited; (d) `Form`-derived types remain
+  prohibited even when unshown. This refinement was assessed against every exemption site in
+  this feature. Resulting register state (see the plan's `[ExcludeFromCodeCoverage]` Exemption
+  Register): **E1 `TaskTreeForm`** retained (Form-derived — condition (d) prohibits STA);
+  **E2 `TreeListViewVisual`** retained after STA assessment — the STA mechanism is available in
+  the pinned MSTest 4.2.2 (`[STATestClass]`/`[STATestMethod]`), but ObjectListView 2.9.1's
+  virtual-mode `TreeListView` cannot execute `AddObject`/`RemoveObject` deterministically on an
+  unshown, handle-less control without reintroducing the message-pump/live-control reliance
+  condition (c) prohibits, and the adapter body is a pure two-line delegation that would test
+  the third-party control rather than adapter logic; **E3 `FormatRow` wrapper** retained —
+  unaffected because its obstacle is type constructibility, not the live-control prohibition.
+  No exemption is removed by the refinement.
 - net481 constraint: no `init`/`record`/`record struct` (no `IsExternalInit` polyfill on
   net48); use plain classes or `readonly struct`.
 
@@ -290,7 +310,21 @@ selects one of these two dispositions.
 
 All tests use MSTest (`[TestClass]`/`[TestMethod]`), Moq, and FluentAssertions, in
 Arrange–Act–Assert structure. No real `Form`/`Control` is constructed, no popups are shown,
-no `Thread.Sleep`/`Task.Delay` is used, and no temporary files are created. Dependencies
+no `Thread.Sleep`/`Task.Delay` is used, and no temporary files are created.
+
+**Last-resort STA-controls refinement (assessed; not exercised in this feature).** The
+maintainer-ratified refinement (epic manifest Shared Design Pattern item 4, 2026-07-09) permits
+constructing in-memory, never-shown WinForms controls on an STA thread as a last resort where no
+seam isolates the logic, using dedicated `*.StaTests.cs` files with `[STATestClass]`/
+`[STATestMethod]` (available in the pinned MSTest 4.2.2) and subject to conditions (a)-(d) in the
+Coverage exemption policy section. That refinement was assessed against this feature's exemption
+sites and did NOT change the register: E1 (Form-derived, condition (d)), E2 (ObjectListView
+2.9.1 virtual-mode `TreeListView` — no deterministic unshown/handle-less `AddObject`/
+`RemoveObject` without message-pump/live-control reliance prohibited by condition (c)), and E3
+(type-constructibility obstacle, unchanged by STA) are all retained. Consequently no
+`*.StaTests.cs` file and no `[STATestClass]`/`[STATestMethod]` test is introduced by this
+feature, and the "no real `Form`/`Control` constructed" property above holds for the whole test
+suite. Dependencies
 mocked: `ITaskTreeForm`, `ITreeVisual`, `IApplicationGlobals` (→ `IOlObjects.App` →
 `Outlook.Explorer`; `Outlook.MailItem`/`TaskItem`), and the two `Action<string>` seams
 (message, line-sink). Real COM-free domain objects are used directly: `TreeOfToDoItems`,
