@@ -305,13 +305,12 @@ namespace TaskTree.Test
             controller.IsValidType(new object()).Should().BeFalse();
         }
 
-        // ---------- ActivateOlItem / ActivateOlItemAsync (null-guard only) ----------
+        // ---------- ActivateOlItem / ActivateOlItemAsync (null-guard) ----------
         //
-        // The selectable / not-selectable / Display branches of ActivateOlItem(Async) drive the live
-        // Outlook Explorer through a late-bound `dynamic item` parameter. That runtime dispatch cannot
-        // resolve against a Moq interop proxy (RuntimeBinderException: "Explorer does not contain a
-        // definition for IsItemSelectableInView") and has no injectable seam, so those two methods are
-        // covered by exemptions E4/E5 and only their deterministic null-guard is exercised here.
+        // ActivateOlItem(Async) now take an `object` item (not `dynamic`), so the Explorer selection and
+        // typed-Display branches bind statically against the mockable Outlook interop interfaces. The
+        // null-guard is exercised here; the selectable / not-selectable / Display branches are covered
+        // in TaskTreeControllerActivateTests.cs against a mocked Explorer.
 
         [TestMethod]
         public void ActivateOlItem_WhenItemNull_NoExplorerInteraction()

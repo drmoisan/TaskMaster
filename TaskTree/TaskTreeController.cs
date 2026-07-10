@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using BrightIdeasSoftware;
 using ToDoModel;
 using UtilitiesCS;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace TaskTree
 {
@@ -56,17 +57,43 @@ namespace TaskTree
 
         #region UI Helper Functions
 
-        // Exemption site E4. Direct Outlook Explorer interaction via a late-bound `dynamic` item.
-        // The `dynamic item` parameter forces runtime binding of `activeExplorer.IsItemSelectableInView(item)`,
-        // `AddToSelection(item)`, and `item.Display()`; that late-bound dispatch cannot resolve against a
-        // Moq interop proxy (RuntimeBinderException) and has no injectable seam, so it requires a live
-        // Outlook Explorer (ratified COM exemption, category c).
-        [ExcludeFromCodeCoverage]
-        internal void ActivateOlItem(dynamic item)
+        // Selects the supplied Outlook item in the active Explorer when it is visible there, otherwise
+        // opens it in its own inspector. The parameter is typed as <see cref="object"/> (not `dynamic`)
+        // so the Explorer selection calls bind statically against the mockable
+        // <see cref="Outlook.Explorer"/> interface. The caller (<see cref="TreeLvActivateItem"/>) gates
+        // this via <see cref="IsValidType"/>, so <paramref name="item"/> is always a
+        // <see cref="Outlook.MailItem"/> or <see cref="Outlook.TaskItem"/>; the strongly-typed
+        // <see cref="DisplayOutlookItem"/> dispatch covers the display branch without late binding.
+        internal void ActivateOlItem(object item)
         {
-            if (item is not null)
+            if (item is null)
             {
-                var activeExplorer = _globals.Ol.App.ActiveExplorer();
+                return;
+            }
+            var activeExplorer = _globals.Ol.App.ActiveExplorer();
+            if (activeExplorer.IsItemSelectableInView(item))
+            {
+                activeExplorer.ClearSelection();
+                activeExplorer.AddToSelection(item);
+            }
+            else
+            {
+                DisplayOutlookItem(item);
+            }
+        }
+
+        // Async counterpart of <see cref="ActivateOlItem"/>. Uses the same statically-bound
+        // <see cref="object"/> seam so the Explorer selection is mockable; the <c>Task.Run</c> wrapping
+        // only offloads the synchronous COM calls and does not affect testability of the routing.
+        internal async Task ActivateOlItemAsync(object item)
+        {
+            if (item is null)
+            {
+                return;
+            }
+            var activeExplorer = _globals.Ol.App.ActiveExplorer();
+            await Task.Run(() =>
+            {
                 if (activeExplorer.IsItemSelectableInView(item))
                 {
                     activeExplorer.ClearSelection();
@@ -74,32 +101,29 @@ namespace TaskTree
                 }
                 else
                 {
-                    item.Display();
+                    DisplayOutlookItem(item);
                 }
-            }
+            });
+            await Task.Run(activeExplorer.Activate);
         }
 
-        // Exemption site E5. Async counterpart of E4; same late-bound `dynamic` Explorer dispatch with
-        // no mockable seam (ratified COM exemption, category c).
-        [ExcludeFromCodeCoverage]
-        internal async Task ActivateOlItemAsync(dynamic item)
+        /// <summary>
+        /// Opens the supplied Outlook item in its own inspector via strongly-typed dispatch. Only the
+        /// two item kinds admitted by <see cref="IsValidType"/> (<see cref="Outlook.MailItem"/> and
+        /// <see cref="Outlook.TaskItem"/>) are handled; any other type is ignored. Typed dispatch
+        /// replaces the former late-bound `dynamic` call so the display branch binds against the
+        /// mockable interop interfaces.
+        /// </summary>
+        private static void DisplayOutlookItem(object item)
         {
-            if (item is not null)
+            switch (item)
             {
-                var activeExplorer = _globals.Ol.App.ActiveExplorer();
-                await Task.Run(() =>
-                {
-                    if (activeExplorer.IsItemSelectableInView(item))
-                    {
-                        activeExplorer.ClearSelection();
-                        activeExplorer.AddToSelection(item);
-                    }
-                    else
-                    {
-                        item.Display();
-                    }
-                });
-                await Task.Run(activeExplorer.Activate);
+                case Outlook.MailItem mail:
+                    mail.Display();
+                    break;
+                case Outlook.TaskItem task:
+                    task.Display();
+                    break;
             }
         }
 

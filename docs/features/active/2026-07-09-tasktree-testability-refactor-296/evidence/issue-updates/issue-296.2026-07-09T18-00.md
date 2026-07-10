@@ -33,27 +33,32 @@ All 16 DoD checkboxes checked in spec.md, mapped to the AC evidence above plus:
 - Caller unchanged: final-caller-unchanged.md (git diff of RibbonController.cs empty).
 - Coverage delta / no-regression: coverage-delta.md (0% baseline -> 94.04%; new files >= 90%).
 
-## `[ExcludeFromCodeCoverage]` Exemption Register — flagged for maintainer ratification
+## `[ExcludeFromCodeCoverage]` Exemption Register — final (remediation pass 1, 2026-07-09T23-26)
 
-Plan register (ratified pattern): E1 `TaskTreeForm` (Form-derived), E2 `TreeListViewVisual`
-(ObjectListView virtual-mode adapter), E3 `FormatRow` wrapper (type non-constructibility).
+Feature-review (remediation-inputs.2026-07-09T23-09.md) flagged E4/E5/E6 as three Blocking findings:
+each was an exemption placed on a TESTABLE seam rather than an irreducible host-bound residual. The
+remediation replaced each with a mockable seam plus real tests and REMOVED the attribute. The final
+register contains only the four legitimate exemptions below.
 
-Three ADDITIONAL exemptions were applied during execution beyond the plan's E1/E2/E3 register,
-each due to empirically-verified COM / live-control untestability. These are surfaced here for
-maintainer ratification (deviation from the plan register, escalated in the executor report):
+### Final exemptions (four — all legitimate host-bound/thin residuals)
 
-| # | Site | Justification (empirically verified) |
-|---|---|---|
-| E4 | `TaskTree/TaskTreeController.cs` — `ActivateOlItem` | Uses `dynamic` dispatch on the Outlook `Explorer`/selection; a Moq proxy throws `RuntimeBinderException` under `dynamic` binding, so the selectable/valid-type branches cannot execute against a mock without a live Outlook Explorer. Null-guard branch remains covered and NOT exempt. |
-| E5 | `TaskTree/TaskTreeController.cs` — `ActivateOlItemAsync` | Same `dynamic`-dispatch obstacle as E4 (async form). Null-guard branch covered and NOT exempt. |
-| E6 | `TaskTree/TaskTreeController.MoveLogic.cs` — `HandleModelDropped` drop routing | `RefreshObjects` NREs on the null `ListView` of a mock drop-event; confirmed via reflection probe. The `default`-case early return remains covered and NOT exempt. |
+| # | Site | Category | Justification |
+|---|---|---|---|
+| E1 | `TaskTree/TaskTreeForm.cs` (type) | b | Form-derived WinForms host surface. |
+| E2 | `TaskTree/TreeListViewVisual.cs` (type) | b/c | Minimal ObjectListView host adapter; two-line delegations to a live virtual-mode control. |
+| E3 | `TaskTree/TaskTreeController.cs` — `FormatRow` | c | Thin residual event-handler wrapper; `FormatRowEventArgs`/`OLVListItem` are not constructible from tests. The strikeout decision is extracted into the covered `ResolveRowStyle`. |
+| E6-residual | `TaskTree/TaskTreeController.MoveLogic.cs` — `HandleModelDropped` | b/c | Thin residual wrapper only: builds E2 adapters from live `e.ListView`/`e.SourceListView` and calls `e.RefreshObjects()` (NREs without a live control). Routing extracted to covered `RouteDrop`; post-drop filter/sort extracted to covered `ApplyPostDropView`. |
 
-Testable seams remain non-exempt: `ResolveRowStyle`, all `MoveObjects*` logic, `FindChildByID`,
-`IsValidType`, `HandleModelCanDrop`, and every `ITaskTreeForm`/`ITreeVisual`/`_showMessage`
-consumer. Resulting coverage with E1-E6 applied: TaskTree.dll 94.04%, controller 95.65%,
-move-logic 93.29%.
+### Removed exemptions (remediation pass 1)
 
-Ratification requested: maintainer to confirm E4/E5/E6 fall under the ratified COM interop /
-live-control exemption (CLAUDE.md General Unit Test Policy §UT2 category c — Outlook Interop
-event-handler paths depending on `Outlook.Application`/`Explorer` without an injectable seam,
-and the ObjectListView live-control obstacle), consistent with the pre-ratified E1/E2/E3.
+| # | Site | Fix | Coverage now |
+|---|---|---|---|
+| E4 | `ActivateOlItem` | `dynamic item` -> `object item` with typed `DisplayOutlookItem` dispatch (`is MailItem`/`is TaskItem` -> `Display()`); Explorer selection binds against the mockable `Outlook.Explorer` interface. New tests cover selectable/Display branches and the caller valid-type path `TreeLvActivateItem`. | Controller.cs 100% line |
+| E5 | `ActivateOlItemAsync` | Same `object`-seam fix (async form); `Task.Run` wrapping unaffected. New tests cover the async selectable/Display/Activate branches and `TreeLvActivateItemAsync` valid-type path. | Controller.cs 100% line |
+| E6 | `HandleModelDropped` drop routing | Extracted the `switch (e.DropTargetLocation)` routing into the covered `RouteDrop(ITreeVisual, ITreeVisual, ModelDropEventArgs)` over the mockable `ITreeVisual` seam (ModelDropEventArgs constructed via the tests' `DropArgs` reflection helper). New tests cover every `DropTargetLocation` enum value. Only the thin `RefreshObjects`/adapter-construction residual keeps the attribute. | MoveLogic.cs 94.54% line |
+
+Testable seams remain non-exempt: `ResolveRowStyle`, `RouteDrop`, `ApplyPostDropView`, all
+`MoveObjects*` logic, `FindChildByID`, `IsValidType`, `HandleModelCanDrop`, `ActivateOlItem(Async)`,
+and every `ITaskTreeForm`/`ITreeVisual`/`_showMessage` consumer. Resulting coverage after removal of
+E4/E5/E6: TaskTree.dll 96.34% line / 91.49% branch (was 94.04%); controller 100% line; move-logic
+94.54% line. 51 tests pass. No `[ExcludeFromCodeCoverage]` remains on a testable seam.

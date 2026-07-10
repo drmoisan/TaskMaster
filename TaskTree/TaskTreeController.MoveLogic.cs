@@ -68,12 +68,12 @@ namespace TaskTree
             }
         }
 
-        // Exemption site E6. Control-bound drop-event marshalling wrapper. It wraps the live drop-event
-        // controls (e.ListView/e.SourceListView) in the E2 adapter and calls e.RefreshObjects(), which
-        // throws NullReferenceException without a live ObjectListView handle; every routing branch reaches
-        // that live-control refresh, so the wrapper cannot execute deterministically without a live
-        // control (ratified WinForms exemption, category b/c analog). The host-neutral move DECISIONS it
-        // dispatches to (MoveObjectsToRoots/Sibling/Children) are NOT exempt and are fully unit-tested.
+        // Exemption site E6. Thin control-bound drop-event marshalling wrapper. Its only irreducible work
+        // is building the E2 adapters from the live drop-event controls (e.ListView/e.SourceListView) and
+        // calling e.RefreshObjects(), which throws NullReferenceException without a live ObjectListView
+        // handle. The host-neutral routing decision is extracted into the fully unit-tested
+        // <see cref="RouteDrop"/>, and the post-drop filter/sort re-application is delegated to the
+        // unit-tested <see cref="ApplyPostDropView"/> (ratified WinForms exemption, category b/c analog).
         [ExcludeFromCodeCoverage]
         internal void HandleModelDropped(object sender, ModelDropEventArgs e)
         {
@@ -87,10 +87,32 @@ namespace TaskTree
                 ? targetVisual
                 : new TreeListViewVisual(sourceTree);
 
+            if (!RouteDrop(targetVisual, sourceVisual, e))
+            {
+                return;
+            }
+            e.RefreshObjects();
+            ApplyPostDropView();
+        }
+
+        /// <summary>
+        /// Routes a completed drop to the matching host-neutral move operation based on
+        /// <see cref="ModelDropEventArgs.DropTargetLocation"/>. Operates only against the mockable
+        /// <see cref="ITreeVisual"/> seam and the test-constructible <see cref="ModelDropEventArgs"/>
+        /// (target model, source models, drop location), so it is fully unit-testable without a live
+        /// control. Returns <c>true</c> when a move was dispatched and <c>false</c> for unhandled drop
+        /// locations, letting the caller skip the post-drop refresh/sort.
+        /// </summary>
+        /// <returns><c>true</c> if a move operation was dispatched; otherwise <c>false</c>.</returns>
+        internal bool RouteDrop(
+            ITreeVisual targetVisual,
+            ITreeVisual sourceVisual,
+            ModelDropEventArgs e
+        )
+        {
             switch (e.DropTargetLocation)
             {
                 case DropTargetLocation.AboveItem:
-                {
                     MoveObjectsToSibling(
                         targetVisual,
                         sourceVisual,
@@ -98,10 +120,8 @@ namespace TaskTree
                         e.SourceModels,
                         0
                     );
-                    break;
-                }
+                    return true;
                 case DropTargetLocation.BelowItem:
-                {
                     MoveObjectsToSibling(
                         targetVisual,
                         sourceVisual,
@@ -109,30 +129,30 @@ namespace TaskTree
                         e.SourceModels,
                         1
                     );
-                    break;
-                }
+                    return true;
                 case DropTargetLocation.Background:
-                {
                     MoveObjectsToRoots(targetVisual, sourceVisual, e.SourceModels);
-                    break;
-                }
+                    return true;
                 case DropTargetLocation.Item:
-                {
                     MoveObjectsToChildren(
                         targetVisual,
                         sourceVisual,
                         (TreeNode<ToDoItem>)e.TargetModel,
                         e.SourceModels
                     );
-                    break;
-                }
-
+                    return true;
                 default:
-                {
-                    return;
-                }
+                    return false;
             }
-            e.RefreshObjects();
+        }
+
+        /// <summary>
+        /// Re-applies the current incomplete-item filter (when active) and re-sorts the tree after a
+        /// drop. Delegates only to the mockable <see cref="ITaskTreeForm"/> seam, so it is unit-testable
+        /// without a live control.
+        /// </summary>
+        internal void ApplyPostDropView()
+        {
             if (_filterCompleted)
                 _viewer.SetModelFilter(x => ((TreeNode<ToDoItem>)x).Value.Complete == false);
             _viewer.SortTree();
