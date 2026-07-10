@@ -22,13 +22,21 @@ namespace TaskVisualization
         // branch selection in AutoFind is measured without a live Outlook process.
         private readonly Func<object, MailItemHelper> _toHelper;
 
+        // MAPI category-creation seam. Production default calls the live
+        // CreateCategoryModule against the running Outlook namespace; tests inject a
+        // stub so the forwarding of prefix/categoryName is measured without a live
+        // MAPI process.
+        private readonly Func<IPrefix, string, Category> _createCategory;
+
         public AutoAssignPeople(
             IApplicationGlobals globals,
-            Func<object, MailItemHelper> toHelper = null
+            Func<object, MailItemHelper> toHelper = null,
+            Func<IPrefix, string, Category> createCategory = null
         )
         {
             _globals = globals;
             _toHelper = toHelper ?? DefaultToHelper;
+            _createCategory = createCategory ?? DefaultCreateCategory;
         }
 
         public IList<string> FilterList
@@ -103,9 +111,6 @@ namespace TaskVisualization
             return new MailItemHelper(mailItem as MailItem, _globals);
         }
 
-        // Outlook-bound: reads recipients from a live MailItem to add missing
-        // people entries. Not unit-testable without a running Outlook process.
-        [ExcludeFromCodeCoverage]
         public IList<string> AddChoicesToDict(
             MailItem olMail,
             IList<IPrefix> prefixes,
@@ -116,10 +121,15 @@ namespace TaskVisualization
             return _globals.TD.People.AddMissingEntries(olMail);
         }
 
-        // MAPI-bound: creates a live Outlook category. Not unit-testable without a
-        // running Outlook process.
-        [ExcludeFromCodeCoverage]
         public Category AddColorCategory(IPrefix prefix, string categoryName)
+        {
+            return _createCategory(prefix, categoryName);
+        }
+
+        // MAPI-bound default: creates a live Outlook category. Not unit-testable
+        // without a running Outlook process.
+        [ExcludeFromCodeCoverage]
+        private Category DefaultCreateCategory(IPrefix prefix, string categoryName)
         {
             return CreateCategoryModule.CreateCategory(
                 olNS: _globals.Ol.NamespaceMAPI,

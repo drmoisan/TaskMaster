@@ -29,7 +29,7 @@ exemption. Testable seams are never exempt.
 `EditFilterController.cs`
 - `DefaultViewerFactory()` — default seam: `new EditFilterViewer()` (live Form). Tests inject a `Mock<IEditFilterViewer>`. Reducibility: the entire controller uses the injected seam; only the production default constructs a form.
 - `DefaultTagSelector(...)` — default seam: `new TagViewer()` + `ShowDialog()` (modal dialog). Tests inject a canned `(cancelled, selection)`. Reducibility: selection logic runs through the injected delegate; only the default shows a dialog.
-- `DeleteFilterDialog(...)` (static) — **ADDED beyond plan.** Constructs the viewer via the default factory and calls `viewer.ShowDialog()`. Irreducible live-form bridge; not unit-testable under the STA/no-form policy. Reducibility: no branch logic beyond the OK/cancel `DialogResult` check that only a live modal can produce; nothing coverable is hidden.
+- `DeleteFilterDialog(...)` (static) — **REMOVED (M1, remediation cycle 1).** The dead static live-form bridge and its only caller path (the private single-argument constructor and the `System.Windows.Forms` using) were deleted; it is no longer an exempt site.
 
 `FlagTasks.cs` (Outlook-bound; no cheap seam)
 - `ctor`, `Run`, `InitializeToDoList`, `PopulateUdf`, `GetSelection`, `GetUserInputFlagsToAdjust` — `ActiveExplorer()`/`Selection`/`MessageBox.Show`/`new TaskViewer()`/`new TaskController()`. Reducibility: all pure flag math extracted to `FlagCalculations.cs` (measured, >= 90%); statics delegate to it.
@@ -49,28 +49,29 @@ exemption. Testable seams are never exempt.
 `AutoAssignPeople.cs`
 - `RunPeopleClassifier` — `AutoFile.AutoFindPeople` on a live helper (may show a missing-recipients dialog).
 - `DefaultToHelper` — constructs `MailItemHelper` from a live `MailItem`.
-- **`AddChoicesToDict`** — single call `_globals.TD.People.AddMissingEntries(olMail)` reading recipients from a live `MailItem`.
-- **`AddColorCategory`** — single call `CreateCategoryModule.CreateCategory(...)` against live MAPI.
-- Reducibility: `FilterList`, the `AutoFind(null)`/unknown-type early-return `[]` branches, and the `MailItem`-branch routing through the `_toHelper` seam are measured. Each exempt member is a one-line irreducible COM call.
+- `DefaultCreateCategory` — **ADDED (B2, remediation cycle 1).** Default of the injected `_createCategory` seam; single call `CreateCategoryModule.CreateCategory(...)` against live MAPI. Tests inject a stub delegate. Reducibility: the entire `AddColorCategory` forwarding runs through the injected seam; only the default performs the live MAPI call.
+- Reducibility: `AddChoicesToDict` is now **measured (B1, remediation cycle 1)** — the exemption was removed and a Moq `IPeopleScoDictionaryNew` pass-through test forwards a `MailItem` and asserts the returned list. `AddColorCategory` is now **measured (B2, remediation cycle 1)** — the exemption was removed and it delegates to the injected `_createCategory` seam; only the live MAPI call remains behind the newly exempt `DefaultCreateCategory`. `FilterList`, the `AutoFind(null)`/unknown-type early-return `[]` branches, and the `MailItem`-branch routing through the `_toHelper` seam are measured.
 
 `ManageFiltersController.cs`
 - `DefaultEditFilterFactory(...)` — **ADDED beyond plan.** The production default of the injected `_editFilterFactory` seam; constructs an `EditFilterController`, which builds and shows a live WinForms form. Irreducible live-form bridge; not unit-testable under the STA/no-form policy. Reducibility: the only logic is the null-vs-non-null entry ternary selecting which `EditFilterController` constructor to call; that branch selection is asserted through the **injected** seam in the `AddFilter` (null) and `EditSelected` (non-null) tests, so no coverable logic is hidden. All orchestration (`LoadFilters`, `EditSelected`, `AddFilter`, `EditFilterCallback`, `DeleteSelected`) remains measured at 100%.
 
 ### Beyond-plan sites flagged for maintainer ratification
 
-Four exemptions go beyond the plan's explicit enumeration; each is a single irreducible
-live-host statement with no hidden coverable logic:
+Remediation cycle 1 resolved the four #298 findings. B1 removed the
+`AutoAssignPeople.AddChoicesToDict` exemption (now measured); B2 removed the
+`AutoAssignPeople.AddColorCategory` exemption (now measured) and moved the live MAPI
+call behind the newly exempt `AutoAssignPeople.DefaultCreateCategory` seam; M1 deleted
+the dead static `EditFilterController.DeleteFilterDialog`. Two exemptions remain beyond
+the plan's explicit enumeration; each is a single irreducible live-host statement with
+no hidden coverable logic:
 
-1. `AutoAssignPeople.AddChoicesToDict` — `_globals.TD.People.AddMissingEntries(liveMailItem)` (live recipient read). Unlike `AutoAssignContext`'s `NotImplementedException` stub (measured via throw test), this is a genuine COM call.
-2. `AutoAssignPeople.AddColorCategory` — MAPI `CreateCategoryModule.CreateCategory(...)` (live category creation).
-3. `EditFilterController.DeleteFilterDialog` (static) — default-factory viewer + `ShowDialog()` (live modal).
-4. `ManageFiltersController.DefaultEditFilterFactory` — default of the injected factory seam; builds a live-form controller.
+1. `AutoAssignPeople.DefaultCreateCategory` — default of the injected `_createCategory` seam; MAPI `CreateCategoryModule.CreateCategory(...)` (live category creation). The forwarding logic in `AddColorCategory` is measured through the injected stub delegate.
+2. `ManageFiltersController.DefaultEditFilterFactory` — default of the injected factory seam; builds a live-form controller.
 
-Sites 3 and 4 were required to satisfy the plan's own `>= 90%` new-class threshold
-without violating the higher-authority STA/no-form policy (the two directives conflict
-at these irreducible live-form bridges). Coverage post-exemption: `ManageFiltersController`
-100%, `EditFilterController` 95.07% (see `qa-gates/coverage-delta.md`). Maintainer
-ratification requested for all four sites.
+Site 2 was required to satisfy the plan's own `>= 90%` new-class threshold without
+violating the higher-authority STA/no-form policy (the two directives conflict at this
+irreducible live-form bridge). Coverage post-exemption: `ManageFiltersController` 100%.
+Maintainer ratification requested for both sites.
 
 ## NEVER exempt (measured)
 

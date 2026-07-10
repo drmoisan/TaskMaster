@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Windows.Forms;
 using Tags;
 using ToDoModel;
 using UtilitiesCS;
@@ -57,11 +56,6 @@ namespace TaskVisualization
 
         public EditFilterController() { }
 
-        private EditFilterController(IApplicationGlobals appGlobals)
-        {
-            _globals = appGlobals;
-        }
-
         public EditFilterController(
             IApplicationGlobals appGlobals,
             Action<EditFilterController, FilterEntry> callback
@@ -107,28 +101,6 @@ namespace TaskVisualization
             }
             _globals = appGlobals;
             Initialize();
-        }
-
-        // Irreducible live-form bridge: constructs the viewer via the default factory
-        // and shows a modal dialog. Not unit-testable without a live WinForms form.
-        [ExcludeFromCodeCoverage]
-        public static bool DeleteFilterDialog(
-            IApplicationGlobals appGlobals,
-            FilterEntry filterEntry
-        )
-        {
-            var fd = new EditFilterController(appGlobals);
-            var viewer = fd.InitializeFactory();
-            viewer.Text = "Are you sure you want to delete this filter?";
-            DialogResult result = viewer.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
 
         private FilterEntry _filterEntryCopy;
@@ -203,8 +175,6 @@ namespace TaskVisualization
                 setText(selections.AsStringNoPrefix);
             }
         }
-
-        internal void SetUpDeleteDialog() { }
 
         #endregion Major Actions
 

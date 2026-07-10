@@ -91,8 +91,7 @@ namespace TaskVisualization.Test
             var viewer = new Mock<IEditFilterViewer>();
             viewer.Setup(v => v.FilterNameText).Returns("Fresh");
             FilterEntry committed = null;
-            var controller = Build(viewer, filterEntry: null, callback: (c, fe) => committed = fe);
-            controller.SetUpDeleteDialog(); // no-op hook; kept covered
+            Build(viewer, filterEntry: null, callback: (c, fe) => committed = fe);
 
             viewer.Raise(v => v.OkClick += null, viewer.Object, EventArgs.Empty);
 

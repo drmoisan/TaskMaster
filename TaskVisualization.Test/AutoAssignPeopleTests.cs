@@ -19,11 +19,18 @@ namespace TaskVisualization.Test
     [TestClass]
     public class AutoAssignPeopleTests
     {
-        private static Mock<IApplicationGlobals> BuildGlobals(IList<string> categoryFilters = null)
+        private static Mock<IApplicationGlobals> BuildGlobals(
+            IList<string> categoryFilters = null,
+            Mock<IPeopleScoDictionaryNew> people = null
+        )
         {
             var td = new Mock<IToDoObjects>();
             var cfList = categoryFilters ?? new List<string> { "a", "b" };
             td.Setup(x => x.CategoryFilters).Returns(BuildFilterList(cfList));
+            if (people != null)
+            {
+                td.Setup(x => x.People).Returns(people.Object);
+            }
 
             var globals = new Mock<IApplicationGlobals>();
             globals.Setup(x => x.TD).Returns(td.Object);
@@ -92,6 +99,55 @@ namespace TaskVisualization.Test
 
             act.Should().Throw<InvalidOperationException>().WithMessage("seam-invoked");
             seamInvoked.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void AddChoicesToDict_PassesMailItemThrough_ReturnsPeopleDictionaryResult()
+        {
+            // AddChoicesToDict forwards the live MailItem to the injected People
+            // dictionary and returns its result verbatim. A Moq IPeopleScoDictionaryNew
+            // proves the pass-through without a live Outlook process or recipient data.
+            var cannedList = new List<string> { "alice", "bob" };
+            var mail = new Mock<MailItem>();
+            var people = new Mock<IPeopleScoDictionaryNew>();
+            people.Setup(p => p.AddMissingEntries(It.IsAny<MailItem>())).Returns(cannedList);
+
+            var sut = new AutoAssignPeople(BuildGlobals(people: people).Object);
+
+            var result = sut.AddChoicesToDict(mail.Object, null, null, null);
+
+            result.Should().BeEquivalentTo(cannedList);
+            people.Verify(p => p.AddMissingEntries(mail.Object), Times.Once);
+        }
+
+        [TestMethod]
+        public void AddColorCategory_ForwardsPrefixAndName_ReturnsSeamCategory()
+        {
+            // AddColorCategory delegates to the injected category-creation seam,
+            // forwarding the prefix and category name and returning the seam's
+            // Category. A stub delegate proves the forwarding without a live MAPI call.
+            var prefix = new Mock<IPrefix>().Object;
+            var categoryName = "TagAlpha";
+            var canned = new Mock<Category>().Object;
+            IPrefix receivedPrefix = null;
+            string receivedName = null;
+            Category StubCreateCategory(IPrefix p, string n)
+            {
+                receivedPrefix = p;
+                receivedName = n;
+                return canned;
+            }
+
+            var sut = new AutoAssignPeople(
+                BuildGlobals().Object,
+                createCategory: StubCreateCategory
+            );
+
+            var result = sut.AddColorCategory(prefix, categoryName);
+
+            result.Should().BeSameAs(canned);
+            receivedPrefix.Should().BeSameAs(prefix);
+            receivedName.Should().Be(categoryName);
         }
     }
 }
