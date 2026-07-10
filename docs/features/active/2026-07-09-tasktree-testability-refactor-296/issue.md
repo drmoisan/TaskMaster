@@ -37,14 +37,14 @@ exist), so the project has 0% unit-test coverage.
 
 ## Acceptance Criteria (early draft)
 
-- [ ] `ITaskTreeForm` exists, derives from `IForm`, and `TaskTreeForm` implements it.
-- [ ] `TaskTreeController` depends on `ITaskTreeForm`, not the concrete form.
-- [ ] Host-neutral logic separated from COM/WinForms interaction.
-- [ ] No production file in `TaskTree` exceeds 500 lines.
-- [ ] `TaskTree.Test` project exists, follows the repo MSTest pattern, and is in the solution.
-- [ ] No unit test constructs a live form/window or triggers a popup.
-- [ ] `TaskTree` project reaches >= 80% line coverage.
-- [ ] Full C# toolchain (csharpier → analyzers → nullable → MSTest) passes with no regression.
+- [x] `ITaskTreeForm` exists, derives from `IForm`, and `TaskTreeForm` implements it.
+- [x] `TaskTreeController` depends on `ITaskTreeForm`, not the concrete form.
+- [x] Host-neutral logic separated from COM/WinForms interaction.
+- [x] No production file in `TaskTree` exceeds 500 lines.
+- [x] `TaskTree.Test` project exists, follows the repo MSTest pattern, and is in the solution.
+- [x] No unit test constructs a live form/window or triggers a popup.
+- [x] `TaskTree` project reaches >= 80% line coverage.
+- [x] Full C# toolchain (csharpier → analyzers → nullable → MSTest) passes with no regression.
 
 ## Constraints & Risks
 
@@ -57,9 +57,9 @@ exist), so the project has 0% unit-test coverage.
 
 ## Test Conditions to Consider
 
-- [ ] Tree/business-logic units covered with pure inputs.
-- [ ] Dialog-driven or UI-bound paths covered via seams (no popups).
-- [ ] Event handler logic covered via a mocked `ITaskTreeForm`.
+- [x] Tree/business-logic units covered with pure inputs.
+- [x] Dialog-driven or UI-bound paths covered via seams (no popups).
+- [x] Event handler logic covered via a mocked `ITaskTreeForm`.
 
 ## Next Step
 

@@ -1,124 +1,156 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Microsoft.Office.Interop.Outlook;
 using Tags;
 using ToDoModel;
 using UtilitiesCS;
 
 namespace TaskVisualization
 {
-    [ExcludeFromCodeCoverage]
     internal class EditFilterController
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
 
+        #region Seams
+
+        // Viewer factory seam: production creates the concrete WinForms form; tests
+        // inject a Mock<IEditFilterViewer> so no live form is constructed.
+        private Func<IEditFilterViewer> _viewerFactory = DefaultViewerFactory;
+
+        // Tag-dialog seam: production shows the Tags dialog; tests inject a canned
+        // (cancelled, selection) result so no popup is shown. Narrow per-call
+        // delegate chosen over the broader ITagPromptService (see Phase 0 P0-T3).
+        private Func<
+            SortedDictionary<string, bool>,
+            (bool cancelled, string selection)
+        > _tagSelector = DefaultTagSelector;
+
+        [ExcludeFromCodeCoverage]
+        private static IEditFilterViewer DefaultViewerFactory() => new EditFilterViewer();
+
+        // Outlook/UI-bound: constructs the Tags viewer/controller and shows a modal
+        // dialog; not unit-testable without a live form.
+        [ExcludeFromCodeCoverage]
+        private static (bool cancelled, string selection) DefaultTagSelector(
+            SortedDictionary<string, bool> dictOptions
+        )
+        {
+            using (var viewer = new TagViewer())
+            {
+                var controller = new TagController(viewer, dictOptions);
+                viewer.ShowDialog();
+                if (controller.ExitType != "Cancel")
+                {
+                    return (false, controller.SelectionAsString());
+                }
+                return (true, null);
+            }
+        }
+
+        #endregion Seams
+
         #region Constructors and Initializers
 
         public EditFilterController() { }
-
-        private EditFilterController(IApplicationGlobals appGlobals)
-        {
-            _globals = appGlobals;
-        }
 
         public EditFilterController(
             IApplicationGlobals appGlobals,
             Action<EditFilterController, FilterEntry> callback
         )
-        {
-            _callback = callback;
-            _filterEntry = new FilterEntry();
-            _globals = appGlobals;
-            Initialize();
-        }
+            : this(appGlobals, null, callback, null, null) { }
 
         public EditFilterController(IApplicationGlobals appGlobals, FilterEntry filterEntry)
-        {
-            _filterEntryCopy = (FilterEntry)filterEntry.Clone();
-            _filterEntry = filterEntry;
-            _globals = appGlobals;
-            Initialize();
-        }
+            : this(appGlobals, filterEntry, null, null, null) { }
 
-        public static bool DeleteFilterDialog(
+        /// <summary>
+        /// Core constructor. Public constructors funnel here with default seams so
+        /// their behavior is unchanged; <c>TaskVisualization.Test</c> uses this
+        /// overload (via <c>InternalsVisibleTo</c>) to inject the viewer factory and
+        /// tag-selector seams. When <paramref name="filterEntry"/> is null a fresh
+        /// <see cref="FilterEntry"/> is created (add-filter path); otherwise the
+        /// supplied entry is used and a revert copy is cloned (edit-filter path).
+        /// </summary>
+        internal EditFilterController(
             IApplicationGlobals appGlobals,
-            FilterEntry filterEntry
+            FilterEntry filterEntry,
+            Action<EditFilterController, FilterEntry> callback,
+            Func<IEditFilterViewer> viewerFactory,
+            Func<SortedDictionary<string, bool>, (bool cancelled, string selection)> tagSelector
         )
         {
-            var fd = new EditFilterController(appGlobals);
-            var viewer = fd.InitializeFactory();
-            viewer.Text = "Are you sure you want to delete this filter?";
-            DialogResult result = viewer.ShowDialog();
-            if (result == DialogResult.OK)
+            if (viewerFactory is not null)
             {
-                return true;
+                _viewerFactory = viewerFactory;
+            }
+            if (tagSelector is not null)
+            {
+                _tagSelector = tagSelector;
+            }
+            _callback = callback;
+            if (filterEntry is not null)
+            {
+                _filterEntryCopy = (FilterEntry)filterEntry.Clone();
+                _filterEntry = filterEntry;
             }
             else
             {
-                return false;
+                _filterEntry = new FilterEntry();
             }
+            _globals = appGlobals;
+            Initialize();
         }
 
         private FilterEntry _filterEntryCopy;
         private FilterEntry _filterEntry;
         Action<EditFilterController, FilterEntry> _callback;
-        private EditFilterViewer _viewer;
+        private IEditFilterViewer _viewer;
         private IApplicationGlobals _globals;
         private FlagClassNoItem _olFlags;
         private ToDoDefaults _defaults;
-        private List<QfcTipsDetails> _tips;
 
         internal void Initialize()
         {
-            _viewer = new EditFilterViewer();
+            _viewer = _viewerFactory();
 
             _defaults = new ToDoDefaults();
 
             _olFlags = new FlagClassNoItem(_globals.Ol.NamespaceMAPI.Categories);
 
-            if (!_filterEntry.Flags.Context.AsStringNoPrefix.IsNullOrEmpty())
-                _viewer.ContextSelection.Text = _filterEntry.Flags.Context.AsStringNoPrefix;
-            if (!_filterEntry.Flags.People.AsStringNoPrefix.IsNullOrEmpty())
-                _viewer.PeopleSelection.Text = _filterEntry.Flags.People.AsStringNoPrefix;
-            if (!_filterEntry.Flags.Projects.AsStringNoPrefix.IsNullOrEmpty())
-                _viewer.ProjectSelection.Text = _filterEntry.Flags.Projects.AsStringNoPrefix;
-            if (!_filterEntry.Flags.Topics.AsStringNoPrefix.IsNullOrEmpty())
-                _viewer.TopicSelection.Text = _filterEntry.Flags.Topics.AsStringNoPrefix;
+            ApplySelectionText();
 
-            _tips = _viewer.GetTips().Select(label => new QfcTipsDetails(label)).ToList();
-            _tips.ForEach(tip => tip.Toggle(Enums.ToggleState.Off));
+            _viewer.ResetTips();
 
             RegisterEventHandlers();
 
             _viewer.Show();
         }
 
-        internal EditFilterViewer InitializeFactory()
+        internal IEditFilterViewer InitializeFactory()
         {
-            _viewer = new EditFilterViewer();
+            _viewer = _viewerFactory();
 
             _defaults = new ToDoDefaults();
 
             _olFlags = new FlagClassNoItem(_globals.Ol.NamespaceMAPI.Categories);
 
-            if (!_filterEntry.Flags.Context.AsStringNoPrefix.IsNullOrEmpty())
-                _viewer.ContextSelection.Text = _filterEntry.Flags.Context.AsStringNoPrefix;
-            if (!_filterEntry.Flags.People.AsStringNoPrefix.IsNullOrEmpty())
-                _viewer.PeopleSelection.Text = _filterEntry.Flags.People.AsStringNoPrefix;
-            if (!_filterEntry.Flags.Projects.AsStringNoPrefix.IsNullOrEmpty())
-                _viewer.ProjectSelection.Text = _filterEntry.Flags.Projects.AsStringNoPrefix;
-            if (!_filterEntry.Flags.Topics.AsStringNoPrefix.IsNullOrEmpty())
-                _viewer.TopicSelection.Text = _filterEntry.Flags.Topics.AsStringNoPrefix;
+            ApplySelectionText();
 
             return _viewer;
+        }
+
+        private void ApplySelectionText()
+        {
+            if (!_filterEntry.Flags.Context.AsStringNoPrefix.IsNullOrEmpty())
+                _viewer.ContextSelectionText = _filterEntry.Flags.Context.AsStringNoPrefix;
+            if (!_filterEntry.Flags.People.AsStringNoPrefix.IsNullOrEmpty())
+                _viewer.PeopleSelectionText = _filterEntry.Flags.People.AsStringNoPrefix;
+            if (!_filterEntry.Flags.Projects.AsStringNoPrefix.IsNullOrEmpty())
+                _viewer.ProjectSelectionText = _filterEntry.Flags.Projects.AsStringNoPrefix;
+            if (!_filterEntry.Flags.Topics.AsStringNoPrefix.IsNullOrEmpty())
+                _viewer.TopicSelectionText = _filterEntry.Flags.Topics.AsStringNoPrefix;
         }
 
         #endregion Constructors and Initializers
@@ -129,26 +161,20 @@ namespace TaskVisualization
             FlagTranslator options,
             FlagTranslator selections,
             IPrefix prefix,
-            System.Windows.Forms.Label label
+            Action<string> setText
         )
         {
             var dictOptions = options
                 .AsListWithPrefix.Select(s => new KeyValuePair<string, bool>(s, false))
                 .ToSortedDictionary();
 
-            using (var viewer = new TagViewer())
+            var (cancelled, selection) = _tagSelector(dictOptions);
+            if (!cancelled)
             {
-                var controller = new TagController(viewer, dictOptions);
-                viewer.ShowDialog();
-                if (controller.ExitType != "Cancel")
-                {
-                    selections.AsStringNoPrefix = controller.SelectionAsString();
-                    label.Text = selections.AsStringNoPrefix;
-                }
+                selections.AsStringNoPrefix = selection;
+                setText(selections.AsStringNoPrefix);
             }
         }
-
-        internal void SetUpDeleteDialog() { }
 
         #endregion Major Actions
 
@@ -156,13 +182,13 @@ namespace TaskVisualization
 
         internal void RegisterEventHandlers()
         {
-            _viewer.ContextSelection.Click += CategorySelection_Click;
-            _viewer.PeopleSelection.Click += PeopleSelection_Click;
-            _viewer.ProjectSelection.Click += ProjectSelection_Click;
-            _viewer.TopicSelection.Click += TopicSelection_Click;
-            _viewer.FoldersSelected.Click += FoldersSelected_Click;
-            _viewer.BtnOk.Click += BtnOk_Click;
-            _viewer.BtnCancel.Click += BtnCancel_Click;
+            _viewer.ContextSelectionClick += CategorySelection_Click;
+            _viewer.PeopleSelectionClick += PeopleSelection_Click;
+            _viewer.ProjectSelectionClick += ProjectSelection_Click;
+            _viewer.TopicSelectionClick += TopicSelection_Click;
+            _viewer.FoldersSelectedClick += FoldersSelected_Click;
+            _viewer.OkClick += BtnOk_Click;
+            _viewer.CancelClick += BtnCancel_Click;
         }
 
         private void CategorySelection_Click(object sender, EventArgs e)
@@ -172,7 +198,7 @@ namespace TaskVisualization
                 _olFlags.Context,
                 _filterEntry.Flags.Context,
                 prefix,
-                _viewer.ContextSelection
+                s => _viewer.ContextSelectionText = s
             );
         }
 
@@ -183,7 +209,7 @@ namespace TaskVisualization
                 _olFlags.People,
                 _filterEntry.Flags.People,
                 prefix,
-                _viewer.PeopleSelection
+                s => _viewer.PeopleSelectionText = s
             );
         }
 
@@ -194,14 +220,19 @@ namespace TaskVisualization
                 _olFlags.Projects,
                 _filterEntry.Flags.Projects,
                 prefix,
-                _viewer.ProjectSelection
+                s => _viewer.ProjectSelectionText = s
             );
         }
 
         private void TopicSelection_Click(object sender, EventArgs e)
         {
             var prefix = _defaults.PrefixList.Find(x => x.PrefixType == PrefixTypeEnum.Topic);
-            SelectItems(_olFlags.Topics, _filterEntry.Flags.Topics, prefix, _viewer.TopicSelection);
+            SelectItems(
+                _olFlags.Topics,
+                _filterEntry.Flags.Topics,
+                prefix,
+                s => _viewer.TopicSelectionText = s
+            );
         }
 
         private void FoldersSelected_Click(object sender, EventArgs e) { }
@@ -218,7 +249,7 @@ namespace TaskVisualization
         private void BtnOk_Click(object sender, EventArgs e)
         {
             _viewer.Hide();
-            _filterEntry.Name = _viewer.FilterName.Text;
+            _filterEntry.Name = _viewer.FilterNameText;
             if (_callback is not null)
             {
                 _callback(this, _filterEntry);

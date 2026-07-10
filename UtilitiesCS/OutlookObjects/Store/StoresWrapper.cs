@@ -41,7 +41,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             // build Stores from that same list. Behavior-preserving: identical included set
             // and order to the prior GetFilteredStores().Select(...). Stopwatch only.
             var filteredStoresStopwatch = Stopwatch.StartNew();
-            var filteredStores = GetFilteredStores().ToList();
+            var filteredStores = MaterializeFilteredStores();
             logger.Debug(
                 $"[store-filter] GetFilteredStores completed: {filteredStores.Count} stores in {filteredStoresStopwatch.ElapsedMilliseconds} ms"
             );
@@ -86,7 +86,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             this.Stores ??= [];
             var totalStopwatch = Stopwatch.StartNew();
             var filteredStoresStopwatch = Stopwatch.StartNew();
-            var stores = GetFilteredStores().ToList();
+            var stores = MaterializeFilteredStores();
             logger.Debug(
                 $"[Startup timing] GetFilteredStores completed: {stores.Count} stores in {filteredStoresStopwatch.ElapsedMilliseconds} ms"
             );
@@ -162,6 +162,26 @@ namespace UtilitiesCS.OutlookObjects.Store
             );
 
             return storeWrapper;
+        }
+
+        /// <summary>
+        /// Materializes the filtered <c>Namespace.Stores</c> set inside an ambient
+        /// <see cref="CurrentStoreContext"/> enumeration-phase scope (issue #292). The raw COM
+        /// enumeration can block the STA on the first <c>IEnumVARIANT::Next()</c> — before any store
+        /// is yielded and before any per-store scope opens — so wrapping the materialization makes the
+        /// watchdog observe the enumeration-phase identity instead of a blank attribution. The scope is
+        /// observational only: the included set and enumeration order are identical to
+        /// <c>GetFilteredStores().ToList()</c>. The <c>using</c> guarantees the prior ambient value is
+        /// restored on normal completion and on a thrown <c>COMException</c>, so the phase identity
+        /// cannot leak into a later, unrelated attribution.
+        /// </summary>
+        /// <returns>The filtered, materialized list of stores in enumeration order.</returns>
+        private List<Outlook.Store> MaterializeFilteredStores()
+        {
+            using (CurrentStoreContext.Begin(CurrentStoreContext.StoresEnumerationPhaseIdentity))
+            {
+                return GetFilteredStores().ToList();
+            }
         }
 
         private IEnumerable<Outlook.Store> GetFilteredStores()

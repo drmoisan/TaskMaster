@@ -11,6 +11,7 @@ using UtilitiesCS.OutlookObjects.Store;
 namespace UtilitiesCS.Test.OutlookObjects.Store
 {
     [TestClass]
+    [DoNotParallelize]
     public partial class StoreWrapperController_Tests
     {
         #region RunFolderSelectionDialog

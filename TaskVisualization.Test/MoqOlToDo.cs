@@ -134,6 +134,7 @@ namespace TaskVisualization.Test
         )
         {
             var email = new Mock<MailItem>();
+            email.Setup(x => x.EntryID).Returns("mock-entry-id");
             email.Setup(x => x.TaskSubject).Returns(TaskSubject);
             email.Setup(x => x.Subject).Returns(TaskSubject);
             email.Setup(x => x.Importance).Returns(olImportance);

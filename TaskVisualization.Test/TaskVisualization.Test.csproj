@@ -54,8 +54,29 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="FlagTasks_Test.cs" />
+    <Compile Include="FlagCalculationsTests.cs" />
+    <Compile Include="FlagChangeItemTests.cs" />
+    <Compile Include="FlagChangeGroupTests.cs" />
+    <Compile Include="FlagChangeTrainingQueueTests.cs" />
+    <Compile Include="AutoCreateProjectTests.cs" />
+    <Compile Include="AutoAssignContextTests.cs" />
+    <Compile Include="AutoAssignPeopleTests.cs" />
+    <Compile Include="EditFilterControllerTests.cs" />
+    <Compile Include="ManageFiltersControllerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MoqOlToDo.cs" />
+    <Compile Include="MoqTaskViewer.cs" />
+    <Compile Include="TaskControllerFixtures.cs" />
+    <Compile Include="TaskControllerTests.cs" />
+    <Compile Include="TaskDurationParserTests.cs" />
+    <Compile Include="TaskPriorityMapperTests.cs" />
+    <Compile Include="TaskControllerActionsTests.cs" />
+    <Compile Include="TaskControllerMergeTests.cs" />
+    <Compile Include="TaskControllerFlagsTests.cs" />
+    <Compile Include="StaControlHarness.cs" />
+    <Compile Include="TaskControllerControlMaps.StaTests.cs" />
+    <Compile Include="TaskControllerAccelerator.StaTests.cs" />
+    <Compile Include="TaskControllerAcceleratorKeyboard.StaTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Azure.Core, Version=1.55.0.0, Culture=neutral, PublicKeyToken=92742159e12e44c8, processorArchitecture=MSIL">
@@ -272,6 +293,10 @@
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
       <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
       <Name>UtilitiesCS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj">
+      <Project>{f2e1680e-1b15-4cf2-bab0-54b8c8f6abdf}</Project>
+      <Name>UtilitiesSwordfish.NET.General</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

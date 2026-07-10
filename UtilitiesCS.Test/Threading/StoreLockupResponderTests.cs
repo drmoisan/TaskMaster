@@ -199,5 +199,44 @@ namespace UtilitiesCS.Test.Threading
             disable.Verify(d => d.DisableForFutureSessions(It.IsAny<StoreIdentity>()), Times.Once);
             disable.Verify(d => d.ReenableAsync(It.IsAny<StoreIdentity>()), Times.Once);
         }
+
+        [TestMethod]
+        public void OnLockupDetected_StoresEnumerationPhaseIdentity_WarnsWithoutDisabling()
+        {
+            // Issue #292 T3: a stall attributed to the Namespace.Stores enumeration phase (a non-null,
+            // non-store phase identity) must emit exactly one [store-lockup] WARN line with
+            // autoDisabled=false and return WITHOUT touching the disable-service write path. A strict
+            // disable service asserts zero IsDisabled/DisableSessionOnly calls, which closes the
+            // verified InvalidOperationException watchdog-thread crash path (null model during the
+            // fresh-build window) and the #265 disabled-store UI pollution path.
+            // Arrange
+            var disable = new Mock<IStoreDisableService>(MockBehavior.Strict);
+            var dispatcher = PassThroughDispatcher();
+            var logs = new List<string>();
+            var responder = new StoreLockupResponder(
+                disable.Object,
+                dispatcher.Object,
+                notify: (id, a, b, c) => { },
+                logSink: logs.Add
+            );
+
+            // Act
+            responder.OnLockupDetected(
+                new LockupAttribution(
+                    TimeSpan.FromSeconds(6),
+                    CurrentStoreContext.StoresEnumerationPhaseIdentity
+                )
+            );
+
+            // Assert: exactly one phase-attributed WARN line with autoDisabled=false, and zero
+            // disable-service calls (the strict mock would throw on any interaction).
+            logs.Should().ContainSingle();
+            logs[0]
+                .Should()
+                .Be(
+                    "[store-lockup] identity=<Stores-enumeration> stallMs=6000.0 autoDisabled=false"
+                );
+            disable.VerifyNoOtherCalls();
+        }
     }
 }

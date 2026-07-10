@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,44 +14,76 @@ using UtilitiesCS;
 namespace TaskVisualization
 {
     [ExcludeFromCodeCoverage]
-    public partial class ManageFilters : Form
+    public partial class ManageFilters : Form, IManageFiltersViewer
     {
         public ManageFilters()
         {
             InitializeComponent();
         }
 
-        private IApplicationGlobals _globals;
+        private ManageFiltersController _controller;
 
+        /// <summary>
+        /// Preserved public surface (invariant 2): builds the host-neutral
+        /// <see cref="ManageFiltersController"/> and delegates load to it.
+        /// </summary>
         public void LoadFilters(IApplicationGlobals globals)
         {
-            _globals = globals;
-            this.FiltersOlv.SetObjects(_globals.AF.Filters);
+            _controller = new ManageFiltersController(this, globals);
+            _controller.LoadFilters();
         }
+
+        #region IManageFiltersViewer pass-throughs
+
+        public FilterEntry SelectedFilter => (FilterEntry)FiltersOlv.SelectedItem.RowObject;
+
+        public void SetFilters(IEnumerable<FilterEntry> filters)
+        {
+            FiltersOlv.SetObjects(filters);
+        }
+
+        public void RebuildList()
+        {
+            FiltersOlv.BuildList();
+        }
+
+        public event EventHandler AddFilterClick
+        {
+            add => BtnAddFilter.Click += value;
+            remove => BtnAddFilter.Click -= value;
+        }
+
+        public event EventHandler EditFilterClick
+        {
+            add => BtnEditFilter.Click += value;
+            remove => BtnEditFilter.Click -= value;
+        }
+
+        public event EventHandler DeleteClick
+        {
+            add => BtnDelete.Click += value;
+            remove => BtnDelete.Click -= value;
+        }
+
+        #endregion IManageFiltersViewer pass-throughs
+
+        #region Designer-wired handlers (delegate to controller)
 
         private void BtnEditFilter_Click(object sender, EventArgs e)
         {
-            var filterEntry = (FilterEntry)FiltersOlv.SelectedItem.RowObject;
-            var editor = new EditFilterController(_globals, filterEntry);
+            _controller.EditSelected();
         }
 
         private void BtnAddFilter_Click(object sender, EventArgs e)
         {
-            var editor = new EditFilterController(_globals, EditFilterCallback);
-            FiltersOlv.SetObjects(_globals.AF.Filters);
-            FiltersOlv.BuildList();
-        }
-
-        private void EditFilterCallback(EditFilterController controller, FilterEntry filterEntry)
-        {
-            _globals.AF.Filters.Add(filterEntry);
-            _globals.AF.Filters.Serialize();
-            FiltersOlv.BuildList();
+            _controller.AddFilter();
         }
 
         private void BtnDelete_Click(object sender, EventArgs e)
         {
-            var filterEntry = (FilterEntry)FiltersOlv.SelectedItem.RowObject;
+            _controller.DeleteSelected();
         }
+
+        #endregion Designer-wired handlers (delegate to controller)
     }
 }

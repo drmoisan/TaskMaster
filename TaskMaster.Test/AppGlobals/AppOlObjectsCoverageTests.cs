@@ -17,6 +17,7 @@ using OutlookStore = Microsoft.Office.Interop.Outlook.Store;
 namespace TaskMaster.Test.AppGlobals
 {
     [TestClass]
+    [DoNotParallelize]
     public class AppOlObjectsCoverageTests
     {
         [TestMethod]

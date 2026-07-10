@@ -12,6 +12,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
     /// <see cref="Action{T}"/> sink. No live COM, no live timer, no network/filesystem, no temporary files.
     /// </summary>
     [TestClass]
+    [DoNotParallelize]
     public class StoreWrapperInitProbeTests
     {
         [TestMethod]

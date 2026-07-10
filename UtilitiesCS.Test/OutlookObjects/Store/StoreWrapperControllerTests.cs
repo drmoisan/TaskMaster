@@ -15,6 +15,7 @@ using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
 namespace UtilitiesCS.Test.OutlookObjects.Store
 {
     [TestClass]
+    [DoNotParallelize]
     public class StoreWrapperControllerTests
     {
         [TestMethod]

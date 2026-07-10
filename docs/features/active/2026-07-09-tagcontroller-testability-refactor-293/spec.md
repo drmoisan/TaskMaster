@@ -368,36 +368,36 @@ over-broad exemption. The remaining live-form launcher and globals/COM wiring st
 
 ## Definition of Done
 
-- [ ] Structure matches this spec; legacy paths retired or redirected
-- [ ] Invariants validated with tests or comparisons
-- [ ] Imports/tooling/entry points updated
-- [ ] Edge cases and error handling verified
-- [ ] Tests, linting, and type checks clean
-- [ ] Docs updated (initiative/README/tasks as needed)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
+- [x] Structure matches this spec; legacy paths retired or redirected
+- [x] Invariants validated with tests or comparisons
+- [x] Imports/tooling/entry points updated
+- [x] Edge cases and error handling verified
+- [x] Tests, linting, and type checks clean
+- [x] Docs updated (initiative/README/tasks as needed)
+- [x] Toolchain pass completed (format → lint → type-check → test)
 
 ### Acceptance Criteria (aligned with issue.md #293)
 
-- [ ] `ITagViewer` interface exists, derives from `IForm`, and exposes the members
+- [x] `ITagViewer` interface exists, derives from `IForm`, and exposes the members
       `TagController` requires; `TagViewer` implements it.
-- [ ] `TagController` depends on `ITagViewer`, not the concrete `TagViewer`.
-- [ ] Host-neutral business logic is separated from COM/WinForms interaction.
-- [ ] No resulting production file exceeds 500 lines.
-- [ ] Unit tests cover the named methods and related logic without constructing real
+- [x] `TagController` depends on `ITagViewer`, not the concrete `TagViewer`.
+- [x] Host-neutral business logic is separated from COM/WinForms interaction.
+- [x] No resulting production file exceeds 500 lines.
+- [x] Unit tests cover the named methods and related logic without constructing real
       WinForms objects; seams are introduced where required.
-- [ ] `TagController` (and extracted logic) reaches `>= 80%` line coverage.
-- [ ] The `Tags` project as a whole reaches `>= 80%` line coverage (epic #295 goal;
+- [x] `TagController` (and extracted logic) reaches `>= 80%` line coverage.
+- [x] The `Tags` project as a whole reaches `>= 80%` line coverage (epic #295 goal;
       includes `TagLauncher` and `CheckBoxController` coverage as needed).
-- [ ] No unit test constructs a live form/window or triggers a popup requiring human
+- [x] No unit test constructs a live form/window or triggers a popup requiring human
       interaction.
-- [ ] Full C# toolchain (csharpier → analyzers → nullable → MSTest) passes with no
+- [x] Full C# toolchain (csharpier → analyzers → nullable → MSTest) passes with no
       regression.
 
 ## Seeded Test Conditions (from potential)
-- [ ] Business-logic units (search parse, filter archive, prefix missing detection,
-- [ ] selection-as-list/string, toggle) covered with pure inputs.
-- [ ] Dialog-driven methods (`TryGetAutoAssignment`, `AddColorCategory`,
-- [ ] `GetUserInputCategory`) covered via seams that intercept `MessageBox`/`InputBox`.
-- [ ] Keyboard event handlers (`OptionsPanel_PreviewKeyDown`, `OptionsPanel_KeyDown`,
-- [ ] `TagViewer_KeyDown`, `SearchText_KeyDown/KeyUp`) covered with mocked `ITagViewer`.
-- [ ] Auto-assign flow covered with a mocked `IAutoAssign`.
+- [x] Business-logic units (search parse, filter archive, prefix missing detection,
+- [x] selection-as-list/string, toggle) covered with pure inputs.
+- [x] Dialog-driven methods (`TryGetAutoAssignment`, `AddColorCategory`,
+- [x] `GetUserInputCategory`) covered via seams that intercept `MessageBox`/`InputBox`.
+- [x] Keyboard event handlers (`OptionsPanel_PreviewKeyDown`, `OptionsPanel_KeyDown`,
+- [x] `TagViewer_KeyDown`, `SearchText_KeyDown/KeyUp`) covered with mocked `ITagViewer`.
+- [x] Auto-assign flow covered with a mocked `IAutoAssign`.
