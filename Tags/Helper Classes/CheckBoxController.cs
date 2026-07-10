@@ -1,11 +1,19 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 
 namespace Tags
 {
-    [ExcludeFromCodeCoverage]
+    /// <summary>
+    /// Wires an option <see cref="CheckBox"/> to its parent <see cref="TagController"/>. The click
+    /// state-machine decision is extracted into the host-neutral <see cref="DecideClick"/> helper
+    /// (register E6, narrowed): the <see cref="CtrlCB"/> subscribe/unsubscribe wiring, the
+    /// <see cref="ctrlCB_Click"/> wrapper, and <see cref="DecideClick"/> are NOT exempt from coverage.
+    /// Only the four members that require a shown window, a real focus transition, or protected-method
+    /// access (<see cref="ctrlCB_GotFocus"/>, <see cref="ctrlCB_LostFocus"/>, <see cref="ctrlCB_KeyDown"/>,
+    /// <see cref="ctrlCB_PreviewKeyDown"/>) retain <see cref="ExcludeFromCodeCoverageAttribute"/>.
+    /// </summary>
     public class CheckBoxController
     {
         public bool TrigByKeyChg;
@@ -57,31 +65,111 @@ namespace Tags
             }
         }
 
-        private void ctrlCB_Click(object sender, EventArgs e)
+        /// <summary>The action a checkbox click resolves to under the trigger state machine.</summary>
+        internal enum CheckBoxClickAction
         {
-            if (!TrigByKeyChg)
+            Toggle,
+            ResetFlags,
+            FlipCheck,
+        }
+
+        /// <summary>
+        /// Host-neutral outcome of <see cref="DecideClick"/>: the resolved action, the toggled choice
+        /// key (for <see cref="CheckBoxClickAction.Toggle"/>), and the next trigger-flag values.
+        /// </summary>
+        internal readonly struct CheckBoxClickDecision
+        {
+            public CheckBoxClickDecision(
+                CheckBoxClickAction action,
+                string resolvedChoice,
+                bool nextTrigByKeyChg,
+                bool nextTrigByValChg
+            )
             {
-                strTemp = CtrlCB.Tag as string;
-                if (string.IsNullOrEmpty(strTemp))
-                {
-                    strTemp = strTagPrefix + CtrlCB.Text;
-                }
-                _parent.ToggleChoice(strTemp);
-                _parent.FocusCheckbox(CtrlCB);
+                Action = action;
+                ResolvedChoice = resolvedChoice;
+                NextTrigByKeyChg = nextTrigByKeyChg;
+                NextTrigByValChg = nextTrigByValChg;
             }
-            else if (TrigByValChg)
+
+            public CheckBoxClickAction Action { get; }
+            public string ResolvedChoice { get; }
+            public bool NextTrigByKeyChg { get; }
+            public bool NextTrigByValChg { get; }
+        }
+
+        /// <summary>
+        /// Pure decision for a checkbox click: given the current trigger flags and the checkbox's Tag,
+        /// Text and prefix, returns the action to take and the resolved choice key. No WinForms state
+        /// is read or written here, which makes the state machine unit-testable.
+        /// </summary>
+        internal static CheckBoxClickDecision DecideClick(
+            bool trigByKeyChg,
+            bool trigByValChg,
+            string tag,
+            string text,
+            string prefix
+        )
+        {
+            if (!trigByKeyChg)
             {
-                TrigByKeyChg = false;
-                TrigByValChg = false;
+                string resolvedChoice = string.IsNullOrEmpty(tag) ? prefix + text : tag;
+                return new CheckBoxClickDecision(
+                    CheckBoxClickAction.Toggle,
+                    resolvedChoice,
+                    trigByKeyChg,
+                    trigByValChg
+                );
+            }
+            else if (trigByValChg)
+            {
+                return new CheckBoxClickDecision(
+                    CheckBoxClickAction.ResetFlags,
+                    null,
+                    false,
+                    false
+                );
             }
             else
             {
-                TrigByValChg = true;
-                CtrlCB.Checked = !CtrlCB.Checked;
+                return new CheckBoxClickDecision(
+                    CheckBoxClickAction.FlipCheck,
+                    null,
+                    trigByKeyChg,
+                    true
+                );
             }
-            // Me.ctrlCB.Value = Not Me.ctrlCB.Value
         }
 
+        private void ctrlCB_Click(object sender, EventArgs e)
+        {
+            var decision = DecideClick(
+                TrigByKeyChg,
+                TrigByValChg,
+                CtrlCB.Tag as string,
+                CtrlCB.Text,
+                strTagPrefix
+            );
+
+            switch (decision.Action)
+            {
+                case CheckBoxClickAction.Toggle:
+                    strTemp = decision.ResolvedChoice;
+                    _parent.ToggleChoice(strTemp);
+                    _parent.FocusCheckbox(CtrlCB);
+                    break;
+                case CheckBoxClickAction.ResetFlags:
+                    TrigByKeyChg = decision.NextTrigByKeyChg;
+                    TrigByValChg = decision.NextTrigByValChg;
+                    break;
+                case CheckBoxClickAction.FlipCheck:
+                    TrigByValChg = decision.NextTrigByValChg;
+                    CtrlCB.Checked = !CtrlCB.Checked;
+                    break;
+            }
+        }
+
+        [ExcludeFromCodeCoverage]
         private void ctrlCB_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
@@ -130,6 +218,7 @@ namespace Tags
             }
         }
 
+        [ExcludeFromCodeCoverage]
         private void ctrlCB_GotFocus(object sender, EventArgs e)
         {
             Control ctrl = sender as Control;
@@ -138,6 +227,7 @@ namespace Tags
             ctrl.ForeColor = tmp_color;
         }
 
+        [ExcludeFromCodeCoverage]
         private void ctrlCB_LostFocus(object sender, EventArgs e)
         {
             Control ctrl = sender as Control;
@@ -146,6 +236,7 @@ namespace Tags
             ctrl.ForeColor = tmp_color;
         }
 
+        [ExcludeFromCodeCoverage]
         private void ctrlCB_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
             switch (e.KeyCode)

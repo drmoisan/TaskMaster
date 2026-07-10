@@ -62,9 +62,15 @@
   <ItemGroup>
     <Compile Include="Helper Classes\CheckBoxController.cs" />
     <Compile Include="Helper Classes\PrefixItem.cs" />
+    <Compile Include="ITagViewer.cs" />
+    <Compile Include="IUserPrompt.cs" />
+    <Compile Include="LauncherAutoAssign.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs" />
+    <Compile Include="TagSelectionModel.cs" />
+    <Compile Include="WinFormsUserPrompt.cs" />
     <Compile Include="TagController.cs" />
+    <Compile Include="TagController.Rendering.cs" />
     <Compile Include="TagLauncher.cs" />
     <Compile Include="TagViewer.cs">
       <SubType>Form</SubType>
