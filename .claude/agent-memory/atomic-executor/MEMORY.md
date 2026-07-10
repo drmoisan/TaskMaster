@@ -1,5 +1,7 @@
 # Atomic Executor Memory Index
 
+- [Concurrent executor in same worktree](project_concurrent_executor_same_worktree.md) — two executors on one plan/worktree corrupt shared files; detect via mtime progression during your own turn; STOP, don't stash/race
+
 - [TaskController (#297) unit-test gotchas](project_taskvisualization_taskcontroller_test_gotchas.md) — ApplyChanges hangs over Moq (mark exempt); get-only MailItem.TaskSubject throws MissingMethodException; STA harness needs TableLayoutPanel parenting + NavTips warmup + no DateTimePicker.Text; C# 7.3 test project; tail-piped vstest buffers til exit
 
 - [MSTest [DoNotParallelize] overlaps the parallel bucket](project_mstest_donotparallelize_overlaps_parallel_bucket.md) — #292: a [DoNotParallelize] null-baseline reader still sees writes from parallel-bucket writers; fix = mark every writer too so zero writers remain parallel
