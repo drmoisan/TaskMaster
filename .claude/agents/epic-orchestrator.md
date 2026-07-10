@@ -65,6 +65,30 @@ On every invocation:
 5. If no checkpoint exists or the objective is new, begin from manifest parsing
    (`docs/features/epics/<epic-slug>/epic.md`).
 
+## Invocation Origin
+
+You are invoked from the main session — via `/epic-orchestrate <epic-manifest-path>`, via
+`/epic-run <epic-slug>` (which replays the kickoff artifact `epic-planner` emitted), or by a
+direct prompt. You delegate to `Agent(orchestrator)`, so an invocation that itself
+originates from an `orchestrator` agent would nest `orchestrator` inside its own delegation
+chain; the PreToolUse hook `.claude/hooks/enforce-epic-invocation-origin.ps1` denies any
+`Agent(epic-orchestrator)` or `Agent(epic-planner)` call whose calling agent is `orchestrator`
+(`EPIC_INVOCATION_ORIGIN_BLOCKED`).
+
+## Prepared-Epic Execution (epic-planner Handoff)
+
+When the epic was prepared by `epic-planner` (the integration branch already exists and
+`docs/features/epics/<epic-slug>/epic-kickoff.md` is present), each child feature folder already
+contains its issue, research, `spec.md`, `user-story.md`, an approved atomic plan, and a
+recorded preflight clearance. In that case:
+
+1. Do not recreate the integration branch; fetch and reuse it.
+2. Each child `Agent(orchestrator)` delegation prompt cites the child's committed `plan-path`
+   and instructs the run to resume at atomic execution from that plan rather than re-running
+   promotion, research, or planning.
+3. The wave barrier, merge-on-green fan-in, and final integration-to-`main` PR proceed
+   unchanged per the `epic-orchestrate` skill.
+
 ## Delegation Model
 
 You delegate exclusively through two channels:

@@ -2,9 +2,16 @@
 name: epic-orchestrate
 description: Route a multi-feature epic through the deterministic wave-scheduling, integration-branch, and fan-in workflow for the epic-orchestrator agent.
 argument-hint: "[epic-manifest-path]"
+context: fork
+agent: epic-orchestrator
 ---
 
 # Epic Orchestrate Skill
+
+A user invocation (`/epic-orchestrate <epic-manifest-path>`) forks the `epic-orchestrator`
+agent with this procedure in context. The epic manifest path (or epic slug) for this run is:
+
+$ARGUMENTS
 
 This skill frames work for the `epic-orchestrator` agent, parallel to how
 `.claude/skills/orchestrate/SKILL.md` frames work for `orchestrator`. It documents the epic
