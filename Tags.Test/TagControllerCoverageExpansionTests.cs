@@ -8,6 +8,7 @@ using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Tags.Test.Fakes;
 using UtilitiesCS;
 
 namespace Tags.Test
@@ -16,7 +17,6 @@ namespace Tags.Test
     public class TagControllerCoverageExpansionTests
     {
         [TestMethod]
-        [STAThread]
         public void AddOption_WhenNewDuplicateAndEmptyInputs_UpdatesSelectionState()
         {
             using (var fixture = CreateFixture())
@@ -33,7 +33,6 @@ namespace Tags.Test
         }
 
         [TestMethod]
-        [STAThread]
         public void ToggleMethods_WhenOptionExists_AddRemoveAndUpdateSelectionState()
         {
             var options = new SortedDictionary<string, bool>
@@ -56,7 +55,6 @@ namespace Tags.Test
         }
 
         [TestMethod]
-        [STAThread]
         public void SearchAndParse_WhenInputIsEmptyMissingOrWildcard_ReturnsExpectedMatches()
         {
             var options = new SortedDictionary<string, bool>
@@ -87,7 +85,6 @@ namespace Tags.Test
         }
 
         [TestMethod]
-        [STAThread]
         public void FilterArchive_WhenAutoAssignerHasExclusions_RemovesMatchesCaseInsensitively()
         {
             var options = new SortedDictionary<string, bool>
@@ -98,23 +95,30 @@ namespace Tags.Test
             var autoAssigner = new Mock<IAutoAssign>(MockBehavior.Loose);
             autoAssigner.SetupGet(x => x.FilterList).Returns(new List<string> { "archive choice" });
 
-            using (var viewer = new TagViewer())
-            {
-                var controller = new TagController(
-                    viewer,
-                    options,
-                    autoAssigner.Object,
-                    new List<IPrefix> { CreatePrefix() },
-                    "current@example.test"
-                );
+            var viewer = new FakeTagViewer();
+            var prompt = new Mock<IUserPrompt>(MockBehavior.Loose);
+            var controller = new TagController(
+                viewer.Object,
+                options,
+                autoAssigner.Object,
+                new List<IPrefix> { CreatePrefix() },
+                "current@example.test",
+                prompt: prompt.Object,
+                drawFocus: _ => { }
+            );
 
+            try
+            {
                 controller.FilterArchive(options).Keys.Should().Equal("Current Choice");
                 controller.ButtonAutoAssignActive.Should().BeFalse();
+            }
+            finally
+            {
+                DisposeOptions(viewer);
             }
         }
 
         [TestMethod]
-        [STAThread]
         public void ResolvePrefix_WhenMissingOrInvalid_UsesDefaultOrThrows()
         {
             using (var fixture = CreateFixture())
@@ -138,7 +142,6 @@ namespace Tags.Test
         }
 
         [TestMethod]
-        [STAThread]
         public void FilterToSelected_AfterStateTransitions_ReloadsOnlySelectedControls()
         {
             var options = new SortedDictionary<string, bool>
@@ -164,7 +167,6 @@ namespace Tags.Test
         }
 
         [TestMethod]
-        [STAThread]
         public void LoadSelections_WhenExistingSelectionsUseBothForms_TogglesMatchingOptions()
         {
             var unprefixedOptions = new SortedDictionary<string, bool>
@@ -192,7 +194,6 @@ namespace Tags.Test
         }
 
         [TestMethod]
-        [STAThread]
         public void SearchAndReload_WhenFilterChanges_ReplacesVisibleCheckboxes()
         {
             var options = new SortedDictionary<string, bool>
@@ -204,18 +205,17 @@ namespace Tags.Test
 
             using (var fixture = CreateFixture(options))
             {
-                FindNamedControl<TextBox>(fixture.Viewer, "SearchText").Text = "Beta";
+                fixture.Viewer.SearchTextValue = "Beta";
                 fixture.Controller.SearchAndReload();
 
-                GetVisibleOptionCheckBoxes(fixture.Viewer)
-                    .Select(control => control.Tag as string)
+                fixture
+                    .Viewer.OptionControls.Select(control => control.Tag as string)
                     .Should()
                     .Equal("TagProgram Beta");
             }
         }
 
         [TestMethod]
-        [STAThread]
         public void UpdateSelections_AfterFiltering_SynchronizesPrivateSelectionLists()
         {
             var options = new SortedDictionary<string, bool>
@@ -230,17 +230,15 @@ namespace Tags.Test
                 fixture.Controller.FilterToSelected();
                 fixture.Controller.UpdateSelections();
 
-                GetPrivateField<IList<string>>(fixture.Controller, "_selections")
-                    .Should()
-                    .Equal("TagProgram Alpha", "TagProgram Gamma");
-                GetPrivateField<IList<string>>(fixture.Controller, "_filteredSelections")
-                    .Should()
-                    .Equal("TagProgram Alpha", "TagProgram Gamma");
+                // Selection state now lives on the controller's TagSelectionModel instance
+                // (fields relocated from TagController in P3-T3), so read it from the model.
+                var model = GetPrivateField<TagSelectionModel>(fixture.Controller, "_model");
+                model.Selections.Should().Equal("TagProgram Alpha", "TagProgram Gamma");
+                model.FilteredSelections.Should().Equal("TagProgram Alpha", "TagProgram Gamma");
             }
         }
 
         [TestMethod]
-        [STAThread]
         public void SelectControlMethods_WhenPositionsChange_UpdateFocusIndexOrThrow()
         {
             var options = new SortedDictionary<string, bool>
@@ -266,7 +264,6 @@ namespace Tags.Test
         }
 
         [TestMethod]
-        [STAThread]
         public void HideArchive_WhenToggled_ReloadsFilteredAndOriginalOptions()
         {
             var options = new SortedDictionary<string, bool>
@@ -284,28 +281,27 @@ namespace Tags.Test
                 )
             )
             {
-                GetVisibleOptionCheckBoxes(fixture.Viewer)
-                    .Select(control => control.Tag as string)
+                fixture
+                    .Viewer.OptionControls.Select(control => control.Tag as string)
                     .Should()
                     .Equal("Current Choice");
 
-                FindNamedControl<CheckBox>(fixture.Viewer, "HideArchive").Checked = false;
-                GetVisibleOptionCheckBoxes(fixture.Viewer)
-                    .Select(control => control.Tag as string)
+                fixture.Viewer.SetHideArchive(false);
+                fixture
+                    .Viewer.OptionControls.Select(control => control.Tag as string)
                     .Should()
                     .Equal("Archive Choice", "Current Choice");
 
-                FindNamedControl<CheckBox>(fixture.Viewer, "HideArchive").Checked = true;
-                GetVisibleOptionCheckBoxes(fixture.Viewer)
-                    .Select(control => control.Tag as string)
+                fixture.Viewer.SetHideArchive(true);
+                fixture
+                    .Viewer.OptionControls.Select(control => control.Tag as string)
                     .Should()
                     .Equal("Current Choice");
             }
         }
 
         [TestMethod]
-        [STAThread]
-        public void AutoAssignClick_WhenExistingAndNewAssignmentsReturned_UpdatesSelections()
+        public async Task AutoAssignAction_WhenExistingAndNewAssignmentsReturned_UpdatesSelections()
         {
             var options = new SortedDictionary<string, bool> { ["TagProgram Existing"] = false };
             var autoAssigner = NewAutoAssigner(new List<string>());
@@ -325,8 +321,8 @@ namespace Tags.Test
                 )
             )
             {
-                RaiseClick(FindNamedControl<Button>(fixture.Viewer, "ButtonAutoAssign"));
-                Task.Delay(50).GetAwaiter().GetResult();
+                // Await the extracted Task-returning action directly (no banned timer/delay wait).
+                await fixture.Controller.ButtonAutoAssign_Action();
 
                 fixture
                     .Controller.GetSelections()
@@ -341,12 +337,15 @@ namespace Tags.Test
             IList<string> selections = null
         )
         {
-            var viewer = new TagViewer();
+            var viewer = new FakeTagViewer();
+            var prompt = new Mock<IUserPrompt>(MockBehavior.Loose);
             var controller = new TagController(
-                viewer,
+                viewer.Object,
                 options ?? new SortedDictionary<string, bool>(),
                 selections,
-                CreatePrefix()
+                CreatePrefix(),
+                prompt.Object,
+                _ => { }
             );
 
             return new ControllerFixture(viewer, controller);
@@ -358,15 +357,18 @@ namespace Tags.Test
             MailItem mailItem
         )
         {
-            var viewer = new TagViewer();
+            var viewer = new FakeTagViewer();
+            var prompt = new Mock<IUserPrompt>(MockBehavior.Loose);
             var controller = new TagController(
-                viewer,
+                viewer.Object,
                 options,
                 autoAssigner,
                 new List<IPrefix> { CreatePrefix() },
                 "current@example.test",
                 prefixKey: "Program",
-                objItemObject: mailItem
+                objItemObject: mailItem,
+                prompt: prompt.Object,
+                drawFocus: _ => { }
             );
             SetPrivateField(controller, "_isMail", true);
             controller.SetAutoAssignState(autoAssigner);
@@ -398,32 +400,12 @@ namespace Tags.Test
             return mailItem.Object;
         }
 
-        private static IReadOnlyList<CheckBox> GetVisibleOptionCheckBoxes(TagViewer viewer) =>
-            FindNamedControl<Panel>(viewer, "L1v2L2_OptionsPanel")
-                .Controls.OfType<CheckBox>()
-                .ToList();
-
-        private static TControl FindNamedControl<TControl>(Control root, string name)
-            where TControl : Control
+        private static void DisposeOptions(FakeTagViewer viewer)
         {
-            if (
-                root is TControl matched
-                && string.Equals(root.Name, name, StringComparison.Ordinal)
-            )
+            foreach (var control in viewer.OptionControls.ToList())
             {
-                return matched;
+                control.Dispose();
             }
-
-            foreach (Control child in root.Controls)
-            {
-                var result = FindNamedControl<TControl>(child, name);
-                if (result != null)
-                {
-                    return result;
-                }
-            }
-
-            return null;
         }
 
         private static T GetPrivateField<T>(object target, string fieldName)
@@ -450,32 +432,21 @@ namespace Tags.Test
             field.SetValue(target, value);
         }
 
-        private static void RaiseClick(Control control)
-        {
-            var invokeOnClick = typeof(Control).GetMethod(
-                "InvokeOnClick",
-                BindingFlags.Instance | BindingFlags.NonPublic
-            );
-
-            invokeOnClick.Should().NotBeNull();
-            invokeOnClick.Invoke(control, new object[] { control, EventArgs.Empty });
-        }
-
         private sealed class ControllerFixture : IDisposable
         {
-            public ControllerFixture(TagViewer viewer, TagController controller)
+            public ControllerFixture(FakeTagViewer viewer, TagController controller)
             {
                 Viewer = viewer;
                 Controller = controller;
             }
 
-            public TagViewer Viewer { get; }
+            public FakeTagViewer Viewer { get; }
 
             public TagController Controller { get; }
 
             public void Dispose()
             {
-                Viewer.Dispose();
+                DisposeOptions(Viewer);
             }
         }
 

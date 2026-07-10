@@ -10,9 +10,13 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Dan Moisan")]
 [assembly: AssemblyProduct("Tags")]
-[assembly: AssemblyCopyright("Copyright © Dan Moisan 2023")]
+[assembly: AssemblyCopyright("Copyright ï¿½ Dan Moisan 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+
+// Expose internal testability seams (LauncherAutoAssign, CheckBoxController.Init, the extracted
+// click-decision helper) to the unit-test assembly per the #293 testability refactor.
+[assembly: InternalsVisibleTo("Tags.Test")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
