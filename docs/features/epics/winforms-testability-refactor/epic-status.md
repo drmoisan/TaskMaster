@@ -13,8 +13,8 @@ The epic checkpoint JSON is the durable, machine-authoritative source.
 - Fan-in model: every child fans into the integration branch via a real child PR (corrected model,
   2026-07-10 maintainer directive). The prior direct `git merge --no-ff` fan-ins for #293/#296/#297
   were unwound to the post-design tip `c7b63358` and re-landed via child PRs (#299/#300/#301).
-- Current wave: 1 (wave 0 complete)
-- Last updated: 2026-07-10T05:11:00Z
+- Current wave: 1 (wave 0 and wave 1 complete)
+- Last updated: 2026-07-10T12:26:14Z
 
 ## Feature Status
 
@@ -23,9 +23,10 @@ The epic checkpoint JSON is the durable, machine-authoritative source.
 | 0 | #293 | 2026-07-09-tagcontroller-testability-refactor-293 | merged | [#299](https://github.com/drmoisan/TaskMaster/pull/299) | 03ab8a1f | 2026-07-10T01:52:00Z | 2026-07-10T05:00:02Z | 2026-07-10T05:02:15Z | — |
 | 0 | #296 | 2026-07-09-tasktree-testability-refactor-296 | merged | [#300](https://github.com/drmoisan/TaskMaster/pull/300) | 1c1332bb | 2026-07-10T01:52:00Z | 2026-07-10T05:06:39Z | 2026-07-10T05:07:42Z | — |
 | 0 | #297 | 2026-07-09-taskvisualization-core-testability-refactor-297 | merged | [#301](https://github.com/drmoisan/TaskMaster/pull/301) | c503ccab | 2026-07-10T01:52:00Z | 2026-07-10T05:09:51Z | 2026-07-10T05:10:47Z | — |
-| 1 | #298 | 2026-07-09-taskvisualization-secondary-testability-298 | not_started | — | — | — | — | — | — |
+| 1 | #298 | 2026-07-09-taskvisualization-secondary-testability-298 | worktree_removed | [#302](https://github.com/drmoisan/TaskMaster/pull/302) | 1ffc2eac | 2026-07-10T05:13:00Z | 2026-07-10T12:20:00Z | 2026-07-10T12:23:07Z | 2026-07-10T12:26:14Z |
 
-Wave 0 (#293, #296, #297) is complete. Wave 1 (#298, depends_on #297) is now eligible to launch.
+Wave 0 (#293, #296, #297) and wave 1 (#298, depends_on #297) are complete. All four child features
+have merged into the integration branch via real child PRs; the #298 worktree has been removed.
 
 ## Coverage (per child, from feature-review evidence)
 
@@ -34,8 +35,11 @@ Wave 0 (#293, #296, #297) is complete. Wave 1 (#298, depends_on #297) is now eli
 | #293 | 92.63 | — |
 | #296 | 96.34 | 91.49 |
 | #297 | 85.36 | 78.28 |
-| #298 | (pending execution) | — |
+| #298 | 89.72 | — |
 
 ## Integration PR
 
-Not yet opened. The final `epic/winforms-testability-refactor-integration` -> `main` PR is authored after all four features are merged.
+The final `epic/winforms-testability-refactor-integration` -> `main` PR is authored after all four
+features are merged. Status: in progress (authored by epic-orchestrator via the pr-author skill
+inline; the `pr-author` subagent is not registered in the current runtime). See the epic checkpoint
+`epic_merge_pr` object for the PR number, S9 CI-gate result, and final merge commit.
