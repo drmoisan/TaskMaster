@@ -252,6 +252,7 @@
     <Compile Include="TagControllerCoverageExpansionTests.cs" />
     <Compile Include="TagControllerRendering.StaTests.cs" />
     <Compile Include="TagControllerSeamTests.cs" />
+    <Compile Include="TagControllerSeamTests.KeyboardNavigation.cs" />
     <Compile Include="TagControllerTests.cs" />
     <Compile Include="TagSelectionModelTests.cs" />
   </ItemGroup>

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -18,8 +17,14 @@ namespace Tags.Test
     /// <see cref="FakeTagViewer"/> with a no-op draw seam, and property forwarders. No live form,
     /// popup, or HWND is used.
     /// </summary>
+    /// <remarks>
+    /// This class is split across multiple files by logical cohesion: this file covers
+    /// dialog-routed methods, auto-assign flows, and property forwarders, plus the shared
+    /// test-construction helpers. See <c>TagControllerSeamTests.KeyboardNavigation.cs</c> for the
+    /// keyboard and navigation handler coverage.
+    /// </remarks>
     [TestClass]
-    public class TagControllerSeamTests
+    public partial class TagControllerSeamTests
     {
         [TestMethod]
         public void ResolveMailItem_ReturnsMailForMailItemAndNullOtherwise()
@@ -258,198 +263,6 @@ namespace Tags.Test
                 p => p.GetCategoryInput(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
                 Times.Never
             );
-            DisposeOptions(viewer);
-        }
-
-        [TestMethod]
-        public void OptionsPanelPreviewKeyDown_MarksUpAndDownAsInputKeys()
-        {
-            var viewer = new FakeTagViewer();
-            var controller = BuildSimple(viewer);
-
-            var down = new PreviewKeyDownEventArgs(Keys.Down);
-            var up = new PreviewKeyDownEventArgs(Keys.Up);
-            var other = new PreviewKeyDownEventArgs(Keys.Left);
-
-            controller.OptionsPanel_PreviewKeyDown(null, down);
-            controller.OptionsPanel_PreviewKeyDown(null, up);
-            controller.OptionsPanel_PreviewKeyDown(null, other);
-
-            down.IsInputKey.Should().BeTrue();
-            up.IsInputKey.Should().BeTrue();
-            other.IsInputKey.Should().BeFalse();
-            DisposeOptions(viewer);
-        }
-
-        [TestMethod]
-        public void OptionsPanelKeyDown_MovesFocusUpAndDown()
-        {
-            var viewer = new FakeTagViewer();
-            var controller = BuildSimple(
-                viewer,
-                options: new SortedDictionary<string, bool> { ["A"] = false, ["B"] = false }
-            );
-
-            controller.OptionsPanel_KeyDown(null, new KeyEventArgs(Keys.Down));
-            GetPrivateField<int>(controller, "intFocus").Should().Be(0);
-
-            controller.OptionsPanel_KeyDown(null, new KeyEventArgs(Keys.Down));
-            GetPrivateField<int>(controller, "intFocus").Should().Be(1);
-
-            controller.OptionsPanel_KeyDown(null, new KeyEventArgs(Keys.Up));
-            GetPrivateField<int>(controller, "intFocus").Should().Be(0);
-            DisposeOptions(viewer);
-        }
-
-        [TestMethod]
-        public void TagViewerKeyDown_OnEnter_TriggersOkExit()
-        {
-            var viewer = new FakeTagViewer();
-            var controller = BuildSimple(viewer);
-
-            controller.TagViewer_KeyDown(null, new KeyEventArgs(Keys.Enter));
-
-            controller.ExitType.Should().Be("Normal");
-            viewer.Mock.Verify(v => v.Close(), Times.Once);
-            DisposeOptions(viewer);
-        }
-
-        [TestMethod]
-        public void SearchTextKeyDownAndKeyUp_RecordCursorAndFilterToSelected()
-        {
-            var viewer = new FakeTagViewer();
-            viewer.SearchSelectionStart = 3;
-            var controller = BuildSimple(
-                viewer,
-                options: new SortedDictionary<string, bool> { ["A"] = true, ["B"] = false }
-            );
-
-            controller.SearchText_KeyDown(null, new KeyEventArgs(Keys.Right));
-            controller.SearchText_KeyUp(null, new KeyEventArgs(Keys.Right));
-
-            // Right-KeyUp at the same cursor position filters to the selected option only.
-            viewer.OptionControls.Select(c => c.Tag as string).Should().Equal("A");
-            DisposeOptions(viewer);
-        }
-
-        [TestMethod]
-        public void SearchTextKeyDown_OnDown_MovesFocusToFirstOption()
-        {
-            var viewer = new FakeTagViewer();
-            var controller = BuildSimple(
-                viewer,
-                options: new SortedDictionary<string, bool> { ["A"] = false }
-            );
-
-            controller.SearchText_KeyDown(null, new KeyEventArgs(Keys.Down));
-
-            GetPrivateField<int>(controller, "intFocus").Should().Be(0);
-            DisposeOptions(viewer);
-        }
-
-        [TestMethod]
-        public void SearchTextKeyUp_OnEnter_TriggersOkExit()
-        {
-            var viewer = new FakeTagViewer();
-            var controller = BuildSimple(viewer);
-
-            controller.SearchText_KeyUp(null, new KeyEventArgs(Keys.Enter));
-
-            controller.ExitType.Should().Be("Normal");
-            DisposeOptions(viewer);
-        }
-
-        [TestMethod]
-        public void SelectPageDown_WhenScrollFits_DoesNothing()
-        {
-            var viewer = new FakeTagViewer { OptionsScrollMaximum = 10, OptionsPanelHeight = 100 };
-            var controller = BuildSimple(
-                viewer,
-                options: new SortedDictionary<string, bool> { ["A"] = false, ["B"] = false }
-            );
-
-            controller.Select_PageDown();
-
-            GetPrivateField<int>(controller, "intFocus").Should().Be(-1);
-            DisposeOptions(viewer);
-        }
-
-        [TestMethod]
-        public void SelectPageDown_WhenNoRowBelowViewport_SelectsLastControl()
-        {
-            var viewer = new FakeTagViewer
-            {
-                OptionsScrollMaximum = 1000,
-                OptionsPanelHeight = 100,
-            };
-            var controller = BuildSimple(
-                viewer,
-                options: new SortedDictionary<string, bool> { ["A"] = false, ["B"] = false }
-            );
-
-            controller.Select_PageDown();
-
-            GetPrivateField<int>(controller, "intFocus").Should().Be(1);
-            DisposeOptions(viewer);
-        }
-
-        [TestMethod]
-        public void SelectPageDown_WhenRowBelowViewport_ScrollsToIt()
-        {
-            var viewer = new FakeTagViewer
-            {
-                OptionsScrollMaximum = 1000,
-                OptionsPanelHeight = 100,
-            };
-            var controller = BuildSimple(
-                viewer,
-                options: new SortedDictionary<string, bool> { ["A"] = false, ["B"] = false }
-            );
-            viewer.OptionControls[1].Top = 200;
-            viewer.OptionControls[1].Height = 50;
-
-            controller.Select_PageDown();
-
-            GetPrivateField<int>(controller, "intFocus").Should().Be(1);
-            DisposeOptions(viewer);
-        }
-
-        [TestMethod]
-        public void SelectPageUp_WhenRowAboveViewport_ScrollsToIt()
-        {
-            var viewer = new FakeTagViewer
-            {
-                OptionsScrollMaximum = 1000,
-                OptionsPanelHeight = 100,
-            };
-            var controller = BuildSimple(
-                viewer,
-                options: new SortedDictionary<string, bool> { ["A"] = false, ["B"] = false }
-            );
-            viewer.OptionControls[0].Top = -50;
-
-            controller.Select_PageUp();
-
-            GetPrivateField<int>(controller, "intFocus").Should().Be(0);
-            DisposeOptions(viewer);
-        }
-
-        [TestMethod]
-        public void SelectPageUp_WhenNoRowAboveViewport_SelectsFirstControl()
-        {
-            var viewer = new FakeTagViewer
-            {
-                OptionsScrollMaximum = 1000,
-                OptionsPanelHeight = 100,
-            };
-            var controller = BuildSimple(
-                viewer,
-                options: new SortedDictionary<string, bool> { ["A"] = false, ["B"] = false }
-            );
-
-            controller.Select_PageUp();
-
-            GetPrivateField<int>(controller, "intFocus").Should().Be(0);
             DisposeOptions(viewer);
         }
 
