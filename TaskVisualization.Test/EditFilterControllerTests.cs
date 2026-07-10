@@ -64,6 +64,43 @@ namespace TaskVisualization.Test
         }
 
         [TestMethod]
+        public void InitializeFactory_ReturnsInjectedViewer_AndAppliesSelectionText()
+        {
+            var viewer = new Mock<IEditFilterViewer>();
+            var filterEntry = new FilterEntry();
+            filterEntry.Flags.Context.AsStringNoPrefix = "C2";
+            var globals = new MoqOlToDo().MockGlobals();
+            var controller = new EditFilterController(
+                globals,
+                filterEntry,
+                null,
+                () => viewer.Object,
+                d => (true, null)
+            );
+
+            var result = controller.InitializeFactory();
+
+            result.Should().BeSameAs(viewer.Object);
+            viewer.VerifySet(v => v.ContextSelectionText = "C2");
+        }
+
+        [TestMethod]
+        public void OkClick_AddPath_NullFilterEntry_CommitsFreshEntry()
+        {
+            // Add-filter path: null entry -> core ctor creates a fresh FilterEntry.
+            var viewer = new Mock<IEditFilterViewer>();
+            viewer.Setup(v => v.FilterNameText).Returns("Fresh");
+            FilterEntry committed = null;
+            var controller = Build(viewer, filterEntry: null, callback: (c, fe) => committed = fe);
+            controller.SetUpDeleteDialog(); // no-op hook; kept covered
+
+            viewer.Raise(v => v.OkClick += null, viewer.Object, EventArgs.Empty);
+
+            committed.Should().NotBeNull();
+            committed.Name.Should().Be("Fresh");
+        }
+
+        [TestMethod]
         public void OkClick_WithCallback_SetsName_InvokesCallback_HidesAndDisposes()
         {
             var viewer = new Mock<IEditFilterViewer>();

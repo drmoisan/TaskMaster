@@ -43,13 +43,13 @@ project-wide coverage goal.
 
 ## Acceptance Criteria (early draft)
 
-- [ ] `IEditFilterViewer` and `IManageFiltersViewer` exist, derive from `IForm`, and their concrete forms implement them.
-- [ ] `EditFilterController` depends on `IEditFilterViewer`; `ManageFilters` logic is testable against `IManageFiltersViewer`.
-- [ ] Helper classes' host-neutral logic separated from COM interaction with seams at Interop boundaries.
-- [ ] No touched production file exceeds 500 lines.
-- [ ] No unit test constructs a live form/window or triggers a popup.
-- [ ] `TaskVisualization` project reaches >= 80% line coverage overall.
-- [ ] Full C# toolchain (csharpier → analyzers → nullable → MSTest) passes with no regression.
+- [x] `IEditFilterViewer` and `IManageFiltersViewer` exist, derive from `IForm`, and their concrete forms implement them.
+- [x] `EditFilterController` depends on `IEditFilterViewer`; `ManageFilters` logic is testable against `IManageFiltersViewer`.
+- [x] Helper classes' host-neutral logic separated from COM interaction with seams at Interop boundaries.
+- [x] No touched production file exceeds 500 lines.
+- [x] No unit test constructs a live form/window or triggers a popup.
+- [x] `TaskVisualization` project reaches >= 80% line coverage overall.
+- [x] Full C# toolchain (csharpier → analyzers → nullable → MSTest) passes with no regression.
 
 ## Constraints & Risks
 

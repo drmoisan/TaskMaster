@@ -109,6 +109,9 @@ namespace TaskVisualization
             Initialize();
         }
 
+        // Irreducible live-form bridge: constructs the viewer via the default factory
+        // and shows a modal dialog. Not unit-testable without a live WinForms form.
+        [ExcludeFromCodeCoverage]
         public static bool DeleteFilterDialog(
             IApplicationGlobals appGlobals,
             FilterEntry filterEntry

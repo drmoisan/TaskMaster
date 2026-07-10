@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using UtilitiesCS;
 
 namespace TaskVisualization
@@ -46,6 +47,13 @@ namespace TaskVisualization
             _editFilterFactory = editFilterFactory ?? DefaultEditFilterFactory;
         }
 
+        // Irreducible live-form bridge: the production default of the injected
+        // edit-filter factory seam. Constructs an EditFilterController, which builds
+        // and shows a live WinForms form; not unit-testable under the STA/no-form
+        // policy. The branch selection (null vs non-null entry) is asserted through
+        // the injected seam in AddFilter/EditSelected tests, so no coverable logic is
+        // hidden here.
+        [ExcludeFromCodeCoverage]
         private EditFilterController DefaultEditFilterFactory(
             IApplicationGlobals globals,
             FilterEntry filterEntry
