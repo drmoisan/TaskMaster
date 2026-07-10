@@ -1,5 +1,7 @@
 # Atomic Executor Memory Index
 
+- [Concurrent executor in same worktree](project_concurrent_executor_same_worktree.md) — two executors on one plan/worktree corrupt shared files; detect via mtime progression during your own turn; STOP, don't stash/race
+
 - [dotnet-coverage denominator nondeterminism](project_dotnet_coverage_denominator_nondeterminism.md) — Invoke-MSTestWithCoverage repo line-rate swings (47% vs 81%) from double-counted denominator; re-baseline via git-stash, trust per-class rates
 - [IApplicationGlobals member forces implementers](project_iapplicationglobals_member_forces_implementers.md) — adding an IApplicationGlobals member breaks 7 hand-written test-double stubs (QuickFiler/TaskMaster/UtilitiesCS .Test) beyond scope lock; Moq mocks auto-implement
 

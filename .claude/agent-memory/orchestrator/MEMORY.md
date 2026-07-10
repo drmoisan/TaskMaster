@@ -36,4 +36,6 @@
 - [Epic child PRs get no CI](project_epic_child_prs_no_ci.md) — ci.yml triggers only on PRs to main/development; child→integration PRs run zero checks by design, so CI-green is vacuous and merge proceeds on blocking_count==0
 - [Epic #295 winforms testability](project_epic_295_winforms_testability.md) — design-phase-only mandate (research→spec→plan→preflight, then STOP); children 293/296/297/298; 298 depends on 297
 - [STA controls ratified as last resort](feedback_sta_controls_last_resort_ratified.md) — unshown WinForms controls on STA OK only after seams, in dedicated *.StaTests.cs files; Forms/popups/pumps still banned
+- [Epic children need full lifecycle + PRs](feedback_epic_children_require_full_lifecycle_and_prs.md) — maintainer rejected executor-driver shortcut AND direct --no-ff child merges; child PRs mandatory even with vacuous CI
+- [Verify subagent capability claims](feedback_verify_subagent_capability_claims.md) — never relay "agent type not registered" without checking .claude/agents frontmatter; demand verbatim error; blocked state, not silent fallback
 - [Epic-child plan Phase 0 paths are stale](feedback_plan_phase0_paths_are_stale_in_epic_children.md) — epic-child plans cite the planning worktree's absolute paths for P0 policy reads; redirect the executor to the CURRENT worktree's files in the delegation prompt
