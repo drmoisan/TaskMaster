@@ -373,25 +373,25 @@ temp files; deterministic.
 
 ## Definition of Done
 
-- [ ] Structure matches this spec; legacy paths retired or redirected
-- [ ] Invariants validated with tests or comparisons
-- [ ] Imports/tooling/entry points updated
-- [ ] Edge cases and error handling verified
-- [ ] Tests, linting, and type checks clean
-- [ ] Docs updated (initiative/README/tasks as needed)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
+- [x] Structure matches this spec; legacy paths retired or redirected
+- [x] Invariants validated with tests or comparisons
+- [x] Imports/tooling/entry points updated
+- [x] Edge cases and error handling verified
+- [x] Tests, linting, and type checks clean
+- [x] Docs updated (initiative/README/tasks as needed)
+- [x] Toolchain pass completed (format → lint → type-check → test)
 
 Alignment with `issue.md` acceptance criteria — the Definition of Done is
 satisfied only when all of the following (from `issue.md` `## Acceptance
 Criteria`) hold:
 
-- [ ] `IEditFilterViewer` and `IManageFiltersViewer` exist, derive from `IForm`, and their concrete forms implement them.
-- [ ] `EditFilterController` depends on `IEditFilterViewer`; `ManageFilters` logic is testable against `IManageFiltersViewer`.
-- [ ] Helper classes' host-neutral logic separated from COM interaction with seams at Interop boundaries.
-- [ ] No touched production file exceeds 500 lines.
-- [ ] No unit test constructs a live form/window or triggers a popup.
-- [ ] `TaskVisualization` project reaches >= 80% line coverage overall.
-- [ ] Full C# toolchain (csharpier → analyzers → nullable → MSTest) passes with no regression.
+- [x] `IEditFilterViewer` and `IManageFiltersViewer` exist, derive from `IForm`, and their concrete forms implement them.
+- [x] `EditFilterController` depends on `IEditFilterViewer`; `ManageFilters` logic is testable against `IManageFiltersViewer`.
+- [x] Helper classes' host-neutral logic separated from COM interaction with seams at Interop boundaries.
+- [x] No touched production file exceeds 500 lines.
+- [x] No unit test constructs a live form/window or triggers a popup.
+- [x] `TaskVisualization` project reaches >= 80% line coverage overall.
+- [x] Full C# toolchain (csharpier → analyzers → nullable → MSTest) passes with no regression.
 
 ## User Story Applicability
 
@@ -405,7 +405,7 @@ are tracked in `issue.md` (`## Acceptance Criteria`) and mirrored in the
 Definition of Done above.
 
 ## Seeded Test Conditions (from potential)
-- [ ] EditFilter dialog logic covered via mocked `IEditFilterViewer`.
-- [ ] ManageFilters list-management logic covered via mocked `IManageFiltersViewer`.
-- [ ] Flag change grouping/queueing logic covered with pure inputs.
-- [ ] AutoCreateProject / AutoAssign* logic covered with mocked Interop seams.
+- [x] EditFilter dialog logic covered via mocked `IEditFilterViewer`.
+- [x] ManageFilters list-management logic covered via mocked `IManageFiltersViewer`.
+- [x] Flag change grouping/queueing logic covered with pure inputs.
+- [x] AutoCreateProject / AutoAssign* logic covered with mocked Interop seams.
