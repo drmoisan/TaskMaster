@@ -140,35 +140,35 @@ tests await deterministically against synchronously-returning mocks.
 
 ### Phase 0 — Baseline Capture and Precondition Verification
 
-- [ ] [P0-T1] Read policy files in the required order and record them in
+- [x] [P0-T1] Read policy files in the required order and record them in
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/baseline/phase0-instructions-read.md`
   with `Timestamp:`, `Policy Order:`, and the explicit list of files read: `CLAUDE.md`,
   `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`,
   `.claude/rules/csharp.md`, `.claude/skills/atomic-plan-contract/SKILL.md`,
   `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`. Binary outcome: artifact exists
   with all three required fields populated.
-- [ ] [P0-T2] Run `csharpier .` in check mode and capture baseline formatting state to
+- [x] [P0-T2] Run `csharpier .` in check mode and capture baseline formatting state to
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/baseline/baseline-format.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Binary outcome: artifact exists
   with all four fields.
-- [ ] [P0-T3] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+- [x] [P0-T3] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
   and capture baseline analyzer state to
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/baseline/baseline-analyzers.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Binary outcome: artifact exists
   with all four fields.
-- [ ] [P0-T4] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+- [x] [P0-T4] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
   and capture baseline nullable/type-check state to
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/baseline/baseline-nullable.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Binary outcome: artifact exists
   with all four fields.
-- [ ] [P0-T5] Run the existing MSTest suite with coverage
+- [x] [P0-T5] Run the existing MSTest suite with coverage
   (`vstest.console.exe <existing *.Test.dll set> /EnableCodeCoverage`), copy the raw coverage
   XML to `artifacts/csharp/coverage.xml`, and record the baseline `TaskTree.dll` line-coverage
   headline (expected 0% — no test project exists yet) to
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/baseline/baseline-coverage.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (must state the numeric
   `TaskTree.dll` baseline line-% value). Binary outcome: artifact records the numeric baseline.
-- [ ] [P0-T6] Verify structural preconditions and record them in
+- [x] [P0-T6] Verify structural preconditions and record them in
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/baseline/baseline-preconditions.md`:
   `TaskTree/TaskTreeController.cs` is 546 lines; `TaskTree/TaskTreeForm.cs` is 108 lines;
   `TaskTree/TaskTreeForm.Designer.cs` is 311 lines; `UtilitiesCS/Interfaces/IWinForm/IForm.cs`
@@ -178,12 +178,12 @@ tests await deterministically against synchronously-returning mocks.
   `Tags.Test/Properties/AssemblyInfo.cs` all exist (mirror source); NO `TaskTree.Test/` folder
   exists; `TaskMaster.sln` contains the `Tags.Test` entry (line 37) and its config block
   (lines 216-227). Binary outcome: all listed facts confirmed and recorded.
-- [ ] [P0-T7] Record the current caller baseline for `TaskMaster/Ribbon/RibbonController.cs::LoadTaskTree`
+- [x] [P0-T7] Record the current caller baseline for `TaskMaster/Ribbon/RibbonController.cs::LoadTaskTree`
   (the exact 3-argument construction `new TaskTreeController(Globals, taskTreeViewer, dataModel)`
   and `taskTreeViewer.Show()` at lines ~88-95) verbatim to
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/baseline/baseline-caller.md`
   so the post-refactor no-edit invariant can be diffed. Binary outcome: verbatim call site recorded.
-- [ ] [P0-T8] Grep-verify no external caller invokes the `TaskTreeController` debug helpers
+- [x] [P0-T8] Grep-verify no external caller invokes the `TaskTreeController` debug helpers
   `WriteTreeToDisk`, `LoopTreeToWrite`, or `AppendLineToCSV`, or accesses the controller `ToDoTree`
   field. Scope the check to invocations that resolve to a `TaskTreeController` instance: search the
   repo for `.WriteTreeToDisk(`, `.LoopTreeToWrite(`, `.AppendLineToCSV(`, and `.ToDoTree`
@@ -205,7 +205,7 @@ tests await deterministically against synchronously-returning mocks.
 
 ### Phase 1 — Interface and Adapter Contracts
 
-- [ ] [P1-T1] Create `TaskTree/ITaskTreeForm.cs` declaring
+- [x] [P1-T1] Create `TaskTree/ITaskTreeForm.cs` declaring
   `public interface ITaskTreeForm : UtilitiesCS.Interfaces.IWinForm.IForm` with the intent-named
   facade members `void SetController(TaskTreeController controller)`,
   `void InitializeTreeView(IEnumerable<TreeNode<ToDoItem>> roots, Predicate<object> incompleteFilter)`,
@@ -218,7 +218,7 @@ tests await deterministically against synchronously-returning mocks.
   full C# toolchain in order (`csharpier .` -> analyzers build -> nullable build ->
   `vstest.console.exe <existing test dlls> /EnableCodeCoverage`); all steps green. Binary
   outcome: file exists, wired into csproj, solution builds green.
-- [ ] [P1-T2] Create `TaskTree/TreeListViewVisual.cs` declaring
+- [x] [P1-T2] Create `TaskTree/TreeListViewVisual.cs` declaring
   `[ExcludeFromCodeCoverage] class TreeListViewVisual : ITreeVisual` (exemption E2) that wraps a
   `BrightIdeasSoftware.TreeListView` and delegates `AddObject(object)`/`RemoveObject(object)` to
   the wrapped control, exposing the wrapped control (or supporting reference comparison) so
@@ -229,7 +229,7 @@ tests await deterministically against synchronously-returning mocks.
 
 ### Phase 2 — TaskTreeForm Facade Implementation
 
-- [ ] [P2-T1] Modify `TaskTree/TaskTreeForm.cs` so `TaskTreeForm` implements `ITaskTreeForm`
+- [x] [P2-T1] Modify `TaskTree/TaskTreeForm.cs` so `TaskTreeForm` implements `ITaskTreeForm`
   (`public partial class TaskTreeForm : Form, ITaskTreeForm`), adding thin facade delegations:
   `InitializeTreeView` (sets `TreeLv.CanExpandGetter/ChildrenGetter/ParentGetter`, wraps the
   incomplete predicate in `new ModelFilter(predicate)`, sets `TreeLv.Roots`, initial
@@ -248,7 +248,7 @@ tests await deterministically against synchronously-returning mocks.
 
 ### Phase 3 — Controller Refactor and Partial Split
 
-- [ ] [P3-T1] Refactor `TaskTree/TaskTreeController.cs` to depend only on `ITaskTreeForm`/`ITreeVisual`:
+- [x] [P3-T1] Refactor `TaskTree/TaskTreeController.cs` to depend only on `ITaskTreeForm`/`ITreeVisual`:
   change the `_viewer` field and the `Viewer` constructor parameter type from `TaskTreeForm` to
   `ITaskTreeForm`; add a trailing optional constructor parameter `Action<string> showMessage = null`
   with `private readonly Action<string> _showMessage = showMessage ?? (m => MessageBox.Show(m));`;
@@ -275,13 +275,13 @@ tests await deterministically against synchronously-returning mocks.
   `_showMessage(...)`); AND the constructor parameter type is `ITaskTreeForm`. Binary outcome:
   controller builds green against the interface seams with no direct control references, and the only
   `MessageBox.Show` token in the controller is the `_showMessage` seam default.
-- [ ] [P3-T2] Delete the dead debug helpers `WriteTreeToDisk`, `LoopTreeToWrite`, and
+- [x] [P3-T2] Delete the dead debug helpers `WriteTreeToDisk`, `LoopTreeToWrite`, and
   `AppendLineToCSV` and the `ToDoTree` field from `TaskTree/TaskTreeController.cs`, and remove any
   now-unused `using` directives (e.g. `System.IO`) surfaced by analyzers. Verification: run the
   full C# toolchain in order; all steps green AND grep for
   `WriteTreeToDisk|LoopTreeToWrite|AppendLineToCSV|ToDoTree` in `TaskTree/` returns zero matches.
   Binary outcome: helpers removed and solution builds green.
-- [ ] [P3-T3] Move `HandleModelCanDrop`, `HandleModelDropped`, `MoveObjectsToRoots`,
+- [x] [P3-T3] Move `HandleModelCanDrop`, `HandleModelDropped`, `MoveObjectsToRoots`,
   `MoveObjectsToSibling`, `MoveObjectsToChildren`, `FindChildByID`, and `IsValidType` into a new
   `TaskTree/TaskTreeController.MoveLogic.cs` declaring `public partial class TaskTreeController`,
   and change `TaskTree/TaskTreeController.cs` to `public partial class TaskTreeController`. Add a
@@ -293,7 +293,7 @@ tests await deterministically against synchronously-returning mocks.
 
 ### Phase 4 — Caller and Wiring Verification
 
-- [ ] [P4-T1] Verify `TaskMaster/Ribbon/RibbonController.cs::LoadTaskTree` compiles with NO
+- [x] [P4-T1] Verify `TaskMaster/Ribbon/RibbonController.cs::LoadTaskTree` compiles with NO
   call-site edit: `git diff` on `TaskMaster/Ribbon/RibbonController.cs` shows zero changes, and
   the solution builds green (the 3-argument `new TaskTreeController(Globals, taskTreeViewer, dataModel)`
   binds because `TaskTreeForm` implements `ITaskTreeForm` and the `showMessage` parameter is
@@ -301,7 +301,7 @@ tests await deterministically against synchronously-returning mocks.
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/qa-gates/caller-unchanged.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Binary outcome: caller file
   unchanged and solution builds green.
-- [ ] [P4-T2] Verify `TaskTree/TaskTree.csproj` contains `<Compile Include>` items for
+- [x] [P4-T2] Verify `TaskTree/TaskTree.csproj` contains `<Compile Include>` items for
   `ITaskTreeForm.cs`, `TreeListViewVisual.cs`, and `TaskTreeController.MoveLogic.cs`, and that all
   production files in `TaskTree/` (`TaskTreeController.cs`, `TaskTreeController.MoveLogic.cs`,
   `ITaskTreeForm.cs`, `TreeListViewVisual.cs`, `TaskTreeForm.cs`, `TaskTreeForm.Designer.cs`) are
@@ -311,7 +311,7 @@ tests await deterministically against synchronously-returning mocks.
 
 ### Phase 5 — Create TaskTree.Test Project
 
-- [ ] [P5-T1] Create `TaskTree.Test/TaskTree.Test.csproj` by mirroring
+- [x] [P5-T1] Create `TaskTree.Test/TaskTree.Test.csproj` by mirroring
   `Tags.Test/Tags.Test.csproj` exactly, changing ONLY: a newly generated unique
   `<ProjectGuid>` (candidate `{7C4E2B1A-3F9D-4A6E-8B2C-1D5E9F0A7C36}` — the executor MUST grep
   `TaskMaster.sln` and every `*.csproj` to confirm no collision and regenerate if it collides);
@@ -332,24 +332,24 @@ tests await deterministically against synchronously-returning mocks.
   `<AdditionalFiles Include="$(MSBuildThisFileDirectory)..\BannedSymbols.txt" />`. `<Compile Include>`
   initially lists `Properties\AssemblyInfo.cs` only. Binary outcome: csproj exists mirroring
   `Tags.Test` with the four adjustments and a verified-unique GUID.
-- [ ] [P5-T2] Create `TaskTree.Test/packages.config` verbatim from `Tags.Test/packages.config`
+- [x] [P5-T2] Create `TaskTree.Test/packages.config` verbatim from `Tags.Test/packages.config`
   (identical package/version/targetFramework `net481` set, including the `developmentDependency`
   analyzer entries). Binary outcome: file exists byte-equivalent to the `Tags.Test` package set.
-- [ ] [P5-T3] Create `TaskTree.Test/app.config` verbatim from `Tags.Test/app.config` (binding
+- [x] [P5-T3] Create `TaskTree.Test/app.config` verbatim from `Tags.Test/app.config` (binding
   redirects required for Extensions/Identity/Testing assemblies under vstest). Binary outcome:
   file exists identical to `Tags.Test/app.config`.
-- [ ] [P5-T4] Create `TaskTree.Test/Properties/AssemblyInfo.cs` mirroring
+- [x] [P5-T4] Create `TaskTree.Test/Properties/AssemblyInfo.cs` mirroring
   `Tags.Test/Properties/AssemblyInfo.cs` with titles/product `TaskTree.Test`,
   `[assembly: ComVisible(false)]`, `[assembly: Guid("<new-ProjectGuid-lowercased>")]`, and
   `AssemblyVersion 1.0.0.0`. Binary outcome: file exists with the new GUID matching P5-T1.
-- [ ] [P5-T5] Add `TaskTree.Test` to `TaskMaster.sln`: insert a
+- [x] [P5-T5] Add `TaskTree.Test` to `TaskMaster.sln`: insert a
   `Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskTree.Test", "TaskTree.Test\TaskTree.Test.csproj", "{<NEW-GUID>}"`
   / `EndProject` entry (same shape as the `Tags.Test` entry at line 37) and a full
   `GlobalSection(ProjectConfigurationPlatforms)` block for the new GUID mirroring the `Tags.Test`
   GUID block at lines 216-227 (Debug|Any CPU, Debug|x64, Debug|x86, Release|Any CPU, Release|x64,
   Release|x86, each `ActiveCfg` + `Build.0`, using the exact `Any CPU` token). Binary outcome:
   sln contains the new project entry and its complete config block.
-- [ ] [P5-T6] Restore and build the empty `TaskTree.Test` project and confirm discovery: run the
+- [x] [P5-T6] Restore and build the empty `TaskTree.Test` project and confirm discovery: run the
   full C# toolchain in order (`csharpier .` -> analyzers build -> nullable build ->
   `vstest.console.exe TaskTree.Test\bin\Debug\TaskTree.Test.dll /EnableCodeCoverage`); the
   assembly builds into `TaskTree.Test\bin\Debug\` and is enumerated by vstest. Record to
@@ -359,7 +359,7 @@ tests await deterministically against synchronously-returning mocks.
 
 ### Phase 6 — Unit Tests to Coverage Floor
 
-- [ ] [P6-T1] Create `TaskTree.Test/TaskTreeControllerTests.cs` (MSTest `[TestClass]`/`[TestMethod]`,
+- [x] [P6-T1] Create `TaskTree.Test/TaskTreeControllerTests.cs` (MSTest `[TestClass]`/`[TestMethod]`,
   Moq, FluentAssertions, AAA) covering: ctor wiring (Verify `SetController`; null message seam ->
   default assigned, no throw), `InitializeTreeListView` (Verify `InitializeTreeView` with
   `_dataModel.Roots` + non-null predicate and `ResizeControls`), `ToggleExpandCollapseAll`
@@ -392,7 +392,7 @@ tests await deterministically against synchronously-returning mocks.
   the file <= 500 lines. Verification: run the full C# toolchain in order; all steps green and the
   new tests pass. Binary outcome: `ResolveRowStyle` extracted in `TaskTreeController.cs`, test file
   exists, wired into csproj, all its tests pass.
-- [ ] [P6-T2] Create `TaskTree.Test/TaskTreeControllerMoveLogicTests.cs` (MSTest, Moq,
+- [x] [P6-T2] Create `TaskTree.Test/TaskTreeControllerMoveLogicTests.cs` (MSTest, Moq,
   FluentAssertions, AAA) covering: `HandleModelCanDrop` (reorder -> Move; drop-on-self -> None;
   all-roots background; drop-on-descendant paradox message), `HandleModelDropped` dispatch (each
   `DropTargetLocation` routes + post-drop `SetModelFilter`/`SortTree`; `default` early return),
@@ -408,7 +408,7 @@ tests await deterministically against synchronously-returning mocks.
   `<Compile Include="TaskTreeControllerMoveLogicTests.cs" />` to `TaskTree.Test/TaskTree.Test.csproj`.
   Keep the file <= 500 lines. Verification: run the full C# toolchain in order; all steps green and
   the new tests pass. Binary outcome: file exists, wired into csproj, all its tests pass.
-- [ ] [P6-T3] Run `vstest.console.exe TaskTree.Test\bin\Debug\TaskTree.Test.dll /EnableCodeCoverage`,
+- [x] [P6-T3] Run `vstest.console.exe TaskTree.Test\bin\Debug\TaskTree.Test.dll /EnableCodeCoverage`,
   copy the raw coverage XML to `artifacts/csharp/coverage.xml`, and confirm `TaskTree.dll` line
   coverage is >= 80% with the new files (`TaskTreeController.cs`, `TaskTreeController.MoveLogic.cs`)
   >= 90%. If below threshold, add targeted `[TestMethod]`s to the existing test files (no csproj
@@ -420,46 +420,46 @@ tests await deterministically against synchronously-returning mocks.
 
 ### Phase 7 — Final QA Loop and Coverage Verification
 
-- [ ] [P7-T1] Run `csharpier .` and record the result to
+- [x] [P7-T1] Run `csharpier .` and record the result to
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/qa-gates/final-format.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. If files change, restart the QA
   loop from this task. Binary outcome: formatting clean with no changes.
-- [ ] [P7-T2] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+- [x] [P7-T2] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
   (lint/analyzers) and record to
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/qa-gates/final-analyzers.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. If a prior QA step changed
   files, restart from P7-T1. Binary outcome: zero analyzer errors.
-- [ ] [P7-T3] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+- [x] [P7-T3] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
   (type-check/nullable) and record to
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/qa-gates/final-nullable.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Binary outcome: build green with
   no nullable warnings-as-errors.
-- [ ] [P7-T4] Run `vstest.console.exe TaskTree.Test\bin\Debug\TaskTree.Test.dll /EnableCodeCoverage`
+- [x] [P7-T4] Run `vstest.console.exe TaskTree.Test\bin\Debug\TaskTree.Test.dll /EnableCodeCoverage`
   (test), copy the raw coverage XML to `artifacts/csharp/coverage.xml`, and record the post-change
   coverage to
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/qa-gates/final-coverage.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` including numeric `TaskTree.dll`
   line-% and per-new-file line-% values. Binary outcome: all tests pass and coverage numbers
   recorded.
-- [ ] [P7-T5] Verify the coverage thresholds and no-regression: baseline `TaskTree.dll`
+- [x] [P7-T5] Verify the coverage thresholds and no-regression: baseline `TaskTree.dll`
   (from P0-T5) vs post-change (from P7-T4) shows `TaskTree.dll` >= 80% line, new files
   (`TaskTreeController.cs`, `TaskTreeController.MoveLogic.cs`) >= 90% line, and no regression on
   changed lines. Record the delta to
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/qa-gates/coverage-delta.md`
   with baseline %, post-change %, and new-file %. Binary outcome: thresholds met and delta
   recorded; if unmet, outcome is remediation-required (not PASS).
-- [ ] [P7-T6] Verify every production file in `TaskTree/` is <= 500 lines
+- [x] [P7-T6] Verify every production file in `TaskTree/` is <= 500 lines
   (`TaskTreeController.cs`, `TaskTreeController.MoveLogic.cs`, `ITaskTreeForm.cs`,
   `TreeListViewVisual.cs`, `TaskTreeForm.cs`, `TaskTreeForm.Designer.cs`) and record the line
   counts to
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/qa-gates/final-filesize.md`.
   Binary outcome: all production files <= 500 lines.
-- [ ] [P7-T7] Verify `TaskMaster/Ribbon/RibbonController.cs` remains unchanged (`git diff` empty)
+- [x] [P7-T7] Verify `TaskMaster/Ribbon/RibbonController.cs` remains unchanged (`git diff` empty)
   after the full refactor and record to
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/qa-gates/final-caller-unchanged.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Binary outcome: caller file
   unchanged.
-- [ ] [P7-T8] Reconcile the `issue.md` Acceptance Criteria and `spec.md` Definition of Done
+- [x] [P7-T8] Reconcile the `issue.md` Acceptance Criteria and `spec.md` Definition of Done
   against collected evidence, mirror the status to
   `docs/features/active/2026-07-09-tasktree-testability-refactor-296/evidence/issue-updates/issue-296.<timestamp>.md`,
   and confirm the `[ExcludeFromCodeCoverage]` Exemption Register (E1, E2, E3) is flagged for
