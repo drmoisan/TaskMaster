@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -13,10 +13,23 @@ using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 
 namespace TaskVisualization
 {
-    [ExcludeFromCodeCoverage]
-    internal class AutoAssignPeople(IApplicationGlobals globals) : IAutoAssign
+    internal class AutoAssignPeople : IAutoAssign
     {
-        private readonly IApplicationGlobals _globals = globals;
+        private readonly IApplicationGlobals _globals;
+
+        // Synchronous MailItemHelper construction seam. Production default builds
+        // the helper from a live MailItem; tests inject a stub so the host-neutral
+        // branch selection in AutoFind is measured without a live Outlook process.
+        private readonly Func<object, MailItemHelper> _toHelper;
+
+        public AutoAssignPeople(
+            IApplicationGlobals globals,
+            Func<object, MailItemHelper> toHelper = null
+        )
+        {
+            _globals = globals;
+            _toHelper = toHelper ?? DefaultToHelper;
+        }
 
         public IList<string> FilterList
         {
@@ -51,17 +64,26 @@ namespace TaskVisualization
                 && olItem.GetOlItemType() == OlItemType.olMailItem
             )
             {
-                helper = new MailItemHelper(olItem.InnerObject as MailItem, _globals);
+                helper = _toHelper(olItem.InnerObject);
             }
             else if (objItem is MailItem olMail)
             {
-                helper = new MailItemHelper(olMail, _globals);
+                helper = _toHelper(olMail);
             }
             else
             {
                 return [];
             }
 
+            return RunPeopleClassifier(helper);
+        }
+
+        // Recipient-matching over a live MailItemHelper; enumerates COM recipient
+        // collections and may show a "missing recipients" dialog. Not unit-testable
+        // without live Outlook data or a form.
+        [ExcludeFromCodeCoverage]
+        private IList<string> RunPeopleClassifier(MailItemHelper helper)
+        {
             return AutoFile.AutoFindPeople(helper, _globals.TD.People, true, false);
 
             //return AutoFile.AutoFindPeople(
@@ -73,6 +95,17 @@ namespace TaskVisualization
             //        blExcludeFlagged: false);
         }
 
+        // Outlook-bound default: constructs a MailItemHelper from a live MailItem.
+        // Not unit-testable without a running Outlook process.
+        [ExcludeFromCodeCoverage]
+        private MailItemHelper DefaultToHelper(object mailItem)
+        {
+            return new MailItemHelper(mailItem as MailItem, _globals);
+        }
+
+        // Outlook-bound: reads recipients from a live MailItem to add missing
+        // people entries. Not unit-testable without a running Outlook process.
+        [ExcludeFromCodeCoverage]
         public IList<string> AddChoicesToDict(
             MailItem olMail,
             IList<IPrefix> prefixes,
@@ -83,6 +116,9 @@ namespace TaskVisualization
             return _globals.TD.People.AddMissingEntries(olMail);
         }
 
+        // MAPI-bound: creates a live Outlook category. Not unit-testable without a
+        // running Outlook process.
+        [ExcludeFromCodeCoverage]
         public Category AddColorCategory(IPrefix prefix, string categoryName)
         {
             return CreateCategoryModule.CreateCategory(
