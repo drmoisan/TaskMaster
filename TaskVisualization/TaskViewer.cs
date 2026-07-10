@@ -16,7 +16,7 @@ using UtilitiesCS;
 namespace TaskVisualization
 {
     [ExcludeFromCodeCoverage]
-    public partial class TaskViewer : Form
+    public partial class TaskViewer : Form, ITaskViewer, ITaskViewerControls
     {
         public TaskViewer()
         {
@@ -54,7 +54,201 @@ namespace TaskVisualization
         public void SetController(TaskController controller)
         {
             _controller = controller;
+
+            // Pure UI wiring relocated from the TaskController constructors so the
+            // controller no longer needs the concrete OKButton/Cancel_Button on its
+            // viewer interface (behavior preserved: both ctors already call SetController).
+            AcceptButton = OKButton;
+            CancelButton = Cancel_Button;
         }
+
+        #region ITaskViewer primitive facade
+
+        public string TaskNameText
+        {
+            get => TaskName.Text;
+            set => TaskName.Text = value;
+        }
+
+        public string ContextText
+        {
+            get => CategorySelection.Text;
+            set => CategorySelection.Text = value;
+        }
+
+        public string PeopleText
+        {
+            get => PeopleSelection.Text;
+            set => PeopleSelection.Text = value;
+        }
+
+        public string ProjectText
+        {
+            get => ProjectSelection.Text;
+            set => ProjectSelection.Text = value;
+        }
+
+        public string TopicText
+        {
+            get => TopicSelection.Text;
+            set => TopicSelection.Text = value;
+        }
+
+        public string DurationText
+        {
+            get => Duration.Text;
+            set => Duration.Text = value;
+        }
+
+        public object PrioritySelectedItem
+        {
+            get => PriorityBox.SelectedItem;
+            set => PriorityBox.SelectedItem = value;
+        }
+
+        public object KbSelectedItem
+        {
+            get => KbSelector.SelectedItem;
+            set => KbSelector.SelectedItem = value;
+        }
+
+        public bool TodayChecked
+        {
+            get => CbxToday.Checked;
+            set => CbxToday.Checked = value;
+        }
+
+        public bool BullpinChecked
+        {
+            get => CbxBullpin.Checked;
+            set => CbxBullpin.Checked = value;
+        }
+
+        public bool FlagAsTaskChecked
+        {
+            get => CbxFlagAsTask.Checked;
+            set => CbxFlagAsTask.Checked = value;
+        }
+
+        public DateTime ReminderValue
+        {
+            get => DtReminder.Value;
+            set => DtReminder.Value = value;
+        }
+
+        public bool ReminderChecked
+        {
+            get => DtReminder.Checked;
+            set => DtReminder.Checked = value;
+        }
+
+        public DateTime DueDateValue
+        {
+            get => DtDuedate.Value;
+            set => DtDuedate.Value = value;
+        }
+
+        public bool DueDateChecked
+        {
+            get => DtDuedate.Checked;
+            set => DtDuedate.Checked = value;
+        }
+
+        public void FocusDuration() => Duration.Focus();
+
+        #endregion
+
+        #region ITaskViewerControls control-identity surface (explicit implementation)
+
+        // Explicit implementation returns the Designer fields (whose names match the
+        // interface members); the control-identity regions of TaskController read these
+        // through the ITaskViewerControls accessor.
+
+        Label ITaskViewerControls.XlSector1 => XlSector1;
+        Label ITaskViewerControls.XlSector2 => XlSector2;
+        Label ITaskViewerControls.XlSector3 => XlSector3;
+        Label ITaskViewerControls.XlSector4 => XlSector4;
+
+        Label ITaskViewerControls.C1S1 => C1S1;
+        Label ITaskViewerControls.C3S1 => C3S1;
+        Label ITaskViewerControls.C4S1 => C4S1;
+        Label ITaskViewerControls.C2S2 => C2S2;
+        Label ITaskViewerControls.C3S2 => C3S2;
+        Label ITaskViewerControls.C4S2 => C4S2;
+        Label ITaskViewerControls.C2S3 => C2S3;
+        Label ITaskViewerControls.C3S3 => C3S3;
+        Label ITaskViewerControls.C4S3 => C4S3;
+        Label ITaskViewerControls.C2S4 => C2S4;
+        Label ITaskViewerControls.C3S4 => C3S4;
+
+        Label ITaskViewerControls.XlTopic => XlTopic;
+        Label ITaskViewerControls.XlProject => XlProject;
+        Label ITaskViewerControls.XlPeople => XlPeople;
+        Label ITaskViewerControls.XlContext => XlContext;
+        Label ITaskViewerControls.XlTaskname => XlTaskname;
+        Label ITaskViewerControls.XlImportance => XlImportance;
+        Label ITaskViewerControls.XlKanban => XlKanban;
+        Label ITaskViewerControls.XlWorktime => XlWorktime;
+        Label ITaskViewerControls.XlReminder => XlReminder;
+        Label ITaskViewerControls.XlDuedate => XlDuedate;
+        Label ITaskViewerControls.XlOk => XlOk;
+        Label ITaskViewerControls.XlCancel => XlCancel;
+        Label ITaskViewerControls.XlAutotag => XlAutotag;
+
+        Label ITaskViewerControls.XlScWaiting => XlScWaiting;
+        Label ITaskViewerControls.XlScUnprocessed => XlScUnprocessed;
+        Label ITaskViewerControls.XlScNews => XlScNews;
+        Label ITaskViewerControls.XlScEmail => XlScEmail;
+        Label ITaskViewerControls.XlScReadingbusiness => XlScReadingbusiness;
+        Label ITaskViewerControls.XlScCalls => XlScCalls;
+        Label ITaskViewerControls.XlScInternet => XlScInternet;
+        Label ITaskViewerControls.XlScPreread => XlScPreread;
+        Label ITaskViewerControls.XlScMeeting => XlScMeeting;
+        Label ITaskViewerControls.XlScPersonal => XlScPersonal;
+        Label ITaskViewerControls.XlScBullpin => XlScBullpin;
+        Label ITaskViewerControls.XlScToday => XlScToday;
+
+        Label ITaskViewerControls.LblTopic => LblTopic;
+        Label ITaskViewerControls.LblProject => LblProject;
+        Label ITaskViewerControls.LblPeople => LblPeople;
+        Label ITaskViewerControls.LblContext => LblContext;
+        Label ITaskViewerControls.LblTaskname => LblTaskname;
+        Label ITaskViewerControls.LblPriority => LblPriority;
+        Label ITaskViewerControls.LblKbf => LblKbf;
+        Label ITaskViewerControls.LblDuration => LblDuration;
+        Label ITaskViewerControls.LblReminder => LblReminder;
+        Label ITaskViewerControls.LblDuedate => LblDuedate;
+
+        Label ITaskViewerControls.CategorySelection => CategorySelection;
+        Label ITaskViewerControls.PeopleSelection => PeopleSelection;
+        Label ITaskViewerControls.ProjectSelection => ProjectSelection;
+        Label ITaskViewerControls.TopicSelection => TopicSelection;
+
+        TextBox ITaskViewerControls.TaskName => TaskName;
+        ComboBox ITaskViewerControls.PriorityBox => PriorityBox;
+        ComboBox ITaskViewerControls.KbSelector => KbSelector;
+        TextBox ITaskViewerControls.Duration => Duration;
+        DateTimePicker ITaskViewerControls.DtReminder => DtReminder;
+        DateTimePicker ITaskViewerControls.DtDuedate => DtDuedate;
+
+        Button ITaskViewerControls.OKButton => OKButton;
+        Button ITaskViewerControls.Cancel_Button => Cancel_Button;
+        Button ITaskViewerControls.AutoTagButton => AutoTagButton;
+        Button ITaskViewerControls.ShortcutWaitingFor => ShortcutWaitingFor;
+        Button ITaskViewerControls.ShortcutUnprocessed => ShortcutUnprocessed;
+        Button ITaskViewerControls.ShortcutNews => ShortcutNews;
+        Button ITaskViewerControls.ShortcutEmail => ShortcutEmail;
+        Button ITaskViewerControls.ShortcutReadingBusiness => ShortcutReadingBusiness;
+        Button ITaskViewerControls.ShortcutCalls => ShortcutCalls;
+        Button ITaskViewerControls.ShortcutInternet => ShortcutInternet;
+        Button ITaskViewerControls.ShortcutPreRead => ShortcutPreRead;
+        Button ITaskViewerControls.ShortcutMeeting => ShortcutMeeting;
+        Button ITaskViewerControls.ShortcutPersonal => ShortcutPersonal;
+
+        CheckBox ITaskViewerControls.CbxBullpin => CbxBullpin;
+        CheckBox ITaskViewerControls.CbxToday => CbxToday;
+
+        #endregion
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {

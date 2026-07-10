@@ -90,8 +90,19 @@
       <DependentUpon>ManageFilters.cs</DependentUpon>
     </Compile>
     <Compile Include="AutoCreateProject.cs" />
+    <Compile Include="ITaskViewer.cs" />
+    <Compile Include="ITaskViewerControls.cs" />
+    <Compile Include="TaskDurationParser.cs" />
+    <Compile Include="TaskPriorityMapper.cs" />
+    <Compile Include="ITagPromptService.cs" />
+    <Compile Include="TagPromptService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TaskController.cs" />
+    <Compile Include="TaskController.Accelerator.cs" />
+    <Compile Include="TaskController.ControlMaps.cs" />
+    <Compile Include="TaskController.ControlRelationships.cs" />
+    <Compile Include="TaskController.Flags.cs" />
+    <Compile Include="TaskController.Actions.cs" />
     <Compile Include="TaskViewer.cs">
       <SubType>Form</SubType>
     </Compile>

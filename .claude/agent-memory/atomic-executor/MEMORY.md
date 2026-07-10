@@ -1,5 +1,7 @@
 # Atomic Executor Memory Index
 
+- [TaskController (#297) unit-test gotchas](project_taskvisualization_taskcontroller_test_gotchas.md) — ApplyChanges hangs over Moq (mark exempt); get-only MailItem.TaskSubject throws MissingMethodException; STA harness needs TableLayoutPanel parenting + NavTips warmup + no DateTimePicker.Text; C# 7.3 test project; tail-piped vstest buffers til exit
+
 - [MSTest [DoNotParallelize] overlaps the parallel bucket](project_mstest_donotparallelize_overlaps_parallel_bucket.md) — #292: a [DoNotParallelize] null-baseline reader still sees writes from parallel-bucket writers; fix = mark every writer too so zero writers remain parallel
 
 - [FluentAssertions Equal(params) has no because](project_fluentassertions_equal_params_no_because.md) — a trailing reason string on .Equal(...) becomes an extra expected element and fails a GREEN-on-HEAD test; use .Equal(new[]{...}) or move reason to .HaveCount(n, reason)

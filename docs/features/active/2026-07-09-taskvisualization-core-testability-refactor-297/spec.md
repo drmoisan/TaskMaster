@@ -432,33 +432,40 @@ focus/handle/pump-bound handler) remains exempt, at method/branch level.
 
 ## Definition of Done
 
-- [ ] Structure matches this spec; `TaskController.cs` decomposed so no in-scope
+- [x] Structure matches this spec; `TaskController.cs` decomposed so no in-scope
       production file exceeds 500 lines
-- [ ] `ITaskViewer` exists, derives from `IForm`, and `TaskViewer` implements it;
+- [x] `ITaskViewer` exists, derives from `IForm`, and `TaskViewer` implements it;
       `TaskController` depends on `ITaskViewer`, not the concrete form
-- [ ] Host-neutral logic separated from COM/WinForms interaction; class-level
+- [x] Host-neutral logic separated from COM/WinForms interaction; class-level
       `[ExcludeFromCodeCoverage]` on `TaskController` removed
-- [ ] No unit test constructs a live form/window or triggers a popup; seams
+- [x] No unit test constructs a live form/window or triggers a popup; seams
       (`ITagPromptService`, notifier, factory) injected
-- [ ] Refactored core reaches >= 80% line coverage; new helper classes >= 90%;
+- [x] Refactored core reaches >= 80% line coverage; new helper classes >= 90%;
       exemption inventory listed for maintainer ratification
-- [ ] Control-identity regions measured via STA last-resort per the ratified
+- [x] Control-identity regions measured via STA last-resort per the ratified
       refinement: `TaskController.ControlMaps.cs` and the measured portion of
       `TaskController.Accelerator.cs` carry no file-level exemption and are covered by
       dedicated `*.StaTests.cs` (`[STATestClass]`/`[STATestMethod]`) against real
       never-shown in-memory controls; no `Form`-derived type is constructed; only the
       `PostMessage`/handle/focus residue remains exempt at method/branch level
-- [ ] Edge cases and error handling verified (positive/negative/edge per unit)
-- [ ] Tests, linting, and type checks clean
-- [ ] Docs updated (spec/plan/epic manifest as needed)
-- [ ] Full C# toolchain pass completed (format → lint → type-check → test) with no
+- [x] Edge cases and error handling verified (positive/negative/edge per unit)
+- [x] Tests, linting, and type checks clean
+- [x] Docs updated (spec/plan/epic manifest as needed)
+- [x] Full C# toolchain pass completed (format → lint → type-check → test) with no
       regression
 
+> **Plan completion (2026-07-10):** All phases P0–P7 of
+> `plan.2026-07-09T16-07.md` executed. Full C# toolchain green in a single pass
+> (csharpier check clean, analyzer 0 errors, nullable/TWAE 0 errors, 104/104 tests
+> pass). Refactored-core line coverage 88.95% (>= 80%); new helper classes 100%
+> (>= 90%). No in-scope production file exceeds 500 lines. Evidence under
+> `evidence/qa-gates/` and `evidence/other/`.
+
 ## Seeded Test Conditions (from potential)
-- [ ] Business-logic units (filtering, sorting, state shaping) covered with pure inputs.
-- [ ] Dialog-driven paths covered via seams intercepting `MessageBox`/input dialogs.
-- [ ] Event handler logic covered via a mocked `ITaskViewer`.
-- [ ] Outlook Interop boundaries mocked behind seams.
+- [x] Business-logic units (filtering, sorting, state shaping) covered with pure inputs.
+- [x] Dialog-driven paths covered via seams intercepting `MessageBox`/input dialogs.
+- [x] Event handler logic covered via a mocked `ITaskViewer`.
+- [x] Outlook Interop boundaries mocked behind seams.
 
 ## User Story Applicability
 
