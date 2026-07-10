@@ -10,19 +10,30 @@ The epic checkpoint JSON is the durable, machine-authoritative source.
 - Epic issue: https://github.com/drmoisan/TaskMaster/issues/295
 - Integration branch: `epic/winforms-testability-refactor-integration`
 - Model budget: `fable_policy: available`
-- Current wave: 0
-- Last updated: 2026-07-10T01:47:31Z
+- Fan-in model: every child fans into the integration branch via a real child PR (corrected model,
+  2026-07-10 maintainer directive). The prior direct `git merge --no-ff` fan-ins for #293/#296/#297
+  were unwound to the post-design tip `c7b63358` and are being re-landed via child PRs.
+- Current wave: 0 (in progress)
+- Last updated: 2026-07-10T05:03:00Z
 
 ## Feature Status
 
 | Wave | Issue | Feature folder | merge_status | PR | merge_commit | worktree_created | pr_opened | merge_confirmed | worktree_removed |
 |---|---|---|---|---|---|---|---|---|---|
-| 0 | #293 | 2026-07-09-tagcontroller-testability-refactor-293 | not_started | — | — | — | — | — | — |
-| 0 | #296 | 2026-07-09-tasktree-testability-refactor-296 | not_started | — | — | — | — | — | — |
-| 0 | #297 | 2026-07-09-taskvisualization-core-testability-refactor-297 | not_started | — | — | — | — | — | — |
+| 0 | #293 | 2026-07-09-tagcontroller-testability-refactor-293 | merged | [#299](https://github.com/drmoisan/TaskMaster/pull/299) | 03ab8a1f | 2026-07-10T01:52:00Z | 2026-07-10T05:00:02Z | 2026-07-10T05:02:15Z | — |
+| 0 | #296 | 2026-07-09-tasktree-testability-refactor-296 | worktree_created | — | — | 2026-07-10T01:52:00Z | — | — | — |
+| 0 | #297 | 2026-07-09-taskvisualization-core-testability-refactor-297 | worktree_created | — | — | 2026-07-10T01:52:00Z | — | — | — |
 | 1 | #298 | 2026-07-09-taskvisualization-secondary-testability-298 | not_started | — | — | — | — | — | — |
 
 Dependency: #298 depends on #297 (both modify `TaskVisualization.csproj` / `TaskVisualization.Test`); #298 launches only after #297 is merged/worktree_removed.
+
+## Coverage (per child, from feature-review evidence)
+
+| Issue | Line % | Branch % |
+|---|---|---|
+| #293 | 92.63 | — |
+| #296 | 96.34 | 91.49 |
+| #297 | 85.36 | 78.28 |
 
 ## Integration PR
 
