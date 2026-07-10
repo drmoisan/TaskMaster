@@ -5,7 +5,9 @@ using System.Reflection;
 using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Tags;
+using Moq;
+using Tags.Test.Fakes;
+using UtilitiesCS;
 
 namespace Tags.Test
 {
@@ -13,30 +15,37 @@ namespace Tags.Test
     public class TagControllerTests
     {
         [TestMethod]
-        [STAThread]
         public void CheckboxClick_WithUnprefixedOptionAndPrefix_DoesNotReconstructMissingKey()
         {
-            var viewer = new TagViewer();
+            // Arrange: headless fake viewer + injected dialog/draw seams, no live form, no STA apartment.
+            var fake = new FakeTagViewer();
             var options = new SortedDictionary<string, bool> { ["Build Team"] = false };
+            var prompt = new Mock<IUserPrompt>(MockBehavior.Loose);
+            var controller = new TagController(
+                fake.Object,
+                options,
+                null,
+                (IPrefix)CreateProgramPrefix(),
+                prompt.Object,
+                _ => { }
+            );
 
-            using (viewer)
+            var optionCheckBox = fake.OptionControls.Single();
+
+            try
             {
-                var controller = (TagController)
-                    Activator.CreateInstance(
-                        typeof(TagController),
-                        viewer,
-                        options,
-                        null,
-                        CreateProgramPrefix()
-                    );
-                var optionCheckBox = FindOptionCheckBox(viewer);
-
                 optionCheckBox.Text.Should().Be("Build Team");
 
+                // Act: raise the checkbox Click through the controller's CheckBoxController wiring.
                 Action act = () => RaiseClick(optionCheckBox);
 
+                // Assert: the option is toggled using its Tag, not a reconstructed prefixed key.
                 act.Should().NotThrow();
                 controller.GetSelections().Should().Equal("Build Team");
+            }
+            finally
+            {
+                optionCheckBox.Dispose();
             }
         }
 
@@ -80,33 +89,6 @@ namespace Tags.Test
                 "TagProgram",
                 noColor
             );
-        }
-
-        private static CheckBox FindOptionCheckBox(TagViewer viewer)
-        {
-            var optionsPanel = FindControls<Panel>(viewer)
-                .Single(control =>
-                    string.Equals(control.Name, "L1v2L2_OptionsPanel", StringComparison.Ordinal)
-                );
-
-            return optionsPanel.Controls.OfType<CheckBox>().Single();
-        }
-
-        private static IEnumerable<TControl> FindControls<TControl>(Control root)
-            where TControl : Control
-        {
-            if (root is TControl matched)
-            {
-                yield return matched;
-            }
-
-            foreach (Control child in root.Controls)
-            {
-                foreach (var descendant in FindControls<TControl>(child))
-                {
-                    yield return descendant;
-                }
-            }
         }
 
         private static void RaiseClick(CheckBox checkBox)

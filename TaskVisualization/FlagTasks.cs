@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -17,7 +17,6 @@ using UtilitiesCS;
 
 namespace TaskVisualization
 {
-    [ExcludeFromCodeCoverage]
     public class FlagTasks
     {
         private readonly List<ToDoItem> _todoSelection;
@@ -32,6 +31,15 @@ namespace TaskVisualization
         private readonly IApplicationGlobals _globals;
         private string _userEmailAddress;
 
+        // Flag-selection dialog seam: production default is the Tags dialog; the
+        // extracted FlagCalculations.GetFlagsToSet is directly stub-testable.
+        private readonly Func<SortedDictionary<string, bool>, List<string>> _flagSelector =
+            GetUserInputFlagsToAdjust;
+
+        // Outlook-bound: reads ActiveExplorer/Selection, shows MessageBox, and
+        // constructs the live TaskViewer/TaskController; not unit-testable without a
+        // running Outlook process. Constructor shape preserved (invariant 1).
+        [ExcludeFromCodeCoverage]
         public FlagTasks(
             IApplicationGlobals globals,
             IList itemList = null,
@@ -53,7 +61,7 @@ namespace TaskVisualization
                 );
                 return;
             }
-            _flagsToSet = GetFlagsToSet(_todoSelection.Count);
+            _flagsToSet = FlagCalculations.GetFlagsToSet(_todoSelection.Count, _flagSelector);
             _viewer = new TaskViewer();
             // _defaultsToDo = New ToDoDefaults()
             _autoAssignPeople = new AutoAssignPeople(globals);
@@ -75,6 +83,9 @@ namespace TaskVisualization
             _userEmailAddress = globals.Ol.UserEmailAddress;
         }
 
+        // Outlook-bound: shows the live TaskViewer form; not unit-testable without a
+        // running Outlook process. Behavior preserved (invariant 1).
+        [ExcludeFromCodeCoverage]
         public DialogResult Run(bool modal = false)
         {
             if (_controller is not null)
@@ -92,6 +103,9 @@ namespace TaskVisualization
             }
         }
 
+        // Outlook-bound: enumerates the live ActiveExplorer selection and shows a
+        // MessageBox / creates a live task item; not unit-testable without Outlook.
+        [ExcludeFromCodeCoverage]
         public static List<ToDoItem> InitializeToDoList(IList itemList, IApplicationGlobals globals)
         {
             var olItems = (
@@ -132,10 +146,16 @@ namespace TaskVisualization
             return todoList;
         }
 
+        // Outlook-bound: builds the ToDo selection from a live Outlook selection and
+        // writes user-defined fields; not unit-testable without a running Outlook.
+        [ExcludeFromCodeCoverage]
         public static void PopulateUdf(IList itemList, IApplicationGlobals globals)
         {
             var toDoSelection = InitializeToDoList(itemList, globals);
-            var flagsToSet = GetFlagsToSet(toDoSelection.Count);
+            var flagsToSet = FlagCalculations.GetFlagsToSet(
+                toDoSelection.Count,
+                GetUserInputFlagsToAdjust
+            );
             toDoSelection.ForEach(x => x.WriteFlagsBatch(flagsToSet));
         }
 
@@ -143,76 +163,21 @@ namespace TaskVisualization
         /// Adds the Selection from the ActiveExplorer to a new List of object
         /// </summary>
         /// <returns>Collection of Outlook Items</returns>
+        // Outlook-bound: enumerates the live Explorer.Selection; not unit-testable.
+        [ExcludeFromCodeCoverage]
         private static IList<object> GetSelection(Explorer olExplorer)
         {
             return olExplorer.Selection.Cast<object>().ToList();
         }
 
         /// <summary>
-        /// Method asks the user which flags to set if selectionCount is greater than 1. Otherwise sets all flags.
+        /// Method asks the user which flags to set if selectionCount is greater than
+        /// 1. Otherwise sets all flags. Production default supplied to
+        /// <see cref="FlagCalculations.GetFlagsToSet"/>.
         /// </summary>
-        /// <param name="selectionCount">Count of outlook object items selected</param>
-        /// <returns></returns>
-        private static Enums.FlagsToSet GetFlagsToSet(int selectionCount)
-        {
-            // If more than one item selected, ask user which flags to set
-            if (selectionCount > 1)
-            {
-                var symbolSelectionDict = GetSymbolsDictionary();
-                var flagStrings = GetUserInputFlagsToAdjust(symbolSelectionDict);
-                return ConvertFlagStringsToEnum(flagStrings);
-            }
-            // Else set them All
-            else
-            {
-                return Enums.FlagsToSet.All;
-            }
-        }
-
-        private static Enums.FlagsToSet ConvertFlagStringsToEnum(List<string> flagStrings)
-        {
-            if (flagStrings.Count == 0)
-            {
-                return Enums.FlagsToSet.All;
-            }
-            else
-            {
-                Enums.FlagsToSet flag;
-                var flagsList = (
-                    from x in flagStrings
-                    where Enum.TryParse(x, out flag)
-                    select Enum.Parse(typeof(Enums.FlagsToSet), x)
-                )
-                    .ToList()
-                    .OfType<Enums.FlagsToSet>();
-
-                Enums.FlagsToSet selectedFlags = (Enums.FlagsToSet)
-                    Conversions.ToInteger(GenericBitwiseStatic<Enums.FlagsToSet>.Or(flagsList));
-                return selectedFlags;
-            }
-        }
-
-        private static SortedDictionary<string, bool> GetSymbolsDictionary()
-        {
-            Enums.FlagsToSet[] excludedMembers = new[]
-            {
-                Enums.FlagsToSet.All,
-                Enums.FlagsToSet.None,
-            };
-            var symbolsDict = Enum.GetValues(typeof(Enums.FlagsToSet))
-                .Cast<Enums.FlagsToSet>()
-                .ToList()
-                .AsEnumerable()
-                .Where(x => excludedMembers.Contains(x) == false)
-                .Select(x => x)
-                .ToDictionary(x => Enum.GetName(typeof(Enums.FlagsToSet), x), x => x);
-
-            var symbolSelectionDict = (from x in symbolsDict select x.Key)
-                .ToDictionary(x => x, x => false)
-                .ToSortedDictionary();
-            return symbolSelectionDict;
-        }
-
+        // Outlook/UI-bound: constructs and shows the Tags flag-selection dialog; not
+        // unit-testable without a live form.
+        [ExcludeFromCodeCoverage]
         private static List<string> GetUserInputFlagsToAdjust(
             SortedDictionary<string, bool> symbolSelectionDict
         )

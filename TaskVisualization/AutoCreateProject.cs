@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -13,12 +13,34 @@ using UtilitiesCS.Extensions;
 
 namespace TaskVisualization
 {
-    [ExcludeFromCodeCoverage]
-    public class AutoCreateProject(IApplicationGlobals globals) : IAutoAssign
+    public class AutoCreateProject : IAutoAssign
     {
-        private readonly IApplicationGlobals _globals = globals;
+        private readonly IApplicationGlobals _globals;
 
-        //private readonly IList<IPrefix> _prefixes;
+        // Interop/dialog seams. Production defaults preserve the original live-host
+        // behavior; tests inject stubs so host-neutral branches are measured without
+        // a live Outlook process or popup.
+        private readonly Func<IEnumerable<string>, string> _chooseProgram;
+        private readonly Func<IPrefix, string, Category> _createCategory;
+        private readonly Func<Items> _getTaskItems;
+
+        /// <summary>
+        /// Creates the project auto-assigner. The single-argument form remains valid
+        /// for existing callers; optional seams default to the live-host
+        /// implementations.
+        /// </summary>
+        public AutoCreateProject(
+            IApplicationGlobals globals,
+            Func<IEnumerable<string>, string> chooseProgram = null,
+            Func<IPrefix, string, Category> createCategory = null,
+            Func<Items> getTaskItems = null
+        )
+        {
+            _globals = globals;
+            _chooseProgram = chooseProgram ?? DefaultChooseProgram;
+            _createCategory = createCategory ?? DefaultCreateCategory;
+            _getTaskItems = getTaskItems ?? GetTaskItems;
+        }
 
         public IList<string> FilterList => [.. _globals.TD.CategoryFilters];
 
@@ -52,15 +74,23 @@ namespace TaskVisualization
                     new ProjectEntry(projectName, projectID, programName, programID)
                 );
                 _globals.TD.ProjInfo.Serialize();
-                var cat = CreateCategoryModule.CreateCategory(
-                    olNS: _globals.Ol.NamespaceMAPI,
-                    prefix: prefix,
-                    newCatName: projectName
-                );
+                var cat = _createCategory(prefix, projectName);
                 CreateProjectTaskItem(projectName, projectID);
                 return cat;
             }
             return null;
+        }
+
+        // MAPI-bound default: creates a live Outlook category. Not unit-testable
+        // without a running Outlook process.
+        [ExcludeFromCodeCoverage]
+        private Category DefaultCreateCategory(IPrefix prefix, string projectName)
+        {
+            return CreateCategoryModule.CreateCategory(
+                olNS: _globals.Ol.NamespaceMAPI,
+                prefix: prefix,
+                newCatName: projectName
+            );
         }
 
         public string GetNextProjectID(string programID)
@@ -76,14 +106,7 @@ namespace TaskVisualization
 
         internal string ChooseOrCreateProgramName()
         {
-            string userEmail = _globals
-                .Ol.StoresWrapper.Stores.FirstOrDefault(x => !x.UserEmailAddress.IsNullOrEmpty())
-                ?.UserEmailAddress;
-            var chooser = new TagLauncher(_globals.TD.ProgramInfo.Keys, null, userEmail);
-
-            chooser.Viewer.Text = "Select or Create Program";
-            chooser.Viewer.ShowDialog();
-            var selection = chooser.Controller.GetSelections().FirstOrDefault();
+            var selection = _chooseProgram(_globals.TD.ProgramInfo.Keys);
             if (selection.IsNullOrEmpty())
             {
                 return null;
@@ -104,6 +127,21 @@ namespace TaskVisualization
             }
         }
 
+        // UI-bound default: shows the TagLauncher program-selection dialog. Not
+        // unit-testable without a live form.
+        [ExcludeFromCodeCoverage]
+        private string DefaultChooseProgram(IEnumerable<string> programKeys)
+        {
+            string userEmail = _globals
+                .Ol.StoresWrapper.Stores.FirstOrDefault(x => !x.UserEmailAddress.IsNullOrEmpty())
+                ?.UserEmailAddress;
+            var chooser = new TagLauncher(programKeys, null, userEmail);
+
+            chooser.Viewer.Text = "Select or Create Program";
+            chooser.Viewer.ShowDialog();
+            return chooser.Controller.GetSelections().FirstOrDefault();
+        }
+
         internal bool TryAutoExtractProgram(string projectName, out string programName)
         {
             programName = null;
@@ -120,9 +158,12 @@ namespace TaskVisualization
             return false;
         }
 
+        // Outlook-bound: creates a live Outlook task item. Not unit-testable without
+        // a running Outlook process.
+        [ExcludeFromCodeCoverage]
         public void CreateProjectTaskItem(string projectName, string projectID)
         {
-            var taskItems = GetTaskItems();
+            var taskItems = _getTaskItems();
             var taskItem = (TaskItem)taskItems.Add(OlItemType.olTaskItem);
             var todo = new ToDoItem(new OutlookItem(taskItem));
             todo.IdAutoCoding = false;
@@ -132,6 +173,9 @@ namespace TaskVisualization
             todo.Context.AsStringNoPrefix = "PROJECTS";
         }
 
+        // Outlook-bound: resolves the live default Tasks folder. Not unit-testable
+        // without a running Outlook process. Also the default for the _getTaskItems seam.
+        [ExcludeFromCodeCoverage]
         internal Items GetTaskItems()
         {
             var olTasksFolder = _globals.Ol.App.Session.GetDefaultFolder(
@@ -158,6 +202,9 @@ namespace TaskVisualization
             throw new NotImplementedException();
         }
 
+        // Outlook/classifier-bound: builds a MailItemHelper from a live MailItem and
+        // runs the classifier engine. Not unit-testable without a running Outlook.
+        [ExcludeFromCodeCoverage]
         public async Task<IList<string>> AutoFindAsync(object objItem)
         {
             var helper = await ToHelper(objItem);
@@ -175,6 +222,9 @@ namespace TaskVisualization
             return results;
         }
 
+        // Outlook-bound: constructs a MailItemHelper from a live MailItem. Not
+        // unit-testable without a running Outlook process.
+        [ExcludeFromCodeCoverage]
         private async Task<MailItemHelper> ToHelper(object objItem)
         {
             MailItemHelper helper = null;

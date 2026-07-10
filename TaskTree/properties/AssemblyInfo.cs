@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("PepsiCo Inc")]
 [assembly: AssemblyProduct("TaskTree")]
-[assembly: AssemblyCopyright("Copyright © PepsiCo Inc 2023")]
+[assembly: AssemblyCopyright("Copyright ï¿½ PepsiCo Inc 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -18,6 +18,10 @@ using System.Runtime.InteropServices;
 // to COM components.  If you need to access a type in this assembly from
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
+
+// Expose internal controller members (event handlers, move logic, IsValidType, etc.) to the
+// TaskTree.Test project so they can be unit-tested without widening the public surface (issue #296).
+[assembly: InternalsVisibleTo("TaskTree.Test")]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("f696e824-377c-46ec-9c6e-56830387094d")]
