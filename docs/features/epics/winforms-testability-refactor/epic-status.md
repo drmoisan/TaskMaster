@@ -14,14 +14,14 @@ The epic checkpoint JSON is the durable, machine-authoritative source.
   2026-07-10 maintainer directive). The prior direct `git merge --no-ff` fan-ins for #293/#296/#297
   were unwound to the post-design tip `c7b63358` and are being re-landed via child PRs.
 - Current wave: 0 (in progress)
-- Last updated: 2026-07-10T05:03:00Z
+- Last updated: 2026-07-10T05:08:00Z
 
 ## Feature Status
 
 | Wave | Issue | Feature folder | merge_status | PR | merge_commit | worktree_created | pr_opened | merge_confirmed | worktree_removed |
 |---|---|---|---|---|---|---|---|---|---|
 | 0 | #293 | 2026-07-09-tagcontroller-testability-refactor-293 | merged | [#299](https://github.com/drmoisan/TaskMaster/pull/299) | 03ab8a1f | 2026-07-10T01:52:00Z | 2026-07-10T05:00:02Z | 2026-07-10T05:02:15Z | — |
-| 0 | #296 | 2026-07-09-tasktree-testability-refactor-296 | worktree_created | — | — | 2026-07-10T01:52:00Z | — | — | — |
+| 0 | #296 | 2026-07-09-tasktree-testability-refactor-296 | merged | [#300](https://github.com/drmoisan/TaskMaster/pull/300) | 1c1332bb | 2026-07-10T01:52:00Z | 2026-07-10T05:06:39Z | 2026-07-10T05:07:42Z | — |
 | 0 | #297 | 2026-07-09-taskvisualization-core-testability-refactor-297 | worktree_created | — | — | 2026-07-10T01:52:00Z | — | — | — |
 | 1 | #298 | 2026-07-09-taskvisualization-secondary-testability-298 | not_started | — | — | — | — | — | — |
 
