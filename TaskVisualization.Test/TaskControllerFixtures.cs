@@ -114,7 +114,8 @@ namespace TaskVisualization.Test
             Mock<IAutoAssign> projectAssign = null,
             Mock<IAutoAssign> contextAssign = null,
             IApplicationGlobals globals = null,
-            Func<MailItem, Task<MailItemHelper>> mailHelperFactory = null
+            Func<MailItem, Task<MailItemHelper>> mailHelperFactory = null,
+            Action<string> setActiveTaskSubject = null
         ) =>
             BuildControllerOver(
                 view.Object,
@@ -125,7 +126,8 @@ namespace TaskVisualization.Test
                 projectAssign,
                 contextAssign,
                 globals,
-                mailHelperFactory
+                mailHelperFactory,
+                setActiveTaskSubject
             );
 
         /// <summary>
@@ -166,7 +168,8 @@ namespace TaskVisualization.Test
             Mock<IAutoAssign> projectAssign = null,
             Mock<IAutoAssign> contextAssign = null,
             IApplicationGlobals globals = null,
-            Func<MailItem, Task<MailItemHelper>> mailHelperFactory = null
+            Func<MailItem, Task<MailItemHelper>> mailHelperFactory = null,
+            Action<string> setActiveTaskSubject = null
         )
         {
             var people = autoAssign ?? AutoAssign();
@@ -184,7 +187,8 @@ namespace TaskVisualization.Test
                 options,
                 (tagPrompt ?? TagPrompt(true)).Object,
                 CapturingNotifier(warnings ?? new List<string>()),
-                mailHelperFactory ?? MailHelperFactory()
+                mailHelperFactory ?? MailHelperFactory(),
+                setActiveTaskSubject
             );
         }
     }

@@ -39,7 +39,8 @@ namespace TaskVisualization
             Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All,
             ITagPromptService tagPromptService = null,
             Action<string> showWarning = null,
-            Func<MailItem, Task<MailItemHelper>> mailItemHelperFactory = null
+            Func<MailItem, Task<MailItemHelper>> mailItemHelperFactory = null,
+            Action<string> setActiveTaskSubject = null
         )
         {
             //TODO: Add description of olCategories and defaults in documentation
@@ -50,7 +51,12 @@ namespace TaskVisualization
             _defaults = defaults;
             _autoAssign = autoAssign;
             _userEmailAddress = userEmailAddress;
-            InitializeSeams(tagPromptService, showWarning, mailItemHelperFactory);
+            InitializeSeams(
+                tagPromptService,
+                showWarning,
+                mailItemHelperFactory,
+                setActiveTaskSubject
+            );
 
             // Activate this controller within the viewer. The accept/cancel button
             // wiring is performed inside TaskViewer.SetController (relocated there so the
@@ -95,7 +101,8 @@ namespace TaskVisualization
             Enums.FlagsToSet flagOptions = Enums.FlagsToSet.All,
             ITagPromptService tagPromptService = null,
             Action<string> showWarning = null,
-            Func<MailItem, Task<MailItemHelper>> mailItemHelperFactory = null
+            Func<MailItem, Task<MailItemHelper>> mailItemHelperFactory = null,
+            Action<string> setActiveTaskSubject = null
         )
         {
             _viewer = formInstance;
@@ -105,7 +112,12 @@ namespace TaskVisualization
             _autoAssign = autoAssign;
             _userEmailAddress = userEmailAddress;
             Globals = globals;
-            InitializeSeams(tagPromptService, showWarning, mailItemHelperFactory);
+            InitializeSeams(
+                tagPromptService,
+                showWarning,
+                mailItemHelperFactory,
+                setActiveTaskSubject
+            );
 
             // Activate this controller within the viewer. The accept/cancel button
             // wiring is performed inside TaskViewer.SetController (relocated there so the
@@ -141,16 +153,20 @@ namespace TaskVisualization
         }
 
         /// <summary>
-        /// Assigns the three seam fields, applying production defaults when a caller passes
+        /// Assigns the four seam fields, applying production defaults when a caller passes
         /// null. Invoked from both constructors so the seams initialize on every construction
         /// path. The <c>MailItemHelper</c> factory reads <see cref="Globals"/> lazily at
         /// invocation time (matching the former inline call), so its default is valid on the
-        /// 11-parameter path where <see cref="Globals"/> is set.
+        /// 11-parameter path where <see cref="Globals"/> is set. The default
+        /// <c>setActiveTaskSubject</c> closure captures <c>_active</c> by variable, resolved at
+        /// invocation time, which is valid because this method runs before <c>_active</c> is
+        /// assigned in the constructor.
         /// </summary>
         private void InitializeSeams(
             ITagPromptService tagPromptService,
             Action<string> showWarning,
-            Func<MailItem, Task<MailItemHelper>> mailItemHelperFactory
+            Func<MailItem, Task<MailItemHelper>> mailItemHelperFactory,
+            Action<string> setActiveTaskSubject
         )
         {
             _tagPromptService = tagPromptService ?? new TagPromptService();
@@ -158,6 +174,7 @@ namespace TaskVisualization
             _mailItemHelperFactory =
                 mailItemHelperFactory
                 ?? (m => MailItemHelper.FromMailItemAsync(m, Globals, default, false));
+            _setActiveTaskSubject = setActiveTaskSubject ?? (v => _active.TaskSubject = v);
         }
 
         /// <summary>
@@ -266,6 +283,7 @@ namespace TaskVisualization
         private ITagPromptService _tagPromptService;
         private Action<string> _showWarning;
         private Func<MailItem, Task<MailItemHelper>> _mailItemHelperFactory;
+        private Action<string> _setActiveTaskSubject;
 
         private readonly List<ToDoItem> _todo_list;
         private readonly ToDoItem _active;

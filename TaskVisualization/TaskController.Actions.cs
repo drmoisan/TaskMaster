@@ -383,7 +383,7 @@ namespace TaskVisualization
                 }
                 case Enums.FlagsToSet.Taskname:
                 {
-                    _active.TaskSubject = value;
+                    _setActiveTaskSubject(value);
                     _viewer.TaskNameText = value;
                     break;
                 }

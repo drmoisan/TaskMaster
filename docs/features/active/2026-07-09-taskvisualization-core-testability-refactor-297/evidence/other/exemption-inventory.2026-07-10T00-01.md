@@ -34,4 +34,12 @@
 
 ## Not-exempt-but-uncovered residue (counted against coverage, not exempted)
 
-- The `InvokeRequired == true` re-invoke one-liners in `OK_Action` / `MergeFlag`, the `OK_Action` category-selected branch tail (it awaits the exempt `ApplyChanges`), the `SetFlag` `Taskname` case (writes the get-only interop `MailItem.TaskSubject`, recoverable only against a live COM object), and the `ExecuteXlAction` `TextBox`/`ComboBox` dispatch lines that call the exempt focus helpers are left in the denominator and simply counted as uncovered. They are not exempted. The measured-core aggregate still meets the 80% floor (88.95%).
+- The `InvokeRequired == true` re-invoke one-liners in `OK_Action` / `MergeFlag`, the `OK_Action` category-selected branch tail (it awaits the exempt `ApplyChanges`), and the `ExecuteXlAction` `TextBox`/`ComboBox` dispatch lines that call the exempt focus helpers are left in the denominator and simply counted as uncovered. They are not exempted. The measured-core aggregate still meets the 80% floor.
+
+## Remediation update (2026-07-10) — `SetFlag(Taskname)` / `Shortcut_ReadingNews` now covered
+
+- Prior state: the `SetFlag` `Taskname` case wrote `_active.TaskSubject` directly, a get-only interop `MailItem.TaskSubject` property recoverable only against a live COM object, so it and `Shortcut_ReadingNews` (which calls `SetFlag(..., Taskname)`) were left uncovered residue (see the entry removed above).
+- Fix: added an optional-with-default constructor seam `Action<string> setActiveTaskSubject = null` to both `TaskController` constructors (mirroring the existing `_showWarning` / `_mailItemHelperFactory` seam pattern). `InitializeSeams` wires `_setActiveTaskSubject = setActiveTaskSubject ?? (v => _active.TaskSubject = v);` so production keeps the original direct write by default, while tests inject a capturing delegate.
+- `SetFlag`'s `Taskname` case now calls `_setActiveTaskSubject(value)` instead of writing `_active.TaskSubject` directly.
+- New tests `SetFlag_Taskname_WritesSubjectAndFacade` and `Shortcut_ReadingNews_SetsAllFlagsAndFocusesDuration` (in `TaskControllerActionsTests.cs`) inject a capturing delegate and assert the captured `TaskSubject` value, the `TaskNameText` facade write, and (for the shortcut) `mock.Verify(v => v.FocusDuration())`.
+- Both methods are now measured; no exemption was added or removed for either method (they were never method-level exempted — only the residue note above is retired).

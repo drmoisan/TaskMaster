@@ -72,11 +72,25 @@ namespace TaskVisualization.Test
             view.Mock.VerifySet(v => v.TopicText = "Budget", Times.AtLeastOnce);
         }
 
-        // Note: the Taskname branch of SetFlag writes _active.TaskSubject, which is a get-only
-        // Outlook-interop property. Production recovers via the COMException -> Subject-alternate
-        // fallback in OutlookItemExtensions.TrySetPropertyValue, a path that requires a live COM
-        // object; a Moq MailItem proxy raises MissingMethodException instead. The Taskname write
-        // is therefore COM-bound and is covered by the exemption rationale, not unit-tested here.
+        [TestMethod]
+        public void SetFlag_Taskname_WritesSubjectAndFacade()
+        {
+            // Arrange: the direct _active.TaskSubject write is COM-bound over a Moq MailItem, so
+            // the controller routes the Taskname branch through the injected
+            // setActiveTaskSubject seam. Capture what the seam receives instead of writing to a
+            // live Outlook-interop property.
+            var view = new MoqTaskViewer();
+            var captured = new List<string>();
+            var controller = TaskControllerFixtures.BuildController(
+                view,
+                setActiveTaskSubject: v => captured.Add(v)
+            );
+
+            controller.SetFlag("New Subject", Enums.FlagsToSet.Taskname);
+
+            captured.Should().Equal(new[] { "New Subject" });
+            view.Mock.VerifySet(v => v.TaskNameText = "New Subject", Times.AtLeastOnce);
+        }
 
         [TestMethod]
         public void SetFlag_Worktime_WritesDurationFacadeOnly()
@@ -182,12 +196,30 @@ namespace TaskVisualization.Test
             controller.Active.Projects.AsStringNoPrefix.Should().Contain("Personal - Other");
         }
 
-        // Note: Shortcut_ReadingNews is not unit-tested here because it calls
-        // SetFlag(..., Taskname), which writes the get-only Outlook-interop property
-        // MailItem.TaskSubject (see the SetFlag Taskname note above). That write is COM-bound
-        // and cannot be serviced by a Moq MailItem, so the method is covered by the exemption
-        // rationale rather than a mock-driven test. Its FocusDuration seam call is exercised
-        // indirectly by the facade-focus verification elsewhere.
+        [TestMethod]
+        public void Shortcut_ReadingNews_SetsAllFlagsAndFocusesDuration()
+        {
+            // Arrange: exercises the Context/Projects/Taskname/Worktime SetFlag chain plus the
+            // FocusDuration facade call. The Taskname write is captured via the injected
+            // setActiveTaskSubject seam rather than the COM-bound _active.TaskSubject setter.
+            var view = new MoqTaskViewer();
+            view.Object.TaskNameText = "Original Subject";
+            var captured = new List<string>();
+            var controller = TaskControllerFixtures.BuildController(
+                view,
+                setActiveTaskSubject: v => captured.Add(v)
+            );
+
+            controller.Shortcut_ReadingNews();
+
+            controller
+                .Active.Context.AsStringNoPrefix.Should()
+                .Be("Reading - News | Articles | Other");
+            controller.Active.Projects.AsStringNoPrefix.Should().Be("Routine - Reading");
+            captured.Should().Equal(new[] { "READ: Original Subject" });
+            view.Mock.VerifySet(v => v.DurationText = "15", Times.AtLeastOnce);
+            view.Mock.Verify(v => v.FocusDuration(), Times.Once);
+        }
 
         // ---- Assign_* / *_Change ------------------------------------------------------
 
