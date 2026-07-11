@@ -728,6 +728,9 @@
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Bag\ConcurrentObservableBag.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Bag\ISimpleActionBagObserver.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Bag\SimpleActionBagObserver.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\IConcurrentObservableCollectionSeams.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollection.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollection.Serialization.cs" />
     <Compile Include="ReusableTypeClasses\TimedActions\TimedAsyncTask.cs" />
     <Compile Include="ReusableTypeClasses\TimedActions\TimedQueueOfActions.cs" />
     <Compile Include="Interfaces\IGlobals\IAppItemEngines.cs" />

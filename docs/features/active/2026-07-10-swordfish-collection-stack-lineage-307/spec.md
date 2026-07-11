@@ -233,13 +233,13 @@ unreferenced.
 
 ## Acceptance Criteria
 
-- [ ] The Swordfish-free clean `ConcurrentObservableCollection<T>` base is created under
+- [x] The Swordfish-free clean `ConcurrentObservableCollection<T>` base is created under
       `UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.*`, built on `ObservableCollection<T>`,
       carrying `IList<T>` + `IList`, `FindIndex`/`FindIndices`/`Find`/`Exists`, `CollectionChanged`,
       `Subscribe(IObserver<...>)`, and the ScoCollection serialization surface (file ctors incl.
       AltListLoader/backup, `Serialize`/`SerializeAsync`, `Deserialize` overloads,
       `FilePath`/`FolderPath`/`FileName`, `ToList`/`FromList`, injectable FS/Prompt seams).
-- [ ] The clean collection serializes as a bare JSON array (no `[JsonObject]`; remains an
+- [x] The clean collection serializes as a bare JSON array (no `[JsonObject]`; remains an
       `IEnumerable`/`IList<T>` so Newtonsoft keeps the array contract).
 - [ ] `CtfMap` and `SubjectMapSco` (incl. `AltListLoader`) are re-based onto the clean collection
       and compile against its member surface (`FindIndex`, indexer, `Add`, `ToList`,

@@ -87,7 +87,7 @@ This feature contributes to the epic's leading indicators without changing produ
 
 ## Acceptance Criteria
 
-- [ ] As the maintainer, the Swordfish-free clean `ConcurrentObservableCollection<T>` base exists
+- [x] As the maintainer, the Swordfish-free clean `ConcurrentObservableCollection<T>` base exists
       (created in F2, built on `ObservableCollection<T>`) with the full member surface the Sco
       subclasses and consumers require, so that the collection re-base can proceed without pulling in
       Swordfish.
