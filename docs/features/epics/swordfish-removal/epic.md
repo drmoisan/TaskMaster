@@ -23,12 +23,12 @@ features:
   - issue_num: 309
     feature_folder: 2026-07-10-swordfish-scosorteddictionary-removal-309
     depends_on: []
-  - issue_num: 9004
-    feature_folder: swordfish-raw-usage-cleanup
+  - issue_num: 310
+    feature_folder: 2026-07-10-swordfish-raw-usage-cleanup-310
     depends_on: []
   - issue_num: 9005
     feature_folder: swordfish-interface-project-teardown
-    depends_on: [9001, 9002, 309, 9004]
+    depends_on: [9001, 9002, 309, 310]
 ---
 
 # Epic: Remove the Swordfish.NET.General Project from TaskMaster
@@ -58,8 +58,14 @@ preserved.
 
 - **Hash dictionary:** `UtilitiesCS.ReusableTypeClasses.ScoDictionaryNew<TKey,TValue>`
   (derives from the clean `ConcurrentObservableDictionary`, `SmartSerializable`-based).
-- **Collection:** clean `ConcurrentObservableCollection` in
-  `UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.*`.
+- **Collection:** ~~clean `ConcurrentObservableCollection` in
+  `UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.*`~~ — **CORRECTED (F4 preparation,
+  issue #310):** verified false on the integration base. That namespace holds only
+  `Bag`/`Dictionary`; the only `ConcurrentObservableCollection<T>` in the repo is the vendored
+  Swordfish type being removed. F2 must CREATE the clean collection base it re-bases
+  `ScoCollection`/`ScoStack` subclasses onto (or select an existing suitable base); it must not
+  assume a pre-existing clean `ConcurrentObservableCollection`. Evidence:
+  `docs/features/active/2026-07-10-swordfish-raw-usage-cleanup-310/research/swap-target-decision-record.md`.
 - **Ordered/observable/serializable list:** `SloLinkedList<T>`
   (derives from `LockingObservableLinkedList<T>`, `SmartSerializable`-based).
 - **Sorted dictionary:** NONE exists Swordfish-free. Do not assume one; deletion of the unused
@@ -76,7 +82,7 @@ concurrently; the ordering constraint applies to execution waves.
 | 0 | 9001 | `swordfish-dictionary-lineage` | C3 | Dictionary lineage: re-point `ScoDictionary` consumers to `ScoDictionaryNew`; reconcile constructor/deserialize shape; preserve on-disk JSON. |
 | 0 | 9002 | `swordfish-collection-stack-lineage` | C3 | Collection + Stack lineage: re-base `ScoCollection`/`ScoStack` subclasses onto the clean collection and `SloLinkedList`; add positional stack surface + async serialize; preserve `MovedMails` on-disk JSON. |
 | 0 | 309 | `2026-07-10-swordfish-scosorteddictionary-removal-309` | C1 | Confirm no production consumer of `ScoSortedDictionary`, then delete the class and its test. |
-| 0 | 9004 | `swordfish-raw-usage-cleanup` | C2 | Re-point `KbdActions` raw `ConcurrentObservableCollection` to the clean type; remove unused `using Swordfish.NET.Collections;`; update `TraceUtility` string literals. |
+| 0 | 310 | `2026-07-10-swordfish-raw-usage-cleanup-310` | C2 | Re-point `KbdActions` raw `ConcurrentObservableCollection` to `List<UClass>` (see decision record); remove unused `using Swordfish.NET.Collections;`; delete stale `TraceUtility` string literals. |
 | 1 | 9005 | `swordfish-interface-project-teardown` | C3 | Migrate/remove `IScoCollection`/`IScoCollection2`; remove `ProjectReference` to `UtilitiesSwordfish.NET.General.csproj` from 8 csprojs; remove project entries from `TaskMaster.sln`; delete project folders; migrate/remove tests referencing Swordfish types. |
 
 Wave assignment is longest-path layering over the dependency DAG:
@@ -143,11 +149,15 @@ or a sort-maintaining decorator.
 
 ### F4 — Raw-usage and unused-using cleanup
 
-Real swap: `KbdActions.cs` uses raw `ConcurrentObservableCollection<UClass>` — re-point to the
-clean `ConcurrentObservableCollection`. Remove unused `using Swordfish.NET.Collections;` from
-`KeyboardHandler.cs`, `FlagDetails.cs`, and `FolderRemapController.cs` (delete and rebuild to
-confirm). Update or remove the `"UtilitiesSwordfish.NET.General"`/`"UtilitiesSwordfish.NET.Test"`
-string literals in `TraceUtility.cs`'s trace filter.
+Real swap: `KbdActions.cs` uses raw `ConcurrentObservableCollection<UClass>` — re-point to
+`System.Collections.Generic.List<UClass>` per the F4 decision record (the "clean
+`ConcurrentObservableCollection`" named in the original brief does not exist; `List<T>` natively
+supplies the load-bearing `FindIndex(Predicate<T>)` and every other member the private `_list`
+field uses, with no `CollectionChanged` or cross-thread mutation to preserve). Remove unused
+`using Swordfish.NET.Collections;` from `KeyboardHandler.cs`, `FlagDetails.cs`, and
+`FolderRemapController.cs` (delete and rebuild to confirm). Delete the stale
+`"UtilitiesSwordfish.NET.General"`/`"UtilitiesSwordfish.NET.Test"` string literals in
+`TraceUtility.cs`'s trace filter.
 
 ### F5 — Interfaces, project references, solution teardown
 
