@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TaskVisualization;
 using UtilitiesCS;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 
 namespace TaskVisualization.Test
 {
@@ -19,7 +20,9 @@ namespace TaskVisualization.Test
     [TestClass]
     public class ManageFiltersControllerTests
     {
-        private static Mock<IApplicationGlobals> BuildGlobals(ScoCollection<FilterEntry> filters)
+        private static Mock<IApplicationGlobals> BuildGlobals(
+            ConcurrentObservableCollection<FilterEntry> filters
+        )
         {
             var af = new Mock<IAppAutoFileObjects>();
             af.Setup(x => x.Filters).Returns(filters);
@@ -33,7 +36,7 @@ namespace TaskVisualization.Test
         public void LoadFilters_BindsFilterSetIntoViewer()
         {
             var viewer = new Mock<IManageFiltersViewer>();
-            var filters = new ScoCollection<FilterEntry>();
+            var filters = new ConcurrentObservableCollection<FilterEntry>();
             var globals = BuildGlobals(filters);
             var controller = new ManageFiltersController(viewer.Object, globals.Object);
 
@@ -49,7 +52,7 @@ namespace TaskVisualization.Test
             var selected = new FilterEntry { Name = "Selected" };
             viewer.Setup(v => v.SelectedFilter).Returns(selected);
 
-            var filters = new ScoCollection<FilterEntry>();
+            var filters = new ConcurrentObservableCollection<FilterEntry>();
             var globals = BuildGlobals(filters);
 
             IApplicationGlobals factoryGlobals = null;
@@ -79,7 +82,7 @@ namespace TaskVisualization.Test
         public void AddFilter_InvokesFactoryWithNull_ThenSetFiltersAndRebuild()
         {
             var viewer = new Mock<IManageFiltersViewer>();
-            var filters = new ScoCollection<FilterEntry>();
+            var filters = new ConcurrentObservableCollection<FilterEntry>();
             var globals = BuildGlobals(filters);
 
             var passedEntries = new List<FilterEntry>();
@@ -104,7 +107,7 @@ namespace TaskVisualization.Test
         public void EditFilterCallback_CommitsEntryToFilterSet_AndRebuilds()
         {
             var viewer = new Mock<IManageFiltersViewer>();
-            var filters = new ScoCollection<FilterEntry>();
+            var filters = new ConcurrentObservableCollection<FilterEntry>();
             var globals = BuildGlobals(filters);
             var controller = new ManageFiltersController(viewer.Object, globals.Object);
             var entry = new FilterEntry { Name = "New" };
@@ -120,7 +123,7 @@ namespace TaskVisualization.Test
         {
             var viewer = new Mock<IManageFiltersViewer>();
             viewer.Setup(v => v.SelectedFilter).Returns(new FilterEntry());
-            var filters = new ScoCollection<FilterEntry>();
+            var filters = new ConcurrentObservableCollection<FilterEntry>();
             var globals = BuildGlobals(filters);
             var controller = new ManageFiltersController(viewer.Object, globals.Object);
 

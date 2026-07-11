@@ -244,10 +244,10 @@ unreferenced.
 - [x] `CtfMap` and `SubjectMapSco` (incl. `AltListLoader`) are re-based onto the clean collection
       and compile against its member surface (`FindIndex`, indexer, `Add`, `ToList`,
       `CollectionChanged`, AltListLoader ctor).
-- [ ] The direct `ScoCollection<T>` consumers are re-pointed to the clean collection:
+- [x] The direct `ScoCollection<T>` consumers are re-pointed to the clean collection:
       `AppAutoFileObjects.Filters`, `AppToDoObjects.PrefixList`, and
       `OlFolderClassifierGroup._mailInfoCollection`/`LoadStaging`.
-- [ ] The interface members `IAppAutoFileObjects.Filters` and `IToDoObjects.PrefixList`/`LoadPrefixList`
+- [x] The interface members `IAppAutoFileObjects.Filters` and `IToDoObjects.PrefixList`/`LoadPrefixList`
       are updated to the clean collection return type (F2 scope; `IScoCollection`/`IScoCollection2`
       untouched).
 - [x] `SloStack<T> : SloLinkedList<T>` is created exposing the full positional surface: `this[int]`

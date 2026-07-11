@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using UtilitiesCS;
 using UtilitiesCS.Interfaces;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 
 namespace UtilitiesCS
 {
@@ -22,8 +23,8 @@ namespace UtilitiesCS
         IApplicationGlobals Parent { get; }
         IProjectData ProjInfo { get; }
         ScDictionary<string, string> ProgramInfo { get; }
-        ScoCollection<IPrefix> PrefixList { get; }
-        ScoCollection<IPrefix> LoadPrefixList();
+        ConcurrentObservableCollection<IPrefix> PrefixList { get; }
+        ConcurrentObservableCollection<IPrefix> LoadPrefixList();
         ScoDictionary<string, int> FilteredFolderScraping { get; }
         ScoDictionary<string, string> FolderRemap { get; }
         string ProjInfo_Filename { get; }

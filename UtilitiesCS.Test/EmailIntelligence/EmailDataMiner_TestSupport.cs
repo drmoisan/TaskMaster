@@ -18,6 +18,7 @@ using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Interfaces;
 using UtilitiesCS.OutlookObjects.Folder;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 
 namespace UtilitiesCS.Test.EmailIntelligence
 {
@@ -118,9 +119,11 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             public ScDictionary<string, string> ProgramInfo => throw new NotImplementedException();
 
-            public ScoCollection<IPrefix> PrefixList => throw new NotImplementedException();
+            public ConcurrentObservableCollection<IPrefix> PrefixList =>
+                throw new NotImplementedException();
 
-            public ScoCollection<IPrefix> LoadPrefixList() => throw new NotImplementedException();
+            public ConcurrentObservableCollection<IPrefix> LoadPrefixList() =>
+                throw new NotImplementedException();
 
             public ScoDictionary<string, int> FilteredFolderScraping { get; }
 

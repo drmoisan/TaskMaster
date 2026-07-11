@@ -22,6 +22,7 @@ using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 using UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList;
 using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 using UtilitiesCS.Threading;
@@ -458,16 +459,16 @@ namespace TaskMaster
         public SubjectMapSco SubjectMap => Initialized(_subjectMap, LoadSubjectMap);
 
         private ObserverHelper<NotifyCollectionChangedEventArgs> _filterObserver;
-        private ScoCollection<FilterEntry> _filters;
-        public ScoCollection<FilterEntry> Filters =>
+        private ConcurrentObservableCollection<FilterEntry> _filters;
+        public ConcurrentObservableCollection<FilterEntry> Filters =>
             Initializer.GetOrLoad(ref _filters, LoadFilters);
 
-        private ScoCollection<FilterEntry> LoadFilters()
+        private ConcurrentObservableCollection<FilterEntry> LoadFilters()
         {
-            ScoCollection<FilterEntry> filters = null;
+            ConcurrentObservableCollection<FilterEntry> filters = null;
             if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
             {
-                filters = new ScoCollection<FilterEntry>(
+                filters = new ConcurrentObservableCollection<FilterEntry>(
                     fileName: _defaults.FileName_Filters,
                     folderPath: pythonStaging
                 );
@@ -491,7 +492,7 @@ namespace TaskMaster
             NotifyCollectionChangedEventArgs e
         )
         {
-            var collection = (ScoCollection<FilterEntry>)sender;
+            var collection = (ConcurrentObservableCollection<FilterEntry>)sender;
             collection.Serialize();
         }
 

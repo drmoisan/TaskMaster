@@ -75,5 +75,118 @@ namespace UtilitiesCS.Test.EmailIntelligence.Compatibility
             restored[1].Folderpath.Should().Be("clients");
             restored[1].EmailSubjectCount.Should().Be(5);
         }
+
+        [TestMethod]
+        public void Filters_SerializeProducesBareConcreteElementArray()
+        {
+            // Arrange — concrete FilterEntry elements (declared type == concrete type, so no $type
+            // at the element root). This asserts the collection's on-disk array contract, which is
+            // what F2 changes. (FilterEntry.Flags carries non-round-trippable delegate state — a
+            // pre-existing FilterEntry concern outside F2 scope — so element order/value round-trip
+            // is asserted separately below via a Flags-free fixture.)
+            var original = new ConcurrentObservableCollection<FilterEntry>
+            {
+                new FilterEntry
+                {
+                    Name = "Newsletters",
+                    Description = "bulk",
+                    Folders = new List<string> { @"Inbox\News" },
+                },
+                new FilterEntry
+                {
+                    Name = "Receipts",
+                    Description = "finance",
+                    Folders = new List<string> { @"Inbox\Finance" },
+                },
+            };
+
+            // Act
+            var json = JsonConvert.SerializeObject(original, AutoSettings);
+
+            // Assert — bare array shape with no root $type object wrapper.
+            json.TrimStart().Should().StartWith("[");
+            json.TrimStart().Should().NotStartWith("{");
+        }
+
+        [TestMethod]
+        public void Filters_DeserializesBareArrayFixture_PreservingElementOrderAndValues()
+        {
+            // Arrange — a bare JSON array of FilterEntry-shaped objects (Flags omitted so the fixture
+            // stays on the round-trippable subset). This proves the clean collection reads the
+            // historical bare-array Filters shape with element order/values intact.
+            const string fixture =
+                "[{\"Name\":\"Newsletters\",\"Description\":\"bulk\",\"Folders\":[\"Inbox\\\\News\"]},"
+                + "{\"Name\":\"Receipts\",\"Description\":\"finance\",\"Folders\":[\"Inbox\\\\Finance\"]}]";
+
+            // Act
+            var restored = JsonConvert.DeserializeObject<
+                ConcurrentObservableCollection<FilterEntry>
+            >(fixture, AutoSettings);
+
+            // Assert
+            restored.Should().HaveCount(2);
+            restored[0].Name.Should().Be("Newsletters");
+            restored[0].Folders.Should().ContainSingle().Which.Should().Be(@"Inbox\News");
+            restored[1].Name.Should().Be("Receipts");
+        }
+
+        [TestMethod]
+        public void PrefixList_RoundTrips_AsPolymorphicElementArray_WithTypeMetadata()
+        {
+            // Arrange — an interface-typed collection with concrete elements. Under
+            // TypeNameHandling.Auto, Newtonsoft writes a per-element assembly-qualified $type so the
+            // concrete implementation is recovered on load. The production concrete type is
+            // ToDoModel.PrefixItem, which this test assembly does not reference; a local IPrefix
+            // implementer models the identical polymorphic on-disk shape ($type per element).
+            var original = new ConcurrentObservableCollection<IPrefix>
+            {
+                new TestPrefix
+                {
+                    PrefixType = PrefixTypeEnum.Context,
+                    Key = "Context",
+                    Value = "_@",
+                    OlUserFieldName = "ctx",
+                },
+                new TestPrefix
+                {
+                    PrefixType = PrefixTypeEnum.Project,
+                    Key = "Project",
+                    Value = "Tag PROJECT",
+                    OlUserFieldName = "prj",
+                },
+            };
+
+            // Act
+            var json = JsonConvert.SerializeObject(original, AutoSettings);
+            var restored = JsonConvert.DeserializeObject<ConcurrentObservableCollection<IPrefix>>(
+                json,
+                AutoSettings
+            );
+
+            // Assert — polymorphic array shape: $type present per element, order/values preserved.
+            json.TrimStart().Should().StartWith("[");
+            json.Should()
+                .Contain("$type", "polymorphic IPrefix elements must carry $type metadata");
+            restored.Should().HaveCount(2);
+            restored[0].Should().BeOfType<TestPrefix>();
+            restored[0].Key.Should().Be("Context");
+            restored[0].Value.Should().Be("_@");
+            restored[1].Key.Should().Be("Project");
+            restored[1].PrefixType.Should().Be(PrefixTypeEnum.Project);
+        }
+
+        /// <summary>
+        /// Local concrete <see cref="IPrefix"/> implementer used to model the polymorphic
+        /// PrefixList on-disk shape. Stands in for the production <c>ToDoModel.PrefixItem</c>, which
+        /// is not referenced by this test assembly.
+        /// </summary>
+        private sealed class TestPrefix : IPrefix
+        {
+            public PrefixTypeEnum PrefixType { get; set; }
+            public string Key { get; set; }
+            public string Value { get; set; }
+            public Microsoft.Office.Interop.Outlook.OlCategoryColor Color { get; set; }
+            public string OlUserFieldName { get; set; }
+        }
     }
 }

@@ -161,21 +161,21 @@ DELETE (only after grep-clean gate in Phase 7):
 
 ### Phase 4 — Re-point Direct `ScoCollection<T>` Consumers and Interfaces
 
-- [ ] [P4-T1] Update `UtilitiesCS/Interfaces/IGlobals/IAppAutoFileObjects.cs` `Filters` return type from `ScoCollection<FilterEntry>` to `ConcurrentObservableCollection<FilterEntry>`
+- [x] [P4-T1] Update `UtilitiesCS/Interfaces/IGlobals/IAppAutoFileObjects.cs` `Filters` return type from `ScoCollection<FilterEntry>` to `ConcurrentObservableCollection<FilterEntry>`
   - Acceptance: interface compiles; only the `Filters` member is retyped; `MovedMails` handled in Phase 5.
-- [ ] [P4-T2] Update `UtilitiesCS/Interfaces/IGlobals/IToDoObjects.cs` `PrefixList` and `LoadPrefixList` return types from `ScoCollection<IPrefix>` to `ConcurrentObservableCollection<IPrefix>`
+- [x] [P4-T2] Update `UtilitiesCS/Interfaces/IGlobals/IToDoObjects.cs` `PrefixList` and `LoadPrefixList` return types from `ScoCollection<IPrefix>` to `ConcurrentObservableCollection<IPrefix>`
   - Acceptance: interface compiles; both members retyped.
-- [ ] [P4-T3] Re-point `TaskMaster/AppGlobals/AppAutoFileObjects.cs` `Filters` (field + property + loader) from `ScoCollection<FilterEntry>` to `ConcurrentObservableCollection<FilterEntry>`, preserving the file constructor, `Subscribe(observer)`, and `Serialize()`
+- [x] [P4-T3] Re-point `TaskMaster/AppGlobals/AppAutoFileObjects.cs` `Filters` (field + property + loader) from `ScoCollection<FilterEntry>` to `ConcurrentObservableCollection<FilterEntry>`, preserving the file constructor, `Subscribe(observer)`, and `Serialize()`
   - Acceptance: `AppAutoFileObjects.Filters` compiles against the clean collection; observer/serialize wiring unchanged.
-- [ ] [P4-T4] Re-point `TaskMaster/AppGlobals/AppToDoObjects.cs` `PrefixList`/`LoadPrefixList` from `ScoCollection<IPrefix>` to `ConcurrentObservableCollection<IPrefix>`, preserving the file constructor, `Count`, `Add(T)`, enumeration
+- [x] [P4-T4] Re-point `TaskMaster/AppGlobals/AppToDoObjects.cs` `PrefixList`/`LoadPrefixList` from `ScoCollection<IPrefix>` to `ConcurrentObservableCollection<IPrefix>`, preserving the file constructor, `Count`, `Add(T)`, enumeration
   - Acceptance: compiles; member usage preserved.
-- [ ] [P4-T5] Re-point `UtilitiesCS/EmailIntelligence/ClassifierGroups/OlFolder/OlFolderClassifierGroup.cs` `_mailInfoCollection`/`LoadStaging` from `ScoCollection<MinedMailInfo>` to `ConcurrentObservableCollection<MinedMailInfo>`, preserving the file constructor and enumeration
+- [x] [P4-T5] Re-point `UtilitiesCS/EmailIntelligence/ClassifierGroups/OlFolder/OlFolderClassifierGroup.cs` `_mailInfoCollection`/`LoadStaging` from `ScoCollection<MinedMailInfo>` to `ConcurrentObservableCollection<MinedMailInfo>`, preserving the file constructor and enumeration
   - Acceptance: compiles; member usage preserved.
-- [ ] [P4-T6] Re-point the remaining test/mocks that reference `ScoCollection<...>`: `EmailDataMiner_TestSupport.cs` (`IToDoObjects.PrefixList`/`LoadPrefixList` mock members), `ClassifierGroups_Tests.cs:883` (`new ScoCollection<IPrefix>`), and `TaskVisualization.Test/ManageFiltersControllerTests.cs` (`new ScoCollection<FilterEntry>`) to `ConcurrentObservableCollection<...>`
+- [x] [P4-T6] Re-point the remaining test/mocks that reference `ScoCollection<...>`: `EmailDataMiner_TestSupport.cs` (`IToDoObjects.PrefixList`/`LoadPrefixList` mock members), `ClassifierGroups_Tests.cs:883` (`new ScoCollection<IPrefix>`), and `TaskVisualization.Test/ManageFiltersControllerTests.cs` (`new ScoCollection<FilterEntry>`) to `ConcurrentObservableCollection<...>`
   - Acceptance: all three test files compile against the clean collection and pass.
-- [ ] [P4-T7] Re-point `ConcurrentObservableCollectionSenderTests.cs` and `ConcurrentObservableCollectionLockRecursionTests.cs` from the Swordfish `ConcurrentObservableCollection` (`using Swordfish.NET.Collections`) to the clean collection, adjusting sender-identity and lock-behavior expectations to the `ObservableCollection<T>` base
+- [x] [P4-T7] Re-point `ConcurrentObservableCollectionSenderTests.cs` and `ConcurrentObservableCollectionLockRecursionTests.cs` from the Swordfish `ConcurrentObservableCollection` (`using Swordfish.NET.Collections`) to the clean collection, adjusting sender-identity and lock-behavior expectations to the `ObservableCollection<T>` base
   - Acceptance: both tests compile against the clean type and pass; no `using Swordfish.NET.*` remains; behaviors not reproducible on the clean base (e.g., `ReaderWriterLockSlim` recursion) are removed or re-expressed with a documented rationale.
-- [ ] [P4-T8] Add Filters and PrefixList JSON round-trip cases to `CollectionRoundTrip_Tests.cs` — Filters as a concrete-element array (no `$type`), PrefixList as a polymorphic-element array carrying the actual assembly-qualified `$type` of the concrete `IPrefix` implementation (read the concrete type name from the DTO source at implementation time)
+- [x] [P4-T8] Add Filters and PrefixList JSON round-trip cases to `CollectionRoundTrip_Tests.cs` — Filters as a concrete-element array (no `$type`), PrefixList as a polymorphic-element array carrying the actual assembly-qualified `$type` of the concrete `IPrefix` implementation (read the concrete type name from the DTO source at implementation time)
   - Acceptance: both round-trips deserialize with the clean-collection consumer types, assert element order/values, and assert `$type` presence stability for the polymorphic PrefixList and `$type` absence for concrete Filters.
 
 ### Phase 5 — Migrate `ScoStack<IMovedMailInfo>` Consumers to `SloStack<IMovedMailInfo>`
