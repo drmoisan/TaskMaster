@@ -241,7 +241,7 @@ unreferenced.
       `FilePath`/`FolderPath`/`FileName`, `ToList`/`FromList`, injectable FS/Prompt seams).
 - [x] The clean collection serializes as a bare JSON array (no `[JsonObject]`; remains an
       `IEnumerable`/`IList<T>` so Newtonsoft keeps the array contract).
-- [ ] `CtfMap` and `SubjectMapSco` (incl. `AltListLoader`) are re-based onto the clean collection
+- [x] `CtfMap` and `SubjectMapSco` (incl. `AltListLoader`) are re-based onto the clean collection
       and compile against its member surface (`FindIndex`, indexer, `Add`, `ToList`,
       `CollectionChanged`, AltListLoader ctor).
 - [ ] The direct `ScoCollection<T>` consumers are re-pointed to the clean collection:

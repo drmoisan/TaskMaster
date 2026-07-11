@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 using static UtilitiesCS.Enums;
 
 namespace UtilitiesCS.Test.EmailIntelligence
@@ -63,7 +64,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             };
 
             return JsonConvert.SerializeObject(
-                new ScoCollection<SubjectMapEntry>(entries),
+                new ConcurrentObservableCollection<SubjectMapEntry>(entries),
                 settings
             );
         }
@@ -213,7 +214,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var fixturePath = CreateVirtualFilePath("subject-map.json");
             var folderPath = Path.GetDirectoryName(fixturePath)!;
             var fileName = Path.GetFileName(fixturePath);
-            var fileSystem = new InMemoryScoCollectionFileSystem(
+            var fileSystem = new InMemoryCollectionFileSystem(
                 new Dictionary<string, string>
                 {
                     [fixturePath] = CreateCollectionJson(
@@ -221,11 +222,11 @@ namespace UtilitiesCS.Test.EmailIntelligence
                     ),
                 }
             );
-            ScoCollection<SubjectMapEntry>.AltListLoader backupLoader =
+            ConcurrentObservableCollection<SubjectMapEntry>.AltListLoader backupLoader =
                 _ => new List<SubjectMapEntry>();
 
             // Act
-            using var scope = new ScoCollectionDependencyScope<SubjectMapEntry>(fileSystem);
+            using var scope = new CollectionDependencyScope<SubjectMapEntry>(fileSystem);
             var fromFile = new SubjectMapSco(fileName, folderPath, commonWords);
             var fromBackup = new SubjectMapSco(
                 fileName,
@@ -320,11 +321,12 @@ namespace UtilitiesCS.Test.EmailIntelligence
             result.Should().BeTrue();
         }
 
-        private sealed class InMemoryScoCollectionFileSystem : IScoCollectionFileSystem
+        private sealed class InMemoryCollectionFileSystem
+            : IConcurrentObservableCollectionFileSystem
         {
             private readonly IReadOnlyDictionary<string, string> _files;
 
-            public InMemoryScoCollectionFileSystem(IReadOnlyDictionary<string, string> files)
+            public InMemoryCollectionFileSystem(IReadOnlyDictionary<string, string> files)
             {
                 _files = files;
             }
@@ -382,29 +384,29 @@ namespace UtilitiesCS.Test.EmailIntelligence
             }
         }
 
-        private sealed class ScoCollectionDependencyScope<T> : IDisposable
+        private sealed class CollectionDependencyScope<T> : IDisposable
         {
-            private readonly IScoCollectionFileSystem _originalFileSystem;
-            private readonly IScoCollectionPrompt _originalPrompt;
+            private readonly IConcurrentObservableCollectionFileSystem _originalFileSystem;
+            private readonly IConcurrentObservableCollectionPrompt _originalPrompt;
 
-            public ScoCollectionDependencyScope(
-                IScoCollectionFileSystem fileSystem,
-                IScoCollectionPrompt prompt = null
+            public CollectionDependencyScope(
+                IConcurrentObservableCollectionFileSystem fileSystem,
+                IConcurrentObservableCollectionPrompt prompt = null
             )
             {
-                _originalFileSystem = ScoCollection<T>.FileSystem;
-                _originalPrompt = ScoCollection<T>.Prompt;
-                ScoCollection<T>.FileSystem = fileSystem;
+                _originalFileSystem = ConcurrentObservableCollection<T>.FileSystem;
+                _originalPrompt = ConcurrentObservableCollection<T>.Prompt;
+                ConcurrentObservableCollection<T>.FileSystem = fileSystem;
                 if (prompt is not null)
                 {
-                    ScoCollection<T>.Prompt = prompt;
+                    ConcurrentObservableCollection<T>.Prompt = prompt;
                 }
             }
 
             public void Dispose()
             {
-                ScoCollection<T>.FileSystem = _originalFileSystem;
-                ScoCollection<T>.Prompt = _originalPrompt;
+                ConcurrentObservableCollection<T>.FileSystem = _originalFileSystem;
+                ConcurrentObservableCollection<T>.Prompt = _originalPrompt;
             }
         }
     }

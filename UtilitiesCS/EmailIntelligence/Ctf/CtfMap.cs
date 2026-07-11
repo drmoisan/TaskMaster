@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
-    public class CtfMap : ScoCollection<CtfMapEntry>
+    public class CtfMap : ConcurrentObservableCollection<CtfMapEntry>
     {
         public CtfMap()
             : base() { }

@@ -150,13 +150,13 @@ DELETE (only after grep-clean gate in Phase 7):
 
 ### Phase 3 — Re-base `ScoCollection` Subclasses onto the Clean Collection
 
-- [ ] [P3-T1] Re-base `UtilitiesCS/EmailIntelligence/Ctf/CtfMap.cs` from `: ScoCollection<CtfMapEntry>` to `: ConcurrentObservableCollection<CtfMapEntry>`, updating the `using`/base-ctor references (`FindIndex`, `this[idx]` get, `Add`, enumeration, AltListLoader ctor)
+- [x] [P3-T1] Re-base `UtilitiesCS/EmailIntelligence/Ctf/CtfMap.cs` from `: ScoCollection<CtfMapEntry>` to `: ConcurrentObservableCollection<CtfMapEntry>`, updating the `using`/base-ctor references (`FindIndex`, `this[idx]` get, `Add`, enumeration, AltListLoader ctor)
   - Acceptance: `CtfMap` compiles against the clean-collection member surface; no `Swordfish.NET.*` reference remains in the file.
-- [ ] [P3-T2] Re-base `UtilitiesCS/EmailIntelligence/SubjectMap/SubjectMapSco.cs` (and `SubjectMapSco.Orchestration.cs` only if compile requires) from `: ScoCollection<SubjectMapEntry>` to `: ConcurrentObservableCollection<SubjectMapEntry>`, preserving `FindIndex`, `this[idx]` get, `Add`, `ToList()`, `Serialize()`, `CollectionChanged +=`, and the AltListLoader/file constructors
+- [x] [P3-T2] Re-base `UtilitiesCS/EmailIntelligence/SubjectMap/SubjectMapSco.cs` (and `SubjectMapSco.Orchestration.cs` only if compile requires) from `: ScoCollection<SubjectMapEntry>` to `: ConcurrentObservableCollection<SubjectMapEntry>`, preserving `FindIndex`, `this[idx]` get, `Add`, `ToList()`, `Serialize()`, `CollectionChanged +=`, and the AltListLoader/file constructors
   - Acceptance: `SubjectMapSco` compiles; it does NOT declare `: ISubjectMapSco` (unchanged); no `Swordfish.NET.*` reference remains.
-- [ ] [P3-T3] Re-point `UtilitiesCS.Test/EmailIntelligence/SubjectMapSco_Tests.cs` from `ScoCollection<SubjectMapEntry>` and the `IScoCollectionFileSystem`/`IScoCollectionPrompt`/`ScoCollectionDependencyScope` seams to the clean-collection type and its new seam interfaces
+- [x] [P3-T3] Re-point `UtilitiesCS.Test/EmailIntelligence/SubjectMapSco_Tests.cs` from `ScoCollection<SubjectMapEntry>` and the `IScoCollectionFileSystem`/`IScoCollectionPrompt`/`ScoCollectionDependencyScope` seams to the clean-collection type and its new seam interfaces
   - Acceptance: test compiles against the clean types and passes; the in-memory FS seam replaces the deleted `ScoCollection` seams (no temp files).
-- [ ] [P3-T4] Add a CtfMap and SubjectMapSco JSON round-trip case to `UtilitiesCS.Test/EmailIntelligence/Compatibility/CollectionRoundTrip_Tests.cs` (create the file if not yet created) using an in-memory concrete-element array fixture (no `$type`), and add its `<Compile Include>` item to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
+- [x] [P3-T4] Add a CtfMap and SubjectMapSco JSON round-trip case to `UtilitiesCS.Test/EmailIntelligence/Compatibility/CollectionRoundTrip_Tests.cs` (create the file if not yet created) using an in-memory concrete-element array fixture (no `$type`), and add its `<Compile Include>` item to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
   - Acceptance: fixture is a bare JSON array of concrete `CtfMapEntry`/`SubjectMapEntry` objects; round-trip asserts element order/values and array shape stability; csproj wired.
 
 ### Phase 4 — Re-point Direct `ScoCollection<T>` Consumers and Interfaces
