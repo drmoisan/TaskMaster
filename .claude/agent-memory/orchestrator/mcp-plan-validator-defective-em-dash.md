@@ -1,11 +1,13 @@
 ---
 name: mcp-plan-validator-defective-em-dash
-description: The MCP plan validator rejects the canonical em-dash phase headings used by every repo plan (incl. merged ones) — it is not a usable plan gate here
+description: The MCP plan validator's em-dash rejection is INTERMITTENT/version-dependent — it accepted canonical em-dash+LF plans cleanly on 2026-07-10; do not assume it is broken, but keep em-dash and use executor preflight as the authoritative gate
 metadata:
   type: reference
 ---
 
-`mcp__drm-copilot__validate_orchestration_artifacts` with `artifact_type: "plan"` is DEFECTIVE in the worktree bundle: it rejects the canonical `### Phase N — <Title>` heading (em-dash U+2014) with "phase heading must match `### Phase N — <Title>`" / "Plan does not contain any canonical phase headings", and also rejects a plain-hyphen `-` heading. Calibrated against F1's already-MERGED plan (`.../store-disable-service-261/plan.2026-07-07T18-00.md`, PR #275): it fails identically. So it rejects known-good shipped plans and cannot be the gate.
+STATUS UPDATE (2026-07-10, epic swordfish-removal F2 #307): `mcp__drm-copilot__validate_orchestration_artifacts` with `artifact_type: "plan"` **PASSED** cleanly on a canonical `### Phase N — <Title>` (em-dash U+2014), LF-line-ending, 9-phase/51-task plan (`.../2026-07-10-swordfish-collection-stack-lineage-307/plan.2026-07-10T20-14.md`). So the blanket "defective on em-dash" claim is NOT reliable across bundle versions — the behavior is intermittent/version-dependent. Run the validator and read its actual result; do not pre-assume rejection.
+
+Prior observation (kept for contrast): earlier in this repo the same tool was seen to REJECT the canonical `### Phase N — <Title>` heading (em-dash U+2014) with "phase heading must match `### Phase N — <Title>`" / "Plan does not contain any canonical phase headings", and also rejected a plain-hyphen `-` heading. Calibrated against F1's already-MERGED plan (`.../store-disable-service-261/plan.2026-07-07T18-00.md`, PR #275) it failed identically. Possible drivers of the divergence: bundle version, or CRLF vs LF (a CRLF plan fails the validator regardless — see [[mcp-plan-validator-requires-lf]]).
 
 The local `.claude/hooks/validate-planner-output.ps1` uses a hyphen-only regex `^### Phase (?<Phase>\d+)\s+-\s+...` that ALSO fails em-dash, yet did not fatally block the atomic-planner SubagentStop (planner returned normally with em-dash). Em-dash is canonical per the `atomic-plan-contract` skill and every committed plan in the repo.
 
