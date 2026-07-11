@@ -14,8 +14,8 @@ intent:
     - No behavior regression in the QuickFiler undo flow or the SortEmail undo flow.
     - Full C# toolchain (csharpier, analyzers, nullable, MSTest) green for every child feature; changed/new code meets coverage thresholds.
 features:
-  - issue_num: 9001
-    feature_folder: swordfish-dictionary-lineage
+  - issue_num: 306
+    feature_folder: 2026-07-10-swordfish-dictionary-lineage-306
     depends_on: []
   - issue_num: 307
     feature_folder: 2026-07-10-swordfish-collection-stack-lineage-307
@@ -28,20 +28,16 @@ features:
     depends_on: []
   - issue_num: 308
     feature_folder: 2026-07-10-swordfish-interface-project-teardown-308
-    depends_on: [9001, 307, 309, 310]
+    depends_on: [306, 307, 309, 310]
 ---
 
 # Epic: Remove the Swordfish.NET.General Project from TaskMaster
 
 - Integration branch: `epic/swordfish-removal-integration`
-- Status: Planning phase IN PROGRESS — child preparation (research, spec, atomic plan,
-  `PREFLIGHT: ALL CLEAR`) is delegated per child; execution awaits maintainer signal via
-  `/epic-run swordfish-removal`.
-
-> Note: `issue_num` values `9001`–`9005` and the `feature_folder` hints above are planning
-> placeholders. They are back-filled with the real promoted GitHub issue numbers and active
-> folder basenames as each child's preparation completes, before the kickoff artifact is
-> written.
+- Status: Planning phase COMPLETE (2026-07-10) — all five children are prepared: issues #306,
+  #307, #308, #309, #310 promoted; active folders, research, spec/user-story, and approved
+  atomic plans committed; every child preflight returned `PREFLIGHT: ALL CLEAR`. Execution
+  awaits maintainer signal via `/epic-run swordfish-removal`.
 
 ## Goal
 
@@ -77,9 +73,9 @@ concurrently; the ordering constraint applies to execution waves.
 
 ## Decomposition and Waves
 
-| Wave | issue_num (placeholder) | Feature folder (hint) | Complexity | Scope |
+| Wave | issue_num | Feature folder | Complexity | Scope |
 |---|---|---|---|---|
-| 0 | 9001 | `swordfish-dictionary-lineage` | C3 | Dictionary lineage: re-point `ScoDictionary` consumers to `ScoDictionaryNew`; reconcile constructor/deserialize shape; preserve on-disk JSON. |
+| 0 | 306 | `2026-07-10-swordfish-dictionary-lineage-306` | C3 | Dictionary lineage: re-point `ScoDictionary` consumers to `ScoDictionaryNew`; reconcile constructor/deserialize shape; preserve on-disk JSON (payloads verified flat, not type-name-embedded). |
 | 0 | 307 | `2026-07-10-swordfish-collection-stack-lineage-307` | C3 | Collection + Stack lineage: CREATE the clean `ConcurrentObservableCollection<T>` base (Phase 1), re-base `ScoCollection`/`ScoStack` subclasses onto it and a new `SloStack<T> : SloLinkedList<T>`; positional stack surface + `SerializeAsync`; preserve `MovedMails` on-disk JSON. |
 | 0 | 309 | `2026-07-10-swordfish-scosorteddictionary-removal-309` | C1 | Confirm no production consumer of `ScoSortedDictionary`, then delete the class and its test. |
 | 0 | 310 | `2026-07-10-swordfish-raw-usage-cleanup-310` | C2 | Re-point `KbdActions` raw `ConcurrentObservableCollection` to `List<UClass>` (see decision record); remove unused `using Swordfish.NET.Collections;`; delete stale `TraceUtility` string literals. |
@@ -112,6 +108,16 @@ interface members `FilteredFolderScraping` and `FolderRemap`. Confirm `PeopleSco
 is inert (commented-out reference). Reconcile the legacy `filename,folderpath` constructor
 against `ScoDictionaryNew`'s `Static.Deserialize` / converter-based path, and preserve on-disk
 JSON for each persisted dictionary.
+
+**F1 research corrections (issue #306):** on-disk dictionary payloads are NOT type-name-embedded
+(default `TypeNameHandling.None`, flat `{"key":value}` maps), so the lineage swap preserves
+compatibility without a binder/converter, conditional on not using the globals
+`GetSettingsJson<T>(globals)` converter path (which emits an incompatible wrapper). Two epic-text
+discrepancies corrected: `FolderScorer._folderNameScores` is in-memory-only (not persisted), and
+`DictRemap` IS persisted though unlisted in the original brief. Preflight census additionally
+pulled ripple consumers into scope: `IEmailDetailsWrapper`, `EmailDetails`/`EmailDetailsWrapper`,
+six `EmailIntelligence` test fixtures, `FilterOlFoldersViewer_Tests`, and the two
+`SortEmail` `...Encoder.Encoder.SerializeAsync()` call sites.
 
 ### F2 — Collection + Stack lineage (ScoCollection/ScoStack)
 
@@ -210,7 +216,9 @@ already handled in F1–F3).
    **RESOLVED for F2/F3 scope:** F2 research verified all five persisted collections in its scope
    serialize as bare JSON arrays under `TypeNameHandling.Auto` (no converter/migration needed;
    round-trip fixtures still planned); F3 research verified no payload embeds
-   `ScoSortedDictionary`. F1's dictionary payloads remain subject to F1 research confirmation.
+   `ScoSortedDictionary`. **RESOLVED for F1 (issue #306):** dictionary payloads are flat
+   `TypeNameHandling.None` maps — no binder/converter needed, conditional on avoiding the globals
+   `GetSettingsJson<T>(globals)` converter path. Fully resolved across F1/F2/F3.
 
 ## Non-Goals
 
