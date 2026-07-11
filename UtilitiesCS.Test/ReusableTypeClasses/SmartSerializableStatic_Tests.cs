@@ -23,19 +23,6 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
-        public void IsSmartSerializable_ScoDictionary_ReturnsFalse()
-        {
-            // Arrange — ScoDictionary does not implement ISmartSerializable<>
-            var type = typeof(ScoDictionary<string, int>);
-
-            // Act
-            var result = type.IsSmartSerializable();
-
-            // Assert
-            result.Should().BeFalse();
-        }
-
-        [TestMethod]
         public void IsSmartSerializable_ConcurrentObservableCollection_ReturnsFalse()
         {
             // Arrange — the clean ConcurrentObservableCollection does not implement ISmartSerializable<>

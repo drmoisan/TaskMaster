@@ -236,9 +236,9 @@ namespace UtilitiesCS
             _folderNameScores.Count == 0 ? 0 : _folderNameScores.Max(x => x.Value);
 
         // The secondary ThenBy on the key gives a deterministic, culture-independent tie-break
-        // for folders that share the same score. The previous Swordfish-based ScoDictionary
-        // enumerated in insertion order; ScoDictionaryNew (ConcurrentDictionary-backed) does not,
-        // so an explicit ordinal key ordering preserves stable ranking output after the migration.
+        // for folders that share the same score. ScoDictionaryNew (ConcurrentDictionary-backed)
+        // does not enumerate in insertion order, so an explicit ordinal key ordering preserves
+        // stable ranking output.
         public string[] ToArray() =>
             _folderNameScores
                 .OrderByDescending(x => x.Value)

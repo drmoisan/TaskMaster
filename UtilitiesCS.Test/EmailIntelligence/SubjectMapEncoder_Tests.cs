@@ -88,7 +88,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that the default constructor creates a valid instance and that
         /// accessing the Encoder property on a default-constructed encoder enters the
         /// null-fallback branch (lines 91-94) and throws ArgumentNullException because
-        /// both _filename and _folderpath are null, making ScoDictionary's path
+        /// both _filename and _folderpath are null, making ScoDictionaryNew's path
         /// combination fail.
         ///
         /// Purpose:
@@ -99,7 +99,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             var encoder = new SubjectMapEncoder();
 
-            // Accessing Encoder triggers the null-folderpath path which throws in ScoDictionary.
+            // Accessing Encoder triggers the null-folderpath path which throws in ScoDictionaryNew.
             Action act = () => _ = encoder.Encoder;
 
             act.Should().Throw<ArgumentNullException>();
