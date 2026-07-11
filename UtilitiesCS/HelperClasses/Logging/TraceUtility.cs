@@ -389,8 +389,6 @@ namespace UtilitiesCS
                         "SVGControl.Test",
                         "TaskTree",
                         "TaskMaster",
-                        "UtilitiesSwordfish.NET.General",
-                        "UtilitiesSwordfish.NET.Test",
                         "Tags.Test",
                     };
                 }
