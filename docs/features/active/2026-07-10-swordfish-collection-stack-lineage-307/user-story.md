@@ -111,7 +111,7 @@ This feature contributes to the epic's leading indicators without changing produ
       unchanged after the migration.
 - [x] As an end user, the QuickFiler and SortEmail undo flows are preserved with no regression, so
       that reversing recent mail moves works identically.
-- [ ] As the maintainer, the dead `RecentsList<T>` type and its test are deleted (not migrated), so
+- [x] As the maintainer, the dead `RecentsList<T>` type and its test are deleted (not migrated), so
       that no effort is spent re-basing code already superseded by `AppAutoFileObjects.RecentsList :
       SloLinkedList<string>`.
 - [ ] As the maintainer, legacy `ScoCollection.cs`/`ScoStack.cs` and their direct tests are removed

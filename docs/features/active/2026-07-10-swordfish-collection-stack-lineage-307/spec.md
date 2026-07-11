@@ -268,7 +268,7 @@ unreferenced.
       regression (forward index read `stack[i]`, positional `Pop(i)` shift-and-reprocess,
       `Serialize()`); the `SloStack` `Pop(int)`/indexer contract the loops depend on is covered by
       tests.
-- [ ] `RecentsList<T>` dead code is removed: `RecentsList.cs` and `RecentsList_Tests.cs` are deleted
+- [x] `RecentsList<T>` dead code is removed: `RecentsList.cs` and `RecentsList_Tests.cs` are deleted
       (not migrated).
 - [ ] Legacy `ScoCollection.cs`/`ScoStack.cs` and their direct tests are deleted only after a
       repo-wide grep confirms no first-party reference to `ScoCollection<`/`ScoStack<` remains

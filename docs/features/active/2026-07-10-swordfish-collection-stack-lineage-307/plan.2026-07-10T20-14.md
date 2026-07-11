@@ -203,11 +203,11 @@ DELETE (only after grep-clean gate in Phase 7):
 
 ### Phase 6 — Delete `RecentsList<T>` Dead Code
 
-- [ ] [P6-T1] Verify no production consumer of the TYPE `RecentsList<T>` remains by running `rg -n "RecentsList<" --glob '**/*.cs'` and confirming hits are limited to `RecentsList.cs`, `RecentsList_Tests.cs`, and commented blocks in `AppAutoFileObjects.cs`; record the result in `evidence/regression-testing/recentslist-deadcode-check.md`
+- [x] [P6-T1] Verify no production consumer of the TYPE `RecentsList<T>` remains by running `rg -n "RecentsList<" --glob '**/*.cs'` and confirming hits are limited to `RecentsList.cs`, `RecentsList_Tests.cs`, and commented blocks in `AppAutoFileObjects.cs`; record the result in `evidence/regression-testing/recentslist-deadcode-check.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming the type is unreferenced in live production code (the `AppAutoFileObjects.RecentsList` PROPERTY is `SloLinkedList<string>` and is unaffected).
-- [ ] [P6-T2] Delete `UtilitiesCS/EmailIntelligence/Recents/RecentsList.cs` and its `<Compile Include>` item in `UtilitiesCS/UtilitiesCS.csproj`
+- [x] [P6-T2] Delete `UtilitiesCS/EmailIntelligence/Recents/RecentsList.cs` and its `<Compile Include>` item in `UtilitiesCS/UtilitiesCS.csproj`
   - Acceptance: file removed and csproj entry removed; solution still builds.
-- [ ] [P6-T3] Delete `UtilitiesCS.Test/EmailIntelligence/RecentsList_Tests.cs` and its `<Compile Include>` item in `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
+- [x] [P6-T3] Delete `UtilitiesCS.Test/EmailIntelligence/RecentsList_Tests.cs` and its `<Compile Include>` item in `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
   - Acceptance: file removed and csproj entry removed; test project still builds.
 
 ### Phase 7 — Delete Legacy `ScoCollection`/`ScoStack` After Grep-Clean Gate

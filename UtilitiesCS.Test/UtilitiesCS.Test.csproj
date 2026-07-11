@@ -172,7 +172,6 @@
     <Compile Include="EmailIntelligence\EmailDataMiner_FolderExtractionCoverage_Tests.cs" />
     <Compile Include="EmailIntelligence\EmailDataMiner_TestSupport.cs" />
     <Compile Include="EmailIntelligence\OlFolderClassifierGroup_Tests.cs" />
-    <Compile Include="EmailIntelligence\RecentsList_Tests.cs" />
     <Compile Include="Extensions\ArrayExtensions_Tests.cs" />
     <Compile Include="Extensions\ArrayExtensionsCoverageTests.cs" />
     <Compile Include="Extensions\AsyncSerialization_Tests.cs" />

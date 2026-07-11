@@ -940,7 +940,6 @@
     <Compile Include="ReusableTypeClasses\TimedActions\TimedDiskWriter.cs" />
     <Compile Include="ReusableTypeClasses\TimedActions\TimerWrapper.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IItemInfo.cs" />
-    <Compile Include="EmailIntelligence\Recents\RecentsList.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientInfo.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEncoder.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEntry.cs" />
