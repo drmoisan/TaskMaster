@@ -349,7 +349,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
         private sealed class DeterministicEncoder : ISubjectMapEncoder
         {
-            public IScoDictionary<string, int> Encoder =>
+            public IScoDictionaryNew<string, int> Encoder =>
                 throw new NotSupportedException("Encoder dictionary is not needed for this test.");
 
             public void AugmentTokenDict(string[] tokens) { }

@@ -387,7 +387,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             mockOl.SetupGet(x => x.ArchiveRoot).Returns(archiveRoot.Object);
 
             var mockTd = new Mock<IToDoObjects>(MockBehavior.Strict);
-            mockTd.SetupGet(x => x.FolderRemap).Returns(new ScoDictionary<string, string>());
+            mockTd.SetupGet(x => x.FolderRemap).Returns(new ScoDictionaryNew<string, string>());
 
             var mockGlobals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
             mockGlobals.SetupGet(x => x.Ol).Returns(mockOl.Object);

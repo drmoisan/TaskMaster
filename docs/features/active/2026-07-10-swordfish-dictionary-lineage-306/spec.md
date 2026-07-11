@@ -86,26 +86,26 @@ Net: four persisted dictionaries require on-disk round-trip compatibility tests 
 
 ## Acceptance Criteria
 
-- [ ] Every production consumer of `ScoDictionary<TKey,TValue>` is re-pointed to `ScoDictionaryNew<TKey,TValue>`: `AppToDoObjects` (`_dictRemap`/`DictRemap`, `_filteredFolderScraping`/`FilteredFolderScraping`, `_folderRemap`/`FolderRemap`), `SubjectMapEncoder` (`_encoder`, `_decoder`), and `FolderScorer` (`_folderNameScores`).
-- [ ] The `IToDoObjects` contract change compiles across all modules: `FilteredFolderScraping` -> `ScoDictionaryNew<string,int>`, `FolderRemap` -> `ScoDictionaryNew<string,string>`, `DictRemap` -> `IScoDictionaryNew<string,string>`; all implementers (`AppToDoObjects`) and all callers compile, including the `EmailDetails.cs` / `EmailDetailsWrapper.cs` ripple consumers whose `dictRemap` parameter becomes `IScoDictionaryNew<string,string>`, and the `ISubjectMapEncoder.Encoder` return type becomes `IScoDictionaryNew<string,int>`.
-- [ ] A per-persisted-dictionary on-disk JSON round-trip compatibility test exists for each of `DictRemap`, `FilteredFolderScraping`, `FolderRemap`, and SubjectMap `Encoder`, that loads a representative existing flat-shape `{"key": value}` payload through the new `Static.Deserialize` path (via injected read seam, no temporary files), verifies successful deserialization and entry fidelity, and re-serializes to a flat object asserting the absence of `$type`/`$id`/`CoDictionary`/`RemainingObject` tokens.
-- [ ] The in-memory-only fields (`SubjectMapEncoder.Decoder`, `FolderScorer._folderNameScores`) are migrated as a pure type swap with no on-disk compatibility test, consistent with the persisted-vs-in-memory classification (including the two documented discrepancies vs the epic text).
-- [ ] The globals-converter-path compatibility constraint is respected: none of the four persisted dictionaries registers `GetSettingsJson<T>(globals)`, `ScoDictionaryConverter`, or `PreserveReferencesHandling.All`; they use only the default `Static.Deserialize` / plain `Serialize()` path.
-- [ ] The `SubjectMapEncoder` construction/persistence reconciliation is complete: the legacy self-loading `(filename, folderpath)` constructor is replaced with `Static.Deserialize`, and the no-arg `Deserialize()` and no-arg `ToDictionary()` call sites are rewritten to new-lineage equivalents; existing negative-path behavior (missing-file create-empty-and-write, duplicate-key rebuild) is preserved.
-- [ ] Affected tests are migrated: consumer-coupled fixtures that construct legacy `ScoDictionary`/`IScoDictionary` are moved to `ScoDictionaryNew`/`IScoDictionaryNew` (including `EmailDetailsTests.cs` and `EmailDetailsWrapperTests.cs`).
-- [ ] `PeopleScoDictionary.cs` is confirmed inert (entirely block-commented) with no F1 change.
+- [x] Every production consumer of `ScoDictionary<TKey,TValue>` is re-pointed to `ScoDictionaryNew<TKey,TValue>`: `AppToDoObjects` (`_dictRemap`/`DictRemap`, `_filteredFolderScraping`/`FilteredFolderScraping`, `_folderRemap`/`FolderRemap`), `SubjectMapEncoder` (`_encoder`, `_decoder`), and `FolderScorer` (`_folderNameScores`).
+- [x] The `IToDoObjects` contract change compiles across all modules: `FilteredFolderScraping` -> `ScoDictionaryNew<string,int>`, `FolderRemap` -> `ScoDictionaryNew<string,string>`, `DictRemap` -> `IScoDictionaryNew<string,string>`; all implementers (`AppToDoObjects`) and all callers compile, including the `EmailDetails.cs` / `EmailDetailsWrapper.cs` ripple consumers whose `dictRemap` parameter becomes `IScoDictionaryNew<string,string>`, and the `ISubjectMapEncoder.Encoder` return type becomes `IScoDictionaryNew<string,int>`.
+- [x] A per-persisted-dictionary on-disk JSON round-trip compatibility test exists for each of `DictRemap`, `FilteredFolderScraping`, `FolderRemap`, and SubjectMap `Encoder`, that loads a representative existing flat-shape `{"key": value}` payload through the new `Static.Deserialize` path (via injected read seam, no temporary files), verifies successful deserialization and entry fidelity, and re-serializes to a flat object asserting the absence of `$type`/`$id`/`CoDictionary`/`RemainingObject` tokens.
+- [x] The in-memory-only fields (`SubjectMapEncoder.Decoder`, `FolderScorer._folderNameScores`) are migrated as a pure type swap with no on-disk compatibility test, consistent with the persisted-vs-in-memory classification (including the two documented discrepancies vs the epic text).
+- [x] The globals-converter-path compatibility constraint is respected: none of the four persisted dictionaries registers `GetSettingsJson<T>(globals)`, `ScoDictionaryConverter`, or `PreserveReferencesHandling.All`; they use only the default `Static.Deserialize` / plain `Serialize()` path.
+- [x] The `SubjectMapEncoder` construction/persistence reconciliation is complete: the legacy self-loading `(filename, folderpath)` constructor is replaced with `Static.Deserialize`, and the no-arg `Deserialize()` and no-arg `ToDictionary()` call sites are rewritten to new-lineage equivalents; existing negative-path behavior (missing-file create-empty-and-write, duplicate-key rebuild) is preserved.
+- [x] Affected tests are migrated: consumer-coupled fixtures that construct legacy `ScoDictionary`/`IScoDictionary` are moved to `ScoDictionaryNew`/`IScoDictionaryNew` (including `EmailDetailsTests.cs` and `EmailDetailsWrapperTests.cs`).
+- [x] `PeopleScoDictionary.cs` is confirmed inert (entirely block-commented) with no F1 change.
 - [ ] Optional: if `SCODictionary.cs` and its direct tests are deleted, all remaining test references — including the three SmartSerializable negative-sample tests — are migrated to a substitute non-`ISmartSerializable` type in the same change. If deletion is not pursued, this criterion is not applicable.
-- [ ] Full C# toolchain is green in a single final pass (csharpier -> .NET analyzers -> nullable/TreatWarningsAsErrors -> MSTest via vstest), and coverage thresholds hold for changed/new code.
+- [x] Full C# toolchain is green in a single final pass (csharpier -> .NET analyzers -> nullable/TreatWarningsAsErrors -> MSTest via vstest), and coverage thresholds hold for changed/new code.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit as applicable)
-- [ ] Edge cases and error handling covered by tests (missing-file create-empty-and-write; SubjectMap duplicate-key rebuild)
-- [ ] Docs updated (README, docs/features/active/... links)
-- [ ] Telemetry/logging added or updated (not applicable — none introduced)
-- [ ] Toolchain pass completed (format -> lint -> type-check -> test)
+- [x] Acceptance criteria documented and mapped to tests or demos
+- [x] Behavior matches acceptance criteria in all documented environments
+- [x] Tests updated/added (unit as applicable)
+- [x] Edge cases and error handling covered by tests (missing-file create-empty-and-write; SubjectMap duplicate-key rebuild)
+- [x] Docs updated (README, docs/features/active/... links)
+- [x] Telemetry/logging added or updated (not applicable — none introduced)
+- [x] Toolchain pass completed (format -> lint -> type-check -> test)
 
 ## Non-Goals
 
@@ -117,6 +117,6 @@ Net: four persisted dictionaries require on-disk round-trip compatibility tests 
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Round-trip JSON compatibility test per persisted dictionary (DictRemap, FilteredFolderScraping, FolderRemap, SubjectMap Encoder).
-- [ ] Interface contract change compiles across all modules.
-- [ ] Existing dictionary behavior (add/remove/lookup/observe) preserved.
+- [x] Round-trip JSON compatibility test per persisted dictionary (DictRemap, FilteredFolderScraping, FolderRemap, SubjectMap Encoder).
+- [x] Interface contract change compiles across all modules.
+- [x] Existing dictionary behavior (add/remove/lookup/observe) preserved.

@@ -19,17 +19,17 @@ namespace UtilitiesCS
             _filename = filename;
             _folderpath = folderpath;
             _subjectMap = subjectMap;
-            _encoder = new ScoDictionary<string, int>(filename, folderpath);
+            _encoder = ScoDictionaryNew<string, int>.Static.Deserialize(filename, folderpath);
         }
 
         private string _filename;
         private string _folderpath;
-        private IScoDictionary<string, int> _encoder;
-        private IScoDictionary<int, string> _decoder;
+        private IScoDictionaryNew<string, int> _encoder;
+        private IScoDictionaryNew<int, string> _decoder;
         private SubjectMapSco _subjectMap;
         private Regex _tokenizerRegex = Tokenizer.GetRegex(new char[] { '&' }.AsTokenPattern());
 
-        public IScoDictionary<int, string> Decoder
+        public IScoDictionaryNew<int, string> Decoder
         {
             get
             {
@@ -37,7 +37,10 @@ namespace UtilitiesCS
                 {
                     if (_encoder is null)
                     {
-                        _encoder.Deserialize();
+                        _encoder = ScoDictionaryNew<string, int>.Static.Deserialize(
+                            _filename,
+                            _folderpath
+                        );
                     }
                     // _decoder = new SCODictionary<int, string>(_encoder.ToDictionary().Select(x => new KeyValuePair<int, string>(x.Value, x.Key)).ToDictionary());
                     var iEnumerableOfKVPs = _encoder.Select(x => new KeyValuePair<int, string>(
@@ -46,7 +49,9 @@ namespace UtilitiesCS
                     ));
                     try
                     {
-                        _decoder = new ScoDictionary<int, string>(iEnumerableOfKVPs.ToDictionary());
+                        _decoder = new ScoDictionaryNew<int, string>(
+                            iEnumerableOfKVPs.ToDictionary()
+                        );
                     }
                     catch (InvalidOperationException)
                     {
@@ -83,14 +88,14 @@ namespace UtilitiesCS
                 return _decoder;
             }
         }
-        public IScoDictionary<string, int> Encoder
+        public IScoDictionaryNew<string, int> Encoder
         {
             get
             {
                 if (_encoder is null)
-                    _encoder = new ScoDictionary<string, int>(
-                        filename: _filename,
-                        folderpath: _folderpath
+                    _encoder = ScoDictionaryNew<string, int>.Static.Deserialize(
+                        _filename,
+                        _folderpath
                     );
                 return _encoder;
             }
@@ -119,16 +124,12 @@ namespace UtilitiesCS
                 .Select((input, index) => new { input, index })
                 .ToDictionary(x => x.input, x => x.index);
 
-            _encoder = new ScoDictionary<string, int>(
-                dictionary: words,
-                filename: _filename,
-                folderpath: _folderpath
-            );
+            _encoder = new ScoDictionaryNew<string, int>(words);
+            _encoder.Config.Disk = new FilePathHelper(_filename, _folderpath);
 
             _encoder.Serialize();
-            _decoder = new ScoDictionary<int, string>(
-                _encoder
-                    .ToDictionary()
+            _decoder = new ScoDictionaryNew<int, string>(
+                new Dictionary<string, int>(_encoder)
                     .Select(x => new KeyValuePair<int, string>(x.Value, x.Key))
                     .ToDictionary()
             );

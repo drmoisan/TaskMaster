@@ -168,11 +168,11 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var miner = new EmailDataMiner(
                 new StubGlobals(
                     toDoObjects: new StubToDoObjects(
-                        filteredFolderScraping: new ScoDictionary<string, int>
+                        filteredFolderScraping: new ScoDictionaryNew<string, int>
                         {
                             ["root/skip"] = 1,
                         },
-                        folderRemap: new ScoDictionary<string, string>
+                        folderRemap: new ScoDictionaryNew<string, string>
                         {
                             ["root/remap"] = "root/remapped",
                         }

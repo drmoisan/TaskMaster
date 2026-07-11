@@ -149,7 +149,7 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
             attachments.SetupGet(x => x.Count).Returns(0);
             parentFolder.SetupGet(x => x.FolderPath).Returns("\\\\Inbox\\Projects");
 
-            var dictRemap = new ScoDictionary<string, string>(
+            var dictRemap = new ScoDictionaryNew<string, string>(
                 new Dictionary<string, string> { ["Projects"] = "Archive Projects" }
             );
 

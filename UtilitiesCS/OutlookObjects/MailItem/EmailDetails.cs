@@ -29,7 +29,7 @@ namespace UtilitiesCS
         public static string[] Details(
             this MailItem OlMail,
             string emailRootFolder,
-            IScoDictionary<string, string> dictRemap = null
+            IScoDictionaryNew<string, string> dictRemap = null
         )
         {
             string[] strAry;
@@ -68,7 +68,7 @@ namespace UtilitiesCS
 
         public static string[] Details(
             this MailItemHelper helper,
-            IScoDictionary<string, string> dictRemap = null
+            IScoDictionaryNew<string, string> dictRemap = null
         )
         {
             string[] strAry;
@@ -305,7 +305,7 @@ namespace UtilitiesCS
         private static string GetEmailFolderPath(
             this MailItem OlMail,
             string emailRootFolder,
-            IScoDictionary<string, string> dictRemap
+            IScoDictionaryNew<string, string> dictRemap
         )
         {
             Folder OlParent = (Folder)OlMail.Parent;
