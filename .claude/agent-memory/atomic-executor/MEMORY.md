@@ -1,5 +1,6 @@
 # Atomic Executor Memory Index
 
+- [ScoDictionaryNew needs TryAdd not Add](project_scodictionarynew_tryadd_not_add.md) — retargeting Sco* stand-in tests to ScoDictionaryNew: `.Add(key,value)` won't compile (CS1061); base ConcurrentObservableDictionary exposes `.TryAdd`; swap in the same edit to avoid a build-fail loop
 - [Concurrent executor in same worktree](project_concurrent_executor_same_worktree.md) — two executors on one plan/worktree corrupt shared files; detect via mtime progression during your own turn; STOP, don't stash/race
 
 - [TaskController (#297) unit-test gotchas](project_taskvisualization_taskcontroller_test_gotchas.md) — ApplyChanges hangs over Moq (mark exempt); get-only MailItem.TaskSubject throws MissingMethodException; STA harness needs TableLayoutPanel parenting + NavTips warmup + no DateTimePicker.Text; C# 7.3 test project; tail-piped vstest buffers til exit

@@ -159,7 +159,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
         /// <summary>
         /// Verifies that Save() closes the viewer and accesses TD.FolderRemap on the
-        /// backing model. Uses an empty ScoDictionary so Serialize() is a no-op.
+        /// backing model. Uses an empty ScoDictionaryNew so Serialize() is a no-op.
         /// </summary>
         [STATestMethod]
         public void Save_ClosesViewer_AndAccessesFolderRemap()

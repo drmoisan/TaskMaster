@@ -3,6 +3,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
 {
@@ -20,8 +21,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         [TestMethod]
         public void IsSmartSerializable_ScoDictionaryInstance_ReturnsFalse()
         {
-            // Arrange — ScoDictionary does not implement ISmartSerializable<>
-            var instance = new ScoDictionary<string, int>();
+            // Arrange — ConcurrentObservableCollection does not implement ISmartSerializable<>
+            var instance = new ConcurrentObservableCollection<int>();
 
             // Act
             var result = _sut.IsSmartSerializable(instance);
@@ -46,8 +47,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         [TestMethod]
         public void IsSmartSerializable_TypeOverload_ScoDictionary_ReturnsFalse()
         {
-            // Arrange — ScoDictionary does not implement ISmartSerializable<>
-            var type = typeof(ScoDictionary<string, int>);
+            // Arrange — ConcurrentObservableCollection does not implement ISmartSerializable<>
+            var type = typeof(ConcurrentObservableCollection<int>);
 
             // Act
             var result = _sut.IsSmartSerializable(type);
@@ -73,13 +74,13 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         public void DeserializeObject_ValidJson_ReturnsInstance()
         {
             // Arrange
-            var dict = new ScoDictionary<string, int>();
-            dict.Add("key", 42);
+            var dict = new ScoDictionaryNew<string, int>();
+            dict.TryAdd("key", 42);
             var settings = NewSmartSerializableConfig.GetDefaultSettings();
             var json = JsonConvert.SerializeObject(dict, settings);
 
             // Act
-            var result = _sut.DeserializeObject<ScoDictionary<string, int>>(json, settings);
+            var result = _sut.DeserializeObject<ScoDictionaryNew<string, int>>(json, settings);
 
             // Assert
             result.Should().NotBeNull();
@@ -93,7 +94,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             var settings = NewSmartSerializableConfig.GetDefaultSettings();
 
             // Act
-            var result = _sut.DeserializeObject<ScoDictionary<string, int>>(
+            var result = _sut.DeserializeObject<ScoDictionaryNew<string, int>>(
                 "{ invalid json!!!",
                 settings
             );

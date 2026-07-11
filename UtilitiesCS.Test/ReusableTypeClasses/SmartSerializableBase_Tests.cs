@@ -49,13 +49,13 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         {
             // Arrange
             var sut = CreateSut();
-            var source = new ScoDictionary<string, int>();
-            source.Add("k1", 10);
+            var source = new ScoDictionaryNew<string, int>();
+            source.TryAdd("k1", 10);
             var settings = sut.GetDefaultSettings();
             var json = JsonConvert.SerializeObject(source, settings);
 
             // Act
-            var result = sut.DeserializeObject<ScoDictionary<string, int>>(json, settings);
+            var result = sut.DeserializeObject<ScoDictionaryNew<string, int>>(json, settings);
 
             // Assert
             result.Should().NotBeNull();
@@ -70,7 +70,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             var settings = sut.GetDefaultSettings();
 
             // Act
-            var result = sut.DeserializeObject<ScoDictionary<string, int>>(
+            var result = sut.DeserializeObject<ScoDictionaryNew<string, int>>(
                 "{ not valid json at all !!!",
                 settings
             );
