@@ -24,7 +24,7 @@ namespace UtilitiesCS
 
         public FolderScorer() { }
 
-        private ScoDictionary<string, long> _folderNameScores = new();
+        private ScoDictionaryNew<string, long> _folderNameScores = new();
         private static readonly char[] _wordChars = { '&' };
         private Regex _tokenizerRegex = Tokenizer.GetRegex(_wordChars.AsTokenPattern());
 
@@ -235,12 +235,21 @@ namespace UtilitiesCS
         public long TopScore() =>
             _folderNameScores.Count == 0 ? 0 : _folderNameScores.Max(x => x.Value);
 
+        // The secondary ThenBy on the key gives a deterministic, culture-independent tie-break
+        // for folders that share the same score. The previous Swordfish-based ScoDictionary
+        // enumerated in insertion order; ScoDictionaryNew (ConcurrentDictionary-backed) does not,
+        // so an explicit ordinal key ordering preserves stable ranking output after the migration.
         public string[] ToArray() =>
-            _folderNameScores.OrderByDescending(x => x.Value).Select(x => x.Key).ToArray();
+            _folderNameScores
+                .OrderByDescending(x => x.Value)
+                .ThenBy(x => x.Key, StringComparer.Ordinal)
+                .Select(x => x.Key)
+                .ToArray();
 
         public string[] ToArray(int topN) =>
             _folderNameScores
                 .OrderByDescending(x => x.Value)
+                .ThenBy(x => x.Key, StringComparer.Ordinal)
                 .Take(topN)
                 .Select(x => x.Key)
                 .ToArray();

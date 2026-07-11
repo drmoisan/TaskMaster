@@ -141,7 +141,7 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItemCoverage
                 [new RecipientInfo("Alan Turing", "alan@example.com", null)]
             );
             helper.SetAttachments([CreateAttachment("report.pdf"), CreateAttachment("chart.png")]);
-            var dictRemap = new ScoDictionary<string, string>(
+            var dictRemap = new ScoDictionaryNew<string, string>(
                 new Dictionary<string, string> { [@"Inbox\Projects"] = @"Archive\Projects" }
             );
 

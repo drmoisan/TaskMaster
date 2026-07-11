@@ -17,7 +17,7 @@ namespace UtilitiesCS
         //string DictPPL_Filename { get; }
         //void DictPPL_Save();
         Task LoadAsync(bool parallel);
-        IScoDictionary<string, string> DictRemap { get; }
+        IScoDictionaryNew<string, string> DictRemap { get; }
         ISerializableList<string> CategoryFilters { get; }
         IIDList IDList { get; }
         IApplicationGlobals Parent { get; }
@@ -25,8 +25,8 @@ namespace UtilitiesCS
         ScDictionary<string, string> ProgramInfo { get; }
         ConcurrentObservableCollection<IPrefix> PrefixList { get; }
         ConcurrentObservableCollection<IPrefix> LoadPrefixList();
-        ScoDictionary<string, int> FilteredFolderScraping { get; }
-        ScoDictionary<string, string> FolderRemap { get; }
+        ScoDictionaryNew<string, int> FilteredFolderScraping { get; }
+        ScoDictionaryNew<string, string> FolderRemap { get; }
         string ProjInfo_Filename { get; }
         string FnameDictRemap { get; }
         string FnameIDList { get; }

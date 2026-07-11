@@ -173,27 +173,27 @@ and until the maintainer or epic-orchestrator exercises the override path.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Existing `KbdActions` tests pass unchanged (regression net for work item 1)
-- [ ] Edge cases and error handling covered by existing tests (no new edge cases introduced)
-- [ ] Docs updated (this spec, user-story.md, decision record cross-referenced)
-- [ ] Toolchain pass completed (CSharpier -> .NET analyzers -> nullable -> MSTest)
+- [x] Acceptance criteria documented and mapped to tests or demos
+- [x] Behavior matches acceptance criteria in all documented environments
+- [x] Existing `KbdActions` tests pass unchanged (regression net for work item 1)
+- [x] Edge cases and error handling covered by existing tests (no new edge cases introduced)
+- [x] Docs updated (this spec, user-story.md, decision record cross-referenced)
+- [x] Toolchain pass completed (CSharpier -> .NET analyzers -> nullable -> MSTest)
 
 ## Acceptance Criteria
 
-- [ ] AC1: `QuickFiler/Controllers/KbdActions.cs` `_list` is re-pointed to
+- [x] AC1: `QuickFiler/Controllers/KbdActions.cs` `_list` is re-pointed to
   `System.Collections.Generic.List<UClass>`; the file no longer references
   `Swordfish.NET.Collections`; the public `KbdActions` API is unchanged; and all existing
   `KbdActions` tests pass.
-- [ ] AC2: `using Swordfish.NET.Collections;` is removed from `KeyboardHandler.cs`,
+- [x] AC2: `using Swordfish.NET.Collections;` is removed from `KeyboardHandler.cs`,
   `FlagDetails.cs`, and `FolderRemapController.cs`, and the solution rebuilds clean (proving each
   using was genuinely unused).
-- [ ] AC3: The stale `"UtilitiesSwordfish.NET.General"` / `"UtilitiesSwordfish.NET.Test"` literals
+- [x] AC3: The stale `"UtilitiesSwordfish.NET.General"` / `"UtilitiesSwordfish.NET.Test"` literals
   in `TraceUtility.cs` are deleted per the disposition recorded in the Research Resolution section
   above.
-- [ ] AC4: No Sco* lineage class (`ScoDictionary`/`ScoCollection`/`ScoStack`/`ScoSortedDictionary`)
+- [x] AC4: No Sco* lineage class (`ScoDictionary`/`ScoCollection`/`ScoStack`/`ScoSortedDictionary`)
   or its consumers are modified beyond the `KbdActions` raw-collection swap; the `UtilitiesSwordfish`
   project, its `ProjectReference` entries, and `TaskMaster.sln` are untouched.
-- [ ] AC5: The full C# toolchain (CSharpier, .NET analyzers, nullable, MSTest) passes, and
+- [x] AC5: The full C# toolchain (CSharpier, .NET analyzers, nullable, MSTest) passes, and
   changed/new code meets the repository coverage thresholds with no regression on changed lines.

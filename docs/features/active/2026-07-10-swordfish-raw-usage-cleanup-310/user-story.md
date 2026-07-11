@@ -53,19 +53,19 @@ migrations owned by F1, F2, and F3: a private collection field in `KbdActions`, 
 
 ## Acceptance Criteria
 
-- [ ] Done when `QuickFiler/Controllers/KbdActions.cs` `_list` is re-pointed to
+- [x] Done when `QuickFiler/Controllers/KbdActions.cs` `_list` is re-pointed to
   `System.Collections.Generic.List<UClass>`, the file no longer references
   `Swordfish.NET.Collections`, the public `KbdActions` API is unchanged, and all existing
   `KbdActions` tests pass. (AC1)
-- [ ] Done when `using Swordfish.NET.Collections;` is removed from `KeyboardHandler.cs`,
+- [x] Done when `using Swordfish.NET.Collections;` is removed from `KeyboardHandler.cs`,
   `FlagDetails.cs`, and `FolderRemapController.cs`, and the solution rebuilds clean. (AC2)
-- [ ] Done when the stale `"UtilitiesSwordfish.NET.General"` / `"UtilitiesSwordfish.NET.Test"`
+- [x] Done when the stale `"UtilitiesSwordfish.NET.General"` / `"UtilitiesSwordfish.NET.Test"`
   literals in `TraceUtility.cs` are deleted, with the rationale recorded in the feature documents.
   (AC3)
-- [ ] Done when no Sco* lineage class or its consumers are modified beyond the `KbdActions` swap,
+- [x] Done when no Sco* lineage class or its consumers are modified beyond the `KbdActions` swap,
   and the `UtilitiesSwordfish` project, its `ProjectReference` entries, and `TaskMaster.sln` remain
   untouched. (AC4)
-- [ ] Done when the full C# toolchain (CSharpier, .NET analyzers, nullable, MSTest) passes, and
+- [x] Done when the full C# toolchain (CSharpier, .NET analyzers, nullable, MSTest) passes, and
   changed/new code meets the repository coverage thresholds with no regression on changed lines.
   (AC5)
 

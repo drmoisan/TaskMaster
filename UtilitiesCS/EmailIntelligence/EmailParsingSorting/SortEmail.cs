@@ -203,7 +203,7 @@ namespace UtilitiesCS
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
 
-            await appGlobals.AF.Encoder.Encoder.SerializeAsync();
+            appGlobals.AF.Encoder.Encoder.Serialize();
         }
 
         [ExcludeFromCodeCoverage]
@@ -438,7 +438,7 @@ namespace UtilitiesCS
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
 
-            await appGlobals.AF.Encoder.Encoder.SerializeAsync();
+            appGlobals.AF.Encoder.Encoder.Serialize();
         }
 
         [ExcludeFromCodeCoverage]

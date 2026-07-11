@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using log4net.Repository.Hierarchy;
 using QuickFiler.Interfaces;
-using Swordfish.NET.Collections;
 using UtilitiesCS;
 
 namespace QuickFiler.Controllers
@@ -21,15 +20,15 @@ namespace QuickFiler.Controllers
 
         public KbdActions()
         {
-            _list = new ConcurrentObservableCollection<UClass>();
+            _list = new List<UClass>();
         }
 
         public KbdActions(IEnumerable<UClass> list)
         {
-            _list = new ConcurrentObservableCollection<UClass>(list);
+            _list = new List<UClass>(list);
         }
 
-        private ConcurrentObservableCollection<UClass> _list = new();
+        private List<UClass> _list = new();
 
         private static bool StoredKeyEquals(TKey left, TKey right) =>
             EqualityComparer<TKey>.Default.Equals(left, right);

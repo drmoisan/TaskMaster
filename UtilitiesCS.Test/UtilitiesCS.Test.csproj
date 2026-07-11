@@ -395,6 +395,7 @@
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollectionSenderTests.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollectionLockRecursionTests.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryNewTests.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\ScoDictionaryNew_OnDiskCompatibility_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ObservableCollectionBatchUpdate_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ObservableDictionary_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ObserverHelper_Tests.cs" />
@@ -411,7 +412,6 @@
     <Compile Include="ReusableTypeClasses\TimedQueueOfActions_Tests.cs" />
     <Compile Include="ReusableTypeClasses\TimedAsyncTask_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ScoDictionaryNew_Tests.cs" />
-    <Compile Include="ReusableTypeClasses\ScoSortedDictionary_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SloLinkedList_Tests.cs" />
     <Compile Include="ReusableTypeClasses\LockingObservableLinkedList_Tests.cs" />
     <Compile Include="ReusableTypeClasses\LockingObservableLinkedListNode_Tests.cs" />

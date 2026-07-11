@@ -166,7 +166,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             // Arrange
             var mockTD = new Mock<IToDoObjects>();
-            mockTD.Setup(td => td.FolderRemap).Returns(new ScoDictionary<string, string>());
+            mockTD.Setup(td => td.FolderRemap).Returns(new ScoDictionaryNew<string, string>());
 
             var mockGlobals = new Mock<IApplicationGlobals>();
             mockGlobals.Setup(g => g.TD).Returns(mockTD.Object);
@@ -247,7 +247,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void SyncGlobalMap_WithEmptyMappings_PropagatesEmptyStateToGlobals()
         {
             // Arrange
-            var folderRemap = new ScoDictionary<string, string>();
+            var folderRemap = new ScoDictionaryNew<string, string>();
             var mockTD = new Mock<IToDoObjects>();
             mockTD.Setup(td => td.FolderRemap).Returns(folderRemap);
 
@@ -272,7 +272,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void SyncGlobalMap_WhenKeyNotInMappings_RemovesObsoleteKey()
         {
             // Arrange — FolderRemap has "obsolete" but Mappings2 is empty
-            var folderRemap = new ScoDictionary<string, string>(
+            var folderRemap = new ScoDictionaryNew<string, string>(
                 new Dictionary<string, string> { { "obsolete", "dest" } }
             );
             var mockTD = new Mock<IToDoObjects>();
@@ -297,7 +297,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void SyncGlobalMap_WithNewMappingEntry_AddsEntryToFolderRemap()
         {
             // Arrange — empty FolderRemap, Mappings2 has one entry with RelativePath and MappedTo
-            var folderRemap = new ScoDictionary<string, string>();
+            var folderRemap = new ScoDictionaryNew<string, string>();
             var mockTD = new Mock<IToDoObjects>();
             mockTD.Setup(td => td.FolderRemap).Returns(folderRemap);
             var mockGlobals = new Mock<IApplicationGlobals>();
@@ -328,7 +328,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void SyncGlobalMap_WithExistingKey_UpdatesEntryToNewDestination()
         {
             // Arrange — FolderRemap already has "src-path" → TryAdd fails → update branch
-            var folderRemap = new ScoDictionary<string, string>(
+            var folderRemap = new ScoDictionaryNew<string, string>(
                 new Dictionary<string, string> { { "src-path", "old-dst" } }
             );
             var mockTD = new Mock<IToDoObjects>();

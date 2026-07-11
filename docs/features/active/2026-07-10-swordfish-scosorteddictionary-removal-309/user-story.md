@@ -67,14 +67,14 @@ class shrinks the analyzer-exempt vendored surface and unblocks the No-COM/testa
 
 ## Acceptance Criteria
 
-- [ ] An auditable repo-wide search confirms no production consumer of `ScoSortedDictionary` or `ConcurrentObservableSortedDictionary`, with scope, patterns, and results recorded
-- [ ] `ScoSortedDictionary.cs` is deleted
-- [ ] `ScoSortedDictionary_Tests.cs` is deleted
-- [ ] The matching `<Compile Include>` entry for `ScoSortedDictionary.cs` is removed from `UtilitiesCS.csproj`
-- [ ] The matching `<Compile Include>` entry for `ScoSortedDictionary_Tests.cs` is removed from `UtilitiesCS.Test.csproj`
-- [ ] The solution builds and all tests pass after removal (full C# toolchain green: csharpier, analyzers, nullable/type-check, MSTest)
-- [ ] No behavior or API change occurs to any other type
-- [ ] No `ProjectReference` or `TaskMaster.sln` change is made
+- [x] An auditable repo-wide search confirms no production consumer of `ScoSortedDictionary` or `ConcurrentObservableSortedDictionary`, with scope, patterns, and results recorded
+- [x] `ScoSortedDictionary.cs` is deleted
+- [x] `ScoSortedDictionary_Tests.cs` is deleted
+- [x] The matching `<Compile Include>` entry for `ScoSortedDictionary.cs` is removed from `UtilitiesCS.csproj`
+- [x] The matching `<Compile Include>` entry for `ScoSortedDictionary_Tests.cs` is removed from `UtilitiesCS.Test.csproj`
+- [x] The solution builds and all tests pass after removal (full C# toolchain green: csharpier, analyzers, nullable/type-check, MSTest)
+- [x] No behavior or API change occurs to any other type
+- [x] No `ProjectReference` or `TaskMaster.sln` change is made
 
 ## Non-Goals
 
