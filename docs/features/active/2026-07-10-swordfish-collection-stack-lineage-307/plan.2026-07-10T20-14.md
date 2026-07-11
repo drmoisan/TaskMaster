@@ -109,17 +109,17 @@ DELETE (only after grep-clean gate in Phase 7):
 
 ### Phase 0 — Baseline Capture and Policy Review
 
-- [ ] [P0-T1] Read policy files in the policy-compliance-order sequence (CLAUDE.md → `.claude/rules/general-code-change.md` → `.claude/rules/general-unit-test.md` → `.claude/rules/csharp.md`) and write `evidence/baseline/phase0-instructions-read.md`
+- [x] [P0-T1] Read policy files in the policy-compliance-order sequence (CLAUDE.md → `.claude/rules/general-code-change.md` → `.claude/rules/general-unit-test.md` → `.claude/rules/csharp.md`) and write `evidence/baseline/phase0-instructions-read.md`
   - Acceptance: artifact contains `Timestamp:`, `Policy Order:`, and the explicit list of files read (all four), each confirmed present.
-- [ ] [P0-T2] Capture the baseline repo-wide reference inventory by running `rg -n "ScoCollection<|ScoStack<" --glob '**/*.cs'` and record every hit path/line in `evidence/baseline/reference-inventory.md`
+- [x] [P0-T2] Capture the baseline repo-wide reference inventory by running `rg -n "ScoCollection<|ScoStack<" --glob '**/*.cs'` and record every hit path/line in `evidence/baseline/reference-inventory.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (count of hits and file list), establishing the deletion-gate starting set for Phase 7.
-- [ ] [P0-T3] Run `csharpier --check .` and write `evidence/baseline/csharpier.md`
+- [x] [P0-T3] Run `csharpier --check .` and write `evidence/baseline/csharpier.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (formatted/needs-format count).
-- [ ] [P0-T4] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` and write `evidence/baseline/msbuild-analyzers.md`
+- [x] [P0-T4] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` and write `evidence/baseline/msbuild-analyzers.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (error/warning counts, build result).
-- [ ] [P0-T5] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true` and write `evidence/baseline/msbuild-nullable.md`
+- [x] [P0-T5] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true` and write `evidence/baseline/msbuild-nullable.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (nullable/type warnings-as-errors result).
-- [ ] [P0-T6] Run `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll TaskMaster.Test\bin\Debug\TaskMaster.Test.dll TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll /EnableCodeCoverage` and write `evidence/baseline/vstest-coverage.md`
+- [x] [P0-T6] Run `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll TaskMaster.Test\bin\Debug\TaskMaster.Test.dll TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll /EnableCodeCoverage` and write `evidence/baseline/vstest-coverage.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with a numeric coverage headline (repo-wide line% and branch%) and total passed/failed counts.
 
 ### Phase 1 — Create the Swordfish-free Clean Collection Base
