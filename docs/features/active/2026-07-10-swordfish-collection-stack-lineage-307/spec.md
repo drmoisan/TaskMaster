@@ -276,20 +276,20 @@ unreferenced.
 - [x] Migrated tests compile and pass against the clean types (`ManageFiltersControllerTests`,
       `ConcurrentObservableCollectionSenderTests`, `ConcurrentObservableCollectionLockRecursionTests`,
       `EmailFiler_Tests`/`EmailFiler_TestSupport`, `AppAutoFileObjectsCoverageExpansionTests`).
-- [ ] New `SloStack<T>` positional members and `SerializeAsync`, and the new clean-collection
+- [x] New `SloStack<T>` positional members and `SerializeAsync`, and the new clean-collection
       members, meet the new-code coverage bar (>= 90% for new modules/methods per repo CLAUDE.md;
       line >= 85% / branch >= 75% per repo rules).
-- [ ] The full C# toolchain passes in order (csharpier → analyzers → nullable → MSTest) with no
+- [x] The full C# toolchain passes in order (csharpier → analyzers → nullable → MSTest) with no
       errors in the final pass.
-- [ ] No `UtilitiesSwordfish` project deletion, `ProjectReference` removal, `TaskMaster.sln` edit,
+- [x] No `UtilitiesSwordfish` project deletion, `ProjectReference` removal, `TaskMaster.sln` edit,
       or F1/F3/F5-reserved type changes are introduced (scope boundary held).
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit/integration as applicable)
-- [ ] Edge cases and error handling covered by tests
-- [ ] Docs updated (README, docs/features/active/... links)
+- [x] Acceptance criteria documented and mapped to tests or demos
+- [x] Behavior matches acceptance criteria in all documented environments
+- [x] Tests updated/added (unit/integration as applicable)
+- [x] Edge cases and error handling covered by tests
+- [x] Docs updated (README, docs/features/active/... links)
 - [ ] Telemetry/logging added or updated (if applicable)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
+- [x] Toolchain pass completed (format → lint → type-check → test)

@@ -223,17 +223,17 @@ DELETE (only after grep-clean gate in Phase 7):
 
 ### Phase 8 — Final QC Loop and Coverage Verification
 
-- [ ] [P8-T1] Run `csharpier .` (apply formatting), then `csharpier --check .`, and write `evidence/qa-gates/csharpier.md`
+- [x] [P8-T1] Run `csharpier .` (apply formatting), then `csharpier --check .`, and write `evidence/qa-gates/csharpier.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (all files formatted, 0 needing changes). If formatting changed files, restart the loop from this task.
-- [ ] [P8-T2] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` and write `evidence/qa-gates/msbuild-analyzers.md`
+- [x] [P8-T2] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` and write `evidence/qa-gates/msbuild-analyzers.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (0 analyzer errors, build succeeded).
-- [ ] [P8-T3] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true` and write `evidence/qa-gates/msbuild-nullable.md`
+- [x] [P8-T3] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true` and write `evidence/qa-gates/msbuild-nullable.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (0 nullable/type warnings-as-errors, build succeeded).
-- [ ] [P8-T4] Run `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll TaskMaster.Test\bin\Debug\TaskMaster.Test.dll TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll /EnableCodeCoverage` and write `evidence/qa-gates/vstest-coverage.md`
+- [x] [P8-T4] Run `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll TaskMaster.Test\bin\Debug\TaskMaster.Test.dll TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll /EnableCodeCoverage` and write `evidence/qa-gates/vstest-coverage.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with numeric post-change coverage headline (repo-wide line% and branch%), all tests passed, 0 failed. No `SKIPPED`.
-- [ ] [P8-T5] Compute and record new/changed-code coverage for the new `ConcurrentObservableCollection<T>` (+ serialization partial + seams) and `SloStack<T>` members from the Phase 8 coverage run, and write the delta/threshold report to `evidence/qa-gates/coverage-delta.md`
+- [x] [P8-T5] Compute and record new/changed-code coverage for the new `ConcurrentObservableCollection<T>` (+ serialization partial + seams) and `SloStack<T>` members from the Phase 8 coverage run, and write the delta/threshold report to `evidence/qa-gates/coverage-delta.md`
   - Acceptance: artifact reports baseline coverage (from Phase 0 `evidence/baseline/vstest-coverage.md`), post-change coverage (P8-T4), and new/changed-code coverage; asserts new `SloStack`/clean-collection members meet ≥ 90% new-code and ≥ 85% line / ≥ 75% branch, and repo-wide floor did not regress. If any threshold is unmet, outcome is remediation-required (not PASS).
-- [ ] [P8-T6] Re-run the full toolchain loop (P8-T1 → P8-T4) once more if any prior QC task changed files, and confirm a single clean pass across csharpier → analyzers → nullable → vstest
+- [x] [P8-T6] Re-run the full toolchain loop (P8-T1 → P8-T4) once more if any prior QC task changed files, and confirm a single clean pass across csharpier → analyzers → nullable → vstest
   - Acceptance: one clean end-to-end pass recorded with no file changes and no failures; if any step changed files or failed, the loop restarts from P8-T1.
 
 ---

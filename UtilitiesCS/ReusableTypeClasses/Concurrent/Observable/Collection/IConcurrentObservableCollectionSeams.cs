@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows.Forms;
 using UtilitiesCS.HelperClasses;
@@ -31,6 +32,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection
     /// <summary>
     /// Default production filesystem implementation backed by <see cref="File"/>.
     /// </summary>
+    [ExcludeFromCodeCoverage] // thin filesystem I/O passthrough (host-bound; see CLAUDE.md I/O-boundary exemption)
     internal sealed class ConcurrentObservableCollectionFileSystem
         : IConcurrentObservableCollectionFileSystem
     {
@@ -44,6 +46,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection
     /// <summary>
     /// Default production prompt implementation backed by <see cref="MyBox"/>.
     /// </summary>
+    [ExcludeFromCodeCoverage] // WinForms MessageBox prompt (host-bound UI; see CLAUDE.md WinForms exemption)
     internal sealed class ConcurrentObservableCollectionPrompt
         : IConcurrentObservableCollectionPrompt
     {

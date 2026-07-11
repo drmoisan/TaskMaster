@@ -280,5 +280,123 @@ namespace UtilitiesCS.Test.ReusableTypeClasses.SerializableNew.Concurrent.Observ
         }
 
         #endregion file-based deserialize path
+
+        #region ISmartSerializable delegation and stubbed-member coverage
+
+        [TestMethod]
+        public void EnumerableConstructor_PopulatesInOrder()
+        {
+            var stack = new SloStack<int>(new[] { 1, 2, 3 });
+
+            stack.Count.Should().Be(3);
+            stack[0].Should().Be(1);
+        }
+
+        [TestMethod]
+        public void Config_GetSet_RoundTrips()
+        {
+            var stack = new SloStack<int>();
+            var config = new NewSmartSerializableConfig();
+
+            stack.Config = config;
+
+            stack.Config.Should().BeSameAs(config);
+        }
+
+        [TestMethod]
+        public void Serialize_NoConfiguredPath_IsNoOp_AndSerializeThreadSafeInvalidPathIsSwallowed()
+        {
+            var stack = new SloStack<int>(new[] { 1 });
+
+            // No configured path → deferred serialize is a no-op; an invalid path is swallowed by
+            // the production error handling in the inherited SmartSerializable.
+            stack.Invoking(s => s.Serialize()).Should().NotThrow();
+            stack
+                .Invoking(s => s.Serialize(@"C:\nonexistent-slostack\file.json"))
+                .Should()
+                .NotThrow();
+            stack
+                .Invoking(s => s.SerializeThreadSafe("*invalid-slostack.json"))
+                .Should()
+                .NotThrow();
+        }
+
+        [TestMethod]
+        public void InstanceDeserializeOverloads_WithInvalidPath_ReturnEmptyStack()
+        {
+            var stack = new SloStack<int>();
+
+            var byName = stack.Deserialize("*invalid-a.json", @"C:\nonexistent-slostack");
+            var byNameAsk = stack.Deserialize(
+                "*invalid-b.json",
+                @"C:\nonexistent-slostack",
+                askUserOnError: false
+            );
+            var byNameSettings = stack.Deserialize(
+                "*invalid-c.json",
+                @"C:\nonexistent-slostack",
+                askUserOnError: false,
+                settings: SmartSerializable<SloStack<int>>.GetDefaultSettings()
+            );
+
+            byName.Should().NotBeNull();
+            byNameAsk.Should().NotBeNull();
+            byNameSettings.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public async Task DeserializeAsyncOverloads_WithLoader_ReturnEmptyStack()
+        {
+            var stack = new SloStack<int>();
+            var loader = new SmartSerializable<SloStack<int>>();
+
+            // The simple overload returns null when the loader's file is absent; the
+            // askUserOnError overload creates an empty instance. Both exercise the typed
+            // DeserializeAsync delegation to the inherited SmartSerializable.
+            var a = await stack.DeserializeAsync(loader);
+            var b = await stack.DeserializeAsync(loader, askUserOnError: false);
+
+            a.Should().BeNull();
+            b.Should().NotBeNull();
+            b.Count.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void StaticDeserializeOverloads_WithInvalidPath_ReturnEmptyStack()
+        {
+            var byName = SloStack<int>.Static.Deserialize("*a.json", @"C:\nonexistent-slostack");
+            var bySettings = SloStack<int>.Static.Deserialize(
+                "*c.json",
+                @"C:\nonexistent-slostack",
+                askUserOnError: false,
+                settings: SmartSerializable<SloStack<int>>.GetDefaultSettings()
+            );
+
+            byName.Should().NotBeNull();
+            bySettings.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public async Task StubbedInterfaceMembers_ThrowNotImplementedException()
+        {
+            ISmartSerializable<SloStack<int>> stack = new SloStack<int>();
+            var loader = new SmartSerializable<SloStack<int>>();
+
+            stack.Invoking(s => s.Deserialize(loader)).Should().Throw<NotImplementedException>();
+            stack
+                .Invoking(s => s.Deserialize(loader, false, () => new SloStack<int>()))
+                .Should()
+                .Throw<NotImplementedException>();
+            await stack
+                .Awaiting(s => s.DeserializeAsync(loader, false, () => new SloStack<int>()))
+                .Should()
+                .ThrowAsync<NotImplementedException>();
+            stack
+                .Invoking(s => s.DeserializeObject("{}", null))
+                .Should()
+                .Throw<NotImplementedException>();
+        }
+
+        #endregion ISmartSerializable delegation and stubbed-member coverage
     }
 }

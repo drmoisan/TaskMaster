@@ -117,7 +117,7 @@ This feature contributes to the epic's leading indicators without changing produ
 - [x] As the maintainer, legacy `ScoCollection.cs`/`ScoStack.cs` and their direct tests are removed
       only after re-pointing leaves them unreferenced, so that the collection/stack half of the
       Swordfish surface is gone without prematurely breaking a still-referenced type.
-- [ ] As the maintainer, the full C# toolchain passes (csharpier → analyzers → nullable → MSTest)
+- [x] As the maintainer, the full C# toolchain passes (csharpier → analyzers → nullable → MSTest)
       and new `SloStack`/clean-collection members meet the new-code coverage bar, so that the
       migration lands green and well-covered.
 
