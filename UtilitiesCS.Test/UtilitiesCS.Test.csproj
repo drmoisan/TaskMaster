@@ -144,6 +144,7 @@
     <Compile Include="EmailIntelligence\SubjectMapEntry_Tests.cs" />
     <Compile Include="EmailIntelligence\SubjectMapMetrics_Tests.cs" />
     <Compile Include="EmailIntelligence\SubjectMapSco_Orchestration_Tests.cs" />
+    <Compile Include="EmailIntelligence\Compatibility\CollectionRoundTrip_Tests.cs" />
     <Compile Include="EmailIntelligence\SubjectMapSco_Tests.cs" />
     <Compile Include="EmailIntelligence\SmithWaterman_Tests.cs" />
     <Compile Include="EmailIntelligence\FilterEntry_Tests.cs" />
@@ -171,7 +172,6 @@
     <Compile Include="EmailIntelligence\EmailDataMiner_FolderExtractionCoverage_Tests.cs" />
     <Compile Include="EmailIntelligence\EmailDataMiner_TestSupport.cs" />
     <Compile Include="EmailIntelligence\OlFolderClassifierGroup_Tests.cs" />
-    <Compile Include="EmailIntelligence\RecentsList_Tests.cs" />
     <Compile Include="Extensions\ArrayExtensions_Tests.cs" />
     <Compile Include="Extensions\ArrayExtensionsCoverageTests.cs" />
     <Compile Include="Extensions\AsyncSerialization_Tests.cs" />
@@ -383,17 +383,17 @@
     <Compile Include="ReusableTypeClasses\Serializable\SerializableListCoverageTests.cs" />
     <Compile Include="ReusableTypeClasses\SerializableList_Tests.cs" />
     <Compile Include="ReusableTypeClasses\StackGeek_Tests.cs" />
-    <Compile Include="ReusableTypeClasses\ScoStack_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\SloStack_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\SloStackUndoContract_Tests.cs" />
     <Compile Include="ReusableTypeClasses\StackObjectCS_Tests.cs" />
     <Compile Include="ReusableTypeClasses\TreeNodeOfT_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionaryTest\ConcurrentObservableDictionaryTest.cs" />
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionaryTest\SimpleObserver.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\ConcurrentObservableDictionaryTests.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollection_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollectionSerialization_Tests.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollectionSenderTests.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollectionLockRecursionTests.cs" />
-    <Compile Include="ReusableTypeClasses\ScoCollection_Tests.cs" />
-    <Compile Include="ReusableTypeClasses\ScoCollectionTests.cs" />
-    <Compile Include="ReusableTypeClasses\ScoCollectionTests_UnfinishedStubs.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryNewTests.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\ScoDictionaryNew_OnDiskCompatibility_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ObservableCollectionBatchUpdate_Tests.cs" />

@@ -17,6 +17,7 @@ using QuickFiler.Interfaces;
 using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace QuickFiler.Controllers
@@ -137,7 +138,7 @@ namespace QuickFiler.Controllers
             set => _complete = value;
         }
 
-        public ScoStack<IMovedMailInfo> MovedItems
+        public SloStack<IMovedMailInfo> MovedItems
         {
             get => _globals.AF.MovedMails;
         }

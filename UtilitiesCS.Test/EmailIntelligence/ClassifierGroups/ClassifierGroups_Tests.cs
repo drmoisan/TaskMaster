@@ -21,6 +21,7 @@ using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
@@ -880,7 +881,7 @@ namespace UtilitiesCS.Test.EmailIntelligence.ClassifierGroups
             mockAf.SetupGet(x => x.ProgressPane).Returns(progressPane.Object);
             mockGlobals.SetupGet(x => x.AF).Returns(mockAf.Object);
 
-            var prefixList = new ScoCollection<IPrefix>
+            var prefixList = new ConcurrentObservableCollection<IPrefix>
             {
                 CreatePrefix("Context", "_@"),
                 CreatePrefix("Project", "Tag PROJECT"),

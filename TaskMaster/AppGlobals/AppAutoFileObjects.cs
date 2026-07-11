@@ -22,6 +22,7 @@ using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 using UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList;
 using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 using UtilitiesCS.Threading;
@@ -173,19 +174,22 @@ namespace TaskMaster
             }
         }
 
-        private ScoStack<IMovedMailInfo> _movedMails;
-        public ScoStack<IMovedMailInfo> MovedMails
+        private SloStack<IMovedMailInfo> _movedMails;
+        public SloStack<IMovedMailInfo> MovedMails
         {
             get => Initialized(_movedMails, LoadMovedMails);
         }
 
-        private ScoStack<IMovedMailInfo> LoadMovedMails()
+        private SloStack<IMovedMailInfo> LoadMovedMails()
         {
             if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
             {
-                var movedMails = new ScoStack<IMovedMailInfo>(
-                    filename: _defaults.FileName_MovedEmails,
-                    folderpath: pythonStaging,
+                // File-based deserialize via the clean SloStack Static path (Swordfish-free).
+                // Uses only the implemented file-based deserialize path — none of the four
+                // stubbed SloLinkedList ISmartSerializable members are exercised.
+                var movedMails = SloStack<IMovedMailInfo>.Static.Deserialize(
+                    _defaults.FileName_MovedEmails,
+                    pythonStaging,
                     askUserOnError: false
                 );
                 return movedMails;
@@ -458,16 +462,16 @@ namespace TaskMaster
         public SubjectMapSco SubjectMap => Initialized(_subjectMap, LoadSubjectMap);
 
         private ObserverHelper<NotifyCollectionChangedEventArgs> _filterObserver;
-        private ScoCollection<FilterEntry> _filters;
-        public ScoCollection<FilterEntry> Filters =>
+        private ConcurrentObservableCollection<FilterEntry> _filters;
+        public ConcurrentObservableCollection<FilterEntry> Filters =>
             Initializer.GetOrLoad(ref _filters, LoadFilters);
 
-        private ScoCollection<FilterEntry> LoadFilters()
+        private ConcurrentObservableCollection<FilterEntry> LoadFilters()
         {
-            ScoCollection<FilterEntry> filters = null;
+            ConcurrentObservableCollection<FilterEntry> filters = null;
             if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
             {
-                filters = new ScoCollection<FilterEntry>(
+                filters = new ConcurrentObservableCollection<FilterEntry>(
                     fileName: _defaults.FileName_Filters,
                     folderPath: pythonStaging
                 );
@@ -491,7 +495,7 @@ namespace TaskMaster
             NotifyCollectionChangedEventArgs e
         )
         {
-            var collection = (ScoCollection<FilterEntry>)sender;
+            var collection = (ConcurrentObservableCollection<FilterEntry>)sender;
             collection.Serialize();
         }
 

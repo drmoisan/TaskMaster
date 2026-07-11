@@ -1,72 +1,65 @@
 using System.Collections.Specialized;
-using System.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Swordfish.NET.Collections;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 
 namespace ConcurrentObservableCollection.Tests
 {
     /// <summary>
-    /// Regression tests for the LockRecursionException bug.
+    /// Lock-recursion hazard tests, re-expressed for the clean, Swordfish-free
+    /// <see cref="ConcurrentObservableCollection{T}"/>.
     ///
-    /// Purpose:
-    ///     ConcurrentObservableBase&lt;T&gt; raises CollectionChanged synchronously from the
-    ///     "DRM Hack" _baseCollection.CollectionChanged relay while the write lock is
-    ///     still held inside DoBaseWrite. If a subscriber then reads from the same
-    ///     collection (e.g. calls map.Last() or accesses Count), it enters DoBaseRead,
-    ///     which tries to acquire a read lock. ReaderWriterLockSlim (NoRecursion policy)
-    ///     throws LockRecursionException because the write lock is already held on the
-    ///     same thread.
+    /// <para>The legacy Swordfish <c>ConcurrentObservableBase&lt;T&gt;</c> raised CollectionChanged
+    /// synchronously while a <see cref="System.Threading.ReaderWriterLockSlim"/> write lock was
+    /// still held inside <c>DoBaseWrite</c>. A handler that re-read the collection (e.g.
+    /// <c>map.Last()</c> or <c>Count</c>) entered <c>DoBaseRead</c>, tried to take a read lock on the
+    /// same non-recursive lock, and threw <c>LockRecursionException</c>.</para>
     ///
-    /// Coverage:
-    ///     1. Verifies the exception IS thrown when the handler re-reads the collection
-    ///        (documents the bug; ensures the fix is never silently reverted).
-    ///     2. Verifies the exception IS NOT thrown when the handler reads only from the
-    ///        event args (the safe, fixed pattern).
+    /// <para>The clean base derives from <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>,
+    /// which does not use a <c>ReaderWriterLockSlim</c>. Rationale for the re-expression (P4-T7):
+    /// the lock-recursion hazard is eliminated by construction, so a handler may safely read the
+    /// collection from inside a CollectionChanged callback. These tests assert that removal and that
+    /// the previously-mandated safe pattern (reading from <c>e.NewItems</c>) still works.</para>
     /// </summary>
     [TestClass]
     public class ConcurrentObservableCollectionLockRecursionTests
     {
         /// <summary>
-        /// Regression: verifies that reading the collection from inside a CollectionChanged
-        /// handler (simulating the original map.Last() call in SubjectMap_CollectionChanged)
-        /// throws LockRecursionException because the write lock is still held during the
-        /// synchronous CollectionChanged callback.
-        ///
-        /// This test documents the root-cause of the production bug and must remain
-        /// so that the bug cannot be silently re-introduced.
+        /// The Swordfish lock-recursion hazard is gone: reading the collection (Count) from inside a
+        /// CollectionChanged handler that fires during Add no longer throws, because the clean base
+        /// holds no re-entrant lock during the notification.
         /// </summary>
         [TestMethod]
-        public void Add_WhenCollectionChangedHandlerReadsCountFromCollection_ThrowsLockRecursionException()
+        public void Add_WhenCollectionChangedHandlerReadsCountFromCollection_DoesNotThrow()
         {
-            // Arrange — subscribe a handler that re-reads the collection (the buggy pattern).
+            // Arrange — a handler that re-reads the collection (the formerly-fatal pattern).
             var collection = new ConcurrentObservableCollection<int>();
+            int observedCount = -1;
 
             collection.CollectionChanged += (sender, e) =>
             {
                 if (e.Action == NotifyCollectionChangedAction.Add)
                 {
-                    // Simulates map.Last(): accesses Count via DoBaseRead while the write
-                    // lock from DoBaseWrite is still held on this thread.
-                    _ = collection.Count;
+                    // On the clean ObservableCollection base this is safe — no lock is held.
+                    observedCount = collection.Count;
                 }
             };
 
-            // Act & Assert — the re-entrant read must throw LockRecursionException.
+            // Act & Assert — no LockRecursionException on the clean base.
             collection
                 .Invoking(c => c.Add(42))
                 .Should()
-                .Throw<LockRecursionException>(
-                    "reading the collection from inside a CollectionChanged handler "
-                        + "that fires during Add re-enters the same lock and must throw"
+                .NotThrow(
+                    "the clean ObservableCollection base holds no ReaderWriterLockSlim during "
+                        + "the synchronous CollectionChanged callback, so re-reading is safe"
                 );
+
+            observedCount.Should().Be(1, "the handler observed the collection after the add");
         }
 
         /// <summary>
-        /// Verifies that the safe pattern — using e.NewItems[0] instead of re-reading the
-        /// collection — does not throw LockRecursionException and delivers the correct item.
-        ///
-        /// This is the pattern applied by the fix to SubjectMap_CollectionChanged.
+        /// The safe pattern — reading from <c>e.NewItems</c> instead of re-reading the collection —
+        /// continues to work and delivers the correct item.
         /// </summary>
         [TestMethod]
         public void Add_WhenCollectionChangedHandlerUsesNewItemsFromEventArgs_DoesNotThrow()
@@ -77,7 +70,6 @@ namespace ConcurrentObservableCollection.Tests
 
             collection.CollectionChanged += (sender, e) =>
             {
-                // Safe: reads from event args, not from the collection itself.
                 if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems?.Count > 0)
                 {
                     capturedItem = (int)e.NewItems[0];
@@ -87,7 +79,7 @@ namespace ConcurrentObservableCollection.Tests
             // Act
             collection.Invoking(c => c.Add(42)).Should().NotThrow();
 
-            // Assert — item was captured correctly without triggering lock recursion.
+            // Assert — item was captured correctly.
             capturedItem
                 .Should()
                 .Be(42, "e.NewItems[0] must contain the item that was just added");

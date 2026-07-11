@@ -233,63 +233,63 @@ unreferenced.
 
 ## Acceptance Criteria
 
-- [ ] The Swordfish-free clean `ConcurrentObservableCollection<T>` base is created under
+- [x] The Swordfish-free clean `ConcurrentObservableCollection<T>` base is created under
       `UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.*`, built on `ObservableCollection<T>`,
       carrying `IList<T>` + `IList`, `FindIndex`/`FindIndices`/`Find`/`Exists`, `CollectionChanged`,
       `Subscribe(IObserver<...>)`, and the ScoCollection serialization surface (file ctors incl.
       AltListLoader/backup, `Serialize`/`SerializeAsync`, `Deserialize` overloads,
       `FilePath`/`FolderPath`/`FileName`, `ToList`/`FromList`, injectable FS/Prompt seams).
-- [ ] The clean collection serializes as a bare JSON array (no `[JsonObject]`; remains an
+- [x] The clean collection serializes as a bare JSON array (no `[JsonObject]`; remains an
       `IEnumerable`/`IList<T>` so Newtonsoft keeps the array contract).
-- [ ] `CtfMap` and `SubjectMapSco` (incl. `AltListLoader`) are re-based onto the clean collection
+- [x] `CtfMap` and `SubjectMapSco` (incl. `AltListLoader`) are re-based onto the clean collection
       and compile against its member surface (`FindIndex`, indexer, `Add`, `ToList`,
       `CollectionChanged`, AltListLoader ctor).
-- [ ] The direct `ScoCollection<T>` consumers are re-pointed to the clean collection:
+- [x] The direct `ScoCollection<T>` consumers are re-pointed to the clean collection:
       `AppAutoFileObjects.Filters`, `AppToDoObjects.PrefixList`, and
       `OlFolderClassifierGroup._mailInfoCollection`/`LoadStaging`.
-- [ ] The interface members `IAppAutoFileObjects.Filters` and `IToDoObjects.PrefixList`/`LoadPrefixList`
+- [x] The interface members `IAppAutoFileObjects.Filters` and `IToDoObjects.PrefixList`/`LoadPrefixList`
       are updated to the clean collection return type (F2 scope; `IScoCollection`/`IScoCollection2`
       untouched).
-- [ ] `SloStack<T> : SloLinkedList<T>` is created exposing the full positional surface: `this[int]`
+- [x] `SloStack<T> : SloLinkedList<T>` is created exposing the full positional surface: `this[int]`
       get, `Peek(int)`, `Pop(int)`, `TryPeek`/`TryPop` (front and indexed), `Push`→AddFirst,
       `Pop()`/`Peek()`→TakeFirst/First, with top-of-stack == index 0.
-- [ ] `SloStack<T>` exposes `SerializeAsync()` and a typed `ISmartSerializable<SloStack<T>>` with
+- [x] `SloStack<T>` exposes `SerializeAsync()` and a typed `ISmartSerializable<SloStack<T>>` with
       file-based `Static.Deserialize(filename, folderpath, askUserOnError:false)`.
-- [ ] All `ScoStack<IMovedMailInfo>` consumers are migrated to `SloStack<IMovedMailInfo>`:
+- [x] All `ScoStack<IMovedMailInfo>` consumers are migrated to `SloStack<IMovedMailInfo>`:
       QuickFiler (`QfcCollectionController`, `QfcDatamodel`, `QfcFormController`,
       `IQfcCollectionController`, `IQfcDatamodel`), `AppAutoFileObjects.MovedMails`/`LoadMovedMails`,
       `SortEmail` (undo + push sites), `EmailFiler` (push site), and `IAppAutoFileObjects.MovedMails`.
-- [ ] MovedMails construction is reconciled to the file-based `SloStack<IMovedMailInfo>.Static.Deserialize`
+- [x] MovedMails construction is reconciled to the file-based `SloStack<IMovedMailInfo>.Static.Deserialize`
       pattern (no reliance on the four stubbed `SloLinkedList` `ISmartSerializable` members).
-- [ ] A JSON round-trip compatibility test exists and passes for each persisted collection —
+- [x] A JSON round-trip compatibility test exists and passes for each persisted collection —
       MovedMails, Filters, PrefixList, CtfMap, SubjectMapSco — using in-memory fixtures (no temp
       files), asserting element order/values and `$type` stability.
-- [ ] `SortEmail.UndoAsync` and `QfcFormController.UndoDialog` undo behavior is preserved with no
+- [x] `SortEmail.UndoAsync` and `QfcFormController.UndoDialog` undo behavior is preserved with no
       regression (forward index read `stack[i]`, positional `Pop(i)` shift-and-reprocess,
       `Serialize()`); the `SloStack` `Pop(int)`/indexer contract the loops depend on is covered by
       tests.
-- [ ] `RecentsList<T>` dead code is removed: `RecentsList.cs` and `RecentsList_Tests.cs` are deleted
+- [x] `RecentsList<T>` dead code is removed: `RecentsList.cs` and `RecentsList_Tests.cs` are deleted
       (not migrated).
-- [ ] Legacy `ScoCollection.cs`/`ScoStack.cs` and their direct tests are deleted only after a
+- [x] Legacy `ScoCollection.cs`/`ScoStack.cs` and their direct tests are deleted only after a
       repo-wide grep confirms no first-party reference to `ScoCollection<`/`ScoStack<` remains
       outside F5-reserved interface files.
-- [ ] Migrated tests compile and pass against the clean types (`ManageFiltersControllerTests`,
+- [x] Migrated tests compile and pass against the clean types (`ManageFiltersControllerTests`,
       `ConcurrentObservableCollectionSenderTests`, `ConcurrentObservableCollectionLockRecursionTests`,
       `EmailFiler_Tests`/`EmailFiler_TestSupport`, `AppAutoFileObjectsCoverageExpansionTests`).
-- [ ] New `SloStack<T>` positional members and `SerializeAsync`, and the new clean-collection
+- [x] New `SloStack<T>` positional members and `SerializeAsync`, and the new clean-collection
       members, meet the new-code coverage bar (>= 90% for new modules/methods per repo CLAUDE.md;
       line >= 85% / branch >= 75% per repo rules).
-- [ ] The full C# toolchain passes in order (csharpier → analyzers → nullable → MSTest) with no
+- [x] The full C# toolchain passes in order (csharpier → analyzers → nullable → MSTest) with no
       errors in the final pass.
-- [ ] No `UtilitiesSwordfish` project deletion, `ProjectReference` removal, `TaskMaster.sln` edit,
+- [x] No `UtilitiesSwordfish` project deletion, `ProjectReference` removal, `TaskMaster.sln` edit,
       or F1/F3/F5-reserved type changes are introduced (scope boundary held).
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit/integration as applicable)
-- [ ] Edge cases and error handling covered by tests
-- [ ] Docs updated (README, docs/features/active/... links)
+- [x] Acceptance criteria documented and mapped to tests or demos
+- [x] Behavior matches acceptance criteria in all documented environments
+- [x] Tests updated/added (unit/integration as applicable)
+- [x] Edge cases and error handling covered by tests
+- [x] Docs updated (README, docs/features/active/... links)
 - [ ] Telemetry/logging added or updated (if applicable)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
+- [x] Toolchain pass completed (format → lint → type-check → test)

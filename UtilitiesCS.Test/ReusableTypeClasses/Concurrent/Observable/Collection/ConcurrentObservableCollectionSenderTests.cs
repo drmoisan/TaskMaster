@@ -2,18 +2,16 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Swordfish.NET.Collections;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 
 namespace ConcurrentObservableCollection.Tests
 {
     /// <summary>
-    /// Regression tests for the CollectionChanged sender identity bug.
-    ///
-    /// ConcurrentObservableBase relays CollectionChanged from its internal
-    /// ObservableCollection, and the original code forwarded the inner
-    /// collection as the sender instead of the wrapper (this). Any subscriber
-    /// that casts sender to the wrapper type (e.g. SubjectMapSco) hits
-    /// InvalidCastException. These tests verify the fix.
+    /// Sender-identity tests for the clean, Swordfish-free
+    /// <see cref="ConcurrentObservableCollection{T}"/>. The type derives from
+    /// <see cref="ObservableCollection{T}"/> and raises CollectionChanged with itself as the
+    /// sender, so a subscriber that casts sender to the wrapper type (the SubjectMapSco pattern)
+    /// receives the wrapper instance rather than a raw inner collection.
     /// </summary>
     [TestClass]
     public class ConcurrentObservableCollectionSenderTests

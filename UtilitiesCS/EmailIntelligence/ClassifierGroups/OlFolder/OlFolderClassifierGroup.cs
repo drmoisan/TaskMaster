@@ -15,6 +15,7 @@ using UtilitiesCS.Extensions;
 using UtilitiesCS.Extensions.Lazy;
 using UtilitiesCS.HelperClasses;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 using UtilitiesCS.Threading;
 
 namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
@@ -117,13 +118,13 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
 
         #region Build Classifiers
 
-        public virtual async Task<ScoCollection<MinedMailInfo>> LoadStaging()
+        public virtual async Task<ConcurrentObservableCollection<MinedMailInfo>> LoadStaging()
         {
             _mailInfoCollection = await Task.Run(() =>
             {
                 if (Globals.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
                 {
-                    return new ScoCollection<MinedMailInfo>(
+                    return new ConcurrentObservableCollection<MinedMailInfo>(
                         Globals.FS.Filenames.EmailInfoStagingFile,
                         pythonStaging
                     );
@@ -137,7 +138,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             return _mailInfoCollection;
         }
 
-        protected ScoCollection<MinedMailInfo> _mailInfoCollection;
+        protected ConcurrentObservableCollection<MinedMailInfo> _mailInfoCollection;
 
         public virtual async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(
             MinedMailInfo[] collection

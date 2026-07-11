@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 
 namespace UtilitiesCS
@@ -28,8 +29,8 @@ namespace UtilitiesCS
         public SubjectMapSco SubjectMap { get; }
         ISubjectMapEncoder Encoder { get; }
         System.Action MaximizeQuickFileWindow { get; set; }
-        ScoStack<IMovedMailInfo> MovedMails { get; }
-        ScoCollection<FilterEntry> Filters { get; }
+        SloStack<IMovedMailInfo> MovedMails { get; }
+        ConcurrentObservableCollection<FilterEntry> Filters { get; }
 
         //AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> ManagerConfiguration { get; }
         //ConcurrentDictionary<string, AsyncLazy<BayesianClassifierGroup>> Manager { get; }

@@ -16,6 +16,7 @@ using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.Interfaces;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList;
 using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
@@ -385,15 +386,15 @@ namespace TaskMaster
         }
 
         // Prefix List
-        private ScoCollection<IPrefix> _prefixList;
-        public ScoCollection<IPrefix> PrefixList =>
+        private ConcurrentObservableCollection<IPrefix> _prefixList;
+        public ConcurrentObservableCollection<IPrefix> PrefixList =>
             Initialized(_prefixList, () => LoadPrefixList());
 
-        public ScoCollection<IPrefix> LoadPrefixList()
+        public ConcurrentObservableCollection<IPrefix> LoadPrefixList()
         {
             if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
             {
-                var prefixList = new ScoCollection<IPrefix>(
+                var prefixList = new ConcurrentObservableCollection<IPrefix>(
                     fileName: _defaults.FileName_PrefixList,
                     folderPath: pythonStaging
                 );

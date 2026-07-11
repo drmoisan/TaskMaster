@@ -7,6 +7,7 @@ using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Controllers;
 using QuickFiler.Helper_Classes;
 using UtilitiesCS;
+using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 
 namespace QuickFiler.Interfaces
 {
@@ -46,7 +47,7 @@ namespace QuickFiler.Interfaces
         void EliminateSpaceForItems(int removalInex, int removalCount);
         void RemoveSpecificControlGroup(int intPosition);
         Task RemoveSpecificControlGroupAsync(int selection);
-        Task MoveEmailsAsync(ScoStack<IMovedMailInfo> StackMovedItems);
+        Task MoveEmailsAsync(SloStack<IMovedMailInfo> StackMovedItems);
         void AddItemGroup(MailItem mailItem);
 
         /// <summary>
