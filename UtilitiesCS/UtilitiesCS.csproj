@@ -886,6 +886,7 @@
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryNew.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryStatic.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\SloLinkedList.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\SloStack.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\ScDictionary.cs" />
     <Compile Include="ReusableTypeClasses\Serializable\Concurrent\ScBag.cs" />
     <Compile Include="Threading\AsyncMultiTasker.cs" />

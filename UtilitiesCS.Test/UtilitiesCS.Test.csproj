@@ -384,6 +384,7 @@
     <Compile Include="ReusableTypeClasses\SerializableList_Tests.cs" />
     <Compile Include="ReusableTypeClasses\StackGeek_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ScoStack_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\SloStack_Tests.cs" />
     <Compile Include="ReusableTypeClasses\StackObjectCS_Tests.cs" />
     <Compile Include="ReusableTypeClasses\TreeNodeOfT_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ConcurrentObservableDictionaryTest\ConcurrentObservableDictionaryTest.cs" />

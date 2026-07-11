@@ -250,10 +250,10 @@ unreferenced.
 - [ ] The interface members `IAppAutoFileObjects.Filters` and `IToDoObjects.PrefixList`/`LoadPrefixList`
       are updated to the clean collection return type (F2 scope; `IScoCollection`/`IScoCollection2`
       untouched).
-- [ ] `SloStack<T> : SloLinkedList<T>` is created exposing the full positional surface: `this[int]`
+- [x] `SloStack<T> : SloLinkedList<T>` is created exposing the full positional surface: `this[int]`
       get, `Peek(int)`, `Pop(int)`, `TryPeek`/`TryPop` (front and indexed), `Push`→AddFirst,
       `Pop()`/`Peek()`→TakeFirst/First, with top-of-stack == index 0.
-- [ ] `SloStack<T>` exposes `SerializeAsync()` and a typed `ISmartSerializable<SloStack<T>>` with
+- [x] `SloStack<T>` exposes `SerializeAsync()` and a typed `ISmartSerializable<SloStack<T>>` with
       file-based `Static.Deserialize(filename, folderpath, askUserOnError:false)`.
 - [ ] All `ScoStack<IMovedMailInfo>` consumers are migrated to `SloStack<IMovedMailInfo>`:
       QuickFiler (`QfcCollectionController`, `QfcDatamodel`, `QfcFormController`,

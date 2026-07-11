@@ -96,7 +96,7 @@ This feature contributes to the epic's leading indicators without changing produ
       `OlFolderClassifierGroup`, and the `IAppAutoFileObjects.Filters` / `IToDoObjects.PrefixList` /
       `LoadPrefixList` interface members) is re-based onto the clean collection, so that no
       collection dependent rides Swordfish.
-- [ ] As the maintainer, `SloStack<T> : SloLinkedList<T>` provides the positional surface the undo
+- [x] As the maintainer, `SloStack<T> : SloLinkedList<T>` provides the positional surface the undo
       loops require (`this[int]`, `Peek(int)`, `Pop(int)`, `TryPeek`/`TryPop` front and indexed,
       `Push`→AddFirst, `Pop()`/`Peek()`→TakeFirst/First, top-of-stack == index 0) plus
       `SerializeAsync()` and file-based `Static.Deserialize`, so that the stack lineage is
