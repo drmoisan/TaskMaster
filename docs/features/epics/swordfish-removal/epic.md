@@ -26,8 +26,8 @@ features:
   - issue_num: 310
     feature_folder: 2026-07-10-swordfish-raw-usage-cleanup-310
     depends_on: []
-  - issue_num: 9005
-    feature_folder: swordfish-interface-project-teardown
+  - issue_num: 308
+    feature_folder: 2026-07-10-swordfish-interface-project-teardown-308
     depends_on: [9001, 9002, 309, 310]
 ---
 
@@ -83,7 +83,7 @@ concurrently; the ordering constraint applies to execution waves.
 | 0 | 9002 | `swordfish-collection-stack-lineage` | C3 | Collection + Stack lineage: re-base `ScoCollection`/`ScoStack` subclasses onto the clean collection and `SloLinkedList`; add positional stack surface + async serialize; preserve `MovedMails` on-disk JSON. |
 | 0 | 309 | `2026-07-10-swordfish-scosorteddictionary-removal-309` | C1 | Confirm no production consumer of `ScoSortedDictionary`, then delete the class and its test. |
 | 0 | 310 | `2026-07-10-swordfish-raw-usage-cleanup-310` | C2 | Re-point `KbdActions` raw `ConcurrentObservableCollection` to `List<UClass>` (see decision record); remove unused `using Swordfish.NET.Collections;`; delete stale `TraceUtility` string literals. |
-| 1 | 9005 | `swordfish-interface-project-teardown` | C3 | Migrate/remove `IScoCollection`/`IScoCollection2`; remove `ProjectReference` to `UtilitiesSwordfish.NET.General.csproj` from 8 csprojs; remove project entries from `TaskMaster.sln`; delete project folders; migrate/remove tests referencing Swordfish types. |
+| 1 | 308 | `2026-07-10-swordfish-interface-project-teardown-308` | C3 | Remove `IScoCollection`/`IScoCollection2`/dead `ISubjectMapSco`; remove `ProjectReference` to `UtilitiesSwordfish.NET.General.csproj` from 9 csprojs (incl. stale `TaskVisualization.Test.csproj` reference found in research); remove project entries from `TaskMaster.sln`; delete project folders; migrate/remove tests referencing Swordfish types. |
 
 Wave assignment is longest-path layering over the dependency DAG:
 `wave(f) = 0` when `depends_on(f)` is empty, else `1 + max(wave(d))`. F1–F4 have no
@@ -161,14 +161,19 @@ field uses, with no `CollectionChanged` or cross-thread mutation to preserve). R
 
 ### F5 — Interfaces, project references, solution teardown
 
-Migrate/remove `IScoCollection.cs` (uses `Swordfish.NET.Collections`) and `IScoCollection2.cs`
-(uses `Swordfish.NET.General.Collections`). Remove the `ProjectReference` to
-`UtilitiesSwordfish.NET.General.csproj` from `UtilitiesCS.csproj`, `UtilitiesCS.Test.csproj`,
-`TaskMaster.csproj`, `TaskMaster.Test.csproj`, `QuickFiler.csproj`, `ToDoModel.csproj`,
-`Tags.csproj`, and `TaskVisualization.csproj` (first confirming Tags and TaskVisualization carry
-no Swordfish type in source, i.e. the reference is stale). Remove the `UtilitiesSwordfish`
-(`{F2E1680E-1B15-4CF2-BAB0-54B8C8F6ABDF}`) and `UtilitiesSwordfish.Test` project entries from
-`TaskMaster.sln` and delete the two project folders. Migrate/remove tests referencing Swordfish
+Remove (not migrate — per F5 research the interfaces are removable) `IScoCollection.cs` (uses
+`Swordfish.NET.Collections`), `IScoCollection2.cs` (uses `Swordfish.NET.General.Collections`),
+the dead `ISubjectMapSco`, and the dead `QfcExplorerController.UpdateForMove` method. Remove the
+`ProjectReference` to `UtilitiesSwordfish.NET.General.csproj` from **nine** csprojs:
+`UtilitiesCS.csproj`, `UtilitiesCS.Test.csproj`, `TaskMaster.csproj`, `TaskMaster.Test.csproj`,
+`QuickFiler.csproj`, `ToDoModel.csproj`, `Tags.csproj`, `TaskVisualization.csproj`, and
+`TaskVisualization.Test.csproj` (the ninth is a stale reference found in F5 research, absent
+from the original brief; Tags/TaskVisualization references confirmed stale — open question 3
+resolved). Remove the `UtilitiesSwordfish` (`{F2E1680E-1B15-4CF2-BAB0-54B8C8F6ABDF}`) and
+`UtilitiesSwordfish.Test` project entries from `TaskMaster.sln` — both the `Project(...)`
+declarations and the `GlobalSection(ProjectConfigurationPlatforms)` entries for both GUIDs — and
+delete the two project folders. Execution carries a WI-0 HALT gate asserting F1–F4 have landed
+before teardown. Migrate/remove tests referencing Swordfish
 types directly (`ObservableDictionary_Tests.cs`, `ConcurrentObservableCollectionSenderTests.cs`,
 `ConcurrentObservableCollectionLockRecursionTests.cs`, and any residual `Sco*` legacy tests not
 already handled in F1–F3).
@@ -195,7 +200,10 @@ already handled in F1–F3).
    `ScoSortedDictionary`/`ConcurrentObservableSortedDictionary`, no JSON payload embeds the type
    name, and a Swordfish-free sorted type (which cannot inherit hash-based `ScoDictionaryNew`) is
    scoped separately if ever wanted.
-3. Are the Tags/TaskVisualization project references genuinely unused? (F5 research)
+3. Are the Tags/TaskVisualization project references genuinely unused? (F5 research) —
+   **RESOLVED (F5 preparation, issue #308):** yes, both are stale, and research found a ninth
+   stale reference in `TaskVisualization.Test.csproj` not listed in the original brief. All nine
+   are removed in the F5 plan.
 4. Are on-disk JSON payloads type-name-embedded (`TypeNameHandling.Auto`) such that a type rename
    breaks deserialization? If so, plan explicit migration/converter work. (F1 and F2 research)
 
