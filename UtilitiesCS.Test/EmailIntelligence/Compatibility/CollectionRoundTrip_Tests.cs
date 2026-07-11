@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
+using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 
 namespace UtilitiesCS.Test.EmailIntelligence.Compatibility
 {
@@ -174,6 +175,45 @@ namespace UtilitiesCS.Test.EmailIntelligence.Compatibility
             restored[1].Key.Should().Be("Project");
             restored[1].PrefixType.Should().Be(PrefixTypeEnum.Project);
         }
+
+        [TestMethod]
+        public void MovedMails_RoundTrips_AsPolymorphicElementArray_IndexZeroIsTop()
+        {
+            // Arrange — the persisted MovedMails stack. Elements are the concrete IMovedMailInfo
+            // implementation (MovedMailInfo), so under TypeNameHandling.Auto each array element
+            // carries an assembly-qualified $type. topToBottom order: "first" is the top-of-stack.
+            var original = new SloStack<IMovedMailInfo>();
+            original.Push(MovedMail("bottom"));
+            original.Push(MovedMail("middle"));
+            original.Push(MovedMail("top")); // last push == front == index 0
+
+            // Act
+            var json = JsonConvert.SerializeObject(original, AutoSettings);
+            var restored = JsonConvert.DeserializeObject<SloStack<IMovedMailInfo>>(
+                json,
+                AutoSettings
+            );
+
+            // Assert — polymorphic per-element $type; index 0 == top after replay via Add→AddLast.
+            json.TrimStart().Should().StartWith("[");
+            json.Should()
+                .Contain("$type", "polymorphic IMovedMailInfo elements must carry $type metadata");
+            restored.Count.Should().Be(3);
+            restored[0]
+                .EntryId.Should()
+                .Be("top", "the array head deserializes to the top-of-stack");
+            restored[1].EntryId.Should().Be("middle");
+            restored[2].EntryId.Should().Be("bottom");
+        }
+
+        private static MovedMailInfo MovedMail(string entryId) =>
+            new MovedMailInfo
+            {
+                FolderPathOld = "Inbox",
+                FolderPathNew = "Archive",
+                EntryId = entryId,
+                StoreId = "store",
+            };
 
         /// <summary>
         /// Local concrete <see cref="IPrefix"/> implementer used to model the polymorphic

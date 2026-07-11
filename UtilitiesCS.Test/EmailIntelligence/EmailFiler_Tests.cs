@@ -357,7 +357,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
                     manager,
                     subjectMap,
                     recents,
-                    new ScoStack<IMovedMailInfo>(),
+                    new SloStack<IMovedMailInfo>(),
                     null
                 ),
             };
@@ -428,7 +428,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var afterFolder = CreateFolder(@"\\Mailbox - Root\Archive", "store-id");
             var beforeMove = CreateMailItem("before-id", beforeFolder.Object);
             var afterMove = CreateMailItem("after-id", afterFolder.Object);
-            var movedMails = new ScoStack<IMovedMailInfo>();
+            var movedMails = new SloStack<IMovedMailInfo>();
             var filer = new ExposedEmailFiler
             {
                 Globals = CreateGlobals(null, null, null, movedMails, root.Object),
@@ -462,7 +462,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         [TestMethod]
-        public void ScoStack_WhenMovedMailInfoPushed_RecordsExpectedPathsOnPeek()
+        public void SloStack_WhenMovedMailInfoPushed_RecordsExpectedPathsOnPeek()
         {
             var info = new MovedMailInfo
             {
@@ -471,7 +471,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 EntryId = "entry-abc-123",
                 StoreId = "store-xyz-456",
             };
-            var stack = new ScoStack<IMovedMailInfo>();
+            var stack = new SloStack<IMovedMailInfo>();
 
             stack.Push(info);
 

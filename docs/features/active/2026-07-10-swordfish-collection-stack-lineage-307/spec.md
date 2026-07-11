@@ -255,16 +255,16 @@ unreferenced.
       `Pop()`/`Peek()`→TakeFirst/First, with top-of-stack == index 0.
 - [x] `SloStack<T>` exposes `SerializeAsync()` and a typed `ISmartSerializable<SloStack<T>>` with
       file-based `Static.Deserialize(filename, folderpath, askUserOnError:false)`.
-- [ ] All `ScoStack<IMovedMailInfo>` consumers are migrated to `SloStack<IMovedMailInfo>`:
+- [x] All `ScoStack<IMovedMailInfo>` consumers are migrated to `SloStack<IMovedMailInfo>`:
       QuickFiler (`QfcCollectionController`, `QfcDatamodel`, `QfcFormController`,
       `IQfcCollectionController`, `IQfcDatamodel`), `AppAutoFileObjects.MovedMails`/`LoadMovedMails`,
       `SortEmail` (undo + push sites), `EmailFiler` (push site), and `IAppAutoFileObjects.MovedMails`.
-- [ ] MovedMails construction is reconciled to the file-based `SloStack<IMovedMailInfo>.Static.Deserialize`
+- [x] MovedMails construction is reconciled to the file-based `SloStack<IMovedMailInfo>.Static.Deserialize`
       pattern (no reliance on the four stubbed `SloLinkedList` `ISmartSerializable` members).
-- [ ] A JSON round-trip compatibility test exists and passes for each persisted collection —
+- [x] A JSON round-trip compatibility test exists and passes for each persisted collection —
       MovedMails, Filters, PrefixList, CtfMap, SubjectMapSco — using in-memory fixtures (no temp
       files), asserting element order/values and `$type` stability.
-- [ ] `SortEmail.UndoAsync` and `QfcFormController.UndoDialog` undo behavior is preserved with no
+- [x] `SortEmail.UndoAsync` and `QfcFormController.UndoDialog` undo behavior is preserved with no
       regression (forward index read `stack[i]`, positional `Pop(i)` shift-and-reprocess,
       `Serialize()`); the `SloStack` `Pop(int)`/indexer contract the loops depend on is covered by
       tests.

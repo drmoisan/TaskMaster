@@ -91,7 +91,7 @@ This feature contributes to the epic's leading indicators without changing produ
       (created in F2, built on `ObservableCollection<T>`) with the full member surface the Sco
       subclasses and consumers require, so that the collection re-base can proceed without pulling in
       Swordfish.
-- [ ] As the maintainer, every `ScoCollection<T>` subclass and direct consumer (`CtfMap`,
+- [x] As the maintainer, every `ScoCollection<T>` subclass and direct consumer (`CtfMap`,
       `SubjectMapSco`, `AppAutoFileObjects.Filters`, `AppToDoObjects.PrefixList`,
       `OlFolderClassifierGroup`, and the `IAppAutoFileObjects.Filters` / `IToDoObjects.PrefixList` /
       `LoadPrefixList` interface members) is re-based onto the clean collection, so that no
@@ -101,15 +101,15 @@ This feature contributes to the epic's leading indicators without changing produ
       `Push`→AddFirst, `Pop()`/`Peek()`→TakeFirst/First, top-of-stack == index 0) plus
       `SerializeAsync()` and file-based `Static.Deserialize`, so that the stack lineage is
       Swordfish-free.
-- [ ] As the maintainer, every `ScoStack<IMovedMailInfo>` consumer (QuickFiler controllers and
+- [x] As the maintainer, every `ScoStack<IMovedMailInfo>` consumer (QuickFiler controllers and
       interfaces, `AppAutoFileObjects.MovedMails`/`LoadMovedMails`, `SortEmail`, `EmailFiler`,
       `IAppAutoFileObjects.MovedMails`) is migrated to `SloStack<IMovedMailInfo>` with construction
       reconciled to the file-based `Static.Deserialize` pattern, so that the MovedMails undo history
       no longer depends on Swordfish.
-- [ ] As an end user, a JSON round-trip compatibility test exists per persisted collection
+- [x] As an end user, a JSON round-trip compatibility test exists per persisted collection
       (MovedMails, Filters, PrefixList, CtfMap, SubjectMapSco), so that existing on-disk files load
       unchanged after the migration.
-- [ ] As an end user, the QuickFiler and SortEmail undo flows are preserved with no regression, so
+- [x] As an end user, the QuickFiler and SortEmail undo flows are preserved with no regression, so
       that reversing recent mail moves works identically.
 - [ ] As the maintainer, the dead `RecentsList<T>` type and its test are deleted (not migrated), so
       that no effort is spent re-basing code already superseded by `AppAutoFileObjects.RecentsList :

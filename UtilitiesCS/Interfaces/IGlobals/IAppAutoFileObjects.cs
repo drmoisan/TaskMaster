@@ -29,7 +29,7 @@ namespace UtilitiesCS
         public SubjectMapSco SubjectMap { get; }
         ISubjectMapEncoder Encoder { get; }
         System.Action MaximizeQuickFileWindow { get; set; }
-        ScoStack<IMovedMailInfo> MovedMails { get; }
+        SloStack<IMovedMailInfo> MovedMails { get; }
         ConcurrentObservableCollection<FilterEntry> Filters { get; }
 
         //AsyncLazy<ConcurrentDictionary<string, NewSmartSerializableLoader>> ManagerConfiguration { get; }

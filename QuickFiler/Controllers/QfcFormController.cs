@@ -12,6 +12,7 @@ using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.Extensions;
 using UtilitiesCS.Interfaces.IWinForm;
+using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 
 namespace QuickFiler.Controllers
 {
@@ -82,7 +83,7 @@ namespace QuickFiler.Controllers
         private WriteMetricsDelegate WriteMetrics;
         private delegate void IterateDelegate();
         private IterateDelegate Iterate;
-        private ScoStack<IMovedMailInfo> _movedItems;
+        private SloStack<IMovedMailInfo> _movedItems;
         private IQfcQueue _qfcQueue;
         private TlpCellStates _states;
         private Dictionary<string, Theme> _themes;

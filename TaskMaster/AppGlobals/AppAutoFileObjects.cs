@@ -174,19 +174,22 @@ namespace TaskMaster
             }
         }
 
-        private ScoStack<IMovedMailInfo> _movedMails;
-        public ScoStack<IMovedMailInfo> MovedMails
+        private SloStack<IMovedMailInfo> _movedMails;
+        public SloStack<IMovedMailInfo> MovedMails
         {
             get => Initialized(_movedMails, LoadMovedMails);
         }
 
-        private ScoStack<IMovedMailInfo> LoadMovedMails()
+        private SloStack<IMovedMailInfo> LoadMovedMails()
         {
             if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
             {
-                var movedMails = new ScoStack<IMovedMailInfo>(
-                    filename: _defaults.FileName_MovedEmails,
-                    folderpath: pythonStaging,
+                // File-based deserialize via the clean SloStack Static path (Swordfish-free).
+                // Uses only the implemented file-based deserialize path — none of the four
+                // stubbed SloLinkedList ISmartSerializable members are exercised.
+                var movedMails = SloStack<IMovedMailInfo>.Static.Deserialize(
+                    _defaults.FileName_MovedEmails,
+                    pythonStaging,
                     askUserOnError: false
                 );
                 return movedMails;

@@ -101,7 +101,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             ManagerAsyncLazy manager,
             SubjectMapSco subjectMap,
             SloLinkedList<string> recents,
-            ScoStack<IMovedMailInfo> movedMails,
+            SloStack<IMovedMailInfo> movedMails,
             Folder rootFolder,
             TimedDiskWriter<string> writer = null
         )

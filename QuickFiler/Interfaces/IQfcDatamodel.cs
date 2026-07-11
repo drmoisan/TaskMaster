@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
+using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 
 namespace QuickFiler.Interfaces
 {
@@ -25,7 +26,7 @@ namespace QuickFiler.Interfaces
         Task<IList<MailItem>> DequeueNextItemGroupAsync(int quantity, int timeOut);
         IList<MailItem> DequeueNextItemGroup(int quantity);
         void UndoMove();
-        ScoStack<IMovedMailInfo> MovedItems { get; }
+        SloStack<IMovedMailInfo> MovedItems { get; }
         IList<MailItem> InitEmailQueue(int batchSize, BackgroundWorker worker);
         Task<IList<MailItem>> InitEmailQueueAsync(
             int batchSize,
