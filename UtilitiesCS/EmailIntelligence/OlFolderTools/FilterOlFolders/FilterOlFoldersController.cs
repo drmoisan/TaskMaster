@@ -73,7 +73,7 @@ namespace UtilitiesCS
             // remove any keys that are no longer selected
             _globals
                 .TD.FilteredFolderScraping.Keys.Where(x => !selected.Contains(x))
-                .ForEach(x => _globals.TD.FilteredFolderScraping.Remove(x));
+                .ForEach(x => _globals.TD.FilteredFolderScraping.TryRemove(x, out _));
 
             // add any new keys that are selected
             selected.ForEach(x => _globals.TD.FilteredFolderScraping.TryAdd(x, 1));

@@ -728,6 +728,9 @@
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Bag\ConcurrentObservableBag.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Bag\ISimpleActionBagObserver.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Bag\SimpleActionBagObserver.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\IConcurrentObservableCollectionSeams.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollection.cs" />
+    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollection.Serialization.cs" />
     <Compile Include="ReusableTypeClasses\TimedActions\TimedAsyncTask.cs" />
     <Compile Include="ReusableTypeClasses\TimedActions\TimedQueueOfActions.cs" />
     <Compile Include="Interfaces\IGlobals\IAppItemEngines.cs" />
@@ -883,6 +886,7 @@
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryNew.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryStatic.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\SloLinkedList.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\SloStack.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\ScDictionary.cs" />
     <Compile Include="ReusableTypeClasses\Serializable\Concurrent\ScBag.cs" />
     <Compile Include="Threading\AsyncMultiTasker.cs" />
@@ -936,7 +940,6 @@
     <Compile Include="ReusableTypeClasses\TimedActions\TimedDiskWriter.cs" />
     <Compile Include="ReusableTypeClasses\TimedActions\TimerWrapper.cs" />
     <Compile Include="Interfaces\IEmailIntelligence\IItemInfo.cs" />
-    <Compile Include="EmailIntelligence\Recents\RecentsList.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientInfo.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEncoder.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEntry.cs" />
@@ -996,11 +999,8 @@
     <Compile Include="Interfaces\IToDo\IProjectInfoLegacy.cs" />
     <Compile Include="Interfaces\IToDo\ISubjectMapEncoder.cs" />
     <Compile Include="Interfaces\IToDo\ISubjectMapEntry.cs" />
-    <Compile Include="Interfaces\IToDo\ISubjectMapSco.cs" />
     <Compile Include="Interfaces\IToDo\IProjectEntry.cs" />
     <Compile Include="Interfaces\IReusableTypeClasses\Observable\IObservableDictionary.cs" />
-    <Compile Include="Interfaces\IReusableTypeClasses\IScoCollection.cs" />
-    <Compile Include="Interfaces\IReusableTypeClasses\IScoCollection2.cs" />
     <Compile Include="Interfaces\IReusableTypeClasses\IScoDictionary.cs" />
     <Compile Include="Interfaces\IReusableTypeClasses\ISerializableDictionary.cs" />
     <Compile Include="Interfaces\IReusableTypeClasses\ISerializableList.cs" />
@@ -1042,10 +1042,6 @@
     <Compile Include="ReusableTypeClasses\Observable\ObservableCollectionBatchUpdate.cs" />
     <Compile Include="ReusableTypeClasses\Observable\ObservableDictionary.cs" />
     <Compile Include="ReusableTypeClasses\Observable\ObserverHelper.cs" />
-    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\ScoCollection.cs" />
-    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\SCODictionary.cs" />
-    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\ScoSortedDictionary.cs" />
-    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\ScoStack.cs" />
     <Compile Include="ReusableTypeClasses\Serializable\SerializableList.cs" />
     <Compile Include="ReusableTypeClasses\Other\StackGeek.cs" />
     <Compile Include="ReusableTypeClasses\Other\StackObjectCS.cs" />
@@ -1079,10 +1075,6 @@
     <ProjectReference Include="..\SVGControl\SVGControl.csproj">
       <Project>{d0fee0d9-901a-4fb8-97d1-96a8f634b83c}</Project>
       <Name>SVGControl</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj">
-      <Project>{f2e1680e-1b15-4cf2-bab0-54b8c8f6abdf}</Project>
-      <Name>UtilitiesSwordfish.NET.General</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

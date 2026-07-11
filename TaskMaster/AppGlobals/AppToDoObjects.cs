@@ -16,6 +16,7 @@ using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.Interfaces;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary;
 using UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList;
 using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
@@ -292,17 +293,17 @@ namespace TaskMaster
         public string FnameDictRemap =>
             Initialized(_fnameDictRemap, () => _fnameDictRemap = _defaults.FileName_DictRemap);
 
-        private ScoDictionary<string, string> _dictRemap;
-        public IScoDictionary<string, string> DictRemap =>
+        private ScoDictionaryNew<string, string> _dictRemap;
+        public IScoDictionaryNew<string, string> DictRemap =>
             Initialized(_dictRemap, () => LoadDictRemap());
 
-        private ScoDictionary<string, string> LoadDictRemap()
+        private ScoDictionaryNew<string, string> LoadDictRemap()
         {
             if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
             {
-                var dictRemap = new ScoDictionary<string, string>(
-                    filename: FnameDictRemap,
-                    folderpath: pythonStaging
+                var dictRemap = ScoDictionaryNew<string, string>.Static.Deserialize(
+                    FnameDictRemap,
+                    pythonStaging
                 );
                 return dictRemap;
             }
@@ -385,15 +386,15 @@ namespace TaskMaster
         }
 
         // Prefix List
-        private ScoCollection<IPrefix> _prefixList;
-        public ScoCollection<IPrefix> PrefixList =>
+        private ConcurrentObservableCollection<IPrefix> _prefixList;
+        public ConcurrentObservableCollection<IPrefix> PrefixList =>
             Initialized(_prefixList, () => LoadPrefixList());
 
-        public ScoCollection<IPrefix> LoadPrefixList()
+        public ConcurrentObservableCollection<IPrefix> LoadPrefixList()
         {
             if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
             {
-                var prefixList = new ScoCollection<IPrefix>(
+                var prefixList = new ConcurrentObservableCollection<IPrefix>(
                     fileName: _defaults.FileName_PrefixList,
                     folderPath: pythonStaging
                 );
@@ -420,15 +421,15 @@ namespace TaskMaster
             _prefixList = await Task.Run(LoadPrefixList);
         }
 
-        private ScoDictionary<string, int> _filteredFolderScraping;
-        public ScoDictionary<string, int> FilteredFolderScraping =>
+        private ScoDictionaryNew<string, int> _filteredFolderScraping;
+        public ScoDictionaryNew<string, int> FilteredFolderScraping =>
             Initialized(_filteredFolderScraping, () => LoadFilteredFolderScraping());
 
-        public ScoDictionary<string, int> LoadFilteredFolderScraping()
+        public ScoDictionaryNew<string, int> LoadFilteredFolderScraping()
         {
             if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
             {
-                var filteredFolderScraping = new ScoDictionary<string, int>(
+                var filteredFolderScraping = ScoDictionaryNew<string, int>.Static.Deserialize(
                     _defaults.FileName_FilteredFolderScraping,
                     pythonStaging
                 );
@@ -448,15 +449,15 @@ namespace TaskMaster
             );
         }
 
-        private ScoDictionary<string, string> _folderRemap;
-        public ScoDictionary<string, string> FolderRemap =>
+        private ScoDictionaryNew<string, string> _folderRemap;
+        public ScoDictionaryNew<string, string> FolderRemap =>
             Initializer.GetOrLoad(ref _folderRemap, () => LoadFolderRemap());
 
-        public ScoDictionary<string, string> LoadFolderRemap()
+        public ScoDictionaryNew<string, string> LoadFolderRemap()
         {
             if (Parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
             {
-                var folderRemap = new ScoDictionary<string, string>(
+                var folderRemap = ScoDictionaryNew<string, string>.Static.Deserialize(
                     _defaults.FileName_FolderRemap,
                     pythonStaging
                 );

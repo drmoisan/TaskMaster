@@ -88,7 +88,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Verifies that the default constructor creates a valid instance and that
         /// accessing the Encoder property on a default-constructed encoder enters the
         /// null-fallback branch (lines 91-94) and throws ArgumentNullException because
-        /// both _filename and _folderpath are null, making ScoDictionary's path
+        /// both _filename and _folderpath are null, making ScoDictionaryNew's path
         /// combination fail.
         ///
         /// Purpose:
@@ -99,7 +99,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             var encoder = new SubjectMapEncoder();
 
-            // Accessing Encoder triggers the null-folderpath path which throws in ScoDictionary.
+            // Accessing Encoder triggers the null-folderpath path which throws in ScoDictionaryNew.
             Action act = () => _ = encoder.Encoder;
 
             act.Should().Throw<ArgumentNullException>();
@@ -111,22 +111,25 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
         /// <summary>
         /// Verifies that accessing Decoder on a default-constructed SubjectMapEncoder
-        /// (where both _decoder and _encoder are null) throws NullReferenceException
-        /// due to the buggy code path at line 40 that calls _encoder.Deserialize()
-        /// on a null reference.
+        /// (where both _decoder and _encoder are null, and the file name / folder path are
+        /// unset) fails fast. After the ScoDictionaryNew migration the null-encoder branch
+        /// loads the encoder via ScoDictionaryNew&lt;string,int&gt;.Static.Deserialize(_filename,
+        /// _folderpath); with a null file name / folder path this throws ArgumentNullException
+        /// from FilePathHelper / Path.Combine rather than the previous NullReferenceException.
         ///
         /// Purpose:
-        ///     Covers lines 39-41 (the _encoder null-check branch inside Decoder getter).
+        ///     Covers the _encoder null-check branch inside the Decoder getter.
         /// </summary>
         [TestMethod]
-        public void Decoder_WhenEncoderIsNull_ThrowsNullReferenceException()
+        public void Decoder_WhenEncoderIsNull_ThrowsArgumentNullException()
         {
             var encoder = new SubjectMapEncoder();
 
-            // Accessing Decoder triggers the null-encoder path which NREs on Deserialize.
+            // Accessing Decoder triggers the null-encoder path, which now loads the encoder via
+            // Static.Deserialize; with an unset file name / folder path it fails fast.
             Action act = () => _ = encoder.Decoder;
 
-            act.Should().Throw<NullReferenceException>();
+            act.Should().Throw<ArgumentNullException>();
         }
 
         // ---------------------------------------------------------------------------

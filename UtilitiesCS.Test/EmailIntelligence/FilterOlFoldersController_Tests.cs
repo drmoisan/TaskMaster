@@ -25,7 +25,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void Constructor_WithFakeSnapshot_UsesCallerLocalSelectionAndWiresViewer()
         {
             var service = new FakeFolderTreeService(CreateSnapshot());
-            var scraping = new ScoDictionary<string, int>();
+            var scraping = new ScoDictionaryNew<string, int>();
             scraping.TryAdd("Archive\\Filtered", 1);
             var viewer = new FakeFilterViewer();
             var globals = CreateGlobals(service, scraping);
@@ -68,7 +68,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var service = new FakeFolderTreeService(CreateSnapshot());
             var viewer = new FakeFilterViewer();
             var controller = new FilterOlFoldersController(
-                CreateGlobals(service, new ScoDictionary<string, int>()).Object,
+                CreateGlobals(service, new ScoDictionaryNew<string, int>()).Object,
                 viewer
             );
             var view = controller.FolderTreeView;
@@ -87,7 +87,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             archiveRoot.SetupGet(x => x.StoreID).Returns("store");
             archiveRoot.SetupGet(x => x.FolderPath).Returns(() => archivePath);
             var service = new FakeFolderTreeService(CreateSnapshot());
-            var scraping = new ScoDictionary<string, int>();
+            var scraping = new ScoDictionaryNew<string, int>();
             scraping.TryAdd("Archive\\Visible", 1);
 
             var controller = new FilterOlFoldersController(
@@ -111,7 +111,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [STATestMethod]
         public void Save_WhenSelectionChanges_RemovesDeselectedKeysAndAddsSelectedKeys()
         {
-            var scraping = new ScoDictionary<string, int>();
+            var scraping = new ScoDictionaryNew<string, int>();
             scraping.TryAdd("RemoveMe", 1);
             var view = CreateCompatibilityView(CreateSnapshot(), "Archive\\Visible");
             var viewer = new FakeFilterViewer();
@@ -131,7 +131,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var controller = CreateControllerWithView(
                 CreateCompatibilityView(CreateSnapshot()),
                 viewer,
-                CreateGlobals(new ScoDictionary<string, int>()).Object
+                CreateGlobals(new ScoDictionaryNew<string, int>()).Object
             );
 
             controller.Discard();
@@ -148,7 +148,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var controller = CreateControllerWithView(
                 CreateCompatibilityView(CreateSnapshot(), "Archive\\Filtered"),
                 viewer,
-                CreateGlobals(new ScoDictionary<string, int>()).Object
+                CreateGlobals(new ScoDictionaryNew<string, int>()).Object
             );
 
             controller.OlFolderTree_PropertyChangedInternal(
@@ -169,7 +169,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var controller = CreateControllerWithView(
                 CreateCompatibilityView(CreateSnapshot()),
                 viewer,
-                CreateGlobals(new ScoDictionary<string, int>()).Object
+                CreateGlobals(new ScoDictionaryNew<string, int>()).Object
             );
 
             Action act = () =>
@@ -223,7 +223,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var controller = CreateControllerWithView(
                 CreateCompatibilityView(CreateSnapshot()),
                 viewer,
-                CreateGlobals(new ScoDictionary<string, int>()).Object
+                CreateGlobals(new ScoDictionaryNew<string, int>()).Object
             );
             var filtered = CreateNode("Filtered", "Filtered", selected: false);
             var notFiltered = CreateNode("NotFiltered", "NotFiltered", selected: true);
@@ -255,7 +255,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             SetField(
                 controller,
                 "_globals",
-                globals ?? CreateGlobals(new ScoDictionary<string, int>()).Object
+                globals ?? CreateGlobals(new ScoDictionaryNew<string, int>()).Object
             );
             return controller;
         }
@@ -274,14 +274,16 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 .SetValue(instance, value);
         }
 
-        private static Mock<IApplicationGlobals> CreateGlobals(ScoDictionary<string, int> scraping)
+        private static Mock<IApplicationGlobals> CreateGlobals(
+            ScoDictionaryNew<string, int> scraping
+        )
         {
             return CreateGlobals(new FakeFolderTreeService(CreateSnapshot()), scraping);
         }
 
         private static Mock<IApplicationGlobals> CreateGlobals(
             IOutlookFolderTreeService service,
-            ScoDictionary<string, int> scraping,
+            ScoDictionaryNew<string, int> scraping,
             Outlook.Folder archiveRoot = null
         )
         {

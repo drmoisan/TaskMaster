@@ -2,6 +2,7 @@ using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
 {
@@ -22,23 +23,10 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
         }
 
         [TestMethod]
-        public void IsSmartSerializable_ScoDictionary_ReturnsFalse()
+        public void IsSmartSerializable_ConcurrentObservableCollection_ReturnsFalse()
         {
-            // Arrange — ScoDictionary does not implement ISmartSerializable<>
-            var type = typeof(ScoDictionary<string, int>);
-
-            // Act
-            var result = type.IsSmartSerializable();
-
-            // Assert
-            result.Should().BeFalse();
-        }
-
-        [TestMethod]
-        public void IsSmartSerializable_ScoCollection_ReturnsFalse()
-        {
-            // Arrange — ScoCollection does not implement ISmartSerializable<>
-            var type = typeof(ScoCollection<int>);
+            // Arrange — the clean ConcurrentObservableCollection does not implement ISmartSerializable<>
+            var type = typeof(ConcurrentObservableCollection<int>);
 
             // Act
             var result = type.IsSmartSerializable();

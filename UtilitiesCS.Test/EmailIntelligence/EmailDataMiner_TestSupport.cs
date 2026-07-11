@@ -18,6 +18,7 @@ using UtilitiesCS.HelperClasses;
 using UtilitiesCS.Interfaces;
 using UtilitiesCS.OutlookObjects.Folder;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 
 namespace UtilitiesCS.Test.EmailIntelligence
 {
@@ -94,19 +95,21 @@ namespace UtilitiesCS.Test.EmailIntelligence
         private sealed class StubToDoObjects : IToDoObjects
         {
             public StubToDoObjects(
-                ScoDictionary<string, int> filteredFolderScraping = null,
-                ScoDictionary<string, string> folderRemap = null
+                ScoDictionaryNew<string, int> filteredFolderScraping = null,
+                ScoDictionaryNew<string, string> folderRemap = null
             )
             {
-                FilteredFolderScraping = filteredFolderScraping ?? new ScoDictionary<string, int>();
-                FolderRemap = folderRemap ?? new ScoDictionary<string, string>();
+                FilteredFolderScraping =
+                    filteredFolderScraping ?? new ScoDictionaryNew<string, int>();
+                FolderRemap = folderRemap ?? new ScoDictionaryNew<string, string>();
             }
 
             public Task LoadAsync(bool parallel) => throw new NotImplementedException();
 
             public IPeopleScoDictionaryNew People => throw new NotImplementedException();
 
-            public IScoDictionary<string, string> DictRemap => throw new NotImplementedException();
+            public IScoDictionaryNew<string, string> DictRemap =>
+                throw new NotImplementedException();
 
             public ISerializableList<string> CategoryFilters => throw new NotImplementedException();
 
@@ -118,13 +121,15 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             public ScDictionary<string, string> ProgramInfo => throw new NotImplementedException();
 
-            public ScoCollection<IPrefix> PrefixList => throw new NotImplementedException();
+            public ConcurrentObservableCollection<IPrefix> PrefixList =>
+                throw new NotImplementedException();
 
-            public ScoCollection<IPrefix> LoadPrefixList() => throw new NotImplementedException();
+            public ConcurrentObservableCollection<IPrefix> LoadPrefixList() =>
+                throw new NotImplementedException();
 
-            public ScoDictionary<string, int> FilteredFolderScraping { get; }
+            public ScoDictionaryNew<string, int> FilteredFolderScraping { get; }
 
-            public ScoDictionary<string, string> FolderRemap { get; }
+            public ScoDictionaryNew<string, string> FolderRemap { get; }
 
             public string ProjInfo_Filename => throw new NotImplementedException();
 

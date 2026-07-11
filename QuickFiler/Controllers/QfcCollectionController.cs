@@ -14,6 +14,7 @@ using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
 using UtilitiesCS;
 using UtilitiesCS.Extensions;
+using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 
 namespace QuickFiler.Controllers
 {
@@ -2201,7 +2202,7 @@ namespace QuickFiler.Controllers
             _itemGroups = null;
         }
 
-        public async Task MoveEmailsAsync(ScoStack<IMovedMailInfo> stackMovedItems)
+        public async Task MoveEmailsAsync(SloStack<IMovedMailInfo> stackMovedItems)
         {
             //TraceUtility.LogMethodCall(stackMovedItems);
             var count = _itemGroupsToMove?.Count() ?? 0;

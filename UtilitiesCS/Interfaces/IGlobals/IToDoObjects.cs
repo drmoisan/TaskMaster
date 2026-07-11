@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using UtilitiesCS;
 using UtilitiesCS.Interfaces;
 using UtilitiesCS.ReusableTypeClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 
 namespace UtilitiesCS
 {
@@ -16,16 +17,16 @@ namespace UtilitiesCS
         //string DictPPL_Filename { get; }
         //void DictPPL_Save();
         Task LoadAsync(bool parallel);
-        IScoDictionary<string, string> DictRemap { get; }
+        IScoDictionaryNew<string, string> DictRemap { get; }
         ISerializableList<string> CategoryFilters { get; }
         IIDList IDList { get; }
         IApplicationGlobals Parent { get; }
         IProjectData ProjInfo { get; }
         ScDictionary<string, string> ProgramInfo { get; }
-        ScoCollection<IPrefix> PrefixList { get; }
-        ScoCollection<IPrefix> LoadPrefixList();
-        ScoDictionary<string, int> FilteredFolderScraping { get; }
-        ScoDictionary<string, string> FolderRemap { get; }
+        ConcurrentObservableCollection<IPrefix> PrefixList { get; }
+        ConcurrentObservableCollection<IPrefix> LoadPrefixList();
+        ScoDictionaryNew<string, int> FilteredFolderScraping { get; }
+        ScoDictionaryNew<string, string> FolderRemap { get; }
         string ProjInfo_Filename { get; }
         string FnameDictRemap { get; }
         string FnameIDList { get; }

@@ -90,7 +90,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var mockTd = new Mock<IToDoObjects>();
             mockTd
                 .SetupGet(x => x.FilteredFolderScraping)
-                .Returns(new ScoDictionary<string, int>());
+                .Returns(new ScoDictionaryNew<string, int>());
             mockGlobals.SetupGet(x => x.TD).Returns(mockTd.Object);
 
             var classifierGroup = new BayesianClassifierGroup

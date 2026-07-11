@@ -16,7 +16,7 @@
 
 //namespace ToDoModel
 //{
-//    public class PeopleScoDictionary : ScoDictionary<string, string>, IPeopleScoDictionary
+//    public class PeopleScoDictionary : ScoDictionaryNew<string, string>, IPeopleScoDictionary
 //    {
 //        #region Constructors and Initializers
 

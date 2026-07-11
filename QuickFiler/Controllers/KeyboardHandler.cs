@@ -14,7 +14,6 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Interfaces;
-using Swordfish.NET.Collections;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
 

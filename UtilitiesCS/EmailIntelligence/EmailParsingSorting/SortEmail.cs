@@ -14,6 +14,7 @@ using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
 using UtilitiesCS.OutlookExtensions;
+using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
@@ -202,7 +203,7 @@ namespace UtilitiesCS
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
 
-            await appGlobals.AF.Encoder.Encoder.SerializeAsync();
+            appGlobals.AF.Encoder.Encoder.Serialize();
         }
 
         [ExcludeFromCodeCoverage]
@@ -437,7 +438,7 @@ namespace UtilitiesCS
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
 
-            await appGlobals.AF.Encoder.Encoder.SerializeAsync();
+            appGlobals.AF.Encoder.Encoder.Serialize();
         }
 
         [ExcludeFromCodeCoverage]
@@ -551,7 +552,7 @@ namespace UtilitiesCS
         // Duplicative with QuickFiler but it is still mapped to main menu so I need to take it out
         [ExcludeFromCodeCoverage]
         public static async Task UndoAsync(
-            ScoStack<IMovedMailInfo> movedStack,
+            SloStack<IMovedMailInfo> movedStack,
             IApplicationGlobals globals
         )
         {

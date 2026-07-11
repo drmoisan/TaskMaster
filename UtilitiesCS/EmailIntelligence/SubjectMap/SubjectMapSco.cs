@@ -14,6 +14,7 @@ using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.SubjectMap;
 using UtilitiesCS.HelperClasses;
+using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 using static Deedle.FrameBuilder;
 
 namespace UtilitiesCS
@@ -21,7 +22,7 @@ namespace UtilitiesCS
     /// <summary>
     /// A serializable list of ISubjectMapEntry. See <see cref="ISubjectMapEntry"/>.
     /// </summary>
-    public partial class SubjectMapSco : ScoCollection<SubjectMapEntry>
+    public partial class SubjectMapSco : ConcurrentObservableCollection<SubjectMapEntry>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -71,7 +72,7 @@ namespace UtilitiesCS
         public SubjectMapSco(
             string filename,
             string folderpath,
-            ScoCollection<SubjectMapEntry>.AltListLoader backupLoader,
+            ConcurrentObservableCollection<SubjectMapEntry>.AltListLoader backupLoader,
             string backupFilepath,
             bool askUserOnError,
             ISerializableList<string> commonWords

@@ -194,7 +194,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var mockTd = new Moq.Mock<IToDoObjects>();
             mockTd
                 .SetupGet(td => td.FilteredFolderScraping)
-                .Returns(new ScoDictionary<string, int>());
+                .Returns(new ScoDictionaryNew<string, int>());
 
             var mockGlobals = new Moq.Mock<IApplicationGlobals>();
             mockGlobals.SetupGet(g => g.TD).Returns(mockTd.Object);
