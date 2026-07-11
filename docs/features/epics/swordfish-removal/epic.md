@@ -17,8 +17,8 @@ features:
   - issue_num: 9001
     feature_folder: swordfish-dictionary-lineage
     depends_on: []
-  - issue_num: 9002
-    feature_folder: swordfish-collection-stack-lineage
+  - issue_num: 307
+    feature_folder: 2026-07-10-swordfish-collection-stack-lineage-307
     depends_on: []
   - issue_num: 309
     feature_folder: 2026-07-10-swordfish-scosorteddictionary-removal-309
@@ -28,7 +28,7 @@ features:
     depends_on: []
   - issue_num: 308
     feature_folder: 2026-07-10-swordfish-interface-project-teardown-308
-    depends_on: [9001, 9002, 309, 310]
+    depends_on: [9001, 307, 309, 310]
 ---
 
 # Epic: Remove the Swordfish.NET.General Project from TaskMaster
@@ -80,7 +80,7 @@ concurrently; the ordering constraint applies to execution waves.
 | Wave | issue_num (placeholder) | Feature folder (hint) | Complexity | Scope |
 |---|---|---|---|---|
 | 0 | 9001 | `swordfish-dictionary-lineage` | C3 | Dictionary lineage: re-point `ScoDictionary` consumers to `ScoDictionaryNew`; reconcile constructor/deserialize shape; preserve on-disk JSON. |
-| 0 | 9002 | `swordfish-collection-stack-lineage` | C3 | Collection + Stack lineage: re-base `ScoCollection`/`ScoStack` subclasses onto the clean collection and `SloLinkedList`; add positional stack surface + async serialize; preserve `MovedMails` on-disk JSON. |
+| 0 | 307 | `2026-07-10-swordfish-collection-stack-lineage-307` | C3 | Collection + Stack lineage: CREATE the clean `ConcurrentObservableCollection<T>` base (Phase 1), re-base `ScoCollection`/`ScoStack` subclasses onto it and a new `SloStack<T> : SloLinkedList<T>`; positional stack surface + `SerializeAsync`; preserve `MovedMails` on-disk JSON. |
 | 0 | 309 | `2026-07-10-swordfish-scosorteddictionary-removal-309` | C1 | Confirm no production consumer of `ScoSortedDictionary`, then delete the class and its test. |
 | 0 | 310 | `2026-07-10-swordfish-raw-usage-cleanup-310` | C2 | Re-point `KbdActions` raw `ConcurrentObservableCollection` to `List<UClass>` (see decision record); remove unused `using Swordfish.NET.Collections;`; delete stale `TraceUtility` string literals. |
 | 1 | 308 | `2026-07-10-swordfish-interface-project-teardown-308` | C3 | Remove `IScoCollection`/`IScoCollection2`/dead `ISubjectMapSco`; remove `ProjectReference` to `UtilitiesSwordfish.NET.General.csproj` from 9 csprojs (incl. stale `TaskVisualization.Test.csproj` reference found in research); remove project entries from `TaskMaster.sln`; delete project folders; migrate/remove tests referencing Swordfish types. |
@@ -193,7 +193,8 @@ already handled in F1–F3).
 ## Open Questions (resolved during child preparation research)
 
 1. Is `RecentsList<T> : ScoCollection<T>` still consumed, or dead code superseded by the
-   `SloLinkedList` `RecentsList`? (F2 research)
+   `SloLinkedList` `RecentsList`? (F2 research) — **RESOLVED (F2 preparation, issue #307):**
+   dead code; the F2 plan deletes it rather than migrating it.
 2. Is a Swordfish-free sorted dictionary wanted for future use, or is deletion of
    `ScoSortedDictionary` sufficient? (F3 research) — **RESOLVED (F3 preparation, issue #309):**
    deletion is sufficient. F3 research confirmed no production consumer of
@@ -205,7 +206,11 @@ already handled in F1–F3).
    stale reference in `TaskVisualization.Test.csproj` not listed in the original brief. All nine
    are removed in the F5 plan.
 4. Are on-disk JSON payloads type-name-embedded (`TypeNameHandling.Auto`) such that a type rename
-   breaks deserialization? If so, plan explicit migration/converter work. (F1 and F2 research)
+   breaks deserialization? If so, plan explicit migration/converter work. (F1 and F2 research) —
+   **RESOLVED for F2/F3 scope:** F2 research verified all five persisted collections in its scope
+   serialize as bare JSON arrays under `TypeNameHandling.Auto` (no converter/migration needed;
+   round-trip fixtures still planned); F3 research verified no payload embeds
+   `ScoSortedDictionary`. F1's dictionary payloads remain subject to F1 research confirmation.
 
 ## Non-Goals
 
