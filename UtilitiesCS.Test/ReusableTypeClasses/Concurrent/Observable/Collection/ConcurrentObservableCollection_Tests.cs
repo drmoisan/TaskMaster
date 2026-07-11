@@ -13,7 +13,7 @@ using UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection;
 namespace UtilitiesCS.Test.ReusableTypeClasses.Concurrent.Observable.Collection
 {
     /// <summary>
-    /// Unit tests for the Swordfish-free <see cref="ConcurrentObservableCollection{T}"/>. Covers the
+    /// Unit tests for the vendored-dependency-free <see cref="ConcurrentObservableCollection{T}"/>. Covers the
     /// list-search surface, indexer/mutation members, observer subscription, native
     /// CollectionChanged, list conversion, and the serialize/deserialize paths driven through an
     /// injected filesystem seam (no temp files).
@@ -80,7 +80,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses.Concurrent.Observable.Collection
         [TestMethod]
         public void FindIndices_WithNonZeroStartIndexOnFullList_Throws()
         {
-            // Preserves the legacy Swordfish FindIndices(startIndex, match) semantics, where the
+            // Preserves the legacy FindIndices(startIndex, match) semantics, where the
             // two-argument overload uses Count (not Count - startIndex) as the span length, so a
             // non-zero start index on a full-length list overflows the range guard.
             var sut = new ConcurrentObservableCollection<int> { 1, 1, 1 };

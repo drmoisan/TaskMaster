@@ -60,53 +60,53 @@ this document is authored in planning mode and no criterion is checked off here.
 
 ### WI-0 — Preflight precondition
 
-- [ ] AC-1: Preflight asserts zero `Swordfish` references in production `*.cs` (research category A);
+- [x] AC-1: Preflight asserts zero `Swordfish` references in production `*.cs` (research category A);
       if non-zero, F5 halts as an upstream (F1-F4) defect.
-- [ ] AC-2: Preflight asserts `UtilitiesCS\HelperClasses\Logging\TraceUtility.cs` contains no
+- [x] AC-2: Preflight asserts `UtilitiesCS\HelperClasses\Logging\TraceUtility.cs` contains no
       `UtilitiesSwordfish.NET.General` / `UtilitiesSwordfish.NET.Test` string literal.
 
 ### WI-1 — Interfaces
 
-- [ ] AC-3: `UtilitiesCS\Interfaces\IReusableTypeClasses\IScoCollection.cs` is removed.
-- [ ] AC-4: `UtilitiesCS\Interfaces\IReusableTypeClasses\IScoCollection2.cs` is removed.
-- [ ] AC-5: `UtilitiesCS\Interfaces\IToDo\ISubjectMapSco.cs` is removed.
-- [ ] AC-6: The dead `UpdateForMove` method (the sole `ISubjectMapSco` reference) is removed from
+- [x] AC-3: `UtilitiesCS\Interfaces\IReusableTypeClasses\IScoCollection.cs` is removed.
+- [x] AC-4: `UtilitiesCS\Interfaces\IReusableTypeClasses\IScoCollection2.cs` is removed.
+- [x] AC-5: `UtilitiesCS\Interfaces\IToDo\ISubjectMapSco.cs` is removed.
+- [x] AC-6: The dead `UpdateForMove` method (the sole `ISubjectMapSco` reference) is removed from
       `QuickFiler\Controllers\QfcExplorerController.cs`, leaving no dangling symbol.
 
 ### WI-2 — Project references
 
-- [ ] AC-7: All NINE `UtilitiesSwordfish.NET.General.csproj` `ProjectReference` entries are removed
+- [x] AC-7: All NINE `UtilitiesSwordfish.NET.General.csproj` `ProjectReference` entries are removed
       (`UtilitiesCS`, `UtilitiesCS.Test`, `TaskMaster`, `TaskMaster.Test`, `QuickFiler`, `ToDoModel`,
       `Tags`, `TaskVisualization`, `TaskVisualization.Test`), with an auditable search confirming the
       `Tags` / `TaskVisualization` / `TaskVisualization.Test` references were stale before removal.
 
 ### WI-3 — Solution entries and project folders
 
-- [ ] AC-8: The `TaskMaster.sln` `Project(...)`/`EndProject` declarations for
+- [x] AC-8: The `TaskMaster.sln` `Project(...)`/`EndProject` declarations for
       `{F2E1680E-1B15-4CF2-BAB0-54B8C8F6ABDF}` and `{9A04D222-2B52-4E93-9B92-CC6EF54D5848}` are removed.
-- [ ] AC-9: The `TaskMaster.sln` `GlobalSection(ProjectConfigurationPlatforms)` entries for both
+- [x] AC-9: The `TaskMaster.sln` `GlobalSection(ProjectConfigurationPlatforms)` entries for both
       GUIDs are removed (no orphaned configuration rows remain).
-- [ ] AC-10: The `UtilitiesSwordfish\` and `UtilitiesSwordfish.Test\` project folders are deleted
+- [x] AC-10: The `UtilitiesSwordfish\` and `UtilitiesSwordfish.Test\` project folders are deleted
       (`git rm -r`), including both csprojs, all vendored `*.cs`, the XAML, and the nested
       `UtilitiesSwordfish\Swordfish.NET.sln`.
 
 ### WI-4 — Tests
 
-- [ ] AC-11: The three direct-Swordfish test files are removed
+- [x] AC-11: The three direct-Swordfish test files are removed
       (`ObservableDictionary_Tests.cs`, `ConcurrentObservableCollectionSenderTests.cs`,
       `ConcurrentObservableCollectionLockRecursionTests.cs`).
-- [ ] AC-12: F2 is confirmed to carry sender-identity and lock-recursion regression coverage against
+- [x] AC-12: F2 is confirmed to carry sender-identity and lock-recursion regression coverage against
       the clean collection base; if absent, a new issue is raised (F5 does not author the coverage).
 
 ### Cross-cutting (epic completes here)
 
-- [ ] AC-13: A repo-wide `Swordfish` search over `*.cs`, `*.csproj`, and `*.sln` returns only
+- [x] AC-13: A repo-wide `Swordfish` search over `*.cs`, `*.csproj`, and `*.sln` returns only
       archived docs/memory (research categories A-E are zero).
-- [ ] AC-14: The solution builds green with both `UtilitiesSwordfish` and `UtilitiesSwordfish.Test`
+- [x] AC-14: The solution builds green with both `UtilitiesSwordfish` and `UtilitiesSwordfish.Test`
       removed and no unresolved type reference.
-- [ ] AC-15: The full C# toolchain passes in order (csharpier -> analyzers -> nullable -> MSTest)
+- [x] AC-15: The full C# toolchain passes in order (csharpier -> analyzers -> nullable -> MSTest)
       with all four steps green in a single final pass.
-- [ ] AC-16: Coverage thresholds hold for changed/new code (repo-wide line coverage `>= 80%` on the
+- [x] AC-16: Coverage thresholds hold for changed/new code (repo-wide line coverage `>= 80%` on the
       testable denominator; changed/new code `>= 90%`), with no coverage regression on surviving
       first-party code attributable to the removed tests.
 

@@ -9,7 +9,7 @@ using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 namespace UtilitiesCS.Test.ReusableTypeClasses.SerializableNew.Concurrent.Observable
 {
     /// <summary>
-    /// Unit tests for the Swordfish-free <see cref="SloStack{T}"/>. Ports the positional-semantics
+    /// Unit tests for the vendored-dependency-free <see cref="SloStack{T}"/>. Ports the positional-semantics
     /// assertions from the legacy <c>ScoStack_Tests</c>: top-of-stack == index 0 == front, the
     /// indexed <c>Peek</c>/<c>Pop</c> members (including shift-down of higher indices), the
     /// <c>TryPeek</c>/<c>TryPop</c> success/failure paths, empty-stack throw behavior, the async

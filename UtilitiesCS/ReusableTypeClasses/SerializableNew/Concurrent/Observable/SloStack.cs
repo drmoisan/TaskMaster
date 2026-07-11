@@ -7,7 +7,7 @@ using UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList;
 namespace UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable
 {
     /// <summary>
-    /// A Swordfish-free serializable stack built on <see cref="SloLinkedList{T}"/>. It is the clean
+    /// A vendored-dependency-free serializable stack built on <see cref="SloLinkedList{T}"/>. It is the clean
     /// replacement for the former <c>ScoStack&lt;T&gt;</c> and provides the positional/stack surface
     /// that the QuickFiler and SortEmail undo loops depend on, with <b>top-of-stack == index 0 ==
     /// <see cref="SloLinkedList{T}"/> front</b>.

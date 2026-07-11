@@ -159,10 +159,6 @@
       <Project>{91b5f9bb-aa29-4dda-9e26-d3dad73ec7ca}</Project>
       <Name>UtilitiesCS</Name>
     </ProjectReference>
-    <ProjectReference Include="..\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj">
-      <Project>{f2e1680e-1b15-4cf2-bab0-54b8c8f6abdf}</Project>
-      <Name>UtilitiesSwordfish.NET.General</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
