@@ -223,7 +223,7 @@ this phase complete without errors in a single pass.
       listing AC-1 through AC-5, each mapped to its exact backing evidence artifact path(s) from
       Phases 2 and 3. Acceptance: the artifact exists and every AC has at least one mapped, existing
       evidence-artifact path.
-- [ ] [P4-T3] Run `git status --porcelain` in the feature worktree and confirm it returns empty
+- [x] [P4-T3] Run `git status --porcelain` in the feature worktree and confirm it returns empty
       (all code changes and evidence artifacts staged/committed). Record to
       `docs/features/active/collection-lock-recursion-coverage-317/evidence/other/clean-worktree-confirmation.<TS>.md`.
       Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and `Output Summary:`
