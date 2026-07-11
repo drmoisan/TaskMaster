@@ -212,13 +212,13 @@ DELETE (only after grep-clean gate in Phase 7):
 
 ### Phase 7 — Delete Legacy `ScoCollection`/`ScoStack` After Grep-Clean Gate
 
-- [ ] [P7-T1] Run the deletion gate `rg -n "ScoCollection<|ScoStack<" --glob '**/*.cs'` and confirm the only remaining hits are the F5-reserved interface files (`UtilitiesCS/Interfaces/IReusableTypeClasses/IScoCollection.cs`, `IScoCollection2.cs`) and `UtilitiesCS/Interfaces/IToDo/ISubjectMapSco.cs` (inherits F5 `IScoCollection<SubjectMapEntry>`); record in `evidence/regression-testing/deletion-gate.md`
+- [x] [P7-T1] Run the deletion gate `rg -n "ScoCollection<|ScoStack<" --glob '**/*.cs'` and confirm the only remaining hits are the F5-reserved interface files (`UtilitiesCS/Interfaces/IReusableTypeClasses/IScoCollection.cs`, `IScoCollection2.cs`) and `UtilitiesCS/Interfaces/IToDo/ISubjectMapSco.cs` (inherits F5 `IScoCollection<SubjectMapEntry>`); record in `evidence/regression-testing/deletion-gate.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; no first-party production or test reference to `ScoCollection<`/`ScoStack<` remains outside the listed F5-reserved interface files. If any other hit remains, STOP and re-point it before proceeding.
-- [ ] [P7-T2] Update `UtilitiesCS.Test/ReusableTypeClasses/SmartSerializableStatic_Tests.cs:38-41` — remove or rewrite the assertion that `ScoCollection<int>` does not implement `ISmartSerializable<>` (moot once `ScoCollection` is deleted)
+- [x] [P7-T2] Update `UtilitiesCS.Test/ReusableTypeClasses/SmartSerializableStatic_Tests.cs:38-41` — remove or rewrite the assertion that `ScoCollection<int>` does not implement `ISmartSerializable<>` (moot once `ScoCollection` is deleted)
   - Acceptance: the moot assertion is removed/rewritten; the test class still compiles and passes.
-- [ ] [P7-T3] Delete `UtilitiesCS/ReusableTypeClasses/Serializable/Concurrent/SCO/ScoCollection.cs` and `ScoStack.cs`, removing their `<Compile Include>` items from `UtilitiesCS/UtilitiesCS.csproj`
+- [x] [P7-T3] Delete `UtilitiesCS/ReusableTypeClasses/Serializable/Concurrent/SCO/ScoCollection.cs` and `ScoStack.cs`, removing their `<Compile Include>` items from `UtilitiesCS/UtilitiesCS.csproj`
   - Acceptance: both files and csproj entries removed; `UtilitiesCS` builds.
-- [ ] [P7-T4] Delete the legacy direct tests `UtilitiesCS.Test/ReusableTypeClasses/ScoCollection_Tests.cs`, `ScoStack_Tests.cs`, `ScoCollectionTests.cs`, and `ScoCollectionTests_UnfinishedStubs.cs`, removing their `<Compile Include>` items from `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
+- [x] [P7-T4] Delete the legacy direct tests `UtilitiesCS.Test/ReusableTypeClasses/ScoCollection_Tests.cs`, `ScoStack_Tests.cs`, `ScoCollectionTests.cs`, and `ScoCollectionTests_UnfinishedStubs.cs`, removing their `<Compile Include>` items from `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
   - Acceptance: files and csproj entries removed; `UtilitiesCS.Test` builds; representative round-trip coverage now lives in the clean-collection and `CollectionRoundTrip_Tests` suites.
 
 ### Phase 8 — Final QC Loop and Coverage Verification

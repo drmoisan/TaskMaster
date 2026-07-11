@@ -114,7 +114,7 @@ This feature contributes to the epic's leading indicators without changing produ
 - [x] As the maintainer, the dead `RecentsList<T>` type and its test are deleted (not migrated), so
       that no effort is spent re-basing code already superseded by `AppAutoFileObjects.RecentsList :
       SloLinkedList<string>`.
-- [ ] As the maintainer, legacy `ScoCollection.cs`/`ScoStack.cs` and their direct tests are removed
+- [x] As the maintainer, legacy `ScoCollection.cs`/`ScoStack.cs` and their direct tests are removed
       only after re-pointing leaves them unreferenced, so that the collection/stack half of the
       Swordfish surface is gone without prematurely breaking a still-referenced type.
 - [ ] As the maintainer, the full C# toolchain passes (csharpier → analyzers → nullable → MSTest)

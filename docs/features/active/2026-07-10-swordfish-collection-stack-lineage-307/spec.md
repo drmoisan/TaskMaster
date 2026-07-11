@@ -270,10 +270,10 @@ unreferenced.
       tests.
 - [x] `RecentsList<T>` dead code is removed: `RecentsList.cs` and `RecentsList_Tests.cs` are deleted
       (not migrated).
-- [ ] Legacy `ScoCollection.cs`/`ScoStack.cs` and their direct tests are deleted only after a
+- [x] Legacy `ScoCollection.cs`/`ScoStack.cs` and their direct tests are deleted only after a
       repo-wide grep confirms no first-party reference to `ScoCollection<`/`ScoStack<` remains
       outside F5-reserved interface files.
-- [ ] Migrated tests compile and pass against the clean types (`ManageFiltersControllerTests`,
+- [x] Migrated tests compile and pass against the clean types (`ManageFiltersControllerTests`,
       `ConcurrentObservableCollectionSenderTests`, `ConcurrentObservableCollectionLockRecursionTests`,
       `EmailFiler_Tests`/`EmailFiler_TestSupport`, `AppAutoFileObjectsCoverageExpansionTests`).
 - [ ] New `SloStack<T>` positional members and `SerializeAsync`, and the new clean-collection

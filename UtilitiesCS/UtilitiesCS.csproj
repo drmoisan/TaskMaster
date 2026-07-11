@@ -1045,10 +1045,8 @@
     <Compile Include="ReusableTypeClasses\Observable\ObservableCollectionBatchUpdate.cs" />
     <Compile Include="ReusableTypeClasses\Observable\ObservableDictionary.cs" />
     <Compile Include="ReusableTypeClasses\Observable\ObserverHelper.cs" />
-    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\ScoCollection.cs" />
     <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\SCODictionary.cs" />
     <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\ScoSortedDictionary.cs" />
-    <Compile Include="ReusableTypeClasses\Serializable\Concurrent\SCO\ScoStack.cs" />
     <Compile Include="ReusableTypeClasses\Serializable\SerializableList.cs" />
     <Compile Include="ReusableTypeClasses\Other\StackGeek.cs" />
     <Compile Include="ReusableTypeClasses\Other\StackObjectCS.cs" />

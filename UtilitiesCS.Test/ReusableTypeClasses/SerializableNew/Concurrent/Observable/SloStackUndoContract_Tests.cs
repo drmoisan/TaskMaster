@@ -12,8 +12,8 @@ namespace UtilitiesCS.Test.ReusableTypeClasses.SerializableNew.Concurrent.Observ
     /// forward index <c>i</c>, reads <c>stack[i]</c>, and on confirmation calls <c>stack.Pop(i)</c>
     /// (removing and returning the element at ordinal <c>i</c>) <b>without advancing <c>i</c></b>, so
     /// the next element shifts down into index <c>i</c> and is reprocessed. These tests assert that
-    /// <see cref="SloStack{T}"/> reproduces the legacy <c>ScoStack</c> shift-and-reprocess ordinal
-    /// semantics exactly. No temp files are used.
+    /// <see cref="SloStack{T}"/> reproduces the legacy shift-and-reprocess ordinal semantics of the
+    /// superseded stack type exactly. No temp files are used.
     /// </summary>
     [TestClass]
     public class SloStackUndoContract_Tests
