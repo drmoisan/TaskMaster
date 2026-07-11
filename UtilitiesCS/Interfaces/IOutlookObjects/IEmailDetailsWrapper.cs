@@ -10,7 +10,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         string[] Details(
             MailItem olMail,
             string emailRootFolder,
-            IScoDictionary<string, string> dictRemap = null
+            IScoDictionaryNew<string, string> dictRemap = null
         );
         string GetActionTaken(MailItem OlMail);
         IEnumerable<Recipient> GetCcRecipients(MailItem olMail);

@@ -14,7 +14,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         public string[] Details(
             MailItem olMail,
             string emailRootFolder,
-            IScoDictionary<string, string> dictRemap = null
+            IScoDictionaryNew<string, string> dictRemap = null
         ) => olMail.Details(emailRootFolder, dictRemap);
 
         public string GetActionTaken(MailItem OlMail) => OlMail.GetActionTaken();

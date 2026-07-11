@@ -83,7 +83,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             // remove any keys that are no longer remapped
             _globals
                 .TD.FolderRemap.Keys.Where(key => !Mappings2.Any(x => x.RelativePath == key))
-                .ForEach(x => _globals.TD.FolderRemap.Remove(x));
+                .ForEach(x => _globals.TD.FolderRemap.TryRemove(x, out _));
 
             // add or update remapped keys
             Mappings2.ForEach(mapping =>

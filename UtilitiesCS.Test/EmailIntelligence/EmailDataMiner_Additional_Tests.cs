@@ -106,7 +106,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         {
             var included = new FolderWrapper(false, 1, 10, "Included", "root/included");
             var excluded = new FolderWrapper(false, 1, 10, "Excluded", "root/excluded");
-            var scraping = new ScoDictionary<string, int> { ["root/excluded"] = 1 };
+            var scraping = new ScoDictionaryNew<string, int> { ["root/excluded"] = 1 };
             var td = new Mock<IToDoObjects>();
             td.SetupGet(x => x.FilteredFolderScraping).Returns(scraping);
             var archiveRoot = new Mock<Folder>().Object;

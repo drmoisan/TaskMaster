@@ -395,6 +395,7 @@
     <Compile Include="ReusableTypeClasses\ScoCollectionTests.cs" />
     <Compile Include="ReusableTypeClasses\ScoCollectionTests_UnfinishedStubs.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryNewTests.cs" />
+    <Compile Include="ReusableTypeClasses\SerializableNew\ScoDictionaryNew_OnDiskCompatibility_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ObservableCollectionBatchUpdate_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ObservableDictionary_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ObserverHelper_Tests.cs" />

@@ -54,7 +54,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             ol.SetupGet(item => item.ArchiveRoot).Returns(new Mock<Folder>().Object);
             var td = new Mock<IToDoObjects>();
             td.SetupGet(item => item.FilteredFolderScraping)
-                .Returns(new ScoDictionary<string, int>());
+                .Returns(new ScoDictionaryNew<string, int>());
             var globals = new Mock<IApplicationGlobals>();
             globals.SetupGet(item => item.Ol).Returns(ol.Object);
             globals.SetupGet(item => item.TD).Returns(td.Object);
@@ -78,7 +78,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             ol.SetupGet(item => item.ArchiveRoot).Returns(new Mock<Folder>().Object);
             var td = new Mock<IToDoObjects>();
             td.SetupGet(item => item.FilteredFolderScraping)
-                .Returns(new ScoDictionary<string, int>());
+                .Returns(new ScoDictionaryNew<string, int>());
             var globals = new Mock<IApplicationGlobals>();
             globals.SetupGet(item => item.Ol).Returns(ol.Object);
             globals.SetupGet(item => item.TD).Returns(td.Object);

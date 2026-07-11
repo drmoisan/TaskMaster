@@ -35,12 +35,12 @@ The vendored `ScoDictionary<TKey,TValue>` (`UtilitiesCS\ReusableTypeClasses\Seri
 
 The authoritative, technically detailed acceptance criteria are maintained in `spec.md` (`## Acceptance Criteria`). The story-level criteria below track the same delivery from the user perspective and must stay consistent with `spec.md`.
 
-- [ ] Every production consumer of `ScoDictionary<TKey,TValue>` (`AppToDoObjects` DictRemap/FilteredFolderScraping/FolderRemap, `SubjectMapEncoder` encoder/decoder, `FolderScorer` scores) is re-pointed to `ScoDictionaryNew<TKey,TValue>`.
-- [ ] The `IToDoObjects` interface members `FilteredFolderScraping`, `FolderRemap`, and `DictRemap` use the new lineage; all implementers and callers compile, including the `EmailDetails.cs` / `EmailDetailsWrapper.cs` ripple consumers and the `ISubjectMapEncoder.Encoder` return type.
-- [ ] On-disk JSON serialization compatibility is preserved for each of the four persisted dictionaries — `DictRemap`, `FilteredFolderScraping`, `FolderRemap`, and SubjectMap `Encoder` — with a per-dictionary round-trip compatibility test that loads a representative existing flat-shape payload and verifies successful deserialization and entry fidelity.
-- [ ] The two in-memory-only fields (SubjectMap `Decoder`, `FolderScorer` scores) are migrated as a pure type swap with no on-disk compatibility test, consistent with the documented discrepancies vs the epic text.
-- [ ] The globals-converter-path compatibility constraint is respected: no persisted dictionary registers `GetSettingsJson<T>(globals)`, `ScoDictionaryConverter`, or `PreserveReferencesHandling.All`.
-- [ ] Affected tests migrated; full C# toolchain (csharpier -> analyzers -> nullable -> MSTest) green; coverage thresholds hold for changed/new code.
+- [x] Every production consumer of `ScoDictionary<TKey,TValue>` (`AppToDoObjects` DictRemap/FilteredFolderScraping/FolderRemap, `SubjectMapEncoder` encoder/decoder, `FolderScorer` scores) is re-pointed to `ScoDictionaryNew<TKey,TValue>`.
+- [x] The `IToDoObjects` interface members `FilteredFolderScraping`, `FolderRemap`, and `DictRemap` use the new lineage; all implementers and callers compile, including the `EmailDetails.cs` / `EmailDetailsWrapper.cs` ripple consumers and the `ISubjectMapEncoder.Encoder` return type.
+- [x] On-disk JSON serialization compatibility is preserved for each of the four persisted dictionaries — `DictRemap`, `FilteredFolderScraping`, `FolderRemap`, and SubjectMap `Encoder` — with a per-dictionary round-trip compatibility test that loads a representative existing flat-shape payload and verifies successful deserialization and entry fidelity.
+- [x] The two in-memory-only fields (SubjectMap `Decoder`, `FolderScorer` scores) are migrated as a pure type swap with no on-disk compatibility test, consistent with the documented discrepancies vs the epic text.
+- [x] The globals-converter-path compatibility constraint is respected: no persisted dictionary registers `GetSettingsJson<T>(globals)`, `ScoDictionaryConverter`, or `PreserveReferencesHandling.All`.
+- [x] Affected tests migrated; full C# toolchain (csharpier -> analyzers -> nullable -> MSTest) green; coverage thresholds hold for changed/new code.
 - [ ] Optional: if re-pointing leaves the legacy `ScoDictionary` class unreferenced, `SCODictionary.cs` and its direct tests may be deleted within this feature only if all remaining test references (including the SmartSerializable negative-sample substitutions) are migrated in the same change.
 
 ## Non-Goals

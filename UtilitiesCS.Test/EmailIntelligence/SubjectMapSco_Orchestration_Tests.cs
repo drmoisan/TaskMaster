@@ -269,20 +269,21 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
         private static Mock<IApplicationGlobals> CreateGlobals(
             IEnumerable<string> filtered = null,
-            ScoDictionary<string, string> remap = null,
+            ScoDictionaryNew<string, string> remap = null,
             ISubjectMapEncoder encoder = null,
             IOutlookFolderTreeService service = null,
             Folder archiveRoot = null
         )
         {
             var td = new Mock<IToDoObjects>(MockBehavior.Strict);
-            var filteredFolders = new ScoDictionary<string, int>();
+            var filteredFolders = new ScoDictionaryNew<string, int>();
             foreach (var path in filtered ?? [])
             {
                 filteredFolders.TryAdd(path, 1);
             }
             td.SetupGet(x => x.FilteredFolderScraping).Returns(filteredFolders);
-            td.SetupGet(x => x.FolderRemap).Returns(remap ?? new ScoDictionary<string, string>());
+            td.SetupGet(x => x.FolderRemap)
+                .Returns(remap ?? new ScoDictionaryNew<string, string>());
 
             var globals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
             globals.SetupGet(x => x.TD).Returns(td.Object);
