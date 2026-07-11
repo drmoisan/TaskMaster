@@ -8,10 +8,10 @@ using System.Linq;
 namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection
 {
     /// <summary>
-    /// A Swordfish-free observable collection built on
+    /// A vendored-dependency-free observable collection built on
     /// <see cref="System.Collections.ObjectModel.ObservableCollection{T}"/>. It is the clean
     /// replacement base for the former <c>ScoCollection&lt;T&gt;</c> (which derived from the
-    /// vendored <c>Swordfish.NET.Collections.ConcurrentObservableCollection&lt;T&gt;</c>).
+    /// now-removed vendored observable-collection library).
     ///
     /// The type re-exposes the list-search surface (<see cref="Find(Predicate{T})"/>,
     /// <see cref="FindIndex(Predicate{T})"/>, <see cref="FindIndices(Predicate{T})"/>,
@@ -23,7 +23,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection
     /// path accessors, and the injectable filesystem/prompt seams) live in the
     /// <c>ConcurrentObservableCollection.Serialization.cs</c> partial.
     ///
-    /// Thread-safety note: unlike the vendored Swordfish base, this type does not use a
+    /// Thread-safety note: unlike the former vendored base, this type does not use a
     /// <c>ReaderWriterLockSlim</c>. Mutations raise <see cref="ObservableCollection{T}"/> events
     /// synchronously on the calling thread. Production write paths already run under
     /// <c>Task.Run</c>; no consumer depends on concurrent multi-writer semantics.
@@ -107,7 +107,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection
         /// Registers <paramref name="observer"/> to receive collection-change notifications.
         /// On subscribe, each current element is replayed as an
         /// <see cref="NotifyCollectionChangedAction.Add"/> notification (matching the prior
-        /// Swordfish observable semantics). The returned token unsubscribes on dispose.
+        /// observable semantics). The returned token unsubscribes on dispose.
         /// </summary>
         public IDisposable Subscribe(IObserver<NotifyCollectionChangedEventArgs> observer)
         {

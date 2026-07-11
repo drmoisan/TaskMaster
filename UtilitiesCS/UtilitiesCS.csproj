@@ -999,11 +999,8 @@
     <Compile Include="Interfaces\IToDo\IProjectInfoLegacy.cs" />
     <Compile Include="Interfaces\IToDo\ISubjectMapEncoder.cs" />
     <Compile Include="Interfaces\IToDo\ISubjectMapEntry.cs" />
-    <Compile Include="Interfaces\IToDo\ISubjectMapSco.cs" />
     <Compile Include="Interfaces\IToDo\IProjectEntry.cs" />
     <Compile Include="Interfaces\IReusableTypeClasses\Observable\IObservableDictionary.cs" />
-    <Compile Include="Interfaces\IReusableTypeClasses\IScoCollection.cs" />
-    <Compile Include="Interfaces\IReusableTypeClasses\IScoCollection2.cs" />
     <Compile Include="Interfaces\IReusableTypeClasses\IScoDictionary.cs" />
     <Compile Include="Interfaces\IReusableTypeClasses\ISerializableDictionary.cs" />
     <Compile Include="Interfaces\IReusableTypeClasses\ISerializableList.cs" />
@@ -1078,10 +1075,6 @@
     <ProjectReference Include="..\SVGControl\SVGControl.csproj">
       <Project>{d0fee0d9-901a-4fb8-97d1-96a8f634b83c}</Project>
       <Name>SVGControl</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj">
-      <Project>{f2e1680e-1b15-4cf2-bab0-54b8c8f6abdf}</Project>
-      <Name>UtilitiesSwordfish.NET.General</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

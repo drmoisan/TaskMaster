@@ -294,10 +294,6 @@
       <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
       <Name>UtilitiesCS</Name>
     </ProjectReference>
-    <ProjectReference Include="..\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj">
-      <Project>{f2e1680e-1b15-4cf2-bab0-54b8c8f6abdf}</Project>
-      <Name>UtilitiesSwordfish.NET.General</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\MSTest.Analyzers.4.2.2\analyzers\dotnet\cs\MSTest.Analyzers.CodeFixes.dll" />

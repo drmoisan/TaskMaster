@@ -268,17 +268,6 @@ namespace QuickFiler.Controllers
             }
         }
 
-        private static void UpdateForMove(
-            MailItem mailItem,
-            string fldr,
-            CtfMap ctfMap,
-            ISubjectMapSco subMap
-        )
-        {
-            ctfMap.Add(mailItem.ConversationID, fldr, 1);
-            subMap.Add(mailItem.Subject, fldr);
-        }
-
         //TODO: Implement SaveMessageAsMSG
         private static void SaveMessageAsMSG(string fileSystem_LOC, IList<MailItem> selItems)
         {

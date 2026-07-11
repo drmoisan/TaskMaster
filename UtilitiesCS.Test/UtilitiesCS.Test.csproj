@@ -390,12 +390,9 @@
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Dictionary\ConcurrentObservableDictionaryTests.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollection_Tests.cs" />
     <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollectionSerialization_Tests.cs" />
-    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollectionSenderTests.cs" />
-    <Compile Include="ReusableTypeClasses\Concurrent\Observable\Collection\ConcurrentObservableCollectionLockRecursionTests.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\Concurrent\Observable\ScoDictionaryNewTests.cs" />
     <Compile Include="ReusableTypeClasses\SerializableNew\ScoDictionaryNew_OnDiskCompatibility_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ObservableCollectionBatchUpdate_Tests.cs" />
-    <Compile Include="ReusableTypeClasses\ObservableDictionary_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ObserverHelper_Tests.cs" />
     <Compile Include="ReusableTypeClasses\DictionaryChangedEventArgs_Tests.cs" />
     <Compile Include="ReusableTypeClasses\BagChangedEventArgs_Tests.cs" />
@@ -848,10 +845,6 @@
     <ProjectReference Include="..\UtilitiesCS\UtilitiesCS.csproj">
       <Project>{46628ec9-8a89-491e-84a2-6cf3069ba011}</Project>
       <Name>UtilitiesCS</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj">
-      <Project>{f2e1680e-1b15-4cf2-bab0-54b8c8f6abdf}</Project>
-      <Name>UtilitiesSwordfish.NET.General</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

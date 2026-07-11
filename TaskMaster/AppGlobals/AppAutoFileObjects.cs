@@ -184,7 +184,7 @@ namespace TaskMaster
         {
             if (_parent.FS.SpecialFolders.TryGetValue("PythonStaging", out var pythonStaging))
             {
-                // File-based deserialize via the clean SloStack Static path (Swordfish-free).
+                // File-based deserialize via the clean SloStack Static path (vendored-dependency-free).
                 // Uses only the implemented file-based deserialize path — none of the four
                 // stubbed SloLinkedList ISmartSerializable members are exercised.
                 var movedMails = SloStack<IMovedMailInfo>.Static.Deserialize(

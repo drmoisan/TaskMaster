@@ -8,7 +8,7 @@ namespace UtilitiesCS.Test.ReusableTypeClasses.SerializableNew
 {
     /// <summary>
     /// On-disk serialization compatibility tests for the persisted dictionaries migrated to the
-    /// Swordfish-free <see cref="ScoDictionaryNew{TKey, TValue}"/> lineage (issue #306, child F1).
+    /// vendored-dependency-free <see cref="ScoDictionaryNew{TKey, TValue}"/> lineage (issue #306, child F1).
     ///
     /// The four persisted dictionaries covered here (DictRemap, FilteredFolderScraping, FolderRemap,
     /// and the SubjectMap Encoder) store a flat <c>{"key": value}</c> JSON object on disk. The
