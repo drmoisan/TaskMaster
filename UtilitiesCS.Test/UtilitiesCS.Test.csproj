@@ -411,7 +411,6 @@
     <Compile Include="ReusableTypeClasses\TimedQueueOfActions_Tests.cs" />
     <Compile Include="ReusableTypeClasses\TimedAsyncTask_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ScoDictionaryNew_Tests.cs" />
-    <Compile Include="ReusableTypeClasses\ScoSortedDictionary_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SloLinkedList_Tests.cs" />
     <Compile Include="ReusableTypeClasses\LockingObservableLinkedList_Tests.cs" />
     <Compile Include="ReusableTypeClasses\LockingObservableLinkedListNode_Tests.cs" />

@@ -1,0 +1,8 @@
+# Phase 0 — C# Nullable/Type-Check Baseline (P0-T4)
+
+- Timestamp: 2026-07-10T23:32
+- Command: `"C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/MSBuild.exe" TaskMaster.sln -t:Rebuild -p:Configuration=Debug -p:Platform="Any CPU" -p:Nullable=enable -p:TreatWarningsAsErrors=true` (repo root; dash-switch form, `-t:Rebuild` required to force recompilation of vendored projects that are otherwise skipped as up-to-date under an incremental `-t:Build` — see project memory `project_build_test_env`)
+- EXIT_CODE: 1
+- Output Summary: `Build FAILED.` — 0 Warning(s), 84 Error(s). All 84 errors originate exclusively from the two vendored, non-scope-lock projects `SVGControl\SVGControl.csproj` and `UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj` (pre-existing nullable-flow diagnostics: `CS8600`/`CS8601`/`CS8603`/`CS8604`/`CS8619`/`CS8625` — possible-null assignments/returns/arguments/conversions in `MostRecentlyUsedDictionary.cs`, `ObservableDictionary.cs`, `ConcurrentObservableBase.cs`, `ConcurrentObservableDictionary.cs`, `ConcurrentObservableCollection.cs`, `DispatcherQueueProcessor.cs`). Zero errors reference `ScoSortedDictionary`, `UtilitiesCS.csproj`, or `UtilitiesCS.Test.csproj`. This is documented pre-existing nullable-gate debt confined to vendored Swordfish/SVGControl code (see project memory `project_repo_sdk_and_nullable_rebuild`), unrelated to and out of scope for this deletion-only change. The baseline is recorded as-is (EXIT_CODE 1) for no-regression comparison against the Phase 2 final-QC run.
+
+Full build log preserved at (session scratchpad, not committed): `p0t4_nullable_baseline.log`.
