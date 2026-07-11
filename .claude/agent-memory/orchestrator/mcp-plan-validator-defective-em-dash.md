@@ -1,11 +1,13 @@
 ---
 name: mcp-plan-validator-defective-em-dash
-description: The MCP plan validator rejects the canonical em-dash phase headings used by every repo plan (incl. merged ones) — it is not a usable plan gate here
+description: The MCP plan validator's em-dash rejection is version-dependent — it PASSED em-dash+LF plans on 2026-07-10; verify behavior in the current bundle before trusting or distrusting it
 metadata:
   type: reference
 ---
 
-`mcp__drm-copilot__validate_orchestration_artifacts` with `artifact_type: "plan"` is DEFECTIVE in the worktree bundle: it rejects the canonical `### Phase N — <Title>` heading (em-dash U+2014) with "phase heading must match `### Phase N — <Title>`" / "Plan does not contain any canonical phase headings", and also rejects a plain-hyphen `-` heading. Calibrated against F1's already-MERGED plan (`.../store-disable-service-261/plan.2026-07-07T18-00.md`, PR #275): it fails identically. So it rejects known-good shipped plans and cannot be the gate.
+UPDATE 2026-07-10 (worktree agent-a0bb15bdb226acc2c, swordfish epic F1 prep): `mcp__drm-copilot__validate_orchestration_artifacts` with `artifact_type: "plan"` ACCEPTED the canonical `### Phase N — <Title>` em-dash headings (U+2014) with LF line endings — returned `ok:true` on all four preflight-revision passes of `plan.2026-07-10T20-14.md`. This directly contradicts the earlier "rejects em-dash" finding below. The bundle appears to have been fixed/updated between sessions. Treat the em-dash-rejection claim as version-dependent: run the validator and observe the actual result rather than assuming a defect. Also note both `atomic-planner` and `atomic-executor` subagents reported the MCP validator tool as "not available" — that is expected (it is exposed to the orchestrator, not to those subagents); run it yourself from the main thread. See [[mcp-tools-available-to-orchestrator]].
+
+PRIOR FINDING (earlier session, may be a superseded bundle): it rejected the canonical `### Phase N — <Title>` heading (em-dash U+2014) with "phase heading must match `### Phase N — <Title>`" / "Plan does not contain any canonical phase headings", and also rejected a plain-hyphen `-` heading. Calibrated against F1's already-MERGED plan (`.../store-disable-service-261/plan.2026-07-07T18-00.md`, PR #275): it failed identically.
 
 The local `.claude/hooks/validate-planner-output.ps1` uses a hyphen-only regex `^### Phase (?<Phase>\d+)\s+-\s+...` that ALSO fails em-dash, yet did not fatally block the atomic-planner SubagentStop (planner returned normally with em-dash). Em-dash is canonical per the `atomic-plan-contract` skill and every committed plan in the repo.
 
