@@ -336,6 +336,29 @@ namespace TaskVisualization.Test
         }
 
         [TestMethod]
+        public void AssignPeople_PassesOutlookItemWrapper_NotInnerObject()
+        {
+            // Regression for issue #322: AssignPeople() must pass the same IOutlookItem wrapper
+            // (Active.OlItem) that AssignContext/AssignProject/AssignTopic pass, not
+            // Active.OlItem.InnerObject (the raw, unwrapped Outlook COM object). Passing the raw
+            // object bypasses AutoAssignPeople.AutoFind's dedicated IOutlookItem-wrapped-mail
+            // branch, which is why the auto-tag function silently does nothing for People.
+            var view = new MoqTaskViewer();
+            var prompt = new Mock<ITagPromptService>();
+            TagPromptRequest captured = null;
+            prompt
+                .Setup(x => x.Prompt(It.IsAny<TagPromptRequest>()))
+                .Callback<TagPromptRequest>(r => captured = r)
+                .Returns(new TagPromptResult(cancelled: true, selection: ""));
+            var controller = TaskControllerFixtures.BuildController(view, tagPrompt: prompt);
+
+            controller.AssignPeople();
+
+            captured.Should().NotBeNull();
+            captured.ObjItemObject.Should().BeSameAs(controller.Active.OlItem);
+        }
+
+        [TestMethod]
         public void AssignContext_Selection_UpdatesActiveAndFacade()
         {
             var view = new MoqTaskViewer();

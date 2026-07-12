@@ -102,6 +102,36 @@ namespace TaskVisualization.Test
         }
 
         [TestMethod]
+        public void AutoFind_OutlookItemMailBranch_RoutesThroughToHelperSeam()
+        {
+            // The IOutlookItem-wrapped-mail branch (AutoAssignPeople.cs:70-76) is the branch the
+            // corrected People argument (Active.OlItem, the wrapper) reaches after the issue #322
+            // fix. It constructs the helper via the synchronous _toHelper seam (called with
+            // olItem.InnerObject) before reaching the exempt classifier. A throwing stub proves
+            // the seam is on the AutoFind execution path for this wrapper shape, without invoking
+            // the COM/dialog-bound recipient matcher.
+            var seamInvoked = false;
+            object seamArg = null;
+            MailItemHelper ThrowingSeam(object o)
+            {
+                seamInvoked = true;
+                seamArg = o;
+                throw new InvalidOperationException("seam-invoked");
+            }
+
+            var sut = new AutoAssignPeople(BuildGlobals().Object, toHelper: ThrowingSeam);
+            var mail = new Mock<MailItem>().Object;
+            var outlookItem = new Mock<IOutlookItem>();
+            outlookItem.SetupGet(x => x.InnerObject).Returns(mail);
+
+            System.Action act = () => sut.AutoFind(outlookItem.Object);
+
+            act.Should().Throw<InvalidOperationException>().WithMessage("seam-invoked");
+            seamInvoked.Should().BeTrue();
+            seamArg.Should().BeSameAs(mail);
+        }
+
+        [TestMethod]
         public void AddChoicesToDict_PassesMailItemThrough_ReturnsPeopleDictionaryResult()
         {
             // AddChoicesToDict forwards the live MailItem to the injected People
