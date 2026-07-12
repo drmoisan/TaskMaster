@@ -16,3 +16,4 @@
 - [tagcontroller-refactor-293](project_tagcontroller_refactor_293.md) — #293/epic #295: ITagViewer/IForm gaps, Tags orphan files, IUserPrompt+DrawFocus seams, PrefixItem NotImplemented, live-form test migration (2026-07-09)
 - [swordfish-removal-epic-306](project_swordfish_removal_epic_306.md) — #306 F1 dictionary lineage: legacy flat JSON (no $type) round-trips via ScoDictionaryNew default path; avoid globals converter; scoping vs F2/F3/F5 (2026-07-10)
 - [legacy-scodictionary-removal-315](project_legacy_scodictionary_removal_315.md) — #315: DELETE SCODictionary_Tests(+Additional), RETARGET 3 SmartSerializable* test files, IScoDictionary interface safe to keep for F5 (2026-07-11)
+- [lock-recursion-coverage-317](project_lock_recursion_coverage_317.md) — #317: deleted LockRecursionTests.cs is a restoration (F2-authored clean-base coverage F5 knowingly removed per WI-4), not new authoring; no git/shell tool this session (2026-07-11)
