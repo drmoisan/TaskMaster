@@ -51,6 +51,32 @@ namespace Tags.Test
         }
 
         [TestMethod]
+        public void ResolveMailItem_OutlookItemWrappedMail_ReturnsInnerMailItem()
+        {
+            // Regression for issue #322: after AssignPeople() started passing the IOutlookItem
+            // wrapper (instead of its raw InnerObject), ResolveMailItem must also recognize a
+            // wrapped mail item so _isMail (and therefore the auto-assign button) is still set,
+            // mirroring AutoAssignPeople.AutoFind's own IOutlookItem-wrapped-mail branch.
+            var viewer = new FakeTagViewer();
+            var innerMail = new Mock<MailItem>().Object;
+            var outlookItem = new Mock<IOutlookItem>();
+            outlookItem.SetupGet(x => x.InnerObject).Returns(innerMail);
+            var autoAssigner = new Mock<IAutoAssign>(MockBehavior.Loose);
+            autoAssigner.SetupGet(x => x.FilterList).Returns(new List<string>());
+            var controller = BuildWithAutoAssign(
+                viewer,
+                new Mock<IUserPrompt>(MockBehavior.Loose).Object,
+                autoAssigner.Object,
+                null
+            );
+
+            controller.ResolveMailItem(outlookItem.Object).Should().BeSameAs(innerMail);
+            controller.ResolveMailItem("not an outlook item").Should().BeNull();
+
+            DisposeOptions(viewer);
+        }
+
+        [TestMethod]
         public void GetUserInputCategory_WithPrefilledName_RoutesThroughPrompt()
         {
             var viewer = new FakeTagViewer();

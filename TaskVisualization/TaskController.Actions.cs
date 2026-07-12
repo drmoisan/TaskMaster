@@ -43,7 +43,7 @@ namespace TaskVisualization
                     prefixes: _defaults.PrefixList,
                     selections: selections,
                     prefixKey: prefix.Key,
-                    objItemObject: _active.OlItem.InnerObject,
+                    objItemObject: _active.OlItem,
                     userEmailAddress: _userEmailAddress,
                     caption: string.Empty
                 )

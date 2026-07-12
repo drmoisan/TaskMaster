@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
+using UtilitiesCS.OutlookExtensions;
 
 namespace Tags
 {
@@ -102,6 +103,13 @@ namespace Tags
             if ((objItem is not null) && (objItem is MailItem))
             {
                 return (MailItem)_objItem;
+            }
+            else if (
+                objItem is IOutlookItem olItem
+                && olItem.GetOlItemType() == OlItemType.olMailItem
+            )
+            {
+                return olItem.InnerObject as MailItem;
             }
             else
                 return null;
