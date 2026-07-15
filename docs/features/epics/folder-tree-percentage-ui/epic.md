@@ -14,30 +14,27 @@ intent:
     - Full C# toolchain (csharpier, .NET analyzers, nullable, MSTest) green for every child feature; changed and new code meets repository coverage thresholds.
     - The QuickFiler inline-image fix carries a dedicated regression test per the repository Bugfix Workflow and does not alter the compact-mode rendering call path beyond cid: resolution.
 features:
-  - issue_num: 9001
-    feature_folder: folder-probability-plumbing
+  - issue_num: 324
+    feature_folder: 2026-07-15-folder-probability-plumbing-324
     depends_on: []
-  - issue_num: 9002
-    feature_folder: efcviewer-folder-tree-percentage
-    depends_on: [9001]
-  - issue_num: 9003
-    feature_folder: quickfiler-folder-tree-percentage
-    depends_on: [9001]
-  - issue_num: 9004
-    feature_folder: quickfiler-inline-image-cid-fix
+  - issue_num: 327
+    feature_folder: 2026-07-15-efcviewer-folder-tree-percentage-327
+    depends_on: [324]
+  - issue_num: 325
+    feature_folder: 2026-07-15-quickfiler-folder-tree-percentage-325
+    depends_on: [324]
+  - issue_num: 326
+    feature_folder: 2026-07-15-quickfiler-inline-image-cid-fix-326
     depends_on: []
 ---
 
 # Epic: Expandable Folder Tree, Percentage Display, and QuickFiler Inline-Image Fix
 
 - Integration branch: `epic/folder-tree-percentage-ui-integration`
-- Status: Planning phase in progress. `issue_num` values above are placeholders and are
-  back-filled from each child's promotion receipt as preparation completes; `depends_on` is
-  rewritten to the resolved issue numbers before the kickoff artifact is written.
-
-> Note: the `issue_num` and `feature_folder` values are placeholders at authoring time and are
-> resolved to concrete values during preparation. This manifest is committed in final, resolved
-> form before the kickoff prompt is emitted.
+- Status: Manifest resolved. Each child feature has been promoted to a GitHub issue and its
+  active feature folder created; `issue_num`, `feature_folder`, and `depends_on` above are the
+  final resolved values. Child preparation (research, spec/user-story, atomic plan, preflight
+  clearance) fans in to this integration branch per feature as it completes.
 
 ## Goal
 
