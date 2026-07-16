@@ -233,12 +233,21 @@ namespace QuickFiler.Controllers.Tests
         )
         {
             var viewer = (EfcViewer)FormatterServices.GetUninitializedObject(typeof(EfcViewer));
-            viewer.FolderListBox = new ListBox();
-            viewer.FolderListBox.Items.Add(selectedFolder);
-            viewer.FolderListBox.SelectedIndex = 0;
+            viewer.FolderListBox = new BrightIdeasSoftware.TreeListView();
             var formController = (EfcFormController)
                 FormatterServices.GetUninitializedObject(typeof(EfcFormController));
             SetPrivateField(formController, "_formViewer", viewer);
+            // SelectedFolder now derives from the cached highlighted FolderSuggestionNode; inject it
+            // directly because the TreeListView cannot select an item without a native window handle.
+            SetPrivateField(
+                formController,
+                "_selectedNode",
+                new FolderSuggestionNode(
+                    selectedFolder,
+                    selectedFolder,
+                    FolderSuggestionNodeKind.Folder
+                )
+            );
             formController.SaveAttachments = saveAttachments;
             formController.SaveEmail = saveEmail;
             formController.SavePictures = savePictures;
