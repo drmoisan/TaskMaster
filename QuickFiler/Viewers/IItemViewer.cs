@@ -78,6 +78,12 @@ namespace QuickFiler
         // string[] so the controller can read the folder list (EnumerateConversation) without the raw
         // ComboBox; the underlying controls remain public on the concrete ItemViewer.
         void SetFolderItems(string[] items);
+
+        // Additive intent member (#325): populates the folder dropdown from the ordered FolderRow
+        // contract (FolderPredictor.FolderRowArray / FindFolderRows), building the expandable folder
+        // tree and the right-aligned prediction percentages. Additive alongside — not a replacement
+        // for — SetFolderItems(string[]), which live controller call sites still use.
+        void SetFolderSuggestions(IReadOnlyList<UtilitiesCS.FolderRow> rows);
         string GetSelectedFolder();
         void SetFolderSelectedIndex(int index);
         void SetFolderSelectedItem(string item);

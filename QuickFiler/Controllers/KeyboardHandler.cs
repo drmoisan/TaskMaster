@@ -542,7 +542,17 @@ namespace QuickFiler.Controllers
                 //    }
                 case Keys.Right:
                 {
-                    var controller = cbo.GetAncestor<ItemViewer>();
+                    // #325: with the dropdown open and a folder-tree node highlighted, Right expands
+                    // it (no-op for a leaf or an already-expanded node). The transition itself is in
+                    // the unit-tested FolderTreeStateModel; only route to it here. When nothing
+                    // expands, fall through to the legacy Pop Out / Enumerate dialog.
+                    if (cbo.GetAncestor<ItemViewer>().FolderTreeRightArrow())
+                    {
+                        e.SuppressKeyPress = true;
+                        e.Handled = true;
+                        break;
+                    }
+
                     e.SuppressKeyPress = true;
                     e.Handled = true;
 
@@ -554,7 +564,24 @@ namespace QuickFiler.Controllers
                     );
                     break;
                 }
-                case Keys k when (k == Keys.Left || k == Keys.Return || k == Keys.Escape):
+                case Keys.Left:
+                {
+                    // #325: with the dropdown open and a folder-tree node highlighted, Left collapses
+                    // it (no-op for a leaf or an already-collapsed node). On a no-op, fall through to
+                    // the legacy behavior that closes the dropdown.
+                    if (cbo.GetAncestor<ItemViewer>().FolderTreeLeftArrow())
+                    {
+                        e.SuppressKeyPress = true;
+                        e.Handled = true;
+                        break;
+                    }
+
+                    UiThread.Dispatcher.Invoke(() => cbo.DroppedDown = false);
+                    e.SuppressKeyPress = true;
+                    e.Handled = true;
+                    break;
+                }
+                case Keys k when (k == Keys.Return || k == Keys.Escape):
                 {
                     // Close the drop down box
                     UiThread.Dispatcher.Invoke(() => cbo.DroppedDown = false);

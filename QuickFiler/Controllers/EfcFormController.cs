@@ -129,6 +129,17 @@ namespace QuickFiler.Controllers
         private System.Action _parentCleanup;
         private EfcDataModel _dataModel;
         private EfcViewer _formViewer;
+
+        // Presented folder-suggestion rows and the host-neutral tree they build. The tree is rebuilt
+        // whenever the presented rows change; _folderRows retains the last raw rows so the delete path
+        // can prepend "Trash to Delete" and rebind.
+        private FolderSuggestionTree _folderTree;
+        private string[] _folderRows = Array.Empty<string>();
+
+        // The currently highlighted tree node, cached from the TreeListView SelectionChanged event so
+        // SelectedFolder/IsValidSelection derive the filing path from the selected node.
+        private FolderSuggestionNode _selectedNode;
+
         private EfcHomeController _homeController;
         private EfcItemController _itemController;
         private ItemViewer _itemViewer;
@@ -277,7 +288,11 @@ namespace QuickFiler.Controllers
 
         public string SelectedFolder
         {
-            get => _formViewer.FolderListBox.SelectedItem as string;
+            // The selected TreeListView model is a FolderSuggestionNode (cached in _selectedNode from
+            // SelectionChanged); its FullPath is the folder identity used for filing. Banner nodes
+            // carry the banner text (which starts with "===="), so IsValidSelection continues to
+            // reject them.
+            get => _selectedNode?.FullPath;
         }
 
         private bool _saveAttachments;
@@ -376,6 +391,7 @@ namespace QuickFiler.Controllers
             _formViewer.ConversationMenuItem.CheckedChanged += MoveConversation_CheckedChanged;
             _formViewer.Ok.Click += ButtonOK_Click;
             RegisterAlwaysOnAsyncKeyActions();
+            ConfigureFolderTreeView();
             _formViewer.FolderListBox.KeyDown += FolderListBox_KeyDown;
             _formViewer.Cancel.Click += ButtonCancel_Click;
             _formViewer.RefreshPredicted.Click += ButtonRefresh_Click;
@@ -401,8 +417,22 @@ namespace QuickFiler.Controllers
             {
                 _formViewer.SearchText.Select();
             }
-            else if (e.KeyCode == Keys.Left) { }
-            else if (e.KeyCode == Keys.Right) { }
+            else if (e.KeyCode == Keys.Left)
+            {
+                // Collapse the highlighted node. The TreeListView (configured with
+                // CanExpandGetter/ChildrenGetter) already collapses the focused row natively on the
+                // Left arrow; this delegates to the host-neutral state model to keep it in sync
+                // without duplicating the control's own toggle (LeftArrow is a no-op on a leaf, an
+                // already-collapsed node, or a banner).
+                _folderTree?.LeftArrow(_selectedNode);
+            }
+            else if (e.KeyCode == Keys.Right)
+            {
+                // Expand the highlighted node; mirrors the native TreeListView Right-arrow behavior in
+                // the host-neutral state model (RightArrow is a no-op on a leaf, an already-expanded
+                // node, or a banner).
+                _folderTree?.RightArrow(_selectedNode);
+            }
         }
 
         public async void ButtonCancel_Click(object sender, EventArgs e)
@@ -548,13 +578,7 @@ namespace QuickFiler.Controllers
 
         private void SearchText_TextChanged(object sender, EventArgs e)
         {
-            _formViewer.FolderListBox.DataSource = _dataModel.FindMatches(
-                _formViewer.SearchText.Text
-            );
-            if (_formViewer.FolderListBox.Items.Count > 1)
-            {
-                _formViewer.FolderListBox.SelectedIndex = 1;
-            }
+            BindFolderRows(_dataModel.FindMatches(_formViewer.SearchText.Text));
         }
 
         public void EditFiltersMenuItem_Click(object sender, EventArgs e)
@@ -700,7 +724,8 @@ namespace QuickFiler.Controllers
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
-            if (((string)_formViewer.FolderListBox.SelectedItem).StartsWith("===="))
+            var selectedFolder = SelectedFolder;
+            if (selectedFolder is null || selectedFolder.StartsWith("===="))
             {
                 MessageBox.Show("Please select a valid folder.");
                 return;
@@ -737,10 +762,11 @@ namespace QuickFiler.Controllers
         public async Task ActionDeleteAsync()
         {
             await _formViewer.UiSyncContext;
-            var items = (string[])_formViewer.FolderListBox.DataSource;
-            var itemList = items.ToList();
+            // Prepend the "Trash to Delete" pseudo-row to the current presented rows and rebind, so the
+            // user can select it as the delete target (preserving the pre-TreeListView delete path).
+            var itemList = _folderRows.ToList();
             itemList.Insert(0, "Trash to Delete");
-            _formViewer.FolderListBox.DataSource = itemList.ToArray();
+            BindFolderRows(itemList.ToArray());
         }
 
         public async Task CreateFolderAsync()
@@ -796,11 +822,7 @@ namespace QuickFiler.Controllers
                 Token
             );
 
-            _formViewer.FolderListBox.DataSource = matches;
-            if (_formViewer.FolderListBox.Items.Count > 0)
-            {
-                _formViewer.FolderListBox.SelectedIndex = 1;
-            }
+            BindFolderRows(matches);
         }
 
         #endregion
@@ -824,6 +846,96 @@ namespace QuickFiler.Controllers
             await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
             //await _formViewer.UiSyncContext;
             control.Focus();
+        }
+
+        // Configures the TreeListView once: the tree glyph/children come from the host-neutral node
+        // model, and the two columns render the folder name and the right-aligned whole-number percent.
+        private void ConfigureFolderTreeView()
+        {
+            var tlv = _formViewer.FolderListBox;
+            tlv.CanExpandGetter = model => (model as FolderSuggestionNode)?.HasChildren ?? false;
+            tlv.ChildrenGetter = model => (model as FolderSuggestionNode)?.Children;
+            tlv.SelectionChanged += FolderListBox_SelectionChanged;
+            _formViewer.olvColumnFolder.AspectGetter = model =>
+                (model as FolderSuggestionNode)?.DisplayName ?? string.Empty;
+            _formViewer.olvColumnPercent.AspectGetter = model =>
+                PercentageFormatter.FormatPercent((model as FolderSuggestionNode)?.Probability);
+        }
+
+        // Caches the highlighted node so SelectedFolder/IsValidSelection and the Left/Right key
+        // transitions read the current selection without touching the control on each access.
+        private void FolderListBox_SelectionChanged(object sender, EventArgs e)
+        {
+            _selectedNode = _formViewer?.FolderListBox.SelectedObject as FolderSuggestionNode;
+        }
+
+        // Builds the host-neutral suggestion tree from the presented rows, joins upstream
+        // probabilities, and feeds the TreeListView. Selects the first row after the leading banner,
+        // matching the prior ListBox behavior (index 1). Uses a local viewer reference so a concurrent
+        // Cleanup() that nulls _formViewer cannot cause a NullReferenceException.
+        private void BindFolderRows(string[] rows)
+        {
+            var formViewer = _formViewer;
+            if (formViewer == null)
+            {
+                return;
+            }
+
+            _folderRows = rows ?? Array.Empty<string>();
+            var tree = FolderSuggestionTree.BuildFromRows(_folderRows);
+
+            var source = BuildProbabilitySource();
+            if (source != null)
+            {
+                new FolderProbabilityAdapter(source).Apply(tree);
+            }
+
+            _folderTree = tree;
+            _selectedNode = null;
+
+            var tlv = formViewer.FolderListBox;
+            tlv.SetObjects(tree.Roots);
+            if (tlv.Items.Count > 1)
+            {
+                tlv.SelectedIndex = 1;
+            }
+        }
+
+        // Projects the scored suggestions into a full-path -> probability lookup consumed by the
+        // FolderProbabilityAdapter. Returns null when no scored suggestions are available, in which
+        // case every percentage cell renders blank.
+        private IFolderProbabilitySource BuildProbabilitySource()
+        {
+            var scores = _dataModel?.FolderHelper?.Suggestions?.ToScoredArray();
+            if (scores == null || scores.Length == 0)
+            {
+                return null;
+            }
+
+            return new DictionaryProbabilitySource(scores);
+        }
+
+        // Thin, exempt implementation of the host-neutral 9001 seam backed by the merged
+        // FolderScore projection (FolderPath -> Probability in [0,1]).
+        [ExcludeFromCodeCoverage]
+        private sealed class DictionaryProbabilitySource : IFolderProbabilitySource
+        {
+            private readonly Dictionary<string, double> _map;
+
+            public DictionaryProbabilitySource(IEnumerable<FolderScore> scores)
+            {
+                _map = new Dictionary<string, double>(StringComparer.Ordinal);
+                foreach (var score in scores)
+                {
+                    // Last value wins for duplicate paths; avoids an add-collision exception.
+                    _map[score.FolderPath] = score.Probability;
+                }
+            }
+
+            public bool TryGetProbability(string fullFolderPath, out double probability)
+            {
+                return _map.TryGetValue(fullFolderPath, out probability);
+            }
         }
 
         public void MaximizeFormViewer()
@@ -958,11 +1070,7 @@ namespace QuickFiler.Controllers
 
             await formViewer.UiSyncContext;
 
-            formViewer.FolderListBox.DataSource = _dataModel.FolderHelper.FolderArray;
-            if (formViewer.FolderListBox.Items.Count > 0)
-            {
-                formViewer.FolderListBox.SelectedIndex = 1;
-            }
+            BindFolderRows(_dataModel.FolderHelper.FolderArray);
         }
 
         internal bool IsValidSelection

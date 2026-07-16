@@ -776,6 +776,16 @@
     <Compile Include="EmailIntelligence\EmailParsingSorting\MovedMailInfo.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictor.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderRow.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderScore.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderNodeViewModel.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderHierarchyBuilder.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderTreeStateModel.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderSuggestionNode.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderSuggestionTree.cs" />
+    <Compile Include="OutlookObjects\Folder\PercentageFormatter.cs" />
+    <Compile Include="OutlookObjects\Folder\IFolderProbabilitySource.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderProbabilityAdapter.cs" />
     <Compile Include="OutlookObjects\Folder\IFolderSearchHandler.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictor.IFolderSearchHandler.cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\OlFolderHelper\SmithWaterman.cs" />
@@ -824,6 +834,7 @@
     <Compile Include="EmailIntelligence\Flags\FlagTranslator.cs" />
     <Compile Include="EmailIntelligence\IntelligenceFilters.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemHelper.Html.cs" />
+    <Compile Include="OutlookObjects\MailItem\CidImageResolver.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemHelper.Loading.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemHelper.Properties.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemHelper.Serialization.cs" />

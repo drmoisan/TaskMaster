@@ -174,6 +174,16 @@ namespace QuickFiler.Controllers
                 // suggestion is selected. The standalone static PopulateAndSelectFolder is retained
                 // unchanged for its existing unit tests.
                 _itemViewer.SetFolderItems(_folderHandler.FolderArray);
+
+                // #325: additionally hand the row model (folder identity + prediction probability)
+                // to the tree/percentage population path. Sourced verbatim from the #324 contract
+                // FolderPredictor.FolderRowArray; scores are not recomputed here. The Suggestions
+                // guard avoids evaluating the row-model getter on an under-initialized predictor
+                // (production predictors always have a scorer).
+                if (_folderHandler.Suggestions != null)
+                {
+                    _itemViewer.SetFolderSuggestions(_folderHandler.FolderRowArray);
+                }
                 if (
                     !string.IsNullOrEmpty(_predeterminedFolder)
                     && _itemViewer.FolderContains(_predeterminedFolder)

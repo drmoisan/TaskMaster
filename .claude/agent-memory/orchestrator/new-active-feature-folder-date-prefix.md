@@ -19,6 +19,12 @@ context:
   and the winforms-testability epic children on the integration branch all carry
   date prefixes (`2026-07-09-tagcontroller-testability-refactor-293`, `...-296`,
   `...-297`, `...-298`). No `git mv` was needed for the swordfish child.
+  Reconfirmed 2026-07-15: folder-tree-percentage-ui child 9003 preparation
+  produced `2026-07-15-quickfiler-folder-tree-percentage-325` automatically
+  (passing `feature_name=quickfiler-folder-tree-percentage`, `issue_number=325`);
+  the tool added both the date prefix and the trailing issue number. No `git mv`.
+  Swordfish `feature_folder` manifest values retain the date prefix, so the
+  epic-planner back-fills the manifest to the full date-prefixed+issue folder name.
 
 **Why:** The canonical convention is the date-prefixed form for every active
 folder (a user previously flagged missing prefixes on epic children). The current

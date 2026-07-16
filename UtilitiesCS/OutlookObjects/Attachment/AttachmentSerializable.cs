@@ -40,6 +40,9 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
                 FileName = "";
             }
 
+            TryFromContentIdAccessor(a, out var contentId);
+            ContentId = contentId;
+
             Index = a.Index;
             if (Type != OlAttachmentType.olEmbeddeditem)
             {
@@ -115,6 +118,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
 
         public OlAttachmentBlockLevel BlockLevel { get; set; }
         public OlObjectClass Class { get; set; }
+        public string ContentId { get; set; }
         public string DisplayName { get; set; }
         public string FileName { get; set; }
         public int Index { get; set; }
@@ -184,6 +188,23 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
             try
             {
                 bytes = attachment.PropertyAccessor.GetProperty(PR_ATTACH_DATA_BIN);
+            }
+            catch (System.Exception)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        internal bool TryFromContentIdAccessor(Attachment attachment, out string contentId)
+        {
+            const string PR_ATTACH_CONTENT_ID =
+                "http://schemas.microsoft.com/mapi/proptag/0x3712001F";
+            contentId = null;
+            try
+            {
+                contentId = attachment.PropertyAccessor.GetProperty(PR_ATTACH_CONTENT_ID);
             }
             catch (System.Exception)
             {
