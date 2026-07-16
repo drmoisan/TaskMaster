@@ -47,7 +47,9 @@ namespace QuickFiler
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.BtnDelItem = new SVGControl.ButtonSVG();
-            this.FolderListBox = new System.Windows.Forms.ListBox();
+            this.FolderListBox = new BrightIdeasSoftware.TreeListView();
+            this.olvColumnFolder = new BrightIdeasSoftware.OLVColumn();
+            this.olvColumnPercent = new BrightIdeasSoftware.OLVColumn();
             this.Ok = new SVGControl.ButtonSVG();
             this.Cancel = new SVGControl.ButtonSVG();
             this.RefreshPredicted = new SVGControl.ButtonSVG();
@@ -879,16 +881,44 @@ namespace QuickFiler
             // 
             // FolderListBox
             // 
+            ((System.ComponentModel.ISupportInitialize)(this.FolderListBox)).BeginInit();
             this.Tlp.SetColumnSpan(this.FolderListBox, 14);
+            this.FolderListBox.AllColumns.Add(this.olvColumnFolder);
+            this.FolderListBox.AllColumns.Add(this.olvColumnPercent);
+            this.FolderListBox.Columns.AddRange(
+                new System.Windows.Forms.ColumnHeader[]
+                {
+                    this.olvColumnFolder,
+                    this.olvColumnPercent,
+                }
+            );
             this.FolderListBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.FolderListBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FolderListBox.FormattingEnabled = true;
-            this.FolderListBox.ItemHeight = 31;
+            this.FolderListBox.FullRowSelect = true;
+            this.FolderListBox.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.FolderListBox.HideSelection = false;
             this.FolderListBox.Location = new System.Drawing.Point(44, 235);
             this.FolderListBox.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.FolderListBox.Name = "FolderListBox";
+            this.FolderListBox.OwnerDraw = true;
+            this.FolderListBox.ShowGroups = false;
             this.FolderListBox.Size = new System.Drawing.Size(3728, 1);
             this.FolderListBox.TabIndex = 11;
+            this.FolderListBox.UseCompatibleStateImageBehavior = false;
+            this.FolderListBox.View = System.Windows.Forms.View.Details;
+            ((System.ComponentModel.ISupportInitialize)(this.FolderListBox)).EndInit();
+            //
+            // olvColumnFolder
+            //
+            this.olvColumnFolder.AspectName = "DisplayName";
+            this.olvColumnFolder.Text = "Folder";
+            this.olvColumnFolder.Width = 3200;
+            //
+            // olvColumnPercent
+            //
+            this.olvColumnPercent.Text = "%";
+            this.olvColumnPercent.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.olvColumnPercent.Width = 500;
             // 
             // Ok
             // 
@@ -4247,7 +4277,9 @@ namespace QuickFiler
         internal System.Windows.Forms.Label label1;
         internal System.Windows.Forms.Label label2;
         internal ButtonSVG BtnDelItem;
-        internal System.Windows.Forms.ListBox FolderListBox;
+        internal BrightIdeasSoftware.TreeListView FolderListBox;
+        internal BrightIdeasSoftware.OLVColumn olvColumnFolder;
+        internal BrightIdeasSoftware.OLVColumn olvColumnPercent;
         internal ButtonSVG Ok;
         internal ButtonSVG Cancel;
         internal ButtonSVG RefreshPredicted;

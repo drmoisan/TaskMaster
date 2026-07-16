@@ -24,6 +24,13 @@ FAIL row (coverage) can coexist for the same language; the gate needs >=1 FAIL r
   ratio) for PowerShell/C#. Note C# `artifacts/csharp/coverage.xml` is Cobertura, has no `<counter>`
   elements, so the hook returns `$null` repo-wide and skips the numeric gate — a `PASS` C# row is
   fine (see [[csharp-coverage-artifact-is-cobertura]]).
+- An ABSENT canonical artifact also yields `$null` repo-wide (Get-Jacoco/LcovRepoCoverage returns
+  null when the file is missing), so the numeric below-85 forced-FAIL branch is skipped exactly like
+  the Cobertura case. Confirmed #327: instructed NOT to write `artifacts/csharp/coverage.xml` (avoids
+  a false 85% FAIL against a pre-existing repo-wide 77.5% exemption); a documented `PASS` C# coverage
+  row plus a prose pre-existing-exemption disposition passed the hook (simulated Ok=True). Deliberately
+  not producing coverage.xml is a valid tactic when repo-wide is a ratified pre-existing below-floor
+  condition and the change-scope gates (new-code >=90%, no changed-line regression) hold.
 - Branch: hook checks `//counter[@type="BRANCH"]`; Pester JaCoCo often has none → `$null` → skipped.
 - Never put a narrowing token (`N/A`, `not applicable`, `out of scope`, `UNVERIFIED`,
   `informational only`, `context only`) on ANY coverage-scoped row for a changed language.

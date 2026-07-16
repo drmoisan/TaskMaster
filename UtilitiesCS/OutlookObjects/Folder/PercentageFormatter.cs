@@ -1,31 +1,35 @@
+#nullable enable
 using System;
+using System.Globalization;
 
 namespace UtilitiesCS
 {
     /// <summary>
-    /// Pure, host-neutral formatter that renders a prediction probability (a <c>double</c> fraction
-    /// in <c>[0,1]</c>, sourced verbatim from <see cref="FolderScore.Probability"/>) as a
-    /// whole-number percentage string such as <c>"43%"</c>. Out-of-range input is clamped to
-    /// <c>[0,1]</c> and midpoint values round away from zero. This seam carries the
-    /// percentage-formatting rule for the QuickFiler folder dropdown and is NOT coverage-exempt.
+    /// Host-neutral formatter for the EfcViewer suggestion percentage column. Converts a consumed
+    /// probability in <c>[0,1]</c> into a whole-number percent string (no decimal places), and yields
+    /// an empty string when no probability is available. The value is never recomputed here.
     /// </summary>
     public static class PercentageFormatter
     {
         /// <summary>
-        /// Formats a probability in <c>[0,1]</c> as a whole-number percentage string (for example
-        /// <c>0.4267 =&gt; "43%"</c>, <c>1.0 =&gt; "100%"</c>, <c>0.0 =&gt; "0%"</c>). Input outside
-        /// <c>[0,1]</c> is clamped before formatting; the scaled value is rounded to the nearest
-        /// integer with midpoint rounding away from zero.
+        /// Formats a probability as a whole-number percent string.
         /// </summary>
-        /// <param name="probability">A relative-confidence fraction; clamped to <c>[0,1]</c>.</param>
-        /// <returns>The whole-number percentage followed by a percent sign.</returns>
-        public static string Format(double probability)
+        /// <param name="probability">
+        /// The consumed probability in <c>[0,1]</c>, or <c>null</c> when the row carries no probability.
+        /// </param>
+        /// <returns>
+        /// The rounded whole-number percent followed by <c>"%"</c> (for example <c>0.732 -> "73%"</c>),
+        /// rounding at the midpoint away from zero; an empty string when <paramref name="probability"/> is null.
+        /// </returns>
+        public static string FormatPercent(double? probability)
         {
-            // Clamp to [0,1]. Math.Clamp is unavailable on this net48 target, so the bounds are
-            // applied explicitly with the identical semantics.
-            double clamped = probability < 0.0 ? 0.0 : (probability > 1.0 ? 1.0 : probability);
-            int percent = (int)Math.Round(clamped * 100.0, MidpointRounding.AwayFromZero);
-            return percent + "%";
+            if (probability == null)
+            {
+                return string.Empty;
+            }
+
+            long percent = (long)Math.Round(probability.Value * 100, MidpointRounding.AwayFromZero);
+            return percent.ToString(CultureInfo.InvariantCulture) + "%";
         }
     }
 }

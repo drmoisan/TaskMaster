@@ -1,60 +1,59 @@
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UtilitiesCS;
 
 namespace UtilitiesCS.Test.OutlookObjects.Folder
 {
     /// <summary>
-    /// Tests for <see cref="UtilitiesCS.PercentageFormatter"/>, the pure host-neutral seam that
-    /// renders a <c>[0,1]</c> probability (sourced from <see cref="UtilitiesCS.FolderScore.Probability"/>)
-    /// as a whole-number percentage string. Covers the representative examples from the spec, midpoint
-    /// rounding away-from-zero, and clamping of out-of-range input.
+    /// Tests for <see cref="UtilitiesCS.PercentageFormatter.FormatPercent"/>: whole-number percent
+    /// rendering with no decimals, midpoint-away-from-zero rounding at the <c>.5</c> boundary, the
+    /// <c>0</c> and <c>1</c> endpoints, and a blank string for a null probability.
     /// </summary>
     [TestClass]
     public class PercentageFormatterTests
     {
         [TestMethod]
-        public void Format_TypicalFraction_RoundsToNearestWholePercent()
+        public void FormatPercent_Zero_ReturnsZeroPercent()
         {
-            // Arrange / Act
-            var result = UtilitiesCS.PercentageFormatter.Format(0.4267);
-
-            // Assert: 0.4267 * 100 = 42.67 -> 43
-            result.Should().Be("43%");
+            PercentageFormatter.FormatPercent(0.0).Should().Be("0%");
         }
 
         [TestMethod]
-        public void Format_One_RendersHundredPercent()
+        public void FormatPercent_One_ReturnsHundredPercent()
         {
-            UtilitiesCS.PercentageFormatter.Format(1.0).Should().Be("100%");
+            PercentageFormatter.FormatPercent(1.0).Should().Be("100%");
         }
 
         [TestMethod]
-        public void Format_Zero_RendersZeroPercent()
+        public void FormatPercent_TypicalValue_RoundsToWholePercent()
         {
-            UtilitiesCS.PercentageFormatter.Format(0.0).Should().Be("0%");
+            PercentageFormatter.FormatPercent(0.732).Should().Be("73%");
         }
 
         [TestMethod]
-        public void Format_Midpoint_RoundsAwayFromZero()
+        public void FormatPercent_RoundsDownBelowMidpoint()
         {
-            // Arrange / Act: 0.125 * 100 = 12.5 exactly; away-from-zero rounds up to 13
-            // (banker's/ToEven rounding would yield 12, so this proves MidpointRounding.AwayFromZero).
-            var result = UtilitiesCS.PercentageFormatter.Format(0.125);
-
-            // Assert
-            result.Should().Be("13%");
+            PercentageFormatter.FormatPercent(0.734).Should().Be("73%");
         }
 
         [TestMethod]
-        public void Format_InputAboveOne_ClampsToHundredPercent()
+        public void FormatPercent_AtMidpoint_RoundsAwayFromZero()
         {
-            UtilitiesCS.PercentageFormatter.Format(1.5).Should().Be("100%");
+            // 0.735 * 100 = 73.5 -> away-from-zero -> 74
+            PercentageFormatter.FormatPercent(0.735).Should().Be("74%");
         }
 
         [TestMethod]
-        public void Format_NegativeInput_ClampsToZeroPercent()
+        public void FormatPercent_SmallMidpoint_RoundsAwayFromZero()
         {
-            UtilitiesCS.PercentageFormatter.Format(-0.3).Should().Be("0%");
+            // 0.005 * 100 = 0.5 -> away-from-zero -> 1
+            PercentageFormatter.FormatPercent(0.005).Should().Be("1%");
+        }
+
+        [TestMethod]
+        public void FormatPercent_Null_ReturnsEmptyString()
+        {
+            PercentageFormatter.FormatPercent(null).Should().BeEmpty();
         }
     }
 }

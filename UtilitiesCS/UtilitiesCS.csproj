@@ -777,10 +777,14 @@
     <Compile Include="OutlookObjects\Folder\FolderPredictor.cs" />
     <Compile Include="OutlookObjects\Folder\FolderRow.cs" />
     <Compile Include="OutlookObjects\Folder\FolderScore.cs" />
-    <Compile Include="OutlookObjects\Folder\PercentageFormatter.cs" />
     <Compile Include="OutlookObjects\Folder\FolderNodeViewModel.cs" />
     <Compile Include="OutlookObjects\Folder\FolderHierarchyBuilder.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeStateModel.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderSuggestionNode.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderSuggestionTree.cs" />
+    <Compile Include="OutlookObjects\Folder\PercentageFormatter.cs" />
+    <Compile Include="OutlookObjects\Folder\IFolderProbabilitySource.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderProbabilityAdapter.cs" />
     <Compile Include="OutlookObjects\Folder\IFolderSearchHandler.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictor.IFolderSearchHandler.cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\OlFolderHelper\SmithWaterman.cs" />
