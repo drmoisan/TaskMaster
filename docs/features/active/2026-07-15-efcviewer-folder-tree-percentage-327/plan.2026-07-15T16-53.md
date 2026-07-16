@@ -25,7 +25,7 @@ This feature consumes an upstream contract that maps full folder-path string -> 
 
 - The probability value is CONSUMED for the percentage display; scores are never recomputed here (spec.md §Out of Scope; research §5.2).
 - Consumption is isolated behind a narrow seam (`IFolderProbabilitySource`) plus a `FolderProbabilityAdapter`, so that if the finalized 9001 contract differs, only the adapter/seam changes.
-- Sequencing: at epic execution time, 9001 merges into `epic/folder-tree-percentage-ui-integration` BEFORE #327 runs. Task `[P3-T4]` re-confirms the actual merged contract shape before wiring the real value. Until the merged shape is confirmed, the adapter is wired to the seam interface only (assumed shape from research §5.2).
+- Sequencing: at epic execution time, 9001 merges into `epic/folder-tree-percentage-ui-integration` BEFORE #327 runs. Task `P3-T4` re-confirms the actual merged contract shape before wiring the real value. Until the merged shape is confirmed, the adapter is wired to the seam interface only (assumed shape from research §5.2).
 
 ## Scope Lock (files created / modified)
 
@@ -62,15 +62,15 @@ path is a policy violation. Timestamps use `yyyy-MM-ddTHH-mm`.
 
 ### Phase 0 — Baseline Capture and Policy Review
 
-- [ ] [P0-T1] Read the policy files in policy-compliance order (`CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/csharp.md`) and record the read in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/baseline/phase0-instructions-read.md`
+- [x] [P0-T1] Read the policy files in policy-compliance order (`CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/csharp.md`) and record the read in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/baseline/phase0-instructions-read.md`
   - Acceptance: artifact exists containing `Timestamp:`, `Policy Order:`, and the explicit list of the four files read.
-- [ ] [P0-T2] Run `csharpier . --check` (or `dotnet tool run csharpier . --check`) at repo root and record the result in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/baseline/phase0-baseline-csharpier.md`
+- [x] [P0-T2] Run `csharpier . --check` (or `dotnet tool run csharpier . --check`) at repo root and record the result in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/baseline/phase0-baseline-csharpier.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
-- [ ] [P0-T3] Build analyzers via `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` and record the result in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/baseline/phase0-baseline-analyzers.md`
+- [x] [P0-T3] Build analyzers via `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` and record the result in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/baseline/phase0-baseline-analyzers.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (warning/error counts).
-- [ ] [P0-T4] Build nullable gate via `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true` and record the result in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/baseline/phase0-baseline-nullable.md`
+- [x] [P0-T4] Build nullable gate via `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true` and record the result in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/baseline/phase0-baseline-nullable.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
-- [ ] [P0-T5] Run baseline tests with coverage via `vstest.console.exe` against the `UtilitiesCS.Test` and `QuickFiler.Test` assemblies with `/EnableCodeCoverage` and record the numeric baseline coverage headline in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/baseline/phase0-baseline-tests-coverage.md`
+- [x] [P0-T5] Run baseline tests with coverage via `vstest.console.exe` against the `UtilitiesCS.Test` and `QuickFiler.Test` assemblies with `/EnableCodeCoverage` and record the numeric baseline coverage headline in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/baseline/phase0-baseline-tests-coverage.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` including numeric baseline line-coverage and branch-coverage percentages.
 
 ### Phase 1 — Host-Neutral Node Model and Hierarchy Builder
