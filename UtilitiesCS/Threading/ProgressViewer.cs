@@ -54,7 +54,11 @@ namespace UtilitiesCS
         public CancellationTokenSource? CancelSource
         {
             get => _cancelSource;
-            set => _cancelSource = value;
+            set
+            {
+                _cancelSource = value;
+                ButtonCancel.Enabled = value != null;
+            }
         }
 
         public void SetCancellationTokenSource(CancellationTokenSource tokenSource)
