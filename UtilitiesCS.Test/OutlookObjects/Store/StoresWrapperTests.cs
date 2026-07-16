@@ -20,7 +20,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
 {
     [TestClass]
     [DoNotParallelize]
-    public class StoresWrapperTests
+    public partial class StoresWrapperTests
     {
         [TestMethod]
         public async Task CreateAsync_WhenCancellationAlreadyRequested_ThrowsOperationCanceledException()
@@ -337,7 +337,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             string filePath,
             string primarySmtpAddress,
             OlExchangeStoreType exchangeStoreType = OlExchangeStoreType.olPrimaryExchangeMailbox,
-            bool throwOnFilePathAccess = false
+            bool throwOnFilePathAccess = false,
+            string storeId = null,
+            bool throwOnStoreIdAccess = false
         )
         {
             var store = new Mock<OutlookStore>();
@@ -346,6 +348,19 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             store.SetupGet(x => x.DisplayName).Returns(displayName);
             store.SetupGet(x => x.ExchangeStoreType).Returns(exchangeStoreType);
             store.Setup(x => x.GetRootFolder()).Returns(rootFolder.Object);
+
+            // why: issue #328. Seed a StoreID so tests can exercise the StoreID-exclusion branch, and
+            // optionally make the read throw to prove the fail-open guard.
+            if (throwOnStoreIdAccess)
+            {
+                store
+                    .SetupGet(x => x.StoreID)
+                    .Throws(new InvalidOperationException("StoreID unavailable"));
+            }
+            else
+            {
+                store.SetupGet(x => x.StoreID).Returns(storeId);
+            }
 
             if (exchangeStoreType != OlExchangeStoreType.olExchangePublicFolder)
             {

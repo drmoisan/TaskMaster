@@ -13,7 +13,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.OutlookObjects.Store
 {
-    public class StoresWrapper : SmartSerializable<StoresWrapper>
+    public partial class StoresWrapper : SmartSerializable<StoresWrapper>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -209,6 +209,16 @@ namespace UtilitiesCS.OutlookObjects.Store
             }
             catch { }
 
+            // why: issue #328. Read the StoreID (guarded, fail-open) alongside the other primitive
+            // reads and pass it plus the configured ExcludedStoreIds into Decide so the filter path
+            // that drives GetFilteredStores()/MaterializeFilteredStores() applies the StoreID branch.
+            string storeId = null;
+            try
+            {
+                storeId = store.StoreID;
+            }
+            catch { }
+
             var exchangeStoreTypeStopwatch = Stopwatch.StartNew();
             bool isPublicFolder =
                 store.ExchangeStoreType == OlExchangeStoreType.olExchangePublicFolder;
@@ -230,6 +240,8 @@ namespace UtilitiesCS.OutlookObjects.Store
             bool isDisabled = IsEffectivelyDisabled(StoreIdentity.Resolve(displayName, filePath));
 
             var (included, rule) = StoreFilterAttribution.Decide(
+                storeId,
+                ExcludedStoreIds,
                 isPublicFolder,
                 displayName,
                 filePath,
@@ -254,80 +266,31 @@ namespace UtilitiesCS.OutlookObjects.Store
             return included;
         }
 
-        public static bool StoreIsIncluded(
-            Outlook.Store store,
-            IList<string> excludedStoreNameContains,
-            IList<string> excludedStoreFilePathContains,
-            IList<string> gwsoFilePathContains,
-            bool excludePublicFolderStores,
-            bool excludeGwsoStores,
-            bool isDisabled
-        )
+        public bool ShouldIncludeStore(Outlook.Store store)
         {
-            if (
-                excludePublicFolderStores
-                && store.ExchangeStoreType == OlExchangeStoreType.olExchangePublicFolder
-            )
-            {
-                return false;
-            }
-
-            if (
-                excludedStoreNameContains is not null
-                && excludedStoreNameContains.Any(x =>
-                    !string.IsNullOrWhiteSpace(x)
-                    && (store.DisplayName?.IndexOf(x, StringComparison.OrdinalIgnoreCase) ?? -1)
-                        >= 0
-                )
-            )
-            {
-                return false;
-            }
-
-            string filePath = null;
+            // why: issue #328. The StoreID exclusion is the most authoritative rule and is checked
+            // first. The StoreID read is guarded (try/catch) mirroring the FilePath guard below; an
+            // unreadable StoreID leaves storeId null so the store is never excluded on this basis
+            // (fail-open).
+            string storeId = null;
             try
             {
-                filePath = store.FilePath;
+                storeId = store.StoreID;
             }
             catch { }
 
             if (
-                excludeGwsoStores
-                && !string.IsNullOrWhiteSpace(filePath)
-                && gwsoFilePathContains.Any(x =>
+                !string.IsNullOrWhiteSpace(storeId)
+                && ExcludedStoreIds is not null
+                && ExcludedStoreIds.Any(x =>
                     !string.IsNullOrWhiteSpace(x)
-                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
+                    && string.Equals(x, storeId, StringComparison.OrdinalIgnoreCase)
                 )
             )
             {
                 return false;
             }
 
-            if (
-                excludedStoreFilePathContains is not null
-                && !string.IsNullOrWhiteSpace(filePath)
-                && excludedStoreFilePathContains.Any(x =>
-                    !string.IsNullOrWhiteSpace(x)
-                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
-                )
-            )
-            {
-                return false;
-            }
-
-            // why: issue #261. Checked last, after the four existing exclusion rules. The caller
-            // supplies the precomputed effective-disabled result because this static overload has no
-            // instance state to consult.
-            if (isDisabled)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public bool ShouldIncludeStore(Outlook.Store store)
-        {
             if (
                 ExcludePublicFolderStores
                 && store.ExchangeStoreType == OlExchangeStoreType.olExchangePublicFolder
@@ -413,6 +376,17 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         [JsonProperty]
         public List<string> ExcludedStoreFilePathContains { get; set; } = [];
+
+        /// <summary>
+        /// StoreIDs explicitly excluded from every store-inclusion surface (issue #328). Compared
+        /// exactly and case-insensitively (<see cref="StringComparison.OrdinalIgnoreCase"/>) against a
+        /// store's <c>StoreID</c>; null/whitespace entries are ignored. This is the most authoritative
+        /// exclusion rule and is evaluated first. Persisted (round-trips through the existing
+        /// "StoresWrapper" serialization key); a legacy JSON payload lacking this key deserializes to
+        /// the empty default, preserving backward compatibility.
+        /// </summary>
+        [JsonProperty]
+        public List<string> ExcludedStoreIds { get; set; } = [];
 
         /// <summary>
         /// Identities of stores disabled for the current and all future sessions (issue #261). Keyed

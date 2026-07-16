@@ -11,6 +11,7 @@ using Deedle;
 using Newtonsoft.Json;
 using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
+using UtilitiesCS.OutlookObjects.Store;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace ToDoModel
@@ -244,8 +245,30 @@ namespace ToDoModel
         /// <param name="olApp">Handle to current <seealso cref="Outlook.Application"/></param>
         public void Rebuild(Outlook.Application olApp)
         {
+            Rebuild(olApp, null);
+        }
+
+        /// <summary>
+        /// Rebuilds the Project Info list from data existing in the underlying Outlook ToDo
+        /// items, skipping stores excluded by the shared
+        /// <see cref="StoresWrapper.ShouldIncludeStore(Outlook.Store)"/> predicate (issue #328).
+        /// A null <paramref name="storesWrapper"/> is fail-open: no store is skipped.
+        /// </summary>
+        /// <param name="olApp">Handle to current <seealso cref="Outlook.Application"/>.</param>
+        /// <param name="storesWrapper">
+        /// The shared store filter, or null when the model is not yet loaded (fail-open).
+        /// </param>
+        public void Rebuild(Outlook.Application olApp, StoresWrapper storesWrapper)
+        {
             Frame<string, string> df = null;
-            foreach (Outlook.Store store in olApp.Session.Stores)
+            foreach (
+                Outlook.Store store in olApp
+                    .Session.Stores.Cast<Outlook.Store>()
+                    // why: issue #328. Route store inclusion through the single shared predicate
+                    // instead of processing every store. Fail-open when the model is not yet
+                    // loaded (storesWrapper is null) per AC7.
+                    .Where(s => storesWrapper is null || storesWrapper.ShouldIncludeStore(s))
+            )
             {
                 var dfTemp = GetDfToDo(store);
                 if (df is null)

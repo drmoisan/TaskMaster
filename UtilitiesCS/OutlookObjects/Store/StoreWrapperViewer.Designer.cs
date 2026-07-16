@@ -47,6 +47,7 @@
             this._buttonOk = new System.Windows.Forms.Button();
             this._buttonCancel = new System.Windows.Forms.Button();
             this._displayName = new System.Windows.Forms.ComboBox();
+            this._excludeStore = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -252,12 +253,24 @@
             this._displayName.Name = "_displayName";
             this._displayName.Size = new System.Drawing.Size(800, 45);
             this._displayName.TabIndex = 20;
-            // 
+            //
+            // _excludeStore
+            //
+            this._excludeStore.AutoSize = true;
+            this._excludeStore.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._excludeStore.Location = new System.Drawing.Point(298, 597);
+            this._excludeStore.Name = "_excludeStore";
+            this._excludeStore.Size = new System.Drawing.Size(516, 41);
+            this._excludeStore.TabIndex = 21;
+            this._excludeStore.Text = "Exclude this store from ToDo processing";
+            this._excludeStore.UseVisualStyleBackColor = true;
+            //
             // StoreWrapperViewer
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1149, 831);
+            this.Controls.Add(this._excludeStore);
             this.Controls.Add(this._displayName);
             this.Controls.Add(this._buttonCancel);
             this.Controls.Add(this._buttonOk);
@@ -305,5 +318,6 @@
         private System.Windows.Forms.Button _buttonOk;
         private System.Windows.Forms.Button _buttonCancel;
         private System.Windows.Forms.ComboBox _displayName;
+        private System.Windows.Forms.CheckBox _excludeStore;
     }
 }

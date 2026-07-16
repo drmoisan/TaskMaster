@@ -82,7 +82,7 @@ namespace TaskMaster
 
         internal async Task SplitToDoIdAsync()
         {
-            await ToDoEvents.RefreshToDoIdSplitsAsync(Globals.Ol.App);
+            await ToDoEvents.RefreshToDoIdSplitsAsync(Globals);
         }
 
         internal void LoadTaskTree()

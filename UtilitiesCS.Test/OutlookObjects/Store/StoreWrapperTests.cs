@@ -3,6 +3,7 @@ using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Newtonsoft.Json;
 using UtilitiesCS.OutlookObjects.Store;
 using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
 using OutlookStore = Microsoft.Office.Interop.Outlook.Store;
@@ -194,6 +195,91 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             var result = wrapper.GetSmtpAddressFromStore();
 
             result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void Init_WhenStoreIdIsReadable_CapturesStoreId()
+        {
+            // Arrange (issue #328)
+            var store = new Mock<OutlookStore>();
+            var rootFolder = CreateRootFolderWithPrimarySmtpAddress("owner@example.com");
+            var inbox = new Mock<OutlookFolder>();
+
+            store.SetupGet(x => x.DisplayName).Returns("Mailbox");
+            store.SetupGet(x => x.StoreID).Returns("STORE-ID-123");
+            store.Setup(x => x.GetRootFolder()).Returns(rootFolder.Object);
+            store
+                .SetupGet(x => x.ExchangeStoreType)
+                .Returns(OlExchangeStoreType.olPrimaryExchangeMailbox);
+            store
+                .Setup(x => x.GetDefaultFolder(OlDefaultFolders.olFolderInbox))
+                .Returns(inbox.Object);
+
+            var wrapper = new StoreWrapper(store.Object);
+
+            // Act
+            wrapper.Init();
+
+            // Assert
+            wrapper.StoreId.Should().Be("STORE-ID-123");
+        }
+
+        [TestMethod]
+        public void Init_WhenStoreIdReadThrows_IsFailSafeAndLeavesStoreIdNull()
+        {
+            // Arrange (issue #328): an unreadable StoreID must not throw out of Init.
+            var store = new Mock<OutlookStore>();
+            var rootFolder = CreateRootFolderWithPrimarySmtpAddress("owner@example.com");
+            var inbox = new Mock<OutlookFolder>();
+
+            store.SetupGet(x => x.DisplayName).Returns("Mailbox");
+            store.SetupGet(x => x.StoreID).Throws(new COMException("StoreID unavailable"));
+            store.Setup(x => x.GetRootFolder()).Returns(rootFolder.Object);
+            store
+                .SetupGet(x => x.ExchangeStoreType)
+                .Returns(OlExchangeStoreType.olPrimaryExchangeMailbox);
+            store
+                .Setup(x => x.GetDefaultFolder(OlDefaultFolders.olFolderInbox))
+                .Returns(inbox.Object);
+
+            var wrapper = new StoreWrapper(store.Object);
+
+            // Act
+            var result = wrapper.Init();
+
+            // Assert
+            result.Should().BeSameAs(wrapper);
+            wrapper.StoreId.Should().BeNull();
+            wrapper.DisplayName.Should().Be("Mailbox");
+        }
+
+        [TestMethod]
+        public void StoreId_SerializeRoundTrip_PreservesValue()
+        {
+            // Arrange (issue #328)
+            var store = new Mock<OutlookStore>();
+            var wrapper = new StoreWrapper(store.Object) { StoreId = "00FFAABB-STORE-ID" };
+
+            // Act
+            var json = JsonConvert.SerializeObject(wrapper);
+            var restored = JsonConvert.DeserializeObject<StoreWrapper>(json);
+
+            // Assert
+            json.Should().Contain("StoreId");
+            json.Should().Contain("00FFAABB-STORE-ID");
+            restored.StoreId.Should().Be("00FFAABB-STORE-ID");
+        }
+
+        [TestMethod]
+        public void StoreId_DeserializeLegacyJsonWithoutKey_DefaultsToNull()
+        {
+            // Legacy payload predating issue #328: no StoreId key present.
+            const string legacyJson = "{\"DisplayName\":\"Mailbox\"}";
+
+            var restored = JsonConvert.DeserializeObject<StoreWrapper>(legacyJson);
+
+            restored.DisplayName.Should().Be("Mailbox");
+            restored.StoreId.Should().BeNull();
         }
     }
 }

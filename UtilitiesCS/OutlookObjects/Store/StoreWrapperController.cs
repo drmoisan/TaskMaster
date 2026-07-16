@@ -169,6 +169,13 @@ namespace UtilitiesCS.OutlookObjects.Store
             PopulateWithCurrent();
         }
 
+        /// <summary>
+        /// Thin event hook for the <c>ExcludeStore</c> checkbox (issue #328). The exclusion set is
+        /// mutated and persisted in the save path (<see cref="AnyChanges"/>/<see cref="SaveChanges"/>)
+        /// based on the checkbox's current state, so no business logic lives in this forwarder.
+        /// </summary>
+        public void ExcludeStore_CheckedChanged(object sender, EventArgs e) { }
+
         public void ArchiveFS_Click()
         {
             if (Viewer.InvokeRequired)
@@ -230,7 +237,29 @@ namespace UtilitiesCS.OutlookObjects.Store
             return !PairwiseEquals(ArchiveOutlook, Current?.ArchiveRoot)
                 || !PairwiseEquals(JunkEmail, Current?.JunkCertain)
                 || !PairwiseEquals(JunkPotential, Current?.JunkPotential)
-                || !PairwiseEquals(ArchiveFS, Current?.ArchiveFsRoot);
+                || !PairwiseEquals(ArchiveFS, Current?.ArchiveFsRoot)
+                || ExcludeStoreSelectionChanged();
+        }
+
+        /// <summary>
+        /// Reports whether the <c>ExcludeStore</c> checkbox state differs from the current store's
+        /// membership in <c>Model.ExcludedStoreIds</c> (issue #328). Returns false when the StoreID is
+        /// unreadable, so an unreadable store can never register as a pending change (fail-safe).
+        /// </summary>
+        internal bool ExcludeStoreSelectionChanged()
+        {
+            var storeId = Current?.StoreId;
+            if (string.IsNullOrWhiteSpace(storeId))
+            {
+                return false;
+            }
+
+            var currentlyExcluded =
+                Model?.ExcludedStoreIds?.Any(id =>
+                    string.Equals(id, storeId, StringComparison.OrdinalIgnoreCase)
+                )
+                ?? false;
+            return currentlyExcluded != Viewer.ExcludeStore.Checked;
         }
 
         internal bool PairwiseEquals<T>(T a, T b)
@@ -280,6 +309,39 @@ namespace UtilitiesCS.OutlookObjects.Store
             //}
             Viewer.JunkEmail.Text = JunkEmail?.RelativePath ?? "Please select a folder";
             Viewer.JunkPotential.Text = JunkPotential?.RelativePath ?? "Please select a folder";
+            BindExcludeStoreCheckbox();
+        }
+
+        /// <summary>
+        /// Binds the <c>ExcludeStore</c> checkbox to the current store's membership in
+        /// <c>Model.ExcludedStoreIds</c> (issue #328, OrdinalIgnoreCase). When the current store's
+        /// StoreID is unreadable the checkbox is disabled and cleared (fail-safe per AC10) so it can
+        /// neither mislead the user nor mutate the exclusion set.
+        /// </summary>
+        internal void BindExcludeStoreCheckbox()
+        {
+            // Defensive: a viewer that does not expose the checkbox (e.g., a partial test double)
+            // has nothing to bind. Production viewers always supply it.
+            var excludeStore = Viewer?.ExcludeStore;
+            if (excludeStore is null)
+            {
+                return;
+            }
+
+            var storeId = Current?.StoreId;
+            if (string.IsNullOrWhiteSpace(storeId))
+            {
+                excludeStore.Enabled = false;
+                excludeStore.Checked = false;
+                return;
+            }
+
+            excludeStore.Enabled = true;
+            excludeStore.Checked =
+                Model?.ExcludedStoreIds?.Any(id =>
+                    string.Equals(id, storeId, StringComparison.OrdinalIgnoreCase)
+                )
+                ?? false;
         }
 
         internal void SaveChanges()
@@ -289,7 +351,40 @@ namespace UtilitiesCS.OutlookObjects.Store
             Current.JunkPotential = JunkPotential;
             Current.ArchiveFsRoot = ArchiveFS;
             PersistJunkFolderSelections();
+            ApplyExcludeStoreSelection();
             Model.Serialize();
+        }
+
+        /// <summary>
+        /// Applies the <c>ExcludeStore</c> checkbox state to <c>Model.ExcludedStoreIds</c> (issue #328):
+        /// adds the current store's StoreID when checked and removes it when unchecked, guarded by an
+        /// OrdinalIgnoreCase membership check for idempotency (no duplicate add, no remove when absent).
+        /// A store with an unreadable StoreID is never mutated (fail-safe per AC10).
+        /// </summary>
+        internal void ApplyExcludeStoreSelection()
+        {
+            var storeId = Current?.StoreId;
+            if (string.IsNullOrWhiteSpace(storeId))
+            {
+                return;
+            }
+
+            Model.ExcludedStoreIds ??= new List<string>();
+            var existing = Model.ExcludedStoreIds.FirstOrDefault(id =>
+                string.Equals(id, storeId, StringComparison.OrdinalIgnoreCase)
+            );
+
+            if (Viewer.ExcludeStore.Checked)
+            {
+                if (existing is null)
+                {
+                    Model.ExcludedStoreIds.Add(storeId);
+                }
+            }
+            else if (existing is not null)
+            {
+                Model.ExcludedStoreIds.Remove(existing);
+            }
         }
 
         internal void PersistJunkFolderSelections()

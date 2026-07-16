@@ -343,6 +343,7 @@
     <Compile Include="OutlookObjects\Store\StoreWrapperInitClockTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperInitProbeTests.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperTests.cs" />
+    <Compile Include="OutlookObjects\Store\StoresWrapperTests.StoreIdExclusion.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperDisableTests.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperRehookTests.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemHelperProjectionTests.cs" />
@@ -485,6 +486,7 @@
     <Compile Include="OutlookObjects\MailItem\MailItemHelper_ExtendedTests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.ButtonAndPopulate.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.ExcludeStore.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.Launch.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensions_Tests.cs" />
     <Compile Include="OutlookObjects\Table\OlToDoTable_Tests.cs" />
