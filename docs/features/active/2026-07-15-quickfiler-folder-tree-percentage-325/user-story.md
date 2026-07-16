@@ -110,14 +110,14 @@ scores.
 
 ## Acceptance Criteria
 
-- [ ] Folders with subfolders render with a plus/minus expand affordance in the QuickFiler folder
+- [x] Folders with subfolders render with a plus/minus expand affordance in the QuickFiler folder
       dropdown on the runtime-live `ItemViewer`; leaf folders render with no glyph.
-- [ ] Clicking the plus expands a node; clicking the resulting minus collapses it.
-- [ ] With a node highlighted, the Right arrow key expands it and the Left arrow key collapses it,
+- [x] Clicking the plus expands a node; clicking the resulting minus collapses it.
+- [x] With a node highlighted, the Right arrow key expands it and the Left arrow key collapses it,
       with no-op behavior for leaves and already-expanded/collapsed nodes.
-- [ ] Each suggestion shows its prediction probability right-aligned in whole-number percentage format
+- [x] Each suggestion shows its prediction probability right-aligned in whole-number percentage format
       (no decimal places); rows with no probability render an empty percentage field.
-- [ ] The percentage value consumes the upstream 9001 probability contract; scores are not recomputed
+- [x] The percentage value consumes the upstream 9001 probability contract; scores are not recomputed
       here.
-- [ ] Shared tree/format/hierarchy logic lives in reusable, testable, host-neutral seams meeting the
+- [x] Shared tree/format/hierarchy logic lives in reusable, testable, host-neutral seams meeting the
       repository coverage thresholds (target: line `>= 85%`, branch `>= 75%`, new-module `>= 90%`).

@@ -18,6 +18,13 @@ namespace UtilitiesCS
         /// <summary>Matches <see cref="FolderPredictor.Suggestions"/>.</summary>
         FolderScorer Suggestions { get; }
 
+        /// <summary>
+        /// Matches <see cref="FolderPredictor.FolderRowArray"/>. Additive row-model surface consumed
+        /// by #325 to populate the QuickFiler folder-tree/percentage dropdown; already implemented on
+        /// <see cref="FolderPredictor"/>.
+        /// </summary>
+        FolderRow[] FolderRowArray { get; }
+
         /// <summary>Matches <see cref="FolderPredictor.FindFolder"/> exactly.</summary>
         string[] FindFolder(
             string searchString,

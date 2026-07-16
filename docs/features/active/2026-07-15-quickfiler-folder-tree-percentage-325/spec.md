@@ -316,27 +316,27 @@ with the body-render path, must not be modified by #325:
 
 ## Acceptance Criteria
 
-- [ ] Folders that contain subfolders render with a plus/minus expand affordance to the left of the
+- [x] Folders that contain subfolders render with a plus/minus expand affordance to the left of the
       node in the QuickFiler folder dropdown (`ItemViewer.CboFolders`); leaf folders render with no
       glyph.
-- [ ] Clicking the plus affordance on a node expands it, and clicking the resulting minus affordance
+- [x] Clicking the plus affordance on a node expands it, and clicking the resulting minus affordance
       collapses it.
-- [ ] With a node highlighted, the Right arrow key expands it (no-op when it is a leaf or already
+- [x] With a node highlighted, the Right arrow key expands it (no-op when it is a leaf or already
       expanded) and the Left arrow key collapses it (no-op when it is a leaf or already collapsed).
-- [ ] Each suggestion displays its prediction probability right-aligned in whole-number percentage
+- [x] Each suggestion displays its prediction probability right-aligned in whole-number percentage
       format with no decimal places (for example `43%`); rows with no probability (synthesized
       ancestors, sentinel headers, recents, "Trash to Delete") render an empty percentage field.
-- [ ] The percentage value is consumed verbatim from the upstream 9001 `FolderSuggestion` probability
+- [x] The percentage value is consumed verbatim from the upstream 9001 `FolderSuggestion` probability
       contract; scores are not recomputed and `FolderScorer`/`FolderPredictor` scoring math is not
       modified.
-- [ ] Shared tree-state, hierarchy-building, and percentage-formatting logic lives in host-neutral,
+- [x] Shared tree-state, hierarchy-building, and percentage-formatting logic lives in host-neutral,
       testable seams (`FolderHierarchyBuilder`, `FolderTreeStateModel`, `PercentageFormatter`,
       `FolderNodeViewModel`) that meet the repository coverage thresholds (target: line `>= 85%`,
       branch `>= 75%`, new-module `>= 90%`), with INV1-INV8 unit-tested exhaustively.
-- [ ] The change is confined to the runtime-live `ItemViewer` and its `IItemViewer` seam; the nine
+- [x] The change is confined to the runtime-live `ItemViewer` and its `IItemViewer` seam; the nine
       dead `[ExcludeFromCodeCoverage]` design-time viewer variants are left untouched.
-- [ ] The change shares no files with the 9004 inline-image `cid:` bugfix and does not modify the
+- [x] The change shares no files with the 9004 inline-image `cid:` bugfix and does not modify the
       body-render / WebView2 path.
-- [ ] The full C# toolchain (csharpier, .NET analyzers, nullable/TreatWarningsAsErrors, MSTest with
+- [x] The full C# toolchain (csharpier, .NET analyzers, nullable/TreatWarningsAsErrors, MSTest with
       coverage) passes green in a single final pass, and existing `SetFolderItems(string[])` controller
       expectations remain green.

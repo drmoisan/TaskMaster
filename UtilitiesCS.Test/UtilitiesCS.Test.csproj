@@ -319,6 +319,10 @@
     <Compile Include="OutlookObjects\Folder\FolderScorerRegressionTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderScoreTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderScorerTests.cs" />
+    <Compile Include="OutlookObjects\Folder\PercentageFormatterTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderNodeViewModelTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderHierarchyBuilderTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderTreeStateModelTests.cs" />
     <Compile Include="OutlookObjects\MailItem\EmailDetailsTests.cs" />
     <Compile Include="OutlookObjects\MailItem\EmailDetailsWrapperTests.cs" />
     <Compile Include="OutlookObjects\MailItem\CaptureEmailAddressesModule2Tests.cs" />
