@@ -190,8 +190,11 @@ namespace QuickFiler
             // 
             this._l0vh_Tlp.SetColumnSpan(this._cboFolders, 2);
             this._cboFolders.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._cboFolders.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this._cboFolders.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._cboFolders.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this._cboFolders.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.CboFolders_DrawItem);
+            this._cboFolders.MouseDown += new System.Windows.Forms.MouseEventHandler(this.CboFolders_MouseDown);
             this._cboFolders.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._cboFolders.FormattingEnabled = true;
             this._cboFolders.Location = new System.Drawing.Point(807, 64);

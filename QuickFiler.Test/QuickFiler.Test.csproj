@@ -93,6 +93,7 @@
     <Compile Include="Controllers\QfcItemControllerTests.cs" />
     <Compile Include="Controllers\QfcItemController.ConversationTests.cs" />
     <Compile Include="Controllers\QfcItemController.FolderHandlingTests.cs" />
+    <Compile Include="Controllers\QfcItemController.FolderSuggestionsTests.cs" />
     <Compile Include="Controllers\QfcItemController.EventWiringTests.cs" />
     <Compile Include="Controllers\QfcItemController.NavigationTests.cs" />
     <Compile Include="Controllers\QfcItemController.MailActionsTests.cs" />
