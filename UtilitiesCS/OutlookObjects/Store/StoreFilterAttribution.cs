@@ -13,6 +13,9 @@ namespace UtilitiesCS.OutlookObjects.Store
     /// </summary>
     public enum StoreFilterRule
     {
+        /// <summary>Excluded because the store's StoreID is present in the configured excluded-StoreID set (issue #328). Checked first, as the most authoritative exclusion.</summary>
+        StoreId,
+
         /// <summary>Excluded because it is an Exchange public-folder store and public folders are excluded.</summary>
         PublicFolder,
 
@@ -46,6 +49,8 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// over already-read primitive property values. Returns the include decision and the rule that
         /// produced the first matching exclusion (or <see cref="StoreFilterRule.Included"/>).
         /// </summary>
+        /// <param name="storeId">The already-read store StoreID (may be null/empty if unavailable). Issue #328.</param>
+        /// <param name="excludedStoreIds">Configured excluded-StoreID values (may be null). Issue #328.</param>
         /// <param name="isPublicFolder">Whether the store's ExchangeStoreType is olExchangePublicFolder.</param>
         /// <param name="displayName">The already-read store DisplayName (may be null/empty).</param>
         /// <param name="filePath">The already-read store FilePath (may be null/empty if unavailable).</param>
@@ -57,6 +62,8 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// <param name="isDisabled">Whether the store is in a disabled scope (issue #261). Checked last, after the four existing exclusion rules and immediately before the included result.</param>
         /// <returns>A tuple of the include decision and the matched rule.</returns>
         public static (bool Included, StoreFilterRule Rule) Decide(
+            string storeId,
+            IReadOnlyCollection<string> excludedStoreIds,
             bool isPublicFolder,
             string displayName,
             string filePath,
@@ -68,6 +75,22 @@ namespace UtilitiesCS.OutlookObjects.Store
             bool isDisabled
         )
         {
+            // why: issue #328. The StoreID exclusion is the most authoritative rule and is
+            // checked first, short-circuiting all other rules. Exact-match, case-insensitive;
+            // null/whitespace StoreID or entries are ignored (fail-open) so an unreadable
+            // StoreID never excludes on this basis.
+            if (
+                !string.IsNullOrWhiteSpace(storeId)
+                && excludedStoreIds is not null
+                && excludedStoreIds.Any(x =>
+                    !string.IsNullOrWhiteSpace(x)
+                    && string.Equals(x, storeId, StringComparison.OrdinalIgnoreCase)
+                )
+            )
+            {
+                return (false, StoreFilterRule.StoreId);
+            }
+
             if (excludePublicFolderStores && isPublicFolder)
             {
                 return (false, StoreFilterRule.PublicFolder);

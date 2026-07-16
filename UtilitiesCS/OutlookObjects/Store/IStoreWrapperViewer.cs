@@ -10,6 +10,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         Label ArchiveOutlook { get; set; }
         Button ButtonCancel { get; set; }
         Button ButtonOk { get; set; }
+        CheckBox ExcludeStore { get; set; }
         ComboBox DisplayName { get; set; }
         Label Inbox { get; set; }
         Label JunkEmail { get; set; }

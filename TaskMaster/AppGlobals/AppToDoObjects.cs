@@ -118,7 +118,7 @@ namespace TaskMaster
 
             if (_projInfo?.Count == 0 && outlookApplication is not null)
             {
-                _projInfo.Rebuild(outlookApplication);
+                _projInfo.Rebuild(outlookApplication, Parent.Ol.StoresWrapper);
             }
         }
 
@@ -132,7 +132,7 @@ namespace TaskMaster
                 );
                 if (projectInfo.Count == 0)
                 {
-                    projectInfo.Rebuild(Parent.Ol.App);
+                    projectInfo.Rebuild(Parent.Ol.App, Parent.Ol.StoresWrapper);
                 }
                 return projectInfo;
             }

@@ -1,13 +1,17 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Deedle;
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using ToDoModel;
 using UtilitiesCS;
+using UtilitiesCS.OutlookObjects.Store;
+using OutlookStore = Microsoft.Office.Interop.Outlook.Store;
 
 namespace ToDoModel.Test
 {
@@ -187,6 +191,84 @@ namespace ToDoModel.Test
             entries.Select(entry => entry.ProjectID).Should().Equal("A001", "B002");
             entries.Select(entry => entry.ProjectName).Should().Equal("Program A-Alpha", "Beta");
             entries.Select(entry => entry.ProgramName).Should().Equal("Program A", "Beta");
+        }
+
+        [TestMethod]
+        public void Rebuild_WhenStoreIdExcluded_DoesNotProcessExcludedStore()
+        {
+            // Arrange
+            var keep = CreateStoreMock("KEEP-STORE-ID");
+            var drop = CreateStoreMock("DROP-STORE-ID");
+            var app = CreateAppWithStores(keep.Object, drop.Object);
+            var wrapper = new StoresWrapper
+            {
+                ExcludedStoreIds = new List<string> { "DROP-STORE-ID" },
+                ExcludedStoreNameContains = new List<string>(),
+                ExcludedStoreFilePathContains = new List<string>(),
+                GwsoFilePathContains = new List<string>(),
+                ExcludeGwsoStores = false,
+                ExcludePublicFolderStores = false,
+            };
+            var data = new ProjectData();
+
+            // Act: Rebuild routes stores through the shared filter before GetDfToDo. This test
+            // asserts the routing side effect (which stores are visited); the downstream
+            // empty-frame failure after the included store yields no ToDo data is intentionally
+            // swallowed because Rebuild completion is out of scope for this routing assertion.
+            try
+            {
+                data.Rebuild(app.Object, wrapper);
+            }
+            catch
+            {
+                // routing-only assertion below.
+            }
+
+            // Assert
+            keep.Verify(
+                x => x.GetDefaultFolder(OlDefaultFolders.olFolderToDo),
+                Times.Once(),
+                "the included store must be processed by Rebuild"
+            );
+            drop.Verify(
+                x => x.GetDefaultFolder(It.IsAny<OlDefaultFolders>()),
+                Times.Never(),
+                "the StoreID-excluded store must be skipped before GetDfToDo"
+            );
+        }
+
+        private static Mock<OutlookStore> CreateStoreMock(string storeId)
+        {
+            var store = new Mock<OutlookStore>();
+            store.SetupGet(x => x.StoreID).Returns(storeId);
+            store.SetupGet(x => x.DisplayName).Returns(storeId + " Mailbox");
+            store
+                .SetupGet(x => x.ExchangeStoreType)
+                .Returns(OlExchangeStoreType.olPrimaryExchangeMailbox);
+            store.SetupGet(x => x.FilePath).Returns(@"C:\Data\" + storeId + ".ost");
+            // why: GetToDoTable() swallows a GetDefaultFolder failure and returns null, so throwing
+            // here keeps the included-store path deterministic (no partial COM table mock needed)
+            // while still recording that the folder was resolved.
+            store
+                .Setup(x => x.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
+                .Throws(new InvalidOperationException("ToDo folder unavailable in test"));
+            return store;
+        }
+
+        private static Mock<Application> CreateAppWithStores(params OutlookStore[] stores)
+        {
+            var storesCollection = new Mock<Stores>();
+            storesCollection
+                .As<IEnumerable>()
+                .Setup(x => x.GetEnumerator())
+                .Returns(() => stores.Cast<object>().GetEnumerator());
+
+            var nameSpace = new Mock<NameSpace>();
+            nameSpace.SetupGet(x => x.Stores).Returns(storesCollection.Object);
+
+            var app = new Mock<Application>();
+            app.SetupGet(x => x.Session).Returns(nameSpace.Object);
+            return app;
         }
 
         private static IProjectEntry NewEntry(

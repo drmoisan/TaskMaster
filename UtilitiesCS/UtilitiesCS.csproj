@@ -714,6 +714,7 @@
     <Compile Include="OutlookObjects\Store\StoreLaunchReadinessEvaluator.cs" />
     <Compile Include="OutlookObjects\Store\StoreRehookResult.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapper.cs" />
+    <Compile Include="OutlookObjects\Store\StoresWrapper.Filtering.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapper.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperInitClock.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperInitProbe.cs" />

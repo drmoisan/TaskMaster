@@ -39,6 +39,20 @@ namespace UtilitiesCS.OutlookObjects.Store
                 $"[Startup timing] Init '{DisplayName ?? "<null>"}' DisplayName: {storeDisplayNameStopwatch.ElapsedMilliseconds} ms"
             );
 
+            // why: issue #328. Persist the StoreID at Init so the settings controller can read it
+            // without a live-COM dependency (stable after deserialize-before-rewire). Guarded so an
+            // unreadable StoreID is fail-safe (leaves the default) rather than throwing during startup.
+            try
+            {
+                StoreId = InnerStore.StoreID;
+            }
+            catch (System.Exception e)
+            {
+                logger.Error(
+                    $"Error reading StoreID for store '{DisplayName ?? "<null>"}' {e.Message}"
+                );
+            }
+
             // why: issue #264. Attribute any UI-thread lockup inside the post-DisplayName blocking
             // COM chain (GetRootFolder / GetDefaultFolder(Inbox) / the SMTP chain) to this store,
             // using the already-cached DisplayName (no new COM read). The scope wraps around the
@@ -136,6 +150,15 @@ namespace UtilitiesCS.OutlookObjects.Store
         #region Store Properties
 
         public string DisplayName { get; set; }
+
+        /// <summary>
+        /// The store's Outlook StoreID, captured during <see cref="Init"/> (issue #328). Persisted so
+        /// the settings UI can match this store against <c>StoresWrapper.ExcludedStoreIds</c> without a
+        /// live-COM read. Additive to serialization and backward-compatible: a legacy payload without
+        /// this key deserializes to the default.
+        /// </summary>
+        [JsonProperty]
+        public string StoreId { get; set; }
 
         [JsonIgnore]
         public Outlook.Store InnerStore { get; internal set; }

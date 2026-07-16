@@ -21,7 +21,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 namespace ToDoModel
 {
     [ExcludeFromCodeCoverage]
-    public static class ToDoEvents
+    public static partial class ToDoEvents
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -56,113 +56,6 @@ namespace ToDoModel
             }
 
             Debug.WriteLine(storeList);
-        }
-
-        public static void WriteToCSV(string filename, string[] strOutput, bool overwrite = false)
-        {
-            // CLEANUP: Determine if ThisAddIn.WriteToCSV function is needed. If so, move it to a library
-            if (overwrite | File.Exists(filename) == false)
-            {
-                using (var sw = new StreamWriter(filename))
-                {
-                    for (int i = 0; i < strOutput.Length; i++)
-                        sw.WriteLine(strOutput[i]);
-                }
-            }
-            else
-            {
-                using (var sw = new StreamWriter(filename, append: true))
-                {
-                    for (int i = 0; i < strOutput.Length; i++)
-                        sw.WriteLine(strOutput[i]);
-                }
-            }
-        }
-
-        public static void WriteToCSV(string filename, string strOutput, bool overwrite = false)
-        {
-            // CLEANUP: Determine if ThisAddIn.WriteToCSV function is needed. If so, move it to a library
-            if (overwrite | File.Exists(filename) == false)
-            {
-                using (var sw = new StreamWriter(filename))
-                {
-                    sw.WriteLine(strOutput);
-                }
-            }
-            else
-            {
-                using (var sw = new StreamWriter(filename, append: true))
-                {
-                    sw.WriteLine(strOutput);
-                }
-            }
-        }
-
-        public static List<object> GetListOfToDoItemsInView(Outlook.Application olApp)
-        {
-            Items OlItems;
-            Outlook.View objView;
-            Folder OlFolder;
-            string strFilter;
-            // QUESTION: ThisAddin.GetListOfToDoItemsInView When is this called? Is it needed?
-            // CLEANUP: ThisAddin.GetListOfToDoItemsInView Move to a Class, Module or a Library depending on how it is used.
-
-            objView = (Outlook.View)olApp.ActiveExplorer().CurrentView;
-            strFilter = "@SQL=" + objView.Filter;
-
-            OlItems = null;
-            foreach (Store oStore in olApp.Session.Stores)
-            {
-                OlFolder = (Folder)oStore.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
-                OlItems =
-                    strFilter == "@SQL=" ? OlFolder.Items : OlFolder.Items.Restrict(strFilter);
-            }
-            var ListObjects = new List<object>();
-            foreach (var objItem in OlItems)
-                ListObjects.Add(objItem);
-            // GetToDoItemsInView = OlItems
-            return ListObjects;
-        }
-
-        public static IAsyncEnumerable<object> GetAsyncEnumerableOfToDoItemsInView(
-            Outlook.Application olApp
-        )
-        {
-            var olView = (Outlook.View)olApp.ActiveExplorer().CurrentView;
-            var strFilter = "@SQL=" + olView.Filter;
-            var items = olApp
-                .Session.Stores?.Cast<Store>()
-                ?.ToAsyncEnumerable()
-                ?.Select(store => store.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
-                ?.SelectMany(folder =>
-                    strFilter == "@SQL="
-                        ? folder?.Items?.Cast<object>()?.ToAsyncEnumerable()
-                        : folder?.Items?.Restrict(strFilter)?.Cast<object>()?.ToAsyncEnumerable()
-                );
-            return items;
-        }
-
-        public static Items GetToDoItemsInView(Outlook.Application OlApp)
-        {
-            Items GetItemsInView_ToDoRet = default;
-            Items OlItems;
-            Outlook.View objView;
-            Folder OlFolder;
-            string strFilter;
-
-            // QUESTION: Depricated? Previous function was GetList. Do we need both?
-            objView = (Outlook.View)OlApp.ActiveExplorer().CurrentView;
-            strFilter = "@SQL=" + objView.Filter;
-
-            OlItems = null;
-            foreach (Store oStore in OlApp.Session.Stores)
-            {
-                OlFolder = (Folder)oStore.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
-                OlItems =
-                    strFilter == "@SQL=" ? OlFolder.Items : OlFolder.Items.Restrict(strFilter);
-            }
-            GetItemsInView_ToDoRet = OlItems;
-            return GetItemsInView_ToDoRet;
         }
 
         public static int IsChild(string strParent, string strChild)
@@ -208,26 +101,6 @@ namespace ToDoModel
         //        return null;
         //    }
         //}
-
-        public static async Task RefreshToDoIdSplitsAsync(Outlook.Application olApp)
-        {
-            var itemsAsyncEnum = GetAsyncEnumerableOfToDoItemsInView(olApp);
-            await itemsAsyncEnum.ForEachAwaitAsync(async item =>
-                await Task.Run(() => TrySplitToDoID(item))
-            );
-        }
-
-        private static void TrySplitToDoID(object item)
-        {
-            try
-            {
-                new ToDoItem(new OutlookItem(item)).SplitID();
-            }
-            catch (System.Exception e)
-            {
-                logger.Error(e.Message, e);
-            }
-        }
 
         public static async Task OlToDoItems_ItemChange(
             object item,
