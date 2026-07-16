@@ -1,0 +1,62 @@
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directories:
+      - "/*"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      analyzers-dev-deps:
+        patterns:
+          - "Meziantou.Analyzer"
+          - "SonarAnalyzer.CSharp"
+          - "Roslynator.Analyzers"
+          - "AsyncFixer"
+          - "Microsoft.CodeAnalysis.BannedApiAnalyzers"
+        group-by: "dependency-name"
+      test-frameworks:
+        patterns:
+          - "MSTest.*"
+          - "Moq"
+          - "FluentAssertions"
+          - "Castle.Core"
+          - "Microsoft.Testing.*"
+          - "Microsoft.TestPlatform.*"
+        group-by: "dependency-name"
+      microsoft-extensions-and-bcl:
+        patterns:
+          - "Microsoft.Extensions.*"
+          - "Microsoft.Bcl.*"
+          - "System.*"
+        group-by: "dependency-name"
+      graph-identity-telemetry:
+        patterns:
+          - "Microsoft.Graph*"
+          - "Microsoft.Identity.*"
+          - "Microsoft.IdentityModel.*"
+          - "Azure.*"
+          - "OpenTelemetry*"
+          - "Microsoft.ApplicationInsights"
+        group-by: "dependency-name"
+    ignore:
+      # Major-version bumps for Microsoft's .NET-runtime-aligned package families are
+      # the only observed point at which supported TFMs (net462/netstandard2.0) have
+      # historically changed; gate major bumps behind manual review rather than
+      # guessing an unverified version-ceiling number (see research §4).
+      - dependency-name: "Microsoft.Extensions.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.Bcl.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "System.Text.Json"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "System.Drawing.Common"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.Graph*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Apache.Arrow*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.Data.Analysis"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.ML*"
+        update-types: ["version-update:semver-major"]
