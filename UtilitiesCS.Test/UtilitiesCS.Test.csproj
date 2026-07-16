@@ -312,6 +312,8 @@
     <Compile Include="OutlookObjects\Folder\FolderMinimalWrapperTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderNavigatorTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderScorerCoverageExpansionTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderScorerRegressionTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderScoreTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderScorerTests.cs" />
     <Compile Include="OutlookObjects\MailItem\EmailDetailsTests.cs" />
     <Compile Include="OutlookObjects\MailItem\EmailDetailsWrapperTests.cs" />
@@ -350,6 +352,7 @@
     <Compile Include="OutlookObjects\Folder\FolderTreeTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictorCoverageExpansionTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictorTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderRowTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperCoverageExpansionTests.cs" />
     <Compile Include="OutlookObjects\Folder\MAPIMethodsTests.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

@@ -775,6 +775,8 @@
     <Compile Include="EmailIntelligence\EmailParsingSorting\MovedMailInfo.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictor.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderRow.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderScore.cs" />
     <Compile Include="OutlookObjects\Folder\IFolderSearchHandler.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictor.IFolderSearchHandler.cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\OlFolderHelper\SmithWaterman.cs" />

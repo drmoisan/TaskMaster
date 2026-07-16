@@ -238,21 +238,67 @@ namespace UtilitiesCS
         // The secondary ThenBy on the key gives a deterministic, culture-independent tie-break
         // for folders that share the same score. ScoDictionaryNew (ConcurrentDictionary-backed)
         // does not enumerate in insertion order, so an explicit ordinal key ordering preserves
-        // stable ranking output.
-        public string[] ToArray() =>
+        // stable ranking output. This single ordered enumeration is the structural parity
+        // mechanism: both the name-only ToArray* projections and the scored ToScoredArray*
+        // projections consume it, so their ordering is guaranteed identical by construction.
+        private IEnumerable<KeyValuePair<string, long>> OrderedScores() =>
             _folderNameScores
                 .OrderByDescending(x => x.Value)
-                .ThenBy(x => x.Key, StringComparer.Ordinal)
-                .Select(x => x.Key)
-                .ToArray();
+                .ThenBy(x => x.Key, StringComparer.Ordinal);
+
+        public string[] ToArray() => OrderedScores().Select(x => x.Key).ToArray();
 
         public string[] ToArray(int topN) =>
-            _folderNameScores
-                .OrderByDescending(x => x.Value)
-                .ThenBy(x => x.Key, StringComparer.Ordinal)
-                .Take(topN)
-                .Select(x => x.Key)
+            OrderedScores().Take(topN).Select(x => x.Key).ToArray();
+
+        /// <summary>
+        /// Additive scored projection mirroring <see cref="ToArray()"/> ordering exactly, but
+        /// carrying each folder's raw <see cref="FolderScore.Score"/> and a max-normalized
+        /// <see cref="FolderScore.Probability"/>. Returns an empty array when no suggestions are
+        /// held.
+        /// </summary>
+        /// <returns>The scored folder suggestions in ranking order.</returns>
+        public FolderScore[] ToScoredArray() => BuildScoredArray(OrderedScores());
+
+        /// <summary>
+        /// Top-<paramref name="topN"/> scored projection mirroring <see cref="ToArray(int)"/>
+        /// ordering exactly. <see cref="FolderScore.Probability"/> is normalized against the
+        /// maximum score of the full ordered set (stable per folder regardless of
+        /// <paramref name="topN"/>). A <paramref name="topN"/> larger than the number of held
+        /// suggestions returns all rows.
+        /// </summary>
+        /// <param name="topN">The maximum number of scored rows to return.</param>
+        /// <returns>The top-<paramref name="topN"/> scored folder suggestions in ranking order.</returns>
+        public FolderScore[] ToScoredArray(int topN) => BuildScoredArray(OrderedScores(), topN);
+
+        // Projects the shared ordered enumeration into FolderScore rows. Probability is
+        // max-normalized (Score / TopScore) with a zero-guard: when the top score is 0 (empty
+        // scorer or all-zero seeds) every Probability is 0 and no divide-by-zero occurs. maxScore
+        // is computed once over the full ordered set so per-folder Probability is stable
+        // regardless of any topN applied to the returned rows.
+        private static FolderScore[] BuildScoredArray(
+            IEnumerable<KeyValuePair<string, long>> orderedScores,
+            int topN = -1
+        )
+        {
+            var ordered = orderedScores.ToArray();
+            if (ordered.Length == 0)
+            {
+                return Array.Empty<FolderScore>();
+            }
+
+            long maxScore = ordered[0].Value;
+            IEnumerable<KeyValuePair<string, long>> selected =
+                topN < 0 ? ordered : ordered.Take(topN);
+
+            return selected
+                .Select(x => new FolderScore(
+                    x.Key,
+                    x.Value,
+                    maxScore == 0 ? 0 : (double)x.Value / maxScore
+                ))
                 .ToArray();
+        }
 
         internal void AddConversationBasedSuggestions(
             MailItem OlMail,
