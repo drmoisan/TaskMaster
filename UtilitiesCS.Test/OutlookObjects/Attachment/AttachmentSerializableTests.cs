@@ -340,6 +340,42 @@ namespace UtilitiesCS.Test.OutlookObjects.Attachment
         }
 
         [TestMethod]
+        public void ContentId_ShouldPopulateFromMockedPropertyAccessor_WhenPropertyPresent()
+        {
+            // Arrange
+            var accessor = new Mock<PropertyAccessor>();
+            accessor
+                .Setup(x => x.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x3712001F"))
+                .Returns("logo1");
+            var outlookAttachment = CreateAttachmentMockCore(type: OlAttachmentType.olByValue);
+            outlookAttachment.SetupGet(x => x.PropertyAccessor).Returns(accessor.Object);
+
+            // Act
+            var attachment = new AttachmentSerializable(outlookAttachment.Object);
+
+            // Assert
+            attachment.ContentId.Should().Be("logo1");
+        }
+
+        [TestMethod]
+        public void ContentId_ShouldDefaultToNull_WhenPropertyAccessorThrows()
+        {
+            // Arrange
+            var accessor = new Mock<PropertyAccessor>();
+            accessor
+                .Setup(x => x.GetProperty(It.IsAny<string>()))
+                .Throws<System.Runtime.InteropServices.COMException>();
+            var outlookAttachment = CreateAttachmentMockCore(type: OlAttachmentType.olByValue);
+            outlookAttachment.SetupGet(x => x.PropertyAccessor).Returns(accessor.Object);
+
+            // Act
+            var attachment = new AttachmentSerializable(outlookAttachment.Object);
+
+            // Assert
+            attachment.ContentId.Should().BeNull();
+        }
+
+        [TestMethod]
         public void TryFromSaveAsLoad_WhenSaveAsFileThrows_ReturnsFalseAndNullBytes()
         {
             // Arrange

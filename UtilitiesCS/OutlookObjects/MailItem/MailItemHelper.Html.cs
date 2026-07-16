@@ -192,6 +192,11 @@ img {
             string body = _item.HTMLBody;
             var regex = new Regex(@"(<body[\S\s]*?>)", RegexOptions.Multiline);
             string revisedBody = regex.Replace(body, "$1" + EmailHeader);
+            revisedBody = CidImageResolver.RewriteCidReferences(
+                revisedBody,
+                AttachmentsInfo,
+                CidImageResolver.DefaultVirtualHost
+            );
             Sw?.LogDuration("GetHtml");
             return revisedBody;
         }
@@ -201,6 +206,11 @@ img {
             string body = _item.HTMLBody;
             var regex = new Regex(@"(<body[\S\s]*?>)", RegexOptions.Multiline);
             string revisedBody = regex.Replace(body, "$1" + EmailHeader);
+            revisedBody = CidImageResolver.RewriteCidReferences(
+                revisedBody,
+                AttachmentsInfo,
+                CidImageResolver.DefaultVirtualHost
+            );
             return revisedBody;
         }
 

@@ -318,6 +318,7 @@
     <Compile Include="OutlookObjects\MailItem\CaptureEmailAddressesModule2Tests.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemExtensionsTests.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemHelperCoreTests.cs" />
+    <Compile Include="OutlookObjects\MailItem\CidImageResolverTests.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientInfoTests.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientStaticTests.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientStaticSenderResolverTests.cs" />

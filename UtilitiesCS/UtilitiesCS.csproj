@@ -823,6 +823,7 @@
     <Compile Include="EmailIntelligence\Flags\FlagTranslator.cs" />
     <Compile Include="EmailIntelligence\IntelligenceFilters.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemHelper.Html.cs" />
+    <Compile Include="OutlookObjects\MailItem\CidImageResolver.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemHelper.Loading.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemHelper.Properties.cs" />
     <Compile Include="OutlookObjects\MailItem\MailItemHelper.Serialization.cs" />

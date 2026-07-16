@@ -63,6 +63,40 @@ namespace QuickFiler.Controllers
                 ((ItemViewer)_itemViewer).L0v2h2_WebView2, // concrete-bound seam (P2-T4): control-host path, runs on real ItemViewer during init
                 _webViewEnvironment
             );
+
+            // Inline cid: image resolution (issue #326): rewritten cid: references resolve to
+            // https://{CidImageResolver.DefaultVirtualHost}/<id> (see MailItemHelper.Html.cs
+            // GetHtml()). Intercept those sub-resource requests here and serve the matching
+            // attachment's bytes from memory. The attachment map is rebuilt at request time (not at
+            // registration time) so it always reflects whichever mail item is currently loaded into
+            // this pooled ItemViewer.
+            var coreWebView2 = ((ItemViewer)_itemViewer).L0v2h2_WebView2.CoreWebView2;
+            coreWebView2.AddWebResourceRequestedFilter(
+                $"https://{CidImageResolver.DefaultVirtualHost}/*",
+                CoreWebView2WebResourceContext.Image
+            );
+            coreWebView2.WebResourceRequested += (sender, e) =>
+            {
+                var requestedId = new Uri(e.Request.Uri).Segments.LastOrDefault()?.Trim('/');
+                if (string.IsNullOrEmpty(requestedId))
+                {
+                    return;
+                }
+
+                var contentIdMap = CidImageResolver.BuildContentIdMap(ItemHelper.AttachmentsInfo);
+                if (!contentIdMap.TryGetValue(requestedId, out var match))
+                {
+                    return;
+                }
+
+                var mimeType = ResolveImageMimeType(match.FileExtension);
+                e.Response = _webViewEnvironment.CreateWebResourceResponse(
+                    new MemoryStream(match.AttachmentData),
+                    200,
+                    "OK",
+                    $"Content-Type: {mimeType}"
+                );
+            };
             //var task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
 
             //await task.ContinueWith(t =>
@@ -71,6 +105,19 @@ namespace QuickFiler.Controllers
             //    _itemViewer.L0v2h2_WebView2.EnsureCoreWebView2Async(_webViewEnvironment);
             //}, Token, TaskContinuationOptions.OnlyOnRanToCompletion, ui);
         }
+
+        // Minimal in-memory extension-to-MIME-type lookup for the WebResourceRequested handler
+        // above; defaults to a generic octet stream for unrecognized/absent extensions rather than
+        // failing the intercepted request.
+        private static string ResolveImageMimeType(string fileExtension) =>
+            fileExtension?.ToLowerInvariant() switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                ".bmp" => "image/bmp",
+                _ => "application/octet-stream",
+            };
 
         // De-exempted cycle-5 (R1): covered by a headless real-ItemViewer test, QfcItemController.ViewerSetupTests.cs.
         internal void ResolveControlGroups(ItemViewer itemViewer)
