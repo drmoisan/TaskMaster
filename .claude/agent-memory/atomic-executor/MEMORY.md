@@ -1,5 +1,7 @@
 # Atomic Executor Memory Index
 
+- [C# canonical coverage artifact conversion](project_csharp_canonical_coverage_artifact_conversion.md) — hook reads artifacts/csharp/coverage.xml as JaCoCo; convert feature Cobertura (dedup lines, per-package counters); first-party aggregate under-counts <85% because uninstrumented assemblies show 0% — defer repo-wide to PR CI per policy-audit §5.4, don't cherry-pick
+
 - [sln/csproj edits: preserve CRLF](project_sln_csproj_edit_crlf_preserve.md) — git-bash `sed -i` strips CRLF from TaskMaster.sln (whole-file churn + BOM loss); use Edit tool or `perl -0777` with explicit `\r\n`; verify with `file` + `git diff --stat`
 - [Swordfish F5 test misclassification](project_swordfish_f5_test_misclassification.md) — #308 plan labeled two F2 clean-base tests as "direct-Swordfish"; only 1 of 3 truly bound Swordfish; verify using/namespace before treating a test removal as Swordfish-only; AC-12 raised #317 for the unique lock-recursion coverage
 - [ScoDictionaryNew needs TryAdd not Add](project_scodictionarynew_tryadd_not_add.md) — retargeting Sco* stand-in tests to ScoDictionaryNew: `.Add(key,value)` won't compile (CS1061); base ConcurrentObservableDictionary exposes `.TryAdd`; swap in the same edit to avoid a build-fail loop

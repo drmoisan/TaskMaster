@@ -66,11 +66,15 @@ path.
   DisplayName-based, runtime, session-versus-future disable state for the lockup-resilience epic.
   The #328 StoreID exclusion is a separate, user-driven, durable exclusion. The two mechanisms stay
   separate; see §9 for the rationale. This feature does not change any #261 behavior.
-- **Deleting the two dead `ToDoEvents` methods.** `GetListOfToDoItemsInView` and
-  `GetToDoItemsInView` appear to have no callers (see §6.2). This spec requires threading the filter
-  into all three named `ToDoEvents` methods for consistency but does **not** delete the two dead
-  methods. Whether to delete them is deferred to the atomic plan as an explicit out-of-scope
-  decision; if pursued, it should be a separate issue.
+- **Deleting the two dead `ToDoEvents` methods (delivered under approved scope change).**
+  `GetListOfToDoItemsInView` and `GetToDoItemsInView` had no callers (see §6.2). This spec originally
+  scoped these two dead methods for consistency-only handling rather than deletion. During delivery,
+  the maintainer approved a scope change to DELETE the two dead methods as part of #328
+  (`artifacts/orchestration/orchestrator-state.json` `human_interaction_history`,
+  `response: scope_change`, `resolved_at: 2026-07-15T23:35:00Z`). As delivered, the two methods were
+  deleted — not threaded and not deferred to a separate issue — which removes their `Session.Stores`
+  bypass entirely. The live path (`GetAsyncEnumerableOfToDoItemsInView`) is routed through the shared
+  `ShouldIncludeStore` predicate as specified.
 - **Collapsing the filter-predicate duplication.** The include/exclude decision is implemented
   across `ShouldIncludeStore`, `StoreIsIncluded`, `StoreFilterAttribution.Decide`, and
   `ShouldIncludeStoreInstrumented`. This feature updates all of them identically to add the StoreID
@@ -257,12 +261,13 @@ Live-path change: add an `IApplicationGlobals globals` parameter to `RefreshToDo
 `globals.Ol.StoresWrapper.ShouldIncludeStore` in the null-safe `.Where`; `RibbonController` passes
 `Globals`.
 
-Dead-method requirement: thread the same `IApplicationGlobals`/filter parameter and null-safe `.Where`
-into the two issue-named dead methods (`GetListOfToDoItemsInView`, `GetToDoItemsInView`) for
-consistency. They are static with no callers, so threading a parameter is safe. **Dead-code flag for
-the atomic plan:** these two methods appear dead; the atomic plan should decide whether to delete
-them instead. Deletion is out of scope for this feature (§2.2) and, if pursued, should be a separate
-issue.
+Dead-method resolution (delivered under approved scope change): the two issue-named dead methods
+(`GetListOfToDoItemsInView`, `GetToDoItemsInView`) were DELETED as part of #328 rather than threaded.
+They were `static` with no callers, so deletion is safe and removes their `Session.Stores` bypass
+entirely. This deletion was approved by the maintainer as a scope change during delivery
+(`artifacts/orchestration/orchestrator-state.json` `human_interaction_history`,
+`response: scope_change`, `resolved_at: 2026-07-15T23:35:00Z`); it was neither threaded for
+consistency nor deferred to a separate issue.
 
 **Site C — `ToDoModel/Data Model/Project/ProjectData.cs`.**
 `Rebuild(Outlook.Application olApp)` enumerates `olApp.Session.Stores` with no filter and calls
@@ -398,8 +403,9 @@ field, otherwise option (a). This is an implementation-time decision for the ato
 - `ToDoModel/Data Model/Tree/TreeOfToDoItems.cs` — thread the filter into
   `GetToDoList`/`GetToDoListAsync`; update the `LoadTree` call.
 - `ToDoModel/Data Model/ToDo/ToDoEvents.cs` — thread the filter into
-  `GetAsyncEnumerableOfToDoItemsInView` + `RefreshToDoIdSplitsAsync` (live) and the two issue-named
-  dead methods.
+  `GetAsyncEnumerableOfToDoItemsInView` + `RefreshToDoIdSplitsAsync` (live path); the two issue-named
+  dead methods (`GetListOfToDoItemsInView`, `GetToDoItemsInView`) were DELETED as part of #328 under
+  the approved scope change (not threaded).
 - `TaskMaster/Ribbon/RibbonController.cs` — pass `Globals` to `RefreshToDoIdSplitsAsync`.
 - `ToDoModel/Data Model/Project/ProjectData.cs` — add a filtered `Rebuild` overload/param.
 - `TaskMaster/AppGlobals/AppToDoObjects.cs` (two call sites) and
@@ -435,8 +441,10 @@ temporary files unless stated otherwise.
       (not excluded on an unread ID).
 - [x] **AC6 — Bypass sites route through the filter.** `TreeOfToDoItems.GetToDoList`/`GetToDoListAsync`,
       `ProjectData.Rebuild`, and `ToDoEvents.GetAsyncEnumerableOfToDoItemsInView` (live path) do not
-      enumerate/process a StoreID-excluded store; the two issue-named `ToDoEvents` methods are threaded
-      with the same filter for consistency. No parallel filtering logic is added outside
+      enumerate/process a StoreID-excluded store; the two dead `ToDoEvents` methods
+      (`GetListOfToDoItemsInView`, `GetToDoItemsInView`) were deleted as part of #328 under the
+      approved scope change (`resolved_at: 2026-07-15T23:35:00Z`), removing their bypass entirely
+      rather than threading them. No parallel filtering logic is added outside
       `StoresWrapper.ShouldIncludeStore`.
 - [x] **AC7 — Not-yet-loaded model is fail-open.** With a null `StoresWrapper` at a bypass site, all
       stores are included (fail-open), matching `AppOlObjects.LoadInboxes`.
@@ -461,9 +469,22 @@ temporary files unless stated otherwise.
 - Total AC items: 12
 - Checked off (delivered): 12
 - Remaining (unchecked): 0
-- Items remaining: none. AC12 is now met: csharpier PASS, analyzers PASS (0 errors), nullable/TWAE
+- Items remaining: none. AC12 is met: csharpier PASS, analyzers PASS (0 errors), nullable/TWAE
   PASS (0 errors), and the vstest suite is functionally green (4611/4611 passing without coverage
   instrumentation; the 19 under-instrumentation failures are pre-existing Deedle/FSharp flakiness).
   The prior scope-conflict was resolved by the in-scope P4-T4 fix adding a handled `get_StoresWrapper`
   fail-open case to the `OlObjectsProxy` test double. All touched files <= 500 lines (AppToDoObjects.cs
   at its documented 503 baseline, not grown).
+- Remediation resolution (2026-07-16T02-30): AC12 was re-graded PARTIAL by the feature-audit on two
+  open coverage items; both are now resolved and AC12 is PASS. R1 — the canonical C# coverage artifact
+  is emitted at `artifacts/csharp/coverage.xml` (JaCoCo, hook-parseable; first-party LINE 70.45% /
+  BRANCH 67.11%), resolving the "canonical artifact absent" finding; the repo-wide first-party
+  aggregate is authoritatively deferred to the PR CI coverage run per policy-audit §5.4 (issue #328's
+  own assembly `UtilitiesCS` is 88.33% line, clearing the floor). R2 — the `StoreWrapper` 64.81% branch
+  coverage is a ratified, documented pre-existing exception (baseline 65.38%, already below the 75%
+  floor before #328; a denominator effect from newly-added fully-covered branches; line 95.31%),
+  recorded in `evidence/qa-gates/storewrapper-branch-coverage-disposition.2026-07-16T02-30.md` with no
+  threshold weakening and no production-source `exclude`. AC6 wording is reconciled by R3: the two dead
+  `ToDoEvents` methods were deleted under the maintainer-approved scope change
+  (`resolved_at: 2026-07-15T23:35:00Z`), not threaded. See
+  `evidence/issue-updates/ac-checkoff.remediation.2026-07-16T02-30.md`.
