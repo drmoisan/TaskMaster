@@ -33,6 +33,71 @@ namespace UtilitiesCS.Test.Threading
         private static ProgressViewer CreateHeadlessViewer() =>
             (ProgressViewer)FormatterServices.GetUninitializedObject(typeof(ProgressViewer));
 
+        /// <summary>
+        /// Verifies that assigning <see cref="ProgressViewer.CancelSource"/> enables
+        /// the Cancel button and that selecting it cancels the same source.
+        /// </summary>
+        [TestMethod]
+        public void CancelSource_WhenAssigned_EnablesButtonAndCancelsSameSourceOnClick()
+        {
+            var context = new SynchronizationContext();
+            SynchronizationContext previousContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(context);
+
+            try
+            {
+                ProgressViewer viewer = new ProgressViewer();
+
+                try
+                {
+                    using var cancelSource = new CancellationTokenSource();
+                    CancellationToken cancellationToken = cancelSource.Token;
+                    FieldInfo cancelButtonField =
+                        typeof(ProgressViewer).GetField(
+                            "ButtonCancel",
+                            BindingFlags.NonPublic | BindingFlags.Instance
+                        )
+                        ?? throw new MissingFieldException(nameof(ProgressViewer), "ButtonCancel");
+                    object cancelButtonValue =
+                        cancelButtonField.GetValue(viewer)
+                        ?? throw new InvalidOperationException(
+                            "ProgressViewer.ButtonCancel resolved to null."
+                        );
+                    var cancelButton =
+                        cancelButtonValue as System.Windows.Forms.Button
+                        ?? throw new InvalidCastException(
+                            "ProgressViewer.ButtonCancel is not a Windows Forms Button."
+                        );
+
+                    viewer.CancelSource = cancelSource;
+                    viewer.Show();
+
+                    cancelButton
+                        .Enabled.Should()
+                        .BeTrue("assigning CancelSource must enable cancellation while loading");
+
+                    cancelButton.PerformClick();
+
+                    cancellationToken
+                        .IsCancellationRequested.Should()
+                        .BeTrue(
+                            "the enabled button must cancel the source assigned to CancelSource"
+                        );
+                }
+                finally
+                {
+                    if (!viewer.IsDisposed)
+                    {
+                        viewer.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
+        }
+
         // ---------------------------------------------------------------------------
         // P30-T1: Cancel path transitions the CancellationToken to cancelled
         // ---------------------------------------------------------------------------
@@ -249,20 +314,39 @@ namespace UtilitiesCS.Test.Threading
         [TestMethod]
         public void CancelSource_SetterAndGetter_RoundTripAssignedValue()
         {
-            // Arrange
-            var viewer = CreateHeadlessViewer();
-            using var cts = new CancellationTokenSource();
+            var context = new SynchronizationContext();
+            SynchronizationContext previousContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(context);
 
-            // Act: use the setter directly (not SetCancellationTokenSource)
-            viewer.CancelSource = cts;
+            try
+            {
+                ProgressViewer viewer = new ProgressViewer();
 
-            // Assert: getter must return the same instance
-            viewer
-                .CancelSource.Should()
-                .BeSameAs(
-                    cts,
-                    "the setter must store and the getter must return the assigned CancellationTokenSource"
-                );
+                try
+                {
+                    using var cts = new CancellationTokenSource();
+
+                    viewer.CancelSource = cts;
+
+                    viewer
+                        .CancelSource.Should()
+                        .BeSameAs(
+                            cts,
+                            "the setter must store and the getter must return the assigned CancellationTokenSource"
+                        );
+                }
+                finally
+                {
+                    if (!viewer.IsDisposed)
+                    {
+                        viewer.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
         }
     }
 }
