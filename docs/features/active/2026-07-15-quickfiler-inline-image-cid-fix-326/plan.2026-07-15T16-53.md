@@ -349,7 +349,7 @@ this phase complete without errors in a single pass.
       evidence artifact path(s) from Phases 1–4 (or to P5-T2's deferred-verification record).
       Acceptance: the artifact exists and every AC bullet has at least one mapped, existing evidence
       artifact path or an explicit deferred-verification note.
-- [ ] [P5-T4] Run `git status --porcelain` and confirm all code changes and evidence artifacts are
+- [x] [P5-T4] Run `git status --porcelain` and confirm all code changes and evidence artifacts are
       staged/committed (empty output, or output limited to files intentionally left untracked by repo
       convention). Record to
       `docs/features/active/2026-07-15-quickfiler-inline-image-cid-fix-326/evidence/other/clean-worktree-confirmation.<TS>.md`.
