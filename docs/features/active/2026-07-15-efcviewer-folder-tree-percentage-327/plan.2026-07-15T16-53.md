@@ -129,17 +129,17 @@ path is a policy violation. Timestamps use `yyyy-MM-ddTHH-mm`.
 
 ### Phase 5 — Final QA and Coverage Verification
 
-- [ ] [P5-T1] Run `csharpier .` (or `dotnet tool run csharpier .`) at repo root and record the result in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/qa-gates/phase5-final-csharpier.md`
+- [x] [P5-T1] Run `csharpier .` (or `dotnet tool run csharpier .`) at repo root and record the result in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/qa-gates/phase5-final-csharpier.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; no formatting changes remain (rerun loop from step 1 if any file changed).
-- [ ] [P5-T2] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` and record the result in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/qa-gates/phase5-final-analyzers.md`
+- [x] [P5-T2] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` and record the result in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/qa-gates/phase5-final-analyzers.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; zero analyzer errors.
-- [ ] [P5-T3] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true` and record the result in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/qa-gates/phase5-final-nullable.md`
+- [x] [P5-T3] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true` and record the result in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/qa-gates/phase5-final-nullable.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; zero nullable/warning-as-error failures.
-- [ ] [P5-T4] Run `vstest.console.exe` against `UtilitiesCS.Test` and `QuickFiler.Test` assemblies with `/EnableCodeCoverage` and record numeric post-change coverage in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/qa-gates/phase5-final-tests-coverage.md`
+- [x] [P5-T4] Run `vstest.console.exe` against `UtilitiesCS.Test` and `QuickFiler.Test` assemblies with `/EnableCodeCoverage` and record numeric post-change coverage in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/qa-gates/phase5-final-tests-coverage.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` including numeric post-change line/branch coverage and per-file coverage for the five new `UtilitiesCS/OutlookObjects/Folder/` modules.
-- [ ] [P5-T5] Compute and record the coverage delta/threshold verification in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/qa-gates/phase5-coverage-delta.md`, comparing baseline (P0-T5) vs post-change (P5-T4) and reporting new/changed-code coverage
+- [x] [P5-T5] Compute and record the coverage delta/threshold verification in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/qa-gates/phase5-coverage-delta.md`, comparing baseline (P0-T5) vs post-change (P5-T4) and reporting new/changed-code coverage
   - Acceptance: artifact records baseline coverage, post-change coverage, and new-code coverage; new host-neutral modules meet `>= 90%`, repository floor is not regressed, and no changed line loses coverage; if any threshold is unmet the outcome is remediation-required (not PASS).
-- [ ] [P5-T6] Map every acceptance criterion in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/spec.md` and `user-story.md` to its verifying test or build/manual-QA evidence in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/other/ac-verification-map.md`
+- [x] [P5-T6] Map every acceptance criterion in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/spec.md` and `user-story.md` to its verifying test or build/manual-QA evidence in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/other/ac-verification-map.md`
   - Acceptance: artifact lists each AC with a PASS/PARTIAL/BLOCKED verdict and a concrete evidence pointer (test name or exempt build/manual-QA note for the two Forms and controller).
 
 ## Test Plan
