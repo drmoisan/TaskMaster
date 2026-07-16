@@ -14,6 +14,7 @@ An Outlook add-in and set of supporting libraries to **triage, tag, and file ema
 * [Build & debug (VSTO add-in)](#build--debug-vsto-add-in)
 * [Running the tests](#running-the-tests)
 * [Configuration & storage](#configuration--storage)
+* [Dependency updates (Dependabot)](#dependency-updates-dependabot)
 * [Common issues](#common-issues)
 * [Contributing & branches](#contributing--branches)
 * [License](#license)
@@ -150,6 +151,15 @@ Test projects include:
 * Packages bring optional capabilities (e.g., **Microsoft.Graph**, **WebView2**) used where available.
 
 > **Privacy note:** The add-in processes Outlook items locally. Saved classifier snapshots and diagnostics are written to your local filesystem; review the save location from the Ribbon before sharing files.
+
+---
+
+## Dependency updates (Dependabot)
+
+* Dependabot's NuGet updater cannot independently bump a transitive/indirect dependency beyond what its referencing primary dependency's own manifest supports. This is documented default ecosystem behavior (GitHub Docs, "About Dependabot security updates"), not a mechanism this repo's `.github/dependabot.yml` invents.
+* The `semver-major`-scoped `ignore` rule set in `.github/dependabot.yml` — covering the eight Microsoft `.NET`-runtime-aligned package families (`Microsoft.Extensions.*`, `Microsoft.Bcl.*`, `System.Text.Json`, `System.Drawing.Common`, `Microsoft.Graph*`, `Apache.Arrow*`, `Microsoft.Data.Analysis`, `Microsoft.ML*`) — is this repo's defense against a future `.NET Framework 4.8.1` (`net481`) compatibility drop. It was adopted because no currently-published version of any package referenced in this repo has dropped net481 support (verified 2026-07-16; see `docs/features/active/2026-07-16-dependabot-net481-support-340/research/2026-07-16T16-10-dependabot-net481-support-research.md` §4). Minor and patch updates for the same package families remain unaffected by this ignore rule.
+* The config scopes all 16 `packages.config` project directories via `directories: ["/*"]` (a single-segment wildcard matching every immediate-child directory of the repository root). A pre-decided fallback exists if post-merge verification shows under-coverage: the literal 16-entry `directories:` list documented in `docs/features/active/2026-07-16-dependabot-net481-support-340/spec.md` Appendix A, to be substituted for the glob in a follow-up commit only if that verification shows fewer directories scanned than expected.
+* **Runbook note (manual, post-merge verification):** after this configuration merges, a maintainer must manually confirm via the repository's **Insights → Dependency graph → Dependabot** tab (or the "Recent update jobs" log) that at least one of the 16 directories is scanned and produces a dependency list. This check is out of scope for any automated toolchain — no format/lint/type-check/test stage applies to a static YAML file — and is tracked as spec AC-11.
 
 ---
 
