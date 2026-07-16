@@ -76,25 +76,25 @@ contract. This feature is the prerequisite plumbing.
 
 ## Acceptance Criteria / Done When
 
-- [ ] A new immutable `FolderScore` value type (`FolderPath`, `Score` long, `Probability` double) is
+- [x] A new immutable `FolderScore` value type (`FolderPath`, `Score` long, `Probability` double) is
       available from the scoring layer (net48-safe `readonly struct`, no record/init).
-- [ ] `FolderScorer.ToScoredArray()` and `ToScoredArray(int)` return `FolderScore[]` whose folder
+- [x] `FolderScorer.ToScoredArray()` and `ToScoredArray(int)` return `FolderScore[]` whose folder
       ordering matches `ToArray()` / `ToArray(int)` exactly, including ties (ordinal tie-break).
-- [ ] Existing outputs `ToArray`, `ToArray(int)`, `FolderArray`, and `FindFolder(...)` remain
+- [x] Existing outputs `ToArray`, `ToArray(int)`, `FolderArray`, and `FindFolder(...)` remain
       byte-for-byte unchanged in ordering and content (regression tests).
-- [ ] `Probability` is max-normalized to `[0,1]` with a zero-guard (empty scorer and all-zero seeds
+- [x] `Probability` is max-normalized to `[0,1]` with a zero-guard (empty scorer and all-zero seeds
       yield `Probability = 0`, no divide-by-zero) and is documented as a relative display value, not
       a calibrated Bayesian posterior.
-- [ ] The scored projection is verified across Bayesian, conversation, and word-sequence sources
+- [x] The scored projection is verified across Bayesian, conversation, and word-sequence sources
       (plus mixed-source accumulation) via the `AddSuggestion` seam, without exercising the COM-bound
       Bayesian path directly.
-- [ ] A `FolderRow` row model with `FolderRowKind { Separator, SearchResult, Suggestion, Recent }`
+- [x] A `FolderRow` row model with `FolderRowKind { Separator, SearchResult, Suggestion, Recent }`
       is available via `FolderPredictor.FolderRowArray` and `FindFolderRows(...)`; `Text` matches the
       legacy string output, `Kind` is correctly tagged, and `Score` is non-null only on `Suggestion`
       rows, so downstream renderers tag separators by `Kind` rather than `.StartsWith("====")`.
-- [ ] The `"Error"` sentinel never appears in the scored contract (regression test).
-- [ ] The contract is documented as sufficient for 9002 and 9003 to render a whole-number
+- [x] The `"Error"` sentinel never appears in the scored contract (regression test).
+- [x] The contract is documented as sufficient for 9002 and 9003 to render a whole-number
       percentage (`Math.Round(Probability * 100)`) and skip non-suggestion rows via `Kind`, from a
       single shared normalization point, with no second plumbing pass.
-- [ ] New/changed code meets the stricter repository coverage regime and the full C# toolchain is
+- [x] New/changed code meets the stricter repository coverage regime and the full C# toolchain is
       green.

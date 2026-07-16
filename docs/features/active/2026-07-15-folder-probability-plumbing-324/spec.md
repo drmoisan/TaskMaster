@@ -226,41 +226,41 @@ MSTest + Moq + FluentAssertions.
 
 ## Acceptance Criteria
 
-- [ ] A new immutable `public readonly struct FolderScore` exists in
+- [x] A new immutable `public readonly struct FolderScore` exists in
       `UtilitiesCS/OutlookObjects/Folder/FolderScore.cs` with get-only `FolderPath` (string),
       `Score` (long), and `Probability` (double) and a constructor (net48-safe: no record/init).
-- [ ] `FolderScorer.ToScoredArray()` and `ToScoredArray(int topN)` exist and return
+- [x] `FolderScorer.ToScoredArray()` and `ToScoredArray(int topN)` exist and return
       `FolderScore[]`.
-- [ ] `ToScoredArray().Select(x => x.FolderPath)` ordering equals `ToArray()` ordering, and
+- [x] `ToScoredArray().Select(x => x.FolderPath)` ordering equals `ToArray()` ordering, and
       `ToScoredArray(n)` ordering equals `ToArray(n)` ordering, including a tie case (regression
       test).
-- [ ] Existing `FolderScorer.ToArray()` / `ToArray(int)` output is unchanged byte-for-byte in
+- [x] Existing `FolderScorer.ToArray()` / `ToArray(int)` output is unchanged byte-for-byte in
       ordering and content (regression test with a golden baseline).
-- [ ] `FolderPredictor.FolderArray` and `FolderPredictor.FindFolder(...)` output is unchanged
+- [x] `FolderPredictor.FolderArray` and `FolderPredictor.FindFolder(...)` output is unchanged
       byte-for-byte in ordering and content (regression test).
-- [ ] `Probability` is max-normalized (`Score / TopScore`) and always in `[0,1]`, with a zero-guard
+- [x] `Probability` is max-normalized (`Score / TopScore`) and always in `[0,1]`, with a zero-guard
       returning 0 when `TopScore == 0` (empty scorer and all-zero-seed tests prove no
       divide-by-zero).
-- [ ] Scored projection is verified across all three score sources (Bayesian, conversation,
+- [x] Scored projection is verified across all three score sources (Bayesian, conversation,
       word-sequence) via the `AddSuggestion` seam, plus a mixed-source accumulation case; the
       COM-bound `AddBayesianSuggestionsAsync` path is not exercised directly.
-- [ ] A `FolderRow` row model (`readonly struct FolderRow` with `Text`, `Kind`, nullable `Score`)
+- [x] A `FolderRow` row model (`readonly struct FolderRow` with `Text`, `Kind`, nullable `Score`)
       and `enum FolderRowKind { Separator, SearchResult, Suggestion, Recent }` exist, with
       `FolderPredictor.FolderRowArray` and `FindFolderRows(...)`; `Text` matches the legacy string
       output, `Kind` is correctly tagged, and `Score` is non-null only on `Suggestion` rows.
-- [ ] The `"Error"` sentinel never appears in the scored contract (regression test).
-- [ ] Downstream contract sufficiency is documented: 9002 and 9003 can render a whole-number
+- [x] The `"Error"` sentinel never appears in the scored contract (regression test).
+- [x] Downstream contract sufficiency is documented: 9002 and 9003 can render a whole-number
       percentage from `Probability` (`Math.Round(Probability * 100)`) and skip non-suggestion rows
       via `Kind`, without a second plumbing pass.
-- [ ] `Probability` XML documentation states it is a relative display value, not a calibrated
+- [x] `Probability` XML documentation states it is a relative display value, not a calibrated
       Bayesian posterior.
-- [ ] New/changed code meets the stricter repository coverage regime (>= 90% line on new members;
+- [x] New/changed code meets the stricter repository coverage regime (>= 90% line on new members;
       branch coverage of empty / all-zero / tie / `topN` paths; no reduction on changed lines).
-- [ ] Full C# toolchain is green (csharpier -> analyzer build -> nullable/type build -> vstest with
+- [x] Full C# toolchain is green (csharpier -> analyzer build -> nullable/type build -> vstest with
       code coverage), reported with the exact commands run.
 
 ## Seeded Test Conditions (from potential)
-- [ ] Unit coverage of the new contract projection (folder identity + probability) for Bayesian,
+- [x] Unit coverage of the new contract projection (folder identity + probability) for Bayesian,
       conversation, and word-sequence suggestion sources.
-- [ ] Regression tests proving `ToArray`/`FolderArray` ordering and content are unchanged.
-- [ ] Edge cases: empty scorer, ties, "Error" sentinel, separator rows.
+- [x] Regression tests proving `ToArray`/`FolderArray` ordering and content are unchanged.
+- [x] Edge cases: empty scorer, ties, "Error" sentinel, separator rows.

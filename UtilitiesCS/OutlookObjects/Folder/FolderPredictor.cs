@@ -224,6 +224,33 @@ namespace UtilitiesCS
             }
         }
 
+        /// <summary>
+        /// Additive row-model mirror of <see cref="FolderArray"/>. Produces the same ordered
+        /// sequence of rows, each <see cref="FolderRow.Text"/> equal to the corresponding
+        /// <see cref="FolderArray"/> string: the "========= SUGGESTIONS =========" separator
+        /// (<see cref="FolderRowKind.Separator"/>), the top-5 scored suggestions
+        /// (<see cref="FolderRowKind.Suggestion"/> with a non-null <see cref="FolderRow.Score"/>),
+        /// the "======= RECENT SELECTIONS ========" separator, and the recent selections
+        /// (<see cref="FolderRowKind.Recent"/>). This getter does not mutate the cached
+        /// <c>_folderList</c>, so <see cref="FolderArray"/> output is unaffected.
+        /// </summary>
+        public FolderRow[] FolderRowArray
+        {
+            get
+            {
+                var rows = new List<FolderRow>();
+                if (Suggestions.Count > 0)
+                {
+                    AddSuggestionRows(rows);
+                }
+                if (_globals.AF.RecentsList.Count > 0)
+                {
+                    AddRecentRows(rows);
+                }
+                return rows.ToArray();
+            }
+        }
+
         private FolderScorer _suggestions;
         public FolderScorer Suggestions
         {
@@ -303,6 +330,76 @@ namespace UtilitiesCS
             AddRecents(ref _folderList);
 
             return FolderArray;
+        }
+
+        /// <summary>
+        /// Additive row-model mirror of <see cref="FindFolder"/> with the same signature and the
+        /// same ordered output. Each <see cref="FolderRow.Text"/> equals the corresponding
+        /// <see cref="FindFolder"/> string: the "======= SEARCH RESULTS =======" separator
+        /// (<see cref="FolderRowKind.Separator"/>) and matching folders
+        /// (<see cref="FolderRowKind.SearchResult"/>), the "========= SUGGESTIONS =========" separator
+        /// and the top-5 scored suggestions (<see cref="FolderRowKind.Suggestion"/> with a non-null
+        /// <see cref="FolderRow.Score"/>), then the "======= RECENT SELECTIONS ========" separator and
+        /// the recents (<see cref="FolderRowKind.Recent"/>). Only <see cref="FolderRowKind.Suggestion"/>
+        /// rows carry a <see cref="FolderRow.Score"/>. This method does not mutate the cached
+        /// <c>_folderList</c>, so <see cref="FindFolder"/> output is unaffected.
+        /// </summary>
+        /// <param name="searchString"><inheritdoc cref="FindFolder"/></param>
+        /// <param name="objItem"><inheritdoc cref="FindFolder"/></param>
+        /// <param name="reloadCTFStagingFiles"><inheritdoc cref="FindFolder"/></param>
+        /// <param name="emailSearchRoots"><inheritdoc cref="FindFolder"/></param>
+        /// <param name="recalcSuggestions"><inheritdoc cref="FindFolder"/></param>
+        /// <param name="exclusions">Folders to exclude from the search results</param>
+        /// <returns>The assembled folder rows in the same order as <see cref="FindFolder"/>.</returns>
+        public FolderRow[] FindFolderRows(
+            string searchString,
+            object objItem,
+            bool reloadCTFStagingFiles = true,
+            List<string> emailSearchRoots = null,
+            bool recalcSuggestions = false,
+            IEnumerable<(string root, string excludedFolder, bool excludeChildren)> exclusions =
+                null
+        )
+        {
+            if (emailSearchRoots is null)
+            {
+                emailSearchRoots = new() { _globals.Ol.ArchiveRootPath };
+            }
+            if (exclusions is null)
+            {
+                exclusions = new List<(string root, string excludedFolder, bool excludeChildren)>();
+            }
+
+            var rows = new List<FolderRow>();
+
+            // Add search results (mirrors the FindFolder search block + AddMatches)
+            var matchingFolders = emailSearchRoots
+                .Select(root =>
+                    GetMatchingFolders(
+                        searchString,
+                        root,
+                        includeChildren: true,
+                        exclusions
+                            .Where(x => x.root == root)
+                            .Select(x => (x.excludedFolder, x.excludeChildren))
+                    )
+                )
+                .SelectMany(x => x)
+                .ToList();
+
+            AddMatchRows(rows, matchingFolders);
+
+            // Add suggestions (unconditional, mirroring the FindFolder AddSuggestions call)
+            if (recalcSuggestions)
+            {
+                RefreshSuggestions(objItem);
+            }
+            AddSuggestionRows(rows);
+
+            // Add recents (mirrors AddRecents, which gates internally on the recents count)
+            AddRecentRows(rows);
+
+            return rows.ToArray();
         }
 
         /// <summary>
@@ -699,6 +796,60 @@ namespace UtilitiesCS
         {
             folderList.Add("========= SUGGESTIONS =========");
             folderList.AddRange(Suggestions.ToArray(5));
+        }
+
+        // Row-model mirror of AddMatches: the SEARCH RESULTS separator (Separator, no score)
+        // followed by the ordered matching folders tagged SearchResult. Uses the same OrderBy(x =>
+        // x) as AddMatches so the Text sequence is identical.
+        private static void AddMatchRows(List<FolderRow> rows, List<string> matchingFolders)
+        {
+            if (matchingFolders is not null && matchingFolders.Count > 0)
+            {
+                matchingFolders = matchingFolders.OrderBy(x => x).ToList();
+                rows.Add(
+                    new FolderRow("======= SEARCH RESULTS =======", FolderRowKind.Separator, null)
+                );
+                foreach (var folder in matchingFolders)
+                {
+                    rows.Add(new FolderRow(folder, FolderRowKind.SearchResult, null));
+                }
+            }
+        }
+
+        // Row-model mirror of AddSuggestions: the SUGGESTIONS separator (Separator, no score)
+        // followed by the top-5 scored suggestions as Suggestion rows carrying their FolderScore.
+        // Text parity with AddSuggestions holds because Suggestions.ToScoredArray(5) shares the same
+        // ordered enumeration as Suggestions.ToArray(5).
+        private void AddSuggestionRows(List<FolderRow> rows)
+        {
+            rows.Add(
+                new FolderRow("========= SUGGESTIONS =========", FolderRowKind.Separator, null)
+            );
+            foreach (var score in Suggestions.ToScoredArray(5))
+            {
+                rows.Add(new FolderRow(score.FolderPath, FolderRowKind.Suggestion, score));
+            }
+        }
+
+        // Row-model mirror of AddRecents: the RECENT SELECTIONS separator (Separator, no score)
+        // followed by each recent selection tagged Recent. Gated internally on the recents count,
+        // exactly as AddRecents is.
+        private void AddRecentRows(List<FolderRow> rows)
+        {
+            if (_globals.AF.RecentsList.Count > 0)
+            {
+                rows.Add(
+                    new FolderRow(
+                        "======= RECENT SELECTIONS ========",
+                        FolderRowKind.Separator,
+                        null
+                    )
+                );
+                foreach (var recent in _globals.AF.RecentsList)
+                {
+                    rows.Add(new FolderRow(recent, FolderRowKind.Recent, null));
+                }
+            }
         }
 
         public List<string> GetMatchingFolders(
