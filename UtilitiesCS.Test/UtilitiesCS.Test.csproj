@@ -268,6 +268,7 @@
     <Compile Include="OutlookObjects\Folder\FolderWrapperNodeContentsComparerTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeNodeKeyTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderSuggestionTreeHierarchyTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderSuggestionTreeStateTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeRequestTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeCompatibilityViewDisposalTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeCompatibilityViewTests.cs" />

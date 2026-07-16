@@ -89,6 +89,108 @@ namespace UtilitiesCS
             return new FolderSuggestionTree(roots);
         }
 
+        /// <summary>
+        /// Projects the tree into the ordered list of currently visible rows via a pre-order flatten.
+        /// A node's children are emitted only when <see cref="FolderSuggestionNode.IsExpanded"/> is
+        /// true; banner rows are always emitted in section order and are never descended into.
+        /// </summary>
+        /// <returns>The visible rows in display order for the current expand/collapse state.</returns>
+        public IReadOnlyList<FolderSuggestionNode> VisibleRows()
+        {
+            var result = new List<FolderSuggestionNode>();
+            foreach (var root in _roots)
+            {
+                Flatten(root, result);
+            }
+
+            return result;
+        }
+
+        private static void Flatten(
+            FolderSuggestionNode node,
+            List<FolderSuggestionNode> accumulator
+        )
+        {
+            accumulator.Add(node);
+
+            // Banner rows are never expandable, so never descend into them.
+            if (node.Kind == FolderSuggestionNodeKind.Banner || !node.IsExpanded)
+            {
+                return;
+            }
+
+            foreach (var child in node.Children)
+            {
+                Flatten(child, accumulator);
+            }
+        }
+
+        /// <summary>
+        /// Expands <paramref name="node"/> when it is an expandable folder that is currently
+        /// collapsed. A banner, a leaf, or an already-expanded node is a no-op.
+        /// </summary>
+        public void Expand(FolderSuggestionNode node)
+        {
+            if (node == null || node.Kind == FolderSuggestionNodeKind.Banner)
+            {
+                return;
+            }
+
+            if (node.HasChildren && !node.IsExpanded)
+            {
+                node.IsExpanded = true;
+            }
+        }
+
+        /// <summary>
+        /// Collapses <paramref name="node"/> when it is currently expanded. A banner, a leaf, or an
+        /// already-collapsed node is a no-op.
+        /// </summary>
+        public void Collapse(FolderSuggestionNode node)
+        {
+            if (node == null || node.Kind == FolderSuggestionNodeKind.Banner)
+            {
+                return;
+            }
+
+            if (node.IsExpanded)
+            {
+                node.IsExpanded = false;
+            }
+        }
+
+        /// <summary>
+        /// Toggles the expand/collapse state of an expandable folder node (mouse plus/minus click).
+        /// A banner or a leaf node is a no-op.
+        /// </summary>
+        public void Toggle(FolderSuggestionNode node)
+        {
+            if (node == null || node.Kind == FolderSuggestionNodeKind.Banner || !node.HasChildren)
+            {
+                return;
+            }
+
+            node.IsExpanded = !node.IsExpanded;
+        }
+
+        /// <summary>
+        /// Right-arrow keyboard behavior on the highlighted node: expands an expandable, collapsed
+        /// folder; a leaf, an already-expanded node, or a banner is a no-op.
+        /// </summary>
+        public void RightArrow(FolderSuggestionNode node)
+        {
+            Expand(node);
+        }
+
+        /// <summary>
+        /// Left-arrow keyboard behavior on the highlighted node: collapses an expanded folder; a
+        /// leaf, an already-collapsed node, or a banner is a no-op.
+        /// </summary>
+        public void LeftArrow(FolderSuggestionNode node)
+        {
+            Collapse(node);
+        }
+
         /// <summary>True when the row is a section/banner header (begins with <c>"===="</c>).</summary>
         private static bool IsBanner(string row)
         {

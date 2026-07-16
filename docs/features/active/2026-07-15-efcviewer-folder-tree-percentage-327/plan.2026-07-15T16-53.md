@@ -86,13 +86,13 @@ path is a policy violation. Timestamps use `yyyy-MM-ddTHH-mm`.
 
 ### Phase 2 — Expand/Collapse State Machine and Visible-Row Projection
 
-- [ ] [P2-T1] Add `VisibleRows()` to `UtilitiesCS/OutlookObjects/Folder/FolderSuggestionTree.cs` performing a pre-order flatten that emits a node's children only when `IsExpanded == true`, always emits banner rows in section order, and never expands banner nodes
+- [x] [P2-T1] Add `VisibleRows()` to `UtilitiesCS/OutlookObjects/Folder/FolderSuggestionTree.cs` performing a pre-order flatten that emits a node's children only when `IsExpanded == true`, always emits banner rows in section order, and never expands banner nodes
   - Acceptance: `VisibleRows()` returns the correct ordered projection for collapsed and expanded states; compiles.
-- [ ] [P2-T2] Add pure state transitions to `UtilitiesCS/OutlookObjects/Folder/FolderSuggestionTree.cs`: `Expand`, `Collapse`, `Toggle`, `RightArrow`, `LeftArrow` with the documented no-op rules (leaf, already-expanded on Right, already-collapsed/leaf on Left, banner row) and no side effects beyond `IsExpanded`
+- [x] [P2-T2] Add pure state transitions to `UtilitiesCS/OutlookObjects/Folder/FolderSuggestionTree.cs`: `Expand`, `Collapse`, `Toggle`, `RightArrow`, `LeftArrow` with the documented no-op rules (leaf, already-expanded on Right, already-collapsed/leaf on Left, banner row) and no side effects beyond `IsExpanded`
   - Acceptance: transitions honor the no-op rules and mutate only `IsExpanded`; compiles.
-- [ ] [P2-T3] Create `UtilitiesCS.Test/OutlookObjects/Folder/FolderSuggestionTreeStateTests.cs` covering leaf Right/Left no-op, already-expanded Right no-op, already-collapsed Left no-op, root nodes, highlighted banner no-op, empty list, single node, and `VisibleRows()` projection after expand and after collapse; add the matching `<Compile Include>` item to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
+- [x] [P2-T3] Create `UtilitiesCS.Test/OutlookObjects/Folder/FolderSuggestionTreeStateTests.cs` covering leaf Right/Left no-op, already-expanded Right no-op, already-collapsed Left no-op, root nodes, highlighted banner no-op, empty list, single node, and `VisibleRows()` projection after expand and after collapse; add the matching `<Compile Include>` item to `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
   - Acceptance: file exists, csproj item present, all state/projection tests pass.
-- [ ] [P2-T4] Run the full C# toolchain loop in order (`csharpier .` -> analyzers `msbuild` -> nullable `msbuild` -> `vstest.console.exe /EnableCodeCoverage`) and record the green pass in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/qa-gates/phase2-toolchain.md`
+- [x] [P2-T4] Run the full C# toolchain loop in order (`csharpier .` -> analyzers `msbuild` -> nullable `msbuild` -> `vstest.console.exe /EnableCodeCoverage`) and record the green pass in `docs/features/active/2026-07-15-efcviewer-folder-tree-percentage-327/evidence/qa-gates/phase2-toolchain.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:` per step, `Output Summary:`; all four steps green in a single pass.
 
 ### Phase 3 — Percentage Formatter and Upstream Probability Adapter
