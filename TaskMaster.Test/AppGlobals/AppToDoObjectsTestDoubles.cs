@@ -128,6 +128,15 @@ namespace TaskMaster.Test.AppGlobals
                 return new ReturnMessage(appAccessor(), null, 0, call.LogicalCallContext, call);
             }
 
+            if (call.MethodName == "get_StoresWrapper")
+            {
+                // Fail-open: return a null StoresWrapper so ProjectData.Rebuild's
+                // "storesWrapper is null || storesWrapper.ShouldIncludeStore(store)" predicate
+                // treats the proxy as not-yet-loaded, preserving this test's original intent
+                // (it asserts Rebuild reaches get_Session, not StoresWrapper filtering behavior).
+                return new ReturnMessage(null, null, 0, call.LogicalCallContext, call);
+            }
+
             return new ReturnMessage(
                 new NotSupportedException(
                     $"Member '{call.MethodName}' is not used by this test proxy."

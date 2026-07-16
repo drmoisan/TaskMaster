@@ -80,7 +80,13 @@ namespace TaskMaster.Ribbon
 
         internal void TryRebuildProjInfo()
         {
-            AppGlobals.TD.ProjInfo.Rebuild(AppGlobals.Ol.App);
+            // why: issue #328. Route the rebuild through the store-filtering overload so excluded
+            // stores are skipped. The filtered overload is declared on the concrete ProjectData
+            // (IProjectData is out of this change's scope), so cast to reach it.
+            ((ProjectData)AppGlobals.TD.ProjInfo).Rebuild(
+                AppGlobals.Ol.App,
+                AppGlobals.Ol.StoresWrapper
+            );
         }
 
         internal void TryRecipientGetInfo()

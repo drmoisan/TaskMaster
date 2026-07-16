@@ -27,6 +27,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             // Arrange
             // Act
             var result = StoreFilterAttribution.Decide(
+                storeId: null,
+                excludedStoreIds: null,
                 isPublicFolder: true,
                 displayName: "Public Folders",
                 filePath: @"C:\Data\public.ost",
@@ -48,6 +50,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         {
             // Arrange / Act
             var result = StoreFilterAttribution.Decide(
+                storeId: null,
+                excludedStoreIds: null,
                 isPublicFolder: false,
                 displayName: "Team Archive",
                 filePath: @"C:\Data\mailbox.ost",
@@ -69,6 +73,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         {
             // Arrange / Act
             var result = StoreFilterAttribution.Decide(
+                storeId: null,
+                excludedStoreIds: null,
                 isPublicFolder: false,
                 displayName: "Google Workspace",
                 filePath: @"C:\Users\Dan\Google\Google Workspace Sync\sync.ost",
@@ -90,6 +96,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         {
             // Arrange / Act
             var result = StoreFilterAttribution.Decide(
+                storeId: null,
+                excludedStoreIds: null,
                 isPublicFolder: false,
                 displayName: "Temp Store",
                 filePath: @"C:\Temp\store.pst",
@@ -111,6 +119,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         {
             // Arrange / Act
             var result = StoreFilterAttribution.Decide(
+                storeId: null,
+                excludedStoreIds: null,
                 isPublicFolder: false,
                 displayName: "Mailbox",
                 filePath: @"C:\Data\mailbox.ost",
@@ -135,6 +145,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             // Arrange: a public-folder store whose path would also match a GWSO token.
             // Act
             var result = StoreFilterAttribution.Decide(
+                storeId: null,
+                excludedStoreIds: null,
                 isPublicFolder: true,
                 displayName: "Public Folders",
                 filePath: @"C:\Users\Dan\Google\Google Apps Sync\sync.ost",
@@ -156,6 +168,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         {
             // Arrange / Act
             var result = StoreFilterAttribution.Decide(
+                storeId: null,
+                excludedStoreIds: null,
                 isPublicFolder: false,
                 displayName: null,
                 filePath: null,
@@ -177,6 +191,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         {
             // Arrange / Act
             var result = StoreFilterAttribution.Decide(
+                storeId: null,
+                excludedStoreIds: null,
                 isPublicFolder: false,
                 displayName: "",
                 filePath: "",
@@ -199,6 +215,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             // Arrange: a Gmail-style FilePath but excludeGwsoStores=false (flag guard).
             // Act
             var result = StoreFilterAttribution.Decide(
+                storeId: null,
+                excludedStoreIds: null,
                 isPublicFolder: false,
                 displayName: "Google Workspace",
                 filePath: @"C:\Users\Dan\Google\Google Workspace Sync\sync.ost",
@@ -222,6 +240,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         {
             // Arrange / Act: no exclusion rule matches, but the store is disabled.
             var result = StoreFilterAttribution.Decide(
+                storeId: null,
+                excludedStoreIds: null,
                 isPublicFolder: false,
                 displayName: "Mailbox",
                 filePath: @"C:\Data\mailbox.ost",
@@ -243,6 +263,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         {
             // Arrange / Act: an earlier rule (public folder) matches while the store is also disabled.
             var result = StoreFilterAttribution.Decide(
+                storeId: null,
+                excludedStoreIds: null,
                 isPublicFolder: true,
                 displayName: "Public Folders",
                 filePath: @"C:\Data\public.ost",
@@ -263,6 +285,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         public void Decide_WhenNameExcludedAndAlsoDisabled_KeepsNameContainsRule()
         {
             var result = StoreFilterAttribution.Decide(
+                storeId: null,
+                excludedStoreIds: null,
                 isPublicFolder: false,
                 displayName: "Team Archive",
                 filePath: @"C:\Data\archive.ost",
@@ -282,6 +306,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         public void Decide_WhenGwsoExcludedAndAlsoDisabled_KeepsGwsoFilePathRule()
         {
             var result = StoreFilterAttribution.Decide(
+                storeId: null,
+                excludedStoreIds: null,
                 isPublicFolder: false,
                 displayName: "Google Workspace",
                 filePath: @"C:\Users\Dan\Google\Google Workspace Sync\sync.ost",
@@ -301,6 +327,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         public void Decide_WhenFilePathExcludedAndAlsoDisabled_KeepsFilePathContainsRule()
         {
             var result = StoreFilterAttribution.Decide(
+                storeId: null,
+                excludedStoreIds: null,
                 isPublicFolder: false,
                 displayName: "Mailbox",
                 filePath: @"C:\Temp\mailbox.ost",
@@ -324,6 +352,59 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
                 .Should()
                 .Be((int)StoreFilterRule.Disabled - 1);
             ((int)StoreFilterRule.Disabled).Should().Be((int)StoreFilterRule.Included - 1);
+        }
+
+        // --- Decide: StoreID exclusion is the authoritative first branch (issue #328) ---
+
+        [TestMethod]
+        public void Decide_WhenStoreIdMatchesAndAnEarlierRuleAlsoMatches_StoreIdWinsAsFirstBranch()
+        {
+            // Arrange: a public-folder store that is also disabled and name-excluded; the StoreID
+            // rule precedes every other rule and must win the attribution.
+            var result = StoreFilterAttribution.Decide(
+                storeId: "excluded",
+                excludedStoreIds: new List<string> { "EXCLUDED" },
+                isPublicFolder: true,
+                displayName: "Team Archive",
+                filePath: @"C:\Temp\store.pst",
+                excludedStoreNameContains: new List<string> { "Archive" },
+                excludedStoreFilePathContains: new List<string> { "Temp" },
+                gwsoFilePathContains: GwsoTokens,
+                excludePublicFolderStores: true,
+                excludeGwsoStores: true,
+                isDisabled: true
+            );
+
+            result.Included.Should().BeFalse();
+            result.Rule.Should().Be(StoreFilterRule.StoreId);
+        }
+
+        [TestMethod]
+        public void Decide_WhenStoreIdDoesNotMatch_PreservesPublicFolderAttribution()
+        {
+            var result = StoreFilterAttribution.Decide(
+                storeId: "REAL",
+                excludedStoreIds: new List<string> { "OTHER" },
+                isPublicFolder: true,
+                displayName: "Public Folders",
+                filePath: @"C:\Data\public.ost",
+                excludedStoreNameContains: new List<string>(),
+                excludedStoreFilePathContains: new List<string>(),
+                gwsoFilePathContains: GwsoTokens,
+                excludePublicFolderStores: true,
+                excludeGwsoStores: true,
+                isDisabled: false
+            );
+
+            result.Included.Should().BeFalse();
+            result.Rule.Should().Be(StoreFilterRule.PublicFolder);
+        }
+
+        [TestMethod]
+        public void StoreFilterRule_EnumOrder_PlacesStoreIdFirst()
+        {
+            ((int)StoreFilterRule.StoreId).Should().Be(0);
+            ((int)StoreFilterRule.StoreId).Should().Be((int)StoreFilterRule.PublicFolder - 1);
         }
 
         // --- FormatLine (P3-T4) ---

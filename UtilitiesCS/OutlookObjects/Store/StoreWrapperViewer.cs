@@ -11,6 +11,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             ButtonOk.Click += ButtonOk_Click;
             ButtonCancel.Click += ButtonCancel_Click;
             DisplayName.SelectedValueChanged += DisplayName_SelectedValueChanged;
+            ExcludeStore.CheckedChanged += ExcludeStore_CheckedChanged;
             ArchiveFS.Click += ArchiveFS_Click;
             ArchiveOutlook.Click += ArchiveOutlook_Click;
             JunkEmail.Click += JunkEmail_Click;
@@ -40,6 +41,11 @@ namespace UtilitiesCS.OutlookObjects.Store
         public void DisplayName_SelectedValueChanged(object sender, EventArgs e)
         {
             Controller?.DisplayName_SelectedValueChanged(sender, e);
+        }
+
+        public void ExcludeStore_CheckedChanged(object sender, EventArgs e)
+        {
+            Controller?.ExcludeStore_CheckedChanged(sender, e);
         }
 
         public void ArchiveFS_Click(object sender, EventArgs e)
@@ -115,6 +121,11 @@ namespace UtilitiesCS.OutlookObjects.Store
         {
             get => _displayName;
             set => _displayName = value;
+        }
+        public CheckBox ExcludeStore
+        {
+            get => _excludeStore;
+            set => _excludeStore = value;
         }
 
         #endregion Make testable

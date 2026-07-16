@@ -10,6 +10,7 @@ using Deedle.Internal;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.OutlookExtensions;
+using UtilitiesCS.OutlookObjects.Store;
 
 namespace ToDoModel
 {
@@ -58,7 +59,7 @@ namespace ToDoModel
         public void LoadTree(LoadOptions LoadType, IApplicationGlobals appGlobals)
         {
             // Get the list of ToDo items from Outlook
-            var items = GetToDoList(LoadType, appGlobals.Ol.App);
+            var items = GetToDoList(LoadType, appGlobals.Ol.App, appGlobals.Ol.StoresWrapper);
 
             // Create a flat tree of ToDo items and assign IDs to those that don't have them
             var tree = ToListTreeNode(items, appGlobals);
@@ -158,7 +159,11 @@ namespace ToDoModel
             }
         }
 
-        public List<OutlookItem> GetToDoList(LoadOptions LoadType, Application Application)
+        public List<OutlookItem> GetToDoList(
+            LoadOptions LoadType,
+            Application Application,
+            StoresWrapper storesWrapper
+        )
         {
             View objView;
 
@@ -169,9 +174,10 @@ namespace ToDoModel
 
             var stores = Application.Session.Stores.Cast<Store>();
             var result = stores
-                .Where(store =>
-                    store.ExchangeStoreType != OlExchangeStoreType.olExchangePublicFolder
-                )
+                // why: issue #328. Route store inclusion through the single shared predicate instead
+                // of a site-local public-folder filter. Fail-open when the model is not yet loaded
+                // (storesWrapper is null) per AC7.
+                .Where(store => storesWrapper is null || storesWrapper.ShouldIncludeStore(store))
                 .Select(store =>
                 {
                     try
@@ -206,12 +212,19 @@ namespace ToDoModel
             return result;
         }
 
-        public IAsyncEnumerable<object> GetToDoListAsync(LoadOptions loadType, Application olApp)
+        public IAsyncEnumerable<object> GetToDoListAsync(
+            LoadOptions loadType,
+            Application olApp,
+            StoresWrapper storesWrapper
+        )
         {
             var olView = (View)olApp.ActiveExplorer().CurrentView;
             var strFilter = "@SQL=" + olView.Filter;
             var items = olApp
                 .Session.Stores?.Cast<Store>()
+                // why: issue #328. Route store inclusion through the single shared predicate.
+                // Fail-open when the model is not yet loaded (storesWrapper is null) per AC7.
+                ?.Where(store => storesWrapper is null || storesWrapper.ShouldIncludeStore(store))
                 ?.ToAsyncEnumerable()
                 ?.Select(store => store.GetDefaultFolder(OlDefaultFolders.olFolderToDo))
                 ?.SelectMany(folder =>
