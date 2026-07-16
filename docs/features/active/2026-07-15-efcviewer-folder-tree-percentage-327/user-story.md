@@ -63,13 +63,13 @@ path strings, which is slow to scan and offers no way to expand or collapse a br
 These items are consistent with the authoritative Acceptance Criteria in `spec.md`. All items are
 unchecked because nothing is delivered yet.
 
-- [ ] Folders containing subfolders render with a plus/minus expand affordance in the EfcViewer folder list.
-- [ ] Mouse click on the plus expands the node and reveals its children; click on the resulting minus collapses it and hides its descendants.
-- [ ] With a node highlighted, the right arrow key expands it and the left arrow key collapses it.
-- [ ] Each suggestion shows its prediction probability right-aligned in whole-number percent (no decimal places).
-- [ ] The probability value is consumed from the upstream `folder-probability-plumbing` contract and is not recomputed; rows with no upstream probability render a blank percentage cell.
-- [ ] The behavior is delivered in both `EfcViewer.cs` and `EfcViewer3.cs`.
-- [ ] The shared, host-neutral tree-state, hierarchy-building, visible-row projection, and percentage-formatting logic meets the repository coverage thresholds.
+- [x] Folders containing subfolders render with a plus/minus expand affordance in the EfcViewer folder list.
+- [x] Mouse click on the plus expands the node and reveals its children; click on the resulting minus collapses it and hides its descendants.
+- [x] With a node highlighted, the right arrow key expands it and the left arrow key collapses it.
+- [x] Each suggestion shows its prediction probability right-aligned in whole-number percent (no decimal places).
+- [x] The probability value is consumed from the upstream `folder-probability-plumbing` contract and is not recomputed; rows with no upstream probability render a blank percentage cell.
+- [x] The behavior is delivered in both `EfcViewer.cs` and `EfcViewer3.cs`.
+- [x] The shared, host-neutral tree-state, hierarchy-building, visible-row projection, and percentage-formatting logic meets the repository coverage thresholds.
 
 ## Non-Goals
 

@@ -148,21 +148,21 @@ placeholder issue 9001).
 This section is an authoritative acceptance-criteria source for this feature, alongside
 `user-story.md`. All items are unchecked because nothing is delivered yet.
 
-- [ ] Folders containing subfolders render with a plus/minus expand affordance in the EfcViewer folder list.
-- [ ] Mouse click on the plus expands the node and reveals its children; click on the resulting minus collapses it and hides its descendants.
-- [ ] With a node highlighted, the right arrow key expands it and the left arrow key collapses it.
-- [ ] Each suggestion shows its prediction probability right-aligned in whole-number percent (no decimal places).
-- [ ] The probability value is consumed from the upstream `folder-probability-plumbing` contract (folder path to `double` in `[0, 1]`) and is not recomputed; rows with no upstream probability render a blank percentage cell.
-- [ ] The behavior is delivered in BOTH viewers: `QuickFiler/Viewers/EfcViewer.cs` and `QuickFiler/Viewers/EfcViewer3.cs`.
-- [ ] The shared, host-neutral logic (tree state and transitions, hierarchy building, visible-row projection, percentage formatting, banner classification, path-to-probability adapter) is factored into a reusable testable helper that meets the repository coverage thresholds.
-- [ ] The full C# toolchain (csharpier, .NET analyzers, nullable, MSTest with Moq + FluentAssertions) is green.
+- [x] Folders containing subfolders render with a plus/minus expand affordance in the EfcViewer folder list.
+- [x] Mouse click on the plus expands the node and reveals its children; click on the resulting minus collapses it and hides its descendants.
+- [x] With a node highlighted, the right arrow key expands it and the left arrow key collapses it.
+- [x] Each suggestion shows its prediction probability right-aligned in whole-number percent (no decimal places).
+- [x] The probability value is consumed from the upstream `folder-probability-plumbing` contract (folder path to `double` in `[0, 1]`) and is not recomputed; rows with no upstream probability render a blank percentage cell.
+- [x] The behavior is delivered in BOTH viewers: `QuickFiler/Viewers/EfcViewer.cs` and `QuickFiler/Viewers/EfcViewer3.cs`.
+- [x] The shared, host-neutral logic (tree state and transitions, hierarchy building, visible-row projection, percentage formatting, banner classification, path-to-probability adapter) is factored into a reusable testable helper that meets the repository coverage thresholds.
+- [x] The full C# toolchain (csharpier, .NET analyzers, nullable, MSTest with Moq + FluentAssertions) is green.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
+- [x] Acceptance criteria documented and mapped to tests or demos
 - [ ] Behavior matches acceptance criteria in both viewers
-- [ ] Tests updated/added (unit for host-neutral helper; build + manual QA for UI wiring)
-- [ ] Edge cases and error handling covered by tests
-- [ ] Docs updated (this spec and `user-story.md` cross-referenced)
-- [ ] Upstream `folder-probability-plumbing` contract shape re-confirmed after 9001 merges
-- [ ] Toolchain pass completed (format → lint → type-check → test)
+- [x] Tests updated/added (unit for host-neutral helper; build + manual QA for UI wiring)
+- [x] Edge cases and error handling covered by tests
+- [x] Docs updated (this spec and `user-story.md` cross-referenced)
+- [x] Upstream `folder-probability-plumbing` contract shape re-confirmed after 9001 merges
+- [x] Toolchain pass completed (format → lint → type-check → test)
