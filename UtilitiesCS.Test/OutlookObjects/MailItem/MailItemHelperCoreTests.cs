@@ -10,6 +10,7 @@ using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS.EmailIntelligence;
+using UtilitiesCS.EmailIntelligence.EmailParsing;
 using InteropMailItem = Microsoft.Office.Interop.Outlook.MailItem;
 using OutlookFolder = Microsoft.Office.Interop.Outlook.Folder;
 
@@ -84,6 +85,31 @@ namespace UtilitiesCS.Test.OutlookObjects.MailItem
 
             result.Should().Contain("<b>From:</b>Sender");
             result.Should().Contain("Original");
+        }
+
+        [TestMethod]
+        public void GetHtml_ShouldRewriteCidReferenceToVirtualHostUrl_WhenAttachmentContentIdMatches()
+        {
+            var mailItem = new Mock<InteropMailItem>();
+            mailItem
+                .SetupGet(x => x.HTMLBody)
+                .Returns("<html><head></head><body><img src=\"cid:logo1\"></body></html>");
+            var helper = CreateHelper();
+            SetField(helper, "_item", mailItem.Object);
+            SetLazyField(helper, "_senderHtml", "Sender");
+            SetLazyField(helper, "_sentOn", "5/2/2026 12:00 AM");
+            SetLazyField(helper, "_toRecipientsHtml", "To User");
+            SetLazyField(helper, "_ccRecipientsHtml", "Cc User");
+            SetLazyField(helper, "_subject", "Planning");
+            SetLazyField(
+                helper,
+                "_attachmentsInfo",
+                new IAttachment[] { new AttachmentSerializable() { ContentId = "logo1" } }
+            );
+
+            var result = helper.GetHtml();
+
+            result.Should().Contain("src=\"https://cid.quickfiler.local/logo1\"");
         }
 
         [TestMethod]

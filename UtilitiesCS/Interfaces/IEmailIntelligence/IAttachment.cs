@@ -8,6 +8,7 @@ namespace UtilitiesCS
         byte[] AttachmentData { get; set; }
         OlAttachmentBlockLevel BlockLevel { get; set; }
         OlObjectClass Class { get; set; }
+        string ContentId { get; set; }
         string DisplayName { get; set; }
         string FileExtension { get; set; }
         string FileName { get; set; }
