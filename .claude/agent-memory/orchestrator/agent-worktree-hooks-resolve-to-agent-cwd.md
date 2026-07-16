@@ -1,0 +1,16 @@
+---
+name: agent-worktree-hooks-resolve-to-agent-cwd
+description: When the orchestrator runs in a .claude/worktrees/agent-<id> isolated worktree, PreToolUse + SubagentStop hooks resolve relative paths against the agent worktree, not the session root
+metadata:
+  type: project
+---
+
+When the child orchestrator runs inside an Agent-tool isolated worktree at `.claude/worktrees/agent-<id>/` (the env "Working directory"), the `gh`/checkpoint enforcement hooks resolve their relative paths against THAT agent worktree, not the epic session root.
+
+Evidence (epic child #324, folder-probability-plumbing, 2026-07-16): `gh pr create` and `gh pr merge --merge` both succeeded reading only the agent-worktree `artifacts/orchestration/orchestrator-state.json` + `artifacts/pr_body_<N>.md` + receipt. The merge is decisive: the child-path epic-merge-gate allows only when it reads `orchestrator-state.json` with `epic_mode==true` and `step9_status=="passed"`; that file existed ONLY in the agent worktree (the session root held only `epic-orchestrator-state.json`), yet the merge was allowed — so the hook read the agent worktree. The SubagentStop `validate-orchestrator-output.ps1` therefore also reads the agent-worktree checkpoint.
+
+**Why:** an Agent-tool isolated worktree makes the agent's own cwd == the worktree, and hooks inherit that cwd. This differs from [[child-orchestrator-pr-hook-reads-session-root]], which applied when the session cwd was a *separately-created named* worktree distinct from the feature worktree (session cwd != feature worktree). Distinguish the two topologies before deciding whether to stage artifacts in the session root.
+
+**How to apply:** in an Agent-tool isolated worktree, author the PR body/receipt and keep the child checkpoint in the agent worktree's `artifacts/` and do NOT copy them to the session root — copying `orchestrator-state.json` to the shared session root can clobber a concurrent sibling child's merge-gate checkpoint. Run `collect_pr_context` with `workspace_root` = the agent worktree. If a future run shows the hook reading the session root (e.g. `PR_CONTEXT_MISSING`/`ORCHESTRATOR_STATE_PREFLIGHT_FAILED` despite valid agent-worktree artifacts), only then stage into the session root.
+
+Also confirmed this run: on an epic integration-based branch the Python validator (`scripts/dev_tools/*.py`) is absent, so `Test-PythonOrchestratorValidatorAvailable` returns false and the portable `OrchestratorStateCompletion.psm1` gate is authoritative at SubagentStop (base presence + model-routing existence only). The bundled MCP `require_complete` check is much stricter (full large-route pr_gate/ci_gate + promotion/research/planning receipts) and will FAIL for a prepared-epic child that resumes at execution — that divergence is expected and is NOT the real Stop gate. See [[orchestrator-state-validator-divergence]].
