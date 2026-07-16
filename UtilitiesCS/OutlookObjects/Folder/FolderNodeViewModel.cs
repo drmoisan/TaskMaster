@@ -75,7 +75,7 @@ namespace UtilitiesCS
         }
 
         /// <summary>
-        /// The right-aligned percentage text: <see cref="PercentageFormatter.Format(double)"/> of
+        /// The right-aligned percentage text: <see cref="PercentageFormatter.FormatPercent(double?)"/> of
         /// <see cref="Probability"/> when it is non-null, otherwise the empty string.
         /// </summary>
         public string FormattedPercentage
@@ -83,7 +83,7 @@ namespace UtilitiesCS
             get
             {
                 return Probability.HasValue
-                    ? PercentageFormatter.Format(Probability.Value)
+                    ? PercentageFormatter.FormatPercent(Probability.Value)
                     : string.Empty;
             }
         }
