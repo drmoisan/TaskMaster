@@ -11,6 +11,7 @@
 - [Remediation-plan em-dash required](remediation-plan-em-dash-required.md) — the plan validator rejects `### Phase N (continued) — <Title>`; only canonical `### Phase N — <Title>` passes
 - [new_active_feature_folder date prefix](new-active-feature-folder-date-prefix.md) — standalone feature folders get the YYYY-MM-DD- prefix automatically; epic-child folders don't (git mv those)
 - [orchestrator-state validator divergence](orchestrator-state-validator-divergence.md) — MCP orchestrator-state check is stricter than the real SubagentStop hook; conform to the canonical schema's remediation_loop shape
+- [orchestrator-state flat keys + step-status enum](orchestrator-state-flat-keys-and-enum.md) — validator needs FLAT top-level variable keys (not nested under "variables") and enum step statuses (in_progress not in-progress); fable_policy "available" => C3->opus
 - [C# analyzer packages.config quirks](csharp-analyzer-packages-config-quirks.md) — non-SDK analyzer wiring needs manual roslyn subfolder selection; SecurityCodeScan.VS2019 breaks Roslyn 5.6 via CS8032 (can't be silenced by editorconfig)
 - [Whole-repo CI gate is not out-of-scope](whole-repo-ci-gate-not-out-of-scope.md) — a pre-existing repo-wide csharpier/lint failure blocks the PR's required check (AC6); fix it, don't defer it
 - [Honor user's per-cycle folder layout](feedback_verify_flat_artifact_layout_after_executor.md) — #181 user committed a per-cycle folder layout (<ts>-remediation/, <ts>-audit/); follow it. Only revert UNDIRECTED agent relocations, not the user's own reorg
