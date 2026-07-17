@@ -16,24 +16,26 @@ intent:
     - No third-party WinForms tree/list control (for example BrightIdeasSoftware.TreeListView) and no WPF/ElementHost are introduced; the breadcrumb control technology is WebView2 (HTML/CSS/JS) in both surfaces.
     - Full C# toolchain (csharpier, .NET analyzers, nullable, MSTest) green for every child feature; changed and new code meets repository coverage thresholds.
 features:
-  - issue_num: 9101
-    feature_folder: 2026-07-16-folder-hierarchy-live-provider
+  - issue_num: 350
+    feature_folder: 2026-07-16-folder-hierarchy-live-provider-350
     depends_on: []
-  - issue_num: 9102
-    feature_folder: 2026-07-16-efcviewer-breadcrumb-webview2
-    depends_on: [9101]
-  - issue_num: 9103
-    feature_folder: 2026-07-16-quickfiler-breadcrumb-webview2
-    depends_on: [9101]
+  - issue_num: 349
+    feature_folder: 2026-07-16-efcviewer-breadcrumb-webview2-349
+    depends_on: [350]
+  - issue_num: 351
+    feature_folder: 2026-07-16-quickfiler-breadcrumb-webview2-351
+    depends_on: [350]
 ---
 
 # Epic: Folder-Tree Breadcrumb Redesign (WebView2)
 
 - Integration branch: `epic/folder-tree-breadcrumb-redesign-integration`
-- Status: Manifest authored by `epic-planner`. `issue_num` values `9101`/`9102`/`9103` are
-  provisional placeholders and are back-filled with the real GitHub issue numbers as each child
-  feature is promoted during preparation. Child preparation (research, spec/user-story, atomic
-  plan, preflight clearance) fans in to this integration branch per feature as it completes.
+- Status: Manifest authored by `epic-planner` and back-filled with the real GitHub issue numbers
+  after each child was promoted during preparation (350 = live folder-hierarchy provider, 349 =
+  EfcViewer WebView2 breadcrumb, 351 = QuickFiler WebView2 breadcrumb). All three child
+  preparations (research, spec/user-story, atomic plan, preflight clearance) are complete and
+  fanned in to this integration branch; each recorded `PREFLIGHT: ALL CLEAR`. Ready for
+  execution by `epic-orchestrator`.
 - Source objective:
   `docs/features/potential/2026-07-16-folder-tree-breadcrumb-redesign-epic-request.md`.
 
@@ -94,7 +96,7 @@ QuickFiler already uses for its WebView2 message-body pane.
 ## Shared Design
 
 The single shared contract across this epic is the **live Outlook folder-hierarchy provider**
-(feature 9101). Given a selected leaf folder it returns:
+(feature 350). Given a selected leaf folder it returns:
 
 - the ordered ancestor chain `Folder -> ... -> Leaf` (root-to-leaf segments) for breadcrumb
   rendering, and
@@ -104,7 +106,7 @@ The single shared contract across this epic is the **live Outlook folder-hierarc
 The provider isolates the Outlook I/O behind an injectable seam so the pure ancestor-chain and
 segment-children logic is unit-testable without a live Outlook process, per repository policy.
 It replaces the prefix-matching-over-suggestion-rows approach that both `FolderSuggestionTree`
-and `FolderHierarchyBuilder` use today. Features 9102 and 9103 both consume this contract to
+and `FolderHierarchyBuilder` use today. Features 349 and 351 both consume this contract to
 populate their WebView2 breadcrumb controls; they share the provider but share no UI base class
 with each other (EfcViewer hosts a `TreeListView` today, QuickFiler hosts a `ComboBox`), so each
 builds its own WebView2 host and JS<->.NET bridge.
@@ -129,35 +131,35 @@ Current state verified in the source objective against current code:
 
 This decomposes into three independently mergeable child features:
 
-- **9101 — Live Outlook folder-hierarchy provider (wave 0, C3).** Introduces the shared
+- **350 — Live Outlook folder-hierarchy provider (wave 0, C3).** Introduces the shared
   ancestor-chain + live-subfolder provider contract and replaces the prefix-matching logic in
   `FolderSuggestionTree.BuildFromRows` and `FolderHierarchyBuilder.Build`. Complexity floor is
   forced to C3 by the `cross_module_contract_change` signal (a new public contract consumed
   across module boundaries by both UI consumers). The folder module is scoring-adjacent (T1/T2)
   and the change adds a live-I/O seam that must be isolated from pure logic. No `depends_on`.
-- **9102 — EfcViewer WebView2 breadcrumb control (wave 1, C4).** Replaces the `TreeListView`
+- **349 — EfcViewer WebView2 breadcrumb control (wave 1, C4).** Replaces the `TreeListView`
   with a WebView2-hosted HTML/CSS/JS breadcrumb control across both `EfcViewer` implementations:
   single-line breadcrumb, leaf-anchored expand affordance, per-segment double-click collapse, a
   JS<->.NET event bridge for double-click and keyboard interaction, routing of the live subfolder
-  query (from 9101) across that bridge, and a CSS-based percentage-visibility fix preceded by a
+  query (from 350) across that bridge, and a CSS-based percentage-visibility fix preceded by a
   runtime reproduction. Banded C4 by judgment: this is a novel control technology for this
   surface with a new bidirectional JS<->.NET interaction model and live-query routing, exceeding
-  the localized-change bands. Consumes 9101's provider contract. `depends_on: [9101]`.
-- **9103 — QuickFiler WebView2 breadcrumb control (wave 1, C4).** Replaces the `CboFolders`
+  the localized-change bands. Consumes 350's provider contract. `depends_on: [350]`.
+- **351 — QuickFiler WebView2 breadcrumb control (wave 1, C4).** Replaces the `CboFolders`
   `ComboBox` with the same WebView2-hosted breadcrumb control and bridge in the live viewer
   variant, after re-verifying viewer-variant liveness; same interaction model, live-query
   routing, and CSS percentage-visibility fix. Banded C4 by judgment for the same novel WebView2
   bridge surface, in a different host control with no shared base class, plus the viewer-variant
-  liveness re-verification. Consumes 9101's provider contract. `depends_on: [9101]`.
+  liveness re-verification. Consumes 350's provider contract. `depends_on: [350]`.
 
 ## Waves
 
 Wave assignment by longest-path layering over the dependency DAG
 (`wave(f) = 0` when `depends_on` is empty, else `1 + max(wave(d))`):
 
-- **Wave 0:** 9101 (live folder-hierarchy provider).
-- **Wave 1:** 9102 (EfcViewer WebView2 breadcrumb), 9103 (QuickFiler WebView2 breadcrumb).
+- **Wave 0:** 350 (live folder-hierarchy provider).
+- **Wave 1:** 349 (EfcViewer WebView2 breadcrumb), 351 (QuickFiler WebView2 breadcrumb).
 
 The DAG is cycle-free (verified manually; the reference wave-computation script is not vendored
-in this repository). 9102 and 9103 have no interdependency and execute in parallel within
-wave 1 once 9101 merges.
+in this repository). 349 and 351 have no interdependency and execute in parallel within
+wave 1 once 350 merges.
