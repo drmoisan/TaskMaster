@@ -7,7 +7,7 @@ using UtilitiesCS.OutlookObjects.Folder;
 namespace QuickFiler
 {
     // Breadcrumb WinForms glue (#351). The host-neutral seams (BreadcrumbBridgeCoordinator ->
-    // BreadcrumbBridgeRouter/BreadcrumbStateModel/BreadcrumbSelectionMap in UtilitiesCS) own all
+    // FolderBreadcrumbBridgeRouter/BreadcrumbStateModel/BreadcrumbSelectionMap in UtilitiesCS) own all
     // correctness; this partial holds only the WinForms glue (WebView2 property exposure, page
     // load via NavigateToString, focus hand-off, and the pre-init message relay). The whole
     // ItemViewer type is [ExcludeFromCodeCoverage] via its primary partial in ItemViewer.cs

@@ -150,7 +150,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         }
 
         private static BreadcrumbRowRender ProjectRow(
-            BreadcrumbRow row,
+            BreadcrumbStateRow row,
             int rowIndex,
             bool selected
         )

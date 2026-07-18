@@ -8,7 +8,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 {
     /// <summary>
     /// Unit tests for the host-neutral <see cref="BreadcrumbStateModel"/> /
-    /// <see cref="BreadcrumbRow"/> collapse/expand state machine (#351 P3-T2): positive
+    /// <see cref="BreadcrumbStateRow"/> collapse/expand state machine (#351 P3-T2): positive
     /// collapse-after/re-expand/affordance flows, negative fail-fast validation, edge chains, and
     /// state-transition sequences. Deterministic; no Outlook, WebView2, timers, or temp files.
     /// </summary>

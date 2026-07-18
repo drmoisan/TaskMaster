@@ -11,7 +11,7 @@ namespace QuickFiler.Viewers
     /// <summary>
     /// Host-neutral coordinator for the QuickFiler breadcrumb (#351 P4-T4, NOT coverage-exempt):
     /// wires <see cref="IWebViewMessenger.MessageReceived"/> -&gt;
-    /// <see cref="BreadcrumbBridgeRouter"/> -&gt; <see cref="IWebViewMessenger.PostJson"/>, exposes
+    /// <see cref="FolderBreadcrumbBridgeRouter"/> -&gt; <see cref="IWebViewMessenger.PostJson"/>, exposes
     /// the population/selection surface the viewer glue delegates to, and raises the .NET events
     /// (<see cref="SelectionChanged"/>, <see cref="UnhandledArrow"/>,
     /// <see cref="FolderArrowKeyDown"/>) that preserve the existing controller seams. The
@@ -23,7 +23,7 @@ namespace QuickFiler.Viewers
     public sealed class BreadcrumbBridgeCoordinator
     {
         private readonly IWebViewMessenger _messenger;
-        private readonly BreadcrumbBridgeRouter _router;
+        private readonly FolderBreadcrumbBridgeRouter _router;
 
         /// <summary>
         /// Creates the coordinator and subscribes to inbound page messages.
@@ -37,7 +37,7 @@ namespace QuickFiler.Viewers
         )
         {
             _messenger = messenger ?? throw new ArgumentNullException(nameof(messenger));
-            _router = new BreadcrumbBridgeRouter(provider);
+            _router = new FolderBreadcrumbBridgeRouter(provider);
             _messenger.MessageReceived += OnMessageReceived;
         }
 

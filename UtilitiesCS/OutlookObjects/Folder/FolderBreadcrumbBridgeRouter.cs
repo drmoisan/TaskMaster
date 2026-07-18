@@ -14,7 +14,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
     /// correctness lives in this host-neutral, fully unit-testable type. No WebView2, WinForms, or
     /// COM references; the only I/O reachable from here is behind the injected provider (G6).
     /// </summary>
-    public sealed class BreadcrumbBridgeRouter
+    public sealed class FolderBreadcrumbBridgeRouter
     {
         private readonly IFolderHierarchyProvider _provider;
         private readonly BreadcrumbStateModel _model = new BreadcrumbStateModel();
@@ -24,7 +24,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// </summary>
         /// <param name="provider">The merged 9101 hierarchy provider. Required.</param>
         /// <exception cref="ArgumentNullException"><paramref name="provider"/> is null.</exception>
-        public BreadcrumbBridgeRouter(IFolderHierarchyProvider provider)
+        public FolderBreadcrumbBridgeRouter(IFolderHierarchyProvider provider)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
@@ -274,7 +274,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         private async Task<IReadOnlyList<string>> FetchAndAttachSubfoldersAsync(
             int rowIndex,
-            BreadcrumbRow row,
+            BreadcrumbStateRow row,
             CancellationToken cancellationToken
         )
         {
@@ -327,7 +327,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 .ConfigureAwait(false);
         }
 
-        private BreadcrumbRow RowAt(int rowIndex)
+        private BreadcrumbStateRow RowAt(int rowIndex)
         {
             if (rowIndex < 0 || rowIndex >= _model.Rows.Count)
             {

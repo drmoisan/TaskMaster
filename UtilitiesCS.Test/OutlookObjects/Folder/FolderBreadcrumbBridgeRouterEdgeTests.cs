@@ -12,14 +12,14 @@ using UtilitiesCS.OutlookObjects.Folder;
 namespace UtilitiesCS.Test.OutlookObjects.Folder
 {
     /// <summary>
-    /// Supplementary edge tests for <see cref="BreadcrumbBridgeRouter"/> (#351 P7 coverage gate),
-    /// split from <c>BreadcrumbBridgeRouterTests.cs</c> to respect the 500-line file ceiling:
+    /// Supplementary edge tests for <see cref="FolderBreadcrumbBridgeRouter"/> (#351 P7 coverage gate),
+    /// split from <c>FolderBreadcrumbBridgeRouterTests.cs</c> to respect the 500-line file ceiling:
     /// subfolderRequest routing (happy path, plain-row error, auto-expand), unroutable inbound
     /// types, empty-chain fallback, subfolder selection routing, and cancellation propagation.
     /// Moq-mocked provider, completed tasks only; deterministic.
     /// </summary>
     [TestClass]
-    public sealed class BreadcrumbBridgeRouterEdgeTests
+    public sealed class FolderBreadcrumbBridgeRouterEdgeTests
     {
         private const string LeafPath = "\\Inbox\\Projects\\Apollo";
 
@@ -58,11 +58,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             return provider;
         }
 
-        private static async Task<BreadcrumbBridgeRouter> PopulatedRouterAsync(
+        private static async Task<FolderBreadcrumbBridgeRouter> PopulatedRouterAsync(
             Mock<IFolderHierarchyProvider> provider
         )
         {
-            var router = new BreadcrumbBridgeRouter(provider.Object);
+            var router = new FolderBreadcrumbBridgeRouter(provider.Object);
             var suggestion = new FolderRow(
                 LeafPath,
                 FolderRowKind.Suggestion,
@@ -97,7 +97,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         public async Task Route_SubfolderRequest_OnPlainRow_ReturnsError()
         {
             // Arrange
-            var router = new BreadcrumbBridgeRouter(
+            var router = new FolderBreadcrumbBridgeRouter(
                 new Mock<IFolderHierarchyProvider>(MockBehavior.Strict).Object
             );
             router.SetItems(new[] { "Trash to Delete" });
@@ -136,7 +136,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         public async Task SetSuggestions_NullRows_ThrowsExplicitly()
         {
             // Arrange
-            var router = new BreadcrumbBridgeRouter(
+            var router = new FolderBreadcrumbBridgeRouter(
                 new Mock<IFolderHierarchyProvider>(MockBehavior.Strict).Object
             );
 
@@ -158,7 +158,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             provider
                 .Setup(p => p.GetAncestorChainAsync(LeafKey, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new FolderBreadcrumbSegment[0]);
-            var router = new BreadcrumbBridgeRouter(provider.Object);
+            var router = new FolderBreadcrumbBridgeRouter(provider.Object);
 
             // Act
             await router.SetSuggestionsAsync(

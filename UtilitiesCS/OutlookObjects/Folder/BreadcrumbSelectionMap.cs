@@ -104,7 +104,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// The output string of one row: leaf full path for suggestion rows, verbatim text for
         /// plain rows (byte-identical, including <c>"Trash to Delete"</c>).
         /// </summary>
-        private static string RowValue(BreadcrumbRow row)
+        private static string RowValue(BreadcrumbStateRow row)
         {
             return row.IsSuggestion ? row.Chain[row.Chain.Count - 1].FolderPath : row.VerbatimText!;
         }

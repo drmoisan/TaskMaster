@@ -11,12 +11,15 @@ namespace UtilitiesCS.OutlookObjects.Folder
     /// probability, or a Path B plain-string row carried verbatim without probability. Holds the
     /// per-row collapse/expand state; all transitions validate their preconditions and fail fast.
     /// </summary>
-    public sealed class BreadcrumbRow
+    public sealed class BreadcrumbStateRow
     {
         private static readonly IReadOnlyList<FolderBreadcrumbSegment> EmptySegments =
             new FolderBreadcrumbSegment[0];
 
-        internal BreadcrumbRow(IReadOnlyList<FolderBreadcrumbSegment> chain, double? probability)
+        internal BreadcrumbStateRow(
+            IReadOnlyList<FolderBreadcrumbSegment> chain,
+            double? probability
+        )
         {
             if (chain == null || chain.Count == 0)
             {
@@ -39,7 +42,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             Subfolders = EmptySegments;
         }
 
-        internal BreadcrumbRow(string verbatimText)
+        internal BreadcrumbStateRow(string verbatimText)
         {
             VerbatimText = verbatimText ?? throw new ArgumentNullException(nameof(verbatimText));
             Chain = EmptySegments;
@@ -180,12 +183,12 @@ namespace UtilitiesCS.OutlookObjects.Folder
     /// </summary>
     public sealed class BreadcrumbStateModel
     {
-        private readonly List<BreadcrumbRow> _rows = new List<BreadcrumbRow>();
+        private readonly List<BreadcrumbStateRow> _rows = new List<BreadcrumbStateRow>();
         private int _selectedIndex = -1;
         private int _selectedSubfolderIndex = -1;
 
         /// <summary>The rows in display order.</summary>
-        public IReadOnlyList<BreadcrumbRow> Rows => _rows;
+        public IReadOnlyList<BreadcrumbStateRow> Rows => _rows;
 
         /// <summary>The selected row index, or -1 when nothing is selected.</summary>
         public int SelectedIndex => _selectedIndex;
@@ -197,7 +200,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         public int SelectedSubfolderIndex => _selectedSubfolderIndex;
 
         /// <summary>The selected row, or null when nothing is selected.</summary>
-        public BreadcrumbRow? SelectedRow => _selectedIndex < 0 ? null : _rows[_selectedIndex];
+        public BreadcrumbStateRow? SelectedRow => _selectedIndex < 0 ? null : _rows[_selectedIndex];
 
         /// <summary>Removes all rows and clears the selection.</summary>
         public void Clear()
@@ -213,13 +216,13 @@ namespace UtilitiesCS.OutlookObjects.Folder
             double? probability
         )
         {
-            _rows.Add(new BreadcrumbRow(chain, probability));
+            _rows.Add(new BreadcrumbStateRow(chain, probability));
         }
 
         /// <summary>Appends a Path B plain-string row carried verbatim without probability.</summary>
         public void AddPlainRow(string verbatimText)
         {
-            _rows.Add(new BreadcrumbRow(verbatimText));
+            _rows.Add(new BreadcrumbStateRow(verbatimText));
         }
 
         /// <summary>
