@@ -255,7 +255,9 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void Analyze_WithTesseractAndValidImageAttachment_ReturnsNoTextFoundToken()
         {
             // Arrange
-            var stripper = new ImageStripper();
+            var mockExtractor = new Mock<IOcrTextExtractor>();
+            mockExtractor.Setup(x => x.ExtractText(It.IsAny<Bitmap>())).Returns(string.Empty);
+            var stripper = new ImageStripper(mockExtractor.Object);
             var attachment = CreateAttachmentFromBitmap(
                 CreateBitmap(width: 8, height: 8, color: Color.White)
             );
@@ -272,7 +274,9 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void ExtractOcrInfo_WithBitmap_WhenNoTextIsDetected_ReturnsNoTextToken()
         {
             // Arrange
-            var stripper = new ImageStripper();
+            var mockExtractor = new Mock<IOcrTextExtractor>();
+            mockExtractor.Setup(x => x.ExtractText(It.IsAny<Bitmap>())).Returns(string.Empty);
+            var stripper = new ImageStripper(mockExtractor.Object);
             using var bitmap = CreateBitmap(width: 8, height: 8, color: Color.White);
 
             // Act

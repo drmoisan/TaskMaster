@@ -5,7 +5,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using Microsoft.Office.Interop.Outlook;
-using Tesseract;
 using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.EmailIntelligence
@@ -19,18 +18,23 @@ namespace UtilitiesCS.EmailIntelligence
         #region Constructors and private fields
 
         public ImageStripper()
-        {
-            //_globals = appGlobals;
-        }
+            : this(cachefile: null, ocrTextExtractor: null) { }
 
         public ImageStripper(string cachefile)
+            : this(cachefile, ocrTextExtractor: null) { }
+
+        public ImageStripper(IOcrTextExtractor ocrTextExtractor)
+            : this(cachefile: null, ocrTextExtractor: ocrTextExtractor) { }
+
+        public ImageStripper(string cachefile, IOcrTextExtractor ocrTextExtractor)
         {
-            //_globals = appGlobals;
             _cachefile = cachefile;
+            _ocrTextExtractor = ocrTextExtractor ?? new TesseractOcrTextExtractor();
         }
 
         //private IApplicationGlobals _globals;
         private string _cachefile;
+        private readonly IOcrTextExtractor _ocrTextExtractor;
 
         #endregion Constructors and private fields
 
@@ -349,35 +353,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         public string extract_text(Bitmap bitmap)
         {
-            // Get byte array of image
-            byte[] data = bitmap.ToByte();
-
-            string tessdataPath =
-                $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}{Path.DirectorySeparatorChar}TaskMaster{Path.DirectorySeparatorChar}tessdata";
-            //string tessdataPath = $"{_globals.FS.FldrAppData}{Path.DirectorySeparatorChar}tessdata";
-            using (
-                TesseractEngine engine = new TesseractEngine(
-                    tessdataPath,
-                    "eng",
-                    EngineMode.Default
-                )
-            )
-            {
-                //var pix = new BitmapToPixConverter().Convert(bitmap);
-                //var page = engine.Process(pix);
-                var page = engine.Process(bitmap);
-
-                var text = page.GetText();
-                return text;
-
-                //using (Pix pix = Pix.LoadFromMemory(data))
-                //{
-                //    using (Tesseract.Page page = engine.Process(pix))
-                //    {
-                //        return page.GetText();
-                //    }
-                //}
-            }
+            return _ocrTextExtractor.ExtractText(bitmap);
         }
     }
 }

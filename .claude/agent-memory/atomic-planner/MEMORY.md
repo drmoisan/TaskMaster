@@ -15,3 +15,5 @@
 - [C# coverage gate expects JaCoCo](project_csharp_coverage_gate_jacoco_format.md) — validate-feature-review-coverage.ps1 reads artifacts/csharp/coverage.xml as JaCoCo, not Cobertura; plan a conversion scoped to first-party
 - [Durable script copy into feature folder](durable-script-copy-into-feature-folder.md) — copy scratchpad-supplied scripts into `<FEATURE>/scripts/` before referencing them in plan tasks (session-scoped temp paths aren't durable)
 - [#351 QuickFiler breadcrumb plan seams](project_351_quickfiler_breadcrumb_plan_seams.md) — JSON code in UtilitiesCS only (QuickFiler lacks Newtonsoft); P2-T1 blocked-if-9101-absent; evidence/repro/ rejected; coordinator pattern
+- [Invoke-MSTestWithCoverage.ps1 canonical coverage runner](reference_invoke_mstest_with_coverage_script.md) — full-suite *.Test.dll → Cobertura XML via dotnet-coverage+vstest /InIsolation; cite for baseline/final-QC coverage tasks
+- [Coverage threshold conflict: CLAUDE.md vs general-unit-test.md](project_coverage_threshold_conflict_claude_md_vs_general_unit_test.md) — 80/90 vs uniform 85/75 no-tier-floor; unresolved as of 2026-07-18; flag to user, don't silently pick
