@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
@@ -149,7 +149,7 @@ namespace QuickFiler.Controllers.Tests
                 SetThemeField(theme, "_tipsExpanded", new List<IQfcTipsDetails>());
                 SetThemeField(theme, "_textboxSearch", new TextBox());
                 SetThemeField(theme, "_textboxBody", new TextBox());
-                SetThemeField(theme, "_comboFolders", new ComboBox());
+                SetThemeFieldViaActivator(theme, "_breadcrumbWebView2");
                 SetThemeFieldViaActivator(theme, "_topicThread");
                 SetThemeFieldViaActivator(theme, "_webView2");
                 SetThemeField(theme, "_viewer", (Control)new Panel());

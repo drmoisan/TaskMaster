@@ -29,7 +29,7 @@ namespace UtilitiesCS
             IList<IQfcTipsDetails> tipsExpanded,
             TextBox textboxSearch,
             TextBox textboxBody,
-            ComboBox comboFolders,
+            Microsoft.Web.WebView2.WinForms.WebView2 breadcrumbWebView2,
             FastObjectListView topicThread,
             Microsoft.Web.WebView2.WinForms.WebView2 webView2,
             Control viewer,
@@ -59,7 +59,8 @@ namespace UtilitiesCS
             Color cboFoldersForeColor,
             Color defaultBackColor,
             Color defaultForeColor,
-            IUiDispatcher uiDispatcher = null
+            IUiDispatcher uiDispatcher = null,
+            Action<string> breadcrumbThemeNotifier = null
         )
         {
             _uiDispatcher = uiDispatcher ?? new WpfUiDispatcher();
@@ -75,7 +76,8 @@ namespace UtilitiesCS
             _tipsExpanded = tipsExpanded;
             _textboxSearch = textboxSearch;
             _textboxBody = textboxBody;
-            _comboFolders = comboFolders;
+            _breadcrumbWebView2 = breadcrumbWebView2;
+            _breadcrumbThemeNotifier = breadcrumbThemeNotifier;
             _topicThread = topicThread;
             _webView2 = webView2;
             _viewer = viewer;
@@ -118,7 +120,10 @@ namespace UtilitiesCS
         IList<IQfcTipsDetails> _tipsExpanded;
         private TextBox _textboxSearch;
         private TextBox _textboxBody;
-        private ComboBox _comboFolders;
+        // #351: the QuickFiler folder control is a WebView2-hosted breadcrumb; theming reaches it
+        // via PreferredColorScheme plus a themeChange bridge message (see Theme.Rendering.cs).
+        private Microsoft.Web.WebView2.WinForms.WebView2 _breadcrumbWebView2;
+        private Action<string> _breadcrumbThemeNotifier;
         private FastObjectListView _topicThread;
         private Microsoft.Web.WebView2.WinForms.WebView2 _webView2;
         private Control _viewer;

@@ -68,6 +68,48 @@ namespace QuickFiler.Viewers
             _messenger.PostJson(renderJson);
         }
 
+        /// <summary>
+        /// Synchronous population facade for the void <c>IItemViewer.SetFolderSuggestions</c>
+        /// contract: rows are populated immediately as plain full-path rows so the selection
+        /// contract (FolderContains/SetFolderSelectedItem/GetSelectedFolder readback) holds
+        /// without awaiting the provider, then the ancestor-chain upgrade runs asynchronously
+        /// (<see cref="SuggestionsUpgrade"/>) preserving the selected index (FR-1/G10).
+        /// </summary>
+        public void SetSuggestions(IReadOnlyList<FolderRow> rows)
+        {
+            if (rows == null)
+            {
+                throw new ArgumentNullException(nameof(rows));
+            }
+
+            var immediate = new string[rows.Count];
+            for (int i = 0; i < rows.Count; i++)
+            {
+                immediate[i] = rows[i].Score.HasValue
+                    ? rows[i].Score.Value.FolderPath
+                    : rows[i].Text;
+            }
+            _messenger.PostJson(_router.SetItems(immediate));
+            SuggestionsUpgrade = UpgradeSuggestionsAsync(rows);
+        }
+
+        /// <summary>The in-flight ancestor-chain upgrade of the latest <see cref="SetSuggestions"/> call.</summary>
+        public Task SuggestionsUpgrade { get; private set; } = Task.CompletedTask;
+
+        private async Task UpgradeSuggestionsAsync(IReadOnlyList<FolderRow> rows)
+        {
+            int selected = _router.Model.SelectedIndex;
+            var renderJson = await _router
+                .SetSuggestionsAsync(rows, CancellationToken.None)
+                .ConfigureAwait(false);
+            if (selected >= 0 && selected < _router.Model.Rows.Count)
+            {
+                // Row order and count are preserved by the rebuild, so index selection carries over.
+                renderJson = _router.SelectRow(selected);
+            }
+            _messenger.PostJson(renderJson);
+        }
+
         /// <summary>Appends Path B plain rows verbatim and re-renders (legacy AddRange semantics).</summary>
         public void AddItems(IReadOnlyList<string> items)
         {

@@ -25,7 +25,13 @@ namespace QuickFiler.Interfaces
         KbdActions<Keys, KaKeyAsync, Func<Keys, Task>> AlwaysOnKeyActionsAsync { get; set; }
         KbdActions<string, KaStringAsync, Func<string, Task>> StringActionsAsync { get; set; }
 
-        void CboFolders_KeyDown(object sender, KeyEventArgs e);
         void CboFolders_KeyDownAsync(object sender, KeyEventArgs e);
+
+        // #351: legacy fall-through target for the breadcrumb bridge's unhandled Left/Right
+        // arrows (Right -> Pop Out/Enumerate dialog; Left -> close the folder control intent).
+        void BreadcrumbArrowFallThrough(
+            ItemViewer viewer,
+            UtilitiesCS.OutlookObjects.Folder.BreadcrumbArrowDirection direction
+        );
     }
 }

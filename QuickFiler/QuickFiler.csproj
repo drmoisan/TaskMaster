@@ -402,6 +402,10 @@
       <DependentUpon>ItemViewer.cs</DependentUpon>
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Viewers\ItemViewer.Breadcrumb.cs">
+      <DependentUpon>ItemViewer.cs</DependentUpon>
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Viewers\ItemViewer.FolderSearch.cs">
       <DependentUpon>ItemViewer.cs</DependentUpon>
       <SubType>UserControl</SubType>

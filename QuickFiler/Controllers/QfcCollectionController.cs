@@ -1299,31 +1299,18 @@ namespace QuickFiler.Controllers
             }
         }
 
+        // #351: the WebView2 breadcrumb replaced the folder ComboBox and has no dropped-down list
+        // state, so no viewer can hold an open dropdown; the Return-key gate that used to close
+        // open dropdowns before acting is now always clear.
         internal bool AnyOpenDropDowns(bool close, CancellationToken token)
         {
-            return _itemGroups.Any(grp => DropDownState(grp.ItemViewer.CboFolders, close));
+            return false;
         }
 
         internal async Task<bool> AnyOpenDropDownsAsync(bool close, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-
-            return await Task.Factory.StartNew(
-                () => _itemGroups.Any(grp => DropDownState(grp.ItemViewer.CboFolders, close)),
-                token,
-                TaskCreationOptions.None,
-                _formViewer.UiScheduler
-            );
-        }
-
-        private bool DropDownState(ComboBox comboBox, bool close)
-        {
-            var state = comboBox.DroppedDown;
-            if (close && state)
-            {
-                comboBox.DroppedDown = false;
-            }
-            return state;
+            return await Task.FromResult(false);
         }
 
         public void RegisterNavigation()
