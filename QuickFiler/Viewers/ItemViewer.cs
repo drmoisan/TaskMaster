@@ -386,11 +386,6 @@ namespace QuickFiler
             get => _btnReplyAll;
             set => _btnReplyAll = value;
         }
-        public System.Windows.Forms.ComboBox CboFolders
-        {
-            get => _cboFolders;
-            set => _cboFolders = value;
-        }
         public System.Windows.Forms.TextBox TxtboxSearch
         {
             get => _txtboxSearch;

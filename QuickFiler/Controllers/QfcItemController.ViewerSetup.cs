@@ -97,6 +97,16 @@ namespace QuickFiler.Controllers
                     $"Content-Type: {mimeType}"
                 );
             };
+
+            // #351: initialize the breadcrumb WebView2 through the same injected seam and the
+            // same CoreWebView2Environment/options object created above for the message-body
+            // pane (G7); no second environment is negotiated against the user-data folder.
+            EnsureBreadcrumbPipeline();
+            await _webViewInitializer.EnsureCoreWebView2Async(
+                ((ItemViewer)_itemViewer).L0vhBreadcrumb_WebView2,
+                _webViewEnvironment
+            );
+            ((ItemViewer)_itemViewer).AttachBreadcrumbWebView();
             //var task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
 
             //await task.ContinueWith(t =>
@@ -104,6 +114,25 @@ namespace QuickFiler.Controllers
             //    _webViewEnvironment = task.Result;
             //    _itemViewer.L0v2h2_WebView2.EnsureCoreWebView2Async(_webViewEnvironment);
             //}, Token, TaskContinuationOptions.OnlyOnRanToCompletion, ui);
+        }
+
+        // #351: idempotently creates the host-neutral breadcrumb pipeline on the concrete viewer
+        // so folder population/selection are correct even before WebView2 core init completes.
+        // The 9101 provider is DI-resolved from the injected globals' folder-tree service seam —
+        // no live Outlook query is issued inside breadcrumb code (G6). Skipped for mock viewers
+        // (unit tests drive the coordinator directly through its own seams).
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        internal void EnsureBreadcrumbPipeline()
+        {
+            if (_itemViewer is ItemViewer viewer && viewer.BreadcrumbCoordinator == null)
+            {
+                var provider = new UtilitiesCS.OutlookObjects.Folder.OutlookFolderHierarchyProvider(
+                    _globals.Ol.FolderTreeService
+                );
+                viewer.InitializeBreadcrumbPipeline(provider);
+                viewer.BreadcrumbUnhandledArrow += (s, direction) =>
+                    _kbdHandler?.BreadcrumbArrowFallThrough(viewer, direction);
+            }
         }
 
         // Minimal in-memory extension-to-MIME-type lookup for the WebResourceRequested handler
@@ -302,6 +331,9 @@ namespace QuickFiler.Controllers
 
         public void Cleanup()
         {
+            // #351: clear the breadcrumb rows/selection before releasing the pooled viewer, in
+            // step with the _webViewEnvironment clearing below.
+            (_itemViewer as ItemViewer)?.ResetBreadcrumb();
             _globals = null;
             _itemViewer = null;
             _parent = null;

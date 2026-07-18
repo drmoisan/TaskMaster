@@ -93,9 +93,18 @@ namespace UtilitiesCS
             _textboxBody.BackColor = TxtboxBodyBackColor;
             _textboxBody.ForeColor = TxtboxBodyForeColor;
 
-            // TODO: Override the draw function because these colors do not work as expected
-            _comboFolders.BackColor = CboFoldersBackColor;
-            _comboFolders.ForeColor = CboFoldersForeColor;
+            // #351: the folder control is the WebView2 breadcrumb; dark/light switching uses the
+            // existing WebView2 mechanism (PreferredColorScheme, pattern below for the body pane)
+            // plus a themeChange bridge message that swaps the page's CSS custom properties.
+            if (_breadcrumbWebView2?.CoreWebView2 is not null)
+            {
+                _breadcrumbWebView2.CoreWebView2.Profile.PreferredColorScheme = Web2ViewScheme;
+            }
+            _breadcrumbThemeNotifier?.Invoke(
+                Web2ViewScheme == Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme.Dark
+                    ? "dark"
+                    : "light"
+            );
 
             _topicThread.BackColor = DefaultBackColor;
             _topicThread.ForeColor = DefaultForeColor;

@@ -23,7 +23,8 @@ namespace QuickFiler
             IList<IQfcTipsDetails> tipsExpanded,
             TextBox textboxSearch,
             TextBox textboxBody,
-            ComboBox comboFolders,
+            WebView2 breadcrumbWebView2,
+            Action<string> breadcrumbThemeNotifier,
             FastObjectListView topicThread,
             WebView2 webView2,
             Control viewer,
@@ -43,7 +44,11 @@ namespace QuickFiler
             TipsExpanded = RequireCollection(tipsExpanded, nameof(tipsExpanded));
             TextboxSearch = textboxSearch ?? throw new ArgumentNullException(nameof(textboxSearch));
             TextboxBody = textboxBody ?? throw new ArgumentNullException(nameof(textboxBody));
-            ComboFolders = comboFolders ?? throw new ArgumentNullException(nameof(comboFolders));
+            BreadcrumbWebView2 =
+                breadcrumbWebView2 ?? throw new ArgumentNullException(nameof(breadcrumbWebView2));
+            BreadcrumbThemeNotifier =
+                breadcrumbThemeNotifier
+                ?? throw new ArgumentNullException(nameof(breadcrumbThemeNotifier));
             TopicThread = topicThread ?? throw new ArgumentNullException(nameof(topicThread));
             WebView2 = webView2 ?? throw new ArgumentNullException(nameof(webView2));
             Viewer = viewer ?? throw new ArgumentNullException(nameof(viewer));
@@ -74,7 +79,11 @@ namespace QuickFiler
 
         internal TextBox TextboxBody { get; }
 
-        internal ComboBox ComboFolders { get; }
+        // #351: the folder control is the WebView2 breadcrumb; the notifier posts the themeChange
+        // bridge message through the viewer's coordinator.
+        internal WebView2 BreadcrumbWebView2 { get; }
+
+        internal Action<string> BreadcrumbThemeNotifier { get; }
 
         internal FastObjectListView TopicThread { get; }
 

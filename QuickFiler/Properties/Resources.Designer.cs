@@ -178,6 +178,16 @@ namespace QuickFiler.Properties {
                 return ResourceManager.GetString("EmailHeader", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.String similar to the self-contained
+        ///   FolderBreadcrumb.html page (#351) loaded via NavigateToString.
+        /// </summary>
+        internal static string FolderBreadcrumb {
+            get {
+                return ResourceManager.GetString("FolderBreadcrumb", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.

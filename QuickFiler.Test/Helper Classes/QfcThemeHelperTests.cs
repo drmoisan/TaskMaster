@@ -253,7 +253,7 @@ namespace QuickFiler.Test.HelperClasses
             viewer.MoveOptionsStrip = new MenuStrip();
             viewer.TxtboxSearch = new TextBox();
             viewer.TxtboxBody = new TextBox();
-            viewer.CboFolders = new ComboBox();
+            viewer.L0vhBreadcrumb_WebView2 = CreateUninitialized<WebView2>();
             viewer.TopicThread = new FastObjectListView();
             viewer.L0v2h2_WebView2 = CreateUninitialized<WebView2>();
             SetPrivateField(
@@ -317,7 +317,8 @@ namespace QuickFiler.Test.HelperClasses
                 new List<IQfcTipsDetails> { tips.Object },
                 new TextBox(),
                 new TextBox(),
-                new ComboBox(),
+                CreateUninitialized<WebView2>(),
+                _ => { },
                 new FastObjectListView(),
                 CreateUninitialized<WebView2>(),
                 new Panel(),

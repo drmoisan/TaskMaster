@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -63,7 +63,7 @@ namespace UtilitiesCS.Test.HelperClasses.ThemeHelpers
                 tipsExpanded: new List<IQfcTipsDetails>(),
                 textboxSearch: new TextBox(),
                 textboxBody: new TextBox(),
-                comboFolders: new ComboBox(),
+                breadcrumbWebView2: null,
                 topicThread: new BrightIdeasSoftware.FastObjectListView(),
                 webView2: new Microsoft.Web.WebView2.WinForms.WebView2(),
                 viewer: new Panel(),
