@@ -27,11 +27,13 @@ namespace UtilitiesCS.EmailIntelligence
     /// </summary>
     internal sealed class TesseractOcrTextExtractor : IOcrTextExtractor
     {
+        internal static string ResolveTessdataPath() =>
+            $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}{Path.DirectorySeparatorChar}TaskMaster{Path.DirectorySeparatorChar}tessdata";
+
         /// <inheritdoc />
         public string ExtractText(Bitmap bitmap)
         {
-            string tessdataPath =
-                $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}{Path.DirectorySeparatorChar}TaskMaster{Path.DirectorySeparatorChar}tessdata";
+            string tessdataPath = ResolveTessdataPath();
 
             using (
                 TesseractEngine engine = new TesseractEngine(

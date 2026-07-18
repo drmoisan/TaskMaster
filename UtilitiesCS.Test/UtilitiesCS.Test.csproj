@@ -159,6 +159,7 @@
     <Compile Include="EmailIntelligence\EmailParsingSorting\MailItemHelperTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MinedMailInfoTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\AttachmentInfoTests.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\TesseractOcrTextExtractor_Tests.cs" />
     <Compile Include="EmailIntelligence\Flags\FlagParserTests.cs" />
     <Compile Include="EmailIntelligence\UnitTest1.cs" />
     <Compile Include="EmailIntelligence\EmailTokenizerTests.cs" />
