@@ -18,10 +18,28 @@ $ARGUMENTS
 
 1. Resolve the epic home. A bare slug resolves to `docs/features/epics/<epic-slug>/`; a path
    argument resolves to its containing epic folder.
-2. Read the committed kickoff artifact at `docs/features/epics/<epic-slug>/epic-kickoff.md`.
-   - If the file does not exist, STOP without delegating anything and report that the epic has
-     no committed kickoff artifact: the user must run `/epic-plan` first (or, for an epic that
-     was authored manually, invoke `/epic-orchestrate <epic-manifest-path>` directly).
+2. Resolve the committed kickoff artifact `docs/features/epics/<epic-slug>/epic-kickoff.md`. It
+   may exist only on the epic integration branch: `epic-plan` commits it to
+   `epic/<epic-slug>-integration` (worked in a separate integration worktree), so the worktree
+   that invokes `/epic-run` is not guaranteed to have it checked out. Discover it across both
+   locations before concluding it is missing:
+   - Attempt `git fetch origin epic/<epic-slug>-integration`. A failure because the remote
+     branch does not exist is the genuine "epic not planned" case; tolerate it and continue to
+     the local check rather than treating the fetch failure as fatal.
+   - Treat the artifact as present when EITHER the plain local path exists in the invoking
+     worktree, OR it exists on the fetched integration ref, tested with
+     `git cat-file -e epic/<epic-slug>-integration:docs/features/epics/<epic-slug>/epic-kickoff.md`
+     (equivalently `origin/epic/<epic-slug>-integration:<path>`).
+   - When the artifact is present only on the integration ref, read its content with
+     `git show <ref>:<path>`. That is sufficient to extract the `## Invocation Prompt` text
+     needed to proceed; do NOT check the integration branch out into the invoking worktree — the
+     session worktree must never be checked out onto the integration branch (worktree-isolation
+     convention).
+   - STOP without delegating anything only when the artifact is absent BOTH locally and on the
+     fetched integration branch (the branch does not exist, or exists but lacks the file). In
+     that case report that the epic has no committed kickoff artifact: the user must run
+     `/epic-plan` first (or, for an epic that was authored manually, invoke
+     `/epic-orchestrate <epic-manifest-path>` directly).
 3. Execute the kickoff artifact's `## Invocation Prompt` section as the epic objective, applying
    the `epic-orchestrate` skill procedure and the `## Prepared-Epic Execution (epic-planner
    Handoff)` section of `.claude/agents/epic-orchestrator.md`: reuse the existing integration
