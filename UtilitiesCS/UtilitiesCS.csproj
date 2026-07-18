@@ -616,6 +616,8 @@
     <Compile Include="OutlookObjects\Folder\BreadcrumbRow.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRowBuilder.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSegment.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbRenderProjection.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbStateModel.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbSegment.cs" />
     <Compile Include="OutlookObjects\Folder\IFolderHierarchyProvider.cs" />
     <Compile Include="OutlookObjects\Folder\OutlookFolderHierarchyProvider.cs" />
