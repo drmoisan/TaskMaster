@@ -52,7 +52,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             var model = ModelWithSuggestion();
             var row = model.Rows[0];
             row.TryExpandLeaf();
-            row.SetSubfolders(new[] { Segment("sub", "\\Inbox\\Projects\\Apollo\\Sub", "Sub", false) });
+            row.SetSubfolders(
+                new[] { Segment("sub", "\\Inbox\\Projects\\Apollo\\Sub", "Sub", false) }
+            );
 
             // Act
             row.CollapseAfter(0);
@@ -84,7 +86,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         {
             // Arrange, Act, Assert: affordance gate follows the segment's HasChildren flag (FR-2).
             ModelWithSuggestion(leafHasChildren: true).Rows[0].LeafHasSubfolders.Should().BeTrue();
-            ModelWithSuggestion(leafHasChildren: false).Rows[0].LeafHasSubfolders.Should().BeFalse();
+            ModelWithSuggestion(leafHasChildren: false)
+                .Rows[0]
+                .LeafHasSubfolders.Should()
+                .BeFalse();
         }
 
         [TestMethod]
@@ -95,7 +100,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 
             // Act
             var expanded = row.TryExpandLeaf();
-            row.SetSubfolders(new[] { Segment("sub", "\\Inbox\\Projects\\Apollo\\Sub", "Sub", false) });
+            row.SetSubfolders(
+                new[] { Segment("sub", "\\Inbox\\Projects\\Apollo\\Sub", "Sub", false) }
+            );
 
             // Assert
             expanded.Should().BeTrue();
@@ -112,9 +119,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             model.AddPlainRow("Trash to Delete");
             model.SelectRow(0);
             model.Rows[0].TryExpandLeaf();
-            model.Rows[0].SetSubfolders(
-                new[] { Segment("sub", "\\Inbox\\Projects\\Apollo\\Sub", "Sub", false) }
-            );
+            model
+                .Rows[0]
+                .SetSubfolders(
+                    new[] { Segment("sub", "\\Inbox\\Projects\\Apollo\\Sub", "Sub", false) }
+                );
             model.SelectSubfolder(0);
 
             // Act
@@ -122,7 +131,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 
             // Assert
             model.SelectedIndex.Should().Be(1);
-            model.SelectedSubfolderIndex.Should().Be(-1, "row selection resets subfolder selection");
+            model
+                .SelectedSubfolderIndex.Should()
+                .Be(-1, "row selection resets subfolder selection");
             model.SelectedRow.IsSuggestion.Should().BeFalse();
         }
 
@@ -220,7 +231,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             var model = ModelWithSuggestion();
 
             // Act, Assert
-            ((Action)(() => model.SelectRow(1))).Should().Throw<ArgumentOutOfRangeException>();
+            ((Action)(() => model.SelectRow(1)))
+                .Should()
+                .Throw<ArgumentOutOfRangeException>();
             ((Action)(() => model.SelectRow(-2))).Should().Throw<ArgumentOutOfRangeException>();
         }
 
@@ -263,7 +276,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             var row = model.Rows[0];
 
             // Act, Assert: no non-leaf segment exists, so any collapse index throws.
-            ((Action)(() => row.CollapseAfter(0))).Should().Throw<ArgumentOutOfRangeException>();
+            ((Action)(() => row.CollapseAfter(0)))
+                .Should()
+                .Throw<ArgumentOutOfRangeException>();
             row.TryExpandLeaf().Should().BeFalse();
         }
 
@@ -287,7 +302,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             // Arrange
             var row = ModelWithSuggestion().Rows[0];
             row.TryExpandLeaf();
-            row.SetSubfolders(new[] { Segment("sub", "\\Inbox\\Projects\\Apollo\\Sub", "Sub", false) });
+            row.SetSubfolders(
+                new[] { Segment("sub", "\\Inbox\\Projects\\Apollo\\Sub", "Sub", false) }
+            );
             row.CollapseAfter(0);
 
             // Act

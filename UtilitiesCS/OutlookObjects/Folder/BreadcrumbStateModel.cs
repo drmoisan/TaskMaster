@@ -41,8 +41,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         internal BreadcrumbRow(string verbatimText)
         {
-            VerbatimText =
-                verbatimText ?? throw new ArgumentNullException(nameof(verbatimText));
+            VerbatimText = verbatimText ?? throw new ArgumentNullException(nameof(verbatimText));
             Chain = EmptySegments;
             Probability = null;
             Subfolders = EmptySegments;

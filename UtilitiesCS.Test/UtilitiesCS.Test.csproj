@@ -271,6 +271,9 @@
     <Compile Include="OutlookObjects\Folder\BreadcrumbRowBuilderTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRowStateTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeNodeKeyTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbBridgeMessagesTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbBridgeRouterTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionMapTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRenderProjectionTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbStateModelTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbSegmentTests.cs" />

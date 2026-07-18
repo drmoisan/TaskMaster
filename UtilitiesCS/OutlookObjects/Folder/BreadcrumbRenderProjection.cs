@@ -149,7 +149,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
             return rows;
         }
 
-        private static BreadcrumbRowRender ProjectRow(BreadcrumbRow row, int rowIndex, bool selected)
+        private static BreadcrumbRowRender ProjectRow(
+            BreadcrumbRow row,
+            int rowIndex,
+            bool selected
+        )
         {
             var names = row.IsSuggestion
                 ? row.Chain.Select(segment => segment.DisplayName).ToArray()
@@ -165,15 +169,21 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 bool isTerminal = s == visibleCount - 1;
                 if (s > 0)
                 {
-                    cells.Add(new BreadcrumbCellRender(BreadcrumbCellKind.Arrow, string.Empty, -1, false));
+                    cells.Add(
+                        new BreadcrumbCellRender(BreadcrumbCellKind.Arrow, string.Empty, -1, false)
+                    );
                 }
                 if (row.CollapsedAfterIndex.HasValue && isTerminal)
                 {
                     // The re-expand plus sits to the left of the now-terminal segment (FR-3).
-                    cells.Add(new BreadcrumbCellRender(BreadcrumbCellKind.Plus, string.Empty, -1, false));
+                    cells.Add(
+                        new BreadcrumbCellRender(BreadcrumbCellKind.Plus, string.Empty, -1, false)
+                    );
                 }
                 bool interior = s > 0 && !isTerminal;
-                cells.Add(new BreadcrumbCellRender(BreadcrumbCellKind.Segment, names[s], s, interior));
+                cells.Add(
+                    new BreadcrumbCellRender(BreadcrumbCellKind.Segment, names[s], s, interior)
+                );
             }
 
             if (row.LeafHasSubfolders)
@@ -190,9 +200,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
 
             var subfolders = row
-                .Subfolders.Select(s =>
-                    new BreadcrumbSubfolderRender(s.DisplayName, s.FolderPath, s.HasChildren)
-                )
+                .Subfolders.Select(s => new BreadcrumbSubfolderRender(
+                    s.DisplayName,
+                    s.FolderPath,
+                    s.HasChildren
+                ))
                 .ToArray();
 
             return new BreadcrumbRowRender(
@@ -201,7 +213,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 selected,
                 row.CollapsedAfterIndex.HasValue,
                 row.LeafExpanded,
-                row.IsSuggestion ? PercentageFormatter.FormatPercent(row.Probability) : string.Empty,
+                row.IsSuggestion
+                    ? PercentageFormatter.FormatPercent(row.Probability)
+                    : string.Empty,
                 cells,
                 subfolders
             );

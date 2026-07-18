@@ -138,7 +138,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             open.Cells.Last().Kind.Should().Be(BreadcrumbCellKind.Minus);
             open.LeafExpanded.Should().BeTrue();
             open.Subfolders.Should()
-                .ContainSingle(s => s.DisplayName == "S" && s.FolderPath == "\\Inbox\\Sub\\Leaf\\S");
+                .ContainSingle(s =>
+                    s.DisplayName == "S" && s.FolderPath == "\\Inbox\\Sub\\Leaf\\S"
+                );
         }
 
         [TestMethod]
