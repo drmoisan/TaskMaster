@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     SubagentStop hook for the atomic-planner subagent.
 
@@ -14,7 +14,7 @@
       - output contains `PREFLIGHT: ALL CLEAR` or
         `PREFLIGHT: REVISIONS REQUIRED`,
       - the advertised plan exists on disk,
-      - the plan contains canonical `### Phase N - <Title>` headings,
+      - the plan contains canonical `### Phase N — <Title>` headings,
       - Phase 0 exists and includes policy-read and baseline tasks,
       - each task uses `- [ ] [P#-T#]` (or checked equivalent),
       - task numbering is sequential within each phase,
@@ -118,7 +118,7 @@ function Get-PlanStructureValidationReport {
         [string[]] $Lines
     )
 
-    $phasePattern = '^### Phase (?<Phase>\d+)\s+-\s+(?<Title>.+)$'
+    $phasePattern = '^### Phase (?<Phase>\d+)\s+—\s+(?<Title>.+)$'
     $taskPattern = '^- \[(?<State>[ xX])\] \[P(?<Phase>\d+)-T(?<Task>\d+)\] (?<Text>.+)$'
     $errors = [System.Collections.Generic.List[string]]::new()
     $tasksByPhase = @{}
@@ -134,7 +134,7 @@ function Get-PlanStructureValidationReport {
         if ($line -match '^### Phase ') {
             $phaseMatch = [regex]::Match($line, $phasePattern)
             if (-not $phaseMatch.Success) {
-                $errors.Add("Line ${lineNumber}: phase heading must match `### Phase N - <Title>`.")
+                $errors.Add("Line ${lineNumber}: phase heading must match `### Phase N — <Title>`.")
                 $currentPhase = $null
                 continue
             }
@@ -245,7 +245,7 @@ function Invoke-PlannerOutputValidation {
     }
 
     $agentOutput = $null
-    if ($payload.PSObject.Properties.Name -contains 'output') {
+    if ($null -ne $payload.PSObject.Properties['output']) {
         $agentOutput = $payload.output
     }
     if ([string]::IsNullOrWhiteSpace($agentOutput)) {
