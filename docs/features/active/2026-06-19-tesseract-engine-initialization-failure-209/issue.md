@@ -83,6 +83,12 @@ This cycle's fix: introduce an injectable seam for the OCR engine, wire `ImageSt
 - [x] AC4: No other test in the suite newly fails or newly passes as a result of this change (no regression, no incidental masking).
 - [x] AC5: CSharpier format, .NET analyzer build, and nullable build all pass with zero errors.
 
+## Maintainer Decision — Coverage Residual on TesseractOcrTextExtractor.cs (2026-07-18)
+
+Following the R1 remediation (extraction of `ResolveTessdataPath()` as a directly-testable helper, covered by `TesseractOcrTextExtractor_Tests.cs`), the R4 re-audit (`remediation-inputs.2026-07-18T21-15.md`) found that `UtilitiesCS/EmailIntelligence/EmailParsingSorting/TesseractOcrTextExtractor.cs` reached 7.6923% line coverage (1 of 13 lines), still below the 85%/90% policy floors. The remaining 12 uncovered lines are the literal construction of the third-party native `Tesseract.TesseractEngine`, the call to `engine.Process(bitmap)`, and `page.GetText()`. The review determined this residual is architecturally at its ceiling: this class is the sole concrete implementation of `IOcrTextExtractor` (the rest of the codebase already mocks the interface at the correct boundary in `ImageStripper_Tests.cs`), and any further seam decomposition would either still require a live, provisioned `tessdata` directory to exercise the native call — the exact external dependency the R1 fix was designed to eliminate from unit tests — or simply relocate the identical untestable native call one level deeper.
+
+**Maintainer decision (Option C — accept as documented residual):** No `[ExcludeFromCodeCoverage]` attribute is added. The 7.6923% line-coverage figure on `TesseractOcrTextExtractor.cs` is accepted as the permanent, intended state of this class going forward. Repo-wide C# coverage continues to carry this class's uncovered native-engine body as a visible cost, consistent with `general-unit-test.md`'s Coverage Exclusion Policy design intent ("leave only the thinnest possible wiring in the host-bound entry point... a real and visible cost in the coverage metric"). This decision resolves the R4 finding without further code change; a future review cycle must not reopen this specific class's coverage percentage as a fresh Blocking finding absent a change to `ExtractText`'s implementation.
+
 ## Next Step
 
 - [x] Promote to GitHub issue (bug-report template)
