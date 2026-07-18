@@ -28,3 +28,20 @@ legitimate way to avoid a false trip, but verify this deliberately rather than r
 
 Related: [[coverage-hook-forces-fail-below-floor-despite-exemption]],
 [[pr-context-summary-misclassifies-cs]].
+
+**Not C#-only, and not confined to coverage-discussion prose (#354 R4):** the same substring
+trap applies to every language's label list (Python labels include the bare word "python";
+PowerShell includes "pester"). It also fires from the standard `## Rejected Scope Narrowing`
+boilerplate paragraph that every policy-audit now carries: that paragraph routinely says
+"...attempted to narrow the audit..., mark any language as **out of scope**, or waive a
+toolchain/**coverage** check..." in the same sentence as a language name mentioned elsewhere in
+the same line (e.g., "1 refactored **Python** script"). If the language name, the word
+"coverage", and a narrowing phrase (`out of scope`, `N/A`, etc.) all land on one physical
+line, the hook flags a false "scope narrowing" FAIL even though the paragraph is generic
+boilerplate about the *audit process*, not a coverage-row disposition. Fix: keep the Rejected
+Scope Narrowing boilerplate sentence free of the changed language's name — move file-count/
+language detail into a separate sentence or paragraph with no "coverage"/narrowing wording on
+the same line. Always re-run the `Test-LanguageCoverageRow` simulation (or the full
+`Invoke-FeatureReviewCoverageValidation` end-to-end with a synthetic `output` payload) against
+the *actual drafted policy-audit* for every changed-file language before finalizing, not just
+for C#.
