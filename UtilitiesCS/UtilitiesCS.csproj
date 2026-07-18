@@ -609,6 +609,9 @@
     <Compile Include="OutlookObjects\Folder\FolderWrapperNameAndParentNameComparer.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperNodeComparer.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperNodeContentsComparer.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderBreadcrumbSegment.cs" />
+    <Compile Include="OutlookObjects\Folder\IFolderHierarchyProvider.cs" />
+    <Compile Include="OutlookObjects\Folder\OutlookFolderHierarchyProvider.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeNodeKey.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeCompatibilityView.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeRefreshReason.cs" />
