@@ -663,6 +663,7 @@
     <Compile Include="EmailIntelligence\EmailParsingSorting\EmailTokenizer.cs" />
     <Compile Include="OutlookObjects\MailItem\CaptureEmailAddressesModule2.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\ImageStripper.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\TesseractOcrTextExtractor.cs" />
     <Compile Include="OutlookObjects\Attachment\AttachmentSerializable.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\SpamBayes\SpamBayes.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\SpamBayes\SpamBayes.Conditions.cs" />
