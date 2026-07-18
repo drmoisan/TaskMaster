@@ -587,7 +587,9 @@ namespace QuickFiler.Controllers
 
         public string SelectedFolder
         {
-            get => _itemViewer.CboFolders.SelectedItem.ToString();
+            // #351: the folder control is the WebView2 breadcrumb; the selection contract is the
+            // same full-path/verbatim string the old ComboBox SelectedItem produced (G10).
+            get => _itemViewer.GetSelectedFolder();
         }
 
         public string Sender
@@ -653,7 +655,7 @@ namespace QuickFiler.Controllers
                 },
                 new List<Control>
                 {
-                    _itemViewer.CboFolders,
+                    _itemViewer.L0vhBreadcrumb_WebView2,
                     _itemViewer.TxtboxSearch,
                     _itemViewer.TopicThread,
                 }

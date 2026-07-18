@@ -14,3 +14,4 @@
 - [#328 store-exclusion seams](project_328_store_exclusion_seams.md) — StoresWrapper(469)/TreeOfToDoItems(481) near 500-limit, ToDoEvents(594) pre-existing over-limit; new test .cs need csproj wiring; four inclusion surfaces lockstep; adopted persisted StoreWrapper.StoreId
 - [C# coverage gate expects JaCoCo](project_csharp_coverage_gate_jacoco_format.md) — validate-feature-review-coverage.ps1 reads artifacts/csharp/coverage.xml as JaCoCo, not Cobertura; plan a conversion scoped to first-party
 - [Durable script copy into feature folder](durable-script-copy-into-feature-folder.md) — copy scratchpad-supplied scripts into `<FEATURE>/scripts/` before referencing them in plan tasks (session-scoped temp paths aren't durable)
+- [#351 QuickFiler breadcrumb plan seams](project_351_quickfiler_breadcrumb_plan_seams.md) — JSON code in UtilitiesCS only (QuickFiler lacks Newtonsoft); P2-T1 blocked-if-9101-absent; evidence/repro/ rejected; coordinator pattern

@@ -233,26 +233,46 @@ namespace QuickFiler.Controllers.Tests
         )
         {
             var viewer = (EfcViewer)FormatterServices.GetUninitializedObject(typeof(EfcViewer));
-            viewer.FolderListBox = new BrightIdeasSoftware.TreeListView();
             var formController = (EfcFormController)
                 FormatterServices.GetUninitializedObject(typeof(EfcFormController));
             SetPrivateField(formController, "_formViewer", viewer);
-            // SelectedFolder now derives from the cached highlighted FolderSuggestionNode; inject it
-            // directly because the TreeListView cannot select an item without a native window handle.
-            SetPrivateField(
-                formController,
-                "_selectedNode",
-                new FolderSuggestionNode(
-                    selectedFolder,
-                    selectedFolder,
-                    FolderSuggestionNodeKind.Folder
-                )
-            );
+            // SelectedFolder now derives from the breadcrumb router's selection tracking (#349);
+            // drive a real router over mocked seams to a selected state instead of injecting the
+            // removed _selectedNode field.
+            SetPrivateField(formController, "_router", CreateSelectedRouter(selectedFolder));
             formController.SaveAttachments = saveAttachments;
             formController.SaveEmail = saveEmail;
             formController.SavePictures = savePictures;
             formController.MoveConversation = moveConversation;
             return formController;
+        }
+
+        // Builds a breadcrumb router over mocked host/provider seams with the supplied folder
+        // path selected, so EfcFormController.SelectedFolder returns it deterministically.
+        private static QuickFiler.Controllers.BreadcrumbBridgeRouter CreateSelectedRouter(
+            string selectedFolder
+        )
+        {
+            var host = new Mock<QuickFiler.Viewers.IBreadcrumbWebHost>();
+            host.SetupGet(h => h.IsCoreInitialized).Returns(true);
+            var provider = new Mock<UtilitiesCS.OutlookObjects.Folder.IFolderHierarchyProvider>();
+            var router = new QuickFiler.Controllers.BreadcrumbBridgeRouter(
+                provider.Object,
+                host.Object,
+                new UtilitiesCS.OutlookObjects.Folder.BreadcrumbMessageCodec(),
+                new UtilitiesCS.OutlookObjects.Folder.BreadcrumbHtmlRenderer(),
+                new QuickFiler.Controllers.BreadcrumbOutboundQueue(host.Object)
+            );
+            router
+                .BindRowsAsync(
+                    new[] { selectedFolder },
+                    new FolderScore[0],
+                    System.Threading.CancellationToken.None
+                )
+                .GetAwaiter()
+                .GetResult();
+            router.SelectFirstRow();
+            return router;
         }
 
         private static void SetPrivateField(object target, string name, object value)

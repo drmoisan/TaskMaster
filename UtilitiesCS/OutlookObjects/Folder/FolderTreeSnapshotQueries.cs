@@ -91,6 +91,59 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 .ToArray();
         }
 
+        /// <summary>
+        /// Returns the ordered root-to-leaf ancestor chain for <paramref name="leafKey"/> by walking
+        /// <see cref="FolderTreeSnapshotNode.ParentKey"/> to the store root and reversing to root-first
+        /// order.
+        /// </summary>
+        /// <param name="snapshot">The immutable snapshot to walk. Required.</param>
+        /// <param name="leafKey">Identity of the leaf folder node.</param>
+        /// <returns>
+        /// Nodes ordered root-first / leaf-last, with the last element equal to the requested leaf.
+        /// An empty list (never null) when <paramref name="leafKey"/> is null or absent from the
+        /// snapshot. A malformed cyclic <see cref="FolderTreeSnapshotNode.ParentKey"/> yields the
+        /// partial chain rather than looping.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="snapshot"/> is null.</exception>
+        public static IReadOnlyList<FolderTreeSnapshotNode> GetAncestorChain(
+            FolderTreeSnapshot snapshot,
+            FolderTreeNodeKey leafKey
+        )
+        {
+            if (snapshot == null)
+            {
+                throw new ArgumentNullException(nameof(snapshot));
+            }
+
+            if (leafKey == null || !snapshot.TryGetNode(leafKey, out var leaf))
+            {
+                return Array.Empty<FolderTreeSnapshotNode>();
+            }
+
+            var chain = new List<FolderTreeSnapshotNode>();
+            var visited = new HashSet<FolderTreeNodeKey>();
+            var current = leaf;
+
+            // visited.Add returns false on a repeat key, which terminates a malformed cyclic ParentKey
+            // walk while preserving the partial chain collected so far.
+            while (current != null && visited.Add(current.Key))
+            {
+                chain.Add(current);
+                if (
+                    current.ParentKey == null
+                    || !snapshot.TryGetNode(current.ParentKey, out var parent)
+                )
+                {
+                    break;
+                }
+
+                current = parent;
+            }
+
+            chain.Reverse();
+            return chain.ToArray();
+        }
+
         public static FolderTreeSnapshot CreateSubtreeSnapshot(
             FolderTreeSnapshot snapshot,
             FolderTreeSnapshotNode rootNode
