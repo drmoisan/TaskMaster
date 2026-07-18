@@ -266,6 +266,10 @@
     <Compile Include="OutlookObjects\Folder\FolderWrapperNameComparerTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperNodeComparerTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperNodeContentsComparerTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbHtmlRendererTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbMessageCodecTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbRowBuilderTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbRowStateTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeNodeKeyTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbSegmentTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeSnapshotQueriesAncestorChainTests.cs" />

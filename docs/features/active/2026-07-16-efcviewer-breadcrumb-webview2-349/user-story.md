@@ -121,10 +121,10 @@ acceptance criteria in `spec.md`.
 - [ ] Every suggestion row in the live `EfcViewer` renders as a single-line breadcrumb
   `Folder -> SubFolder -> Leaf`, anchored at the selected/predicted leaf, in a WebView2-hosted
   HTML/CSS/JS control replacing the `TreeListView`.
-- [ ] The expand affordance (plus when collapsed, minus when expanded) appears only on the leaf
+- [x] The expand affordance (plus when collapsed, minus when expanded) appears only on the leaf
   segment, and only when the leaf's `HasSubfolders` is true; leaves without subfolders show no
   affordance.
-- [ ] Double-clicking a non-leaf segment collapses the row after that segment — downstream
+- [x] Double-clicking a non-leaf segment collapses the row after that segment — downstream
   arrows, segments, and the leaf are hidden — and shows a plus to the left of the now-terminal
   segment; activating that plus re-expands the full breadcrumb.
 - [ ] Expanding a segment lists every real immediate Outlook subfolder of that folder via the
@@ -137,25 +137,25 @@ acceptance criteria in `spec.md`.
 - [ ] A JS<->.NET bridge (`window.chrome.webview.postMessage` -> `WebMessageReceived`;
   `PostWebMessageAsJson`/`NavigateToString` outbound) carries double-click and left/right-arrow
   keyboard interaction and routes the live subfolder query across the WebView2 boundary.
-- [ ] `EfcViewer3` is handled as a mechanical Designer-only control swap or removal with no
+- [x] `EfcViewer3` is handled as a mechanical Designer-only control swap or removal with no
   behavioral wiring; the behavioral conversion targets `EfcViewer` + `EfcFormController` only
   (EfcViewer3 is dead code: sole runtime instantiation is `new EfcViewer()` at
   `EfcViewerQueue.cs:83`).
-- [ ] No third-party WinForms tree/list control and no WPF/`ElementHost` are introduced; the
+- [x] No third-party WinForms tree/list control and no WPF/`ElementHost` are introduced; the
   control technology is WebView2 (HTML/CSS/JS).
-- [ ] The scoring/ranking algorithm is unchanged; the feature-324 percentage plumbing
+- [x] The scoring/ranking algorithm is unchanged; the feature-324 percentage plumbing
   (`FolderRow.Score` -> `PercentageFormatter.FormatPercent`) is reused as-is.
 - [ ] Behavior parity is preserved: Up-at-top focuses `SearchText` (via a `focusSearch` bridge
   message); the `"Trash to Delete"` pseudo-row remains selectable; `"===="` banner rows remain
   non-interactive and rejected by `IsValidSelection`; the `'F'` action focuses the breadcrumb
   control; dark-mode re-theming works.
-- [ ] The pure breadcrumb row model and collapse/expand state machine, the bridge message
+- [x] The pure breadcrumb row model and collapse/expand state machine, the bridge message
   contracts (JSON round-trip plus malformed-input negatives), the HTML renderer, and the bridge
   router are unit-tested with MSTest + Moq + FluentAssertions (router against
   `Mock<IFolderHierarchyProvider>` and `Mock<IBreadcrumbWebHost>`), meeting repository coverage
   floors with >= 90% on new modules; host/Outlook wiring stays behind coverage-exempt seams with
   in-code justification, and no new testable logic is added to `EfcFormController`.
-- [ ] The full C# toolchain passes in a single pass: csharpier, msbuild with analyzers, msbuild
+- [x] The full C# toolchain passes in a single pass: csharpier, msbuild with analyzers, msbuild
   with nullable/TreatWarningsAsErrors, and vstest with coverage; no banned APIs
   (`DateTime.Now`, `DateTime.UtcNow`, `Random.Shared`, `Thread.Sleep`, `Task.Delay`) in
   touched/new code or tests.

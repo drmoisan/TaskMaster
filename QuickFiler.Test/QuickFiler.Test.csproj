@@ -54,6 +54,8 @@
     <OutputPath>bin\x86\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Controllers\BreadcrumbBridgeRouterQueueTests.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouterTests.cs" />
     <Compile Include="Controllers\KbdActionsTests.cs" />
     <Compile Include="Controllers\KbdActionsRemainingBranchesTests.cs" />
     <Compile Include="Controllers\KaCharTests.cs" />

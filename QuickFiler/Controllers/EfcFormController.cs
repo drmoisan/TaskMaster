@@ -15,6 +15,7 @@ using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
 using QuickFiler.Properties;
+using QuickFiler.Viewers;
 using TaskVisualization;
 using ToDoModel;
 using UtilitiesCS;
@@ -130,15 +131,14 @@ namespace QuickFiler.Controllers
         private EfcDataModel _dataModel;
         private EfcViewer _formViewer;
 
-        // Presented folder-suggestion rows and the host-neutral tree they build. The tree is rebuilt
-        // whenever the presented rows change; _folderRows retains the last raw rows so the delete path
-        // can prepend "Trash to Delete" and rebind.
-        private FolderSuggestionTree _folderTree;
+        // Presented folder-suggestion rows; retained so the delete path can prepend
+        // "Trash to Delete" and rebind through the breadcrumb router.
         private string[] _folderRows = Array.Empty<string>();
 
-        // The currently highlighted tree node, cached from the TreeListView SelectionChanged event so
-        // SelectedFolder/IsValidSelection derive the filing path from the selected node.
-        private FolderSuggestionNode _selectedNode;
+        // Breadcrumb WebView2 wiring (#349): the exempt host adapter over the Designer control and
+        // the non-exempt router that owns all breadcrumb logic. This controller stays wiring-only.
+        private WebView2BreadcrumbHost _breadcrumbHost;
+        private BreadcrumbBridgeRouter _router;
 
         private EfcHomeController _homeController;
         private EfcItemController _itemController;
@@ -288,11 +288,10 @@ namespace QuickFiler.Controllers
 
         public string SelectedFolder
         {
-            // The selected TreeListView model is a FolderSuggestionNode (cached in _selectedNode from
-            // SelectionChanged); its FullPath is the folder identity used for filing. Banner nodes
-            // carry the banner text (which starts with "===="), so IsValidSelection continues to
-            // reject them.
-            get => _selectedNode?.FullPath;
+            // Derived from the bridge router's selection tracking. The router never selects
+            // "===="-banner rows, and IsValidSelection keeps its "====" rejection as a second
+            // guard, so banner rows remain invalid filing targets.
+            get => _router?.SelectedFolderPath;
         }
 
         private bool _saveAttachments;
@@ -391,8 +390,7 @@ namespace QuickFiler.Controllers
             _formViewer.ConversationMenuItem.CheckedChanged += MoveConversation_CheckedChanged;
             _formViewer.Ok.Click += ButtonOK_Click;
             RegisterAlwaysOnAsyncKeyActions();
-            ConfigureFolderTreeView();
-            _formViewer.FolderListBox.KeyDown += FolderListBox_KeyDown;
+            ConfigureBreadcrumbControl();
             _formViewer.Cancel.Click += ButtonCancel_Click;
             _formViewer.RefreshPredicted.Click += ButtonRefresh_Click;
             _formViewer.NewFolder.Click += ButtonCreate_Click;
@@ -407,31 +405,10 @@ namespace QuickFiler.Controllers
         {
             if (e.KeyCode == Keys.Down)
             {
+                // Enter the breadcrumb list and select its first row (parity with the prior
+                // TreeListView down-arrow behavior); further key handling happens in-document.
                 _formViewer.FolderListBox.Select();
-            }
-        }
-
-        public void FolderListBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Up && _formViewer.FolderListBox.SelectedIndex == 0)
-            {
-                _formViewer.SearchText.Select();
-            }
-            else if (e.KeyCode == Keys.Left)
-            {
-                // Collapse the highlighted node. The TreeListView (configured with
-                // CanExpandGetter/ChildrenGetter) already collapses the focused row natively on the
-                // Left arrow; this delegates to the host-neutral state model to keep it in sync
-                // without duplicating the control's own toggle (LeftArrow is a no-op on a leaf, an
-                // already-collapsed node, or a banner).
-                _folderTree?.LeftArrow(_selectedNode);
-            }
-            else if (e.KeyCode == Keys.Right)
-            {
-                // Expand the highlighted node; mirrors the native TreeListView Right-arrow behavior in
-                // the host-neutral state model (RightArrow is a no-op on a leaf, an already-expanded
-                // node, or a banner).
-                _folderTree?.RightArrow(_selectedNode);
+                _router?.SelectFirstRow();
             }
         }
 
@@ -712,6 +689,9 @@ namespace QuickFiler.Controllers
                 {
                     ActiveTheme = "LightNormal";
                 }
+
+                // Re-theme the breadcrumb document alongside the WinForms theme swap.
+                _router?.ApplyTheme(DarkMode);
             }
         }
 
@@ -848,93 +828,77 @@ namespace QuickFiler.Controllers
             control.Focus();
         }
 
-        // Configures the TreeListView once: the tree glyph/children come from the host-neutral node
-        // model, and the two columns render the folder name and the right-aligned whole-number percent.
-        private void ConfigureFolderTreeView()
+        // Wiring-only breadcrumb setup (#349): constructs the exempt WebView2 host adapter and the
+        // non-exempt router where ConfigureFolderTreeView previously wired the TreeListView, then
+        // connects the router's events back to the form. All breadcrumb logic lives in the router.
+        private void ConfigureBreadcrumbControl()
         {
-            var tlv = _formViewer.FolderListBox;
-            tlv.CanExpandGetter = model => (model as FolderSuggestionNode)?.HasChildren ?? false;
-            tlv.ChildrenGetter = model => (model as FolderSuggestionNode)?.Children;
-            tlv.SelectionChanged += FolderListBox_SelectionChanged;
-            _formViewer.olvColumnFolder.AspectGetter = model =>
-                (model as FolderSuggestionNode)?.DisplayName ?? string.Empty;
-            _formViewer.olvColumnPercent.AspectGetter = model =>
-                PercentageFormatter.FormatPercent((model as FolderSuggestionNode)?.Probability);
+            _breadcrumbHost = new WebView2BreadcrumbHost(
+                _formViewer.BreadcrumbWebView,
+                new WebView2CoreInitializer()
+            );
+            var provider = new UtilitiesCS.OutlookObjects.Folder.OutlookFolderHierarchyProvider(
+                _globals.Ol.FolderTreeService
+            );
+            _router = new BreadcrumbBridgeRouter(
+                provider,
+                _breadcrumbHost,
+                new UtilitiesCS.OutlookObjects.Folder.BreadcrumbMessageCodec(),
+                new UtilitiesCS.OutlookObjects.Folder.BreadcrumbHtmlRenderer(),
+                new BreadcrumbOutboundQueue(_breadcrumbHost)
+            );
+            _breadcrumbHost.CoreInitialized += (s, e) => _router.NotifyCoreInitialized();
+            _router.FocusSearchRequested += (s, e) => _formViewer?.SearchText.Select();
+            _router.ApplyTheme(DarkMode);
+            _ = InitializeBreadcrumbHostAsync();
         }
 
-        // Caches the highlighted node so SelectedFolder/IsValidSelection and the Left/Right key
-        // transitions read the current selection without touching the control on each access.
-        private void FolderListBox_SelectionChanged(object sender, EventArgs e)
+        // Fire-and-forget host initialization with an error boundary (the router queues every
+        // outbound payload until CoreWebView2InitializationCompleted fires).
+        private async Task InitializeBreadcrumbHostAsync()
         {
-            _selectedNode = _formViewer?.FolderListBox.SelectedObject as FolderSuggestionNode;
+            try
+            {
+                await _breadcrumbHost.InitializeAsync(_formViewer.UiSyncContext);
+            }
+            catch (System.Exception ex)
+            {
+                logger.Error($"Breadcrumb WebView2 initialization failed: {ex.Message}", ex);
+            }
         }
 
-        // Builds the host-neutral suggestion tree from the presented rows, joins upstream
-        // probabilities, and feeds the TreeListView. Selects the first row after the leading banner,
-        // matching the prior ListBox behavior (index 1). Uses a local viewer reference so a concurrent
-        // Cleanup() that nulls _formViewer cannot cause a NullReferenceException.
+        // Routes the presented rows through the breadcrumb router (delete-path trash rebind,
+        // RefreshSuggestionsAsync, and SearchText_TextChanged all land here). Uses a local viewer
+        // reference so a concurrent Cleanup() cannot cause a NullReferenceException.
         private void BindFolderRows(string[] rows)
         {
             var formViewer = _formViewer;
-            if (formViewer == null)
+            if (formViewer == null || _router == null)
             {
                 return;
             }
 
             _folderRows = rows ?? Array.Empty<string>();
-            var tree = FolderSuggestionTree.BuildFromRows(_folderRows);
-
-            var source = BuildProbabilitySource();
-            if (source != null)
-            {
-                new FolderProbabilityAdapter(source).Apply(tree);
-            }
-
-            _folderTree = tree;
-            _selectedNode = null;
-
-            var tlv = formViewer.FolderListBox;
-            tlv.SetObjects(tree.Roots);
-            if (tlv.Items.Count > 1)
-            {
-                tlv.SelectedIndex = 1;
-            }
+            _ = BindBreadcrumbRowsAsync(_folderRows);
         }
 
-        // Projects the scored suggestions into a full-path -> probability lookup consumed by the
-        // FolderProbabilityAdapter. Returns null when no scored suggestions are available, in which
-        // case every percentage cell renders blank.
-        private IFolderProbabilitySource BuildProbabilitySource()
+        // Async bind boundary: joins the feature-324 score projection and delegates to the router.
+        private async Task BindBreadcrumbRowsAsync(string[] rows)
         {
-            var scores = _dataModel?.FolderHelper?.Suggestions?.ToScoredArray();
-            if (scores == null || scores.Length == 0)
+            try
             {
-                return null;
+                var scores =
+                    _dataModel?.FolderHelper?.Suggestions?.ToScoredArray()
+                    ?? Array.Empty<FolderScore>();
+                await _router.BindRowsAsync(rows, scores, Token);
             }
-
-            return new DictionaryProbabilitySource(scores);
-        }
-
-        // Thin, exempt implementation of the host-neutral 9001 seam backed by the merged
-        // FolderScore projection (FolderPath -> Probability in [0,1]).
-        [ExcludeFromCodeCoverage]
-        private sealed class DictionaryProbabilitySource : IFolderProbabilitySource
-        {
-            private readonly Dictionary<string, double> _map;
-
-            public DictionaryProbabilitySource(IEnumerable<FolderScore> scores)
+            catch (OperationCanceledException)
             {
-                _map = new Dictionary<string, double>(StringComparer.Ordinal);
-                foreach (var score in scores)
-                {
-                    // Last value wins for duplicate paths; avoids an add-collision exception.
-                    _map[score.FolderPath] = score.Probability;
-                }
+                logger.Debug("Breadcrumb bind canceled.");
             }
-
-            public bool TryGetProbability(string fullFolderPath, out double probability)
+            catch (System.Exception ex)
             {
-                return _map.TryGetValue(fullFolderPath, out probability);
+                logger.Error($"Breadcrumb bind failed: {ex.Message}", ex);
             }
         }
 

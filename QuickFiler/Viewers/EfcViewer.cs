@@ -85,6 +85,12 @@ namespace QuickFiler
             };
         }
 
+        /// <summary>
+        /// Exposes the Designer-owned breadcrumb WebView2 control to the form controller
+        /// (consumed by the WebView2BreadcrumbHost adapter wiring).
+        /// </summary>
+        internal Microsoft.Web.WebView2.WinForms.WebView2 BreadcrumbWebView => FolderListBox;
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if ((_keyboardHandler is not null) && (keyData.HasFlag(Keys.Alt)))
