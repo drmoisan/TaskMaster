@@ -272,6 +272,7 @@
     <Compile Include="OutlookObjects\Folder\BreadcrumbRowStateTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeNodeKeyTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbSegmentTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderHierarchyProviderAdapterTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeSnapshotQueriesAncestorChainTests.cs" />
     <Compile Include="OutlookObjects\Folder\OutlookFolderHierarchyProviderTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderSuggestionTreeHierarchyTests.cs" />
