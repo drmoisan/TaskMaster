@@ -284,6 +284,8 @@
   <ItemGroup>
     <Compile Include="Controllers\BayesianPerformanceController.cs" />
     <Compile Include="Controllers\EfcDataModel.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouter.cs" />
+    <Compile Include="Controllers\BreadcrumbOutboundQueue.cs" />
     <Compile Include="Controllers\EfcFormController.cs" />
     <Compile Include="Controllers\EfcHomeController.cs" />
     <Compile Include="Controllers\EfcHomeController.Metrics.cs" />
@@ -383,6 +385,8 @@
     </Compile>
     <Compile Include="Viewers\IItemViewer.cs" />
     <Compile Include="Viewers\IWebViewCoreInitializer.cs" />
+    <Compile Include="Viewers\IBreadcrumbWebHost.cs" />
+    <Compile Include="Viewers\WebView2BreadcrumbHost.cs" />
     <Compile Include="Viewers\WebView2CoreInitializer.cs" />
     <Compile Include="Viewers\ItemViewer.cs">
       <SubType>UserControl</SubType>
