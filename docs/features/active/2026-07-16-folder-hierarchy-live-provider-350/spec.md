@@ -273,36 +273,36 @@ consuming UI features."
 
 ## Acceptance Criteria
 
-- [ ] A public folder-hierarchy provider contract (`IFolderHierarchyProvider`) returns the ordered
+- [x] A public folder-hierarchy provider contract (`IFolderHierarchyProvider`) returns the ordered
       root-to-leaf ancestor chain for a selected leaf folder.
-- [ ] The provider returns, on demand, the real immediate subfolders of a given segment queried live
+- [x] The provider returns, on demand, the real immediate subfolders of a given segment queried live
       against the real Outlook hierarchy (via the existing cached snapshot, not from suggestion rows).
-- [ ] The live Outlook query is isolated behind an injectable seam (reused `IOutlookFolderTreeService` /
+- [x] The live Outlook query is isolated behind an injectable seam (reused `IOutlookFolderTreeService` /
       `IOutlookFolderHierarchyReader`); the pure ancestor-chain and segment-children logic is
       unit-testable without a live Outlook process, and the feature adds no new COM/coverage-exempt code.
-- [ ] The pure ancestor-chain helper (`FolderTreeSnapshotQueries.GetAncestorChain`) enforces the
+- [x] The pure ancestor-chain helper (`FolderTreeSnapshotQueries.GetAncestorChain`) enforces the
       documented invariants: root-first/leaf-last ordering; last element equals the requested leaf;
       adjacent `(parent, child)` satisfies `child.ParentKey == parent.Key`; leaf == root yields a
       single-element chain; null snapshot raises `ArgumentNullException`; null/unknown key returns an
       empty list (never null); identity is by `FolderTreeNodeKey`; a defensive cycle guard prevents
       looping.
-- [ ] The new provider supersedes the prefix-matching-over-suggestion-rows approach used by
+- [x] The new provider supersedes the prefix-matching-over-suggestion-rows approach used by
       `FolderSuggestionTree.BuildFromRows` and `FolderHierarchyBuilder.Build` by delivering the live
       ancestor-chain and real-immediate-subfolder queries those methods lack. Removal of the old methods
       and rewiring of their UI callers (`EfcFormController.BindFolderRows` for 9102,
       `ItemViewer.SetFolderSuggestions` for 9103) is executed by the consuming UI features when they
       adopt the provider, so wave-0 feature 9101 stays independently mergeable and does not break the
       build by deleting methods still referenced by unmigrated UI code.
-- [ ] The scoring/ranking algorithm and the feature-324 probability plumbing
+- [x] The scoring/ranking algorithm and the feature-324 probability plumbing
       (`FolderScore.Probability` -> `FolderRow.Score` -> `PercentageFormatter.FormatPercent`) are
       unchanged, and `FolderBreadcrumbSegment` carries no probability field.
-- [ ] Full C# toolchain green (csharpier, .NET analyzers, nullable, MSTest); changed and new code meets
+- [x] Full C# toolchain green (csharpier, .NET analyzers, nullable, MSTest); changed and new code meets
       repository coverage thresholds.
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Unit coverage: ancestor-chain computation for single-level, multi-level, and root-only folders.
-- [ ] Unit coverage: segment-children retrieval via a mocked live-hierarchy seam.
-- [ ] Negative flows: missing/null selected folder, unresolved handle, empty subfolder set.
-- [ ] Edge cases: leaf equals root; duplicate segment names at different depths.
-- [ ] Isolation: no test touches a live Outlook process or COM interop.
+- [x] Unit coverage: ancestor-chain computation for single-level, multi-level, and root-only folders.
+- [x] Unit coverage: segment-children retrieval via a mocked live-hierarchy seam.
+- [x] Negative flows: missing/null selected folder, unresolved handle, empty subfolder set.
+- [x] Edge cases: leaf equals root; duplicate segment names at different depths.
+- [x] Isolation: no test touches a live Outlook process or COM interop.

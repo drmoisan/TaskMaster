@@ -109,26 +109,26 @@ through them the end user judging and navigating suggested filing targets.
 
 ## Acceptance Criteria
 
-- [ ] A consuming UI feature can obtain the ordered root-to-leaf ancestor chain for a selected leaf
+- [x] A consuming UI feature can obtain the ordered root-to-leaf ancestor chain for a selected leaf
       folder from `IFolderHierarchyProvider.GetAncestorChainAsync`, with the last segment equal to the
       requested leaf and `HasChildren` set correctly for rendering the expand affordance.
-- [ ] A consuming UI feature can obtain, on demand, the real immediate Outlook subfolders of a given
+- [x] A consuming UI feature can obtain, on demand, the real immediate Outlook subfolders of a given
       segment from `IFolderHierarchyProvider.GetImmediateSubfoldersAsync` (queried live via the cached
       snapshot, not from suggestion rows), receiving an empty list rather than null when there are none.
-- [ ] A consuming UI feature can resolve a UI-selected folder path to a stable `FolderTreeNodeKey` via
+- [x] A consuming UI feature can resolve a UI-selected folder path to a stable `FolderTreeNodeKey` via
       `ResolveLeafKeyAsync`, receiving `null` when no matching node exists, and can route subsequent
       expand calls by that key so duplicate segment names at different depths are distinguished.
-- [ ] The segment DTO (`FolderBreadcrumbSegment`) is probability-free; each consumer joins the
+- [x] The segment DTO (`FolderBreadcrumbSegment`) is probability-free; each consumer joins the
       percentage from the existing feature-324 plumbing by `FolderPath`, and the scoring/ranking
       algorithm and probability plumbing are unchanged.
-- [ ] The provider and its pure ancestor-chain helper are unit-testable without a live Outlook process
+- [x] The provider and its pure ancestor-chain helper are unit-testable without a live Outlook process
       (the live query is isolated behind the reused `IOutlookFolderTreeService` seam), so a consumer's
       tests can depend on the contract without COM.
-- [ ] Wave-0 mergeability is preserved: this feature ADDS the provider and does not delete
+- [x] Wave-0 mergeability is preserved: this feature ADDS the provider and does not delete
       `FolderSuggestionTree.BuildFromRows` or `FolderHierarchyBuilder.Build` or rewire their UI callers
       (`EfcFormController.BindFolderRows`, `ItemViewer.SetFolderSuggestions`); that removal and rewiring
       is performed by 9102 and 9103 when they adopt the provider.
-- [ ] Full C# toolchain green (csharpier, .NET analyzers, nullable, MSTest); changed and new code meets
+- [x] Full C# toolchain green (csharpier, .NET analyzers, nullable, MSTest); changed and new code meets
       repository coverage thresholds.
 
 ## Non-Goals
