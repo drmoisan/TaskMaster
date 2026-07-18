@@ -120,6 +120,7 @@ namespace UtilitiesCS
         IList<IQfcTipsDetails> _tipsExpanded;
         private TextBox _textboxSearch;
         private TextBox _textboxBody;
+
         // #351: the QuickFiler folder control is a WebView2-hosted breadcrumb; theming reaches it
         // via PreferredColorScheme plus a themeChange bridge message (see Theme.Rendering.cs).
         private Microsoft.Web.WebView2.WinForms.WebView2 _breadcrumbWebView2;

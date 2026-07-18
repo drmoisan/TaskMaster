@@ -404,6 +404,59 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         [TestMethod]
+        public void SelectSubfolder_OutOfRangeIndex_Throws()
+        {
+            // Arrange
+            var model = ModelWithSuggestion();
+            model.SelectedRow.TryExpandLeaf();
+            model.SelectedRow.SetSubfolders(
+                new[] { Segment("sub", "\\Inbox\\Projects\\Apollo\\Sub", "Sub", false) }
+            );
+
+            // Act, Assert
+            ((System.Action)(() => model.SelectSubfolder(-1)))
+                .Should()
+                .Throw<ArgumentOutOfRangeException>();
+            ((System.Action)(() => model.SelectSubfolder(1)))
+                .Should()
+                .Throw<ArgumentOutOfRangeException>();
+        }
+
+        [TestMethod]
+        public void LeftArrow_WithSubfolderSelected_ResetsSubfolderSelectionAndCollapses()
+        {
+            // Arrange
+            var model = ModelWithSuggestion();
+            model.SelectedRow.TryExpandLeaf();
+            model.SelectedRow.SetSubfolders(
+                new[] { Segment("sub", "\\Inbox\\Projects\\Apollo\\Sub", "Sub", false) }
+            );
+            model.SelectSubfolder(0);
+
+            // Act
+            var handled = model.LeftArrow();
+
+            // Assert
+            handled.Should().BeTrue();
+            model.SelectedSubfolderIndex.Should().Be(-1);
+            model.SelectedRow.LeafExpanded.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void AddSuggestionRow_NullSegmentInChain_Throws()
+        {
+            // Arrange
+            var model = new BreadcrumbStateModel();
+            var chain = new[] { Segment("root", "\\Inbox", "Inbox", true), null };
+
+            // Act
+            Action act = () => model.AddSuggestionRow(chain, 0.5);
+
+            // Assert
+            act.Should().Throw<ArgumentException>().WithMessage("*null segments*");
+        }
+
+        [TestMethod]
         public void Clear_RemovesRowsAndSelection()
         {
             // Arrange

@@ -272,6 +272,7 @@
     <Compile Include="OutlookObjects\Folder\BreadcrumbRowStateTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeNodeKeyTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbBridgeMessagesTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbBridgeRouterEdgeTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbBridgeRouterTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionMapTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRenderProjectionTests.cs" />

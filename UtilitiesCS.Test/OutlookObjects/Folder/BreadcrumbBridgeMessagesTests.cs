@@ -244,6 +244,14 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         [TestMethod]
+        public void ThemeChangeMessage_EmptyOrWhitespaceTheme_Throws()
+        {
+            ((Action)(() => new ThemeChangeMessage(""))).Should().Throw<ArgumentException>();
+            ((Action)(() => new ThemeChangeMessage("  "))).Should().Throw<ArgumentException>();
+            ((Action)(() => new ThemeChangeMessage(null))).Should().Throw<ArgumentException>();
+        }
+
+        [TestMethod]
         public void Serialize_NullMessage_Throws()
         {
             Action act = () => BreadcrumbBridgeSerializer.Serialize(null);

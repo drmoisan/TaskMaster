@@ -101,8 +101,7 @@ namespace UtilitiesCS
                 _breadcrumbWebView2.CoreWebView2.Profile.PreferredColorScheme = Web2ViewScheme;
             }
             _breadcrumbThemeNotifier?.Invoke(
-                Web2ViewScheme
-                    == Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme.Dark
+                Web2ViewScheme == Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme.Dark
                     ? "dark"
                     : "light"
             );

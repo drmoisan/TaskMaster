@@ -273,8 +273,7 @@ namespace QuickFiler.Test.Viewers
             harness.Receive("{\"type\":\"unhandledArrow\",\"direction\":\"left\"}");
 
             // Assert: the synthetic key seam fires for every arrow message (FR-6).
-            keys.Should()
-                .Equal(BreadcrumbArrowDirection.Right, BreadcrumbArrowDirection.Left);
+            keys.Should().Equal(BreadcrumbArrowDirection.Right, BreadcrumbArrowDirection.Left);
         }
 
         [TestMethod]
@@ -305,6 +304,79 @@ namespace QuickFiler.Test.Viewers
             // Assert
             harness.Coordinator.Contains("Trash to Delete").Should().BeTrue();
             harness.Coordinator.GetFolderItems().Should().Equal(LeafPath, "Trash to Delete");
+        }
+
+        [TestMethod]
+        public void SetSuggestions_SyncFacade_PopulatesImmediatelyThenUpgradesPreservingSelection()
+        {
+            // Arrange: an empty coordinator (population not yet run).
+            var harness = CreateHarness(populate: false);
+            var row = new FolderRow(
+                LeafPath,
+                FolderRowKind.Suggestion,
+                new FolderScore(LeafPath, 1000, 0.73)
+            );
+
+            // Act: the void IItemViewer.SetFolderSuggestions path.
+            harness.Coordinator.SetSuggestions(new[] { row });
+
+            // Assert (immediate): the selection contract holds synchronously via plain-path rows.
+            harness.Coordinator.Contains(LeafPath).Should().BeTrue();
+            harness.Coordinator.SelectRow(0);
+            harness.Coordinator.GetSelectedFolder().Should().Be(LeafPath);
+
+            // Assert (upgrade): completed-task provider -> chain rows with preserved selection.
+            harness.Coordinator.SuggestionsUpgrade.GetAwaiter().GetResult();
+            harness.Coordinator.GetSelectedFolder().Should().Be(LeafPath);
+            var lastRender = harness.PostedMessages().OfType<RenderMessage>().Last();
+            lastRender.Rows[0].IsSuggestion.Should().BeTrue("the upgrade attaches the chain");
+            lastRender.Rows[0].PercentText.Should().Be("73%");
+        }
+
+        [TestMethod]
+        public void SetSuggestions_NullRows_Throws()
+        {
+            var harness = CreateHarness(populate: false);
+            ((Action)(() => harness.Coordinator.SetSuggestions(null)))
+                .Should()
+                .Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void SelectItem_KnownItemSelects_UnknownItemIsNoOp()
+        {
+            // Arrange
+            var harness = CreateHarness();
+            int raised = 0;
+            harness.Coordinator.SelectionChanged += (s, e) => raised++;
+
+            // Act + Assert: known item selects and raises the event.
+            harness.Coordinator.SelectItem(LeafPath);
+            raised.Should().Be(1);
+            harness.Coordinator.GetSelectedFolder().Should().Be(LeafPath);
+
+            // Unknown item: legacy ComboBox no-op — no event, selection untouched.
+            harness.Coordinator.SelectItem("\\Nope");
+            raised.Should().Be(1);
+            harness.Coordinator.GetSelectedFolder().Should().Be(LeafPath);
+        }
+
+        [TestMethod]
+        public void SetTheme_PostsThemeChangeMessage()
+        {
+            // Arrange
+            var harness = CreateHarness();
+
+            // Act
+            harness.Coordinator.SetTheme("dark");
+
+            // Assert
+            harness
+                .PostedMessages()
+                .OfType<ThemeChangeMessage>()
+                .Single()
+                .Theme.Should()
+                .Be("dark");
         }
 
         [TestMethod]

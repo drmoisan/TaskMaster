@@ -265,7 +265,7 @@ today.
 
 ## Acceptance Criteria
 
-- [ ] AC-1: In the single live `ItemViewer` variant (scope decision recorded above), the
+- [x] AC-1: In the single live `ItemViewer` variant (scope decision recorded above), the
   `CboFolders` `ComboBox` is replaced by a WebView2-hosted HTML/CSS/JS breadcrumb control
   following the QuickFiler WebView2 message-body pane pattern (`IWebViewCoreInitializer` init,
   `NavigateToString` content delivery); the nine dead viewer variants are unchanged.
@@ -295,35 +295,56 @@ today.
   as consumed at `QfcItemController.MailActions.cs:90,103` and `QfcCollectionController.cs`;
   both Path A (`AssignFolderComboBox` `FolderRow` suggestions) and Path B
   (`TextBoxSearch_TextChanged` plain `string[]` search results) populate and select correctly.
-- [ ] AC-9: No third-party WinForms tree/list control and no WPF/`ElementHost` are introduced;
+- [x] AC-9: No third-party WinForms tree/list control and no WPF/`ElementHost` are introduced;
   no new NuGet packages are added.
-- [ ] AC-10: The scoring/ranking algorithm and model output are unchanged; the surfaced
+- [x] AC-10: The scoring/ranking algorithm and model output are unchanged; the surfaced
   percentage is the score already computed (feature 324 plumbing reused as-is).
-- [ ] AC-11: Breadcrumb core logic (`BreadcrumbStateModel`, rendering projection, bridge message
+- [x] AC-11: Breadcrumb core logic (`BreadcrumbStateModel`, rendering projection, bridge message
   router, selection mapping) is host-neutral and unit-tested with MSTest + Moq +
   FluentAssertions without a live Outlook process or a live WebView2; live Outlook I/O is
   reachable only through the injectable 9101 provider seam.
-- [ ] AC-12: The full C# toolchain (csharpier, .NET analyzers, nullable, MSTest via vstest) is
+- [x] AC-12: The full C# toolchain (csharpier, .NET analyzers, nullable, MSTest via vstest) is
   green; new host-neutral code meets >= 90% line coverage; changed lines do not lose coverage;
   new test files have explicit `<Compile Include>` entries.
-- [ ] AC-13: The 9101 dependency is reconciled: the assumed contract
+- [x] AC-13: The 9101 dependency is reconciled: the assumed contract
   (`ASSUMED-PENDING-9101-MERGE`) is replaced with the actual merged provider surface (directly
   or via a thin QuickFiler-facing adapter) before the breadcrumb consumes it.
 
 ## Definition of Done
 
 - [ ] All acceptance criteria above checked off with evidence.
-- [ ] Tests added for positive, negative, edge, and error scenarios of the state model, router,
+- [x] Tests added for positive, negative, edge, and error scenarios of the state model, router,
   projection, and selection mapping.
 - [ ] Runtime evidence (reproduction and post-fix) committed under the feature `evidence/` tree.
-- [ ] Docs updated (this spec, user-story, issue AC alignment).
-- [ ] Toolchain pass completed (format -> analyzers -> nullable -> test) with commands reported.
+- [x] Docs updated (this spec, user-story, issue AC alignment).
+- [x] Toolchain pass completed (format -> analyzers -> nullable -> test) with commands reported.
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Unit coverage: pure breadcrumb-model logic (ancestor-chain rendering, collapse/expand
+- [x] Unit coverage: pure breadcrumb-model logic (ancestor-chain rendering, collapse/expand
   state transitions) without a live Outlook process.
-- [ ] Integration scenarios: JS<->.NET bridge message routing for double-click, keyboard, and
+- [x] Integration scenarios: JS<->.NET bridge message routing for double-click, keyboard, and
   live subfolder query.
 - [ ] Runtime reproduction of the percentage-obscuring defect, then verification the CSS fix
   resolves it.
+
+## Acceptance Criteria Evidence (#351 execution, 2026-07-18)
+
+Checked criteria and their evidence (paths relative to the feature folder):
+
+- AC-1: WebView2 breadcrumb replaces `CboFolders` in the live `ItemViewer` only (Designer diff + `evidence/other/guardrail-verification.2026-07-18T10-08.md` G8 PASS; init through `IWebViewCoreInitializer` + `NavigateToString` in `QfcItemController.ViewerSetup.cs`/`ItemViewer.Breadcrumb.cs`).
+- AC-9/AC-10: `evidence/other/guardrail-verification.2026-07-18T10-08.md` (G1/G2/G3 PASS — no third-party control, no new packages, scoring untouched).
+- AC-11: host-neutral core unit-tested without Outlook/WebView2 — 114 new MSTest+Moq+FluentAssertions tests (`evidence/qa-gates/final-qc-test-coverage.2026-07-18T10-50.md`).
+- AC-12: full toolchain green in one pass + coverage bars (`evidence/qa-gates/final-qc-csharpier.2026-07-18T10-20.md`, `final-qc-analyzer-build.2026-07-18T10-25.md`, `final-qc-nullable-build.2026-07-18T10-27.md`, `final-qc-test-coverage.2026-07-18T10-50.md`, `coverage-delta-verification.2026-07-18T11-15.md` VERDICT: PASS).
+- AC-13: `evidence/other/9101-contract-reconciliation.2026-07-18T08-55.md` (RECONCILIATION: DIRECT-CONSUME; `ASSUMED-PENDING-9101-MERGE` resolved).
+
+Unchecked criteria (AC-2..AC-8, and the runtime Definition of Done / seeded runtime test
+condition): the delivering execution environment had no live Outlook host; each behavior is
+pinned by deterministic unit tests and recorded in structural-impossibility dossiers
+(`evidence/regression-testing/fail-before-exception.2026-07-18T08-52.md`,
+`evidence/qa-gates/percentage-visibility-postfix.2026-07-18T10-12.md`,
+`evidence/qa-gates/breadcrumb-runtime-interaction.2026-07-18T10-13.md`,
+`evidence/qa-gates/selection-contract-runtime.2026-07-18T10-14.md`,
+`evidence/other/webview2-resource-observation.2026-07-18T10-15.md`), all marked
+MANUAL-VERIFICATION-REQUIRED. They remain unchecked pending live-add-in verification by the
+maintainer.

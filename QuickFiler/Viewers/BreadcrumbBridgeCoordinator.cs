@@ -85,9 +85,8 @@ namespace QuickFiler.Viewers
             var immediate = new string[rows.Count];
             for (int i = 0; i < rows.Count; i++)
             {
-                immediate[i] = rows[i].Score.HasValue
-                    ? rows[i].Score.Value.FolderPath
-                    : rows[i].Text;
+                var score = rows[i].Score;
+                immediate[i] = score.HasValue ? score.Value.FolderPath : rows[i].Text;
             }
             _messenger.PostJson(_router.SetItems(immediate));
             SuggestionsUpgrade = UpgradeSuggestionsAsync(rows);

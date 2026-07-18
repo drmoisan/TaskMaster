@@ -381,6 +381,21 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         [TestMethod]
+        public void SetItemsAndAddItems_NullInput_ThrowExplicitly()
+        {
+            // Arrange
+            var router = new BreadcrumbBridgeRouter(
+                new Mock<IFolderHierarchyProvider>(MockBehavior.Strict).Object
+            );
+
+            // Act, Assert
+            ((Action)(() => router.SetItems(null)))
+                .Should()
+                .Throw<ArgumentNullException>();
+            ((Action)(() => router.AddItems(null))).Should().Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
         public void Constructor_NullProvider_Throws()
         {
             // Arrange, Act

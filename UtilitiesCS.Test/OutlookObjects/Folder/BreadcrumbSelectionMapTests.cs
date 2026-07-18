@@ -18,7 +18,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
     {
         private const string LeafPath = "\\Inbox\\Projects\\Apollo";
 
-        private static FolderBreadcrumbSegment Segment(string entryId, string path, string name, bool hasChildren) =>
+        private static FolderBreadcrumbSegment Segment(
+            string entryId,
+            string path,
+            string name,
+            bool hasChildren
+        ) =>
             new FolderBreadcrumbSegment(
                 new FolderTreeNodeKey("store-a", entryId, path),
                 name,
