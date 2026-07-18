@@ -69,9 +69,9 @@ subfolder listing. Issue 9101 is executed and merged before this feature.
   CSS-based fix applied).
 - [ ] A JS<->.NET event bridge handles double-click and keyboard (left/right arrow) interaction and
   routes the live subfolder query.
-- [ ] No third-party WinForms tree/list control and no WPF/ElementHost are introduced.
-- [ ] The scoring/ranking algorithm and model output are unchanged.
-- [ ] Full C# toolchain (csharpier, .NET analyzers, nullable, MSTest) is green; changed and new
+- [x] No third-party WinForms tree/list control and no WPF/ElementHost are introduced.
+- [x] The scoring/ranking algorithm and model output are unchanged.
+- [x] Full C# toolchain (csharpier, .NET analyzers, nullable, MSTest) is green; changed and new
   code meets repository coverage thresholds; breadcrumb core logic is unit-testable without a live
   Outlook process.
 
@@ -91,9 +91,9 @@ subfolder listing. Issue 9101 is executed and merged before this feature.
 
 ## Test Conditions to Consider
 
-- [ ] Unit coverage: pure breadcrumb-model logic (ancestor-chain rendering, collapse/expand state
+- [x] Unit coverage: pure breadcrumb-model logic (ancestor-chain rendering, collapse/expand state
   transitions) without a live Outlook process.
-- [ ] Integration scenarios: JS<->.NET bridge message routing for double-click, keyboard, and live
+- [x] Integration scenarios: JS<->.NET bridge message routing for double-click, keyboard, and live
   subfolder query.
 - [ ] Runtime reproduction of the percentage-obscuring defect, then verification the CSS fix
   resolves it.
@@ -102,3 +102,7 @@ subfolder listing. Issue 9101 is executed and merged before this feature.
 
 - [ ] Promote to GitHub issue (feature request template)
 - [ ] Create `docs/features/active/2026-07-16-quickfiler-breadcrumb-webview2/` folder from the template
+
+## Acceptance Criteria Evidence (#351 execution, 2026-07-18)
+
+Checked items are backed by `docs/features/active/2026-07-16-quickfiler-breadcrumb-webview2-351/evidence/` artifacts (guardrail-verification, final-qc-* toolchain gates, coverage-delta-verification VERDICT: PASS, 114 new unit tests). The remaining runtime-behavior items (breadcrumb rendering/interaction/percentage visibility/selection filing) are pinned by deterministic unit tests and Phase 6 structural-impossibility dossiers (MANUAL-VERIFICATION-REQUIRED in the live add-in) and remain unchecked.

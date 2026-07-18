@@ -86,7 +86,7 @@ EfcViewer surface (issue 9102) while keeping the filing workflow — selection, 
 - [ ] US-7: Selecting a breadcrumb (or a listed subfolder, or a search result) files the message
   to exactly the full folder path shown; typing in the search box still lists matching folders
   and the "Trash to Delete" entry still behaves exactly as it does today.
-- [ ] US-8: The suggestion percentages themselves are unchanged — the same scores the predictor
+- [x] US-8: The suggestion percentages themselves are unchanged — the same scores the predictor
   already computes are displayed; only the presentation changes.
 
 ## Non-Goals
@@ -95,3 +95,8 @@ EfcViewer surface (issue 9102) while keeping the filing workflow — selection, 
 - No redesign of the EfcViewer surface (delivered separately by issue 9102).
 - No changes to the nine inactive QuickFiler viewer variants; only the live item viewer changes.
 - No new third-party UI controls; the control is WebView2-hosted HTML/CSS/JS.
+
+## Acceptance Criteria Evidence (#351 execution, 2026-07-18)
+
+- US-8 checked: the scoring/ranking sources are untouched (`evidence/other/guardrail-verification.2026-07-18T10-08.md` G3 PASS) and the displayed percentage is formatter-parity-tested (`BreadcrumbRenderProjectionTests.Project_PercentFormatting_MatchesPercentageFormatterParity`).
+- US-1..US-7 remain unchecked: runtime user behaviors could not be verified without a live Outlook host; each is pinned by deterministic unit tests in the Phase 6 structural-impossibility dossiers under `evidence/qa-gates/` (MANUAL-VERIFICATION-REQUIRED).

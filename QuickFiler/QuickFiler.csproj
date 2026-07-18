@@ -384,10 +384,13 @@
       <DependentUpon>EfcViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Viewers\IItemViewer.cs" />
+    <Compile Include="Viewers\BreadcrumbBridgeCoordinator.cs" />
     <Compile Include="Viewers\IWebViewCoreInitializer.cs" />
     <Compile Include="Viewers\IBreadcrumbWebHost.cs" />
     <Compile Include="Viewers\WebView2BreadcrumbHost.cs" />
+    <Compile Include="Viewers\IWebViewMessenger.cs" />
     <Compile Include="Viewers\WebView2CoreInitializer.cs" />
+    <Compile Include="Viewers\WebView2Messenger.cs" />
     <Compile Include="Viewers\ItemViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -396,6 +399,10 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Viewers\ItemViewer.Commands.cs">
+      <DependentUpon>ItemViewer.cs</DependentUpon>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Viewers\ItemViewer.Breadcrumb.cs">
       <DependentUpon>ItemViewer.cs</DependentUpon>
       <SubType>UserControl</SubType>
     </Compile>
@@ -497,6 +504,7 @@
     <Content Include="Resources\Delete.png" />
     <Content Include="Resources\Delete.svg" />
     <Content Include="Resources\EmailHeader.html" />
+    <Content Include="Resources\FolderBreadcrumb.html" />
     <Content Include="Resources\FlagDarkRed.png" />
     <Content Include="Resources\FlagDarkRed.svg" />
     <None Include="Resources\Forward1.png" />

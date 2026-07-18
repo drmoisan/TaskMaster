@@ -260,250 +260,21 @@ namespace QuickFiler.Controllers
             }
         }
 
-        private List<Keys> _cboKeys = new List<Keys>
-        {
-            Keys.Up,
-            Keys.Down,
-            Keys.Left,
-            Keys.Right,
-            Keys.Escape,
-            Keys.Return,
-        };
-
-        public void CboFolders_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (SynchronizationContext.Current is null)
-                SynchronizationContext.SetSynchronizationContext(
-                    new WindowsFormsSynchronizationContext()
-                );
-
-            ItemViewer viewer = null;
-            if (_cboKeys.Contains(e.KeyCode))
-            {
-                viewer = GetItemViewer(sender as Control);
-            }
-
-            switch (e.KeyCode)
-            {
-                case Keys.Escape:
-                {
-                    viewer.Controller.CounterEnter = 1;
-                    viewer.Controller.CounterComboRight = 0;
-                    viewer.CboFolders.DroppedDown = false;
-                    e.SuppressKeyPress = true;
-                    e.Handled = true;
-                    break;
-                }
-                case Keys.Up:
-                {
-                    viewer.Controller.CounterEnter = 0;
-                    break;
-                }
-                case Keys.Down:
-                {
-                    viewer.Controller.CounterEnter = 0;
-                    break;
-                }
-                case Keys.Right:
-                {
-                    viewer.Controller.CounterEnter = 0;
-                    switch (viewer.Controller.CounterComboRight)
-                    {
-                        case 0:
-                        {
-                            viewer.CboFolders.DroppedDown = true;
-                            viewer.Controller.CounterComboRight++;
-                            break;
-                        }
-                        case 1:
-                        {
-                            viewer.CboFolders.DroppedDown = false;
-                            viewer.Controller.CounterComboRight = 0;
-                            MyBox.ShowDialog(
-                                "Pop Out Item or Enumerate Conversation?",
-                                "Dialog",
-                                BoxIcon.Question,
-                                viewer.Controller.RightKeyActions
-                            );
-                            break;
-                        }
-                        default:
-                        {
-                            MessageBox.Show(
-                                "Error in intComboRightCtr ... setting to 0 and continuing",
-                                "Error",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error
-                            );
-                            viewer.Controller.CounterComboRight = 0;
-                            break;
-                        }
-                    }
-                    e.SuppressKeyPress = true;
-                    e.Handled = true;
-                    break;
-                }
-                case Keys.Left:
-                {
-                    viewer.Controller.CounterEnter = 1;
-                    viewer.Controller.CounterComboRight = 0;
-                    if (viewer.CboFolders.DroppedDown)
-                    {
-                        viewer.CboFolders.DroppedDown = false;
-                        e.SuppressKeyPress = true;
-                        e.Handled = true;
-                    }
-                    else
-                    {
-                        this.KeyboardHandler_KeyDown(sender, e);
-                    }
-
-                    break;
-                }
-                case Keys.Return:
-                {
-                    if (viewer.Controller.CounterEnter == 1)
-                    {
-                        viewer.Controller.CounterEnter = 0;
-                        viewer.Controller.CounterComboRight = 0;
-                        KeyboardHandler_KeyDown(sender, e);
-                    }
-                    else
-                    {
-                        viewer.Controller.CounterEnter = 1;
-                        viewer.Controller.CounterComboRight = 0;
-                        viewer.CboFolders.DroppedDown = false;
-                        e.SuppressKeyPress = true;
-                        e.Handled = true;
-                    }
-                    break;
-                }
-            }
-        }
-
-        public async void CboFolders_KeyDownAsyncOld(object sender, KeyEventArgs e)
-        {
-            await UiThread.Dispatcher.InvokeAsync(() =>
-            {
-                ItemViewer viewer = null;
-                if (_cboKeys.Contains(e.KeyCode))
-                {
-                    viewer = GetItemViewer(sender as Control);
-                }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.Escape:
-                    {
-                        viewer.Controller.CounterEnter = 1;
-                        viewer.Controller.CounterComboRight = 0;
-                        viewer.CboFolders.DroppedDown = false;
-                        e.SuppressKeyPress = true;
-                        e.Handled = true;
-                        break;
-                    }
-                    case Keys.Up:
-                    {
-                        viewer.Controller.CounterEnter = 0;
-                        break;
-                    }
-                    case Keys.Down:
-                    {
-                        viewer.Controller.CounterEnter = 0;
-                        break;
-                    }
-                    case Keys.Right:
-                    {
-                        viewer.Controller.CounterEnter = 0;
-                        switch (viewer.Controller.CounterComboRight)
-                        {
-                            case 0:
-                            {
-                                viewer.CboFolders.DroppedDown = true;
-                                viewer.Controller.CounterComboRight++;
-                                break;
-                            }
-                            case 1:
-                            {
-                                viewer.CboFolders.DroppedDown = false;
-                                viewer.Controller.CounterComboRight = 0;
-                                MyBox.ShowDialog(
-                                    "Pop Out Item or Enumerate Conversation?",
-                                    "Dialog",
-                                    BoxIcon.Question,
-                                    viewer.Controller.RightKeyActions
-                                );
-                                break;
-                            }
-                            default:
-                            {
-                                MessageBox.Show(
-                                    "Error in intComboRightCtr ... setting to 0 and continuing",
-                                    "Error",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Error
-                                );
-                                viewer.Controller.CounterComboRight = 0;
-                                break;
-                            }
-                        }
-                        e.SuppressKeyPress = true;
-                        e.Handled = true;
-                        break;
-                    }
-                    case Keys.Left:
-                    {
-                        viewer.Controller.CounterEnter = 1;
-                        viewer.Controller.CounterComboRight = 0;
-                        if (viewer.CboFolders.DroppedDown)
-                        {
-                            viewer.CboFolders.DroppedDown = false;
-                            e.SuppressKeyPress = true;
-                            e.Handled = true;
-                        }
-                        else
-                        {
-                            this.KeyboardHandler_KeyDownAsync(sender, e);
-                        }
-
-                        break;
-                    }
-                    case Keys.Return:
-                    {
-                        if (viewer.Controller.CounterEnter == 1)
-                        {
-                            viewer.Controller.CounterEnter = 0;
-                            viewer.Controller.CounterComboRight = 0;
-                            KeyboardHandler_KeyDownAsync(sender, e);
-                        }
-                        else
-                        {
-                            viewer.Controller.CounterEnter = 1;
-                            viewer.Controller.CounterComboRight = 0;
-                            viewer.CboFolders.DroppedDown = false;
-                            e.SuppressKeyPress = true;
-                            e.Handled = true;
-                        }
-                        break;
-                    }
-                }
-            });
-        }
-
+        // #351: the breadcrumb surface raises its arrows through the JS bridge, so this handler
+        // now serves only genuine ComboBox senders (the old sender-type ArgumentException guard is
+        // bypassed for the breadcrumb's synthetic FolderKeyDown events instead of throwing).
         public async void CboFolders_KeyDownAsync(object sender, KeyEventArgs e)
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext()
                 );
-            if (sender is not ComboBox)
+            if (!(sender is ComboBox cb))
             {
-                throw new ArgumentException(
-                    $"{nameof(CboFolders_KeyDownAsync)} event handler can "
-                        + $"only be assigned to a ComboBox.  must be a ComboBox"
-                );
+                // Breadcrumb-originated synthetic key events are fully handled by the bridge
+                // (BreadcrumbBridgeCoordinator.UnhandledArrow drives the legacy fall-throughs).
+                return;
             }
-            var cb = (ComboBox)sender;
             if (cb.DroppedDown)
             {
                 await DdOpen_KeyDownAsync(cb, e);
@@ -511,6 +282,35 @@ namespace QuickFiler.Controllers
             else
             {
                 await DdClosed_KeyDownAsync(cb, e);
+            }
+        }
+
+        // #351: legacy fall-through target for BreadcrumbBridgeCoordinator.UnhandledArrow —
+        // Right (nothing to expand) opens the Pop Out / Enumerate Conversation dialog exactly as
+        // the old dropdown-open Right did; Left (nothing to collapse) closes the folder control
+        // via the SetFolderDroppedDown(false) intent, matching the old close-the-dropdown branch.
+        public void BreadcrumbArrowFallThrough(
+            ItemViewer viewer,
+            UtilitiesCS.OutlookObjects.Folder.BreadcrumbArrowDirection direction
+        )
+        {
+            if (viewer is null)
+            {
+                throw new ArgumentNullException(nameof(viewer));
+            }
+
+            if (direction == UtilitiesCS.OutlookObjects.Folder.BreadcrumbArrowDirection.Right)
+            {
+                MyBox.ShowDialog(
+                    "Pop Out Item or Enumerate Conversation?",
+                    "Dialog",
+                    BoxIcon.Question,
+                    viewer.Controller.RightKeyActions
+                );
+            }
+            else
+            {
+                viewer.SetFolderDroppedDown(false);
             }
         }
 
@@ -542,17 +342,8 @@ namespace QuickFiler.Controllers
                 //    }
                 case Keys.Right:
                 {
-                    // #325: with the dropdown open and a folder-tree node highlighted, Right expands
-                    // it (no-op for a leaf or an already-expanded node). The transition itself is in
-                    // the unit-tested FolderTreeStateModel; only route to it here. When nothing
-                    // expands, fall through to the legacy Pop Out / Enumerate dialog.
-                    if (cbo.GetAncestor<ItemViewer>().FolderTreeRightArrow())
-                    {
-                        e.SuppressKeyPress = true;
-                        e.Handled = true;
-                        break;
-                    }
-
+                    // #351: the breadcrumb owns Right-arrow expansion via the JS bridge; for a
+                    // remaining ComboBox sender only the legacy Pop Out / Enumerate dialog applies.
                     e.SuppressKeyPress = true;
                     e.Handled = true;
 
@@ -566,16 +357,8 @@ namespace QuickFiler.Controllers
                 }
                 case Keys.Left:
                 {
-                    // #325: with the dropdown open and a folder-tree node highlighted, Left collapses
-                    // it (no-op for a leaf or an already-collapsed node). On a no-op, fall through to
-                    // the legacy behavior that closes the dropdown.
-                    if (cbo.GetAncestor<ItemViewer>().FolderTreeLeftArrow())
-                    {
-                        e.SuppressKeyPress = true;
-                        e.Handled = true;
-                        break;
-                    }
-
+                    // #351: the breadcrumb owns Left-arrow collapse via the JS bridge; for a
+                    // remaining ComboBox sender only the legacy close-the-dropdown branch applies.
                     UiThread.Dispatcher.Invoke(() => cbo.DroppedDown = false);
                     e.SuppressKeyPress = true;
                     e.Handled = true;

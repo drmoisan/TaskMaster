@@ -169,6 +169,12 @@ namespace QuickFiler.Controllers
 
             if (_folderHandler?.FolderArray?.Length > 0)
             {
+                // #351: the breadcrumb pipeline (injected 9101 provider behind the coordinator)
+                // must exist before population so ancestor chains come from
+                // IFolderHierarchyProvider.GetAncestorChainAsync instead of the decommissioned
+                // FolderHierarchyBuilder.Build (AC-5); no-op once initialized.
+                EnsureBreadcrumbPipeline();
+
                 // Intent-member equivalent of PopulateAndSelectFolder (Seam C): predetermined
                 // high-confidence folder is preselected when present; otherwise the index-1 top
                 // suggestion is selected. The standalone static PopulateAndSelectFolder is retained
