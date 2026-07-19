@@ -45,9 +45,15 @@ features:
   - issue_num: 372
     feature_folder: utilitiescs-nullable-email-classifier
     depends_on: [utilitiescs-nullable-extensions]
-  - issue_num: 9011
+  - issue_num: 374
     feature_folder: utilitiescs-nullable-dialogs-misc
     depends_on: [utilitiescs-nullable-extensions, utilitiescs-nullable-helperclasses]
+  - issue_num: 9013
+    feature_folder: utilitiescs-nullable-residuals
+    depends_on:
+      - utilitiescs-nullable-extensions
+      - utilitiescs-nullable-helperclasses
+      - utilitiescs-nullable-threading
   - issue_num: 9012
     feature_folder: utilitiescs-nullable-ci-capstone
     depends_on:
@@ -62,6 +68,7 @@ features:
       - utilitiescs-nullable-email-parsing
       - utilitiescs-nullable-email-classifier
       - utilitiescs-nullable-dialogs-misc
+      - utilitiescs-nullable-residuals
 ---
 
 # Epic: UtilitiesCS Nullable-Reference-Type Remediation
@@ -174,13 +181,74 @@ Wave assignment uses longest-path layering (`wave = 0` when `depends_on` is empt
 | utilitiescs-nullable-outlook-mailitem-item | `OutlookObjects/MailItem` + Item + Conversation + Attachment + Table | extensions, helperclasses | ~25 | C2 |
 | utilitiescs-nullable-email-parsing | `EmailIntelligence/EmailParsingSorting` + SubjectMap + Ctf | extensions | ~18 | C2 |
 | utilitiescs-nullable-email-classifier | `EmailIntelligence/Bayesian` + ClassifierGroups + Flags | extensions | ~18 | C3 |
-| utilitiescs-nullable-dialogs-misc | `Dialogs/` + remaining small subdirs (catch-all) | extensions, helperclasses | ~16 | C2 |
+| utilitiescs-nullable-dialogs-misc | `Dialogs/` (12 targets + 2 verify-only misc: `WindowsAPI/ExtraDeclarations.cs`, `Properties/AssemblyInfo.cs`) | extensions, helperclasses | 14 | C2 |
+| utilitiescs-nullable-residuals | Residual unowned CS86xx-risk trees: `Examples/` + `To Depricate/` + `OneDriveHelpers/` + `OutlookObjects/` root+8 leaf dirs + `EmailIntelligence/` root+Evaluation+OlFolderTools+People | extensions, helperclasses, threading | 44 | C3 |
 
 ### Wave 2 (capstone)
 
 | feature_folder | cluster | depends_on | est. files | complexity |
 | --- | --- | --- | --- | --- |
-| utilitiescs-nullable-ci-capstone | CI nullable-gate finalization + rules-conflict flag + optional project-level Nullable | all eleven remediation children | ~3 | C2 |
+| utilitiescs-nullable-ci-capstone | CI nullable-gate finalization + rules-conflict flag + optional project-level Nullable | all twelve remediation children | ~3 | C2 |
+
+## Residual-Scope Decision (2026-07-18)
+
+The `dialogs-misc` child (issue #374) was the designated Wave-1 catch-all, but narrowed its
+adopted scope to `UtilitiesCS/Dialogs/` (12 remediation targets + 2 verify-only misc files) and
+flagged the unowned residual trees in its `spec.md` "Ownership Gaps Flagged for
+Epic-Planner / Maintainer". Those residuals were cross-checked against this epic's
+definition-of-done inventory (~2131 CS86xx diagnostics across ~234 files / ~40 subdirectories of
+`UtilitiesCS/`, the CI error-log distribution). Ownership was reconciled by exhaustive `.cs`
+file count against the already-prepared children:
+
+- `OutlookObjects/` (126 `.cs`): Folder(63)+Store(20)=83 owned by `outlook-folder-store` (#365);
+  MailItem(12)+Item(9)+Conversation(2)+Attachment(2)+Table(5)=30 owned by `outlook-mailitem-item`
+  (#371); **residual = 13** (root 3 + AppointmentItem, Calendar, Category, Com, Explorer, Fields,
+  Filter DASL, Recipient).
+- `EmailIntelligence/` (100 `.cs`): EmailParsingSorting(14)+SubjectMap(7)+Ctf(4)=25 owned by
+  `email-parsing` (#370); Bayesian(27)+ClassifierGroups(16)+Flags(6)=49 owned by `email-classifier`
+  (#372); **residual = 26** (root 4 + Evaluation 2 + OlFolderTools 18 + People 2).
+- Other unowned trees: `Examples/` (1), `To Depricate/` (2), `OneDriveHelpers/` (2).
+
+### Decision: one additional remediation child
+
+**In-scope residuals exist**, so per the epic's definition-of-done a new remediation child is
+added rather than an exclusion note. `utilitiescs-nullable-residuals` (Wave 1, placeholder
+`issue_num: 9013`) owns the **44** residual files with genuine CS86xx risk
+(Examples 1 + To Depricate 2 + OneDriveHelpers 2 + OutlookObjects residual 13 +
+EmailIntelligence residual 26). Sampled evidence in the `dialogs-misc` spec plus structural
+confirmation (uninitialized non-nullable fields, unguarded COM dereferences) show these are
+genuine CS8618/CS8602-class candidates in the epic's error-log inventory. The child's
+`depends_on: [extensions, helperclasses, threading]` edges are source-confirmed by grep across
+the 44 files: 7 files consume `UtilitiesCS.Extensions`, 4 consume `UtilitiesCS.HelperClasses`,
+and 1 (`OneDriveHelpers/OneDriveDownloader.cs`) consumes the Threading cluster
+(`TimeOutTask.RunWithTimeout` / `TryCopyToAsyncWithTimeout`) — an edge the `dialogs-misc` spec
+flagged as undeclared, now declared here. All three dependency clusters are Wave 0, so the child
+is Wave 1. Complexity band C3: the residual set spans Outlook COM adapters and EmailIntelligence
+modules and folds in the `cross_module_contract_change` floor signal via its multi-cluster
+consumption.
+
+### Epic-wide exclusions (recorded, not assigned to any child)
+
+- `UtilitiesCS/Interfaces/**` (~62 `.cs`): near-zero CS86xx risk — pure interface member
+  declarations with no bodies, fields, or constructors, so CS8618 cannot fire. Formally excluded
+  from every child, extending the established `Interfaces/IHelperClasses/` precedent (already out
+  of scope for `helperclasses` #364) repo-wide.
+- `UtilitiesCS/Properties/Resources.Designer.cs` and `Settings.Designer.cs` (2 `.cs`): fully
+  generated Designer files, left null-oblivious (no pragma). `AssemblyInfo.cs` is already a
+  verify-only member of `dialogs-misc` scope.
+
+These exclusions carry no CS86xx debt under the per-file pragma enforcement design; leaving them
+non-opted-in does not cross-block and does not diminish the epic's definition of done.
+
+### dialogs-misc (#374) flags retained
+
+- The manifest's `depends_on` edge from `dialogs-misc` to `helperclasses` (#364) is
+  grep-unconfirmed by source (zero `HelperClasses/` type references under `Dialogs/`). The edge is
+  retained (both Wave-0 upstreams are prepared, so it is harmless) and flagged, not dropped.
+- `dialogs-misc`'s atomic plan carries a Phase-0 execution-start gate: its execution must not
+  begin until `extensions` (#363) Batch D (`Extensions/WinFormsExtensions.cs`, the `Clone<T>()`
+  contract consumed by the button wrappers and `MyBox`) has merged. This gate is enforced at
+  atomic-execution time by `epic-orchestrator`, not during planning.
 
 ## Complexity Rationale
 
