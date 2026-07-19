@@ -157,13 +157,13 @@ List notable constraints (performance, compatibility, scope) or risks.
 
 Acceptance criteria (from `issue.md`, mapped here for traceability):
 
-- [ ] AC1: Every `.cs` file under `UtilitiesCS/Extensions/` that emits CS86xx carries
+- [x] AC1: Every `.cs` file under `UtilitiesCS/Extensions/` that emits CS86xx carries
   `#nullable enable` and compiles with zero nullable diagnostics under the per-file pragma with
   `TreatWarningsAsErrors`.
-- [ ] AC2: No project-level `<Nullable>` element is introduced into `UtilitiesCS.csproj`.
-- [ ] AC3: No behavior change; existing tests still pass.
-- [ ] AC4: No coverage regression on changed lines.
-- [ ] AC5: Public signatures of the remediated extension methods remain behavior-compatible;
+- [x] AC2: No project-level `<Nullable>` element is introduced into `UtilitiesCS.csproj`.
+- [x] AC3: No behavior change; existing tests still pass.
+- [x] AC4: No coverage regression on changed lines.
+- [x] AC5: Public signatures of the remediated extension methods remain behavior-compatible;
   nullability annotations reflect actual null behavior so they are safe contracts for downstream
   epic consumers.
 

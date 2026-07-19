@@ -13,6 +13,8 @@ using Newtonsoft.Json;
 
 namespace UtilitiesCS
 {
+#nullable enable
+
     public static class AsyncSerialization
     {
         internal const double MB = 1000000;
@@ -242,7 +244,9 @@ namespace UtilitiesCS
 
             if (0 < totalBytesCopied)
             {
-                progress.Report(100);
+                // Preserves the original unconditional call; the earlier progress?.Report
+                // usages set the flow state to maybe-null, but the progress contract is non-null.
+                progress!.Report(100);
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -294,7 +298,9 @@ namespace UtilitiesCS
             }
 
             if (0 < totalBytesCopied)
-                progress.Report(new KeyValuePair<long, long>(totalBytesCopied, sourceLength));
+                // Preserves the original unconditional call; the earlier null-comparisons set
+                // the flow state to maybe-null, but the progress contract is non-null here.
+                progress!.Report(new KeyValuePair<long, long>(totalBytesCopied, sourceLength));
             cancellationToken.ThrowIfCancellationRequested();
         }
 

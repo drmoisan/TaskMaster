@@ -8,9 +8,11 @@ using static UtilitiesCS.ArrayExtensions;
 
 namespace UtilitiesCS
 {
+#nullable enable
+
     public static class StringExtensions
     {
-        public static bool IsNullOrEmpty(this string str) => string.IsNullOrEmpty(str);
+        public static bool IsNullOrEmpty(this string? str) => string.IsNullOrEmpty(str);
 
         public static string[] Split(this string str, char separator, bool trim)
         {

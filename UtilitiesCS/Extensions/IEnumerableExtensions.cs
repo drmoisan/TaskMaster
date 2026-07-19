@@ -13,6 +13,8 @@ using UtilitiesCS.Threading;
 
 namespace UtilitiesCS
 {
+#nullable enable
+
     public static class IEnumerableExtensions
     {
         /// <summary>
@@ -25,7 +27,7 @@ namespace UtilitiesCS
         /// <exception cref="ArgumentNullException">An element in the sequence cannot be cast to type TResult.</exception>
         public static IEnumerable<TResult> CastNullSafe<TResult>(this IEnumerable source)
         {
-            IEnumerable<TResult> enumerable = source as IEnumerable<TResult>;
+            IEnumerable<TResult>? enumerable = source as IEnumerable<TResult>;
             if (enumerable != null)
             {
                 return enumerable;
@@ -45,7 +47,10 @@ namespace UtilitiesCS
             {
                 if (item is null)
                 {
-                    yield return default(TResult);
+                    // Intentional null-substitution for null elements; the null-forgiving
+                    // operator preserves the existing default(TResult) yield without changing
+                    // the IEnumerable<TResult> contract that downstream callers depend on.
+                    yield return default(TResult)!;
                 }
                 else
                 {
@@ -58,7 +63,7 @@ namespace UtilitiesCS
             int DifferenceCount,
             IEnumerable<T> OnlyThis,
             IEnumerable<T> OnlyOther
-        ) CompareTo<T>(this IEnumerable<T> enumerable, IEnumerable<T> other)
+        ) CompareTo<T>(this IEnumerable<T>? enumerable, IEnumerable<T>? other)
         {
             if (enumerable is null)
             {
@@ -94,7 +99,7 @@ namespace UtilitiesCS
         //    }
         //}
 
-        public static bool IsSubsetOf<T>(this IEnumerable<T> source, IEnumerable<T> other)
+        public static bool IsSubsetOf<T>(this IEnumerable<T>? source, IEnumerable<T>? other)
         {
             if (source is null || other is null)
             {
@@ -108,7 +113,9 @@ namespace UtilitiesCS
             TKey key
         )
         {
-            return groups.Where(x => x.Key.Equals(key)).SelectMany(x => x);
+            // IGrouping keys are non-null for the groupings this method consumes; the
+            // null-forgiving operator preserves the original x.Key.Equals(key) comparison.
+            return groups.Where(x => x.Key!.Equals(key)).SelectMany(x => x);
         }
 
         public static string StringJoin(this IEnumerable<string> strings, string seperator = ",") =>
@@ -121,11 +128,11 @@ namespace UtilitiesCS
             this IEnumerable<T> enumerable,
             int count,
             ProgressTracker progress,
-            Action<int> onItemCompleted = null
+            Action<int>? onItemCompleted = null
         )
         {
             int completed = 0;
-            List<T> list = null;
+            List<T>? list = null;
             progress.Report(0, $"Consuming {0:N0} of {count:N0}");
 
             using (
@@ -204,7 +211,7 @@ namespace UtilitiesCS
             this IEnumerable<T> enumerable,
             int count,
             ProgressTrackerPane progress,
-            Stopwatch sw
+            Stopwatch? sw
         )
         {
             enumerable.ThrowIfNullOrEmpty();

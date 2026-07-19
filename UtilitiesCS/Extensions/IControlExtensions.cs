@@ -9,6 +9,8 @@ using UtilitiesCS.Interfaces.IWinForm;
 
 namespace UtilitiesCS.Extensions
 {
+#nullable enable
+
     public static class IControlExtensions
     {
         public static Screen GetScreen(this IControl control)
