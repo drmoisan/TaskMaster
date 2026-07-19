@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -142,7 +143,7 @@ namespace UtilitiesCS
             bool blSelected;
 
             blSelected = false;
-            string[] varCats = (objItem.Categories as string).Split(',', trim: true);
+            string[] varCats = (objItem.Categories as string)!.Split(',', trim: true);
             var loopTo = varCats.Length;
             for (i = 0; i < loopTo; i++)
             {

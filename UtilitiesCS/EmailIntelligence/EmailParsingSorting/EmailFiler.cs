@@ -435,7 +435,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
         protected internal virtual Task SaveAttachmentAsync(AttachmentHelper attachment)
         {
-            return attachment.SaveAttachmentAsync(Config.SaveFsPath);
+            return attachment.SaveAttachmentAsync(Config.SaveFsPath!);
         }
 
         protected internal virtual void DeleteFile(string filePath)
