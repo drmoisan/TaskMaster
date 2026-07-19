@@ -115,14 +115,14 @@ kinds, so no `EVIDENCE_LOCATION_OVERRIDE_REJECTED` substitution is required.
 
 ### Phase 2 — Batch B Pure Host-Neutral Leaf
 
-- [ ] [P2-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailItem/CidImageResolver.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P2-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailItem/CidImageResolver.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P2-T3). This file is NOT COM-bound and is held to normal, non-exempt coverage expectations.
-- [ ] [P2-T2] Run CSharpier over `UtilitiesCS/OutlookObjects/MailItem/CidImageResolver.cs` with `dotnet tool run csharpier .` and confirm no residual formatting diff
+- [x] [P2-T2] Run CSharpier over `UtilitiesCS/OutlookObjects/MailItem/CidImageResolver.cs` with `dotnet tool run csharpier .` and confirm no residual formatting diff
   - Acceptance: `csharpier --check .` exits 0 for the touched file.
-- [ ] [P2-T3] Run the pragma-only nullable build and record Batch B verification to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/qa-gates/batch-b-nullable-build.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P2-T3] Run the pragma-only nullable build and record Batch B verification to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/qa-gates/batch-b-nullable-build.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx for `CidImageResolver.cs` and NO new diagnostics elsewhere.
-- [ ] [P2-T4] Run the `CidImageResolverTests.cs` suite with coverage (non-exempt file) and record results to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/regression-testing/batch-b-tests.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P2-T4] Run the `CidImageResolverTests.cs` suite with coverage (non-exempt file) and record results to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/regression-testing/batch-b-tests.<yyyy-MM-ddTHH-mm>.md`
   - Command: `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"FullyQualifiedName~CidImageResolver"`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with passed/failed counts AND numeric coverage for `CidImageResolver.cs`; no coverage regression on changed lines.
 

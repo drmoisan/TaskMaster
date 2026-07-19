@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -44,7 +45,9 @@ namespace UtilitiesCS
             {
                 if (!string.IsNullOrEmpty(attachment?.ContentId))
                 {
-                    map[attachment.ContentId] = attachment;
+                    // The IsNullOrEmpty guard above returns false only when attachment and its
+                    // ContentId are both non-null, so the dereference here is provably safe.
+                    map[attachment!.ContentId] = attachment;
                 }
             }
 
