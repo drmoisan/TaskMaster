@@ -54,7 +54,7 @@ features:
       - utilitiescs-nullable-extensions
       - utilitiescs-nullable-helperclasses
       - utilitiescs-nullable-threading
-  - issue_num: 9012
+  - issue_num: 376
     feature_folder: utilitiescs-nullable-ci-capstone
     depends_on:
       - utilitiescs-nullable-extensions
@@ -73,12 +73,13 @@ features:
 
 # Epic: UtilitiesCS Nullable-Reference-Type Remediation
 
-> **Placeholder issue numbers.** The `issue_num` values `9001`-`9012` in the frontmatter are
-> provisional placeholders assigned at manifest-authoring time, before child promotion. Each is
-> back-filled with the real GitHub issue number from its child's promotion receipt as preparation
-> completes. `depends_on` edges are expressed as `feature_folder` basenames (a form the
-> `epic-orchestrate` schema resolves via the `feature_folder` index), so the dependency graph
-> remains valid while `issue_num` values are still placeholders.
+> **Issue numbers (all back-filled).** The `issue_num` values were provisional placeholders
+> (`9001`-`9013`) at manifest-authoring time, before child promotion. As of planning completion
+> every placeholder has been back-filled with the real GitHub issue number from its child's
+> promotion receipt: `363`, `364`, `366`, `367`, `369`, `368`, `365`, `371`, `370`, `372`, `374`,
+> `375`, and `376` (capstone). No placeholders remain. `depends_on` edges are expressed as
+> `feature_folder` basenames (a form the `epic-orchestrate` schema resolves via the
+> `feature_folder` index), so the dependency graph is valid independent of `issue_num`.
 
 ## Goal
 
@@ -212,8 +213,8 @@ file count against the already-prepared children:
 ### Decision: one additional remediation child
 
 **In-scope residuals exist**, so per the epic's definition-of-done a new remediation child is
-added rather than an exclusion note. `utilitiescs-nullable-residuals` (Wave 1, placeholder
-`issue_num: 9013`) owns the **44** residual files with genuine CS86xx risk
+added rather than an exclusion note. `utilitiescs-nullable-residuals` (Wave 1,
+`issue_num: 375`) owns the **44** residual files with genuine CS86xx risk
 (Examples 1 + To Depricate 2 + OneDriveHelpers 2 + OutlookObjects residual 13 +
 EmailIntelligence residual 26). Sampled evidence in the `dialogs-misc` spec plus structural
 confirmation (uninitialized non-nullable fields, unguarded COM dereferences) show these are
