@@ -21,13 +21,13 @@ features:
   - issue_num: 364
     feature_folder: utilitiescs-nullable-helperclasses
     depends_on: []
-  - issue_num: 9003
+  - issue_num: 366
     feature_folder: utilitiescs-nullable-reusabletypes
     depends_on: []
-  - issue_num: 9004
+  - issue_num: 367
     feature_folder: utilitiescs-nullable-newtonsofthelpers
     depends_on: []
-  - issue_num: 9005
+  - issue_num: 369
     feature_folder: utilitiescs-nullable-threading
     depends_on: []
   - issue_num: 368
@@ -36,7 +36,7 @@ features:
   - issue_num: 9007
     feature_folder: utilitiescs-nullable-outlook-folder-store
     depends_on: [utilitiescs-nullable-extensions, utilitiescs-nullable-helperclasses]
-  - issue_num: 9008
+  - issue_num: 371
     feature_folder: utilitiescs-nullable-outlook-mailitem-item
     depends_on: [utilitiescs-nullable-extensions, utilitiescs-nullable-helperclasses]
   - issue_num: 370
