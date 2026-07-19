@@ -12,7 +12,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
     public interface IOutlookFolderHierarchyReader
     {
         Task<IReadOnlyList<FolderTreeSnapshotNode>> ReadFoldersAsync(
-            FolderTreeRequest request,
+            FolderTreeRequest? request,
             IDeadlineClock? deadlineClock,
             IDispatcherYield? dispatcherYield,
             CancellationToken cancellationToken

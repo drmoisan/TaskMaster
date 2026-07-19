@@ -31,7 +31,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         }
 
         public async Task<FolderTreeSnapshot> BuildSnapshotAsync(
-            FolderTreeRequest request,
+            FolderTreeRequest? request,
             CancellationToken cancellationToken
         )
         {
