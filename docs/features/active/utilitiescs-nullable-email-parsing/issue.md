@@ -40,16 +40,16 @@ non-opted-in and must not be cross-blocked by this change.
 
 ## Acceptance Criteria (early draft)
 
-- [ ] AC1: Every `.cs` file in the cluster (`EmailParsingSorting/`, `SubjectMap/`, `Ctf/`) that
+- [x] AC1: Every `.cs` file in the cluster (`EmailParsingSorting/`, `SubjectMap/`, `Ctf/`) that
   emits CS86xx carries `#nullable enable` and compiles with zero nullable diagnostics under the
   per-file pragma with `TreatWarningsAsErrors`.
-- [ ] AC2: No project-level `<Nullable>` element is introduced into `UtilitiesCS.csproj`.
-- [ ] AC3: No behavior change to parsing/sorting logic; existing tests still pass.
-- [ ] AC4: No coverage regression on changed lines.
-- [ ] AC5: Public signatures of the remediated types remain behavior-compatible; nullability
+- [x] AC2: No project-level `<Nullable>` element is introduced into `UtilitiesCS.csproj`.
+- [x] AC3: No behavior change to parsing/sorting logic; existing tests still pass.
+- [x] AC4: No coverage regression on changed lines.
+- [x] AC5: Public signatures of the remediated types remain behavior-compatible; nullability
   annotations reflect actual null behavior and are consistent with the upstream
   `utilitiescs-nullable-extensions` annotation contracts they consume.
-- [ ] AC6: Non-remediated files remain non-opted-in and are not cross-blocked; the change is
+- [x] AC6: Non-remediated files remain non-opted-in and are not cross-blocked; the change is
   independently mergeable under the per-file pragma architecture.
 
 ## Constraints & Risks

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -118,7 +119,7 @@ namespace UtilitiesCS
         internal void Init(string emailSubject, int emailSubjectCount)
         {
             _subjectTokens = emailSubject.Tokenize(_tokenizerRegex);
-            _subjectTokens = _subjectTokens.StripCommonWords(_commonWords);
+            _subjectTokens = _subjectTokens.StripCommonWords(_commonWords!);
             if (_subjectTokens.Count() == 0)
             {
                 throw new System.InvalidOperationException(
@@ -132,10 +133,10 @@ namespace UtilitiesCS
             {
                 try
                 {
-                    _subjectEncoded = _encoder.Encode(_subjectTokens);
+                    _subjectEncoded = _encoder!.Encode(_subjectTokens);
                     if (
                         _subjectEncoded is not null
-                        && _subjectEncoded.Length != _subjectWordLengths.Length
+                        && _subjectEncoded.Length != _subjectWordLengths!.Length
                     )
                     {
                         throw new System.InvalidOperationException(
@@ -192,7 +193,7 @@ namespace UtilitiesCS
             _subjectTokens = _subjectText.Tokenize(_tokenizerRegex);
             if ((_commonWords is not null) & (_subjectTokens.Length > 0))
             {
-                _subjectTokens.StripCommonWords(_commonWords);
+                _subjectTokens.StripCommonWords(_commonWords!);
             }
             if (_subjectTokens.Count() == 0)
             {
@@ -209,27 +210,27 @@ namespace UtilitiesCS
         #region Public Properties
 
         [JsonIgnore]
-        public IList<string> CommonWords
+        public IList<string>? CommonWords
         {
             get => _commonWords;
             set => _commonWords = value;
         }
-        private IList<string> _commonWords;
+        private IList<string>? _commonWords;
 
-        public string Folderpath
+        public string? Folderpath
         {
             get => _folderPath;
             set
             {
                 _folderPath = value;
-                _folderName = _folderPath.Split("\\").Last();
+                _folderName = _folderPath!.Split("\\").Last();
                 _folderTokens = _folderName.Tokenize(_tokenizerRegex);
                 _folderWordLengths = _folderTokens.Select(x => x.Length).ToArray();
                 if (ReadyToEncode(_folderTokens, false))
                 {
                     try
                     {
-                        _folderEncoded = _encoder.Encode(_folderTokens);
+                        _folderEncoded = _encoder!.Encode(_folderTokens);
                         if (_folderEncoded.Length != _folderWordLengths.Length)
                         {
                             throw new System.InvalidOperationException(
@@ -244,15 +245,15 @@ namespace UtilitiesCS
                 }
             }
         }
-        private string _folderPath;
+        private string? _folderPath;
 
-        public string Foldername
+        public string? Foldername
         {
             get => _folderName;
         }
-        private string _folderName;
+        private string? _folderName;
 
-        public string EmailSubject
+        public string? EmailSubject
         {
             get => _subjectText;
             set
@@ -294,7 +295,7 @@ namespace UtilitiesCS
                 }
             }
         }
-        private string _subjectText;
+        private string? _subjectText;
 
         public int EmailSubjectCount
         {
@@ -304,7 +305,7 @@ namespace UtilitiesCS
         private int _subjectEmailCount;
 
         [JsonIgnore]
-        public ISubjectMapEncoder Encoder
+        public ISubjectMapEncoder? Encoder
         {
             get => _encoder;
             set
@@ -314,16 +315,16 @@ namespace UtilitiesCS
                     this.Encode();
             }
         }
-        private ISubjectMapEncoder _encoder;
+        private ISubjectMapEncoder? _encoder;
 
-        public int[] FolderWordLengths
+        public int[]? FolderWordLengths
         {
             get => _folderWordLengths;
             set => _folderWordLengths = value;
         }
-        private int[] _folderWordLengths;
+        private int[]? _folderWordLengths;
 
-        public int[] FolderEncoded
+        public int[]? FolderEncoded
         {
             get
             {
@@ -331,13 +332,13 @@ namespace UtilitiesCS
                 if (
                     _folderEncoded is null
                     && _encoder is not null
-                    && ReadyToEncode(_folderTokens, false)
+                    && ReadyToEncode(_folderTokens!, false)
                 )
                 {
                     try
                     {
                         _folderEncoded = _encoder.Encode(_folderTokens);
-                        if (_folderEncoded.Length != _folderWordLengths.Length)
+                        if (_folderEncoded.Length != _folderWordLengths!.Length)
                         {
                             throw new System.InvalidOperationException(
                                 $"{nameof(_folderEncoded)} length {_folderEncoded.Length} does not match {nameof(_folderWordLengths)} length {_folderWordLengths.Length}"
@@ -362,7 +363,7 @@ namespace UtilitiesCS
                 _folderEncoded = value;
             }
         }
-        private int[] _folderEncoded;
+        private int[]? _folderEncoded;
 
         [JsonIgnore]
         public int Score
@@ -372,7 +373,7 @@ namespace UtilitiesCS
         }
         private int _score = 0;
 
-        public int[] SubjectEncoded
+        public int[]? SubjectEncoded
         {
             get
             {
@@ -380,7 +381,7 @@ namespace UtilitiesCS
                 if (
                     _subjectEncoded is null
                     && _encoder is not null
-                    && ReadyToEncode(_subjectTokens, false)
+                    && ReadyToEncode(_subjectTokens!, false)
                 )
                 {
                     try
@@ -388,7 +389,7 @@ namespace UtilitiesCS
                         _subjectEncoded = _encoder.Encode(_subjectTokens);
                         if (
                             _subjectEncoded is not null
-                            && _subjectEncoded.Length != _subjectWordLengths.Length
+                            && _subjectEncoded.Length != _subjectWordLengths!.Length
                         )
                         {
                             throw new System.InvalidOperationException(
@@ -412,14 +413,14 @@ namespace UtilitiesCS
                 _subjectEncoded = value;
             }
         }
-        private int[] _subjectEncoded;
+        private int[]? _subjectEncoded;
 
-        public int[] SubjectWordLengths
+        public int[]? SubjectWordLengths
         {
             get => _subjectWordLengths;
             set => _subjectWordLengths = value;
         }
-        private int[] _subjectWordLengths;
+        private int[]? _subjectWordLengths;
 
         public Regex TokenizerRegex
         {
@@ -432,8 +433,8 @@ namespace UtilitiesCS
 
         #region Private Properties
 
-        private string[] _folderTokens;
-        private string[] _subjectTokens;
+        private string[]? _folderTokens;
+        private string[]? _subjectTokens;
         private char[] _wordChars = { '&' };
 
         #endregion Private Properties
@@ -442,8 +443,8 @@ namespace UtilitiesCS
 
         internal void Encode()
         {
-            _folderEncoded = _encoder.Encode(_folderTokens);
-            _subjectEncoded = _encoder.Encode(_subjectTokens);
+            _folderEncoded = _encoder!.Encode(_folderTokens);
+            _subjectEncoded = _encoder!.Encode(_subjectTokens);
 
             //if (_folderTokens is null)
             //{
@@ -466,8 +467,8 @@ namespace UtilitiesCS
         {
             _tokenizerRegex = tokenizerRegex;
             Init(
-                emailFolder: _folderPath,
-                emailSubject: _subjectText,
+                emailFolder: _folderPath!,
+                emailSubject: _subjectText!,
                 emailSubjectCount: _subjectEmailCount
             );
             if (ReadyToEncode(encoder))
@@ -484,12 +485,12 @@ namespace UtilitiesCS
             }
         }
 
-        public int[] Encode(ISubjectMapEncoder encoder, string[] tokens)
+        public int[]? Encode(ISubjectMapEncoder encoder, string[] tokens)
         {
             _encoder = encoder;
             if (ReadyToEncode(tokens, true))
             {
-                return _encoder.Encode(tokens);
+                return _encoder!.Encode(tokens);
             }
             else
             {
@@ -497,7 +498,7 @@ namespace UtilitiesCS
             }
         }
 
-        internal int[] Encode(ISubjectMapEncoder encoder, string text)
+        internal int[]? Encode(ISubjectMapEncoder encoder, string text)
         {
             if (text is null)
             {
@@ -512,7 +513,7 @@ namespace UtilitiesCS
                 string[] tokens = text.Tokenize(_tokenizerRegex);
                 if (ReadyToEncode(tokens, true))
                 {
-                    return _encoder.Encode(tokens);
+                    return _encoder!.Encode(tokens);
                 }
                 else
                 {
@@ -539,12 +540,12 @@ namespace UtilitiesCS
             if (IsNull(_encoder, nameof(_encoder), throwEx))
                 return false;
 
-            string[] tokens = TokensToEncode(throwEx);
+            string[]? tokens = TokensToEncode(throwEx);
 
-            if (IsNull(tokens, nameof(tokens), throwEx) || tokens.Length == 0)
+            if (IsNull(tokens, nameof(tokens), throwEx) || tokens!.Length == 0)
                 return false;
 
-            _encoder.AugmentTokenDict(tokens);
+            _encoder!.AugmentTokenDict(tokens);
 
             return true;
         }
@@ -562,12 +563,12 @@ namespace UtilitiesCS
                 return false;
             }
 
-            _encoder.AugmentTokenDict(tokens);
+            _encoder!.AugmentTokenDict(tokens);
 
             return true;
         }
 
-        internal bool IsNull(object value, string name, bool throwEx)
+        internal bool IsNull(object? value, string name, bool throwEx)
         {
             if (value is null)
             {
@@ -586,7 +587,7 @@ namespace UtilitiesCS
             return false;
         }
 
-        internal string[] TokensToEncode(bool throwEx)
+        internal string[]? TokensToEncode(bool throwEx)
         {
             if ((_folderTokens is null) || (_folderTokens.Length == 0))
             {
@@ -616,7 +617,7 @@ namespace UtilitiesCS
         {
             try
             {
-                Init(_folderPath, _subjectText, _subjectEmailCount);
+                Init(_folderPath!, _subjectText!, _subjectEmailCount);
             }
             catch (System.Exception e)
             {
@@ -640,8 +641,8 @@ namespace UtilitiesCS
         public bool Validate()
         {
             if (
-                _folderTokens.Length != _folderWordLengths.Length
-                || _subjectTokens.Length != _subjectTokens.Length
+                _folderTokens!.Length != _folderWordLengths!.Length
+                || _subjectTokens!.Length != _subjectTokens!.Length
             )
             {
                 return TryRepair(true);

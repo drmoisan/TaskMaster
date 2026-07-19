@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -26,14 +27,14 @@ namespace UtilitiesCS.EmailIntelligence
         public ImageStripper(IOcrTextExtractor ocrTextExtractor)
             : this(cachefile: null, ocrTextExtractor: ocrTextExtractor) { }
 
-        public ImageStripper(string cachefile, IOcrTextExtractor ocrTextExtractor)
+        public ImageStripper(string? cachefile, IOcrTextExtractor? ocrTextExtractor)
         {
             _cachefile = cachefile;
             _ocrTextExtractor = ocrTextExtractor ?? new TesseractOcrTextExtractor();
         }
 
         //private IApplicationGlobals _globals;
-        private string _cachefile;
+        private string? _cachefile;
         private readonly IOcrTextExtractor _ocrTextExtractor;
 
         #endregion Constructors and private fields
@@ -89,13 +90,13 @@ namespace UtilitiesCS.EmailIntelligence
                 // an image, but optimized the fact we don't bother processing large
                 // images.
                 var nbytes = part.Size;
-                byte[] bytes = null;
+                byte[]? bytes = null;
                 if (nbytes < max_image_size)
                 {
                     try
                     {
                         bytes = part.AttachmentData;
-                        if (bytes.IsNullOrEmpty())
+                        if (bytes!.IsNullOrEmpty())
                         {
                             tokens.Add($"invalid-image:{part.Type}");
                         }
@@ -116,8 +117,8 @@ namespace UtilitiesCS.EmailIntelligence
                 // what garbage they will call a GIF image to entice you to open
                 // it?
 
-                Image image = null;
-                Bitmap bitmap = null;
+                Image? image = null;
+                Bitmap? bitmap = null;
 
                 try
                 {
@@ -154,17 +155,17 @@ namespace UtilitiesCS.EmailIntelligence
                     if (rows.Count == 0)
                     {
                         // first image
-                        rows.AddLast(bitmap);
+                        rows.AddLast(bitmap!);
                     }
-                    else if (rows.Last().Height != bitmap.Height)
+                    else if (rows.Last().Height != bitmap!.Height)
                     {
                         // new image, different height => start new row
-                        rows.AddLast(bitmap);
+                        rows.AddLast(bitmap!);
                     }
                     else
                     {
                         // new image, same height => extend current row
-                        rows.Last.Value = imconcatlr(rows.Last.Value, bitmap);
+                        rows.Last.Value = imconcatlr(rows.Last.Value, bitmap!);
                     }
                 }
             }
@@ -287,10 +288,10 @@ namespace UtilitiesCS.EmailIntelligence
         /// </summary>
         /// <param name="image"></param>
         /// <returns></returns>
-        internal Bitmap GetFrameWithText(Image image)
+        internal Bitmap? GetFrameWithText(Image image)
         {
             var frames = SeperateMultiFrame(image);
-            Bitmap imageWithText = null;
+            Bitmap? imageWithText = null;
             var bgpix = 1e17;
             foreach (var frame in frames)
             {

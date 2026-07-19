@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -84,7 +85,7 @@ namespace UtilitiesCS
                             this[idx].EmailFolders[j + 1] = this[idx].EmailFolders[j];
                         }
                         this[idx].EmailCounts[i] = CtfMap.EmailCount;
-                        this[idx].EmailFolders[i] = CtfMap.EmailFolder;
+                        this[idx].EmailFolders[i] = CtfMap.EmailFolder!;
                         added = true;
                         break;
                     }
@@ -95,7 +96,7 @@ namespace UtilitiesCS
                     if (CtfMap.EmailCount > this[idx].EmailCounts[_maxFoldersPerConv])
                     {
                         this[idx].EmailCounts[_maxFoldersPerConv] = CtfMap.EmailCount;
-                        this[idx].EmailFolders[_maxFoldersPerConv] = CtfMap.EmailFolder;
+                        this[idx].EmailFolders[_maxFoldersPerConv] = CtfMap.EmailFolder!;
                     }
                 }
             }
@@ -150,7 +151,7 @@ namespace UtilitiesCS
             this[Inc_Num].FolderCount = Folder_Count;
             this[Inc_Num].EmailConversationID = Map.ConversationID;
             this[Inc_Num].EmailCounts[Inc_Position] = Map.EmailCount;
-            this[Inc_Num].EmailFolders[Inc_Position] = Map.EmailFolder;
+            this[Inc_Num].EmailFolders[Inc_Position] = Map.EmailFolder!;
         }
 
         #region "Backup Loader and Writer"
@@ -178,7 +179,7 @@ namespace UtilitiesCS
             var loopTo = CTF_Inc_Ct;
             for (i = 1; i <= loopTo; i++)
             {
-                listOutput.Add(this[i].EmailConversationID);
+                listOutput.Add(this[i].EmailConversationID!);
                 listOutput.Add(this[i].FolderCount.ToString());
                 var loopTo1 = this[i].FolderCount;
                 for (j = 1; j <= loopTo1; j++)
@@ -221,7 +222,7 @@ namespace UtilitiesCS
             return listCTF;
         }
 
-        public static CtfIncidence TryDequeueIncidence(ref Queue<string> lines)
+        public static CtfIncidence? TryDequeueIncidence(ref Queue<string> lines)
         {
             var incidence = new CtfIncidence();
             try
@@ -292,7 +293,7 @@ namespace UtilitiesCS
         internal static string[] ReadFileToArray(string filepath)
         {
             //QUESTION: Is ReadFileToArray method duplicative of read csv? Should it be moved to a common location?
-            string[] filecontents = null;
+            string[]? filecontents = null;
             try
             {
                 filecontents = File.ReadAllLines(filepath, System.Text.Encoding.ASCII);

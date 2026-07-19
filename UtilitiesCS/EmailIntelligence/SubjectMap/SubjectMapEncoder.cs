@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,11 +23,11 @@ namespace UtilitiesCS
             _encoder = ScoDictionaryNew<string, int>.Static.Deserialize(filename, folderpath);
         }
 
-        private string _filename;
-        private string _folderpath;
-        private IScoDictionaryNew<string, int> _encoder;
-        private IScoDictionaryNew<int, string> _decoder;
-        private SubjectMapSco _subjectMap;
+        private string? _filename;
+        private string? _folderpath;
+        private IScoDictionaryNew<string, int>? _encoder;
+        private IScoDictionaryNew<int, string>? _decoder;
+        private SubjectMapSco? _subjectMap;
         private Regex _tokenizerRegex = Tokenizer.GetRegex(new char[] { '&' }.AsTokenPattern());
 
         public IScoDictionaryNew<int, string> Decoder
@@ -85,7 +86,7 @@ namespace UtilitiesCS
                         }
                     }
                 }
-                return _decoder;
+                return _decoder!;
             }
         }
         public IScoDictionaryNew<string, int> Encoder
@@ -116,7 +117,7 @@ namespace UtilitiesCS
         {
             var words = map.ToList()
                 .Select(x =>
-                    string.Concat(x.EmailSubject, " ", x.Folderpath.Split("\\").Last())
+                    string.Concat(x.EmailSubject, " ", x.Folderpath!.Split("\\").Last())
                         .Tokenize(_tokenizerRegex)
                 )
                 .SelectMany(x => x)
@@ -171,7 +172,7 @@ namespace UtilitiesCS
             }
             if (changed)
             {
-                _encoder.Serialize();
+                _encoder!.Serialize();
             }
         }
 
@@ -187,7 +188,7 @@ namespace UtilitiesCS
 
         public int[] Encode(string text)
         {
-            return text.Tokenize().Select(x => _encoder[x]).ToArray();
+            return text.Tokenize().Select(x => _encoder![x]).ToArray();
         }
 
         public string Decode(int[] encodedWords)
