@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -62,7 +63,11 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public string Name => _directoryInfo.Name;
 
-        public IDirectoryInfo Parent => new DirectoryInfoWrapper(_directoryInfo.Parent);
+        // Behavior-preserving `!`: at a filesystem root DirectoryInfo.Parent is null and the
+        // DirectoryInfoWrapper ctor throws ArgumentNullException, exactly as before annotation.
+        // The wrapped IDirectoryInfo interface is out of scope (oblivious). The latent root-throws
+        // behavior is FLAGGED (evidence/other/maintainer-flags), not fixed here.
+        public IDirectoryInfo Parent => new DirectoryInfoWrapper(_directoryInfo.Parent!);
 
         public IDirectoryInfo Root => new DirectoryInfoWrapper(_directoryInfo.Root);
 

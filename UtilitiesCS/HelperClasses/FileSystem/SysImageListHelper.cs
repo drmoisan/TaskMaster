@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace ObjectListViewDemo
     {
         private SysImageListHelper() { }
 
-        protected ImageList.ImageCollection SmallImageCollection
+        protected ImageList.ImageCollection? SmallImageCollection
         {
             get
             {
@@ -33,7 +34,7 @@ namespace ObjectListViewDemo
             }
         }
 
-        protected ImageList.ImageCollection LargeImageCollection
+        protected ImageList.ImageCollection? LargeImageCollection
         {
             get
             {
@@ -43,7 +44,7 @@ namespace ObjectListViewDemo
             }
         }
 
-        protected ImageList SmallImageList
+        protected ImageList? SmallImageList
         {
             get
             {
@@ -55,7 +56,7 @@ namespace ObjectListViewDemo
             }
         }
 
-        protected ImageList LargeImageList
+        protected ImageList? LargeImageList
         {
             get
             {
@@ -79,7 +80,7 @@ namespace ObjectListViewDemo
             this.treeView = treeView;
         }
 
-        protected TreeView treeView;
+        protected TreeView? treeView;
 
         /// <summary>
         /// Create a SysImageListHelper that will fetch images for the given listview control.
@@ -111,7 +112,7 @@ namespace ObjectListViewDemo
             this.listView = listView;
         }
 
-        protected ObjectListView listView;
+        protected ObjectListView? listView;
 
         /// <summary>
         /// Return the index of the image that has the Shell Icon for the given file/directory.
@@ -125,7 +126,9 @@ namespace ObjectListViewDemo
             else if (System.IO.Path.HasExtension(path))
                 path = System.IO.Path.GetExtension(path);
 
-            if (this.SmallImageCollection.ContainsKey(path))
+            // Behavior-preserving `!`: the collection is non-null once a listView/treeView ctor
+            // was used (the parameterless ctor is private/unused); a null collection throws as before.
+            if (this.SmallImageCollection!.ContainsKey(path))
                 return this.SmallImageCollection.IndexOfKey(path);
 
             try
@@ -149,12 +152,13 @@ namespace ObjectListViewDemo
             return this.SmallImageCollection.IndexOfKey(path);
         }
 
-        private void AddImageToCollection(string key, ImageList imageList, Icon image)
+        private void AddImageToCollection(string key, ImageList? imageList, Icon? image)
         {
             if (imageList == null)
                 return;
 
-            if (imageList.ImageSize == image.Size)
+            // Behavior-preserving `!`: a null icon throws on .Size, exactly as before annotation.
+            if (imageList.ImageSize == image!.Size)
             {
                 imageList.Images.Add(key, image);
                 return;

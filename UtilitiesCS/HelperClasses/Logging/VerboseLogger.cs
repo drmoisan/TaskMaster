@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿#nullable enable
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,7 +9,8 @@ namespace UtilitiesCS
         where T : class
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+            // Standard log4net logger declaration: non-null in a static field initializer.
+            System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType!
         );
 
         public VerboseLogger()

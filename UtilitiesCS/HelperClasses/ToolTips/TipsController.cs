@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,13 +29,14 @@ namespace TaskVisualization
 
             if (_parentType == typeof(TableLayoutPanel))
             {
-                _tlp = (TableLayoutPanel)_labelControl.Parent;
+                // Behavior-preserving `!`: ResolveParentType already validated the parent non-null.
+                _tlp = (TableLayoutPanel)_labelControl.Parent!;
                 _columnNumber = _tlp.GetColumn(_labelControl);
                 _columnWidth = _tlp.ColumnStyles[_columnNumber].Width;
             }
             else
             {
-                _panel = (Panel)_labelControl.Parent;
+                _panel = (Panel)_labelControl.Parent!;
             }
             _state = Enums.ToggleState.On;
         }
@@ -42,7 +44,7 @@ namespace TaskVisualization
         public T ResolveParent<T>(Control control)
             where T : Control
         {
-            return (T)_labelControl.Parent;
+            return (T)_labelControl.Parent!;
         }
 
         public Type ResolveParentType()
@@ -56,35 +58,38 @@ namespace TaskVisualization
             }
             else if (
                 !new List<Type> { typeof(TableLayoutPanel), typeof(Panel) }.Contains(
-                    _labelControl.Parent.GetType()
+                    _labelControl.Parent!.GetType()
                 )
             )
             {
                 throw new ArgumentException(
                     $"The parent of {nameof(LabelControl)} must "
                         + $"be of type {typeof(TableLayoutPanel)} but it is of "
-                        + $"type {LabelControl.Parent.GetType()}"
+                        + $"type {LabelControl.Parent!.GetType()}"
                 );
             }
-            return _labelControl.Parent.GetType();
+            return _labelControl.Parent!.GetType();
         }
 
         private Enums.ToggleState _state;
-        private Type _parentType;
 
-        private Label _labelControl;
+        // `= null!`: _parentType/_labelControl are set by InitializeLabel (called from every ctor);
+        // _tlp/_panel are set for the matching parent type and read only under the _parentType gate.
+        private Type _parentType = null!;
+
+        private Label _labelControl = null!;
         public Label LabelControl
         {
             get => _labelControl;
         }
 
-        private TableLayoutPanel _tlp;
+        private TableLayoutPanel _tlp = null!;
         public TableLayoutPanel TLP
         {
             get => _tlp;
         }
 
-        private Panel _panel;
+        private Panel _panel = null!;
 
         private int _columnNumber;
         public int ColumnNumber

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using Microsoft.Win32;
 
@@ -38,7 +39,7 @@ namespace UtilitiesCS
         {
             try
             {
-                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath))
+                using (RegistryKey? key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath))
                 {
                     if (key == null)
                     {
@@ -46,7 +47,7 @@ namespace UtilitiesCS
                         return false;
                     }
 
-                    object value = key.GetValue(RegistryValueName);
+                    object? value = key.GetValue(RegistryValueName);
                     if (value is int intValue)
                     {
                         // AppsUseLightTheme = 0 means Dark Mode is active

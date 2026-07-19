@@ -197,31 +197,31 @@ Additional constraints and risks:
 
 ## Definition of Done
 
-- [ ] Every `.cs` file under `UtilitiesCS/HelperClasses/` that emits CS86xx carries a
+- [x] Every `.cs` file under `UtilitiesCS/HelperClasses/` that emits CS86xx carries a
   `#nullable enable` pragma and compiles with zero nullable (CS86xx) diagnostics under the
   per-file pragma with `/p:TreatWarningsAsErrors=true`.
-- [ ] No project-level or solution-level `<Nullable>` element is introduced; `UtilitiesCS.csproj`
+- [x] No project-level or solution-level `<Nullable>` element is introduced; `UtilitiesCS.csproj`
   retains none.
-- [ ] Changes are annotation/null-safety only: no behavior change, no API/signature semantics
+- [x] Changes are annotation/null-safety only: no behavior change, no API/signature semantics
   change, no refactor beyond nullable annotation.
-- [ ] All existing MSTest tests for UtilitiesCS still pass; no coverage regression on changed
+- [x] All existing MSTest tests for UtilitiesCS still pass; no coverage regression on changed
   lines.
-- [ ] The full C# toolchain (csharpier -> analyzer/codestyle build -> nullable/
+- [x] The full C# toolchain (csharpier -> analyzer/codestyle build -> nullable/
   TreatWarningsAsErrors build -> vstest with coverage) passes on the final pass, using the
   pragma-only type-check command (`/t:Rebuild /p:TreatWarningsAsErrors=true`, without
   `/p:Nullable=enable`) for this child.
-- [ ] The `PhysicalFileInfoAdapter` injectable-delegate seam is preserved exactly (seam fields,
+- [x] The `PhysicalFileInfoAdapter` injectable-delegate seam is preserved exactly (seam fields,
   both constructors, and `?? throw` guards unchanged).
-- [ ] FileSystem adapter root-boundary annotations use behavior-preserving `!` (with a `// why`
+- [x] FileSystem adapter root-boundary annotations use behavior-preserving `!` (with a `// why`
   comment); the latent root-throws behavior is flagged, not fixed.
-- [ ] `DvgForm.Designer.cs` handling and the epic-scope conflict are documented; the Designer
+- [x] `DvgForm.Designer.cs` handling and the epic-scope conflict are documented; the Designer
   file is not hand-edited (default: left non-opted-in).
-- [ ] The `PrettyPrint.cs` 500-line pre-existing violation is flagged (not fixed) in the feature
+- [x] The `PrettyPrint.cs` 500-line pre-existing violation is flagged (not fixed) in the feature
   docs.
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Existing MSTest suite for UtilitiesCS still passes post-annotation.
-- [ ] No coverage regression on changed lines.
-- [ ] Nullable gate passes for the opted-in files using the pragma-only build
+- [x] Existing MSTest suite for UtilitiesCS still passes post-annotation.
+- [x] No coverage regression on changed lines.
+- [x] Nullable gate passes for the opted-in files using the pragma-only build
   (`/t:Rebuild /p:TreatWarningsAsErrors=true`, without `/p:Nullable=enable`).

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -101,7 +102,7 @@ namespace UtilitiesCS
 
         public static T GetOrLoad<T>(ref T variable, Func<T> loader)
         {
-            if (EqualityComparer<T>.Default.Equals(variable, default(T)))
+            if (EqualityComparer<T>.Default.Equals(variable, default(T)!))
             {
                 variable = loader();
             }
@@ -110,7 +111,7 @@ namespace UtilitiesCS
 
         public static T GetOrLoad<T>(ref T variable, Func<T> loader, Action<T> callbackOnSet)
         {
-            if (EqualityComparer<T>.Default.Equals(variable, default(T)))
+            if (EqualityComparer<T>.Default.Equals(variable, default(T)!))
             {
                 variable = loader();
                 callbackOnSet(variable);
@@ -118,7 +119,9 @@ namespace UtilitiesCS
             return variable;
         }
 
-        public static T GetOrLoad<T>(
+        // Deliberate downstream contract: returns default(T) (null for reference T) when the
+        // dependency check fails, so the return is annotated T?. Callers must handle a possible null.
+        public static T? GetOrLoad<T>(
             ref T variable,
             Func<T> loader,
             bool strict,
@@ -135,7 +138,8 @@ namespace UtilitiesCS
             }
         }
 
-        public static T GetOrLoad<T>(
+        // Deliberate downstream contract: T? for the default(T) failure path.
+        public static T? GetOrLoad<T>(
             ref T variable,
             Func<T> loader,
             Action<T> callbackOnSet,
@@ -200,11 +204,11 @@ namespace UtilitiesCS
             {
                 try
                 {
-                    if (EqualityComparer<T>.Default.Equals(variable, default(T)))
+                    if (EqualityComparer<T>.Default.Equals(variable, default(T)!))
                     {
                         variable = loader();
                     }
-                    if (EqualityComparer<T>.Default.Equals(variable, default(T)))
+                    if (EqualityComparer<T>.Default.Equals(variable, default(T)!))
                     {
                         variable = defaultValue;
                     }
@@ -236,12 +240,12 @@ namespace UtilitiesCS
                 try
                 {
                     // If no value is set try to load it
-                    if (EqualityComparer<T>.Default.Equals(variable, default(T)))
+                    if (EqualityComparer<T>.Default.Equals(variable, default(T)!))
                     {
                         variable = loader();
                     }
                     // Repeat check in case the loader returned default. In that case load defaultValue
-                    if (EqualityComparer<T>.Default.Equals(variable, default(T)))
+                    if (EqualityComparer<T>.Default.Equals(variable, default(T)!))
                     {
                         variable = defaultValue;
                         defaultSetAndSaver(variable); // function is never reached if it was passed as null
@@ -258,7 +262,8 @@ namespace UtilitiesCS
             }
         }
 
-        public static T Load<T>(Func<T> loader, bool strict, params object[] dependencies)
+        // Deliberate downstream contract: T? for the default(T) failure path.
+        public static T? Load<T>(Func<T> loader, bool strict, params object[] dependencies)
         {
             if (DependenciesNotNull(strict, dependencies))
             {
@@ -286,7 +291,7 @@ namespace UtilitiesCS
         {
             if (dependencies is null)
             {
-                var caller = new StackFrame(1, false).GetMethod().Name;
+                var caller = new StackFrame(1, false).GetMethod()!.Name;
                 var message =
                     $"Method {caller} failed the dependency check because {nameof(dependencies)} "
                     + "was passed as a null array";
@@ -296,7 +301,7 @@ namespace UtilitiesCS
             }
             if (dependencies.Count() == 0)
             {
-                var caller = new StackFrame(1, false).GetMethod().Name;
+                var caller = new StackFrame(1, false).GetMethod()!.Name;
                 var message =
                     $"Method {caller} failed the dependency check because {nameof(dependencies)} "
                     + "was empty";
@@ -309,7 +314,7 @@ namespace UtilitiesCS
                     .Select(x => x.ToString())
                     .ToArray()
                     .SentenceJoin();
-                var caller = new StackFrame(1, false).GetMethod().Name;
+                var caller = new StackFrame(1, false).GetMethod()!.Name;
                 var message =
                     $"Method {caller} failed the dependency check because {nameof(dependencies)} "
                     + $"contains a null value at position {errors}";

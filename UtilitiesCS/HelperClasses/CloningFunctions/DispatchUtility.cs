@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -44,10 +45,10 @@ namespace UtilitiesCS.HelperClasses
             SecurityAction.LinkDemand,
             Flags = SecurityPermissionFlag.UnmanagedCode
         )]
-        public static Type GetType(object obj, bool throwIfNotFound)
+        public static Type? GetType(object obj, bool throwIfNotFound)
         {
             RequireReference(obj, "obj");
-            Type result = GetType((IDispatchInfo)obj, throwIfNotFound);
+            Type? result = GetType((IDispatchInfo)obj, throwIfNotFound);
             return result;
         }
 
@@ -82,10 +83,10 @@ namespace UtilitiesCS.HelperClasses
         /// <remarks>
         /// This can invoke a method or a property get accessor.
         /// </remarks>
-        public static object Invoke(object obj, int dispId, object[] args)
+        public static object? Invoke(object obj, int dispId, object[] args)
         {
             string memberName = "[DispId=" + dispId + "]";
-            object result = Invoke(obj, memberName, args);
+            object? result = Invoke(obj, memberName, args);
             return result;
         }
 
@@ -99,11 +100,11 @@ namespace UtilitiesCS.HelperClasses
         /// <remarks>
         /// This can invoke a method or a property get accessor.
         /// </remarks>
-        public static object Invoke(object obj, string memberName, object[] args)
+        public static object? Invoke(object obj, string memberName, object[] args)
         {
             RequireReference(obj, "obj");
             Type type = obj.GetType();
-            object result = type.InvokeMember(
+            object? result = type.InvokeMember(
                 memberName,
                 BindingFlags.InvokeMethod | BindingFlags.GetProperty,
                 null,
@@ -139,11 +140,11 @@ namespace UtilitiesCS.HelperClasses
         /// <param name="dispatch">An object that implements IDispatch.</param>
         /// <param name="throwIfNotFound">Whether an exception should be thrown if a Type can't be obtained.</param>
         /// <returns>A .NET Type that can be used with reflection.</returns>
-        private static Type GetType(IDispatchInfo dispatch, bool throwIfNotFound)
+        private static Type? GetType(IDispatchInfo dispatch, bool throwIfNotFound)
         {
             RequireReference(dispatch, "dispatch");
 
-            Type result = null;
+            Type? result = null;
             int typeInfoCount;
             int hr = dispatch.GetTypeInfoCount(out typeInfoCount);
             if (hr == S_OK && typeInfoCount > 0)
@@ -261,7 +262,8 @@ namespace UtilitiesCS.HelperClasses
                     UnmanagedType.CustomMarshaler,
                     MarshalTypeRef = typeof(System.Runtime.InteropServices.CustomMarshalers.TypeToTypeInfoMarshaler)
                 )]
-                    out Type typeInfo
+                // Nullable: the marshaled Type is only set when GetTypeInfoCount returned 1.
+                out Type? typeInfo
             );
 
             /// <summary>
