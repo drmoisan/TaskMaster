@@ -141,26 +141,26 @@ evidence path is used. The delegation prompt supplied only canonical `evidence/`
 
 ### Phase 4 — Batch 4 FileSystem Wrappers and Adapters
 
-- [ ] [P4-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/FileSystemInfoWrapper.cs` (clean delegating wrapper; ctor already `?? throw`) and apply annotation-only edits to reach zero CS86xx
+- [x] [P4-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/FileSystemInfoWrapper.cs` (clean delegating wrapper; ctor already `?? throw`) and apply annotation-only edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P4-T9).
-- [ ] [P4-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/DirectoryInfoWrapper.cs` and annotate the `Parent`/`Root` BCL-null-into-throwing-ctor boundary with a behavior-preserving `!` plus a short `// why` comment (the wrapped `IDirectoryInfo` is oblivious/out-of-scope) to reach zero CS86xx
+- [x] [P4-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/DirectoryInfoWrapper.cs` and annotate the `Parent`/`Root` BCL-null-into-throwing-ctor boundary with a behavior-preserving `!` plus a short `// why` comment (the wrapped `IDirectoryInfo` is oblivious/out-of-scope) to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; root boundary uses `!` (not a nullable contract change); zero CS86xx (verified in P4-T9).
-- [ ] [P4-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/FileInfoWrapper.cs` and annotate the `Directory`/`DirectoryName` null boundary with a behavior-preserving `!` plus `// why` comment to reach zero CS86xx
+- [x] [P4-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/FileInfoWrapper.cs` and annotate the `Directory`/`DirectoryName` null boundary with a behavior-preserving `!` plus `// why` comment to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P4-T9).
-- [ ] [P4-T4] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/PhysicalDirectoryInfoAdapter.cs` and annotate the `Parent`/`Root` boundary (BCL `DirectoryInfo?` passed into the throwing `DirectoryInfoWrapper` ctor) with a behavior-preserving `!` plus `// why` comment to reach zero CS86xx
+- [x] [P4-T4] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/PhysicalDirectoryInfoAdapter.cs` and annotate the `Parent`/`Root` boundary (BCL `DirectoryInfo?` passed into the throwing `DirectoryInfoWrapper` ctor) with a behavior-preserving `!` plus `// why` comment to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; latent root-throws behavior is preserved (not fixed); zero CS86xx (verified in P4-T9).
-- [ ] [P4-T5] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/PhysicalFileInfoAdapter.cs` and annotate the `Directory`/`DirectoryName` boundary while preserving the injectable-delegate seam EXACTLY (the `_appendText`/`_openByMode`/`_openByModeAndAccess`/`_openWrite` fields, both constructors, and the `?? throw` guards must remain unchanged) to reach zero CS86xx
+- [x] [P4-T5] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/PhysicalFileInfoAdapter.cs` and annotate the `Directory`/`DirectoryName` boundary while preserving the injectable-delegate seam EXACTLY (the `_appendText`/`_openByMode`/`_openByModeAndAccess`/`_openWrite` fields, both constructors, and the `?? throw` guards must remain unchanged) to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; seam fields, both ctors, and `?? throw` guards byte-unchanged except for annotations; the `PhysicalFileSystemAdapters_Tests` seam is not perturbed; zero CS86xx (verified in P4-T9).
-- [ ] [P4-T6] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/MyFileSystemInfo.cs` and annotate the `AsDirectory`/`AsFile` (`as`) locals, the `Length` dereference, `Equals(object? obj)`, and `==`/`!=` operand nullability to reach zero CS86xx
+- [x] [P4-T6] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/MyFileSystemInfo.cs` and annotate the `AsDirectory`/`AsFile` (`as`) locals, the `Length` dereference, `Equals(object? obj)`, and `==`/`!=` operand nullability to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P4-T9).
-- [ ] [P4-T7] Record the FileSystem adapter root-boundary flags to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/other/maintainer-flags.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P4-T7] Record the FileSystem adapter root-boundary flags to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/other/maintainer-flags.<yyyy-MM-ddTHH-mm>.md`
   - Acceptance: artifact records (a) the behavior-preserving `!` decision at `Parent`/`Root`/`Directory`/`DirectoryName` boundaries, and (b) the latent "root throws `ArgumentNullException`" behavior FLAGGED for a possible future issue (not fixed here), with `Timestamp:`.
-- [ ] [P4-T8] Run CSharpier over the Batch 4 files (`FileSystem/FileSystemInfoWrapper.cs`, `FileSystem/DirectoryInfoWrapper.cs`, `FileSystem/FileInfoWrapper.cs`, `FileSystem/PhysicalDirectoryInfoAdapter.cs`, `FileSystem/PhysicalFileInfoAdapter.cs`, `FileSystem/MyFileSystemInfo.cs`) and confirm no residual formatting diff
+- [x] [P4-T8] Run CSharpier over the Batch 4 files (`FileSystem/FileSystemInfoWrapper.cs`, `FileSystem/DirectoryInfoWrapper.cs`, `FileSystem/FileInfoWrapper.cs`, `FileSystem/PhysicalDirectoryInfoAdapter.cs`, `FileSystem/PhysicalFileInfoAdapter.cs`, `FileSystem/MyFileSystemInfo.cs`) and confirm no residual formatting diff
   - Acceptance: `csharpier --check .` exits 0 for the touched files.
-- [ ] [P4-T9] Run the pragma-only nullable build and record Batch 4 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch4-nullable-build.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P4-T9] Run the pragma-only nullable build and record Batch 4 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch4-nullable-build.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx for the 6 opted-in Batch 4 files and NO new diagnostics elsewhere.
-- [ ] [P4-T10] Run the Batch 4 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch4-tests.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P4-T10] Run the Batch 4 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch4-tests.<yyyy-MM-ddTHH-mm>.md`
   - Command: `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"FullyQualifiedName~FileSystemInfoWrapper|FullyQualifiedName~DirectoryInfoWrapper|FullyQualifiedName~FileInfoWrapper|FullyQualifiedName~PhysicalFileSystemAdapters|FullyQualifiedName~MyFileSystemInfo"`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; all Batch 4 tests green and behavior-identical, with the PhysicalFileSystemAdapters tests deterministic (no reintroduced shared-file flakiness).
 
