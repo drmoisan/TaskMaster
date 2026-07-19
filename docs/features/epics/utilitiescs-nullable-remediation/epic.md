@@ -15,10 +15,10 @@ intent:
     - No behavior changes; null-annotation and null-safety remediation only.
     - No reduction in coverage on changed lines.
 features:
-  - issue_num: 9001
+  - issue_num: 363
     feature_folder: utilitiescs-nullable-extensions
     depends_on: []
-  - issue_num: 9002
+  - issue_num: 364
     feature_folder: utilitiescs-nullable-helperclasses
     depends_on: []
   - issue_num: 9003
