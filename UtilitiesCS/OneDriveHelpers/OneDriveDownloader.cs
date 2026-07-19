@@ -31,7 +31,8 @@ namespace UtilitiesCS.OneDriveHelpers
             protected set => _client = value;
         }
 
-        protected Func<string, CancellationToken, Task<HttpResponseMessage>> _clientGetAsync = null!;
+        protected Func<string, CancellationToken, Task<HttpResponseMessage>> _clientGetAsync =
+            null!;
         public virtual Func<string, CancellationToken, Task<HttpResponseMessage>> ClientGetAsync
         {
             get => _clientGetAsync;

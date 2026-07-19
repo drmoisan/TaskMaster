@@ -132,7 +132,11 @@ namespace UtilitiesCS
             }
         }
 
-        public static string[]? CsvRead(string filename, string folderpath, bool skipHeaders = false)
+        public static string[]? CsvRead(
+            string filename,
+            string folderpath,
+            bool skipHeaders = false
+        )
         {
             string filepath = Path.Combine(folderpath, filename);
 
