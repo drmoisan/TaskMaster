@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Globalization;
 
@@ -39,7 +40,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// <param name="totalMs">Total milliseconds spent in the Init call.</param>
         /// <param name="threadId">The managed thread id that ran the Init call.</param>
         /// <returns>A single-line, log-ready string.</returns>
-        public string FormatLine(string storeDisplayName, double totalMs, int threadId)
+        public string FormatLine(string? storeDisplayName, double totalMs, int threadId)
         {
             var name = storeDisplayName ?? "<null>";
             return string.Format(
@@ -57,7 +58,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// <param name="storeDisplayName">The store DisplayName (rendered as &lt;null&gt; when null).</param>
         /// <param name="totalMs">Total milliseconds spent in the Init call.</param>
         /// <param name="threadId">The managed thread id that ran the Init call.</param>
-        public void EmitLine(string storeDisplayName, double totalMs, int threadId)
+        public void EmitLine(string? storeDisplayName, double totalMs, int threadId)
         {
             _emit(FormatLine(storeDisplayName, totalMs, threadId));
         }

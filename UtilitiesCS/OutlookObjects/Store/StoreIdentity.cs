@@ -1,3 +1,4 @@
+#nullable enable
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.OutlookObjects.Store
@@ -59,16 +60,16 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// <paramref name="filePathFallback"/> when non-null/non-whitespace; otherwise
         /// <see cref="UnresolvedSentinel"/>.
         /// </returns>
-        public static StoreIdentity Resolve(string displayName, string filePathFallback = null)
+        public static StoreIdentity Resolve(string? displayName, string? filePathFallback = null)
         {
             if (!string.IsNullOrWhiteSpace(displayName))
             {
-                return new StoreIdentity(displayName);
+                return new StoreIdentity(displayName!);
             }
 
             if (!string.IsNullOrWhiteSpace(filePathFallback))
             {
-                return new StoreIdentity(filePathFallback);
+                return new StoreIdentity(filePathFallback!);
             }
 
             return new StoreIdentity(UnresolvedSentinel);
@@ -87,14 +88,14 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// <returns>The resolved <see cref="StoreIdentity"/> (see the pure overload's contract).</returns>
         public static StoreIdentity Resolve(Outlook.Store store)
         {
-            string displayName = null;
+            string? displayName = null;
             try
             {
                 displayName = store.DisplayName;
             }
             catch { }
 
-            string filePath = null;
+            string? filePath = null;
             try
             {
                 filePath = store.FilePath;
