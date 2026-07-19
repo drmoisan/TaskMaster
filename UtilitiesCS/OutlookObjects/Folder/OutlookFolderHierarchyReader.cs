@@ -218,7 +218,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         {
             string StoreId { get; }
             bool ShouldInclude(StoresWrapper storesWrapper);
-            IOutlookFolderAdapter GetRootFolder();
+            IOutlookFolderAdapter? GetRootFolder();
         }
 
         internal interface IOutlookFolderAdapter
