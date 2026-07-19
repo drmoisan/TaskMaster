@@ -82,19 +82,19 @@ kinds, so no `EVIDENCE_LOCATION_OVERRIDE_REJECTED` substitution is required.
 
 ### Phase 0 — Policy Reads and Baseline Capture
 
-- [ ] [P0-T1] Read the policy and requirements files in order and emit a policy-read evidence artifact to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/baseline/phase0-instructions-read.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P0-T1] Read the policy and requirements files in order and emit a policy-read evidence artifact to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/baseline/phase0-instructions-read.<yyyy-MM-ddTHH-mm>.md`
   - Read order: `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/csharp.md`, then `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/spec.md`, `user-story.md`, `issue.md`, and `research/research.2026-07-18T22-15.md`.
   - Acceptance: artifact contains `Timestamp:`, `Policy Order:`, and an explicit list of every file read.
-- [ ] [P0-T2] Run the CSharpier format check baseline and record it to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/baseline/csharpier-baseline.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P0-T2] Run the CSharpier format check baseline and record it to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/baseline/csharpier-baseline.<yyyy-MM-ddTHH-mm>.md`
   - Command: `dotnet tool run csharpier --check .`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (pass/fail and any unformatted-file count).
-- [ ] [P0-T3] Run the analyzer/codestyle build baseline and record it to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/baseline/analyzer-build-baseline.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P0-T3] Run the analyzer/codestyle build baseline and record it to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/baseline/analyzer-build-baseline.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (build result and analyzer warning/error counts).
-- [ ] [P0-T4] Run the pragma-only nullable build baseline and record the pre-remediation CS86xx count for the 30 in-scope files to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/baseline/nullable-build-baseline.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P0-T4] Run the pragma-only nullable build baseline and record the pre-remediation CS86xx count for the 30 in-scope files to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/baseline/nullable-build-baseline.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` recording the exact pre-remediation CS86xx count for `UtilitiesCS/OutlookObjects/{MailItem,Item,Conversation,Attachment,Table}/` files (accounting for `MailItemHelper.Html.cs`'s existing interior pragma region, which may already emit diagnostics under `TreatWarningsAsErrors`), and confirming NO `/p:Nullable=enable` was passed.
-- [ ] [P0-T5] Run the coverage baseline over the UtilitiesCS test assemblies, targeting the `UtilitiesCS.Test/OutlookObjects/` suite, and record numeric coverage to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/baseline/coverage-baseline.<yyyy-MM-ddTHH-mm>.md` with the Cobertura XML at `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/baseline/coverage-baseline.<yyyy-MM-ddTHH-mm>.cobertura.xml`
+- [x] [P0-T5] Run the coverage baseline over the UtilitiesCS test assemblies, targeting the `UtilitiesCS.Test/OutlookObjects/` suite, and record numeric coverage to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/baseline/coverage-baseline.<yyyy-MM-ddTHH-mm>.md` with the Cobertura XML at `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/baseline/coverage-baseline.<yyyy-MM-ddTHH-mm>.cobertura.xml`
   - Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/baseline/coverage-baseline.<yyyy-MM-ddTHH-mm>.cobertura.xml` (full-suite driver wrapping `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage`).
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with the NUMERIC baseline overall `line-rate`/`branch-rate` from the Cobertura root `<coverage>` element AND the targeted `UtilitiesCS/OutlookObjects/` line percentage if obtainable from per-package figures; passed/failed test counts recorded.
 
