@@ -1,4 +1,5 @@
-﻿//using QuickFiler.Interfaces;
+﻿#nullable enable
+//using QuickFiler.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,13 +51,14 @@ namespace UtilitiesCS
 
             if (parentType == typeof(TableLayoutPanel))
             {
-                _tlp = (TableLayoutPanel)_labelControl.Parent;
+                // Behavior-preserving `!`: the parent was validated non-null by ResolveParentType.
+                _tlp = (TableLayoutPanel)_labelControl.Parent!;
                 _columnNumber = _tlp.GetColumn(_labelControl);
                 _columnWidth = _tlp.ColumnStyles[_columnNumber].Width;
             }
             else if (parentType == typeof(System.Windows.Forms.Panel))
             {
-                _tlp = null;
+                _tlp = null!;
                 _columnNumber = 0;
                 _columnWidth = 0;
             }
@@ -106,16 +108,16 @@ namespace UtilitiesCS
                 {
                     typeof(TableLayoutPanel),
                     typeof(System.Windows.Forms.Panel),
-                }.Contains(_labelControl.Parent.GetType())
+                }.Contains(_labelControl.Parent!.GetType())
             )
             {
                 throw new ArgumentException(
                     $"The parent of {nameof(LabelControl)} must "
                         + $"be of type {typeof(TableLayoutPanel)} but it is of "
-                        + $"type {LabelControl.Parent.GetType()}"
+                        + $"type {LabelControl.Parent!.GetType()}"
                 );
             }
-            return _labelControl.Parent.GetType();
+            return _labelControl.Parent!.GetType();
         }
 
         internal async Task InitializeAsync(CancellationToken token)
@@ -135,10 +137,13 @@ namespace UtilitiesCS
             }
         }
 
-        private System.Windows.Forms.Panel _panel;
+        // `= null!`: _panel/_parentType/_uiContext/_tlp are set by the constructor or async
+        // initializer matching the parent type; the readers are gated by _parentType, preserving
+        // the existing runtime contract without behavior change.
+        private System.Windows.Forms.Panel _panel = null!;
         private Enums.ToggleState _state;
-        private Type _parentType;
-        private SynchronizationContext _uiContext;
+        private Type _parentType = null!;
+        private SynchronizationContext _uiContext = null!;
         private CancellationToken _token;
 
         private System.Windows.Forms.Label _labelControl;
@@ -148,7 +153,7 @@ namespace UtilitiesCS
             internal set => _labelControl = value;
         }
 
-        private TableLayoutPanel _tlp;
+        private TableLayoutPanel _tlp = null!;
         public TableLayoutPanel TLP
         {
             get => _tlp;

@@ -214,24 +214,24 @@ evidence path is used. The delegation prompt supplied only canonical `evidence/`
 
 ### Phase 7 — Batch 7 ThemeHelpers and ToolTips
 
-- [ ] [P7-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ThemeHelpers/SystemThemeDetector.cs` and annotate `OpenSubKey` (`RegistryKey?`) and `GetValue` (`object?`) results with the existing guards to reach zero CS86xx
+- [x] [P7-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ThemeHelpers/SystemThemeDetector.cs` and annotate `OpenSubKey` (`RegistryKey?`) and `GetValue` (`object?`) results with the existing guards to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P7-T8).
-- [ ] [P7-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ThemeHelpers/Theme.cs` and annotate the optional-parameter defaults (`IUiDispatcher? uiDispatcher = null`, `Action<string>? ... = null`) and reference-type fields to reach zero CS86xx, opting in together with `Theme.Rendering.cs`
+- [x] [P7-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ThemeHelpers/Theme.cs` and annotate the optional-parameter defaults (`IUiDispatcher? uiDispatcher = null`, `Action<string>? ... = null`) and reference-type fields to reach zero CS86xx, opting in together with `Theme.Rendering.cs`
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx across the partial type once both parts are opted in (verified in P7-T8).
-- [ ] [P7-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ThemeHelpers/Theme.Rendering.cs` (same partial `Theme` type as `Theme.cs`; opt in together to keep consistent field-null-state analysis) and apply annotation-only edits to reach zero CS86xx
+- [x] [P7-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ThemeHelpers/Theme.Rendering.cs` (same partial `Theme` type as `Theme.cs`; opt in together to keep consistent field-null-state analysis) and apply annotation-only edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx across the partial type (verified in P7-T8).
-- [ ] [P7-T4] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ThemeHelpers/ThemeControlGroup.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P7-T4] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ThemeHelpers/ThemeControlGroup.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P7-T8).
-- [ ] [P7-T5] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ToolTips/QfcTipsDetails.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P7-T5] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ToolTips/QfcTipsDetails.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P7-T8).
-- [ ] [P7-T6] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ToolTips/TipsController.cs` and annotate the `_labelControl.Parent` casts (`as` -> nullable) and the uninitialized `_labelControl`/`_tlp`/`_panel` fields to reach zero CS86xx
+- [x] [P7-T6] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ToolTips/TipsController.cs` and annotate the `_labelControl.Parent` casts (`as` -> nullable) and the uninitialized `_labelControl`/`_tlp`/`_panel` fields to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P7-T8).
-- [ ] [P7-T7] Run CSharpier over the Batch 7 files (`ThemeHelpers/SystemThemeDetector.cs`, `ThemeHelpers/Theme.cs`, `ThemeHelpers/Theme.Rendering.cs`, `ThemeHelpers/ThemeControlGroup.cs`, `ToolTips/QfcTipsDetails.cs`, `ToolTips/TipsController.cs`) and confirm no residual formatting diff
+- [x] [P7-T7] Run CSharpier over the Batch 7 files (`ThemeHelpers/SystemThemeDetector.cs`, `ThemeHelpers/Theme.cs`, `ThemeHelpers/Theme.Rendering.cs`, `ThemeHelpers/ThemeControlGroup.cs`, `ToolTips/QfcTipsDetails.cs`, `ToolTips/TipsController.cs`) and confirm no residual formatting diff
   - Acceptance: `csharpier --check .` exits 0 for the touched files.
-- [ ] [P7-T8] Run the pragma-only nullable build and record Batch 7 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch7-nullable-build.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P7-T8] Run the pragma-only nullable build and record Batch 7 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch7-nullable-build.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx for the 6 opted-in Batch 7 files (Theme partial type consistent) and NO new diagnostics elsewhere.
-- [ ] [P7-T9] Run the Batch 7 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch7-tests.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P7-T9] Run the Batch 7 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch7-tests.<yyyy-MM-ddTHH-mm>.md`
   - Command: `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"FullyQualifiedName~Theme|FullyQualifiedName~QfcTipsDetails|FullyQualifiedName~TipsController"`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; all Batch 7 tests green and behavior-identical.
 
