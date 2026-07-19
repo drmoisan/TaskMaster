@@ -60,19 +60,19 @@ evidence path is used. The delegation prompt supplied only canonical `evidence/`
 
 ### Phase 0 — Policy Reads and Baseline Capture
 
-- [ ] [P0-T1] Read the policy and requirements files in order and emit a policy-read evidence artifact to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/baseline/phase0-instructions-read.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P0-T1] Read the policy and requirements files in order and emit a policy-read evidence artifact to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/baseline/phase0-instructions-read.<yyyy-MM-ddTHH-mm>.md`
   - Read order: `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/csharp.md`, then `docs/features/active/utilitiescs-nullable-helperclasses/spec.md`, `user-story.md`, `issue.md`, and `research/research-findings.2026-07-18T21-45.md`.
   - Acceptance: artifact contains `Timestamp:`, `Policy Order:`, and an explicit list of every file read.
-- [ ] [P0-T2] Run the CSharpier format check baseline and record it to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/baseline/csharpier-baseline.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P0-T2] Run the CSharpier format check baseline and record it to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/baseline/csharpier-baseline.<yyyy-MM-ddTHH-mm>.md`
   - Command: `dotnet tool run csharpier --check .`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (pass/fail and any unformatted-file count).
-- [ ] [P0-T3] Run the analyzer/codestyle build baseline and record it to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/baseline/analyzer-build-baseline.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P0-T3] Run the analyzer/codestyle build baseline and record it to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/baseline/analyzer-build-baseline.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (build result and analyzer warning/error counts).
-- [ ] [P0-T4] Run the pragma-only nullable build baseline (expected clean because no `HelperClasses/` file yet carries a pragma and the project has no `<Nullable>` element) and record it to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/baseline/nullable-build-baseline.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P0-T4] Run the pragma-only nullable build baseline (expected clean because no `HelperClasses/` file yet carries a pragma and the project has no `<Nullable>` element) and record it to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/baseline/nullable-build-baseline.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` recording the pre-opt-in CS86xx count (expected 0) and confirming NO `/p:Nullable=enable` was passed.
-- [ ] [P0-T5] Run the coverage baseline over the UtilitiesCS test assemblies and record numeric coverage to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/baseline/coverage-baseline.<yyyy-MM-ddTHH-mm>.md` with the Cobertura XML at `docs/features/active/utilitiescs-nullable-helperclasses/evidence/baseline/coverage-baseline.<yyyy-MM-ddTHH-mm>.cobertura.xml`
+- [x] [P0-T5] Run the coverage baseline over the UtilitiesCS test assemblies and record numeric coverage to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/baseline/coverage-baseline.<yyyy-MM-ddTHH-mm>.md` with the Cobertura XML at `docs/features/active/utilitiescs-nullable-helperclasses/evidence/baseline/coverage-baseline.<yyyy-MM-ddTHH-mm>.cobertura.xml`
   - Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-helperclasses/evidence/baseline/coverage-baseline.<yyyy-MM-ddTHH-mm>.cobertura.xml` (full-suite driver wrapping `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage`).
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with NUMERIC baseline overall `line-rate`/`branch-rate` from the Cobertura root `<coverage>` element AND the targeted `UtilitiesCS/HelperClasses/` line percentage if obtainable from per-package figures; passed/failed test counts recorded.
 
