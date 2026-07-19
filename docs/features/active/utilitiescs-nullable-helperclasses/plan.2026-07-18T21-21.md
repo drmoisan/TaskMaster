@@ -237,20 +237,20 @@ evidence path is used. The delegation prompt supplied only canonical `evidence/`
 
 ### Phase 8 — Batch 8 High-Contract Finish
 
-- [ ] [P8-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Initializer.cs` and make the deliberate unconstrained-generic return-contract decisions for `SetAndSave`/`GetOrLoad`/`Load` (`ref T`, `default(T)` returns via `[return: MaybeNull]` / `T?`) to reach zero CS86xx
+- [x] [P8-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Initializer.cs` and make the deliberate unconstrained-generic return-contract decisions for `SetAndSave`/`GetOrLoad`/`Load` (`ref T`, `default(T)` returns via `[return: MaybeNull]` / `T?`) to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; the generic return-nullability decisions are recorded as deliberate downstream contracts; public signatures behavior-compatible; zero CS86xx (verified in P8-T6).
-- [ ] [P8-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/FilePathHelper.cs` and apply the two-group string-property contract split — `FilePath`/`FolderPath`/`FileName` non-null (default `""`) and `FileStemSeed`/`FileStemSuffix`/`FileStem`/`FileExtension` nullable sentinels — plus `object? sender` and `Path.GetDirectoryName` (`string?`) annotations to reach zero CS86xx
+- [x] [P8-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/FilePathHelper.cs` and apply the two-group string-property contract split — `FilePath`/`FolderPath`/`FileName` non-null (default `""`) and `FileStemSeed`/`FileStemSuffix`/`FileStem`/`FileExtension` nullable sentinels — plus `object? sender` and `Path.GetDirectoryName` (`string?`) annotations to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; the string-property nullability split reflects actual runtime behavior; the Newtonsoft converter contract remains behavior-compatible; zero CS86xx (verified in P8-T6).
-- [ ] [P8-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/PrettyPrint.cs` and apply annotation-only null-safety edits (do NOT split the file) to reach zero CS86xx
+- [x] [P8-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/PrettyPrint.cs` and apply annotation-only null-safety edits (do NOT split the file) to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; no refactor/split; zero CS86xx (verified in P8-T6).
-- [ ] [P8-T4] Record the file-size pre-existing-violation flags to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/other/maintainer-flags.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P8-T4] Record the file-size pre-existing-violation flags to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/other/maintainer-flags.<yyyy-MM-ddTHH-mm>.md`
   - Acceptance: artifact records (a) `PrettyPrint.cs` (677 lines) exceeds the 500-line limit as a PRE-EXISTING condition, flagged not fixed (splitting is out of annotation-only scope), and (b) `FilePathHelper.cs` (494 lines) is near the limit and any pragma+annotation breach of 500 is flagged rather than triggering a refactor, with `Timestamp:`.
-- [ ] [P8-T5] Run CSharpier over the Batch 8 files (`Initializer.cs`, `FileSystem/FilePathHelper.cs`, `PrettyPrint.cs`) and confirm no residual formatting diff
+- [x] [P8-T5] Run CSharpier over the Batch 8 files (`Initializer.cs`, `FileSystem/FilePathHelper.cs`, `PrettyPrint.cs`) and confirm no residual formatting diff
   - Acceptance: `csharpier --check .` exits 0 for the touched files.
-- [ ] [P8-T6] Run the pragma-only nullable build and record Batch 8 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch8-nullable-build.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P8-T6] Run the pragma-only nullable build and record Batch 8 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch8-nullable-build.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx for the 3 opted-in Batch 8 files and NO new diagnostics elsewhere.
-- [ ] [P8-T7] Run the Batch 8 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch8-tests.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P8-T7] Run the Batch 8 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch8-tests.<yyyy-MM-ddTHH-mm>.md`
   - Command: `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"FullyQualifiedName~Initializer|FullyQualifiedName~PropertyInitializer|FullyQualifiedName~FilePathHelper|FullyQualifiedName~PrettyPrint"`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; all Batch 8 tests green and behavior-identical, including the FilePathHelper Newtonsoft converter tests.
 
