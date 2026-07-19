@@ -156,11 +156,11 @@ Test-assembly resolution rule: the `UtilitiesCS.Test` assembly resolves at execu
 
 ### Phase 11 — Examples and Dead-Duplicate Handling
 
-- [ ] [P11-T1] Add `#nullable enable` to `UtilitiesCS/Examples/MSDemoConv.cs` and remediate annotation-only (default maintainer-decision behavior): use `Outlook.Folder?` locals for the `... as Outlook.Folder` casts and apply justified `!` at the demo's own `folder.Store`/`.Name` derefs; no behavior change. The exclude/delete alternatives remain a maintainer decision recorded in `spec.md`.
+- [x] [P11-T1] Add `#nullable enable` to `UtilitiesCS/Examples/MSDemoConv.cs` and remediate annotation-only (default maintainer-decision behavior): use `Outlook.Folder?` locals for the `... as Outlook.Folder` casts and apply justified `!` at the demo's own `folder.Store`/`.Name` derefs; no behavior change. The exclude/delete alternatives remain a maintainer decision recorded in `spec.md`.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx (resolving the CS8600/CS8602 sites); no new runtime guard.
-- [ ] [P11-T2] Confirm `UtilitiesCS/EmailIntelligence/People/PeopleScoDictionaryNewBackup.cs` receives NO `#nullable enable` pragma (dead, uncompiled duplicate — a pragma would be a no-op that cannot emit CS86xx) and is not in the `UtilitiesCS.csproj` `<Compile Include>` set.
+- [x] [P11-T2] Confirm `UtilitiesCS/EmailIntelligence/People/PeopleScoDictionaryNewBackup.cs` receives NO `#nullable enable` pragma (dead, uncompiled duplicate — a pragma would be a no-op that cannot emit CS86xx) and is not in the `UtilitiesCS.csproj` `<Compile Include>` set.
   - Acceptance: `git diff` shows the backup file unmodified; a grep of `UtilitiesCS/UtilitiesCS.csproj` confirms only the live `PeopleScoDictionaryNew.cs` is compiled; effective compiled hand-written opt-in set is 37 files (the exclude/delete decision remains a maintainer flag in `spec.md`).
-- [ ] [P11-T3] Run the pragma-only rebuild and record Examples/dead-duplicate verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/examples-pragma-verify.<timestamp>.md`.
+- [x] [P11-T3] Run the pragma-only rebuild and record Examples/dead-duplicate verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/examples-pragma-verify.<timestamp>.md`.
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx for `MSDemoConv.cs` and that the backup file emitted no diagnostics (not compiled).
 
 ### Phase 12 — Final QC and Acceptance-Criteria Mapping
