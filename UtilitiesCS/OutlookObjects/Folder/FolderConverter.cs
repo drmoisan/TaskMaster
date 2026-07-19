@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
@@ -186,7 +187,7 @@ namespace UtilitiesCS
             return olFolderBranch.FolderPath.ToFsFolderpath(olAncestor, fsAncestorEquivalent);
         }
 
-        public static string ToFsFolderpath(
+        public static string? ToFsFolderpath(
             this Folder olFolderBranch,
             IApplicationGlobals appGlobals
         )
@@ -204,7 +205,7 @@ namespace UtilitiesCS
             }
         }
 
-        public static string ToFsFolderpath(
+        public static string? ToFsFolderpath(
             this MAPIFolder olFolderBranch,
             IApplicationGlobals appGlobals
         )

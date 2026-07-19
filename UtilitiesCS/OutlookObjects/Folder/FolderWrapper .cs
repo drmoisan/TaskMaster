@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -56,10 +57,10 @@ namespace UtilitiesCS
             SubscribeToPropertyChanged(IFolderWrapper.PropertyEnum.All);
         }
 
-        private MAPIFolder _olRoot;
+        private MAPIFolder? _olRoot;
 
         [JsonIgnore]
-        public MAPIFolder OlRoot
+        public MAPIFolder? OlRoot
         {
             get => _olRoot;
             set
@@ -69,10 +70,10 @@ namespace UtilitiesCS
             }
         }
 
-        private MAPIFolder _olFolder;
+        private MAPIFolder? _olFolder;
 
         [JsonIgnore]
-        public MAPIFolder OlFolder
+        public MAPIFolder? OlFolder
         {
             get => _olFolder;
             set
@@ -95,25 +96,25 @@ namespace UtilitiesCS
 
         #region Lazy Properties
 
-        private Lazy<int> _lazyItemCount;
+        private Lazy<int>? _lazyItemCount;
         public int ItemCount
         {
-            get => _lazyItemCount.Value;
+            get => _lazyItemCount!.Value;
             set => _lazyItemCount = value.ToLazyValue();
         }
 
-        private Lazy<int> _lazyItemCountSubFolders;
+        private Lazy<int>? _lazyItemCountSubFolders;
 
         [JsonIgnore]
         public int ItemCountSubFolders
         {
-            get => _lazyItemCountSubFolders.Value;
+            get => _lazyItemCountSubFolders!.Value;
             set => _lazyItemCountSubFolders = value.ToLazyValue();
         }
 
         internal int LoadItemCountSubFolders()
         {
-            return ItemCount + SumItemCountRecursively(OlFolder);
+            return ItemCount + SumItemCountRecursively(OlFolder!);
         }
 
         internal int SumItemCountRecursively(MAPIFolder folder)
@@ -124,16 +125,16 @@ namespace UtilitiesCS
                 ?? 0;
         }
 
-        private Lazy<long> _lazyFolderSize;
+        private Lazy<long>? _lazyFolderSize;
         public long FolderSize
         {
-            get => _lazyFolderSize.Value;
+            get => _lazyFolderSize!.Value;
             set => _lazyFolderSize = value.ToLazyValue();
         }
 
         private long LoadFolderSize()
         {
-            var items = OlFolder.Items;
+            var items = OlFolder!.Items;
             long totalSize = 0L;
             foreach (var objItem in items)
             {
@@ -165,32 +166,32 @@ namespace UtilitiesCS
             return totalSize;
         }
 
-        private bool HasProperty(object obj, string propertyName)
+        private bool HasProperty(object? obj, string propertyName)
         {
             if (obj == null)
                 return false;
             return obj.GetType().GetProperty(propertyName) != null;
         }
 
-        private Lazy<string> _lazyName;
-        public string Name
+        private Lazy<string?>? _lazyName;
+        public string? Name
         {
-            get => _lazyName.Value;
-            private set => _lazyName = value.ToLazy();
+            get => _lazyName!.Value;
+            private set => _lazyName = new Lazy<string?>(() => value);
         }
 
-        internal virtual string LoadName() => OlFolder?.Name;
+        internal virtual string? LoadName() => OlFolder?.Name;
 
-        private Lazy<string> _lazyRelativePath;
+        private Lazy<string?>? _lazyRelativePath;
 
         [JsonProperty]
-        public string RelativePath
+        public string? RelativePath
         {
-            get => _lazyRelativePath.Value;
-            set => _lazyRelativePath = value.ToLazy();
+            get => _lazyRelativePath!.Value;
+            set => _lazyRelativePath = new Lazy<string?>(() => value);
         }
 
-        internal virtual string LoadRelativePath()
+        internal virtual string? LoadRelativePath()
         {
             if (OlRoot is null || OlFolder is null)
             {
@@ -236,9 +237,9 @@ namespace UtilitiesCS
         public void ResetLazy()
         {
             _lazyFolderSize = new Lazy<long>(LoadFolderSize);
-            _lazyItemCount = new Lazy<int>(() => OlFolder.Items.Count);
-            _lazyName = new Lazy<string>(LoadName);
-            _lazyRelativePath = new Lazy<string>(LoadRelativePath);
+            _lazyItemCount = new Lazy<int>(() => OlFolder!.Items.Count);
+            _lazyName = new Lazy<string?>(LoadName);
+            _lazyRelativePath = new Lazy<string?>(LoadRelativePath);
             _lazyItemCountSubFolders = new Lazy<int>(LoadItemCountSubFolders);
             ItemHelpers = new AsyncLazy<IItemInfo[]>(async () =>
                 await Task.Run(() => LoadItemHelpers())
@@ -327,7 +328,7 @@ namespace UtilitiesCS
             }
         }
 
-        private void PropertyChanged_OlFolder(object sender, PropertyChangedEventArgs e)
+        private void PropertyChanged_OlFolder(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(OlFolder))
             {
@@ -335,35 +336,35 @@ namespace UtilitiesCS
             }
         }
 
-        private void PropertyChanged_OlRoot(object sender, PropertyChangedEventArgs e)
+        private void PropertyChanged_OlRoot(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(OlRoot))
             {
-                _lazyRelativePath = new Lazy<string>(LoadRelativePath);
+                _lazyRelativePath = new Lazy<string?>(LoadRelativePath);
             }
         }
 
-        private void PropertyChanged_ItemCount(object sender, PropertyChangedEventArgs e)
+        private void PropertyChanged_ItemCount(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(ItemCount)) { }
         }
 
-        private void PropertyChanged_FolderSize(object sender, PropertyChangedEventArgs e)
+        private void PropertyChanged_FolderSize(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(FolderSize)) { }
         }
 
-        private void PropertyChanged_Name(object sender, PropertyChangedEventArgs e)
+        private void PropertyChanged_Name(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Name)) { }
         }
 
-        private void PropertyChanged_RelativePath(object sender, PropertyChangedEventArgs e)
+        private void PropertyChanged_RelativePath(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(RelativePath)) { }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
@@ -377,10 +378,10 @@ namespace UtilitiesCS
         //private Lazy<IItemInfo[]> _lazyItemHelpers;
         //public IItemInfo[] ItemHelpers { get => _lazyItemHelpers.Value; set => _lazyItemHelpers = value?.ToLazy(); }
         [JsonIgnore]
-        public AsyncLazy<IItemInfo[]> ItemHelpers { get; set; }
+        public AsyncLazy<IItemInfo[]>? ItemHelpers { get; set; }
 
         [JsonIgnore]
-        public IApplicationGlobals Globals { get; set; }
+        public IApplicationGlobals? Globals { get; set; }
 
         internal IItemInfo[] LoadItemHelpers()
         {
@@ -389,7 +390,7 @@ namespace UtilitiesCS
                 throw new ArgumentNullException("Globals");
             }
             List<IItemInfo> helpers = [];
-            var items = OlFolder.Items;
+            var items = OlFolder!.Items;
             foreach (var objItem in items)
             {
                 try
@@ -495,8 +496,8 @@ namespace UtilitiesCS
             {
                 other.Globals = Globals;
             }
-            var currentHelpers = await ItemHelpers;
-            var otherHelpers = await other.ItemHelpers;
+            var currentHelpers = await ItemHelpers!;
+            var otherHelpers = await other.ItemHelpers!;
             if (currentHelpers.IsNullOrEmpty() || otherHelpers.IsNullOrEmpty())
             {
                 return ([], currentHelpers, otherHelpers);
