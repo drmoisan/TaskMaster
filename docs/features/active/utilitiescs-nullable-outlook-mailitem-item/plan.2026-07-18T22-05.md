@@ -176,19 +176,19 @@ kinds, so no `EVIDENCE_LOCATION_OVERRIDE_REJECTED` substitution is required.
 
 ### Phase 5 — Batch E Attachment Cluster
 
-- [ ] [P5-T1] Verify the upstream #364 `FilePathHelper` contract (non-nullable `""`-default `FilePath`/`FolderPath`/`FileName` properties) has landed in `UtilitiesCS/HelperClasses/FileSystem/FilePathHelper.cs` before annotating this batch
+- [x] [P5-T1] Verify the upstream #364 `FilePathHelper` contract (non-nullable `""`-default `FilePath`/`FolderPath`/`FileName` properties) has landed in `UtilitiesCS/HelperClasses/FileSystem/FilePathHelper.cs` before annotating this batch
   - Command: `grep -n "FilePath\|FolderPath\|FileName" UtilitiesCS/HelperClasses/FileSystem/FilePathHelper.cs`
   - Acceptance: grep output confirms the property declarations exist with the expected non-nullable, default-`""` shape; if the contract has not landed, this task is BLOCKED and must be re-run before proceeding to P5-T2/P5-T3.
-- [ ] [P5-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Attachment/AttachmentSerializable.cs` and annotate the lazy byte-fetching members (`GetBytes`, `TryFromAccessor`, `TryFromSaveAsLoad`, `TryFromContentIdAccessor`) to reach zero CS86xx
+- [x] [P5-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Attachment/AttachmentSerializable.cs` and annotate the lazy byte-fetching members (`GetBytes`, `TryFromAccessor`, `TryFromSaveAsLoad`, `TryFromContentIdAccessor`) to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P5-T5).
-- [ ] [P5-T3] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Attachment/AttachmentHelper.cs` and forward `FilePathSave`/`FolderPathSave` to the `FilePathHelperSave.FilePath`/`.FolderPath` contract without adding a conflicting nullable annotation, to reach zero CS86xx
+- [x] [P5-T3] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Attachment/AttachmentHelper.cs` and forward `FilePathSave`/`FolderPathSave` to the `FilePathHelperSave.FilePath`/`.FolderPath` contract without adding a conflicting nullable annotation, to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; `FilePathSave`/`FolderPathSave` inherit the non-nullable `""`-default contract as-is; zero CS86xx (verified in P5-T5).
-- [ ] [P5-T4] Run CSharpier over the Batch E files (`Attachment/AttachmentSerializable.cs`, `Attachment/AttachmentHelper.cs`) and confirm no residual formatting diff
+- [x] [P5-T4] Run CSharpier over the Batch E files (`Attachment/AttachmentSerializable.cs`, `Attachment/AttachmentHelper.cs`) and confirm no residual formatting diff
   - Acceptance: `csharpier --check .` exits 0 for the touched files.
-- [ ] [P5-T5] Run the pragma-only nullable build and record Batch E verification to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/qa-gates/batch-e-nullable-build.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P5-T5] Run the pragma-only nullable build and record Batch E verification to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/qa-gates/batch-e-nullable-build.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx for the 2 opted-in Batch E files and NO new diagnostics elsewhere.
-- [ ] [P5-T6] Run the Batch E UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/regression-testing/batch-e-tests.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P5-T6] Run the Batch E UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/regression-testing/batch-e-tests.<yyyy-MM-ddTHH-mm>.md`
   - Command: `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"FullyQualifiedName~AttachmentSerializable|FullyQualifiedName~AttachmentHelper"`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with passed/failed counts; `AttachmentHelperTests.cs`, `AttachmentSerializableTests.cs`, and legacy `AttachmentSerializable_Tests.cs` all green and behavior-identical.
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -61,7 +62,7 @@ namespace UtilitiesCS.EmailIntelligence
             Attachment attachment,
             DateTime sentOn,
             string saveFolderPath,
-            string deleteFolderPath
+            string? deleteFolderPath
         )
         {
             _attachment = attachment;
@@ -140,14 +141,14 @@ namespace UtilitiesCS.EmailIntelligence
         public const string PR_ATTACH_DATA_BIN =
             "http://schemas.microsoft.com/mapi/proptag/0x37010102";
 
-        private AttachmentSerializable _attachmentInfo;
+        private AttachmentSerializable? _attachmentInfo;
         public IAttachment AttachmentInfo
         {
-            get => _attachmentInfo;
+            get => _attachmentInfo!;
             set => _attachmentInfo = value as AttachmentSerializable;
         }
 
-        private Attachment _attachment;
+        private Attachment _attachment = null!;
         public Attachment Attachment
         {
             get => _attachment;
@@ -161,8 +162,8 @@ namespace UtilitiesCS.EmailIntelligence
             set => _datePrefix = value;
         }
 
-        private List<string> _errorMessages;
-        public List<string> ErrorMessages
+        private List<string>? _errorMessages;
+        public List<string>? ErrorMessages
         {
             get => _errorMessages;
         }
@@ -187,8 +188,8 @@ namespace UtilitiesCS.EmailIntelligence
             set => FilePathHelperSaveAlt.FilePath = value;
         }
 
-        private string _filePathDelete;
-        public string FilePathDelete
+        private string? _filePathDelete;
+        public string? FilePathDelete
         {
             get => _filePathDelete;
             set => _filePathDelete = value;
@@ -201,8 +202,8 @@ namespace UtilitiesCS.EmailIntelligence
             set => FilePathHelperSave.FolderPath = value;
         }
 
-        private string _folderPathDelete;
-        public string FolderPathDelete
+        private string? _folderPathDelete;
+        public string? FolderPathDelete
         {
             get => _folderPathDelete;
             set => _folderPathDelete = value;
@@ -262,7 +263,7 @@ namespace UtilitiesCS.EmailIntelligence
             Attachment attachment,
             DateTime sentOn,
             string saveFolderPath,
-            string deleteFolderPath
+            string? deleteFolderPath
         )
         {
             _errorMessages = new List<string>();
