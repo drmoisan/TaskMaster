@@ -138,11 +138,11 @@ Test-assembly resolution rule: the `UtilitiesCS.Test` assembly resolves at execu
 
 ### Phase 9 — Batch 8 Large COM Helpers (500-Line FLAG Batch)
 
-- [ ] [P9-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Fields/UserDefinedFields.cs` (722 lines, pre-existing 500-line breach — FLAG, do NOT split); annotate `SafeGetPropertyAccessorValue`/`TryGetProperty`/`GetUdfValue` returns to `object?`, `GetUdfString` to `string?`, `GetUdfValue<T>` to `T?`, and `UserProperty? objProperty`; COM member chains need no `!` (oblivious on net481).
+- [x] [P9-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Fields/UserDefinedFields.cs` (722 lines, pre-existing 500-line breach — FLAG, do NOT split); annotate `SafeGetPropertyAccessorValue`/`TryGetProperty`/`GetUdfValue` returns to `object?`, `GetUdfString` to `string?`, `GetUdfValue<T>` to `T?`, and `UserProperty? objProperty`; COM member chains need no `!` (oblivious on net481).
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no split; breach recorded pre-existing in `spec.md`, not worsened in a status-changing way (AC8); no new runtime guard.
-- [ ] [P9-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/AppointmentItem/MeetingItemHelper.cs` (847 lines, pre-existing 500-line breach — FLAG, do NOT split); annotate `Lazy<...>`-backed getters returning non-null `string`/`T` to `string?`/`T?` (or justified `!`), `PropertyChanged` event `?`, and `_item`/`Sw`/`Lazy<...>` ctor-unset fields; retain the existing inline `#nullable enable/disable` island around `_emailHeader` if still required for zero CS86xx.
+- [x] [P9-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/AppointmentItem/MeetingItemHelper.cs` (847 lines, pre-existing 500-line breach — FLAG, do NOT split); annotate `Lazy<...>`-backed getters returning non-null `string`/`T` to `string?`/`T?` (or justified `!`), `PropertyChanged` event `?`, and `_item`/`Sw`/`Lazy<...>` ctor-unset fields; retain the existing inline `#nullable enable/disable` island around `_emailHeader` if still required for zero CS86xx.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no split; breach recorded pre-existing in `spec.md`, not worsened in a status-changing way (AC8); no new runtime guard.
-- [ ] [P9-T3] Run the pragma-only rebuild and record Batch 8 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch8-pragma-verify.<timestamp>.md`.
+- [x] [P9-T3] Run the pragma-only rebuild and record Batch 8 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch8-pragma-verify.<timestamp>.md`.
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx across the two large COM helpers.
 
 ### Phase 10 — To Depricate Batch
