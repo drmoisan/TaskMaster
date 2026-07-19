@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
+#nullable enable
+
     public static class QueueExtensions
     {
         public static IEnumerable<T> DequeueChunk<T>(this Queue<T> queue, int chunkSize)

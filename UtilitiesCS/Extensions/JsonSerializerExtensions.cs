@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 
 namespace UtilitiesCS.Extensions
 {
+#nullable enable
+
     public static class JsonSerializerExtensions
     {
         public static JsonSerializer DeepCopy(this JsonSerializer serializer)

@@ -11,6 +11,8 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
+#nullable enable
+
     public static partial class DfDeedle
     {
         internal static Series<int, string> GetColumnEid(object[] slice)
@@ -18,7 +20,7 @@ namespace UtilitiesCS
             return slice.CastNullSafe<string>().ToOrdinalSeries();
         }
 
-        internal static object GetFirstNonNull(IEnumerable<object> columnData)
+        internal static object? GetFirstNonNull(IEnumerable<object>? columnData)
         {
             if ((columnData is null) || (columnData.Count() == 0))
             {
@@ -34,9 +36,9 @@ namespace UtilitiesCS
             return filteredData.First();
         }
 
-        public static Frame<int, string> FromArray2D(
-            object[,] data,
-            Dictionary<string, int> columnDictionary
+        public static Frame<int, string>? FromArray2D(
+            object[,]? data,
+            Dictionary<string, int>? columnDictionary
         )
         {
             if (data is null)
@@ -75,7 +77,7 @@ namespace UtilitiesCS
             return dfTemp;
         }
 
-        private static async Task<Frame<int, string>> FromDefaultFolderAsync(
+        private static async Task<Frame<int, string>?> FromDefaultFolderAsync(
             Store store,
             OlDefaultFolders folderEnum,
             string[] removeColumns,
@@ -115,12 +117,12 @@ namespace UtilitiesCS
                 .ToArrayAsync();
 
             var data = jagged.To2D();
-            Frame<int, string> df = FromArray2D(data: data, columnDictionary);
+            Frame<int, string>? df = FromArray2D(data: data, columnDictionary);
 
             return df;
         }
 
-        public static Frame<int, string> FromDefaultFolder(
+        public static Frame<int, string>? FromDefaultFolder(
             Store store,
             OlDefaultFolders folderEnum,
             string[] removeColumns,
@@ -140,7 +142,7 @@ namespace UtilitiesCS
 
             (var data, var columnInfo) = StoreTableEtlInvoker(table);
 
-            Frame<int, string> df = FromArray2D(data: data, columnInfo);
+            Frame<int, string>? df = FromArray2D(data: data, columnInfo);
 
             return df;
         }
@@ -152,7 +154,7 @@ namespace UtilitiesCS
             string[] addColumns
         )
         {
-            Frame<string, string> df = null;
+            Frame<string, string>? df = null;
             foreach (Outlook.Store store in stores)
             {
                 var dfTemp = DfDeedle.FromDefaultFolder(

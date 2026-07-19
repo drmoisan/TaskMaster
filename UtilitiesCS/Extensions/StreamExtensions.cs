@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.Extensions
 {
+#nullable enable
+
     public static class StreamExtensions
     {
         public static async Task<bool> TryCopyToAsyncWithTimeout(

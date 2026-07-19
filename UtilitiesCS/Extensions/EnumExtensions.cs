@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
+#nullable enable
+
     /// <summary>
     /// Generic Extension to combine flags in an enumeration.
     /// Extension takes the following overloads:

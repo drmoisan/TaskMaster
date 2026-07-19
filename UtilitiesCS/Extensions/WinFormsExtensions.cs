@@ -16,6 +16,8 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS
 {
+#nullable enable
+
     public static class WinFormsExtensions
     {
         /// <summary>
@@ -171,10 +173,13 @@ namespace UtilitiesCS
             }
         }
 
-        public static T GetAncestor<T>(this Control control)
+        public static T? GetAncestor<T>(this Control control)
             where T : class
         {
-            var parent = control.Parent;
+            // control.Parent is nullable (top-level controls have no parent). The
+            // null-forgiving operator preserves the original behavior, which dereferenced
+            // parent.Parent directly (an NRE for a parentless control that is not a T).
+            Control parent = control.Parent!;
             if (parent is T)
             {
                 return parent as T;
@@ -189,7 +194,7 @@ namespace UtilitiesCS
             }
         }
 
-        public static T GetAncestor<T>(this Control control, bool strict)
+        public static T? GetAncestor<T>(this Control control, bool strict)
             where T : class
         {
             var result = control.GetAncestor<T>();
@@ -215,7 +220,7 @@ namespace UtilitiesCS
             }
             else
             {
-                var methodBase = new StackTrace().GetFrame(1).GetMethod();
+                var methodBase = new StackTrace().GetFrame(1)!.GetMethod()!;
                 //var callerName = methodBase.Name;
                 var parameters = methodBase.GetParameters();
                 var message =
@@ -227,7 +232,7 @@ namespace UtilitiesCS
             }
         }
 
-        public static bool IsRegistered(this EventHandler handler, Delegate prospectiveHandler) =>
+        public static bool IsRegistered(this EventHandler? handler, Delegate prospectiveHandler) =>
             handler != null
             && handler
                 .GetInvocationList()
@@ -239,17 +244,19 @@ namespace UtilitiesCS
         )
         {
             eventName = "Event" + eventName;
-            FieldInfo f1 = typeof(Control).GetField(
+            FieldInfo? f1 = typeof(Control).GetField(
                 eventName,
                 BindingFlags.Static | BindingFlags.NonPublic
             );
 
-            object obj = f1.GetValue(control);
-            PropertyInfo pi = control
+            // The reflected static event field and the "Events" property are always present
+            // on Control; the null-forgiving operators preserve the original non-null contract.
+            object obj = f1!.GetValue(control)!;
+            PropertyInfo? pi = control
                 .GetType()
                 .GetProperty("Events", BindingFlags.NonPublic | BindingFlags.Instance);
 
-            return ((EventHandlerList)pi.GetValue(control, null), obj);
+            return ((EventHandlerList)pi!.GetValue(control, null)!, obj);
         }
 
         public static void RemoveEventHandlers(this Control control, string eventName)
@@ -380,12 +387,12 @@ namespace UtilitiesCS
             ref T clonedInstance
         )
         {
-            object value = property.GetValue(classToClone);
+            object? value = property.GetValue(classToClone);
             if (
                 (value != null)
                 && (value.GetType().IsClass)
                 && (!value.GetType().IsPrimitiveLike())
-                && (value.GetType().FullName.StartsWith("System.") ? (remainingDepth-- > 0) : true)
+                && (value.GetType().FullName!.StartsWith("System.") ? (remainingDepth-- > 0) : true)
             )
             {
                 property.SetValue(clonedInstance, value.Clone(true, remainingDepth));
@@ -405,8 +412,10 @@ namespace UtilitiesCS
         )
             where T : class
         {
-            object sourceClass2 = property.GetValue(sourceClass);
-            object destinationClass2 = property.GetValue(destinationClass);
+            // Sub-property source/destination objects are non-null for the property graph
+            // this walk copies; the null-forgiving operators preserve the original behavior.
+            object sourceClass2 = property.GetValue(sourceClass)!;
+            object destinationClass2 = property.GetValue(destinationClass)!;
 
             PropertyInfo[] subProperties = sourceClass2.GetType().GetProperties();
 
@@ -424,8 +433,8 @@ namespace UtilitiesCS
             T sourceClass
         )
         {
-            var source = (TableLayoutSettings)property.GetValue(sourceClass);
-            var destination = (TableLayoutSettings)property.GetValue(destinationClass);
+            var source = (TableLayoutSettings)property.GetValue(sourceClass)!;
+            var destination = (TableLayoutSettings)property.GetValue(destinationClass)!;
 
             destination.ColumnCount = source.ColumnCount;
             foreach (ColumnStyle style in source.ColumnStyles)
@@ -451,7 +460,7 @@ namespace UtilitiesCS
 
             try
             {
-                clonedInstance = (T)Activator.CreateInstance(type);
+                clonedInstance = (T)Activator.CreateInstance(type)!;
             }
             catch (MissingMethodException)
             {

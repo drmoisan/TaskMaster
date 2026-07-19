@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.Extensions.Lazy
 {
+#nullable enable
+
     public static class LazyExtension
     {
         public static Lazy<T> ToLazy<T>(this T value)
