@@ -110,13 +110,13 @@
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with pass/fail counts confirming no test regression (AC3).
 
 ### Phase 2 — Batch B CTF Map and Subject-Map Leaf Collections
-- [ ] [P2-T1] Add a `#nullable enable` pragma to each of the 3 Batch B files: `UtilitiesCS/EmailIntelligence/Ctf/CtfMap.cs`, `UtilitiesCS/EmailIntelligence/Ctf/CtfIncidenceList.cs`, `UtilitiesCS/EmailIntelligence/SubjectMap/CommonWords.cs`
+- [x] [P2-T1] Add a `#nullable enable` pragma to each of the 3 Batch B files: `UtilitiesCS/EmailIntelligence/Ctf/CtfMap.cs`, `UtilitiesCS/EmailIntelligence/Ctf/CtfIncidenceList.cs`, `UtilitiesCS/EmailIntelligence/SubjectMap/CommonWords.cs`
   - Acceptance: each of the 3 named files contains a `#nullable enable` pragma; no `<Nullable>` element added to the csproj (AC1, AC2).
-- [ ] [P2-T2] Apply nullable annotations, guards, and justified `!` to the 3 Batch B files so each reaches zero CS86xx under the pragma; keep the `[Obsolete]` attribute on `CtfIncidenceList.cs` unchanged; annotate `CtfMap.cs`'s `MAPIFolder`-typed members consistently with `CtfMapEntry`'s Batch A annotations
+- [x] [P2-T2] Apply nullable annotations, guards, and justified `!` to the 3 Batch B files so each reaches zero CS86xx under the pragma; keep the `[Obsolete]` attribute on `CtfIncidenceList.cs` unchanged; annotate `CtfMap.cs`'s `MAPIFolder`-typed members consistently with `CtfMapEntry`'s Batch A annotations
   - Acceptance: no post-condition attribute is added; public signatures remain behavior-compatible (AC5); changes are annotation/null-safety only (AC3).
-- [ ] [P2-T3] Run `dotnet tool run csharpier .` then the pragma-gate rebuild `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true` and record the result at `docs/features/active/utilitiescs-nullable-email-parsing/evidence/qa-gates/batch-b-nullable-gate.md`
+- [x] [P2-T3] Run `dotnet tool run csharpier .` then the pragma-gate rebuild `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true` and record the result at `docs/features/active/utilitiescs-nullable-email-parsing/evidence/qa-gates/batch-b-nullable-gate.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` showing zero CS86xx for the 3 Batch B files (AC1).
-- [ ] [P2-T4] Run the UtilitiesCS test suite with coverage via `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-email-parsing/evidence/regression-testing/batch-b-coverage.cobertura.xml` and record the result at `docs/features/active/utilitiescs-nullable-email-parsing/evidence/regression-testing/batch-b-tests.md`
+- [x] [P2-T4] Run the UtilitiesCS test suite with coverage via `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-email-parsing/evidence/regression-testing/batch-b-coverage.cobertura.xml` and record the result at `docs/features/active/utilitiescs-nullable-email-parsing/evidence/regression-testing/batch-b-tests.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with pass/fail counts confirming no test regression (AC3).
 
 ### Phase 3 — Batch C SubjectMap Encoding Chain (Includes Mandatory SubjectMapSco Partial-Class Group)

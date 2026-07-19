@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -105,7 +106,7 @@ namespace UtilitiesCS
             return listCTF;
         }
 
-        public static CtfMapEntry TryDequeueEntry(ref Queue<string> lines)
+        public static CtfMapEntry? TryDequeueEntry(ref Queue<string> lines)
         {
             var entry = new CtfMapEntry();
             try
@@ -190,7 +191,7 @@ namespace UtilitiesCS
         private static string[] ReadFileToArray(string filepath)
         {
             //QUESTION: Is ReadFileToArray method duplicative of read csv? Should it be moved to a common location?
-            string[] filecontents = null;
+            string[]? filecontents = null;
             try
             {
                 filecontents = File.ReadAllLines(filepath, System.Text.Encoding.ASCII);
