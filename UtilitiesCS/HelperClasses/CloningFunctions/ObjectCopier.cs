@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -17,8 +18,10 @@ namespace UtilitiesCS.HelperClasses
         /// </summary>
         /// <typeparam name="T">The type of object being copied.</typeparam>
         /// <param name="source">The object instance to copy.</param>
-        /// <returns>A deep copy of the object.</returns>
-        public static T Clone<T>(T source)
+        /// <returns>A deep copy of the object, or <c>default</c> when <paramref name="source"/> is null.</returns>
+        // Deliberate downstream contract: the return is annotated `T?` because the null-source
+        // path returns default(T) (null for reference types). Callers must handle a possible null.
+        public static T? Clone<T>(T source)
         {
             if (!typeof(T).IsSerializable)
             {
@@ -33,7 +36,7 @@ namespace UtilitiesCS.HelperClasses
             IFormatter formatter = new BinaryFormatter();
             formatter.Serialize(stream, source);
             stream.Seek(0, SeekOrigin.Begin);
-            return (T)formatter.Deserialize(stream);
+            return (T?)formatter.Deserialize(stream);
         }
     }
 }

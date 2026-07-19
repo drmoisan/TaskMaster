@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +14,7 @@ namespace UtilitiesCS.HelperClasses
             return GetObjectSize(obj, new HashSet<object>());
         }
 
-        private static long GetObjectSize(object obj, HashSet<object> visited)
+        private static long GetObjectSize(object? obj, HashSet<object> visited)
         {
             if (obj == null)
                 return 0;

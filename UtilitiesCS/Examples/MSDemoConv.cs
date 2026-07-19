@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -21,10 +22,10 @@ namespace UtilitiesCS.Examples
             if (selectedItem is Outlook.MailItem)
             {
                 // Cast selectedItem to MailItem.
-                Outlook.MailItem mailItem = selectedItem as Outlook.MailItem;
+                Outlook.MailItem? mailItem = selectedItem as Outlook.MailItem;
                 // Determine store of mailItem.
-                Outlook.Folder folder = mailItem.Parent as Outlook.Folder;
-                Outlook.Store store = folder.Store;
+                Outlook.Folder? folder = mailItem!.Parent as Outlook.Folder;
+                Outlook.Store store = folder!.Store;
                 if (store.IsConversationEnabled == true)
                 {
                     // Obtain a Conversation object.
@@ -56,9 +57,9 @@ namespace UtilitiesCS.Examples
                             // can appear in Conversation.
                             if (item is Outlook.MailItem)
                             {
-                                Outlook.MailItem mail = item as Outlook.MailItem;
-                                Outlook.Folder inFolder = mail.Parent as Outlook.Folder;
-                                string msg = mail.Subject + " in folder " + inFolder.Name;
+                                Outlook.MailItem? mail = item as Outlook.MailItem;
+                                Outlook.Folder? inFolder = mail!.Parent as Outlook.Folder;
+                                string msg = mail.Subject + " in folder " + inFolder!.Name;
                                 Debug.WriteLine(msg);
                             }
                             // Call EnumerateConversation
@@ -82,9 +83,9 @@ namespace UtilitiesCS.Examples
                     // can appear in Conversation.
                     if (myItem is Outlook.MailItem)
                     {
-                        Outlook.MailItem mailItem = myItem as Outlook.MailItem;
-                        Outlook.Folder inFolder = mailItem.Parent as Outlook.Folder;
-                        string msg = mailItem.Subject + " in folder " + inFolder.Name;
+                        Outlook.MailItem? mailItem = myItem as Outlook.MailItem;
+                        Outlook.Folder? inFolder = mailItem!.Parent as Outlook.Folder;
+                        string msg = mailItem.Subject + " in folder " + inFolder!.Name;
                         Debug.WriteLine(msg);
                     }
                     // Continue recursion.

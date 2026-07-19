@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -114,8 +115,8 @@ namespace UtilitiesCS
         {
             int[] columnLengths =
             [
-                dict.Keys.Select(key => key.ToString().Length).Max(),
-                dict.Values.Select(value => value.ToString().Length).Max(),
+                dict.Keys.Select(key => key!.ToString()!.Length).Max(),
+                dict.Values.Select(value => value!.ToString()!.Length).Max(),
             ];
             return columnLengths;
         }
@@ -164,9 +165,9 @@ namespace UtilitiesCS
             this IDictionary<TKey, TValue> dict,
             Func<TKey, string> keyConverter,
             Func<TValue, string> valueConverter,
-            string[] headers = null,
-            Enums.Justification[] justifications = default,
-            string title = null
+            string[]? headers = null,
+            Enums.Justification[]? justifications = default,
+            string? title = null
         )
         {
             var jagged = dict.Select(kvp =>
@@ -178,9 +179,9 @@ namespace UtilitiesCS
 
         public static string ToFormattedText(
             this string[][] jagged,
-            string[] headers = null,
-            Enums.Justification[] justifications = default,
-            string title = null
+            string[]? headers = null,
+            Enums.Justification[]? justifications = default,
+            string? title = null
         )
         {
             int columnCount = GetJaggedColumnCount(ref jagged, headers, title);
@@ -327,7 +328,8 @@ namespace UtilitiesCS
                 return new string(' ', width);
             }
 
-            if (text.Length >= width)
+            // Behavior-preserving `!`: the IsNullOrEmpty guard above returns for null/empty text.
+            if (text!.Length >= width)
                 return text.Substring(0, width);
 
             var spacesPerLetter = (int)Math.Truncate(width / (double)text.Length);
@@ -413,8 +415,8 @@ namespace UtilitiesCS
 
         private static void AppendJaggedHeaders(
             ref StringBuilder sb,
-            string[] headers,
-            string title,
+            string[]? headers,
+            string? title,
             int[] columnWidths,
             int tableWidth
         )
@@ -432,12 +434,13 @@ namespace UtilitiesCS
             }
         }
 
-        private static void AppendJaggedTitle(ref StringBuilder sb, string title, int tableWidth)
+        private static void AppendJaggedTitle(ref StringBuilder sb, string? title, int tableWidth)
         {
             if (!title.IsNullOrEmpty())
             {
                 sb.AppendLine(new string('=', tableWidth));
-                if (title.Length + 3 <= tableWidth)
+                // Behavior-preserving `!`: the IsNullOrEmpty guard above ensures title is non-null.
+                if (title!.Length + 3 <= tableWidth)
                 {
                     sb.AppendLine($"| {title.PadToCenter(tableWidth - 3)}|");
                 }
@@ -474,7 +477,7 @@ namespace UtilitiesCS
 
         private static int[] GetJaggedColumnWidths(
             string[][] jagged,
-            string[] headers,
+            string[]? headers,
             int columnCount
         )
         {
@@ -505,8 +508,8 @@ namespace UtilitiesCS
 
         private static int GetJaggedColumnCount(
             ref string[][] jagged,
-            string[] headers,
-            string title
+            string[]? headers,
+            string? title
         )
         {
             // Get the max number of columns

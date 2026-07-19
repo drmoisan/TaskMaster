@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,21 +19,21 @@ namespace UtilitiesCS
             _html = html;
         }
 
-        private string _name;
-        private string _address;
-        private string _html;
+        private string? _name;
+        private string? _address;
+        private string? _html;
 
-        public virtual string Name
+        public virtual string? Name
         {
             get => _name;
             set => _name = value;
         }
-        public virtual string Address
+        public virtual string? Address
         {
             get => _address;
             set => _address = value;
         }
-        public virtual string Html
+        public virtual string? Html
         {
             get => _html;
             set => _html = value;

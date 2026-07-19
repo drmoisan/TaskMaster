@@ -1,4 +1,5 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿#nullable enable
+using Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
@@ -12,9 +13,9 @@ namespace UtilitiesCS
                 | item.MessageClass == "IPM.Outlook.Recall";
         }
 
-        public static MailItem TryResolveMailItemDep(object objItem)
+        public static MailItem? TryResolveMailItemDep(object objItem)
         {
-            MailItem OlMail = null;
+            MailItem? OlMail = null;
             if (objItem is MailItem)
             {
                 OlMail = (MailItem)objItem;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -13,7 +14,8 @@ namespace UtilitiesCS
     public class FilePathHelper : INotifyPropertyChanged, ICloneable
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+            // Standard log4net logger declaration: non-null in a static field initializer.
+            System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType!
         );
 
         #region Constructors
@@ -99,8 +101,9 @@ namespace UtilitiesCS
             }
         }
 
-        private string _fileStemSeed = null;
-        public string FileStemSeed
+        // Null-by-design sentinel group: these are null until the stem is parsed/initialized.
+        private string? _fileStemSeed = null;
+        public string? FileStemSeed
         {
             get => _fileStemSeed;
             set
@@ -110,8 +113,8 @@ namespace UtilitiesCS
             }
         }
 
-        private string _fileStemSuffix = null;
-        public string FileStemSuffix
+        private string? _fileStemSuffix = null;
+        public string? FileStemSuffix
         {
             get => _fileStemSuffix;
             set
@@ -121,15 +124,15 @@ namespace UtilitiesCS
             }
         }
 
-        private string _fileStem = null;
-        public string FileStem
+        private string? _fileStem = null;
+        public string? FileStem
         {
             get => _fileStem;
             protected set => _fileStem = value;
         }
 
-        private string _fileExtension = null;
-        public string FileExtension
+        private string? _fileExtension = null;
+        public string? FileExtension
         {
             get => _fileExtension;
             set
@@ -195,7 +198,8 @@ namespace UtilitiesCS
             if (!StemInitialized())
                 return MAX_PATH;
 
-            return MAX_PATH - FolderPath.Length - FileExtension.Length - FileStemSuffix.Length;
+            // StemInitialized() guarantees the stem sentinels are non-null.
+            return MAX_PATH - FolderPath.Length - FileExtension!.Length - FileStemSuffix!.Length;
         }
 
         public (string Stem, string Extension) ExtractStemAndExtension(string fileName)
@@ -214,13 +218,13 @@ namespace UtilitiesCS
 
         public bool TryParseFileStem(
             string fileStem,
-            out string fileStemSeed,
-            out string fileStemSuffix
+            out string? fileStemSeed,
+            out string? fileStemSuffix
         )
         {
             fileStemSeed = FileStemSeed ?? "";
             fileStemSuffix = FileStemSuffix ?? "";
-            string remainingChars = fileStem;
+            string? remainingChars = fileStem;
 
             // case 1: empty fileStem
             if (fileStem.IsNullOrEmpty())
@@ -238,7 +242,7 @@ namespace UtilitiesCS
             if (
                 !fileStemSeed.IsNullOrEmpty() && (remainingChars?.StartsWith(fileStemSeed) ?? false)
             )
-                remainingChars = remainingChars.Replace(fileStemSeed, "");
+                remainingChars = remainingChars!.Replace(fileStemSeed, "");
 
             // step 2 strip existing suffix if it exists and append any remaining chars to seed
             if (
@@ -246,7 +250,7 @@ namespace UtilitiesCS
                 && (remainingChars?.EndsWith(fileStemSuffix) ?? false)
             )
             {
-                remainingChars = remainingChars.Replace(fileStemSuffix, "");
+                remainingChars = remainingChars!.Replace(fileStemSuffix, "");
                 fileStemSeed += remainingChars;
             }
 
@@ -275,7 +279,7 @@ namespace UtilitiesCS
 
             var (fileStem, fileExtension) = ExtractStemAndExtension(fileName);
 
-            if (TryParseFileStem(fileStem, out string fileStemSeed, out string fileStemSuffix))
+            if (TryParseFileStem(fileStem, out string? fileStemSeed, out string? fileStemSuffix))
             {
                 _fileStemSeed = fileStemSeed;
                 _fileStemSuffix = fileStemSuffix;
@@ -294,14 +298,15 @@ namespace UtilitiesCS
             if (!StemInitialized())
                 return false;
 
+            // StemInitialized() guarantees the stem sentinels are non-null.
             var maxSeedLength =
-                MAX_PATH - FolderPath.Length - FileExtension.Length - FileStemSuffix.Length;
+                MAX_PATH - FolderPath.Length - FileExtension!.Length - FileStemSuffix!.Length;
 
             var fileName = $"{FileStemSeed}{FileStemSuffix}{FileExtension}";
             var filePath = Path.Combine(FolderPath, fileName);
             if (filePath.Length > MAX_PATH)
             {
-                maxSeedLength = FileStemSeed.Length + MAX_PATH - filePath.Length;
+                maxSeedLength = FileStemSeed!.Length + MAX_PATH - filePath.Length;
                 _fileStemSeed = FileStemSeed.Substring(0, maxSeedLength);
             }
             return true;
@@ -338,9 +343,9 @@ namespace UtilitiesCS
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        public void FilePathHelper_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        public void FilePathHelper_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
@@ -348,13 +353,17 @@ namespace UtilitiesCS
                     if (!_folderPath.IsNullOrEmpty() && !_fileName.IsNullOrEmpty())
                         _filePath = Path.Combine(_folderPath, _fileName);
                     else
-                        _filePath = null;
+                        // Behavior-preserving: FilePath is the non-null (default "") contract group;
+                        // the transient internal null assignment is retained via null!.
+                        _filePath = null!;
                     break;
                 case "FolderPath":
                     if (!_folderPath.IsNullOrEmpty() && !_fileName.IsNullOrEmpty())
                         _filePath = Path.Combine(_folderPath, _fileName);
                     else
-                        _filePath = null;
+                        // Behavior-preserving: FilePath is the non-null (default "") contract group;
+                        // the transient internal null assignment is retained via null!.
+                        _filePath = null!;
                     break;
 
                 case "FilePath":
@@ -367,7 +376,9 @@ namespace UtilitiesCS
 
                     try
                     {
-                        _folderPath = Path.GetDirectoryName(_filePath);
+                        // Path.GetDirectoryName returns null only for a root path; `!` preserves
+                        // the prior assignment behavior for the non-null FolderPath group.
+                        _folderPath = Path.GetDirectoryName(_filePath)!;
                     }
                     catch (System.Exception ex)
                     {

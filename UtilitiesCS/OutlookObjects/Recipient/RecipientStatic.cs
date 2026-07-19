@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -21,7 +22,7 @@ namespace UtilitiesCS
         private const string PR_SMTP_ADDRESS =
             "http://schemas.microsoft.com/mapi/proptag/0x39FE001E";
 
-        public static Outlook.AddressList GetGlobalAddressList(
+        public static Outlook.AddressList? GetGlobalAddressList(
             this Outlook.Store store,
             Outlook.Application olApp
         )
@@ -126,7 +127,7 @@ namespace UtilitiesCS
 
             // Prefer the Exchange directory primary SMTP over the mail-item field, which
             // may contain a stale or X500 Exchange DN address.
-            string address = null;
+            string? address = null;
             try
             {
                 if (IsExchangeAddressEntry(sender))
@@ -363,7 +364,7 @@ namespace UtilitiesCS
             }
         }
 
-        public static Recipient ToResolvedRecipient(
+        public static Recipient? ToResolvedRecipient(
             this AddressEntry addressEntry,
             Outlook.NameSpace ns
         )
@@ -398,7 +399,7 @@ namespace UtilitiesCS
             return recipients.Select(x => x.GetInfo());
         }
 
-        public static RecipientInfo GetInfo(this Recipient recipient, SegmentStopWatch sw = null)
+        public static RecipientInfo GetInfo(this Recipient recipient, SegmentStopWatch? sw = null)
         {
             (var name, var address) = GetRecipientInfo(recipient);
             sw?.LogDuration("GetRecipientInfo");
@@ -501,9 +502,9 @@ namespace UtilitiesCS
         }
 
         internal static (
-            string FirstName,
-            string LastName,
-            string DomainName
+            string? FirstName,
+            string? LastName,
+            string? DomainName
         ) ExtractNameFromAddress(string address)
         {
             var rx = new Regex(@"^(.+)@([^@]+)$");

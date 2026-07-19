@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,7 +24,7 @@ namespace UtilitiesCS
             int milliseconds,
             int maxAttempts,
             bool strict,
-            Func<int, CancellationTokenSource> timeoutSourceFactory = null
+            Func<int, CancellationTokenSource>? timeoutSourceFactory = null
         )
         {
             return await function.RunWithTimeout(
@@ -43,7 +44,7 @@ namespace UtilitiesCS
             int maxAttempts,
             bool strict,
             int attempt,
-            Func<int, CancellationTokenSource> timeoutSourceFactory = null
+            Func<int, CancellationTokenSource>? timeoutSourceFactory = null
         )
         {
             token.ThrowIfCancellationRequested();
@@ -56,7 +57,7 @@ namespace UtilitiesCS
                 timeoutSource.Token
             );
 
-            TResult result = default(TResult);
+            TResult result = default(TResult)!;
             try
             {
                 result = await Task.Run(() => function(), combinedToken.Token);
@@ -90,7 +91,7 @@ namespace UtilitiesCS
                 }
             }
 
-            return result;
+            return result!;
         }
 
         public static async Task<TResult> RunWithTimeout<TResult>(
@@ -121,7 +122,7 @@ namespace UtilitiesCS
                 timeoutSource.Token
             );
 
-            TResult result = default;
+            TResult result = default!;
             try
             {
                 result = await task(combinedToken.Token);
@@ -154,7 +155,7 @@ namespace UtilitiesCS
                 }
             }
 
-            return result;
+            return result!;
         }
 
         #endregion RunWithTimeout<TResult>
@@ -191,7 +192,7 @@ namespace UtilitiesCS
                 timeoutSource.Token
             );
 
-            TResult result = default;
+            TResult result = default!;
             try
             {
                 result = await Task.Run(() => function(arg1), combinedToken.Token);
@@ -225,7 +226,7 @@ namespace UtilitiesCS
                 }
             }
 
-            return result;
+            return result!;
         }
 
         public static async Task<TResult> RunWithTimeout<T1, TResult>(
@@ -258,7 +259,7 @@ namespace UtilitiesCS
                 timeoutSource.Token
             );
 
-            TResult result = default;
+            TResult result = default!;
 
             try
             {
@@ -295,7 +296,7 @@ namespace UtilitiesCS
                 }
             }
 
-            return result;
+            return result!;
         }
 
         #endregion RunWithTimeout<T1, TResult>
@@ -342,7 +343,7 @@ namespace UtilitiesCS
                 timeoutSource.Token
             );
 
-            TResult result = default(TResult);
+            TResult result = default(TResult)!;
             try
             {
                 result = await Task.Run(() => function(arg1, arg2), combinedToken.Token);
@@ -377,7 +378,7 @@ namespace UtilitiesCS
                 }
             }
 
-            return result;
+            return result!;
         }
 
         public static async Task<TResult> RunWithTimeout<T1, T2, TResult>(
@@ -420,7 +421,7 @@ namespace UtilitiesCS
                 timeoutSource.Token
             );
 
-            TResult result = default(TResult);
+            TResult result = default(TResult)!;
             try
             {
                 result = await task(arg1, arg2, cancel);
@@ -455,7 +456,7 @@ namespace UtilitiesCS
                 }
             }
 
-            return result;
+            return result!;
         }
 
         public static async Task RunWithTimeout<T1, T2>(
@@ -572,7 +573,7 @@ namespace UtilitiesCS
                 timeoutSource.Token
             );
 
-            TResult result = default;
+            TResult result = default!;
             try
             {
                 result = await Task.Run(() => function(arg1, arg2, arg3), combinedToken.Token);
@@ -608,7 +609,7 @@ namespace UtilitiesCS
                 }
             }
 
-            return result;
+            return result!;
         }
 
         public static async Task<TResult> RunWithTimeout<T1, T2, T3, TResult>(
@@ -654,7 +655,7 @@ namespace UtilitiesCS
                 timeoutSource.Token
             );
 
-            TResult result = default;
+            TResult result = default!;
             try
             {
                 result = await task(arg1, arg2, arg3, cancel);
@@ -690,7 +691,7 @@ namespace UtilitiesCS
                 }
             }
 
-            return result;
+            return result!;
         }
 
         public static async Task RunWithTimeout<T1, T2, T3>(
@@ -789,10 +790,10 @@ namespace UtilitiesCS
                     proxy.TrySetCanceled();
                     break;
                 case TaskStatus.RanToCompletion:
-                    Task<TResult> castedSource = source as Task<TResult>;
+                    Task<TResult>? castedSource = source as Task<TResult>;
                     proxy.TrySetResult(
                         castedSource == null
-                            ? default(TResult)
+                            ? default(TResult)!
                             : // source is a Task
                             castedSource.Result
                     ); // source is a Task<TResult>
@@ -808,7 +809,7 @@ namespace UtilitiesCS
             int repeatAttempts
         )
         {
-            Task<TResult> result = default;
+            Task<TResult> result = null!;
 
             try
             {
@@ -826,7 +827,7 @@ namespace UtilitiesCS
                     logger.Warn($"Task timed out after {repeatAttempts} attempts.");
                 }
             }
-            return result;
+            return result!;
         }
 
         /// <summary>
@@ -898,7 +899,7 @@ namespace UtilitiesCS
 
         public static Task TimeoutAfter(this Task task, int millisecondsTimeout, int repeatAttempts)
         {
-            Task result = default;
+            Task result = null!;
 
             try
             {
@@ -911,7 +912,7 @@ namespace UtilitiesCS
                     result = task.TimeoutAfter(millisecondsTimeout, repeatAttempts - 1);
                 }
             }
-            return result;
+            return result!;
         }
 
         public static Task TimeoutAfter(this Task task, int millisecondsTimeout)

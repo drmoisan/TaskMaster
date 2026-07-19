@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -32,7 +33,7 @@ namespace UtilitiesCS
             bool QuickLoad = false,
             bool WholeConversation = true,
             string strSeed = "",
-            object objItem = null
+            object? objItem = null
         )
         {
             throw new NotImplementedException();
@@ -140,8 +141,8 @@ namespace UtilitiesCS
                 fsAncestorEquivalent,
                 out string destinationOlPath,
                 out string saveFsPath,
-                out string deleteFsPath,
-                out Folder destinationFolder
+                out string? deleteFsPath,
+                out Folder? destinationFolder
             );
 
             // Exit if the destination folder cannot be resolved
@@ -262,7 +263,7 @@ namespace UtilitiesCS
 
             // Move the email to the destination folder
 
-            MailItem mailItemNew = null;
+            MailItem? mailItemNew = null;
             MailItem mailItemOriginal = mailHelper.Item;
 
             try
@@ -325,7 +326,7 @@ namespace UtilitiesCS
                 fsAncestorEquivalent,
                 out string destinationOlPath,
                 out string saveFsPath,
-                out string deleteFsPath
+                out string? deleteFsPath
             );
 
             foreach (var mailItem in mailItems)
@@ -368,7 +369,7 @@ namespace UtilitiesCS
                 appGlobals.AF.SubjectMap.Add(mailItem.Subject, destinationOlStem);
 
                 // Move the email to the destination folder
-                Folder olDestination = null;
+                Folder? olDestination = null;
                 try
                 {
                     var folderHandler = new FolderPredictor(appGlobals);
@@ -389,7 +390,7 @@ namespace UtilitiesCS
                     //logger.Debug($"Folder with path {destinationOlPath} could not be resolved");
                 }
 
-                MailItem mailItemTemp = null;
+                MailItem? mailItemTemp = null;
 
                 try
                 {
@@ -413,10 +414,10 @@ namespace UtilitiesCS
                 }
 
                 // Add the email to the Undo Stack
-                PushToUndoStack(mailItem, mailItemTemp, appGlobals);
+                PushToUndoStack(mailItem, mailItemTemp!, appGlobals);
 
                 // Capture the move details in the log
-                await Task.Run(() => CaptureMoveDetails(mailItem, mailItemTemp, appGlobals))
+                await Task.Run(() => CaptureMoveDetails(mailItem, mailItemTemp!, appGlobals))
                     .ConfigureAwait(false);
             }
 
@@ -469,7 +470,7 @@ namespace UtilitiesCS
                 fsAncestorEquivalent,
                 out string destinationOlPath,
                 out string saveFsPath,
-                out string deleteFsPath
+                out string? deleteFsPath
             );
 
             foreach (var mailItem in mailItems)
@@ -626,7 +627,7 @@ namespace UtilitiesCS
         internal static IEnumerable<AttachmentHelper> GetAttachmentsInfo(
             MailItem mailItem,
             string saveFsPath,
-            string deleteFsPath,
+            string? deleteFsPath,
             bool saveAttachments,
             bool savePictures
         )
@@ -651,7 +652,7 @@ namespace UtilitiesCS
         internal static IAsyncEnumerable<AttachmentHelper> GetAttachmentsInfoAsync(
             MailItem mailItem,
             string saveFsPath,
-            string deleteFsPath,
+            string? deleteFsPath,
             bool saveAttachments,
             bool savePictures
         )
@@ -983,7 +984,7 @@ namespace UtilitiesCS
             string fsAncestorEquivalent,
             out string destinationOlPath,
             out string saveFsPath,
-            out string deleteFsPath
+            out string? deleteFsPath
         )
         {
             //TraceUtility.LogMethodCall(mailItems, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent);
@@ -1018,8 +1019,8 @@ namespace UtilitiesCS
             string fsAncestorEquivalent,
             out string destinationOlPath,
             out string saveFsPath,
-            out string deleteFsPath,
-            out Folder destinationFolder
+            out string? deleteFsPath,
+            out Folder? destinationFolder
         )
         {
             //TraceUtility.LogMethodCall(currentFolder, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent);
@@ -1354,8 +1355,8 @@ namespace UtilitiesCS
             string strFileLocation
         )
         {
-            string[] strOutput = null;
-            string[,] strAryOutput;
+            string[]? strOutput = null;
+            string[,]? strAryOutput;
             if (File.Exists(Path.Combine(strFileName, strFileLocation)))
             {
                 strAryOutput = new string[14, 2];
@@ -1382,7 +1383,7 @@ namespace UtilitiesCS
         }
 
         [ExcludeFromCodeCoverage]
-        private static void SanitizeArray(string[,] strAryOutput, ref string[] strOutput)
+        private static void SanitizeArray(string[,]? strAryOutput, ref string[]? strOutput)
         {
             if (strAryOutput == null)
             {
@@ -1392,7 +1393,7 @@ namespace UtilitiesCS
             {
                 for (int j = 0; j < strAryOutput.GetLength(0); j++)
                 {
-                    strOutput[j] = string.Join(
+                    strOutput![j] = string.Join(
                         "\t",
                         strAryOutput
                             .SliceRow(j)

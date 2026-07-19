@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Runtime.InteropServices.ComTypes;
 using iop = System.Runtime.InteropServices;
 

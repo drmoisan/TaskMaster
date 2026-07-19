@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -62,7 +63,7 @@ namespace ObjectListViewDemo
         /// <param name="isSmallImage">True if the small (16x16) icon is required, otherwise the 32x32 icon will be returned</param>
         /// <param name="useFileType">If this is true, only the file extension will be considered</param>
         /// <returns>The icon of the given file, or null if something goes wrong</returns>
-        public Icon GetFileIcon(string path, bool isSmallImage, bool useFileType)
+        public Icon? GetFileIcon(string path, bool isSmallImage, bool useFileType)
         {
             int flags = SHGFI_ICON;
             if (isSmallImage)

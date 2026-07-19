@@ -1,4 +1,5 @@
-﻿namespace UtilitiesCS
+﻿#nullable enable
+namespace UtilitiesCS
 {
     public class CtfMapEntry
     {
@@ -11,17 +12,17 @@
             _emailCount = emailCount;
         }
 
-        private string _emailFolder;
-        private string _conversationID;
+        private string? _emailFolder;
+        private string? _conversationID;
         private int _emailCount;
 
-        public string EmailFolder
+        public string? EmailFolder
         {
             get => _emailFolder;
             set => _emailFolder = value;
         }
 
-        public string ConversationID
+        public string? ConversationID
         {
             get => _conversationID;
             set => _conversationID = value;

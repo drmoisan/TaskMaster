@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿#nullable enable
+using System.Diagnostics;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 
@@ -6,13 +7,13 @@ namespace UtilitiesCS
 {
     public static class CreateCategoryModule
     {
-        public static Category CreateCategory(
+        public static Category? CreateCategory(
             this NameSpace olNS,
             IPrefix prefix,
             string newCatName
         )
         {
-            Category objCategory = null;
+            Category? objCategory = null;
 
             string strTemp;
 

@@ -308,18 +308,18 @@ without introducing any undeclared cross-cluster dependency edge.
 
 Acceptance criteria (from `issue.md`, mapped here for traceability):
 
-- [ ] AC1: Every one of the 14 in-scope files (12 `Dialogs/` remediation targets +
+- [x] AC1: Every one of the 14 in-scope files (12 `Dialogs/` remediation targets +
   `ExtraDeclarations.cs` + `AssemblyInfo.cs`) carries `#nullable enable` and compiles with zero
   nullable (CS86xx) diagnostics under the per-file pragma with `TreatWarningsAsErrors`.
-- [ ] AC2: No project-level or solution-level `<Nullable>` element is introduced;
+- [x] AC2: No project-level or solution-level `<Nullable>` element is introduced;
   `UtilitiesCS.csproj` retains none.
-- [ ] AC3: No behavior change to dialog display, button-wrapper, or MyBox logic; existing
+- [x] AC3: No behavior change to dialog display, button-wrapper, or MyBox logic; existing
   `UtilitiesCS.Test/Dialogs/` tests still pass.
-- [ ] AC4: No coverage regression on changed lines.
-- [ ] AC5: Public signatures of the remediated types remain behavior-compatible; nullability
+- [x] AC4: No coverage regression on changed lines.
+- [x] AC5: Public signatures of the remediated types remain behavior-compatible; nullability
   annotations reflect actual null behavior and are consistent with the consumed
   `WinFormsExtensions.Clone<T>()` contract from `utilitiescs-nullable-extensions` (#363).
-- [ ] AC6: Non-remediated files (the 4 Designer-generated files and every other file outside
+- [x] AC6: Non-remediated files (the 4 Designer-generated files and every other file outside
   this cluster) remain non-opted-in and are not cross-blocked; the change is independently
   mergeable under the per-file pragma architecture.
 

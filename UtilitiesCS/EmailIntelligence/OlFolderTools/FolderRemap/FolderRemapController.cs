@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -58,7 +59,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             get => _folderRemapTree;
         }
 
-        private List<OlFolderRemap> _mappings2;
+        private List<OlFolderRemap> _mappings2 = null!;
         public List<OlFolderRemap> Mappings2
         {
             get => _mappings2;
@@ -91,7 +92,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
                 if (
                     !_globals.TD.FolderRemap.TryAdd(
                         mapping.RelativePath,
-                        mapping.MappedTo.RelativePath
+                        mapping.MappedTo!.RelativePath
                     )
                 )
                     _globals.TD.FolderRemap[mapping.RelativePath] = mapping.MappedTo.RelativePath;
@@ -149,9 +150,9 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             {
                 var sourceModels = e.SourceModels.Cast<TreeNode<OlFolderRemap>>();
                 var target = e.TargetModel as TreeNode<OlFolderRemap>;
-                if (target.Value.MappedTo is not null)
+                if (target!.Value.MappedTo is not null)
                     e.InfoMessage =
-                        $"Target {target.Value.Name} is mapped to another folder {target.Value.MappedTo.Name}";
+                        $"Target {target.Value.Name} is mapped to another folder {target.Value.MappedTo!.Name}";
                 //if (sourceModels.Any(x => target.IsAncestor(x)))
                 //    e.InfoMessage = "Cannot drop on descendant (think of the temporal paradoxes!)";
                 //else
@@ -186,8 +187,8 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         }
 
         private void MoveObjectsToChildren(
-            TreeListView targetTree,
-            TreeListView sourceTree,
+            TreeListView? targetTree,
+            TreeListView? sourceTree,
             TreeNode<OlFolderRemap> target,
             IList toMove
         )

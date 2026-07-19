@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 
 namespace UtilitiesCS.Threading
@@ -29,14 +30,14 @@ namespace UtilitiesCS.Threading
         /// </summary>
         public const string StoresEnumerationPhaseIdentity = "<Stores-enumeration>";
 
-        private static volatile string _current;
+        private static volatile string? _current;
 
         /// <summary>
         /// The identity of the store currently being processed, or <see langword="null"/> when no
         /// per-store scope is active ("no context"). This is a plain in-memory field read: no COM,
         /// no blocking. Safe to call from the watchdog's background thread.
         /// </summary>
-        public static string Current => _current;
+        public static string? Current => _current;
 
         /// <summary>
         /// Opens an ambient scope naming the store currently being processed. Captures the previous
@@ -51,14 +52,14 @@ namespace UtilitiesCS.Threading
         /// The already-cached store identity (typically <c>DisplayName</c>). No COM read is performed.
         /// </param>
         /// <returns>An <see cref="IDisposable"/> that restores the previous ambient value on dispose.</returns>
-        public static IDisposable Begin(string storeIdentity)
+        public static IDisposable Begin(string? storeIdentity)
         {
             var previous = _current;
             _current = Normalize(storeIdentity);
             return new Scope(previous);
         }
 
-        private static string Normalize(string storeIdentity)
+        private static string? Normalize(string? storeIdentity)
         {
             if (string.IsNullOrWhiteSpace(storeIdentity))
             {
@@ -75,10 +76,10 @@ namespace UtilitiesCS.Threading
 
         private sealed class Scope : IDisposable
         {
-            private readonly string _previous;
+            private readonly string? _previous;
             private bool _disposed;
 
-            internal Scope(string previous)
+            internal Scope(string? previous)
             {
                 _previous = previous;
             }

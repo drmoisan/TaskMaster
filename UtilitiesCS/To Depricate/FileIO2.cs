@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -105,7 +106,7 @@ namespace UtilitiesCS
             }
         }
 
-        public static string[] CSV_ReadTxtF(
+        public static string[]? CSV_ReadTxtF(
             string filename,
             string folderpath,
             bool skipHeaders = true
@@ -131,7 +132,11 @@ namespace UtilitiesCS
             }
         }
 
-        public static string[] CsvRead(string filename, string folderpath, bool skipHeaders = false)
+        public static string[]? CsvRead(
+            string filename,
+            string folderpath,
+            bool skipHeaders = false
+        )
         {
             string filepath = Path.Combine(folderpath, filename);
 
@@ -208,8 +213,8 @@ namespace UtilitiesCS
             string delimiter = ","
         )
         {
-            string[] array1D = CsvRead(filename, folderpath, skipHeaders);
-            return SplitArrayTo2D(array1D, delimiter);
+            string[]? array1D = CsvRead(filename, folderpath, skipHeaders);
+            return SplitArrayTo2D(array1D!, delimiter);
         }
 
         public static string[][] CsvReadToJagged(
@@ -219,8 +224,8 @@ namespace UtilitiesCS
             string delimiter = ","
         )
         {
-            string[] array1D = CsvRead(filename, folderpath, skipHeaders);
-            var jagged = array1D.Select(x => x.Split(delimiter, trim: true)).ToArray();
+            string[]? array1D = CsvRead(filename, folderpath, skipHeaders);
+            var jagged = array1D!.Select(x => x.Split(delimiter, trim: true)).ToArray();
             return jagged;
         }
     }

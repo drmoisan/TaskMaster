@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -53,7 +54,7 @@ namespace ObjectListViewDemo
             get { return this.AsDirectory != null; }
         }
 
-        public IDirectoryInfo AsDirectory
+        public IDirectoryInfo? AsDirectory
         {
             get { return this.info as IDirectoryInfo; }
         }
@@ -71,7 +72,7 @@ namespace ObjectListViewDemo
         //        return di;
         //    }
         //}
-        public IFileInfo AsFile
+        public IFileInfo? AsFile
         {
             get { return this.info as IFileInfo; }
         }
@@ -114,7 +115,8 @@ namespace ObjectListViewDemo
 
         public long Length
         {
-            get { return this.AsFile.Length; }
+            // Behavior-preserving `!`: accessing Length on a non-file throws, exactly as before.
+            get { return this.AsFile!.Length; }
         }
 
         public IEnumerable GetFileSystemInfos()
@@ -122,7 +124,8 @@ namespace ObjectListViewDemo
             ArrayList children = new ArrayList();
             if (this.IsDirectory)
             {
-                foreach (IFileSystemInfo x in this.AsDirectory.GetFileSystemInfos())
+                // IsDirectory guarantees AsDirectory is non-null.
+                foreach (IFileSystemInfo x in this.AsDirectory!.GetFileSystemInfos())
                     children.Add(new MyFileSystemInfo(x));
             }
             return children;
@@ -130,7 +133,7 @@ namespace ObjectListViewDemo
 
         // Two file system objects are equal if they point to the same file system path
 
-        public bool Equals(MyFileSystemInfo other)
+        public bool Equals(MyFileSystemInfo? other)
         {
             if (ReferenceEquals(null, other))
                 return false;
@@ -139,7 +142,7 @@ namespace ObjectListViewDemo
             return Equals(other.info.FullName, this.info.FullName);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj))
                 return false;
@@ -155,12 +158,12 @@ namespace ObjectListViewDemo
             return (this.info != null ? this.info.FullName.GetHashCode() : 0);
         }
 
-        public static bool operator ==(MyFileSystemInfo left, MyFileSystemInfo right)
+        public static bool operator ==(MyFileSystemInfo? left, MyFileSystemInfo? right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(MyFileSystemInfo left, MyFileSystemInfo right)
+        public static bool operator !=(MyFileSystemInfo? left, MyFileSystemInfo? right)
         {
             return !Equals(left, right);
         }
