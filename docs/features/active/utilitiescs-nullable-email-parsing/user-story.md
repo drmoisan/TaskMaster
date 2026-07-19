@@ -62,22 +62,22 @@ cross-module contracts this cluster relies on for correct null-flow analysis.
 
 ## Acceptance Criteria
 
-- [ ] AC1: Every `.cs` file in the cluster (`EmailParsingSorting/`, `SubjectMap/`, `Ctf/`) that
+- [x] AC1: Every `.cs` file in the cluster (`EmailParsingSorting/`, `SubjectMap/`, `Ctf/`) that
   emits CS86xx carries `#nullable enable` and compiles with zero nullable diagnostics under the
   per-file pragma with `TreatWarningsAsErrors`, so that the repaired gate can enforce this
   cluster without a global `/p:Nullable=enable` flag.
-- [ ] AC2: No project-level `<Nullable>` element is introduced into `UtilitiesCS.csproj`, so
+- [x] AC2: No project-level `<Nullable>` element is introduced into `UtilitiesCS.csproj`, so
   that the per-file opt-in architecture required by the epic is preserved.
-- [ ] AC3: No behavior change to parsing/sorting logic; existing tests still pass, so that the
+- [x] AC3: No behavior change to parsing/sorting logic; existing tests still pass, so that the
   remediation is verifiably annotation-only.
-- [ ] AC4: No coverage regression on changed lines, so that the annotation work does not
+- [x] AC4: No coverage regression on changed lines, so that the annotation work does not
   introduce untested executable paths (for example new runtime null guards).
-- [ ] AC5: Public signatures of the remediated types remain behavior-compatible; nullability
+- [x] AC5: Public signatures of the remediated types remain behavior-compatible; nullability
   annotations reflect actual null behavior and are consistent with the upstream
   `utilitiescs-nullable-extensions` annotation contracts they consume, so that this cluster's
   contracts do not propagate an incorrect null-state assumption to any other cluster or to the
   Wave-2 capstone.
-- [ ] AC6: Non-remediated files remain non-opted-in and are not cross-blocked; the change is
+- [x] AC6: Non-remediated files remain non-opted-in and are not cross-blocked; the change is
   independently mergeable under the per-file pragma architecture, so that this feature can merge
   without waiting on `utilitiescs-nullable-email-classifier` or any other Wave-1/Wave-2 sibling.
 
