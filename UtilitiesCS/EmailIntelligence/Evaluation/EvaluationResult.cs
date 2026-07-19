@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 
 namespace UtilitiesCS.EmailIntelligence.Evaluation

@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS.Dialogs;
 
+#nullable enable
+
 namespace UtilitiesCS
 {
     public enum BoxIcon
@@ -90,7 +92,7 @@ namespace UtilitiesCS
             return result;
         }
 
-        public static T ShowDialog<T>(
+        public static T? ShowDialog<T>(
             MyBoxViewer viewer,
             string Message,
             string Title,
@@ -148,7 +150,7 @@ namespace UtilitiesCS
             return ShowDialog(viewer, message, title, icon, actionButtons);
         }
 
-        public static T ShowDialog<T>(
+        public static T? ShowDialog<T>(
             string message,
             string title,
             BoxIcon icon,
@@ -236,7 +238,7 @@ namespace UtilitiesCS
         public class FunctionButtonGroup<T>
         {
             public List<FunctionButton<T>> FunctionButtons { get; set; } = [];
-            public T Result { get; set; }
+            public T? Result { get; set; }
         }
 
         internal static FunctionButtonGroup<T> ToFunctionButtonsAsync<T>(

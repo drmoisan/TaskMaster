@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Drawing;
@@ -24,7 +25,7 @@ namespace UtilitiesCS
         TreeListView IFilterOlFoldersViewer.TlvNotFiltered => TlvNotFiltered;
         TreeListView IFilterOlFoldersViewer.TlvFiltered => TlvFiltered;
 
-        private FilterOlFoldersController _controller;
+        private FilterOlFoldersController _controller = null!;
 
         public void SetController(FilterOlFoldersController controller)
         {

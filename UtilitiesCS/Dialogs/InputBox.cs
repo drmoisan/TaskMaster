@@ -2,6 +2,8 @@
 using System.Threading;
 using System.Windows.Forms;
 
+#nullable enable
+
 namespace UtilitiesCS
 {
     /// <summary>
@@ -66,7 +68,7 @@ namespace UtilitiesCS
         /// Side Effects:
         ///     Disposes the viewer form before returning.
         /// </summary>
-        public static string ShowDialog(
+        public static string? ShowDialog(
             string Prompt,
             string Title = "",
             string DefaultResponse = ""

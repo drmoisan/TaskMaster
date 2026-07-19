@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -20,7 +21,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         }
 
         [ExcludeFromCodeCoverage]
-        public static OlFolderRemap SelectFolder(IList<TreeNode<OlFolderRemap>> roots)
+        public static OlFolderRemap? SelectFolder(IList<TreeNode<OlFolderRemap>> roots)
         {
             var selector = new FolderSelector();
             selector.Initialize(roots);
@@ -50,7 +51,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             };
         }
 
-        internal OlFolderRemap Selection => _selection;
-        private OlFolderRemap _selection = null;
+        internal OlFolderRemap? Selection => _selection;
+        private OlFolderRemap? _selection = null;
     }
 }

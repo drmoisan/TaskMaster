@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -18,8 +19,17 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace ToDoModel.Data_Model.People
 {
+    // The base type ScoDictionaryNew<,>/ConcurrentObservableDictionary<,> (ReusableTypeClasses #366)
+    // is still nullable-oblivious on this branch, so evaluating this class's inherited interface
+    // implementations in a nullable-enabled context raises CS8644 (interface-member nullability of the
+    // base's implementation "doesn't match"). This is the undeclared #366 edge recorded in spec.md
+    // Maintainer Decisions item 5; it cannot be annotated away with ?/!/= null! and #366 is out of
+    // scope for this child. The class declaration line is therefore kept in an oblivious region while
+    // the member bodies below remain nullable-enabled and fully checked (CS8618/CS8602/CS8603/CS8625).
+#nullable disable
     public class PeopleScoDictionaryNew : ScoDictionaryNew<string, string>, IPeopleScoDictionaryNew
     {
+#nullable enable
         //private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
         //    System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -44,10 +54,10 @@ namespace ToDoModel.Data_Model.People
         #endregion Constructors
 
         [JsonProperty]
-        internal IApplicationGlobals Globals { get; set; }
+        internal IApplicationGlobals Globals { get; set; } = null!;
 
         [JsonIgnore]
-        private IPrefix _prefix;
+        private IPrefix _prefix = null!;
         public IPrefix Prefix
         {
             get => _prefix;
@@ -131,9 +141,9 @@ namespace ToDoModel.Data_Model.People
         }
 
         [ExcludeFromCodeCoverage]
-        public string AddMissingEntry(string address) //internal
+        public string? AddMissingEntry(string address) //internal
         {
-            var newPerson = SplitAddressToFirstLastName(address);
+            string? newPerson = SplitAddressToFirstLastName(address);
             var existingPeople = GetPeopleCatNames();
             var matchResult = MatchToExisting(existingPeople, newPerson);
             if (matchResult.IsNullOrEmpty())
@@ -176,7 +186,7 @@ namespace ToDoModel.Data_Model.People
         }
 
         [ExcludeFromCodeCoverage]
-        public string RefineValidateCategory(string newPerson, IPrefix prefix)
+        public string? RefineValidateCategory(string newPerson, IPrefix prefix)
         {
             bool continueAsking = true;
             while (continueAsking)

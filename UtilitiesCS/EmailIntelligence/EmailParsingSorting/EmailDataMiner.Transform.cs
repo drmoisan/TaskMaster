@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -123,7 +124,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             if (count == 0)
             {
                 progress.Report(100);
-                return default;
+                return default!;
             }
 
             var cBag = await AsyncMultiTasker.AsyncMultiTaskChunker(
@@ -263,9 +264,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public async Task<MinedMailInfo[]> ToMinedMail(IItemInfo[] items)
         {
-            return await Task.Run(() =>
-                items?.Select(item => new MinedMailInfo(item))?.ToArray() ?? null
-            );
+            return (
+                await Task.Run(() =>
+                    items?.Select(item => new MinedMailInfo(item))?.ToArray() ?? null
+                )
+            )!;
         }
 
         public async Task<MinedMailInfo[]> FilterExcluded(MinedMailInfo[] items)
@@ -273,7 +276,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return await Task.Run(() =>
                 items
                     .Where(x =>
-                        !_globals.TD.FilteredFolderScraping.ContainsKey(x.FolderInfo.RelativePath)
+                        !_globals.TD.FilteredFolderScraping.ContainsKey(x.FolderInfo!.RelativePath)
                     )
                     .ToArray()
             );
@@ -285,10 +288,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 foreach (var item in items)
                 {
-                    if (_globals.TD.FolderRemap.ContainsKey(item.FolderInfo.RelativePath))
+                    if (_globals.TD.FolderRemap.ContainsKey(item.FolderInfo!.RelativePath))
                     {
-                        item.FolderInfo.RelativePath = _globals.TD.FolderRemap[
-                            item.FolderInfo.RelativePath
+                        item.FolderInfo!.RelativePath = _globals.TD.FolderRemap[
+                            item.FolderInfo!.RelativePath
                         ];
                     }
                 }
@@ -325,7 +328,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             List<Tin> list = [];
             for (int i = 0; i < count; i++)
             {
-                Tin obj = await Task.Run(() => Deserialize<Tin>($"{tInName}_{i:0000}"));
+                Tin? obj = await Task.Run(() => Deserialize<Tin>($"{tInName}_{i:0000}"));
                 if (obj is not null)
                 {
                     list.Add(obj);
@@ -400,7 +403,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 fileName = tName;
             }
-            T result = await EmailDataMiner.DeserializeAsync<T>(folderPath, fileName);
+            T result = (await EmailDataMiner.DeserializeAsync<T>(folderPath, fileName))!;
 
             return result;
         }

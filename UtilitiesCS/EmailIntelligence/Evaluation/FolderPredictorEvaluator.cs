@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -122,14 +123,14 @@ namespace UtilitiesCS.EmailIntelligence.Evaluation
                     continue;
                 }
 
-                leaves.Add(trueLeaf);
-                var predicted = PredictTop(predictor, example.Tokens);
+                leaves.Add(trueLeaf!);
+                var predicted = PredictTop(predictor, example!.Tokens);
 
                 if (predicted is null)
                 {
                     // Abstention: counts as a false negative for the true class and a true negative
                     // for every other class. It never increments any class's false positives.
-                    Increment(falseNegatives, trueLeaf);
+                    Increment(falseNegatives, trueLeaf!);
                     abstentions++;
                     continue;
                 }
@@ -137,14 +138,14 @@ namespace UtilitiesCS.EmailIntelligence.Evaluation
                 leaves.Add(predicted);
                 if (string.Equals(predicted, trueLeaf, StringComparison.Ordinal))
                 {
-                    Increment(truePositives, trueLeaf);
+                    Increment(truePositives, trueLeaf!);
                 }
                 else
                 {
                     // A wrong, non-abstaining prediction is a false positive for the predicted class
                     // and a false negative for the true class.
                     Increment(falsePositives, predicted);
-                    Increment(falseNegatives, trueLeaf);
+                    Increment(falseNegatives, trueLeaf!);
                 }
             }
 
@@ -175,7 +176,7 @@ namespace UtilitiesCS.EmailIntelligence.Evaluation
 
         // Returns the highest-probability predicted leaf, or null when the predictor abstains
         // (an empty classification result).
-        private static string PredictTop(IFolderPredictor predictor, string[] tokens)
+        private static string? PredictTop(IFolderPredictor predictor, string[] tokens)
         {
             var top = predictor.Classify(tokens ?? Array.Empty<string>()).Take(1).ToArray();
             return top.Length == 0 ? null : top[0].Class;

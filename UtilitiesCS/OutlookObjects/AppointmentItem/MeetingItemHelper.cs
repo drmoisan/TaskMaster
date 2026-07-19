@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -81,21 +82,25 @@ namespace UtilitiesCS
             _htmlBody = new(() => _item.RTFBody, true);
             _html = new(() => GetHtml(HTMLBody), true);
             _isTaskFlagSet = new(() => _item.FlagStatus == OlFlagStatus.olFlagMarked);
-            _olRecipients = new(() => _item.Recipients?.Cast<Recipient>().ToArray(), true);
+            _olRecipients = new(() => (_item.Recipients?.Cast<Recipient>().ToArray())!, true);
             _ccRecipients = new(
                 () =>
-                    OlRecipients
-                        ?.Where(x => x.Type == (int)OlMailRecipientType.olCC)
-                        .Select(x => x.GetInfo())
-                        .ToArray(),
+                    (
+                        OlRecipients
+                            ?.Where(x => x.Type == (int)OlMailRecipientType.olCC)
+                            .Select(x => x.GetInfo())
+                            .ToArray()
+                    )!,
                 true
             );
             _toRecipients = new(
                 () =>
-                    OlRecipients
-                        ?.Where(x => x.Type == (int)OlMailRecipientType.olTo)
-                        .Select(x => x.GetInfo())
-                        .ToArray(),
+                    (
+                        OlRecipients
+                            ?.Where(x => x.Type == (int)OlMailRecipientType.olTo)
+                            .Select(x => x.GetInfo())
+                            .ToArray()
+                    )!,
                 true
             );
             _toRecipientsName = new(
@@ -130,7 +135,7 @@ namespace UtilitiesCS
                 true
             );
             _attachmentsInfo = new(() =>
-                AttachmentsHelper?.Select(x => x.AttachmentInfo)?.ToArray()
+                (AttachmentsHelper?.Select(x => x.AttachmentInfo)?.ToArray())!
             );
             _appointment = new(() => _item.GetAssociatedAppointment(false), true);
             _internetCodepage = new(() => Appointment.InternetCodepage, true);
@@ -268,47 +273,47 @@ namespace UtilitiesCS
 
         #region Public Properties
 
-        internal Lazy<AppointmentItem> _appointment;
+        internal Lazy<AppointmentItem> _appointment = null!;
         public AppointmentItem Appointment
         {
-            get => _appointment?.Value;
+            get => (_appointment?.Value)!;
             set => _appointment = value.ToLazy();
         }
 
-        private MeetingItem _item;
+        private MeetingItem _item = null!;
 
-        private Lazy<string> _actionable;
+        private Lazy<string> _actionable = null!;
         public string Actionable
         {
-            get => _actionable?.Value;
+            get => (_actionable?.Value)!;
             set => _actionable = value.ToLazy();
         }
 
-        private Lazy<string> _body;
+        private Lazy<string> _body = null!;
         public string Body
         {
-            get => _body?.Value;
+            get => (_body?.Value)!;
             set => _body = value.ToLazy();
         }
 
-        private Lazy<string> _categories;
+        private Lazy<string> _categories = null!;
         public string Categories
         {
-            get => _categories?.Value;
+            get => (_categories?.Value)!;
             set => _categories = value.ToLazy();
         }
 
-        private Lazy<string> _conversationID;
+        private Lazy<string> _conversationID = null!;
         public string ConversationID
         {
-            get => _conversationID?.Value;
+            get => (_conversationID?.Value)!;
             set => _conversationID = value.ToLazy();
         }
 
-        private Lazy<string> _emailPrefixToStrip;
+        private Lazy<string> _emailPrefixToStrip = null!;
         public string EmailPrefixToStrip
         {
-            get => _emailPrefixToStrip?.Value;
+            get => (_emailPrefixToStrip?.Value)!;
             internal set => _emailPrefixToStrip = value.ToLazy();
         }
 
@@ -316,38 +321,38 @@ namespace UtilitiesCS
         //public string EntryId { get => PriorityInitialized(ref _entryId); set => _entryId = value; }
 
         //private Lazy<T> _entryId = new(() => { return default; }, true);
-        private Lazy<string> _entryId;
+        private Lazy<string> _entryId = null!;
         public string EntryId
         {
             get => _entryId.Value;
             set => _entryId = value.ToLazy();
         }
 
-        private Lazy<IApplicationGlobals> _globals;
+        private Lazy<IApplicationGlobals> _globals = null!;
         internal IApplicationGlobals Globals
         {
-            get => _globals?.Value;
+            get => (_globals?.Value)!;
             set => _globals = value.ToLazy();
         }
 
-        private Lazy<string> _storeId;
+        private Lazy<string> _storeId = null!;
         public string StoreId
         {
             get => _storeId.Value;
             set => _storeId = value.ToLazy();
         }
 
-        private Lazy<IFolderWrapper> _folderInfo;
+        private Lazy<IFolderWrapper> _folderInfo = null!;
         public IFolderWrapper FolderInfo
         {
-            get => _folderInfo?.Value;
+            get => (_folderInfo?.Value)!;
             set => _folderInfo = value.ToLazy();
         }
 
-        private Lazy<string> _folderName;
+        private Lazy<string> _folderName = null!;
         public string FolderName
         {
-            get => _folderName?.Value;
+            get => (_folderName?.Value)!;
             set => _folderName = value.ToLazy();
         }
 
@@ -368,58 +373,58 @@ namespace UtilitiesCS
             set => _plainTextOptions = value;
         }
 
-        public SegmentStopWatch Sw { get; set; }
+        public SegmentStopWatch? Sw { get; set; }
 
-        private Lazy<string> _sentOn;
+        private Lazy<string> _sentOn = null!;
         public virtual string SentOn
         {
-            get => _sentOn?.Value;
+            get => (_sentOn?.Value)!;
             set => _sentOn = value.ToLazy();
         }
 
-        private Lazy<string> _subject;
+        private Lazy<string> _subject = null!;
         public virtual string Subject
         {
-            get => _subject?.Value;
+            get => (_subject?.Value)!;
             set => _subject = value.ToLazy();
         }
 
-        private Lazy<string> _senderHtml;
+        private Lazy<string> _senderHtml = null!;
         public virtual string SenderHtml
         {
-            get => _senderHtml?.Value;
+            get => (_senderHtml?.Value)!;
             set => _senderHtml = value.ToLazy();
         }
 
-        private Lazy<string> _senderName;
+        private Lazy<string> _senderName = null!;
         public virtual string SenderName
         {
-            get => _senderName?.Value;
+            get => (_senderName?.Value)!;
             set => _senderName = value.ToLazy();
         }
 
-        private Lazy<IRecipientInfo> _sender;
+        private Lazy<IRecipientInfo> _sender = null!;
         public virtual IRecipientInfo Sender
         {
             get => _sender.Value;
             set => _sender = value.ToLazy();
         }
 
-        private Lazy<int> _size;
+        private Lazy<int> _size = null!;
         public virtual int Size
         {
             get => _size.Value;
             set => _size = value.ToLazyValue();
         }
 
-        private LazyTry<Recipient[]> _olRecipients;
+        private LazyTry<Recipient[]> _olRecipients = null!;
         internal virtual Recipient[] OlRecipients
         {
             get => _olRecipients.Value;
             set => _olRecipients = value.ToLazyTry();
         }
 
-        private Lazy<string> _ccRecipientsHtml;
+        private Lazy<string> _ccRecipientsHtml = null!;
         public virtual string CcRecipientsHtml
         {
             get => _ccRecipientsHtml.Value;
@@ -430,7 +435,7 @@ namespace UtilitiesCS
             }
         }
 
-        private Lazy<string> _ccRecipientsName;
+        private Lazy<string> _ccRecipientsName = null!;
         public virtual string CcRecipientsName
         {
             get => _ccRecipientsName.Value;
@@ -441,14 +446,14 @@ namespace UtilitiesCS
             }
         }
 
-        private Lazy<IRecipientInfo[]> _ccRecipients;
+        private Lazy<IRecipientInfo[]> _ccRecipients = null!;
         public virtual IRecipientInfo[] CcRecipients
         {
             get => _ccRecipients.Value;
             protected set => _ccRecipients = value.ToLazy();
         }
 
-        private Lazy<string> _toRecipientsHtml;
+        private Lazy<string> _toRecipientsHtml = null!;
         public virtual string ToRecipientsHtml
         {
             get => _toRecipientsHtml.Value;
@@ -459,7 +464,7 @@ namespace UtilitiesCS
             }
         }
 
-        private Lazy<string> _toRecipientsName;
+        private Lazy<string> _toRecipientsName = null!;
         public virtual string ToRecipientsName
         {
             get => _toRecipientsName.Value;
@@ -470,42 +475,42 @@ namespace UtilitiesCS
             }
         }
 
-        private Lazy<IRecipientInfo[]> _toRecipients;
+        private Lazy<IRecipientInfo[]> _toRecipients = null!;
         public virtual IRecipientInfo[] ToRecipients
         {
             get => _toRecipients.Value;
             protected set => _toRecipients = value.ToLazy();
         }
 
-        private Lazy<string> _triage;
+        private Lazy<string> _triage = null!;
         public virtual string Triage
         {
             get => _triage.Value;
             set => _triage = value.ToLazy();
         }
 
-        private Lazy<string> _html = null;
+        private Lazy<string> _html = null!;
         public virtual string Html
         {
             get => _html.Value;
             private set => _html = value.ToLazy();
         }
 
-        private Lazy<string> _htmlBody;
+        private Lazy<string> _htmlBody = null!;
         public virtual string HTMLBody
         {
             get => _htmlBody.Value;
             protected set => _htmlBody = value.ToLazy();
         }
 
-        private Lazy<DateTime> _sentDate;
+        private Lazy<DateTime> _sentDate = null!;
         public virtual DateTime SentDate
         {
             get => _sentDate.Value;
             set => _sentDate = value.ToLazyValue();
         }
 
-        private Lazy<AttachmentHelper[]> _attachmentsHelper;
+        private Lazy<AttachmentHelper[]> _attachmentsHelper = null!;
         public virtual AttachmentHelper[] AttachmentsHelper
         {
             get => _attachmentsHelper.Value;
@@ -527,10 +532,10 @@ namespace UtilitiesCS
             return attachments;
         }
 
-        private Lazy<IAttachment[]> _attachmentsInfo;
+        private Lazy<IAttachment[]> _attachmentsInfo = null!;
         public IAttachment[] AttachmentsInfo
         {
-            get => _attachmentsInfo?.Value;
+            get => (_attachmentsInfo?.Value)!;
             protected set => _attachmentsInfo = value.ToLazy();
         }
 
@@ -547,7 +552,7 @@ namespace UtilitiesCS
             get => _tokens.Value;
             protected set => _tokens = value.ToLazy();
         }
-        private Lazy<string[]> _tokens;
+        private Lazy<string[]> _tokens = null!;
 
         public async Task<IEnumerable<string>> TokenizeAsync()
         {
@@ -560,9 +565,9 @@ namespace UtilitiesCS
         {
             get => _tokenizer ??= new EmailTokenizer();
         }
-        private IEmailTokenizer _tokenizer;
+        private IEmailTokenizer _tokenizer = null!;
 
-        private Lazy<bool> _unread;
+        private Lazy<bool> _unread = null!;
         public bool UnRead
         {
             get => _unread.Value;
@@ -579,14 +584,14 @@ namespace UtilitiesCS
             get => _internetCodepage.Value;
             set => _internetCodepage = value.ToLazyValue();
         }
-        private Lazy<int> _internetCodepage;
+        private Lazy<int> _internetCodepage = null!;
 
         private int LoadInternetCodepage()
         {
             return Appointment.ThrowIfNull().InternetCodepage;
         }
 
-        private Lazy<bool> _isTaskFlagSet;
+        private Lazy<bool> _isTaskFlagSet = null!;
         public bool IsTaskFlagSet
         {
             get => _isTaskFlagSet.Value;
@@ -696,7 +701,6 @@ style='color:black'>"
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>";
         }
 
-#nullable enable
         private string? _emailHeader = null;
         internal string EmailHeader
         {
@@ -732,8 +736,6 @@ style='color:black'>"
                 return _emailHeader;
             }
         }
-
-#nullable disable
 
         internal string DarkModeHeader
         {
@@ -806,7 +808,7 @@ img {
 
         #region INotifyPropertyChanged
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -82,7 +83,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             return root;
         }
 
-        private List<TreeNode<OlFolderRemap>> _roots;
+        private List<TreeNode<OlFolderRemap>> _roots = null!;
         public List<TreeNode<OlFolderRemap>> Roots
         {
             get => _roots;
@@ -116,13 +117,13 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             {
                 TreeNode<OlFolderRemap> mapNode = remapTree
                     .SelectMany(x =>
-                        x.FindAll(x => x.Value.RelativePath == mapping.MappedTo.RelativePath)
+                        x.FindAll(x => x.Value.RelativePath == mapping.MappedTo!.RelativePath)
                     )
                     .FirstOrDefault();
 
                 if (mapNode == default(TreeNode<OlFolderRemap>))
                 {
-                    mapNode = new TreeNode<OlFolderRemap>(mapping.MappedTo);
+                    mapNode = new TreeNode<OlFolderRemap>(mapping.MappedTo!);
                     remapTree.Add(mapNode);
                 }
                 mapNode.AddChild(mapping);
@@ -182,7 +183,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         #endregion INotifyPropertyChanged
     }
@@ -199,14 +200,14 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             _name = olFolder.Name;
         }
 
-        private MAPIFolder _olRoot;
+        private MAPIFolder _olRoot = null!;
         public MAPIFolder OlRoot
         {
             get => _olRoot;
             set => _olRoot = value;
         }
 
-        private MAPIFolder _olFolder;
+        private MAPIFolder _olFolder = null!;
         public MAPIFolder OlFolder
         {
             get => _olFolder;
@@ -218,22 +219,22 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
             }
         }
 
-        private string _name;
+        private string _name = null!;
         public string Name
         {
             get => _name;
             private set => _name = value;
         }
 
-        private string _relativePath;
+        private string _relativePath = null!;
         public string RelativePath
         {
             get => _relativePath;
             private set => _relativePath = value;
         }
 
-        private OlFolderRemap _mappedTo;
-        public OlFolderRemap MappedTo
+        private OlFolderRemap? _mappedTo;
+        public OlFolderRemap? MappedTo
         {
             get => _mappedTo;
             set
@@ -254,7 +255,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         //    }
         //}
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {

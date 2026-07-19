@@ -70,26 +70,26 @@ future PRs" outcome the epic exists to prevent.
 
 ## Acceptance Criteria
 
-- [ ] AC1: Every compiled in-scope hand-written file carries `#nullable enable` and produces zero
+- [x] AC1: Every compiled in-scope hand-written file carries `#nullable enable` and produces zero
   CS86xx diagnostics under the pragma-only build
   `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU"
   /p:TreatWarningsAsErrors=true`.
-- [ ] AC2: No `<Nullable>` element is added to `UtilitiesCS.csproj` or the solution; verification
+- [x] AC2: No `<Nullable>` element is added to `UtilitiesCS.csproj` or the solution; verification
   uses the pragma-only command with no global `/p:Nullable=enable`.
-- [ ] AC3: The 6 `*.Designer.cs` files under `OlFolderTools` are left oblivious (no pragma) and are
+- [x] AC3: The 6 `*.Designer.cs` files under `OlFolderTools` are left oblivious (no pragma) and are
   not cross-blocked.
-- [ ] AC4: No behavior change — no new types, no post-condition attributes, no `record`/`record
+- [x] AC4: No behavior change — no new types, no post-condition attributes, no `record`/`record
   struct`/`init`, existing guards preserved, no new runtime guard beyond what reaching zero CS86xx
   strictly requires.
-- [ ] AC5: Annotations are consistent with the upstream extensions/helperclasses/threading
+- [x] AC5: Annotations are consistent with the upstream extensions/helperclasses/threading
   annotated signatures (for example `TimeOutTask.RunWithTimeout` returns non-null `Task<TResult>`;
   `StreamExtensions.TryCopyToAsyncWithTimeout` returns `Task<bool>`).
-- [ ] AC6: A clean baseline test run is captured before edits, and no test regressions or
+- [x] AC6: A clean baseline test run is captured before edits, and no test regressions or
   changed-line coverage regressions are attributable to this child.
-- [ ] AC7: The six Maintainer Decisions and Flags (dead duplicate exclusion, `MSDemoConv.cs`
+- [x] AC7: The six Maintainer Decisions and Flags (dead duplicate exclusion, `MSDemoConv.cs`
   decision, deprecation-marked files, `MailResolution_ToRemove`, the `ReusableTypeClasses` #366
   edge, and the three 500-line breaches) are recorded in `spec.md`.
-- [ ] AC8: No in-scope file exceeds 500 lines as a result of edits; the three pre-existing
+- [x] AC8: No in-scope file exceeds 500 lines as a result of edits; the three pre-existing
   >500-line files are flagged, not split.
 
 ## Non-Goals

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
@@ -148,7 +149,7 @@ namespace UtilitiesCS
         /// <param name="subject"></param>
         /// <param name="folderName"></param>
         /// <returns></returns>
-        public SubjectMapEntry Find(string subject, string folderName)
+        public SubjectMapEntry? Find(string subject, string folderName)
         {
             int idx = base.FindIndex(entry =>
                 (entry.EmailSubject == subject) && (entry.Folderpath == folderName)
