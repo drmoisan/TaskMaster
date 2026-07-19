@@ -95,15 +95,15 @@ Test-assembly resolution rule: the `UtilitiesCS.Test` assembly resolves at execu
 
 ### Phase 6 — Batch 5 EmailIntelligence Data Types
 
-- [ ] [P6-T1] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/FilterEntry.cs`; resolve the 2-arg-ctor CS8618 on `_description` with `private string _description = null!;` (behavior-preserving — keeps the current null) or `string?`; do NOT set `_description = ""` (that would change the runtime value).
+- [x] [P6-T1] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/FilterEntry.cs`; resolve the 2-arg-ctor CS8618 on `_description` with `private string _description = null!;` (behavior-preserving — keeps the current null) or `string?`; do NOT set `_description = ""` (that would change the runtime value).
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; runtime value unchanged.
-- [ ] [P6-T2] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/IntelligenceConfig.cs`; set `Config = null!` (or `?`), `LastResourceTimingBreakdown` to `string?`, and the filtered KVP value to `null!`; leave `ResourceTimingRow` as the existing plain `readonly struct` (no `record struct`/`init`, avoids CS0518 on net481).
+- [x] [P6-T2] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/IntelligenceConfig.cs`; set `Config = null!` (or `?`), `LastResourceTimingBreakdown` to `string?`, and the filtered KVP value to `null!`; leave `ResourceTimingRow` as the existing plain `readonly struct` (no `record struct`/`init`, avoids CS0518 on net481).
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no `record`/`init` introduced.
-- [ ] [P6-T3] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/Evaluation/FolderPredictorEvaluator.cs`; change `PredictTop` return to `string?`; because `string.IsNullOrEmpty` does NOT refine null-state on net481, apply justified `!` at the guaranteed-non-null sites (`trueLeaf!` for `leaves.Add`/`Increment`, `example!` for `example.Tokens`) rather than any new guard.
+- [x] [P6-T3] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/Evaluation/FolderPredictorEvaluator.cs`; change `PredictTop` return to `string?`; because `string.IsNullOrEmpty` does NOT refine null-state on net481, apply justified `!` at the guaranteed-non-null sites (`trueLeaf!` for `leaves.Add`/`Increment`, `example!` for `example.Tokens`) rather than any new guard.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no new runtime guard; `!` used only at guaranteed-non-null sites.
-- [ ] [P6-T4] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/People/PeopleScoDictionaryNew.cs`; set `Globals`/`_prefix` to `= null!` (behavior-preserving, preserves the existing deref) and change `AddMissingEntry`/`RefineValidateCategory` returns to `string?`.
+- [x] [P6-T4] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/People/PeopleScoDictionaryNew.cs`; set `Globals`/`_prefix` to `= null!` (behavior-preserving, preserves the existing deref) and change `AddMissingEntry`/`RefineValidateCategory` returns to `string?`.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no new runtime guard; existing `[ExcludeFromCodeCoverage]` members unchanged.
-- [ ] [P6-T5] Run the pragma-only rebuild and record Batch 5 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch5-pragma-verify.<timestamp>.md`.
+- [x] [P6-T5] Run the pragma-only rebuild and record Batch 5 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch5-pragma-verify.<timestamp>.md`.
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx across the four Batch 5 files.
 
 ### Phase 7 — Batch 6 OlFolderTools FilterOlFolders
